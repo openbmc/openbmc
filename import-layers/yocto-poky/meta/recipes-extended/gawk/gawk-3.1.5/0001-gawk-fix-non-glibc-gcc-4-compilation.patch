@@ -1,0 +1,67 @@
+From 53496e2e306b16ac59801553f775bcca164e6a39 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+Date: Wed, 14 Sep 2016 16:20:37 +0100
+Subject: [PATCH] fix gcc >= 4 compilation
+
+| ../gawk-3.1.5/hard-locale.h: In function 'hard_locale':
+| ../gawk-3.1.5/hard-locale.h:43:20: error: invalid storage class for function 'xmalloc'
+|        static ptr_t xmalloc PARAMS ((size_t n));
+|                     ^~~~~~~
+
+| ../gawk-3.1.5/hard-locale.h:45:22: warning: implicit declaration of function 'xmalloc' [-Wimplicit-function-declaration]
+|        char *locale = xmalloc (strlen (p) + 1);
+|                       ^~~~~~~
+| ../gawk-3.1.5/hard-locale.h:45:22: warning: initialization makes pointer from integer without a cast [-Wint-conversion]
+| ../gawk-3.1.5/dfa.c: At top level:
+| ../gawk-3.1.5/dfa.c:125:14: error: conflicting types for 'xmalloc'
+|  static ptr_t xmalloc PARAMS ((size_t n));
+|               ^~~~~~~
+| In file included from ../gawk-3.1.5/dfa.c:112:0:
+| ../gawk-3.1.5/hard-locale.h:45:22: note: previous implicit declaration of 'xmalloc' was here
+|        char *locale = xmalloc (strlen (p) + 1);
+|                       ^~~~~~~
+
+Upstream-Status: Inappropriate [required for gawk 3.1.5 (GPLv2) recipe only]
+
+Signed-off-by: André Draszik <git@andred.net>
+---
+ dfa.c         | 2 +-
+ hard-locale.h | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/dfa.c b/dfa.c
+index 71e3736..97f6045 100644
+--- a/dfa.c
++++ b/dfa.c
+@@ -109,6 +109,7 @@ extern void free();
+ 
+ #include "regex.h"
+ #include "dfa.h"
++static ptr_t xmalloc PARAMS ((size_t n));
+ #include "hard-locale.h"
+ 
+ /* HPUX, define those as macros in sys/param.h */
+@@ -122,7 +123,6 @@ extern void free();
+ static void dfamust PARAMS ((struct dfa *dfa));
+ 
+ static ptr_t xcalloc PARAMS ((size_t n, size_t s));
+-static ptr_t xmalloc PARAMS ((size_t n));
+ static ptr_t xrealloc PARAMS ((ptr_t p, size_t n));
+ #ifdef DEBUG
+ static void prtok PARAMS ((token t));
+diff --git a/hard-locale.h b/hard-locale.h
+index 0f4986b..9ee57e0 100644
+--- a/hard-locale.h
++++ b/hard-locale.h
+@@ -40,8 +40,6 @@ hard_locale (int category)
+       if (strcmp (p, "C") == 0 || strcmp (p, "POSIX") == 0)
+ 	hard = 0;
+ # else
+-      static ptr_t xmalloc PARAMS ((size_t n));
+-
+       char *locale = xmalloc (strlen (p) + 1);
+       strcpy (locale, p);
+ 
+-- 
+2.9.3
+

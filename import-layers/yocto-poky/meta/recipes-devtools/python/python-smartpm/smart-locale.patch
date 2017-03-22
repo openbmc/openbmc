@@ -1,0 +1,27 @@
+rpm or commands run by rpm can use output which isn't strictly acsii such
+as quotation characters around expression which are character 0xe2.
+
+Use utf-8 as an encoding rather than whatever the system suggests to
+ensure smart copes with this rather than erroring with unicode errors.
+
+RP 2016/5/19
+Upstream-Status: Pending
+
+
+Index: git/smart/backends/rpm/pm.py
+===================================================================
+--- git.orig/smart/backends/rpm/pm.py
++++ git/smart/backends/rpm/pm.py
+@@ -32,11 +32,7 @@ from smart.pm import PackageManager
+ from smart import sysconf, iface, Error, _
+ 
+ 
+-try:
+-    ENCODING = locale.getpreferredencoding()
+-except locale.Error:
+-    ENCODING = "ascii"
+-
++ENCODING = "utf-8"
+ 
+ def get_public_key(header):
+     return header.sprintf("%|DSAHEADER?{%{DSAHEADER:pgpsig}}:"

@@ -7,7 +7,7 @@ Subject: [PATCH 02/32] Add knob to control whether numa support should be
 otherwise undeterministic dependency will be generated
 during build depending upong numa being staged or not
 
-signed-off-by: Roy.Li <rongqing.li@windriver.com>
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  m4/ltp-numa.m4 | 10 +++++++++-

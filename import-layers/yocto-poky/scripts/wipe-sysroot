@@ -51,4 +51,4 @@ rm -rf $STAMPS_DIR/*/*/*.do_packagedata.*
 rm -rf $STAMPS_DIR/*/*/*.do_packagedata_setscene.*
 
 # The sstate manifests
-rm -rf $SSTATE_MANIFESTS/manifest-*.populate-sysroot
+rm -rf $SSTATE_MANIFESTS/manifest-*.populate_sysroot

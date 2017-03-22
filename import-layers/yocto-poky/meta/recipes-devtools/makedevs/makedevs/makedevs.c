@@ -360,7 +360,7 @@ static int interpret_table_entry(char *line)
 	unsigned long mode = 0755, uid = 0, gid = 0, major = 0, minor = 0;
 	unsigned long start = 0, increment = 1, count = 0;
 
-	if (0 > sscanf(line, "%40s %c %lo %40s %40s %lu %lu %lu %lu %lu", path,
+	if (0 > sscanf(line, "%4095s %c %lo %40s %40s %lu %lu %lu %lu %lu", path,
 		    &type, &mode, usr_buf, grp_buf, &major, &minor, &start,
 		    &increment, &count))
 	{
@@ -510,7 +510,7 @@ int main(int argc, char **argv)
 	umask (0);
 
 	if (argc==1) {
-		fprintf(stderr, helptext);
+		fputs( helptext , stderr );
 		exit(1);
 	}
 
@@ -525,7 +525,7 @@ int main(int argc, char **argv)
 				error_msg_and_die("%s: not a proper device table file", optarg);
 			break;
 		case 'h':
-			printf(helptext);
+			puts(helptext);
 			exit(0);
 		case 'r':
 		case 'd':				/* for compatibility with mkfs.jffs, genext2fs, etc... */
@@ -553,13 +553,13 @@ int main(int argc, char **argv)
 			printf("%s: %s\n", app_name, VERSION);
 			exit(0);
 		default:
-			fprintf(stderr, helptext);
+			fputs(helptext,stderr);
 			exit(1);
 		}
 	}
 
 	if (argv[optind] != NULL) {
-		fprintf(stderr, helptext);
+		fputs(helptext,stderr);
 		exit(1);
 	}
 

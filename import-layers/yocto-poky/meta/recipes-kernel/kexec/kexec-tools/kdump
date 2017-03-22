@@ -8,23 +8,7 @@
 #
 
 #default
-KDUMP_KVER="`uname -r`"
-KDUMP_KIMAGE="/boot/bzImage-${KDUMP_KVER}"
-KDUMP_CMDLINE="`cat /proc/cmdline`"
-KDUMP_CMDLINE_APPEND="kdump_needed maxcpus=1 irqpoll reset_devices"
-KDUMP_VMCORE_PATH="/var/crash/`date +"%Y-%m-%d"`"
-
-#get right kernel image
-march="`uname -m`"
-case ${march} in
-	x86*|i?86)
-		;;
-		*)
-		KDUMP_KIMAGE="/boot/uImage-${KDUMP_KVER}"
-		;;
-esac
-
-KEXEC=usr/sbin/kexec
+KEXEC=/usr/sbin/kexec
 KEXEC_ARGS="-p"
 
 MAKEDUMPFILE=/usr/bin/makedumpfile
@@ -34,6 +18,9 @@ LOGGER="logger -p info -t kdump"
 
 if [ -f /etc/sysconfig/kdump.conf ]; then
 	. /etc/sysconfig/kdump.conf
+else
+	echo "no /etc/sysconfig/kdump.conf"
+	exit 1;
 fi
 
 do_check()
@@ -41,24 +28,33 @@ do_check()
 	#check makedumpfile
 	if [ ! -e ${MAKEDUMPFILE} -o ! -x ${MAKEDUMPFILE} ] ;then
 		echo "No makedumpfile found."
-		return 1;
+		exit 0
 	fi
 
 	#check kexec
 	if [ ! -e ${KEXEC} -o ! -x ${KEXEC} ] ;then
 		echo "No kexec found."
-		return 1;
+		exit 0
 	fi
 
 	#check whether kdump kernel image exists on the system
-	if [ ! -f ${KDUMP_KIMAGE} ]; then
+	if [ -z "${KDUMP_KIMAGE}" -o ! -f "${KDUMP_KIMAGE}" ]; then
 		echo "No kdump kernel image found."
-		return 1
+		exit 0
+	fi
+
+	if [ "${KDUMP_CMDLINE}"x = "x" ] ; then
+		echo "KDUMP_CMDLINE is not configured"
+		exit 0
 	fi
 }
 
 do_save_vmcore()
 {
+	if [ ${KDUMP_VMCORE_PATH}x = x ]; then
+		KDUMP_VMCORE_PATH="/var/crash/`date +"%Y-%m-%d"`"
+	fi
+
 	mkdir -p ${KDUMP_VMCORE_PATH}
 	echo "Saving a vmcore to ${KDUMP_VMCORE_PATH}."
 
@@ -100,20 +96,6 @@ do_start()
 		${LOGGER} "Kdump isn't supported on the running kernel,please check boot option!!!"
 		return 1
 	fi
-
-	#handle kdump cmdline parameters, remove some useless options
-	kcmdline=""
-	for x in `cat /proc/cmdline`; do
-		case $x in
-			crashkernel*)
-				;;
-			*)
-				kcmdline="${kcmdline} $x"
-				;;
-		esac
-	done
-
-	KDUMP_CMDLINE="${kcmdline} ${KDUMP_CMDLINE_APPEND}"
 
 	#Load the kdump kernel image
 	${KEXEC} ${KEXEC_ARGS} "${KDUMP_KIMAGE}" --append="${KDUMP_CMDLINE}"

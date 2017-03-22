@@ -21,8 +21,8 @@
 
 from __future__ import unicode_literals
 
-from django.db import models, IntegrityError
-from django.db.models import F, Q, Avg, Max, Sum
+from django.db import models, IntegrityError, DataError
+from django.db.models import F, Q, Sum, Count
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 
@@ -32,9 +32,11 @@ from django.core import validators
 from django.conf import settings
 import django.db.models.signals
 
-import os.path
+import sys
+import os
 import re
 import itertools
+from signal import SIGUSR1
 
 import logging
 logger = logging.getLogger("toaster")
@@ -77,7 +79,7 @@ if 'sqlite' in settings.DATABASES['default']['ENGINE']:
         try:
             obj = self.create(**params)
             return obj, True
-        except IntegrityError:
+        except (IntegrityError, DataError):
             exc_info = sys.exc_info()
             try:
                 return self.get(**lookup), False
@@ -102,7 +104,7 @@ class GitURLValidator(validators.URLValidator):
 
 def GitURLField(**kwargs):
     r = models.URLField(**kwargs)
-    for i in xrange(len(r.validators)):
+    for i in range(len(r.validators)):
         if isinstance(r.validators[i], validators.URLValidator):
             r.validators[i] = GitURLValidator()
     return r
@@ -116,39 +118,48 @@ class ToasterSetting(models.Model):
     def __unicode__(self):
         return "Setting %s = %s" % (self.name, self.value)
 
+
 class ProjectManager(models.Manager):
     def create_project(self, name, release):
         if release is not None:
-            prj = self.model(name = name, bitbake_version = release.bitbake_version, release = release)
+            prj = self.model(name=name,
+                             bitbake_version=release.bitbake_version,
+                             release=release)
         else:
-            prj = self.model(name = name, bitbake_version = None, release = None)
+            prj = self.model(name=name,
+                             bitbake_version=None,
+                             release=None)
 
         prj.save()
 
-        for defaultconf in ToasterSetting.objects.filter(name__startswith="DEFCONF_"):
+        for defaultconf in ToasterSetting.objects.filter(
+                name__startswith="DEFCONF_"):
             name = defaultconf.name[8:]
-            ProjectVariable.objects.create( project = prj,
-                name = name,
-                value = defaultconf.value)
+            ProjectVariable.objects.create(project=prj,
+                                           name=name,
+                                           value=defaultconf.value)
 
         if release is None:
             return prj
 
         for rdl in release.releasedefaultlayer_set.all():
-            try:
-                lv = Layer_Version.objects.filter(layer__name = rdl.layer_name, up_branch__name = release.branch_name)[0].get_equivalents_wpriority(prj)[0]
-                ProjectLayer.objects.create( project = prj,
-                        layercommit = lv,
-                        optional = False )
-            except IndexError:
-                # we may have no valid layer version objects, and that's ok
-                pass
+            lv = Layer_Version.objects.filter(
+                layer__name=rdl.layer_name,
+                release=release).first()
+
+            if lv:
+                ProjectLayer.objects.create(project=prj,
+                                            layercommit=lv,
+                                            optional=False)
+            else:
+                logger.warning("Default project layer %s not found" %
+                               rdl.layer_name)
 
         return prj
 
     # return single object with is_default = True
     def get_or_create_default_project(self):
-        projects = super(ProjectManager, self).filter(is_default = True)
+        projects = super(ProjectManager, self).filter(is_default=True)
 
         if len(projects) > 1:
             raise Exception('Inconsistent project data: multiple ' +
@@ -156,7 +167,8 @@ class ProjectManager(models.Manager):
         elif len(projects) < 1:
             options = {
                 'name': 'Command line builds',
-                'short_description': 'Project for builds started outside Toaster',
+                'short_description':
+                'Project for builds started outside Toaster',
                 'is_default': True
             }
             project = Project.objects.create(**options)
@@ -269,7 +281,7 @@ class Project(models.Model):
         # guard on release, as it can be null
         if self.release:
             queryset = Layer_Version.objects.filter(
-                (Q(up_branch__name=self.release.branch_name) &
+                (Q(release=self.release) &
                  Q(build=None) &
                  Q(project=None)) |
                  Q(project=self))
@@ -335,7 +347,15 @@ class Project(models.Model):
             for l in self.projectlayer_set.all().order_by("pk"):
                 commit = l.layercommit.get_vcs_reference()
                 print("ii Building layer ", l.layercommit.layer.name, " at vcs point ", commit)
-                BRLayer.objects.create(req = br, name = l.layercommit.layer.name, giturl = l.layercommit.layer.vcs_url, commit = commit, dirpath = l.layercommit.dirpath, layer_version=l.layercommit)
+                BRLayer.objects.create(
+                    req=br,
+                    name=l.layercommit.layer.name,
+                    giturl=l.layercommit.layer.vcs_url,
+                    commit=commit,
+                    dirpath=l.layercommit.dirpath,
+                    layer_version=l.layercommit,
+                    local_source_dir=l.layercommit.layer.local_source_dir
+                )
 
             br.state = BuildRequest.REQ_QUEUED
             now = timezone.now()
@@ -357,6 +377,8 @@ class Project(models.Model):
             except ProjectVariable.DoesNotExist:
                 pass
             br.save()
+            signal_runbuilds()
+
         except Exception:
             # revert the build request creation since we're not done cleanly
             br.delete()
@@ -386,8 +408,14 @@ class Build(models.Model):
     completed_on = models.DateTimeField()
     outcome = models.IntegerField(choices=BUILD_OUTCOME, default=IN_PROGRESS)
     cooker_log_path = models.CharField(max_length=500)
-    build_name = models.CharField(max_length=100)
+    build_name = models.CharField(max_length=100, default='')
     bitbake_version = models.CharField(max_length=50)
+
+    # number of recipes to parse for this build
+    recipes_to_parse = models.IntegerField(default=1)
+
+    # number of recipes parsed so far for this build
+    recipes_parsed = models.IntegerField(default=0)
 
     @staticmethod
     def get_recent(project=None):
@@ -415,14 +443,30 @@ class Build(models.Model):
         # to show build progress in mrb_section.html
         for build in recent_builds:
             build.percentDone = build.completeper()
+            build.outcomeText = build.get_outcome_text()
 
         return recent_builds
+
+    def started(self):
+        """
+        As build variables are only added for a build when its BuildStarted event
+        is received, a build with no build variables is counted as
+        "in preparation" and not properly started yet. This method
+        will return False if a build has no build variables (it never properly
+        started), or True otherwise.
+
+        Note that this is a temporary workaround for the fact that we don't
+        have a fine-grained state variable on a build which would allow us
+        to record "in progress" (BuildStarted received) vs. "in preparation".
+        """
+        variables = Variable.objects.filter(build=self)
+        return len(variables) > 0
 
     def completeper(self):
         tf = Task.objects.filter(build = self)
         tfc = tf.count()
         if tfc > 0:
-            completeper = tf.exclude(order__isnull=True).count()*100/tfc
+            completeper = tf.exclude(order__isnull=True).count()*100 // tfc
         else:
             completeper = 0
         return completeper
@@ -434,57 +478,61 @@ class Build(models.Model):
             eta += ((eta - self.started_on)*(100-completeper))/completeper
         return eta
 
+    def has_images(self):
+        """
+        Returns True if at least one of the targets for this build has an
+        image file associated with it, False otherwise
+        """
+        targets = Target.objects.filter(build_id=self.id)
+        has_images = False
+        for target in targets:
+            if target.has_images():
+                has_images = True
+                break
+        return has_images
+
+    def has_image_recipes(self):
+        """
+        Returns True if a build has any targets which were built from
+        image recipes.
+        """
+        image_recipes = self.get_image_recipes()
+        return len(image_recipes) > 0
+
     def get_image_file_extensions(self):
         """
-        Get list of file name extensions for images produced by this build
+        Get string of file name extensions for images produced by this build;
+        note that this is the actual list of extensions stored on Target objects
+        for this build, and not the value of IMAGE_FSTYPES.
+
+        Returns comma-separated string, e.g. "vmdk, ext4"
         """
-        targets = Target.objects.filter(build_id = self.id)
         extensions = []
 
-        # pattern to match against file path for building extension string
-        pattern = re.compile('\.([^\.]+?)$')
-
+        targets = Target.objects.filter(build_id = self.id)
         for target in targets:
-            if (not target.is_image):
+            if not target.is_image:
                 continue
 
-            target_image_files = Target_Image_File.objects.filter(target_id = target.id)
+            target_image_files = Target_Image_File.objects.filter(
+                target_id=target.id)
 
             for target_image_file in target_image_files:
-                file_name = os.path.basename(target_image_file.file_name)
-                suffix = ''
+                extensions.append(target_image_file.suffix)
 
-                continue_matching = True
-
-                # incrementally extract the suffix from the file path,
-                # checking it against the list of valid suffixes at each
-                # step; if the path is stripped of all potential suffix
-                # parts without matching a valid suffix, this returns all
-                # characters after the first '.' in the file name
-                while continue_matching:
-                    matches = pattern.search(file_name)
-
-                    if None == matches:
-                        continue_matching = False
-                        suffix = re.sub('^\.', '', suffix)
-                        continue
-                    else:
-                        suffix = matches.group(1) + suffix
-
-                    if suffix in Target_Image_File.SUFFIXES:
-                        continue_matching = False
-                        continue
-                    else:
-                        # reduce the file name and try to find the next
-                        # segment from the path which might be part
-                        # of the suffix
-                        file_name = re.sub('.' + matches.group(1), '', file_name)
-                        suffix = '.' + suffix
-
-                if not suffix in extensions:
-                    extensions.append(suffix)
+        extensions = list(set(extensions))
+        extensions.sort()
 
         return ', '.join(extensions)
+
+    def get_image_fstypes(self):
+        """
+        Get the IMAGE_FSTYPES variable value for this build as a de-duplicated
+        list of image file suffixes.
+        """
+        image_fstypes = Variable.objects.get(
+            build=self, variable_name='IMAGE_FSTYPES').variable_value
+        return list(set(re.split(r' {1,}', image_fstypes)))
 
     def get_sorted_target_list(self):
         tgts = Target.objects.filter(build_id = self.id).order_by( 'target' );
@@ -576,49 +624,69 @@ class Build(models.Model):
 
         return target_labels
 
-    def get_current_status(self):
-        """
-        get the status string from the build request if the build
-        has one, or the text for the build outcome if it doesn't
-        """
-
-        from bldcontrol.models import BuildRequest
-
-        build_request = None
+    def get_buildrequest(self):
+        buildrequest = None
         if hasattr(self, 'buildrequest'):
-            build_request = self.buildrequest
+            buildrequest = self.buildrequest
+        return buildrequest
 
-        if (build_request
-                and build_request.state != BuildRequest.REQ_INPROGRESS
-                and self.outcome == Build.IN_PROGRESS):
-            return self.buildrequest.get_state_display()
+    def is_queued(self):
+        from bldcontrol.models import BuildRequest
+        buildrequest = self.get_buildrequest()
+        if buildrequest:
+            return buildrequest.state == BuildRequest.REQ_QUEUED
+        else:
+            return False
+
+    def is_cancelling(self):
+        from bldcontrol.models import BuildRequest
+        buildrequest = self.get_buildrequest()
+        if buildrequest:
+            return self.outcome == Build.IN_PROGRESS and \
+                buildrequest.state == BuildRequest.REQ_CANCELLING
+        else:
+            return False
+
+    def is_parsing(self):
+        """
+        True if the build is still parsing recipes
+        """
+        return self.outcome == Build.IN_PROGRESS and \
+            self.recipes_parsed < self.recipes_to_parse
+
+    def is_starting(self):
+        """
+        True if the build has no completed tasks yet and is still just starting
+        tasks.
+
+        Note that the mechanism for testing whether a Task is "done" is whether
+        its order field is set, as per the completeper() method.
+        """
+        return self.outcome == Build.IN_PROGRESS and \
+            self.task_build.filter(order__isnull=False).count() == 0
+
+    def get_state(self):
+        """
+        Get the state of the build; one of 'Succeeded', 'Failed', 'In Progress',
+        'Cancelled' (Build outcomes); or 'Queued', 'Cancelling' (states
+        dependent on the BuildRequest state).
+
+        This works around the fact that we have BuildRequest states as well
+        as Build states, but really we just want to know the state of the build.
+        """
+        if self.is_cancelling():
+            return 'Cancelling';
+        elif self.is_queued():
+            return 'Queued'
+        elif self.is_parsing():
+            return 'Parsing'
+        elif self.is_starting():
+            return 'Starting'
         else:
             return self.get_outcome_text()
 
     def __str__(self):
         return "%d %s %s" % (self.id, self.project, ",".join([t.target for t in self.target_set.all()]))
-
-
-# an Artifact is anything that results from a Build, and may be of interest to the user, and is not stored elsewhere
-class BuildArtifact(models.Model):
-    build = models.ForeignKey(Build)
-    file_name = models.FilePathField()
-    file_size = models.IntegerField()
-
-    def get_local_file_name(self):
-        try:
-            deploydir = Variable.objects.get(build = self.build, variable_name="DEPLOY_DIR").variable_value
-            return  self.file_name[len(deploydir)+1:]
-        except:
-            raise
-
-        return self.file_name
-
-    def get_basename(self):
-        return os.path.basename(self.file_name)
-
-    def is_available(self):
-        return self.build.buildrequest.environment.has_artifact(self.file_name)
 
 class ProjectTarget(models.Model):
     project = models.ForeignKey(Project)
@@ -633,6 +701,7 @@ class Target(models.Model):
     is_image = models.BooleanField(default = False)
     image_size = models.IntegerField(default=0)
     license_manifest_path = models.CharField(max_length=500, null=True)
+    package_manifest_path = models.CharField(max_length=500, null=True)
 
     def package_count(self):
         return Target_Installed_Package.objects.filter(target_id__exact=self.id).count()
@@ -640,14 +709,180 @@ class Target(models.Model):
     def __unicode__(self):
         return self.target
 
+    def get_similar_targets(self):
+        """
+        Get target sfor the same machine, task and target name
+        (e.g. 'core-image-minimal') from a successful build for this project
+        (but excluding this target).
+
+        Note that we only look for targets built by this project because
+        projects can have different configurations from each other, and put
+        their artifacts in different directories.
+
+        The possibility of error when retrieving candidate targets
+        is minimised by the fact that bitbake will rebuild artifacts if MACHINE
+        (or various other variables) change. In this case, there is no need to
+        clone artifacts from another target, as those artifacts will have
+        been re-generated for this target anyway.
+        """
+        query = ~Q(pk=self.pk) & \
+            Q(target=self.target) & \
+            Q(build__machine=self.build.machine) & \
+            Q(build__outcome=Build.SUCCEEDED) & \
+            Q(build__project=self.build.project)
+
+        return Target.objects.filter(query)
+
+    def get_similar_target_with_image_files(self):
+        """
+        Get the most recent similar target with Target_Image_Files associated
+        with it, for the purpose of cloning those files onto this target.
+        """
+        similar_target = None
+
+        candidates = self.get_similar_targets()
+        if candidates.count() == 0:
+            return similar_target
+
+        task_subquery = Q(task=self.task)
+
+        # we can look for a 'build' task if this task is a 'populate_sdk_ext'
+        # task, as the latter also creates images; and vice versa; note that
+        # 'build' targets can have their task set to '';
+        # also note that 'populate_sdk' does not produce image files
+        image_tasks = [
+            '', # aka 'build'
+            'build',
+            'image',
+            'populate_sdk_ext'
+        ]
+        if self.task in image_tasks:
+            task_subquery = Q(task__in=image_tasks)
+
+        # annotate with the count of files, to exclude any targets which
+        # don't have associated files
+        candidates = candidates.annotate(num_files=Count('target_image_file'))
+
+        query = task_subquery & Q(num_files__gt=0)
+
+        candidates = candidates.filter(query)
+
+        if candidates.count() > 0:
+            candidates.order_by('build__completed_on')
+            similar_target = candidates.last()
+
+        return similar_target
+
+    def get_similar_target_with_sdk_files(self):
+        """
+        Get the most recent similar target with TargetSDKFiles associated
+        with it, for the purpose of cloning those files onto this target.
+        """
+        similar_target = None
+
+        candidates = self.get_similar_targets()
+        if candidates.count() == 0:
+            return similar_target
+
+        # annotate with the count of files, to exclude any targets which
+        # don't have associated files
+        candidates = candidates.annotate(num_files=Count('targetsdkfile'))
+
+        query = Q(task=self.task) & Q(num_files__gt=0)
+
+        candidates = candidates.filter(query)
+
+        if candidates.count() > 0:
+            candidates.order_by('build__completed_on')
+            similar_target = candidates.last()
+
+        return similar_target
+
+    def clone_image_artifacts_from(self, target):
+        """
+        Make clones of the Target_Image_Files and TargetKernelFile objects
+        associated with Target target, then associate them with this target.
+
+        Note that for Target_Image_Files, we only want files from the previous
+        build whose suffix matches one of the suffixes defined in this
+        target's build's IMAGE_FSTYPES configuration variable. This prevents the
+        Target_Image_File object for an ext4 image being associated with a
+        target for a project which didn't produce an ext4 image (for example).
+
+        Also sets the license_manifest_path and package_manifest_path
+        of this target to the same path as that of target being cloned from, as
+        the manifests are also build artifacts but are treated differently.
+        """
+
+        image_fstypes = self.build.get_image_fstypes()
+
+        # filter out any image files whose suffixes aren't in the
+        # IMAGE_FSTYPES suffixes variable for this target's build
+        image_files = [target_image_file \
+            for target_image_file in target.target_image_file_set.all() \
+            if target_image_file.suffix in image_fstypes]
+
+        for image_file in image_files:
+            image_file.pk = None
+            image_file.target = self
+            image_file.save()
+
+        kernel_files = target.targetkernelfile_set.all()
+        for kernel_file in kernel_files:
+            kernel_file.pk = None
+            kernel_file.target = self
+            kernel_file.save()
+
+        self.license_manifest_path = target.license_manifest_path
+        self.package_manifest_path = target.package_manifest_path
+        self.save()
+
+    def clone_sdk_artifacts_from(self, target):
+        """
+        Clone TargetSDKFile objects from target and associate them with this
+        target.
+        """
+        sdk_files = target.targetsdkfile_set.all()
+        for sdk_file in sdk_files:
+            sdk_file.pk = None
+            sdk_file.target = self
+            sdk_file.save()
+
+    def has_images(self):
+        """
+        Returns True if this target has one or more image files attached to it.
+        """
+        return self.target_image_file_set.all().count() > 0
+
+# kernel artifacts for a target: bzImage and modules*
+class TargetKernelFile(models.Model):
+    target = models.ForeignKey(Target)
+    file_name = models.FilePathField()
+    file_size = models.IntegerField()
+
+    @property
+    def basename(self):
+        return os.path.basename(self.file_name)
+
+# SDK artifacts for a target: sh and manifest files
+class TargetSDKFile(models.Model):
+    target = models.ForeignKey(Target)
+    file_name = models.FilePathField()
+    file_size = models.IntegerField()
+
+    @property
+    def basename(self):
+        return os.path.basename(self.file_name)
+
 class Target_Image_File(models.Model):
     # valid suffixes for image files produced by a build
     SUFFIXES = {
         'btrfs', 'cpio', 'cpio.gz', 'cpio.lz4', 'cpio.lzma', 'cpio.xz',
         'cramfs', 'elf', 'ext2', 'ext2.bz2', 'ext2.gz', 'ext2.lzma', 'ext4',
-        'ext4.gz', 'ext3', 'ext3.gz', 'hddimg', 'iso', 'jffs2', 'jffs2.sum',
-        'squashfs', 'squashfs-lzo', 'squashfs-xz', 'tar.bz2', 'tar.lz4',
-        'tar.xz', 'tartar.gz', 'ubi', 'ubifs', 'vmdk'
+        'ext4.gz', 'ext3', 'ext3.gz', 'hdddirect', 'hddimg', 'iso', 'jffs2',
+        'jffs2.sum', 'multiubi', 'qcow2', 'squashfs', 'squashfs-lzo',
+        'squashfs-xz', 'tar', 'tar.bz2', 'tar.gz', 'tar.lz4', 'tar.xz', 'ubi',
+        'ubifs', 'vdi', 'vmdk', 'wic', 'wic.bz2', 'wic.gz', 'wic.lzma'
     }
 
     target = models.ForeignKey(Target)
@@ -656,6 +891,13 @@ class Target_Image_File(models.Model):
 
     @property
     def suffix(self):
+        """
+        Suffix for image file, minus leading "."
+        """
+        for suffix in Target_Image_File.SUFFIXES:
+            if self.file_name.endswith(suffix):
+                return suffix
+
         filename, suffix = os.path.splitext(self.file_name)
         suffix = suffix.lstrip('.')
         return suffix
@@ -860,30 +1102,69 @@ class CustomImagePackage(Package):
                                             related_name='appends_set')
 
 
-
 class Package_DependencyManager(models.Manager):
     use_for_related_fields = True
+    TARGET_LATEST = "use-latest-target-for-target"
 
     def get_queryset(self):
         return super(Package_DependencyManager, self).get_queryset().exclude(package_id = F('depends_on__id'))
 
-    def get_total_source_deps_size(self):
-        """ Returns the total file size of all the packages that depend on
-        thispackage.
-        """
-        return self.all().aggregate(Sum('depends_on__size'))
+    def for_target_or_none(self, target):
+        """ filter the dependencies to be displayed by the supplied target
+        if no dependences are found for the target then try None as the target
+        which will return the dependences calculated without the context of a
+        target e.g. non image recipes.
 
-    def get_total_revdeps_size(self):
-        """ Returns the total file size of all the packages that depend on
-        this package.
+        returns: { size, packages }
         """
-        return self.all().aggregate(Sum('package_id__size'))
+        package_dependencies = self.all_depends().order_by('depends_on__name')
 
+        if target is self.TARGET_LATEST:
+            installed_deps =\
+                    package_dependencies.filter(~Q(target__target=None))
+        else:
+            installed_deps =\
+                    package_dependencies.filter(Q(target__target=target))
+
+        packages_list = None
+        total_size = 0
+
+        # If we have installed depdencies for this package and target then use
+        # these to display
+        if installed_deps.count() > 0:
+            packages_list = installed_deps
+            total_size = installed_deps.aggregate(
+                Sum('depends_on__size'))['depends_on__size__sum']
+        else:
+            new_list = []
+            package_names = []
+
+            # Find dependencies for the package that we know about even if
+            # it's not installed on a target e.g. from a non-image recipe
+            for p in package_dependencies.filter(Q(target=None)):
+                if p.depends_on.name in package_names:
+                    continue
+                else:
+                    package_names.append(p.depends_on.name)
+                    new_list.append(p.pk)
+                    # while we're here we may as well total up the size to
+                    # avoid iterating again
+                    total_size += p.depends_on.size
+
+            # We want to return a queryset here for consistency so pick the
+            # deps from the new_list
+            packages_list = package_dependencies.filter(Q(pk__in=new_list))
+
+        return {'packages': packages_list,
+                'size': total_size}
 
     def all_depends(self):
-        """ Returns just the depends packages and not any other dep_type """
+        """ Returns just the depends packages and not any other dep_type
+        Note that this is for any target
+        """
         return self.filter(Q(dep_type=Package_Dependency.TYPE_RDEPENDS) |
                            Q(dep_type=Package_Dependency.TYPE_TRDEPENDS))
+
 
 class Package_Dependency(models.Model):
     TYPE_RDEPENDS = 0
@@ -930,21 +1211,27 @@ class Target_Installed_Package(models.Model):
     target = models.ForeignKey(Target)
     package = models.ForeignKey(Package, related_name='buildtargetlist_package')
 
+
 class Package_File(models.Model):
     package = models.ForeignKey(Package, related_name='buildfilelist_package')
     path = models.FilePathField(max_length=255, blank=True)
     size = models.IntegerField()
 
+
 class Recipe(models.Model):
-    search_allowed_fields = ['name', 'version', 'file_path', 'section', 'summary', 'description', 'license', 'layer_version__layer__name', 'layer_version__branch', 'layer_version__commit', 'layer_version__local_path', 'layer_version__layer_source__name']
+    search_allowed_fields = ['name', 'version', 'file_path', 'section',
+                             'summary', 'description', 'license',
+                             'layer_version__layer__name',
+                             'layer_version__branch', 'layer_version__commit',
+                             'layer_version__local_path',
+                             'layer_version__layer_source']
 
-    layer_source = models.ForeignKey('LayerSource', default = None, null = True)  # from where did we get this recipe
-    up_id = models.IntegerField(null = True, default = None)                    # id of entry in the source
-    up_date = models.DateTimeField(null = True, default = None)
+    up_date = models.DateTimeField(null=True, default=None)
 
-    name = models.CharField(max_length=100, blank=True)                 # pn
-    version = models.CharField(max_length=100, blank=True)              # pv
-    layer_version = models.ForeignKey('Layer_Version', related_name='recipe_layer_version')
+    name = models.CharField(max_length=100, blank=True)
+    version = models.CharField(max_length=100, blank=True)
+    layer_version = models.ForeignKey('Layer_Version',
+                                      related_name='recipe_layer_version')
     summary = models.TextField(blank=True)
     description = models.TextField(blank=True)
     section = models.CharField(max_length=100, blank=True)
@@ -954,13 +1241,6 @@ class Recipe(models.Model):
     file_path = models.FilePathField(max_length=255)
     pathflags = models.CharField(max_length=200, blank=True)
     is_image = models.BooleanField(default=False)
-
-    def get_layersource_view_url(self):
-        if self.layer_source is None:
-            return ""
-
-        url = self.layer_source.get_object_view(self.layer_version.up_branch, "recipes", self.name)
-        return url
 
     def __unicode__(self):
         return "Recipe " + self.name + ":" + self.version
@@ -1007,8 +1287,6 @@ class Recipe_Dependency(models.Model):
 
 class Machine(models.Model):
     search_allowed_fields = ["name", "description", "layer_version__layer__name"]
-    layer_source = models.ForeignKey('LayerSource', default = None, null = True)  # from where did we get this machine
-    up_id = models.IntegerField(null = True, default = None)                      # id of entry in the source
     up_date = models.DateTimeField(null = True, default = None)
 
     layer_version = models.ForeignKey('Layer_Version')
@@ -1023,285 +1301,9 @@ class Machine(models.Model):
     def __unicode__(self):
         return "Machine " + self.name + "(" + self.description + ")"
 
-    class Meta:
-        unique_together = ("layer_source", "up_id")
 
 
-from django.db.models.base import ModelBase
 
-class InheritanceMetaclass(ModelBase):
-    def __call__(cls, *args, **kwargs):
-        obj = super(InheritanceMetaclass, cls).__call__(*args, **kwargs)
-        return obj.get_object()
-
-
-class LayerSource(models.Model):
-    __metaclass__ = InheritanceMetaclass
-
-    class Meta:
-        unique_together = (('sourcetype', 'apiurl'), )
-
-    TYPE_LOCAL = 0
-    TYPE_LAYERINDEX = 1
-    TYPE_IMPORTED = 2
-    SOURCE_TYPE = (
-        (TYPE_LOCAL, "local"),
-        (TYPE_LAYERINDEX, "layerindex"),
-        (TYPE_IMPORTED, "imported"),
-      )
-
-    name = models.CharField(max_length=63, unique = True)
-    sourcetype = models.IntegerField(choices=SOURCE_TYPE)
-    apiurl = models.CharField(max_length=255, null=True, default=None)
-
-    def __init__(self, *args, **kwargs):
-        super(LayerSource, self).__init__(*args, **kwargs)
-        if self.sourcetype == LayerSource.TYPE_LOCAL:
-            self.__class__ = LocalLayerSource
-        elif self.sourcetype == LayerSource.TYPE_LAYERINDEX:
-            self.__class__ = LayerIndexLayerSource
-        elif self.sourcetype == LayerSource.TYPE_IMPORTED:
-            self.__class__ = ImportedLayerSource
-        elif self.sourcetype == None:
-            raise Exception("Unknown LayerSource-derived class. If you added a new layer source type, fill out all code stubs.")
-
-
-    def update(self):
-        """
-            Updates the local database information from the upstream layer source
-        """
-        raise Exception("Abstract, update() must be implemented by all LayerSource-derived classes (object is %s)" % str(vars(self)))
-
-    def save(self, *args, **kwargs):
-        return super(LayerSource, self).save(*args, **kwargs)
-
-    def get_object(self):
-        # preset an un-initilized object
-        if None == self.name:
-            self.name=""
-        if None == self.apiurl:
-            self.apiurl=""
-        if None == self.sourcetype:
-            self.sourcetype=LayerSource.TYPE_LOCAL
-
-        if self.sourcetype == LayerSource.TYPE_LOCAL:
-            self.__class__ = LocalLayerSource
-        elif self.sourcetype == LayerSource.TYPE_LAYERINDEX:
-            self.__class__ = LayerIndexLayerSource
-        elif self.sourcetype == LayerSource.TYPE_IMPORTED:
-            self.__class__ = ImportedLayerSource
-        else:
-            raise Exception("Unknown LayerSource type. If you added a new layer source type, fill out all code stubs.")
-        return self
-
-    def __unicode__(self):
-        return "%s (%s)" % (self.name, self.sourcetype)
-
-
-class LocalLayerSource(LayerSource):
-    class Meta(LayerSource._meta.__class__):
-        proxy = True
-
-    def __init__(self, *args, **kwargs):
-        super(LocalLayerSource, self).__init__(args, kwargs)
-        self.sourcetype = LayerSource.TYPE_LOCAL
-
-    def update(self):
-        """
-            Fetches layer, recipe and machine information from local repository
-        """
-        pass
-
-class ImportedLayerSource(LayerSource):
-    class Meta(LayerSource._meta.__class__):
-        proxy = True
-
-    def __init__(self, *args, **kwargs):
-        super(ImportedLayerSource, self).__init__(args, kwargs)
-        self.sourcetype = LayerSource.TYPE_IMPORTED
-
-    def update(self):
-        """
-            Fetches layer, recipe and machine information from local repository
-        """
-        pass
-
-
-class LayerIndexLayerSource(LayerSource):
-    class Meta(LayerSource._meta.__class__):
-        proxy = True
-
-    def __init__(self, *args, **kwargs):
-        super(LayerIndexLayerSource, self).__init__(args, kwargs)
-        self.sourcetype = LayerSource.TYPE_LAYERINDEX
-
-    def get_object_view(self, branch, objectype, upid):
-        return self.apiurl + "../branch/" + branch.name + "/" + objectype + "/?q=" + str(upid)
-
-    def update(self):
-        """
-            Fetches layer, recipe and machine information from remote repository
-        """
-        assert self.apiurl is not None
-        from django.db import transaction, connection
-
-        import urllib2, urlparse, json
-        import os
-        proxy_settings = os.environ.get("http_proxy", None)
-        oe_core_layer = 'openembedded-core'
-
-        def _get_json_response(apiurl = self.apiurl):
-            _parsedurl = urlparse.urlparse(apiurl)
-            path = _parsedurl.path
-
-            try:
-                res = urllib2.urlopen(apiurl)
-            except urllib2.URLError as e:
-                raise Exception("Failed to read %s: %s" % (path, e.reason))
-
-            return json.loads(res.read())
-
-        # verify we can get the basic api
-        try:
-            apilinks = _get_json_response()
-        except Exception as e:
-            import traceback
-            if proxy_settings is not None:
-                logger.info("EE: Using proxy %s" % proxy_settings)
-            logger.warning("EE: could not connect to %s, skipping update: %s\n%s" % (self.apiurl, e, traceback.format_exc(e)))
-            return
-
-        # update branches; only those that we already have names listed in the
-        # Releases table
-        whitelist_branch_names = map(lambda x: x.branch_name, Release.objects.all())
-        if len(whitelist_branch_names) == 0:
-            raise Exception("Failed to make list of branches to fetch")
-
-        logger.debug("Fetching branches")
-        branches_info = _get_json_response(apilinks['branches']
-            + "?filter=name:%s" % "OR".join(whitelist_branch_names))
-        for bi in branches_info:
-            b, created = Branch.objects.get_or_create(layer_source = self, name = bi['name'])
-            b.up_id = bi['id']
-            b.up_date = bi['updated']
-            b.name = bi['name']
-            b.short_description = bi['short_description']
-            b.save()
-
-        # update layers
-        layers_info = _get_json_response(apilinks['layerItems'])
-
-        for li in layers_info:
-            # Special case for the openembedded-core layer
-            if li['name'] == oe_core_layer:
-                try:
-                    # If we have an existing openembedded-core for example
-                    # from the toasterconf.json augment the info using the
-                    # layerindex rather than duplicate it
-                    oe_core_l =  Layer.objects.get(name=oe_core_layer)
-                    # Take ownership of the layer as now coming from the
-                    # layerindex
-                    oe_core_l.layer_source = self
-                    oe_core_l.up_id = li['id']
-                    oe_core_l.summary = li['summary']
-                    oe_core_l.description = li['description']
-                    oe_core_l.save()
-                    continue
-
-                except Layer.DoesNotExist:
-                    pass
-
-            l, created = Layer.objects.get_or_create(layer_source = self, name = li['name'])
-            l.up_id = li['id']
-            l.up_date = li['updated']
-            l.vcs_url = li['vcs_url']
-            l.vcs_web_url = li['vcs_web_url']
-            l.vcs_web_tree_base_url = li['vcs_web_tree_base_url']
-            l.vcs_web_file_base_url = li['vcs_web_file_base_url']
-            l.summary = li['summary']
-            l.description = li['description']
-            l.save()
-
-        # update layerbranches/layer_versions
-        logger.debug("Fetching layer information")
-        layerbranches_info = _get_json_response(apilinks['layerBranches']
-                + "?filter=branch:%s" % "OR".join(map(lambda x: str(x.up_id), [i for i in Branch.objects.filter(layer_source = self) if i.up_id is not None] ))
-            )
-
-        for lbi in layerbranches_info:
-            lv, created = Layer_Version.objects.get_or_create(layer_source = self,
-                    up_id = lbi['id'],
-                    layer=Layer.objects.get(layer_source = self, up_id = lbi['layer'])
-                )
-
-            lv.up_date = lbi['updated']
-            lv.up_branch = Branch.objects.get(layer_source = self, up_id = lbi['branch'])
-            lv.branch = lbi['actual_branch']
-            lv.commit = lbi['actual_branch']
-            lv.dirpath = lbi['vcs_subdir']
-            lv.save()
-
-        # update layer dependencies
-        layerdependencies_info = _get_json_response(apilinks['layerDependencies'])
-        dependlist = {}
-        for ldi in layerdependencies_info:
-            try:
-                lv = Layer_Version.objects.get(layer_source = self, up_id = ldi['layerbranch'])
-            except Layer_Version.DoesNotExist as e:
-                continue
-
-            if lv not in dependlist:
-                dependlist[lv] = []
-            try:
-                dependlist[lv].append(Layer_Version.objects.get(layer_source = self, layer__up_id = ldi['dependency'], up_branch = lv.up_branch))
-            except Layer_Version.DoesNotExist:
-                logger.warning("Cannot find layer version (ls:%s), up_id:%s lv:%s" % (self, ldi['dependency'], lv))
-
-        for lv in dependlist:
-            LayerVersionDependency.objects.filter(layer_version = lv).delete()
-            for lvd in dependlist[lv]:
-                LayerVersionDependency.objects.get_or_create(layer_version = lv, depends_on = lvd)
-
-
-        # update machines
-        logger.debug("Fetching machine information")
-        machines_info = _get_json_response(apilinks['machines']
-                + "?filter=layerbranch:%s" % "OR".join(map(lambda x: str(x.up_id), Layer_Version.objects.filter(layer_source = self)))
-            )
-
-        for mi in machines_info:
-            mo, created = Machine.objects.get_or_create(layer_source = self, up_id = mi['id'], layer_version = Layer_Version.objects.get(layer_source = self, up_id = mi['layerbranch']))
-            mo.up_date = mi['updated']
-            mo.name = mi['name']
-            mo.description = mi['description']
-            mo.save()
-
-        # update recipes; paginate by layer version / layer branch
-        logger.debug("Fetching target information")
-        recipes_info = _get_json_response(apilinks['recipes']
-                + "?filter=layerbranch:%s" % "OR".join(map(lambda x: str(x.up_id), Layer_Version.objects.filter(layer_source = self)))
-            )
-        for ri in recipes_info:
-            try:
-                ro, created = Recipe.objects.get_or_create(layer_source = self, up_id = ri['id'], layer_version = Layer_Version.objects.get(layer_source = self, up_id = ri['layerbranch']))
-                ro.up_date = ri['updated']
-                ro.name = ri['pn']
-                ro.version = ri['pv']
-                ro.summary = ri['summary']
-                ro.description = ri['description']
-                ro.section = ri['section']
-                ro.license = ri['license']
-                ro.homepage = ri['homepage']
-                ro.bugtracker = ri['bugtracker']
-                ro.file_path = ri['filepath'] + "/" + ri['filename']
-                if 'inherits' in ri:
-                    ro.is_image = 'image' in ri['inherits'].split()
-                else: # workaround for old style layer index
-                    ro.is_image = "-image-" in ri['pn']
-                ro.save()
-            except IntegrityError as e:
-                logger.debug("Failed saving recipe, ignoring: %s (%s:%s)" % (e, ro.layer_version, ri['filepath']+"/"+ri['filename']))
-                ro.delete()
 
 class BitbakeVersion(models.Model):
 
@@ -1325,87 +1327,94 @@ class Release(models.Model):
     def __unicode__(self):
         return "%s (%s)" % (self.name, self.branch_name)
 
-class ReleaseLayerSourcePriority(models.Model):
-    """ Each release selects layers from the set up layer sources, ordered by priority """
-    release = models.ForeignKey("Release")
-    layer_source = models.ForeignKey("LayerSource")
-    priority = models.IntegerField(default = 0)
-
-    def __unicode__(self):
-        return "%s-%s:%d" % (self.release.name, self.layer_source.name, self.priority)
-    class Meta:
-        unique_together = (('release', 'layer_source'),)
-
+    def __str__(self):
+        return self.name
 
 class ReleaseDefaultLayer(models.Model):
     release = models.ForeignKey(Release)
     layer_name = models.CharField(max_length=100, default="")
 
 
-# Branch class is synced with layerindex.Branch, branches can only come from remote layer indexes
-class Branch(models.Model):
-    layer_source = models.ForeignKey('LayerSource', null = True, default = True)
-    up_id = models.IntegerField(null = True, default = None)                    # id of branch in the source
-    up_date = models.DateTimeField(null = True, default = None)
+class LayerSource(object):
+    """ Where the layer metadata came from """
+    TYPE_LOCAL = 0
+    TYPE_LAYERINDEX = 1
+    TYPE_IMPORTED = 2
+    TYPE_BUILD = 3
 
-    name = models.CharField(max_length=50)
-    short_description = models.CharField(max_length=50, blank=True)
+    SOURCE_TYPE = (
+        (TYPE_LOCAL, "local"),
+        (TYPE_LAYERINDEX, "layerindex"),
+        (TYPE_IMPORTED, "imported"),
+        (TYPE_BUILD, "build"),
+    )
 
-    class Meta:
-        verbose_name_plural = "Branches"
-        unique_together = (('layer_source', 'name'),('layer_source', 'up_id'))
+    def types_dict():
+        """ Turn the TYPES enums into a simple dictionary """
+        dictionary = {}
+        for key in LayerSource.__dict__:
+            if "TYPE" in key:
+                dictionary[key] = getattr(LayerSource, key)
+        return dictionary
 
-    def __unicode__(self):
-        return self.name
 
-
-# Layer class synced with layerindex.LayerItem
 class Layer(models.Model):
-    layer_source = models.ForeignKey(LayerSource, null = True, default = None)  # from where did we got this layer
-    up_id = models.IntegerField(null = True, default = None)                    # id of layer in the remote source
-    up_date = models.DateTimeField(null = True, default = None)
+
+    up_date = models.DateTimeField(null=True, default=timezone.now)
 
     name = models.CharField(max_length=100)
     layer_index_url = models.URLField()
-    vcs_url = GitURLField(default = None, null = True)
-    vcs_web_url = models.URLField(null = True, default = None)
-    vcs_web_tree_base_url = models.URLField(null = True, default = None)
-    vcs_web_file_base_url = models.URLField(null = True, default = None)
+    vcs_url = GitURLField(default=None, null=True)
+    local_source_dir = models.TextField(null = True, default = None)
+    vcs_web_url = models.URLField(null=True, default=None)
+    vcs_web_tree_base_url = models.URLField(null=True, default=None)
+    vcs_web_file_base_url = models.URLField(null=True, default=None)
 
-    summary = models.TextField(help_text='One-line description of the layer', null = True, default = None)
-    description = models.TextField(null = True, default = None)
+    summary = models.TextField(help_text='One-line description of the layer',
+                               null=True, default=None)
+    description = models.TextField(null=True, default=None)
 
     def __unicode__(self):
-        return "%s / %s " % (self.name, self.layer_source)
-
-    class Meta:
-        unique_together = (("layer_source", "up_id"), ("layer_source", "name"))
+        return "%s / %s " % (self.name, self.summary)
 
 
-# LayerCommit class is synced with layerindex.LayerBranch
 class Layer_Version(models.Model):
     """
     A Layer_Version either belongs to a single project or no project
     """
-    search_allowed_fields = ["layer__name", "layer__summary", "layer__description", "layer__vcs_url", "dirpath", "up_branch__name", "commit", "branch"]
-    build = models.ForeignKey(Build, related_name='layer_version_build', default = None, null = True)
+    search_allowed_fields = ["layer__name", "layer__summary",
+                             "layer__description", "layer__vcs_url",
+                             "dirpath", "release__name", "commit", "branch"]
+
+    build = models.ForeignKey(Build, related_name='layer_version_build',
+                              default=None, null=True)
+
     layer = models.ForeignKey(Layer, related_name='layer_version_layer')
 
-    layer_source = models.ForeignKey(LayerSource, null = True, default = None)                   # from where did we get this Layer Version
-    up_id = models.IntegerField(null = True, default = None)        # id of layerbranch in the remote source
-    up_date = models.DateTimeField(null = True, default = None)
-    up_branch = models.ForeignKey(Branch, null = True, default = None)
+    layer_source = models.IntegerField(choices=LayerSource.SOURCE_TYPE,
+                                       default=0)
 
-    branch = models.CharField(max_length=80)            # LayerBranch.actual_branch
-    commit = models.CharField(max_length=100)           # LayerBranch.vcs_last_rev
-    dirpath = models.CharField(max_length=255, null = True, default = None)          # LayerBranch.vcs_subdir
-    priority = models.IntegerField(default = 0)         # if -1, this is a default layer
+    up_date = models.DateTimeField(null=True, default=timezone.now)
 
-    local_path = models.FilePathField(max_length=1024, default = "/")  # where this layer was checked-out
+    # To which metadata release does this layer version belong to
+    release = models.ForeignKey(Release, null=True, default=None)
 
-    project = models.ForeignKey('Project', null = True, default = None)   # Set if this layer is project-specific; always set for imported layers, and project-set branches
+    branch = models.CharField(max_length=80)
+    commit = models.CharField(max_length=100)
+    # If the layer is in a subdir
+    dirpath = models.CharField(max_length=255, null=True, default=None)
 
-    # code lifted, with adaptations, from the layerindex-web application https://git.yoctoproject.org/cgit/cgit.cgi/layerindex-web/
+    # if -1, this is a default layer
+    priority = models.IntegerField(default=0)
+
+    # where this layer exists on the filesystem
+    local_path = models.FilePathField(max_length=1024, default="/")
+
+    # Set if this layer is restricted to a particular project
+    project = models.ForeignKey('Project', null=True, default=None)
+
+    # code lifted, with adaptations, from the layerindex-web application
+    # https://git.yoctoproject.org/cgit/cgit.cgi/layerindex-web/
     def _handle_url_path(self, base_url, path):
         import re, posixpath
         if base_url:
@@ -1422,7 +1431,7 @@ class Layer_Version(models.Model):
                     extra_path = self.dirpath
             else:
                 extra_path = path
-            branchname = self.up_branch.name
+            branchname = self.release.name
             url = base_url.replace('%branch%', branchname)
 
             # If there's a % in the path (e.g. a wildcard bbappend) we need to encode it
@@ -1447,23 +1456,19 @@ class Layer_Version(models.Model):
     def get_vcs_file_link_url(self, file_path=""):
         if self.layer.vcs_web_file_base_url is None:
             return None
-        return self._handle_url_path(self.layer.vcs_web_file_base_url, file_path)
+        return self._handle_url_path(self.layer.vcs_web_file_base_url,
+                                     file_path)
 
     def get_vcs_dirpath_link_url(self):
         if self.layer.vcs_web_tree_base_url is None:
             return None
         return self._handle_url_path(self.layer.vcs_web_tree_base_url, '')
 
-    def get_equivalents_wpriority(self, project):
-        layer_versions = project.get_all_compatible_layer_versions()
-        filtered = layer_versions.filter(layer__name = self.layer.name)
-        return filtered.order_by("-layer_source__releaselayersourcepriority__priority")
-
     def get_vcs_reference(self):
         if self.branch is not None and len(self.branch) > 0:
             return self.branch
-        if self.up_branch is not None:
-            return self.up_branch.name
+        if self.release is not None:
+            return self.release.name
         if self.commit is not None and len(self.commit) > 0:
             return self.commit
         return 'N/A'
@@ -1491,20 +1496,23 @@ class Layer_Version(models.Model):
         return sorted(result, key=lambda x: x.layer.name)
 
     def __unicode__(self):
-        return "%d %s (VCS %s, Project %s)" % (self.pk, str(self.layer), self.get_vcs_reference(), self.build.project if self.build is not None else "No project")
+        return ("id %d belongs to layer: %s" % (self.pk, self.layer.name))
 
-    class Meta:
-        unique_together = ("layer_source", "up_id")
+    def __str__(self):
+        if self.release:
+            release = self.release.name
+        else:
+            release = "No release set"
+
+        return "%d %s (%s)" % (self.pk, self.layer.name, release)
+
 
 class LayerVersionDependency(models.Model):
-    layer_source = models.ForeignKey(LayerSource, null = True, default = None)  # from where did we got this layer
-    up_id = models.IntegerField(null = True, default = None)                    # id of layerbranch in the remote source
 
-    layer_version = models.ForeignKey(Layer_Version, related_name="dependencies")
-    depends_on = models.ForeignKey(Layer_Version, related_name="dependees")
-
-    class Meta:
-        unique_together = ("layer_source", "up_id")
+    layer_version = models.ForeignKey(Layer_Version,
+                                      related_name="dependencies")
+    depends_on = models.ForeignKey(Layer_Version,
+                                   related_name="dependees")
 
 class ProjectLayer(models.Model):
     project = models.ForeignKey(Project)
@@ -1585,6 +1593,21 @@ class CustomImageRecipe(Recipe):
                                                   Q(recipe_includes=self)) &
                                                  ~Q(recipe_excludes=self))
 
+    def get_base_recipe_file(self):
+        """Get the base recipe file path if it exists on the file system"""
+        path_schema_one = "%s/%s" % (self.base_recipe.layer_version.dirpath,
+                                     self.base_recipe.file_path)
+
+        path_schema_two = self.base_recipe.file_path
+
+        if os.path.exists(path_schema_one):
+            return path_schema_one
+
+        # The path may now be the full path if the recipe has been built
+        if os.path.exists(path_schema_two):
+            return path_schema_two
+
+        return None
 
     def generate_recipe_file_contents(self):
         """Generate the contents for the recipe file."""
@@ -1599,17 +1622,16 @@ class CustomImageRecipe(Recipe):
             # We add all the known packages to be built by this recipe apart
             # from locale packages which are are controlled with IMAGE_LINGUAS.
             for pkg in self.get_all_packages().exclude(
-                name__icontains="locale"):
+                    name__icontains="locale"):
                 packages_conf += pkg.name+' '
 
         packages_conf += "\""
-        try:
-            base_recipe = open("%s/%s" %
-                               (self.base_recipe.layer_version.dirpath,
-                                self.base_recipe.file_path), 'r').read()
-        except IOError:
-            # The path may now be the full path if the recipe has been built
-            base_recipe = open(self.base_recipe.file_path, 'r').read()
+
+        base_recipe_path = self.get_base_recipe_file()
+        if base_recipe_path:
+            base_recipe = open(base_recipe_path, 'r').read()
+        else:
+            raise IOError("Based on recipe file not found")
 
         # Add a special case for when the recipe we have based a custom image
         # recipe on requires another recipe.
@@ -1618,8 +1640,8 @@ class CustomImageRecipe(Recipe):
         # "require recipes-core/images/core-image-minimal.bb"
 
         req_search = re.search(r'(require\s+)(.+\.bb\s*$)',
-                                   base_recipe,
-                                   re.MULTILINE)
+                               base_recipe,
+                               re.MULTILINE)
         if req_search:
             require_filename = req_search.group(2).strip()
 
@@ -1629,19 +1651,19 @@ class CustomImageRecipe(Recipe):
 
             new_require_line = "require %s" % corrected_location
 
-            base_recipe = \
-                    base_recipe.replace(req_search.group(0), new_require_line)
+            base_recipe = base_recipe.replace(req_search.group(0),
+                                              new_require_line)
 
-
-        info = {"date" : timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "base_recipe" : base_recipe,
-                "recipe_name" : self.name,
-                "base_recipe_name" : self.base_recipe.name,
-                "license" : self.license,
-                "summary" : self.summary,
-                "description" : self.description,
-                "packages_conf" : packages_conf.strip(),
-               }
+        info = {
+            "date": timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "base_recipe": base_recipe,
+            "recipe_name": self.name,
+            "base_recipe_name": self.base_recipe.name,
+            "license": self.license,
+            "summary": self.summary,
+            "description": self.description,
+            "packages_conf": packages_conf.strip()
+        }
 
         recipe_contents = ("# Original recipe %(base_recipe_name)s \n"
                            "%(base_recipe)s\n\n"
@@ -1716,6 +1738,11 @@ def invalidate_cache(**kwargs):
       cache.clear()
     except Exception as e:
       logger.warning("Problem with cache backend: Failed to clear cache: %s" % e)
+
+def signal_runbuilds():
+    """Send SIGUSR1 to runbuilds process"""
+    with open(os.path.join(os.getenv('BUILDDIR'), '.runbuilds.pid')) as pidf:
+        os.kill(int(pidf.read()), SIGUSR1)
 
 django.db.models.signals.post_save.connect(invalidate_cache)
 django.db.models.signals.post_delete.connect(invalidate_cache)

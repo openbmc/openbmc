@@ -4,14 +4,14 @@ Add subpackage -ptest which runs all unit test cases for qemu.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- tests/Makefile |   10 ++++++++++
- 1 file changed, 10 insertions(+)
+ tests/Makefile.include | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/tests/Makefile b/tests/Makefile
-index 88f7105..3f40b4b 100644
---- a/tests/Makefile
-+++ b/tests/Makefile
-@@ -405,3 +405,12 @@ all: $(QEMU_IOTESTS_HELPERS-y)
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 14be491..0fce37a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -776,3 +776,11 @@ all: $(QEMU_IOTESTS_HELPERS-y)
  
  -include $(wildcard tests/*.d)
  -include $(wildcard tests/libqos/*.d)
@@ -23,7 +23,6 @@ index 88f7105..3f40b4b 100644
 +		nf=$$(echo $$f | sed 's/tests\//\.\//g'); \
 +		$$nf; \
 +	done
-+
---
-1.7.9.5
+-- 
+2.9.0
 

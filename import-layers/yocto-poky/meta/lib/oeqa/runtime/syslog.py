@@ -9,7 +9,6 @@ def setUpModule():
 class SyslogTest(oeRuntimeTest):
 
     @testcase(201)
-    @skipUnlessPassed("test_syslog_help")
     def test_syslog_running(self):
         (status,output) = self.target.run(oeRuntimeTest.pscmd + ' | grep -i [s]yslogd')
         self.assertEqual(status, 0, msg="no syslogd process, ps output: %s" % self.target.run(oeRuntimeTest.pscmd)[1])
@@ -19,8 +18,16 @@ class SyslogTestConfig(oeRuntimeTest):
     @testcase(1149)
     @skipUnlessPassed("test_syslog_running")
     def test_syslog_logger(self):
-        (status,output) = self.target.run('logger foobar && test -e /var/log/messages && grep foobar /var/log/messages || logread | grep foobar')
-        self.assertEqual(status, 0, msg="Test log string not found in /var/log/messages. Output: %s " % output)
+        (status, output) = self.target.run('logger foobar')
+        self.assertEqual(status, 0, msg="Can't log into syslog. Output: %s " % output)
+
+        (status, output) = self.target.run('grep foobar /var/log/messages')
+        if status != 0:
+            if oeRuntimeTest.tc.d.getVar("VIRTUAL-RUNTIME_init_manager", "") == "systemd":
+                (status, output) = self.target.run('journalctl -o cat | grep foobar')
+            else:
+                (status, output) = self.target.run('logread | grep foobar')
+        self.assertEqual(status, 0, msg="Test log string not found in /var/log/messages or logread. Output: %s " % output)
 
     @testcase(1150)
     @skipUnlessPassed("test_syslog_running")

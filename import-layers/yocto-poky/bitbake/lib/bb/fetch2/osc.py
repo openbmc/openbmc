@@ -88,23 +88,21 @@ class Osc(FetchMethod):
             oscupdatecmd = self._buildosccommand(ud, d, "update")
             logger.info("Update "+ ud.url)
             # update sources there
-            os.chdir(ud.moddir)
             logger.debug(1, "Running %s", oscupdatecmd)
             bb.fetch2.check_network_access(d, oscupdatecmd, ud.url)
-            runfetchcmd(oscupdatecmd, d)
+            runfetchcmd(oscupdatecmd, d, workdir=ud.moddir)
         else:
             oscfetchcmd = self._buildosccommand(ud, d, "fetch")
             logger.info("Fetch " + ud.url)
             # check out sources there
             bb.utils.mkdirhier(ud.pkgdir)
-            os.chdir(ud.pkgdir)
             logger.debug(1, "Running %s", oscfetchcmd)
             bb.fetch2.check_network_access(d, oscfetchcmd, ud.url)
-            runfetchcmd(oscfetchcmd, d)
+            runfetchcmd(oscfetchcmd, d, workdir=ud.pkgdir)
 
-        os.chdir(os.path.join(ud.pkgdir + ud.path))
         # tar them up to a defined filename
-        runfetchcmd("tar -czf %s %s" % (ud.localpath, ud.module), d, cleanup = [ud.localpath])
+        runfetchcmd("tar -czf %s %s" % (ud.localpath, ud.module), d,
+                    cleanup=[ud.localpath], workdir=os.path.join(ud.pkgdir + ud.path))
 
     def supports_srcrev(self):
         return False

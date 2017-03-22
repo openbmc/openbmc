@@ -1,18 +1,16 @@
 SUMMARY = "Additional utilities for the opkg package manager"
 SUMMARY_update-alternatives-opkg = "Utility for managing the alternatives system"
 SECTION = "base"
-HOMEPAGE = "http://code.google.com/p/opkg/"
+HOMEPAGE = "http://git.yoctoproject.org/cgit/cgit.cgi/opkg-utils"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
                     file://opkg.py;beginline=1;endline=18;md5=15917491ad6bf7acc666ca5f7cc1e083"
 PROVIDES += "${@bb.utils.contains('PACKAGECONFIG', 'update-alternatives', 'virtual/update-alternatives', '', d)}"
 
-SRCREV = "53274f087565fd45d8452c5367997ba6a682a37a"
-PV = "0.1.8+git${SRCPV}"
+SRCREV = "3ffece9bf19a844edacc563aa092fd1fbfcffeee"
+PV = "0.3.2+git${SRCPV}"
 
-SRC_URI = "git://git.yoctoproject.org/opkg-utils \
-           file://opkg-build-Exit-when-fail-to-list-files.patch \
-           file://0001-opkg-build-re-do-find-ls-code-to-not-fail-on-filenam.patch"
+SRC_URI = "git://git.yoctoproject.org/opkg-utils"
 SRC_URI_append_class-native = " file://tar_ignore_error.patch"
 
 S = "${WORKDIR}/git"

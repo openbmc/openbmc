@@ -1,0 +1,57 @@
+From 0c55d7e18f40465e95e8e4bf22af01f5d4477d3c Mon Sep 17 00:00:00 2001
+From: Daniel Klauer <daniel.klauer@gin.de>
+Date: Wed, 11 May 2016 17:22:49 +0200
+Subject: [PATCH] rpm: Don't ignore transaction error with empty problems list
+
+SmartPM could misinterpret RPM transaction error as success,
+if ts.run() (RPM Python API) returns an empty problems list,
+because of incorrect check for None which treated empty list
+to be the same as None when it has different meaning.
+
+ts.run() returns:
+* None in case of success
+* problems list in case of error, may be empty
+(look at rpmts_Run() in rpm-5.4.14/python/rpmts-py.c [1])
+
+"if mylist" is not good enough to check for error here, because it will
+treat an empty list as "false" because its len() == 0 [2].
+
+ts.check() seems to be different (it's ok for it to return an empty list),
+but for consistency it should be made clear that it can return either None,
+an empty list or a non-empty list.
+
+[1] http://rpm5.org/cvs/fileview?f=rpm/python/rpmts-py.c&v=1.111.2.3
+[2] https://docs.python.org/2/library/stdtypes.html#truth-value-testing
+
+Upstream-Status: Pending
+
+Signed-off-by: Daniel Klauer <daniel.klauer@gin.de>
+---
+ smart/backends/rpm/pm.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/smart/backends/rpm/pm.py b/smart/backends/rpm/pm.py
+index 9bbd952..635f726 100644
+--- a/smart/backends/rpm/pm.py
++++ b/smart/backends/rpm/pm.py
+@@ -208,7 +208,7 @@ class RPMPackageManager(PackageManager):
+         force = sysconf.get("rpm-force", False)
+         if not force:
+             probs = ts.check()
+-            if probs:
++            if (probs is not None) and (len(probs) != 0):
+                 problines = []
+                 for prob in probs:
+                     name1 = "%s-%s-%s" % prob[0]
+@@ -247,7 +247,7 @@ class RPMPackageManager(PackageManager):
+             del getTS.ts
+             cb.grabOutput(False)
+             prog.setDone()
+-            if probs:
++            if probs is not None:
+                 raise Error, "\n".join([x[0] for x in probs])
+             prog.stop()
+
+--
+1.9.1
+

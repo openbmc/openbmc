@@ -1,0 +1,30 @@
+# Fixtures directory
+
+Fixtures are data dumps that can be loaded into Toaster's database to provide
+configuration and data.
+
+In this directory we have the fixtures which are loaded the first time you start Toaster.
+This is to provide useful default values and metadata to Toaster.
+
+ - settings.xml This Contains Toaster wide settings, such as the default values for
+   certain bitbake variables.
+
+ - poky.xml This is the default release data for supported poky based setup 
+
+ - oe-core.xml This is the default release data for supported oe-core based setups
+
+# Custom data/configuration
+
+  - custom.xml
+
+To add custom initial data/configuration to Toaster place a file called
+"custom.xml" in this directory. If present it will be loaded into the database.
+We suggest that this is used to overlay any configuration already done.
+All objects loaded with the same primary keys overwrite the existing data.
+Data can be provided in XML, JSON and if installed YAML formats.
+
+# To load data at any point in time
+
+Use the django management command manage.py loaddata <your fixture file>
+For further information see the Django command documentation at:
+https://docs.djangoproject.com/en/1.8/ref/django-admin/#django-admin-loaddata

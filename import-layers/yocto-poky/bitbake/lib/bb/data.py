@@ -182,12 +182,12 @@ def inheritFromOS(d, savedenv, permitted):
 
 def emit_var(var, o=sys.__stdout__, d = init(), all=False):
     """Emit a variable to be sourced by a shell."""
-    if d.getVarFlag(var, "python", False):
+    func = d.getVarFlag(var, "func", False)
+    if d.getVarFlag(var, 'python', False) and func:
         return False
 
     export = d.getVarFlag(var, "export", False)
     unexport = d.getVarFlag(var, "unexport", False)
-    func = d.getVarFlag(var, "func", False)
     if not all and not export and not unexport and not func:
         return False
 
@@ -258,11 +258,13 @@ def exported_keys(d):
                                       not d.getVarFlag(key, 'unexport', False))
 
 def exported_vars(d):
-    for key in exported_keys(d):
+    k = list(exported_keys(d))
+    for key in k:
         try:
             value = d.getVar(key, True)
-        except Exception:
-            pass
+        except Exception as err:
+            bb.warn("%s: Unable to export ${%s}: %s" % (d.getVar("FILE", True), key, err))
+            continue
 
         if value is not None:
             yield key, str(value)
@@ -339,7 +341,7 @@ def build_dependencies(key, keys, shelldeps, varflagsexcl, d):
             deps |= parser.references
             deps = deps | (keys & parser.execs)
             return deps, value
-        varflags = d.getVarFlags(key, ["vardeps", "vardepvalue", "vardepsexclude", "vardepvalueexclude", "postfuncs", "prefuncs", "lineno", "filename"]) or {}
+        varflags = d.getVarFlags(key, ["vardeps", "vardepvalue", "vardepsexclude", "exports", "postfuncs", "prefuncs", "lineno", "filename"]) or {}
         vardeps = varflags.get("vardeps")
         value = d.getVar(key, False)
 
@@ -364,7 +366,7 @@ def build_dependencies(key, keys, shelldeps, varflagsexcl, d):
             if varflags.get("python"):
                 parser = bb.codeparser.PythonParser(key, logger)
                 if value and "\t" in value:
-                    logger.warn("Variable %s contains tabs, please remove these (%s)" % (key, d.getVar("FILE", True)))
+                    logger.warning("Variable %s contains tabs, please remove these (%s)" % (key, d.getVar("FILE", True)))
                 parser.parse_python(value, filename=varflags.get("filename"), lineno=varflags.get("lineno"))
                 deps = deps | parser.references
                 deps = deps | (keys & parser.execs)
@@ -383,6 +385,8 @@ def build_dependencies(key, keys, shelldeps, varflagsexcl, d):
                 deps = deps | set(varflags["prefuncs"].split())
             if "postfuncs" in varflags:
                 deps = deps | set(varflags["postfuncs"].split())
+            if "exports" in varflags:
+                deps = deps | set(varflags["exports"].split())
         else:
             parser = d.expandWithRefs(value, key)
             deps |= parser.references

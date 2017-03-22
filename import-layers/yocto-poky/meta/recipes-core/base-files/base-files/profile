@@ -5,12 +5,6 @@ PATH="/usr/local/bin:/usr/bin:/bin"
 EDITOR="vi"			# needed for packages like cron, git-commit
 test -z "$TERM" && TERM="vt100"	# Basic terminal capab. For screen etc.
 
-if [ ! -e /etc/localtime -a ! -e /etc/TZ ]; then
-	TZ="UTC"		# Time Zone. Look at http://theory.uwinnipeg.ca/gnu/glibc/libc_303.html 
-				# for an explanation of how to set this to your local timezone.
-	export TZ
-fi
-
 if [ "$HOME" = "ROOTHOME" ]; then
    PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
 fi
@@ -20,17 +14,22 @@ if [ "$PS1" ]; then
 fi
 
 if [ -d /etc/profile.d ]; then
-  for i in /etc/profile.d/* ; do
-    . $i
+  for i in /etc/profile.d/*.sh ; do
+    if [ -f $i -a -r $i ]; then
+      . $i
+    fi
   done
   unset i
 fi
 
-if [ -x /usr/bin/resize ];then
-  /usr/bin/resize >/dev/null
+if [ -x /usr/bin/resize ] && termpath="`tty`"; then
+  # Make sure we are on a serial console (i.e. the device used starts with /dev/tty),
+  # otherwise we confuse e.g. the eclipse launcher which tries do use ssh
+  case "$termpath" in
+  /dev/tty*) resize >/dev/null
+  esac
 fi
 
 export PATH PS1 OPIEDIR QPEDIR QTDIR EDITOR TERM
 
 umask 022
-

@@ -634,6 +634,25 @@
                 </para>
             </section>
 
+            <section id='executing-a-list-of-task-and-recipe-combinations'>
+                <title>Executing a List of Task and Recipe Combinations</title>
+
+                <para>
+                    The BitBake command line supports specifying different
+                    tasks for individual targets when you specify multiple
+                    targets.
+                    For example, suppose you had two targets (or recipes)
+                    <filename>myfirstrecipe</filename> and
+                    <filename>mysecondrecipe</filename> and you needed
+                    BitBake to run <filename>taskA</filename> for the first
+                    recipe and <filename>taskB</filename> for the second
+                    recipe:
+                    <literallayout class='monospaced'>
+     $ bitbake myfirstrecipe:do_taskA mysecondrecipe:do_taskB
+                    </literallayout>
+                </para>
+            </section>
+
             <section id='generating-dependency-graphs'>
                 <title>Generating Dependency Graphs</title>
 

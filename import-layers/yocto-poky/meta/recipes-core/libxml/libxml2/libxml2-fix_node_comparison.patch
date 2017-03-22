@@ -1,0 +1,67 @@
+libxml2-2.9.4: Fix comparison with root node in xmlXPathCmpNodes and NULL pointer deref in XPointer
+
+xpath:
+ - Check for errors after evaluating first operand.
+ - Add sanity check for empty stack.
+ - Include comparation in changes from xmlXPathCmpNodesExt to xmlXPathCmpNodes
+
+Upstream-Status: Backported
+ - [https://git.gnome.org/browse/libxml2/commit/?id=c1d1f7121194036608bf555f08d3062a36fd344b]
+ - [https://git.gnome.org/browse/libxml2/commit/?id=a005199330b86dada19d162cae15ef9bdcb6baa8]
+CVE: necessary changes for fixing CVE-2016-5131
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
+
+diff --git a/result/XPath/xptr/viderror b/result/XPath/xptr/viderror
+new file mode 100644
+index 0000000..d589882
+--- /dev/null
++++ b/result/XPath/xptr/viderror
+@@ -0,0 +1,4 @@
++
++========================
++Expression: xpointer(non-existing-fn()/range-to(id('chapter2')))
++Object is empty (NULL)
+diff --git a/test/XPath/xptr/viderror b/test/XPath/xptr/viderror
+new file mode 100644
+index 0000000..da8c53b
+--- /dev/null
++++ b/test/XPath/xptr/viderror
+@@ -0,0 +1 @@
++xpointer(non-existing-fn()/range-to(id('chapter2')))
+diff --git a/xpath.c b/xpath.c
+index 113bce6..d992841 100644
+--- a/xpath.c
++++ b/xpath.c
+@@ -3342,13 +3342,13 @@ xmlXPathCmpNodes(xmlNodePtr node1, xmlNodePtr node2) {
+      * compute depth to root
+      */
+     for (depth2 = 0, cur = node2;cur->parent != NULL;cur = cur->parent) {
+-	if (cur == node1)
++	if (cur->parent == node1)
+ 	    return(1);
+ 	depth2++;
+     }
+     root = cur;
+     for (depth1 = 0, cur = node1;cur->parent != NULL;cur = cur->parent) {
+-	if (cur == node2)
++	if (cur->parent == node2)
+ 	    return(-1);
+ 	depth1++;
+     }
+@@ -14005,9 +14005,14 @@ xmlXPathCompOpEval(xmlXPathParserContextPtr ctxt, xmlXPathStepOpPtr op)
+                 xmlNodeSetPtr oldset;
+                 int i, j;
+ 
+-                if (op->ch1 != -1)
++                if (op->ch1 != -1) {
+                     total +=
+                         xmlXPathCompOpEval(ctxt, &comp->steps[op->ch1]);
++                    CHECK_ERROR0;
++                }
++                if (ctxt->value == NULL) {
++                    XP_ERROR0(XPATH_INVALID_OPERAND);
++                }
+                 if (op->ch2 == -1)
+                     return (total);
+ 

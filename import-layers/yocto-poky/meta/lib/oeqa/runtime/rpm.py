@@ -51,12 +51,32 @@ class RpmInstallRemoveTest(oeRuntimeTest):
     @testcase(1096)
     @skipUnlessPassed('test_ssh')
     def test_rpm_query_nonroot(self):
-        (status, output) = self.target.run('useradd test1')
-        self.assertTrue(status == 0, msg="Failed to create new user: " + output)
-        (status, output) = self.target.run('sudo -u test1 id')
-        self.assertTrue('(test1)' in output, msg="Failed to execute as new user")
-        (status, output) = self.target.run('sudo -u test1 rpm -qa')
-        self.assertEqual(status, 0, msg="status: %s. Cannot run rpm -qa: %s" % (status, output))
+
+        def set_up_test_user(u):
+            (status, output) = self.target.run("id -u %s" % u)
+            if status == 0:
+                pass
+            else:
+                (status, output) = self.target.run("useradd %s" % u)
+                self.assertTrue(status == 0, msg="Failed to create new user: " + output)
+
+        def exec_as_test_user(u):
+            (status, output) = self.target.run("su -c id %s" % u)
+            self.assertTrue("({0})".format(u) in output, msg="Failed to execute as new user")
+            (status, output) = self.target.run("su -c \"rpm -qa\" %s " % u)
+            self.assertEqual(status, 0, msg="status: %s. Cannot run rpm -qa: %s" % (status, output))
+
+        def unset_up_test_user(u):
+            (status, output) = self.target.run("userdel -r %s" % u)
+            self.assertTrue(status == 0, msg="Failed to erase user: %s" % output)
+
+        tuser = 'test1'
+
+        try:
+            set_up_test_user(tuser)
+            exec_as_test_user(tuser)
+        finally:
+            unset_up_test_user(tuser)
 
     @testcase(195)
     @skipUnlessPassed('test_rpm_install')
@@ -98,4 +118,3 @@ class RpmInstallRemoveTest(oeRuntimeTest):
     @classmethod
     def tearDownClass(self):
         oeRuntimeTest.tc.target.run('rm -f /tmp/rpm-doc.rpm')
-

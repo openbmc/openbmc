@@ -1,0 +1,37 @@
+From 657983ef9ca8f8354172682e17408c4f6b5bc667 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 14 Jul 2016 19:46:08 -0700
+Subject: [PATCH 1/4] pkg-diff.sh: check_single_file(): return at once when
+ same
+
+If the two files are the same, return at once, this can save a lot of
+time when there are archives inside archives.
+
+Upstream-Status: Submitted [https://github.com/openSUSE/build-compare/pull/10]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ pkg-diff.sh | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/pkg-diff.sh b/pkg-diff.sh
+index 3cf10aa..402d4a4 100644
+--- a/pkg-diff.sh
++++ b/pkg-diff.sh
+@@ -293,6 +293,13 @@ check_compressed_file()
+ check_single_file()
+ {
+   local file="$1"
++
++  # If the two files are the same, return at once.
++  if [ -f old/$file -a -f new/$file ]; then
++    if cmp -s old/$file new/$file; then
++      return 0
++    fi
++  fi
+   case $file in
+     *.spec)
+        sed -i -e "s,Release:.*$release1,Release: @RELEASE@," old/$file
+-- 
+2.9.0
+

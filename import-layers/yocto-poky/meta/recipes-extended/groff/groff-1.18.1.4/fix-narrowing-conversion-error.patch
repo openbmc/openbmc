@@ -1,0 +1,61 @@
+From fc289ab69c6d7e4ad489172509a85f68afec43ea Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 29 Jul 2016 03:19:39 -0400
+Subject: [PATCH] fix narrowing conversion error
+
+While gcc6 used, build old groff (for anti-GPLv3 reasons) failed:
+.....
+|groff-1.18.1.4/src/devices/grolbp/charset.h:69:1: error: narrowing
+conversion of '130' from 'int' to 'char' inside { } [-Wnarrowing]
+......
+
+In upstream git://git.savannah.gnu.org/groff.git,
+the following commit fix the issue, but the license is GPLV3,
+we could not backport it to the old groff which license is GPLV2.
+...
+commit d180038ae0da19655bc2760ae2043efa0550a76c
+Author: Werner LEMBERG <wl@gnu.org>
+Date:   Wed Apr 16 21:11:07 2003 +0000
+    * src/devices/grolbp/charset.h (symset): Use `unsigned char'.
+...
+
+We use another different way to fix the issue.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/devices/grolbp/charset.h | 2 +-
+ src/devices/grolbp/lbp.cc    | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/devices/grolbp/charset.h b/src/devices/grolbp/charset.h
+index adc76f4..e9c6c5b 100644
+--- a/src/devices/grolbp/charset.h
++++ b/src/devices/grolbp/charset.h
+@@ -1,6 +1,6 @@
+ // Definition of the WP54 character set
+ 
+-char symset[] = {
++int symset[] = {
+ 0x57,0x50,0x35,0x34,0x00,0x41,0x76,0x61,0x6e,0x74,0x47,0x61,
+ 0x72,0x64,0x65,0x2d,0x42,0x6f,0x6f,0x6b,0x00,0x41,0x76,
+ 0x61,0x6e,0x74,0x47,0x61,0x72,0x64,0x65,0x2d,0x44,0x65,
+diff --git a/src/devices/grolbp/lbp.cc b/src/devices/grolbp/lbp.cc
+index 76db32a..00d4ca7 100644
+--- a/src/devices/grolbp/lbp.cc
++++ b/src/devices/grolbp/lbp.cc
+@@ -152,8 +152,8 @@ static void wp54charset()
+ {
+   unsigned int i;
+   lbpputs("\033[714;100;29;0;32;120.}");
+-  for (i = 0; i < sizeof(symset); i++)
+-    lbpputc(symset[i]);
++  for (i = 0; i < sizeof(symset)/sizeof(symset[0]); i++)
++    lbpputc((char)symset[i]&0xFF);
+   lbpputs("\033[100;0 D");
+   return;
+ }
+-- 
+2.8.1
+

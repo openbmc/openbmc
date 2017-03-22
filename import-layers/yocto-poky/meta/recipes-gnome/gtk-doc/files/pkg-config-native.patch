@@ -1,0 +1,34 @@
+Use native pkg-config when looking for gtk-doc.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/gtk-doc.m4 b/gtk-doc.m4
+index 3675543..94881ae 100644
+--- a/gtk-doc.m4
++++ b/gtk-doc.m4
+@@ -1,6 +1,6 @@
+ dnl -*- mode: autoconf -*-
+
+-# serial 2
++# serial 2.1
+
+ dnl Usage:
+ dnl   GTK_DOC_CHECK([minimum-gtk-doc-version])
+@@ -10,11 +10,16 @@ AC_DEFUN([GTK_DOC_CHECK],
+   AC_BEFORE([AC_PROG_LIBTOOL],[$0])dnl setup libtool first
+   AC_BEFORE([AM_PROG_LIBTOOL],[$0])dnl setup libtool first
+
++  gtkdoc_pkgconfig_save=$PKG_CONFIG
++  PKG_CONFIG=pkg-config-native
++
+   ifelse([$1],[],[gtk_doc_requires="gtk-doc"],[gtk_doc_requires="gtk-doc >= $1"])
+   AC_MSG_CHECKING([for gtk-doc])
+   PKG_CHECK_EXISTS([$gtk_doc_requires],[have_gtk_doc=yes],[have_gtk_doc=no])
+   AC_MSG_RESULT($have_gtk_doc)
+
++  PKG_CONFIG=$gtkdoc_pkgconfig_save
++
+   if test "$have_gtk_doc" = "no"; then
+       AC_MSG_WARN([
+   You will not be able to create source packages with 'make dist'

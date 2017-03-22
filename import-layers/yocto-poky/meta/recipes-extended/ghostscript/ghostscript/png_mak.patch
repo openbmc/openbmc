@@ -1,21 +1,32 @@
 ghostscript: add dependency for pnglibconf.h
-    
+
 When using parallel make jobs, we need to be sure that
 pnglibconf.h is created before we try to reference it,
 so add a rule to png.mak.
 
 Upstream-Status: Pending
-    
+
 Signed-off-by: Joe Slater <jslater@windriver.com>
 
+Rebase to 9.19
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ base/png.mak | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/base/png.mak b/base/png.mak
+index fe5c6e2..8abb53a 100644
 --- a/base/png.mak
 +++ b/base/png.mak
-@@ -81,6 +81,8 @@ png.config-clean :
- $(pnglibconf_h) : $(PNGSRC)scripts$(D)pnglibconf.h.prebuilt
- 	$(CP_)  $(PNGSRC)scripts$(D)pnglibconf.h.prebuilt $(pnglibconf_h)
+@@ -74,6 +74,8 @@ png.clean-not-config-clean :
+ 
+ pnglibconf_h=$(PNGGENDIR)$(D)pnglibconf.h
  
 +$(MAKEDIRS) : $(pnglibconf_h)
 +
- PDEP=$(AK) $(pnglibconf_h) $(MAKEDIRS)
- 
- png_1=$(PNGOBJ)png.$(OBJ) $(PNGOBJ)pngmem.$(OBJ) $(PNGOBJ)pngerror.$(OBJ) $(PNGOBJ)pngset.$(OBJ)
+ png.config-clean :
+ 	$(RM_) $(pnglibconf_h)
+ 	$(RM_) $(PNGGEN)lpg*.dev
+-- 
+2.8.1
+

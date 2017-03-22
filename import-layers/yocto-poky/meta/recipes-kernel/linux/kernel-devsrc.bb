@@ -28,9 +28,6 @@ do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 do_populate_sysroot[noexec] = "1"
 
-# Define where the kernel headers are installed on the target as well as where
-# they are staged.
-KERNEL_SRC_PATH = "/usr/src/kernel"
 S = "${STAGING_KERNEL_DIR}"
 B = "${STAGING_KERNEL_BUILDDIR}"
 

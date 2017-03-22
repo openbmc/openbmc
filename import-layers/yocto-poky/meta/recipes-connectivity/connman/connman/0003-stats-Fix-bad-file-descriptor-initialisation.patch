@@ -1,0 +1,102 @@
+From c7f4151fb053b0d0691d8f10d7e3690265d28889 Mon Sep 17 00:00:00 2001
+From: Lukasz Nowak <lnowak@tycoint.com>
+Date: Wed, 26 Oct 2016 18:13:02 +0100
+Subject: [PATCH] stats: Fix bad file descriptor initialisation
+
+Stats file code initialises its file descriptor field to 0.  But 0 is
+a valid fd value. -1 should be used instead.  This causes problems
+when an error happens before a stats file is open (e.g. mkdir
+fails). The clean-up procedure, stats_free() calls close(fd).  When fd
+is 0, this first closes stdin, and then any files/sockets which
+received fd=0, re-used by the OS.
+
+Fixed several instances of bad file descriptor field handling, in case
+of errors.
+
+The bug results with connman freezing if there is no read/write storage
+directory available, and there are multiple active interfaces
+(fd=0 gets re-used for sockets in that case).
+
+The patch was imported from the Connman git repository
+(git://git.kernel.org/pub/scm/network/connman) as of commit id
+c7f4151fb053b0d0691d8f10d7e3690265d28889. 
+
+Upstream-Status: Accepted
+Signed-off-by: Lukasz Nowak <lnowak@tycoint.com>
+---
+ src/stats.c | 15 +++++++++++++++
+ src/util.c  |  4 ++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/src/stats.c b/src/stats.c
+index 26343b1..c3ca738 100644
+--- a/src/stats.c
++++ b/src/stats.c
+@@ -378,6 +378,7 @@ static int stats_file_setup(struct stats_file *file)
+ 			strerror(errno), file->name);
+ 
+ 		TFR(close(file->fd));
++		file->fd = -1;
+ 		g_free(file->name);
+ 		file->name = NULL;
+ 
+@@ -393,6 +394,7 @@ static int stats_file_setup(struct stats_file *file)
+ 	err = stats_file_remap(file, size);
+ 	if (err < 0) {
+ 		TFR(close(file->fd));
++		file->fd = -1;
+ 		g_free(file->name);
+ 		file->name = NULL;
+ 
+@@ -649,6 +651,13 @@ static int stats_file_history_update(struct stats_file *data_file)
+ 	bzero(history_file, sizeof(struct stats_file));
+ 	bzero(temp_file, sizeof(struct stats_file));
+ 
++	/*
++	 * 0 is a valid file descriptor - fd needs to be initialized
++	 * to -1 to handle errors correctly
++	 */
++	history_file->fd = -1;
++	temp_file->fd = -1;
++
+ 	err = stats_open(history_file, data_file->history_name);
+ 	if (err < 0)
+ 		return err;
+@@ -682,6 +691,12 @@ int __connman_stats_service_register(struct connman_service *service)
+ 		if (!file)
+ 			return -ENOMEM;
+ 
++		/*
++		 * 0 is a valid file descriptor - fd needs to be initialized
++		 * to -1 to handle errors correctly
++		 */
++		file->fd = -1;
++
+ 		g_hash_table_insert(stats_hash, service, file);
+ 	} else {
+ 		return -EALREADY;
+diff --git a/src/util.c b/src/util.c
+index e6532c8..732d451 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -63,7 +63,7 @@ int __connman_util_init(void)
+ {
+ 	int r = 0;
+ 
+-	if (f > 0)
++	if (f >= 0)
+ 		return 0;
+ 
+ 	f = open(URANDOM, O_RDONLY);
+@@ -86,7 +86,7 @@ int __connman_util_init(void)
+ 
+ void __connman_util_cleanup(void)
+ {
+-	if (f > 0)
++	if (f >= 0)
+ 		close(f);
+ 
+ 	f = -1;
+-- 
+2.7.4
+

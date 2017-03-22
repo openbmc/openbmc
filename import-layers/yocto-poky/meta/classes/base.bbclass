@@ -10,7 +10,7 @@ inherit utility-tasks
 inherit metadata_scm
 inherit logging
 
-OE_IMPORTS += "os sys time oe.path oe.utils oe.data oe.package oe.packagegroup oe.sstatesig oe.lsb oe.cachedpath"
+OE_IMPORTS += "os sys time oe.path oe.utils oe.types oe.package oe.packagegroup oe.sstatesig oe.lsb oe.cachedpath"
 OE_IMPORTS[type] = "list"
 
 def oe_import(d):
@@ -105,12 +105,15 @@ def get_lic_checksum_file_list(d):
         # any others should be covered by SRC_URI.
         try:
             path = bb.fetch.decodeurl(url)[2]
+            if not path:
+                raise bb.fetch.MalformedUrl(url)
+
             if path[0] == '/':
                 if path.startswith(tmpdir):
                     continue
                 filelist.append(path + ":" + str(os.path.exists(path)))
         except bb.fetch.MalformedUrl:
-            raise bb.build.FuncFailed(d.getVar('PN', True) + ": LIC_FILES_CHKSUM contains an invalid URL: " + url)
+            bb.fatal(d.getVar('PN', True) + ": LIC_FILES_CHKSUM contains an invalid URL: " + url)
     return " ".join(filelist)
 
 addtask fetch
@@ -128,30 +131,28 @@ python base_do_fetch() {
         fetcher = bb.fetch2.Fetch(src_uri, d)
         fetcher.download()
     except bb.fetch2.BBFetchException as e:
-        raise bb.build.FuncFailed(e)
+        bb.fatal(str(e))
 }
 
 addtask unpack after do_fetch
 do_unpack[dirs] = "${WORKDIR}"
+
+python () {
+    if d.getVar('S', True) != d.getVar('WORKDIR', True):
+        d.setVarFlag('do_unpack', 'cleandirs', '${S}')
+    else:
+        d.setVarFlag('do_unpack', 'cleandirs', os.path.join('${S}', 'patches'))
+}
 python base_do_unpack() {
     src_uri = (d.getVar('SRC_URI', True) or "").split()
     if len(src_uri) == 0:
         return
 
-    rootdir = d.getVar('WORKDIR', True)
-
-    # Ensure that we cleanup ${S}/patches
-    # TODO: Investigate if we can remove
-    # the entire ${S} in this case.
-    s_dir = d.getVar('S', True)
-    p_dir = os.path.join(s_dir, 'patches')
-    bb.utils.remove(p_dir, True)
-
     try:
         fetcher = bb.fetch2.Fetch(src_uri, d)
-        fetcher.unpack(rootdir)
+        fetcher.unpack(d.getVar('WORKDIR', True))
     except bb.fetch2.BBFetchException as e:
-        raise bb.build.FuncFailed(e)
+        bb.fatal(str(e))
 }
 
 def pkgarch_mapping(d):
@@ -308,7 +309,7 @@ base_do_compile() {
 }
 
 addtask install after do_compile
-do_install[dirs] = "${D} ${B}"
+do_install[dirs] = "${B}"
 # Remove and re-create ${D} so that is it guaranteed to be empty
 do_install[cleandirs] = "${D}"
 
@@ -430,12 +431,6 @@ python () {
         appendVar('RDEPENDS_${PN}', extrardeps)
         appendVar('PACKAGECONFIG_CONFARGS', extraconf)
 
-        # TODO: once all recipes/classes abusing EXTRA_OECONF
-        # to get PACKAGECONFIG options are fixed to use PACKAGECONFIG_CONFARGS
-        # move this appendVar to autotools.bbclass.
-        if not bb.data.inherits_class('cmake', d):
-            appendVar('EXTRA_OECONF', extraconf)
-
     pn = d.getVar('PN', True)
     license = d.getVar('LICENSE', True)
     if license == "INVALID":
@@ -477,7 +472,7 @@ python () {
         else:
             raise bb.parse.SkipPackage("incompatible with machine %s (not in COMPATIBLE_MACHINE)" % d.getVar('MACHINE', True))
 
-    source_mirror_fetch = d.getVar('SOURCE_MIRROR_FETCH', 0)
+    source_mirror_fetch = d.getVar('SOURCE_MIRROR_FETCH', False)
     if not source_mirror_fetch:
         need_host = d.getVar('COMPATIBLE_HOST', True)
         if need_host:
@@ -490,7 +485,7 @@ python () {
 
         check_license = False if pn.startswith("nativesdk-") else True
         for t in ["-native", "-cross-${TARGET_ARCH}", "-cross-initial-${TARGET_ARCH}",
-              "-crosssdk-${SDK_ARCH}", "-crosssdk-initial-${SDK_ARCH}",
+              "-crosssdk-${SDK_SYS}", "-crosssdk-initial-${SDK_SYS}",
               "-cross-canadian-${TRANSLATED_TARGET_ARCH}"]:
             if pn.endswith(d.expand(t)):
                 check_license = False
@@ -542,6 +537,19 @@ python () {
                 if pn in incompatwl:
                     bb.note("INCLUDING " + pn + " as buildable despite INCOMPATIBLE_LICENSE because it has been whitelisted")
 
+        # Try to verify per-package (LICENSE_<pkg>) values. LICENSE should be a
+        # superset of all per-package licenses. We do not do advanced (pattern)
+        # matching of license expressions - just check that all license strings
+        # in LICENSE_<pkg> are found in LICENSE.
+        license_set = oe.license.list_licenses(license)
+        for pkg in d.getVar('PACKAGES', True).split():
+            pkg_license = d.getVar('LICENSE_' + pkg, True)
+            if pkg_license:
+                unlisted = oe.license.list_licenses(pkg_license) - license_set
+                if unlisted:
+                    bb.warn("LICENSE_%s includes licenses (%s) that are not "
+                            "listed in LICENSE" % (pkg, ' '.join(unlisted)))
+
     needsrcrev = False
     srcuri = d.getVar('SRC_URI', True)
     for uri in srcuri.split():
@@ -565,6 +573,10 @@ python () {
         elif scheme == "hg":
             needsrcrev = True
             d.appendVarFlag('do_fetch', 'depends', ' mercurial-native:do_populate_sysroot')
+
+        # Perforce packages support SRCREV = "${AUTOREV}"
+        elif scheme == "p4":
+            needsrcrev = True
 
         # OSC packages should DEPEND on osc-native
         elif scheme == "osc":
@@ -658,8 +670,8 @@ python do_cleanall() {
     try:
         fetcher = bb.fetch2.Fetch(src_uri, d)
         fetcher.clean()
-    except bb.fetch2.BBFetchException, e:
-        raise bb.build.FuncFailed(e)
+    except bb.fetch2.BBFetchException as e:
+        bb.fatal(str(e))
 }
 do_cleanall[nostamp] = "1"
 

@@ -1,0 +1,57 @@
+Upstream-Status: Backport
+
+Supplementary fix of CVE-2016-5403 which is backported from:
+
+http://git.qemu.org/?p=qemu.git;a=commit;h=4b7f91e
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From 4b7f91ed0270a371e1933efa21ba600b6da23ab9 Mon Sep 17 00:00:00 2001
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 7 Sep 2016 11:51:25 -0400
+Subject: [PATCH] virtio: zero vq->inuse in virtio_reset()
+
+vq->inuse must be zeroed upon device reset like most other virtqueue
+fields.
+
+In theory, virtio_reset() just needs assert(vq->inuse == 0) since
+devices must clean up in-flight requests during reset (requests cannot
+not be leaked!).
+
+In practice, it is difficult to achieve vq->inuse == 0 across reset
+because balloon, blk, 9p, etc implement various different strategies for
+cleaning up requests.  Most devices call g_free(elem) directly without
+telling virtio.c that the VirtQueueElement is cleaned up.  Therefore
+vq->inuse is not decremented during reset.
+
+This patch zeroes vq->inuse and trusts that devices are not leaking
+VirtQueueElements across reset.
+
+I will send a follow-up series that refactors request life-cycle across
+all devices and converts vq->inuse = 0 into assert(vq->inuse == 0) but
+this more invasive approach is not appropriate for stable trees.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-stable <qemu-stable@nongnu.org>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Ladi Prosek <lprosek@redhat.com>
+---
+ hw/virtio/virtio.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 74c085c..e8a13a5 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -822,6 +822,7 @@ void virtio_reset(void *opaque)
+         vdev->vq[i].signalled_used_valid = false;
+         vdev->vq[i].notification = true;
+         vdev->vq[i].vring.num = vdev->vq[i].vring.num_default;
++        vdev->vq[i].inuse = 0;
+     }
+ }
+ 
+-- 
+2.9.3
+

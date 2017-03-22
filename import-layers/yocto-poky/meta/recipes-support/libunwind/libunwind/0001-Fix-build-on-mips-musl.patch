@@ -1,0 +1,81 @@
+From e623c7703945a5eb6c9a30586ec5e23b2f7396f6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 23 Mar 2016 06:08:59 +0000
+Subject: [PATCH] Fix build on mips/musl
+
+Do not include endian.h on musl it includes
+further headers which can not be compiled in __ASSEMBLER__
+ mode
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/coredump/_UCD_internal.h | 34 ++++++++++++++++++++++++++++++++++
+ src/mips/getcontext.S        |  3 +--
+ 2 files changed, 35 insertions(+), 2 deletions(-)
+
+Index: git/src/coredump/_UCD_internal.h
+===================================================================
+--- git.orig/src/coredump/_UCD_internal.h
++++ git/src/coredump/_UCD_internal.h
+@@ -44,6 +44,41 @@ WITH THE SOFTWARE OR THE USE OR OTHER DE
+ 
+ #include "libunwind_i.h"
+ 
++#ifndef __GLIBC__
++#include <sys/reg.h>
++
++#define EF_REG0			6
++#define EF_REG1			7
++#define EF_REG2			8
++#define EF_REG3			9
++#define EF_REG4			10
++#define EF_REG5			11
++#define EF_REG6			12
++#define EF_REG7			13
++#define EF_REG8			14
++#define EF_REG9			15
++#define EF_REG10		16
++#define EF_REG11		17
++#define EF_REG12		18
++#define EF_REG13		19
++#define EF_REG14		20
++#define EF_REG15		21
++#define EF_REG16		22
++#define EF_REG17		23
++#define EF_REG18		24
++#define EF_REG19		25
++#define EF_REG20		26
++#define EF_REG21		27
++#define EF_REG22		28
++#define EF_REG23		29
++#define EF_REG24		30
++#define EF_REG25		31
++#define EF_REG28		34
++#define EF_REG29		35
++#define EF_REG30		36
++#define EF_REG31		37
++#endif
++
+ 
+ #if SIZEOF_OFF_T == 4
+ typedef uint32_t uoff_t;
+Index: git/src/mips/getcontext.S
+===================================================================
+--- git.orig/src/mips/getcontext.S
++++ git/src/mips/getcontext.S
+@@ -24,12 +24,11 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ 
+ #include "offsets.h"
+-#include <endian.h>
+ 
+ 	.text
+ 
+ #if _MIPS_SIM == _ABIO32
+-# if __BYTE_ORDER == __BIG_ENDIAN
++# if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+ #  define OFFSET 4
+ # else
+ #  define OFFSET 0

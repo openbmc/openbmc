@@ -52,7 +52,7 @@
        <link linkend='var-MIRRORS'>M</link>
 <!--               <link linkend='var-glossary-n'>N</link> -->
        <link linkend='var-OVERRIDES'>O</link>
-       <link linkend='var-PACKAGES'>P</link>
+       <link linkend='var-P4DIR'>P</link>
 <!--       <link linkend='var-QMAKE_PROFILES'>Q</link> -->
        <link linkend='var-RDEPENDS'>R</link>
        <link linkend='var-SECTION'>S</link>
@@ -716,7 +716,7 @@
             </glossdef>
         </glossentry>
 
-        <glossentry id='var-BB_SETSCENE_VERIFY_FUNCTION'><glossterm>BB_SETSCENE_VERIFY_FUNCTION</glossterm>
+        <glossentry id='var-BB_SETSCENE_VERIFY_FUNCTION2'><glossterm>BB_SETSCENE_VERIFY_FUNCTION2</glossterm>
             <glossdef>
                 <para>
                     Specifies a function to call that verifies the list of
@@ -986,6 +986,29 @@
      BBCLASSEXTEND =+ "native nativesdk"
      BBCLASSEXTEND =+ "multilib:<replaceable>multilib_name</replaceable>"
                     </literallayout>
+                    <note>
+                        <para>
+                        Internally, the <filename>BBCLASSEXTEND</filename>
+                        mechanism generates recipe variants by rewriting
+                        variable values and applying overrides such as
+                        <filename>_class-native</filename>.
+                        For example, to generate a native version of a recipe,
+                        a
+                        <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                        on "foo" is rewritten to a <filename>DEPENDS</filename>
+                        on "foo-native".
+                        </para>
+
+                        <para>
+                        Even when using <filename>BBCLASSEXTEND</filename>, the
+                        recipe is only parsed once.
+                        Parsing once adds some limitations.
+                        For example, it is not possible to
+                        include a different file depending on the variant,
+                        since <filename>include</filename> statements are
+                        processed when the recipe is parsed.
+                        </para>
+                    </note>
                 </para>
              </glossdef>
         </glossentry>
@@ -994,7 +1017,7 @@
             <glossdef>
                 <para>
                     Sets the BitBake debug output level to a specific value
-                    as incremented by the <filename>-d</filename> command line
+                    as incremented by the <filename>-D</filename> command line
                     option.
                     <note>
                         You must set this variable in the external environment
@@ -1636,6 +1659,17 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-LAYERDIR_RE'><glossterm>LAYERDIR_RE</glossterm>
+            <glossdef>
+                <para>When used inside the <filename>layer.conf</filename> configuration
+                    file, this variable provides the path of the current layer,
+                    escaped for use in a regular expression
+                    (<link linkend='var-BBFILE_PATTERN'><filename>BBFILE_PATTERN</filename></link>).
+                    This variable is not available outside of <filename>layer.conf</filename>
+                    and references are expanded immediately when parsing of the file completes.</para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-LAYERVERSION'><glossterm>LAYERVERSION</glossterm>
             <glossdef>
                 <para>Optionally specifies the version of a layer as a single number.
@@ -1736,6 +1770,15 @@
     </glossdiv>
 
     <glossdiv id='var-glossary-p'><title>P</title>
+
+        <glossentry id='var-P4DIR'><glossterm>P4DIR</glossterm>
+            <glossdef>
+                <para>
+                    The directory in which a local copy of a Perforce depot
+                    is stored when it is fetched.
+                </para>
+            </glossdef>
+        </glossentry>
 
         <glossentry id='var-PACKAGES'><glossterm>PACKAGES</glossterm>
             <glossdef>
@@ -1932,6 +1975,27 @@
                     </literallayout>
                     The <filename>PROVIDES</filename> statement results in
                     the "libav" recipe also being known as "libpostproc".
+                </para>
+
+                <para>
+                    In addition to providing recipes under alternate names,
+                    the <filename>PROVIDES</filename> mechanism is also used
+                    to implement virtual targets.
+                    A virtual target is a name that corresponds to some
+                    particular functionality (e.g. a Linux kernel).
+                    Recipes that provide the functionality in question list the
+                    virtual target in <filename>PROVIDES</filename>.
+                    Recipes that depend on the functionality in question can
+                    include the virtual target in
+                    <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                    to leave the choice of provider open.
+                </para>
+
+                <para>
+                    Conventionally, virtual targets have names on the form
+                    "virtual/function" (e.g. "virtual/kernel").
+                    The slash is simply part of the name and has no
+                    syntactical significance.
                 </para>
             </glossdef>
         </glossentry>

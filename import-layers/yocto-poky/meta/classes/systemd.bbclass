@@ -32,7 +32,7 @@ if type systemctl >/dev/null 2>/dev/null; then
 	systemctl $OPTS ${SYSTEMD_AUTO_ENABLE} ${SYSTEMD_SERVICE}
 
 	if [ -z "$D" -a "${SYSTEMD_AUTO_ENABLE}" = "enable" ]; then
-		systemctl restart ${SYSTEMD_SERVICE}
+		systemctl --no-block restart ${SYSTEMD_SERVICE}
 	fi
 fi
 }
@@ -165,8 +165,7 @@ python systemd_populate_packages() {
                 if path_found != '':
                     systemd_add_files_and_parse(pkg_systemd, path_found, service, keys)
                 else:
-                    raise bb.build.FuncFailed("SYSTEMD_SERVICE_%s value %s does not exist" % \
-                        (pkg_systemd, service))
+                    bb.fatal("SYSTEMD_SERVICE_%s value %s does not exist" % (pkg_systemd, service))
 
     # Run all modifications once when creating package
     if os.path.exists(d.getVar("D", True)):

@@ -25,30 +25,25 @@ BitBake build tools.
 #
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
-from __future__ import absolute_import
-from __future__ import print_function
 import os, re
 import signal
 import logging
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+if 'git' not in urllib.parse.uses_netloc:
+    urllib.parse.uses_netloc.append('git')
+import operator
+import collections
+import subprocess
+import pickle
 import bb.persist_data, bb.utils
 import bb.checksum
 from bb import data
 import bb.process
-import subprocess
 
 __version__ = "2"
 _checksum_cache = bb.checksum.FileChecksumCache()
 
 logger = logging.getLogger("BitBake.Fetcher")
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-    logger.info("Importing cPickle failed. "
-                "Falling back to a very slow implementation.")
 
 class BBFetchException(Exception):
     """Class all fetch exceptions inherit from"""
@@ -231,14 +226,14 @@ class URI(object):
         # them are not quite RFC compliant.
         uri, param_str = (uri.split(";", 1) + [None])[:2]
 
-        urlp = urlparse.urlparse(uri)
+        urlp = urllib.parse.urlparse(uri)
         self.scheme = urlp.scheme
 
         reparse = 0
 
         # Coerce urlparse to make URI scheme use netloc
-        if not self.scheme in urlparse.uses_netloc:
-            urlparse.uses_params.append(self.scheme)
+        if not self.scheme in urllib.parse.uses_netloc:
+            urllib.parse.uses_params.append(self.scheme)
             reparse = 1
 
         # Make urlparse happy(/ier) by converting local resources
@@ -249,7 +244,7 @@ class URI(object):
             reparse = 1
 
         if reparse:
-            urlp = urlparse.urlparse(uri)
+            urlp = urllib.parse.urlparse(uri)
 
         # Identify if the URI is relative or not
         if urlp.scheme in self._relative_schemes and \
@@ -265,7 +260,7 @@ class URI(object):
             if urlp.password:
                 self.userinfo += ':%s' % urlp.password
 
-        self.path = urllib.unquote(urlp.path)
+        self.path = urllib.parse.unquote(urlp.path)
 
         if param_str:
             self.params = self._param_str_split(param_str, ";")
@@ -297,7 +292,7 @@ class URI(object):
             if self.query else '')
 
     def _param_str_split(self, string, elmdelim, kvdelim="="):
-        ret = {}
+        ret = collections.OrderedDict()
         for k, v in [x.split(kvdelim, 1) for x in string.split(elmdelim)]:
             ret[k] = v
         return ret
@@ -313,11 +308,11 @@ class URI(object):
 
     @property
     def path_quoted(self):
-        return urllib.quote(self.path)
+        return urllib.parse.quote(self.path)
 
     @path_quoted.setter
     def path_quoted(self, path):
-        self.path = urllib.unquote(path)
+        self.path = urllib.parse.unquote(path)
 
     @property
     def path(self):
@@ -390,7 +385,7 @@ def decodeurl(url):
         user = ''
         pswd = ''
 
-    p = {}
+    p = collections.OrderedDict()
     if parm:
         for s in parm.split(';'):
             if s:
@@ -399,7 +394,7 @@ def decodeurl(url):
                 s1, s2 = s.split('=')
                 p[s1] = s2
 
-    return type, host, urllib.unquote(path), user, pswd, p
+    return type, host, urllib.parse.unquote(path), user, pswd, p
 
 def encodeurl(decoded):
     """Encodes a URL from tokens (scheme, network location, path,
@@ -423,7 +418,7 @@ def encodeurl(decoded):
     # Standardise path to ensure comparisons work
     while '//' in path:
         path = path.replace("//", "/")
-    url += "%s" % urllib.quote(path)
+    url += "%s" % urllib.parse.quote(path)
     if p:
         for parm in p:
             url += ";%s=%s" % (parm, p[parm])
@@ -586,12 +581,12 @@ def verify_checksum(ud, d, precomputed={}):
             raise NoChecksumError('Missing SRC_URI checksum', ud.url)
 
         # Log missing sums so user can more easily add them
-        logger.warn('Missing md5 SRC_URI checksum for %s, consider adding to the recipe:\n'
-                    'SRC_URI[%s] = "%s"',
-                    ud.localpath, ud.md5_name, md5data)
-        logger.warn('Missing sha256 SRC_URI checksum for %s, consider adding to the recipe:\n'
-                    'SRC_URI[%s] = "%s"',
-                    ud.localpath, ud.sha256_name, sha256data)
+        logger.warning('Missing md5 SRC_URI checksum for %s, consider adding to the recipe:\n'
+                       'SRC_URI[%s] = "%s"',
+                       ud.localpath, ud.md5_name, md5data)
+        logger.warning('Missing sha256 SRC_URI checksum for %s, consider adding to the recipe:\n'
+                       'SRC_URI[%s] = "%s"',
+                       ud.localpath, ud.sha256_name, sha256data)
 
     # We want to alert the user if a checksum is defined in the recipe but
     # it does not match.
@@ -659,9 +654,9 @@ def verify_donestamp(ud, d, origud=None):
             # files to those containing the checksums.
             if not isinstance(e, EOFError):
                 # Ignore errors, they aren't fatal
-                logger.warn("Couldn't load checksums from donestamp %s: %s "
-                            "(msg: %s)" % (ud.donestamp, type(e).__name__,
-                                           str(e)))
+                logger.warning("Couldn't load checksums from donestamp %s: %s "
+                               "(msg: %s)" % (ud.donestamp, type(e).__name__,
+                                              str(e)))
 
     try:
         checksums = verify_checksum(ud, d, precomputed_checksums)
@@ -669,14 +664,14 @@ def verify_donestamp(ud, d, origud=None):
         # as an upgrade path from the previous done stamp file format.
         if checksums != precomputed_checksums:
             with open(ud.donestamp, "wb") as cachefile:
-                p = pickle.Pickler(cachefile, pickle.HIGHEST_PROTOCOL)
+                p = pickle.Pickler(cachefile, 2)
                 p.dump(checksums)
         return True
     except ChecksumError as e:
         # Checksums failed to verify, trigger re-download and remove the
         # incorrect stamp file.
-        logger.warn("Checksum mismatch for local file %s\n"
-                    "Cleaning and trying again." % ud.localpath)
+        logger.warning("Checksum mismatch for local file %s\n"
+                       "Cleaning and trying again." % ud.localpath)
         if os.path.exists(ud.localpath):
             rename_bad_checksum(ud, e.checksum)
         bb.utils.remove(ud.donestamp)
@@ -703,13 +698,13 @@ def update_stamp(ud, d):
             checksums = verify_checksum(ud, d)
             # Store the checksums for later re-verification against the recipe
             with open(ud.donestamp, "wb") as cachefile:
-                p = pickle.Pickler(cachefile, pickle.HIGHEST_PROTOCOL)
+                p = pickle.Pickler(cachefile, 2)
                 p.dump(checksums)
         except ChecksumError as e:
             # Checksums failed to verify, trigger re-download and remove the
             # incorrect stamp file.
-            logger.warn("Checksum mismatch for local file %s\n"
-                        "Cleaning and trying again." % ud.localpath)
+            logger.warning("Checksum mismatch for local file %s\n"
+                           "Cleaning and trying again." % ud.localpath)
             if os.path.exists(ud.localpath):
                 rename_bad_checksum(ud, e.checksum)
             bb.utils.remove(ud.donestamp)
@@ -766,6 +761,7 @@ def get_srcrev(d, method_name='sortable_revision'):
     if not format:
         raise FetchError("The SRCREV_FORMAT variable must be set when multiple SCMs are used.")
 
+    name_to_rev = {}
     seenautoinc = False
     for scm in scms:
         ud = urldata[scm]
@@ -774,7 +770,16 @@ def get_srcrev(d, method_name='sortable_revision'):
             seenautoinc = seenautoinc or autoinc
             if len(rev) > 10:
                 rev = rev[:10]
-            format = format.replace(name, rev)
+            name_to_rev[name] = rev
+    # Replace names by revisions in the SRCREV_FORMAT string. The approach used
+    # here can handle names being prefixes of other names and names appearing
+    # as substrings in revisions (in which case the name should not be
+    # expanded). The '|' regular expression operator tries matches from left to
+    # right, so we need to sort the names with the longest ones first.
+    names_descending_len = sorted(name_to_rev, key=len, reverse=True)
+    name_to_rev_re = "|".join(re.escape(name) for name in names_descending_len)
+    format = re.sub(name_to_rev_re, lambda match: name_to_rev[match.group(0)], format)
+
     if seenautoinc:
        format = "AUTOINC+" + format
 
@@ -784,7 +789,7 @@ def localpath(url, d):
     fetcher = bb.fetch2.Fetch([url], d)
     return fetcher.localpath(url)
 
-def runfetchcmd(cmd, d, quiet=False, cleanup=None):
+def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
     """
     Run cmd returning the command output
     Raise an error if interrupted or cmd fails
@@ -807,13 +812,16 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None):
                   'GIT_SSL_CAINFO',
                   'GIT_SMART_HTTP',
                   'SSH_AUTH_SOCK', 'SSH_AGENT_PID',
-                  'SOCKS5_USER', 'SOCKS5_PASSWD']
+                  'SOCKS5_USER', 'SOCKS5_PASSWD',
+                  'DBUS_SESSION_BUS_ADDRESS',
+                  'P4CONFIG']
 
     if not cleanup:
         cleanup = []
 
+    origenv = d.getVar("BB_ORIGENV", False)
     for var in exportvars:
-        val = d.getVar(var, True)
+        val = d.getVar(var, True) or (origenv and origenv.getVar(var, True))
         if val:
             cmd = 'export ' + var + '=\"%s\"; %s' % (val, cmd)
 
@@ -823,7 +831,7 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None):
     error_message = ""
 
     try:
-        (output, errors) = bb.process.run(cmd, shell=True, stderr=subprocess.PIPE)
+        (output, errors) = bb.process.run(cmd, log=log, shell=True, stderr=subprocess.PIPE, cwd=workdir)
         success = True
     except bb.process.NotFoundError as e:
         error_message = "Fetch command %s" % (e.command)
@@ -834,7 +842,7 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None):
             output = "output:\n%s" % e.stderr
         else:
             output = "no output"
-        error_message = "Fetch command failed with exit code %s, %s" % (e.exitcode, output)
+        error_message = "Fetch command %s failed with exit code %s, %s" % (e.command, e.exitcode, output)
     except bb.process.CmdError as e:
         error_message = "Fetch command %s could not be run:\n%s" % (e.command, e.msg)
     if not success:
@@ -937,8 +945,6 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
                 return found
             return False
 
-        os.chdir(ld.getVar("DL_DIR", True))
-
         if not verify_donestamp(ud, ld, origud) or ud.method.need_update(ud, ld):
             ud.method.download(ud, ld)
             if hasattr(ud.method,"build_mirror_data"):
@@ -982,8 +988,8 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
 
     except bb.fetch2.BBFetchException as e:
         if isinstance(e, ChecksumError):
-            logger.warn("Mirror checksum failure for url %s (original url: %s)\nCleaning and trying again." % (ud.url, origud.url))
-            logger.warn(str(e))
+            logger.warning("Mirror checksum failure for url %s (original url: %s)\nCleaning and trying again." % (ud.url, origud.url))
+            logger.warning(str(e))
             if os.path.exists(ud.localpath):
                 rename_bad_checksum(ud, e.checksum)
         elif isinstance(e, NoChecksumError):
@@ -1198,7 +1204,7 @@ class FetchData(object):
             raise NonLocalMethod()
 
         if self.parm.get("proto", None) and "protocol" not in self.parm:
-            logger.warn('Consider updating %s recipe to use "protocol" not "proto" in SRC_URI.', d.getVar('PN', True))
+            logger.warning('Consider updating %s recipe to use "protocol" not "proto" in SRC_URI.', d.getVar('PN', True))
             self.parm["protocol"] = self.parm.get("proto", None)
 
         if hasattr(self.method, "urldata_init"):
@@ -1395,7 +1401,18 @@ class FetchMethod(object):
                 else:
                     cmd = 'rpm2cpio.sh %s | cpio -id' % (file)
             elif file.endswith('.deb') or file.endswith('.ipk'):
-                cmd = 'ar -p %s data.tar.gz | zcat | tar --no-same-owner -xpf -' % file
+                output = subprocess.check_output('ar -t %s' % file, preexec_fn=subprocess_setup, shell=True)
+                datafile = None
+                if output:
+                    for line in output.decode().splitlines():
+                        if line.startswith('data.tar.'):
+                            datafile = line
+                            break
+                    else:
+                        raise UnpackError("Unable to unpack deb/ipk package - does not contain data.tar.* file", urldata.url)
+                else:
+                    raise UnpackError("Unable to unpack deb/ipk package - could not list contents", urldata.url)
+                cmd = 'ar x %s %s && tar --no-same-owner -xpf %s && rm %s' % (file, datafile, datafile, datafile)
             elif file.endswith('.tar.7z'):
                 cmd = '7z x -so %s | tar xf - ' % file
             elif file.endswith('.7z'):
@@ -1403,7 +1420,13 @@ class FetchMethod(object):
 
         # If 'subdir' param exists, create a dir and use it as destination for unpack cmd
         if 'subdir' in urldata.parm:
-            unpackdir = '%s/%s' % (rootdir, urldata.parm.get('subdir'))
+            subdir = urldata.parm.get('subdir')
+            if os.path.isabs(subdir):
+                if not os.path.realpath(subdir).startswith(os.path.realpath(rootdir)):
+                    raise UnpackError("subdir argument isn't a subdirectory of unpack root %s" % rootdir, urldata.url)
+                unpackdir = subdir
+            else:
+                unpackdir = os.path.join(rootdir, subdir)
             bb.utils.mkdirhier(unpackdir)
         else:
             unpackdir = rootdir
@@ -1422,22 +1445,16 @@ class FetchMethod(object):
                     if urlpath.find("/") != -1:
                         destdir = urlpath.rsplit("/", 1)[0] + '/'
                         bb.utils.mkdirhier("%s/%s" % (unpackdir, destdir))
-                cmd = 'cp -fpPR %s %s' % (file, destdir)
+                cmd = 'cp -fpPRH %s %s' % (file, destdir)
 
         if not cmd:
             return
 
-        # Change to unpackdir before executing command
-        save_cwd = os.getcwd();
-        os.chdir(unpackdir)
-
         path = data.getVar('PATH', True)
         if path:
             cmd = "PATH=\"%s\" %s" % (path, cmd)
-        bb.note("Unpacking %s to %s/" % (file, os.getcwd()))
-        ret = subprocess.call(cmd, preexec_fn=subprocess_setup, shell=True)
-
-        os.chdir(save_cwd)
+        bb.note("Unpacking %s to %s/" % (file, unpackdir))
+        ret = subprocess.call(cmd, preexec_fn=subprocess_setup, shell=True, cwd=unpackdir)
 
         if ret != 0:
             raise UnpackError("Unpack command %s failed with return value %s" % (cmd, ret), urldata.url)
@@ -1505,8 +1522,9 @@ class Fetch(object):
         self.connection_cache = connection_cache
 
         fn = d.getVar('FILE', True)
-        if cache and fn and fn in urldata_cache:
-            self.ud = urldata_cache[fn]
+        mc = d.getVar('__BBMULTICONFIG', True) or ""
+        if cache and fn and mc + fn in urldata_cache:
+            self.ud = urldata_cache[mc + fn]
 
         for url in urls:
             if url not in self.ud:
@@ -1518,7 +1536,7 @@ class Fetch(object):
                         pass
 
         if fn and cache:
-            urldata_cache[fn] = self.ud
+            urldata_cache[mc + fn] = self.ud
 
     def localpath(self, url):
         if url not in self.urls:
@@ -1572,8 +1590,6 @@ class Fetch(object):
                 if premirroronly:
                     self.d.setVar("BB_NO_NETWORK", "1")
 
-                os.chdir(self.d.getVar("DL_DIR", True))
-
                 firsterr = None
                 verified_stamp = verify_donestamp(ud, self.d)
                 if not localpath and (not verified_stamp or m.need_update(ud, self.d)):
@@ -1594,14 +1610,14 @@ class Fetch(object):
 
                     except BBFetchException as e:
                         if isinstance(e, ChecksumError):
-                            logger.warn("Checksum failure encountered with download of %s - will attempt other sources if available" % u)
+                            logger.warning("Checksum failure encountered with download of %s - will attempt other sources if available" % u)
                             logger.debug(1, str(e))
                             if os.path.exists(ud.localpath):
                                 rename_bad_checksum(ud, e.checksum)
                         elif isinstance(e, NoChecksumError):
                             raise
                         else:
-                            logger.warn('Failed to fetch URL %s, attempting MIRRORS if available' % u)
+                            logger.warning('Failed to fetch URL %s, attempting MIRRORS if available' % u)
                             logger.debug(1, str(e))
                         firsterr = e
                         # Remove any incomplete fetch
@@ -1734,7 +1750,7 @@ class FetchConnectionCache(object):
             del self.cache[cn]
 
     def close_connections(self):
-        for cn in self.cache.keys():
+        for cn in list(self.cache.keys()):
             self.cache[cn].close()
             del self.cache[cn]
 

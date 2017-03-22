@@ -51,13 +51,22 @@ class Tinfoil:
         features = []
         if tracking:
             features.append(CookerFeatures.BASEDATASTORE_TRACKING)
+        cleanedvars = bb.utils.clean_environment()
         self.cooker = BBCooker(self.config, features)
         self.config_data = self.cooker.data
         bb.providers.logger.setLevel(logging.ERROR)
         self.cooker_data = None
+        for k in cleanedvars:
+            os.environ[k] = cleanedvars[k]
 
     def register_idle_function(self, function, data):
         pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.shutdown()
 
     def parseRecipes(self):
         sys.stderr.write("Parsing recipes..")
@@ -74,15 +83,51 @@ class Tinfoil:
         self.logger.setLevel(logging.INFO)
         sys.stderr.write("done.\n")
 
-        self.cooker_data = self.cooker.recipecache
+        self.cooker_data = self.cooker.recipecaches['']
 
     def prepare(self, config_only = False):
         if not self.cooker_data:
             if config_only:
                 self.cooker.parseConfiguration()
-                self.cooker_data = self.cooker.recipecache
+                self.cooker_data = self.cooker.recipecaches['']
             else:
                 self.parseRecipes()
+
+    def parse_recipe_file(self, fn, appends=True, appendlist=None, config_data=None):
+        """
+        Parse the specified recipe file (with or without bbappends)
+        and return a datastore object representing the environment
+        for the recipe.
+        Parameters:
+            fn: recipe file to parse - can be a file path or virtual
+                specification
+            appends: True to apply bbappends, False otherwise
+            appendlist: optional list of bbappend files to apply, if you
+                        want to filter them
+            config_data: custom config datastore to use. NOTE: if you
+                         specify config_data then you cannot use a virtual
+                         specification for fn.
+        """
+        if appends and appendlist == []:
+            appends = False
+        if appends:
+            if appendlist:
+                appendfiles = appendlist
+            else:
+                if not hasattr(self.cooker, 'collection'):
+                    raise Exception('You must call tinfoil.prepare() with config_only=False in order to get bbappends')
+                appendfiles = self.cooker.collection.get_file_appends(fn)
+        else:
+            appendfiles = None
+        if config_data:
+            # We have to use a different function here if we're passing in a datastore
+            localdata = bb.data.createCopy(config_data)
+            envdata = bb.cache.parse_recipe(localdata, fn, appendfiles)['']
+        else:
+            # Use the standard path
+            parser = bb.cache.NoCache(self.cooker.databuilder)
+            envdata = parser.loadDataFull(fn, appendfiles)
+        return envdata
 
     def shutdown(self):
         self.cooker.shutdown(force=True)

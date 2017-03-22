@@ -18,8 +18,9 @@ RDEPENDS_${PN}-pod += "perl"
 
 # Some additional dependencies that the above doesn't manage to figure out
 RDEPENDS_${PN}-module-file-spec += "${PN}-module-file-spec-unix"
-DEPENDS_${PN}-module-math-bigint += "${PN}-module-math-bigint-calc"
+RDEPENDS_${PN}-module-math-bigint += "${PN}-module-math-bigint-calc"
 RDEPENDS_${PN}-module-thread-queue += "${PN}-module-attributes"
+RDEPENDS_${PN}-module-overload += "${PN}-module-overloading"
 
 
 # Depends list

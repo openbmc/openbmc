@@ -23,4 +23,4 @@ do_install_append () {
 
 EXTRA_OECONF = "--with-udev-rules-dir=${nonarch_base_libdir}/udev/rules.d"
 
-FILES_${PN} += "${nonarch_base_libdir}/udev/rules.d/ ${datadir}/X11/xorg.conf.d"
+FILES_${PN} += "${datadir}/X11/xorg.conf.d"

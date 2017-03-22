@@ -63,6 +63,12 @@ SRC_URI += " \
         file://ext-ODBM_File-t-odbm.t-fix-the-path-of-dbmt_common.p.patch \
         file://perl-PathTools-don-t-filter-out-blib-from-INC.patch \
         file://perl-errno-generation-gcc5.patch \
+        file://perl-fix-conflict-between-skip_all-and-END.patch \
+        file://perl-test-customized.patch \
+        file://perl-fix-CVE-2016-2381.patch \
+        file://perl-fix-CVE-2016-6185.patch \
+        file://perl-fix-CVE-2015-8607.patch \
+        file://perl-fix-CVE-2016-1238.patch \
 "
 
 # Fix test case issues
@@ -340,7 +346,9 @@ FILES_perl-module-unicore += "${libdir}/perl/${PV}/unicore"
 ALLOW_EMPTY_perl-modules = "1"
 PACKAGES_append = " perl-modules "
 
-python populate_packages_prepend () {
+PACKAGESPLITFUNCS_prepend = "split_perl_packages "
+
+python split_perl_packages () {
     libdir = d.expand('${libdir}/perl/${PV}')
     do_split_packages(d, libdir, 'auto/([^.]*)/[^/]*\.(so|ld|ix|al)', 'perl-module-%s', 'perl module %s', recursive=True, match_path=True, prepend=False)
     do_split_packages(d, libdir, 'Module/([^\/]*)\.pm', 'perl-module-%s', 'perl module %s', recursive=True, allow_dirs=False, match_path=True, prepend=False)

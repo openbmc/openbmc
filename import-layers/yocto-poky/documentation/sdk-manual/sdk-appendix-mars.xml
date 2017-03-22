@@ -1,0 +1,889 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<appendix id='sdk-appendix-mars'>
+    <title>Using Eclipse Mars</title>
+
+    <para>
+        This release of the Yocto Project supports both the Neon and Mars
+        versions of the Eclipse IDE.
+        This appendix presents information that describes how to obtain and
+        configure the Mars version of Eclipse.
+        It also provides a basic project example that you can work through
+        from start to finish.
+        For general information on using the Eclipse IDE and the Yocto
+        Project Eclipse Plug-In, see the
+        "<link linkend='sdk-developing-applications-using-eclipse'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></link>"
+        section.
+    </para>
+
+    <section id='mars-setting-up-the-eclipse-ide'>
+        <title>Setting Up the Mars Version of the Eclipse IDE</title>
+
+        <para>
+            To develop within the Eclipse IDE, you need to do the following:
+            <orderedlist>
+                <listitem><para>Install the Mars version of the Eclipse
+                    IDE.</para></listitem>
+                <listitem><para>Configure the Eclipse IDE.
+                    </para></listitem>
+                <listitem><para>Install the Eclipse Yocto Plug-in.
+                    </para></listitem>
+                <listitem><para>Configure the Eclipse Yocto Plug-in.
+                    </para></listitem>
+            </orderedlist>
+            <note>
+                Do not install Eclipse from your distribution's package
+                repository.
+                Be sure to install Eclipse from the official Eclipse
+                download site as directed in the next section.
+            </note>
+        </para>
+
+        <section id='mars-installing-eclipse-ide'>
+            <title>Installing the Mars Eclipse IDE</title>
+
+            <para>
+                Follow these steps to locate, install, and configure
+                Mars Eclipse:
+                <orderedlist>
+                    <listitem><para><emphasis>Locate the Mars Download:</emphasis>
+                        Open a browser and go to
+                        <ulink url='http://www.eclipse.org/mars/'>http://www.eclipse.org/mars/</ulink>.
+                        </para></listitem>
+                    <listitem><para><emphasis>Download the Tarball:</emphasis>
+                        Click the "Download" button and then use the "Linux
+                        for Eclipse IDE for C++ Developers"
+                        appropriate for your development system
+                        (e.g.
+                        <ulink url='http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/mars/2/eclipse-cpp-mars-2-linux-gtk-x86_64.tar.gz'>64-bit under Linux for Eclipse IDE for C++ Developers</ulink>
+                        if your development system is a Linux 64-bit machine.
+                        </para></listitem>
+                    <listitem><para><emphasis>Unpack the Tarball:</emphasis>
+                        Move to a clean directory and unpack the tarball.
+                        Here is an example:
+                        <literallayout class='monospaced'>
+     $ cd ~
+     $ tar -xzvf ~/Downloads/eclipse-cpp-mars-2-linux-gtk-x86_64.tar.gz
+                        </literallayout>
+                        Everything unpacks into a folder named "Eclipse".
+                        </para></listitem>
+                    <listitem><para><emphasis>Launch Eclipse:</emphasis>
+                        Double click the "Eclipse" file in the folder to
+                        launch Eclipse.
+                        <note>
+                            If you experience a NullPointer Exception after
+                            launch Eclipse or the debugger from within Eclipse,
+                            try adding the following
+                            to your <filename>eclipse.ini</filename> file,
+                            which is located in the directory in which you
+                            unpacked the Eclipse tar file:
+                            <literallayout class='monospaced'>
+     --launcher.GTK_version
+     2
+                            </literallayout>
+                            Alternatively, you can export the
+                            <filename>SWT_GTK</filename> variable in your
+                            shell as follows:
+                            <literallayout class='monospaced'>
+     $ export SWT_GTK3=0
+                            </literallayout>
+                            </note>
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
+
+        <section id='mars-configuring-the-mars-eclipse-ide'>
+            <title>Configuring the Mars Eclipse IDE</title>
+
+            <para>
+                Follow these steps to configure the Mars Eclipse IDE.
+                <note>
+                    Depending on how you installed Eclipse and what you have
+                    already done, some of the options will not appear.
+                    If you cannot find an option as directed by the manual,
+                    it has already been installed.
+                </note>
+                <orderedlist>
+                    <listitem><para>Be sure Eclipse is running and
+                        you are in your workbench.
+                        </para></listitem>
+                    <listitem><para>Select "Install New Software" from
+                        the "Help" pull-down menu.
+                        </para></listitem>
+                    <listitem><para>Select
+                        "Mars - http://download.eclipse.org/releases/mars"
+                        from the "Work with:" pull-down menu.
+                        </para></listitem>
+                    <listitem><para>Expand the box next to
+                        "Linux Tools" and select "C/C++ Remote
+                        (Over TCF/TE) Run/Debug Launcher" and
+                        "TM Terminal".
+                        </para></listitem>
+                    <listitem><para>Expand the box next to "Mobile and
+                        Device Development" and select the following
+                        boxes:
+                        <literallayout class='monospaced'>
+     C/C++ Remote (Over TCF/TE) Run/Debug Launcher
+     Remote System Explorer User Actions
+     TM Terminal
+     TCF Remote System Explorer add-in
+     TCF Target Explorer
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>Expand the box next to
+                        "Programming Languages" and select the
+                        following boxes:
+                        <literallayout class='monospaced'>
+     C/C++ Autotools Support
+     C/C++ Development Tools SDK
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        Complete the installation by clicking through
+                        appropriate "Next" and "Finish" buttons.
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
+
+        <section id='mars-installing-the-eclipse-yocto-plug-in'>
+            <title>Installing or Accessing the Mars Eclipse Yocto Plug-in</title>
+
+            <para>
+                You can install the Eclipse Yocto Plug-in into the Eclipse
+                IDE one of two ways:  use the Yocto Project's Eclipse
+                Update site to install the pre-built plug-in or build and
+                install the plug-in from the latest source code.
+            </para>
+
+            <section id='mars-new-software'>
+                <title>Installing the Pre-built Plug-in from the Yocto Project Eclipse Update Site</title>
+
+                <para>
+                    To install the Mars Eclipse Yocto Plug-in from the update
+                    site, follow these steps:
+                    <orderedlist>
+                        <listitem><para>Start up the Eclipse IDE.
+                            </para></listitem>
+                        <listitem><para>In Eclipse, select "Install New
+                            Software" from the "Help" menu.
+                            </para></listitem>
+                        <listitem><para>Click "Add..." in the "Work with:"
+                            area.
+                            </para></listitem>
+                       <listitem><para>Enter
+                            <filename>&ECLIPSE_DL_PLUGIN_URL;/mars</filename>
+                            in the URL field and provide a meaningful name
+                            in the "Name" field.
+                            </para></listitem>
+                        <listitem><para>Click "OK" to have the entry added
+                            to the "Work with:" drop-down list.
+                            </para></listitem>
+                        <listitem><para>Select the entry for the plug-in
+                            from the "Work with:" drop-down list.
+                            </para></listitem>
+                        <listitem><para>Check the boxes next to the following:
+                            <literallayout class='monospaced'>
+     Yocto Project SDK Plug-in
+     Yocto Project Documentation plug-in
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>Complete the remaining software
+                            installation steps and then restart the Eclipse
+                            IDE to finish the installation of the plug-in.
+                            <note>
+                                You can click "OK" when prompted about
+                                installing software that contains unsigned
+                                content.
+                            </note>
+                            </para></listitem>
+                    </orderedlist>
+                </para>
+            </section>
+
+            <section id='mars-zip-file-method'>
+                <title>Installing the Plug-in Using the Latest Source Code</title>
+
+                <para>
+                    To install the Mars Eclipse Yocto Plug-in from the latest
+                    source code, follow these steps:
+                    <orderedlist>
+                        <listitem><para>Be sure your development system
+                            has JDK 1.7+
+                            </para></listitem>
+                        <listitem><para>install X11-related packages:
+                            <literallayout class='monospaced'>
+     $ sudo apt-get install xauth
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>In a new terminal shell, create a Git
+                            repository with:
+                            <literallayout class='monospaced'>
+     $ cd ~
+     $ git clone git://git.yoctoproject.org/eclipse-poky
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>Use Git to checkout the correct
+                            tag:
+                            <literallayout class='monospaced'>
+     $ cd ~/eclipse-poky
+     $ git checkout mars/yocto-&DISTRO;
+                            </literallayout>
+                            This puts you in a detached HEAD state, which
+                            is fine since you are only going to be building
+                            and not developing.
+                            </para></listitem>
+                        <listitem><para>Change to the
+                            <filename>scripts</filename>
+                            directory within the Git repository:
+                            <literallayout class='monospaced'>
+     $ cd scripts
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>Set up the local build environment
+                            by running the setup script:
+                            <literallayout class='monospaced'>
+     $ ./setup.sh
+                            </literallayout>
+                            When the script finishes execution,
+                            it prompts you with instructions on how to run
+                            the <filename>build.sh</filename> script, which
+                            is also in the <filename>scripts</filename>
+                            directory of the Git repository created
+                            earlier.
+                            </para></listitem>
+                        <listitem><para>Run the <filename>build.sh</filename>
+                            script as directed.
+                            Be sure to provide the tag name, documentation
+                            branch, and a release name.</para>
+                            <para>
+                            Following is an example:
+                            <literallayout class='monospaced'>
+     $ ECLIPSE_HOME=/home/scottrif/eclipse-poky/scripts/eclipse ./build.sh -l mars/yocto-&DISTRO; master yocto-&DISTRO; 2>&amp;1 | tee build.log
+                            </literallayout>
+                            The previous example command adds the tag you
+                            need for <filename>mars/yocto-&DISTRO;</filename>
+                            to <filename>HEAD</filename>, then tells the
+                            build script to use the local (-l) Git checkout
+                            for the build.
+                            After running the script, the file
+                            <filename>org.yocto.sdk-</filename><replaceable>release</replaceable><filename>-</filename><replaceable>date</replaceable><filename>-archive.zip</filename>
+                            is in the current directory.
+                            </para></listitem>
+                        <listitem><para>If necessary, start the Eclipse IDE
+                            and be sure you are in the Workbench.
+                            </para></listitem>
+                        <listitem><para>Select "Install New Software" from
+                            the "Help" pull-down menu.
+                            </para></listitem>
+                        <listitem><para>Click "Add".
+                            </para></listitem>
+                        <listitem><para>Provide anything you want in the
+                            "Name" field.
+                            </para></listitem>
+                        <listitem><para>Click "Archive" and browse to the
+                            ZIP file you built earlier.
+                            This ZIP file should not be "unzipped", and must
+                            be the <filename>*archive.zip</filename> file
+                            created by running the
+                            <filename>build.sh</filename> script.
+                            </para></listitem>
+                        <listitem><para>Click the "OK" button.
+                            </para></listitem>
+                        <listitem><para>Check the boxes that appear in
+                            the installation window to install the
+                            following:
+                            <literallayout class='monospaced'>
+     Yocto Project SDK Plug-in
+     Yocto Project Documentation plug-in
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>Finish the installation by clicking
+                            through the appropriate buttons.
+                            You can click "OK" when prompted about
+                            installing software that contains unsigned
+                            content.
+                            </para></listitem>
+                        <listitem><para>Restart the Eclipse IDE if
+                            necessary.
+                            </para></listitem>
+                    </orderedlist>
+                </para>
+
+                <para>
+                    At this point you should be able to configure the
+                    Eclipse Yocto Plug-in as described in the
+                    "<link linkend='mars-configuring-the-eclipse-yocto-plug-in'>Configuring the Mars Eclipse Yocto Plug-in</link>"
+                    section.</para>
+            </section>
+        </section>
+
+        <section id='mars-configuring-the-eclipse-yocto-plug-in'>
+            <title>Configuring the Mars Eclipse Yocto Plug-in</title>
+
+            <para>
+                Configuring the Mars Eclipse Yocto Plug-in involves setting the
+                Cross Compiler options and the Target options.
+                The configurations you choose become the default settings
+                for all projects.
+                You do have opportunities to change them later when
+                you configure the project (see the following section).
+            </para>
+
+            <para>
+                To start, you need to do the following from within the
+                Eclipse IDE:
+                <itemizedlist>
+                    <listitem><para>Choose "Preferences" from the
+                        "Window" menu to display the Preferences Dialog.
+                        </para></listitem>
+                    <listitem><para>Click "Yocto Project SDK" to display
+                        the configuration screen.
+                        </para></listitem>
+                </itemizedlist>
+                The following sub-sections describe how to configure the
+                the plug-in.
+                <note>
+                    Throughout the descriptions, a start-to-finish example for
+                    preparing a QEMU image for use with Eclipse is referenced
+                    as the "wiki" and is linked to the example on the
+                    <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'> Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
+                    wiki page.
+                </note>
+            </para>
+
+            <section id='mars-configuring-the-cross-compiler-options'>
+                <title>Configuring the Cross-Compiler Options</title>
+
+                <para>
+                    Cross Compiler options enable Eclipse to use your specific
+                    cross compiler toolchain.
+                    To configure these options, you must select
+                    the type of toolchain, point to the toolchain, specify
+                    the sysroot location, and select the target
+                    architecture.
+                    <itemizedlist>
+                        <listitem><para><emphasis>Selecting the Toolchain Type:</emphasis>
+                            Choose between
+                            <filename>Standalone pre-built toolchain</filename>
+                            and
+                            <filename>Build system derived toolchain</filename>
+                            for Cross Compiler Options.
+                                <itemizedlist>
+                                    <listitem><para><emphasis>
+                                        <filename>Standalone Pre-built Toolchain:</filename></emphasis>
+                                        Select this type when you are using
+                                        a stand-alone cross-toolchain.
+                                        For example, suppose you are an
+                                        application developer and do not
+                                        need to build a target image.
+                                        Instead, you just want to use an
+                                        architecture-specific toolchain on
+                                        an existing kernel and target root
+                                        filesystem.
+                                        In other words, you have downloaded
+                                        and installed a pre-built toolchain
+                                        for an existing image.
+                                        </para></listitem>
+                                   <listitem><para><emphasis>
+                                        <filename>Build System Derived Toolchain:</filename></emphasis>
+                                        Select this type if you built the
+                                        toolchain as part of the
+                                        <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                                        When you select
+                                        <filename>Build system derived toolchain</filename>,
+                                        you are using the toolchain built and
+                                        bundled inside the Build Directory.
+                                        For example, suppose you created a
+                                        suitable image using the steps in the
+                                        <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
+                                        In this situation, you would select the
+                                        <filename>Build system derived toolchain</filename>.
+                                        </para></listitem>
+                                </itemizedlist>
+                            </para></listitem>
+                        <listitem><para><emphasis>Specify the Toolchain Root Location:</emphasis>
+                            If you are using a stand-alone pre-built
+                            toolchain, you should be pointing to where it is
+                            installed (e.g.
+                            <filename>/opt/poky/&DISTRO;</filename>).
+                            See the
+                            "<link linkend='sdk-installing-the-sdk'>Installing the SDK</link>"
+                            section for information about how the SDK is
+                            installed.</para>
+                            <para>If you are using a build system derived
+                            toolchain, the path you provide for the
+                            <filename>Toolchain Root Location</filename>
+                            field is the
+                            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                            from which you run the
+                            <filename>bitbake</filename> command (e.g
+                            <filename>/home/scottrif/poky/build</filename>).</para>
+                            <para>For more information, see the
+                            "<link linkend='sdk-building-an-sdk-installer'>Building an SDK Installer</link>"
+                            section.
+                            </para></listitem>
+                        <listitem><para><emphasis>Specify Sysroot Location:</emphasis>
+                            This location is where the root filesystem for
+                            the target hardware resides.
+                            </para>
+                            <para>This location depends on where you
+                            separately extracted and installed the target
+                            filesystem.
+                            As an example, suppose you prepared an image
+                            using the steps in the
+                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
+                            If so, the <filename>MY_QEMU_ROOTFS</filename>
+                            directory is found in the
+                            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                            and you would browse to and select that directory
+                            (e.g. <filename>/home/scottrif/build/MY_QEMU_ROOTFS</filename>).
+                            </para>
+                            <para>For more information on how to install the
+                            toolchain and on how to extract and install the
+                            sysroot filesystem, see the
+                            "<link linkend='sdk-building-an-sdk-installer'>Building an SDK Installer</link>"
+                            section.
+                            </para></listitem>
+                        <listitem><para><emphasis>Select the Target Architecture:</emphasis>
+                            The target architecture is the type of hardware
+                            you are going to use or emulate.
+                            Use the pull-down
+                            <filename>Target Architecture</filename> menu
+                            to make your selection.
+                            The pull-down menu should have the supported
+                            architectures.
+                            If the architecture you need is not listed in
+                            the menu, you will need to build the image.
+                            See the
+                            "<ulink url='&YOCTO_DOCS_QS_URL;#qs-building-images'>Building Images</ulink>"
+                            section of the Yocto Project Quick Start for
+                            more information.
+                            You can also see the
+                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+            </section>
+
+            <section id='mars-configuring-the-target-options'>
+                <title>Configuring the Target Options</title>
+
+                <para>
+                    You can choose to emulate hardware using the QEMU
+                    emulator, or you can choose to run your image on actual
+                    hardware.
+                    <itemizedlist>
+                        <listitem><para><emphasis>QEMU:</emphasis>
+                            Select this option if you will be using the
+                            QEMU emulator.
+                            If you are using the emulator, you also need to
+                            locate the kernel and specify any custom
+                            options.</para>
+                            <para>If you selected the
+                            <filename>Build system derived toolchain</filename>,
+                            the target kernel you built will be located in
+                            the
+                            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                            in
+                            <filename>tmp/deploy/images/<replaceable>machine</replaceable></filename>
+                            directory.
+                            As an example, suppose you performed the steps in
+                            the
+                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
+                            In this case, you specify your Build Directory path
+                            followed by the image (e.g.
+                            <filename>/home/scottrif/poky/build/tmp/deploy/images/qemux86/bzImage-qemux86.bin</filename>).
+                            </para>
+                            <para>If you selected the standalone pre-built
+                            toolchain, the pre-built image you downloaded is
+                            located in the directory you specified when you
+                            downloaded the image.</para>
+                            <para>Most custom options are for advanced QEMU
+                            users to further customize their QEMU instance.
+                            These options are specified between paired
+                            angled brackets.
+                            Some options must be specified outside the
+                            brackets.
+                            In particular, the options
+                            <filename>serial</filename>,
+                            <filename>nographic</filename>, and
+                            <filename>kvm</filename> must all be outside the
+                            brackets.
+                            Use the <filename>man qemu</filename> command
+                            to get help on all the options and their use.
+                            The following is an example:
+                           <literallayout class='monospaced'>
+    serial ‘&lt;-m 256 -full-screen&gt;’
+                            </literallayout></para>
+                            <para>
+                            Regardless of the mode, Sysroot is already
+                            defined as part of the Cross-Compiler Options
+                            configuration in the
+                            <filename>Sysroot Location:</filename> field.
+                            </para></listitem>
+                        <listitem><para><emphasis>External HW:</emphasis>
+                            Select this option if you will be using actual
+                            hardware.</para></listitem>
+                    </itemizedlist>
+                </para>
+
+                <para>
+                    Click the "Apply" and "OK" to save your plug-in
+                    configurations.
+                </para>
+            </section>
+        </section>
+    </section>
+
+    <section id='mars-creating-the-project'>
+        <title>Creating the Project</title>
+
+        <para>
+            You can create two types of projects:  Autotools-based, or
+            Makefile-based.
+            This section describes how to create Autotools-based projects
+            from within the Eclipse IDE.
+            For information on creating Makefile-based projects in a
+            terminal window, see the
+            "<link linkend='makefile-based-projects'>Makefile-Based Projects</link>"
+            section.
+            <note>
+                Do not use special characters in project names
+                (e.g. spaces, underscores, etc.).  Doing so can
+                cause configuration to fail.
+            </note>
+        </para>
+
+        <para>
+            To create a project based on a Yocto template and then display
+            the source code, follow these steps:
+            <orderedlist>
+                <listitem><para>Select "C Project" from the "File -> New" menu.
+                    </para></listitem>
+                <listitem><para>Expand <filename>Yocto Project SDK Autotools Project</filename>.
+                    </para></listitem>
+                <listitem><para>Select <filename>Hello World ANSI C Autotools Projects</filename>.
+                    This is an Autotools-based project based on a Yocto
+                    template.
+                    </para></listitem>
+                <listitem><para>Put a name in the <filename>Project name:</filename>
+                    field.
+                    Do not use hyphens as part of the name
+                    (e.g. <filename>hello</filename>).
+                    </para></listitem>
+                <listitem><para>Click "Next".
+                    </para></listitem>
+                <listitem><para>Add appropriate information in the various
+                    fields.
+                    </para></listitem>
+                <listitem><para>Click "Finish".
+                    </para></listitem>
+                <listitem><para>If the "open perspective" prompt appears,
+                    click "Yes" so that you in the C/C++ perspective.
+                    </para></listitem>
+                <listitem><para>The left-hand navigation pane shows your
+                    project.
+                    You can display your source by double clicking the
+                    project's source file.
+                    </para></listitem>
+            </orderedlist>
+        </para>
+    </section>
+
+    <section id='mars-configuring-the-cross-toolchains'>
+        <title>Configuring the Cross-Toolchains</title>
+
+        <para>
+            The earlier section,
+            "<link linkend='mars-configuring-the-eclipse-yocto-plug-in'>Configuring the Mars Eclipse Yocto Plug-in</link>",
+            sets up the default project configurations.
+            You can override these settings for a given project by following
+            these steps:
+            <orderedlist>
+                <listitem><para>Select "Yocto Project Settings" from
+                    the "Project -> Properties" menu.
+                    This selection brings up the Yocto Project Settings
+                    Dialog and allows you to make changes specific to an
+                    individual project.</para>
+                    <para>By default, the Cross Compiler Options and Target
+                    Options for a project are inherited from settings you
+                    provided using the Preferences Dialog as described
+                    earlier in the
+                    "<link linkend='mars-configuring-the-eclipse-yocto-plug-in'>Configuring the Mars Eclipse Yocto Plug-in</link>" section.
+                    The Yocto Project Settings Dialog allows you to override
+                    those default settings for a given project.
+                    </para></listitem>
+                <listitem><para>Make or verify your configurations for the
+                    project and click "OK".
+                    </para></listitem>
+                <listitem><para>Right-click in the navigation pane and
+                    select "Reconfigure Project" from the pop-up menu.
+                    This selection reconfigures the project by running
+                    <filename>autogen.sh</filename> in the workspace for
+                    your project.
+                    The script also runs <filename>libtoolize</filename>,
+                    <filename>aclocal</filename>,
+                    <filename>autoconf</filename>,
+                    <filename>autoheader</filename>,
+                    <filename>automake --a</filename>, and
+                    <filename>./configure</filename>.
+                    Click on the "Console" tab beneath your source code to
+                    see the results of reconfiguring your project.
+                    </para></listitem>
+            </orderedlist>
+        </para>
+    </section>
+
+    <section id='mars-building-the-project'>
+        <title>Building the Project</title>
+
+        <para>
+            To build the project select "Build All" from the
+            "Project" menu.
+            The console should update and you can note the cross-compiler
+            you are using.
+            <note>
+                When building "Yocto Project SDK Autotools" projects, the
+                Eclipse IDE might display error messages for
+                Functions/Symbols/Types that cannot be "resolved", even when
+                the related include file is listed at the project navigator and
+                when the project is able to build.
+                For these cases only, it is recommended to add a new linked
+                folder to the appropriate sysroot.
+                Use these steps to add the linked folder:
+                <orderedlist>
+                    <listitem><para>
+                        Select the project.
+                        </para></listitem>
+                    <listitem><para>
+                        Select "Folder" from the
+                        <filename>File > New</filename> menu.
+                        </para></listitem>
+                    <listitem><para>
+                        In the "New Folder" Dialog, select "Link to alternate
+                        location (linked folder)".
+                        </para></listitem>
+                    <listitem><para>
+                        Click "Browse" to navigate to the include folder inside
+                        the same sysroot location selected in the Yocto Project
+                        configuration preferences.
+                        </para></listitem>
+                    <listitem><para>
+                        Click "OK".
+                        </para></listitem>
+                    <listitem><para>
+                        Click "Finish" to save the linked folder.
+                        </para></listitem>
+                </orderedlist>
+            </note>
+        </para>
+    </section>
+
+    <section id='mars-starting-qemu-in-user-space-nfs-mode'>
+        <title>Starting QEMU in User-Space NFS Mode</title>
+
+        <para>
+            To start the QEMU emulator from within Eclipse, follow these
+            steps:
+            <note>
+                See the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-qemu'>Using the Quick EMUlator (QEMU)</ulink>"
+                chapter in the Yocto Project Development Manual
+                for more information on using QEMU.
+            </note>
+            <orderedlist>
+                <listitem><para>Expose and select "External Tools
+                    Configurations ..." from the "Run -> External Tools" menu.
+                    </para></listitem>
+                <listitem><para>
+                    Locate and select your image in the navigation panel to
+                    the left (e.g. <filename>qemu_i586-poky-linux</filename>).
+                    </para></listitem>
+                <listitem><para>
+                    Click "Run" to launch QEMU.
+                    <note>
+                        The host on which you are running QEMU must have
+                        the <filename>rpcbind</filename> utility running to be
+                        able to make RPC calls on a server on that machine.
+                        If QEMU does not invoke and you receive error messages
+                        involving <filename>rpcbind</filename>, follow the
+                        suggestions to get the service running.
+                        As an example, on a new Ubuntu 16.04 LTS installation,
+                        you must do the following in order to get QEMU to
+                        launch:
+                        <literallayout class='monospaced'>
+     $ sudo apt-get install rpcbind
+                        </literallayout>
+                        After installing <filename>rpcbind</filename>, you
+                        need to edit the
+                        <filename>/etc/init.d/rpcbind</filename> file to
+                        include the following line:
+                        <literallayout class='monospaced'>
+     OPTIONS="-i -w"
+                        </literallayout>
+                        After modifying the file, you need to start the
+                        service:
+                        <literallayout class='monospaced'>
+     $ sudo service portmap restart
+                        </literallayout>
+                    </note>
+                    </para></listitem>
+                <listitem><para>If needed, enter your host root password in
+                    the shell window at the prompt.
+                    This sets up a <filename>Tap 0</filename> connection
+                    needed for running in user-space NFS mode.
+                    </para></listitem>
+                <listitem><para>Wait for QEMU to launch.
+                    </para></listitem>
+                <listitem><para>Once QEMU launches, you can begin operating
+                    within that environment.
+                    One useful task at this point would be to determine the
+                    IP Address for the user-space NFS by using the
+                    <filename>ifconfig</filename> command.
+                    The IP address of the QEMU machine appears in the
+                    xterm window.
+                    You can use this address to help you see which particular
+                    IP address the instance of QEMU is using.
+                    </para></listitem>
+            </orderedlist>
+        </para>
+    </section>
+
+    <section id='mars-deploying-and-debugging-the-application'>
+        <title>Deploying and Debugging the Application</title>
+
+        <para>
+            Once the QEMU emulator is running the image, you can deploy
+            your application using the Eclipse IDE and then use
+            the emulator to perform debugging.
+            Follow these steps to deploy the application.
+            <note>
+                Currently, Eclipse does not support SSH port forwarding.
+                Consequently, if you need to run or debug a remote
+                application using the host display, you must create a
+                tunneling connection from outside Eclipse and keep
+                that connection alive during your work.
+                For example, in a new terminal, run the following:
+                <literallayout class='monospaced'>
+     $ ssh -XY <replaceable>user_name</replaceable>@<replaceable>remote_host_ip</replaceable>
+                </literallayout>
+                Using the above form, here is an example:
+                <literallayout class='monospaced'>
+     $ ssh -XY root@192.168.7.2
+                </literallayout>
+                After running the command, add the command to be executed
+                in Eclipse's run configuration before the application
+                as follows:
+                <literallayout class='monospaced'>
+     export DISPLAY=:10.0
+                </literallayout>
+                Be sure to not destroy the connection during your QEMU
+                session (i.e. do not
+                exit out of or close that shell).
+            </note>
+            <orderedlist>
+                <listitem><para>Select "Debug Configurations..." from the
+                    "Run" menu.</para></listitem>
+                <listitem><para>In the left area, expand
+                    <filename>C/C++Remote Application</filename>.
+                    </para></listitem>
+                <listitem><para>Locate your project and select it to bring
+                    up a new tabbed view in the Debug Configurations Dialog.
+                    </para></listitem>
+                <listitem><para>Click on the "Debugger" tab to see the
+                    cross-tool debugger you are using.
+                    Be sure to change to the debugger perspective in Eclipse.
+                    </para></listitem>
+                <listitem><para>Click on the "Main" tab.
+                    </para></listitem>
+                <listitem><para>Create a new connection to the QEMU instance
+                    by clicking on "new".</para></listitem>
+                <listitem><para>Select <filename>SSH</filename>, which means
+                    Secure Socket Shell.
+                    Optionally, you can select an TCF connection instead.
+                    </para></listitem>
+                <listitem><para>Click "Next".
+                    </para></listitem>
+                <listitem><para>Clear out the "Connection name" field and
+                    enter any name you want for the connection.
+                    </para></listitem>
+                <listitem><para>Put the IP address for the connection in
+                    the "Host" field.
+                    For QEMU, the default is <filename>192.168.7.2</filename>.
+                    However, if a previous QEMU session did not exit
+                    cleanly, the IP address increments (e.g.
+                    <filename>192.168.7.3</filename>).
+                    <note>
+                        You can find the IP address for the current QEMU
+                        session by looking in the xterm that opens when
+                        you launch QEMU.
+                    </note>
+                    </para></listitem>
+                <listitem><para>Enter <filename>root</filename>, which
+                    is the default for QEMU, for the "User" field.
+                    Be sure to leave the password field empty.
+                    </para></listitem>
+                <listitem><para>Click "Finish" to close the
+                    New Connections Dialog.
+                    </para></listitem>
+                <listitem><para>If necessary, use the drop-down menu now in the
+                    "Connection" field and pick the IP Address you entered.
+                     </para></listitem>
+                <listitem><para>Assuming you are connecting as the root user,
+                    which is the default for QEMU x86-64 SDK images provided by
+                    the Yocto Project, in the "Remote Absolute File Path for
+                    C/C++ Application" field, browse to
+                    <filename>/home/root</filename>.
+                    You could also browse to any other path you have write
+                    access to on the target such as
+                    <filename>/usr/bin</filename>.
+                    This location is where your application will be located on
+                    the QEMU system.
+                    If you fail to browse to and specify an appropriate
+                    location, QEMU will not understand what to remotely
+                    launch.
+                    Eclipse is helpful in that it auto fills your application
+                    name for you assuming you browsed to a directory.
+                    <note>
+                        If you are prompted to provide a username and to
+                        optionally set a password, be sure you provide
+                        "root" as the username and you leave the password
+                        field blank.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    Be sure you change to the "Debug" perspective in Eclipse.
+                    </para></listitem>
+                <listitem><para>Click "Debug"
+                    </para></listitem>
+                <listitem><para>Accept the debug perspective.
+                    </para></listitem>
+            </orderedlist>
+        </para>
+    </section>
+
+    <section id='mars-using-Linuxtools'>
+        <title>Using Linuxtools</title>
+
+        <para>
+            As mentioned earlier in the manual, performance tools exist
+            (Linuxtools) that enhance your development experience.
+            These tools are aids in developing and debugging applications and
+            images.
+            You can run these tools from within the Eclipse IDE through the
+            "Linuxtools" menu.
+        </para>
+
+        <para>
+            For information on how to configure and use these tools, see
+            <ulink url='http://www.eclipse.org/linuxtools/'>http://www.eclipse.org/linuxtools/</ulink>.
+        </para>
+    </section>
+</appendix>
+<!--
+vim: expandtab tw=80 ts=4
+-->

@@ -1,0 +1,39 @@
+From 946d36266d8a30f04fe34d3183bf4929141934d2 Mon Sep 17 00:00:00 2001
+From: coypu <coypu@sdf.org>
+Date: Wed, 2 Mar 2016 19:38:48 +0200
+Subject: [PATCH] gdate: Move warning pragma outside of function
+
+Commit 0817af40e8c74c721c30f6ef482b1f53d12044c7 breaks the build on
+older versions of GCC, which don't allow pragma inside functions.
+
+https://bugzilla.gnome.org/761550
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ glib/glib/gdate.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/glib/glib/gdate.c b/glib/glib/gdate.c
+index 1978cf7..20e6c4a 100644
+--- a/glib/glib/gdate.c
++++ b/glib/glib/gdate.c
+@@ -2439,6 +2439,9 @@ win32_strftime_helper (const GDate     *d,
+  *
+  * Returns: number of characters written to the buffer, or 0 the buffer was too small
+  */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
++
+ gsize     
+ g_date_strftime (gchar       *s, 
+                  gsize        slen, 
+@@ -2549,3 +2552,5 @@ g_date_strftime (gchar       *s,
+   return retval;
+ #endif
+ }
++
++#pragma GCC diagnostic pop
+-- 
+1.9.1
+

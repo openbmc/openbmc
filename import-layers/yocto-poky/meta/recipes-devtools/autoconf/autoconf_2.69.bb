@@ -5,8 +5,7 @@ PR = "r11"
 LICENSE = "GPLv2 & GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
 		    file://COPYINGv3;md5=d32239bcb673463ab874e80d47fae504"
-SRC_URI += "file://autoreconf-include.patch \
-	    file://check-automake-cross-warning.patch \
+SRC_URI += "file://check-automake-cross-warning.patch \
 	    file://autoreconf-exclude.patch \
 	    file://autoreconf-gnuconfigize.patch \
             file://config_site.patch \

@@ -1,0 +1,32 @@
+It will add -mips64r6 and -mips64r2 to cmdline which will
+cause conflicts
+
+in OE we user mips32r2 and mips64r2 for mips arch versions
+so there is no benefit of detecting it automatically by
+poking at tools especially in cross env
+
+Fixes errors like
+
+linking -mnan=2008 module with previous -mnan=legacy modules
+failed to merge target specific data of file
+
+-Khem
+Upstream-Status: Inappropriate [OE-Specific]
+
+Index: ffmpeg-3.1.1/configure
+===================================================================
+--- ffmpeg-3.1.1.orig/configure
++++ ffmpeg-3.1.1/configure
+@@ -5220,12 +5220,9 @@ elif enabled mips; then
+ 
+     # Enable minimum ISA based on selected options
+     if enabled mips64; then
+-        enabled mips64r6 && check_inline_asm_flags mips64r6 '"dlsa $0, $0, $0, 1"' '-mips64r6'
+         enabled mips64r2 && check_inline_asm_flags mips64r2 '"dext $0, $0, 0, 1"' '-mips64r2'
+         disabled mips64r6 && disabled mips64r2 && check_inline_asm_flags mips64r1 '"daddi $0, $0, 0"' '-mips64'
+     else
+-        enabled mips32r6 && check_inline_asm_flags mips32r6 '"aui $0, $0, 0"' '-mips32r6'
+-        enabled mips32r5 && check_inline_asm_flags mips32r5 '"eretnc"' '-mips32r5'
+         enabled mips32r2 && check_inline_asm_flags mips32r2 '"ext $0, $0, 0, 1"' '-mips32r2'
+         disabled mips32r6 && disabled mips32r5 && disabled mips32r2 && check_inline_asm_flags mips32r1 '"addi $0, $0, 0"' '-mips32'
+     fi

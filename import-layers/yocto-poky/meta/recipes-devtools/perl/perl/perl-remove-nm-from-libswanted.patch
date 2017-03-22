@@ -1,0 +1,30 @@
+From 4732711e2548b6d734ca831d65dbcf501a89774e Mon Sep 17 00:00:00 2001
+From: Andreas Koenig <andk@cpan.org>
+Date: Sun, 3 Jan 2016 08:40:33 +0100
+Subject: [PATCH] Remove nm from libswanted
+
+Nm stood for "New Math" library in the context of 1994. 2014 a conflicting
+library libnm appeared that has a network manager context.
+
+Upstream-Status: Backport [commit 4732711e on branch blead, tag v5.25.0]
+
+---
+ Configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Configure b/Configure
+index 0e71b4b..cfbdaa1 100755
+--- a/Configure
++++ b/Configure
+@@ -1464,7 +1464,7 @@ libswanted_uselargefiles=''
+ : set usesocks on the Configure command line to enable socks.
+ : List of libraries we want.
+ : If anyone needs extra -lxxx, put those in a hint file.
+-libswanted="cl pthread socket bind inet nsl nm ndbm gdbm dbm db malloc dl ld"
++libswanted="cl pthread socket bind inet nsl ndbm gdbm dbm db malloc dl ld"
+ libswanted="$libswanted sun m crypt sec util c cposix posix ucb bsd BSD"
+ : We probably want to search /usr/shlib before most other libraries.
+ : This is only used by the lib/ExtUtils/MakeMaker.pm routine extliblist.
+-- 
+2.9.2
+

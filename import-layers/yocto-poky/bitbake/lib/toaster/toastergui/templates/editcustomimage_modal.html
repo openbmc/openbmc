@@ -6,32 +6,36 @@ choose which one to edit
 required context:
   build - a Build object
 -->
-<div class="modal hide fade in" aria-hidden="false" id="edit-custom-image-modal">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3>Which image do you want to edit?</h3>
-  </div>
+<div class="modal fade" aria-hidden="false" id="edit-custom-image-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Which image do you want to edit?</h3>
+      </div>
 
-  <div class="modal-body">
-    <div class="row-fluid">
-      {% for recipe in build.get_custom_image_recipes %}
-        <label class="radio">
-          {{recipe.name}}
-          <input type="radio" class="form-control" name="select-custom-image"
-                 data-url="{% url 'customrecipe' build.project.id recipe.id %}">
-        </label>
-      {% endfor %}
+      <div class="modal-body">
+        {% for recipe in build.get_custom_image_recipes %}
+        <div class="radio">
+          <label>
+            <input type="radio" name="select-custom-image"
+                                data-url="{% url 'customrecipe' build.project.id recipe.id %}">
+            {{recipe.name}}
+          </label>
+        </div>
+        {% endfor %}
+        <span class="help-block text-danger" id="invalid-custom-image-help" style="display:none">
+          Please select a custom image to edit.
+        </span>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary btn-lg" data-url="#"
+                                               data-action="edit-custom-image" disabled>
+          Edit custom image
+        </button>
+      </div>
     </div>
-    <span class="help-block error" id="invalid-custom-image-help" style="display:none">
-      Please select a custom image to edit.
-    </span>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-primary btn-large" data-url="#"
-       data-action="edit-custom-image" disabled>
-      Edit custom image
-    </button>
   </div>
 </div>
 
@@ -46,7 +50,7 @@ $(document).ready(function () {
     return $('[name="select-custom-image"]:checked');
   };
 
-  radios.change(function () {
+  function enableSubmit() {
     if (getSelectedRadios().length === 1) {
       editCustomImageButton.removeAttr('disabled');
       error.hide();
@@ -55,6 +59,14 @@ $(document).ready(function () {
       editCustomImageButton.attr('disabled', 'disabled');
       error.show();
     }
+  };
+
+  $("#edit-custom-image-modal").on("shown.bs.modal", function() {
+    enableSubmit();
+  });
+
+  radios.change(function () {
+    enableSubmit();
   });
 
   editCustomImageButton.click(function () {
@@ -67,5 +79,10 @@ $(document).ready(function () {
       error.show();
     }
   });
+
+  // Select the first custom image listed. Radio button groups
+  // should always have an option selected by default
+  $("input:radio:first").attr("checked", "checked");
+
 });
 </script>

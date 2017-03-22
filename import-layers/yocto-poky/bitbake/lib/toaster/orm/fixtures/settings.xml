@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+  <!-- Default project settings -->
+  <!-- pk=1 is DISTRO -->
+  <object model="orm.toastersetting" pk="2">
+    <field type="CharField" name="name">DEFAULT_RELEASE</field>
+    <field type="CharField" name="value">morty</field>
+  </object>
+  <object model="orm.toastersetting" pk="3">
+    <field type="CharField" name="name">DEFCONF_PACKAGE_CLASSES</field>
+    <field type="CharField" name="value">package_rpm</field>
+  </object>
+  <object model="orm.toastersetting" pk="4">
+    <field type="CharField" name="name">DEFCONF_MACHINE</field>
+    <field type="CharField" name="value">qemux86</field>
+  </object>
+  <object model="orm.toastersetting" pk="5">
+    <field type="CharField" name="name">DEFCONF_SSTATE_DIR</field>
+    <field type="CharField" name="value">${TOPDIR}/../sstate-cache</field>
+  </object>
+  <object model="orm.toastersetting" pk="6">
+    <field type="CharField" name="name">DEFCONF_IMAGE_INSTALL_append</field>
+    <field type="CharField" name="value"></field>
+  </object>
+  <object model="orm.toastersetting" pk="7">
+    <field type="CharField" name="name">DEFCONF_IMAGE_FSTYPES</field>
+    <field type="CharField" name="value">ext3 jffs2 tar.bz2</field>
+  </object>
+  <object model="orm.toastersetting" pk="8">
+    <field type="CharField" name="name">DEFCONF_DL_DIR</field>
+    <field type="CharField" name="value">${TOPDIR}/../downloads</field>
+  </object>
+</django-objects>

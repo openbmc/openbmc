@@ -1,8 +1,33 @@
 #!/bin/sh
 
 ./lzotest -mavail -n10 -q /etc/services
+if [ $? -eq 0 ]; then
+  echo 'PASS: lzotest'
+else
+  echo 'FAIL: lzotest'
+fi
 LZOTEST=./lzotest /bin/sh -e "./check.sh" "/etc"
 ./align
+if [ $? -eq 0 ]; then
+  echo 'PASS: align'
+else
+  echo 'FAIL: align'
+fi
 ./chksum
+if [ $? -eq 0 ]; then
+  echo 'PASS: chksum'
+else
+  echo 'FAIL: chksum'
+fi
 ./simple
+if [ $? -eq 0 ]; then
+  echo 'PASS: simple'
+else
+  echo 'FAIL: simple'
+fi
 ./testmini
+if [ $? -eq 0 ]; then
+  echo 'PASS: testmini'
+else
+  echo 'FAIL: testmini'
+fi

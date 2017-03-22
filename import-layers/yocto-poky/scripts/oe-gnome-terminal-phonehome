@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Gnome terminal won't tell us which PID a given command is run as 
+# or allow a single instance so we can't tell when it completes.
+# This allows us to figure out the PID of the target so we can tell 
+# when its done.
+#
+echo $$ > $1
+shift
+exec $@

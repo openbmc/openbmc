@@ -1,0 +1,41 @@
+From 836a16fe5b5bab4a3afe2c991c104652775ce3a3 Mon Sep 17 00:00:00 2001
+From: David Abdurachmanov <davidlt@cern.ch>
+Date: Mon, 11 Apr 2016 16:00:57 +0200
+Subject: elfcmp: fix self-comparison error with GCC 6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Noticed with Fedora 24 Alpha, gcc (GCC) 6.0.0 20160406
+(Red Hat 6.0.0-0.20).
+
+elfcmp.c: In function ‘main’:
+elfcmp.c:364:199: error: self-comparison always evaluates
+to false [-Werror=tautological-compare]
+        if (unlikely (name1 == NULL || name2 == NULL
+
+Signed-off-by: David Abdurachmanov <davidlt@cern.ch>
+---
+
+Upstream-Status: Backport
+
+ src/ChangeLog | 4 ++++
+ src/elfcmp.c  | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/elfcmp.c b/src/elfcmp.c
+index 852b92f..7b5d39c 100644
+--- a/src/elfcmp.c
++++ b/src/elfcmp.c
+@@ -368,7 +368,7 @@ main (int argc, char *argv[])
+ 				&& sym1->st_shndx != SHN_UNDEF)
+ 			    || sym1->st_info != sym2->st_info
+ 			    || sym1->st_other != sym2->st_other
+-			    || sym1->st_shndx != sym1->st_shndx))
++			    || sym1->st_shndx != sym2->st_shndx))
+ 		{
+ 		  // XXX Do we want to allow reordered symbol tables?
+ 		symtab_mismatch:
+-- 
+cgit v0.12
+

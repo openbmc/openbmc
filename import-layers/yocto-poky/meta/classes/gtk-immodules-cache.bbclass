@@ -15,7 +15,8 @@ if [ "x$D" != "x" ]; then
             ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-2.0')} \
                 $IMFILES > $D${libdir}/gtk-2.0/2.10.0/immodules.cache 2>/dev/null &&
                 sed -i -e "s:$D::" $D${libdir}/gtk-2.0/2.10.0/immodules.cache
-        elif [ -x $D${bindir}/gtk-query-immodules-3.0 ]; then
+        fi
+        if [ -x $D${bindir}/gtk-query-immodules-3.0 ]; then
             IMFILES=$(ls $D${libdir}/gtk-3.0/*/immodules/*.so)
             ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-3.0')} \
                 $IMFILES > $D${libdir}/gtk-3.0/3.0.0/immodules.cache 2>/dev/null &&
@@ -40,7 +41,8 @@ if [ "x$D" != "x" ]; then
             ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-2.0')} \
                 $IMFILES > $D${libdir}/gtk-2.0/2.10.0/immodules.cache 2>/dev/null &&
                 sed -i -e "s:$D::" $D${libdir}/gtk-2.0/2.10.0/immodules.cache
-        elif [ -x $D${bindir}/gtk-query-immodules-3.0 ]; then
+        fi
+        if [ -x $D${bindir}/gtk-query-immodules-3.0 ]; then
             IMFILES=$(ls $D${libdir}/gtk-3.0/*/immodules/*.so)
             ${@qemu_run_binary(d, '$D', '${bindir}/gtk-query-immodules-3.0')} \
                 $IMFILES > $D${libdir}/gtk-3.0/3.0.0/immodules.cache 2>/dev/null &&
@@ -82,6 +84,6 @@ python __anonymous() {
         gtkimmodules_check = d.getVar('GTKIMMODULES_PACKAGES', False)
         if not gtkimmodules_check:
             bb_filename = d.getVar('FILE', False)
-            raise bb.build.FuncFailed("ERROR: %s inherits gtk-immodules-cache but doesn't set GTKIMMODULES_PACKAGES" % bb_filename)
+            bb.fatal("ERROR: %s inherits gtk-immodules-cache but doesn't set GTKIMMODULES_PACKAGES" % bb_filename)
 }
 

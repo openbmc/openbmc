@@ -11,35 +11,43 @@
 
 <!-- Begin container -->
 
-<div class="row-fluid span11">
-    <div class="page-header">
+<div class="row">
+  <div class="col-md-12">
+    <div class="page-header build-data">
         <h1>{{recipe.name}}_{{recipe.version}}</h1>
     </div>
+  </div>
 </div>
 
-<div class="row-fluid span7 tabbable">
-    <ul class="nav nav-pills">
+<div class="row">
+  <div class="col-md-8 tabbable">
+    <ul class="nav nav-tabs">
         <li>
             <a href="{% url "recipe" build.pk recipe.id "1" %}">
-                <i class="icon-question-sign get-help" title="Build-related information about the recipe"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="Build-related
+                    information about the recipe"></span>
                 Recipe details
             </a>
         </li>
         <li class="active">
-			<a href="#packages-built" data-toggle="tab">
-                <i class="icon-question-sign get-help" title="The packaged output resulting from building the recipe"></i>
+          <a href="#packages-built" data-toggle="tab">
+                <span class="glyphicon glyphicon-question-sign get-help" title="The packaged
+                    output resulting from building the recipe"></span>
                 Packages ({{object_count}})
             </a>
         </li>
         <li>
             <a href="{% url "recipe" build.pk recipe.id "3" %}">
-                <i class="icon-question-sign get-help" title="The recipe build-time dependencies (i.e. other recipes)"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The recipe
+                    build-time dependencies (i.e. other recipes)"></span>
                 Build dependencies ({{recipe.r_dependencies_recipe.all.count}})
             </a>
         </li>
         <li>
             <a href="{% url "recipe" build.pk recipe.id "4" %}">
-                <i class="icon-question-sign get-help" title="The recipe build-time reverse dependencies (i.e. the recipes that depend on this recipe)"></i>
+                <span class="glyphicon glyphicon-question-sign get-help" title="The recipe
+                    build-time reverse dependencies (i.e. the recipes that
+                    depend on this recipe)"></span>
                 Reverse build dependencies ({{recipe.r_dependencies_depends.all.count}})
             </a>
         </li>
@@ -72,8 +80,8 @@
 
                     <tr>
                         <td><a href="{% url "package_built_detail" build.pk package.pk %}">{{package.name}}</a></td>
-                        <td><a href="{% url "package_built_detail" build.pk package.pk %}">{{package.version}}_{{package.revision}}</a></td>
-                        <td class="sizecol"><a href="{% url "package_built_detail" build.pk package.pk %}">{{package.size|filtered_filesizeformat}}</a></td>
+                        <td>{{package.version}}_{{package.revision}}</td>
+                        <td class="sizecol">{{package.size|filtered_filesizeformat}}</td>
                     </tr>
 
                         {% endfor %}
@@ -86,9 +94,10 @@
             {% endif %}
         </div> {# tab-pane #}
     </div> {# tab-content #}
-</div> {# span7 #}
+</div> {# col-md-8 #}
 
-<div class="row span4 well">
+<div class="col-md-4">
+  <div class="well">
     <h2>About {{recipe.name}}</h2>
     <dl class="item-info">
         {% if recipe.summary %}
@@ -119,5 +128,8 @@
             <dd>{{recipe.license}}</dd>
         {% endif %}
     </dl>
+  </div>
 </div>
+
+</div> <!-- end row -->
 {% endblock pagedetailinfomain %}

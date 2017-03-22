@@ -8,7 +8,7 @@
 
 # Package name      : perl5
 # Source directory  : .
-# Configuration time: Thu Jun 18 05:37:27 UTC 2015
+# Configuration time: Fri May  6 20:13:46 PDT 2016
 # Configured by     : Open Embedded
 # Target system     : linux qemux86-64 3.19.5-yocto-standard #1 smp preempt tue jun 16 00:28:17 pdt 2015 x86_64 gnulinux
 
@@ -66,7 +66,7 @@ aphostname=''
 api_revision='5'
 api_subversion='0'
 api_version='22'
-api_versionstring='5.22.1'
+api_versionstring='5.22.0'
 ar='ar'
 archlib='@LIBDIR@/perl/5.22.1/@ARCH@-thread-multi'
 archlibexp='@STAGINGDIR@@LIBDIR@/perl/5.22.1/@ARCH@-thread-multi'
@@ -96,7 +96,7 @@ ccsymbols=''
 ccversion=''
 cf_by='Open Embedded'
 cf_email='Open Embedded@localhost.localdomain'
-cf_time='Thu Jun 18 05:37:27 UTC 2015'
+cf_time='Fri May  6 20:13:46 PDT 2016'
 charbits='8'
 charsize='1'
 chgrp=''
@@ -1194,7 +1194,7 @@ vendorprefixexp='@EXECPREFIX@'
 vendorscript='@USRBIN@'
 vendorscriptexp='@USRBIN@'
 version='5.22.1'
-version_patchlevel_string='version 22 subversion 0'
+version_patchlevel_string='version 22 subversion 1'
 versiononly='undef'
 vi=''
 xlibpth='@LIBDIR@/386 @BASELIBDIR@386'
@@ -1204,7 +1204,7 @@ zcat=''
 zip='zip'
 PERL_REVISION=5
 PERL_VERSION=22
-PERL_SUBVERSION=0
+PERL_SUBVERSION=1
 PERL_API_REVISION=5
 PERL_API_VERSION=22
 PERL_API_SUBVERSION=0

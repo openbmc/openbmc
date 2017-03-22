@@ -1,0 +1,44 @@
+From 1a41069c0dc054e59cd76fc3d8cf7cc2a78b5e8d Mon Sep 17 00:00:00 2001
+From: Allen Winter <allen.winter@kdab.com>
+Date: Sat, 3 Sep 2016 16:56:29 -0400
+Subject: [PATCH] CMakeLists.txt, libical.pc.in - fix iculibs (remove full path) ISSUE: 227
+
+Upstream-Status: Backport
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+----
+diff -Naur libical-2.0.0-orig/CMakeLists.txt libical-2.0.0/CMakeLists.txt
+--- libical-2.0.0-orig/CMakeLists.txt	2016-09-08 18:05:06.166049345 +0300
++++ libical-2.0.0/CMakeLists.txt	2016-09-08 18:05:45.201561334 +0300
+@@ -128,6 +128,7 @@
+ #  RSCALE info at http://tools.ietf.org/html/rfc7529
+ find_package(ICU)
+ if(ICU_FOUND)
++  set(ICUUC_LIBS "-licuuc") #for libical.pc
+   set(HAVE_LIBICU 1)
+   if(ICU_MAJOR_VERSION VERSION_GREATER 50)
+     set(HAVE_ICU_DANGI TRUE)
+@@ -137,6 +138,7 @@
+ endif()
+ if(ICU_I18N_FOUND)
+   set(HAVE_LIBICU_I18N 1)
++  set(ICUI18N_LIBS "-licui18n") #for libical.pc
+ endif()
+ 
+ # MSVC specific definitions
+diff -Naur libical-2.0.0-orig/libical.pc.in libical-2.0.0/libical.pc.in
+--- libical-2.0.0-orig/libical.pc.in	2015-12-28 23:44:53.000000000 +0200
++++ libical-2.0.0/libical.pc.in	2016-09-08 18:09:12.991963597 +0300
+@@ -3,10 +3,10 @@
+ libdir=@libdir@
+ includedir=@includedir@
+ threadslib=@PTHREAD_LIBS@
+-iculib=@ICU_LIBRARIES@ @ICU_I18N_LIBRARIES@
++iculibs=@ICUUC_LIBS@ @ICUI18N_LIBS@
+ 
+ Name: libical
+ Description: An implementation of basic iCAL protocols
+ Version: @VERSION@
+-Libs: -L${libdir} -lical -licalss -licalvcal ${threadslib} ${iculib}
++Libs: -L${libdir} -lical -licalss -licalvcal ${threadslib} ${iculibs}
+ Cflags: -I${includedir}

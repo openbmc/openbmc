@@ -1,0 +1,38 @@
+From a2d385e504323641b1127821833c61e77301c90b Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Sat, 11 Jun 2016 22:45:37 +0300
+Subject: [PATCH] Forward port mips & arm memory barrier patches
+
+Upstream-Status: Pending
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ lib/util/util.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/lib/util/util.h b/lib/util/util.h
+index 591722d..0768056 100644
+--- a/lib/util/util.h
++++ b/lib/util/util.h
+@@ -29,4 +29,19 @@
+ #define read_barrier()           asm volatile("" ::: "memory")
+ #endif
+ 
++#ifdef __arm__
++/*
++ * Use the __kuser_memory_barrier helper in the CPU helper page. See
++ * arch/arm/kernel/entry-armv.S in the kernel source for details.
++ */
++#define read_barrier()         ((void(*)(void))0xffff0fa0)()
++#endif
++
++#ifdef __mips__
++#define read_barrier()         asm volatile(".set   mips2\n\t" \
++                                            "sync\n\t" \
++                                            ".set   mips0" ::: "memory")
++#endif
++
++
+ #endif /* SP_UTIL_H */
+-- 
+2.1.4
+

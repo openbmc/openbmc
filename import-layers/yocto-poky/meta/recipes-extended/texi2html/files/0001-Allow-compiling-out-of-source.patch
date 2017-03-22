@@ -1,0 +1,39 @@
+From: Olaf Mandel <o.mandel@menlosystems.com>
+Date: Fri, 21 Oct 2016 13:04:44 +0000
+Subject: [PATCH] Allow compiling out-of-source
+
+Upstream-Status: Backport of [svn://svn.sv.gnu.org/texinfo/trunk r3602]
+---
+ Makefile.am | 2 +-
+ Makefile.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 3447463..c9b5b5c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -208,7 +208,7 @@ i18n/en.thl i18n/: $(po_document_dir)/po_document/$(PACKAGE)_document.pot
+ 	  done; \
+ 	  msgexec -i $< "$(srcdir)/gettext_to_separated.pl" | "$(srcdir)/separated_to_hash.pl" en > i18n/en.thl; \
+ 	else \
+-	  cp -p i18n_ref/*.thl i18n; \
++	  cp -p "$(srcdir)/i18n_ref/"*.thl i18n; \
+ 	fi
+ 
+ i18n_ref:
+diff --git a/Makefile.in b/Makefile.in
+index 4264b37..a13f84d 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1126,7 +1126,7 @@ i18n/en.thl i18n/: $(po_document_dir)/po_document/$(PACKAGE)_document.pot
+ 	  done; \
+ 	  msgexec -i $< "$(srcdir)/gettext_to_separated.pl" | "$(srcdir)/separated_to_hash.pl" en > i18n/en.thl; \
+ 	else \
+-	  cp -p i18n_ref/*.thl i18n; \
++	  cp -p "$(srcdir)/i18n_ref/"*.thl i18n; \
+ 	fi
+ 
+ i18n_ref:
+-- 
+2.1.4
+

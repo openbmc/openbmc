@@ -24,6 +24,11 @@ SRC_URI = "http://w1.fi/releases/wpa_supplicant-${PV}.tar.gz  \
            file://wpa_supplicant.conf \
            file://wpa_supplicant.conf-sane \
            file://99_wpa_supplicant \
+           file://0001-WPS-Reject-a-Credential-with-invalid-passphrase.patch \
+           file://0002-Remove-newlines-from-wpa_supplicant-config-network-o.patch \
+           file://0001-Reject-psk-parameter-set-with-invalid-passphrase-cha.patch \
+           file://0002-Reject-SET_CRED-commands-with-newline-characters-in-.patch \
+           file://0003-Reject-SET-commands-with-newline-characters-in-the-s.patch \
           "
 SRC_URI[md5sum] = "96ff75c3a514f1f324560a2376f13110"
 SRC_URI[sha256sum] = "cce55bae483b364eae55c35ba567c279be442ed8bab5b80a3c7fb0d057b9b316"

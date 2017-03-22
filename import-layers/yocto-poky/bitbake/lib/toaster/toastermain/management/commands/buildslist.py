@@ -10,4 +10,4 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self,**options):
         for b in Build.objects.all():
-            print "%d: %s %s %s" % (b.pk, b.machine, b.distro, ",".join([x.target for x in b.target_set.all()]))
+            print("%d: %s %s %s" % (b.pk, b.machine, b.distro, ",".join([x.target for x in b.target_set.all()])))

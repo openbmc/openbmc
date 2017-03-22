@@ -1,0 +1,41 @@
+Upstream-Status: Submitted
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From d940aa0079c253b958cf9158e9ec7922ecf464f9 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 9 Nov 2016 00:00:48 +0000
+Subject: [PATCH] staprun: fix linking if monitor is enabled
+
+If the monitor is enabled, monitor.c needs to link against json-c and ncurses.
+Instead of adding these linker flags to AM_CFLAGS (global CC flags) add them to
+stapio_LDADD.
+
+Apart from being the "right" thing to do, this fixes build failures on systems
+such as current Ubuntu (which defaults to using --as-needed and similar) where
+link order is important.
+---
+ staprun/Makefile.am | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/staprun/Makefile.am b/staprun/Makefile.am
+index 63d4088..66b3e21 100644
+--- a/staprun/Makefile.am
++++ b/staprun/Makefile.am
+@@ -42,12 +42,11 @@ staprun_CXXFLAGS += $(nss_CFLAGS)
+ staprun_LDADD += $(nss_LIBS)
+ endif
+ 
+-if HAVE_MONITOR_LIBS
+-AM_CFLAGS += $(jsonc_LIBS) $(ncurses_LIBS)
+-endif
+-
+ stapio_SOURCES = stapio.c mainloop.c common.c ctl.c relay.c relay_old.c monitor.c
+ stapio_LDADD = libstrfloctime.a -lpthread
++if HAVE_MONITOR_LIBS
++stapio_LDADD += $(jsonc_LIBS) $(ncurses_LIBS)
++endif
+ 
+ man_MANS = staprun.8
+ 
+-- 
+2.8.1

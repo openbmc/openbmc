@@ -1,0 +1,403 @@
+From c1948ec29b8dcdc58d2d92700c325abdeab111a6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <adraszik@tycoint.com>
+Date: Thu, 25 Aug 2016 13:15:00 +0100
+Subject: [PATCH 2/3] lib: switch to using strerror_l() instead of strerror_r()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+glibc provides two versions of strerror_r(), which
+can be chosen between using feature test macros
+_GNU_SOURCE and _POSIX_C_SOURCE. libnl is built using
+the former, hence we get the glibc special version,
+and all code so far has been written for this.
+
+Other C libraries like musl on the other hand only try
+to be posix compliant, and only ever provide the posix
+version of strerror_r(), which has a different signature.
+
+Uses in libnl hence generally cause printf() of an *int*
+with a *string format* specifier for that reason.
+
+Additionally, strerror_r() has been deprecated:
+  http://austingroupbugs.net/view.php?id=655
+
+Switch to using strerror_l() (via our wrapper just
+introduced).
+
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+Reviewed-by: Stephane Ayotte <sayotte@tycoint.com>
+Signed-off-by: Thomas Haller <thaller@redhat.com>
+---
+Upstream-Status: Backport https://github.com/thom311/libnl/commit/c1948ec29b8dcdc58d2d92700c325abdeab111a6
+ lib/cache_mngr.c        |  5 ++---
+ lib/fib_lookup/lookup.c |  3 ++-
+ lib/handlers.c          |  4 ++--
+ lib/msg.c               |  4 ++--
+ lib/nl.c                | 26 +++++++++-----------------
+ lib/route/route_obj.c   |  3 ++-
+ lib/socket.c            | 33 +++++++++++----------------------
+ 7 files changed, 30 insertions(+), 48 deletions(-)
+
+diff --git a/lib/cache_mngr.c b/lib/cache_mngr.c
+index b9eb345..1f23eb1 100644
+--- a/lib/cache_mngr.c
++++ b/lib/cache_mngr.c
+@@ -33,6 +33,7 @@
+  */
+ 
+ #include <netlink-private/netlink.h>
++#include <netlink-private/utils.h>
+ #include <netlink/netlink.h>
+ #include <netlink/cache.h>
+ #include <netlink/utils.h>
+@@ -392,10 +393,8 @@ int nl_cache_mngr_poll(struct nl_cache_mngr *mngr, int timeout)
+ 	ret = poll(&fds, 1, timeout);
+ 	NL_DBG(3, "Cache manager %p, poll() returned %d\n", mngr, ret);
+ 	if (ret < 0) {
+-		char buf[64];
+-
+ 		NL_DBG(4, "nl_cache_mngr_poll(%p): poll() failed with %d (%s)\n",
+-			mngr, errno, strerror_r(errno, buf, sizeof(buf)));
++			mngr, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 
+diff --git a/lib/fib_lookup/lookup.c b/lib/fib_lookup/lookup.c
+index 43b6126..efc862b 100644
+--- a/lib/fib_lookup/lookup.c
++++ b/lib/fib_lookup/lookup.c
+@@ -17,6 +17,7 @@
+  */
+ 
+ #include <netlink-private/netlink.h>
++#include <netlink-private/utils.h>
+ #include <netlink/netlink.h>
+ #include <netlink/attr.h>
+ #include <netlink/utils.h>
+@@ -133,7 +134,7 @@ static void result_dump_line(struct nl_object *obj, struct nl_dump_params *p)
+ 		     nl_rtntype2str(res->fr_type, buf, sizeof(buf)));
+ 	nl_dump(p, "scope %s error %s (%d)\n",
+ 		rtnl_scope2str(res->fr_scope, buf, sizeof(buf)),
+-		strerror_r(-res->fr_error, buf, sizeof(buf)), res->fr_error);
++		nl_strerror_l(-res->fr_error), res->fr_error);
+ }
+ 
+ static void result_dump_details(struct nl_object *obj, struct nl_dump_params *p)
+diff --git a/lib/handlers.c b/lib/handlers.c
+index 97a0d9c..4a48b99 100644
+--- a/lib/handlers.c
++++ b/lib/handlers.c
+@@ -26,6 +26,7 @@
+  */
+ 
+ #include <netlink-private/netlink.h>
++#include <netlink-private/utils.h>
+ #include <netlink/netlink.h>
+ #include <netlink/utils.h>
+ #include <netlink/msg.h>
+@@ -79,10 +80,9 @@ static int nl_error_handler_verbose(struct sockaddr_nl *who,
+ 				    struct nlmsgerr *e, void *arg)
+ {
+ 	FILE *ofd = arg ? arg : stderr;
+-	char buf[256];
+ 
+ 	fprintf(ofd, "-- Error received: %s\n-- Original message: ",
+-		strerror_r(-e->error, buf, sizeof(buf)));
++		nl_strerror_l(-e->error));
+ 	print_header_content(ofd, &e->msg);
+ 	fprintf(ofd, "\n");
+ 
+diff --git a/lib/msg.c b/lib/msg.c
+index e8a7e99..9af3f3a 100644
+--- a/lib/msg.c
++++ b/lib/msg.c
+@@ -27,6 +27,7 @@
+  */
+ 
+ #include <netlink-private/netlink.h>
++#include <netlink-private/utils.h>
+ #include <netlink/netlink.h>
+ #include <netlink/utils.h>
+ #include <netlink/cache.h>
+@@ -913,11 +914,10 @@ static void dump_error_msg(struct nl_msg *msg, FILE *ofd)
+ 	fprintf(ofd, "  [ERRORMSG] %zu octets\n", sizeof(*err));
+ 
+ 	if (nlmsg_len(hdr) >= sizeof(*err)) {
+-		char buf[256];
+ 		struct nl_msg *errmsg;
+ 
+ 		fprintf(ofd, "    .error = %d \"%s\"\n", err->error,
+-			strerror_r(-err->error, buf, sizeof(buf)));
++			nl_strerror_l(-err->error));
+ 		fprintf(ofd, "  [ORIGINAL MESSAGE] %zu octets\n", sizeof(*hdr));
+ 
+ 		errmsg = nlmsg_inherit(&err->msg);
+diff --git a/lib/nl.c b/lib/nl.c
+index 123f657..a45c3ea 100644
+--- a/lib/nl.c
++++ b/lib/nl.c
+@@ -27,6 +27,7 @@
+ 
+ #include <netlink-private/netlink.h>
+ #include <netlink-private/socket.h>
++#include <netlink-private/utils.h>
+ #include <netlink/netlink.h>
+ #include <netlink/utils.h>
+ #include <netlink/handlers.h>
+@@ -105,7 +106,6 @@ int nl_connect(struct nl_sock *sk, int protocol)
+ 	int errsv;
+ 	socklen_t addrlen;
+ 	struct sockaddr_nl local = { 0 };
+-	char buf[64];
+ 	int try_bind = 1;
+ 
+ #ifdef SOCK_CLOEXEC
+@@ -119,7 +119,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
+ 	if (sk->s_fd < 0) {
+ 		errsv = errno;
+ 		NL_DBG(4, "nl_connect(%p): socket() failed with %d (%s)\n", sk, errsv,
+-			strerror_r(errsv, buf, sizeof(buf)));
++			nl_strerror_l(errsv));
+ 		err = -nl_syserr2nlerr(errsv);
+ 		goto errout;
+ 	}
+@@ -158,7 +158,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
+ 				_nl_socket_used_ports_set(used_ports, port);
+ 			} else {
+ 				NL_DBG(4, "nl_connect(%p): bind() for port %u failed with %d (%s)\n",
+-					sk, (unsigned) port, errsv, strerror_r(errsv, buf, sizeof(buf)));
++					sk, (unsigned) port, errsv, nl_strerror_l(errsv));
+ 				_nl_socket_used_ports_release_all(used_ports);
+ 				err = -nl_syserr2nlerr(errsv);
+ 				goto errout;
+@@ -172,7 +172,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
+ 		if (err != 0) {
+ 			errsv = errno;
+ 			NL_DBG(4, "nl_connect(%p): bind() failed with %d (%s)\n",
+-				sk, errsv, strerror_r(errsv, buf, sizeof(buf)));
++				sk, errsv, nl_strerror_l(errsv));
+ 			err = -nl_syserr2nlerr(errsv);
+ 			goto errout;
+ 		}
+@@ -183,7 +183,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
+ 			  &addrlen);
+ 	if (err < 0) {
+ 		NL_DBG(4, "nl_connect(%p): getsockname() failed with %d (%s)\n",
+-			sk, errno, strerror_r(errno, buf, sizeof(buf)));
++			sk, errno, nl_strerror_l(errno));
+ 		err = -nl_syserr2nlerr(errno);
+ 		goto errout;
+ 	}
+@@ -280,10 +280,8 @@ int nl_sendto(struct nl_sock *sk, void *buf, size_t size)
+ 	ret = sendto(sk->s_fd, buf, size, 0, (struct sockaddr *)
+ 		     &sk->s_peer, sizeof(sk->s_peer));
+ 	if (ret < 0) {
+-		char errbuf[64];
+-
+ 		NL_DBG(4, "nl_sendto(%p): sendto() failed with %d (%s)\n",
+-			sk, errno, strerror_r(errno, errbuf, sizeof(errbuf)));
++			sk, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 
+@@ -343,10 +341,8 @@ int nl_sendmsg(struct nl_sock *sk, struct nl_msg *msg, struct msghdr *hdr)
+ 
+ 	ret = sendmsg(sk->s_fd, hdr, 0);
+ 	if (ret < 0) {
+-		char errbuf[64];
+-
+ 		NL_DBG(4, "nl_sendmsg(%p): sendmsg() failed with %d (%s)\n",
+-			sk, errno, strerror_r(errno, errbuf, sizeof(errbuf)));
++			sk, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 
+@@ -706,15 +702,13 @@ retry:
+ 		goto abort;
+ 	}
+ 	if (n < 0) {
+-		char errbuf[64];
+-
+ 		if (errno == EINTR) {
+ 			NL_DBG(3, "recvmsg() returned EINTR, retrying\n");
+ 			goto retry;
+ 		}
+ 
+ 		NL_DBG(4, "nl_sendmsg(%p): nl_recv() failed with %d (%s)\n",
+-			sk, errno, strerror_r(errno, errbuf, sizeof(errbuf)));
++			sk, errno, nl_strerror_l(errno));
+ 		retval = -nl_syserr2nlerr(errno);
+ 		goto abort;
+ 	}
+@@ -980,10 +974,8 @@ continue_reading:
+ 					goto out;
+ 				}
+ 			} else if (e->error) {
+-				char buf[64];
+-
+ 				NL_DBG(4, "recvmsgs(%p): RTNETLINK responded with %d (%s)\n",
+-					sk, -e->error, strerror_r(-e->error, buf, sizeof(buf)));
++					sk, -e->error, nl_strerror_l(-e->error));
+ 
+ 				/* Error message reported back from kernel. */
+ 				if (cb->cb_err) {
+diff --git a/lib/route/route_obj.c b/lib/route/route_obj.c
+index 7347ed2..21b67b1 100644
+--- a/lib/route/route_obj.c
++++ b/lib/route/route_obj.c
+@@ -31,6 +31,7 @@
+  */
+ 
+ #include <netlink-private/netlink.h>
++#include <netlink-private/utils.h>
+ #include <netlink/netlink.h>
+ #include <netlink/cache.h>
+ #include <netlink/utils.h>
+@@ -259,7 +260,7 @@ static void route_dump_details(struct nl_object *a, struct nl_dump_params *p)
+ 	if ((r->ce_mask & ROUTE_ATTR_CACHEINFO) && r->rt_cacheinfo.rtci_error) {
+ 		nl_dump_line(p, "    cacheinfo error %d (%s)\n",
+ 			r->rt_cacheinfo.rtci_error,
+-			strerror_r(-r->rt_cacheinfo.rtci_error, buf, sizeof(buf)));
++			nl_strerror_l(-r->rt_cacheinfo.rtci_error));
+ 	}
+ 
+ 	if (r->ce_mask & ROUTE_ATTR_METRICS) {
+diff --git a/lib/socket.c b/lib/socket.c
+index 97b2f69..55153b4 100644
+--- a/lib/socket.c
++++ b/lib/socket.c
+@@ -33,6 +33,7 @@
+ 
+ #include <netlink-private/netlink.h>
+ #include <netlink-private/socket.h>
++#include <netlink-private/utils.h>
+ #include <netlink/netlink.h>
+ #include <netlink/utils.h>
+ #include <netlink/handlers.h>
+@@ -449,11 +450,9 @@ int nl_socket_add_memberships(struct nl_sock *sk, int group, ...)
+ 		err = setsockopt(sk->s_fd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP,
+ 						 &group, sizeof(group));
+ 		if (err < 0) {
+-			char buf[64];
+-
+ 			va_end(ap);
+ 			NL_DBG(4, "nl_socket_add_memberships(%p): setsockopt() failed with %d (%s)\n",
+-				sk, errno, strerror_r(errno, buf, sizeof(buf)));
++				sk, errno, nl_strerror_l(errno));
+ 			return -nl_syserr2nlerr(errno);
+ 		}
+ 
+@@ -501,11 +500,9 @@ int nl_socket_drop_memberships(struct nl_sock *sk, int group, ...)
+ 		err = setsockopt(sk->s_fd, SOL_NETLINK, NETLINK_DROP_MEMBERSHIP,
+ 						 &group, sizeof(group));
+ 		if (err < 0) {
+-			char buf[64];
+-
+ 			va_end(ap);
+ 			NL_DBG(4, "nl_socket_drop_memberships(%p): setsockopt() failed with %d (%s)\n",
+-				sk, errno, strerror_r(errno, buf, sizeof(buf)));
++				sk, errno, nl_strerror_l(errno));
+ 			return -nl_syserr2nlerr(errno);
+ 		}
+ 
+@@ -619,7 +616,6 @@ int nl_socket_set_fd(struct nl_sock *sk, int protocol, int fd)
+ {
+ 	int err = 0;
+ 	socklen_t addrlen;
+-	char buf[64];
+ 	struct sockaddr_nl local = { 0 };
+ 	int so_type = -1, so_protocol = -1;
+ 
+@@ -633,7 +629,7 @@ int nl_socket_set_fd(struct nl_sock *sk, int protocol, int fd)
+ 	                  &addrlen);
+ 	if (err < 0) {
+ 		NL_DBG(4, "nl_socket_set_fd(%p,%d): getsockname() failed with %d (%s)\n",
+-		       sk, fd, errno, strerror_r(errno, buf, sizeof(buf)));
++		       sk, fd, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 	if (addrlen != sizeof(local))
+@@ -648,7 +644,7 @@ int nl_socket_set_fd(struct nl_sock *sk, int protocol, int fd)
+ 	err = getsockopt(fd, SOL_SOCKET, SO_TYPE, &so_type, &addrlen);
+ 	if (err < 0) {
+ 		NL_DBG(4, "nl_socket_set_fd(%p,%d): getsockopt() for SO_TYPE failed with %d (%s)\n",
+-		       sk, fd, errno, strerror_r(errno, buf, sizeof(buf)));
++		       sk, fd, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 	if (addrlen != sizeof(so_type))
+@@ -666,7 +662,7 @@ int nl_socket_set_fd(struct nl_sock *sk, int protocol, int fd)
+ 		if (errno == ENOPROTOOPT)
+ 			goto no_so_protocol;
+ 		NL_DBG(4, "nl_socket_set_fd(%p,%d): getsockopt() for SO_PROTOCOL failed with %d (%s)\n",
+-		       sk, fd, errno, strerror_r(errno, buf, sizeof(buf)));
++		       sk, fd, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 	if (addrlen != sizeof(so_protocol))
+@@ -709,10 +705,8 @@ int nl_socket_set_nonblocking(const struct nl_sock *sk)
+ 		return -NLE_BAD_SOCK;
+ 
+ 	if (fcntl(sk->s_fd, F_SETFL, O_NONBLOCK) < 0) {
+-		char buf[64];
+-
+ 		NL_DBG(4, "nl_socket_set_nonblocking(%p): fcntl() failed with %d (%s)\n",
+-			sk, errno, strerror_r(errno, buf, sizeof(buf)));
++			sk, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 
+@@ -813,7 +807,6 @@ int nl_socket_modify_err_cb(struct nl_sock *sk, enum nl_cb_kind kind,
+ int nl_socket_set_buffer_size(struct nl_sock *sk, int rxbuf, int txbuf)
+ {
+ 	int err;
+-	char buf[64];
+ 
+ 	if (rxbuf <= 0)
+ 		rxbuf = 32768;
+@@ -828,7 +821,7 @@ int nl_socket_set_buffer_size(struct nl_sock *sk, int rxbuf, int txbuf)
+ 			 &txbuf, sizeof(txbuf));
+ 	if (err < 0) {
+ 		NL_DBG(4, "nl_socket_set_buffer_size(%p): setsockopt() failed with %d (%s)\n",
+-			sk, errno, strerror_r(errno, buf, sizeof(buf)));
++			sk, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 
+@@ -836,7 +829,7 @@ int nl_socket_set_buffer_size(struct nl_sock *sk, int rxbuf, int txbuf)
+ 			 &rxbuf, sizeof(rxbuf));
+ 	if (err < 0) {
+ 		NL_DBG(4, "nl_socket_set_buffer_size(%p): setsockopt() failed with %d (%s)\n",
+-			sk, errno, strerror_r(errno, buf, sizeof(buf)));
++			sk, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 
+@@ -890,10 +883,8 @@ int nl_socket_set_passcred(struct nl_sock *sk, int state)
+ 	err = setsockopt(sk->s_fd, SOL_SOCKET, SO_PASSCRED,
+ 			 &state, sizeof(state));
+ 	if (err < 0) {
+-		char buf[64];
+-
+ 		NL_DBG(4, "nl_socket_set_passcred(%p): setsockopt() failed with %d (%s)\n",
+-			sk, errno, strerror_r(errno, buf, sizeof(buf)));
++			sk, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 
+@@ -922,10 +913,8 @@ int nl_socket_recv_pktinfo(struct nl_sock *sk, int state)
+ 	err = setsockopt(sk->s_fd, SOL_NETLINK, NETLINK_PKTINFO,
+ 			 &state, sizeof(state));
+ 	if (err < 0) {
+-		char buf[64];
+-
+ 		NL_DBG(4, "nl_socket_recv_pktinfo(%p): setsockopt() failed with %d (%s)\n",
+-			sk, errno, strerror_r(errno, buf, sizeof(buf)));
++			sk, errno, nl_strerror_l(errno));
+ 		return -nl_syserr2nlerr(errno);
+ 	}
+ 
+-- 
+2.9.3
+

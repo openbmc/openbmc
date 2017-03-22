@@ -25,8 +25,8 @@ diff --git a/configure.ac b/configure.ac
 index 9c52aeb..26cacd6 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -747,9 +747,16 @@ AC_SUBST(FT2_CFLAGS)
- AC_SUBST(FT2_LIBS)
+@@ -752,9 +752,16 @@ AC_SUBST(FT2_CFLAGS)
+ fi dnl of EXT plugins
  
  dnl *** gio-unix-2.0 for tests/check/pipelines/tcp.c ***
 +AC_ARG_ENABLE([gio_unix_2_0],

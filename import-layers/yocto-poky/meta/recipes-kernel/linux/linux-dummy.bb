@@ -18,6 +18,8 @@ FILES_kernel-modules = ""
 ALLOW_EMPTY_kernel-modules = "1"
 DESCRIPTION_kernel-modules = "Kernel modules meta package"
 
+INHIBIT_DEFAULT_DEPS = "1"
+
 #COMPATIBLE_MACHINE = "your_machine"
 
 PR = "r1"

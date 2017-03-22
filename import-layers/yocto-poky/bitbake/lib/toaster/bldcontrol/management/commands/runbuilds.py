@@ -1,31 +1,27 @@
-from django.core.management.base import NoArgsCommand, CommandError
+from django.core.management.base import NoArgsCommand
 from django.db import transaction
 from django.db.models import Q
 
 from bldcontrol.bbcontroller import getBuildEnvironmentController
-from bldcontrol.bbcontroller import ShellCmdException, BuildSetupException
 from bldcontrol.models import BuildRequest, BuildEnvironment
 from bldcontrol.models import BRError, BRVariable
 
-from orm.models import Build, ToasterSetting, LogMessage, Target
+from orm.models import Build, LogMessage, Target
 
-import os
 import logging
-import time
-import sys
 import traceback
+import signal
 
 logger = logging.getLogger("toaster")
 
 class Command(NoArgsCommand):
-    args    = ""
-    help    = "Schedules and executes build requests as possible."
-    "Does not return (interrupt with Ctrl-C)"
-
+    args = ""
+    help = "Schedules and executes build requests as possible. "\
+           "Does not return (interrupt with Ctrl-C)"
 
     @transaction.atomic
     def _selectBuildEnvironment(self):
-        bec = getBuildEnvironmentController(lock = BuildEnvironment.LOCK_FREE)
+        bec = getBuildEnvironmentController(lock=BuildEnvironment.LOCK_FREE)
         bec.be.lock = BuildEnvironment.LOCK_LOCK
         bec.be.save()
         return bec
@@ -54,8 +50,8 @@ class Command(NoArgsCommand):
                 logger.debug("runbuilds: No build env")
                 return
 
-            logger.debug("runbuilds: starting build %s, environment %s" % \
-                         (str(br).decode('utf-8'), bec.be))
+            logger.info("runbuilds: starting build %s, environment %s" % \
+                        (br, bec.be))
 
             # let the build request know where it is being executed
             br.environment = bec.be
@@ -68,24 +64,22 @@ class Command(NoArgsCommand):
 
         except Exception as e:
             logger.error("runbuilds: Error launching build %s" % e)
-            traceback.print_exc(e)
+            traceback.print_exc()
             if "[Errno 111] Connection refused" in str(e):
                 # Connection refused, read toaster_server.out
                 errmsg = bec.readServerLogFile()
             else:
                 errmsg = str(e)
 
-            BRError.objects.create(req = br,
-                    errtype = str(type(e)),
-                    errmsg = errmsg,
-                    traceback = traceback.format_exc(e))
+            BRError.objects.create(req=br, errtype=str(type(e)), errmsg=errmsg,
+                                   traceback=traceback.format_exc())
             br.state = BuildRequest.REQ_FAILED
             br.save()
             bec.be.lock = BuildEnvironment.LOCK_FREE
             bec.be.save()
 
     def archive(self):
-        for br in BuildRequest.objects.filter(state = BuildRequest.REQ_ARCHIVE):
+        for br in BuildRequest.objects.filter(state=BuildRequest.REQ_ARCHIVE):
             if br.build == None:
                 br.state = BuildRequest.REQ_FAILED
             else:
@@ -102,14 +96,13 @@ class Command(NoArgsCommand):
                                        BuildRequest.REQ_COMPLETED,
                                        BuildRequest.REQ_CANCELLING]) &
             Q(lock=BuildEnvironment.LOCK_LOCK) &
-            Q(updated__lt=timezone.now() - timedelta(seconds = 30))
+            Q(updated__lt=timezone.now() - timedelta(seconds=30))
         ).update(lock=BuildEnvironment.LOCK_FREE)
 
 
         # update all Builds that were in progress and failed to start
-        for br in BuildRequest.objects.filter(
-            state=BuildRequest.REQ_FAILED,
-            build__outcome=Build.IN_PROGRESS):
+        for br in BuildRequest.objects.filter(state=BuildRequest.REQ_FAILED,
+                                              build__outcome=Build.IN_PROGRESS):
             # transpose the launch errors in ToasterExceptions
             br.build.outcome = Build.FAILED
             for brerror in br.brerror_set.all():
@@ -126,7 +119,7 @@ class Command(NoArgsCommand):
 
 
         # update all BuildRequests without a build created
-        for br in BuildRequest.objects.filter(build = None):
+        for br in BuildRequest.objects.filter(build=None):
             br.build = Build.objects.create(project=br.project,
                                             completed_on=br.updated,
                                             started_on=br.created)
@@ -151,29 +144,34 @@ class Command(NoArgsCommand):
 
         # Make sure the LOCK is removed for builds which have been fully
         # cancelled
-        for br in BuildRequest.objects.filter(
-            Q(build__outcome=Build.CANCELLED) &
-            Q(state=BuildRequest.REQ_CANCELLING) &
-            ~Q(environment=None)):
+        for br in BuildRequest.objects.filter(\
+                      Q(build__outcome=Build.CANCELLED) &
+                      Q(state=BuildRequest.REQ_CANCELLING) &
+                      ~Q(environment=None)):
             br.environment.lock = BuildEnvironment.LOCK_FREE
             br.environment.save()
 
+    def runbuild(self):
+        try:
+            self.cleanup()
+        except Exception as e:
+            logger.warn("runbuilds: cleanup exception %s" % str(e))
+
+        try:
+            self.archive()
+        except Exception as e:
+            logger.warn("runbuilds: archive exception %s" % str(e))
+
+        try:
+            self.schedule()
+        except Exception as e:
+            logger.warn("runbuilds: schedule exception %s" % str(e))
 
     def handle_noargs(self, **options):
+        self.runbuild()
+
+        signal.signal(signal.SIGUSR1, lambda sig, frame: None)
+
         while True:
-            try:
-                self.cleanup()
-            except Exception as e:
-                logger.warn("runbuilds: cleanup exception %s" % str(e))
-
-            try:
-                self.archive()
-            except Exception as e:
-                logger.warn("runbuilds: archive exception %s" % str(e))
-
-            try:
-                self.schedule()
-            except Exception as e:
-                logger.warn("runbuilds: schedule exception %s" % str(e))
-
-            time.sleep(1)
+            signal.pause()
+            self.runbuild()

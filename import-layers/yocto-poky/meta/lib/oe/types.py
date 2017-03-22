@@ -33,7 +33,7 @@ def choice(value, choices):
     Acts as a multiple choice for the user.  To use this, set the variable
     type flag to 'choice', and set the 'choices' flag to a space separated
     list of valid values."""
-    if not isinstance(value, basestring):
+    if not isinstance(value, str):
         raise TypeError("choice accepts a string, not '%s'" % type(value))
 
     value = value.lower()
@@ -106,7 +106,7 @@ def boolean(value):
     Valid values for false: 'no', 'n', 'false', 'f', '0'
     """
 
-    if not isinstance(value, basestring):
+    if not isinstance(value, str):
         raise TypeError("boolean accepts a string, not '%s'" % type(value))
 
     value = value.lower()

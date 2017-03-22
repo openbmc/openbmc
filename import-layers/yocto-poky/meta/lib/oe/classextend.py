@@ -1,3 +1,5 @@
+import collections
+
 class ClassExtender(object):
     def __init__(self, extname, d):
         self.extname = extname
@@ -77,7 +79,7 @@ class ClassExtender(object):
             self.d.setVar("EXTENDPKGV", orig)
             return
         deps = bb.utils.explode_dep_versions2(deps)
-        newdeps = {}
+        newdeps = collections.OrderedDict()
         for dep in deps:
             newdeps[self.map_depends(dep)] = deps[dep]
 

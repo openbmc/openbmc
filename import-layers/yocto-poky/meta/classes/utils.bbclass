@@ -24,6 +24,7 @@ def base_version_less_or_equal(variable, checkvalue, truevalue, falsevalue, d):
     return oe.utils.version_less_or_equal(variable, checkvalue, truevalue, falsevalue, d)
 
 def base_contains(variable, checkvalues, truevalue, falsevalue, d):
+    bb.note('base_contains is deprecated, please use bb.utils.contains instead.')
     return bb.utils.contains(variable, checkvalues, truevalue, falsevalue, d)
 
 def base_both_contain(variable1, variable2, checkvalue, d):
@@ -61,15 +62,18 @@ def is_machine_specific(d):
 oe_soinstall() {
 	# Purpose: Install shared library file and
 	#          create the necessary links
-	# Example:
-	#
-	# oe_
-	#
-	#bbnote installing shared library $1 to $2
-	#
+	# Example: oe_soinstall libfoo.so.1.2.3 ${D}${libdir}
 	libname=`basename $1`
+	case "$libname" in
+	    *.so)
+	        bbfatal "oe_soinstall: Shared library must haved versioned filename (e.g. libfoo.so.1.2.3)"
+	        ;;
+	esac
 	install -m 755 $1 $2/$libname
 	sonamelink=`${HOST_PREFIX}readelf -d $1 |grep 'Library soname:' |sed -e 's/.*\[\(.*\)\].*/\1/'`
+	if [ -z $sonamelink ]; then
+		bbfatal "oe_soinstall: $libname is missing ELF tag 'SONAME'."
+	fi
 	solink=`echo $libname | sed -e 's/\.so\..*/.so/'`
 	ln -sf $libname $2/$sonamelink
 	ln -sf $libname $2/$solink
@@ -248,7 +252,7 @@ oe_machinstall() {
 create_cmdline_wrapper () {
 	# Create a wrapper script where commandline options are needed
 	#
-	# These are useful to work around relocation issues, by passing extra options 
+	# These are useful to work around relocation issues, by passing extra options
 	# to a program
 	#
 	# Usage: create_cmdline_wrapper FILENAME <extra-options>
@@ -302,7 +306,7 @@ hardlinkdir () {
 
 
 def check_app_exists(app, d):
-    app = d.expand(app)
+    app = d.expand(app).strip()
     path = d.getVar('PATH', d, True)
     return bool(bb.utils.which(path, app))
 
@@ -322,7 +326,7 @@ def base_set_filespath(path, d):
     overrides.reverse()
     for o in overrides:
         for p in path:
-            if p != "": 
+            if p != "":
                 filespath.append(os.path.join(p, o))
     return ":".join(filespath)
 
@@ -378,3 +382,50 @@ def all_multilib_tune_values(d, var, unique = True, need_split = True, delim = '
     else:
         ret = values
     return " ".join(ret)
+
+def all_multilib_tune_list(vars, d):
+    """
+    Return a list of ${VAR} for each variable VAR in vars from each 
+    multilib tune configuration.
+    Is safe to be called from a multilib recipe/context as it can
+    figure out the original tune and remove the multilib overrides.
+    """
+    values = {}
+    for v in vars:
+        values[v] = []
+
+    localdata = bb.data.createCopy(d)
+    overrides = localdata.getVar("OVERRIDES", False).split(":")
+    newoverrides = []
+    for o in overrides:
+        if not o.startswith("virtclass-multilib-"):
+            newoverrides.append(o)
+    localdata.setVar("OVERRIDES", ":".join(newoverrides))
+    localdata.setVar("MLPREFIX", "")
+    origdefault = localdata.getVar("DEFAULTTUNE_MULTILIB_ORIGINAL", True)
+    if origdefault:
+        localdata.setVar("DEFAULTTUNE", origdefault)
+    bb.data.update_data(localdata)
+    values['ml'] = ['']
+    for v in vars:
+        values[v].append(localdata.getVar(v, True))
+    variants = d.getVar("MULTILIB_VARIANTS", True) or ""
+    for item in variants.split():
+        localdata = bb.data.createCopy(d)
+        overrides = localdata.getVar("OVERRIDES", False) + ":virtclass-multilib-" + item
+        localdata.setVar("OVERRIDES", overrides)
+        localdata.setVar("MLPREFIX", item + "-")
+        bb.data.update_data(localdata)
+        values[v].append(localdata.getVar(v, True))
+        values['ml'].append(item)
+    return values
+
+# If the user hasn't set up their name/email, set some defaults
+check_git_config() {
+	if ! git config user.email > /dev/null ; then
+		git config --local user.email "${PATCH_GIT_USER_EMAIL}"
+	fi
+	if ! git config user.name > /dev/null ; then
+		git config --local user.name "${PATCH_GIT_USER_NAME}"
+	fi
+}

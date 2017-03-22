@@ -158,7 +158,7 @@ function customRecipePageInit(ctx) {
           msg += " <strong>" + dep.name + "</strong>";
 
           /* Add any cells currently in view to the list of cells which get
-           * an inline notification inside them and which change add/rm state
+           * an list-inline notification inside them and which change add/rm state
            */
           depBtnCell = $("#package-btn-cell-" + dep.pk);
           btnCell = btnCell.add(depBtnCell);
@@ -208,7 +208,7 @@ function customRecipePageInit(ctx) {
           }
 
           /* Add any cells currently in view to the list of cells which get
-           * an inline notification inside them and which change add/rm state
+           * an list-inline notification inside them and which change add/rm state
            */
           depBtnCell = $("#package-btn-cell-" + dep.pk);
           btnCell = btnCell.add(depBtnCell);
@@ -281,4 +281,36 @@ function customRecipePageInit(ctx) {
         window.location.replace(libtoaster.ctx.projectBuildsUrl);
     });
   });
+
+  $("#delete-custom-recipe-confirmed").click(function(e){
+    e.preventDefault();
+    libtoaster.disableAjaxLoadingTimer();
+    $(this).find('[data-role="submit-state"]').hide();
+    $(this).find('[data-role="loading-state"]').show();
+    $(this).attr("disabled", "disabled");
+
+    $.ajax({
+        type: 'DELETE',
+        url: ctx.recipe.xhrCustomRecipeUrl,
+        headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
+        success: function (data) {
+          if (data.error !== "ok") {
+            console.warn(data.error);
+          } else {
+            var msg = $('<span>You have deleted <strong>1</strong> custom image: <strong id="deleted-custom-image-name"></strong></span>');
+            msg.find("#deleted-custom-image-name").text(ctx.recipe.name);
+
+            libtoaster.setNotification("custom-image-recipe-deleted",
+                                       msg.html());
+
+            window.location.replace(data.gotoUrl);
+          }
+        },
+        error: function (data) {
+          console.warn(data);
+        }
+    });
+  });
+
+
 }
