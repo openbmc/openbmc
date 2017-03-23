@@ -27,7 +27,7 @@ def find_conf_files():
     return  myfiles
 
 python install_conf_files() {
-    from shutil import copy
+    import shutil
 
     files = find_conf_files()
 
@@ -39,7 +39,7 @@ python install_conf_files() {
         if not os.path.exists(parent):
             os.makedirs(parent)
 
-        copy(f, dest)
+        shutil.copy(f, dest)
 }
 
 do_install[postfuncs] += "install_conf_files"
