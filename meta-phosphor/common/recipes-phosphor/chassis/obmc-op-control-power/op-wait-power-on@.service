@@ -12,6 +12,7 @@ ConditionPathExists=!/run/openbmc/chassis@%i-on
 Type=oneshot
 RemainAfterExit=yes
 ExecStart={sbindir}/pgood_wait /org/openbmc/control/power%i on
+TimeoutSec=30
 
 [Install]
 WantedBy=obmc-chassis-start@%i.target
