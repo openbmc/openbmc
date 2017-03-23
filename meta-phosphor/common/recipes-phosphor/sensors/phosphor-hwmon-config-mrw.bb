@@ -4,6 +4,7 @@ PR = "r1"
 
 inherit obmc-phosphor-license
 inherit allarch
+inherit native
 
 DEPENDS += "mrw-perl-tools-native mrw-native"
 
