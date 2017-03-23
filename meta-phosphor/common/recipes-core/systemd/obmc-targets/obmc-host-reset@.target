@@ -1,0 +1,7 @@
+[Unit]
+Description=Host%i (Reset Check)
+Conflicts=obmc-stop-host%i.target
+RefuseManualStop=yes
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
