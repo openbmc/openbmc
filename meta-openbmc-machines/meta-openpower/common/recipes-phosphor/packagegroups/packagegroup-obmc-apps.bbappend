@@ -13,13 +13,6 @@ RDEPENDS_${PN}-extrasdev += "${@mf_enabled(d, 'p9-vcs-workaround', 'iicmaster')}
 # provider (VIRTUAL-RUNTIME_obmc-inventory-manager).
 RDEPENDS_${PN}-inventory += "obmc-mgr-inventory"
 
-# Add the deprecated /org/openbmc led namespace providing
-# obmc-control-led application to the leds packagegroup
-# until all applications have been updated to use the new,
-# officially spec'ed xyz.openbmc_project.Led
-# provider (VIRTUAL-RUNTIME_obmc-leds-manager).
-RDEPENDS_${PN}-leds += "obmc-control-led"
-
 # Add the deprecated /org/openbmc sensor namespace providing
 # obmc-hwmon and obmc-mgr-sensor applications to the sensor
 # packagegroup until all applications have been updated to use
