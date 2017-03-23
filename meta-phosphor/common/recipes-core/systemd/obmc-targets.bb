@@ -34,12 +34,17 @@ CHASSIS_POWER_TARGETS_2 = "reset"
 # - start:                 Services to run to do the host boot
 # - started:               Services to run once the host is booted
 # - stop-pre,stop,stopped: Same as above but applied to shutting down the host
-HOST_SYNCH_TARGETS = "start-pre start started stop-pre stop stopped"
+# - reset-running:         Services to check if host is running after bmc reset
+HOST_SYNCH_TARGETS = "start-pre start started stop-pre stop stopped reset-running"
 
 # Track all host action targets
 # - stop:    Services to run to shutdown the host
 # - quiesce: Target to enter on host boot failure
 HOST_ACTION_TARGETS = "stop quiesce"
+
+# TODO: openbmc/openbmc#1205 - Move this to standard host action targets
+# - reset:   Check host state and update host "start" target if host running
+HOST_ACTION_TARGETS_2 = "reset"
 
 CHASSIS_FMT = "obmc-chassis-{0}@.target"
 SYNCH_POWER_FMT = "obmc-power-{0}@.target"
@@ -47,6 +52,7 @@ CHASSIS_POWER_FMT = "obmc-power-chassis-{0}@.target"
 CHASSIS_POWER_FMT_2 = "obmc-chassis-{0}@.target"
 HOST_SYNCH_FMT = "obmc-host-{0}@.target"
 HOST_ACTION_FMT = "obmc-{0}-host@.target"
+HOST_ACTION_FMT_2 = "obmc-host-{0}@.target"
 
 CHASSIS_LINK_FMT = "${CHASSIS_FMT}:obmc-chassis-{0}@{1}.target"
 SYNCH_POWER_LINK_FMT = "${SYNCH_POWER_FMT}:obmc-power-{0}@{1}.target"
@@ -54,6 +60,7 @@ CHASSIS_POWER_LINK_FMT = "${CHASSIS_POWER_FMT}:obmc-power-chassis-{0}@{1}.target
 CHASSIS_POWER_LINK_FMT_2 = "${CHASSIS_POWER_FMT_2}:obmc-chassis-{0}@{1}.target"
 HOST_LINK_SYNCH_FMT = "${HOST_SYNCH_FMT}:obmc-host-{0}@{1}.target"
 HOST_LINK_ACTION_FMT = "${HOST_ACTION_FMT}:obmc-{0}-host@{1}.target"
+HOST_LINK_ACTION_FMT_2 = "${HOST_ACTION_FMT_2}:obmc-host-{0}@{1}.target"
 
 SYSTEMD_SERVICE_${PN} += " \
         obmc-mapper.target \
@@ -69,6 +76,7 @@ SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'CHASSIS_POWER_FMT', 'CHASSIS_POWER
 SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'CHASSIS_POWER_FMT_2', 'CHASSIS_POWER_TARGETS_2')}"
 SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'HOST_SYNCH_FMT', 'HOST_SYNCH_TARGETS')}"
 SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'HOST_ACTION_FMT', 'HOST_ACTION_TARGETS')}"
+SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'HOST_ACTION_FMT_2', 'HOST_ACTION_TARGETS_2')}"
 
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_LINK_FMT', 'CHASSIS_TARGETS', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'SYNCH_POWER_LINK_FMT', 'SYNCH_POWER_TARGETS', 'OBMC_POWER_INSTANCES')}"
@@ -76,3 +84,4 @@ SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_POWER_LINK_FMT', 'CHASSIS_POW
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_POWER_LINK_FMT_2', 'CHASSIS_POWER_TARGETS_2', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_SYNCH_FMT', 'HOST_SYNCH_TARGETS', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT', 'HOST_ACTION_TARGETS', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT_2', 'HOST_ACTION_TARGETS_2', 'OBMC_HOST_INSTANCES')}"
