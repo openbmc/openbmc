@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenPOWER OCC controller
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+
+[Service]
+ExecStart={sbindir}/openpower-occ-control
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

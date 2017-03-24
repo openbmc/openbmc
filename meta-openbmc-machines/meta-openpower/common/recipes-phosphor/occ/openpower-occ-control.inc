@@ -1,0 +1,5 @@
+HOMEPAGE = "https://github.com/openbmc/openpower-occ-control"
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
+SRC_URI += "git:///esw/san2/dkodihal/obmc/openpower-occ-control"
+SRCREV = "5c373326c046fccb8a1d02615504843ec0d15683"
