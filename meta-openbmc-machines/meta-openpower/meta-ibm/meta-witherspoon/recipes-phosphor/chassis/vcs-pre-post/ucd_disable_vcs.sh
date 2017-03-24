@@ -11,15 +11,7 @@ ucd_retries=5
 ucdpath="/sys/bus/i2c/drivers/ucd9000"
 if [ -e $ucdpath ]
 then
-  i=0
-  until [ $i -ge $ucd_retries ] || [ ! -z $ucd ]; do
-    ucd=`ls $ucdpath | grep 64`
-    if [ $i -ge "1" ]; then
-      echo "Unable to find UCD driver. Retry number $i"
-      sleep 1
-    fi
-    i=$((i+1))
-  done
+  ucd=`ls $ucdpath | grep 64`
   echo $ucd > $ucdpath/unbind
 fi
 
