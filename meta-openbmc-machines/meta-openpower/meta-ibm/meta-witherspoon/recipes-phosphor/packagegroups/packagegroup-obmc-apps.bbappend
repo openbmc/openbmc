@@ -1,1 +1,1 @@
-RDEPENDS_${PN}-inventory += "openpower-fru-vpd"
+RDEPENDS_${PN}-inventory += "openpower-fru-vpd openpower-occ-control"
