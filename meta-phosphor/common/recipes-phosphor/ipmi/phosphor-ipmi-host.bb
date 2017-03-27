@@ -31,7 +31,7 @@ RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
-SRCREV = "50234ad43e643ff7c01567b1000505d35bd035b5"
+SRCREV = "6dc96680f1e9db0d1c87ab26865a27ac80cefd3d"
 
 # Setup IPMI Whitelist Conf files
 WHITELIST_CONF = " \
