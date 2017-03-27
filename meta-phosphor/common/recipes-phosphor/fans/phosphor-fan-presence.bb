@@ -35,6 +35,6 @@ SYSTEMD_SERVICE_${PN}-tach += "${TMPL}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-fan-presence"
-SRCREV = "14476ae2e627fcc5fe8390db08b957bcfc16b912"
+SRCREV = "2b44a6c0b282cf50c563a175535c4c32f55a81dc"
 
 S = "${WORKDIR}/git"
