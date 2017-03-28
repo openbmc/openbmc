@@ -1,0 +1,21 @@
+#Air cooled zones
+- zone_conditions:
+  - name: air_cooled_chassis
+
+  zones:
+    - zone: 0
+      cooling_profiles:
+      - air
+      - all
+      full_speed: 10500
+
+#Water cooled zones
+- zone_conditions:
+  - name: water_and_air_cooled_chassis
+
+  zones:
+    - zone: 0
+      cooling_profiles:
+      - water
+      - all
+      full_speed: 10500
