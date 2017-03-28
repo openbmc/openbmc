@@ -49,6 +49,6 @@ FILES_${PN}-dbus = "${PYTHON_SITEPACKAGES_DIR}/obmc/dbuslib"
 
 SRC_URI += "git://github.com/openbmc/pyphosphor"
 
-SRCREV = "93daccf77f24c8d8f0b9fdc739e102a662eef8df"
+SRCREV = "7a57f95bb8b44d008748307446c1b11757c1ae70"
 
 S = "${WORKDIR}/git"
