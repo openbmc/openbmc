@@ -1,0 +1,42 @@
+#Air cooled zones
+- zone_conditions:
+  - name: air_cooled_chassis
+
+  zones:
+    - zone: 0
+      cooling_profiles:
+      - air
+      - all
+      initial_speed: 10500
+      num_missing_for_speed_change:
+        num: 1
+        targets:
+          - zone: 0
+            speed: 10500
+      num_nonfunctional_for_speed_change:
+        num: 1
+        targets:
+          - zone: 0
+            speed: 10500
+
+#Water cooled zones
+- zone_conditions:
+  - name: water_and_air_cooled_chassis
+
+  zones:
+    - zone: 0
+      cooling_profiles:
+      - water
+      - all
+      initial_speed: 10500
+      num_missing_for_speed_change:
+        num: 1
+        targets:
+          - zone: 0
+            speed: 10500
+      num_nonfunctional_for_speed_change:
+        num: 1
+        targets:
+          - zone: 0
+            speed: 10500
+
