@@ -1,0 +1,18 @@
+conditions:
+  - name: air_cooled_chassis
+    type: getProperty
+    property: CoolingType
+    interface: xyz.openbmc_project.Inventory.Decorator.CoolingType 
+    path: /xyz/openbmc_project/inventory/system/chassis
+    value:
+      type: string
+      value: Air
+
+  - name: water_and_air_cooled_chassis
+    type: getProperty
+    property: CoolingType
+    interface: xyz.openbmc_project.Inventory.Decorator.CoolingType 
+    path: /xyz/openbmc_project/inventory/system/chassis
+    value:
+      type: string
+      value: Water
