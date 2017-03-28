@@ -31,9 +31,13 @@ SRCREV = "58f16f7e3a60e05a04e25c0a7e363757b65e72d5"
 
 S = "${WORKDIR}/git"
 
+PACKAGECONFIG ??= "metadata-processing"
+PACKAGECONFIG[metadata-processing] = " \
+        --enable-metadata-processing, \
+        --disable-metadata-processing, , \
+        "
+
 EXTRA_OECONF = " \
         YAML_DIR=${STAGING_DIR_NATIVE}${yaml_dir} \
         CALLOUTS_YAML=${STAGING_DIR_NATIVE}${callouts_datadir}/callouts.yaml \
         "
-
-TARGET_CXXFLAGS += "-DPROCESS_META"
