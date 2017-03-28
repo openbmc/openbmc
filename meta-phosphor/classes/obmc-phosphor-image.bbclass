@@ -24,6 +24,10 @@ inherit core-image
 inherit obmc-phosphor-license
 inherit obmc-phosphor-utils
 
+# TODO: openbmc/openbmc#1407 - Remove with RHEL6 support deprecation.
+#     Set supported kernel back to RHEL6.4's kernel.
+SDK_OLDEST_KERNEL = "2.6.32"
+
 FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "packagegroup-obmc-apps-bmc-state-mgmt"
 FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt')}"
 FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "packagegroup-obmc-apps-chassis-state-mgmt"
