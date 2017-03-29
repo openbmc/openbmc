@@ -23,7 +23,7 @@ index afb6b31..6dd92e7 100644
  	src/shared/bus-util.h \
  	src/shared/logs-show.c \
  	src/shared/logs-show.h \
-@@ -5579,37 +5578,6 @@ tests += \
+@@ -5579,39 +5578,6 @@ tests += \
  	test-login-tables \
  	test-login-shared
  
@@ -51,8 +51,10 @@ index afb6b31..6dd92e7 100644
 -pamlib_LTLIBRARIES = \
 -	pam_systemd.la
 -
+-if ENABLE_PAM_CONFIG
 -dist_pamconf_DATA = \
 -	src/login/systemd-user
+-endif
 -
 -EXTRA_DIST += \
 -	src/login/systemd-user.m4
