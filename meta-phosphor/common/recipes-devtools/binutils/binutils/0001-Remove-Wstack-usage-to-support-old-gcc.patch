@@ -1,0 +1,207 @@
+From d3d5f6e646cec760c2f48455580da338f687d553 Mon Sep 17 00:00:00 2001
+From: Patrick Williams <patrick@stwcx.xyz>
+Date: Tue, 28 Mar 2017 22:01:58 -0500
+Subject: [PATCH] Remove -Wstack-usage to support old gcc
+
+Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
+---
+ bfd/configure      | 14 --------------
+ bfd/warning.m4     |  1 -
+ binutils/configure | 14 --------------
+ gas/configure      | 14 --------------
+ gold/configure     | 14 --------------
+ gprof/configure    | 14 --------------
+ ld/configure       | 14 --------------
+ opcodes/configure  | 14 --------------
+ 8 files changed, 99 deletions(-)
+
+diff --git a/bfd/configure b/bfd/configure
+index a437569..aa56ae0 100755
+--- a/bfd/configure
++++ b/bfd/configure
+@@ -12257,20 +12257,6 @@ fi
+ rm -f conftest*
+ 
+ 
+-# Add -Wstack-usage if the compiler is a sufficiently recent version of GCC.
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-__GNUC__
+-_ACEOF
+-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+-  $EGREP "^[0-4]$" >/dev/null 2>&1; then :
+-
+-else
+-  GCC_WARN_CFLAGS="$GCC_WARN_CFLAGS -Wstack-usage=262144"
+-fi
+-rm -f conftest*
+-
+-
+ # Set WARN_WRITE_STRINGS if the compiler supports -Wwrite-strings.
+ WARN_WRITE_STRINGS=""
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+diff --git a/bfd/warning.m4 b/bfd/warning.m4
+index 4c5b55d..2ceea02 100644
+--- a/bfd/warning.m4
++++ b/bfd/warning.m4
+@@ -28,7 +28,6 @@ GCC_WARN_CFLAGS="-W -Wall -Wstrict-prototypes -Wmissing-prototypes"
+ AC_EGREP_CPP([^[0-3]$],[__GNUC__],,GCC_WARN_CFLAGS="$GCC_WARN_CFLAGS -Wshadow")
+ 
+ # Add -Wstack-usage if the compiler is a sufficiently recent version of GCC.
+-AC_EGREP_CPP([^[0-4]$],[__GNUC__],,GCC_WARN_CFLAGS="$GCC_WARN_CFLAGS -Wstack-usage=262144")
+ 
+ # Set WARN_WRITE_STRINGS if the compiler supports -Wwrite-strings.
+ WARN_WRITE_STRINGS=""
+diff --git a/binutils/configure b/binutils/configure
+index 6cbf17c..d789156 100755
+--- a/binutils/configure
++++ b/binutils/configure
+@@ -11962,20 +11962,6 @@ fi
+ rm -f conftest*
+ 
+ 
+-# Add -Wstack-usage if the compiler is a sufficiently recent version of GCC.
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-__GNUC__
+-_ACEOF
+-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+-  $EGREP "^[0-4]$" >/dev/null 2>&1; then :
+-
+-else
+-  GCC_WARN_CFLAGS="$GCC_WARN_CFLAGS -Wstack-usage=262144"
+-fi
+-rm -f conftest*
+-
+-
+ # Set WARN_WRITE_STRINGS if the compiler supports -Wwrite-strings.
+ WARN_WRITE_STRINGS=""
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+diff --git a/gas/configure b/gas/configure
+index f7753b8..76e5d43 100755
+--- a/gas/configure
++++ b/gas/configure
+@@ -11738,20 +11738,6 @@ fi
+ rm -f conftest*
+ 
+ 
+-# Add -Wstack-usage if the compiler is a sufficiently recent version of GCC.
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-__GNUC__
+-_ACEOF
+-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+-  $EGREP "^[0-4]$" >/dev/null 2>&1; then :
+-
+-else
+-  GCC_WARN_CFLAGS="$GCC_WARN_CFLAGS -Wstack-usage=262144"
+-fi
+-rm -f conftest*
+-
+-
+ # Set WARN_WRITE_STRINGS if the compiler supports -Wwrite-strings.
+ WARN_WRITE_STRINGS=""
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+diff --git a/gold/configure b/gold/configure
+index 8240c28..58273df 100755
+--- a/gold/configure
++++ b/gold/configure
+@@ -6740,20 +6740,6 @@ fi
+ rm -f conftest*
+ 
+ 
+-# Add -Wstack-usage if the compiler is a sufficiently recent version of GCC.
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-__GNUC__
+-_ACEOF
+-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+-  $EGREP "^[0-4]$" >/dev/null 2>&1; then :
+-
+-else
+-  GCC_WARN_CFLAGS="$GCC_WARN_CFLAGS -Wstack-usage=262144"
+-fi
+-rm -f conftest*
+-
+-
+ # Set WARN_WRITE_STRINGS if the compiler supports -Wwrite-strings.
+ WARN_WRITE_STRINGS=""
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+diff --git a/gprof/configure b/gprof/configure
+index bf3ecaa..37ef760 100755
+--- a/gprof/configure
++++ b/gprof/configure
+@@ -12118,20 +12118,6 @@ fi
+ rm -f conftest*
+ 
+ 
+-# Add -Wstack-usage if the compiler is a sufficiently recent version of GCC.
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-__GNUC__
+-_ACEOF
+-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+-  $EGREP "^[0-4]$" >/dev/null 2>&1; then :
+-
+-else
+-  GCC_WARN_CFLAGS="$GCC_WARN_CFLAGS -Wstack-usage=262144"
+-fi
+-rm -f conftest*
+-
+-
+ # Set WARN_WRITE_STRINGS if the compiler supports -Wwrite-strings.
+ WARN_WRITE_STRINGS=""
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+diff --git a/ld/configure b/ld/configure
+index f9be51a..350ea53 100755
+--- a/ld/configure
++++ b/ld/configure
+@@ -15575,20 +15575,6 @@ fi
+ rm -f conftest*
+ 
+ 
+-# Add -Wstack-usage if the compiler is a sufficiently recent version of GCC.
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-__GNUC__
+-_ACEOF
+-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+-  $EGREP "^[0-4]$" >/dev/null 2>&1; then :
+-
+-else
+-  GCC_WARN_CFLAGS="$GCC_WARN_CFLAGS -Wstack-usage=262144"
+-fi
+-rm -f conftest*
+-
+-
+ # Set WARN_WRITE_STRINGS if the compiler supports -Wwrite-strings.
+ WARN_WRITE_STRINGS=""
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+diff --git a/opcodes/configure b/opcodes/configure
+index f615634..c983a12 100755
+--- a/opcodes/configure
++++ b/opcodes/configure
+@@ -11525,20 +11525,6 @@ fi
+ rm -f conftest*
+ 
+ 
+-# Add -Wstack-usage if the compiler is a sufficiently recent version of GCC.
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-__GNUC__
+-_ACEOF
+-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+-  $EGREP "^[0-4]$" >/dev/null 2>&1; then :
+-
+-else
+-  GCC_WARN_CFLAGS="$GCC_WARN_CFLAGS -Wstack-usage=262144"
+-fi
+-rm -f conftest*
+-
+-
+ # Set WARN_WRITE_STRINGS if the compiler supports -Wwrite-strings.
+ WARN_WRITE_STRINGS=""
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-- 
+2.7.2
+
