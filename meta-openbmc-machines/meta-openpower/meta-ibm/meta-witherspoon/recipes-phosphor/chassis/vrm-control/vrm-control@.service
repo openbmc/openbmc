@@ -7,7 +7,7 @@ Conflicts=obmc-power-chassis-off@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
-ExecStart={bindir}/vrm-control.sh vdna=0.9 vdnb=0.9
+ExecStart={bindir}/vrm-control.sh vdna=0.9 vdnb=0.9 vddra=1.2 vddrb=1.2
 Type=oneshot
 RemainAfterExit=yes
 
