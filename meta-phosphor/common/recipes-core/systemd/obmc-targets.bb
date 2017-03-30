@@ -48,6 +48,23 @@ CHASSIS_POWER_FMT_2 = "obmc-chassis-{0}@.target"
 HOST_SYNCH_FMT = "obmc-host-{0}@.target"
 HOST_ACTION_FMT = "obmc-{0}-host@.target"
 
+START_POW_CHASSIS_ON_TMPL = "obmc-power-chassis-on@.target";
+START_POW_CHASSIS_ON = "obmc-power-chassis-on@{0}.target";
+START_POW_CHASSIS_OFF_TMPL = "obmc-power-chassis-off@.target";
+START_POW_CHASSIS_OFF = "obmc-power-chassis-off@{0}.target";
+START_CHASSIS_STOP_TMPL = "'obmc-chassis-stop@.target";
+START_CHASSIS_STOP = "obmc-chassis-stop@{0}.target";
+START_CHASSIS_START_TMPL = "obmc-chassis-start@.target";
+START_CHASSIS_START = "obmc-chassis-start@{0}.target";
+START_STOP_HOST_TMPL = "obmc-stop-host@.target";
+START_STOP_HOST = "obmc-stop-host@{0}.target";
+
+START_CHASSIS_POWON = "../${START_POW_CHASSIS_ON_TMPL}:${START_POW_CHASSIS_ON}.requires/obmc-chassis-poweron@{0}.target";
+START_CHASSIS_POWOFF = "../${START_POW_CHASSIS_OFF_TMPL}:${START_POW_CHASSIS_OFF}.requires/obmc-chassis-poweroff@{0}.target";
+START_HOST_STOP = "../${START_CHASSIS_STOP_TMPL}:${START_CHASSIS_STOP}.requires/obmc-host-stop@{0}.target";
+START_HOST_START = "../${START_CHASSIS_START_TMPL}:${START_CHASSIS_START}.requires/obmc-host-start@{0}.target";
+START_HOST_SHUTDOWN = "../${START_STOP_HOST_TMPL}:${START_STOP_HOST}.requires/obmc-host-shutdown@{0}.target";
+
 CHASSIS_LINK_FMT = "${CHASSIS_FMT}:obmc-chassis-{0}@{1}.target"
 SYNCH_POWER_LINK_FMT = "${SYNCH_POWER_FMT}:obmc-power-{0}@{1}.target"
 CHASSIS_POWER_LINK_FMT = "${CHASSIS_POWER_FMT}:obmc-power-chassis-{0}@{1}.target"
@@ -76,3 +93,5 @@ SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_POWER_LINK_FMT', 'CHASSIS_POW
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_POWER_LINK_FMT_2', 'CHASSIS_POWER_TARGETS_2', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_SYNCH_FMT', 'HOST_SYNCH_TARGETS', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT', 'HOST_ACTION_TARGETS', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'START_CHASSIS_POWON', 'START_CHASSIS_POWOFF', 'START_HOST_STOP')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'START_HOST_START', 'START_HOST_SHUTDOWN')}"
