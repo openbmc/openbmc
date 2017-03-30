@@ -24,5 +24,5 @@ do_install() {
             ${bindir}/gen_fru_properties.pl \
             -m ${datadir}/obmc-mrw/${MACHINE}.xml \
             -c config.yaml \
-            -o ${DEST}/out.yaml
+            -o ${DEST}/extra-properties.yaml
 }
