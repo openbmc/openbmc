@@ -90,7 +90,7 @@ Github.  It is recommended you search through the issues before opening
 a new one.
 
 ## Finding out more ##
-Dive deeper in to OpenBMC by opening the [docs](https://github.com/openbmc/docs)
+Dive deeper into OpenBMC by opening the [docs](https://github.com/openbmc/docs)
 repository
 
 ## Contact ##
