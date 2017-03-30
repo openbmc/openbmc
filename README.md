@@ -36,7 +36,7 @@ to a hardware target.  OpenBMC has placed all known hardware targets in a
 standard directory structure `meta-openbmc-machines/meta-openpower/[company]/[target]`.
 You can see all of the known targets with `find meta-openbmc-machines -type d -name conf`.
 Choose the hardware target and then move to the next step. Additional examples
-can be found in the [OpenBMC Cheatsheet] (https://github.com/openbmc/docs/blob/master/cheatsheet.md)
+can be found in the [OpenBMC Cheatsheet](https://github.com/openbmc/docs/blob/master/cheatsheet.md)
 
 Machine | TEMPLATECONF
 --------|---------
@@ -74,9 +74,10 @@ testing. After visual inspection of the commit, a CI run can be manually
 performed by the reviewer.
 
 Automated testing against the QEMU model along with supported systems are
-performed.  The OpenBMC project uses the [Robot Framework]
-(http://robotframework.org/) for all automation.  Our complete test
-repository can be found [here](https://github.com/openbmc/openbmc-test-automation).
+performed.  The OpenBMC project uses the
+[Robot Framework](http://robotframework.org/) for all automation.  Our
+complete test repository can be found
+[here](https://github.com/openbmc/openbmc-test-automation).
 
 ## Submitting Patches ##
 Support of additional hardware and software packages is always welcome.
@@ -94,7 +95,6 @@ Dive deeper in to OpenBMC by opening the [docs](https://github.com/openbmc/docs)
 repository
 
 ## Contact ##
-- Mail: openbmc@lists.ozlabs.org  [https://lists.ozlabs.org/listinfo/openbmc]
-(https://lists.ozlabs.org/listinfo/openbmc)
+- Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
 - IRC: #openbmc on freenode.net
 - Riot: [#openbmc:matrix.org](https://riot.im/app/#/room/#openbmc:matrix.org)
