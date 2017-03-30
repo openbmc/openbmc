@@ -5,7 +5,7 @@ inherit native
 inherit obmc-phosphor-license
 inherit phosphor-ipmi-fru
 
-SRC_URI += "file://out.yaml"
+SRC_URI += "file://extra-properties.yaml"
 
 PROVIDES += "virtual/phosphor-ipmi-fru-properties"
 
@@ -18,5 +18,5 @@ do_install() {
 
         DEST=${D}${properties_datadir}
         install -d ${DEST}
-        install out.yaml ${DEST}
+        install extra-properties.yaml ${DEST}
 }
