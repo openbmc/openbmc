@@ -5,7 +5,7 @@ inherit native
 inherit obmc-phosphor-license
 inherit phosphor-ipmi-fru
 
-SRC_URI += "file://config.yaml"
+SRC_URI += "file://extra-properties.yaml"
 
 DEPENDS += " \
            mrw-native \
@@ -24,5 +24,5 @@ do_install() {
             ${bindir}/gen_fru_properties.pl \
             -m ${datadir}/obmc-mrw/${MACHINE}.xml \
             -c config.yaml \
-            -o ${DEST}/out.yaml
+            -o ${DEST}/extra-properties.yaml
 }
