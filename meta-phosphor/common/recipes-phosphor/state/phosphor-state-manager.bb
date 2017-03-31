@@ -11,6 +11,7 @@ STATE_MGR_PACKAGES = " \
     ${PN}-host \
     ${PN}-chassis \
     ${PN}-bmc \
+    ${PN}-discover \
 "
 PACKAGES =+ "${STATE_MGR_PACKAGES}"
 PACKAGES_remove = "${PN}"
@@ -19,9 +20,7 @@ RDEPENDS_${PN}-staticdev = "${STATE_MGR_PACKAGES}"
 
 DBUS_PACKAGES = "${STATE_MGR_PACKAGES}"
 
-# Set SYSTEMD_PACKAGES to empty because we do not want ${PN} and DBUS_PACKAGES
-# handles the rest.
-SYSTEMD_PACKAGES = ""
+SYSTEMD_PACKAGES = "${PN}-discover"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
@@ -35,6 +34,7 @@ RDEPENDS_${PN} += "sdbusplus"
 RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-bmc += "libsystemd phosphor-dbus-interfaces"
+RDEPENDS_${PN}-discover += "libsystemd phosphor-dbus-interfaces"
 
 FILES_${PN}-host = "${sbindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
@@ -45,7 +45,10 @@ DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
 FILES_${PN}-bmc = "${sbindir}/phosphor-bmc-state-manager"
 DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 
+FILES_${PN}-discover = "${sbindir}/phosphor-discover-system-state"
+SYSTEMD_SERVICE_${PN}-discover += "xyz.openbmc_project.State.Discover.service"
+
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "f318d877f5ed7ce11bf53d7ee2828d558285317c"
+SRCREV = "3ed10085ae988b08e8230d35693d370bf75f0574"
 
 S = "${WORKDIR}/git"
