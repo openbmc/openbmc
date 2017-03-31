@@ -1,0 +1,16 @@
+[Unit]
+Description=Reboot If Enabled
+Wants=mapper-wait@-org-openbmc-settings-host%i.service
+After=mapper-wait@-org-openbmc-settings-host%i.service
+Wants=mapper-wait@-xyz-openbmc_project-state-host%i.service
+After=mapper-wait@-xyz-openbmc_project-state-host%i.service
+Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStart={sbindir}/phosphor-discover-system-state --host %i
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
