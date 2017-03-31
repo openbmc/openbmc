@@ -1,0 +1,16 @@
+[Unit]
+Description=If power policy is ALWAYS_POWER_ON, powers the host on.
+Wants=mapper-wait@-org-openbmc-settings-host0.service
+After=mapper-wait@-org-openbmc-settings-host0.service
+Wants=mapper-wait@-xyz-openbmc_project-state-host0.service
+After=mapper-wait@-xyz-openbmc_project-state-host0.service
+Wants=mapper-wait@-xyz-openbmc_project-state-chassis0.service
+After=mapper-wait@-xyz-openbmc_project-state-chassis0.service
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStart={sbindir}/phosphor-discover-system-state
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
