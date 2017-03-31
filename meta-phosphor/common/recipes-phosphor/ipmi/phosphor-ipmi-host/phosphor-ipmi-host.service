@@ -8,8 +8,6 @@ After=mapper-wait@-org-openbmc-settings-host0.service
 [Service]
 Restart=always
 ExecStart={sbindir}/ipmid
-Type=dbus
-BusName={BUSNAME}
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
