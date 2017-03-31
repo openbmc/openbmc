@@ -1039,3 +1039,67 @@
       Version:
         IPMIFruProperty: Version
 
+100:
+    /system/chassis/io_board:
+        xyz.openbmc_project.Inventory.Item:
+            PrettyName:
+               IPMIFruSection: Board
+               IPMIFruProperty: Name
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+            PartNumber:
+               IPMIFruSection: Board
+               IPMIFruProperty: Part Number
+            SerialNumber:
+               IPMIFruSection: Board
+               IPMIFruProperty: Serial Number
+            Manufacturer:
+               IPMIFruSection: Board
+               IPMIFruProperty: Manufacturer
+            BuildDate:
+               IPMIFruSection: Board
+               IPMIFruProperty: Mfg Date
+        xyz.openbmc_project.Inventory.Item.NetworkInterface:
+            MACAddress:
+               IPMIFruSection: Board
+               IPMIFruProperty: Custom Field 2
+
+101:
+    /system/chassis/sas_expander:
+        xyz.openbmc_project.Inventory.Item:
+            PrettyName:
+               IPMIFruSection: Board
+               IPMIFruProperty: Name
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+            PartNumber:
+               IPMIFruSection: Board
+               IPMIFruProperty: Part Number
+            SerialNumber:
+               IPMIFruSection: Board
+               IPMIFruProperty: Serial Number
+            Manufacturer:
+               IPMIFruSection: Board
+               IPMIFruProperty: Manufacturer
+            BuildDate:
+               IPMIFruSection: Board
+               IPMIFruProperty: Mfg Date
+
+102:
+    /system/chassis/hdd_backplane:
+        xyz.openbmc_project.Inventory.Item:
+            PrettyName:
+               IPMIFruSection: Board
+               IPMIFruProperty: Name
+        xyz.openbmc_project.Inventory.Decorator.Asset:
+            PartNumber:
+               IPMIFruSection: Board
+               IPMIFruProperty: Part Number
+            SerialNumber:
+               IPMIFruSection: Board
+               IPMIFruProperty: Serial Number
+            Manufacturer:
+               IPMIFruSection: Board
+               IPMIFruProperty: Manufacturer
+            BuildDate:
+               IPMIFruSection: Board
+               IPMIFruProperty: Mfg Date
+
