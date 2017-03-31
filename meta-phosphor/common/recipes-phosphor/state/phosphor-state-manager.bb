@@ -20,9 +20,7 @@ RDEPENDS_${PN}-staticdev = "${STATE_MGR_PACKAGES}"
 
 DBUS_PACKAGES = "${STATE_MGR_PACKAGES}"
 
-# Set SYSTEMD_PACKAGES to empty because we do not want ${PN} and DBUS_PACKAGES
-# handles the rest.
-SYSTEMD_PACKAGES = ""
+SYSTEMD_PACKAGES = "${PN}-discover"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
@@ -48,6 +46,12 @@ FILES_${PN}-bmc = "${sbindir}/phosphor-bmc-state-manager"
 DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 
 FILES_${PN}-discover = "${sbindir}/phosphor-discover-system-state"
+SYSTEMD_SERVICE_${PN}-discover += "phosphor-discover-system-state@.service"
+
+TMPL = "phosphor-discover-system-state@.service"
+INSTFMT = "phosphor-discover-system-state@{0}.service"
+FMT = "../${TMPL}:${SYSTEMD_DEFAULT_TARGET}.wants/${INSTFMT}"
+SYSTEMD_LINK_${PN}-discover += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
 SRCREV = "cc3fb5d9a720a9a5b2102683da716004cd938e39"

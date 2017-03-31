@@ -41,6 +41,7 @@ RDEPENDS_${PN}-extrasdev = " \
 SUMMARY_${PN}-host-state-mgmt = "Host state management"
 RDEPENDS_${PN}-host-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-host-state-manager} \
+        ${VIRTUAL-RUNTIME_obmc-discover-system-state} \
         "
 
 SUMMARY_${PN}-inventory = "Inventory applications"
