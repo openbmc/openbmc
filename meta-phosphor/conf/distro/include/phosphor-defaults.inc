@@ -32,6 +32,11 @@ VIRTUAL-RUNTIME_obmc-chassis-state-manager ?= "phosphor-state-manager-chassis"
 # interface.
 VIRTUAL-RUNTIME_obmc-host-state-manager ?= "phosphor-state-manager-host"
 
+# obmc-discover-system-state
+#
+# Provides an implementation of phosphor-discover-system-state
+VIRTUAL-RUNTIME_obmc-discover-system-state ?= "phosphor-discover-system-state"
+
 # obmc-fan-presence
 #
 # Provides implementations of fan presence detection

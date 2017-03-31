@@ -1,15 +1,12 @@
 [Unit]
-Description=Restore Last State
-Wants=obmc-mgr-state.target
-After=obmc-mgr-state.target
+Description=Reboot If Enabled
 Wants=mapper-wait@-org-openbmc-settings-host0.service
 After=mapper-wait@-org-openbmc-settings-host0.service
 
 [Service]
 Restart=no
 Type=oneshot
-ExecStart={sbindir}/discover_system_state.py
-Environment="PYTHONUNBUFFERED=1"
+ExecStart={sbindir}/phosphor-discover-system-state
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
