@@ -350,3 +350,26 @@
     xyz.openbmc_project.Inventory.Item:
         Present: 'true'
 
+/system/chassis/io_board:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/hdd_backplane:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/sas_expander:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
