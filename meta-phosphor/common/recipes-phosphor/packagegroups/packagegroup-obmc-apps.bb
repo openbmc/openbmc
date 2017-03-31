@@ -43,6 +43,11 @@ RDEPENDS_${PN}-host-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-host-state-manager} \
         "
 
+SUMMARY_${PN}-discover-system-state = "System state discovery"
+RDEPENDS_${PN}-discover-system-state = " \
+        ${VIRTUAL-RUNTIME_obmc-discover-system-state} \
+        "
+
 SUMMARY_${PN}-inventory = "Inventory applications"
 RDEPENDS_${PN}-inventory = " \
         ${VIRTUAL-RUNTIME_obmc-inventory-manager} \
