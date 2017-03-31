@@ -1,0 +1,3 @@
+# If power policy is ALWAYS_POWER_ON, powers the host on.
+[Unit]
+Description=Reboot If Enabled
