@@ -31,6 +31,7 @@ RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
+#SRCREV = "d5b2ac0e5d5decac55e7ed4be989e3d57a45c35e"
 SRCREV = "0661beb1dd93711ce684450997d21da8b64c729d"
 
 # Setup IPMI Whitelist Conf files
@@ -46,7 +47,6 @@ EXTRA_OECONF = " \
 S = "${WORKDIR}/git"
 
 HOSTIPMI_PROVIDER_LIBRARY += "libapphandler.so"
-HOSTIPMI_PROVIDER_LIBRARY += "libhostservice.so"
 HOSTIPMI_PROVIDER_LIBRARY += "libsysintfcmds.so"
 
 NETIPMI_PROVIDER_LIBRARY += "libapphandler.so"
@@ -56,15 +56,7 @@ FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
 FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
 
-DBUS_SERVICE_${PN} += "org.openbmc.HostServices.service"
+DBUS_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
 
 # Soft Power Off
 RDEPENDS_${PN} += "phosphor-mapper"
-
-TMPL = "op-stop-host@.service"
-INSTFMT = "op-stop-host@{0}.service"
-TGTFMT = "obmc-stop-host@{0}.target"
-FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
-
-SYSTEMD_SERVICE_${PN} += "${TMPL}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
