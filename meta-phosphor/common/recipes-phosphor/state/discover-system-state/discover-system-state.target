@@ -1,0 +1,2 @@
+[Unit]
+Description=If power policy is ALWAYS_POWER_ON, powers the host on.
