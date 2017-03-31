@@ -1,0 +1,145 @@
+From 2c476d33da9c92cc67f027c1776cb10fd3d27601 Mon Sep 17 00:00:00 2001
+From: Adriana Kobylak <anoo@us.ibm.com>
+Date: Wed, 29 Mar 2017 15:51:59 -0500
+Subject: [PATCH] Add journal sync
+
+---
+ src/journal/sd-journal.c      | 84 +++++++++++++++++++++++++++++++++++++++++++
+ src/libsystemd/libsystemd.sym |  1 +
+ src/systemd/sd-journal.h      |  2 ++
+ 3 files changed, 87 insertions(+)
+
+diff --git a/src/journal/sd-journal.c b/src/journal/sd-journal.c
+index 5a2a28a..341b011 100644
+--- a/src/journal/sd-journal.c
++++ b/src/journal/sd-journal.c
+@@ -29,6 +29,8 @@
+ #include "sd-journal.h"
+ 
+ #include "alloc-util.h"
++#include "bus-error.h"
++#include "bus-util.h"
+ #include "catalog.h"
+ #include "compress.h"
+ #include "dirent-util.h"
+@@ -45,8 +47,10 @@
+ #include "list.h"
+ #include "lookup3.h"
+ #include "missing.h"
++#include "mkdir.h"
+ #include "path-util.h"
+ #include "replace-var.h"
++#include "sd-bus.h"
+ #include "stat-util.h"
+ #include "stdio-util.h"
+ #include "string-util.h"
+@@ -2798,3 +2802,83 @@ _public_ int sd_journal_has_persistent_files(sd_journal *j) {
+ 
+         return j->has_persistent_files;
+ }
++
++_public_ int sd_journal_sync() {
++        _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
++        _cleanup_close_ int watch_fd = -1;
++        usec_t start;
++        int r;
++        int sig = SIGRTMIN+1;
++        const char* watch_path = "/run/systemd/journal/synced";
++
++        start = now(CLOCK_MONOTONIC);
++
++        /* This call sends the specified signal to journald, and waits
++         * for acknowledgment by watching the mtime of the specified
++         * flag file. This is used to trigger syncing or rotation and
++         * then wait for the operation to complete. */
++
++        for (;;) {
++                usec_t tstamp;
++
++                /* See if a sync happened by now. */
++                r = read_timestamp_file(watch_path, &tstamp);
++                if (r < 0 && r != -ENOENT)
++                        return log_error_errno(errno, "Failed to read %s: %m", watch_path);
++                if (r >= 0 && tstamp >= start)
++                        return 0;
++
++                /* Let's ask for a sync, but only once. */
++                if (!bus) {
++                        _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
++
++                        r = bus_connect_system_systemd(&bus);
++                        if (r < 0)
++                                return log_error_errno(r, "Failed to get D-Bus connection: %m");
++
++                        r = sd_bus_call_method(
++                                        bus,
++                                        "org.freedesktop.systemd1",
++                                        "/org/freedesktop/systemd1",
++                                        "org.freedesktop.systemd1.Manager",
++                                        "KillUnit",
++                                        &error,
++                                        NULL,
++                                        "ssi", "systemd-journald.service", "main", sig);
++                        if (r < 0)
++                                return log_error_errno(r, "Failed to kill journal service: %s", bus_error_message(&error, r));
++
++                        continue;
++                }
++
++                /* Let's install the inotify watch, if we didn't do that yet. */
++                if (watch_fd < 0) {
++
++                        mkdir_p("/run/systemd/journal", 0755);
++
++                        watch_fd = inotify_init1(IN_NONBLOCK|IN_CLOEXEC);
++                        if (watch_fd < 0)
++                                return log_error_errno(errno, "Failed to create inotify watch: %m");
++
++                        r = inotify_add_watch(watch_fd, "/run/systemd/journal", IN_MOVED_TO|IN_DONT_FOLLOW|IN_ONLYDIR);
++                        if (r < 0)
++                                return log_error_errno(errno, "Failed to watch journal directory: %m");
++
++                        /* Recheck the flag file immediately, so that we don't miss any event since the last check. */
++                        continue;
++                }
++
++                /* OK, all preparatory steps done, let's wait until
++                 * inotify reports an event. */
++
++                r = fd_wait_for_event(watch_fd, POLLIN, USEC_INFINITY);
++                if (r < 0)
++                        return log_error_errno(r, "Failed to wait for event: %m");
++
++                r = flush_fd(watch_fd);
++                if (r < 0)
++                        return log_error_errno(r, "Failed to flush inotify events: %m");
++        }
++
++        return 0;
++}
+diff --git a/src/libsystemd/libsystemd.sym b/src/libsystemd/libsystemd.sym
+index f0c06c7..767af22 100644
+--- a/src/libsystemd/libsystemd.sym
++++ b/src/libsystemd/libsystemd.sym
+@@ -489,4 +489,5 @@ global:
+         sd_journal_enumerate_fields;
+         sd_journal_restart_fields;
+         sd_bus_message_append_cmdline;
++        sd_journal_sync;
+ } LIBSYSTEMD_227;
+diff --git a/src/systemd/sd-journal.h b/src/systemd/sd-journal.h
+index abb9eca..3a24204 100644
+--- a/src/systemd/sd-journal.h
++++ b/src/systemd/sd-journal.h
+@@ -143,6 +143,8 @@ int sd_journal_get_catalog_for_message_id(sd_id128_t id, char **text);
+ int sd_journal_has_runtime_files(sd_journal *j);
+ int sd_journal_has_persistent_files(sd_journal *j);
+ 
++int sd_journal_sync();
++
+ /* The inverse condition avoids ambiguity of dangling 'else' after the macro */
+ #define SD_JOURNAL_FOREACH(j)                                           \
+         if (sd_journal_seek_head(j) < 0) { }                            \
+-- 
+1.8.2.2
+
