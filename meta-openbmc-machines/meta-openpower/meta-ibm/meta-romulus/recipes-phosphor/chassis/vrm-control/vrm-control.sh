@@ -42,7 +42,7 @@ then
   let e=(e^0x1F)+1
   e="-$e"
 fi
-printf "	%0.3fA\n" `echo $m $e $2 | awk '{print ($1 * 2^$2) / $3}'`
+printf "	%0.3fA\n" `echo $m $e $2 | awk '{print ($1 * 2^$2)}'`
 }
 
 
