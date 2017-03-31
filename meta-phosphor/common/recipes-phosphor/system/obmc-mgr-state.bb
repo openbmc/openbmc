@@ -14,11 +14,7 @@ RDEPENDS_${PN} += "\
         python-pygobject \
         "
 
-SKELETON_DIR = "pystatemgr"
-SYSTEMD_SERVICE_${PN} += "obmc-mgr-state.service obmc-mgr-state.target"
-
 TMPL = "mapper-wait@.service"
-TGT = "obmc-mgr-state.target"
 HOST_FMT = "../${TMPL}:${TGT}.wants/mapper-wait@-org-openbmc-settings-host{0}.service"
 CHASSIS_FMT = "../${TMPL}:${TGT}.wants/mapper-wait@-org-openbmc-control-chassis{0}.service"
 POWER_FMT = "../${TMPL}:${TGT}.wants/mapper-wait@-org-openbmc-control-power{0}.service"
