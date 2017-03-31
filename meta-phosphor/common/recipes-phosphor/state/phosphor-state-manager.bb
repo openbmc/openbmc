@@ -8,12 +8,12 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 STATE_MGR_PACKAGES = " \
+    ${PN} \
     ${PN}-host \
     ${PN}-chassis \
     ${PN}-bmc \
 "
 PACKAGES =+ "${STATE_MGR_PACKAGES}"
-PACKAGES_remove = "${PN}"
 RDEPENDS_${PN}-dev = "${STATE_MGR_PACKAGES}"
 RDEPENDS_${PN}-staticdev = "${STATE_MGR_PACKAGES}"
 
@@ -32,9 +32,12 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
 RDEPENDS_${PN} += "sdbusplus"
 
+RDEPENDS_${PN} += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-bmc += "libsystemd phosphor-dbus-interfaces"
+
+FILES_${PN} = "${sbindir}/phosphor-discover-system-state"
 
 FILES_${PN}-host = "${sbindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
@@ -46,6 +49,6 @@ FILES_${PN}-bmc = "${sbindir}/phosphor-bmc-state-manager"
 DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "f318d877f5ed7ce11bf53d7ee2828d558285317c"
+SRCREV = "3ed10085ae988b08e8230d35693d370bf75f0574"
 
 S = "${WORKDIR}/git"
