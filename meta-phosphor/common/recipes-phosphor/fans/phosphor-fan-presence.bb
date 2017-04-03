@@ -16,6 +16,7 @@ DEPENDS += "python-mako-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "virtual/phosphor-fan-presence-config"
+DEPENDS += "libevdev"
 RDEPENDS_${PN} += "sdbusplus"
 
 FAN_PRESENCE_PACKAGES = " \
