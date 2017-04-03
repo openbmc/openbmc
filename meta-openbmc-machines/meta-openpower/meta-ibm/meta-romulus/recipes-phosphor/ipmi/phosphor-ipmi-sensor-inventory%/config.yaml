@@ -1,0 +1,1124 @@
+0x0b:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm0
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x0c:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm1
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x0d:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm2
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x0e:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm3
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x0f:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm4
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x10:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm5
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x11:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm6
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x12:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm7
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x13:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm8
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x14:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm9
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x15:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm10
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x16:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm11
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x17:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm12
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x18:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm13
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x19:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm14
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x1a:
+  sensorType: 0x0C
+  path: /system/chassis/motherboard/dimm15
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: bool
+          assert: true
+          deassert: false
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          assert: false
+          deassert: true
+          type: bool
+0x08:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x09:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+
+0x2b:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core0
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x2c:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core1
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x2d:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core2
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x2e:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core3
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x2f:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core4
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x30:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core5
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x31:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core6
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x32:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core7
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x33:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core8
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x34:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core9
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x35:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core10
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x36:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core11
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x37:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core12
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x38:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core13
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x39:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core14
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x3a:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core15
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x3b:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core16
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x3c:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core17
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x3d:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core18
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x3e:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core19
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x3f:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core20
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x40:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core21
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x41:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core22
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x42:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0/core23
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x43:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core0
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x44:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core1
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x45:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core2
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x46:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core3
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x47:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core4
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x48:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core5
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x49:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core6
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x4a:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core7
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x4b:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core8
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x4c:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core9
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x4d:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core10
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x4e:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core11
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x4f:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core12
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x50:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core13
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x51:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core14
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x52:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core15
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x53:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core16
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x54:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core17
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x55:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core18
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x56:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core19
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x57:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core20
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x58:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core21
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x59:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core22
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x5a:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core23
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+
