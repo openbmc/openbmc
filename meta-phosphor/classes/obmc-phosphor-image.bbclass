@@ -80,6 +80,8 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
         ffdc \
         rsync \
+        strace \
+        sbefifo-tools \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
