@@ -4,3 +4,6 @@ Wants={SYSTEMD_DEFAULT_TARGET}
 After={SYSTEMD_DEFAULT_TARGET}
 RefuseManualStop=yes
 Conflicts=obmc-power-chassis-off@%i.target
+
+[Install]
+WantedBy=obmc-gpio-asserted@%i.target
