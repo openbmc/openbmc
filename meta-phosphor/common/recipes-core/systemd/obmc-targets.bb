@@ -47,12 +47,18 @@ CHASSIS_LINK_ACTION_FMT = "${CHASSIS_ACTION_FMT}:obmc-chassis-power{0}@{1}.targe
 HOST_LINK_SYNCH_FMT = "${HOST_SYNCH_FMT}:obmc-host-{0}@{1}.target"
 HOST_LINK_ACTION_FMT = "${HOST_ACTION_FMT}:obmc-host-{0}@{1}.target"
 
+QUIESCE_TMPL = "obmc-quiesce-host@.target"
+GPIO_TGTFMT = "obmc-host-termination@0.target"
+QUIESCE_INSTFMT = "obmc-quiesce-host@0.target"
+GPIO_QUIESCE_FMT = "${QUIESCE_TMPL}:${GPIO_TGTFMT}.wants/${QUIESCE_INSTFMT}"
+
 SYSTEMD_SERVICE_${PN} += " \
         obmc-mapper.target \
         obmc-webserver-pre.target \
         obmc-fans-ready.target \
         obmc-fan-control.target \
         obmc-standby.target \
+        obmc-host-termination@.target \
         "
 
 SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'CHASSIS_SYNCH_FMT', 'CHASSIS_SYNCH_TARGETS')}"
@@ -64,3 +70,5 @@ SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_LINK_SYNCH_FMT', 'CHASSIS_SYN
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_LINK_ACTION_FMT', 'CHASSIS_ACTION_TARGETS', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_SYNCH_FMT', 'HOST_SYNCH_TARGETS', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT', 'HOST_ACTION_TARGETS', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "obmc-host-termination@.target:obmc-host-termination@${OBMC_CHECKSTOP_INSTANCES}.target"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'GPIO_QUIESCE_FMT', OBMC_CHECKSTOP_INSTANCES)}"

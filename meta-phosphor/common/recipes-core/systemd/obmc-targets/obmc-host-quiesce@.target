@@ -4,3 +4,6 @@ Wants={SYSTEMD_DEFAULT_TARGET}
 After={SYSTEMD_DEFAULT_TARGET}
 RefuseManualStop=yes
 Conflicts=obmc-chassis-poweroff@%i.target
+
+[Install]
+WantedBy=obmc-host-termination@%i.target
