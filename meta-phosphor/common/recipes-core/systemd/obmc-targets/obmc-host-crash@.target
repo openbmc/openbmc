@@ -1,0 +1,6 @@
+[Unit]
+Description=Host instance %i crashed
+Wants=obmc-host-started@%i.target
+After=obmc-host-started@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
+RefuseManualStop=yes

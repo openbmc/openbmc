@@ -35,7 +35,10 @@ HOST_SYNCH_TARGETS = "start-pre starting started stop-pre stopping stopped reset
 # - quiesce:  Target to enter on host boot failure
 # - shutdown: Tell host to shutdown, then stop system
 # - reset:   Services to check if host is running and update host "start" target
-HOST_ACTION_TARGETS = "start stop quiesce reset shutdown"
+# - crash:   Target to run when host crashes. it is very much similar to
+#            quiesce target but the only delta is that this target contains
+#            multiple services and one of them is the quiesce target.
+HOST_ACTION_TARGETS = "start stop quiesce reset shutdown crash"
 
 CHASSIS_SYNCH_FMT = "obmc-power-{0}@.target"
 CHASSIS_ACTION_FMT = "obmc-chassis-power{0}@.target"
@@ -46,6 +49,11 @@ CHASSIS_LINK_SYNCH_FMT = "${CHASSIS_SYNCH_FMT}:obmc-power-{0}@{1}.target"
 CHASSIS_LINK_ACTION_FMT = "${CHASSIS_ACTION_FMT}:obmc-chassis-power{0}@{1}.target"
 HOST_LINK_SYNCH_FMT = "${HOST_SYNCH_FMT}:obmc-host-{0}@{1}.target"
 HOST_LINK_ACTION_FMT = "${HOST_ACTION_FMT}:obmc-host-{0}@{1}.target"
+
+QUIESCE_TMPL = "obmc-host-quiesce@.target"
+CRASH_TGTFMT = "obmc-host-crash{0}.target"
+QUIESCE_INSTFMT = "obmc-host-quiesce@{0}.target"
+CRASH_QUIESCE_FMT = "${QUIESCE_TMPL}:${CRASH_TGTFMT}.wants/${QUIESCE_INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += " \
         obmc-mapper.target \
@@ -64,3 +72,4 @@ SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_LINK_SYNCH_FMT', 'CHASSIS_SYN
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_LINK_ACTION_FMT', 'CHASSIS_ACTION_TARGETS', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_SYNCH_FMT', 'HOST_SYNCH_TARGETS', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT', 'HOST_ACTION_TARGETS', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CRASH_QUIESCE_FMT', 'OBMC_CHECKSTOP_INSTANCES')}"
