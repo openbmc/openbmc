@@ -1,0 +1,4 @@
+[Unit]
+Description=Host instance %i crashed
+Conflicts=obmc-chassis-poweroff@%i.target
+RefuseManualStop=yes
