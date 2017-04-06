@@ -15,4 +15,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=obmc-power-chassis-on@%i.target
+WantedBy=obmc-chassis-poweron@%i.target
