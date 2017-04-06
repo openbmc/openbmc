@@ -6,7 +6,7 @@ Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
 Wants=fsi-scan@%i.service
 Before=fsi-scan@%i.service
-Conflicts=obmc-power-chassis-off@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
 ConditionDirectoryNotEmpty=!/sys/bus/platform/drivers/fsi-master-gpio/fsi-master
 
 [Service]
@@ -15,4 +15,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-RequiredBy=obmc-power-chassis-on@%i.target
+RequiredBy=obmc-chassis-poweron@%i.target
