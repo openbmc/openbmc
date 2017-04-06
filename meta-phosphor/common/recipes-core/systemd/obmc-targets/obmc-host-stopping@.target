@@ -1,7 +1,8 @@
 [Unit]
-Description=Host%i (Stopped)
+Description=Host%i (Stopping)
 Wants={SYSTEMD_DEFAULT_TARGET}
-After=obmc-host-stop@%i.target
+After=obmc-host-stop-pre@%i.target
 Conflicts=obmc-host-start@%i.target
+Conflicts=obmc-host-starting@%i.target
 RefuseManualStart=yes
 RefuseManualStop=yes
