@@ -1,7 +1,10 @@
 [Unit]
 Description=Stop Host%i
 Wants={SYSTEMD_DEFAULT_TARGET}
-After=obmc-host-stop-pre@%i.target
-Conflicts=obmc-chassis-start@%i.target
-RefuseManualStart=yes
+After={SYSTEMD_DEFAULT_TARGET}
+Wants=mapper-wait@-org-openbmc-control-chassis%i.service
+After=mapper-wait@-org-openbmc-control-chassis%i.service
+Conflicts=obmc-host-start@%i.target
 RefuseManualStop=yes
+OnFailure=obmc-chassis-poweroff@%i.target
+OnFailureJobMode=flush
