@@ -15,4 +15,4 @@ Type=oneshot
 ExecStart={sbindir}/mapper call /org/openbmc/control/power%i org.openbmc.control.Power setPowerState i 1
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+WantedBy=obmc-host-starting@%i.target

@@ -8,7 +8,7 @@ inherit obmc-phosphor-systemd
 SKELETON_DIR = "pciedetect"
 
 TMPL = "pcie-slot-detect@.service"
-TGTFMT = "obmc-chassis-start@{0}.target"
+TGTFMT = "obmc-host-start@{0}.target"
 INSTFMT = "pcie-slot-detect@{0}.service"
 FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
 

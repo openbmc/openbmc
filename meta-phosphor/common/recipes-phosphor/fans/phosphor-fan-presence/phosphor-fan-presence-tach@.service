@@ -2,11 +2,11 @@
 Description=Phosphor Fan Presence Tach Daemon
 Wants=obmc-power-on@%i.target
 After=obmc-power-on@%i.target
-Conflicts=obmc-chassis-stop@%i.target
+Conflicts=obmc-host-stopping@%i.target
 
 [Service]
 Restart=on-failure
 ExecStart={sbindir}/phosphor-fan-presence-tach
 
 [Install]
-RequiredBy=obmc-chassis-start@%i.target
+RequiredBy=obmc-host-starting@%i.target
