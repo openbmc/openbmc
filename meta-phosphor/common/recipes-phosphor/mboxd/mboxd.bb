@@ -36,7 +36,7 @@ do_install_append() {
 }
 
 TMPL = "mboxd-reload@.service"
-TGTFMT = "obmc-power-chassis-off@{0}.target"
+TGTFMT = "obmc-chassis-poweroff@{0}.target"
 INSTFMT = "mboxd-reload@{0}.service"
 FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
 

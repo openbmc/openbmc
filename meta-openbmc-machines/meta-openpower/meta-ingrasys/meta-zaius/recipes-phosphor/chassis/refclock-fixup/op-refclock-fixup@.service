@@ -14,4 +14,4 @@ RemainAfterExit=yes
 ExecStart={sbindir}/fix_zaius_refclock.sh
 
 [Install]
-RequiredBy=obmc-power-chassis-on@%i.target
+RequiredBy=obmc-chassis-poweron@%i.target
