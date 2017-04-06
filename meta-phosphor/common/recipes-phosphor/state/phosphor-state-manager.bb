@@ -50,6 +50,6 @@ DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 FILES_${PN}-discover = "${sbindir}/phosphor-discover-system-state"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "3ed10085ae988b08e8230d35693d370bf75f0574"
+SRCREV = "6838ea9dda69e9e3112a2eaa2d8dcae254e16a85"
 
 S = "${WORKDIR}/git"
