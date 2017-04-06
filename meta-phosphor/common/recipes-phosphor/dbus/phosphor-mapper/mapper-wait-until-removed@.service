@@ -1,0 +1,10 @@
+[Unit]
+Description=Wait for %I to be removed
+Wants=obmc-mapper.target
+After=obmc-mapper.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=no
+ExecStart=/usr/sbin/mapper wait-until-removed %I
