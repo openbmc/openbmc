@@ -3,7 +3,7 @@ Description=Apply voltage overrides to VRMs
 Wants=avsbus-disable@%i.service
 After=avsbus-disable@%i.service
 Before=avsbus-enable@%i.service
-Conflicts=obmc-power-chassis-off@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 ExecStart={bindir}/vrm.sh
@@ -11,4 +11,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=obmc-power-chassis-on@%i.target
+WantedBy=obmc-chassis-poweron@%i.target
