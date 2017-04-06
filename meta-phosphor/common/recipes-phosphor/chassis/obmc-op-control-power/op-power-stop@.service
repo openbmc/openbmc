@@ -12,4 +12,4 @@ RemainAfterExit=yes
 ExecStart={sbindir}/mapper call /org/openbmc/control/power%i org.openbmc.control.Power setPowerState i 0
 
 [Install]
-WantedBy=obmc-chassis-stop@%i.target
+WantedBy=obmc-host-stop@%i.target

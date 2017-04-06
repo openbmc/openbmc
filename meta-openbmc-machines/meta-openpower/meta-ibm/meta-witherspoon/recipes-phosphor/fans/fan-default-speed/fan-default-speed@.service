@@ -5,7 +5,7 @@ Wants=obmc-power-on@%i.target
 After=obmc-power-on@%i.target
 Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
-Conflicts=obmc-chassis-stop@%i.target
+Conflicts=obmc-host-stop@%i.target
 
 [Service]
 ExecStart={bindir}/set_fan_speeds.sh 8000
@@ -13,4 +13,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=obmc-chassis-start@%i.target
+WantedBy=obmc-host-start@%i.target

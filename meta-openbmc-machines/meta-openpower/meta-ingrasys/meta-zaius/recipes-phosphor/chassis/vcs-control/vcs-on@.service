@@ -4,7 +4,7 @@ Wants=vcs_workaround@%i.service
 After=vcs_workaround@%i.service
 Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
-Conflicts=obmc-chassis-stop@%i.target
+Conflicts=obmc-host-stop@%i.target
 
 [Service]
 ExecStart={bindir}/zaius_vcs.sh on
