@@ -14,4 +14,4 @@ ExecStart={sbindir}/pgood_wait /org/openbmc/control/power%i off
 ExecStart=/bin/rm -f /run/openbmc/chassis@%i-on
 
 [Install]
-WantedBy=obmc-chassis-stop@%i.target
+WantedBy=obmc-host-stop@%i.target
