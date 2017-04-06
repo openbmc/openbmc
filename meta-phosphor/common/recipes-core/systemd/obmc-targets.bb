@@ -46,7 +46,7 @@ HOST_ACTION_TARGETS = "stop quiesce"
 # - reset:   Check host state and update host "start" target if host running
 HOST_ACTION_TARGETS_2 = "reset"
 
-CHASSIS_FMT = "obmc-chassis-{0}@.target"
+CHASSIS_FMT = "obmc-host-{0}@.target"
 SYNCH_POWER_FMT = "obmc-power-{0}@.target"
 CHASSIS_POWER_FMT = "obmc-chassis-power{0}@.target"
 CHASSIS_POWER_FMT_2 = "obmc-chassis-{0}@.target"
@@ -54,7 +54,7 @@ HOST_SYNCH_FMT = "obmc-host-{0}@.target"
 HOST_ACTION_FMT = "obmc-{0}-host@.target"
 HOST_ACTION_FMT_2 = "obmc-host-{0}@.target"
 
-CHASSIS_LINK_FMT = "${CHASSIS_FMT}:obmc-chassis-{0}@{1}.target"
+CHASSIS_LINK_FMT = "${CHASSIS_FMT}:obmc-host-{0}@{1}.target"
 SYNCH_POWER_LINK_FMT = "${SYNCH_POWER_FMT}:obmc-power-{0}@{1}.target"
 CHASSIS_POWER_LINK_FMT = "${CHASSIS_POWER_FMT}:obmc-chassis-power{0}@{1}.target"
 CHASSIS_POWER_LINK_FMT_2 = "${CHASSIS_POWER_FMT_2}:obmc-chassis-{0}@{1}.target"
