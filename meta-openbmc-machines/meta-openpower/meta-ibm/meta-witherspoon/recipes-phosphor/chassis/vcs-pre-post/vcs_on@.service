@@ -4,7 +4,7 @@ Wants=vcs_workaround@%i.service
 After=vcs_workaround@%i.service
 Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
-Conflicts=obmc-power-chassis-off@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
@@ -13,4 +13,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=obmc-power-chassis-on@%i.target
+WantedBy=obmc-chassis-poweron@%i.target
