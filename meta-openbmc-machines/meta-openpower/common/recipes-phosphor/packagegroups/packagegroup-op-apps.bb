@@ -34,7 +34,7 @@ RDEPENDS_${PN}-chassis = " \
         obmc-host-failure-reboots \
         "
 #Pull in obmc-fsi on all P9 OpenPOWER systems
-RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'obmc-fsi', 'obmc-fsi')}"
+RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'op-fsi', 'op-fsi')}"
 
 SUMMARY_${PN}-fans = "OpenPOWER Fans"
 RDEPENDS_${PN}-fans = " \
