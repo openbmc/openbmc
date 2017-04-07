@@ -3,7 +3,9 @@ DESCRIPTION = "Application to contol the OpenPOWER On-Chip-Controller"
 HOMEPAGE = "https://github.com/openbmc/openpower-occ-control"
 PR = "r1"
 
-inherit autotools pkgconfig
+inherit autotools \
+        pkgconfig \
+        obmc-phosphor-dbus-service
 
 require ${PN}.inc
 
