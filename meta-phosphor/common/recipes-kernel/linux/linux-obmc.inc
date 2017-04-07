@@ -9,6 +9,10 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI += "file://v3-0001-drivers-fsi-Increase-delay-before-sampling-input-.patch"
+SRC_URI += "file://0001-drivers-fsi-Change-interrupt-handler-device-traversa.patch"
+SRC_URI += "file://0002-drivers-fsi-Look-for-Hub-sourced-IRQs.patch"
+SRC_URI += "file://0003-drivers-fsi-Scan-for-hub-link-IRQ-sources.patch"
+SRC_URI += "file://0004-drivers-fsi-Set-IRQ-masks-along-hub-path.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 

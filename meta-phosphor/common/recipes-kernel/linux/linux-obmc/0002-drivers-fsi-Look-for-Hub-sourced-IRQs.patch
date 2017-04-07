@@ -1,0 +1,48 @@
+From 91381692bcea4bcc4080cfa7d67bc3f99c91e8de Mon Sep 17 00:00:00 2001
+From: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+Date: Thu, 6 Apr 2017 12:10:11 -0500
+Subject: [PATCH linux dev-4.7 2/4] drivers/fsi: Look for Hub sourced IRQs
+To: joel@jms.id.au
+Cc: openbmc@lists.ozlabs.org
+
+In addition to looking for local device IRQs on the slave also
+check if the IRQ came from a hub source in the interrupt handler.
+
+Signed-off-by: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+---
+ drivers/fsi/fsi-core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/fsi/fsi-core.c b/drivers/fsi/fsi-core.c
+index 36dde94..45e1171 100644
+--- a/drivers/fsi/fsi-core.c
++++ b/drivers/fsi/fsi-core.c
+@@ -98,6 +98,11 @@ static int fsi_slave_write(struct fsi_slave *slave, uint32_t addr,
+ #define FSI_SI1S		0x1C	/* R: IRQ status */
+ 
+ /*
++ * SI1S, SI1M fields
++ */
++#define FSI_SI1_HUB_SRC		0x00100000	/* hub IRQ source */
++
++/*
+  * SMODE fields
+  */
+ #define	FSI_SMODE_WSC		0x80000000	/* Warm start done */
+@@ -793,6 +798,13 @@ static int __fsi_dev_irq(struct device *dev, void *data)
+ 		return 1;
+ 	}
+ 
++	if (!(*si1s & FSI_SI1_HUB_SRC)) {
++		dev_dbg(dev, "IRQ not from a hub source\n");
++		return 0;
++	}
++
++	/* TODO: handle hub sourced IRQ */
++
+ 	return 0;
+ }
+ 
+-- 
+1.8.2.2
+
