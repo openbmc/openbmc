@@ -1,0 +1,69 @@
+From 70f73f3277361163c010e17360d7b1905fdf921f Mon Sep 17 00:00:00 2001
+From: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+Date: Thu, 6 Apr 2017 11:56:37 -0500
+Subject: [PATCH linux dev-4.7 1/4] drivers/fsi: Change interrupt handler
+ device traversal.
+To: joel@jms.id.au
+Cc: openbmc@lists.ozlabs.org
+
+Traverse the slave device list and master slave list using the
+kernel utility device_for_each_child instead of using internally
+managed linked lists.
+
+Signed-off-by: Christopher Bostic <cbostic@linux.vnet.ibm.com>
+---
+ drivers/fsi/fsi-core.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/fsi/fsi-core.c b/drivers/fsi/fsi-core.c
+index 3d382e6..36dde94 100644
+--- a/drivers/fsi/fsi-core.c
++++ b/drivers/fsi/fsi-core.c
+@@ -778,22 +778,32 @@ static void fsi_master_unscan(struct fsi_master *master)
+ 	master->slave_list = false;
+ }
+ 
+-static void fsi_master_irq(struct fsi_master *master, int link, uint32_t si1s)
++static int __fsi_dev_irq(struct device *dev, void *data)
+ {
+-	struct fsi_slave *slave;
+-	struct fsi_device *fsi_dev;
+-
+-	if (list_empty(&master->my_slaves))
+-		return;
++	uint32_t *si1s = data;
++	struct fsi_device *fsi_dev = to_fsi_dev(dev);
+ 
+-	slave = list_first_entry(&master->my_slaves, struct fsi_slave,
+-				list_link);
++	if (!fsi_dev || !si1s) {
++		dev_dbg(dev, "Invalid input: %p %p\n", fsi_dev, si1s);
++		return -EINVAL;
++	}
+ 
+-	list_for_each_entry(fsi_dev, &slave->my_engines, link) {
+-		if (si1s & (0x80000000 >> fsi_dev->si1s_bit) &&
+-		    fsi_dev->irq_handler)
+-			fsi_dev->irq_handler(0, &fsi_dev->dev);
++	if (*si1s & (0x80000000 >> fsi_dev->si1s_bit) && fsi_dev->irq_handler) {
++		fsi_dev->irq_handler(0, &fsi_dev->dev);
++		return 1;
+ 	}
++
++	return 0;
++}
++
++static int __fsi_slave_irq(struct device *dev, void *data)
++{
++	return device_for_each_child(dev, data, __fsi_dev_irq);
++}
++
++static void fsi_master_irq(struct fsi_master *master, int link, uint32_t si1s)
++{
++	device_for_each_child(master->dev, &si1s, __fsi_slave_irq);
+ }
+ 
+ static int fsi_master_ipoll(void *data)
+-- 
+1.8.2.2
+
