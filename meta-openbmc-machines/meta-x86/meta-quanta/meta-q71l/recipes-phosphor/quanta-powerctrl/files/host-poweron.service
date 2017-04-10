@@ -1,0 +1,12 @@
+[Unit]
+Description=Start Host
+Requires=host-gpio.service
+After=host-gpio.service
+
+[Service]
+RemainAfterExit=yes
+Type=oneshot
+ExecStart=/usr/sbin/poweron.sh
+
+[Install]
+WantedBy=obmc-chassis-poweron@0.target
