@@ -1,0 +1,13 @@
+[Unit]
+Description=Start Host
+Requires=host-gpio.service
+After=host-gpio.service
+Conflicts=obmc-host-stop@0.target
+
+[Service]
+RemainAfterExit=yes
+Type=oneshot
+ExecStart={sbindir}/poweron.sh
+
+[Install]
+WantedBy=obmc-host-start@0.target

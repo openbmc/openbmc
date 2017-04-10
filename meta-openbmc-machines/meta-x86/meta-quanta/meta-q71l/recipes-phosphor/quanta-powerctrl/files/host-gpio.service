@@ -1,0 +1,8 @@
+[Unit]
+Description=Configure GPIOs for Host Power Control
+
+[Service]
+Restart=no
+RemainsAfterExit=true
+Type=oneshot
+ExecStart={sbindir}/init_once.sh
