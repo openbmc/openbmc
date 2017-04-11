@@ -1,0 +1,8 @@
+[Unit]
+Description=Hardware RNG Entropy Gatherer Daemon
+
+[Service]
+ExecStart=@SBINDIR@/rngd -f
+
+[Install]
+WantedBy=multi-user.target
