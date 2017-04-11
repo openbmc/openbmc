@@ -1,0 +1,11 @@
+[Unit]
+Description=Tests Entropy Every Minute Before Starting Phosphor Gevent
+Wants=phosphor-gevent-minute-timer.timer
+
+[Service]
+ExecStart=/usr/sbin/phosphor-gevent-watchdog.sh
+
+[Install]
+WantedBy=phosphor-gevent-minute-timer.target
+
+

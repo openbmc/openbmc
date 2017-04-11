@@ -1,0 +1,12 @@
+[Unit]
+Description=Phosphor Gevent Minute Timer
+
+[Timer]
+OnBootSec=1min
+OnCalendar=*:0/1
+Unit=phosphor-gevent-minute-timer.target
+
+[Install]
+WantedBy=basic.target
+
+
