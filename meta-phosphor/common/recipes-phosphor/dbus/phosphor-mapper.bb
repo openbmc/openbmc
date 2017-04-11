@@ -14,7 +14,10 @@ DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.ObjectMapper.service"
-SYSTEMD_SERVICE_${PN} = "mapper-wait@.service mapper-wait-until-removed@.service"
+SYSTEMD_SERVICE_${PN} += " \
+        mapper-wait@.service \
+        mapper-subtree-remove@.service \
+        "
 RDEPENDS_libmapper += "libsystemd"
 RDEPENDS_${PN} += " \
         python-xml \
