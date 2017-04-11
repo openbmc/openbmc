@@ -1,0 +1,10 @@
+[Unit]
+Description=mapper subtree-remove %I
+Wants=obmc-mapper.target
+After=obmc-mapper.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+Restart=no
+ExecStart={sbindir}/mapper subtree-remove %I
