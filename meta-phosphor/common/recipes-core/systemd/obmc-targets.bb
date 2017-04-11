@@ -30,11 +30,12 @@ CHASSIS_ACTION_TARGETS = "on off reset"
 HOST_SYNCH_TARGETS = "start-pre start started stop-pre stop stopped reset-running"
 
 # Track all host action targets
-# - start:   Service to run to start the host
-# - stop:    Services to run to shutdown the host
-# - quiesce: Target to enter on host boot failure
+# - start:    Service to run to start the host
+# - stop:     Services to run to shutdown the host
+# - quiesce:  Target to enter on host boot failure
+# - shutdown: Tell host to shutdown, then stop system
 # - reset:   Services to check if host is running and update host "start" target
-HOST_ACTION_TARGETS = "start stop quiesce reset"
+HOST_ACTION_TARGETS = "start stop quiesce reset shutdown"
 
 CHASSIS_SYNCH_FMT = "obmc-power-{0}@.target"
 CHASSIS_ACTION_FMT = "obmc-chassis-power{0}@.target"
