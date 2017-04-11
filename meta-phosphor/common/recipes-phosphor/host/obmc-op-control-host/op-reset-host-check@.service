@@ -7,7 +7,7 @@ Wants=obmc-host-reset-running@%i.target
 Before=obmc-host-reset-running@%i.target
 Wants=op-reset-chassis-on@%i.service
 After=op-reset-chassis-on@%i.service
-Conflicts=obmc-stop-host@%i.target
+Conflicts=obmc-host-shutdown@%i.target
 ConditionPathExists=/run/openbmc/chassis@%i-on
 
 [Service]
