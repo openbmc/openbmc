@@ -8,5 +8,5 @@ After=obmc-host-start-pre@%i.target
 Conflicts=obmc-host-stop@%i.target
 RefuseManualStart=yes
 RefuseManualStop=yes
-OnFailure=obmc-quiesce-host@%i.target
+OnFailure=obmc-host-quiesce@%i.target
 OnFailureJobMode=flush
