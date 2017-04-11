@@ -1,0 +1,9 @@
+[Unit]
+Description=Hardware RNG Entropy Gatherer Daemon
+
+[Service]
+ExecStart=@SBINDIR@/rngd -f -r /dev/urandom
+SuccessExitStatus=66
+
+[Install]
+WantedBy=multi-user.target
