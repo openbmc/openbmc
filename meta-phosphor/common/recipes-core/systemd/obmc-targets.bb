@@ -40,7 +40,7 @@ HOST_SYNCH_TARGETS = "start-pre start started stop-pre stop stopped reset-runnin
 # Track all host action targets
 # - stop:    Services to run to shutdown the host
 # - quiesce: Target to enter on host boot failure
-HOST_ACTION_TARGETS = "stop quiesce"
+HOST_ACTION_TARGETS = "shutdown quiesce"
 
 # TODO: openbmc/openbmc#1205 - Move this to standard host action targets
 # - reset:   Check host state and update host "start" target if host running
@@ -50,14 +50,14 @@ SYNCH_POWER_FMT = "obmc-power-{0}@.target"
 CHASSIS_POWER_FMT = "obmc-chassis-power{0}@.target"
 CHASSIS_POWER_FMT_2 = "obmc-chassis-{0}@.target"
 HOST_SYNCH_FMT = "obmc-host-{0}@.target"
-HOST_ACTION_FMT = "obmc-{0}-host@.target"
+HOST_ACTION_FMT = "obmc-host-{0}@.target"
 HOST_ACTION_FMT_2 = "obmc-host-{0}@.target"
 
 SYNCH_POWER_LINK_FMT = "${SYNCH_POWER_FMT}:obmc-power-{0}@{1}.target"
 CHASSIS_POWER_LINK_FMT = "${CHASSIS_POWER_FMT}:obmc-chassis-power{0}@{1}.target"
 CHASSIS_POWER_LINK_FMT_2 = "${CHASSIS_POWER_FMT_2}:obmc-chassis-{0}@{1}.target"
 HOST_LINK_SYNCH_FMT = "${HOST_SYNCH_FMT}:obmc-host-{0}@{1}.target"
-HOST_LINK_ACTION_FMT = "${HOST_ACTION_FMT}:obmc-{0}-host@{1}.target"
+HOST_LINK_ACTION_FMT = "${HOST_ACTION_FMT}:obmc-host-shutdown@{1}.target"
 HOST_LINK_ACTION_FMT_2 = "${HOST_ACTION_FMT_2}:obmc-host-{0}@{1}.target"
 
 SYSTEMD_SERVICE_${PN} += " \
@@ -79,5 +79,5 @@ SYSTEMD_LINK_${PN} += "${@compose_list(d, 'SYNCH_POWER_LINK_FMT', 'SYNCH_POWER_T
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_POWER_LINK_FMT', 'CHASSIS_POWER_TARGETS', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_POWER_LINK_FMT_2', 'CHASSIS_POWER_TARGETS_2', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_SYNCH_FMT', 'HOST_SYNCH_TARGETS', 'OBMC_HOST_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT', 'HOST_ACTION_TARGETS', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT_2', 'HOST_ACTION_TARGETS_2', 'OBMC_HOST_INSTANCES')}"
