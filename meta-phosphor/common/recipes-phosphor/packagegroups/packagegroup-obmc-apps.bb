@@ -47,6 +47,7 @@ SUMMARY_${PN}-inventory = "Inventory applications"
 RDEPENDS_${PN}-inventory = " \
         ${VIRTUAL-RUNTIME_obmc-inventory-manager} \
         ${VIRTUAL-RUNTIME_obmc-fan-presence} \
+        phosphor-chassis-cooling-type \
         "
 
 SUMMARY_${PN}-leds = "LED applications"
