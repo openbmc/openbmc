@@ -8,6 +8,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
+SRC_URI += "file://phosphor-gpio-keys.scc"
+SRC_URI += "file://phosphor-gpio-keys.cfg"
 SRC_URI += "file://v3-0001-drivers-fsi-Increase-delay-before-sampling-input-.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
