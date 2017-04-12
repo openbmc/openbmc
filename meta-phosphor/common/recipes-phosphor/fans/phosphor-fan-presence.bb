@@ -22,11 +22,17 @@ FAN_PRESENCE_PACKAGES = " \
     ${PN}-tach \
 "
 PACKAGES_remove = "${PN}"
-PACKAGES += "${FAN_PRESENCE_PACKAGES}"
+PACKAGES += "${FAN_PRESENCE_PACKAGES} phosphor-chassis-cooling-type"
+
+# Remove when this package has content
+ALLOW_EMPTY_phosphor-chassis-cooling-type = "1"
+
 SYSTEMD_PACKAGES = "${FAN_PRESENCE_PACKAGES}"
-RDEPENDS_${PN}-dev = "${FAN_PRESENCE_PACKAGES}"
+RDEPENDS_${PN}-dev = "${FAN_PRESENCE_PACKAGES} phosphor-chassis-cooling-type"
 
 RDEPENDS_${PN}-tach += "sdbusplus"
+
+RDEPENDS_phosphor-chassis-cooling-type += "libevdev"
 
 # Needed to install into the obmc-chassis-start target
 TMPL = "phosphor-fan-presence-tach@.service"
