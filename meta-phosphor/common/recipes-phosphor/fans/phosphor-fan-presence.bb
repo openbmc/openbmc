@@ -17,7 +17,6 @@ DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "virtual/phosphor-fan-presence-config"
 DEPENDS += "libevdev"
-RDEPENDS_${PN} += "sdbusplus"
 
 FAN_PRESENCE_PACKAGES = " \
     ${PN}-tach \
@@ -26,6 +25,8 @@ PACKAGES_remove = "${PN}"
 PACKAGES += "${FAN_PRESENCE_PACKAGES}"
 SYSTEMD_PACKAGES = "${FAN_PRESENCE_PACKAGES}"
 RDEPENDS_${PN}-dev = "${FAN_PRESENCE_PACKAGES}"
+
+RDEPENDS_${PN}-tach += "sdbusplus"
 
 # Needed to install into the obmc-chassis-start target
 TMPL = "phosphor-fan-presence-tach@.service"
