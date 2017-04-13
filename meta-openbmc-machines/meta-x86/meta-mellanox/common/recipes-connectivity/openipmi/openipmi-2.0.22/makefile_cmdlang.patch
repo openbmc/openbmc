@@ -1,0 +1,13 @@
+diff --git a/cmdlang/Makefile.am b/cmdlang/Makefile.am
+index e80090d..b59ff24 100644
+--- a/cmdlang/Makefile.am
++++ b/cmdlang/Makefile.am
+@@ -16,7 +16,7 @@ libOpenIPMIcmdlang_la_LIBADD = -lm \
+ 	$(top_builddir)/utils/libOpenIPMIutils.la \
+ 	$(top_builddir)/lib/libOpenIPMI.la
+ libOpenIPMIcmdlang_la_LDFLAGS = -rdynamic -version-info $(LD_VERSION) \
+-	-Wl,-Map -Wl,libOpenIPMIcmdlang.map -L$(libdir)
++	-Wl,-Map -Wl,libOpenIPMIcmdlang.map
+ 
+ bin_PROGRAMS = openipmish
+ 

@@ -1,0 +1,8 @@
+recipes-bsp          - Anything with links to specific hardware or hardware configuration information
+recipes-connectivity - Libraries and applications related to communication with other devices 
+recipes-core         - What's needed to build a basic working Linux image including commonly used dependencies
+recipes-devtools     - Tools primarily used by the build system (but can also be used on targets)
+recipes-extended     - Applications which whilst not essential add features compared to the alternatives in
+                       core. May be needed for full tool functionality or LSB compliance.
+recipes-kernel       - The kernel and generic applications/libraries with strong kernel dependencies
+recipes-phosphor     - Phosphor OpenBMC applications and configuration
