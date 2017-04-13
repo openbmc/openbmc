@@ -1,0 +1,30 @@
+diff --git a/drivers/fsi/fsi-core.c b/drivers/fsi/fsi-core.c
+index 36dde94..45e1171 100644
+--- a/drivers/fsi/fsi-core.c
++++ b/drivers/fsi/fsi-core.c
+@@ -98,6 +98,11 @@ static int fsi_slave_write(struct fsi_slave *slave, uint32_t addr,
+ #define FSI_SI1S		0x1C	/* R: IRQ status */
+ 
+ /*
++ * SI1S, SI1M fields
++ */
++#define FSI_SI1_HUB_SRC		0x00100000	/* hub IRQ source */
++
++/*
+  * SMODE fields
+  */
+ #define	FSI_SMODE_WSC		0x80000000	/* Warm start done */
+@@ -793,6 +798,13 @@ static int __fsi_dev_irq(struct device *dev, void *data)
+ 		return 1;
+ 	}
+ 
++	if (!(*si1s & FSI_SI1_HUB_SRC)) {
++		dev_dbg(dev, "IRQ not from a hub source\n");
++		return 0;
++	}
++
++	/* TODO: handle hub sourced IRQ */
++
+ 	return 0;
+ }
+ 
