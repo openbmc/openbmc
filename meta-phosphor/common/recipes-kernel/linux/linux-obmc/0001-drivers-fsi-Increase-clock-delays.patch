@@ -1,0 +1,30 @@
+From 5918317a40c1fcef2e001002f22b5a1a21347339 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 14 Apr 2017 09:27:41 -0500
+Subject: [PATCH] drivers: fsi: Increase clock delays
+
+Hostboot tools not working with lower delays.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ drivers/fsi/fsi-master-gpio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/fsi/fsi-master-gpio.c b/drivers/fsi/fsi-master-gpio.c
+index 0907977..54a54c0 100644
+--- a/drivers/fsi/fsi-master-gpio.c
++++ b/drivers/fsi/fsi-master-gpio.c
+@@ -13,8 +13,8 @@
+ 
+ #include "fsi-master.h"
+ 
+-#define	FSI_GPIO_STD_DLY	1	/* Standard pin delay in nS */
+-#define	FSI_GPIO_SDA_IN_DLY	200	/* Wait to sample SDA line, in nS */
++#define	FSI_GPIO_STD_DLY	2200	/* Standard pin delay in nS */
++#define	FSI_GPIO_SDA_IN_DLY	2200	/* Wait to sample SDA line, in nS */
+ #define	FSI_ECHO_DELAY_CLOCKS	16	/* Number clocks for echo delay */
+ #define	FSI_PRE_BREAK_CLOCKS	50	/* Number clocks to prep for break */
+ #define	FSI_BREAK_CLOCKS	256	/* Number of clocks to issue break */
+-- 
+1.8.3.1
+
