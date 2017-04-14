@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor Download Manager
+
+[Service]
+ExecStart={sbindir}/phosphor-download-manager
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
