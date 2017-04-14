@@ -64,4 +64,5 @@ RDEPENDS_${PN}-sensors = " \
 SUMMARY_${PN}-software = "Software applications"
 RDEPENDS_${PN}-software = " \
         ${VIRTUAL-RUNTIME_obmc-bmc-code-mgr} \
+        ${VIRTUAL-RUNTIME_obmc-bmc-download-mgr} \
         "
