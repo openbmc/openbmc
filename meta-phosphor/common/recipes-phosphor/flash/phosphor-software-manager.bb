@@ -27,8 +27,9 @@ inherit obmc-phosphor-dbus-service
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces"
+DEPENDS += "phosphor-logging"
 
-RDEPENDS_${PN}-version += "phosphor-dbus-interfaces sdbusplus"
+RDEPENDS_${PN}-version += "phosphor-dbus-interfaces sdbusplus phosphor-logging"
 
 FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager"
 FILES_${PN}-version += "${sbindir}/phosphor-download-manager"
