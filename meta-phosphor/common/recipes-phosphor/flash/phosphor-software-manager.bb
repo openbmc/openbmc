@@ -30,7 +30,8 @@ DEPENDS += "phosphor-dbus-interfaces"
 
 RDEPENDS_${PN}-version += "phosphor-dbus-interfaces sdbusplus"
 
-FILES_${PN}-version = "${sbindir}/phosphor-version-software-manager"
+FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager"
+FILES_${PN}-version += "${sbindir}/phosphor-download-manager"
 DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.BMC.Version.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
