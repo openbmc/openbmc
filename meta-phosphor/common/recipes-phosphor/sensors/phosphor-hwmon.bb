@@ -28,7 +28,7 @@ RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_phosphor-hwmon-config}"
 SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
 SRC_URI += "file://70-hwmon.rules"
 
-SRCREV = "4e1f30f1da6827945087857f3df7164a352ff5cf"
+SRCREV = "05711eb061d7f8a7d3b11a4d7d09d60a6afc2583"
 
 S = "${WORKDIR}/git"
 
