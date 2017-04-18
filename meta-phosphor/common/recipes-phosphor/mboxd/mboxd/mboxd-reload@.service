@@ -7,9 +7,8 @@ Conflicts=obmc-power-chassis-on@%i.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/killall -HUP mboxd
-# TODO: openbmc/openbmc#1045 - mboxd reload workaround
-ExecStart=/bin/sleep 45
+ExecStart={sbindir}/mboxctl --reset
 
 [Install]
 WantedBy=obmc-power-chassis-off@%i.target
+WantedBy=obmc-quiesce-host@%i.target

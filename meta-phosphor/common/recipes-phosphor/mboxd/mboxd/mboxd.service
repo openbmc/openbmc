@@ -8,7 +8,7 @@ After=dev-aspeed\x2dmbox.device
 
 [Service]
 Restart=always
-ExecStart={sbindir}/mboxd --flash {FLASH_SIZE} --verbose
+ExecStart={sbindir}/mboxd --flash {FLASH_SIZE} --verbose --window-size 1M
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
