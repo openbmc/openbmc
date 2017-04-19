@@ -42,20 +42,37 @@ PACKAGECONFIG[presence] = " \
 "
 RDEPENDS_${PN}-presence-tach += "sdbusplus"
 
-# Needed to install into the obmc-host-start target
-TMPL = "phosphor-fan-presence-tach@.service"
-INSTFMT = "phosphor-fan-presence-tach@{0}.service"
-TGTFMT = "obmc-host-start@{0}.target"
-FMT = "../${TMPL}:${TGTFMT}.requires/${INSTFMT}"
+# Needed to install into the obmc-chassis-poweron target
+TMPL_TACH = "phosphor-fan-presence-tach@.service"
+INSTFMT_TACH = "phosphor-fan-presence-tach@{0}.service"
+TGTFMT = "obmc-chassis-poweron@{0}.target"
+FMT_TACH = "../${TMPL_TACH}:${TGTFMT}.requires/${INSTFMT_TACH}"
 
 FILES_${PN}-presence-tach = "${sbindir}/phosphor-fan-presence-tach"
-SYSTEMD_SERVICE_${PN}-presence-tach += "${TMPL}"
-SYSTEMD_LINK_${PN}-presence-tach += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE_${PN}-presence-tach += "${TMPL_TACH}"
+SYSTEMD_LINK_${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSIS_INSTANCES')}"
 
 # --------------------------------------
 # ${PN}-control specific configuration
-PACKAGECONFIG[control] = "--enable-control,--disable-control,,"
+PACKAGECONFIG[control] = "--enable-control \
+     FAN_DEF_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/fans.yaml \
+     FAN_ZONE_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/zones.yaml \
+     FAN_ZONE_OUTPUT_DIR=${S}/control, \
+    --disable-control, \
+    virtual/phosphor-fan-control-fan-config \
+    virtual/phosphor-fan-control-zone-config \
+    , \
+"
+
+RDEPENDS_${PN}-control += "sdbusplus"
+
+TMPL_CONTROL = "phosphor-fan-control@.service"
+INSTFMT_CONTROL = "phosphor-fan-control@{0}.service"
+FMT_CONTROL = "../${TMPL_CONTROL}:${TGTFMT}.requires/${INSTFMT_CONTROL}"
+
 FILES_${PN}-control = "${sbindir}/phosphor-fan-control"
+SYSTEMD_SERVICE_${PN}-control += "${TMPL_CONTROL}"
+SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_INSTANCES')}"
 
 # --------------------------------------
 # phosphor-chassis-cooling-type specific configuration
