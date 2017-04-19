@@ -33,7 +33,7 @@ SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service
 RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
 SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
 
-SRCREV = "4736b9176ceced0dc0261ceeff70eac5963f4411"
+SRCREV = "5422e0e9f96e2fd2591a3a8d89a78d427b0ac5a3"
 
 # Setup IPMI Whitelist Conf files
 WHITELIST_CONF = " \
