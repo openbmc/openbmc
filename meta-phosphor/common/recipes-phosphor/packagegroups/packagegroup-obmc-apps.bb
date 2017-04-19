@@ -45,6 +45,7 @@ RDEPENDS_${PN}-extrasdev = " \
 # be added those respective package groups instead.
 SUMMARY_${PN}-fan-control = "Fan control"
 RDEPENDS_${PN}-fan-control = " \
+        ${VIRTUAL-RUNTIME_obmc-fan-control} \
         "
 
 SUMMARY_${PN}-host-state-mgmt = "Host state management"
