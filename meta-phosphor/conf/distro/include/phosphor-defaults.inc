@@ -61,7 +61,7 @@ VIRTUAL-RUNTIME_obmc-leds-sysfs ?= "phosphor-led-sysfs"
 VIRTUAL-RUNTIME_obmc-bmc-code-mgr ?= "phosphor-software-manager-version"
 
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
-PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-net-ipmid"
+PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-ipmi-net"
 
 # obmc-sensors-hwmon
 #
