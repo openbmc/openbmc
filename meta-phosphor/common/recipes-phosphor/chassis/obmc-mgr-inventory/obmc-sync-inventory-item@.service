@@ -6,8 +6,6 @@ After=obmc-read-eeprom@%i.service
 [Service]
 Restart=no
 Type=oneshot
-EnvironmentFile={envfiledir}/obmc/sync_inventory_item/%I
-ExecStart={sbindir}/sync_inventory_items.py -t $FRU_TYPE -n $FRU_NAME -p ${{PROPERTY}} -s $SYNC_TYPE
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
