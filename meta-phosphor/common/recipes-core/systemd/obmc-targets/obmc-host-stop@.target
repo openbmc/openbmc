@@ -1,5 +1,6 @@
 [Unit]
 Description=Stop Host%i
+After=op-stop-host@.service
 Wants={SYSTEMD_DEFAULT_TARGET}
 After={SYSTEMD_DEFAULT_TARGET}
 Wants=mapper-wait@-org-openbmc-control-chassis%i.service
