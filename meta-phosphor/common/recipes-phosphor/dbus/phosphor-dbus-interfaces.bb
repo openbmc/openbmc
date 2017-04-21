@@ -16,7 +16,7 @@ PACKAGE_BEFORE_PN = "${PN}-yaml"
 FILES_${PN}-yaml = "${datadir}/${PN}/yaml"
 
 SRC_URI += "git://github.com/openbmc/phosphor-dbus-interfaces"
-SRCREV = "8d885b9c28e63b36e13de50e56f17f63bc4ab448"
+SRCREV = "cb1e8063a019eeacd74f9298647cbe15d5868ff9"
 
 DEPENDS_remove_class-native = "sdbus++-native"
 DEPENDS_remove_class-nativesdk = "sdbus++-native"
