@@ -1,6 +1,6 @@
 KBRANCH ?= "dev-4.7"
 LINUX_VERSION ?= "4.7.10"
 
-SRCREV="6786cab8778ba96d84d89c7aec34374b5f4f1968"
+SRCREV="08a5126be4b35613c3d2b6ad5e91400aa87798d9"
 
 require linux-obmc.inc
