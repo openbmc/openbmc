@@ -8,6 +8,7 @@ inherit autotools pkgconfig
 inherit obmc-phosphor-systemd
 
 DEPENDS += "autoconf-archive-native"
+DEPENDS += "systemd"
 RDEPENDS_${PN} += "libsystemd"
 
 S = "${WORKDIR}/git"
