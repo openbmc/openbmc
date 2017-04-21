@@ -1,0 +1,29 @@
+From d2ddd08794734233b2198535a8c16f59f4ddcfff Mon Sep 17 00:00:00 2001
+From: Lei YU <mine260309@gmail.com>
+Date: Wed, 19 Apr 2017 13:51:12 +0800
+Subject: [PATCH] Remove CONFIG_FTGMAC100_EGIGA for ast-g4-phy
+
+Temporary fix for Garrison and Firestone to use 100base-T mode.
+Otherwise the network in Uboot is not working.
+
+Signed-off-by: Lei YU <mine260309@gmail.com>
+---
+ include/configs/ast-g4-phy.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/configs/ast-g4-phy.h b/include/configs/ast-g4-phy.h
+index baa522f..607f1e7 100644
+--- a/include/configs/ast-g4-phy.h
++++ b/include/configs/ast-g4-phy.h
+@@ -22,7 +22,7 @@
+ #define CONFIG_MAC_NUM			2
+ #define CONFIG_FTGMAC100
+ #define CONFIG_PHY_MAX_ADDR		32
+-#define CONFIG_FTGMAC100_EGIGA
++/*#define CONFIG_FTGMAC100_EGIGA*/
+ 
+ /* platform.S settings */
+ #define CONFIG_CPU_420			1
+-- 
+1.9.1
+

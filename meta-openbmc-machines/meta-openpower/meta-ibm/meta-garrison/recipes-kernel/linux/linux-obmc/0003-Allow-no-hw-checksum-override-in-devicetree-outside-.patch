@@ -1,0 +1,30 @@
+From 923158c7f4039eb1c6213f8f4ca6b083712168bd Mon Sep 17 00:00:00 2001
+From: Timothy Pearson <tpearson@raptorengineering.com>
+Date: Tue, 13 Sep 2016 10:10:39 -0500
+Subject: [PATCH 3/4] Allow no-hw-checksum override in devicetree outside of
+ NCSI mode.
+
+This is required for Firestone networking to function correctly.
+
+Signed-off-by: Timothy Pearson <tpearson@raptorengineering.com>
+---
+ drivers/net/ethernet/faraday/ftgmac100.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+index f40fa92..64bb190 100644
+--- a/drivers/net/ethernet/faraday/ftgmac100.c
++++ b/drivers/net/ethernet/faraday/ftgmac100.c
+@@ -1424,8 +1424,7 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 	 * in that case.
+ 	 */
+ 	netdev->features = NETIF_F_IP_CSUM | NETIF_F_GRO;
+-	if (priv->use_ncsi &&
+-	    of_get_property(pdev->dev.of_node, "no-hw-checksum", NULL))
++	if (of_get_property(pdev->dev.of_node, "no-hw-checksum", NULL))
+ 		netdev->features &= ~NETIF_F_IP_CSUM;
+ 
+ 
+-- 
+1.9.1
+
