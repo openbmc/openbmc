@@ -1,0 +1,57 @@
+From a475943a2c39830f321b4f7f0b9e6054263a58d5 Mon Sep 17 00:00:00 2001
+From: Lei YU <mine260309@gmail.com>
+Date: Fri, 14 Apr 2017 16:05:57 +0800
+Subject: [PATCH 4/4] ARM: dts: aspeed: garrison: Direct use PHY instead of
+ NCSI
+
+Garrison BMC's network does not use NCSI, it directly connects to PHY
+
+Signed-off-by: Lei YU <mine260309@gmail.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-garrison.dts | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-garrison.dts b/arch/arm/boot/dts/aspeed-bmc-opp-garrison.dts
+index 3921bb3..bd00f20 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-garrison.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-garrison.dts
+@@ -1,7 +1,8 @@
+ /dts-v1/;
+ 
+ #include "aspeed-g4.dtsi"
+-#include <dt-bindings/gpio/gpio.h>
++
++#include <dt-bindings/gpio/aspeed-gpio.h>
+ 
+ / {
+ 	model = "Garrison BMC";
+@@ -60,20 +61,21 @@
+ 				label = "pnor";
+ 			};
+ 		};
+-
+ 	};
+ };
+ 
+-&uart5 {
++&mac0 {
+ 	status = "okay";
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rgmii1_default &pinctrl_mdio1_default>;
+ };
+ 
+-&mac0 {
++&uart5 {
+ 	status = "okay";
+-
+-	use-ncsi;
+ };
+ 
++
+ &i2c4 {
+ 	status = "okay";
+ 
+-- 
+1.9.1
+

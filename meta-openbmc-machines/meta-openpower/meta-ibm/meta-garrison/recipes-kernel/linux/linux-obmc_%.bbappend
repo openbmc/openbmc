@@ -1,2 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-obmc:"
 SRC_URI += "file://garrison.cfg"
+SRC_URI += "file://0001-phy-broadcom-Add-support-for-the-BCM54210E.patch"
+SRC_URI += "file://0002-net-phy-Expose-100base-T-capability-only.patch"
+SRC_URI += "file://0003-Allow-no-hw-checksum-override-in-devicetree-outside-.patch"
+SRC_URI += "file://0004-ARM-dts-aspeed-garrison-Direct-use-PHY-instead-of-NC.patch"
