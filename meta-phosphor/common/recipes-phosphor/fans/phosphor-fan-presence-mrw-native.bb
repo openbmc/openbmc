@@ -3,7 +3,7 @@ PR = "r1"
 
 inherit native
 inherit obmc-phosphor-license
-inherit phosphor-fan-presence
+inherit phosphor-fan
 
 DEPENDS += " \
            mrw-native \
