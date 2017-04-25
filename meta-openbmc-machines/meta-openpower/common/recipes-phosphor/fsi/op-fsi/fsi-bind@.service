@@ -8,9 +8,10 @@ Wants=fsi-scan@%i.service
 Before=fsi-scan@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 ConditionDirectoryNotEmpty=!/sys/bus/platform/drivers/fsi-master-gpio/fsi-master
+ConditionDirectoryNotEmpty=!/sys/bus/platform/drivers/fsi-master-gpio/gpio-fsi
 
 [Service]
-ExecStart=/bin/sh -c "echo fsi-master > /sys/bus/platform/drivers/fsi-master-gpio/bind"
+ExecStart=/bin/sh -c "echo fsi-master > /sys/bus/platform/drivers/fsi-master-gpio/bind || echo gpio-fsi > /sys/bus/platform/drivers/fsi-master-gpio/bind"
 Type=oneshot
 RemainAfterExit=yes
 
