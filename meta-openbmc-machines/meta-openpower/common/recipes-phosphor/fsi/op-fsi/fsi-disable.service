@@ -4,6 +4,6 @@ Conflicts=fsi-enable.service
 
 [Service]
 ExecStart=/usr/sbin/openpower-proc-control setSyncFSIClock
-ExecStart=/bin/sh -c "echo fsi-master > /sys/bus/platform/drivers/fsi-master-gpio/unbind"
+ExecStart=/bin/sh -c "echo fsi-master > /sys/bus/platform/drivers/fsi-master-gpio/unbind || echo gpio-fsi > /sys/bus/platform/drivers/fsi-master-gpio/unbind"
 Type=oneshot
 RemainAfterExit=yes
