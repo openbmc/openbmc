@@ -34,6 +34,6 @@ FILES_${PN}-version = "${sbindir}/phosphor-version-software-manager"
 DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.BMC.Version.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
-SRCREV = "9e408ea12d892a73d133815d4bbd486f8b593f40"
+SRCREV = "392f294d5cb4a0ba65d81669e8d9be66841c7297"
 
 S = "${WORKDIR}/git"
