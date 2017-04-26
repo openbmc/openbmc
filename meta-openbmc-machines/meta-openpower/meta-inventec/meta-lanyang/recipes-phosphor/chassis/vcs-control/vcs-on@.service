@@ -1,0 +1,15 @@
+[Unit]
+Description=Turn VCS rails on
+Wants=vcs_workaround@%i.service
+After=vcs_workaround@%i.service
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
+Conflicts=obmc-host-stop@%i.target
+
+[Service]
+ExecStart={bindir}/lanyang_vcs.sh on
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=obmc-chassis-poweron@%i.target
