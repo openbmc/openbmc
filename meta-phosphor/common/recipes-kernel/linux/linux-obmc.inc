@@ -9,6 +9,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI += "file://v3-0001-drivers-fsi-Increase-delay-before-sampling-input-.patch"
+SRC_URI += "file://v2-0001-drivers-fsi-Add-FSI-SBEFIFO-driver.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
