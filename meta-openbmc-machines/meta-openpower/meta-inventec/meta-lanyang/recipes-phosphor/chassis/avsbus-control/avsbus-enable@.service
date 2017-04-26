@@ -1,0 +1,13 @@
+[Unit]
+Description=Enable AVSBus on VRMs
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
+Conflicts=obmc-chassis-stop@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=obmc-power-chassis-on@%i.target
