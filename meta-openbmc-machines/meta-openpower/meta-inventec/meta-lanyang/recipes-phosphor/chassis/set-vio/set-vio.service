@@ -1,0 +1,9 @@
+[Unit]
+Description=Set VIO rail voltages
+Before={SYSTEMD_DEFAULT_TARGET}
+
+[Service]
+Type=oneshot
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

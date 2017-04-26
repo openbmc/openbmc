@@ -1,0 +1,13 @@
+[Unit]
+Description=Disable AVSBus on VRMs
+Wants=obmc-power-stop-pre@%i.target
+Before=obmc-power-stop-pre@%i.target
+Conflicts=obmc-chassis-start@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-stop@%i.target
