@@ -1,0 +1,9 @@
+[Unit]
+Description=Open power debug data collector
+
+[Service]
+ExecStart={sbindir}/checkstop_app
+Type=oneshot
+Restart=no
+
+WantedBy=obmc-host-termination@%i.target
