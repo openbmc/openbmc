@@ -1,0 +1,10 @@
+[Unit]
+Description=Open power debug data collector 
+
+[Service]
+ExecStart={sbindir}/checkstop_app
+Type=oneshot
+Restart=no
+
+[install]
+WantedBy=obmc-gpio-assert.@0.target
