@@ -19,3 +19,5 @@ RDEPENDS_${PN}-inventory += "obmc-mgr-inventory"
 # the new, officially spec'ed xyz.openbmc_project.SensorValue
 # providers (VIRTUAL-RUNTIME_obmc-sensor-hwmon).
 RDEPENDS_${PN}-sensors += "obmc-hwmon obmc-mgr-sensor"
+
+RDEPENDS_${PN}-debug-collector += "openpower-debug-collector"
