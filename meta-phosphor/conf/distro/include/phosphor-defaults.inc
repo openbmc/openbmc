@@ -58,7 +58,12 @@ VIRTUAL-RUNTIME_obmc-inventory-manager ?= "phosphor-inventory-manager"
 # obmc-led-manager
 #
 # Provides an implementation of the xyz.openbmc_project.ledmanager interface.
-VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager"
+VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager-ledmanager"
+
+# obmc-led-manage-obmc-led-monitor
+#
+# Provides an implementation of the FRU fault monitor.
+VIRTUAL-RUNTIME_obmc-led-monitor ?= "phosphor-led-manager-faultmonitor"
 
 # obmc-led-sysfs
 #
