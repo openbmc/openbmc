@@ -55,10 +55,10 @@ VIRTUAL-RUNTIME_obmc-fan-control ?= "phosphor-fan-control"
 # interface.
 VIRTUAL-RUNTIME_obmc-inventory-manager ?= "phosphor-inventory-manager"
 
-# obmc-led-manager
+# obmc-led-manage-ledmanagerr
 #
 # Provides an implementation of the xyz.openbmc_project.ledmanager interface.
-VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager"
+VIRTUAL-RUNTIME_obmc-leds-manager-ledmanager ?= "phosphor-led-manager-ledmanager"
 
 # obmc-led-sysfs
 #
