@@ -18,7 +18,7 @@ RDEPENDS_${PN} += "phosphor-logging"
 S = "${WORKDIR}/git"
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.LED.GroupManager.service"
-SYSTEMD_SERVICE_${PN} += "obmc-led-group-start@.service obmc-led-group-stop@.service"
+SYSTEMD_SERVICE_${PN} += "obmc-led-group-start@.service obmc-led-group-stop@.service obmc-fru-fault-monitor.service"
 
 SYSTEMD_LINK_${PN} += "../obmc-led-group-start@.service:${SYSTEMD_DEFAULT_TARGET}.wants/obmc-led-group-start@bmc_booted.service"
 

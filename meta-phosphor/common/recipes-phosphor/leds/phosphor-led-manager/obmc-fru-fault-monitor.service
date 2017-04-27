@@ -1,0 +1,10 @@
+[Unit]
+Description=FRU Fault monitor service
+
+[Service]
+Restart=yes
+ExecStart={sbindir}/phosphor-fru-fault-monitor
+Type=oneshot
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
