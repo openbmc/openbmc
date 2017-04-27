@@ -11,6 +11,7 @@ PACKAGES = " \
         ${PN}-chassis-state-mgmt \
         ${PN}-extras \
         ${PN}-extrasdev \
+        ${PN}-fan-control \
         ${PN}-host-state-mgmt \
         ${PN}-inventory \
         ${PN}-leds \
@@ -38,9 +39,18 @@ RDEPENDS_${PN}-extrasdev = " \
         rest-dbus \
         "
 
+# Use the fan control package group for applications
+# implementing fan control or system fan policy only.
+# Applications that create inventory or sensors should
+# be added those respective package groups instead.
+SUMMARY_${PN}-fan-control = "Fan control"
+RDEPENDS_${PN}-fan-control = " \
+        "
+
 SUMMARY_${PN}-host-state-mgmt = "Host state management"
 RDEPENDS_${PN}-host-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-host-state-manager} \
+        ${VIRTUAL-RUNTIME_obmc-discover-system-state} \
         "
 
 SUMMARY_${PN}-inventory = "Inventory applications"
@@ -52,7 +62,7 @@ RDEPENDS_${PN}-inventory = " \
 
 SUMMARY_${PN}-leds = "LED applications"
 RDEPENDS_${PN}-leds = " \
-        ${VIRTUAL-RUNTIME_obmc-leds-manager} \
+        ${VIRTUAL-RUNTIME_obmc-leds-manager-ledmanager} \
         ${VIRTUAL-RUNTIME_obmc-leds-sysfs} \
         "
 
@@ -64,4 +74,5 @@ RDEPENDS_${PN}-sensors = " \
 SUMMARY_${PN}-software = "Software applications"
 RDEPENDS_${PN}-software = " \
         ${VIRTUAL-RUNTIME_obmc-bmc-code-mgr} \
+        ${VIRTUAL-RUNTIME_obmc-bmc-download-mgr} \
         "

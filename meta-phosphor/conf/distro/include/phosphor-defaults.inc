@@ -32,10 +32,22 @@ VIRTUAL-RUNTIME_obmc-chassis-state-manager ?= "phosphor-state-manager-chassis"
 # interface.
 VIRTUAL-RUNTIME_obmc-host-state-manager ?= "phosphor-state-manager-host"
 
+# obmc-discover-system-state
+#
+# Provides an implementation of phosphor-discover-system-state, which, if the
+# host is powered off, will check the current power policy and, if necessary,
+# power the host back on.
+VIRTUAL-RUNTIME_obmc-discover-system-state ?= "phosphor-state-manager-discover"
+
 # obmc-fan-presence
 #
 # Provides implementations of fan presence detection
 VIRTUAL-RUNTIME_obmc-fan-presence ?= "phosphor-fan-presence-tach"
+
+# obmc-fan-control
+#
+# Provides implementations of fan control
+VIRTUAL-RUNTIME_obmc-fan-control ?= "phosphor-fan-control"
 
 # obmc-inventory-manager
 #
@@ -43,10 +55,10 @@ VIRTUAL-RUNTIME_obmc-fan-presence ?= "phosphor-fan-presence-tach"
 # interface.
 VIRTUAL-RUNTIME_obmc-inventory-manager ?= "phosphor-inventory-manager"
 
-# obmc-led-manager
+# obmc-led-manage-ledmanagerr
 #
 # Provides an implementation of the xyz.openbmc_project.ledmanager interface.
-VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager"
+VIRTUAL-RUNTIME_obmc-leds-manager-ledmanager ?= "phosphor-led-manager-ledmanager"
 
 # obmc-led-sysfs
 #
@@ -60,8 +72,14 @@ VIRTUAL-RUNTIME_obmc-leds-sysfs ?= "phosphor-led-sysfs"
 # interface.
 VIRTUAL-RUNTIME_obmc-bmc-code-mgr ?= "phosphor-software-manager-version"
 
+# obmc-bmc-download-mgr
+#
+# Provides an implementation of the xyz.openbmc_project.Common.TFTP
+# interface.
+VIRTUAL-RUNTIME_obmc-bmc-download-mgr ?= "phosphor-software-manager-download-mgr"
+
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
-PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-net-ipmid"
+PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-ipmi-net"
 
 # obmc-sensors-hwmon
 #
@@ -133,6 +151,14 @@ PREFERRED_PROVIDER_virtual/phosphor-logging-callouts ?= \
 # the phosphor-fan-presence build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-fan-presence-mrw-native', 'phosphor-fan-presence-example-native')}"
+
+# The phosphor-fan-control application is data driven and requires a YAML
+# file to define the fans in the system.
+# This virtual is a native recipe that provides that definition by installing
+# the YAML file in the format and native sysroot location expected by
+# the phosphor-fan-control build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-fan-control-fan-config-mrw-native', 'phosphor-fan-control-fan-config-native')}"
 
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
