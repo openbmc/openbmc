@@ -71,6 +71,7 @@ SUMMARY_${PN}-leds = "LED applications"
 RDEPENDS_${PN}-leds = " \
         ${VIRTUAL-RUNTIME_obmc-leds-manager} \
         ${VIRTUAL-RUNTIME_obmc-leds-sysfs} \
+        ${VIRTUAL-RUNTIME_obmc-led-monitor} \
         "
 
 SUMMARY_${PN}-sensors = "Sensor applications"
