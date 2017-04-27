@@ -1,0 +1,11 @@
+[Unit]
+Description=FRU Fault monitor service
+Wants=mapper-wait@-xyz-openbmc_project-led-groups.service
+After=mapper-wait@-xyz-openbmc_project-led-groups.service
+
+[Service]
+Restart=always
+ExecStart={sbindir}/phosphor-fru-fault-monitor
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
