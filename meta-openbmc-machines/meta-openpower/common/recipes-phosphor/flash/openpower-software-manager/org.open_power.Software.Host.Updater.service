@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenPower Software Update Manager
+
+[Service]
+ExecStart={sbindir}/openpower-update-manager
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

@@ -7,11 +7,6 @@ PR = "r1"
 inherit skeleton-gdbus
 inherit obmc-phosphor-dbus-service
 
-RDEPENDS_${PN} += "mtd-utils-ubifs"
-
 SKELETON_DIR = "flashbios"
 DBUS_SERVICE_${PN} += "org.openbmc.control.Flash.service"
 SYSTEMD_SERVICE_${PN} += "obmc-flash-init.service"
-SYSTEMD_SERVICE_${PN} += "obmc-flash-bios-ubiattach.service"
-SYSTEMD_SERVICE_${PN} += "obmc-flash-bios-ubimount@.service"
-SYSTEMD_SERVICE_${PN} += "obmc-flash-bios-squashfsmount@.service"
