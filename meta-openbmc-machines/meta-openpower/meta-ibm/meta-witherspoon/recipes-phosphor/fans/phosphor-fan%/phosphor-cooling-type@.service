@@ -1,0 +1,12 @@
+[Unit]
+Description=Phosphor Cooling Type
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+ConditionPathExists={envfiledir}/phosphor-cooling-type-%i.conf
+
+[Service]
+EnvironmentFile={envfiledir}/phosphor-cooling-type-%i.conf
+ExecStart={sbindir}/phosphor-cooling-type ${{OBJPATH}} ${{AIR}} ${{WATER}} ${{DEVICE}} ${{CODE}}
+
+[Install]
+RequiredBy={SYSTEMD_DEFAULT_TARGET}
