@@ -1,0 +1,10 @@
+[Unit]
+Description=Phosphor Cooling Type
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+
+[Service]
+ExecStart={sbindir}/phosphor-cooling-type --air --dev=/dev/input/event0 --event=13
+
+[Install]
+RequiredBy=obmc-chassis-start@%i.target
