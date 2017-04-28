@@ -190,5 +190,12 @@ PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config ?= \
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-inventory-sel ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-inventory-sel-mrw-native', 'phosphor-ipmi-inventory-sel-native')}"
 
+# The phosphor-gpio-monitor application is data-driven and requires an input.
+# The application then watches the passed in input event entry for the
+# change in polarity for the value matching user input. Once the required
+# condition is met, it calls into a systemd target file if one is mentioned
+# in input.
+PREFERRED_PROVIDER_virtual/obmc-gpio-monitor ?= "phosphor-gpio-monitor"
+
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
