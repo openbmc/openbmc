@@ -1,0 +1,4 @@
+PATH=/dev/input/event0
+KEY=74
+POLARITY=1
+TARGET=obmc-host-crash@0.target
