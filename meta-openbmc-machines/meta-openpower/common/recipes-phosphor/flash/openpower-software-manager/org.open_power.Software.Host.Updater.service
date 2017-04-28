@@ -1,0 +1,12 @@
+[Unit]
+Description=OpenPower Software Update Manager
+Before=xyz.openbmc_project.Software.BMC.Version.service
+
+[Service]
+ExecStart={sbindir}/openpower-update-manager
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

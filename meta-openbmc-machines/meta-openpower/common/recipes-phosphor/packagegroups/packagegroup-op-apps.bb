@@ -47,11 +47,11 @@ RDEPENDS_${PN}-fans = " \
 
 SUMMARY_${PN}-flash = "OpenPOWER Flash"
 RDEPENDS_${PN}-flash = " \
-        obmc-flash-bios \
         obmc-flash-bmc \
         obmc-mgr-download \
         obmc-op-flasher \
         obmc-control-bmc \
+        openpower-software-manager \
         "
 
 SUMMARY_${PN}-system = "OpenPOWER System"
