@@ -121,6 +121,12 @@ PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
 VIRTUAL-RUNTIME_phosphor-hwmon-config ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-hwmon-config-mrw')}"
 
+
+# obmc-gpio-monitor
+#
+# Monitors user specified gpio device for assertions
+VIRTUAL-RUNTIME_obmc-gpio-monitor ?= "phosphor-gpio-monitor"
+
 # virtual/phosphor-ipmi-fru-hostfw-config
 #
 # The phosphor-ipmi-fru application is data-driven and requires an input
@@ -189,6 +195,9 @@ PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config ?= \
 # the phosphor-host-ipmid build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-inventory-sel ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-inventory-sel-mrw-native', 'phosphor-ipmi-inventory-sel-native')}"
+
+# Provides monitoring GPIO
+PREFERRED_PROVIDER_virtual/obmc-gpio-monitor ?= "phosphor-gpio-monitor"
 
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
