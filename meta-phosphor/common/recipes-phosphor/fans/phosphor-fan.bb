@@ -35,7 +35,7 @@ RDEPENDS_${PN}-staticdev = "${FAN_PACKAGES}"
 # ${PN}-presence-tach specific configuration
 PACKAGECONFIG[presence] = " \
         --enable-presence \
-	FAN_DETECT_YAML_FILE=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml, \
+        FAN_DETECT_YAML_FILE=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml, \
         --disable-presence, \
         virtual/phosphor-fan-presence-config \
         , \
@@ -62,3 +62,6 @@ FILES_${PN}-control = "${sbindir}/phosphor-fan-control"
 PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,libevdev,"
 RDEPENDS_phosphor-chassis-cooling-type += "libevdev"
 FILES_phosphor-chassis-cooling-type = "${sbindir}/phosphor-cooling-type"
+SYSTEMD_SERVICE_phosphor-chassis-cooling-type += "phosphor-cooling-type@.service"
+#SYSTEMD_LINK_phosphor-chassis-cooling-type += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
+

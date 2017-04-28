@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor Cooling Type
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+
+[Service]
+EnvironmentFile={envfiledir}/fans/phosphor-cooling-type/phosphor-cooling-type.conf
+ExecStart={sbindir}/phosphor-cooling-type $ARG1 $ARG2 $ARG3 $ARG4
+
+[Install]
+RequiredBy={SYSTEMD_DEFAULT_TARGET}
