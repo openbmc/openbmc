@@ -1,8 +1,9 @@
 [Unit]
-Description=GPIO asserted on %i
+Description=Host terminated on %i
 Wants=obmc-host-started@%i.target
 After=obmc-host-started@%i.target
-Conflicts=obmc-chassis-stop@%i.target
-Conflicts=obmc-stop-host@%i.target
+Conflicts=obmc-host-quiesce@%i.target
+Conflicts=obmc-host-shutdown@%i.target
+Conflicts=obmc-host-stop@%i.target
 RefuseManualStart=yes
 RefuseManualStop=yes
