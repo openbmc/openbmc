@@ -36,6 +36,9 @@ RDEPENDS_${PN}-chassis = " \
 #Pull in obmc-fsi on all P9 OpenPOWER systems
 RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'op-fsi', 'op-fsi')}"
 
+#Pull in p9-cfam-override on all P9 OpenPOWER systems
+RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'p9-cfam-override', 'p9-cfam-override')}"
+
 SUMMARY_${PN}-fans = "OpenPOWER Fans"
 RDEPENDS_${PN}-fans = " \
         obmc-hwmon \
