@@ -99,6 +99,12 @@ PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
 VIRTUAL-RUNTIME_phosphor-hwmon-config ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-hwmon-config-mrw')}"
 
+
+# obmc-gpio-monitor
+#
+# Monitors user specified gpio device for assertions
+VIRTUAL-RUNTIME_obmc-gpio-monitor ?= "phosphor-gpio-monitor"
+
 # virtual/phosphor-ipmi-fru-hostfw-config
 #
 # The phosphor-ipmi-fru application is data-driven and requires an input

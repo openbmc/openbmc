@@ -20,6 +20,7 @@
 # - obmc-software                     - OpenBMC software management
 # - obmc-system-mgmt                  - OpenBMC system management
 # - obmc-user-mgmt                    - OpenBMC user management
+# - obmc-gpio-mon                     - OpenBMC GPIO monitor
 
 inherit core-image
 inherit obmc-phosphor-license
@@ -48,6 +49,7 @@ FEATURE_PACKAGES_obmc-settings-mgmt ?= "${@df_enabled(d, 'obmc-settings-mgmt', '
 FEATURE_PACKAGES_obmc-software ?= "packagegroup-obmc-apps-software"
 FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt')}"
 FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt')}"
+FEATURE_PACKAGES_obmc-gpio-mon ?= "packagegroup-obmc-apps-gpio-mon"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -71,6 +73,7 @@ IMAGE_FEATURES += " \
         obmc-system-mgmt \
         obmc-user-mgmt \
         ssh-server-dropbear \
+        obmc-gpio-mon \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
