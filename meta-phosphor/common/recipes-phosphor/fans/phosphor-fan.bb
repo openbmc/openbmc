@@ -26,7 +26,7 @@ FAN_PACKAGES = " \
         ${PN}-presence-tach \
         ${PN}-control \
         ${PN}-monitor \
-        phosphor-chassis-cooling-type \
+        phosphor-cooling-type \
 "
 PACKAGES_remove = "${PN}"
 PACKAGES += "${FAN_PACKAGES}"
@@ -68,9 +68,14 @@ SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_I
 SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHASSIS_INSTANCES')}"
 
 # --------------------------------------
-# phosphor-chassis-cooling-type specific configuration
-RDEPENDS_phosphor-chassis-cooling-type += "libevdev"
-FILES_phosphor-chassis-cooling-type = "${sbindir}/phosphor-cooling-type"
+# phosphor-cooling-type specific configuration
+RDEPENDS_phosphor-cooling-type += "libevdev"
+
+COOLING_TMPL = "phosphor-cooling-type@.service"
+COOLING_INSTFMT = "phosphor-cooling-type@{0}.service"
+
+FILES_phosphor-cooling-type = "${sbindir}/phosphor-cooling-type"
+SYSTEMD_SERVICE_phosphor-cooling-type += "${COOLING_TMPL}"
 
 # --------------------------------------
 # ${PN}-monitor specific configuration
