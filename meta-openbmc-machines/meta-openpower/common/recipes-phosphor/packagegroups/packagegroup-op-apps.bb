@@ -52,6 +52,7 @@ RDEPENDS_${PN}-flash = " \
         obmc-mgr-download \
         obmc-op-flasher \
         obmc-control-bmc \
+        openpower-software-manager \
         "
 
 SUMMARY_${PN}-system = "OpenPOWER System"
