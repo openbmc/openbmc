@@ -23,11 +23,10 @@ FAN_PACKAGES = " \
         ${PN}-presence-tach \
         ${PN}-control \
         ${PN}-monitor \
-        phosphor-chassis-cooling-type \
 "
-PACKAGES_remove = "${PN}"
+PACKAGES_remove = "${PN} cooling-type"
 PACKAGES += "${FAN_PACKAGES}"
-PACKAGECONFIG ??= "presence control cooling-type monitor"
+PACKAGECONFIG ??= "presence control monitor"
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
 RDEPENDS_${PN}-dev = "${FAN_PACKAGES}"
 RDEPENDS_${PN}-staticdev = "${FAN_PACKAGES}"
@@ -36,7 +35,7 @@ RDEPENDS_${PN}-staticdev = "${FAN_PACKAGES}"
 # ${PN}-presence-tach specific configuration
 PACKAGECONFIG[presence] = " \
         --enable-presence \
-	FAN_DETECT_YAML_FILE=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml, \
+        FAN_DETECT_YAML_FILE=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml, \
         --disable-presence, \
         virtual/phosphor-fan-presence-config \
         , \
@@ -76,12 +75,6 @@ SYSTEMD_SERVICE_${PN}-control += "${TMPL_CONTROL}"
 SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_INSTANCES')}"
 
 # --------------------------------------
-# phosphor-chassis-cooling-type specific configuration
-PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,libevdev,"
-RDEPENDS_phosphor-chassis-cooling-type += "libevdev"
-FILES_phosphor-chassis-cooling-type = "${sbindir}/phosphor-cooling-type"
-
-# --------------------------------------
 # ${PN}-monitor specific configuration
 PACKAGECONFIG[monitor] = "--enable-monitor \
      FAN_MONITOR_YAML_FILE=${STAGING_DIR_NATIVE}${monitor_datadir}/monitor.yaml \
@@ -100,3 +93,8 @@ FMT_MONITOR = "../${TMPL_MONITOR}:${TGTFMT}.requires/${INSTFMT_MONITOR}"
 FILES_${PN}-monitor = "${sbindir}/phosphor-fan-monitor"
 SYSTEMD_SERVICE_${PN}-monitor += "${TMPL_MONITOR}"
 SYSTEMD_LINK_${PN}-monitor += "${@compose_list(d, 'FMT_MONITOR', 'OBMC_CHASSIS_INSTANCES')}"
+
+# --------------------------------------
+# phosphor-cooling-type specific configuration
+PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,libevdev,"
+
