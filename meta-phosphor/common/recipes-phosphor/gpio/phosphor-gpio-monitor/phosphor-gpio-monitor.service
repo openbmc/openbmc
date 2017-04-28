@@ -1,0 +1,7 @@
+[Unit]
+Description=Phosphor GPIO monitor
+
+[Service]
+Restart=no
+ExecStart={sbindir}/phosphor-gpio-monitor
+Type=oneshot

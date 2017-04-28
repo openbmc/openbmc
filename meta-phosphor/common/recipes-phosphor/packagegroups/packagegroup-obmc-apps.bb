@@ -16,6 +16,7 @@ PACKAGES = " \
         ${PN}-leds \
         ${PN}-sensors \
         ${PN}-software \
+        ${PN}-gpio-mon \
         "
 
 SUMMARY_${PN}-bmc-state-mgmt = "BMC state management"
@@ -64,4 +65,9 @@ RDEPENDS_${PN}-sensors = " \
 SUMMARY_${PN}-software = "Software applications"
 RDEPENDS_${PN}-software = " \
         ${VIRTUAL-RUNTIME_obmc-bmc-code-mgr} \
+        "
+
+SUMMARY_${PN}-gpio-mon = "GPIO monitor application"
+RDEPENDS_${PN}-gpio-mon = " \
+        ${VIRTUAL-RUNTIME_obmc-gpio-monitor} \
         "
