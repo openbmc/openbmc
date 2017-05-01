@@ -11,6 +11,7 @@ PACKAGES = " \
         ${PN}-chassis-state-mgmt \
         ${PN}-extras \
         ${PN}-extrasdev \
+        ${PN}-fan-control \
         ${PN}-host-state-mgmt \
         ${PN}-inventory \
         ${PN}-leds \
@@ -36,6 +37,14 @@ RDEPENDS_${PN}-extras = " \
 SUMMARY_${PN}-extrasdev = "Development features"
 RDEPENDS_${PN}-extrasdev = " \
         rest-dbus \
+        "
+
+# Use the fan control package group for applications
+# implementing fan control or system fan policy only.
+# Applications that create inventory or sensors should
+# be added to those respective package groups instead.
+SUMMARY_${PN}-fan-control = "Fan control"
+RDEPENDS_${PN}-fan-control = " \
         "
 
 SUMMARY_${PN}-host-state-mgmt = "Host state management"
