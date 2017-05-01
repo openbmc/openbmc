@@ -7,7 +7,7 @@ After=obmc-read-eeprom@%i.service
 Restart=no
 Type=oneshot
 EnvironmentFile={envfiledir}/obmc/sync_inventory_item/%I
-ExecStart=/usr/bin/env sync_inventory_items.py -t $FRU_TYPE -n $FRU_NAME -p ${{PROPERTY}} -s $SYNC_TYPE
+ExecStart=/usr/bin/env sync_inventory_items.py -p ${{PROPERTY}} -s $SYNC_TYPE
 SyslogIdentifier=sync_inventory_items.py
 
 [Install]

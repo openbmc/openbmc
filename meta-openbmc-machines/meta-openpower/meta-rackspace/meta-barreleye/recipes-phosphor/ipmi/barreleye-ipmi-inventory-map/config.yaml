@@ -1055,10 +1055,16 @@
             BuildDate:
                IPMIFruSection: Board
                IPMIFruProperty: Mfg Date
+    /system/chassis/io_board/bmc/ethernet:
         xyz.openbmc_project.Inventory.Item.NetworkInterface:
             MACAddress:
                IPMIFruSection: Board
                IPMIFruProperty: Custom Field 2
+        xyz.openbmc_project.Inventory.Item:
+            PrettyName:
+               IPMIFruSection: Board
+               IPMIFruProperty: Name
+
 
 101:
     /system/chassis/sas_expander:
