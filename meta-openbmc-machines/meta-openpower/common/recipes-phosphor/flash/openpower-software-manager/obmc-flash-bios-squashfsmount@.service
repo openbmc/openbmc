@@ -5,7 +5,7 @@ After=obmc-flash-bios-ubiattach.service
 
 [Service]
 Type=oneshot
-RemainAfterExit=yes
+RemainAfterExit=no
 ExecStart=/bin/sh -c '{sbindir}/ubimkvol /dev/ubi0 -N pnor-ro-%i -s 32MiB --type=static; \
                       mkdir /media/pnor-ro-%i; \
                       volumeid%i=`ubinfo -d 0 -N pnor-ro-%i | grep "Volume ID" | sed -e "s|Volume ID:||" -e "s/^ *//" | grep -o "^\S*"`; \
