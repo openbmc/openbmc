@@ -1,4 +1,4 @@
 FRU_TYPE=MAIN_PLANAR
 FRU_NAME=motherboard
-PROPERTY="Custom Field 1"
+PROPERTY="uuid"
 SYNC_TYPE=uuid
