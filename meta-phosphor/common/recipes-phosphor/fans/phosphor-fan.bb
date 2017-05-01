@@ -22,11 +22,12 @@ DEPENDS += "phosphor-logging"
 FAN_PACKAGES = " \
         ${PN}-presence-tach \
         ${PN}-control \
+        ${PN}-monitor \
         phosphor-chassis-cooling-type \
 "
 PACKAGES_remove = "${PN}"
 PACKAGES += "${FAN_PACKAGES}"
-PACKAGECONFIG ??= "presence control cooling-type"
+PACKAGECONFIG ??= "presence control cooling-type monitor"
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
 RDEPENDS_${PN}-dev = "${FAN_PACKAGES}"
 RDEPENDS_${PN}-staticdev = "${FAN_PACKAGES}"
@@ -79,3 +80,23 @@ SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_I
 PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,libevdev,"
 RDEPENDS_phosphor-chassis-cooling-type += "libevdev"
 FILES_phosphor-chassis-cooling-type = "${sbindir}/phosphor-cooling-type"
+
+# --------------------------------------
+# ${PN}-monitor specific configuration
+PACKAGECONFIG[monitor] = "--enable-monitor \
+     FAN_MONITOR_YAML_FILE=${STAGING_DIR_NATIVE}${monitor_datadir}/monitor.yaml \
+     FAN_MONITOR_OUTPUT_DIR=${S}/monitor, \
+    --disable-monitor, \
+    phosphor-fan-monitor-config-native \
+    , \
+"
+
+RDEPENDS_${PN}-monitor += "sdbusplus"
+
+TMPL_MONITOR = "phosphor-fan-monitor@.service"
+INSTFMT_MONITOR = "phosphor-fan-monitor@{0}.service"
+FMT_MONITOR = "../${TMPL_MONITOR}:${TGTFMT}.requires/${INSTFMT_MONITOR}"
+
+FILES_${PN}-monitor = "${sbindir}/phosphor-fan-monitor"
+SYSTEMD_SERVICE_${PN}-monitor += "${TMPL_MONITOR}"
+SYSTEMD_LINK_${PN}-monitor += "${@compose_list(d, 'FMT_MONITOR', 'OBMC_CHASSIS_INSTANCES')}"
