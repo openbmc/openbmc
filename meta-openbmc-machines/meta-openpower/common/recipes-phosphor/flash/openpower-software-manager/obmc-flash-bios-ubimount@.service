@@ -1,11 +1,22 @@
 [Unit]
-Description=Mount UBIFS volume pnor-rw-%I
+Description=Mount UBIFS volume pnor-rw-%I and pnor-prsv
 Requires=obmc-flash-bios-ubiattach.service
 After=obmc-flash-bios-ubiattach.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/sh -c '{sbindir}/ubimkvol /dev/ubi0 -N pnor-rw-%i -s 1MiB; \
-                      mkdir /media/pnor-rw-%i; \
-                      mount -t ubifs ubi0:pnor-rw-%i /media/pnor-rw-%i'
+ExecStart=/bin/sh -c 'if [ ! -d "/media/pnor-rw-%i" ]; then \
+                        mkdir /media/pnor-rw-%i; fi; \
+                      if [ ! -d "/media/pnor-prsv" ]; then \
+                        mkdir /media/pnor-prsv; fi; \
+                      volumeid%i=`ubinfo -d 0 -N pnor-ro-%i | grep "Volume ID"`; \
+                      if [ -z "${volumeid%i}" ]; then \
+                        {sbindir}/ubimkvol /dev/ubi0 -N pnor-rw-%i -s 1MiB; fi; \
+                      volumeid%i=`ubinfo -d 0 -N pnor-prsv | grep "Volume ID"`; \
+                      if [ -z "${volumeid%i}" ]; then \
+                        {sbindir}/ubimkvol /dev/ubi0 -N pnor-prsv -s 1MiB; fi; \
+                      if ! grep -q pnor-rw-%i /proc/mounts; then \
+                        mount -t ubifs ubi0:pnor-rw-%i /media/pnor-rw-%i; fi; \
+                      if ! grep -q pnor-prsv /proc/mounts; then \
+                        mount -t ubifs ubi0:pnor-prsv /media/pnor-prsv; fi;'
