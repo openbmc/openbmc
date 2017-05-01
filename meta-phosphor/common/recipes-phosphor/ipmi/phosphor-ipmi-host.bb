@@ -49,6 +49,7 @@ S = "${WORKDIR}/git"
 
 HOSTIPMI_PROVIDER_LIBRARY += "libapphandler.so"
 HOSTIPMI_PROVIDER_LIBRARY += "libsysintfcmds.so"
+HOSTIPMI_PROVIDER_LIBRARY += "libhostservice.so"
 
 NETIPMI_PROVIDER_LIBRARY += "libapphandler.so"
 
