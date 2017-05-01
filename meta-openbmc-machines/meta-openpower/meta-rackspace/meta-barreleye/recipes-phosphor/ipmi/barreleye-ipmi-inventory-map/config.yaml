@@ -71,11 +71,8 @@
       SerialNumber:
         IPMIFruProperty: Serial Number
         IPMIFruSection: Chassis
-      PartNumber:
-        IPMIFruProperty: Part Number
-        IPMIFruSection: Chassis
       Model:
-        IPMIFruProperty: Type
+        IPMIFruProperty: Part Number
         IPMIFruSection: Chassis
 4:
   /system/chassis/motherboard/membuf0:
@@ -1058,6 +1055,7 @@
             BuildDate:
                IPMIFruSection: Board
                IPMIFruProperty: Mfg Date
+    /system/chassis/io_board/bmc/ethernet:
         xyz.openbmc_project.Inventory.Item.NetworkInterface:
             MACAddress:
                IPMIFruSection: Board

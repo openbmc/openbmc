@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-NAMES = "io_board motherboard"
+NAMES = "io_board/bmc/ethernet motherboard"
 ITEMSFMT = "system/chassis/{0}"
 ITEMS_ESCAPEDFMT = "system-chassis-{0}"
 
