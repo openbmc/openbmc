@@ -2,6 +2,8 @@
 Description=Read %I EEPROM
 Wants=mapper-wait@-xyz-openbmc_project-inventory.service
 After=mapper-wait@-xyz-openbmc_project-inventory.service
+Wants=mapper-wait@-org-openbmc-inventory-%i.service
+After=mapper-wait@-org-openbmc-inventory-%i.service
 
 [Service]
 Restart=no
