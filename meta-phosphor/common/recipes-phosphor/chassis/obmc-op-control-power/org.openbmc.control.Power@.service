@@ -1,7 +1,5 @@
 [Unit]
 Description=Phosphor Power%i Control
-Wants=mapper-wait@-org-openbmc-managers-System.service
-After=mapper-wait@-org-openbmc-managers-System.service
 
 [Service]
 EnvironmentFile={envfiledir}/obmc/power_control
