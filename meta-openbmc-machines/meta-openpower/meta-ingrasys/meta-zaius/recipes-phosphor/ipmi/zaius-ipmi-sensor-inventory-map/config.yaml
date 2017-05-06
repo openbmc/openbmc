@@ -1,0 +1,168 @@
+0xA0:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout1
+  sensorReadingType: 0x01
+  multiplierM: 51
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xA1:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout2
+  sensorReadingType: 0x01
+  multiplierM: 21
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xA2:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout3
+  sensorReadingType: 0x01
+  multiplierM: 14
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xA3:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout4
+  sensorReadingType: 0x01
+  multiplierM: 9
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xA4:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout5
+  sensorReadingType: 0x01
+  multiplierM: 6
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xA5:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout6
+  sensorReadingType: 0x01
+  multiplierM: 5
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xA6:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout7
+  sensorReadingType: 0x01
+  multiplierM: 4
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xA7:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout8
+  sensorReadingType: 0x01
+  multiplierM: 4
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xA8:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout9
+  sensorReadingType: 0x01
+  multiplierM: 7
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xA9:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout10
+  sensorReadingType: 0x01
+  multiplierM: 5
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xAA:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout11
+  sensorReadingType: 0x01
+  multiplierM: 5
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xAB:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout12
+  sensorReadingType: 0x01
+  multiplierM: 5
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xAC:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/vout13
+  sensorReadingType: 0x01
+  multiplierM: 5
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
