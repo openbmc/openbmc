@@ -171,5 +171,13 @@ PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config ?= \
 PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-fan-control-fan-config-mrw-native', 'phosphor-fan-control-fan-config-native')}"
 
+# The phosphor-host-ipmid application is data-driven and requires an input
+# mapping of inventory object path to the sensor number and sensor metadata.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the phosphor-host-ipmid build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/phosphor-ipmi-inventory-sel ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-inventory-sel-mrw-native', 'phosphor-ipmi-inventory-sel-native')}"
+
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
