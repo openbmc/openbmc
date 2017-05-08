@@ -12,6 +12,7 @@ STATE_MGR_PACKAGES = " \
     ${PN}-chassis \
     ${PN}-bmc \
     ${PN}-discover \
+    ${PN}-check \
 "
 PACKAGES =+ "${STATE_MGR_PACKAGES}"
 PACKAGES_remove = "${PN}"
@@ -35,6 +36,7 @@ RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-bmc += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-discover += "libsystemd phosphor-dbus-interfaces"
+RDEPENDS_${PN}-check += "libsystemd phosphor-dbus-interfaces"
 
 FILES_${PN}-host = "${sbindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
@@ -47,6 +49,8 @@ DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 
 FILES_${PN}-discover = "${sbindir}/phosphor-discover-system-state"
 SYSTEMD_SERVICE_${PN}-discover += "phosphor-discover-system-state@.service"
+
+FILES_${PN}-check = "${sbindir}/phosphor-host-check"
 
 TMPL = "phosphor-discover-system-state@.service"
 INSTFMT = "phosphor-discover-system-state@{0}.service"

@@ -17,6 +17,7 @@ PACKAGES = " \
         ${PN}-leds \
         ${PN}-sensors \
         ${PN}-software \
+        ${PN}-host-check \
         "
 
 SUMMARY_${PN}-bmc-state-mgmt = "BMC state management"
@@ -27,6 +28,11 @@ RDEPENDS_${PN}-bmc-state-mgmt = " \
 SUMMARY_${PN}-chassis-state-mgmt = "Chassis state management"
 RDEPENDS_${PN}-chassis-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-chassis-state-manager} \
+        "
+
+SUMMARY_${PN}-host-check = "Host state check on bmc reset"
+RDEPENDS_${PN}-host-check = " \
+        ${VIRTUAL-RUNTIME_obmc-host-check} \
         "
 
 SUMMARY_${PN}-extras = "Extra features"
