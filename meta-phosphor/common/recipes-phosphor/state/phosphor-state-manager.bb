@@ -12,6 +12,7 @@ STATE_MGR_PACKAGES = " \
     ${PN}-chassis \
     ${PN}-bmc \
     ${PN}-discover \
+    ${PN}-host-check \
 "
 PACKAGES =+ "${STATE_MGR_PACKAGES}"
 PACKAGES_remove = "${PN}"
@@ -35,6 +36,7 @@ RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-bmc += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-discover += "libsystemd phosphor-dbus-interfaces"
+RDEPENDS_${PN}-host-check += "libsystemd phosphor-dbus-interfaces"
 
 FILES_${PN}-host = "${sbindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
@@ -48,12 +50,36 @@ DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 FILES_${PN}-discover = "${sbindir}/phosphor-discover-system-state"
 SYSTEMD_SERVICE_${PN}-discover += "phosphor-discover-system-state@.service"
 
+FILES_${PN}-host-check = "${sbindir}/phosphor-host-check"
+DBUS_SERVICE_${PN}-host-check += "phosphor-reset-host-check@.service"
+DBUS_SERVICE_${PN}-host-check += "phosphor-reset-host-running@.service"
+
+RESET_CHECK_TMPL = "phosphor-reset-host-check@.service"
+RESET_CHECK_TGTFMT = "obmc-host-reset@{1}.target"
+RESET_CHECK_INSTFMT = "phosphor-reset-host-check@{0}.service"
+RESET_CHECK_FMT = "../${RESET_CHECK_TMPL}:${RESET_CHECK_TGTFMT}.requires/${RESET_CHECK_INSTFMT}"
+
+RESET_RUNNING_TMPL = "phosphor-reset-host-running@.service"
+RESET_RUNNING_TGTFMT = "obmc-host-reset@{1}.target"
+RESET_RUNNING_INSTFMT = "phosphor-reset-host-running@{0}.service"
+RESET_RUNNING_FMT = "../${RESET_RUNNING_TMPL}:${RESET_RUNNING_TGTFMT}.requires/${RESET_RUNNING_INSTFMT}"
+
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_CHECK_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_RUNNING_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
+
+# Force the standby target to run the host reset check target
+RESET_TMPL_CTRL = "obmc-host-reset@.target"
+SYSD_TGT = "${SYSTEMD_DEFAULT_TARGET}"
+RESET_INSTFMT_CTRL = "obmc-host-reset@{0}.target"
+RESET_FMT_CTRL = "../${RESET_TMPL_CTRL}:${SYSD_TGT}.wants/${RESET_INSTFMT_CTRL}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_FMT_CTRL', 'OBMC_HOST_INSTANCES')}"
+
 TMPL = "phosphor-discover-system-state@.service"
 INSTFMT = "phosphor-discover-system-state@{0}.service"
 FMT = "../${TMPL}:${SYSTEMD_DEFAULT_TARGET}.wants/${INSTFMT}"
 SYSTEMD_LINK_${PN}-discover += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "cc3fb5d9a720a9a5b2102683da716004cd938e39"
+SRCREV = "d5ac63507a47010f51ce857bd680c2f655380841"
 
 S = "${WORKDIR}/git"
