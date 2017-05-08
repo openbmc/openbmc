@@ -18,6 +18,7 @@ PACKAGES = " \
         ${PN}-sensors \
         ${PN}-software \
         ${PN}-host-check-mgmt \
+        ${PN}-debug-collector \
         "
 
 SUMMARY_${PN}-bmc-state-mgmt = "BMC state management"
@@ -82,3 +83,6 @@ RDEPENDS_${PN}-software = " \
         ${VIRTUAL-RUNTIME_obmc-bmc-code-mgr} \
         ${VIRTUAL-RUNTIME_obmc-bmc-download-mgr} \
         "
+SUMMARY_${PN}-debug-collector = "BMC debug collector"
+RDEPENDS_${PN}-debug-collector = " \
+        ${VIRTUAL-RUNTIME_obmc-debug-collector} \
