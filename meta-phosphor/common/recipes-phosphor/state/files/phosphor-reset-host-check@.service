@@ -1,8 +1,7 @@
 [Unit]
 Description=Check Host%i status on BMC reset
-# TODO: openbmc/openbmc#1274
-#Wants=mapper-wait@-xyz-openbmc_project-control-host%i.service
-#After=mapper-wait@-xyz-openbmc_project-control-host%i.service
+Wants=mapper-wait@-xyz-openbmc_project-control-host%i.service
+After=mapper-wait@-xyz-openbmc_project-control-host%i.service
 Wants=obmc-host-reset-running@%i.target
 Before=obmc-host-reset-running@%i.target
 Wants=op-reset-chassis-on@%i.service
@@ -13,7 +12,7 @@ ConditionPathExists=/run/openbmc/chassis@%i-on
 [Service]
 RemainAfterExit=yes
 Type=oneshot
-ExecStart=/bin/sh -c "echo TODO - Check Host Status on BMC Reset"
+ExecStart=/usr/sbin/phosphor-host-check
 
 
 [Install]
