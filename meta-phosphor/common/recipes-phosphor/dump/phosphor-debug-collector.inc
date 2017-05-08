@@ -1,0 +1,5 @@
+HOMEPAGE = "https://github.com/openbmc/phosphor-debug-collector"
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
+SRC_URI += "git:///esw/san5/othayoth/obmc_dbus/phosphor-debug-collector"
+SRCREV = "6d1ffc1cdcc50c317a320404e72f2b32fab8a391"
