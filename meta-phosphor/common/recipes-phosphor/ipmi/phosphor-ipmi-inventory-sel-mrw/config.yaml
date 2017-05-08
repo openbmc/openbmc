@@ -1,0 +1,20 @@
+# Maps the Entity ID to the interested Sensor Type & Offset
+0x01:
+   SensorType: 0x12
+   Offset: 0x02
+
+0x03:
+   SensorType: 0x07
+   Offset: 0x08
+
+0x07:
+   SensorType: 0xC7
+   Offset: 0x00
+
+0x20:
+   SensorType: 0x0C
+   Offset: 0x04
+
+0xD0:
+   SensorType: 0x07
+   Offset: 0x08
