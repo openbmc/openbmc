@@ -22,3 +22,19 @@ EnclosureIdentify:
         DutyOn: 50
         Period: 1000
         priority: 'Blink'
+LampTest:
+    beep:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        priority: 'Blink'
+    heartbeat:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        priority: 'Blink'
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        priority: 'Blink'
