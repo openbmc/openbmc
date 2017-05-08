@@ -87,6 +87,10 @@ PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-ipmi-net"
 # for hwmon sensors.
 VIRTUAL-RUNTIME_obmc-sensors-hwmon ?= "phosphor-hwmon"
 
+# obmc-debug-collector
+# The phosphor-dump-manager application used for collecting and managing Dumps
+VIRTUAL-RUNTIME_obmc-debug-collector ?= "phosphor-dump-manager"
+
 PREFERRED_PROVIDER_virtual/obmc-settings-mgmt ?= "phosphor-settings"
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt ?= "obmc-phosphor-sysd"
 PREFERRED_PROVIDER_virtual/obmc-user-mgmt ?= "obmc-phosphor-user"
