@@ -14,7 +14,6 @@ FMT = "org.openbmc.control.Host@{0}.service"
 DBUS_SERVICE_${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_SERVICE_${PN} = " \
         op-start-host@.service \
-        op-reset-host-check@.service \
         op-reset-host-running@.service \
         "
 
@@ -23,18 +22,12 @@ START_TGTFMT = "obmc-host-start@{1}.target"
 START_INSTFMT = "obmc-start-host@{0}.service"
 START_FMT = "../${START_TMPL}:${START_TGTFMT}.requires/${START_INSTFMT}"
 
-RESET_CHECK_TMPL = "op-reset-host-check@.service"
-RESET_CHECK_TGTFMT = "obmc-host-reset@{1}.target"
-RESET_CHECK_INSTFMT = "op-reset-host-check@{0}.service"
-RESET_CHECK_FMT = "../${RESET_CHECK_TMPL}:${RESET_CHECK_TGTFMT}.requires/${RESET_CHECK_INSTFMT}"
-
 RESET_RUNNING_TMPL = "op-reset-host-running@.service"
 RESET_RUNNING_TGTFMT = "obmc-host-reset@{1}.target"
 RESET_RUNNING_INSTFMT = "op-reset-host-running@{0}.service"
 RESET_RUNNING_FMT = "../${RESET_RUNNING_TMPL}:${RESET_RUNNING_TGTFMT}.requires/${RESET_RUNNING_INSTFMT}"
 
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_CHECK_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_RUNNING_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
 # Force the standby target to run the host reset check target
