@@ -1,0 +1,109 @@
+0x56:
+  /system/chassis/motherboard:
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+      BuildDate:
+        IPMIFruProperty: Mfg Date
+        IPMIFruSection: Board
+      PartNumber:
+        IPMIFruProperty: Part Number
+        IPMIFruSection: Board
+      Manufacturer:
+        IPMIFruProperty: Manufacturer
+        IPMIFruSection: Board
+      SerialNumber:
+        IPMIFruProperty: Serial Number
+        IPMIFruSection: Board
+    xyz.openbmc_project.Inventory.Item:
+      PrettyName:
+        IPMIFruProperty: Name
+        IPMIFruSection: Board
+  /system:
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+      SerialNumber:
+        IPMIFruProperty: Serial Number
+        IPMIFruSection: Chassis
+      PartNumber:
+        IPMIFruProperty: Part Number
+        IPMIFruSection: Chassis
+      Model:
+        IPMIFruProperty: Type
+        IPMIFruSection: Chassis
+
+0x50:
+  /system/chassis/motherboard/bmc:
+    xyz.openbmc_project.Inventory.Item:
+      PrettyName:
+        IPMIFruProperty: Name
+        IPMIFruSection: Board
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+      BuildDate:
+        IPMIFruProperty: Mfg Date
+        IPMIFruSection: Board
+      PartNumber:
+        IPMIFruProperty: Part Number
+        IPMIFruSection: Board
+      Manufacturer:
+        IPMIFruProperty: Manufacturer
+        IPMIFruSection: Board
+      SerialNumber:
+        IPMIFruProperty: Serial Number
+        IPMIFruSection: Board
+    xyz.openbmc_project.Inventory.Decorator.Revision:
+      Version:
+        IPMIFruProperty: FRU File ID
+        IPMIFruSection: Board
+
+0x52:
+  /system/chassis/pdb:
+    xyz.openbmc_project.Inventory.Item:
+      PrettyName:
+        IPMIFruProperty: Name
+        IPMIFruSection: Board
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+      SerialNumber:
+        IPMIFruProperty: Serial Number
+        IPMIFruSection: Board
+      Manufacturer:
+        IPMIFruProperty: Manufacturer
+        IPMIFruSection: Board
+      PartNumber:
+        IPMIFruProperty: Part Number
+        IPMIFruSection: Board
+      BuildDate:
+        IPMIFruProperty: Mfg Date
+        IPMIFruSection: Board
+      Model:
+        IPMIFruProperty: Model Number
+        IPMIFruSection: Board
+    xyz.openbmc_project.Inventory.Decorator.Revision:
+      Version:
+        IPMIFruProperty: FRU File ID
+        IPMIFruSection: Board
+
+0x57:
+  /system/chassis/fp:
+    xyz.openbmc_project.Inventory.Item:
+      PrettyName:
+        IPMIFruProperty: Name
+        IPMIFruSection: Board
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+      SerialNumber:
+        IPMIFruProperty: Serial Number
+        IPMIFruSection: Board
+      Manufacturer:
+        IPMIFruProperty: Manufacturer
+        IPMIFruSection: Board
+      PartNumber:
+        IPMIFruProperty: Part Number
+        IPMIFruSection: Board
+      BuildDate:
+        IPMIFruProperty: Mfg Date
+        IPMIFruSection: Board
+      Model:
+        IPMIFruProperty: Model Number
+        IPMIFruSection: Board
+    xyz.openbmc_project.Inventory.Decorator.Revision:
+      Version:
+        IPMIFruProperty: FRU File ID
+        IPMIFruSection: Board
+
