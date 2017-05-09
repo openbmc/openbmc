@@ -1,0 +1,142 @@
+0xF0:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/temp2_inlet
+  sensorReadingType: 0x01
+  multiplierM: 511
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xF1:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/temp1
+  sensorReadingType: 0x01
+  multiplierM: 511
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xF2:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/temp3
+  sensorReadingType: 0x01
+  multiplierM: 511
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xB0:
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan1
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xB1:
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan2
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xB2:
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan3
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xB3:
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan4
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xB4:
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan5
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xB5:
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan6
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xB6:
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan7
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
+
+0xB7:
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan8
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        0x0:
+          type: int
