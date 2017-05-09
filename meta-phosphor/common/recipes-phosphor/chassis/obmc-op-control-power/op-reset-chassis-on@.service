@@ -11,4 +11,4 @@ ExecStart=/bin/systemctl start obmc-chassis-poweron@%i.target
 
 
 [Install]
-WantedBy=obmc-chassis-reset@%i.target
+WantedBy=obmc-chassis-powerreset@%i.target

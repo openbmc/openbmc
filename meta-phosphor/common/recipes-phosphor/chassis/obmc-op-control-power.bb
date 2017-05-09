@@ -43,7 +43,7 @@ OFF_INSTFMT = "op-wait-power-off@{0}.service"
 OFF_FMT = "../${OFF_TMPL}:${STOP_TGTFMT}.requires/${OFF_INSTFMT}"
 
 RESET_TMPL = "op-reset-pgood-check@.service"
-RESET_TGTFMT = "obmc-chassis-reset@{1}.target"
+RESET_TGTFMT = "obmc-chassis-powerreset@{1}.target"
 RESET_INSTFMT = "op-reset-pgood-check@{0}.service"
 RESET_FMT = "../${RESET_TMPL}:${RESET_TGTFMT}.requires/${RESET_INSTFMT}"
 
@@ -78,8 +78,8 @@ STOP_FMT_CTRL = "../${STOP_TMPL_CTRL}:${STOP_TGTFMT_CTRL}.requires/${STOP_INSTFM
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT_CTRL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 
 # Force the standby target to run the chassis reset check target
-RESET_TMPL_CTRL = "obmc-chassis-reset@.target"
+RESET_TMPL_CTRL = "obmc-chassis-powerreset@.target"
 SYSD_TGT = "${SYSTEMD_DEFAULT_TARGET}"
-RESET_INSTFMT_CTRL = "obmc-chassis-reset@{0}.target"
+RESET_INSTFMT_CTRL = "obmc-chassis-powerreset@{0}.target"
 RESET_FMT_CTRL = "../${RESET_TMPL_CTRL}:${SYSD_TGT}.wants/${RESET_INSTFMT_CTRL}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_FMT_CTRL', 'OBMC_CHASSIS_INSTANCES')}"

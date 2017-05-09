@@ -13,4 +13,4 @@ ExecStart=/bin/sh -c "busctl get-property `mapper get-service /org/openbmc/contr
 
 
 [Install]
-WantedBy=obmc-chassis-reset@%i.target
+WantedBy=obmc-chassis-powerreset@%i.target
