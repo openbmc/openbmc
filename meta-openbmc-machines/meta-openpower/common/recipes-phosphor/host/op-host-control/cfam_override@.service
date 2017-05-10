@@ -8,7 +8,7 @@ Wants=fsi-scan@%i.service
 After=fsi-scan@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
-ConditionFileExists=/var/lib/obmc/cfam_overrides
+ConditionPathExists=/var/lib/obmc/cfam_overrides
 
 [Service]
 ExecStart={sbindir}/openpower-proc-control CFAMOverride
