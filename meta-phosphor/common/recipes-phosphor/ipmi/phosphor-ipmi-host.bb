@@ -11,6 +11,7 @@ inherit obmc-phosphor-sdbus-service
 inherit obmc-phosphor-ipmiprovider-symlink
 inherit phosphor-ipmi-host
 inherit pythonnative
+inherit obmc-phosphor-systemd
 
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-mapper"
@@ -19,6 +20,7 @@ DEPENDS += "packagegroup-obmc-ipmid-providers"
 DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces"
+DEPENDS += "obmc-targets"
 
 RDEPENDS_${PN}-dev += "phosphor-logging"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
@@ -27,6 +29,7 @@ RDEPENDS_${PN} += "network"
 RDEPENDS_${PN} += "libmapper"
 RDEPENDS_${PN} += "phosphor-time-manager"
 RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
+RDEPENDS_${PN} += "obmc-targets"
 
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 
@@ -59,3 +62,10 @@ FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/
 
 # Soft Power Off
 RDEPENDS_${PN} += "phosphor-mapper"
+
+# install the soft power off service in the host shutdown target
+SOFT_TMPL = "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
+SOFT_TGTFMT = "obmc-host-shutdown@{0}.target"
+SOFT_INSTFMT = "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
+SOFT_FMT = "../${SOFT_TMPL}:${SOFT_TGTFMT}.requires/${SOFT_INSTFMT}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')}"
