@@ -45,7 +45,7 @@ RDEPENDS_${PN}-download-mgr += " \
 
 FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager"
 FILES_${PN}-download-mgr += "${sbindir}/phosphor-download-manager"
-DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.BMC.Version.service"
+DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.Version.service"
 DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
