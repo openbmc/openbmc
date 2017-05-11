@@ -1,0 +1,15 @@
+[Unit]
+Description=Init PNOR for Host%i
+After=obmc-power-on@%i.target
+Before=obmc-host-start-pre@%i.target
+Conflicts=obmc-host-stop@%i.target
+ConditionPathExists=!/run/openbmc/host@%i-on
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# TODO openbmc/openbmc#1598 - Delete this service once available
+ExecStart={sbindir}/pflash -i
+
+[Install]
+WantedBy=obmc-host-start@%i.target
