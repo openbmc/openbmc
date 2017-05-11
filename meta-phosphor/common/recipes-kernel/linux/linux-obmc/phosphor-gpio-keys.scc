@@ -1,2 +1,0 @@
-define KFEATURE_DESCRIPTION "Enable gpio-keys"
-kconf non-hardware phosphor-gpio-keys.cfg
