@@ -1,5 +1,6 @@
-SUMMARY = "Logging DBUS Object"
-DESCRIPTION = "Logging DBUS Object"
+SUMMARY = "Phosphor OpenBMC event and error logging"
+DESCRIPTION = "An error and event log daemon application, and \
+               supporting tools for OpenBMC."
 HOMEPAGE = "https://github.com/openbmc/phosphor-logging"
 PR = "r1"
 
