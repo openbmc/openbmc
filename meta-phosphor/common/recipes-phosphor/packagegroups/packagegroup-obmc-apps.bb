@@ -87,3 +87,4 @@ RDEPENDS_${PN}-software = " \
 SUMMARY_${PN}-debug-collector = "BMC debug collector"
 RDEPENDS_${PN}-debug-collector = " \
         ${VIRTUAL-RUNTIME_obmc-debug-collector} \
+        "
