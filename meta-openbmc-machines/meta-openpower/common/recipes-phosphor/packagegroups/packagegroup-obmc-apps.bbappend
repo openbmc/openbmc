@@ -6,13 +6,6 @@ RDEPENDS_${PN}-extrasdev += "obmc-pydevtools"
 # that use openfsi
 RDEPENDS_${PN}-extrasdev += "${@mf_enabled(d, 'p9-vcs-workaround', 'iicmaster')}"
 
-# Add the deprecated /org/openbmc inventory namespace providing
-# obmc-mgr-inventory application to the inventory packagegroup
-# until all applications have been updated to use the new,
-# officially spec'ed xyz.openbmc_project.Inventory.Manager
-# provider (VIRTUAL-RUNTIME_obmc-inventory-manager).
-RDEPENDS_${PN}-inventory += "obmc-mgr-inventory"
-
 # Add the deprecated /org/openbmc sensor namespace providing
 # obmc-hwmon and obmc-mgr-sensor applications to the sensor
 # packagegroup until all applications have been updated to use
