@@ -6,6 +6,7 @@ PR = "r1"
 inherit autotools \
         pkgconfig \
         obmc-phosphor-systemd \
+        pythonnative
 
 require ${PN}.inc
 
@@ -13,6 +14,7 @@ DEPENDS += " \
         phosphor-logging \
         autoconf-archive-native \
         "
+DEPENDS += "sdbus++-native"
 
 RDEPENDS_${PN} += " \
             phosphor-logging \
