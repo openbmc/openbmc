@@ -6,6 +6,7 @@ PR = "r1"
 inherit autotools \
         pkgconfig \
         obmc-phosphor-systemd \
+        pythonnative
 
 require ${PN}.inc
 
