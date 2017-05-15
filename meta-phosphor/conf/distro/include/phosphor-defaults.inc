@@ -80,7 +80,7 @@ VIRTUAL-RUNTIME_obmc-leds-sysfs ?= "phosphor-led-sysfs"
 
 # obmc-bmc-code-mgr
 #
-# Provides an implementation of the xyz.openbmc_project.Software.BMC.Version
+# Provides an implementation of the xyz.openbmc_project.Software.Version
 # interface.
 VIRTUAL-RUNTIME_obmc-bmc-code-mgr ?= "phosphor-software-manager-version"
 
@@ -89,6 +89,12 @@ VIRTUAL-RUNTIME_obmc-bmc-code-mgr ?= "phosphor-software-manager-version"
 # Provides an implementation of the xyz.openbmc_project.Common.TFTP
 # interface.
 VIRTUAL-RUNTIME_obmc-bmc-download-mgr ?= "phosphor-software-manager-download-mgr"
+
+# obmc-bmc-updater
+#
+# Provides an implementation of the xyz.openbmc_project.Software.Activation
+# interface.
+VIRTUAL-RUNTIME_obmc-bmc-updater ?= "phosphor-software-manager-updater"
 
 PREFERRED_PROVIDER_virtual/obmc-logging-mgmt ?= "phosphor-logging"
 PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-ipmi-net"
