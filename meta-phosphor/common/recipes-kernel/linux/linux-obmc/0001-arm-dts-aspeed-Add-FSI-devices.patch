@@ -1,0 +1,507 @@
+From e45cd4677a36eb759537f59c5f5bcf46b91728b3 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Mon, 15 May 2017 11:02:48 -0500
+Subject: [PATCH linux dev-4.10] arm: dts: aspeed: Add FSI devices
+
+using Jeremy's new bindings
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts    |  75 ++++++++++
+ arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts | 181 +++++++++++++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts       | 181 +++++++++++++++++++++++
+ 3 files changed, 437 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts b/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
+index b4faa1d..6f23ce3 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
+@@ -85,12 +85,87 @@
+ 
+ 	gpio-fsi {
+ 		compatible = "fsi-master-gpio", "fsi-master";
++		#address-cells = <2>;
++		#size-cells = <0>;
+ 
+ 		clock-gpios = <&gpio ASPEED_GPIO(A, 4) GPIO_ACTIVE_HIGH>;
+ 		data-gpios = <&gpio ASPEED_GPIO(A, 5) GPIO_ACTIVE_HIGH>;
+ 		mux-gpios = <&gpio ASPEED_GPIO(A, 6) GPIO_ACTIVE_HIGH>;
+ 		enable-gpios = <&gpio ASPEED_GPIO(D, 0) GPIO_ACTIVE_HIGH>;
+ 		trans-gpios = <&gpio ASPEED_GPIO(H, 6) GPIO_ACTIVE_HIGH>;
++
++		cfam@0,0 {
++			reg = <0 0>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			i2c-master@1800 {
++				compatible = "ibm,fsi-i2c-master";
++				reg = <0x1800 0x400>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				port@0 {
++					port = <0>;
++				};
++
++				port@1 {
++					port = <1>;
++				};
++
++				port@2 {
++					port = <2>;
++				};
++
++				port@3 {
++					port = <3>;
++				};
++
++				port@4 {
++					port = <4>;
++				};
++
++				port@5 {
++					port = <5>;
++				};
++
++				port@6 {
++					port = <6>;
++				};
++
++				port@7 {
++					port = <7>;
++				};
++
++				port@8 {
++					port = <8>;
++				};
++
++				port@9 {
++					port = <9>;
++				};
++
++				port@10 {
++					port = <10>;
++				};
++
++				port@11 {
++					port = <11>;
++				};
++
++				port@12 {
++					port = <12>;
++				};
++
++				port@13 {
++					port = <13>;
++				};
++
++				port@14 {
++					port = <14>;
++				};
++			};
++		};
+ 	};
+ };
+ 
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+index f20aaf4..5d83a76 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+@@ -65,6 +65,8 @@
+ 
+ 	gpio-fsi {
+ 		compatible = "fsi-master-gpio", "fsi-master";
++		#address-cells = <2>;
++		#size-cells = <0>;
+ 
+ 		status = "okay";
+ 
+@@ -73,6 +75,185 @@
+ 		mux-gpios = <&gpio ASPEED_GPIO(A, 6) GPIO_ACTIVE_HIGH>;
+ 		enable-gpios = <&gpio ASPEED_GPIO(D, 0) GPIO_ACTIVE_HIGH>;
+ 		trans-gpios = <&gpio ASPEED_GPIO(R, 2) GPIO_ACTIVE_HIGH>;
++
++		cfam@0,0 {
++			reg = <0 0>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			i2c-master@1800 {
++				compatible = "ibm,fsi-i2c-master";
++				reg = <0x1800 0x400>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				port@0 {
++					port = <0>;
++				};
++
++				port@1 {
++					port = <1>;
++				};
++
++				port@2 {
++					port = <2>;
++				};
++
++				port@3 {
++					port = <3>;
++				};
++
++				port@4 {
++					port = <4>;
++				};
++
++				port@5 {
++					port = <5>;
++				};
++
++				port@6 {
++					port = <6>;
++				};
++
++				port@7 {
++					port = <7>;
++				};
++
++				port@8 {
++					port = <8>;
++				};
++
++				port@9 {
++					port = <9>;
++				};
++
++				port@10 {
++					port = <10>;
++				};
++
++				port@11 {
++					port = <11>;
++				};
++
++				port@12 {
++					port = <12>;
++				};
++
++				port@13 {
++					port = <13>;
++				};
++
++				port@14 {
++					port = <14>;
++				};
++			};
++
++			sbefifo@2400 {
++				compatible = "ibm,p9-sbefifo";
++				reg = <0x2400 0x400>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				occ@1 {
++					compatible = "ibm,p9-occ";
++					reg = <1>;
++				};
++			};
++
++			hub@3400 {
++				compatible = "fsi-master-hub";
++				reg = <0x3400 0x400>;
++				#address-cells = <2>;
++				#size-cells = <0>;
++
++				cfam@1,0 {
++					reg = <1 0>;
++					#address-cells = <1>;
++					#size-cells = <1>;
++
++					i2c-master@1800 {
++						compatible =
++							"ibm,fsi-i2c-master";
++						reg = <0x1800 0x400>;
++						#address-cells = <1>;
++						#size-cells = <0>;
++
++						port@0 {
++							port = <0>;
++						};
++
++						port@1 {
++							port = <1>;
++						};
++
++						port@2 {
++							port = <2>;
++						};
++
++						port@3 {
++							port = <3>;
++						};
++
++						port@4 {
++							port = <4>;
++						};
++
++						port@5 {
++							port = <5>;
++						};
++
++						port@6 {
++							port = <6>;
++						};
++
++						port@7 {
++							port = <7>;
++						};
++
++						port@8 {
++							port = <8>;
++						};
++
++						port@9 {
++							port = <9>;
++						};
++
++						port@10 {
++							port = <10>;
++						};
++
++						port@11 {
++							port = <11>;
++						};
++
++						port@12 {
++							port = <12>;
++						};
++
++						port@13 {
++							port = <13>;
++						};
++
++						port@14 {
++							port = <14>;
++						};
++					};
++
++					sbefifo@2400 {
++						compatible = "ibm,p9-sbefifo";
++						reg = <0x2400 0x400>;
++						#address-cells = <1>;
++						#size-cells = <0>;
++
++						occ@2 {
++							compatible =
++								"ibm,p9-occ";
++							reg = <2>;
++						};
++					};
++				};
++			};
++		};
+ 	};
+ 
+ 	iio-hwmon {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts b/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
+index b5c4c0f..6f36e56 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
+@@ -77,6 +77,8 @@
+ 
+ 	gpio-fsi {
+ 		compatible = "fsi-master-gpio", "fsi-master";
++		#address-cells = <2>;
++		#size-cells = <0>;
+ 
+ 		status = "okay";
+ 
+@@ -85,6 +87,185 @@
+ 		trans-gpios = <&gpio ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
+ 		enable-gpios = <&gpio ASPEED_GPIO(D, 0) GPIO_ACTIVE_HIGH>;
+ 		mux-gpios = <&gpio ASPEED_GPIO(P, 6) GPIO_ACTIVE_HIGH>;
++
++		cfam@0,0 {
++			reg = <0 0>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			i2c-master@1800 {
++				compatible = "ibm,fsi-i2c-master";
++				reg = <0x1800 0x400>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				port@0 {
++					port = <0>;
++				};
++
++				port@1 {
++					port = <1>;
++				};
++
++				port@2 {
++					port = <2>;
++				};
++
++				port@3 {
++					port = <3>;
++				};
++
++				port@4 {
++					port = <4>;
++				};
++
++				port@5 {
++					port = <5>;
++				};
++
++				port@6 {
++					port = <6>;
++				};
++
++				port@7 {
++					port = <7>;
++				};
++
++				port@8 {
++					port = <8>;
++				};
++
++				port@9 {
++					port = <9>;
++				};
++
++				port@10 {
++					port = <10>;
++				};
++
++				port@11 {
++					port = <11>;
++				};
++
++				port@12 {
++					port = <12>;
++				};
++
++				port@13 {
++					port = <13>;
++				};
++
++				port@14 {
++					port = <14>;
++				};
++			};
++
++			sbefifo@2400 {
++				compatible = "ibm,p9-sbefifo";
++				reg = <0x2400 0x400>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				occ@1 {
++					compatible = "ibm,p9-occ";
++					reg = <1>;
++				};
++			};
++
++			hub@3400 {
++				compatible = "fsi-master-hub";
++				reg = <0x3400 0x400>;
++				#address-cells = <2>;
++				#size-cells = <0>;
++
++				cfam@1,0 {
++					reg = <1 0>;
++					#address-cells = <1>;
++					#size-cells = <1>;
++
++					i2c-master@1800 {
++						compatible =
++							"ibm,fsi-i2c-master";
++						reg = <0x1800 0x400>;
++						#address-cells = <1>;
++						#size-cells = <0>;
++
++						port@0 {
++							port = <0>;
++						};
++
++						port@1 {
++							port = <1>;
++						};
++
++						port@2 {
++							port = <2>;
++						};
++
++						port@3 {
++							port = <3>;
++						};
++
++						port@4 {
++							port = <4>;
++						};
++
++						port@5 {
++							port = <5>;
++						};
++
++						port@6 {
++							port = <6>;
++						};
++
++						port@7 {
++							port = <7>;
++						};
++
++						port@8 {
++							port = <8>;
++						};
++
++						port@9 {
++							port = <9>;
++						};
++
++						port@10 {
++							port = <10>;
++						};
++
++						port@11 {
++							port = <11>;
++						};
++
++						port@12 {
++							port = <12>;
++						};
++
++						port@13 {
++							port = <13>;
++						};
++
++						port@14 {
++							port = <14>;
++						};
++					};
++
++					sbefifo@2400 {
++						compatible = "ibm,p9-sbefifo";
++						reg = <0x2400 0x400>;
++						#address-cells = <1>;
++						#size-cells = <0>;
++
++						occ@2 {
++							compatible =
++								"ibm,p9-occ";
++							reg = <2>;
++						};
++					};
++				};
++			};
++		};
+ 	};
+ 
+ 	iio-hwmon {
+-- 
+1.8.3.1
+
