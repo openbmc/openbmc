@@ -10,6 +10,7 @@ LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 SOFTWARE_MGR_PACKAGES = " \
     ${PN}-version \
     ${PN}-download-mgr \
+    ${PN}-updater \
 "
 PACKAGES =+ "${SOFTWARE_MGR_PACKAGES}"
 PACKAGES_remove = "${PN}"
@@ -42,11 +43,18 @@ RDEPENDS_${PN}-download-mgr += " \
     phosphor-dbus-interfaces \
     sdbusplus \
 "
+RDEPENDS_${PN}-updater += " \
+    phosphor-logging \
+    phosphor-dbus-interfaces \
+    sdbusplus \
+"
 
 FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager"
 FILES_${PN}-download-mgr += "${sbindir}/phosphor-download-manager"
-DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.Version.service"
+FILES_${PN}-updater += "${sbindir}/phosphor-image-updater"
+DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.BMC.Updater.service"
 DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
+DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.Download.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
 SRCREV = "9b7c0b6da3e764cf51baf6b87ab4297a39ab782f"
