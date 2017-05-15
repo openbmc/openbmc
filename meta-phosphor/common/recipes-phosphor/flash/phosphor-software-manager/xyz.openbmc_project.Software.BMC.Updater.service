@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenBMC Software Update Manager
+Wants=xyz.openbmc_project.Software.Version.service
+Before=xyz.openbmc_project.Software.Version.service
+
+[Service]
+ExecStart={sbindir}/phosphor-image-updater
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
