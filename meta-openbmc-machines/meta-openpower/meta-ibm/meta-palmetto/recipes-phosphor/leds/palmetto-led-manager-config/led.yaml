@@ -18,3 +18,16 @@ EnclosureIdentify:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
+LampTest:
+    heartbeat:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+    power:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
