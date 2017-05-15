@@ -1,6 +1,5 @@
 [Unit]
 Description=Phosphor Version Software Manager
-Before=mapper-wait@-xyz-openbmc_project-software-version.service
 
 [Service]
 ExecStartPre=/bin/sh -c 'mkdir -p /tmp/images'
