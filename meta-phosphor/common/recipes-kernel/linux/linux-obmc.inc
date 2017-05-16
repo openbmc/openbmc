@@ -20,6 +20,7 @@ SRC_URI += "file://linux-dev-4.10-drivers-fsi-Add-FSI-SBEFIFO-driver.patch"
 SRC_URI += "file://linux-dev-4.10-1-3-drivers-fsi-sbefifo-Add-in-kernel-API.patch"
 SRC_URI += "file://linux-dev-4.10-2-3-drivers-fsi-sbefifo-Add-OCC-driver.patch"
 SRC_URI += "file://0001-arm-dts-aspeed-Add-FSI-devices.patch"
+SRC_URI += "file://0001-hwmon-Add-support-for-MAX31785-intelligent-fan-contr.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
