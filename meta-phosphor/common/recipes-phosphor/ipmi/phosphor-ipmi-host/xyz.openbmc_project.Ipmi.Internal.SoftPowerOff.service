@@ -6,4 +6,5 @@ After=mapper-wait@-org-openbmc-HostIpmi-1.service
 [Service]
 Restart=no
 ExecStart={sbindir}/phosphor-softpoweroff
+ExecStart=/bin/systemctl start obmc-host-stop@0.target
 Type=oneshot
