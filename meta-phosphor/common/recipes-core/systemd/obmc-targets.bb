@@ -46,12 +46,14 @@ CHASSIS_LINK_SYNCH_FMT = "${CHASSIS_SYNCH_FMT}:obmc-power-{0}@{1}.target"
 CHASSIS_LINK_ACTION_FMT = "${CHASSIS_ACTION_FMT}:obmc-chassis-power{0}@{1}.target"
 HOST_LINK_SYNCH_FMT = "${HOST_SYNCH_FMT}:obmc-host-{0}@{1}.target"
 HOST_LINK_ACTION_FMT = "${HOST_ACTION_FMT}:obmc-host-{0}@{1}.target"
+FAN_LINK_FMT = "obmc-fan-control-ready@.target:obmc-fan-control-ready@{0}.target"
 
 SYSTEMD_SERVICE_${PN} += " \
         obmc-mapper.target \
         obmc-webserver-pre.target \
         obmc-fans-ready.target \
         obmc-fan-control.target \
+        obmc-fan-control-ready@.target \
         obmc-standby.target \
         "
 
@@ -64,3 +66,4 @@ SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_LINK_SYNCH_FMT', 'CHASSIS_SYN
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_LINK_ACTION_FMT', 'CHASSIS_ACTION_TARGETS', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_SYNCH_FMT', 'HOST_SYNCH_TARGETS', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT', 'HOST_ACTION_TARGETS', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FAN_LINK_FMT', 'OBMC_CHASSIS_INSTANCES')}"
