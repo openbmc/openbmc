@@ -1,12 +1,10 @@
 [Unit]
 Description=Phosphor Fan Control Daemon
-Wants=obmc-power-on@%i.target
-After=obmc-power-on@%i.target
 Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 Restart=on-failure
-ExecStart={sbindir}/phosphor-fan-control
+ExecStart={sbindir}/phosphor-fan-control --control
 
 [Install]
-RequiredBy=obmc-chassis-poweron@%i.target
+RequiredBy=obmc-fan-control-ready@%i.target

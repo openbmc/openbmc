@@ -46,8 +46,8 @@ RDEPENDS_${PN}-presence-tach += "sdbusplus"
 # Needed to install into the obmc-chassis-poweron target
 TMPL_TACH = "phosphor-fan-presence-tach@.service"
 INSTFMT_TACH = "phosphor-fan-presence-tach@{0}.service"
-TGTFMT = "obmc-chassis-poweron@{0}.target"
-FMT_TACH = "../${TMPL_TACH}:${TGTFMT}.requires/${INSTFMT_TACH}"
+POWERON_TGT = "obmc-chassis-poweron@{0}.target"
+FMT_TACH = "../${TMPL_TACH}:${POWERON_TGT}.requires/${INSTFMT_TACH}"
 
 FILES_${PN}-presence-tach = "${sbindir}/phosphor-fan-presence-tach"
 SYSTEMD_SERVICE_${PN}-presence-tach += "${TMPL_TACH}"
@@ -67,13 +67,20 @@ PACKAGECONFIG[control] = "--enable-control \
 
 RDEPENDS_${PN}-control += "sdbusplus"
 
+FAN_CONTROL_TGT = "obmc-fan-control-ready@{0}.target"
+
 TMPL_CONTROL = "phosphor-fan-control@.service"
 INSTFMT_CONTROL = "phosphor-fan-control@{0}.service"
-FMT_CONTROL = "../${TMPL_CONTROL}:${TGTFMT}.requires/${INSTFMT_CONTROL}"
+FMT_CONTROL = "../${TMPL_CONTROL}:${FAN_CONTROL_TGT}.requires/${INSTFMT_CONTROL}"
+
+TMPL_CONTROL_INIT = "phosphor-fan-control-init@.service"
+INSTFMT_CONTROL_INIT = "phosphor-fan-control-init@{0}.service"
+FMT_CONTROL_INIT = "../${TMPL_CONTROL_INIT}:${POWERON_TGT}.requires/${INSTFMT_CONTROL_INIT}"
 
 FILES_${PN}-control = "${sbindir}/phosphor-fan-control"
-SYSTEMD_SERVICE_${PN}-control += "${TMPL_CONTROL}"
+SYSTEMD_SERVICE_${PN}-control += "${TMPL_CONTROL} ${TMPL_CONTROL_INIT}"
 SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHASSIS_INSTANCES')}"
 
 # --------------------------------------
 # phosphor-chassis-cooling-type specific configuration
@@ -95,7 +102,7 @@ RDEPENDS_${PN}-monitor += "sdbusplus"
 
 TMPL_MONITOR = "phosphor-fan-monitor@.service"
 INSTFMT_MONITOR = "phosphor-fan-monitor@{0}.service"
-FMT_MONITOR = "../${TMPL_MONITOR}:${TGTFMT}.requires/${INSTFMT_MONITOR}"
+FMT_MONITOR = "../${TMPL_MONITOR}:${FAN_CONTROL_TGT}.requires/${INSTFMT_MONITOR}"
 
 FILES_${PN}-monitor = "${sbindir}/phosphor-fan-monitor"
 SYSTEMD_SERVICE_${PN}-monitor += "${TMPL_MONITOR}"

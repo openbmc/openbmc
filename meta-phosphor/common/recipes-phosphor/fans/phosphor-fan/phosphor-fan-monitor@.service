@@ -1,7 +1,7 @@
 [Unit]
 Description=Phosphor Fan Monitor Daemon
-Wants=obmc-power-on@%i.target
-After=obmc-power-on@%i.target
+Wants=phosphor-fan-control@%i.service
+Before=phosphor-fan-control@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
@@ -9,4 +9,4 @@ Restart=on-failure
 ExecStart={sbindir}/phosphor-fan-monitor
 
 [Install]
-RequiredBy=obmc-chassis-poweron@%i.target
+RequiredBy=obmc-fan-control-ready@%i.target
