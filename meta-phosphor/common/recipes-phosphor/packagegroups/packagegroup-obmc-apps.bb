@@ -19,6 +19,7 @@ PACKAGES = " \
         ${PN}-software \
         ${PN}-host-check-mgmt \
         ${PN}-debug-collector \
+        ${PN}-settings \
         "
 
 SUMMARY_${PN}-bmc-state-mgmt = "BMC state management"
@@ -90,4 +91,9 @@ RDEPENDS_${PN}-software = " \
 SUMMARY_${PN}-debug-collector = "BMC debug collector"
 RDEPENDS_${PN}-debug-collector = " \
         ${VIRTUAL-RUNTIME_obmc-debug-collector} \
+        "
+
+SUMMARY_${PN}-settings = "Settings applications"
+RDEPENDS_${PN}-settings = " \
+        ${VIRTUAL-RUNTIME_obmc-settings-mgr} \
         "

@@ -121,6 +121,11 @@ PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
 VIRTUAL-RUNTIME_phosphor-hwmon-config ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-hwmon-config-mrw')}"
 
+# obmc-settings-mgr
+#
+# Provides a manager for user settings.
+VIRTUAL-RUNTIME_obmc-settings-mgr ?= "phosphor-settings-manager"
+
 # virtual/phosphor-ipmi-fru-hostfw-config
 #
 # The phosphor-ipmi-fru application is data-driven and requires an input
