@@ -10,6 +10,7 @@ KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI += "file://phosphor-gpio-keys.scc"
 SRC_URI += "file://phosphor-gpio-keys.cfg"
+SRC_URI += "file://0001-drivers-fsi-Fix-SBE-OCC-for-2-socket-properly.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 

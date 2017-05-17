@@ -1,0 +1,1616 @@
+From 03dc0fd6cea33ffeac2bcc6f5ee3256a4132cd3a Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 19 May 2017 16:09:36 -0500
+Subject: [PATCH] drivers: fsi: Fix SBE/OCC for 2 socket properly.
+
+Also update dts.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts |  20 +-
+ arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts       |  26 +
+ drivers/fsi/Makefile                             |   2 +-
+ drivers/fsi/fsi-sbefifo.c                        |  83 +--
+ drivers/fsi/occ.c                                | 658 +++++++++++++++++++++++
+ drivers/fsi/occfifo.c                            | 649 ----------------------
+ include/linux/fsi-sbefifo.h                      |  17 +-
+ 7 files changed, 749 insertions(+), 706 deletions(-)
+ create mode 100644 drivers/fsi/occ.c
+ delete mode 100644 drivers/fsi/occfifo.c
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+index ca228be..13def4b 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+@@ -80,15 +80,25 @@
+ 			status = "okay";
+ 
+ 			reg = <0x2400>;
++
++			occ@1 {
++				compatible = "ibm,p9-occ";
++				reg = <1>;
++			};
+ 		};
+-	};
+ 
+-	occfifo@1 {
+-		compatible = "ibm,occfifo";
++		sbefifo2: sbefifo@82400 {
++			compatible = "ibm,power9-sbefifo";
+ 
+-		status = "okay";
++			status = "okay";
++
++			reg = <0x2400>;
+ 
+-		bus = <&sbefifo1>;
++			occ@2 {
++				compatible = "ibm,p9-occ";
++				reg = <2>;
++			};
++		};
+ 	};
+ 
+ 	iio-hwmon {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts b/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
+index 7ea66de..81a325a 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
+@@ -85,6 +85,32 @@
+ 		trans-gpios = <&gpio ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
+ 		enable-gpios = <&gpio ASPEED_GPIO(D, 0) GPIO_ACTIVE_HIGH>;
+ 		mux-gpios = <&gpio ASPEED_GPIO(P, 6) GPIO_ACTIVE_HIGH>;
++
++		sbefifo1: sbefifo@2400 {
++			compatible = "ibm,power9-sbefifo";
++
++			status = "okay";
++
++			reg = <0x2400>;
++
++			occ@1 {
++				compatible = "ibm,p9-occ";
++				reg = <1>;
++			};
++		};
++
++		sbefifo2: sbefifo@82400 {
++			compatible = "ibm,power9-sbefifo";
++
++			status = "okay";
++
++			reg = <0x2400>;
++
++			occ@2 {
++				compatible = "ibm,p9-occ";
++				reg = <2>;
++			};
++		};
+ 	};
+ 
+ 	iio-hwmon {
+diff --git a/drivers/fsi/Makefile b/drivers/fsi/Makefile
+index eddaf79..eb2dd12 100644
+--- a/drivers/fsi/Makefile
++++ b/drivers/fsi/Makefile
+@@ -2,6 +2,6 @@
+ obj-$(CONFIG_FSI) += fsi-core.o
+ obj-$(CONFIG_FSI_MASTER_GPIO) += fsi-master-gpio.o
+ obj-$(CONFIG_FSI_SBEFIFO) += fsi-sbefifo.o
+-obj-$(CONFIG_OCCFIFO) += occfifo.o
++obj-$(CONFIG_OCCFIFO) += occ.o
+ obj-$(CONFIG_FSI_SCOM) += fsi-scom.o
+ obj-$(CONFIG_FSI_I2C) += i2c/
+diff --git a/drivers/fsi/fsi-sbefifo.c b/drivers/fsi/fsi-sbefifo.c
+index b395cb6..d43e063 100644
+--- a/drivers/fsi/fsi-sbefifo.c
++++ b/drivers/fsi/fsi-sbefifo.c
+@@ -20,6 +20,7 @@
+ #include <linux/miscdevice.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
++#include <linux/of_platform.h>
+ #include <linux/poll.h>
+ #include <linux/sched.h>
+ #include <linux/slab.h>
+@@ -51,7 +52,6 @@ struct sbefifo {
+ 	wait_queue_head_t wait;
+ 	struct list_head link;
+ 	struct list_head xfrs;
+-	struct list_head drv_refs;
+ 	struct kref kref;
+ 	struct device_node *node;
+ 	spinlock_t lock;
+@@ -723,34 +723,21 @@ static const struct file_operations sbefifo_fops = {
+ 	.release	= sbefifo_release,
+ };
+ 
+-struct sbefifo *sbefifo_drv_reference(struct device_node *node,
+-				      struct sbefifo_drv_ref *ref)
++struct sbefifo_client *sbefifo_drv_open(struct device *dev,
++					unsigned long flags)
+ {
++	struct sbefifo_client *client = NULL;
+ 	struct sbefifo *sbefifo;
++	struct fsi_device *fsi_dev = to_fsi_dev(dev);
+ 
+ 	list_for_each_entry(sbefifo, &sbefifo_fifos, link) {
+-		if (node == sbefifo->node) {
+-			if (ref)
+-				list_add(&ref->link, &sbefifo->drv_refs);
+-			return sbefifo;
+-		}
+-	}
+-
+-	return NULL;
+-}
+-EXPORT_SYMBOL_GPL(sbefifo_drv_reference);
+-
+-struct sbefifo_client *sbefifo_drv_open(struct sbefifo *sbefifo,
+-					unsigned long flags)
+-{
+-	struct sbefifo_client *client;
+-
+-	if (!sbefifo)
+-		return NULL;
++		if (sbefifo->fsi_dev != fsi_dev)
++			continue;
+ 
+-	client = sbefifo_new_client(sbefifo);
+-	if (client)
+-		client->f_flags = flags;
++		client = sbefifo_new_client(sbefifo);
++		if (client)
++			client->f_flags = flags;
++	}
+ 
+ 	return client;
+ }
+@@ -778,18 +765,26 @@ void sbefifo_drv_release(struct sbefifo_client *client)
+ }
+ EXPORT_SYMBOL_GPL(sbefifo_drv_release);
+ 
+-int sbefifo_drv_get_idx(struct sbefifo *sbefifo)
++static int sbefifo_unregister_child(struct device *dev, void *data)
+ {
+-	return sbefifo->idx;
++	struct platform_device *child = to_platform_device(dev);
++
++	of_device_unregister(child);
++	if (dev->of_node)
++		of_node_clear_flag(dev->of_node, OF_POPULATED);
++
++	return 0;
+ }
+ 
+ static int sbefifo_probe(struct device *dev)
+ {
+ 	struct fsi_device *fsi_dev = to_fsi_dev(dev);
+-	struct sbefifo *sbefifo;
++	struct sbefifo *sbefifo, *check;
+ 	struct device_node *np;
++	struct platform_device *child;
++	char child_name[32];
+ 	u32 sts, addr;
+-	int ret;
++	int ret, child_idx = 0;
+ 
+ 	dev_info(dev, "Found sbefifo device\n");
+ 	sbefifo = kzalloc(sizeof(*sbefifo), GFP_KERNEL);
+@@ -829,7 +824,6 @@ static int sbefifo_probe(struct device *dev)
+ 			sbefifo->idx);
+ 	init_waitqueue_head(&sbefifo->wait);
+ 	INIT_LIST_HEAD(&sbefifo->xfrs);
+-	INIT_LIST_HEAD(&sbefifo->drv_refs);
+ 
+ 	for_each_compatible_node(np, NULL, "ibm,power9-sbefifo") {
+ 		ret = of_property_read_u32(np, "reg", &addr);
+@@ -839,7 +833,29 @@ static int sbefifo_probe(struct device *dev)
+ 		/* TODO: get real address, not cfam offset */
+ 		if (addr == fsi_dev->addr) {
+ 			sbefifo->node = np;
+-			break;
++
++			/* make sure we haven't found this one already */
++			list_for_each_entry(check, &sbefifo_fifos, link) {
++				if (check->node == np) {
++					sbefifo->node = NULL;
++					break;
++				}
++			}
++
++			if (sbefifo->node)
++				break;
++		}
++	}
++
++	if (sbefifo->node) {
++		/* create platform devs for dts child nodes (occ, etc) */
++		for_each_child_of_node(sbefifo->node, np) {
++			snprintf(child_name, sizeof(child_name), "%s-dev%d",
++				 sbefifo->name, child_idx++);
++			child = of_platform_device_create(np, child_name, dev);
++			if (!child)
++				dev_warn(&sbefifo->fsi_dev->dev,
++					 "failed to create child node dev\n");
+ 		}
+ 	}
+ 
+@@ -855,18 +871,13 @@ static int sbefifo_remove(struct device *dev)
+ {
+ 	struct fsi_device *fsi_dev = to_fsi_dev(dev);
+ 	struct sbefifo *sbefifo, *sbefifo_tmp;
+-	struct sbefifo_drv_ref *ref, *ref_tmp;
+ 	struct sbefifo_xfr *xfr;
+ 
+ 	list_for_each_entry_safe(sbefifo, sbefifo_tmp, &sbefifo_fifos, link) {
+ 		if (sbefifo->fsi_dev != fsi_dev)
+ 			continue;
+ 
+-		list_for_each_entry_safe(ref, ref_tmp, &sbefifo->drv_refs,
+-					 link) {
+-			ref->notify(ref);
+-			list_del(&ref->link);
+-		}
++		device_for_each_child(dev, NULL, sbefifo_unregister_child);
+ 
+ 		misc_deregister(&sbefifo->mdev);
+ 		list_del(&sbefifo->link);
+diff --git a/drivers/fsi/occ.c b/drivers/fsi/occ.c
+new file mode 100644
+index 0000000..37242b3
+--- /dev/null
++++ b/drivers/fsi/occ.c
+@@ -0,0 +1,658 @@
++/*
++ * Copyright 2017 IBM Corp.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#include <asm/unaligned.h>
++#include <linux/device.h>
++#include <linux/err.h>
++#include <linux/fsi-sbefifo.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/miscdevice.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++#include <linux/uaccess.h>
++#include <linux/wait.h>
++#include <linux/workqueue.h>
++
++#define OCC_SRAM_BYTES		4096
++#define OCC_CMD_DATA_BYTES	4090
++#define OCC_RESP_DATA_BYTES	4089
++
++struct occ {
++	struct device *sbefifo;
++	char name[32];
++	int idx;
++	struct miscdevice mdev;
++	struct list_head xfrs;
++	spinlock_t list_lock;
++	spinlock_t occ_lock;
++	struct work_struct work;
++};
++
++#define to_occ(x)	container_of((x), struct occ, mdev)
++
++struct occ_command {
++	u8 seq_no;
++	u8 cmd_type;
++	u16 data_length;
++	u8 data[OCC_CMD_DATA_BYTES];
++	u16 checksum;
++} __packed;
++
++struct occ_response {
++	u8 seq_no;
++	u8 cmd_type;
++	u8 return_status;
++	u16 data_length;
++	u8 data[OCC_RESP_DATA_BYTES];
++	u16 checksum;
++} __packed;
++
++struct occ_xfr;
++
++enum {
++	CLIENT_NONBLOCKING,
++};
++
++struct occ_client {
++	struct occ *occ;
++	struct occ_xfr *xfr;
++	spinlock_t lock;
++	wait_queue_head_t wait;
++	size_t read_offset;
++	unsigned long flags;
++};
++
++enum {
++	XFR_IN_PROGRESS,
++	XFR_COMPLETE,
++	XFR_CANCELED,
++	XFR_WAITING,
++};
++
++struct occ_xfr {
++	struct list_head link;
++	struct occ_client *client;
++	int rc;
++	u8 buf[OCC_SRAM_BYTES];
++	size_t cmd_data_length;
++	size_t resp_data_length;
++	unsigned long flags;
++};
++
++static struct workqueue_struct *occ_wq;
++
++static DEFINE_IDA(occ_ida);
++
++static void occ_enqueue_xfr(struct occ_xfr *xfr)
++{
++	int empty;
++	struct occ *occ = xfr->client->occ;
++
++	spin_lock_irq(&occ->list_lock);
++	empty = list_empty(&occ->xfrs);
++	list_add_tail(&xfr->link, &occ->xfrs);
++	spin_unlock(&occ->list_lock);
++
++	if (empty)
++		queue_work(occ_wq, &occ->work);
++}
++
++static int occ_open(struct inode *inode, struct file *file)
++{
++	struct occ_client *client;
++	struct miscdevice *mdev = file->private_data;
++	struct occ *occ = to_occ(mdev);
++
++	client = kzalloc(sizeof(*client), GFP_KERNEL);
++	if (!client)
++		return -ENOMEM;
++
++	client->occ = occ;
++	spin_lock_init(&client->lock);
++	init_waitqueue_head(&client->wait);
++
++	if (file->f_flags & O_NONBLOCK)
++		set_bit(CLIENT_NONBLOCKING, &client->flags);
++
++	file->private_data = client;
++
++	return 0;
++}
++
++static ssize_t occ_read(struct file *file, char __user *buf, size_t len,
++			loff_t *offset)
++{
++	int rc;
++	size_t bytes;
++	struct occ_xfr *xfr;
++	struct occ_client *client = file->private_data;
++
++	if (!access_ok(VERIFY_WRITE, buf, len))
++		return -EFAULT;
++
++	if (len > OCC_SRAM_BYTES)
++		return -EINVAL;
++
++	spin_lock_irq(&client->lock);
++	if (!client->xfr) {
++		/* we just finished reading all data, return 0 */
++		if (client->read_offset) {
++			rc = 0;
++			client->read_offset = 0;
++		} else
++			rc = -ENOMSG;
++
++		goto done;
++	}
++
++	xfr = client->xfr;
++
++	if (!test_bit(XFR_COMPLETE, &xfr->flags)) {
++		if (client->flags & CLIENT_NONBLOCKING) {
++			rc = -ERESTARTSYS;
++			goto done;
++		}
++
++		set_bit(XFR_WAITING, &xfr->flags);
++		spin_unlock(&client->lock);
++
++		rc = wait_event_interruptible(client->wait,
++			test_bit(XFR_COMPLETE, &xfr->flags) ||
++			test_bit(XFR_CANCELED, &xfr->flags));
++
++		spin_lock_irq(&client->lock);
++		if (test_bit(XFR_CANCELED, &xfr->flags)) {
++			kfree(xfr);
++			spin_unlock(&client->lock);
++			kfree(client);
++			return -EBADFD;
++		}
++
++		clear_bit(XFR_WAITING, &xfr->flags);
++		if (!test_bit(XFR_COMPLETE, &xfr->flags)) {
++			rc = -EINTR;
++			goto done;
++		}
++	}
++
++	if (xfr->rc) {
++		rc = xfr->rc;
++		goto done;
++	}
++
++	if (copy_to_user(buf, &xfr->buf[client->read_offset], bytes)) {
++		rc = -EFAULT;
++		goto done;
++	}
++
++	client->read_offset += bytes;
++
++	/* xfr done */
++	if (client->read_offset == xfr->resp_data_length) {
++		kfree(xfr);
++		client->xfr = NULL;
++	}
++
++	rc = bytes;
++
++done:
++	spin_unlock(&client->lock);
++	return rc;
++}
++
++static ssize_t occ_write(struct file *file, const char __user *buf,
++			 size_t len, loff_t *offset)
++{
++	int rc;
++	unsigned int i, j;
++	u8 tmp;
++	u16 data_length, checksum = 0;
++	struct occ_xfr *xfr;
++	struct occ_client *client = file->private_data;
++
++	if (!access_ok(VERIFY_READ, buf, len))
++		return -EFAULT;
++
++	if (len > (OCC_CMD_DATA_BYTES + 3) || len < 3)
++		return -EINVAL;
++
++	spin_lock_irq(&client->lock);
++	if (client->xfr) {
++		rc = -EDEADLK;
++		goto done;
++	}
++
++	xfr = kzalloc(sizeof(*xfr), GFP_KERNEL);
++	if (!xfr) {
++		rc = -ENOMEM;
++		goto done;
++	}
++
++	xfr->buf[0] = 1;
++
++	if (copy_from_user(&xfr->buf[1], buf, len)) {
++		kfree(xfr);
++		rc = -EFAULT;
++		goto done;
++	}
++
++	data_length = (xfr->buf[2] << 8) + xfr->buf[3];
++	if (data_length > OCC_CMD_DATA_BYTES) {
++		kfree(xfr);
++		rc = -EINVAL;
++		goto done;
++	}
++
++	for (i = 0; i < data_length + 4; ++i)
++		checksum += xfr->buf[i];
++
++	xfr->buf[data_length + 4] = checksum >> 8;
++	xfr->buf[data_length + 5] = checksum & 0xFF;
++
++	/* byte swap the whole buffer */
++	for (i = 0; i < data_length + 6; i += 4) {
++		tmp = xfr->buf[i + 3];
++		xfr->buf[i + 3] = xfr->buf[i];
++		xfr->buf[i] = tmp;
++
++		tmp = xfr->buf[i + 2];
++		xfr->buf[i + 2] = xfr->buf[i + 1];
++		xfr->buf[i + 1] = tmp;
++	}
++
++	xfr->client = client;
++	xfr->cmd_data_length = data_length + 6;
++	client->xfr = xfr;
++	client->read_offset = 0;
++
++	occ_enqueue_xfr(xfr);
++
++	rc = len;
++
++done:
++	spin_unlock(&client->lock);
++	return rc;
++}
++
++static int occ_release(struct inode *inode, struct file *file)
++{
++	struct occ_xfr *xfr;
++	struct occ_client *client = file->private_data;
++	struct occ *occ = client->occ;
++
++	spin_lock_irq(&client->lock);
++	xfr = client->xfr;
++	if (!xfr) {
++		spin_unlock(&client->lock);
++		kfree(client);
++		return 0;
++	}
++
++	spin_lock_irq(&occ->list_lock);
++	set_bit(XFR_CANCELED, &xfr->flags);
++	if (!test_bit(XFR_IN_PROGRESS, &xfr->flags)) {
++		/* already deleted from list if complete */
++		if (!test_bit(XFR_COMPLETE, &xfr->flags))
++			list_del(&xfr->link);
++
++		spin_unlock(&occ->list_lock);
++
++		if (test_bit(XFR_WAITING, &xfr->flags)) {
++			/* blocking read; let reader clean up */
++			wake_up_interruptible(&client->wait);
++			spin_unlock(&client->lock);
++			return 0;
++		}
++
++		kfree(xfr);
++		spin_unlock(&client->lock);
++		kfree(client);
++		return 0;
++	}
++
++	/* operation is in progress; let worker clean up*/
++	spin_unlock(&occ->list_lock);
++	spin_unlock(&client->lock);
++	return 0;
++}
++
++static const struct file_operations occ_fops = {
++	.owner = THIS_MODULE,
++	.open = occ_open,
++	.read = occ_read,
++	.write = occ_write,
++	.release = occ_release,
++};
++
++static int occ_getscom(struct device *sbefifo, u32 address, u8 *data)
++{
++	int i, rc;
++	u32 buf[4];
++	struct sbefifo_client *client;
++	const size_t len = sizeof(buf);
++
++	buf[0] = 0x4;
++	buf[1] = 0xa201;
++	buf[2] = 0;
++	buf[3] = address;
++
++	client = sbefifo_drv_open(sbefifo, 0);
++	if (!client)
++		return -ENODEV;
++
++	rc = sbefifo_drv_write(client, (const char *)buf, len);
++	if (rc < 0)
++		goto done;
++	else if (rc != len) {
++		rc = -EMSGSIZE;
++		goto done;
++	}
++
++	rc = sbefifo_drv_read(client, (char *)buf, len);
++	if (rc < 0)
++		goto done;
++	else if (rc != len) {
++		rc = -EMSGSIZE;
++		goto done;
++	}
++
++	/* check for good response */
++	if ((buf[2] >> 16) != 0xC0DE) {
++		rc = -EFAULT;
++		goto done;
++	}
++
++	rc = 0;
++
++	for (i = 0; i < 4; ++i) {
++		data[i] = ((u8 *)buf)[3 - i];
++		data[i + 4] = ((u8 *)buf)[7 - i];
++	}
++
++done:
++	sbefifo_drv_release(client);
++	return rc;
++}
++
++static int occ_putscom(struct device *sbefifo, u32 address, u8 *data)
++{
++	int rc;
++	u32 buf[6];
++	struct sbefifo_client *client;
++	const size_t len = sizeof(buf);
++
++	buf[0] = 0x6;
++	buf[1] = 0xa202;
++	buf[2] = 0;
++	buf[3] = address;
++	memcpy(&buf[4], data, sizeof(u64));
++
++	client = sbefifo_drv_open(sbefifo, 0);
++	if (!client)
++		return -ENODEV;
++
++	rc = sbefifo_drv_write(client, (const char *)buf, len);
++	if (rc < 0)
++		goto done;
++	else if (rc != len) {
++		rc = -EMSGSIZE;
++		goto done;
++	}
++
++	rc = 0;
++
++	/* ignore response */
++	sbefifo_drv_read(client, (char *)buf, len);
++
++done:
++	sbefifo_drv_release(client);
++	return rc;
++}
++
++static int occ_putscom_u32(struct device *sbefifo, u32 address, u32 data0,
++			   u32 data1)
++{
++	u8 buf[8];
++
++	memcpy(buf, &data0, 4);
++	memcpy(buf + 4, &data1, 4);
++
++	return occ_putscom(sbefifo, address, buf);
++}
++
++static void occ_worker(struct work_struct *work)
++{
++	int i, empty, canceled, waiting, rc;
++	u16 resp_data_length;
++	struct occ *occ = container_of(work, struct occ, work);
++	struct device *sbefifo = occ->sbefifo;
++	struct occ_client *client;
++	struct occ_xfr *xfr;
++	struct occ_response *resp;
++
++again:
++	spin_lock_irq(&occ->list_lock);
++	xfr = list_first_entry(&occ->xfrs, struct occ_xfr, link);
++	if (!xfr) {
++		spin_unlock(&occ->list_lock);
++		return;
++	}
++
++	set_bit(XFR_IN_PROGRESS, &xfr->flags);
++	spin_unlock(&occ->list_lock);
++
++	resp = (struct occ_response *)xfr->buf;
++
++	spin_lock_irq(&occ->occ_lock);
++
++	/* set address reg to occ sram command buffer */
++	rc = occ_putscom_u32(sbefifo, 0x6D050, 0xFFFBE000, 0);
++	if (rc)
++		goto done;
++
++	/* write cmd data */
++	for (i = 0; i < xfr->cmd_data_length; i += 8) {
++		rc = occ_putscom(sbefifo, 0x6D055, &xfr->buf[i]);
++		if (rc)
++			goto done;
++	}
++
++	/* trigger attention */
++	rc = occ_putscom_u32(sbefifo, 0x6D035, 0x20010000, 0);
++	if (rc)
++		goto done;
++
++	/* set address reg to occ sram response buffer */
++	rc = occ_putscom_u32(sbefifo, 0x6D050, 0xFFFBF000, 0);
++	if (rc)
++		goto done;
++
++	rc = occ_getscom(sbefifo, 0x6D055, xfr->buf);
++	if (rc)
++		goto done;
++
++	xfr->resp_data_length += 8;
++
++	resp_data_length = (xfr->buf[3] << 8) + xfr->buf[4];
++	if (resp_data_length > OCC_RESP_DATA_BYTES) {
++		rc = -EDOM;
++		goto done;
++	}
++
++	/* already read 3 bytes of resp data, but also need 2 bytes chksum */
++	for (i = 8; i < resp_data_length + 7; i += 8) {
++		rc = occ_getscom(sbefifo, 0x6D055, &xfr->buf[i]);
++		if (rc)
++			goto done;
++
++		xfr->resp_data_length += 8;
++	}
++
++	/* no errors, got all data */
++	xfr->resp_data_length = resp_data_length + 7;
++
++done:
++	spin_unlock(&occ->occ_lock);
++
++	xfr->rc = rc;
++	client = xfr->client;
++
++	/* lock client to prevent race with read() */
++	spin_lock_irq(&client->lock);
++	set_bit(XFR_COMPLETE, &xfr->flags);
++	waiting = test_bit(XFR_WAITING, &xfr->flags);
++	spin_unlock(&client->lock);
++
++	spin_lock_irq(&occ->list_lock);
++	clear_bit(XFR_IN_PROGRESS, &xfr->flags);
++	list_del(&xfr->link);
++	empty = list_empty(&occ->xfrs);
++	canceled = test_bit(XFR_CANCELED, &xfr->flags);
++	spin_unlock(&occ->list_lock);
++
++	if (waiting)
++		wake_up_interruptible(&client->wait);
++	else if (canceled) {
++		kfree(xfr);
++		kfree(xfr->client);
++	}
++
++	if (!empty)
++		goto again;
++}
++
++static int occ_probe(struct platform_device *pdev)
++{
++	int rc, child_idx = 0;
++	u32 reg;
++	struct occ *occ;
++	struct device_node *np;
++	struct platform_device *child;
++	struct device *dev = &pdev->dev;
++	char child_name[32];
++
++	dev_info(dev, "Found occ device\n");
++	occ = devm_kzalloc(dev, sizeof(*occ), GFP_KERNEL);
++	if (!occ)
++		return -ENOMEM;
++
++	occ->sbefifo = dev->parent;
++	INIT_LIST_HEAD(&occ->xfrs);
++	spin_lock_init(&occ->list_lock);
++	spin_lock_init(&occ->occ_lock);
++	INIT_WORK(&occ->work, occ_worker);
++
++	if (dev->of_node) {
++		rc = of_property_read_u32(dev->of_node, "reg", &reg);
++		if (!rc) {
++			/* make sure we don't have a duplicate from dts */
++			occ->idx = ida_simple_get(&occ_ida, reg, reg + 1,
++						  GFP_KERNEL);
++			if (occ->idx < 0)
++				occ->idx = ida_simple_get(&occ_ida, 1, INT_MAX,
++							  GFP_KERNEL);
++		} else
++			occ->idx = ida_simple_get(&occ_ida, 1, INT_MAX,
++						  GFP_KERNEL);
++	} else
++		occ->idx = ida_simple_get(&occ_ida, 1, INT_MAX, GFP_KERNEL);
++
++	snprintf(occ->name, sizeof(occ->name), "occ%d", occ->idx);
++	occ->mdev.fops = &occ_fops;
++	occ->mdev.minor = MISC_DYNAMIC_MINOR;
++	occ->mdev.name = occ->name;
++	occ->mdev.parent = dev;
++
++	rc = misc_register(&occ->mdev);
++	if (rc) {
++		dev_err(dev, "failed to register miscdevice\n");
++		return rc;
++	}
++
++	platform_set_drvdata(pdev, occ);
++
++	return 0;
++}
++
++static int occ_remove(struct platform_device *pdev)
++{
++	struct occ_xfr *xfr, *tmp;
++	struct occ *occ = platform_get_drvdata(pdev);
++	struct occ_client *client;
++
++	misc_deregister(&occ->mdev);
++
++	spin_lock_irq(&occ->list_lock);
++	list_for_each_entry_safe(xfr, tmp, &occ->xfrs, link) {
++		client = xfr->client;
++		set_bit(XFR_CANCELED, &xfr->flags);
++
++		if (!test_bit(XFR_IN_PROGRESS, &xfr->flags)) {
++			list_del(&xfr->link);
++
++			spin_lock_irq(&client->lock);
++			if (test_bit(XFR_WAITING, &xfr->flags)) {
++				wake_up_interruptible(&client->wait);
++				spin_unlock(&client->lock);
++			} else {
++				kfree(xfr);
++				spin_unlock(&client->lock);
++				kfree(client);
++			}
++		}
++	}
++	spin_unlock(&occ->list_lock);
++
++	flush_work(&occ->work);
++
++	ida_simple_remove(&occ_ida, occ->idx);
++
++	return 0;
++}
++
++static const struct of_device_id occ_match[] = {
++	{ .compatible = "ibm,p9-occ" },
++	{ },
++};
++
++static struct platform_driver occ_driver = {
++	.driver = {
++		.name = "occ",
++		.of_match_table	= occ_match,
++	},
++	.probe	= occ_probe,
++	.remove = occ_remove,
++};
++
++static int occ_init(void)
++{
++	occ_wq = create_singlethread_workqueue("occ");
++	if (!occ_wq)
++		return -ENOMEM;
++
++	return platform_driver_register(&occ_driver);
++}
++
++static void occ_exit(void)
++{
++	destroy_workqueue(occ_wq);
++
++	platform_driver_unregister(&occ_driver);
++}
++
++module_init(occ_init);
++module_exit(occ_exit);
++
++MODULE_AUTHOR("Eddie James <eajames@us.ibm.com>");
++MODULE_DESCRIPTION("BMC P9 OCC driver");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/fsi/occfifo.c b/drivers/fsi/occfifo.c
+deleted file mode 100644
+index c1a3351..0000000
+--- a/drivers/fsi/occfifo.c
++++ /dev/null
+@@ -1,649 +0,0 @@
+-/*
+- * Copyright 2017 IBM Corp.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- */
+-
+-#include <asm/unaligned.h>
+-#include <linux/device.h>
+-#include <linux/err.h>
+-#include <linux/fsi-sbefifo.h>
+-#include <linux/init.h>
+-#include <linux/kernel.h>
+-#include <linux/miscdevice.h>
+-#include <linux/module.h>
+-#include <linux/of.h>
+-#include <linux/platform_device.h>
+-#include <linux/slab.h>
+-#include <linux/uaccess.h>
+-#include <linux/wait.h>
+-#include <linux/workqueue.h>
+-
+-#define OCC_SRAM_BYTES		4096
+-#define OCC_CMD_DATA_BYTES	4090
+-#define OCC_RESP_DATA_BYTES	4089
+-
+-struct occfifo {
+-	struct sbefifo_drv_ref ref;
+-	struct sbefifo *sbefifo;
+-	char name[32];
+-	struct miscdevice mdev;
+-	struct list_head xfrs;
+-	spinlock_t list_lock;
+-	spinlock_t occ_lock;
+-	struct work_struct work;
+-};
+-
+-#define to_occfifo(x)	container_of((x), struct occfifo, mdev)
+-
+-struct occ_command {
+-	u8 seq_no;
+-	u8 cmd_type;
+-	u16 data_length;
+-	u8 data[OCC_CMD_DATA_BYTES];
+-	u16 checksum;
+-};
+-
+-struct occ_response {
+-	u8 seq_no;
+-	u8 cmd_type;
+-	u8 return_status;
+-	u16 data_length;
+-	u8 data[OCC_RESP_DATA_BYTES];
+-	u16 checksum;
+-};
+-
+-struct occfifo_xfr;
+-
+-enum {
+-	CLIENT_NONBLOCKING,
+-};
+-
+-struct occfifo_client {
+-	struct occfifo *occfifo;
+-	struct occfifo_xfr *xfr;
+-	spinlock_t lock;
+-	wait_queue_head_t wait;
+-	size_t read_offset;
+-	unsigned long flags;
+-};
+-
+-enum {
+-	XFR_IN_PROGRESS,
+-	XFR_COMPLETE,
+-	XFR_CANCELED,
+-	XFR_WAITING,
+-};
+-
+-struct occfifo_xfr {
+-	struct list_head link;
+-	struct occfifo_client *client;
+-	int rc;
+-	u8 buf[OCC_SRAM_BYTES];
+-	size_t cmd_data_length;
+-	size_t resp_data_length;
+-	unsigned long flags;
+-};
+-
+-static struct workqueue_struct *occfifo_wq;
+-
+-static void occfifo_enqueue_xfr(struct occfifo_xfr *xfr)
+-{
+-	int empty;
+-	struct occfifo *occfifo = xfr->client->occfifo;
+-
+-	spin_lock_irq(&occfifo->list_lock);
+-	empty = list_empty(&occfifo->xfrs);
+-	list_add_tail(&xfr->link, &occfifo->xfrs);
+-	spin_unlock(&occfifo->list_lock);
+-
+-	if (empty)
+-		queue_work(occfifo_wq, &occfifo->work);
+-}
+-
+-static int occfifo_open(struct inode *inode, struct file *file)
+-{
+-	struct occfifo_client *client;
+-	struct miscdevice *mdev = file->private_data;
+-	struct occfifo *occfifo = to_occfifo(mdev);
+-
+-	client = kzalloc(sizeof(*client), GFP_KERNEL);
+-	if (!client)
+-		return -ENOMEM;
+-
+-	client->occfifo = occfifo;
+-	spin_lock_init(&client->lock);
+-	init_waitqueue_head(&client->wait);
+-
+-	if (file->f_flags & O_NONBLOCK)
+-		set_bit(CLIENT_NONBLOCKING, &client->flags);
+-
+-	file->private_data = client;
+-
+-	return 0;
+-}
+-
+-static ssize_t occfifo_read(struct file *file, char __user *buf, size_t len,
+-			    loff_t *offset)
+-{
+-	int rc;
+-	size_t bytes;
+-	struct occfifo_xfr *xfr;
+-	struct occfifo_client *client = file->private_data;
+-
+-	if (!access_ok(VERIFY_WRITE, buf, len))
+-		return -EFAULT;
+-
+-	if (len > OCC_SRAM_BYTES)
+-		return -EINVAL;
+-
+-	spin_lock_irq(&client->lock);
+-	if (!client->xfr) {
+-		/* we just finished reading all data, return 0 */
+-		if (client->read_offset) {
+-			rc = 0;
+-			client->read_offset = 0;
+-		}
+-		else
+-			rc = -ENOMSG;
+-
+-		goto done;
+-	}
+-
+-	xfr = client->xfr;
+-
+-	if (!test_bit(XFR_COMPLETE, &xfr->flags)) {
+-		if (client->flags & CLIENT_NONBLOCKING) {
+-			rc = -ERESTARTSYS;
+-			goto done;
+-		}
+-
+-		set_bit(XFR_WAITING, &xfr->flags);
+-		spin_unlock(&client->lock);
+-
+-		rc = wait_event_interruptible(client->wait,
+-			test_bit(XFR_COMPLETE, &xfr->flags) ||
+-			test_bit(XFR_CANCELED, &xfr->flags));
+-
+-		spin_lock_irq(&client->lock);
+-		if (test_bit(XFR_CANCELED, &xfr->flags)) {
+-			kfree(xfr);
+-			spin_unlock(&client->lock);
+-			kfree(client);
+-			return -EBADFD;
+-		}
+-
+-		clear_bit(XFR_WAITING, &xfr->flags);
+-		if (!test_bit(XFR_COMPLETE, &xfr->flags)) {
+-			rc = -EINTR;
+-			goto done;
+-		}
+-	}
+-
+-	if (xfr->rc) {
+-		rc = xfr->rc;
+-		goto done;
+-	}
+-
+-	bytes = min(len, xfr->resp_data_length - client->read_offset);
+-	if (copy_to_user(buf, &xfr->buf[client->read_offset], bytes)) {
+-		rc = -EFAULT;
+-		goto done;
+-	}
+-
+-	client->read_offset += bytes;
+-
+-	/* xfr done */
+-	if (client->read_offset == xfr->resp_data_length) {
+-		kfree(xfr);
+-		client->xfr = NULL;
+-	}
+-
+-	rc = bytes;
+-
+-done:
+-	spin_unlock(&client->lock);
+-	return rc;
+-}
+-
+-static ssize_t occfifo_write(struct file *file, const char __user *buf,
+-			     size_t len, loff_t *offset)
+-{
+-	int rc;
+-	struct occfifo_xfr *xfr;
+-	struct occfifo_client *client = file->private_data;
+-
+-	if (!access_ok(VERIFY_READ, buf, len))
+-		return -EFAULT;
+-
+-	if (len > OCC_SRAM_BYTES)
+-		return -EINVAL;
+-
+-	spin_lock_irq(&client->lock);
+-	if (client->xfr) {
+-		rc = -EDEADLK;
+-		goto done;
+-	}
+-
+-	xfr = kzalloc(sizeof(*xfr), GFP_KERNEL);
+-	if (!xfr) {
+-		rc = -ENOMEM;
+-		goto done;
+-	}
+-
+-	if (copy_from_user(xfr->buf, buf, len)) {
+-		kfree(xfr);
+-		rc = -EFAULT;
+-		goto done;
+-	}
+-
+-	xfr->client = client;
+-	xfr->cmd_data_length = len;
+-	client->xfr = xfr;
+-	client->read_offset = 0;
+-
+-	occfifo_enqueue_xfr(xfr);
+-
+-	rc = len;
+-
+-done:
+-	spin_unlock(&client->lock);
+-	return rc;
+-}
+-
+-static int occfifo_release(struct inode *inode, struct file *file)
+-{
+-	struct occfifo_xfr *xfr;
+-	struct occfifo_client *client = file->private_data;
+-	struct occfifo *occfifo = client->occfifo;
+-
+-	spin_lock_irq(&client->lock);
+-	xfr = client->xfr;
+-	if (!xfr) {
+-		spin_unlock(&client->lock);
+-		kfree(client);
+-		return 0;
+-	}
+-
+-	spin_lock_irq(&occfifo->list_lock);
+-	set_bit(XFR_CANCELED, &xfr->flags);
+-	if (!test_bit(XFR_IN_PROGRESS, &xfr->flags)) {
+-		/* already deleted from list if complete */
+-		if (!test_bit(XFR_COMPLETE, &xfr->flags))
+-			list_del(&xfr->link);
+-
+-		spin_unlock(&occfifo->list_lock);
+-
+-		if (test_bit(XFR_WAITING, &xfr->flags)) {
+-			/* blocking read; let reader clean up */
+-			wake_up_interruptible(&client->wait);
+-			spin_unlock(&client->lock);
+-			return 0;
+-		}
+-
+-		kfree(xfr);
+-		spin_unlock(&client->lock);
+-		kfree(client);
+-		return 0;
+-	}
+-
+-	/* operation is in progress; let worker clean up*/
+-	spin_unlock(&occfifo->list_lock);
+-	spin_unlock(&client->lock);
+-	return 0;
+-}
+-
+-static const struct file_operations occfifo_fops = {
+-	.owner = THIS_MODULE,
+-	.open = occfifo_open,
+-	.read = occfifo_read,
+-	.write = occfifo_write,
+-	.release = occfifo_release,
+-};
+-
+-static int occfifo_getscom(struct sbefifo *sbefifo, u32 address, u8 *data)
+-{
+-	int rc;
+-	u32 buf[4];
+-	struct sbefifo_client *client;
+-	const size_t len = sizeof(buf);
+-
+-	buf[0] = 0x4;
+-	buf[1] = 0xa201;
+-	buf[2] = 0;
+-	buf[3] = address;
+-
+-	client = sbefifo_drv_open(sbefifo, 0);
+-	if (!client)
+-		return -ENODEV;
+-
+-	rc = sbefifo_drv_write(client, (const char *)buf, len);
+-	if (rc < 0)
+-		goto done;
+-	else if (rc != len) {
+-		rc = -EIO;
+-		goto done;
+-	}
+-
+-	rc = sbefifo_drv_read(client, (char *)buf, len);
+-	if (rc < 0)
+-		goto done;
+-	else if (rc != len) {
+-		rc = -EIO;
+-		goto done;
+-	}
+-
+-	rc = 0;
+-
+-	memcpy(data, buf, sizeof(u64));
+-
+-done:
+-	sbefifo_drv_release(client);
+-	return rc;
+-}
+-
+-static int occfifo_putscom(struct sbefifo *sbefifo, u32 address, u8 *data)
+-{
+-	int rc;
+-	u32 buf[6];
+-	struct sbefifo_client *client;
+-	const size_t len = sizeof(buf);
+-
+-	buf[0] = 0x6;
+-	buf[1] = 0xa202;
+-	buf[2] = 0;
+-	buf[3] = address;
+-	memcpy(&buf[4], data, sizeof(u64));
+-
+-	client = sbefifo_drv_open(sbefifo, 0);
+-	if (!client)
+-		return -ENODEV;
+-
+-	rc = sbefifo_drv_write(client, (const char *)buf, len);
+-	if (rc < 0)
+-		goto done;
+-	else if (rc != len) {
+-		rc = -EIO;
+-		goto done;
+-	}
+-
+-	rc = sbefifo_drv_read(client, (char *)buf, sizeof(u32) * 4);
+-	if (rc < 0) {
+-		rc = 0;
+-		goto done;
+-	} else if (rc != sizeof(u32) * 4) {
+-		rc = -EIO;
+-		goto done;
+-	}
+-
+-	rc = 0;
+-
+-done:
+-	sbefifo_drv_release(client);
+-	return rc;
+-}
+-
+-static int occfifo_putscom_u32(struct sbefifo *sbefifo, u32 address, u32 data0,
+-			       u32 data1)
+-{
+-	u8 buf[8];
+-
+-	memcpy(buf, &data0, 4);
+-	memcpy(buf + 4, &data1, 4);
+-
+-	return occfifo_putscom(sbefifo, address, buf);
+-}
+-
+-static void occfifo_worker(struct work_struct *work)
+-{
+-	int i, empty, canceled, waiting, rc;
+-	u16 resp_data_length;
+-	struct occfifo *occfifo = container_of(work, struct occfifo, work);
+-	struct sbefifo *sbefifo = occfifo->sbefifo;
+-	struct occfifo_client *client;
+-	struct occfifo_xfr *xfr;
+-	struct occ_response *resp;
+-
+-again:
+-	spin_lock_irq(&occfifo->list_lock);
+-	xfr = list_first_entry(&occfifo->xfrs, struct occfifo_xfr, link);
+-	if (!xfr) {
+-		spin_unlock(&occfifo->list_lock);
+-		return;
+-	}
+-
+-	set_bit(XFR_IN_PROGRESS, &xfr->flags);
+-	spin_unlock(&occfifo->list_lock);
+-
+-	resp = (struct occ_response *)xfr->buf;
+-
+-	spin_lock_irq(&occfifo->occ_lock);
+-
+-	/* set stream mode enabled */
+-	rc = occfifo_putscom_u32(sbefifo, 0x6D053, 0x08000000, 0);
+-	if (rc)
+-		goto done;
+-
+-	/* set stream mode to linear */
+-	rc = occfifo_putscom_u32(sbefifo, 0x6D052, 0x04000000, 0);
+-	if (rc)
+-		goto done;
+-
+-	/* set address reg to occ sram command buffer */
+-	rc = occfifo_putscom_u32(sbefifo, 0x6D050, 0xFFFBE000, 0);
+-	if (rc)
+-		goto done;
+-
+-	/* write cmd data */
+-	for (i = 0; i < xfr->cmd_data_length; i += 8) {
+-		rc = occfifo_putscom(sbefifo, 0x6D055, &xfr->buf[i]);
+-		if (rc)
+-			goto done;
+-	}
+-
+-	/* set stream mode enabled and stream mode to circular */
+-	rc = occfifo_putscom_u32(sbefifo, 0x6D033, 0x0C000000, 0);
+-	if (rc)
+-		goto done;
+-
+-	/* trigger attention */
+-	rc = occfifo_putscom_u32(sbefifo, 0x6D035, 0x20010000, 0);
+-	if (rc)
+-		goto done;
+-
+-	/* set address reg to occ sram response buffer */
+-	rc = occfifo_putscom_u32(sbefifo, 0x6D050, 0xFFFBF000, 0);
+-	if (rc)
+-		goto done;
+-
+-	rc = occfifo_getscom(sbefifo, 0x6D055, xfr->buf);
+-	if (rc)
+-		goto done;
+-
+-	xfr->resp_data_length += 8;
+-
+-	resp_data_length = be16_to_cpu(get_unaligned(&resp->data_length));
+-	if (resp_data_length > OCC_RESP_DATA_BYTES) {
+-		rc = -EFAULT;
+-		goto done;
+-	}
+-
+-	/* already read 3 bytes of resp data, but also need 2 bytes chksum */
+-	for (i = 8; i < resp_data_length + 7; i += 8) {
+-		rc = occfifo_getscom(sbefifo, 0x6D055, &xfr->buf[i]);
+-		if (rc)
+-			goto done;
+-
+-		xfr->resp_data_length += 8;
+-	}
+-
+-	/* no errors, got all data */
+-	xfr->resp_data_length = resp_data_length + 7;
+-
+-done:
+-	spin_unlock(&occfifo->occ_lock);
+-
+-	xfr->rc = rc;
+-	client = xfr->client;
+-
+-	/* lock client to prevent race with read() */
+-	spin_lock_irq(&client->lock);
+-	set_bit(XFR_COMPLETE, &xfr->flags);
+-	waiting = test_bit(XFR_WAITING, &xfr->flags);
+-	spin_unlock(&client->lock);
+-
+-	spin_lock_irq(&occfifo->list_lock);
+-	clear_bit(XFR_IN_PROGRESS, &xfr->flags);
+-	list_del(&xfr->link);
+-	empty = list_empty(&occfifo->xfrs);
+-	canceled = test_bit(XFR_CANCELED, &xfr->flags);
+-	spin_unlock(&occfifo->list_lock);
+-
+-	if (waiting)
+-		wake_up_interruptible(&client->wait);
+-	else if (canceled) {
+-		kfree(xfr);
+-		kfree(xfr->client);
+-	}
+-
+-	if (!empty)
+-		goto again;
+-}
+-
+-void occfifo_notify(struct sbefifo_drv_ref *ref)
+-{
+-	struct occfifo *occfifo = container_of(ref, struct occfifo, ref);
+-
+-	/* TODO: find better solution? this does seem to work if we lose
+-	 * the sbefifo in the middle of a transfer
+-	 */
+-	occfifo->sbefifo = NULL;
+-}
+-
+-static int occfifo_probe(struct platform_device *pdev)
+-{
+-	int rc;
+-	struct occfifo *occfifo;
+-	struct device_node *bus;
+-	struct device *dev = &pdev->dev;
+-	struct device_node *node = dev->of_node;
+-
+-	occfifo = devm_kzalloc(dev, sizeof(*occfifo), GFP_KERNEL);
+-	if (!occfifo)
+-		return -ENOMEM;
+-
+-	bus = of_parse_phandle(node, "bus", 0);
+-	if (!bus) {
+-		dev_err(dev, "failed to get dts phandle\n");
+-		return -ENODEV;
+-	}
+-
+-	occfifo->ref.notify = occfifo_notify;
+-	occfifo->sbefifo = sbefifo_drv_reference(bus, &occfifo->ref);
+-	if (!occfifo->sbefifo) {
+-		dev_err(dev, "failed to get sbefifo reference\n");
+-		rc = -ENODEV;
+-		goto done;
+-	}
+-
+-	INIT_LIST_HEAD(&occfifo->xfrs);
+-	spin_lock_init(&occfifo->list_lock);
+-	spin_lock_init(&occfifo->occ_lock);
+-	INIT_WORK(&occfifo->work, occfifo_worker);
+-
+-	snprintf(occfifo->name, sizeof(occfifo->name), "occfifo%d",
+-		 sbefifo_drv_get_idx(occfifo->sbefifo));
+-
+-	occfifo->mdev.fops = &occfifo_fops;
+-	occfifo->mdev.minor = MISC_DYNAMIC_MINOR;
+-	occfifo->mdev.name = occfifo->name;
+-	occfifo->mdev.parent = dev;
+-
+-	rc = misc_register(&occfifo->mdev);
+-	if (rc) {
+-		dev_err(dev, "failed to register miscdevice\n");
+-		goto done;
+-	}
+-
+-	platform_set_drvdata(pdev, occfifo);
+-
+-done:
+-	of_node_put(bus);
+-	return rc;
+-}
+-
+-static int occfifo_remove(struct platform_device *pdev)
+-{
+-	struct occfifo_xfr *xfr, *tmp;
+-	struct occfifo *occfifo = platform_get_drvdata(pdev);
+-	struct occfifo_client *client;
+-
+-	misc_deregister(&occfifo->mdev);
+-
+-	spin_lock_irq(&occfifo->list_lock);
+-	list_for_each_entry_safe(xfr, tmp, &occfifo->xfrs, link) {
+-		client = xfr->client;
+-		set_bit(XFR_CANCELED, &xfr->flags);
+-
+-		if (!test_bit(XFR_IN_PROGRESS, &xfr->flags)) {
+-			list_del(&xfr->link);
+-
+-			spin_lock_irq(&client->lock);
+-			if (test_bit(XFR_WAITING, &xfr->flags)) {
+-				wake_up_interruptible(&client->wait);
+-				spin_unlock(&client->lock);
+-			}
+-			else {
+-				kfree(xfr);
+-				spin_unlock(&client->lock);
+-				kfree(client);
+-			}
+-		}
+-	}
+-	spin_unlock(&occfifo->list_lock);
+-
+-	flush_work(&occfifo->work);
+-	list_del(&occfifo->ref.link);
+-
+-	return 0;
+-}
+-
+-static const struct of_device_id occfifo_match[] = {
+-	{ .compatible = "ibm,occfifo" },
+-	{ },
+-};
+-
+-static struct platform_driver occfifo_driver = {
+-	.driver = {
+-		.name = "occfifo",
+-		.of_match_table	= occfifo_match,
+-	},
+-	.probe	= occfifo_probe,
+-	.remove = occfifo_remove,
+-};
+-
+-static int occfifo_init(void)
+-{
+-	occfifo_wq = create_singlethread_workqueue("occfifo");
+-	if (!occfifo_wq)
+-		return -ENOMEM;
+-
+-	return platform_driver_register(&occfifo_driver);
+-}
+-
+-static void occfifo_exit(void)
+-{
+-	destroy_workqueue(occfifo_wq);
+-
+-	platform_driver_unregister(&occfifo_driver);
+-}
+-
+-module_init(occfifo_init);
+-module_exit(occfifo_exit);
+-
+-MODULE_AUTHOR("Eddie James <eajames@us.ibm.com>");
+-MODULE_DESCRIPTION("BMC P9 OCC driver");
+-MODULE_LICENSE("GPL");
+diff --git a/include/linux/fsi-sbefifo.h b/include/linux/fsi-sbefifo.h
+index 2d8115a..0ff38d0 100644
+--- a/include/linux/fsi-sbefifo.h
++++ b/include/linux/fsi-sbefifo.h
+@@ -14,21 +14,10 @@
+ #ifndef __FSI_SBEFIFO_H__
+ #define __FSI_SBEFIFO_H__
+ 
+-#include <linux/types.h>
+-
+-struct device_node;
+-struct sbefifo;
++struct device;
+ struct sbefifo_client;
+ 
+-struct sbefifo_drv_ref {
+-	struct list_head link;
+-	void (*notify)(struct sbefifo_drv_ref *ref);
+-};
+-
+-extern struct sbefifo *sbefifo_drv_reference(struct device_node *node,
+-					     struct sbefifo_drv_ref *ref);
+-
+-extern struct sbefifo_client *sbefifo_drv_open(struct sbefifo *sbefifo,
++extern struct sbefifo_client *sbefifo_drv_open(struct device *dev,
+ 					       unsigned long flags);
+ extern int sbefifo_drv_read(struct sbefifo_client *client, char *buf,
+ 			    size_t len);
+@@ -36,6 +25,4 @@ extern int sbefifo_drv_write(struct sbefifo_client *client, const char *buf,
+ 			     size_t len);
+ extern void sbefifo_drv_release(struct sbefifo_client *client);
+ 
+-extern int sbefifo_drv_get_idx(struct sbefifo *sbefifo);
+-
+ #endif /* __FSI_SBEFIFO_H__ */
+-- 
+1.8.3.1
+
