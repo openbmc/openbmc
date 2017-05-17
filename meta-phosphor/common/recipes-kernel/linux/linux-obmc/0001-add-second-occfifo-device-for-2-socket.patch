@@ -1,0 +1,80 @@
+From f56d1c6b203d3c7332b63110fc4850a596f125e2 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Wed, 17 May 2017 10:36:27 -0500
+Subject: [PATCH] add second occfifo device for 2 socket
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts | 16 ++++++++++++++++
+ drivers/fsi/fsi-sbefifo.c                        | 14 ++++++++++++--
+ 2 files changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+index ca228be..e95d925 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+@@ -81,6 +81,14 @@
+ 
+ 			reg = <0x2400>;
+ 		};
++
++		sbefifo2: sbefifo@82400 {
++			compatible = "ibm,power9-sbefifo";
++
++			status = "okay";
++
++			reg = <0x2400>;
++		};
+ 	};
+ 
+ 	occfifo@1 {
+@@ -91,6 +99,14 @@
+ 		bus = <&sbefifo1>;
+ 	};
+ 
++	occfifo@2 {
++		compatible = "ibm,occfifo";
++
++		status = "okay";
++
++		bus = <&sbefifo2>;
++	};
++
+ 	iio-hwmon {
+ 		compatible = "iio-hwmon";
+ 		io-channels = <&bmp 1>;
+diff --git a/drivers/fsi/fsi-sbefifo.c b/drivers/fsi/fsi-sbefifo.c
+index b395cb6..e7755a6 100644
+--- a/drivers/fsi/fsi-sbefifo.c
++++ b/drivers/fsi/fsi-sbefifo.c
+@@ -786,7 +786,7 @@ int sbefifo_drv_get_idx(struct sbefifo *sbefifo)
+ static int sbefifo_probe(struct device *dev)
+ {
+ 	struct fsi_device *fsi_dev = to_fsi_dev(dev);
+-	struct sbefifo *sbefifo;
++	struct sbefifo *sbefifo, *check;
+ 	struct device_node *np;
+ 	u32 sts, addr;
+ 	int ret;
+@@ -839,7 +839,17 @@ static int sbefifo_probe(struct device *dev)
+ 		/* TODO: get real address, not cfam offset */
+ 		if (addr == fsi_dev->addr) {
+ 			sbefifo->node = np;
+-			break;
++
++			/* make sure we haven't found this one already */
++			list_for_each_entry(check, &sbefifo_fifos, link) {
++				if (check->node == np) {
++					sbefifo->node = NULL;
++					break;
++				}
++			}
++
++			if (sbefifo->node)
++				break;
+ 		}
+ 	}
+ 
+-- 
+1.8.3.1
+

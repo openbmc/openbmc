@@ -1,0 +1,156 @@
+From d0fe0bd1548cad9c287f9f73a0180b78c4207588 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 19 May 2017 10:41:15 -0500
+Subject: [PATCH] drivers: occfifo: add sequencing and checksum calculation
+
+Also ignore response after putscom.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ drivers/fsi/occfifo.c | 45 +++++++++++++++++++++++++++++++++------------
+ 1 file changed, 33 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/fsi/occfifo.c b/drivers/fsi/occfifo.c
+index c1a3351..7a9182c 100644
+--- a/drivers/fsi/occfifo.c
++++ b/drivers/fsi/occfifo.c
+@@ -11,6 +11,7 @@
+ #include <linux/device.h>
+ #include <linux/err.h>
+ #include <linux/fsi-sbefifo.h>
++#include <linux/idr.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/miscdevice.h>
+@@ -35,6 +36,7 @@ struct occfifo {
+ 	spinlock_t list_lock;
+ 	spinlock_t occ_lock;
+ 	struct work_struct work;
++	struct ida sequencing;
+ };
+ 
+ #define to_occfifo(x)	container_of((x), struct occfifo, mdev)
+@@ -69,6 +71,7 @@ struct occfifo_client {
+ 	wait_queue_head_t wait;
+ 	size_t read_offset;
+ 	unsigned long flags;
++	u8 seq_no;
+ };
+ 
+ enum {
+@@ -106,6 +109,7 @@ static void occfifo_enqueue_xfr(struct occfifo_xfr *xfr)
+ 
+ static int occfifo_open(struct inode *inode, struct file *file)
+ {
++	int seq_no;
+ 	struct occfifo_client *client;
+ 	struct miscdevice *mdev = file->private_data;
+ 	struct occfifo *occfifo = to_occfifo(mdev);
+@@ -117,6 +121,10 @@ static int occfifo_open(struct inode *inode, struct file *file)
+ 	client->occfifo = occfifo;
+ 	spin_lock_init(&client->lock);
+ 	init_waitqueue_head(&client->wait);
++	seq_no = ida_simple_get(&occfifo->sequencing, 1, 0x100, GFP_KERNEL);
++	if (seq_no < 0)
++		return seq_no;
++	client->seq_no = seq_no;
+ 
+ 	if (file->f_flags & O_NONBLOCK)
+ 		set_bit(CLIENT_NONBLOCKING, &client->flags);
+@@ -213,6 +221,9 @@ static ssize_t occfifo_write(struct file *file, const char __user *buf,
+ 			     size_t len, loff_t *offset)
+ {
+ 	int rc;
++	u16 data_length;
++	u16 checksum = 0;
++	unsigned int i;
+ 	struct occfifo_xfr *xfr;
+ 	struct occfifo_client *client = file->private_data;
+ 
+@@ -234,14 +245,25 @@ static ssize_t occfifo_write(struct file *file, const char __user *buf,
+ 		goto done;
+ 	}
+ 
+-	if (copy_from_user(xfr->buf, buf, len)) {
++	xfr->buf[0] = client->seq_no;
++
++	/* user shouldn't pass sequence number */
++	if (copy_from_user(&xfr->buf[1], buf, len)) {
+ 		kfree(xfr);
+ 		rc = -EFAULT;
+ 		goto done;
+ 	}
+ 
++	data_length = (xfr->buf[2] << 8) + xfr->buf[3];
++
++	for (i = 0; i < data_length + 4; ++i)
++		checksum += xfr->buf[i];
++
++	xfr->buf[data_length + 4] = checksum >> 8;
++	xfr->buf[data_length + 5] = checksum & 0xFF;
++
+ 	xfr->client = client;
+-	xfr->cmd_data_length = len;
++	xfr->cmd_data_length = data_length + 6;
+ 	client->xfr = xfr;
+ 	client->read_offset = 0;
+ 
+@@ -260,6 +282,8 @@ static int occfifo_release(struct inode *inode, struct file *file)
+ 	struct occfifo_client *client = file->private_data;
+ 	struct occfifo *occfifo = client->occfifo;
+ 
++	ida_simple_remove(&occfifo->sequencing, client->seq_no);
++
+ 	spin_lock_irq(&client->lock);
+ 	xfr = client->xfr;
+ 	if (!xfr) {
+@@ -370,17 +394,11 @@ static int occfifo_putscom(struct sbefifo *sbefifo, u32 address, u8 *data)
+ 		goto done;
+ 	}
+ 
+-	rc = sbefifo_drv_read(client, (char *)buf, sizeof(u32) * 4);
+-	if (rc < 0) {
+-		rc = 0;
+-		goto done;
+-	} else if (rc != sizeof(u32) * 4) {
+-		rc = -EIO;
+-		goto done;
+-	}
+-
+ 	rc = 0;
+ 
++	/* ignore response */
++	sbefifo_drv_read(client, (char *)buf, len);
++
+ done:
+ 	sbefifo_drv_release(client);
+ 	return rc;
+@@ -553,6 +571,7 @@ static int occfifo_probe(struct platform_device *pdev)
+ 	spin_lock_init(&occfifo->list_lock);
+ 	spin_lock_init(&occfifo->occ_lock);
+ 	INIT_WORK(&occfifo->work, occfifo_worker);
++	ida_init(&occfifo->sequencing);
+ 
+ 	snprintf(occfifo->name, sizeof(occfifo->name), "occfifo%d",
+ 		 sbefifo_drv_get_idx(occfifo->sbefifo));
+@@ -582,6 +601,7 @@ static int occfifo_remove(struct platform_device *pdev)
+ 	struct occfifo_client *client;
+ 
+ 	misc_deregister(&occfifo->mdev);
++	ida_destroy(&occfifo->sequencing);
+ 
+ 	spin_lock_irq(&occfifo->list_lock);
+ 	list_for_each_entry_safe(xfr, tmp, &occfifo->xfrs, link) {
+@@ -606,7 +626,8 @@ static int occfifo_remove(struct platform_device *pdev)
+ 	spin_unlock(&occfifo->list_lock);
+ 
+ 	flush_work(&occfifo->work);
+-	list_del(&occfifo->ref.link);
++	if (occfifo->sbeifof)
++		list_del(&occfifo->ref.link);
+ 
+ 	return 0;
+ }
+-- 
+1.8.3.1
+
