@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor Settings Daemon
+
+[Service]
+ExecStart={sbindir}/phosphor-settings-manager
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
