@@ -1,0 +1,51 @@
+/xyz/openbmc_project/settings/host0/auto_reboot:
+    Interface: xyz.openbmc_project.Settings.Boot.RebootPolicy
+    Defaults:
+        AutoReboot: 'false'
+
+/xyz/openbmc_project/settings/host0/boot_source:
+    Interface: xyz.openbmc_project.Settings.Boot.Source
+    Defaults:
+        BootSource: boot::Source::Sources::Default
+
+/xyz/openbmc_project/settings/host0/boot_mode:
+    Interface: xyz.openbmc_project.Settings.Boot.Mode
+    Defaults:
+        BootMode: boot::Mode::Modes::Regular
+
+/xyz/openbmc_project/settings/host0/boot_settings_scope:
+    Interface: xyz.openbmc_project.Settings.Scope
+    Defaults:
+        SettingScope: Scope::Scopes::OneTime
+
+/xyz/openbmc_project/settings/host0/network_config:
+    Interface: xyz.openbmc_project.Settings.Network.Config
+
+/xyz/openbmc_project/settings/host0/power_cap:
+    Interface: xyz.openbmc_project.Settings.Power.Cap
+
+/xyz/openbmc_project/settings/host0/power_restore_policy:
+    Interface: xyz.openbmc_project.Settings.Power.RestorePolicy
+    Defaults:
+        PowerRestorePolicy: power::RestorePolicy::Policy::Restore
+
+/xyz/openbmc_project/settings/time/sync_method:
+    Interface: xyz.openbmc_project.Settings.Time.Synchronization
+    Defaults:
+        TimeSyncMethod: time::Synchronization::Method::NTP
+
+/xyz/openbmc_project/settings/time/owner:
+    Interface: xyz.openbmc_project.Settings.Time.Owner
+    Defaults:
+        TimeOwner: time::Owner::Owners::BMC
+
+/xyz/openbmc_project/settings/time/use_ntp:
+    Interface: xyz.openbmc_project.Settings.Time.NTP
+    Defaults:
+        DHCPProvidedNTP: 'true'
+
+/xyz/openbmc_project/settings/host0/cpu0/turbo_enabled:
+    Interface: xyz.openbmc_project.Settings.Frequency.Turbo
+
+/xyz/openbmc_project/settings/host0/cpu1/turbo_enabled:
+    Interface: xyz.openbmc_project.Settings.Frequency.Turbo
