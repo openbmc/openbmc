@@ -1,0 +1,15 @@
+[Unit]
+Description=Check Chassis%i pgood and create a file to indicate it
+Wants=mapper-wait@-org-openbmc-control-power%i.service
+After=mapper-wait@-org-openbmc-control-power%i.service
+Wants=obmc-power-reset-on@%i.target
+Before=obmc-power-reset-on@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/bin/sh -c "if [ $(busctl get-property `mapper get-service /org/openbmc/control/power%i` /org/openbmc/control/power%i org.openbmc.control.Power pgood | sed 's/i\s*[1]/on/' | grep on | wc -l) != 0 ]; then mkdir -p /run/openbmc/ && touch /run/openbmc/chassis@%i-on; fi"
+
+[Install]
+WantedBy=obmc-chassis-powerreset@%i.target
