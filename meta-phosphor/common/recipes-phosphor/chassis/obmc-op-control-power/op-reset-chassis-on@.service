@@ -1,7 +1,7 @@
 [Unit]
 Description=Start chassis%i on after BMC reset
-Requires=op-reset-set-power-on@%i.service
-After=op-reset-set-power-on@%i.service
+Requires=op-reset-chassis-running@%i.service
+After=op-reset-chassis-running@%i.service
 After=obmc-power-reset-on@%i.target
 Requires=obmc-power-reset-on@%i.target
 
