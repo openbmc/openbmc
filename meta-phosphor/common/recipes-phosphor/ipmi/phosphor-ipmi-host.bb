@@ -1,6 +1,5 @@
 SUMMARY = "Phosphor OpenBMC IPMI daemon"
 DESCRIPTION = "Phosphor OpenBMC IPMI router and plugin libraries"
-HOMEPAGE = "http://github.com/openbmc/phosphor-host-ipmid"
 PR = "r1"
 
 RRECOMMENDS_${PN} += "packagegroup-obmc-ipmid-providers-libs"
@@ -30,12 +29,11 @@ RDEPENDS_${PN} += "libmapper"
 RDEPENDS_${PN} += "phosphor-time-manager"
 RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 
+require ${PN}.inc
+
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 
 RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
-SRC_URI += "git://github.com/openbmc/phosphor-host-ipmid"
-
-SRCREV = "83527efebc74c906aa6e7ed3205703db48002619"
 
 # Setup IPMI Whitelist Conf files
 WHITELIST_CONF = " \
