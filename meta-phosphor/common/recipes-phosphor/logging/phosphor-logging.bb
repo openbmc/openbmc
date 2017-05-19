@@ -7,7 +7,6 @@ inherit autotools pkgconfig
 inherit pythonnative
 inherit obmc-phosphor-license
 inherit obmc-phosphor-dbus-service
-inherit phosphor-dbus-interfaces
 inherit phosphor-logging
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.Logging.service"
@@ -39,5 +38,6 @@ PACKAGECONFIG[metadata-processing] = " \
 
 EXTRA_OECONF = " \
         YAML_DIR=${STAGING_DIR_NATIVE}${yaml_dir} \
+        OP_YAML_DIR=${STAGING_DIR_NATIVE}${op_yaml_dir} \
         CALLOUTS_YAML=${STAGING_DIR_NATIVE}${callouts_datadir}/callouts.yaml \
         "
