@@ -77,14 +77,6 @@ STOP_INSTFMT_CTRL = "obmc-chassis-poweroff@{0}.target"
 STOP_FMT_CTRL = "../${STOP_TMPL_CTRL}:${STOP_TGTFMT_CTRL}.requires/${STOP_INSTFMT_CTRL}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT_CTRL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 
-# Ensure when the obmc-chassis-poweroff target is called that
-# obmc-host-stop target is also called
-OFF_TMPL_CTRL = "obmc-host-stop@.target"
-OFF_TGTFMT_CTRL = "obmc-chassis-poweroff@{1}.target"
-OFF_INSTFMT_CTRL = "obmc-host-stop@{0}.target"
-OFF_FMT_CTRL = "../${OFF_TMPL_CTRL}:${OFF_TGTFMT_CTRL}.requires/${OFF_INSTFMT_CTRL}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'OFF_FMT_CTRL', 'OBMC_HOST_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-
 # Force the standby target to run the chassis reset check target
 RESET_TMPL_CTRL = "obmc-chassis-powerreset@.target"
 SYSD_TGT = "${SYSTEMD_DEFAULT_TARGET}"
