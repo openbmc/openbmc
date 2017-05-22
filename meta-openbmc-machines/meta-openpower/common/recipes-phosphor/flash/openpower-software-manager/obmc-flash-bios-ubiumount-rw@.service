@@ -1,0 +1,16 @@
+[Unit]
+Description=Remove UBIFS volume pnor-rw-%I
+Wants=obmc-flash-bios-ubiattach.service
+After=obmc-flash-bios-ubiattach.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/bin/sh -c 'rw=pnor-rw-%i; \
+                      if grep -q $rw /proc/mounts; then \
+                        umount /media/$rw; fi; \
+                      rw_ubi=`ubinfo -d 0 -a | grep $rw`; \
+                      if [ ! -z "$rw_ubi" ]; then \
+                        {sbindir}/ubirmvol /dev/ubi0 -N $rw; fi; \
+                      if [ -d "/media/$rw" ]; then \
+                        rm -r /media/$rw; fi;'
