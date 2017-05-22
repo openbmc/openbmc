@@ -28,6 +28,8 @@ DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
 SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubiattach.service \
         obmc-flash-bios-ubimount@.service \
+        obmc-flash-bios-ubiumount.service \
+        obmc-flash-bios-ubiumount@.service \
         obmc-flash-bios-squashfsmount@.service \
         "
 
