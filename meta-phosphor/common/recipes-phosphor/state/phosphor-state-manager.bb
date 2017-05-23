@@ -80,6 +80,6 @@ FMT = "../${TMPL}:${SYSTEMD_DEFAULT_TARGET}.wants/${INSTFMT}"
 SYSTEMD_LINK_${PN}-discover += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "222014e0f3e06d6850d78d2f6972ac07e14a0b8c"
+SRCREV = "c99ad19b76f233f2c31a02d133770377572fc92a"
 
 S = "${WORKDIR}/git"
