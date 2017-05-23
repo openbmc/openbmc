@@ -19,6 +19,7 @@ SRC_URI += "file://linux-dev-4.10-1-3-drivers-fsi-sbefifo-Add-in-kernel-API.patc
 SRC_URI += "file://linux-dev-4.10-2-3-drivers-fsi-sbefifo-Add-OCC-driver.patch"
 SRC_URI += "file://0001-arm-dts-aspeed-Add-FSI-devices.patch"
 SRC_URI += "file://0001-hwmon-Add-support-for-MAX31785-intelligent-fan-contr.patch"
+SRC_URI += "file://0001-arm-dts-barreleye-Add-missing-clock-sources.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
