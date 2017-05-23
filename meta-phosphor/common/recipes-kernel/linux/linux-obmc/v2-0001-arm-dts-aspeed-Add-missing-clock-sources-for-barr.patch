@@ -1,0 +1,196 @@
+From af9bc81e2158c326552c013d6591f533b69286e3 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Thu, 25 May 2017 09:59:09 -0500
+Subject: [PATCH linux dev-4.10 v2] arm: dts: aspeed: Add missing clock sources
+ for barreleye
+
+Reorganize flash controllers into the ast2400 config. Barreleye wasn't
+booting with the new aspeed-smc driver.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts | 44 ++++++++--------------
+ arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts  | 52 ++++++++------------------
+ arch/arm/boot/dts/aspeed-g4.dtsi               | 34 +++++++++++++++++
+ 3 files changed, 66 insertions(+), 64 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts b/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts
+index be1f2d1..7a616bb 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts
+@@ -31,34 +31,6 @@
+ 		};
+ 	};
+ 
+-	ahb {
+-		bmc_pnor: fmc@1e620000 {
+-			reg = < 0x1e620000 0x94
+-				0x20000000 0x02000000 >;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "aspeed,ast2400-fmc";
+-			flash@0 {
+-				reg = < 0 >;
+-				compatible = "jedec,spi-nor" ;
+-#include "aspeed-bmc-opp-flash-layout.dtsi"
+-			};
+-		};
+-
+-		host_pnor: spi@1e630000 {
+-			reg = < 0x1e630000 0x18
+-				0x30000000 0x02000000 >;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "aspeed,ast2400-spi";
+-			flash@0 {
+-				reg = < 0 >;
+-				compatible = "jedec,spi-nor" ;
+-				label = "pnor";
+-			};
+-		};
+-	};
+-
+ 	leds {
+ 		compatible = "gpio-leds";
+ 
+@@ -76,6 +48,22 @@
+ 	};
+ };
+ 
++&bmc_pnor {
++	status = "okay";
++	flash@0 {
++		status = "okay";
++		m25p,fast-read;
++#include "aspeed-bmc-opp-flash-layout.dtsi"
++	};
++};
++
++&host_pnor {
++	flash@0 {
++		status = "okay";
++		m25p,fast-read;
++	};
++};
++
+ &pinctrl {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_flbusy_default &pinctrl_flwp_default
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts b/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
+index b4faa1d..e55abe6 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-palmetto.dts
+@@ -47,42 +47,6 @@
+                 };
+         };
+ 
+-	ahb {
+-		bmc_pnor: fmc@1e620000 {
+-			reg = < 0x1e620000 0x94
+-				0x20000000 0x02000000 >;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "aspeed,ast2400-fmc";
+-			aspeed,fmc-has-dma;
+-			interrupts = <19>;
+-			clocks = <&clk_ahb>;
+-			clock-names = "ahb";
+-			flash@0 {
+-				reg = < 0 >;
+-				compatible = "jedec,spi-nor" ;
+-				m25p,fast-read;
+-#include "aspeed-bmc-opp-flash-layout.dtsi"
+-			};
+-		};
+-
+-		host_pnor: spi@1e630000 {
+-			reg = < 0x1e630000 0x18
+-				0x30000000 0x02000000 >;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "aspeed,ast2400-spi";
+-			clocks = <&clk_ahb>;
+-			clock-names = "ahb";
+-			flash {
+-				reg = < 0 >;
+-				compatible = "jedec,spi-nor" ;
+-				label = "pnor";
+-				m25p,fast-read;
+-			};
+-		};
+-	};
+-
+ 	gpio-fsi {
+ 		compatible = "fsi-master-gpio", "fsi-master";
+ 
+@@ -94,6 +58,22 @@
+ 	};
+ };
+ 
++&bmc_pnor {
++	status = "okay";
++	flash@0 {
++		status = "okay";
++		m25p,fast-read;
++#include "aspeed-bmc-opp-flash-layout.dtsi"
++	};
++};
++
++&host_pnor {
++	flash@0 {
++		status = "okay";
++		m25p,fast-read;
++	};
++};
++
+ &pinctrl {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_flbusy_default &pinctrl_flwp_default
+diff --git a/arch/arm/boot/dts/aspeed-g4.dtsi b/arch/arm/boot/dts/aspeed-g4.dtsi
+index d8827d5..9fb7889 100644
+--- a/arch/arm/boot/dts/aspeed-g4.dtsi
++++ b/arch/arm/boot/dts/aspeed-g4.dtsi
+@@ -44,6 +44,40 @@
+ 		#size-cells = <1>;
+ 		ranges;
+ 
++		bmc_pnor: fmc@1e620000 {
++			reg = < 0x1e620000 0x94
++				0x20000000 0x02000000 >;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "aspeed,ast2400-fmc";
++			status = "disabled";
++			aspeed,fmc-has-dma;
++			interrupts = <19>;
++			clocks = <&clk_ahb>;
++			clock-names = "ahb";
++			flash@0 {
++				reg = < 0 >;
++				compatible = "jedec,spi-nor" ;
++				status = "disabled";
++			};
++		};
++
++		host_pnor: spi@1e630000 {
++			reg = < 0x1e630000 0x18
++				0x30000000 0x02000000 >;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "aspeed,ast2400-spi";
++			status = "disabled";
++			clocks = <&clk_ahb>;
++			clock-names = "ahb";
++			flash@0 {
++				reg = < 0 >;
++				compatible = "jedec,spi-nor" ;
++				status = "disabled";
++			};
++		};
++
+ 		vic: interrupt-controller@1e6c0080 {
+ 			compatible = "aspeed,ast2400-vic";
+ 			interrupt-controller;
+-- 
+1.8.3.1
+
