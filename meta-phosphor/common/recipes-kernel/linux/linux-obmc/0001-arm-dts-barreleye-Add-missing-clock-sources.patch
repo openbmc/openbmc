@@ -1,0 +1,48 @@
+From cd9dbc0802652d3c713ccf04801578dbbe3a8725 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Tue, 23 May 2017 13:45:45 -0500
+Subject: [PATCH] arm: dts: barreleye: Add missing clock sources
+
+Prevented BMC from booting on Barreleye in 4.10 kernel, with new aspeed-smc driver.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts b/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts
+index be1f2d1..9b59587 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-barreleye.dts
+@@ -37,10 +37,14 @@
+ 				0x20000000 0x02000000 >;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
++			interrupts = <19>;
+ 			compatible = "aspeed,ast2400-fmc";
++			clocks = <&clk_ahb>;
++			clock-names = "ahb";
+ 			flash@0 {
+ 				reg = < 0 >;
+ 				compatible = "jedec,spi-nor" ;
++				m25p,fast-read;
+ #include "aspeed-bmc-opp-flash-layout.dtsi"
+ 			};
+ 		};
+@@ -51,10 +55,13 @@
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			compatible = "aspeed,ast2400-spi";
++			clocks = <&clk_ahb>;
++			clock-names = "ahb";
+ 			flash@0 {
+ 				reg = < 0 >;
+ 				compatible = "jedec,spi-nor" ;
+ 				label = "pnor";
++				m25p,fast-read;
+ 			};
+ 		};
+ 	};
+-- 
+1.8.3.1
+
