@@ -12,7 +12,7 @@ inherit pythonnative
 DBUS_SERVICE_${PN} = "org.openbmc.settings.Host.service"
 
 DEPENDS += "python-pyyaml-native"
-RDEPENDS_${PN} += "python-dbus python-pygobject"
+RDEPENDS_${PN} += "python-dbus python-pygobject python-ipy"
 PROVIDES += "virtual/obmc-settings-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-settings-mgmt"
 
