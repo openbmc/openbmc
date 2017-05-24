@@ -1,0 +1,40 @@
+0x07:
+    sensorType: 0xC3
+    Path: /xyz/openbmc_project/state/host0/boot_count
+    sensorReadingType: 0x6F
+    interfaces:
+        xyz.openbmc_project.State.Boot.Count:
+            BootCount:
+                type: uint16
+0x03:
+    sensorType: 0x0F
+    Path: /xyz/openbmc_project/state/host0/boot_progress
+    sensorReadingType: 0x6F
+    interfaces:
+        xyz.openbmc_project.State.Boot.Progress:
+            BootProgress:
+                type: string
+0x05:
+    sensorType: 0x1F
+    Path: /xyz/openbmc_project/state/host0/os_status
+    sensorReadingType: 0x6F
+    interfaces:
+        xyz.openbmc_project.State.OperatingSystem.Status:
+            BootProgress:
+                type: string
+0x08:
+    sensorType: 0x09
+    Path: /org/open_power/occ/proc0/status
+    sensorReadingType: 0x09
+    interfaces:
+        org.open_power.OCC.Status:
+            OCCActive:
+                type: bool
+0x09:
+    sensorType: 0x09
+    Path: /org/open_power/occ/proc1/status
+    sensorReadingType: 0x09
+    interfaces:
+        org.open_power.OCC.Status:
+            OCCActive:
+                type: bool
