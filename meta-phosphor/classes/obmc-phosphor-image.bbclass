@@ -80,6 +80,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
         ffdc \
         rsync \
+		nginx \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
