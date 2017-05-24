@@ -91,6 +91,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         ffdc \
         rsync \
         rng-tools \
+        python3-redfish \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""

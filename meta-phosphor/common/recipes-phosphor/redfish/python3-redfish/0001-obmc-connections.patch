@@ -1,0 +1,69 @@
+diff --git a/RedDrum-RedfishService.py b/RedDrum-RedfishService.py
+index 955c905..97787e9 100644
+--- a/RedDrum-RedfishService.py
++++ b/RedDrum-RedfishService.py
+@@ -1,3 +1,4 @@
++#!/usr/bin/env python3
+ # Copyright Notice:
+ # Copyright 2016 Distributed Management Task Force, Inc. All rights reserved.
+ # License: BSD 3-Clause License. For full text see link: https://github.com/DMTF/Redfish-Profile-Simulator/LICENSE.md
+diff --git a/RedDrum/Backend/OpenBMC/backendRoot.py b/RedDrum/Backend/OpenBMC/backendRoot.py
+index 6fd4fd6..5607341 100644
+--- a/RedDrum/Backend/OpenBMC/backendRoot.py
++++ b/RedDrum/Backend/OpenBMC/backendRoot.py
+@@ -42,7 +42,7 @@ class RdBackendRoot():
+ 
+         # to move the data caches somewhere safe, edit these path and dont run with isLocal flat in RedDrumMain
+         #rdSvcPath="/opt/dell/rm-tools/RMRedfishService"   # this is a read path  
+-        #rdr.RedDrumConfPath = "/etc/opt/dell/rm-tools/RedDrum.conf"  # read path 
++        rdr.RedDrumConfPath = "/usr/share/RedDrum/RedDrum.conf"  # read path 
+         #rdr.varDataPath="/var/www/rf/"
+         #rdr.baseDataPath=os.path.join(rdSvcPath, "RedDrum","RedfishService", "FlaskApp", "Data")
+ 
+diff --git a/RedDrum/redDrumMain.py b/RedDrum/redDrumMain.py
+index e714a9d..3a16bea 100644
+--- a/RedDrum/redDrumMain.py
++++ b/RedDrum/redDrumMain.py
+@@ -32,26 +32,27 @@ def redDrumMain(*args, **kwargs):
+     rdr.program="redDrumMain"
+     rdr.version="0.9.5"
+ 
++    rdr.RedDrumConfPath = resource_filename(__name__, 'RedDrum.conf')
++    rdr.templatesBase = resource_filename(__name__, "/" )
++    rdr.baseDataPath=os.path.join(rdr.templatesBase, "RedfishService", rdService,  "Data")
++
+     # startup the Backend
+     #   Note that the Backend start code may change the root data in rdr to specify paths, etc
+     #   cd the RedDrum/Backend and edit __init__.py to select a specific Backend
+     rdbe = RedDrumBackend(rdr)
+     rdr.backend=rdbe
+ 
+-    rdr.RedDrumConf = resource_filename(__name__, 'RedDrum.conf')
+-    rdr.templatesBase = resource_filename(__name__, "/" )
+-    rdr.baseDataPath=os.path.join(rdr.templatesBase, "RedfishService", rdService,  "Data")
+-    print ("HI THERE: %s" % rdr.RedDrumConf )
++    print ("HI THERE: %s" % rdr.RedDrumConfPath )
+     print ("HI THERE: %s" % rdr.templatesBase )
+     print ("HI THERE: %s" % rdr.baseDataPath )
+     sys.stdout.flush()
+-    
++
+     # Now update the default root data with any data stored in RedDrum.conf config file
+     #    This includes the config parameteers for Authentication and header processing
+     #    Anything from RedDrum.conf can be OVER_WRITTEN by Backend start code!
+     try:
+         config = configparser.ConfigParser(inline_comment_prefixes='#')
+-        config.read(rdr.RedDrumConf)
++        config.read(rdr.RedDrumConfPath)
+     except IOError:
+         print ("Error: RM Config File does not appear to exist.")
+ 
+@@ -63,7 +64,7 @@ def redDrumMain(*args, **kwargs):
+         os.mkdir(rdr.varDataPath)
+     except FileExistsError:
+         pass
+-    for subdir in ["chassisdb", "db", "managersDb", "systemsDb", "static"]:
++    for subdir in ["chassisDb", "db", "managersDb", "systemsDb", "static"]:
+         try:
+             print ("Make dir: %s" % os.path.join(rdr.varDataPath, subdir))
+             os.mkdir(os.path.join(rdr.varDataPath, subdir))
