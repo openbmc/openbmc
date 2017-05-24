@@ -1,27 +1,124 @@
+0xC3:
+  path: /xyz/openbmc_project/control/host0/reboot_attempts
+  updatePath: /xyz/openbmc_project/control/boot
+  updateInterface: org.freedesktop.DBus.Properties
+  command: Set
+  interfaces:
+    xyz.openbmc_project.Control.Boot.RebootAttempts:
+      AttemptsLeft:
+        Reading:
+          0x01:
+            0xFF:
+              type: string
+              set: set
+0x1F:
+  path: /xyz/openbmc_project/state/host0/os_status
+  sensorReadingType: 0x6F
+  updatePath: /xyz/openbmc_project/state/host0/os_status
+  updateInterface: org.freedesktop.DBus.Properties
+  command: Set
+  interfaces:
+    xyz.openbmc_project.State.OperatingSystem.Status:
+      OperatingSystemState:
+        assertion:
+          0x00:
+            0x01:
+              assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CBoot"
+              type: string
+            0x02:
+              assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.PXEBoot"
+              type: string
+            0x03:
+              assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.DiagBoot"
+              type: string
+            0x04:
+              assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CDROMBoot"
+              type: string
+            0x05:
+              assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.ROMBoot"
+              type: string
+            0x06:
+                assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete"
+                type: string
+0x0F:
+  path: /xyz/openbmc_project/state/boot/progress
+  updatePath: /xyz/openbmc_project/state/boot/progress 
+  updateInterface: org.freedesktop.DBus.Properties
+  command: Set
+  interfaces:
+    xyz.openbmc_project.State.Boot.Progress:
+      ProgressStages:
+        Reading:
+          0x02:
+            0x00:
+              type: string
+              set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.Unspecified"
+            0x01:
+              type: string
+              set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.MemoryInit"
+            0x03:
+              type: string
+              set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.SecondaryProcInit"
+            0x13:
+              type: string
+              set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.OSStart"
+            0x14:
+              type: string
+              set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.MotherboardInit"
+0x09:
+  path: /org/open_power/occ/proc0/status
+  updatePath: /org/open_power/occ/proc0/status
+  updateInterface: org.freedesktop.DBus.Properties
+  command: Set
+  interfaces:
+    org.open_power.OCC.Status:
+      OCCActive:
+        0x00:
+          0x00:
+            type: bool
+            assert: true
+          0x01:
+            type: bool
+            assert: false
 0x0C:
-  xyz.openbmc_project.State.Decorator.OperationalStatus:
-    Functional:
-      0x04:
-        type:   "bool"
-        assert:  false
-        deassert: true
-  xyz.openbmc_project.Inventory.Item:
-    Present:
-      0x06:
-        type: "bool"
-        assert: true
-        deassert: false
-
+  updatePath: /xyz/openbmc_project/inventory
+  updateInterface: xyz.openbmc_project.Inventory.Manager
+  command: Notify
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        assertion:
+          0x00:
+            0x04:
+              type:   "bool"
+              assert:  false
+              deassert: true
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        assertion:
+          0x00:
+            0x06:
+              type: "bool"
+              assert: true
+              deassert: false
 0x07:
-  xyz.openbmc_project.State.Decorator.OperationalStatus:
-    Functional:
-      0x08:
-        type:   "bool"
-        assert: false
-        deassert: true
-  xyz.openbmc_project.Inventory.Item:
-    Present:
-      0x07:
-        type: "bool"
-        assert: true
-        deassert: false
+  updatePath: /xyz/openbmc_project/inventory
+  updateInterface: xyz.openbmc_project.Inventory.Manager
+  command: Notify
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        assertion:
+          0x00:
+            0x08:
+              type:   "bool"
+              assert: false
+              deassert: true
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        assertion:
+          0x00:
+            0x07:
+              type: "bool"
+              assert: true
+              deassert: false
