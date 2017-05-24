@@ -25,6 +25,8 @@ SYSTEMD_PACKAGES = ""
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
+inherit pythonnative
+inherit obmc-phosphor-systemd
 
 DEPENDS += " \
     autoconf-archive-native \
@@ -57,6 +59,6 @@ DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.servic
 DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
-SRCREV = "4e48fd582e86bd8246a5602dde4b5f644ae03d11"
+SRCREV = "2ce7da29e0f893d0185b660f19ad17af916bbbeb"
 
 S = "${WORKDIR}/git"
