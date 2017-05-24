@@ -1,0 +1,71 @@
+0x07:
+    sensorType: 0xC3
+    Path: /xyz/openbmc_project/state/host0/boot_count
+    sensorReadingType: 0x6F
+    interfaces:
+        xyz.openbmc_project.State.Boot.Count:
+            BootCount:
+                0xFF: 
+                    type: uint16
+0x03:
+    sensorType: 0x0F
+    Path: /xyz/openbmc_project/state/host0/boot_progress
+    sensorReadingType: 0x6F
+    interfaces:
+        xyz.openbmc_project.State.Boot.Progress:
+            BootProgress:
+                0x01:
+                    assert: "Memory Initialization"
+                0x03:
+                    assert: "Secondary Processor(s) Initialization"
+                0x13:
+                    assert: "Starting operating system boot process"
+                0x14:
+                    assert: "Baseboard or Motherborad Initialization"
+                    type: string
+0x05:
+    sensorType: 0x1F
+    Path: /xyz/openbmc_project/state/host0/os_status
+    sensorReadingType: 0x6F
+    interfaces:
+        xyz.openbmc_project.State.OperatingSystem.Status:
+            BootProgress:
+                0x00:
+                    assert: "A: boot completed"
+                0x01:
+                    assert: "B: boot completed"
+                0x02:
+                    assert: "PXE boot completed"
+                0x03:
+                    assert: "Diagnostic boot completed"
+                0x04:
+                    assert: "CD-ROM boot completed"
+                0x05:
+                    assert: "ROM boot completed"
+                0x06:
+                    assert: "boot completed - boot device not specified"
+                type: string
+0x08:
+    sensorType: 0x09
+    Path: /org/open_power/occ/proc0/status
+    sensorReadingType: 0x09
+    interfaces:
+        org.open_power.OCC.Status:
+            OCCActive:
+                0x00:
+                    assert: true
+                0x01:
+                    assert: false
+                type: bool
+0x09:
+    sensorType: 0x09
+    Path: /org/open_power/occ/proc1/status
+    sensorReadingType: 0x09
+    interfaces:
+        org.open_power.OCC.Status:
+            OCCActive:
+                0x00:
+                    assert: true
+                0x01:
+                    assert: false
+                type: bool
