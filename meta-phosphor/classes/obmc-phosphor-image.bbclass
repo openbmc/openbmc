@@ -89,6 +89,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
         ffdc \
         rsync \
+	python3-redfish \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
