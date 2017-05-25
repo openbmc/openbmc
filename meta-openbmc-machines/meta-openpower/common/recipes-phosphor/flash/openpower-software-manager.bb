@@ -24,6 +24,17 @@ RDEPENDS_${PN} += " \
         sdbusplus \
         "
 
+S = "${WORKDIR}"
+SRC_URI += " \
+        file://bios-ubiattach \
+        file://bios-ubiformat"
+
+do_install() {
+        install -d ${D}${sbindir}
+        install -m 0755 ${WORKDIR}/bios-ubiattach ${D}${sbindir}/bios-ubiattach
+        install -m 0755 ${WORKDIR}/bios-ubiformat ${D}${sbindir}/bios-ubiformat
+}
+
 DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
 SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubiattach.service \
