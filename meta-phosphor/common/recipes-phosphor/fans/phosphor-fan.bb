@@ -17,6 +17,9 @@ DEPENDS += "python-pyyaml-native"
 DEPENDS += "python-mako-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
+DEPENDS += "virtual/phosphor-fan-presence-config"
+DEPENDS += "virtual/phosphor-fan-control-fan-config"
+DEPENDS += "phosphor-fan-monitor-config-native"
 
 # Package configuration
 FAN_PACKAGES = " \
@@ -27,20 +30,12 @@ FAN_PACKAGES = " \
 "
 PACKAGES_remove = "${PN}"
 PACKAGES += "${FAN_PACKAGES}"
-PACKAGECONFIG ??= "presence control cooling-type monitor"
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
 RDEPENDS_${PN}-dev = "${FAN_PACKAGES}"
 RDEPENDS_${PN}-staticdev = "${FAN_PACKAGES}"
 
 # --------------------------------------
 # ${PN}-presence-tach specific configuration
-PACKAGECONFIG[presence] = " \
-        --enable-presence \
-        FAN_DETECT_YAML_FILE=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml, \
-        --disable-presence, \
-        virtual/phosphor-fan-presence-config \
-        , \
-"
 RDEPENDS_${PN}-presence-tach += "sdbusplus"
 
 # Needed to install into the obmc-chassis-poweron target
@@ -55,16 +50,6 @@ SYSTEMD_LINK_${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSI
 
 # --------------------------------------
 # ${PN}-control specific configuration
-PACKAGECONFIG[control] = "--enable-control \
-     FAN_DEF_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/fans.yaml \
-     FAN_ZONE_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/zones.yaml \
-     FAN_ZONE_OUTPUT_DIR=${S}/control, \
-    --disable-control, \
-    virtual/phosphor-fan-control-fan-config \
-    phosphor-fan-control-zone-config-native \
-    , \
-"
-
 RDEPENDS_${PN}-control += "sdbusplus"
 
 FAN_CONTROL_TGT = "obmc-fan-control-ready@{0}.target"
@@ -84,20 +69,11 @@ SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHAS
 
 # --------------------------------------
 # phosphor-chassis-cooling-type specific configuration
-PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,libevdev,"
 RDEPENDS_phosphor-chassis-cooling-type += "libevdev"
 FILES_phosphor-chassis-cooling-type = "${sbindir}/phosphor-cooling-type"
 
 # --------------------------------------
 # ${PN}-monitor specific configuration
-PACKAGECONFIG[monitor] = "--enable-monitor \
-     FAN_MONITOR_YAML_FILE=${STAGING_DIR_NATIVE}${monitor_datadir}/monitor.yaml \
-     FAN_MONITOR_OUTPUT_DIR=${S}/monitor, \
-    --disable-monitor, \
-    phosphor-fan-monitor-config-native \
-    , \
-"
-
 RDEPENDS_${PN}-monitor += "sdbusplus"
 
 TMPL_MONITOR = "phosphor-fan-monitor@.service"
