@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Get the mtd device number for pnor
+pnor=`grep pnor /proc/mtd |cut -c 4`
+
+# Format the pnor mtd device as ubi
+echo "Starting ubiformat /dev/mtd$pnor"
+ubiformat /dev/mtd$pnor -y -q
