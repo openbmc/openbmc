@@ -5,7 +5,7 @@ SECTION = "bootloader"
 
 DEPENDS = "openssl"
 
-SRCREV = "be5e3b5b680746718f45ec5ad45e2debc61407b5"
+SRCREV = "f7ef560f809f140185b6241d83b76de80dcfcf37"
 UBRANCH = "v2016.07-aspeed-openbmc"
 SRC_URI = "git://git@github.com/openbmc/u-boot.git;branch=${UBRANCH};protocol=https"
 
