@@ -2,6 +2,7 @@
 Description=Stop Host%i (Pre)
 Wants={SYSTEMD_DEFAULT_TARGET}
 After={SYSTEMD_DEFAULT_TARGET}
+Before=obmc-host-stopping@%i.target
 Conflicts=obmc-host-start@%i.target
 RefuseManualStart=yes
 RefuseManualStop=yes
