@@ -79,6 +79,13 @@ INSTFMT = "phosphor-discover-system-state@{0}.service"
 FMT = "../${TMPL}:${SYSTEMD_DEFAULT_TARGET}.wants/${INSTFMT}"
 SYSTEMD_LINK_${PN}-discover += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 
+# Force the shutdown target to run the host-stop target
+HOST_STOP_TMPL = "obmc-host-stop@.target"
+HOST_STOP_TGTFMT = "obmc-host-shutdown@{1}.target"
+HOST_STOP_INSTFMT = "obmc-host-stop@{0}.target"
+HOST_STOP_FMT = "../${HOST_STOP_TMPL}:${HOST_STOP_TGTFMT}.requires/${HOST_STOP_INSTFMT}"
+SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_STOP_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
+
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
 SRCREV = "48696ce1a4a5b894382f0c9336a93d43f23b5fb1"
 

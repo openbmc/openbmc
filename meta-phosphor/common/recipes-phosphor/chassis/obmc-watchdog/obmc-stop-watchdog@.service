@@ -2,6 +2,8 @@
 Description=Stop Watchdog%i
 Wants=mapper-wait@-org-openbmc-watchdog-host%i.service
 After=mapper-wait@-org-openbmc-watchdog-host%i.service
+Wants=obmc-host-stop-pre@%i.target
+Before=obmc-host-stop-pre@%i.target
 Conflicts=obmc-host-start@%i.target
 
 [Service]
