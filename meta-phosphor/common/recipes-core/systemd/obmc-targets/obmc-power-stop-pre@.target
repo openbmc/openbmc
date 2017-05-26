@@ -2,6 +2,7 @@
 Description=Power%i Off (Pre)
 Wants={SYSTEMD_DEFAULT_TARGET}
 After={SYSTEMD_DEFAULT_TARGET}
+After=obmc-host-stopped@%i.target
 Conflicts=obmc-chassis-poweron@%i.target
 RefuseManualStart=yes
 RefuseManualStop=yes
