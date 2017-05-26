@@ -1,0 +1,956 @@
+From 7104dda6179ed9c76c5eaa4086ac20deab369d03 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 19 May 2017 16:47:34 -0500
+Subject: [PATCH 3/3] drivers: hwmon: Add OCC driver
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts |   5 +
+ arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts       |   5 +
+ drivers/hwmon/Kconfig                            |   2 +
+ drivers/hwmon/Makefile                           |   1 +
+ drivers/hwmon/occ/Kconfig                        |  24 ++
+ drivers/hwmon/occ/Makefile                       |   7 +
+ drivers/hwmon/occ/common.c                       | 110 +++++++
+ drivers/hwmon/occ/common.h                       | 124 ++++++++
+ drivers/hwmon/occ/p9.c                           | 350 +++++++++++++++++++++++
+ drivers/hwmon/occ/p9.h                           |  17 ++
+ drivers/hwmon/occ/p9_sbe.c                       | 195 +++++++++++++
+ 11 files changed, 840 insertions(+)
+ create mode 100644 drivers/hwmon/occ/Kconfig
+ create mode 100644 drivers/hwmon/occ/Makefile
+ create mode 100644 drivers/hwmon/occ/common.c
+ create mode 100644 drivers/hwmon/occ/common.h
+ create mode 100644 drivers/hwmon/occ/p9.c
+ create mode 100644 drivers/hwmon/occ/p9.h
+ create mode 100644 drivers/hwmon/occ/p9_sbe.c
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+index b0338db..17f68c4 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+@@ -157,6 +157,11 @@
+ 				occ@1 {
+ 					compatible = "ibm,p9-occ";
+ 					reg = <1>;
++
++					occ-hwmon@1 {
++						compatible =
++							"ibm,p9-occ-hwmon";
++					};
+ 				};
+ 			};
+ 
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts b/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
+index 6f36e56..1bde27e 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
+@@ -169,6 +169,11 @@
+ 				occ@1 {
+ 					compatible = "ibm,p9-occ";
+ 					reg = <1>;
++
++					occ-hwmon@1 {
++						compatible =
++							"ibm,p9-occ-hwmon";
++					};
+ 				};
+ 			};
+ 
+diff --git a/drivers/hwmon/Kconfig b/drivers/hwmon/Kconfig
+index 190d270..e80ca81 100644
+--- a/drivers/hwmon/Kconfig
++++ b/drivers/hwmon/Kconfig
+@@ -1240,6 +1240,8 @@ config SENSORS_NSA320
+ 	  This driver can also be built as a module. If so, the module
+ 	  will be called nsa320-hwmon.
+ 
++source drivers/hwmon/occ/Kconfig
++
+ config SENSORS_PCF8591
+ 	tristate "Philips PCF8591 ADC/DAC"
+ 	depends on I2C
+diff --git a/drivers/hwmon/Makefile b/drivers/hwmon/Makefile
+index d2cb7e8..bdb43e2 100644
+--- a/drivers/hwmon/Makefile
++++ b/drivers/hwmon/Makefile
+@@ -170,6 +170,7 @@ obj-$(CONFIG_SENSORS_WM8350)	+= wm8350-hwmon.o
+ obj-$(CONFIG_SENSORS_XGENE)	+= xgene-hwmon.o
+ 
+ obj-$(CONFIG_PMBUS)		+= pmbus/
++obj-$(CONFIG_SENSORS_IBMOCC)	+= occ/
+ 
+ ccflags-$(CONFIG_HWMON_DEBUG_CHIP) := -DDEBUG
+ 
+diff --git a/drivers/hwmon/occ/Kconfig b/drivers/hwmon/occ/Kconfig
+new file mode 100644
+index 0000000..dc597a2
+--- /dev/null
++++ b/drivers/hwmon/occ/Kconfig
+@@ -0,0 +1,24 @@
++#
++# On-Chip Controller configuration
++#
++
++menuconfig SENSORS_IBMOCC
++	tristate "IBM On-Chip Controller"
++	help
++	  If you say yes here you get support for monitoring the IBM POWER
++	  processor sensors via the On-Chip Controller (OCC).
++
++	  This driver can also be built as a module. If so, the module will be
++	  called occ-hwmon.
++
++if SENSORS_IBMOCC
++
++config SENSORS_IBMOCC_P9_SBE
++	bool "IBM P9 OCC via SBE"
++	depends on OCCFIFO
++	help
++	  If you say yes here you get support for monitoring the POWER9
++	  processor sensors via the OCC, from a service processor, over SBE
++	  engine on FSI bus.
++
++endif
+diff --git a/drivers/hwmon/occ/Makefile b/drivers/hwmon/occ/Makefile
+new file mode 100644
+index 0000000..7bdd119
+--- /dev/null
++++ b/drivers/hwmon/occ/Makefile
+@@ -0,0 +1,7 @@
++occ-hwmon-objs := common.o
++
++ifeq ($(CONFIG_SENSORS_IBMOCC_P9_SBE), y)
++occ-hwmon-objs += p9.o p9_sbe.o
++endif
++
++obj-$(CONFIG_SENSORS_IBMOCC) += occ-hwmon.o
+diff --git a/drivers/hwmon/occ/common.c b/drivers/hwmon/occ/common.c
+new file mode 100644
+index 0000000..8f88a1d
+--- /dev/null
++++ b/drivers/hwmon/occ/common.c
+@@ -0,0 +1,110 @@
++/*
++ * Copyright 2017 IBM Corp.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#include "common.h"
++
++void occ_parse_poll_response(struct occ *occ)
++{
++	unsigned int i, offset = 0, size = 0;
++	struct occ_sensor *sensor;
++	struct occ_sensors *sensors = &occ->sensors;
++	struct occ_response *resp = &occ->resp;
++	struct occ_poll_response *poll =
++		(struct occ_poll_response *)&resp->data[0];
++	struct occ_poll_response_header *header = &poll->header;
++	struct occ_sensor_data_block *block = &poll->block;
++
++	for (i = 0; i < header->num_sensor_data_blocks; ++i) {
++		block = (struct occ_sensor_data_block *)((u8 *)block + offset);
++		offset = (block->header.num_sensors *
++			  block->header.sensor_length) + sizeof(block->header);
++		size += offset;
++
++		/* validate all the length/size fields */ 
++		if ((size + sizeof(*header)) >= OCC_RESP_DATA_BYTES) {
++			dev_warn(occ->bus_dev, "exceeded response buffer\n");
++			return;
++		}
++
++		if (strncmp(block->header.eye_catcher, "TEMP", 4) == 0)
++			sensor = &sensors->temp;
++		else if (strncmp(block->header.eye_catcher, "FREQ", 4) == 0)
++			sensor = &sensors->freq;
++		else if (strncmp(block->header.eye_catcher, "POWR", 4) == 0)
++			sensor = &sensors->power;
++		else if (strncmp(block->header.eye_catcher, "CAPS", 4) == 0)
++			sensor = &sensors->caps;
++		else {
++			dev_warn(occ->bus_dev, "sensor not supported %.4s\n",
++				 block->header.eye_catcher);
++			continue;
++		}
++
++		sensor->num_sensors = block->header.num_sensors;
++		sensor->data = &block->data;
++	}
++}
++
++int occ_poll(struct occ *occ)
++{
++	u16 checksum = occ->poll_cmd_data + 1;
++	u8 cmd[8];
++
++	cmd[0] = 0;
++	cmd[1] = 0;
++	cmd[2] = 0;
++	cmd[3] = 1;
++	cmd[4] = occ->poll_cmd_data;
++	cmd[5] = checksum >> 8;
++	cmd[6] = checksum & 0xFF;
++	cmd[7] = 0;
++
++	return occ->send_cmd(occ, cmd);
++}
++
++int occ_set_user_power_cap(struct occ *occ, u16 user_power_cap)
++{
++	int rc;
++	u8 cmd[8];
++	u16 checksum = 0x24;
++
++	user_power_cap = cpu_to_be16(user_power_cap);
++
++	cmd[0] = 0;
++	cmd[1] = 0x22;
++	cmd[2] = 0;
++	cmd[3] = 2;
++
++	memcpy(&cmd[4], &user_power_cap, 2);
++	
++	checksum += cmd[4] + cmd[5];
++	cmd[6] = checksum >> 8;
++	cmd[7] = checksum & 0xFF;
++
++	mutex_lock(&occ->lock);
++	rc = occ->send_cmd(occ, cmd);
++	mutex_unlock(&occ->lock);
++
++	return rc;
++}
++
++int occ_update_response(struct occ *occ)
++{
++	int rc = 0;
++
++	mutex_lock(&occ->lock);
++
++	if (time_after(jiffies, occ->last_update + OCC_UPDATE_FREQUENCY)) {
++		rc = occ_poll(occ);
++		occ->last_update = jiffies;
++	}
++
++	mutex_unlock(&occ->lock);
++	return rc;
++}
+diff --git a/drivers/hwmon/occ/common.h b/drivers/hwmon/occ/common.h
+new file mode 100644
+index 0000000..32ed0ac
+--- /dev/null
++++ b/drivers/hwmon/occ/common.h
+@@ -0,0 +1,124 @@
++/*
++ * Copyright 2017 IBM Corp.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#ifndef __OCC_COMMON_H__
++#define __OCC_COMMON_H__
++
++#include <linux/hwmon-sysfs.h>
++#include <linux/sysfs.h>
++
++#define OCC_UPDATE_FREQUENCY		msecs_to_jiffies(1000)
++#define OCC_RESP_DATA_BYTES		4089
++
++struct occ_response {
++	u8 seq_no;
++	u8 cmd_type;
++	u8 return_status;
++	u16 data_length_be;
++	u8 data[OCC_RESP_DATA_BYTES];
++	u16 checksum_be;
++} __packed;
++
++struct occ_sensor_data_block_header {
++	u8 eye_catcher[4];
++	u8 reserved;
++	u8 sensor_format;
++	u8 sensor_length;
++	u8 num_sensors;
++} __packed;
++
++struct occ_sensor_data_block {
++	struct occ_sensor_data_block_header header;
++	u32 data;
++} __packed;
++
++struct occ_poll_response_header {
++	u8 status;
++	u8 ext_status;
++	u8 occs_present;
++	u8 config_data;
++	u8 occ_state;
++	u8 mode;
++	u8 ips_status;
++	u8 error_log_id;
++	u32 error_log_start_address_be;
++	u16 error_log_length_be;
++	u16 reserved;
++	u8 occ_code_level[16];
++	u8 eye_catcher[6];
++	u8 num_sensor_data_blocks;
++	u8 sensor_data_block_header_version;
++} __packed;
++
++struct occ_poll_response {
++	struct occ_poll_response_header header;
++	struct occ_sensor_data_block block;
++} __packed;
++
++struct occ_sensor {
++	u8 num_sensors;
++	void *data;
++};
++
++struct occ_sensors {
++	struct occ_sensor temp;
++	struct occ_sensor freq;
++	struct occ_sensor power;
++	struct occ_sensor caps;
++};
++
++struct occ_attribute {
++	char name[32];
++	struct sensor_device_attribute_2 sensor;
++};
++
++struct occ {
++	struct device *bus_dev;
++	struct device *hwmon;
++
++	unsigned long last_update;
++	struct mutex lock;
++
++	struct occ_response resp;
++	struct occ_sensors sensors;
++
++	unsigned int num_attrs;
++	struct occ_attribute *attrs;
++	struct attribute_group group;
++	const struct attribute_group *groups[2];
++
++	u8 poll_cmd_data;
++	int (*send_cmd)(struct occ *occ, u8 *cmd);
++};
++
++#define ATTR_OCC(_name, _mode, _show, _store) {				\
++	.attr	= {							\
++		.name = _name,						\
++		.mode = VERIFY_OCTAL_PERMISSIONS(_mode),		\
++	},								\
++	.show	= _show,						\
++	.store	= _store,						\
++}
++
++#define SENSOR_ATTR_OCC(_name, _mode, _show, _store, _nr, _index) {	\
++	.dev_attr	= ATTR_OCC(_name, _mode, _show, _store),	\
++	.index 		= _index,					\
++	.nr 		= _nr,						\
++}
++
++#define OCC_INIT_ATTR(_name, _mode, _show, _store, _nr, _index)		\
++	((struct sensor_device_attribute_2)				\
++		SENSOR_ATTR_OCC(_name, _mode, _show, _store, _nr, _index))
++
++void occ_parse_poll_response(struct occ *occ);
++int occ_poll(struct occ *occ);
++int occ_set_user_power_cap(struct occ *occ, u16 user_power_cap);
++int occ_update_response(struct occ *occ);
++
++#endif /* __OCC_COMMON_H__ */
+diff --git a/drivers/hwmon/occ/p9.c b/drivers/hwmon/occ/p9.c
+new file mode 100644
+index 0000000..ba73855
+--- /dev/null
++++ b/drivers/hwmon/occ/p9.c
+@@ -0,0 +1,350 @@
++/*
++ * Copyright 2017 IBM Corp.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#include "common.h"
++
++struct p9_temp_sensor {
++	u32 sensor_id;
++	u8 fru_type;
++	u8 value;
++} _packed;
++
++struct p9_freq_sensor {
++	u32 sensor_id;
++	u16 value;
++} __packed;
++
++struct p9_power_sensor {
++	u32 sensor_id;
++	u8 function_id;
++	u8 apss_channel;
++	u16 reserved;
++	u32 update_tag;
++	u64 accumulator;
++	u16 value;
++} __packed;
++
++struct p9_caps_sensor {
++	u16 curr_powercap;
++	u16 curr_powerreading;
++	u16 norm_powercap;
++	u16 max_powercap;
++	u16 min_powercap;
++	u16 user_powerlimit;
++	u8 user_powerlimit_source;
++} __packed;
++
++static ssize_t p9_occ_show_temp(struct device *dev,
++				struct device_attribute *attr,
++				char *buf)
++{
++	int rc;
++	u32 val = 0;
++	struct p9_temp_sensor *temp;
++	struct occ *occ = dev_get_drvdata(dev);
++	struct occ_sensors *sensors = &occ->sensors;
++	struct sensor_device_attribute_2 *sattr = to_sensor_dev_attr_2(attr);
++
++	rc = occ_update_response(occ);
++	if (rc)
++		return rc;
++
++	temp = ((struct p9_temp_sensor *)sensors->temp.data) + sattr->index;
++
++	switch (sattr->nr) {
++	case 0:
++		val = be32_to_cpu(temp->sensor_id);
++		break;
++	case 1:
++		val = temp->fru_type;
++		break;
++	case 2:
++		/* millidegree */
++		val = temp->value * 1000;
++		break;
++	}
++
++	return snprintf(buf, PAGE_SIZE - 1, "%u\n", val);
++}
++
++static ssize_t p9_occ_show_freq(struct device *dev,
++				struct device_attribute *attr,
++				char *buf)
++{
++	int rc;
++	u32 val = 0;
++	struct p9_freq_sensor *freq;
++	struct occ *occ = dev_get_drvdata(dev);
++	struct occ_sensors *sensors = &occ->sensors;
++	struct sensor_device_attribute_2 *sattr = to_sensor_dev_attr_2(attr);
++
++	rc = occ_update_response(occ);
++	if (rc)
++		return rc;
++
++	freq = ((struct p9_freq_sensor *)sensors->freq.data) + sattr->index;
++
++	switch (sattr->nr) {
++	case 0:
++		val = be32_to_cpu(freq->sensor_id);
++		break;
++	case 1:
++		val = be16_to_cpu(freq->value);
++		break;
++	}
++
++	return snprintf(buf, PAGE_SIZE - 1, "%u\n", val);
++}
++
++static ssize_t p9_occ_show_power(struct device *dev,
++				 struct device_attribute *attr,
++				 char *buf)
++{
++	int rc;
++	u64 val = 0;
++	struct p9_power_sensor *power;
++	struct occ *occ = dev_get_drvdata(dev);
++	struct occ_sensors *sensors = &occ->sensors;
++	struct sensor_device_attribute_2 *sattr = to_sensor_dev_attr_2(attr);
++
++	rc = occ_update_response(occ);
++	if (rc)
++		return rc;
++
++	power = ((struct p9_power_sensor *)sensors->power.data) + sattr->index;
++
++	switch (sattr->nr) {
++	case 0:
++		val = be32_to_cpu(power->sensor_id);
++		break;
++	case 1:
++		val = power->function_id;
++		break;
++	case 2:
++		val = power->apss_channel;
++		break;
++	case 3:
++		val = be32_to_cpu(power->update_tag);
++		break;
++	case 4:
++		val = be64_to_cpu(power->accumulator);
++		break;
++	case 5:
++		val = be16_to_cpu(power->value);
++		break;
++	}
++
++	return snprintf(buf, PAGE_SIZE - 1, "%llu\n", val);
++}
++
++static ssize_t p9_occ_show_caps(struct device *dev,
++				struct device_attribute *attr,
++				char *buf)
++{
++	int rc;
++	u16 val = 0;
++	struct p9_caps_sensor *caps;
++	struct occ *occ = dev_get_drvdata(dev);
++	struct occ_sensors *sensors = &occ->sensors;
++	struct sensor_device_attribute_2 *sattr = to_sensor_dev_attr_2(attr);
++
++	rc = occ_update_response(occ);
++	if (rc)
++		return rc;
++
++	caps = ((struct p9_caps_sensor *)sensors->caps.data) + sattr->index;
++
++	switch (sattr->nr) {
++	case 0:
++		val = be16_to_cpu(caps->curr_powercap);
++		break;
++	case 1:
++		val = be16_to_cpu(caps->curr_powerreading);
++		break;
++	case 2:
++		val = be16_to_cpu(caps->norm_powercap);
++		break;
++	case 3:
++		val = be16_to_cpu(caps->max_powercap);
++		break;
++	case 4:
++		val = be16_to_cpu(caps->min_powercap);
++		break;
++	case 5:
++		val = be16_to_cpu(caps->user_powerlimit);
++		break;
++	case 6:
++		val = caps->user_powerlimit_source;
++		break;
++	}
++
++	return snprintf(buf, PAGE_SIZE - 1, "%u\n", val);
++}
++
++static ssize_t p9_occ_store_caps_user(struct device *dev,
++				      struct device_attribute *attr,
++				      const char *buf, size_t count)
++{
++	int rc;
++	u16 user_power_cap;
++	struct occ *occ = dev_get_drvdata(dev);
++
++	rc = kstrtou16(buf, 0, &user_power_cap);
++	if (rc)
++		return rc;
++
++	rc = occ_set_user_power_cap(occ, user_power_cap);
++	if (rc)
++		return rc;
++
++	return count;
++}
++
++int p9_occ_setup_sensor_attrs(struct occ *occ)
++{
++	unsigned int i, s;
++	struct device *dev = occ->bus_dev;
++	struct occ_sensors *sensors = &occ->sensors;
++	struct occ_attribute *attr;
++
++	occ->num_attrs = (sensors->temp.num_sensors * 3);
++	occ->num_attrs += (sensors->freq.num_sensors * 2);
++	occ->num_attrs += (sensors->power.num_sensors * 6);
++	occ->num_attrs += (sensors->caps.num_sensors * 7);
++
++	occ->attrs = devm_kzalloc(dev, sizeof(*occ->attrs) * occ->num_attrs,
++				  GFP_KERNEL);
++	if (!occ->attrs)
++		return -ENOMEM;
++
++	occ->group.attrs = devm_kzalloc(dev, sizeof(*occ->group.attrs) *
++					occ->num_attrs + 1, GFP_KERNEL);
++	if (!occ->group.attrs)
++		return -ENOMEM;
++
++	attr = occ->attrs;
++	for (i = 0; i < sensors->temp.num_sensors; ++i) {
++		s = i + 1;
++
++		snprintf(attr->name, sizeof(attr->name), "temp%d_label", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_temp, NULL, 0, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "temp%d_fru_type", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_temp, NULL, 1, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "temp%d_input", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_temp, NULL, 2, i);
++		attr++;
++	}
++
++	for (i = 0; i < sensors->freq.num_sensors; ++i) {
++		s = i + 1;
++
++		snprintf(attr->name, sizeof(attr->name), "freq%d_label", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_freq, NULL, 0, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "freq%d_input", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_freq, NULL, 1, i);
++		attr++;
++	}
++
++	for (i = 0; i < sensors->power.num_sensors; ++i) {
++		s = i + 1;
++
++		snprintf(attr->name, sizeof(attr->name), "power%d_label", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_power, NULL, 0, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "power%d_function_id",
++			 s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_power, NULL, 1, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name),
++			 "power%d_apss_channel", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_power, NULL, 2, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "power%d_update_tag",
++			 s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_power, NULL, 3, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "power%d_accumulator",
++			 s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_power, NULL, 4, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "power%d_input", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_power, NULL, 5, i);
++		attr++;
++	}
++
++	for (i = 0; i < sensors->caps.num_sensors; ++i) {
++		s = i + 1;
++
++		snprintf(attr->name, sizeof(attr->name), "caps%d_curr", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_caps, NULL, 0, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "caps%d_reading", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_caps, NULL, 1, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "caps%d_norm", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_caps, NULL, 2, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "caps%d_max", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_caps, NULL, 3, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "caps%d_min", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_caps, NULL, 4, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "caps%d_user", s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0644,
++					     p9_occ_show_caps,
++					     p9_occ_store_caps_user, 5, i);
++		attr++;
++
++		snprintf(attr->name, sizeof(attr->name), "caps%d_user_source",
++			 s);
++		attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++					     p9_occ_show_caps, NULL, 6, i);
++		attr++;
++	}
++
++	/* put the sensors in the group */
++	for (i = 0; i < occ->num_attrs; ++i) {
++		occ->group.attrs[i] = &occ->attrs[i].sensor.dev_attr.attr;
++	}
++
++	return 0;
++}
+diff --git a/drivers/hwmon/occ/p9.h b/drivers/hwmon/occ/p9.h
+new file mode 100644
+index 0000000..12d1bc5
+--- /dev/null
++++ b/drivers/hwmon/occ/p9.h
+@@ -0,0 +1,17 @@
++/*
++ * Copyright 2017 IBM Corp.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#ifndef __OCC_P9_H__
++#define __OCC_P9_H__
++
++struct occ;
++
++int p9_occ_setup_sensor_attrs(struct occ *occ);
++
++#endif /* __OCC_P9_H__ */
+diff --git a/drivers/hwmon/occ/p9_sbe.c b/drivers/hwmon/occ/p9_sbe.c
+new file mode 100644
+index 0000000..db78bdc
+--- /dev/null
++++ b/drivers/hwmon/occ/p9_sbe.c
+@@ -0,0 +1,195 @@
++/*
++ * Copyright 2017 IBM Corp.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ */
++
++#include "common.h"
++#include <linux/hwmon.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/occ.h>
++#include <linux/sched.h>
++#include <linux/workqueue.h>
++#include "p9.h"
++
++#define P9_SBE_OCC_SETUP_DELAY		2500
++
++#define OCC_TIMEOUT_MS			5000
++#define OCC_CMD_IN_PRG_MS		100
++
++#define RESP_RETURN_CMD_IN_PRG		0xFF
++#define RESP_RETURN_SUCCESS		0
++#define RESP_RETURN_CMD_INVAL		0x11
++#define RESP_RETURN_CMD_LEN		0x12
++#define RESP_RETURN_DATA_INVAL		0x13
++#define RESP_RETURN_CHKSUM		0x14
++#define RESP_RETURN_OCC_ERR		0x15
++#define RESP_RETURN_STATE		0x16
++
++struct p9_sbe_occ {
++	struct occ occ;
++	struct delayed_work setup;
++	struct device *sbe;
++};
++
++#define to_p9_sbe_occ(x)	container_of((x), struct p9_sbe_occ, occ)
++
++static int p9_sbe_occ_send_cmd(struct occ *occ, u8 *cmd)
++{
++	int rc;
++	unsigned long start;
++	struct occ_client *client;
++	struct occ_response *resp = &occ->resp;
++	struct p9_sbe_occ *p9_sbe_occ = to_p9_sbe_occ(occ);
++
++	start = jiffies;
++
++retry:
++	client = occ_drv_open(p9_sbe_occ->sbe, 0);
++	if (!client)
++		return -ENODEV;
++
++	rc = occ_drv_write(client, (const char *)&cmd[1], 7);
++	if (rc < 0)
++		goto err;
++
++	rc = occ_drv_read(client, (char *)resp, sizeof(*resp));
++	if (rc < 0)
++		goto err;
++
++	occ_drv_release(client);
++
++	switch (resp->return_status) {
++	case RESP_RETURN_CMD_IN_PRG:
++		if (jiffies > (start + msecs_to_jiffies(OCC_TIMEOUT_MS)))
++			rc = -EALREADY;
++		else {
++			set_current_state(TASK_INTERRUPTIBLE);
++			schedule_timeout(msecs_to_jiffies(OCC_CMD_IN_PRG_MS));
++
++			goto retry;
++		}
++		break;
++	case RESP_RETURN_SUCCESS:
++		rc = 0;
++		break;
++	case RESP_RETURN_CMD_INVAL:
++	case RESP_RETURN_CMD_LEN:
++	case RESP_RETURN_DATA_INVAL:
++	case RESP_RETURN_CHKSUM:
++		rc = -EINVAL;
++		break;
++	case RESP_RETURN_OCC_ERR:
++		rc = -EREMOTE;
++		break;
++	default:
++		rc = -EFAULT;
++	}
++
++	if (rc < 0) {
++		dev_warn(occ->bus_dev, "occ bad response:%d\n",
++			 resp->return_status);
++		return rc;
++	}
++
++	return 0;
++
++err:
++	occ_drv_release(client);
++	dev_err(occ->bus_dev, "occ bus op failed rc:%d\n", rc);
++	return rc;
++}
++
++static void p9_sbe_occ_setup(struct work_struct *work)
++{
++	int rc;
++	struct delayed_work *dwork = to_delayed_work(work);
++	struct p9_sbe_occ *p9_sbe_occ = container_of(dwork, struct p9_sbe_occ,
++						     setup);
++	struct occ *occ = &p9_sbe_occ->occ;
++
++	/* no need to lock */
++	rc = occ_poll(occ);
++	if (rc < 0) {
++		dev_err(occ->bus_dev, "failed to get OCC poll response: %d\n",
++			rc);
++		return;
++	}
++
++	occ_parse_poll_response(occ);
++
++	rc = p9_occ_setup_sensor_attrs(occ);
++	if (rc) {
++		dev_err(occ->bus_dev, "failed to setup p9 attrs: %d\n", rc);
++		return;
++	}
++
++	occ->hwmon = devm_hwmon_device_register_with_groups(occ->bus_dev,
++							    "p9_occ", occ,
++							    occ->groups);
++	if (IS_ERR(occ->hwmon)) {
++		dev_err(occ->bus_dev, "failed to register hwmon device: %ld\n",
++			PTR_ERR(occ->hwmon));
++		return;
++	}
++}
++
++static int p9_sbe_occ_probe(struct platform_device *pdev)
++{
++	struct occ *occ;
++	struct p9_sbe_occ *p9_sbe_occ = devm_kzalloc(&pdev->dev,
++						     sizeof(*p9_sbe_occ),
++						     GFP_KERNEL);
++	if (!p9_sbe_occ)
++		return -ENOMEM;
++
++	p9_sbe_occ->sbe = pdev->dev.parent;
++
++	occ = &p9_sbe_occ->occ;
++	occ->bus_dev = &pdev->dev;
++	occ->groups[0] = &occ->group;
++	occ->poll_cmd_data = 0x20;
++	occ->send_cmd = p9_sbe_occ_send_cmd;
++	mutex_init(&occ->lock);
++	INIT_DELAYED_WORK(&p9_sbe_occ->setup, p9_sbe_occ_setup);
++	platform_set_drvdata(pdev, p9_sbe_occ);
++
++	schedule_delayed_work(&p9_sbe_occ->setup,
++			      msecs_to_jiffies(P9_SBE_OCC_SETUP_DELAY));
++	
++	return 0;
++}
++
++static int p9_sbe_occ_remove(struct platform_device *pdev)
++{
++	struct p9_sbe_occ *p9_sbe_occ = platform_get_drvdata(pdev);
++
++	cancel_delayed_work_sync(&p9_sbe_occ->setup);
++
++	return 0;
++}
++
++static const struct of_device_id p9_sbe_occ_of_match[] = {
++	{ .compatible = "ibm,p9-occ-hwmon" },
++	{ },
++};
++
++static struct platform_driver p9_sbe_occ_driver = {
++	.driver = {
++		.name = "occ-hwmon",
++		.of_match_table	= p9_sbe_occ_of_match,
++	},
++	.probe	= p9_sbe_occ_probe,
++	.remove = p9_sbe_occ_remove,
++};
++
++module_platform_driver(p9_sbe_occ_driver);
++
++MODULE_AUTHOR("Eddie James <eajames@us.ibm.com>");
++MODULE_DESCRIPTION("BMC P9 OCC hwmon driver");
++MODULE_LICENSE("GPL");
+-- 
+1.8.3.1
+
