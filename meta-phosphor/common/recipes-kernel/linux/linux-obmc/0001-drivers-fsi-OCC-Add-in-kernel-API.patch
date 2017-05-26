@@ -1,0 +1,359 @@
+From 5457538a6ec899f2c61994e0c9b77f0cce880c91 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 26 May 2017 10:32:27 -0500
+Subject: [PATCH] drivers: fsi: OCC: Add in-kernel API
+
+needed for hwmon driver
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ drivers/fsi/occ.c   | 171 ++++++++++++++++++++++++++++++++++++++++++----------
+ include/linux/occ.h |  27 +++++++++
+ 2 files changed, 166 insertions(+), 32 deletions(-)
+ create mode 100644 include/linux/occ.h
+
+diff --git a/drivers/fsi/occ.c b/drivers/fsi/occ.c
+index 74272c8..b91e03c 100644
+--- a/drivers/fsi/occ.c
++++ b/drivers/fsi/occ.c
+@@ -16,6 +16,7 @@
+ #include <linux/miscdevice.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
++#include <linux/of_platform.h>
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ #include <linux/uaccess.h>
+@@ -45,7 +46,7 @@ struct occ_command {
+ 	u16 data_length;
+ 	u8 data[OCC_CMD_DATA_BYTES];
+ 	u16 checksum;
+-};
++} __packed;
+ 
+ struct occ_response {
+ 	u8 seq_no;
+@@ -54,7 +55,7 @@ struct occ_response {
+ 	u16 data_length;
+ 	u8 data[OCC_RESP_DATA_BYTES];
+ 	u16 checksum;
+-};
++} __packed;
+ 
+ struct occ_xfr;
+ 
+@@ -106,38 +107,45 @@ static void occ_enqueue_xfr(struct occ_xfr *xfr)
+ 		queue_work(occ_wq, &occ->work);
+ }
+ 
+-static int occ_open(struct inode *inode, struct file *file)
++static struct occ_client *occ_open_common(struct occ *occ, unsigned long flags)
+ {
+ 	struct occ_client *client;
+-	struct miscdevice *mdev = file->private_data;
+-	struct occ *occ = to_occ(mdev);
+ 
+ 	client = kzalloc(sizeof(*client), GFP_KERNEL);
+ 	if (!client)
+-		return -ENOMEM;
++		return NULL;
+ 
+ 	client->occ = occ;
+ 	spin_lock_init(&client->lock);
+ 	init_waitqueue_head(&client->wait);
+ 
+-	if (file->f_flags & O_NONBLOCK)
++	if (flags & O_NONBLOCK)
+ 		set_bit(CLIENT_NONBLOCKING, &client->flags);
+ 
++	return client;
++}
++
++static int occ_open(struct inode *inode, struct file *file)
++{
++	struct occ_client *client;
++	struct miscdevice *mdev = file->private_data;
++	struct occ *occ = to_occ(mdev);
++
++	client = occ_open_common(occ, file->f_flags);
++	if (!client)
++		return -ENOMEM;
++
+ 	file->private_data = client;
+ 
+ 	return 0;
+ }
+ 
+-static ssize_t occ_read(struct file *file, char __user *buf, size_t len,
+-			loff_t *offset)
++static ssize_t occ_read_common(struct occ_client *client, char __user *ubuf,
++			       char *kbuf, size_t len)
+ {
+ 	int rc;
+ 	size_t bytes;
+ 	struct occ_xfr *xfr;
+-	struct occ_client *client = file->private_data;
+-
+-	if (!access_ok(VERIFY_WRITE, buf, len))
+-		return -EFAULT;
+ 
+ 	if (len > OCC_SRAM_BYTES)
+ 		return -EINVAL;
+@@ -190,10 +198,13 @@ static ssize_t occ_read(struct file *file, char __user *buf, size_t len,
+ 	}
+ 
+ 	bytes = min(len, xfr->resp_data_length - client->read_offset);
+-	if (copy_to_user(buf, &xfr->buf[client->read_offset], bytes)) {
+-		rc = -EFAULT;
+-		goto done;
+-	}
++	if (ubuf) {
++		if (copy_to_user(ubuf, &xfr->buf[client->read_offset], bytes)) {
++			rc = -EFAULT;
++			goto done;
++		}
++	} else
++		memcpy(kbuf, &xfr->buf[client->read_offset], bytes);
+ 
+ 	client->read_offset += bytes;
+ 
+@@ -210,17 +221,27 @@ static ssize_t occ_read(struct file *file, char __user *buf, size_t len,
+ 	return rc;
+ }
+ 
+-static ssize_t occ_write(struct file *file, const char __user *buf,
+-			 size_t len, loff_t *offset)
++static ssize_t occ_read(struct file *file, char __user *buf, size_t len,
++			loff_t *offset)
+ {
+-	int rc;
+-	struct occ_xfr *xfr;
+ 	struct occ_client *client = file->private_data;
+ 
+-	if (!access_ok(VERIFY_READ, buf, len))
++	if (!access_ok(VERIFY_WRITE, buf, len))
+ 		return -EFAULT;
+ 
+-	if (len > OCC_SRAM_BYTES)
++	return occ_read_common(client, buf, NULL, len);
++}
++
++static ssize_t occ_write_common(struct occ_client *client,
++				const char __user *ubuf, const char *kbuf,
++				size_t len)
++{
++	int rc;
++	unsigned int i;
++	u16 data_length, checksum = 0;
++	struct occ_xfr *xfr;
++
++	if (len > (OCC_CMD_DATA_BYTES + 3) || len < 3)
+ 		return -EINVAL;
+ 
+ 	spin_lock_irq(&client->lock);
+@@ -235,14 +256,32 @@ static ssize_t occ_write(struct file *file, const char __user *buf,
+ 		goto done;
+ 	}
+ 
+-	if (copy_from_user(xfr->buf, buf, len)) {
++	xfr->buf[0] = 1;
++
++	if (ubuf) {
++		if (copy_from_user(&xfr->buf[1], ubuf, len)) {
++			kfree(xfr);
++			rc = -EFAULT;
++			goto done;
++		}
++	} else
++		memcpy(&xfr->buf[1], kbuf, len);
++
++	data_length = (xfr->buf[2] << 8) + xfr->buf[3];
++	if (data_length > OCC_CMD_DATA_BYTES) {
+ 		kfree(xfr);
+-		rc = -EFAULT;
++		rc = -EINVAL;
+ 		goto done;
+ 	}
+ 
++	for (i = 0; i < data_length + 4; ++i)
++		checksum += xfr->buf[i];
++
++	xfr->buf[data_length + 4] = checksum >> 8;
++	xfr->buf[data_length + 5] = checksum & 0xFF;
++
+ 	xfr->client = client;
+-	xfr->cmd_data_length = len;
++	xfr->cmd_data_length = data_length + 6;
+ 	client->xfr = xfr;
+ 	client->read_offset = 0;
+ 
+@@ -255,10 +294,20 @@ static ssize_t occ_write(struct file *file, const char __user *buf,
+ 	return rc;
+ }
+ 
+-static int occ_release(struct inode *inode, struct file *file)
++static ssize_t occ_write(struct file *file, const char __user *buf,
++			 size_t len, loff_t *offset)
+ {
+-	struct occ_xfr *xfr;
+ 	struct occ_client *client = file->private_data;
++
++	if (!access_ok(VERIFY_READ, buf, len))
++		return -EFAULT;
++
++	return occ_write_common(client, buf, NULL, len);
++}
++
++static int occ_release_common(struct occ_client *client)
++{
++	struct occ_xfr *xfr;
+ 	struct occ *occ = client->occ;
+ 
+ 	spin_lock_irq(&client->lock);
+@@ -297,6 +346,13 @@ static int occ_release(struct inode *inode, struct file *file)
+ 	return 0;
+ }
+ 
++static int occ_release(struct inode *inode, struct file *file)
++{
++	struct occ_client *client = file->private_data;
++
++	return occ_release_common(client);
++}
++
+ static const struct file_operations occ_fops = {
+ 	.owner = THIS_MODULE,
+ 	.open = occ_open,
+@@ -452,9 +508,9 @@ static void occ_worker(struct work_struct *work)
+ 
+ 	xfr->resp_data_length += 8;
+ 
+-	resp_data_length = be16_to_cpu(get_unaligned(&resp->data_length));
++	resp_data_length = (xfr->buf[3] << 8) + xfr->buf[4];
+ 	if (resp_data_length > OCC_RESP_DATA_BYTES) {
+-		rc = -EFAULT;
++		rc = -EDOM;
+ 		goto done;
+ 	}
+ 
+@@ -500,12 +556,52 @@ static void occ_worker(struct work_struct *work)
+ 		goto again;
+ }
+ 
++struct occ_client *occ_drv_open(struct device *dev, unsigned long flags)
++{
++	struct occ *occ = dev_get_drvdata(dev);
++
++	return occ_open_common(occ, flags);
++}
++EXPORT_SYMBOL_GPL(occ_drv_open);
++
++int occ_drv_read(struct occ_client *client, char *buf, size_t len)
++{
++	return occ_read_common(client, NULL, buf, len);
++}
++EXPORT_SYMBOL_GPL(occ_drv_read);
++
++int occ_drv_write(struct occ_client *client, const char *buf, size_t len)
++{
++	return occ_write_common(client, NULL, buf, len);
++}
++EXPORT_SYMBOL_GPL(occ_drv_write);
++
++void occ_drv_release(struct occ_client *client)
++{
++	occ_release_common(client);
++}
++EXPORT_SYMBOL_GPL(occ_drv_release);
++
++static int occ_unregister_child(struct device *dev, void *data)
++{
++	struct platform_device *child = to_platform_device(dev);
++
++	of_device_unregister(child);
++	if (dev->of_node)
++		of_node_clear_flag(dev->of_node, OF_POPULATED);
++
++	return 0;
++}
++
+ static int occ_probe(struct platform_device *pdev)
+ {
+-	int rc;
++	int rc, child_idx = 0;
+ 	u32 reg;
+ 	struct occ *occ;
++	struct device_node *np;
++	struct platform_device *child;
+ 	struct device *dev = &pdev->dev;
++	char child_name[32];
+ 
+ 	dev_info(dev, "Found occ device\n");
+ 	occ = devm_kzalloc(dev, sizeof(*occ), GFP_KERNEL);
+@@ -530,6 +626,16 @@ static int occ_probe(struct platform_device *pdev)
+ 		} else
+ 			occ->idx = ida_simple_get(&occ_ida, 1, INT_MAX,
+ 						  GFP_KERNEL);
++
++		/* create platform devs for dts child nodes (hwmon, etc) */
++		for_each_child_of_node(dev->of_node, np) {
++			snprintf(child_name, sizeof(child_name), "occ%d-dev%d",
++				 occ->idx, child_idx++);
++			child = of_platform_device_create(np, child_name, dev);
++			if (!child)
++				dev_warn(dev,
++					 "failed to create child node dev\n");
++		}
+ 	} else
+ 		occ->idx = ida_simple_get(&occ_ida, 1, INT_MAX, GFP_KERNEL);
+ 
+@@ -558,6 +664,8 @@ static int occ_remove(struct platform_device *pdev)
+ 
+ 	misc_deregister(&occ->mdev);
+ 
++	device_for_each_child(&pdev->dev, NULL, occ_unregister_child);
++
+ 	spin_lock_irq(&occ->list_lock);
+ 	list_for_each_entry_safe(xfr, tmp, &occ->xfrs, link) {
+ 		client = xfr->client;
+@@ -622,4 +730,3 @@ static void occ_exit(void)
+ MODULE_AUTHOR("Eddie James <eajames@us.ibm.com>");
+ MODULE_DESCRIPTION("BMC P9 OCC driver");
+ MODULE_LICENSE("GPL");
+-
+diff --git a/include/linux/occ.h b/include/linux/occ.h
+new file mode 100644
+index 0000000..d78332c
+--- /dev/null
++++ b/include/linux/occ.h
+@@ -0,0 +1,27 @@
++/*
++ * Copyright (C) IBM Corporation 2017
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERGCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#ifndef __OCC_H__
++#define __OCC_H__
++
++struct device;
++struct occ_client;
++
++extern struct occ_client *occ_drv_open(struct device *dev,
++				       unsigned long flags);
++extern int occ_drv_read(struct occ_client *client, char *buf, size_t len);
++extern int occ_drv_write(struct occ_client *client, const char *buf,
++			 size_t len);
++extern void occ_drv_release(struct occ_client *client);
++
++#endif /* __OCC_H__ */
+-- 
+1.8.3.1
+
