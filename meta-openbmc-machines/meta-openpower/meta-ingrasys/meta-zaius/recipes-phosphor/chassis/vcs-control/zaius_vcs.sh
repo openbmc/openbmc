@@ -24,42 +24,18 @@ retry()
 # Result stored in $ucd_reg
 ucd_get()
 {
-    retry i2cget -y $ucd_bus $ucd_addr $1 b
+    retry i2cget -f -y $ucd_bus $ucd_addr $1 b
     ucd_reg=$retry_output
 }
 
 # Usage: ucd_get address value
 ucd_set()
 {
-    retry i2cset -y $ucd_bus $ucd_addr $1 $2 b
-}
-
-unbind_ucd()
-{
-    if [ -e $ucd_path/$ucd_driver ]; then
-        echo -e "\tUnbinding UCD driver $ucd_driver"
-        echo $ucd_driver > $ucd_path/unbind
-    else
-        echo -e "\tWarning: $ucd_path/$ucd_driver doesn't exist"
-    fi
-}
-
-rebind_ucd()
-{
-    if [ -e $ucd_path ]; then
-        echo -e "\tBinding UCD driver $ucd_driver"
-        local i=0
-        until [ -d $ucd_path/$ucd_driver ] || [ $i -ge $ucd_retries ]; do
-            i=$((i+1))
-            echo $ucd_driver > $ucd_path/bind || ret=$?
-        done
-        if [ ! -d $ucd_path/$ucd_driver ]; then exit $ret; fi
-    fi
+    retry i2cset -f -y $ucd_bus $ucd_addr $1 $2 b
 }
 
 vcs_set_gpios()
 {
-    unbind_ucd
     echo -e "\tSetting UCD GPIO 5 to $1"
     ucd_set 0xFA 5
     ucd_set 0xFB $1
@@ -68,13 +44,11 @@ vcs_set_gpios()
     ucd_set 0xFA 6
     ucd_set 0xFB $1
     ucd_set 0xFB $1
-    rebind_ucd
 }
 
 vcs_get()
 {
     echo Reading VCS settings
-    unbind_ucd
     ucd_set 0xFA 5
     ucd_get 0xFB
     local val=`echo $ucd_reg | grep -i -c 0x0f`
@@ -83,7 +57,6 @@ vcs_get()
     ucd_get 0xFB
     local val=`echo $ucd_reg | grep -i -c 0x0f`
     echo -e "\tUCD GPIO 6 state=$val"
-    rebind_ucd
 }
 
 
