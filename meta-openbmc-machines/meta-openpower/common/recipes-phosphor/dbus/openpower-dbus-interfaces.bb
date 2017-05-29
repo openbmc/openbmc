@@ -7,13 +7,10 @@ S = "${WORKDIR}/git"
 inherit autotools pkgconfig
 inherit obmc-phosphor-license
 inherit pythonnative
+inherit phosphor-dbus-yaml
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbus++-native"
-
-PACKAGE_BEFORE_PN = "${PN}-yaml"
-
-FILES_${PN}-yaml = "${datadir}/${PN}/yaml"
 
 SRC_URI += "git://github.com/openbmc/openpower-dbus-interfaces"
 SRCREV = "b331f56c416812b20c1a338b3ffdce32d169a0c1"
