@@ -55,8 +55,8 @@ python discovery_services_postinstall() {
     if not avahi_enabled and slp_enabled:
         return
 
-    avahi_service_dir = d.getVar('AVAHI_SERVICES_DIR', True)
-    slp_service_dir = d.getVar('SLP_SERVICES_DIR', True)
+    avahi_service_dir = d.getVar('AVAHI_SERVICES_DIR', True).strip()
+    slp_service_dir = d.getVar('SLP_SERVICES_DIR', True).strip()
 
     if not os.path.exists(avahi_service_dir):
         os.makedirs(avahi_service_dir)
