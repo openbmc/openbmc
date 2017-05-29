@@ -28,11 +28,8 @@
       SerialNumber:
         IPMIFruProperty: Serial Number
         IPMIFruSection: Chassis
-      PartNumber:
-        IPMIFruProperty: Part Number
-        IPMIFruSection: Chassis
       Model:
-        IPMIFruProperty: Type
+        IPMIFruProperty: Part Number
         IPMIFruSection: Chassis
 
   /system/chassis/motherboard/membuf:
