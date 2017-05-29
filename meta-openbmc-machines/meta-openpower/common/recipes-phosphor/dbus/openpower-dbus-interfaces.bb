@@ -14,6 +14,7 @@ DEPENDS += "sdbus++-native"
 PACKAGE_BEFORE_PN = "${PN}-yaml"
 
 FILES_${PN}-yaml = "${datadir}/${PN}/yaml"
+FILES_${PN}-yaml += "${datadir}/error/yaml"
 
 SRC_URI += "git://github.com/openbmc/openpower-dbus-interfaces"
 SRCREV = "f70ed2aab61e03b0bc5401bf5bb72ce8d6c0d426"
