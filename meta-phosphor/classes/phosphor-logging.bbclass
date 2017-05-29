@@ -1,2 +1,5 @@
 callouts_datadir="${datadir}/phosphor-logging/callouts"
-error_yaml_dir = "${datadir}/phosphor-logging/error/yaml"
+yaml_dir = "${datadir}/sdbus/yaml"
+
+PACKAGE_BEFORE_PN += "${PN}-yaml"
+FILES_${PN}-yaml += "${yaml_dir}"
