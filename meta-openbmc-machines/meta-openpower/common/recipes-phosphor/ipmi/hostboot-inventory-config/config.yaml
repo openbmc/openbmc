@@ -28,15 +28,12 @@ PROC:
 SYS:
   Interfaces:
     xyz.openbmc_project.Inventory.Decorator.Asset:
-      PartNumber:
+      Model:
         IPMIFruSection: Chassis
         IPMIFruProperty: "Part Number"
       SerialNumber:
         IPMIFruSection: Chassis
         IPMIFruProperty: "Serial Number"
-      Model:
-        IPMIFruSection: Chassis
-        IPMIFruProperty: "Type"
 
 NODE:
   Interfaces:
