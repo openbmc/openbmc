@@ -14,6 +14,7 @@ DEPENDS += "sdbus++-native"
 PACKAGE_BEFORE_PN = "${PN}-yaml"
 
 FILES_${PN}-yaml = "${datadir}/${PN}/yaml"
+FILES_${PN}-yaml += "${datadir}/error/yaml"
 
 SRC_URI += "git://github.com/openbmc/phosphor-dbus-interfaces"
 SRCREV = "83e652c2a41f9b567ef3537bc0da7cce79ee7d61"
