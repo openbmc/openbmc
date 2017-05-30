@@ -13,6 +13,7 @@ RemainAfterExit=yes
 ExecStart={sbindir}/pgood_wait /org/openbmc/control/power%i off
 ExecStart=/bin/rm -f /run/openbmc/chassis@%i-on
 ExecStart=/bin/rm -f /run/openbmc/host@%i-on
+ExecStart=/bin/rm -f /run/openbmc/host@%i-request
 
 [Install]
 WantedBy=obmc-host-stop@%i.target
