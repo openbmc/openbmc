@@ -1,0 +1,9 @@
+[Unit]
+Description=Phosphor Dump core monitor.
+
+[Service]
+ExecStart={sbindir}/phosphor-dump-monitor
+Restart=always
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
