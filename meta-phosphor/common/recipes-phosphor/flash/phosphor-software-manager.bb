@@ -58,6 +58,6 @@ DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.servic
 DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
-SRCREV = "9ec18ef03dc6c0fd6cba2702384b78ffff6d7bae"
+SRCREV = "9f3571468fe17f6a8f1f91b5fb488e3336cd1dbd"
 
 S = "${WORKDIR}/git"
