@@ -1,0 +1,5 @@
+# Empty phosphor-dbus-monitor configuration file.
+# When other configuration files are provided, this
+# file is ignored.  If no other configuration
+# files are provided, phosphor-dbus-monitor
+# will detect the empty configuration and exit.

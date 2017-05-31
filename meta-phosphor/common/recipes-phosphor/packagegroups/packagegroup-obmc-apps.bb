@@ -45,6 +45,7 @@ RDEPENDS_${PN}-extras = " \
 SUMMARY_${PN}-extrasdev = "Development features"
 RDEPENDS_${PN}-extrasdev = " \
         rest-dbus \
+        phosphor-dbus-monitor \
         "
 
 # Use the fan control package group for applications
