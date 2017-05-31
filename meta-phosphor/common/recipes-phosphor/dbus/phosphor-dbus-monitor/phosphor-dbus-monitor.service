@@ -1,0 +1,10 @@
+[Unit]
+Description=Phosphor DBus Monitor
+After=obmc-mapper.target
+
+[Service]
+Restart=always
+ExecStart={sbindir}/phosphor-dbus-monitor
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
