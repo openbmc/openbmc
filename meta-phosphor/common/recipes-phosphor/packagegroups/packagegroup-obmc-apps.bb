@@ -40,6 +40,7 @@ RDEPENDS_${PN}-host-check-mgmt = " \
 SUMMARY_${PN}-extras = "Extra features"
 RDEPENDS_${PN}-extras = " \
         phosphor-rest \
+        phosphor-dbus-monitor \
         "
 
 SUMMARY_${PN}-extrasdev = "Development features"
