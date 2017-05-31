@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor Dump core monitor.
+
+[Service]
+ExecStart={sbindir}/phosphor-dump-monitor
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
