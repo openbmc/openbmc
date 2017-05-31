@@ -34,6 +34,6 @@ SYSTEMD_SERVICE_${PN} += " \
         "
 
 SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
-SRCREV = "2fdb9310ae999bac265131264409d6a294dac91f"
+SRCREV = "3accb3221efd3cfc7d409438bee5a1801c2561dc"
 
 S = "${WORKDIR}/git"
