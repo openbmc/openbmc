@@ -1,0 +1,89 @@
+# Witherspoon fan policy for PDM.
+
+- name: fan paths
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/chassis/fan0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/chassis/fan1
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/chassis/fan2
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/chassis/fan3
+
+- name: fan functional
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+      meta: FUNCTIONAL
+      property: Functional
+
+- name: system path
+  class: group
+  group: path
+  members:
+    - meta: HOST
+      path: /xyz/openbmc_project/state/host0
+
+- name: system state
+  class: group
+  group: property
+  type: string
+  members:
+    - interface: xyz.openbmc_project.State.Host
+      meta: HOSTSTATE
+      property: CurrentHostState
+
+- name: fan watch
+  class: watch
+  watch: property
+  paths: fan paths
+  properties: fan functional
+  callback: count functional
+
+- name: system state watch
+  class: watch
+  watch: property
+  paths: system path
+  properties: system state
+  callback: count functional
+
+- name: system on
+  class: condition
+  condition: count
+  paths: system path
+  properties: system state
+  callback: system shutdown
+  defer: 5000000us
+  countop: '!='
+  countbound: 0
+  op: '!='
+  bound: xyz.openbmc_project.State.Host.HostState.Off
+
+- name: count functional
+  class: condition
+  condition: count
+  paths: fan paths
+  properties: fan functional
+  callback: system on
+  countop: '>='
+  countbound: 1
+  op: '=='
+  bound: false
+
+- name: system shutdown
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+    - value: obmc-host-stop@0.target
+      type: string
+    - value: replace
+      type: string
