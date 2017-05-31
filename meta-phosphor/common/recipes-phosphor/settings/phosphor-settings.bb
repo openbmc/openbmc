@@ -19,7 +19,7 @@ RPROVIDES_${PN} += "virtual-obmc-settings-mgmt"
 SRC_URI += "git://github.com/openbmc/phosphor-settingsd"
 SRC_URI += "file://merge_settings.py"
 
-SRCREV = "3b8d055ca761a68c74dad01a306f238674d71878"
+SRCREV = "672219903522547fbef7258748521c96bf86705c"
 
 S = "${WORKDIR}/git"
 
