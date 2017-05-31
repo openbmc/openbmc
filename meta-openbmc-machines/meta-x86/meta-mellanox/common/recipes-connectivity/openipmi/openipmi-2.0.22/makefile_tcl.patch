@@ -1,0 +1,13 @@
+diff --git a/tcl/Makefile.am b/tcl/Makefile.am
+index b702819..282619c 100644
+--- a/tcl/Makefile.am
++++ b/tcl/Makefile.am
+@@ -11,7 +11,7 @@ libOpenIPMItcl_la_SOURCES = tcl_os_hnd.c
+ libOpenIPMItcl_la_CFLAGS = $(TCL_CFLAGS) $(AM_CFLAGS)
+ libOpenIPMItcl_la_LIBADD = $(GDBM_LIB)
+ libOpenIPMItcl_la_LDFLAGS = -rdynamic -version-info $(LD_VERSION) \
+-	-Wl,-Map -Wl,libOpenIPMItcl.map $(TCL_LIBS) -L$(libdir) \
++	-Wl,-Map -Wl,libOpenIPMItcl.map $(TCL_LIBS) \
+ 	-rpath $(libdir)
+ 
+ noinst_PROGRAMS = test_handlers
