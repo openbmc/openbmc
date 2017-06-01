@@ -24,6 +24,7 @@ SRC_URI += "file://0001-hwmon-Add-support-for-MAX31785-intelligent-fan-contr.pat
 SRC_URI += "file://v2-0001-arm-dts-aspeed-Add-missing-clock-sources-for-barr.patch"
 SRC_URI += "file://0001-drivers-fsi-OCC-Add-in-kernel-API.patch"
 SRC_URI += "file://0002-drivers-hwmon-Add-OCC-driver.patch"
+SRC_URI += "file://0001-drivers-fsi-switch-to-getsram-putsram.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
