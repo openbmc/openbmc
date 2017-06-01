@@ -22,6 +22,7 @@ SRC_URI += "file://linux-dev-4.10-2-3-drivers-fsi-sbefifo-Add-OCC-driver.patch"
 SRC_URI += "file://0001-arm-dts-aspeed-Add-FSI-devices.patch"
 SRC_URI += "file://0001-hwmon-Add-support-for-MAX31785-intelligent-fan-contr.patch"
 SRC_URI += "file://v2-0001-arm-dts-aspeed-Add-missing-clock-sources-for-barr.patch"
+SRC_URI += "file://0001-arm-configs-aspeed-Disable-CONFIG_MTD_SPI_NOR_USE_4K.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
