@@ -21,5 +21,12 @@ STOP_TGTFMT = "obmc-host-stop@{1}.target"
 STOP_INSTFMT = "obmc-stop-watchdog@{0}.service"
 STOP_FMT = "../${STOP_TMPL}:${STOP_TGTFMT}.requires/${STOP_INSTFMT}"
 
+# Ensure we also call the stop watchdog if the user
+# just directly cuts chassis power
+CHASSIS_TGTFMT= "obmc-chassis-poweroff@{1}.target"
+CHASSIS_FMT = "../${STOP_TMPL}:${CHASSIS_TGTFMT}.requires/${STOP_INSTFMT}"
+
+
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT', 'OBMC_WATCHDOG_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT', 'OBMC_WATCHDOG_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'CHASSIS_FMT', 'OBMC_WATCHDOG_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
