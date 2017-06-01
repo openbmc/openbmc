@@ -90,6 +90,39 @@ cases.
 Github.  It is recommended you search through the issues before opening
 a new one.
 
+## Features of OpenBMC ##
+
+**Feature List**
+* REST Management
+* IPMI
+* SSH based SOL
+* Power and Cooling Management
+* Event Logs
+* Zeroconf discoverable
+* Sensors
+* Inventory
+* LED Management
+* Host Watchdog
+* Simulation
+
+**Features In Progress**
+* Code Update Support for multiple BMC/BIOS images
+* POWER On Chip Controller (OCC) Support
+* Full IPMI 2.0 Compliance with DCMI
+* Verified Boot
+* HTML5 Java Script Web User Interface
+* BMC RAS
+
+**Features Requested but need help**
+* OpenCompute Redfish Compliance
+* OpenBMC performance monitoring
+* cgroup user management and policies
+* Remote KVM
+* Remote USB
+* OpenStack Ironic Integration
+* QEMU enhancements
+
+
 ## Finding out more ##
 Dive deeper in to OpenBMC by opening the [docs](https://github.com/openbmc/docs)
 repository
