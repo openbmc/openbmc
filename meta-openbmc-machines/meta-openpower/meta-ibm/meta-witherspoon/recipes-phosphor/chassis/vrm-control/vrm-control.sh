@@ -99,6 +99,11 @@ then
   exit
 fi
 
+echo 4-0070 > /sys/bus/i2c/drivers/ir35221/unbind
+echo 4-0071 > /sys/bus/i2c/drivers/ir35221/unbind
+echo 5-0070 > /sys/bus/i2c/drivers/ir35221/unbind
+echo 5-0071 > /sys/bus/i2c/drivers/ir35221/unbind
+
 echo "rail	set	read	current"
 echo "-------	------- ------- -------"
 for param in ${@:1}
@@ -153,3 +158,8 @@ do
       echo "	non-existant"
   esac
 done
+
+echo 4-0070 > /sys/bus/i2c/drivers/ir35221/bind
+echo 4-0071 > /sys/bus/i2c/drivers/ir35221/bind
+echo 5-0070 > /sys/bus/i2c/drivers/ir35221/bind
+echo 5-0071 > /sys/bus/i2c/drivers/ir35221/bind
