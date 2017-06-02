@@ -1,20 +1,13 @@
-From patchwork Fri May 12 19:38:18 2017
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: [linux,dev-4.10,1/3] drivers: fsi: sbefifo: Add in-kernel API
-From: eajames@linux.vnet.ibm.com
-X-Patchwork-Id: 761836
-Message-Id: <1494617900-32369-2-git-send-email-eajames@linux.vnet.ibm.com>
-To: openbmc@lists.ozlabs.org
-Cc: "Edward A. James" <eajames@us.ibm.com>, bradleyb@fuzziesquirrel.com,
- cbostic@linux.vnet.ibm.com
-Date: Fri, 12 May 2017 14:38:18 -0500
-
+From 7f5e267c49e4855b911062db680372d4a750ba4c Mon Sep 17 00:00:00 2001
 From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 2 Jun 2017 12:24:07 -0500
+Subject: [PATCH linux dev-4.10 v4 1/2] drivers: fsi: sbefifo: Add in-kernel
+ API
 
-Add exported functions to the SBEFIFO driver to open/write/read/close
-from within the kernel.
+Refactor user interface of sbefifo driver to allow for an in-kernel API
+as well. Add exported functions for other drivers to call, and add an
+include file with those functions. Also parse the device tree for child
+nodes and create child platform devices accordingly.
 
 Signed-off-by: Edward A. James <eajames@us.ibm.com>
 ---
@@ -24,14 +17,10 @@ Signed-off-by: Edward A. James <eajames@us.ibm.com>
  create mode 100644 include/linux/fsi-sbefifo.h
 
 diff --git a/drivers/fsi/fsi-sbefifo.c b/drivers/fsi/fsi-sbefifo.c
-index b49aec2..56e6331 100644
+index b49aec2..fbc8dc5 100644
 --- a/drivers/fsi/fsi-sbefifo.c
 +++ b/drivers/fsi/fsi-sbefifo.c
-@@ -15,9 +15,12 @@
- #include <linux/errno.h>
- #include <linux/idr.h>
- #include <linux/fsi.h>
-+#include <linux/fsi-sbefifo.h>
+@@ -18,6 +18,8 @@
  #include <linux/list.h>
  #include <linux/miscdevice.h>
  #include <linux/module.h>
@@ -40,7 +29,7 @@ index b49aec2..56e6331 100644
  #include <linux/poll.h>
  #include <linux/sched.h>
  #include <linux/slab.h>
-@@ -82,6 +85,7 @@ struct sbefifo_client {
+@@ -82,6 +84,7 @@ struct sbefifo_client {
  	struct list_head xfrs;
  	struct sbefifo *dev;
  	struct kref kref;
@@ -48,7 +37,7 @@ index b49aec2..56e6331 100644
  };
  
  static struct list_head sbefifo_fifos;
-@@ -506,6 +510,7 @@ static int sbefifo_open(struct inode *inode, struct file *file)
+@@ -506,6 +509,7 @@ static int sbefifo_open(struct inode *inode, struct file *file)
  		return -ENOMEM;
  
  	file->private_data = client;
@@ -56,7 +45,7 @@ index b49aec2..56e6331 100644
  
  	return 0;
  }
-@@ -530,24 +535,18 @@ static unsigned int sbefifo_poll(struct file *file, poll_table *wait)
+@@ -530,24 +534,18 @@ static unsigned int sbefifo_poll(struct file *file, poll_table *wait)
  	return mask;
  }
  
@@ -85,7 +74,7 @@ index b49aec2..56e6331 100644
  		return -EAGAIN;
  
  	sbefifo_get_client(client);
-@@ -566,10 +565,13 @@ static ssize_t sbefifo_read(struct file *file, char __user *buf,
+@@ -566,10 +564,13 @@ static ssize_t sbefifo_read(struct file *file, char __user *buf,
  
  	n = min_t(size_t, n, len);
  
@@ -103,7 +92,7 @@ index b49aec2..56e6331 100644
  
  	if (sbefifo_buf_readnb(&client->rbuf, n)) {
  		xfr = sbefifo_client_next_xfr(client);
-@@ -592,20 +594,28 @@ static ssize_t sbefifo_read(struct file *file, char __user *buf,
+@@ -592,20 +593,28 @@ static ssize_t sbefifo_read(struct file *file, char __user *buf,
  	return n;
  }
  
@@ -138,7 +127,7 @@ index b49aec2..56e6331 100644
  	if ((len >> 2) << 2 != len)
  		return -EINVAL;
  
-@@ -617,7 +627,7 @@ static ssize_t sbefifo_write(struct file *file, const char __user *buf,
+@@ -617,7 +626,7 @@ static ssize_t sbefifo_write(struct file *file, const char __user *buf,
  	spin_lock_irq(&sbefifo->lock);
  	xfr = sbefifo_next_xfr(sbefifo);
  
@@ -147,7 +136,7 @@ index b49aec2..56e6331 100644
  		spin_unlock_irq(&sbefifo->lock);
  		return -EAGAIN;
  	}
-@@ -657,18 +667,25 @@ static ssize_t sbefifo_write(struct file *file, const char __user *buf,
+@@ -657,18 +666,25 @@ static ssize_t sbefifo_write(struct file *file, const char __user *buf,
  
  		n = min_t(size_t, n, len);
  
@@ -181,7 +170,7 @@ index b49aec2..56e6331 100644
  		ret += n;
  
  		/*
-@@ -685,6 +702,19 @@ static ssize_t sbefifo_write(struct file *file, const char __user *buf,
+@@ -685,6 +701,19 @@ static ssize_t sbefifo_write(struct file *file, const char __user *buf,
  	return ret;
  }
  
@@ -201,7 +190,7 @@ index b49aec2..56e6331 100644
  static int sbefifo_release(struct inode *inode, struct file *file)
  {
  	struct sbefifo_client *client = file->private_data;
-@@ -704,12 +734,68 @@ static int sbefifo_release(struct inode *inode, struct file *file)
+@@ -704,12 +733,68 @@ static int sbefifo_release(struct inode *inode, struct file *file)
  	.release	= sbefifo_release,
  };
  
@@ -271,10 +260,11 @@ index b49aec2..56e6331 100644
  
  	dev_info(dev, "Found sbefifo device\n");
  	sbefifo = kzalloc(sizeof(*sbefifo), GFP_KERNEL);
-@@ -750,6 +836,18 @@ static int sbefifo_probe(struct device *dev)
- 	init_waitqueue_head(&sbefifo->wait);
- 	INIT_LIST_HEAD(&sbefifo->xfrs);
+@@ -755,6 +840,19 @@ static int sbefifo_probe(struct device *dev)
+ 			(unsigned long)sbefifo);
  
+ 	list_add(&sbefifo->link, &sbefifo_fifos);
++
 +	if (dev->of_node) {
 +		/* create platform devs for dts child nodes (occ, etc) */
 +		for_each_child_of_node(dev->of_node, np) {
@@ -286,10 +276,10 @@ index b49aec2..56e6331 100644
 +					 "failed to create child node dev\n");
 +		}
 +	}
-+
- 	/* This bit of silicon doesn't offer any interrupts... */
- 	setup_timer(&sbefifo->poll_timer, sbefifo_poll_timer,
- 			(unsigned long)sbefifo);
++	
+ 	return misc_register(&sbefifo->mdev);
+ }
+ 
 @@ -767,6 +865,9 @@ static int sbefifo_remove(struct device *dev)
  	list_for_each_entry_safe(sbefifo, sbefifo_tmp, &sbefifo_fifos, link) {
  		if (sbefifo->fsi_dev != fsi_dev)
@@ -336,3 +326,6 @@ index 0000000..1b46c63
 +extern void sbefifo_drv_release(struct sbefifo_client *client);
 +
 +#endif /* __FSI_SBEFIFO_H__ */
+-- 
+1.8.3.1
+
