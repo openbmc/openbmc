@@ -9,6 +9,8 @@ inherit setuptools
 inherit obmc-phosphor-dbus-service
 inherit pythonnative
 
+include phosphor-settings-manager.inc
+
 DBUS_SERVICE_${PN} = "org.openbmc.settings.Host.service"
 
 DEPENDS += "python-pyyaml-native"
@@ -16,10 +18,7 @@ RDEPENDS_${PN} += "python-dbus python-pygobject python-ipy"
 PROVIDES += "virtual/obmc-settings-mgmt"
 RPROVIDES_${PN} += "virtual-obmc-settings-mgmt"
 
-SRC_URI += "git://github.com/openbmc/phosphor-settingsd"
 SRC_URI += "file://merge_settings.py"
-
-SRCREV = "672219903522547fbef7258748521c96bf86705c"
 
 S = "${WORKDIR}/git"
 
