@@ -9,7 +9,6 @@ OBMC_RESET_BUTTON_INSTANCES ?= "0"
 OBMC_WATCHDOG_INSTANCES ?= "0"
 
 PREFERRED_PROVIDER_virtual/obmc-chassis-mgmt ?= "obmc-phosphor-chassisd"
-PREFERRED_PROVIDER_virtual/obmc-event-mgmt ?= "obmc-phosphor-event"
 PREFERRED_PROVIDER_virtual/obmc-fan-mgmt ?= "obmc-phosphor-fand"
 PREFERRED_PROVIDER_virtual/obmc-flash-mgmt ?= "obmc-phosphor-flashd"
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw ?= "phosphor-ipmi-hw-example"
