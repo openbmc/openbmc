@@ -24,18 +24,24 @@ RDEPENDS_${PN} += " \
         sdbusplus \
         "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/git"
+
+SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
+
 SRC_URI += " \
         file://bios-ubiattach \
         file://bios-ubiformat"
 
-do_install() {
+SRCREV = "5ba6b10e0b3622ceb920a07d1094af7607ae5dff"
+
+do_install_append() {
         install -d ${D}${sbindir}
         install -m 0755 ${WORKDIR}/bios-ubiattach ${D}${sbindir}/bios-ubiattach
         install -m 0755 ${WORKDIR}/bios-ubiformat ${D}${sbindir}/bios-ubiformat
 }
 
 DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
+
 SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubiattach.service \
         obmc-flash-bios-ubimount@.service \
@@ -43,8 +49,3 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubiumount-rw@.service \
         obmc-flash-bios-squashfsmount@.service \
         "
-
-SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
-SRCREV = "5ba6b10e0b3622ceb920a07d1094af7607ae5dff"
-
-S = "${WORKDIR}/git"
