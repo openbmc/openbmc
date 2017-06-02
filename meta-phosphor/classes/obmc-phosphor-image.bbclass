@@ -5,7 +5,6 @@
 # - obmc-bmc-state-mgmt               - OpenBMC BMC state management
 # - obmc-chassis-mgmt                 - OpenBMC chassis management
 # - obmc-chassis-state-mgmt           - OpenBMC chassis state management
-# - obmc-event-mgmt                   - OpenBMC event management
 # - obmc-fan-control                  - OpenBMC fan management
 # - obmc-fan-mgmt                     - Deprecated - use obmc-fan-control instead
 # - obmc-flash-mgmt                   - OpenBMC flash management
@@ -34,7 +33,6 @@ SDK_OLDEST_KERNEL = "2.6.32"
 FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "packagegroup-obmc-apps-bmc-state-mgmt"
 FEATURE_PACKAGES_obmc-chassis-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-chassis-mgmt', 'virtual-obmc-chassis-mgmt')}"
 FEATURE_PACKAGES_obmc-chassis-state-mgmt ?= "packagegroup-obmc-apps-chassis-state-mgmt"
-FEATURE_PACKAGES_obmc-event-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-event-mgmt', 'virtual-obmc-event-mgmt')}"
 FEATURE_PACKAGES_obmc-fan-control ?= "packagegroup-obmc-apps-fan-control"
 FEATURE_PACKAGES_obmc-fan-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-fan-mgmt', 'virtual-obmc-fan-mgmt')}"
 FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-flash-mgmt', 'virtual-obmc-flash-mgmt')}"
@@ -58,7 +56,6 @@ IMAGE_FEATURES += " \
         obmc-bmc-state-mgmt \
         obmc-chassis-mgmt \
         obmc-chassis-state-mgmt \
-        obmc-event-mgmt \
         obmc-fan-control \
         obmc-fan-mgmt \
         obmc-flash-mgmt \
