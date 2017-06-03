@@ -21,5 +21,5 @@ RDEPENDS_${PN} += "phosphor-logging"
 SYSTEMD_SERVICE_${PN} += "phosphor-gpio-monitor@.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-gpio-monitor"
-SRCREV = "77ec47996d0c8b78d0f08d17fed8ff03107a1e03"
+SRCREV = "e3b859ca45f17386257fa4e506acd266a18f1aa3"
 S = "${WORKDIR}/git"
