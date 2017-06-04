@@ -1,0 +1,336 @@
+From a20bca191d6a624a413f4d44436006da221aa3c7 Mon Sep 17 00:00:00 2001
+From: Adriana Kobylak <anoo@us.ibm.com>
+Date: Tue, 6 Jun 2017 15:15:57 -0500
+Subject: [PATCH 1/2] journal: Create journald dbus object
+
+Create the org.freedesktop.journal1 dbus
+interface to make available journal functionality
+through the dbus. Set it to be disabled by default.
+---
+ Makefile.am                                    | 40 ++++++++++++
+ configure.ac                                   |  9 +++
+ src/journal/journald-dbus.c                    | 86 ++++++++++++++++++++++++++
+ src/journal/org.freedesktop.journal1.conf      | 27 ++++++++
+ src/journal/org.freedesktop.journal1.policy    |  9 +++
+ src/journal/org.freedesktop.journal1.policy.in | 19 ++++++
+ src/journal/org.freedesktop.journal1.service   | 12 ++++
+ units/org.freedesktop.journal1.busname         | 13 ++++
+ units/systemd-journald-dbus.service.in         | 19 ++++++
+ 9 files changed, 234 insertions(+)
+ create mode 100644 src/journal/journald-dbus.c
+ create mode 100644 src/journal/org.freedesktop.journal1.conf
+ create mode 100644 src/journal/org.freedesktop.journal1.policy
+ create mode 100644 src/journal/org.freedesktop.journal1.policy.in
+ create mode 100644 src/journal/org.freedesktop.journal1.service
+ create mode 100644 units/org.freedesktop.journal1.busname
+ create mode 100644 units/systemd-journald-dbus.service.in
+
+diff --git a/Makefile.am b/Makefile.am
+index 1cc657a..9e231bb 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -5966,6 +5966,46 @@ EXTRA_DIST += \
+ 	test/networkd-test.py
+ 
+ # ------------------------------------------------------------------------------
++if ENABLE_JOURNALD_DBUS
++systemd_journald_dbus_SOURCES = \
++    src/journal/journald-dbus.c
++
++systemd_journald_dbus_LDADD = \
++    libsystemd-shared.la
++
++rootlibexec_PROGRAMS += \
++    systemd-journald-dbus
++
++nodist_systemunit_DATA += \
++    units/systemd-journald-dbus.service
++
++dist_systemunit_DATA_busnames += \
++    units/org.freedesktop.journal1.busname
++
++dist_dbuspolicy_DATA += \
++    src/journal/org.freedesktop.journal1.conf
++
++dist_dbussystemservice_DATA += \
++    src/journal/org.freedesktop.journal1.service
++
++polkitpolicy_files += \
++    src/journal/org.freedesktop.journal1.policy
++
++SYSTEM_UNIT_ALIASES += \
++    systemd-journald-dbus.service dbus-org.freedesktop.journal1.service
++
++BUSNAMES_TARGET_WANTS += \
++    org.freedesktop.journal1.busname
++
++endif
++
++polkitpolicy_in_files += \
++    src/journal/org.freedesktop.journal1.policy.in
++
++EXTRA_DIST += \
++    units/systemd-journald-dbus.service.in
++
++# ------------------------------------------------------------------------------
+ if ENABLE_LOGIND
+ systemd_logind_SOURCES = \
+ 	src/login/logind.c \
+diff --git a/configure.ac b/configure.ac
+index cf37ca6..33a30a6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1468,6 +1468,14 @@ AS_IF([test "x$enable_manpages" != xno], [
+ AM_CONDITIONAL(ENABLE_MANPAGES, [test "x$have_manpages" = "xyes"])
+ 
+ # ------------------------------------------------------------------------------
++have_journald_dbus=no
++AC_ARG_ENABLE(journald_dbus, AS_HELP_STRING([--disable-journald-dbus], [disable journal dbus objects]))
++if test "x$enable_journald_dbus" != "xno"; then
++        have_journald_dbus=yes
++fi
++AM_CONDITIONAL(ENABLE_JOURNALD_DBUS, [test "$have_journald_dbus" = "yes"])
++
++# ------------------------------------------------------------------------------
+ AC_ARG_ENABLE(hibernate,
+        [AS_HELP_STRING([--disable-hibernate], [disable hibernation support])],
+        enable_hibernate=$enableval, enable_hibernate=yes)
+@@ -1742,6 +1750,7 @@ AC_MSG_RESULT([
+         tpm:                               ${have_tpm}
+         Python:                            ${have_python}
+         man pages:                         ${have_manpages}
++        journald-dbus:                     ${have_journald_dbus}
+         test coverage:                     ${have_coverage}
+         Split /usr:                        ${enable_split_usr}
+         SysV compatibility:                ${SYSTEM_SYSV_COMPAT}
+diff --git a/src/journal/journald-dbus.c b/src/journal/journald-dbus.c
+new file mode 100644
+index 0000000..6f8c3d3
+--- /dev/null
++++ b/src/journal/journald-dbus.c
+@@ -0,0 +1,86 @@
++/***
++  This file is part of systemd.
++
++  Copyright 2017
++
++  systemd is free software; you can redistribute it and/or modify it
++  under the terms of the GNU Lesser General Public License as published by
++  the Free Software Foundation; either version 2.1 of the License, or
++  (at your option) any later version.
++
++  systemd is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++  Lesser General Public License for more details.
++
++  You should have received a copy of the GNU Lesser General Public License
++  along with systemd; If not, see <http://www.gnu.org/licenses/>.
++***/
++
++#include "bus-util.h"
++#include "def.h"
++#include "sd-bus.h"
++
++static int connect_bus(sd_event *event, sd_bus **_bus) {
++        _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
++        int r;
++
++        assert(event);
++        assert(_bus);
++
++        r = sd_bus_default_system(&bus);
++        if (r < 0)
++                return log_error_errno(r, "Failed to get system bus connection: %m");
++
++        r = sd_bus_request_name(bus, "org.freedesktop.journal1", 0);
++        if (r < 0)
++                return log_error_errno(r, "Failed to register name: %m");
++
++        r = sd_bus_attach_event(bus, event, 0);
++        if (r < 0)
++                return log_error_errno(r, "Failed to attach bus to event loop: %m");
++
++        *_bus = bus;
++        bus = NULL;
++
++        return 0;
++}
++
++int main(int argc, char *argv[]) {
++        _cleanup_(sd_event_unrefp) sd_event *event = NULL;
++        _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
++        int r;
++
++        log_set_target(LOG_TARGET_AUTO);
++        log_parse_environment();
++        log_open();
++
++        umask(0022);
++
++        if (argc != 1) {
++                log_error("This program takes no arguments.");
++                r = -EINVAL;
++                goto finish;
++        }
++
++        r = sd_event_default(&event);
++        if (r < 0) {
++                log_error_errno(r, "Failed to allocate event loop: %m");
++                goto finish;
++        }
++
++        sd_event_set_watchdog(event, true);
++
++        r = connect_bus(event, &bus);
++        if (r < 0)
++                goto finish;
++
++        r = bus_event_loop_with_idle(event, bus, "org.freedesktop.journal1", DEFAULT_EXIT_USEC, NULL, NULL);
++        if (r < 0) {
++                log_error_errno(r, "Failed to run event loop: %m");
++                goto finish;
++        }
++
++finish:
++        return r < 0 ? EXIT_FAILURE : EXIT_SUCCESS;
++}
+diff --git a/src/journal/org.freedesktop.journal1.conf b/src/journal/org.freedesktop.journal1.conf
+new file mode 100644
+index 0000000..2e93596
+--- /dev/null
++++ b/src/journal/org.freedesktop.journal1.conf
+@@ -0,0 +1,27 @@
++<?xml version="1.0"?> <!--*-nxml-*-->
++<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
++        "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
++
++<!--
++  This file is part of systemd.
++
++  systemd is free software; you can redistribute it and/or modify it
++  under the terms of the GNU Lesser General Public License as published by
++  the Free Software Foundation; either version 2.1 of the License, or
++  (at your option) any later version.
++-->
++
++<busconfig>
++
++        <policy user="root">
++                <allow own="org.freedesktop.journal1"/>
++                <allow send_destination="org.freedesktop.journal1"/>
++                <allow receive_sender="org.freedesktop.journal1"/>
++        </policy>
++
++        <policy context="default">
++                <allow send_destination="org.freedesktop.journal1"/>
++                <allow receive_sender="org.freedesktop.journal1"/>
++        </policy>
++
++</busconfig>
+diff --git a/src/journal/org.freedesktop.journal1.policy b/src/journal/org.freedesktop.journal1.policy
+new file mode 100644
+index 0000000..9b0c362
+--- /dev/null
++++ b/src/journal/org.freedesktop.journal1.policy
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
++        "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
++<policyconfig>
++
++        <vendor>The systemd Project</vendor>
++        <vendor_url>http://www.freedesktop.org/wiki/Software/systemd</vendor_url>
++
++</policyconfig>
+\ No newline at end of file
+diff --git a/src/journal/org.freedesktop.journal1.policy.in b/src/journal/org.freedesktop.journal1.policy.in
+new file mode 100644
+index 0000000..811865c
+--- /dev/null
++++ b/src/journal/org.freedesktop.journal1.policy.in
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="UTF-8"?> <!--*-nxml-*-->
++<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
++        "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
++
++<!--
++  This file is part of systemd.
++
++  systemd is free software; you can redistribute it and/or modify it
++  under the terms of the GNU Lesser General Public License as published by
++  the Free Software Foundation; either version 2.1 of the License, or
++  (at your option) any later version.
++-->
++
++<policyconfig>
++
++        <vendor>The systemd Project</vendor>
++        <vendor_url>http://www.freedesktop.org/wiki/Software/systemd</vendor_url>
++
++</policyconfig>
+diff --git a/src/journal/org.freedesktop.journal1.service b/src/journal/org.freedesktop.journal1.service
+new file mode 100644
+index 0000000..6734a5e
+--- /dev/null
++++ b/src/journal/org.freedesktop.journal1.service
+@@ -0,0 +1,12 @@
++#  This file is part of systemd.
++#
++#  systemd is free software; you can redistribute it and/or modify it
++#  under the terms of the GNU Lesser General Public License as published by
++#  the Free Software Foundation; either version 2.1 of the License, or
++#  (at your option) any later version.
++
++[D-BUS Service]
++Name=org.freedesktop.journal1
++Exec=/bin/false
++User=root
++SystemdService=dbus-org.freedesktop.journal1.service
+diff --git a/units/org.freedesktop.journal1.busname b/units/org.freedesktop.journal1.busname
+new file mode 100644
+index 0000000..de65cd4
+--- /dev/null
++++ b/units/org.freedesktop.journal1.busname
+@@ -0,0 +1,13 @@
++#  This file is part of systemd.
++#
++#  systemd is free software; you can redistribute it and/or modify it
++#  under the terms of the GNU Lesser General Public License as published by
++#  the Free Software Foundation; either version 2.1 of the License, or
++#  (at your option) any later version.
++
++[Unit]
++Description=Journal Service Bus Name
++
++[BusName]
++Service=systemd-journald-dbus.service
++AllowWorld=talk
+diff --git a/units/systemd-journald-dbus.service.in b/units/systemd-journald-dbus.service.in
+new file mode 100644
+index 0000000..c8652e8
+--- /dev/null
++++ b/units/systemd-journald-dbus.service.in
+@@ -0,0 +1,19 @@
++#  This file is part of systemd.
++#
++#  systemd is free software; you can redistribute it and/or modify it
++#  under the terms of the GNU Lesser General Public License as published by
++#  the Free Software Foundation; either version 2.1 of the License, or
++#  (at your option) any later version.
++
++[Unit]
++Description=Journal Dbus Service
++
++[Service]
++ExecStart=@rootlibexecdir@/systemd-journald-dbus
++BusName=org.freedesktop.journal1
++WatchdogSec=3min
++CapabilityBoundingSet=CAP_SYS_ADMIN CAP_DAC_OVERRIDE CAP_SYS_PTRACE CAP_SYSLOG CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_CHOWN CAP_DAC_READ_SEARCH CAP_FOWNER CAP_SETUID CAP_SETGID CAP_MAC_OVERRIDE
++MemoryDenyWriteExecute=yes
++RestrictRealtime=yes
++RestrictAddressFamilies=AF_UNIX AF_NETLINK
++SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module @mount @obsolete @raw-io
+-- 
+1.8.2.2
+
