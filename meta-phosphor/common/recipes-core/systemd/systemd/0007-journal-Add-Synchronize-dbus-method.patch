@@ -1,0 +1,52 @@
+From 7f770c9f0dadd72c82ada3939bab1cb88dcbd9fd Mon Sep 17 00:00:00 2001
+From: Adriana Kobylak <anoo@us.ibm.com>
+Date: Tue, 6 Jun 2017 14:55:52 -0500
+Subject: [PATCH 2/2] journal: Add Synchronize dbus method
+
+Add a Synchronize dbus method that performs
+the function of the 'journalctl --sync' call.
+Callers can then call this method in a blocking
+or async manner.
+---
+ src/journal/journald-dbus.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/src/journal/journald-dbus.c b/src/journal/journald-dbus.c
+index 6f8c3d3..561482b 100644
+--- a/src/journal/journald-dbus.c
++++ b/src/journal/journald-dbus.c
+@@ -21,6 +21,20 @@
+ #include "def.h"
+ #include "sd-bus.h"
+ 
++static int method_synchronize(sd_bus_message *m, void *userdata, sd_bus_error *error) {
++        int r;
++
++        r = system("journalctl --sync");
++        r = WEXITSTATUS(r);
++        return sd_bus_reply_method_return(m, "i", r);
++}
++
++static const sd_bus_vtable journal_vtable[] = {
++        SD_BUS_VTABLE_START(0),
++        SD_BUS_METHOD("Synchronize", NULL, "i", method_synchronize, SD_BUS_VTABLE_UNPRIVILEGED),
++        SD_BUS_VTABLE_END,
++};
++
+ static int connect_bus(sd_event *event, sd_bus **_bus) {
+         _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
+         int r;
+@@ -32,6 +46,10 @@ static int connect_bus(sd_event *event, sd_bus **_bus) {
+         if (r < 0)
+                 return log_error_errno(r, "Failed to get system bus connection: %m");
+ 
++        r = sd_bus_add_object_vtable(bus, NULL, "/org/freedesktop/journal1", "org.freedesktop.journal1", journal_vtable, NULL);
++        if (r < 0)
++                return log_error_errno(r, "Failed to register object: %m");
++
+         r = sd_bus_request_name(bus, "org.freedesktop.journal1", 0);
+         if (r < 0)
+                 return log_error_errno(r, "Failed to register name: %m");
+-- 
+1.8.2.2
+
