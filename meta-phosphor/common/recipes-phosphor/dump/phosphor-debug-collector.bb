@@ -8,7 +8,8 @@ PR = "r1"
 
 inherit autotools \
         pkgconfig \
-        obmc-phosphor-dbus-service
+        obmc-phosphor-dbus-service \
+        pythonnative
 
 require phosphor-debug-collector.inc
 
@@ -25,6 +26,7 @@ RDEPENDS_${PN} += " \
         sdbusplus \
         phosphor-dbus-interfaces \
         phosphor-logging \
+        sdbusplus-native \
         "
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.Dump.service"
