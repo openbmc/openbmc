@@ -10,6 +10,7 @@ inherit obmc-phosphor-license
 inherit obmc-phosphor-dbus-service
 inherit phosphor-dbus-interfaces
 inherit phosphor-logging
+inherit obmc-yaml
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.Logging.service"
 
