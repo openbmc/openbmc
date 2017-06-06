@@ -4,6 +4,7 @@ Wants=obmc-power-start-pre@%i.target
 Before=obmc-power-start-pre@%i.target
 Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
+ConditionPathExists=!/var/lib/obmc/dd20
 
 [Service]
 ExecStart={bindir}/ucd_disable_vcs.sh
