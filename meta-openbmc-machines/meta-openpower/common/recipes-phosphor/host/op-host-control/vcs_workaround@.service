@@ -8,6 +8,7 @@ Wants=fsi-scan@%i.service
 After=fsi-scan@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
+ConditionPathExists=!/var/lib/obmc/dd20
 
 [Service]
 ExecStart={sbindir}/openpower-proc-control vcsWorkaround
