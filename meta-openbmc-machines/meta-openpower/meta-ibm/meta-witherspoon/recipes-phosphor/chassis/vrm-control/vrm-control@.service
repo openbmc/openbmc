@@ -5,6 +5,7 @@ After=avsbus-disable@%i.service
 Before=avsbus-enable@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
+ConditionPathExists=!/var/lib/obmc/dd20
 
 [Service]
 ExecStart={bindir}/vrm-control.sh vdna=0.9 vdnb=0.9
