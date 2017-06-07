@@ -108,6 +108,26 @@ mount_ubi() {
   fi
 }
 
+umount_ubi() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  ubidev="/dev/ubi${pnor}"
+  mountdir="/media/${name}"
+
+  if is_mounted "${name}"; then
+    umount "${mountdir}"
+  fi
+
+  vol="$(findubi "${name}")"
+  if [ -n "${vol}" ]; then
+    ubirmvol "${ubidev}" -N "${name}"
+  fi
+
+  if [ -d "${mountdir}" ]; then
+    rm -r "${mountdir}"
+  fi
+}
+
 case "$1" in
   ubiattach)
     attach_ubi
@@ -120,6 +140,10 @@ case "$1" in
   ubimount)
     name="$2"
     mount_ubi
+    ;;
+  ubiumount)
+    name="$2"
+    umount_ubi
     ;;
   *)
     echo "Invalid argument"
