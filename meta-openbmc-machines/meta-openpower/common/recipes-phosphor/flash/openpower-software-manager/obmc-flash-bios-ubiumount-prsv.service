@@ -6,10 +6,4 @@ After=obmc-flash-bios-ubiattach.service
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/bin/sh -c 'if grep -q pnor-prsv /proc/mounts; then \
-                        umount /media/pnor-prsv; fi; \
-                      prsv_ubi=`ubinfo -d 0 -a | grep pnor-prsv`; \
-                      if [ ! -z "$prsv_ubi" ]; then \
-                        {sbindir}/ubirmvol /dev/ubi0 -N pnor-prsv; fi; \
-                      if [ -d "/media/pnor-prsv" ]; then \
-                        rm -r /media/pnor-prsv; fi;'
+ExecStart={sbindir}/obmc-flash-bios ubiumount pnor-prsv
