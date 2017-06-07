@@ -6,18 +6,5 @@ After=obmc-flash-bios-ubiattach.service
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/bin/sh -c 'rw=pnor-rw-%i; \
-                      if [ ! -d "/media/$rw" ]; then \
-                        mkdir /media/$rw; fi; \
-                      if [ ! -d "/media/pnor-prsv" ]; then \
-                        mkdir /media/pnor-prsv; fi; \
-                      rw_ubi=`ubinfo -d 0 -a | grep $rw`; \
-                      if [ -z "$rw_ubi" ]; then \
-                        {sbindir}/ubimkvol /dev/ubi0 -N $rw -s 1MiB; fi; \
-                      prsv_ubi=`ubinfo -d 0 -a | grep pnor-prsv`; \
-                      if [ -z "$prsv_ubi" ]; then \
-                        {sbindir}/ubimkvol /dev/ubi0 -N pnor-prsv -s 1MiB; fi; \
-                      if ! grep -q $rw /proc/mounts; then \
-                        mount -t ubifs ubi0:$rw /media/$rw; fi; \
-                      if ! grep -q pnor-prsv /proc/mounts; then \
-                        mount -t ubifs ubi0:pnor-prsv /media/pnor-prsv; fi;'
+ExecStart={sbindir}/obmc-flash-bios ubimount pnor-rw-%i
+ExecStart={sbindir}/obmc-flash-bios ubimount pnor-prsv
