@@ -1,6 +1,6 @@
 [Unit]
 Description=OpenPOWER debug data collector
-Conflicts=obmc-host-quiesce@%i.target
+Before=obmc-host-quiesce@%i.target
 
 [Service]
 ExecStart={sbindir}/checkstop_app
