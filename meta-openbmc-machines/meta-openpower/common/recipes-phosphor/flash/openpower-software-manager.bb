@@ -32,7 +32,7 @@ SRC_URI += " \
         file://bios-ubiattach \
         file://bios-ubiformat"
 
-SRCREV = "5ba6b10e0b3622ceb920a07d1094af7607ae5dff"
+SRCREV = "942df8ab3127d0e5e37cdce33f55b53496fddbe2"
 
 do_install_append() {
         install -d ${D}${sbindir}
