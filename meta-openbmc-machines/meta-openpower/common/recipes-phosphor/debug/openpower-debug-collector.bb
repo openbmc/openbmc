@@ -21,9 +21,11 @@ RDEPENDS_${PN} += " \
 
 S = "${WORKDIR}/git"
 
-TMPL = "openpower-debug-collector@.service"
-INSTFMT = "openpower-debug-collector@{0}.service"
-LINK_FMT = "${TMPL}:${INSTFMT}"
+# This needs to be executed as part of host crash
+DEBUG_TMPL = "openpower-debug-collector@.service"
+CRASH_TGTFMT = "obmc-host-crash@{0}.target"
+DEBUG_INSTFMT = "openpower-debug-collector@{0}.service"
+CRASH_DEBUG_FMT = "../${DEBUG_TMPL}:${CRASH_TGTFMT}.wants/${DEBUG_INSTFMT}"
 
-SYSTEMD_SERVICE_${PN} += "${TMPL}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'LINK_FMT', 'OBMC_CHECKSTOP_INSTANCES')}"
+SYSTEMD_SERVICE_${PN} += "${DEBUG_TMPL}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CRASH_DEBUG_FMT', 'OBMC_HOST_INSTANCES')}"
