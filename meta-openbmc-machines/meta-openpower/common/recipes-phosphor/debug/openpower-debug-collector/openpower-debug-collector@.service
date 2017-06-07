@@ -1,5 +1,6 @@
 [Unit]
 Description=OpenPOWER debug data collector
+Before=obmc-quiesce-host@%i.target
 Conflicts=obmc-host-quiesce@%i.target
 
 [Service]
