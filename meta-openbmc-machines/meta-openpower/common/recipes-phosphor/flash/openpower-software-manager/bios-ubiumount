@@ -1,0 +1,29 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 partition-name" >&2
+  exit 1
+fi
+
+# Get the pnor mtd device number
+pnor=`grep pnor /proc/mtd |cut -c 4`
+
+# Unmount the volume if it is mounted
+mountdir="/media/$1"
+if grep -q $1 /proc/mounts
+then
+  umount $mountdir
+fi
+
+# Remove the volume if it exists
+vol=`ubinfo -d $pnor -a | grep $1`
+if [ ! -z "$vol" ]
+then
+  ubirmvol /dev/ubi$pnor -N $1
+fi
+
+# Remove the mount directory if it exists
+if [ -d $mountdir ]
+then
+  rm -r $mountdir
+fi

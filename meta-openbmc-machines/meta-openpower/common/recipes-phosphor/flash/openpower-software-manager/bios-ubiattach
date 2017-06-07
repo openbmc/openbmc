@@ -4,7 +4,7 @@
 pnor=`grep pnor /proc/mtd |cut -c 4`
 
 # Attach the pnor mtd device to ubi
-ubiattach /dev/ubi_ctrl -m $pnor
+ubiattach /dev/ubi_ctrl -m $pnor -d $pnor
 if [ $? -ne 0 ]
 then
   # Check the pnor mtd device is formatted as ubi by reading the first 3 byes,
@@ -18,6 +18,6 @@ then
     # Format device as ubi
     bios-ubiformat
     # Retry the ubiattach
-    ubiattach /dev/ubi_ctrl -m $pnor
+    ubiattach /dev/ubi_ctrl -m $pnor -d $pnor
   fi
 fi
