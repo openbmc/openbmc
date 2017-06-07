@@ -1,0 +1,15 @@
+[Unit]
+Description=Power off mode bind ir35221 device driver devs
+After=vcs_off_poweroff@%i.service
+Wants=obmc-power-stop@i.target
+Before=obmc-power-stop@%i.target
+Conflicts=obmc-power-stop@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-off
+
+[Service]
+ExecStart={bindir}/ir35221-unbind-bind.sh bind
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-poweroff@%i.target
