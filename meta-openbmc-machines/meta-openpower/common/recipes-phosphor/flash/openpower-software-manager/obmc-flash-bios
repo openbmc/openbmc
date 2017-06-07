@@ -1,0 +1,150 @@
+#!/bin/sh
+
+# Get the mtd device number (mtdX)
+findmtd() {
+  m="$(grep -xl "$1" /sys/class/mtd/*/name)"
+  m="${m%/name}"
+  m="${m##*/}"
+  echo "${m}"
+}
+
+# Get the ubi device number (ubiX_Y)
+findubi() {
+  u="$(grep -xl "$1" /sys/class/ubi/ubi?/subsystem/ubi*/name)"
+  u="${u%/name}"
+  u="${u##*/}"
+  echo "${u}"
+}
+
+# Get the mount information
+findmount() {
+  m="$(grep -q "$1" /proc/mounts)"
+  echo "${m}"
+}
+
+# Attach the pnor mtd device to ubi
+attach_ubi() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  pnordev="/dev/mtd${pnor}"
+
+  ubiattach /dev/ubi_ctrl -m "${pnor}" -d "${pnor}"
+  if [ $? -ne 0 ]; then
+    # Check the pnor mtd device is formatted as ubi by reading the first 3 byes,
+    # which should be the ascii chars 'UBI'
+    magic="$(hexdump -C -n 3 ${pnordev})"
+    if [[ "${magic}" =~ "UBI" ]]; then
+      # Device already formatted as ubi, ubiattach failed for some other reason
+      exit -1
+    else
+      # Format device as ubi
+      echo "Starting ubiformat ${pnordev}"
+      ubiformat "${pnordev}" -y -q
+      # Retry the ubiattach
+      ubiattach /dev/ubi_ctrl -m "${pnor}" -d "${pnor}"
+    fi
+  fi
+}
+
+mount_squashfs() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  ubidev="/dev/ubi${pnor}"
+  mountdir="/media/${name}"
+
+  if [ ! -d ${mountdir} ]; then
+    mkdir "${mountdir}"
+  fi
+
+  # Create a static ubi volume of arbitrary size 32MB,
+  # the volume will shrink to fit the pnor image if smaller
+  vol="$(findubi ${name})"
+  if [ -z "${vol}" ]; then
+    ubimkvol "${ubidev}" -N "${name}" -s 32MiB --type=static
+    vol="$(findubi ${name})"
+  fi
+
+  # Create a ubi block needed for read-only volumes,
+  # and update the volume with the pnor squashfs image
+  volumeid="${vol#ubi*_}"
+  block="/dev/ubiblock${pnor}_${volumeid}"
+  if [ ! -e $block ]
+  then
+    ubidevid="${ubidev}_${volumeid}"
+    img="/tmp/images/${version}/pnor.xz.squashfs"
+    ubiblock --create "${ubidevid}"
+    ubiupdatevol "${ubidevid}" "${img}"
+  fi
+
+  mount="$(findmount ${name})"
+  if [ -z "${mount}" ]; then
+    mount -t squashfs -o ro "${block}" "${mountdir}"
+  fi
+}
+
+mount_ubi() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  ubidev="/dev/ubi${pnor}"
+  mountdir="/media/${name}"
+
+  if [ ! -d ${mountdir} ]; then
+    mkdir "${mountdir}"
+  fi
+
+  # Create a dynamic ubi volume of initial arbitrary size 1MB,
+  # the volume will grow dynamically as needed
+  vol="$(findubi ${name})"
+  if [ -z "${vol}" ]; then
+    ubimkvol "${ubidev}" -N "${name}" -s 1MiB
+  fi
+
+  mount="$(findmount ${name})"
+  if [ -z "${mount}" ]; then
+    mountdev="ubi${pnor}:${name}"
+    mount -t ubifs "${mountdev}" "${mountdir}"
+  fi
+}
+
+umount_ubi() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  ubidev="/dev/ubi${pnor}"
+  mountdir="/media/${name}"
+  mount="$(findmount ${name})"
+
+  if [ -n "${mount}" ]; then
+    umount "${mountdir}"
+  fi
+
+  vol="$(findubi ${name})"
+  if [ -n "${vol}" ]; then
+    ubirmvol "${ubidev}" -N "${name}"
+  fi
+
+  if [ -d ${mountdir} ]; then
+    rm -r "${mountdir}"
+  fi
+}
+
+case "$1" in
+  ubiattach)
+    attach_ubi
+    ;;
+  squashfsmount)
+    name=$2
+    version=$3
+    mount_squashfs
+    ;;
+  ubimount)
+    name=$2
+    mount_ubi
+    ;;
+  ubiumount)
+    name=$2
+    umount_ubi
+    ;;
+  *)
+    break
+    ;;
+esac
