@@ -1,0 +1,14 @@
+[Unit]
+Description=power on mode unbind ir35221 device driver devs
+Wants=obmc-power-start-pre@%i.target
+Before=obmc-power-start-pre@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
+
+[Service]
+ExecStart=/usr/bin/ir35221-unbind-bind.sh unbind
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-poweron@%i.target
