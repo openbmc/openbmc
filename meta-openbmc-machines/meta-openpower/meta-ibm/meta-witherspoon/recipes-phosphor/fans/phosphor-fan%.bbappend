@@ -22,3 +22,6 @@ COOLING_ENV_FMT = "obmc/phosphor-fan/phosphor-cooling-type-{0}.conf"
 
 SYSTEMD_ENVIRONMENT_FILE_phosphor-cooling-type += "${@compose_list(d, 'COOLING_ENV_FMT', 'OBMC_CHASSIS_INSTANCES')}"
 
+#These 2 services are protected by the watchdog
+SYSTEMD_OVERRIDE_phosphor-fan-control += "fan-watchdog-monitor.conf:phosphor-fan-control@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE_phosphor-fan-monitor += "fan-watchdog-monitor.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-monitor.conf"
