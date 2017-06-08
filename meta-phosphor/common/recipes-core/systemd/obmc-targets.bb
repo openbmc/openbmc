@@ -62,6 +62,7 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-fans-ready.target \
         obmc-fan-control.target \
         obmc-fan-control-ready@.target \
+        obmc-fan-watchdog-takeover.target \
         obmc-standby.target \
         "
 
