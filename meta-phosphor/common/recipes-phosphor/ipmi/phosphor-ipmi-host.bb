@@ -21,6 +21,7 @@ DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "obmc-targets"
+DEPENDS += "virtual/phosphor-ipmi-host-inventory"
 DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 DEPENDS += "virtual/phosphor-ipmi-host-hostfw-config"
 
@@ -48,6 +49,7 @@ EXTRA_OECONF = " \
         WHITELIST_CONF="${WHITELIST_CONF}" \
         SENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/sensor.yaml \
         INVSENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/invsensor.yaml \
+        YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/config.yaml \
         "
 
 S = "${WORKDIR}/git"
