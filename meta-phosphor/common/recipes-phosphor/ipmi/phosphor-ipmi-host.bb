@@ -1,5 +1,6 @@
 SUMMARY = "Phosphor OpenBMC IPMI daemon"
 DESCRIPTION = "Phosphor OpenBMC IPMI router and plugin libraries"
+HOMEPAGE = "http://github.com/openbmc/phosphor-host-ipmid"
 PR = "r1"
 
 RRECOMMENDS_${PN} += "packagegroup-obmc-ipmid-providers-libs"
@@ -21,6 +22,7 @@ DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "obmc-targets"
 DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
+DEPENDS += "virtual/phosphor-ipmi-host-hostfw-config"
 
 RDEPENDS_${PN}-dev += "phosphor-logging"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
