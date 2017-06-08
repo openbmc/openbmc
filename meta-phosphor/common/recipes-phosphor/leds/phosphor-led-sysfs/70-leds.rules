@@ -1,1 +1,1 @@
-SUBSYSTEM=="leds", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="xyz.openbmc_project.led.controller@sys$devpath"
+SUBSYSTEM=="leds", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="xyz.openbmc_project.led.controller@sys-class-leds-$name"
