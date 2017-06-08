@@ -156,8 +156,13 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-read-hostfw-config ?= "phosphor-ipm
 # the phosphor-ipmi-fru build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-inventory ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-inventory-mrw-native', 'phosphor-ipmi-fru-inventory-example-native')}"
+
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-properties ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-properties-mrw-native', 'phosphor-ipmi-fru-properties-native')}"
+
+
+PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-read-inventory ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-read-inventory-mrw-native', 'phosphor-ipmi-fru-read-inventory-example-native')}"
 
 # The phosphor-led-manager application is data-driven and requires an input
 # yaml of LED group and members.
