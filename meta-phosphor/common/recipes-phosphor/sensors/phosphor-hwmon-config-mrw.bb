@@ -11,7 +11,7 @@ do_compile_append() {
     ${STAGING_BINDIR_NATIVE}/perl-native/perl \
         ${STAGING_BINDIR_NATIVE}/hwmon.pl \
         -x ${STAGING_DATADIR_NATIVE}/obmc-mrw/${MACHINE}.xml \
-        -d ${WORKDIR}
+        -d ${WORKDIR}/mrw-config-files
 }
 
 def find_conf_files(dir):
@@ -30,12 +30,15 @@ def find_conf_files(dir):
 python install_conf_files() {
     from shutil import copy
 
-    files = find_conf_files(d.getVar("WORKDIR", True))
+    conf_file_dir = os.path.join(
+        d.getVar("WORKDIR", True),
+        'mrw-config-files')
+    files = find_conf_files(conf_file_dir)
 
     install_dir = os.path.join(d.getVar("D", True),
                                "etc", "default", "obmc", "hwmon")
 
-    dir_len = len(d.getVar("WORKDIR", True))
+    dir_len = len(conf_file_dir)
 
     for f in files:
         dest = os.path.join(install_dir, f[dir_len + 1:])
