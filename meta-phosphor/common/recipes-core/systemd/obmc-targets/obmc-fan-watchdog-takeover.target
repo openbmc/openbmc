@@ -1,0 +1,6 @@
+#The system implementation should start this target when dynamic fan control
+#is no longer desired or possible.  It should also add units to this target
+#that enabled continued operation after dynamic fan control is no longer
+#desired or possible.
+[Unit]
+Description=Fan watchdog takeover target
