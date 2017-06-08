@@ -138,6 +138,17 @@ VIRTUAL-RUNTIME_obmc-settings-mgr ?= "phosphor-settings-manager"
 # the phosphor-ipmi-fru build process.
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-hostfw-config ?= "phosphor-ipmi-fru-hostfw-config-example-native"
 
+
+# virtual/phosphor-ipmi-fru-read-hostfw-config
+#
+# The phosphor-ipmi-host application is data-driven and requires an input
+# mapping of how the host firmware reports inventory via IPMI.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the phosphor-ipmi-host build process.
+PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-read-hostfw-config ?= "phosphor-ipmi-fru-read-hostfw-config-example-native"
+
+
 # The phosphor-ipmi-fru application is data-driven and requires an input
 # mapping of IPMI inventory metadata to DBus objects interfaces and properties.
 # This virtual is a native recipe that provides that mapping by installing
@@ -145,8 +156,13 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-hostfw-config ?= "phosphor-ipmi-fru
 # the phosphor-ipmi-fru build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-inventory ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-inventory-mrw-native', 'phosphor-ipmi-fru-inventory-example-native')}"
+
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-properties ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-properties-mrw-native', 'phosphor-ipmi-fru-properties-native')}"
+
+
+PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-read-inventory ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-read-inventory-mrw-native', 'phosphor-ipmi-fru-read-inventory-example-native')}"
 
 # The phosphor-led-manager application is data-driven and requires an input
 # yaml of LED group and members.

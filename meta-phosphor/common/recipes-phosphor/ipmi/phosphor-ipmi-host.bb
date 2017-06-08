@@ -1,5 +1,6 @@
 SUMMARY = "Phosphor OpenBMC IPMI daemon"
 DESCRIPTION = "Phosphor OpenBMC IPMI router and plugin libraries"
+HOMEPAGE = "http://github.com/openbmc/phosphor-host-ipmid"
 PR = "r1"
 
 RRECOMMENDS_${PN} += "packagegroup-obmc-ipmid-providers-libs"
@@ -20,7 +21,9 @@ DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "obmc-targets"
+DEPENDS += "virtual/phosphor-ipmi-fru-read-inventory"
 DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
+DEPENDS += "virtual/phosphor-ipmi-fru-read-hostfw-config"
 
 RDEPENDS_${PN}-dev += "phosphor-logging"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
@@ -46,6 +49,7 @@ EXTRA_OECONF = " \
         WHITELIST_CONF="${WHITELIST_CONF}" \
         SENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/sensor.yaml \
         INVSENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/invsensor.yaml \
+        FRU_YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/config.yaml \
         "
 
 S = "${WORKDIR}/git"
