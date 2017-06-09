@@ -1,0 +1,177 @@
+From 80d7ca294bc6f0c36e67e5d6ead13a932b27f167 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 9 Jun 2017 10:22:40 -0500
+Subject: [PATCH linux dev-4.10 v2 4/5] drivers: occ: hwmon and fsi probing fix
+
+Probe the FSI-based OCC hwmon driver immediately instead of delaying.
+The probe will fail during FSI scan intentionally, since the OCC is not
+active when the system is first powering on. The driver can then be
+manually bound when the OCC becomes active.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ drivers/fsi/fsi-sbefifo.c  |  4 ++--
+ drivers/fsi/occ.c          |  8 +++++++-
+ drivers/hwmon/occ/p9_sbe.c | 38 ++++++++++----------------------------
+ 3 files changed, 19 insertions(+), 31 deletions(-)
+
+diff --git a/drivers/fsi/fsi-sbefifo.c b/drivers/fsi/fsi-sbefifo.c
+index fbc8dc5..bcf284c 100644
+--- a/drivers/fsi/fsi-sbefifo.c
++++ b/drivers/fsi/fsi-sbefifo.c
+@@ -839,8 +839,6 @@ static int sbefifo_probe(struct device *dev)
+ 	setup_timer(&sbefifo->poll_timer, sbefifo_poll_timer,
+ 			(unsigned long)sbefifo);
+ 
+-	list_add(&sbefifo->link, &sbefifo_fifos);
+-
+ 	if (dev->of_node) {
+ 		/* create platform devs for dts child nodes (occ, etc) */
+ 		for_each_child_of_node(dev->of_node, np) {
+@@ -852,6 +850,8 @@ static int sbefifo_probe(struct device *dev)
+ 					 "failed to create child node dev\n");
+ 		}
+ 	}
++
++	list_add(&sbefifo->link, &sbefifo_fifos);
+ 	
+ 	return misc_register(&sbefifo->mdev);
+ }
+diff --git a/drivers/fsi/occ.c b/drivers/fsi/occ.c
+index a1508f2..f43ae51 100644
+--- a/drivers/fsi/occ.c
++++ b/drivers/fsi/occ.c
+@@ -635,6 +635,9 @@ struct occ_client *occ_drv_open(struct device *dev, unsigned long flags)
+ {
+ 	struct occ *occ = dev_get_drvdata(dev);
+ 
++	if (!occ)
++		return NULL;
++
+ 	return occ_open_common(occ, flags);
+ }
+ EXPORT_SYMBOL_GPL(occ_drv_open);
+@@ -688,7 +691,8 @@ static int occ_probe(struct platform_device *pdev)
+ 	mutex_init(&occ->occ_lock);
+ 	INIT_WORK(&occ->work, occ_worker);
+ 
+-	platform_set_drvdata(pdev, occ);
++	/* ensure NULL before we probe children, so they don't hang FSI */
++	platform_set_drvdata(pdev, NULL);
+ 
+ 	if (dev->of_node) {
+ 		rc = of_property_read_u32(dev->of_node, "reg", &reg);
+@@ -715,6 +719,8 @@ static int occ_probe(struct platform_device *pdev)
+ 	} else
+ 		occ->idx = ida_simple_get(&occ_ida, 1, INT_MAX, GFP_KERNEL);
+ 
++	platform_set_drvdata(pdev, occ);
++
+ 	snprintf(occ->name, sizeof(occ->name), "occ%d", occ->idx);
+ 	occ->mdev.fops = &occ_fops;
+ 	occ->mdev.minor = MISC_DYNAMIC_MINOR;
+diff --git a/drivers/hwmon/occ/p9_sbe.c b/drivers/hwmon/occ/p9_sbe.c
+index fe435ef..c70858d 100644
+--- a/drivers/hwmon/occ/p9_sbe.c
++++ b/drivers/hwmon/occ/p9_sbe.c
+@@ -16,11 +16,8 @@
+ #include <linux/sched.h>
+ #include <linux/workqueue.h>
+ 
+-#define P9_SBE_OCC_SETUP_DELAY		5000
+-
+ struct p9_sbe_occ {
+ 	struct occ occ;
+-	struct delayed_work setup;
+ 	struct device *sbe;
+ };
+ 
+@@ -93,12 +90,9 @@ static int p9_sbe_occ_send_cmd(struct occ *occ, u8 *cmd)
+ 	return rc;
+ }
+ 
+-static void p9_sbe_occ_setup(struct work_struct *work)
++static int p9_sbe_occ_setup(struct p9_sbe_occ *p9_sbe_occ)
+ {
+ 	int rc;
+-	struct delayed_work *dwork = to_delayed_work(work);
+-	struct p9_sbe_occ *p9_sbe_occ = container_of(dwork, struct p9_sbe_occ,
+-						     setup);
+ 	struct occ *occ = &p9_sbe_occ->occ;
+ 
+ 	/* no need to lock */
+@@ -106,7 +100,7 @@ static void p9_sbe_occ_setup(struct work_struct *work)
+ 	if (rc < 0) {
+ 		dev_err(occ->bus_dev, "failed to get OCC poll response: %d\n",
+ 			rc);
+-		return;
++		return rc;
+ 	}
+ 
+ 	occ_parse_poll_response(occ);
+@@ -114,21 +108,24 @@ static void p9_sbe_occ_setup(struct work_struct *work)
+ 	rc = occ_setup_sensor_attrs(occ);
+ 	if (rc) {
+ 		dev_err(occ->bus_dev, "failed to setup p9 attrs: %d\n", rc);
+-		return;
++		return rc;
+ 	}
+ 
+ 	occ->hwmon = devm_hwmon_device_register_with_groups(occ->bus_dev,
+ 							    "p9_occ", occ,
+ 							    occ->groups);
+ 	if (IS_ERR(occ->hwmon)) {
+-		dev_err(occ->bus_dev, "failed to register hwmon device: %ld\n",
+-			PTR_ERR(occ->hwmon));
+-		return;
++		rc = PTR_ERR(occ->hwmon);
++		dev_err(occ->bus_dev, "failed to register hwmon device: %d\n",
++			rc);
++		return rc;
+ 	}
+ 
+ 	rc = occ_create_status_attrs(occ);
+ 	if (rc)
+ 		dev_err(occ->bus_dev, "failed to setup p9 status attrs: %d\n", rc);
++
++	return rc;
+ }
+ 
+ static int p9_sbe_occ_probe(struct platform_device *pdev)
+@@ -148,24 +145,10 @@ static int p9_sbe_occ_probe(struct platform_device *pdev)
+ 	occ->poll_cmd_data = 0x20;
+ 	occ->send_cmd = p9_sbe_occ_send_cmd;
+ 	mutex_init(&occ->lock);
+-	INIT_DELAYED_WORK(&p9_sbe_occ->setup, p9_sbe_occ_setup);
+ 
+ 	platform_set_drvdata(pdev, occ);
+ 
+-	schedule_delayed_work(&p9_sbe_occ->setup,
+-			      msecs_to_jiffies(P9_SBE_OCC_SETUP_DELAY));
+-
+-	return 0;
+-}
+-
+-static int p9_sbe_occ_remove(struct platform_device *pdev)
+-{
+-	struct occ *occ = platform_get_drvdata(pdev);
+-	struct p9_sbe_occ *p9_sbe_occ = to_p9_sbe_occ(occ);
+-
+-	cancel_delayed_work_sync(&p9_sbe_occ->setup);
+-
+-	return 0;
++	return p9_sbe_occ_setup(p9_sbe_occ);
+ }
+ 
+ static const struct of_device_id p9_sbe_occ_of_match[] = {
+@@ -179,7 +162,6 @@ static int p9_sbe_occ_remove(struct platform_device *pdev)
+ 		.of_match_table	= p9_sbe_occ_of_match,
+ 	},
+ 	.probe	= p9_sbe_occ_probe,
+-	.remove = p9_sbe_occ_remove,
+ };
+ 
+ module_platform_driver(p9_sbe_occ_driver);
+-- 
+1.8.3.1
+
