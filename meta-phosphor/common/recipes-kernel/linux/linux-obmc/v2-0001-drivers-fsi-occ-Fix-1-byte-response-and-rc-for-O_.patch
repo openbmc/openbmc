@@ -1,0 +1,48 @@
+From af244888a3af01ef877521c07cbee2887f045664 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Wed, 7 Jun 2017 17:49:15 -0500
+Subject: [PATCH linux dev-4.10 v2 1/5] drivers: fsi: occ: Fix 1 byte response
+ and rc for O_NONBLOCK
+
+Couple of bug fixes.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ drivers/fsi/occ.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/fsi/occ.c b/drivers/fsi/occ.c
+index fc014b6..a1508f2 100644
+--- a/drivers/fsi/occ.c
++++ b/drivers/fsi/occ.c
+@@ -188,7 +188,7 @@ static ssize_t occ_read_common(struct occ_client *client, char __user *ubuf,
+ 
+ 	if (!test_bit(XFR_COMPLETE, &xfr->flags)) {
+ 		if (test_bit(CLIENT_NONBLOCKING, &client->flags)) {
+-			rc = -ERESTARTSYS;
++			rc = -EAGAIN;
+ 			goto done;
+ 		}
+ 
+@@ -593,11 +593,13 @@ static void occ_worker(struct work_struct *work)
+ 		goto done;
+ 	}
+ 
+-	/* already got 3 bytes resp, also need 2 bytes checksum */
+-	rc = occ_getsram(sbefifo, 0xFFFBF008, &xfr->buf[8],
+-			 resp_data_length - 1);
+-	if (rc)
+-		goto done;
++	if (resp_data_length > 1) {
++		/* already got 3 bytes resp, also need 2 bytes checksum */
++		rc = occ_getsram(sbefifo, 0xFFFBF008, &xfr->buf[8],
++				 resp_data_length - 1);
++		if (rc)
++			goto done;
++	}
+ 
+ 	xfr->resp_data_length = resp_data_length + 7;
+ 
+-- 
+1.8.3.1
+
