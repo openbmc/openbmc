@@ -7,7 +7,7 @@ PR = "r1"
 inherit autotools \
         pkgconfig \
         pythonnative \
-        phosphor-dbus-interfaces \
+        phosphor-dbus-yaml \
         phosphor-inventory-manager \
         obmc-phosphor-dbus-service
 
