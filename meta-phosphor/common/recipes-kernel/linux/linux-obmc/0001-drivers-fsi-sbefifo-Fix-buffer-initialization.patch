@@ -1,0 +1,28 @@
+From 00f1b72019de37f47e8efbb25748f4c6c352918c Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Tue, 13 Jun 2017 09:29:09 -0500
+Subject: [PATCH linux dev-4.10] drivers: fsi: sbefifo: Fix buffer
+ initialization
+
+Flags field wasn't set, leading to inconsistent results.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ drivers/fsi/fsi-sbefifo.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/fsi/fsi-sbefifo.c b/drivers/fsi/fsi-sbefifo.c
+index fbc8dc5..52d7a1b 100644
+--- a/drivers/fsi/fsi-sbefifo.c
++++ b/drivers/fsi/fsi-sbefifo.c
+@@ -156,6 +156,7 @@ static size_t sbefifo_dev_nwwriteable(u32 sts)
+ 
+ static void sbefifo_buf_init(struct sbefifo_buf *buf)
+ {
++	WRITE_ONCE(buf->flags, 0);
+ 	WRITE_ONCE(buf->rpos, buf->buf);
+ 	WRITE_ONCE(buf->wpos, buf->buf);
+ }
+-- 
+1.8.3.1
+

@@ -10,6 +10,13 @@ KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI += "file://phosphor-gpio-keys.scc"
 SRC_URI += "file://phosphor-gpio-keys.cfg"
+SRC_URI += "file://0001-drivers-fsi-sbefifo-Fix-buffer-initialization.patch"
+SRC_URI += "file://v2-0001-drivers-fsi-occ-Fix-1-byte-response-and-rc-for-O_.patch"
+SRC_URI += "file://v2-0002-drivers-hwmon-occ-Add-new-sensor-versions-and-non.patch"
+SRC_URI += "file://v2-0003-drivers-hwmon-occ-Add-P8-OCC-access.patch"
+SRC_URI += "file://v2-0004-drivers-occ-hwmon-and-fsi-probing-fix.patch"
+SRC_URI += "file://v2-0005-aspeed-update-power9-dts-and-defconfigs-for-OCC.patch"
+SRC_URI += "file://0001-drivers-hwmon-occ-Add-master-attribute-and-remove-st.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
