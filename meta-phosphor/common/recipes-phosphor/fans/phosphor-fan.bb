@@ -27,7 +27,7 @@ FAN_PACKAGES = " \
 
 PACKAGES_remove = "${PN}"
 PACKAGES += "${FAN_PACKAGES}"
-PACKAGECONFIG ??= "presence control monitor"
+PACKAGECONFIG ?= "presence control monitor"
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
 RDEPENDS_${PN}-dev = "${FAN_PACKAGES}"
 RDEPENDS_${PN}-staticdev = "${FAN_PACKAGES}"
