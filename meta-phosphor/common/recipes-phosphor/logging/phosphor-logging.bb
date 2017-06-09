@@ -8,7 +8,6 @@ inherit autotools pkgconfig
 inherit pythonnative
 inherit obmc-phosphor-license
 inherit obmc-phosphor-dbus-service
-inherit phosphor-dbus-interfaces
 inherit phosphor-logging
 inherit phosphor-dbus-yaml
 
