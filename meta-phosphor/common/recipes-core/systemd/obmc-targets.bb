@@ -38,7 +38,8 @@ HOST_SYNCH_TARGETS = "start-pre starting started stop-pre stopping stopped reset
 # - crash:   Target to run when host crashes. it is very much similar to
 #            quiesce target but the only delta is that this target contains
 #            multiple services and one of them is the quiesce target.
-HOST_ACTION_TARGETS = "start stop quiesce reset shutdown crash"
+# - timeout: Target to run when host watchdog times out
+HOST_ACTION_TARGETS = "start stop quiesce reset shutdown crash timeout"
 
 CHASSIS_SYNCH_FMT = "obmc-power-{0}@.target"
 CHASSIS_ACTION_FMT = "obmc-chassis-power{0}@.target"
@@ -51,10 +52,13 @@ HOST_LINK_SYNCH_FMT = "${HOST_SYNCH_FMT}:obmc-host-{0}@{1}.target"
 HOST_LINK_ACTION_FMT = "${HOST_ACTION_FMT}:obmc-host-{0}@{1}.target"
 FAN_LINK_FMT = "obmc-fan-control-ready@.target:obmc-fan-control-ready@{0}.target"
 
+# Targets to be executed on checkstop and watchdog timeout
+HOST_ERROR_TARGETS = "crash timeout"
+
 QUIESCE_TMPL = "obmc-host-quiesce@.target"
-CRASH_TGTFMT = "obmc-host-crash@{0}.target"
-QUIESCE_INSTFMT = "obmc-host-quiesce@{0}.target"
-CRASH_QUIESCE_FMT = "../${QUIESCE_TMPL}:${CRASH_TGTFMT}.wants/${QUIESCE_INSTFMT}"
+CRASH_TIMEOUT_TGTFMT = "obmc-host-{0}@{1}.target"
+QUIESCE_INSTFMT = "obmc-host-quiesce@{1}.target"
+QUIESCE_FMT = "../${QUIESCE_TMPL}:${CRASH_TIMEOUT_TGTFMT}.wants/${QUIESCE_INSTFMT}"
 
 SYSTEMD_SERVICE_${PN} += " \
         obmc-mapper.target \
@@ -75,4 +79,4 @@ SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHASSIS_LINK_ACTION_FMT', 'CHASSIS_AC
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_SYNCH_FMT', 'HOST_SYNCH_TARGETS', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_LINK_ACTION_FMT', 'HOST_ACTION_TARGETS', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FAN_LINK_FMT', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CRASH_QUIESCE_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERROR_TARGETS', 'OBMC_HOST_INSTANCES')}"
