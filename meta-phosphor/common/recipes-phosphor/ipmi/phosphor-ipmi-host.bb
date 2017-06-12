@@ -29,6 +29,7 @@ RDEPENDS_${PN} += "network"
 RDEPENDS_${PN} += "libmapper"
 RDEPENDS_${PN} += "phosphor-time-manager"
 RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
+RDEPENDS_${PN} += "virtual/obmc-watchdog"
 
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 
