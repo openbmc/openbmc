@@ -49,7 +49,7 @@ RDEPENDS_${PN}-monitor += " \
 FILES_${PN}-manager += "${sbindir}/phosphor-dump-manager"
 FILES_${PN}-monitor += "${sbindir}/phosphor-dump-monitor"
 
-DBUS_SERVICE_${PN}-manager += "xyz.openbmc_project.Dump.Manager.service"
+DBUS_SERVICE_${PN}-manager += "xyz.openbmc_project.Dump.service"
 SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
 
 S = "${WORKDIR}/git"
