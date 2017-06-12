@@ -26,3 +26,7 @@ RDEPENDS_${PN}-debug-collector += "openpower-debug-collector"
 # This will kick start a gpio monitor that will catch the
 # host checkstop conditions and takes necessary actions
 RDEPENDS_${PN}-host-state-mgmt += "checkstop-monitor"
+
+# Add watchdog as part of host state management package
+# This will kick start watchdog process that will be used during PowerOn
+RDEPENDS_${PN}-host-state-mgmt += "watchdog"

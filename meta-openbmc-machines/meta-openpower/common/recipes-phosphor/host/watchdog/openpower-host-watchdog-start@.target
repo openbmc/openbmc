@@ -1,0 +1,4 @@
+[Unit]
+Description=Start Host %I watchdog
+Requires=phosphor-watchdog@%i.service
+RefuseManualStop=yes

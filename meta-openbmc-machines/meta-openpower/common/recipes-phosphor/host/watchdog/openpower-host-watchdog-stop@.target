@@ -1,0 +1,4 @@
+[Unit]
+Description=Stop Host %I watchdog
+Conflicts=phosphor-watchdog@%i.service
+RefuseManualStop=yes

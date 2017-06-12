@@ -201,5 +201,11 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-inventory-sel ?= \
 # in input.
 PREFERRED_PROVIDER_virtual/obmc-gpio-monitor ?= "phosphor-gpio-monitor"
 
+# The phosphor-watchdog application is data-driven and requires an input.
+# The application then starts a timer in disabled state. User of this timer
+# needs to first enable and then use it. This also provides a way for changing
+# the timeout if needed.
+PREFERRED_PROVIDER_virtual/obmc-watchdog ?= "phosphor-watchdog"
+
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
