@@ -28,3 +28,7 @@ RDEPENDS_${PN}-host-state-mgmt += "checkstop-monitor"
 # Add openpower debug collector as a requirement for state-mgmt
 # since it is used during checkstop handling.
 RDEPENDS_${PN}-host-state-mgmt += "openpower-debug-collector"
+
+# Add watchdog as part of host state management package
+# This will kick start watchdog process that will be used during PowerOn
+RDEPENDS_${PN}-host-state-mgmt += "watchdog"

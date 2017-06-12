@@ -1,0 +1,5 @@
+[Unit]
+Description=Start Host %I watchdog
+Requires=phosphor-watchdog@%i.service
+Conflicts=openpower-host-watchdog-stop@%i.target
+RefuseManualStop=yes
