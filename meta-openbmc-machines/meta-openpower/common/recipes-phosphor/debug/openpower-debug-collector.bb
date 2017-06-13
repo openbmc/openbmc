@@ -21,11 +21,23 @@ RDEPENDS_${PN} += " \
 
 S = "${WORKDIR}/git"
 
-# This needs to be executed as part of host crash
-DEBUG_TMPL = "openpower-debug-collector@.service"
-CRASH_TGTFMT = "obmc-host-crash@{0}.target"
-DEBUG_INSTFMT = "openpower-debug-collector@{0}.service"
-CRASH_DEBUG_FMT = "../${DEBUG_TMPL}:${CRASH_TGTFMT}.wants/${DEBUG_INSTFMT}"
+# This provides below 2 applications that are called into in case
+# of host checkstop and host watchdog timeout respectively.
+APPS = "checkstop watchdog"
 
-SYSTEMD_SERVICE_${PN} += "${DEBUG_TMPL}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CRASH_DEBUG_FMT', 'OBMC_HOST_INSTANCES')}"
+DEBUG_TMPL = "openpower-debug-collector-{0}@.service"
+SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'DEBUG_TMPL', 'APPS')}"
+
+# This needs to be executed as part of host crash
+CHECKSTOP_TMPL = "openpower-debug-collector-checkstop@.service"
+CRASH_TGTFMT = "obmc-host-crash@{0}.target"
+CHECKSTOP_INSTFMT = "openpower-debug-collector-checkstop@{0}.service"
+CRASH_CHECKSTOP_FMT = "../${CHECKSTOP_TMPL}:${CRASH_TGTFMT}.wants/${CHECKSTOP_INSTFMT}"
+
+# For now, just create a watchdog symlink in base
+WDOG_TMPL = "openpower-debug-collector-watchdog@.service"
+WDOG_INSTFMT = "openpower-debug-collector-watchdog@{0}.service"
+LINK_FMT = "${WDOG_TMPL}:${WDOG_INSTFMT}"
+
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CRASH_CHECKSTOP_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'LINK_FMT', 'OBMC_HOST_INSTANCES')}"
