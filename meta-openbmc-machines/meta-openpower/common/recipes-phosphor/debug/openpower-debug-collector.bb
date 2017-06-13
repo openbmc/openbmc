@@ -1,5 +1,5 @@
 SUMMARY = "OpenPOWER Debug Collector"
-DESCRIPTION = "Application to log error during host checkstop"
+DESCRIPTION = "Application to log error during host checkstop and watchdog timeout"
 
 PR = "r1"
 
@@ -34,10 +34,11 @@ CRASH_TGTFMT = "obmc-host-crash@{0}.target"
 CHECKSTOP_INSTFMT = "openpower-debug-collector-checkstop@{0}.service"
 CRASH_CHECKSTOP_FMT = "../${CHECKSTOP_TMPL}:${CRASH_TGTFMT}.wants/${CHECKSTOP_INSTFMT}"
 
-# For now, just create a watchdog symlink in base
+# Make watchdog part of obmc-host-timeout target
 WDOG_TMPL = "openpower-debug-collector-watchdog@.service"
+TIMEOUT_TGTFMT = "obmc-host-timeout@{0}.target"
 WDOG_INSTFMT = "openpower-debug-collector-watchdog@{0}.service"
-LINK_FMT = "${WDOG_TMPL}:${WDOG_INSTFMT}"
+TIMEOUT_WDOG_FMT = "../${WDOG_TMPL}:${TIMEOUT_TGTFMT}.wants/${WDOG_INSTFMT}"
 
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CRASH_CHECKSTOP_FMT', 'OBMC_HOST_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'LINK_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'TIMEOUT_WDOG_FMT', 'OBMC_HOST_INSTANCES')}"
