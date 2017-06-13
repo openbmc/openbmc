@@ -1,5 +1,5 @@
 [Unit]
-Description=OpenPOWER debug data collector
+Description=OpenPOWER debug data collector for host checkstop
 Before=obmc-host-quiesce@%i.target
 
 [Service]
