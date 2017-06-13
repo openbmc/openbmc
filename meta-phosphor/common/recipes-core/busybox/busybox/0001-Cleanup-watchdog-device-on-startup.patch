@@ -1,0 +1,47 @@
+From f6ee43d6106f75b23e5ff162aab6fbe5c30af508 Mon Sep 17 00:00:00 2001
+From: Matt Spinler <spinler@us.ibm.com>
+Date: Tue, 13 Jun 2017 15:26:49 -0500
+Subject: [PATCH] Cleanup watchdog device on startup
+
+It is possible the watchdog device is configured to do
+something other than reset the system on a watchdog timeout.
+If this occurs, and the watchdog is started back up again, the
+watchdog driver won't actually start the watchdog hardware
+unless the watchdog device has been properly closed first.
+
+So, on startup, write the magic character to the watchdog
+device to ensure it's in a good state before running.
+
+Signed-off-by: Matt Spinler <spinler@us.ibm.com>
+---
+ miscutils/watchdog.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/miscutils/watchdog.c b/miscutils/watchdog.c
+index 07ae64e52..c13d75989 100644
+--- a/miscutils/watchdog.c
++++ b/miscutils/watchdog.c
+@@ -62,6 +62,7 @@ int watchdog_main(int argc, char **argv)
+ 		{ "", 0 }
+ 	};
+ 
++	const char V = 'V';
+ 	unsigned opts;
+ 	unsigned stimer_duration; /* how often to restart */
+ 	unsigned htimer_duration = 60000; /* reboots after N ms if not restarted */
+@@ -93,6 +94,12 @@ int watchdog_main(int argc, char **argv)
+ 
+ 	/* WDIOC_SETTIMEOUT takes seconds, not milliseconds */
+ 	htimer_duration = htimer_duration / 1000;
++
++	/* Ensure device is cleaned up from last time */
++	write(3, &V, 1);
++	close(3);
++	xmove_fd(xopen(argv[argc - 1], O_WRONLY), 3);
++
+ #ifndef WDIOC_SETTIMEOUT
+ # error WDIOC_SETTIMEOUT is not defined, cannot compile watchdog applet
+ #else
+-- 
+2.11.0
+
