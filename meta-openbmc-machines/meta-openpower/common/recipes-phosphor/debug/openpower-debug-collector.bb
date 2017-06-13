@@ -21,9 +21,13 @@ RDEPENDS_${PN} += " \
 
 S = "${WORKDIR}/git"
 
-TMPL = "openpower-debug-collector@.service"
-INSTFMT = "openpower-debug-collector@{0}.service"
-LINK_FMT = "${TMPL}:${INSTFMT}"
+# This provides below 2 applications that are called into in case
+# of host checkstop and host watchdog timeout respectively.
+APPS = "checkstop watchdog"
 
-SYSTEMD_SERVICE_${PN} += "${TMPL}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'LINK_FMT', 'OBMC_CHECKSTOP_INSTANCES')}"
+DEBUG_TMPL = "openpower-debug-collector-{0}@.service"
+DEBUG_INSTFMT = "openpower-debug-collector-{0}@{1}.service"
+LINK_FMT = "${DEBUG_TMPL}:${DEBUG_INSTFMT}"
+
+SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'DEBUG_TMPL', 'APPS')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'LINK_FMT', 'APPS', 'OBMC_HOST_INSTANCES')}"
