@@ -12,8 +12,8 @@ WSPOON_ITEMSFMT = "ahb/apb/{0}.conf"
 WSPOON_ITEMS = "${@compose_list(d, 'WSPOON_ITEMSFMT', 'WSPOON_CHIPS')}"
 
 WSPOON_OCCS = " \
-              cfam@0,0/sbefifo@2400/occ@1 \
-              cfam@0,0/sbefifo@82400/occ@2 \
+              cfam@0,0/sbefifo@2400/occ@1/hwmon-occ@1 \
+              cfam@0,0/sbefifo@82400/occ@2/hwmon-occ@2 \
               "
 WSPOON_OCCSFMT = "base/gpio-fsi/{0}.conf"
 WSPOON_OCCITEMS = "${@compose_list(d, 'WSPOON_OCCSFMT', 'WSPOON_OCCS')}"
