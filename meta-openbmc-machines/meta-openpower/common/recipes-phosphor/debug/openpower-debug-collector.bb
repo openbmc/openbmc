@@ -1,5 +1,5 @@
 SUMMARY = "OpenPOWER Debug Collector"
-DESCRIPTION = "Application to log error during host checkstop"
+DESCRIPTION = "Application to log error during host checkstop and watchdog timeout"
 
 PR = "r1"
 
@@ -26,8 +26,12 @@ S = "${WORKDIR}/git"
 APPS = "checkstop watchdog"
 
 DEBUG_TMPL = "openpower-debug-collector-{0}@.service"
-DEBUG_INSTFMT = "openpower-debug-collector-{0}@{1}.service"
-LINK_FMT = "${DEBUG_TMPL}:${DEBUG_INSTFMT}"
-
 SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'DEBUG_TMPL', 'APPS')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'LINK_FMT', 'APPS', 'OBMC_HOST_INSTANCES')}"
+
+# Make watchdog part of obmc-host-timeout target
+WDOG_TMPL = "openpower-debug-collector-watchdog@.service"
+TIMEOUT_TGTFMT = "obmc-host-timeout@{0}.target"
+WDOG_INSTFMT = "openpower-debug-collector-watchdog@{0}.service"
+TIMEOUT_WDOG_FMT = "../${WDOG_TMPL}:${TIMEOUT_TGTFMT}.wants/${WDOG_INSTFMT}"
+
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'TIMEOUT_WDOG_FMT', 'OBMC_HOST_INSTANCES')}"
