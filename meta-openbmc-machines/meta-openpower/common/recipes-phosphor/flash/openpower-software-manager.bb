@@ -32,6 +32,7 @@ SRC_URI += " \
         file://bios-squashfsmount \
         file://bios-ubiattach \
         file://bios-ubiformat \
+        file://bios-ubiinit   \
         file://bios-ubimount  \
         file://bios-ubiumount"
 
@@ -42,6 +43,7 @@ do_install_append() {
         install -m 0755 ${WORKDIR}/bios-squashfsmount ${D}${sbindir}/bios-squashfsmount
         install -m 0755 ${WORKDIR}/bios-ubiattach ${D}${sbindir}/bios-ubiattach
         install -m 0755 ${WORKDIR}/bios-ubiformat ${D}${sbindir}/bios-ubiformat
+        install -m 0755 ${WORKDIR}/bios-ubiinit ${D}${sbindir}/bios-ubiinit
         install -m 0755 ${WORKDIR}/bios-ubimount ${D}${sbindir}/bios-ubimount
         install -m 0755 ${WORKDIR}/bios-ubiumount ${D}${sbindir}/bios-ubiumount
 }
@@ -50,6 +52,7 @@ DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
 
 SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubiattach.service \
+        obmc-flash-bios-ubiinit.service \
         obmc-flash-bios-ubimount@.service \
         obmc-flash-bios-ubiumount-prsv.service \
         obmc-flash-bios-ubiumount-rw@.service \

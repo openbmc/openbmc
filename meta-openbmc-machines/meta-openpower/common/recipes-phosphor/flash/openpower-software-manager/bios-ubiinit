@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# Get the mtd device number for pnor
+pnor=`grep pnor /proc/mtd |cut -c 4`
+
+if [ ! -e "/dev/ubi$pnor" ]
+then
+  ubiattach /dev/ubi_ctrl -m $pnor -d $pnor
+  if [ $? -ne 0 ]
+  then
+    # Ignore any errors since the chip may not be formatted as ubi
+    exit 0
+  fi
+fi
+
+# Find all the existing ubi volumes by name if any
+for volname in $(ubinfo -d $pnor -a | grep "Name:" | sed -e "s|Name:||" -e "s/^ *//" | grep -o "^\S*")
+do
+  if ! grep -q $volname /proc/mounts
+  then
+    # Create mount dir if it does not exist and mount existing pnor ubi volumes
+    mountdir="/media/$volname"
+    if [ ! -d "$mountdir" ]
+    then
+      mkdir $mountdir
+    fi
+
+    # Get the volume type to determine how to mount
+    voltype=`ubinfo -d $pnor -a -N $volname | grep "Type:" | sed -e "s|Type:||" -e "s/^ *//" | grep -o "^\S*"`
+    if [[ $voltype == "static" ]]
+    then
+      # Get the volume id
+      volumeid=`ubinfo -d $pnor -N $volname | grep "Volume ID" | sed -e "s|Volume ID:||" -e "s/^ *//" | grep -o "^\S*"`
+      mount -t squashfs -o ro /dev/ubiblock${pnor}_${volumeid} $mountdir
+    elif [[ $voltype == "dynamic" ]]
+    then
+      mount -t ubifs ubi$pnor:$volname $mountdir
+    fi
+  fi
+done

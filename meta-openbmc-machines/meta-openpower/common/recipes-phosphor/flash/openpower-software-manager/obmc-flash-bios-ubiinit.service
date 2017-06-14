@@ -1,0 +1,7 @@
+[Unit]
+Description=Mount the PNOR UBI volumes
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart={sbindir}/bios-ubiinit
