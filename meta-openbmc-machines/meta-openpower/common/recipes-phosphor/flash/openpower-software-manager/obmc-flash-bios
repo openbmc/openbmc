@@ -16,6 +16,12 @@ findubi() {
   echo "${u}"
 }
 
+# Get the ubi volume type (static or dynamic)
+findubi_type() {
+  t="$(cat /sys/class/ubi/ubi?/subsystem/$1/type)"
+  echo "${t}"
+}
+
 # Get the mount information
 findmount() {
   m="$(grep -l "$1" /proc/mounts)"
@@ -128,6 +134,42 @@ umount_ubi() {
   fi
 }
 
+init_ubi() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  ubidev="/dev/ubi${pnor}"
+
+  if [ ! -e "${ubidev}" ]; then
+    ubiattach /dev/ubi_ctrl -m ${pnor} -d ${pnor}
+    if [ $? -ne 0 ]; then
+      # Ignore any errors since the chip may not be formatted as ubi
+      return 0
+    fi
+  fi
+
+  # Find all the existing ubi volumes by name if any
+  for volname in $(cat /sys/class/ubi/ubi?/subsystem/ubi*/name); do
+    mountdir="/media/${volname}"
+    mount="$(findmount "${volname}")"
+    if [ -z "${mount}" ]; then
+      if [ ! -d "${mountdir}" ]; then
+        mkdir "${mountdir}"
+      fi
+
+      vol="$(findubi "${volname}")"
+      vol_type="$(findubi_type "${vol}")"
+      if [[ "${vol_type}" == "static" ]]; then
+        volumeid="${vol#ubi*_}"
+        block="/dev/ubiblock${pnor}_${volumeid}"
+        mount -t squashfs -o ro "${block}" "${mountdir}"
+      elif [[ "${vol_type}" == "dynamic" ]]; then
+        mountdev="ubi${pnor}:${volname}"
+        mount -t ubifs "${mountdev}" "${mountdir}"
+      fi
+    fi
+  done
+}
+
 case "$1" in
   ubiattach)
     attach_ubi
@@ -144,6 +186,9 @@ case "$1" in
   ubiumount)
     name="$2"
     umount_ubi
+    ;;
+  ubiinit)
+    init_ubi
     ;;
   *)
     echo "Invalid argument"
