@@ -7,6 +7,8 @@ Conflicts=obmc-chassis-poweroff@%i.target
 [Service]
 Restart=on-failure
 ExecStart={sbindir}/phosphor-fan-monitor
+Type=notify
+NotifyAccess=all
 
 [Install]
 RequiredBy=obmc-fan-control-ready@%i.target
