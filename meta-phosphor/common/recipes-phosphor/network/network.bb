@@ -19,7 +19,7 @@ DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "phosphor-logging"
 
 RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "python-dbus python-pygobject python-ipy"
+RDEPENDS_${PN} += "python-dbus python-pygobject python-ipy python-subprocess"
 RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 RDEPENDS_${PN} += "phosphor-logging"
 
