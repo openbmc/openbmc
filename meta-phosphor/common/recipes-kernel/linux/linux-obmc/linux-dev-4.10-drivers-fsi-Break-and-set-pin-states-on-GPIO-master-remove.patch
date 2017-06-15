@@ -1,0 +1,29 @@
+diff --git a/drivers/fsi/fsi-master-gpio.c b/drivers/fsi/fsi-master-gpio.c
+index 2a6a812..47eaf61 100644
+--- a/drivers/fsi/fsi-master-gpio.c
++++ b/drivers/fsi/fsi-master-gpio.c
+@@ -585,17 +585,23 @@ static int fsi_master_gpio_probe(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-
+ static int fsi_master_gpio_remove(struct platform_device *pdev)
+ {
+ 	struct fsi_master_gpio *master = platform_get_drvdata(pdev);
+ 
++	fsi_master_gpio_break(&master->master, 0);
++
++	gpiod_set_value(master->gpio_clk, 0);
+ 	devm_gpiod_put(&pdev->dev, master->gpio_clk);
++	gpiod_set_value(master->gpio_data, 1);
+ 	devm_gpiod_put(&pdev->dev, master->gpio_data);
++	gpiod_set_value(master->gpio_trans, 0);
+ 	if (master->gpio_trans)
+ 		devm_gpiod_put(&pdev->dev, master->gpio_trans);
++	gpiod_set_value(master->gpio_enable, 1);
+ 	if (master->gpio_enable)
+ 		devm_gpiod_put(&pdev->dev, master->gpio_enable);
++	gpiod_set_value(master->gpio_mux, 0);
+ 	if (master->gpio_mux)
+ 		devm_gpiod_put(&pdev->dev, master->gpio_mux);
+ 	fsi_master_unregister(&master->master);
