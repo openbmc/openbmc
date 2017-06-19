@@ -25,3 +25,6 @@ SYSTEMD_ENVIRONMENT_FILE_phosphor-cooling-type += "${@compose_list(d, 'COOLING_E
 #These 2 services are protected by the watchdog
 SYSTEMD_OVERRIDE_phosphor-fan-control += "fan-watchdog-monitor.conf:phosphor-fan-control@0.service.d/fan-watchdog-monitor.conf"
 SYSTEMD_OVERRIDE_phosphor-fan-monitor += "fan-watchdog-monitor.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-monitor.conf"
+
+#This service needs to be stopped when watchdog expires
+SYSTEMD_OVERRIDE_phosphor-fan-monitor += "fan-watchdog-conflicts.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-conflicts.conf"
