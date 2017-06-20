@@ -34,6 +34,7 @@ SRC_URI += "\
         file://0001-Ignore-differences-between-mips-machine-identifiers.patch \
         file://0002-Add-support-for-mips64-abis-in-mips_retval.c.patch \
         file://0003-Add-mips-n64-relocation-format-hack.patch \
+        file://0004-fix-implicit-case-fallthrough-warning.patch \
         file://uclibc-support.patch \
         file://elfcmp-fix-self-comparision.patch \
 "
