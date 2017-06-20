@@ -86,6 +86,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
         ffdc \
         rsync \
+        rng-tools \
         "
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
