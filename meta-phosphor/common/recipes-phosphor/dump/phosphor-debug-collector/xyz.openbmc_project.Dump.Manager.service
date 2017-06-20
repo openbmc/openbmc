@@ -2,6 +2,7 @@
 Description=Phosphor Dump Manager
 
 [Service]
+ExecStartPre=/bin/sh -c 'mkdir -p /var/log/dumps'
 ExecStart={sbindir}/phosphor-dump-manager
 Restart=always
 Type=dbus
