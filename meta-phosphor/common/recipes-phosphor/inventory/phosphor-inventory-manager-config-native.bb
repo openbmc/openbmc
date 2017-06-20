@@ -7,9 +7,9 @@ PR = "r1"
 inherit obmc-phosphor-license
 inherit native
 
-OBMC_INVENTORY_PROVIDERS ??= "phosphor-inventory-manager-config-example-native"
+PHOSPHOR_INVENTORY_MANAGER_CONFIGS ??= ""
 
 # To add additional managed inventory items, create a recipe in your layer,
-# and add it to OBMC_INVENTORY_PROVIDERS with a bbappend to this recipe.
+# and add it to PHOSPHOR_INVENTORY_MANAGER_CONFIGS with a bbappend to this recipe.
 
-DEPENDS += "${OBMC_INVENTORY_PROVIDERS}"
+DEPENDS += "${PHOSPHOR_INVENTORY_MANAGER_CONFIGS}"
