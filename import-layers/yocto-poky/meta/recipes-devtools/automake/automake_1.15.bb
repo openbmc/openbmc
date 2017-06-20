@@ -21,6 +21,7 @@ RDEPENDS_${PN}_class-native = "autoconf-native hostperl-runtime-native"
 SRC_URI += " file://python-libdir.patch \
             file://buildtest.patch \
             file://performance.patch \
+            file://perl-regex-curly.patch \
             file://new_rt_path_for_test-driver.patch"
 
 SRC_URI[md5sum] = "716946a105ca228ab545fc37a70df3a3"
