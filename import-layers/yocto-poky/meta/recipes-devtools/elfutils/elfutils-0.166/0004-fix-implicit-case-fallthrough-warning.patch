@@ -1,0 +1,19 @@
+commit eae5f878800f20f6042b81959cc5a5c02046063a
+Author: Anton Novikov <a.novikov@yadro.com>
+Date:   Tue Jun 20 16:30:41 2017 +0300
+
+    suppress implicit case fallthrough warning
+
+diff --git a/configure.ac b/configure.ac
+index 6ad4dd8..b6dee75 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -39,7 +39,7 @@ AC_COPYRIGHT([Copyright (C) 1996-2016 Red Hat, Inc.])
+ AC_PREREQ(2.63)			dnl Minimum Autoconf version required.
+ 
+ dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
+-AM_INIT_AUTOMAKE([gnits 1.11 -Wno-portability dist-bzip2 no-dist-gzip parallel-tests])
++AM_INIT_AUTOMAKE([gnits 1.11 -Wno-portability -Wno-implicit-fallthrough dist-bzip2 no-dist-gzip parallel-tests])
+ AM_MAINTAINER_MODE
+ 
+ AM_SILENT_RULES([yes])
