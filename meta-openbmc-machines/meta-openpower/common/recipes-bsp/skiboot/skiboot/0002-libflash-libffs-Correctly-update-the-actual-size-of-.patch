@@ -1,0 +1,33 @@
+From 73e1e8a727a9e7179719eb7844bd4248d9890114 Mon Sep 17 00:00:00 2001
+From: Cyril Bur <cyril.bur@au1.ibm.com>
+Date: Wed, 21 Jun 2017 16:34:36 +1000
+Subject: [PATCH] libflash/libffs: Correctly update the actual size of the
+ partition
+
+libffs has been updating FFS partition information in the wrong place
+which leads to incomplete erases and corruption.
+
+Fixes: 602dee45 libflash/libffs: Rework libffs
+Signed-off-by: Cyril Bur <cyril.bur@au1.ibm.com>
+Signed-off-by: Stewart Smith <stewart@linux.vnet.ibm.com>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+ libflash/libffs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libflash/libffs.c b/libflash/libffs.c
+index 763e061c7a19..7ae9050e77f2 100644
+--- a/libflash/libffs.c
++++ b/libflash/libffs.c
+@@ -781,7 +781,7 @@ int ffs_update_act_size(struct ffs_handle *ffs, uint32_t part_idx,
+ 		FL_DBG("FFS: Entry not found\n");
+ 		return FFS_ERR_PART_NOT_FOUND;
+ 	}
+-	offset = ent->base;
++	offset = ffs->toc_offset + ffs_hdr_raw_size(part_idx);
+ 	FL_DBG("FFS: part index %d at offset 0x%08x\n",
+ 	       part_idx, offset);
+ 
+-- 
+2.11.0
+
