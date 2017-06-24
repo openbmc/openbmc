@@ -18,6 +18,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "virtual/phosphor-settings-defaults"
 DEPENDS += "sdbusplus sdbusplus-native"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
+DEPENDS += "cereal"
 
 RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 
