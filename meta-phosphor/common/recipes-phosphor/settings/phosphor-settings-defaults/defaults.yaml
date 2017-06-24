@@ -15,6 +15,8 @@
 
 /xyz/openbmc_project/control/host0/power_cap:
     Interface: xyz.openbmc_project.Control.Power.Cap
+    Defaults:
+        PowerCap: 0
 
 /xyz/openbmc_project/control/host0/power_restore_policy:
     Interface: xyz.openbmc_project.Control.Power.RestorePolicy
