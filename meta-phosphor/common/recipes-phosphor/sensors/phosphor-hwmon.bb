@@ -29,7 +29,7 @@ SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
 SRC_URI += "file://70-hwmon.rules"
 SRC_URI += "file://70-iio.rules"
 
-SRCREV = "ac8b7c6b71f089a9054e34d555c14ad14dd501b4"
+SRCREV = "2f370c4e351adb90dc218d719b962cb841a399eb"
 
 S = "${WORKDIR}/git"
 
