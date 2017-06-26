@@ -59,11 +59,13 @@ PACKAGECONFIG[control] = "--enable-control \
      FAN_DEF_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/fans.yaml \
      FAN_ZONE_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/zones.yaml \
      ZONE_EVENTS_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/events.yaml \
+     ZONE_CONDITIONS_YAML_FILE=${STAGING_DIR_NATIVE}${control_datadir}/zone_conditions.yaml \
      FAN_ZONE_OUTPUT_DIR=${S}/control, \
     --disable-control, \
     virtual/phosphor-fan-control-fan-config \
     phosphor-fan-control-zone-config-native \
     phosphor-fan-control-events-config-native \
+    phosphor-fan-control-zone-conditions-config-native \
     , \
 "
 
