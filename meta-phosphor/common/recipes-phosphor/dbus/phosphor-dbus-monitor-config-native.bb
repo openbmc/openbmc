@@ -15,6 +15,6 @@ PHOSPHOR_DBUS_MONITOR_CONFIGS ??= ""
 
 DEPENDS += "${PHOSPHOR_DBUS_MONITOR_CONFIGS}"
 
-do_install_append() {
-    mkdir -p ${config_dir}
+do_install() {
+    mkdir -p ${D}${config_dir}
 }
