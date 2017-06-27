@@ -1,0 +1,173 @@
+From patchwork Mon Jun 26 19:33:05 2017
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [linux,dev-4.10] arm/dts: Add I2C master and ports to FSI cfam
+From: eajames@linux.vnet.ibm.com
+X-Patchwork-Id: 780849
+Message-Id: <1498505585-1820-1-git-send-email-eajames@linux.vnet.ibm.com>
+To: openbmc@lists.ozlabs.org
+Cc: "Edward A. James" <eajames@us.ibm.com>
+Date: Mon, 26 Jun 2017 14:33:05 -0500
+
+From: "Edward A. James" <eajames@us.ibm.com>
+
+FSI I2C master algorithm probes port devices based on dts.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/ibm-power9-cfam.dtsi | 134 +++++++++++++++++++++++++++++++++
+ 1 file changed, 134 insertions(+)
+
+diff --git a/arch/arm/boot/dts/ibm-power9-cfam.dtsi b/arch/arm/boot/dts/ibm-power9-cfam.dtsi
+index f29c6e3..a0b5c97 100644
+--- a/arch/arm/boot/dts/ibm-power9-cfam.dtsi
++++ b/arch/arm/boot/dts/ibm-power9-cfam.dtsi
+@@ -4,6 +4,73 @@
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+ 
++		i2cm@1800 {
++			compatible = "ibm,fsi-i2c-master";
++			reg = <0x1800 0x400>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				port = <0>;
++			};
++
++			port@1 {
++				port = <1>;
++			};
++
++			port@2 {
++				port = <2>;
++			};
++
++			port@3 {
++				port = <3>;
++			};
++
++			port@4 {
++				port = <4>;
++			};
++
++			port@5 {
++				port = <5>;
++			};
++
++			port@6 {
++				port = <6>;
++			};
++
++			port@7 {
++				port = <7>;
++			};
++
++			port@8 {
++				port = <8>;
++			};
++
++			port@9 {
++				port = <9>;
++			};
++
++			port@10 {
++				port = <10>;
++			};
++
++			port@11 {
++				port = <11>;
++			};
++
++			port@12 {
++				port = <12>;
++			};
++
++			port@13 {
++				port = <13>;
++			};
++
++			port@14 {
++				port = <14>;
++			};
++		};
++
+ 		sbefifo@2400 {
+ 			compatible = "ibm,p9-sbefifo";
+ 			reg = <0x2400 0x400>;
+@@ -31,6 +98,73 @@
+ 				#address-cells = <1>;
+ 				#size-cells = <1>;
+ 
++				i2cm@1800 {
++					compatible = "ibm,fsi-i2c-master";
++					reg = <0x1800 0x400>;
++					#address-cells = <1>;
++					#size-cells = <0>;
++
++					port@0 {
++						port = <0>;
++					};
++
++					port@1 {
++						port = <1>;
++					};
++
++					port@2 {
++						port = <2>;
++					};
++
++					port@3 {
++						port = <3>;
++					};
++
++					port@4 {
++						port = <4>;
++					};
++
++					port@5 {
++						port = <5>;
++					};
++
++					port@6 {
++						port = <6>;
++					};
++
++					port@7 {
++						port = <7>;
++					};
++
++					port@8 {
++						port = <8>;
++					};
++
++					port@9 {
++						port = <9>;
++					};
++
++					port@10 {
++						port = <10>;
++					};
++
++					port@11 {
++						port = <11>;
++					};
++
++					port@12 {
++						port = <12>;
++					};
++
++					port@13 {
++						port = <13>;
++					};
++
++					port@14 {
++						port = <14>;
++					};
++				};
++
+ 				sbefifo@2400 {
+ 					compatible = "ibm,p9-sbefifo";
+ 					reg = <0x2400 0x400>;
