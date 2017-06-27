@@ -1,0 +1,7 @@
+[Unit]
+Description=Create read-write ubi volume %I
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart={sbindir}/obmc-flash-bmc ubirw {RW_MTD} rw-%i
