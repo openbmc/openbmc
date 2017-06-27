@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Get the mtd device number (mtdX)
+findmtd() {
+  m="$(grep -xl "$1" /sys/class/mtd/*/name)"
+  m="${m%/name}"
+  m="${m##*/}"
+  echo "${m}"
+}
+
+# Get the ubi device number (ubiX_Y)
+findubi() {
+  u="$(grep -xl "$1" /sys/class/ubi/ubi?/subsystem/ubi*/name)"
+  u="${u%/name}"
+  u="${u##*/}"
+  echo "${u}"
+}
+
+ubi_rw() {
+  rwmtd="$(findmtd "${reqmtd}")"
+  rw="${rwmtd#mtd}"
+  ubidev="/dev/ubi${rw}"
+
+  # Create a ubi volume of size 4MB, that is the current size of the rwfs image
+  vol="$(findubi "${name}")"
+  if [ -z "${vol}" ]; then
+    ubimkvol "${ubidev}" -N "${name}" -s 4MiB
+  fi
+}
+
+case "$1" in
+  ubirw)
+    reqmtd="$2"
+    name="$3"
+    ubi_rw
+    ;;
+  *)
+    echo "Invalid argument"
+    exit 1
+    ;;
+esac
+rc=$?
+if [ ${rc} -ne 0 ]; then
+  echo "$0: error ${rc}"
+  exit ${rc}
+fi
