@@ -19,7 +19,7 @@ SRC_URI += "file://99-aspeed-mbox.rules"
 SRC_URI += "file://99-aspeed-lpc-ctrl.rules"
 SRC_URI += "file://aspeed-lpc-ctrl-h.patch"
 
-SRCREV="90b92fe48ec72b6c15cce24d33ac983548368b98"
+SRCREV="99551ef1fec6851af8903acb22b55d741ea2ad17"
 
 PROVIDES += "mboxctl"
 
