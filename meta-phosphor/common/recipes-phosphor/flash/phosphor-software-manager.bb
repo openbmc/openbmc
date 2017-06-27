@@ -52,10 +52,27 @@ RDEPENDS_${PN}-updater += " \
 
 FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager"
 FILES_${PN}-download-mgr += "${sbindir}/phosphor-download-manager"
-FILES_${PN}-updater += "${sbindir}/phosphor-image-updater"
+FILES_${PN}-updater += " \
+    ${sbindir}/phosphor-image-updater \
+    ${sbindir}/obmc-flash-bmc \
+    "
 DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.Version.service"
 DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
 DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
+
+SYSTEMD_SERVICE_${PN}-updater += " \
+    obmc-flash-bmc-ubirw.service \
+    "
+
+# Name of the mtd device where the ubi volumes should be created
+BMC_RW_MTD ??= "pnor"
+SYSTEMD_SUBSTITUTIONS += "RW_MTD:${BMC_RW_MTD}:obmc-flash-bmc-ubirw.service"
+
+SRC_URI += "file://obmc-flash-bmc"
+do_install_append() {
+    install -d ${D}${sbindir}
+    install -m 0755 ${WORKDIR}/obmc-flash-bmc ${D}${sbindir}/obmc-flash-bmc
+}
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
 SRCREV = "4c1aec09c68f27fcdcf0f419c9eb08a56c3ab772"
