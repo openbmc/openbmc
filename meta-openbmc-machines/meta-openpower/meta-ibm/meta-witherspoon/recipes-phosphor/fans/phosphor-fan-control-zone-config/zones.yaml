@@ -13,6 +13,7 @@ zone_configuration:
       - air
       - all
       full_speed: 10500
+      default_floor: 8000
 
 #Water cooled zones
 - zone_conditions:
@@ -24,3 +25,4 @@ zone_configuration:
       - water
       - all
       full_speed: 10500
+      default_floor: 8000
