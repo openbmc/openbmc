@@ -44,3 +44,7 @@ FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
 SYSTEMD_SERVICE_${PN} += "mboxd.service"
 SYSTEMD_SERVICE_${PN} += "mboxd-reload@.service"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
+
+EXTRA_OECONF = " \
+        enable_virtual_pnor=no \
+        "
