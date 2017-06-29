@@ -14,4 +14,6 @@ MACHINE_EXTRA_RDEPENDS += "udev-aspeed-vuart"
 
 SERIAL_CONSOLES = "115200;ttyS4"
 
+MACHINEOVERRIDES .= ":ast2400"
+
 require conf/machine/include/tune-arm926ejs.inc
