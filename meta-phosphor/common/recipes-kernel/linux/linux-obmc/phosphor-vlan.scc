@@ -1,0 +1,2 @@
+define KFEATURE_DESCRIPTION "Enable VLAN support"
+kconf non-hardware phosphor-vlan.cfg

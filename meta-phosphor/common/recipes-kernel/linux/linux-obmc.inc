@@ -10,6 +10,9 @@ KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI += "file://phosphor-gpio-keys.scc"
 SRC_URI += "file://phosphor-gpio-keys.cfg"
+SRC_URI += "file://phosphor-vlan.scc"
+SRC_URI += "file://phosphor-vlan.cfg"
+
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
@@ -29,3 +32,6 @@ do_patch_append() {
 
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
+
+KERNEL_FEATURES_append = " phosphor-vlan"
+KERNEL_FEATURES_remove_qemuall = " phosphor-vlan"
