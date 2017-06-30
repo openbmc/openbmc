@@ -21,6 +21,7 @@
 # - obmc-system-mgmt                  - OpenBMC system management
 # - obmc-user-mgmt                    - OpenBMC user management
 # - obmc-debug-collector              - OpenBMC debug collector
+# - obmc-syslog-mgmt                  - OpenBMC syslog management
 
 inherit core-image
 inherit obmc-phosphor-license
@@ -51,6 +52,7 @@ FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-system-mgm
 FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt')}"
 FEATURE_PACKAGES_obmc-debug-collector ?= "packagegroup-obmc-apps-debug-collector"
 FEATURE_PACKAGES_obmc-settings ?= "packagegroup-obmc-apps-settings"
+FEATURE_PACKAGES_obmc-syslog-mgmt ?= "obmc-syslog-mgmt"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -75,6 +77,7 @@ IMAGE_FEATURES += " \
         obmc-user-mgmt \
         ssh-server-dropbear \
         obmc-debug-collector \
+        obmc-syslog-mgmt \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \

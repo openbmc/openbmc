@@ -1,0 +1,12 @@
+[Unit]
+Description=Phosphor Syslog settings manager
+
+[Service]
+Restart=always
+ExecStart={sbindir}/syslogmgmt.py
+Type=dbus
+BusName={BUSNAME}
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
