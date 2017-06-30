@@ -1,10 +1,17 @@
 groups:
-    - name: zone0_fans
-      description: Group of fan inventory objects for zone 0
+    - name: air_cooled_zone0_fans
+      description: Group of fan inventory objects for air cooled zone 0
       type: inventory
       members:
           - /system/chassis/motherboard/fan0
           - /system/chassis/motherboard/fan1
+          - /system/chassis/motherboard/fan2
+          - /system/chassis/motherboard/fan3
+    - name: water_and_air_cooled_zone0_fans
+      description: Group of fan inventory objects for water/air cooled zone 0
+      type: inventory
+      members:
+          - /system/chassis/motherboard/fan0
           - /system/chassis/motherboard/fan2
           - /system/chassis/motherboard/fan3
 
@@ -17,12 +24,12 @@ actions:
           - speed
 
 events:
-    - name: missing_before_high_speed
+    - name: missing_before_high_speed_air
       zone_conditions:
           - name: air_cooled_chassis
             zones:
                 - 0
-      group: zone0_fans
+      group: air_cooled_zone0_fans
       interface: xyz.openbmc_project.Inventory.Item
       property:
           name: Present
@@ -34,12 +41,12 @@ events:
           speed:
               value: 10500
               type: uint64_t
-    - name: fails_before_high_speed
+    - name: fails_before_high_speed_air
       zone_conditions:
           - name: air_cooled_chassis
             zones:
                 - 0
-      group: zone0_fans
+      group: air_cooled_zone0_fans
       interface: xyz.openbmc_project.State.Decorator.OperationalStatus
       property:
           name: Functional
@@ -51,3 +58,38 @@ events:
           speed:
               value: 10500
               type: uint64_t
+    - name: missing_before_high_speed_water_and_air
+      zone_conditions:
+          - name: water_and_air_cooled_chassis
+            zones:
+                - 0
+      group: water_and_air_cooled_zone0_fans
+      interface: xyz.openbmc_project.Inventory.Item
+      property:
+          name: Present
+          type: bool
+      action:
+          name: count_state_before_speed
+          count: 1
+          property: false
+          speed:
+              value: 10500
+              type: uint64_t
+    - name: fails_before_high_speed_water_and_air
+      zone_conditions:
+          - name: water_and_air_cooled_chassis
+            zones:
+                - 0
+      group: water_and_air_cooled_zone0_fans
+      interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+      property:
+          name: Functional
+          type: bool
+      action:
+          name: count_state_before_speed
+          count: 1
+          property: false
+          speed:
+              value: 10500
+              type: uint64_t
+
