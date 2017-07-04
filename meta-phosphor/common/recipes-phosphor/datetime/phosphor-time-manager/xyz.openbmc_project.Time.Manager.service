@@ -9,7 +9,7 @@ After=mapper-wait@-org-openbmc-control-power0.service
 
 [Service]
 Restart=always
-ExecStart={sbindir}/timemanager
+ExecStart={sbindir}/phosphor-timemanager
 Type=dbus
 BusName={BUSNAME}
 

@@ -20,4 +20,4 @@ SRC_URI += "git://github.com/openbmc/phosphor-time-manager"
 SRCREV = "2a96cfc0ed4e5466793a82292ee5640c992b963c"
 S = "${WORKDIR}/git"
 
-DBUS_SERVICE_${PN} += "org.openbmc.TimeManager.service"
+DBUS_SERVICE_${PN} += "xyz.openbmc_project.Time.Manager.service"
