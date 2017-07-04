@@ -11,8 +11,8 @@ After=mapper-wait@-org-openbmc-control-power0.service
 
 [Service]
 Restart=always
-ExecStart=/usr/bin/env timemanager
-SyslogIdentifier=timemanager
+ExecStart=/usr/bin/env phosphor-timemanager
+SyslogIdentifier=phosphor-timemanager
 Type=dbus
 BusName={BUSNAME}
 
