@@ -12,7 +12,7 @@ SRC_URI += "file://phosphor-gpio-keys.scc"
 SRC_URI += "file://phosphor-gpio-keys.cfg"
 SRC_URI += "file://phosphor-vlan.scc"
 SRC_URI += "file://phosphor-vlan.cfg"
-
+SRC_URI += "file://v3-0001-drivers-hwmon-occ-Add-sysfs_notify-on-error.patch"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
