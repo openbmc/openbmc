@@ -11,6 +11,8 @@ DEPENDS += "mrw-native mrw-perl-tools-native"
 DEPENDS += "virtual/phosphor-ipmi-fru-hostfw-config"
 PROVIDES += "virtual/phosphor-ipmi-fru-read-inventory"
 
+S = "${WORKDIR}/git"
+
 do_install() {
 
     DEST=${D}${config_datadir}
