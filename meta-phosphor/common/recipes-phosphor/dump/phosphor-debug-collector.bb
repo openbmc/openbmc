@@ -22,7 +22,8 @@ SYSTEMD_PACKAGES = "${PN}-monitor"
 inherit autotools \
         pkgconfig \
         obmc-phosphor-dbus-service \
-        pythonnative
+        pythonnative \
+        phosphor-debug-collector
 
 require phosphor-debug-collector.inc
 
@@ -46,10 +47,15 @@ RDEPENDS_${PN}-monitor += " \
         phosphor-logging \
 "
 
+MGR_SVC ?= "xyz.openbmc_project.Dump.Manager.service"
+
+SYSTEMD_SUBSTITUTIONS += "BMC_DUMP_PATH:${bmc_dump_path}:${MGR_SVC}"
+
 FILES_${PN}-manager += "${sbindir}/phosphor-dump-manager"
 FILES_${PN}-monitor += "${sbindir}/phosphor-dump-monitor"
 
-DBUS_SERVICE_${PN}-manager += "xyz.openbmc_project.Dump.Manager.service"
+DBUS_SERVICE_${PN}-manager += "${MGR_SVC}"
 SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
+
 
 S = "${WORKDIR}/git"
