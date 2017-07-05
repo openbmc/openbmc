@@ -57,5 +57,6 @@ FILES_${PN}-monitor += "${sbindir}/phosphor-dump-monitor"
 DBUS_SERVICE_${PN}-manager += "${mgrsvc}"
 SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
 
+EXTRA_OECONF = "BMC_DUMP_FILE_DIR=${bmc_dump_file_dir}"
 
 S = "${WORKDIR}/git"
