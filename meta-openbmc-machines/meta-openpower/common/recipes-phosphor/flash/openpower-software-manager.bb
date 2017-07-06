@@ -28,16 +28,13 @@ S = "${WORKDIR}/git"
 
 SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
 
-SRC_URI += " \
-        file://bios-ubiattach \
-        file://bios-ubiformat"
+SRC_URI += "file://obmc-flash-bios"
 
 SRCREV = "a8eda56300d309cb11566787d70fd1b9a5721e07"
 
 do_install_append() {
         install -d ${D}${sbindir}
-        install -m 0755 ${WORKDIR}/bios-ubiattach ${D}${sbindir}/bios-ubiattach
-        install -m 0755 ${WORKDIR}/bios-ubiformat ${D}${sbindir}/bios-ubiformat
+        install -m 0755 ${WORKDIR}/obmc-flash-bios ${D}${sbindir}/obmc-flash-bios
 }
 
 DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
