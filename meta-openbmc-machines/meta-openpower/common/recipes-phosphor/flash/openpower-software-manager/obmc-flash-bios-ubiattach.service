@@ -4,5 +4,4 @@ Description=Attach the PNOR mtd device to UBI
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart={sbindir}/bios-ubiattach
-ExecStop=/bin/sh -c 'grep pnor /proc/mtd |cut -c 4 |xargs {sbindir}/ubidetach /dev/ubi_ctrl -m'
+ExecStart={sbindir}/obmc-flash-bios ubiattach
