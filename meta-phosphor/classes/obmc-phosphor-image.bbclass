@@ -51,6 +51,7 @@ FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-system-mgm
 FEATURE_PACKAGES_obmc-user-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-user-mgmt', 'virtual-obmc-user-mgmt')}"
 FEATURE_PACKAGES_obmc-debug-collector ?= "packagegroup-obmc-apps-debug-collector"
 FEATURE_PACKAGES_obmc-settings ?= "packagegroup-obmc-apps-settings"
+FEATURE_PACKAGES_obmc-network-mgmt ?= "packagegroup-obmc-apps-network"
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
@@ -75,6 +76,7 @@ IMAGE_FEATURES += " \
         obmc-user-mgmt \
         ssh-server-dropbear \
         obmc-debug-collector \
+        obmc-network-mgmt \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
