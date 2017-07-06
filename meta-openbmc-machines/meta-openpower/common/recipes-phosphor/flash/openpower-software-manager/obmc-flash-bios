@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# Get the mtd device number (mtdX)
+findmtd() {
+  m="$(grep -xl "$1" /sys/class/mtd/*/name)"
+  m="${m%/name}"
+  m="${m##*/}"
+  echo "${m}"
+}
+
+# Attach the pnor mtd device to ubi
+attach_ubi() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  pnordev="/dev/mtd${pnor}"
+
+  ubiattach /dev/ubi_ctrl -m "${pnor}" -d "${pnor}"
+  rc=$?
+  if [ ${rc} -ne 0 ]; then
+    # Check the pnor mtd device is formatted as ubi by reading the first 3 byes,
+    # which should be the ascii chars 'UBI'
+    magic="$(hexdump -C -n 3 ${pnordev})"
+    if [[ "${magic}" =~ "UBI" ]]; then
+      # Device already formatted as ubi, ubiattach failed for some other reason
+      return ${rc}
+    else
+      # Format device as ubi
+      echo "Starting ubiformat ${pnordev}"
+      ubiformat "${pnordev}" -y -q
+      # Retry the ubiattach
+      ubiattach /dev/ubi_ctrl -m "${pnor}" -d "${pnor}"
+    fi
+  fi
+}
+
+case "$1" in
+  ubiattach)
+    attach_ubi
+    ;;
+  *)
+    echo "Invalid argument"
+    exit 1
+    ;;
+esac
+rc=$?
+if [ ${rc} -ne 0 ]; then
+  echo "$0: error ${rc}"
+  exit ${rc}
+fi
