@@ -8,6 +8,20 @@ findmtd() {
   echo "${m}"
 }
 
+# Get the ubi device number (ubiX_Y)
+findubi() {
+  u="$(grep -xl "$1" /sys/class/ubi/ubi?/subsystem/ubi*/name)"
+  u="${u%/name}"
+  u="${u##*/}"
+  echo "${u}"
+}
+
+# Get the mount information
+is_mounted() {
+  grep -q "$1" /proc/mounts
+  return $?
+}
+
 # Attach the pnor mtd device to ubi
 attach_ubi() {
   pnormtd="$(findmtd pnor)"
@@ -33,9 +47,47 @@ attach_ubi() {
   fi
 }
 
+mount_squashfs() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  ubidev="/dev/ubi${pnor}"
+  mountdir="/media/${name}"
+
+  if [ ! -d "${mountdir}" ]; then
+    mkdir "${mountdir}"
+  fi
+
+  # Create a static ubi volume of arbitrary size 32MB,
+  # the volume will shrink to fit the pnor image if smaller
+  vol="$(findubi "${name}")"
+  if [ -z "${vol}" ]; then
+    ubimkvol "${ubidev}" -N "${name}" -s 32MiB --type=static
+    vol="$(findubi "${name}")"
+  fi
+
+  # Create a ubi block needed for read-only volumes,
+  # and update the volume with the pnor squashfs image
+  ubidevid="${vol#ubi}"
+  block="/dev/ubiblock${ubidevid}"
+  if [ ! -e "$block" ]; then
+    img="/tmp/images/${version}/pnor.xz.squashfs"
+    ubiblock --create "/dev/ubi${ubidevid}"
+    ubiupdatevol "/dev/ubi${ubidevid}" "${img}"
+  fi
+
+  if ! is_mounted "${name}"; then
+    mount -t squashfs -o ro "${block}" "${mountdir}"
+  fi
+}
+
 case "$1" in
   ubiattach)
     attach_ubi
+    ;;
+  squashfsmount)
+    name="$2"
+    version="$3"
+    mount_squashfs
     ;;
   *)
     echo "Invalid argument"
