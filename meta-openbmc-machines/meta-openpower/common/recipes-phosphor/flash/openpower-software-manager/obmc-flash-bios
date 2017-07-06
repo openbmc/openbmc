@@ -80,6 +80,29 @@ mount_squashfs() {
   fi
 }
 
+mount_ubi() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  ubidev="/dev/ubi${pnor}"
+  mountdir="/media/${name}"
+
+  if [ ! -d "${mountdir}" ]; then
+    mkdir "${mountdir}"
+  fi
+
+  # Create a dynamic ubi volume of initial arbitrary size 1MB,
+  # the volume will grow dynamically as needed
+  vol="$(findubi "${name}")"
+  if [ -z "${vol}" ]; then
+    ubimkvol "${ubidev}" -N "${name}" -s 1MiB
+  fi
+
+  if ! is_mounted "${name}"; then
+    mountdev="ubi${pnor}:${name}"
+    mount -t ubifs "${mountdev}" "${mountdir}"
+  fi
+}
+
 case "$1" in
   ubiattach)
     attach_ubi
@@ -88,6 +111,10 @@ case "$1" in
     name="$2"
     version="$3"
     mount_squashfs
+    ;;
+  ubimount)
+    name="$2"
+    mount_ubi
     ;;
   *)
     echo "Invalid argument"
