@@ -6,9 +6,4 @@ After=obmc-flash-bios-ubiattach.service
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/bin/sh -c '{sbindir}/ubimkvol /dev/ubi0 -N pnor-ro-%i -s 32MiB --type=static; \
-                      mkdir /media/pnor-ro-%i; \
-                      volumeid%i=`ubinfo -d 0 -N pnor-ro-%i | grep "Volume ID" | sed -e "s|Volume ID:||" -e "s/^ *//" | grep -o "^\S*"`; \
-                      ubiblock --create /dev/ubi0_$volumeid%i; \
-                      ubiupdatevol /dev/ubi0_$volumeid%i /tmp/images/%i/pnor.xz.squashfs; \
-                      mount -t squashfs -o ro /dev/ubiblock0_$volumeid%i /media/pnor-ro-%i'
+ExecStart={sbindir}/obmc-flash-bios squashfsmount pnor-ro-%i %i
