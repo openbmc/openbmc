@@ -129,6 +129,11 @@ VIRTUAL-RUNTIME_phosphor-hwmon-config ?= \
 # Provides a manager for user settings.
 VIRTUAL-RUNTIME_obmc-settings-mgr ?= "phosphor-settings-manager"
 
+# obmc-network-manager
+#
+# Provide support for managing network
+VIRTUAL-RUNTIME_obmc-network-manager ?= "network"
+
 # virtual/phosphor-ipmi-fru-hostfw-config
 #
 # The phosphor-ipmi-fru application is data-driven and requires an input

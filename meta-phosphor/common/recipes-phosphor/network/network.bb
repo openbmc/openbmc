@@ -10,6 +10,8 @@ inherit obmc-phosphor-dbus-service
 inherit phosphor-networkd-rev
 
 DBUS_SERVICE_${PN} += "org.openbmc.NetworkManager.service"
+DBUS_SERVICE_${PN} += "xyz.openbmc_project.Network.service"
+
 SYSTEMD_SERVICE_${PN} += "network-update-dns.service"
 
 DEPENDS += "systemd"
