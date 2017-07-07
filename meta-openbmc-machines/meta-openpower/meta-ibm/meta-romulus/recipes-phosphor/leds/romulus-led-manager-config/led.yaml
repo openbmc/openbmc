@@ -1,0 +1,26 @@
+bmc_booted:
+
+power_on:
+
+enclosure_fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+
+enclosure_identify:
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+
+lamp_test:
+    fault:
+        Action: 'Blink'
+        DutyOn: 25
+        Period: 1000
+    identify:
+        Action: 'Blink'
+        DutyOn: 75
+        Period: 1000
+
