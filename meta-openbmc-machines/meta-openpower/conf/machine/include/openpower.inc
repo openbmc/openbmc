@@ -25,3 +25,6 @@ PREFERRED_PROVIDER_virtual/openpower-fru-inventory ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'openpower-fru-inventory-mrw-native', 'openpower-fru-inventory-example-native')}"
 PREFERRED_PROVIDER_virtual/openpower-fru-properties ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'openpower-fru-properties-mrw-native', 'openpower-fru-properties-example-native')}"
+PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-read-inventory ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-read-inventory-mrw-native', 'phosphor-ipmi-fru-read-inventory-example-native')}"
+
