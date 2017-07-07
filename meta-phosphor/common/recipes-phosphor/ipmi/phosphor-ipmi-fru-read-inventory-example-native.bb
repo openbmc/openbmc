@@ -13,5 +13,5 @@ S = "${WORKDIR}/git"
 do_install() {
         DEST=${D}${config_datadir}
         install -d ${DEST}
-        install scripts/example.yaml ${DEST}/config.yaml
+        install scripts/fru-read-example.yaml ${DEST}/config.yaml
 }
