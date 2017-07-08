@@ -1,0 +1,8 @@
+[Unit]
+Description=Automount /usr/local
+
+[Automount]
+Where=/usr/local
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
