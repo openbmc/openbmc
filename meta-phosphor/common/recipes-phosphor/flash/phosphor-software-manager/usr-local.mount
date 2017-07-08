@@ -1,0 +1,8 @@
+[Unit]
+Description=/usr/local
+After=obmc-standby.target
+
+[Mount]
+What=tmpfs
+Where=/usr/local
+Type=tmpfs

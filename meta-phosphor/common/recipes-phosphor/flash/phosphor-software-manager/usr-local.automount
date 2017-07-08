@@ -1,0 +1,9 @@
+[Unit]
+Description=Automount /usr/local
+After=obmc-standby.target
+
+[Automount]
+Where=/usr/local
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

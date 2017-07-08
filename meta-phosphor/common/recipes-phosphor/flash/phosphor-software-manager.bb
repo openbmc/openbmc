@@ -56,10 +56,16 @@ FILES_${PN}-updater += " \
     ${sbindir}/phosphor-image-updater \
     ${sbindir}/obmc-flash-bmc \
     "
-DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.Version.service"
+DBUS_SERVICE_${PN}-version += " \
+    xyz.openbmc_project.Software.Version.service \
+    usr-local.automount \
+    "
 DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
 DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 
+SYSTEMD_SERVICE_${PN}-version += " \
+    usr-local.mount \
+    "
 SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-ubirw@.service \
     obmc-flash-bmc-ubiro@.service \
