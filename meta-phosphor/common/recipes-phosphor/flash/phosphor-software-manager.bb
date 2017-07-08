@@ -62,11 +62,18 @@ DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 
 SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-ubirw@.service \
+    obmc-flash-bmc-ubiro@.service \
     "
 
-# Name of the mtd device where the read-write volume should be created
+# Name of the mtd device where the ubi volumes should be created
 BMC_RW_MTD ??= "pnor"
+BMC_RO_MTD ??= "pnor"
+BMC_KERNEL_MTD ??= "pnor"
+BMC_UBOOT_MTD ??= "pnor"
 SYSTEMD_SUBSTITUTIONS += "RW_MTD:${BMC_RW_MTD}:obmc-flash-bmc-ubirw@.service"
+SYSTEMD_SUBSTITUTIONS += "RO_MTD:${BMC_RO_MTD}:obmc-flash-bmc-ubiro@.service"
+SYSTEMD_SUBSTITUTIONS += "KERNEL_MTD:${BMC_KERNEL_MTD}:obmc-flash-bmc-ubiro@.service"
+SYSTEMD_SUBSTITUTIONS += "UBOOT_MTD:${BMC_UBOOT_MTD}:obmc-flash-bmc-ubiro@.service"
 
 SRC_URI += "file://obmc-flash-bmc"
 do_install_append() {
