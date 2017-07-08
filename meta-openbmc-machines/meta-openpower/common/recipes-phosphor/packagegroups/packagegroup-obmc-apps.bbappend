@@ -14,11 +14,11 @@ RDEPENDS_${PN}-extrasdev += "${@mf_enabled(d, 'p9-vcs-workaround', 'iicmaster')}
 RDEPENDS_${PN}-inventory += "obmc-mgr-inventory"
 
 # Add the deprecated /org/openbmc sensor namespace providing
-# obmc-hwmon and obmc-mgr-sensor applications to the sensor
+# the obmc-mgr-sensor application to the sensor
 # packagegroup until all applications have been updated to use
 # the new, officially spec'ed xyz.openbmc_project.SensorValue
 # providers (VIRTUAL-RUNTIME_obmc-sensor-hwmon).
-RDEPENDS_${PN}-sensors += "obmc-hwmon obmc-mgr-sensor"
+RDEPENDS_${PN}-sensors += "obmc-mgr-sensor"
 
 # Add checkstop monitor as part of host state management package
 # This will kick start a gpio monitor that will catch the
