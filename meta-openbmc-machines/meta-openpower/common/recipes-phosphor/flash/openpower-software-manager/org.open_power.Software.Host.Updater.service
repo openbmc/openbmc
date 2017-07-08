@@ -2,6 +2,8 @@
 Description=OpenPower Software Update Manager
 Wants=xyz.openbmc_project.Software.Version.service
 Before=xyz.openbmc_project.Software.Version.service
+Wants=usr-local.mount
+Before=usr-local.mount
 
 [Service]
 ExecStart={sbindir}/openpower-update-manager
