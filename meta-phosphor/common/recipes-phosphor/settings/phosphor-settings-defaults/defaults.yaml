@@ -33,3 +33,17 @@
     Interface: xyz.openbmc_project.Time.Synchronization
     Defaults:
         TimeSyncMethod: Synchronization::Method::NTP
+
+/xyz/openbmc_project/network/host0/intf:
+    Interface: xyz.openbmc_project.Network.MACAddress
+    Defaults:
+        MACAddress: '"00:00:00:00:00:00"'
+
+/xyz/openbmc_project/network/host0/intf/addr:
+    Interface: xyz.openbmc_project.Network.IP
+    Defaults:
+        Address: '"0.0.0.0"'
+        PrefixLength: 0
+        Origin: IP::AddressOrigin::Static
+        Gateway: '"0.0.0.0"'
+        Type: IP::Protocol::IPv4
