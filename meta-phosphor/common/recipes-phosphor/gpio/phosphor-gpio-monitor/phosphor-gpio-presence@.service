@@ -1,0 +1,7 @@
+[Unit]
+Description=Phosphor GPIO %I Presence
+
+[Service]
+Restart=no
+EnvironmentFile={envfiledir}/obmc/gpio/%I
+ExecStart={sbindir}/phosphor-gpio-presence --path=${{PATH}} --dev=${{DEVICE}} --key=${{KEY}} --name=${{NAME}}

@@ -21,6 +21,7 @@ RDEPENDS_${PN} += "libevdev"
 RDEPENDS_${PN} += "phosphor-logging"
 
 SYSTEMD_SERVICE_${PN} += "phosphor-gpio-monitor@.service"
+SYSTEMD_SERVICE_${PN} += "phosphor-gpio-presence@.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-gpio-monitor"
 SRCREV = "ba8de42135766deab2125a784a89d3e51bc2e194"
