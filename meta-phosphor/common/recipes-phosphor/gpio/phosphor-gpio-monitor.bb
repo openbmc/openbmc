@@ -8,19 +8,47 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
 
-RPROVIDES_${PN} += "virtual/obmc-gpio-monitor"
+GPIO_PACKAGES = " \
+        ${PN}-monitor \
+        ${PN}-presence \
+"
+
+PACKAGES += "${GPIO_PACKAGES}"
+PACKAGES_remove = "${PN}"
+RDEPENDS_${PN}-dev = "${GPIO_PACKAGES}"
+RDEPENDS_${PN}-staticdev = "${GPIO_PACKAGES}"
+SYSTEMD_PACKAGES = "${GPIO_PACKAGES}"
+
+RPROVIDES_${PN}-monitor += "virtual/obmc-gpio-monitor"
+RPROVIDES_${PN}-presence += "virtual/obmc-gpio-presence"
+
 PROVIDES += "virtual/obmc-gpio-monitor"
+PROVIDES += "virtual/obmc-gpio-presence"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus sdbusplus-native"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "libevdev"
 DEPENDS += "phosphor-logging"
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "libevdev"
-RDEPENDS_${PN} += "phosphor-logging"
 
-SYSTEMD_SERVICE_${PN} += "phosphor-gpio-monitor@.service"
+RDEPENDS_${PN}-monitor += " \
+    libsystemd \
+    libevdev \
+    phosphor-logging \
+"
+RDEPENDS_${PN}-presence += " \
+    libsystemd \
+    libevdev \
+    phosphor-logging \
+    sdbusplus \
+"
+
+SYSTEMD_SERVICE_${PN}-monitor += "phosphor-gpio-monitor@.service"
+SYSTEMD_SERVICE_${PN}-presence += "phosphor-gpio-presence@.service"
+
+FILES_${PN}-monitor += "${sbindir}/phosphor-gpio-monitor"
+FILES_${PN}-monitor += "${sbindir}/phosphor-gpio-util"
+FILES_${PN}-presence += "${sbindir}/phosphor-gpio-presence"
 
 SRC_URI += "git://github.com/openbmc/phosphor-gpio-monitor"
 SRCREV = "ba8de42135766deab2125a784a89d3e51bc2e194"
