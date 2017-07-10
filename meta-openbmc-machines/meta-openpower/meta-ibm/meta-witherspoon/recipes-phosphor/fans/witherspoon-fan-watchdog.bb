@@ -4,7 +4,7 @@ PR = "r1"
 inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
 
-RDEPENDS_${PN} += "phosphor-gpio-monitor"
+RDEPENDS_${PN} += "virtual/obmc-gpio-monitor"
 RDEPENDS_${PN} += "busybox"
 
 RESET_SERVICE = "witherspoon-reset-fan-watchdog.service"
