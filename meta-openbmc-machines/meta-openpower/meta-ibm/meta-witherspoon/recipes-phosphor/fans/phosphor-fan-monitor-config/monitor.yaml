@@ -5,6 +5,8 @@
     sensors:
       - name: fan0_0
         has_target: true
+      - name: fan0_1
+        has_target: false
 
   - inventory: /system/chassis/motherboard/fan1
     allowed_out_of_range_time: 20
@@ -13,6 +15,8 @@
     sensors:
       - name: fan1_0
         has_target: true
+      - name: fan1_1
+        has_target: false
 
   - inventory: /system/chassis/motherboard/fan2
     allowed_out_of_range_time: 20
@@ -21,6 +25,8 @@
     sensors:
       - name: fan2_0
         has_target: true
+      - name: fan2_1
+        has_target: false
 
   - inventory: /system/chassis/motherboard/fan3
     allowed_out_of_range_time: 20
@@ -29,3 +35,5 @@
     sensors:
       - name: fan3_0
         has_target: true
+      - name: fan3_1
+        has_target: false

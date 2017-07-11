@@ -4,18 +4,22 @@
     Description:
     Sensors:
       - fan2_0
+      - fan2_1
   - PrettyName: fan0
     Inventory: /system/chassis/motherboard/fan0
     Description:
     Sensors:
       - fan0_0
+      - fan0_1
   - PrettyName: fan1
     Inventory: /system/chassis/motherboard/fan1
     Description:
     Sensors:
       - fan1_0
+      - fan1_1
   - PrettyName: fan3
     Inventory: /system/chassis/motherboard/fan3
     Description:
     Sensors:
       - fan3_0
+      - fan3_1
