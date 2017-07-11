@@ -1,0 +1,21 @@
+- Tach:
+  - PrettyName: fan2
+    Inventory: /system/chassis/motherboard/fan2
+    Description:
+    Sensors:
+      - fan2
+  - PrettyName: fan0
+    Inventory: /system/chassis/motherboard/fan0
+    Description:
+    Sensors:
+      - fan0
+  - PrettyName: fan1
+    Inventory: /system/chassis/motherboard/fan1
+    Description:
+    Sensors:
+      - fan1
+  - PrettyName: fan3
+    Inventory: /system/chassis/motherboard/fan3
+    Description:
+    Sensors:
+      - fan3
