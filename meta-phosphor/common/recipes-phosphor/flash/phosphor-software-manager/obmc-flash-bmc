@@ -28,11 +28,61 @@ ubi_rw() {
   fi
 }
 
+ubi_ro() {
+  romtd="$(findmtd "${reqmtd}")"
+  ro="${romtd#mtd}"
+  ubidev="/dev/ubi${ro}"
+
+  # Create a static ubi volume
+  # TODO Get the actual image size openbmc/openbmc#1840
+  vol="$(findubi "${name}")"
+  if [ -z "${vol}" ]; then
+    ubimkvol "${ubidev}" -N "${name}" -s "${imgsize}" --type=static
+    vol="$(findubi "${name}")"
+  fi
+}
+
+# Squashfs images need a ubi block
+ubi_block() {
+  vol="$(findubi "${name}")"
+  ubidevid="${vol#ubi}"
+  block="/dev/ubiblock${ubidevid}"
+  if [ ! -e "$block" ]; then
+    ubiblock --create "/dev/ubi${ubidevid}"
+  fi
+}
+
+ubi_updatevol() {
+  vol="$(findubi "${name}")"
+  ubidevid="${vol#ubi}"
+  img="/tmp/images/${version}/${imgfile}"
+  ubiupdatevol "/dev/ubi${ubidevid}" "${img}"
+}
+
 case "$1" in
   ubirw)
     reqmtd="$2"
     name="$3"
     ubi_rw
+    ;;
+  ubiro)
+    reqmtd="$2"
+    name="$3"
+    version="$4"
+    imgfile="image-rofs"
+    imgsize="16MiB"
+    ubi_ro
+    ubi_block
+    ubi_updatevol
+    ;;
+  ubikernel)
+    reqmtd="$2"
+    name="$3"
+    version="$4"
+    imgfile="image-kernel"
+    imgsize="4MiB"
+    ubi_ro
+    ubi_updatevol
     ;;
   *)
     echo "Invalid argument"
