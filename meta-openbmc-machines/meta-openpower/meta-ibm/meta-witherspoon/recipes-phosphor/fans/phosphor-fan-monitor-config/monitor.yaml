@@ -3,7 +3,7 @@
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
-      - name: fan0
+      - name: fan0_0
         has_target: true
 
   - inventory: /system/chassis/motherboard/fan1
@@ -11,7 +11,7 @@
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
-      - name: fan1
+      - name: fan1_0
         has_target: true
 
   - inventory: /system/chassis/motherboard/fan2
@@ -19,7 +19,7 @@
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
-      - name: fan2
+      - name: fan2_0
         has_target: true
 
   - inventory: /system/chassis/motherboard/fan3
@@ -27,5 +27,5 @@
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
-      - name: fan3
+      - name: fan3_0
         has_target: true

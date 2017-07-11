@@ -3,19 +3,19 @@ fans:
     cooling_zone: 0
     cooling_profile: all
     sensors:
-      - fan2
+      - fan2_0
   - inventory: /system/chassis/motherboard/fan0
     cooling_zone: 0
     cooling_profile: all
     sensors:
-      - fan0
+      - fan0_0
   - inventory: /system/chassis/motherboard/fan1
     cooling_zone: 0
     cooling_profile: air
     sensors:
-      - fan1
+      - fan1_0
   - inventory: /system/chassis/motherboard/fan3
     cooling_zone: 0
     cooling_profile: all
     sensors:
-      - fan3
+      - fan3_0
