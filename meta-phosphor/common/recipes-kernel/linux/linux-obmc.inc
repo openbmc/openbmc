@@ -13,9 +13,6 @@ SRC_URI += "file://phosphor-gpio-keys.cfg"
 SRC_URI += "file://phosphor-vlan.scc"
 SRC_URI += "file://phosphor-vlan.cfg"
 
-
-LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
-
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE_${MACHINE} = "openbmc"
