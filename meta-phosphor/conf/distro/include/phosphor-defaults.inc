@@ -186,7 +186,7 @@ PREFERRED_PROVIDER_virtual/phosphor-logging-callouts ?= \
 # configuration files in the format and native sysroot location expected by
 # the phosphor-fan-presence build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config ?= \
-    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-fan-presence-mrw-native', 'phosphor-fan-presence-example-native')}"
+    "${@cf_enabled(d, 'obmc-mrw', 'phosphor-fan-presence-mrw-native', 'phosphor-fan-presence-config-native')}"
 
 # The phosphor-fan-control application is data driven and requires a YAML
 # file to define the fans in the system.
