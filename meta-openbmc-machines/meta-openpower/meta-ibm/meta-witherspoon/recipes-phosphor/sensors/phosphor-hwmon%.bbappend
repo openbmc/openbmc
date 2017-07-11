@@ -3,6 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 WSPOON_CHIPS = " \
                i2c@1e78a000/i2c-bus@100/bmp280@77 \
                i2c@1e78a000/i2c-bus@100/dps310@76 \
+               i2c@1e78a000/i2c-bus@100/max31785@52 \
                i2c@1e78a000/i2c-bus@140/ir35221@70 \
                i2c@1e78a000/i2c-bus@140/ir35221@71 \
                i2c@1e78a000/i2c-bus@180/ir35221@70 \
