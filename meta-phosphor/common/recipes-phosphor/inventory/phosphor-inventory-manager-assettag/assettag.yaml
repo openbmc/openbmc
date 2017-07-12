@@ -1,0 +1,14 @@
+events:
+    - name: Creating AssetTag at startup
+      description: >
+          Create /system at startup and populate the AssetTag property with
+          empty string.
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+             /system:
+                xyz.openbmc_project.Inventory.Decorator.AssetTag:
+                  AssetTag:
+                    value: ""
+                    type: string
