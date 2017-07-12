@@ -1,0 +1,15 @@
+0x09:
+  path: /org/open_power/control/
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  interfaces:
+    org.open_power.OCC.Status:
+      OccActive:
+        0x00:
+          type: "bool"
+          assert: "false"
+          deassert: "true"
+        0x01:
+          type: "bool"
+          assert: "true"
+          deassert: "false"
