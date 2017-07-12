@@ -2,6 +2,8 @@
 Description=Phosphor Host State Manager
 Wants=mapper-wait@-org-openbmc-managers-System.service
 After=mapper-wait@-org-openbmc-managers-System.service
+Wants=mapper-wait@-xyz-openbmc_project-Settings.service
+After=mapper-wait@-xyz-openbmc_project-Settings.service
 Before=mapper-wait@-xyz-openbmc_project-state-host.service
 
 [Service]
