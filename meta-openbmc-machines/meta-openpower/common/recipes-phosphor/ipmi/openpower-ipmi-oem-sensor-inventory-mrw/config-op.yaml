@@ -1,0 +1,12 @@
+0x09:
+  path: /org/open_power/control/
+  updateInterface: org.freedesktop.DBus.Properties
+  interfaces:
+    org.open_power.OCC.Status:
+      OCCActive:
+        0x00:
+          type: "bool"
+          assert: "false"
+        0x01:
+          type: "bool"
+          assert: "true"
