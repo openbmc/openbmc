@@ -1,0 +1,9 @@
+[Unit]
+Description=Create a ubi volume for pnor patches
+Wants=usr-local.mount
+After=usr-local.mount
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart={sbindir}/obmc-flash-bios ubimount pnor-patch
