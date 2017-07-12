@@ -1,15 +1,63 @@
+0x07:
+  sensorType: 0xC3
+  path: /xyz/openbmc_project/control/host0/reboot_attempts
+  sensorReadingType: 0x6F
+  updatePath: /xyz/openbmc_project/control/boot
+  updateInterface: org.freedesktop.DBus.Properties
+  readingType: reading
+  byteOffset: 0x01
+  interfaces:
+    xyz.openbmc_project.Control.Boot.RebootAttempts:
+      AttemptsLeft:
+        0xFF:
+          type: string
+          set: set
+0x03:
+  sensorType: 0x0F
+  path: /xyz/openbmc_project/state/boot/progress
+  sensorReadingType: 0x6F
+  updatePath: /xyz/openbmc_project/state/boot/progress
+  updateInterface: org.freedesktop.DBus.Properties
+  readingType: reading
+  byteOffset: 0x02
+  interfaces:
+    xyz.openbmc_project.State.Boot.Progress:
+      ProgressStages:
+        0x00:
+          type: string
+          set: xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.Unspecified
+        0x01:
+          type: string
+          set: xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.MemoryInit
+        0x03:
+          type: string
+          set: xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.SecondaryProcInit
+        0x13:
+          type: string
+          set: xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.OSStart
+        0x14:
+          type: string
+          set: xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.MotherboardInit
 0xa6:
   sensorType: 0x0C
   path: /system/chassis/motherboard/dimm0
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xa8:
   sensorType: 0x0C
@@ -17,12 +65,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xba:
   sensorType: 0x0C
@@ -30,12 +86,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xbc:
   sensorType: 0x0C
@@ -43,12 +107,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xbe:
   sensorType: 0x0C
@@ -56,12 +128,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xc0:
   sensorType: 0x0C
@@ -69,12 +149,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xc2:
   sensorType: 0x0C
@@ -82,12 +170,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xc4:
   sensorType: 0x0C
@@ -95,12 +191,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xaa:
   sensorType: 0x0C
@@ -108,12 +212,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xac:
   sensorType: 0x0C
@@ -121,12 +233,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xae:
   sensorType: 0x0C
@@ -134,12 +254,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xb0:
   sensorType: 0x0C
@@ -147,12 +275,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xb2:
   sensorType: 0x0C
@@ -160,12 +296,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xb4:
   sensorType: 0x0C
@@ -173,12 +317,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xb6:
   sensorType: 0x0C
@@ -186,12 +338,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0xb8:
   sensorType: 0x0C
@@ -199,12 +359,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x04:
-          assert: "false"
-          deassert: "true"
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          assert: true
+          deassert: false
           type: bool
 0x5a:
   sensorType: 0x07
@@ -212,12 +380,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x12:
   sensorType: 0x07
@@ -225,12 +401,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x15:
   sensorType: 0x07
@@ -238,12 +422,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x18:
   sensorType: 0x07
@@ -251,12 +443,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x1b:
   sensorType: 0x07
@@ -264,12 +464,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x1e:
   sensorType: 0x07
@@ -277,12 +485,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x21:
   sensorType: 0x07
@@ -290,12 +506,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x24:
   sensorType: 0x07
@@ -303,12 +527,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x27:
   sensorType: 0x07
@@ -316,12 +548,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x2a:
   sensorType: 0x07
@@ -329,12 +569,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x2d:
   sensorType: 0x07
@@ -342,12 +590,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x30:
   sensorType: 0x07
@@ -355,12 +611,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x33:
   sensorType: 0x07
@@ -368,12 +632,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x36:
   sensorType: 0x07
@@ -381,12 +653,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x39:
   sensorType: 0x07
@@ -394,12 +674,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x3c:
   sensorType: 0x07
@@ -407,12 +695,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x3f:
   sensorType: 0x07
@@ -420,12 +716,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x42:
   sensorType: 0x07
@@ -433,12 +737,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x45:
   sensorType: 0x07
@@ -446,12 +758,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x48:
   sensorType: 0x07
@@ -459,12 +779,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x4b:
   sensorType: 0x07
@@ -472,12 +800,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x4e:
   sensorType: 0x07
@@ -485,12 +821,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x51:
   sensorType: 0x07
@@ -498,12 +842,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x54:
   sensorType: 0x07
@@ -511,12 +863,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x57:
   sensorType: 0x07
@@ -524,12 +884,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0xa4:
   sensorType: 0x07
@@ -537,12 +905,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x5c:
   sensorType: 0x07
@@ -550,12 +926,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x5f:
   sensorType: 0x07
@@ -563,12 +947,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x62:
   sensorType: 0x07
@@ -576,12 +968,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x65:
   sensorType: 0x07
@@ -589,12 +989,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x68:
   sensorType: 0x07
@@ -602,12 +1010,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x6b:
   sensorType: 0x07
@@ -615,12 +1031,41 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
+          type: bool
+0x6e:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1/core6
+  sensorReadingType: 0x6F
+  updatePath: /xyz/openbmc_project/inventory
+  updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          assert: true
+          deassert: false
           type: bool
 0x71:
   sensorType: 0x07
@@ -628,12 +1073,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x74:
   sensorType: 0x07
@@ -641,12 +1094,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x77:
   sensorType: 0x07
@@ -654,12 +1115,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x7a:
   sensorType: 0x07
@@ -667,12 +1136,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x7d:
   sensorType: 0x07
@@ -680,12 +1157,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x80:
   sensorType: 0x07
@@ -693,12 +1178,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x83:
   sensorType: 0x07
@@ -706,12 +1199,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x86:
   sensorType: 0x07
@@ -719,12 +1220,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x89:
   sensorType: 0x07
@@ -732,12 +1241,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x8c:
   sensorType: 0x07
@@ -745,12 +1262,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x8f:
   sensorType: 0x07
@@ -758,12 +1283,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x92:
   sensorType: 0x07
@@ -771,12 +1304,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x95:
   sensorType: 0x07
@@ -784,12 +1325,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x98:
   sensorType: 0x07
@@ -797,12 +1346,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x9b:
   sensorType: 0x07
@@ -810,12 +1367,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0x9e:
   sensorType: 0x07
@@ -823,12 +1388,20 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
 0xa1:
   sensorType: 0x07
@@ -836,10 +1409,47 @@
   sensorReadingType: 0x6F
   updatePath: /xyz/openbmc_project/inventory
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          assert: false
+          deassert: true
+          type: bool
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
-          deassert: "false"
-          assert: "true"
+          assert: true
+          deassert: false
           type: bool
+0x05:
+  sensorType: 0x1F
+  path: /xyz/openbmc_project/state/host0/os_status
+  sensorReadingType: 0x6F
+  updatePath: /xyz/openbmc_project/state/host0/os_status
+  updateInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  byteOffset: 0x00
+  interfaces:
+    xyz.openbmc_project.State.OperatingSystem.Status:
+      OperatingSystemState:
+        0x02:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.PXEBoot
+          type: string
+        0x06:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete
+          type: string
+        0x04:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CDROMBoot
+          type: string
+        0x01:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CBoot
+          type: string
+        0x03:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.DiagBoot
+          type: string
+        0x05:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.ROMBoot
+          type: string
