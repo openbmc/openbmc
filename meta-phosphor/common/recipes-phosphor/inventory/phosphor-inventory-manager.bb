@@ -21,6 +21,7 @@ DEPENDS += " \
         sdbusplus \
         sdbusplus-native \
         autoconf-archive-native \
+        phosphor-inventory-manager-config-native \
         "
 RDEPENDS_${PN} += " \
         sdbusplus \
