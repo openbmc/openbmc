@@ -11,4 +11,5 @@ RDEPENDS_${PN} = " \
     net-tools \
     phosphor-logging-test \
     lmsensors-sensors \
+    tcpdump \
     "
