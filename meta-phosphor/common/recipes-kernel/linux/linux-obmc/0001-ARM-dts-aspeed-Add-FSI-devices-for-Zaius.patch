@@ -1,0 +1,42 @@
+From 6c9d5185aa6f7da8f8e6be144afaf7871c761d60 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Wed, 12 Jul 2017 13:36:55 -0500
+Subject: [PATCH linux dev-4.10] ARM: dts: aspeed: Add FSI devices for Zaius
+
+Missing label, properties, and include file.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts b/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
+index c620015..750ec12 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-zaius.dts
+@@ -71,10 +71,10 @@
+ 		};
+ 	};
+ 
+-	gpio-fsi {
++	fsi: gpio-fsi {
+ 		compatible = "fsi-master-gpio", "fsi-master";
+-
+-		status = "okay";
++		#address-cells = <2>;
++		#size-cells = <0>;
+ 
+ 		/*
+ 		 * These 2 GPIOs are set per board revision in aspeed.c.
+@@ -96,6 +96,8 @@
+ 	};
+ };
+ 
++#include "ibm-power9-cfam.dtsi"
++
+ &fmc {
+ 	status = "okay";
+ 	flash@0 {
+-- 
+1.8.3.1
+
