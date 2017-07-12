@@ -10,4 +10,5 @@ RDEPENDS_${PN} = " \
     ethtool \
     net-tools \
     phosphor-logging-test \
+    tcpdump \
     "
