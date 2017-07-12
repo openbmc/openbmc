@@ -1,0 +1,46 @@
+From patchwork Fri Jul  7 07:25:44 2017
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [linux,
+ dev-4.10] ARM: aspeed: witherspoon: Add reset tolerance for host
+ power GPIOs
+From: Andrew Jeffery <andrew@aj.id.au>
+X-Patchwork-Id: 785386
+Message-Id: <20170707072544.25003-1-andrew@aj.id.au>
+To: joel@jms.id.au
+Cc: Andrew Jeffery <andrew@aj.id.au>, openbmc@lists.ozlabs.org
+Date: Fri,  7 Jul 2017 16:55:44 +0930
+
+Enables the host to stay up across BMC reboots. This is a temporary
+approach. Ultimately bindings support and reset tolerance capability
+will be added to the GPIO driver, and the behaviour will be described
+in the devicetree.
+
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+---
+ arch/arm/mach-aspeed/aspeed.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm/mach-aspeed/aspeed.c b/arch/arm/mach-aspeed/aspeed.c
+index 74611a9c2c79..100805e8c263 100644
+--- a/arch/arm/mach-aspeed/aspeed.c
++++ b/arch/arm/mach-aspeed/aspeed.c
+@@ -177,7 +177,17 @@ static void __init do_zaius_setup(void)
+ 
+ static void __init do_witherspoon_setup(void)
+ {
++	unsigned long reg;
++
+ 	do_common_setup();
++
++	/* Reset tolerance for BMC_POWER_UP (GPIOD1) */
++	reg = readl(AST_IO(AST_BASE_GPIO | 0x01C));
++	writel(reg | BIT(25), AST_IO(AST_BASE_GPIO | 0x01C));
++
++	/* Reset tolerance for SOFTWARE_PGOOD (GPIOR1) */
++	reg = readl(AST_IO(AST_BASE_GPIO | 0x12C));
++	writel(reg | BIT(9), AST_IO(AST_BASE_GPIO | 0x12C));
+ }
+ 
+ static void __init do_romulus_setup(void)

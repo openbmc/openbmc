@@ -12,6 +12,7 @@ SRC_URI += "file://phosphor-gpio-keys.scc"
 SRC_URI += "file://phosphor-gpio-keys.cfg"
 SRC_URI += "file://phosphor-vlan.scc"
 SRC_URI += "file://phosphor-vlan.cfg"
+SRC_URI += "file://linux-dev-4.10-ARM-aspeed-witherspoon-Add-reset-tolerance-for-host-power-GPIOs.patch"
 
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
