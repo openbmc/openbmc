@@ -30,6 +30,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
+DEPENDS += "cereal"
 RDEPENDS_${PN} += "sdbusplus"
 
 RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"
