@@ -1,0 +1,34 @@
+0x0C:
+  updatePath: /xyz/openbmc_project/inventory
+  updateInterface: xyz.openbmc_project.Inventory.Manager
+  updateCommand: Notify
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x04:
+          type:   "bool"
+          assert:  false
+          deassert: true
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x06:
+          type: "bool"
+          assert: true
+          deassert: false
+0x07:
+  updatePath: /xyz/openbmc_project/inventory
+  updateInterface: xyz.openbmc_project.Inventory.Manager
+  updateCommand: Notify
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          type:   "bool"
+          assert: false
+          deassert: true
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          type: "bool"
+          assert: true
+          deassert: false
