@@ -1,0 +1,185 @@
+From 6fd6d1f415e3aa282c66be9140142d36fbaece52 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 14 Jul 2017 10:15:29 -0500
+Subject: [PATCH linux dev-4.10] drivers/hwmon/occ: Change power sensor type a0
+ attributes
+
+Needed to be more standard.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ drivers/hwmon/occ/common.c | 74 ++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 58 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/hwmon/occ/common.c b/drivers/hwmon/occ/common.c
+index 4e3e411..8b0a008 100644
+--- a/drivers/hwmon/occ/common.c
++++ b/drivers/hwmon/occ/common.c
+@@ -565,6 +565,14 @@ static ssize_t occ_show_power_a0(struct device *dev,
+ 	case 14:
+ 		val = get_unaligned_be64(&power->vdn.accumulator);
+ 		break;
++	case 15:
++		return snprintf(buf, PAGE_SIZE - 1, "system\n");
++	case 16:
++		return snprintf(buf, PAGE_SIZE - 1, "proc\n");
++	case 17:
++		return snprintf(buf, PAGE_SIZE - 1, "vdd\n");
++	case 18:
++		return snprintf(buf, PAGE_SIZE - 1, "vdn\n");
+ 	}
+ 
+ 	return snprintf(buf, PAGE_SIZE - 1, "%llu\n", val);
+@@ -804,7 +812,7 @@ int occ_setup_sensor_attrs(struct occ *occ)
+ 		show_power = occ_show_power_2;
+ 		break;
+ 	case 0xA0:
+-		occ->num_attrs += (sensors->power.num_sensors * 15);
++		occ->num_attrs += (sensors->power.num_sensors * 19);
+ 		show_power = occ_show_power_a0;
+ 		break;
+ 	default:
+@@ -888,91 +896,125 @@ int occ_setup_sensor_attrs(struct occ *occ)
+ 			s = i + 1;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_label", s);
++				 "power%d_id", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 0, i);
+ 			attr++;
+ 
++			/* system power attributes */
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_system_update_time", s);
++				 "power%d_label", s);
++			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++						     show_power, NULL, 15, i);
++			attr++;
++
++			snprintf(attr->name, sizeof(attr->name),
++				 "power%d_update_time", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 1, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_system_value", s);
++				 "power%d_input", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 2, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_system_update_tag", s);
++				 "power%d_update_tag", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 3, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_system_accumulator", s);
++				 "power%d_accumulator", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 4, i);
+ 			attr++;
+ 
++			s++;
++
++			/* proc power attributes */
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_proc_update_time", s);
++				 "power%d_label", s);
++			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++						     show_power, NULL, 16, i);
++			attr++;
++
++			snprintf(attr->name, sizeof(attr->name),
++				 "power%d_update_time", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 5, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_proc_value", s);
++				 "power%d_input", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 6, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_proc_update_tag", s);
++				 "power%d_update_tag", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 7, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_proc_accumulator", s);
++				 "power%d_accumulator", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 8, i);
+ 			attr++;
+ 
++			s++;
++
++			/* vdd power attributes */
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_vdd_value", s);
++				 "power%d_label", s);
++			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++						     show_power, NULL, 17, i);
++			attr++;
++
++			snprintf(attr->name, sizeof(attr->name),
++				 "power%d_input", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 9, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_vdd_update_tag", s);
++				 "power%d_update_tag", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 10, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_vdd_accumulator", s);
++				 "power%d_accumulator", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 11, i);
+ 			attr++;
+ 
++			s++;
++
++			/* vdn power attributes */
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_vdn_value", s);
++				 "power%d_label", s);
++			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
++						     show_power, NULL, 18, i);
++			attr++;
++
++			snprintf(attr->name, sizeof(attr->name),
++				 "power%d_input", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 12, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_vdn_update_tag", s);
++				 "power%d_update_tag", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 13, i);
+ 			attr++;
+ 
+ 			snprintf(attr->name, sizeof(attr->name),
+-				 "power%d_vdn_accumulator", s);
++				 "power%d_accumulator", s);
+ 			attr->sensor = OCC_INIT_ATTR(attr->name, 0444,
+ 						     show_power, NULL, 14, i);
+ 			attr++;
+-- 
+1.8.3.1
+

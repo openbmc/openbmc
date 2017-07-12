@@ -12,6 +12,8 @@ SRC_URI += "file://phosphor-gpio-keys.scc"
 SRC_URI += "file://phosphor-gpio-keys.cfg"
 SRC_URI += "file://phosphor-vlan.scc"
 SRC_URI += "file://phosphor-vlan.cfg"
+SRC_URI += "file://0001-ARM-dts-aspeed-Add-FSI-devices-for-Zaius.patch"
+SRC_URI += "file://0001-drivers-hwmon-occ-Change-power-sensor-type-a0-attrib.patch"
 
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
