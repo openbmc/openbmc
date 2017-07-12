@@ -5,11 +5,10 @@ inherit native
 inherit obmc-phosphor-license
 inherit phosphor-ipmi-host
 
-SRC_URI += "file://config.yaml"
-
 DEPENDS += " \
            mrw-native \
            mrw-perl-tools-native \
+           packagegroup-obmc-ipmi-sensors \
            "
 
 PROVIDES += "virtual/phosphor-ipmi-sensor-inventory"
@@ -17,12 +16,12 @@ PROVIDES += "virtual/phosphor-ipmi-sensor-inventory"
 S = "${WORKDIR}"
 
 do_install() {
-        DEST=${D}${sensor_datadir}
-        install -d ${DEST}
+
+        install -d ${sensor_datadir}
 
         ${bindir}/perl-native/perl \
             ${bindir}/gen_ipmi_sensor.pl \
             -i ${datadir}/obmc-mrw/${MACHINE}.xml \
-            -m config.yaml \
-            -o ${DEST}/sensor.yaml
+            -m ${sensor_yamldir} \
+            -o ${sensor_datadir}/sensor.yaml
 }
