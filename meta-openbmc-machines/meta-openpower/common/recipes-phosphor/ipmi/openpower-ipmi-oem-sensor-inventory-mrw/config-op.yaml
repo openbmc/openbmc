@@ -1,6 +1,8 @@
 0x09:
   path: /org/open_power/control/
   updateInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  byteOffset: 0x00  
   interfaces:
     org.open_power.OCC.Status:
       OCCActive:

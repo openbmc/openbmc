@@ -1,5 +1,68 @@
+0xC3:
+  path: /xyz/openbmc_project/control/host0/reboot_attempts
+  updateInterface: org.freedesktop.DBus.Properties
+  readingType: reading
+  byteOffset: 0x01
+  interfaces:
+    xyz.openbmc_project.Control.Boot.RebootAttempts:
+      AttemptsLeft:
+        0xFF:
+          type: string
+          set: set
+0x1F:
+  path: /xyz/openbmc_project/state/host0/os_status
+  sensorReadingType: 0x6F
+  updateInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  byteOffset: 0x00
+  interfaces:
+    xyz.openbmc_project.State.OperatingSystem.Status:
+      OperatingSystemState:
+        0x01:
+          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CBoot"
+          type: string
+        0x02:
+          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.PXEBoot"
+          type: string
+        0x03:
+          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.DiagBoot"
+          type: string
+        0x04:
+          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CDROMBoot"
+          type: string
+        0x05:
+          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.ROMBoot"
+          type: string
+        0x06:
+          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete"
+          type: string
+0x0F:
+  path: /xyz/openbmc_project/state/boot/progress
+  updateInterface: org.freedesktop.DBus.Properties
+  readingType: reading
+  byteOffset: 0x02
+  interfaces:
+    xyz.openbmc_project.State.Boot.Progress:
+      ProgressStages:
+        0x00:
+          type: string
+          set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.Unspecified"
+        0x01:
+          type: string
+          set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.MemoryInit"
+        0x03:
+          type: string
+          set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.SecondaryProcInit"
+        0x13:
+          type: string
+          set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.OSStart"
+        0x14:
+          type: string
+          set: "xyz.openbmc_project.State.Boot.Progress.BootProgress.ProgressStages.MotherboardInit"
 0x0C:
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -15,6 +78,8 @@
           deassert: false
 0x07:
   updateInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
