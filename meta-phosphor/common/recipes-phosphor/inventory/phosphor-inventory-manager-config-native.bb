@@ -7,7 +7,7 @@ PR = "r1"
 inherit obmc-phosphor-license
 inherit native
 
-PHOSPHOR_INVENTORY_MANAGER_CONFIGS ??= ""
+PHOSPHOR_INVENTORY_MANAGER_CONFIGS ??= "phosphor-inventory-manager-assettag-native"
 
 # To add additional managed inventory items, create a recipe in your layer,
 # and add it to PHOSPHOR_INVENTORY_MANAGER_CONFIGS with a bbappend to this recipe.
