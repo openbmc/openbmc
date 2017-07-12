@@ -44,5 +44,6 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubimount@.service \
         obmc-flash-bios-ubiumount-prsv.service \
         obmc-flash-bios-ubiumount-rw@.service \
+        obmc-flash-bios-ubipatch.service \
         obmc-flash-bios-squashfsmount@.service \
         "
