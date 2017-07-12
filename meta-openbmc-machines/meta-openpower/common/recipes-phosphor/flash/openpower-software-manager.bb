@@ -37,7 +37,10 @@ do_install_append() {
         install -m 0755 ${WORKDIR}/obmc-flash-bios ${D}${sbindir}/obmc-flash-bios
 }
 
-DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
+DBUS_SERVICE_${PN} += " \
+    org.open_power.Software.Host.Updater.service \
+    obmc-flash-bios-ubipatch.service \
+    "
 
 SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubiattach.service \
