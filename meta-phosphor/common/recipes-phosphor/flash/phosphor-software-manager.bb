@@ -63,6 +63,8 @@ DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-ubirw.service \
     obmc-flash-bmc-ubiro@.service \
+    obmc-flash-bmc-setenv@.service \
+    obmc-flash-bmc-ubirw-reset.service \
     "
 
 # Name of the mtd device where the ubi volumes should be created
@@ -72,6 +74,7 @@ BMC_RO_MTD ??= "pnor"
 # are merged into a single ubi one openbmc/openbmc#1942
 BMC_KERNEL_MTD ??= "pnor"
 SYSTEMD_SUBSTITUTIONS += "RW_MTD:${BMC_RW_MTD}:obmc-flash-bmc-ubirw.service"
+SYSTEMD_SUBSTITUTIONS += "RW_MTD:${BMC_RW_MTD}:obmc-flash-bmc-ubirw-reset.service"
 SYSTEMD_SUBSTITUTIONS += "RO_MTD:${BMC_RO_MTD}:obmc-flash-bmc-ubiro@.service"
 SYSTEMD_SUBSTITUTIONS += "KERNEL_MTD:${BMC_KERNEL_MTD}:obmc-flash-bmc-ubiro@.service"
 

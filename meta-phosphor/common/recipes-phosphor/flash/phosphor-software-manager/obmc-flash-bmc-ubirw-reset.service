@@ -1,0 +1,8 @@
+[Unit]
+Description=Reset BMC read-write ubi volume
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/bin/sh -c 'if [ "$(fw_printenv rwreset)" == "rwreset=true" ]; then \
+                          obmc-flash-bmc ubirw {RW_MTD} rw; fi'
