@@ -1,0 +1,10 @@
+[Unit]
+Description=Prevents BMC from rebooting.
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStop=<your script/program>
+
+[Install]
+WantedBy=multi-user.target

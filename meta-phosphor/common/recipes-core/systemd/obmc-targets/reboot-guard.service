@@ -1,0 +1,8 @@
+[Unit]
+Description=Reboot Guard
+
+[Service]
+ExecStart=/bin/true
+
+[Install]
+RequiredBy=shutdown.target
