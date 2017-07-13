@@ -21,6 +21,11 @@ ubi_rw() {
   rw="${rwmtd#mtd}"
   ubidev="/dev/ubi${rw}"
 
+  if [ "$(fw_printenv rwreset)" == "rwreset=true" ]; then
+    ubi_remove
+    fw_setenv rwreset
+  fi
+
   # Create a ubi volume of size 4MB, that is the current size of the rwfs image
   vol="$(findubi "${name}")"
   if [ -z "${vol}" ]; then
@@ -52,6 +57,28 @@ ubi_ro() {
   fi
 }
 
+ubi_remove() {
+    vol="$(findubi "${name}")"
+
+    if [ ! -z "$vol" ]; then
+        vol="${vol%_*}"
+
+        if grep -q "${vol}:$name" /proc/mounts; then
+            mountdir=$(grep "${vol}:$name" /proc/mounts | cut -d " " -f 2)
+            umount "$mountdir"
+            rm -r "$mountdir"
+        fi
+
+        ubirmvol "/dev/${vol}" -N "$name"
+    fi
+}
+
+ubi_setenv() {
+    name="${variable%"\x3d"*}"
+    value="${variable##*"\x3d"}"
+    fw_setenv "$name" "$value"
+}
+
 case "$1" in
   ubirw)
     reqmtd="$2"
@@ -73,6 +100,14 @@ case "$1" in
     imgfile="image-kernel"
     imgsize="4MiB"
     ubi_ro
+    ;;
+  ubiremove)
+    name="$2"
+    ubi_remove
+    ;;
+  ubisetenv)
+    variable="$2"
+    ubi_setenv
     ;;
   *)
     echo "Invalid argument"
