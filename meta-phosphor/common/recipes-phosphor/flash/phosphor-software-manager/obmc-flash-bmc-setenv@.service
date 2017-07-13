@@ -1,0 +1,7 @@
+[Unit]
+Description=Set U-Boot environment variable
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart={sbindir}/obmc-flash-bmc ubisetenv %i
