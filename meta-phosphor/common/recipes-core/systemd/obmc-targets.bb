@@ -68,6 +68,8 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-fan-control-ready@.target \
         obmc-fan-watchdog-takeover.target \
         obmc-standby.target \
+        reboot-guard.service \
+        start-reboot-guard.service \
         "
 
 SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'CHASSIS_SYNCH_FMT', 'CHASSIS_SYNCH_TARGETS')}"

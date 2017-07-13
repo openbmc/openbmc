@@ -1,0 +1,8 @@
+[Unit]
+Description=Start Reboot Guard
+
+[Service]
+ExecStart=/bin/systemctl enable reboot-guard
+
+[Install]
+WantedBy=multi-user.target
