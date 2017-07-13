@@ -1,0 +1,12 @@
+[Unit]
+Description=Start Reboot Guard
+Before=shutdown.target
+
+[Service]
+ExecStart=/bin/true
+ExecStop=/bin/sleep 30
+ExecStop=/bin/systemctl start reboot-guard
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
