@@ -6,12 +6,15 @@ KCONFIG_MODE="--alldefconfig"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+inherit obmc-phosphor-utils
+
 KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI += "file://phosphor-gpio-keys.scc"
 SRC_URI += "file://phosphor-gpio-keys.cfg"
 SRC_URI += "file://phosphor-vlan.scc"
 SRC_URI += "file://phosphor-vlan.cfg"
+SRC_URI += "${@df_enabled(d, 'obmc-ubi-filesystem', 'file://0001-ARM-dts-Aspeed-Witherspoon-Update-BMC-partitioning.patch')}"
 
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
