@@ -1,0 +1,40 @@
+From 45102d0c56f3f93f902ce3a6d5809b2f12a9305b Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 14 Jul 2017 14:00:34 -0500
+Subject: [PATCH linux dev-4.10] ARM: dts: aspeed: Update bmc partitioning
+
+Remove kernel, rofs, and rwfs partitions, and instead add one obmc
+partition for ubi volumes.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi b/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi
+index 4bcfd1b..18c68a7 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi
+@@ -11,16 +11,8 @@
+ 					reg = < 0x60000 0x20000 >;
+ 					label = "u-boot-env";
+ 				};
+-				kernel@80000 {
+-					reg = < 0x80000 0x440000 >;
+-					label = "kernel";
+-				};
+-				rofs@0c0000 {
+-					reg = < 0x4c0000 0x1740000 >;
+-					label = "rofs";
+-				};
+-				rwfs@1c00000 {
+-					reg = < 0x1c00000 0x400000 >;
+-					label = "rwfs";
++				obmc@80000 {
++					reg = < 0x80000 0x1F80000 >;
++					label = "obmc";
+ 				};
+ 		};
+-- 
+1.8.3.1
+
