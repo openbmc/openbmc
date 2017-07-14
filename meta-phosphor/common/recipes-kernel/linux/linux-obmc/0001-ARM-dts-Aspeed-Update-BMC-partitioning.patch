@@ -1,0 +1,82 @@
+From 17fa15d064a7f65d75e742a193a666dc58d75ecc Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Tue, 15 Aug 2017 09:56:32 -0500
+Subject: [PATCH linux dev-4.10] ARM: dts: Aspeed: Update BMC partitioning
+
+Create a layout for the alternate bmc flash, and update partitioning to
+just three partitions.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-alt-bmc-opp-flash-layout.dtsi | 18 ++++++++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi     | 14 +++-----------
+ arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts       |  3 ++-
+ 3 files changed, 23 insertions(+), 12 deletions(-)
+ create mode 100644 arch/arm/boot/dts/aspeed-alt-bmc-opp-flash-layout.dtsi
+
+diff --git a/arch/arm/boot/dts/aspeed-alt-bmc-opp-flash-layout.dtsi b/arch/arm/boot/dts/aspeed-alt-bmc-opp-flash-layout.dtsi
+new file mode 100644
+index 0000000..0d4711b
+--- /dev/null
++++ b/arch/arm/boot/dts/aspeed-alt-bmc-opp-flash-layout.dtsi
+@@ -0,0 +1,18 @@
++		label = "alt-bmc";
++		partitions {
++				#address-cells = < 1 >;
++				#size-cells = < 1 >;
++				compatible = "fixed-partitions";
++				u-boot@0 {
++					reg = < 0 0x60000 >;
++					label = "alt-u-boot";
++				};
++				u-boot-env@60000 {
++					reg = < 0x60000 0x20000 >;
++					label = "alt-u-boot-env";
++				};
++				obmc@80000 {
++					reg = < 0x80000 0x1F80000 >;
++					label = "alt-obmc";
++				};
++		};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi b/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi
+index 4bcfd1b..18c68a7 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout.dtsi
+@@ -11,16 +11,8 @@
+ 					reg = < 0x60000 0x20000 >;
+ 					label = "u-boot-env";
+ 				};
+-				kernel@80000 {
+-					reg = < 0x80000 0x440000 >;
+-					label = "kernel";
+-				};
+-				rofs@0c0000 {
+-					reg = < 0x4c0000 0x1740000 >;
+-					label = "rofs";
+-				};
+-				rwfs@1c00000 {
+-					reg = < 0x1c00000 0x400000 >;
+-					label = "rwfs";
++				obmc@80000 {
++					reg = < 0x80000 0x1F80000 >;
++					label = "obmc";
+ 				};
+ 		};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+index dd30c20..a526d5e 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+@@ -178,8 +178,9 @@
+ 	};
+ 	flash@1 {
+ 		status = "okay";
+-		label = "alt";
+ 		m25p,fast-read;
++
++#include "aspeed-alt-bmc-opp-flash-layout.dtsi"
+ 	};
+ };
+ 
+-- 
+1.8.3.1
+
