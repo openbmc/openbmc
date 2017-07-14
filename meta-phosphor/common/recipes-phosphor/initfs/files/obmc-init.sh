@@ -64,10 +64,14 @@ get_fw_env_var() {
 	#   double \0 at the end of the environment.
 	# * print the value of the variable name passed as argument
 
-	cat /run/fw_env | 
-	tr '\n\000' '\r\n' |
-	tail -c +5 | tail -c +${copies-1} | 
-	sed -ne '/^$/,$d' -e "s/^$1=//p"
+	envdev=$(findmtd u-boot-env)
+	if test -n $envdev
+	then
+		cat /dev/$envdev |
+		tr '\n\000' '\r\n' |
+		tail -c +5 | tail -c +${copies-1} |
+		sed -ne '/^$/,$d' -e "s/^$1=//p"
+	fi
 }
 
 setup_resolv() {
@@ -149,13 +153,6 @@ HERE
 		exec /bin/sh
 	fi
 }
-
-env=$(findmtd u-boot-env)
-if test -n $env
-then
-	ln -s /dev/$env /run/mtd:u-boot-env
-	cp /run/mtd:u-boot-env /run/fw_env
-fi
 
 rofs=$(findmtd rofs)
 rwfs=$(findmtd rwfs)

@@ -1,0 +1,1 @@
+SUBSYSTEM=="mtd", SYMLINK+="mtd/%s{name}"
