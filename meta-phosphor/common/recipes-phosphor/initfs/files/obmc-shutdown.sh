@@ -33,12 +33,6 @@ set +x
 update=/run/initramfs/update
 image=/run/initramfs/image-
 
-if test -s /run/fw_env -a -c /run/mtd:u-boot-env -a ! -e ${image}u-boot-env &&
-	! cmp /run/mtd:u-boot-env /run/fw_env
-then
-	ln -sn /run/fw_env ${image}u-boot-env
-fi
-
 if ls $image* > /dev/null 2>&1
 then
 	if test -x $update
