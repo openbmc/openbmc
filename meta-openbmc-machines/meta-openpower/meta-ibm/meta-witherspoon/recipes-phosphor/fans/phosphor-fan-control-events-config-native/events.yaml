@@ -20,6 +20,26 @@ groups:
       members:
           - /temperature/ambient
 
+conditions:
+    - name: occ0_active
+      description: Check that D-Bus property indicates OCC0 in active state
+      type: PropertyChanged
+      properties:
+        - interface: org.open_power.OCC.Status
+          path: /org/open_power/control/occ0
+          property: OccActive
+          type: bool
+          value: true
+    - name: occ1_active
+      description: Check that D-Bus property indicates OCC1 in active state
+      type: PropertyChanged
+      properties:
+        - interface: org.open_power.OCC.Status
+          path: /org/open_power/control/occ1
+          property: OccActive
+          type: bool
+          value: true
+
 actions:
     - name: count_state_before_speed
       description: Set the speed when a number of properties at a state
