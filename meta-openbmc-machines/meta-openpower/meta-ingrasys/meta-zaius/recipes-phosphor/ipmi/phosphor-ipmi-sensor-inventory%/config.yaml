@@ -1,0 +1,34 @@
+0x21:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu0
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
+0x71:
+  sensorType: 0x07
+  path: /system/chassis/motherboard/cpu1
+  sensorReadingType: 0x6F
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          deassert: true
+          assert: false
+          type: bool
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          deassert: false
+          assert: true
+          type: bool
