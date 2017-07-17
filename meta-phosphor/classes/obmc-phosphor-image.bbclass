@@ -77,6 +77,7 @@ IMAGE_FEATURES += " \
         ssh-server-dropbear \
         obmc-debug-collector \
         obmc-network-mgmt \
+        obmc-settings \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
