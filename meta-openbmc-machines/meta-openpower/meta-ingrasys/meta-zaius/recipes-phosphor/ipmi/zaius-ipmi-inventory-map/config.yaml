@@ -1,1 +1,49 @@
-# This file is a stub.
+1:
+  /system/chassis/motherboard/cpu0:
+    xyz.openbmc_project.Inventory.Decorator.Revision:
+      Version:
+        IPMIFruProperty: Custom Field 2
+        IPMIFruSection: Board
+        IPMIFruValueDelimiter: 58
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+      BuildDate:
+        IPMIFruProperty: Mfg Date
+        IPMIFruSection: Board
+      PartNumber:
+        IPMIFruProperty: Part Number
+        IPMIFruSection: Board
+      Manufacturer:
+        IPMIFruProperty: Manufacturer
+        IPMIFruSection: Board
+      SerialNumber:
+        IPMIFruProperty: Serial Number
+        IPMIFruSection: Board
+    xyz.openbmc_project.Inventory.Item:
+      PrettyName:
+        IPMIFruProperty: Name
+        IPMIFruSection: Board
+2:
+  /system/chassis/motherboard/cpu1:
+    xyz.openbmc_project.Inventory.Decorator.Revision:
+      Version:
+        IPMIFruProperty: Custom Field 2
+        IPMIFruSection: Board
+        IPMIFruValueDelimiter: 58
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+      BuildDate:
+        IPMIFruProperty: Mfg Date
+        IPMIFruSection: Board
+      PartNumber:
+        IPMIFruProperty: Part Number
+        IPMIFruSection: Board
+      Manufacturer:
+        IPMIFruProperty: Manufacturer
+        IPMIFruSection: Board
+      SerialNumber:
+        IPMIFruProperty: Serial Number
+        IPMIFruSection: Board
+    xyz.openbmc_project.Inventory.Item:
+      PrettyName:
+        IPMIFruProperty: Name
+        IPMIFruSection: Board
+        Value: False
