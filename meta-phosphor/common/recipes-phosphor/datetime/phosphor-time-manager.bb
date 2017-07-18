@@ -17,7 +17,7 @@ RDEPENDS_${PN} += "libmapper"
 RDEPENDS_${PN} += "libsystemd"
 
 SRC_URI += "git://github.com/openbmc/phosphor-time-manager"
-SRCREV = "25b4ce95f9d0bea33fbf0364e72f304542a19bc5"
+SRCREV = "eaee45522525b0b6d479cf9ac6afe4767648d258"
 S = "${WORKDIR}/git"
 
 DBUS_SERVICE_${PN} += "org.openbmc.TimeManager.service"
