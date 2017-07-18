@@ -57,11 +57,12 @@ mount_squashfs() {
     mkdir "${mountdir}"
   fi
 
-  # Create a static ubi volume of arbitrary size 32MB,
-  # the volume will shrink to fit the pnor image if smaller
+  # Create a static ubi volume of arbitrary size 24MB,
+  # the current pnor image is ~19MB
+  # TODO Set size based on file size openbmc/openbmc#1840
   vol="$(findubi "${name}")"
   if [ -z "${vol}" ]; then
-    ubimkvol "${ubidev}" -N "${name}" -s 32MiB --type=static
+    ubimkvol "${ubidev}" -N "${name}" -s 24MiB --type=static
     vol="$(findubi "${name}")"
   fi
 
@@ -86,15 +87,19 @@ mount_ubi() {
   ubidev="/dev/ubi${pnor}"
   mountdir="/media/${name}"
 
+  if [[ "${name}" == "pnor-prsv" ]]; then
+    size="2MiB"
+  else
+    size="16MiB"
+  fi
+
   if [ ! -d "${mountdir}" ]; then
     mkdir "${mountdir}"
   fi
 
-  # Create a dynamic ubi volume of initial arbitrary size 1MB,
-  # the volume will grow dynamically as needed
   vol="$(findubi "${name}")"
   if [ -z "${vol}" ]; then
-    ubimkvol "${ubidev}" -N "${name}" -s 1MiB
+    ubimkvol "${ubidev}" -N "${name}" -s "${size}"
   fi
 
   if ! is_mounted "${name}"; then
