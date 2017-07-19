@@ -33,3 +33,8 @@
     Interface: xyz.openbmc_project.Time.Synchronization
     Defaults:
         TimeSyncMethod: Synchronization::Method::NTP
+
+/xyz/openbmc_project/control/host0/TpmEnable:
+    Interface: xyz.openbmc_project.Control.Tpm.Policy
+    Defaults:
+        TpmEnable: 'false'
