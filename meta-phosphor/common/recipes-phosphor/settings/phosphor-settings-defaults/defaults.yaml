@@ -79,3 +79,9 @@
     Properties:
         RestrictionMode:
             Default: RestrictionMode::Modes::None
+
+/xyz/openbmc_project/control/host0/TPMEnable:
+    Interface: xyz.openbmc_project.Control.TPM.Policy
+    Properties:
+        TPMEnable:
+           Default: 'false'
