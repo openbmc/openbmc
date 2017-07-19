@@ -73,3 +73,9 @@
             Default: '"0.0.0.0"'
         Type:
             Default: IP::Protocol::IPv4
+
+/xyz/openbmc_project/control/host0/TPMEnable:
+    Interface: xyz.openbmc_project.Control.TPM.Policy
+    Properties:
+        TPMEnable:
+           Default: 'false'
