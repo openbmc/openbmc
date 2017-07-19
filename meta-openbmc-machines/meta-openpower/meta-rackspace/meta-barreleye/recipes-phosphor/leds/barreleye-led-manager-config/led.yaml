@@ -1,6 +1,6 @@
 BmcBooted:
     heartbeat:
-        Action: 'On'
+        Action: 'Blink'
         DutyOn: 50
         Period: 0
 PowerOn:
