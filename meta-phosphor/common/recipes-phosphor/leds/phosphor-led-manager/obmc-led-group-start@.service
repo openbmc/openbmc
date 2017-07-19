@@ -2,6 +2,8 @@
 Description=Assert %i LED
 Wants=mapper-wait@-xyz-openbmc_project-led-groups-%i.service
 After=mapper-wait@-xyz-openbmc_project-led-groups-%i.service
+Wants=multi-user.target
+After=multi-user.target
 Conflicts=obmc-led-group-stop@%i.service
 
 [Service]
