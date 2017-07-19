@@ -53,5 +53,7 @@ INSTFMT = "obmc-led-group-{0}@power_on.service"
 FMT = "../${TMPLFMT}:${TGTFMT}.wants/${INSTFMT}"
 SYSTEMD_LINK_${PN}-ledmanager += "${@compose_list(d, 'FMT', 'STATES')}"
 
+# Install the override to set up a Conflicts relation
+SYSTEMD_OVERRIDE_${PN}-ledmanager += "bmc_booted.conf:obmc-led-group-start@bmc_booted.service.d/bmc_booted.conf"
 
 EXTRA_OECONF = "YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN}"
