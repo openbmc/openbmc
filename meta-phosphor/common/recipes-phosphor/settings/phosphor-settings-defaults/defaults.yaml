@@ -47,3 +47,7 @@
         Origin: IP::AddressOrigin::Static
         Gateway: '"0.0.0.0"'
         Type: IP::Protocol::IPv4
+/xyz/openbmc_project/control/host0/TPMEnable:
+    Interface: xyz.openbmc_project.Control.Tpm.Policy
+    Defaults:
+        TpmEnable: 'false'
