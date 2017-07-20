@@ -3,14 +3,13 @@ LICENSE = "Apache-2.0"
 
 SRC_URI += "git://github.com/open-power/skiboot.git;nobranch=1"
 SRC_URI += "file://0001-external-Use-more-standard-PREFIX-vs-prefix.patch"
-SRC_URI += "file://0002-libflash-libffs-Correctly-update-the-actual-size-of-.patch"
 
 FILESEXTRAPATHS_append := "${THISDIR}/skiboot:"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "skiboot-5.6.0"
-PV = "5.6.0"
+SRCREV = "v5.7-rc2"
+PV = "v5.7-rc2"
 
 S = "${WORKDIR}/git"
 
