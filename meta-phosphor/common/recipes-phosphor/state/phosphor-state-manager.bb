@@ -80,12 +80,12 @@ INSTFMT = "phosphor-discover-system-state@{0}.service"
 FMT = "../${TMPL}:${SYSTEMD_DEFAULT_TARGET}.wants/${INSTFMT}"
 SYSTEMD_LINK_${PN}-discover += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 
-# Force the shutdown target to run the host-stop target
-HOST_STOP_TMPL = "obmc-host-stop@.target"
+# Force the shutdown target to run the chassis-poweroff target
+CHASSIS_STOP_TMPL = "obmc-chassis-poweroff@.target"
 HOST_STOP_TGTFMT = "obmc-host-shutdown@{1}.target"
-HOST_STOP_INSTFMT = "obmc-host-stop@{0}.target"
-HOST_STOP_FMT = "../${HOST_STOP_TMPL}:${HOST_STOP_TGTFMT}.requires/${HOST_STOP_INSTFMT}"
-SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_STOP_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
+CHASSIS_STOP_INSTFMT = "obmc-chassis-poweroff@{0}.target"
+HOST_STOP_FMT = "../${CHASSIS_STOP_TMPL}:${HOST_STOP_TGTFMT}.requires/${CHASSIS_STOP_INSTFMT}"
+SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_STOP_FMT', 'OBMC_CHASSIS_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
 SRCREV = "181f8364f81fc8864e9ae86f28de13f80cd9bbf9"
