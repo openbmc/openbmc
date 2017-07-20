@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/phosphor-fan-monitor-config:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
