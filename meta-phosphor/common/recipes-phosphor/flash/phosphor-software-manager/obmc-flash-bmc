@@ -16,6 +16,17 @@ findubi() {
   echo "${u}"
 }
 
+# Append to the bootargs env variable the info needed to instruct the
+# kernel to attach ubi to it (ubi.mtd=name,0,0,number). Ex: ubi.mtd=alt,0,0,6
+set_bootargs_ubi() {
+  bootargs="$(fw_printenv -n bootargs)"
+  ubimtd="ubi.mtd=$1,0,0,$2"
+  if [[ ! "${bootargs}" =~ "${ubimtd}" ]]; then
+    bootargs="${bootargs} ${ubimtd}"
+    fw_setenv bootargs "${bootargs}"
+  fi
+}
+
 ubi_rw() {
   rwmtd="$(findmtd "${reqmtd}")"
   rw="${rwmtd#mtd}"
@@ -31,6 +42,8 @@ ubi_rw() {
   if [ -z "${vol}" ]; then
     ubimkvol "${ubidev}" -N "${name}" -s 4MiB
   fi
+
+  set_bootargs_ubi "${reqmtd}" "${rw}"
 }
 
 ubi_ro() {
@@ -45,6 +58,8 @@ ubi_ro() {
     ubimkvol "${ubidev}" -N "${name}" -s "${imgsize}" --type=static
     vol="$(findubi "${name}")"
   fi
+
+  set_bootargs_ubi "${reqmtd}" "${ro}"
 }
 
 # Squashfs images need a ubi block
