@@ -28,6 +28,11 @@ attach_ubi() {
   pnor="${pnormtd#mtd}"
   pnordev="/dev/mtd${pnor}"
 
+  if [ -d "/sys/class/ubi/ubi${pnor}" ]; then
+    # Already attached
+    return 0
+  fi
+
   ubiattach /dev/ubi_ctrl -m "${pnor}" -d "${pnor}"
   rc=$?
   if [ ${rc} -ne 0 ]; then
