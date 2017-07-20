@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/phosphor-fan-control-events-config:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
