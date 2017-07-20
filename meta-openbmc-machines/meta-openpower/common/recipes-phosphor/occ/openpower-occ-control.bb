@@ -29,4 +29,6 @@ RDEPENDS_${PN} += " \
                phosphor-dbus-interfaces \
                "
 
+EXTRA_OECONF_append = "${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'i2c-occ', ' --enable-i2c-occ', '', d)}"
+
 S = "${WORKDIR}/git"
