@@ -33,10 +33,21 @@ set +x
 update=/run/initramfs/update
 image=/run/initramfs/image-
 
+wdt="-t 1 -T 5"
+wdrst="-T 15"
+
 if ls $image* > /dev/null 2>&1
 then
 	if test -x $update
 	then
+		if test -c /dev/watchdog
+		then
+			echo Pinging watchdog ${wdt+with args $wdt}
+			watchdog $wdt -F /dev/watchdog &
+			wd=$!
+		else
+			wd=
+		fi
 		$update --clean-saved-files
 		remaining=$(ls $image*)
 		if test -n "$remaining"
@@ -45,6 +56,20 @@ then
 			echo 1>&2 "$remaining"
 		else
 			echo "Flash update completed."
+		fi
+
+		if test -n "$wd"
+		then
+			kill -9 $wd
+			if test -n "$wdrst"
+			then
+				echo Reseting watchdog timeouts to $wdrst
+				watchdog $wdrst -F /dev/watchdog &
+				sleep 1
+				# Kill the watchdog daemon, setting a timeout
+				# for the remaining shutdown work
+				kill -9 $!
+			fi
 		fi
 	else
 		echo 1>&2 "Flash update requested but $update program missing!"
