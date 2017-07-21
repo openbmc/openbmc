@@ -1,0 +1,7 @@
+[Unit]
+Description=Deletes BMC read-write ubi volume
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart={sbindir}/obmc-flash-bmc ubiremove rw
