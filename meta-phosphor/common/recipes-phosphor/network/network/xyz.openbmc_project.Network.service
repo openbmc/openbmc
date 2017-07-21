@@ -1,5 +1,6 @@
 [Unit]
 Description=Phosphor Network Manager
+After=obmc-mapper.target
 
 [Service]
 ExecStart={sbindir}/phosphor-network-manager
