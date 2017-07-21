@@ -63,6 +63,8 @@ DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-ubirw.service \
     obmc-flash-bmc-ubiro@.service \
+    obmc-flash-bmc-ubirw-remove.service \
+    obmc-flash-bmc-ubiro-remove@.service \
     "
 
 # Name of the mtd device where the ubi volumes should be created
