@@ -47,3 +47,8 @@
         Origin: IP::AddressOrigin::Static
         Gateway: '"0.0.0.0"'
         Type: IP::Protocol::IPv4
+
+/xyz/openbmc_project/control/host0/restriction_mode:
+    Interface: xyz.openbmc_project.Control.Security.RestrictionMode
+    Defaults:
+        RestrictionMode: RestrictionMode::Modes::Whitelist
