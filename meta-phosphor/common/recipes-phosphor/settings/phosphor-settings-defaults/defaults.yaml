@@ -73,3 +73,15 @@
             Default: '"0.0.0.0"'
         Type:
             Default: IP::Protocol::IPv4
+    Defaults:
+        Address: '"0.0.0.0"'
+        PrefixLength: 0
+        Origin: IP::AddressOrigin::Static
+        Gateway: '"0.0.0.0"'
+        Type: IP::Protocol::IPv4
+
+/xyz/openbmc_project/control/host0/restriction_mode:
+    Interface: xyz.openbmc_project.Control.Security.RestrictionMode
+    Properties:
+        RestrictionMode:
+            Default: RestrictionMode::Modes::Whitelist
