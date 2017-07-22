@@ -1,3 +1,10 @@
+# WARNING!
+#
+# These modifications to os-release disable the bitbake parse
+# cache (for the os-release recipe only).  Before copying
+# and pasting into another recipe ensure it is understood
+# what that means!
+
 def run_git(d, cmd):
     try:
         oeroot = d.getVar('COREBASE', True)
@@ -20,5 +27,6 @@ python() {
 }
 
 OS_RELEASE_FIELDS_append = " BUILD_ID"
-do_compile[nostamp] = "1"
-do_compile[vardepsexclude] = "BUILD_ID VERSION VERSION_ID NAME PRETTY_NAME"
+
+# Ensure the git commands run every time bitbake is invoked.
+BB_DONT_CACHE = "1"
