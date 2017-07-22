@@ -2,9 +2,6 @@
 #@NAME: OpenBMC
 #@DESCRIPTION: Common machine configuration for OpenBMC chips
 
-MACHINE_EXTRA_RRECOMMENDS = " kernel-modules"
-EXTRA_IMAGEDEPENDS += "u-boot"
-
 KERNEL_CLASSES ?= "kernel-fitimage"
 KERNEL_IMAGETYPES ?= "fitImage"
 KERNEL_EXTRA_ARGS += "LOADADDR=${UBOOT_ENTRYPOINT}"
