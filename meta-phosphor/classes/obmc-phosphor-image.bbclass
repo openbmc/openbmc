@@ -95,14 +95,6 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
 
 OBMC_IMAGE_EXTRA_INSTALL ?= ""
 
-def image_overlay_enabled(d, ifEnabledStr):
-        if d.getVar('OBMC_PHOSPHOR_IMAGE_OVERLAY', True) != "1":
-            return ""
-        return ifEnabledStr
-
-IMAGE_FSTYPES += "${@image_overlay_enabled(d, "overlay")}"
-inherit ${@image_overlay_enabled(d, "image-overlay")}
-
 do_image_complete[depends] += "obmc-phosphor-debug-tarball:do_image_complete"
 
 # The /etc/version file is misleading and not useful.  Remove it.
