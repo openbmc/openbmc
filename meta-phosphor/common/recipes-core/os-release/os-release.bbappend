@@ -17,8 +17,17 @@ python() {
     build_id = run_git(d, 'describe --abbrev=0')
     if build_id:
         d.setVar('BUILD_ID', build_id)
+
+    # The default sstate setup gets in the way here.
+    # Given the low impact nature of this recipe
+    # just don't bother with it at all.
+    tasks = filter(lambda k: d.getVarFlag(k, "task", True), d.keys())
+    for task in tasks:
+        if task.endswith("_setscene"):
+            bb.build.deltask(task, d)
 }
 
 OS_RELEASE_FIELDS_append = " BUILD_ID"
-do_compile[nostamp] = "1"
-do_compile[vardepsexclude] = "BUILD_ID VERSION VERSION_ID NAME PRETTY_NAME"
+
+# Ensure the git commands run every time bitbake is invoked.
+BB_DONT_CACHE = "1"
