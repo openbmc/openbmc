@@ -1,5 +1,1 @@
----
-org.openbmc.settings.Host:
-    settings:
-        powerpolicy:
-            default: "ALWAYS_POWER_ON"
+../phosphor-settings-manager/powerpolicy-default-ALWAYS_POWER_ON.override.yml
