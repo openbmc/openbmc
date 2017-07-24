@@ -43,8 +43,6 @@ do_generate_flash() {
 	rwfs="rwfs.${OVERLAY_BASETYPE}"
 
 	flash="${IMAGE_NAME}.overlay"
-	alltar="${IMAGE_NAME}.all.tar"
-	tar="${IMAGE_NAME}.tar"
 
 	mk_nor_image ${S}/$rwfs ${RWFS_SIZE}
 	if [ "${OVERLAY_BASETYPE}" != jffs2 ]; then
@@ -60,6 +58,24 @@ do_generate_flash() {
 	dd if=$ddir/$rootfs of=$dst bs=1k conv=notrunc seek=${FLASH_ROFS_OFFSET}
 	dd if=${S}/$rwfs of=$dst bs=1k conv=notrunc seek=${FLASH_RWFS_OFFSET}
 
+	cd ${IMGDEPLOYDIR}
+	ln -sf $flash ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.overlay
+
+	# Maintain a number of non-standard name legacy links.
+	ln -sf $flash ${IMGDEPLOYDIR}/flash-${MACHINE}
+}
+
+do_generate_tars() {
+	ddir="${IMGDEPLOYDIR}"
+	kernel="${FLASH_KERNEL_IMAGE}"
+	uboot="u-boot.${UBOOT_SUFFIX}"
+	rootfs="${IMAGE_LINK_NAME}.${IMAGE_BASETYPE}"
+	rwfs="rwfs.${OVERLAY_BASETYPE}"
+
+	flash="${IMAGE_NAME}.overlay"
+	alltar="${IMAGE_NAME}.all.tar"
+	tar="${IMAGE_NAME}.tar"
+
 	# Create some links to help make the tar archives
 	ln -sf $ddir/${IMAGE_LINK_NAME}.overlay ${S}/image-bmc
 	ln -sf ${DEPLOY_DIR_IMAGE}/$uboot ${S}/image-u-boot
@@ -72,16 +88,15 @@ do_generate_flash() {
 	tar -h -cvf $ddir/$tar -C ${S} image-u-boot image-kernel image-rofs image-rwfs
 
 	cd ${IMGDEPLOYDIR}
-	ln -sf $flash ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.overlay
 	ln -sf $alltar ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.all.tar
 	ln -sf $tar ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.tar
 
 	# Maintain a number of non-standard name legacy links.
-	ln -sf $flash ${IMGDEPLOYDIR}/flash-${MACHINE}
 	ln -sf $tar ${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.tar
 	ln -sf $alltar ${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.all.tar
 }
-do_generate_flash[vardepsexclude] = "DATETIME"
+
+do_generate_tars[vardepsexclude] = "DATETIME"
 
 do_generate_flash[depends] += " \
         ${PN}:do_image_${@d.getVar('IMAGE_BASETYPE', True).replace('-', '_')} \
@@ -89,4 +104,9 @@ do_generate_flash[depends] += " \
         u-boot:do_populate_sysroot \
         "
 
+do_generate_tars[depends] += " \
+        ${PN}:do_generate_flash  \
+        "
+
 addtask generate_flash before do_image_complete
+addtask generate_tars before do_image_complete
