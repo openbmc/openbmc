@@ -1,3 +1,7 @@
+# Constructs a bootable, fixed-offset mtd image with u-boot
+# bootloader, kernel fitimage, read only root filesystem,
+# and writeable overlay filesystem.
+
 IMAGE_BASETYPE ?= "squashfs-xz"
 OVERLAY_BASETYPE ?= "jffs2"
 
@@ -5,10 +9,6 @@ IMAGE_TYPES += "overlay"
 
 IMAGE_TYPEDEP_overlay = "${IMAGE_BASETYPE}"
 IMAGE_TYPES_MASKED += "overlay"
-
-FLASH_IMAGE_NAME ?= "flash-${MACHINE}-${DATETIME}"
-FLASH_IMAGE_NAME[vardepsexclude] = "DATETIME"
-FLASH_IMAGE_LINK ?= "flash-${MACHINE}"
 
 FLASH_KERNEL_IMAGE ?= "fitImage-${INITRAMFS_IMAGE}-${MACHINE}.bin"
 
@@ -36,51 +36,57 @@ mk_nor_image() {
 }
 
 do_generate_flash() {
-	ddir="${DEPLOY_DIR_IMAGE}"
+	ddir="${IMGDEPLOYDIR}"
 	kernel="${FLASH_KERNEL_IMAGE}"
 	uboot="u-boot.${UBOOT_SUFFIX}"
 	rootfs="${IMAGE_LINK_NAME}.${IMAGE_BASETYPE}"
 	rwfs="rwfs.${OVERLAY_BASETYPE}"
 
-	if [ ! -f $ddir/$kernel ]; then
-		bbfatal "Kernel file $ddir/$kernel does not exist"
-	fi
-	if [ ! -f $ddir/$uboot ]; then
-		bbfatal "U-boot file $ddir/$uboot does not exist"
-	fi
-	if [ ! -f $ddir/$rootfs ]; then
-		bbfatal "Rootfs file $ddir/$rootfs does not exist"
-	fi
+	flash="${IMAGE_NAME}.overlay"
+	alltar="${IMAGE_NAME}.all.tar"
+	tar="${IMAGE_NAME}.tar"
 
-	mk_nor_image $ddir/$rwfs ${RWFS_SIZE}
+	mk_nor_image ${S}/$rwfs ${RWFS_SIZE}
 	if [ "${OVERLAY_BASETYPE}" != jffs2 ]; then
-		mkfs.${OVERLAY_BASETYPE} ${OVERLAY_MKFS_OPTS} $ddir/$rwfs || \
+		mkfs.${OVERLAY_BASETYPE} ${OVERLAY_MKFS_OPTS} ${S}/$rwfs || \
 			bbfatal "mkfs rwfs"
 	fi
 
-	dst="$ddir/${FLASH_IMAGE_NAME}"
-	rm -rf $dst
+	# Assemble the flash image
+	dst="$ddir/$flash"
 	mk_nor_image $dst ${FLASH_SIZE}
-	dd if=$ddir/$uboot of=$dst bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET}
-	dd if=$ddir/$kernel of=$dst bs=1k conv=notrunc seek=${FLASH_KERNEL_OFFSET}
+	dd if=${DEPLOY_DIR_IMAGE}/$uboot of=$dst bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET}
+	dd if=${DEPLOY_DIR_IMAGE}/$kernel of=$dst bs=1k conv=notrunc seek=${FLASH_KERNEL_OFFSET}
 	dd if=$ddir/$rootfs of=$dst bs=1k conv=notrunc seek=${FLASH_ROFS_OFFSET}
-	dd if=$ddir/$rwfs of=$dst bs=1k conv=notrunc seek=${FLASH_RWFS_OFFSET}
-	dstlink="$ddir/${FLASH_IMAGE_LINK}"
-	rm -rf $dstlink
-	ln -sf ${FLASH_IMAGE_NAME} $dstlink
+	dd if=${S}/$rwfs of=$dst bs=1k conv=notrunc seek=${FLASH_RWFS_OFFSET}
 
-	ln -sf ${FLASH_IMAGE_NAME} $ddir/image-bmc
-	ln -sf $uboot $ddir/image-u-boot
-	ln -sf $kernel $ddir/image-kernel
-	ln -sf $rootfs $ddir/image-rofs
-	ln -sf $rwfs $ddir/image-rwfs
+	# Create some links to help make the tar archives
+	ln -sf $ddir/${IMAGE_LINK_NAME}.overlay ${S}/image-bmc
+	ln -sf ${DEPLOY_DIR_IMAGE}/$uboot ${S}/image-u-boot
+	ln -sf ${DEPLOY_DIR_IMAGE}/$kernel ${S}/image-kernel
+	ln -sf $ddir/$rootfs ${S}/image-rofs
+	ln -sf $rwfs ${S}/image-rwfs
 
-	tar -h -cvf $ddir/${MACHINE}-${DATETIME}.all.tar -C $ddir image-bmc
-	tar -h -cvf $ddir/${MACHINE}-${DATETIME}.tar -C $ddir image-u-boot image-kernel image-rofs image-rwfs
+	# Create the tar archives
+	tar -h -cvf $ddir/$alltar -C ${S} image-bmc
+	tar -h -cvf $ddir/$tar -C ${S} image-u-boot image-kernel image-rofs image-rwfs
+
+	cd ${IMGDEPLOYDIR}
+	ln -sf $flash ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.overlay
+	ln -sf $alltar ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.all.tar
+	ln -sf $tar ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.tar
+
+	# Maintain a number of non-standard name legacy links.
+	ln -sf $flash ${IMGDEPLOYDIR}/flash-${MACHINE}
+	ln -sf $tar ${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.tar
+	ln -sf $alltar ${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.all.tar
 }
 do_generate_flash[vardepsexclude] = "DATETIME"
 
-do_generate_flash[depends] += "${PN}:do_image_complete"
-do_generate_flash[depends] += "u-boot:do_populate_sysroot"
+do_generate_flash[depends] += " \
+        ${PN}:do_image_${@d.getVar('IMAGE_BASETYPE', True).replace('-', '_')} \
+        virtual/kernel:do_deploy \
+        u-boot:do_populate_sysroot \
+        "
 
-addtask generate_flash before do_build
+addtask generate_flash before do_image_complete
