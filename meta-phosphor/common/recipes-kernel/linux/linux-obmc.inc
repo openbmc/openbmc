@@ -12,6 +12,7 @@ SRC_URI += "file://phosphor-gpio-keys.scc"
 SRC_URI += "file://phosphor-gpio-keys.cfg"
 SRC_URI += "file://phosphor-vlan.scc"
 SRC_URI += "file://phosphor-vlan.cfg"
+SRC_URI += "file://0001-drivers-fsi-Improve-SBEFIFO-probing.patch"
 
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"

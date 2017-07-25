@@ -1,0 +1,545 @@
+From c2eaef79adabf5de498a7c3424011c57aee47bdb Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Tue, 25 Jul 2017 16:44:40 -0500
+Subject: [PATCH linux dev-4.10] drivers/fsi: Improve SBEFIFO probing
+
+Create a new SBEFIFO bus type, and register OCC driver on that bus.
+
+Defer the SBEFIFO probe to prevent client devices (OCC, etc) from
+hanging. Clients expect a response from the SBE, so we need to be sure
+that the SBE is in a good state before we allow client access to the
+bus.
+
+If something goes wrong, and the SBE never initializes after FSI is
+scanned, this will poll forever... But it's pretty lightweight with a
+check every 250/500 ms depending on what stage we're at.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ drivers/fsi/fsi-sbefifo.c   | 281 ++++++++++++++++++++++++++++++++++++--------
+ drivers/fsi/occ.c           |  27 ++---
+ include/linux/fsi-sbefifo.h |   3 +
+ 3 files changed, 250 insertions(+), 61 deletions(-)
+
+diff --git a/drivers/fsi/fsi-sbefifo.c b/drivers/fsi/fsi-sbefifo.c
+index d7dccf9..fdf298a 100644
+--- a/drivers/fsi/fsi-sbefifo.c
++++ b/drivers/fsi/fsi-sbefifo.c
+@@ -25,6 +25,7 @@
+ #include <linux/slab.h>
+ #include <linux/timer.h>
+ #include <linux/uaccess.h>
++#include <linux/workqueue.h>
+ 
+ /*
+  * The SBEFIFO is a pipe-like FSI device for communicating with
+@@ -40,12 +41,16 @@
+ 
+ #define SBEFIFO_STS		0x04
+ #define   SBEFIFO_EMPTY			BIT(20)
++#define   SBEFIFO_RESET			BIT(25)
++#define SBEFIFO_RESET_REQ	0xC
+ #define SBEFIFO_EOT_RAISE	0x08
+ #define   SBEFIFO_EOT_MAGIC		0xffffffff
+ #define SBEFIFO_EOT_ACK		0x14
++#define   EOT_MASK			0x000000ff
+ 
+ struct sbefifo {
+ 	struct timer_list poll_timer;
++	struct delayed_work prober;
+ 	struct fsi_device *fsi_dev;
+ 	struct miscdevice mdev;
+ 	wait_queue_head_t wait;
+@@ -56,6 +61,12 @@ struct sbefifo {
+ 	char name[32];
+ 	int idx;
+ 	int rc;
++#define SBEFIFO_PROBE_COMPLETE		1
++#define SBEFIFO_PROBE_RESET		2
++#define SBEFIFO_PROBE_RESET_WAIT	3
++#define SBEFIFO_PROBE_WRITE_DONE	4
++#define SBEFIFO_PROBE_CANCEL		5
++	unsigned long probe_flags;
+ };
+ 
+ struct sbefifo_buf {
+@@ -87,6 +98,13 @@ struct sbefifo_client {
+ 	unsigned long f_flags;
+ };
+ 
++struct sbefifo_device {
++	struct device dev;
++	struct sbefifo *sbefifo;
++};
++
++#define to_sbefifo_device(x)	container_of((x), struct sbefifo_device, dev)
++
+ static struct list_head sbefifo_fifos;
+ 
+ static DEFINE_IDA(sbefifo_ida);
+@@ -357,7 +375,6 @@ static struct sbefifo_xfr *sbefifo_next_xfr(struct sbefifo *sbefifo)
+ 
+ static void sbefifo_poll_timer(unsigned long data)
+ {
+-	static const unsigned long EOT_MASK = 0x000000ff;
+ 	struct sbefifo *sbefifo = (void *)data;
+ 	struct sbefifo_buf *rbuf, *wbuf;
+ 	struct sbefifo_xfr *xfr = NULL;
+@@ -382,6 +399,7 @@ static void sbefifo_poll_timer(unsigned long data)
+ 		rbuf = &drain;
+ 		wbuf = &drain;
+ 		sbefifo_buf_init(&drain);
++		WRITE_ONCE(wbuf->rpos, wbuf->buf + SBEFIFO_BUF_CNT);
+ 		if (!test_bit(SBEFIFO_XFR_RESP_PENDING, &xfr->flags))
+ 			set_bit(SBEFIFO_XFR_WRITE_DONE, &xfr->flags);
+ 	}
+@@ -742,18 +760,16 @@ static int sbefifo_release(struct inode *inode, struct file *file)
+ struct sbefifo_client *sbefifo_drv_open(struct device *dev,
+ 					unsigned long flags)
+ {
+-	struct sbefifo_client *client = NULL;
+-	struct sbefifo *sbefifo;
+-	struct fsi_device *fsi_dev = to_fsi_dev(dev);
++	struct sbefifo_client *client;
++	struct sbefifo_device *sbefifo_dev = to_sbefifo_device(dev);
++	struct sbefifo *sbefifo = sbefifo_dev->sbefifo;
+ 
+-	list_for_each_entry(sbefifo, &sbefifo_fifos, link) {
+-		if (sbefifo->fsi_dev != fsi_dev)
+-			continue;
++	if (!sbefifo)
++		return NULL;
+ 
+-		client = sbefifo_new_client(sbefifo);
+-		if (client)
+-			client->f_flags = flags;
+-	}
++	client = sbefifo_new_client(sbefifo);
++	if (client)
++		client->f_flags = flags;
+ 
+ 	return client;
+ }
+@@ -781,26 +797,183 @@ void sbefifo_drv_release(struct sbefifo_client *client)
+ }
+ EXPORT_SYMBOL_GPL(sbefifo_drv_release);
+ 
+-static int sbefifo_unregister_child(struct device *dev, void *data)
++static int sbefifo_bus_match(struct device *dev, struct device_driver *drv)
+ {
+-	struct platform_device *child = to_platform_device(dev);
++	const struct of_device_id *id;
++	struct device_node *np = dev_of_node(dev);
+ 
+-	of_device_unregister(child);
+-	if (dev->of_node)
+-		of_node_clear_flag(dev->of_node, OF_POPULATED);
++	if (np) {
++		for (id = drv->of_match_table; id; ++id) {
++			if (of_device_is_compatible(np, id->compatible))
++				return 1;
++		}
++	}
+ 
+-	return 0;
++	return strstr(dev_name(dev), drv->name) ? 1 : 0;
++}
++
++static struct bus_type sbefifo_bus_type = {
++	.name = "sbefifo",
++	.match = sbefifo_bus_match,
++};
++
++int sbefifo_driver_register(struct device_driver *drv)
++{
++	drv->bus = &sbefifo_bus_type;
++	return driver_register(drv);
++}
++EXPORT_SYMBOL_GPL(sbefifo_driver_register);
++
++static void sbefifo_device_release(struct device *dev)
++{
++	struct sbefifo_device *sbefifo_dev = to_sbefifo_device(dev);
++
++	of_node_put(dev->of_node);
++	sbefifo_dev->sbefifo = NULL;
++	kfree(sbefifo_dev);
++}
++
++static int sbefifo_start_write(struct sbefifo *sbefifo)
++{
++	int i, rc;
++	__be32 op[4] = {
++		cpu_to_be32(4),
++		cpu_to_be32(0xa403),
++		0,
++		cpu_to_be32(0x6d051)
++	};
++	
++	/* do a scom to test whether sbe is ready to go */
++	for (i = 0; i < ARRAY_SIZE(op); ++i) {
++		rc = sbefifo_writew(sbefifo, (u32)op[i]);
++		if (rc)
++			return rc;
++	}
++
++	return sbefifo_outw(sbefifo, SBEFIFO_UP | SBEFIFO_EOT_RAISE,
++			    SBEFIFO_EOT_MAGIC);
++}
++
++static void sbefifo_do_probe(struct sbefifo *sbefifo)
++{
++	int rc;
++	u32 reg;
++	struct device *dev = &sbefifo->fsi_dev->dev;
++	struct device_node *np;
++	struct sbefifo_device *sbefifo_dev;
++
++	for_each_available_child_of_node(dev_of_node(dev), np) {
++		sbefifo_dev = kzalloc(sizeof(*sbefifo_dev), GFP_KERNEL);
++		if (!sbefifo_dev)
++			return;
++
++		rc = of_property_read_u32(np, "reg", &reg);
++		if (rc)
++			dev_set_name(&sbefifo_dev->dev, np->name);
++		else
++			dev_set_name(&sbefifo_dev->dev, "%s%u", np->name, reg);
++
++		sbefifo_dev->dev.parent = dev;
++		sbefifo_dev->dev.bus = &sbefifo_bus_type;
++		sbefifo_dev->dev.release = sbefifo_device_release;
++		sbefifo_dev->dev.of_node = of_node_get(np);
++
++		rc = device_register(&sbefifo_dev->dev);
++		if (rc) {
++			put_device(&sbefifo_dev->dev);
++			continue;
++		}
++
++		sbefifo_dev->sbefifo = sbefifo;
++	}
++
++	if (!misc_register(&sbefifo->mdev))
++		set_bit(SBEFIFO_PROBE_COMPLETE, &sbefifo->probe_flags);
++}
++
++static void sbefifo_prober(struct work_struct *work)
++{
++	u32 status, drain, dummy = 0x1;
++	int rc, eot;
++	size_t i, devn;
++	struct delayed_work *dwork = to_delayed_work(work);
++	struct sbefifo *sbefifo = container_of(dwork, struct sbefifo, prober);
++
++	if (test_bit(SBEFIFO_PROBE_CANCEL, &sbefifo->probe_flags))
++		return;
++
++	if (test_and_clear_bit(SBEFIFO_PROBE_RESET, &sbefifo->probe_flags)) {
++		rc = sbefifo_outw(sbefifo, SBEFIFO_UP | SBEFIFO_RESET_REQ,
++				  dummy);
++		if (rc)
++			goto err;
++
++		set_bit(SBEFIFO_PROBE_RESET_WAIT, &sbefifo->probe_flags);
++	}
++
++	if (test_bit(SBEFIFO_PROBE_RESET_WAIT, &sbefifo->probe_flags)) {
++		rc = sbefifo_inw(sbefifo, SBEFIFO_UP | SBEFIFO_STS, &status);
++		if (rc)
++			goto err;
++
++		if (status & SBEFIFO_RESET) {
++			/* Still waiting for fifo reset. Reschedule */
++			schedule_delayed_work(dwork, msecs_to_jiffies(250));
++			return;
++		}
++
++		clear_bit(SBEFIFO_PROBE_RESET_WAIT, &sbefifo->probe_flags);
++	}
++
++	if (!test_and_set_bit(SBEFIFO_PROBE_WRITE_DONE,
++	    &sbefifo->probe_flags)) {
++		rc = sbefifo_start_write(sbefifo);
++		if (rc)
++			goto err;
++	}
++
++	rc = sbefifo_inw(sbefifo, SBEFIFO_DWN | SBEFIFO_STS, &status);
++	if (rc)
++		goto err;
++
++	devn = sbefifo_dev_nwreadable(status);
++	if (!devn) {
++		/* No data yet. Reschedule */
++		schedule_delayed_work(dwork, msecs_to_jiffies(500));
++		return;
++	}
++
++	eot = (status & EOT_MASK) != 0;
++	if (eot)
++		devn--;
++
++	for (i = 0; i < devn; ++i) {
++		rc = sbefifo_readw(sbefifo, &drain);
++		if (rc)
++			goto err;
++	}
++
++	if (eot)
++		sbefifo_ack_eot(sbefifo);
++	else {
++		/* Need to read more data. Reschedule immediately */
++		schedule_delayed_work(dwork, 0);
++		return;
++	}
++
++	sbefifo_do_probe(sbefifo);
++
++	return;
++err:
++	sbefifo->rc = rc;
+ }
+ 
+ static int sbefifo_probe(struct device *dev)
+ {
+ 	struct fsi_device *fsi_dev = to_fsi_dev(dev);
+ 	struct sbefifo *sbefifo;
+-	struct device_node *np;
+-	struct platform_device *child;
+-	char child_name[32];
+ 	u32 sts;
+-	int ret, child_idx = 0;
++	int ret;
+ 
+ 	dev_info(dev, "Found sbefifo device\n");
+ 	sbefifo = kzalloc(sizeof(*sbefifo), GFP_KERNEL);
+@@ -813,20 +986,16 @@ static int sbefifo_probe(struct device *dev)
+ 			SBEFIFO_UP | SBEFIFO_STS, &sts);
+ 	if (ret)
+ 		return ret;
+-	if (!(sts & SBEFIFO_EMPTY)) {
+-		dev_err(&sbefifo->fsi_dev->dev,
+-				"Found data in upstream fifo\n");
+-		return -EIO;
+-	}
++
++	if (!(sts & SBEFIFO_EMPTY))
++		set_bit(SBEFIFO_PROBE_RESET, &sbefifo->probe_flags);
+ 
+ 	ret = sbefifo_inw(sbefifo, SBEFIFO_DWN | SBEFIFO_STS, &sts);
+ 	if (ret)
+ 		return ret;
+-	if (!(sts & SBEFIFO_EMPTY)) {
+-		dev_err(&sbefifo->fsi_dev->dev,
+-				"Found data in downstream fifo\n");
+-		return -EIO;
+-	}
++
++	if (!(sts & SBEFIFO_EMPTY))
++		set_bit(SBEFIFO_PROBE_RESET, &sbefifo->probe_flags);
+ 
+ 	sbefifo->mdev.minor = MISC_DYNAMIC_MINOR;
+ 	sbefifo->mdev.fops = &sbefifo_fops;
+@@ -840,26 +1009,24 @@ static int sbefifo_probe(struct device *dev)
+ 			sbefifo->idx);
+ 	init_waitqueue_head(&sbefifo->wait);
+ 	INIT_LIST_HEAD(&sbefifo->xfrs);
++	INIT_DELAYED_WORK(&sbefifo->prober, sbefifo_prober);
+ 
+ 	/* This bit of silicon doesn't offer any interrupts... */
+ 	setup_timer(&sbefifo->poll_timer, sbefifo_poll_timer,
+ 			(unsigned long)sbefifo);
+ 
+-	if (dev->of_node) {
+-		/* create platform devs for dts child nodes (occ, etc) */
+-		for_each_child_of_node(dev->of_node, np) {
+-			snprintf(child_name, sizeof(child_name), "%s-dev%d",
+-				 sbefifo->name, child_idx++);
+-			child = of_platform_device_create(np, child_name, dev);
+-			if (!child)
+-				dev_warn(&sbefifo->fsi_dev->dev,
+-					 "failed to create child node dev\n");
+-		}
+-	}
+-
+ 	list_add(&sbefifo->link, &sbefifo_fifos);
++
++	schedule_delayed_work(&sbefifo->prober, 0);
+ 	
+-	return misc_register(&sbefifo->mdev);
++	return 0;
++}
++
++static int sbefifo_unregister_child(struct device *dev, void *data)
++{
++	device_unregister(dev);
++
++	return 0;
+ }
+ 
+ static int sbefifo_remove(struct device *dev)
+@@ -872,9 +1039,15 @@ static int sbefifo_remove(struct device *dev)
+ 		if (sbefifo->fsi_dev != fsi_dev)
+ 			continue;
+ 
++		set_bit(SBEFIFO_PROBE_CANCEL, &sbefifo->probe_flags);
++		if (!cancel_delayed_work(&sbefifo->prober))
++			flush_delayed_work(&sbefifo->prober);
++
++		if (test_bit(SBEFIFO_PROBE_COMPLETE, &sbefifo->probe_flags))
++			misc_deregister(&sbefifo->mdev);
++
+ 		device_for_each_child(dev, NULL, sbefifo_unregister_child);
+ 
+-		misc_deregister(&sbefifo->mdev);
+ 		list_del(&sbefifo->link);
+ 		ida_simple_remove(&sbefifo_ida, sbefifo->idx);
+ 
+@@ -915,13 +1088,29 @@ static int sbefifo_remove(struct device *dev)
+ 
+ static int sbefifo_init(void)
+ {
++	int rc;
++
+ 	INIT_LIST_HEAD(&sbefifo_fifos);
+-	return fsi_driver_register(&sbefifo_drv);
++
++	rc = bus_register(&sbefifo_bus_type);
++	if (rc)
++		return rc;
++
++	rc = fsi_driver_register(&sbefifo_drv);
++	if (rc)
++		goto err;
++
++	return 0;
++
++err:
++	bus_unregister(&sbefifo_bus_type);
++	return rc;
+ }
+ 
+ static void sbefifo_exit(void)
+ {
+ 	fsi_driver_unregister(&sbefifo_drv);
++	bus_unregister(&sbefifo_bus_type);
+ }
+ 
+ module_init(sbefifo_init);
+diff --git a/drivers/fsi/occ.c b/drivers/fsi/occ.c
+index d984e51..db67964 100644
+--- a/drivers/fsi/occ.c
++++ b/drivers/fsi/occ.c
+@@ -684,28 +684,27 @@ static int occ_unregister_child(struct device *dev, void *data)
+ 	return 0;
+ }
+ 
+-static int occ_probe(struct platform_device *pdev)
++static int occ_probe(struct device *dev)
+ {
+ 	int rc, child_idx = 0;
+ 	u32 reg;
+ 	struct occ *occ;
+ 	struct device_node *np;
+ 	struct platform_device *child;
+-	struct device *dev = &pdev->dev;
+ 	char child_name[32];
+ 
+ 	occ = devm_kzalloc(dev, sizeof(*occ), GFP_KERNEL);
+ 	if (!occ)
+ 		return -ENOMEM;
+ 
+-	occ->sbefifo = dev->parent;
++	occ->sbefifo = dev;
+ 	INIT_LIST_HEAD(&occ->xfrs);
+ 	spin_lock_init(&occ->list_lock);
+ 	mutex_init(&occ->occ_lock);
+ 	INIT_WORK(&occ->work, occ_worker);
+ 
+ 	/* ensure NULL before we probe children, so they don't hang FSI */
+-	platform_set_drvdata(pdev, NULL);
++	dev_set_drvdata(dev, NULL);
+ 
+ 	if (dev->of_node) {
+ 		rc = of_property_read_u32(dev->of_node, "reg", &reg);
+@@ -732,7 +731,7 @@ static int occ_probe(struct platform_device *pdev)
+ 	} else
+ 		occ->idx = ida_simple_get(&occ_ida, 1, INT_MAX, GFP_KERNEL);
+ 
+-	platform_set_drvdata(pdev, occ);
++	dev_set_drvdata(dev, occ);
+ 
+ 	snprintf(occ->name, sizeof(occ->name), "occ%d", occ->idx);
+ 	occ->mdev.fops = &occ_fops;
+@@ -749,13 +748,13 @@ static int occ_probe(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-static int occ_remove(struct platform_device *pdev)
++static int occ_remove(struct device *dev)
+ {
+-	struct occ *occ = platform_get_drvdata(pdev);
++	struct occ *occ = dev_get_drvdata(dev);
+ 
+ 	flush_work(&occ->work);
+ 	misc_deregister(&occ->mdev);
+-	device_for_each_child(&pdev->dev, NULL, occ_unregister_child);
++	device_for_each_child(dev, NULL, occ_unregister_child);
+ 	ida_simple_remove(&occ_ida, occ->idx);
+ 
+ 	return 0;
+@@ -766,11 +765,9 @@ static int occ_remove(struct platform_device *pdev)
+ 	{ },
+ };
+ 
+-static struct platform_driver occ_driver = {
+-	.driver = {
+-		.name = "occ",
+-		.of_match_table	= occ_match,
+-	},
++static struct device_driver occ_driver = {
++	.name = "occ",
++	.of_match_table	= occ_match,
+ 	.probe	= occ_probe,
+ 	.remove = occ_remove,
+ };
+@@ -781,14 +778,14 @@ static int occ_init(void)
+ 	if (!occ_wq)
+ 		return -ENOMEM;
+ 
+-	return platform_driver_register(&occ_driver);
++	return sbefifo_driver_register(&occ_driver);
+ }
+ 
+ static void occ_exit(void)
+ {
+ 	destroy_workqueue(occ_wq);
+ 
+-	platform_driver_unregister(&occ_driver);
++	driver_unregister(&occ_driver);
+ }
+ 
+ module_init(occ_init);
+diff --git a/include/linux/fsi-sbefifo.h b/include/linux/fsi-sbefifo.h
+index 1b46c63..4f85140 100644
+--- a/include/linux/fsi-sbefifo.h
++++ b/include/linux/fsi-sbefifo.h
+@@ -17,6 +17,7 @@
+ #define __FSI_SBEFIFO_H__
+ 
+ struct device;
++struct device_driver;
+ struct sbefifo_client;
+ 
+ extern struct sbefifo_client *sbefifo_drv_open(struct device *dev,
+@@ -27,4 +28,6 @@ extern int sbefifo_drv_write(struct sbefifo_client *client, const char *buf,
+ 			     size_t len);
+ extern void sbefifo_drv_release(struct sbefifo_client *client);
+ 
++extern int sbefifo_driver_register(struct device_driver *drv);
++
+ #endif /* __FSI_SBEFIFO_H__ */
+-- 
+1.8.3.1
+
