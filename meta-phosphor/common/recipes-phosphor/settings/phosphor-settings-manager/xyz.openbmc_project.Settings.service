@@ -1,5 +1,6 @@
 [Unit]
 Description=Phosphor Settings Daemon
+Before=mapper-wait@-.service
 
 [Service]
 ExecStart={sbindir}/phosphor-settings-manager

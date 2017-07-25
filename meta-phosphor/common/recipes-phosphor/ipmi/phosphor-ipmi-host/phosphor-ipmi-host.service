@@ -1,4 +1,6 @@
 [Unit]
+Wants=mapper-wait@-.service
+After=mapper-wait@-.service
 Description=Phosphor Inband IPMI
 Wants=clear-once.service
 After=clear-once.service

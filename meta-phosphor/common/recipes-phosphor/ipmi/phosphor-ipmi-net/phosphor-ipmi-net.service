@@ -1,5 +1,7 @@
 [Unit]
 Description=Network IPMI daemon
+Wants=mapper-wait@-.service
+After=mapper-wait@-.service
 
 [Service]
 ExecStart={sbindir}/netipmid
