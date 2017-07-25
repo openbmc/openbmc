@@ -2,5 +2,5 @@
 Description=Power%i Host Off
 Wants={SYSTEMD_DEFAULT_TARGET}
 RefuseManualStop=yes
-OnFailure=obmc-host-stop@%i.target
+OnFailure=obmc-chassis-poweroff@%i.target
 OnFailureJobMode=flush
