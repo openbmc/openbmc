@@ -38,3 +38,6 @@ OS_RELEASE_FIELDS_append = " BUILD_ID"
 
 # Ensure the git commands run every time bitbake is invoked.
 BB_DONT_CACHE = "1"
+
+# Make os-release available to other recipes.
+SYSROOT_DIRS_append = " ${sysconfdir}"
