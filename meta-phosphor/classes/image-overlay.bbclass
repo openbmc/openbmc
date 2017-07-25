@@ -65,7 +65,7 @@ do_generate_flash() {
 	ln -sf $flash ${IMGDEPLOYDIR}/flash-${MACHINE}
 }
 
-do_generate_tars() {
+make_overlay_tars() {
 	ddir="${IMGDEPLOYDIR}"
 	kernel="${FLASH_KERNEL_IMAGE}"
 	uboot="u-boot.${UBOOT_SUFFIX}"
@@ -84,8 +84,8 @@ do_generate_tars() {
 	ln -sf $rwfs ${S}/image-rwfs
 
 	# Create the tar archives
-	tar -h -cvf $ddir/$alltar -C ${S} image-bmc
-	tar -h -cvf $ddir/$tar -C ${S} image-u-boot image-kernel image-rofs image-rwfs
+	tar -h -cvf $ddir/$alltar -C ${S} image-bmc MANIFEST
+	tar -h -cvf $ddir/$tar -C ${S} image-u-boot image-kernel image-rofs image-rwfs MANIFEST
 
 	cd ${IMGDEPLOYDIR}
 	ln -sf $alltar ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.all.tar
@@ -96,7 +96,32 @@ do_generate_tars() {
 	ln -sf $alltar ${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.all.tar
 }
 
-do_generate_tars[vardepsexclude] = "DATETIME"
+make_overlay_tars[vardepsexclude] = "DATETIME"
+
+def generate_manifest(d):
+    import configparser
+    import io
+    path = d.getVar('STAGING_DIR_HOST', True) + d.getVar('sysconfdir', True)
+    path = os.path.join(path, 'os-release')
+    parser = configparser.SafeConfigParser(strict=False)
+    parser.optionxform = str
+    version = ''
+    with open(path, 'r') as fd:
+        buf = '[root]\n' + fd.read()
+        fd = io.StringIO(buf)
+        parser.readfp(fd)
+        version = parser['root']['VERSION_ID']
+
+    with open(os.path.join(d.getVar('S', True), 'MANIFEST'), 'w') as fd:
+        fd.write('purpose=xyz.openbmc_project.Software.Version.VersionPurpose.BMC\n')
+        fd.write('version={}\n'.format(version.strip('"')))
+
+
+python do_generate_tars() {
+    generate_manifest(d)
+    bb.build.exec_func('make_overlay_tars', d)
+}
+
 
 do_generate_flash[depends] += " \
         ${PN}:do_image_${@d.getVar('IMAGE_BASETYPE', True).replace('-', '_')} \
@@ -106,6 +131,7 @@ do_generate_flash[depends] += " \
 
 do_generate_tars[depends] += " \
         ${PN}:do_generate_flash  \
+        os-release:do_populate_sysroot \
         "
 
 addtask generate_flash before do_image_complete
