@@ -52,6 +52,7 @@ RDEPENDS_${PN}-dreport += " \
         systemd \
         ${VIRTUAL-RUNTIME_base-utils} \
         bash \
+        xz \
 "
 
 MGR_SVC ?= "xyz.openbmc_project.Dump.Manager.service"
