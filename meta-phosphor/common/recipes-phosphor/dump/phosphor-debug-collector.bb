@@ -40,6 +40,7 @@ RDEPENDS_${PN}-manager += " \
         sdbusplus \
         phosphor-dbus-interfaces \
         phosphor-logging \
+        xz \
 "
 RDEPENDS_${PN}-monitor += " \
         sdbusplus \
