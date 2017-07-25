@@ -1,9 +1,11 @@
 [Unit]
 Description=Phosphor Time Manager daemon
+Wants=mapper-wait@-xyz-openbmc_project-time-owner.service
+After=mapper-wait@-xyz-openbmc_project-time-owner.service
+Wants=mapper-wait@-xyz-openbmc_project-time-sync_method.service
+After=mapper-wait@-xyz-openbmc_project-time-sync_method.service
 Wants=mapper-wait@-org-openbmc-NetworkManager-Interface.service
 After=mapper-wait@-org-openbmc-NetworkManager-Interface.service
-Wants=mapper-wait@-org-openbmc-settings-host0.service
-After=mapper-wait@-org-openbmc-settings-host0.service
 Wants=mapper-wait@-org-openbmc-control-power0.service
 After=mapper-wait@-org-openbmc-control-power0.service
 
