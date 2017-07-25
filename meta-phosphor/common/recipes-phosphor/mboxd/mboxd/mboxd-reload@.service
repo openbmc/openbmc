@@ -1,8 +1,8 @@
 [Unit]
-Description=Reload mboxd after power off
-Wants=op-wait-power-off@%i.service
-After=op-wait-power-off@%i.service
-Conflicts=obmc-chassis-poweron@%i.target
+Description=Reload mboxd during power on
+Wants=obmc-power-start-pre@%i.target
+Before=obmc-power-start-pre@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 Type=oneshot
@@ -10,4 +10,4 @@ RemainAfterExit=yes
 ExecStart={sbindir}/mboxctl --reset
 
 [Install]
-WantedBy=obmc-chassis-poweroff@%i.target
+WantedBy=obmc-chassis-poweron@%i.target
