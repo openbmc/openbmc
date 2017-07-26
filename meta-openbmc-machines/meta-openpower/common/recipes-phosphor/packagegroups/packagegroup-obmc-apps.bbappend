@@ -23,7 +23,7 @@ RDEPENDS_${PN}-sensors += "obmc-mgr-sensor"
 # Add checkstop monitor as part of host state management package
 # This will kick start a gpio monitor that will catch the
 # host checkstop conditions and takes necessary actions
-RDEPENDS_${PN}-host-state-mgmt += "checkstop-monitor"
+RDEPENDS_${PN}-host-state-mgmt += "checkstop-monitor-native"
 
 # Add openpower debug collector as a requirement for state-mgmt
 # since it is used during checkstop handling.
