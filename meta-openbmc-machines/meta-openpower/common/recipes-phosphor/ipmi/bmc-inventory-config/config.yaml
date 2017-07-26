@@ -1,0 +1,33 @@
+FAN:
+  Interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      PrettyName:
+        IPMIFruSection: Product
+        IPMIFruProperty: "Name"
+
+BOXELDER:
+  Interfaces:
+    xyz.openbmc_project.Inventory.Decorator.Asset:
+      BuildDate:
+        IPMIFruSection: Board
+        IPMIFruProperty: "Mfg Date"
+      Manufacturer:
+        IPMIFruSection: Board
+        IPMIFruProperty: "Manufacturer"
+      PartNumber:
+        IPMIFruSection: Board
+        IPMIFruProperty: "Part Number"
+      SerialNumber:
+        IPMIFruSection: Board
+        IPMIFruProperty: "Serial Number"
+    xyz.openbmc_project.Inventory.Item:
+      PrettyName:
+        IPMIFruSection: Board
+        IPMIFruProperty: "Name"
+
+ETHERNET:
+  Interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      PrettyName:
+        IPMIFruSection: Product
+        IPMIFruProperty: "Name"
