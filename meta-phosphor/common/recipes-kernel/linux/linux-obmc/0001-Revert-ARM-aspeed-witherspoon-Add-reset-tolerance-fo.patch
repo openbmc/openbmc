@@ -1,0 +1,36 @@
+From e5fabdfc176c8b8bc575fcd71237fd7af974b9a5 Mon Sep 17 00:00:00 2001
+From: Patrick Williams <patrick@stwcx.xyz>
+Date: Wed, 26 Jul 2017 14:05:42 -0500
+Subject: [PATCH] Revert "ARM: aspeed: witherspoon: Add reset tolerance for
+ host power GPIOs"
+
+This reverts commit b2cd8101eec3c200940405f12582473617a520f7.
+---
+ arch/arm/mach-aspeed/aspeed.c | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/arch/arm/mach-aspeed/aspeed.c b/arch/arm/mach-aspeed/aspeed.c
+index a9e91d96b820..74611a9c2c79 100644
+--- a/arch/arm/mach-aspeed/aspeed.c
++++ b/arch/arm/mach-aspeed/aspeed.c
+@@ -177,17 +177,7 @@ static void __init do_zaius_setup(void)
+ 
+ static void __init do_witherspoon_setup(void)
+ {
+-	unsigned long reg;
+-
+ 	do_common_setup();
+-
+-	/* Reset tolerance for BMC_POWER_UP (GPIOD1) */
+-	reg = readl(AST_IO(AST_BASE_GPIO | 0x01c));
+-	writel(reg | BIT(25), AST_IO(AST_BASE_GPIO | 0x01c));
+-
+-	/* Reset tolerance for SOFTWARE_PGOOD (GPIOR1) */
+-	reg = readl(AST_IO(AST_BASE_GPIO | 0x12c));
+-	writel(reg | BIT(9), AST_IO(AST_BASE_GPIO | 0x12c));
+ }
+ 
+ static void __init do_romulus_setup(void)
+-- 
+2.13.0
+
