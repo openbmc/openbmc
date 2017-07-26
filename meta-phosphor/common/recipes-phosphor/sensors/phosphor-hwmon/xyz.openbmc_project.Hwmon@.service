@@ -2,6 +2,7 @@
 Description=Phosphor Hwmon Poller
 ConditionFileNotEmpty=/etc/default/obmc/hwmon/%I.conf
 StopWhenUnneeded=true
+After=xyz.openbmc_project.ObjectMapper.service
 
 [Service]
 Restart=always
