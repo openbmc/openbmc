@@ -1,0 +1,43 @@
+# A YAML similar to this sample would have to be generated, for eg with MRW
+# inputs and system configuration, to depict IPMI FRU information.
+#
+# This file maps phosphor dbus inventory properties to IPMI properties
+#
+# This YAML could help generate C++ code.
+# Format of the YAML:
+# Fruid:
+#   Associated Fru paths
+#     d-bus Interfaces
+#       d-bus Properties
+#         IPMI Fru mapping
+#5:
+#  /system/chassis/motherboard/fan1:
+#    xyz.openbmc_project.Inventory.Item:
+#      PrettyName:
+#        IPMIFruProperty: Product Name
+#        IPMIFruSection: Product
+#6:
+#  /system/chassis/motherboard/boxelder/bmc:
+#    xyz.openbmc_project.Inventory.Item:
+#      PrettyName:
+#        IPMIFruProperty: Product Name
+#        IPMIFruSection: Board
+#    xyz.openbmc_project.Inventory.Decorator.Asset:
+#      BuildDate:
+#        IPMIFruProperty: Mfg Date
+#        IPMIFruSection: Board
+#      SerialNumber:
+#        IPMIFruProperty: Serial Number
+#        IPMIFruSection: Board
+#      PartNumber:
+#        IPMIFruProperty: Part Number
+#        IPMIFruSection: Board
+#      Manufacturer:
+#        IPMIFruProperty: Manufacturer
+#        IPMIFruSection: Board
+#7:
+#  /system/chassis/motherboard/boxelder/bmc/ethernet:
+#    xyz.openbmc_project.Inventory.Item:
+#      PrettyName:
+#        IPMIFruProperty: Product Name
+#        IPMIFruSection: Product
