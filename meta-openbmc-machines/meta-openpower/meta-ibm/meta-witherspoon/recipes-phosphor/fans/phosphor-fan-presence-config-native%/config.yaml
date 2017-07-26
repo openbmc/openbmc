@@ -1,6 +1,10 @@
 - name: fan0
   path: /system/chassis/motherboard/fan0
   methods:
+    - type: gpio
+      key: 4
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event
     - type: tach
       sensors:
         - fan0_0
@@ -11,6 +15,10 @@
 - name: fan1
   path: /system/chassis/motherboard/fan1
   methods:
+    - type: gpio
+      key: 5
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event
     - type: tach
       sensors:
         - fan1_0
@@ -21,6 +29,10 @@
 - name: fan2
   path: /system/chassis/motherboard/fan2
   methods:
+    - type: gpio
+      key: 6
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event
     - type: tach
       sensors:
         - fan2_0
@@ -31,6 +43,10 @@
 - name: fan3
   path: /system/chassis/motherboard/fan3
   methods:
+    - type: gpio
+      key: 7
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060
+      devpath: /dev/input/by-path/platform-gpio-keys-polled-event
     - type: tach
       sensors:
         - fan3_0
