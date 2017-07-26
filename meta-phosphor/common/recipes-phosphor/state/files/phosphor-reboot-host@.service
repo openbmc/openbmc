@@ -1,0 +1,11 @@
+[Unit]
+Description=Reboot host%i
+Wants=obmc-host-stop@%i.target
+After=obmc-host-stop@%i.target
+
+[Service]
+ExecStart={base_bindir}/systemctl start obmc-host-start@%i.target
+
+
+[Install]
+WantedBy=obmc-host-reboot@%i.target
