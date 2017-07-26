@@ -40,7 +40,8 @@ HOST_SYNCH_TARGETS = "start-pre starting started stop-pre stopping stopped reset
 #            quiesce target but the only delta is that this target contains
 #            multiple services and one of them is the quiesce target.
 # - timeout: Target to run when host watchdog times out
-HOST_ACTION_TARGETS = "start stop quiesce reset shutdown crash timeout"
+# - reboot:  Reboot the host
+HOST_ACTION_TARGETS = "start stop quiesce reset shutdown crash timeout reboot"
 
 CHASSIS_SYNCH_FMT = "obmc-power-{0}@.target"
 CHASSIS_ACTION_FMT = "obmc-chassis-{0}@.target"
