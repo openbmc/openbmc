@@ -1,32 +1,32 @@
 50:
-    /system/chassis/motherboard/fan0:
+  /system/chassis/motherboard/fan0:
     xyz.openbmc_project.Inventory.Item:
       PrettyName:
-        IPMIFruProperty: Name
+        IPMIFruProperty: Product Name
         IPMIFruSection: Product
 51:
-    /system/chassis/motherboard/fan1:
+  /system/chassis/motherboard/fan1:
     xyz.openbmc_project.Inventory.Item:
       PrettyName:
-        IPMIFruProperty: Name
+        IPMIFruProperty: Product Name
         IPMIFruSection: Product
 52:
-    /system/chassis/motherboard/fan2:
+  /system/chassis/motherboard/fan2:
     xyz.openbmc_project.Inventory.Item:
       PrettyName:
-        IPMIFruProperty: Name
+        IPMIFruProperty: Product Name
         IPMIFruSection: Product
 53:
-    /system/chassis/motherboard/fan3:
+  /system/chassis/motherboard/fan3:
     xyz.openbmc_project.Inventory.Item:
       PrettyName:
-        IPMIFruProperty: Name
+        IPMIFruProperty: Product Name
         IPMIFruSection: Product
 60:
-    /system/chassis/motherboard/boxelder/bmc:
+  /system/chassis/motherboard/boxelder/bmc:
     xyz.openbmc_project.Inventory.Item:
       PrettyName:
-        IPMIFruProperty: Name
+        IPMIFruProperty: Board Name
         IPMIFruSection: Board
     xyz.openbmc_project.Inventory.Decorator.Asset:
       PartNumber:
@@ -45,8 +45,8 @@
         IPMIFruProperty: Mfg Date
         IPMIFruSection: Board
 70:
-    /system/chassis/motherboard/boxelder/bmc/ethernet:
+  /system/chassis/motherboard/boxelder/bmc/ethernet:
     xyz.openbmc_project.Inventory.Item:
       PrettyName:
-        IPMIFruProperty: Name
+        IPMIFruProperty: Product Name
         IPMIFruSection: Product
