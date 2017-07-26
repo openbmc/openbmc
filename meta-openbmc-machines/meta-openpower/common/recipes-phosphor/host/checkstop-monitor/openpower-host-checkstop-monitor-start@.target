@@ -1,4 +1,0 @@
-[Unit]
-Description=Start Host %I monitor
-Requires=phosphor-gpio-monitor@%i.service
-RefuseManualStop=yes
