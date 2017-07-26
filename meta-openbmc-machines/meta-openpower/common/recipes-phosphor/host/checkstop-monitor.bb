@@ -15,11 +15,16 @@ OBMC_HOST_MONITOR_INSTANCES = "checkstop"
 # via GPIO assertion
 SYSTEMD_ENVIRONMENT_FILE_${PN} +="obmc/gpio/checkstop"
 
-STATES = "start stop"
-CHECKSTOP_SERVICE_FMT = "openpower-host-checkstop-monitor-{0}@.target"
-SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'CHECKSTOP_SERVICE_FMT', 'STATES')}"
+# This package is not supplying the unit file and also this is not a native
+# recipe since state-mgmt needs this package at runtime. Unsetting this below
+# variable will let the build go through
+SYSTEMD_SERVICE_${PN} ?=""
 
-CHECKSTOP_TMPL = "openpower-host-checkstop-monitor-{0}@.target"
-CHECKSTOP_TGTFMT = "openpower-host-checkstop-monitor-{0}@{1}.target"
-CHECKSTOP_MONITOR_FMT = "../${CHECKSTOP_TMPL}:obmc-host-{0}@{2}.target.wants/${CHECKSTOP_TGTFMT}"
+# Install the override to set up a Conflicts relation
+SYSTEMD_OVERRIDE_${PN} +="checkstop.conf:phosphor-gpio-monitor@checkstop.service.d/checkstop.conf"
+
+STATES = "start"
+GPIO_MONITOR_TMPL = "phosphor-gpio-monitor@.service"
+GPIO_MONITOR_TGTFMT = "phosphor-gpio-monitor@{1}.service"
+CHECKSTOP_MONITOR_FMT = "../${GPIO_MONITOR_TMPL}:obmc-host-{0}@{2}.target.wants/${GPIO_MONITOR_TGTFMT}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CHECKSTOP_MONITOR_FMT', 'STATES', 'OBMC_HOST_MONITOR_INSTANCES', 'OBMC_HOST_INSTANCES')}"
