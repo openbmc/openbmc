@@ -1,0 +1,11 @@
+[Unit]
+Description=Reboot host%i
+After=obmc-host-stop@%i.target
+
+[Service]
+RemainAfterExit=no
+ExecStart=/bin/systemctl start obmc-host-start@%i.target
+
+
+[Install]
+WantedBy=obmc-host-reboot@%i.target
