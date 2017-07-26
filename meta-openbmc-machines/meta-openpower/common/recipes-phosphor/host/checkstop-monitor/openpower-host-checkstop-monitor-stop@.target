@@ -1,4 +1,0 @@
-[Unit]
-Description=Stop Host %I monitor
-Conflicts=phosphor-gpio-monitor@%i.service
-RefuseManualStop=yes
