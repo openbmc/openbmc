@@ -1,0 +1,10 @@
+[Unit]
+Description=Reboot Host%i
+Wants={SYSTEMD_DEFAULT_TARGET}
+After={SYSTEMD_DEFAULT_TARGET}
+Wants=mapper-wait@-org-openbmc-control-chassis%i.service
+After=mapper-wait@-org-openbmc-control-chassis%i.service
+Conflicts=obmc-host-start@%i.target
+RefuseManualStop=yes
+OnFailure=obmc-chassis-poweroff@%i.target
+OnFailureJobMode=flush
