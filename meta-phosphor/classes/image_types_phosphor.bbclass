@@ -18,7 +18,9 @@ inherit ${IMAGE_TYPE_uboot}
 # The reference BMC software update implementation.
 
 # Image composition
-FLASH_KERNEL_IMAGE ?= "fitImage-${INITRAMFS_IMAGE}-${MACHINE}.bin"
+FLASH_KERNEL_IMAGE ?= "${@bb.utils.contains('DISTRO_FEATURES', \
+        'obmc-ubi-filesystem', 'fitImage-${MACHINE}.bin', \
+        'fitImage-${INITRAMFS_IMAGE}-${MACHINE}.bin', d)}"
 IMAGE_BASETYPE ?= "squashfs-xz"
 OVERLAY_BASETYPE ?= "jffs2"
 FLASH_UBI_BASETYPE ?= "${IMAGE_BASETYPE}"
