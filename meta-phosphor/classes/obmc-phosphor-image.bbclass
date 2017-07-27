@@ -78,6 +78,7 @@ IMAGE_FEATURES += " \
         obmc-debug-collector \
         obmc-network-mgmt \
         obmc-settings \
+        ${@df_enabled(d, 'obmc-ubi-filesystem', 'read-only-rootfs')} \
         "
 
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
