@@ -1,0 +1,10 @@
+[Unit]
+Description=Create a ubiblock on %I
+Requires=obmc-flash-bios-ubiattach.service
+After=obmc-flash-bios-ubiattach.service
+
+[Service]
+ExecStart=/usr/sbin/ubiblock --create %I
+
+[Install]
+WantedBy=multi-user.target

@@ -47,6 +47,42 @@ attach_ubi() {
   fi
 }
 
+# Creates a systemd mount file for ubi and squashfs
+# Inputs ${1}=FileName
+#         ${2}=Type
+#         ${3}=What
+#         ${4}=Where
+#         ${5}=Options
+create_mountFile() {
+  mountFile="/etc/systemd/system/multi-user.target.wants/${1}"
+  # Remove any existing mountFile that was previously created.
+  if [ -e ${mountFile} ]; then
+    rm -r ${mountFile}
+  fi
+
+  echo "[Unit]" >> ${mountFile}
+  echo "Description=Systemd Mount $3" >> ${mountFile}
+
+  if [[ "${2}" == "squashfs" ]]; then
+    ubiblock=$(echo ${3} | tr -d /dev/ubiblock)
+    echo "Requires=obmc-flash-bios-ubiblock@-dev-ubi${ubiblock}.service" >> ${mountFile}
+    echo "After=obmc-flash-bios-ubiblock@-dev-ubi${ubiblock}.service" >> ${mountFile}
+  else
+    echo "Requires=obmc-flash-bios-ubiattach.service" >> ${mountFile}
+    echo "After=obmc-flash-bios-ubiattach.service" >> ${mountFile}
+  fi
+
+  echo "[Mount]" >> ${mountFile}
+  echo "Type=${2}" >> ${mountFile}
+  echo "What=${3}" >> ${mountFile}
+  echo "Where=${4}" >> ${mountFile}
+  echo "Options=${5}" >> ${mountFile}
+  echo "[Install]" >> ${mountFile}
+  echo "WantedBy=multi-user.target" >> ${mountFile}
+  chmod ugo+rwx -R ${mountFile}
+}
+
+
 mount_squashfs() {
   pnormtd="$(findmtd pnor)"
   pnor="${pnormtd#mtd}"
@@ -78,6 +114,10 @@ mount_squashfs() {
 
   if ! is_mounted "${name}"; then
     mount -t squashfs -o ro "${block}" "${mountdir}"
+
+    version=$(echo $(echo $mountdir | grep -o '[^-]*$')  | cut -d. -f2)
+    filePath="media-pnor\\x2dro\\x2d$version.mount"
+    create_mountFile "${filePath}" "squashfs" "${block}" "${mountdir}" "ro"
   fi
 }
 
@@ -105,6 +145,14 @@ mount_ubi() {
   if ! is_mounted "${name}"; then
     mountdev="ubi${pnor}:${name}"
     mount -t ubifs "${mountdev}" "${mountdir}"
+    
+    if [[ "${name}" == "pnor-prsv" ]]; then
+      create_mountFile "media-pnor\\x2dprsv.mount" "ubifs" ${mountdev} ${mountdir} ""
+    else
+      version=$(echo $(echo $mountdir | grep -o '[^-]*$') | cut -d. -f2)
+      filePath="media-pnor\\x2drw\\x2d$version.mount"
+      create_mountFile "${filePath}" "ubifs" "${mountdev}" "${mountdir}" ""
+    fi
   fi
 }
 
