@@ -21,7 +21,8 @@ IMAGE_CLASSES += "image_types_uboot"
 
 INITRAMFS_CTYPE ?= "lzma"
 INITRAMFS_FSTYPES += "cpio.${INITRAMFS_CTYPE}"
-INITRAMFS_IMAGE = "obmc-phosphor-initramfs"
+INITRAMFS_IMAGE = "${@bb.utils.contains('DISTRO_FEATURES', \
+        'obmc-ubi-filesystem', '', 'obmc-phosphor-initramfs', d)}"
 
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "qemu-usermode"
 
