@@ -4,6 +4,9 @@ SRCREV = "a5e0a21ed4b62ab4d8ff09f70b751db0f46ddaac"
 UBRANCH = "v2016.07-aspeed-openbmc"
 SRC_URI = "git://git@github.com/openbmc/u-boot.git;branch=${UBRANCH};protocol=https"
 
+SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
+    'file://0001-config-ast-common-hack-bootopts.patch', '', d)}"
+
 PV = "v2016.07+git${SRCPV}"
 
 SRC_URI += "file://0001-configs-ast-Add-redundnant-env.patch"
