@@ -15,7 +15,9 @@ FLASH_IMAGE_NAME ?= "flash-${MACHINE}-${DATETIME}"
 FLASH_IMAGE_NAME[vardepsexclude] = "DATETIME"
 FLASH_IMAGE_LINK ?= "flash-${MACHINE}"
 
-FLASH_KERNEL_IMAGE ?= "fitImage-${INITRAMFS_IMAGE}-${MACHINE}.bin"
+FLASH_KERNEL_IMAGE ?= "${@bb.utils.contains('DISTRO_FEATURES', \
+    'obmc-ubi-filesystem', 'fitImage-${MACHINE}.bin', \
+    'fitImage-${INITRAMFS_IMAGE}-${MACHINE}.bin', d)}"
 
 FLASH_UBOOT_OFFSET ?= "0"
 FLASH_KERNEL_OFFSET ?= "512"
