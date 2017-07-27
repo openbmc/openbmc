@@ -1,0 +1,14 @@
+[Unit]
+Description=Remount the squashfs and ubi volumes after a reboot
+Requires=obmc-flash-bios-ubiattach.service
+After=obmc-flash-bios-ubiattach.service
+Wants=org.open_power.Software.Host.Updater.service
+Before=org.open_power.Software.Host.Updater.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart={sbindir}/obmc-flash-bios ubiremount
+
+[Install]
+WantedBy=multi-user.target
