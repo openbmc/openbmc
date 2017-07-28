@@ -1,0 +1,50 @@
+From d55c979f11f9194a5112c91e05e9ab53c189c36a Mon Sep 17 00:00:00 2001
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Fri, 28 Jul 2017 17:30:22 +0930
+Subject: [PATCH 4/5] ARM: dts: aspeed: Configure Witherspoon to mark its fans
+ as installed
+
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+index 5afc03a19863..56cdc76c1250 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+@@ -216,6 +216,7 @@
+ 		fan@0 {
+ 			compatible = "pmbus-fan";
+ 			reg = <0>;
++			mark-fan-installed;
+ 			tach-pulses = <2>;
+ 			maxim,fan-rotor-input = "tach";
+ 			maxim,fan-pwm-freq = <25000>;
+@@ -229,6 +230,7 @@
+ 		fan@1 {
+ 			compatible = "pmbus-fan";
+ 			reg = <1>;
++			mark-fan-installed;
+ 			tach-pulses = <2>;
+ 			maxim,fan-rotor-input = "tach";
+ 			maxim,fan-pwm-freq = <25000>;
+@@ -242,6 +244,7 @@
+ 		fan@2 {
+ 			compatible = "pmbus-fan";
+ 			reg = <2>;
++			mark-fan-installed;
+ 			tach-pulses = <2>;
+ 			maxim,fan-rotor-input = "tach";
+ 			maxim,fan-pwm-freq = <25000>;
+@@ -255,6 +258,7 @@
+ 		fan@3 {
+ 			compatible = "pmbus-fan";
+ 			reg = <3>;
++			mark-fan-installed;
+ 			tach-pulses = <2>;
+ 			maxim,fan-rotor-input = "tach";
+ 			maxim,fan-pwm-freq = <25000>;
+-- 
+2.11.0
+

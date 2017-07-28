@@ -1,0 +1,36 @@
+From 04f526ca97a89429e2b6b373b56bc02bb418338a Mon Sep 17 00:00:00 2001
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Fri, 28 Jul 2017 17:04:47 +0930
+Subject: [PATCH 5/5] max31785: Support mark-fan-installed devicetree property
+
+Allows fans to be marked as installed via the devicetree.
+
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+---
+ drivers/hwmon/pmbus/max31785.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/hwmon/pmbus/max31785.c b/drivers/hwmon/pmbus/max31785.c
+index 1c2648ce5322..09f501ba7cc6 100644
+--- a/drivers/hwmon/pmbus/max31785.c
++++ b/drivers/hwmon/pmbus/max31785.c
+@@ -270,9 +270,13 @@ static int max31785_of_fan_config(struct i2c_client *client,
+ 	if (pb_cfg < 0)
+ 		return pb_cfg;
+ 
+-	if (!(pb_cfg & PB_FAN_1_INSTALLED)) {
+-		dev_warn(dev, "Fan %d is configured but not installed\n", page);
+-		return 0;
++	if (of_property_read_bool(child, "mark-fan-installed")) {
++		pb_cfg |= PB_FAN_1_INSTALLED;
++	} else {
++		if (!(pb_cfg & PB_FAN_1_INSTALLED)) {
++			dev_warn(dev, "Fan %d is configured but not installed\n", page);
++			return 0;
++		}
+ 	}
+ 
+ 	ret = of_property_read_string(child, "maxim,fan-rotor-input", &sval);
+-- 
+2.11.0
+
