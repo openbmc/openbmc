@@ -1,49 +1,75 @@
 /xyz/openbmc_project/control/host0/auto_reboot:
     Interface: xyz.openbmc_project.Control.Boot.RebootPolicy
-    Defaults:
-        AutoReboot: 'false'
+    Properties:
+        AutoReboot:
+           Default: 'false'
 
 /xyz/openbmc_project/control/host0/boot_source:
     Interface: xyz.openbmc_project.Control.Boot.Source
-    Defaults:
-        BootSource: Source::Sources::Default
+    Properties:
+        BootSource:
+            Default: Source::Sources::Default
 
 /xyz/openbmc_project/control/host0/boot_mode:
     Interface: xyz.openbmc_project.Control.Boot.Mode
-    Defaults:
-        BootMode: Mode::Modes::Regular
+    Properties:
+        BootMode:
+            Default: Mode::Modes::Regular
 
 /xyz/openbmc_project/control/host0/power_cap:
     Interface: xyz.openbmc_project.Control.Power.Cap
-    Defaults:
-        PowerCap: 0
-        PowerCapEnable: 'false'
+    Properties:
+        PowerCap:
+            Default: 0
+            Validation:
+                Type: "range"
+                Validator: "0..1000"
+                Unit: "Watts"
+        PowerCapEnable:
+             Default: 'false'
 
 /xyz/openbmc_project/control/host0/power_restore_policy:
     Interface: xyz.openbmc_project.Control.Power.RestorePolicy
-    Defaults:
-        PowerRestorePolicy: RestorePolicy::Policy::Restore
+    Properties:
+        PowerRestorePolicy:
+            Default: RestorePolicy::Policy::Restore
 
 /xyz/openbmc_project/time/owner:
     Interface: xyz.openbmc_project.Time.Owner
-    Defaults:
-        TimeOwner: Owner::Owners::BMC
+    Properties:
+        TimeOwner:
+            Default: Owner::Owners::BMC
 
 /xyz/openbmc_project/time/sync_method:
     Interface: xyz.openbmc_project.Time.Synchronization
-    Defaults:
-        TimeSyncMethod: Synchronization::Method::NTP
+    Properties:
+        TimeSyncMethod:
+            Default: Synchronization::Method::NTP
 
 /xyz/openbmc_project/network/host0/intf:
     Interface: xyz.openbmc_project.Network.MACAddress
-    Defaults:
-        MACAddress: '"00:00:00:00:00:00"'
+    Properties:
+        MACAddress:
+            Default: '"00:00:00:00:00:00"'
+            Validation:
+                Type: "regex"
+                Validator: '^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$'
 
+#needs to implement address validation TODO openbmc/issues/2046
 /xyz/openbmc_project/network/host0/intf/addr:
     Interface: xyz.openbmc_project.Network.IP
-    Defaults:
-        Address: '"0.0.0.0"'
-        PrefixLength: 0
-        Origin: IP::AddressOrigin::Static
-        Gateway: '"0.0.0.0"'
-        Type: IP::Protocol::IPv4
+    Properties:
+        Address:
+            Default: '"0.0.0.0"'
+        PrefixLength:
+            Default: 0
+            Validation:
+                Type: "range"
+                Validator: 0..128
+                Unit: "bits"
+        Origin:
+            Default: IP::AddressOrigin::Static
+        Gateway:
+            Default: '"0.0.0.0"'
+        Type:
+            Default: IP::Protocol::IPv4
