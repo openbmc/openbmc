@@ -1,0 +1,9 @@
+[Unit]
+Description=Remove UBIFS volume pnor-ro-%I
+Wants=obmc-flash-bios-ubiattach.service
+After=obmc-flash-bios-ubiattach.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart={sbindir}/obmc-flash-bios ubiumount pnor-ro-%i
