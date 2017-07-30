@@ -92,6 +92,7 @@ SUMMARY_${PN}-debug-collector = "BMC debug collector"
 RDEPENDS_${PN}-debug-collector = " \
         ${VIRTUAL-RUNTIME_obmc-dump-manager} \
         ${VIRTUAL-RUNTIME_obmc-dump-monitor} \
+        phosphor-debug-collector-dreport \
         "
 
 SUMMARY_${PN}-settings = "Settings applications"
