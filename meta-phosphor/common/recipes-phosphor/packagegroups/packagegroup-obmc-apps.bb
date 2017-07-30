@@ -19,6 +19,7 @@ PACKAGES = " \
         ${PN}-software \
         ${PN}-host-check-mgmt \
         ${PN}-debug-collector \
+        ${PN}-debug-collector-dreport \
         ${PN}-settings \
         ${PN}-network \
         "
