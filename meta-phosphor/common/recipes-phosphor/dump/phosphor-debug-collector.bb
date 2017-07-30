@@ -9,6 +9,7 @@ PR = "r1"
 DEBUG_COLLECTOR_PKGS = " \
     ${PN}-manager \
     ${PN}-monitor \
+    ${PN}-dreport \
 "
 PACKAGES =+ "${DEBUG_COLLECTOR_PKGS}"
 PACKAGES_remove = "${PN}"
@@ -40,11 +41,17 @@ RDEPENDS_${PN}-manager += " \
         sdbusplus \
         phosphor-dbus-interfaces \
         phosphor-logging \
+        ${PN}-dreport \
 "
 RDEPENDS_${PN}-monitor += " \
         sdbusplus \
         phosphor-dbus-interfaces \
         phosphor-logging \
+"
+RDEPENDS_${PN}-dreport += " \
+        systemd \
+        ${VIRTUAL-RUNTIME_base-utils} \
+        bash \
 "
 
 MGR_SVC ?= "xyz.openbmc_project.Dump.Manager.service"
@@ -53,6 +60,7 @@ SYSTEMD_SUBSTITUTIONS += "BMC_DUMP_PATH:${bmc_dump_path}:${MGR_SVC}"
 
 FILES_${PN}-manager += "${sbindir}/phosphor-dump-manager"
 FILES_${PN}-monitor += "${sbindir}/phosphor-dump-monitor"
+FILES_${PN}-dreport += "${bindir}/dreport"
 
 DBUS_SERVICE_${PN}-manager += "${MGR_SVC}"
 SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
@@ -60,3 +68,9 @@ SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
 EXTRA_OECONF = "BMC_DUMP_PATH=${bmc_dump_path}"
 
 S = "${WORKDIR}/git"
+
+do_install_append() {
+       install -d ${D}${bindir}
+       install -m 0755 ${S}/tools/dreport \
+                       ${D}${bindir}/dreport
+}
