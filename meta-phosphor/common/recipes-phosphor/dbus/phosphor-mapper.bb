@@ -29,6 +29,7 @@ RDEPENDS_${PN} += " \
         python-dbus \
         python-pygobject \
         pyphosphor-dbus \
+        pyphosphor-utils \
         sdbusplus \
         phosphor-logging \
         "
