@@ -2,7 +2,7 @@
     Interface: xyz.openbmc_project.Control.Boot.RebootPolicy
     Properties:
         AutoReboot:
-           Default: 'false'
+           Default: 'true'
 
 /xyz/openbmc_project/control/host0/boot_source:
     Interface: xyz.openbmc_project.Control.Boot.Source
