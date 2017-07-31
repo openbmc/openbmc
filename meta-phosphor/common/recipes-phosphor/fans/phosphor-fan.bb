@@ -17,6 +17,7 @@ DEPENDS += "python-pyyaml-native"
 DEPENDS += "python-mako-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
+DEPENDS += "libevdev"
 
 # Package configuration
 FAN_PACKAGES = " \
@@ -108,4 +109,4 @@ SYSTEMD_LINK_${PN}-monitor += "${@compose_list(d, 'FMT_MONITOR', 'OBMC_CHASSIS_I
 
 # --------------------------------------
 # phosphor-cooling-type specific configuration
-PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,libevdev,"
+PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,,"
