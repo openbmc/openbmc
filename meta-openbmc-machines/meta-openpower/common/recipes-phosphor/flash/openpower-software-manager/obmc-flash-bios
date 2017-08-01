@@ -160,6 +160,10 @@ remount_ubi() {
 
     if [[ ${name} == pnor-prsv ]] || [[ ${name} == pnor-rw* ]] || [[ ${name} == pnor-ro* ]]; then
       mountdir="/media/${name}"
+      if [ ! -d "${mountdir}" ]; then
+        mkdir -p "${mountdir}"
+      fi
+
       if [[ ${name} == pnor-ro* ]]
       then
         ubiblock --create /dev/ubi${pnor}_${element}
