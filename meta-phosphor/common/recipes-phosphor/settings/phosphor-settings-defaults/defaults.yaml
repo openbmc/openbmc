@@ -1,3 +1,9 @@
+/xyz/openbmc_project/control/minimum_ship_level_required:
+    Interface: xyz.openbmc_project.Control.MinimumShipLevel
+    Properties:
+        MinimumShipLevelRequired:
+           Default: 'true'
+
 /xyz/openbmc_project/control/host0/auto_reboot:
     Interface: xyz.openbmc_project.Control.Boot.RebootPolicy
     Properties:
