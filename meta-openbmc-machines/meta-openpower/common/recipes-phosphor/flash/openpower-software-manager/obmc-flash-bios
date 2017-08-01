@@ -22,7 +22,17 @@ is_mounted() {
   return $?
 }
 
-# Attach the pnor mtd device to ubi
+# Attempts to re-attach the pnor mtd device to ubi.
+reattach_ubi() {
+    pnormtd="$(findmtd pnor)"
+    pnor="${pnormtd#mtd}"
+    pnordev="/dev/mtd${pnor}"
+
+    ubiattach /dev/ubi_ctrl -m "${pnor}" -d "${pnor}"
+}
+
+# Attach the pnor mtd device to ubi.
+# If unsuccessful then format device as ubi.
 attach_ubi() {
   pnormtd="$(findmtd pnor)"
   pnor="${pnormtd#mtd}"
@@ -159,6 +169,9 @@ remount_ubi() {
 case "$1" in
   ubiattach)
     attach_ubi
+    ;;
+  ubireattach)
+    reattach_ubi
     ;;
   squashfsmount)
     name="$2"

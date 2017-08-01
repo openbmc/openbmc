@@ -1,0 +1,7 @@
+[Unit]
+Description=Re-Attach the PNOR mtd device to UBI
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart={sbindir}/obmc-flash-bios ubireattach
