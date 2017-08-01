@@ -16,5 +16,6 @@ do_install() {
         # create AssetTag property at startup
 
         install -d ${base_datadir}/events.d/
+        install -d ${base_datadir}/extra_interfaces.d/
         install assettag.yaml ${base_datadir}/events.d/assettag.yaml
 }
