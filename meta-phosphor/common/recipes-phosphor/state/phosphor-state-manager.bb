@@ -88,6 +88,6 @@ HOST_STOP_FMT = "../${CHASSIS_STOP_TMPL}:${HOST_STOP_TGTFMT}.requires/${CHASSIS_
 SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_STOP_FMT', 'OBMC_CHASSIS_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "55f132bfeb4a3d634589b71e77b8289fc652aebf"
+SRCREV = "2710e730c698952b6803fea2af6c63bff8ff385c"
 
 S = "${WORKDIR}/git"
