@@ -37,7 +37,7 @@ RDEPENDS_${PN}-staticdev = "${FAN_PACKAGES}"
 # ${PN}-presence-tach specific configuration
 PACKAGECONFIG[presence] = " \
         --enable-presence \
-        FAN_DETECT_YAML_FILE=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml, \
+        PRESENCE_CONFIG=${STAGING_DIR_NATIVE}${presence_datadir}/config.yaml, \
         --disable-presence, \
         virtual/phosphor-fan-presence-config \
         , \
