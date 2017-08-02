@@ -15,6 +15,10 @@ inherit autotools \
         phosphor-dbus-monitor \
         obmc-phosphor-systemd
 
+PACKAGE_BEFORE_PN = "phosphor-msl-verify"
+SYSTEMD_PACKAGES = "${PN} phosphor-msl-verify"
+SYSTEMD_SERVICE_phosphor-msl-verify = "phosphor-msl-verify.service"
+
 DEPENDS += " \
         ${PN}-config-native \
         phosphor-logging \
@@ -26,6 +30,13 @@ RDEPENDS_${PN} += " \
         phosphor-dbus-interfaces \
         phosphor-logging \
         "
+
+RDEPENDS_phosphor-msl-verify += " \
+        sdbusplus \
+        phosphor-dbus-interfaces \
+        phosphor-logging \
+        "
+FILES_phosphor-msl-verify = "${sbindir}/phosphor-msl-verify"
 
 S = "${WORKDIR}/git"
 
