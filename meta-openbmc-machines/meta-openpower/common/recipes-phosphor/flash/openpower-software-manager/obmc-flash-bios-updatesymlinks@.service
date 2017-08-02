@@ -1,0 +1,9 @@
+[Unit]
+Description=Updates symlinks for active PNOR version
+Wants=mbox-reset.service
+Before=mbox-reset.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart={sbindir}/obmc-flash-bios updatesymlinks %i

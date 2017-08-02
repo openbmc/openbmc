@@ -175,6 +175,36 @@ remount_ubi() {
   done
 }
 
+update_symlinks() {
+  PNOR_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/"
+  PNOR_RO_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/ro"
+  PNOR_RO_PREFIX="/media/pnor-ro-"
+  PNOR_RW_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/rw"
+  PNOR_RW_PREFIX="/media/pnor-rw-"
+  PNOR_PRSV_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/prsv"
+  PNOR_PRSV="/media/pnor-prsv"
+
+  if [ ! -d "${PNOR_ACTIVE_PATH}" ]; then
+        mkdir -p "${PNOR_ACTIVE_PATH}"
+  fi
+
+  # If the RW or RO active links exist, remove them and create new
+  # ones pointing to the active version.
+  if [[ ! -h ${PNOR_RO_ACTIVE_PATH}  ]]; then
+    rm ${PNOR_RO_ACTIVE_PATH}
+  fi
+  ln -sfv ${PNOR_RO_PREFIX}${version} ${PNOR_RO_ACTIVE_PATH}
+
+  if [[ ! -h ${PNOR_RW_ACTIVE_PATH}  ]]; then
+    rm ${PNOR_RW_ACTIVE_PATH}
+  fi
+  ln -sfv ${PNOR_RW_PREFIX}${version} ${PNOR_RW_ACTIVE_PATH}
+
+  if [[ ! -h ${PNOR_PRSV_ACTIVE_PATH}  ]]; then
+    ln -sfv ${PNOR_PRSV} ${PNOR_PRSV_ACTIVE_PATH}
+  fi
+}
+
 case "$1" in
   ubiattach)
     attach_ubi
@@ -194,6 +224,10 @@ case "$1" in
     ;;
   ubiremount)
     remount_ubi
+    ;;
+  updatesymlinks)
+    version="$2"
+    update_symlinks
     ;;
   *)
     echo "Invalid argument"
