@@ -1,1 +1,1 @@
-bmc_dump_path="/tmp/dumps"
+bmc_dump_path="/var/lib/phosphor-debug-collector/dumps"
