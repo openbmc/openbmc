@@ -180,6 +180,56 @@ remount_ubi() {
   done
 }
 
+update_symlinks() {
+  PNOR_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/"
+  PNOR_RO_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/ro"
+  PNOR_RO_PREFIX="/media/pnor-ro-"
+  PNOR_RW_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/rw"
+  PNOR_RW_PREFIX="/media/pnor-rw-"
+  PNOR_PRSV_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/prsv"
+  PNOR_PRSV="/media/pnor-prsv"
+
+  # Get the current PNOR version using the priorities stored in
+  # the persistence storage files.
+  persistencePath="/var/lib/obmc/openpower-pnor-code-mgmt/"
+  data="$(grep -r "priority" ${persistencePath})"
+  if [[ -z "$data" ]]; then
+    return 0;
+  fi
+  IFS=$'\n' array=(${data})
+  for element in ${array[@]};
+  do
+    element="${element#$persistencePath}"
+    version="$( cut -d ':' -f 1 <<< "$element" )";
+    priority="${element: -1}"
+
+    if [[ priority -le lowestPriority  ]]; then
+      lowestPriority=${priority}
+      currentVersion=${version}
+    fi
+  done
+
+  if [ ! -d "${PNOR_ACTIVE_PATH}" ]; then
+        mkdir -p "${PNOR_ACTIVE_PATH}"
+  fi
+
+  # If the RW or RO active links doesn't point to the version with
+  # lowest priority, then remove the symlink and create new ones.
+  if [[ $(readlink -f "${PNOR_RO_ACTIVE_PATH}") != ${PNOR_RO_PREFIX}${currentVersion}  ]]; then
+    rm -f ${PNOR_RO_ACTIVE_PATH}
+    ln -sfv ${PNOR_RO_PREFIX}${currentVersion} ${PNOR_RO_ACTIVE_PATH}
+  fi
+
+  if [[ $(readlink -f "${PNOR_RW_ACTIVE_PATH}") != ${PNOR_RW_PREFIX}${currentVersion}  ]]; then
+    rm -f ${PNOR_RW_ACTIVE_PATH}
+    ln -sfv ${PNOR_RW_PREFIX}${currentVersion} ${PNOR_RW_ACTIVE_PATH}
+  fi
+
+  if [[ ! -h ${PNOR_PRSV_ACTIVE_PATH}  ]]; then
+    ln -sfv ${PNOR_PRSV} ${PNOR_PRSV_ACTIVE_PATH}
+  fi
+}
+
 case "$1" in
   ubiattach)
     attach_ubi
@@ -199,6 +249,9 @@ case "$1" in
     ;;
   ubiremount)
     remount_ubi
+    ;;
+  updatesymlinks)
+    update_symlinks
     ;;
   *)
     echo "Invalid argument"
