@@ -52,7 +52,7 @@ python do_emit_env() {
         d.getVar('namespace_dir', True)
     paths = []
     for p in os.listdir(path):
-        paths.append(os.sep + os.sep.join(p.split('-')))
+        paths.append(os.sep.join(p.split('-')))
 
     path = d.getVar('STAGING_DIR_NATIVE', True) + \
         d.getVar('interface_dir', True)

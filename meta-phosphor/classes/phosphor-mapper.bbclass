@@ -34,7 +34,7 @@ python phosphor_mapper_do_postinst() {
                 os.makedirs(parent)
             path = os.path.join(
                 parent,
-                '-'.join(p[1:].split(os.sep)))
+                '-'.join(p.split(os.sep)))
             with open(path, 'w+') as fd:
                 pass
 
