@@ -3,6 +3,9 @@ Description=OpenPOWER debug data collector for host checkstop
 Before=obmc-host-quiesce@%i.target
 
 [Service]
+# Adding 5 seconds to allow OCC to collect debug data
+# before processing checkstop
+ExecStart={base_bindir}/sleep 5
 ExecStart={sbindir}/checkstop_app
 Type=oneshot
 Restart=no
