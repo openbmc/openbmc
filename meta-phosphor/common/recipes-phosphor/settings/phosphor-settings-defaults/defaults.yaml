@@ -59,7 +59,7 @@
             Default: '"00:00:00:00:00:00"'
             Validation:
                 Type: "regex"
-                Validator: '^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$'
+                Validator: '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
 
 #needs to implement address validation TODO openbmc/issues/2046
 /xyz/openbmc_project/network/host0/intf/addr:
