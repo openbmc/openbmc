@@ -1,0 +1,34 @@
+0x08:
+  sensorType: 0x09
+  path: /org/open_power/control/occ0
+  sensorReadingType: 0x09
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  interfaces:
+    org.open_power.OCC.Status:
+      OccActive:
+          0x00:
+            assert: false
+            deassert: true
+            type: bool
+          0x01:
+            assert: true
+            deassert: false
+            type: bool
+0x09:
+  sensorType: 0x09
+  path: /org/open_power/control/occ1
+  sensorReadingType: 0x09
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  interfaces:
+    org.open_power.OCC.Status:
+      OccActive:
+          0x00:
+            assert: false
+            deassert: true
+            type: bool
+          0x01:
+            assert: true
+            deassert: false
+            type: bool
