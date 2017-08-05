@@ -10,7 +10,11 @@ UBOOT_SUFFIX ?= "bin"
 
 MACHINEOVERRIDES =. "openbmc:"
 
-IMAGE_FSTYPES += "cpio.${INITRAMFS_CTYPE}.u-boot mtd-static mtd-static-tar mtd-static-alltar"
+IMAGE_FSTYPES += "cpio.${INITRAMFS_CTYPE}.u-boot"
+IMAGE_FSTYPES += "${@bb.utils.contains('MACHINE_FEATURES', \
+        'obmc-ubi-fs', \
+        'mtd-ubi mtd-ubi-tar', \
+        'mtd-static mtd-static-tar mtd-static-alltar', d)}"
 OBMC_IMAGE_EXTRA_INSTALL_append = " u-boot-fw-utils"
 
 INITRAMFS_CTYPE ?= "lzma"
