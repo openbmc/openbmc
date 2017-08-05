@@ -10,7 +10,7 @@ UBOOT_SUFFIX ?= "bin"
 
 MACHINEOVERRIDES =. "openbmc:"
 
-IMAGE_FSTYPES += "cpio.${INITRAMFS_CTYPE}.u-boot overlay"
+IMAGE_FSTYPES += "cpio.${INITRAMFS_CTYPE}.u-boot mtd-static mtd-static-tar mtd-static-alltar"
 OBMC_IMAGE_EXTRA_INSTALL_append = " u-boot-fw-utils"
 
 INITRAMFS_CTYPE ?= "lzma"
