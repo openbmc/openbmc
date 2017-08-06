@@ -91,3 +91,12 @@
     Properties:
         TPMEnable:
            Default: 'false'
+
+/xyz/openbmc_project/control/host0/entry_cap:
+    Interface: xyz.openbmc_project.Control.Entry.Cap
+    Properties:
+        EntryCap:
+            Default:100
+            Validation:
+                Type: "range"
+                Validator: "1..1000"
