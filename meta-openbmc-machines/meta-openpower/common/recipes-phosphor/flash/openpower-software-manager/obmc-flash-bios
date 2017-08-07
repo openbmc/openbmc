@@ -144,16 +144,11 @@ remount_ubi() {
   pnordev="/dev/mtd${pnor}"
 
   # Re-Attach the pnor mtd device to ubi
-  ubiattach /dev/ubi_ctrl -m "${pnor}" -d "${pnor}"
-  rc=$?
-  if [ ${rc} -ne 0 ]; then
-    # Check the pnor mtd device is formatted as ubi by reading
-    # the first 3 byes, which should be the ascii chars 'UBI'
-    magic="$(hexdump -C -n 3 ${pnordev})"
-    if [[ ! "${magic}" =~ "UBI" ]]; then
-      # Device not formatted as ubi.
-      return
-    fi
+  if [[ $(hexdump -C -n 3 ${pnordev}) =~ "UBI" ]]; then
+    ubiattach /dev/ubi_ctrl -m "${pnor}" -d "${pnor}"
+  else
+    # Device not formatted as ubi.
+    return 0
   fi
 
   # Get information on all ubi volumes
