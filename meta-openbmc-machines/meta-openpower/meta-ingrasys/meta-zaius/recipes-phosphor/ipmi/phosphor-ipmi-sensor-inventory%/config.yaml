@@ -2,6 +2,9 @@
   sensorType: 0x07
   path: /system/chassis/motherboard/cpu0
   sensorReadingType: 0x6F
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: reading
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -19,6 +22,9 @@
   sensorType: 0x07
   path: /system/chassis/motherboard/cpu1
   sensorReadingType: 0x6F
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: reading
+  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
