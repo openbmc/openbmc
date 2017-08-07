@@ -65,12 +65,20 @@
           type:   "bool"
           assert:  false
           deassert: true
+        0x06:
+          type: "bool"
+          assert: true
+          deassert: false
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x06:
           type: "bool"
           assert: true
           deassert: false
+  overrides:
+    skipupdate:
+      skiptype: nonfru
+      0x06: assert
 0x07:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
@@ -82,9 +90,17 @@
           type:   "bool"
           assert: false
           deassert: true
+        0x07:
+          type: "bool"
+          assert: true
+          deassert: false
     xyz.openbmc_project.Inventory.Item:
       Present:
         0x07:
           type: "bool"
           assert: true
           deassert: false
+  overrides:
+    skipupdate:
+      skiptype: nonfru
+      0x07: assert
