@@ -2,6 +2,8 @@
   sensorType: 0x07
   path: /system/chassis/motherboard/cpu0
   sensorReadingType: 0x6F
+  serviceInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -19,6 +21,8 @@
   sensorType: 0x07
   path: /system/chassis/motherboard/cpu1
   sensorReadingType: 0x6F
+  serviceInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
