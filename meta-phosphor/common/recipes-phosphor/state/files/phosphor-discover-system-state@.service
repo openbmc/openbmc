@@ -6,6 +6,7 @@ Wants=mapper-wait@-xyz-openbmc_project-state-host%i.service
 After=mapper-wait@-xyz-openbmc_project-state-host%i.service
 Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+After=op-reset-chassis-on@%i.service
 
 [Service]
 Restart=no
