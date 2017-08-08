@@ -54,9 +54,18 @@ attach_ubi() {
 
 mount_squashfs() {
   pnormtd="$(findmtd pnor)"
-  pnor="${pnormtd#mtd}"
-  ubidev="/dev/ubi${pnor}"
+  ubidev="/dev/ubi${pnormtd#mtd}"
   mountdir="/media/${name}"
+  vol="$(findubi "${name}")"
+
+  if is_mounted "${name}"; then
+    echo "${name} is already mounted."
+    return 0
+  fi
+
+  if [ ! -z "${vol}" ]; then
+    ubirmvol "${ubidev}" -N "${name}"
+  fi
 
   if [ ! -d "${mountdir}" ]; then
     mkdir "${mountdir}"
@@ -65,24 +74,35 @@ mount_squashfs() {
   # Create a static ubi volume of arbitrary size 24MB,
   # the current pnor image is ~19MB
   # TODO Set size based on file size openbmc/openbmc#1840
+  ubimkvol "${ubidev}" -N "${name}" -s 24MiB --type=static
   vol="$(findubi "${name}")"
-  if [ -z "${vol}" ]; then
-    ubimkvol "${ubidev}" -N "${name}" -s 24MiB --type=static
-    vol="$(findubi "${name}")"
+
+  if [ $? != 0 ]; then
+    echo "Unable to create RO volume!"
+    return 1
   fi
 
-  # Create a ubi block needed for read-only volumes,
-  # and update the volume with the pnor squashfs image
   ubidevid="${vol#ubi}"
-  block="/dev/ubiblock${ubidevid}"
-  if [ ! -e "$block" ]; then
-    img="/tmp/images/${version}/pnor.xz.squashfs"
-    ubiblock --create "/dev/ubi${ubidevid}"
-    ubiupdatevol "/dev/ubi${ubidevid}" "${img}"
+  img="/tmp/images/${version}/pnor.xz.squashfs"
+  ubiupdatevol "/dev/ubi${ubidevid}" "${img}"
+
+  if [ $? != 0 ]; then
+    echo "Unable to update RO volume!"
+    return 1
   fi
 
-  if ! is_mounted "${name}"; then
-    mount -t squashfs -o ro "${block}" "${mountdir}"
+  ubiblock --create "/dev/ubi${ubidevid}"
+
+  if [ $? != 0 ]; then
+    echo "Unable to create UBI block for RO volume!"
+    return 1
+  fi
+
+  mount -t squashfs -o ro "/dev/ubiblock${ubidevid}" "${mountdir}"
+
+  if [ $? != 0 ]; then
+    echo "Unable to mount RO volume!"
+    return 1
   fi
 }
 
