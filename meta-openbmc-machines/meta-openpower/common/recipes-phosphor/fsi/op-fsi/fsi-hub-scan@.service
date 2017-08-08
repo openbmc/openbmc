@@ -1,0 +1,10 @@
+[Unit]
+Description=Scan FSI hub device
+Wants=fsi-scan@%i.service
+After=fsi-scan@%i.service
+Conflicts=obmc-chassis-poweroff@%i.target
+
+[Service]
+ExecStart=/bin/sh -c "echo 1 > /sys/devices/platform/gpio-fsi/fsi0/slave@00:00/00:00:00:0a/fsi1/rescan"
+Type=oneshot
+RemainAfterExit=yes

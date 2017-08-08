@@ -1,6 +1,8 @@
 [Unit]
 Description=Enable FSI
 Conflicts=fsi-disable.service
+Wants=fsi-hub-scan@0.service
+Before=fsi-hub-scan@0.service
 
 [Service]
 ExecStart=/bin/sh -c "echo 0 > /sys/devices/platform/gpio-fsi/external_mode"
