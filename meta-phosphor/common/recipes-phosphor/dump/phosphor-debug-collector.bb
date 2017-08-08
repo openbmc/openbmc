@@ -1,6 +1,6 @@
 SUMMARY = "Phosphor Debug Collector"
 DESCRIPTION = "Phosphor Debug Collector provides mechanisms \
-to collect various FFDC files and system parameters. \
+to collect various log files and system parameters. \
 This will be helpful for troubleshooting the problems in OpenBMC \
 based systems."
 
