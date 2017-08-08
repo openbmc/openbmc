@@ -3,8 +3,6 @@ Description=OpenPower Software Update Manager
 Wants=xyz.openbmc_project.Software.Version.service
 Before=xyz.openbmc_project.Software.Version.service
 Before=mboxd.service
-Wants=usr-local.mount
-Before=usr-local.mount
 Wants=obmc-flash-bios-ubipatch.service
 Before=obmc-flash-bios-ubipatch.service
 
