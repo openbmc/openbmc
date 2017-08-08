@@ -63,6 +63,11 @@ do_generate_flash() {
 
 	# Maintain a number of non-standard name legacy links.
 	ln -sf $flash ${IMGDEPLOYDIR}/flash-${MACHINE}
+	ln -sf $flash ${IMGDEPLOYDIR}/image-bmc
+	ln -sf $uboot ${IMGDEPLOYDIR}/image-u-boot
+	ln -sf $kernel ${IMGDEPLOYDIR}/image-kernel
+	ln -sf $rootfs ${IMGDEPLOYDIR}/image-rofs
+	ln -sf ${S}/$rwfs ${IMGDEPLOYDIR}/image-rwfs
 }
 
 make_overlay_tars() {
