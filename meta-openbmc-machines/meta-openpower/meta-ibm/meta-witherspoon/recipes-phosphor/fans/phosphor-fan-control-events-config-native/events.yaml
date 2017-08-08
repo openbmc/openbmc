@@ -1,7 +1,7 @@
 groups:
     - name: air_cooled_zone0_fans
       description: Group of fan inventory objects for air cooled zone 0
-      type: inventory
+      type: /xyz/openbmc_project/inventory
       members:
           - /system/chassis/motherboard/fan0
           - /system/chassis/motherboard/fan1
@@ -9,14 +9,14 @@ groups:
           - /system/chassis/motherboard/fan3
     - name: water_and_air_cooled_zone0_fans
       description: Group of fan inventory objects for water/air cooled zone 0
-      type: inventory
+      type: /xyz/openbmc_project/inventory
       members:
           - /system/chassis/motherboard/fan0
           - /system/chassis/motherboard/fan2
           - /system/chassis/motherboard/fan3
     - name: zone0_ambient
       description: Group of ambient temperature sensors for zone 0
-      type: sensors
+      type: /xyz/openbmc_project/sensors
       members:
           - /temperature/ambient
 
