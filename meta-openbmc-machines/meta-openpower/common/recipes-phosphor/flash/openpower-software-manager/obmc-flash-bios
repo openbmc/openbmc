@@ -79,6 +79,11 @@ mount_squashfs() {
     img="/tmp/images/${version}/pnor.xz.squashfs"
     ubiblock --create "/dev/ubi${ubidevid}"
     ubiupdatevol "/dev/ubi${ubidevid}" "${img}"
+    if [ "$?" != 0 ]; then
+      # if this fails, a device is busy - log some info about current volumes
+      df | cat
+      ubinfo -a | cat
+    fi
   fi
 
   if ! is_mounted "${name}"; then
