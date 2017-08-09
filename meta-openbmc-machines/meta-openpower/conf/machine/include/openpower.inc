@@ -4,7 +4,6 @@ OBMC_MACHINE_FEATURES += "\
         obmc-phosphor-flash-mgmt \
         obmc-host-ipmi \
         obmc-host-ctl \
-        openpower-pflash \
         obmc-host-state-mgmt \
         obmc-chassis-state-mgmt \
         obmc-bmc-state-mgmt \

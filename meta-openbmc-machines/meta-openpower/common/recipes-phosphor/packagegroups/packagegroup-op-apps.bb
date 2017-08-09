@@ -47,7 +47,7 @@ RDEPENDS_${PN}-flash = " \
         obmc-flash-bios \
         obmc-flash-bmc \
         obmc-mgr-download \
-        obmc-op-flasher \
+        ${@mf_enabled(d, 'openpower-ubi-fs', '', 'obmc-op-flasher')} \
         obmc-control-bmc \
         openpower-software-manager \
         "
