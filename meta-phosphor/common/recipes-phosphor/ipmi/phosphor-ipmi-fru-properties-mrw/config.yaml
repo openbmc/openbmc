@@ -21,3 +21,11 @@ SYS:
         Cached: 'false'
     xyz.openbmc_project.Inventory.Item:
         Present: 'true'
+
+NODE:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'false'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
