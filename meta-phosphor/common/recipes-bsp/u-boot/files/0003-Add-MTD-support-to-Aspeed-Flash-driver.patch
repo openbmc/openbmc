@@ -1,0 +1,58 @@
+From e0943f339fcb502444135f880a3e630b8e42b004 Mon Sep 17 00:00:00 2001
+From: Adriana Kobylak <anoo@linux.vnet.ibm.com>
+Date: Mon, 7 Aug 2017 12:17:27 -0500
+Subject: [PATCH u-boot v2016.07-aspeed-openbmc] Add MTD support to Aspeed Flash driver
+
+Add support to the aspeed flash driver to enable the common mtd layer
+through CONFIG_FLASH_CFI_MTD.
+
+This enables the flash to be used by u-boot mtd drivers including
+the mtdparts and ubi commands.
+
+Signed-off-by: Adriana Kobylak <anoo@linux.vnet.ibm.com>
+Acked-by: Milton Miller <miltonm@us.ibm.com>
+---
+ arch/arm/mach-aspeed/flash.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm/mach-aspeed/flash.c b/arch/arm/mach-aspeed/flash.c
+index 9c5ead6..e1e3cf8 100644
+--- a/arch/arm/mach-aspeed/flash.c
++++ b/arch/arm/mach-aspeed/flash.c
+@@ -124,6 +124,22 @@ flash_info_t flash_info[CONFIG_SYS_MAX_FLASH_BANKS];		/* FLASH chips info */
+ /* specificspi */
+ #define SpecificSPI_N25Q512	0x00000001
+ 
++#ifdef CONFIG_FLASH_CFI_MTD
++static uint flash_verbose=1;
++void flash_set_verbose(uint v)
++{
++	flash_verbose = v;
++}
++
++unsigned long flash_sector_size(flash_info_t *info, flash_sect_t sect)
++{
++	if (sect != (info->sector_count - 1))
++		return info->start[sect + 1] - info->start[sect];
++	else
++		return info->start[0] + info->size - info->start[sect];
++}
++#endif
++
+ /*-----------------------------------------------------------------------*/
+ static u32 ast_spi_calculate_divisor(u32 max_speed_hz)
+ {
+@@ -1372,6 +1388,10 @@ unsigned long flash_init (void)
+ 		       flash_get_info(CONFIG_ENV_ADDR_REDUND));
+ #endif
+ 
++#ifdef CONFIG_FLASH_CFI_MTD
++	cfi_mtd_init();
++#endif
++
+ 	return (size);
+ }
+ 
+-- 
+1.8.2.2
+
