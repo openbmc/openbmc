@@ -48,6 +48,11 @@ RDEPENDS_${PN}-updater += " \
     phosphor-logging \
     phosphor-dbus-interfaces \
     sdbusplus \
+    virtual-obmc-image-manager \
+"
+
+RPROVIDES_${PN}-version += " \
+    virtual-obmc-image-manager \
 "
 
 FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager"

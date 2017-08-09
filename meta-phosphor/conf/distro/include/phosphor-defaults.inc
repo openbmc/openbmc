@@ -77,12 +77,6 @@ VIRTUAL-RUNTIME_obmc-led-monitor ?= "phosphor-led-manager-faultmonitor"
 # Linux kernel LED subsystem LEDs.
 VIRTUAL-RUNTIME_obmc-leds-sysfs ?= "phosphor-led-sysfs"
 
-# obmc-bmc-code-mgr
-#
-# Provides an implementation of the xyz.openbmc_project.Software.Version
-# interface.
-VIRTUAL-RUNTIME_obmc-bmc-code-mgr ?= "phosphor-software-manager-version"
-
 # obmc-bmc-download-mgr
 #
 # Provides an implementation of the xyz.openbmc_project.Common.TFTP
