@@ -3,7 +3,7 @@
   path: /xyz/openbmc_project/state/host0
   sensorReadingType: 0x6F
   serviceInterface: org.freedesktop.DBus.Properties
-  readingType: reading
+  readingType: assertion
   interfaces:
     xyz.openbmc_project.Control.Boot.RebootAttempts:
       AttemptsLeft:
