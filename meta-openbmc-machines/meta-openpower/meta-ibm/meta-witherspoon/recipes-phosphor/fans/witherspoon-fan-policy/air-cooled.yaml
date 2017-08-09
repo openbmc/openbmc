@@ -135,10 +135,12 @@
   class: callback
   callback: group
   members:
-    - check presence
-    - check functional
+    - check group presence
+    - check group functional
+    - check individual presence
+    - check individual functional
 
-- name: check presence
+- name: check group presence
   description: >
     'If this condition passes more than one fan has been unplugged
     for more than 25 seconds.  Shut the system down.  Count present
@@ -153,13 +155,13 @@
   paths: fans
   properties: fan present
   defer: 25000000us
-  callback: check power
+  callback: shutdown if powered
   countop: '<'
   countbound: 3
   op: '=='
   bound: true
 
-- name: check functional
+- name: check group functional
   description: >
     'If this condition passes more than one fan in the group has been
     marked as nonfunctional for five seconds.  Shut the system down.
@@ -172,13 +174,51 @@
   paths: fans
   properties: fan functional
   defer: 5000000us
-  callback: check power
+  callback: shutdown if powered
   countop: '>'
   countbound: 1
   op: '=='
   bound: false
 
-- name: check power
+- name: check individual presence
+  description: >
+    'If this condition passes a fan has been unplugged
+    for more than 25 seconds. Create an error log.
+
+    For a more detailed definition of unplugged, consult the documentation
+    of xyz.openbmc_project.Inventory.Item and/or the documentation
+    of the fan inventory object implementation.'
+  class: condition
+  condition: count
+  paths: fans
+  properties: fan present
+  defer: 25000000us
+  callback: notpresent error if powered
+  countop: '<'
+  countbound: 4
+  op: '=='
+  bound: true
+
+- name: check individual functional
+  description: >
+    'If this condition passes a fan in the group has been marked
+    as nonfunctional for five seconds. Shut the system down.
+
+    For a more detailed definition of nonfunctional, consult the documentation
+    of xyz.openbmc_project.State.Decorator.OperationalStatus and/or the
+    documentation of the fan inventory object implementation.'
+  class: condition
+  condition: count
+  paths: fans
+  properties: fan functional
+  defer: 5000000us
+  callback: nonfunctional error if powered
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: false
+
+- name: shutdown if powered
   description: >
     'If the chassis has power, power it off.'
   class: condition
@@ -186,6 +226,32 @@
   paths: chassis state
   properties: chassis powered
   callback: log and shutdown
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: notpresent error if powered
+  description: >
+    'If the chassis has power, create a NotPresent error log'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: notpresent error
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: nonfunctional error if powered
+  description: >
+    'If the chassis has power, create a Nonfunctional error log'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: nonfunctional error
   countop: '>'
   countbound: 0
   op: '=='
@@ -224,3 +290,25 @@
   properties: chassis powered
   severity: ERR
   message: Shutting down system.  There are not enough functional fans.
+
+- name: notpresent error
+  class: callback
+  callback: elog
+  paths: fans
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan
+      type: string
+
+- name: nonfunctional error
+  class: callback
+  callback: elog
+  paths: fans
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan
+      type: string
