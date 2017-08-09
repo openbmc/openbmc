@@ -22,6 +22,7 @@ RDEPENDS_${PN} += " \
         phosphor-dbus-interfaces \
         phosphor-logging \
         sdbusplus \
+        virtual-obmc-image-manager \
         "
 
 S = "${WORKDIR}/git"
