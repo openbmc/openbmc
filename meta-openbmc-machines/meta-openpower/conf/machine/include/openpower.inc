@@ -24,3 +24,11 @@ PREFERRED_PROVIDER_virtual/openpower-fru-inventory ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'openpower-fru-inventory-mrw-native', 'openpower-fru-inventory-example-native')}"
 PREFERRED_PROVIDER_virtual/openpower-fru-properties ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'openpower-fru-properties-mrw-native', 'openpower-fru-properties-example-native')}"
+
+# The openpower-occ-control application is data-driven and requires an input
+# yaml of OCC instance numbers to sensor IDs.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the openpower-occ-control build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/openpower-occ-control-config-native ?= \
+    "${@cf_enabled(d, 'obmc-mrw', 'openpower-occ-control-config-mrw-native', 'openpower-occ-control-config-example-native')}"
