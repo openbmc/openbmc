@@ -1,0 +1,29 @@
+From fd1f8a28faa1eb7726c10baef368e9aa4089ed62 Mon Sep 17 00:00:00 2001
+From: Adriana Kobylak <anoo@us.ibm.com>
+Date: Sun, 30 Jul 2017 16:13:43 -0500
+Subject: [PATCH 1/5] UBI support
+
+---
+ include/configs/ast-g5-ncsi.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/include/configs/ast-g5-ncsi.h b/include/configs/ast-g5-ncsi.h
+index 12d6684..7e40193 100644
+--- a/include/configs/ast-g5-ncsi.h
++++ b/include/configs/ast-g5-ncsi.h
+@@ -28,4 +28,12 @@
+ 
+ #define CONFIG_HW_WATCHDOG
+ 
++#define CONFIG_CMD_UBI
++#define CONFIG_CMD_UBIFS
++#define CONFIG_RBTREE
++#define CONFIG_MTD_DEVICE
++#define CONFIG_MTD_PARTITIONS
++#define CONFIG_CMD_MTDPARTS
++#define CONFIG_LZO
++
+ #endif	/* __AST_G5_NCSI_CONFIG_H */
+-- 
+1.8.2.2
+

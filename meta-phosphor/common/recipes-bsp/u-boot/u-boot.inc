@@ -5,6 +5,7 @@ UBRANCH = "v2016.07-aspeed-openbmc"
 SRC_URI = "git://git@github.com/openbmc/u-boot.git;branch=${UBRANCH};protocol=https"
 
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'obmc-ubi-filesystem', \
-    'file://0001-config-ast-common-hack-bootopts.patch', '', d)}"
+    'file://0001-config-ast-common-hack-bootopts.patch \
+     file://0002-config-ast-g5-add-ubi-support.patch', '', d)}"
 
 PV = "v2016.07+git${SRCPV}"
