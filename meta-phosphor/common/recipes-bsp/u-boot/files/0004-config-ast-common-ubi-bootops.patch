@@ -1,0 +1,65 @@
+From d9e403ce8669d9b0ac4e94a7c64cef91ad51dc80 Mon Sep 17 00:00:00 2001
+From: Adriana Kobylak <anoo@us.ibm.com>
+Date: Wed, 9 Aug 2017 14:11:56 -0500
+Subject: [PATCH] config/ast-common: Add bootopts to support ubi and mtd partitioning
+
+Signed-off-by: Adriana Kobylak <anoo@us.ibm.com>
+---
+ include/configs/ast-common.h | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
+index b8b1f01..9c12f1f 100644
+--- a/include/configs/ast-common.h
++++ b/include/configs/ast-common.h
+@@ -84,10 +84,16 @@
+ #define CONFIG_SYS_MAXARGS		16
+ #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
+ 
++/*
++ * Dynamic MTD Partition support
++ */
++#define MTDIDS_DEFAULT		"nor0=bmc"
++#define MTDPARTS_DEFAULT	"mtdparts=bmc:384k(u-boot),128k(u-boot-env),-(obmc-ubi)"
++
+ #if 0
+ #define CONFIG_BOOTARGS			"console=ttyS4,115200n8 root=/dev/ram rw"
+ #endif
+-#define CONFIG_BOOTARGS                         "console=ttyS4,115200n8 root=/dev/mtdblock4 ro"
++#define CONFIG_BOOTARGS			"console=ttyS4,115200n8 ubi.mtd=obmc-ubi,0,0,0 ubi.mtd=alt-obmc-ubi,0,0,4 ro rootfstype=squashfs"
+ 
+ #define CONFIG_AST_SPI_NOR    /* AST SPI NOR Flash */
+ #define CONFIG_FMC_CS			1
+@@ -96,6 +102,7 @@
+ #define CONFIG_ENV_IS_IN_FLASH		1
+ #define CONFIG_ENV_ADDR			(AST_FMC_CS0_BASE + 0x60000)
+ #define CONFIG_ENV_ADDR_REDUND		(AST_FMC_CS0_BASE + 0x70000)
++#define CONFIG_LOADADDR			80800000
+ 
+ #define CONFIG_ENV_OFFSET		0x60000	/* environment starts here  */
+ #define CONFIG_ENV_OFFSET_REDUND	0x70000
+@@ -109,11 +116,20 @@
+ 	"    bootm 20080000; else bootm 20080000 20300000; " \
+ 	"fi"
+ #endif
+-#define CONFIG_BOOTCOMMAND                      "fdt addr 20080000; bootm 20080000"
++#define CONFIG_BOOTCOMMAND		"run set_bootargs; run obmc_bootcmd"
+ #define CONFIG_ENV_OVERWRITE
+ #define ASPEED_ENV_SETTINGS \
++	"ubiblock=0,1 \0" \
++	"root=/dev/ubiblock0_1 \0" \
++	"kernelname=kernel0 \0" \
++	"kernelname=kernel0 \0" \
++	"loadaddr=" CONFIG_LOADADDR "\0" \
++	"set_bootargs=setenv bootargs " CONFIG_BOOTARGS " ubi.block=${ubiblock} root=${root} \0" \
++	"obmc_bootcmd=ubi part obmc-ubi; ubi read ${loadaddr} ${kernelname}; bootm ${loadaddr} \0" \
+ 	"verify=yes\0"	\
+ 	"spi_dma=yes\0" \
++	"mtdids=" MTDIDS_DEFAULT "\0" \
++	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+ 	""
+ 
+ #endif	/* __AST_COMMON_CONFIG_H */
+-- 
+1.8.2.2
+
