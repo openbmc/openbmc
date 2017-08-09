@@ -1,0 +1,51 @@
+From d98a449df8695862c795056489546ef8b4748485 Mon Sep 17 00:00:00 2001
+From: Adriana Kobylak <anoo@us.ibm.com>
+Date: Wed, 9 Aug 2017 14:11:56 -0500
+Subject: [PATCH] aspeed: Add dynamic MTD partition support
+
+Signed-off-by: Adriana Kobylak <anoo@us.ibm.com>
+---
+ include/configs/ast-common.h | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
+index 6f2a50b..9da964d 100644
+--- a/include/configs/ast-common.h
++++ b/include/configs/ast-common.h
+@@ -84,10 +84,16 @@
+ #define CONFIG_SYS_MAXARGS		16
+ #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
+ 
++/*
++ * Dynamic MTD Partition support
++ */
++#define MTDIDS_DEFAULT	"nor0=bmc"
++#define MTDPARTS_DEFAULT	"mtdparts=bmc:-(obmc)"
++
+ #if 0
+ #define CONFIG_BOOTARGS			"console=ttyS4,115200n8 root=/dev/ram rw"
+ #endif
+-#define CONFIG_BOOTARGS                         "console=ttyS4,115200n8 root=/dev/mtdblock4 ro"
++#define CONFIG_BOOTARGS			"console=ttyS4,115200n8 ubi.mtd=bmc,0,0,0 ro ubi.block=0,1 rootfstype=squashfs root=/dev/ubiblock0_1"
+ 
+ #define CONFIG_AST_SPI_NOR    /* AST SPI NOR Flash */
+ #define CONFIG_FMC_CS			1
+@@ -106,12 +112,14 @@
+ 	"    bootm 20080000; else bootm 20080000 20300000; " \
+ 	"fi"
+ #endif
+-#define CONFIG_BOOTCOMMAND                      "fdt addr 20080000; bootm 20080000"
++#define CONFIG_BOOTCOMMAND		"ubi part obmc; ubi read 80800000 kernel0; fdt addr 80800000; bootm 80800000"
+ #define CONFIG_ENV_OVERWRITE
+ 
+ #define ASPEED_ENV_SETTINGS \
+ 	"verify=yes\0"	\
+ 	"spi_dma=yes\0" \
++	"mtdids=" MTDIDS_DEFAULT "\0" \
++	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+ 	""
+ 
+ #endif	/* __AST_COMMON_CONFIG_H */
+-- 
+1.8.2.2
+
