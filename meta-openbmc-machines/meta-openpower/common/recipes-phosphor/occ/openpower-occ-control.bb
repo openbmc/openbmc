@@ -12,6 +12,7 @@ require ${PN}.inc
 
 DBUS_SERVICE_${PN} += "org.open_power.OCC.Control.service"
 
+DEPENDS += "virtual/${PN}-config-native"
 DEPENDS += " \
         sdbusplus \
         sdbusplus-native \
@@ -29,6 +30,7 @@ RDEPENDS_${PN} += " \
                phosphor-dbus-interfaces \
                "
 
+EXTRA_OECONF = "YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN}"
 EXTRA_OECONF_append = "${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'i2c-occ', ' --enable-i2c-occ', '', d)}"
 
 S = "${WORKDIR}/git"
