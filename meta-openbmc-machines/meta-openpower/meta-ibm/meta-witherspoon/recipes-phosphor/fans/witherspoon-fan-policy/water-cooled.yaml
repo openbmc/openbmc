@@ -4,6 +4,27 @@
 # If the number of functional fans drops below that
 # power the system off.
 
+- name: fan0
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0
+
+- name: fan2
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
+
+- name: fan3
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
+
 - name: fans
   description: >
     'A water cooled Witherspoon has three fans to monitor.'
@@ -121,22 +142,58 @@
   condition: count
   paths: chassis
   properties: chassis water cooled
-  callback: check fans
+  callback: check power
   countop: '=='
   countbound: 1
   op: '=='
   bound: true
 
+- name: check power
+  description: >
+    'If the chassis has power, check fans.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fans
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
 - name: check fans
   description: >
-    'Verify there are at least two functional fans.'
+    'Verify there are at least two functional fans, power off if not.
+     Create an error if a fan is nonfuncitonal or not present'
   class: callback
   callback: group
   members:
-    - check presence
-    - check functional
+    - check group presence
+    - check group functional
+    - check individual presence
+    - check individual functional
 
-- name: check presence
+- name: check individual presence
+  description: >
+    'Verify each of the 3 fans are present.'
+  class: callback
+  callback: group
+  members:
+    - check fan0 presence
+    - check fan2 presence
+    - check fan3 presence
+
+- name: check individual functional
+  description: >
+    'Verify each of the 3 fans are functional.'
+  class: callback
+  callback: group
+  members:
+    - check fan0 functional
+    - check fan2 functional
+    - check fan3 functional
+
+- name: check group presence
   description: >
     'If this condition passes more than one fan has been unplugged
     for more than 25 seconds.  Shut the system down.  Count present
@@ -151,13 +208,13 @@
   paths: fans
   properties: fan present
   defer: 25000000us
-  callback: check power
+  callback: log and shutdown
   countop: '<'
   countbound: 2
   op: '=='
   bound: true
 
-- name: check functional
+- name: check group functional
   description: >
     'If this condition passes more than one fan in the group has been marked
     as nonfunctional for five seconds. Shut the system down.
@@ -170,24 +227,92 @@
   paths: fans
   properties: fan functional
   defer: 5000000us
-  callback: check power
+  callback: log and shutdown
   countop: '>'
   countbound: 1
   op: '=='
   bound: false
 
-- name: check power
+- name: check fan0 presence
   description: >
-    'If the chassis has power, power it off.'
+    'If this condition passes fan0 has been unplugged for more than 20 seconds.'
   class: condition
   condition: count
-  paths: chassis state
-  properties: chassis powered
-  callback: log and shutdown
+  paths: fan0
+  properties: fan present
+  defer: 20000000us
+  callback: notpresent fan0 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check fan0 functional
+  description: >
+    'If this condition passes fan0 has been marked as nonfunctional.'
+  class: condition
+  condition: count
+  paths: fan0
+  properties: fan functional
+  callback: nonfunctional fan0 error
   countop: '>'
   countbound: 0
   op: '=='
-  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+  bound: false
+
+- name: check fan2 presence
+  description: >
+    'If this condition passes fan2 has been unplugged for more than 20 seconds.'
+  class: condition
+  condition: count
+  paths: fan2
+  properties: fan present
+  defer: 20000000us
+  callback: notpresent fan2 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check fan2 functional
+  description: >
+    'If this condition passes fan2 has been marked as nonfunctional.'
+  class: condition
+  condition: count
+  paths: fan2
+  properties: fan functional
+  callback: nonfunctional fan2 error
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: false
+
+- name: check fan3 presence
+  description: >
+    'If this condition passes fan3 has been unplugged for more than 20 seconds.'
+  class: condition
+  condition: count
+  paths: fan3
+  properties: fan present
+  defer: 20000000us
+  callback: notpresent fan3 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check fan3 functional
+  description: >
+    'If this condition passes fan3 has been marked as nonfunctional.'
+  class: condition
+  condition: count
+  paths: fan3
+  properties: fan functional
+  callback: nonfunctional fan3 error
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: false
 
 - name: log and shutdown
   description: >
@@ -222,3 +347,69 @@
   properties: chassis powered
   severity: ERR
   message: Shutting down system.  There are not enough functional fans.
+
+- name: notpresent fan0 error
+  class: callback
+  callback: elog
+  paths: fan0
+  properties: fan present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0
+      type: string
+
+- name: nonfunctional fan0 error
+  class: callback
+  callback: elog
+  paths: fan0
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0
+      type: string
+
+- name: notpresent fan2 error
+  class: callback
+  callback: elog
+  paths: fan2
+  properties: fan present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
+      type: string
+
+- name: nonfunctional fan2 error
+  class: callback
+  callback: elog
+  paths: fan2
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
+      type: string
+
+- name: notpresent fan3 error
+  class: callback
+  callback: elog
+  paths: fan3
+  properties: fan present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
+      type: string
+
+- name: nonfunctional fan3 error
+  class: callback
+  callback: elog
+  paths: fan3
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
+      type: string
