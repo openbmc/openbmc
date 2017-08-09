@@ -149,6 +149,7 @@
   members:
     - shutdown
     - log
+    - create criticalhigh error
 
 - name: shutdown
   description: >
@@ -174,3 +175,16 @@
   properties: core temp
   severity: ERR
   message: The system is too hot.  Shutting down.
+
+- name: create criticalhigh error
+  description: >
+    'Create a CriticalHigh Error log.'
+  class: callback
+  callback: elog
+  paths: core sensors
+  properties: core temp
+  error: xyz::openbmc_project::Sensor::Threshold::Error::CriticalHigh
+  metadata:
+    - name: xyz::openbmc_project::Sensor::Threshold::CriticalHigh::SENSOR_TYPE
+      value: temperature
+      type: string
