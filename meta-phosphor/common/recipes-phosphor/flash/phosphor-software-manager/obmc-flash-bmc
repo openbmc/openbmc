@@ -80,6 +80,43 @@ ubi_remove() {
     fi
 }
 
+remount_ubi() {
+  # Get a list of all devices formatted as UBI
+  for file in /dev/mtd*; do
+    if [[ $(hexdump -C -n 3 $file) =~ "UBI" ]]; then
+      mtd="${file: -1}"
+      if [[ $mtd =~ ^-?[0-9]+$ ]]; then
+        mtds=${mtd},${mtds}
+      fi
+    fi
+  done
+
+  IFS=',' read -r -a mtds <<< "$mtds"
+  mtds=($(echo "${mtds[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+  for mtd in ${mtds[@]}; do
+    # Re-attach mtd device to ubi if not already done
+    ubiattach /dev/ubi_ctrl -m "${mtd}" -d "${mtd}" &> /dev/null
+    # Get information on all ubi volumes
+    ubinfo=$(ubinfo -d ${mtd})
+    presentVolumes=${ubinfo##*:}
+    IFS=', ' read -r -a array <<< "$presentVolumes"
+    for element in ${array[@]}; do
+      elementProperties=$(ubinfo -d $mtd -n $element)
+      # Get ubi volume name by getting rid of additional properties
+      name=${elementProperties#*Name:}
+      name="${name%Character*}"
+      name="$(echo -e "${name}" | tr -d '[:space:]')"
+
+      if [[ ${name} == ro-* ]]; then
+        mountdir="/media/${name}"
+        mkdir -p "${mountdir}"
+        ubiblock --create /dev/ubi${mtd}_${element} &> /dev/null
+        mount -t squashfs -o ro "/dev/ubiblock${mtd}_${element}" "${mountdir}"
+      fi
+    done
+  done
+}
+
 ubi_setenv() {
     varName="${variable%"\x3d"*}"
     value="${variable##*"\x3d"}"
@@ -118,6 +155,9 @@ case "$1" in
   ubisetenv)
     variable="$2"
     ubi_setenv
+    ;;
+  ubiremount)
+    remount_ubi
     ;;
   *)
     echo "Invalid argument"
