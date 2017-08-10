@@ -1,0 +1,12 @@
+[Unit]
+Description=Remount the ubi volume after a reboot
+Wants=xyz.openbmc_project.Software.BMC.Updater.service
+Before=xyz.openbmc_project.Software.BMC.Updater.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart={sbindir}/obmc-flash-bmc ubiremount
+
+[Install]
+WantedBy=multi-user.target

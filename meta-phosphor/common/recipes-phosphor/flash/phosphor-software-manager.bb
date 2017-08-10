@@ -72,6 +72,7 @@ SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-ubirw-remove.service \
     obmc-flash-bmc-ubiro-remove@.service \
     usr-local.mount \
+    obmc-flash-bmc-ubiremount.service \
     "
 
 # Name of the mtd device where the ubi volumes should be created
