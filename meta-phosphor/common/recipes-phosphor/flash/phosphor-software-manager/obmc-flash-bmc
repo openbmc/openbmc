@@ -80,6 +80,40 @@ ubi_remove() {
     fi
 }
 
+remount_ubi() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  pnordev="/dev/mtd${pnor}"
+
+  # Re-Attach the pnor mtd device to ubi
+  if [[ $(hexdump -C -n 3 ${pnordev}) =~ "UBI" ]]; then
+    ubiattach /dev/ubi_ctrl -m "${pnor}" -d "${pnor}"
+  else
+    # Device not formatted as ubi.
+    return 0
+  fi
+
+  # Get information on all ubi volumes
+  ubinfo=$(ubinfo -d ${pnor})
+  presentVolumes=${ubinfo##*:}
+  IFS=', ' read -r -a array <<< "$presentVolumes"
+  for element in ${array[@]};
+  do
+    elementProperties=$(ubinfo -d $pnor -n $element)
+    # Get ubi volume name by getting rid of additional properties
+    name=${elementProperties#*Name:}
+    name="${name%Character*}"
+    name="$(echo -e "${name}" | tr -d '[:space:]')"
+
+    if [[ ${name} == ro-* ]]; then
+      mountdir="/media/${name}"
+      mkdir -p "${mountdir}"
+      ubiblock --create /dev/ubi${pnor}_${element}
+      mount -t squashfs -o ro "/dev/ubiblock${pnor}_${element}" "${mountdir}"
+    fi
+  done
+}
+
 ubi_setenv() {
     varName="${variable%"\x3d"*}"
     value="${variable##*"\x3d"}"
@@ -118,6 +152,9 @@ case "$1" in
   ubisetenv)
     variable="$2"
     ubi_setenv
+    ;;
+  ubiremount)
+    remount_ubi
     ;;
   *)
     echo "Invalid argument"
