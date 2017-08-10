@@ -10,3 +10,5 @@ ITEMS += "${@compose_list(d, 'TEMPBASE', 'TEMPS')}"
 
 ENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_quanta-q71l := " ${@compose_list(d, 'ENVS', 'ITEMS')}"
+
+EXTRA_OECONF_append_quanta-q71l = " --enable-remove-from-dbus-on-fail"
