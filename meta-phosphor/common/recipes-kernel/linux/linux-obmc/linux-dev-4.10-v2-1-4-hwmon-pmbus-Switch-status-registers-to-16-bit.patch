@@ -1,0 +1,77 @@
+From patchwork Fri Aug 11 18:03:25 2017
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [linux, dev-4.10, v2,
+ 1/4] hwmon: (pmbus): Switch status registers to 16 bit
+From: eajames@linux.vnet.ibm.com
+X-Patchwork-Id: 800702
+Message-Id: <1502474608-2674-2-git-send-email-eajames@linux.vnet.ibm.com>
+To: openbmc@lists.ozlabs.org
+Cc: "Edward A. James" <eajames@us.ibm.com>
+Date: Fri, 11 Aug 2017 13:03:25 -0500
+
+From: "Edward A. James" <eajames@us.ibm.com>
+
+Switch the storage of status registers to 16 bit values. This allows us
+to store all the bits of STATUS_WORD.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ drivers/hwmon/pmbus/pmbus_core.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/hwmon/pmbus/pmbus_core.c b/drivers/hwmon/pmbus/pmbus_core.c
+index 3c8bcbd..06924b3 100644
+--- a/drivers/hwmon/pmbus/pmbus_core.c
++++ b/drivers/hwmon/pmbus/pmbus_core.c
+@@ -113,7 +113,7 @@ struct pmbus_data {
+ 	 * A single status register covers multiple attributes,
+ 	 * so we keep them all together.
+ 	 */
+-	u8 status[PB_NUM_STATUS_REG];
++	u16 status[PB_NUM_STATUS_REG];
+ 	u8 status_register;
+ 
+ 	u8 currpage;
+@@ -858,10 +858,10 @@ static int pmbus_get_boolean(struct pmbus_data *data, struct pmbus_boolean *b,
+ {
+ 	struct pmbus_sensor *s1 = b->s1;
+ 	struct pmbus_sensor *s2 = b->s2;
+-	u16 reg = (index >> 8) & 0xffff;
+-	u8 mask = index & 0xff;
++	u16 reg = (index >> 16) & 0xffff;
++	u16 mask = index & 0xffff;
+ 	int ret, status;
+-	u8 regval;
++	u16 regval;
+ 
+ 	status = data->status[reg];
+ 	if (status < 0)
+@@ -1002,7 +1002,7 @@ static int pmbus_add_boolean(struct pmbus_data *data,
+ 			     const char *name, const char *type, int seq,
+ 			     struct pmbus_sensor *s1,
+ 			     struct pmbus_sensor *s2,
+-			     u16 reg, u8 mask)
++			     u16 reg, u16 mask)
+ {
+ 	struct pmbus_boolean *boolean;
+ 	struct sensor_device_attribute *a;
+@@ -1018,7 +1018,7 @@ static int pmbus_add_boolean(struct pmbus_data *data,
+ 	boolean->s1 = s1;
+ 	boolean->s2 = s2;
+ 	pmbus_attr_init(a, boolean->name, S_IRUGO, pmbus_show_boolean, NULL,
+-			(reg << 8) | mask);
++			(reg << 16) | mask);
+ 
+ 	return pmbus_add_attribute(data, &a->dev_attr.attr);
+ }
+@@ -1110,7 +1110,7 @@ struct pmbus_limit_attr {
+  */
+ struct pmbus_sensor_attr {
+ 	u16 reg;			/* sensor register */
+-	u8 gbit;			/* generic status bit */
++	u16 gbit;			/* generic status bit */
+ 	u8 nlimit;			/* # of limit registers */
+ 	enum pmbus_sensor_classes class;/* sensor class */
+ 	const char *label;		/* sensor label */

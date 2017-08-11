@@ -1,0 +1,41 @@
+From patchwork Fri Aug 11 17:56:45 2017
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [linux, dev-4.10, v5,
+ 4/4] ARM: dts: aspeed: Witherspoon: Add power supplies to i2c bus
+From: eajames@linux.vnet.ibm.com
+X-Patchwork-Id: 800701
+Message-Id: <1502474205-1557-5-git-send-email-eajames@linux.vnet.ibm.com>
+To: openbmc@lists.ozlabs.org
+Cc: "Edward A. James" <eajames@us.ibm.com>, bjwyman@gmail.com
+Date: Fri, 11 Aug 2017 12:56:45 -0500
+
+From: "Edward A. James" <eajames@us.ibm.com>
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+index 9ab8e46..dd30c20 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
+@@ -417,6 +417,16 @@
+ 			type = <PCA955X_TYPE_GPIO>;
+ 		};
+ 	};
++
++	power-supply@68 {
++		compatible = "ibm,cffps1";
++		reg = <0x68>;
++	};
++
++	power-supply@69 {
++		compatible = "ibm,cffps1";
++		reg = <0x69>;
++	};
+ };
+ 
+ &i2c4 {

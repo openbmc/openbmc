@@ -1,0 +1,48 @@
+From patchwork Fri Aug 11 17:56:42 2017
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [linux, dev-4.10, v5,
+ 1/4] dt-bindings: i2c: Document the IBM CCF power supply version 1
+From: eajames@linux.vnet.ibm.com
+X-Patchwork-Id: 800697
+Message-Id: <1502474205-1557-2-git-send-email-eajames@linux.vnet.ibm.com>
+To: openbmc@lists.ozlabs.org
+Cc: "Edward A. James" <eajames@us.ibm.com>, bjwyman@gmail.com
+Date: Fri, 11 Aug 2017 12:56:42 -0500
+
+From: "Edward A. James" <eajames@us.ibm.com>
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ .../devicetree/bindings/i2c/ibm,cffps1.txt          | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/i2c/ibm,cffps1.txt
+
+diff --git a/Documentation/devicetree/bindings/i2c/ibm,cffps1.txt b/Documentation/devicetree/bindings/i2c/ibm,cffps1.txt
+new file mode 100644
+index 0000000..f68a0a6
+--- /dev/null
++++ b/Documentation/devicetree/bindings/i2c/ibm,cffps1.txt
+@@ -0,0 +1,21 @@
++Device-tree bindings for IBM Common Form Factor Power Supply Version 1
++----------------------------------------------------------------------
++
++Required properties:
++ - compatible = "ibm,cffps1";
++ - reg = < I2C bus address >;		: Address of the power supply on the
++					  I2C bus.
++
++Example:
++
++    i2c-bus@100 {
++        #address-cells = <1>;
++        #size-cells = <0>;
++        #interrupt-cells = <1>;
++        < more properties >
++
++        power-supply@68 {
++            compatible = "ibm,cffps1";
++            reg = <0x68>;
++        };
++    };
