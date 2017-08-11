@@ -1,6 +1,6 @@
-KBRANCH ?= "dev-4.10"
+KBRANCH ?= "ibm-pcs-psu"
 LINUX_VERSION ?= "4.10.17"
 
-SRCREV="b8cd93f62581143a80ba5c0c61629031ce4a5240"
+SRCREV="16862e56f0cb450048f1ae5ed0dce3ce136dc65e"
 
 require linux-obmc.inc
