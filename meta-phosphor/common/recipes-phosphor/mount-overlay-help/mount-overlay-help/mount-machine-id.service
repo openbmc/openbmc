@@ -1,0 +1,14 @@
+[Unit]
+Description=Mount machine-id
+Requires=etc.mount
+After=etc.mount
+DefaultDependencies=false
+ConditionPathExists=!/var/persist/etc/machine-id
+
+[Install]
+RequiredBy=local-fs.target
+
+[Service]
+ExecStart=/bin/sh -c "mount --bind /run/machine-id /etc/machine-id"
+Type=oneshot
+RemainAfterExit=no
