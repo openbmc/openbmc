@@ -1,0 +1,7 @@
+[Unit]
+Description=Mount overlay file-system
+
+[Service]
+ExecStart=/bin/sh -c "mkdir -p /var/upper && mkdir -p /var/work"
+Type=oneshot
+RemainAfterExit=yes
