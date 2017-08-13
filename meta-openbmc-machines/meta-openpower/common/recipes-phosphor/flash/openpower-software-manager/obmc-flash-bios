@@ -186,6 +186,10 @@ remount_ubi() {
 }
 
 update_symlinks() {
+  pnormtd="$(findmtd pnor)"
+  pnor="${pnormtd#mtd}"
+  pnordev="/dev/mtd${pnor}"
+
   PNOR_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/"
   PNOR_RO_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/ro"
   PNOR_RO_PREFIX="/media/pnor-ro-"
@@ -199,7 +203,12 @@ update_symlinks() {
   persistencePath="/var/lib/obmc/openpower-pnor-code-mgmt/"
   data="$(grep -r "priority" ${persistencePath})"
   if [[ -z "$data" ]]; then
-    return 0;
+    if [[ "$(hexdump -C -n 3 ${pnordev})" =~ "UBI" ]]; then
+      return -1
+    else
+      # Device not formatted as UBI.
+      return 0
+    fi
   fi
   IFS=$'\n' array=(${data})
   for element in ${array[@]};

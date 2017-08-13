@@ -6,6 +6,7 @@ Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
 Wants=mapper-subtree-remove@-xyz-openbmc\x5fproject-software\x3Axyz.openbmc_project.Software.ActivationBlocksTransition.service
 After=mapper-subtree-remove@-xyz-openbmc\x5fproject-software\x3Axyz.openbmc_project.Software.ActivationBlocksTransition.service
+Requires=obmc-flash-bios-updatesymlinks.service
 Conflicts=obmc-chassis-poweroff@%i.target
 RefuseManualStop=yes
 OnFailure=obmc-chassis-poweroff@%i.target
