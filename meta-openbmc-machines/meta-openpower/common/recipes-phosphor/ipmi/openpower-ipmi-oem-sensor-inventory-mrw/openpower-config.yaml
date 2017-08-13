@@ -1,5 +1,4 @@
-0x09:
-  path: /org/open_power/control/
+occ_active_sensor:
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
   interfaces:
