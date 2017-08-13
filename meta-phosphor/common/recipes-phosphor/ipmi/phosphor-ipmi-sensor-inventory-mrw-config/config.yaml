@@ -1,13 +1,14 @@
-0xC3:
+boot_count_sensor:
   path: /xyz/openbmc_project/state/host0
   serviceInterface: org.freedesktop.DBus.Properties
-  readingType: assertion
+  readingType: readingAssertion
   interfaces:
     xyz.openbmc_project.Control.Boot.RebootAttempts:
       AttemptsLeft:
         0xFF:
           type: uint32_t
-0x1F:
+
+os_boot_sensor:
   path: /xyz/openbmc_project/state/host0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
@@ -32,7 +33,8 @@
         0x06:
           assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete"
           type: string
-0x0F:
+
+fw_boot_sensor:
   path: /xyz/openbmc_project/state/host0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: eventdata2
@@ -54,10 +56,10 @@
         0x14:
           type: string
           set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit"
-0x0C:
+
+dimm_func_sensor:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
-  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -71,16 +73,33 @@
           type: "bool"
           assert: true
           deassert: false
-0x07:
+
+cpu_func_sensor:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
-  byteOffset: 0x00
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
         0x08:
           type:   "bool"
-          assert: false
+          assert:  false
+          deassert: true
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        0x07:
+          type: "bool"
+          assert: true
+          deassert: false
+
+cpucore_func_sensor:
+  serviceInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        0x08:
+          type:   "bool"
+          assert:  false
           deassert: true
     xyz.openbmc_project.Inventory.Item:
       Present:
