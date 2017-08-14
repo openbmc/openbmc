@@ -1,0 +1,11 @@
+[Unit]
+Description=Witherspoon Power Sequencer Power-on Monitor
+Wants=op-power-start@0.service
+After=op-power-start@0.service
+Conflicts=obmc-chassis-poweroff@0.target
+ConditionPathExists=!/run/openbmc/chassis@0-on
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env witherspoon-pseq-monitor -a pgood-monitor -i 5
+SyslogIdentifier=witherspoon-pseq-monitor
