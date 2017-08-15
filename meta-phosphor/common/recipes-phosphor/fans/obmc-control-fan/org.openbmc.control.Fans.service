@@ -7,7 +7,8 @@ Before=obmc-fan-control.target
 
 [Service]
 Restart=always
-ExecStart={sbindir}/fan_control.exe -f 6
+ExecStart=/usr/bin/env fan_control.exe -f 6
+SyslogIdentifier=fan_control.exe
 Type=dbus
 BusName={BUSNAME}
 Environment="PYTHONUNBUFFERED=1"

@@ -4,7 +4,8 @@ Wants=xyz.openbmc_project.Software.Version.service
 Before=xyz.openbmc_project.Software.Version.service
 
 [Service]
-ExecStart={sbindir}/phosphor-image-updater
+ExecStart=/usr/bin/env phosphor-image-updater
+SyslogIdentifier=phosphor-image-updater
 Restart=always
 Type=dbus
 BusName={BUSNAME}

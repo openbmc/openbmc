@@ -6,7 +6,8 @@ Before=mboxd-reload@.service
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bios updatesymlinks
+ExecStart=/usr/bin/env obmc-flash-bios updatesymlinks
+SyslogIdentifier=obmc-flash-bios
 
 [Install]
 WantedBy=mboxd.service mboxd-reload@.service

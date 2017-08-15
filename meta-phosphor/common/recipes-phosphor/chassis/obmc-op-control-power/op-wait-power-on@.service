@@ -11,7 +11,8 @@ ConditionPathExists=!/run/openbmc/chassis@%i-on
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart={sbindir}/pgood_wait /org/openbmc/control/power%i on
+ExecStart=/usr/bin/env pgood_wait /org/openbmc/control/power%i on
+SyslogIdentifier=pgood_wait
 TimeoutSec=30
 
 [Install]

@@ -6,5 +6,6 @@ After=obmc-flash-bios-ubiattach.service
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bios ubimount pnor-rw-%i
-ExecStart={sbindir}/obmc-flash-bios ubimount pnor-prsv
+ExecStart=/usr/bin/env obmc-flash-bios ubimount pnor-rw-%i
+ExecStart=/usr/bin/env obmc-flash-bios ubimount pnor-prsv
+SyslogIdentifier=obmc-flash-bios

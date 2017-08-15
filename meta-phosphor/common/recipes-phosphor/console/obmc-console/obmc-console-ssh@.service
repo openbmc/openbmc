@@ -5,7 +5,8 @@ Wants=obmc-console@{OBMC_CONSOLE_HOST_TTY}.service
 [Service]
 Environment="DROPBEAR_RSAKEY_DIR=/etc/dropbear"
 EnvironmentFile={envfiledir}/dropbear
-ExecStart=-{sbindir}/dropbear -i -r ${{DROPBEAR_RSAKEY_DIR}}/dropbear_rsa_host_key -c {bindir}/obmc-console-client $DROPBEAR_EXTRA_ARGS
+ExecStart=-/usr/bin/env dropbear -i -r ${{DROPBEAR_RSAKEY_DIR}}/dropbear_rsa_host_key -c "/usr/bin/env obmc-console-client" $DROPBEAR_EXTRA_ARGS
+SyslogIdentifier=dropbear
 ExecReload={base_bindir}/kill -HUP $MAINPID
 StandardInput=socket
 KillMode=process

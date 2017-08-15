@@ -6,7 +6,8 @@ Before=org.open_power.Software.Host.Updater.service
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bios ubiremount
+ExecStart=/usr/bin/env obmc-flash-bios ubiremount
+SyslogIdentifier=obmc-flash-bios
 
 [Install]
 WantedBy=multi-user.target

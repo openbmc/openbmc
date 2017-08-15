@@ -6,7 +6,8 @@ After=mapper-wait@-org-openbmc-managers-System.service
 [Service]
 EnvironmentFile={envfiledir}/obmc/power_control
 Restart=always
-ExecStart={sbindir}/power_control.exe $POLL_INTERVAL $PGOOD_TIMEOUT
+ExecStart=/usr/bin/env power_control.exe $POLL_INTERVAL $PGOOD_TIMEOUT
+SyslogIdentifier=power_control.exe
 Type=dbus
 BusName={BUSNAME}
 

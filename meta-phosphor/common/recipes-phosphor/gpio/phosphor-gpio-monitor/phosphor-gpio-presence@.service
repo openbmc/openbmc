@@ -6,7 +6,8 @@ ConditionPathExists={envfiledir}/obmc/gpio/phosphor-power-supply-%i.conf
 
 [Service]
 EnvironmentFile={envfiledir}/obmc/gpio/phosphor-power-supply-%i.conf
-ExecStart={sbindir}/phosphor-gpio-presence --path=${{PATH}} --inventory=${{INVENTORY}} --key=${{KEY}} --name=${{NAME}}
+ExecStart=/usr/bin/env phosphor-gpio-presence --path=${{DEVPATH}} --inventory=${{INVENTORY}} --key=${{KEY}} --name=${{NAME}}
+SyslogIdentifier=phosphor-gpio-presence
 
 [Install]
 RequiredBy={SYSTEMD_DEFAULT_TARGET}

@@ -7,4 +7,5 @@ After=obmc-mapper.target
 Type=oneshot
 RemainAfterExit=yes
 Restart=no
-ExecStart={sbindir}/mapper wait %I
+ExecStart=/usr/bin/env mapper wait %I
+SyslogIdentifier=mapper

@@ -4,7 +4,8 @@ Wants=mapper-wait@-xyz-openbmc_project-inventory.service
 After=mapper-wait@-xyz-openbmc_project-inventory.service
 
 [Service]
-ExecStart={sbindir}/openpower-occ-control
+ExecStart=/usr/bin/env openpower-occ-control
+SyslogIdentifier=openpower-occ-control
 Restart=always
 Type=dbus
 BusName={BUSNAME}

@@ -2,7 +2,8 @@
 Description=Phosphor Dump core monitor.
 
 [Service]
-ExecStart={sbindir}/phosphor-dump-monitor
+ExecStart=/usr/bin/env phosphor-dump-monitor
+SyslogIdentifier=phosphor-dump-monitor
 Restart=always
 
 [Install]

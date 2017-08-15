@@ -4,5 +4,6 @@ Description=Create read-only ubi volumes %I
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bmc ubiro {RO_MTD} rofs-%i %i
-ExecStart={sbindir}/obmc-flash-bmc ubikernel {KERNEL_MTD} kernel-%i %i
+ExecStart=/usr/bin/env obmc-flash-bmc ubiro {RO_MTD} rofs-%i %i
+ExecStart=/usr/bin/env obmc-flash-bmc ubikernel {KERNEL_MTD} kernel-%i %i
+SyslogIdentifier=obmc-flash-bmc

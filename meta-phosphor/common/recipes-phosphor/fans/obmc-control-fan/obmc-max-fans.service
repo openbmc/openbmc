@@ -7,4 +7,5 @@ After=obmc-fan-control.target
 [Service]
 Type=oneshot
 Restart=no
-ExecStart={sbindir}/mapper call /org/openbmc/control/fans org.openbmc.control.Fans setMax
+ExecStart=/usr/bin/env mapper call /org/openbmc/control/fans org.openbmc.control.Fans setMax
+SyslogIdentifier=mapper

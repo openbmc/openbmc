@@ -5,7 +5,8 @@ After=mapper-wait@-org-openbmc-managers-System.service
 
 [Service]
 Restart=always
-ExecStart={sbindir}/button_power.exe
+ExecStart=/usr/bin/env button_power.exe
+SyslogIdentifier=button_power.exe
 Type=dbus
 BusName={BUSNAME}
 

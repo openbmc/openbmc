@@ -3,7 +3,8 @@ Description=Phosphor Flash Controller
 
 [Service]
 Restart=always
-ExecStart={sbindir}/obmc-phosphor-flashd
+ExecStart=/usr/bin/env obmc-phosphor-flashd
+SyslogIdentifier=obmc-phosphor-flashd
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}

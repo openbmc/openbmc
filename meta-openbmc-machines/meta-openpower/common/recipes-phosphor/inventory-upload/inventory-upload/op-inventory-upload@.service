@@ -8,7 +8,8 @@ Conflicts=obmc-host-stop@%i.target
 Restart=no
 Type=oneshot
 RemainAfterExit=yes
-ExecStart={sbindir}/inventory_upload.py
+ExecStart=/usr/bin/env inventory_upload.py
+SyslogIdentifier=inventory_upload.py
 Environment="PYTHONUNBUFFERED=1"
 
 [Install]

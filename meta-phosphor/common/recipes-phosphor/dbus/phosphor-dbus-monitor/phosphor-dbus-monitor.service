@@ -4,7 +4,8 @@ After=obmc-mapper.target
 
 [Service]
 Restart=always
-ExecStart={sbindir}/phosphor-dbus-monitor
+ExecStart=/usr/bin/env phosphor-dbus-monitor
+SyslogIdentifier=phosphor-dbus-monitor
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}

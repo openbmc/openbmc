@@ -11,7 +11,8 @@ ConditionPathExists=!/run/openbmc/chassis@%i-on
 ConditionPathExists=/var/lib/obmc/cfam_overrides
 
 [Service]
-ExecStart={sbindir}/openpower-proc-control CFAMOverride
+ExecStart=/usr/bin/env openpower-proc-control CFAMOverride
+SyslogIdentifier=openpower-proc-control
 Type=oneshot
 RemainAfterExit=yes
 

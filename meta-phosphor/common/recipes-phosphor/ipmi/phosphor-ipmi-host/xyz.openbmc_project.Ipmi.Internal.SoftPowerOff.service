@@ -9,5 +9,6 @@ ConditionPathExists=!/run/openbmc/host@0-request
 
 [Service]
 Restart=no
-ExecStart={sbindir}/phosphor-softpoweroff
+ExecStart=/usr/bin/env phosphor-softpoweroff
+SyslogIdentifier=phosphor-softpoweroff
 Type=oneshot

@@ -2,7 +2,8 @@
 Description=Phosphor Download Manager
 
 [Service]
-ExecStart={sbindir}/phosphor-download-manager
+ExecStart=/usr/bin/env phosphor-download-manager
+SyslogIdentifier=phosphor-download-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}

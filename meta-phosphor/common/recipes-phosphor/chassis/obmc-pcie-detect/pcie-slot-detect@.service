@@ -7,7 +7,8 @@ Conflicts=obmc-host-stop@%i.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart={sbindir}/pcie_slot_present.exe
+ExecStart=/usr/bin/env pcie_slot_present.exe
+SyslogIdentifier=pcie_slot_present.exe
 
 [Install]
 WantedBy=obmc-host-start@%i.target

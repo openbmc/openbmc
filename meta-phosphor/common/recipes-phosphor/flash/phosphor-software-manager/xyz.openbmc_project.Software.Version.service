@@ -3,7 +3,8 @@ Description=Phosphor Version Software Manager
 
 [Service]
 ExecStartPre=/bin/sh -c 'mkdir -p /tmp/images'
-ExecStart={sbindir}/phosphor-version-software-manager
+ExecStart=/usr/bin/env phosphor-version-software-manager
+SyslogIdentifier=phosphor-version-software-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}

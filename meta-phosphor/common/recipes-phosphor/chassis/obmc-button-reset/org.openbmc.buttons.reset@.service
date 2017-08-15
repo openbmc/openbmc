@@ -5,7 +5,8 @@ After=mapper-wait@-org-openbmc-managers-System.service
 
 [Service]
 Restart=always
-ExecStart={sbindir}/button_reset.exe
+ExecStart=/usr/bin/env button_reset.exe
+SyslogIdentifier=button_reset.exe
 Type=dbus
 BusName={BUSNAME}
 

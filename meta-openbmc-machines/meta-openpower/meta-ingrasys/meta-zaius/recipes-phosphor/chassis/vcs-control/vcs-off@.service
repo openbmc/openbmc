@@ -5,7 +5,8 @@ Before=obmc-power-stop-pre@%i.target
 Conflicts=obmc-host-start@%i.target
 
 [Service]
-ExecStart={bindir}/zaius_vcs.sh off
+ExecStart=/usr/bin/env zaius_vcs.sh off
+SyslogIdentifier=zaius_vcs.sh
 Type=oneshot
 RemainAfterExit=yes
 

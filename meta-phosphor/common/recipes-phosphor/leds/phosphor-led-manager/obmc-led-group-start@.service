@@ -8,4 +8,5 @@ Conflicts=obmc-led-group-stop@%i.service
 Type=oneshot
 RemainAfterExit=yes
 Restart=no
-ExecStart={sbindir}/mapper call /xyz/openbmc_project/led/groups/%i org.freedesktop.DBus.Properties Set ssv xyz.openbmc_project.Led.Group Asserted b true
+ExecStart=/usr/bin/env mapper call /xyz/openbmc_project/led/groups/%i org.freedesktop.DBus.Properties Set ssv xyz.openbmc_project.Led.Group Asserted b true
+SyslogIdentifier=mapper

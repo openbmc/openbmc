@@ -10,7 +10,8 @@ Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
-ExecStart={sbindir}/openpower-proc-control vcsWorkaround
+ExecStart=/usr/bin/env openpower-proc-control vcsWorkaround
+SyslogIdentifier=openpower-proc-control
 Type=oneshot
 RemainAfterExit=yes
 

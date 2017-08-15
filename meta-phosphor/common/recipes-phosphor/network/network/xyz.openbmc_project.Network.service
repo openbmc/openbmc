@@ -3,11 +3,11 @@ Description=Phosphor Network Manager
 After=obmc-mapper.target
 
 [Service]
-ExecStart={sbindir}/phosphor-network-manager
+ExecStart=/usr/bin/env phosphor-network-manager
+SyslogIdentifier=phosphor-network-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
-

@@ -5,7 +5,8 @@ After=obmc-webserver-pre.target
 
 [Service]
 Restart=always
-ExecStart={sbindir}/phosphor-rocket $APPLICATION
+ExecStart=/usr/bin/env phosphor-rocket $APPLICATION
+SyslogIdentifier=phosphor-rocket
 Environment="PYTHONUNBUFFERED=1"
 EnvironmentFile={envfiledir}/obmc/wsgi_app
 

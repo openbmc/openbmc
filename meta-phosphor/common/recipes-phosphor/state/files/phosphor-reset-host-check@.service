@@ -12,8 +12,8 @@ ConditionPathExists=/run/openbmc/chassis@%i-on
 [Service]
 RemainAfterExit=yes
 Type=oneshot
-ExecStart=/usr/sbin/phosphor-host-check
-
+ExecStart=/usr/bin/env phosphor-host-check
+SyslogIdentifier=phosphor-host-check
 
 [Install]
 WantedBy=obmc-host-reset@%i.target

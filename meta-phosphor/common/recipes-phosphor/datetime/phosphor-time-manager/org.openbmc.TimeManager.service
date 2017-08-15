@@ -11,7 +11,8 @@ After=mapper-wait@-org-openbmc-control-power0.service
 
 [Service]
 Restart=always
-ExecStart={sbindir}/timemanager
+ExecStart=/usr/bin/env timemanager
+SyslogIdentifier=timemanager
 Type=dbus
 BusName={BUSNAME}
 

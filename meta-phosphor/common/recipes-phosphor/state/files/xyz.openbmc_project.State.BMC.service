@@ -5,7 +5,8 @@ After=mapper-wait@-org-openbmc-managers-System.service
 Before=mapper-wait@-xyz-openbmc_project-state-bmc.service
 
 [Service]
-ExecStart={sbindir}/phosphor-bmc-state-manager
+ExecStart=/usr/bin/env phosphor-bmc-state-manager
+SyslogIdentifier=phosphor-bmc-state-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}

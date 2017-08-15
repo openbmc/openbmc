@@ -3,7 +3,8 @@ Description=Phosphor Sensor Manager
 
 [Service]
 Restart=always
-ExecStart={sbindir}/sensor_manager2.py
+ExecStart=/usr/bin/env sensor_manager2.py
+SyslogIdentifier=sensor_manager2.py
 Type=dbus
 BusName={BUSNAME}
 Environment="PYTHONUNBUFFERED=1"

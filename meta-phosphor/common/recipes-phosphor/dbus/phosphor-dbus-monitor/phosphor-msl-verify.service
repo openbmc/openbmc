@@ -6,4 +6,5 @@ Wants=mapper-wait@-xyz-openbmc_project-inventory.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart={sbindir}/phosphor-msl-verify
+ExecStart=/usr/bin/env phosphor-msl-verify
+SyslogIdentifier=phosphor-msl-verify

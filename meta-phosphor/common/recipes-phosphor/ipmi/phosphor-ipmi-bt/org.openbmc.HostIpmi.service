@@ -3,7 +3,8 @@ Description=Phosphor IPMI BT DBus Bridge
 
 [Service]
 Restart=always
-ExecStart={sbindir}/btbridged
+ExecStart=/usr/bin/env btbridged
+SyslogIdentifier=btbridged
 Type=dbus
 BusName={BUSNAME}
 

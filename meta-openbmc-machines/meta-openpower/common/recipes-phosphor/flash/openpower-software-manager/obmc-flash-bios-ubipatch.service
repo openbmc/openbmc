@@ -6,4 +6,5 @@ After=usr-local.mount
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bios ubimount pnor-patch
+ExecStart=/usr/bin/env obmc-flash-bios ubimount pnor-patch
+SyslogIdentifier=obmc-flash-bios

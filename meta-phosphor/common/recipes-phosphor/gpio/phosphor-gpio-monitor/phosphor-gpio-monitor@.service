@@ -4,4 +4,5 @@ Description=Phosphor GPIO %I monitor
 [Service]
 Restart=no
 EnvironmentFile={envfiledir}/obmc/gpio/%I
-ExecStart={sbindir}/phosphor-gpio-monitor --path=${{PATH}} --key=${{KEY}} --polarity=${{POLARITY}} --target=${{TARGET}}
+ExecStart=/usr/bin/env phosphor-gpio-monitor --path=${{DEVPATH}} --key=${{KEY}} --polarity=${{POLARITY}} --target=${{TARGET}}
+SyslogIdentifier=phosphor-gpio-monitor

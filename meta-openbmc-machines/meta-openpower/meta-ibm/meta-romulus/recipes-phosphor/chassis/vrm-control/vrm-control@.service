@@ -6,7 +6,8 @@ Before=avsbus-enable@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
-ExecStart={bindir}/vrm.sh
+ExecStart=/usr/bin/env vrm.sh
+SyslogIdentifier=vrm.sh
 Type=oneshot
 RemainAfterExit=yes
 

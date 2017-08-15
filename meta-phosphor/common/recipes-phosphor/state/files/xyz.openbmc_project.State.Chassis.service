@@ -5,7 +5,8 @@ After=mapper-wait@-org-openbmc-managers-System.service
 Before=mapper-wait@-xyz-openbmc_project-state-chassis.service
 
 [Service]
-ExecStart={sbindir}/phosphor-chassis-state-manager
+ExecStart=/usr/bin/env phosphor-chassis-state-manager
+SyslogIdentifier=phosphor-chassis-state-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}

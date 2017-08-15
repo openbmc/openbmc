@@ -6,7 +6,8 @@ Before=xyz.openbmc_project.Software.BMC.Updater.service
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bmc ubiremount
+ExecStart=/usr/bin/env obmc-flash-bmc ubiremount
+SyslogIdentifier=obmc-flash-bmc
 
 [Install]
 WantedBy=multi-user.target

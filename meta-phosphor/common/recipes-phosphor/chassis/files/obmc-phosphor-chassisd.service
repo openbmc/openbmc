@@ -3,7 +3,8 @@ Description=Phosphor Chassis Controller
 
 [Service]
 Restart=always
-ExecStart={sbindir}/obmc-phosphor-chassisd
+ExecStart=/usr/bin/env obmc-phosphor-chassisd
+SyslogIdentifier=obmc-phosphor-chassisd
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}

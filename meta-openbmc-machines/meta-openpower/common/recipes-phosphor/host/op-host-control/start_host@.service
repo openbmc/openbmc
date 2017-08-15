@@ -10,7 +10,8 @@ Conflicts=obmc-host-stop@%i.target
 ConditionPathExists=!/run/openbmc/host@%i-on
 
 [Service]
-ExecStart={sbindir}/openpower-proc-control startHost
+ExecStart=/usr/bin/env openpower-proc-control startHost
+SyslogIdentifier=openpower-proc-control
 Type=oneshot
 RemainAfterExit=yes
 

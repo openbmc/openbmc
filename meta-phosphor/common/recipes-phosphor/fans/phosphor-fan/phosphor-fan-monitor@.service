@@ -6,7 +6,8 @@ Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 Restart=on-failure
-ExecStart={sbindir}/phosphor-fan-monitor
+ExecStart=/usr/bin/env phosphor-fan-monitor
+SyslogIdentifier=phosphor-fan-monitor
 Type=notify
 NotifyAccess=all
 

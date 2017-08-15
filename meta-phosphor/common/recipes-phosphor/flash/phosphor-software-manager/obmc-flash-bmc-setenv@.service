@@ -4,4 +4,5 @@ Description=Set U-Boot environment variable
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bmc ubisetenv %i
+ExecStart=/usr/bin/env obmc-flash-bmc ubisetenv %i
+SyslogIdentifier=obmc-flash-bmc

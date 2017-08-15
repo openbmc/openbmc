@@ -3,7 +3,8 @@ Description=OpenPOWER OCC Active Disable
 Before=obmc-host-stop-pre@%i.target
 
 [Service]
-ExecStart={bindir}/occ-active.sh disable
+ExecStart=/usr/bin/env occ-active.sh disable
+SyslogIdentifier=occ-active.sh
 Type=oneshot
 
 [Install]

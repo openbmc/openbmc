@@ -6,7 +6,8 @@ Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
-ExecStart={bindir}/vcs_off.sh
+ExecStart=/usr/bin/env vcs_off.sh
+SyslogIdentifier=vcs_off.sh
 Type=oneshot
 RemainAfterExit=yes
 

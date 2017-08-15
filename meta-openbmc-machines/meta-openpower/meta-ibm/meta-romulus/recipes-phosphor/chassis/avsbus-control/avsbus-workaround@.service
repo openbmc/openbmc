@@ -7,7 +7,8 @@ Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
-ExecStart={bindir}/avsbus-workaround.sh
+ExecStart=/usr/bin/env avsbus-workaround.sh
+SyslogIdentifier=avsbus-workaround.sh
 Type=oneshot
 RemainAfterExit=yes
 

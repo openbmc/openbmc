@@ -3,7 +3,8 @@ Description=Phosphor Dump Manager
 
 [Service]
 ExecStartPre=/bin/sh -c 'mkdir -p {BMC_DUMP_PATH}'
-ExecStart={sbindir}/phosphor-dump-manager
+ExecStart=/usr/bin/env phosphor-dump-manager
+SyslogIdentifier=phosphor-dump-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}

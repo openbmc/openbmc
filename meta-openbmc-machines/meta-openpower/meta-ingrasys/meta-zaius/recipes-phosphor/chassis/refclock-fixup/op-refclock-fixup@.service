@@ -12,7 +12,8 @@ ConditionPathExists=!/run/openbmc/chassis@%i-on
 Restart=no
 Type=oneshot
 RemainAfterExit=yes
-ExecStart={sbindir}/fix_zaius_refclock.sh
+ExecStart=/usr/bin/env fix_zaius_refclock.sh
+SyslogIdentifier=fix_zaius_refclock.sh
 
 [Install]
 RequiredBy=obmc-chassis-poweron@%i.target

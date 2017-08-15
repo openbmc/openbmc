@@ -4,5 +4,6 @@ Description=Deletes read-only and kernel ubi volume %I
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bmc ubiremove rofs-%i
-ExecStart={sbindir}/obmc-flash-bmc ubiremove kernel-%i
+ExecStart=/usr/bin/env obmc-flash-bmc ubiremove rofs-%i
+ExecStart=/usr/bin/env obmc-flash-bmc ubiremove kernel-%i
+SyslogIdentifier=obmc-flash-bmc

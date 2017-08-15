@@ -2,7 +2,8 @@
 Description=Phosphor Network Manager
 
 [Service]
-ExecStart={sbindir}/netman.py
+ExecStart=/usr/bin/env netman.py
+SyslogIdentifier=netman.py
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
 Type=dbus

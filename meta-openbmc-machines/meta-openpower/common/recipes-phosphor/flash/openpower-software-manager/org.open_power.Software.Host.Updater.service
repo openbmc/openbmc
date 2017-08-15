@@ -7,7 +7,8 @@ Wants=obmc-flash-bios-ubipatch.service
 Before=obmc-flash-bios-ubipatch.service
 
 [Service]
-ExecStart={sbindir}/openpower-update-manager
+ExecStart=/usr/bin/env openpower-update-manager
+SyslogIdentifier=openpower-update-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}

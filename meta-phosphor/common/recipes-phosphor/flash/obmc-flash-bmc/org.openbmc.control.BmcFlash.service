@@ -7,7 +7,8 @@ After=mapper-wait@-org-openbmc-control-bmc0.service
 
 [Service]
 Restart=always
-ExecStart={sbindir}/bmc_update.py
+ExecStart=/usr/bin/env bmc_update.py
+SyslogIdentifier=bmc_update.py
 Environment="PYTHONUNBUFFERED=1"
 Type=dbus
 BusName={BUSNAME}

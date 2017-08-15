@@ -4,4 +4,5 @@ Description=Attach the PNOR mtd device to UBI
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart={sbindir}/obmc-flash-bios ubiattach
+ExecStart=/usr/bin/env obmc-flash-bios ubiattach
+SyslogIdentifier=obmc-flash-bios

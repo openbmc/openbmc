@@ -3,5 +3,6 @@ Description=Phosphor DBUS Browser
 
 [Service]
 Restart=always
-ExecStart={sbindir}/rest-dbus
+ExecStart=/usr/bin/env rest-dbus
+SyslogIdentifier=rest-dbus
 Environment="PYTHONUNBUFFERED=1"

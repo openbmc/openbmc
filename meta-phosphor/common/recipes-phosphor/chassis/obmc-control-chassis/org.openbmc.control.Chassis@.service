@@ -3,7 +3,8 @@ Description=Phosphor Chassis%i Control
 
 [Service]
 Restart=always
-ExecStart={sbindir}/chassis_control.py
+ExecStart=/usr/bin/env chassis_control.py
+SyslogIdentifier=chassis_control.py
 Type=dbus
 BusName={BUSNAME}
 Environment="PYTHONUNBUFFERED=1"

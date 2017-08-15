@@ -3,4 +3,5 @@ Description=Phosphor sysfs LED controller
 
 [Service]
 Restart=always
-ExecStart={sbindir}/phosphor-ledcontroller -p %f
+ExecStart=/usr/bin/env phosphor-ledcontroller -p %f
+SyslogIdentifier=phosphor-ledcontroller

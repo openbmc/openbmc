@@ -7,7 +7,8 @@ Before=obmc-host-start-pre@%i.target
 Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
-ExecStart={bindir}/cpld_trigger.sh
+ExecStart=/usr/bin/env cpld_trigger.sh
+SyslogIdentifier=cpld_trigger.sh
 Type=oneshot
 RemainAfterExit=yes
 

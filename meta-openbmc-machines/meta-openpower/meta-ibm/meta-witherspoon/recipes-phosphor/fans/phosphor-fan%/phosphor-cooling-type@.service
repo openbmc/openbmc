@@ -6,7 +6,8 @@ ConditionPathExists={envfiledir}/obmc/phosphor-fan/phosphor-cooling-type-%i.conf
 
 [Service]
 EnvironmentFile={envfiledir}/obmc/phosphor-fan/phosphor-cooling-type-%i.conf
-ExecStart={sbindir}/phosphor-cooling-type ${{OBJPATH}} ${{AIR}} ${{WATER}} ${{DEVICE}} ${{CODE}}
+ExecStart=/usr/bin/env phosphor-cooling-type ${{OBJPATH}} ${{AIR}} ${{WATER}} ${{DEVICE}} ${{CODE}}
+SyslogIdentifier=phosphor-cooling-type
 
 [Install]
 RequiredBy={SYSTEMD_DEFAULT_TARGET}

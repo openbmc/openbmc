@@ -7,7 +7,8 @@ Conflicts=obmc-chassis-poweroff@%i.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart={sbindir}/mboxctl --reset
+ExecStart=/usr/bin/env mboxctl --reset
+SyslogIdentifier=mboxctl
 
 [Install]
 WantedBy=obmc-chassis-poweron@%i.target

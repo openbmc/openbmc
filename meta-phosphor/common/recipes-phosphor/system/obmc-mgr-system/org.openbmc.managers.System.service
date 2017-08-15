@@ -5,7 +5,8 @@ After=obmc-mapper.target
 
 [Service]
 Restart=always
-ExecStart={sbindir}/system_manager.py
+ExecStart=/usr/bin/env system_manager.py
+SyslogIdentifier=system_manager.py
 Type=dbus
 BusName={BUSNAME}
 Environment="PYTHONUNBUFFERED=1"

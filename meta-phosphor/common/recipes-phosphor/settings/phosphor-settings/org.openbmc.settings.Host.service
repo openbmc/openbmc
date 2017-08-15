@@ -5,7 +5,8 @@ Wants=obmc-mapper.target
 After=obmc-mapper.target
 
 [Service]
-ExecStart={sbindir}/settings_manager.py
+ExecStart=/usr/bin/env settings_manager.py
+SyslogIdentifier=settings_manager.py
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
 Type=dbus

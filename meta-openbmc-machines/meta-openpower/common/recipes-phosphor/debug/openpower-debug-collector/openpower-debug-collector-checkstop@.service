@@ -6,6 +6,7 @@ Before=obmc-host-quiesce@%i.target
 # Adding 5 seconds to allow OCC to collect debug data
 # before processing checkstop
 ExecStart={base_bindir}/sleep 5
-ExecStart={sbindir}/checkstop_app
+ExecStart=/usr/bin/env checkstop_app
+SyslogIdentifier=checkstop_app
 Type=oneshot
 Restart=no

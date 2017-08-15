@@ -4,7 +4,8 @@ Description=Lightweight SLP Server
 After=network.target
 
 [Service]
-ExecStart={sbindir}/slpd
+ExecStart=/usr/bin/env slpd
+SyslogIdentifier=slpd
 Restart=always
 
 [Install]

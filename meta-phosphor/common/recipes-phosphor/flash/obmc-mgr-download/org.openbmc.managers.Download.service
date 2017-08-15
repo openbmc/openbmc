@@ -3,7 +3,8 @@ Description=Phosphor Download Manager
 
 [Service]
 Restart=always
-ExecStart={sbindir}/download_manager.py
+ExecStart=/usr/bin/env download_manager.py
+SyslogIdentifier=download_manager.py
 Environment="PYTHONUNBUFFERED=1"
 Type=dbus
 BusName={BUSNAME}

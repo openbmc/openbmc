@@ -2,7 +2,8 @@
 Description=Phosphor User Manager
 
 [Service]
-ExecStart={sbindir}/obmc-phosphor-userd
+ExecStart=/usr/bin/env obmc-phosphor-userd
+SyslogIdentifier=obmc-phosphor-userd
 Environment="PYTHONUNBUFFERED=1"
 Restart=always
 Type=dbus

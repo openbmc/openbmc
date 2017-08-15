@@ -9,7 +9,8 @@ ConditionPathExists=!/run/openbmc/host@%i-on
 Type=oneshot
 RemainAfterExit=yes
 # TODO openbmc/openbmc#1598 - Delete this service once available
-ExecStart={sbindir}/pflash -i
+ExecStart=/usr/bin/env pflash -i
+SyslogIdentifier=pflash
 
 [Install]
 WantedBy=obmc-host-start@%i.target

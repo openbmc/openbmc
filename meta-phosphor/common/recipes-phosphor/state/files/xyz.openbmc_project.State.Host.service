@@ -8,7 +8,8 @@ Before=mapper-wait@-xyz-openbmc_project-state-host.service
 After=phosphor-reset-host-running@0.service
 
 [Service]
-ExecStart={sbindir}/phosphor-host-state-manager
+ExecStart=/usr/bin/env phosphor-host-state-manager
+SyslogIdentifier=phosphor-host-state-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}

@@ -5,7 +5,8 @@ After=mapper-wait@-org-openbmc-managers-System.service
 
 [Service]
 Restart=always
-ExecStart={sbindir}/control_host.exe
+ExecStart=/usr/bin/env control_host.exe
+SyslogIdentifier=control_host.exe
 Type=dbus
 BusName={BUSNAME}
 

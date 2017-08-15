@@ -11,5 +11,6 @@ Wants=mapper-wait@-xyz-openbmc_project-control-host0-restriction_mode.service
 After=mapper-wait@-xyz-openbmc_project-control-host0-restriction_mode.service
 
 [Service]
-ExecStart={sbindir}/netipmid
+ExecStart=/usr/bin/env netipmid
+SyslogIdentifier=netipmid
 Restart=always

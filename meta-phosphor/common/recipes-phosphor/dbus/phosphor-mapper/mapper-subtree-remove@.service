@@ -7,4 +7,5 @@ After=obmc-mapper.target
 Type=oneshot
 RemainAfterExit=no
 Restart=no
-ExecStart={sbindir}/mapper subtree-remove %I
+ExecStart=/usr/bin/env mapper subtree-remove %I
+SyslogIdentifier=mapper

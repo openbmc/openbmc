@@ -5,7 +5,8 @@ After=mapper-wait@-org-openbmc-control-flash-bios.service
 
 [Service]
 Restart=no
-ExecStart={sbindir}/mapper call /org/openbmc/control/flash/bios org.openbmc.Flash init
+ExecStart=/usr/bin/env mapper call /org/openbmc/control/flash/bios org.openbmc.Flash init
+SyslogIdentifier=mapper
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}

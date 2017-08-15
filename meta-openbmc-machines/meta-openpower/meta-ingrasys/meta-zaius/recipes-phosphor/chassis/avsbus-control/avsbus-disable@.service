@@ -6,7 +6,8 @@ Conflicts=obmc-host-start@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
 [Service]
-ExecStart={bindir}/zaius_avsbus.sh disable
+ExecStart=/usr/bin/env zaius_avsbus.sh disable
+SyslogIdentifier=zaius_avsbus.sh
 Type=oneshot
 RemainAfterExit=yes
 

@@ -3,7 +3,8 @@ Description=Phosphor BMC%i Control
 
 [Service]
 Restart=always
-ExecStart={sbindir}/control_bmc.exe
+ExecStart=/usr/bin/env control_bmc.exe
+SyslogIdentifier=control_bmc.exe
 Type=dbus
 BusName={BUSNAME}
 

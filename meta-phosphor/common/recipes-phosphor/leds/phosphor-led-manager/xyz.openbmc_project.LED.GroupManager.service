@@ -4,7 +4,8 @@ Before=mapper-wait@-xyz-openbmc_project-led-groups.service
 
 [Service]
 Restart=always
-ExecStart={sbindir}/phosphor-ledmanager
+ExecStart=/usr/bin/env phosphor-ledmanager
+SyslogIdentifier=phosphor-ledmanager
 Type=dbus
 BusName={BUSNAME}
 

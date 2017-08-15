@@ -6,7 +6,8 @@ Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 Restart=on-failure
-ExecStart={sbindir}/phosphor-fan-presence-tach
+ExecStart=/usr/bin/env phosphor-fan-presence-tach
+SyslogIdentifier=phosphor-fan-presence-tach
 
 [Install]
 RequiredBy=obmc-chassis-poweron@%i.target

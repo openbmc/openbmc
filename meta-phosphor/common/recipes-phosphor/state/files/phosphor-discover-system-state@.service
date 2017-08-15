@@ -11,7 +11,8 @@ After=op-reset-chassis-on@%i.service
 [Service]
 Restart=no
 Type=oneshot
-ExecStart={sbindir}/phosphor-discover-system-state --host %i
+ExecStart=/usr/bin/env phosphor-discover-system-state --host %i
+SyslogIdentifier=phosphor-discover-system-state
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
