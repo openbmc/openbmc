@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenPOWER OCC Active Disable
+Before=obmc-host-stop-pre@%i.target
+
+[Service]
+ExecStart={bindir}/occ-active.sh disable
+Type=oneshot
+
+[Install]
+WantedBy=obmc-host-stop@%i.target
