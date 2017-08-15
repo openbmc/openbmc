@@ -3,7 +3,7 @@ Description=Phosphor System Manager
 
 [Service]
 Restart=always
-ExecStart={sbindir}/obmc-phosphor-sysd
+ExecStart=/usr/bin/env obmc-phosphor-sysd
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}

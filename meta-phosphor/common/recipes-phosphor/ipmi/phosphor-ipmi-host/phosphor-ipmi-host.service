@@ -17,7 +17,7 @@ After=mapper-wait@-org-openbmc-settings-host0.service
 
 [Service]
 Restart=always
-ExecStart={sbindir}/ipmid
+ExecStart=/usr/bin/env ipmid
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}

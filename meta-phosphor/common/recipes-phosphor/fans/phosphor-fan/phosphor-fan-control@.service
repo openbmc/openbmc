@@ -4,7 +4,7 @@ Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 Restart=on-failure
-ExecStart={sbindir}/phosphor-fan-control --control
+ExecStart=/usr/bin/env phosphor-fan-control --control
 
 [Install]
 RequiredBy=obmc-fan-control-ready@%i.target

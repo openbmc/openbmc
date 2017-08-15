@@ -4,4 +4,4 @@ Description=Deletes read-only ubi volume %I
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bmc ubiremove ro-%i
+ExecStart=/usr/bin/env obmc-flash-bmc ubiremove ro-%i

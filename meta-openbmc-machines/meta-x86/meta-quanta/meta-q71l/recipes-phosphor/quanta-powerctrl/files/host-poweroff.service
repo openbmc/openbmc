@@ -7,7 +7,7 @@ Conflicts=obmc-chassis-power-on@0.target
 [Service]
 RemainAfterExit=yes
 Type=oneshot
-ExecStart={sbindir}/poweroff.sh
+ExecStart=/usr/bin/env poweroff.sh
 
 [Install]
 WantedBy=obmc-chassis-power-off@0.target

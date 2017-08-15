@@ -14,7 +14,7 @@ ConditionPathExists=!/run/openbmc/host@%i-on
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart={sbindir}/mapper call /org/openbmc/control/host%i org.openbmc.control.Host boot
+ExecStart=/usr/bin/env mapper call /org/openbmc/control/host%i org.openbmc.control.Host boot
 
 [Install]
 WantedBy=obmc-host-start@%i.target

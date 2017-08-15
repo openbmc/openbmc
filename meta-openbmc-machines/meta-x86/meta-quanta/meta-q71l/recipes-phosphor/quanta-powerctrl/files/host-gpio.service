@@ -5,4 +5,4 @@ Description=Configure GPIOs for Host Power Control
 Restart=no
 RemainsAfterExit=true
 Type=oneshot
-ExecStart={sbindir}/init_once.sh
+ExecStart=/usr/bin/env init_once.sh

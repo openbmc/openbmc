@@ -5,7 +5,7 @@ After=mapper-wait@-org-openbmc-managers-Download.service
 
 [Service]
 Restart=always
-ExecStart={sbindir}/flash_bios.exe
+ExecStart=/usr/bin/env flash_bios.exe
 Type=dbus
 BusName={BUSNAME}
 

@@ -6,6 +6,6 @@ After=obmc-webserver-pre.target
 
 [Service]
 Restart=always
-ExecStart={sbindir}/phosphor-gevent $APPLICATION
+ExecStart=/usr/bin/env phosphor-gevent $APPLICATION
 Environment="PYTHONUNBUFFERED=1"
 EnvironmentFile={envfiledir}/obmc/wsgi_app

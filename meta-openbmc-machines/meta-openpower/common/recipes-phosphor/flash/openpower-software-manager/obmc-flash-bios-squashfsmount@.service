@@ -6,4 +6,4 @@ After=obmc-flash-bios-ubiattach.service
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bios squashfsmount pnor-ro-%i %i
+ExecStart=/usr/bin/env obmc-flash-bios squashfsmount pnor-ro-%i %i

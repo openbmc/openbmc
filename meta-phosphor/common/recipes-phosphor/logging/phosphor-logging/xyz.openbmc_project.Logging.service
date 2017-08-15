@@ -2,7 +2,7 @@
 Description=Phosphor Log Manager
 
 [Service]
-ExecStart={sbindir}/phosphor-log-manager
+ExecStart=/usr/bin/env phosphor-log-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}

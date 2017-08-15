@@ -2,7 +2,7 @@
 Description=Phosphor Inverse ARP
 
 [Service]
-ExecStart={sbindir}/inarp
+ExecStart=/usr/bin/env inarp
 Restart=always
 
 [Install]

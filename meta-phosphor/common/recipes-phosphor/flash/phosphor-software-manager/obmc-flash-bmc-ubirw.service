@@ -4,4 +4,4 @@ Description=Create BMC read-write ubi volume
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart={sbindir}/obmc-flash-bmc ubirw {RW_MTD} rw
+ExecStart=/usr/bin/env obmc-flash-bmc ubirw {RW_MTD} rw

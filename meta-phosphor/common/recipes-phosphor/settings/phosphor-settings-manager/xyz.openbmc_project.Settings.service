@@ -2,7 +2,7 @@
 Description=Phosphor Settings Daemon
 
 [Service]
-ExecStart={sbindir}/phosphor-settings-manager
+ExecStart=/usr/bin/env phosphor-settings-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}
