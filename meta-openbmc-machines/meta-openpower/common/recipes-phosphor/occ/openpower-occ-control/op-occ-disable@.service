@@ -1,0 +1,10 @@
+[Unit]
+Description=OpenPOWER OCC Active Disable
+Before=obmc-host-stop-pre@%i.target
+
+[Service]
+ExecStart=/bin/sh -c "busctl tree org.open_power.OCC.Control --list | grep occ | xargs -n1 -I{} busctl set-property org.open_power.OCC.Control  {} org.open_power.OCC.Status OccActive b false"
+Type=oneshot
+
+[Install]
+WantedBy=obmc-host-stop@%i.target
