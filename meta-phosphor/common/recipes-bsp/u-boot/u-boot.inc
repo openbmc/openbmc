@@ -5,3 +5,5 @@ UBRANCH = "v2016.07-aspeed-openbmc"
 SRC_URI = "git://git@github.com/openbmc/u-boot.git;branch=${UBRANCH};protocol=https"
 
 PV = "v2016.07+git${SRCPV}"
+
+SRC_URI += "file://0001-configs-ast-Add-redundnant-env.patch"

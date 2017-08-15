@@ -1,0 +1,33 @@
+From ba7cf47befb92e2565bf6169ccc5b766647de222 Mon Sep 17 00:00:00 2001
+From: "Edward A. James" <eajames@us.ibm.com>
+Date: Thu, 13 Jul 2017 13:42:18 -0500
+Subject: [PATCH u-boot] configs/ast: Add redundnant env
+
+Configure ast chips to run redundant u-boot environments.
+
+Signed-off-by: Edward A. James <eajames@us.ibm.com>
+---
+ include/configs/ast-common.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
+index 110c780..15e1db4 100644
+--- a/include/configs/ast-common.h
++++ b/include/configs/ast-common.h
+@@ -92,9 +92,12 @@
+ #define CONFIG_SYS_MAX_FLASH_SECT	(8192)		/* max number of sectors on one chip */
+ #define CONFIG_ENV_IS_IN_FLASH		1
+ #define CONFIG_ENV_ADDR			(AST_FMC_CS0_BASE + 0x60000)
++#define CONFIG_ENV_ADDR_REDUND		(AST_FMC_CS0_BASE + 0x70000)
+ 
+ #define CONFIG_ENV_OFFSET		0x60000	/* environment starts here  */
+-#define CONFIG_ENV_SIZE			0x20000	/* Total Size of Environment Sector */
++#define CONFIG_ENV_OFFSET_REDUND	0x70000
++#define CONFIG_ENV_SIZE			0x10000	/* Total Size of Environment Sector */
++#define CONFIG_ENV_SIZE_REDUND		0x10000
+ 
+ #define CONFIG_BOOTCOMMAND	\
+ 	"fdt addr 20080000; " \
+-- 
+1.8.3.1
+
