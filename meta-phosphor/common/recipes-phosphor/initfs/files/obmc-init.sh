@@ -55,7 +55,7 @@ get_fw_env_var() {
 	# count non-blank non-comment lines
 	# copies=$(grep -v ^# /etc/fw_env.config | grep -c [::alnum::])
 	# ... we could if we had the fw_env.config in the initramfs
-	copies=1
+	copies=2
 
 	# * Change \n to \r and \0 to \n
 	# * Skip to the 5th byte to skip over crc
