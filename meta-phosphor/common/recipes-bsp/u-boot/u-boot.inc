@@ -5,7 +5,8 @@ UBRANCH = "v2016.07-aspeed-openbmc"
 SRC_URI = "git://git@github.com/openbmc/u-boot.git;branch=${UBRANCH};protocol=https"
 
 SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
-    'file://0001-config-ast-common-hack-bootopts.patch', '', d)}"
+    'file://0001-config-ast-common-hack-bootopts.patch \
+     file://0002-Add-MTD-support-to-Aspeed-Flash-driver.patch', '', d)}"
 
 PV = "v2016.07+git${SRCPV}"
 
