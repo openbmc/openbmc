@@ -119,10 +119,10 @@ events:
           name: set_floor_from_average_sensor_value
           map:
               value:
-                  - 27000: 3500
-                  - 32000: 4600
-                  - 37000: 5200
-                  - 40000: 5800
+                  - 27000: 8000
+                  - 32000: 8000
+                  - 37000: 8000
+                  - 40000: 8000
               type: std::map<int64_t, uint64_t>
     - name: update_water_cooled_floor_speed_based_on_ambient
       zone_conditions:
@@ -138,10 +138,10 @@ events:
           name: set_floor_from_average_sensor_value
           map:
               value:
-                  - 27000: 3000
-                  - 32000: 4300
-                  - 37000: 5000
-                  - 40000: 5800
+                  - 27000: 8000
+                  - 32000: 8000
+                  - 37000: 8000
+                  - 40000: 8000
               type: std::map<int64_t, uint64_t>
     - name: update_ceiling_speed_based_on_ambient
       zone_conditions:
@@ -160,6 +160,6 @@ events:
           name: set_ceiling_from_average_sensor_value
           map:
               value:
-                  - 25000: 7200
+                  - 25000: 10500
                   - 27000: 10500
               type: std::map<int64_t, uint64_t>
