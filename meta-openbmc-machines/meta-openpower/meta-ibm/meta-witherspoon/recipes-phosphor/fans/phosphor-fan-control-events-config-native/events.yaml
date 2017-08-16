@@ -81,6 +81,12 @@ groups:
           - /temperature/p1_core21_temp
           - /temperature/p1_core22_temp
           - /temperature/p1_core23_temp
+    - name: zone0_regulators
+      description: Group of regulator temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/p0_vdd_temp
+          - /temperature/p1_vdd_temp
 
 preconditions:
     - name: property_states_match
@@ -319,6 +325,52 @@ events:
       action:
           name: set_net_decrease_speed
           property: 70000
+          factor:
+              value: 1000
+              type: int64_t
+          delta:
+              value: 10
+              type: uint64_t
+      timer:
+          interval: 15
+    - name: speed_increase_changes_based_on_regulator_temps
+      zone_conditions:
+          - name: air_cooled_chassis
+            zones:
+                - 0
+          - name: water_and_air_cooled_chassis
+            zones:
+                - 0
+      group: zone0_regulators
+      interface: xyz.openbmc_project.Sensor.Value
+      property:
+          name: Value
+          type: int64_t
+      action:
+          name: set_net_increase_speed
+          property: 85000
+          factor:
+              value: 1000
+              type: int64_t
+          delta:
+              value: 400
+              type: uint64_t
+    - name: speed_decrease_changes_based_on_regulator_temps
+      zone_conditions:
+          - name: air_cooled_chassis
+            zones:
+                - 0
+          - name: water_and_air_cooled_chassis
+            zones:
+                - 0
+      group: zone0_regulators
+      interface: xyz.openbmc_project.Sensor.Value
+      property:
+          name: Value
+          type: int64_t
+      action:
+          name: set_net_decrease_speed
+          property: 82000
           factor:
               value: 1000
               type: int64_t
