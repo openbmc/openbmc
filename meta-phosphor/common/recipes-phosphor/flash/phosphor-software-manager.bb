@@ -92,6 +92,6 @@ do_install_append() {
 }
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
-SRCREV = "140fcb159bf1d26153dfa11fe75cc26337cfb21a"
+SRCREV = "7b5010f2579f497ec36ae7220ed871d7ba76fc26"
 
 S = "${WORKDIR}/git"
