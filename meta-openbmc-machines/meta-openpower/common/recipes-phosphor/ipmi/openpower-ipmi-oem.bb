@@ -10,6 +10,17 @@ inherit obmc-phosphor-utils
 
 DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "autoconf-archive-native"
+DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "phosphor-logging"
+DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
+DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"
+
+RDEPENDS_${PN} += " \
+        sdbusplus \
+        phosphor-logging \
+        openpower-dbus-interfaces \
+        phosphor-dbus-interfaces \
+        "
 
 TARGET_CFLAGS += "-fpic"
 
