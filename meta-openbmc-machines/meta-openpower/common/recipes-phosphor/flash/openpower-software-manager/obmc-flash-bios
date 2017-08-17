@@ -208,26 +208,33 @@ update_symlinks() {
   PNOR_RW_PREFIX="/media/pnor-rw-"
   PNOR_PRSV_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/prsv"
   PNOR_PRSV="/media/pnor-prsv"
+  PERSISTENCE_PATH="/var/lib/obmc/openpower-pnor-code-mgmt/"
 
-  # Get the current PNOR version using the priorities stored in
-  # the persistence storage files.
-  persistencePath="/var/lib/obmc/openpower-pnor-code-mgmt/"
-  data="$(grep -r "priority" ${persistencePath})"
-  if [[ -z "$data" ]]; then
-    return 0;
-  fi
-  IFS=$'\n' array=(${data})
-  for element in ${array[@]};
-  do
-    element="${element#$persistencePath}"
-    version="$( cut -d ':' -f 1 <<< "$element" )";
-    priority="${element: -1}"
+  # Get a list of all active PNOR versions
+  data="$(ls -d ${PNOR_RO_PREFIX}*)"
+  IFS=$'\n'  array=(${data})
 
-    if [[ priority -le lowestPriority  ]]; then
-      lowestPriority=${priority}
-      currentVersion=${version}
+  currentVersion=""
+  lowestPriority=255
+  for element in ${array[@]}; do
+    #Remove the PNOR_RO_PREFIX from the path to get version ID.
+    versionId="${element#${PNOR_RO_PREFIX}}"
+
+    # Get the priority of active versions from persistence files.
+    if [[ -f "${PERSISTENCE_PATH}${versionId}" ]]; then
+      data="$(grep -r "priority" ${PERSISTENCE_PATH}${versionId})"
+      priority="${data: -1}"
+      if [[ priority -le lowestPriority  ]]; then
+        lowestPriority=${priority}
+        currentVersion=${versionId}
+      fi
     fi
   done
+
+  # Return if no active version found
+  if [ -z $currentVersion ]; then
+    return 0;
+  fi
 
   if [ ! -d "${PNOR_ACTIVE_PATH}" ]; then
         mkdir -p "${PNOR_ACTIVE_PATH}"
