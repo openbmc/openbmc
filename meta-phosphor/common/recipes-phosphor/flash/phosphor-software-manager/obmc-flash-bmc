@@ -1,5 +1,18 @@
 #!/bin/sh
 
+# Get the root mtd device number (mtdX) from "/dev/ubiblockX_Y on /"
+findrootmtd() {
+  rootmatch=" on / "
+  m="$(mount | grep "${rootmatch}" | grep "ubiblock")"
+  m="${m##*ubiblock}"
+  m="${m%_*}"
+  if [ -z "${m}" ]; then
+    # default to bmc mtd (0)
+    m=0
+  fi
+  echo "mtd${m}"
+}
+
 # Get the mtd device number (mtdX)
 findmtd() {
   m="$(grep -xl "$1" /sys/class/mtd/*/name)"
@@ -35,6 +48,15 @@ ubi_rw() {
 
 ubi_ro() {
   romtd="$(findmtd "${reqmtd}")"
+  romtd2="$(findmtd "${reqmtd2}")"
+
+  if [ ! "${romtd}" == "${romtd2}" ]; then
+    # Request to use alternate mtd device, choose the non-root one
+    rootmtd="$(findrootmtd)"
+    if [ "${rootmtd}" == "${romtd}" ]; then
+      romtd="${romtd2}"
+    fi
+  fi
   ro="${romtd#mtd}"
   ubidev="/dev/ubi${ro}"
 
@@ -130,7 +152,8 @@ case "$1" in
     ubi_rw
     ;;
   ubiro)
-    reqmtd="$2"
+    reqmtd="$(echo "$2" | cut -d "+" -f 1)"
+    reqmtd2="$(echo "$2" | cut -d "+" -f 2)"
     name="$3"
     version="$4"
     imgfile="image-rofs"
@@ -140,7 +163,8 @@ case "$1" in
     ubi_updatevol
     ;;
   ubikernel)
-    reqmtd="$2"
+    reqmtd="$(echo "$2" | cut -d "+" -f 1)"
+    reqmtd2="$(echo "$2" | cut -d "+" -f 2)"
     name="$3"
     version="$4"
     imgfile="image-kernel"
