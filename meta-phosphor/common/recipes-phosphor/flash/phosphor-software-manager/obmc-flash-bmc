@@ -145,7 +145,19 @@ ubi_setenv() {
     fw_setenv "$varName" "$value"
 }
 
+mtd_write() {
+  flashmtd="$(findmtd "${reqmtd}")"
+  img="/tmp/images/${version}/${imgfile}"
+  flashcp -v ${img} /dev/${flashmtd}
+}
+
 case "$1" in
+  mtduboot)
+    reqmtd="$2"
+    version="$3"
+    imgfile="image-u-boot"
+    mtd_write
+    ;;
   ubirw)
     reqmtd="$2"
     name="$3"
