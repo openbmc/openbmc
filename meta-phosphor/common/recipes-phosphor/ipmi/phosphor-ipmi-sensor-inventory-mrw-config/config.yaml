@@ -107,3 +107,17 @@ cpucore_func_sensor:
           type: "bool"
           assert: true
           deassert: false
+
+tpm_required_sensor:
+  path: /xyz/openbmc_project/control/host0/TPMEnable
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  interfaces:
+    xyz.openbmc_project.Control.TPM.Policy:
+      TPMEnable:
+        0x00:
+          type: "bool"
+          assert: false
+        0x01:
+          type: "bool"
+          assert: true
