@@ -76,11 +76,9 @@ SYSTEMD_SERVICE_${PN}-updater += " \
     "
 
 # Name of the mtd device where the ubi volumes should be created
-BMC_RW_MTD ??= "pnor"
-BMC_RO_MTD ??= "pnor"
-# TODO Change kernel location to primary BMC chip once the rofs/rwfs mtd devices
-# are merged into a single ubi one openbmc/openbmc#1942
-BMC_KERNEL_MTD ??= "pnor"
+BMC_RW_MTD ??= "bmc"
+BMC_RO_MTD ??= "bmc"
+BMC_KERNEL_MTD ??= "bmc"
 SYSTEMD_SUBSTITUTIONS += "RW_MTD:${BMC_RW_MTD}:obmc-flash-bmc-ubirw.service"
 SYSTEMD_SUBSTITUTIONS += "RO_MTD:${BMC_RO_MTD}:obmc-flash-bmc-ubiro@.service"
 SYSTEMD_SUBSTITUTIONS += "KERNEL_MTD:${BMC_KERNEL_MTD}:obmc-flash-bmc-ubiro@.service"
