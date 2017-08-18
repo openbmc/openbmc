@@ -110,8 +110,12 @@ mount_ubi() {
   pnormtd="$(findmtd pnor)"
   pnor="${pnormtd#mtd}"
   ubidev="/dev/ubi${pnor}"
+  pnordev="/dev/mtd${pnor}"
 
   if [[ "${name}" == "pnor-patch" ]]; then
+    if [[ ! "$(hexdump -C -n 3 ${pnordev})" =~ "UBI" ]]; then
+      return 0
+    fi
     mountdir="/usr/local/share/pnor"
   else
     mountdir="/media/${name}"
