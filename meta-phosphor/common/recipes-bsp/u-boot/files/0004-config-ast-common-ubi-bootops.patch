@@ -9,7 +9,7 @@ Signed-off-by: Adriana Kobylak <anoo@us.ibm.com>
  1 file changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
-index b8b1f01..9c12f1f 100644
+index e7fa6ed..578de2c 100644
 --- a/include/configs/ast-common.h
 +++ b/include/configs/ast-common.h
 @@ -84,10 +84,16 @@
@@ -38,20 +38,21 @@ index b8b1f01..9c12f1f 100644
  
  #define CONFIG_ENV_OFFSET		0x60000	/* environment starts here  */
  #define CONFIG_ENV_OFFSET_REDUND	0x70000
-@@ -109,11 +116,20 @@
+@@ -109,12 +116,21 @@
  	"    bootm 20080000; else bootm 20080000 20300000; " \
  	"fi"
  #endif
 -#define CONFIG_BOOTCOMMAND                      "fdt addr 20080000; bootm 20080000"
 +#define CONFIG_BOOTCOMMAND		"run set_bootargs; run obmc_bootcmd"
  #define CONFIG_ENV_OVERWRITE
+ 
  #define ASPEED_ENV_SETTINGS \
 +	"ubiblock=0,1 \0" \
 +	"root=/dev/ubiblock0_1 \0" \
 +	"kernelname=kernel0 \0" \
 +	"kernelname=kernel0 \0" \
-+	"loadaddr=" CONFIG_LOADADDR "\0" \
-+	"set_bootargs=setenv bootargs " CONFIG_BOOTARGS " ubi.block=${ubiblock} root=${root} \0" \
++	"loadaddr=" __stringify(CONFIG_LOADADDR) "\0" \
++	"set_bootargs=setenv bootargs " CONFIG_BOOTARGS " ubi.block=\${ubiblock} root=\${root} \0" \
 +	"obmc_bootcmd=ubi part obmc-ubi; ubi read ${loadaddr} ${kernelname}; bootm ${loadaddr} \0" \
  	"verify=yes\0"	\
  	"spi_dma=yes\0" \
