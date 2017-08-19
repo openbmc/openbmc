@@ -1,7 +1,8 @@
 [Unit]
-Description=Deletes read-only ubi volume %I
+Description=Deletes read-only and kernel ubi volume %I
 
 [Service]
 Type=oneshot
 RemainAfterExit=no
 ExecStart={sbindir}/obmc-flash-bmc ubiremove ro-%i
+ExecStart={sbindir}/obmc-flash-bmc ubiremove kernel-%i
