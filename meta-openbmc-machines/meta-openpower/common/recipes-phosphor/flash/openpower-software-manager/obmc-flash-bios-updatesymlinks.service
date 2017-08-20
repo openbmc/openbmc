@@ -1,9 +1,12 @@
 [Unit]
 Description=Updates symlinks for active PNOR version
+Before=mboxd.service
+Before=mboxd-reload@.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=no
 ExecStart={sbindir}/obmc-flash-bios updatesymlinks
 
+[Install]
 WantedBy=mboxd.service mboxd-reload@.service
