@@ -7,9 +7,9 @@ BMC:
         VINI,DR: PrettyName
     xyz.openbmc_project.Common.UUID:
         OPFR,UD: UUID
-
-
+    xyz.openbmc_project.Inventory.Item.Bmc:
 ETHERNET:
     xyz.openbmc_project.Inventory.Item.NetworkInterface:
         VINI,B1: MACAddress
         OPFR,B1: MACAddress
+    xyz.openbmc_project.Inventory.Item.Ethernet:

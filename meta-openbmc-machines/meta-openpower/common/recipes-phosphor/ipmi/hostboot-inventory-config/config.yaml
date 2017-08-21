@@ -25,6 +25,8 @@ PROC:
         # Delimiter value in ascii as YAML parser
         # was not allowing certain characters like ":" as value
         IPMIFruValueDelimiter: "58"
+    xyz.openbmc_project.Inventory.Item.Cpu:
+
 SYS:
   Interfaces:
     xyz.openbmc_project.Inventory.Decorator.Asset:
@@ -34,6 +36,7 @@ SYS:
       SerialNumber:
         IPMIFruSection: Chassis
         IPMIFruProperty: "Serial Number"
+    xyz.openbmc_project.Inventory.Item.System:
 
 NODE:
   Interfaces:
@@ -54,6 +57,7 @@ NODE:
       PrettyName:
         IPMIFruSection: Board
         IPMIFruProperty: "Name"
+    xyz.openbmc_project.Inventory.Item.Chassis:
   AssociatedTypes:
     - SYS
 
@@ -83,6 +87,7 @@ DIMM:
       Version:
         IPMIFruSection: Product
         IPMIFruProperty: "Version"
+    xyz.openbmc_project.Inventory.Item.Dimm:
 
 MEMBUFF:
   Interfaces:
@@ -103,3 +108,4 @@ MEMBUFF:
       PrettyName:
         IPMIFruSection: Board
         IPMIFruProperty: "Name"
+    xyz.openbmc_project.Inventory.Item.MemoryBuffer:
