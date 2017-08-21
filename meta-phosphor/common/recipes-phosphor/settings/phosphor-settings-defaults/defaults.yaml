@@ -38,7 +38,7 @@
     Interface: xyz.openbmc_project.Control.Power.RestorePolicy
     Properties:
         PowerRestorePolicy:
-            Default: RestorePolicy::Policy::Restore
+            Default: RestorePolicy::Policy::AlwaysOff
 
 /xyz/openbmc_project/time/owner:
     Interface: xyz.openbmc_project.Time.Owner
