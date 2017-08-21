@@ -107,7 +107,7 @@ remount_ubi() {
       name="${name%Character*}"
       name="$(echo -e "${name}" | tr -d '[:space:]')"
 
-      if [[ ${name} == ro-* ]]; then
+      if [[ ${name} == rofs-* ]]; then
         mountdir="/media/${name}"
         mkdir -p "${mountdir}"
         ubiblock --create /dev/ubi${mtd}_${element} &> /dev/null

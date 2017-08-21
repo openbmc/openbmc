@@ -5,11 +5,11 @@ Subject: [PATCH] config/ast-common: Add bootopts to support ubi and mtd partitio
 
 Signed-off-by: Adriana Kobylak <anoo@us.ibm.com>
 ---
- include/configs/ast-common.h | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ include/configs/ast-common.h | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
 diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
-index e7fa6ed..578de2c 100644
+index e7fa6ed..1f0e64e 100644
 --- a/include/configs/ast-common.h
 +++ b/include/configs/ast-common.h
 @@ -84,10 +84,16 @@
@@ -38,7 +38,7 @@ index e7fa6ed..578de2c 100644
  
  #define CONFIG_ENV_OFFSET		0x60000	/* environment starts here  */
  #define CONFIG_ENV_OFFSET_REDUND	0x70000
-@@ -109,12 +116,21 @@
+@@ -109,12 +116,20 @@
  	"    bootm 20080000; else bootm 20080000 20300000; " \
  	"fi"
  #endif
@@ -49,8 +49,7 @@ index e7fa6ed..578de2c 100644
  #define ASPEED_ENV_SETTINGS \
 +	"ubiblock=0,1 \0" \
 +	"root=/dev/ubiblock0_1 \0" \
-+	"kernelname=kernel0 \0" \
-+	"kernelname=kernel0 \0" \
++	"kernelname=kernel-0 \0" \
 +	"loadaddr=" __stringify(CONFIG_LOADADDR) "\0" \
 +	"set_bootargs=setenv bootargs " CONFIG_BOOTARGS " ubi.block=\${ubiblock} root=\${root} \0" \
 +	"obmc_bootcmd=ubi part obmc-ubi; ubi read ${loadaddr} ${kernelname}; bootm ${loadaddr} \0" \

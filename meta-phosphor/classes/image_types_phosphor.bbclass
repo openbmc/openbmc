@@ -145,10 +145,10 @@ do_generate_ubi() {
 	rm -f $cfg ubi-img
 
 	# Construct the ubinize config file
-	add_volume $cfg 0 static kernel0 \
+	add_volume $cfg 0 static kernel-0 \
 		${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE}
 
-	add_volume $cfg 1 static rofs0 \
+	add_volume $cfg 1 static rofs-0 \
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_UBI_BASETYPE}
 
 	add_volume $cfg 2 dynamic rwfs rwfs.${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_RWFS_TXT_SIZE}
