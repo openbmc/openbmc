@@ -1,0 +1,11 @@
+[Unit]
+Description=Check PNOR UBI format
+Before=mboxd.service
+
+[Service]
+ExecStart={bindir}/check_pnor_format.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=mboxd.service
