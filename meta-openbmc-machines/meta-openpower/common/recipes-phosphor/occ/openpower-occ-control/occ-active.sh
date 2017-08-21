@@ -11,7 +11,10 @@ else
     echo "  disable - set occ's to inactive state"
     exit -1
 fi
-busctl tree org.open_power.OCC.Control --list | grep occ | xargs -n1 -I{} \
-    busctl set-property org.open_power.OCC.Control {} \
-    org.open_power.OCC.Status OccActive b $value
+
+OCC_CONTROL_SERVICE="org.open_power.OCC.Control"
+
+busctl tree $OCC_CONTROL_SERVICE --list | grep occ | xargs -r -n1 -I{} \
+    busctl set-property $OCC_CONTROL_SERVICE {} org.open_power.OCC.Status \
+    OccActive b $value
 exit 0
