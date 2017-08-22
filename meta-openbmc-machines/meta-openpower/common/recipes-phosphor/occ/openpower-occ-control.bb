@@ -18,6 +18,7 @@ do_install_append() {
 }
 
 DBUS_SERVICE_${PN} += "org.open_power.OCC.Control.service"
+SYSTEMD_SERVICE_${PN} += "op-occ-enable@.service"
 SYSTEMD_SERVICE_${PN} += "op-occ-disable@.service"
 
 DEPENDS += "virtual/${PN}-config-native"
@@ -43,11 +44,17 @@ RDEPENDS_${PN} += " \
 EXTRA_OECONF = "YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN}"
 EXTRA_OECONF_append = "${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'i2c-occ', ' --enable-i2c-occ', '', d)}"
 
-# Ensure host stop target requires occ disable service
-OCC_DISABLE_TMPL = "op-occ-disable@.service"
-HOST_STOP_TGTFMT = "obmc-host-stop@{0}.target"
-OCC_DISABLE_INSTFMT = "op-occ-disable@{0}.service"
-HOST_STOP_OCC_DISABLE_FMT = "../${OCC_DISABLE_TMPL}:${HOST_STOP_TGTFMT}.requires/${OCC_DISABLE_INSTFMT}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_STOP_OCC_DISABLE_FMT', 'OBMC_HOST_INSTANCES')}"
+OCC_ENABLE = "enable"
+OCC_DISABLE = "disable"
+HOST_START = "start"
+HOST_STOP = "stop"
+
+# Ensure host-stop and host-start targets require needed occ states
+OCC_TMPL = "op-occ-{0}@.service"
+HOST_TGTFMT = "obmc-host-{1}@{2}.target"
+OCC_INSTFMT = "op-occ-{0}@{2}.service"
+HOST_OCC_FMT = "../${OCC_TMPL}:${HOST_TGTFMT}.requires/${OCC_INSTFMT}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_OCC_FMT', 'OCC_ENABLE', 'HOST_START', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_OCC_FMT', 'OCC_DISABLE', 'HOST_STOP', 'OBMC_HOST_INSTANCES')}"
 
 S = "${WORKDIR}/git"

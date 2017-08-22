@@ -1,6 +1,7 @@
 [Unit]
 Description=OpenPOWER OCC Active Disable
 Before=obmc-host-stop-pre@%i.target
+Conflicts=op-occ-enable@%i.service
 
 [Service]
 ExecStart=/usr/bin/env occ-active.sh disable

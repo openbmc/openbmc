@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenPOWER OCC Active Enable for host %I
+Conflicts=obmc-host-stop@%i.target
+Conflicts=op-occ-disable@%i.service
+Wants=org.open_power.OCC.Control.service
+After=org.open_power.OCC.Control.service
+ConditionPathExists=/run/openbmc/host@%i-on
+
+[Service]
+ExecStart=/usr/bin/env occ-active.sh enable
+SyslogIdentifier=occ-active.sh
+Type=oneshot
+
+[Install]
+WantedBy=obmc-host-start@%i.target
