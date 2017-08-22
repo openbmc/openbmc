@@ -140,8 +140,8 @@ remount_ubi() {
 }
 
 ubi_setenv() {
-    varName="${variable%"\x3d"*}"
-    value="${variable##*"\x3d"}"
+    varName="${variable%=*}"
+    value="${variable##*=}"
     fw_setenv "$varName" "$value"
 }
 
