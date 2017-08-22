@@ -107,6 +107,7 @@ cpucore_func_sensor:
           type: "bool"
           assert: true
           deassert: false
+          skipOn: "deassert"
 
 tpm_required_sensor:
   path: /xyz/openbmc_project/control/host0/TPMEnable
