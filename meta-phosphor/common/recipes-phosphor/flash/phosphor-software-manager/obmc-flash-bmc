@@ -76,7 +76,15 @@ ubi_block() {
   block="/dev/ubiblock${ubidevid}"
   if [ ! -e "$block" ]; then
     ubiblock --create "/dev/ubi${ubidevid}"
+    if [ $? != 0 ]; then
+      echo "Unable to create ubiblock ${name}:${ubidevid}"
+      return 1
+    fi
   fi
+  copy_env_var_to_alt ubiblock
+  ubi_setenv "ubiblock=$(echo "${ubidevid}" | sed 's/_/,/')"
+  copy_env_var_to_alt root
+  ubi_setenv "root=${block}"
 }
 
 ubi_updatevol() {
@@ -84,6 +92,14 @@ ubi_updatevol() {
   ubidevid="${vol#ubi}"
   img="/tmp/images/${version}/${imgfile}"
   ubiupdatevol "/dev/ubi${ubidevid}" "${img}"
+  if [ $? != 0 ]; then
+    echo "Unable to update volume ${name}!"
+    return 1
+  fi
+  if [[ "${name}" =~ "kernel" ]]; then
+    copy_env_var_to_alt kernelname
+    ubi_setenv "kernelname=${name}"
+  fi
 }
 
 ubi_remove() {
@@ -139,7 +155,15 @@ remount_ubi() {
   done
 }
 
+# Read the current env variable and set it on the alternate boot env
+copy_env_var_to_alt() {
+  varName=$1
+  value="$(fw_printenv -n "${varName}")"
+  fw_setenv -c /etc/alt_fw_env.config "${varName}" "${value}"
+}
+
 ubi_setenv() {
+    variable=$1
     varName="${variable%=*}"
     value="${variable##*=}"
     fw_setenv "$varName" "$value"
@@ -171,8 +195,8 @@ case "$1" in
     imgfile="image-rofs"
     imgsize="16MiB"
     ubi_ro
-    ubi_block
     ubi_updatevol
+    ubi_block
     ;;
   ubikernel)
     reqmtd="$(echo "$2" | cut -d "+" -f 1)"
@@ -189,8 +213,7 @@ case "$1" in
     ubi_remove
     ;;
   ubisetenv)
-    variable="$2"
-    ubi_setenv
+    ubi_setenv "$2"
     ;;
   ubiremount)
     remount_ubi
