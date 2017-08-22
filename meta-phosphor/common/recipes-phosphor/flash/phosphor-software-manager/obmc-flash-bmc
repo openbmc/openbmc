@@ -13,6 +13,14 @@ findrootmtd() {
   echo "mtd${m}"
 }
 
+findrootubi() {
+  rootmatch=" on / "
+  m="$(mount | grep "${rootmatch}")"
+  m="${m##*ubiblock}"
+  m="${m% on*}"
+  echo "ubi${m}"
+}
+
 # Get the mtd device number (mtdX)
 findmtd() {
   m="$(grep -xl "$1" /sys/class/mtd/*/name)"
@@ -29,13 +37,53 @@ findubi() {
   echo "${u}"
 }
 
+# Get all ubi devices on a specific mtd that match requested string
+findubi_onmtd() {
+  u="$(grep -h "$1" /sys/class/ubi/ubi"$2"/subsystem/ubi"$2"*/name)"
+  u="${u%/name}"
+  u="${u##*/}"
+  echo "${u}"
+}
+
+# Make space on flash before creating new volumes. This can be enhanced
+# determine current flash usage. For now only keep a "keepmax" number of them
+ubi_remove_volumes()
+{
+  kernelname="$(fw_printenv -n kernelname)"
+  curversion="${kernelname##*-}"
+  rootubi="$(findrootubi)"
+
+  # Just keep max number of volumes before updating, don't delete the version
+  # the BMC is booted from, and when a version is identified to be deleted,
+  # delete both the rofs and kernel volumes for that version.
+  rmnames="$(findubi_onmtd "${name%-*}-" "${ro}")"
+  rmnames=(${rmnames})
+  ubicount="${#rmnames[@]}"
+  while [ ${ubicount} -ge ${keepmax} ]; do
+    # Loop through existing volumes and skip currently active ones
+    for (( index=0; index<${#rmnames[@]}; index++ )); do
+      rmname="${rmnames[${index}]}"
+      rmversion="${rmname##*-}"
+      rmubi="$(findubi "rofs-${rmversion}")"
+      if [[ ( "${rmubi}" != "${rootubi}" ) &&
+            ( "${rmname}" != "${kernelname}" ) ]]; then
+        ubi_remove "rofs-${rmversion}"
+        ubi_remove "kernel-${rmversion}"
+        break
+      fi
+    done
+    # Decrease count regardless to avoid an infinite loop
+    (( ubicount-- ))
+  done
+}
+
 ubi_rw() {
   rwmtd="$(findmtd "${reqmtd}")"
   rw="${rwmtd#mtd}"
   ubidev="/dev/ubi${rw}"
 
   if [ "$(fw_printenv rwreset)" == "rwreset=true" ]; then
-    ubi_remove
+    ubi_remove "${name}"
     fw_setenv rwreset
   fi
 
@@ -47,11 +95,13 @@ ubi_rw() {
 }
 
 ubi_ro() {
+  keepmax=2 # Default 2 volumes per mtd
   romtd="$(findmtd "${reqmtd}")"
   romtd2="$(findmtd "${reqmtd2}")"
 
   if [ ! "${romtd}" == "${romtd2}" ]; then
     # Request to use alternate mtd device, choose the non-root one
+    keepmax=1 # 1 volume on each of the requested mtds
     rootmtd="$(findrootmtd)"
     if [ "${rootmtd}" == "${romtd}" ]; then
       romtd="${romtd2}"
@@ -59,6 +109,8 @@ ubi_ro() {
   fi
   ro="${romtd#mtd}"
   ubidev="/dev/ubi${ro}"
+
+  ubi_remove_volumes
 
   # Create a static ubi volume
   # TODO Get the actual image size openbmc/openbmc#1840
@@ -103,18 +155,19 @@ ubi_updatevol() {
 }
 
 ubi_remove() {
-    vol="$(findubi "${name}")"
+    rmname="$1"
+    vol="$(findubi "${rmname}")"
 
     if [ ! -z "$vol" ]; then
         vol="${vol%_*}"
 
-        if grep -q "${vol}:$name" /proc/mounts; then
-            mountdir=$(grep "${vol}:$name" /proc/mounts | cut -d " " -f 2)
+        if grep -q "${vol}:$rmname" /proc/mounts; then
+            mountdir=$(grep "${vol}:$rmname" /proc/mounts | cut -d " " -f 2)
             umount "$mountdir"
             rm -r "$mountdir"
         fi
 
-        ubirmvol "/dev/${vol}" -N "$name"
+        ubirmvol "/dev/${vol}" -N "$rmname"
     fi
 }
 
@@ -210,7 +263,7 @@ case "$1" in
     ;;
   ubiremove)
     name="$2"
-    ubi_remove
+    ubi_remove "${name}"
     ;;
   ubisetenv)
     ubi_setenv "$2"
