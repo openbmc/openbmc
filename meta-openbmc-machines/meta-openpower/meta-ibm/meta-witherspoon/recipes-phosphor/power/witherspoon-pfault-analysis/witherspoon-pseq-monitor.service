@@ -1,0 +1,11 @@
+[Unit]
+Description=Witherspoon Power Sequencer Runtime Monitor
+Wants=obmc-host-start-pre@0.target
+Before=obmc-host-start-pre@0.target
+Wants=vcs_on@0.service
+After=vcs_on@0.service
+Conflicts=obmc-chassis-poweroff@0.target
+
+[Service]
+ExecStart=/usr/bin/env witherspoon-pseq-monitor -a runtime-monitor -i 1
+SyslogIdentifier=witherspoon-pseq-monitor
