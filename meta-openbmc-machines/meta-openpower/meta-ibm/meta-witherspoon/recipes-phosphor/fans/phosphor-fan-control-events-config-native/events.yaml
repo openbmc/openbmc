@@ -282,9 +282,6 @@ events:
           - name: air_cooled_chassis
             zones:
                 - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
       precondition:
           name: property_states_match
           groups:
@@ -317,9 +314,6 @@ events:
     - name: speed_decrease_changes_based_on_core_temps
       zone_conditions:
           - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
             zones:
                 - 0
       precondition:
