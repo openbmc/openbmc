@@ -1,15 +1,11 @@
 [Unit]
 Description=Phosphor Fan Monitor Daemon
-Wants=phosphor-fan-control@%i.service
-Before=phosphor-fan-control@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 Restart=on-failure
-ExecStart=/usr/bin/env phosphor-fan-monitor
+ExecStart=/usr/bin/env phosphor-fan-monitor --monitor
 SyslogIdentifier=phosphor-fan-monitor
-Type=notify
-NotifyAccess=all
 
 [Install]
 RequiredBy=obmc-fan-control-ready@%i.target

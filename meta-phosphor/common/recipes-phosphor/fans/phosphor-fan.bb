@@ -103,9 +103,14 @@ TMPL_MONITOR = "phosphor-fan-monitor@.service"
 INSTFMT_MONITOR = "phosphor-fan-monitor@{0}.service"
 FMT_MONITOR = "../${TMPL_MONITOR}:${FAN_CONTROL_TGT}.requires/${INSTFMT_MONITOR}"
 
+TMPL_MONITOR_INIT = "phosphor-fan-monitor-init@.service"
+INSTFMT_MONITOR_INIT = "phosphor-fan-monitor-init@{0}.service"
+FMT_MONITOR_INIT = "../${TMPL_MONITOR_INIT}:${POWERON_TGT}.requires/${INSTFMT_MONITOR_INIT}"
+
 FILES_${PN}-monitor = "${sbindir}/phosphor-fan-monitor"
-SYSTEMD_SERVICE_${PN}-monitor += "${TMPL_MONITOR}"
+SYSTEMD_SERVICE_${PN}-monitor += "${TMPL_MONITOR} ${TMPL_MONITOR_INIT}"
 SYSTEMD_LINK_${PN}-monitor += "${@compose_list(d, 'FMT_MONITOR', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK_${PN}-monitor += "${@compose_list(d, 'FMT_MONITOR_INIT', 'OBMC_CHASSIS_INSTANCES')}"
 
 # --------------------------------------
 # phosphor-cooling-type specific configuration
