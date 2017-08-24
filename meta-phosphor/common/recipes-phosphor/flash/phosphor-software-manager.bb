@@ -60,6 +60,7 @@ FILES_${PN}-download-mgr += "${sbindir}/phosphor-download-manager"
 FILES_${PN}-updater += " \
     ${sbindir}/phosphor-image-updater \
     ${sbindir}/obmc-flash-bmc \
+    /usr/local \
     "
 DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.Version.service"
 DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
@@ -87,6 +88,7 @@ SRC_URI += "file://obmc-flash-bmc"
 do_install_append() {
     install -d ${D}${sbindir}
     install -m 0755 ${WORKDIR}/obmc-flash-bmc ${D}${sbindir}/obmc-flash-bmc
+    install -d ${D}/usr/local
 }
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
