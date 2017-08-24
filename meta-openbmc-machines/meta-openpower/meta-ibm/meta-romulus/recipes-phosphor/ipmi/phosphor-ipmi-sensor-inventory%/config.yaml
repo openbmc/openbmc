@@ -1,5 +1,67 @@
+0x02:
+  interfaces:
+    xyz.openbmc_project.State.Boot.Progress:
+      BootProgress:
+        0x00:
+          set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.Unspecified
+          type: string
+        0x01:
+          set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.MemoryInit
+          type: string
+        0x03:
+          set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.SecondaryProcInit
+          type: string
+        0x13:
+          set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart
+          type: string
+        0x14:
+          set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit
+          type: string
+  path: /xyz/openbmc_project/state/host0
+  readingType: eventdata2
+  sensorReadingType: 0x6F
+  sensorType: 0x0F
+  serviceInterface: org.freedesktop.DBus.Properties
+0x91:
+  interfaces:
+    xyz.openbmc_project.State.OperatingSystem.Status:
+      OperatingSystemState:
+        0x01:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CBoot
+          type: string
+        0x02:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.PXEBoot
+          type: string
+        0x03:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.DiagBoot
+          type: string
+        0x04:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CDROMBoot
+          type: string
+        0x05:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.ROMBoot
+          type: string
+        0x06:
+          assert: xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete
+          type: string
+  path: /xyz/openbmc_project/state/host0
+  readingType: assertion
+  sensorReadingType: 0x6F
+  sensorType: 0x1F
+  serviceInterface: org.freedesktop.DBus.Properties
+0x8B:
+  interfaces:
+    xyz.openbmc_project.Control.Boot.RebootAttempts:
+      AttemptsLeft:
+        0xFF:
+          type: uint32_t
+  path: /xyz/openbmc_project/state/host0
+  readingType: readingAssertion
+  sensorReadingType: 0x6F
+  sensorType: 0xC3
+  serviceInterface: org.freedesktop.DBus.Properties
 0x03:
-  sensorType: 0x09
+  sensorType: 0x07
   path: /org/open_power/control/occ0
   sensorReadingType: 0x09
   serviceInterface: org.freedesktop.DBus.Properties
@@ -16,7 +78,7 @@
             deassert: false
             type: bool
 0x04:
-  sensorType: 0x09
+  sensorType: 0x07
   path: /org/open_power/control/occ1
   sensorReadingType: 0x09
   serviceInterface: org.freedesktop.DBus.Properties
