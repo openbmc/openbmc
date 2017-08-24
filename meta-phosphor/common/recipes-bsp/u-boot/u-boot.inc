@@ -1,6 +1,6 @@
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6"
 
-SRCREV = "a5e0a21ed4b62ab4d8ff09f70b751db0f46ddaac"
+SRCREV = "1b3fb9515dcd280fca764b2521f152ca04d04701"
 UBRANCH = "v2016.07-aspeed-openbmc"
 SRC_URI = "git://git@github.com/openbmc/u-boot.git;branch=${UBRANCH};protocol=https"
 
@@ -8,8 +8,6 @@ SRC_URI += "file://0001-configs-ast-Add-redundnant-env.patch"
 
 SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
     'file://0001-config-ast-common-hack-bootopts.patch \
-     file://0002-Add-MTD-support-to-Aspeed-Flash-driver.patch \
-     file://0003-Add-MTD-and-UBI-support-to-ast-g5.patch \
      file://0004-config-ast-common-ubi-bootops.patch', '', d)}"
 
 PV = "v2016.07+git${SRCPV}"
