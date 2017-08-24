@@ -9,12 +9,12 @@ Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
  1 file changed, 6 insertions(+)
 
 diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
-index 15e1db4..e7fa6ed 100644
+index 0475109..8dfaff7 100644
 --- a/include/configs/ast-common.h
 +++ b/include/configs/ast-common.h
-@@ -84,7 +84,10 @@
- #define CONFIG_SYS_MAXARGS		16
- #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
+@@ -96,7 +96,10 @@
+ #define CONFIG_CMD_MTDPARTS
+ #endif
  
 +#if 0
  #define CONFIG_BOOTARGS			"console=ttyS4,115200n8 root=/dev/ram rw"
@@ -23,7 +23,7 @@ index 15e1db4..e7fa6ed 100644
  
  #define CONFIG_AST_SPI_NOR    /* AST SPI NOR Flash */
  #define CONFIG_FMC_CS			1
-@@ -99,11 +102,14 @@
+@@ -111,11 +114,14 @@
  #define CONFIG_ENV_SIZE			0x10000	/* Total Size of Environment Sector */
  #define CONFIG_ENV_SIZE_REDUND		0x10000
  
