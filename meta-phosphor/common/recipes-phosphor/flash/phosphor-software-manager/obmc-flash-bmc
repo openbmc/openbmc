@@ -217,9 +217,13 @@ copy_env_var_to_alt() {
 
 ubi_setenv() {
     variable=$1
-    varName="${variable%=*}"
-    value="${variable##*=}"
-    fw_setenv "$varName" "$value"
+    if [[ "$variable" == *"="* ]]; then
+        varName="${variable%=*}"
+        value="${variable##*=}"
+        fw_setenv "$varName" "$value"
+    else
+        fw_setenv "$variable"
+    fi
 }
 
 mtd_write() {
