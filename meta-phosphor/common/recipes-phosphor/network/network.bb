@@ -30,5 +30,4 @@ S = "${WORKDIR}/git"
 do_install_append() {
         install -d ${D}/${sbindir}
         install ${S}/netman.py ${D}/${sbindir}
-        install ${S}/conf/network-manager.conf ${D}/${sysconfdir}
 }
