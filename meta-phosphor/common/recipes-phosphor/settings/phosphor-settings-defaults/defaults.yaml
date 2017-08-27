@@ -1,93 +1,93 @@
 /xyz/openbmc_project/control/minimum_ship_level_required:
-    Interface: xyz.openbmc_project.Control.MinimumShipLevel
-    Properties:
-        MinimumShipLevelRequired:
-           Default: 'true'
+    - Interface: xyz.openbmc_project.Control.MinimumShipLevel
+      Properties:
+          MinimumShipLevelRequired:
+             Default: 'true'
 
 /xyz/openbmc_project/control/host0/auto_reboot:
-    Interface: xyz.openbmc_project.Control.Boot.RebootPolicy
-    Properties:
-        AutoReboot:
-           Default: 'true'
+    - Interface: xyz.openbmc_project.Control.Boot.RebootPolicy
+      Properties:
+          AutoReboot:
+             Default: 'true'
 
 /xyz/openbmc_project/control/host0/boot_source:
-    Interface: xyz.openbmc_project.Control.Boot.Source
-    Properties:
-        BootSource:
-            Default: Source::Sources::Default
+    - Interface: xyz.openbmc_project.Control.Boot.Source
+      Properties:
+          BootSource:
+              Default: Source::Sources::Default
 
 /xyz/openbmc_project/control/host0/boot_mode:
-    Interface: xyz.openbmc_project.Control.Boot.Mode
-    Properties:
-        BootMode:
-            Default: Mode::Modes::Regular
+    - Interface: xyz.openbmc_project.Control.Boot.Mode
+      Properties:
+          BootMode:
+              Default: Mode::Modes::Regular
 
 /xyz/openbmc_project/control/host0/power_cap:
-    Interface: xyz.openbmc_project.Control.Power.Cap
-    Properties:
-        PowerCap:
-            Default: 0
-            Validation:
-                Type: "range"
-                Validator: "0..1000"
-                Unit: "Watts"
-        PowerCapEnable:
-             Default: 'false'
-
+    - Interface: xyz.openbmc_project.Control.Power.Cap
+      Properties:
+          PowerCap:
+              Default: 0
+              Validation:
+                  Type: "range"
+                  Validator: "0..1000"
+                  Unit: "Watts"
+          PowerCapEnable:
+               Default: 'false'
+  
 /xyz/openbmc_project/control/host0/power_restore_policy:
-    Interface: xyz.openbmc_project.Control.Power.RestorePolicy
-    Properties:
-        PowerRestorePolicy:
-            Default: RestorePolicy::Policy::AlwaysOff
+    - Interface: xyz.openbmc_project.Control.Power.RestorePolicy
+      Properties:
+          PowerRestorePolicy:
+              Default: RestorePolicy::Policy::AlwaysOff
 
 /xyz/openbmc_project/time/owner:
-    Interface: xyz.openbmc_project.Time.Owner
-    Properties:
-        TimeOwner:
-            Default: Owner::Owners::BMC
+    - Interface: xyz.openbmc_project.Time.Owner
+      Properties:
+          TimeOwner:
+              Default: Owner::Owners::BMC
 
 /xyz/openbmc_project/time/sync_method:
-    Interface: xyz.openbmc_project.Time.Synchronization
-    Properties:
-        TimeSyncMethod:
-            Default: Synchronization::Method::NTP
+    - Interface: xyz.openbmc_project.Time.Synchronization
+      Properties:
+          TimeSyncMethod:
+              Default: Synchronization::Method::NTP
 
 /xyz/openbmc_project/network/host0/intf:
-    Interface: xyz.openbmc_project.Network.MACAddress
-    Properties:
-        MACAddress:
-            Default: '"00:00:00:00:00:00"'
-            Validation:
-                Type: "regex"
-                Validator: '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
+    - Interface: xyz.openbmc_project.Network.MACAddress
+      Properties:
+          MACAddress:
+              Default: '"00:00:00:00:00:00"'
+              Validation:
+                  Type: "regex"
+                  Validator: '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
 
 #needs to implement address validation TODO openbmc/issues/2046
 /xyz/openbmc_project/network/host0/intf/addr:
-    Interface: xyz.openbmc_project.Network.IP
-    Properties:
-        Address:
-            Default: '"0.0.0.0"'
-        PrefixLength:
-            Default: 0
-            Validation:
-                Type: "range"
-                Validator: 0..128
-                Unit: "bits"
-        Origin:
-            Default: IP::AddressOrigin::Static
-        Gateway:
-            Default: '"0.0.0.0"'
-        Type:
-            Default: IP::Protocol::IPv4
+    - Interface: xyz.openbmc_project.Network.IP
+      Properties:
+          Address:
+              Default: '"0.0.0.0"'
+          PrefixLength:
+              Default: 0
+              Validation:
+                  Type: "range"
+                  Validator: 0..128
+                  Unit: "bits"
+          Origin:
+              Default: IP::AddressOrigin::Static
+          Gateway:
+              Default: '"0.0.0.0"'
+          Type:
+              Default: IP::Protocol::IPv4
 
 /xyz/openbmc_project/control/host0/restriction_mode:
-    Interface: xyz.openbmc_project.Control.Security.RestrictionMode
-    Properties:
-        RestrictionMode:
-            Default: RestrictionMode::Modes::None
+    - Interface: xyz.openbmc_project.Control.Security.RestrictionMode
+      Properties:
+          RestrictionMode:
+              Default: RestrictionMode::Modes::None
 
 /xyz/openbmc_project/control/host0/TPMEnable:
-    Interface: xyz.openbmc_project.Control.TPM.Policy
-    Properties:
-        TPMEnable:
-           Default: 'false'
+    - Interface: xyz.openbmc_project.Control.TPM.Policy
+      Properties:
+          TPMEnable:
+             Default: 'false'
