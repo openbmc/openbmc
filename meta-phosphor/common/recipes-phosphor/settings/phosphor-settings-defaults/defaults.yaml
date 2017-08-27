@@ -10,13 +10,11 @@
           AutoReboot:
              Default: 'true'
 
-/xyz/openbmc_project/control/host0/boot_source:
+/xyz/openbmc_project/control/host0/boot:
     - Interface: xyz.openbmc_project.Control.Boot.Source
       Properties:
           BootSource:
               Default: Source::Sources::Default
-
-/xyz/openbmc_project/control/host0/boot_mode:
     - Interface: xyz.openbmc_project.Control.Boot.Mode
       Properties:
           BootMode:
