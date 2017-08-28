@@ -9,12 +9,14 @@ LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
+inherit pythonnative
 
 DEPENDS += " \
         autoconf-archive-native \
         phosphor-dbus-interfaces \
         phosphor-logging \
         sdbusplus \
+        sdbusplus-native \
         "
 
 RDEPENDS_${PN} += " \
@@ -31,7 +33,7 @@ SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
 
 SRC_URI += "file://obmc-flash-bios"
 
-SRCREV = "e53222d7d3ab7f6b7c96896d2a04fa74c0754e23"
+SRCREV = "3fa7028487e7bac94a65dd7b06e15a54f9b843a8"
 
 do_install_append() {
         install -d ${D}${sbindir}
