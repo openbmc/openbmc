@@ -15,6 +15,6 @@ do_install() {
         # This recipe would provide the yaml for inventory manager to
         # create AssetTag property at startup
 
-        install -d ${base_datadir}/events.d/
-        install assettag.yaml ${base_datadir}/events.d/assettag.yaml
+        install -d ${D}${base_datadir}/events.d/
+        install assettag.yaml ${D}${base_datadir}/events.d/assettag.yaml
 }
