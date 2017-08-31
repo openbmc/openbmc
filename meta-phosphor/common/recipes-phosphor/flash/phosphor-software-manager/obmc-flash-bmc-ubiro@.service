@@ -1,5 +1,6 @@
 [Unit]
 Description=Store read-only images %I to BMC storage
+OnFailure=obmc-flash-bmc-ubiro-remove@%i.service
 
 [Service]
 Type=oneshot
