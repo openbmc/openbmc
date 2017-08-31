@@ -2,6 +2,8 @@
 Description=OpenBMC Software Update Manager
 Wants=xyz.openbmc_project.Software.Version.service
 Before=xyz.openbmc_project.Software.Version.service
+Wants=obmc-mapper.target
+After=obmc-mapper.target
 
 [Service]
 ExecStart=/usr/bin/env phosphor-image-updater
