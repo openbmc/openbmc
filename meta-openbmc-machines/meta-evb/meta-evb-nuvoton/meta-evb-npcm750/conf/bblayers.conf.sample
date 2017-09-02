@@ -1,0 +1,35 @@
+# LAYER_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+LCONF_VERSION = "6"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-poky \
+  ##OEROOT##/import-layers/meta-openembedded/meta-oe \
+  ##OEROOT##/import-layers/meta-openembedded/meta-networking \
+  ##OEROOT##/import-layers/meta-openembedded/meta-python \
+  ##OEROOT##/import-layers/meta-virtualization \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-openbmc-bsp/meta-nuvoton \
+  ##OEROOT##/meta-openbmc-bsp/meta-nuvoton/meta-npcm7xx \
+  ##OEROOT##/meta-openbmc-machines/meta-evb \
+  ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-nuvoton \
+  ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-nuvoton/meta-evb-npcm750 \
+  "
+BBLAYERS_NON_REMOVABLE ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-poky \
+  ##OEROOT##/import-layers/meta-openembedded/meta-oe \
+  ##OEROOT##/import-layers/meta-openembedded/meta-networking \
+  ##OEROOT##/import-layers/meta-openembedded/meta-python \
+  ##OEROOT##/import-layers/meta-virtualization \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-openbmc-bsp/meta-nuvoton \
+  ##OEROOT##/meta-openbmc-bsp/meta-nuvoton/meta-npcm7xx \
+  ##OEROOT##/meta-openbmc-machines/meta-evb \
+  ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-nuvoton \
+  ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-nuvoton/meta-evb-npcm750 \
+  "
