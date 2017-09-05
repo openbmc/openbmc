@@ -69,6 +69,10 @@ ubi_remove_volumes()
             ( "${rmname}" != "${kernelname}" ) ]]; then
         ubi_remove "rofs-${rmversion}"
         ubi_remove "kernel-${rmversion}"
+        # Remove the kernel copy in alt if any
+        if [[ "${name}" =~ "kernel" ]]; then
+          ubi_remove "kernel-${rmversion}" "${ro}"
+        fi
         break
       fi
     done
@@ -115,6 +119,12 @@ ubi_ro() {
   # Create a static ubi volume
   # TODO Get the actual image size openbmc/openbmc#1840
   vol="$(findubi "${name}")"
+  if [ ! -z "${vol}" ]; then
+    # Allow a duplicate kernel volume on the alt mtd
+    if [[ "${name}" =~ "kernel" ]]; then
+      vol="$(findubi_onmtd "${name%-*}-" "${ro}")"
+    fi
+  fi
   if [ -z "${vol}" ]; then
     ubimkvol "${ubidev}" -N "${name}" -s "${imgsize}" --type=static
     vol="$(findubi "${name}")"
@@ -239,6 +249,18 @@ update_env_vars() {
   ubi_setenv "root=${block}"
 }
 
+# Create a copy in the alt mtd
+create_vol_in_alt() {
+  alt="alt-bmc"
+  altmtd="$(findmtd "${alt}")"
+  if [ ! -z "${altmtd}" ]; then
+    reqmtd="${alt}"
+    reqmtd2="${alt}"
+    ubi_ro
+    ubi_updatevol
+  fi
+}
+
 case "$1" in
   mtduboot)
     reqmtd="$2"
@@ -271,6 +293,7 @@ case "$1" in
     imgsize="4MiB"
     ubi_ro
     ubi_updatevol
+    create_vol_in_alt
     ;;
   ubiremove)
     name="$2"
