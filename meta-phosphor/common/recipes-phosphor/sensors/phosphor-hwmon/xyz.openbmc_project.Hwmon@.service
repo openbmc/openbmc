@@ -1,11 +1,10 @@
 [Unit]
 Description=Phosphor Hwmon Poller
 ConditionFileNotEmpty=/etc/default/obmc/hwmon/%I.conf
-StopWhenUnneeded=true
 After=xyz.openbmc_project.ObjectMapper.service
 
 [Service]
-Restart=always
+Restart=on-failure
 ExecStart=/usr/bin/env phosphor-hwmon-readd -o %f
 SyslogIdentifier=phosphor-hwmon-readd
 EnvironmentFile=/etc/default/obmc/hwmon/%I.conf

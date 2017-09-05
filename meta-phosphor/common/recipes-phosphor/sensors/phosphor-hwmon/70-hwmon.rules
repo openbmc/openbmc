@@ -1,1 +1,2 @@
-SUBSYSTEM=="hwmon", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="xyz.openbmc_project.Hwmon@%E{OF_FULLNAME}.service"
+SUBSYSTEM=="hwmon", ACTION=="add", RUN="/usr/bin/start_hwmon.sh start %p %E{OF_FULLNAME}"
+SUBSYSTEM=="hwmon", ACTION=="remove", RUN="/usr/bin/start_hwmon.sh stop %p %E{OF_FULLNAME}"

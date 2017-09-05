@@ -1,4 +1,4 @@
-From 8b1e098b70d2701ad2b53d4527c2423b7c2f7ce1 Mon Sep 17 00:00:00 2001
+From 3e0b58ab998209b392a2870124503659245c2483 Mon Sep 17 00:00:00 2001
 From: "Edward A. James" <eajames@us.ibm.com>
 Date: Wed, 16 Aug 2017 07:58:56 -0500
 Subject: [PATCH] ARM: dts: Aspeed: Witherspoon: Update BMC partitioning
@@ -7,17 +7,18 @@ Add simplified partitions for BMC and alternate flash. Include these by
 default in Witherspoon.
 
 Signed-off-by: Edward A. James <eajames@us.ibm.com>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
 ---
  .../boot/dts/aspeed-bmc-alt-opp-flash-layout-ubi.dtsi  | 18 ++++++++++++++++++
  arch/arm/boot/dts/aspeed-bmc-opp-flash-layout-ubi.dtsi | 18 ++++++++++++++++++
- arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts       |  5 +++--
- 3 files changed, 39 insertions(+), 2 deletions(-)
+ arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts       |  3 ++-
+ 3 files changed, 38 insertions(+), 1 deletion(-)
  create mode 100644 arch/arm/boot/dts/aspeed-bmc-alt-opp-flash-layout-ubi.dtsi
  create mode 100644 arch/arm/boot/dts/aspeed-bmc-opp-flash-layout-ubi.dtsi
 
 diff --git a/arch/arm/boot/dts/aspeed-bmc-alt-opp-flash-layout-ubi.dtsi b/arch/arm/boot/dts/aspeed-bmc-alt-opp-flash-layout-ubi.dtsi
 new file mode 100644
-index 0000000..9277599
+index 000000000000..927759950023
 --- /dev/null
 +++ b/arch/arm/boot/dts/aspeed-bmc-alt-opp-flash-layout-ubi.dtsi
 @@ -0,0 +1,18 @@
@@ -41,7 +42,7 @@ index 0000000..9277599
 +		};
 diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout-ubi.dtsi b/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout-ubi.dtsi
 new file mode 100644
-index 0000000..0059ad1
+index 000000000000..0059ad16d2ba
 --- /dev/null
 +++ b/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout-ubi.dtsi
 @@ -0,0 +1,18 @@
@@ -64,25 +65,25 @@ index 0000000..0059ad1
 +				};
 +		};
 diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
-index dd30c20..51f965e 100644
+index b24ea9967fc8..0b69aa942e18 100644
 --- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
 +++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
-@@ -174,12 +174,13 @@
+@@ -182,13 +182,14 @@
  		status = "okay";
+ 		label = "bmc";
  		m25p,fast-read;
- 
 -#include "openbmc-flash-layout.dtsi"
 +#include "aspeed-bmc-opp-flash-layout-ubi.dtsi"
  	};
+ 
  	flash@1 {
  		status = "okay";
--		label = "alt";
+ 		label = "alt";
  		m25p,fast-read;
-+
 +#include "aspeed-bmc-alt-opp-flash-layout-ubi.dtsi"
  	};
  };
  
 -- 
-1.8.3.1
+2.15.1
 

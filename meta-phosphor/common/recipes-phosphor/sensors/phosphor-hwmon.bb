@@ -25,6 +25,7 @@ RDEPENDS_${PN} += "\
         sdbusplus \
         phosphor-dbus-interfaces \
         phosphor-logging \
+        bash \
         "
 
 RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_phosphor-hwmon-config}"
@@ -35,6 +36,7 @@ RDEPENDS_max31785-msl = "${VIRTUAL-RUNTIME_base-utils} i2c-tools"
 SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
 SRC_URI += "file://70-hwmon.rules"
 SRC_URI += "file://70-iio.rules"
+SRC_URI += "file://start_hwmon.sh"
 
 SRCREV = "a23babd6952cb21397d6aa408a827047d1de81de"
 
@@ -45,4 +47,7 @@ do_install_append() {
         install -d ${D}/${base_libdir}/udev/rules.d/
         install ${WORKDIR}/70-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
         install ${WORKDIR}/70-iio.rules ${D}/${base_libdir}/udev/rules.d/
+
+        install -d ${D}${bindir}
+        install -m 0755 ${WORKDIR}/start_hwmon.sh ${D}${bindir}
 }
