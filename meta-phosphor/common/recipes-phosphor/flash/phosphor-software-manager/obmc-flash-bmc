@@ -133,10 +133,6 @@ ubi_block() {
       return 1
     fi
   fi
-  copy_env_var_to_alt ubiblock
-  ubi_setenv "ubiblock=$(echo "${ubidevid}" | sed 's/_/,/')"
-  copy_env_var_to_alt root
-  ubi_setenv "root=${block}"
 }
 
 ubi_updatevol() {
@@ -147,10 +143,6 @@ ubi_updatevol() {
   if [ $? != 0 ]; then
     echo "Unable to update volume ${name}!"
     return 1
-  fi
-  if [[ "${name}" =~ "kernel" ]]; then
-    copy_env_var_to_alt kernelname
-    ubi_setenv "kernelname=${name}"
   fi
 }
 
@@ -226,6 +218,27 @@ mtd_write() {
   flashcp -v ${img} /dev/${flashmtd}
 }
 
+backup_env_vars() {
+  copy_env_var_to_alt kernelname
+  copy_env_var_to_alt ubiblock
+  copy_env_var_to_alt root
+}
+
+update_env_vars() {
+  vol="$(findubi rofs-"${version}")"
+  if [ -z "${vol}" ]; then
+    return 1
+  fi
+  ubidevid="${vol#ubi}"
+  block="/dev/ubiblock${ubidevid}"
+  if [ ! -e "${block}" ]; then
+    return 1
+  fi
+  ubi_setenv "kernelname=kernel-${version}"
+  ubi_setenv "ubiblock=$(echo "${ubidevid}" | sed 's/_/,/')"
+  ubi_setenv "root=${block}"
+}
+
 case "$1" in
   mtduboot)
     reqmtd="$2"
@@ -268,6 +281,13 @@ case "$1" in
     ;;
   ubiremount)
     remount_ubi
+    ;;
+  preupdate)
+    backup_env_vars
+    ;;
+  postupdate)
+    version="$2"
+    update_env_vars
     ;;
   *)
     echo "Invalid argument"
