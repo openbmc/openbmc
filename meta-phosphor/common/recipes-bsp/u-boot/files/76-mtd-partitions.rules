@@ -1,1 +1,1 @@
-SUBSYSTEM=="mtd", SYMLINK+="mtd/%s{name}"
+ENV{DEVTYPE}=="mtd", SYMLINK+="mtd/%s{name}"
