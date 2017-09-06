@@ -5,6 +5,8 @@ Before=xyz.openbmc_project.Software.Version.service
 Before=mboxd.service
 Wants=obmc-flash-bios-ubipatch.service
 Before=obmc-flash-bios-ubipatch.service
+Wants=obmc-mapper.target
+After=obmc-mapper.target
 
 [Service]
 ExecStart=/usr/bin/env openpower-update-manager
