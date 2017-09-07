@@ -82,7 +82,7 @@ ubi_rw() {
   rw="${rwmtd#mtd}"
   ubidev="/dev/ubi${rw}"
 
-  if [ "$(fw_printenv rwreset)" == "rwreset=true" ]; then
+  if [ "$(fw_printenv rwreset 2>/dev/null)" == "rwreset=true" ]; then
     ubi_remove "${name}"
     fw_setenv rwreset
   fi
