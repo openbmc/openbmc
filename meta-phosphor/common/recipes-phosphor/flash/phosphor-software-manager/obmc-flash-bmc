@@ -172,15 +172,9 @@ ubi_remove() {
 }
 
 remount_ubi() {
-  # Get a list of all devices formatted as UBI
-  for file in /dev/mtd*; do
-    if [[ $(hexdump -C -n 3 $file) =~ "UBI" ]]; then
-      mtd="${file: -1}"
-      if [[ $mtd =~ ^-?[0-9]+$ ]]; then
-        mtds=${mtd},${mtds}
-      fi
-    fi
-  done
+  bmcmtd="$(findmtd "bmc")"
+  altbmcmtd="$(findmtd "alt-bmc")"
+  mtds="${bmcmtd: -1}","${altbmcmtd: -1}"
 
   IFS=',' read -r -a mtds <<< "$mtds"
   mtds=($(echo "${mtds[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
