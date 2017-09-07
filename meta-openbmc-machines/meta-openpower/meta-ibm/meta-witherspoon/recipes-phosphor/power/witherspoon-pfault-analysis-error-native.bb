@@ -15,5 +15,4 @@ do_install_append() {
     DEST=${yaml_dir}/xyz/openbmc_project/Power
     install -d ${DEST}
     install ${SRC}/Fault.errors.yaml ${DEST}
-    install ${SRC}/Fault.metadata.yaml ${DEST}
 }
