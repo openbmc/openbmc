@@ -161,8 +161,8 @@ ubi_remove() {
     if [ ! -z "$vol" ]; then
         vol="${vol%_*}"
 
-        if grep -q "${vol}:$rmname" /proc/mounts; then
-            mountdir=$(grep "${vol}:$rmname" /proc/mounts | cut -d " " -f 2)
+        if grep -q "$rmname" /proc/mounts; then
+            mountdir=$(grep "$rmname" /proc/mounts | cut -d " " -f 2)
             umount "$mountdir"
             rm -r "$mountdir"
         fi
