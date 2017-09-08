@@ -271,6 +271,31 @@ update_env_vars() {
   ubi_setenv "root=${block}"
 }
 
+#TODO: Replace the implementation with systemd-inhibitors lock
+#      once systemd/systemd#949 is resolved
+rebootguardenable() {
+  dir="/run/systemd/system/"
+  file="reboot-guard.conf"
+  units=("reboot" "poweroff" "halt")
+
+  for unit in "${units[@]}"; do
+    mkdir -p ${dir}${unit}.target.d
+    echo -e "[Unit]\nRefuseManualStart=yes" >> ${dir}${unit}.target.d/${file}
+  done
+}
+
+#TODO: Replace the implementation with systemd-inhibitors lock
+#      once systemd/systemd#949 is resolved
+rebootguarddisable() {
+  dir="/run/systemd/system/"
+  file="reboot-guard.conf"
+  units=("reboot" "poweroff" "halt")
+
+  for unit in "${units[@]}"; do
+    rm -rf ${dir}${unit}.target.d/${file}
+  done
+}
+
 # Create a copy in the alt mtd
 create_vol_in_alt() {
   alt="alt-bmc"
@@ -333,6 +358,12 @@ case "$1" in
   updateubootvars)
     version="$2"
     update_env_vars
+    ;;
+  rebootguardenable)
+    rebootguardenable
+    ;;
+  rebootguarddisable)
+    rebootguarddisable
     ;;
   *)
     echo "Invalid argument"
