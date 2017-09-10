@@ -213,6 +213,7 @@ update_symlinks() {
   PNOR_PRSV_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/prsv"
   PNOR_PRSV="/media/pnor-prsv"
   PERSISTENCE_PATH="/var/lib/obmc/openpower-pnor-code-mgmt/"
+  PNOR_PATCH_LOCATION="/usr/local/share/pnor/"
 
   # Get a list of all active PNOR versions
   data="$(ls -d ${PNOR_RO_PREFIX}*)"
@@ -248,6 +249,7 @@ update_symlinks() {
   # lowest priority, then remove the symlink and create new ones.
   if [[ $(readlink -f "${PNOR_RO_ACTIVE_PATH}") != ${PNOR_RO_PREFIX}${currentVersion}  ]]; then
     rm -f ${PNOR_RO_ACTIVE_PATH}
+    rm -rf ${PNOR_PATCH_LOCATION}*
     ln -sfv ${PNOR_RO_PREFIX}${currentVersion} ${PNOR_RO_ACTIVE_PATH}
   fi
 
