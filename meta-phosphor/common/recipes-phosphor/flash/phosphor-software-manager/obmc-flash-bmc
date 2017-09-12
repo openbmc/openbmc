@@ -327,10 +327,10 @@ case "$1" in
   ubiremount)
     remount_ubi
     ;;
-  preupdate)
+  createenvbackup)
     backup_env_vars
     ;;
-  postupdate)
+  updateubootvars)
     version="$2"
     update_env_vars
     ;;
