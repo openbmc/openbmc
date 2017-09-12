@@ -150,6 +150,7 @@
     - shutdown
     - log
     - create criticalhigh error
+    - create shutdown error
 
 - name: shutdown
   description: >
@@ -188,3 +189,12 @@
     - name: xyz::openbmc_project::Sensor::Threshold::CriticalHigh::SENSOR_TYPE
       value: temperature
       type: string
+
+- name: create shutdown error
+  description: >
+    'Create a SystemShutdown Error log.'
+  class: callback
+  callback: elog
+  paths: core sensors
+  properties: core temp
+  error: xyz::openbmc_project::State::Shutdown::ThermalEvent::Error::Processor
