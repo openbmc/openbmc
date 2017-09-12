@@ -1,0 +1,7 @@
+[Unit]
+Description=/var/lib/systemd/coredump
+
+[Mount]
+What=tmpfs
+Where=/var/lib/systemd/coredump
+Type=tmpfs
