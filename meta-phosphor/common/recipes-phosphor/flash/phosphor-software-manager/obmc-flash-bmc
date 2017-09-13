@@ -196,9 +196,12 @@ remount_ubi() {
 
       if [[ ${name} == rofs-* ]]; then
         mountdir="/media/${name}"
-        mkdir -p "${mountdir}"
-        ubiblock --create /dev/ubi${mtd}_${element} &> /dev/null
-        mount -t squashfs -o ro "/dev/ubiblock${mtd}_${element}" "${mountdir}"
+
+        if [ ! -d ${mountdir} ]; then
+          mkdir -p "${mountdir}"
+          ubiblock --create /dev/ubi${mtd}_${element} &> /dev/null
+          mount -t squashfs -o ro "/dev/ubiblock${mtd}_${element}" "${mountdir}"
+        fi
       fi
     done
   done
