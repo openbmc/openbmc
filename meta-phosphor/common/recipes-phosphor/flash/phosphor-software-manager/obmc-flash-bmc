@@ -37,26 +37,41 @@ findubi() {
   echo "${u}"
 }
 
-# Get all ubi devices on a specific mtd that match requested string
+# Get the ubi device number (ubiX_Y) on a specific mtd
 findubi_onmtd() {
+  u="$(grep -xl "$1" /sys/class/ubi/ubi"$2"/subsystem/ubi"$2"*/name)"
+  u="${u%/name}"
+  u="${u##*/}"
+  echo "${u}"
+}
+
+# Get all ubi device names on a specific mtd that match requested string
+findubiname_onmtd() {
   u="$(grep -h "$1" /sys/class/ubi/ubi"$2"/subsystem/ubi"$2"*/name)"
   u="${u%/name}"
   u="${u##*/}"
   echo "${u}"
 }
 
+# Get the name from the requested ubiX_Y volume
+findname() {
+  n="$(cat /sys/class/ubi/$1/name)"
+  echo "${n}"
+}
+
 # Make space on flash before creating new volumes. This can be enhanced
 # determine current flash usage. For now only keep a "keepmax" number of them
 ubi_remove_volumes()
 {
-  kernelname="$(fw_printenv -n kernelname)"
-  curversion="${kernelname##*-}"
   rootubi="$(findrootubi)"
+  rootname="$(findname "${rootubi}")"
+  rootversion="${rootname##*-}"
+  rootkernel="kernel-${rootversion}"
 
   # Just keep max number of volumes before updating, don't delete the version
   # the BMC is booted from, and when a version is identified to be deleted,
   # delete both the rofs and kernel volumes for that version.
-  rmnames="$(findubi_onmtd "${name%-*}-" "${ro}")"
+  rmnames="$(findubiname_onmtd "${name%-*}-" "${ro}")"
   rmnames=(${rmnames})
   ubicount="${#rmnames[@]}"
   while [ ${ubicount} -ge ${keepmax} ]; do
@@ -64,15 +79,14 @@ ubi_remove_volumes()
     for (( index=0; index<${#rmnames[@]}; index++ )); do
       rmname="${rmnames[${index}]}"
       rmversion="${rmname##*-}"
-      rmubi="$(findubi "rofs-${rmversion}")"
+      [ "${rmversion}" == "${version}" ] && continue
+      rmubi="$(findubi_onmtd "rofs-${rmversion}" "${ro}")"
       if [[ ( "${rmubi}" != "${rootubi}" ) &&
-            ( "${rmname}" != "${kernelname}" ) ]]; then
-        ubi_remove "rofs-${rmversion}"
-        ubi_remove "kernel-${rmversion}"
-        # Remove the kernel copy in alt if any
-        if [[ "${name}" =~ "kernel" ]]; then
-          ubi_remove "kernel-${rmversion}" "${ro}"
-        fi
+            ( "${rmname}" != "${rootkernel}" ) ]]; then
+        ubi_remove "rofs-${rmversion}" "${ro}"
+        ubi_remove "kernel-${rmversion}" "${ro}"
+        # Remove priority value
+        fw_setenv "${rmversion}"
         break
       fi
     done
@@ -122,7 +136,7 @@ ubi_ro() {
   if [ ! -z "${vol}" ]; then
     # Allow a duplicate kernel volume on the alt mtd
     if [[ "${name}" =~ "kernel" ]]; then
-      vol="$(findubi_onmtd "${name%-*}-" "${ro}")"
+      vol="$(findubi_onmtd "${name}" "${ro}")"
     fi
   fi
   if [ -z "${vol}" ]; then
@@ -158,7 +172,12 @@ ubi_updatevol() {
 
 ubi_remove() {
     rmname="$1"
-    vol="$(findubi "${rmname}")"
+    rmmtd="$2"
+    if [ ! -z "${rmmtd}" ]; then
+      vol="$(findubi_onmtd "${rmname}" "${rmmtd}")"
+    else
+      vol="$(findubi "${rmname}")"
+    fi
 
     if [ ! -z "$vol" ]; then
         vol="${vol%_*}"
