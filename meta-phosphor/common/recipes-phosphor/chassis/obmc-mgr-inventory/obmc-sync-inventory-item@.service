@@ -1,7 +1,5 @@
 [Unit]
 Description=Sync %I
-Wants=obmc-read-eeprom@%i.service
-After=obmc-read-eeprom@%i.service
 
 [Service]
 Restart=no
