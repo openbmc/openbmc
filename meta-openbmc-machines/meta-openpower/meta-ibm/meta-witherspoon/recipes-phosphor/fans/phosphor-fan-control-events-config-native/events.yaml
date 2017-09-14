@@ -297,10 +297,10 @@ events:
                 value: 1000
                 type: int64_t
             delta:
-                value: 10
+                value: 40
                 type: uint64_t
       timer:
-          interval: 15
+          interval: 5
     - name: occ_active_speed_changes
       precondition:
           name: property_states_match
@@ -343,10 +343,10 @@ events:
                           value: 1000
                           type: int64_t
                       delta:
-                          value: 10
+                          value: 40
                           type: uint64_t
                 timer:
-                    interval: 15
+                    interval: 5
               - name: speed_changes_based_on_dimm_temps
                 zone_conditions:
                     - name: air_cooled_chassis
@@ -362,7 +362,7 @@ events:
                     type: int64_t
                 actions:
                     - name: set_net_increase_speed
-                      property: 74000
+                      property: 64000
                       factor:
                           value: 1000
                           type: int64_t
@@ -370,12 +370,12 @@ events:
                           value: 200
                           type: uint64_t
                     - name: set_net_decrease_speed
-                      property: 71000
+                      property: 61000
                       factor:
                           value: 1000
                           type: int64_t
                       delta:
-                          value: 10
+                          value: 40
                           type: uint64_t
                 timer:
-                    interval: 15
+                    interval: 5
