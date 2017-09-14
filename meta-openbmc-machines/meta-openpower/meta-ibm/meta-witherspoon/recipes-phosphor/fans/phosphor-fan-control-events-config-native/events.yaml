@@ -161,13 +161,13 @@ events:
       property:
           name: Present
           type: bool
-      action:
-          name: count_state_before_speed
-          count: 1
-          property: false
-          speed:
-              value: 10500
-              type: uint64_t
+      actions:
+          - name: count_state_before_speed
+            count: 1
+            property: false
+            speed:
+                value: 10500
+                type: uint64_t
     - name: fails_before_high_speed_air
       zone_conditions:
           - name: air_cooled_chassis
@@ -178,13 +178,13 @@ events:
       property:
           name: Functional
           type: bool
-      action:
-          name: count_state_before_speed
-          count: 1
-          property: false
-          speed:
-              value: 10500
-              type: uint64_t
+      actions:
+          - name: count_state_before_speed
+            count: 1
+            property: false
+            speed:
+                value: 10500
+                type: uint64_t
     - name: missing_before_high_speed_water_and_air
       zone_conditions:
           - name: water_and_air_cooled_chassis
@@ -195,13 +195,13 @@ events:
       property:
           name: Present
           type: bool
-      action:
-          name: count_state_before_speed
-          count: 1
-          property: false
-          speed:
-              value: 10500
-              type: uint64_t
+      actions:
+          - name: count_state_before_speed
+            count: 1
+            property: false
+            speed:
+                value: 10500
+                type: uint64_t
     - name: fails_before_high_speed_water_and_air
       zone_conditions:
           - name: water_and_air_cooled_chassis
@@ -212,14 +212,14 @@ events:
       property:
           name: Functional
           type: bool
-      action:
-          name: count_state_before_speed
-          count: 1
-          property: false
-          speed:
-              value: 10500
-              type: uint64_t
-    - name: update_air_cooled_floor_speed_based_on_ambient
+      actions:
+          - name: count_state_before_speed
+            count: 1
+            property: false
+            speed:
+                value: 10500
+                type: uint64_t
+    - name: set_air_cooled_speed_boundaries_based_on_ambient
       zone_conditions:
           - name: air_cooled_chassis
             zones:
@@ -229,16 +229,22 @@ events:
       property:
           name: Value
           type: int64_t
-      action:
-          name: set_floor_from_average_sensor_value
-          map:
-              value:
-                  - 27000: 10500
-                  - 32000: 10500
-                  - 37000: 10500
-                  - 40000: 10500
-              type: std::map<int64_t, uint64_t>
-    - name: update_water_cooled_floor_speed_based_on_ambient
+      actions:
+          - name: set_floor_from_average_sensor_value
+            map:
+                value:
+                    - 27000: 10500
+                    - 32000: 10500
+                    - 37000: 10500
+                    - 40000: 10500
+                type: std::map<int64_t, uint64_t>
+          - name: set_ceiling_from_average_sensor_value
+            map:
+                value:
+                    - 25000: 10500
+                    - 27000: 10500
+                type: std::map<int64_t, uint64_t>
+    - name: set_water_cooled_speed_boundaries_based_on_ambient
       zone_conditions:
           - name: water_and_air_cooled_chassis
             zones:
@@ -248,106 +254,22 @@ events:
       property:
           name: Value
           type: int64_t
-      action:
-          name: set_floor_from_average_sensor_value
-          map:
-              value:
-                  - 27000: 10500
-                  - 32000: 10500
-                  - 37000: 10500
-                  - 40000: 10500
-              type: std::map<int64_t, uint64_t>
-    - name: update_ceiling_speed_based_on_ambient
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: zone0_ambient
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
-      action:
-          name: set_ceiling_from_average_sensor_value
-          map:
-              value:
-                  - 25000: 10500
-                  - 27000: 10500
-              type: std::map<int64_t, uint64_t>
-    - name: speed_increase_changes_based_on_core_temps
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-      precondition:
-          name: property_states_match
-          groups:
-              - name: occ0_object
-                interface: org.open_power.OCC.Status
-                property:
-                    name: OccActive
-                    type: bool
-                    value: true
-              - name: occ1_object
-                interface: org.open_power.OCC.Status
-                property:
-                    name: OccActive
-                    type: bool
-                    value: true
-      group: zone0_cores
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
-      action:
-          name: set_net_increase_speed
-          property: 73000
-          factor:
-              value: 1000
-              type: int64_t
-          delta:
-              value: 400
-              type: uint64_t
-    - name: speed_decrease_changes_based_on_core_temps
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-      precondition:
-          name: property_states_match
-          groups:
-              - name: occ0_object
-                interface: org.open_power.OCC.Status
-                property:
-                    name: OccActive
-                    type: bool
-                    value: true
-              - name: occ1_object
-                interface: org.open_power.OCC.Status
-                property:
-                    name: OccActive
-                    type: bool
-                    value: true
-      group: zone0_cores
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
-      action:
-          name: set_net_decrease_speed
-          property: 70000
-          factor:
-              value: 1000
-              type: int64_t
-          delta:
-              value: 10
-              type: uint64_t
-      timer:
-          interval: 15
-    - name: speed_increase_changes_based_on_regulator_temps
+      actions:
+          - name: set_floor_from_average_sensor_value
+            map:
+                value:
+                    - 27000: 10500
+                    - 32000: 10500
+                    - 37000: 10500
+                    - 40000: 10500
+                type: std::map<int64_t, uint64_t>
+          - name: set_ceiling_from_average_sensor_value
+            map:
+                value:
+                    - 25000: 10500
+                    - 27000: 10500
+                type: std::map<int64_t, uint64_t>
+    - name: speed_changes_based_on_regulator_temps
       zone_conditions:
           - name: air_cooled_chassis
             zones:
@@ -360,47 +282,26 @@ events:
       property:
           name: Value
           type: int64_t
-      action:
-          name: set_net_increase_speed
-          property: 85000
-          factor:
-              value: 1000
-              type: int64_t
-          delta:
-              value: 400
-              type: uint64_t
-    - name: speed_decrease_changes_based_on_regulator_temps
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: zone0_regulators
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
-      action:
-          name: set_net_decrease_speed
-          property: 82000
-          factor:
-              value: 1000
-              type: int64_t
-          delta:
-              value: 10
-              type: uint64_t
+      actions:
+          - name: set_net_increase_speed
+            property: 85000
+            factor:
+                value: 1000
+                type: int64_t
+            delta:
+                value: 400
+                type: uint64_t
+          - name: set_net_decrease_speed
+            property: 82000
+            factor:
+                value: 1000
+                type: int64_t
+            delta:
+                value: 10
+                type: uint64_t
       timer:
           interval: 15
-    - name: speed_increase_changes_based_on_dimm_temps
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
+    - name: occ_active_speed_changes
       precondition:
           name: property_states_match
           groups:
@@ -416,56 +317,65 @@ events:
                     name: OccActive
                     type: bool
                     value: true
-      group: zone0_dimms
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
-      action:
-          name: set_net_increase_speed
-          property: 74000
-          factor:
-              value: 1000
-              type: int64_t
-          delta:
-              value: 200
-              type: uint64_t
-    - name: speed_decrease_changes_based_on_dimm_temps
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      precondition:
-          name: property_states_match
-          groups:
-              - name: occ0_object
-                interface: org.open_power.OCC.Status
+          events:
+              - name: speed_changes_based_on_core_temps
+                zone_conditions:
+                    - name: air_cooled_chassis
+                      zones:
+                          - 0
+                group: zone0_cores
+                interface: xyz.openbmc_project.Sensor.Value
                 property:
-                    name: OccActive
-                    type: bool
-                    value: true
-              - name: occ1_object
-                interface: org.open_power.OCC.Status
+                    name: Value
+                    type: int64_t
+                actions:
+                    - name: set_net_increase_speed
+                      property: 73000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 400
+                          type: uint64_t
+                    - name: set_net_decrease_speed
+                      property: 70000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 10
+                          type: uint64_t
+                timer:
+                    interval: 15
+              - name: speed_changes_based_on_dimm_temps
+                zone_conditions:
+                    - name: air_cooled_chassis
+                      zones:
+                          - 0
+                    - name: water_and_air_cooled_chassis
+                      zones:
+                          - 0
+                group: zone0_dimms
+                interface: xyz.openbmc_project.Sensor.Value
                 property:
-                    name: OccActive
-                    type: bool
-                    value: true
-      group: zone0_dimms
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
-      action:
-          name: set_net_decrease_speed
-          property: 71000
-          factor:
-              value: 1000
-              type: int64_t
-          delta:
-              value: 10
-              type: uint64_t
-      timer:
-          interval: 15
+                    name: Value
+                    type: int64_t
+                actions:
+                    - name: set_net_increase_speed
+                      property: 74000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 200
+                          type: uint64_t
+                    - name: set_net_decrease_speed
+                      property: 71000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 10
+                          type: uint64_t
+                timer:
+                    interval: 15
