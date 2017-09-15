@@ -64,10 +64,7 @@ FILES_${PN}-monitor += "${sbindir}/phosphor-dump-monitor"
 FILES_${PN}-dreport += "${bindir}/dreport"
 
 DBUS_SERVICE_${PN}-manager += "${MGR_SVC}"
-SYSTEMD_SERVICE_${PN}-monitor += " \
-                          obmc-dump-monitor.service \
-                          var-lib-systemd-coredump.mount \
-"
+SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
 
 EXTRA_OECONF = "BMC_DUMP_PATH=${bmc_dump_path}"
 

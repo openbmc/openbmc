@@ -1,7 +1,5 @@
 [Unit]
 Description=Phosphor Dump core monitor.
-Wants=var-lib-systemd-coredump.mount
-Before=var-lib-systemd-coredump.mount
 
 [Service]
 ExecStart=/usr/bin/env phosphor-dump-monitor
