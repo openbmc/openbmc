@@ -19,6 +19,18 @@ groups:
       type: /xyz/openbmc_project/sensors
       members:
           - /temperature/ambient
+    - name: zone0_fan_tachs
+      description: Group of fan tach feedback speed inputs for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /fan_tach/fan0_0
+          - /fan_tach/fan0_1
+          - /fan_tach/fan1_0
+          - /fan_tach/fan1_1
+          - /fan_tach/fan2_0
+          - /fan_tach/fan2_1
+          - /fan_tach/fan3_0
+          - /fan_tach/fan3_1
     - name: occ0_object
       description: Dbus object containing OCC0 properties
       type: /org/open_power/control
@@ -137,6 +149,10 @@ preconditions:
           - groups
 
 actions:
+    - name: set_request_speed_base_with_max
+      description: >
+          Set the base request speed of a zone to the max value of a group for
+          calculating a new target speed
     - name: count_state_before_speed
       description: Set the speed when a number of properties at a state
       parameters:
@@ -289,6 +305,21 @@ events:
                     - 25000: 10500
                     - 27000: 10500
                 type: std::map<int64_t, uint64_t>
+    - name: set_base_request_speed_to_max_tach_feedback
+      zone_conditions:
+          - name: air_cooled_chassis
+            zones:
+                - 0
+          - name: water_and_air_cooled_chassis
+            zones:
+                - 0
+      group: zone0_fan_tachs
+      interface: xyz.openbmc_project.Sensor.Value
+      property:
+          name: Value
+          type: int64_t
+      actions:
+          - name: set_request_speed_base_with_max
     - name: speed_changes_based_on_regulator_temps
       zone_conditions:
           - name: air_cooled_chassis
