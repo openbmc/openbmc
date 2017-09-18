@@ -4,8 +4,8 @@ Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
 Wants=obmc-power-on@%i.target
 After=obmc-power-on@%i.target
-Wants=fsi-hub-scan@%i.service
-After=fsi-hub-scan@%i.service
+Wants=fsi-scan@%i.service
+After=fsi-scan@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
 
