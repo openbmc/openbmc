@@ -7,10 +7,20 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig
-
-DEPENDS += "autoconf-archive-native phosphor-logging"
-RDEPENDS_${PN} += "phosphor-logging"
+inherit autotools pkgconfig pythonnative
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control"
 SRCREV = "ee401e9b58d234cc2e8126d264542f9f4548f2ee"
+
+DEPENDS += " \
+        autoconf-archive-native \
+        phosphor-logging \
+        phosphor-dbus-interfaces \
+        openpower-dbus-interfaces \
+        "
+
+RDEPENDS_${PN} += " \
+        phosphor-logging \
+        phosphor-dbus-interfaces \
+        openpower-dbus-interfaces \
+        "
