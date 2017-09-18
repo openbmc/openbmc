@@ -5,6 +5,8 @@ PR = "r1"
 inherit obmc-phosphor-systemd
 inherit obmc-phosphor-license
 
+RDEPENDS_${PN} += "op-proc-control"
+
 TGTFMT = "obmc-chassis-poweron@{0}.target"
 
 TMPL_SCAN = "fsi-scan@.service"

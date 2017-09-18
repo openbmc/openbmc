@@ -7,7 +7,9 @@ Before=obmc-host-start-pre@%i.target
 Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
-ExecStart=/bin/sh -c "if [ -f /sys/bus/platform/devices/gpio-fsi/fsi0/rescan ]; then echo 1 > /sys/bus/platform/devices/gpio-fsi/fsi0/rescan; else echo 1 > /sys/bus/platform/devices/fsi-master/scan; fi"
+ExecStart=/usr/bin/env openpower-proc-control scanFSI
+SyslogIdentifier=openpower-proc-control
+
 Type=oneshot
 RemainAfterExit=yes
 
