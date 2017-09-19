@@ -24,8 +24,11 @@ RDEPENDS_${PN} += " \
          "
 
 CHASSIS_ON_TGT = "obmc-chassis-poweron@0.target"
+SEQ_MONITOR_SVC = "witherspoon-pseq-monitor.service"
+SEQ_MONITOR_FMT = "../${SEQ_MONITOR_SVC}:${CHASSIS_ON_TGT}.wants/${SEQ_MONITOR_SVC}"
+
 SEQ_PGOOD_SVC = "witherspoon-pseq-monitor-pgood.service"
 SEQ_PGOOD_FMT = "../${SEQ_PGOOD_SVC}:${CHASSIS_ON_TGT}.wants/${SEQ_PGOOD_SVC}"
 
-SYSTEMD_SERVICE_${PN} += "${SEQ_PGOOD_SVC}"
-SYSTEMD_LINK_${PN} += "${SEQ_PGOOD_FMT}"
+SYSTEMD_SERVICE_${PN} += "${SEQ_MONITOR_SVC} ${SEQ_PGOOD_SVC}"
+SYSTEMD_LINK_${PN} += "${SEQ_MONITOR_FMT} ${SEQ_PGOOD_FMT}"
