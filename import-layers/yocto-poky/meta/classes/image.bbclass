@@ -456,7 +456,7 @@ python () {
 
         rm_tmp_images = set()
         def gen_conversion_cmds(bt):
-            for ctype in ctypes:
+            for ctype in sorted(ctypes):
                 if bt[bt.find('.') + 1:] == ctype:
                     type = bt[0:-len(ctype) - 1]
                     if type.startswith("debugfs_"):
