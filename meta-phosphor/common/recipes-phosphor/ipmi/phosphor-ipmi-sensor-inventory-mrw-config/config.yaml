@@ -121,3 +121,27 @@ tpm_required_sensor:
         0x01:
           type: "bool"
           assert: true
+
+ps_derating_sensor:
+  path: /xyz/openbmc_project/control/host0/powersupply_derating
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingAssertion
+  interfaces:
+    xyz.openbmc_project.Control.PowerSupply.Derating:
+      PowerSupplyDerating:
+        0xFF:
+          type: uint32_t
+
+ps_redundancy_state_sensor:
+  path: /xyz/openbmc_project/control/host0/powersupply_redundancy
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  interfaces:
+    xyz.openbmc_project.Control.PowerSupply.Redundancy:
+      PowerSupplyRedundancy:
+        0x00:
+          type: "bool"
+          assert: false
+        0x01:
+          type: "bool"
+          assert: true
