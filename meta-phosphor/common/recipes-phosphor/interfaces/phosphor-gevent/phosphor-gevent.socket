@@ -1,6 +1,5 @@
 [Unit]
 Description=Phosphor Webserver socket
-PartOf=systemd-networkd.service
 
 [Socket]
 ListenStream=443

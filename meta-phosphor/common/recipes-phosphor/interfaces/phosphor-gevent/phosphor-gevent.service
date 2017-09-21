@@ -1,6 +1,5 @@
 [Unit]
 Description=Phosphor Webserver
-PartOf=systemd-networkd.service
 After=phosphor-gevent.socket
 After=obmc-webserver-pre.target
 
