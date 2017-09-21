@@ -77,6 +77,7 @@ SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-updateubootvars@.service \
     reboot-guard-enable.service \
     reboot-guard-disable.service \
+    obmc-flash-bmc-cleanup.service \
     "
 
 # Name of the mtd device where the ubi volumes should be created

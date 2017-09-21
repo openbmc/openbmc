@@ -192,6 +192,26 @@ ubi_remove() {
     fi
 }
 
+ubi_cleanup() {
+    # When ubi_cleanup is run, it expects one or no active version.
+    activeVersion=$(busctl --list --no-pager tree \
+            xyz.openbmc_project.Software.BMC.Updater | \
+            grep /xyz/openbmc_project/software/ | tail -c 9)
+
+    if [[ -z "$activeVersion" ]]; then
+        vols=$(ubinfo -a | grep -e "kernel-" -e "rofs-" | cut -c 14-)
+        vols=(${vols})
+    else
+        vols=$(ubinfo -a | grep -e "kernel-" -e "rofs-" | \
+                grep -v "$activeVersion" | cut -c 14-)
+        vols=(${vols})
+    fi
+
+    for (( index=0; index<${#vols[@]}; index++ )); do
+         ubi_remove ${vols[index]}
+    done
+}
+
 remount_ubi() {
   bmcmtd="$(findmtd "bmc")"
   altbmcmtd="$(findmtd "alt-bmc")"
@@ -345,6 +365,9 @@ case "$1" in
   ubiremove)
     name="$2"
     ubi_remove "${name}"
+    ;;
+  ubicleanup)
+    ubi_cleanup
     ;;
   ubisetenv)
     ubi_setenv "$2"

@@ -51,4 +51,5 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubiremount.service \
         obmc-flash-bios-updatesymlinks.service \
         obmc-flash-bios-ubiclear@.service \
+        obmc-flash-bios-cleanup.service \
         "

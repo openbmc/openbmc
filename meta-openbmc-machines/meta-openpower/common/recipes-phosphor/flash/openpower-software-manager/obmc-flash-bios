@@ -270,6 +270,27 @@ clear_ubi() {
   fi
 }
 
+ubi_cleanup() {
+    # When ubi_cleanup is run, it expects one or no active version.
+    activeVersion=$(busctl --list --no-pager tree \
+            org.open_power.Software.Host.Updater | \
+            grep /xyz/openbmc_project/software/ | tail -c 9)
+
+    if [[ -z "$activeVersion" ]]; then
+        vols=$(ubinfo -a | grep -e "pnor-ro-" -e "pnor-rw-" | cut -c 14-)
+        vols=(${vols})
+    else
+        vols=$(ubinfo -a | grep -e "pnor-ro-" -e "pnor-rw-" | \
+                grep -v "$activeVersion" | cut -c 14-)
+        vols=(${vols})
+    fi
+
+    for (( index=0; index<${#vols[@]}; index++ )); do
+         name=${vols[index]}
+         umount_ubi
+    done
+}
+
 case "$1" in
   ubiattach)
     attach_ubi
@@ -296,6 +317,9 @@ case "$1" in
   ubiclear)
     name="$2"
     clear_ubi
+    ;;
+  ubicleanup)
+    ubi_cleanup
     ;;
   *)
     echo "Invalid argument"
