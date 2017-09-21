@@ -1,0 +1,9 @@
+[Unit]
+Description=Factory reset BMC if reset enabled
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/bin/env obmc-flash-bmc reset
+SyslogIdentifier=obmc-flash-bmc

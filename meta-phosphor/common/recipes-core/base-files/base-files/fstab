@@ -4,7 +4,7 @@
 proc                 /proc                proc       defaults              0  0
 devpts               /dev/pts             devpts     mode=0620,gid=5       0  0
 tmpfs                /run                 tmpfs      mode=0755,nodev,nosuid,strictatime 0  0
-ubi0:rwfs            /var                 ubifs      defaults              0  0
+ubi0:rwfs            /var                 ubifs      defaults,x-systemd.requires=obmc-flash-bmc-reset.service 0  0
 overlay              /etc                 overlay    defaults,x-systemd.requires=prepare-overlay.service,lowerdir=/etc,upperdir=/var/persist/etc,workdir=/var/persist/etc-work 0  0
 tmpfs                /var/volatile        tmpfs      defaults              0  0
 tmpfs                /media               tmpfs      defaults              0  0

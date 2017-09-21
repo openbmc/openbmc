@@ -100,11 +100,6 @@ ubi_rw() {
   rw="${rwmtd#mtd}"
   ubidev="/dev/ubi${rw}"
 
-  if [ "$(fw_printenv rwreset 2>/dev/null)" == "rwreset=true" ]; then
-    ubi_remove "${name}"
-    fw_setenv rwreset
-  fi
-
   # Create a ubi volume of size 4MB, that is the current size of the rwfs image
   vol="$(findubi "${name}")"
   if [ -z "${vol}" ]; then
@@ -328,6 +323,19 @@ create_vol_in_alt() {
   fi
 }
 
+factory_reset() {
+    # A lock file for printenv exists on /var, which isn't mounted when this
+    # function is called. We have to read the rwreset variable out of file.
+    ubootmtd="$(findmtd "u-boot-env")"
+    grep -q -x "rwreset=true" /dev/$ubootmtd
+    if [ "$?" = "0" ]; then
+      ubi_remove "rwfs"
+      reqmtd="bmc"
+      name="rwfs"
+      ubi_rw
+    fi
+}
+
 case "$1" in
   mtduboot)
     reqmtd="$2"
@@ -387,6 +395,9 @@ case "$1" in
     ;;
   rebootguarddisable)
     rebootguarddisable
+    ;;
+  reset)
+    factory_reset
     ;;
   *)
     echo "Invalid argument"
