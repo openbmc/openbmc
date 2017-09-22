@@ -1,0 +1,8 @@
+[Unit]
+Description=Clear UBIFS volume %i
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/bin/env obmc-flash-bios ubiclear %i
+SyslogIdentifier=obmc-flash-bios

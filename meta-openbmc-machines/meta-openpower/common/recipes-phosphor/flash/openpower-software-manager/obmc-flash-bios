@@ -263,6 +263,13 @@ update_symlinks() {
   fi
 }
 
+clear_ubi() {
+  mountdir="/media/${name}"
+  if is_mounted "${name}"; then
+    rm -rf $mountdir/..?* $mountdir/.[!.]* $mountdir/*
+  fi
+}
+
 case "$1" in
   ubiattach)
     attach_ubi
@@ -285,6 +292,10 @@ case "$1" in
     ;;
   updatesymlinks)
     update_symlinks
+    ;;
+  ubiclear)
+    name="$2"
+    clear_ubi
     ;;
   *)
     echo "Invalid argument"

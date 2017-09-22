@@ -45,10 +45,10 @@ DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
 SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubiattach.service \
         obmc-flash-bios-ubimount@.service \
-        obmc-flash-bios-ubiumount-prsv.service \
         obmc-flash-bios-ubiumount-ro@.service \
         obmc-flash-bios-ubiumount-rw@.service \
         obmc-flash-bios-ubipatch.service \
         obmc-flash-bios-ubiremount.service \
         obmc-flash-bios-updatesymlinks.service \
+        obmc-flash-bios-ubiclear@.service \
         "
