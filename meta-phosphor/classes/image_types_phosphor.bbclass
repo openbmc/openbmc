@@ -10,6 +10,7 @@ def build_uboot(d):
 # Inherit u-boot classes if legacy uboot images are in use.
 IMAGE_TYPE_uboot = '${@build_uboot(d)}'
 inherit ${IMAGE_TYPE_uboot}
+inherit image_version
 
 # Phosphor image types
 #
@@ -139,16 +140,27 @@ add_volume() {
 	fi
 }
 
-do_generate_ubi() {
+python do_generate_ubi() {
+        version_id = do_get_versionID(d)
+        d.setVar('VERSION_ID', version_id)
+        bb.build.exec_func("do_make_ubi", d)
+}
+do_generate_ubi[dirs] = "${S}/ubi"
+do_generate_ubi[depends] += " \
+        ${PN}:do_image_${@d.getVar('FLASH_UBI_BASETYPE', True).replace('-', '_')} \
+        virtual/kernel:do_deploy \
+        u-boot:do_populate_sysroot \
+        mtd-utils-native:do_populate_sysroot \
+        "
+
+do_make_ubi() {
 	cfg=ubinize-${IMAGE_NAME}.cfg
-
 	rm -f $cfg ubi-img
-
 	# Construct the ubinize config file
-	add_volume $cfg 0 static kernel-0 \
+	add_volume $cfg 0 static kernel-${VERSION_ID} \
 		${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE}
 
-	add_volume $cfg 1 static rofs-0 \
+	add_volume $cfg 1 static rofs-${VERSION_ID} \
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${FLASH_UBI_BASETYPE}
 
 	add_volume $cfg 2 dynamic rwfs rwfs.${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_RWFS_TXT_SIZE}
@@ -168,8 +180,8 @@ do_generate_ubi() {
 	cd ${IMGDEPLOYDIR}
 	ln -sf ${IMAGE_NAME}.ubi.mtd ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ubi.mtd
 }
-do_generate_ubi[dirs] = "${S}/ubi"
-do_generate_ubi[depends] += " \
+do_make_ubi[dirs] = "${S}/ubi"
+do_make_ubi[depends] += " \
         ${PN}:do_image_${@d.getVar('FLASH_UBI_BASETYPE', True).replace('-', '_')} \
         virtual/kernel:do_deploy \
         u-boot:do_populate_sysroot \
@@ -281,19 +293,7 @@ do_generate_ubi_tar[depends] += " \
         "
 
 python do_generate_phosphor_manifest() {
-    import configparser
-    import io
-    path = d.getVar('STAGING_DIR_HOST', True) + d.getVar('sysconfdir', True)
-    path = os.path.join(path, 'os-release')
-    parser = configparser.SafeConfigParser(strict=False)
-    parser.optionxform = str
-    version = ''
-    with open(path, 'r') as fd:
-        buf = '[root]\n' + fd.read()
-        fd = io.StringIO(buf)
-        parser.readfp(fd)
-        version = parser['root']['VERSION_ID']
-
+    version = do_get_version(d)
     with open('MANIFEST', 'w') as fd:
         fd.write('purpose=xyz.openbmc_project.Software.Version.VersionPurpose.BMC\n')
         fd.write('version={}\n'.format(version.strip('"')))

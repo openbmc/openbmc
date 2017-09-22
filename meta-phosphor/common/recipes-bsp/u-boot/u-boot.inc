@@ -4,10 +4,26 @@ SRCREV = "16f997c564f873b4fdf12fc90ee8a9f6f6080961"
 UBRANCH = "v2016.07-aspeed-openbmc"
 SRC_URI = "git://git@github.com/openbmc/u-boot.git;branch=${UBRANCH};protocol=https"
 
+inherit image_version
+
 SRC_URI += "file://0001-configs-ast-Add-redundnant-env.patch"
 
 SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
     'file://0001-config-ast-common-hack-bootopts.patch \
      file://0004-config-ast-common-ubi-bootops.patch', '', d)}"
+
+python do_configure () {
+    if ((d.getVar("MACHINE_FEATURES", True)) == "obmc-ubi-fs"):
+        version_id=do_get_versionID(d)
+        d.setVar('VERSION_ID', version_id)
+        bb.build.exec_func("patch_uboot", d)
+}
+
+patch_uboot () {
+	sed -i "s/kernel-0/kernel-${VERSION_ID}/g" \
+	${S}/patches/0004-config-ast-common-ubi-bootops.patch &> /dev/null
+	sed -i "s/kernel-0/kernel-${VERSION_ID}/g" \
+	${S}/include/configs/ast-common.h &> /dev/null
+}
 
 PV = "v2016.07+git${SRCPV}"
