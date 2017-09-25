@@ -4,6 +4,12 @@ Conflicts=obmc-host-stop@%i.target
 Conflicts=op-occ-disable@%i.service
 Wants=org.open_power.OCC.Control.service
 After=org.open_power.OCC.Control.service
+Wants=fsi-scan@%i.service
+After=fsi-scan@%i.service
+# TODO - openbmc/openbmc#2278 - Remove fsi-hub-scan
+# These are not needed once we remove fsi-hub-scan service
+Wants=fsi-hub-scan@%i.service
+After=fsi-hub-scan@%i.service
 ConditionPathExists=/run/openbmc/host@%i-on
 
 [Service]
