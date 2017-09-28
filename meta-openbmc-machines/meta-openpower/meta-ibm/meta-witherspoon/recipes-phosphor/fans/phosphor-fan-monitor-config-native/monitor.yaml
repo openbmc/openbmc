@@ -1,3 +1,4 @@
+fans:
   - inventory: /system/chassis/motherboard/fan0
     allowed_out_of_range_time: 20
     deviation: 15
@@ -37,3 +38,11 @@
         has_target: true
       - name: fan3_1
         has_target: false
+
+sensor_trust_groups:
+  - class: NonzeroSpeed
+    sensors:
+      - name: fan0_1
+      - name: fan1_1
+      - name: fan2_1
+      - name: fan3_1
