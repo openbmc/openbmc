@@ -6,7 +6,6 @@ inherit native
 inherit obmc-phosphor-license
 inherit phosphor-dbus-yaml
 
-PROVIDES += "openpower-debug-collector-error-native"
 require openpower-debug-collector.inc
 
 S = "${WORKDIR}/git"
