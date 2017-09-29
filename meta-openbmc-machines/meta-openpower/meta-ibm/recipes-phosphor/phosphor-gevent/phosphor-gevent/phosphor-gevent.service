@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor REST Server
+After=network.target
+After=obmc-webserver-pre.target
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/env phosphor-gevent $APPLICATION --no-ssl
+SyslogIdentifier=phosphor-gevent
+Environment="PYTHONUNBUFFERED=1"
+EnvironmentFile={envfiledir}/obmc/wsgi_app

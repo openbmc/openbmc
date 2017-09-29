@@ -16,7 +16,6 @@ RDEPENDS_${PN} += " \
         "
 RRECOMMENDS_${PN} += "python-gevent-websocket"
 
-
 S = "${WORKDIR}/git/servers/gevent"
 
-SYSTEMD_SERVICE_${PN} += "${PN}.service ${PN}.socket"
+SYSTEMD_SERVICE_${PN} += " ${PN}.service  ${PN}.socket"
