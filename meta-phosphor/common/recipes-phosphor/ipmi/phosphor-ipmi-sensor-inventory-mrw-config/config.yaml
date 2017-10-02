@@ -5,8 +5,9 @@ boot_count_sensor:
   interfaces:
     xyz.openbmc_project.Control.Boot.RebootAttempts:
       AttemptsLeft:
-        0xFF:
-          type: uint32_t
+        Offsets:
+          0xFF:
+            type: uint32_t
 
 os_boot_sensor:
   path: /xyz/openbmc_project/state/host0
@@ -15,24 +16,25 @@ os_boot_sensor:
   interfaces:
     xyz.openbmc_project.State.OperatingSystem.Status:
       OperatingSystemState:
-        0x01:
-          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CBoot"
-          type: string
-        0x02:
-          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.PXEBoot"
-          type: string
-        0x03:
-          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.DiagBoot"
-          type: string
-        0x04:
-          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CDROMBoot"
-          type: string
-        0x05:
-          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.ROMBoot"
-          type: string
-        0x06:
-          assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete"
-          type: string
+        Offsets:
+          0x01:
+            assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CBoot"
+            type: string
+          0x02:
+            assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.PXEBoot"
+            type: string
+          0x03:
+            assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.DiagBoot"
+            type: string
+          0x04:
+            assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.CDROMBoot"
+            type: string
+          0x05:
+            assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.ROMBoot"
+            type: string
+          0x06:
+            assert: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete"
+            type: string
 
 fw_boot_sensor:
   path: /xyz/openbmc_project/state/host0
@@ -41,21 +43,22 @@ fw_boot_sensor:
   interfaces:
     xyz.openbmc_project.State.Boot.Progress:
       BootProgress:
-        0x00:
-          type: string
-          set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.Unspecified"
-        0x01:
-          type: string
-          set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.MemoryInit"
-        0x03:
-          type: string
-          set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.SecondaryProcInit"
-        0x13:
-          type: string
-          set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart"
-        0x14:
-          type: string
-          set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit"
+        Offsets:
+          0x00:
+            type: string
+            set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.Unspecified"
+          0x01:
+            type: string
+            set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.MemoryInit"
+          0x03:
+            type: string
+            set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.SecondaryProcInit"
+          0x13:
+            type: string
+            set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart"
+          0x14:
+            type: string
+            set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit"
 
 dimm_func_sensor:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -63,16 +66,23 @@ dimm_func_sensor:
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
-        0x04:
-          type:   "bool"
-          assert:  false
-          deassert: true
+        Offsets:
+          0x04:
+            type:   "bool"
+            assert:  false
+            deassert: true
+        Prereqs:
+          0x06:
+            type: "bool"
+            assert: true
+            deassert: false
     xyz.openbmc_project.Inventory.Item:
       Present:
-        0x06:
-          type: "bool"
-          assert: true
-          deassert: false
+        Offsets:
+          0x06:
+            type: "bool"
+            assert: true
+            deassert: false
 
 cpu_func_sensor:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -80,16 +90,23 @@ cpu_func_sensor:
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
-        0x08:
-          type:   "bool"
-          assert:  false
-          deassert: true
+        Offsets:
+          0x08:
+            type:   "bool"
+            assert:  false
+            deassert: true
+        Prereqs:
+          0x07:
+            type: "bool"
+            assert: true
+            deassert: false
     xyz.openbmc_project.Inventory.Item:
       Present:
-        0x07:
-          type: "bool"
-          assert: true
-          deassert: false
+        Offsets:
+          0x07:
+            type: "bool"
+            assert: true
+            deassert: false
 
 cpucore_func_sensor:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -97,17 +114,24 @@ cpucore_func_sensor:
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
-        0x08:
-          type:   "bool"
-          assert:  false
-          deassert: true
+        Offsets:
+          0x08:
+            type:   "bool"
+            assert:  false
+            deassert: true
+        Prereqs:
+          0x07:
+            type: "bool"
+            assert: true
+            deassert: false
     xyz.openbmc_project.Inventory.Item:
       Present:
-        0x07:
-          type: "bool"
-          assert: true
-          deassert: false
-          skipOn: "deassert"
+        Offsets:
+          0x07:
+            type: "bool"
+            assert: true
+            deassert: false
+            skipOn: "deassert"
 
 tpm_required_sensor:
   path: /xyz/openbmc_project/control/host0/TPMEnable
@@ -116,9 +140,10 @@ tpm_required_sensor:
   interfaces:
     xyz.openbmc_project.Control.TPM.Policy:
       TPMEnable:
-        0x00:
-          type: "bool"
-          assert: false
-        0x01:
-          type: "bool"
-          assert: true
+        Offsets:
+          0x00:
+            type: "bool"
+            assert: false
+          0x01:
+            type: "bool"
+            assert: true

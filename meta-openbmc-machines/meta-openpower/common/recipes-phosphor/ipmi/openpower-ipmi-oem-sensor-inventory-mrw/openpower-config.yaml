@@ -4,11 +4,12 @@ occ_active_sensor:
   interfaces:
     org.open_power.OCC.Status:
       OccActive:
-        0x00:
-          type: "bool"
-          assert: "false"
-          deassert: "true"
-        0x01:
-          type: "bool"
-          assert: "true"
-          deassert: "false"
+        Offsets:
+          0x00:
+            type: "bool"
+            assert: "false"
+            deassert: "true"
+          0x01:
+            type: "bool"
+            assert: "true"
+            deassert: "false"
