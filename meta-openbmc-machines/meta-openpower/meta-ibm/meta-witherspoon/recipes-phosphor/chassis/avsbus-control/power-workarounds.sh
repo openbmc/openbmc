@@ -42,6 +42,24 @@ i2cset -y 11 0x64 0x00 0x09 i # set PAGE
 i2cset -y 11 0x64 0xF5 0x81 i # set margin_config
 i2cset -y 11 0x64 0x21 0x85 0x33 i # set VOUT_COMMAND
 
+# Increase over-current settings
+#VDD A phase current
+i2cset -y 4 0x12 0xFF 0x04 b    # set window register high byte to 4
+i2cset -y 4 0x12 0x3C 0xFF b    # Disable
+#VDD B phase current
+i2cset -y 5 0x12 0xFF 0x04 b    # set window register high byte to 4
+i2cset -y 5 0x12 0x3C 0xFF b    # Disable
+#VDD A master OC fault to 445A
+i2cset -y 4 0x70 0x00 0x00 b    # PAGE
+i2cset -y 4 0x70 0x46 0x08DE w
+# VDD A master OC warn to 384A
+i2cset -y 4 0x70 0x4A 0x08C0 w
+#VDD B master OC fault to 445A
+i2cset -y 5 0x70 0x00 0x00 b    # PAGE
+i2cset -y 5 0x70 0x46 0x08DE w
+# VDD B master OC warn to 384A
+i2cset -y 5 0x70 0x4A 0x08C0 w
+
 # re-bind ucd driver only if we unbound it (i.e. ucd has been set with a value)
 if [ -e $ucdpath -a -n "$ucd" ]; then
   j=0
