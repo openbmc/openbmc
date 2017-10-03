@@ -13,3 +13,4 @@ TimeoutStartSec=60
 Restart=no
 
 ExecStart=/sbin/fw_setenv openbmconce
+ExecStart=/sbin/fw_setenv openbmconce
