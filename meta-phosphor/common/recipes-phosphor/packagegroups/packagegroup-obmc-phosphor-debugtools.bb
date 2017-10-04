@@ -12,4 +12,5 @@ RDEPENDS_${PN} = " \
     phosphor-logging-test \
     lmsensors-sensors \
     tcpdump \
+    latencytop \
     "
