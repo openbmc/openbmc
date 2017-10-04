@@ -1,0 +1,3 @@
+# Default MRW settings override definition YAML - empty.
+# Any MRW variables, marked by MRW_<MRW variable name>, are replaced with their
+# MRW value.

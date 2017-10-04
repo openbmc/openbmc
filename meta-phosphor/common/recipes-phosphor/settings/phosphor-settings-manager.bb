@@ -16,6 +16,7 @@ DEPENDS += "python-pyyaml-native"
 DEPENDS += "python-mako-native"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "virtual/phosphor-settings-defaults"
+DEPENDS += "${@cf_enabled(d, 'obmc-mrw', 'phosphor-settings-read-settings-mrw')}"
 DEPENDS += "sdbusplus sdbusplus-native"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "phosphor-logging"
@@ -46,6 +47,10 @@ python do_merge_settings () {
     cmd = []
     cmd.append(os.path.join(workdir, 'merge_settings.py'))
     cmd.append(os.path.join(settingsdir, 'defaults.yaml'))
+    # Used for any settings from the MRW
+    use_mrw = cf_enabled(d, 'obmc-mrw', 'true')
+    if (use_mrw == 'true'):
+        cmd.append(os.path.join(settingsdir, 'mrw-settings.override.yaml'))
 
     fetch = bb.fetch2.Fetch([], d)
     override_urls = [url for url in fetch.urls if url.endswith('.override.yml')]
