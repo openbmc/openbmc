@@ -2,6 +2,7 @@
 Description=Updates symlinks for active PNOR version
 Before=mboxd.service
 Before=mboxd-reload@.service
+After=org.open_power.Software.Host.Updater.service
 
 [Service]
 Type=oneshot

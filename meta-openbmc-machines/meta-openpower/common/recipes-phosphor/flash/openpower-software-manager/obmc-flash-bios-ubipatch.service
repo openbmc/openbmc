@@ -1,5 +1,6 @@
 [Unit]
 Description=Create a ubi volume for pnor patches
+Before=mboxd.service
 Wants=usr-local.mount
 After=usr-local.mount
 
