@@ -13,7 +13,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbus++-native"
 
 SRC_URI += "git://github.com/openbmc/phosphor-dbus-interfaces"
-SRCREV = "73b90641813116e934d347e7f0bcb946b690ef3b"
+SRCREV = "38e0b33304565c788d946321b7e72c4d24d31483"
 
 DEPENDS_remove_class-native = "sdbus++-native"
 DEPENDS_remove_class-nativesdk = "sdbus++-native"
