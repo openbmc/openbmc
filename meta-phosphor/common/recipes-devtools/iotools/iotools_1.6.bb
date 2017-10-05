@@ -1,9 +1,9 @@
 DESCRIPTION = "Command line tools for hardware device registers"
-HOMEPAGE = "https://github.com/adurbin/iotools"
+HOMEPAGE = "https://github.com/jonmayergoogle/iotools"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
-SRCREV = "452ad1f4957a4f307fbe204419e5d08a1a1febb9"
-SRC_URI = "git://git@github.com/adurbin/iotools.git;protocol=https"
+SRCREV = "223a7be0885dd3d0dba910d55d06745bdfd846d8"
+SRC_URI = "git://git@github.com/jonmayergoogle/iotools.git;protocol=https"
 PV = "v1.6+git${SRCPV}"
 
 S = "${WORKDIR}/git"
