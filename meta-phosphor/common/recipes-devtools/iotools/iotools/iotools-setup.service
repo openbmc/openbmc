@@ -1,0 +1,11 @@
+[Unit]
+Description=Install iotool links
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/usr/bin/env iotools --make-links
+SystlogIdentifier=iotools
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

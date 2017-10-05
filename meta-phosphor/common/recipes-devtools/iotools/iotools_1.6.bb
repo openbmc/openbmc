@@ -6,6 +6,8 @@ SRCREV = "223a7be0885dd3d0dba910d55d06745bdfd846d8"
 SRC_URI = "git://git@github.com/jonmayergoogle/iotools.git;protocol=https"
 PV = "v1.6+git${SRCPV}"
 
+inherit obmc-phosphor-systemd
+
 S = "${WORKDIR}/git"
 FILES_${PN} = "${sbindir}"
 
@@ -20,3 +22,5 @@ do_install() {
     install -d ${D}${sbindir}
     install -m 0755 iotools ${D}${sbindir}
 }
+
+SYSTEMD_SERVICE_${PN} += "iotools-setup.service"
