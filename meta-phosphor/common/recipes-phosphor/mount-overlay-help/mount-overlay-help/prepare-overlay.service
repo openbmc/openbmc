@@ -4,6 +4,6 @@ RequiresMountsFor=/var
 DefaultDependencies=false
 
 [Service]
-ExecStart=/bin/sh -c "rm -rf /var/persist/etc-work && mkdir -p /var/persist/etc /var/persist/etc-work /var/persist/home/root"
+ExecStart=/bin/sh -c "if ! mountpoint /etc; then rm -rf /var/persist/etc-work && mkdir -p /var/persist/etc-work; fi; mkdir -p /var/persist/etc /var/persist/home/root"
 Type=oneshot
 RemainAfterExit=no
