@@ -11,8 +11,8 @@ require witherspoon-pfault-analysis.inc
 S = "${WORKDIR}/git"
 
 do_install_append() {
-    SRC=${S}/xyz/openbmc_project/Power
-    DEST=${yaml_dir}/xyz/openbmc_project/Power
+    SRC=${S}/org/open_power/Witherspoon
+    DEST=${yaml_dir}/org/open_power/Witherspoon
     install -d ${DEST}
     install ${SRC}/Fault.errors.yaml ${DEST}
     install ${SRC}/Fault.metadata.yaml ${DEST}
