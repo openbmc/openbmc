@@ -147,3 +147,27 @@ tpm_required_sensor:
           0x01:
             type: "bool"
             assert: true
+
+gpu_func_sensor:
+  serviceInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  interfaces:
+    xyz.openbmc_project.State.Decorator.OperationalStatus:
+      Functional:
+        Offsets:
+          0x08:
+            type:   "bool"
+            assert:  false
+            deassert: true
+        Prereqs:
+          0x07:
+            type: "bool"
+            assert: true
+            deassert: false
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        Offsets:
+          0x07:
+            type: "bool"
+            assert: true
+            deassert: false
