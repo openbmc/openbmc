@@ -57,6 +57,8 @@ mount_squashfs() {
   ubidev="/dev/ubi${pnormtd#mtd}"
   mountdir="/media/${name}"
   vol="$(findubi "${name}")"
+  img="/tmp/images/${version}/pnor.xz.squashfs"
+  filesize="$(ls -sh $img | awk -F " " {'print $1'})"
 
   if is_mounted "${name}"; then
     echo "${name} is already mounted."
@@ -71,10 +73,8 @@ mount_squashfs() {
     mkdir "${mountdir}"
   fi
 
-  # Create a static ubi volume of arbitrary size 24MB,
-  # the current pnor image is ~19MB
-  # TODO Set size based on file size openbmc/openbmc#1840
-  ubimkvol "${ubidev}" -N "${name}" -s 24MiB --type=static
+  # Set size of read-only partition equal to pnor.xz.squashfs
+  ubimkvol "${ubidev}" -N "${name}" -s "${filesize}"KiB --type=static
   vol="$(findubi "${name}")"
 
   if [ $? != 0 ]; then
@@ -83,7 +83,6 @@ mount_squashfs() {
   fi
 
   ubidevid="${vol#ubi}"
-  img="/tmp/images/${version}/pnor.xz.squashfs"
   ubiupdatevol "/dev/ubi${ubidevid}" "${img}"
 
   if [ $? != 0 ]; then
