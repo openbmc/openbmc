@@ -9,7 +9,7 @@ ConditionPathExists={envfiledir}/obmc/power-supply-monitor/power-supply-monitor-
 [Service]
 EnvironmentFile={envfiledir}/obmc/power-supply-monitor/power-supply-monitor-%i.conf
 ExecStart=/usr/bin/env witherspoon-psu-monitor --path=${{DEVPATH}} --instance=${{INSTANCE}} --inventory=${{INVENTORY}}
-SysLogIdentifier=witherspoon-psu-monitor
+SyslogIdentifier=witherspoon-psu-monitor
 
 [Install]
 RequiredBy={SYSTEMD_DEFAULT_TARGET}
