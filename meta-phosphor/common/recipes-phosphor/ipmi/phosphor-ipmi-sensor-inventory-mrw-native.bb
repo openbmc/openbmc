@@ -41,7 +41,7 @@ python do_merge_sensor_config () {
     cmd.append(os.path.join(sensoryamldir, 'config.yaml'))
 
     fetch = os.listdir(sensoryamldir)
-    override_urls = filter(lambda f: f.endswith('-config.yaml'), fetch)
+    override_urls = [url for url in fetch if url.endswith('-config.yaml')]
     for url in override_urls:
         bb.debug(2, 'Merging extra configurations: ' + url)
         filename = os.path.join(sensoryamldir, url)

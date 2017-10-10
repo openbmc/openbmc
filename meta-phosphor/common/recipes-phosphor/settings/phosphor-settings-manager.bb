@@ -48,7 +48,7 @@ python do_merge_settings () {
     cmd.append(os.path.join(settingsdir, 'defaults.yaml'))
 
     fetch = bb.fetch2.Fetch([], d)
-    override_urls = filter(lambda f: f.endswith('.override.yml'), fetch.urls)
+    override_urls = [url for url in fetch.urls if url.endswith('.override.yml')]
     for url in override_urls:
         bb.debug(2, 'Overriding with source: ' + url)
         local_base = os.path.basename(fetch.localpath(url))

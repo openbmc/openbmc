@@ -91,7 +91,7 @@ python do_merge_sensors () {
     if os.stat(os.path.join(sensorsdir, 'sensor.yaml')).st_size == 0:
         return
     fetch = bb.fetch2.Fetch([], d)
-    override_urls = filter(lambda f: f.endswith('.hardcoded.yaml'), fetch.urls)
+    override_urls = [url for url in fetch.urls if url.endswith('.hardcoded.yaml')]
     for url in override_urls:
         bb.debug(2, 'Overriding with source: ' + url)
         local_base = os.path.basename(fetch.localpath(url))
