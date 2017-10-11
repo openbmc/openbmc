@@ -94,6 +94,7 @@ RDEPENDS_${PN}-debug-collector = " \
         ${VIRTUAL-RUNTIME_obmc-dump-manager} \
         ${VIRTUAL-RUNTIME_obmc-dump-monitor} \
         phosphor-debug-collector-dreport \
+        phosphor-debug-collector-scripts \
         "
 
 SUMMARY_${PN}-settings = "Settings applications"
