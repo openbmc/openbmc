@@ -41,8 +41,14 @@ TIMEOUT_TGTFMT = "obmc-host-timeout@{0}.target"
 WDOG_INSTFMT = "openpower-debug-collector-watchdog@{0}.service"
 TIMEOUT_WDOG_FMT = "../${WDOG_TMPL}:${TIMEOUT_TGTFMT}.wants/${WDOG_INSTFMT}"
 
+# Capture debug information on watchdog timeout
+DEBUG_WD_TIMEOUT_TMPL = "openpower-debug-collector-watchdog-timeout@.service"
+DEBUG_WD_TIMEOUT_INSTFMT = "openpower-debug-collector-watchdog-timeout@{0}.service"
+DEBUG_WD_TIMEOUT_FMT = "../${DEBUG_WD_TIMEOUT_TMPL}:${TIMEOUT_TGTFMT}.wants/${DEBUG_WD_TIMEOUT_INSTFMT}"
+
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'CRASH_CHECKSTOP_FMT', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'TIMEOUT_WDOG_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'DEBUG_WD_TIMEOUT_FMT', 'OBMC_HOST_INSTANCES')}"
 
 # Do not depend on phosphor-logging for native build
 DEPENDS_remove_class-native = "phosphor-logging"
