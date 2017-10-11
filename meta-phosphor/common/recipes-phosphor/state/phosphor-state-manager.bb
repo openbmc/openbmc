@@ -102,6 +102,6 @@ HOST_REBOOT_SVC_FMT = "../${HOST_REBOOT_SVC}:${HOST_REBOOT_TGTFMT}.requires/${HO
 SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_REBOOT_SVC_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "4e6534f5b2520228a275941e2f3f5a495f41b9aa"
+SRCREV = "0a83873508c542b21f99e2b5e1a2605f91916f4f"
 
 S = "${WORKDIR}/git"
