@@ -171,3 +171,18 @@ gpu_func_sensor:
             type: "bool"
             assert: true
             deassert: false
+
+host_auto_reboot_control_sensor:
+  path: /xyz/openbmc_project/control/host0/auto_reboot
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  interfaces:
+    xyz.openbmc_project.Control.Boot.RebootPolicy:
+      AutoReboot:
+        Offsets:
+          0x00:
+            type: "bool"
+            assert: false
+          0x01:
+            type: "bool"
+            assert: true
