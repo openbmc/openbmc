@@ -14,6 +14,8 @@ RPROVIDES_${PN} += "virtual-obmc-wsgihost"
 RDEPENDS_${PN} += " \
         python-gevent \
         "
+RRECOMMENDS_${PN} += "python-gevent-websocket"
+
 
 S = "${WORKDIR}/git/servers/gevent"
 

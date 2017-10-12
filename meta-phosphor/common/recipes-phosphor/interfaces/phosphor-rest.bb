@@ -9,7 +9,10 @@ inherit obmc-phosphor-discovery-service
 
 require phosphor-rest.inc
 
-RRECOMMENDS_${PN} += "virtual-obmc-wsgihost"
+RRECOMMENDS_${PN} += " \
+        virtual-obmc-wsgihost \
+        python-gevent-websocket \
+        "
 
 RDEPENDS_${PN} += " \
         python-xml \
