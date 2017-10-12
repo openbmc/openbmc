@@ -75,3 +75,10 @@ do_install_append() {
        install -m 0755 ${S}/tools/dreport \
                        ${D}${bindir}/dreport
 }
+
+#Enable ubifs-workaround by MACHINE_FEATURE obmc-ubi-fs.
+PACKAGECONFIG_append = "${@mf_enabled(d, 'obmc-ubi-fs', 'ubifs-workaround')}"
+PACKAGECONFIG[ubifs-workaround] = " \
+       --enable-ubifs-workaround, \
+       --disable-ubifs-workaround \
+"
