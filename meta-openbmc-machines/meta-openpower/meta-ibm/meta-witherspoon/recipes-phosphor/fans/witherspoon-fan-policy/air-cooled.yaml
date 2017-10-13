@@ -354,12 +354,14 @@
 
 - name: log and shutdown
   description: >
-    'Shut the system down and log an event.'
+    'Shut the system down, log an event in the journal, and create an
+     error log.'
   class: callback
   callback: group
   members:
     - shutdown
     - log
+    - create shutdown error
 
 - name: shutdown
   description: >
@@ -473,3 +475,12 @@
     - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
       value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
       type: string
+
+- name: create shutdown error
+  description: >
+    'Create a Fan Shutdown Error log.'
+  class: callback
+  callback: elog
+  paths: chassis state
+  properties: chassis powered
+  error: xyz::openbmc_project::State::Shutdown::Inventory::Error::Fan
