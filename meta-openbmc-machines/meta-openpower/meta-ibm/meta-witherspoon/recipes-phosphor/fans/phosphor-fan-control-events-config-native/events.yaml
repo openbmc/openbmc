@@ -139,6 +139,11 @@ groups:
           - /temperature/gpu3_mem_temp
           - /temperature/gpu4_mem_temp
           - /temperature/gpu5_mem_temp
+    - name: zone0_pcie
+      description: Group of pcie temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/pcie
 
 preconditions:
     - name: property_states_match
@@ -344,6 +349,38 @@ events:
                 type: uint64_t
           - name: set_net_decrease_speed
             property: 82000
+            factor:
+                value: 1000
+                type: int64_t
+            delta:
+                value: 40
+                type: uint64_t
+      timer:
+          interval: 5
+    - name: speed_changes_based_on_pcie_temps
+      zone_conditions:
+          - name: air_cooled_chassis
+            zones:
+                - 0
+          - name: water_and_air_cooled_chassis
+            zones:
+                - 0
+      group: zone0_pcie
+      interface: xyz.openbmc_project.Sensor.Value
+      property:
+          name: Value
+          type: int64_t
+      actions:
+          - name: set_net_increase_speed
+            property: 55000
+            factor:
+                value: 1000
+                type: int64_t
+            delta:
+                value: 400
+                type: uint64_t
+          - name: set_net_decrease_speed
+            property: 52000
             factor:
                 value: 1000
                 type: int64_t
