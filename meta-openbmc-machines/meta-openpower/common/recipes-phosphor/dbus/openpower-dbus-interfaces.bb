@@ -13,7 +13,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbus++-native"
 
 SRC_URI += "git://github.com/openbmc/openpower-dbus-interfaces"
-SRCREV = "2ed0abbd4eea5833502d4720b26cd114e7b0e1e9"
+SRCREV = "da6699fa9724d22dd61ea255053f3d08f40a3d7a"
 
 DEPENDS_remove_class-native = "sdbus++-native"
 DEPENDS_remove_class-nativesdk = "sdbus++-native"
