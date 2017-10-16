@@ -274,15 +274,15 @@ events:
           - name: set_floor_from_average_sensor_value
             map:
                 value:
-                    - 27000: 10500
-                    - 32000: 10500
-                    - 37000: 10500
-                    - 40000: 10500
+                    - 27000: 7200
+                    - 32000: 7200
+                    - 37000: 7200
+                    - 40000: 7200
                 type: std::map<int64_t, uint64_t>
           - name: set_ceiling_from_average_sensor_value
             map:
                 value:
-                    - 25000: 10500
+                    - 25000: 7200
                     - 27000: 10500
                 type: std::map<int64_t, uint64_t>
     - name: set_water_cooled_speed_boundaries_based_on_ambient
@@ -299,15 +299,15 @@ events:
           - name: set_floor_from_average_sensor_value
             map:
                 value:
-                    - 27000: 10500
-                    - 32000: 10500
-                    - 37000: 10500
-                    - 40000: 10500
+                    - 27000: 7200
+                    - 32000: 7200
+                    - 37000: 7200
+                    - 40000: 7200
                 type: std::map<int64_t, uint64_t>
           - name: set_ceiling_from_average_sensor_value
             map:
                 value:
-                    - 25000: 10500
+                    - 25000: 7200
                     - 27000: 10500
                 type: std::map<int64_t, uint64_t>
     - name: set_base_request_speed_to_max_tach_feedback
