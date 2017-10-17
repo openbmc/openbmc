@@ -333,7 +333,7 @@
   interface: org.freedesktop.systemd1.Manager
   method: StartUnit
   args:
-    - value: obmc-host-shutdown@0.target
+    - value: obmc-chassis-hard-poweroff@0.target
       type: string
     - value: replace
       type: string
