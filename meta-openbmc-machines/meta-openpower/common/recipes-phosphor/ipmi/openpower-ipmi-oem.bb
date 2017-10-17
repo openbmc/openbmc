@@ -1,12 +1,14 @@
 SUMMARY = "Phosphor IPMI plugin for OpenPOWER OEM Commands"
 DESCRIPTION = "Phosphor IPMI plugin for OpenPOWER OEM Commands"
-HOMEPAGE = "https://github.com/openbmc/openpower-host-ipmi-oem"
 PR = "r1"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-license
 inherit obmc-phosphor-ipmiprovider-symlink
 inherit obmc-phosphor-utils
+inherit pythonnative
+
+require ${PN}.inc
 
 DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "autoconf-archive-native"
@@ -14,6 +16,7 @@ DEPENDS += "sdbusplus sdbusplus-native"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"
+DEPENDS += "sdbus++-native"
 
 RDEPENDS_${PN} += " \
         sdbusplus \
@@ -23,9 +26,6 @@ RDEPENDS_${PN} += " \
         "
 
 TARGET_CFLAGS += "-fpic"
-
-SRC_URI += "git://github.com/openbmc/openpower-host-ipmi-oem"
-SRCREV = "17346b00a17a1b5202758fdfbffef8c2c065044d"
 
 HOSTIPMI_PROVIDER_LIBRARY += "liboemhandler.so"
 
