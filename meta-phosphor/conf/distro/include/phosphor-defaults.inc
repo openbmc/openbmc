@@ -108,7 +108,6 @@ VIRTUAL-RUNTIME_obmc-dump-monitor ?= "phosphor-debug-collector-monitor"
 
 PREFERRED_PROVIDER_virtual/obmc-settings-mgmt ?= "phosphor-settings"
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt ?= "obmc-phosphor-sysd"
-PREFERRED_PROVIDER_virtual/obmc-user-mgmt ?= "obmc-phosphor-user"
 PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
 
 # phosphor-hwmon-config
@@ -215,6 +214,12 @@ PREFERRED_PROVIDER_virtual/obmc-gpio-monitor ?= "phosphor-gpio-monitor"
 # needs to first enable and then use it. This also provides a way for changing
 # the timeout if needed.
 PREFERRED_PROVIDER_virtual/obmc-watchdog ?= "phosphor-watchdog"
+
+# obmc-user-mgmt
+#
+# Provides an implementation of xyz.openbmc_project.User.Manager catering
+# to user management
+VIRTUAL-RUNTIME_obmc-user-mgmt ?= "phosphor-user-manager"
 
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
