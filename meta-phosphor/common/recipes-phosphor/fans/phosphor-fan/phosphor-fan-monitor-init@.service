@@ -10,4 +10,4 @@ ExecStart=/usr/bin/env phosphor-fan-monitor --init
 SyslogIdentifier=phosphor-fan-monitor
 
 [Install]
-RequiredBy=obmc-chassis-poweron@%i.target
+WantedBy=obmc-chassis-poweron@%i.target

@@ -80,7 +80,7 @@ FMT_CONTROL = "../${TMPL_CONTROL}:${FAN_CONTROL_TGT}.requires/${INSTFMT_CONTROL}
 
 TMPL_CONTROL_INIT = "phosphor-fan-control-init@.service"
 INSTFMT_CONTROL_INIT = "phosphor-fan-control-init@{0}.service"
-FMT_CONTROL_INIT = "../${TMPL_CONTROL_INIT}:${POWERON_TGT}.requires/${INSTFMT_CONTROL_INIT}"
+FMT_CONTROL_INIT = "../${TMPL_CONTROL_INIT}:${POWERON_TGT}.wants/${INSTFMT_CONTROL_INIT}"
 
 FILES_${PN}-control = "${sbindir}/phosphor-fan-control"
 SYSTEMD_SERVICE_${PN}-control += "${TMPL_CONTROL} ${TMPL_CONTROL_INIT}"
@@ -105,7 +105,7 @@ FMT_MONITOR = "../${TMPL_MONITOR}:${FAN_CONTROL_TGT}.requires/${INSTFMT_MONITOR}
 
 TMPL_MONITOR_INIT = "phosphor-fan-monitor-init@.service"
 INSTFMT_MONITOR_INIT = "phosphor-fan-monitor-init@{0}.service"
-FMT_MONITOR_INIT = "../${TMPL_MONITOR_INIT}:${POWERON_TGT}.requires/${INSTFMT_MONITOR_INIT}"
+FMT_MONITOR_INIT = "../${TMPL_MONITOR_INIT}:${POWERON_TGT}.wants/${INSTFMT_MONITOR_INIT}"
 
 FILES_${PN}-monitor = "${sbindir}/phosphor-fan-monitor"
 SYSTEMD_SERVICE_${PN}-monitor += "${TMPL_MONITOR} ${TMPL_MONITOR_INIT}"
