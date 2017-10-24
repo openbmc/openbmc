@@ -22,9 +22,12 @@ COOLING_ENV_FMT = "obmc/phosphor-fan/phosphor-cooling-type-{0}.conf"
 
 SYSTEMD_ENVIRONMENT_FILE_phosphor-cooling-type += "${@compose_list(d, 'COOLING_ENV_FMT', 'OBMC_CHASSIS_INSTANCES')}"
 
-#These 2 services are protected by the watchdog
+#These services are protected by the watchdog
+SYSTEMD_OVERRIDE_phosphor-fan-control-init += "fan-watchdog-monitor.conf:phosphor-fan-control-init@0.service.d/fan-watchdog-monitor.conf"
 SYSTEMD_OVERRIDE_phosphor-fan-control += "fan-watchdog-monitor.conf:phosphor-fan-control@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE_phosphor-fan-monitor-init += "fan-watchdog-monitor.conf:phosphor-fan-monitor-init@0.service.d/fan-watchdog-monitor.conf"
 SYSTEMD_OVERRIDE_phosphor-fan-monitor += "fan-watchdog-monitor.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-monitor.conf"
 
-#This service needs to be stopped when watchdog expires
+#These services need to be stopped when watchdog expires
+SYSTEMD_OVERRIDE_phosphor-fan-control += "fan-watchdog-conflicts.conf:phosphor-fan-control@0.service.d/fan-watchdog-conflicts.conf"
 SYSTEMD_OVERRIDE_phosphor-fan-monitor += "fan-watchdog-conflicts.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-conflicts.conf"
