@@ -9,5 +9,4 @@ ExecStartPre=/usr/bin/env obmc-flash-bmc createenvbackup
 ExecStart=/usr/bin/env obmc-flash-bmc ubiro {RO_MTD} rofs-%i %i
 ExecStart=/usr/bin/env obmc-flash-bmc ubikernel {KERNEL_MTD} kernel-%i %i
 ExecStart=/usr/bin/env obmc-flash-bmc mtduboot u-boot %i
-ExecStartPost=/usr/bin/env obmc-flash-bmc updateubootvars %i
 SyslogIdentifier=obmc-flash-bmc
