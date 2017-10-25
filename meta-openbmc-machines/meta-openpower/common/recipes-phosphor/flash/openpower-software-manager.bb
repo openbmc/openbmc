@@ -33,7 +33,7 @@ SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
 
 SRC_URI += "file://obmc-flash-bios"
 
-SRCREV = "850d5f6b4c01a7e6e3bc93fe4b840d60755d8952"
+SRCREV = "2a6981b9e2e2d5612d51279519c885e7fd42681b"
 
 do_install_append() {
         install -d ${D}${sbindir}
