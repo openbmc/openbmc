@@ -20,6 +20,9 @@
           0x03:
             type: string
             set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.SecondaryProcInit
+          0x07:
+            type: string
+            set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.PCIInit
           0x14:
             type: string
             set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit

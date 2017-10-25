@@ -17,6 +17,9 @@
           0x01:
             type: string
             set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.MemoryInit
+          0x07:
+            type: string
+            set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.PCIInit
           0x14:
             type: string
             set: xyz.openbmc_project.State.Boot.Progress.ProgressStages.MotherboardInit

@@ -53,6 +53,9 @@ fw_boot_sensor:
           0x03:
             type: string
             set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.SecondaryProcInit"
+          0x07:
+            type: string
+            set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.PCIInit"
           0x13:
             type: string
             set: "xyz.openbmc_project.State.Boot.Progress.ProgressStages.OSStart"
