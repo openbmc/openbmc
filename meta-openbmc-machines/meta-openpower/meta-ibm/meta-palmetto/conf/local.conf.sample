@@ -190,7 +190,7 @@ PATCHRESOLVE = "noop"
 # shutdown the build. If there is less that 100MB or 1K inodes, perform a hard abort
 # of the build. The reason for this is that running completely out of space can corrupt
 # files and damages the build in ways which may not be easily recoverable.
-# It's necesary to monitor /tmp, if there is no space left the build will fail
+# It's necessary to monitor /tmp, if there is no space left the build will fail
 # with very exotic errors.
 BB_DISKMON_DIRS = "\
     STOPTASKS,${TMPDIR},1G,100K \
