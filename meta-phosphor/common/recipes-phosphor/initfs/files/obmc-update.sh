@@ -212,7 +212,7 @@ do
 	m=$(findmtd ${f#$image})
 	if test -z "$m"
 	then
-		echoerr "Unable to find mtd partiton for ${f##*/}."
+		echoerr "Unable to find mtd partition for ${f##*/}."
 		exit 1
 	fi
 	if test -n "$checksize" && toobig "$f" "$m"

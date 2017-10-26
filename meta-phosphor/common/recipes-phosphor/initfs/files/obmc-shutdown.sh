@@ -63,7 +63,7 @@ then
 			kill -9 $wd
 			if test -n "$wdrst"
 			then
-				echo Reseting watchdog timeouts to $wdrst
+				echo Resetting watchdog timeouts to $wdrst
 				watchdog $wdrst -F /dev/watchdog &
 				sleep 1
 				# Kill the watchdog daemon, setting a timeout
