@@ -25,7 +25,7 @@ RDEPENDS_${PN} += " \
 TARGET_CFLAGS += "-fpic"
 
 SRC_URI += "git://github.com/openbmc/openpower-host-ipmi-oem"
-SRCREV = "64994eab31d026aa9155b45d8f84a2950e1c9fb4"
+SRCREV = "17346b00a17a1b5202758fdfbffef8c2c065044d"
 
 HOSTIPMI_PROVIDER_LIBRARY += "liboemhandler.so"
 
