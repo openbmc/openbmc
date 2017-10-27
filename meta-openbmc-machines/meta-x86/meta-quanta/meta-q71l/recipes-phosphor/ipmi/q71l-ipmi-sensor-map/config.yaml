@@ -5,11 +5,15 @@
   multiplierM: 511
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xF1:
   sensorType: 0x01
@@ -18,11 +22,15 @@
   multiplierM: 511
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xF2:
   sensorType: 0x01
@@ -31,11 +39,15 @@
   multiplierM: 511
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xB0:
   sensorType: 0x04
@@ -44,11 +56,15 @@
   multiplierM: 100
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xB1:
   sensorType: 0x04
@@ -57,11 +73,15 @@
   multiplierM: 100
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xB2:
   sensorType: 0x04
@@ -70,11 +90,15 @@
   multiplierM: 100
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xB3:
   sensorType: 0x04
@@ -83,11 +107,15 @@
   multiplierM: 100
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xB4:
   sensorType: 0x04
@@ -96,11 +124,15 @@
   multiplierM: 100
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xB5:
   sensorType: 0x04
@@ -109,11 +141,15 @@
   multiplierM: 100
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xB6:
   sensorType: 0x04
@@ -122,11 +158,15 @@
   multiplierM: 100
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
 
 0xB7:
   sensorType: 0x04
@@ -135,8 +175,12 @@
   multiplierM: 100
   offsetB: 0
   bExp: 0
+  mutability: Mutability::Write|Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
   interfaces:
     xyz.openbmc_project.Sensor.Value:
       Value:
-        0x0:
-          type: int
+        Offsets:
+          0x0:
+            type: int64_t
