@@ -266,6 +266,78 @@ actions:
           - delta
 
 events:
+    - name: default_fan_floor_on_service_fail
+      zone_conditions:
+          - name: air_cooled_chassis
+            zones:
+                - 0
+          - name: water_and_air_cooled_chassis
+            zones:
+                - 0
+      group: zone0_ambient
+      interface: xyz.openbmc_project.Sensor.Value
+      property:
+          name: Value
+          type: int64_t
+      matches:
+          - name: nameOwnerChanged
+      actions:
+          - name: call_actions_based_on_timer
+            timer:
+                delay: 5
+                type: oneshot
+            actions:
+                - name: default_floor_on_missing_owner
+    - name: high_speed_on_occ0_service_fail
+      zone_conditions:
+          - name: air_cooled_chassis
+            zones:
+                - 0
+          - name: water_and_air_cooled_chassis
+            zones:
+                - 0
+      group: occ0_object
+      interface: org.open_power.OCC.Status
+      property:
+          name: OccActive
+          type: bool
+      matches:
+          - name: nameOwnerChanged
+      actions:
+          - name: call_actions_based_on_timer
+            timer:
+                delay: 5
+                type: oneshot
+            actions:
+                - name: set_speed_on_missing_owner
+                  speed:
+                      value: 10500
+                      type: uint64_t
+    - name: high_speed_on_occ1_service_fail
+      zone_conditions:
+          - name: air_cooled_chassis
+            zones:
+                - 0
+          - name: water_and_air_cooled_chassis
+            zones:
+                - 0
+      group: occ1_object
+      interface: org.open_power.OCC.Status
+      property:
+          name: OccActive
+          type: bool
+      matches:
+          - name: nameOwnerChanged
+      actions:
+          - name: call_actions_based_on_timer
+            timer:
+                delay: 5
+                type: oneshot
+            actions:
+                - name: set_speed_on_missing_owner
+                  speed:
+                      value: 10500
+                      type: uint64_t
     - name: missing_before_high_speed_air
       zone_conditions:
           - name: air_cooled_chassis
