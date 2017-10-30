@@ -7,8 +7,10 @@ inherit phosphor-dbus-monitor
 
 SRC_URI += "file://air-cooled.yaml"
 SRC_URI += "file://water-cooled.yaml"
+SRC_URI += "file://fan-errors.yaml"
 
 do_install() {
         install -D ${WORKDIR}/air-cooled.yaml ${D}${config_dir}/air-cooled.yaml
         install -D ${WORKDIR}/water-cooled.yaml ${D}${config_dir}/water-cooled.yaml
+        install -D ${WORKDIR}/fan-errors.yaml ${D}${config_dir}/fan-errors.yaml
 }
