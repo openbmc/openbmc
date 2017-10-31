@@ -1,2 +1,2 @@
 SRC_URI += "git://github.com/openbmc/phosphor-networkd"
-SRCREV = "fc7df192a24db545dc5253707e09df3e42dedb4e"
+SRCREV = "d75f0497cd92042d4e2dba8662df9ff7e661d0be"
