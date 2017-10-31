@@ -34,7 +34,7 @@ PACKAGE_BEFORE_PN += "${PN}-elog"
 FILES_${PN}-elog += "${elog_dir}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-logging"
-SRCREV = "f8a5a7978355ead2d148c3e93607d1c24adf8a74"
+SRCREV = "deae3cac49b8c3312751017d36abe35e4cf7cfa1"
 
 S = "${WORKDIR}/git"
 
