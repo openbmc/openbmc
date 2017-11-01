@@ -57,4 +57,14 @@ HOST_OCC_FMT = "../${OCC_TMPL}:${HOST_TGTFMT}.requires/${OCC_INSTFMT}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_OCC_FMT', 'OCC_ENABLE', 'HOST_START', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_OCC_FMT', 'OCC_DISABLE', 'HOST_STOP', 'OBMC_HOST_INSTANCES')}"
 
+# Set the occ disable service to be executed on host error
+HOST_ERROR_TARGETS = "crash timeout"
+
+OCC_DISABLE_TMPL = "op-occ-disable@.service"
+HOST_ERROR_TGTFMT = "obmc-host-{0}@{1}.target"
+OCC_DISABLE_INSTFMT = "op-occ-disable@{1}.service"
+HOST_ERROR_FMT = "../${OCC_DISABLE_TMPL}:${HOST_ERROR_TGTFMT}.wants/${OCC_DISABLE_INSTFMT}"
+
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'HOST_ERROR_FMT', 'HOST_ERROR_TARGETS', 'OBMC_HOST_INSTANCES')}"
+
 S = "${WORKDIR}/git"
