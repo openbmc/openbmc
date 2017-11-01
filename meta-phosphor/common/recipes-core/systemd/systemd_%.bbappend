@@ -16,6 +16,7 @@ SRC_URI += "file://0004-basic-Use-path-escaping-when-mangling-path-instances.pat
 SRC_URI += "file://0005-dont-return-error-if-unable-to-create-network-namespace.patch"
 SRC_URI += "file://0006-journal-Create-journald-dbus-object.patch"
 SRC_URI += "file://0007-journal-Add-Synchronize-dbus-method.patch"
+SRC_URI += "${@mf_enabled(d, 'obmc-ubi-fs', 'file://software.conf')}"
 
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${libdir}/systemd/network/default.network"
@@ -30,4 +31,11 @@ do_install_append() {
         #TODO Remove after this issue is resolved
         #https://github.com/openbmc/openbmc/issues/152
         ln -s /dev/null ${D}/etc/systemd/system/systemd-hwdb-update.service
+
+        # /tmp/images is the software image upload directory.
+        # It should not be deleted since it is watched by the Image Manager
+        # for new images.
+        if ${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', 'true', 'false', d)}; then
+                install -m 0644 ${WORKDIR}/software.conf ${D}${exec_prefix}/lib/tmpfiles.d/
+        fi
 }
