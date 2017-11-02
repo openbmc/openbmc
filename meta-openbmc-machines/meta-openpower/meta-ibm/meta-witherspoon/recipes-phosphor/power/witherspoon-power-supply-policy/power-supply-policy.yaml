@@ -7,14 +7,14 @@
   group: path
   members:
     - meta: POWER SUPPLY
-      path: /xyz/openbmc_project/inventory/system/chassis/power_supply0
+      path: /xyz/openbmc_project/inventory/system/chassis/powersupply0
 
 - name: power supply1
   class: group
   group: path
   members:
     - meta: POWER SUPPLY
-      path: /xyz/openbmc_project/inventory/system/chassis/power_supply1
+      path: /xyz/openbmc_project/inventory/system/chassis/powersupply1
 
 - name: power supplies
   description: >
@@ -23,9 +23,9 @@
   group: path
   members:
     - meta: POWER SUPPLY
-      path: /xyz/openbmc_project/inventory/system/chassis/power_supply0
+      path: /xyz/openbmc_project/inventory/system/chassis/powersupply0
     - meta: POWER SUPPLY
-      path: /xyz/openbmc_project/inventory/system/chassis/power_supply1
+      path: /xyz/openbmc_project/inventory/system/chassis/powersupply1
 
 - name: chassis state
   description: >
@@ -142,7 +142,7 @@
   error: xyz::openbmc_project::Inventory::Error::NotPresent
   metadata:
     - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
-      value: /xyz/openbmc_project/inventory/system/chassis/power_supply0
+      value: /xyz/openbmc_project/inventory/system/chassis/powersupply0
       type: string
 
 - name: notpresent power supply1 error
@@ -153,5 +153,5 @@
   error: xyz::openbmc_project::Inventory::Error::NotPresent
   metadata:
     - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
-      value: /xyz/openbmc_project/inventory/system/chassis/power_supply1
+      value: /xyz/openbmc_project/inventory/system/chassis/powersupply1
       type: string

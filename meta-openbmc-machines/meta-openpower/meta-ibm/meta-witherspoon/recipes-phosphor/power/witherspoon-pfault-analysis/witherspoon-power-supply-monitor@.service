@@ -1,7 +1,7 @@
 [Unit]
 Description=Witherspoon Power Supply %I Monitor
-Wants=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-power_supply%i.service
-After=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-power_supply%i.service
+Wants=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-powersupply%i.service
+After=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-powersupply%i.service
 Wants=mapper-wait@-org-openbmc-control-power0.service
 After=mapper-wait@-org-openbmc-control-power0.service
 ConditionPathExists={envfiledir}/obmc/power-supply-monitor/power-supply-monitor-%i.conf
