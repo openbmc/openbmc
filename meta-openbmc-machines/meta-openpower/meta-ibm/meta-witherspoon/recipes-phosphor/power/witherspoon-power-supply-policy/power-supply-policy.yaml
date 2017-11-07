@@ -155,3 +155,61 @@
     - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
       value: /xyz/openbmc_project/inventory/system/chassis/powersupply1
       type: string
+
+- name: resolve power supply0 errors if present
+  description: >
+    'If power supply0 is present, call the resolve ps0 errors callback.'
+  class: condition
+  condition: count
+  paths: power supply0
+  properties: power supply present
+  callback: resolve power supply0 errors
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: true
+
+- name: resolve power supply1 errors if present
+  description: >
+    'If power supply1 is present, call the resolve ps1 errors callback.'
+  class: condition
+  condition: count
+  paths: power supply1
+  properties: power supply present
+  callback: resolve power supply1 errors
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: true
+
+- name: resolve power supply0 errors
+  class: callback
+  callback: resolve callout
+  paths: power supply0
+  properties: power supply present
+  callout: /xyz/openbmc_project/inventory/system/chassis/powersupply0
+
+- name: resolve power supply1 errors
+  class: callback
+  callback: resolve callout
+  paths: power supply1
+  properties: power supply present
+  callout: /xyz/openbmc_project/inventory/system/chassis/powersupply1
+
+- name: watch power supply0 present for resolving error logs
+  description: >
+    'On supply present state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: power supply0
+  properties: power supply present
+  callback: resolve power supply0 errors if present
+
+- name: watch power supply1 present for resolving error logs
+  description: >
+    'On supply present state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: power supply1
+  properties: power supply present
+  callback: resolve power supply1 errors if present
