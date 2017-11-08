@@ -327,6 +327,9 @@ events:
           - name: set_request_speed_base_with_max
     - name: speed_changes_based_on_regulator_temps
       zone_conditions:
+          - name: air_cooled_chassis
+            zones:
+                - 0
           - name: water_and_air_cooled_chassis
             zones:
                 - 0
@@ -356,6 +359,9 @@ events:
           interval: 5
     - name: speed_changes_based_on_pcie_temps
       zone_conditions:
+          - name: air_cooled_chassis
+            zones:
+                - 0
           - name: water_and_air_cooled_chassis
             zones:
                 - 0
@@ -400,8 +406,40 @@ events:
                     type: bool
                     value: true
           events:
+              - name: speed_changes_based_on_core_temps
+                zone_conditions:
+                    - name: air_cooled_chassis
+                      zones:
+                          - 0
+                group: zone0_cores
+                interface: xyz.openbmc_project.Sensor.Value
+                property:
+                    name: Value
+                    type: int64_t
+                actions:
+                    - name: set_net_increase_speed
+                      property: 73000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 400
+                          type: uint64_t
+                    - name: set_net_decrease_speed
+                      property: 70000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 40
+                          type: uint64_t
+                timer:
+                    interval: 5
               - name: speed_changes_based_on_dimm_temps
                 zone_conditions:
+                    - name: air_cooled_chassis
+                      zones:
+                          - 0
                     - name: water_and_air_cooled_chassis
                       zones:
                           - 0
@@ -421,6 +459,64 @@ events:
                           type: uint64_t
                     - name: set_net_decrease_speed
                       property: 61000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 40
+                          type: uint64_t
+                timer:
+                    interval: 5
+              - name: speed_changes_based_on_gpu_core_temps
+                zone_conditions:
+                    - name: air_cooled_chassis
+                      zones:
+                          - 0
+                group: zone0_gpu_cores
+                interface: xyz.openbmc_project.Sensor.Value
+                property:
+                    name: Value
+                    type: int64_t
+                actions:
+                    - name: set_net_increase_speed
+                      property: 78000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 600
+                          type: uint64_t
+                    - name: set_net_decrease_speed
+                      property: 75000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 40
+                          type: uint64_t
+                timer:
+                    interval: 5
+              - name: speed_changes_based_on_gpu_memory_temps
+                zone_conditions:
+                    - name: air_cooled_chassis
+                      zones:
+                          - 0
+                group: zone0_gpu_memory
+                interface: xyz.openbmc_project.Sensor.Value
+                property:
+                    name: Value
+                    type: int64_t
+                actions:
+                    - name: set_net_increase_speed
+                      property: 80000
+                      factor:
+                          value: 1000
+                          type: int64_t
+                      delta:
+                          value: 600
+                          type: uint64_t
+                    - name: set_net_decrease_speed
+                      property: 77000
                       factor:
                           value: 1000
                           type: int64_t
