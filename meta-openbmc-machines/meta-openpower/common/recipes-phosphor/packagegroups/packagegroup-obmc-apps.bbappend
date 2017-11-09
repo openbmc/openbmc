@@ -1,4 +1,4 @@
-RDEPENDS_${PN}-extrasdev += "obmc-pydevtools"
+RDEPENDS_${PN}-extrasdevtools += "obmc-pydevtools"
 
 # Add the deprecated /org/openbmc inventory namespace providing
 # obmc-mgr-inventory application to the inventory packagegroup

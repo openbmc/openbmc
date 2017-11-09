@@ -84,6 +84,7 @@ IMAGE_FEATURES += " \
 CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         packagegroup-obmc-apps-extras \
         packagegroup-obmc-apps-extrasdev \
+        packagegroup-obmc-apps-extrasdevtools \
         i2c-tools \
         screen \
         obmc-console \

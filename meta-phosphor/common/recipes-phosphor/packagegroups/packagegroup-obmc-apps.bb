@@ -11,6 +11,7 @@ PACKAGES = " \
         ${PN}-chassis-state-mgmt \
         ${PN}-extras \
         ${PN}-extrasdev \
+        ${PN}-extrasdevtools \
         ${PN}-fan-control \
         ${PN}-host-state-mgmt \
         ${PN}-inventory \
@@ -48,6 +49,10 @@ RDEPENDS_${PN}-extras = " \
 SUMMARY_${PN}-extrasdev = "Development features"
 RDEPENDS_${PN}-extrasdev = " \
         rest-dbus \
+        "
+
+SUMMARY_${PN}-extrasdevtools = "Development tools"
+RDEPENDS_${PN}-extrasdevtools = " \
         "
 
 # Use the fan control package group for applications
