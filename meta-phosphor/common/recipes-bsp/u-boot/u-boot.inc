@@ -10,7 +10,8 @@ SRC_URI += "file://0001-configs-ast-Add-redundnant-env.patch"
 
 SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
     'file://0001-config-ast-common-hack-bootopts.patch \
-     file://0004-config-ast-common-ubi-bootops.patch', '', d)}"
+     file://0004-config-ast-common-ubi-bootops.patch \
+     file://0001-config-ast-common-Add-conditional-factory-reset-comm.patch', '', d)}"
 
 python do_configure () {
     if ((d.getVar("MACHINE_FEATURES", True)) == "obmc-ubi-fs"):

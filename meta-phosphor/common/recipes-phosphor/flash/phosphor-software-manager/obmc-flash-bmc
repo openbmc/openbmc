@@ -59,6 +59,14 @@ findname() {
   echo "${n}"
 }
 
+# Set the u-boot env command that performs the factory reset if requested
+set_do_rwreset() {
+  if ! fw_printenv do_rwreset; then
+    fw_setenv do_rwreset "if test \"\${rwreset}\" = \"true\"; then ubi remove rwfs; ubi create rwfs 0x400000; fi"
+    fw_setenv obmc_bootcmd "ubi part obmc-ubi; run do_rwreset; ubi read \${loadaddr} \${kernelname}; bootm \${loadaddr}"
+  fi
+}
+
 # Make space on flash before creating new volumes. This can be enhanced
 # determine current flash usage. For now only keep a "keepmax" number of them
 ubi_remove_volumes()
@@ -239,6 +247,8 @@ remount_ubi() {
       fi
     done
   done
+
+  set_do_rwreset
 }
 
 # Read the current env variable and set it on the alternate boot env
@@ -323,19 +333,6 @@ create_vol_in_alt() {
   fi
 }
 
-factory_reset() {
-    # A lock file for printenv exists on /var, which isn't mounted when this
-    # function is called. We have to read the rwreset variable out of file.
-    ubootmtd="$(findmtd "u-boot-env")"
-    grep -q -x "rwreset=true" /dev/$ubootmtd
-    if [ "$?" = "0" ]; then
-      ubi_remove "rwfs"
-      reqmtd="bmc"
-      name="rwfs"
-      ubi_rw
-    fi
-}
-
 case "$1" in
   mtduboot)
     reqmtd="$2"
@@ -395,9 +392,6 @@ case "$1" in
     ;;
   rebootguarddisable)
     rebootguarddisable
-    ;;
-  reset)
-    factory_reset
     ;;
   *)
     echo "Invalid argument"

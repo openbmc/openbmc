@@ -1,0 +1,19 @@
+#!/bin/sh
+
+if ! mount ubi0:rwfs /var -t ubifs -o defaults; then
+  if ! mount ubi0:rwfs /var -t ubifs -o defaults,ro; then
+    mount tmpfs /var -t tmpfs -o defaults
+  fi
+fi
+
+mkdir -p /var/persist/etc /var/persist/etc-work /var/persist/home/root
+
+rm -rf /var/persist/etc-work/*
+# rm -rf specifically skips . and .. directories; pipe all output to null to avoid the error message
+rm -rf /var/persist/etc-work/.* > /dev/null 2>&1
+
+if ! mount overlay /etc -t overlay -o defaults,lowerdir=/etc,upperdir=/var/persist/etc,workdir=/var/persist/etc-work; then
+  mount overlay /etc -t overlay -o defaults,lowerdir=/etc:/var/persist/etc
+fi
+
+exec /lib/systemd/systemd
