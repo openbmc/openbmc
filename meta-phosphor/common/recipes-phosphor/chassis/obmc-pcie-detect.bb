@@ -4,6 +4,7 @@ PR = "r1"
 
 inherit skeleton-gdbus
 inherit obmc-phosphor-systemd
+inherit pkgconfig
 
 SKELETON_DIR = "pciedetect"
 
