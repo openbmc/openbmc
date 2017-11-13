@@ -112,6 +112,9 @@ mount_ubi() {
   pnordev="/dev/mtd${pnor}"
 
   if [[ "${name}" == "pnor-patch" ]]; then
+    if [[ "$(fw_printenv fieldmode 2>/dev/null)" == "fieldmode=true" ]]; then
+      return 0
+    fi
     if [[ ! "$(hexdump -C -n 3 ${pnordev})" =~ "UBI" ]]; then
       return 0
     fi
