@@ -13,23 +13,22 @@ DESCRIPTION = "\
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://PKG-INFO;md5=0ccca7097c1d29fa42e75e9c15c6ff2e"
 
-SRCNAME = "M2Crypto"
-SRC_URI = "http://pypi.python.org/packages/source/M/M2Crypto/${SRCNAME}-${PV}.tar.gz \
+PYPI_PACKAGE = "M2Crypto"
+
+SRC_URI += " \
            file://m2crypto-Fix-build-with-SWIG-3.0.5.patch \
 "
 
 SRC_URI[md5sum] = "573f21aaac7d5c9549798e72ffcefedd"
 SRC_URI[sha256sum] = "6071bfc817d94723e9b458a010d565365104f84aa73f7fe11919871f7562ff72"
 
-S = "${WORKDIR}/${SRCNAME}-${PV}"
-
-inherit setuptools
+inherit setuptools pypi
 
 DEPENDS += "openssl swig-native"
 
 DISTUTILS_BUILD_ARGS += "build_ext -I${STAGING_INCDIR}"
 
-inherit setuptools
+inherit setuptools pypi
 
 SWIG_FEATURES_x86-64 = "-D__x86_64__"
 SWIG_FEATURES ?= ""
