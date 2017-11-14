@@ -10,6 +10,7 @@ WSPOON_CHIPS = " \
                i2c@1e78a000/i2c-bus@140/ir35221@71 \
                i2c@1e78a000/i2c-bus@180/ir35221@70 \
                i2c@1e78a000/i2c-bus@180/ir35221@71 \
+               i2c@1e78a000/i2c-bus@380/tmp275@4a \
                "
 WSPOON_ITEMSFMT = "ahb/apb/{0}.conf"
 WSPOON_ITEMS = "${@compose_list(d, 'WSPOON_ITEMSFMT', 'WSPOON_CHIPS')}"
