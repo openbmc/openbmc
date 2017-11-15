@@ -22,6 +22,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "obmc-targets"
 DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 DEPENDS += "virtual/phosphor-ipmi-fru-merge-config"
+DEPENDS += "sdbus++-native"
 
 RDEPENDS_${PN}-dev += "phosphor-logging"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"

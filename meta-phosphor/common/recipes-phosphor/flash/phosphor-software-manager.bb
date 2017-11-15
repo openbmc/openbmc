@@ -32,6 +32,7 @@ DEPENDS += " \
     sdbusplus \
     phosphor-dbus-interfaces \
     phosphor-logging \
+    sdbus++-native \
 "
 
 RDEPENDS_${PN}-version += " \
