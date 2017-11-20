@@ -1,6 +1,6 @@
 fans:
   - inventory: /system/chassis/motherboard/fan0
-    allowed_out_of_range_time: 20
+    allowed_out_of_range_time: 30
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
@@ -10,7 +10,7 @@ fans:
         has_target: false
 
   - inventory: /system/chassis/motherboard/fan1
-    allowed_out_of_range_time: 20
+    allowed_out_of_range_time: 30
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
@@ -20,7 +20,7 @@ fans:
         has_target: false
 
   - inventory: /system/chassis/motherboard/fan2
-    allowed_out_of_range_time: 20
+    allowed_out_of_range_time: 30
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
@@ -30,7 +30,7 @@ fans:
         has_target: false
 
   - inventory: /system/chassis/motherboard/fan3
-    allowed_out_of_range_time: 20
+    allowed_out_of_range_time: 30
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
     sensors:
