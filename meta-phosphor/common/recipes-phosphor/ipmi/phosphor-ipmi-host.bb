@@ -13,6 +13,7 @@ inherit phosphor-ipmi-host
 inherit pythonnative
 
 DEPENDS += "autoconf-archive-native"
+DEPENDS += "nlohmann-json"
 DEPENDS += "obmc-targets"
 DEPENDS += "packagegroup-obmc-ipmid-providers"
 DEPENDS += "phosphor-dbus-interfaces"
@@ -55,7 +56,9 @@ EXTRA_OECONF = " \
 
 S = "${WORKDIR}/git"
 
-SRC_URI += "file://merge_yamls.py"
+SRC_URI += "file://merge_yamls.py \
+            file://dev_id.json \
+            "
 
 HOSTIPMI_PROVIDER_LIBRARY += "libapphandler.so"
 HOSTIPMI_PROVIDER_LIBRARY += "libsysintfcmds.so"
@@ -65,6 +68,7 @@ NETIPMI_PROVIDER_LIBRARY += "libapphandler.so"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
+FILES_${PN}_append = " ${datadir}/ipmi-providers/dev_id.json"
 FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
 
 # Soft Power Off
@@ -101,6 +105,11 @@ python do_merge_sensors () {
 
     # Invoke the script and don't catch any resulting exception.
     subprocess.check_call(cmd)
+}
+do_install_append(){
+    install -d ${D}${datadir}/ipmi-providers
+    install -m 0644 -D ${WORKDIR}/dev_id.json \
+        ${D}${datadir}/ipmi-providers/dev_id.json
 }
 # python-pyyaml-native is installed by do_configure, so put this task after
 addtask merge_sensors after do_configure before do_compile
