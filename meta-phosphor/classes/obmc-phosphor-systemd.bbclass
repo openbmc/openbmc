@@ -80,7 +80,7 @@ def SystemdUnit(unit):
                 base = self.unit.replace('dbus-', '')
                 base = base.replace('.%s' % cls, '')
                 if self.is_instance:
-                    base = base.rstrip('@%s' % self.instance)
+                    base = base.replace('@%s' % self.instance, '')
                 if self.is_template:
                     base = base.rstrip('@')
                 return base
