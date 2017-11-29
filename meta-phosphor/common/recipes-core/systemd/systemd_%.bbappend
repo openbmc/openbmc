@@ -25,6 +25,9 @@ FILES_${PN} += "${datadir}/dbus-1/system.d/org.freedesktop.journal1.conf"
 SRC_URI += "file://0007-journal-Add-Synchronize-dbus-method.patch"
 SRC_URI_append_df-obmc-ubi-fs = " file://software.conf"
 
+SRC_URI += "file://0001-watchdog-allow-a-device-path-to-be-specified.patch"
+SRC_URI += "file://0002-core-Add-WatchdogDevice-config-option-and-implement-.patch"
+
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${libdir}/systemd/network/default.network"
 FILES_${PN} += "${libdir}/systemd/system.conf.d/service-restart-policy.conf"

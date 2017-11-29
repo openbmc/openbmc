@@ -1,0 +1,141 @@
+From 9a7b66daa24ed5c6a994323b308c3c3a0a10bf6a Mon Sep 17 00:00:00 2001
+From: Eddie James <eajames@us.ibm.com>
+Date: Thu, 5 Apr 2018 12:31:15 -0500
+Subject: [PATCH 2/3] core: Add WatchdogDevice config option and implement it
+
+This option allows a device path to be specified for the systemd
+watchdog (both runtime and shutdown).
+
+If a system requires a watchdog other than /dev/watchdog (pointing to
+/dev/watchdog0) to be used to reboot the system, this setting should be
+changed to the relevant watchdog device path (e.g. /dev/watchdog1).
+---
+ src/core/main.c     | 32 ++++++++++++++++++++++++++++++--
+ src/core/shutdown.c | 11 +++++++++++
+ 2 files changed, 41 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/main.c b/src/core/main.c
+index 07e3e97..d4673bf 100644
+--- a/src/core/main.c
++++ b/src/core/main.c
+@@ -119,6 +119,7 @@ static usec_t arg_default_start_limit_interval = DEFAULT_START_LIMIT_INTERVAL;
+ static unsigned arg_default_start_limit_burst = DEFAULT_START_LIMIT_BURST;
+ static usec_t arg_runtime_watchdog = 0;
+ static usec_t arg_shutdown_watchdog = 10 * USEC_PER_MINUTE;
++static char *arg_watchdog_device = NULL;
+ static char **arg_default_environment = NULL;
+ static struct rlimit *arg_default_rlimit[_RLIMIT_MAX] = {};
+ static uint64_t arg_capability_bounding_set = CAP_ALL;
+@@ -459,6 +460,13 @@ static int parse_proc_cmdline_item(const char *key, const char *value, void *dat
+                 if (arg_default_timeout_start_usec <= 0)
+                         arg_default_timeout_start_usec = USEC_INFINITY;
+ 
++        } else if (proc_cmdline_key_streq(key, "systemd.watchdog_device")) {
++
++                if (proc_cmdline_value_missing(key, value))
++                        return 0;
++
++                parse_path_argument_and_warn(value, false, &arg_watchdog_device);
++
+         } else if (streq(key, "quiet") && !value) {
+ 
+                 if (arg_show_status == _SHOW_STATUS_UNSET)
+@@ -715,6 +723,7 @@ static int parse_config_file(void) {
+                 { "Manager", "JoinControllers",           config_parse_join_controllers, 0, &arg_join_controllers                  },
+                 { "Manager", "RuntimeWatchdogSec",        config_parse_sec,              0, &arg_runtime_watchdog                  },
+                 { "Manager", "ShutdownWatchdogSec",       config_parse_sec,              0, &arg_shutdown_watchdog                 },
++                { "Manager", "WatchdogDevice",            config_parse_path,             0, &arg_watchdog_device                   },
+                 { "Manager", "CapabilityBoundingSet",     config_parse_capability_set,   0, &arg_capability_bounding_set           },
+ #ifdef HAVE_SECCOMP
+                 { "Manager", "SystemCallArchitectures",   config_parse_syscall_archs,    0, &arg_syscall_archs                     },
+@@ -1776,6 +1785,13 @@ int main(int argc, char *argv[]) {
+                         test_usr();
+                 }
+ 
++                if (arg_system && arg_watchdog_device) {
++                        r = watchdog_set_device(arg_watchdog_device);
++                        if (r < 0)
++                                log_warning_errno(r, "Failed to set watchdog device to %s, ignoring: %m",
++                                                  arg_watchdog_device);
++                }
++
+                 if (arg_system && arg_runtime_watchdog > 0 && arg_runtime_watchdog != USEC_INFINITY)
+                         watchdog_set_timeout(&arg_runtime_watchdog);
+ 
+@@ -2147,8 +2163,13 @@ finish:
+          * here explicitly. valgrind will only generate nice output on
+          * exit(), not on exec(), hence let's do the former not the
+          * latter here. */
+-        if (getpid() == 1 && RUNNING_ON_VALGRIND)
++        if (getpid() == 1 && RUNNING_ON_VALGRIND) {
++                /* Cleanup watchdog_device strings for valgrind. We need them
++                 * in become_shutdown() so normally we cannot free them yet. */
++                watchdog_free_device();
++                arg_watchdog_device = mfree(arg_watchdog_device);
+                 return 0;
++        }
+ #endif
+ 
+         if (shutdown_verb) {
+@@ -2211,7 +2232,11 @@ finish:
+ 
+                         /* Tell the binary how often to ping, ignore failure */
+                         if (asprintf(&e, "WATCHDOG_USEC="USEC_FMT, arg_shutdown_watchdog) > 0)
+-                                (void) strv_push(&env_block, e);
++                                (void) strv_consume(&env_block, e);
++
++                        if (arg_watchdog_device &&
++                            asprintf(&e, "WATCHDOG_DEVICE=%s", arg_watchdog_device) > 0)
++                                (void) strv_consume(&env_block, e);
+                 } else
+                         watchdog_close(true);
+ 
+@@ -2226,6 +2251,9 @@ finish:
+                           getpid() == 1 ? "freezing" : "quitting");
+         }
+ 
++        watchdog_free_device();
++        arg_watchdog_device = mfree(arg_watchdog_device);
++
+         if (getpid() == 1) {
+                 if (error_message)
+                         manager_status_printf(NULL, STATUS_TYPE_EMERGENCY,
+diff --git a/src/core/shutdown.c b/src/core/shutdown.c
+index a7d5e57..5f0d961 100644
+--- a/src/core/shutdown.c
++++ b/src/core/shutdown.c
+@@ -166,6 +166,7 @@ int main(int argc, char *argv[]) {
+         unsigned retries;
+         int cmd, r;
+         static const char* const dirs[] = {SYSTEM_SHUTDOWN_PATH, NULL};
++        char *watchdog_device;
+ 
+         log_parse_environment();
+         r = parse_argv(argc, argv);
+@@ -206,6 +207,13 @@ int main(int argc, char *argv[]) {
+         in_container = detect_container() > 0;
+ 
+         use_watchdog = !!getenv("WATCHDOG_USEC");
++        watchdog_device = getenv("WATCHDOG_DEVICE");
++        if (watchdog_device) {
++                r = watchdog_set_device(watchdog_device);
++                if (r < 0)
++                        log_warning_errno(r, "Failed to set watchdog device to %s, ignoring: %m",
++                                          watchdog_device);
++        }
+ 
+         /* Lock us into memory */
+         mlockall(MCL_CURRENT|MCL_FUTURE);
+@@ -319,6 +327,9 @@ int main(int argc, char *argv[]) {
+ 
+  initrd_jump:
+ 
++        /* We're done with the watchdog. */
++        watchdog_free_device();
++
+         arguments[0] = NULL;
+         arguments[1] = arg_verb;
+         arguments[2] = NULL;
+-- 
+1.8.3.1
+
