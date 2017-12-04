@@ -1,0 +1,115 @@
+From 9135ca401186fb14e5e5110bbb04d1ccc480360a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Nov 2016 04:15:44 +0000
+Subject: [PATCH] Fix build with clang
+
+Fixes for following errors found by clang
+
+src/racoon/eaytest.c:316:6: error: comparison of array 'dnstr_w1' not equal to a null pointer is always true
+      [-Werror,-Wtautological-pointer-compare]
+        if (dnstr_w1 != NULL) {
+            ^~~~~~~~    ~~~~
+src/racoon/eaytest.c:326:6: error: comparison of array 'dnstr_w1' not equal to a null pointer is always true
+      [-Werror,-Wtautological-pointer-compare]
+        if (dnstr_w1 != NULL) {
+            ^~~~~~~~    ~~~~
+
+src/racoon/isakmp.c:1134:11: error: promoted type 'int' of K&R function parameter is not compatible with the
+                  parameter type 'u_int8_t' (aka 'unsigned char') declared in a previous prototype [-Werror,-Wknr-promoted-parameter]
+                    u_int8_t etype;
+                             ^
+src/racoon/isakmp.c:184:48: note: previous declaration is here
+        struct sockaddr *, struct sockaddr *, u_int8_t));
+                                                     ^
+            1 error generated.
+
+src/racoon/racoonctl.c:1457:15: error: incompatible pointer types passing 'struct evt_async *' to parameter of type
+        'caddr_t' (aka 'char *') [-Werror,-Wincompatible-pointer-types]
+                            print_cfg(ec, len);
+                                      ^~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/racoon/eaytest.c   |  4 ++--
+ src/racoon/isakmp.c    | 10 +++++-----
+ src/racoon/racoonctl.c |  7 +++----
+ 3 files changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/src/racoon/eaytest.c b/src/racoon/eaytest.c
+index 1474bdc..d609e4f 100644
+--- a/src/racoon/eaytest.c
++++ b/src/racoon/eaytest.c
+@@ -313,7 +313,7 @@ certtest(ac, av)
+ 
+ 	printf("exact match: succeed.\n");
+ 
+-	if (dnstr_w1 != NULL) {
++	if (dnstr_w1[0] != '\0') {
+ 		asn1dn = eay_str2asn1dn(dnstr_w1, strlen(dnstr_w1));
+ 		if (asn1dn == NULL || asn1dn->l == asn1dn0.l)
+ 			errx(1, "asn1dn length wrong for wildcard 1\n");
+@@ -323,7 +323,7 @@ certtest(ac, av)
+ 		printf("wildcard 1 match: succeed.\n");
+ 	}
+ 
+-	if (dnstr_w1 != NULL) {
++	if (dnstr_w1[0] != '\0') {
+ 		asn1dn = eay_str2asn1dn(dnstr_w2, strlen(dnstr_w2));
+ 		if (asn1dn == NULL || asn1dn->l == asn1dn0.l)
+ 			errx(1, "asn1dn length wrong for wildcard 2\n");
+diff --git a/src/racoon/isakmp.c b/src/racoon/isakmp.c
+index 2672f7a..da7ebe8 100644
+--- a/src/racoon/isakmp.c
++++ b/src/racoon/isakmp.c
+@@ -567,7 +567,7 @@ isakmp_main(msg, remote, local)
+ 
+ 				/* it must be responder's 1st exchange. */
+ 				if (isakmp_ph1begin_r(msg, remote, local,
+-					isakmp->etype) < 0)
++					(u_int8_t)isakmp->etype) < 0)
+ 					return -1;
+ 				break;
+ 
+@@ -1128,10 +1128,10 @@ isakmp_ph1begin_i(rmconf, remote, local)
+ 
+ /* new negotiation of phase 1 for responder */
+ static int
+-isakmp_ph1begin_r(msg, remote, local, etype)
+-	vchar_t *msg;
+-	struct sockaddr *remote, *local;
+-	u_int8_t etype;
++isakmp_ph1begin_r(vchar_t *msg,
++	struct sockaddr *remote,
++	struct sockaddr *local,
++	u_int8_t etype)
+ {
+ 	struct isakmp *isakmp = (struct isakmp *)msg->v;
+ 	struct ph1handle *iph1;
+diff --git a/src/racoon/racoonctl.c b/src/racoon/racoonctl.c
+index da28ecd..bbf068e 100644
+--- a/src/racoon/racoonctl.c
++++ b/src/racoon/racoonctl.c
+@@ -1299,9 +1299,8 @@ print_evt(evtdump)
+  * Print ISAKMP mode config info (IP and banner)
+  */
+ void
+-print_cfg(buf, len)
+-	caddr_t buf;
+-	int len;
++print_cfg(caddr_t buf,
++	int len)
+ {
+ 	struct evt_async *evtdump = (struct evt_async *)buf;
+ 	struct isakmp_data *attr;
+@@ -1454,7 +1453,7 @@ handle_recv(combuf)
+ 		else if (evt_quit_event == ec->ec_type) {
+ 			switch (ec->ec_type) {
+ 			case EVT_PHASE1_MODE_CFG:
+-				print_cfg(ec, len);
++				print_cfg((caddr_t)ec, len);
+ 				break;
+ 			default:
+ 				print_evt(ec);
+-- 
+1.9.1
+

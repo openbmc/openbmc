@@ -1,0 +1,29 @@
+From 92bf2f24d4762efd1dbcc4add457e2b600aa50cf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 Mar 2017 08:02:17 -0700
+Subject: [PATCH] makefile: Add LDFLAGS to linking rule
+
+This make it use correct link flags and fixes errors like
+No GNU_HASH in the elf binary
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index c2b0bc7..cdfb58f 100755
+--- a/Makefile
++++ b/Makefile
+@@ -34,7 +34,7 @@ sgpio.o: sgpio.c
+ 	${CC} $(CFLAGS) -c sgpio.c
+ 
+ sgpio: sgpio.o
+-	${CC} -g sgpio.o -o sgpio
++	${CC} $(LDFLAGS) -g sgpio.o -o sgpio
+ 
+ clean:
+ 	rm -f sgpio.o sgpio
+-- 
+2.12.0
+

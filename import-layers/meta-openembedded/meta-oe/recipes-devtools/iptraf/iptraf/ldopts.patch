@@ -1,0 +1,35 @@
+Index: iptraf-3.0.0/src/Makefile
+===================================================================
+--- iptraf-3.0.0.orig/src/Makefile
++++ iptraf-3.0.0/src/Makefile
+@@ -5,7 +5,7 @@
+ #
+ # Architecture determination string borrowed from the kernel makefile.
+ #
+-ARCH 		:= $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
++ARCH 		?= $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
+ 			-e s/arm.*/arm/ -e s/sa110/arm/)
+ PLATFORM 	= -DPLATFORM=\"$(shell uname -s)/$(ARCH)\"
+ VERNUMBER	:= $(shell cat version)
+@@ -17,7 +17,7 @@ VERSION 	= -DVERSION=\"$(VERNUMBER)\"
+ #
+ BINDIR		= ../../iptraf-$(VERNUMBER).bin.$(ARCH)
+ 
+-CC		= gcc
++CC		= $(CC)
+ LIBS		= -L../support -ltextbox -lpanel -lncurses   # in this order!
+ 
+ # comment this one out to omit debug code when done.
+@@ -31,10 +31,10 @@ PROF		= #-pg
+ # options to be passed to the compiler.  I don't believe they need to be
+ # modified (except for -m486 on non-Intel x86 platforms).
+ 
+-CFLAGS		= -Wall #-O2 #-m486
++CFLAGS		?= -Wall #-O2 #-m486
+ DIRS		= -DWORKDIR=\"$(WORKDIR)\" \
+ 		  -DLOGDIR=\"$(LOGDIR)\" -DEXECDIR=\"$(TARGET)\"
+-LDOPTS		= #-static
++LDOPTS		?= #-static
+ 
+ # you may want to change this to point to your ncurses include directory
+ # if the ncurses include files are not in the default location.

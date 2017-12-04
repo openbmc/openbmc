@@ -6,7 +6,9 @@ LIC_FILES_CHKSUM = "file://debian/copyright;md5=c3ea231a32635cbb5debedf3e88aa3df
 
 PV = "4.1+git${SRCPV}"
 
-SRC_URI = "git://risingtidesystems.com/lio-utils.git"
+SRC_URI = "git://risingtidesystems.com/lio-utils.git \
+           file://0001-Makefiles-Respect-environment-variables-and-add-LDFL.patch \
+           "
 SRCREV = "28bd928655bdc7bd3cf380f0196630690c51e05f"
 S = "${WORKDIR}/git"
 

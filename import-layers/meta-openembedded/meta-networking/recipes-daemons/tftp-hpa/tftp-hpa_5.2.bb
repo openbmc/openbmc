@@ -75,5 +75,5 @@ INITSCRIPT_PARAMS = "start 20 2 3 4 5 . stop 20 1 ."
 
 ALTERNATIVE_${PN} = "tftp"
 ALTERNATIVE_TARGET[tftp] = "${bindir}/tftp-hpa"
-ALTERNATIVE_PRIORITY = "50"
+ALTERNATIVE_PRIORITY = "60"
 

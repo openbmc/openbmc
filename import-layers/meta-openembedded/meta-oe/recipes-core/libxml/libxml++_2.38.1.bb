@@ -3,7 +3,7 @@ DESCRIPTION = "C++ wrapper for libxml library"
 HOMEPAGE = "http://libxmlplusplus.sourceforge.net"
 BUGTRACKER = "http://bugzilla.gnome.org/buglist.cgi?product=libxml%2B%2B"
 SECTION = "libs"
-LICENSE = "GPLv2"
+LICENSE = "LGPL-2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34 "
 
 SHRT_VER = "${@d.getVar('PV',True).split('.')[0]}.${@d.getVar('PV',True).split('.')[1]}"

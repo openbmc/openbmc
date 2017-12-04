@@ -20,6 +20,8 @@ do_configure_prepend() {
     sed -i -e s:help::g ${S}/Makefile.am
 }
 
+CXXFLAGS += "--std=c++11"
+
 RRECOMMENDS_${PN} = "adwaita-icon-theme"
 
 FILES_${PN} += "${datadir}/icons \

@@ -16,6 +16,7 @@ SRC_URI[sha256sum] = "e3f9427b27c5bddf898d383d45c0d3d5397e2056ff935d9a5cdaef6a9a
 
 inherit autotools-brokensep pkgconfig binconfig
 
+EXTRA_OECONF = "--with-boost=${STAGING_DIR_HOST}${prefix}"
 # Upstream is currently working on porting the code to use std::unique_ptr instead of the
 # deprecated auto_ptr.  For now, ignore the issue.
 CXXFLAGS += "-Wno-error=deprecated-declarations"

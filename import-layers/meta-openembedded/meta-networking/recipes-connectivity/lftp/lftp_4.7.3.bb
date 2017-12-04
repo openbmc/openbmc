@@ -14,6 +14,8 @@ SRC_URI[sha256sum] = "ce6519831603c19c2cf2e3c10b41d6ddc87a16049b99383e7b9b77fbc7
 
 inherit autotools gettext pkgconfig
 
+acpaths = "-I ./m4"
+
 EXTRA_OECONF += "--with-modules"
 
 PACKAGECONFIG ??= "libidn openssl zlib gnutls readline expat"

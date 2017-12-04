@@ -1,0 +1,57 @@
+    chrony: fix build failure for arma9
+    
+    Eliminate references to syscalls not available
+    for ARM_EABI.  Also add a dependency on libseccomp
+    which is needed for scfilter to work.
+    
+    Set PACKAGECONFIG to not enable scfilter, since
+    kernel CONFIG_SECCOMP is unlikely to be set.  This
+    aligns the usage of libseccomp with that of other packages.
+
+    Upstream-Status: Pending
+    
+    Signed-off-by: Joe Slater <jslater@windriver.com>
+
+--- a/sys_linux.c
++++ b/sys_linux.c
+@@ -453,13 +453,12 @@ SYS_Linux_EnableSystemCallFilter(int lev
+   const int syscalls[] = {
+     /* Clock */
+     SCMP_SYS(adjtimex), SCMP_SYS(gettimeofday), SCMP_SYS(settimeofday),
+-    SCMP_SYS(time),
+     /* Process */
+-    SCMP_SYS(clone), SCMP_SYS(exit), SCMP_SYS(exit_group), SCMP_SYS(getrlimit),
++    SCMP_SYS(clone), SCMP_SYS(exit), SCMP_SYS(exit_group),
+     SCMP_SYS(rt_sigaction), SCMP_SYS(rt_sigreturn), SCMP_SYS(rt_sigprocmask),
+     SCMP_SYS(set_tid_address), SCMP_SYS(sigreturn), SCMP_SYS(wait4),
+     /* Memory */
+-    SCMP_SYS(brk), SCMP_SYS(madvise), SCMP_SYS(mmap), SCMP_SYS(mmap2),
++    SCMP_SYS(brk), SCMP_SYS(madvise), SCMP_SYS(mmap2),
+     SCMP_SYS(mprotect), SCMP_SYS(mremap), SCMP_SYS(munmap), SCMP_SYS(shmdt),
+     /* Filesystem */
+     SCMP_SYS(access), SCMP_SYS(chmod), SCMP_SYS(chown), SCMP_SYS(chown32),
+@@ -470,14 +469,21 @@ SYS_Linux_EnableSystemCallFilter(int lev
+     SCMP_SYS(bind), SCMP_SYS(connect), SCMP_SYS(getsockname),
+     SCMP_SYS(recvfrom), SCMP_SYS(recvmsg), SCMP_SYS(sendmmsg),
+     SCMP_SYS(sendmsg), SCMP_SYS(sendto),
+-    /* TODO: check socketcall arguments */
+-    SCMP_SYS(socketcall),
+     /* General I/O */
+     SCMP_SYS(_newselect), SCMP_SYS(close), SCMP_SYS(open), SCMP_SYS(pipe),
+-    SCMP_SYS(poll), SCMP_SYS(read), SCMP_SYS(futex), SCMP_SYS(select),
++    SCMP_SYS(poll), SCMP_SYS(read), SCMP_SYS(futex),
+     SCMP_SYS(set_robust_list), SCMP_SYS(write),
+     /* Miscellaneous */
+     SCMP_SYS(uname),
++    /* not always available */
++#if ! defined(__ARM_EABI__)
++    SCMP_SYS(time),
++    SCMP_SYS(getrlimit),
++    SCMP_SYS(select),
++    SCMP_SYS(mmap),
++    /* TODO: check socketcall arguments */
++    SCMP_SYS(socketcall),
++#endif
+   };
+ 
+   const int socket_domains[] = {

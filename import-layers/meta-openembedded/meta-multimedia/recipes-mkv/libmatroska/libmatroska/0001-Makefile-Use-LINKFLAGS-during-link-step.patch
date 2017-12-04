@@ -1,0 +1,28 @@
+From f0c879097c331d1dabe6ee92b583a8badb62ea6d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 Mar 2017 08:26:35 -0700
+Subject: [PATCH] Makefile: Use LINKFLAGS during link step
+
+Adds much needed GNU_HASH section into the .so
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ make/linux/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/make/linux/Makefile b/make/linux/Makefile
+index 3ca7b0f..b5c9645 100644
+--- a/make/linux/Makefile
++++ b/make/linux/Makefile
+@@ -104,7 +104,7 @@ $(LIBRARY): $(objects)
+ 	$(RANLIB) $@
+ 
+ $(LIBRARY_SO): $(objects_so)
+-	$(CXX) -shared -Wl,-soname,$(LIBRARY_SO_VER) -o $(LIBRARY_SO_VER) $(objects_so) -lebml
++	$(CXX) $(LINKFLAGS) -shared -Wl,-soname,$(LIBRARY_SO_VER) -o $(LIBRARY_SO_VER) $(objects_so) -lebml
+ 	rm -f $(LIBRARY_SO)
+ 	ln -s $(LIBRARY_SO_VER) $(LIBRARY_SO)
+ 
+-- 
+2.12.0
+

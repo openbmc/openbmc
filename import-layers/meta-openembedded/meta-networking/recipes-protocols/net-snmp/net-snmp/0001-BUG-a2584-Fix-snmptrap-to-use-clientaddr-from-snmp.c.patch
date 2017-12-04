@@ -1,0 +1,48 @@
+From a92628a163ebf1ea62220684736300461c003875 Mon Sep 17 00:00:00 2001
+From: Niels Baggesen <nba@users.sourceforge.net>
+Date: Mon, 26 Jan 2015 20:26:06 +0100
+Subject: [PATCH] BUG#a2584: Fix snmptrap to use clientaddr from snmp.conf.
+ Thanks to rizwan
+
+Upstream-Status: backport
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ snmplib/transports/snmpUDPIPv6Domain.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/snmplib/transports/snmpUDPIPv6Domain.c b/snmplib/transports/snmpUDPIPv6Domain.c
+index 55e3610..aca69ae 100644
+--- a/snmplib/transports/snmpUDPIPv6Domain.c
++++ b/snmplib/transports/snmpUDPIPv6Domain.c
+@@ -256,6 +256,27 @@ netsnmp_udp6_transport(struct sockaddr_in6 *addr, int local)
+         t->data = NULL;
+         t->data_length = 0;
+     } else {
++        char           *client_socket = NULL;
++        /*
++         * This is a client session.  If we've been given a
++         * client address to send from, then bind to that.
++         * Otherwise the send will use "something sensible".
++         */
++
++        client_socket = netsnmp_ds_get_string(NETSNMP_DS_LIBRARY_ID,
++                                    NETSNMP_DS_LIB_CLIENT_ADDR);
++        if (client_socket) {
++            struct sockaddr_in6 client_addr;
++            netsnmp_sockaddr_in6_2(&client_addr, client_socket, NULL);
++            rc = bind(t->sock, (struct sockaddr *)&client_addr,
++                              sizeof(struct sockaddr_in6));
++            if ( rc != 0 ) {
++                DEBUGMSGTL(("netsnmp_udp6", "failed to bind for clientaddr: %d %s\n",
++                                 errno, strerror(errno)));
++                netsnmp_socketbase_close(t);
++                netsnmp_transport_free(t);
++            }
++        }
+         /*
+          * This is a client session.  Save the address in the
+          * transport-specific data pointer for later use by netsnmp_udp6_send.
+-- 
+2.9.3
+

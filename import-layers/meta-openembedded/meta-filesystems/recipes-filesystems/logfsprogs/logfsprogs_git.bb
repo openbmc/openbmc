@@ -11,7 +11,9 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://fsck.c;md5=3859dc73da97909ff1d0125e88a27e02"
 DEPENDS = "zlib"
 
-SRC_URI = "git://github.com/prasad-joshi/logfsprogs.git"
+SRC_URI = "git://github.com/prasad-joshi/logfsprogs.git \
+           file://0001-Add-LDFLAGS-to-linker-cmdline.patch \
+"
 SRCREV = "45b72c81ce3c6fa17ca19bafc207ea93e76312f4"
 
 S = "${WORKDIR}/git"

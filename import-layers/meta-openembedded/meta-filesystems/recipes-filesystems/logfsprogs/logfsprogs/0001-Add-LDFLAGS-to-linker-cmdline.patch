@@ -1,0 +1,46 @@
+From a322794f80f2718ae4463669c4b6ab2fbb15ffec Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Apr 2017 17:36:45 +0000
+Subject: [PATCH] Add $(LDFLAGS) to linker cmdline
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: git/Makefile
+===================================================================
+--- git.orig/Makefile
++++ git/Makefile
+@@ -14,7 +14,7 @@ ZLIB_O	:= crc32.o deflate.o adler32.o co
+ CC	:= gcc
+ CHECK	:= cgcc
+ CHECKFLAGS := -D__CHECK_ENDIAN__
+-CFLAGS	:= -std=gnu99
++CFLAGS	+= -std=gnu99
+ CFLAGS	+= -Wall
+ CFLAGS	+= -Os
+ CFLAGS	+= -D_FILE_OFFSET_BITS=64
+@@ -28,18 +28,18 @@ $(ZLIB_O): /usr/lib/libz.a
+ 
+ ifdef S
+ EXTRA_OBJ := $(ZLIB_O)
+-CFLAGS += -static
++LDFLAGS += -static
+ else
+-CFLAGS += -lz
++LDFLAGS += -lz
+ endif
+ 
+ mklogfs: $(EXTRA_OBJ)
+ mklogfs: mkfs.o lib.o btree.o segment.o readwrite.o
+-	$(CC) $(CFLAGS) -o $@ $^
++	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+ 
+ logfsck: $(ZLIB_O)
+ logfsck: fsck.o lib.o journal.o super.o
+-	$(CC) $(CFLAGS) -o $@ $^
++	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+ 
+ $(OBJ): kerncompat.h logfs.h logfs_abi.h btree.h
+ 

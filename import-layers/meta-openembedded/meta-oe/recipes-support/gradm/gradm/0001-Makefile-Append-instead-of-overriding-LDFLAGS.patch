@@ -1,0 +1,26 @@
+From d67e93ada37d7237983fd10894c18b92f4243d50 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 Mar 2017 08:51:45 -0700
+Subject: [PATCH] Makefile: Append instead of overriding LDFLAGS
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 28557ff..deed94c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -29,7 +29,7 @@ OPT_FLAGS := -O2
+ # for older versions of grsecurity, comment the above line and uncomment the below:
+ #OPT_FLAGS := $(shell if [ "`uname -m`" != "sparc64" ] && [ "`uname -m`" != "x86_64" ]; then echo "-O2" ; else echo "-O2 -m64" ; fi)
+ CFLAGS := $(OPT_FLAGS) -fPIE -Wcast-qual -DGRSEC_DIR=\"$(GRSEC_DIR)\" -D_LARGEFILE64_SOURCE
+-LDFLAGS= -pie
++LDFLAGS+= -pie
+ INSTALL = /usr/bin/install -c
+ 
+ # FHS
+-- 
+2.12.0
+

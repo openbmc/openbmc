@@ -5,9 +5,10 @@ HOMEPAGE = "https://github.com/gflags/gflags"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING.txt;md5=c80d1a3b623f72bb85a4c75b556551df"
 
-SRC_URI = "git://github.com/gflags/gflags.git;branch=release"
-SRCREV = "1a02f2851ee3d48d32d2c8f4d8f390a0bc25565c"
-S = "${WORKDIR}/git/"
+SRC_URI = "https://github.com/gflags/gflags/archive/v${PV}.tar.gz"
+SRC_URI[md5sum] = "ac432de923f9de1e9780b5254884599f"
+SRC_URI[sha256sum] = "d8331bd0f7367c8afd5fcb5f5e85e96868a00fd24b7276fa5fcee1e5575c2662"
+S = "${WORKDIR}/${PN}-${PV}/"
 
 FILES_${PN}-dev += "${libdir}/cmake"
 

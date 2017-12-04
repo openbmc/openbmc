@@ -3,7 +3,7 @@ DESCRIPTION = "mpv is a fork of mplayer2 and MPlayer. It shares some features wi
 SECTION = "multimedia"
 HOMEPAGE = "http://www.mpv.io/"
 DEPENDS = "zlib ffmpeg jpeg virtual/libx11 xsp libxv \
-           libxscrnsaver libv4l libxinerama \
+           libxscrnsaver libv4l libxinerama libvdpau \
 "
 
 REQUIRED_DISTRO_FEATURES = "x11"
@@ -27,6 +27,7 @@ PACKAGECONFIG[lua] = "--enable-lua,--disable-lua,lua luajit"
 PACKAGECONFIG[libass] = "--enable-libass,--disable-libass,libass"
 PACKAGECONFIG[libarchive] = "--enable-libarchive,--disable-libarchive,libarchive"
 PACKAGECONFIG[jack] = "--enable-jack, --disable-jack, jack"
+PACKAGECONFIG[vaapi] = "--enable-vaapi, --disable-vaapi,libva"
 
 SIMPLE_TARGET_SYS = "${@'${TARGET_SYS}'.replace('${TARGET_VENDOR}', '')}"
 EXTRA_OECONF = " \

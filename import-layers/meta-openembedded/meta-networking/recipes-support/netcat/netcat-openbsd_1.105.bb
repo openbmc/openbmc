@@ -41,4 +41,4 @@ do_install() {
     install -d ${D}${bindir}
     install -m 755 ${S}/nc ${D}${bindir}/nc.${BPN}
 }
-ALTERNATIVE_PRIORITY = "50"
+ALTERNATIVE_PRIORITY = "60"

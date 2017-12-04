@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b3190d5244e08e78e4c8ee78544f4863"
 SRC_URI = "${SOURCEFORGE_MIRROR}/pupnp/${BP}.tar.bz2 \
            file://avoid-redefining-strnlen-and-strndup.patch \
            file://sepbuildfix.patch \
+           file://CVE-2016-8863.patch \
 "
 
 SRC_URI[md5sum] = "ee16e5d33a3ea7506f38d71facc057dd"

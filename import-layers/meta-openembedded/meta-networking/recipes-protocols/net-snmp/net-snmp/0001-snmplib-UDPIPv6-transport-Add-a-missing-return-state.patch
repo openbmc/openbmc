@@ -1,0 +1,29 @@
+From 1ee72102fbe722d232d74abc4660a8b134cec8d6 Mon Sep 17 00:00:00 2001
+From: Bart Van Assche <bvanassche@acm.org>
+Date: Sat, 23 May 2015 07:32:53 +0200
+Subject: [PATCH] snmplib, UDPIPv6 transport: Add a missing return statement
+
+Detected by Coverity.
+
+Upstream-Status: backport
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ snmplib/transports/snmpUDPIPv6Domain.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/snmplib/transports/snmpUDPIPv6Domain.c b/snmplib/transports/snmpUDPIPv6Domain.c
+index 029b164..11c39bb 100644
+--- a/snmplib/transports/snmpUDPIPv6Domain.c
++++ b/snmplib/transports/snmpUDPIPv6Domain.c
+@@ -285,6 +285,7 @@ netsnmp_udp6_transport(struct sockaddr_in6 *addr, int local)
+                                  errno, strerror(errno)));
+                 netsnmp_socketbase_close(t);
+                 netsnmp_transport_free(t);
++                return NULL;
+             }
+         }
+         /*
+-- 
+2.9.3
+

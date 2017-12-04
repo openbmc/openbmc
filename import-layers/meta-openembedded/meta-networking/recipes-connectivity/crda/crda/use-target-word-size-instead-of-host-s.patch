@@ -1,0 +1,34 @@
+From c1c42513edd27c97341f2033af77c13a4724eb8f Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Fri, 25 Nov 2016 16:48:01 +0800
+Subject: [PATCH] crda: Use target word size instead of host's.
+
+In key2pub.py, the codes check the wordsize
+of the host machine but not the target's, this fix
+fetches the wordsize of target from the build system.
+
+Upstream-Status: Pending
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+---
+ utils/key2pub.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/utils/key2pub.py b/utils/key2pub.py
+index 3e84cd2..401d58a 100755
+--- a/utils/key2pub.py
++++ b/utils/key2pub.py
+@@ -58,9 +58,9 @@ def print_ssl_32(output, name, val):
+     output.write('};\n\n')
+ 
+ def print_ssl(output, name, val):
+-    import struct
++    import os
+     output.write('#include <stdint.h>\n')
+-    if len(struct.pack('@L', 0)) == 8:
++    if os.getenv('TARGET_BITS') == '64':
+         return print_ssl_64(output, name, val)
+     else:
+         return print_ssl_32(output, name, val)
+-- 
+1.9.1
+

@@ -15,6 +15,8 @@ SRC_URI[sha256sum] = "ed00ffaeaa312a5b4f969f4e97a64603a866bbe16e393ea02f5bf05234
 
 S = "${WORKDIR}/${BPN}"
 
+EXTRA_OEMAKE += "LFLAGS='${LDFLAGS}'"
+
 RDEPENDS_${PN} = "bash"
 INITSCRIPT_NAME = "sms3"
 INITSCRIPT_PARAMS = "defaults"

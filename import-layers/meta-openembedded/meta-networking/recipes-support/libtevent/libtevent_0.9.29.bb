@@ -6,7 +6,7 @@ LICENSE = "LGPLv3+"
 DEPENDS += "libtalloc"
 RDEPENDS_python-tevent = "python"
 
-SRC_URI = "http://samba.org/ftp/tevent/tevent-${PV}.tar.gz \
+SRC_URI = "https://samba.org/ftp/tevent/tevent-${PV}.tar.gz \
            file://tevent-Add-configure-options-for-packages.patch \
 "
 LIC_FILES_CHKSUM = "file://tevent.h;endline=26;md5=4e458d658cb25e21efc16f720e78b85a"

@@ -1,0 +1,58 @@
+From 8d2164a090f17286ea8291f30a123595cf447dc3 Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Wed, 30 Nov 2016 10:27:36 +0800
+Subject: [PATCH] crda: fix issues when 'USE_OPENSSL=1'.
+
+Fxed the below issues if configured with 'USE_OPENSSL=1':
+a. keys-ssl.c uses BN_ULONG but doesn't include the openssl headers leading
+   to build failures:
+   keys-ssl.c:2:8: error: unknown type name 'BN_ULONG'
+   static BN_ULONG e_0[1] = {
+
+b. The large unqualified constants also break building:
+   keys-ssl.c:8:2: warning: overflow in implicit constant conversion [-Woverflow]
+     0x63a2705416a0d8e1, 0xdc9fca11c8ba757b,
+
+c. keys-ssl.c: error: 'keys' defined but not used [-Werror=unused-variable]
+   static struct pubkey keys[] = {
+
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+Upsteam-Status: Pending
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+---
+ utils/key2pub.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/utils/key2pub.py b/utils/key2pub.py
+index 401d58a..3ae00b8 100755
+--- a/utils/key2pub.py
++++ b/utils/key2pub.py
+@@ -24,7 +24,7 @@ def print_ssl_64(output, name, val):
+     for v1, v2, v3, v4, v5, v6, v7, v8 in vnew:
+         if not idx:
+             output.write('\t')
+-        output.write('0x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x, ' % (ord(v1), ord(v2), ord(v3), ord(v4), ord(v5), ord(v6), ord(v7), ord(v8)))
++        output.write('0x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2xULL, ' % (ord(v1), ord(v2), ord(v3), ord(v4), ord(v5), ord(v6), ord(v7), ord(v8)))
+         idx += 1
+         if idx == 2:
+             idx = 0
+@@ -60,6 +60,7 @@ def print_ssl_32(output, name, val):
+ def print_ssl(output, name, val):
+     import os
+     output.write('#include <stdint.h>\n')
++    output.write('#include <openssl/bn.h>\n')
+     if os.getenv('TARGET_BITS') == '64':
+         return print_ssl_64(output, name, val)
+     else:
+@@ -78,7 +79,7 @@ struct pubkey {
+ 
+ #define KEYS(e,n)	{ KEY(e), KEY(n), }
+ 
+-static struct pubkey keys[] = {
++static struct pubkey keys[] __attribute__((unused))= {
+ ''')
+     for n in xrange(n + 1):
+         output.write('	KEYS(e_%d, n_%d),\n' % (n, n))
+-- 
+1.9.1
+

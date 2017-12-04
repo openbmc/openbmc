@@ -1,10 +1,10 @@
 SUMMARY = "SGPIO captive backplane tool"
 DESCRIPTION = "Intel SGPIO enclosure management utility"
 
-SRC_URI = " \
-    http://pkgs.fedoraproject.org/repo/pkgs/${BPN}/${BPN}-1.2-0.10-src.tar.gz/a417bf68da4e9bd79a4664c11d7debd1/${BPN}-1.2-0.10-src.tar.gz \
-    file://Makefile-error-fix.patch \
-"
+SRC_URI = "http://pkgs.fedoraproject.org/repo/pkgs/${BPN}/${BPN}-1.2-0.10-src.tar.gz/a417bf68da4e9bd79a4664c11d7debd1/${BPN}-1.2-0.10-src.tar.gz \
+           file://Makefile-error-fix.patch \
+           file://0001-makefile-Add-LDFLAGS-to-linking-rule.patch \
+           "
 SRC_URI[md5sum] = "a417bf68da4e9bd79a4664c11d7debd1"
 SRC_URI[sha256sum] = "9bf8c42acaa247efd9321bdb1fc2390022f0c554d77fbbd4a7363d990fc0270b"
 

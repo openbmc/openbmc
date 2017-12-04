@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6 \
                     "
 
-SRC_URI = "https://ftp.samba.org/pub/${PN}/${BP}.tar.gz \
+SRC_URI = "https://ftp.samba.org/pub/${BPN}/${BP}.tar.gz \
            file://01-support-cross-compile-for-linux-os.patch \
            file://02-link-rep_snprintf-for-ltdbtool.patch \
            file://service-ensure-the-PID-directory-is-created.patch \

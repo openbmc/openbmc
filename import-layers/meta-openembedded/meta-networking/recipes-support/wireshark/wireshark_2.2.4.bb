@@ -4,13 +4,14 @@ SECTION = "net"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://README.linux;md5=631e077455b7972172eb149195e065b0"
 
-DEPENDS = "pcre expat glib-2.0"
+DEPENDS = "pcre expat glib-2.0 glib-2.0-native"
 
 SRC_URI = "https://2.na.dl.wireshark.org/src/all-versions/${BP}.tar.bz2"
 
 PE = "1"
-SRC_URI[md5sum] = "49a1023a69ac108ca089d750eee50e37"
-SRC_URI[sha256sum] = "900e22af04c8b35e0d02a25a360ab1fb7cfe5ac18fc48a9afd75a7103e569149"
+
+SRC_URI[md5sum] = "6d0878ba931ea379f6e675d4cba6536b"
+SRC_URI[sha256sum] = "42a7fb35eed5a32478153e24601a284bb50148b7ba919c3e8452652f4c2a3911"
 
 inherit autotools pkgconfig perlnative
 

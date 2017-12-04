@@ -16,8 +16,8 @@ SRC_URI = "\
     file://automake-foreign.patch \
 "
 
-PV = "3.1.2+gitr${SRCPV}"
-SRCREV = "4fbdab392caf6fcd77c538b6712b721a56ff31b8"
+PV = "3.1.3+gitr${SRCPV}"
+SRCREV = "099244ec686b620393e9845478a554b1c7ca5c8b"
 
 S = "${WORKDIR}/git"
 

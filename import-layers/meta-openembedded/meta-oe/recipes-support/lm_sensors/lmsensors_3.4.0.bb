@@ -7,13 +7,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
 
 DEPENDS = "sysfsutils virtual/libiconv bison-native flex-native rrdtool"
 
-SRC_URI = "http://dl.lm-sensors.org/lm-sensors/releases/lm_sensors-${PV}.tar.bz2 \
+SRC_URI = "https://github.com/groeck/lm-sensors/archive/V3-4-0.tar.gz \
            file://fancontrol.init \
            file://sensord.init \
            file://0001-lmsensors-sensors-detect-print-a-special-message-whe.patch \
 "
-SRC_URI[md5sum] = "c03675ae9d43d60322110c679416901a"
-SRC_URI[sha256sum] = "e0579016081a262dd23eafe1d22b41ebde78921e73a1dcef71e05e424340061f"
+SRC_URI[md5sum] = "1e9f117cbfa11be1955adc96df71eadb"
+SRC_URI[sha256sum] = "e334c1c2b06f7290e3e66bdae330a5d36054701ffd47a5dde7a06f9a7402cb4e"
 
 inherit update-rc.d systemd
 
@@ -29,7 +29,7 @@ SYSTEMD_PACKAGES = "${PN}-sensord"
 SYSTEMD_SERVICE_${PN}-sensord = "sensord.service lm_sensors.service fancontrol.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-S = "${WORKDIR}/lm_sensors-${PV}"
+S = "${WORKDIR}/lm-sensors-3-4-0"
 
 EXTRA_OEMAKE = 'EXLDFLAGS="${LDFLAGS}" \
         MACHINE=${TARGET_ARCH} PREFIX=${prefix} MANDIR=${mandir} \

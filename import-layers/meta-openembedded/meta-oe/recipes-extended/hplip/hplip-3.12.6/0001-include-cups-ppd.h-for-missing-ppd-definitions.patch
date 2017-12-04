@@ -1,0 +1,42 @@
+From 7ef9c040dd959105c16d4dc67e14f3bbea25e77f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Dec 2016 19:51:19 +0000
+Subject: [PATCH] include cups/ppd.h for missing ppd definitions
+
+Fixes errors spotted by clang
+
+| prnt/hpcups/HPCupsFilter.cpp:365:18: error: use of undeclared identifier 'ppdFindAttr'
+|     if (((attr = ppdFindAttr(m_ppd, "hpPrinterLanguage", NULL)) == NULL) ||
+|                  ^
+| prnt/hpcups/HPCupsFilter.cpp:368:13: error: use of undeclared identifier 'ppdClose'
+|             ppdClose(m_ppd);
+|             ^
+| prnt/hpcups/HPCupsFilter.cpp:444:9: error: use of undeclared identifier 'ppdClose'
+|         ppdClose(m_ppd);
+|         ^
+| prnt/hpcups/HPCupsFilter.cpp:497:13: error: use of undeclared identifier 'ppdOpenFile'
+|     m_ppd = ppdOpenFile(getenv("PPD"));
+|             ^
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ prnt/hpcups/HPCupsFilter.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/prnt/hpcups/HPCupsFilter.h b/prnt/hpcups/HPCupsFilter.h
+index 0431a7a..eb0cad6 100644
+--- a/prnt/hpcups/HPCupsFilter.h
++++ b/prnt/hpcups/HPCupsFilter.h
+@@ -37,6 +37,7 @@
+ #include "Job.h"
+ 
+ #include "dbuscomm.h"
++#include <cups/ppd.h>
+ 
+ #define		DBITMAPFILEHEADER		14
+ #define		DBITMAPINFOHEADER		40
+-- 
+1.9.1
+

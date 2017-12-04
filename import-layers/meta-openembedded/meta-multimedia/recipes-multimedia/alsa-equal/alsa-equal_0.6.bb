@@ -1,12 +1,12 @@
 DESCRIPTION = "A real-time adjustable equalizer plugin for ALSA"
-HOMEPAGE = "http://www.thedigitalmachine.net/alsaequal.html"
+HOMEPAGE = "https://web.archive.org/web/20161105202833/http://thedigitalmachine.net/alsaequal.html"
 LICENSE = "LGPL-2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=243b725d71bb5df4a1e5920b344b86ad"
 
 DEPENDS = "alsa-lib"
 
 SRC_URI = " \
-    http://www.thedigitalmachine.net/tools/alsaequal-${PV}.tar.bz2 \
+    https://launchpad.net/ubuntu/+archive/primary/+files/alsaequal_${PV}.orig.tar.bz2 \
     file://0001-Fix-asneeded.patch \
     file://0002-Fix-Eq-CAPS-plugin-name.patch \
     file://0003-Fix-mixer.patch \

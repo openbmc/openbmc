@@ -12,7 +12,7 @@ RDEPENDS_${PN}-tools = "perl ${PN}"
 
 # arm would compile but has never been tested upstream.  mips would not compile.
 #
-COMPATIBLE_HOST = "(x86_64|i.86|powerpc).*-linux"
+COMPATIBLE_HOST = "(x86_64|i.86|powerpc|arm).*-linux"
 
 PACKAGES =+ "${PN}-tools"
 FILES_${PN}-tools = "${bindir}/*.pl"

@@ -10,11 +10,11 @@ Signed-off-by: Hongjun.Yang <hongjun.yang@windriver.com>
  Makefile.in | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.in b/Makefile.in
-index 8c35a45..4fb8ae6 100644
---- a/Makefile.in
-+++ b/Makefile.in
-@@ -428,9 +428,17 @@ distclean:
+Index: tcpdump-4.9.0/Makefile.in
+===================================================================
+--- tcpdump-4.9.0.orig/Makefile.in
++++ tcpdump-4.9.0/Makefile.in
+@@ -436,9 +436,17 @@ distclean:
  	    tests/failure-outputs.txt
  	rm -rf autom4te.cache tests/DIFF tests/NEW
  
@@ -25,14 +25,11 @@ index 8c35a45..4fb8ae6 100644
  	(cd tests && ./TESTrun.sh)
  
 +install-ptest:
-+	cp -r tests			$(DESTDIR) 
-+	cp -r config.h			$(DESTDIR)
-+	install -m 0755 Makefile 	$(DESTDIR)
-+	ln -sf /usr/sbin/tcpdump	$(DESTDIR)/tcpdump
++	cp -r tests                     $(DESTDIR)
++	cp -r config.h                  $(DESTDIR)
++	install -m 0755 Makefile        $(DESTDIR)
++	ln -sf /usr/sbin/tcpdump        $(DESTDIR)/tcpdump
 +
- tags: $(TAGFILES)
- 	ctags -wtd $(TAGFILES)
+ extags: $(TAGFILES)
+ 	ctags $(TAGFILES)
  
--- 
-1.9.1
-

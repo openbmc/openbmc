@@ -9,7 +9,7 @@ DEPENDS = "virtual/kernel openssl readline flex-native bison-native"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_URI = "ftp://ftp.netbsd.org/pub/NetBSD/misc/ipsec-tools/0.8/ipsec-tools-${PV}.tar.bz2 \
+SRC_URI = "http://ftp.netbsd.org/pub/NetBSD/misc/ipsec-tools/0.8/ipsec-tools-${PV}.tar.bz2 \
            file://0002-Don-t-link-against-libfl.patch \
            file://configure.patch \
            file://0001-racoon-pfkey-avoid-potential-null-pointer-dereferenc.patch \
@@ -21,6 +21,7 @@ SRC_URI = "ftp://ftp.netbsd.org/pub/NetBSD/misc/ipsec-tools/0.8/ipsec-tools-${PV
            file://racoon.conf \
            file://racoon.service \
            file://fix-CVE-2015-4047.patch \
+           file://0001-Fix-build-with-clang.patch \
           "
 SRC_URI[md5sum] = "d53ec14a0a3ece64e09e5e34b3350b41"
 SRC_URI[sha256sum] = "8eb6b38716e2f3a8a72f1f549c9444c2bc28d52c9536792690564c74fe722f2d"

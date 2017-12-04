@@ -1,0 +1,31 @@
+Upstream-Status: Submitted [https://github.com/samba-team/samba/pull/70]
+
+Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+
+From 50eac4fd30944e5e1d83060757633fe0ed572723 Mon Sep 17 00:00:00 2001
+From: Andreas Oberritter <obi@opendreambox.org>
+Date: Wed, 30 Nov 2016 16:25:06 +0100
+Subject: [PATCH] packaging: Avoid timeout for nmbd if started offline with
+ systemd
+
+If no network connection appears within DefaultTimeoutStartSec
+(~ 90s) after startup, nmbd fails to notify systemd and will
+therefore get killed.
+
+Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+---
+ packaging/systemd/nmb.service | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/packaging/systemd/nmb.service b/packaging/systemd/nmb.service
+index 992c0cd..555c9ab 100644
+--- a/packaging/systemd/nmb.service
++++ b/packaging/systemd/nmb.service
+@@ -10,6 +10,7 @@ EnvironmentFile=-/etc/sysconfig/samba
+ ExecStart=/usr/sbin/nmbd $NMBDOPTIONS
+ ExecReload=/usr/bin/kill -HUP $MAINPID
+ LimitCORE=infinity
++TimeoutStartSec=0
+ 
+ [Install]
+ WantedBy=multi-user.target

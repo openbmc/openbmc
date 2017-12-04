@@ -13,7 +13,8 @@ S = "${WORKDIR}/memstattool"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=87be186443b1ac2cfa466f475e1ee0cb"
 
 SRC_URI = "http://sourceforge.net/projects/memstattool/files/memstat_${PV}.tar.gz \
-          "
+           file://0001-Include-limits.h-for-PATH_MAX-definition.patch \
+           "
 
 SRC_URI[md5sum] = "2c3acc0c62b2a18f6601b84e54aa7462"
 SRC_URI[sha256sum] = "245d5fc7fb87bcfd14486cd34917cae2856e799559ac568434af12c4852bce94"

@@ -9,6 +9,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \
            file://fix-libusb-paths.patch \
            file://cups-1.6.patch \
            file://configure.patch \
+           file://0001-include-cups-ppd.h-for-missing-ppd-definitions.patch \
 "
 
 DEPENDS += "cups python libusb"

@@ -33,6 +33,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 SRC_URI = "https://download.tuxfamily.org/chrony/chrony-${PV}.tar.gz \
     file://chrony.conf \
     file://chronyd \
+    file://arm_eabi.patch \
 "
 SRC_URI[md5sum] = "d0598aa8a9be8faccef9386f6fc0d5f2"
 SRC_URI[sha256sum] = "8d04e7cda2333289c2104b731d39c3c1db94816e43bae35d7ee4e7ae8af6391f"
@@ -58,15 +59,15 @@ inherit update-rc.d systemd
 #     chrony.conf and init script.
 #   - 'scfilter' enables support for system call filtering, but requires the
 #     kernel to have CONFIG_SECCOMP enabled.
-PACKAGECONFIG ??= "editline scfilter \
+PACKAGECONFIG ??= "editline \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)} \
 "
 PACKAGECONFIG[readline] = "--without-editline,--without-readline,readline"
 PACKAGECONFIG[editline] = ",--without-editline,libedit"
 PACKAGECONFIG[sechash] = "--without-tomcrypt,--disable-sechash,nss"
 PACKAGECONFIG[privdrop] = ",--disable-privdrop,libcap"
-PACKAGECONFIG[scfilter] = "--enable-scfilter,--without-seccomp"
-PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+PACKAGECONFIG[scfilter] = "--enable-scfilter,--without-seccomp,libseccomp"
+PACKAGECONFIG[ipv6] = ",--disable-ipv6,"
 PACKAGECONFIG[nss] = "--with-nss,--without-nss,nss"
 PACKAGECONFIG[libcap] = "--with-libcap,--without-libcap,libcap"
 

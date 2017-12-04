@@ -1,0 +1,29 @@
+From 4b6c957372314562bf7b9117103e3a08643eb7b8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 Mar 2017 17:47:28 -0700
+Subject: [PATCH] Include limits.h for PATH_MAX definition
+
+Fixes
+
+error: use of undeclared identifier 'PATH_MAX'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ memstat.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/memstat.c b/memstat.c
+index 5039fb0..3ff6ee4 100644
+--- a/memstat.c
++++ b/memstat.c
+@@ -19,6 +19,7 @@
+ #include <unistd.h>
+ #include <getopt.h>
+ #include <errno.h>
++#include <limits.h>
+ 
+ /* blacklist devices that just map physical memory */
+ char *blacklist[] = {
+-- 
+2.12.0
+

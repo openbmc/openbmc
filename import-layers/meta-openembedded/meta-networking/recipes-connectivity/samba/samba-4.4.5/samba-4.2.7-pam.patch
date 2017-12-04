@@ -1,0 +1,36 @@
+Lifted from gentoo and ported to 4.4.5
+
+http://data.gpo.zugaina.org/musl/net-fs/samba/files/samba-4.2.7-pam.patch
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+
+Index: samba-4.4.5/source3/wscript
+===================================================================
+--- samba-4.4.5.orig/source3/wscript
++++ samba-4.4.5/source3/wscript
+@@ -873,7 +873,7 @@ msg.msg_accrightslen = sizeof(fd);
+         if conf.env.with_iconv:
+             conf.DEFINE('HAVE_ICONV', 1)
+ 
+-    if Options.options.with_pam:
++    if Options.options.with_pam != False:
+         use_pam=True
+         conf.CHECK_HEADERS('security/pam_appl.h pam/pam_appl.h')
+         if not conf.CONFIG_SET('HAVE_SECURITY_PAM_APPL_H') and not conf.CONFIG_SET('HAVE_PAM_PAM_APPL_H'):
+@@ -945,6 +945,15 @@ int i; i = PAM_RADIO_TYPE;
+         if use_pam:
+             conf.DEFINE('WITH_PAM', 1)
+             conf.DEFINE('WITH_PAM_MODULES', 1)
++    else:
++        Logs.warn("PAM disabled")
++        use_pam=False
++        conf.undefine('WITH_PAM')
++        conf.undefine('WITH_PAM_MODULES')
++        conf.undefine('HAVE_SECURITY_PAM_APPL_H')
++        conf.undefine('PAM_RHOST')
++        conf.undefine('PAM_TTY')
++        conf.undefine('HAVE_PAM_PAM_APPL_H')
+ 
+     seteuid = False
+ 

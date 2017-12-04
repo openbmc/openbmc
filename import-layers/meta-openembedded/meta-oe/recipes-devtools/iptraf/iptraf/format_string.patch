@@ -1,0 +1,31 @@
+Index: iptraf-3.0.0/src/othptab.c
+===================================================================
+--- iptraf-3.0.0.orig/src/othptab.c
++++ iptraf-3.0.0/src/othptab.c
+@@ -335,7 +335,7 @@ void printothpentry(struct othptable *ta
+                 break;
+             }
+ 
+-            sprintf(scratchpad, inet_ntoa(saddr));
++            sprintf(scratchpad, "%s", inet_ntoa(saddr));
+             strcat(msgstring, scratchpad);
+             wattrset(table->othpwin, ARPATTR);
+             break;
+@@ -354,7 +354,7 @@ void printothpentry(struct othptable *ta
+                 break;
+             }
+ 
+-            sprintf(scratchpad, rarp_mac_addr);
++            sprintf(scratchpad, "%s", rarp_mac_addr);
+             strcat(msgstring, scratchpad);
+             wattrset(table->othpwin, ARPATTR);
+             break;
+@@ -421,7 +421,7 @@ void printothpentry(struct othptable *ta
+         wattrset(table->othpwin, UNKNIPATTR);
+         protptr = getprotobynumber(entry->protocol);
+         if (protptr != NULL) {
+-            sprintf(protname, protptr->p_aliases[0]);
++            sprintf(protname, "%s", protptr->p_aliases[0]);
+         } else {
+             sprintf(protname, "IP protocol");
+             unknown = 1;

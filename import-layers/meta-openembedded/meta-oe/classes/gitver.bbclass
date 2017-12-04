@@ -13,37 +13,45 @@ def git_drop_tag_prefix(version):
         return version
 
 GIT_TAGADJUST = "git_drop_tag_prefix(version)"
-GITVER = "${@get_git_pv('${S}', d, tagadjust=lambda version:${GIT_TAGADJUST})}"
-GITSHA = "${@get_git_hash('${S}', d)}"
+GITVER = "${@get_git_pv(d, tagadjust=lambda version:${GIT_TAGADJUST})}"
+GITSHA = "${@get_git_hash(d)}"
 
 def gitrev_run(cmd, path):
     (output, error) = bb.process.run(cmd, cwd=path)
     return output.rstrip()
 
-def get_git_pv(path, d, tagadjust=None):
+def get_git_pv(d, tagadjust=None):
     import os
-    import bb.process
 
-    gitdir = os.path.abspath(os.path.join(d.getVar("S", True), ".git"))
+    srcdir = d.getVar("EXTERNALSRC", True) or d.getVar("S", True)
+    gitdir = os.path.abspath(os.path.join(srcdir, ".git"))
     try:
         ver = gitrev_run("git describe --tags", gitdir)
-    except Exception, exc:
-        bb.fatal(str(exc))
-
-    if not ver:
+    except:
         try:
             ver = gitrev_run("git rev-parse --short HEAD", gitdir)
-        except Exception, exc:
-            bb.fatal(str(exc))
+            if ver:
+                return "0.0+%s" % ver
+            else:
+                return "0.0"
 
-        if ver:
-            return "0.0+%s" % ver
-        else:
-            return "0.0"
-    else:
-        if tagadjust:
-            ver = tagadjust(ver)
-        return ver
+        except Exception as exc:
+            raise bb.parse.SkipPackage(str(exc))
+
+    if ver and tagadjust:
+        ver = tagadjust(ver)
+    return ver
+
+def get_git_hash(d):
+    import os
+
+    srcdir = d.getVar("EXTERNALSRC", True) or d.getVar("S", True)
+    gitdir = os.path.abspath(os.path.join(srcdir, ".git"))
+    try:
+        return gitrev_run("git rev-parse HEAD", gitdir)
+
+    except Exception as exc:
+        bb.fatal(str(exc))
 
 def mark_recipe_dependencies(path, d):
     from bb.parse import mark_dependency
@@ -71,5 +79,6 @@ def mark_recipe_dependencies(path, d):
         mark_dependency(d, tagdir)
 
 python () {
-    mark_recipe_dependencies(d.getVar("S", True), d)
+    srcdir = d.getVar("EXTERNALSRC", True) or d.getVar("S", True)
+    mark_recipe_dependencies(srcdir, d)
 }

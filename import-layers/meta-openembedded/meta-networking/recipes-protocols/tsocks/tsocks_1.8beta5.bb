@@ -23,3 +23,6 @@ S = "${WORKDIR}/tsocks-1.8"
 FILES_${PN} = "${libdir}/* ${bindir}/tsocks"
 FILES_${PN}-dev = ""
 INSANE_SKIP_${PN} = "dev-so"
+
+EXTRA_OEMAKE = "SHCC='${CC} -fPIC ${LDFLAGS}'"
+

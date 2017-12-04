@@ -3,7 +3,7 @@ HOMEPAGE = "http://talloc.samba.org"
 SECTION = "libs"
 LICENSE = "LGPL-3.0+ & GPL-3.0+"
 
-SRC_URI = "http://samba.org/ftp/talloc/talloc-${PV}.tar.gz \
+SRC_URI = "https://samba.org/ftp/talloc/talloc-${PV}.tar.gz \
            file://talloc-Add-configure-options-for-packages.patch \
 "
 LIC_FILES_CHKSUM = "file://talloc.h;beginline=3;endline=27;md5=a301712782cad6dd6d5228bfa7825249 \

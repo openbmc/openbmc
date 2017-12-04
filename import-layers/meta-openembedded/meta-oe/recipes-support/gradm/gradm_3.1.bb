@@ -12,7 +12,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=4641e94ec96f98fabc56ff9cc48be14b"
 DEPENDS = "flex-native bison-native ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
 
 SRC_URI = "http://grsecurity.net/stable/${BP}-201507191652.tar.gz \
-           file://0001-Makefile-remove-strip.patch"
+           file://0001-Makefile-remove-strip.patch \
+           file://0001-Makefile-Append-instead-of-overriding-LDFLAGS.patch \
+           "
 SRC_URI[md5sum] = "ecec72d3a9b6d84c00eda97957b707b6"
 SRC_URI[sha256sum] = "2f14c357bf0459e502a4e108b76c3f6240aa484762d07bb1687796b9b9297a50"
 

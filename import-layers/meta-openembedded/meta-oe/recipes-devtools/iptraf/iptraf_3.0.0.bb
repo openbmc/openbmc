@@ -12,12 +12,15 @@ DEPENDS = "ncurses"
 
 SRC_URI = " \
     ftp://iptraf.seul.org/pub/iptraf/iptraf-3.0.0.tar.gz \
-    file://0001-src-Fix-error-in-cross-compile.patch"
+    file://0001-src-Fix-error-in-cross-compile.patch \
+    file://format_string.patch \
+    file://ldopts.patch \
+"
 SRC_URI[md5sum] = "377371c28ee3c21a76f7024920649ea8"
 SRC_URI[sha256sum] = "9ee433d95573d612539da4b452e6cdcbca6ab6674a88bfbf6eaf12d4902b5163"
 RDEPENDS_${PN} = "ncurses"
 
-EXTRA_OEMAKE = "-e MAKEFLAGS="
+EXTRA_OEMAKE = "-e MAKEFLAGS= LDOPTS='${LDFLAGS}' ARCH='${TARGET_ARCH}'"
 
 do_compile() {
     oe_runmake -C src all
