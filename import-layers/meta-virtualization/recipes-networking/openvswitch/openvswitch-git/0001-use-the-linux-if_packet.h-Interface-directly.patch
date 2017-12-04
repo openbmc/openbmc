@@ -1,0 +1,35 @@
+From 1cec65e45f011c3f52eed5e27d3d816502e36610 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 20 Mar 2017 12:12:51 -0700
+Subject: [PATCH 1/2] use the linux if_packet.h Interface directly
+
+Helps compiling with musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/netdev-linux.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/lib/netdev-linux.c b/lib/netdev-linux.c
+index a5a9ec1ab..9dd40acdd 100644
+--- a/lib/netdev-linux.c
++++ b/lib/netdev-linux.c
+@@ -33,14 +33,13 @@
+ #include <linux/pkt_sched.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/sockios.h>
++#include <linux/if_packet.h>
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ #include <sys/utsname.h>
+-#include <netpacket/packet.h>
+ #include <net/if.h>
+ #include <net/if_arp.h>
+-#include <net/if_packet.h>
+ #include <net/route.h>
+ #include <netinet/in.h>
+ #include <poll.h>
+-- 
+2.12.0
+

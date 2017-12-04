@@ -25,6 +25,8 @@ SRC_URI += "\
 	file://disable_m4_check.patch \
 	file://kernel_module.patch \
 	file://openvswitch-ptest-Fix-python-path.patch \
+	file://0001-use-the-linux-if_packet.h-Interface-directly.patch \
+	file://0002-Define-WAIT_ANY-if-not-provided-by-system.patch \
 	"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=247d8817aece26b21a8cd6791b3ea994"

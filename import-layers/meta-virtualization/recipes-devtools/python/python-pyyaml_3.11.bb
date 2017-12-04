@@ -18,7 +18,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=6015f088759b10e0bc2bf64898d4ae17"
 
 SRCNAME = "PyYAML"
-SRC_URI = "http://pyyaml.org/download/pyyaml/${SRCNAME}-${PV}.tar.gz"
+SRC_URI = "https://pyyaml.org/download/pyyaml/${SRCNAME}-${PV}.tar.gz"
 
 SRC_URI[md5sum] = "f50e08ef0fe55178479d3a618efe21db"
 SRC_URI[sha256sum] = "c36c938a872e5ff494938b33b14aaa156cb439ec67548fcab3535bb78b0846e8"

@@ -58,8 +58,8 @@ RDEPENDS_${PN} = "curl aufs-util git util-linux iptables \
                   ${@bb.utils.contains('DISTRO_FEATURES','systemd','','cgroup-lite',d)} \
                  "
 RDEPENDS_${PN} += "containerd runc"
-RRECOMMENDS_${PN} = "lxc docker-registry rt-tests"
-RRECOMMENDS_${PN} += " kernel-module-dm-thin-pool kernel-module-nf-nat"
+RRECOMMENDS_${PN} = "kernel-module-dm-thin-pool kernel-module-nf-nat"
+RSUGGESTS_${PN} = "lxc docker-registry rt-tests"
 DOCKER_PKG="github.com/docker/docker"
 
 do_configure[noexec] = "1"
@@ -122,7 +122,7 @@ SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','systemd','docke
 
 INITSCRIPT_PACKAGES += "${@bb.utils.contains('DISTRO_FEATURES','sysvinit','${PN}','',d)}"
 INITSCRIPT_NAME_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','sysvinit','docker.init','',d)}"
-INITSCRIPT_PARAMS_${PN} = "${OS_DEFAULT_INITSCRIPT_PARAMS}"
+INITSCRIPT_PARAMS_${PN} = "defaults"
 
 do_install() {
 	mkdir -p ${D}/${bindir}
