@@ -1,0 +1,13 @@
+[Unit]
+Description=Phosphor GPIO %I Presence
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+ConditionPathExists={envfiledir}/obmc/gpio/phosphor-pcie-card-e2b.conf
+
+[Service]
+EnvironmentFile={envfiledir}/obmc/gpio/phosphor-pcie-card-e2b.conf
+ExecStart=/usr/bin/env phosphor-gpio-presence --path=${{DEVPATH}} --inventory=${{INVENTORY}} --key=${{KEY}} --name=${{NAME}}
+SyslogIdentifier=phosphor-gpio-presence
+
+[Install]
+RequiredBy={SYSTEMD_DEFAULT_TARGET}

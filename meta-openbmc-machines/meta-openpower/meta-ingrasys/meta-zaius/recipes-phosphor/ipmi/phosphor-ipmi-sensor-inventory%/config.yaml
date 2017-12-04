@@ -154,3 +154,17 @@
             assert: true
             deassert: false
             type: bool
+0xFC:
+  sensorType: 0xCD
+  path: /system/chassis/pcie_e2b_present
+  sensorReadingType: 0x03
+  serviceInterface: xyz.openbmc_project.Inventory.Manager
+  readingType: assertion
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        Offsets:
+          0x01:
+            assert: true
+            deassert: false
+            type: bool
