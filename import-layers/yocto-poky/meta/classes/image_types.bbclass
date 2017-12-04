@@ -17,17 +17,25 @@ def imagetypes_getdepends(d):
                 d += ":do_populate_sysroot"
             deps.add(d)
 
+    # Take a type in the form of foo.bar.car and split it into the items
+    # needed for the image deps "foo", and the conversion deps ["bar", "car"]
+    def split_types(typestring):
+        types = typestring.split(".")
+        return types[0], types[1:]
+
     fstypes = set((d.getVar('IMAGE_FSTYPES', True) or "").split())
     fstypes |= set((d.getVar('IMAGE_FSTYPES_DEBUGFS', True) or "").split())
 
     deps = set()
     for typestring in fstypes:
-        types = typestring.split(".")
-        basetype, resttypes = types[0], types[1:]
-
+        basetype, resttypes = split_types(typestring)
         adddep(d.getVar('IMAGE_DEPENDS_%s' % basetype, True) , deps)
+
         for typedepends in (d.getVar("IMAGE_TYPEDEP_%s" % basetype, True) or "").split():
-            adddep(d.getVar('IMAGE_DEPENDS_%s' % typedepends, True) , deps)
+            base, rest = split_types(typedepends)
+            adddep(d.getVar('IMAGE_DEPENDS_%s' % base, True) , deps)
+            resttypes += rest
+
         for ctype in resttypes:
             adddep(d.getVar("CONVERSION_DEPENDS_%s" % ctype, True), deps)
             adddep(d.getVar("COMPRESS_DEPENDS_%s" % ctype, True), deps)

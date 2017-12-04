@@ -1,0 +1,38 @@
+From 75c4aec6de3a615909f3283eac585760de101b8c Mon Sep 17 00:00:00 2001
+From: Saul Wold <sgw@linux.intel.com>
+Date: Tue, 7 Mar 2017 10:46:12 -0800
+Subject: [PATCH] buildrun: remove quotes around -I include line
+
+By having the quotes, the kernel Makefile addtree macro adds the
+kernel $srctree directory as a prefix and causes compilation failures.
+Removing the quotes resolves the issue.
+
+This is trimmed from the verbose output of the GCC command line
+Before:
+ -I/srv/sdb/builds/4.9/tmp/work-shared/qemux86-64/kernel-source/"/srv/sdb/releases/jethro/builds/4.1/tmp/sysroots/x86_64-linux/usr/share/systemtap/runtime"
+
+After:
+ -I/srv/sdb/builds/4.9/tmp/sysroots/x86_64-linux/usr/share/systemtap/runtime
+
+Upstream-Status: Pending
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+---
+ buildrun.cxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/buildrun.cxx b/buildrun.cxx
+index aaea64c..8a8ee9f 100644
+--- a/buildrun.cxx
++++ b/buildrun.cxx
+@@ -495,7 +495,7 @@ compile_pass (systemtap_session& s)
+   #if CHECK_POINTER_ARITH_PR5947
+   o << "EXTRA_CFLAGS += -Wpointer-arith" << endl;
+   #endif
+-  o << "EXTRA_CFLAGS += -I\"" << s.runtime_path << "\"" << endl;
++  o << "EXTRA_CFLAGS += -I" << s.runtime_path << endl;
+   // XXX: this may help ppc toc overflow
+   // o << "CFLAGS := $(subst -Os,-O2,$(CFLAGS)) -fminimal-toc" << endl;
+   o << "obj-m := " << s.module_name << ".o" << endl;
+-- 
+2.7.4
+

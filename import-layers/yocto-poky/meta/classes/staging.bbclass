@@ -171,7 +171,6 @@ addtask populate_sysroot after do_install
 
 SYSROOT_PREPROCESS_FUNCS ?= ""
 SYSROOT_DESTDIR = "${WORKDIR}/sysroot-destdir"
-SYSROOT_LOCK = "${STAGING_DIR}/staging.lock"
 
 # We clean out any existing sstate from the sysroot if we rerun configure
 python sysroot_cleansstate () {

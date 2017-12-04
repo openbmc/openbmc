@@ -1673,13 +1673,15 @@ class OpkgPM(OpkgDpkgPM):
                                         self.d.getVar('FEED_DEPLOYDIR_BASE_URI', True),
                                         arch))
 
-                        if self.opkg_dir != '/var/lib/opkg':
+                        if self.d.getVar('OPKGLIBDIR', True) != '/var/lib':
                             # There is no command line option for this anymore, we need to add
                             # info_dir and status_file to config file, if OPKGLIBDIR doesn't have
                             # the default value of "/var/lib" as defined in opkg:
-                            # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_INFO_DIR      "/var/lib/opkg/info"
-                            # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_STATUS_FILE   "/var/lib/opkg/status"
+                            # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_LISTS_DIR     VARDIR "/lib/opkg/lists"
+                            # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_INFO_DIR      VARDIR "/lib/opkg/info"
+                            # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_STATUS_FILE   VARDIR "/lib/opkg/status"
                             cfg_file.write("option info_dir     %s\n" % os.path.join(self.d.getVar('OPKGLIBDIR', True), 'opkg', 'info'))
+                            cfg_file.write("option lists_dir    %s\n" % os.path.join(self.d.getVar('OPKGLIBDIR', True), 'opkg', 'lists'))
                             cfg_file.write("option status_file  %s\n" % os.path.join(self.d.getVar('OPKGLIBDIR', True), 'opkg', 'status'))
 
 
@@ -1698,13 +1700,15 @@ class OpkgPM(OpkgDpkgPM):
                     config_file.write("src oe-%s file:%s\n" %
                                       (arch, pkgs_dir))
 
-            if self.opkg_dir != '/var/lib/opkg':
+            if self.d.getVar('OPKGLIBDIR', True) != '/var/lib':
                 # There is no command line option for this anymore, we need to add
                 # info_dir and status_file to config file, if OPKGLIBDIR doesn't have
                 # the default value of "/var/lib" as defined in opkg:
-                # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_INFO_DIR      "/var/lib/opkg/info"
-                # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_STATUS_FILE   "/var/lib/opkg/status"
+                # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_LISTS_DIR     VARDIR "/lib/opkg/lists"
+                # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_INFO_DIR      VARDIR "/lib/opkg/info"
+                # libopkg/opkg_conf.h:#define OPKG_CONF_DEFAULT_STATUS_FILE   VARDIR "/lib/opkg/status"
                 config_file.write("option info_dir     %s\n" % os.path.join(self.d.getVar('OPKGLIBDIR', True), 'opkg', 'info'))
+                config_file.write("option lists_dir    %s\n" % os.path.join(self.d.getVar('OPKGLIBDIR', True), 'opkg', 'lists'))
                 config_file.write("option status_file  %s\n" % os.path.join(self.d.getVar('OPKGLIBDIR', True), 'opkg', 'status'))
 
     def insert_feeds_uris(self):
@@ -1776,7 +1780,7 @@ class OpkgPM(OpkgDpkgPM):
 
     def remove(self, pkgs, with_dependencies=True):
         if with_dependencies:
-            cmd = "%s %s --force-depends --force-remove --force-removal-of-dependent-packages remove %s" % \
+            cmd = "%s %s --force-remove --force-removal-of-dependent-packages remove %s" % \
                 (self.opkg_cmd, self.opkg_args, ' '.join(pkgs))
         else:
             cmd = "%s %s --force-depends remove %s" % \
@@ -1860,7 +1864,10 @@ class OpkgPM(OpkgDpkgPM):
 
         # Create an temp dir as opkg root for dummy installation
         temp_rootfs = self.d.expand('${T}/opkg')
-        temp_opkg_dir = os.path.join(temp_rootfs, 'var/lib/opkg')
+        opkg_lib_dir = self.d.getVar('OPKGLIBDIR', True)
+        if opkg_lib_dir[0] == "/":
+            opkg_lib_dir = opkg_lib_dir[1:]
+        temp_opkg_dir = os.path.join(temp_rootfs, opkg_lib_dir, 'opkg')
         bb.utils.mkdirhier(temp_opkg_dir)
 
         opkg_args = "-f %s -o %s " % (self.config_file, temp_rootfs)

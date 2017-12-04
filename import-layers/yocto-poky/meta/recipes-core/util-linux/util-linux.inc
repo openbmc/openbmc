@@ -271,9 +271,11 @@ BBCLASSEXTEND = "native nativesdk"
 
 python do_package_prepend () {
     if '--enable-su' in d.getVar('EXTRA_OECONF', True).split():
-        alt_name = "su"
-        d.setVarFlag('ALTERNATIVE_LINK_NAME', alt_name, '%s/%s' % (d.getVar('base_bindir', True), alt_name))
-        d.appendVar('ALTERNATIVE_%s' % (d.getVar('PN', True)), ' ' + alt_name)
+        d.appendVar(d.expand('ALTERNATIVE_${PN}'), ' su')
+        d.appendVar(d.expand('ALTERNATIVE_${PN}-doc'), ' su.1')
+
+        d.setVarFlag('ALTERNATIVE_LINK_NAME', "su", d.expand('${base_bindir}/su'))
+        d.setVarFlag('ALTERNATIVE_LINK_NAME', "su.1", d.expand('${mandir}/man1/su.1'))
 }
 
 python populate_packages_prepend() {

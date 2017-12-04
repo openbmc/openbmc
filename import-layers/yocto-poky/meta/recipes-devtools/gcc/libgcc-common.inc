@@ -144,6 +144,9 @@ BASETARGET_SYS = "${@get_original_os(d)}"
 
 addtask extra_symlinks after do_multilib_install before do_package do_populate_sysroot
 fakeroot python do_extra_symlinks() {
+    if bb.data.inherits_class('nativesdk', d):
+        return
+
     targetsys = d.getVar('BASETARGET_SYS', True)
 
     if targetsys != d.getVar('TARGET_SYS', True):

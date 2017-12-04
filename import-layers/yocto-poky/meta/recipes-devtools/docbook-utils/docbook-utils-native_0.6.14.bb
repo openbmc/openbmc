@@ -10,7 +10,7 @@ DEPENDS = "openjade-native sgmlspl-native docbook-dsssl-stylesheets-native docbo
 PR = "r3"
 
 SRC_URI = "\
-	ftp://sources.redhat.com/pub/docbook-tools/new-trials/SOURCES/docbook-utils-${PV}.tar.gz \
+	http://ftp.osuosl.org/pub/blfs/conglomeration/docbook-utils/docbook-utils-${PV}.tar.gz \
 	file://re.patch \
 "
 

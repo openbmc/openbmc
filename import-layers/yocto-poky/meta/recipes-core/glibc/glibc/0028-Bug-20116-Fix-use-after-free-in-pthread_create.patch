@@ -1,0 +1,668 @@
+From e7ba24f05d86acf7072e066ea6d7b235a106688c Mon Sep 17 00:00:00 2001
+From: Carlos O'Donell <carlos@redhat.com>
+Date: Sat, 28 Jan 2017 19:13:34 -0500
+Subject: [PATCH] Bug 20116: Fix use after free in pthread_create()
+
+The commit documents the ownership rules around 'struct pthread' and
+when a thread can read or write to the descriptor. With those ownership
+rules in place it becomes obvious that pd->stopped_start should not be
+touched in several of the paths during thread startup, particularly so
+for detached threads. In the case of detached threads, between the time
+the thread is created by the OS kernel and the creating thread checks
+pd->stopped_start, the detached thread might have already exited and the
+memory for pd unmapped. As a regression test we add a simple test which
+exercises this exact case by quickly creating detached threads with
+large enough stacks to ensure the thread stack cache is bypassed and the
+stacks are unmapped. Before the fix the testcase segfaults, after the
+fix it works correctly and completes without issue.
+
+For a detailed discussion see:
+https://www.sourceware.org/ml/libc-alpha/2017-01/msg00505.html
+
+(cherry-picked from commit f8bf15febcaf137bbec5a61101e88cd5a9d56ca8)
+
+Upstream-Status: Backport [master]
+Signed-off-by: Yuanjie Huang <yuanjie.huang@windriver.com>
+---
+ ChangeLog                              |  23 ++++
+ nptl/Makefile                          |   3 +-
+ nptl/createthread.c                    |  10 +-
+ nptl/pthread_create.c                  | 207 +++++++++++++++++++++++++++------
+ nptl/pthread_getschedparam.c           |   1 +
+ nptl/pthread_setschedparam.c           |   1 +
+ nptl/pthread_setschedprio.c            |   1 +
+ nptl/tpp.c                             |   2 +
+ nptl/tst-create-detached.c             | 137 ++++++++++++++++++++++
+ sysdeps/nacl/createthread.c            |  10 +-
+ sysdeps/unix/sysv/linux/createthread.c |  16 ++-
+ 11 files changed, 356 insertions(+), 55 deletions(-)
+ create mode 100644 nptl/tst-create-detached.c
+
+diff --git a/ChangeLog b/ChangeLog
+index 84ae7a7af8..0fbda9020e 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,26 @@
++2016-01-28  Carlos O'Donell  <carlos@redhat.com>
++	    Alexey Makhalov <amakhalov@vmware.com>
++	    Florian Weimer <fweimer@redhat.com>
++
++	[BZ #20116]
++	* nptl/pthread_create.c: Document concurrency notes.
++	Enhance thread creation notes.
++	(create_thread): Use bool *stopped_start.
++	(START_THREAD_DEFN): Comment ownership of PD.
++	(__pthread_create_2_1): Add local bool stopped_start and use
++	that instead of pd->stopped_start where appropriate.
++	* nptl/createthread.c (create_thread): Use bool *stopped_start.
++	* sysdeps/nacl/createthread.c (create_thread): Use bool *stopped_start.
++	* sysdeps/unix/sysv/linux/createthread.c (create_thread): Likewise.
++	* nptl/tst-create-detached.c: New file.
++	* nptl/Makefile (tests): Add tst-create-detached.
++	* nptl/pthread_getschedparam.c (__pthread_getschedparam):
++	Reference the enhanced thread creation notes.
++	* nptl/pthread_setschedparam.c (__pthread_setschedparam): Likewise.
++	* nptl/pthread_setschedprio.c (pthread_setschedprio): Likewise.
++	* nptl/tpp.c (__pthread_tpp_change_priority): Likewise.
++	(__pthread_current_priority): Likewise.
++
+ 2016-08-04  Carlos O'Donell  <carlos@redhat.com>
+ 
+ 	* po/de.po: Update from Translation Project.
+diff --git a/nptl/Makefile b/nptl/Makefile
+index 0d8aadebed..7dec4edb53 100644
+--- a/nptl/Makefile
++++ b/nptl/Makefile
+@@ -290,7 +290,8 @@ tests = tst-typesizes \
+ 	tst-initializers1 $(addprefix tst-initializers1-,\
+ 			    c89 gnu89 c99 gnu99 c11 gnu11) \
+ 	tst-bad-schedattr \
+-	tst-thread_local1 tst-mutex-errorcheck tst-robust10
++	tst-thread_local1 tst-mutex-errorcheck tst-robust10 \
++	tst-create-detached \
+ xtests = tst-setuid1 tst-setuid1-static tst-setuid2 \
+ 	tst-mutexpp1 tst-mutexpp6 tst-mutexpp10
+ test-srcs = tst-oddstacklimit
+diff --git a/nptl/createthread.c b/nptl/createthread.c
+index ba2f9c7167..328f85865d 100644
+--- a/nptl/createthread.c
++++ b/nptl/createthread.c
+@@ -25,16 +25,14 @@
+ 
+ static int
+ create_thread (struct pthread *pd, const struct pthread_attr *attr,
+-	       bool stopped_start, STACK_VARIABLES_PARMS, bool *thread_ran)
++	       bool *stopped_start, STACK_VARIABLES_PARMS, bool *thread_ran)
+ {
+   /* If the implementation needs to do some tweaks to the thread after
+      it has been created at the OS level, it can set STOPPED_START here.  */
+ 
+-  pd->stopped_start = stopped_start;
+-  if (__glibc_unlikely (stopped_start))
+-    /* We make sure the thread does not run far by forcing it to get a
+-       lock.  We lock it here too so that the new thread cannot continue
+-       until we tell it to.  */
++  pd->stopped_start = *stopped_start;
++  if (__glibc_unlikely (*stopped_start))
++    /* See CONCURRENCY NOTES in nptl/pthread_create.c.  */
+     lll_lock (pd->lock, LLL_PRIVATE);
+ 
+   return ENOSYS;
+diff --git a/nptl/pthread_create.c b/nptl/pthread_create.c
+index a834063ad5..44b17bec86 100644
+--- a/nptl/pthread_create.c
++++ b/nptl/pthread_create.c
+@@ -54,25 +54,141 @@ unsigned int __nptl_nthreads = 1;
+ /* Code to allocate and deallocate a stack.  */
+ #include "allocatestack.c"
+ 
+-/* createthread.c defines this function, and two macros:
++/* CONCURRENCY NOTES:
++
++   Understanding who is the owner of the 'struct pthread' or 'PD'
++   (refers to the value of the 'struct pthread *pd' function argument)
++   is critically important in determining exactly which operations are
++   allowed and which are not and when, particularly when it comes to the
++   implementation of pthread_create, pthread_join, pthread_detach, and
++   other functions which all operate on PD.
++
++   The owner of PD is responsible for freeing the final resources
++   associated with PD, and may examine the memory underlying PD at any
++   point in time until it frees it back to the OS or to reuse by the
++   runtime.
++
++   The thread which calls pthread_create is called the creating thread.
++   The creating thread begins as the owner of PD.
++
++   During startup the new thread may examine PD in coordination with the
++   owner thread (which may be itself).
++
++   The four cases of ownership transfer are:
++
++   (1) Ownership of PD is released to the process (all threads may use it)
++       after the new thread starts in a joinable state
++       i.e. pthread_create returns a usable pthread_t.
++
++   (2) Ownership of PD is released to the new thread starting in a detached
++       state.
++
++   (3) Ownership of PD is dynamically released to a running thread via
++       pthread_detach.
++
++   (4) Ownership of PD is acquired by the thread which calls pthread_join.
++
++   Implementation notes:
++
++   The PD->stopped_start and thread_ran variables are used to determine
++   exactly which of the four ownership states we are in and therefore
++   what actions can be taken.  For example after (2) we cannot read or
++   write from PD anymore since the thread may no longer exist and the
++   memory may be unmapped.  The most complicated cases happen during
++   thread startup:
++
++   (a) If the created thread is in a detached (PTHREAD_CREATE_DETACHED),
++       or joinable (default PTHREAD_CREATE_JOINABLE) state and
++       STOPPED_START is true, then the creating thread has ownership of
++       PD until the PD->lock is released by pthread_create.  If any
++       errors occur we are in states (c), (d), or (e) below.
++
++   (b) If the created thread is in a detached state
++       (PTHREAD_CREATED_DETACHED), and STOPPED_START is false, then the
++       creating thread has ownership of PD until it invokes the OS
++       kernel's thread creation routine.  If this routine returns
++       without error, then the created thread owns PD; otherwise, see
++       (c) and (e) below.
++
++   (c) If the detached thread setup failed and THREAD_RAN is true, then
++       the creating thread releases ownership to the new thread by
++       sending a cancellation signal.  All threads set THREAD_RAN to
++       true as quickly as possible after returning from the OS kernel's
++       thread creation routine.
++
++   (d) If the joinable thread setup failed and THREAD_RAN is true, then
++       then the creating thread retains ownership of PD and must cleanup
++       state.  Ownership cannot be released to the process via the
++       return of pthread_create since a non-zero result entails PD is
++       undefined and therefore cannot be joined to free the resources.
++       We privately call pthread_join on the thread to finish handling
++       the resource shutdown (Or at least we should, see bug 19511).
++
++   (e) If the thread creation failed and THREAD_RAN is false, then the
++       creating thread retains ownership of PD and must cleanup state.
++       No waiting for the new thread is required because it never
++       started.
++
++   The nptl_db interface:
++
++   The interface with nptl_db requires that we enqueue PD into a linked
++   list and then call a function which the debugger will trap.  The PD
++   will then be dequeued and control returned to the thread.  The caller
++   at the time must have ownership of PD and such ownership remains
++   after control returns to thread. The enqueued PD is removed from the
++   linked list by the nptl_db callback td_thr_event_getmsg.  The debugger
++   must ensure that the thread does not resume execution, otherwise
++   ownership of PD may be lost and examining PD will not be possible.
++
++   Note that the GNU Debugger as of (December 10th 2015) commit
++   c2c2a31fdb228d41ce3db62b268efea04bd39c18 no longer uses
++   td_thr_event_getmsg and several other related nptl_db interfaces. The
++   principal reason for this is that nptl_db does not support non-stop
++   mode where other threads can run concurrently and modify runtime
++   structures currently in use by the debugger and the nptl_db
++   interface.
++
++   Axioms:
++
++   * The create_thread function can never set stopped_start to false.
++   * The created thread can read stopped_start but never write to it.
++   * The variable thread_ran is set some time after the OS thread
++     creation routine returns, how much time after the thread is created
++     is unspecified, but it should be as quickly as possible.
++
++*/
++
++/* CREATE THREAD NOTES:
++
++   createthread.c defines the create_thread function, and two macros:
+    START_THREAD_DEFN and START_THREAD_SELF (see below).
+ 
+-   create_thread is obliged to initialize PD->stopped_start.  It
+-   should be true if the STOPPED_START parameter is true, or if
+-   create_thread needs the new thread to synchronize at startup for
+-   some other implementation reason.  If PD->stopped_start will be
+-   true, then create_thread is obliged to perform the operation
+-   "lll_lock (PD->lock, LLL_PRIVATE)" before starting the thread.
++   create_thread must initialize PD->stopped_start.  It should be true
++   if the STOPPED_START parameter is true, or if create_thread needs the
++   new thread to synchronize at startup for some other implementation
++   reason.  If STOPPED_START will be true, then create_thread is obliged
++   to lock PD->lock before starting the thread.  Then pthread_create
++   unlocks PD->lock which synchronizes-with START_THREAD_DEFN in the
++   child thread which does an acquire/release of PD->lock as the last
++   action before calling the user entry point.  The goal of all of this
++   is to ensure that the required initial thread attributes are applied
++   (by the creating thread) before the new thread runs user code.  Note
++   that the the functions pthread_getschedparam, pthread_setschedparam,
++   pthread_setschedprio, __pthread_tpp_change_priority, and
++   __pthread_current_priority reuse the same lock, PD->lock, for a
++   similar purpose e.g. synchronizing the setting of similar thread
++   attributes.  These functions are never called before the thread is
++   created, so don't participate in startup syncronization, but given
++   that the lock is present already and in the unlocked state, reusing
++   it saves space.
+ 
+    The return value is zero for success or an errno code for failure.
+    If the return value is ENOMEM, that will be translated to EAGAIN,
+    so create_thread need not do that.  On failure, *THREAD_RAN should
+    be set to true iff the thread actually started up and then got
+-   cancelled before calling user code (*PD->start_routine), in which
+-   case it is responsible for doing its own cleanup.  */
+-
++   canceled before calling user code (*PD->start_routine).  */
+ static int create_thread (struct pthread *pd, const struct pthread_attr *attr,
+-			  bool stopped_start, STACK_VARIABLES_PARMS,
++			  bool *stopped_start, STACK_VARIABLES_PARMS,
+ 			  bool *thread_ran);
+ 
+ #include <createthread.c>
+@@ -314,12 +430,19 @@ START_THREAD_DEFN
+       /* Store the new cleanup handler info.  */
+       THREAD_SETMEM (pd, cleanup_jmp_buf, &unwind_buf);
+ 
++      /* We are either in (a) or (b), and in either case we either own
++         PD already (2) or are about to own PD (1), and so our only
++	 restriction would be that we can't free PD until we know we
++	 have ownership (see CONCURRENCY NOTES above).  */
+       if (__glibc_unlikely (pd->stopped_start))
+ 	{
+ 	  int oldtype = CANCEL_ASYNC ();
+ 
+ 	  /* Get the lock the parent locked to force synchronization.  */
+ 	  lll_lock (pd->lock, LLL_PRIVATE);
++
++	  /* We have ownership of PD now.  */
++
+ 	  /* And give it up right away.  */
+ 	  lll_unlock (pd->lock, LLL_PRIVATE);
+ 
+@@ -378,7 +501,8 @@ START_THREAD_DEFN
+ 							   pd, pd->nextevent));
+ 	    }
+ 
+-	  /* Now call the function to signal the event.  */
++	  /* Now call the function which signals the event.  See
++	     CONCURRENCY NOTES for the nptl_db interface comments.  */
+ 	  __nptl_death_event ();
+ 	}
+     }
+@@ -642,19 +766,28 @@ __pthread_create_2_1 (pthread_t *newthread, const pthread_attr_t *attr,
+      that cares whether the thread count is correct.  */
+   atomic_increment (&__nptl_nthreads);
+ 
+-  bool thread_ran = false;
++  /* Our local value of stopped_start and thread_ran can be accessed at
++     any time. The PD->stopped_start may only be accessed if we have
++     ownership of PD (see CONCURRENCY NOTES above).  */
++  bool stopped_start = false; bool thread_ran = false;
+ 
+   /* Start the thread.  */
+   if (__glibc_unlikely (report_thread_creation (pd)))
+     {
+-      /* Create the thread.  We always create the thread stopped
+-	 so that it does not get far before we tell the debugger.  */
+-      retval = create_thread (pd, iattr, true, STACK_VARIABLES_ARGS,
+-			      &thread_ran);
++      stopped_start = true;
++
++      /* We always create the thread stopped at startup so we can
++	 notify the debugger.  */
++      retval = create_thread (pd, iattr, &stopped_start,
++			      STACK_VARIABLES_ARGS, &thread_ran);
+       if (retval == 0)
+ 	{
+-	  /* create_thread should have set this so that the logic below can
+-	     test it.  */
++	  /* We retain ownership of PD until (a) (see CONCURRENCY NOTES
++	     above).  */
++
++	  /* Assert stopped_start is true in both our local copy and the
++	     PD copy.  */
++	  assert (stopped_start);
+ 	  assert (pd->stopped_start);
+ 
+ 	  /* Now fill in the information about the new thread in
+@@ -671,26 +804,30 @@ __pthread_create_2_1 (pthread_t *newthread, const pthread_attr_t *attr,
+ 						       pd, pd->nextevent)
+ 		 != 0);
+ 
+-	  /* Now call the function which signals the event.  */
++	  /* Now call the function which signals the event.  See
++	     CONCURRENCY NOTES for the nptl_db interface comments.  */
+ 	  __nptl_create_event ();
+ 	}
+     }
+   else
+-    retval = create_thread (pd, iattr, false, STACK_VARIABLES_ARGS,
+-			    &thread_ran);
++    retval = create_thread (pd, iattr, &stopped_start,
++			    STACK_VARIABLES_ARGS, &thread_ran);
+ 
+   if (__glibc_unlikely (retval != 0))
+     {
+-      /* If thread creation "failed", that might mean that the thread got
+-	 created and ran a little--short of running user code--but then
+-	 create_thread cancelled it.  In that case, the thread will do all
+-	 its own cleanup just like a normal thread exit after a successful
+-	 creation would do.  */
+-
+       if (thread_ran)
+-	assert (pd->stopped_start);
++	/* State (c) or (d) and we may not have PD ownership (see
++	   CONCURRENCY NOTES above).  We can assert that STOPPED_START
++	   must have been true because thread creation didn't fail, but
++	   thread attribute setting did.  */
++	/* See bug 19511 which explains why doing nothing here is a
++	   resource leak for a joinable thread.  */
++	assert (stopped_start);
+       else
+ 	{
++	  /* State (e) and we have ownership of PD (see CONCURRENCY
++	     NOTES above).  */
++
+ 	  /* Oops, we lied for a second.  */
+ 	  atomic_decrement (&__nptl_nthreads);
+ 
+@@ -710,10 +847,14 @@ __pthread_create_2_1 (pthread_t *newthread, const pthread_attr_t *attr,
+     }
+   else
+     {
+-      if (pd->stopped_start)
+-	/* The thread blocked on this lock either because we're doing TD_CREATE
+-	   event reporting, or for some other reason that create_thread chose.
+-	   Now let it run free.  */
++      /* We don't know if we have PD ownership.  Once we check the local
++         stopped_start we'll know if we're in state (a) or (b) (see
++	 CONCURRENCY NOTES above).  */
++      if (stopped_start)
++	/* State (a), we own PD. The thread blocked on this lock either
++	   because we're doing TD_CREATE event reporting, or for some
++	   other reason that create_thread chose.  Now let it run
++	   free.  */
+ 	lll_unlock (pd->lock, LLL_PRIVATE);
+ 
+       /* We now have for sure more than one thread.  The main thread might
+diff --git a/nptl/pthread_getschedparam.c b/nptl/pthread_getschedparam.c
+index b887881baf..de71171a08 100644
+--- a/nptl/pthread_getschedparam.c
++++ b/nptl/pthread_getschedparam.c
+@@ -35,6 +35,7 @@ __pthread_getschedparam (pthread_t threadid, int *policy,
+ 
+   int result = 0;
+ 
++  /* See CREATE THREAD NOTES in nptl/pthread_create.c.  */
+   lll_lock (pd->lock, LLL_PRIVATE);
+ 
+   /* The library is responsible for maintaining the values at all
+diff --git a/nptl/pthread_setschedparam.c b/nptl/pthread_setschedparam.c
+index dfb52b9dbf..dcb520f1c8 100644
+--- a/nptl/pthread_setschedparam.c
++++ b/nptl/pthread_setschedparam.c
+@@ -36,6 +36,7 @@ __pthread_setschedparam (pthread_t threadid, int policy,
+ 
+   int result = 0;
+ 
++  /* See CREATE THREAD NOTES in nptl/pthread_create.c.  */
+   lll_lock (pd->lock, LLL_PRIVATE);
+ 
+   struct sched_param p;
+diff --git a/nptl/pthread_setschedprio.c b/nptl/pthread_setschedprio.c
+index cefc6481d6..8134b50560 100644
+--- a/nptl/pthread_setschedprio.c
++++ b/nptl/pthread_setschedprio.c
+@@ -38,6 +38,7 @@ pthread_setschedprio (pthread_t threadid, int prio)
+   struct sched_param param;
+   param.sched_priority = prio;
+ 
++  /* See CREATE THREAD NOTES in nptl/pthread_create.c.  */
+   lll_lock (pd->lock, LLL_PRIVATE);
+ 
+   /* If the thread should have higher priority because of some
+diff --git a/nptl/tpp.c b/nptl/tpp.c
+index e175bf4d53..223bd6bbee 100644
+--- a/nptl/tpp.c
++++ b/nptl/tpp.c
+@@ -114,6 +114,7 @@ __pthread_tpp_change_priority (int previous_prio, int new_prio)
+   if (priomax == newpriomax)
+     return 0;
+ 
++  /* See CREATE THREAD NOTES in nptl/pthread_create.c.  */
+   lll_lock (self->lock, LLL_PRIVATE);
+ 
+   tpp->priomax = newpriomax;
+@@ -165,6 +166,7 @@ __pthread_current_priority (void)
+ 
+   int result = 0;
+ 
++  /* See CREATE THREAD NOTES in nptl/pthread_create.c.  */
+   lll_lock (self->lock, LLL_PRIVATE);
+ 
+   if ((self->flags & ATTR_FLAG_SCHED_SET) == 0)
+diff --git a/nptl/tst-create-detached.c b/nptl/tst-create-detached.c
+new file mode 100644
+index 0000000000..ea93e441c7
+--- /dev/null
++++ b/nptl/tst-create-detached.c
+@@ -0,0 +1,137 @@
++/* Bug 20116: Test rapid creation of detached threads.
++   Copyright (C) 2017 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; see the file COPYING.LIB.  If
++   not, see <http://www.gnu.org/licenses/>.  */
++
++/* The goal of the test is to trigger a failure if the parent touches
++   any part of the thread descriptor after the detached thread has
++   exited.  We test this by creating many detached threads with large
++   stacks.  The stacks quickly fill the the stack cache and subsequent
++   threads will start to cause the thread stacks to be immediately
++   unmapped to satisfy the stack cache max.  With the stacks being
++   unmapped the parent's read of any part of the thread descriptor will
++   trigger a segfault.  That segfault is what we are trying to cause,
++   since any segfault is a defect in the implementation.  */
++
++#include <pthread.h>
++#include <stdio.h>
++#include <errno.h>
++#include <unistd.h>
++#include <stdbool.h>
++#include <sys/resource.h>
++#include <support/xthread.h>
++
++/* Number of threads to create.  */
++enum { threads_to_create = 100000 };
++
++/* Number of threads which should spawn other threads.  */
++enum { creator_threads  = 2 };
++
++/* Counter of threads created so far.  This is incremented by all the
++   running creator threads.  */
++static unsigned threads_created;
++
++/* Thread callback which does nothing, so that the thread exits
++   immediatedly.  */
++static void *
++do_nothing (void *arg)
++{
++  return NULL;
++}
++
++/* Attribute indicating that the thread should be created in a detached
++   fashion.  */
++static pthread_attr_t detached;
++
++/* Barrier to synchronize initialization.  */
++static pthread_barrier_t barrier;
++
++static void *
++creator_thread (void *arg)
++{
++  int ret;
++  xpthread_barrier_wait (&barrier);
++
++  while (true)
++    {
++      pthread_t thr;
++      /* Thread creation will fail if the kernel does not free old
++	 threads quickly enough, so we do not report errors.  */
++      ret = pthread_create (&thr, &detached, do_nothing, NULL);
++      if (ret == 0 && __atomic_add_fetch (&threads_created, 1, __ATOMIC_SEQ_CST)
++          >= threads_to_create)
++        break;
++    }
++
++  return NULL;
++}
++
++static int
++do_test (void)
++{
++  /* Limit the size of the process, so that memory allocation will
++     fail without impacting the entire system.  */
++  {
++    struct rlimit limit;
++    if (getrlimit (RLIMIT_AS, &limit) != 0)
++      {
++        printf ("FAIL: getrlimit (RLIMIT_AS) failed: %m\n");
++        return 1;
++      }
++    /* This limit, 800MB, is just a heuristic. Any value can be
++       picked.  */
++    long target = 800 * 1024 * 1024;
++    if (limit.rlim_cur == RLIM_INFINITY || limit.rlim_cur > target)
++      {
++        limit.rlim_cur = target;
++        if (setrlimit (RLIMIT_AS, &limit) != 0)
++          {
++            printf ("FAIL: setrlimit (RLIMIT_AS) failed: %m\n");
++            return 1;
++          }
++      }
++  }
++
++  xpthread_attr_init (&detached);
++
++  xpthread_attr_setdetachstate (&detached, PTHREAD_CREATE_DETACHED);
++
++  /* A large thread stack seems beneficial for reproducing a race
++     condition in detached thread creation.  The goal is to reach the
++     limit of the runtime thread stack cache such that the detached
++     thread's stack is unmapped after exit and causes a segfault when
++     the parent reads the thread descriptor data stored on the the
++     unmapped stack.  */
++  xpthread_attr_setstacksize (&detached, 16 * 1024 * 1024);
++
++  xpthread_barrier_init (&barrier, NULL, creator_threads);
++
++  pthread_t threads[creator_threads];
++
++  for (int i = 0; i < creator_threads; ++i)
++    threads[i] = xpthread_create (NULL, creator_thread, NULL);
++
++  for (int i = 0; i < creator_threads; ++i)
++    xpthread_join (threads[i]);
++
++  xpthread_attr_destroy (&detached);
++
++  xpthread_barrier_destroy (&barrier);
++
++  return 0;
++}
++
++#include <support/test-driver.c>
+diff --git a/sysdeps/nacl/createthread.c b/sysdeps/nacl/createthread.c
+index 7b571c34e2..5465558cc1 100644
+--- a/sysdeps/nacl/createthread.c
++++ b/sysdeps/nacl/createthread.c
+@@ -32,15 +32,13 @@ static void start_thread (void) __attribute__ ((noreturn));
+ 
+ static int
+ create_thread (struct pthread *pd, const struct pthread_attr *attr,
+-	       bool stopped_start, STACK_VARIABLES_PARMS, bool *thread_ran)
++	       bool *stopped_start, STACK_VARIABLES_PARMS, bool *thread_ran)
+ {
+   pd->tid = __nacl_get_tid (pd);
+ 
+-  pd->stopped_start = stopped_start;
+-  if (__glibc_unlikely (stopped_start))
+-    /* We make sure the thread does not run far by forcing it to get a
+-       lock.  We lock it here too so that the new thread cannot continue
+-       until we tell it to.  */
++  pd->stopped_start = *stopped_start;
++  if (__glibc_unlikely (*stopped_start))
++    /* See CONCURRENCY NOTES in nptl/pthread_create.c.  */
+     lll_lock (pd->lock, LLL_PRIVATE);
+ 
+   TLS_DEFINE_INIT_TP (tp, pd);
+diff --git a/sysdeps/unix/sysv/linux/createthread.c b/sysdeps/unix/sysv/linux/createthread.c
+index 6d32cece48..66ddae61d4 100644
+--- a/sysdeps/unix/sysv/linux/createthread.c
++++ b/sysdeps/unix/sysv/linux/createthread.c
+@@ -46,7 +46,7 @@ static int start_thread (void *arg) __attribute__ ((noreturn));
+ 
+ static int
+ create_thread (struct pthread *pd, const struct pthread_attr *attr,
+-	       bool stopped_start, STACK_VARIABLES_PARMS, bool *thread_ran)
++	       bool *stopped_start, STACK_VARIABLES_PARMS, bool *thread_ran)
+ {
+   /* Determine whether the newly created threads has to be started
+      stopped since we have to set the scheduling parameters or set the
+@@ -54,13 +54,11 @@ create_thread (struct pthread *pd, const struct pthread_attr *attr,
+   if (attr != NULL
+       && (__glibc_unlikely (attr->cpuset != NULL)
+ 	  || __glibc_unlikely ((attr->flags & ATTR_FLAG_NOTINHERITSCHED) != 0)))
+-    stopped_start = true;
++    *stopped_start = true;
+ 
+-  pd->stopped_start = stopped_start;
+-  if (__glibc_unlikely (stopped_start))
+-    /* We make sure the thread does not run far by forcing it to get a
+-       lock.  We lock it here too so that the new thread cannot continue
+-       until we tell it to.  */
++  pd->stopped_start = *stopped_start;
++  if (__glibc_unlikely (*stopped_start))
++    /* See CONCURRENCY NOTES in nptl/pthread_creat.c.  */
+     lll_lock (pd->lock, LLL_PRIVATE);
+ 
+   /* We rely heavily on various flags the CLONE function understands:
+@@ -117,7 +115,7 @@ create_thread (struct pthread *pd, const struct pthread_attr *attr,
+       /* Set the affinity mask if necessary.  */
+       if (attr->cpuset != NULL)
+ 	{
+-	  assert (stopped_start);
++	  assert (*stopped_start);
+ 
+ 	  res = INTERNAL_SYSCALL (sched_setaffinity, err, 3, pd->tid,
+ 				  attr->cpusetsize, attr->cpuset);
+@@ -140,7 +138,7 @@ create_thread (struct pthread *pd, const struct pthread_attr *attr,
+       /* Set the scheduling parameters.  */
+       if ((attr->flags & ATTR_FLAG_NOTINHERITSCHED) != 0)
+ 	{
+-	  assert (stopped_start);
++	  assert (*stopped_start);
+ 
+ 	  res = INTERNAL_SYSCALL (sched_setscheduler, err, 3, pd->tid,
+ 				  pd->schedpolicy, &pd->schedparam);
+-- 
+2.11.0
+

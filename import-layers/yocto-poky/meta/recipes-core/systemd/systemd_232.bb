@@ -24,7 +24,7 @@ SRC_URI += " \
            file://0009-util-bypass-unimplemented-_SC_PHYS_PAGES-system-conf.patch \
            file://0010-implment-systemd-sysv-install-for-OE.patch \
            file://0011-nss-mymachines-Build-conditionally-when-HAVE_MYHOSTN.patch \
-           file://0012-rules-whitelist-hd-devices.patch \   
+           file://0012-rules-whitelist-hd-devices.patch \
            file://0013-Make-root-s-home-directory-configurable.patch \
            file://0014-Revert-rules-remove-firmware-loading-rules.patch \
            file://0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch \

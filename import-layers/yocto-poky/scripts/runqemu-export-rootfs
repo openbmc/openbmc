@@ -78,23 +78,17 @@ if [ ! -d "$PSEUDO_LOCALSTATEDIR" ]; then
 fi
 
 # rpc.mountd RPC port
-NFS_MOUNTPROG=$[ 21111 + $NFS_INSTANCE ]
+MOUNTD_RPCPORT=${MOUNTD_RPCPORT:=$[ 21111 + $NFS_INSTANCE ]}
 # rpc.nfsd RPC port
-NFS_NFSPROG=$[ 11111 + $NFS_INSTANCE ]
-# NFS port number
-NFS_PORT=$[ 3049 + 2 * $NFS_INSTANCE ]
+NFSD_RPCPORT=${NFSD_RPCPORT:=$[ 11111 + $NFS_INSTANCE ]}
+# NFS server port number
+NFSD_PORT=${NFSD_PORT:=$[ 3049 + 2 * $NFS_INSTANCE ]}
 # mountd port number
-MOUNT_PORT=$[ 3048 + 2 * $NFS_INSTANCE ]
+MOUNTD_PORT=${MOUNTD_PORT:=$[ 3048 + 2 * $NFS_INSTANCE ]}
 
 ## For debugging you would additionally add
 ## --debug all
-UNFSD_OPTS="-p -N -i $NFSPID -e $EXPORTS -x $NFS_NFSPROG -n $NFS_PORT -y $NFS_MOUNTPROG -m $MOUNT_PORT"
-
-# Setup the exports file
-if [ "$1" = "start" ]; then
-	echo "Creating exports file..."
-	echo "$NFS_EXPORT_DIR (rw,async,no_root_squash,no_all_squash,insecure)" > $EXPORTS
-fi
+UNFSD_OPTS="-p -N -i $NFSPID -e $EXPORTS -x $NFSD_RPCPORT -n $NFSD_PORT -y $MOUNTD_RPCPORT -m $MOUNTD_PORT"
 
 # See how we were called.
 case "$1" in
@@ -113,6 +107,9 @@ case "$1" in
 
 		exit 1
 	fi
+
+	echo "Creating exports file..."
+	echo "$NFS_EXPORT_DIR (rw,no_root_squash,no_all_squash,insecure)" > $EXPORTS
 
 	echo "Starting User Mode nfsd"
 	echo "  $PSEUDO $PSEUDO_OPTS $OECORE_NATIVE_SYSROOT/usr/bin/unfsd $UNFSD_OPTS"

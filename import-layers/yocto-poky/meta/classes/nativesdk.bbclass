@@ -97,3 +97,5 @@ do_populate_sysroot[stamp-extra-info] = ""
 do_packagedata[stamp-extra-info] = ""
 
 USE_NLS = "${SDKUSE_NLS}"
+
+OLDEST_KERNEL = "${SDK_OLDEST_KERNEL}"

@@ -17,6 +17,9 @@ REQUIRED_DISTRO_FEATURES = "systemd"
 
 VOLATILE_BINDS ?= "\
     /var/volatile/lib /var/lib\n\
+    /var/volatile/cache /var/cache\n\
+    /var/volatile/spool /var/spool\n\
+    /var/volatile/srv /srv\n\
 "
 VOLATILE_BINDS[type] = "list"
 VOLATILE_BINDS[separator] = "\n"
@@ -67,5 +70,11 @@ do_install () {
     for service in ${SYSTEMD_SERVICE_volatile-binds}; do
         install -m 0644 $service ${D}${systemd_unitdir}/system/
     done
+
+    # Suppress attempts to process some tmpfiles that are not temporary.
+    #
+    install -d ${D}${sysconfdir}/tmpfiles.d ${D}/var/cache
+    ln -s /dev/null ${D}${sysconfdir}/tmpfiles.d/etc.conf
+    ln -s /dev/null ${D}${sysconfdir}/tmpfiles.d/home.conf
 }
 do_install[dirs] = "${WORKDIR}"

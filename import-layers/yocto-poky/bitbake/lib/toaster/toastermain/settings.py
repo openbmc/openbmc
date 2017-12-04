@@ -60,9 +60,19 @@ DATABASES = {
 if 'sqlite' in DATABASES['default']['ENGINE']:
     DATABASES['default']['OPTIONS'] = { 'timeout': 20 }
 
-# Hosts/domain names that are valid for this site; required if DEBUG is False
-# See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+# Update as of django 1.8.16 release, the '*' is needed to allow us to connect while running
+# on hosts without explicitly setting the fqdn for the toaster server.
+# See https://docs.djangoproject.com/en/dev/ref/settings/ for info on ALLOWED_HOSTS
+# Previously this setting was not enforced if DEBUG was set but it is now.
+# The previous behavior was such that ALLOWED_HOSTS defaulted to ['localhost','127.0.0.1','::1']
+# and if you bound to 0.0.0.0:<port #> then accessing toaster as localhost or fqdn would both work.
+# To have that same behavior, with a fqdn explicitly enabled you would set
+# ALLOWED_HOSTS= ['localhost','127.0.0.1','::1','myserver.mycompany.com'] for
+# Django >= 1.8.16. By default, we are not enforcing this restriction in
+# DEBUG mode.
+if DEBUG is True:
+    # this will allow connection via localhost,hostname, or fqdn
+    ALLOWED_HOSTS = ['*']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

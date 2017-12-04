@@ -149,12 +149,18 @@ do_kernel_metadata() {
 	elements="`echo -n ${bsp_definition} ${sccs} ${patches} ${KERNEL_FEATURES}`"
 	if [ -n "${elements}" ]; then
 		scc --force -o ${S}/${meta_dir}:cfg,meta ${includes} ${bsp_definition} ${sccs} ${patches} ${KERNEL_FEATURES}
+		if [ $? -ne 0 ]; then
+			bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+		fi
 	fi
 
 	# run2: only generate patches for elements that have been passed on the SRC_URI
 	elements="`echo -n ${sccs} ${patches} ${KERNEL_FEATURES}`"
 	if [ -n "${elements}" ]; then
 		scc --force -o ${S}/${meta_dir}:patch --cmds patch ${includes} ${sccs} ${patches} ${KERNEL_FEATURES}
+		if [ $? -ne 0 ]; then
+			bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+		fi
 	fi
 }
 

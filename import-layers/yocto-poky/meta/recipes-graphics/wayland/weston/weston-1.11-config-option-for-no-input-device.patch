@@ -1,0 +1,123 @@
+From bbf2e6ebbd9c051775f43e1e3c3a2f41322342e8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20D=C3=ADaz?= <daniel.diaz@linaro.org>
+Date: Fri, 21 Oct 2016 14:03:13 -0500
+Subject: [PATCH] Add configuration option for no input device.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+[Backported from master, 75b7197.]
+
+As it has been discussed in the past [1], running Weston
+without any input device at launch might be beneficial for
+some use cases.
+
+Certainly, it's best for the vast majority of users (and
+the project) to require an input device to be present, as
+to avoid frustration and hassle, but for those brave souls
+that so prefer, this patch lets them run without any input
+device at all.
+
+This introduces a simple configuration in weston.ini:
+  [core]
+  require-input=true
+
+True is the default, so no behavioral change is introduced.
+
+[1] https://lists.freedesktop.org/archives/wayland-devel/2015-November/025193.html
+
+Signed-off-by: Daniel Díaz <daniel.diaz@linaro.org>
+---
+ man/weston.ini.man  | 5 +++++
+ src/compositor.h    | 4 ++++
+ src/libinput-seat.c | 6 ++++++
+ src/main.c          | 5 +++++
+ weston.ini.in       | 1 +
+ 5 files changed, 21 insertions(+)
+
+diff --git a/man/weston.ini.man b/man/weston.ini.man
+index d7c4a6f..c7d0f01 100644
+--- a/man/weston.ini.man
++++ b/man/weston.ini.man
+@@ -169,6 +169,11 @@ time, the one specified in the command-line will be used. On the other
+ hand, if none of these sets the value, default idle timeout will be
+ set to 300 seconds.
+ .RS
++.PP
++.RE
++.TP 7
++.BI "require-input=" true
++require an input device for launch
+ 
+ .SH "LIBINPUT SECTION"
+ The
+diff --git a/src/compositor.h b/src/compositor.h
+index 0bbf458..476b650 100644
+--- a/src/compositor.h
++++ b/src/compositor.h
+@@ -803,6 +803,10 @@ struct weston_compositor {
+ 
+ 	void *user_data;
+ 	void (*exit)(struct weston_compositor *c);
++
++	/* Whether to let the compositor run without any input device. */
++	bool require_input;
++
+ };
+ 
+ struct weston_buffer {
+diff --git a/src/libinput-seat.c b/src/libinput-seat.c
+index 8ce0ee0..e1fdcf0 100644
+--- a/src/libinput-seat.c
++++ b/src/libinput-seat.c
+@@ -255,6 +255,12 @@ udev_input_enable(struct udev_input *input)
+ 			devices_found = 1;
+ 	}
+ 
++	if (devices_found == 0 && !c->require_input) {
++		weston_log("warning: no input devices found, but none required "
++			   "as per configuration.\n");
++		return 0;
++	}
++
+ 	if (devices_found == 0) {
+ 		weston_log(
+ 			"warning: no input devices on entering Weston. "
+diff --git a/src/main.c b/src/main.c
+index 3279ac6..09905ea 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -1298,6 +1298,7 @@ int main(int argc, char *argv[])
+ 	struct wl_client *primary_client;
+ 	struct wl_listener primary_client_destroyed;
+ 	struct weston_seat *seat;
++	int require_input;
+ 
+ 	const struct weston_option core_options[] = {
+ 		{ WESTON_OPTION_STRING, "backend", 'B', &backend },
+@@ -1373,6 +1374,10 @@ int main(int argc, char *argv[])
+ 	if (weston_compositor_init_config(ec, config) < 0)
+ 		goto out;
+ 
++	weston_config_section_get_bool(section, "require-input",
++				       &require_input, true);
++	ec->require_input = require_input;
++
+ 	if (load_backend(ec, backend, &argc, argv, config) < 0) {
+ 		weston_log("fatal: failed to create compositor backend\n");
+ 		goto out;
+diff --git a/weston.ini.in b/weston.ini.in
+index 14a4c0c..d837fb5 100644
+--- a/weston.ini.in
++++ b/weston.ini.in
+@@ -2,6 +2,7 @@
+ #modules=xwayland.so,cms-colord.so
+ #shell=desktop-shell.so
+ #gbm-format=xrgb2101010
++#require-input=true
+ 
+ [shell]
+ background-image=/usr/share/backgrounds/gnome/Aqua.jpg
+-- 
+1.9.1
+

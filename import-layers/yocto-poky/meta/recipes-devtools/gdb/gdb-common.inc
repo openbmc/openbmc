@@ -1,6 +1,5 @@
 SUMMARY = "GNU debugger"
 HOMEPAGE = "http://www.gnu.org/software/gdb/"
-LICENSE = "GPLv3+"
 SECTION = "devel"
 DEPENDS = "expat zlib ncurses virtual/libiconv ${LTTNGUST}"
 
@@ -16,32 +15,9 @@ LTTNGUST_mips64eln32 = ""
 LTTNGUST_sh4 = ""
 LTTNGUST_libc-musl = ""
 
-LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
-		file://COPYING.LIB;md5=9f604d8a4f8e74f4f5140845a21b6674 \
-		file://COPYING3;md5=d32239bcb673463ab874e80d47fae504 \
-		file://COPYING3.LIB;md5=6a6a8e020838b23406c81b19c1d46df6"
-
 inherit autotools texinfo
 
-SRCREV = "1a982b689ce4e20523bdf69e47fdd574c4f63934"
-
-SRC_URI = "git://sourceware.org/git/binutils-gdb.git;branch=gdb-7.11-branch \
-           file://0001-include-sys-types.h-for-mode_t.patch \
-           file://0002-make-man-install-relative-to-DESTDIR.patch \
-           file://0003-mips-linux-nat-Define-_ABIO32-if-not-defined.patch \
-           file://0004-ppc-ptrace-Define-pt_regs-uapi_pt_regs-on-GLIBC-syst.patch \
-           file://0005-Add-support-for-Renesas-SH-sh4-architecture.patch \
-           file://0006-Dont-disable-libreadline.a-when-using-disable-static.patch \
-           file://0007-use-asm-sgidefs.h.patch \
-           file://0008-Use-exorted-definitions-of-SIGRTMIN.patch \
-           file://0009-Change-order-of-CFLAGS.patch \
-           file://0010-resolve-restrict-keyword-conflict.patch \
-           file://0011-avx_mpx.patch \
-"
-
 UPSTREAM_CHECK_GITTAGREGEX = "gdb\-(?P<pver>.+)\-release"
-
-S = "${WORKDIR}/git"
 
 B = "${WORKDIR}/build-${TARGET_SYS}"
 

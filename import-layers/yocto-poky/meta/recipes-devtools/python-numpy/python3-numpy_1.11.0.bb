@@ -9,6 +9,7 @@ SRC_URI = "https://files.pythonhosted.org/packages/source/n/${SRCNAME}/${SRCNAME
            file://0001-Don-t-search-usr-and-so-on-for-libraries-by-default-.patch \
            file://remove-build-path-in-comments.patch \
            file://fix_shebang_f2py.patch \
+           file://d70d37b7c4aa2af3fe879a0d858c54f2aa32a725.patch \
            ${CONFIGFILESURI} "
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/numpy/files/"
 

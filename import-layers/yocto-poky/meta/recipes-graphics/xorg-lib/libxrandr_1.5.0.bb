@@ -19,5 +19,8 @@ XORG_PN = "libXrandr"
 
 BBCLASSEXTEND = "native nativesdk"
 
+SRC_URI += "file://CVE-2016-7947_CVE-2016-7948.patch \
+	"
+
 SRC_URI[md5sum] = "309762867e41c6fd813da880d8a1bc93"
 SRC_URI[sha256sum] = "6f864959b7fc35db11754b270d71106ef5b5cf363426aa58589cb8ac8266de58"

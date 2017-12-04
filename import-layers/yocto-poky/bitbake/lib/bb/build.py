@@ -92,6 +92,7 @@ class TaskBase(event.Event):
     def __init__(self, t, logfile, d):
         self._task = t
         self._package = d.getVar("PF", True)
+        self._mc = d.getVar("BB_CURRENT_MC", True)
         self.taskfile = d.getVar("FILE", True)
         self.taskname = self._task
         self.logfile = logfile
@@ -723,7 +724,7 @@ def make_stamp(task, d, file_name = None):
     for mask in cleanmask:
         for name in glob.glob(mask):
             # Preserve sigdata files in the stamps directory
-            if "sigdata" in name:
+            if "sigdata" in name or "sigbasedata" in name:
                 continue
             # Preserve taint files in the stamps directory
             if name.endswith('.taint'):

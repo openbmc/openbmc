@@ -8,8 +8,7 @@ DEPENDS = "libtool bzip2 zlib virtual/libintl"
 
 PR = "r11"
 
-SRC_URI = "https://fedorahosted.org/releases/e/l/${BPN}/${BP}.tar.bz2"
-
+SRC_URI = "ftp://sourceware.org/pub/elfutils/${PV}/${BP}.tar.bz2"
 SRC_URI[md5sum] = "a0bed1130135f17ad27533b0034dba8d"
 SRC_URI[sha256sum] = "8aebfa4a745db21cf5429c9541fe482729b62efc7e53e9110151b4169fe887da"
 

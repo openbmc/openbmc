@@ -1,0 +1,47 @@
+From 154b2c19f392817a936aea0190e276f8228cb489 Mon Sep 17 00:00:00 2001
+From: "Erik M. Bray" <erik.bray@lri.fr>
+Date: Mon, 12 Dec 2016 13:07:16 +0100
+Subject: [PATCH] BUG: xlocale.h is not available in newlib--all the defines
+ used here from xlocale.h are instead found in locale.h
+
+Added a feature check for xlocale.h, with fallback to locale.h if it is
+missing.
+---
+ numpy/core/setup_common.py          | 1 +
+ numpy/core/src/multiarray/numpyos.c | 8 +++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+Upstream-Status: Backport
+RP 2017/9/6
+
+diff --git a/numpy/core/setup_common.py b/numpy/core/setup_common.py
+index ba7521e3043..a1729e65656 100644
+--- a/numpy/core/setup_common.py
++++ b/numpy/core/setup_common.py
+@@ -113,6 +113,7 @@ def check_api_version(apiversion, codegen_dir):
+                 "xmmintrin.h",  # SSE
+                 "emmintrin.h",  # SSE2
+                 "features.h",  # for glibc version linux
++                "xlocale.h"  # see GH#8367
+ ]
+ 
+ # optional gcc compiler builtins and their call arguments and optional a
+diff --git a/numpy/core/src/multiarray/numpyos.c b/numpy/core/src/multiarray/numpyos.c
+index 450ec40b6e0..84617ea78c3 100644
+--- a/numpy/core/src/multiarray/numpyos.c
++++ b/numpy/core/src/multiarray/numpyos.c
+@@ -15,7 +15,13 @@
+ 
+ #ifdef HAVE_STRTOLD_L
+ #include <stdlib.h>
+-#include <xlocale.h>
++#ifdef HAVE_XLOCALE_H
++    /*
++     * the defines from xlocale.h are included in locale.h on some sytems;
++     * see gh-8367
++     */
++    #include <xlocale.h>
++#endif
+ #endif
+ 
+ 

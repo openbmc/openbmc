@@ -5,6 +5,7 @@ require openssl.inc
 DEPENDS += "cryptodev-linux"
 
 CFLAG += "-DHAVE_CRYPTODEV -DUSE_CRYPTODEV_DIGESTS"
+CFLAG_append_class-native = " -fPIC"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=27ffa5d74bb5a337056c14b2ef93fbf6"
 
@@ -40,6 +41,9 @@ SRC_URI += "file://find.pl;subdir=${BP}/util/ \
             file://configure-musl-target.patch \
             file://parallel.patch \
             file://openssl-util-perlpath.pl-cwd.patch \
+            file://CVE-2016-7055.patch \
+            file://0001-CVE-2017-3731.patch \
+            file://0002-CVE-2017-3731.patch \
            "
 SRC_URI[md5sum] = "96322138f0b69e61b7212bc53d5e912b"
 SRC_URI[sha256sum] = "e7aff292be21c259c6af26469c7a9b3ba26e9abaaffd325e3dccc9785256c431"

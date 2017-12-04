@@ -1,0 +1,22 @@
+The existing sed expression can match expressions like 
+--sysroot=/some/path/xxx-linux/ which clearly isn't intended and 
+injects incorrect paths into LDFLAGS.
+
+Fix this in the same way we address the problem in CFLAGS.
+
+RP 2016/12/7
+Upstream-Status: Pending
+
+Index: subversion-1.9.4/build/ac-macros/serf.m4
+===================================================================
+--- subversion-1.9.4.orig/build/ac-macros/serf.m4
++++ subversion-1.9.4/build/ac-macros/serf.m4
+@@ -171,7 +171,7 @@ AC_DEFUN(SVN_SERF_PKG_CONFIG,
+           SVN_SERF_INCLUDES=[`$PKG_CONFIG $serf_pc_arg --cflags | $SED -e 's/ -D[^ ]*//g' -e 's/^-D[^ ]*//g'`]
+           SVN_SERF_LIBS=`$PKG_CONFIG $serf_pc_arg --libs-only-l` 
+           dnl don't use --libs-only-L because then we might miss some options
+-          LDFLAGS=["$LDFLAGS `$PKG_CONFIG $serf_pc_arg --libs | $SED -e 's/-l[^ ]*//g'`"]
++          LDFLAGS=["$LDFLAGS `$PKG_CONFIG $serf_pc_arg --libs | $SED -e 's/ -l[^ ]*//g' -e 's/^-l[^ ]*//g'`"]
+           break
+         else
+           AC_MSG_RESULT([no])

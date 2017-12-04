@@ -302,7 +302,8 @@
                 <itemizedlist>
                     <listitem><para><emphasis>Ubuntu and Debian</emphasis>
                         <literallayout class='monospaced'>
-     $ sudo apt-get install &UBUNTU_HOST_PACKAGES_ESSENTIAL; libsdl1.2-dev xterm
+     $ sudo apt-get install &UBUNTU_HOST_PACKAGES_ESSENTIAL; \
+     libsdl1.2-dev xterm
                         </literallayout>
                         </para></listitem>
                     <listitem><para><emphasis>Fedora</emphasis>
@@ -312,12 +313,14 @@
                         </para></listitem>
                     <listitem><para><emphasis>OpenSUSE</emphasis>
                         <literallayout class='monospaced'>
-     $ sudo zypper install &OPENSUSE_HOST_PACKAGES_ESSENTIAL; libSDL-devel xterm
+     $ sudo zypper install &OPENSUSE_HOST_PACKAGES_ESSENTIAL; \
+     libSDL-devel xterm
                         </literallayout>
                         </para></listitem>
                     <listitem><para><emphasis>CentOS</emphasis>
                         <literallayout class='monospaced'>
-     $ sudo yum install &CENTOS_HOST_PACKAGES_ESSENTIAL; SDL-devel xterm
+     $ sudo yum install &CENTOS_HOST_PACKAGES_ESSENTIAL; \
+     SDL-devel xterm
                         </literallayout>
                         <note>
                             CentOS 6.x users need to ensure that the required
@@ -727,7 +730,7 @@
                         Once the build completes, the resulting console-only image
                         is located in the Build Directory here:
                         <literallayout class='monospaced'>
-     tmp/deploy/images/intel-corei7-64/core-image-base-intel-corei7-64.hddimg
+     tmp/deploy/images/intel-corei7-64/core-image-base-intel-corei7-64.wic
                         </literallayout>
                         </para></listitem>
                     <listitem><para><emphasis>Write the Image:</emphasis>
@@ -735,14 +738,14 @@
                         (e.g. a USB key, SATA drive, SD card, etc.) using the
                         <filename>dd</filename> utility:
                         <literallayout class='monospaced'>
-     $ sudo dd if=tmp/deploy/images/intel-corei7-64/core-image-minimal-intel-corei7-64.wic of=TARGET_DEVICE
+     $ sudo dd if=tmp/deploy/images/intel-corei7-64/core-image-base-intel-corei7-64.wic of=TARGET_DEVICE
                         </literallayout>
                         In the previous command, the
                         <filename>TARGET_DEVICE</filename> is the device node in
                         the host machine (e.g. <filename>/dev/sdc</filename>, which
                         is most likely a USB stick, or
                         <filename>/dev/mmcblk0</filename>, which is most likely an
-                        SD card.
+                        SD card).
                         </para></listitem>
                     <listitem><para><emphasis>Boot the Hardware:</emphasis>
                         With the boot device provisioned, you can insert the

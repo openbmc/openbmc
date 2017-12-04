@@ -258,11 +258,13 @@ def exported_keys(d):
                                       not d.getVarFlag(key, 'unexport', False))
 
 def exported_vars(d):
-    for key in exported_keys(d):
+    k = list(exported_keys(d))
+    for key in k:
         try:
             value = d.getVar(key, True)
-        except Exception:
-            pass
+        except Exception as err:
+            bb.warn("%s: Unable to export ${%s}: %s" % (d.getVar("FILE", True), key, err))
+            continue
 
         if value is not None:
             yield key, str(value)

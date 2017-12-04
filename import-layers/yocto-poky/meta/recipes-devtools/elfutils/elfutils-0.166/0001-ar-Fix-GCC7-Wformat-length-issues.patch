@@ -1,0 +1,125 @@
+From f090883ca61f0bf0f979c5b26d4e1a69e805156e Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mjw@redhat.com>
+Date: Thu, 10 Nov 2016 18:45:02 +0100
+Subject: [PATCH] ar: Fix GCC7 -Wformat-length issues.
+
+GCC7 adds warnings for snprintf formatting into too small buffers.
+Fix the two issues pointed out by the new warning. The ar header
+fields are fixed length containing left-justified strings without
+zero terminator. snprintf always adds a '\0' char at the end (which
+we then don't copy into the ar header field) and numbers are decimal
+strings of fixed 10 chars  (-Wformat-length thinks formatting
+them as size_t might overflow the buffer on 64bit arches).
+
+Signed-off-by: Mark Wielaard <mjw@redhat.com>
+
+Upstream-Status: Backport
+Upstream-Commit: d5afff85e22b38949f3e7936231c67de16e180e8
+---
+ src/ar.c    | 15 +++++++++++----
+ src/arlib.c | 16 ++++++++++------
+ 2 files changed, 21 insertions(+), 10 deletions(-)
+
+diff --git a/src/ar.c b/src/ar.c
+index 1320d07b..f2160d35 100644
+--- a/src/ar.c
++++ b/src/ar.c
+@@ -1,5 +1,5 @@
+ /* Create, modify, and extract from archives.
+-   Copyright (C) 2005-2012 Red Hat, Inc.
++   Copyright (C) 2005-2012, 2016 Red Hat, Inc.
+    This file is part of elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
+ 
+@@ -853,7 +853,10 @@ write_member (struct armem *memb, off_t *startp, off_t *lenp, Elf *elf,
+ 	      off_t end_off, int newfd)
+ {
+   struct ar_hdr arhdr;
+-  char tmpbuf[sizeof (arhdr.ar_name) + 1];
++  /* The ar_name is not actually zero teminated, but we need that for
++     snprintf.  Also if the name is too long, then the string starts
++     with '/' plus an index off number (decimal).  */
++  char tmpbuf[sizeof (arhdr.ar_name) + 2];
+ 
+   bool changed_header = memb->long_name_off != -1;
+   if (changed_header)
+@@ -1455,7 +1458,11 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
+ 
+ 	      /* Create the header.  */
+ 	      struct ar_hdr arhdr;
+-	      char tmpbuf[sizeof (arhdr.ar_name) + 1];
++	      /* The ar_name is not actually zero teminated, but we
++		 need that for snprintf.  Also if the name is too
++		 long, then the string starts with '/' plus an index
++		 off number (decimal).  */
++	      char tmpbuf[sizeof (arhdr.ar_name) + 2];
+ 	      if (all->long_name_off == -1)
+ 		{
+ 		  size_t namelen = strlen (all->name);
+@@ -1465,7 +1472,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
+ 		}
+ 	      else
+ 		{
+-		  snprintf (tmpbuf, sizeof (arhdr.ar_name) + 1, "/%-*ld",
++		  snprintf (tmpbuf, sizeof (tmpbuf), "/%-*ld",
+ 			    (int) sizeof (arhdr.ar_name), all->long_name_off);
+ 		  memcpy (arhdr.ar_name, tmpbuf, sizeof (arhdr.ar_name));
+ 		}
+diff --git a/src/arlib.c b/src/arlib.c
+index 43a9145b..0c2e4cde 100644
+--- a/src/arlib.c
++++ b/src/arlib.c
+@@ -1,5 +1,5 @@
+ /* Functions to handle creation of Linux archives.
+-   Copyright (C) 2007-2012 Red Hat, Inc.
++   Copyright (C) 2007-2012, 2016 Red Hat, Inc.
+    This file is part of elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2007.
+ 
+@@ -23,6 +23,7 @@
+ #include <assert.h>
+ #include <error.h>
+ #include <gelf.h>
++#include <inttypes.h>
+ #include <libintl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -107,6 +108,9 @@ arlib_init (void)
+ void
+ arlib_finalize (void)
+ {
++  /* Note that the size is stored as decimal string in 10 chars,
++     without zero terminator (we add + 1 here only so snprintf can
++     put it at the end, we then don't use it when we memcpy it).  */
+   char tmpbuf[sizeof (((struct ar_hdr *) NULL)->ar_size) + 1];
+ 
+   symtab.longnameslen = obstack_object_size (&symtab.longnamesob);
+@@ -121,9 +125,9 @@ arlib_finalize (void)
+ 
+       symtab.longnames = obstack_finish (&symtab.longnamesob);
+ 
+-      int s = snprintf (tmpbuf, sizeof (tmpbuf), "%-*zu",
++      int s = snprintf (tmpbuf, sizeof (tmpbuf), "%-*" PRIu32 "",
+ 			(int) sizeof (((struct ar_hdr *) NULL)->ar_size),
+-			symtab.longnameslen - sizeof (struct ar_hdr));
++			(uint32_t) (symtab.longnameslen - sizeof (struct ar_hdr)));
+       memcpy (&((struct ar_hdr *) symtab.longnames)->ar_size, tmpbuf, s);
+     }
+ 
+@@ -169,10 +173,10 @@ arlib_finalize (void)
+ 
+   /* See comment for ar_date above.  */
+   memcpy (&((struct ar_hdr *) symtab.symsoff)->ar_size, tmpbuf,
+-	  snprintf (tmpbuf, sizeof (tmpbuf), "%-*zu",
++	  snprintf (tmpbuf, sizeof (tmpbuf), "%-*" PRIu32 "",
+ 		    (int) sizeof (((struct ar_hdr *) NULL)->ar_size),
+-		    symtab.symsofflen + symtab.symsnamelen
+-		    - sizeof (struct ar_hdr)));
++		    (uint32_t) (symtab.symsofflen + symtab.symsnamelen
++				- sizeof (struct ar_hdr))));
+ }
+ 
+ 
+-- 
+2.13.0
+

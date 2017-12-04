@@ -512,7 +512,7 @@ class PythonRecipeHandler(RecipeHandler):
         except (OSError, subprocess.CalledProcessError):
             pass
         else:
-            for line in dep_output.decode('utf-8').splitlines():
+            for line in dep_output.splitlines():
                 line = line.rstrip()
                 dep, filename = line.split('\t', 1)
                 if filename.endswith('/setup.py'):
@@ -591,7 +591,7 @@ class PythonRecipeHandler(RecipeHandler):
         if 'stderr' not in popenargs:
             popenargs['stderr'] = subprocess.STDOUT
         try:
-            return subprocess.check_output(cmd, **popenargs)
+            return subprocess.check_output(cmd, **popenargs).decode('utf-8')
         except OSError as exc:
             logger.error('Unable to run `{}`: {}', ' '.join(cmd), exc)
             raise

@@ -37,6 +37,14 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0024-eglibc-Forward-port-cross-locale-generation-support.patch \
            file://0025-Define-DUMMY_LOCALE_T-if-not-defined.patch \
            file://0026-build_local_scope.patch \
+           file://0028-Bug-20116-Fix-use-after-free-in-pthread_create.patch \
+           file://CVE-2016-6323.patch \
+           file://0001-Add-atomic_exchange_relaxed.patch \
+           file://0002-Add-atomic-operations-required-by-the-new-condition-.patch \
+           file://0003-Add-pretty-printers-for-the-NPTL-lock-types.patch \
+           file://0004-New-condvar-implementation-that-provides-stronger-or.patch \
+           file://0005-Remove-__ASSUME_REQUEUE_PI.patch \
+           file://0006-Fix-atomic_fetch_xor_release.patch \
 "
 
 SRC_URI += "\

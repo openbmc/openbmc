@@ -1,0 +1,149 @@
+From 27b7131d3d8133bf3a5ce72d4e4ff4dfadd71f20 Mon Sep 17 00:00:00 2001
+From: Catalin Enache <catalin.enache@windriver.com>
+Date: Fri, 30 Jun 2017 12:08:29 +0300
+Subject: [PATCH 5/6] Remove __ASSUME_REQUEUE_PI
+
+The new cond var implementation (ed19993b5b0d) removed all the
+__ASSUME_{REQUEUE_PI,FUTEX_LOCK_PI} internal usage so there is no
+need to keep defining it.  This patch removes all USE_REQUEUE_PI
+and __ASSUME_REQUEUE_PI.  It is as follow up from BZ#18463.
+
+Checked with a build for x86_64-linux-gnu, arm-linux-gnueabhf,
+m68-linux-gnu, mips64-linux-gnu, and sparc64-linux-gnu.
+
+    * nptl/pthreadP.h (USE_REQUEUE_PI): Remove ununsed macro.
+    * sysdeps/unix/sysv/linux/arm/kernel-features.h
+    (__ASSUME_REQUEUE_PI): Likewise.
+    * sysdeps/unix/sysv/linux/kernel-features.h
+    (__ASSUME_REQUEUE_PI): Likewise.
+    * sysdeps/unix/sysv/linux/m68k/kernel-features.h
+    (__ASSUME_REQUEUE_PI): Likewise.
+    * sysdeps/unix/sysv/linux/mips/kernel-features.h
+    (__ASSUME_REQUEUE_PI): Likewise.
+    * sysdeps/unix/sysv/linux/sparc/kernel-features.h
+    (__ASSUME_REQUEUE_PI): Likewise.
+
+Upstream-Status: Backport
+
+Author: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Signed-off-by: Catalin Enache <catalin.enache@windriver.com>
+---
+ ChangeLog                                       | 14 ++++++++++++++
+ nptl/pthreadP.h                                 | 12 ------------
+ sysdeps/unix/sysv/linux/arm/kernel-features.h   |  1 -
+ sysdeps/unix/sysv/linux/kernel-features.h       |  5 -----
+ sysdeps/unix/sysv/linux/m68k/kernel-features.h  |  1 -
+ sysdeps/unix/sysv/linux/mips/kernel-features.h  |  1 -
+ sysdeps/unix/sysv/linux/sparc/kernel-features.h |  1 -
+ 7 files changed, 14 insertions(+), 21 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index c94db7b..44c518b 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,17 @@
++2017-04-04  Adhemerval Zanella  <adhemerval.zanella@linaro.org>
++
++	* nptl/pthreadP.h (USE_REQUEUE_PI): Remove ununsed macro.
++	* sysdeps/unix/sysv/linux/arm/kernel-features.h
++	(__ASSUME_REQUEUE_PI): Likewise.
++	* sysdeps/unix/sysv/linux/kernel-features.h
++	(__ASSUME_REQUEUE_PI): Likewise.
++	* sysdeps/unix/sysv/linux/m68k/kernel-features.h
++	(__ASSUME_REQUEUE_PI): Likewise.
++	* sysdeps/unix/sysv/linux/mips/kernel-features.h
++	(__ASSUME_REQUEUE_PI): Likewise.
++	* sysdeps/unix/sysv/linux/sparc/kernel-features.h
++	(__ASSUME_REQUEUE_PI): Likewise.
++
+ 2016-12-31  Torvald Riegel  <triegel@redhat.com>
+ 
+ 	[BZ #13165]
+diff --git a/nptl/pthreadP.h b/nptl/pthreadP.h
+index e9992bc..730c4ad 100644
+--- a/nptl/pthreadP.h
++++ b/nptl/pthreadP.h
+@@ -594,18 +594,6 @@ extern void __wait_lookup_done (void) attribute_hidden;
+ # define PTHREAD_STATIC_FN_REQUIRE(name) __asm (".globl " #name);
+ #endif
+ 
+-/* Test if the mutex is suitable for the FUTEX_WAIT_REQUEUE_PI operation.  */
+-#if (defined lll_futex_wait_requeue_pi \
+-     && defined __ASSUME_REQUEUE_PI)
+-# define USE_REQUEUE_PI(mut) \
+-   ((mut) && (mut) != (void *) ~0l \
+-    && (((mut)->__data.__kind \
+-	 & (PTHREAD_MUTEX_PRIO_INHERIT_NP | PTHREAD_MUTEX_ROBUST_NORMAL_NP)) \
+-	== PTHREAD_MUTEX_PRIO_INHERIT_NP))
+-#else
+-# define USE_REQUEUE_PI(mut) 0
+-#endif
+-
+ /* Returns 0 if POL is a valid scheduling policy.  */
+ static inline int
+ check_sched_policy_attr (int pol)
+diff --git a/sysdeps/unix/sysv/linux/arm/kernel-features.h b/sysdeps/unix/sysv/linux/arm/kernel-features.h
+index 6ca607e..339ad45 100644
+--- a/sysdeps/unix/sysv/linux/arm/kernel-features.h
++++ b/sysdeps/unix/sysv/linux/arm/kernel-features.h
+@@ -23,7 +23,6 @@
+    futex_atomic_cmpxchg_inatomic, depending on kernel
+    configuration.  */
+ #if __LINUX_KERNEL_VERSION < 0x030E03
+-# undef __ASSUME_REQUEUE_PI
+ # undef __ASSUME_SET_ROBUST_LIST
+ #endif
+ 
+diff --git a/sysdeps/unix/sysv/linux/kernel-features.h b/sysdeps/unix/sysv/linux/kernel-features.h
+index 1d3b554..9f2cf9f 100644
+--- a/sysdeps/unix/sysv/linux/kernel-features.h
++++ b/sysdeps/unix/sysv/linux/kernel-features.h
+@@ -101,11 +101,6 @@
+ #define __ASSUME_PREADV	1
+ #define __ASSUME_PWRITEV	1
+ 
+-/* Support for FUTEX_*_REQUEUE_PI was added in 2.6.31 (but some
+-   architectures lack futex_atomic_cmpxchg_inatomic in some
+-   configurations).  */
+-#define __ASSUME_REQUEUE_PI	1
+-
+ /* Support for recvmmsg functionality was added in 2.6.33.  The macros
+    defined correspond to those for accept4.  */
+ #if __LINUX_KERNEL_VERSION >= 0x020621
+diff --git a/sysdeps/unix/sysv/linux/m68k/kernel-features.h b/sysdeps/unix/sysv/linux/m68k/kernel-features.h
+index 46ec601..174c1c6 100644
+--- a/sysdeps/unix/sysv/linux/m68k/kernel-features.h
++++ b/sysdeps/unix/sysv/linux/m68k/kernel-features.h
+@@ -51,6 +51,5 @@
+ 
+ /* No support for PI futexes or robust mutexes before 3.10 for m68k.  */
+ #if __LINUX_KERNEL_VERSION < 0x030a00
+-# undef __ASSUME_REQUEUE_PI
+ # undef __ASSUME_SET_ROBUST_LIST
+ #endif
+diff --git a/sysdeps/unix/sysv/linux/mips/kernel-features.h b/sysdeps/unix/sysv/linux/mips/kernel-features.h
+index b486d90..a795911c 100644
+--- a/sysdeps/unix/sysv/linux/mips/kernel-features.h
++++ b/sysdeps/unix/sysv/linux/mips/kernel-features.h
+@@ -24,7 +24,6 @@
+ /* The MIPS kernel does not support futex_atomic_cmpxchg_inatomic if
+    emulating LL/SC.  */
+ #if __mips == 1 || defined _MIPS_ARCH_R5900
+-# undef __ASSUME_REQUEUE_PI
+ # undef __ASSUME_SET_ROBUST_LIST
+ #endif
+ 
+diff --git a/sysdeps/unix/sysv/linux/sparc/kernel-features.h b/sysdeps/unix/sysv/linux/sparc/kernel-features.h
+index 69c9c7c..dd3ddf0 100644
+--- a/sysdeps/unix/sysv/linux/sparc/kernel-features.h
++++ b/sysdeps/unix/sysv/linux/sparc/kernel-features.h
+@@ -34,6 +34,5 @@
+ /* 32-bit SPARC kernels do not support
+    futex_atomic_cmpxchg_inatomic.  */
+ #if !defined __arch64__ && !defined __sparc_v9__
+-# undef __ASSUME_REQUEUE_PI
+ # undef __ASSUME_SET_ROBUST_LIST
+ #endif
+-- 
+2.10.2
+

@@ -457,7 +457,7 @@ python () {
         rm_tmp_images = set()
         def gen_conversion_cmds(bt):
             for ctype in sorted(ctypes):
-                if bt[bt.find('.') + 1:] == ctype:
+                if bt.endswith("." + ctype):
                     type = bt[0:-len(ctype) - 1]
                     if type.startswith("debugfs_"):
                         type = type[8:]
@@ -487,7 +487,7 @@ python () {
         # Clean up after applying all conversion commands. Some of them might
         # use the same input, therefore we cannot delete sooner without applying
         # some complex dependency analysis.
-        for image in rm_tmp_images:
+        for image in sorted(rm_tmp_images):
             cmds.append("\trm " + image)
 
         after = 'do_image'

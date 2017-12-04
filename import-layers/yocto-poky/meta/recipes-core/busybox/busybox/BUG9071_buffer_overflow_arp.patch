@@ -1,0 +1,53 @@
+busybox1.24.1: Fix busybox - (local) cmdline stack buffer overwrite 
+
+[No upstream tracking] -- https://bugs.busybox.net/show_bug.cgi?id=9071
+
+busybox - (local) cmdline stack buffer overwrite 
+
+Busybox provides an `arp` applet which is missing an array bounds check for 
+command-line parameter `IFNAME`. It is therefore vulnerable to a command-line 
+based local stack buffer overwrite effectively allowing local users to write 
+past a 16 bytes fixed stack buffer. This leads to two scenarios, one (A) where 
+an IOCTL for GET_HW_ADDRESS (`SIOCGIFHWADDR`) fails and results in a corrupted 
+`va_list` being passed to `*printf()` and one (B) where an attacker might provide 
+valid params for the IOCTL and trick the program to proceed and result in a 
+`RET eip overwrite` eventually gaining code execution.
+
+Upstream-Status: Backport [https://git.busybox.net/busybox/commit/networking/arp.c?id=88e2b1cb626761b1924305b761a5dfc723613c4e]
+BUG: BUG9071
+Signed-off-by: Martin Balik <martin.balik@siemens.com>
+Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
+
+--
+
+diff --git a/networking/arp.c b/networking/arp.c
+index 0099aa5..87eb327 100644
+--- a/networking/arp.c
++++ b/networking/arp.c
+@@ -176,7 +176,7 @@ static int arp_del(char **args)
+ 	if (flags == 0)
+ 		flags = 3;
+ 
+-	strncpy(req.arp_dev, device, sizeof(req.arp_dev));
++	strncpy_IFNAMSIZ(req.arp_dev, device);
+ 
+ 	err = -1;
+ 
+@@ -217,7 +217,7 @@ static void arp_getdevhw(char *ifname, struct sockaddr *sa)
+ 	struct ifreq ifr;
+ 	const struct hwtype *xhw;
+ 
+-	strcpy(ifr.ifr_name, ifname);
++	strncpy_IFNAMSIZ(ifr.ifr_name, ifname);
+ 	ioctl_or_perror_and_die(sockfd, SIOCGIFHWADDR, &ifr,
+ 					"can't get HW-Address for '%s'", ifname);
+ 	if (hw_set && (ifr.ifr_hwaddr.sa_family != hw->type)) {
+@@ -330,7 +330,7 @@ static int arp_set(char **args)
+ 	/* Fill in the remainder of the request. */
+ 	req.arp_flags = flags;
+ 
+-	strncpy(req.arp_dev, device, sizeof(req.arp_dev));
++	strncpy_IFNAMSIZ(req.arp_dev, device);
+ 
+ 	/* Call the kernel. */
+ 	if (option_mask32 & ARP_OPT_v)

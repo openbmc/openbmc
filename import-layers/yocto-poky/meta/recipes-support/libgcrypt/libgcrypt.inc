@@ -20,6 +20,8 @@ SRC_URI = "${GNUPG_MIRROR}/libgcrypt/libgcrypt-${PV}.tar.gz \
            file://libgcrypt-fix-building-error-with-O2-in-sysroot-path.patch \
            file://fix-ICE-failure-on-mips-with-option-O-and-g.patch \
            file://fix-undefined-reference-to-pthread.patch \
+           file://0001-ecc-Store-EdDSA-session-key-in-secure-memory.patch \
+           file://CVE-2017-7526.patch \
 "
 
 BINCONFIG = "${bindir}/libgcrypt-config"

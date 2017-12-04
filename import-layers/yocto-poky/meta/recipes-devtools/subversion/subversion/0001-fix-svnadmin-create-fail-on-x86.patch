@@ -1,0 +1,56 @@
+From 09475e0befca8d120c957177ce8568fa2209a1a9 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Wed, 2 Nov 2016 11:09:44 +0800
+Subject: [PATCH] fix "svnadmin create" fail on x86
+
+When run the following command on x86:
+
+        svnadmin create /var/test_repo
+
+It cause segmentation fault error like the following:
+
+        [16499.751837] svnadmin[21117]: segfault at 83 ip 00000000f74bf7f6 sp 00000000ffdd9b34 error 4 in libc-2.24.so[f7441000+1af000]
+        Segmentation fault (core dumped)
+
+This is because in source code ./subversion/libsvn_fs_fs/low_level.c,
+function svn_fs_fs__unparse_footer, when:
+
+        target arch:    x86
+        apr_off_t:      4 bytes
+
+if the "APR_OFF_T_FMT" is "lld", it still use type "apr_off_t" to pass
+data to apr, but in apr source code file apr_snprintf.c the function
+apr_vformatter meet "lld", it would use the:
+
+        i_quad = va_arg(ap, apr_int64_t);
+
+It uses the apr_int64_t to deal data, it read 8 bytes, so the follow-up
+data may be error.
+
+Upstream-Status: Pending
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ subversion/libsvn_fs_fs/low_level.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/subversion/libsvn_fs_fs/low_level.c b/subversion/libsvn_fs_fs/low_level.c
+index a27bbcc..6ddbe28 100644
+--- a/subversion/libsvn_fs_fs/low_level.c
++++ b/subversion/libsvn_fs_fs/low_level.c
+@@ -250,10 +250,10 @@ svn_fs_fs__unparse_footer(apr_off_t l2p_offset,
+ {
+   return svn_stringbuf_createf(result_pool,
+                                "%" APR_OFF_T_FMT " %s %" APR_OFF_T_FMT " %s",
+-                               l2p_offset,
++                               (APR_OFF_T_FMT=="lld") ? (apr_int64_t)l2p_offset : l2p_offset,
+                                svn_checksum_to_cstring(l2p_checksum,
+                                                        scratch_pool),
+-                               p2l_offset,
++                               (APR_OFF_T_FMT=="lld") ? (apr_int64_t)p2l_offset : p2l_offset,
+                                svn_checksum_to_cstring(p2l_checksum,
+                                                        scratch_pool));
+ }
+-- 
+2.7.4
+

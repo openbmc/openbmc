@@ -43,12 +43,12 @@ python __anonymous () {
     typeformake = re.sub(r'\.gz', '', types)
     d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake)
 
-    for type in typeformake.split():
+    for type in types.split():
         typelower = type.lower()
 
         d.appendVar('PACKAGES', ' ' + 'kernel-image-' + typelower)
 
-        d.setVar('FILES_kernel-image-' + typelower, '/boot/' + type + '*')
+        d.setVar('FILES_kernel-image-' + typelower, '/boot/' + type + '-${KERNEL_VERSION_NAME}')
 
         d.appendVar('RDEPENDS_kernel-image', ' ' + 'kernel-image-' + typelower)
 
@@ -165,7 +165,7 @@ copy_initramfs() {
 	mkdir -p ${B}/usr
 	# Find and use the first initramfs image archive type we find
 	rm -f ${B}/usr/${INITRAMFS_IMAGE}-${MACHINE}.cpio
-	for img in cpio.gz cpio.lz4 cpio.lzo cpio.lzma cpio.xz; do
+	for img in cpio cpio.gz cpio.lz4 cpio.lzo cpio.lzma cpio.xz; do
 		if [ -e "${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.$img" ]; then
 			cp ${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.$img ${B}/usr/.
 			case $img in
@@ -235,12 +235,6 @@ do_bundle_initramfs () {
 				mv -f ${KERNEL_OUTPUT_DIR}/$type.bak ${KERNEL_OUTPUT_DIR}/$type
 			fi
 		done
-		# Update install area
-		for type in ${KERNEL_IMAGETYPES} ; do
-			echo "There is kernel image bundled with initramfs: ${B}/${KERNEL_OUTPUT_DIR}/$type.initramfs"
-			install -m 0644 ${B}/${KERNEL_OUTPUT_DIR}/$type.initramfs ${D}/boot/$type-initramfs-${MACHINE}.bin
-			echo "${B}/${KERNEL_OUTPUT_DIR}/$type.initramfs"
-		done
 	fi
 }
 do_bundle_initramfs[dirs] = "${B}"
@@ -270,6 +264,7 @@ kernel_do_compile() {
 		oe_runmake ${typeformake} CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 		for type in ${KERNEL_IMAGETYPES} ; do
 			if test "${typeformake}.gz" = "${type}"; then
+				mkdir -p "${KERNEL_OUTPUT_DIR}"
 				gzip -9c < "${typeformake}" > "${KERNEL_OUTPUT_DIR}/${type}"
 				break;
 			fi
@@ -486,7 +481,7 @@ FILES_${PN} = ""
 FILES_kernel-base = "/lib/modules/${KERNEL_VERSION}/modules.order /lib/modules/${KERNEL_VERSION}/modules.builtin"
 FILES_kernel-image = ""
 FILES_kernel-dev = "/boot/System.map* /boot/Module.symvers* /boot/config* ${KERNEL_SRC_PATH} /lib/modules/${KERNEL_VERSION}/build"
-FILES_kernel-vmlinux = "/boot/vmlinux*"
+FILES_kernel-vmlinux = "/boot/vmlinux-${KERNEL_VERSION_NAME}"
 FILES_kernel-modules = ""
 RDEPENDS_kernel = "kernel-base"
 # Allow machines to override this dependency if kernel image files are
@@ -611,8 +606,6 @@ kernel_do_deploy() {
 		ln -sf ${base_name}.bin ${DEPLOYDIR}/${symlink_name}.bin
 		ln -sf ${base_name}.bin ${DEPLOYDIR}/${type}
 	done
-
-	cp ${COREBASE}/meta/files/deploydir_readme.txt ${DEPLOYDIR}/README_-_DO_NOT_DELETE_FILES_IN_THIS_DIRECTORY.txt
 
 	cd ${B}
 	# Update deploy directory

@@ -1,0 +1,25 @@
+From ab29615ed6c2e779b472903564dc683dc1015de7 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 22 Feb 2017 13:37:33 +0200
+Subject: [PATCH] Do not let configure write a python location into the dtrace
+ binary
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ dtrace.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dtrace.in b/dtrace.in
+index 5e1cf8079..a24229cbc 100644
+--- a/dtrace.in
++++ b/dtrace.in
+@@ -1,4 +1,4 @@
+-#!@preferred_python@
++#!/usr/bin/python3
+ # vim: et sta sts=4 sw=4 ts=8
+ 
+ # This handles the systemtap equivalent of
+-- 
+2.11.0
+

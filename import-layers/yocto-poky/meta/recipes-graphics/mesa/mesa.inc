@@ -79,6 +79,9 @@ EXCLUDE_FROM_WORLD = "1"
 # Remove the mesa dependency on mesa-dev, as mesa is empty
 RDEPENDS_${PN}-dev = ""
 
+# Add dependency so that GLES3 header don't need to be added manually
+RDEPENDS_libgles2-mesa-dev += "libgles3-mesa-dev"
+
 PACKAGES =+ "libegl-mesa libegl-mesa-dev \
              libosmesa libosmesa-dev \
              libgl-mesa libgl-mesa-dev \

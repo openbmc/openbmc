@@ -1,5 +1,6 @@
-# Version v0.96
-SRCREV = "e1b1537a20b35af75a49bf55dcf70296f8a62467"
+# Version 1.1
+SRCREV = "dff174f994f547a5785d32454865f140daacb0f5"
+PE = "1"
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git"
 

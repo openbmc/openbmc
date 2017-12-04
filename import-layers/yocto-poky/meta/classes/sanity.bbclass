@@ -929,7 +929,9 @@ def check_sanity_everybuild(status, d):
     # If /bin/sh is a symlink, check that it points to dash or bash
     if os.path.islink('/bin/sh'):
         real_sh = os.path.realpath('/bin/sh')
-        if not real_sh.endswith('/dash') and not real_sh.endswith('/bash'):
+        # Due to update-alternatives, the shell name may take various
+        # forms, such as /bin/dash, bin/bash, /bin/bash.bash ...
+        if '/dash' not in real_sh and '/bash' not in real_sh:
             status.addresult("Error, /bin/sh links to %s, must be dash or bash\n" % real_sh)
 
 def check_sanity(sanity_data):

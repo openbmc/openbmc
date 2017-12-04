@@ -48,6 +48,8 @@ python do_package_ipk () {
             if os.path.exists(p):
                 bb.utils.prunedir(p)
 
+    recipesource = os.path.basename(d.getVar('FILE', True))
+
     for pkg in packages.split():
         localdata = bb.data.createCopy(d)
         root = "%s/%s" % (pkgdest, pkg)
@@ -212,10 +214,7 @@ python do_package_ipk () {
             ctrlfile.write("Replaces: %s\n" % bb.utils.join_deps(rreplaces))
         if rconflicts:
             ctrlfile.write("Conflicts: %s\n" % bb.utils.join_deps(rconflicts))
-        src_uri = localdata.getVar("SRC_URI", True).strip() or "None"
-        if src_uri:
-            src_uri = re.sub("\s+", " ", src_uri)
-            ctrlfile.write("Source: %s\n" % " ".join(src_uri.split()))
+        ctrlfile.write("Source: %s\n" % recipesource)
         ctrlfile.close()
 
         for script in ["preinst", "postinst", "prerm", "postrm"]:

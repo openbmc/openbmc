@@ -114,11 +114,11 @@ link_hash()
 	LINKFILE=${HASH}.${TAG}${SUFFIX}
     done
 
-    echo "${1} => ${LINKFILE}"
+    echo "${3} => ${LINKFILE}"
 
     # assume any system with a POSIX shell will either support symlinks or
     # do something to handle this gracefully
-    ln -s ${1} ${LINKFILE}
+    ln -s ${3} ${LINKFILE}
 
     return 0
 }
@@ -142,7 +142,19 @@ hash_dir()
 
     ls -1 *.pem *.cer *.crt *.crl 2>/dev/null | while read FILE
     do
-	check_file ${FILE}
+	REAL_FILE=${FILE}
+	# if we run on build host then get to the real files in rootfs
+	if [ -n "${SYSROOT}" -a -h ${FILE} ]
+	then
+	    FILE=$( readlink ${FILE} )
+	    # check the symlink is absolute (or dangling in other word)
+	    if [ "x/" = "x$( echo ${FILE} | cut -c1 -)" ]
+	    then
+		REAL_FILE=${SYSROOT}/${FILE}
+	    fi
+	fi
+
+	check_file ${REAL_FILE}
         local FILE_TYPE=${?}
 	local TYPE_STR=''
 
@@ -157,7 +169,7 @@ hash_dir()
 	    continue
         fi
 
-	link_hash ${FILE} ${TYPE_STR}
+	link_hash ${REAL_FILE} ${TYPE_STR} ${FILE}
     done
 }
 

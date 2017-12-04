@@ -1,0 +1,36 @@
+From 2ada22f05460223924efe54080cb4419e2b4c276 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 24 Feb 2017 17:53:02 +0200
+Subject: [PATCH] Install python modules to correct library dir.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ python/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/python/Makefile.am b/python/Makefile.am
+index a254480f9..efe9f3c01 100644
+--- a/python/Makefile.am
++++ b/python/Makefile.am
+@@ -47,7 +47,7 @@ install-exec-local:
+ if HAVE_PYTHON2_PROBES
+ 	(cd $(srcdir); CFLAGS="$(AM_CPPFLAGS)" $(PYTHON) setup.py build \
+          --build-base $(shell readlink -f $(builddir))/py2build \
+-	 install --prefix $(DESTDIR)$(prefix) \
++	 install --prefix $(DESTDIR)$(prefix) --install-lib=$(DESTDIR)${pythondir} \
+ 	 --single-version-externally-managed \
+ 	 --record $(shell readlink -f $(builddir))/py2build/install_files.txt \
+          --verbose)
+@@ -55,7 +55,7 @@ endif
+ if HAVE_PYTHON3_PROBES
+ 	(cd $(srcdir); CFLAGS="$(AM_CPPFLAGS)" $(PYTHON3) setup.py build \
+          --build-base $(shell readlink -f $(builddir))/py3build \
+-	 install --prefix $(DESTDIR)$(prefix) \
++	 install --prefix $(DESTDIR)$(prefix) --install-lib=$(DESTDIR)${python3dir} \
+ 	 --single-version-externally-managed \
+ 	 --record $(shell readlink -f $(builddir))/py3build/install_files.txt \
+          --verbose)
+-- 
+2.11.0
+

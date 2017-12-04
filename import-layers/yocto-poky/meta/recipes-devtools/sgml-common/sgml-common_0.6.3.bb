@@ -15,7 +15,7 @@ SECTION = "base"
 
 PR = "r1"
 
-SRC_URI = "ftp://sources.redhat.com/pub/docbook-tools/new-trials/SOURCES/sgml-common-${PV}.tgz \
+SRC_URI = "https://ftp.osuosl.org/pub/blfs/conglomeration/sgml-common/sgml-common-${PV}.tgz \
            file://autohell.patch \
            file://license.patch"
 

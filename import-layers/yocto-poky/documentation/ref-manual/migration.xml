@@ -3489,7 +3489,7 @@
         <para>
             <filename>runqemu</filename> has been ported to Python and has
             changed behavior in some cases.
-            Previous usage patterns continued to be supported.
+            Previous usage patterns continue to be supported.
         </para>
 
         <para>
@@ -3617,6 +3617,27 @@ $ runqemu qemux86-64 tmp/deploy/images/qemux86-64/core-image-minimal-qemux86-64.
             <literallayout class='monospaced'>
      TARGET_CC_ARCH += "${LDFLAGS}"
             </literallayout>
+        </para>
+    </section>
+
+    <section id='migration-2.2-kernel-image-base-name-no-longer-uses-kernel-imagetype'>
+        <title><filename>KERNEL_IMAGE_BASE_NAME</filename> no Longer Uses <filename>KERNEL_IMAGETYPE</filename></title>
+
+        <para>
+            The
+            <link linkend='var-KERNEL_IMAGE_BASE_NAME'><filename>KERNEL_IMAGE_BASE_NAME</filename></link>
+            variable no longer uses the
+            <link linkend='var-KERNEL_IMAGETYPE'><filename>KERNEL_IMAGETYPE</filename></link>
+            variable to create the image's base name.
+            Because the OpenEmbedded build system can now build multiple kernel
+            image types, this part of the kernel image base name as been
+            removed leaving only the following:
+            <literallayout class='monospaced'>
+     KERNEL_IMAGE_BASE_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}
+            </literallayout>
+            If you have recipes or classes that use
+            <filename>KERNEL_IMAGE_BASE_NAME</filename> directly, you might
+            need to update the references to ensure they continue to work.
         </para>
     </section>
 

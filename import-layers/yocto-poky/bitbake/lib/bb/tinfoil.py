@@ -51,10 +51,13 @@ class Tinfoil:
         features = []
         if tracking:
             features.append(CookerFeatures.BASEDATASTORE_TRACKING)
+        cleanedvars = bb.utils.clean_environment()
         self.cooker = BBCooker(self.config, features)
         self.config_data = self.cooker.data
         bb.providers.logger.setLevel(logging.ERROR)
         self.cooker_data = None
+        for k in cleanedvars:
+            os.environ[k] = cleanedvars[k]
 
     def register_idle_function(self, function, data):
         pass

@@ -17,12 +17,8 @@ class TestScripts(oeSelfTest):
         path = os.path.dirname(get_bb_var('WORKDIR', 'gzip'))
         old_version_recipe = os.path.join(get_bb_var('COREBASE'), 'meta/recipes-extended/gzip/gzip_1.3.12.bb')
         old_version = '1.3.12'
-        bitbake("-ccleansstate gzip")
-        bitbake("-ccleansstate -b %s" % old_version_recipe)
-        if os.path.exists(get_bb_var('WORKDIR', "-b %s" % old_version_recipe)):
-            shutil.rmtree(get_bb_var('WORKDIR', "-b %s" % old_version_recipe))
-        if os.path.exists(get_bb_var('WORKDIR', 'gzip')):
-            shutil.rmtree(get_bb_var('WORKDIR', 'gzip'))
+        bitbake("-c clean gzip")
+        bitbake("-c clean -b %s" % old_version_recipe)
 
         if os.path.exists(path):
             initial_contents = os.listdir(path)

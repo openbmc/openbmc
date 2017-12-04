@@ -2273,12 +2273,13 @@
 
         <glossentry id='var-CONFIG_INITRAMFS_SOURCE'><glossterm>CONFIG_INITRAMFS_SOURCE</glossterm>
             <info>
-                CONFIG_INITRAMFS_SOURCE[doc] = "Identifies the initial RAM disk (initramfs) source files. The OpenEmbedded build system receives and uses this kernel Kconfig variable as an environment variable."
+                CONFIG_INITRAMFS_SOURCE[doc] = "Identifies the initial RAM filesystem (initramfs) source files. The OpenEmbedded build system receives and uses this kernel Kconfig variable as an environment variable."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Identifies the initial RAM disk (initramfs) source files.
+                    Identifies the initial RAM filesystem (initramfs) source
+                    files.
                     The OpenEmbedded build system receives and uses
                     this kernel Kconfig variable as an environment variable.
                     By default, the variable is set to null ("").
@@ -2303,6 +2304,12 @@
                 <para>
                     If you specify multiple directories and files, the
                     initramfs image will be the aggregate of all of them.
+                </para>
+
+                <para>
+                    For information on creating an initramfs, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
+                    section in the Yocto Project Development Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -4885,9 +4892,9 @@
                     is normally the same as the
                     <link linkend='var-TARGET_OS'><filename>TARGET_OS</filename></link>.
                     The variable can be set to "linux" for <filename>glibc</filename>-based systems and
-                    to "linux-uclibc" for <filename>uclibc</filename>.
+                    to "linux-musl" for <filename>musl</filename>.
                     For ARM/EABI targets, there are also "linux-gnueabi" and
-                    "linux-uclibc-gnueabi" values possible.
+                    "linux-musleabi" values possible.
                 </para>
             </glossdef>
         </glossentry>
@@ -5405,9 +5412,12 @@
                         variable to specify packages for installation.
                         Instead, use the
                         <link linkend='var-PACKAGE_INSTALL'><filename>PACKAGE_INSTALL</filename></link>
-                        variable, which allows the initial RAM disk (initramfs)
-                        recipe to use a fixed set of packages and not be
-                        affected by <filename>IMAGE_INSTALL</filename>.
+                        variable, which allows the initial RAM filesystem
+                        (initramfs) recipe to use a fixed set of packages and
+                        not be affected by <filename>IMAGE_INSTALL</filename>.
+                        For information on creating an initramfs, see the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
+                        section in the Yocto Project Development Manual.
                     </note>
                 </para>
 
@@ -6133,13 +6143,13 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
         <glossentry id='var-INITRAMFS_FSTYPES'><glossterm>INITRAMFS_FSTYPES</glossterm>
             <info>
-                INITRAMFS_FSTYPES[doc] = "Defines the format for the output image of an initial RAM disk (initramfs), which is used during boot."
+                INITRAMFS_FSTYPES[doc] = "Defines the format for the output image of an initial RAM filesystem (initramfs), which is used during boot."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Defines the format for the output image of an initial
-                    RAM disk (initramfs), which is used during boot.
+                    RAM filesystem (initramfs), which is used during boot.
                     Supported formats are the same as those supported by the
                     <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
                     variable.
@@ -6152,7 +6162,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>,
                     is "cpio.gz".
                     The Linux kernel's initramfs mechanism, as opposed to the
-                    initial RAM disk
+                    initial RAM filesystem
                     <ulink url='https://en.wikipedia.org/wiki/Initrd'>initrd</ulink>
                     mechanism, expects an optionally compressed cpio
                     archive.
@@ -6162,7 +6172,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
         <glossentry id='var-INITRAMFS_IMAGE'><glossterm>INITRAMFS_IMAGE</glossterm>
             <info>
-                INITRAMFS_IMAGE[doc] = "Specifies the PROVIDES name of an image recipe that is used to build an initial RAM disk (initramfs) image."
+                INITRAMFS_IMAGE[doc] = "Specifies the PROVIDES name of an image recipe that is used to build an initial RAM filesystem (initramfs) image."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
@@ -6170,7 +6180,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Specifies the
                     <link linkend='var-PROVIDES'><filename>PROVIDES</filename></link>
                     name of an image recipe that is used to build an initial
-                    RAM disk (initramfs) image.
+                    RAM filesystem (initramfs) image.
                     An initramfs provides a temporary root filesystem used for
                     early system initialization (e.g. loading of modules
                     needed to locate and mount the "real" root filesystem).
@@ -6211,17 +6221,21 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 </para>
 
                 <para>
-                    Finally, for more information you can also see the
+                    For more information, you can also see the
                     <link linkend='var-INITRAMFS_IMAGE_BUNDLE'><filename>INITRAMFS_IMAGE_BUNDLE</filename></link>
                     variable, which allows the generated image to be bundled
                     inside the kernel image.
+                    Additionally, for information on creating an initramfs, see
+                    the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
+                    section in the Yocto Project Development Manual.
                 </para>
             </glossdef>
         </glossentry>
 
         <glossentry id='var-INITRAMFS_IMAGE_BUNDLE'><glossterm>INITRAMFS_IMAGE_BUNDLE</glossterm>
             <info>
-                INITRAMFS_IMAGE_BUNDLE[doc] = "Controls whether or not the image recipe specified by INITRAMFS_IMAGE is run through an extra pass (do_bundle_initramfs) during kernel compilation in order to build a single binary that contains both the kernel image and the initial RAM disk (initramfs)."
+                INITRAMFS_IMAGE_BUNDLE[doc] = "Controls whether or not the image recipe specified by INITRAMFS_IMAGE is run through an extra pass (do_bundle_initramfs) during kernel compilation in order to build a single binary that contains both the kernel image and the initial RAM filesystem (initramfs)."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
@@ -6231,8 +6245,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     is run through an extra pass
                     (<link linkend='ref-tasks-bundle_initramfs'><filename>do_bundle_initramfs</filename></link>)
                     during kernel compilation in order to build a single binary
-                    that contains both the kernel image and the initial RAM disk
-                    (initramfs).
+                    that contains both the kernel image and the initial RAM
+                    filesystem (initramfs) image.
                     This makes use of the
                     <link linkend='var-CONFIG_INITRAMFS_SOURCE'><filename>CONFIG_INITRAMFS_SOURCE</filename></link>
                     kernel feature.
@@ -6279,6 +6293,9 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     See the
                     <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta-poky/conf/local.conf.sample.extended'><filename>local.conf.sample.extended</filename></ulink>
                     file for additional information.
+                    Also, for information on creating an initramfs, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
+                    section in the Yocto Project Development Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -6766,13 +6783,12 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <link linkend='ref-classes-kernel'>kernel</link> class
                     as follows:
                     <literallayout class='monospaced'>
-     KERNEL_IMAGE_BASE_NAME ?= "${KERNEL_IMAGETYPE}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
+     KERNEL_IMAGE_BASE_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
                     </literallayout>
                 </para>
 
                 <para>
                     See the
-                    <link linkend='var-KERNEL_IMAGETYPE'><filename>KERNEL_IMAGETYPE</filename></link>,
                     <link linkend='var-PKGE'><filename>PKGE</filename></link>,
                     <link linkend='var-PKGV'><filename>PKGV</filename></link>,
                     <link linkend='var-PKGR'><filename>PKGR</filename></link>,
@@ -9106,9 +9122,12 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     the
                     <link linkend='images-core-image-minimal-initramfs'><filename>core-image-minimal-initramfs</filename></link>
                     image.
-                    When working with an initial RAM disk (initramfs)
+                    When working with an initial RAM filesystem (initramfs)
                     image, use the <filename>PACKAGE_INSTALL</filename>
                     variable.
+                    For information on creating an initramfs, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
+                    section in the Yocto Project Development Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -10657,7 +10676,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <literallayout class='monospaced'>
      RDEPENDS_${PN} = "<replaceable>package</replaceable> (<replaceable>operator</replaceable> <replaceable>version</replaceable>)"
                     </literallayout>
-                    For <filename>operator</filename>, you can specify the
+                    For <replaceable>operator</replaceable>, you can specify the
                     following:
                     <literallayout class='monospaced'>
      =
@@ -10666,6 +10685,13 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
      &lt;=
      &gt;=
                     </literallayout>
+                    For <replaceable>version</replaceable>, provide the version
+                    number.
+                    <note><title>Tip</title>
+                        You can use
+                        <link linkend='var-EXTENDPKGV'><filename>EXTENDPKGV</filename></link>
+                        to provide a full package version specification.
+                    </note>
                     For example, the following sets up a dependency on version
                     1.2 or greater of the package <filename>foo</filename>:
                     <literallayout class='monospaced'>
@@ -12685,9 +12711,22 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Specifies the path to the top-level sysroots directory
                     (i.e.
                     <filename>${</filename><link linkend='var-TMPDIR'><filename>TMPDIR</filename></link><filename>}/sysroots</filename>).
+                </para>
+
+                <para>
+                    <filename>STAGING_DIR</filename> contains the directories
+                    that are staged into the sysroot by the
+                    <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>
+                    task.
+                    See the
+                    <link linkend='var-SYSROOT_DIRS'><filename>SYSROOT_DIRS</filename></link>
+                    variable and the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#new-sharing-files-between-recipes'>Sharing Files Between Recipes</ulink>"
+                    section for more information.
                     <note>
                         Recipes should never write files directly under
-                        this directory because the OpenEmbedded build system
+                        the <filename>STAGING_DIR</filename> directory because
+                        the OpenEmbedded build system
                         manages the directory automatically.
                         Instead, files should be installed to
                         <filename>${</filename><link linkend='var-D'><filename>D</filename></link><filename>}</filename>
@@ -13731,9 +13770,9 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Specifies the target's operating system.
                     The variable can be set to "linux" for <filename>glibc</filename>-based systems and
-                    to "linux-uclibc" for <filename>uclibc</filename>.
+                    to "linux-musl" for <filename>musl</filename>.
                     For ARM/EABI targets, there are also "linux-gnueabi" and
-                    "linux-uclibc-gnueabi" values possible.
+                    "linux-musleabi" values possible.
                 </para>
             </glossdef>
         </glossentry>
@@ -13862,7 +13901,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
         <glossentry id='var-TCLIBC'><glossterm>TCLIBC</glossterm>
             <info>
-                TCLIBC[doc] = "Specifies GNU standard C library (libc) variant to use during the build process. You can select 'glibc' or 'uclibc'."
+                TCLIBC[doc] = "Specifies GNU standard C library (libc) variant to use during the build process. You can select 'glibc' or 'musl'."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
@@ -13874,7 +13913,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 </para>
 
                 <para>
-                    You can select "glibc" or "uclibc".
+                    You can select "glibc" or "musl".
                 </para>
             </glossdef>
         </glossentry>
@@ -13913,7 +13952,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <link linkend='var-TCLIBC'><filename>TCLIBC</filename></link>,
                     which controls the variant of the GNU standard C library
                     (<filename>libc</filename>) used during the build process:
-                    <filename>glibc</filename> or <filename>uclibc</filename>.
+                    <filename>glibc</filename> or <filename>musl</filename>.
                 </para>
 
                 <para>
@@ -14419,6 +14458,10 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     </literallayout>
                     In this case, a default list of packages is set in this
                     variable, but you can add additional packages to the list.
+                    See the
+                    "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-adding-individual-packages'>Adding Individual Packages to the Standard SDK</ulink>"
+                    section in the Yocto Project Software Development Kit (SDK)
+                    Developer's Guide for more information.
                 </para>
 
                 <para>
@@ -14470,6 +14513,12 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     uses when it creates the target part of an SDK
                     (i.e. the part built for the target hardware), which
                     includes libraries and headers.
+                    Use this variable to add individual packages to the
+                    part of the SDK that runs on the target.
+                    See the
+                    "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-adding-individual-packages'>Adding Individual Packages to the Standard SDK</ulink>"
+                    section in the Yocto Project Software Development Kit (SDK)
+                    Developer's Guide for more information.
                 </para>
 
                 <para>
@@ -15515,6 +15564,26 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     see the
                     "<link linkend='ref-classes-insane'><filename>insane.bbclass</filename></link>"
                     section.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-WKS_FILE'><glossterm>WKS_FILE</glossterm>
+            <info>
+               WKS_FILE[doc] = "Specifies the name of the wic kickstart file."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    Specifies the location of the Wic
+                    kickstart file that is used by the OpenEmbedded build
+                    system to create a partitioned image
+                    (<replaceable>image</replaceable><filename>.wic</filename>).
+                    For information on how to create a
+                    partitioned image, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-wic-images-oe'>Creating Partitioned Images</ulink>"
+                    section.
+                    For details on the kickstart file format, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#openembedded-kickstart-wks-reference'>OpenEmbedded Kickstart (<filename>.wks</filename>) Reference</ulink>.
                 </para>
             </glossdef>
         </glossentry>

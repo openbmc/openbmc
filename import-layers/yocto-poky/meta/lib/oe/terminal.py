@@ -227,6 +227,8 @@ def spawn(name, sh_cmd, title=None, env=None, d=None):
 
     pipe = terminal(sh_cmd, title, env, d)
     output = pipe.communicate()[0]
+    if output:
+        output = output.decode("utf-8")
     if pipe.returncode != 0:
         raise ExecutionError(sh_cmd, pipe.returncode, output)
 

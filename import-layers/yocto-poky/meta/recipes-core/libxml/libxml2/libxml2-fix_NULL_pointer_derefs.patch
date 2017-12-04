@@ -1,0 +1,46 @@
+libxml2-2.9.4: Fix more NULL pointer derefs
+
+xpointer: Fix more NULL pointer derefs
+
+Upstream-Status: Backported [https://git.gnome.org/browse/libxml2/commit/?id=e905f08123e4a6e7731549e6f09dadff4cab65bd]
+CVE: -
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
+
+diff --git a/xpointer.c b/xpointer.c
+index 676c510..074db24 100644
+--- a/xpointer.c
++++ b/xpointer.c
+@@ -555,7 +555,7 @@ xmlXPtrNewRangeNodeObject(xmlNodePtr start, xmlXPathObjectPtr end) {
+ 	    /*
+ 	     * Empty set ...
+ 	     */
+-	    if (end->nodesetval->nodeNr <= 0)
++	    if ((end->nodesetval == NULL) || (end->nodesetval->nodeNr <= 0))
+ 		return(NULL);
+ 	    break;
+ 	default:
+@@ -1400,7 +1400,7 @@ xmlXPtrEval(const xmlChar *str, xmlXPathContextPtr ctx) {
+ 		     */
+ 		    xmlNodeSetPtr set;
+ 		    set = tmp->nodesetval;
+-		    if ((set->nodeNr != 1) ||
++		    if ((set == NULL) || (set->nodeNr != 1) ||
+ 			(set->nodeTab[0] != (xmlNodePtr) ctx->doc))
+ 			stack++;
+ 		} else
+@@ -2073,9 +2073,11 @@ xmlXPtrRangeFunction(xmlXPathParserContextPtr ctxt, int nargs) {
+ 	xmlXPathFreeObject(set);
+         XP_ERROR(XPATH_MEMORY_ERROR);
+     }
+-    for (i = 0;i < oldset->locNr;i++) {
+-	xmlXPtrLocationSetAdd(newset,
+-		xmlXPtrCoveringRange(ctxt, oldset->locTab[i]));
++    if (oldset != NULL) {
++	for (i = 0;i < oldset->locNr;i++) {
++	  xmlXPtrLocationSetAdd(newset,
++		  xmlXPtrCoveringRange(ctxt, oldset->locTab[i]));
++      }
+     }
+ 
+     /*

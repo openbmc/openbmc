@@ -1,0 +1,52 @@
+From 06fcf98f6ca40dc6b823d7d6231a240a1794ef2d Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Tue, 28 Feb 2017 10:40:37 +0800
+Subject: [PATCH] ifupdown: pass interface device name for ipv6 route commands
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+commit 028524317d8d0011ed38e86e507a06738a5b5a97 from upstream
+
+IPv6 routes need the device argument for link-local routes, or they
+cannot be used at all. E.g. "gateway fe80::def" seems to be used in
+some places, but kernel refuses to insert the route unless device
+name is explicitly specified in the route addition.
+
+Signed-off-by: Timo Teräs <timo.teras@iki.fi>
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+
+Upstream-Status: Backport
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+---
+ networking/ifupdown.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/networking/ifupdown.c b/networking/ifupdown.c
+index 17bc4e9..a00f68d 100644
+--- a/networking/ifupdown.c
++++ b/networking/ifupdown.c
+@@ -394,8 +394,8 @@ static int FAST_FUNC static_up6(struct interface_defn_t *ifd, execfn *exec)
+ # if ENABLE_FEATURE_IFUPDOWN_IP
+ 	result = execute("ip addr add %address%/%netmask% dev %iface%[[ label %label%]]", ifd, exec);
+ 	result += execute("ip link set[[ mtu %mtu%]][[ addr %hwaddress%]] %iface% up", ifd, exec);
+-	/* Was: "[[ ip ....%gateway% ]]". Removed extra spaces w/o checking */
+-	result += execute("[[ip route add ::/0 via %gateway%]][[ metric %metric%]]", ifd, exec);
++	/* Reportedly, IPv6 needs "dev %iface%", but IPv4 does not: */
++	result += execute("[[ip route add ::/0 via %gateway% dev %iface%]][[ metric %metric%]]", ifd, exec);
+ # else
+ 	result = execute("ifconfig %iface%[[ media %media%]][[ hw %hwaddress%]][[ mtu %mtu%]] up", ifd, exec);
+ 	result += execute("ifconfig %iface% add %address%/%netmask%", ifd, exec);
+@@ -421,7 +421,8 @@ static int FAST_FUNC v4tunnel_up(struct interface_defn_t *ifd, execfn *exec)
+ 			"%endpoint%[[ local %local%]][[ ttl %ttl%]]", ifd, exec);
+ 	result += execute("ip link set %iface% up", ifd, exec);
+ 	result += execute("ip addr add %address%/%netmask% dev %iface%", ifd, exec);
+-	result += execute("[[ip route add ::/0 via %gateway%]]", ifd, exec);
++	/* Reportedly, IPv6 needs "dev %iface%", but IPv4 does not: */
++	result += execute("[[ip route add ::/0 via %gateway% dev %iface%]]", ifd, exec);
+ 	return ((result == 4) ? 4 : 0);
+ }
+ 
+-- 
+1.9.1
+

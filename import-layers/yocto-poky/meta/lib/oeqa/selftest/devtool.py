@@ -9,7 +9,8 @@ import fnmatch
 
 import oeqa.utils.ftools as ftools
 from oeqa.selftest.base import oeSelfTest
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, create_temp_layer, runqemu, get_test_layer
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, create_temp_layer
+from oeqa.utils.commands import get_bb_vars, runqemu, get_test_layer
 from oeqa.utils.decorators import testcase
 
 class DevtoolBase(oeSelfTest):
@@ -114,6 +115,20 @@ class DevtoolBase(oeSelfTest):
 
 class DevtoolTests(DevtoolBase):
 
+    @classmethod
+    def setUpClass(cls):
+        bb_vars = get_bb_vars(['TOPDIR', 'SSTATE_DIR'])
+        cls.original_sstate = bb_vars['SSTATE_DIR']
+        cls.devtool_sstate = os.path.join(bb_vars['TOPDIR'], 'sstate_devtool')
+        cls.sstate_conf  = 'SSTATE_DIR = "%s"\n' % cls.devtool_sstate
+        cls.sstate_conf += ('SSTATE_MIRRORS += "file://.* file:///%s/PATH"\n'
+                            % cls.original_sstate)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.log.debug('Deleting devtool sstate cache on %s' % cls.devtool_sstate)
+        runCmd('rm -rf %s' % cls.devtool_sstate)
+
     def setUp(self):
         """Test case setup function"""
         super(DevtoolTests, self).setUp()
@@ -121,6 +136,7 @@ class DevtoolTests(DevtoolBase):
         self.assertTrue(not os.path.exists(self.workspacedir),
                         'This test cannot be run with a workspace directory '
                         'under the build directory')
+        self.append_config(self.sstate_conf)
 
     def _check_src_repo(self, repo_dir):
         """Check srctree git repository"""

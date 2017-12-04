@@ -12,3 +12,8 @@ RDEPENDS_${PN} = "\
     libstdc++-dev \
     ${LIBC_DEPENDENCIES} \
     "
+
+RRECOMMENDS_${PN} = "\
+    libssp \
+    libssp-dev \
+    "

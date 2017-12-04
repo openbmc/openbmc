@@ -21,6 +21,7 @@ SRC_URI = "${GNU_MIRROR}/bash/${BP}.tar.gz;name=tarball \
            ${GNU_MIRROR}/bash/bash-4.3-patches/bash43-044;apply=yes;striplevel=0;name=patch044 \
            ${GNU_MIRROR}/bash/bash-4.3-patches/bash43-045;apply=yes;striplevel=0;name=patch045 \
            ${GNU_MIRROR}/bash/bash-4.3-patches/bash43-046;apply=yes;striplevel=0;name=patch046 \
+           ${GNU_MIRROR}/bash/bash-4.3-patches/bash43-047;apply=yes;striplevel=0;name=patch047 \
            file://execute_cmd.patch;striplevel=0 \
            file://mkbuiltins_have_stringize.patch \
            file://build-tests.patch \
@@ -30,6 +31,7 @@ SRC_URI = "${GNU_MIRROR}/bash/${BP}.tar.gz;name=tarball \
            file://fix-run-builtins.patch \
            file://0001-help-fix-printf-format-security-warning.patch \
            file://fix-run-intl.patch \
+           file://CVE-2016-9401.patch \
            "
 
 SRC_URI[tarball.md5sum] = "a27b3ee9be83bd3ba448c0ff52b28447"
@@ -67,5 +69,7 @@ SRC_URI[patch045.md5sum] = "4473244ca5abfd4b018ea26dc73e7412"
 SRC_URI[patch045.sha256sum] = "ba6ec3978e9eaa1eb3fabdaf3cc6fdf8c4606ac1c599faaeb4e2d69864150023"
 SRC_URI[patch046.md5sum] = "7e5fb09991c077076b86e0e057798913"
 SRC_URI[patch046.sha256sum] = "b3b456a6b690cd293353f17e22d92a202b3c8bce587ae5f2667c20c9ab6f688f"
+SRC_URI[patch047.md5sum] = "8483153bad1a6f52cadc3bd9a8df7835"
+SRC_URI[patch047.sha256sum] = "c69248de7e78ba6b92f118fe1ef47bc86479d5040fe0b1f908ace1c9e3c67c4a"
 
 BBCLASSEXTEND = "nativesdk"

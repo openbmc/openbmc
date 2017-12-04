@@ -289,8 +289,8 @@ class RunQueueData:
         return tid + task_name_suffix
 
     def get_short_user_idstring(self, task, task_name_suffix = ""):
-        (mc, fn, taskname, _) = split_tid_mcfn(task)
-        pn = self.dataCaches[mc].pkg_fn[fn]
+        (mc, fn, taskname, taskfn) = split_tid_mcfn(task)
+        pn = self.dataCaches[mc].pkg_fn[taskfn]
         taskname = taskname_from_tid(task) + task_name_suffix
         return "%s:%s" % (pn, taskname)
 
@@ -884,14 +884,14 @@ class RunQueueData:
         if not self.cooker.configuration.nosetscene:
             for tid in self.runtaskentries:
                 (mc, fn, taskname, _) = split_tid_mcfn(tid)
-                setscenetid = fn + ":" + taskname + "_setscene"
+                setscenetid = tid + "_setscene"
                 if setscenetid not in taskData[mc].taskentries:
                     continue
                 self.runq_setscene_tids.append(tid)
 
         def invalidate_task(tid, error_nostamp):
-            (mc, fn, taskname, _) = split_tid_mcfn(tid)
-            taskdep = self.dataCaches[mc].task_deps[fn]
+            (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
+            taskdep = self.dataCaches[mc].task_deps[taskfn]
             if fn + ":" + taskname not in taskData[mc].taskentries:
                 logger.warning("Task %s does not exist, invalidating this task will have no effect" % taskname)
             if 'nostamp' in taskdep and taskname in taskdep['nostamp']:
@@ -997,8 +997,9 @@ class RunQueue:
             magic = "decafbadbad"
         if fakeroot:
             magic = magic + "beef"
-            fakerootcmd = self.cfgData.getVar("FAKEROOTCMD", True)
-            fakerootenv = (self.cfgData.getVar("FAKEROOTBASEENV", True) or "").split()
+            mcdata = self.cooker.databuilder.mcdata[mc]
+            fakerootcmd = mcdata.getVar("FAKEROOTCMD", True)
+            fakerootenv = (mcdata.getVar("FAKEROOTBASEENV", True) or "").split()
             env = os.environ.copy()
             for key, value in (var.split('=') for var in fakerootenv):
                 env[key] = value
@@ -1059,10 +1060,9 @@ class RunQueue:
         for mc in self.rqdata.dataCaches:
             self.worker[mc] = self._start_worker(mc)
 
-    def start_fakeworker(self, rqexec):
-        if not self.fakeworker:
-            for mc in self.rqdata.dataCaches:
-                self.fakeworker[mc] = self._start_worker(mc, True, rqexec)
+    def start_fakeworker(self, rqexec, mc):
+        if not mc in self.fakeworker:
+            self.fakeworker[mc] = self._start_worker(mc, True, rqexec)
 
     def teardown_workers(self):
         self.teardown = True
@@ -1322,7 +1322,7 @@ class RunQueue:
                 continue
 
             sq_fn.append(fn)
-            sq_hashfn.append(self.rqdata.dataCaches[mc].hashfn[fn])
+            sq_hashfn.append(self.rqdata.dataCaches[mc].hashfn[taskfn])
             sq_hash.append(self.rqdata.runtaskentries[tid].hash)
             sq_taskname.append(taskname)
             sq_task.append(tid)
@@ -1402,8 +1402,8 @@ class RunQueue:
 
 
         for tid in invalidtasks:
-            (mc, fn, taskname, _) = split_tid_mcfn(tid)
-            pn = self.rqdata.dataCaches[mc].pkg_fn[fn]
+            (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
+            pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
             h = self.rqdata.runtaskentries[tid].hash
             matches = bb.siggen.find_siginfo(pn, taskname, [], self.cfgData)
             match = None
@@ -1506,8 +1506,8 @@ class RunQueueExecute:
         taskdata = {}
         taskdeps.add(task)
         for dep in taskdeps:
-            (mc, fn, taskname, _) = split_tid_mcfn(dep)
-            pn = self.rqdata.dataCaches[mc].pkg_fn[fn]
+            (mc, fn, taskname, taskfn) = split_tid_mcfn(dep)
+            pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
             taskdata[dep] = [pn, taskname, fn]
         call = self.rq.depvalidate + "(task, taskdata, notneeded, d)"
         locs = { "task" : task, "taskdata" : taskdata, "notneeded" : self.scenequeue_notneeded, "d" : self.cooker.expanded_data }
@@ -1707,7 +1707,7 @@ class RunQueueExecuteTasks(RunQueueExecute):
 
             # Check tasks that are going to run against the whitelist
             def check_norun_task(tid, showerror=False):
-                (mc, fn, taskname, _) = split_tid_mcfn(tid)
+                (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
                 # Ignore covered tasks
                 if tid in self.rq.scenequeue_covered:
                     return False
@@ -1715,11 +1715,11 @@ class RunQueueExecuteTasks(RunQueueExecute):
                 if self.rq.check_stamp_task(tid, taskname, cache=self.stampcache):
                     return False
                 # Ignore noexec tasks
-                taskdep = self.rqdata.dataCaches[mc].task_deps[fn]
+                taskdep = self.rqdata.dataCaches[mc].task_deps[taskfn]
                 if 'noexec' in taskdep and taskname in taskdep['noexec']:
                     return False
 
-                pn = self.rqdata.dataCaches[mc].pkg_fn[fn]
+                pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
                 if not check_setscene_enforce_whitelist(pn, taskname, self.rqdata.setscenewhitelist):
                     if showerror:
                         if tid in self.rqdata.runq_setscene_tids:
@@ -1787,9 +1787,9 @@ class RunQueueExecuteTasks(RunQueueExecute):
 
             taskdep = self.rqdata.dataCaches[mc].task_deps[taskfn]
             if 'fakeroot' in taskdep and taskname in taskdep['fakeroot'] and not self.cooker.configuration.dry_run:
-                if not self.rq.fakeworker:
+                if not mc in self.rq.fakeworker:
                     try:
-                        self.rq.start_fakeworker(self)
+                        self.rq.start_fakeworker(self, mc)
                     except OSError as exc:
                         logger.critical("Failed to spawn fakeroot worker to run %s: %s" % (task, str(exc)))
                         self.rq.state = runQueueFailed
@@ -1868,6 +1868,7 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
         sq_revdeps_new = {}
         sq_revdeps_squash = {}
         self.sq_harddeps = {}
+        self.stamps = {}
 
         # We need to construct a dependency graph for the setscene functions. Intermediate
         # dependencies between the setscene tasks only complicate the code. This code
@@ -1978,9 +1979,10 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
         # e.g. do_sometask_setscene[depends] = "targetname:do_someothertask_setscene"
         # Note that anything explicitly depended upon will have its reverse dependencies removed to avoid circular dependencies
         for tid in self.rqdata.runq_setscene_tids:
-                (mc, fn, taskname, _) = split_tid_mcfn(tid)
-                realtid = fn + ":" + taskname + "_setscene"
+                (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
+                realtid = tid + "_setscene"
                 idepends = self.rqdata.taskData[mc].taskentries[realtid].idepends
+                self.stamps[tid] = bb.build.stampfile(taskname + "_setscene", self.rqdata.dataCaches[mc], taskfn, noextra=True)
                 for (depname, idependtask) in idepends:
 
                     if depname not in self.rqdata.taskData[mc].build_targets:
@@ -2044,7 +2046,7 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
             for tid in self.sq_revdeps:
                 (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
 
-                taskdep = self.rqdata.dataCaches[mc].task_deps[fn]
+                taskdep = self.rqdata.dataCaches[mc].task_deps[taskfn]
 
                 if 'noexec' in taskdep and taskname in taskdep['noexec']:
                     noexec.append(tid)
@@ -2065,7 +2067,7 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
                     continue
 
                 sq_fn.append(fn)
-                sq_hashfn.append(self.rqdata.dataCaches[mc].hashfn[fn])
+                sq_hashfn.append(self.rqdata.dataCaches[mc].hashfn[taskfn])
                 sq_hash.append(self.rqdata.runtaskentries[tid].hash)
                 sq_taskname.append(taskname)
                 sq_task.append(tid)
@@ -2113,8 +2115,8 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
     def check_taskfail(self, task):
         if self.rqdata.setscenewhitelist:
             realtask = task.split('_setscene')[0]
-            (mc, fn, taskname, _) = split_tid_mcfn(realtask)
-            pn = self.rqdata.dataCaches[mc].pkg_fn[fn]
+            (mc, fn, taskname, taskfn) = split_tid_mcfn(realtask)
+            pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
             if not check_setscene_enforce_whitelist(pn, taskname, self.rqdata.setscenewhitelist):
                 logger.error('Task %s.%s failed' % (pn, taskname + "_setscene"))
                 self.rq.state = runQueueCleanUp
@@ -2157,7 +2159,7 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
         if self.stats.active < self.number_tasks:
             # Find the next setscene to run
             for nexttask in self.rqdata.runq_setscene_tids:
-                if nexttask in self.runq_buildable and nexttask not in self.runq_running:
+                if nexttask in self.runq_buildable and nexttask not in self.runq_running and self.stamps[nexttask] not in self.build_stamps.values():
                     if nexttask in self.unskippable:
                         logger.debug(2, "Setscene task %s is unskippable" % nexttask)
                     if nexttask not in self.unskippable and len(self.sq_revdeps[nexttask]) > 0 and self.sq_revdeps[nexttask].issubset(self.scenequeue_covered) and self.check_dependencies(nexttask, self.sq_revdeps[nexttask], True):
@@ -2199,14 +2201,16 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
 
             taskdep = self.rqdata.dataCaches[mc].task_deps[taskfn]
             if 'fakeroot' in taskdep and taskname in taskdep['fakeroot'] and not self.cooker.configuration.dry_run:
-                if not self.rq.fakeworker:
-                    self.rq.start_fakeworker(self)
+                if not mc in self.rq.fakeworker:
+                    self.rq.start_fakeworker(self, mc)
                 self.rq.fakeworker[mc].process.stdin.write(b"<runtask>" + pickle.dumps((taskfn, task, taskname, True, self.cooker.collection.get_file_appends(taskfn), None)) + b"</runtask>")
                 self.rq.fakeworker[mc].process.stdin.flush()
             else:
                 self.rq.worker[mc].process.stdin.write(b"<runtask>" + pickle.dumps((taskfn, task, taskname, True, self.cooker.collection.get_file_appends(taskfn), None)) + b"</runtask>")
                 self.rq.worker[mc].process.stdin.flush()
 
+            self.build_stamps[task] = bb.build.stampfile(taskname, self.rqdata.dataCaches[mc], taskfn, noextra=True)
+            self.build_stamps2.append(self.build_stamps[task])
             self.runq_running.add(task)
             self.stats.taskActive()
             if self.stats.active < self.number_tasks:

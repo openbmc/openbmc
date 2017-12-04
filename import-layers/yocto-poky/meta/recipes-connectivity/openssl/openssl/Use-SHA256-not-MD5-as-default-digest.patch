@@ -1,0 +1,69 @@
+From d795f5f20a29adecf92c09459a3ee07ffac01a99 Mon Sep 17 00:00:00 2001
+From: Rich Salz <rsalz@akamai.com>
+Date: Sat, 13 Jun 2015 17:03:39 -0400
+Subject: [PATCH] Use SHA256 not MD5 as default digest.
+
+Commit f8547f62c212837dbf44fb7e2755e5774a59a57b upstream.
+
+Upstream-Status: Backport
+Backport from OpenSSL 2.0 to OpenSSL 1.0.2
+Commit f8547f62c212837dbf44fb7e2755e5774a59a57b   
+
+CVE: CVE-2004-2761
+
+    The MD5 Message-Digest Algorithm is not collision resistant,
+    which makes it easier for context-dependent attackers to            
+    conduct spoofing attacks, as demonstrated by attacks on the     
+    use of MD5 in the signature algorithm of an X.509 certificate.     
+
+Reviewed-by: Viktor Dukhovni <viktor@openssl.org>
+Signed-off-by: Zhang Xiao <xiao.zhang@windriver.com>     
+Signed-off-by: T.O. Radzy Radzykewycz <radzy@windriver.com> 
+---
+ apps/ca.c   | 2 +-
+ apps/dgst.c | 2 +-
+ apps/enc.c  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/apps/ca.c b/apps/ca.c
+index 3b7336c..8f3a84b 100644
+--- a/apps/ca.c
++++ b/apps/ca.c
+@@ -1612,7 +1612,7 @@ static int certify_cert(X509 **xret, char *infile, EVP_PKEY *pkey, X509 *x509,
+     } else
+         BIO_printf(bio_err, "Signature ok\n");
+ 
+-    if ((rreq = X509_to_X509_REQ(req, NULL, EVP_md5())) == NULL)
++    if ((rreq = X509_to_X509_REQ(req, NULL, NULL)) == NULL)
+         goto err;
+ 
+     ok = do_body(xret, pkey, x509, dgst, sigopts, policy, db, serial, subj,
+diff --git a/apps/dgst.c b/apps/dgst.c
+index 95e5fa3..0d1529f 100644
+--- a/apps/dgst.c
++++ b/apps/dgst.c
+@@ -442,7 +442,7 @@ int MAIN(int argc, char **argv)
+             goto end;
+         }
+         if (md == NULL)
+-            md = EVP_md5();
++            md = EVP_sha256();
+         if (!EVP_DigestInit_ex(mctx, md, impl)) {
+             BIO_printf(bio_err, "Error setting digest %s\n", pname);
+             ERR_print_errors(bio_err);
+diff --git a/apps/enc.c b/apps/enc.c
+index 7b7c70b..a7d944c 100644
+--- a/apps/enc.c
++++ b/apps/enc.c
+@@ -344,7 +344,7 @@ int MAIN(int argc, char **argv)
+     }
+ 
+     if (dgst == NULL) {
+-        dgst = EVP_md5();
++        dgst = EVP_sha256();
+     }
+ 
+     if (bufsize != NULL) {
+-- 
+1.9.1
+

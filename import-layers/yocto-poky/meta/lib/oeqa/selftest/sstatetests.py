@@ -16,7 +16,7 @@ class SStateTests(SStateBase):
 
     # Test sstate files creation and their location
     def run_test_sstate_creation(self, targets, distro_specific=True, distro_nonspecific=True, temp_sstate_location=True, should_pass=True):
-        self.config_sstate(temp_sstate_location)
+        self.config_sstate(temp_sstate_location, [self.sstate_path])
 
         if  self.temp_sstate_location:
             bitbake(['-cclean'] + targets)
@@ -60,7 +60,7 @@ class SStateTests(SStateBase):
 
     # Test the sstate files deletion part of the do_cleansstate task
     def run_test_cleansstate_task(self, targets, distro_specific=True, distro_nonspecific=True, temp_sstate_location=True):
-        self.config_sstate(temp_sstate_location)
+        self.config_sstate(temp_sstate_location, [self.sstate_path])
 
         bitbake(['-ccleansstate'] + targets)
 
@@ -92,7 +92,7 @@ class SStateTests(SStateBase):
 
     # Test rebuilding of distro-specific sstate files
     def run_test_rebuild_distro_specific_sstate(self, targets, temp_sstate_location=True):
-        self.config_sstate(temp_sstate_location)
+        self.config_sstate(temp_sstate_location, [self.sstate_path])
 
         bitbake(['-ccleansstate'] + targets)
 

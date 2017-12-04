@@ -11,6 +11,9 @@ files."
 PE = "1"
 PR = "${INC_PR}.0"
 
+DEPENDS = "util-macros-native"
+REQUIRED_DISTRO_FEATURES_class-native = ""
+
 RDEPENDS_${PN} += "mkfontscale"
 RDEPENDS_${PN}_class-native += "mkfontscale-native"
 

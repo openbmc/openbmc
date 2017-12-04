@@ -1,12 +1,12 @@
 SUMMARY = "Utilities and libraries for handling compiled object files"
-HOMEPAGE = "https://fedorahosted.org/elfutils"
+HOMEPAGE = "https://sourceware.org/elfutils"
 SECTION = "base"
 LICENSE = "(GPLv3 & Elfutils-Exception)"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 DEPENDS = "libtool bzip2 zlib virtual/libintl"
 DEPENDS_append_libc-musl = " argp-standalone fts "
 
-SRC_URI = "https://fedorahosted.org/releases/e/l/elfutils/${PV}/${BP}.tar.bz2"
+SRC_URI = "ftp://sourceware.org/pub/elfutils/${PV}/${BP}.tar.bz2"
 SRC_URI[md5sum] = "d4e462b7891915dc5326bccefa2024ff"
 SRC_URI[sha256sum] = "3c056914c8a438b210be0d790463b960fc79d234c3f05ce707cbff80e94cba30"
 
@@ -18,7 +18,10 @@ SRC_URI += "\
         file://0001-remove-the-unneed-checking.patch \
         file://0001-fix-a-stack-usage-warning.patch \
         file://aarch64_uio.patch \
+        file://Fix_one_GCC7_warning.patch \
+        file://0001-Add-GCC7-Wimplicit-fallthrough-support-fixes.patch \
         file://shadow.patch \
+        file://0001-ar-Fix-GCC7-Wformat-length-issues.patch \
 "
 
 # pick the patch from debian
@@ -37,6 +40,8 @@ SRC_URI += "\
         file://uclibc-support.patch \
         file://elfcmp-fix-self-comparision.patch \
 "
+# Fix the patches from Debian with GCC7
+SRC_URI += "file://fallthrough.patch"
 SRC_URI_append_libc-musl = " file://0001-build-Provide-alternatives-for-glibc-assumptions-hel.patch "
 
 # The buildsystem wants to generate 2 .h files from source using a binary it just built,

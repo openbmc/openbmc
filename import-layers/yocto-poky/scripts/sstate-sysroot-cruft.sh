@@ -141,6 +141,18 @@ WHITELIST="${WHITELIST} \
   .*/var/cache/fontconfig/ \
 "
 
+# created by oe.utils.write_ld_so_conf which is used from few bbclasses and recipes:
+# meta/classes/image-prelink.bbclass:    oe.utils.write_ld_so_conf(d)
+# meta/classes/insane.bbclass:                oe.utils.write_ld_so_conf(d)
+# meta/classes/insane.bbclass:                oe.utils.write_ld_so_conf(d)
+# meta/recipes-gnome/gobject-introspection/gobject-introspection_1.48.0.bb:    oe.utils.write_ld_so_conf(d)
+# meta/recipes-gnome/gobject-introspection/gobject-introspection_1.48.0.bb:        oe.utils.write_ld_so_conf(d)
+# introduced in oe-core commit 7fd1d7e639c2ed7e0699937a5cb245c187b7c811
+# and more visible since added to gobject-introspection in 10e0c1a3a452baa05d160a92a54b2e33cf0fd061
+WHITELIST="${WHITELIST} \
+  [^/]*/etc/ld.so.conf \
+"
+
 SYSROOTS="`readlink -f ${tmpdir}`/sysroots/"
 
 mkdir ${OUTPUT}

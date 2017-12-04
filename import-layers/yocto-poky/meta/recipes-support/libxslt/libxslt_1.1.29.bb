@@ -11,6 +11,8 @@ DEPENDS = "libxml2"
 SRC_URI = "ftp://xmlsoft.org/libxslt/libxslt-${PV}.tar.gz \
            file://pkgconfig_fix.patch \
            file://0001-Use-pkg-config-to-find-gcrypt-and-libxml2.patch \
+           file://0001-Link-libraries-with-libm.patch \
+           file://0001-Check-for-integer-overflow-in-xsltAddTextString.patch \
            "
 
 SRC_URI[md5sum] = "a129d3c44c022de3b9dcf6d6f288d72e"

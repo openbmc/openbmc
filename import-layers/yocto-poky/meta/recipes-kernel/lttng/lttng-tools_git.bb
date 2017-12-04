@@ -113,4 +113,7 @@ do_install_ptest () {
 	# checkpatch.pl is unneeded on target and causes file-rdeps QA
 	# warnings.
 	rm -f ${D}${PTEST_PATH}/extras/checkpatch.pl
+
+        # Remove built libraries as they confuse the packages' runtime dependency resolution
+        rm -rf ${D}${PTEST_PATH}/src/lib/lttng-ctl/.libs/
 }

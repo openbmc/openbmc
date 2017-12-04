@@ -1,0 +1,58 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<appendix id='sdk-appendix-customizing-standard'>
+
+<title>Customizing the Standard SDK</title>
+
+<para>
+    This appendix presents customizations you can apply to the standard SDK.
+</para>
+
+<section id='sdk-adding-individual-packages'>
+    <title>Adding Individual Packages to the Standard SDK</title>
+
+    <para>
+         When you build a standard SDK using the
+         <filename>bitbake -c populate_sdk</filename>, a default set of
+         packages is included in the resulting SDK.
+         The
+         <ulink url='&YOCTO_DOCS_REF_URL;#var-TOOLCHAIN_HOST_TASK'><filename>TOOLCHAIN_HOST_TASK</filename></ulink>
+         and
+         <ulink url='&YOCTO_DOCS_REF_URL;#var-TOOLCHAIN_TARGET_TASK'><filename>TOOLCHAIN_TARGET_TASK</filename></ulink>
+         variables control the set of packages adding to the SDK.
+    </para>
+
+    <para>
+        If you want to add individual packages to the toolchain that runs on
+        the host, simply add those packages to the
+        <filename>TOOLCHAIN_HOST_TASK</filename> variable.
+        Similarly, if you want to add packages to the default set that is
+        part of the toolchain that runs on the target, add the packages to the
+        <filename>TOOLCHAIN_TARGET_TASK</filename> variable.
+    </para>
+</section>
+
+<section id='adding-api-documentation-to-the-standard-sdk'>
+    <title>Adding API Documentation to the Standard SDK</title>
+
+    <para>
+        You can include API documentation as well as any other
+        documentation provided by recipes with the standard SDK by
+        adding "api-documentation" to the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></ulink>
+        variable:
+        <literallayout class='monospaced'>
+     DISTRO_FEATURES_append = " api-documentation"
+        </literallayout>
+        Setting this variable as shown here causes the OpenEmbedded build
+        system to build the documentation and then include it in the standard
+        SDK.
+    </para>
+</section>
+
+</appendix>
+<!--
+vim: expandtab tw=80 ts=4
+-->

@@ -14,6 +14,7 @@ SRC_URI = "https://wayland.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
            file://xwayland.weston-start \
            file://make-weston-launch-exit-for-unrecognized-option.patch \
            file://0001-weston-launch-Provide-a-default-version-that-doesn-t.patch \
+           file://weston-1.11-config-option-for-no-input-device.patch \
 "
 SRC_URI[md5sum] = "bc6f90a2039163804aecfa663b69c4c2"
 SRC_URI[sha256sum] = "05e086e9f186a06843b9f7a5e1abf19347b1a6e4be26d7e74927abc17b6b7125"

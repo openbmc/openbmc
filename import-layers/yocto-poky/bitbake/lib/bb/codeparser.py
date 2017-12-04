@@ -342,8 +342,7 @@ class ShellParser():
         except pyshlex.NeedMore:
             raise sherrors.ShellSyntaxError("Unexpected EOF")
 
-        for token in tokens:
-            self.process_tokens(token)
+        self.process_tokens(tokens)
 
     def process_tokens(self, tokens):
         """Process a supplied portion of the syntax tree as returned by
@@ -389,18 +388,24 @@ class ShellParser():
             "case_clause": case_clause,
         }
 
-        for token in tokens:
-            name, value = token
-            try:
-                more_tokens, words = token_handlers[name](value)
-            except KeyError:
-                raise NotImplementedError("Unsupported token type " + name)
+        def process_token_list(tokens):
+            for token in tokens:
+                if isinstance(token, list):
+                    process_token_list(token)
+                    continue
+                name, value = token
+                try:
+                    more_tokens, words = token_handlers[name](value)
+                except KeyError:
+                    raise NotImplementedError("Unsupported token type " + name)
 
-            if more_tokens:
-                self.process_tokens(more_tokens)
+                if more_tokens:
+                    self.process_tokens(more_tokens)
 
-            if words:
-                self.process_words(words)
+                if words:
+                    self.process_words(words)
+
+        process_token_list(tokens)
 
     def process_words(self, words):
         """Process a set of 'words' in pyshyacc parlance, which includes

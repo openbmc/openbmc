@@ -17,6 +17,7 @@ SRC_URI += " file://configure_ac.patch"
 SRC_URI[md5sum] = "015f6a0217ca6f2c5442ca406476920b"
 SRC_URI[sha256sum] = "3c12c5f54ccaa1d40abc65d672107dcc75d3e1fcb38c267484334280096e5156"
 
+CVE_PRODUCT = "libcurl"
 inherit autotools pkgconfig binconfig multilib_header
 
 PACKAGECONFIG ??= "${@bb.utils.contains("DISTRO_FEATURES", "ipv6", "ipv6", "", d)} gnutls proxy zlib"

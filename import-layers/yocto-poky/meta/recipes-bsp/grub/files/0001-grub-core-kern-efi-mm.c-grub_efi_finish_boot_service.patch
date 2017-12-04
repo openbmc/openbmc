@@ -1,0 +1,79 @@
+From b258761d11946b28a847dff0768c3f271e13d60a Mon Sep 17 00:00:00 2001
+From: Awais Belal <awais_belal@mentor.com>
+Date: Thu, 8 Dec 2016 18:21:12 +0500
+Subject: [PATCH 1/2] * grub-core/kern/efi/mm.c
+ (grub_efi_finish_boot_services):  Try terminating EFI services several times
+ due to quirks in some  implementations.
+
+Upstream-status: Backport [ http://git.savannah.gnu.org/cgit/grub.git/patch/?id=e75fdee420a7ad95e9a465c9699adc2e2e970440 ]
+
+Signed-off-by: Awais Belal <awais_belal@mentor.com>
+---
+ grub-core/kern/efi/mm.c | 46 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 16 deletions(-)
+
+diff --git a/grub-core/kern/efi/mm.c b/grub-core/kern/efi/mm.c
+index 461deb0..b00e0bc 100644
+--- a/grub-core/kern/efi/mm.c
++++ b/grub-core/kern/efi/mm.c
+@@ -167,27 +167,41 @@ grub_efi_finish_boot_services (grub_efi_uintn_t *outbuf_size, void *outbuf,
+ 			   apple, sizeof (apple)) == 0);
+ #endif
+ 
+-  if (grub_efi_get_memory_map (&finish_mmap_size, finish_mmap_buf, &finish_key,
+-			       &finish_desc_size, &finish_desc_version) < 0)
+-    return grub_error (GRUB_ERR_IO, "couldn't retrieve memory map");
++  while (1)
++    {
++      if (grub_efi_get_memory_map (&finish_mmap_size, finish_mmap_buf, &finish_key,
++				   &finish_desc_size, &finish_desc_version) < 0)
++	return grub_error (GRUB_ERR_IO, "couldn't retrieve memory map");
+ 
+-  if (outbuf && *outbuf_size < finish_mmap_size)
+-    return grub_error (GRUB_ERR_IO, "memory map buffer is too small");
++      if (outbuf && *outbuf_size < finish_mmap_size)
++	return grub_error (GRUB_ERR_IO, "memory map buffer is too small");
+ 
+-  finish_mmap_buf = grub_malloc (finish_mmap_size);
+-  if (!finish_mmap_buf)
+-    return grub_errno;
++      finish_mmap_buf = grub_malloc (finish_mmap_size);
++      if (!finish_mmap_buf)
++	return grub_errno;
+ 
+-  if (grub_efi_get_memory_map (&finish_mmap_size, finish_mmap_buf, &finish_key,
+-			       &finish_desc_size, &finish_desc_version) <= 0)
+-    return grub_error (GRUB_ERR_IO, "couldn't retrieve memory map");
++      if (grub_efi_get_memory_map (&finish_mmap_size, finish_mmap_buf, &finish_key,
++				   &finish_desc_size, &finish_desc_version) <= 0)
++	{
++	  grub_free (finish_mmap_buf);
++	  return grub_error (GRUB_ERR_IO, "couldn't retrieve memory map");
++	}
+ 
+-  b = grub_efi_system_table->boot_services;
+-  status = efi_call_2 (b->exit_boot_services, grub_efi_image_handle,
+-		       finish_key);
+-  if (status != GRUB_EFI_SUCCESS)
+-    return grub_error (GRUB_ERR_IO, "couldn't terminate EFI services");
++      b = grub_efi_system_table->boot_services;
++      status = efi_call_2 (b->exit_boot_services, grub_efi_image_handle,
++			   finish_key);
++      if (status == GRUB_EFI_SUCCESS)
++	break;
+ 
++      if (status != GRUB_EFI_INVALID_PARAMETER)
++	{
++	  grub_free (finish_mmap_buf);
++	  return grub_error (GRUB_ERR_IO, "couldn't terminate EFI services");
++	}
++
++      grub_free (finish_mmap_buf);
++      grub_printf ("Trying to terminate EFI services again\n");
++    }
+   grub_efi_is_finished = 1;
+   if (outbuf_size)
+     *outbuf_size = finish_mmap_size;
+-- 
+1.9.1
+

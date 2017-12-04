@@ -42,7 +42,8 @@ class Wic(oeSelfTest):
     def setUpLocal(self):
         """This code is executed before each test method."""
         self.write_config('IMAGE_FSTYPES += " hddimg"\n'
-                          'MACHINE_FEATURES_append = " efi"\n')
+                          'MACHINE_FEATURES_append = " efi"\n'
+                          'WKS_FILE = "wic-image-minimal"\n')
 
         # Do this here instead of in setUpClass as the base setUp does some
         # clean up which can result in the native tools built earlier in

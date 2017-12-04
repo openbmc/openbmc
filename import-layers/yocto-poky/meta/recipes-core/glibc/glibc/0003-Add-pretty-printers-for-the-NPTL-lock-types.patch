@@ -1,0 +1,3197 @@
+From 246fee86fc90c57738ee282a061039f82832f4ea Mon Sep 17 00:00:00 2001
+From: Catalin Enache <catalin.enache@windriver.com>
+Date: Fri, 30 Jun 2017 13:42:04 +0300
+Subject: [PATCH 3/6] Add pretty printers for the NPTL lock types
+
+This patch adds pretty printers for the following NPTL types:
+
+- pthread_mutex_t
+- pthread_mutexattr_t
+- pthread_cond_t
+- pthread_condattr_t
+- pthread_rwlock_t
+- pthread_rwlockattr_t
+
+To load the pretty printers into your gdb session, do the following:
+
+python
+import sys
+sys.path.insert(0, '/path/to/glibc/build/nptl/pretty-printers')
+end
+
+source /path/to/glibc/source/pretty-printers/nptl-printers.py
+
+You can check which printers are registered and enabled by issuing the
+'info pretty-printer' gdb command. Printers should trigger automatically when
+trying to print a variable of one of the types mentioned above.
+
+The printers are architecture-independent, and were tested on an AMD64 running
+Ubuntu 14.04 and an x86 VM running Fedora 24.
+
+In order to work, the printers need to know the values of various flags that
+are scattered throughout pthread.h and pthreadP.h as enums and #defines. Since
+replicating these constants in the printers file itself would create a
+maintenance burden, I wrote a script called gen-py-const.awk that Makerules uses
+to extract the constants. This script is pretty much the same as gen-as-const.awk,
+except it doesn't cast the constant values to 'long' and is thorougly documented.
+The constants need only to be enumerated in a .pysym file, which is then referenced
+by a Make variable called gen-py-const-headers.
+
+As for the install directory, I discussed this with Mike Frysinger and Siddhesh
+Poyarekar, and we agreed that it can be handled in a separate patch, and shouldn't
+block merging of this one.
+
+In addition, I've written a series of test cases for the pretty printers.
+Each lock type (mutex, condvar and rwlock) has two test programs, one for itself
+and other for its related 'attributes' object. Each test program in turn has a
+PExpect-based Python script that drives gdb and compares its output to the
+expected printer's. The tests run on the glibc host, which is assumed to have
+both gdb and PExpect; if either is absent the tests will fail with code 77
+(UNSUPPORTED). For cross-testing you should use cross-test-ssh.sh as test-wrapper.
+I've tested the printers on both native builds and a cross build using a Beaglebone
+Black running Debian, with the build system's filesystem shared with the board
+through NFS.
+
+Finally, I've written a README that explains all this and more.
+
+    * INSTALL: Regenerated.
+    * Makeconfig: Add comments and whitespace to make the control flow
+    clearer.
+    (+link-printers-tests, +link-pie-printers-tests, CFLAGS-printers-tests,
+    installed-rtld-LDFLAGS, built-rtld-LDFLAGS, link-libc-rpath,
+    link-libc-tests-after-rpath-link, link-libc-printers-tests): New.
+    (rtld-LDFLAGS, rtld-tests-LDFLAGS, link-libc-tests-rpath-link,
+    link-libc-tests): Use the new variables as required.
+    * Makerules ($(py-const)): New rule.
+    generated: Add $(py-const).
+    * README.pretty-printers: New file.
+    * Rules (tests-printers-programs, tests-printers-out, py-env): New.
+    (others): Depend on $(py-const).
+    (tests): Depend on $(tests-printers-programs) or $(tests-printers-out),
+    as required.  Pass $(tests-printers) to merge-test-results.sh.
+    * manual/install.texi: Add requirements for testing the pretty printers.
+    * nptl/Makefile (gen-py-const-headers, pretty-printers, tests-printers,
+    CFLAGS-test-mutexattr-printers.c CFLAGS-test-mutex-printers.c,
+    CFLAGS-test-condattr-printers.c, CFLAGS-test-cond-printers.c,
+    CFLAGS-test-rwlockattr-printers.c CFLAGS-test-rwlock-printers.c,
+    tests-printers-libs): Define.
+    * nptl/nptl-printers.py: New file.
+    * nptl/nptl_lock_constants.pysym: Likewise.
+    * nptl/test-cond-printers.c: Likewise.
+    * nptl/test-cond-printers.py: Likewise.
+    * nptl/test-condattr-printers.c: Likewise.
+    * nptl/test-condattr-printers.py: Likewise.
+    * nptl/test-mutex-printers.c: Likewise.
+    * nptl/test-mutex-printers.py: Likewise.
+    * nptl/test-mutexattr-printers.c: Likewise.
+    * nptl/test-mutexattr-printers.py: Likewise.
+    * nptl/test-rwlock-printers.c: Likewise.
+    * nptl/test-rwlock-printers.py: Likewise.
+    * nptl/test-rwlockattr-printers.c: Likewise.
+    * nptl/test-rwlockattr-printers.py: Likewise.
+    * scripts/gen-py-const.awk: Likewise.
+    * scripts/test_printers_common.py: Likewise.
+    * scripts/test_printers_exceptions.py: Likewise.
+
+Upstream-Status: Backport
+
+Author: Martin Galvan <martin.galvan@tallertechnologies.com>
+Signed-off-by: Catalin Enache <catalin.enache@windriver.com>
+---
+ ChangeLog                           |  45 +++
+ INSTALL                             |  27 ++
+ Makeconfig                          |  76 ++++-
+ Makerules                           |  46 +++
+ NEWS                                |   6 +
+ README.pretty-printers              | 169 ++++++++++
+ Rules                               |  44 ++-
+ manual/install.texi                 |  30 ++
+ nptl/Makefile                       |  18 +
+ nptl/nptl-printers.py               | 633 ++++++++++++++++++++++++++++++++++++
+ nptl/nptl_lock_constants.pysym      |  75 +++++
+ nptl/test-cond-printers.c           |  57 ++++
+ nptl/test-cond-printers.py          |  50 +++
+ nptl/test-condattr-printers.c       |  94 ++++++
+ nptl/test-condattr-printers.py      |  71 ++++
+ nptl/test-mutex-printers.c          | 151 +++++++++
+ nptl/test-mutex-printers.py         |  97 ++++++
+ nptl/test-mutexattr-printers.c      | 144 ++++++++
+ nptl/test-mutexattr-printers.py     | 101 ++++++
+ nptl/test-rwlock-printers.c         |  78 +++++
+ nptl/test-rwlock-printers.py        |  64 ++++
+ nptl/test-rwlockattr-printers.c     |  98 ++++++
+ nptl/test-rwlockattr-printers.py    |  73 +++++
+ scripts/gen-py-const.awk            | 118 +++++++
+ scripts/test_printers_common.py     | 364 +++++++++++++++++++++
+ scripts/test_printers_exceptions.py |  61 ++++
+ 26 files changed, 2770 insertions(+), 20 deletions(-)
+ create mode 100644 README.pretty-printers
+ create mode 100644 nptl/nptl-printers.py
+ create mode 100644 nptl/nptl_lock_constants.pysym
+ create mode 100644 nptl/test-cond-printers.c
+ create mode 100644 nptl/test-cond-printers.py
+ create mode 100644 nptl/test-condattr-printers.c
+ create mode 100644 nptl/test-condattr-printers.py
+ create mode 100644 nptl/test-mutex-printers.c
+ create mode 100644 nptl/test-mutex-printers.py
+ create mode 100644 nptl/test-mutexattr-printers.c
+ create mode 100644 nptl/test-mutexattr-printers.py
+ create mode 100644 nptl/test-rwlock-printers.c
+ create mode 100644 nptl/test-rwlock-printers.py
+ create mode 100644 nptl/test-rwlockattr-printers.c
+ create mode 100644 nptl/test-rwlockattr-printers.py
+ create mode 100644 scripts/gen-py-const.awk
+ create mode 100644 scripts/test_printers_common.py
+ create mode 100644 scripts/test_printers_exceptions.py
+
+diff --git a/ChangeLog b/ChangeLog
+index 96b6da2..8036c1e 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,48 @@
++2016-12-08  Martin Galvan  <martin.galvan@tallertechnologies.com>
++
++	* INSTALL: Regenerated.
++	* Makeconfig: Add comments and whitespace to make the control flow
++	clearer.
++	(+link-printers-tests, +link-pie-printers-tests,
++	CFLAGS-printers-tests, installed-rtld-LDFLAGS,
++	built-rtld-LDFLAGS, link-libc-rpath,
++	link-libc-tests-after-rpath-link,
++	link-libc-printers-tests): New.
++	(rtld-LDFLAGS, rtld-tests-LDFLAGS, link-libc-tests-rpath-link,
++	link-libc-tests): Use the new variables as required.
++	* Makerules ($(py-const)): New rule.
++	generated: Add $(py-const).
++	* README.pretty-printers: New file.
++	* Rules (tests-printers-programs, tests-printers-out, py-env): New.
++	(others): Depend on $(py-const).
++	(tests): Depend on $(tests-printers-programs) or
++	$(tests-printers-out),
++	as required.  Pass $(tests-printers) to merge-test-results.sh.
++	* manual/install.texi: Add requirements for testing the pretty
++	printers.
++	* nptl/Makefile (gen-py-const-headers, pretty-printers,
++	tests-printers, CFLAGS-test-mutexattr-printers.c
++	CFLAGS-test-mutex-printers.c, CFLAGS-test-condattr-printers.c,
++	CFLAGS-test-cond-printers.c, CFLAGS-test-rwlockattr-printers.c
++	CFLAGS-test-rwlock-printers.c, tests-printers-libs): Define.
++	* nptl/nptl-printers.py: New file.
++	* nptl/nptl_lock_constants.pysym: Likewise.
++	* nptl/test-cond-printers.c: Likewise.
++	* nptl/test-cond-printers.py: Likewise.
++	* nptl/test-condattr-printers.c: Likewise.
++	* nptl/test-condattr-printers.py: Likewise.
++	* nptl/test-mutex-printers.c: Likewise.
++	* nptl/test-mutex-printers.py: Likewise.
++	* nptl/test-mutexattr-printers.c: Likewise.
++	* nptl/test-mutexattr-printers.py: Likewise.
++	* nptl/test-rwlock-printers.c: Likewise.
++	* nptl/test-rwlock-printers.py: Likewise.
++	* nptl/test-rwlockattr-printers.c: Likewise.
++	* nptl/test-rwlockattr-printers.py: Likewise.
++	* scripts/gen-py-const.awk: Likewise.
++	* scripts/test_printers_common.py: Likewise.
++	* scripts/test_printers_exceptions.py: Likewise.
++
+ 2016-08-09  Torvald Riegel  <triegel@redhat.com>
+ 
+ 	* include/atomic.h (atomic_fetch_and_relaxed,
+diff --git a/INSTALL b/INSTALL
+index ec3445f..dd62c86 100644
+--- a/INSTALL
++++ b/INSTALL
+@@ -224,6 +224,33 @@ You can specify 'stop-on-test-failure=y' when running 'make check' to
+ make the test run stop and exit with an error status immediately when a
+ failure occurs.
+ 
++   The GNU C Library pretty printers come with their own set of scripts
++for testing, which run together with the rest of the testsuite through
++'make check'.  These scripts require the following tools to run
++successfully:
++
++   * Python 2.7.6/3.4.3 or later
++
++     Python is required for running the printers' test scripts.
++
++   * PExpect 4.0
++
++     The printer tests drive GDB through test programs and compare its
++     output to the printers'.  PExpect is used to capture the output of
++     GDB, and should be compatible with the Python version in your
++     system.
++
++   * GDB 7.8 or later with support for Python 2.7.6/3.4.3 or later
++
++     GDB itself needs to be configured with Python support in order to
++     use the pretty printers.  Notice that your system having Python
++     available doesn't imply that GDB supports it, nor that your
++     system's Python and GDB's have the same version.
++
++If these tools are absent, the printer tests will report themselves as
++'UNSUPPORTED'.  Notice that some of the printer tests require the GNU C
++Library to be compiled with debugging symbols.
++
+    To format the 'GNU C Library Reference Manual' for printing, type
+ 'make dvi'.  You need a working TeX installation to do this.  The
+ distribution builds the on-line formatted version of the manual, as Info
+diff --git a/Makeconfig b/Makeconfig
+index 03fd89c..2d92d94 100644
+--- a/Makeconfig
++++ b/Makeconfig
+@@ -416,6 +416,11 @@ $(+link-pie-before-libc) $(rtld-tests-LDFLAGS) $(link-libc-tests) \
+ 			 $(+link-pie-after-libc)
+ $(call after-link,$@)
+ endef
++define +link-pie-printers-tests
++$(+link-pie-before-libc) $(built-rtld-LDFLAGS) $(link-libc-printers-tests) \
++			 $(+link-pie-after-libc)
++$(call after-link,$@)
++endef
+ endif
+ # Command for statically linking programs with the C library.
+ ifndef +link-static
+@@ -445,7 +450,8 @@ ifeq (yes,$(build-pie-default))
+ no-pie-ldflag = -no-pie
+ +link = $(+link-pie)
+ +link-tests = $(+link-pie-tests)
+-else
+++link-printers-tests = $(+link-pie-printers-tests)
++else  # not build-pie-default
+ +link-before-libc = $(CC) -nostdlib -nostartfiles -o $@ \
+ 	      $(sysdep-LDFLAGS) $(LDFLAGS) $(LDFLAGS-$(@F)) \
+ 	      $(combreloc-LDFLAGS) $(relro-LDFLAGS) $(hashstyle-LDFLAGS) \
+@@ -466,51 +472,87 @@ $(+link-before-libc) $(rtld-tests-LDFLAGS) $(link-libc-tests) \
+ 		     $(+link-after-libc)
+ $(call after-link,$@)
+ endef
+-endif
+-else
++define +link-printers-tests
++$(+link-before-libc) $(built-rtld-LDFLAGS) $(link-libc-printers-tests) \
++		     $(+link-after-libc)
++$(call after-link,$@)
++endef
++endif  # build-pie-default
++else  # build-static
+ +link = $(+link-static)
+ +link-tests = $(+link-static-tests)
+-endif
+-endif
+++link-printers-tests = $(+link-static-tests)
++endif  # build-shared
++endif  # +link
++
++# The pretty printer test programs need to be compiled without optimizations
++# so they won't confuse gdb.  We could use either the 'GCC optimize' pragma
++# or the 'optimize' function attribute to achieve this; however, at least on
++# ARM, gcc always produces different debugging symbols when invoked with
++# a -O greater than 0 than when invoked with -O0, regardless of anything else
++# we're using to suppress optimizations.  Therefore, we need to explicitly pass
++# -O0 to it through CFLAGS.
++# Additionally, the build system will try to -include $(common-objpfx)/config.h
++# when compiling the tests, which will throw an error if some special macros
++# (such as __OPTIMIZE__ and IS_IN_build) aren't defined.  To avoid this, we
++# tell gcc to define IS_IN_build.
++CFLAGS-printers-tests := -O0 -ggdb3 -DIS_IN_build
++
+ ifeq (yes,$(build-shared))
++# These indicate whether to link using the built ld.so or the installed one.
++installed-rtld-LDFLAGS = -Wl,-dynamic-linker=$(rtlddir)/$(rtld-installed-name)
++built-rtld-LDFLAGS = -Wl,-dynamic-linker=$(elf-objpfx)ld.so
++
+ ifndef rtld-LDFLAGS
+-rtld-LDFLAGS = -Wl,-dynamic-linker=$(rtlddir)/$(rtld-installed-name)
++rtld-LDFLAGS = $(installed-rtld-LDFLAGS)
+ endif
++
+ ifndef rtld-tests-LDFLAGS
+ ifeq (yes,$(build-hardcoded-path-in-tests))
+-rtld-tests-LDFLAGS = -Wl,-dynamic-linker=$(elf-objpfx)ld.so
++rtld-tests-LDFLAGS = $(built-rtld-LDFLAGS)
+ else
+-rtld-tests-LDFLAGS = $(rtld-LDFLAGS)
+-endif
+-endif
+-endif
++rtld-tests-LDFLAGS = $(installed-rtld-LDFLAGS)
++endif  # build-hardcoded-path-in-tests
++endif  # rtld-tests-LDFLAGS
++
++endif  # build-shared
++
+ ifndef link-libc
+ ifeq (yes,$(build-shared))
+ # We need the versioned name of libc.so in the deps of $(others) et al
+ # so that the symlink to libc.so is created before anything tries to
+ # run the linked programs.
++link-libc-rpath = -Wl,-rpath=$(rpath-link)
+ link-libc-rpath-link = -Wl,-rpath-link=$(rpath-link)
++
+ ifeq (yes,$(build-hardcoded-path-in-tests))
+-link-libc-tests-rpath-link = -Wl,-rpath=$(rpath-link)
++link-libc-tests-rpath-link = $(link-libc-rpath)
+ else
+ link-libc-tests-rpath-link = $(link-libc-rpath-link)
+-endif
++endif  # build-hardcoded-path-in-tests
++
+ link-libc-before-gnulib = $(common-objpfx)libc.so$(libc.so-version) \
+ 			  $(common-objpfx)$(patsubst %,$(libtype.oS),c) \
+ 			  $(as-needed) $(elf-objpfx)ld.so \
+ 			  $(no-as-needed)
+ link-libc = $(link-libc-rpath-link) $(link-libc-before-gnulib) $(gnulib)
++
++link-libc-tests-after-rpath-link = $(link-libc-before-gnulib) $(gnulib-tests)
+ link-libc-tests = $(link-libc-tests-rpath-link) \
+-		  $(link-libc-before-gnulib) $(gnulib-tests)
++		  $(link-libc-tests-after-rpath-link)
++# Pretty printer test programs always require rpath instead of rpath-link.
++link-libc-printers-tests = $(link-libc-rpath) \
++			   $(link-libc-tests-after-rpath-link)
++
+ # This is how to find at build-time things that will be installed there.
+ rpath-dirs = math elf dlfcn nss nis rt resolv crypt mathvec
+ rpath-link = \
+ $(common-objdir):$(subst $(empty) ,:,$(patsubst ../$(subdir),.,$(rpath-dirs:%=$(common-objpfx)%)))
+-else
++else  # build-static
+ link-libc = $(common-objpfx)libc.a $(otherlibs) $(gnulib) $(common-objpfx)libc.a $(gnulib)
+ link-libc-tests = $(common-objpfx)libc.a $(otherlibs) $(gnulib-tests) $(common-objpfx)libc.a $(gnulib-tests)
+-endif
+-endif
++endif  # build-shared
++endif  # link-libc
+ 
+ # Differences in the linkers on the various platforms.
+ LDFLAGS-rpath-ORIGIN = -Wl,-rpath,'$$ORIGIN'
+diff --git a/Makerules b/Makerules
+index be3c11b..b7e0f59 100644
+--- a/Makerules
++++ b/Makerules
+@@ -214,6 +214,52 @@ sed-remove-dotdot := -e 's@  *\([^ 	\/$$][^ 	\]*\)@ $$(..)\1@g' \
+ 		     -e 's@^\([^ 	\/$$][^ 	\]*\)@$$(..)\1@g'
+ endif
+ 
++ifdef gen-py-const-headers
++# We'll use a static pattern rule to match .pysym files with their
++# corresponding generated .py files.
++# The generated .py files go in the submodule's dir in the glibc build dir.
++py-const-files := $(patsubst %.pysym,%.py,$(gen-py-const-headers))
++py-const-dir := $(objpfx)
++py-const := $(addprefix $(py-const-dir),$(py-const-files))
++py-const-script := $(..)scripts/gen-py-const.awk
++
++# This is a hack we use to generate .py files with constants for Python
++# pretty printers.  It works the same way as gen-as-const.
++# See scripts/gen-py-const.awk for details on how the awk | gcc mechanism
++# works.
++#
++# $@.tmp and $@.tmp2 are temporary files we use to store the partial contents
++# of the target file.  We do this instead of just writing on $@ because, if the
++# build process terminates prematurely, re-running Make wouldn't run this rule
++# since Make would see that the target file already exists (despite it being
++# incomplete).
++#
++# The sed line replaces "@name@SOME_NAME@value@SOME_VALUE@" strings from the
++# output of 'gcc -S' with "SOME_NAME = SOME_VALUE" strings.
++# The '-n' option, combined with the '/p' command, makes sed output only the
++# modified lines instead of the whole input file.  The output is redirected
++# to a .py file; we'll import it in the pretty printers file to read
++# the constants generated by gen-py-const.awk.
++# The regex has two capturing groups, for SOME_NAME and SOME_VALUE
++# respectively.  Notice SOME_VALUE may be prepended by a special character,
++# depending on the assembly syntax (e.g. immediates are prefixed by a '$'
++# in AT&T x86, and by a '#' in ARM).  We discard it using a complemented set
++# before the second capturing group.
++$(py-const): $(py-const-dir)%.py: %.pysym $(py-const-script) \
++	     $(common-before-compile)
++	$(make-target-directory)
++	$(AWK) -f $(py-const-script) $< \
++	       | $(CC) -S -o $@.tmp $(CFLAGS) $(CPPFLAGS) -x c -
++	echo '# GENERATED FILE\n' > $@.tmp2
++	echo '# Constant definitions for pretty printers.' >> $@.tmp2
++	echo '# See gen-py-const.awk for details.\n' >> $@.tmp2
++	sed -n -r 's/^.*@name@([^@]+)@value@[^[:xdigit:]Xx-]*([[:xdigit:]Xx-]+)@.*/\1 = \2/p' \
++	    $@.tmp >> $@.tmp2
++	mv -f $@.tmp2 $@
++	rm -f $@.tmp
++
++generated += $(py-const)
++endif  # gen-py-const-headers
+ 
+ ifdef gen-as-const-headers
+ # Generating headers for assembly constants.
+diff --git a/NEWS b/NEWS
+index b0447e7..3002773 100644
+--- a/NEWS
++++ b/NEWS
+@@ -5,6 +5,12 @@ See the end for copying conditions.
+ Please send GNU C library bug reports via <http://sourceware.org/bugzilla/>
+ using `glibc' in the "product" field.
+ 
++
++* GDB pretty printers have been added for mutex and condition variable
++  structures in POSIX Threads. When installed and loaded in gdb these pretty
++  printers show various pthread variables in human-readable form when read
++  using the 'print' or 'display' commands in gdb.
++
+ Version 2.24
+ 
+ * The minimum Linux kernel version that this version of the GNU C Library
+diff --git a/README.pretty-printers b/README.pretty-printers
+new file mode 100644
+index 0000000..8662900
+--- /dev/null
++++ b/README.pretty-printers
+@@ -0,0 +1,169 @@
++README for the glibc Python pretty printers
++===========================================
++
++Pretty printers are gdb extensions that allow it to print useful, human-readable
++information about a program's variables.  For example, for a pthread_mutex_t
++gdb would usually output something like this:
++
++(gdb) print mutex
++$1 = {
++  __data = {
++    __lock = 22020096,
++    __count = 0,
++    __owner = 0,
++    __nusers = 0,
++    __kind = 576,
++    __spins = 0,
++    __elision = 0,
++    __list = {
++      __prev = 0x0,
++      __next = 0x0
++    }
++  },
++  __size = "\000\000P\001", '\000' <repeats 12 times>, "@\002", '\000' <repeats 21 times>,
++  __align = 22020096
++}
++
++However, with a pretty printer gdb will output something like this:
++
++(gdb) print mutex
++$1 = pthread_mutex_t = {
++  Type = Normal,
++  Status = Unlocked,
++  Robust = No,
++  Shared = No,
++  Protocol = Priority protect,
++  Priority ceiling = 42
++}
++
++Before printing a value, gdb will first check if there's a pretty printer
++registered for it.  If there is, it'll use it, otherwise it'll print the value
++as usual.  Pretty printers can be registered in various ways; for our purposes
++we register them for the current objfile by calling
++gdb.printing.register_pretty_printer().
++
++Currently our printers are based on gdb.RegexpCollectionPrettyPrinter, which
++means they'll be triggered if the type of the variable we're printing matches
++a given regular expression.  For example, MutexPrinter will be triggered if
++our variable's type matches the regexp '^pthread_mutex_t$'.
++
++Besides the printers themselves, each module may have a constants file which the
++printers will import.  These constants are generated from C headers during the
++build process, and need to be in the Python search path when loading the
++printers.
++
++
++Installing and loading
++----------------------
++
++The pretty printers and their constant files may be installed in different paths
++for each distro, though gdb should be able to automatically load them by itself.
++When in doubt, you can use the 'info pretty-printer' gdb command to list the
++loaded pretty printers.
++
++If the printers aren't automatically loaded for some reason, you should add the
++following to your .gdbinit:
++
++python
++import sys
++sys.path.insert(0, '/path/to/constants/file/directory')
++end
++
++source /path/to/printers.py
++
++If you're building glibc manually, '/path/to/constants/file/directory' should be
++'/path/to/glibc-build/submodule', where 'submodule' is e.g. nptl.
++
++
++Testing
++-------
++
++The pretty printers come with a small test suite based on PExpect, which is a
++Python module with Expect-like features for spawning and controlling interactive
++programs.  Each printer has a corresponding C program and a Python script
++that uses PExpect to drive gdb through the program and compare its output to
++the expected printer's.
++
++The tests run on the glibc host, which is assumed to have both gdb and PExpect;
++if any of those is absent the tests will fail with code 77 (UNSUPPORTED).
++Native builds can be tested simply by doing 'make check'; cross builds must use
++cross-test-ssh.sh as test-wrapper, like this:
++
++make test-wrapper='/path/to/scripts/cross-test-ssh.sh user@host' check
++
++(Remember to share the build system's filesystem with the glibc host's through
++NFS or something similar).
++
++Running 'make check' on a cross build will only compile the test programs,
++without running the scripts.
++
++
++Adding new pretty printers
++--------------------------
++
++Adding new pretty printers to glibc requires following these steps:
++
++1. Identify which constants must be generated from C headers, and write the
++corresponding .pysym file.  See scripts/gen-py-const.awk for more information
++on how this works.  The name of the .pysym file must be added to the
++'gen-py-const-headers' variable in your submodule's Makefile (without the .pysym
++extension).
++
++2. Write the pretty printer code itself.  For this you can follow the gdb
++Python API documentation, and use the existing printers as examples.  The printer
++code must import the generated constants file (which will have the same name
++as your .pysym file).  The names of the pretty printer files must be added
++to the 'pretty-printers' variable in your submodule's Makefile (without the .py
++extension).
++
++3. Write the unit tests for your pretty printers.  The build system calls each
++test script passing it the paths to the test program source, the test program
++binary, and the printer files you added to 'pretty-printers' in the previous
++step.  The test scripts, in turn, must import scripts/test_printers_common
++and call the init_test function passing it, among other things, the name of the
++set of pretty printers to enable (as seen by running 'info pretty-printer').
++You can use the existing unit tests as examples.
++
++4. Add the names of the pretty printer tests to the 'tests-printers' variable
++in your submodule's Makefile (without extensions).  In addition, for each test
++program you must define a corresponding CFLAGS-* variable and set it to
++$(CFLAGS-printers-tests) to ensure they're compiled correctly.  For example,
++test-foo-printer.c requires the following:
++
++CFLAGS-test-foo-printer.c := $(CFLAGS-printers-tests)
++
++Finally, if your programs need to be linked with a specific library, you can add
++its name to the 'tests-printers-libs' variable in your submodule's Makefile.
++
++
++Known issues
++------------
++
++* Pretty printers are inherently coupled to the code they're targetting, thus
++any changes to the target code must also update the corresponding printers.
++On the plus side, the printer code itself may serve as a kind of documentation
++for the target code.
++
++* Older versions of the gdb Python API have a bug where
++gdb.RegexpCollectionPrettyPrinter would not be able to get a value's real type
++if it was typedef'd.  This would cause gdb to ignore the pretty printers for
++types like pthread_mutex_t, which is defined as:
++
++typedef union
++{
++  ...
++} pthread_mutex_t;
++
++This was fixed in commit 1b588015839caafc608a6944a78aea170f5fb2f6, and released
++as part of gdb 7.8.  However, typedef'ing an already typedef'd type may cause
++a similar issue, e.g.:
++
++typedef pthread_mutex_t mutex;
++mutex a_mutex;
++
++Here, trying to print a_mutex won't trigger the pthread_mutex_t printer.
++
++* The test programs must be compiled without optimizations.  This is necessary
++because the test scripts rely on the C code structure being preserved when
++stepping through the programs.  Things like aggressive instruction reordering
++or optimizing variables out may make this kind of testing impossible.
+diff --git a/Rules b/Rules
+index 8306d36..10a6479 100644
+--- a/Rules
++++ b/Rules
+@@ -85,16 +85,27 @@ common-generated += dummy.o dummy.c
+ 
+ .PHONY: others tests bench bench-build
+ 
++# Test programs for the pretty printers.
++tests-printers-programs := $(addprefix $(objpfx),$(tests-printers))
++
++# .out files with the output of running the pretty printer tests.
++tests-printers-out := $(patsubst %,$(objpfx)%.out,$(tests-printers))
++
+ ifeq ($(build-programs),yes)
+ others: $(addprefix $(objpfx),$(others) $(sysdep-others) $(extra-objs))
+ else
+ others: $(addprefix $(objpfx),$(extra-objs))
+ endif
++
++# Generate constant files for Python pretty printers if required.
++others: $(py-const)
++
+ ifeq ($(run-built-tests),no)
+-tests: $(addprefix $(objpfx),$(tests) $(test-srcs)) $(tests-special)
++tests: $(addprefix $(objpfx),$(tests) $(test-srcs)) $(tests-special) \
++       $(tests-printers-programs)
+ xtests: tests $(xtests-special)
+ else
+-tests: $(tests:%=$(objpfx)%.out) $(tests-special)
++tests: $(tests:%=$(objpfx)%.out) $(tests-special) $(tests-printers-out)
+ xtests: tests $(xtests:%=$(objpfx)%.out) $(xtests-special)
+ endif
+ 
+@@ -102,7 +113,8 @@ tests-special-notdir = $(patsubst $(objpfx)%, %, $(tests-special))
+ xtests-special-notdir = $(patsubst $(objpfx)%, %, $(xtests-special))
+ tests:
+ 	$(..)scripts/merge-test-results.sh -s $(objpfx) $(subdir) \
+-	  $(sort $(tests) $(tests-special-notdir:.out=)) \
++	  $(sort $(tests) $(tests-special-notdir:.out=) \
++	  $(tests-printers)) \
+ 	  > $(objpfx)subdir-tests.sum
+ xtests:
+ 	$(..)scripts/merge-test-results.sh -s $(objpfx) $(subdir) \
+@@ -212,6 +224,32 @@ endif
+ 
+ endif	# tests
+ 
++ifneq "$(strip $(tests-printers))" ""
++# We're defining this here for now; later it'll be defined at configure time
++# inside Makeconfig.
++PYTHON := python
++
++# Static pattern rule for building the test programs for the pretty printers.
++$(tests-printers-programs): %: %.o $(tests-printers-libs) \
++  $(sort $(filter $(common-objpfx)lib%,$(link-libc-static-tests))) \
++  $(addprefix $(csu-objpfx),start.o) $(+preinit) $(+postinit)
++	$(+link-printers-tests)
++
++# Add the paths to the generated constants file and test_common_printers.py
++# to PYTHONPATH so the test scripts can find them.
++py-env := PYTHONPATH=$(py-const-dir):$(..)scripts:$${PYTHONPATH}
++
++# Static pattern rule that matches the test-* targets to their .c and .py
++# prerequisites.  It'll run the corresponding test script for each test program
++# we compiled and place its output in the corresponding .out file.
++# The pretty printer files and test_common_printers.py must be present for all.
++$(tests-printers-out): $(objpfx)%.out: $(objpfx)% %.py %.c $(pretty-printers) \
++		       $(..)scripts/test_printers_common.py
++	$(test-wrapper-env) $(py-env) \
++	    $(PYTHON) $*.py $*.c $(objpfx)$* $(pretty-printers) > $@; \
++	$(evaluate-test)
++endif
++
+ 
+ .PHONY: distclean realclean subdir_distclean subdir_realclean \
+ 	subdir_clean subdir_mostlyclean subdir_testclean
+diff --git a/manual/install.texi b/manual/install.texi
+index 79ee45f..468479e 100644
+--- a/manual/install.texi
++++ b/manual/install.texi
+@@ -256,6 +256,36 @@ occurred.  You can specify @samp{stop-on-test-failure=y} when running
+ @code{make check} to make the test run stop and exit with an error
+ status immediately when a failure occurs.
+ 
++The @glibcadj{} pretty printers come with their own set of scripts for testing,
++which run together with the rest of the testsuite through @code{make check}.
++These scripts require the following tools to run successfully:
++
++@itemize @bullet
++@item
++Python 2.7.6/3.4.3 or later
++
++Python is required for running the printers' test scripts.
++
++@item PExpect 4.0
++
++The printer tests drive GDB through test programs and compare its output
++to the printers'.  PExpect is used to capture the output of GDB, and should be
++compatible with the Python version in your system.
++
++@item
++GDB 7.8 or later with support for Python 2.7.6/3.4.3 or later
++
++GDB itself needs to be configured with Python support in order to use the
++pretty printers.  Notice that your system having Python available doesn't imply
++that GDB supports it, nor that your system's Python and GDB's have the same
++version.
++@end itemize
++
++@noindent
++If these tools are absent, the printer tests will report themselves as
++@code{UNSUPPORTED}.  Notice that some of the printer tests require @theglibc{}
++to be compiled with debugging symbols.
++
+ To format the @cite{GNU C Library Reference Manual} for printing, type
+ @w{@code{make dvi}}.  You need a working @TeX{} installation to do
+ this.  The distribution builds the on-line formatted version of the
+diff --git a/nptl/Makefile b/nptl/Makefile
+index 7dec4ed..49f6ba6 100644
+--- a/nptl/Makefile
++++ b/nptl/Makefile
+@@ -308,6 +308,24 @@ gen-as-const-headers = pthread-errnos.sym \
+ 		       unwindbuf.sym \
+ 		       lowlevelrobustlock.sym pthread-pi-defines.sym
+ 
++gen-py-const-headers := nptl_lock_constants.pysym
++pretty-printers := nptl-printers.py
++tests-printers := test-mutexattr-printers test-mutex-printers \
++		  test-condattr-printers test-cond-printers \
++		  test-rwlockattr-printers test-rwlock-printers
++
++CFLAGS-test-mutexattr-printers.c := $(CFLAGS-printers-tests)
++CFLAGS-test-mutex-printers.c := $(CFLAGS-printers-tests)
++CFLAGS-test-condattr-printers.c := $(CFLAGS-printers-tests)
++CFLAGS-test-cond-printers.c := $(CFLAGS-printers-tests)
++CFLAGS-test-rwlockattr-printers.c := $(CFLAGS-printers-tests)
++CFLAGS-test-rwlock-printers.c := $(CFLAGS-printers-tests)
++
++ifeq ($(build-shared),yes)
++tests-printers-libs := $(shared-thread-library)
++else
++tests-printers-libs := $(static-thread-library)
++endif
+ 
+ LDFLAGS-pthread.so = -Wl,--enable-new-dtags,-z,nodelete,-z,initfirst
+ 
+diff --git a/nptl/nptl-printers.py b/nptl/nptl-printers.py
+new file mode 100644
+index 0000000..e402f23
+--- /dev/null
++++ b/nptl/nptl-printers.py
+@@ -0,0 +1,633 @@
++# Pretty printers for the NPTL lock types.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++"""This file contains the gdb pretty printers for the following types:
++
++    * pthread_mutex_t
++    * pthread_mutexattr_t
++    * pthread_cond_t
++    * pthread_condattr_t
++    * pthread_rwlock_t
++    * pthread_rwlockattr_t
++
++You can check which printers are registered and enabled by issuing the
++'info pretty-printer' gdb command.  Printers should trigger automatically when
++trying to print a variable of one of the types mentioned above.
++"""
++
++from __future__ import print_function
++
++import gdb
++import gdb.printing
++from nptl_lock_constants import *
++
++MUTEX_TYPES = {
++    PTHREAD_MUTEX_NORMAL: ('Type', 'Normal'),
++    PTHREAD_MUTEX_RECURSIVE: ('Type', 'Recursive'),
++    PTHREAD_MUTEX_ERRORCHECK: ('Type', 'Error check'),
++    PTHREAD_MUTEX_ADAPTIVE_NP: ('Type', 'Adaptive')
++}
++
++class MutexPrinter(object):
++    """Pretty printer for pthread_mutex_t."""
++
++    def __init__(self, mutex):
++        """Initialize the printer's internal data structures.
++
++        Args:
++            mutex: A gdb.value representing a pthread_mutex_t.
++        """
++
++        data = mutex['__data']
++        self.lock = data['__lock']
++        self.count = data['__count']
++        self.owner = data['__owner']
++        self.kind = data['__kind']
++        self.values = []
++        self.read_values()
++
++    def to_string(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_mutex_t.
++        """
++
++        return 'pthread_mutex_t'
++
++    def children(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_mutex_t.
++        """
++
++        return self.values
++
++    def read_values(self):
++        """Read the mutex's info and store it in self.values.
++
++        The data contained in self.values will be returned by the Iterator
++        created in self.children.
++        """
++
++        self.read_type()
++        self.read_status()
++        self.read_attributes()
++        self.read_misc_info()
++
++    def read_type(self):
++        """Read the mutex's type."""
++
++        mutex_type = self.kind & PTHREAD_MUTEX_KIND_MASK
++
++        # mutex_type must be casted to int because it's a gdb.Value
++        self.values.append(MUTEX_TYPES[int(mutex_type)])
++
++    def read_status(self):
++        """Read the mutex's status.
++
++        For architectures which support lock elision, this method reads
++        whether the mutex appears as locked in memory (i.e. it may show it as
++        unlocked even after calling pthread_mutex_lock).
++        """
++
++        if self.kind == PTHREAD_MUTEX_DESTROYED:
++            self.values.append(('Status', 'Destroyed'))
++        elif self.kind & PTHREAD_MUTEX_ROBUST_NORMAL_NP:
++            self.read_status_robust()
++        else:
++            self.read_status_no_robust()
++
++    def read_status_robust(self):
++        """Read the status of a robust mutex.
++
++        In glibc robust mutexes are implemented in a very different way than
++        non-robust ones.  This method reads their locking status,
++        whether it may have waiters, their registered owner (if any),
++        whether the owner is alive or not, and the status of the state
++        they're protecting.
++        """
++
++        if self.lock == PTHREAD_MUTEX_UNLOCKED:
++            self.values.append(('Status', 'Unlocked'))
++        else:
++            if self.lock & FUTEX_WAITERS:
++                self.values.append(('Status', 'Locked, possibly with waiters'))
++            else:
++                self.values.append(('Status',
++                                    'Locked, possibly with no waiters'))
++
++            if self.lock & FUTEX_OWNER_DIED:
++                self.values.append(('Owner ID', '%d (dead)' % self.owner))
++            else:
++                self.values.append(('Owner ID', self.lock & FUTEX_TID_MASK))
++
++        if self.owner == PTHREAD_MUTEX_INCONSISTENT:
++            self.values.append(('State protected by this mutex',
++                                'Inconsistent'))
++        elif self.owner == PTHREAD_MUTEX_NOTRECOVERABLE:
++            self.values.append(('State protected by this mutex',
++                                'Not recoverable'))
++
++    def read_status_no_robust(self):
++        """Read the status of a non-robust mutex.
++
++        Read info on whether the mutex is locked, if it may have waiters
++        and its owner (if any).
++        """
++
++        lock_value = self.lock
++
++        if self.kind & PTHREAD_MUTEX_PRIO_PROTECT_NP:
++            lock_value &= ~(PTHREAD_MUTEX_PRIO_CEILING_MASK)
++
++        if lock_value == PTHREAD_MUTEX_UNLOCKED:
++            self.values.append(('Status', 'Unlocked'))
++        else:
++            if self.kind & PTHREAD_MUTEX_PRIO_INHERIT_NP:
++                waiters = self.lock & FUTEX_WAITERS
++                owner = self.lock & FUTEX_TID_MASK
++            else:
++                # Mutex protocol is PP or none
++                waiters = (self.lock != PTHREAD_MUTEX_LOCKED_NO_WAITERS)
++                owner = self.owner
++
++            if waiters:
++                self.values.append(('Status', 'Locked, possibly with waiters'))
++            else:
++                self.values.append(('Status',
++                                    'Locked, possibly with no waiters'))
++
++            self.values.append(('Owner ID', owner))
++
++    def read_attributes(self):
++        """Read the mutex's attributes."""
++
++        if self.kind != PTHREAD_MUTEX_DESTROYED:
++            if self.kind & PTHREAD_MUTEX_ROBUST_NORMAL_NP:
++                self.values.append(('Robust', 'Yes'))
++            else:
++                self.values.append(('Robust', 'No'))
++
++            # In glibc, robust mutexes always have their pshared flag set to
++            # 'shared' regardless of what the pshared flag of their
++            # mutexattr was.  Therefore a robust mutex will act as shared
++            # even if it was initialized with a 'private' mutexattr.
++            if self.kind & PTHREAD_MUTEX_PSHARED_BIT:
++                self.values.append(('Shared', 'Yes'))
++            else:
++                self.values.append(('Shared', 'No'))
++
++            if self.kind & PTHREAD_MUTEX_PRIO_INHERIT_NP:
++                self.values.append(('Protocol', 'Priority inherit'))
++            elif self.kind & PTHREAD_MUTEX_PRIO_PROTECT_NP:
++                prio_ceiling = ((self.lock & PTHREAD_MUTEX_PRIO_CEILING_MASK)
++                                >> PTHREAD_MUTEX_PRIO_CEILING_SHIFT)
++
++                self.values.append(('Protocol', 'Priority protect'))
++                self.values.append(('Priority ceiling', prio_ceiling))
++            else:
++                # PTHREAD_PRIO_NONE
++                self.values.append(('Protocol', 'None'))
++
++    def read_misc_info(self):
++        """Read miscellaneous info on the mutex.
++
++        For now this reads the number of times a recursive mutex was locked
++        by the same thread.
++        """
++
++        mutex_type = self.kind & PTHREAD_MUTEX_KIND_MASK
++
++        if mutex_type == PTHREAD_MUTEX_RECURSIVE and self.count > 1:
++            self.values.append(('Times locked recursively', self.count))
++
++class MutexAttributesPrinter(object):
++    """Pretty printer for pthread_mutexattr_t.
++
++    In the NPTL this is a type that's always casted to struct pthread_mutexattr
++    which has a single 'mutexkind' field containing the actual attributes.
++    """
++
++    def __init__(self, mutexattr):
++        """Initialize the printer's internal data structures.
++
++        Args:
++            mutexattr: A gdb.value representing a pthread_mutexattr_t.
++        """
++
++        self.values = []
++
++        try:
++            mutexattr_struct = gdb.lookup_type('struct pthread_mutexattr')
++            self.mutexattr = mutexattr.cast(mutexattr_struct)['mutexkind']
++            self.read_values()
++        except gdb.error:
++            # libpthread doesn't have debug symbols, thus we can't find the
++            # real struct type.  Just print the union members.
++            self.values.append(('__size', mutexattr['__size']))
++            self.values.append(('__align', mutexattr['__align']))
++
++    def to_string(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_mutexattr_t.
++        """
++
++        return 'pthread_mutexattr_t'
++
++    def children(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_mutexattr_t.
++        """
++
++        return self.values
++
++    def read_values(self):
++        """Read the mutexattr's info and store it in self.values.
++
++        The data contained in self.values will be returned by the Iterator
++        created in self.children.
++        """
++
++        mutexattr_type = (self.mutexattr
++                          & ~PTHREAD_MUTEXATTR_FLAG_BITS
++                          & ~PTHREAD_MUTEX_NO_ELISION_NP)
++
++        # mutexattr_type must be casted to int because it's a gdb.Value
++        self.values.append(MUTEX_TYPES[int(mutexattr_type)])
++
++        if self.mutexattr & PTHREAD_MUTEXATTR_FLAG_ROBUST:
++            self.values.append(('Robust', 'Yes'))
++        else:
++            self.values.append(('Robust', 'No'))
++
++        if self.mutexattr & PTHREAD_MUTEXATTR_FLAG_PSHARED:
++            self.values.append(('Shared', 'Yes'))
++        else:
++            self.values.append(('Shared', 'No'))
++
++        protocol = ((self.mutexattr & PTHREAD_MUTEXATTR_PROTOCOL_MASK) >>
++                    PTHREAD_MUTEXATTR_PROTOCOL_SHIFT)
++
++        if protocol == PTHREAD_PRIO_NONE:
++            self.values.append(('Protocol', 'None'))
++        elif protocol == PTHREAD_PRIO_INHERIT:
++            self.values.append(('Protocol', 'Priority inherit'))
++        elif protocol == PTHREAD_PRIO_PROTECT:
++            self.values.append(('Protocol', 'Priority protect'))
++
++CLOCK_IDS = {
++    CLOCK_REALTIME: 'CLOCK_REALTIME',
++    CLOCK_MONOTONIC: 'CLOCK_MONOTONIC',
++    CLOCK_PROCESS_CPUTIME_ID: 'CLOCK_PROCESS_CPUTIME_ID',
++    CLOCK_THREAD_CPUTIME_ID: 'CLOCK_THREAD_CPUTIME_ID',
++    CLOCK_MONOTONIC_RAW: 'CLOCK_MONOTONIC_RAW',
++    CLOCK_REALTIME_COARSE: 'CLOCK_REALTIME_COARSE',
++    CLOCK_MONOTONIC_COARSE: 'CLOCK_MONOTONIC_COARSE'
++}
++
++class ConditionVariablePrinter(object):
++    """Pretty printer for pthread_cond_t."""
++
++    def __init__(self, cond):
++        """Initialize the printer's internal data structures.
++
++        Args:
++            cond: A gdb.value representing a pthread_cond_t.
++        """
++
++        # Since PTHREAD_COND_SHARED is an integer, we need to cast it to void *
++        # to be able to compare it to the condvar's __data.__mutex member.
++        #
++        # While it looks like self.shared_value should be a class variable,
++        # that would result in it having an incorrect size if we're loading
++        # these printers through .gdbinit for a 64-bit objfile in AMD64.
++        # This is because gdb initially assumes the pointer size to be 4 bytes,
++        # and only sets it to 8 after loading the 64-bit objfiles.  Since
++        # .gdbinit runs before any objfiles are loaded, this would effectively
++        # make self.shared_value have a size of 4, thus breaking later
++        # comparisons with pointers whose types are looked up at runtime.
++        void_ptr_type = gdb.lookup_type('void').pointer()
++        self.shared_value = gdb.Value(PTHREAD_COND_SHARED).cast(void_ptr_type)
++
++        data = cond['__data']
++        self.total_seq = data['__total_seq']
++        self.mutex = data['__mutex']
++        self.nwaiters = data['__nwaiters']
++        self.values = []
++
++        self.read_values()
++
++    def to_string(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_cond_t.
++        """
++
++        return 'pthread_cond_t'
++
++    def children(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_cond_t.
++        """
++
++        return self.values
++
++    def read_values(self):
++        """Read the condvar's info and store it in self.values.
++
++        The data contained in self.values will be returned by the Iterator
++        created in self.children.
++        """
++
++        self.read_status()
++        self.read_attributes()
++        self.read_mutex_info()
++
++    def read_status(self):
++        """Read the status of the condvar.
++
++        This method reads whether the condvar is destroyed and how many threads
++        are waiting for it.
++        """
++
++        if self.total_seq == PTHREAD_COND_DESTROYED:
++            self.values.append(('Status', 'Destroyed'))
++
++        self.values.append(('Threads waiting for this condvar',
++                            self.nwaiters >> COND_NWAITERS_SHIFT))
++
++    def read_attributes(self):
++        """Read the condvar's attributes."""
++
++        clock_id = self.nwaiters & ((1 << COND_NWAITERS_SHIFT) - 1)
++
++        # clock_id must be casted to int because it's a gdb.Value
++        self.values.append(('Clock ID', CLOCK_IDS[int(clock_id)]))
++
++        shared = (self.mutex == self.shared_value)
++
++        if shared:
++            self.values.append(('Shared', 'Yes'))
++        else:
++            self.values.append(('Shared', 'No'))
++
++    def read_mutex_info(self):
++        """Read the data of the mutex this condvar is bound to.
++
++        A pthread_cond_t's __data.__mutex member is a void * which
++        must be casted to pthread_mutex_t *.  For shared condvars, this
++        member isn't recorded and has a special value instead.
++        """
++
++        if self.mutex and self.mutex != self.shared_value:
++            mutex_type = gdb.lookup_type('pthread_mutex_t')
++            mutex = self.mutex.cast(mutex_type.pointer()).dereference()
++
++            self.values.append(('Mutex', mutex))
++
++class ConditionVariableAttributesPrinter(object):
++    """Pretty printer for pthread_condattr_t.
++
++    In the NPTL this is a type that's always casted to struct pthread_condattr,
++    which has a single 'value' field containing the actual attributes.
++    """
++
++    def __init__(self, condattr):
++        """Initialize the printer's internal data structures.
++
++        Args:
++            condattr: A gdb.value representing a pthread_condattr_t.
++        """
++
++        self.values = []
++
++        try:
++            condattr_struct = gdb.lookup_type('struct pthread_condattr')
++            self.condattr = condattr.cast(condattr_struct)['value']
++            self.read_values()
++        except gdb.error:
++            # libpthread doesn't have debug symbols, thus we can't find the
++            # real struct type.  Just print the union members.
++            self.values.append(('__size', condattr['__size']))
++            self.values.append(('__align', condattr['__align']))
++
++    def to_string(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_condattr_t.
++        """
++
++        return 'pthread_condattr_t'
++
++    def children(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_condattr_t.
++        """
++
++        return self.values
++
++    def read_values(self):
++        """Read the condattr's info and store it in self.values.
++
++        The data contained in self.values will be returned by the Iterator
++        created in self.children.
++        """
++
++        clock_id = self.condattr & ((1 << COND_NWAITERS_SHIFT) - 1)
++
++        # clock_id must be casted to int because it's a gdb.Value
++        self.values.append(('Clock ID', CLOCK_IDS[int(clock_id)]))
++
++        if self.condattr & 1:
++            self.values.append(('Shared', 'Yes'))
++        else:
++            self.values.append(('Shared', 'No'))
++
++class RWLockPrinter(object):
++    """Pretty printer for pthread_rwlock_t."""
++
++    def __init__(self, rwlock):
++        """Initialize the printer's internal data structures.
++
++        Args:
++            rwlock: A gdb.value representing a pthread_rwlock_t.
++        """
++
++        data = rwlock['__data']
++        self.readers = data['__nr_readers']
++        self.queued_readers = data['__nr_readers_queued']
++        self.queued_writers = data['__nr_writers_queued']
++        self.writer_id = data['__writer']
++        self.shared = data['__shared']
++        self.prefers_writers = data['__flags']
++        self.values = []
++        self.read_values()
++
++    def to_string(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_rwlock_t.
++        """
++
++        return 'pthread_rwlock_t'
++
++    def children(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_rwlock_t.
++        """
++
++        return self.values
++
++    def read_values(self):
++        """Read the rwlock's info and store it in self.values.
++
++        The data contained in self.values will be returned by the Iterator
++        created in self.children.
++        """
++
++        self.read_status()
++        self.read_attributes()
++
++    def read_status(self):
++        """Read the status of the rwlock."""
++
++        # Right now pthread_rwlock_destroy doesn't do anything, so there's no
++        # way to check if an rwlock is destroyed.
++
++        if self.writer_id:
++            self.values.append(('Status', 'Locked (Write)'))
++            self.values.append(('Writer ID', self.writer_id))
++        elif self.readers:
++            self.values.append(('Status', 'Locked (Read)'))
++            self.values.append(('Readers', self.readers))
++        else:
++            self.values.append(('Status', 'Unlocked'))
++
++        self.values.append(('Queued readers', self.queued_readers))
++        self.values.append(('Queued writers', self.queued_writers))
++
++    def read_attributes(self):
++        """Read the attributes of the rwlock."""
++
++        if self.shared:
++            self.values.append(('Shared', 'Yes'))
++        else:
++            self.values.append(('Shared', 'No'))
++
++        if self.prefers_writers:
++            self.values.append(('Prefers', 'Writers'))
++        else:
++            self.values.append(('Prefers', 'Readers'))
++
++class RWLockAttributesPrinter(object):
++    """Pretty printer for pthread_rwlockattr_t.
++
++    In the NPTL this is a type that's always casted to
++    struct pthread_rwlockattr, which has two fields ('lockkind' and 'pshared')
++    containing the actual attributes.
++    """
++
++    def __init__(self, rwlockattr):
++        """Initialize the printer's internal data structures.
++
++        Args:
++            rwlockattr: A gdb.value representing a pthread_rwlockattr_t.
++        """
++
++        self.values = []
++
++        try:
++            rwlockattr_struct = gdb.lookup_type('struct pthread_rwlockattr')
++            self.rwlockattr = rwlockattr.cast(rwlockattr_struct)
++            self.read_values()
++        except gdb.error:
++            # libpthread doesn't have debug symbols, thus we can't find the
++            # real struct type.  Just print the union members.
++            self.values.append(('__size', rwlockattr['__size']))
++            self.values.append(('__align', rwlockattr['__align']))
++
++    def to_string(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_rwlockattr_t.
++        """
++
++        return 'pthread_rwlockattr_t'
++
++    def children(self):
++        """gdb API function.
++
++        This is called from gdb when we try to print a pthread_rwlockattr_t.
++        """
++
++        return self.values
++
++    def read_values(self):
++        """Read the rwlockattr's info and store it in self.values.
++
++        The data contained in self.values will be returned by the Iterator
++        created in self.children.
++        """
++
++        rwlock_type = self.rwlockattr['lockkind']
++        shared = self.rwlockattr['pshared']
++
++        if shared == PTHREAD_PROCESS_SHARED:
++            self.values.append(('Shared', 'Yes'))
++        else:
++            # PTHREAD_PROCESS_PRIVATE
++            self.values.append(('Shared', 'No'))
++
++        if (rwlock_type == PTHREAD_RWLOCK_PREFER_READER_NP or
++            rwlock_type == PTHREAD_RWLOCK_PREFER_WRITER_NP):
++            # This is a known bug.  Using PTHREAD_RWLOCK_PREFER_WRITER_NP will
++            # still make the rwlock prefer readers.
++            self.values.append(('Prefers', 'Readers'))
++        elif rwlock_type == PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP:
++            self.values.append(('Prefers', 'Writers'))
++
++def register(objfile):
++    """Register the pretty printers within the given objfile."""
++
++    printer = gdb.printing.RegexpCollectionPrettyPrinter('glibc-pthread-locks')
++
++    printer.add_printer('pthread_mutex_t', r'^pthread_mutex_t$',
++                        MutexPrinter)
++    printer.add_printer('pthread_mutexattr_t', r'^pthread_mutexattr_t$',
++                        MutexAttributesPrinter)
++    printer.add_printer('pthread_cond_t', r'^pthread_cond_t$',
++                        ConditionVariablePrinter)
++    printer.add_printer('pthread_condattr_t', r'^pthread_condattr_t$',
++                        ConditionVariableAttributesPrinter)
++    printer.add_printer('pthread_rwlock_t', r'^pthread_rwlock_t$',
++                        RWLockPrinter)
++    printer.add_printer('pthread_rwlockattr_t', r'^pthread_rwlockattr_t$',
++                        RWLockAttributesPrinter)
++
++    if objfile == None:
++        objfile = gdb
++
++    gdb.printing.register_pretty_printer(objfile, printer)
++
++register(gdb.current_objfile())
+diff --git a/nptl/nptl_lock_constants.pysym b/nptl/nptl_lock_constants.pysym
+new file mode 100644
+index 0000000..303ec61
+--- /dev/null
++++ b/nptl/nptl_lock_constants.pysym
+@@ -0,0 +1,75 @@
++#include <pthreadP.h>
++
++-- Mutex types
++PTHREAD_MUTEX_KIND_MASK          PTHREAD_MUTEX_KIND_MASK_NP
++PTHREAD_MUTEX_NORMAL
++PTHREAD_MUTEX_RECURSIVE          PTHREAD_MUTEX_RECURSIVE_NP
++PTHREAD_MUTEX_ERRORCHECK         PTHREAD_MUTEX_ERRORCHECK_NP
++PTHREAD_MUTEX_ADAPTIVE_NP
++
++-- Mutex status
++-- These are hardcoded all over the code; there are no enums/macros for them.
++PTHREAD_MUTEX_DESTROYED         -1
++PTHREAD_MUTEX_UNLOCKED           0
++PTHREAD_MUTEX_LOCKED_NO_WAITERS  1
++
++-- For robust mutexes
++PTHREAD_MUTEX_INCONSISTENT
++PTHREAD_MUTEX_NOTRECOVERABLE
++FUTEX_OWNER_DIED
++
++-- For robust and PI mutexes
++FUTEX_WAITERS
++FUTEX_TID_MASK
++
++-- Mutex attributes
++PTHREAD_MUTEX_ROBUST_NORMAL_NP
++PTHREAD_MUTEX_PRIO_INHERIT_NP
++PTHREAD_MUTEX_PRIO_PROTECT_NP
++PTHREAD_MUTEX_PSHARED_BIT
++PTHREAD_MUTEX_PRIO_CEILING_SHIFT
++PTHREAD_MUTEX_PRIO_CEILING_MASK
++
++-- Mutex attribute flags
++PTHREAD_MUTEXATTR_PROTOCOL_SHIFT
++PTHREAD_MUTEXATTR_PROTOCOL_MASK
++PTHREAD_MUTEXATTR_PRIO_CEILING_MASK
++PTHREAD_MUTEXATTR_FLAG_ROBUST
++PTHREAD_MUTEXATTR_FLAG_PSHARED
++PTHREAD_MUTEXATTR_FLAG_BITS
++PTHREAD_MUTEX_NO_ELISION_NP
++
++-- Priority protocols
++PTHREAD_PRIO_NONE
++PTHREAD_PRIO_INHERIT
++PTHREAD_PRIO_PROTECT
++
++-- These values are hardcoded as well:
++-- Value of __mutex for shared condvars.
++PTHREAD_COND_SHARED             (void *)~0l
++
++-- Value of __total_seq for destroyed condvars.
++PTHREAD_COND_DESTROYED          -1ull
++
++-- __nwaiters encodes the number of threads waiting on a condvar
++-- and the clock ID.
++-- __nwaiters >> COND_NWAITERS_SHIFT gives us the number of waiters.
++COND_NWAITERS_SHIFT
++
++-- Condvar clock IDs
++CLOCK_REALTIME
++CLOCK_MONOTONIC
++CLOCK_PROCESS_CPUTIME_ID
++CLOCK_THREAD_CPUTIME_ID
++CLOCK_MONOTONIC_RAW
++CLOCK_REALTIME_COARSE
++CLOCK_MONOTONIC_COARSE
++
++-- Rwlock attributes
++PTHREAD_RWLOCK_PREFER_READER_NP
++PTHREAD_RWLOCK_PREFER_WRITER_NP
++PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP
++
++-- 'Shared' attribute values
++PTHREAD_PROCESS_PRIVATE
++PTHREAD_PROCESS_SHARED
+diff --git a/nptl/test-cond-printers.c b/nptl/test-cond-printers.c
+new file mode 100644
+index 0000000..0f2a5f4
+--- /dev/null
++++ b/nptl/test-cond-printers.c
+@@ -0,0 +1,57 @@
++/* Helper program for testing the pthread_cond_t pretty printer.
++
++   Copyright (C) 2016 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++/* Keep the calls to the pthread_* functions on separate lines to make it easy
++   to advance through the program using the gdb 'next' command.  */
++
++#include <time.h>
++#include <pthread.h>
++
++#define PASS 0
++#define FAIL 1
++
++static int test_status_destroyed (pthread_cond_t *condvar);
++
++int
++main (void)
++{
++  pthread_cond_t condvar;
++  pthread_condattr_t attr;
++  int result = FAIL;
++
++  if (pthread_condattr_init (&attr) == 0
++      && test_status_destroyed (&condvar) == PASS)
++    result = PASS;
++  /* Else, one of the pthread_cond* functions failed.  */
++
++  return result;
++}
++
++/* Initializes CONDVAR, then destroys it.  */
++static int
++test_status_destroyed (pthread_cond_t *condvar)
++{
++  int result = FAIL;
++
++  if (pthread_cond_init (condvar, NULL) == 0
++      && pthread_cond_destroy (condvar) == 0)
++    result = PASS; /* Test status (destroyed).  */
++
++  return result;
++}
+diff --git a/nptl/test-cond-printers.py b/nptl/test-cond-printers.py
+new file mode 100644
+index 0000000..af0e12e
+--- /dev/null
++++ b/nptl/test-cond-printers.py
+@@ -0,0 +1,50 @@
++# Common tests for the ConditionVariablePrinter class.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++import sys
++
++from test_printers_common import *
++
++test_source = sys.argv[1]
++test_bin = sys.argv[2]
++printer_files = sys.argv[3:]
++printer_names = ['global glibc-pthread-locks']
++
++try:
++    init_test(test_bin, printer_files, printer_names)
++    go_to_main()
++
++    var = 'condvar'
++    to_string = 'pthread_cond_t'
++
++    break_at(test_source, 'Test status (destroyed)')
++    continue_cmd() # Go to test_status_destroyed
++    test_printer(var, to_string, {'Status': 'Destroyed'})
++
++    continue_cmd() # Exit
++
++except (NoLineError, pexpect.TIMEOUT) as exception:
++    print('Error: {0}'.format(exception))
++    result = FAIL
++
++else:
++    print('Test succeeded.')
++    result = PASS
++
++exit(result)
+diff --git a/nptl/test-condattr-printers.c b/nptl/test-condattr-printers.c
+new file mode 100644
+index 0000000..4db4098
+--- /dev/null
++++ b/nptl/test-condattr-printers.c
+@@ -0,0 +1,94 @@
++/* Helper program for testing the pthread_cond_t and pthread_condattr_t
++   pretty printers.
++
++   Copyright (C) 2016 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++/* Keep the calls to the pthread_* functions on separate lines to make it easy
++   to advance through the program using the gdb 'next' command.  */
++
++#include <time.h>
++#include <pthread.h>
++
++#define PASS 0
++#define FAIL 1
++
++static int condvar_reinit (pthread_cond_t *condvar,
++			   const pthread_condattr_t *attr);
++static int test_setclock (pthread_cond_t *condvar, pthread_condattr_t *attr);
++static int test_setpshared (pthread_cond_t *condvar, pthread_condattr_t *attr);
++
++/* Need these so we don't have lines longer than 79 chars.  */
++#define SET_SHARED(attr, shared) pthread_condattr_setpshared (attr, shared)
++
++int
++main (void)
++{
++  pthread_cond_t condvar;
++  pthread_condattr_t attr;
++  int result = FAIL;
++
++  if (pthread_condattr_init (&attr) == 0
++      && pthread_cond_init (&condvar, NULL) == 0
++      && test_setclock (&condvar, &attr) == PASS
++      && test_setpshared (&condvar, &attr) == PASS)
++    result = PASS;
++  /* Else, one of the pthread_cond* functions failed.  */
++
++  return result;
++}
++
++/* Destroys CONDVAR and re-initializes it using ATTR.  */
++static int
++condvar_reinit (pthread_cond_t *condvar, const pthread_condattr_t *attr)
++{
++  int result = FAIL;
++
++  if (pthread_cond_destroy (condvar) == 0
++      && pthread_cond_init (condvar, attr) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests setting the clock ID attribute.  */
++static int
++test_setclock (pthread_cond_t *condvar, pthread_condattr_t *attr)
++{
++  int result = FAIL;
++
++  if (pthread_condattr_setclock (attr, CLOCK_REALTIME) == 0 /* Set clock.  */
++      && condvar_reinit (condvar, attr) == PASS)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests setting whether the condvar can be shared between processes.  */
++static int
++test_setpshared (pthread_cond_t *condvar, pthread_condattr_t *attr)
++{
++  int result = FAIL;
++
++  if (SET_SHARED (attr, PTHREAD_PROCESS_SHARED) == 0 /* Set shared.  */
++      && condvar_reinit (condvar, attr) == PASS
++      && SET_SHARED (attr, PTHREAD_PROCESS_PRIVATE) == 0
++      && condvar_reinit (condvar, attr) == PASS)
++    result = PASS;
++
++  return result;
++}
+diff --git a/nptl/test-condattr-printers.py b/nptl/test-condattr-printers.py
+new file mode 100644
+index 0000000..7ea01db
+--- /dev/null
++++ b/nptl/test-condattr-printers.py
+@@ -0,0 +1,71 @@
++# Common tests for the ConditionVariablePrinter and
++# ConditionVariableAttributesPrinter classes.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++import sys
++
++from test_printers_common import *
++
++test_source = sys.argv[1]
++test_bin = sys.argv[2]
++printer_files = sys.argv[3:]
++printer_names = ['global glibc-pthread-locks']
++
++try:
++    init_test(test_bin, printer_files, printer_names)
++    go_to_main()
++
++    check_debug_symbol('struct pthread_condattr')
++
++    condvar_var = 'condvar'
++    condvar_to_string = 'pthread_cond_t'
++
++    attr_var = 'attr'
++    attr_to_string = 'pthread_condattr_t'
++
++    break_at(test_source, 'Set clock')
++    continue_cmd() # Go to test_setclock
++    next_cmd(2)
++    test_printer(condvar_var, condvar_to_string, {'Clock ID': 'CLOCK_REALTIME'})
++    test_printer(attr_var, attr_to_string, {'Clock ID': 'CLOCK_REALTIME'})
++
++    break_at(test_source, 'Set shared')
++    continue_cmd() # Go to test_setpshared
++    next_cmd(2)
++    test_printer(condvar_var, condvar_to_string, {'Shared': 'Yes'})
++    test_printer(attr_var, attr_to_string, {'Shared': 'Yes'})
++    next_cmd(2)
++    test_printer(condvar_var, condvar_to_string, {'Shared': 'No'})
++    test_printer(attr_var, attr_to_string, {'Shared': 'No'})
++
++    continue_cmd() # Exit
++
++except (NoLineError, pexpect.TIMEOUT) as exception:
++    print('Error: {0}'.format(exception))
++    result = FAIL
++
++except DebugError as exception:
++    print(exception)
++    result = UNSUPPORTED
++
++else:
++    print('Test succeeded.')
++    result = PASS
++
++exit(result)
+diff --git a/nptl/test-mutex-printers.c b/nptl/test-mutex-printers.c
+new file mode 100644
+index 0000000..b973e82
+--- /dev/null
++++ b/nptl/test-mutex-printers.c
+@@ -0,0 +1,151 @@
++/* Helper program for testing the pthread_mutex_t pretty printer.
++
++   Copyright (C) 2016 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++/* Keep the calls to the pthread_* functions on separate lines to make it easy
++   to advance through the program using the gdb 'next' command.  */
++
++#include <stdlib.h>
++#include <errno.h>
++#include <pthread.h>
++
++#define PASS 0
++#define FAIL 1
++
++static int test_status_destroyed (pthread_mutex_t *mutex);
++static int test_status_no_robust (pthread_mutex_t *mutex,
++				  pthread_mutexattr_t *attr);
++static int test_status_robust (pthread_mutex_t *mutex,
++			       pthread_mutexattr_t *attr);
++static int test_locking_state_robust (pthread_mutex_t *mutex);
++static void *thread_func (void *arg);
++static int test_recursive_locks (pthread_mutex_t *mutex,
++				 pthread_mutexattr_t *attr);
++
++int
++main (void)
++{
++  pthread_mutex_t mutex;
++  pthread_mutexattr_t attr;
++  int result = FAIL;
++
++  if (pthread_mutexattr_init (&attr) == 0
++      && test_status_destroyed (&mutex) == PASS
++      && test_status_no_robust (&mutex, &attr) == PASS
++      && test_status_robust (&mutex, &attr) == PASS
++      && test_recursive_locks (&mutex, &attr) == PASS)
++    result = PASS;
++  /* Else, one of the pthread_mutex* functions failed.  */
++
++  return result;
++}
++
++/* Initializes MUTEX, then destroys it.  */
++static int
++test_status_destroyed (pthread_mutex_t *mutex)
++{
++  int result = FAIL;
++
++  if (pthread_mutex_init (mutex, NULL) == 0
++      && pthread_mutex_destroy (mutex) == 0)
++    result = PASS; /* Test status (destroyed).  */
++
++  return result;
++}
++
++/* Tests locking of non-robust mutexes.  */
++static int
++test_status_no_robust (pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
++{
++  int result = FAIL;
++
++  if (pthread_mutexattr_setrobust (attr, PTHREAD_MUTEX_STALLED) == 0
++      && pthread_mutex_init (mutex, attr) == 0
++      && pthread_mutex_lock (mutex) == 0 /* Test status (non-robust).  */
++      && pthread_mutex_unlock (mutex) == 0
++      && pthread_mutex_destroy (mutex) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests locking of robust mutexes.  */
++static int
++test_status_robust (pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
++{
++  int result = FAIL;
++
++  if (pthread_mutexattr_setrobust (attr, PTHREAD_MUTEX_ROBUST) == 0
++      && pthread_mutex_init (mutex, attr) == 0
++      && test_locking_state_robust (mutex) == PASS /* Test status (robust).  */
++      && pthread_mutex_destroy (mutex) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests locking and state corruption of robust mutexes.  We'll mark it as
++   inconsistent, then not recoverable.  */
++static int
++test_locking_state_robust (pthread_mutex_t *mutex)
++{
++  int result = FAIL;
++  pthread_t thread;
++
++  if (pthread_create (&thread, NULL, thread_func, mutex) == 0 /* Create.  */
++      && pthread_join (thread, NULL) == 0
++      && pthread_mutex_lock (mutex) == EOWNERDEAD /* Test locking (robust).  */
++      && pthread_mutex_unlock (mutex) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Function to be called by the child thread when testing robust mutexes.  */
++static void *
++thread_func (void *arg)
++{
++  pthread_mutex_t *mutex = (pthread_mutex_t *)arg;
++
++  if (pthread_mutex_lock (mutex) != 0) /* Thread function.  */
++    exit (FAIL);
++
++  /* Thread terminates without unlocking the mutex, thus marking it as
++     inconsistent.  */
++  return NULL;
++}
++
++/* Tests locking the mutex multiple times in a row.  */
++static int
++test_recursive_locks (pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
++{
++  int result = FAIL;
++
++  if (pthread_mutexattr_settype (attr, PTHREAD_MUTEX_RECURSIVE) == 0
++      && pthread_mutex_init (mutex, attr) == 0
++      && pthread_mutex_lock (mutex) == 0
++      && pthread_mutex_lock (mutex) == 0
++      && pthread_mutex_lock (mutex) == 0 /* Test recursive locks.  */
++      && pthread_mutex_unlock (mutex) == 0
++      && pthread_mutex_unlock (mutex) == 0
++      && pthread_mutex_unlock (mutex) == 0
++      && pthread_mutex_destroy (mutex) == 0)
++    result = PASS;
++
++  return result;
++}
+diff --git a/nptl/test-mutex-printers.py b/nptl/test-mutex-printers.py
+new file mode 100644
+index 0000000..7f542ad
+--- /dev/null
++++ b/nptl/test-mutex-printers.py
+@@ -0,0 +1,97 @@
++# Tests for the MutexPrinter class.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++import sys
++
++from test_printers_common import *
++
++test_source = sys.argv[1]
++test_bin = sys.argv[2]
++printer_files = sys.argv[3:]
++printer_names = ['global glibc-pthread-locks']
++
++try:
++    init_test(test_bin, printer_files, printer_names)
++    go_to_main()
++
++    var = 'mutex'
++    to_string = 'pthread_mutex_t'
++
++    break_at(test_source, 'Test status (destroyed)')
++    continue_cmd() # Go to test_status_destroyed
++    test_printer(var, to_string, {'Status': 'Destroyed'})
++
++    break_at(test_source, 'Test status (non-robust)')
++    continue_cmd() # Go to test_status_no_robust
++    test_printer(var, to_string, {'Status': 'Unlocked'})
++    next_cmd()
++    thread_id = get_current_thread_lwpid()
++    test_printer(var, to_string, {'Status': 'Locked, possibly with no waiters',
++                                  'Owner ID': thread_id})
++
++    break_at(test_source, 'Test status (robust)')
++    continue_cmd() # Go to test_status_robust
++    test_printer(var, to_string, {'Status': 'Unlocked'})
++
++    # We'll now test the robust mutex locking states.  We'll create a new
++    # thread that will lock a robust mutex and exit without unlocking it.
++    break_at(test_source, 'Create')
++    continue_cmd() # Go to test_locking_state_robust
++    # Set a breakpoint for the new thread to hit.
++    break_at(test_source, 'Thread function')
++    continue_cmd()
++    # By now the new thread is created and has hit its breakpoint.
++    set_scheduler_locking(True)
++    parent = 1
++    child = 2
++    select_thread(child)
++    child_id = get_current_thread_lwpid()
++    # We've got the new thread's ID.
++    select_thread(parent)
++    # Make the new thread finish its function while we wait.
++    continue_cmd(thread=child)
++    # The new thread should be dead by now.
++    break_at(test_source, 'Test locking (robust)')
++    continue_cmd()
++    test_printer(var, to_string, {'Owner ID': r'{0} \(dead\)'.format(child_id)})
++    # Try to lock and unlock the mutex.
++    next_cmd()
++    test_printer(var, to_string, {'Owner ID': thread_id,
++                           'State protected by this mutex': 'Inconsistent'})
++    next_cmd()
++    test_printer(var, to_string, {'Status': 'Unlocked',
++                        'State protected by this mutex': 'Not recoverable'})
++    set_scheduler_locking(False)
++
++    break_at(test_source, 'Test recursive locks')
++    continue_cmd() # Go to test_recursive_locks
++    test_printer(var, to_string, {'Times locked recursively': '2'})
++    next_cmd()
++    test_printer(var, to_string, {'Times locked recursively': '3'})
++    continue_cmd() # Exit
++
++except (NoLineError, pexpect.TIMEOUT) as exception:
++    print('Error: {0}'.format(exception))
++    result = FAIL
++
++else:
++    print('Test succeeded.')
++    result = PASS
++
++exit(result)
+diff --git a/nptl/test-mutexattr-printers.c b/nptl/test-mutexattr-printers.c
+new file mode 100644
+index 0000000..9ecfff7
+--- /dev/null
++++ b/nptl/test-mutexattr-printers.c
+@@ -0,0 +1,144 @@
++/* Helper program for testing the pthread_mutex_t and pthread_mutexattr_t
++   pretty printers.
++
++   Copyright (C) 2016 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++/* Keep the calls to the pthread_* functions on separate lines to make it easy
++   to advance through the program using the gdb 'next' command.  */
++
++#include <pthread.h>
++
++#define PASS 0
++#define FAIL 1
++#define PRIOCEILING 42
++
++/* Need these so we don't have lines longer than 79 chars.  */
++#define SET_TYPE(attr, type) pthread_mutexattr_settype (attr, type)
++#define SET_ROBUST(attr, robust) pthread_mutexattr_setrobust (attr, robust)
++#define SET_SHARED(attr, shared) pthread_mutexattr_setpshared (attr, shared)
++#define SET_PROTOCOL(attr, protocol) \
++	pthread_mutexattr_setprotocol (attr, protocol)
++#define SET_PRIOCEILING(mutex, prioceiling, old_ceiling) \
++	pthread_mutex_setprioceiling (mutex, prioceiling, old_ceiling)
++
++static int mutex_reinit (pthread_mutex_t *mutex,
++			 const pthread_mutexattr_t *attr);
++static int test_settype (pthread_mutex_t *mutex, pthread_mutexattr_t *attr);
++static int test_setrobust (pthread_mutex_t *mutex, pthread_mutexattr_t *attr);
++static int test_setpshared (pthread_mutex_t *mutex, pthread_mutexattr_t *attr);
++static int test_setprotocol (pthread_mutex_t *mutex,
++			     pthread_mutexattr_t *attr);
++
++int
++main (void)
++{
++  pthread_mutex_t mutex;
++  pthread_mutexattr_t attr;
++  int result = FAIL;
++
++  if (pthread_mutexattr_init (&attr) == 0
++      && pthread_mutex_init (&mutex, NULL) == 0
++      && test_settype (&mutex, &attr) == PASS
++      && test_setrobust (&mutex, &attr) == PASS
++      && test_setpshared (&mutex, &attr) == PASS
++      && test_setprotocol (&mutex, &attr) == PASS)
++    result = PASS;
++  /* Else, one of the pthread_mutex* functions failed.  */
++
++  return result;
++}
++
++/* Destroys MUTEX and re-initializes it using ATTR.  */
++static int
++mutex_reinit (pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
++{
++  int result = FAIL;
++
++  if (pthread_mutex_destroy (mutex) == 0
++      && pthread_mutex_init (mutex, attr) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests setting the mutex type.  */
++static int
++test_settype (pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
++{
++  int result = FAIL;
++
++  if (SET_TYPE (attr, PTHREAD_MUTEX_ERRORCHECK) == 0 /* Set type.  */
++      && mutex_reinit (mutex, attr) == 0
++      && SET_TYPE (attr, PTHREAD_MUTEX_RECURSIVE) == 0
++      && mutex_reinit (mutex, attr) == 0
++      && SET_TYPE (attr, PTHREAD_MUTEX_NORMAL) == 0
++      && mutex_reinit (mutex, attr) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests setting whether the mutex is robust.  */
++static int
++test_setrobust (pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
++{
++  int result = FAIL;
++
++  if (SET_ROBUST (attr, PTHREAD_MUTEX_ROBUST) == 0 /* Set robust.  */
++      && mutex_reinit (mutex, attr) == 0
++      && SET_ROBUST (attr, PTHREAD_MUTEX_STALLED) == 0
++      && mutex_reinit (mutex, attr) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests setting whether the mutex can be shared between processes.  */
++static int
++test_setpshared (pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
++{
++  int result = FAIL;
++
++  if (SET_SHARED (attr, PTHREAD_PROCESS_SHARED) == 0 /* Set shared.  */
++      && mutex_reinit (mutex, attr) == 0
++      && SET_SHARED (attr, PTHREAD_PROCESS_PRIVATE) == 0
++      && mutex_reinit (mutex, attr) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests setting the mutex protocol and, for Priority Protect, the Priority
++   Ceiling.  */
++static int
++test_setprotocol (pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
++{
++  int result = FAIL;
++  int old_prioceiling;
++
++  if (SET_PROTOCOL (attr, PTHREAD_PRIO_INHERIT) == 0 /* Set protocol.  */
++      && mutex_reinit (mutex, attr) == 0
++      && SET_PROTOCOL (attr, PTHREAD_PRIO_PROTECT) == 0
++      && mutex_reinit (mutex, attr) == 0
++      && SET_PRIOCEILING(mutex, PRIOCEILING, &old_prioceiling) == 0
++      && SET_PROTOCOL (attr, PTHREAD_PRIO_NONE) == 0
++      && mutex_reinit (mutex, attr) == 0)
++    result = PASS;
++
++  return result;
++}
+diff --git a/nptl/test-mutexattr-printers.py b/nptl/test-mutexattr-printers.py
+new file mode 100644
+index 0000000..4464723
+--- /dev/null
++++ b/nptl/test-mutexattr-printers.py
+@@ -0,0 +1,101 @@
++# Common tests for the MutexPrinter and MutexAttributesPrinter classes.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++import sys
++
++from test_printers_common import *
++
++test_source = sys.argv[1]
++test_bin = sys.argv[2]
++printer_files = sys.argv[3:]
++printer_names = ['global glibc-pthread-locks']
++PRIOCEILING = 42
++
++try:
++    init_test(test_bin, printer_files, printer_names)
++    go_to_main()
++
++    check_debug_symbol('struct pthread_mutexattr')
++
++    mutex_var = 'mutex'
++    mutex_to_string = 'pthread_mutex_t'
++
++    attr_var = 'attr'
++    attr_to_string = 'pthread_mutexattr_t'
++
++    break_at(test_source, 'Set type')
++    continue_cmd() # Go to test_settype
++    next_cmd(2)
++    test_printer(attr_var, attr_to_string, {'Type': 'Error check'})
++    test_printer(mutex_var, mutex_to_string, {'Type': 'Error check'})
++    next_cmd(2)
++    test_printer(attr_var, attr_to_string, {'Type': 'Recursive'})
++    test_printer(mutex_var, mutex_to_string, {'Type': 'Recursive'})
++    next_cmd(2)
++    test_printer(attr_var, attr_to_string, {'Type': 'Normal'})
++    test_printer(mutex_var, mutex_to_string, {'Type': 'Normal'})
++
++    break_at(test_source, 'Set robust')
++    continue_cmd() # Go to test_setrobust
++    next_cmd(2)
++    test_printer(attr_var, attr_to_string, {'Robust': 'Yes'})
++    test_printer(mutex_var, mutex_to_string, {'Robust': 'Yes'})
++    next_cmd(2)
++    test_printer(attr_var, attr_to_string, {'Robust': 'No'})
++    test_printer(mutex_var, mutex_to_string, {'Robust': 'No'})
++
++    break_at(test_source, 'Set shared')
++    continue_cmd() # Go to test_setpshared
++    next_cmd(2)
++    test_printer(attr_var, attr_to_string, {'Shared': 'Yes'})
++    test_printer(mutex_var, mutex_to_string, {'Shared': 'Yes'})
++    next_cmd(2)
++    test_printer(attr_var, attr_to_string, {'Shared': 'No'})
++    test_printer(mutex_var, mutex_to_string, {'Shared': 'No'})
++
++    break_at(test_source, 'Set protocol')
++    continue_cmd() # Go to test_setprotocol
++    next_cmd(2)
++    test_printer(attr_var, attr_to_string, {'Protocol': 'Priority inherit'})
++    test_printer(mutex_var, mutex_to_string, {'Protocol': 'Priority inherit'})
++    next_cmd(2)
++    test_printer(attr_var, attr_to_string, {'Protocol': 'Priority protect'})
++    test_printer(mutex_var, mutex_to_string, {'Protocol': 'Priority protect'})
++    next_cmd(2)
++    test_printer(mutex_var, mutex_to_string, {'Priority ceiling':
++                                              str(PRIOCEILING)})
++    next_cmd()
++    test_printer(attr_var, attr_to_string, {'Protocol': 'None'})
++    test_printer(mutex_var, mutex_to_string, {'Protocol': 'None'})
++
++    continue_cmd() # Exit
++
++except (NoLineError, pexpect.TIMEOUT) as exception:
++    print('Error: {0}'.format(exception))
++    result = FAIL
++
++except DebugError as exception:
++    print(exception)
++    result = UNSUPPORTED
++
++else:
++    print('Test succeeded.')
++    result = PASS
++
++exit(result)
+diff --git a/nptl/test-rwlock-printers.c b/nptl/test-rwlock-printers.c
+new file mode 100644
+index 0000000..dbbe9b8
+--- /dev/null
++++ b/nptl/test-rwlock-printers.c
+@@ -0,0 +1,78 @@
++/* Helper program for testing the pthread_rwlock_t pretty printer.
++
++   Copyright (C) 2016 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++/* Keep the calls to the pthread_* functions on separate lines to make it easy
++   to advance through the program using the gdb 'next' command.  */
++
++#include <pthread.h>
++
++#define PASS 0
++#define FAIL 1
++
++static int test_locking_reader (pthread_rwlock_t *rwlock);
++static int test_locking_writer (pthread_rwlock_t *rwlock);
++
++int
++main (void)
++{
++  pthread_rwlock_t rwlock;
++
++  int result = FAIL;
++
++  if (test_locking_reader (&rwlock) == PASS
++      && test_locking_writer (&rwlock) == PASS)
++    result = PASS;
++  /* Else, one of the pthread_rwlock* functions failed.  */
++
++  return result;
++}
++
++/* Tests locking the rwlock multiple times as a reader.  */
++static int
++test_locking_reader (pthread_rwlock_t *rwlock)
++{
++  int result = FAIL;
++
++  if (pthread_rwlock_init (rwlock, NULL) == 0
++      && pthread_rwlock_rdlock (rwlock) == 0 /* Test locking (reader).  */
++      && pthread_rwlock_rdlock (rwlock) == 0
++      && pthread_rwlock_rdlock (rwlock) == 0
++      && pthread_rwlock_unlock (rwlock) == 0
++      && pthread_rwlock_unlock (rwlock) == 0
++      && pthread_rwlock_unlock (rwlock) == 0
++      && pthread_rwlock_destroy (rwlock) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests locking the rwlock as a writer.  */
++static int
++test_locking_writer (pthread_rwlock_t *rwlock)
++{
++  int result = FAIL;
++
++  if (pthread_rwlock_init (rwlock, NULL) == 0
++      && pthread_rwlock_wrlock (rwlock) == 0 /* Test locking (writer).  */
++      && pthread_rwlock_unlock (rwlock) == 0
++      && pthread_rwlock_destroy (rwlock) == 0)
++    result = PASS;
++
++  return result;
++}
+diff --git a/nptl/test-rwlock-printers.py b/nptl/test-rwlock-printers.py
+new file mode 100644
+index 0000000..b972fa6
+--- /dev/null
++++ b/nptl/test-rwlock-printers.py
+@@ -0,0 +1,64 @@
++# Common tests for the RWLockPrinter class.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++import sys
++
++from test_printers_common import *
++
++test_source = sys.argv[1]
++test_bin = sys.argv[2]
++printer_files = sys.argv[3:]
++printer_names = ['global glibc-pthread-locks']
++
++try:
++    init_test(test_bin, printer_files, printer_names)
++    go_to_main()
++
++    var = 'rwlock'
++    to_string = 'pthread_rwlock_t'
++
++    break_at(test_source, 'Test locking (reader)')
++    continue_cmd() # Go to test_locking_reader
++    test_printer(var, to_string, {'Status': 'Unlocked'})
++    next_cmd()
++    test_printer(var, to_string, {'Status': r'Locked \(Read\)', 'Readers': '1'})
++    next_cmd()
++    test_printer(var, to_string, {'Readers': '2'})
++    next_cmd()
++    test_printer(var, to_string, {'Readers': '3'})
++
++    break_at(test_source, 'Test locking (writer)')
++    continue_cmd() # Go to test_locking_writer
++    test_printer(var, to_string, {'Status': 'Unlocked'})
++    next_cmd()
++    thread_id = get_current_thread_lwpid()
++    test_printer(var, to_string, {'Status': r'Locked \(Write\)',
++                                  'Writer ID': thread_id})
++
++    continue_cmd() # Exit
++
++except (NoLineError, pexpect.TIMEOUT) as exception:
++    print('Error: {0}'.format(exception))
++    result = FAIL
++
++else:
++    print('Test succeeded.')
++    result = PASS
++
++exit(result)
+diff --git a/nptl/test-rwlockattr-printers.c b/nptl/test-rwlockattr-printers.c
+new file mode 100644
+index 0000000..d12facf
+--- /dev/null
++++ b/nptl/test-rwlockattr-printers.c
+@@ -0,0 +1,98 @@
++/* Helper program for testing the pthread_rwlock_t and pthread_rwlockattr_t
++   pretty printers.
++
++   Copyright (C) 2016 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++/* Keep the calls to the pthread_* functions on separate lines to make it easy
++   to advance through the program using the gdb 'next' command.  */
++
++#include <pthread.h>
++
++#define PASS 0
++#define FAIL 1
++
++/* Need these so we don't have lines longer than 79 chars.  */
++#define SET_KIND(attr, kind) pthread_rwlockattr_setkind_np (attr, kind)
++#define SET_SHARED(attr, shared) pthread_rwlockattr_setpshared (attr, shared)
++
++static int rwlock_reinit (pthread_rwlock_t *rwlock,
++			  const pthread_rwlockattr_t *attr);
++static int test_setkind_np (pthread_rwlock_t *rwlock,
++			    pthread_rwlockattr_t *attr);
++static int test_setpshared (pthread_rwlock_t *rwlock,
++			    pthread_rwlockattr_t *attr);
++
++int
++main (void)
++{
++  pthread_rwlock_t rwlock;
++  pthread_rwlockattr_t attr;
++  int result = FAIL;
++
++  if (pthread_rwlockattr_init (&attr) == 0
++      && pthread_rwlock_init (&rwlock, NULL) == 0
++      && test_setkind_np (&rwlock, &attr) == PASS
++      && test_setpshared (&rwlock, &attr) == PASS)
++    result = PASS;
++  /* Else, one of the pthread_rwlock* functions failed.  */
++
++  return result;
++}
++
++/* Destroys RWLOCK and re-initializes it using ATTR.  */
++static int
++rwlock_reinit (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
++{
++  int result = FAIL;
++
++  if (pthread_rwlock_destroy (rwlock) == 0
++      && pthread_rwlock_init (rwlock, attr) == 0)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests setting whether the rwlock prefers readers or writers.  */
++static int
++test_setkind_np (pthread_rwlock_t *rwlock, pthread_rwlockattr_t *attr)
++{
++  int result = FAIL;
++
++  if (SET_KIND (attr, PTHREAD_RWLOCK_PREFER_READER_NP) == 0 /* Set kind.  */
++      && rwlock_reinit (rwlock, attr) == PASS
++      && SET_KIND (attr, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP) == 0
++      && rwlock_reinit (rwlock, attr) == PASS)
++    result = PASS;
++
++  return result;
++}
++
++/* Tests setting whether the rwlock can be shared between processes.  */
++static int
++test_setpshared (pthread_rwlock_t *rwlock, pthread_rwlockattr_t *attr)
++{
++  int result = FAIL;
++
++  if (SET_SHARED (attr, PTHREAD_PROCESS_SHARED) == 0 /* Set shared.  */
++      && rwlock_reinit (rwlock, attr) == PASS
++      && SET_SHARED (attr, PTHREAD_PROCESS_PRIVATE) == 0
++      && rwlock_reinit (rwlock, attr) == PASS)
++    result = PASS;
++
++  return result;
++}
+diff --git a/nptl/test-rwlockattr-printers.py b/nptl/test-rwlockattr-printers.py
+new file mode 100644
+index 0000000..1ca2dc6
+--- /dev/null
++++ b/nptl/test-rwlockattr-printers.py
+@@ -0,0 +1,73 @@
++# Common tests for the RWLockPrinter and RWLockAttributesPrinter classes.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++import sys
++
++from test_printers_common import *
++
++test_source = sys.argv[1]
++test_bin = sys.argv[2]
++printer_files = sys.argv[3:]
++printer_names = ['global glibc-pthread-locks']
++
++try:
++    init_test(test_bin, printer_files, printer_names)
++    go_to_main()
++
++    check_debug_symbol('struct pthread_rwlockattr')
++
++    rwlock_var = 'rwlock'
++    rwlock_to_string = 'pthread_rwlock_t'
++
++    attr_var = 'attr'
++    attr_to_string = 'pthread_rwlockattr_t'
++
++    break_at(test_source, 'Set kind')
++    continue_cmd() # Go to test_setkind_np
++    next_cmd(2)
++    test_printer(rwlock_var, rwlock_to_string, {'Prefers': 'Readers'})
++    test_printer(attr_var, attr_to_string, {'Prefers': 'Readers'})
++    next_cmd(2)
++    test_printer(rwlock_var, rwlock_to_string, {'Prefers': 'Writers'})
++    test_printer(attr_var, attr_to_string, {'Prefers': 'Writers'})
++
++    break_at(test_source, 'Set shared')
++    continue_cmd() # Go to test_setpshared
++    next_cmd(2)
++    test_printer(rwlock_var, rwlock_to_string, {'Shared': 'Yes'})
++    test_printer(attr_var, attr_to_string, {'Shared': 'Yes'})
++    next_cmd(2)
++    test_printer(rwlock_var, rwlock_to_string, {'Shared': 'No'})
++    test_printer(attr_var, attr_to_string, {'Shared': 'No'})
++
++    continue_cmd() # Exit
++
++except (NoLineError, pexpect.TIMEOUT) as exception:
++    print('Error: {0}'.format(exception))
++    result = FAIL
++
++except DebugError as exception:
++    print(exception)
++    result = UNSUPPORTED
++
++else:
++    print('Test succeeded.')
++    result = PASS
++
++exit(result)
+diff --git a/scripts/gen-py-const.awk b/scripts/gen-py-const.awk
+new file mode 100644
+index 0000000..4586f59
+--- /dev/null
++++ b/scripts/gen-py-const.awk
+@@ -0,0 +1,118 @@
++# Script to generate constants for Python pretty printers.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++# This script is a smaller version of the clever gen-asm-const.awk hack used to
++# generate ASM constants from .sym files.  We'll use this to generate constants
++# for Python pretty printers.
++#
++# The input to this script are .pysym files that look like:
++# #C_Preprocessor_Directive...
++# NAME1
++# NAME2 expression...
++#
++# A line giving just a name implies an expression consisting of just that name.
++# Comments start with '--'.
++#
++# The output of this script is a 'dummy' function containing 'asm' declarations
++# for each non-preprocessor line in the .pysym file.  The expression values
++# will appear as input operands to the 'asm' declaration.  For example, if we
++# have:
++#
++# /* header.h */
++# #define MACRO 42
++#
++# struct S {
++#     char c1;
++#     char c2;
++#     char c3;
++# };
++#
++# enum E {
++#     ZERO,
++#     ONE
++# };
++#
++# /* symbols.pysym */
++# #include <stddef.h>
++# #include "header.h"
++# -- This is a comment
++# MACRO
++# C3_OFFSET offsetof(struct S, c3)
++# E_ONE ONE
++#
++# the output will be:
++#
++# #include <stddef.h>
++# #include "header.h"
++# void dummy(void)
++# {
++#   asm ("@name@MACRO@value@%0@" : : "i" (MACRO));
++#   asm ("@name@C3_OFFSET@value@%0@" : : "i" (offsetof(struct S, c3)));
++#   asm ("@name@E_ONE@value@%0@" : : "i" (ONE));
++# }
++#
++# We'll later feed this output to gcc -S.  Since '-S' tells gcc to compile but
++# not assemble, gcc will output something like:
++#
++# dummy:
++# 	...
++# 	@name@MACRO@value@$42@
++# 	@name@C3_OFFSET@value@$2@
++# 	@name@E_ONE@value@$1@
++#
++# Finally, we can process that output to extract the constant values.
++# Notice gcc may prepend a special character such as '$' to each value.
++
++# found_symbol indicates whether we found a non-comment, non-preprocessor line.
++BEGIN { found_symbol = 0 }
++
++# C preprocessor directives go straight through.
++/^#/ { print; next; }
++
++# Skip comments.
++/--/ { next; }
++
++# Trim leading whitespace.
++{ sub(/^[[:blank:]]*/, ""); }
++
++# If we found a non-comment, non-preprocessor line, print the 'dummy' function
++# header.
++NF > 0 && !found_symbol {
++    print "void dummy(void)\n{";
++    found_symbol = 1;
++}
++
++# If the line contains just a name, duplicate it so we can use that name
++# as the value of the expression.
++NF == 1 { sub(/^.*$/, "& &"); }
++
++# If a line contains a name and an expression...
++NF > 1 {
++    name = $1;
++
++    # Remove any characters before the second field.
++    sub(/^[^[:blank:]]+[[:blank:]]+/, "");
++
++    # '$0' ends up being everything that appeared after the first field
++    # separator.
++    printf "  asm (\"@name@%s@value@%0@\" : : \"i\" (%s));\n", name, $0;
++}
++
++# Close the 'dummy' function.
++END { if (found_symbol) print "}"; }
+diff --git a/scripts/test_printers_common.py b/scripts/test_printers_common.py
+new file mode 100644
+index 0000000..c79d7e3
+--- /dev/null
++++ b/scripts/test_printers_common.py
+@@ -0,0 +1,364 @@
++# Common functions and variables for testing the Python pretty printers.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++"""These tests require PExpect 4.0 or newer.
++
++Exported constants:
++    PASS, FAIL, UNSUPPORTED (int): Test exit codes, as per evaluate-test.sh.
++"""
++
++import os
++import re
++from test_printers_exceptions import *
++
++PASS = 0
++FAIL = 1
++UNSUPPORTED = 77
++
++gdb_bin = 'gdb'
++gdb_options = '-q -nx'
++gdb_invocation = '{0} {1}'.format(gdb_bin, gdb_options)
++pexpect_min_version = 4
++gdb_min_version = (7, 8)
++encoding = 'utf-8'
++
++try:
++    import pexpect
++except ImportError:
++    print('PExpect 4.0 or newer must be installed to test the pretty printers.')
++    exit(UNSUPPORTED)
++
++pexpect_version = pexpect.__version__.split('.')[0]
++
++if int(pexpect_version) < pexpect_min_version:
++    print('PExpect 4.0 or newer must be installed to test the pretty printers.')
++    exit(UNSUPPORTED)
++
++if not pexpect.which(gdb_bin):
++    print('gdb 7.8 or newer must be installed to test the pretty printers.')
++    exit(UNSUPPORTED)
++
++timeout = 5
++TIMEOUTFACTOR = os.environ.get('TIMEOUTFACTOR')
++
++if TIMEOUTFACTOR:
++    timeout = int(TIMEOUTFACTOR)
++
++try:
++    # Check the gdb version.
++    version_cmd = '{0} --version'.format(gdb_invocation, timeout=timeout)
++    gdb_version_out = pexpect.run(version_cmd, encoding=encoding)
++
++    # The gdb version string is "GNU gdb <PKGVERSION><version>", where
++    # PKGVERSION can be any text.  We assume that there'll always be a space
++    # between PKGVERSION and the version number for the sake of the regexp.
++    version_match = re.search(r'GNU gdb .* ([1-9]+)\.([0-9]+)', gdb_version_out)
++
++    if not version_match:
++        print('The gdb version string (gdb -v) is incorrectly formatted.')
++        exit(UNSUPPORTED)
++
++    gdb_version = (int(version_match.group(1)), int(version_match.group(2)))
++
++    if gdb_version < gdb_min_version:
++        print('gdb 7.8 or newer must be installed to test the pretty printers.')
++        exit(UNSUPPORTED)
++
++    # Check if gdb supports Python.
++    gdb_python_cmd = '{0} -ex "python import os" -batch'.format(gdb_invocation,
++                                                                timeout=timeout)
++    gdb_python_error = pexpect.run(gdb_python_cmd, encoding=encoding)
++
++    if gdb_python_error:
++        print('gdb must have python support to test the pretty printers.')
++        exit(UNSUPPORTED)
++
++    # If everything's ok, spawn the gdb process we'll use for testing.
++    gdb = pexpect.spawn(gdb_invocation, echo=False, timeout=timeout,
++                        encoding=encoding)
++    gdb_prompt = u'\(gdb\)'
++    gdb.expect(gdb_prompt)
++
++except pexpect.ExceptionPexpect as exception:
++    print('Error: {0}'.format(exception))
++    exit(FAIL)
++
++def test(command, pattern=None):
++    """Sends 'command' to gdb and expects the given 'pattern'.
++
++    If 'pattern' is None, simply consumes everything up to and including
++    the gdb prompt.
++
++    Args:
++        command (string): The command we'll send to gdb.
++        pattern (raw string): A pattern the gdb output should match.
++
++    Returns:
++        string: The string that matched 'pattern', or an empty string if
++            'pattern' was None.
++    """
++
++    match = ''
++
++    gdb.sendline(command)
++
++    if pattern:
++        # PExpect does a non-greedy match for '+' and '*'.  Since it can't look
++        # ahead on the gdb output stream, if 'pattern' ends with a '+' or a '*'
++        # we may end up matching only part of the required output.
++        # To avoid this, we'll consume 'pattern' and anything that follows it
++        # up to and including the gdb prompt, then extract 'pattern' later.
++        index = gdb.expect([u'{0}.+{1}'.format(pattern, gdb_prompt),
++                            pexpect.TIMEOUT])
++
++        if index == 0:
++            # gdb.after now contains the whole match.  Extract the text that
++            # matches 'pattern'.
++            match = re.match(pattern, gdb.after, re.DOTALL).group()
++        elif index == 1:
++            # We got a timeout exception.  Print information on what caused it
++            # and bail out.
++            error = ('Response does not match the expected pattern.\n'
++                     'Command: {0}\n'
++                     'Expected pattern: {1}\n'
++                     'Response: {2}'.format(command, pattern, gdb.before))
++
++            raise pexpect.TIMEOUT(error)
++    else:
++        # Consume just the the gdb prompt.
++        gdb.expect(gdb_prompt)
++
++    return match
++
++def init_test(test_bin, printer_files, printer_names):
++    """Loads the test binary file and the required pretty printers to gdb.
++
++    Args:
++        test_bin (string): The name of the test binary file.
++        pretty_printers (list of strings): A list with the names of the pretty
++            printer files.
++    """
++
++    # Load all the pretty printer files.  We're assuming these are safe.
++    for printer_file in printer_files:
++        test('source {0}'.format(printer_file))
++
++    # Disable all the pretty printers.
++    test('disable pretty-printer', r'0 of [0-9]+ printers enabled')
++
++    # Enable only the required printers.
++    for printer in printer_names:
++        test('enable pretty-printer {0}'.format(printer),
++             r'[1-9][0-9]* of [1-9]+ printers enabled')
++
++    # Finally, load the test binary.
++    test('file {0}'.format(test_bin))
++
++def go_to_main():
++    """Executes a gdb 'start' command, which takes us to main."""
++
++    test('start', r'main')
++
++def get_line_number(file_name, string):
++    """Returns the number of the line in which 'string' appears within a file.
++
++    Args:
++        file_name (string): The name of the file we'll search through.
++        string (string): The string we'll look for.
++
++    Returns:
++        int: The number of the line in which 'string' appears, starting from 1.
++    """
++    number = -1
++
++    with open(file_name) as src_file:
++        for i, line in enumerate(src_file):
++            if string in line:
++                number = i + 1
++                break
++
++    if number == -1:
++        raise NoLineError(file_name, string)
++
++    return number
++
++def break_at(file_name, string, temporary=True, thread=None):
++    """Places a breakpoint on the first line in 'file_name' containing 'string'.
++
++    'string' is usually a comment like "Stop here".  Notice this may fail unless
++    the comment is placed inline next to actual code, e.g.:
++
++        ...
++        /* Stop here */
++        ...
++
++    may fail, while:
++
++        ...
++        some_func(); /* Stop here */
++        ...
++
++    will succeed.
++
++    If 'thread' isn't None, the breakpoint will be set for all the threads.
++    Otherwise, it'll be set only for 'thread'.
++
++    Args:
++        file_name (string): The name of the file we'll place the breakpoint in.
++        string (string): A string we'll look for inside the file.
++            We'll place a breakpoint on the line which contains it.
++        temporary (bool): Whether the breakpoint should be automatically deleted
++            after we reach it.
++        thread (int): The number of the thread we'll place the breakpoint for,
++            as seen by gdb.  If specified, it should be greater than zero.
++    """
++
++    if not thread:
++        thread_str = ''
++    else:
++        thread_str = 'thread {0}'.format(thread)
++
++    if temporary:
++        command = 'tbreak'
++        break_type = 'Temporary breakpoint'
++    else:
++        command = 'break'
++        break_type = 'Breakpoint'
++
++    line_number = str(get_line_number(file_name, string))
++
++    test('{0} {1}:{2} {3}'.format(command, file_name, line_number, thread_str),
++         r'{0} [0-9]+ at 0x[a-f0-9]+: file {1}, line {2}\.'.format(break_type,
++                                                                   file_name,
++                                                                   line_number))
++
++def continue_cmd(thread=None):
++    """Executes a gdb 'continue' command.
++
++    If 'thread' isn't None, the command will be applied to all the threads.
++    Otherwise, it'll be applied only to 'thread'.
++
++    Args:
++        thread (int): The number of the thread we'll apply the command to,
++            as seen by gdb.  If specified, it should be greater than zero.
++    """
++
++    if not thread:
++        command = 'continue'
++    else:
++        command = 'thread apply {0} continue'.format(thread)
++
++    test(command)
++
++def next_cmd(count=1, thread=None):
++    """Executes a gdb 'next' command.
++
++    If 'thread' isn't None, the command will be applied to all the threads.
++    Otherwise, it'll be applied only to 'thread'.
++
++    Args:
++        count (int): The 'count' argument of the 'next' command.
++        thread (int): The number of the thread we'll apply the command to,
++            as seen by gdb.  If specified, it should be greater than zero.
++    """
++
++    if not thread:
++        command = 'next'
++    else:
++        command = 'thread apply {0} next'
++
++    test('{0} {1}'.format(command, count))
++
++def select_thread(thread):
++    """Selects the thread indicated by 'thread'.
++
++    Args:
++        thread (int): The number of the thread we'll switch to, as seen by gdb.
++            This should be greater than zero.
++    """
++
++    if thread > 0:
++        test('thread {0}'.format(thread))
++
++def get_current_thread_lwpid():
++    """Gets the current thread's Lightweight Process ID.
++
++    Returns:
++        string: The current thread's LWP ID.
++    """
++
++    # It's easier to get the LWP ID through the Python API than the gdb CLI.
++    command = 'python print(gdb.selected_thread().ptid[1])'
++
++    return test(command, r'[0-9]+')
++
++def set_scheduler_locking(mode):
++    """Executes the gdb 'set scheduler-locking' command.
++
++    Args:
++        mode (bool): Whether the scheduler locking mode should be 'on'.
++    """
++    modes = {
++        True: 'on',
++        False: 'off'
++    }
++
++    test('set scheduler-locking {0}'.format(modes[mode]))
++
++def test_printer(var, to_string, children=None, is_ptr=True):
++    """ Tests the output of a pretty printer.
++
++    For a variable called 'var', this tests whether its associated printer
++    outputs the expected 'to_string' and children (if any).
++
++    Args:
++        var (string): The name of the variable we'll print.
++        to_string (raw string): The expected output of the printer's 'to_string'
++            method.
++        children (map {raw string->raw string}): A map with the expected output
++            of the printer's children' method.
++        is_ptr (bool): Whether 'var' is a pointer, and thus should be
++            dereferenced.
++    """
++
++    if is_ptr:
++        var = '*{0}'.format(var)
++
++    test('print {0}'.format(var), to_string)
++
++    if children:
++        for name, value in children.items():
++            # Children are shown as 'name = value'.
++            test('print {0}'.format(var), r'{0} = {1}'.format(name, value))
++
++def check_debug_symbol(symbol):
++    """ Tests whether a given debugging symbol exists.
++
++    If the symbol doesn't exist, raises a DebugError.
++
++    Args:
++        symbol (string): The symbol we're going to check for.
++    """
++
++    try:
++        test('ptype {0}'.format(symbol), r'type = {0}'.format(symbol))
++
++    except pexpect.TIMEOUT:
++        # The symbol doesn't exist.
++        raise DebugError(symbol)
+diff --git a/scripts/test_printers_exceptions.py b/scripts/test_printers_exceptions.py
+new file mode 100644
+index 0000000..17034b5
+--- /dev/null
++++ b/scripts/test_printers_exceptions.py
+@@ -0,0 +1,61 @@
++# Exception classes used when testing the Python pretty printers.
++#
++# Copyright (C) 2016 Free Software Foundation, Inc.
++# This file is part of the GNU C Library.
++#
++# The GNU C Library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# The GNU C Library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with the GNU C Library; if not, see
++# <http://www.gnu.org/licenses/>.
++
++class NoLineError(Exception):
++    """Custom exception to indicate that a test file doesn't contain
++    the requested string.
++    """
++
++    def __init__(self, file_name, string):
++        """Constructor.
++
++        Args:
++            file_name (string): The name of the test file.
++            string (string): The string that was requested.
++        """
++
++        super(NoLineError, self).__init__()
++        self.file_name = file_name
++        self.string = string
++
++    def __str__(self):
++        """Shows a readable representation of the exception."""
++
++        return ('File {0} has no line containing the following string: {1}'
++                .format(self.file_name, self.string))
++
++class DebugError(Exception):
++    """Custom exception to indicate that a required debugging symbol is missing.
++    """
++
++    def __init__(self, symbol):
++        """Constructor.
++
++        Args:
++            symbol (string): The name of the entity whose debug info is missing.
++        """
++
++        super(DebugError, self).__init__()
++        self.symbol = symbol
++
++    def __str__(self):
++        """Shows a readable representation of the exception."""
++
++        return ('The required debugging information for {0} is missing.'
++                .format(self.symbol))
+-- 
+2.10.2
+

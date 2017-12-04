@@ -83,12 +83,14 @@ def copyhardlinktree(src, dst):
         if os.path.isdir(src):
             import glob
             if len(glob.glob('%s/.??*' % src)) > 0:
-                source = '%s/.??* ' % src
-            source = source + '%s/*' % src
+                source = './.??* '
+            source += './*'
+            s_dir = src
         else:
             source = src
-        cmd = 'cp -afl --preserve=xattr %s %s' % (source, dst)
-        subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+            s_dir = os.getcwd()
+        cmd = 'cp -afl --preserve=xattr %s %s' % (source, os.path.realpath(dst))
+        subprocess.check_output(cmd, shell=True, cwd=s_dir, stderr=subprocess.STDOUT)
     else:
         copytree(src, dst)
 

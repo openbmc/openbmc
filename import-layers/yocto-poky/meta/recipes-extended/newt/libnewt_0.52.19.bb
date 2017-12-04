@@ -8,7 +8,7 @@ shared library needed by programs built with newt, as well as a \
 /usr/bin/dialog replacement called whiptail.  Newt is based on the \
 slang library."
 
-HOMEPAGE = "https://fedorahosted.org/newt/"
+HOMEPAGE = "https://releases.pagure.org/newt/"
 SECTION = "libs"
 
 LICENSE = "LGPLv2"
@@ -17,7 +17,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2"
 # slang needs to be >= 2.2
 DEPENDS = "slang popt"
 
-SRC_URI = "https://fedorahosted.org/releases/n/e/newt/newt-${PV}.tar.gz \
+SRC_URI = "https://releases.pagure.org/newt/newt-${PV}.tar.gz \
            file://fix_SHAREDDIR.patch \
            file://cross_ar.patch \
            file://Makefile.in-Add-tinfo-library-to-the-linking-librari.patch \

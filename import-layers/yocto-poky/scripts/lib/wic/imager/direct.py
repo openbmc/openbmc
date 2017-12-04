@@ -108,7 +108,7 @@ class DirectImageCreator(BaseImageCreator):
             if pnum == num:
                 if  part.no_table:
                     return 0
-                if self.ptable_format == 'msdos' and realnum > 3:
+                if self.ptable_format == 'msdos' and realnum > 3 and len(parts) > 4:
                     # account for logical partition numbering, ex. sda5..
                     return realnum + 1
                 return realnum

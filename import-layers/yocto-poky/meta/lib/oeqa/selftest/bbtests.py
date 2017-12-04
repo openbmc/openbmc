@@ -37,7 +37,6 @@ class BitbakeTests(oeSelfTest):
 
     @testcase(103)
     def test_local_sstate(self):
-        bitbake('m4-native -ccleansstate')
         bitbake('m4-native')
         bitbake('m4-native -cclean')
         result = bitbake('m4-native')
@@ -83,8 +82,8 @@ class BitbakeTests(oeSelfTest):
         pkgsplit_dir = get_bb_var('PKGDEST', test_recipe)
         man_dir = get_bb_var('mandir', test_recipe)
 
-        bitbake('-c cleansstate %s' % test_recipe)
-        bitbake(test_recipe)
+        bitbake('-c clean %s' % test_recipe)
+        bitbake('-c package -f %s' % test_recipe)
         self.add_command_to_tearDown('bitbake -c clean %s' % test_recipe)
 
         man_file = os.path.join(image_dir + man_dir, 'man3/zlib.3')
@@ -103,7 +102,6 @@ class BitbakeTests(oeSelfTest):
         # test 2 from bug 5875
         test_recipe = 'zlib'
 
-        bitbake('-c cleansstate %s' % test_recipe)
         bitbake(test_recipe)
         self.add_command_to_tearDown('bitbake -c clean %s' % test_recipe)
 
@@ -221,7 +219,7 @@ INHERIT_remove = \"report-error\"
         self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
         self.write_recipeinc('man',"\ndo_fail_task () {\nexit 1 \n}\n\naddtask do_fail_task before do_fetch\n" )
         runCmd('bitbake -c cleanall man xcursor-transparent-theme')
-        result = runCmd('bitbake man xcursor-transparent-theme -k', ignore_status=True)
+        result = runCmd('bitbake -c unpack -k man xcursor-transparent-theme', ignore_status=True)
         errorpos = result.output.find('ERROR: Function failed: do_fail_task')
         manver = re.search("NOTE: recipe xcursor-transparent-theme-(.*?): task do_unpack: Started", result.output)
         continuepos = result.output.find('NOTE: recipe xcursor-transparent-theme-%s: task do_unpack: Started' % manver.group(1))

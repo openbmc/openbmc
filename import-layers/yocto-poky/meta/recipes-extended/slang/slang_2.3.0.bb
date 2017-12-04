@@ -9,7 +9,7 @@ to recode S-Lang procedures in C if you need to."
 
 HOMEPAGE = "http://www.jedsoft.org/slang/"
 SECTION = "libs"
-DEPENDS = "pcre ncurses"
+DEPENDS = "ncurses virtual/libiconv"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a52a18a472d4f7e45479b06563717c02"
@@ -20,17 +20,23 @@ SRC_URI = "http://www.jedsoft.org/releases/${BPN}/${BP}.tar.bz2 \
            file://fix-check-pcre.patch \
            file://slang-fix-the-iconv-existence-checking.patch \
            file://0001-Fix-error-conflicting-types-for-posix_close.patch \
+           file://no-x.patch \
           "
-UPSTREAM_CHECK_URI = "http://www.jedsoft.org/releases/slang/"
-
-inherit autotools-brokensep
-
-CLEANBROKEN = "1"
-
 SRC_URI[md5sum] = "3bcc790460d52db1316c20395b7ac2f1"
 SRC_URI[sha256sum] = "f95224060f45e0d8212a5039b339afa5f1a94a1bb0298e796104e5b12e926129"
 
-EXTRA_OECONF += " --without-z --without-png --without-onig --x-includes=${STAGING_DIR_HOST}/usr/include/X11 --x-libraries=${STAGING_DIR_HOST}/usr/lib"
+UPSTREAM_CHECK_URI = "http://www.jedsoft.org/releases/slang/"
+PREMIRRORS_append = "\n http://www.jedsoft.org/releases/slang/.* http://www.jedsoft.org/releases/slang/old/ \n"
+
+inherit autotools-brokensep
+CLEANBROKEN = "1"
+
+EXTRA_OECONF = "--without-onig"
+
+PACKAGECONFIG ??= "pcre"
+PACKAGECONFIG[pcre] = "--with-pcre,--without-pcre,pcre"
+PACKAGECONFIG[png] = "--with-png,--without-png,libpng"
+PACKAGECONFIG[zlib] = "--with-z,--without-z,zlib"
 
 do_configure_prepend() {
     # slang keeps configure.ac and rest of autoconf files in autoconf/ directory
@@ -47,5 +53,6 @@ do_install() {
 FILES_${PN} += "${libdir}/${BPN}/v2/modules/ ${datadir}/slsh/"
 
 PARALLEL_MAKE = ""
+PARALLEL_MAKEINST = ""
 
 BBCLASSEXTEND = "native"

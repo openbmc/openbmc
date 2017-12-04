@@ -246,7 +246,7 @@ RDEPENDS_${PN}-terminal="${PN}-core ${PN}-io"
 FILES_${PN}-terminal="${libdir}/python2.7/pty.* ${libdir}/python2.7/tty.* "
 
 SUMMARY_${PN}-tests="Python tests"
-RDEPENDS_${PN}-tests="${PN}-core"
+RDEPENDS_${PN}-tests="${PN}-core ${PN}-modules"
 FILES_${PN}-tests="${libdir}/python2.7/test "
 
 SUMMARY_${PN}-textutils="Python option parsing, text wrapping and CSV support"

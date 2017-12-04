@@ -4,13 +4,15 @@
 
 # testsdk.bbclass enables testing for SDK and Extensible SDK
 #
-# For run SDK tests you need to do,
-# - bitbake core-image-sato -c populate_sdk
-# - bitbake core-image-sato -c testsdk
+# To run SDK tests, run the commands:
+# $ bitbake <image-name> -c populate_sdk
+# $ bitbake <image-name> -c testsdk
 #
-# For run eSDK tests you need to do,
-# - bitbake core-image-sato -c populate_sdk_ext
-# - bitbake core-image-sato -c testsdkext
+# To run eSDK tests, run the commands:
+# $ bitbake <image-name> -c populate_sdk_ext
+# $ bitbake <image-name> -c testsdkext
+#
+# where "<image-name>" is an image like core-image-sato.
 
 TEST_LOG_DIR ?= "${WORKDIR}/testimage"
 TESTSDKLOCK = "${TMPDIR}/testsdk.lock"

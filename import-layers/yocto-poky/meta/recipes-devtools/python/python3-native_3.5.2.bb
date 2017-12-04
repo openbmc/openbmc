@@ -65,7 +65,8 @@ RPROVIDES += " \
     python3-unittest-native \
 "
 
-EXTRA_OECONF_append = " --bindir=${bindir}/${PN} --without-ensurepip"
+# uninative may be used on pre glibc 2.25 systems which don't have getentropy
+EXTRA_OECONF_append = " --bindir=${bindir}/${PN} --without-ensurepip ac_cv_func_getentropy=no"
 
 EXTRA_OEMAKE = '\
   LIBC="" \
@@ -80,6 +81,7 @@ PYTHONLSBOPTS = ""
 
 do_configure_append() {
 	autoreconf --verbose --install --force --exclude=autopoint ../Python-${PV}/Modules/_ctypes/libffi
+	sed -i -e 's,#define HAVE_GETRANDOM 1,/\* #undef HAVE_GETRANDOM \*/,' ${B}/pyconfig.h
 }
 
 do_install() {

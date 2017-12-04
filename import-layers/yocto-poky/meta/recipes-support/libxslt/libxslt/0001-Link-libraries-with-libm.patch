@@ -1,0 +1,48 @@
+From 487e2f7e35dad3deec7978ce4478a3d4ea5070e7 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Fri, 10 Feb 2017 14:26:59 +0200
+Subject: [PATCH] Link libraries with libm
+
+Otherwise linking the resulting libraries to a binary (e.g. xsltproc)
+fails when using gold linker:
+| ../libxslt/.libs/libxslt.so: error: undefined reference to 'fmod'
+| ../libxslt/.libs/libxslt.so: error: undefined reference to 'pow'
+| ../libexslt/.libs/libexslt.so: error: undefined reference to 'floor'
+| collect2: error: ld returned 1 exit status
+
+Upstream-Status: Submitted [mailing list, Feb 10 2017]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ libexslt/Makefile.am | 2 +-
+ libxslt/Makefile.am  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libexslt/Makefile.am b/libexslt/Makefile.am
+index 1cf5138..5449524 100644
+--- a/libexslt/Makefile.am
++++ b/libexslt/Makefile.am
+@@ -27,7 +27,7 @@ libexslt_la_SOURCES =                   \
+ 	libexslt.h			\
+ 	dynamic.c
+ 
+-libexslt_la_LIBADD = $(top_builddir)/libxslt/libxslt.la $(EXTRA_LIBS) $(LIBGCRYPT_LIBS)
++libexslt_la_LIBADD = $(top_builddir)/libxslt/libxslt.la $(EXTRA_LIBS) $(LIBGCRYPT_LIBS) $(M_LIBS)
+ libexslt_la_LDFLAGS = $(WIN32_EXTRA_LDFLAGS) -version-info $(LIBEXSLT_VERSION_INFO)
+ 
+ man_MANS = libexslt.3
+diff --git a/libxslt/Makefile.am b/libxslt/Makefile.am
+index d9fed68..9d44c3d 100644
+--- a/libxslt/Makefile.am
++++ b/libxslt/Makefile.am
+@@ -62,7 +62,7 @@ else
+ LIBXSLT_VERSION_SCRIPT =
+ endif
+ 
+-libxslt_la_LIBADD = $(LIBXML_LIBS) $(EXTRA_LIBS)
++libxslt_la_LIBADD = $(LIBXML_LIBS) $(M_LIBS) $(EXTRA_LIBS)
+ libxslt_la_LDFLAGS =					\
+ 		$(WIN32_EXTRA_LDFLAGS)			\
+ 		$(LIBXSLT_VERSION_SCRIPT)		\
+-- 
+2.1.4
+

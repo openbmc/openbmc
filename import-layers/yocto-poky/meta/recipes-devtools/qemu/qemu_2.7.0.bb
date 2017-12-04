@@ -9,6 +9,11 @@ SRC_URI += "file://configure-fix-Darwin-target-detection.patch \
             file://no-valgrind.patch \
             file://pathlimit.patch \
             file://qemu-2.5.0-cflags.patch \
+            file://0001-virtio-zero-vq-inuse-in-virtio_reset.patch \
+            file://0002-fix-CVE-2016-7423.patch \
+            file://0003-fix-CVE-2016-7908.patch \
+            file://0004-fix-CVE-2016-7909.patch \
+            file://04b33e21866412689f18b7ad6daf0a54d8f959a7.patch \
 "
 
 SRC_URI_prepend = "http://wiki.qemu-project.org/download/${BP}.tar.bz2"

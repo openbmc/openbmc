@@ -9,7 +9,11 @@ DEPENDS = "zlib"
 PN = "libpng12"
 S = "${WORKDIR}/libpng-${PV}"
 
-SRC_URI = "${GENTOO_MIRROR}/libpng-${PV}.tar.xz"
+LIBV = "12"
+
+SRC_URI = "${SOURCEFORGE_MIRROR}/project/libpng/libpng${LIBV}/${PV}/libpng-${PV}.tar.xz"
+
+MIRRORS += "${SOURCEFORGE_MIRROR}/project/libpng/libpng${LIBV}/${PV}/ ${SOURCEFORGE_MIRROR}/project/libpng/libpng${LIBV}/older-releases/${PV}"
 
 SRC_URI[md5sum] = "868562bd1c58b76ed8703f135a2e439a"
 SRC_URI[sha256sum] = "24ce54581468b937734a6ecc86f7e121bc46a90d76a0d948dca08f32ee000dbe"

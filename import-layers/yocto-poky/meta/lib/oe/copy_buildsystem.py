@@ -4,11 +4,15 @@ import stat
 import shutil
 
 def _smart_copy(src, dest):
+    import subprocess
     # smart_copy will choose the correct function depending on whether the
     # source is a file or a directory.
     mode = os.stat(src).st_mode
     if stat.S_ISDIR(mode):
-        shutil.copytree(src, dest, symlinks=True, ignore=shutil.ignore_patterns('.git'))
+        bb.utils.mkdirhier(dest)
+        cmd = "tar --exclude='.git' --xattrs --xattrs-include='*' -chf - -C %s -p . \
+        | tar --xattrs --xattrs-include='*' -xf - -C %s" % (src, dest)
+        subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
     else:
         shutil.copyfile(src, dest)
         shutil.copymode(src, dest)

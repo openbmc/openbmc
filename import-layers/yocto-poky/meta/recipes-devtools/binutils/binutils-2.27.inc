@@ -36,6 +36,15 @@ SRC_URI = "\
      file://0014-libtool-remove-rpath.patch \
      file://0015-binutils-mips-gas-pic-relax-linkonce.diff \
      file://0015-Refine-.cfi_sections-check-to-only-consider-compact-.patch \
+     file://0016-Fix-seg-fault-in-ARM-linker-when-trying-to-parse-a-b.patch \
+     file://0017-Fix-the-generation-of-alignment-frags-in-code-sectio.patch \
+     file://0001-ppc-apuinfo-for-spe-parsed-incorrectly.patch \
+     file://CVE-2017-6965.patch \
+     file://CVE-2017-6966.patch \
+     file://CVE-2017-6969.patch \
+     file://CVE-2017-6969_2.patch \
+     file://CVE-2017-7209.patch \
+     file://CVE-2017-7210.patch \
 "
 S  = "${WORKDIR}/git"
 

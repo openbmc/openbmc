@@ -1,0 +1,33 @@
+From 43f1b04449bb1cf7e0092263f1c2a25f3fca08ef Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 8 Nov 2016 23:07:41 +0000
+Subject: [PATCH 5/6] systemtap: remove explicit msgfmt check
+
+There is no need to explicitly check that msgfmt was found as the gettext macros
+handle this for us if NLS is enabled.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+---
+ configure.ac | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2ea9b3cbf..95417f59c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -36,10 +36,6 @@ AC_CHECK_FUNCS(openat)
+ AM_GNU_GETTEXT(external)
+ AM_GNU_GETTEXT_VERSION([0.19.4])
+ 
+-if test "x$GMSGFMT" = "x:"; then
+-   AC_MSG_ERROR([missing gnu /usr/bin/msgfmt])
+-fi
+-
+ # We want the 'PYTHON' varible to be python version 2. We also want
+ # our custom 'PYTHON3' varible to be python version 3.
+ #
+-- 
+2.11.0
+

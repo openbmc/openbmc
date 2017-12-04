@@ -142,6 +142,18 @@
                 <listitem><para><emphasis>alsa:</emphasis> Include ALSA support
                     (OSS compatibility kernel modules installed if available).
                     </para></listitem>
+                <listitem><para><emphasis>api-documentation:</emphasis>
+                    Enables generation of API documentation during recipe
+                    builds.
+                    The resulting documentation is added to SDK tarballs
+                    when the
+                    <filename>bitbake -c populate_sdk</filename> command
+                    is used.
+                    See the
+                    "<ulink url='&YOCTO_DOCS_SDK_URL;#adding-api-documentation-to-the-standard-sdk'>Adding API Documentation to the Standard SDK</ulink>"
+                    section in the Yocto Project Software Development Kit (SDK)
+                    Developer's Guide for more information.
+                    </para></listitem>
                 <listitem><para><emphasis>bluetooth:</emphasis> Include
                     bluetooth support (integrated BT only).</para></listitem>
                 <listitem><para><emphasis>bluez5:</emphasis> Include

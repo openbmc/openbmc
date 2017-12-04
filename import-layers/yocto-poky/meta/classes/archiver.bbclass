@@ -125,7 +125,7 @@ python () {
 # (e.g. git repositories) is "unpacked" and then put into a tarball.
 python do_ar_original() {
 
-    import shutil, tarfile, tempfile
+    import shutil, tempfile
 
     if d.getVarFlag('ARCHIVER_MODE', 'src', True) != "original":
         return
@@ -261,13 +261,9 @@ def create_tarball(d, srcdir, suffix, ar_outdir):
         filename = '%s.tar.gz' % d.getVar('PF', True)
     tarname = os.path.join(ar_outdir, filename)
 
-    srcdir = srcdir.rstrip('/')
-    dirname = os.path.dirname(srcdir)
-    basename = os.path.basename(srcdir)
-    os.chdir(dirname)
     bb.note('Creating %s' % tarname)
     tar = tarfile.open(tarname, 'w:gz')
-    tar.add(basename)
+    tar.add(srcdir, arcname=os.path.basename(srcdir))
     tar.close()
 
 # creating .diff.gz between source.orig and source
@@ -353,8 +349,8 @@ python do_ar_recipe () {
     bbappend_files = d.getVar('BBINCLUDED', True).split()
     # If recipe name is aa, we need to match files like aa.bbappend and aa_1.1.bbappend
     # Files like aa1.bbappend or aa1_1.1.bbappend must be excluded.
-    bbappend_re = re.compile( r".*/%s_[^/]*\.bbappend$" %pn)
-    bbappend_re1 = re.compile( r".*/%s\.bbappend$" %pn)
+    bbappend_re = re.compile( r".*/%s_[^/]*\.bbappend$" % re.escape(pn))
+    bbappend_re1 = re.compile( r".*/%s\.bbappend$" % re.escape(pn))
     for file in bbappend_files:
         if bbappend_re.match(file) or bbappend_re1.match(file):
             shutil.copy(file, outdir)

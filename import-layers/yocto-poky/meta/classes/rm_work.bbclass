@@ -58,7 +58,7 @@ do_rm_work () {
             *do_setscene*)
                 break
                 ;;
-            *sigdata*)
+            *sigdata*|*sigbasedata*)
                 i=dummy
                 break
                 ;;

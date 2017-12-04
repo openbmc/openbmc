@@ -1873,11 +1873,22 @@
     </para>
 
     <para>
-        This means that each built kernel module is packaged separately and inter-module
-        dependencies are created by parsing the <filename>modinfo</filename> output.
-        If all modules are required, then installing the <filename>kernel-modules</filename>
-        package installs all packages with modules and various other kernel packages
-        such as <filename>kernel-vmlinux</filename>.
+        This means that each built kernel module is packaged separately and
+        inter-module dependencies are created by parsing the
+        <filename>modinfo</filename> output.
+        If all modules are required, then installing the
+        <filename>kernel-modules</filename> package installs all packages with
+        modules and various other kernel packages such as
+        <filename>kernel-vmlinux</filename>.
+    </para>
+
+    <para>
+        The <filename>kernel</filename> class contains logic that allows
+        you to embed an initial RAM filesystem (initramfs) image when
+        you build the kernel image.
+        For information on how to build an initramfs, see the
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
+        section in the Yocto Project Development Manual.
     </para>
 
     <para>

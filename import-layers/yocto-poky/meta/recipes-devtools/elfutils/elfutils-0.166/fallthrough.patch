@@ -1,0 +1,36 @@
+GCC7 adds -Wimplicit-fallthrough to warn when a switch case falls through,
+however this causes warnings (which are promoted to errors) with the elfutils
+patches from Debian for mips and parisc, which use fallthrough's by design.
+
+Explicitly mark the intentional fallthrough switch cases with a comment to
+disable the warnings where the fallthrough behaviour is desired.
+
+Upstream-Status: Pending [debian]
+Signed-off-by: Joshua Lock <joshua.g.lock@intel.com>
+
+Index: elfutils-0.168/backends/parisc_retval.c
+===================================================================
+--- elfutils-0.168.orig/backends/parisc_retval.c
++++ elfutils-0.168/backends/parisc_retval.c
+@@ -166,7 +166,7 @@ parisc_return_value_location_ (Dwarf_Die
+ 	  return nloc_intregpair;
+ 
+ 	/* Else fall through.  */
+-      }
++      } // fallthrough
+ 
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+Index: elfutils-0.168/backends/mips_retval.c
+===================================================================
+--- elfutils-0.168.orig/backends/mips_retval.c
++++ elfutils-0.168/backends/mips_retval.c
+@@ -387,7 +387,7 @@ mips_return_value_location (Dwarf_Die *f
+               else
+                 return nloc_intregpair;
+             }
+-        }
++        } // fallthrough
+ 
+       /* Fallthrough to handle large types */
+ 

@@ -44,7 +44,7 @@ class EdgeRouterTarget(MasterImageHardwareTarget):
     def __init__(self, d):
         super(EdgeRouterTarget, self).__init__(d)
 
-	self.image_fstype = self.get_image_fstype(d)
+        self.image_fstype = self.get_image_fstype(d)
         self.deploy_cmds = [
                 'mount -L boot /boot',
                 'mkdir -p /mnt/testrootfs',

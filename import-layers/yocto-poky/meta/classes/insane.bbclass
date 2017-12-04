@@ -63,6 +63,8 @@ def package_qa_get_machine_dict(d):
                         "arm" :       (40,     0,    0,          True,          32),
                       },
             "elf" : {
+                        "aarch64" :   (183,    0,    0,          True,          64),
+                        "aarch64_be" :(183,    0,    0,          False,         64),
                         "i586" :      (3,      0,    0,          True,          32),
                         "x86_64":     (62,     0,    0,          True,          64),
                         "epiphany":   (4643,   0,    0,          True,          32),
@@ -403,47 +405,6 @@ def package_qa_check_perm(path,name,d, elf, messages):
     """
     return
 
-QAPATHTEST[unsafe-references-in-binaries] = "package_qa_check_unsafe_references_in_binaries"
-def package_qa_check_unsafe_references_in_binaries(path, name, d, elf, messages):
-    """
-    Ensure binaries in base_[bindir|sbindir|libdir] do not link to files under exec_prefix
-    """
-    if unsafe_references_skippable(path, name, d):
-        return
-
-    if elf:
-        import subprocess as sub
-        pn = d.getVar('PN', True)
-
-        exec_prefix = d.getVar('exec_prefix', True)
-        sysroot_path = d.getVar('STAGING_DIR_TARGET', True)
-        sysroot_path_usr = sysroot_path + exec_prefix
-
-        try:
-            ldd_output = bb.process.Popen(["prelink-rtld", "--root", sysroot_path, path], stdout=sub.PIPE).stdout.read().decode("utf-8")
-        except bb.process.CmdError:
-            error_msg = pn + ": prelink-rtld aborted when processing %s" % path
-            package_qa_handle_error("unsafe-references-in-binaries", error_msg, d)
-            return False
-
-        if sysroot_path_usr in ldd_output:
-            ldd_output = ldd_output.replace(sysroot_path, "")
-
-            pkgdest = d.getVar('PKGDEST', True)
-            packages = d.getVar('PACKAGES', True)
-
-            for package in packages.split():
-                short_path = path.replace('%s/%s' % (pkgdest, package), "", 1)
-                if (short_path != path):
-                    break
-
-            base_err = pn + ": %s, installed in the base_prefix, requires a shared library under exec_prefix (%s)" % (short_path, exec_prefix)
-            for line in ldd_output.split('\n'):
-                if exec_prefix in line:
-                    error_msg = "%s: %s" % (base_err, line.strip())
-                    package_qa_handle_error("unsafe-references-in-binaries", error_msg, d)
-
-            return False
 
 QAPATHTEST[unsafe-references-in-scripts] = "package_qa_check_unsafe_references_in_scripts"
 def package_qa_check_unsafe_references_in_scripts(path, name, d, elf, messages):
@@ -647,8 +608,8 @@ def package_qa_check_buildpaths(path, name, d, elf, messages):
         return
 
     tmpdir = d.getVar('TMPDIR', True)
-    with open(path) as f:
-        file_content = f.read()
+    with open(path, 'rb') as f:
+        file_content = f.read().decode('utf-8', errors='ignore')
         if tmpdir in file_content:
             package_qa_add_message(messages, "buildpaths", "File %s in package contained reference to tmpdir" % package_qa_clean_path(path,d))
 
@@ -820,6 +781,23 @@ def package_qa_check_staged(path,d):
 
     return sane
 
+# Run all package-wide warnfuncs and errorfuncs
+def package_qa_package(warnfuncs, errorfuncs, skip, package, d):
+    warnings = {}
+    errors = {}
+
+    for func in warnfuncs:
+        func(package, d, warnings)
+    for func in errorfuncs:
+        func(package, d, errors)
+
+    for w in warnings:
+        package_qa_handle_error(w, warnings[w], d)
+    for e in errors:
+        package_qa_handle_error(e, errors[e], d)
+
+    return len(errors) == 0
+
 # Walk over all files in a directory and call func
 def package_qa_walk(warnfuncs, errorfuncs, skip, package, d):
     import oe.qa
@@ -855,7 +833,7 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
 
     if not "-dbg" in pkg and not "packagegroup-" in pkg and not "-image" in pkg:
         localdata = bb.data.createCopy(d)
-        localdata.setVar('OVERRIDES', pkg)
+        localdata.setVar('OVERRIDES', localdata.getVar('OVERRIDES', True) + ':' + pkg)
         bb.data.update_data(localdata)
 
         # Now check the RDEPENDS
@@ -983,31 +961,24 @@ def package_qa_check_deps(pkg, pkgdest, skip, d):
     check_valid_deps('RREPLACES')
     check_valid_deps('RCONFLICTS')
 
-QAPATHTEST[expanded-d] = "package_qa_check_expanded_d"
-def package_qa_check_expanded_d(path,name,d,elf,messages):
+QAPKGTEST[expanded-d] = "package_qa_check_expanded_d"
+def package_qa_check_expanded_d(package, d, messages):
     """
     Check for the expanded D (${D}) value in pkg_* and FILES
     variables, warn the user to use it correctly.
     """
-
     sane = True
-    expanded_d = d.getVar('D',True)
+    expanded_d = d.getVar('D', True)
 
-    # Get packages for current recipe and iterate
-    packages = d.getVar('PACKAGES', True).split(" ")
-    for pak in packages:
-    # Go through all variables and check if expanded D is found, warn the user accordingly
-        for var in 'FILES','pkg_preinst', 'pkg_postinst', 'pkg_prerm', 'pkg_postrm':
-            bbvar = d.getVar(var + "_" + pak, False)
-            if bbvar:
-                # Bitbake expands ${D} within bbvar during the previous step, so we check for its expanded value
-                if expanded_d in bbvar:
-                    if var == 'FILES':
-                        package_qa_add_message(messages, "expanded-d", "FILES in %s recipe should not contain the ${D} variable as it references the local build directory not the target filesystem, best solution is to remove the ${D} reference" % pak)
-                        sane = False
-                    else:
-                        package_qa_add_message(messages, "expanded-d", "%s in %s recipe contains ${D}, it should be replaced by $D instead" % (var, pak))
-                        sane = False
+    for var in 'FILES','pkg_preinst', 'pkg_postinst', 'pkg_prerm', 'pkg_postrm':
+        bbvar = d.getVar(var + "_" + package, True) or ""
+        if expanded_d in bbvar:
+            if var == 'FILES':
+                package_qa_add_message(messages, "expanded-d", "FILES in %s recipe should not contain the ${D} variable as it references the local build directory not the target filesystem, best solution is to remove the ${D} reference" % package)
+                sane = False
+            else:
+                package_qa_add_message(messages, "expanded-d", "%s in %s recipe contains ${D}, it should be replaced by $D instead" % (var, package))
+                sane = False
     return sane
 
 def package_qa_check_encoding(keys, encode, d):
@@ -1115,7 +1086,6 @@ python do_package_qa () {
     if not packages:
         return
 
-    testmatrix = d.getVarFlags("QAPATHTEST")
     import re
     # The package name matches the [a-z0-9.+-]+ regular expression
     pkgname_pattern = re.compile("^[a-z0-9.+-]+$")
@@ -1125,28 +1095,33 @@ python do_package_qa () {
     for dep in taskdepdata:
         taskdeps.add(taskdepdata[dep][0])
 
-    g = globals()
     for package in packages:
+        def parse_test_matrix(matrix_name):
+            testmatrix = d.getVarFlags(matrix_name) or {}
+            g = globals()
+            warnchecks = []
+            for w in (d.getVar("WARN_QA", True) or "").split():
+                if w in skip:
+                   continue
+                if w in testmatrix and testmatrix[w] in g:
+                    warnchecks.append(g[testmatrix[w]])
+                if w == 'unsafe-references-in-binaries':
+                    oe.utils.write_ld_so_conf(d)
+
+            errorchecks = []
+            for e in (d.getVar("ERROR_QA", True) or "").split():
+                if e in skip:
+                   continue
+                if e in testmatrix and testmatrix[e] in g:
+                    errorchecks.append(g[testmatrix[e]])
+                if e == 'unsafe-references-in-binaries':
+                    oe.utils.write_ld_so_conf(d)
+            return warnchecks, errorchecks
+
         skip = (d.getVar('INSANE_SKIP_' + package, True) or "").split()
         if skip:
             bb.note("Package %s skipping QA tests: %s" % (package, str(skip)))
-        warnchecks = []
-        for w in (d.getVar("WARN_QA", True) or "").split():
-            if w in skip:
-               continue
-            if w in testmatrix and testmatrix[w] in g:
-                warnchecks.append(g[testmatrix[w]])
-            if w == 'unsafe-references-in-binaries':
-                oe.utils.write_ld_so_conf(d)
 
-        errorchecks = []
-        for e in (d.getVar("ERROR_QA", True) or "").split():
-            if e in skip:
-               continue
-            if e in testmatrix and testmatrix[e] in g:
-                errorchecks.append(g[testmatrix[e]])
-            if e == 'unsafe-references-in-binaries':
-                oe.utils.write_ld_so_conf(d)
 
         bb.note("Checking Package: %s" % package)
         # Check package name
@@ -1154,8 +1129,11 @@ python do_package_qa () {
             package_qa_handle_error("pkgname",
                     "%s doesn't match the [a-z0-9.+-]+ regex" % package, d)
 
-        path = "%s/%s" % (pkgdest, package)
-        package_qa_walk(warnchecks, errorchecks, skip, package, d)
+        warn_checks, error_checks = parse_test_matrix("QAPATHTEST")
+        package_qa_walk(warn_checks, error_checks, skip, package, d)
+
+        warn_checks, error_checks = parse_test_matrix("QAPKGTEST")
+        package_qa_package(warn_checks, error_checks, skip, package, d)
 
         package_qa_check_rdepends(package, pkgdest, skip, taskdeps, packages, d)
         package_qa_check_deps(package, pkgdest, skip, d)

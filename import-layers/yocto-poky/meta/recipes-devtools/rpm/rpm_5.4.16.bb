@@ -119,6 +119,7 @@ SRC_URI += " \
 	   file://gcc6-stdlib.patch \
 	   file://0001-system.h-query.c-support-nosignature.patch \
 	   file://rpm-ensure-rpm2cpio-call-rpm-relocation-code.patch \
+	   file://0001-macros-add-_gpg_sign_cmd_extra_args.patch \
 "
 
 # OE specific changes
@@ -384,10 +385,10 @@ FILES_${PN} =  "${bindir}/rpm \
 		${localstatedir}/lib/wdj \
 		${bindir}/rpm.real \
 		${bindir}/rpmconstant.real \
-		${bindir}/rpm2cpio.real \
 		"
 
 FILES_${PN}-common = "${bindir}/rpm2cpio \
+		${bindir}/rpm2cpio.real \
 		${bindir}/gendiff \
 		${sysconfdir}/rpm \
 		${localstatedir}/spool/repackage \

@@ -36,8 +36,15 @@ SECTION = "libs"
 SRC_URI = " \
     http://libbsd.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
 "
+SRC_URI_append_libc-musl  = " \
+    file://0001-Replace-__BEGIN_DECLS-and-__END_DECLS.patch \
+    file://0002-Remove-funopen.patch \
+    file://0003-Fix-build-breaks-due-to-missing-a.out.h.patch \
+"
 
 SRC_URI[md5sum] = "e935c1bb6cc98a4a43cb1da22795493a"
 SRC_URI[sha256sum] = "934b634f4dfd865b6482650b8f522c70ae65c463529de8be907b53c89c3a34a8"
 
 inherit autotools pkgconfig
+
+BBCLASSEXTEND = "native nativesdk"

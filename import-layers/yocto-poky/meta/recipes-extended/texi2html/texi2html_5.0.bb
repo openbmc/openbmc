@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 PR = "r2"
 
 SRC_URI     = "${SAVANNAH_GNU_MIRROR}/texi2html/${BPN}-${PV}.tar.bz2 \
+               file://0001-Allow-compiling-out-of-source.patch \
                "
 
 SRC_URI[md5sum] = "f15ac876fcdc8be865b16535f480aa54"

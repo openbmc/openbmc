@@ -4,12 +4,10 @@
 
 <appendix id='sdk-appendix-customizing'>
 
-<title>Customizing the SDK</title>
+<title>Customizing the Extensible SDK</title>
 
 <para>
-    This appendix presents customizations you can apply to both the standard
-    and extensible SDK.
-    Each subsection identifies the type of SDK to which the section applies.
+    This appendix presents customizations you can apply to the extensible SDK.
 </para>
 
 <section id='sdk-configuring-the-extensible-sdk'>

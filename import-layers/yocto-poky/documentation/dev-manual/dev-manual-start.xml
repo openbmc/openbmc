@@ -352,6 +352,11 @@
         <ulink url='&YOCTO_DOCS_REF_URL;#var-SDKMACHINE'><filename>SDKMACHINE</filename></ulink>).
         If you are not using an SDK type image, you need to separately download
         and install the stand-alone Yocto Project cross-toolchain tarball.
+        See the
+        "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-appendix-obtain'>Obtaining the SDK</ulink>"
+        appendix in the Yocto Project Software Development Kit (SDK)
+        Developer's Guide for more information on locating and installing
+        cross-toolchains.
     </para>
 
     <para>

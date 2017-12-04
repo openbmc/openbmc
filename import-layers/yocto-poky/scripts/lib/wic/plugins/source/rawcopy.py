@@ -71,16 +71,16 @@ class RawCopyPlugin(SourcePlugin):
         dst = os.path.join(cr_workdir, "%s.%s" % (source_params['file'], part.lineno))
 
         if 'skip' in source_params:
-            sparse_copy(src, dst, skip=source_params['skip'])
+            sparse_copy(src, dst, skip=int(source_params['skip']))
         else:
             sparse_copy(src, dst)
 
         # get the size in the right units for kickstart (kB)
         du_cmd = "du -Lbks %s" % dst
         out = exec_cmd(du_cmd)
-        filesize = out.split()[0]
+        filesize = int(out.split()[0])
 
-        if int(filesize) > int(part.size):
+        if filesize > part.size:
             part.size = filesize
 
         part.source_file = dst

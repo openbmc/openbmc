@@ -72,6 +72,24 @@
                     <listitem><para><emphasis>Launch Eclipse:</emphasis>
                         Double click the "Eclipse" file in the folder to
                         launch Eclipse.
+                        <note>
+                            If you experience a NullPointer Exception after
+                            launch Eclipse or the debugger from within Eclipse,
+                            try adding the following
+                            to your <filename>eclipse.ini</filename> file,
+                            which is located in the directory in which you
+                            unpacked the Eclipse tar file:
+                            <literallayout class='monospaced'>
+     --launcher.GTK_version
+     2
+                            </literallayout>
+                            Alternatively, you can export the
+                            <filename>SWT_GTK</filename> variable in your
+                            shell as follows:
+                            <literallayout class='monospaced'>
+     $ export SWT_GTK3=0
+                            </literallayout>
+                            </note>
                         </para></listitem>
                 </orderedlist>
             </para>

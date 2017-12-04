@@ -6,7 +6,7 @@ of the drudgery of manually editing the symbolic links."
 
 RECIPE_NO_UPDATE_REASON = "Version 1.5 requires selinux"
 
-HOMEPAGE = "http://fedorahosted.org/releases/c/h/chkconfig"
+HOMEPAGE = "https://github.com/fedora-sysv"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5574c6965ae5f583e55880e397fbb018"
@@ -16,12 +16,16 @@ PROVIDES += "virtual/update-alternatives"
 
 PR = "r7"
 
-SRC_URI = "http://fedorahosted.org/releases/c/h/chkconfig/${BPN}-${PV}.tar.bz2 \
+S = "${WORKDIR}/${BPN}-${BPN}-${PV}"
+
+UPSTREAM_CHECK_URI = "https://github.com/fedora-sysv/${BPN}/releases"
+
+SRC_URI = "https://github.com/fedora-sysv/chkconfig/archive/chkconfig-${PV}.tar.gz \
            file://replace_caddr_t.patch \
           "
 
-SRC_URI[md5sum] = "c2039ca67f2749fe0c06ef7c6f8ee246"
-SRC_URI[sha256sum] = "18b497d25b2cada955c72810e45fcad8280d105f17cf45e2970f18271211de68"
+SRC_URI[md5sum] = "3f51ac38a234be5278b3a2d9705eda5e"
+SRC_URI[sha256sum] = "bf1e81f0d7cc999b536c9fe7877abf584a4082fd03c9d2597b6f090966579b40"
 
 inherit gettext
 

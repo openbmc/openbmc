@@ -1,0 +1,14 @@
+There's no need to check for the X libraries as the socket module doesn't use
+anything from X.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/autoconf/configure.ac b/autoconf/configure.ac
+index b61e974..a3e5db2 100644
+--- a/autoconf/configure.ac
++++ b/autoconf/configure.ac
+@@ -72,3 +71,0 @@ AC_SUBST(LIB_READLINE)
+-# For the socket module
+-AC_PATH_XTRA
+-

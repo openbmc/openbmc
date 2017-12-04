@@ -88,7 +88,7 @@ SDK_TITLE_task-populate-sdk-ext = "${@d.getVar('DISTRO_NAME', True) or d.getVar(
 def clean_esdk_builddir(d, sdkbasepath):
     """Clean up traces of the fake build for create_filtered_tasklist()"""
     import shutil
-    cleanpaths = 'cache conf/sanity_info conf/templateconf.cfg tmp'.split()
+    cleanpaths = 'cache conf/sanity_info tmp'.split()
     for pth in cleanpaths:
         fullpth = os.path.join(sdkbasepath, pth)
         if os.path.isdir(fullpth):
@@ -305,10 +305,13 @@ python copy_buildsystem () {
             f.write('SIGGEN_LOCKEDSIGS_TASKSIG_CHECK = "warn"\n\n')
 
             # Set up whitelist for run on install
-            f.write('BB_SETSCENE_ENFORCE_WHITELIST = "%:* *:do_shared_workdir *:do_rm_work"\n\n')
+            f.write('BB_SETSCENE_ENFORCE_WHITELIST = "%:* *:do_shared_workdir *:do_rm_work *:do_package"\n\n')
 
             # Hide the config information from bitbake output (since it's fixed within the SDK)
-            f.write('BUILDCFG_HEADER = ""\n')
+            f.write('BUILDCFG_HEADER = ""\n\n')
+
+            # Map gcc-dependent uninative sstate cache for installer usage
+            f.write('SSTATE_MIRRORS = "file://universal/(.*) file://universal-4.9/\\1\\nfile://universal-4.9/(.*) file://universal-4.8/\\1"\n\n')
 
             # Allow additional config through sdk-extra.conf
             fn = bb.cookerdata.findConfigFile('sdk-extra.conf', d)
@@ -344,6 +347,10 @@ python copy_buildsystem () {
                     if line.strip() and not line.startswith('#'):
                         f.write(line)
 
+    # Write a templateconf.cfg
+    with open(baseoutpath + '/conf/templateconf.cfg', 'w') as f:
+        f.write('meta/conf\n')
+
     # Ensure any variables set from the external environment (by way of
     # BB_ENV_EXTRAWHITE) are set in the SDK's configuration
     extralines = []
@@ -370,8 +377,9 @@ python copy_buildsystem () {
 
     sstate_out = baseoutpath + '/sstate-cache'
     bb.utils.remove(sstate_out, True)
-    # uninative.bbclass sets NATIVELSBSTRING to 'universal'
-    fixedlsbstring = 'universal'
+
+    # uninative.bbclass sets NATIVELSBSTRING to 'universal%s' % oe.utils.host_gcc_version(d)
+    fixedlsbstring = "universal%s" % oe.utils.host_gcc_version(d)
 
     sdk_include_toolchain = (d.getVar('SDK_INCLUDE_TOOLCHAIN', True) == '1')
     sdk_ext_type = d.getVar('SDK_EXT_TYPE', True)

@@ -54,8 +54,9 @@ class Signing(oeSelfTest):
 
         self.write_config(feature)
 
-        bitbake('-c cleansstate %s' % test_recipe)
-        bitbake(test_recipe)
+        bitbake('-c clean %s' % test_recipe)
+        bitbake('-f -c package_write_rpm %s' % test_recipe)
+
         self.add_command_to_tearDown('bitbake -c clean %s' % test_recipe)
 
         pkgdatadir = get_bb_var('PKGDATA_DIR', test_recipe)
@@ -98,7 +99,6 @@ class Signing(oeSelfTest):
         sstatedir = os.path.join(builddir, 'test-sstate')
 
         self.add_command_to_tearDown('bitbake -c clean %s' % test_recipe)
-        self.add_command_to_tearDown('bitbake -c cleansstate %s' % test_recipe)
         self.add_command_to_tearDown('rm -rf %s' % sstatedir)
 
         # Determine the pub key signature
@@ -112,10 +112,12 @@ class Signing(oeSelfTest):
         feature += 'SSTATE_VERIFY_SIG ?= "1"\n'
         feature += 'GPG_PATH = "%s"\n' % self.gpg_dir
         feature += 'SSTATE_DIR = "%s"\n' % sstatedir
+        # Any mirror might have partial sstate without .sig files, triggering failures
+        feature += 'SSTATE_MIRRORS_forcevariable = ""\n'
 
         self.write_config(feature)
 
-        bitbake('-c cleansstate %s' % test_recipe)
+        bitbake('-c clean %s' % test_recipe)
         bitbake(test_recipe)
 
         recipe_sig = glob.glob(sstatedir + '/*/*:ed:*_package.tgz.sig')

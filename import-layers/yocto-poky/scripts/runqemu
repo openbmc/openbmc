@@ -167,6 +167,7 @@ class BaseConfig(object):
         self.kernel = ''
         self.kernel_cmdline = ''
         self.kernel_cmdline_script = ''
+        self.bootparams = ''
         self.dtb = ''
         self.fstype = ''
         self.kvm_enabled = False
@@ -368,7 +369,7 @@ class BaseConfig(object):
             elif arg.startswith('qemuparams='):
                 self.qemu_opt_script += ' %s' % arg[len('qemuparams='):]
             elif arg.startswith('bootparams='):
-                self.kernel_cmdline_script += ' %s' % arg[len('bootparams='):]
+                self.bootparams = arg[len('bootparams='):]
             elif os.path.exists(arg) or (re.search(':', arg) and re.search('/', arg)):
                 self.check_arg_path(os.path.abspath(arg))
             elif re.search('-image-', arg):
@@ -676,17 +677,35 @@ class BaseConfig(object):
             else:
                 self.nfs_server = '192.168.7.1'
 
-        nfs_instance = int(self.nfs_instance)
+        # Figure out a new nfs_instance to allow multiple qemus running.
+        # CentOS 7.1's ps doesn't print full command line without "ww"
+        # when invoke by subprocess.Popen().
+        cmd = "ps auxww"
+        ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+        pattern = '/bin/unfsd .* -i .*\.pid -e .*/exports([0-9]+) '
+        all_instances = re.findall(pattern, ps, re.M)
+        if all_instances:
+            all_instances.sort(key=int)
+            self.nfs_instance = int(all_instances.pop()) + 1
 
-        mountd_rpcport = 21111 + nfs_instance
-        nfsd_rpcport = 11111 + nfs_instance
-        nfsd_port = 3049 + 2 * nfs_instance
-        mountd_port = 3048 + 2 * nfs_instance
-        unfs_opts="nfsvers=3,port=%s,mountprog=%s,nfsprog=%s,udp,mountport=%s" % (nfsd_port, mountd_rpcport, nfsd_rpcport, mountd_port)
-        self.unfs_opts = unfs_opts
+        mountd_rpcport = 21111 + self.nfs_instance
+        nfsd_rpcport = 11111 + self.nfs_instance
+        nfsd_port = 3049 + 2 * self.nfs_instance
+        mountd_port = 3048 + 2 * self.nfs_instance
 
-        p = '%s/.runqemu-sdk/pseudo' % os.getenv('HOME')
-        os.putenv('PSEUDO_LOCALSTATEDIR', p)
+        # Export vars for runqemu-export-rootfs
+        export_dict = {
+            'NFS_INSTANCE': self.nfs_instance,
+            'MOUNTD_RPCPORT': mountd_rpcport,
+            'NFSD_RPCPORT': nfsd_rpcport,
+            'NFSD_PORT': nfsd_port,
+            'MOUNTD_PORT': mountd_port,
+        }
+        for k, v in export_dict.items():
+            # Use '%s' since they are integers
+            os.putenv(k, '%s' % v)
+
+        self.unfs_opts="nfsvers=3,port=%s,mountprog=%s,nfsprog=%s,udp,mountport=%s" % (nfsd_port, mountd_rpcport, nfsd_rpcport, mountd_port)
 
         # Extract .tar.bz2 or .tar.bz if no self.nfs_dir
         if not self.nfs_dir:
@@ -714,7 +733,7 @@ class BaseConfig(object):
                 self.nfs_dir = dest
 
         # Start the userspace NFS server
-        cmd = 'runqemu-export-rootfs restart %s' % self.nfs_dir
+        cmd = 'runqemu-export-rootfs start %s' % self.nfs_dir
         logger.info('Running %s...' % cmd)
         if subprocess.call(cmd, shell=True) != 0:
             raise Exception('Failed to run %s' % cmd)
@@ -723,6 +742,8 @@ class BaseConfig(object):
 
 
     def setup_slirp(self):
+        """Setup user networking"""
+
         if self.fstype == 'nfs':
             self.setup_nfs()
         self.kernel_cmdline_script += ' ip=dhcp'
@@ -790,14 +811,13 @@ class BaseConfig(object):
             logger.error("Failed to setup tap device. Run runqemu-gen-tapdevs to manually create.")
             return 1
         self.tap = tap
-        n0 = tap[3:]
-        n1 = int(n0) * 2 + 1
-        n2 = n1 + 1
-        self.nfs_instance = n0
+        tapnum = int(tap[3:])
+        gateway = tapnum * 2 + 1
+        client = gateway + 1
         if self.fstype == 'nfs':
             self.setup_nfs()
-        self.kernel_cmdline_script += " ip=192.168.7.%s::192.168.7.%s:255.255.255.0" % (n2, n1)
-        mac = "52:54:00:12:34:%02x" % n2
+        self.kernel_cmdline_script += " ip=192.168.7.%s::192.168.7.%s:255.255.255.0" % (client, gateway)
+        mac = "52:54:00:12:34:%02x" % client
         qb_tap_opt = self.get('QB_TAP_OPT')
         if qb_tap_opt:
             qemu_tap_opt = qb_tap_opt.replace('@TAP@', tap).replace('@MAC@', mac)
@@ -840,11 +860,11 @@ class BaseConfig(object):
                         vm_drive = '-drive if=none,id=hd,file=%s,format=%s -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd' \
                                        % (self.rootfs, rootfs_format)
                     elif subprocess.call(cmd2, shell=True) == 0:
-                        logger.info('Using scsi drive')
+                        logger.info('Using ide drive')
                         vm_drive = "%s,format=%s" % (self.rootfs, rootfs_format)
                     else:
                         logger.warn("Can't detect drive type %s" % self.rootfs)
-                        logger.warn('Tring to use virtio block drive')
+                        logger.warn('Trying to use virtio block drive')
                         vm_drive = '-drive if=virtio,file=%s,format=%s' % (self.rootfs, rootfs_format)
                 self.rootfs_options = '%s -no-reboot' % vm_drive
             self.kernel_cmdline = 'root=%s rw highres=off' % (self.get('QB_KERNEL_ROOT'))
@@ -935,7 +955,9 @@ class BaseConfig(object):
 
     def start_qemu(self):
         if self.kernel:
-            kernel_opts = "-kernel %s -append '%s %s %s'" % (self.kernel, self.kernel_cmdline, self.kernel_cmdline_script, self.get('QB_KERNEL_CMDLINE_APPEND'))
+            kernel_opts = "-kernel %s -append '%s %s %s %s'" % (self.kernel, self.kernel_cmdline,
+                                                                self.kernel_cmdline_script, self.get('QB_KERNEL_CMDLINE_APPEND'),
+                                                                self.bootparams)
             if self.dtb:
                 kernel_opts += " -dtb %s" % self.dtb
         else:

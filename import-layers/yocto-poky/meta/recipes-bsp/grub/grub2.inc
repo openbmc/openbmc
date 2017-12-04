@@ -32,6 +32,9 @@ SRC_URI = "ftp://ftp.gnu.org/gnu/grub/grub-${PV}.tar.gz \
            file://0001-Remove-direct-_llseek-code-and-require-long-filesyst.patch \
            file://fix-texinfo.patch \
            file://0001-grub-core-gettext-gettext.c-main_context-secondary_c.patch \
+           file://0001-Enforce-no-pie-if-the-compiler-supports-it.patch \
+           file://0001-grub-core-kern-efi-mm.c-grub_efi_finish_boot_service.patch \
+           file://0002-grub-core-kern-efi-mm.c-grub_efi_get_memory_map-Neve.patch \
             "
 
 DEPENDS = "flex-native bison-native autogen-native"

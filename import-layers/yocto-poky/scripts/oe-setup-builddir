@@ -61,7 +61,7 @@ if [ -n "$TEMPLATECONF" ]; then
             TEMPLATECONF="$OEROOT/$TEMPLATECONF"
         fi
         if [ ! -d "$TEMPLATECONF" ]; then
-            echo >&2 "Error: '$TEMPLATECONF' must be a directory containing local.conf & bblayers.conf"
+            echo >&2 "Error: TEMPLATECONF value points to nonexistent directory '$TEMPLATECONF'"
             exit 1
         fi
     fi

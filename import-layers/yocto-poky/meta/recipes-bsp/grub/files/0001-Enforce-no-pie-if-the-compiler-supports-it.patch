@@ -1,0 +1,45 @@
+From 6186bcf1bcaaa0f16e79339e07c64c841d4d957d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 2 Dec 2016 20:52:40 +0200
+Subject: [PATCH] Enforce -no-pie, if the compiler supports it.
+
+Add a -no-pie as recent (2 Dec 2016) Debian testing compiler
+seems to default to enabling PIE when linking. See
+https://wiki.ubuntu.com/SecurityTeam/PIE
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ acinclude.m4 | 2 +-
+ configure.ac | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 19200b0..a713923 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -416,7 +416,7 @@ int main() {
+ 
+ [# `$CC -c -o ...' might not be portable.  But, oh, well...  Is calling
+ # `ac_compile' like this correct, after all?
+-if eval "$ac_compile -S -o conftest.s" 2> /dev/null; then]
++if eval "$ac_compile -S -o conftest.s" 2> /dev/null && eval "$CC -dumpspecs 2>/dev/null | grep -e no-pie" ; then]
+   AC_MSG_RESULT([yes])
+   [# Should we clear up other files as well, having called `AC_LANG_CONFTEST'?
+   rm -f conftest.s
+diff --git a/configure.ac b/configure.ac
+index df20991..506c6b4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -603,7 +603,7 @@ grub_CHECK_PIE
+ [# Need that, because some distributions ship compilers that include
+ # `-fPIE' in the default specs.
+ if [ x"$pie_possible" = xyes ]; then
+-  TARGET_CFLAGS="$TARGET_CFLAGS -fno-PIE"
++  TARGET_CFLAGS="$TARGET_CFLAGS -fno-PIE -no-pie"
+ fi]
+ 
+ # Position independent executable.
+-- 
+2.10.2
+

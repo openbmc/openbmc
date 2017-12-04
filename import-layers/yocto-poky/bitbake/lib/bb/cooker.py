@@ -252,6 +252,10 @@ class BBCooker:
         signal.signal(signal.SIGHUP, self.sigterm_exception)
 
     def config_notifications(self, event):
+        if event.maskname == "IN_Q_OVERFLOW":
+            bb.warn("inotify event queue overflowed, invalidating caches.")
+            self.baseconfig_valid = False
+            return
         if not event.pathname in self.configwatcher.bbwatchedfiles:
             return
         if not event.pathname in self.inotify_modified_files:
@@ -259,6 +263,10 @@ class BBCooker:
         self.baseconfig_valid = False
 
     def notifications(self, event):
+        if event.maskname == "IN_Q_OVERFLOW":
+            bb.warn("inotify event queue overflowed, invalidating caches.")
+            self.parsecache_valid = False
+            return
         if not event.pathname in self.inotify_modified_files:
             self.inotify_modified_files.append(event.pathname)
         self.parsecache_valid = False
@@ -657,8 +665,40 @@ class BBCooker:
         # A task of None means use the default task
         if task is None:
             task = self.configuration.cmd
+        if not task.startswith("do_"):
+            task = "do_%s" % task
 
-        fulltargetlist = self.checkPackages(pkgs_to_build, task)
+        targetlist = self.checkPackages(pkgs_to_build, task)
+        fulltargetlist = []
+        defaulttask_implicit = ''
+        defaulttask_explicit = False
+        wildcard = False
+
+        # Wild card expansion:
+        # Replace string such as "multiconfig:*:bash"
+        # into "multiconfig:A:bash multiconfig:B:bash bash"
+        for k in targetlist:
+            if k.startswith("multiconfig:"):
+                if wildcard:
+                    bb.fatal('multiconfig conflict')
+                if k.split(":")[1] == "*":
+                    wildcard = True
+                    for mc in self.multiconfigs:
+                        if mc:
+                            fulltargetlist.append(k.replace('*', mc))
+                        # implicit default task
+                        else:
+                            defaulttask_implicit = k.split(":")[2]
+                else:
+                    fulltargetlist.append(k)
+            else:
+                defaulttask_explicit = True
+                fulltargetlist.append(k)
+
+        if not defaulttask_explicit and defaulttask_implicit != '':
+            fulltargetlist.append(defaulttask_implicit)
+
+        bb.debug(1,"Target list: %s" % (str(fulltargetlist)))
         taskdata = {}
         localdata = {}
 
@@ -715,6 +755,9 @@ class BBCooker:
         Create a dependency graph of pkgs_to_build including reverse dependency
         information.
         """
+        if not task.startswith("do_"):
+            task = "do_%s" % task
+
         runlist, taskdata = self.prepareTreeData(pkgs_to_build, task)
         rq = bb.runqueue.RunQueue(self, self.data, self.recipecaches, taskdata, runlist)
         rq.rqdata.prepare()
@@ -818,6 +861,9 @@ class BBCooker:
         """
         Create a dependency tree of pkgs_to_build, returning the data.
         """
+        if not task.startswith("do_"):
+            task = "do_%s" % task
+
         _, taskdata = self.prepareTreeData(pkgs_to_build, task)
 
         seen_fns = []
@@ -1318,6 +1364,8 @@ class BBCooker:
         # If we are told to do the None task then query the default task
         if (task == None):
             task = self.configuration.cmd
+        if not task.startswith("do_"):
+            task = "do_%s" % task
 
         fn, cls, mc = bb.cache.virtualfn2realfn(buildfile)
         fn = self.matchFile(fn)
@@ -1354,8 +1402,6 @@ class BBCooker:
         # Invalidate task for target if force mode active
         if self.configuration.force:
             logger.verbose("Invalidate task %s, %s", task, fn)
-            if not task.startswith("do_"):
-                task = "do_%s" % task
             bb.parse.siggen.invalidate_task(task, self.recipecaches[mc], fn)
 
         # Setup taskdata structure
@@ -1367,8 +1413,6 @@ class BBCooker:
         bb.event.fire(bb.event.BuildStarted(buildname, [item]), self.expanded_data)
 
         # Execute the runqueue
-        if not task.startswith("do_"):
-            task = "do_%s" % task
         runlist = [[mc, item, task, fn]]
 
         rq = bb.runqueue.RunQueue(self, self.data, self.recipecaches, taskdata, runlist)
@@ -1579,7 +1623,8 @@ class BBCooker:
         if self.state != state.parsing and not self.parsecache_valid:
             self.parseConfiguration ()
             if CookerFeatures.SEND_SANITYEVENTS in self.featureset:
-                bb.event.fire(bb.event.SanityCheck(False), self.data)
+                for mc in self.multiconfigs:
+                    bb.event.fire(bb.event.SanityCheck(False), self.databuilder.mcdata[mc])
 
             for mc in self.multiconfigs:
                 ignore = self.databuilder.mcdata[mc].getVar("ASSUME_PROVIDED", True) or ""

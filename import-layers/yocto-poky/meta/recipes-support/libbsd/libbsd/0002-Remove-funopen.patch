@@ -1,0 +1,55 @@
+From 28fc66e8b848709a2e69dba7f07694248e0154e8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 6 Nov 2016 09:40:43 -0800
+Subject: [PATCH 2/3] Remove funopen()
+
+Musl doesnt have prerequisites for it.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Inappropriate [musl specific]
+
+ man/Makefile.am  | 1 -
+ src/Makefile.am  | 1 -
+ test/Makefile.am | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/man/Makefile.am b/man/Makefile.am
+index e4d6e4a..c701d94 100644
+--- a/man/Makefile.am
++++ b/man/Makefile.am
+@@ -29,7 +29,6 @@ dist_man_MANS = \
+ 	flopen.3 \
+ 	fmtcheck.3 \
+ 	fparseln.3 \
+-	funopen.3bsd \
+ 	getbsize.3 \
+ 	getmode.3 \
+ 	getpeereid.3 \
+diff --git a/src/Makefile.am b/src/Makefile.am
+index ad83dbf..13225a3 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -76,7 +76,6 @@ libbsd_la_SOURCES = \
+ 	fmtcheck.c \
+ 	fparseln.c \
+ 	fpurge.c \
+-	funopen.c \
+ 	getbsize.c \
+ 	getpeereid.c \
+ 	hash/md5.c \
+diff --git a/test/Makefile.am b/test/Makefile.am
+index a75c8ff..e3a1d41 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -36,7 +36,6 @@ check_PROGRAMS = \
+ 	endian \
+ 	humanize \
+ 	fgetln \
+-	funopen \
+ 	fparseln \
+ 	fpurge \
+ 	md5 \
+-- 
+2.10.2
+
