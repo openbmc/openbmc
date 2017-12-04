@@ -7,3 +7,5 @@ PACKAGECONFIG_rpi ?= " \
     ${@bb.utils.contains("DISTRO_FEATURES", "wayland", "xwayland", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "systemd", "", d)} \
 "
+
+XSERVER_RRECOMMENDS_append = " xf86-input-libinput"

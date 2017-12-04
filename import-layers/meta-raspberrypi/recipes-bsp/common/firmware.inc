@@ -1,10 +1,10 @@
-RPIFW_DATE ?= "20161125"
+RPIFW_DATE ?= "20170405"
 RPIFW_SRC_URI ?= "https://github.com/raspberrypi/firmware/archive/1.${RPIFW_DATE}.tar.gz"
 RPIFW_S ?= "${WORKDIR}/firmware-1.${RPIFW_DATE}"
 
 SRC_URI = "${RPIFW_SRC_URI}"
-SRC_URI[md5sum] = "a9281d2869e2d7673a83d41bacfa66c2"
-SRC_URI[sha256sum] = "744e050630621c70991c91e0ee8663dc2f579e743583ca762b13b00bc75859bc"
+SRC_URI[md5sum] = "ea82d14a7cd8cfae9b78e00d4e56bc71"
+SRC_URI[sha256sum] = "2f4e5bddbac1372590db203002c35cbba3fb9d6172a93c314ee27bf05ae13bff"
 
 PV = "${RPIFW_DATE}"
 
