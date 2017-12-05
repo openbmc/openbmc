@@ -1,6 +1,6 @@
 [Unit]
 Description=Power on bind ir35221 device driver devs
-After=vcs_on@%i.service
+After=avsbus-enable@%i.service
 Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
 Conflicts=obmc-chassis-poweroff@%i.target

@@ -30,19 +30,7 @@ TMPL_ON_IRUNBIND = "ir35221-on-unbind@.service"
 INSTFMT_ON_IRUNBIND = "ir35221-on-unbind@{0}.service"
 FMT_ON_IRUNBIND = "../${TMPL_ON_IRUNBIND}:${TGTFMT_ON}.requires/${INSTFMT_ON_IRUNBIND}"
 
-TGTFMT_OFF = "obmc-chassis-poweroff@{0}.target"
-
-TMPL_OFF_IRBIND = "ir35221-off-bind@.service"
-INSTFMT_OFF_IRBIND = "ir35221-off-bind@{0}.service"
-FMT_OFF_IRBIND = "../${TMPL_OFF_IRBIND}:${TGTFMT_OFF}.requires/${INSTFMT_OFF_IRBIND}"
-
-TMPL_OFF_IRUNBIND = "ir35221-off-unbind@.service"
-INSTFMT_OFF_IRUNBIND = "ir35221-off-unbind@{0}.service"
-FMT_OFF_IRUNBIND = "../${TMPL_OFF_IRUNBIND}:${TGTFMT_OFF}.requires/${INSTFMT_OFF_IRUNBIND}"
-
-SYSTEMD_SERVICE_${PN} += "${TMPL} ${TMPL_ON_IRUNBIND} ${TMPL_ON_IRBIND} ${TMPL_OFF_IRUNBIND} ${TMPL_OFF_IRBIND}"
+SYSTEMD_SERVICE_${PN} += "${TMPL} ${TMPL_ON_IRUNBIND} ${TMPL_ON_IRBIND}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON_IRBIND', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON_IRUNBIND', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_OFF_IRBIND', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_OFF_IRUNBIND', 'OBMC_CHASSIS_INSTANCES')}"

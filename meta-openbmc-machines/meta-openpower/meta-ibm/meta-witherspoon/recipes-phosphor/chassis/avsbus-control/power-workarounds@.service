@@ -1,7 +1,7 @@
 [Unit]
 Description=Perform power workarounds on VRMs
-Wants=ucd_disable_vcs@%i.service
-After=ucd_disable_vcs@%i.service
+Wants=ir35221-on-unbind@%i.service
+After=ir35221-on-unbind@%i.service
 Before=avsbus-disable@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 ConditionPathExists=!/run/openbmc/chassis@%i-on
