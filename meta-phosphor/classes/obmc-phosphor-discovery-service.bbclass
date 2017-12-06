@@ -3,12 +3,12 @@ DISCOVERY_SVC_PACKAGES ?= "${PN}"
 
 python() {
     avahi_enabled = bb.utils.contains(
-            'DISTRO_FEATURES', 'avahi', 'true', 'false', d)
+            'DISTRO_FEATURES', 'avahi', True, False, d)
     slp_enabled = bb.utils.contains(
-            'DISTRO_FEATURES', 'slp', 'true', 'false', d)
+            'DISTRO_FEATURES', 'slp', True, False, d)
 
 
-    if not avahi_enabled and slp_enabled:
+    if not avahi_enabled and not slp_enabled:
         return
 
     syscnfdir = d.getVar('sysconfdir', True)
@@ -48,11 +48,11 @@ python() {
 
 python discovery_services_postinstall() {
     avahi_enabled = bb.utils.contains(
-            'DISTRO_FEATURES', 'avahi', 'true', 'false', d)
+            'DISTRO_FEATURES', 'avahi', True, False, d)
     slp_enabled = bb.utils.contains(
-            'DISTRO_FEATURES', 'slp', 'true', 'false', d)
+            'DISTRO_FEATURES', 'slp', True, False, d)
 
-    if not avahi_enabled and slp_enabled:
+    if not avahi_enabled and not slp_enabled:
         return
 
     avahi_service_dir = d.getVar('AVAHI_SERVICES_DIR', True).strip()
