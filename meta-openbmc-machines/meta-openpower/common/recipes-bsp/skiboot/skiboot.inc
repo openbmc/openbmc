@@ -8,8 +8,8 @@ FILESEXTRAPATHS_append := "${THISDIR}/skiboot:"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRCREV = "e0ee24c27a172bcf482f6f2bc905e6211c134bcc"
-PV = "v5.9"
+SRCREV = "1a1a2bd43829dc49c63fda07c569fbfcb73353a5"
+PV = "v5.9.4"
 
 S = "${WORKDIR}/git"
 
