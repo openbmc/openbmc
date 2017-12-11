@@ -1,0 +1,1 @@
+recipes-kernel       - The kernel and generic applications/libraries with strong kernel dependencies
