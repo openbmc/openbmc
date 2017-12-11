@@ -133,6 +133,76 @@ groups:
       members:
           - /temperature/pcie
 
+matches:
+    - name: propertiesChanged
+      description: >
+          A property changed match
+      parameters:
+          - object
+          - interface
+      signal: propertySignal
+    - name: interfacesAdded
+      description: >
+          An interfaces added match
+      parameters:
+          - object
+      signal: objectSignal
+    - name: interfacesRemoved
+      description: >
+          An interfaces removed match
+      parameters:
+          - object
+      signal: objectSignal
+    - name: nameOwnerChanged
+      description: >
+          A name owner changed match
+      parameters:
+          - object
+          - interface
+      signal: ownerSignal
+
+signals:
+    - name: propertySignal
+      description: >
+          Handle property signals
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+      handler: setProperty
+    - name: objectSignal
+      description: >
+          Handle object signals
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+      handler: setProperty
+    - name: ownerSignal
+      description: >
+          Handle owner signals
+      parameters:
+          - object
+          - interface
+      handler: setService
+
+handlers:
+    - name: setProperty
+      description: >
+          Sets a value for the given object/interface/property
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+    - name: setService
+      description: >
+          Sets the service name(s) for the given group
+      parameters:
+          - group
+
 preconditions:
     - name: property_states_match
       description: >
@@ -142,6 +212,22 @@ preconditions:
           - groups
 
 actions:
+    - name: call_actions_based_on_timer
+      description: >
+          Sets up a list of actions to be invoked when the defined timer
+          expires (or for each expiration of a repeating timer)
+      parameters:
+          - timer
+          - actions
+    - name: default_floor_on_missing_owner
+      description: >
+          Set the fan floor to the default floor
+    - name: set_speed_on_missing_owner
+      description: >
+          Set fans to the given speed when any service within the group
+          no longer exists
+      parameters:
+          - speed
     - name: set_request_speed_base_with_max
       description: >
           Set the base request speed of a zone to the max value of a group for
@@ -190,6 +276,8 @@ events:
       property:
           name: Present
           type: bool
+      matches:
+          - name: propertiesChanged
       actions:
           - name: count_state_before_speed
             count: 1
@@ -207,6 +295,8 @@ events:
       property:
           name: Functional
           type: bool
+      matches:
+          - name: propertiesChanged
       actions:
           - name: count_state_before_speed
             count: 1
@@ -224,6 +314,8 @@ events:
       property:
           name: Present
           type: bool
+      matches:
+          - name: propertiesChanged
       actions:
           - name: count_state_before_speed
             count: 1
@@ -241,6 +333,8 @@ events:
       property:
           name: Functional
           type: bool
+      matches:
+          - name: propertiesChanged
       actions:
           - name: count_state_before_speed
             count: 1
@@ -258,6 +352,8 @@ events:
       property:
           name: Value
           type: int64_t
+      matches:
+          - name: propertiesChanged
       actions:
           - name: set_floor_from_average_sensor_value
             map:
@@ -283,6 +379,8 @@ events:
       property:
           name: Value
           type: int64_t
+      matches:
+          - name: propertiesChanged
       actions:
           - name: set_floor_from_average_sensor_value
             map:
@@ -311,6 +409,9 @@ events:
       property:
           name: Value
           type: int64_t
+      matches:
+          - name: interfacesAdded
+          - name: propertiesChanged
       actions:
           - name: set_net_increase_speed
             property: 85000
@@ -343,6 +444,9 @@ events:
       property:
           name: Value
           type: int64_t
+      matches:
+          - name: interfacesAdded
+          - name: propertiesChanged
       actions:
           - name: set_net_increase_speed
             property: 55000
@@ -378,6 +482,9 @@ events:
                     name: OccActive
                     type: bool
                     value: true
+          matches:
+              - name: interfacesAdded
+              - name: propertiesChanged
           events:
               - name: speed_changes_based_on_core_temps
                 zone_conditions:
@@ -389,6 +496,9 @@ events:
                 property:
                     name: Value
                     type: int64_t
+                matches:
+                    - name: interfacesAdded
+                    - name: propertiesChanged
                 actions:
                     - name: set_net_increase_speed
                       property: 73000
@@ -421,6 +531,9 @@ events:
                 property:
                     name: Value
                     type: int64_t
+                matches:
+                    - name: interfacesAdded
+                    - name: propertiesChanged
                 actions:
                     - name: set_net_increase_speed
                       property: 64000
@@ -450,6 +563,9 @@ events:
                 property:
                     name: Value
                     type: int64_t
+                matches:
+                    - name: interfacesAdded
+                    - name: propertiesChanged
                 actions:
                     - name: set_net_increase_speed
                       property: 78000
@@ -479,6 +595,9 @@ events:
                 property:
                     name: Value
                     type: int64_t
+                matches:
+                    - name: interfacesAdded
+                    - name: propertiesChanged
                 actions:
                     - name: set_net_increase_speed
                       property: 80000
