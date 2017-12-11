@@ -262,10 +262,10 @@ events:
           - name: set_floor_from_average_sensor_value
             map:
                 value:
-                    - 27000: 7200
-                    - 32000: 7200
-                    - 37000: 7200
-                    - 40000: 7200
+                    - 27000: 3500
+                    - 32000: 4600
+                    - 37000: 5200
+                    - 40000: 5800
                 type: std::map<int64_t, uint64_t>
           - name: set_ceiling_from_average_sensor_value
             map:
