@@ -1,12 +1,14 @@
 # Water cooled Witherspoon fan policy for PDM.
 #
-# A water cooled Witherspoon requires a minimum of two functional fans.
-# If the number of functional fans drops below that
-# power the system off.
+# A water cooled Witherspoon requires a minimum of two functional fan
+# enclosures or four functional fan rotors across all enclosures.
+# If the number of functional fan enclosures is below two, soft poweroff
+# the system, whereas if the number of fan rotors drop below four, an
+# immediate hard poweroff of the system occurs.
 
-- name: fans
+- name: fan enclosures
   description: >
-    'A water cooled Witherspoon has three fans to monitor.'
+    'A water cooled Witherspoon has three fan enclosures to monitor.'
   class: group
   group: path
   members:
@@ -16,6 +18,25 @@
       path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
     - meta: FAN
       path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
+
+- name: fan rotors
+  description: >
+    'A water cooled Witherspoon has six fan rotors to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0/fan0_0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0/fan0_1
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2/fan2_0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2/fan2_1
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3/fan3_0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3/fan3_1
 
 - name: chassis state
   description: >
@@ -81,19 +102,28 @@
 
 - name: watch fan present
   description: >
-    'Trigger logic on fan presence state changes.'
+    'Trigger logic on fan enclosure presence state changes.'
   class: watch
   watch: property
-  paths: fans
+  paths: fan enclosures
   properties: fan present
   callback: check cooling type
 
 - name: watch fan functional
   description: >
-    'Trigger logic on fan functional state changes.'
+    'Trigger logic on fan enclosure functional state changes.'
   class: watch
   watch: property
-  paths: fans
+  paths: fan enclosures
+  properties: fan functional
+  callback: check cooling type
+
+- name: watch fan rotor functional
+  description: >
+    'Trigger logic on fan rotor functional state changes.'
+  class: watch
+  watch: property
+  paths: fan rotors
   properties: fan functional
   callback: check cooling type
 
@@ -142,12 +172,14 @@
 
 - name: check fans
   description: >
-    'Verify there are at least two functional fans, power off if not.'
+    'Verify there are at least two functional fan enclosures and at least
+    four functional fan rotors, power off if not.'
   class: callback
   callback: group
   members:
     - check group presence
-    - check group functional
+    - check group functional enclosures
+    - check group functional rotors
 
 - name: check group presence
   description: >
@@ -161,7 +193,7 @@
     of the fan inventory object implementation.'
   class: condition
   condition: count
-  paths: fans
+  paths: fan enclosures
   properties: fan present
   defer: 25000000us
   callback: log and shutdown
@@ -170,17 +202,17 @@
   op: '=='
   bound: true
 
-- name: check group functional
+- name: check group functional enclosures
   description: >
-    'If this condition passes more than one fan in the group has been marked
-    as nonfunctional for ten seconds. Shut the system down.
+    'If this condition passes more than one fan enclosure in the group has been
+    marked as nonfunctional for ten seconds. Shut the system down.
 
     For a more detailed definition of nonfunctional, consult the documentation
     of xyz.openbmc_project.State.Decorator.OperationalStatus and/or the
     documentation of the fan inventory object implementation.'
   class: condition
   condition: count
-  paths: fans
+  paths: fan enclosures
   properties: fan functional
   defer: 10000000us
   callback: log and shutdown
@@ -188,6 +220,36 @@
   countbound: 1
   op: '=='
   bound: false
+
+- name: check group functional rotors
+  description: >
+    'If this condition passes more than two fan rotors in the group have been
+    marked as nonfunctional for five seconds. Immediately power off.
+
+    For a more detailed definition of nonfunctional, consult the documentation
+    of xyz.openbmc_project.State.Decorator.OperationalStatus and/or the
+    documentation of the fan inventory object implementation.'
+  class: condition
+  condition: count
+  paths: fan rotors
+  properties: fan functional
+  defer: 5000000us
+  callback: log and poweroff
+  countop: '>'
+  countbound: 2
+  op: '=='
+  bound: false
+
+- name: log and poweroff
+  description: >
+    'Immediately poweroff, log an event in the journal, and create an
+     error log.'
+  class: callback
+  callback: group
+  members:
+    - hard poweroff
+    - log hard poweroff
+    - create shutdown error
 
 - name: log and shutdown
   description: >
@@ -197,12 +259,12 @@
   callback: group
   members:
     - shutdown
-    - log
+    - log shutdown
     - create shutdown error
 
-- name: shutdown
+- name: hard poweroff
   description: >
-    'Shut down the system.'
+    'Immediately power off the system.'
   class: callback
   callback: method
   service: org.freedesktop.systemd1
@@ -215,7 +277,32 @@
     - value: replace
       type: string
 
-- name: log
+- name: shutdown
+  description: >
+    'Shut down the system.'
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+    - value: obmc-host-shutdown@0.target
+      type: string
+    - value: replace
+      type: string
+
+- name: log hard poweroff
+  description: >
+    'Log a hard poweroff event to the systemd journal.'
+  class: callback
+  callback: journal
+  paths: chassis state
+  properties: chassis powered
+  severity: ERR
+  message: Immediate poweroff of system. There are not enough functional fans.
+
+- name: log shutdown
   description: >
     'Log a shutdown event to the systemd journal.'
   class: callback
@@ -223,7 +310,7 @@
   paths: chassis state
   properties: chassis powered
   severity: ERR
-  message: Shutting down system.  There are not enough functional fans.
+  message: Request shutdown of system. There are not enough functional fans.
 
 - name: create shutdown error
   description: >
