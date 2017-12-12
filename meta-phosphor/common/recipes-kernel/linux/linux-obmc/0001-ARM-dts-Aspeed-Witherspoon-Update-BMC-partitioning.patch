@@ -71,7 +71,7 @@ index dd30c20..51f965e 100644
  		status = "okay";
  		m25p,fast-read;
  
--#include "aspeed-bmc-opp-flash-layout.dtsi"
+-#include "openbmc-flash-layout.dtsi"
 +#include "aspeed-bmc-opp-flash-layout-ubi.dtsi"
  	};
  	flash@1 {
