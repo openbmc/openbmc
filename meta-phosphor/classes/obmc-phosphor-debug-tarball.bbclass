@@ -6,7 +6,7 @@ IMAGE_FSTYPES = "tar.xz"
 inherit image
 inherit obmc-phosphor-license
 
-IMAGE_INSTALL_append = " busybox packagegroup-obmc-phosphor-debugtools"
+IMAGE_INSTALL_append = " busybox packagegroup-obmc-phosphor-debugtools perf "
 
 # Override from image_types.bbclass to restrict tarball to /usr tree.
 IMAGE_CMD_tar = "${IMAGE_CMD_TAR} -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar -C ${IMAGE_ROOTFS}/usr ."
