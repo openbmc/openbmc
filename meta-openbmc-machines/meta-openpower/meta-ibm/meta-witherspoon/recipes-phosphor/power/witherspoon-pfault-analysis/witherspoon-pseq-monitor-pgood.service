@@ -7,5 +7,5 @@ ConditionPathExists=!/run/openbmc/chassis@0-on
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/env witherspoon-pseq-monitor -a pgood-monitor -i 5
+ExecStart=/usr/bin/env witherspoon-pseq-monitor -a pgood-monitor -i 5000
 SyslogIdentifier=witherspoon-pseq-monitor
