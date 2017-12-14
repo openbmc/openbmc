@@ -3,6 +3,7 @@ PR = "r1"
 
 inherit native
 inherit phosphor-ipmi-fru
+inherit mrw-xml
 
 require phosphor-ipmi-fru.inc
 
@@ -22,7 +23,7 @@ do_install() {
 
     ${bindir}/perl-native/perl \
         ${bindir}/gen_ipmi_fru.pl \
-        -i ${datadir}/obmc-mrw/${MACHINE}.xml \
+        -i ${mrw_datadir}/${MRW_XML} \
         -m ${hostfw_datadir}/config.yaml \
         -o ${DEST}/config.yaml
 }

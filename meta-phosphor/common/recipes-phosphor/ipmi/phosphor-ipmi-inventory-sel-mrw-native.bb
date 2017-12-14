@@ -4,6 +4,7 @@ PR = "r1"
 inherit native
 inherit obmc-phosphor-license
 inherit phosphor-ipmi-host
+inherit mrw-xml
 
 SRC_URI += "file://config.yaml"
 
@@ -22,7 +23,7 @@ do_install() {
 
         ${bindir}/perl-native/perl \
             ${bindir}/gen_ipmi_sel.pl \
-            -i ${datadir}/obmc-mrw/${MACHINE}.xml \
+            -i ${mrw_datadir}/${MRW_XML} \
             -m config.yaml \
             -o ${DEST}/invsensor.yaml
 }

@@ -4,6 +4,7 @@ PR = "r1"
 inherit native
 inherit obmc-phosphor-license
 inherit phosphor-fan
+inherit mrw-xml
 
 DEPENDS += " \
            mrw-native \
@@ -20,6 +21,6 @@ do_install() {
 
         ${bindir}/perl-native/perl \
             ${bindir}/gen_presence_yaml.pl \
-            -i ${datadir}/obmc-mrw/${MACHINE}.xml \
+            -i ${mrw_datadir}/${MRW_XML} \
             -o ${DEST}/config.yaml
 }

@@ -4,6 +4,7 @@ PR = "r1"
 inherit native
 inherit obmc-phosphor-license
 inherit openpower-fru-vpd
+inherit mrw-xml
 
 SRC_URI += "file://config.yaml"
 
@@ -22,7 +23,7 @@ do_install() {
 
         ${bindir}/perl-native/perl \
             ${bindir}/gen_fru_properties.pl \
-            -m ${datadir}/obmc-mrw/${MACHINE}.xml \
+            -m ${mrw_datadir}/${MRW_XML} \
             -c config.yaml \
             -o ${DEST}/out.yaml
 }

@@ -4,6 +4,7 @@ PR = "r1"
 inherit native
 inherit obmc-phosphor-license
 inherit phosphor-logging
+inherit mrw-xml
 
 DEPENDS += " \
            mrw-native \
@@ -20,6 +21,6 @@ do_install() {
 
         ${bindir}/perl-native/perl \
             ${bindir}/gen_callouts.pl \
-            -m ${datadir}/obmc-mrw/${MACHINE}.xml \
+            -m ${mrw_datadir}/${MRW_XML} \
             -o ${DEST}/callouts.yaml
 }

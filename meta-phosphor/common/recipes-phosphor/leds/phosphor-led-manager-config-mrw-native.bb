@@ -4,6 +4,7 @@ PR = "r1"
 inherit native
 inherit obmc-phosphor-utils
 inherit obmc-phosphor-license
+inherit mrw-xml
 
 PROVIDES += "virtual/phosphor-led-manager-config-native"
 DEPENDS += "mrw-native mrw-perl-tools-native"
@@ -17,7 +18,7 @@ do_install_append() {
         install -d ${DEST}/
         ${STAGING_BINDIR_NATIVE}/perl-native/perl \
         ${STAGING_BINDIR_NATIVE}/gen_led_groups.pl \
-        -i ${STAGING_DATADIR_NATIVE}/obmc-mrw/${MACHINE}.xml \
+        -i ${mrw_datadir}/${MRW_XML} \
         -o ${DEST}/led.yaml
     fi
 }

@@ -7,6 +7,7 @@ PR = "r1"
 
 inherit native
 inherit phosphor-settings-manager
+inherit mrw-xml
 
 inherit obmc-phosphor-license
 
@@ -26,7 +27,7 @@ do_install() {
     # gen_settings.pl replaces any MRW variables with their value
     ${bindir}/perl-native/perl \
         ${bindir}/gen_settings.pl \
-        -i ${datadir}/obmc-mrw/${MACHINE}.xml \
+        -i ${mrw_datadir}/${MRW_XML} \
         -s ${DEST}/mrw-override-settings.yaml \
         -o ${SETTINGS}/mrw-settings.override.yaml \
         -f

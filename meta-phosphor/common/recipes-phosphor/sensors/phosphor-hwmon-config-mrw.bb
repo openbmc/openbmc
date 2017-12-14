@@ -4,13 +4,14 @@ PR = "r1"
 
 inherit obmc-phosphor-license
 inherit allarch
+inherit mrw-xml
 
 DEPENDS += "mrw-perl-tools-native mrw-native"
 
 do_compile_append() {
     ${STAGING_BINDIR_NATIVE}/perl-native/perl \
         ${STAGING_BINDIR_NATIVE}/hwmon.pl \
-        -x ${STAGING_DATADIR_NATIVE}/obmc-mrw/${MACHINE}.xml \
+        -x ${mrw_datadir}/${MRW_XML} \
         -d ${WORKDIR}/mrw-config-files
 }
 

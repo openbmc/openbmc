@@ -2,6 +2,8 @@ SUMMARY = "Phosphor Inventory Generation"
 DESCRIPTION = "Generates inventory data from the machine readable workbook"
 PR = "r1"
 
+inherit mrw-xml
+
 S = "${WORKDIR}/git"
 
 PROVIDES += "virtual/obmc-inventory-data"
@@ -20,7 +22,7 @@ FILES_${PN} += "${datadir}/inventory"
 
 do_compile() {
     ${STAGING_BINDIR_NATIVE}/perl-native/perl ${S}/inventory.pl \
-        -x ${STAGING_DATADIR_NATIVE}/obmc-mrw/${MACHINE}.xml -o inventory.json
+        -x ${STAGING_DIR_NATIVE}${mrw_datadir}/${MRW_XML} -o inventory.json
 }
 
 do_install() {

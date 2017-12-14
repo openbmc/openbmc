@@ -4,6 +4,7 @@ PR = "r1"
 inherit native
 inherit obmc-phosphor-license
 inherit phosphor-fan
+inherit mrw-xml
 
 DEPENDS += " \
            mrw-native \
@@ -17,7 +18,7 @@ S = "${WORKDIR}"
 do_compile() {
     ${bindir}/perl-native/perl \
         ${bindir}/gen_fan_zone_yaml.pl \
-        -i ${datadir}/obmc-mrw/${MACHINE}.xml \
+        -i ${mrw_datadir}/${MRW_XML} \
         -o ${S}/fans.yaml
 }
 

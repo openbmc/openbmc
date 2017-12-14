@@ -4,6 +4,7 @@ PR = "r1"
 inherit native
 inherit obmc-phosphor-license
 inherit openpower-fru-vpd
+inherit mrw-xml
 
 DEPENDS += " \
            mrw-native \
@@ -21,7 +22,7 @@ do_install() {
 
         ${bindir}/perl-native/perl \
             ${bindir}/gen_openpower_fru.pl \
-            -m ${datadir}/obmc-mrw/${MACHINE}.xml \
+            -m ${mrw_datadir}/${MRW_XML} \
             -c ${vpdlayout_datadir}/layout.yaml \
             -o ${DEST}/inventory
 }
