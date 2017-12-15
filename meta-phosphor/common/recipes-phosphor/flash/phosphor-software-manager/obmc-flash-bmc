@@ -259,12 +259,18 @@ copy_env_var_to_alt() {
 }
 
 ubi_setenv() {
+    # The U-Boot environment maintains two banks of environment variables.
+    # The banks need to be consistent with each other to ensure that these
+    # variables can reliably be read from file. In order to guarantee that the
+    # banks are both correct, we need to run fw_setenv twice.
     variable=$1
     if [[ "$variable" == *"="* ]]; then
         varName="${variable%=*}"
         value="${variable##*=}"
         fw_setenv "$varName" "$value"
+        fw_setenv "$varName" "$value"
     else
+        fw_setenv "$variable"
         fw_setenv "$variable"
     fi
 }
