@@ -1,0 +1,285 @@
+From 70fc4f57902290c48bec9acb2393ded84c09d4ca Mon Sep 17 00:00:00 2001
+From: Lennart Poettering <lennart@poettering.net>
+Date: Thu, 17 Nov 2016 17:07:46 +0100
+Subject: [PATCH] sd-id128: add new sd_id128_get_machine_app_specific() API
+
+This adds an API for retrieving an app-specific machine ID to sd-id128.
+Internally it calculates HMAC-SHA256 with an 128bit app-specific ID as payload
+and the machine ID as key.
+
+(An alternative would have been to use siphash for this, which is also
+cryptographically strong. However, as it only generates 64bit hashes it's not
+an obvious choice for generating 128bit IDs.)
+
+Fixes: #4667
+---
+ Makefile-man.am                    |  5 +++
+ man/machine-id.xml                 | 15 +++++----
+ man/sd_id128_get_machine.xml       | 65 +++++++++++++++++++++++++++++++-------
+ src/libsystemd/libsystemd.sym      |  5 +++
+ src/libsystemd/sd-id128/sd-id128.c | 32 +++++++++++++++++++
+ src/systemd/sd-id128.h             |  2 +-
+ src/test/test-id128.c              |  6 ++++
+ 7 files changed, 110 insertions(+), 20 deletions(-)
+
+diff --git a/Makefile-man.am b/Makefile-man.am
+index 013e0d7..228e29f 100644
+--- a/Makefile-man.am
++++ b/Makefile-man.am
+@@ -397,6 +397,7 @@ MANPAGES_ALIAS += \
+ 	man/sd_id128_from_string.3 \
+ 	man/sd_id128_get_boot.3 \
+ 	man/sd_id128_get_invocation.3 \
++	man/sd_id128_get_machine_app_specific.3 \
+ 	man/sd_id128_is_null.3 \
+ 	man/sd_id128_t.3 \
+ 	man/sd_is_mq.3 \
+@@ -750,6 +751,7 @@ man/sd_id128_equal.3: man/sd-id128.3
+ man/sd_id128_from_string.3: man/sd_id128_to_string.3
+ man/sd_id128_get_boot.3: man/sd_id128_get_machine.3
+ man/sd_id128_get_invocation.3: man/sd_id128_get_machine.3
++man/sd_id128_get_machine_app_specific.3: man/sd_id128_get_machine.3
+ man/sd_id128_is_null.3: man/sd-id128.3
+ man/sd_id128_t.3: man/sd-id128.3
+ man/sd_is_mq.3: man/sd_is_fifo.3
+@@ -1531,6 +1533,9 @@ man/sd_id128_get_boot.html: man/sd_id128_get_machine.html
+ man/sd_id128_get_invocation.html: man/sd_id128_get_machine.html
+ 	$(html-alias)
+ 
++man/sd_id128_get_machine_app_specific.html: man/sd_id128_get_machine.html
++	$(html-alias)
++
+ man/sd_id128_is_null.html: man/sd-id128.html
+ 	$(html-alias)
+ 
+diff --git a/man/machine-id.xml b/man/machine-id.xml
+index a722649..3c261bf 100644
+--- a/man/machine-id.xml
++++ b/man/machine-id.xml
+@@ -71,13 +71,14 @@
+     <para>This machine ID adheres to the same format and logic as the
+     D-Bus machine ID.</para>
+ 
+-    <para>This ID uniquely identifies the host. It should be considered "confidential", and must not
+-    be exposed in untrusted environments, in particular on the network. If a stable unique
+-    identifier that is tied to the machine is needed for some application, the machine ID or any
+-    part of it must not be used directly. Instead the machine ID should be hashed with a
+-    cryptographic, keyed hash function, using a fixed, application-specific key. That way the ID
+-    will be properly unique, and derived in a constant way from the machine ID but there will be no
+-    way to retrieve the original machine ID from the application-specific one.</para>
++    <para>This ID uniquely identifies the host. It should be considered "confidential", and must not be exposed in
++    untrusted environments, in particular on the network. If a stable unique identifier that is tied to the machine is
++    needed for some application, the machine ID or any part of it must not be used directly. Instead the machine ID
++    should be hashed with a cryptographic, keyed hash function, using a fixed, application-specific key. That way the
++    ID will be properly unique, and derived in a constant way from the machine ID but there will be no way to retrieve
++    the original machine ID from the application-specific one. The
++    <citerefentry><refentrytitle>sd_id128_get_machine_app_specific</refentrytitle><manvolnum>3</manvolnum></citerefentry>
++    API provides an implementation of such an algorithm.</para>
+ 
+     <para>The
+     <citerefentry><refentrytitle>systemd-machine-id-setup</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+diff --git a/man/sd_id128_get_machine.xml b/man/sd_id128_get_machine.xml
+index 9a86c24..3938c6d 100644
+--- a/man/sd_id128_get_machine.xml
++++ b/man/sd_id128_get_machine.xml
+@@ -44,6 +44,7 @@
+ 
+   <refnamediv>
+     <refname>sd_id128_get_machine</refname>
++    <refname>sd_id128_get_machine_app_specific</refname>
+     <refname>sd_id128_get_boot</refname>
+     <refname>sd_id128_get_invocation</refname>
+     <refpurpose>Retrieve 128-bit IDs</refpurpose>
+@@ -59,6 +60,12 @@
+       </funcprototype>
+ 
+       <funcprototype>
++        <funcdef>int <function>sd_id128_get_machine_app_specific</function></funcdef>
++        <paramdef>sd_id128_t <parameter>app_id</parameter></paramdef>
++        <paramdef>sd_id128_t *<parameter>ret</parameter></paramdef>
++      </funcprototype>
++
++      <funcprototype>
+         <funcdef>int <function>sd_id128_get_boot</function></funcdef>
+         <paramdef>sd_id128_t *<parameter>ret</parameter></paramdef>
+       </funcprototype>
+@@ -74,11 +81,22 @@
+   <refsect1>
+     <title>Description</title>
+ 
+-    <para><function>sd_id128_get_machine()</function> returns the
+-    machine ID of the executing host. This reads and parses the
+-    <citerefentry><refentrytitle>machine-id</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+-    file. This function caches the machine ID internally to make
+-    retrieving the machine ID a cheap operation.</para>
++    <para><function>sd_id128_get_machine()</function> returns the machine ID of the executing host. This reads and
++    parses the <citerefentry><refentrytitle>machine-id</refentrytitle><manvolnum>5</manvolnum></citerefentry>
++    file. This function caches the machine ID internally to make retrieving the machine ID a cheap operation. This ID
++    may be used wherever a unique identifier for the local system is needed. However, it is recommended to use this ID
++    as-is only in trusted environments. In untrusted environments it is recommended to derive an application specific
++    ID from this machine ID, in an irreversable (cryptographically secure) way. To make this easy
++    <function>sd_id128_get_machine_app_specific()</function> is provided, see below.</para>
++
++    <para><function>sd_id128_get_machine_app_specific()</function> is similar to
++    <function>sd_id128_get_machine()</function>, but retrieves a machine ID that is specific to the application that is
++    identified by the indicated application ID. It is recommended to use this function instead of
++    <function>sd_id128_get_machine()</function> when passing an ID to untrusted environments, in order to make sure
++    that the original machine ID may not be determined externally. The application-specific ID should be generated via
++    a tool like <command>journalctl --new-id128</command>, and may be compiled into the application. This function will
++    return the same application-specific ID for each combination of machine ID and application ID. Internally, this
++    function calculates HMAC-SHA256 of the application ID, keyed by the machine ID.</para>
+ 
+     <para><function>sd_id128_get_boot()</function> returns the boot ID
+     of the executing kernel. This reads and parses the
+@@ -95,10 +113,10 @@
+     <citerefentry><refentrytitle>systemd.exec</refentrytitle><manvolnum>5</manvolnum></citerefentry> for details. The
+     ID is cached internally. In future a different mechanism to determine the invocation ID may be added.</para>
+ 
+-    <para>Note that <function>sd_id128_get_boot()</function> and <function>sd_id128_get_invocation()</function> always
+-    return UUID v4 compatible IDs.  <function>sd_id128_get_machine()</function> will also return a UUID v4-compatible
+-    ID on new installations but might not on older.  It is possible to convert the machine ID into a UUID v4-compatible
+-    one. For more information, see
++    <para>Note that <function>sd_id128_get_machine_app_specific()</function>, <function>sd_id128_get_boot()</function>
++    and <function>sd_id128_get_invocation()</function> always return UUID v4 compatible IDs.
++    <function>sd_id128_get_machine()</function> will also return a UUID v4-compatible ID on new installations but might
++    not on older.  It is possible to convert the machine ID into a UUID v4-compatible one. For more information, see
+     <citerefentry><refentrytitle>machine-id</refentrytitle><manvolnum>5</manvolnum></citerefentry>.</para>
+ 
+     <para>For more information about the <literal>sd_id128_t</literal>
+@@ -117,13 +135,36 @@
+   <refsect1>
+     <title>Notes</title>
+ 
+-    <para>The <function>sd_id128_get_machine()</function>, <function>sd_id128_get_boot()</function> and
+-    <function>sd_id128_get_invocation()</function> interfaces are available as a shared library, which can be compiled
+-    and linked to with the <literal>libsystemd</literal> <citerefentry
++    <para>The <function>sd_id128_get_machine()</function>, <function>sd_id128_get_machine_app_specific()</function>
++    <function>sd_id128_get_boot()</function> and <function>sd_id128_get_invocation()</function> interfaces are
++    available as a shared library, which can be compiled and linked to with the
++    <literal>libsystemd</literal> <citerefentry
+     project='die-net'><refentrytitle>pkg-config</refentrytitle><manvolnum>1</manvolnum></citerefentry> file.</para>
+   </refsect1>
+ 
+   <refsect1>
++    <title>Examples</title>
++
++    <example>
++      <title>Application-specific machine ID</title>
++
++      <para>Here's a simple example for an application specific machine ID:</para>
++
++      <programlisting>#include &lt;systemd/sd-id128.h&gt;
++#include &lt;stdio.h&gt;
++
++#define OUR_APPLICATION_ID SD_ID128_MAKE(c2,73,27,73,23,db,45,4e,a6,3b,b9,6e,79,b5,3e,97)
++
++int main(int argc, char *argv[]) {
++        sd_id128_t id;
++        sd_id128_get_machine_app_specific(OUR_APPLICATION_ID, &amp;id);
++        printf("Our application ID: " SD_ID128_FORMAT_STR "\n", SD_ID128_FORMAT_VAL(id));
++        return 0;
++}</programlisting>
++    </example>
++  </refsect1>
++
++  <refsect1>
+     <title>See Also</title>
+ 
+     <para>
+diff --git a/src/libsystemd/libsystemd.sym b/src/libsystemd/libsystemd.sym
+index d48ef6b..46c4dac 100644
+--- a/src/libsystemd/libsystemd.sym
++++ b/src/libsystemd/libsystemd.sym
+@@ -511,3 +511,8 @@ global:
+         sd_bus_get_exit_on_disconnect;
+         sd_id128_get_invocation;
+ } LIBSYSTEMD_231;
++
++LIBSYSTEMD_233 {
++global:
++        sd_id128_get_machine_app_specific;
++} LIBSYSTEMD_232;
+diff --git a/src/libsystemd/sd-id128/sd-id128.c b/src/libsystemd/sd-id128/sd-id128.c
+index d4450c7..0d673ba 100644
+--- a/src/libsystemd/sd-id128/sd-id128.c
++++ b/src/libsystemd/sd-id128/sd-id128.c
+@@ -27,6 +27,7 @@
+ #include "hexdecoct.h"
+ #include "id128-util.h"
+ #include "io-util.h"
++#include "khash.h"
+ #include "macro.h"
+ #include "random-util.h"
+ #include "util.h"
+@@ -181,3 +182,34 @@ _public_ int sd_id128_randomize(sd_id128_t *ret) {
+         *ret = make_v4_uuid(t);
+         return 0;
+ }
++
++_public_ int sd_id128_get_machine_app_specific(sd_id128_t app_id, sd_id128_t *ret) {
++        _cleanup_(khash_unrefp) khash *h = NULL;
++        sd_id128_t m, result;
++        const void *p;
++        int r;
++
++        assert_return(ret, -EINVAL);
++
++        r = sd_id128_get_machine(&m);
++        if (r < 0)
++                return r;
++
++        r = khash_new_with_key(&h, "hmac(sha256)", &m, sizeof(m));
++        if (r < 0)
++                return r;
++
++        r = khash_put(h, &app_id, sizeof(app_id));
++        if (r < 0)
++                return r;
++
++        r = khash_digest_data(h, &p);
++        if (r < 0)
++                return r;
++
++        /* We chop off the trailing 16 bytes */
++        memcpy(&result, p, MIN(khash_get_size(h), sizeof(result)));
++
++        *ret = make_v4_uuid(result);
++        return 0;
++}
+diff --git a/src/systemd/sd-id128.h b/src/systemd/sd-id128.h
+index ee011b1..6cc8e4a 100644
+--- a/src/systemd/sd-id128.h
++++ b/src/systemd/sd-id128.h
+@@ -39,12 +39,12 @@ union sd_id128 {
+ #define SD_ID128_STRING_MAX 33
+ 
+ char *sd_id128_to_string(sd_id128_t id, char s[SD_ID128_STRING_MAX]);
+-
+ int sd_id128_from_string(const char *s, sd_id128_t *ret);
+ 
+ int sd_id128_randomize(sd_id128_t *ret);
+ 
+ int sd_id128_get_machine(sd_id128_t *ret);
++int sd_id128_get_machine_app_specific(sd_id128_t app_id, sd_id128_t *ret);
+ int sd_id128_get_boot(sd_id128_t *ret);
+ int sd_id128_get_invocation(sd_id128_t *ret);
+ 
+diff --git a/src/test/test-id128.c b/src/test/test-id128.c
+index 1c8e554..ab5a111 100644
+--- a/src/test/test-id128.c
++++ b/src/test/test-id128.c
+@@ -153,5 +153,11 @@ int main(int argc, char *argv[]) {
+         assert_se(id128_read_fd(fd, ID128_UUID, &id2) >= 0);
+         assert_se(sd_id128_equal(id, id2));
+ 
++        assert_se(sd_id128_get_machine_app_specific(SD_ID128_MAKE(f0,3d,aa,eb,1c,33,4b,43,a7,32,17,29,44,bf,77,2e), &id) >= 0);
++        assert_se(sd_id128_get_machine_app_specific(SD_ID128_MAKE(f0,3d,aa,eb,1c,33,4b,43,a7,32,17,29,44,bf,77,2e), &id2) >= 0);
++        assert_se(sd_id128_equal(id, id2));
++        assert_se(sd_id128_get_machine_app_specific(SD_ID128_MAKE(51,df,0b,4b,c3,b0,4c,97,80,e2,99,b9,8c,a3,73,b8), &id2) >= 0);
++        assert_se(!sd_id128_equal(id, id2));
++
+         return 0;
+ }
+-- 
+2.7.4
+

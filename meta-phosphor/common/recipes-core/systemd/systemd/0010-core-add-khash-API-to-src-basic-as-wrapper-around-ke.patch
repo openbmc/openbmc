@@ -1,0 +1,520 @@
+From 0fe5f3c5d743a7e4c63580a67066935f9e23a2f4 Mon Sep 17 00:00:00 2001
+From: Lennart Poettering <lennart@poettering.net>
+Date: Thu, 17 Nov 2016 17:03:21 +0100
+Subject: [PATCH] core: add "khash" API to src/basic/ (as wrapper around kernel
+ AF_ALG)
+
+Let's take inspiration from bluez's ELL library, and let's move our
+cryptographic primitives away from libgcrypt and towards the kernel's AF_ALG
+cryptographic userspace API.
+
+In the long run we should try to remove the dependency on libgcrypt, in favour
+of using only the kernel's own primitives, however this is unlikely to happen
+anytime soon, as the kernel does not provide Elliptic Curve APIs to userspace
+at this time, and we need them for the DNSSEC cryptographic.
+
+This commit only covers hashing for now, symmetric encryption/decryption or
+even asymetric encryption/decryption is not available for now.
+
+"khash" is little more than a lightweight wrapper around the kernel's AF_ALG
+socket API.
+---
+ .gitignore           |   1 +
+ Makefile.am          |  14 ++-
+ src/basic/khash.c    | 275 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/basic/khash.h    |  53 ++++++++++
+ src/basic/missing.h  |   4 +
+ src/test/test-hash.c |  82 +++++++++++++++
+ 6 files changed, 428 insertions(+), 1 deletion(-)
+ create mode 100644 src/basic/khash.c
+ create mode 100644 src/basic/khash.h
+ create mode 100644 src/test/test-hash.c
+
+diff --git a/.gitignore b/.gitignore
+index 21fcf98..2e39f65 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -198,6 +198,7 @@
+ /test-fs-util
+ /test-fstab-util
+ /test-glob-util
++/test-hash
+ /test-hashmap
+ /test-hexdecoct
+ /test-hostname
+diff --git a/Makefile.am b/Makefile.am
+index 6c350b0..6ea367b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -934,7 +934,9 @@ libbasic_la_SOURCES = \
+ 	src/basic/alloc-util.h \
+ 	src/basic/alloc-util.c \
+ 	src/basic/formats-util.h \
+-	src/basic/nss-util.h
++	src/basic/nss-util.h \
++	src/basic/khash.h \
++	src/basic/khash.c
+ 
+ nodist_libbasic_la_SOURCES = \
+ 	src/basic/errno-from-name.h \
+@@ -4046,6 +4048,16 @@ tests += \
+ 	test-id128
+ 
+ # ------------------------------------------------------------------------------
++test_hash_SOURCES = \
++	src/test/test-hash.c
++
++test_hash_LDADD = \
++	libsystemd-shared.la
++
++tests += \
++	test-hash
++
++# ------------------------------------------------------------------------------
+ 
+ bin_PROGRAMS += \
+ 	systemd-socket-activate
+diff --git a/src/basic/khash.c b/src/basic/khash.c
+new file mode 100644
+index 0000000..9a2a3ed
+--- /dev/null
++++ b/src/basic/khash.c
+@@ -0,0 +1,275 @@
++/***
++  This file is part of systemd.
++
++  Copyright 2016 Lennart Poettering
++
++  systemd is free software; you can redistribute it and/or modify it
++  under the terms of the GNU Lesser General Public License as published by
++  the Free Software Foundation; either version 2.1 of the License, or
++  (at your option) any later version.
++
++  systemd is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++  Lesser General Public License for more details.
++
++  You should have received a copy of the GNU Lesser General Public License
++  along with systemd; If not, see <http://www.gnu.org/licenses/>.
++***/
++
++#include <linux/if_alg.h>
++#include <stdbool.h>
++#include <sys/socket.h>
++
++#include "alloc-util.h"
++#include "fd-util.h"
++#include "hexdecoct.h"
++#include "khash.h"
++#include "macro.h"
++#include "missing.h"
++#include "string-util.h"
++#include "util.h"
++
++/* On current kernels the maximum digest (according to "grep digestsize /proc/crypto | sort -u") is actually 32, but
++ * let's add some extra room, the few wasted bytes don't really matter... */
++#define LONGEST_DIGEST 128
++
++struct khash {
++        int fd;
++        char *algorithm;
++        uint8_t digest[LONGEST_DIGEST+1];
++        size_t digest_size;
++        bool digest_valid;
++};
++
++int khash_new_with_key(khash **ret, const char *algorithm, const void *key, size_t key_size) {
++        union {
++                struct sockaddr sa;
++                struct sockaddr_alg alg;
++        } sa = {
++                .alg.salg_family = AF_ALG,
++                .alg.salg_type = "hash",
++        };
++
++        _cleanup_(khash_unrefp) khash *h = NULL;
++        _cleanup_close_ int fd = -1;
++        ssize_t n;
++
++        assert(ret);
++        assert(key || key_size == 0);
++
++        /* Filter out an empty algorithm early, as we do not support an algorithm by that name. */
++        if (isempty(algorithm))
++                return -EINVAL;
++
++        /* Overly long hash algorithm names we definitely do not support */
++        if (strlen(algorithm) >= sizeof(sa.alg.salg_name))
++                return -EOPNOTSUPP;
++
++        fd = socket(AF_ALG, SOCK_SEQPACKET|SOCK_CLOEXEC, 0);
++        if (fd < 0)
++                return -errno;
++
++        strcpy((char*) sa.alg.salg_name, algorithm);
++        if (bind(fd, &sa.sa, sizeof(sa)) < 0) {
++                if (errno == ENOENT)
++                        return -EOPNOTSUPP;
++                return -errno;
++        }
++
++        if (key) {
++                if (setsockopt(fd, SOL_ALG, ALG_SET_KEY, key, key_size) < 0)
++                        return -errno;
++        }
++
++        h = new0(khash, 1);
++        if (!h)
++                return -ENOMEM;
++
++        h->fd = accept4(fd, NULL, 0, SOCK_CLOEXEC);
++        if (h->fd < 0)
++                return -errno;
++
++        h->algorithm = strdup(algorithm);
++        if (!h->algorithm)
++                return -ENOMEM;
++
++        /* Temporary fix for rc kernel bug: https://bugzilla.redhat.com/show_bug.cgi?id=1395896 */
++        (void) send(h->fd, NULL, 0, 0);
++
++        /* Figure out the digest size */
++        n = recv(h->fd, h->digest, sizeof(h->digest), 0);
++        if (n < 0)
++                return -errno;
++        if (n >= LONGEST_DIGEST) /* longer than what we expected? If so, we don't support this */
++                return -EOPNOTSUPP;
++
++        h->digest_size = (size_t) n;
++        h->digest_valid = true;
++
++        /* Temporary fix for rc kernel bug: https://bugzilla.redhat.com/show_bug.cgi?id=1395896 */
++        (void) send(h->fd, NULL, 0, 0);
++
++        *ret = h;
++        h = NULL;
++
++        return 0;
++}
++
++int khash_new(khash **ret, const char *algorithm) {
++        return khash_new_with_key(ret, algorithm, NULL, 0);
++}
++
++khash* khash_unref(khash *h) {
++        if (!h)
++                return NULL;
++
++        safe_close(h->fd);
++        free(h->algorithm);
++        free(h);
++
++        return NULL;
++}
++
++int khash_dup(khash *h, khash **ret) {
++        _cleanup_(khash_unrefp) khash *copy = NULL;
++
++        assert(h);
++        assert(ret);
++
++        copy = newdup(khash, h, 1);
++        if (!copy)
++                return -ENOMEM;
++
++        copy->fd = -1;
++        copy->algorithm = strdup(h->algorithm);
++        if (!copy)
++                return -ENOMEM;
++
++        copy->fd = accept4(h->fd, NULL, 0, SOCK_CLOEXEC);
++        if (copy->fd < 0)
++                return -errno;
++
++        *ret = copy;
++        copy = NULL;
++
++        return 0;
++}
++
++const char *khash_get_algorithm(khash *h) {
++        assert(h);
++
++        return h->algorithm;
++}
++
++size_t khash_get_size(khash *h) {
++        assert(h);
++
++        return h->digest_size;
++}
++
++int khash_reset(khash *h) {
++        ssize_t n;
++
++        assert(h);
++
++        n = send(h->fd, NULL, 0, 0);
++        if (n < 0)
++                return -errno;
++
++        h->digest_valid = false;
++
++        return 0;
++}
++
++int khash_put(khash *h, const void *buffer, size_t size) {
++        ssize_t n;
++
++        assert(h);
++        assert(buffer || size == 0);
++
++        if (size <= 0)
++                return 0;
++
++        n = send(h->fd, buffer, size, MSG_MORE);
++        if (n < 0)
++                return -errno;
++
++        h->digest_valid = false;
++
++        return 0;
++}
++
++int khash_put_iovec(khash *h, const struct iovec *iovec, size_t n) {
++        struct msghdr mh = {
++                mh.msg_iov = (struct iovec*) iovec,
++                mh.msg_iovlen = n,
++        };
++        ssize_t k;
++
++        assert(h);
++        assert(iovec || n == 0);
++
++        if (n <= 0)
++                return 0;
++
++        k = sendmsg(h->fd, &mh, MSG_MORE);
++        if (k < 0)
++                return -errno;
++
++        h->digest_valid = false;
++
++        return 0;
++}
++
++static int retrieve_digest(khash *h) {
++        ssize_t n;
++
++        assert(h);
++
++        if (h->digest_valid)
++                return 0;
++
++        n = recv(h->fd, h->digest, h->digest_size, 0);
++        if (n < 0)
++                return n;
++        if ((size_t) n != h->digest_size) /* digest size changed? */
++                return -EIO;
++
++        h->digest_valid = true;
++
++        return 0;
++}
++
++int khash_digest_data(khash *h, const void **ret) {
++        int r;
++
++        assert(h);
++        assert(ret);
++
++        r = retrieve_digest(h);
++        if (r < 0)
++                return r;
++
++        *ret = h->digest;
++        return 0;
++}
++
++int khash_digest_string(khash *h, char **ret) {
++        int r;
++        char *p;
++
++        assert(h);
++        assert(ret);
++
++        r = retrieve_digest(h);
++        if (r < 0)
++                return r;
++
++        p = hexmem(h->digest, h->digest_size);
++        if (!p)
++                return -ENOMEM;
++
++        *ret = p;
++        return 0;
++}
+diff --git a/src/basic/khash.h b/src/basic/khash.h
+new file mode 100644
+index 0000000..f404a68
+--- /dev/null
++++ b/src/basic/khash.h
+@@ -0,0 +1,53 @@
++#pragma once
++
++/***
++  This file is part of systemd.
++
++  Copyright 2016 Lennart Poettering
++
++  systemd is free software; you can redistribute it and/or modify it
++  under the terms of the GNU Lesser General Public License as published by
++  the Free Software Foundation; either version 2.1 of the License, or
++  (at your option) any later version.
++
++  systemd is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++  Lesser General Public License for more details.
++
++  You should have received a copy of the GNU Lesser General Public License
++  along with systemd; If not, see <http://www.gnu.org/licenses/>.
++***/
++
++#include <inttypes.h>
++#include <sys/types.h>
++#include <sys/uio.h>
++
++#include "macro.h"
++
++typedef struct khash khash;
++
++/* For plain hash functions. Hash functions commonly supported on today's kernels are: crc32c, crct10dif, crc32,
++ * sha224, sha256, sha512, sha384, sha1, md5, md4, sha3-224, sha3-256, sha3-384, sha3-512, and more.*/
++int khash_new(khash **ret, const char *algorithm);
++
++/* For keyed hash functions. Hash functions commonly supported on today's kernels are: hmac(sha256), cmac(aes),
++ * cmac(des3_ede), hmac(sha3-512), hmac(sha3-384), hmac(sha3-256), hmac(sha3-224), hmac(rmd160), hmac(rmd128),
++ * hmac(sha224), hmac(sha512), hmac(sha384), hmac(sha1), hmac(md5), and more. */
++int khash_new_with_key(khash **ret, const char *algorithm, const void *key, size_t key_size);
++
++int khash_dup(khash *h, khash **ret);
++khash* khash_unref(khash *h);
++
++const char *khash_get_algorithm(khash *h);
++size_t khash_get_size(khash *h);
++
++int khash_reset(khash *h);
++
++int khash_put(khash *h, const void *buffer, size_t size);
++int khash_put_iovec(khash *h, const struct iovec *iovec, size_t n);
++
++int khash_digest_data(khash *h, const void **ret);
++int khash_digest_string(khash *h, char **ret);
++
++DEFINE_TRIVIAL_CLEANUP_FUNC(khash*, khash_unref);
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index 8833617..1502b3f 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -1085,4 +1085,8 @@ typedef int32_t key_serial_t;
+ #define exp10(x) (exp((x) * log(10)))
+ #endif /* __UCLIBC__ */
+
++#ifndef SOL_ALG
++#define SOL_ALG 279
++#endif
++
+ #include "missing_syscall.h"
+diff --git a/src/test/test-hash.c b/src/test/test-hash.c
+new file mode 100644
+index 0000000..1972b94
+--- /dev/null
++++ b/src/test/test-hash.c
+@@ -0,0 +1,82 @@
++/***
++  This file is part of systemd.
++
++  Copyright 2016 Lennart Poettering
++
++  systemd is free software; you can redistribute it and/or modify it
++  under the terms of the GNU Lesser General Public License as published by
++  the Free Software Foundation; either version 2.1 of the License, or
++  (at your option) any later version.
++
++  systemd is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++  Lesser General Public License for more details.
++
++  You should have received a copy of the GNU Lesser General Public License
++  along with systemd; If not, see <http://www.gnu.org/licenses/>.
++***/
++
++#include "alloc-util.h"
++#include "log.h"
++#include "string-util.h"
++#include "khash.h"
++
++int main(int argc, char *argv[]) {
++        _cleanup_(khash_unrefp) khash *h = NULL, *copy = NULL;
++        _cleanup_free_ char *s = NULL;
++
++        log_set_max_level(LOG_DEBUG);
++
++        assert_se(khash_new(&h, NULL) == -EINVAL);
++        assert_se(khash_new(&h, "") == -EINVAL);
++        assert_se(khash_new(&h, "foobar") == -EOPNOTSUPP);
++
++        assert_se(khash_new(&h, "sha256") >= 0);
++        assert_se(khash_get_size(h) == 32);
++        assert_se(streq(khash_get_algorithm(h), "sha256"));
++
++        assert_se(khash_digest_string(h, &s) >= 0);
++        assert_se(streq(s, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
++        s = mfree(s);
++
++        assert_se(khash_put(h, "foobar", 6) >= 0);
++        assert_se(khash_digest_string(h, &s) >= 0);
++        assert_se(streq(s, "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"));
++        s = mfree(s);
++
++        assert_se(khash_put(h, "piep", 4) >= 0);
++        assert_se(khash_digest_string(h, &s) >= 0);
++        assert_se(streq(s, "f114d872b5ea075d3be9040d0b7a429514b3f9324a8e8e3dc3fb24c34ee56bea"));
++        s = mfree(s);
++
++        assert_se(khash_put(h, "foo", 3) >= 0);
++        assert_se(khash_dup(h, &copy) >= 0);
++
++        assert_se(khash_put(h, "bar", 3) >= 0);
++        assert_se(khash_put(copy, "bar", 3) >= 0);
++
++        assert_se(khash_digest_string(h, &s) >= 0);
++        assert_se(streq(s, "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"));
++        s = mfree(s);
++
++        assert_se(khash_digest_string(copy, &s) >= 0);
++        assert_se(streq(s, "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"));
++        s = mfree(s);
++
++        h = khash_unref(h);
++
++        assert_se(khash_new_with_key(&h, "hmac(sha256)", "quux", 4) >= 0);
++        assert_se(khash_get_size(h) == 32);
++        assert_se(streq(khash_get_algorithm(h), "hmac(sha256)"));
++
++        assert_se(khash_digest_string(h, &s) >= 0);
++        assert_se(streq(s, "abed9f8218ab473f77218a6a7d39abf1d21fa46d0700c4898e330ba88309d5ae"));
++        s = mfree(s);
++
++        assert_se(khash_put(h, "foobar", 6) >= 0);
++        assert_se(khash_digest_string(h, &s) >= 0);
++        assert_se(streq(s, "33f6c70a60db66007d5325d5d1dea37c371354e5b83347a59ad339ce9f4ba3dc"));
++
++        return 0;
++}
+-- 
+2.7.4
+
