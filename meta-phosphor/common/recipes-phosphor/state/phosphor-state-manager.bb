@@ -13,6 +13,7 @@ STATE_MGR_PACKAGES = " \
     ${PN}-bmc \
     ${PN}-discover \
     ${PN}-host-check \
+    ${PN}-reset-sensor-states \
 "
 PACKAGES =+ "${STATE_MGR_PACKAGES}"
 PACKAGES_remove = "${PN}"
@@ -21,7 +22,13 @@ RDEPENDS_${PN}-staticdev = "${STATE_MGR_PACKAGES}"
 
 DBUS_PACKAGES = "${STATE_MGR_PACKAGES}"
 
-SYSTEMD_PACKAGES = "${PN}-discover"
+SYSTEMD_PACKAGES = "${PN}-discover \
+                    ${PN}-reset-sensor-states \
+"
+# The reset-sensor-states function will reset the host
+# sensors on a BMC reset or system power loss so it is
+# recommended when bringing in the host state function
+RRECOMMENDS_${PN}-host = "${PN}-reset-sensor-states"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
@@ -38,6 +45,7 @@ RDEPENDS_${PN}-chassis += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-bmc += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-discover += "libsystemd phosphor-dbus-interfaces"
 RDEPENDS_${PN}-host-check += "libsystemd phosphor-dbus-interfaces"
+RDEPENDS_${PN}-reset-sensor-states += "libsystemd phosphor-dbus-interfaces"
 
 FILES_${PN}-host = "${sbindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
@@ -56,10 +64,17 @@ FILES_${PN}-host-check = "${sbindir}/phosphor-host-check"
 SYSTEMD_SERVICE_${PN}-host-check += "phosphor-reset-host-check@.service"
 SYSTEMD_SERVICE_${PN}-host-check += "phosphor-reset-host-running@.service"
 
+SYSTEMD_SERVICE_${PN}-reset-sensor-states += "phosphor-reset-sensor-states@.service"
+
 RESET_CHECK_TMPL = "phosphor-reset-host-check@.service"
 RESET_CHECK_TGTFMT = "obmc-host-reset@{1}.target"
 RESET_CHECK_INSTFMT = "phosphor-reset-host-check@{0}.service"
 RESET_CHECK_FMT = "../${RESET_CHECK_TMPL}:${RESET_CHECK_TGTFMT}.requires/${RESET_CHECK_INSTFMT}"
+
+SENSOR_RESET_TMPL = "phosphor-reset-sensor-states@.service"
+SENSOR_RESET_TGTFMT = "obmc-host-reset@{1}.target"
+SENSOR_RESET_INSTFMT = "phosphor-reset-sensor-states@{0}.service"
+SENSOR_RESET_FMT = "../${SENSOR_RESET_TMPL}:${SENSOR_RESET_TGTFMT}.requires/${SENSOR_RESET_INSTFMT}"
 
 RESET_RUNNING_TMPL = "phosphor-reset-host-running@.service"
 RESET_RUNNING_TGTFMT = "obmc-host-reset@{1}.target"
@@ -68,6 +83,8 @@ RESET_RUNNING_FMT = "../${RESET_RUNNING_TMPL}:${RESET_RUNNING_TGTFMT}.requires/$
 
 SYSTEMD_LINK_${PN}-host-check += "${@compose_list_zip(d, 'RESET_CHECK_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN}-host-check += "${@compose_list_zip(d, 'RESET_RUNNING_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
+
+SYSTEMD_LINK_${PN}-reset-sensor-states += "${@compose_list_zip(d, 'SENSOR_RESET_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
 # Force the standby target to run the host reset check target
 RESET_TMPL_CTRL = "obmc-host-reset@.target"
