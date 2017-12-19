@@ -173,7 +173,7 @@
 - name: check group functional
   description: >
     'If this condition passes more than one fan in the group has been marked
-    as nonfunctional for five seconds. Shut the system down.
+    as nonfunctional for ten seconds. Shut the system down.
 
     For a more detailed definition of nonfunctional, consult the documentation
     of xyz.openbmc_project.State.Decorator.OperationalStatus and/or the
@@ -182,7 +182,7 @@
   condition: count
   paths: fans
   properties: fan functional
-  defer: 5000000us
+  defer: 10000000us
   callback: log and shutdown
   countop: '>'
   countbound: 1
