@@ -1,0 +1,10 @@
+[Unit]
+Description=Fan Watchdog Failure Monitor
+
+#This can get called every time a process dies, so ensure it's never limited
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env phosphor-unit-failure-monitor --source %i --target obmc-fan-watchdog-takeover.target --action start
+SyslogIdentifier=phosphor-unit-failure-monitor

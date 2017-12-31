@@ -1,0 +1,56 @@
+manager_configuration:
+  power_on_delay: 5
+
+zone_configuration:
+
+#Air cooled zones
+- zone_conditions:
+  - name: air_cooled_chassis
+
+  zones:
+    - zone: 0
+      cooling_profiles:
+      - air
+      - all
+      full_speed: 1000
+      default_floor: 100
+      increase_delay: 5
+      decrease_interval: 5
+    - zone: 1
+      cooling_profiles:
+      - air
+      - all
+      full_speed: 1000
+      default_floor: 100
+      increase_delay: 5
+      decrease_interval: 5
+    - zone: 2
+      cooling_profiles:
+      - air
+      - all
+      full_speed: 1000
+      default_floor: 100
+      increase_delay: 5
+      decrease_interval: 5
+
+#Water cooled zones
+- zone_conditions:
+  - name: water_and_air_cooled_chassis
+
+  zones:
+    - zone: 0
+      cooling_profiles:
+      - water
+      - all
+      full_speed: 1000
+      default_floor: 100
+      increase_delay: 5
+      decrease_interval: 5
+    - zone: 2
+      cooling_profiles:
+      - water
+      - all
+      full_speed: 1000
+      default_floor: 100
+      increase_delay: 5
+      decrease_interval: 5

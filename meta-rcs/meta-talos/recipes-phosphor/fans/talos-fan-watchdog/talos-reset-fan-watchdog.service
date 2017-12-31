@@ -1,0 +1,12 @@
+[Unit]
+Description=Talos Fan Watchdog Reset
+Wants=phosphor-fan-control-init@0.service
+Before=phosphor-fan-control-init@0.service
+Conflicts=obmc-chassis-poweroff@0.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile={envfiledir}/obmc/talos-fan-watchdog/reset-fan-watchdog.conf
+ExecStart=/usr/bin/env phosphor-gpio-util -p ${{GPIO_PATH}} -g ${{GPIO}} -a ${{ACTION}} -d ${{DELAY}}
+SyslogIdentifier=phosphor-gpio-util

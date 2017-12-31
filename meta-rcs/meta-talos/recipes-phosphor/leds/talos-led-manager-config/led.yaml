@@ -1,0 +1,38 @@
+bmc_booted:
+    power:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'On'
+
+    bmc_ready:
+        Action: 'On'
+
+power_on:
+    power:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+enclosure_fault:
+    fault:
+        Action: 'On'
+
+enclosure_identify:
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+
+# The Op Panel on the Talos II system holds a multicolor LED.
+# Both the 'fault' and 'identify' gpios are wired to the same LED.
+# By holding one in 'on' while the other in 'blink' state, ensures
+# the manufacturing process can verify both colors function
+lamp_test:
+    fault:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+    identify:
+        Action: 'On'
