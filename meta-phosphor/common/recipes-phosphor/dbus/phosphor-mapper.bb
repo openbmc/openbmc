@@ -35,7 +35,7 @@ RDEPENDS_${PN} += " \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-objmgr"
 
-SRCREV = "c33ae65c829038c29a76070f22ab8feebd688c95"
+SRCREV = "1246924be23abb2f9e1460ae8a1a0b3cd1ceaae6"
 
 S = "${WORKDIR}/git"
 
