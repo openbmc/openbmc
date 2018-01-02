@@ -7,6 +7,8 @@ inherit obmc-phosphor-dbus-service
 
 RRECOMMENDS_${PN} += "virtual-obmc-inventory-data"
 
+VIRTUAL-RUNTIME_skeleton_workbook ?= ""
+
 RDEPENDS_${PN} += "\
         python-argparse \
         python-dbus \
