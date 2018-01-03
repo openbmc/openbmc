@@ -14,3 +14,18 @@ occ_active_sensor:
             type: "bool"
             assert: "true"
             deassert: "false"
+
+hb_volatile_sensor:
+  path: /org/open_power/control/volatile
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  interfaces:
+    xyz.openbmc_project.Object.Enable:
+      Enabled:
+        Offsets:
+          0x00:
+            type: "bool"
+            assert: false
+          0x01:
+            type: "bool"
+            assert: true
