@@ -1,5 +1,5 @@
 SUMMARY = "Phosphor Systemd targets"
-DESCRIPTION = "Provides well known Systemd syncronization points for OpenBMC."
+DESCRIPTION = "Provides well known Systemd synchronization points for OpenBMC."
 HOMEPAGE = "http://github.com/openbmc"
 PR = "r1"
 
