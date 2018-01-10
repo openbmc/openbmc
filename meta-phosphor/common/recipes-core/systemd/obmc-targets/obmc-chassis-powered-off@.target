@@ -1,0 +1,9 @@
+[Unit]
+Description=Chassis%i (Powered Off)
+Wants={SYSTEMD_DEFAULT_TARGET}
+After={SYSTEMD_DEFAULT_TARGET}
+Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+Conflicts=obmc-chassis-poweron@%i.target
+Conflicts=obmc-chassis-reset@%i.target
+RefuseManualStop=yes

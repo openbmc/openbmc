@@ -1,6 +1,6 @@
 [Unit]
 Description=Phosphor Fan Monitor Daemon
-Conflicts=obmc-chassis-poweroff@%i.target
+Conflicts=obmc-chassis-powered-off@%i.target
 
 [Service]
 Restart=on-failure

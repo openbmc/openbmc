@@ -20,6 +20,7 @@ SYSTEMD_SERVICE_${PN} += " \
         op-wait-power-off@.service \
         op-reset-chassis-running@.service \
         op-reset-chassis-on@.service \
+        op-powered-off@.service \
         "
 
 SYSTEMD_ENVIRONMENT_FILE_${PN} += "obmc/power_control"
@@ -33,6 +34,10 @@ STOP_TMPL = "op-power-stop@.service"
 STOP_TGTFMT = "obmc-chassis-poweroff@{1}.target"
 STOP_INSTFMT = "op-power-stop@{0}.service"
 STOP_FMT = "../${STOP_TMPL}:${STOP_TGTFMT}.requires/${STOP_INSTFMT}"
+
+POWERED_OFF_TMPL = "op-powered-off@.service"
+POWERED_OFF_INSTFMT = "op-powered-off@{0}.service"
+POWERED_OFF_FMT = "../${POWERED_OFF_TMPL}:${STOP_TGTFMT}.requires/${POWERED_OFF_INSTFMT}"
 
 ON_TMPL = "op-wait-power-on@.service"
 ON_INSTFMT = "op-wait-power-on@{0}.service"
@@ -55,6 +60,7 @@ RESET_ON_CHASSIS_FMT = "../${RESET_ON_CHASSIS_TMPL}:${RESET_TGTFMT}.requires/${R
 # Build up requires relationship for START_TGTFMT and STOP_TGTFMT
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'STOP_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'POWERED_OFF_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'ON_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'OFF_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_ON_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"

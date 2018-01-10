@@ -4,7 +4,12 @@ Wants=obmc-host-stop@%i.target
 After=obmc-host-stop@%i.target
 
 [Service]
-ExecStart={base_bindir}/systemctl start obmc-host-start@%i.target
+#ExecStart={base_bindir}/systemctl start obmc-host-start@%i.target
+# This service is starting another target that conflicts with the
+# target this service is running in. OpenBMC needs a refactor of
+# how it does its host reset path. Until then, this short term
+# solution does the job.
+ExecStart=/bin/sh -c "sleep 5 && systemctl start obmc-host-start@%i.target"
 
 
 [Install]

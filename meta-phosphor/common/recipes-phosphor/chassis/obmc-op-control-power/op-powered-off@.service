@@ -1,0 +1,20 @@
+[Unit]
+Description=Power is off to chassis%i
+After=op-wait-power-off@%i.service
+Requires=op-wait-power-off@%i.service
+
+[Service]
+RemainAfterExit=no
+# systemd starts all wanted targets in parallel and a Conflict
+# statement will resolve itself when the target starts, not when
+# completes. Some services have a requirement to stop
+# once power is off. The solution is to create a new target,
+# obmc-chassis-powered-off@.target, that is started after it is
+# verified that power has been removed from the chassis. Then
+# services may conflict with this target to ensure they
+# are stopped at the appropriate time.
+ExecStart=/bin/systemctl start obmc-chassis-powered-off@%i.target
+
+
+[Install]
+WantedBy=obmc-chassis-poweroff@%i.target
