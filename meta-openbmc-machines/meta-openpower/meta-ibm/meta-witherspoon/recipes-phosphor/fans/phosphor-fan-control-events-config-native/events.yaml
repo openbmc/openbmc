@@ -267,18 +267,13 @@ actions:
 
 events:
     - name: default_fan_floor_on_service_fail
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: zone0_ambient
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
+      # No global zone conditions defined == all unless defined on group
+      groups:
+          - name: zone0_ambient
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
       matches:
           - name: nameOwnerChanged
       actions:
@@ -289,18 +284,13 @@ events:
             actions:
                 - name: default_floor_on_missing_owner
     - name: high_speed_on_occ0_service_fail
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: occ0_object
-      interface: org.open_power.OCC.Status
-      property:
-          name: OccActive
-          type: bool
+      # No global zone conditions defined == all unless defined on group
+      groups:
+          - name: occ0_object
+            interface: org.open_power.OCC.Status
+            property:
+                name: OccActive
+                type: bool
       matches:
           - name: nameOwnerChanged
       actions:
@@ -314,18 +304,13 @@ events:
                       value: 10500
                       type: uint64_t
     - name: high_speed_on_occ1_service_fail
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: occ1_object
-      interface: org.open_power.OCC.Status
-      property:
-          name: OccActive
-          type: bool
+      # No global zone conditions defined == all unless defined on group
+      groups:
+          - name: occ1_object
+            interface: org.open_power.OCC.Status
+            property:
+                name: OccActive
+                type: bool
       matches:
           - name: nameOwnerChanged
       actions:
@@ -339,91 +324,104 @@ events:
                       value: 10500
                       type: uint64_t
     - name: missing_before_high_speed_air
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-      group: air_cooled_zone0_fans
-      interface: xyz.openbmc_project.Inventory.Item
-      property:
-          name: Present
-          type: bool
+      groups:
+          - name: air_cooled_zone0_fans
+            zone_conditions:
+                - name: air_cooled_chassis
+                  zones:
+                      - 0
+            interface: xyz.openbmc_project.Inventory.Item
+            property:
+                name: Present
+                type: bool
       matches:
           - name: propertiesChanged
       actions:
           - name: count_state_before_speed
             count: 1
-            property: false
+            property:
+                value: false
+                type: bool
             speed:
                 value: 10500
                 type: uint64_t
     - name: fails_before_high_speed_air
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-      group: air_cooled_zone0_fans
-      interface: xyz.openbmc_project.State.Decorator.OperationalStatus
-      property:
-          name: Functional
-          type: bool
+      groups:
+          - name: air_cooled_zone0_fans
+            zone_conditions:
+                - name: air_cooled_chassis
+                  zones:
+                      - 0
+            interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+            property:
+                name: Functional
+                type: bool
       matches:
           - name: propertiesChanged
       actions:
           - name: count_state_before_speed
             count: 1
-            property: false
+            property:
+                value: false
+                type: bool
             speed:
                 value: 10500
                 type: uint64_t
     - name: missing_before_high_speed_water_and_air
-      zone_conditions:
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: water_and_air_cooled_zone0_fans
-      interface: xyz.openbmc_project.Inventory.Item
-      property:
-          name: Present
-          type: bool
+      groups:
+          - name: water_and_air_cooled_zone0_fans
+            zone_conditions:
+                - name: water_and_air_cooled_chassis
+                  zones:
+                      - 0
+            interface: xyz.openbmc_project.Inventory.Item
+            property:
+                name: Present
+                type: bool
       matches:
           - name: propertiesChanged
       actions:
           - name: count_state_before_speed
             count: 1
-            property: false
+            property:
+                value: false
+                type: bool
             speed:
                 value: 10500
                 type: uint64_t
     - name: fails_before_high_speed_water_and_air
-      zone_conditions:
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: water_and_air_cooled_zone0_fans
-      interface: xyz.openbmc_project.State.Decorator.OperationalStatus
-      property:
-          name: Functional
-          type: bool
+      groups:
+          - name: water_and_air_cooled_zone0_fans
+            zone_conditions:
+                - name: water_and_air_cooled_chassis
+                  zones:
+                      - 0
+            interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+            property:
+                name: Functional
+                type: bool
       matches:
           - name: propertiesChanged
       actions:
           - name: count_state_before_speed
             count: 1
-            property: false
+            property:
+                value: false
+                type: bool
             speed:
                 value: 10500
                 type: uint64_t
     - name: set_air_cooled_speed_boundaries_based_on_ambient
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-      group: zone0_ambient
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
+      groups:
+          - name: zone0_ambient
+            zone_conditions:
+                - name: air_cooled_chassis
+                  zones:
+                      - 0
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
       matches:
           - name: propertiesChanged
       actions:
@@ -442,15 +440,16 @@ events:
                     - 27000: 10500
                 type: std::map<int64_t, uint64_t>
     - name: set_water_cooled_speed_boundaries_based_on_ambient
-      zone_conditions:
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: zone0_ambient
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
+      groups:
+          - name: zone0_ambient
+            zone_conditions:
+                - name: water_and_air_cooled_chassis
+                  zones:
+                      - 0
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
       matches:
           - name: propertiesChanged
       actions:
@@ -469,24 +468,21 @@ events:
                     - 27000: 10500
                 type: std::map<int64_t, uint64_t>
     - name: speed_changes_based_on_regulator_temps
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: zone0_regulators
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
+      # No global zone conditions defined == all unless defined on group
+      groups:
+          - name: zone0_regulators
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
       matches:
           - name: interfacesAdded
           - name: propertiesChanged
       actions:
           - name: set_net_increase_speed
-            property: 85000
+            property:
+                value: 85000
+                type: int64_t
             factor:
                 value: 1000
                 type: int64_t
@@ -494,7 +490,9 @@ events:
                 value: 400
                 type: uint64_t
           - name: set_net_decrease_speed
-            property: 82000
+            property:
+                value: 82000
+                type: int64_t
             factor:
                 value: 1000
                 type: int64_t
@@ -504,24 +502,21 @@ events:
       timer:
           interval: 5
     - name: speed_changes_based_on_pcie_temps
-      zone_conditions:
-          - name: air_cooled_chassis
-            zones:
-                - 0
-          - name: water_and_air_cooled_chassis
-            zones:
-                - 0
-      group: zone0_pcie
-      interface: xyz.openbmc_project.Sensor.Value
-      property:
-          name: Value
-          type: int64_t
+      # No global zone conditions defined == all unless defined on group
+      groups:
+          - name: zone0_pcie
+            interface: xyz.openbmc_project.Sensor.Value
+            property:
+                name: Value
+                type: int64_t
       matches:
           - name: interfacesAdded
           - name: propertiesChanged
       actions:
           - name: set_net_increase_speed
-            property: 55000
+            property:
+                value: 55000
+                type: int64_t
             factor:
                 value: 1000
                 type: int64_t
@@ -529,7 +524,9 @@ events:
                 value: 400
                 type: uint64_t
           - name: set_net_decrease_speed
-            property: 52000
+            property:
+                value: 52000
+                type: int64_t
             factor:
                 value: 1000
                 type: int64_t
@@ -559,21 +556,24 @@ events:
               - name: propertiesChanged
           events:
               - name: speed_changes_based_on_core_temps
-                zone_conditions:
-                    - name: air_cooled_chassis
-                      zones:
-                          - 0
-                group: zone0_cores
-                interface: xyz.openbmc_project.Sensor.Value
-                property:
-                    name: Value
-                    type: int64_t
+                groups:
+                    - name: zone0_cores
+                      zone_conditions:
+                          - name: air_cooled_chassis
+                            zones:
+                                - 0
+                      interface: xyz.openbmc_project.Sensor.Value
+                      property:
+                          name: Value
+                          type: int64_t
                 matches:
                     - name: interfacesAdded
                     - name: propertiesChanged
                 actions:
                     - name: set_net_increase_speed
-                      property: 73000
+                      property:
+                          value: 73000
+                          type: int64_t
                       factor:
                           value: 1000
                           type: int64_t
@@ -581,7 +581,9 @@ events:
                           value: 400
                           type: uint64_t
                     - name: set_net_decrease_speed
-                      property: 70000
+                      property:
+                          value: 70000
+                          type: int64_t
                       factor:
                           value: 1000
                           type: int64_t
@@ -591,24 +593,21 @@ events:
                 timer:
                     interval: 5
               - name: speed_changes_based_on_dimm_temps
-                zone_conditions:
-                    - name: air_cooled_chassis
-                      zones:
-                          - 0
-                    - name: water_and_air_cooled_chassis
-                      zones:
-                          - 0
-                group: zone0_dimms
-                interface: xyz.openbmc_project.Sensor.Value
-                property:
-                    name: Value
-                    type: int64_t
+                # No global zone conditions defined == all unless defined on group
+                groups:
+                    - name: zone0_dimms
+                      interface: xyz.openbmc_project.Sensor.Value
+                      property:
+                          name: Value
+                          type: int64_t
                 matches:
                     - name: interfacesAdded
                     - name: propertiesChanged
                 actions:
                     - name: set_net_increase_speed
-                      property: 64000
+                      property:
+                          value: 64000
+                          type: int64_t
                       factor:
                           value: 1000
                           type: int64_t
@@ -616,7 +615,9 @@ events:
                           value: 200
                           type: uint64_t
                     - name: set_net_decrease_speed
-                      property: 61000
+                      property:
+                          value: 61000
+                          type: int64_t
                       factor:
                           value: 1000
                           type: int64_t
@@ -626,21 +627,24 @@ events:
                 timer:
                     interval: 5
               - name: speed_changes_based_on_gpu_core_temps
-                zone_conditions:
-                    - name: air_cooled_chassis
-                      zones:
-                          - 0
-                group: zone0_gpu_cores
-                interface: xyz.openbmc_project.Sensor.Value
-                property:
-                    name: Value
-                    type: int64_t
+                groups:
+                    - name: zone0_gpu_cores
+                      zone_conditions:
+                          - name: air_cooled_chassis
+                            zones:
+                                - 0
+                      interface: xyz.openbmc_project.Sensor.Value
+                      property:
+                          name: Value
+                          type: int64_t
                 matches:
                     - name: interfacesAdded
                     - name: propertiesChanged
                 actions:
                     - name: set_net_increase_speed
-                      property: 78000
+                      property:
+                          value: 78000
+                          type: int64_t
                       factor:
                           value: 1000
                           type: int64_t
@@ -648,7 +652,9 @@ events:
                           value: 600
                           type: uint64_t
                     - name: set_net_decrease_speed
-                      property: 75000
+                      property:
+                          value: 75000
+                          type: int64_t
                       factor:
                           value: 1000
                           type: int64_t
@@ -658,21 +664,24 @@ events:
                 timer:
                     interval: 5
               - name: speed_changes_based_on_gpu_memory_temps
-                zone_conditions:
-                    - name: air_cooled_chassis
-                      zones:
-                          - 0
-                group: zone0_gpu_memory
-                interface: xyz.openbmc_project.Sensor.Value
-                property:
-                    name: Value
-                    type: int64_t
+                groups:
+                    - name: zone0_gpu_memory
+                      zone_conditions:
+                          - name: air_cooled_chassis
+                            zones:
+                                - 0
+                      interface: xyz.openbmc_project.Sensor.Value
+                      property:
+                          name: Value
+                          type: int64_t
                 matches:
                     - name: interfacesAdded
                     - name: propertiesChanged
                 actions:
                     - name: set_net_increase_speed
-                      property: 80000
+                      property:
+                          value: 80000
+                          type: int64_t
                       factor:
                           value: 1000
                           type: int64_t
@@ -680,7 +689,9 @@ events:
                           value: 600
                           type: uint64_t
                     - name: set_net_decrease_speed
-                      property: 77000
+                      property:
+                          value: 77000
+                          type: int64_t
                       factor:
                           value: 1000
                           type: int64_t
