@@ -1,17 +1,20 @@
-# OpenBMC #
+# OpenBMC
 
 [![Build Status](https://openpower.xyz/buildStatus/icon?job=openbmc-build)](https://openpower.xyz/job/openbmc-build/)
 
 The OpenBMC project can be described as a Linux distribution for embedded
 devices that have a BMC; typically, but not limited to, things like servers,
 top of rack switches or RAID appliances. The OpenBMC stack uses technologies
-such as Yocto, Open-Embedded, Systemd and DBus to allow easy customization
-for your server platform.
+such as [Yocto](https://www.yoctoproject.org/),
+[OpenEmbedded](https://www.openembedded.org/wiki/Main_Page),
+[systemd](https://www.freedesktop.org/wiki/Software/systemd/), and
+[D-Bus](https://www.freedesktop.org/wiki/Software/dbus/) to allow easy
+customization for your server platform.
 
 
-## Setting up your OpenBMC project ##
+## Setting up your OpenBMC project
 
-### 1) Prerequisite ###
+### 1) Prerequisite
 - Ubuntu 14.04
 
 ```
@@ -24,19 +27,21 @@ sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath d
 sudo dnf install -y git patch diffstat texinfo chrpath SDL-devel bitbake
 sudo dnf groupinstall "C Development Tools and Libraries"
 ```
-### 2) Download the source ###
+### 2) Download the source
 ```
 git clone git@github.com:openbmc/openbmc.git
 cd openbmc
 ```
 
-### 3) Target your hardware ###
+### 3) Target your hardware
 Any build requires an environment variable known as `TEMPLATECONF` to be set
 to a hardware target.  OpenBMC has placed all known hardware targets in a
-standard directory structure `meta-openbmc-machines/meta-openpower/[company]/[target]`.
-You can see all of the known targets with `find meta-openbmc-machines -type d -name conf`.
-Choose the hardware target and then move to the next step. Additional examples
-can be found in the [OpenBMC Cheatsheet](https://github.com/openbmc/docs/blob/master/cheatsheet.md)
+standard directory structure
+`meta-openbmc-machines/meta-[architecture]/meta-[company]/meta-[target]`.
+You can see all of the known targets with
+`find meta-openbmc-machines -type d -name conf`. Choose the hardware target and
+then move to the next step. Additional examples can be found in the
+[OpenBMC Cheatsheet](https://github.com/openbmc/docs/blob/master/cheatsheet.md)
 
 Machine | TEMPLATECONF
 --------|---------
@@ -51,7 +56,7 @@ As an example target Palmetto
 export TEMPLATECONF=meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto/conf
 ```
 
-### 3) Build ###
+### 4) Build
 
 ```
 . openbmc-env
@@ -61,12 +66,12 @@ bitbake obmc-phosphor-image
 Additional details can be found in the [docs](https://github.com/openbmc/docs)
 repository.
 
-## Build Validation and Testing ##
-Commits submitted by members of the OpenBMC Github community are compiled and
+## Build Validation and Testing
+Commits submitted by members of the OpenBMC GitHub community are compiled and
 tested via our [Jenkins](https://openpower.xyz/) server.  Commits are run
 through two levels of testing.  At the repository level the makefile `make
 check` directive is run.  At the system level, the commit is built into a
-firmware image and run with a arm-softmmu QEMU model against a barrage of
+firmware image and run with an arm-softmmu QEMU model against a barrage of
 [CI tests](https://openpower.xyz/job/openbmc-test-qemu-ci/).
 
 Commits submitted by non-members do not automatically proceed through CI
@@ -79,18 +84,18 @@ performed.  The OpenBMC project uses the
 complete test repository can be found
 [here](https://github.com/openbmc/openbmc-test-automation).
 
-## Submitting Patches ##
+## Submitting Patches
 Support of additional hardware and software packages is always welcome.
 Please follow the [contributing guidelines](https://github.com/openbmc/docs/blob/master/contributing.md)
 when making a submission.  It is expected that contributions contain test
 cases.
 
-## Bug Reporting ##
+## Bug Reporting
 [Issues](https://github.com/openbmc/openbmc/issues) are managed on
-Github.  It is recommended you search through the issues before opening
+GitHub.  It is recommended you search through the issues before opening
 a new one.
 
-## Features of OpenBMC ##
+## Features of OpenBMC
 
 **Feature List**
 * REST Management
@@ -104,10 +109,10 @@ a new one.
 * LED Management
 * Host Watchdog
 * Simulation
-
-**Features In Progress**
 * Code Update Support for multiple BMC/BIOS images
 * POWER On Chip Controller (OCC) Support
+
+**Features In Progress**
 * Full IPMI 2.0 Compliance with DCMI
 * Verified Boot
 * HTML5 Java Script Web User Interface
@@ -123,11 +128,11 @@ a new one.
 * QEMU enhancements
 
 
-## Finding out more ##
+## Finding out more
 Dive deeper in to OpenBMC by opening the [docs](https://github.com/openbmc/docs)
-repository
+repository.
 
-## Contact ##
+## Contact
 - Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
 - IRC: #openbmc on freenode.net
 - Riot: [#openbmc:matrix.org](https://riot.im/app/#/room/#openbmc:matrix.org)
