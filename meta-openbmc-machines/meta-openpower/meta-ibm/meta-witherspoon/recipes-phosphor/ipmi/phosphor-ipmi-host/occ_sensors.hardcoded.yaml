@@ -7,6 +7,7 @@
   interfaces:
     org.open_power.OCC.Status:
       OccActive:
+        Offsets:
           0x00:
             assert: false
             deassert: true
@@ -24,6 +25,7 @@
   interfaces:
     org.open_power.OCC.Status:
       OccActive:
+        Offsets:
           0x00:
             assert: false
             deassert: true
