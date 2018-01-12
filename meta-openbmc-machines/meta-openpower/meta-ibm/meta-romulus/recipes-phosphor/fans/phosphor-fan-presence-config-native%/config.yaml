@@ -1,0 +1,20 @@
+- name: fan0
+  path: /system/chassis/motherboard/fan0
+  methods:
+    - type: tach
+      sensors:
+        - fan0
+
+- name: fan1
+  path: /system/chassis/motherboard/fan1
+  methods:
+    - type: tach
+      sensors:
+        - fan1
+
+- name: fan2
+  path: /system/chassis/motherboard/fan2
+  methods:
+    - type: tach
+      sensors:
+        - fan2
