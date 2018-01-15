@@ -1,0 +1,37 @@
+# LAYER_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+LCONF_VERSION = "6"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-poky \
+  ##OEROOT##/import-layers/meta-openembedded/meta-oe \
+  ##OEROOT##/import-layers/meta-openembedded/meta-networking \
+  ##OEROOT##/import-layers/meta-openembedded/meta-perl \
+  ##OEROOT##/import-layers/meta-openembedded/meta-python \
+  ##OEROOT##/import-layers/meta-virtualization \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
+  ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2500 \
+  ##OEROOT##/meta-openbmc-machines/meta-arm \
+  ##OEROOT##/meta-openbmc-machines/meta-arm/meta-qualcomm \
+  ##OEROOT##/meta-openbmc-machines/meta-arm/meta-qualcomm/meta-centriq2400-rep \
+  "
+BBLAYERS_NON_REMOVABLE ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-poky \
+  ##OEROOT##/import-layers/meta-openembedded/meta-oe \
+  ##OEROOT##/import-layers/meta-openembedded/meta-networking \
+  ##OEROOT##/import-layers/meta-openembedded/meta-perl \
+  ##OEROOT##/import-layers/meta-openembedded/meta-python \
+  ##OEROOT##/import-layers/meta-virtualization \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
+  ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2500 \
+  ##OEROOT##/meta-openbmc-machines/meta-arm \
+  ##OEROOT##/meta-openbmc-machines/meta-arm/meta-qualcomm \
+  ##OEROOT##/meta-openbmc-machines/meta-arm/meta-qualcomm/meta-centriq2400-rep \
+  "
