@@ -10,7 +10,7 @@ UBOOT_LOADADDRESS ?= "0x80001000"
 
 MACHINE_EXTRA_RDEPENDS += "udev-aspeed-vuart"
 
-DEFAULTTUNE = "armv6-novfp"
+DEFAULTTUNE ?= "arm1176jzs"
 
 SERIAL_CONSOLES = "115200;ttyS4"
 
@@ -18,4 +18,4 @@ SOC_FAMILY = "aspeed-g5"
 include conf/machine/include/soc-family.inc
 MACHINEOVERRIDES .= ":ast2500"
 
-require conf/machine/include/arm/arch-armv6.inc
+require conf/machine/include/tune-arm1176jz-s.inc
