@@ -6,7 +6,8 @@ PR = "r1"
 inherit autotools \
         pkgconfig \
         obmc-phosphor-dbus-service \
-        pythonnative
+        pythonnative \
+        phosphor-dbus-yaml
 
 require ${PN}.inc
 
