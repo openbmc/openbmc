@@ -14,6 +14,8 @@ DEFAULTTUNE = "armv6-novfp"
 
 SERIAL_CONSOLES = "115200;ttyS4"
 
+SOC_FAMILY = "aspeed-g5"
+include conf/machine/include/soc-family.inc
 MACHINEOVERRIDES .= ":ast2500"
 
 require conf/machine/include/arm/arch-armv6.inc
