@@ -8,7 +8,7 @@ ConditionPathExists={envfiledir}/obmc/power-supply-monitor/power-supply-monitor-
 
 [Service]
 EnvironmentFile={envfiledir}/obmc/power-supply-monitor/power-supply-monitor-%i.conf
-ExecStart=/usr/bin/env witherspoon-psu-monitor --path=${{DEVPATH}} --instance=${{INSTANCE}} --inventory=${{INVENTORY}}
+ExecStart=/usr/bin/env witherspoon-psu-monitor --path=${{DEVPATH}} --instance=${{INSTANCE}} --inventory=${{INVENTORY}} --num-history-records=${{NUM_HISTORY_RECORDS}} --sync-gpio-path=${{SYNC_GPIO_PATH}} --sync-gpio-num=${{SYNC_GPIO_NUM}}
 SyslogIdentifier=witherspoon-psu-monitor
 
 [Install]
