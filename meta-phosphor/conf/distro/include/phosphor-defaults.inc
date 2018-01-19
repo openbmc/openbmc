@@ -168,6 +168,13 @@ PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native ?= \
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-sensor-inventory ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-ipmi-sensor-inventory-mrw-native', 'phosphor-ipmi-sensor-inventory-native')}"
 
+# The phosphor-host-ipmid application is data-driven and requires an input
+# mapping of IPMI channel to DBus objects interfaces and properties.
+# This virtual is a native recipe that provides that mapping by installing
+# configuration files in the format and native sysroot location expected by
+# the phosphor-host-ipmid build process in the native sysroot.
+PREFERRED_PROVIDER_virtual/phosphor-ipmi-channel-config ?= "phosphor-ipmi-channel-inventory-native"
+
 # The phosphor-logging application has a data driven plugin that adds FRU
 # callout information to error logs, when applications generating error logs
 # add the requisite callout metadata to the systemd journal.  The plugin requires

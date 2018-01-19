@@ -1,0 +1,6 @@
+# Channel Number (must be unique) is the key
+1:
+  # ifName the ethernet device name (used in the dbus path)
+  ifName: eth0
+2:
+  ifName: eth1
