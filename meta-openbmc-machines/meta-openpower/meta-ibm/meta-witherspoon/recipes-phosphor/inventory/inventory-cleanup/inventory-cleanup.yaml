@@ -1,0 +1,13 @@
+description: >
+    Witherspoon inventory fixups
+
+events:
+    - name: Remove power_supplies
+      description: >
+          Remove the deprecated 'power_supply' objects
+      type: startup
+      actions:
+          - name: destroyObjects
+            paths:
+                - /system/chassis/power_supply0
+                - /system/chassis/power_supply1
