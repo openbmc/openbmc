@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+set -eo pipefail
 
 # Get the root mtd device number (mtdX) from "/dev/ubiblockX_Y on /"
 findrootmtd() {
@@ -169,10 +170,6 @@ ubi_block() {
   block="/dev/ubiblock${ubidevid}"
   if [ ! -e "$block" ]; then
     ubiblock --create "/dev/ubi${ubidevid}"
-    if [ $? != 0 ]; then
-      echo "Unable to create ubiblock ${name}:${ubidevid}"
-      return 1
-    fi
   fi
 }
 
@@ -181,10 +178,6 @@ ubi_updatevol() {
   ubidevid="${vol#ubi}"
   img="/tmp/images/${version}/${imgfile}"
   ubiupdatevol "/dev/ubi${ubidevid}" "${img}"
-  if [ $? != 0 ]; then
-    echo "Unable to update volume ${name}!"
-    return 1
-  fi
 }
 
 ubi_remove() {
@@ -237,8 +230,6 @@ remount_ubi() {
   IFS=',' read -r -a mtds <<< "$mtds"
   mtds=($(echo "${mtds[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
   for mtd in ${mtds[@]}; do
-    # Re-attach mtd device to ubi if not already done
-    ubiattach /dev/ubi_ctrl -m "${mtd}" -d "${mtd}" &> /dev/null
     # Get information on all ubi volumes
     ubinfo=$(ubinfo -d ${mtd})
     presentVolumes=${ubinfo##*:}
@@ -255,7 +246,11 @@ remount_ubi() {
 
         if [ ! -d ${mountdir} ]; then
           mkdir -p "${mountdir}"
-          ubiblock --create /dev/ubi${mtd}_${element} &> /dev/null
+          # U-Boot will create the ubiblock for the running version, but not
+          # for the version on the other chip
+          if [ ! -e "/dev/ubiblock${mtd}_${element}" ]; then
+            ubiblock --create /dev/ubi${mtd}_${element}
+          fi
           mount -t squashfs -o ro "/dev/ubiblock${mtd}_${element}" "${mountdir}"
         fi
       fi
@@ -455,8 +450,3 @@ case "$1" in
     exit 1
     ;;
 esac
-rc=$?
-if [ ${rc} -ne 0 ]; then
-  echo "$0: error ${rc}"
-  exit ${rc}
-fi
