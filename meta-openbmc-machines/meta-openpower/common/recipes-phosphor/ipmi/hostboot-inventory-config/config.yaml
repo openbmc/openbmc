@@ -1,4 +1,5 @@
 PROC:
+  EntityID: 3
   Interfaces:
     xyz.openbmc_project.Inventory.Decorator.Asset:
       BuildDate:
@@ -28,6 +29,8 @@ PROC:
     xyz.openbmc_project.Inventory.Item.Cpu:
 
 SYS:
+  # same entity ID as it is Associated type of NODE
+  EntityID: 7
   Interfaces:
     xyz.openbmc_project.Inventory.Decorator.Asset:
       Model:
@@ -39,6 +42,7 @@ SYS:
     xyz.openbmc_project.Inventory.Item.System:
 
 NODE:
+  EntityID: 7
   Interfaces:
     xyz.openbmc_project.Inventory.Decorator.Asset:
       BuildDate:
@@ -62,6 +66,7 @@ NODE:
     - SYS
 
 DIMM:
+  EntityID: 32
   Interfaces:
     xyz.openbmc_project.Inventory.Decorator.Asset:
       BuildDate:
@@ -90,6 +95,7 @@ DIMM:
     xyz.openbmc_project.Inventory.Item.Dimm:
 
 MEMBUFF:
+  EntityID: 8
   Interfaces:
     xyz.openbmc_project.Inventory.Decorator.Asset:
       BuildDate:
