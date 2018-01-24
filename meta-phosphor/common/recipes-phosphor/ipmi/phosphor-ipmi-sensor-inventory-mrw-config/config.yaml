@@ -2,6 +2,7 @@ boot_count_sensor:
   path: /xyz/openbmc_project/state/host0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingAssertion
+  sensorNamePattern: nameProperty
   interfaces:
     xyz.openbmc_project.Control.Boot.RebootAttempts:
       AttemptsLeft:
@@ -13,6 +14,7 @@ os_boot_sensor:
   path: /xyz/openbmc_project/state/host0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  sensorNamePattern: nameProperty
   interfaces:
     xyz.openbmc_project.State.OperatingSystem.Status:
       OperatingSystemState:
@@ -40,6 +42,7 @@ fw_boot_sensor:
   path: /xyz/openbmc_project/state/host0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: eventdata2
+  sensorNamePattern: nameProperty
   interfaces:
     xyz.openbmc_project.State.Boot.Progress:
       BootProgress:
@@ -66,6 +69,7 @@ fw_boot_sensor:
 dimm_func_sensor:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -90,6 +94,7 @@ dimm_func_sensor:
 cpu_func_sensor:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -114,6 +119,7 @@ cpu_func_sensor:
 cpucore_func_sensor:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -140,6 +146,7 @@ tpm_required_sensor:
   path: /xyz/openbmc_project/control/host0/TPMEnable
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.Control.TPM.Policy:
       TPMEnable:
@@ -154,6 +161,7 @@ tpm_required_sensor:
 gpu_func_sensor:
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -179,6 +187,7 @@ host_auto_reboot_control_sensor:
   path: /xyz/openbmc_project/control/host0/auto_reboot
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.Control.Boot.RebootPolicy:
       AutoReboot:
