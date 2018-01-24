@@ -10,6 +10,8 @@ SyslogIdentifier=system_manager.py
 Type=dbus
 BusName={BUSNAME}
 Environment="PYTHONUNBUFFERED=1"
+Nice=19
+TimeoutStartSec=180s
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
