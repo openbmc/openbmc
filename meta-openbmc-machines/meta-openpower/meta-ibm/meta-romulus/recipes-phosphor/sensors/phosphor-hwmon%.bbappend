@@ -8,6 +8,7 @@ SRCREV = "26d21731c292a02ec71480fade9a06658160eafb"
 SRC_URI += " file://0001-sysfs-Return-ETIMEDOUT-instead-of-throw-exception.patch"
 
 CHIPS = " \
+        i2c@1e78a000/i2c-bus@440/w83773g@4c \
         pwm-tacho-controller@1e786000 \
         "
 ITEMSFMT = "ahb/apb/{0}.conf"
