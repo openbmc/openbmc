@@ -14,7 +14,7 @@ SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
      file://0001-config-ast-common-Add-conditional-factory-reset-comm.patch', '', d)}"
 
 python do_configure () {
-    if ((d.getVar("MACHINE_FEATURES", True)) == "obmc-ubi-fs"):
+    if "obmc-ubi-fs" in d.getVar("MACHINE_FEATURES", True):
         version_id=do_get_versionID(d)
         d.setVar('VERSION_ID', version_id)
         bb.build.exec_func("patch_uboot", d)
