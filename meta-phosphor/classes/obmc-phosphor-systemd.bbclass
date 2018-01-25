@@ -198,6 +198,11 @@ python() {
         add_sd_user(d, '%s' % dest, pkg)
 
 
+    if d.getVar('CLASSOVERRIDE', True) != 'class-target':
+        return
+
+    d.appendVarFlag('do_install', 'postfuncs', ' systemd_do_postinst')
+
     pn = d.getVar('PN', True)
     if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
         d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
@@ -326,6 +331,3 @@ do_install_append() {
                         ${D}${systemd_system_unitdir}/$s
         done
 }
-
-
-do_install[postfuncs] += "systemd_do_postinst"

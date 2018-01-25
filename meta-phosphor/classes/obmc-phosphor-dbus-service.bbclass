@@ -124,6 +124,11 @@ python() {
             % (d.getVar('dbus_system_servicesdir', True), search_match))
 
 
+    if d.getVar('CLASSOVERRIDE', True) != 'class-target':
+        return
+
+    d.appendVarFlag('do_install', 'postfuncs', ' dbus_do_postinst')
+
     for pkg in listvar_to_list(d, 'DBUS_PACKAGES'):
         if pkg not in (d.getVar('SYSTEMD_PACKAGES', True) or ''):
             set_append(d, 'SYSTEMD_PACKAGES', pkg)
@@ -168,7 +173,5 @@ do_install_append() {
                         ${D}${dbus_system_servicesdir}$s
         done
 }
-
-do_install[postfuncs] += "dbus_do_postinst"
 
 inherit obmc-phosphor-systemd
