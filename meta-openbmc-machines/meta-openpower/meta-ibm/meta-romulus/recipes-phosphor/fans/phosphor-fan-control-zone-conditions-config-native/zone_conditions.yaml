@@ -1,0 +1,9 @@
+conditions:
+  - name: air_cooled_chassis
+    type: getProperty
+    properties:
+      - property: WaterCooled
+        interface: xyz.openbmc_project.Inventory.Decorator.CoolingType
+        path: /xyz/openbmc_project/inventory/system/chassis
+        type: bool
+        value: false

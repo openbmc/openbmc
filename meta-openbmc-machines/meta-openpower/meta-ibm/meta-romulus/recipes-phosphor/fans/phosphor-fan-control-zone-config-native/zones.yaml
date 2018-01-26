@@ -1,0 +1,13 @@
+manager_configuration:
+  power_on_delay: 20
+
+zone_configuration:
+
+#Air cooled zones
+- zone_conditions:
+  zones:
+    - zone: 0
+      full_speed: 255
+      default_floor: 195
+      increase_delay: 5
+      decrease_interval: 30
