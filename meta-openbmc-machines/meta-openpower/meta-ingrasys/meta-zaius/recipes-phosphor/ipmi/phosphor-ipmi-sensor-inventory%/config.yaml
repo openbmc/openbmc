@@ -156,7 +156,7 @@
             type: bool
 0xFC:
   sensorType: 0xCD
-  path: /system/chassis/pcie_e2b_present
+  path: /system/chassis/pcie_card_e2b
   sensorReadingType: 0x03
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
