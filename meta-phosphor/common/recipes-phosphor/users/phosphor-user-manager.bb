@@ -19,5 +19,5 @@ RDEPENDS_${PN} += "phosphor-logging"
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.User.Manager.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-user-manager"
-SRCREV = "035a96983cdf8a11a1c2380106c11c94cb8418b2"
+SRCREV = "1f5a002f4b596522cf46eaad3cfd072a44b5848d"
 S = "${WORKDIR}/git"
