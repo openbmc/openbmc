@@ -103,3 +103,9 @@
       Properties:
           TPMEnable:
              Default: 'false'
+
+/xyz/openbmc_project/control/power_supply_redundancy:
+    - Interface: xyz.openbmc_project.Control.PowerSupplyRedundancy
+      Properties:
+          PowerSupplyRedundancyEnabled:
+             Default: 'true'
