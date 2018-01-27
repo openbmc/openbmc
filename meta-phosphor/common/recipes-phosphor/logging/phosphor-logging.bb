@@ -40,11 +40,11 @@ S = "${WORKDIR}/git"
 
 # Do not DEPEND on the specified packages for native build
 # as they will not be available in host machine
-DEPENDS_remove_class-native =   " \
+DEPENDS_remove_class-native = " \
         virtual/phosphor-logging-callouts \
-        sdbus++-native \
-        systemd-native \
-        cereal-native \
+        sdbus++ \
+        systemd \
+        cereal \
         "
 
 # Do not DEPEND on the specified packages for native SDK build
@@ -52,10 +52,9 @@ DEPENDS_remove_class-native =   " \
 DEPENDS_remove_class-nativesdk = " \
         virtual/phosphor-logging-callouts \
         sdbus++-native \
-        nativesdk-cereal \
-        nativesdk-systemd \
-        nativesdk-phosphor-dbus-interfaces \
-        nativesdk-phosphor-logging \
+        cereal \
+        systemd \
+        phosphor-dbus-interfaces \
         "
 
 PACKAGECONFIG ??= "metadata-processing install_scripts"
