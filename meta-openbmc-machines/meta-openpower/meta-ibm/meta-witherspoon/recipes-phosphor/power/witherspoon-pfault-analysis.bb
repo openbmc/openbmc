@@ -14,6 +14,7 @@ S = "${WORKDIR}/git"
 DEPENDS += " \
          phosphor-logging \
          autoconf-archive-native \
+         openpower-dbus-interfaces \
          sdbus++-native \
          "
 

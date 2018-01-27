@@ -23,6 +23,7 @@ DEPENDS += " \
         ${PN}-config-native \
         phosphor-logging \
         autoconf-archive-native \
+        sdbusplus-native \
         gtest \
         "
 RDEPENDS_${PN} += " \
