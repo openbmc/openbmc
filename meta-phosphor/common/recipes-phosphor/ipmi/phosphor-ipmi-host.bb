@@ -12,10 +12,18 @@ inherit obmc-phosphor-systemd
 inherit phosphor-ipmi-host
 inherit pythonnative
 
+def ipmi_whitelists(d):
+    whitelists = d.getVar(
+        'VIRTUAL-RUNTIME_phosphor-ipmi-providers', True) or ''
+    whitelists = whitelists.split()
+    whitelists = [ '{}-whitelist-native'.format(x) for x in whitelists ]
+    return ' '.join(whitelists)
+
+
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "nlohmann-json"
 DEPENDS += "obmc-targets"
-DEPENDS += "packagegroup-obmc-ipmid-providers"
+DEPENDS += "${@ipmi_whitelists(d)}"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-mapper"

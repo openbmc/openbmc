@@ -230,3 +230,15 @@ VIRTUAL-RUNTIME_obmc-user-mgmt ?= "phosphor-user-manager"
 
 OBMC_DBUS_PATH_ROOT ?= "/xyz/openbmc_project"
 OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
+
+# VIRTUAL-RUNTIME_phosphor-ipmi-providers are the set of shared library
+# plugins for the host-ipmid application.  By default the IPMI FRU plugin
+# is enabled.  Additionally the host-ipmid recipe uses
+# VIRTUAL-RUNTIME_phosphor-ipmi-providers to compute a list of potential
+# IPMI whitelist recipe dependencies.  For example:
+#
+# VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
+#
+# Will add a build dependency to host-ipmid on the
+# phosphor-ipmi-fru-whitelist-native recipe.
+VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
