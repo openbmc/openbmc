@@ -6,6 +6,7 @@ PR = "r1"
 
 inherit skeleton-gdbus
 inherit obmc-phosphor-dbus-service
+inherit pkgconfig
 
 SKELETON_DIR = "flashbios"
 DBUS_SERVICE_${PN} += "org.openbmc.control.Flash.service"

@@ -4,6 +4,7 @@ PR = "r1"
 
 inherit skeleton-sdbus
 inherit obmc-phosphor-dbus-service
+inherit pkgconfig
 
 RDEPENDS_${PN} += "libsystemd"
 SKELETON_DIR = "fanctl"

@@ -4,6 +4,7 @@ PR = "r1"
 
 inherit skeleton-gdbus
 inherit obmc-phosphor-dbus-service
+inherit pkgconfig
 
 PROVIDES += "virtual/obmc-host-ctl"
 RPROVIDES_${PN} += "virtual-obmc-host-ctl"
