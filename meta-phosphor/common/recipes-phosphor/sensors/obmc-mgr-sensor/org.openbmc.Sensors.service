@@ -1,5 +1,7 @@
 [Unit]
 Description=Phosphor Sensor Manager
+Wants=mapper-wait@-xyz-openbmc_project-control-power_supply_redundancy.service
+After=mapper-wait@-xyz-openbmc_project-control-power_supply_redundancy.service
 
 [Service]
 Restart=always
