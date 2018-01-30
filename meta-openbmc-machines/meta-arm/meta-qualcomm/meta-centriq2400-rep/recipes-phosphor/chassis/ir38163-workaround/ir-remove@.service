@@ -1,0 +1,13 @@
+[Unit]
+Description=Remove IR38163 device
+After=obmc-power-off@%i.target
+Conflicts=obmc-chassis-poweron@%i.target
+
+[Service]
+ExecStart=/usr/bin/env ir38163_workaround.sh rm
+SyslogIdentifier=ir38163_workaround.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-host-stop@%i.target
