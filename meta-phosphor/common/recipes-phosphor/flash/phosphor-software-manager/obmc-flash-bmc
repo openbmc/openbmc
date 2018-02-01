@@ -29,6 +29,13 @@ findmtd() {
   echo "${m}"
 }
 
+# Get the mtd device number only (return X of mtdX)
+findmtdnum() {
+  m="$(findmtd "$1")"
+  m="${m##mtd}"
+  echo "${m}"
+}
+
 # Get the ubi device number (ubiX_Y)
 findubi() {
   u="$(grep -xl "$1" /sys/class/ubi/ubi?/subsystem/ubi*/name)"
@@ -258,6 +265,41 @@ copy_env_var_to_alt() {
   fw_setenv -c /etc/alt_fw_env.config "${varName}" "${value}"
 }
 
+# When the alternate bmc chip boots, u-boot thinks its the primary mtdX.
+# Therefore need to swap the chip numbers when copying the ubiblock and root to
+# alternate bmc u-boot environment.
+copy_ubiblock_to_alt() {
+  value="$(fw_printenv -n ubiblock)"
+  bmcNum="$(findmtdnum "bmc")"
+  altNum="$(findmtdnum "alt-bmc")"
+  replaceAlt="${value/${altNum},/${bmcNum},}"
+
+  if [[ "${value}" == "${replaceAlt}" ]]; then
+    replaceBmc="${value/${bmcNum},/${altNum},}"
+    value=${replaceBmc}
+  else
+    value=${replaceAlt}
+  fi
+
+  fw_setenv -c /etc/alt_fw_env.config ubiblock "${value}"
+}
+
+copy_root_to_alt() {
+  value="$(fw_printenv -n root)"
+  bmcNum="$(findmtdnum "bmc")"
+  altNum="$(findmtdnum "alt-bmc")"
+  replaceAlt="${value/${altNum}_/${bmcNum}_}"
+
+  if [[ "${value}" == "${replaceAlt}" ]]; then
+    replaceBmc="${value/${bmcNum}_/${altNum}_}"
+    value=${replaceBmc}
+  else
+    value=${replaceAlt}
+  fi
+
+  fw_setenv -c /etc/alt_fw_env.config root "${value}"
+}
+
 ubi_setenv() {
     # The U-Boot environment maintains two banks of environment variables.
     # The banks need to be consistent with each other to ensure that these
@@ -283,8 +325,8 @@ mtd_write() {
 
 backup_env_vars() {
   copy_env_var_to_alt kernelname
-  copy_env_var_to_alt ubiblock
-  copy_env_var_to_alt root
+  copy_ubiblock_to_alt
+  copy_root_to_alt
 }
 
 update_env_vars() {
