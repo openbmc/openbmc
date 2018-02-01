@@ -1,2 +1,2 @@
-SRCREV ?= "89e6c91889cbd27d0857aa44438ede5e4eb7fd80"
+SRCREV ?= "a30ab9db33bb8d1c208b2b86b8e824c5c70dae54"
 SKELETON_URI ?= "git://github.com/openbmc/skeleton"
