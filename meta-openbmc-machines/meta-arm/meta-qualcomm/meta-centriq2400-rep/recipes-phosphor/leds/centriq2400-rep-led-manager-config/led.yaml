@@ -1,0 +1,15 @@
+bmc_booted:
+power_on:
+    Power_ID_LED:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+enclosure_fault:
+    RAS_ERROR_LED:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+    System_FAULT:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
