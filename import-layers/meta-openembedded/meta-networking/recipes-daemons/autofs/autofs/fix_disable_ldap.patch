@@ -15,8 +15,10 @@ Signed-off-by: Amy Fong <amy.fong@windriver.com>
  include/lookup_ldap.h |    4 ++++
  1 file changed, 4 insertions(+)
 
---- a/include/lookup_ldap.h
-+++ b/include/lookup_ldap.h
+Index: autofs-5.1.2/include/lookup_ldap.h
+===================================================================
+--- autofs-5.1.2.orig/include/lookup_ldap.h
++++ autofs-5.1.2/include/lookup_ldap.h
 @@ -1,7 +1,9 @@
  #ifndef LOOKUP_LDAP_H
  #define LOOKUP_LDAP_H
@@ -27,14 +29,14 @@ Signed-off-by: Amy Fong <amy.fong@windriver.com>
  
  #ifdef WITH_SASL
  #include <openssl/ssl.h>
-@@ -109,10 +111,12 @@
+@@ -117,10 +119,12 @@ struct lookup_context {
  
  #define LDAP_AUTH_USESIMPLE	0x0008
  
 +#ifdef WITH_LDAP
  /* lookup_ldap.c */
  LDAP *init_ldap_connection(unsigned logopt, const char *uri, struct lookup_context *ctxt);
- int unbind_ldap_connection(unsigned logopt, LDAP *ldap, struct lookup_context *ctxt);
+ int unbind_ldap_connection(unsigned logopt, struct ldap_conn *conn, struct lookup_context *ctxt);
  int authtype_requires_creds(const char *authtype);
 +#endif
  

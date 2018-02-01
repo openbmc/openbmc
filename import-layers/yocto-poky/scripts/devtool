@@ -215,6 +215,9 @@ def main():
     global config
     global context
 
+    if sys.getfilesystemencoding() != "utf-8":
+        sys.exit("Please use a locale setting which supports utf-8.\nPython can't change the filesystem locale after loading so we need a utf-8 when python starts or things won't work.")
+
     context = Context(fixed_setup=False)
 
     # Default basepath
@@ -288,13 +291,17 @@ def main():
     scriptutils.logger_setup_color(logger, global_args.color)
 
     if global_args.bbpath is None:
-        tinfoil = setup_tinfoil(config_only=True, basepath=basepath)
         try:
-            global_args.bbpath = tinfoil.config_data.getVar('BBPATH', True)
-        finally:
-            tinfoil.shutdown()
+            tinfoil = setup_tinfoil(config_only=True, basepath=basepath)
+            try:
+                global_args.bbpath = tinfoil.config_data.getVar('BBPATH')
+            finally:
+                tinfoil.shutdown()
+        except bb.BBHandledException:
+            return 2
 
-    for path in [scripts_path] + global_args.bbpath.split(':'):
+    # Search BBPATH first to allow layers to override plugins in scripts_path
+    for path in global_args.bbpath.split(':') + [scripts_path]:
         pluginpath = os.path.join(path, 'lib', 'devtool')
         scriptutils.load_plugins(logger, plugins, pluginpath)
 

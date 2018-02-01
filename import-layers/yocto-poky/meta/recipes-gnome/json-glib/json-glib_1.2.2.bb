@@ -13,6 +13,8 @@ DEPENDS = "glib-2.0"
 SRC_URI[archive.md5sum] = "c1daefb8d0fb59612af0c072c8aabb58"
 SRC_URI[archive.sha256sum] = "ea128ab52a824fcd06e5448fbb2bd8d9a13740d51c66d445828edba71321a621"
 
-inherit gnomebase gettext lib_package gobject-introspection gtk-doc
+inherit gnomebase gettext lib_package gobject-introspection gtk-doc manpages
 
-BBCLASSEXTEND = "native"
+PACKAGECONFIG[manpages] = "--enable-man --with-xml-catalog=${STAGING_ETCDIR_NATIVE}/xml/catalog.xml, --disable-man, libxslt-native xmlto-native"
+
+BBCLASSEXTEND = "native nativesdk"

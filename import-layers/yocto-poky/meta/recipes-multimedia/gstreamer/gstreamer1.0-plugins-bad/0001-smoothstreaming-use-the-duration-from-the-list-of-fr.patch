@@ -1,0 +1,62 @@
+From 0fbee8f37427b88339194b22ba9aa210772a8613 Mon Sep 17 00:00:00 2001
+From: Matthew Waters <matthew@centricular.com>
+Date: Thu, 10 Nov 2016 17:20:27 +1100
+Subject: [PATCH] smoothstreaming: use the duration from the list of fragments
+ if not present in the manifest
+
+Provides a more accurate duration for live streams that may be minutes
+or hours in front of the earliest fragment.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=774178
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ ext/smoothstreaming/gstmssmanifest.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/ext/smoothstreaming/gstmssmanifest.c b/ext/smoothstreaming/gstmssmanifest.c
+index 317b3cef9..144bbb42d 100644
+--- a/ext/smoothstreaming/gstmssmanifest.c
++++ b/ext/smoothstreaming/gstmssmanifest.c
+@@ -888,6 +888,7 @@ gst_mss_manifest_get_duration (GstMssManifest * manifest)
+   gchar *duration;
+   guint64 dur = -1;
+ 
++  /* try the property */
+   duration =
+       (gchar *) xmlGetProp (manifest->xmlrootnode,
+       (xmlChar *) MSS_PROP_STREAM_DURATION);
+@@ -895,6 +896,29 @@ gst_mss_manifest_get_duration (GstMssManifest * manifest)
+     dur = g_ascii_strtoull (duration, NULL, 10);
+     xmlFree (duration);
+   }
++  /* else use the fragment list */
++  if (dur <= 0) {
++    guint64 max_dur = 0;
++    GSList *iter;
++
++    for (iter = manifest->streams; iter; iter = g_slist_next (iter)) {
++      GstMssStream *stream = iter->data;
++
++      if (stream->active) {
++        if (stream->fragments) {
++          GList *l = g_list_last (stream->fragments);
++          GstMssStreamFragment *fragment = (GstMssStreamFragment *) l->data;
++          guint64 frag_dur =
++              fragment->time + fragment->duration * fragment->repetitions;
++          max_dur = MAX (frag_dur, max_dur);
++        }
++      }
++    }
++
++    if (max_dur != 0)
++      dur = max_dur;
++  }
++
+   return dur;
+ }
+ 
+-- 
+2.11.0
+

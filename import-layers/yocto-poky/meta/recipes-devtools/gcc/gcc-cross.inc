@@ -5,11 +5,14 @@ EXTRADEPENDS = ""
 DEPENDS = "virtual/${TARGET_PREFIX}binutils virtual/${TARGET_PREFIX}libc-for-gcc ${EXTRADEPENDS} ${NATIVEDEPS}"
 PROVIDES = "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}g++"
 python () {
-    if d.getVar("TARGET_OS", True).startswith("linux"):
+    if d.getVar("TARGET_OS").startswith("linux"):
         d.setVar("EXTRADEPENDS", "linux-libc-headers")
 }
 
 PN = "gcc-cross-${TARGET_ARCH}"
+
+# Ignore how TARGET_ARCH is computed.
+TARGET_ARCH[vardepvalue] = "${TARGET_ARCH}"
 
 require gcc-configure-common.inc
 
@@ -185,21 +188,28 @@ do_install () {
 	# We use libiberty from binutils
 	find ${D}${exec_prefix}/lib -name libiberty.a | xargs rm -f
 	find ${D}${exec_prefix}/lib -name libiberty.h | xargs rm -f
-
-	# gcc-runtime installs libgcc into a special location in staging since it breaks doing a standalone build
-	case ${PN} in
-		*gcc-cross-${TARGET_ARCH}|*gcc-crosssdk-${SDK_SYS})
-			dest=${D}/${includedir}/gcc-build-internal-${TARGET_SYS}
-			hardlinkdir . $dest
-		;;
-	esac
 }
-# This is reflected in the recipe name and target gcc shouldn't depend 
-# on SDK settings either
-do_install[vardepsexclude] += "SDK_SYS"
 
 do_package[noexec] = "1"
 do_packagedata[noexec] = "1"
 do_package_write_ipk[noexec] = "1"
 do_package_write_rpm[noexec] = "1"
 do_package_write_deb[noexec] = "1"
+
+BUILDDIRSTASH = "${WORKDIR}/stashed-builddir"
+do_gcc_stash_builddir[dirs] = "${B}"
+do_gcc_stash_builddir[cleandirs] = "${BUILDDIRSTASH}"
+do_gcc_stash_builddir () {
+	dest=${BUILDDIRSTASH}
+	hardlinkdir . $dest
+}
+addtask do_gcc_stash_builddir after do_compile before do_install
+SSTATETASKS += "do_gcc_stash_builddir"
+do_gcc_stash_builddir[sstate-inputdirs] = "${BUILDDIRSTASH}"
+do_gcc_stash_builddir[sstate-outputdirs] = "${COMPONENTS_DIR}/${BUILD_ARCH}/gcc-stashed-builddir${COMPILERINITIAL}-${TARGET_SYS}"
+do_gcc_stash_builddir[sstate-fixmedir] = "${COMPONENTS_DIR}/${BUILD_ARCH}/gcc-stashed-builddir${COMPILERINITIAL}-${TARGET_SYS}"
+
+python do_gcc_stash_builddir_setscene () {
+    sstate_setscene(d)
+}
+addtask do_gcc_stash_builddir_setscene

@@ -32,4 +32,4 @@ FILES_${PN}-dbg += "${libdir}/window-manager-settings/.debug"
 FILES_${PN}-dev += "${libdir}/window-manager-settings/*.la"
 FILES_${PN}-staticdev += "${libdir}/window-manager-settings/*.a"
 
-PNBLACKLIST[gnome-control-center] ?= "Depends on broken gnome-menus"
+PNBLACKLIST[gnome-control-center] ?= "Depends on broken gnome-menus - the recipe will be removed on 2017-09-01 unless the issue is fixed"

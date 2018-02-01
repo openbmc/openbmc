@@ -12,6 +12,9 @@ inherit autotools gettext
 EXTRA_OECONF = "--disable-ssl --disable-kerberos --enable-force_localhost"
 FILES_${PN}-dbg += "${libdir}/lprng/filters/.debug"
 
+# configure: WARNING: Program 'clear' is not found. Set environment CLEAR=no if you do not want to use it
+export CLEAR = "no"
+
 do_install_append() {
     mv ${D}/etc/printcap.sample ${D}/etc/printcap
     mv ${D}/etc/lpd/lpd.conf.sample ${D}/etc/lpd/lpd.conf

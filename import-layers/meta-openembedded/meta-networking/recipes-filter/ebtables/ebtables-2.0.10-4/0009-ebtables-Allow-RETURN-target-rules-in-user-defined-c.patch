@@ -1,0 +1,48 @@
+From e6b367c0c2668341c47242d099f4d2048ae575ef Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alin=20N=C4=83stac?= <alin.nastac@gmail.com>
+Date: Thu, 22 Oct 2015 16:41:03 +0200
+Subject: [PATCH 09/10] ebtables: Allow RETURN target rules in user defined
+ chains
+
+During loop checking ebtables marks entries with '1 << NF_BR_NUMHOOKS' if
+they're called from a base chain rather than a user defined chain.
+
+This can be used by ebtables targets that can encode a special return
+value to bail out if e.g. RETURN is used from a base chain.
+
+Unfortunately, this is broken, since the '1 << NF_BR_NUMHOOKS' is also
+copied to called user-defined-chains (i.e., a user defined chain can no
+longer be distinguished from a base chain):
+
+root@OpenWrt:~# ebtables -N foo
+root@OpenWrt:~# ebtables -A OUTPUT -j foo
+root@OpenWrt:~# ebtables -A foo -j mark --mark-or 3 --mark-target RETURN
+--mark-target RETURN not allowed on base chain.
+
+This works if -A OUTPUT -j foo is omitted, but will still appear
+if we try to call foo from OUTPUT afterwards.
+
+After this patch we still reject
+'-A OUTPUT -j mark .. --mark-target RETURN'.
+
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ libebtc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libebtc.c b/libebtc.c
+index 17ba8f2..74830ec 100644
+--- a/libebtc.c
++++ b/libebtc.c
+@@ -1102,7 +1102,7 @@ void ebt_check_for_loops(struct ebt_u_replace *replace)
+ 			/* check if we've dealt with this chain already */
+ 			if (entries2->hook_mask & (1<<i))
+ 				goto letscontinue;
+-			entries2->hook_mask |= entries->hook_mask;
++			entries2->hook_mask |= entries->hook_mask & ~(1 << NF_BR_NUMHOOKS);
+ 			/* Jump to the chain, make sure we know how to get back */
+ 			stack[sp].chain_nr = chain_nr;
+ 			stack[sp].n = j;
+-- 
+2.12.1
+

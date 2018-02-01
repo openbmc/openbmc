@@ -1,0 +1,24 @@
+From 8520274759cb8f95e483b02a445aff225e13467b Mon Sep 17 00:00:00 2001
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Tue, 16 Aug 2016 16:00:27 +0200
+Subject: [PATCH] .gitignore the new test case
+
+Upstream-Status: Backport
+
+Signed-off-by: Catalin Enache <catalin.enache@windriver.com>
+---
+ tests/tga/.gitignore | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/tga/.gitignore b/tests/tga/.gitignore
+index e88e124..7a659b1 100644
+--- a/tests/tga/.gitignore
++++ b/tests/tga/.gitignore
+@@ -4,3 +4,4 @@
+ /bug00248
+ /bug00248a
+ /tga_null
++/tga_read
+-- 
+2.10.2
+

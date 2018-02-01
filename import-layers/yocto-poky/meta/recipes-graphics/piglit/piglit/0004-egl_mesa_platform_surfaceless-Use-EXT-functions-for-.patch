@@ -1,0 +1,78 @@
+From 57de1ff6758ec5ea4a52637f233e3e3150086255 Mon Sep 17 00:00:00 2001
+From: Daniel Diaz <daniel.diaz@linaro.org>
+Date: Wed, 17 May 2017 18:00:17 -0500
+Subject: [PATCH 4/4] egl_mesa_platform_surfaceless: Use EXT functions for
+ surfaces
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+These EXT symbols are guaranteed to exist since they require
+EGL_EXT_platform_base.
+
+Upstream-Status: Accepted, since git 7b74602.
+
+Signed-off-by: Daniel Díaz <daniel.diaz@linaro.org>
+Reviewed-by: Emil Velikov <emil.velikov@collabora.com>
+---
+ .../egl_mesa_platform_surfaceless.c                | 23 ++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/tests/egl/spec/egl_mesa_platform_surfaceless/egl_mesa_platform_surfaceless.c b/tests/egl/spec/egl_mesa_platform_surfaceless/egl_mesa_platform_surfaceless.c
+index 81a3919..264ed71 100644
+--- a/tests/egl/spec/egl_mesa_platform_surfaceless/egl_mesa_platform_surfaceless.c
++++ b/tests/egl/spec/egl_mesa_platform_surfaceless/egl_mesa_platform_surfaceless.c
+@@ -24,6 +24,24 @@
+ #include "piglit-util.h"
+ #include "piglit-util-egl.h"
+ 
++/* Extension function pointers.
++ *
++ * Use prefix 'pegl' (piglit egl) instead of 'egl' to avoid collisions with
++ * prototypes in eglext.h. */
++EGLSurface (*peglCreatePlatformPixmapSurfaceEXT)(EGLDisplay display, EGLConfig config,
++	    NativePixmapType native_pixmap, const EGLint *attrib_list);
++EGLSurface (*peglCreatePlatformWindowSurfaceEXT)(EGLDisplay display, EGLConfig config,
++	    NativeWindowType native_window, const EGLint *attrib_list);
++
++static void
++init_egl_extension_funcs(void)
++{
++	peglCreatePlatformPixmapSurfaceEXT = (void*)
++		eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
++	peglCreatePlatformWindowSurfaceEXT = (void*)
++		eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
++}
++
+ static void
+ test_setup(EGLDisplay *dpy)
+ {
+@@ -72,7 +90,7 @@ test_create_window(void *test_data)
+ 
+ 	test_setup(&dpy);
+ 
+-	surf = eglCreatePlatformWindowSurface(dpy, EGL_NO_CONFIG_KHR,
++	surf = peglCreatePlatformWindowSurfaceEXT(dpy, EGL_NO_CONFIG_KHR,
+ 					      /*native_window*/ NULL,
+ 					      /*attrib_list*/ NULL);
+ 	if (surf) {
+@@ -103,7 +121,7 @@ test_create_pixmap(void *test_data)
+ 
+ 	test_setup(&dpy);
+ 
+-	surf = eglCreatePlatformPixmapSurface(dpy, EGL_NO_CONFIG_KHR,
++	surf = peglCreatePlatformPixmapSurfaceEXT(dpy, EGL_NO_CONFIG_KHR,
+ 					      /*native_window*/ NULL,
+ 					      /*attrib_list*/ NULL);
+ 	if (surf) {
+@@ -205,6 +223,7 @@ main(int argc, char **argv)
+ 		piglit_report_result(PIGLIT_FAIL);
+ 	}
+ 
++	init_egl_extension_funcs();
+ 	result = piglit_run_selected_subtests(subtests, selected_names,
+ 					      num_selected, result);
+ 	piglit_report_result(result);
+-- 
+1.9.1
+

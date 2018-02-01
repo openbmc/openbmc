@@ -1,0 +1,32 @@
+From ab060a57b41f989665ade20e813bbcb67f91f1f2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 9 Jul 2017 15:56:28 -0700
+Subject: [PATCH] include linux/sysinfo.h directly
+
+This is done to avoid the kernel header linux/kernel.h to use
+__GLIBC__ define to decide on if libc implements sysinfo() API
+or not. Kernel headers should be independent of such assumptions
+but until its done in right place, change the local header
+override to avoid this assumption
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usr/include/sys/sysinfo.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/include/sys/sysinfo.h b/usr/include/sys/sysinfo.h
+index dba68dc6..d145c0b1 100644
+--- a/usr/include/sys/sysinfo.h
++++ b/usr/include/sys/sysinfo.h
+@@ -5,7 +5,7 @@
+ #ifndef _SYS_SYSINFO_H
+ #define _SYS_SYSINFO_H
+ 
+-#include <linux/kernel.h>
++#include <linux/sysinfo.h>
+ 
+ extern int sysinfo(struct sysinfo *info);
+ 
+-- 
+2.13.2
+

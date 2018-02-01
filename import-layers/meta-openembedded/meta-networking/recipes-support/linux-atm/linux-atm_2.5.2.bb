@@ -11,6 +11,9 @@ SRC_URI = "http://nchc.dl.sourceforge.net/project/${BPN}/${BPN}/${PV}/${BPN}-${P
            file://link-with-ldflags.patch \
            file://install-from-buildir.patch \
            file://0001-fix-compile-error-with-linux-kernel-v4.8.patch \
+           file://0001-ttcp-Add-printf-format-string.patch \
+           file://0002-sigd-Replace-on_exit-API-with-atexit.patch \
+           file://0003-mpoad-Drop-old-hack-to-compile-with-very-old-glibc.patch \
 "
 
 SRC_URI[md5sum] = "d49499368c3cf15f73a05d9bce8824a8"

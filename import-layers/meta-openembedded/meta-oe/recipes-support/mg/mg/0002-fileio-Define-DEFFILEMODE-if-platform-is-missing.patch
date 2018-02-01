@@ -1,0 +1,28 @@
+From ce24a29cabb8f1774d262e120e5764a2afeb3825 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 7 Apr 2017 16:53:49 -0700
+Subject: [PATCH 2/2] fileio: Define DEFFILEMODE if platform is missing
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ fileio.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/fileio.c b/fileio.c
+index 9b69665..a852fd2 100644
+--- a/fileio.c
++++ b/fileio.c
+@@ -28,6 +28,10 @@
+ #include "kbd.h"
+ #include "pathnames.h"
+ 
++#if !defined(DEFFILEMODE)
++# define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)/* 0666*/
++#endif
++
+ static char *bkuplocation(const char *);
+ static int   bkupleavetmp(const char *);
+ 
+-- 
+2.12.2
+

@@ -27,7 +27,7 @@ EXTRA_OECONF = "--prefix=${prefix} \
                "
 
 # RDEPEND on systemd optionally
-PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/,,,systemd"
 
 EXTRA_OEMAKE += 'libdir=${prefix}/lib'

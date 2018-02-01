@@ -1,0 +1,13 @@
+[Unit]
+Description=Kernel Logging Service
+After=syslogd.service
+
+[Service]
+Type=forking
+ExecStart=/sbin/klogd
+PIDFile=/var/run/klogd.pid
+StandardOutput=null
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "620fa4eb12375021bef6e4f237cbd2dd5d49e56beb414bee052c746bee
 
 S = "${WORKDIR}/LuaJIT-${PV}"
 
-inherit pkgconfig binconfig
+inherit pkgconfig binconfig siteinfo
 
 BBCLASSEXTEND = "native"
 
@@ -21,9 +21,7 @@ BBCLASSEXTEND = "native"
 # you need to install the multilib development package (e.g.
 # libc6-dev-i386 on Debian/Ubuntu) and build a 32 bit host part
 # (HOST_CC="gcc -m32").
-BUILD_CC_ARCH_append_powerpc = ' -m32'
-BUILD_CC_ARCH_append_x86 = ' -m32'
-BUILD_CC_ARCH_append_arm = ' -m32'
+BUILD_CC_ARCH_append = " ${@['-m32',''][d.getVar('SITEINFO_BITS', True) != '32']}"
 
 # The lua makefiles expect the TARGET_SYS to be from uname -s
 # Values: Windows, Linux, Darwin, iOS, SunOS, PS3, GNU/kFreeBSD

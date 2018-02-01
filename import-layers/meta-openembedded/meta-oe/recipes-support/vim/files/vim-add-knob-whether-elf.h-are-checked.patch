@@ -7,13 +7,13 @@ Upstream-status: Pending
 
 Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
 ---
- src/configure.in |    7 +++++++
+ src/configure.ac |    7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/src/configure.in b/src/configure.in
+diff --git a/src/configure.ac b/src/configure.ac
 index d734064..f504fa6 100644
---- a/src/configure.in
-+++ b/src/configure.in
+--- a/src/configure.ac
++++ b/src/configure.ac
 @@ -2483,11 +2483,18 @@ AC_TRY_COMPILE([#include <stdio.h>], [int x __attribute__((unused));],
  	AC_MSG_RESULT(no))
  

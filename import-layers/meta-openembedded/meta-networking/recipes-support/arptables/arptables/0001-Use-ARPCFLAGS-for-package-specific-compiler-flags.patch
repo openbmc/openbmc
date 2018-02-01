@@ -1,0 +1,79 @@
+From a2021f0bc0f029dfa05dcca5db3d2ec77904d41a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 30 Mar 2017 12:33:51 -0700
+Subject: [PATCH] Use ARPCFLAGS for package specific compiler flags
+
+This leaves room for setting CFLAGS in environment
+which OE uses to pass tweaks
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile            | 15 +++++++--------
+ extensions/Makefile |  5 ++++-
+ 2 files changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 7bead0d..336db6b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -7,15 +7,13 @@ LIBDIR:=$(PREFIX)/lib
+ BINDIR:=$(PREFIX)/sbin
+ MANDIR:=$(PREFIX)/man
+ man8dir=$(MANDIR)/man8
+-INITDIR:=/etc/rc.d/init.d
++INITDIR:=/etc/init.d
+ SYSCONFIGDIR:=/etc/sysconfig
+ DESTDIR:=
+ 
+ MANS = arptables.8 arptables-save.8 arptables-restore.8
+ 
+-COPT_FLAGS:=-O2
+-CFLAGS:=$(COPT_FLAGS) -Wall -Wunused -I$(KERNEL_DIR)/include/ -Iinclude/ -DARPTABLES_VERSION=\"$(ARPTABLES_VERSION)\" #-g -DDEBUG #-pg # -DARPTC_DEBUG
+-
++ARPCFLAGS:=-Wall -Wunused -I$(KERNEL_DIR)/include/ -Iinclude/ -DARPTABLES_VERSION=\"$(ARPTABLES_VERSION)\"
+ ifndef ARPT_LIBDIR
+ ARPT_LIBDIR:=$(LIBDIR)/arptables
+ endif
+@@ -25,13 +23,13 @@ include extensions/Makefile
+ all: arptables libarptc/libarptc.a
+ 
+ arptables.o: arptables.c
+-	$(CC) $(CFLAGS) -c -o $@ $<
++	$(CC) $(ARPCFLAGS) $(CFLAGS) -c -o $@ $<
+ 
+ arptables-standalone.o: arptables-standalone.c
+-	$(CC) $(CFLAGS) -c -o $@ $<
++	$(CC) $(ARPCFLAGS) $(CFLAGS) -c -o $@ $<
+ 
+ libarptc/libarptc.o: libarptc/libarptc.c libarptc/libarptc_incl.c
+-	$(CC) $(CFLAGS) -c -o $@ $<
++	$(CC) $(ARPCFLAGS) $(CFLAGS) -c -o $@ $<
+ 
+ libarptc/libarptc.a: libarptc/libarptc.o
+ 	$(AR) rcs $@ $<
+@@ -53,7 +51,8 @@ scripts: arptables-save arptables-restore arptables.sysv
+ 	install -m 0755 arptables-restore_ $(DESTDIR)$(BINDIR)/arptables-restore
+ 	cat arptables.sysv | sed 's/__EXEC_PATH__/$(tmp1)/g' | sed 's/__SYSCONFIG__/$(tmp2)/g' > arptables.sysv_
+ 	if [ "$(DESTDIR)" != "" ]; then mkdir -p $(DESTDIR)$(INITDIR); fi
+-	if test -d $(DESTDIR)$(INITDIR); then install -m 0755 arptables.sysv_ $(DESTDIR)$(INITDIR)/arptables; fi
++	install -d $(DESTDIR)$(INITDIR)
++	install -m 0755 arptables.sysv_ $(DESTDIR)$(INITDIR)/arptables
+ 	rm -f arptables-save_ arptables-restore_ arptables.sysv_
+ 
+ .PHONY: install-man
+diff --git a/extensions/Makefile b/extensions/Makefile
+index 0189cc9..b046425 100644
+--- a/extensions/Makefile
++++ b/extensions/Makefile
+@@ -4,4 +4,7 @@ EXT_FUNC+=standard mangle CLASSIFY MARK
+ EXT_OBJS+=$(foreach T,$(EXT_FUNC), extensions/arpt_$(T).o)
+ 
+ extensions/ebt_%.o: extensions/arpt_%.c include/arptables.h include/arptables_common.h
+-	$(CC) $(CFLAGS) $(PROGSPECS) -c -o $@ $<
++	$(CC) $(CFLAGS) $(ARPCFLAGS) $(PROGSPECS) -c -o $@ $<
++
++extensions/arpt_%.o: extensions/arpt_%.c include/arptables.h include/arptables_common.h
++	$(CC) $(CFLAGS) $(ARPCFLAGS) $(PROGSPECS) -c -o $@ $<
+-- 
+2.12.1
+

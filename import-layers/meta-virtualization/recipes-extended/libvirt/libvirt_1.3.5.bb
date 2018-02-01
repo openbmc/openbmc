@@ -7,7 +7,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 SECTION = "console/tools"
 
 DEPENDS = "bridge-utils gnutls libxml2 lvm2 avahi parted curl libpcap util-linux e2fsprogs pm-utils \
-	   iptables dnsmasq readline libtasn1 libxslt-native"
+	   iptables dnsmasq readline libtasn1 libxslt-native acl libdevmapper \
+	   ${@bb.utils.contains('PACKAGECONFIG', 'polkit', 'shadow-native', '', d)}"
 
 # libvirt-guests.sh needs gettext.sh
 #
@@ -37,6 +38,7 @@ SRC_URI = "http://libvirt.org/sources/libvirt-${PV}.tar.gz;name=libvirt \
            file://0001-qemu-Let-empty-default-VNC-password-work-as-document.patch \
            file://0001-ptest-add-missing-test_helper-files.patch \
            file://0001-ptest-Remove-Windows-1252-check-from-esxutilstest.patch \
+	   file://0001-Added-configure-variable-for-placing-systemd-untis-l.patch \
           "
 
 SRC_URI[libvirt.md5sum] = "f9dc1e63d559eca50ae0ee798a4c6c6d"
@@ -117,7 +119,8 @@ FILES_${PN}-libvirtd = " \
 FILES_${PN}-virsh = "${bindir}/virsh"
 FILES_${PN} += "${libdir}/libvirt/connection-driver \
 	    ${datadir}/augeas \
-	    ${datadir}/polkit-1"
+	    ${@bb.utils.contains('PACKAGECONFIG', 'polkit', '${datadir}/polkit-1', '', d)} \
+	    "
 
 FILES_${PN}-dbg += "${libdir}/libvirt/connection-driver/.debug ${libdir}/libvirt/lock-driver/.debug"
 FILES_${PN}-staticdev += "${libdir}/*.a ${libdir}/libvirt/connection-driver/*.a ${libdir}/libvirt/lock-driver/*.a"
@@ -208,6 +211,7 @@ PACKAGECONFIG[numactl] = "--with-numactl,--without-numactl,numactl,"
 PACKAGECONFIG[fuse] = "--with-fuse,--without-fuse,fuse,"
 PACKAGECONFIG[audit] = "--with-audit,--without-audit,audit,"
 PACKAGECONFIG[libcap-ng] = "--with-capng,--without-capng,libcap-ng,"
+PACKAGECONFIG[wireshark] = "--with-wireshark-dissector,--without-wireshark-dissector,wireshark libwsutil,"
 
 # Enable the Python tool support
 require libvirt-python.inc
@@ -250,6 +254,15 @@ do_install_append() {
 	echo "d root root 0755 ${localstatedir}/run/libvirt/qemu none" \
 	     >> ${D}${sysconfdir}/default/volatiles/99_libvirt
 
+	# Manually set permissions and ownership to match polkit recipe
+	if ${@bb.utils.contains('PACKAGECONFIG', 'polkit', 'true', 'false', d)}; then
+		install -d -m 0700 ${D}/${datadir}/polkit-1/rules.d
+		chown polkitd ${D}/${datadir}/polkit-1/rules.d
+		chgrp root ${D}/${datadir}/polkit-1/rules.d
+	else
+		rm -rf ${D}/${datadir}/polkit-1
+	fi
+
 	# Add hook support for libvirt
 	mkdir -p ${D}/etc/libvirt/hooks
 
@@ -263,7 +276,7 @@ EXTRA_OECONF += " \
     --with-init-script=systemd \
     "
 
-EXTRA_OEMAKE = "BUILD_DIR=${B} DEST_DIR=${D}${PTEST_PATH} PTEST_DIR=${PTEST_PATH}"
+EXTRA_OEMAKE = "BUILD_DIR=${B} DEST_DIR=${D}${PTEST_PATH} PTEST_DIR=${PTEST_PATH} SYSTEMD_UNIT_DIR=${systemd_system_unitdir}"
 
 do_compile_ptest() {
 	oe_runmake -C tests buildtest-TESTS

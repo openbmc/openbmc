@@ -1,0 +1,40 @@
+From 9b66394c712ec0d0fcb2052baa7f590621a53461 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Tue, 8 Nov 2016 13:15:46 -0500
+Subject: [PATCH] selinux: drop selinux support
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+---
+ src/systemdhook.c | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/src/systemdhook.c b/src/systemdhook.c
+index 274e5b910699..b9e8f1be376a 100644
+--- a/src/systemdhook.c
++++ b/src/systemdhook.c
+@@ -14,7 +14,6 @@
+ #include <errno.h>
+ #include <inttypes.h>
+ #include <linux/limits.h>
+-#include <selinux/selinux.h>
+ #include <yajl/yajl_tree.h>
+ 
+ #include "config.h"
+@@ -538,14 +537,6 @@ static int prestart(const char *rootfs,
+ 			}
+ 		}
+ 
+-		if (strcmp("", mount_label)) {
+-			rc = setfilecon(journal_dir, (security_context_t)mount_label);
+-			if (rc < 0) {
+-				pr_perror("Failed to set journal dir selinux context");
+-				return -1;
+-			}
+-		}
+-
+ 		if (makepath(cont_journal_dir, 0755) == -1) {
+ 			if (errno != EEXIST) {
+ 				pr_perror("Failed to mkdir container journal dir: %s", cont_journal_dir);
+-- 
+2.4.0.53.g8440f74
+

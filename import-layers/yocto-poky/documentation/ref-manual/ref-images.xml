@@ -54,9 +54,6 @@
             <listitem><para><filename>core-image-clutter</filename>:
                 An image with support for the Open GL-based toolkit Clutter, which enables development of
                 rich and animated graphical user interfaces.</para></listitem>
-            <listitem><para><filename>core-image-directfb</filename>:
-                An image that uses <filename>directfb</filename> instead of X11.
-                </para></listitem>
             <listitem><para><filename>core-image-full-cmdline</filename>:
                 A console-only image with more full-featured Linux system
                 functionality installed.</para></listitem>

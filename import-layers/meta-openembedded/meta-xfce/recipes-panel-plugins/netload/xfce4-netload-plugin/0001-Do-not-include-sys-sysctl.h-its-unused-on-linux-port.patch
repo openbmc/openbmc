@@ -1,0 +1,25 @@
+From 7fcc7352ec11644ac8be4e9ec1584a5be3333684 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Jul 2017 18:18:30 -0700
+Subject: [PATCH] Do not include sys/sysctl.h its unused on linux port
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ panel-plugin/os.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/panel-plugin/os.h b/panel-plugin/os.h
+index 473c2a4..9a5c544 100644
+--- a/panel-plugin/os.h
++++ b/panel-plugin/os.h
+@@ -170,7 +170,6 @@
+ #elif __linux__             /* L I N U X */
+ #  include <stdio.h>
+ #  include <sys/param.h>
+-#  include <sys/sysctl.h>
+ #  include <stdlib.h>
+ #  include <stdarg.h>
+ #  include <unistd.h>
+-- 
+2.13.2
+

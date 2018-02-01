@@ -21,5 +21,5 @@ inherit autotools gettext pkgconfig distro_features_check
 
 FILES_${PN}-dev += "${datadir}/pkgconfig"
 
-RDEPENDS_${PN} = "libudev"
+RRECOMMENDS_${PN} = "udev-hwdb"
 RDEPENDS_${PN}-ptest = "libboost-system libboost-thread"

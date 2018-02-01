@@ -1,0 +1,33 @@
+From 71fdfdfcea2bfa5f522512366bfcdf95f861ecc6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 23 Apr 2017 23:44:37 -0700
+Subject: [PATCH] lib/yp_all_host.c: Fix build with gcc 7
+
+fixes
+
+| ../../../../../../../workspace/sources/yp-tools/lib/yp_all_host.c: In function 'yp_all_host':
+| ../../../../../../../workspace/sources/yp-tools/lib/yp_all_host.c:109:30: error: comparison between pointer and zero character constant [-Werror=pointer-compare]
+|        inmap == NULL || inmap == '\0')
+|                               ^~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/yp_all_host.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/yp_all_host.c b/lib/yp_all_host.c
+index 59cf236..4a07a7e 100644
+--- a/lib/yp_all_host.c
++++ b/lib/yp_all_host.c
+@@ -106,7 +106,7 @@ yp_all_host (const char *indomain, const char *inmap,
+ 
+   if (hostname == NULL || hostname[0] == '\0' ||
+       indomain == NULL || indomain[0] == '\0' ||
+-      inmap == NULL || inmap == '\0')
++      inmap == NULL || inmap[0] == '\0')
+     return YPERR_BADARGS;
+ 
+   res = YPERR_YPERR;
+-- 
+2.12.2
+

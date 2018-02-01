@@ -3,7 +3,6 @@ inherit allarch
 SUMMARY = "Operating system identification"
 DESCRIPTION = "The /etc/os-release file contains operating system identification data."
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 INHIBIT_DEFAULT_DEPS = "1"
 
 do_fetch[noexec] = "1"
@@ -33,8 +32,8 @@ def sanitise_version(ver):
 python do_compile () {
     import shutil
     with open(d.expand('${B}/os-release'), 'w') as f:
-        for field in d.getVar('OS_RELEASE_FIELDS', True).split():
-            value = d.getVar(field, True)
+        for field in d.getVar('OS_RELEASE_FIELDS').split():
+            value = d.getVar(field)
             if value and field == 'VERSION_ID':
                 value = sanitise_version(value)
             if value:

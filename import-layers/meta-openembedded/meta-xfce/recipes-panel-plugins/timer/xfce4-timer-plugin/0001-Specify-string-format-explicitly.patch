@@ -1,0 +1,32 @@
+From 6b786e1c161026ab5486ac218891a85db65bf3ba Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 22 Mar 2017 15:28:24 -0700
+Subject: [PATCH] Specify string format explicitly
+
+Avoids below errors when compiling with -Wformat-security
+
+error: format string is not a string literal (potentially insecure)
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/xfcetimer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/xfcetimer.c b/src/xfcetimer.c
+index 601772f..4b89682 100644
+--- a/src/xfcetimer.c
++++ b/src/xfcetimer.c
+@@ -190,7 +190,7 @@ static gboolean update_function (gpointer data){
+ 
+     dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+                                     GTK_MESSAGE_WARNING,
+-                                    GTK_BUTTONS_NONE, dialog_message);
++                                    GTK_BUTTONS_NONE, "%s", dialog_message);
+                            
+     gtk_window_set_title ((GtkWindow *) dialog, dialog_title);                                    
+  
+-- 
+2.12.0
+

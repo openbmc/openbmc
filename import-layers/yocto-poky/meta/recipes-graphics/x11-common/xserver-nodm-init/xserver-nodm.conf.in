@@ -2,6 +2,6 @@
 
 XSERVER=/usr/bin/Xorg
 DISPLAY=:0
-ARGS=" -br -pn @BLANK_ARGS@ "
+ARGS=" -br -pn @BLANK_ARGS@ @NO_CURSOR_ARG@ "
 HOME=@HOME@
 USER=@USER@

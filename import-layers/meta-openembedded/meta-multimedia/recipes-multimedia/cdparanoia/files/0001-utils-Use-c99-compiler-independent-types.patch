@@ -1,0 +1,49 @@
+From 89071cbc8d3ab9a15503f397580b7590338e5e91 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Jul 2017 17:23:45 -0700
+Subject: [PATCH] utils: Use c99 compiler independent types
+
+Make it portable across different platforms
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils.h | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/utils.h b/utils.h
+index 10dce58..73bba92 100644
+--- a/utils.h
++++ b/utils.h
+@@ -3,6 +3,7 @@
+ #include <stdio.h>
+ #include <errno.h>
+ #include <string.h>
++#include <stdint.h>
+ 
+ extern long buffering_write(int outf, char *buffer, long num);
+ extern int buffering_close(int fd);
+@@ -18,15 +19,15 @@ static inline int bigendianp(void){
+ }
+ 
+ static inline int32_t swap32(int32_t x){
+-  return((((u_int32_t)x & 0x000000ffU) << 24) | 
+-	 (((u_int32_t)x & 0x0000ff00U) <<  8) | 
+-	 (((u_int32_t)x & 0x00ff0000U) >>  8) | 
+-	 (((u_int32_t)x & 0xff000000U) >> 24));
++  return((((uint32_t)x & 0x000000ffU) << 24) | 
++	 (((uint32_t)x & 0x0000ff00U) <<  8) | 
++	 (((uint32_t)x & 0x00ff0000U) >>  8) | 
++	 (((uint32_t)x & 0xff000000U) >> 24));
+ }
+ 
+ static inline int16_t swap16(int16_t x){
+-  return((((u_int16_t)x & 0x00ffU) <<  8) | 
+-	 (((u_int16_t)x & 0xff00U) >>  8));
++  return((((uint16_t)x & 0x00ffU) <<  8) | 
++	 (((uint16_t)x & 0xff00U) >>  8));
+ }
+ 
+ #if BYTE_ORDER == LITTLE_ENDIAN
+-- 
+2.13.2
+

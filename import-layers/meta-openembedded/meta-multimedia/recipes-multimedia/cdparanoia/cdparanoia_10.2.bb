@@ -11,7 +11,12 @@ SRC_URI = "http://downloads.xiph.org/releases/cdparanoia/cdparanoia-III-${PV}.sr
            file://0001-Use-DESTDIR-in-install-Makefile-rule.patch \
            file://0002-interface-remove-C-reserved-keyword.patch \
            file://0003-Fix-missing-shared-object-LDFLAGS.patch \
-"
+           file://dont-use-internal-configs.patch \
+           file://out-of-tree-build.patch \
+           file://0001-check-for-null-buffer-before-trying-a-byteswap.patch \
+           file://0002-Fix-printf-format-errors.patch \
+           file://0001-utils-Use-c99-compiler-independent-types.patch \
+           "
 SRC_URI[md5sum] = "b304bbe8ab63373924a744eac9ebc652"
 SRC_URI[sha256sum] = "005db45ef4ee017f5c32ec124f913a0546e77014266c6a1c50df902a55fe64df"
 
@@ -24,4 +29,6 @@ S = "${WORKDIR}/cdparanoia-III-${PV}"
 # between the compilation of those two targets)
 PARALLEL_MAKE = ""
 
-inherit autotools-brokensep
+EXTRA_OECONF = "CC='${CC}' CFLAGS='${CFLAGS}'"
+
+inherit autotools

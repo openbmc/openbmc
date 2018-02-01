@@ -1,0 +1,65 @@
+From 9a1f2bbf3cd2417e0c10d18578e224abe2071d68 Mon Sep 17 00:00:00 2001
+From: Florian Westphal <fw@strlen.de>
+Date: Tue, 21 Mar 2017 19:47:22 +0100
+Subject: [PATCH 2/4] src: allow update of net base w. meta l4proto icmpv6
+
+nft add rule ip6 f i meta l4proto ipv6-icmp icmpv6 type nd-router-advert
+<cmdline>:1:50-60: Error: conflicting protocols specified: unknown vs. icmpv6
+
+add icmpv6 to nexthdr list so base gets updated correctly.
+
+Reported-by: Thomas Woerner <twoerner@redhat.com>
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+Upstream-Status: Backport
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ src/proto.c                 | 1 +
+ tests/py/any/meta.t         | 1 +
+ tests/py/any/meta.t.payload | 7 +++++++
+ 3 files changed, 9 insertions(+)
+
+diff --git a/src/proto.c b/src/proto.c
+index 79e9dbf..fcdfbe7 100644
+--- a/src/proto.c
++++ b/src/proto.c
+@@ -779,6 +779,7 @@ const struct proto_desc proto_inet_service = {
+ 		PROTO_LINK(IPPROTO_TCP,		&proto_tcp),
+ 		PROTO_LINK(IPPROTO_DCCP,	&proto_dccp),
+ 		PROTO_LINK(IPPROTO_SCTP,	&proto_sctp),
++		PROTO_LINK(IPPROTO_ICMPV6,	&proto_icmp6),
+ 	},
+ 	.templates	= {
+ 		[0]	= PROTO_META_TEMPLATE("l4proto", &inet_protocol_type, NFT_META_L4PROTO, 8),
+diff --git a/tests/py/any/meta.t b/tests/py/any/meta.t
+index c3ac0a4..2ff942f 100644
+--- a/tests/py/any/meta.t
++++ b/tests/py/any/meta.t
+@@ -38,6 +38,7 @@ meta l4proto { 33, 55, 67, 88};ok;meta l4proto { 33, 55, 67, 88}
+ meta l4proto != { 33, 55, 67, 88};ok
+ meta l4proto { 33-55};ok
+ meta l4proto != { 33-55};ok
++meta l4proto ipv6-icmp icmpv6 type nd-router-advert;ok;icmpv6 type nd-router-advert
+ 
+ meta priority root;ok
+ meta priority none;ok
+diff --git a/tests/py/any/meta.t.payload b/tests/py/any/meta.t.payload
+index e432656..871f1ad 100644
+--- a/tests/py/any/meta.t.payload
++++ b/tests/py/any/meta.t.payload
+@@ -187,6 +187,13 @@ ip test-ip4 input
+   [ byteorder reg 1 = hton(reg 1, 2, 1) ]
+   [ lookup reg 1 set __set%d 0x1 ]
+ 
++# meta l4proto ipv6-icmp icmpv6 type nd-router-advert
++ip test-ip4 input
++  [ meta load l4proto => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000086 ]
++
+ # meta mark 0x4
+ ip test-ip4 input
+   [ meta load mark => reg 1 ]
+-- 
+2.11.0
+

@@ -1,0 +1,17 @@
+include sys/types.h for u_int32_t
+
+ui.c:340:5: error: unknown type name 'u_int32_t'; did you mean 'uint32_t'?
+     u_int32_t     addr;
+     ^~~~~~~~~
+Index: OpenIPMI-2.0.22/ui/ui.c
+===================================================================
+--- OpenIPMI-2.0.22.orig/ui/ui.c
++++ OpenIPMI-2.0.22/ui/ui.c
+@@ -42,6 +42,7 @@
+ #include <fcntl.h>
+ #include <time.h>
+ #include <sys/time.h>
++#include <sys/types.h>
+ #include <ctype.h>
+ 
+ #include <OpenIPMI/selector.h>

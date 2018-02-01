@@ -1,0 +1,31 @@
+From d42ece6fa15b98d7f9221b90b85b78631df2c0a0 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 14 Feb 2017 13:51:19 +0200
+Subject: [PATCH] When nice value cannot be reset, issue a notice instead of a
+ warning
+
+Otherwise build logs on the autobuilder get very clutter, as it
+doesn't allow the nice value to be reset for some reason.
+
+Upstream-Status: Inappropriate [oe specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ lib/rpmscript.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/rpmscript.c b/lib/rpmscript.c
+index 5e1e99906..3975aead8 100644
+--- a/lib/rpmscript.c
++++ b/lib/rpmscript.c
+@@ -347,7 +347,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+         int ret;
+         ret = setpriority(PRIO_PROCESS, 0, 0);
+         if (ret == -1) {
+-            rpmlog(RPMLOG_WARNING, _("Unable to reset nice value: %s"),
++            rpmlog(RPMLOG_NOTICE, _("Unable to reset nice value: %s\n"),
+                 strerror(errno));
+         }
+ 
+-- 
+2.11.0
+

@@ -19,3 +19,5 @@ S = "${WORKDIR}/${SRCNAME}"
 
 PACKAGES =+ "${PN}-examples"
 FILES_${PN}-examples = "${datadir}/libeflvala ${bindir}/*"
+
+PNBLACKLIST[libeflvala] ?= "Depends on blacklisted elementary - the recipe will be removed on 2017-09-01 unless the issue is fixed"

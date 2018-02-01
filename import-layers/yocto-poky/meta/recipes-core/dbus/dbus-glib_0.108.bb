@@ -1,0 +1,4 @@
+require dbus-glib.inc
+
+SRC_URI[md5sum] = "a66a613705870752ca9786e0359aea97"
+SRC_URI[sha256sum] = "9f340c7e2352e9cdf113893ca77ca9075d9f8d5e81476bf2bf361099383c602c"

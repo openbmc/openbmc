@@ -100,4 +100,4 @@ FILES_${PN}-dev += "${libdir}/gstreamer-0.10/*.la"
 FILES_${PN}-staticdev += "${libdir}/gstreamer-0.10/*.a"
 
 # http://errors.yoctoproject.org/Errors/Details/40736/
-PNBLACKLIST[gst-ffmpeg] ?= "Not compatible with currently used ffmpeg 3"
+PNBLACKLIST[gst-ffmpeg] ?= "Not compatible with currently used ffmpeg 3 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

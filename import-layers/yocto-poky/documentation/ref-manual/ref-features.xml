@@ -195,6 +195,10 @@
                 <listitem><para><emphasis>keyboard:</emphasis> Include keyboard
                     support (e.g. keymaps will be loaded during boot).
                     </para></listitem>
+                <listitem><para><emphasis>ldconfig:</emphasis>
+                    Include support for ldconfig and
+                    <filename>ld.so.conf</filename> on the target.
+                    </para></listitem>
                 <listitem><para><emphasis>nfs:</emphasis> Include NFS client
                     support (for mounting NFS exports on device).
                     </para></listitem>
@@ -297,6 +301,12 @@
                     Enables logging postinstall script runs to
                     the <filename>/var/log/postinstall.log</filename> file
                     on first boot of the image on the target system.
+                    <note>
+                        To make the <filename>/var/log</filename> directory
+                        on the target persistent, use the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-VOLATILE_LOG_DIR'><filename>VOLATILE_LOG_DIR</filename></ulink>
+                        variable by setting it to "no".
+                    </note>
                     </para></listitem>
                 <listitem><para><emphasis>ptest-pkgs:</emphasis>
                     Installs ptest packages for all ptest-enabled recipes.

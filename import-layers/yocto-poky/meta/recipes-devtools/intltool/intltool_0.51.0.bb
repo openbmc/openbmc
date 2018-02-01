@@ -22,6 +22,7 @@ inherit autotools pkgconfig perlnative
 
 export PERL = "${bindir}/env perl"
 PERL_class-native = "/usr/bin/env nativeperl"
+PERL_class-nativesdk = "/usr/bin/env perl"
 
 # gettext is assumed to exist on the host
 RDEPENDS_${PN}_class-native = "libxml-parser-perl-native"
@@ -33,4 +34,4 @@ FILES_${PN} += "${datadir}/aclocal"
 
 INSANE_SKIP_${PN} += "dev-deps"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

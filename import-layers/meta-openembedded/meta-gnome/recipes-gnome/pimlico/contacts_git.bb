@@ -16,4 +16,4 @@ SRC_URI =+ "git://git.gnome.org/${BPN} \
 
 S = "${WORKDIR}/git"
 
-
+PNBLACKLIST[contacts] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/132826/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

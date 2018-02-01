@@ -1,4 +1,7 @@
-Always use devmapper
+From c4f0dba4e86bfa20252fcc8218398e7468ca9149 Mon Sep 17 00:00:00 2001
+From: Aws Ismail <aws.ismail@windriver.com>
+Date: Mon, 22 Sep 2014 17:22:32 -0700
+Subject: [PATCH] Always use devmapper
 
 Do not try to compute several _API_ make variables
 from host information when cross-compiling.
@@ -7,38 +10,48 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
 Signed-off-by: Joe Slater <joe.slater@windriver.com>
+---
+ libmultipath/Makefile | 27 ++++-----------------------
+ 1 file changed, 4 insertions(+), 23 deletions(-)
 
 diff --git a/libmultipath/Makefile b/libmultipath/Makefile
-index e5b06b3..efd6cf6 100644
+index 495cebe..9626e69 100644
 --- a/libmultipath/Makefile
 +++ b/libmultipath/Makefile
-@@ -17,23 +17,18 @@ OBJS = memory.o parser.o vector.o devmapper.o \
-        log.o configure.o structs_vec.o sysfs.o prio.o checkers.o \
-        lock.o waiter.o file.o wwids.o
+@@ -20,29 +20,10 @@ ifdef SYSTEMD
+ 	endif
+ endif
  
 -LIBDM_API_FLUSH = $(shell grep -Ecs '^[a-z]*[[:space:]]+dm_task_no_flush' /usr/include/libdevmapper.h)
- 
+-
 -ifneq ($(strip $(LIBDM_API_FLUSH)),0)
-+#ifneq ($(strip $(LIBDM_API_FLUSH)),0)
- 	CFLAGS += -DLIBDM_API_FLUSH -D_GNU_SOURCE
+-	CFLAGS += -DLIBDM_API_FLUSH -D_GNU_SOURCE
 -endif
-+#endif
- 
+-
 -LIBDM_API_COOKIE = $(shell grep -Ecs '^[a-z]*[[:space:]]+dm_task_set_cookie' /usr/include/libdevmapper.h)
 -
 -ifneq ($(strip $(LIBDM_API_COOKIE)),0)
-+#ifneq ($(strip $(LIBDM_API_COOKIE)),0)
- 	CFLAGS += -DLIBDM_API_COOKIE
+-	CFLAGS += -DLIBDM_API_COOKIE
 -endif
 -
--LIBUDEV_API_RECVBUF = $(shell grep -Ecs '^[a-z]*[[:space:]]+udev_monitor_set_resolve_buffer_size' /usr/include/libudev.h)
-+#endif
- 
+-LIBUDEV_API_RECVBUF = $(shell grep -Ecs '^[a-z]*[[:space:]]+udev_monitor_set_receive_buffer_size' /usr/include/libudev.h)
+-
 -ifneq ($(strip $(LIBUDEV_API_RECVBUF)),0)
-+#ifneq ($(strip $(LIBUDEV_API_RECVBUF)),0)
- 	CFLAGS += -DLIBUDEV_API_RECVBUF
+-	CFLAGS += -DLIBUDEV_API_RECVBUF
 -endif
-+#endif
+-
+-LIBDM_API_DEFERRED = $(shell grep -Ecs '^[a-z]*[[:space:]]+dm_task_deferred_remove' /usr/include/libdevmapper.h)
+-
+-ifneq ($(strip $(LIBDM_API_DEFERRED)),0)
+-	CFLAGS += -DLIBDM_API_DEFERRED
+-endif
++CFLAGS += -DLIBDM_API_FLUSH -D_GNU_SOURCE
++CFLAGS += -DLIBDM_API_COOKIE
++CFLAGS += -DLIBUDEV_API_RECVBUF
++CFLAGS += -DLIBDM_API_DEFERRED
  
- 
- all: $(LIBS)
+ OBJS = memory.o parser.o vector.o devmapper.o callout.o \
+ 	hwtable.o blacklist.o util.o dmparser.o config.o \
+-- 
+2.11.0
+

@@ -1,0 +1,76 @@
+From 16df170ad4808d12acd5e919ac4f6e7f33a247b3 Mon Sep 17 00:00:00 2001
+From: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Date: Thu, 1 Sep 2016 10:57:42 +0900
+Subject: [PATCH 3/9] arm64: identify PHYS_OFFSET correctly
+
+Due to the kernel patch, commit e7cd190385d1 ("arm64: mark reserved
+memblock regions explicitly in iomem"), the current code will not be able
+to identify the correct value of PHYS_OFFSET if some "reserved" memory
+region, which is likely to be UEFI runtime services code/data, exists at
+an address below the first "System RAM" regions.
+
+This patch fixes this issue.
+
+Upstream-Status: Backport [https://git.linaro.org/people/takahiro.akashi/kexec-tools.git]
+
+Signed-off-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ kexec/arch/arm64/iomem.h       |  7 +++++++
+ kexec/arch/arm64/kexec-arm64.c | 12 ++++++++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
+ create mode 100644 kexec/arch/arm64/iomem.h
+
+diff --git a/kexec/arch/arm64/iomem.h b/kexec/arch/arm64/iomem.h
+new file mode 100644
+index 0000000..7fd66eb
+--- /dev/null
++++ b/kexec/arch/arm64/iomem.h
+@@ -0,0 +1,7 @@
++#ifndef IOMEM_H
++#define IOMEM_H
++
++#define SYSTEM_RAM		"System RAM\n"
++#define IOMEM_RESERVED		"reserved\n"
++
++#endif
+diff --git a/kexec/arch/arm64/kexec-arm64.c b/kexec/arch/arm64/kexec-arm64.c
+index 2e8839a..8ac811d 100644
+--- a/kexec/arch/arm64/kexec-arm64.c
++++ b/kexec/arch/arm64/kexec-arm64.c
+@@ -21,6 +21,7 @@
+ #include "crashdump-arm64.h"
+ #include "dt-ops.h"
+ #include "fs2dt.h"
++#include "iomem.h"
+ #include "kexec-syscall.h"
+ #include "arch/options.h"
+ 
+@@ -475,7 +476,14 @@ static int get_memory_ranges_iomem_cb(void *data, int nr, char *str,
+ 		return -1;
+ 
+ 	r = (struct memory_range *)data + nr;
+-	r->type = RANGE_RAM;
++
++	if (!strncmp(str, SYSTEM_RAM, strlen(SYSTEM_RAM)))
++		r->type = RANGE_RAM;
++	else if (!strncmp(str, IOMEM_RESERVED, strlen(IOMEM_RESERVED)))
++		r->type = RANGE_RESERVED;
++	else
++		return 1;
++
+ 	r->start = base;
+ 	r->end = base + length - 1;
+ 
+@@ -494,7 +502,7 @@ static int get_memory_ranges_iomem_cb(void *data, int nr, char *str,
+ static int get_memory_ranges_iomem(struct memory_range *array,
+ 	unsigned int *count)
+ {
+-	*count = kexec_iomem_for_each_line("System RAM\n",
++	*count = kexec_iomem_for_each_line(NULL,
+ 		get_memory_ranges_iomem_cb, array);
+ 
+ 	if (!*count) {
+-- 
+1.9.1
+

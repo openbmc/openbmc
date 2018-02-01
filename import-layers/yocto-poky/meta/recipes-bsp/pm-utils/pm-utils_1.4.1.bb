@@ -13,7 +13,9 @@ SRC_URI = "http://pm-utils.freedesktop.org/releases/pm-utils-${PV}.tar.gz"
 SRC_URI[md5sum] = "1742a556089c36c3a89eb1b957da5a60"
 SRC_URI[sha256sum] = "8ed899032866d88b2933a1d34cc75e8ae42dcde20e1cc21836baaae3d4370c0b"
 
-inherit pkgconfig autotools
+inherit pkgconfig autotools manpages
+
+PACKAGECONFIG[manpages] = "--enable-doc, --disable-doc, libxslt-native xmlto-native"
 
 RDEPENDS_${PN} = "grep bash"
 

@@ -1,0 +1,59 @@
+From 6cf42c468e93b0aaa171961e059bc3e2fb915889 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Fri, 28 Apr 2017 14:35:19 +0300
+Subject: [PATCH] gtk-play: Disable visualizations
+
+This is a workaround for [YOCTO #11410] (audio playback is broken in
+mediaplayer if vaapi is used). It disables visualizations and makes
+sure we clear the window (otherwise nothing does that and result is
+very ugly).
+
+This patch should be removed when 11410 is fixed.
+
+Upstream-Status: Inappropriate [bug workaround]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ gtk/gtk-play.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/gtk/gtk-play.c b/gtk/gtk-play.c
+index 8ae0fea..63b9bb0 100644
+--- a/gtk/gtk-play.c
++++ b/gtk/gtk-play.c
+@@ -1401,6 +1401,15 @@ get_child_position (GtkOverlay * overlay, GtkWidget * widget,
+   return TRUE;
+ }
+ 
++/* Hack to make sure something gets drawn if visualizations are disabled */
++static gboolean
++draw_cb (GtkWidget *widget, cairo_t *cr, gpointer data)
++{
++  cairo_set_source_rgb (cr, 0, 0, 0);
++  cairo_paint (cr);
++  return FALSE;
++}
++
+ static void
+ create_ui (GtkPlay * play)
+ {
+@@ -1431,6 +1440,8 @@ create_ui (GtkPlay * play)
+     play->video_area = gtk_drawing_area_new ();
+     g_signal_connect (play->video_area, "realize",
+         G_CALLBACK (video_area_realize_cb), play);
++    g_signal_connect (play->video_area, "draw",
++        G_CALLBACK (draw_cb), NULL);
+   }
+   gtk_widget_set_events (play->video_area, GDK_EXPOSURE_MASK
+       | GDK_LEAVE_NOTIFY_MASK
+@@ -1753,7 +1764,7 @@ gtk_play_constructor (GType type, guint n_construct_params,
+ 
+   /* enable visualization (by default playbin uses goom) */
+   /* if visualization is enabled then use the first element */
+-  gst_player_set_visualization_enabled (self->player, TRUE);
++  gst_player_set_visualization_enabled (self->player, FALSE);
+ 
+   g_signal_connect (G_OBJECT (self), "show", G_CALLBACK (show_cb), NULL);
+ 
+-- 
+2.1.4
+

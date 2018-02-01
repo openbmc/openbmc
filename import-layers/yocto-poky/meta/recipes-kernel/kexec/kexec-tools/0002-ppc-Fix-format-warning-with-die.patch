@@ -1,0 +1,43 @@
+From 1c956fc8c6b6324d8d38bba5f9e60a018051c6f5 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 16 Mar 2017 15:39:06 +0200
+Subject: [PATCH 2/2] ppc: Fix format warning with die()
+
+Enable compiling kexec-tools for ppc with -Werror=format-security.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Submitted [Mailing list]
+---
+ kexec/arch/ppc/kexec-elf-ppc.c    | 2 +-
+ kexec/arch/ppc/kexec-uImage-ppc.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kexec/arch/ppc/kexec-elf-ppc.c b/kexec/arch/ppc/kexec-elf-ppc.c
+index 291f06d..ad43ad1 100644
+--- a/kexec/arch/ppc/kexec-elf-ppc.c
++++ b/kexec/arch/ppc/kexec-elf-ppc.c
+@@ -453,7 +453,7 @@ out:
+ 	if (!tmp_cmdline)
+ 		free(command_line);
+ 	if (error_msg)
+-		die(error_msg);
++		die("%s", error_msg);
+ 
+ 	return result;
+ }
+diff --git a/kexec/arch/ppc/kexec-uImage-ppc.c b/kexec/arch/ppc/kexec-uImage-ppc.c
+index 5eec6e4..e8f7adc 100644
+--- a/kexec/arch/ppc/kexec-uImage-ppc.c
++++ b/kexec/arch/ppc/kexec-uImage-ppc.c
+@@ -306,7 +306,7 @@ out:
+ 	if (!tmp_cmdline)
+ 		free(command_line);
+ 	if (error_msg)
+-		die(error_msg);
++		die("%s", error_msg);
+ 	return ret;
+ }
+ 
+-- 
+2.11.0
+

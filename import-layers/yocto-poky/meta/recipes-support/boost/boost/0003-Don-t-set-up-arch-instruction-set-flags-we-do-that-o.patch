@@ -1,0 +1,143 @@
+From 7c49525812567f1219706c4ed330b3bd2cc8e94a Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Tue, 13 Dec 2016 10:29:32 -0700
+Subject: [PATCH 3/3] Don't set up arch/instruction-set flags, we do that
+ ourselves
+
+Upstream-Status: Inappropriate
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+---
+ tools/build/src/tools/gcc.jam | 121 ------------------------------------------
+ 1 file changed, 121 deletions(-)
+
+diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
+index 942f141..d062c20 100644
+--- a/tools/build/src/tools/gcc.jam
++++ b/tools/build/src/tools/gcc.jam
+@@ -1068,124 +1068,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :
+         <architecture>$(architecture)/<instruction-set>$(instruction-set)
+         : $(values) ;
+ }
+-
+-
+-# Set architecture/instruction-set options.
+-#
+-# x86 and compatible
+-# The 'native' option appeared in gcc 4.2 so we cannot safely use it as default.
+-# Use i686 instead for 32-bit.
+-toolset.flags gcc OPTIONS <architecture>x86/<address-model>32/<instruction-set> : -march=i686 ;
+-cpu-flags gcc OPTIONS : x86 : native : -march=native ;
+-cpu-flags gcc OPTIONS : x86 : i486 : -march=i486 ;
+-cpu-flags gcc OPTIONS : x86 : i586 : -march=i586 ;
+-cpu-flags gcc OPTIONS : x86 : i686 : -march=i686 ;
+-cpu-flags gcc OPTIONS : x86 : pentium : -march=pentium ;
+-cpu-flags gcc OPTIONS : x86 : pentium-mmx : -march=pentium-mmx ;
+-cpu-flags gcc OPTIONS : x86 : pentiumpro : -march=pentiumpro ;
+-cpu-flags gcc OPTIONS : x86 : pentium2 : -march=pentium2 ;
+-cpu-flags gcc OPTIONS : x86 : pentium3 : -march=pentium3 ;
+-cpu-flags gcc OPTIONS : x86 : pentium3m : -march=pentium3m ;
+-cpu-flags gcc OPTIONS : x86 : pentium-m : -march=pentium-m ;
+-cpu-flags gcc OPTIONS : x86 : pentium4 : -march=pentium4 ;
+-cpu-flags gcc OPTIONS : x86 : pentium4m : -march=pentium4m ;
+-cpu-flags gcc OPTIONS : x86 : prescott : -march=prescott ;
+-cpu-flags gcc OPTIONS : x86 : nocona : -march=nocona ;
+-cpu-flags gcc OPTIONS : x86 : core2 : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : conroe : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : conroe-xe : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : conroe-l : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : allendale : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : wolfdale : -march=core2 -msse4.1 ;
+-cpu-flags gcc OPTIONS : x86 : merom : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : merom-xe : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : kentsfield : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : kentsfield-xe : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : yorksfield : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : penryn : -march=core2 ;
+-cpu-flags gcc OPTIONS : x86 : corei7 : -march=corei7 ;
+-cpu-flags gcc OPTIONS : x86 : nehalem : -march=corei7 ;
+-cpu-flags gcc OPTIONS : x86 : corei7-avx : -march=corei7-avx ;
+-cpu-flags gcc OPTIONS : x86 : sandy-bridge : -march=corei7-avx ;
+-cpu-flags gcc OPTIONS : x86 : core-avx-i : -march=core-avx-i ;
+-cpu-flags gcc OPTIONS : x86 : ivy-bridge : -march=core-avx-i ;
+-cpu-flags gcc OPTIONS : x86 : haswell : -march=core-avx-i -mavx2 -mfma -mbmi -mbmi2 -mlzcnt ;
+-cpu-flags gcc OPTIONS : x86 : k6 : -march=k6 ;
+-cpu-flags gcc OPTIONS : x86 : k6-2 : -march=k6-2 ;
+-cpu-flags gcc OPTIONS : x86 : k6-3 : -march=k6-3 ;
+-cpu-flags gcc OPTIONS : x86 : athlon : -march=athlon ;
+-cpu-flags gcc OPTIONS : x86 : athlon-tbird : -march=athlon-tbird ;
+-cpu-flags gcc OPTIONS : x86 : athlon-4 : -march=athlon-4 ;
+-cpu-flags gcc OPTIONS : x86 : athlon-xp : -march=athlon-xp ;
+-cpu-flags gcc OPTIONS : x86 : athlon-mp : -march=athlon-mp ;
+-##
+-cpu-flags gcc OPTIONS : x86 : k8 : -march=k8 ;
+-cpu-flags gcc OPTIONS : x86 : opteron : -march=opteron ;
+-cpu-flags gcc OPTIONS : x86 : athlon64 : -march=athlon64 ;
+-cpu-flags gcc OPTIONS : x86 : athlon-fx : -march=athlon-fx ;
+-cpu-flags gcc OPTIONS : x86 : k8-sse3 : -march=k8-sse3 ;
+-cpu-flags gcc OPTIONS : x86 : opteron-sse3 : -march=opteron-sse3 ;
+-cpu-flags gcc OPTIONS : x86 : athlon64-sse3 : -march=athlon64-sse3 ;
+-cpu-flags gcc OPTIONS : x86 : amdfam10 : -march=amdfam10 ;
+-cpu-flags gcc OPTIONS : x86 : barcelona : -march=barcelona ;
+-cpu-flags gcc OPTIONS : x86 : bdver1 : -march=bdver1 ;
+-cpu-flags gcc OPTIONS : x86 : bdver2 : -march=bdver2 ;
+-cpu-flags gcc OPTIONS : x86 : bdver3 : -march=bdver3 ;
+-cpu-flags gcc OPTIONS : x86 : btver1 : -march=btver1 ;
+-cpu-flags gcc OPTIONS : x86 : btver2 : -march=btver2 ;
+-cpu-flags gcc OPTIONS : x86 : winchip-c6 : -march=winchip-c6 ;
+-cpu-flags gcc OPTIONS : x86 : winchip2 : -march=winchip2 ;
+-cpu-flags gcc OPTIONS : x86 : c3 : -march=c3 ;
+-cpu-flags gcc OPTIONS : x86 : c3-2 : -march=c3-2 ;
+-##
+-cpu-flags gcc OPTIONS : x86 : atom : -march=atom ;
+-# Sparc
+-cpu-flags gcc OPTIONS : sparc : v7 : -mcpu=v7 : default ;
+-cpu-flags gcc OPTIONS : sparc : cypress : -mcpu=cypress ;
+-cpu-flags gcc OPTIONS : sparc : v8 : -mcpu=v8 ;
+-cpu-flags gcc OPTIONS : sparc : supersparc : -mcpu=supersparc ;
+-cpu-flags gcc OPTIONS : sparc : sparclite : -mcpu=sparclite ;
+-cpu-flags gcc OPTIONS : sparc : hypersparc : -mcpu=hypersparc ;
+-cpu-flags gcc OPTIONS : sparc : sparclite86x : -mcpu=sparclite86x ;
+-cpu-flags gcc OPTIONS : sparc : f930 : -mcpu=f930 ;
+-cpu-flags gcc OPTIONS : sparc : f934 : -mcpu=f934 ;
+-cpu-flags gcc OPTIONS : sparc : sparclet : -mcpu=sparclet ;
+-cpu-flags gcc OPTIONS : sparc : tsc701 : -mcpu=tsc701 ;
+-cpu-flags gcc OPTIONS : sparc : v9 : -mcpu=v9 ;
+-cpu-flags gcc OPTIONS : sparc : ultrasparc : -mcpu=ultrasparc ;
+-cpu-flags gcc OPTIONS : sparc : ultrasparc3 : -mcpu=ultrasparc3 ;
+-# RS/6000 & PowerPC
+-cpu-flags gcc OPTIONS : power : 403 : -mcpu=403 ;
+-cpu-flags gcc OPTIONS : power : 505 : -mcpu=505 ;
+-cpu-flags gcc OPTIONS : power : 601 : -mcpu=601 ;
+-cpu-flags gcc OPTIONS : power : 602 : -mcpu=602 ;
+-cpu-flags gcc OPTIONS : power : 603 : -mcpu=603 ;
+-cpu-flags gcc OPTIONS : power : 603e : -mcpu=603e ;
+-cpu-flags gcc OPTIONS : power : 604 : -mcpu=604 ;
+-cpu-flags gcc OPTIONS : power : 604e : -mcpu=604e ;
+-cpu-flags gcc OPTIONS : power : 620 : -mcpu=620 ;
+-cpu-flags gcc OPTIONS : power : 630 : -mcpu=630 ;
+-cpu-flags gcc OPTIONS : power : 740 : -mcpu=740 ;
+-cpu-flags gcc OPTIONS : power : 7400 : -mcpu=7400 ;
+-cpu-flags gcc OPTIONS : power : 7450 : -mcpu=7450 ;
+-cpu-flags gcc OPTIONS : power : 750 : -mcpu=750 ;
+-cpu-flags gcc OPTIONS : power : 801 : -mcpu=801 ;
+-cpu-flags gcc OPTIONS : power : 821 : -mcpu=821 ;
+-cpu-flags gcc OPTIONS : power : 823 : -mcpu=823 ;
+-cpu-flags gcc OPTIONS : power : 860 : -mcpu=860 ;
+-cpu-flags gcc OPTIONS : power : 970 : -mcpu=970 ;
+-cpu-flags gcc OPTIONS : power : 8540 : -mcpu=8540 ;
+-cpu-flags gcc OPTIONS : power : power : -mcpu=power ;
+-cpu-flags gcc OPTIONS : power : power2 : -mcpu=power2 ;
+-cpu-flags gcc OPTIONS : power : power3 : -mcpu=power3 ;
+-cpu-flags gcc OPTIONS : power : power4 : -mcpu=power4 ;
+-cpu-flags gcc OPTIONS : power : power5 : -mcpu=power5 ;
+-cpu-flags gcc OPTIONS : power : powerpc : -mcpu=powerpc ;
+-cpu-flags gcc OPTIONS : power : powerpc64 : -mcpu=powerpc64 ;
+-cpu-flags gcc OPTIONS : power : rios : -mcpu=rios ;
+-cpu-flags gcc OPTIONS : power : rios1 : -mcpu=rios1 ;
+-cpu-flags gcc OPTIONS : power : rios2 : -mcpu=rios2 ;
+-cpu-flags gcc OPTIONS : power : rsc : -mcpu=rsc ;
+-cpu-flags gcc OPTIONS : power : rs64a : -mcpu=rs64 ;
+-# AIX variant of RS/6000 & PowerPC
+-toolset.flags gcc AROPTIONS <address-model>64/<target-os>aix : "-X64" ;
+-- 
+2.8.0

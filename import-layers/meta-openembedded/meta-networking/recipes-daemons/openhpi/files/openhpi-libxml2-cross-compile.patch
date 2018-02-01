@@ -1,0 +1,21 @@
+Fix libxml2 for cross-compiling
+
+Use proper XML2_INCLUDE path when cross-compiling
+
+Upstream-Status: Pending
+
+Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/configure.ac b/configure.ac
+index 30a792c..b5f5aad 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -175,7 +175,7 @@ AC_CHECK_HEADERS([openssl/md2.h openssl/md5.h openssl/bio.h openssl/ssl.h openss
+ 
+ dnl xml is used for XML-based communication in ilo2_ribcl and oa_soap
+ AC_CHECK_LIB([xml2],[xmlParseMemory],[XML2_LIB=-lxml2],[XML2_LIB=])
+-AC_CHECK_HEADERS([libxml2/libxml/xmlexports.h],[XML2_INCLUDE="-I/usr/include/libxml2"],[XML2_INCLUDE])
++AC_CHECK_HEADERS([libxml2/libxml/xmlexports.h],[XML2_INCLUDE="$XML2_INCLUDE"],[XML2_INCLUDE])
+ AC_SUBST(XML2_LIB)
+ AC_SUBST(XML2_INCLUDE)
+ 

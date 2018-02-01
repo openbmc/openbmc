@@ -1,0 +1,224 @@
+Taken from 
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=755956
+
+--- ./src/expr_ops.h	2014-06-24 17:07:05.574784704 +0400
++++ ../libnftnl-1.0.2-my/./src/expr_ops.h	2014-07-25 00:19:28.367694613 +0400
+@@ -28,7 +28,7 @@
+ 	const void *(*get)(const struct nft_rule_expr *e, uint16_t type, uint32_t *data_len);
+ 	int 	(*parse)(struct nft_rule_expr *e, struct nlattr *attr);
+ 	void	(*build)(struct nlmsghdr *nlh, struct nft_rule_expr *e);
+-	int	(*snprintf)(char *buf, size_t len, uint32_t type, uint32_t flags, struct nft_rule_expr *e);
++    int	(*snprintf_)(char *buf, size_t len, uint32_t type, uint32_t flags, struct nft_rule_expr *e);
+ 	int	(*xml_parse)(struct nft_rule_expr *e, mxml_node_t *tree,
+ 			     struct nft_parse_err *err);
+ 	int	(*json_parse)(struct nft_rule_expr *e, json_t *data,
+--- ./src/rule.c	2014-06-24 17:07:05.574784704 +0400
++++ ../libnftnl-1.0.2-my/./src/rule.c	2014-07-25 00:19:28.355694880 +0400
+@@ -813,7 +813,7 @@
+ 			       "{\"type\":\"%s\",", expr->ops->name);
+ 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+ 
+-		ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
++        ret = expr->ops->snprintf_(buf+offset, len, type, flags, expr);
+ 		SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+ 
+ 		/*
+--- ./src/expr.c	2014-06-24 17:07:05.574784704 +0400
++++ ../libnftnl-1.0.2-my/./src/expr.c	2014-07-25 00:19:27.367716863 +0400
+@@ -227,7 +227,7 @@
+ 	int ret;
+ 	unsigned int offset = 0, len = size;
+ 
+-	ret = expr->ops->snprintf(buf+offset, len, type, flags, expr);
++	ret = expr->ops->snprintf_(buf+offset, len, type, flags, expr);
+ 	SNPRINTF_BUFFER_SIZE(ret, size, len, offset);
+ 
+ 	return offset;
+--- ./src/expr/exthdr.c	2014-06-25 18:34:08.174284719 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/exthdr.c	2014-07-25 00:21:48.192583628 +0400
+@@ -362,7 +362,7 @@
+ 	.get		= nft_rule_expr_exthdr_get,
+ 	.parse		= nft_rule_expr_exthdr_parse,
+ 	.build		= nft_rule_expr_exthdr_build,
+-	.snprintf	= nft_rule_expr_exthdr_snprintf,
++	.snprintf_	= nft_rule_expr_exthdr_snprintf,
+ 	.xml_parse	= nft_rule_expr_exthdr_xml_parse,
+ 	.json_parse	= nft_rule_expr_exthdr_json_parse,
+ };
+--- ./src/expr/log.c	2014-06-25 18:34:08.178284810 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/log.c	2014-07-25 00:21:48.160584340 +0400
+@@ -332,7 +332,7 @@
+ 	.get		= nft_rule_expr_log_get,
+ 	.parse		= nft_rule_expr_log_parse,
+ 	.build		= nft_rule_expr_log_build,
+-	.snprintf	= nft_rule_expr_log_snprintf,
++	.snprintf_	= nft_rule_expr_log_snprintf,
+ 	.xml_parse	= nft_rule_expr_log_xml_parse,
+ 	.json_parse	= nft_rule_expr_log_json_parse,
+ };
+--- ./src/expr/limit.c	2014-06-25 18:34:08.178284810 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/limit.c	2014-07-25 00:21:48.108585496 +0400
+@@ -250,7 +250,7 @@
+ 	.get		= nft_rule_expr_limit_get,
+ 	.parse		= nft_rule_expr_limit_parse,
+ 	.build		= nft_rule_expr_limit_build,
+-	.snprintf	= nft_rule_expr_limit_snprintf,
++	.snprintf_	= nft_rule_expr_limit_snprintf,
+ 	.xml_parse	= nft_rule_expr_limit_xml_parse,
+ 	.json_parse	= nft_rule_expr_limit_json_parse,
+ };
+--- ./src/expr/cmp.c	2014-06-25 18:34:08.174284719 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/cmp.c	2014-07-25 00:21:48.172584073 +0400
+@@ -331,7 +331,7 @@
+ 	.get		= nft_rule_expr_cmp_get,
+ 	.parse		= nft_rule_expr_cmp_parse,
+ 	.build		= nft_rule_expr_cmp_build,
+-	.snprintf	= nft_rule_expr_cmp_snprintf,
++	.snprintf_	= nft_rule_expr_cmp_snprintf,
+ 	.xml_parse	= nft_rule_expr_cmp_xml_parse,
+ 	.json_parse	= nft_rule_expr_cmp_json_parse,
+ };
+--- ./src/expr/target.c	2014-06-25 18:34:08.182284901 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/target.c	2014-07-25 00:21:48.184583806 +0400
+@@ -274,7 +274,7 @@
+ 	.get		= nft_rule_expr_target_get,
+ 	.parse		= nft_rule_expr_target_parse,
+ 	.build		= nft_rule_expr_target_build,
+-	.snprintf	= nft_rule_expr_target_snprintf,
++	.snprintf_	= nft_rule_expr_target_snprintf,
+ 	.xml_parse	= nft_rule_expr_target_xml_parse,
+ 	.json_parse	= nft_rule_expr_target_json_parse,
+ };
+--- ./src/expr/byteorder.c	2014-06-25 18:34:08.158284356 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/byteorder.c	2014-07-25 00:21:48.148584607 +0400
+@@ -384,7 +384,7 @@
+ 	.get		= nft_rule_expr_byteorder_get,
+ 	.parse		= nft_rule_expr_byteorder_parse,
+ 	.build		= nft_rule_expr_byteorder_build,
+-	.snprintf	= nft_rule_expr_byteorder_snprintf,
++	.snprintf_	= nft_rule_expr_byteorder_snprintf,
+ 	.xml_parse	= nft_rule_expr_byteorder_xml_parse,
+ 	.json_parse	= nft_rule_expr_byteorder_json_parse,
+ };
+--- ./src/expr/lookup.c	2014-06-25 18:34:08.178284810 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/lookup.c	2014-07-25 00:21:48.136584874 +0400
+@@ -305,7 +305,7 @@
+ 	.get		= nft_rule_expr_lookup_get,
+ 	.parse		= nft_rule_expr_lookup_parse,
+ 	.build		= nft_rule_expr_lookup_build,
+-	.snprintf	= nft_rule_expr_lookup_snprintf,
++	.snprintf_	= nft_rule_expr_lookup_snprintf,
+ 	.xml_parse	= nft_rule_expr_lookup_xml_parse,
+ 	.json_parse	= nft_rule_expr_lookup_json_parse,
+ };
+--- ./src/expr/immediate.c	2014-06-25 18:34:08.178284810 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/immediate.c	2014-07-25 00:21:48.124585141 +0400
+@@ -365,7 +365,7 @@
+ 	.get		= nft_rule_expr_immediate_get,
+ 	.parse		= nft_rule_expr_immediate_parse,
+ 	.build		= nft_rule_expr_immediate_build,
+-	.snprintf	= nft_rule_expr_immediate_snprintf,
++	.snprintf_	= nft_rule_expr_immediate_snprintf,
+ 	.xml_parse	= nft_rule_expr_immediate_xml_parse,
+ 	.json_parse	= nft_rule_expr_immediate_json_parse,
+ };
+--- ./src/expr/meta.c	2014-06-25 18:34:08.178284810 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/meta.c	2014-07-25 00:21:48.040587008 +0400
+@@ -340,7 +340,7 @@
+ 	.get		= nft_rule_expr_meta_get,
+ 	.parse		= nft_rule_expr_meta_parse,
+ 	.build		= nft_rule_expr_meta_build,
+-	.snprintf	= nft_rule_expr_meta_snprintf,
++	.snprintf_	= nft_rule_expr_meta_snprintf,
+ 	.xml_parse 	= nft_rule_expr_meta_xml_parse,
+ 	.json_parse 	= nft_rule_expr_meta_json_parse,
+ };
+--- ./src/expr/queue.c	2014-06-25 18:34:08.182284901 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/queue.c	2014-07-25 00:21:48.208583272 +0400
+@@ -294,7 +294,7 @@
+ 	.get		= nft_rule_expr_queue_get,
+ 	.parse		= nft_rule_expr_queue_parse,
+ 	.build		= nft_rule_expr_queue_build,
+-	.snprintf	= nft_rule_expr_queue_snprintf,
++	.snprintf_	= nft_rule_expr_queue_snprintf,
+ 	.xml_parse	= nft_rule_expr_queue_xml_parse,
+ 	.json_parse	= nft_rule_expr_queue_json_parse,
+ };
+--- ./src/expr/nat.c	2014-06-25 18:34:08.182284901 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/nat.c	2014-07-25 00:21:48.084586030 +0400
+@@ -430,7 +430,7 @@
+ 	.get		= nft_rule_expr_nat_get,
+ 	.parse		= nft_rule_expr_nat_parse,
+ 	.build		= nft_rule_expr_nat_build,
+-	.snprintf	= nft_rule_expr_nat_snprintf,
++	.snprintf_	= nft_rule_expr_nat_snprintf,
+ 	.xml_parse	= nft_rule_expr_nat_xml_parse,
+ 	.json_parse	= nft_rule_expr_nat_json_parse,
+ };
+--- ./src/expr/payload.c	2014-06-25 18:34:08.182284901 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/payload.c	2014-07-25 00:21:48.200583450 +0400
+@@ -337,7 +337,7 @@
+ 	.get		= nft_rule_expr_payload_get,
+ 	.parse		= nft_rule_expr_payload_parse,
+ 	.build		= nft_rule_expr_payload_build,
+-	.snprintf	= nft_rule_expr_payload_snprintf,
++	.snprintf_	= nft_rule_expr_payload_snprintf,
+ 	.xml_parse	= nft_rule_expr_payload_xml_parse,
+ 	.json_parse	= nft_rule_expr_payload_json_parse,
+ };
+--- ./src/expr/reject.c	2014-06-25 18:34:08.182284901 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/reject.c	2014-07-25 00:21:48.096585762 +0400
+@@ -242,7 +242,7 @@
+ 	.get		= nft_rule_expr_reject_get,
+ 	.parse		= nft_rule_expr_reject_parse,
+ 	.build		= nft_rule_expr_reject_build,
+-	.snprintf	= nft_rule_expr_reject_snprintf,
++	.snprintf_	= nft_rule_expr_reject_snprintf,
+ 	.xml_parse	= nft_rule_expr_reject_xml_parse,
+ 	.json_parse	= nft_rule_expr_reject_json_parse,
+ };
+--- ./src/expr/counter.c	2014-06-25 18:34:08.174284719 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/counter.c	2014-07-25 00:21:48.056586652 +0400
+@@ -236,7 +236,7 @@
+ 	.get		= nft_rule_expr_counter_get,
+ 	.parse		= nft_rule_expr_counter_parse,
+ 	.build		= nft_rule_expr_counter_build,
+-	.snprintf	= nft_rule_expr_counter_snprintf,
++	.snprintf_	= nft_rule_expr_counter_snprintf,
+ 	.xml_parse	= nft_rule_expr_counter_xml_parse,
+ 	.json_parse	= nft_rule_expr_counter_json_parse,
+ };
+--- ./src/expr/ct.c	2014-06-25 18:34:08.174284719 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/ct.c	2014-07-25 00:21:48.068586385 +0400
+@@ -428,7 +428,7 @@
+ 	.get		= nft_rule_expr_ct_get,
+ 	.parse		= nft_rule_expr_ct_parse,
+ 	.build		= nft_rule_expr_ct_build,
+-	.snprintf	= nft_rule_expr_ct_snprintf,
++	.snprintf_	= nft_rule_expr_ct_snprintf,
+ 	.xml_parse	= nft_rule_expr_ct_xml_parse,
+ 	.json_parse	= nft_rule_expr_ct_json_parse,
+ };
+--- ./src/expr/bitwise.c	2014-06-25 18:34:08.158284356 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/bitwise.c	2014-07-25 00:21:49.272559599 +0400
+@@ -403,7 +403,7 @@
+ 	.get		= nft_rule_expr_bitwise_get,
+ 	.parse		= nft_rule_expr_bitwise_parse,
+ 	.build		= nft_rule_expr_bitwise_build,
+-	.snprintf	= nft_rule_expr_bitwise_snprintf,
++    .snprintf_	= nft_rule_expr_bitwise_snprintf,
+ 	.xml_parse	= nft_rule_expr_bitwise_xml_parse,
+ 	.json_parse	= nft_rule_expr_bitwise_json_parse,
+ };
+--- ./src/expr/match.c	2014-06-25 18:34:08.178284810 +0400
++++ ../libnftnl-1.0.2-my/./src/expr/match.c	2014-07-25 00:21:48.032587186 +0400
+@@ -273,7 +273,7 @@
+ 	.get		= nft_rule_expr_match_get,
+ 	.parse		= nft_rule_expr_match_parse,
+ 	.build		= nft_rule_expr_match_build,
+-	.snprintf	= nft_rule_expr_match_snprintf,
++	.snprintf_	= nft_rule_expr_match_snprintf,
+ 	.xml_parse 	= nft_rule_expr_match_xml_parse,
+ 	.json_parse 	= nft_rule_expr_match_json_parse,
+ };
+

@@ -22,7 +22,6 @@ BitBake 'Fetch' git annex implementation
 
 import os
 import bb
-from   bb import data
 from   bb.fetch2.git import Git
 from   bb.fetch2 import runfetchcmd
 from   bb.fetch2 import logger

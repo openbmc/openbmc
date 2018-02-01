@@ -21,7 +21,7 @@ inherit native
 # into the sysroot, as we may use them to construct the rootfs. As such, we
 # only adjust the paths to match the metadata for the target, not native.
 obey_variables () {
-	sed -i 's,ALTERNATIVES_ROOT,OPKG_OFFLINE_ROOT,' alternatives.c
+	sed -i 's,ALTERNATIVES_ROOT,OPKG_OFFLINE_ROOT,' ${S}/alternatives.c
 }
 
 do_compile () {

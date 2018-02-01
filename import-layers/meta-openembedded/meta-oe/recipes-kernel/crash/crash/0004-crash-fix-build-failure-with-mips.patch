@@ -1,0 +1,87 @@
+From 423ebdce07aa9f398f32c0adf659353069d023c6 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 4 May 2017 07:14:13 +0000
+Subject: [PATCH] crash: fix build failure with mips
+
+When build crash with mips:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mips-linux-nat.c:157:1: error: conflicting types for 'ps_get_thread_area'
+ ps_get_thread_area (const struct ps_prochandle *ph,
+ ^~~~~~~~~~~~~~~~~~
+In file included from gdb_proc_service.h:26:0,
+                 from mips-linux-nat.c:32:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This problem have been fixed on intel and arm plantform, we can use the
+similar approch to fix it on mips.
+
+Upstream-status: Submitted [https://github.com/crash-utility/crash/pull/11]
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ Makefile                                |  1 +
+ crash-fix-build-failure-with-mips.patch | 39 +++++++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
+ create mode 100644 crash-fix-build-failure-with-mips.patch
+
+diff --git a/Makefile b/Makefile
+index 5496523..2ec3325 100644
+--- a/Makefile
++++ b/Makefile
+@@ -268,6 +268,7 @@ gdb_patch:
+ 		grep 'extern ps_err_e ps_get_thread_area (struct' ${RECIPE_SYSROOT}/usr/include/proc_service.h; \
+ 		if [ $$? -eq 0 ]; then \
+ 			patch -p0 < ${GDB}-proc_service.h.patch; \
++			patch -p1 < crash-fix-build-failure-with-mips.patch; \
+ 		fi; \
+ 	fi
+ 
+diff --git a/crash-fix-build-failure-with-mips.patch b/crash-fix-build-failure-with-mips.patch
+new file mode 100644
+index 0000000..0c70c5f
+--- /dev/null
++++ b/crash-fix-build-failure-with-mips.patch
+@@ -0,0 +1,39 @@
++From 615c802d9c73fad48723b6567042cd54f6795849 Mon Sep 17 00:00:00 2001
++From: Dengke Du <dengke.du@windriver.com>
++Date: Thu, 4 May 2017 06:14:47 +0000
++Subject: [PATCH] crash: fix build failure with mips
++
++When build crash with mips:
++
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++mips-linux-nat.c:157:1: error: conflicting types for 'ps_get_thread_area'
++ ps_get_thread_area (const struct ps_prochandle *ph,
++ ^~~~~~~~~~~~~~~~~~
++In file included from gdb_proc_service.h:26:0,
++                 from mips-linux-nat.c:32:
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++This problem have been fixed on intel and arm plantform, we can use the
++similar approch to fix it on mips.
++
++Signed-off-by: Dengke Du <dengke.du@windriver.com>
++---
++ gdb-7.6/gdb/mips-linux-nat.c | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/gdb-7.6/gdb/mips-linux-nat.c b/gdb-7.6/gdb/mips-linux-nat.c
++index 61e83c6..d517e37 100644
++--- a/gdb-7.6/gdb/mips-linux-nat.c
+++++ b/gdb-7.6/gdb/mips-linux-nat.c
++@@ -154,7 +154,7 @@ mips64_linux_register_addr (struct gdbarch *gdbarch, int regno, int store)
++ /* Fetch the thread-local storage pointer for libthread_db.  */
++ 
++ ps_err_e
++-ps_get_thread_area (const struct ps_prochandle *ph,
+++ps_get_thread_area (struct ps_prochandle *ph,
++                     lwpid_t lwpid, int idx, void **base)
++ {
++   if (ptrace (PTRACE_GET_THREAD_AREA, lwpid, NULL, base) != 0)
++-- 
++2.11.0
++
+-- 
+2.11.0
+

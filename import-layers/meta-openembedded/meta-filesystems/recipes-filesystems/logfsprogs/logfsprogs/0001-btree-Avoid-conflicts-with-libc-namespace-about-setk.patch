@@ -1,0 +1,135 @@
+From 5a8e26157d9642f022587cc1ca7525213c7a5379 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jul 2017 18:41:53 -0700
+Subject: [PATCH] btree: Avoid conflicts with libc namespace about setkey()
+
+This issue is highlighted with musl mainly because the
+function signature from stdlib.h does not match the local
+static function
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ btree.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/btree.c b/btree.c
+index eddc33b..dd3fef9 100644
+--- a/btree.c
++++ b/btree.c
+@@ -123,7 +123,7 @@ static unsigned long bval(struct btree_geo *geo, unsigned long *node, int n)
+ 	return node[geo->no_pairs * geo->keylen + n];
+ }
+ 
+-static void setkey(struct btree_geo *geo, unsigned long *node,
++static void _setkey(struct btree_geo *geo, unsigned long *node,
+ 		unsigned long *key, int n)
+ {
+ 	longcpy(bkey(geo, node, n), key, geo->keylen);
+@@ -292,7 +292,7 @@ static unsigned long *find_level(struct btree_head *head, struct btree_geo *geo,
+ 			/* FIXME: If the right-most key on higher levels is
+ 			 * always zero, this wouldn't be necessary. */
+ 			i--;
+-			setkey(geo, node, key, i);
++			_setkey(geo, node, key, i);
+ 		}
+ 		BUG_ON(i < 0);
+ 		node = (unsigned long *)bval(geo, node, i);
+@@ -311,7 +311,7 @@ static int btree_grow(struct btree_head *head, struct btree_geo *geo)
+ 		return -ENOMEM;
+ 	if (head->node) {
+ 		fill = getfill(geo, head->node, 0);
+-		setkey(geo, node, bkey(geo, head->node, fill - 1), 0);
++		_setkey(geo, node, bkey(geo, head->node, fill - 1), 0);
+ 		setval(geo, node, (unsigned long)head->node, 0);
+ 	}
+ 	head->node = node;
+@@ -342,16 +342,16 @@ static void steal_l(struct btree_head *head, struct btree_geo *geo, int level,
+ 
+ 	for (i = rfill - 1; i >= 0; i--) {
+ 		/* Shift entries on the right */
+-		setkey(geo, right, bkey(geo, right, i), i + no_entries);
++		_setkey(geo, right, bkey(geo, right, i), i + no_entries);
+ 		setval(geo, right, bval(geo, right, i), i + no_entries);
+ 	}
+ 	for (i = 0; i < no_entries; i++) {
+ 		/* Move some entries to the right */
+-		setkey(geo, right, bkey(geo, left, lfill - no_entries + i), i);
++		_setkey(geo, right, bkey(geo, left, lfill - no_entries + i), i);
+ 		setval(geo, right, bval(geo, left, lfill - no_entries + i), i);
+ 	}
+ 	/* Set parent key */
+-	setkey(geo, parent, bkey(geo, left, lfill - no_entries - 1), lpos);
++	_setkey(geo, parent, bkey(geo, left, lfill - no_entries - 1), lpos);
+ 	for (i = lfill - no_entries; i < lfill; i++)
+ 		clearpair(geo, left, i);
+ }
+@@ -366,14 +366,14 @@ static void steal_r(struct btree_head *head, struct btree_geo *geo, int level,
+ 
+ 	for (i = 0; i < no_entries; i++) {
+ 		/* Move some entries to the left */
+-		setkey(geo, left, bkey(geo, right, i), lfill + i);
++		_setkey(geo, left, bkey(geo, right, i), lfill + i);
+ 		setval(geo, left, bval(geo, right, i), lfill + i);
+ 	}
+ 	/* Set parent key */
+-	setkey(geo, parent, bkey(geo, right, no_entries - 1), lpos);
++	_setkey(geo, parent, bkey(geo, right, no_entries - 1), lpos);
+ 	/* Shift entries on the right */
+ 	for ( ; i < rfill; i++) {
+-		setkey(geo, right, bkey(geo, right, i), i - no_entries);
++		_setkey(geo, right, bkey(geo, right, i), i - no_entries);
+ 		setval(geo, right, bval(geo, right, i), i - no_entries);
+ 	}
+ 	for (i = rfill - no_entries; i < rfill; i++)
+@@ -399,14 +399,14 @@ static int split(struct btree_head *head, struct btree_geo *geo,
+ 		return err;
+ 	}
+ 	for (i = 0; i < fill / 2; i++) {
+-		setkey(geo, new, bkey(geo, node, i), i);
++		_setkey(geo, new, bkey(geo, node, i), i);
+ 		setval(geo, new, bval(geo, node, i), i);
+-		setkey(geo, node, bkey(geo, node, i + fill / 2), i);
++		_setkey(geo, node, bkey(geo, node, i + fill / 2), i);
+ 		setval(geo, node, bval(geo, node, i + fill / 2), i);
+ 		clearpair(geo, node, i + fill / 2);
+ 	}
+ 	if (fill & 1) {
+-		setkey(geo, node, bkey(geo, node, fill - 1), i);
++		_setkey(geo, node, bkey(geo, node, fill - 1), i);
+ 		setval(geo, node, bval(geo, node, fill - 1), i);
+ 		clearpair(geo, node, fill - 1);
+ 	}
+@@ -487,10 +487,10 @@ retry:
+ 
+ 	/* shift and insert */
+ 	for (i = fill; i > pos; i--) {
+-		setkey(geo, node, bkey(geo, node, i - 1), i);
++		_setkey(geo, node, bkey(geo, node, i - 1), i);
+ 		setval(geo, node, bval(geo, node, i - 1), i);
+ 	}
+-	setkey(geo, node, key, pos);
++	_setkey(geo, node, key, pos);
+ 	setval(geo, node, val, pos);
+ 
+ 	return 0;
+@@ -513,7 +513,7 @@ static void merge(struct btree_head *head, struct btree_geo *geo, int level,
+ 
+ 	for (i = 0; i < rfill; i++) {
+ 		/* Move all entries to the left */
+-		setkey(geo, left, bkey(geo, right, i), lfill + i);
++		_setkey(geo, left, bkey(geo, right, i), lfill + i);
+ 		setval(geo, left, bval(geo, right, i), lfill + i);
+ 	}
+ 	/* Exchange left and right child in parent */
+@@ -615,7 +615,7 @@ static void *btree_remove_level(struct btree_head *head, struct btree_geo *geo,
+ 
+ 	/* remove and shift */
+ 	for (i = pos; i < fill - 1; i++) {
+-		setkey(geo, node, bkey(geo, node, i + 1), i);
++		_setkey(geo, node, bkey(geo, node, i + 1), i);
+ 		setval(geo, node, bval(geo, node, i + 1), i);
+ 	}
+ 	clearpair(geo, node, fill - 1);
+-- 
+2.13.2
+

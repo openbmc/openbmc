@@ -1,0 +1,35 @@
+From 6746e3a9615d1566bf228e9012d0841b15178810 Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Sun, 26 Feb 2017 13:50:33 +0100
+Subject: [PATCH] Undefine GLOB_BRACE
+
+GLOB_BRACE is not defined in posix and thus not implemented in musl libc.
+
+Fixed by defining it to 0 if it is undefined.
+
+Upstream-Status: Inappropriate [musl libc specific]
+
+Signed-off-by: Ming Liu <peter.x.liu@external.atlascopco.com>
+---
+ plugins/imfile/imfile.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/plugins/imfile/imfile.c b/plugins/imfile/imfile.c
+index d20471f..f9aff81 100644
+--- a/plugins/imfile/imfile.c
++++ b/plugins/imfile/imfile.c
+@@ -85,6 +85,11 @@ static int bLegacyCnfModGlobalsPermitted;/* are legacy module-global config para
+ 
+ #define ADD_METADATA_UNSPECIFIED -1
+ 
++/* fixes build with musl libc */
++#ifndef GLOB_BRACE
++#define GLOB_BRACE 0
++#endif
++
+ /* this structure is used in pure polling mode as well one of the support
+  * structures for inotify.
+  */
+-- 
+1.9.1
+

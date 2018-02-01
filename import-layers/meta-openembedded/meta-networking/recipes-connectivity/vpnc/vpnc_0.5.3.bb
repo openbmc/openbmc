@@ -4,17 +4,39 @@ AUTHOR = "Maurice Massar vpnc@unix-ag.uni-kl.de"
 SECTION = "net"
 LICENSE = "GPL-2.0+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=173b74cb8ac640a9992c03f3bce22a33"
-DEPENDS = "libgcrypt"
 
-inherit perlnative
+DEPENDS += "libgcrypt"
 
-EXTRA_OEMAKE = "-e MAKEFLAGS="
-CFLAGS_append = ' -DVERSION=\\"${PV}\\"'
-LDFLAGS_append = " -lgcrypt -lgpg-error"
+PV .= "r550-2jnpr1"
+SRCREV = "b1243d29e0c00312ead038b04a2cf5e2fa31d740"
+SRC_URI = "git://github.com/ndpgroup/vpnc \
+           file://long-help \
+           file://default.conf \
+           file://0001-search-for-log-help-in-build-dir.patch \
+           file://0002-Fix-vpnc-install-for-cross-compile.patch \
+           file://0003-error.h-is-specific-to-glibc-on-linux.patch \
+           file://0004-Use-pkgconfig-instead-of-libgcrypt-config.patch \
+           file://0005-include-sys-ttydefaults.h-for-CEOT-definition.patch \
+           file://0006-sysdep-Add-header-include-sequence-to-adjust-for-mus.patch \
+           file://0007-add-error-API-when-error.h-is-not-on-platform.patch \
+           file://0008-include-sysdep.h-before-net-if_tun.h.patch \
+           "
+
+PACKAGECONFIG ?= "gnutls"
+
+PACKAGECONFIG[gnutls] = ",,gnutls"
+PACKAGECONFIG[openssl] = ",,openssl"
+
+S = "${WORKDIR}/git"
+
+inherit perlnative pkgconfig
+
+#EXTRA_OEMAKE = "-e MAKEFLAGS="
 
 do_configure_append () {
     # Make sure we use our nativeperl wrapper
     sed -i "1s:#!.*:#!/usr/bin/env nativeperl:" ${S}/*.pl
+    cp ${WORKDIR}/long-help ${S}
 }
 
 do_install () {
@@ -34,12 +56,3 @@ vpnc_sysroot_preprocess () {
 CONFFILES_${PN} = "${sysconfdir}/vpnc/default.conf"
 RDEPENDS_${PN} = "perl-module-io-file"
 RRECOMMENDS_${PN} = "kernel-module-tun"
-
-SRC_URI = "http://www.unix-ag.uni-kl.de/~massar/vpnc/vpnc-${PV}.tar.gz \
-           file://makeman.patch \
-           file://vpnc-install.patch \
-           file://long-help \
-           file://default.conf"
-
-SRC_URI[md5sum] = "4378f9551d5b077e1770bbe09995afb3"
-SRC_URI[sha256sum] = "46cea3bd02f207c62c7c6f2f22133382602baeda1dc320747809e94881414884"

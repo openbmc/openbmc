@@ -1,0 +1,268 @@
+From 1ea003d4fccc4646fd1848a182405a1c7000ab18 Mon Sep 17 00:00:00 2001
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Date: Sun, 8 Jan 2017 11:38:23 -0200
+Subject: [PATCH 28/28] Rework -fno-omit-frame-pointer support on i386
+
+Commit 6b1df8b27f fixed the -OS build issue on i386 (BZ#20729) by
+expliciting disabling frame pointer (-fomit-frame-pointer) on the
+faulty objects.  Although it does fix the issue, it is a subpar
+workaround that adds complexity in build process (a rule for each
+object to add the required compiler option and pontentially more
+rules for objects that call {INLINE,INTERNAL}_SYSCALL) and does not
+allow the implementations to get all the possible debug/calltrack
+information possible (used mainly in debuggers and performance
+measurement tools).
+
+This patch fixes it by adding an explicit configure check to see
+if -fno-omit-frame-pointer is set and to act accordingly (set or
+not OPTIMIZE_FOR_GCC_5).  The make rules is simplified and only
+one is required: to add libc-do-syscall on loader due mmap
+(which will be empty anyway for default build with
+-fomit-frame-pointer).
+
+Checked on i386-linux-gnu with GCC 6.2.1 with CFLAGS sets as
+'-Os', '-O2 -fno-omit-frame-pointer', and '-O2 -fomit-frame-pointer'.
+For '-Os' the testsuite issues described by BZ#19463 and BZ#15105
+still applied.
+
+It fixes BZ #21029, although it is marked as duplicated of #20729
+(I reopened to track this cleanup).
+
+	[BZ #21029]
+	* config.h.in [CAN_USE_REGISTER_ASM_EBP]: New define.
+	* sysdeps/unix/sysv/linux/i386/Makefile
+	[$(subdir) = elf] (sysdep-dl-routines): Add libc-do-syscall.
+	(uses-6-syscall-arguments): Remove.
+	[$(subdir) = misc] (CFLAGS-epoll_pwait.o): Likewise.
+	[$(subdir) = misc] (CFLAGS-epoll_pwait.os): Likewise.
+	[$(subdir) = misc] (CFLAGS-mmap.o): Likewise.
+	[$(subdir) = misc] (CFLAGS-mmap.os): Likewise.
+	[$(subdir) = misc] (CFLAGS-mmap64.o): Likewise.
+	[$(subdir) = misc] (CFLAGS-mmap64.os): Likewise.
+	[$(subdir) = misc] (CFLAGS-pselect.o): Likewise.
+	[$(subdir) = misc] (cflags-pselect.o): Likewise.
+	[$(subdir) = misc] (cflags-pselect.os): Likewise.
+	[$(subdir) = misc] (cflags-rtld-mmap.os): Likewise.
+	[$(subdir) = sysvipc] (cflags-semtimedop.o): Likewise.
+	[$(subdir) = sysvipc] (cflags-semtimedop.os): Likewise.
+	[$(subdir) = io] (CFLAGS-posix_fadvise64.o): Likewise.
+	[$(subdir) = io] (CFLAGS-posix_fadvise64.os): Likewise.
+	[$(subdir) = io] (CFLAGS-posix_fallocate.o): Likewise.
+	[$(subdir) = io] (CFLAGS-posix_fallocate.os): Likewise.
+	[$(subdir) = io] (CFLAGS-posix_fallocate64.o): Likewise.
+	[$(subdir) = io] (CFLAGS-posix_fallocate64.os): Likewise.
+	[$(subdir) = io] (CFLAGS-sync_file_range.o): Likewise.
+	[$(subdir) = io] (CFLAGS-sync_file_range.os): Likewise.
+	[$(subdir) = io] (CFLAGS-fallocate.o): Likewise.
+	[$(subdir) = io] (CFLAGS-fallocate.os): Likewise.
+	[$(subdir) = io] (CFLAGS-fallocate64.o): Likewise.
+	[$(subdir) = io] (CFLAGS-fallocate64.os): Likewise.
+	[$(subdir) = nptl] (CFLAGS-pthread_rwlock_timedrdlock.o):
+	Likewise.
+	[$(subdir) = nptl] (CFLAGS-pthread_rwlock_timedrdlock.os):
+	Likewise.
+	[$(subdir) = nptl] (CFLAGS-pthread_rwlock_timedrwlock.o):
+	Likewise.
+	[$(subdir) = nptl] (CFLAGS-pthread_rwlock_timedrwlock.os):
+	Likewise.
+	[$(subdir) = nptl] (CFLAGS-sem_wait.o): Likewise.
+	[$(subdir) = nptl] (CFLAGS-sem_wait.os): Likewise.
+	[$(subdir) = nptl] (CFLAGS-sem_timedwait.o): Likewise.
+	[$(subdir) = nptl] (CFLAGS-sem_timedwait.os): Likewise.
+	* sysdeps/unix/sysv/linux/i386/configure.ac: Add check if compiler allows
+	ebp on inline assembly.
+	* sysdeps/unix/sysv/linux/i386/configure: Regenerate.
+	* sysdeps/unix/sysv/linux/i386/sysdep.h (OPTIMIZE_FOR_GCC_5):
+	Set if CAN_USE_REGISTER_ASM_EBP is set.
+	(check_consistency): Likewise.
+
+Upstream-Status: Backport
+
+  https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=3b33d6ed6096c1d20d05a650b06026d673f7399a
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ config.h.in                               |  4 ++++
+ sysdeps/unix/sysv/linux/i386/Makefile     | 39 +------------------------------
+ sysdeps/unix/sysv/linux/i386/configure    | 39 +++++++++++++++++++++++++++++++
+ sysdeps/unix/sysv/linux/i386/configure.ac | 17 ++++++++++++++
+ sysdeps/unix/sysv/linux/i386/sysdep.h     |  6 ++---
+ 5 files changed, 64 insertions(+), 41 deletions(-)
+
+diff --git a/config.h.in b/config.h.in
+index 7bfe923..fb2cc51 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -259,4 +259,8 @@
+ /* Build glibc with tunables support.  */
+ #define HAVE_TUNABLES 0
+ 
++/* Some compiler options may now allow to use ebp in __asm__ (used mainly
++   in i386 6 argument syscall issue).  */
++#define CAN_USE_REGISTER_ASM_EBP 0
++
+ #endif
+diff --git a/sysdeps/unix/sysv/linux/i386/Makefile b/sysdeps/unix/sysv/linux/i386/Makefile
+index 9609752..6aac0df 100644
+--- a/sysdeps/unix/sysv/linux/i386/Makefile
++++ b/sysdeps/unix/sysv/linux/i386/Makefile
+@@ -1,47 +1,18 @@
+ # The default ABI is 32.
+ default-abi := 32
+ 
+-# %ebp is used to pass the 6th argument to system calls, so these
+-# system calls are incompatible with a frame pointer.
+-uses-6-syscall-arguments = -fomit-frame-pointer
+-
+ ifeq ($(subdir),misc)
+ sysdep_routines += ioperm iopl vm86
+-CFLAGS-epoll_pwait.o += $(uses-6-syscall-arguments)
+-CFLAGS-epoll_pwait.os += $(uses-6-syscall-arguments)
+-CFLAGS-mmap.o += $(uses-6-syscall-arguments)
+-CFLAGS-mmap.os += $(uses-6-syscall-arguments)
+-CFLAGS-mmap64.o += $(uses-6-syscall-arguments)
+-CFLAGS-mmap64.os += $(uses-6-syscall-arguments)
+-CFLAGS-pselect.o += $(uses-6-syscall-arguments)
+-CFLAGS-pselect.os += $(uses-6-syscall-arguments)
+-CFLAGS-rtld-mmap.os += $(uses-6-syscall-arguments)
+-endif
+-
+-ifeq ($(subdir),sysvipc)
+-CFLAGS-semtimedop.o += $(uses-6-syscall-arguments)
+-CFLAGS-semtimedop.os += $(uses-6-syscall-arguments)
+ endif
+ 
+ ifeq ($(subdir),elf)
++sysdep-dl-routines += libc-do-syscall
+ sysdep-others += lddlibc4
+ install-bin += lddlibc4
+ endif
+ 
+ ifeq ($(subdir),io)
+ sysdep_routines += libc-do-syscall
+-CFLAGS-posix_fadvise64.o += $(uses-6-syscall-arguments)
+-CFLAGS-posix_fadvise64.os += $(uses-6-syscall-arguments)
+-CFLAGS-posix_fallocate.o += $(uses-6-syscall-arguments)
+-CFLAGS-posix_fallocate.os += $(uses-6-syscall-arguments)
+-CFLAGS-posix_fallocate64.o += $(uses-6-syscall-arguments)
+-CFLAGS-posix_fallocate64.os += $(uses-6-syscall-arguments)
+-CFLAGS-sync_file_range.o += $(uses-6-syscall-arguments)
+-CFLAGS-sync_file_range.os += $(uses-6-syscall-arguments)
+-CFLAGS-fallocate.o += $(uses-6-syscall-arguments)
+-CFLAGS-fallocate.os += $(uses-6-syscall-arguments)
+-CFLAGS-fallocate64.o += $(uses-6-syscall-arguments)
+-CFLAGS-fallocate64.os += $(uses-6-syscall-arguments)
+ endif
+ 
+ ifeq ($(subdir),nptl)
+@@ -61,14 +32,6 @@ ifeq ($(subdir),nptl)
+ # pull in __syscall_error routine
+ libpthread-routines += sysdep
+ libpthread-shared-only-routines += sysdep
+-CFLAGS-pthread_rwlock_timedrdlock.o += $(uses-6-syscall-arguments)
+-CFLAGS-pthread_rwlock_timedrdlock.os += $(uses-6-syscall-arguments)
+-CFLAGS-pthread_rwlock_timedwrlock.o += $(uses-6-syscall-arguments)
+-CFLAGS-pthread_rwlock_timedwrlock.os += $(uses-6-syscall-arguments)
+-CFLAGS-sem_wait.o += $(uses-6-syscall-arguments)
+-CFLAGS-sem_wait.os += $(uses-6-syscall-arguments)
+-CFLAGS-sem_timedwait.o += $(uses-6-syscall-arguments)
+-CFLAGS-sem_timedwait.os += $(uses-6-syscall-arguments)
+ endif
+ 
+ ifeq ($(subdir),rt)
+diff --git a/sysdeps/unix/sysv/linux/i386/configure b/sysdeps/unix/sysv/linux/i386/configure
+index eb72659..ae2c356 100644
+--- a/sysdeps/unix/sysv/linux/i386/configure
++++ b/sysdeps/unix/sysv/linux/i386/configure
+@@ -3,5 +3,44 @@
+ 
+ arch_minimum_kernel=2.6.32
+ 
++# Check if CFLAGS allows compiler to use ebp register in inline assembly.
++
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if compiler flags allows ebp in inline assembly" >&5
++$as_echo_n "checking if compiler flags allows ebp in inline assembly... " >&6; }
++if ${libc_cv_can_use_register_asm_ebp+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++
++    void foo (int i)
++    {
++      register int reg asm ("ebp") = i;
++      asm ("# %0" : : "r" (reg));
++    }
++int
++main ()
++{
++
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_compile "$LINENO"; then :
++  libc_cv_can_use_register_asm_ebp=yes
++else
++  libc_cv_can_use_register_asm_ebp=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libc_cv_can_use_register_asm_ebp" >&5
++$as_echo "$libc_cv_can_use_register_asm_ebp" >&6; }
++if test $libc_cv_can_use_register_asm_ebp = yes; then
++  $as_echo "#define CAN_USE_REGISTER_ASM_EBP 1" >>confdefs.h
++
++fi
++
+ libc_cv_gcc_unwind_find_fde=yes
+ ldd_rewrite_script=sysdeps/unix/sysv/linux/ldd-rewrite.sed
+diff --git a/sysdeps/unix/sysv/linux/i386/configure.ac b/sysdeps/unix/sysv/linux/i386/configure.ac
+index 1a11da6..1cd632e 100644
+--- a/sysdeps/unix/sysv/linux/i386/configure.ac
++++ b/sysdeps/unix/sysv/linux/i386/configure.ac
+@@ -3,5 +3,22 @@ GLIBC_PROVIDES dnl See aclocal.m4 in the top level source directory.
+ 
+ arch_minimum_kernel=2.6.32
+ 
++# Check if CFLAGS allows compiler to use ebp register in inline assembly.
++AC_CACHE_CHECK([if compiler flags allows ebp in inline assembly],
++                libc_cv_can_use_register_asm_ebp, [
++AC_COMPILE_IFELSE(
++  [AC_LANG_PROGRAM([
++    void foo (int i)
++    {
++      register int reg asm ("ebp") = i;
++      asm ("# %0" : : "r" (reg));
++    }])],
++  [libc_cv_can_use_register_asm_ebp=yes],
++  [libc_cv_can_use_register_asm_ebp=no])
++])
++if test $libc_cv_can_use_register_asm_ebp = yes; then
++  AC_DEFINE(CAN_USE_REGISTER_ASM_EBP)
++fi
++
+ libc_cv_gcc_unwind_find_fde=yes
+ ldd_rewrite_script=sysdeps/unix/sysv/linux/ldd-rewrite.sed
+diff --git a/sysdeps/unix/sysv/linux/i386/sysdep.h b/sysdeps/unix/sysv/linux/i386/sysdep.h
+index baf4642..449b23e 100644
+--- a/sysdeps/unix/sysv/linux/i386/sysdep.h
++++ b/sysdeps/unix/sysv/linux/i386/sysdep.h
+@@ -44,9 +44,9 @@
+ /* Since GCC 5 and above can properly spill %ebx with PIC when needed,
+    we can inline syscalls with 6 arguments if GCC 5 or above is used
+    to compile glibc.  Disable GCC 5 optimization when compiling for
+-   profiling since asm ("ebp") can't be used to put the 6th argument
+-   in %ebp for syscall.  */
+-#if __GNUC_PREREQ (5,0) && !defined PROF
++   profiling or when -fno-omit-frame-pointer is used since asm ("ebp")
++   can't be used to put the 6th argument in %ebp for syscall.  */
++#if __GNUC_PREREQ (5,0) && !defined PROF && CAN_USE_REGISTER_ASM_EBP
+ # define OPTIMIZE_FOR_GCC_5
+ #endif
+ 
+-- 
+1.9.1
+

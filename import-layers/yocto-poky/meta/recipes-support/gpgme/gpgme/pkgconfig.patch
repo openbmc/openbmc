@@ -4,37 +4,50 @@ simpler and less error prone when cross compiling.
 Upstream-Status: Denied [Upstream not interested in pkg-config support]
 RP 2015/4/17
 
+Rebase to 1.8.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac            |   1 +
+ src/Makefile.am         |   4 +-
+ src/gpgme-pthread.pc.in |  15 +++++++
+ src/gpgme.m4            | 114 ++++--------------------------------------------
+ src/gpgme.pc.in         |  15 +++++++
+ 5 files changed, 42 insertions(+), 107 deletions(-)
+ create mode 100644 src/gpgme-pthread.pc.in
+ create mode 100644 src/gpgme.pc.in
+
 diff --git a/configure.ac b/configure.ac
-index 298a22b..c778b61 100644
+index 0a67b48..e402dd3 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -622,6 +622,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -875,6 +875,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
                  src/versioninfo.rc
                  src/gpgme.h)
  AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
 +AC_CONFIG_FILES(src/gpgme.pc src/gpgme-pthread.pc)
- AC_CONFIG_FILES([lang/Makefile lang/cl/Makefile lang/cl/gpgme.asd])
- AC_OUTPUT
- 
+ AC_CONFIG_FILES(lang/cpp/Makefile lang/cpp/src/Makefile)
+ AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig-w32.cmake.in)
+ AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig.cmake.in)
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 58922f9..40d0dca 100644
+index ce6f1d4..5f38fee 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -20,11 +20,13 @@
+@@ -19,12 +19,14 @@
+ ## Process this file with automake to produce Makefile.in
  
- # Note: moc_kdpipeiodevice should actually be a dependecy below.
  EXTRA_DIST = gpgme-config.in gpgme.m4 libgpgme.vers ChangeLog-2011 \
--	     gpgme.h.in versioninfo.rc.in gpgme.def moc_kdpipeiodevice.cpp
-+	     gpgme.h.in versioninfo.rc.in gpgme.def moc_kdpipeiodevice.cpp gpgme.pc.in gpgme-pthread.pc.in
+-	     gpgme.h.in versioninfo.rc.in gpgme.def
++	     gpgme.h.in versioninfo.rc.in gpgme.def gpgme.pc.in gpgme-pthread.pc.in
  
  bin_SCRIPTS = gpgme-config
  m4datadir = $(datadir)/aclocal
  m4data_DATA = gpgme.m4
+ nodist_include_HEADERS = gpgme.h
 +pkgconfigdir = $(libdir)/pkgconfig
 +pkgconfig_DATA = gpgme.pc gpgme-pthread.pc
- nodist_include_HEADERS = gpgme.h
  
  bin_PROGRAMS = gpgme-tool
+ 
 diff --git a/src/gpgme-pthread.pc.in b/src/gpgme-pthread.pc.in
 new file mode 100644
 index 0000000..980a48e
@@ -51,9 +64,9 @@ index 0000000..980a48e
 +host=@GPGME_CONFIG_HOST@
 +
 +Name: gpgme
-+Description: GnuPG Made Easy (GPGME) is a C language library that allows to addsupport for cryptography to a program (threaded version)
++Description: GnuPG Made Easy (GPGME) is a C language library that allows to addsupport for cryptography to a program (deprecated)
 +Version: @VERSION@
-+Libs: -L${libdir} -lgpgme-pthread -lpthread
++Libs: -L${libdir} -lgpgme -lpthread
 +Cflags: -I${includedir}
 +Requires: libassuan gpg-error
 diff --git a/src/gpgme.m4 b/src/gpgme.m4
@@ -277,3 +290,6 @@ index 0000000..b69539f
 +Cflags: -I${includedir}
 +Requires: libassuan gpg-error
 \ No newline at end of file
+-- 
+2.8.1
+

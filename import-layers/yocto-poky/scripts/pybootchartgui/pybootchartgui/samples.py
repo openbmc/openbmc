@@ -53,6 +53,33 @@ class MemSample:
         # discard incomplete samples
         return [v for v in MemSample.used_values if v not in keys] == []
 
+class DrawMemSample:
+    """
+    Condensed version of a MemSample with exactly the values used by the drawing code.
+    Initialized either from a valid MemSample or
+    a tuple/list of buffer/used/cached/swap values.
+    """
+    def __init__(self, mem_sample):
+        self.time = mem_sample.time
+        if isinstance(mem_sample, MemSample):
+            self.buffers = mem_sample.records['MemTotal'] - mem_sample.records['MemFree']
+            self.used = mem_sample.records['MemTotal'] - mem_sample.records['MemFree'] - mem_sample.records['Buffers']
+            self.cached = mem_sample.records['Cached']
+            self.swap = mem_sample.records['SwapTotal'] - mem_sample.records['SwapFree']
+        else:
+            self.buffers, self.used, self.cached, self.swap = mem_sample
+
+class DiskSpaceSample:
+    def __init__(self, time):
+        self.time = time
+        self.records = {}
+
+    def add_value(self, name, value):
+        self.records[name] = value
+
+    def valid(self):
+        return bool(self.records)
+
 class ProcessSample:
     def __init__(self, time, state, cpu_sample):
         self.time = time

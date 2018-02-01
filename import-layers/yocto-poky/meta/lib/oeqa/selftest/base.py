@@ -163,7 +163,7 @@ be re-executed from a clean environment to ensure accurate results.")
 
     # remove data from <builddir>/conf/selftest.inc
     def remove_config(self, data):
-        self.log.debug("Removing from: %s\n\%s\n" % (self.testinc_path, data))
+        self.log.debug("Removing from: %s\n%s\n" % (self.testinc_path, data))
         ftools.remove_from_file(self.testinc_path, data)
 
     # write to meta-sefltest/recipes-test/<recipe>/test_recipe.inc
@@ -206,7 +206,7 @@ be re-executed from a clean environment to ensure accurate results.")
 
     # remove data from <builddir>/conf/bblayers.inc
     def remove_bblayers_config(self, data):
-        self.log.debug("Removing from: %s\n\%s\n" % (self.testinc_bblayers_path, data))
+        self.log.debug("Removing from: %s\n%s\n" % (self.testinc_bblayers_path, data))
         ftools.remove_from_file(self.testinc_bblayers_path, data)
 
     # write to <builddir>/conf/machine.inc

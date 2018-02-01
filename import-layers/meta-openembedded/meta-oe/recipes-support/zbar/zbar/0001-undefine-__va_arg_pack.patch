@@ -1,0 +1,51 @@
+From f842872244219d9881fbec77054702412b1e16f8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Dec 2016 16:41:27 -0800
+Subject: [PATCH] undefine __va_arg_pack
+
+dprintf() is also a libc function. This fixes
+the compile errors
+
+/usr/include/bits/stdio2.h:140:1: error: expected identifier or '(' before '{' token
+|  {
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ zbar/debug.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/zbar/debug.h b/zbar/debug.h
+index 482ca8d..68948f6 100644
+--- a/zbar/debug.h
++++ b/zbar/debug.h
+@@ -23,6 +23,7 @@
+ 
+ /* varargs variations on compile time debug spew */
+ 
++#undef __va_arg_pack
+ #ifndef DEBUG_LEVEL
+ 
+ # ifdef __GNUC__
+@@ -36,15 +37,14 @@
+ #else
+ 
+ # include <stdio.h>
+-
+ # ifdef __GNUC__
+-#  define dprintf(level, args...) \
++#  define dprintf(level, format, args...) \
+     if((level) <= DEBUG_LEVEL)    \
+-        fprintf(stderr, args)
++        fprintf(stderr, format, args)
+ # else
+-#  define dprintf(level, ...)     \
++#  define dprintf(level, format, ...)     \
+     if((level) <= DEBUG_LEVEL)    \
+-        fprintf(stderr, __VA_ARGS__)
++        fprintf(stderr, format, __VA_ARGS__)
+ # endif
+ 
+ #endif /* DEBUG_LEVEL */
+-- 
+2.10.2
+

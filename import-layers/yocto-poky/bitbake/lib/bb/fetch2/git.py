@@ -50,7 +50,7 @@ Supported SRC_URI options are:
    The default is "0", set nobranch=1 if needed.
 
 - usehead
-   For local git:// urls to use the current branch HEAD as the revsion for use with
+   For local git:// urls to use the current branch HEAD as the revision for use with
    AUTOREV. Implies nobranch.
 
 """
@@ -76,7 +76,6 @@ import re
 import bb
 import errno
 import bb.progress
-from   bb    import data
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import runfetchcmd
 from   bb.fetch2 import logger
@@ -174,19 +173,19 @@ class Git(FetchMethod):
         if len(branches) != len(ud.names):
             raise bb.fetch2.ParameterError("The number of name and branch parameters is not balanced", ud.url)
         ud.branches = {}
-        for name in ud.names:
-            branch = branches[ud.names.index(name)]
+        for pos, name in enumerate(ud.names):
+            branch = branches[pos]
             ud.branches[name] = branch
             ud.unresolvedrev[name] = branch
 
         if ud.usehead:
             ud.unresolvedrev['default'] = 'HEAD'
 
-        ud.basecmd = data.getVar("FETCHCMD_git", d, True) or "git -c core.fsyncobjectfiles=0"
+        ud.basecmd = d.getVar("FETCHCMD_git") or "git -c core.fsyncobjectfiles=0"
 
-        ud.write_tarballs = ((data.getVar("BB_GENERATE_MIRROR_TARBALLS", d, True) or "0") != "0") or ud.rebaseable
+        ud.write_tarballs = ((d.getVar("BB_GENERATE_MIRROR_TARBALLS") or "0") != "0") or ud.rebaseable
 
-        ud.setup_revisons(d)
+        ud.setup_revisions(d)
 
         for name in ud.names:
             # Ensure anything that doesn't look like a sha256 checksum/revision is translated into one
@@ -206,9 +205,9 @@ class Git(FetchMethod):
         if ud.rebaseable:
             for name in ud.names:
                 gitsrcname = gitsrcname + '_' + ud.revisions[name]
-        ud.mirrortarball = 'git2_%s.tar.gz' % (gitsrcname)
-        ud.fullmirror = os.path.join(d.getVar("DL_DIR", True), ud.mirrortarball)
-        gitdir = d.getVar("GITDIR", True) or (d.getVar("DL_DIR", True) + "/git2/")
+        ud.mirrortarball = 'git2_%s.tar.gz' % gitsrcname
+        ud.fullmirror = os.path.join(d.getVar("DL_DIR"), ud.mirrortarball)
+        gitdir = d.getVar("GITDIR") or (d.getVar("DL_DIR") + "/git2/")
         ud.clonedir = os.path.join(gitdir, gitsrcname)
 
         ud.localfile = ud.clonedir
@@ -229,7 +228,7 @@ class Git(FetchMethod):
     def try_premirror(self, ud, d):
         # If we don't do this, updating an existing checkout with only premirrors
         # is not possible
-        if d.getVar("BB_FETCH_PREMIRRORONLY", True) is not None:
+        if d.getVar("BB_FETCH_PREMIRRORONLY") is not None:
             return True
         if os.path.exists(ud.clonedir):
             return False
@@ -241,7 +240,7 @@ class Git(FetchMethod):
         # If the checkout doesn't exist and the mirror tarball does, extract it
         if not os.path.exists(ud.clonedir) and os.path.exists(ud.fullmirror):
             bb.utils.mkdirhier(ud.clonedir)
-            runfetchcmd("tar -xzf %s" % (ud.fullmirror), d, workdir=ud.clonedir)
+            runfetchcmd("tar -xzf %s" % ud.fullmirror, d, workdir=ud.clonedir)
 
         repourl = self._get_repo_url(ud)
 
@@ -252,7 +251,7 @@ class Git(FetchMethod):
                 repourl = repourl[7:]
             clone_cmd = "LANG=C %s clone --bare --mirror %s %s --progress" % (ud.basecmd, repourl, ud.clonedir)
             if ud.proto.lower() != 'file':
-                bb.fetch2.check_network_access(d, clone_cmd)
+                bb.fetch2.check_network_access(d, clone_cmd, ud.url)
             progresshandler = GitProgressHandler(d)
             runfetchcmd(clone_cmd, d, log=progresshandler)
 
@@ -292,15 +291,15 @@ class Git(FetchMethod):
                 os.unlink(ud.fullmirror)
 
             logger.info("Creating tarball of git repository")
-            runfetchcmd("tar -czf %s %s" % (ud.fullmirror, os.path.join(".") ), d, workdir=ud.clonedir)
-            runfetchcmd("touch %s.done" % (ud.fullmirror), d, workdir=ud.clonedir)
+            runfetchcmd("tar -czf %s ." % ud.fullmirror, d, workdir=ud.clonedir)
+            runfetchcmd("touch %s.done" % ud.fullmirror, d)
 
     def unpack(self, ud, destdir, d):
         """ unpack the downloaded src to destdir"""
 
         subdir = ud.parm.get("subpath", "")
         if subdir != "":
-            readpathspec = ":%s" % (subdir)
+            readpathspec = ":%s" % subdir
             def_destsuffix = "%s/" % os.path.basename(subdir.rstrip('/'))
         else:
             readpathspec = ""
@@ -380,14 +379,26 @@ class Git(FetchMethod):
         """
         Run git ls-remote with the specified search string
         """
-        repourl = self._get_repo_url(ud)
-        cmd = "%s ls-remote %s %s" % \
-              (ud.basecmd, repourl, search)
-        if ud.proto.lower() != 'file':
-            bb.fetch2.check_network_access(d, cmd)
-        output = runfetchcmd(cmd, d, True)
-        if not output:
-            raise bb.fetch2.FetchError("The command %s gave empty output unexpectedly" % cmd, ud.url)
+        # Prevent recursion e.g. in OE if SRCPV is in PV, PV is in WORKDIR,
+        # and WORKDIR is in PATH (as a result of RSS), our call to
+        # runfetchcmd() exports PATH so this function will get called again (!)
+        # In this scenario the return call of the function isn't actually
+        # important - WORKDIR isn't needed in PATH to call git ls-remote
+        # anyway.
+        if d.getVar('_BB_GIT_IN_LSREMOTE', False):
+            return ''
+        d.setVar('_BB_GIT_IN_LSREMOTE', '1')
+        try:
+            repourl = self._get_repo_url(ud)
+            cmd = "%s ls-remote %s %s" % \
+                (ud.basecmd, repourl, search)
+            if ud.proto.lower() != 'file':
+                bb.fetch2.check_network_access(d, cmd, repourl)
+            output = runfetchcmd(cmd, d, True)
+            if not output:
+                raise bb.fetch2.FetchError("The command %s gave empty output unexpectedly" % cmd, ud.url)
+        finally:
+            d.delVar('_BB_GIT_IN_LSREMOTE')
         return output
 
     def _latest_revision(self, ud, d, name):
@@ -418,7 +429,7 @@ class Git(FetchMethod):
         """
         pupver = ('', '')
 
-        tagregex = re.compile(d.getVar('UPSTREAM_CHECK_GITTAGREGEX', True) or "(?P<pver>([0-9][\.|_]?)+)")
+        tagregex = re.compile(d.getVar('UPSTREAM_CHECK_GITTAGREGEX') or "(?P<pver>([0-9][\.|_]?)+)")
         try:
             output = self._lsremote(ud, d, "refs/tags/*")
         except bb.fetch2.FetchError or bb.fetch2.NetworkAccess:
@@ -470,7 +481,7 @@ class Git(FetchMethod):
             if not os.path.exists(rev_file) or not os.path.getsize(rev_file):
                 from pipes import quote
                 commits = bb.fetch2.runfetchcmd(
-                        "git rev-list %s -- | wc -l" % (quote(rev)),
+                        "git rev-list %s -- | wc -l" % quote(rev),
                         d, quiet=True).strip().lstrip('0')
                 if commits:
                     open(rev_file, "w").write("%d\n" % int(commits))
@@ -485,5 +496,5 @@ class Git(FetchMethod):
         try:
             self._lsremote(ud, d, "")
             return True
-        except FetchError:
+        except bb.fetch2.FetchError:
             return False

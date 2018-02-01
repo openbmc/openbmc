@@ -10,3 +10,5 @@ inherit texinfo update-alternatives
 
 ALTERNATIVE_${PN} = "time"
 ALTERNATIVE_PRIORITY = "100"
+
+BBCLASSEXTEND = "native nativesdk"

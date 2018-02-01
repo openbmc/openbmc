@@ -1,10 +1,12 @@
 # This configuration file lists filesystem objects that should get verified
 # during startup and be created if missing.
 #
-# Every line must either be a comment starting with #
-# or a definition of format:
+# Entries have the following format:
 # <type> <owner> <group> <mode> <path> <linksource>
 # where the items are separated by whitespace !
+#
+# The # character introduces a comment lasting until end of line.
+# Blank lines are ignored.
 #
 # <type> : d|f|l : (d)irectory|(f)ile|(l)ink
 #

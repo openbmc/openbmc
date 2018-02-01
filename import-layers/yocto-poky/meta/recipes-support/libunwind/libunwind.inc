@@ -9,6 +9,7 @@ inherit autotools
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[lzma] = "--enable-minidebuginfo,--disable-minidebuginfo,xz"
+PACKAGECONFIG[latexdocs] = "--enable-documentaiton, --disable-documentation, latex2man-native"
 
 EXTRA_OECONF_arm = "--enable-debug-frame"
 EXTRA_OECONF_aarch64 = "--enable-debug-frame"

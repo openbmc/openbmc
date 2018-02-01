@@ -92,7 +92,7 @@ python __anonymous () {
 	fi
 '''
 
-    imagetypes = d.getVar('KERNEL_IMAGETYPES', True)
+    imagetypes = d.getVar('KERNEL_IMAGETYPES')
     imagetypes = re.sub(r'\.gz$', '', imagetypes)
 
     for type in imagetypes.split():

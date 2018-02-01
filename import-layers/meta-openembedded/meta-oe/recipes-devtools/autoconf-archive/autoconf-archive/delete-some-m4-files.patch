@@ -1,0 +1,23 @@
+Delete two m4files ax_code_coverage.m4 and ax_check_enable_debug.m4
+to avoid installing conflicts. These two files can be installed by
+gnome-common from oe-core, even if the files in gnmoe-common is
+copied from autoconf-archive(the reason is that the old version
+autoconf-archive don't provide the two files).
+After upgrading to the new version, we need to drop them in meta-oe
+and then set rdepends to gnome-common(oe-core)
+
+Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
+
+Index: a/configure.ac
+===================================================================
+--- a/configure.ac     2016-09-16 06:00:00.000000000 +0800
++++ b/configure.ac     2017-04-18 17:43:05.946290554 +0800
+@@ -19,7 +19,7 @@
+ 
+ AC_PROG_SED
+ 
+-M4FILES="m4_esyscmd([echo -n m4/*.m4])"
++M4FILES="m4_esyscmd([echo -n m4/*.m4 | sed -e 's:m4/ax_code_coverage.m4 ::g'|sed -e 's:m4/ax_check_enable_debug.m4 ::g'])"
+ AC_SUBST([M4FILES])
+ 
+ TEXIFILES="m4_esyscmd([cd m4 && echo -n *.m4 | sed -e 's/\.m4/.texi/g'])"

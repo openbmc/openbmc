@@ -20,6 +20,7 @@ SRC_URI += " \
             file://sha256.patch \
             file://sysconf_nrprocessors.patch \
             file://fix-out-of-tree-build.patch \
+            file://0001-Adjust-the-order-of-headers-to-fix-build-for-musl.patch \
             "
 
 SRC_URI_append_arm = " file://arm_crashdump.patch"

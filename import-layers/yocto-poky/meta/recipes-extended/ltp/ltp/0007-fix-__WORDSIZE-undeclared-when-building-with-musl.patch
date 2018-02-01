@@ -1,0 +1,30 @@
+From a2639bd0f0d3f9f3049ee33e6710fed06225f54f Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 9 Feb 2017 18:20:58 +0800
+Subject: [PATCH 1/2] fix __WORDSIZE undeclared when building with musl
+
+fix __WORDSIZE undeclared when building with musl.
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+Upstream-Status: Pending
+---
+ include/old/test.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/old/test.h b/include/old/test.h
+index d492560..263e92e 100644
+--- a/include/old/test.h
++++ b/include/old/test.h
+@@ -58,6 +58,9 @@
+ #include "tst_clone.h"
+ #include "old_device.h"
+ #include "old_tmpdir.h"
++#ifndef __GLIBC__
++#include <bits/reg.h>
++#endif
+ 
+ /*
+  * Ensure that NUMSIGS is defined.
+-- 
+2.7.4
+

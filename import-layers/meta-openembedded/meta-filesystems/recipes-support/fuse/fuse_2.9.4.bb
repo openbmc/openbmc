@@ -22,6 +22,7 @@ SRC_URI[sha256sum] = "6be9c0bff6af8c677414935f31699ea5a7f8f5f791cfa5205be02ea186
 inherit autotools pkgconfig update-rc.d systemd
 
 INITSCRIPT_NAME = "fuse"
+INITSCRIPT_PARAMS = "start 3 S . stop 20 0 6 ."
 
 SYSTEMD_SERVICE_${PN} = ""
 
@@ -29,10 +30,7 @@ DEPENDS = "gettext-native"
 
 PACKAGES =+ "fuse-utils-dbg fuse-utils libulockmgr libulockmgr-dev libulockmgr-dbg"
 
-# Fusermount requires features from the util-linux version of mount.
-RDEPENDS_${PN} += "util-linux-mount"
-
-RRECOMMENDS_${PN} = "kernel-module-fuse libulockmgr fuse-utils"
+RRECOMMENDS_${PN}_class-target = "kernel-module-fuse libulockmgr fuse-utils"
 
 FILES_${PN} += "${libdir}/libfuse.so.*"
 FILES_${PN}-dev += "${libdir}/libfuse*.la"
@@ -62,3 +60,5 @@ do_install_append() {
         install -m 0644 ${WORKDIR}/fuse.conf ${D}${sysconfdir}/modules-load.d
     fi
 }
+
+BBCLASSEXTEND = "native nativesdk"

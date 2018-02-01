@@ -18,7 +18,7 @@ PACKAGES = "${PN} ${PN}-dev"
 FILES_${PN}-dev = "${includedir}/libintl.h ${libdir}/libintl.a"
 INSANE_SKIP_${PN}-dev = "staticdev"
 ALLOW_EMPTY_${PN} = "1"
-CFLAGS_append = " -fPIC -Wall -I ../../include ${@['-DSTUB_ONLY', ''][d.getVar('USE_NLS', 1) != 'no']}"
+CFLAGS_append = " -fPIC -Wall -I ../../include ${@['-DSTUB_ONLY', ''][d.getVar('USE_NLS') != 'no']}"
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_compile() {

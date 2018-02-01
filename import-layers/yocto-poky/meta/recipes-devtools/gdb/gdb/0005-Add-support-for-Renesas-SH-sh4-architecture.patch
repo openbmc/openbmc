@@ -1,4 +1,4 @@
-From 8c5fe58c5a0044ddb517a41b277ed27fb3d3bedc Mon Sep 17 00:00:00 2001
+From 6649e2cccfb11dec076abb02eae0afab95614829 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 02:31:12 +0000
 Subject: [PATCH 05/10] Add support for Renesas SH (sh4) architecture.
@@ -27,10 +27,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  11 files changed, 617 insertions(+), 29 deletions(-)
 
 diff --git a/gdb/Makefile.in b/gdb/Makefile.in
-index ec2af52..df8e84d 100644
+index 7b2df86878..10f1266fe3 100644
 --- a/gdb/Makefile.in
 +++ b/gdb/Makefile.in
-@@ -1736,6 +1736,7 @@ ALLDEPFILES = \
+@@ -1750,6 +1750,7 @@ ALLDEPFILES = \
  	score-tdep.c \
  	ser-go32.c ser-pipe.c ser-tcp.c ser-mingw.c \
  	sh-tdep.c sh64-tdep.c shnbsd-tdep.c shnbsd-nat.c \
@@ -39,7 +39,7 @@ index ec2af52..df8e84d 100644
  	solib-svr4.c \
  	sparc-linux-nat.c sparc-linux-tdep.c \
 diff --git a/gdb/configure.host b/gdb/configure.host
-index ef265eb..322a1e2 100644
+index ef265ebe29..322a1e2c67 100644
 --- a/gdb/configure.host
 +++ b/gdb/configure.host
 @@ -149,6 +149,7 @@ powerpc*-*-linux*)	gdb_host=linux ;;
@@ -51,7 +51,7 @@ index ef265eb..322a1e2 100644
  			gdb_host=nbsd ;;
  sh*-*-openbsd*)		gdb_host=nbsd ;;
 diff --git a/gdb/sh-linux-tdep.c b/gdb/sh-linux-tdep.c
-index 2418d25..ac8ea9e 100644
+index 2418d25010..ac8ea9e2a4 100644
 --- a/gdb/sh-linux-tdep.c
 +++ b/gdb/sh-linux-tdep.c
 @@ -18,14 +18,37 @@
@@ -599,7 +599,7 @@ index 2418d25..ac8ea9e 100644
  
    /* GNU/Linux uses SVR4-style shared libraries.  */
 diff --git a/gdb/sh-tdep.c b/gdb/sh-tdep.c
-index 336b48e..847b271 100644
+index 694f5f742d..8d54df7a1a 100644
 --- a/gdb/sh-tdep.c
 +++ b/gdb/sh-tdep.c
 @@ -21,6 +21,9 @@
@@ -662,7 +662,7 @@ index 336b48e..847b271 100644
        len = TYPE_LENGTH (type);
        val = sh_justify_value_in_reg (gdbarch, args[argnum], len);
  
-@@ -1821,7 +1808,7 @@ sh_dwarf2_frame_init_reg (struct gdbarch *gdbarch, int regnum,
+@@ -1819,7 +1806,7 @@ sh_dwarf2_frame_init_reg (struct gdbarch *gdbarch, int regnum,
      reg->how = DWARF2_FRAME_REG_UNDEFINED;
  }
  
@@ -671,7 +671,7 @@ index 336b48e..847b271 100644
  sh_alloc_frame_cache (void)
  {
    struct sh_frame_cache *cache;
-@@ -1848,7 +1835,7 @@ sh_alloc_frame_cache (void)
+@@ -1846,7 +1833,7 @@ sh_alloc_frame_cache (void)
    return cache;
  }
  
@@ -680,7 +680,7 @@ index 336b48e..847b271 100644
  sh_frame_cache (struct frame_info *this_frame, void **this_cache)
  {
    struct gdbarch *gdbarch = get_frame_arch (this_frame);
-@@ -1915,9 +1902,9 @@ sh_frame_cache (struct frame_info *this_frame, void **this_cache)
+@@ -1913,9 +1900,9 @@ sh_frame_cache (struct frame_info *this_frame, void **this_cache)
    return cache;
  }
  
@@ -693,7 +693,7 @@ index 336b48e..847b271 100644
  {
    struct gdbarch *gdbarch = get_frame_arch (this_frame);
    struct sh_frame_cache *cache = sh_frame_cache (this_frame, this_cache);
-@@ -1931,7 +1918,7 @@ sh_frame_prev_register (struct frame_info *this_frame,
+@@ -1929,7 +1916,7 @@ sh_frame_prev_register (struct frame_info *this_frame,
       the current frame.  Frob regnum so that we pull the value from
       the correct place.  */
    if (regnum == gdbarch_pc_regnum (gdbarch))
@@ -702,7 +702,7 @@ index 336b48e..847b271 100644
  
    if (regnum < SH_NUM_REGS && cache->saved_regs[regnum] != -1)
      return frame_unwind_got_memory (this_frame, regnum,
-@@ -2240,8 +2227,8 @@ sh_return_in_first_hidden_param_p (struct gdbarch *gdbarch,
+@@ -2238,8 +2225,8 @@ sh_return_in_first_hidden_param_p (struct gdbarch *gdbarch,
  static struct gdbarch *
  sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  {
@@ -712,7 +712,7 @@ index 336b48e..847b271 100644
  
    /* SH5 is handled entirely in sh64-tdep.c.  */
    if (info.bfd_arch_info->mach == bfd_mach_sh5)
-@@ -2257,6 +2244,18 @@ sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -2255,6 +2242,18 @@ sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
    tdep = XCNEW (struct gdbarch_tdep);
    gdbarch = gdbarch_alloc (&info, tdep);
  
@@ -731,7 +731,7 @@ index 336b48e..847b271 100644
    set_gdbarch_short_bit (gdbarch, 2 * TARGET_CHAR_BIT);
    set_gdbarch_int_bit (gdbarch, 4 * TARGET_CHAR_BIT);
    set_gdbarch_long_bit (gdbarch, 4 * TARGET_CHAR_BIT);
-@@ -2407,10 +2406,11 @@ sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -2405,10 +2404,11 @@ sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
        break;
      }
  
@@ -745,7 +745,7 @@ index 336b48e..847b271 100644
    frame_unwind_append_unwinder (gdbarch, &sh_frame_unwind);
  
 diff --git a/gdb/sh-tdep.h b/gdb/sh-tdep.h
-index 666968f..62c65b5 100644
+index 666968f787..62c65b55ea 100644
 --- a/gdb/sh-tdep.h
 +++ b/gdb/sh-tdep.h
 @@ -21,6 +21,12 @@
@@ -828,7 +828,7 @@ index 666968f..62c65b5 100644
       where each general-purpose register is stored inside the associated
       core file section.  */
 diff --git a/gdb/testsuite/gdb.asm/asm-source.exp b/gdb/testsuite/gdb.asm/asm-source.exp
-index 6d9aef8..5b66b42 100644
+index 6d9aef81bb..5b66b429d1 100644
 --- a/gdb/testsuite/gdb.asm/asm-source.exp
 +++ b/gdb/testsuite/gdb.asm/asm-source.exp
 @@ -116,6 +116,11 @@ switch -glob -- [istarget] {
@@ -844,7 +844,7 @@ index 6d9aef8..5b66b42 100644
          set asm-arch sh
  	set debug-flags "-gdwarf-2"
 diff --git a/gdb/testsuite/gdb.asm/sh.inc b/gdb/testsuite/gdb.asm/sh.inc
-index a4a5fc5..89efed7 100644
+index a4a5fc545e..89efed7795 100644
 --- a/gdb/testsuite/gdb.asm/sh.inc
 +++ b/gdb/testsuite/gdb.asm/sh.inc
 @@ -40,9 +40,8 @@
@@ -859,7 +859,7 @@ index a4a5fc5..89efed7 100644
  	.align	1
  .Lafterconst\@:
 diff --git a/gdb/testsuite/gdb.base/annota1.c b/gdb/testsuite/gdb.base/annota1.c
-index 424e1b8..0de2e7b 100644
+index 424e1b8327..0de2e7b633 100644
 --- a/gdb/testsuite/gdb.base/annota1.c
 +++ b/gdb/testsuite/gdb.base/annota1.c
 @@ -1,6 +1,9 @@
@@ -873,7 +873,7 @@ index 424e1b8..0de2e7b 100644
  void
  handle_USR1 (int sig)
 diff --git a/gdb/testsuite/gdb.base/annota3.c b/gdb/testsuite/gdb.base/annota3.c
-index 424e1b8..952aaf21 100644
+index 424e1b8327..952aaf218a 100644
 --- a/gdb/testsuite/gdb.base/annota3.c
 +++ b/gdb/testsuite/gdb.base/annota3.c
 @@ -1,6 +1,10 @@
@@ -888,7 +888,7 @@ index 424e1b8..952aaf21 100644
  void
  handle_USR1 (int sig)
 diff --git a/gdb/testsuite/gdb.base/sigall.c b/gdb/testsuite/gdb.base/sigall.c
-index 81f3b08..1574b2d 100644
+index 81f3b08d6b..1574b2d6cb 100644
 --- a/gdb/testsuite/gdb.base/sigall.c
 +++ b/gdb/testsuite/gdb.base/sigall.c
 @@ -1,6 +1,9 @@
@@ -902,7 +902,7 @@ index 81f3b08..1574b2d 100644
  /* Signal handlers, we set breakpoints in them to make sure that the
     signals really get delivered.  */
 diff --git a/gdb/testsuite/gdb.base/signals.c b/gdb/testsuite/gdb.base/signals.c
-index 7566068..1205a9b 100644
+index 756606880f..1205a9bc9c 100644
 --- a/gdb/testsuite/gdb.base/signals.c
 +++ b/gdb/testsuite/gdb.base/signals.c
 @@ -3,6 +3,10 @@
@@ -917,5 +917,5 @@ index 7566068..1205a9b 100644
  static int count = 0;
  
 -- 
-2.8.2
+2.11.0
 

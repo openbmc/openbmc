@@ -11,8 +11,10 @@ from orm.models import Build, LogMessage, Target
 import logging
 import traceback
 import signal
+import os
 
 logger = logging.getLogger("toaster")
+
 
 class Command(NoArgsCommand):
     args = ""
@@ -50,7 +52,7 @@ class Command(NoArgsCommand):
                 logger.debug("runbuilds: No build env")
                 return
 
-            logger.info("runbuilds: starting build %s, environment %s" % \
+            logger.info("runbuilds: starting build %s, environment %s" %
                         (br, bec.be))
 
             # let the build request know where it is being executed
@@ -80,7 +82,7 @@ class Command(NoArgsCommand):
 
     def archive(self):
         for br in BuildRequest.objects.filter(state=BuildRequest.REQ_ARCHIVE):
-            if br.build == None:
+            if br.build is None:
                 br.state = BuildRequest.REQ_FAILED
             else:
                 br.state = BuildRequest.REQ_COMPLETED
@@ -99,10 +101,10 @@ class Command(NoArgsCommand):
             Q(updated__lt=timezone.now() - timedelta(seconds=30))
         ).update(lock=BuildEnvironment.LOCK_FREE)
 
-
         # update all Builds that were in progress and failed to start
-        for br in BuildRequest.objects.filter(state=BuildRequest.REQ_FAILED,
-                                              build__outcome=Build.IN_PROGRESS):
+        for br in BuildRequest.objects.filter(
+                state=BuildRequest.REQ_FAILED,
+                build__outcome=Build.IN_PROGRESS):
             # transpose the launch errors in ToasterExceptions
             br.build.outcome = Build.FAILED
             for brerror in br.brerror_set.all():
@@ -116,7 +118,6 @@ class Command(NoArgsCommand):
             # didn't have a change to release the BE lock
             br.environment.lock = BuildEnvironment.LOCK_FREE
             br.environment.save()
-
 
         # update all BuildRequests without a build created
         for br in BuildRequest.objects.filter(build=None):
@@ -144,7 +145,7 @@ class Command(NoArgsCommand):
 
         # Make sure the LOCK is removed for builds which have been fully
         # cancelled
-        for br in BuildRequest.objects.filter(\
+        for br in BuildRequest.objects.filter(
                       Q(build__outcome=Build.CANCELLED) &
                       Q(state=BuildRequest.REQ_CANCELLING) &
                       ~Q(environment=None)):
@@ -168,6 +169,12 @@ class Command(NoArgsCommand):
             logger.warn("runbuilds: schedule exception %s" % str(e))
 
     def handle_noargs(self, **options):
+        pidfile_path = os.path.join(os.environ.get("BUILDDIR", "."),
+                                    ".runbuilds.pid")
+
+        with open(pidfile_path, 'w') as pidfile:
+            pidfile.write("%s" % os.getpid())
+
         self.runbuild()
 
         signal.signal(signal.SIGUSR1, lambda sig, frame: None)

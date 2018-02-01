@@ -2,7 +2,7 @@ import unittest
 import os
 
 from oeqa.selftest.base import oeSelfTest
-from oeqa.utils.commands import get_bb_var, bitbake
+from oeqa.utils.commands import get_bb_var, get_bb_vars, bitbake
 from oeqa.utils.decorators import testcase
 
 class ManifestEntry:
@@ -84,9 +84,10 @@ class VerifyManifest(oeSelfTest):
         try:
             mdir = self.get_dir_from_bb_var('SDK_DEPLOY', self.buildtarget)
             for k in d_target.keys():
+                bb_vars = get_bb_vars(['SDK_NAME', 'SDK_VERSION'], self.buildtarget)
                 mfilename[k] = "{}-toolchain-{}.{}.manifest".format(
-                        get_bb_var("SDK_NAME", self.buildtarget),
-                        get_bb_var("SDK_VERSION", self.buildtarget),
+                        bb_vars['SDK_NAME'],
+                        bb_vars['SDK_VERSION'],
                         k)
                 mpath[k] = os.path.join(mdir, mfilename[k])
                 if not os.path.isfile(mpath[k]):

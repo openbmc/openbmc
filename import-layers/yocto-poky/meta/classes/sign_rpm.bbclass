@@ -22,31 +22,24 @@ RPM_GPG_BACKEND ?= 'local'
 
 
 python () {
-    if d.getVar('RPM_GPG_PASSPHRASE_FILE', True):
+    if d.getVar('RPM_GPG_PASSPHRASE_FILE'):
         raise_sanity_error('RPM_GPG_PASSPHRASE_FILE is replaced by RPM_GPG_PASSPHRASE', d)
     # Check configuration
     for var in ('RPM_GPG_NAME', 'RPM_GPG_PASSPHRASE'):
-        if not d.getVar(var, True):
+        if not d.getVar(var):
             raise_sanity_error("You need to define %s in the config" % var, d)
-
-    # Set the expected location of the public key
-    d.setVar('RPM_GPG_PUBKEY', os.path.join(d.getVar('STAGING_DIR_TARGET', False),
-                                            d.getVar('sysconfdir', False),
-                                            'pki',
-                                            'rpm-gpg',
-                                            'RPM-GPG-KEY-${DISTRO_VERSION}'))
 }
 
 python sign_rpm () {
     import glob
     from oe.gpg_sign import get_signer
 
-    signer = get_signer(d, d.getVar('RPM_GPG_BACKEND', True))
-    rpms = glob.glob(d.getVar('RPM_PKGWRITEDIR', True) + '/*')
+    signer = get_signer(d, d.getVar('RPM_GPG_BACKEND'))
+    rpms = glob.glob(d.getVar('RPM_PKGWRITEDIR') + '/*')
 
     signer.sign_rpms(rpms,
-                     d.getVar('RPM_GPG_NAME', True),
-                     d.getVar('RPM_GPG_PASSPHRASE', True))
+                     d.getVar('RPM_GPG_NAME'),
+                     d.getVar('RPM_GPG_PASSPHRASE'))
 }
 
 do_package_index[depends] += "signing-keys:do_deploy"

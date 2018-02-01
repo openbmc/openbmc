@@ -1,0 +1,21 @@
+From: Daniel Schepler <dschepler@gmail.com>
+Subject: Fix FTBFS in x32
+Bug-Debian: https://bugs.debian.org/700795
+Upstream-Status: Pending
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+Index: webkitgtk-2.16.1/Source/WTF/wtf/Platform.h
+===================================================================
+--- webkitgtk-2.16.1.orig/Source/WTF/wtf/Platform.h
++++ webkitgtk-2.16.1/Source/WTF/wtf/Platform.h
+@@ -172,7 +172,11 @@
+ /* CPU(X86_64) - AMD64 / Intel64 / x86_64 64-bit */
+ #if   defined(__x86_64__) \
+     || defined(_M_X64)
++#ifdef __ILP32__
++#define WTF_CPU_X86_64_32 1
++#else
+ #define WTF_CPU_X86_64 1
++#endif
+ #define WTF_CPU_X86_SSE2 1
+ #endif
+ 

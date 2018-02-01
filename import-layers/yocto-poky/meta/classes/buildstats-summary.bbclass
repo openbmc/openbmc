@@ -7,7 +7,7 @@ python buildstats_summary () {
     if not os.path.exists(bsdir):
         return
 
-    sstatetasks = (e.data.getVar('SSTATETASKS', True) or '').split()
+    sstatetasks = (e.data.getVar('SSTATETASKS') or '').split()
     built = collections.defaultdict(lambda: [set(), set()])
     for pf in os.listdir(bsdir):
         taskdir = os.path.join(bsdir, pf)

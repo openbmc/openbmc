@@ -17,11 +17,15 @@ SRC_URI = "git://github.com/openSUSE/build-compare.git \
            file://functions.sh-improve-deb-and-ipk-checking.patch \
            "
 
+# Date matches entry in build-compare.changes and date of SRCREV.
+#
 SRCREV = "c5352c054c6ef15735da31b76d6d88620f4aff0a"
+PE = "1"
+PV = "2015.02.10+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-BBCLASSEXTEND += "native nativesdk"
+BBCLASSEXTEND = "native nativesdk"
 
 do_install() {
     install -d ${D}/${bindir}

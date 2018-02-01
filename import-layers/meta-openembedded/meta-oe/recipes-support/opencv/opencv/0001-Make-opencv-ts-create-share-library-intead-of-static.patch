@@ -1,0 +1,26 @@
+From 49d1f7c40a5d097f23671318045ac54bc07846cf Mon Sep 17 00:00:00 2001
+From: Bian Naimeng <biannm@cn.fujitsu.com>
+Date: Wed, 19 Apr 2017 03:11:37 +0900
+Subject: [PATCH] Make opencv-ts create share library intead of static.
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ modules/ts/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/ts/CMakeLists.txt b/modules/ts/CMakeLists.txt
+index bb56da2..7bb4ce9 100644
+--- a/modules/ts/CMakeLists.txt
++++ b/modules/ts/CMakeLists.txt
+@@ -4,7 +4,7 @@ if(IOS)
+   ocv_module_disable(ts)
+ endif()
+ 
+-set(OPENCV_MODULE_TYPE STATIC)
++#set(OPENCV_MODULE_TYPE STATIC)
+ set(OPENCV_MODULE_IS_PART_OF_WORLD FALSE)
+ 
+ ocv_warnings_disable(CMAKE_CXX_FLAGS -Wundef)
+-- 
+1.8.4.2
+

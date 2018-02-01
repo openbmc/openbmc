@@ -1,0 +1,85 @@
+The previous build_with_updated_interfaces_of_linux_v4.8_and_above.patch
+does not alloc struct ahash_request before using it. This will cause the
+kernel call trace below when calling gen_scsiid on kernel 4.8 or later
+version.
+
+This patch normalizes the calling of ahash API according to the example
+in kernel doc Documentation/crypto/api-intro.txt.
+
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000020
+IP: [<ffffffffa0008d45>] volume_add+0x625/0x7f0 [iscsi_trgt]
+PGD dd77067 PUD dd7c067 PMD 0 
+Oops: 0000 [#1] PREEMPT SMP
+Modules linked in: iscsi_trgt(O)
+CPU: 0 PID: 350 Comm: ietd Tainted: G           O    4.8.12-yocto-standard #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.9.3-0-ge2fc41e-prebuilt.qemu-project.org 04/01/2014
+task: ffff88000dfe2c00 task.stack: ffff88000de88000
+RIP: 0010:[<ffffffffa0008d45>]  [<ffffffffa0008d45>] volume_add+0x625/0x7f0 [iscsi_trgt]
+RSP: 0018:ffff88000de8bd90  EFLAGS: 00000206
+RAX: 000000000000ddfa RBX: ffff88000ddd1d78 RCX: ffffea0000000000
+RDX: 0000000000000600 RSI: 0000000000000000 RDI: ffff88000ddd1c14
+RBP: ffff88000de8be38 R08: ffff88000de44180 R09: ffff88000de8bdd0
+R10: 000000000000002c R11: 0000000000000000 R12: ffff88000ddfa600
+R13: 0000000000000000 R14: 0000000000000000 R15: ffff88000de92200
+FS:  00007f767548b700(0000) GS:ffff88000fc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000020 CR3: 000000000dd2d000 CR4: 00000000000006f0
+Stack:
+ ffff88000de8bdd0 ffff88000dc1b3d0 ffff88000ddfa650 ffff88000ddfa660
+ ffff88000df8f000 ffff88000ddd1c00 ffff88000de44180 0000000000000000
+ ffffea0000377440 0000000f00000c14 0000000000000000 0000000000000000
+Call Trace:
+ [<ffffffffa0006547>] ioctl+0x217/0x390 [iscsi_trgt]
+ [<ffffffff81192574>] do_vfs_ioctl+0x94/0x5c0
+ [<ffffffff8117ff73>] ? vfs_read+0xf3/0x120
+ [<ffffffff81192b19>] SyS_ioctl+0x79/0x90
+ [<ffffffff8191a45b>] entry_SYSCALL_64_fastpath+0x13/0x8f
+Code: 4c 01 e0 0f 82 a2 01 00 00 48 b9 00 00 00 80 ff 77 00 00 48 01
+c8 45 31 f6 48 b9 00 00 00 00 00 ea ff ff 89 54 24 68 48 c1 e8 0c <49>
+8b 56 20 4c 89 44 24 20 4c 89 f7 48 c1 e0 06 c7 44 24 6c 04 
+RIP  [<ffffffffa0008d45>] volume_add+0x625/0x7f0 [iscsi_trgt]
+ RSP <ffff88000de8bd90>
+CR2: 0000000000000020
+end trace cd2016297df21635 ]
+ietd_response_recv 200 0 -5
+Input/output error.
+
+Upstream-Status: Pending [This patch is based on the previous one which
+has not been merged upstream.]
+
+Signed-off-by: Zhe He <zhe.he@windriver.com>
+
+--- iscsitarget-1.4.20.3+svn502_orig/kernel/volume.c	2017-01-18 08:57:56.752187402 +0800
++++ iscsitarget-1.4.20.3+svn502/kernel/volume.c	2017-01-18 09:02:44.164195234 +0800
+@@ -93,13 +93,14 @@ static void gen_scsiid(struct iet_volume
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
+ 	tfm = crypto_alloc_ahash("md5", 0, CRYPTO_ALG_ASYNC);
++	hash = ahash_request_alloc(tfm, GFP_ATOMIC);
+ #else
+ 	hash.tfm = crypto_alloc_hash("md5", 0, CRYPTO_ALG_ASYNC);
+ 	hash.flags = 0;
+ #endif
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
+-	if (!IS_ERR(tfm)) {
++	if (tfm && !IS_ERR(tfm)) {
+ #else
+ 	if (!IS_ERR(hash.tfm)) {
+ #endif
+@@ -116,10 +117,13 @@ static void gen_scsiid(struct iet_volume
+ 		nbytes += sizeof(volume->lun);
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
+-		crypto_ahash_init(hash);
++		ahash_request_set_callback(hash, 0, NULL, NULL);
+ 		ahash_request_set_crypt(hash, sg, volume->scsi_id, nbytes);
+-		crypto_ahash_update(hash);
+ 		crypto_ahash_digest(hash);
++		crypto_ahash_init(hash);
++		crypto_ahash_update(hash);
++		crypto_ahash_final(hash);
++		ahash_request_free(hash);
+ 		crypto_free_ahash(tfm);
+ #else
+ 		crypto_hash_init(&hash);

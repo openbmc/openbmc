@@ -1,0 +1,53 @@
+Fix formatting strings when compiling with Wformat options
+
+Imported from debian
+
+--- a/lib/application.c
++++ b/lib/application.c
+@@ -352,7 +352,7 @@ static void xnp_application_update_notes
+ 			XfconfChannel* _tmp16_;
+ 			const gchar* _tmp17_;
+ 			_tmp9_ = _ ("Select notes path");
+-			_tmp10_ = (GtkMessageDialog*) gtk_message_dialog_new (NULL, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _tmp9_);
++			_tmp10_ = (GtkMessageDialog*) gtk_message_dialog_new (NULL, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", _tmp9_);
+ 			g_object_ref_sink (_tmp10_);
+ 			error_dialog = _tmp10_;
+ 			_tmp11_ = error_dialog;
+@@ -419,7 +419,7 @@ static void xnp_application_update_notes
+ 		XfconfChannel* _tmp35_;
+ 		const gchar* _tmp36_;
+ 		_tmp27_ = _ ("Select notes path");
+-		_tmp28_ = (GtkMessageDialog*) gtk_message_dialog_new (NULL, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _tmp27_);
++		_tmp28_ = (GtkMessageDialog*) gtk_message_dialog_new (NULL, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", _tmp27_);
+ 		g_object_ref_sink (_tmp28_);
+ 		error_dialog = _tmp28_;
+ 		_tmp29_ = error_dialog;
+@@ -2082,7 +2082,7 @@ static void xnp_application_delete_windo
+ 		gint _tmp9_;
+ 		_tmp3_ = window;
+ 		_tmp4_ = _ ("Are you sure you want to delete this group?");
+-		_tmp5_ = (GtkMessageDialog*) gtk_message_dialog_new ((GtkWindow*) _tmp3_, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, _tmp4_);
++		_tmp5_ = (GtkMessageDialog*) gtk_message_dialog_new ((GtkWindow*) _tmp3_, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", _tmp4_);
+ 		g_object_ref_sink (_tmp5_);
+ 		dialog = _tmp5_;
+ 		_tmp6_ = dialog;
+@@ -2721,7 +2721,7 @@ void xnp_application_open_settings_dialo
+ 		e = _inner_error_;
+ 		_inner_error_ = NULL;
+ 		_tmp0_ = _ ("Unable to open the settings dialog");
+-		_tmp1_ = (GtkMessageDialog*) gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, _tmp0_);
++		_tmp1_ = (GtkMessageDialog*) gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", _tmp0_);
+ 		g_object_ref_sink (_tmp1_);
+ 		error_dialog = _tmp1_;
+ 		_tmp2_ = error_dialog;
+--- a/lib/window.c
++++ b/lib/window.c
+@@ -3542,7 +3542,7 @@ void xnp_window_delete_note (XnpWindow*
+ 		GtkMessageDialog* _tmp13_;
+ 		gint _tmp14_;
+ 		_tmp9_ = _ ("Are you sure you want to delete this note?");
+-		_tmp10_ = (GtkMessageDialog*) gtk_message_dialog_new ((GtkWindow*) self, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, _tmp9_);
++		_tmp10_ = (GtkMessageDialog*) gtk_message_dialog_new ((GtkWindow*) self, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", _tmp9_);
+ 		g_object_ref_sink (_tmp10_);
+ 		dialog = _tmp10_;
+ 		_tmp11_ = dialog;

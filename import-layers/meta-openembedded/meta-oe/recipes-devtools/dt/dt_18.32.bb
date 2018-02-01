@@ -45,3 +45,5 @@ do_install() {
 }
 
 RDEPENDS_${PN} += "tcsh"
+
+PNBLACKLIST[dt] ?= "Rdepends on blacklisted tcsh - the recipe will be removed on 2017-09-01 unless the issue is fixed"

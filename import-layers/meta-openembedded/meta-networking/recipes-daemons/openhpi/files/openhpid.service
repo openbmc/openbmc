@@ -1,0 +1,11 @@
+[Unit]
+Description=Daemon providing access to the SAF Hardware Platform Interface
+After=syslog.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/openhpid.pid
+ExecStart=@SBINDIR@/openhpid -c @SYSCONFDIR@/openhpi/openhpi.conf
+
+[Install]
+WantedBy=multi-user.target

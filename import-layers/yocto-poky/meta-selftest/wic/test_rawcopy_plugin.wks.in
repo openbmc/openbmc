@@ -1,0 +1,6 @@
+# short-description: This file is used in oe-selftest wic module to test rawcopy plugin
+
+part /boot --active --source bootimg-pcbios
+part / --source rawcopy --sourceparams="file=core-image-minimal-${MACHINE}.ext4" --use-uuid
+
+bootloader  --timeout=0 --append="console=ttyS0,115200n8"

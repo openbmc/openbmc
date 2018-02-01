@@ -23,4 +23,4 @@ S = "${WORKDIR}/git"
 
 FILES_${PN} += "${datadir}/themes"
 
-PNBLACKLIST[elbow] ?= "Depends on blacklisted webkit-efl"
+PNBLACKLIST[elbow] ?= "Depends on blacklisted webkit-efl - the recipe will be removed on 2017-09-01 unless the issue is fixed"

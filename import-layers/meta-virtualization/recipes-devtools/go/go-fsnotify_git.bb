@@ -9,8 +9,8 @@ SRCNAME = "fsnotify"
 PKG_NAME = "github.com/go-fsnotify/${SRCNAME}"
 SRC_URI = "git://${PKG_NAME}.git"
 
-SRCREV = "ca50e738d35a862c379baf8fffbc3bfd080b3cff"
-PV = "1.0.4+git${SRCREV}"
+SRCREV = "836bfd95fecc0f1511dd66bdbf2b5b61ab8b00b6"
+PV = "1.2.11+git${SRCREV}"
 
 S = "${WORKDIR}/git"
 

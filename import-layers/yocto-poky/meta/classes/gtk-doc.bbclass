@@ -50,7 +50,7 @@ export GIO_MODULE_DIR=${STAGING_LIBDIR}/gio/modules-dummy
 
 GIR_EXTRA_LIBS_PATH=\`find ${B} -name .libs| tr '\n' ':'\`\$GIR_EXTRA_LIBS_PATH
 
-if test -d ".libs"; then
+if [ -d ".libs" ]; then
     $qemu_binary ".libs/\$@"
 else
     $qemu_binary "\$@"

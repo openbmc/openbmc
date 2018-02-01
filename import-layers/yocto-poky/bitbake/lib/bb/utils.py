@@ -523,12 +523,8 @@ def md5_file(filename):
     """
     Return the hex string representation of the MD5 checksum of filename.
     """
-    try:
-        import hashlib
-        m = hashlib.md5()
-    except ImportError:
-        import md5
-        m = md5.new()
+    import hashlib
+    m = hashlib.md5()
 
     with open(filename, "rb") as f:
         for line in f:
@@ -538,14 +534,9 @@ def md5_file(filename):
 def sha256_file(filename):
     """
     Return the hex string representation of the 256-bit SHA checksum of
-    filename.  On Python 2.4 this will return None, so callers will need to
-    handle that by either skipping SHA checks, or running a standalone sha256sum
-    binary.
+    filename.
     """
-    try:
-        import hashlib
-    except ImportError:
-        return None
+    import hashlib
 
     s = hashlib.sha256()
     with open(filename, "rb") as f:
@@ -557,10 +548,7 @@ def sha1_file(filename):
     """
     Return the hex string representation of the SHA1 checksum of the filename
     """
-    try:
-        import hashlib
-    except ImportError:
-        return None
+    import hashlib
 
     s = hashlib.sha1()
     with open(filename, "rb") as f:
@@ -665,7 +653,7 @@ def build_environment(d):
     for var in bb.data.keys(d):
         export = d.getVarFlag(var, "export", False)
         if export:
-            os.environ[var] = d.getVar(var, True) or ""
+            os.environ[var] = d.getVar(var) or ""
 
 def _check_unsafe_delete_path(path):
     """
@@ -692,7 +680,7 @@ def remove(path, recurse=False):
             if _check_unsafe_delete_path(path):
                 raise Exception('bb.utils.remove: called with dangerous path "%s" and recurse=True, refusing to delete!' % path)
         # shutil.rmtree(name) would be ideal but its too slow
-        subprocess.call(['rm', '-rf'] + glob.glob(path))
+        subprocess.check_call(['rm', '-rf'] + glob.glob(path))
         return
     for name in glob.glob(path):
         try:
@@ -911,10 +899,19 @@ def copyfile(src, dest, newmtime = None, sstat = None):
         newmtime = sstat[stat.ST_MTIME]
     return newmtime
 
-def which(path, item, direction = 0, history = False):
+def which(path, item, direction = 0, history = False, executable=False):
     """
-    Locate a file in a PATH
+    Locate `item` in the list of paths `path` (colon separated string like $PATH).
+    If `direction` is non-zero then the list is reversed.
+    If `history` is True then the list of candidates also returned as result,history.
+    If `executable` is True then the candidate has to be an executable file,
+    otherwise the candidate simply has to exist.
     """
+
+    if executable:
+        is_candidate = lambda p: os.path.isfile(p) and os.access(p, os.X_OK)
+    else:
+        is_candidate = lambda p: os.path.exists(p)
 
     hist = []
     paths = (path or "").split(':')
@@ -924,7 +921,7 @@ def which(path, item, direction = 0, history = False):
     for p in paths:
         next = os.path.join(p, item)
         hist.append(next)
-        if os.path.exists(next):
+        if is_candidate(next):
             if not os.path.isabs(next):
                 next = os.path.abspath(next)
             if history:
@@ -953,7 +950,7 @@ def contains(variable, checkvalues, truevalue, falsevalue, d):
     Arguments:
 
     variable -- the variable name. This will be fetched and expanded (using
-    d.getVar(variable, True)) and then split into a set().
+    d.getVar(variable)) and then split into a set().
 
     checkvalues -- if this is a string it is split on whitespace into a set(),
     otherwise coerced directly into a set().
@@ -966,7 +963,7 @@ def contains(variable, checkvalues, truevalue, falsevalue, d):
     d -- the data store.
     """
 
-    val = d.getVar(variable, True)
+    val = d.getVar(variable)
     if not val:
         return falsevalue
     val = set(val.split())
@@ -979,7 +976,7 @@ def contains(variable, checkvalues, truevalue, falsevalue, d):
     return falsevalue
 
 def contains_any(variable, checkvalues, truevalue, falsevalue, d):
-    val = d.getVar(variable, True)
+    val = d.getVar(variable)
     if not val:
         return falsevalue
     val = set(val.split())
@@ -990,6 +987,30 @@ def contains_any(variable, checkvalues, truevalue, falsevalue, d):
     if checkvalues & val:
         return truevalue
     return falsevalue
+
+def filter(variable, checkvalues, d):
+    """Return all words in the variable that are present in the checkvalues.
+
+    Arguments:
+
+    variable -- the variable name. This will be fetched and expanded (using
+    d.getVar(variable)) and then split into a set().
+
+    checkvalues -- if this is a string it is split on whitespace into a set(),
+    otherwise coerced directly into a set().
+
+    d -- the data store.
+    """
+
+    val = d.getVar(variable)
+    if not val:
+        return ''
+    val = set(val.split())
+    if isinstance(checkvalues, str):
+        checkvalues = set(checkvalues.split())
+    else:
+        checkvalues = set(checkvalues)
+    return ' '.join(sorted(checkvalues & val))
 
 def cpu_count():
     return multiprocessing.cpu_count()
@@ -1378,10 +1399,10 @@ def edit_bblayers_conf(bblayers_conf, add, remove):
 
 def get_file_layer(filename, d):
     """Determine the collection (as defined by a layer's layer.conf file) containing the specified file"""
-    collections = (d.getVar('BBFILE_COLLECTIONS', True) or '').split()
+    collections = (d.getVar('BBFILE_COLLECTIONS') or '').split()
     collection_res = {}
     for collection in collections:
-        collection_res[collection] = d.getVar('BBFILE_PATTERN_%s' % collection, True) or ''
+        collection_res[collection] = d.getVar('BBFILE_PATTERN_%s' % collection) or ''
 
     def path_to_layer(path):
         # Use longest path so we handle nested layers
@@ -1394,7 +1415,7 @@ def get_file_layer(filename, d):
         return match
 
     result = None
-    bbfiles = (d.getVar('BBFILES', True) or '').split()
+    bbfiles = (d.getVar('BBFILES') or '').split()
     bbfilesmatch = False
     for bbfilesentry in bbfiles:
         if fnmatch.fnmatch(filename, bbfilesentry):
@@ -1471,7 +1492,7 @@ def export_proxies(d):
         if v in os.environ.keys():
             exported = True
         else:
-            v_proxy = d.getVar(v, True)
+            v_proxy = d.getVar(v)
             if v_proxy is not None:
                 os.environ[v] = v_proxy
                 exported = True
@@ -1503,3 +1524,14 @@ def load_plugins(logger, plugins, pluginpath):
                 plugins.append(obj or plugin)
             else:
                 plugins.append(plugin)
+
+
+class LogCatcher(logging.Handler):
+    """Logging handler for collecting logged messages so you can check them later"""
+    def __init__(self):
+        self.messages = []
+        logging.Handler.__init__(self, logging.WARNING)
+    def emit(self, record):
+        self.messages.append(bb.build.logformatter.format(record))
+    def contains(self, message):
+        return (message in self.messages)

@@ -1,0 +1,49 @@
+From: jose.bollo@iot.bzh
+Date: Thu, 4 May 2017 21:47:38 +0200
+Subject: [PATCH] Check response existence on upgrade
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When a connection upgrade is requested and when the
+request sent an error reply, the response is most of
+the time already sent when the test on
+connection->response->upgrade_handler is made, leading
+to dereferencing NULL.
+
+Two possibilities exist:
+
+  NULL == connection->response || NULL == connection->response->upgrade_handler
+
+or
+
+  NULL != connection->response && NULL == connection->response->upgrade_handler
+
+The first is prefered because it is probably safer to close the connection
+in that case.
+
+Upstream-Status: Accepted [https://gnunet.org/git/libmicrohttpd.git/commit/?id=b4216c60fdb5b48f6cfec416301fc63a1167e6cd]
+
+Change-Id: Ie6e7fc165f7fe3635ade0952bb34a0b937d38716
+Signed-off-by: José Bollo <jobol@nonadev.net>
+Signed-off-by: José Bollo <jose.bollo@iot.bzh>
+---
+ src/microhttpd/connection.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/microhttpd/connection.c b/src/microhttpd/connection.c
+index a495524..d39c110 100644
+--- a/src/microhttpd/connection.c
++++ b/src/microhttpd/connection.c
+@@ -882,7 +882,7 @@ keepalive_possible (struct MHD_Connection *connection)
+ #ifdef UPGRADE_SUPPORT
+     if ( (MHD_str_equal_caseless_ (end,
+                                    "upgrade")) &&
+-         (NULL == connection->response->upgrade_handler) )
++         (NULL == connection->response || NULL == connection->response->upgrade_handler) )
+       return MHD_NO;
+ #endif /* UPGRADE_SUPPORT */
+ 
+-- 
+2.9.3
+

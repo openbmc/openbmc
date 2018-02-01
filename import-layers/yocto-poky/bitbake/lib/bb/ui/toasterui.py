@@ -168,6 +168,9 @@ def main(server, eventHandler, params):
         logger.warning("buildhistory is not enabled. Please enable INHERIT += \"buildhistory\" to see image details.")
         build_history_enabled = False
 
+    if not "buildstats" in inheritlist.split(" "):
+        logger.warning("buildstats is not enabled. Please enable INHERIT += \"buildstats\" to generate build statistics.")
+
     if not params.observe_only:
         params.updateFromServer(server)
         params.updateToServer(server, os.environ.copy())
@@ -232,6 +235,9 @@ def main(server, eventHandler, params):
 
             # pylint: disable=protected-access
             # the code will look into the protected variables of the event; no easy way around this
+
+            if isinstance(event, bb.event.HeartbeatEvent):
+                continue
 
             if isinstance(event, bb.event.ParseStarted):
                 if not (build_log and build_log_file_path):
@@ -432,9 +438,7 @@ def main(server, eventHandler, params):
                 elif event.type == "SetBRBE":
                     buildinfohelper.brbe = buildinfohelper._get_data_from_event(event)
                 elif event.type == "TaskArtifacts":
-                    # not implemented yet
-                    # see https://bugzilla.yoctoproject.org/show_bug.cgi?id=10283 for details
-                    pass
+                    buildinfohelper.scan_task_artifacts(event)
                 elif event.type == "OSErrorException":
                     logger.error(event)
                 else:

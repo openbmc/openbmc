@@ -5,6 +5,7 @@ LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=78fa8ef966b48fbf9095e13cc92377c5"
 
 DEPENDS = "xz libpcap libpcre daq libdnet util-linux"
+DEPENDS_append_libc-musl = " libtirpc"
 
 SRC_URI = " ${GENTOO_MIRROR}/${BP}.tar.gz;name=tarball \
     file://snort.init \
@@ -46,6 +47,9 @@ PACKAGECONFIG ?= "openssl lzma"
 PACKAGECONFIG[openssl] = "--with-openssl-includes=${STAGING_INCDIR} --with-openssl-libraries=${STAGING_LIBDIR}, --without-openssl-includes --without-openssl-libraries, openssl,"
 PACKAGECONFIG[lzma] = "--with-lzma-includes=${STAGING_INCDIR} --with-lzma-libraries=${STAGING_LIBDIR}, --without-lzma-includes --without-lzma-libraries, xz,"
 
+CFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc"
+LDFLAGS_append_libc-musl = " -ltirpc"
+
 do_install_append() {
     install -d ${D}${sysconfdir}/snort/rules
     install -d ${D}${sysconfdir}/snort/preproc_rules
@@ -53,6 +57,17 @@ do_install_append() {
     for i in map config conf dtd; do
         cp ${S}/etc/*.$i ${D}${sysconfdir}/snort/
     done
+
+    # fix the hardcoded path and lib name
+    # comment out the rules that are not provided
+    sed -i -e 's#/usr/local/lib#${libdir}#' \
+           -e 's#\.\./\(.*rules\)#${sysconfdir}/snort/\1#' \
+           -e 's#\(libsf_engine.so\)#\1.0#' \
+           -e 's/^\(include $RULE_PATH\)/#\1/' \
+           -e 's/^\(dynamicdetection\)/#\1/' \
+           -e '/preprocessor reputation/,/blacklist/ s/^/#/' \
+           ${D}${sysconfdir}/snort/snort.conf
+
     cp ${S}/preproc_rules/*.rules ${D}${sysconfdir}/snort/preproc_rules/
     install -m 755 ${WORKDIR}/snort.init ${D}${sysconfdir}/init.d/snort
     mkdir -p ${D}${localstatedir}/log/snort

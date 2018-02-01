@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+
+# OpenEmbedded test tool
+#
+# Copyright (C) 2016 Intel Corporation
+# Released under the MIT license (see COPYING.MIT)
+
+import os
+import sys
+import argparse
+import importlib
+import logging
+
+scripts_path = os.path.dirname(os.path.realpath(__file__))
+lib_path = scripts_path + '/lib'
+sys.path = sys.path + [lib_path]
+import argparse_oe
+import scriptutils
+
+# oe-test is used for testexport and it doesn't have oe lib
+# so we just skip adding these libraries (not used in testexport)
+try:
+    import scriptpath
+    scriptpath.add_oe_lib_path()
+except ImportError:
+    pass
+
+from oeqa.core.context import OETestContextExecutor
+
+logger = scriptutils.logger_create('oe-test')
+
+def _load_test_components(logger):
+    components = {}
+
+    for path in sys.path:
+        base_dir = os.path.join(path, 'oeqa')
+        if os.path.exists(base_dir) and os.path.isdir(base_dir):
+            for file in os.listdir(base_dir):
+                comp_name = file
+                comp_context = os.path.join(base_dir, file, 'context.py')
+                if os.path.exists(comp_context):
+                    comp_plugin = importlib.import_module('oeqa.%s.%s' % \
+                            (comp_name, 'context'))
+                    try:
+                        if not issubclass(comp_plugin._executor_class,
+                                OETestContextExecutor):
+                            raise TypeError("Component %s in %s, _executor_class "\
+                                "isn't derived from OETestContextExecutor."\
+                                % (comp_name, comp_context))
+
+                        components[comp_name] = comp_plugin._executor_class()
+                    except AttributeError:
+                        raise AttributeError("Component %s in %s don't have "\
+                                "_executor_class defined." % (comp_name, comp_context))
+
+    return components
+
+def main():
+    parser = argparse_oe.ArgumentParser(description="OpenEmbedded test tool",
+                                        add_help=False,
+                                        epilog="Use %(prog)s <subcommand> --help to get help on a specific command")
+    parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
+    parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
+    global_args, unparsed_args = parser.parse_known_args()
+
+    # Help is added here rather than via add_help=True, as we don't want it to
+    # be handled by parse_known_args()
+    parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS,
+                        help='show this help message and exit')
+
+    if global_args.debug:
+        logger.setLevel(logging.DEBUG)
+    elif global_args.quiet:
+        logger.setLevel(logging.ERROR)
+
+    components = _load_test_components(logger)
+
+    subparsers = parser.add_subparsers(dest="subparser_name", title='subcommands', metavar='<subcommand>')
+    subparsers.add_subparser_group('components', 'Test components')
+    subparsers.required = True
+    for comp_name in sorted(components.keys()):
+        comp = components[comp_name]
+        comp.register_commands(logger, subparsers)
+
+    try:
+        args = parser.parse_args(unparsed_args, namespace=global_args)
+        results = args.func(logger, args)
+        ret = 0 if results.wasSuccessful() else 1
+    except SystemExit as err:
+        if err.code != 0:
+            raise err
+        ret = err.code
+    except argparse_oe.ArgumentUsageError as ae:
+        parser.error_subcommand(ae.message, ae.subcommand)
+
+    return ret
+
+if __name__ == '__main__':
+    try:
+        ret = main()
+    except Exception:
+        ret = 1
+        import traceback
+        traceback.print_exc()
+    sys.exit(ret)

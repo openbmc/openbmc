@@ -12,8 +12,11 @@ LICENSE = "LGPLv2+"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=e4cf3810f33a067ea7ccd2cd889fed21"
 SRCREV = "b6b3ed1fa4c6de12908a9f01d1689f156c3cd441"
+PV = "0.1.496+git${SRCPV}"
+
 SRC_URI = "git://git.sv.gnu.org/gnulib;protocol=git \
 "
+
 S = "${WORKDIR}/git"
 
 do_install () {

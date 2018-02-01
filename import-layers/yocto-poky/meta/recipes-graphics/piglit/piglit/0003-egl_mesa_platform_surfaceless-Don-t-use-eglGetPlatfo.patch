@@ -1,0 +1,36 @@
+From c0dc430b8f5deeacdb11cd188195e16f512af233 Mon Sep 17 00:00:00 2001
+From: Daniel Diaz <daniel.diaz@linaro.org>
+Date: Wed, 17 May 2017 18:00:16 -0500
+Subject: [PATCH 3/4] egl_mesa_platform_surfaceless: Don't use
+ eglGetPlatformDisplay directly
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The entry point is not guaranteed to exist, so use the
+piglit_egl_get_default_display() helper which does the correct thing.
+
+Upstream-Status: Accepted, since git 7b74602.
+
+Signed-off-by: Daniel Díaz <daniel.diaz@linaro.org>
+Reviewed-by: Emil Velikov <emil.velikov@collabora.com>
+---
+ .../spec/egl_mesa_platform_surfaceless/egl_mesa_platform_surfaceless.c  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/egl/spec/egl_mesa_platform_surfaceless/egl_mesa_platform_surfaceless.c b/tests/egl/spec/egl_mesa_platform_surfaceless/egl_mesa_platform_surfaceless.c
+index 3bbd6aa..81a3919 100644
+--- a/tests/egl/spec/egl_mesa_platform_surfaceless/egl_mesa_platform_surfaceless.c
++++ b/tests/egl/spec/egl_mesa_platform_surfaceless/egl_mesa_platform_surfaceless.c
+@@ -31,7 +31,7 @@ test_setup(EGLDisplay *dpy)
+ 
+ 	piglit_require_egl_extension(EGL_NO_DISPLAY, "EGL_MESA_platform_surfaceless");
+ 
+-	*dpy = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA, NULL, NULL);
++	*dpy = piglit_egl_get_default_display(EGL_PLATFORM_SURFACELESS_MESA);
+ 	if (*dpy == EGL_NO_DISPLAY) {
+ 		printf("failed to get EGLDisplay\n");
+ 		piglit_report_result(PIGLIT_SKIP);
+-- 
+1.9.1
+

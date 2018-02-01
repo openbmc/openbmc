@@ -10,6 +10,14 @@
 #
 # RM_WORK_EXCLUDE += "icu-native icu busybox"
 #
+# Recipes can also configure which entries in their ${WORKDIR}
+# are preserved besides temp, which already gets excluded by default
+# because it contains logs:
+# do_install_append () {
+#     echo "bar" >${WORKDIR}/foo
+# }
+# RM_WORK_EXCLUDE_ITEMS += "foo"
+RM_WORK_EXCLUDE_ITEMS = "temp"
 
 # Use the completion scheduler by default when rm_work is active
 # to try and reduce disk usage
@@ -17,9 +25,6 @@ BB_SCHEDULER ?= "completion"
 
 # Run the rm_work task in the idle scheduling class
 BB_TASK_IONICE_LEVEL_task-rm_work = "3.0"
-
-RMWORK_ORIG_TASK := "${BB_DEFAULT_TASK}"
-BB_DEFAULT_TASK = "rm_work_all"
 
 do_rm_work () {
     # If the recipe name is in the RM_WORK_EXCLUDE, skip the recipe.
@@ -37,7 +42,7 @@ do_rm_work () {
         # failures of removing pseudo folers on NFS2/3 server.
         if [ $dir = 'pseudo' ]; then
             rm -rf $dir 2> /dev/null || true
-        elif [ $dir != 'temp' ]; then
+        elif ! echo '${RM_WORK_EXCLUDE_ITEMS}' | grep -q -w "$dir"; then
             rm -rf $dir
         fi
     done
@@ -66,7 +71,7 @@ do_rm_work () {
                 i=dummy
                 break
                 ;;
-            *do_rootfs*|*do_image*|*do_bootimg*|*do_bootdirectdisk*|*do_vmimg*)
+            *do_rootfs*|*do_image*|*do_bootimg*|*do_bootdirectdisk*|*do_vmimg*|*do_write_qemuboot_conf*)
                 i=dummy
                 break
                 ;;
@@ -97,13 +102,12 @@ do_rm_work () {
         rm -f $i
     done
 }
-addtask rm_work after do_${RMWORK_ORIG_TASK}
-
 do_rm_work_all () {
     :
 }
 do_rm_work_all[recrdeptask] = "do_rm_work"
-addtask rm_work_all after do_rm_work
+do_rm_work_all[noexec] = "1"
+addtask rm_work_all after before do_build
 
 do_populate_sdk[postfuncs] += "rm_work_populatesdk"
 rm_work_populatesdk () {
@@ -117,13 +121,52 @@ rm_work_rootfs () {
 }
 rm_work_rootfs[cleandirs] = "${WORKDIR}/rootfs"
 
-python () {
+# This task can be used instead of do_build to trigger building
+# without also invoking do_rm_work. It only exists when rm_work.bbclass
+# is active, otherwise do_build needs to be used.
+#
+# The intended usage is
+# ${@ d.getVar('RM_WORK_BUILD_WITHOUT') or 'do_build'}
+# in places that previously used just 'do_build'.
+RM_WORK_BUILD_WITHOUT = "do_build_without_rm_work"
+do_build_without_rm_work () {
+    :
+}
+do_build_without_rm_work[noexec] = "1"
+
+# We have to add these tasks already now, because all tasks are
+# meant to be defined before the RecipeTaskPreProcess event triggers.
+# The inject_rm_work event handler then merely changes task dependencies.
+addtask do_rm_work
+addtask do_build_without_rm_work
+addhandler inject_rm_work
+inject_rm_work[eventmask] = "bb.event.RecipeTaskPreProcess"
+python inject_rm_work() {
     if bb.data.inherits_class('kernel', d):
-        d.appendVar("RM_WORK_EXCLUDE", ' ' + d.getVar("PN", True))
+        d.appendVar("RM_WORK_EXCLUDE", ' ' + d.getVar("PN"))
     # If the recipe name is in the RM_WORK_EXCLUDE, skip the recipe.
-    excludes = (d.getVar("RM_WORK_EXCLUDE", True) or "").split()
-    pn = d.getVar("PN", True)
+    excludes = (d.getVar("RM_WORK_EXCLUDE") or "").split()
+    pn = d.getVar("PN")
+
+    # Determine what do_build depends upon, without including do_build
+    # itself or our own special do_rm_work_all.
+    deps = set(bb.build.preceedtask('do_build', True, d))
+    deps.difference_update(('do_build', 'do_rm_work_all'))
+
     if pn in excludes:
         d.delVarFlag('rm_work_rootfs', 'cleandirs')
         d.delVarFlag('rm_work_populatesdk', 'cleandirs')
+    else:
+        # Inject do_rm_work into the tasks of the current recipe such that do_build
+        # depends on it and that it runs after all other tasks that block do_build,
+        # i.e. after all work on the current recipe is done. The reason for taking
+        # this approach instead of making do_rm_work depend on do_build is that
+        # do_build inherits additional runtime dependencies on
+        # other recipes and thus will typically run much later than completion of
+        # work in the recipe itself.
+        # In practice, addtask() here merely updates the dependencies.
+        bb.build.addtask('do_rm_work', 'do_build', ' '.join(deps), d)
+
+    # Always update do_build_without_rm_work dependencies.
+    bb.build.addtask('do_build_without_rm_work', '', ' '.join(deps), d)
 }

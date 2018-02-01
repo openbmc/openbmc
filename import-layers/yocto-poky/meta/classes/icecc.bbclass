@@ -101,7 +101,7 @@ def use_icecc(bb,d):
     if icecc_is_allarch(bb, d):
         return "no"
 
-    pn = d.getVar('PN', True)
+    pn = d.getVar('PN')
 
     system_class_blacklist = []
     user_class_blacklist = (d.getVar('ICECC_USER_CLASS_BL', False) or "none").split()
@@ -140,7 +140,7 @@ def use_icecc(bb,d):
     return "yes"
 
 def icecc_is_allarch(bb, d):
-    return d.getVar("PACKAGE_ARCH", True) == "all" or bb.data.inherits_class('allarch', d)
+    return d.getVar("PACKAGE_ARCH") == "all" or bb.data.inherits_class('allarch', d)
 
 def icecc_is_kernel(bb, d):
     return \

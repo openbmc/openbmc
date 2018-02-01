@@ -19,4 +19,4 @@ GNOME_COMPRESS_TYPE="bz2"
 RRECOMMENDS_${PN} += "gnome-common-schemas"
 
 # http://errors.yoctoproject.org/Errors/Details/68636/
-PNBLACKLIST[gnome-terminal] ?= "BROKEN: fails to build with gcc-6"
+PNBLACKLIST[gnome-terminal] ?= "BROKEN: fails to build with gcc-6 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

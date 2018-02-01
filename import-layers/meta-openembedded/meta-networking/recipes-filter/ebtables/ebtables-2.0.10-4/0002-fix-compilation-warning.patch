@@ -1,0 +1,25 @@
+From 2a5333fc8b4825251adfb717d980d89cefde38d6 Mon Sep 17 00:00:00 2001
+From: Petri Gynther <petri.gynther@gmail.com>
+Date: Sun, 24 Feb 2013 10:56:59 +0100
+Subject: [PATCH 02/10] fix compilation warning
+
+---
+ communication.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/communication.c b/communication.c
+index 62ed667..ba058c0 100644
+--- a/communication.c
++++ b/communication.c
+@@ -282,7 +282,7 @@ static int store_counters_in_file(char *filename, struct ebt_u_replace *repl)
+ 	}
+ close_file:
+ 	fclose(file);
+-	return 0;
++	return ret;
+ }
+ 
+ /* Gets executed after ebt_deliver_table. Delivers the counters to the kernel
+-- 
+2.12.1
+

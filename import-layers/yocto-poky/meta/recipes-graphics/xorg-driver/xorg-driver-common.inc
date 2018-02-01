@@ -33,8 +33,8 @@ def _add_xorg_abi_depends(d, name):
     }
 
     output = os.popen("pkg-config xorg-server --variable=%s" % abis[name]).read()
-    mlprefix = d.getVar('MLPREFIX', True) or ''
+    mlprefix = d.getVar('MLPREFIX') or ''
     abi = "%sxorg-abi-%s-%s" % (mlprefix, name, output.split(".")[0])
 
-    pn = d.getVar("PN", True)
+    pn = d.getVar("PN")
     d.appendVar('RDEPENDS_' + pn, ' ' + abi)

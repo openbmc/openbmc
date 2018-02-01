@@ -20,7 +20,7 @@ SRC_URI = "https://releases.pagure.org/libuser/libuser-${PV}.tar.xz \
 SRC_URI[md5sum] = "63e5e5c551e99dc5302b40b80bd6d4f2"
 SRC_URI[sha256sum] = "a58ff4fabb01a25043b142185a33eeea961109dd60d4b40b6a9df4fa3cace20b"
 
-DEPENDS = "popt libpam glib-2.0 docbook-utils-native linuxdoc-tools-native python3"
+DEPENDS = "popt libpam glib-2.0 python3"
 
 inherit autotools gettext python3native python3-dir pkgconfig gtk-doc
 

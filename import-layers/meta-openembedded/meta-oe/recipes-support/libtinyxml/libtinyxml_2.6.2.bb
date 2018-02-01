@@ -42,4 +42,4 @@ do_install() {
     install -m 0644 ${S}/tinyxml.h ${D}${includedir}
 }
 
-BBCLASSEXTEND += "native"
+BBCLASSEXTEND = "native"

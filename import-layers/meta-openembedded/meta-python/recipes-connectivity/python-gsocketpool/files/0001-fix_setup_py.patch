@@ -1,0 +1,35 @@
+From 2d47a5df58802173bf90d760b1d6f520aeea76fc Mon Sep 17 00:00:00 2001
+From: Andrej Rode <andrej.rode@ettus.com>
+Date: Mon, 10 Apr 2017 16:47:41 -0700
+Subject: [PATCH] setup: remove find_packages since that would install tests as
+ a package as well
+
+Signed-off-by: Andrej Rode <andrej.rode@ettus.com>
+---
+ setup.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 6b37016..a1f11a7 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1,6 +1,6 @@
+ # -*- coding: utf-8 -*-
+ 
+-from setuptools import setup, find_packages
++from setuptools import setup
+ 
+ setup(
+     name='gsocketpool',
+@@ -9,7 +9,7 @@ setup(
+     author='Studio Ousia',
+     author_email='ikuya@ousia.jp',
+     url='http://github.com/studio-ousia/gsocketpool',
+-    packages=find_packages(),
++    packages=['gsocketpool'],
+     license=open('LICENSE').read(),
+     include_package_data=True,
+     classifiers=(
+-- 
+2.10.2
+

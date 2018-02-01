@@ -21,10 +21,10 @@ index 7bca948..5a1bc44 100644
 --- a/libopkg/opkg_conf.h
 +++ b/libopkg/opkg_conf.h
 @@ -40,7 +40,7 @@ extern "C" {
- #define OPKG_CONF_DEFAULT_STATUS_FILE   "/var/lib/opkg/status"
- #define OPKG_CONF_DEFAULT_CACHE_DIR     "/var/cache/opkg"
- #define OPKG_CONF_DEFAULT_CONF_FILE_DIR "/etc/opkg"
--#define OPKG_CONF_DEFAULT_LOCK_FILE     "/var/run/opkg.lock"
+ #define OPKG_CONF_DEFAULT_STATUS_FILE   VARDIR "/lib/opkg/status"
+ #define OPKG_CONF_DEFAULT_CACHE_DIR     VARDIR "/cache/opkg"
+ #define OPKG_CONF_DEFAULT_CONF_FILE_DIR SYSCONFDIR "/opkg"
+-#define OPKG_CONF_DEFAULT_LOCK_FILE     VARDIR "/run/opkg.lock"
 +#define OPKG_CONF_DEFAULT_LOCK_FILE     "/run/opkg.lock"
  
  /* In case the config file defines no dest */

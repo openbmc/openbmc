@@ -180,7 +180,7 @@ build results (as the layer priority order has effectively changed).
 
         if first_regex:
             # Find the BBFILES entries that match (which will have come from this conf/layer.conf file)
-            bbfiles = str(self.tinfoil.config_data.getVar('BBFILES', True)).split()
+            bbfiles = str(self.tinfoil.config_data.getVar('BBFILES')).split()
             bbfiles_layer = []
             for item in bbfiles:
                 if first_regex.match(item):

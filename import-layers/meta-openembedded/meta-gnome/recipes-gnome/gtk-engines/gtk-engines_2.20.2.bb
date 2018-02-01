@@ -6,7 +6,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 SECTION = "x11/base"
-DEPENDS = "intltool-native gtk+ gettext-native"
+DEPENDS = "intltool-native gtk+ gettext-native glib-2.0-native"
 
 PR = "r3"
 
@@ -41,8 +41,8 @@ ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 UPSTREAM_CHECK_REGEX = "(?P<pver>2\.([0-8]*[02468])+(\.\d+)+)"
 
 python populate_packages_prepend() {
-    engines_root = os.path.join(d.getVar('libdir', True), "gtk-2.0/2.10.0/engines")
-    themes_root = os.path.join(d.getVar('datadir', True), "themes")
+    engines_root = os.path.join(d.getVar('libdir'), "gtk-2.0/2.10.0/engines")
+    themes_root = os.path.join(d.getVar('datadir'), "themes")
 
     do_split_packages(d, engines_root, '^lib(.*)\.so$', 'gtk-engine-%s', 'GTK %s theme engine', extra_depends='')
     do_split_packages(d, themes_root, '(.*)', 'gtk-theme-%s', 'GTK theme %s', allow_dirs=True, extra_depends='')

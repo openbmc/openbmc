@@ -1,0 +1,135 @@
+From 0e054339c1422168a7f4a9dcf090268053a33b1f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Jul 2017 21:05:37 -0700
+Subject: [PATCH 2/5] wvtask: Dont use ucontext on non-glibc systems
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/wvtask.cc | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/utils/wvtask.cc b/utils/wvtask.cc
+index cdcd544..c0bff7d 100644
+--- a/utils/wvtask.cc
++++ b/utils/wvtask.cc
+@@ -199,7 +199,9 @@ WvTaskMan::WvTaskMan()
+     stacktop = (char *)alloca(0);
+     
+     context_return = 0;
++#ifdef __GLIBC__
+     assert(getcontext(&get_stack_return) == 0);
++#endif
+     if (context_return == 0)
+     {
+ 	// initial setup - start the stackmaster() task (never returns!)
+@@ -265,13 +267,17 @@ int WvTaskMan::run(WvTask &task, int val)
+ 	state = &old_task->mystate;
+     
+     context_return = 0;
++#ifdef __GLIBC__
+     assert(getcontext(state) == 0);
++#endif
+     int newval = context_return;
+     if (newval == 0)
+     {
+ 	// saved the state, now run the task.
+         context_return = val;
++#ifdef __GLIBC__
+         setcontext(&task.mystate);
++#endif
+         return -1;
+     }
+     else
+@@ -319,13 +325,17 @@ int WvTaskMan::yield(int val)
+ #endif
+ 		
+     context_return = 0;
++#ifdef __GLIBC__
+     assert(getcontext(&current_task->mystate) == 0);
++#endif
+     int newval = context_return;
+     if (newval == 0)
+     {
+ 	// saved the task state; now yield to the toplevel.
+         context_return = val;
++#ifdef __GLIBC__
+         setcontext(&toplevel);
++#endif
+         return -1;
+     }
+     else
+@@ -341,7 +351,9 @@ int WvTaskMan::yield(int val)
+ void WvTaskMan::get_stack(WvTask &task, size_t size)
+ {
+     context_return = 0;
++#ifdef __GLIBC__
+     assert(getcontext(&get_stack_return) == 0);
++#endif
+     if (context_return == 0)
+     {
+ 	assert(magic_number == -WVTASK_MAGIC);
+@@ -371,7 +383,9 @@ void WvTaskMan::get_stack(WvTask &task, size_t size)
+ 	// initial setup
+ 	stack_target = &task;
+ 	context_return = size/1024 + (size%1024 > 0);
++#ifdef __GLIBC__
+ 	setcontext(&stackmaster_task);
++#endif
+     }
+     else
+     {
+@@ -409,7 +423,9 @@ void WvTaskMan::_stackmaster()
+ 	assert(magic_number == -WVTASK_MAGIC);
+ 	
+         context_return = 0;
++#ifdef __GLIBC__
+         assert(getcontext(&stackmaster_task) == 0);
++#endif
+         val = context_return;
+ 	if (val == 0)
+ 	{
+@@ -419,7 +435,9 @@ void WvTaskMan::_stackmaster()
+ 	    // all current stack allocations) and go back to get_stack
+ 	    // (or the constructor, if that's what called us)
+             context_return = 1;
++#ifdef __GLIBC__
+             setcontext(&get_stack_return);
++#endif
+ 	}
+ 	else
+ 	{
+@@ -474,7 +492,9 @@ void WvTaskMan::do_task()
+ 	
+     // back here from longjmp; someone wants stack space.    
+     context_return = 0;
++#ifdef __GLIBC__
+     assert(getcontext(&task->mystate) == 0);
++#endif
+     if (context_return == 0)
+     {
+ 	// done the setjmp; that means the target task now has
+@@ -510,7 +530,9 @@ void WvTaskMan::do_task()
+                 }
+                 else
+                 {
++#ifdef __GLIBC__
+                     assert(getcontext(&task->func_call) == 0);
++#endif
+                     task->func_call.uc_stack.ss_size = task->stacksize;
+                     task->func_call.uc_stack.ss_sp = task->stack;
+                     task->func_call.uc_stack.ss_flags = 0;
+@@ -521,9 +543,11 @@ void WvTaskMan::do_task()
+                             (void (*)(void))call_func, 1, task);
+ 
+                     context_return = 0;
++#ifdef __GLIBC__
+                     assert(getcontext(&task->func_return) == 0);
+                     if (context_return == 0)
+                         setcontext(&task->func_call);
++#endif
+                 }
+ 		
+ 		// the task's function terminated.
+-- 
+2.13.3
+

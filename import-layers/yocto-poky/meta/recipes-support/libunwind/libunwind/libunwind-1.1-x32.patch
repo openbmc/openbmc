@@ -1,0 +1,31 @@
+From 506bd37bd580d7382d7c58257dac4b1e502a887c Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Tue, 13 Dec 2016 09:50:34 -0700
+Subject: [PATCH] Fix for X32
+
+Apply patch to fix the X32 build from https://github.com/sjnewbury/x32.
+
+Upstream-Status: Pending
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+---
+ src/x86_64/Gos-linux.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/x86_64/Gos-linux.c b/src/x86_64/Gos-linux.c
+index 9e1acfc..8169d5a 100644
+--- a/src/x86_64/Gos-linux.c
++++ b/src/x86_64/Gos-linux.c
+@@ -143,8 +143,8 @@ x86_64_sigreturn (unw_cursor_t *cursor)
+ 
+   Debug (8, "resuming at ip=%llx via sigreturn(%p)\n",
+              (unsigned long long) c->dwarf.ip, sc);
+-  __asm__ __volatile__ ("mov %0, %%rsp;"
+-                        "mov %1, %%rax;"
++  __asm__ __volatile__ ("mov %q0, %%rsp;"
++                        "mov %q1, %%rax;"
+                         "syscall"
+                         :: "r"(sc), "i"(SYS_rt_sigreturn)
+                         : "memory");
+-- 
+2.8.0
+

@@ -1,0 +1,38 @@
+From ed4422979b221c8613ca02eb5c57cb80009366d1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 Mar 2017 10:13:24 -0700
+Subject: [PATCH 1/2] Fix comparison types
+
+Fixes
+error: comparison between pointer and integer ('char *' and 'int')
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ clients/memflush.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/clients/memflush.cc b/clients/memflush.cc
+index 8bd0dbf..71545ea 100644
+--- a/clients/memflush.cc
++++ b/clients/memflush.cc
+@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
+ {
+   options_parse(argc, argv);
+ 
+-  if (opt_servers == false)
++  if (opt_servers == NULL)
+   {
+     char *temp;
+ 
+@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
+       opt_servers= strdup(temp);
+     }
+ 
+-    if (opt_servers == false)
++    if (opt_servers == NULL)
+     {
+       std::cerr << "No Servers provided" << std::endl;
+       exit(EXIT_FAILURE);
+-- 
+2.12.0
+

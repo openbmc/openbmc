@@ -1,0 +1,49 @@
+From a9f8d414972b0b7c963d7efe38b5cfdcb6413c46 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 6 Feb 2017 16:34:54 -0500
+Subject: [PATCH] Remove extra const keywords gcc 7 gripes about.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/efibootdump.c | 2 +-
+ src/efibootmgr.c  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/efibootdump.c b/src/efibootdump.c
+index 3e448c2..5a9b681 100644
+--- a/src/efibootdump.c
++++ b/src/efibootdump.c
+@@ -36,7 +36,7 @@ print_boot_entry(efi_load_option *loadopt, size_t data_size)
+ 	uint8_t *optional_data = NULL;
+ 	size_t optional_data_len = 0;
+ 	uint16_t pathlen;
+-	const unsigned char const *desc;
++	const unsigned char *desc;
+ 	char *raw;
+ 	size_t raw_len;
+ 
+diff --git a/src/efibootmgr.c b/src/efibootmgr.c
+index baefa68..683623b 100644
+--- a/src/efibootmgr.c
++++ b/src/efibootmgr.c
+@@ -214,7 +214,7 @@ warn_duplicate_name(list_t *boot_list)
+ 	list_t *pos;
+ 	var_entry_t *boot;
+ 	efi_load_option *load_option;
+-	const unsigned char const *desc;
++	const unsigned char *desc;
+ 
+ 	list_for_each(pos, boot_list) {
+ 		boot = list_entry(pos, var_entry_t, list);
+@@ -821,7 +821,7 @@ show_boot_vars()
+ {
+ 	list_t *pos;
+ 	var_entry_t *boot;
+-	const unsigned char const *description;
++	const unsigned char *description;
+ 	efi_load_option *load_option;
+ 	efidp dp = NULL;
+ 	unsigned char *optional_data = NULL;
+-- 
+2.12.2
+

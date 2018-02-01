@@ -20,3 +20,5 @@ do_install() {
     install -m 0755 dbus-daemon-proxy ${D}${bindir}
 }
 
+
+PNBLACKLIST[dbus-daemon-proxy] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130613/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

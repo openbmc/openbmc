@@ -1,0 +1,84 @@
+From f21a7a4849b50c30341ec571813bd7fe37040ad3 Mon Sep 17 00:00:00 2001
+From: Florian Westphal <fw@strlen.de>
+Date: Thu, 18 May 2017 13:30:54 +0200
+Subject: [PATCH 4/4] payload: enforce ip/ip6 protocol depending on icmp or
+ icmpv6
+
+After some discussion with Pablo we agreed to treat icmp/icmpv6 specially.
+
+in the case of a rule like 'tcp dport 22' the inet, bridge and netdev
+families only care about the lower layer protocol.
+
+In the icmpv6 case however we'd like to also enforce an ipv6 protocol check
+(and ipv4 check in icmp case).
+
+This extends payload_gen_special_dependency() to consider this.
+With this patch:
+
+add rule $pf filter input meta l4proto icmpv6
+add rule $pf filter input meta l4proto icmpv6 icmpv6 type echo-request
+add rule $pf filter input icmpv6 type echo-request
+
+will work in all tables and all families.
+For inet/bridge/netdev, an ipv6 protocol dependency is added; this will
+not match ipv4 packets with ip->protocol == icmpv6, EXCEPT in the case
+of the ip family.
+
+Its still possible to match icmpv6-in-ipv4 in inet/bridge/netdev with an
+explicit dependency:
+
+add rule inet f i ip protocol ipv6-icmp meta l4proto ipv6-icmp icmpv6 type ...
+
+Implicit dependencies won't get removed at the moment, so
+  bridge ... icmp type echo-request
+will be shown as
+  ether type ip meta l4proto 1 icmp type echo-request
+
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+Upstream-Status: Backport
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ src/payload.c | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/src/payload.c b/src/payload.c
+index 38db15e..8796ee5 100644
+--- a/src/payload.c
++++ b/src/payload.c
+@@ -264,10 +264,29 @@ payload_gen_special_dependency(struct eval_ctx *ctx, const struct expr *expr)
+ 	case PROTO_BASE_LL_HDR:
+ 		return payload_get_get_ll_hdr(ctx);
+ 	case PROTO_BASE_TRANSPORT_HDR:
+-		if (expr->payload.desc == &proto_icmp)
+-			return &proto_ip;
+-		if (expr->payload.desc == &proto_icmp6)
+-			return &proto_ip6;
++		if (expr->payload.desc == &proto_icmp ||
++		    expr->payload.desc == &proto_icmp6) {
++			const struct proto_desc *desc, *desc_upper;
++			struct stmt *nstmt;
++
++			desc = ctx->pctx.protocol[PROTO_BASE_LL_HDR].desc;
++			if (!desc) {
++				desc = payload_get_get_ll_hdr(ctx);
++				if (!desc)
++					break;
++			}
++
++			desc_upper = &proto_ip6;
++			if (expr->payload.desc == &proto_icmp)
++				desc_upper = &proto_ip;
++
++			if (payload_add_dependency(ctx, desc, desc_upper,
++						   expr, &nstmt) < 0)
++				return NULL;
++
++			list_add_tail(&nstmt->list, &ctx->stmt->list);
++			return desc_upper;
++		}
+ 		return &proto_inet_service;
+ 	default:
+ 		break;
+-- 
+2.11.0
+

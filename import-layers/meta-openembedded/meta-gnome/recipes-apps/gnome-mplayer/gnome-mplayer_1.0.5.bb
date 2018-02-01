@@ -5,7 +5,7 @@ SECTION = "multimedia"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
-PNBLACKLIST[gnome-mplayer] ?= "rdepends on blacklisted mplayer"
+PNBLACKLIST[gnome-mplayer] ?= "rdepends on blacklisted mplayer - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 PR = "r2"
 
 DEPENDS = "gmtk gtk+ alsa-lib libnotify glib-2.0 dbus-glib virtual/libx11 libxscrnsaver"

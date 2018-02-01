@@ -1,0 +1,23 @@
+Encode arm EABI ( hard/soft ) calling convention in ELF header
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: go/src/cmd/link/internal/ld/elf.go
+===================================================================
+--- go.orig/src/cmd/link/internal/ld/elf.go
++++ go/src/cmd/link/internal/ld/elf.go
+@@ -827,7 +827,13 @@
+ 	// 32-bit architectures
+ 	case '5':
+ 		// we use EABI on both linux/arm and freebsd/arm.
+-		if HEADTYPE == obj.Hlinux || HEADTYPE == obj.Hfreebsd {
++		if HEADTYPE == obj.Hlinux {
++			if Ctxt.Goarm == 7 {
++				ehdr.flags = 0x5000402 // has entry point, Version5 EABI, hard float
++			} else {
++				ehdr.flags = 0x5000202 // has entry point, Version5 EABI, soft float
++			}
++		} else if HEADTYPE == obj.Hfreebsd {
+ 			// We set a value here that makes no indication of which
+ 			// float ABI the object uses, because this is information
+ 			// used by the dynamic linker to compare executables and

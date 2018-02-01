@@ -1,0 +1,46 @@
+From ad1977a358319093b305df6d84be6db676ef1e4a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 6 Nov 2016 22:35:16 -0800
+Subject: [PATCH 02/10] Remove FILEWRAP
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ xbmc/utils/posix/PosixInterfaceForCLog.cpp | 6 +-----
+ xbmc/utils/posix/PosixInterfaceForCLog.h   | 4 +---
+ 2 files changed, 2 insertions(+), 8 deletions(-)
+
+Index: git/xbmc/utils/posix/PosixInterfaceForCLog.cpp
+===================================================================
+--- git.orig/xbmc/utils/posix/PosixInterfaceForCLog.cpp
++++ git/xbmc/utils/posix/PosixInterfaceForCLog.cpp
+@@ -29,10 +29,6 @@
+ #include "platform/android/activity/XBMCApp.h"
+ #endif // TARGET_ANDROID
+ 
+-struct FILEWRAP : public FILE
+-{};
+-
+-
+ CPosixInterfaceForCLog::CPosixInterfaceForCLog() :
+   m_file(NULL)
+ { }
+@@ -52,7 +48,7 @@ bool CPosixInterfaceForCLog::OpenLogFile
+   (void)remove(backupOldLogToFilename.c_str()); // if it's failed, try to continue
+   (void)rename(logFilename.c_str(), backupOldLogToFilename.c_str()); // if it's failed, try to continue
+ 
+-  m_file = (FILEWRAP*)fopen(logFilename.c_str(), "wb");
++  m_file = fopen(logFilename.c_str(), "wb");
+   if (!m_file)
+     return false; // error, can't open log file
+ 
+Index: git/xbmc/utils/posix/PosixInterfaceForCLog.h
+===================================================================
+--- git.orig/xbmc/utils/posix/PosixInterfaceForCLog.h
++++ git/xbmc/utils/posix/PosixInterfaceForCLog.h
+@@ -34,5 +34,5 @@ public:
+   void PrintDebugString(const std::string& debugString);
+   static void GetCurrentLocalTime(int& hour, int& minute, int& second, double& millisecond);
+ private:
+-  FILEWRAP* m_file;
++  FILE* m_file;
+ };

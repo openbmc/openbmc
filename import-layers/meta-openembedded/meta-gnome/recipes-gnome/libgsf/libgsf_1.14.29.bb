@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=dc7371b50816c96e145fa0f8ade8e24d \
 
 SECTION = "libs"
 
-DEPENDS= "libxml2 bzip2 glib-2.0 zlib intltool-native"
+DEPENDS= "libxml2 bzip2 glib-2.0 zlib intltool-native gnome-common-native"
 
 inherit autotools pkgconfig gnome gconf gobject-introspection
 

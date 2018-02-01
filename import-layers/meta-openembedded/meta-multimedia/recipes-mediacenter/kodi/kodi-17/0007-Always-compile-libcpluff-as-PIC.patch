@@ -1,0 +1,30 @@
+From d989cbdb7686c3b95dc749967f89b93e47f955a6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 3 Nov 2016 13:10:00 -0700
+Subject: [PATCH 07/10] Always compile libcpluff as PIC
+
+Fixes errors e.g.
+
+ld: lib/cpluff/libcpluff/.libs/libcpluff.a(pcontrol.o): relocation R_X86_64_PC32 against symbol `cp_stop_plugins' can not be used when making a shared object; recompile with -fPIC
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3132dc1..ab4eea3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2385,7 +2385,7 @@ XB_CONFIG_MODULE([lib/cpluff], [
+     --prefix="${prefix}" --includedir="${includedir}" --libdir="${libdir}" --datadir="${datadir}" \
+     --host=$host_alias \
+     --build=$build_alias \
+-    --target=$target_alias CFLAGS="$CFLAGS" CC="$CC" CXX="$CXX" LDFLAGS="$LDFLAGS" LIBS=""
++    --target=$target_alias --with-pic=yes CFLAGS="$CFLAGS" CC="$CC" CXX="$CXX" LDFLAGS="$LDFLAGS" LIBS=""
+     #LDFLAGS="$LDFLAGS -Wl,-read_only_relocs,suppress"
+ ], [0])
+ 
+-- 
+2.10.2
+

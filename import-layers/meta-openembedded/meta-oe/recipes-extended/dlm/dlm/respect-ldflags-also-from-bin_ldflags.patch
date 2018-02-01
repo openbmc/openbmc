@@ -1,0 +1,36 @@
+diff -uNr dlm-4.0.2.orig/dlm_controld/Makefile dlm-4.0.2/dlm_controld/Makefile
+--- dlm-4.0.2.orig/dlm_controld/Makefile	2017-04-04 10:49:23.661320260 +0200
++++ dlm-4.0.2/dlm_controld/Makefile	2017-04-04 10:50:36.121326429 +0200
+@@ -55,7 +55,7 @@
+ BIN_CFLAGS += -fPIE -DPIE
+ BIN_CFLAGS += -I../include -I../libdlm
+ 
+-BIN_LDFLAGS += -Wl,-z,now -Wl,-z,relro -pie
++BIN_LDFLAGS += $(LDFLAGS) -Wl,-z,now -Wl,-z,relro -pie
+ BIN_LDFLAGS += -lpthread -lrt -lcpg -lcmap -lcfg -lquorum
+ 
+ LIB_CFLAGS += $(BIN_CFLAGS)
+diff -uNr dlm-4.0.2.orig/dlm_tool/Makefile dlm-4.0.2/dlm_tool/Makefile
+--- dlm-4.0.2.orig/dlm_tool/Makefile	2013-07-31 17:50:26.000000000 +0200
++++ dlm-4.0.2/dlm_tool/Makefile	2017-04-04 10:50:44.617327153 +0200
+@@ -32,7 +32,7 @@
+ BIN_CFLAGS += -fPIE -DPIE
+ BIN_CFLAGS += -I../include -I../libdlm -I../dlm_controld
+ 
+-BIN_LDFLAGS += -Wl,-z,now -Wl,-z,relro -pie
++BIN_LDFLAGS += $(LDFLAGS) -Wl,-z,now -Wl,-z,relro -pie
+ BIN_LDFLAGS += -L../libdlm -L../dlm_controld
+ BIN_LDFLAGS += -lpthread -ldlm -ldlmcontrol
+ 
+diff -uNr dlm-4.0.2.orig/dlm_controld/Makefile dlm-4.0.2/dlm_controld/Makefile
+--- dlm-4.0.2.orig/dlm_controld/Makefile	2017-04-04 11:02:58.578389641 +0200
++++ dlm-4.0.2/dlm_controld/Makefile	2017-04-04 11:07:55.672414935 +0200
+@@ -59,7 +59,7 @@
+ BIN_LDFLAGS += -lpthread -lrt -lcpg -lcmap -lcfg -lquorum
+ 
+ LIB_CFLAGS += $(BIN_CFLAGS)
+-LIB_LDFLAGS += -Wl,-z,relro -pie
++LIB_LDFLAGS += $(LDFLAGS) -Wl,-z,relro -pie
+ 
+ ifeq ($(USE_SD_NOTIFY),yes)
+ 	BIN_CFLAGS += $(shell pkg-config --cflags libsystemd-daemon) \

@@ -39,7 +39,7 @@ def edit_recipe(args, config, basepath, workspace):
             rd = parse_recipe(config, tinfoil, args.recipename, True)
             if not rd:
                 return 1
-            recipefile = rd.getVar('FILE', True)
+            recipefile = rd.getVar('FILE')
         finally:
             tinfoil.shutdown()
     else:
@@ -62,20 +62,20 @@ def configure_help(args, config, basepath, workspace):
         rd = parse_recipe(config, tinfoil, args.recipename, appends=True, filter_workspace=False)
         if not rd:
             return 1
-        b = rd.getVar('B', True)
-        s = rd.getVar('S', True)
+        b = rd.getVar('B')
+        s = rd.getVar('S')
         configurescript = os.path.join(s, 'configure')
         confdisabled = 'noexec' in rd.getVarFlags('do_configure') or 'do_configure' not in (rd.getVar('__BBTASKS', False) or [])
-        configureopts = oe.utils.squashspaces(rd.getVar('CONFIGUREOPTS', True) or '')
-        extra_oeconf = oe.utils.squashspaces(rd.getVar('EXTRA_OECONF', True) or '')
-        extra_oecmake = oe.utils.squashspaces(rd.getVar('EXTRA_OECMAKE', True) or '')
-        do_configure = rd.getVar('do_configure', True) or ''
+        configureopts = oe.utils.squashspaces(rd.getVar('CONFIGUREOPTS') or '')
+        extra_oeconf = oe.utils.squashspaces(rd.getVar('EXTRA_OECONF') or '')
+        extra_oecmake = oe.utils.squashspaces(rd.getVar('EXTRA_OECMAKE') or '')
+        do_configure = rd.getVar('do_configure') or ''
         do_configure_noexpand = rd.getVar('do_configure', False) or ''
         packageconfig = rd.getVarFlags('PACKAGECONFIG') or []
         autotools = bb.data.inherits_class('autotools', rd) and ('oe_runconf' in do_configure or 'autotools_do_configure' in do_configure)
         cmake = bb.data.inherits_class('cmake', rd) and ('cmake_do_configure' in do_configure)
-        cmake_do_configure = rd.getVar('cmake_do_configure', True)
-        pn = rd.getVar('PN', True)
+        cmake_do_configure = rd.getVar('cmake_do_configure')
+        pn = rd.getVar('PN')
     finally:
         tinfoil.shutdown()
 

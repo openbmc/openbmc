@@ -12,7 +12,7 @@ S = "${WORKDIR}/gpio"
 CLEANBROKEN = "1"
 
 do_compile() {
-    ${CC} ${CFLAGS} ${LDFLAGS} -static -o ${PN} gpio-s3c6410.c
+    ${CC} ${CFLAGS} ${LDFLAGS} -o ${PN} gpio-s3c6410.c
 }
 
 do_install() {

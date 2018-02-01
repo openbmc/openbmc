@@ -1,0 +1,28 @@
+From 23c6e9df611c86a5e97079e1b88c7a18474bf0bc Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 16 Dec 2016 16:52:04 +0200
+Subject: [PATCH] Correctly check the stamp file that indicates if we need to
+ re-build vala code
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index d043b3d..0e85590 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -42,7 +42,7 @@ AM_COND_IF(EXTRALIB_ONLY,
+     [enable_actions=no])
+ if test x"$enable_actions" = xyes; then
+     dnl no vala compiler required when sources are from dist tarball
+-    if test -f src/actions/libfmactions_la_vala.stamp; then
++    if test -f $srcdir/src/actions/libfmactions_la_vala.stamp; then
+         AM_PROG_VALAC
+     else
+         AM_PROG_VALAC([0.13.0])
+-- 
+2.10.2
+

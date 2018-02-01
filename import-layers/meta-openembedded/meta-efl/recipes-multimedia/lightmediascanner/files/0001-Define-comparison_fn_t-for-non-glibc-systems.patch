@@ -1,0 +1,33 @@
+From 5bc5b8c5dad3edec6736fd7e7ce61250c4ce3725 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Jul 2017 17:13:19 -0700
+Subject: [PATCH] Define comparison_fn_t for non-glibc systems
+
+lightmediascanner.c:324:12: error: 'comparison_fn_t' undeclared (first use in this function)
+           (comparison_fn_t)_plugin_sort);
+            ^~~~~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/lightmediascanner.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/lib/lightmediascanner.c b/src/lib/lightmediascanner.c
+index 344b247..b866883 100644
+--- a/src/lib/lightmediascanner.c
++++ b/src/lib/lightmediascanner.c
+@@ -37,6 +37,11 @@
+ #define DEFAULT_SLAVE_TIMEOUT 1000
+ #define DEFAULT_COMMIT_INTERVAL 100
+ 
++#if !defined(__GLIBC__)
++typedef int (*__compar_fn_t) (const void*, const void*);
++typedef __compar_fn_t comparison_fn_t;
++#endif
++
+ #ifdef HAVE_MAGIC_H
+ static magic_t _magic_handle;
+ 
+-- 
+2.13.2
+

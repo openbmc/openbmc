@@ -17,55 +17,48 @@ EXTRA_OECONF_PATHS = "\
 EXTRA_OECONF_append_linuxstdbase = " --enable-clocale=gnu"
 
 RUNTIMELIBITM = "libitm"
-RUNTIMELIBITM_mips = ""
-RUNTIMELIBITM_mipsel = ""
-RUNTIMELIBITM_mips64 = ""
-RUNTIMELIBITM_mips64el = ""
-RUNTIMELIBITM_mipsisa32r6 = ""
-RUNTIMELIBITM_mipsisa32r6el = ""
-RUNTIMELIBITM_mipsisa64r6 = ""
-RUNTIMELIBITM_mipsisa64r6el = ""
+RUNTIMELIBITM_mipsarch = ""
 RUNTIMELIBITM_nios2 = ""
 RUNTIMELIBITM_microblaze = ""
 
 RUNTIMETARGET = "libssp libstdc++-v3 libgomp libatomic ${RUNTIMELIBITM} \
     ${@bb.utils.contains_any('FORTRAN', [',fortran',',f77'], 'libquadmath', '', d)} \
 "
+RUNTIMETARGET_append_x86 = " libmpx"
+RUNTIMETARGET_append_x86-64 = " libmpx"
+RUNTIMETARGET_remove_libc-musl = "libmpx"
 
-#  ?
 # libiberty
 # libmudflap
 # libgfortran needs separate recipe due to libquadmath dependency
 
 do_configure () {
 	export CXX="${CXX} -nostdinc++ -nostdlib++"
-	mtarget=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-	target=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-	hardlinkdir ${STAGING_INCDIR_NATIVE}/gcc-build-internal-$mtarget ${B}
+
 	for d in libgcc ${RUNTIMETARGET}; do
 		echo "Configuring $d"
-		rm -rf ${B}/$target/$d/
-		mkdir -p ${B}/$target/$d/
-		cd ${B}/$target/$d/
+		rm -rf ${B}/${TARGET_SYS}/$d/
+		mkdir -p ${B}/${TARGET_SYS}/$d/
+		cd ${B}/${TARGET_SYS}/$d/
 		chmod a+x ${S}/$d/configure
-		relpath=${@os.path.relpath("${S}/$d", "${B}/$target/$d")}
+		relpath=${@os.path.relpath("${S}/$d", "${B}/${TARGET_SYS}/$d")}
 		$relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
 	done
 }
+EXTRACONFFUNCS += "extract_stashed_builddir"
+do_configure[depends] += "${COMPILERDEP}"
 
 do_compile () {
-	target=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
 	for d in libgcc ${RUNTIMETARGET}; do
-		cd ${B}/$target/$d/
-		oe_runmake MULTIBUILDTOP=${B}/$target/$d/
+		cd ${B}/${TARGET_SYS}/$d/
+		oe_runmake MULTIBUILDTOP=${B}/${TARGET_SYS}/$d/
 	done
 }
 
 do_install () {
-	target=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
 	for d in ${RUNTIMETARGET}; do
-		cd ${B}/$target/$d/
-		oe_runmake 'DESTDIR=${D}' MULTIBUILDTOP=${B}/$target/$d/ install
+		cd ${B}/${TARGET_SYS}/$d/
+		oe_runmake 'DESTDIR=${D}' MULTIBUILDTOP=${B}/${TARGET_SYS}/$d/ install
 	done
 	rm -rf ${D}${infodir}/libgomp.info ${D}${infodir}/dir
 	rm -rf ${D}${infodir}/libitm.info ${D}${infodir}/dir
@@ -147,6 +140,17 @@ PACKAGES = "\
     libitm \
     libitm-dev \
     libitm-staticdev \
+"
+PACKAGES_append_x86 = "\
+    libmpx \
+    libmpx-dev \
+    libmpx-staticdev \
+"
+
+PACKAGES_append_x86-64 = "\
+    libmpx \
+    libmpx-dev \
+    libmpx-staticdev \
 "
 
 # The base package doesn't exist, so we clear the recommends.
@@ -251,6 +255,20 @@ FILES_libitm-dev = "\
 SUMMARY_libitm-dev = "GNU transactional memory support library - development files"
 FILES_libitm-staticdev = "${libdir}/libitm.a"
 SUMMARY_libitm-staticdev = "GNU transactional memory support library - static development files"
+
+
+FILES_libmpx = "${libdir}/libmpx.so.* ${libdir}/libmpxwrappers.so.*"
+SUMMARY_libmpx = "Intel Memory Protection Extension library"
+FILES_libmpx-dev = "\
+    ${libdir}/libmpxwrappers.so \
+    ${libdir}/libmpxwrappers.la \
+    ${libdir}/libmpx.so \
+    ${libdir}/libmpx.la \
+    ${libdir}/libmpx.spec \
+"
+SUMMARY_libmpx-dev = "Intel Memory Protection Extension library - development files"
+FILES_libmpx-staticdev = "${libdir}/libmpx.a ${libdir}/libmpxwrappers.a"
+SUMMARY_libmpx-staticdev = "Intel Memory Protection Extension library - static development files"
 
 do_package_write_ipk[depends] += "virtual/${MLPREFIX}libc:do_packagedata"
 do_package_write_deb[depends] += "virtual/${MLPREFIX}libc:do_packagedata"

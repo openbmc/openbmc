@@ -1394,83 +1394,182 @@
         can be reviewed and merged by the appropriate maintainer.
     </para>
 
-    <para>
-        Before submitting any change, be sure to find out who you should be
-        notifying.
-        Several methods exist through which you find out who you should be copying
-        or notifying:
-        <itemizedlist>
-            <listitem><para><emphasis>Maintenance File:</emphasis>
-                Examine the <filename>maintainers.inc</filename> file, which is
-                located in the
-                <link linkend='source-directory'>Source Directory</link>
-                at <filename>meta-poky/conf/distro/include</filename>, to
-                see who is responsible for code.
-                </para></listitem>
-            <listitem><para><emphasis>Board Support Package (BSP) README Files:</emphasis>
-                For BSP maintainers of supported BSPs, you can examine
-                individual BSP <filename>README</filename> files.
-                In addition, some layers (such as the <filename>meta-intel</filename> layer),
-                include a <filename>MAINTAINERS</filename> file which contains
-                a list of all supported BSP maintainers for that layer.
-                </para></listitem>
-            <listitem><para><emphasis>Search by File:</emphasis>
-                Using <link linkend='git'>Git</link>, you can enter the
-                following command to bring up a short list of all commits
-                against a specific file:
-                <literallayout class='monospaced'>
+    <section id='submit-change-overview'>
+        <title>Overview</title>
+
+        <para>
+            The Yocto Project uses a mailing list and patch-based workflow
+            that is similar to the Linux kernel but contains important
+            differences.
+            In general, a mailing list exists through which you can submit
+            patches.
+            The specific mailing list you need to use depends on the
+            location of the code you are changing.
+            Each component (e.g. layer) should have a
+            <filename>README</filename> file that indicates where to send
+            the changes and which process to follow.
+        </para>
+
+        <para>
+            You can send the patch to the mailing list using whichever approach
+            you feel comfortable with to generate the patch.
+            Once sent, the patch is usually reviewed by the community at large.
+            If somebody has concerns with the patch, they will usually voice
+            their concern over the mailing list.
+            If a patch does not receive any negative reviews, the maintainer of
+            the affected layer typically takes the patch, tests it, and then
+            based on successful testing, merges the patch.
+        </para>
+
+        <para>
+            Specific to OpenEmbedded-Core, two commonly used testing trees
+            exist:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis>"ross/mut" branch:</emphasis>
+                    The "mut" (master-under-test) tree
+                    exists in the <filename>poky-contrib</filename> repository
+                    in the
+                    <ulink url='&YOCTO_GIT_URL;'>Yocto Project source repositories</ulink>.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>"master-next" branch:</emphasis>
+                    This branch is part of the main
+                    "poky" repository in the Yocto Project source repositories.
+                    </para></listitem>
+            </itemizedlist>
+            Maintainers use these branches to test submissions prior to merging
+            patches.
+            Thus, you can get an idea of the status of a patch based on
+            whether the patch has been merged into one of these branches.
+        </para>
+
+        <para>
+            This system is imperfect and patches can sometimes get lost in the
+            flow.
+            Asking about the status of a patch is reasonable if the patch
+            has been idle for a while with no feedback.
+            The Yocto Project does have plans to use
+            <ulink url='https://en.wikipedia.org/wiki/Patchwork_(software)'>Patchwork</ulink>
+            to track the status of patches and also to automatically preview
+            patches.
+        </para>
+
+        <para>
+            The following sections provide general instructions for both
+            pushing changes upstream and for submitting changes as patches.
+        </para>
+    </section>
+
+    <section id='submit-change-submissions-to-poky'>
+        <title>Submissions to Poky</title>
+
+        <para>
+            The "poky" repository, which is the Yocto Project's reference build
+            environment, is a hybrid repository that contains several
+            individual pieces (e.g. BitBake, OpenEmbedded-Core, meta-yocto,
+            documentation, and so forth) built using the combo-layer tool.
+            The upstream location used for submitting changes varies by
+            component:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis>Core Metadata:</emphasis>
+                    Send your patch to the
+                    <ulink url='http://lists.openembedded.org/mailman/listinfo/openembedded-core'>openembedded-core</ulink>
+                    mailing list.  For example, a change to anything under
+                    the <filename>meta</filename> or
+                    <filename>scripts</filename> directories should be sent
+                    to this mailing list.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>BitBake:</emphasis>
+                    For changes to BitBake (i.e. anything under the
+                    <filename>bitbake</filename> directory), send your patch
+                    to the
+                    <ulink url='http://lists.openembedded.org/mailman/listinfo/bitbake-devel'>bitbake-devel</ulink>
+                    mailing list.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>"meta-yocto-bsp" and "meta-poky" trees:</emphasis>
+                    These trees are
+                    part of the "meta-yocto" repository in the Yocto Project
+                    source repositories.
+                    Use the
+                    <ulink url='https://lists.yoctoproject.org/listinfo/poky'>poky</ulink>
+                    mailing list.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='submit-change-submissions-to-other-layers'>
+        <title>Submissions to Other Layers</title>
+
+        <para>
+            For changes to other layers hosted in the Yocto Project source
+            repositories (i.e. <filename>yoctoproject.org</filename>), tools,
+            and the Yocto Project documentation, use the
+            <ulink url='https://lists.yoctoproject.org/listinfo/yocto'>Yocto Project</ulink>
+            general mailing list.
+            <note>
+                Sometimes a layer's documentation specifies to use a
+                particular mailing list.
+                If so, use that list.
+            </note>
+            For additional recipes that do not fit into the core Metadata, you
+            should determine which layer the recipe should go into and submit
+            the change in the manner recommended by the documentation (e.g.
+            the <filename>README</filename> file) supplied with the layer.
+            If in doubt, please ask on the Yocto general mailing list or on
+            the openembedded-devel mailing list.
+        </para>
+    </section>
+
+    <section id='submit-change-patch-submission-details'>
+        <title>Patch Submission Details</title>
+
+        <para>
+            When submitting any change, you can check who you should be
+            notifying.
+            Use either of these methods to find out:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis>Maintenance File:</emphasis>
+                    Examine the <filename>maintainers.inc</filename> file, which is
+                    located in the
+                    <link linkend='source-directory'>Source Directory</link>
+                    at <filename>meta-poky/conf/distro/include</filename>, to
+                    see who is responsible for code.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Search by File:</emphasis>
+                    Using <link linkend='git'>Git</link>, you can enter the
+                    following command to bring up a short list of all commits
+                    against a specific file:
+                    <literallayout class='monospaced'>
      git shortlog -- <replaceable>filename</replaceable>
-                </literallayout>
-                Just provide the name of the file for which you are interested.
-                The information returned is not ordered by history but does
-                include a list of all committers grouped by name.
-                From the list, you can see who is responsible for the bulk of
-                the changes against the file.
-                </para></listitem>
-        </itemizedlist>
-    </para>
+                    </literallayout>
+                    Just provide the name of the file for which you are interested.
+                    The information returned is not ordered by history but does
+                    include a list of all committers grouped by name.
+                    From the list, you can see who is responsible for the bulk of
+                    the changes against the file.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
 
-    <para>
-        For a list of the Yocto Project and related mailing lists, see the
-        "<ulink url='&YOCTO_DOCS_REF_URL;#resources-mailinglist'>Mailing lists</ulink>" section in
-        the Yocto Project Reference Manual.
-    </para>
+        <para>
+            For a list of the Yocto Project and related mailing lists, see the
+            "<ulink url='&YOCTO_DOCS_REF_URL;#resources-mailinglist'>Mailing lists</ulink>"
+            section in the Yocto Project Reference Manual.
+        </para>
 
-    <para>
-        Here is some guidance on which mailing list to use for what type of change:
-        <itemizedlist>
-            <listitem><para>For changes to the core
-                <link linkend='metadata'>Metadata</link>, send your patch to the
-                <ulink url='&OE_LISTS_URL;/listinfo/openembedded-core'>openembedded-core</ulink> mailing list.
-                For example, a change to anything under the <filename>meta</filename> or
-                <filename>scripts</filename> directories
-                should be sent to this mailing list.</para></listitem>
-            <listitem><para>For changes to BitBake (anything under the <filename>bitbake</filename>
-                directory), send your patch to the
-                <ulink url='&OE_LISTS_URL;/listinfo/bitbake-devel'>bitbake-devel</ulink> mailing list.</para></listitem>
-            <listitem><para>For changes to <filename>meta-poky</filename>, send your patch to the
-                <ulink url='&YOCTO_LISTS_URL;/listinfo/poky'>poky</ulink> mailing list.</para></listitem>
-            <listitem><para>For changes to other layers hosted on
-                <filename>yoctoproject.org</filename> (unless the
-                layer's documentation specifies otherwise), tools, and Yocto Project
-                documentation, use the
-                <ulink url='&YOCTO_LISTS_URL;/listinfo/yocto'>yocto</ulink> mailing list.</para></listitem>
-            <listitem><para>For additional recipes that do not fit into the core Metadata,
-                you should determine which layer the recipe should go into and submit the
-                change in the manner recommended by the documentation (e.g. README) supplied
-                with the layer. If in doubt, please ask on the
-                <ulink url='&YOCTO_LISTS_URL;/listinfo/yocto'>yocto</ulink> or
-                <ulink url='&OE_LISTS_URL;/listinfo/openembedded-devel'>openembedded-devel</ulink>
-                mailing lists.</para></listitem>
-        </itemizedlist>
-    </para>
-
-    <para>
-        When you send a patch, be sure to include a "Signed-off-by:"
-        line in the same style as required by the Linux kernel.
-        Adding this line signifies that you, the submitter, have agreed to the Developer's Certificate of Origin 1.1
-        as follows:
-        <literallayout class='monospaced'>
+        <para>
+            When you send a patch, be sure to include a "Signed-off-by:"
+            line in the same style as required by the Linux kernel.
+            Adding this line signifies that you, the submitter, have agreed
+            to the Developer's Certificate of Origin 1.1 as follows:
+            <literallayout class='monospaced'>
      Developer's Certificate of Origin 1.1
 
      By making a contribution to this project, I certify that:
@@ -1496,68 +1595,76 @@
          personal information I submit with it, including my sign-off) is
          maintained indefinitely and may be redistributed consistent with
          this project or the open source license(s) involved.
-        </literallayout>
-    </para>
+            </literallayout>
+        </para>
 
-    <para>
-        In a collaborative environment, it is necessary to have some sort of standard
-        or method through which you submit changes.
-        Otherwise, things could get quite chaotic.
-        One general practice to follow is to make small, controlled changes.
-        Keeping changes small and isolated aids review, makes merging/rebasing easier
-        and keeps the change history clean when anyone needs to refer to it in future.
-    </para>
+        <para>
+            In a collaborative environment, it is necessary to have some sort
+            of standard or method through which you submit changes.
+            Otherwise, things could get quite chaotic.
+            One general practice to follow is to make small, controlled changes.
+            Keeping changes small and isolated aids review, makes
+            merging/rebasing easier and keeps the change history clean should
+            anyone need to refer to it in future.
+        </para>
 
-    <para>
-        When you make a commit, you must follow certain standards established by the
-        OpenEmbedded and Yocto Project development teams.
-        For each commit, you must provide a single-line summary of the change and you
-        should almost always provide a more detailed description of what you did (i.e.
-        the body of the commit message).
-        The only exceptions for not providing a detailed description would be if your
-        change is a simple, self-explanatory change that needs no further description
-        beyond the summary.
-        Here are the guidelines for composing a commit message:
-        <itemizedlist>
-            <listitem><para>Provide a single-line, short summary of the change.
-                This summary is typically viewable in the "shortlist" of changes.
-                Thus, providing something short and descriptive that gives the reader
-                a summary of the change is useful when viewing a list of many commits.
-                This short description should be prefixed by the recipe name (if changing a recipe), or
-                else the short form path to the file being changed.
-                </para></listitem>
-            <listitem><para>For the body of the commit message, provide detailed information
-                that describes what you changed, why you made the change, and the approach
-                you used. It may also be helpful if you mention how you tested the change.
-                Provide as much detail as you can in the body of the commit message.
-                </para></listitem>
-            <listitem><para>
-                If the change addresses a specific bug or issue that is
-                associated with a bug-tracking ID, include a reference to that
-                ID in your detailed description.
-                For example, the Yocto Project uses a specific convention for
-                bug references - any commit that addresses a specific bug should
-                use the following form for the detailed description:
-                <literallayout class='monospaced'>
+        <para>
+            When you make a commit, you must follow certain standards
+            established by the OpenEmbedded and Yocto Project development teams.
+            For each commit, you must provide a single-line summary of the
+            change and you should almost always provide a more detailed
+            description of what you did (i.e. the body of the commit message).
+            The only exceptions for not providing a detailed description would
+            be if your change is a simple, self-explanatory change that needs
+            no further description beyond the summary.
+            Here are the guidelines for composing a commit message:
+            <itemizedlist>
+                <listitem><para>
+                    Provide a single-line, short summary of the change.
+                    This summary is typically viewable in the "shortlist" of
+                    changes.
+                    Thus, providing something short and descriptive that
+                    gives the reader a summary of the change is useful when
+                    viewing a list of many commits.
+                    You should prefix this short description with the recipe
+                    name (if changing a recipe), or else with the short form
+                    path to the file being changed.
+                    </para></listitem>
+                <listitem><para>
+                    For the body of the commit message, provide detailed
+                    information that describes what you changed, why you made
+                    the change, and the approach you used.
+                    It might also be helpful if you mention how you tested
+                    the change.
+                    Provide as much detail as you can in the body of the
+                    commit message.
+                    </para></listitem>
+                <listitem><para>
+                    If the change addresses a specific bug or issue that is
+                    associated with a bug-tracking ID, include a reference
+                    to that ID in your detailed description.
+                    For example, the Yocto Project uses a specific convention
+                    for bug references - any commit that addresses a specific
+                    bug should use the following form for the detailed
+                    description.
+                    Be sure to use the actual bug-tracking ID from
+                    Bugzilla for
+                    <replaceable>bug-id</replaceable>:
+                    <literallayout class='monospaced'>
      Fixes [YOCTO #<replaceable>bug-id</replaceable>]
 
      <replaceable>detailed description of change</replaceable>
-                </literallayout></para></listitem>
-                Where <replaceable>bug-id</replaceable> is replaced with the
-                specific bug ID from the Yocto Project Bugzilla instance.
-        </itemizedlist>
-    </para>
+                    </literallayout>
+                    </para></listitem>
+            </itemizedlist>
+        </para>
 
-    <para>
-        You can find more guidance on creating well-formed commit messages at this OpenEmbedded
-        wiki page:
-        <ulink url='&OE_HOME_URL;/wiki/Commit_Patch_Message_Guidelines'></ulink>.
-    </para>
-
-    <para>
-        The next two sections describe general instructions for both pushing
-        changes upstream and for submitting changes as patches.
-    </para>
+        <para>
+            You can find more guidance on creating well-formed commit messages
+            at this OpenEmbedded wiki page:
+            <ulink url='&OE_HOME_URL;/wiki/Commit_Patch_Message_Guidelines'></ulink>.
+        </para>
+    </section>
 
     <section id='pushing-a-change-upstream'>
         <title>Using Scripts to Push a Change Upstream and Request a Pull</title>

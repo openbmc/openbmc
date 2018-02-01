@@ -1,0 +1,122 @@
+diff -Naur patch.org/ruli-0.36/Makefile patch.new/ruli-0.36/Makefile 
+--- ruli-0.36/Makefile	2015-09-10 15:14:13.952262350 -0400
++++ ruli-0.36/Makefile	2015-09-10 15:14:38.628261620 -0400
+@@ -7,17 +7,17 @@
+ .PHONY: default
+ default:
+ 	$(MAKE) -C src   
+-	$(MAKE) -C sample 
++#	$(MAKE) -C sample 
+ 
+ .PHONY: clean
+ clean:
+ 	$(MAKE) -C src    clean
+-	$(MAKE) -C sample clean
++#	$(MAKE) -C sample clean
+ 
+ .PHONY: install
+ install:
+ 	$(MAKE) -C src    install
+-	$(MAKE) -C sample install
++#	$(MAKE) -C sample install
+ 
+ .PHONY: dpkg
+ dpkg:
+
+=====================================================================
+
+diff -Naur patch.org/git/src/Makefile patch.new/git/src/Makefile 
+--- ruli-0.36/src/Makefile	2005-06-13 12:34:53.000000000 -0400
++++ ruli-0.36/src/Makefile	2015-09-11 09:46:06.290287347 -0400
+@@ -18,9 +18,9 @@
+ #
+ # Debian packaging likes this: OOP_BASE_DIR = /usr
+ #
+-OOP_BASE_DIR    = /usr/local/oop
+-OOP_INCLUDE_DIR = $(OOP_BASE_DIR)/include
+-OOP_LIB_DIR     = $(OOP_BASE_DIR)/lib
++#OOP_BASE_DIR    = /usr/local/oop
++OOP_INCLUDE_DIR = ${PKG_CONFIG_SYSROOT_DIR}/$(includedir)/
++#OOP_LIB_DIR     = $(OOP_BASE_DIR)/lib
+ 
+ #
+ # INSTALL_BASE_DIR indicates where RULI
+@@ -30,11 +30,11 @@
+ #
+ # Debian packaging likes this: INSTALL_BASE_DIR = $(DESTDIR)/usr
+ #
+-INSTALL_BASE_DIR     = ../install/ruli
+-INSTALL_INCLUDE_DIR  = $(INSTALL_BASE_DIR)/include
+-INSTALL_LIB_DIR      = $(INSTALL_BASE_DIR)/lib
+-INSTALL_MAN_DIR      = $(INSTALL_BASE_DIR)/share/man
+-INSTALL_MAN3_DIR     = $(INSTALL_MAN_DIR)/man3
++#INSTALL_BASE_DIR     = ../install/ruli
++#INSTALL_INCLUDE_DIR  = $(INSTALL_BASE_DIR)/include
++#INSTALL_LIB_DIR      = $(INSTALL_BASE_DIR)/lib
++#INSTALL_MAN_DIR      = $(INSTALL_BASE_DIR)/share/man
++#INSTALL_MAN3_DIR     = $(INSTALL_MAN_DIR)/man3
+ 
+ # SunOS, Linux
+ PLATFORM=$(shell uname)
+@@ -45,7 +45,7 @@
+ 
+ WARN = -pedantic -ansi -Wshadow -Wpointer-arith -Wcast-qual \
+ 	-Wcast-align -Wwrite-strings -Wredundant-decls
+-CC = gcc
++#CC = gcc
+ 
+ # gcc-specific options (not valid for g++)
+ ifeq ($(CC),gcc)
+@@ -58,7 +58,7 @@
+ FLAGS = $(DEBUG) -O2 -pipe -Wall -g -shared -D_REENTRANT \
+         $(DEFINE_SOLARIS) -I. -I$(OOP_INCLUDE_DIR)
+ SOFT_CFLAGS = $(WARN) $(FLAGS)
+-CFLAGS = $(WARN) -Werror $(FLAGS)
++CFLAGS = $(WARN) $(FLAGS)
+ LIBOBJ = ruli_isaac.o ruli_mem.o ruli_rand.o ruli_util.o ruli_list.o \
+ 	ruli_addr.o ruli_sock.o ruli_txt.o ruli_msg.o ruli_fsm.o \
+ 	ruli_res.o ruli_parse.o ruli_host.o ruli_srv.o ruli_conf.o \
+@@ -66,7 +66,7 @@
+ 	ruli_getaddrinfo.o
+ SHAREDOBJ = $(LIBOBJ:%.o=%.os)
+ SONAME = libruli.so.4
+-LDFLAGS = -L$(OOP_LIB_DIR)
++#LDFLAGS = -L$(OOP_LIB_DIR)
+ 
+ COMPILE = $(CC) $(ARCH) $(CPPFLAGS) $(CFLAGS) -c
+ SHARED_COMPILE = $(CC) $(ARCH) $(CPPFLAGS) $(SHARED) $(CFLAGS) -o $@ -c
+@@ -89,19 +89,19 @@
+ strip: ruli
+ 	strip $(SONAME) libruli.a
+ 
+-.PHONY: install
+-install: ruli
+-	mkdir -p $(INSTALL_LIB_DIR) $(INSTALL_INCLUDE_DIR) $(INSTALL_MAN3_DIR)
+-	cp $(SONAME) libruli.a $(INSTALL_LIB_DIR)
+-	cp *.h $(INSTALL_INCLUDE_DIR)
+-	cp ../doc/man/*.3 $(INSTALL_MAN3_DIR)
+-	cd $(INSTALL_LIB_DIR) && ln -s $(SONAME) libruli.so
+-	@echo
+-	@echo "REMINDER:"
+-	@echo "Add $(INSTALL_LIB_DIR) to your dynamic loader path:"
+-	@echo "# echo $(INSTALL_LIB_DIR) >> /etc/ld.so.conf"
+-	@echo "# ldconfig"
+-	@echo
++#.PHONY: install
++#install: ruli
++#	mkdir -p $(INSTALL_LIB_DIR) $(INSTALL_INCLUDE_DIR) $(INSTALL_MAN3_DIR)
++#	cp $(SONAME) libruli.a $(INSTALL_LIB_DIR)
++#	cp *.h $(INSTALL_INCLUDE_DIR)
++#	cp ../doc/man/*.3 $(INSTALL_MAN3_DIR)
++#	cd $(INSTALL_LIB_DIR) && ln -s $(SONAME) libruli.so
++#	@echo
++#	@echo "REMINDER:"
++#	@echo "Add $(INSTALL_LIB_DIR) to your dynamic loader path:"
++#	@echo "# echo $(INSTALL_LIB_DIR) >> /etc/ld.so.conf"
++#	@echo "# ldconfig"
++#	@echo
+ 
+ .PHONY: ruli
+ ruli: $(SONAME) libruli.a
+
+

@@ -1,8 +1,8 @@
 inherit kernel-uboot
 
 python __anonymous () {
-    if "uImage" in (d.getVar('KERNEL_IMAGETYPES', True) or "").split():
-        depends = d.getVar("DEPENDS", True)
+    if "uImage" in (d.getVar('KERNEL_IMAGETYPES') or "").split():
+        depends = d.getVar("DEPENDS")
         depends = "%s u-boot-mkimage-native" % depends
         d.setVar("DEPENDS", depends)
 
@@ -11,27 +11,25 @@ python __anonymous () {
         # to build uImage using the kernel build system if and only if
         # KEEPUIMAGE == yes. Otherwise, we pack compressed vmlinux into
         # the uImage .
-        if d.getVar("KEEPUIMAGE", True) != 'yes':
-            typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE", True) or ""
+        if d.getVar("KEEPUIMAGE") != 'yes':
+            typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE") or ""
             if "uImage" in typeformake.split():
                 d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake.replace('uImage', 'vmlinux'))
+
+            # Enable building of uImage with mkimage
+            bb.build.addtask('do_uboot_mkimage', 'do_install', 'do_kernel_link_images', d)
 }
 
+do_uboot_mkimage[dirs] += "${B}"
 do_uboot_mkimage() {
-	if echo "${KERNEL_IMAGETYPES}" | grep -wq "uImage"; then
-		if test "x${KEEPUIMAGE}" != "xyes" ; then
-			uboot_prep_kimage
+	uboot_prep_kimage
 
-			ENTRYPOINT=${UBOOT_ENTRYPOINT}
-			if test -n "${UBOOT_ENTRYSYMBOL}"; then
-				ENTRYPOINT=`${HOST_PREFIX}nm ${S}/vmlinux | \
-					awk '$3=="${UBOOT_ENTRYSYMBOL}" {print $1}'`
-			fi
-
-			uboot-mkimage -A ${UBOOT_ARCH} -O linux -T kernel -C "${linux_comp}" -a ${UBOOT_LOADADDRESS} -e $ENTRYPOINT -n "${DISTRO_NAME}/${PV}/${MACHINE}" -d linux.bin arch/${ARCH}/boot/uImage
-			rm -f linux.bin
-		fi
+	ENTRYPOINT=${UBOOT_ENTRYPOINT}
+	if [ -n "${UBOOT_ENTRYSYMBOL}" ]; then
+		ENTRYPOINT=`${HOST_PREFIX}nm ${B}/vmlinux | \
+			awk '$3=="${UBOOT_ENTRYSYMBOL}" {print "0x"$1;exit}'`
 	fi
-}
 
-addtask uboot_mkimage before do_install after do_compile
+	uboot-mkimage -A ${UBOOT_ARCH} -O linux -T kernel -C "${linux_comp}" -a ${UBOOT_LOADADDRESS} -e $ENTRYPOINT -n "${DISTRO_NAME}/${PV}/${MACHINE}" -d linux.bin ${B}/arch/${ARCH}/boot/uImage
+	rm -f linux.bin
+}

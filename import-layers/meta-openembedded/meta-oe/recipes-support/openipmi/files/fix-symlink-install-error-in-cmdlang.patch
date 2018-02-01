@@ -1,0 +1,22 @@
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Thu Jun 7 16:00:13 2012 -0400
+
+    This patch fixes the error during the install stage when
+    creating a symbolic link for opeipmish in openipmi/cmdlang
+    
+    Upstream-Status: Pending
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/cmdlang/Makefile.am b/cmdlang/Makefile.am
+index 92d6e83..f6039f9 100644
+--- a/cmdlang/Makefile.am
++++ b/cmdlang/Makefile.am
+@@ -36,6 +36,7 @@ CLEANFILES = libOpenIPMIcmdlang.map
+ # compatability.
+ install-data-local:
+ 	rm -f $(DESTDIR)$(bindir)/ipmish
++	mkdir -p $(DESTDIR)$(bindir)/
+ 	$(LN_S) openipmish $(DESTDIR)$(bindir)/ipmish
+ 
+ uninstall-local:

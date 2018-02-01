@@ -797,15 +797,47 @@
         </para>
     </section>
 
+    <section id='structure-build-tmp-sysroots-components'>
+        <title><filename>build/tmp/sysroots-components/</filename></title>
+
+        <para>
+            This directory is the location of the sysroot contents that the
+            task
+            <link linkend='ref-tasks-prepare_recipe_sysroot'><filename>do_prepare_recipe_sysroot</filename></link>
+            links or copies into the recipe-specific sysroot for each
+            recipe listed in
+            <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>.
+            Population of this directory is handled through shared state, while
+            the path is specified by the <filename>COMPONENTS_DIR</filename>
+            variable. Apart from a few unusual circumstances, handling of the
+            <filename>sysroots-components</filename> directory should be
+            automatic, and recipes should not directly reference
+            <filename>build/tmp/sysroots-components</filename>.
+        </para>
+    </section>
+
     <section id='structure-build-tmp-sysroots'>
         <title><filename>build/tmp/sysroots/</filename></title>
 
         <para>
-            This directory contains shared header files and libraries as well as other shared
-            data.
-            Packages that need to share output with other packages do so within this directory.
-            The directory is subdivided by architecture so multiple builds can run within
-            the one Build Directory.
+            Previous versions of the OpenEmbedded build system used to
+            create a global shared sysroot per machine along with a native
+            sysroot.
+            Beginning with the &DISTRO; version of the Yocto Project,
+            sysroots exist in recipe-specific
+            <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>
+            directories.
+            Thus, the <filename>build/tmp/sysroots/</filename> directory
+            is unused.
+            <note>
+                The <filename>build/tmp/sysroots/</filename> directory
+                can still be populated using the
+                <filename>bitbake build-sysroots</filename> command and can
+                be used for compatibility in some cases.
+                However, in general it is not recommended to populate
+                this directory.
+                Individual recipe-specific sysroots should be used.
+            </note>
         </para>
     </section>
 
@@ -891,6 +923,101 @@
             The <filename>WORKDIR/image/</filename> directory is where "make
             install" places its output that is then split into sub-packages
             within <filename>WORKDIR/packages-split/</filename>.
+        </para>
+    </section>
+
+    <section id='structure-build-tmp-work-tunearch-recipename-version'>
+        <title><filename>build/tmp/work/<replaceable>tunearch</replaceable>/<replaceable>recipename</replaceable>/<replaceable>version</replaceable>/</filename></title>
+
+        <para>
+            The recipe work directory - <filename>${WORKDIR}</filename>.
+        </para>
+
+        <para>
+            As described earlier in the
+            "<link linkend='structure-build-tmp-sysroots'><filename>build/tmp/sysroots/</filename></link>"
+            section, beginning with the &DISTRO; release of the Yocto
+            Project, the OpenEmbedded build system builds each recipe in its
+            own work directory (i.e.
+            <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>).
+            The path to the work directory is constructed using the
+            architecture of the given build (e.g.
+            <link linkend='var-TUNE_PKGARCH'><filename>TUNE_PKGARCH</filename></link>,
+            <link linkend='var-MACHINE_ARCH'><filename>MACHINE_ARCH</filename></link>,
+            or "allarch"), the recipe name, and the version of the recipe (i.e.
+            <link linkend='var-PE'><filename>PE</filename></link><filename>:</filename><link linkend='var-PV'><filename>PV</filename></link><filename>-</filename><link linkend='var-PR'><filename>PR</filename></link>).
+        </para>
+
+        <para>
+            A number of key subdirectories exist within each recipe
+            work directory:
+            <itemizedlist>
+                <listitem><para>
+                    <filename>${WORKDIR}/temp</filename>:
+                    Contains the log files of each task executed for this
+                    recipe, the "run" files for each executed task, which
+                    contain the code run, and a
+                    <filename>log.task_order</filename> file, which lists the
+                    order in which tasks were executed.
+                   </para></listitem>
+                <listitem><para>
+                    <filename>${WORKDIR}/image</filename>:
+                    Contains the output of the
+                    <link linkend='ref-tasks-install'><filename>do_install</filename></link>
+                    task, which corresponds to the
+                    <filename>${</filename><link linkend='var-D'><filename>D</filename></link><filename>}</filename>
+                    variable in that task.
+                   </para></listitem>
+                <listitem><para>
+                    <filename>${WORKDIR}/pseudo</filename>:
+                    Contains the pseudo database and log for any tasks executed
+                    under pseudo for the recipe.
+                   </para></listitem>
+                <listitem><para>
+                    <filename>${WORKDIR}/sysroot-destdir</filename>:
+                    Contains the output of the
+                    <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>
+                    task.
+                   </para></listitem>
+                <listitem><para>
+                    <filename>${WORKDIR}/package</filename>:
+                    Contains the output of the
+                    <link linkend='ref-tasks-package'><filename>do_package</filename></link>
+                    task before the output is split into individual packages.
+                   </para></listitem>
+                <listitem><para>
+                    <filename>${WORKDIR}/packages-split</filename>:
+                    Contains the output of the <filename>do_package</filename>
+                    task after the output has been split into individual
+                    packages.
+                    Subdirectories exist for each individual package created
+                    by the recipe.
+                   </para></listitem>
+                <listitem><para>
+                    <filename>${WORKDIR}/recipe-sysroot</filename>:
+                    A directory populated with the target dependencies of the
+                    recipe.
+                    This directory looks like the target filesystem and
+                    contains libraries that the recipe might need to link
+                    against (e.g. the C library).
+                   </para></listitem>
+                <listitem><para>
+                    <filename>${WORKDIR}/recipe-sysroot-native</filename>:
+                    A directory populated with the native dependencies of the
+                    recipe.
+                    This directory contains the tools the recipe needs to build
+                    (e.g. the compiler, Autoconf, libtool, and so forth).
+                   </para></listitem>
+                <listitem><para>
+                    <filename>${WORKDIR}/build</filename>:
+                    This subdirectory applies only to recipes that support
+                    builds where the source is separate from the
+                    build artifacts.
+                    The OpenEmbedded build system uses this directory as a
+                    separate build directory (i.e.
+                    <filename>${</filename><link linkend='var-B'><filename>B</filename></link><filename>}</filename>).
+                   </para></listitem>
+            </itemizedlist>
         </para>
     </section>
 

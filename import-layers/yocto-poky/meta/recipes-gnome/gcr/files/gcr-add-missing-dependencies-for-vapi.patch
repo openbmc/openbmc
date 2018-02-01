@@ -1,0 +1,51 @@
+From e7e0c56ca82031121f192f7f711b78418b154c9f Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Mon, 28 Nov 2016 10:17:34 +0800
+Subject: [PATCH] gcr: add missing dependencies for vapi
+
+According to the vapi_DEPS definition:
+gcr-3.vapi depends on gck-1.vapi,
+gcr-ui-3.vapi depends on gck-1.vapi and gcr-3.vapi
+
+But these dependencies are missing for the make targets,
+so it will fail when build in parallel:
+error: Package `gck-1' not found in specified Vala API directories or GObject-Introspection GIR directories
+error: Package `gcr-3' not found in specified Vala API directories or GObject-Introspection GIR directories
+
+Upstream-Status: Submitted [https://bug775966.bugzilla-attachments.gnome.org/attachment.cgi?id=341791]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ gcr/Makefile.am | 2 +-
+ ui/Makefile.am  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gcr/Makefile.am b/gcr/Makefile.am
+index eda302f..6e78dba 100644
+--- a/gcr/Makefile.am
++++ b/gcr/Makefile.am
+@@ -221,7 +221,7 @@ gir_DATA += Gcr-@GCR_MAJOR@.gir
+ 
+ if ENABLE_VAPIGEN
+ 
+-gcr-@GCR_MAJOR@.vapi: Gcr-@GCR_MAJOR@.gir gcr/Gcr-@GCR_MAJOR@.metadata gcr-@GCR_MAJOR@.deps
++gcr-@GCR_MAJOR@.vapi: Gcr-@GCR_MAJOR@.gir gcr/Gcr-@GCR_MAJOR@.metadata gcr-@GCR_MAJOR@.deps gck-@GCK_MAJOR@.vapi
+ 
+ VAPIGEN_VAPIS += gcr-@GCR_MAJOR@.vapi
+ 
+diff --git a/ui/Makefile.am b/ui/Makefile.am
+index aa52476..6612f0d 100644
+--- a/ui/Makefile.am
++++ b/ui/Makefile.am
+@@ -160,7 +160,7 @@ gir_DATA += GcrUi-@GCR_MAJOR@.gir
+ 
+ if ENABLE_VAPIGEN
+ 
+-gcr-ui-@GCR_MAJOR@.vapi: GcrUi-@GCR_MAJOR@.gir ui/GcrUi-@GCR_MAJOR@.metadata gcr-ui-@GCR_MAJOR@.deps
++gcr-ui-@GCR_MAJOR@.vapi: GcrUi-@GCR_MAJOR@.gir ui/GcrUi-@GCR_MAJOR@.metadata gcr-ui-@GCR_MAJOR@.deps gck-@GCK_MAJOR@.vapi gcr-@GCR_MAJOR@.vapi
+ 
+ VAPIGEN_VAPIS += gcr-ui-@GCR_MAJOR@.vapi
+ 
+-- 
+2.8.3
+

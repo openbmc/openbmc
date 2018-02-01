@@ -74,17 +74,19 @@ of the following environment variables (in any order):
     kvm-vhost - enable KVM with vhost when running x86/x86_64 (VT-capable CPU required)
     publicvnc - enable a VNC server open to all hosts
     audio - enable audio
+    [*/]ovmf* - OVMF firmware file or base name for booting with UEFI
   tcpserial=<port> - specify tcp serial port number
   biosdir=<dir> - specify custom bios dir
   biosfilename=<filename> - specify bios filename
   qemuparams=<xyz> - specify custom parameters to QEMU
   bootparams=<xyz> - specify custom kernel parameters during boot
-  help: print this text
+  help, -h, --help: print this text
 
 Examples:
+  runqemu
   runqemu qemuarm
   runqemu tmp/deploy/images/qemuarm
-  runqemu tmp/deploy/images/qemux86/.qemuboot.conf
+  runqemu tmp/deploy/images/qemux86/<qemuboot.conf>
   runqemu qemux86-64 core-image-sato ext4
   runqemu qemux86-64 wic-image-minimal wic
   runqemu path/to/bzImage-qemux86.bin path/to/nfsrootdir/ serial
@@ -96,7 +98,7 @@ Examples:
 """)
 
 def check_tun():
-    """Check /dev/net/run"""
+    """Check /dev/net/tun"""
     dev_tun = '/dev/net/tun'
     if not os.path.exists(dev_tun):
         raise Exception("TUN control device %s is unavailable; you may need to enable TUN (e.g. sudo modprobe tun)" % dev_tun)
@@ -147,21 +149,46 @@ def get_first_file(cmds):
                     return f
     return ''
 
+def check_free_port(host, port):
+    """ Check whether the port is free or not """
+    import socket
+    from contextlib import closing
+
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+        if sock.connect_ex((host, port)) == 0:
+            # Port is open, so not free
+            return False
+        else:
+            # Port is not open, so free
+            return True
+
 class BaseConfig(object):
     def __init__(self):
-        # Vars can be merged with .qemuboot.conf, use a dict to manage them.
-        self.d = {
-            'MACHINE': '',
-            'DEPLOY_DIR_IMAGE': '',
-            'QB_KERNEL_ROOT': '/dev/vda',
-        }
+        # The self.d saved vars from self.set(), part of them are from qemuboot.conf
+        self.d = {'QB_KERNEL_ROOT': '/dev/vda'}
+
+        # Supported env vars, add it here if a var can be got from env,
+        # and don't use os.getenv in the code.
+        self.env_vars = ('MACHINE',
+                        'ROOTFS',
+                        'KERNEL',
+                        'DEPLOY_DIR_IMAGE',
+                        'OE_TMPDIR',
+                        'OECORE_NATIVE_SYSROOT',
+                        )
 
         self.qemu_opt = ''
         self.qemu_opt_script = ''
-        self.nfs_dir = ''
         self.clean_nfs_dir = False
         self.nfs_server = ''
         self.rootfs = ''
+        # File name(s) of a OVMF firmware file or variable store,
+        # to be added with -drive if=pflash.
+        # Found in the same places as the rootfs, with or without one of
+        # these suffices: qcow2, bin.
+        # Setting one also adds "-vga std" because that is all that
+        # OVMF supports.
+        self.ovmf_bios = []
         self.qemuboot = ''
         self.qbconfload = False
         self.kernel = ''
@@ -187,6 +214,15 @@ class BaseConfig(object):
         self.snapshot = False
         self.fstypes = ('ext2', 'ext3', 'ext4', 'jffs2', 'nfs', 'btrfs', 'cpio.gz', 'cpio', 'ramfs')
         self.vmtypes = ('hddimg', 'hdddirect', 'wic', 'vmdk', 'qcow2', 'vdi', 'iso')
+        self.network_device = "-device e1000,netdev=net0,mac=@MAC@"
+        # Use different mac section for tap and slirp to avoid
+        # conflicts, e.g., when one is running with tap, the other is
+        # running with slirp.
+        # The last section is dynamic, which is for avoiding conflicts,
+        # when multiple qemus are running, e.g., when multiple tap or
+        # slirp qemus are running.
+        self.mac_tap = "52:54:00:12:34:"
+        self.mac_slirp = "52:54:00:12:35:"
 
     def acquire_lock(self):
         logger.info("Acquiring lockfile %s..." % self.lock)
@@ -208,6 +244,8 @@ class BaseConfig(object):
     def get(self, key):
         if key in self.d:
             return self.d.get(key)
+        elif os.getenv(key):
+            return os.getenv(key)
         else:
             return ''
 
@@ -219,7 +257,7 @@ class BaseConfig(object):
             if not re.search('.qemuboot.conf$', '\n'.join(os.listdir(p)), re.M):
                 logger.info("Can't find required *.qemuboot.conf in %s" % p)
                 return False
-            if not re.search('-image-', '\n'.join(os.listdir(p))):
+            if not any(map(lambda name: '-image-' in name, os.listdir(p))):
                 logger.info("Can't find *-image-* in %s" % p)
                 return False
             return True
@@ -246,12 +284,11 @@ class BaseConfig(object):
 
     def check_arg_nfs(self, p):
         if os.path.isdir(p):
-            self.nfs_dir = p
+            self.rootfs = p
         else:
             m = re.match('(.*):(.*)', p)
             self.nfs_server = m.group(1)
-            self.nfs_dir = m.group(2)
-        self.rootfs = ""
+            self.rootfs = m.group(2)
         self.check_arg_fstype('nfs')
 
     def check_arg_path(self, p):
@@ -260,6 +297,7 @@ class BaseConfig(object):
         - Check whether is a kernel file
         - Check whether is a image file
         - Check whether it is a nfs dir
+        - Check whether it is a OVMF flash file
         """
         if p.endswith('.qemuboot.conf'):
             self.qemuboot = p
@@ -268,37 +306,52 @@ class BaseConfig(object):
              re.search('zImage', p) or re.search('vmlinux', p) or \
              re.search('fitImage', p) or re.search('uImage', p):
             self.kernel =  p
-        elif os.path.exists(p) and (not os.path.isdir(p)) and re.search('-image-', os.path.basename(p)):
+        elif os.path.exists(p) and (not os.path.isdir(p)) and '-image-' in os.path.basename(p):
             self.rootfs = p
-            dirpath = os.path.dirname(p)
-            m = re.search('(.*)\.(.*)$', p)
-            if m:
-                qb = '%s%s' % (re.sub('\.rootfs$', '', m.group(1)), '.qemuboot.conf')
+            # Check filename against self.fstypes can hanlde <file>.cpio.gz,
+            # otherwise, its type would be "gz", which is incorrect.
+            fst = ""
+            for t in self.fstypes:
+                if p.endswith(t):
+                    fst = t
+                    break
+            if not fst:
+                m = re.search('.*\.(.*)$', self.rootfs)
+                if m:
+                    fst =  m.group(1)
+            if fst:
+                self.check_arg_fstype(fst)
+                qb = re.sub('\.' + fst + "$", '', self.rootfs)
+                qb = '%s%s' % (re.sub('\.rootfs$', '', qb), '.qemuboot.conf')
                 if os.path.exists(qb):
                     self.qemuboot = qb
                     self.qbconfload = True
                 else:
                     logger.warn("%s doesn't exist" % qb)
-                fst = m.group(2)
-                self.check_arg_fstype(fst)
             else:
                 raise Exception("Can't find FSTYPE from: %s" % p)
-        elif os.path.isdir(p) or re.search(':', arg) and re.search('/', arg):
+
+        elif os.path.isdir(p) or re.search(':', p) and re.search('/', p):
             if self.is_deploy_dir_image(p):
                 logger.info('DEPLOY_DIR_IMAGE: %s' % p)
                 self.set("DEPLOY_DIR_IMAGE", p)
             else:
                 logger.info("Assuming %s is an nfs rootfs" % p)
                 self.check_arg_nfs(p)
+        elif os.path.basename(p).startswith('ovmf'):
+            self.ovmf_bios.append(p)
         else:
             raise Exception("Unknown path arg %s" % p)
 
     def check_arg_machine(self, arg):
         """Check whether it is a machine"""
-        if self.get('MACHINE') and self.get('MACHINE') != arg or re.search('/', arg):
-            raise Exception("Unknown arg: %s" % arg)
-        elif self.get('MACHINE') == arg:
+        if self.get('MACHINE') == arg:
             return
+        elif self.get('MACHINE') and self.get('MACHINE') != arg:
+            raise Exception("Maybe conflicted MACHINE: %s vs %s" % (self.get('MACHINE'), arg))
+        elif re.search('/', arg):
+            raise Exception("Unknown arg: %s" % arg)
+
         logger.info('Assuming MACHINE = %s' % arg)
 
         # if we're running under testimage, or similarly as a child
@@ -307,14 +360,14 @@ class BaseConfig(object):
         # FIXME: testimage.bbclass exports these two variables into env,
         # are there other scenarios in which we need to support being
         # invoked by bitbake?
-        deploy = os.environ.get('DEPLOY_DIR_IMAGE')
-        bbchild = deploy and os.environ.get('OE_TMPDIR')
+        deploy = self.get('DEPLOY_DIR_IMAGE')
+        bbchild = deploy and self.get('OE_TMPDIR')
         if bbchild:
             self.set_machine_deploy_dir(arg, deploy)
             return
         # also check whether we're running under a sourced toolchain
         # environment file
-        if os.environ.get('OECORE_NATIVE_SYSROOT'):
+        if self.get('OECORE_NATIVE_SYSROOT'):
             self.set("MACHINE", arg)
             return
 
@@ -372,11 +425,13 @@ class BaseConfig(object):
                 self.bootparams = arg[len('bootparams='):]
             elif os.path.exists(arg) or (re.search(':', arg) and re.search('/', arg)):
                 self.check_arg_path(os.path.abspath(arg))
-            elif re.search('-image-', arg):
+            elif re.search(r'-image-|-image$', arg):
                 # Lazy rootfs
                 self.rootfs = arg
+            elif arg.startswith('ovmf'):
+                self.ovmf_bios.append(arg)
             else:
-                # At last, assume is it the MACHINE
+                # At last, assume it is the MACHINE
                 if (not unknown_arg) or unknown_arg == arg:
                     unknown_arg = arg
                 else:
@@ -385,18 +440,19 @@ class BaseConfig(object):
         if unknown_arg:
             if self.get('MACHINE') == unknown_arg:
                 return
-            if not self.get('DEPLOY_DIR_IMAGE'):
-                # Trying to get DEPLOY_DIR_IMAGE from env.
-                p = os.getenv('DEPLOY_DIR_IMAGE')
-                if p and self.is_deploy_dir_image(p):
-                    machine = os.path.basename(p)
-                    if unknown_arg == machine:
-                        self.set_machine_deploy_dir(machine, p)
-                        return
-                    else:
-                        logger.info('DEPLOY_DIR_IMAGE: %s' % p)
-                        self.set("DEPLOY_DIR_IMAGE", p)
+            if self.get('DEPLOY_DIR_IMAGE'):
+                machine = os.path.basename(self.get('DEPLOY_DIR_IMAGE'))
+                if unknown_arg == machine:
+                    self.set("MACHINE", machine)
+                    return
+
             self.check_arg_machine(unknown_arg)
+
+        if not self.get('DEPLOY_DIR_IMAGE'):
+            self.load_bitbake_env()
+            s = re.search('^DEPLOY_DIR_IMAGE="(.*)"', self.bitbake_e, re.M)
+            if s:
+                self.set("DEPLOY_DIR_IMAGE", s.group(1))
 
     def check_kvm(self):
         """Check kvm and kvm-host"""
@@ -426,6 +482,11 @@ class BaseConfig(object):
 
         if os.access(dev_kvm, os.W_OK|os.R_OK):
             self.qemu_opt_script += ' -enable-kvm'
+            if self.get('MACHINE') == "qemux86":
+                # Workaround for broken APIC window on pre 4.15 host kernels which causes boot hangs
+                # See YOCTO #12301
+                # On 64 bit we use x2apic
+                self.kernel_cmdline_script += " clocksource=kvm-clock hpet=disable noapic nolapic"
         else:
             logger.error("You have no read or write permission on /dev/kvm.")
             logger.error("Please change the ownership of this file as described at:")
@@ -454,6 +515,15 @@ class BaseConfig(object):
     def check_rootfs(self):
         """Check and set rootfs"""
 
+        if self.fstype == "none":
+            return
+
+        if self.get('ROOTFS'):
+            if not self.rootfs:
+                self.rootfs = self.get('ROOTFS')
+            elif self.get('ROOTFS') != self.rootfs:
+                raise Exception("Maybe conflicted ROOTFS: %s vs %s" % (self.get('ROOTFS'), self.rootfs))
+
         if self.fstype == 'nfs':
             return
 
@@ -473,15 +543,36 @@ class BaseConfig(object):
         if not os.path.exists(self.rootfs):
             raise Exception("Can't find rootfs: %s" % self.rootfs)
 
+    def check_ovmf(self):
+        """Check and set full path for OVMF firmware and variable file(s)."""
+
+        for index, ovmf in enumerate(self.ovmf_bios):
+            if os.path.exists(ovmf):
+                continue
+            for suffix in ('qcow2', 'bin'):
+                path = '%s/%s.%s' % (self.get('DEPLOY_DIR_IMAGE'), ovmf, suffix)
+                if os.path.exists(path):
+                    self.ovmf_bios[index] = path
+                    break
+            else:
+                raise Exception("Can't find OVMF firmware: %s" % ovmf)
+
     def check_kernel(self):
         """Check and set kernel, dtb"""
         # The vm image doesn't need a kernel
         if self.fstype in self.vmtypes:
             return
 
+        # QB_DEFAULT_KERNEL is always a full file path
+        kernel_name = os.path.basename(self.get('QB_DEFAULT_KERNEL'))
+
+        # The user didn't want a kernel to be loaded
+        if kernel_name == "none":
+            return
+
         deploy_dir_image = self.get('DEPLOY_DIR_IMAGE')
         if not self.kernel:
-            kernel_match_name = "%s/%s" % (deploy_dir_image, self.get('QB_DEFAULT_KERNEL'))
+            kernel_match_name = "%s/%s" % (deploy_dir_image, kernel_name)
             kernel_match_link = "%s/%s" % (deploy_dir_image, self.get('KERNEL_IMAGETYPE'))
             kernel_startswith = "%s/%s*" % (deploy_dir_image, self.get('KERNEL_IMAGETYPE'))
             cmds = (kernel_match_name, kernel_match_link, kernel_startswith)
@@ -543,7 +634,8 @@ class BaseConfig(object):
     def check_and_set(self):
         """Check configs sanity and set when needed"""
         self.validate_paths()
-        check_tun()
+        if not self.slirp_enabled:
+            check_tun()
         # Check audio
         if self.audio_enabled:
             if not self.get('QB_AUDIO_DRV'):
@@ -559,6 +651,7 @@ class BaseConfig(object):
         self.check_kvm()
         self.check_fstype()
         self.check_rootfs()
+        self.check_ovmf()
         self.check_kernel()
         self.check_biosdir()
         self.check_mem()
@@ -568,8 +661,6 @@ class BaseConfig(object):
         if not self.qemuboot:
             if self.get('DEPLOY_DIR_IMAGE'):
                 deploy_dir_image = self.get('DEPLOY_DIR_IMAGE')
-            elif os.getenv('DEPLOY_DIR_IMAGE'):
-                deploy_dir_image = os.getenv('DEPLOY_DIR_IMAGE')
             else:
                 logger.info("Can't find qemuboot conf file, DEPLOY_DIR_IMAGE is NULL!")
                 return
@@ -586,7 +677,15 @@ class BaseConfig(object):
                 logger.info('Running %s...' % cmd)
                 qbs = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
                 if qbs:
-                    self.qemuboot = qbs.split()[0]
+                    for qb in qbs.split():
+                        # Don't use initramfs when other choices unless fstype is ramfs
+                        if '-initramfs-' in os.path.basename(qb) and self.fstype != 'cpio.gz':
+                                continue
+                        self.qemuboot = qb
+                        break
+                    if not self.qemuboot:
+                        # Use the first one when no choice
+                        self.qemuboot = qbs.split()[0]
                     self.qbconfload = True
 
         if not self.qemuboot:
@@ -595,7 +694,7 @@ class BaseConfig(object):
             return
 
         if not os.path.exists(self.qemuboot):
-            raise Exception("Failed to find <image>.qemuboot.conf!")
+            raise Exception("Failed to find %s (wrong image name or BSP does not support running under qemu?)." % self.qemuboot)
 
         logger.info('CONFFILE: %s' % self.qemuboot)
 
@@ -611,8 +710,8 @@ class BaseConfig(object):
         # artefacts are relative to that file, rather than in whatever
         # directory DEPLOY_DIR_IMAGE in the conf file points to.
         if self.qbconfload:
-            imgdir = os.path.dirname(self.qemuboot)
-            if imgdir != self.get('DEPLOY_DIR_IMAGE'):
+            imgdir = os.path.realpath(os.path.dirname(self.qemuboot))
+            if imgdir != os.path.realpath(self.get('DEPLOY_DIR_IMAGE')):
                 logger.info('Setting DEPLOY_DIR_IMAGE to folder containing %s (%s)' % (self.qemuboot, imgdir))
                 self.set('DEPLOY_DIR_IMAGE', imgdir)
 
@@ -627,7 +726,7 @@ class BaseConfig(object):
                 self.load_bitbake_env()
 
             if self.bitbake_e:
-                native_vars = ['STAGING_DIR_NATIVE', 'STAGING_BINDIR_NATIVE']
+                native_vars = ['STAGING_DIR_NATIVE']
                 for nv in native_vars:
                     s = re.search('^%s="(.*)"' % nv, self.bitbake_e, re.M)
                     if s and s.group(1) != self.get(nv):
@@ -638,8 +737,8 @@ class BaseConfig(object):
                 # be able to call `bitbake -e`, then try:
                 # - get OE_TMPDIR from environment and guess paths based on it
                 # - get OECORE_NATIVE_SYSROOT from environment (for sdk)
-                tmpdir = os.environ.get('OE_TMPDIR', None)
-                oecore_native_sysroot = os.environ.get('OECORE_NATIVE_SYSROOT', None)
+                tmpdir = self.get('OE_TMPDIR')
+                oecore_native_sysroot = self.get('OECORE_NATIVE_SYSROOT')
                 if tmpdir:
                     logger.info('Setting STAGING_DIR_NATIVE and STAGING_BINDIR_NATIVE relative to OE_TMPDIR (%s)' % tmpdir)
                     hostos, _, _, _, machine = os.uname()
@@ -664,9 +763,11 @@ class BaseConfig(object):
         print('MACHINE: [%s]' % self.get('MACHINE'))
         print('FSTYPE: [%s]' % self.fstype)
         if self.fstype  == 'nfs':
-            print('NFS_DIR: [%s]' % self.nfs_dir)
+            print('NFS_DIR: [%s]' % self.rootfs)
         else:
             print('ROOTFS: [%s]' % self.rootfs)
+        if self.ovmf_bios:
+            print('OVMF: %s' % self.ovmf_bios)
         print('CONFFILE: [%s]' % self.qemuboot)
         print('')
 
@@ -707,13 +808,13 @@ class BaseConfig(object):
 
         self.unfs_opts="nfsvers=3,port=%s,mountprog=%s,nfsprog=%s,udp,mountport=%s" % (nfsd_port, mountd_rpcport, nfsd_rpcport, mountd_port)
 
-        # Extract .tar.bz2 or .tar.bz if no self.nfs_dir
-        if not self.nfs_dir:
+        # Extract .tar.bz2 or .tar.bz if no nfs dir
+        if not (self.rootfs and os.path.isdir(self.rootfs)):
             src_prefix = '%s/%s' % (self.get('DEPLOY_DIR_IMAGE'), self.get('IMAGE_LINK_NAME'))
             dest = "%s-nfsroot" % src_prefix
             if os.path.exists('%s.pseudo_state' % dest):
                 logger.info('Use %s as NFS_DIR' % dest)
-                self.nfs_dir = dest
+                self.rootfs = dest
             else:
                 src = ""
                 src1 = '%s.tar.bz2' % src_prefix
@@ -730,16 +831,15 @@ class BaseConfig(object):
                 if subprocess.call(cmd, shell=True) != 0:
                     raise Exception('Failed to run %s' % cmd)
                 self.clean_nfs_dir = True
-                self.nfs_dir = dest
+                self.rootfs = dest
 
         # Start the userspace NFS server
-        cmd = 'runqemu-export-rootfs start %s' % self.nfs_dir
+        cmd = 'runqemu-export-rootfs start %s' % self.rootfs
         logger.info('Running %s...' % cmd)
         if subprocess.call(cmd, shell=True) != 0:
             raise Exception('Failed to run %s' % cmd)
 
         self.nfs_running = True
-
 
     def setup_slirp(self):
         """Setup user networking"""
@@ -747,7 +847,33 @@ class BaseConfig(object):
         if self.fstype == 'nfs':
             self.setup_nfs()
         self.kernel_cmdline_script += ' ip=dhcp'
-        self.set('NETWORK_CMD', self.get('QB_SLIRP_OPT'))
+        # Port mapping
+        hostfwd = ",hostfwd=tcp::2222-:22,hostfwd=tcp::2323-:23"
+        qb_slirp_opt_default = "-netdev user,id=net0%s" % hostfwd
+        qb_slirp_opt = self.get('QB_SLIRP_OPT') or qb_slirp_opt_default
+        # Figure out the port
+        ports = re.findall('hostfwd=[^-]*:([0-9]+)-[^,-]*', qb_slirp_opt)
+        ports = [int(i) for i in ports]
+        mac = 2
+        # Find a free port to avoid conflicts
+        for p in ports[:]:
+            p_new = p
+            while not check_free_port('localhost', p_new):
+                p_new += 1
+                mac += 1
+                while p_new in ports:
+                        p_new += 1
+                        mac += 1
+            if p != p_new:
+                ports.append(p_new)
+                qb_slirp_opt = re.sub(':%s-' % p, ':%s-' % p_new, qb_slirp_opt)
+                logger.info("Port forward changed: %s -> %s" % (p, p_new))
+        mac = "%s%02x" % (self.mac_slirp, mac)
+        self.set('NETWORK_CMD', '%s %s' % (self.network_device.replace('@MAC@', mac), qb_slirp_opt))
+        # Print out port foward
+        hostfwd = re.findall('(hostfwd=[^,]*)', qb_slirp_opt)
+        if hostfwd:
+            logger.info('Port forward: %s' % ' '.join(hostfwd))
 
     def setup_tap(self):
         """Setup tap"""
@@ -799,7 +925,7 @@ class BaseConfig(object):
             gid = os.getgid()
             uid = os.getuid()
             logger.info("Setting up tap interface under sudo")
-            cmd = 'sudo %s %s %s %s' % (self.qemuifup, uid, gid, self.get('STAGING_DIR_NATIVE'))
+            cmd = 'sudo %s %s %s %s' % (self.qemuifup, uid, gid, self.bindir_native)
             tap = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').rstrip('\n')
             lockfile = os.path.join(lockdir, tap)
             self.lock = lockfile + '.lock'
@@ -816,27 +942,35 @@ class BaseConfig(object):
         client = gateway + 1
         if self.fstype == 'nfs':
             self.setup_nfs()
-        self.kernel_cmdline_script += " ip=192.168.7.%s::192.168.7.%s:255.255.255.0" % (client, gateway)
-        mac = "52:54:00:12:34:%02x" % client
+        netconf = "192.168.7.%s::192.168.7.%s:255.255.255.0" % (client, gateway)
+        logger.info("Network configuration: %s", netconf)
+        self.kernel_cmdline_script += " ip=%s" % netconf
+        mac = "%s%02x" % (self.mac_tap, client)
         qb_tap_opt = self.get('QB_TAP_OPT')
         if qb_tap_opt:
-            qemu_tap_opt = qb_tap_opt.replace('@TAP@', tap).replace('@MAC@', mac)
+            qemu_tap_opt = qb_tap_opt.replace('@TAP@', tap)
         else:
-            qemu_tap_opt = "-device virtio-net-pci,netdev=net0,mac=%s -netdev tap,id=net0,ifname=%s,script=no,downscript=no" % (mac, self.tap)
+            qemu_tap_opt = "-netdev tap,id=net0,ifname=%s,script=no,downscript=no" % (self.tap)
 
         if self.vhost_enabled:
             qemu_tap_opt += ',vhost=on'
 
-        self.set('NETWORK_CMD', qemu_tap_opt)
+        self.set('NETWORK_CMD', '%s %s' % (self.network_device.replace('@MAC@', mac), qemu_tap_opt))
 
     def setup_network(self):
+        if self.get('QB_NET') == 'none':
+            return
         cmd = "stty -g"
         self.saved_stty = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+        self.network_device = self.get('QB_NETWORK_DEVICE') or self.network_device
         if self.slirp_enabled:
             self.setup_slirp()
         else:
             self.setup_tap()
 
+    def setup_rootfs(self):
+        if self.get('QB_ROOTFS') == 'none':
+            return
         rootfs_format = self.fstype if self.fstype in ('vmdk', 'qcow2', 'vdi') else 'raw'
 
         qb_rootfs_opt = self.get('QB_ROOTFS_OPT')
@@ -849,30 +983,39 @@ class BaseConfig(object):
             self.kernel_cmdline = 'root=/dev/ram0 rw debugshell'
             self.rootfs_options = '-initrd %s' % self.rootfs
         else:
+            vm_drive = ''
             if self.fstype in self.vmtypes:
                 if self.fstype == 'iso':
                     vm_drive = '-cdrom %s' % self.rootfs
-                else:
-                    cmd1 = "grep -q 'root=/dev/sd' %s" % self.rootfs
-                    cmd2 = "grep -q 'root=/dev/hd' %s" % self.rootfs
-                    if subprocess.call(cmd1, shell=True) == 0:
+                elif self.get('QB_DRIVE_TYPE'):
+                    drive_type = self.get('QB_DRIVE_TYPE')
+                    if drive_type.startswith("/dev/sd"):
                         logger.info('Using scsi drive')
                         vm_drive = '-drive if=none,id=hd,file=%s,format=%s -device virtio-scsi-pci,id=scsi -device scsi-hd,drive=hd' \
                                        % (self.rootfs, rootfs_format)
-                    elif subprocess.call(cmd2, shell=True) == 0:
+                    elif drive_type.startswith("/dev/hd"):
                         logger.info('Using ide drive')
                         vm_drive = "%s,format=%s" % (self.rootfs, rootfs_format)
                     else:
-                        logger.warn("Can't detect drive type %s" % self.rootfs)
-                        logger.warn('Trying to use virtio block drive')
+                        # virtio might have been selected explicitly (just use it), or
+                        # is used as fallback (then warn about that).
+                        if not drive_type.startswith("/dev/vd"):
+                            logger.warn("Unknown QB_DRIVE_TYPE: %s" % drive_type)
+                            logger.warn("Failed to figure out drive type, consider define or fix QB_DRIVE_TYPE")
+                            logger.warn('Trying to use virtio block drive')
                         vm_drive = '-drive if=virtio,file=%s,format=%s' % (self.rootfs, rootfs_format)
+
+                # All branches above set vm_drive.
                 self.rootfs_options = '%s -no-reboot' % vm_drive
             self.kernel_cmdline = 'root=%s rw highres=off' % (self.get('QB_KERNEL_ROOT'))
 
         if self.fstype == 'nfs':
             self.rootfs_options = ''
-            k_root = '/dev/nfs nfsroot=%s:%s,%s' % (self.nfs_server, self.nfs_dir, self.unfs_opts)
+            k_root = '/dev/nfs nfsroot=%s:%s,%s' % (self.nfs_server, self.rootfs, self.unfs_opts)
             self.kernel_cmdline = 'root=%s rw highres=off' % k_root
+
+        if self.fstype == 'none':
+            self.rootfs_options = ''
 
         self.set('ROOTFS_OPTIONS', self.rootfs_options)
 
@@ -921,13 +1064,38 @@ class BaseConfig(object):
         if not qemu_system:
             raise Exception("Failed to boot, QB_SYSTEM_NAME is NULL!")
 
-        qemu_bin = '%s/%s' % (self.get('STAGING_BINDIR_NATIVE'), qemu_system)
+        qemu_bin = '%s/%s' % (self.bindir_native, qemu_system)
+
+        # It is possible to have qemu-native in ASSUME_PROVIDED, and it won't
+        # find QEMU in sysroot, it needs to use host's qemu.
+        if not os.path.exists(qemu_bin):
+            logger.info("QEMU binary not found in %s, trying host's QEMU" % qemu_bin)
+            for path in (os.environ['PATH'] or '').split(':'):
+                qemu_bin_tmp = os.path.join(path, qemu_system)
+                logger.info("Trying: %s" % qemu_bin_tmp)
+                if os.path.exists(qemu_bin_tmp):
+                    qemu_bin = qemu_bin_tmp
+                    if not os.path.isabs(qemu_bin):
+                        qemu_bin = os.path.abspath(qemu_bin)
+                    logger.info("Using host's QEMU: %s" % qemu_bin)
+                    break
+
         if not os.access(qemu_bin, os.X_OK):
             raise OEPathError("No QEMU binary '%s' could be found" % qemu_bin)
 
         check_libgl(qemu_bin)
 
-        self.qemu_opt = "%s %s %s %s %s" % (qemu_bin, self.get('NETWORK_CMD'), self.qemu_opt_script, self.get('ROOTFS_OPTIONS'), self.get('QB_OPT_APPEND'))
+        self.qemu_opt = "%s %s %s %s" % (qemu_bin, self.get('NETWORK_CMD'), self.get('ROOTFS_OPTIONS'), self.get('QB_OPT_APPEND'))
+
+        for ovmf in self.ovmf_bios:
+            format = ovmf.rsplit('.', 1)[-1]
+            self.qemu_opt += ' -drive if=pflash,format=%s,file=%s' % (format, ovmf)
+        if self.ovmf_bios:
+            # OVMF only supports normal VGA, i.e. we need to override a -vga vmware
+            # that gets added for example for normal qemux86.
+            self.qemu_opt += ' -vga std'
+
+        self.qemu_opt += ' ' + self.qemu_opt_script
 
         if self.snapshot:
             self.qemu_opt += " -snapshot"
@@ -953,6 +1121,17 @@ class BaseConfig(object):
             elif serial_num == 1:
                 self.qemu_opt += " %s" % self.get("QB_SERIAL_OPT")
 
+        # We always wants ttyS0 and ttyS1 in qemu machines (see SERIAL_CONSOLES),
+        # if not serial or serialtcp options was specified only ttyS0 is created
+        # and sysvinit shows an error trying to enable ttyS1:
+        #     INIT: Id "S1" respawning too fast: disabled for 5 minutes
+        serial_num = len(re.findall("-serial", self.qemu_opt))
+        if serial_num == 0:
+            if re.search("-nographic", self.qemu_opt):
+                self.qemu_opt += " -serial mon:stdio -serial null"
+            else:
+                self.qemu_opt += " -serial mon:vc -serial null"
+
     def start_qemu(self):
         if self.kernel:
             kernel_opts = "-kernel %s -append '%s %s %s %s'" % (self.kernel, self.kernel_cmdline,
@@ -969,7 +1148,7 @@ class BaseConfig(object):
 
     def cleanup(self):
         if self.cleantap:
-            cmd = 'sudo %s %s %s' % (self.qemuifdown, self.tap, self.get('STAGING_DIR_NATIVE'))
+            cmd = 'sudo %s %s %s' % (self.qemuifdown, self.tap, self.bindir_native)
             logger.info('Running %s' % cmd)
             subprocess.call(cmd, shell=True)
         if self.lock_descriptor:
@@ -978,7 +1157,7 @@ class BaseConfig(object):
 
         if self.nfs_running:
             logger.info("Shutting down the userspace NFS server...")
-            cmd = "runqemu-export-rootfs stop %s" % self.nfs_dir
+            cmd = "runqemu-export-rootfs stop %s" % self.rootfs
             logger.info('Running %s' % cmd)
             subprocess.call(cmd, shell=True)
 
@@ -987,9 +1166,9 @@ class BaseConfig(object):
             subprocess.call(cmd, shell=True)
 
         if self.clean_nfs_dir:
-            logger.info('Removing %s' % self.nfs_dir)
-            shutil.rmtree(self.nfs_dir)
-            shutil.rmtree('%s.pseudo_state' % self.nfs_dir)
+            logger.info('Removing %s' % self.rootfs)
+            shutil.rmtree(self.rootfs)
+            shutil.rmtree('%s.pseudo_state' % self.rootfs)
 
     def load_bitbake_env(self, mach=None):
         if self.bitbake_e:
@@ -1014,8 +1193,30 @@ class BaseConfig(object):
             self.bitbake_e = ''
             logger.warn("Couldn't run 'bitbake -e' to gather environment information:\n%s" % err.output.decode('utf-8'))
 
+    @property
+    def bindir_native(self):
+        result = self.get('STAGING_BINDIR_NATIVE')
+        if result and os.path.exists(result):
+            return result
+
+        cmd = 'bitbake qemu-helper-native -e'
+        logger.info('Running %s...' % cmd)
+        out = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        out = out.stdout.read().decode('utf-8')
+
+        match = re.search('^STAGING_BINDIR_NATIVE="(.*)"', out, re.M)
+        if match:
+            result = match.group(1)
+            if os.path.exists(result):
+                self.set('STAGING_BINDIR_NATIVE', result)
+                return result
+            raise Exception("Native sysroot directory %s doesn't exist" % result)
+        else:
+            raise Exception("Can't find STAGING_BINDIR_NATIVE in '%s' output" % cmd)
+
+
 def main():
-    if len(sys.argv) == 1 or "help" in sys.argv:
+    if "help" in sys.argv or '-h' in sys.argv or '--help' in sys.argv:
         print_usage()
         return 0
     config = BaseConfig()
@@ -1030,6 +1231,7 @@ def main():
     config.print_config()
     try:
         config.setup_network()
+        config.setup_rootfs()
         config.setup_final()
         config.start_qemu()
     finally:

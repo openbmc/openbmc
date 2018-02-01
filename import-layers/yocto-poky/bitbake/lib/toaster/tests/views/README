@@ -1,0 +1,4 @@
+
+Django unit tests to verify classes and functions based on django Views
+
+To run just these tests use ./manage.py test tests.views

@@ -77,14 +77,29 @@
                 <revremark>Released with the Yocto Project 2.2 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.2.1</revnumber>
-                <date>January 2017</date>
-                <revremark>Released with the Yocto Project 2.2.1 Release.</revremark>
+                <revnumber>2.3</revnumber>
+                <date>May 2017</date>
+                <revremark>Released with the Yocto Project 2.3 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.2.2</revnumber>
+                <revnumber>2.3.1</revnumber>
                 <date>June 2017</date>
-                <revremark>Released with the Yocto Project 2.2.2 Release.</revremark>
+                <revremark>Released with the Yocto Project 2.3.1 Release.</revremark>
+            </revision>
+            <revision>
+                <revnumber>2.3.2</revnumber>
+                <date>September 2017</date>
+                <revremark>Released with the Yocto Project 2.3.2 Release.</revremark>
+            </revision>
+            <revision>
+                <revnumber>2.3.3</revnumber>
+                <date>January 2018</date>
+                <revremark>Released with the Yocto Project 2.3.3 Release.</revremark>
+            </revision>
+            <revision>
+                <revnumber>2.3.4</revnumber>
+                <date>April 2018</date>
+                <revremark>Released with the Yocto Project 2.3.4 Release.</revremark>
             </revision>
         </revhistory>
 
@@ -98,12 +113,33 @@
         Permission is granted to copy, distribute and/or modify this document under
         the terms of the <ulink type="http" url="http://creativecommons.org/licenses/by-sa/2.0/uk/">Creative Commons Attribution-Share Alike 2.0 UK: England &amp; Wales</ulink> as published by Creative Commons.
       </para>
-      <note>
-          For the latest version of this manual associated with this
-          Yocto Project release, see the
-          <ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;'>Yocto Project Linux Kernel Development Manual</ulink>
-          from the Yocto Project website.
-      </note>
+           <note><title>Manual Notes</title>
+               <itemizedlist>
+                   <listitem><para>
+                       For the latest version of the Yocto Project Linux
+                       Kernel Development Manual associated with this Yocto
+                       Project release (version &YOCTO_DOC_VERSION;),
+                       see the Yocto Project Linux Kernel Development
+                       Manual from the
+                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>.
+                       </para></listitem>
+                   <listitem><para>
+                       This version of the manual is version
+                       &YOCTO_DOC_VERSION;.
+                       For later releases of the Yocto Project (if they exist),
+                       go to the
+                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                       and use the drop-down "Active Releases" button
+                       and choose the Yocto Project version for which you want
+                       the manual.
+                       </para></listitem>
+                   <listitem><para>
+                        For an in-development version of the Yocto Project
+                        Linux Kernel Development Manual, see
+                        <ulink url='&YOCTO_DOCS_URL;/latest/kernel-dev/kernel-dev.html'></ulink>.
+                        </para></listitem>
+                </itemizedlist>
+            </note>
     </legalnotice>
 
     </bookinfo>

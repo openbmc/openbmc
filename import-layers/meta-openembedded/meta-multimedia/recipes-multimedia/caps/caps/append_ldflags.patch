@@ -1,0 +1,18 @@
+Change the order of linker flags such that -shared is appearig after -pie/-fpie
+this helps in building the package when secuiry flags are enabled
+
+-Khem
+
+Index: caps-0.9.24/Makefile
+===================================================================
+--- caps-0.9.24.orig/Makefile
++++ caps-0.9.24/Makefile
+@@ -14,7 +14,7 @@ STRIP = strip
+ -include defines.make
+ 
+ CFLAGS += $(OPTS) $(_CFLAGS)
+-LDFLAGS += $(_LDFLAGS) $(CFLAGS)
++LDFLAGS += $(CFLAGS) $(_LDFLAGS)
+ 
+ PLUG = caps
+ 

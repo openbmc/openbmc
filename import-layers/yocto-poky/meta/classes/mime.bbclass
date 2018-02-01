@@ -1,4 +1,5 @@
-DEPENDS += "shared-mime-info-native shared-mime-info"
+DEPENDS += "shared-mime-info"
+PACKAGE_WRITE_DEPS += "shared-mime-info-native"
 
 mime_postinst() {
 if [ "$1" = configure ]; then
@@ -28,8 +29,8 @@ fi
 
 python populate_packages_append () {
     import re
-    packages = d.getVar('PACKAGES', True).split()
-    pkgdest =  d.getVar('PKGDEST', True)
+    packages = d.getVar('PACKAGES').split()
+    pkgdest =  d.getVar('PKGDEST')
 
     for pkg in packages:
         mime_dir = '%s/%s/usr/share/mime/packages' % (pkgdest, pkg)
@@ -41,15 +42,15 @@ python populate_packages_append () {
                     mimes.append(f)
         if mimes:
             bb.note("adding mime postinst and postrm scripts to %s" % pkg)
-            postinst = d.getVar('pkg_postinst_%s' % pkg, True)
+            postinst = d.getVar('pkg_postinst_%s' % pkg)
             if not postinst:
                 postinst = '#!/bin/sh\n'
-            postinst += d.getVar('mime_postinst', True)
+            postinst += d.getVar('mime_postinst')
             d.setVar('pkg_postinst_%s' % pkg, postinst)
-            postrm = d.getVar('pkg_postrm_%s' % pkg, True)
+            postrm = d.getVar('pkg_postrm_%s' % pkg)
             if not postrm:
                 postrm = '#!/bin/sh\n'
-            postrm += d.getVar('mime_postrm', True)
+            postrm += d.getVar('mime_postrm')
             d.setVar('pkg_postrm_%s' % pkg, postrm)
             bb.note("adding shared-mime-info-data dependency to %s" % pkg)
             d.appendVar('RDEPENDS_' + pkg, " shared-mime-info-data")

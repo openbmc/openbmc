@@ -1,0 +1,7 @@
+# short-description: image for use in machine agnostic wic test cases
+
+# /boot is intentionally an empty partition
+part /boot --ondisk sda --label boot --active --align 1024 --size 16
+part / --source rootfs --ondisk sda --fstype=ext4 --label platform --align 1024 --use-uuid
+
+# bootloader is intentionally left out

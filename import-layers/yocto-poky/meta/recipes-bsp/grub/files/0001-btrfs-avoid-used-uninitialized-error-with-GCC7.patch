@@ -1,0 +1,36 @@
+From 6cef7f6079550af3bf91dbff824398eaef08c3c5 Mon Sep 17 00:00:00 2001
+From: Andrei Borzenkov <arvidjaar@gmail.com>
+Date: Tue, 4 Apr 2017 19:22:32 +0300
+Subject: [PATCH 1/4] btrfs: avoid "used uninitialized" error with GCC7
+
+sblock was local and so considered new variable on every loop
+iteration.
+
+Closes: 50597
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ grub-core/fs/btrfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index 9cffa91..4849c1c 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -227,11 +227,11 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data,
+ static grub_err_t
+ read_sblock (grub_disk_t disk, struct grub_btrfs_superblock *sb)
+ {
++  struct grub_btrfs_superblock sblock;
+   unsigned i;
+   grub_err_t err = GRUB_ERR_NONE;
+   for (i = 0; i < ARRAY_SIZE (superblock_sectors); i++)
+     {
+-      struct grub_btrfs_superblock sblock;
+       /* Don't try additional superblocks beyond device size.  */
+       if (i && (grub_le_to_cpu64 (sblock.this_device.size)
+ 		>> GRUB_DISK_SECTOR_BITS) <= superblock_sectors[i])
+-- 
+1.9.1
+

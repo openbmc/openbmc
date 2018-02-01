@@ -1,0 +1,36 @@
+Disable bits of remote capture support inherited from the WinPCAP merge
+which cause applications to FTBFS if they define HAVE_REMOTE.
+
+Patch from:
+https://anonscm.debian.org/cgit/users/rfrancoise/libpcap.git/commit/?
+id=f35949969269dfdcc3549b12fade604755e1e326
+
+Upstream-Status: Pending
+
+--- a/pcap/pcap.h
++++ b/pcap/pcap.h
+@@ -506,6 +506,11 @@
+   #define MODE_STAT 1
+   #define MODE_MON 2
+ 
++#ifdef HAVE_REMOTE
++  /* Includes most of the public stuff that is needed for the remote capture */
++  #include <remote-ext.h>
++#endif	 /* HAVE_REMOTE */
++
+ #elif defined(MSDOS)
+ 
+   /*
+@@ -526,11 +531,6 @@
+ 
+ #endif /* _WIN32/MSDOS/UN*X */
+ 
+-#ifdef HAVE_REMOTE
+-  /* Includes most of the public stuff that is needed for the remote capture */
+-  #include <remote-ext.h>
+-#endif	 /* HAVE_REMOTE */
+-
+ #ifdef __cplusplus
+ }
+ #endif
+

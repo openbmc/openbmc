@@ -1,9 +1,4 @@
-try:
-    # Python 2
-    import commands as cmdstatus
-except ImportError:
-    # Python 3
-    import subprocess as cmdstatus
+import subprocess
 
 def read_file(filename):
     try:
@@ -23,27 +18,27 @@ def ifelse(condition, iftrue = True, iffalse = False):
         return iffalse
 
 def conditional(variable, checkvalue, truevalue, falsevalue, d):
-    if d.getVar(variable, True) == checkvalue:
+    if d.getVar(variable) == checkvalue:
         return truevalue
     else:
         return falsevalue
 
 def less_or_equal(variable, checkvalue, truevalue, falsevalue, d):
-    if float(d.getVar(variable, True)) <= float(checkvalue):
+    if float(d.getVar(variable)) <= float(checkvalue):
         return truevalue
     else:
         return falsevalue
 
 def version_less_or_equal(variable, checkvalue, truevalue, falsevalue, d):
-    result = bb.utils.vercmp_string(d.getVar(variable,True), checkvalue)
+    result = bb.utils.vercmp_string(d.getVar(variable), checkvalue)
     if result <= 0:
         return truevalue
     else:
         return falsevalue
 
 def both_contain(variable1, variable2, checkvalue, d):
-    val1 = d.getVar(variable1, True)
-    val2 = d.getVar(variable2, True)
+    val1 = d.getVar(variable1)
+    val2 = d.getVar(variable2)
     val1 = set(val1.split())
     val2 = set(val2.split())
     if isinstance(checkvalue, str):
@@ -66,8 +61,8 @@ def set_intersect(variable1, variable2, d):
     s3 = set_intersect(s1, s2)
     => s3 = "b c"
     """
-    val1 = set(d.getVar(variable1, True).split())
-    val2 = set(d.getVar(variable2, True).split())
+    val1 = set(d.getVar(variable1).split())
+    val2 = set(d.getVar(variable2).split())
     return " ".join(val1 & val2)
 
 def prune_suffix(var, suffixes, d):
@@ -77,7 +72,7 @@ def prune_suffix(var, suffixes, d):
         if var.endswith(suffix):
             var = var.replace(suffix, "")
 
-    prefix = d.getVar("MLPREFIX", True)
+    prefix = d.getVar("MLPREFIX")
     if prefix and var.startswith(prefix):
         var = var.replace(prefix, "")
 
@@ -102,6 +97,10 @@ def param_bool(cfg, field, dflt = None):
         return False
     raise ValueError("invalid value for boolean parameter '%s': '%s'" % (field, value))
 
+def build_depends_string(depends, task):
+    """Append a taskname to a string of dependencies as used by the [depends] flag"""
+    return " ".join(dep + ":" + task for dep in depends.split())
+
 def inherits(d, *classes):
     """Return True if the metadata inherits any of the specified classes"""
     return any(bb.data.inherits_class(cls, d) for cls in classes)
@@ -115,9 +114,9 @@ def features_backfill(var,d):
     # disturbing distributions that have already set DISTRO_FEATURES.
     # Distributions wanting to elide a value in DISTRO_FEATURES_BACKFILL should
     # add the feature to DISTRO_FEATURES_BACKFILL_CONSIDERED
-    features = (d.getVar(var, True) or "").split()
-    backfill = (d.getVar(var+"_BACKFILL", True) or "").split()
-    considered = (d.getVar(var+"_BACKFILL_CONSIDERED", True) or "").split()
+    features = (d.getVar(var) or "").split()
+    backfill = (d.getVar(var+"_BACKFILL") or "").split()
+    considered = (d.getVar(var+"_BACKFILL_CONSIDERED") or "").split()
 
     addfeatures = []
     for feature in backfill:
@@ -133,18 +132,18 @@ def packages_filter_out_system(d):
     Return a list of packages from PACKAGES with the "system" packages such as
     PN-dbg PN-doc PN-locale-eb-gb removed.
     """
-    pn = d.getVar('PN', True)
+    pn = d.getVar('PN')
     blacklist = [pn + suffix for suffix in ('', '-dbg', '-dev', '-doc', '-locale', '-staticdev')]
     localepkg = pn + "-locale-"
     pkgs = []
 
-    for pkg in d.getVar('PACKAGES', True).split():
+    for pkg in d.getVar('PACKAGES').split():
         if pkg not in blacklist and localepkg not in pkg:
             pkgs.append(pkg)
     return pkgs
 
 def getstatusoutput(cmd):
-    return cmdstatus.getstatusoutput(cmd)
+    return subprocess.getstatusoutput(cmd)
 
 
 def trim_version(version, num_parts=2):
@@ -233,11 +232,10 @@ def format_pkg_list(pkg_dict, ret_format=None):
 def host_gcc_version(d):
     import re, subprocess
 
-    compiler = d.getVar("BUILD_CC", True)
-
+    compiler = d.getVar("BUILD_CC")
     try:
         env = os.environ.copy()
-        env["PATH"] = d.getVar("PATH", True)
+        env["PATH"] = d.getVar("PATH")
         output = subprocess.check_output("%s --version" % compiler, shell=True, env=env).decode("utf-8")
     except subprocess.CalledProcessError as e:
         bb.fatal("Error running %s --version: %s" % (compiler, e.output.decode("utf-8")))
@@ -321,8 +319,8 @@ def write_ld_so_conf(d):
         bb.utils.remove(ldsoconf)
     bb.utils.mkdirhier(os.path.dirname(ldsoconf))
     with open(ldsoconf, "w") as f:
-        f.write(d.getVar("base_libdir", True) + '\n')
-        f.write(d.getVar("libdir", True) + '\n')
+        f.write(d.getVar("base_libdir") + '\n')
+        f.write(d.getVar("libdir") + '\n')
 
 class ImageQAFailed(bb.build.FuncFailed):
     def __init__(self, description, name=None, logfile=None):

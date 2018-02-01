@@ -1,0 +1,40 @@
+From 56768fc0c2cbd6abcf28c9805ab516db8a0548d4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Mar 2017 23:09:47 -0700
+Subject: [PATCH 6/8] sysdep: Add header include sequence to adjust for musl
+
+---
+ sysdep.h | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/sysdep.h b/sysdep.h
+index 6a323f0..0122b95 100644
+--- a/sysdep.h
++++ b/sysdep.h
+@@ -17,16 +17,20 @@
+  * __SKYOS__
+  *
+  */
++/* hack to make sure kernel headers understand that libc (musl)
++ * does define IFF_LOWER_UP et al.
++ */
++#define __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO 0
+ 
+ #include <sys/types.h>
+ #include <sys/socket.h>
+-#include <netinet/in.h>
+ 
+ #if !defined(__CYGWIN__)
+-#include <net/if.h>
+-#include <net/if_arp.h>
++//#include <linux/if.h>
++//#include <net/if_arp.h>
+ #include <netinet/if_ether.h>
+ #endif
++#include <netinet/in.h>
+ 
+ #include "config.h"
+ 
+-- 
+2.12.1
+

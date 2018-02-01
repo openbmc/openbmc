@@ -1,0 +1,116 @@
+From de69555afaf05efcdeea7b7c20c6f7b12f3e1bac Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Fri, 20 Jan 2017 11:58:44 -0500
+Subject: [PATCH] context: use golang.org/x/net pkg until we move to go 1.7
+
+In go 1.6 the context.go is not yet integrated and as such we will get
+build errors like:
+
+walwrap.go:4:2: cannot find package "context" in any of:
+...
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ client/README.md                                                        | 2 +-
+ client/client.go                                                        | 2 +-
+ daemon/info_unix.go                                                     | 2 +-
+ integration-cli/docker_api_attach_test.go                               | 2 +-
+ integration-cli/docker_cli_save_load_unix_test.go                       | 2 +-
+ vendor/github.com/docker/swarmkit/manager/logbroker/subscription.go     | 2 +-
+ vendor/github.com/docker/swarmkit/manager/state/raft/storage/walwrap.go | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/client/README.md b/client/README.md
+index 059dfb3..9de54aa 100644
+--- a/client/README.md
++++ b/client/README.md
+@@ -8,7 +8,7 @@ For example, to list running containers (the equivalent of `docker ps`):
+ package main
+ 
+ import (
+-	"context"
++	"golang.org/x/net/context"
+ 	"fmt"
+ 
+ 	"github.com/docker/docker/api/types"
+diff --git a/client/client.go b/client/client.go
+index a9bdab6..95933af 100644
+--- a/client/client.go
++++ b/client/client.go
+@@ -19,7 +19,7 @@ For example, to list running containers (the equivalent of "docker ps"):
+ 	package main
+ 
+ 	import (
+-		"context"
++		"golang.org/x/net/context"
+ 		"fmt"
+ 
+ 		"github.com/docker/docker/api/types"
+diff --git a/daemon/info_unix.go b/daemon/info_unix.go
+index 9c41c0e..57f8a7b 100644
+--- a/daemon/info_unix.go
++++ b/daemon/info_unix.go
+@@ -3,7 +3,7 @@
+ package daemon
+ 
+ import (
+-	"context"
++	"golang.org/x/net/context"
+ 	"os/exec"
+ 	"strings"
+ 
+diff --git a/integration-cli/docker_api_attach_test.go b/integration-cli/docker_api_attach_test.go
+index d43bf3a..e5802a7 100644
+--- a/integration-cli/docker_api_attach_test.go
++++ b/integration-cli/docker_api_attach_test.go
+@@ -3,7 +3,7 @@ package main
+ import (
+ 	"bufio"
+ 	"bytes"
+-	"context"
++	"golang.org/x/net/context"
+ 	"io"
+ 	"net"
+ 	"net/http"
+diff --git a/integration-cli/docker_cli_save_load_unix_test.go b/integration-cli/docker_cli_save_load_unix_test.go
+index 22445e5..d0afc8c 100644
+--- a/integration-cli/docker_cli_save_load_unix_test.go
++++ b/integration-cli/docker_cli_save_load_unix_test.go
+@@ -3,7 +3,7 @@
+ package main
+ 
+ import (
+-	"context"
++	"golang.org/x/net/context"
+ 	"fmt"
+ 	"io/ioutil"
+ 	"os"
+diff --git a/vendor/github.com/docker/swarmkit/manager/logbroker/subscription.go b/vendor/github.com/docker/swarmkit/manager/logbroker/subscription.go
+index 6b3295a..cbfcf7e 100644
+--- a/vendor/github.com/docker/swarmkit/manager/logbroker/subscription.go
++++ b/vendor/github.com/docker/swarmkit/manager/logbroker/subscription.go
+@@ -1,7 +1,7 @@
+ package logbroker
+ 
+ import (
+-	"context"
++	"golang.org/x/net/context"
+ 	"fmt"
+ 	"strings"
+ 	"sync"
+diff --git a/vendor/github.com/docker/swarmkit/manager/state/raft/storage/walwrap.go b/vendor/github.com/docker/swarmkit/manager/state/raft/storage/walwrap.go
+index 5a6c71a..efe5921 100644
+--- a/vendor/github.com/docker/swarmkit/manager/state/raft/storage/walwrap.go
++++ b/vendor/github.com/docker/swarmkit/manager/state/raft/storage/walwrap.go
+@@ -1,7 +1,7 @@
+ package storage
+ 
+ import (
+-	"context"
++	"golang.org/x/net/context"
+ 	"io"
+ 	"io/ioutil"
+ 	"os"
+-- 
+2.7.4
+

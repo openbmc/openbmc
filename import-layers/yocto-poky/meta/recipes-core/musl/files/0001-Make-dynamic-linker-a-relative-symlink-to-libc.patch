@@ -1,6 +1,6 @@
-From 94c0b97b62125d8bbc92dce0694e387d5b2ad181 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Sun, 10 Jan 2016 12:14:02 -0800
+From 0ec74744a4cba7c5fdfaa2685995119a4fca0260 Mon Sep 17 00:00:00 2001
+From: Amarnath Valluri <amarnath.valluri@intel.com>
+Date: Wed, 18 Jan 2017 16:14:37 +0200
 Subject: [PATCH] Make dynamic linker a relative symlink to libc
 
 absolute symlink into $(libdir) fails to load in a cross build
@@ -9,26 +9,68 @@ applications, which cross build systems often do, since not everything
 can be computed during cross builds, qemu in usermode often comes to aid
 in such situations to feed into cross builds.
 
+V2:
+ Make use of 'ln -r' to create relative symlinks, as most fo the distros
+ shipping coreutils 8.16+
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
 ---
 Upstream-Status: Pending
-
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+---
+ Makefile         | 2 +-
+ tools/install.sh | 8 +++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index b2226fa..0d71f7f 100644
+index 8246b78..d1dbe39 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -189,7 +189,7 @@ $(DESTDIR)$(includedir)/%: include/%
+@@ -215,7 +215,7 @@ $(DESTDIR)$(includedir)/%: $(srcdir)/include/%
  	$(INSTALL) -D -m 644 $< $@
  
  $(DESTDIR)$(LDSO_PATHNAME): $(DESTDIR)$(libdir)/libc.so
 -	$(INSTALL) -D -l $(libdir)/libc.so $@ || true
-+	$(INSTALL) -D -l ..$(libdir)/libc.so $@ || true
++	$(INSTALL) -D -r $(DESTDIR)$(libdir)/libc.so $@ || true
  
  install-libs: $(ALL_LIBS:lib/%=$(DESTDIR)$(libdir)/%) $(if $(SHARED_LIBS),$(DESTDIR)$(LDSO_PATHNAME),)
  
+diff --git a/tools/install.sh b/tools/install.sh
+index d913b60..b6a7f79 100755
+--- a/tools/install.sh
++++ b/tools/install.sh
+@@ -6,18 +6,20 @@
+ #
+ 
+ usage() {
+-printf "usage: %s [-D] [-l] [-m mode] src dest\n" "$0" 1>&2
++printf "usage: %s [-D] [-l] [-r] [-m mode] src dest\n" "$0" 1>&2
+ exit 1
+ }
+ 
+ mkdirp=
+ symlink=
++symlinkflags="-s"
+ mode=755
+ 
+-while getopts Dlm: name ; do
++while getopts Dlrm: name ; do
+ case "$name" in
+ D) mkdirp=yes ;;
+ l) symlink=yes ;;
++r) symlink=yes; symlinkflags="$symlinkflags -r" ;;
+ m) mode=$OPTARG ;;
+ ?) usage ;;
+ esac
+@@ -48,7 +50,7 @@ trap 'rm -f "$tmp"' EXIT INT QUIT TERM HUP
+ umask 077
+ 
+ if test "$symlink" ; then
+-ln -s "$1" "$tmp"
++ln $symlinkflags "$1" "$tmp"
+ else
+ cat < "$1" > "$tmp"
+ chmod "$mode" "$tmp"
 -- 
-2.7.0
+2.7.4
 

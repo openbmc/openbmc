@@ -1,0 +1,61 @@
+From d82691b8d58201dd03e30585daacd8ffd1556ae2 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 27 Feb 2017 09:43:30 +0200
+Subject: [PATCH] Do not hardcode "lib/rpm" as the installation path for
+ default configuration and macros.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ configure.ac | 2 +-
+ macros.in    | 2 +-
+ rpm.am       | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4f3be8770..92ffd3d68 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -875,7 +875,7 @@ else
+     usrprefix=$prefix
+ fi
+ 
+-RPMCONFIGDIR="`echo ${usrprefix}/lib/rpm`"
++RPMCONFIGDIR="`echo ${libdir}/rpm`"
+ AC_SUBST(RPMCONFIGDIR)
+ 
+ AC_SUBST(OBJDUMP)
+diff --git a/macros.in b/macros.in
+index c6d5a6b03..84ae25275 100644
+--- a/macros.in
++++ b/macros.in
+@@ -877,7 +877,7 @@ package or when debugging this package.\
+ %_sharedstatedir	%{_prefix}/com
+ %_localstatedir		%{_prefix}/var
+ %_lib			lib
+-%_libdir		%{_exec_prefix}/%{_lib}
++%_libdir		@libdir@
+ %_includedir		%{_prefix}/include
+ %_infodir		%{_datadir}/info
+ %_mandir		%{_datadir}/man
+diff --git a/rpm.am b/rpm.am
+index 1f43ad8a0..6854ff6ba 100644
+--- a/rpm.am
++++ b/rpm.am
+@@ -1,10 +1,10 @@
+ # Internal binaries
+ ## HACK: It probably should be $(libexecdir)/rpm or $(libdir)/rpm
+-rpmlibexecdir = $(prefix)/lib/rpm
++rpmlibexecdir = $(libdir)/rpm
+ 
+ # Host independent config files
+ ## HACK: it probably should be $(datadir)/rpm
+-rpmconfigdir = $(prefix)/lib/rpm
++rpmconfigdir = $(libdir)/rpm
+ 
+ # Libtool version (current-revision-age) for all our libraries
+ rpm_version_info = 7:0:0
+-- 
+2.11.0
+

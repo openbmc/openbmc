@@ -10,20 +10,26 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 
 PE = "1"
-PV = "7.3+git${SRCPV}"
-SRCREV = "01b10e191e99d8cb147e5a2b7da8196e0ec6fb94"
+PV = "7.91+git${SRCPV}"
+SRCREV = "c22d359433b333937ee3d803450dc41998115685"
 
 DEPENDS = "elfutils"
 RDEPENDS_${PN} = "elfutils"
 SRC_URI = "git://anonscm.debian.org/collab-maint/ltrace.git;branch=master \
            file://configure-allow-to-disable-selinux-support.patch \
            file://0001-replace-readdir_r-with-readdir.patch \
-          "
+           file://0001-Use-correct-enum-type.patch \
+           file://0002-Fix-const-qualifier-error.patch \
+           file://0001-ARM-code-has-unreachable-code-after-switch-statement.patch \
+           file://0001-Fix-tautological-compare-warning.patch \
+           file://0001-Add-support-for-mips64-n32-n64.patch \
+           file://0001-configure-Recognise-linux-musl-as-a-host-OS.patch \
+           "
 S = "${WORKDIR}/git"
 
 inherit autotools
 
-PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)}"
+PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
 PACKAGECONFIG[unwind] = "--with-libunwind,--without-libunwind,libunwind"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux,libselinux"
 

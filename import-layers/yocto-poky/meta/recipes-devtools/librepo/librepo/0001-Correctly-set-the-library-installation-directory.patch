@@ -1,0 +1,28 @@
+From 36d87919223db9b054862ad38cdda8d9222a2bab Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Dec 2016 18:04:35 +0200
+Subject: [PATCH 1/4] Correctly set the library installation directory
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ librepo/CMakeLists.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/librepo/CMakeLists.txt b/librepo/CMakeLists.txt
+index 2fe76d8..5026def 100644
+--- a/librepo/CMakeLists.txt
++++ b/librepo/CMakeLists.txt
+@@ -60,7 +60,8 @@ CONFIGURE_FILE("version.h.in" "${CMAKE_CURRENT_SOURCE_DIR}/version.h" @ONLY)
+ IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
+   SET (LIB_SUFFIX "64")
+ ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
+-SET (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
++#SET (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
++SET (LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+ 
+ INSTALL(FILES ${librepo_HEADERS} DESTINATION include/librepo)
+ INSTALL(TARGETS librepo LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+-- 
+2.11.0
+

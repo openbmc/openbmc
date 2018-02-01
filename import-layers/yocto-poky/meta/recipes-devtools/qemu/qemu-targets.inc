@@ -4,8 +4,8 @@
 
 def get_qemu_target_list(d):
     import bb
-    archs = d.getVar('QEMU_TARGETS', True).split()
-    tos = d.getVar('HOST_OS', True)
+    archs = d.getVar('QEMU_TARGETS').split()
+    tos = d.getVar('HOST_OS')
     softmmuonly = ""
     for arch in ['ppcemb']:
         if arch in archs:

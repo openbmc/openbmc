@@ -16,6 +16,6 @@ do_configure() {
 	oe_runconf
 }
 
-export AUTOMAKE = "${@bb.utils.which('automake', d.getVar('PATH', True))}"
+export AUTOMAKE = "${@bb.utils.which('automake', d.getVar('PATH'))}"
 
 FILES_${PN} += "${datadir}/automake* ${datadir}/aclocal*"

@@ -1,0 +1,39 @@
+From ae10245c15a617bd57337981bb42eb36629f9b59 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Wed, 8 Feb 2017 15:53:31 +0800
+Subject: [PATCH 01/26] add _GNU_SOURCE to pec_listener.c
+
+In previous patch 0007-replace-SIGCLD-with-SIGCHLD.patch made by Khem Raj
+contains two aspects:
+
+	1. replace SIGCLD with SIGCHLD
+	2. add _GNU_SOURCE to pec_listener.c
+
+The replace SIGCLD with SIGCHLD have been integrated upstream, so make a
+another patch to add _GNU_SOURCE to pec_listener.c comply with Khem Raj's
+previous patch.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+Upstream-Status: Pending
+
+%% original patch: 0001-add-_GNU_SOURCE-to-pec_listener.c.patch
+---
+ testcases/kernel/connectors/pec/pec_listener.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testcases/kernel/connectors/pec/pec_listener.c b/testcases/kernel/connectors/pec/pec_listener.c
+index d11e4dc..b8b5e0d 100644
+--- a/testcases/kernel/connectors/pec/pec_listener.c
++++ b/testcases/kernel/connectors/pec/pec_listener.c
+@@ -20,6 +20,7 @@
+ /*                                                                            */
+ /******************************************************************************/
+ 
++#define _GNU_SOURCE
+ #include <sys/socket.h>
+ #include <sys/poll.h>
+ #include <sys/types.h>
+-- 
+2.8.1
+

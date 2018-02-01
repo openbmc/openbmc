@@ -6,7 +6,10 @@ SRCREV = "5394"
 PV = "0.0.0+svnr${SRCPV}"
 PR = "r2"
 
-SRC_URI = "svn://svn.openmoko.org/trunk/src/target;module=AR6kSDK.build_sw.18;protocol=http"
+SRC_URI = "svn://svn.openmoko.org/trunk/src/target;module=AR6kSDK.build_sw.18;protocol=http \
+           file://0001-makefile-Pass-CFLAGS-to-compile.patch \
+           file://0002-fix-err-API-to-have-format-string.patch \
+           "
 S = "${WORKDIR}/AR6kSDK.build_sw.18/host/tools/wmiconfig"
 
 CLEANBROKEN = "1"

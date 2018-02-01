@@ -1,0 +1,30 @@
+From c9859a38a58996b8767a30e14febc03845f66f95 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 1 Jul 2017 13:10:53 -0700
+Subject: [PATCH] Define 64bit atomic helpers for ppc 32-bit
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/atomic64.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/atomic64.c b/src/atomic64.c
+index f841b39b..35c7c9d8 100644
+--- a/src/atomic64.c
++++ b/src/atomic64.c
+@@ -18,10 +18,10 @@
+ #include <stdbool.h>
+ 
+ /*
+- * only need these on MIPS, since it lacks hardware 64-bit atomics,
++ * only need these on MIPS & PPC32, since it lacks hardware 64-bit atomics,
+  * unlike x86 and ARM.
+  */
+-#if defined(__mips__) || defined(__mipsel__)
++#if defined(__mips__) || defined(__mipsel__) || defined(__powerpc__)
+ 
+ static void __spin_lock(volatile int *lock) {
+   while (__sync_lock_test_and_set(lock, 1))
+-- 
+2.13.2
+

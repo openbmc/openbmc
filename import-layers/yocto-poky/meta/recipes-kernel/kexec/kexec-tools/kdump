@@ -89,7 +89,7 @@ do_start()
 		return 0
 	fi
 
-	#check the running kernel cmdline option,insure "crashkenrel=" always set.
+	#check the running kernel cmdline option,insure "crashkernel=" always set.
 	grep -q crashkernel= /proc/cmdline
 	if [ $? != 0 ]; then
 		echo "Kdump isn't supported on the running kernel,please check boot option!!!"

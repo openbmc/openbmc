@@ -13,14 +13,14 @@ This layer depends on:
 
 URI: git://github.com/openembedded/oe-core.git
 subdirectory: meta
-branch: morty
+branch: pyro 
 revision: HEAD
 
 For some recipes, the meta-oe layer is required:
 
 URI: git://github.com/openembedded/meta-oe.git
 subdirectory: meta-oe
-branch: morty
+branch: pyro 
 revision: HEAD
 
 
@@ -52,9 +52,12 @@ Maintenance
 -----------
 
 Send patches / pull requests to openembedded-devel@lists.openembedded.org
-with '[meta-webserver][morty]' in the subject.
+with '[meta-webserver][pyro]' in the subject.
 
-morty branch maintainer(s):
+When sending single patches, please use something like:
+'git send-email -M -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix=meta-webserver][pyro][PATCH'
+
+pyro Branch Maintainer:
 Armin Kuster <akuster808@gmail.com>
 
 

@@ -1,0 +1,54 @@
+From 687881c5fa342686c8724adcdac0f9d555a351c3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Apr 2017 18:10:57 -0700
+Subject: [PATCH] Fix format security warnings
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/dates_callbacks.c | 2 +-
+ src/dates_gtk.c       | 2 +-
+ src/gconf-bridge.c    | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/dates_callbacks.c b/src/dates_callbacks.c
+index d704c8f..46b8cb1 100644
+--- a/src/dates_callbacks.c
++++ b/src/dates_callbacks.c
+@@ -365,7 +365,7 @@ dates_about_cb (GtkWidget *widget, DatesData *d)
+ 
+ 	if (!pixb) {
+ 		g_assert (error);
+-		g_warning (error->message);
++		g_warning ("%s", error->message);
+ 		g_clear_error (&error);
+ 	}
+ 
+diff --git a/src/dates_gtk.c b/src/dates_gtk.c
+index 403bc25..fd691d2 100644
+--- a/src/dates_gtk.c
++++ b/src/dates_gtk.c
+@@ -1114,7 +1114,7 @@ calendar_do_edit_dialog_response_cb (GtkDialog *dialog, gint response_id, gpoint
+ 				GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+ 				GTK_MESSAGE_WARNING,
+ 				GTK_BUTTONS_NONE,
+-				prompt);
++				"%s", prompt);
+ 
+ 		g_free (prompt);
+ 
+diff --git a/src/gconf-bridge.c b/src/gconf-bridge.c
+index 49754cf..67d3757 100644
+--- a/src/gconf-bridge.c
++++ b/src/gconf-bridge.c
+@@ -1220,7 +1220,7 @@ error_handler (GConfClient *client,
+                 dlg = gtk_message_dialog_new (NULL, 0,
+                                               GTK_MESSAGE_ERROR,
+                                               GTK_BUTTONS_OK,
+-                                              message);
++                                              "%s", message);
+                 g_free (message);
+ 
+                 gtk_message_dialog_format_secondary_text
+-- 
+2.12.2
+

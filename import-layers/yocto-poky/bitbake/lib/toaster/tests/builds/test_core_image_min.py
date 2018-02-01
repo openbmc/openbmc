@@ -31,14 +31,14 @@ from orm.models import Package_Dependency, Recipe_Dependency, Build
 from orm.models import Task_Dependency, Package, Target, Recipe
 from orm.models import CustomImagePackage
 
-from buildtest import BuildTest
+from tests.builds.buildtest import BuildTest
 
 
 class BuildCoreImageMinimal(BuildTest):
     """Build core-image-minimal and test the results"""
 
     def setUp(self):
-        self.build("core-image-minimal")
+        self.completed_build = self.build("core-image-minimal")
 
     # Check if build name is unique - tc_id=795
     def test_Build_Unique_Name(self):
@@ -59,38 +59,29 @@ class BuildCoreImageMinimal(BuildTest):
 
     # Check if task order is unique for one build - tc=824
     def test_Task_Unique_Order(self):
-        builds = Build.objects.values('id')
-        cnt_err = []
+        total_task_order = Task.objects.filter(
+            build=self.built).values('order').count()
+        distinct_task_order = Task.objects.filter(
+            build=self.completed_build).values('order').distinct().count()
 
-        for build in builds:
-            total_task_order = Task.objects.filter(
-                build=build['id']).values('order').count()
-            distinct_task_order = Task.objects.filter(
-                build=build['id']).values('order').distinct().count()
-
-            if (total_task_order != distinct_task_order):
-                cnt_err.append(build['id'])
-
-        self.assertEqual(len(cnt_err),
-                         0,
-                         msg='Errors for build id: %s' % cnt_err)
+        self.assertEqual(total_task_order,
+                         distinct_task_order,
+                         msg='Errors task order is not unique')
 
     # Check task order sequence for one build - tc=825
     def test_Task_Order_Sequence(self):
-        builds = builds = Build.objects.values('id')
         cnt_err = []
-        for build in builds:
-            tasks = Task.objects.filter(
-                Q(build=build['id']),
-                ~Q(order=None),
-                ~Q(task_name__contains='_setscene')
-            ).values('id', 'order').order_by("order")
+        tasks = Task.objects.filter(
+            Q(build=self.completed_build),
+            ~Q(order=None),
+            ~Q(task_name__contains='_setscene')
+        ).values('id', 'order').order_by("order")
 
-            cnt_tasks = 0
-            for task in tasks:
-                cnt_tasks += 1
-                if (task['order'] != cnt_tasks):
-                    cnt_err.append(task['id'])
+        cnt_tasks = 0
+        for task in tasks:
+            cnt_tasks += 1
+            if (task['order'] != cnt_tasks):
+                cnt_err.append(task['id'])
         self.assertEqual(
             len(cnt_err), 0, msg='Errors for task id: %s' % cnt_err)
 
@@ -126,8 +117,7 @@ class BuildCoreImageMinimal(BuildTest):
                     task['sstate_result'] != Task.SSTATE_MISS):
                 cnt_err.append({'id': task['id'],
                                 'name': task['task_name'],
-                                'sstate_result': task['sstate_result'],
-                               })
+                                'sstate_result': task['sstate_result']})
 
         self.assertEqual(len(cnt_err),
                          0,

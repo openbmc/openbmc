@@ -1,0 +1,49 @@
+From 5e6b6e23a8b04475c5a9de7eddb4c18103932fe5 Mon Sep 17 00:00:00 2001
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+Date: Wed, 7 Aug 2013 20:53:57 +0200
+Subject: [PATCH 2/6] src: get source code license header in sync with current
+ licensing terms
+
+Since (3956761 license: upgrade to GPLv2+), we upgraded to GPLv2+,
+propagate that changes to src/iftable.c and src/rtnl.c
+
+Reported-by: Thomas Woerner <twoerner@redhat.com>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+ src/iftable.c | 2 +-
+ src/rtnl.c    | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/iftable.c b/src/iftable.c
+index 0325335..5976ed8 100644
+--- a/src/iftable.c
++++ b/src/iftable.c
+@@ -3,7 +3,7 @@
+  * (C) 2004 by Astaro AG, written by Harald Welte <hwelte@astaro.com>
+  * (C) 2008 by Pablo Neira Ayuso <pablo@netfilter.org>
+  *
+- * This software is Free Software and licensed under GNU GPLv2. 
++ * This software is Free Software and licensed under GNU GPLv2+.
+  */
+ 
+ /* IFINDEX handling */
+diff --git a/src/rtnl.c b/src/rtnl.c
+index 5ccb272..7b4ac7d 100644
+--- a/src/rtnl.c
++++ b/src/rtnl.c
+@@ -1,10 +1,10 @@
+ /* rtnl - rtnetlink utility functions
+  *
+  * (C) 2004 by Astaro AG, written by Harald Welte <hwelte@astaro.com>
+- * 
++ *
+  * Adapted to nfnetlink by Eric Leblond <eric@inl.fr>
+  *
+- * This software is free software and licensed under GNU GPLv2. 
++ * This software is free software and licensed under GNU GPLv2+.
+  *
+  */
+ 
+-- 
+2.12.1
+

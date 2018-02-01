@@ -7,14 +7,13 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e23fadd6ceef8c618fc1c65191d846fa"
 PYPI_PACKAGE = "Cython"
 BBCLASSEXTEND = "native"
 
-SRC_URI[md5sum] = "890b494a12951f1d6228c416a5789554"
-SRC_URI[sha256sum] = "84808fda00508757928e1feadcf41c9f78e9a9b7167b6649ab0933b76f75e7b9"
+SRC_URI[md5sum] = "642c81285e1bb833b14ab3f439964086"
+SRC_URI[sha256sum] = "f141d1f9c27a07b5a93f7dc5339472067e2d7140d1c5a9e20112a5665ca60306"
 
 inherit pypi
 
-RDEPENDS_${PN} += "\
+RDEPENDS_${PN}_class-target += "\
     ${PYTHON_PN}-netserver \
     ${PYTHON_PN}-subprocess \
     ${PYTHON_PN}-shell \
 "
-RDEPENDS_${PN}_class-native = ""

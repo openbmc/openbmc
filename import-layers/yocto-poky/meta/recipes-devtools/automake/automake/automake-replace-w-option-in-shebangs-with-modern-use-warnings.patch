@@ -1,0 +1,99 @@
+From 41e06b7a354774913dcd2e32a35440e407843357 Mon Sep 17 00:00:00 2001
+From: Serhii Popovych <spopovyc@cisco.com>
+Date: Wed, 10 Feb 2016 17:07:32 +0000
+Subject: [PATCH] perl: Replace -w option in shebangs with modern "use
+ warnings" In some builds we might provide ac_cv_path_PERL as /usr/bin/env
+ perl to use newer version of the perl from users PATH rather than older from
+ standard system path.
+
+However using /usr/bin/env perl -w from shebang line isn't
+possible because it translates to something like
+/usr/bin/env -w perl and env complains about illegal option.
+
+To address this we can remove -w option from perl shebang
+line and add "use warnings" statement.
+
+Upstream-Status: Pending
+Signed-off-by: Serhii Popovych <spopovyc@cisco.com>
+---
+ bin/aclocal.in     | 3 ++-
+ bin/automake.in    | 3 ++-
+ t/wrap/aclocal.in  | 3 ++-
+ t/wrap/automake.in | 3 ++-
+ 4 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/bin/aclocal.in b/bin/aclocal.in
+index 349f24a..50cb8d3 100644
+--- a/bin/aclocal.in
++++ b/bin/aclocal.in
+@@ -1,4 +1,4 @@
+-#!@PERL@ -w
++#!@PERL@
+ # -*- perl -*-
+ # @configure_input@
+ 
+@@ -33,6 +33,7 @@ BEGIN
+ }
+ 
+ use strict;
++use warnings;
+ 
+ use Automake::Config;
+ use Automake::General;
+diff --git a/bin/automake.in b/bin/automake.in
+index eedc8bc..e0a01cf 100644
+--- a/bin/automake.in
++++ b/bin/automake.in
+@@ -1,4 +1,4 @@
+-#!@PERL@ -w
++#!@PERL@
+ # -*- perl -*-
+ # @configure_input@
+ 
+@@ -28,6 +28,7 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
+ package Automake;
+ 
+ use strict;
++use warnings;
+ 
+ BEGIN
+ {
+diff --git a/t/wrap/aclocal.in b/t/wrap/aclocal.in
+index e64b546..9996899 100644
+--- a/t/wrap/aclocal.in
++++ b/t/wrap/aclocal.in
+@@ -1,4 +1,4 @@
+-#!@PERL@ -w
++#!@PERL@
+ # @configure_input@
+ 
+ # Copyright (C) 2012-2014 Free Software Foundation, Inc.
+@@ -19,6 +19,7 @@
+ BEGIN
+ {
+   use strict;
++  use warnings;
+   @Aclocal::perl_libdirs = ('@abs_top_srcdir@/lib');
+   unshift @Aclocal::perl_libdirs, '@abs_top_builddir@/lib'
+     if '@srcdir@' ne '.';
+diff --git a/t/wrap/automake.in b/t/wrap/automake.in
+index 8b943b1..be61226 100644
+--- a/t/wrap/automake.in
++++ b/t/wrap/automake.in
+@@ -1,4 +1,4 @@
+-#!@PERL@ -w
++#!@PERL@
+ # @configure_input@
+ 
+ # Copyright (C) 2012-2014 Free Software Foundation, Inc.
+@@ -19,6 +19,7 @@
+ BEGIN
+ {
+   use strict;
++  use warnings;
+   @Automake::perl_libdirs = ('@abs_top_srcdir@/lib');
+   unshift @Automake::perl_libdirs, '@abs_top_builddir@/lib'
+     if '@srcdir@' ne '.';
+-- 
+2.3.0
+

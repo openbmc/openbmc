@@ -1,0 +1,50 @@
+<script type="text/javascript">
+  chartsDrawing += 1;
+  google.charts.setOnLoadCallback(drawChart_{{ chart_elem_id }});
+  function drawChart_{{ chart_elem_id }}() {
+    var data = new google.visualization.DataTable();
+
+    // Chart options
+    var options = {
+      theme : 'material',
+      legend: 'none',
+      hAxis: { format: '', title: 'Commit number',
+               minValue: {{ chart_opts.haxis.min }},
+               maxValue: {{ chart_opts.haxis.max }} },
+      {% if measurement.type == 'time' %}
+      vAxis: { format: 'h:mm:ss' },
+      {% else %}
+      vAxis: { format: '' },
+      {% endif %}
+      pointSize: 5,
+      chartArea: { left: 80, right: 15 },
+    };
+
+    // Define data columns
+    data.addColumn('number', 'Commit');
+    data.addColumn('{{ measurement.value_type.gv_data_type }}',
+                   '{{ measurement.value_type.quantity }}');
+    // Add data rows
+    data.addRows([
+      {% for sample in measurement.samples %}
+        [{{ sample.commit_num }}, {{ sample.mean.gv_value() }}],
+      {% endfor %}
+    ]);
+
+    // Finally, draw the chart
+    chart_div = document.getElementById('{{ chart_elem_id }}');
+    var chart = new google.visualization.LineChart(chart_div);
+    google.visualization.events.addListener(chart, 'ready', function () {
+      //chart_div = document.getElementById('{{ chart_elem_id }}');
+      //chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
+      png_div = document.getElementById('{{ chart_elem_id }}_png');
+      png_div.outerHTML = '<a id="{{ chart_elem_id }}_png" href="' + chart.getImageURI() + '">PNG</a>';
+      console.log("CHART READY: {{ chart_elem_id }}");
+      chartsDrawing -= 1;
+      if (chartsDrawing == 0)
+        console.log("ALL CHARTS READY");
+    });
+    chart.draw(data, options);
+}
+</script>
+

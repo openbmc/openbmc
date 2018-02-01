@@ -1,0 +1,31 @@
+From c4254fd8ff1888ca285e3242b812010357ce2b3e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 24 Jun 2017 22:52:40 -0700
+Subject: [PATCH] i18n: Drop include <xlocale.h>
+
+glibc 2.26 drops this header
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ i18n/digitlst.cpp | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+Index: source/i18n/digitlst.cpp
+===================================================================
+--- source.orig/i18n/digitlst.cpp
++++ source/i18n/digitlst.cpp
+@@ -61,11 +61,7 @@
+ #endif
+ 
+ #if U_USE_STRTOD_L
+-# if U_PLATFORM_USES_ONLY_WIN32_API || U_PLATFORM == U_PF_CYGWIN
+-#   include <locale.h>
+-# else
+-#   include <xlocale.h>
+-# endif
++# include <locale.h>
+ #endif
+ 
+ // ***************************************************************************

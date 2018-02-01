@@ -1,15 +1,22 @@
+From 4dd9f3f81d8c81c96ff1ea0890ea55685f28b7e9 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 1 Jul 2014 15:51:53 +0800
+Subject: [PATCH 28/49] perl, perl-native, perl-ptest: upgrade from 5.14.3 to
+ 5.20.0
+
 Upstream-Status:Inappropriate [embedded specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
----
- Makefile.SH |  145 +++++++++++++++++++++++++++--------------------------------
- 1 file changed, 67 insertions(+), 78 deletions(-)
 
-Index: perl-5.22.1/Makefile.SH
-===================================================================
---- perl-5.22.1.orig/Makefile.SH
-+++ perl-5.22.1/Makefile.SH
-@@ -39,10 +39,10 @@ case "$useshrplib" in
+---
+ Makefile.SH | 147 ++++++++++++++++++++++++++++--------------------------------
+ 1 file changed, 68 insertions(+), 79 deletions(-)
+
+diff --git a/Makefile.SH b/Makefile.SH
+index 916b332..b143d46 100755
+--- a/Makefile.SH
++++ b/Makefile.SH
+@@ -48,10 +48,10 @@ case "$useshrplib" in
  true)
  	# Prefix all runs of 'miniperl' and 'perl' with
  	# $ldlibpth so that ./perl finds *this* shared libperl.
@@ -24,7 +31,7 @@ Index: perl-5.22.1/Makefile.SH
  
  	pldlflags="$cccdlflags"
  	static_ldflags=''
-@@ -122,10 +122,11 @@ true)
+@@ -131,10 +131,11 @@ true)
  	    *)
  		eval "ldlibpthval=\"\$$ldlibpthname\""
  
@@ -40,7 +47,7 @@ Index: perl-5.22.1/Makefile.SH
  
  		;;
  	    esac
-@@ -141,18 +142,7 @@ true)
+@@ -150,18 +151,7 @@ true)
  	    # INSTALL file, under "Building a shared perl library".
  	    # If there is no pre-existing $libperl, we don't need
  	    # to do anything further.
@@ -60,17 +67,13 @@ Index: perl-5.22.1/Makefile.SH
  	    ;;
  	os390)	test -f /bin/env && ldlibpth="/bin/env $ldlibpth"
  		;;
-@@ -566,13 +556,23 @@ splintfiles = $(c1)
+@@ -596,13 +586,23 @@ splintfiles = $(c1)
  	@echo `$(CCCMDSRC)` -S $*.c
  	@`$(CCCMDSRC)` -S $*.c
  
 -all: $(FIRSTMAKEFILE) $(MINIPERL_EXE) $(generated_pods) $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make $(MANIFEST_SRT)
 -	@echo " ";
 -	@echo "	Everything is up to date. Type '$(MAKE) test' to run test suite."
--
--$(MANIFEST_SRT):	MANIFEST $(PERL_EXE)
--	@$(RUN_PERL) Porting/manisort -q || (echo "WARNING: re-sorting MANIFEST"; \
--	    $(RUN_PERL) Porting/manisort -q -o MANIFEST; sh -c true)
 +#all: $(FIRSTMAKEFILE) $(MINIPERL_EXE) $(generated_pods) $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make $(MANIFEST_SRT)
 +#	@echo " ";
 +#	@echo "	Everything is up to date. Type '$(MAKE) test' to run test suite."
@@ -80,7 +83,10 @@ Index: perl-5.22.1/Makefile.SH
 +more: $(generated_pods) $(private) $(public)
 +
 +more2: $(dynamic_ext)
-+
+ 
+-$(MANIFEST_SRT):	MANIFEST $(PERL_EXE)
+-	@$(RUN_PERL) Porting/manisort -q || (echo "WARNING: re-sorting MANIFEST"; \
+-	    $(RUN_PERL) Porting/manisort -q -o MANIFEST; sh -c true)
 +more3: $(nonxs_ext)
 +
 +more4: extras.make $(MANIFEST_SRT)
@@ -91,7 +97,7 @@ Index: perl-5.22.1/Makefile.SH
  	@touch $(MANIFEST_SRT)
  
  .PHONY: all utilities
-@@ -581,7 +581,7 @@ $(MANIFEST_SRT):	MANIFEST $(PERL_EXE)
+@@ -611,7 +611,7 @@ $(MANIFEST_SRT):	MANIFEST $(PERL_EXE)
  # by make_patchnum.pl.
  git_version.h: lib/Config_git.pl
  
@@ -100,7 +106,7 @@ Index: perl-5.22.1/Makefile.SH
  	$(MINIPERL) make_patchnum.pl
  
  # make sure that we recompile perl.c if the git version changes
-@@ -594,7 +594,7 @@ perl$(OBJ_EXT): git_version.h
+@@ -624,7 +624,7 @@ perl$(OBJ_EXT): git_version.h
  # loading, we need to build perl first.
  case "$usedl$static_cwd" in
  defineundef)
@@ -109,7 +115,7 @@ Index: perl-5.22.1/Makefile.SH
      ;;
  definedefine)
      util_deps='$(PERL_EXE) $(CONFIGPM) FORCE'
-@@ -604,7 +604,7 @@ definedefine)
+@@ -634,7 +634,7 @@ definedefine)
  esac
  
  $spitshell >>$Makefile <<!GROK!THIS!
@@ -118,16 +124,16 @@ Index: perl-5.22.1/Makefile.SH
  	\$(MINIPERL) -Ilib utils/Makefile.PL
  
  utilities:	utils/Makefile $util_deps
-@@ -699,7 +699,7 @@ esac
- 
- 
+@@ -743,7 +743,7 @@ ext.libs: $(static_ext)
+ ;;
+ *)
  $spitshell >>$Makefile <<'!NO!SUBS!'
 -perlmain.c: $(MINIPERL_EXE) ext/ExtUtils-Miniperl/pm_to_blib
 +perlmain.c: ext/ExtUtils-Miniperl/lib/ExtUtils/Miniperl.pm
  	$(MINIPERL) -Ilib -MExtUtils::Miniperl -e 'writemain(\"perlmain.c", @ARGV)' DynaLoader $(static_ext)
  
  # The file ext.libs is a list of libraries that must be linked in
-@@ -760,7 +760,7 @@ PERLEXPORT		= perl.exp
+@@ -806,7 +806,7 @@ PERLEXPORT		= perl.exp
  	;;
  	esac
  	$spitshell >>$Makefile <<'!NO!SUBS!'
@@ -136,7 +142,7 @@ Index: perl-5.22.1/Makefile.SH
  	./$(MINIPERLEXP) makedef.pl --sort-fold PLATFORM=aix CC_FLAGS="$(OPTIMIZE)" > perl.exp
  
  !NO!SUBS!
-@@ -769,7 +769,7 @@ os2)
+@@ -815,7 +815,7 @@ os2)
  	$spitshell >>$Makefile <<'!NO!SUBS!'
  MINIPERLEXP		= miniperl
  
@@ -145,19 +151,19 @@ Index: perl-5.22.1/Makefile.SH
  	./$(MINIPERLEXP) makedef.pl PLATFORM=os2 -DPERL_DLL=$(PERL_DLL) CC_FLAGS="$(OPTIMIZE)" > perl5.def
  
  !NO!SUBS!
-@@ -829,7 +829,7 @@ $(LIBPERL): $& $(obj) $(DYNALOADER) $(LI
+@@ -878,7 +878,7 @@ $(LIBPERL): $& $(perllib_objs) $(DYNALOADER) $(LIBPERLEXPORT)
  	true)
  		$spitshell >>$Makefile <<'!NO!SUBS!'
  	rm -f $@
--	$(LD) -o $@ $(SHRPLDFLAGS) $(obj) $(DYNALOADER) $(libs)
-+	$(LD) -o $@ $(SHRPLDFLAGS) $(obj) $(DYNALOADER) $(libs) -Wl,-soname,libperl.so.5
+-	$(LD) -o $@ $(SHRPLDFLAGS) $(perllib_objs) $(DYNALOADER) $(libs)
++	$(LD) -o $@ $(SHRPLDFLAGS) $(perllib_objs) $(DYNALOADER) $(libs) -Wl,-soname,libperl.so.5
  !NO!SUBS!
  		case "$osname" in
  		aix)
-@@ -877,7 +877,9 @@ $(MINIPERL_EXE): lib/buildcustomize.pl
+@@ -936,15 +936,19 @@ lib/buildcustomize.pl: $& $(miniperl_objs) write_buildcustomize.pl
  		$spitshell >>$Makefile <<'!NO!SUBS!'
- lib/buildcustomize.pl: $& $(mini_obj)
- 	$(CC) -o $(MINIPERL_EXE) $(CLDFLAGS) $(mini_obj) $(libs)
+ lib/buildcustomize.pl: $& $(miniperl_objs)
+ 	$(CC) -o $(MINIPERL_EXE) $(CLDFLAGS) $(miniperl_objs) $(libs)
 -	$(LDLIBPTH) ./miniperl$(HOST_EXE_EXT) -w -Ilib -Idist/Exporter/lib -MExporter -e '<?>' || sh -c 'echo >&2 Failed to build miniperl.  Please run make minitest; exit 1'
 +	mv -f miniperl miniperl-target
 +	ln -s hostperl miniperl
@@ -165,21 +171,22 @@ Index: perl-5.22.1/Makefile.SH
  	$(MINIPERL) -f write_buildcustomize.pl
  !NO!SUBS!
  		;;
-@@ -885,7 +887,9 @@ lib/buildcustomize.pl: $& $(mini_obj)
+ 	next4*)
  		$spitshell >>$Makefile <<'!NO!SUBS!'
- lib/buildcustomize.pl: $& $(mini_obj) write    ldcustomize.pl
- 	$(CC) -o $(MINIPERL_EXE) $(mini_obj    libs)
+ lib/buildcustomize.pl: $& $(miniperl_objs) write    ldcustomize.pl
+-	$(CC) -o $(MINIPERL_EXE) $(miniperl_objs    libs)
 -	$(LDLIBPTH) ./miniperl$(HOST    _EXT) -w -Ilib -Idist/Exporter/lib -MExporter -e '<?>' || sh -c 'echo >&2 Failed to build miniperl.  Please run make minitest; exit 1'
++	$(CC) -o $(MINIPERL_EXE) $(miniperl_objs   libs)
 +	mv -f miniperl miniperl-target
 +	ln -s hostperl miniperl
 +	#$(LDLIBPTH) ./miniperl$(HOST    _EXT) -w -Ilib -Idist/Exporter/lib -MExporter -e '<?>' || sh -c 'echo >&2 Failed to build miniperl.  Please run make minitest; exit 1'
  	$(MINIPERL) -f write_buildcustomize.pl    
  !NO!SUBS!
  		;;
-@@ -907,7 +911,9 @@ lib/buildcustomize.pl: $& $(mini_obj) wr
+@@ -966,7 +970,9 @@ lib/buildcustomize.pl: $& $(miniperl_objs) write_buildcustomize.pl
  	-@rm -f miniperl.xok
  	$(CC) $(CLDFLAGS) $(NAMESPACEFLAGS) -o $(MINIPERL_EXE) \
- 	    $(mini_obj) $(libs)
+ 	    $(miniperl_objs) $(libs)
 -	$(LDLIBPTH) ./miniperl$(HOST_EXE_EXT) -w -Ilib -Idist/Exporter/lib -MExporter -e '<?>' || sh -c 'echo >&2 Failed to build miniperl.  Please run make minitest; exit 1'
 +	mv -f miniperl miniperl-target
 +	ln -s hostperl miniperl
@@ -187,7 +194,7 @@ Index: perl-5.22.1/Makefile.SH
  	$(MINIPERL) -f write_buildcustomize.pl
  !NO!SUBS!
  		;;
-@@ -918,7 +924,9 @@ lib/buildcustomize.pl: \$& \$(mini_obj)
+@@ -977,7 +983,9 @@ lib/buildcustomize.pl: \$& \$(miniperl_objs) write_buildcustomize.pl
  	-@rm -f miniperl.xok
  	-@rm \$(MINIPERL_EXE)
  	\$(LNS) \$(HOST_PERL) \$(MINIPERL_EXE)
@@ -198,10 +205,10 @@ Index: perl-5.22.1/Makefile.SH
  	\$(MINIPERL) -f write_buildcustomize.pl 'osname' "$osname"
  !GROK!THIS!
  		else
-@@ -927,7 +935,9 @@ lib/buildcustomize.pl: $& $(mini_obj) wr
+@@ -986,7 +994,9 @@ lib/buildcustomize.pl: $& $(miniperl_objs) write_buildcustomize.pl
  	-@rm -f miniperl.xok
  	$(CC) $(CLDFLAGS) -o $(MINIPERL_EXE) \
- 	    $(mini_obj) $(libs)
+ 	    $(miniperl_objs) $(libs)
 -	$(LDLIBPTH) ./miniperl$(HOST_EXE_EXT) -w -Ilib -Idist/Exporter/lib -MExporter -e '<?>' || sh -c 'echo >&2 Failed to build miniperl.  Please run make minitest; exit 1'
 +	mv -f miniperl miniperl-target
 +	ln -s hostperl miniperl
@@ -209,7 +216,7 @@ Index: perl-5.22.1/Makefile.SH
  	$(MINIPERL) -f write_buildcustomize.pl
  !NO!SUBS!
  		fi
-@@ -971,7 +981,7 @@ case "${osname}" in
+@@ -1036,7 +1046,7 @@ case "${osname}" in
  catamount)
  $spitshell >>$Makefile <<!GROK!THIS!
  .PHONY: makeppport
@@ -218,7 +225,7 @@ Index: perl-5.22.1/Makefile.SH
  	-@for f in Makefile.PL PPPort_pm.PL PPPort_xs.PL ppport_h.PL; do \
  	(cd ext/Devel-PPPort && `pwd`/run.sh ../../$(MINIPERL_EXE) -I../../lib \$\$f); \
  	done
-@@ -981,7 +991,7 @@ makeppport: \$(MINIPERL_EXE) \$(CONFIGPM
+@@ -1046,7 +1056,7 @@ makeppport: \$(MINIPERL_EXE) \$(CONFIGPM)
  *)
  $spitshell >>$Makefile <<'!NO!SUBS!'
  .PHONY: makeppport
@@ -227,7 +234,7 @@ Index: perl-5.22.1/Makefile.SH
  	$(MINIPERL) mkppport
  
  !NO!SUBS!
-@@ -991,16 +1001,16 @@ esac
+@@ -1056,16 +1066,16 @@ esac
  $spitshell >>$Makefile <<'!NO!SUBS!'
  
  .PHONY: preplibrary
@@ -247,7 +254,7 @@ Index: perl-5.22.1/Makefile.SH
  	$(MINIPERL) lib/unicore/mktables -C lib/unicore -P pod -maketest -makelist -p
  #	Commented out so always runs, mktables looks at far more files than we
  #	can in this makefile to decide if needs to run or not
-@@ -1009,12 +1019,12 @@ uni.data: $(MINIPERL_EXE) $(CONFIGPM) li
+@@ -1074,12 +1084,12 @@ uni.data: $(MINIPERL_EXE) $(CONFIGPM) lib/unicore/mktables $(nonxs_ext)
  # $(PERL_EXE) and ext because pod_lib.pl needs Digest::MD5
  # But also this ensures that all extensions are built before we try to scan
  # them, which picks up Devel::PPPort's documentation.
@@ -263,16 +270,16 @@ Index: perl-5.22.1/Makefile.SH
  	$(MINIPERL) autodoc.pl
  
  pod/perlmodlib.pod: $(MINIPERL_EXE) pod/perlmodlib.PL MANIFEST
-@@ -1024,7 +1034,7 @@ pod/perl5221delta.pod: pod/perldelta.pod
- 	$(RMS) pod/perl5221delta.pod
- 	$(LNS) perldelta.pod pod/perl5221delta.pod
+@@ -1089,7 +1099,7 @@ pod/perl5240delta.pod: pod/perldelta.pod
+ 	$(RMS) pod/perl5240delta.pod
+ 	$(LNS) perldelta.pod pod/perl5240delta.pod
  
 -extra.pods: $(MINIPERL_EXE)
 +extra.pods:
  	-@test ! -f extra.pods || rm -f `cat extra.pods`
  	-@rm -f extra.pods
  	-@for x in `grep -l '^=[a-z]' README.* | grep -v README.vms` ; do \
-@@ -1068,8 +1078,7 @@ EOT
+@@ -1133,8 +1143,7 @@ EOT
          $spitshell >>$Makefile <<EOT
  
  install_$name install-$name: \$(INSTALL_DEPENDENCE) installperl all installman
@@ -282,7 +289,7 @@ Index: perl-5.22.1/Makefile.SH
  EOT
      fi
  
-@@ -1079,11 +1088,7 @@ done
+@@ -1144,11 +1153,7 @@ done
  if test "X$hostperl" != X; then
  	$spitshell >>$Makefile <<'!NO!SUBS!'
  install.perl:	$(INSTALL_DEPENDENCE) installperl
@@ -295,7 +302,7 @@ Index: perl-5.22.1/Makefile.SH
  
  # XXX Experimental. Hardwired values, but useful for testing.
  # Eventually Configure could ask for some of these values.
-@@ -1101,24 +1106,8 @@ install.html: all installhtml
+@@ -1166,24 +1171,8 @@ install.html: all installhtml
  else
  	$spitshell >>$Makefile <<'!NO!SUBS!'
  install.perl:	$(INSTALL_DEPENDENCE) installperl
@@ -321,7 +328,7 @@ Index: perl-5.22.1/Makefile.SH
  !NO!SUBS!
  fi
  
-@@ -1210,13 +1199,13 @@ manicheck:	FORCE
+@@ -1275,13 +1264,13 @@ manicheck:	FORCE
  #
  # DynaLoader may be needed for extensions that use Makefile.PL.
  
@@ -338,7 +345,7 @@ Index: perl-5.22.1/Makefile.SH
  	$(MINIPERL) make_ext.pl $@ $(MAKE_EXT_ARGS) MAKE="$(MAKE)" LIBPERL_A=$(LIBPERL) LINKTYPE=static $(STATIC_LDFLAGS)
  
  n_dummy $(nonxs_ext):	$(MINIPERL_EXE) lib/buildcustomize.pl preplibrary FORCE
-@@ -1405,14 +1394,14 @@ test_prep_pre: preplibrary utilities $(n
+@@ -1479,14 +1468,14 @@ test_prep_pre: preplibrary utilities $(nonxs_ext)
  
  case "$targethost" in
  '') $spitshell >>$Makefile <<'!NO!SUBS!'
@@ -355,7 +362,7 @@ Index: perl-5.22.1/Makefile.SH
  	\$(dynamic_ext) \$(TEST_PERL_DLL) runtests \
  	\$(generated_pods)
  	$to libperl.*
-@@ -1465,7 +1454,7 @@ test_prep test-prep: test_prep_pre \$(MI
+@@ -1539,7 +1528,7 @@ test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE
  esac
  
  $spitshell >>$Makefile <<'!NO!SUBS!'
@@ -364,12 +371,15 @@ Index: perl-5.22.1/Makefile.SH
  	$(MINIPERL) make_ext.pl $(dynamic_ext_re) MAKE="$(MAKE)" LIBPERL_A=$(LIBPERL) LINKTYPE=dynamic
  	cd t && (rm -f $(PERL_EXE); $(LNS) ../$(PERL_EXE) $(PERL_EXE))
  !NO!SUBS!
-@@ -1526,7 +1515,7 @@ minitest_prep:
+@@ -1600,7 +1589,7 @@ minitest_prep:
  
  MINITEST_TESTS = base/*.t comp/*.t cmd/*.t run/*.t io/*.t re/*.t opbasic/*.t op/*.t uni/*.t perf/*.t
  
 -minitest: $(MINIPERL_EXE) minitest_prep
 +minitest: minitest_prep
- 	- cd t && $(RUN_PERL) TEST $(MINITEST_TESTS) </dev/tty
+ 	- cd t && $(RUN_PERL) TEST $(MINITEST_TESTS) <$(devtty)
  
  minitest-notty minitest_notty: $(MINIPERL_EXE) minitest_prep
+-- 
+2.1.4
+

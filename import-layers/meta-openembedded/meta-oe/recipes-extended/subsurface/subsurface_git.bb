@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://gpl-2.0.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "libdivecomputer gtk+ libxml2 glib-2.0 gconf"
 
-PNBLACKLIST[subsurface] ?= "Needs to be upgraded for compatibility with new libdivecomputer"
+PNBLACKLIST[subsurface] ?= "Needs to be upgraded for compatibility with new libdivecomputer - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 inherit gtk-icon-cache cmake
 

@@ -16,23 +16,25 @@ pm_installed=false
 for pm in $backend_list; do
 	pi_dir="#SYSCONFDIR#/$pm-postinsts"
 
-	[ -d $pi_dir ] && break
+	if [ ! -d $pi_dir ]; then
+		continue
+	fi
 
+	# found the package manager, it has postinsts
 	case $pm in
 		"deb")
 			if [ -s "#LOCALSTATEDIR#/lib/dpkg/status" ]; then
 				pm_installed=true
-				break
 			fi
 			;;
 
 		"ipk")
-			if [ -s "/var/lib/opkg/status" ]; then
+			if [ -s "#LOCALSTATEDIR#/lib/opkg/status" ]; then
 				pm_installed=true
-				break
 			fi
 			;;
 	esac
+	break
 done
 
 remove_rcsd_link () {
@@ -45,6 +47,9 @@ if [ -z "$pi_dir" ]; then
 	remove_rcsd_link
 	exit 0
 fi
+
+echo "Configuring packages on first boot...."
+echo " (This may take several minutes. Please do not power off the machine.)"
 
 [ -e #SYSCONFDIR#/default/postinst ] && . #SYSCONFDIR#/default/postinst
 

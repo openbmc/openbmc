@@ -182,17 +182,20 @@ urlpatterns = patterns('toastergui.views',
             typeaheads.RecipesTypeAhead.as_view(), name='xhr_recipestypeahead'),
         url(r'^xhr_typeahead/projects$',
             typeaheads.ProjectsTypeAhead.as_view(), name='xhr_projectstypeahead'),
-
-
+        url(r'^xhr_typeahead/gitrev$',
+            typeaheads.GitRevisionTypeAhead.as_view(),
+            name='xhr_gitrevtypeahead'),
 
         url(r'^xhr_testreleasechange/(?P<pid>\d+)$', 'xhr_testreleasechange',
             name='xhr_testreleasechange'),
         url(r'^xhr_configvaredit/(?P<pid>\d+)$', 'xhr_configvaredit',
             name='xhr_configvaredit'),
 
-        url(r'^xhr_importlayer/$', 'xhr_importlayer', name='xhr_importlayer'),
-
         url(r'^xhr_layer/(?P<pid>\d+)/(?P<layerversion_id>\d+)$',
+            api.XhrLayer.as_view(),
+            name='xhr_layer'),
+
+        url(r'^xhr_layer/(?P<pid>\d+)$',
             api.XhrLayer.as_view(),
             name='xhr_layer'),
 

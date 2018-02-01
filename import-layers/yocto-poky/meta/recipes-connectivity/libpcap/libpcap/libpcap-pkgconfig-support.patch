@@ -1,25 +1,27 @@
-From 8887132e85892a72a84ca3878e60f254ad2ce939 Mon Sep 17 00:00:00 2001
-From: Joe MacDonald <joe_macdonald@mentor.com>
-Date: Tue, 24 Feb 2015 15:56:06 -0500
+From 2796129af52901dd68595e5e88a639308541def9 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Thu, 3 Nov 2016 17:56:29 -0200
 Subject: [PATCH] libpcap: pkgconfig support
+Organization: O.S. Systems Software LTDA.
 
 Adding basic structure to support pkg-config.
 
 Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
 ---
  Makefile.in   |  5 +++++
- configure.in  |  1 +
+ configure.ac  |  1 +
  libpcap.pc.in | 10 ++++++++++
  3 files changed, 16 insertions(+)
  create mode 100644 libpcap.pc.in
 
 diff --git a/Makefile.in b/Makefile.in
-index 1c2d745..1f25faf 100644
+index e71d973..d7004ed 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -60,6 +60,10 @@ V_RPATH_OPT = @V_RPATH_OPT@
+@@ -61,6 +61,10 @@ V_RPATH_OPT = @V_RPATH_OPT@
  DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
  PROG=libpcap
  
@@ -30,19 +32,19 @@ index 1c2d745..1f25faf 100644
  # Standard CFLAGS
  FULL_CFLAGS = $(CCOPT) $(INCLS) $(DEFS) $(CFLAGS)
  
-@@ -275,6 +279,7 @@ EXTRA_DIST = \
+@@ -286,6 +290,7 @@ EXTRA_DIST = \
  	lbl/os-solaris2.h \
  	lbl/os-sunos4.h \
  	lbl/os-ultrix4.h \
 +	libpcap.pc \
+ 	missing/getopt.c \
+ 	missing/getopt.h \
  	missing/snprintf.c \
- 	mkdep \
- 	msdos/bin2c.c \
-diff --git a/configure.in b/configure.in
-index 8f5c86b..fb51b35 100644
---- a/configure.in
-+++ b/configure.in
-@@ -1700,6 +1700,7 @@ esac
+diff --git a/configure.ac b/configure.ac
+index da2f940..4fc67bf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1805,6 +1805,7 @@ fi
  AC_PROG_INSTALL
  
  AC_CONFIG_HEADER(config.h)
@@ -67,5 +69,5 @@ index 0000000..4f78ad8
 +Libs: -L${libdir} -lpcap
 +Cflags: -I${includedir}
 -- 
-1.9.1
+2.1.4
 

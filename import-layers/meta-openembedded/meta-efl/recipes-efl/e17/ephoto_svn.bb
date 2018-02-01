@@ -17,3 +17,5 @@ SRCNAME = "${PN}"
 B = "${S}"
 
 SRC_URI += "file://configure.patch"
+
+PNBLACKLIST[ephoto] ?= "Depends on blacklisted elementary - the recipe will be removed on 2017-09-01 unless the issue is fixed"

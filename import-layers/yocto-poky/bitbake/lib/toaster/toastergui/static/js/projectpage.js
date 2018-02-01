@@ -12,6 +12,8 @@ function projectPageInit(ctx) {
   var machineChangeFormToggle = $("#change-machine-toggle");
   var machineNameTitle = $("#project-machine-name");
   var machineChangeCancel = $("#cancel-machine-change");
+  var machineInputForm = $("#machine-input-form");
+  var invalidMachineNameHelp = $("#invalid-machine-name-help");
 
   var freqBuildBtn =  $("#freq-build-btn");
   var freqBuildList = $("#freq-build-list");
@@ -208,8 +210,23 @@ function projectPageInit(ctx) {
 
 
   /* Change machine functionality */
+  machineChangeInput.keyup(function(){
+    if ($(this).val().indexOf(' ') >= 0) {
+        machineChangeBtn.attr("disabled", "disabled");
+        invalidMachineNameHelp.show();
+        machineInputForm.addClass('has-error');
+    } else {
+        machineChangeBtn.removeAttr("disabled");
+        invalidMachineNameHelp.hide();
+        machineInputForm.removeClass('has-error');
+    }
+  });
 
   machineChangeFormToggle.click(function(){
+    machineChangeInput.val(machineNameTitle.text());
+    machineChangeBtn.removeAttr("disabled");
+    invalidMachineNameHelp.hide();
+    machineInputForm.removeClass('has-error');
     machineForm.slideDown();
     machineNameTitle.hide();
     $(this).hide();

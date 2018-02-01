@@ -3,7 +3,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/nginx
 NAME=nginx
 DESC=nginx
-PID=/var/run/nginx/nginx.pid
+PID=/run/nginx/nginx.pid
 
 test -x $DAEMON || exit 0
 

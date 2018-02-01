@@ -1,0 +1,30 @@
+From 6b49020893f999df56392b49b1a289cb96a113a1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Mar 2017 22:08:17 -0700
+Subject: [PATCH 3/8] error.h is specific to glibc on linux
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdep.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/sysdep.h b/sysdep.h
+index 137bf6d..6a323f0 100644
+--- a/sysdep.h
++++ b/sysdep.h
+@@ -37,9 +37,10 @@ int tun_read(int fd, unsigned char *buf, int len);
+ int tun_get_hwaddr(int fd, char *dev, uint8_t *hwaddr);
+ 
+ /***************************************************************************/
+-#if defined(__linux__) || defined(__GLIBC__)
++#if defined(__linux__)
++#if defined(__GLIBC__)
+ #include <error.h>
+-
++#endif
+ #define HAVE_VASPRINTF 1
+ #define HAVE_ASPRINTF  1
+ #define HAVE_ERROR     1
+-- 
+2.12.1
+

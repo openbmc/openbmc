@@ -15,10 +15,10 @@ of known secure NIS server (/etc/yp.conf) Binds to \
 the server which answered as first. \
 "
 HOMEPAGE = "http://www.linux-nis.org/nis/ypbind-mt/index.html"
-DEPENDS = "yp-tools ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
+DEPENDS = "yp-tools ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PROVIDES += "ypbind"
 
-PNBLACKLIST[ypbind-mt] ?= "BROKEN: Depends on broken yp-tools"
+PNBLACKLIST[ypbind-mt] ?= "BROKEN: Depends on broken yp-tools - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 SRC_URI = "http://www.linux-nis.org/download/ypbind-mt/${BP}.tar.bz2 \
            file://ypbind.init \

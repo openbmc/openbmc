@@ -1,20 +1,20 @@
 python multilib_virtclass_handler () {
-    cls = e.data.getVar("BBEXTENDCURR", True)
-    variant = e.data.getVar("BBEXTENDVARIANT", True)
+    cls = e.data.getVar("BBEXTENDCURR")
+    variant = e.data.getVar("BBEXTENDVARIANT")
     if cls != "multilib" or not variant:
         return
 
-    e.data.setVar('STAGING_KERNEL_DIR', e.data.getVar('STAGING_KERNEL_DIR', True))
+    e.data.setVar('STAGING_KERNEL_DIR', e.data.getVar('STAGING_KERNEL_DIR'))
 
     # There should only be one kernel in multilib configs
     # We also skip multilib setup for module packages.
-    provides = (e.data.getVar("PROVIDES", True) or "").split()
+    provides = (e.data.getVar("PROVIDES") or "").split()
     if "virtual/kernel" in provides or bb.data.inherits_class('module-base', e.data):
         raise bb.parse.SkipPackage("We shouldn't have multilib variants for the kernel")
 
-    save_var_name=e.data.getVar("MULTILIB_SAVE_VARNAME", True) or ""
+    save_var_name=e.data.getVar("MULTILIB_SAVE_VARNAME") or ""
     for name in save_var_name.split():
-        val=e.data.getVar(name, True)
+        val=e.data.getVar(name)
         if val:
             e.data.setVar(name + "_MULTILIB_ORIGINAL", val)
 
@@ -26,7 +26,7 @@ python multilib_virtclass_handler () {
     if bb.data.inherits_class('image', e.data):
         e.data.setVar("MLPREFIX", variant + "-")
         e.data.setVar("PN", variant + "-" + e.data.getVar("PN", False))
-        e.data.setVar('SDKTARGETSYSROOT', e.data.getVar('SDKTARGETSYSROOT', True))
+        e.data.setVar('SDKTARGETSYSROOT', e.data.getVar('SDKTARGETSYSROOT'))
         target_vendor = e.data.getVar("TARGET_VENDOR_" + "virtclass-multilib-" + variant, False)
         if target_vendor:
             e.data.setVar("TARGET_VENDOR", target_vendor)
@@ -36,7 +36,6 @@ python multilib_virtclass_handler () {
         e.data.setVar("MLPREFIX", variant + "-")
         override = ":virtclass-multilib-" + variant
         e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + override)
-        bb.data.update_data(e.data)
         return
 
     if bb.data.inherits_class('native', e.data):
@@ -50,9 +49,15 @@ python multilib_virtclass_handler () {
 
 
     # Expand this since this won't work correctly once we set a multilib into place
-    e.data.setVar("ALL_MULTILIB_PACKAGE_ARCHS", e.data.getVar("ALL_MULTILIB_PACKAGE_ARCHS", True))
+    e.data.setVar("ALL_MULTILIB_PACKAGE_ARCHS", e.data.getVar("ALL_MULTILIB_PACKAGE_ARCHS"))
  
     override = ":virtclass-multilib-" + variant
+
+    blacklist = e.data.getVarFlag('PNBLACKLIST', e.data.getVar('PN'))
+    if blacklist:
+        pn_new = variant + "-" + e.data.getVar('PN')
+        if not e.data.getVarFlag('PNBLACKLIST', pn_new):
+            e.data.setVarFlag('PNBLACKLIST', pn_new, blacklist)
 
     e.data.setVar("MLPREFIX", variant + "-")
     e.data.setVar("PN", variant + "-" + e.data.getVar("PN", False))
@@ -60,7 +65,7 @@ python multilib_virtclass_handler () {
 
     # Expand the WHITELISTs with multilib prefix
     for whitelist in ["WHITELIST_GPL-3.0", "LGPLv2_WHITELIST_GPL-3.0"]:
-        pkgs = e.data.getVar(whitelist, True)
+        pkgs = e.data.getVar(whitelist)
         for pkg in pkgs.split():
             pkgs += " " + variant + "-" + pkg
         e.data.setVar(whitelist, pkgs)
@@ -78,7 +83,7 @@ multilib_virtclass_handler[eventmask] = "bb.event.RecipePreFinalise"
 STAGINGCC_prepend = "${BBEXTENDVARIANT}-"
 
 python __anonymous () {
-    variant = d.getVar("BBEXTENDVARIANT", True)
+    variant = d.getVar("BBEXTENDVARIANT")
 
     import oe.classextend
 
@@ -88,7 +93,7 @@ python __anonymous () {
         clsextend.map_depends_variable("PACKAGE_INSTALL")
         clsextend.map_depends_variable("LINGUAS_INSTALL")
         clsextend.map_depends_variable("RDEPENDS")
-        pinstall = d.getVar("LINGUAS_INSTALL", True) + " " + d.getVar("PACKAGE_INSTALL", True)
+        pinstall = d.getVar("LINGUAS_INSTALL") + " " + d.getVar("PACKAGE_INSTALL")
         d.setVar("PACKAGE_INSTALL", pinstall)
         d.setVar("LINGUAS_INSTALL", "")
         # FIXME, we need to map this to something, not delete it!
@@ -104,7 +109,7 @@ python __anonymous () {
         return
 
     clsextend.rename_packages()
-    clsextend.rename_package_variables((d.getVar("PACKAGEVARS", True) or "").split())
+    clsextend.rename_package_variables((d.getVar("PACKAGEVARS") or "").split())
 
     clsextend.map_packagevars()
     clsextend.map_regexp_variable("PACKAGES_DYNAMIC")
@@ -119,7 +124,7 @@ PACKAGEFUNCS_append = " do_package_qa_multilib"
 python do_package_qa_multilib() {
 
     def check_mlprefix(pkg, var, mlprefix):
-        values = bb.utils.explode_deps(d.getVar('%s_%s' % (var, pkg), True) or d.getVar(var, True) or "")
+        values = bb.utils.explode_deps(d.getVar('%s_%s' % (var, pkg)) or d.getVar(var) or "")
         candidates = []
         for i in values:
             if i.startswith('virtual/'):
@@ -130,14 +135,14 @@ python do_package_qa_multilib() {
                 candidates.append(i)
         if len(candidates) > 0:
             msg = "%s package %s - suspicious values '%s' in %s" \
-                   % (d.getVar('PN', True), pkg, ' '.join(candidates), var)
+                   % (d.getVar('PN'), pkg, ' '.join(candidates), var)
             package_qa_handle_error("multilib", msg, d)
 
-    ml = d.getVar('MLPREFIX', True)
+    ml = d.getVar('MLPREFIX')
     if not ml:
         return
 
-    packages = d.getVar('PACKAGES', True)
+    packages = d.getVar('PACKAGES')
     for pkg in packages.split():
         check_mlprefix(pkg, 'RDEPENDS', ml)
         check_mlprefix(pkg, 'RPROVIDES', ml)

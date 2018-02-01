@@ -1,0 +1,28 @@
+From d95c2977da074be0d3913e94fb8fb5ed1c64404a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Apr 2017 10:04:03 -0700
+Subject: [PATCH 2/2] msgpack: Add comment for intended fallthrough
+
+Helps fixing build with gcc7
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/msgpack-c-0b7cabd/include/msgpack/unpack_template.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/msgpack-c-0b7cabd/include/msgpack/unpack_template.h b/lib/msgpack-c-0b7cabd/include/msgpack/unpack_template.h
+index a6dae6f..651e6c2 100644
+--- a/lib/msgpack-c-0b7cabd/include/msgpack/unpack_template.h
++++ b/lib/msgpack-c-0b7cabd/include/msgpack/unpack_template.h
+@@ -248,7 +248,7 @@ msgpack_unpack_func(int, _execute)(msgpack_unpack_struct(_context)* ctx, const c
+ 
+             _fixed_trail_again:
+                 ++p;
+-
++            // fallthrough
+             default:
+                 if((size_t)(pe - p) < trail) { goto _out; }
+                 n = p;  p += trail - 1;
+-- 
+2.12.2
+

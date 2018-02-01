@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://box2d/License.txt;md5=e5d39ad91f7dc4692dcdb1d85139ec6
 # 0.12.1+gitAUTOINC+de5452e56b-r1/git/clutter-box2d/clutter-box2d.h:226:47:
 #  fatal error: clutter-box2d/clutter-box2d-child.h: No such file or directory
 # |  #include <clutter-box2d/clutter-box2d-child.h>
-PNBLACKLIST[clutter-box2d] ?= "BROKEN: doesn't build with B!=S"
+PNBLACKLIST[clutter-box2d] ?= "BROKEN: doesn't build with B!=S - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 SRCREV = "de5452e56b537a11fd7f9453d048ff4b4793b5a2"
 PV = "0.12.1+git${SRCPV}"

@@ -1,0 +1,45 @@
+Fix a regression that causes the MIPS code from building.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 7bfb22af123ac10798a9a4c9ec7b23e5065db35e Mon Sep 17 00:00:00 2001
+From: DRC <information@libjpeg-turbo.org>
+Date: Mon, 26 Sep 2016 17:59:14 -0500
+Subject: [PATCH] Fix broken MIPS build
+
+Regression introduced by 9055fb408dcb585ce9392d395e16630d51002152
+
+Fixes #104
+---
+ ChangeLog.md      | 3 +++
+ simd/jsimd_mips.c | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/ChangeLog.md b/ChangeLog.md
+index e2b9df3..71ddcaa 100644
+--- a/ChangeLog.md
++++ b/ChangeLog.md
+@@ -6,6 +6,9 @@
+ 1. Fixed a regression introduced by 1.5.1[7] that prevented libjpeg-turbo from
+ building with Android NDK platforms prior to android-21 (5.0).
+ 
++2. Fixed a regression introduced by 1.5.1[1] that prevented the MIPS DSPR2 SIMD
++code in libjpeg-turbo from building.
++
+ 
+ 1.5.1
+ =====
+diff --git a/simd/jsimd_mips.c b/simd/jsimd_mips.c
+index 63b8115..02e90cd 100644
+--- a/simd/jsimd_mips.c
++++ b/simd/jsimd_mips.c
+@@ -63,6 +63,8 @@ parse_proc_cpuinfo(const char* search_string)
+ LOCAL(void)
+ init_simd (void)
+ {
++  char *env = NULL;
++
+   if (simd_support != ~0U)
+     return;
+ 

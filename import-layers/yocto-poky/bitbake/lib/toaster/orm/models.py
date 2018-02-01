@@ -38,6 +38,7 @@ import re
 import itertools
 from signal import SIGUSR1
 
+
 import logging
 logger = logging.getLogger("toaster")
 
@@ -178,24 +179,27 @@ class ProjectManager(models.Manager):
         else:
             return projects[0]
 
+
 class Project(models.Model):
-    search_allowed_fields = ['name', 'short_description', 'release__name', 'release__branch_name']
+    search_allowed_fields = ['name', 'short_description', 'release__name',
+                             'release__branch_name']
     name = models.CharField(max_length=100)
     short_description = models.CharField(max_length=50, blank=True)
     bitbake_version = models.ForeignKey('BitbakeVersion', null=True)
-    release     = models.ForeignKey("Release", null=True)
-    created     = models.DateTimeField(auto_now_add = True)
-    updated     = models.DateTimeField(auto_now = True)
+    release = models.ForeignKey("Release", null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     # This is a horrible hack; since Toaster has no "User" model available when
     # running in interactive mode, we can't reference the field here directly
-    # Instead, we keep a possible null reference to the User id, as not to force
+    # Instead, we keep a possible null reference to the User id,
+    # as not to force
     # hard links to possibly missing models
-    user_id     = models.IntegerField(null = True)
-    objects     = ProjectManager()
+    user_id = models.IntegerField(null=True)
+    objects = ProjectManager()
 
     # set to True for the project which is the default container
     # for builds initiated by the command line etc.
-    is_default  = models.BooleanField(default = False)
+    is_default= models.BooleanField(default=False)
 
     def __unicode__(self):
         return "%s (Release %s, BBV %s)" % (self.name, self.release, self.bitbake_version)
@@ -221,16 +225,16 @@ class Project(models.Model):
             return( -1 )
 
     def get_last_outcome(self):
-        build_id = self.get_last_build_id
+        build_id = self.get_last_build_id()
         if (-1 == build_id):
             return( "" )
         try:
-            return Build.objects.filter( id = self.get_last_build_id )[ 0 ].outcome
+            return Build.objects.filter( id = build_id )[ 0 ].outcome
         except (Build.DoesNotExist,IndexError):
             return( "not_found" )
 
     def get_last_target(self):
-        build_id = self.get_last_build_id
+        build_id = self.get_last_build_id()
         if (-1 == build_id):
             return( "" )
         try:
@@ -239,7 +243,7 @@ class Project(models.Model):
             return( "not_found" )
 
     def get_last_errors(self):
-        build_id = self.get_last_build_id
+        build_id = self.get_last_build_id()
         if (-1 == build_id):
             return( 0 )
         try:
@@ -248,7 +252,7 @@ class Project(models.Model):
             return( "not_found" )
 
     def get_last_warnings(self):
-        build_id = self.get_last_build_id
+        build_id = self.get_last_build_id()
         if (-1 == build_id):
             return( 0 )
         try:
@@ -265,7 +269,7 @@ class Project(models.Model):
         return last_build.get_image_file_extensions()
 
     def get_last_imgfiles(self):
-        build_id = self.get_last_build_id
+        build_id = self.get_last_build_id()
         if (-1 == build_id):
             return( "" )
         try:
@@ -333,20 +337,45 @@ class Project(models.Model):
 
         return queryset
 
-
     def schedule_build(self):
-        from bldcontrol.models import BuildRequest, BRTarget, BRLayer, BRVariable, BRBitbake
-        br = BuildRequest.objects.create(project = self)
-        try:
 
-            BRBitbake.objects.create(req = br,
-                giturl = self.bitbake_version.giturl,
-                commit = self.bitbake_version.branch,
-                dirpath = self.bitbake_version.dirpath)
+        from bldcontrol.models import BuildRequest, BRTarget, BRLayer
+        from bldcontrol.models import BRBitbake, BRVariable
+
+        try:
+            now = timezone.now()
+            build = Build.objects.create(project=self,
+                                         completed_on=now,
+                                         started_on=now)
+
+            br = BuildRequest.objects.create(project=self,
+                                             state=BuildRequest.REQ_QUEUED,
+                                             build=build)
+            BRBitbake.objects.create(req=br,
+                                     giturl=self.bitbake_version.giturl,
+                                     commit=self.bitbake_version.branch,
+                                     dirpath=self.bitbake_version.dirpath)
+
+            for t in self.projecttarget_set.all():
+                BRTarget.objects.create(req=br, target=t.target, task=t.task)
+                Target.objects.create(build=br.build, target=t.target,
+                                      task=t.task)
+                # If we're about to build a custom image recipe make sure
+                # that layer is currently in the project before we create the
+                # BRLayer objects
+                customrecipe = CustomImageRecipe.objects.filter(
+                    name=t.target,
+                    project=self).first()
+                if customrecipe:
+                    ProjectLayer.objects.get_or_create(
+                        project=self,
+                        layercommit=customrecipe.layer_version,
+                        optional=False)
 
             for l in self.projectlayer_set.all().order_by("pk"):
                 commit = l.layercommit.get_vcs_reference()
-                print("ii Building layer ", l.layercommit.layer.name, " at vcs point ", commit)
+                logger.debug("Adding layer to build %s" %
+                             l.layercommit.layer.name)
                 BRLayer.objects.create(
                     req=br,
                     name=l.layercommit.layer.name,
@@ -357,25 +386,16 @@ class Project(models.Model):
                     local_source_dir=l.layercommit.layer.local_source_dir
                 )
 
-            br.state = BuildRequest.REQ_QUEUED
-            now = timezone.now()
-            br.build = Build.objects.create(project = self,
-                                completed_on=now,
-                                started_on=now,
-                                )
-            for t in self.projecttarget_set.all():
-                BRTarget.objects.create(req = br, target = t.target, task = t.task)
-                Target.objects.create(build = br.build, target = t.target, task = t.task)
-
             for v in self.projectvariable_set.all():
-                BRVariable.objects.create(req = br, name = v.name, value = v.value)
-
+                BRVariable.objects.create(req=br, name=v.name, value=v.value)
 
             try:
-                br.build.machine = self.projectvariable_set.get(name = 'MACHINE').value
+                br.build.machine = self.projectvariable_set.get(
+                    name='MACHINE').value
                 br.build.save()
             except ProjectVariable.DoesNotExist:
                 pass
+
             br.save()
             signal_runbuilds()
 
@@ -882,7 +902,7 @@ class Target_Image_File(models.Model):
         'ext4.gz', 'ext3', 'ext3.gz', 'hdddirect', 'hddimg', 'iso', 'jffs2',
         'jffs2.sum', 'multiubi', 'qcow2', 'squashfs', 'squashfs-lzo',
         'squashfs-xz', 'tar', 'tar.bz2', 'tar.gz', 'tar.lz4', 'tar.xz', 'ubi',
-        'ubifs', 'vdi', 'vmdk', 'wic', 'wic.bz2', 'wic.gz', 'wic.lzma'
+        'ubifs', 'vdi', 'vmdk', 'wic', 'wic.bmap', 'wic.bz2', 'wic.gz', 'wic.lzma'
     }
 
     target = models.ForeignKey(Target)
@@ -1365,7 +1385,7 @@ class Layer(models.Model):
     name = models.CharField(max_length=100)
     layer_index_url = models.URLField()
     vcs_url = GitURLField(default=None, null=True)
-    local_source_dir = models.TextField(null = True, default = None)
+    local_source_dir = models.TextField(null=True, default=None)
     vcs_web_url = models.URLField(null=True, default=None)
     vcs_web_tree_base_url = models.URLField(null=True, default=None)
     vcs_web_file_base_url = models.URLField(null=True, default=None)
@@ -1473,22 +1493,33 @@ class Layer_Version(models.Model):
             return self.commit
         return 'N/A'
 
-    def get_detailspage_url(self, project_id):
+    def get_detailspage_url(self, project_id=None):
+        """ returns the url to the layer details page uses own project
+        field if project_id is not specified """
+
+        if project_id is None:
+            project_id = self.project.pk
+
         return reverse('layerdetails', args=(project_id, self.pk))
 
     def get_alldeps(self, project_id):
         """Get full list of unique layer dependencies."""
-        def gen_layerdeps(lver, project):
+        def gen_layerdeps(lver, project, depth):
+            if depth == 0:
+                return
             for ldep in lver.dependencies.all():
                 yield ldep.depends_on
                 # get next level of deps recursively calling gen_layerdeps
-                for subdep in gen_layerdeps(ldep.depends_on, project):
+                for subdep in gen_layerdeps(ldep.depends_on, project, depth-1):
                     yield subdep
 
         project = Project.objects.get(pk=project_id)
         result = []
-        projectlvers = [player.layercommit for player in project.projectlayer_set.all()]
-        for dep in gen_layerdeps(self, project):
+        projectlvers = [player.layercommit for player in
+                        project.projectlayer_set.all()]
+        # protect against infinite layer dependency loops
+        maxdepth = 20
+        for dep in gen_layerdeps(self, project, maxdepth):
             # filter out duplicates and layers already belonging to the project
             if dep not in result + projectlvers:
                 result.append(dep)
@@ -1631,7 +1662,8 @@ class CustomImageRecipe(Recipe):
         if base_recipe_path:
             base_recipe = open(base_recipe_path, 'r').read()
         else:
-            raise IOError("Based on recipe file not found")
+            raise IOError("Based on recipe file not found: %s" %
+                          base_recipe_path)
 
         # Add a special case for when the recipe we have based a custom image
         # recipe on requires another recipe.
@@ -1741,8 +1773,12 @@ def invalidate_cache(**kwargs):
 
 def signal_runbuilds():
     """Send SIGUSR1 to runbuilds process"""
-    with open(os.path.join(os.getenv('BUILDDIR'), '.runbuilds.pid')) as pidf:
-        os.kill(int(pidf.read()), SIGUSR1)
+    try:
+        with open(os.path.join(os.getenv('BUILDDIR', '.'),
+                               '.runbuilds.pid')) as pidf:
+            os.kill(int(pidf.read()), SIGUSR1)
+    except FileNotFoundError:
+        logger.info("Stopping existing runbuilds: no current process found")
 
 django.db.models.signals.post_save.connect(invalidate_cache)
 django.db.models.signals.post_delete.connect(invalidate_cache)

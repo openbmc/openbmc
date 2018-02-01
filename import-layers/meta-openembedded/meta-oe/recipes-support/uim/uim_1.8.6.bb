@@ -8,6 +8,7 @@ SRC_URI = "http://uim.googlecode.com/files/uim-${PV}.tar.bz2"
 
 SRC_URI_append_class-target = " file://uim-module-manager.patch \
     file://0001-fix-bug-for-cross-compile.patch \
+    file://0001-Add-support-for-aarch64.patch \
 "
 SRC_URI[md5sum] = "ecea4c597bab1fd4ba98ea84edcece59"
 SRC_URI[sha256sum] = "7b1ea803c73f3478917166f04f67cce6e45ad7ea5ab6df99b948c17eb1cb235f"
@@ -42,7 +43,7 @@ do_install_append() {
     rm -rf ${D}/${datadir}/applications
 }
 
-PACKAGES += "uim-xim uim-utils uim-skk uim-gtk2.0 uim-gtk3 uim-fep uim-common uim-anthy libuim0 libuim-dev"
+PACKAGES =+ "uim-xim uim-utils uim-skk uim-gtk2.0 uim-gtk3 uim-fep uim-anthy uim-common libuim0 libuim-dev"
 
 FILES_${PN} = "${bindir}/uim-help \
     ${libdir}/uim/plugin/libuim-* \

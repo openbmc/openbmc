@@ -1,0 +1,97 @@
+From c0e785f8da2caa6617052b1c7b347e0dffb1520d Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Tue, 13 Dec 2016 10:29:17 -0700
+Subject: [PATCH 2/3] Don't set up -m32/-m64, we do that ourselves
+
+Upstream-Status: Inappropriate
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+---
+ tools/build/src/tools/gcc.jam | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
+index 0f346a5..942f141 100644
+--- a/tools/build/src/tools/gcc.jam
++++ b/tools/build/src/tools/gcc.jam
+@@ -509,7 +509,6 @@ rule compile.c++.pch ( targets * : sources * : properties * )
+ {
+     setup-threading $(targets) : $(sources) : $(properties) ;
+     setup-fpic $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+ }
+ 
+ actions compile.c++.pch
+@@ -521,7 +520,6 @@ rule compile.c.pch ( targets * : sources * : properties * )
+ {
+     setup-threading $(targets) : $(sources) : $(properties) ;
+     setup-fpic $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+ }
+ 
+ actions compile.c.pch
+@@ -533,7 +531,6 @@ rule compile.c++.preprocess ( targets * : sources * : properties * )
+ {
+     setup-threading $(targets) : $(sources) : $(properties) ;
+     setup-fpic $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+ 
+     # Some extensions are compiled as C++ by default. For others, we need to
+     # pass -x c++. We could always pass -x c++ but distcc does not work with it.
+@@ -548,7 +545,6 @@ rule compile.c.preprocess ( targets * : sources * : properties * )
+ {
+     setup-threading $(targets) : $(sources) : $(properties) ;
+     setup-fpic $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+ 
+     # If we use the name g++ then default file suffix -> language mapping does
+     # not work. So have to pass -x option. Maybe, we can work around this by
+@@ -564,7 +560,6 @@ rule compile.c++ ( targets * : sources * : properties * )
+ {
+     setup-threading $(targets) : $(sources) : $(properties) ;
+     setup-fpic $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+ 
+     # Some extensions are compiled as C++ by default. For others, we need to
+     # pass -x c++. We could always pass -x c++ but distcc does not work with it.
+@@ -594,7 +589,6 @@ rule compile.c ( targets * : sources * : properties * )
+ {
+     setup-threading $(targets) : $(sources) : $(properties) ;
+     setup-fpic $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+ 
+     # If we use the name g++ then default file suffix -> language mapping does
+     # not work. So have to pass -x option. Maybe, we can work around this by
+@@ -610,7 +604,6 @@ rule compile.fortran ( targets * : sources * : properties * )
+ {
+     setup-threading $(targets) : $(sources) : $(properties) ;
+     setup-fpic $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+ }
+ 
+ actions compile.c++ bind PCH_FILE
+@@ -641,7 +634,6 @@ actions compile.fortran
+ rule compile.asm ( targets * : sources * : properties * )
+ {
+     setup-fpic $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+     LANG on $(<) = "-x assembler-with-cpp" ;
+ }
+ 
+@@ -950,7 +942,6 @@ rule quote-rpath ( targets * )
+ rule link ( targets * : sources * : properties * )
+ {
+     setup-threading $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+     SPACE on $(targets) = " " ;
+     # Serialize execution of the 'link' action, since running N links in
+     # parallel is just slower. For now, serialize only gcc links, it might be a
+@@ -1018,7 +1009,6 @@ actions piecemeal archive
+ rule link.dll ( targets * : sources * : properties * )
+ {
+     setup-threading $(targets) : $(sources) : $(properties) ;
+-    setup-address-model $(targets) : $(sources) : $(properties) ;
+     SPACE on $(targets) = " " ;
+     JAM_SEMAPHORE on $(targets) = <s>gcc-link-semaphore ;
+     quote-rpath $(targets) ;
+-- 
+2.8.0

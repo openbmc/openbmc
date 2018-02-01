@@ -1,0 +1,29 @@
+From 10e7d4e4bfcb70344d18f0d4ce36068475747f25 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Mar 2017 15:59:43 -0700
+Subject: [PATCH] correct the location of unistd.h
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ os-daq-modules/daq_ipfw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/os-daq-modules/daq_ipfw.c b/os-daq-modules/daq_ipfw.c
+index 016beb0..c2a4175 100644
+--- a/os-daq-modules/daq_ipfw.c
++++ b/os-daq-modules/daq_ipfw.c
+@@ -23,10 +23,10 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>
++#include <unistd.h>
+ 
+ #include <sys/types.h>
+ #include <sys/time.h>
+-#include <sys/unistd.h>
+ 
+ #include <netinet/in.h>
+ #include <sys/socket.h>
+-- 
+2.12.1
+

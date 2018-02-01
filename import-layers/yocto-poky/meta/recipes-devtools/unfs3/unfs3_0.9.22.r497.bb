@@ -14,7 +14,10 @@ DEPENDS_append_class-nativesdk = " flex-nativesdk"
 
 MOD_PV = "497"
 S = "${WORKDIR}/trunk"
-SRC_URI = "svn://svn.code.sf.net/p/unfs3/code;module=trunk;rev=${MOD_PV};protocol=http \
+# Only subversion url left in OE-Core, use a mirror tarball instead since
+# this rarely changes.
+# svn://svn.code.sf.net/p/unfs3/code;module=trunk;rev=${MOD_PV};protocol=http
+SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/trunk_svn.code.sf.net_.p.unfs3.code_497_.tar.gz \
            file://unfs3_parallel_build.patch \
            file://alternate_rpc_ports.patch \
            file://fix_pid_race_parent_writes_child_pid.patch \
@@ -23,8 +26,8 @@ SRC_URI = "svn://svn.code.sf.net/p/unfs3/code;module=trunk;rev=${MOD_PV};protoco
            file://relative_max_socket_path_len.patch \
            file://tcp_no_delay.patch \
           "
-SRC_URI[md5sum] = "3687acc4ee992e536472365dd99712a7"
-SRC_URI[sha256sum] = "274b43ada9c6eea1da26eb7010d72889c5278984ba0b50dff4e093057d4d64f8"
+SRC_URI[md5sum] = "2e43e471c77ade0331901c40b8f8e9a3"
+SRC_URI[sha256sum] = "21009468a9ba07b72ea93780d025a63ab4e55bf8fc3127803c296f0900fe1bac"
 
 BBCLASSEXTEND = "native nativesdk"
 

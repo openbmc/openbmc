@@ -25,9 +25,7 @@ PACKAGE_ARCHS = "${SDK_PACKAGE_ARCHS}"
 DEPENDS_append = " chrpath-replacement-native"
 EXTRANATIVEPATH += "chrpath-native"
 
-STAGING_DIR_HOST = "${STAGING_DIR}/${MULTIMACH_HOST_SYS}"
-STAGING_DIR_TARGET = "${STAGING_DIR}/${MULTIMACH_TARGET_SYS}"
-PKGDATA_DIR = "${STAGING_DIR_HOST}/pkgdata"
+PKGDATA_DIR = "${TMPDIR}/pkgdata/${SDK_SYS}"
 
 HOST_ARCH = "${SDK_ARCH}"
 HOST_VENDOR = "${SDK_VENDOR}"
@@ -45,6 +43,10 @@ TARGET_PREFIX = "${SDK_PREFIX}"
 TARGET_CC_ARCH = "${SDK_CC_ARCH}"
 TARGET_LD_ARCH = "${SDK_LD_ARCH}"
 TARGET_AS_ARCH = "${SDK_AS_ARCH}"
+TARGET_CPPFLAGS = "${BUILDSDK_CPPFLAGS}"
+TARGET_CFLAGS = "${BUILDSDK_CFLAGS}"
+TARGET_CXXFLAGS = "${BUILDSDK_CXXFLAGS}"
+TARGET_LDFLAGS = "${BUILDSDK_LDFLAGS}"
 TARGET_FPU = ""
 EXTRA_OECONF_GCC_FLOAT = ""
 
@@ -64,17 +66,23 @@ export PKG_CONFIG_DIR = "${STAGING_DIR_HOST}${libdir}/pkgconfig"
 export PKG_CONFIG_SYSROOT_DIR = "${STAGING_DIR_HOST}"
 
 python nativesdk_virtclass_handler () {
-    pn = e.data.getVar("PN", True)
+    pn = e.data.getVar("PN")
     if not (pn.endswith("-nativesdk") or pn.startswith("nativesdk-")):
         return
 
+    # Set features here to prevent appends and distro features backfill
+    # from modifying nativesdk distro features
+    features = set(d.getVar("DISTRO_FEATURES_NATIVESDK").split())
+    filtered = set(bb.utils.filter("DISTRO_FEATURES", d.getVar("DISTRO_FEATURES_FILTER_NATIVESDK"), d).split())
+    d.setVar("DISTRO_FEATURES", " ".join(sorted(features | filtered)))
+
     e.data.setVar("MLPREFIX", "nativesdk-")
-    e.data.setVar("PN", "nativesdk-" + e.data.getVar("PN", True).replace("-nativesdk", "").replace("nativesdk-", ""))
+    e.data.setVar("PN", "nativesdk-" + e.data.getVar("PN").replace("-nativesdk", "").replace("nativesdk-", ""))
     e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + ":virtclass-nativesdk")
 }
 
 python () {
-    pn = d.getVar("PN", True)
+    pn = d.getVar("PN")
     if not pn.startswith("nativesdk-"):
         return
 
@@ -82,7 +90,7 @@ python () {
 
     clsextend = oe.classextend.NativesdkClassExtender("nativesdk", d)
     clsextend.rename_packages()
-    clsextend.rename_package_variables((d.getVar("PACKAGEVARS", True) or "").split())
+    clsextend.rename_package_variables((d.getVar("PACKAGEVARS") or "").split())
 
     clsextend.map_depends_variable("DEPENDS")
     clsextend.map_packagevars()

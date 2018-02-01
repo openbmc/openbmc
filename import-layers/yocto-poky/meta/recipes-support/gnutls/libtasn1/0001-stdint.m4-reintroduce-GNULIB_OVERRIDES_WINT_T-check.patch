@@ -1,0 +1,63 @@
+From b17dbb8d3c5605db3a1d82861fcaeef4636d1117 Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Thu, 26 Jan 2017 18:54:48 +0200
+Subject: [PATCH] stdint.m4: reintroduce GNULIB_OVERRIDES_WINT_T check
+
+Partially revert the gnulib commit: 5a400b3f5a1f5483dbfd75d38bdb7080218a063b
+to fix the build error with musl library.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ gl/m4/stdint.m4 | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/gl/m4/stdint.m4 b/gl/m4/stdint.m4
+index 4ac854d..3dc3da1 100644
+--- a/gl/m4/stdint.m4
++++ b/gl/m4/stdint.m4
+@@ -355,6 +355,32 @@ int32_t i32 = INT32_C (0x7fffffff);
+     gl_STDINT_TYPE_PROPERTIES
+   fi
+ 
++  dnl Determine whether gnulib's <wchar.h> or <wctype.h> would, if present,
++  dnl override 'wint_t'.
++    AC_CACHE_CHECK([whether wint_t is too small],
++      [gl_cv_type_wint_t_too_small],
++      [AC_COMPILE_IFELSE(
++           [AC_LANG_PROGRAM([[
++  /* Tru64 with Desktop Toolkit C has a bug: <stdio.h> must be included before
++     <wchar.h>.
++     BSD/OS 4.0.1 has a bug: <stddef.h>, <stdio.h> and <time.h> must be
++     included before <wchar.h>.  */
++  #if !(defined __GLIBC__ && !defined __UCLIBC__)
++  # include <stddef.h>
++  # include <stdio.h>
++  # include <time.h>
++  #endif
++  #include <wchar.h>
++              int verify[sizeof (wint_t) < sizeof (int) ? -1 : 1];
++              ]])],
++           [gl_cv_type_wint_t_too_small=no],
++           [gl_cv_type_wint_t_too_small=yes])])
++    if test $gl_cv_type_wint_t_too_small = yes; then
++      GNULIB_OVERRIDES_WINT_T=1
++    else
++      GNULIB_OVERRIDES_WINT_T=0
++    fi
++
+   dnl The substitute stdint.h needs the substitute limit.h's _GL_INTEGER_WIDTH.
+   LIMITS_H=limits.h
+   AM_CONDITIONAL([GL_GENERATE_LIMITS_H], [test -n "$LIMITS_H"])
+@@ -363,6 +389,7 @@ int32_t i32 = INT32_C (0x7fffffff);
+   AC_SUBST([HAVE_SYS_BITYPES_H])
+   AC_SUBST([HAVE_SYS_INTTYPES_H])
+   AC_SUBST([STDINT_H])
++  AC_SUBST([GNULIB_OVERRIDES_WINT_T])
+   AM_CONDITIONAL([GL_GENERATE_STDINT_H], [test -n "$STDINT_H"])
+ ])
+ 
+-- 
+2.4.0
+

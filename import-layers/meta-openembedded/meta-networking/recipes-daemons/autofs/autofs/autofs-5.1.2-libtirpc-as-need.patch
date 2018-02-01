@@ -1,0 +1,30 @@
+Make configure compatible with -Wl,--as-needed following
+https://wiki.gentoo.org/wiki/Project:Quality_Assurance/As-needed#Failure_in_..2Fconfigure
+
+2016-07-05 Martin von Gagern
+
+Index: autofs-5.1.2/aclocal.m4
+===================================================================
+--- autofs-5.1.2.orig/aclocal.m4
++++ autofs-5.1.2/aclocal.m4
+@@ -415,9 +415,9 @@ AC_DEFUN([AF_CHECK_LIBTIRPC],
+ [
+ # save current flags
+ af_check_libtirpc_save_cflags="$CFLAGS"
+-af_check_libtirpc_save_ldflags="$LDFLAGS"
++af_check_libtirpc_save_libs="$LIBS"
+ CFLAGS="$CFLAGS -I=/usr/include/tirpc"
+-LDFLAGS="$LDFLAGS -ltirpc"
++LIBS="$LIBS -ltirpc"
+ 
+ AC_TRY_LINK(
+     [ #include <rpc/rpc.h> ],
+@@ -440,7 +440,7 @@ AC_CHECK_FUNCS([getrpcbyname getservbyna
+ 
+ # restore flags
+ CFLAGS="$af_check_libtirpc_save_cflags"
+-LDFLAGS="$af_check_libtirpc_save_ldflags"
++LIBS="$af_check_libtirpc_save_libs"
+ ])
+ 
+ AC_DEFUN([AF_WITH_LIBTIRPC],

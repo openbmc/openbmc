@@ -1,0 +1,28 @@
+From 5958b151a4dbb89114e90c971a34b74f873b7beb Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 7 Feb 2017 12:16:03 +0200
+Subject: [PATCH] Get parameters for both libsolv and libsolvext (libdnf is
+ using both)
+
+Upstream-Status: Pending [depends on whether https://github.com/openSUSE/libsolv/pull/177 is accepted]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b531da1..e512da0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -28,7 +28,7 @@ find_package (PkgConfig REQUIRED)
+ SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+ PKG_CHECK_MODULES(GLIB gio-unix-2.0>=2.44.0 REQUIRED)
+ FIND_LIBRARY (RPMDB_LIBRARY NAMES rpmdb)
+-PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
++PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv libsolvext)
+ set(LIBSOLV_LIBRARY ${LIBSOLV_LIBRARIES})
+ pkg_check_modules (CHECK REQUIRED check)
+ pkg_check_modules (REPO REQUIRED librepo)
+-- 
+2.11.0
+

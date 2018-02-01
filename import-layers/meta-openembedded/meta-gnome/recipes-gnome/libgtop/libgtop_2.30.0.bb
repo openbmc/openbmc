@@ -6,6 +6,9 @@ inherit gnomebase lib_package gtk-doc distro_features_check gobject-introspectio
 # depends on libxau
 REQUIRED_DISTRO_FEATURES = "x11"
 
+SRC_URI = "${GNOME_MIRROR}/${GNOMEBN}/${@gnome_verdir("${PV}")}/${GNOMEBN}-${PV}.tar.${GNOME_COMPRESS_TYPE};name=archive \
+           file://0001-netload-Include-libc-net-headers-unconditionally.patch \
+           "
 SRC_URI[archive.md5sum] = "ee29a9ef60659ebf4b075ac281f71cb2"
 SRC_URI[archive.sha256sum] = "463bcbe5737b1b93f3345ee34abf601e8eb864f507c49ff1921c2737abafc1e5"
 

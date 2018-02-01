@@ -1,0 +1,43 @@
+From 1e48821ba109b00e9c2931f12aa206c4ef54fd71 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 24 Apr 2017 12:34:55 -0700
+Subject: [PATCH] libgeis: Compare the first character of string to null
+
+gcc7 wants to be specific when it comes to comparing characters
+and strings
+
+fixes
+
+| ../../../../../../../workspace/sources/geis/libgeis/geis_v1.c: In function '_v1_subscribe_device':
+| ../../../../../../../workspace/sources/geis/libgeis/geis_v1.c:613:20: error: comparison between pointer and zero character constant [-Werror=pointer-compare]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libgeis/geis_v1.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libgeis/geis_v1.c b/libgeis/geis_v1.c
+index 67045ee..07c0851 100644
+--- a/libgeis/geis_v1.c
++++ b/libgeis/geis_v1.c
+@@ -610,7 +610,7 @@ _v1_subscribe_device(GeisInstance instance,
+                      const char **gesture_list)
+ {
+   GeisStatus result = GEIS_UNKNOWN_ERROR;
+-  if (gesture_list == GEIS_ALL_GESTURES)
++  if (gesture_list[0][0] == GEIS_ALL_GESTURES)
+   {
+     geis_debug("subscribing device %d for all gestures", device_id);
+   }
+@@ -757,7 +757,7 @@ geis_unsubscribe(GeisInstance     instance,
+                  GeisGestureType *gesture_list)
+ {
+   GeisStatus status = GEIS_STATUS_NOT_SUPPORTED;
+-  if (gesture_list == GEIS_ALL_GESTURES)
++  if (gesture_list[0] == GEIS_ALL_GESTURES)
+   {
+     status = geis_subscription_deactivate(instance->subscription);
+   }
+-- 
+2.12.2
+

@@ -1,0 +1,36 @@
+From 9e9e5814456ec23b9fc669d342bf9d8f7ee49fc2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 16:48:00 -0700
+Subject: [PATCH 5/5] sd-lldp.h: Remove net/ethernet.h seems to be over
+ specified
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/systemd/src/systemd/sd-lldp.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: NetworkManager-1.4.2/src/systemd/src/systemd/sd-lldp.h
+===================================================================
+--- NetworkManager-1.4.2.orig/src/systemd/src/systemd/sd-lldp.h
++++ NetworkManager-1.4.2/src/systemd/src/systemd/sd-lldp.h
+@@ -22,7 +22,7 @@
+ ***/
+ 
+ #include <inttypes.h>
+-#include <net/ethernet.h>
++//#include <net/ethernet.h>
+ #include <sys/types.h>
+ 
+ #include "sd-event.h"
+Index: NetworkManager-1.4.2/src/systemd/src/libsystemd-network/sd-lldp.c
+===================================================================
+--- NetworkManager-1.4.2.orig/src/systemd/src/libsystemd-network/sd-lldp.c
++++ NetworkManager-1.4.2/src/systemd/src/libsystemd-network/sd-lldp.c
+@@ -21,6 +21,7 @@
+ #include "nm-sd-adapt.h"
+ 
+ #include <arpa/inet.h>
++#include <net/ethernet.h>
+ 
+ #include "sd-lldp.h"
+ 

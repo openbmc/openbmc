@@ -1,0 +1,5 @@
+#!/bin/sh
+for x in `find ./ -name Makefile`;
+do
+	make -C `dirname ${x}` -k runtest-TESTS
+done

@@ -1,0 +1,48 @@
+[Qemu-ppc] [PATCH 1/1] target-ppc, tcg: fix usermode segfault with pthread
+
+From: Sam Bobroff
+Subject: [Qemu-ppc] [PATCH 1/1] target-ppc, tcg: fix usermode segfault with pthread_create()
+Date: Mon, 30 Jan 2017 16:08:07 +1100
+Programs run under qemu-ppc64 on an x86_64 host currently segfault
+if they use pthread_create() due to the adjustment made to the NIP in
+commit bd6fefe71cec5a0c7d2be4ac96307f25db56abf9.
+
+This patch changes cpu_loop() to set the NIP back to the
+pre-incremented value before calling do_syscall(), which causes the
+correct address to be used for the new thread and corrects the fault.
+
+Signed-off-by: Sam Bobroff <address@hidden>
+
+Upstream-Status: Backport
+
+---
+
+linux-user/main.c | 4 +++-
+1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 30049581ef..b5dee01541 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -1712,18 +1712,20 @@ void cpu_loop(CPUPPCState *env)
+              * in syscalls.
+              */
+             env->crf[0] &= ~0x1;
++            env->nip += 4;
+             ret = do_syscall(env, env->gpr[0], env->gpr[3], env->gpr[4],
+                              env->gpr[5], env->gpr[6], env->gpr[7],
+                              env->gpr[8], 0, 0);
+             if (ret == -TARGET_ERESTARTSYS) {
++                env->nip -= 4;
+                 break;
+             }
+             if (ret == (target_ulong)(-TARGET_QEMU_ESIGRETURN)) {
++                env->nip -= 4;
+                 /* Returning from a successful sigreturn syscall.
+                    Avoid corrupting register state.  */
+                 break;
+             }
+-            env->nip += 4;
+             if (ret > (target_ulong)(-515)) {
+                 env->crf[0] |= 0x1;
+                 ret = -ret;

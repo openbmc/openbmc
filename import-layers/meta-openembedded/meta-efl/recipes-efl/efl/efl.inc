@@ -51,7 +51,7 @@ EXTRA_OECONF_append_class-native = " \
     --disable-image-loader-dds \
 "
 
-PACKAGECONFIG ?= "egl opengl-es gstreamer1 pulseaudio luajit ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)}"
+PACKAGECONFIG ?= "egl opengl-es gstreamer1 pulseaudio luajit ${@bb.utils.filter('DISTRO_FEATURES', 'wayland', d)}"
 PACKAGECONFIG_class-native = "luajit"
 
 PACKAGECONFIG[wayland] = "--enable-wayland --enable-wayland-ivi-shell,--disable-wayland --disable-wayland-ivi-shell,wayland"
@@ -285,3 +285,6 @@ FILES_${PN}-dev += " \
     ${datadir}/eo/gdb \
     ${bindir}/eldbus-codegen \
 "
+
+PNBLACKLIST[efl] ?= "Depends on broken efl-native - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+PNBLACKLIST[efl-native] ?= "Broken: fails to build with http://errors.yoctoproject.org/Errors/Details/138240/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

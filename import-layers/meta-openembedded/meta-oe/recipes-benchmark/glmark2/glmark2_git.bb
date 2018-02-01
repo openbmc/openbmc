@@ -12,13 +12,13 @@ DEPENDS = "libpng12 jpeg"
 
 PV = "2014.03+${SRCPV}"
 
-SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https \
-           file://build-Check-packages-to-be-used-by-the-enabled-flavo.patch \
-           file://0001-Fix-wl_surface-should-be-destoryed-after-the-wl_wind.patch \
-           file://Fix-build-error-due-missing-space-before-macro.patch \
-           file://Fix-configure-for-sqrt-check.patch \
-           file://Fix-deprecated-declarations.patch"
-SRCREV = "fa71af2dfab711fac87b9504b6fc9862f44bf72a"
+SRC_URI = " \
+    git://github.com/glmark2/glmark2.git;protocol=https \
+    file://build-Check-packages-to-be-used-by-the-enabled-flavo.patch \
+    file://0001-Fix-wl_surface-should-be-destoryed-after-the-wl_wind.patch \
+    file://Fix-configure-for-sqrt-check.patch \
+"
+SRCREV = "f413c5b423250b4fde8f95639ad368d5b02c5b9b"
 
 S = "${WORKDIR}/git"
 
@@ -39,7 +39,7 @@ PACKAGECONFIG[wayland-gl] = ",,virtual/libgl wayland"
 PACKAGECONFIG[wayland-gles2] = ",,virtual/libgles2 wayland"
 
 python __anonymous() {
-    packageconfig = (d.getVar("PACKAGECONFIG", True) or "").split()
+    packageconfig = (d.getVar("PACKAGECONFIG") or "").split()
     flavors = []
     if "x11-gles2" in packageconfig:
         flavors.append("x11-glesv2")

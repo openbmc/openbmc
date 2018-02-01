@@ -2,7 +2,7 @@
 "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
 [<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
 
-<appendix id='sdk-appendix-mars'>
+<appendix id='sdk-appendix-latest-yp-eclipse-plug-in'>
     <title>Using Eclipse Mars</title>
 
     <para>

@@ -1,0 +1,90 @@
+From 829302792bf0e4935d29efc23ca1f2e9e7ee7dfd Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 7 Jan 2016 03:12:38 -0500
+Subject: [PATCH] test.pl: adjust for ptest
+
+* Don't use interactive inputs, set default test
+  settings instead.
+* Change the test results output to the ptest format
+
+Upstream-Status: Inappropriate [OE ptest specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ test.pl | 31 ++++++++++++++++++-------------
+ 1 file changed, 18 insertions(+), 13 deletions(-)
+
+diff --git a/test.pl b/test.pl
+index cfd1c1e..9b4f10e 100644
+--- a/test.pl
++++ b/test.pl
+@@ -7,11 +7,11 @@
+ # Change 1..1 below to 1..last_test_to_print .
+ # (It may become useful if the test is moved to ./t subdirectory.)
+ 
+-BEGIN {print "1..5\n";}
+-END {print "not ok 1\n" unless $loaded;}
++BEGIN {print "Start testing for libauthen-radius-perl\n";}
++END {print "\nFAIL: test1\n" unless $loaded;}
+ use Authen::Radius;
+ $loaded = 1;
+-print "ok 1\n";
++print "\nPASS: test1\n";
+ 
+ ######################### End of black magic.
+ 
+@@ -19,26 +19,31 @@ print "ok 1\n";
+ # (correspondingly "not ok 13") depending on the success of chunk 13
+ # of the test code):
+ 
++$host = "127.0.0.1";
++$secret = "testing123";
++$user = "testing";
++$pwd = "testpassword";
++
+ print "Make sure this machine is in your Radius clients file!\n";
+-print "Enter hostname[:port] of your Radius server: "; chomp ($host = <STDIN>);
+-print "Enter shared-secret of your Radius server: "; chomp ($secret = <STDIN>);
+-print "Enter a username to be validated: "; chomp ($user = <STDIN>);
+-print "Enter this user's password: "; chomp ($pwd = <STDIN>);
++print "hostname of your Radius server: $host\n";
++print "shared-secret of your Radius server: $secret\n";
++print "The username to be validated: $user\n";
++print "The user's password: $pwd\n";
+ 
+ $t = 2;
+ if ($host ne '') {
+ 	$r = new Authen::Radius(Host => $host, Secret => $secret, Debug => 1);
+-	print defined($r) ? "" : "not ", "ok $t\n"; $t++;
++	print defined($r) ? "\nPASS: test$t\n" : "\nFAIL: test$t\n"; $t++;
+ 	#Authen::Radius->load_dictionary;
+-	print $r->check_pwd($user, $pwd) ? "" : "not ", "ok $t\n"; $t++;
++	print $r->check_pwd($user, $pwd) ? "\nPASS: test$t\n" : "\nFAIL: test$t\n"; $t++;
+ 	@a = $r->get_attributes;
+-	print $#a != -1 ? "" : "not ", "ok $t\n"; $t++;
++	print $#a != -1 ? "\nPASS: test$t\n" : "\nFAIL: test$t\n"; $t++;
+ 	#for $a (@a) {
+ 	#	print "attr: name=$a->{'Name'} value=$a->{'Value'}\n";
+ 	#}
+ } else {
+ 	foreach my $t (2..4) {
+-		print "skipped $t\n";
++		print "\nSKIP test$t\n";
+ 	}
+ }
+ 
+@@ -53,9 +58,9 @@ my $data = "what do ya want for nothing?";
+ my $etalon_digest = hex_to_ascii("750c783e6ab0b503eaa86e310a5db738");
+ my $digest = Authen::Radius::hmac_md5(undef, $data, $key);
+ if ($etalon_digest eq $digest) {
+-	print "ok 5\n";
++	print "\nPASS: test5\n";
+ } else {
+-	print "not ok 5\n";
++	print "\nFAIL: test5\n";
+ }
+ 
+ exit;
+-- 
+1.9.1
+

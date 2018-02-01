@@ -1,7 +1,7 @@
-From 7e11aafc3a7cb873b3f648740c8acd379597e4d1 Mon Sep 17 00:00:00 2001
+From 2727e58d1d269994de17cadb12195001b14585e7 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:48:24 +0000
-Subject: [PATCH 01/25] nativesdk-glibc: Look for host system ld.so.cache as
+Subject: [PATCH 01/26] nativesdk-glibc: Look for host system ld.so.cache as
  well
 
 Upstream-Status: Inappropriate [embedded specific]
@@ -31,10 +31,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index c0d6249..2c73105 100644
+index 51fb0d0..f503dbc 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -2094,6 +2094,14 @@ _dl_map_object (struct link_map *loader, const char *name,
+@@ -2054,6 +2054,14 @@ _dl_map_object (struct link_map *loader, const char *name,
              }
          }
  
@@ -49,7 +49,7 @@ index c0d6249..2c73105 100644
  #ifdef USE_LDCONFIG
        if (fd == -1
  	  && (__glibc_likely ((mode & __RTLD_SECURE) == 0)
-@@ -2152,14 +2160,6 @@ _dl_map_object (struct link_map *loader, const char *name,
+@@ -2112,14 +2120,6 @@ _dl_map_object (struct link_map *loader, const char *name,
  	}
  #endif
  
@@ -65,5 +65,5 @@ index c0d6249..2c73105 100644
        if (__glibc_unlikely (GLRO(dl_debug_mask) & DL_DEBUG_LIBS))
  	_dl_debug_printf ("\n");
 -- 
-2.8.2
+2.10.2
 

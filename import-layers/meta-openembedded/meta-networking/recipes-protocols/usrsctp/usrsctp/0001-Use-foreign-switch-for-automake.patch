@@ -1,0 +1,28 @@
+From 748bc693cf24baf42e459e12f152349e392b6737 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 20 Dec 2016 21:32:11 -0800
+Subject: [PATCH] Use foreign switch for automake
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 64cc9994..19ccd4a3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -29,7 +29,7 @@ dnl SUCH DAMAGE.
+ dnl
+ 
+ AC_INIT([libusrsctp], [0.9.3.0])
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ 
+ AC_PROG_CC
+ AC_PROG_LIBTOOL
+-- 
+2.11.0
+

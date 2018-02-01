@@ -1,0 +1,39 @@
+From a370ccd9447752c555aeca04f64021efedde4db3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 7 Apr 2017 17:16:19 -0700
+Subject: [PATCH] Undefine REGEX for musl based systems
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ GNUmakefile | 1 -
+ Makefile    | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/GNUmakefile b/GNUmakefile
+index 7bf7dca..0e10030 100644
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -41,7 +41,6 @@ endif
+ CC?=		gcc
+ CFLAGS?=	-O2 -pipe
+ CFLAGS+=	-g -Wall
+-CPPFLAGS=	-DREGEX
+ CPPFLAGS+=	-D_GNU_SOURCE
+ CPPFLAGS+=	$(BSD_CPPFLAGS) -D__dead=__dead2
+ LIBS=		$(CURSES_LIBS) $(BSD_LIBS)
+diff --git a/Makefile b/Makefile
+index 94ce340..d516bbc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -10,7 +10,7 @@ DPADD+=	${LIBCURSES} ${LIBUTIL}
+ #	REGEX		-- create regular expression functions.
+ #	STARTUPFILE	-- look for and handle initialization file.
+ #
+-CFLAGS+=-Wall -DREGEX
++CFLAGS+=-Wall
+ 
+ SRCS=	autoexec.c basic.c bell.c buffer.c cinfo.c dir.c display.c \
+ 	echo.c extend.c file.c fileio.c funmap.c help.c kbd.c keymap.c \
+-- 
+2.12.2
+

@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "libcap libpng cairo dbus udev"
 PROVIDES = "virtual/psplash"
-RPROVIDES_${PN} = "virtual/psplash virtual/psplash-support"
+RPROVIDES_${PN} = "virtual-psplash virtual-psplash-support"
 
 SRC_URI = "http://www.freedesktop.org/software/plymouth/releases/${BPN}-${PV}.tar.bz2"
 SRC_URI[md5sum] = "ff420994deb7ea203df678df92e7ab7d"

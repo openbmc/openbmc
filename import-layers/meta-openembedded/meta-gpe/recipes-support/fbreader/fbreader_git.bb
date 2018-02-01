@@ -42,4 +42,4 @@ do_install() {
 }
 
 # http://errors.yoctoproject.org/Errors/Details/68618/
-PNBLACKLIST[fbreader] ?= "BROKEN: fails to build with gcc-6"
+PNBLACKLIST[fbreader] ?= "BROKEN: fails to build with gcc-6 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

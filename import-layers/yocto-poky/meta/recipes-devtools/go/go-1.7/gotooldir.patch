@@ -1,0 +1,30 @@
+Define tooldir in relation to GOTOOLDIR env var
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: go/src/go/build/build.go
+===================================================================
+--- go.orig/src/go/build/build.go
++++ go/src/go/build/build.go
+@@ -1388,7 +1388,7 @@ func init() {
+ }
+ 
+ // ToolDir is the directory containing build tools.
+-var ToolDir = filepath.Join(runtime.GOROOT(), "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
++var ToolDir = envOr("GOTOOLDIR", filepath.Join(runtime.GOROOT(), "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH))
+ 
+ // IsLocalImport reports whether the import path is
+ // a local import path, like ".", "..", "./foo", or "../foo".
+Index: go/src/cmd/go/build.go
+===================================================================
+--- go.orig/src/cmd/go/build.go
++++ go/src/cmd/go/build.go
+@@ -1312,7 +1312,7 @@ func (b *builder) build(a *action) (err
+ 		}
+ 
+ 		cgoExe := tool("cgo")
+-		if a.cgo != nil && a.cgo.target != "" {
++		if a.cgo != nil && a.cgo.target != "" && os.Getenv("GOTOOLDIR") == "" {
+ 			cgoExe = a.cgo.target
+ 		}
+ 		outGo, outObj, err := b.cgo(a.p, cgoExe, obj, pcCFLAGS, pcLDFLAGS, cgofiles, gccfiles, cxxfiles, a.p.MFiles)

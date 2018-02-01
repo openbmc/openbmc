@@ -9,9 +9,7 @@ LICENSE = "GPLv3+"
 
 DEPENDS = "zlib"
 
-SRC_URI = "git://git.samba.org/ccache.git"
-
-S = "${WORKDIR}/git"
+SRC_URI = "https://download.samba.org/pub/${BPN}/${BP}.tar.xz"
 
 inherit autotools
 

@@ -51,8 +51,8 @@ IMAGE_TYPEDEP_hddimg = "ext4"
 IMAGE_TYPES_MASKED += "live hddimg iso"
 
 python() {
-    image_b = d.getVar('IMAGE_BASENAME', True)
-    initrd_i = d.getVar('INITRD_IMAGE_LIVE', True)
+    image_b = d.getVar('IMAGE_BASENAME')
+    initrd_i = d.getVar('INITRD_IMAGE_LIVE')
     if image_b == initrd_i:
         bb.error('INITRD_IMAGE_LIVE %s cannot use image live, hddimg or iso.' % initrd_i)
         bb.fatal('Check IMAGE_FSTYPES and INITRAMFS_FSTYPES settings.')
@@ -264,9 +264,9 @@ build_hddimg() {
 
 python do_bootimg() {
     set_live_vm_vars(d, 'LIVE')
-    if d.getVar("PCBIOS", True) == "1":
+    if d.getVar("PCBIOS") == "1":
         bb.build.exec_func('build_syslinux_cfg', d)
-    if d.getVar("EFI", True) == "1":
+    if d.getVar("EFI") == "1":
         bb.build.exec_func('build_efi_cfg', d)
     bb.build.exec_func('build_hddimg', d)
     bb.build.exec_func('build_iso', d)

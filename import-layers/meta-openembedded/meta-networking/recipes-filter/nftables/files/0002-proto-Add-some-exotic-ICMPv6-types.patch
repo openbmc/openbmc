@@ -1,0 +1,147 @@
+From 9ade8fb75f8963375b45b3f2973b8bb7aa66ad76 Mon Sep 17 00:00:00 2001
+From: Phil Sutter <phil@nwl.cc>
+Date: Thu, 16 Mar 2017 13:43:20 +0100
+Subject: [PATCH] proto: Add some exotic ICMPv6 types
+
+This adds support for matching on inverse ND messages as defined by
+RFC3122 (not implemented in Linux) and MLDv2 as defined by RFC3810.
+
+Note that ICMPV6_MLD2_REPORT macro is defined in linux/icmpv6.h but
+including that header leads to conflicts with symbols defined in
+netinet/icmp6.h.
+
+In addition to the above, "mld-listener-done" is introduced as an alias
+for "mld-listener-reduction".
+
+Signed-off-by: Phil Sutter <phil@nwl.cc>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+Upstream-Status: Backport
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ src/proto.c                       |  8 ++++++++
+ tests/py/ip6/icmpv6.t             |  8 ++++++--
+ tests/py/ip6/icmpv6.t.payload.ip6 | 34 +++++++++++++++++++++++++++++++++-
+ 3 files changed, 47 insertions(+), 3 deletions(-)
+
+diff --git a/src/proto.c b/src/proto.c
+index fb96530..79e9dbf 100644
+--- a/src/proto.c
++++ b/src/proto.c
+@@ -632,6 +632,10 @@ const struct proto_desc proto_ip = {
+ 
+ #include <netinet/icmp6.h>
+ 
++#define IND_NEIGHBOR_SOLICIT	141
++#define IND_NEIGHBOR_ADVERT	142
++#define ICMPV6_MLD2_REPORT	143
++
+ static const struct symbol_table icmp6_type_tbl = {
+ 	.base		= BASE_DECIMAL,
+ 	.symbols	= {
+@@ -643,6 +647,7 @@ static const struct symbol_table icmp6_type_tbl = {
+ 		SYMBOL("echo-reply",			ICMP6_ECHO_REPLY),
+ 		SYMBOL("mld-listener-query",		MLD_LISTENER_QUERY),
+ 		SYMBOL("mld-listener-report",		MLD_LISTENER_REPORT),
++		SYMBOL("mld-listener-done",		MLD_LISTENER_REDUCTION),
+ 		SYMBOL("mld-listener-reduction",	MLD_LISTENER_REDUCTION),
+ 		SYMBOL("nd-router-solicit",		ND_ROUTER_SOLICIT),
+ 		SYMBOL("nd-router-advert",		ND_ROUTER_ADVERT),
+@@ -650,6 +655,9 @@ static const struct symbol_table icmp6_type_tbl = {
+ 		SYMBOL("nd-neighbor-advert",		ND_NEIGHBOR_ADVERT),
+ 		SYMBOL("nd-redirect",			ND_REDIRECT),
+ 		SYMBOL("router-renumbering",		ICMP6_ROUTER_RENUMBERING),
++		SYMBOL("ind-neighbor-solicit",		IND_NEIGHBOR_SOLICIT),
++		SYMBOL("ind-neighbor-advert",		IND_NEIGHBOR_ADVERT),
++		SYMBOL("mld2-listener-report",		ICMPV6_MLD2_REPORT),
+ 		SYMBOL_LIST_END
+ 	},
+ };
+diff --git a/tests/py/ip6/icmpv6.t b/tests/py/ip6/icmpv6.t
+index afbd451..a898fe3 100644
+--- a/tests/py/ip6/icmpv6.t
++++ b/tests/py/ip6/icmpv6.t
+@@ -11,7 +11,8 @@ icmpv6 type echo-request accept;ok
+ icmpv6 type echo-reply accept;ok
+ icmpv6 type mld-listener-query accept;ok
+ icmpv6 type mld-listener-report accept;ok
+-icmpv6 type mld-listener-reduction accept;ok
++icmpv6 type mld-listener-done accept;ok
++icmpv6 type mld-listener-reduction accept;ok;icmpv6 type mld-listener-done accept
+ icmpv6 type nd-router-solicit accept;ok
+ icmpv6 type nd-router-advert accept;ok
+ icmpv6 type nd-neighbor-solicit accept;ok
+@@ -19,8 +20,11 @@ icmpv6 type nd-neighbor-advert accept;ok
+ icmpv6 type nd-redirect accept;ok
+ icmpv6 type parameter-problem accept;ok
+ icmpv6 type router-renumbering accept;ok
++icmpv6 type ind-neighbor-solicit accept;ok
++icmpv6 type ind-neighbor-advert accept;ok
++icmpv6 type mld2-listener-report accept;ok
+ icmpv6 type {destination-unreachable, time-exceeded, nd-router-solicit} accept;ok
+-icmpv6 type {router-renumbering, mld-listener-reduction, time-exceeded, nd-router-solicit} accept;ok
++icmpv6 type {router-renumbering, mld-listener-done, time-exceeded, nd-router-solicit} accept;ok
+ icmpv6 type {mld-listener-query, time-exceeded, nd-router-advert} accept;ok
+ icmpv6 type != {mld-listener-query, time-exceeded, nd-router-advert} accept;ok
+ 
+diff --git a/tests/py/ip6/icmpv6.t.payload.ip6 b/tests/py/ip6/icmpv6.t.payload.ip6
+index 9fe2496..30f58ca 100644
+--- a/tests/py/ip6/icmpv6.t.payload.ip6
++++ b/tests/py/ip6/icmpv6.t.payload.ip6
+@@ -54,6 +54,14 @@ ip6 test-ip6 input
+   [ cmp eq reg 1 0x00000083 ]
+   [ immediate reg 0 accept ]
+ 
++# icmpv6 type mld-listener-done accept
++ip6 test-ip6 input
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000084 ]
++  [ immediate reg 0 accept ]
++
+ # icmpv6 type mld-listener-reduction accept
+ ip6 test-ip6 input
+   [ payload load 1b @ network header + 6 => reg 1 ]
+@@ -118,6 +126,30 @@ ip6 test-ip6 input
+   [ cmp eq reg 1 0x0000008a ]
+   [ immediate reg 0 accept ]
+ 
++# icmpv6 type ind-neighbor-solicit accept
++ip6 test-ip6 input
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x0000008d ]
++  [ immediate reg 0 accept ]
++
++# icmpv6 type ind-neighbor-advert accept
++ip6 test-ip6 input
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x0000008e ]
++  [ immediate reg 0 accept ]
++
++# icmpv6 type mld2-listener-report accept
++ip6 test-ip6 input
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x0000008f ]
++  [ immediate reg 0 accept ]
++
+ # icmpv6 type {destination-unreachable, time-exceeded, nd-router-solicit} accept
+ __set%d test-ip6 3
+ __set%d test-ip6 0
+@@ -129,7 +161,7 @@ ip6 test-ip6 input
+   [ lookup reg 1 set __set%d ]
+   [ immediate reg 0 accept ]
+ 
+-# icmpv6 type {router-renumbering, mld-listener-reduction, time-exceeded, nd-router-solicit} accept
++# icmpv6 type {router-renumbering, mld-listener-done, time-exceeded, nd-router-solicit} accept
+ __set%d test-ip6 3
+ __set%d test-ip6 0
+ 	element 0000008a  : 0 [end]	element 00000084  : 0 [end]	element 00000003  : 0 [end]	element 00000085  : 0 [end]
+-- 
+2.11.0
+

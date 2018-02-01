@@ -19,6 +19,7 @@
 # oe-build-perf-test and archives the results.
 
 script=`basename $0`
+script_dir=$(realpath $(dirname $0))
 archive_dir=~/perf-results/archives
 
 usage () {
@@ -29,29 +30,44 @@ Optional arguments:
   -h                show this help and exit.
   -a ARCHIVE_DIR    archive results tarball here, give an empty string to
                     disable tarball archiving (default: $archive_dir)
-  -c COMMITISH      test (checkout) this commit
+  -c COMMITISH      test (checkout) this commit, <branch>:<commit> can be
+                    specified to test specific commit of certain branch
   -C GIT_REPO       commit results into Git
+  -E EMAIL_ADDR     send email report
+  -P GIT_REMOTE     push results to a remote Git repository
   -w WORK_DIR       work dir for this script
                     (default: GIT_TOP_DIR/build-perf-test)
+  -x                create xml report (instead of json)
 EOF
+}
+
+get_os_release_var () {
+    ( source /etc/os-release; eval echo '$'$1 )
 }
 
 
 # Parse command line arguments
 commitish=""
-while getopts "ha:c:C:w:" opt; do
+oe_build_perf_test_extra_opts=()
+oe_git_archive_extra_opts=()
+while getopts "ha:c:C:E:P:w:x" opt; do
     case $opt in
         h)  usage
             exit 0
             ;;
-        a)  archive_dir=`realpath "$OPTARG"`
+        a)  archive_dir=`realpath -s "$OPTARG"`
             ;;
         c)  commitish=$OPTARG
             ;;
-        C)  results_repo=`realpath "$OPTARG"`
-            commit_results=("--commit-results" "$results_repo")
+        C)  results_repo=`realpath -s "$OPTARG"`
             ;;
-        w)  base_dir=`realpath "$OPTARG"`
+        E)  email_to="$OPTARG"
+            ;;
+        P)  oe_git_archive_extra_opts+=("--push" "$OPTARG")
+            ;;
+        w)  base_dir=`realpath -s "$OPTARG"`
+            ;;
+        x)  oe_build_perf_test_extra_opts+=("--xml")
             ;;
         *)  usage
             exit 1
@@ -67,6 +83,17 @@ if [ $# -ne 0 ]; then
     exit 1
 fi
 
+# Open a file descriptor for flock and acquire lock
+LOCK_FILE="/tmp/oe-build-perf-test-wrapper.lock"
+if ! exec 3> "$LOCK_FILE"; then
+    echo "ERROR: Unable to open lock file"
+    exit 1
+fi
+if ! flock -n 3; then
+    echo "ERROR: Another instance of this script is running"
+    exit 1
+fi
+
 echo "Running on `uname -n`"
 if ! git_topdir=$(git rev-parse --show-toplevel); then
         echo "The current working dir doesn't seem to be a git clone. Please cd there before running `basename $0`"
@@ -76,15 +103,33 @@ fi
 cd "$git_topdir"
 
 if [ -n "$commitish" ]; then
-    # Checkout correct revision
-    echo "Checking out $commitish"
+    echo "Running git fetch"
     git fetch &> /dev/null
     git checkout HEAD^0 &> /dev/null
-    git branch -D $commitish &> /dev/null
-    if ! git checkout -f $commitish &> /dev/null; then
-        echo "Git checkout failed"
+
+    # Handle <branch>:<commit> format
+    if echo "$commitish" | grep -q ":"; then
+        commit=`echo "$commitish" | cut -d":" -f2`
+        branch=`echo "$commitish" | cut -d":" -f1`
+    else
+        commit="$commitish"
+        branch="$commitish"
+    fi
+
+    echo "Checking out $commitish"
+    git branch -D $branch &> /dev/null
+    if ! git checkout -f $branch &> /dev/null; then
+        echo "ERROR: Git checkout failed"
         exit 1
     fi
+
+    # Check that the specified branch really contains the commit
+    commit_hash=`git rev-parse --revs-only $commit --`
+    if [ -z "$commit_hash" -o "`git merge-base $branch $commit`" != "$commit_hash" ]; then
+        echo "ERROR: branch $branch does not contain commit $commit"
+        exit 1
+    fi
+    git reset --hard $commit > /dev/null
 fi
 
 # Setup build environment
@@ -119,10 +164,8 @@ fi
 # Run actual test script
 oe-build-perf-test --out-dir "$results_dir" \
                    --globalres-file "$globalres_log" \
-                   --lock-file "$base_dir/oe-build-perf.lock" \
-                   "${commit_results[@]}" \
-                   --commit-results-branch "{tester_host}/{git_branch}/$machine" \
-                   --commit-results-tag "{tester_host}/{git_branch}/$machine/{git_commit_count}-g{git_commit}/{tag_num}"
+                   "${oe_build_perf_test_extra_opts[@]}" \
+                   --lock-file "$base_dir/oe-build-perf.lock"
 
 case $? in
     1)  echo "ERROR: oe-build-perf-test script failed!"
@@ -131,6 +174,29 @@ case $? in
     2)  echo "NOTE: some tests failed!"
         ;;
 esac
+
+# Commit results to git
+if [ -n "$results_repo" ]; then
+    echo -e "\nArchiving results in $results_repo"
+    oe-git-archive \
+        --git-dir "$results_repo" \
+        --branch-name "{hostname}/{branch}/{machine}" \
+        --tag-name "{hostname}/{branch}/{machine}/{commit_count}-g{commit}/{tag_number}" \
+        --exclude "buildstats.json" \
+        --notes "buildstats/{branch_name}" "$results_dir/buildstats.json" \
+        "${oe_git_archive_extra_opts[@]}" \
+        "$results_dir"
+
+    # Send email report
+    if [ -n "$email_to" ]; then
+        echo -e "\nEmailing test report"
+        os_name=`get_os_release_var PRETTY_NAME`
+        oe-build-perf-report -r "$results_repo" > report.txt
+        oe-build-perf-report -r "$results_repo" --html > report.html
+        "$script_dir"/oe-build-perf-report-email.py --to "$email_to" --subject "Build Perf Test Report for $os_name" --text report.txt --html report.html "${OE_BUILD_PERF_REPORT_EMAIL_EXTRA_ARGS[@]}"
+    fi
+fi
+
 
 echo -ne "\n\n-----------------\n"
 echo "Global results file:"

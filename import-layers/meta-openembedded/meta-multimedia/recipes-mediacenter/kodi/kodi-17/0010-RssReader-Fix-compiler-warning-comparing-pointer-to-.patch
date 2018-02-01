@@ -1,0 +1,40 @@
+From 55233024648b5673dbf223586968e71cc4c70711 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 16 Nov 2016 18:49:36 -0800
+Subject: [PATCH 10/10] RssReader: Fix compiler warning comparing pointer to
+ zero
+
+Clang finds this warning
+RssReader.cpp:272:19: error: ordered comparison between pointer and zero ('TiXmlElement *' and 'int')
+  while (itemNode > 0)
+         ~~~~~~~~ ^ ~
+RssReader.cpp:276:22: error: ordered comparison between pointer and zero ('TiXmlNode *' and 'int')
+    while (childNode > 0)
+           ~~~~~~~~~ ^ ~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ xbmc/utils/RssReader.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/utils/RssReader.cpp b/xbmc/utils/RssReader.cpp
+index 9186f56..2494dc8 100644
+--- a/xbmc/utils/RssReader.cpp
++++ b/xbmc/utils/RssReader.cpp
+@@ -269,11 +269,11 @@ void CRssReader::GetNewsItems(TiXmlElement* channelXmlNode, int iFeed)
+   if (m_tagSet.empty())
+     AddTag("title");
+ 
+-  while (itemNode > 0)
++  while (itemNode != NULL)
+   {
+     TiXmlNode* childNode = itemNode->FirstChild();
+     mTagElements.clear();
+-    while (childNode > 0)
++    while (childNode != NULL)
+     {
+       std::string strName = childNode->ValueStr();
+ 
+-- 
+2.10.2
+

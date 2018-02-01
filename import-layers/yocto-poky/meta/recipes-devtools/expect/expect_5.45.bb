@@ -25,6 +25,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/expect/Expect/${PV}/${BPN}${PV}.tar.gz \
            file://0002-tcl.m4.patch \
            file://01-example-shebang.patch \
            file://0001-expect-install-scripts-without-using-the-fixline1-tc.patch \
+           file://0001-Resolve-string-formatting-issues.patch \
           "
 SRC_URI[md5sum] = "44e1a4f4c877e9ddc5a542dfa7ecc92b"
 SRC_URI[sha256sum] = "b28dca90428a3b30e650525cdc16255d76bb6ccd65d448be53e620d95d5cc040"
@@ -43,11 +44,16 @@ do_install_append() {
         sed -e 's|$dir|${libdir}|' -i ${D}${libdir}/expect${PV}/pkgIndex.tcl
 }
 
+# Apparently the public Tcl headers are only in /usr/include/tcl8.6
+# when building for the target.
+TCL_INCLUDE_PATH = ""
+TCL_INCLUDE_PATH_class-target = "--with-tclinclude=${STAGING_INCDIR}/tcl8.6"
+
 EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
-                 --with-tclinclude=${STAGING_INCDIR}/tcl8.6 \
                  --enable-shared \
                  --enable-threads \
                  --disable-rpath \
+                 ${TCL_INCLUDE_PATH} \
                 "
 EXTRA_OEMAKE_install = " 'SCRIPTS=' "
 
@@ -62,3 +68,5 @@ FILES_${PN}-dev = "${libdir_native}/expect${PV}/libexpect*.so \
 FILES_${PN} += "${libdir}/libexpect${PV}.so \
                 ${libdir}/expect${PV}/* \
                "
+
+BBCLASSEXTEND = "native nativesdk"

@@ -42,3 +42,5 @@ do_install() {
 
 SRC_URI[md5sum] = "da9ec4721efdb0ec0aaa182bff16ad82"
 SRC_URI[sha256sum] = "328aec454db80e225aa0b5c31adef74bf62a14357482947e87e9731686b3c624"
+
+PNBLACKLIST[fbreader] ?= "Depends on blacklisted libgpewidget - the recipe will be removed on 2017-09-01 unless the issue is fixed"

@@ -203,6 +203,75 @@ linux/arch/powerpc/boot/dts/mpc8315erdb.dts within the kernel source). If
 you have left them at the factory default then you shouldn't need to do
 anything here.
 
+Note: To boot from USB disk you need u-boot that supports 'ext2load usb'
+command. You need to setup TFTP server, load u-boot from there and
+flash it to NOR flash.
+
+Beware! Flashing bootloader is potentially dangerous operation that can
+brick your device if done incorrectly. Please, make sure you understand
+what below commands mean before executing them.
+
+Load the new u-boot.bin from TFTP server to memory address 200000
+=> tftp 200000 u-boot.bin
+
+Disable flash protection
+=> protect off all
+
+Erase the old u-boot from fe000000 to fe06ffff in NOR flash.
+The size is 0x70000 (458752 bytes)
+=> erase fe000000 fe06ffff
+
+Copy the new u-boot from address 200000 to fe000000
+the size is 0x70000. It has to be greater or equal to u-boot.bin size
+=> cp.b 200000 fe000000 70000
+
+Enable flash protection again
+=> protect on all
+
+Reset the board
+=> reset
+
+--- Booting from USB disk ---
+
+ 1. Flash partitioned image to the USB disk
+
+    # dd if=core-image-minimal-mpc8315e-rdb.wic of=/dev/sdb
+
+ 2. Plug USB disk into the MPC8315 board
+
+ 3. Connect the board's first serial port to your workstation and then start up
+    your favourite serial terminal so that you will be able to interact with
+    the serial console. If you don't have a favourite, picocom is suggested:
+
+  $ picocom /dev/ttyUSB0 -b 115200
+
+ 4. Power up or reset the board and press a key on the terminal when prompted
+    to get to the U-Boot command line
+
+ 5. Optional. Load the u-boot.bin from the USB disk:
+
+ => usb start
+ => ext2load usb 0:1 200000 u-boot.bin
+
+    and flash it to NOR flash as described above.
+
+ 6. Set fdtaddr and loadaddr. This is not necessary if you set them before.
+
+ => setenv fdtaddr a00000
+ => setenv loadaddr 1000000
+
+ 7. Load the kernel and dtb from first partition of the USB disk:
+
+ => usb start
+ => ext2load usb 0:1 $loadaddr uImage
+ => ext2load usb 0:1 $fdtaddr dtb
+
+ 8. Set bootargs and boot up the device
+
+ => setenv bootargs root=/dev/sdb2 rw rootwait console=ttyS0,115200
+ => bootm $loadaddr - $fdtaddr
+
+
 --- Booting from NFS root ---
 
 Load the kernel and dtb (device tree blob), and boot the system as follows:
@@ -317,7 +386,7 @@ Steps:
 
  2. Flash the image.
 
-    # dd core-image-minimal-edgerouter.wic of=/dev/sdb
+    # dd if=core-image-minimal-edgerouter.wic of=/dev/sdb
 
  3. Insert USB disk into the edgerouter and boot it.
 

@@ -1,0 +1,31 @@
+From 218e0702d6ce4d2cb20d5d108daa16afca2b7c41 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 16 Dec 2016 13:22:51 +0100
+Subject: [PATCH] replace missing AM_PATH_AUDIOFILE by PKG_CHECK_MODULES(
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstrem-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 486c492..dccfd1b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -353,7 +353,7 @@ echo "---------------------------------------------------------------------"
+ echo "--- Checking for the audiofile library.  NOTE: This library is now"
+ echo "--- REQUIRED from proper compilation of the esound package."
+ 
+-AM_PATH_AUDIOFILE(0.1.5, [
++PKG_CHECK_MODULES(AUDIOFILE, audiofile, [
+ 
+ build_esdplay=true
+ echo "--- libaudiofile found. Building esound with audiofile support"
+-- 
+2.7.4
+

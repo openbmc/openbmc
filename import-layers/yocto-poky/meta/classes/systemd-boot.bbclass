@@ -4,9 +4,7 @@
 
 # systemd-boot.bbclass - The "systemd-boot" is essentially the gummiboot merged into systemd.
 #                        The original standalone gummiboot project is dead without any more
-#                        maintenance. As a start point, we replace all gummitboot occurrences
-#                        with systemd-boot in gummiboot.bbclass to have a base version of this
-#                        systemd-boot.bbclass.
+#                        maintenance.
 #
 # Set EFI_PROVIDER = "systemd-boot" to use systemd-boot on your live images instead of grub-efi
 # (images built by image-live.bbclass or image-vm.bbclass)
@@ -39,6 +37,8 @@ efi_populate() {
         install -d ${DEST}/loader
         install -d ${DEST}/loader/entries
         install -m 0644 ${DEPLOY_DIR_IMAGE}/${EFI_IMAGE} ${DEST}${EFIDIR}/${DEST_EFI_IMAGE}
+        EFIPATH=$(echo "${EFIDIR}" | sed 's/\//\\/g')
+        printf 'fs0:%s\%s\n' "$EFIPATH" "$DEST_EFI_IMAGE" >${DEST}/startup.nsh
         install -m 0644 ${SYSTEMD_BOOT_CFG} ${DEST}/loader/loader.conf
         for i in ${SYSTEMD_BOOT_ENTRIES}; do
             install -m 0644 ${i} ${DEST}/loader/entries
@@ -50,6 +50,7 @@ efi_iso_populate() {
         efi_populate $iso_dir
         mkdir -p ${EFIIMGDIR}/${EFIDIR}
         cp $iso_dir/${EFIDIR}/* ${EFIIMGDIR}${EFIDIR}
+        cp -r $iso_dir/loader ${EFIIMGDIR}
         cp $iso_dir/vmlinuz ${EFIIMGDIR}
         EFIPATH=$(echo "${EFIDIR}" | sed 's/\//\\/g')
         echo "fs0:${EFIPATH}\\${DEST_EFI_IMAGE}" > ${EFIIMGDIR}/startup.nsh
@@ -63,8 +64,8 @@ efi_hddimg_populate() {
 }
 
 python build_efi_cfg() {
-    s = d.getVar("S", True)
-    labels = d.getVar('LABELS', True)
+    s = d.getVar("S")
+    labels = d.getVar('LABELS')
     if not labels:
         bb.debug(1, "LABELS not defined, nothing to do")
         return
@@ -73,7 +74,10 @@ python build_efi_cfg() {
         bb.debug(1, "No labels, nothing to do")
         return
 
-    cfile = d.getVar('SYSTEMD_BOOT_CFG', True)
+    cfile = d.getVar('SYSTEMD_BOOT_CFG')
+    cdir = os.path.dirname(cfile)
+    if not os.path.exists(cdir):
+        os.makedirs(cdir)
     try:
          cfgfile = open(cfile, 'w')
     except OSError:
@@ -81,7 +85,7 @@ python build_efi_cfg() {
 
     cfgfile.write('# Automatically created by OE\n')
     cfgfile.write('default %s\n' % (labels.split()[0]))
-    timeout = d.getVar('SYSTEMD_BOOT_TIMEOUT', True)
+    timeout = d.getVar('SYSTEMD_BOOT_TIMEOUT')
     if timeout:
         cfgfile.write('timeout %s\n' % timeout)
     else:
@@ -91,7 +95,7 @@ python build_efi_cfg() {
     for label in labels.split():
         localdata = d.createCopy()
 
-        overrides = localdata.getVar('OVERRIDES', True)
+        overrides = localdata.getVar('OVERRIDES')
         if not overrides:
             bb.fatal('OVERRIDES not defined')
 
@@ -102,13 +106,12 @@ python build_efi_cfg() {
         except OSError:
             bb.fatal('Unable to open %s' % entryfile)
         localdata.setVar('OVERRIDES', label + ':' + overrides)
-        bb.data.update_data(localdata)
 
         entrycfg.write('title %s\n' % label)
         entrycfg.write('linux /vmlinuz\n')
 
-        append = localdata.getVar('APPEND', True)
-        initrd = localdata.getVar('INITRD', True)
+        append = localdata.getVar('APPEND')
+        initrd = localdata.getVar('INITRD')
 
         if initrd:
             entrycfg.write('initrd /initrd\n')

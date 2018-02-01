@@ -24,7 +24,7 @@
     </script>
     <script src="{% static 'js/jsrender.min.js' %}">
     </script>
-    <script src="{% static 'js/prettify.js' %}">
+    <script src="{% static 'js/highlight.pack.js' %}">
     </script>
     <script src="{% static 'js/libtoaster.js' %}">
     </script>
@@ -100,7 +100,8 @@
         <div class="collapse navbar-collapse" id="global-nav">
             <ul class="nav navbar-nav">
             {% if request.resolver_match.url_name != 'landing' and request.resolver_match.url_name != 'newproject' %}
-              <li {% if request.resolver_match.url_name == 'all-builds' %}
+              <li id="navbar-all-builds"
+              {% if request.resolver_match.url_name == 'all-builds' %}
               class="active"
               {% endif %}>
               <a href="{% url 'all-builds' %}">
@@ -108,7 +109,8 @@
                 All builds
               </a>
               </li>
-              <li {% if request.resolver_match.url_name == 'all-projects'  %}
+              <li id="navbar-all-projects"
+              {% if request.resolver_match.url_name == 'all-projects'  %}
               class="active"
               {% endif %}>
               <a href="{% url 'all-projects' %}">
@@ -117,7 +119,7 @@
               </a>
               </li>
             {% endif %}
-              <li>
+              <li id="navbar-docs">
               <a target="_blank" href="http://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html">
                 <i class="glyphicon glyphicon-book"></i>
                 Documentation

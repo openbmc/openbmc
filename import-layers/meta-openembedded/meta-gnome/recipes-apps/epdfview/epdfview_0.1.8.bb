@@ -20,6 +20,6 @@ SRC_URI = "http://www.emma-soft.com/projects/${BPN}/chrome/site/releases/${BP}.t
 SRC_URI[md5sum] = "e50285b01612169b2594fea375f53ae4"
 SRC_URI[sha256sum] = "948648ae7c9d7b3b408d738bd4f48d87375b1196cae1129d6b846a8de0f2f8f0"
 
-PNBLACKLIST[epdfview] ?= "BROKEN: images are not displayed anymore"
+PNBLACKLIST[epdfview] ?= "BROKEN: images are not displayed anymore - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 # There will be no further development / upstream is gone [1]
 # [1] https://bugzilla.redhat.com/show_bug.cgi?id=906121

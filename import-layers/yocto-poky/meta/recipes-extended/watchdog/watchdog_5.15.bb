@@ -52,8 +52,9 @@ FILES_${PN}-keepalive = " \
     ${sbindir}/wd_keepalive \
 "
 
-RDEPENDS_${PN} += "${PN}-config ${PN}-keepalive"
+RDEPENDS_${PN} += "${PN}-config"
+RRECOMMENDS_${PN} += "kernel-module-softdog"
+
 RDEPENDS_${PN}-keepalive += "${PN}-config"
-
-RRECOMMENDS_${PN} = "kernel-module-softdog"
-
+RCONFLICTS_${PN}-keepalive += "${PN}"
+RRECOMMENDS_${PN}-keepalive += "kernel-module-softdog"

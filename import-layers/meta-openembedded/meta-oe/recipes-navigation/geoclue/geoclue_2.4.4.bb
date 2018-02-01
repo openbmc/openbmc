@@ -8,7 +8,7 @@ SECTION = "console/network"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=8114b83a0435d8136b47bd70111ce5cd"
 
-DEPENDS = "glib-2.0 dbus json-glib libsoup-2.4 intltool-native"
+DEPENDS = "glib-2.0 dbus json-glib libsoup-2.4 intltool-native gobject-introspection-native"
 
 inherit autotools pkgconfig gtk-doc
 

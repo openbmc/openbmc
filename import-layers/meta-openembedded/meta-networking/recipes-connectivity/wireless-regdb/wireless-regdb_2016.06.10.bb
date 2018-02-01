@@ -12,7 +12,9 @@ inherit bin_package
 
 do_install() {
     install -d -m0755 ${D}${libdir}/crda
+    install -d -m0755 ${D}${sysconfdir}/wireless-regdb/pubkeys
     install -m 0644 regulatory.bin ${D}${libdir}/crda/regulatory.bin
+    install -m 0644 sforshee.key.pub.pem ${D}${sysconfdir}/wireless-regdb/pubkeys/sforshee.key.pub.pem
 }
 
 RSUGGESTS_${PN} = "crda"

@@ -1,0 +1,29 @@
+From abfeb0cf4e3261a66a7a23abc9aed33c034c850d Mon Sep 17 00:00:00 2001
+From: Joshua Watt <Joshua.Watt@garmin.com>
+Date: Wed, 6 Dec 2017 13:26:19 -0600
+Subject: [PATCH] Include locale_t.h compatibility header
+
+Newer versions of glibc (since 2.26) moved the locale typedefs from
+xlocale.h to bits/types/locale_t.h. Create a compatibility header for
+these newer versions of glibc
+
+See f0be25b6336db7492e47d2e8e72eb8af53b5506d in glibc
+
+Upstream-Status: Inappropriate compatibility with newer host glibc
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+
+---
+ locale/bits/types/locale_t.h | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 locale/bits/types/locale_t.h
+
+diff --git a/locale/bits/types/locale_t.h b/locale/bits/types/locale_t.h
+new file mode 100644
+index 0000000000..b519a6c5f8
+--- /dev/null
++++ b/locale/bits/types/locale_t.h
+@@ -0,0 +1 @@
++#include <xlocale.h>
+-- 
+2.14.3
+

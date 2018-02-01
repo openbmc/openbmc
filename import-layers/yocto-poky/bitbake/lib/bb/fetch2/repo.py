@@ -25,7 +25,6 @@ BitBake "Fetch" repo (git) implementation
 
 import os
 import bb
-from   bb    import data
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import runfetchcmd
 
@@ -51,17 +50,17 @@ class Repo(FetchMethod):
         if not ud.manifest.endswith('.xml'):
             ud.manifest += '.xml'
 
-        ud.localfile = data.expand("repo_%s%s_%s_%s.tar.gz" % (ud.host, ud.path.replace("/", "."), ud.manifest, ud.branch), d)
+        ud.localfile = d.expand("repo_%s%s_%s_%s.tar.gz" % (ud.host, ud.path.replace("/", "."), ud.manifest, ud.branch))
 
     def download(self, ud, d):
         """Fetch url"""
 
-        if os.access(os.path.join(data.getVar("DL_DIR", d, True), ud.localfile), os.R_OK):
+        if os.access(os.path.join(d.getVar("DL_DIR"), ud.localfile), os.R_OK):
             logger.debug(1, "%s already exists (or was stashed). Skipping repo init / sync.", ud.localpath)
             return
 
         gitsrcname = "%s%s" % (ud.host, ud.path.replace("/", "."))
-        repodir = data.getVar("REPODIR", d, True) or os.path.join(data.getVar("DL_DIR", d, True), "repo")
+        repodir = d.getVar("REPODIR") or os.path.join(d.getVar("DL_DIR"), "repo")
         codir = os.path.join(repodir, gitsrcname, ud.manifest)
 
         if ud.user:

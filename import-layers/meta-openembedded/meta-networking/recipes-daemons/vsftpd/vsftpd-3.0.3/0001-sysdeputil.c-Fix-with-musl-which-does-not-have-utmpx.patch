@@ -1,0 +1,28 @@
+From e55135c2a4ea7eae3cb1f4dccf69ca477ea095bf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Mar 2017 20:09:12 -0700
+Subject: [PATCH] sysdeputil.c: Fix with musl which does not have utmpx
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeputil.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/sysdeputil.c b/sysdeputil.c
+index 06f01f4..a8cff3b 100644
+--- a/sysdeputil.c
++++ b/sysdeputil.c
+@@ -58,7 +58,9 @@
+ #define VSF_SYSDEP_HAVE_SHADOW
+ #define VSF_SYSDEP_HAVE_USERSHELL
+ #define VSF_SYSDEP_HAVE_LIBCAP
+-#define VSF_SYSDEP_HAVE_UTMPX
++#if defined(__GLIBC__)
++  #define VSF_SYSDEP_HAVE_UTMPX
++#endif
+ 
+ #define __USE_GNU
+ #include <utmpx.h>
+-- 
+2.12.1
+

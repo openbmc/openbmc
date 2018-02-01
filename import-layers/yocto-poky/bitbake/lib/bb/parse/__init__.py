@@ -123,7 +123,7 @@ def init_parser(d):
 
 def resolve_file(fn, d):
     if not os.path.isabs(fn):
-        bbpath = d.getVar("BBPATH", True)
+        bbpath = d.getVar("BBPATH")
         newfn, attempts = bb.utils.which(bbpath, fn, history=True)
         for af in attempts:
             mark_dependency(d, af)

@@ -1,0 +1,427 @@
+From 06a8224c99282ac1a606edd9e8ea3f591112942d Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Thu, 18 Feb 2016 14:04:31 +0100
+Subject: [PATCH] Update to p8-platform
+
+---
+ CMakeLists.txt                         |  6 +++---
+ pvr.hts/changelog.txt                  |  4 ++--
+ src/AutoRecordings.cpp                 |  2 +-
+ src/HTSPConnection.cpp                 |  8 +++----
+ src/HTSPDemuxer.cpp                    |  2 +-
+ src/HTSPVFS.cpp                        |  6 +++---
+ src/TimeRecordings.cpp                 |  2 +-
+ src/Tvheadend.cpp                      |  4 ++--
+ src/Tvheadend.h                        | 38 +++++++++++++++++-----------------
+ src/client.cpp                         |  4 ++--
+ src/client.h                           |  4 ++--
+ src/tvheadend/Subscription.cpp         |  2 +-
+ src/tvheadend/Subscription.h           |  4 ++--
+ src/tvheadend/utilities/AsyncState.cpp |  4 ++--
+ src/tvheadend/utilities/AsyncState.h   |  6 +++---
+ 15 files changed, 48 insertions(+), 48 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0842682..cb04942 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -6,10 +6,10 @@ enable_language(CXX)
+ 
+ find_package(kodi REQUIRED)
+ find_package(kodiplatform REQUIRED)
+-find_package(platform REQUIRED)
++find_package(p8-platform REQUIRED)
+ 
+ include_directories(${kodiplatform_INCLUDE_DIRS}
+-                    ${platform_INCLUDE_DIRS}
++                    ${p8-platform_INCLUDE_DIRS}
+                     ${KODI_INCLUDE_DIR}
+                     ${PROJECT_SOURCE_DIR}/lib)
+ 
+@@ -95,7 +95,7 @@ list(APPEND HTS_SOURCES
+ 
+ add_subdirectory(lib/libhts)
+ 
+-set(DEPLIBS ${platform_LIBRARIES} hts)
++set(DEPLIBS ${p8-platform_LIBRARIES} hts)
+ if(WIN32)
+   list(APPEND DEPLIBS ws2_32)
+ endif()
+diff --git a/pvr.hts/changelog.txt b/pvr.hts/changelog.txt
+index 9ffa33c..1e7fe30 100644
+--- a/pvr.hts/changelog.txt
++++ b/pvr.hts/changelog.txt
+@@ -49,7 +49,7 @@
+ - fixed: Autorec: Start and stop time handling.
+ - fixed: LocaltimeToUTC conversion (timer settings clock display incorrect).
+ - fixed: Several issues with predictive tuning.
+-- added: build: Automatically fill in platform and library name.
++- added: build: Automatically fill in p8-platform and library name.
+ - fixed: Use epg data only for creation of epg-based timers.
+ - improved: Do not try to reconnect to tvh while suspending or not fully awake again.
+ 
+@@ -97,7 +97,7 @@
+ - added: support for creating repeating timers, aka time schedules
+ - fixed: conditions for addon restart after settings changes
+ - internal: fixed build system regressions introduced with move to cmake
+-- internal: updated to use libplatform
++- internal: updated to use libp8-platform
+ 
+ 2.1.7
+ - added: support for radio channel groups
+diff --git a/src/AutoRecordings.cpp b/src/AutoRecordings.cpp
+index 5fa60a0..d9e5e1d 100644
+--- a/src/AutoRecordings.cpp
++++ b/src/AutoRecordings.cpp
+@@ -26,7 +26,7 @@
+ #include "tvheadend/utilities/Utilities.h"
+ #include "tvheadend/utilities/Logger.h"
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ using namespace tvheadend;
+ using namespace tvheadend::entity;
+ using namespace tvheadend::utilities;
+diff --git a/src/HTSPConnection.cpp b/src/HTSPConnection.cpp
+index aec1296..86f5004 100644
+--- a/src/HTSPConnection.cpp
++++ b/src/HTSPConnection.cpp
+@@ -19,9 +19,9 @@
+  *
+  */
+ 
+-#include "platform/threads/mutex.h"
+-#include "platform/util/StringUtils.h"
+-#include "platform/sockets/tcp.h"
++#include "p8-platform/threads/mutex.h"
++#include "p8-platform/util/StringUtils.h"
++#include "p8-platform/sockets/tcp.h"
+ 
+ extern "C" {
+ #include "libhts/htsmsg_binary.h"
+@@ -33,7 +33,7 @@ extern "C" {
+ 
+ using namespace std;
+ using namespace ADDON;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ using namespace tvheadend;
+ using namespace tvheadend::utilities;
+ 
+diff --git a/src/HTSPDemuxer.cpp b/src/HTSPDemuxer.cpp
+index a6e1f12..7f45345 100644
+--- a/src/HTSPDemuxer.cpp
++++ b/src/HTSPDemuxer.cpp
+@@ -27,7 +27,7 @@
+ 
+ using namespace std;
+ using namespace ADDON;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ using namespace tvheadend;
+ using namespace tvheadend::utilities;
+ 
+diff --git a/src/HTSPVFS.cpp b/src/HTSPVFS.cpp
+index 0463f56..0404bab 100644
+--- a/src/HTSPVFS.cpp
++++ b/src/HTSPVFS.cpp
+@@ -19,8 +19,8 @@
+  *
+  */
+ 
+-#include "platform/threads/mutex.h"
+-#include "platform/util/StringUtils.h"
++#include "p8-platform/threads/mutex.h"
++#include "p8-platform/util/StringUtils.h"
+ #include "tvheadend/utilities/Logger.h"
+ 
+ extern "C" {
+@@ -30,7 +30,7 @@ extern "C" {
+ #include "Tvheadend.h"
+ 
+ using namespace std;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ using namespace tvheadend::utilities;
+ 
+ /*
+diff --git a/src/TimeRecordings.cpp b/src/TimeRecordings.cpp
+index 5d34938..97aae09 100644
+--- a/src/TimeRecordings.cpp
++++ b/src/TimeRecordings.cpp
+@@ -25,7 +25,7 @@
+ #include "tvheadend/utilities/Utilities.h"
+ #include "tvheadend/utilities/Logger.h"
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ using namespace tvheadend;
+ using namespace tvheadend::entity;
+ using namespace tvheadend::utilities;
+diff --git a/src/Tvheadend.cpp b/src/Tvheadend.cpp
+index 2057241..14c3bd4 100644
+--- a/src/Tvheadend.cpp
++++ b/src/Tvheadend.cpp
+@@ -23,7 +23,7 @@
+ #include <ctime>
+ #include <memory>
+ 
+-#include "platform/util/StringUtils.h"
++#include "p8-platform/util/StringUtils.h"
+ 
+ #include "Tvheadend.h"
+ #include "tvheadend/utilities/Utilities.h"
+@@ -31,7 +31,7 @@
+ 
+ using namespace std;
+ using namespace ADDON;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ using namespace tvheadend;
+ using namespace tvheadend::entity;
+ using namespace tvheadend::utilities;
+diff --git a/src/Tvheadend.h b/src/Tvheadend.h
+index 2ce4552..e794716 100644
+--- a/src/Tvheadend.h
++++ b/src/Tvheadend.h
+@@ -22,10 +22,10 @@
+  */
+ 
+ #include "client.h"
+-#include "platform/sockets/tcp.h"
+-#include "platform/threads/threads.h"
+-#include "platform/threads/mutex.h"
+-#include "platform/util/buffer.h"
++#include "p8-platform/sockets/tcp.h"
++#include "p8-platform/threads/threads.h"
++#include "p8-platform/threads/mutex.h"
++#include "p8-platform/util/buffer.h"
+ #include "kodi/xbmc_codec_types.h"
+ #include "kodi/xbmc_stream_utils.hpp"
+ #include "kodi/libXBMC_addon.h"
+@@ -88,7 +88,7 @@ class CHTSPMessage;
+ 
+ /* Typedefs */
+ typedef std::map<uint32_t,CHTSPResponse*> CHTSPResponseList;
+-typedef PLATFORM::SyncedBuffer<CHTSPMessage> CHTSPMessageQueue;
++typedef P8PLATFORM::SyncedBuffer<CHTSPMessage> CHTSPMessageQueue;
+ 
+ /*
+  * HTSP Response handler
+@@ -98,10 +98,10 @@ class CHTSPResponse
+ public:
+   CHTSPResponse();
+   ~CHTSPResponse();
+-  htsmsg_t *Get ( PLATFORM::CMutex &mutex, uint32_t timeout );
++  htsmsg_t *Get ( P8PLATFORM::CMutex &mutex, uint32_t timeout );
+   void      Set ( htsmsg_t *m );
+ private:
+-  PLATFORM::CCondition<volatile bool> m_cond;
++  P8PLATFORM::CCondition<volatile bool> m_cond;
+   bool                                m_flag;
+   htsmsg_t                           *m_msg;
+ };
+@@ -146,7 +146,7 @@ public:
+  * HTSP Connection registration thread
+  */
+ class CHTSPRegister
+-  : public PLATFORM::CThread
++  : public P8PLATFORM::CThread
+ {
+   friend class CHTSPConnection;
+ 
+@@ -163,7 +163,7 @@ private:
+  * HTSP Connection
+  */
+ class CHTSPConnection
+-  : public PLATFORM::CThread
++  : public P8PLATFORM::CThread
+ {
+   friend class CHTSPRegister;
+ 
+@@ -190,7 +190,7 @@ public:
+   inline bool IsConnected       ( void ) const { return m_ready; }
+   bool        WaitForConnection ( void );
+ 
+-  inline PLATFORM::CMutex& Mutex ( void ) { return m_mutex; }
++  inline P8PLATFORM::CMutex& Mutex ( void ) { return m_mutex; }
+ 
+   void        OnSleep ( void );
+   void        OnWake  ( void );
+@@ -202,10 +202,10 @@ private:
+   bool        SendHello        ( void );
+   bool        SendAuth         ( const std::string &u, const std::string &p );
+ 
+-  PLATFORM::CTcpSocket               *m_socket;
+-  PLATFORM::CMutex                    m_mutex;
++  P8PLATFORM::CTcpSocket               *m_socket;
++  P8PLATFORM::CMutex                    m_mutex;
+   CHTSPRegister                       m_regThread;
+-  PLATFORM::CCondition<volatile bool> m_regCond;
++  P8PLATFORM::CCondition<volatile bool> m_regCond;
+   bool                                m_ready;
+   uint32_t                            m_seq;
+   std::string                         m_serverName;
+@@ -273,13 +273,13 @@ public:
+   void SetStreamingProfile(const std::string &profile);
+ 
+ private:
+-  PLATFORM::CMutex                        m_mutex;
++  P8PLATFORM::CMutex                        m_mutex;
+   CHTSPConnection                        &m_conn;
+-  PLATFORM::SyncedBuffer<DemuxPacket*>    m_pktBuffer;
++  P8PLATFORM::SyncedBuffer<DemuxPacket*>    m_pktBuffer;
+   ADDON::XbmcStreamProperties             m_streams;
+   std::map<int,int>                       m_streamStat;
+   int64_t                                 m_seekTime;
+-  PLATFORM::CCondition<volatile int64_t>  m_seekCond;
++  P8PLATFORM::CCondition<volatile int64_t>  m_seekCond;
+   bool                                    m_seeking;
+   bool                                    m_speedChange;
+   tvheadend::status::SourceInfo           m_sourceInfo;
+@@ -350,7 +350,7 @@ private:
+  * Root object for Tvheadend connection
+  */
+ class CTvheadend
+-  : public PLATFORM::CThread
++  : public P8PLATFORM::CThread
+ {
+ public:
+   CTvheadend();
+@@ -422,7 +422,7 @@ private:
+    */
+   tvheadend::Profiles         m_profiles;
+ 
+-  PLATFORM::CMutex            m_mutex;
++  P8PLATFORM::CMutex            m_mutex;
+ 
+   CHTSPConnection             m_conn;
+ 
+@@ -519,7 +519,7 @@ public:
+    */
+   bool WaitForConnection ( void )
+   {
+-    PLATFORM::CLockObject lock(m_conn.Mutex());
++    P8PLATFORM::CLockObject lock(m_conn.Mutex());
+     return m_conn.WaitForConnection();
+   }
+   std::string GetServerName    ( void )
+diff --git a/src/client.cpp b/src/client.cpp
+index 94d2db9..3295914 100644
+--- a/src/client.cpp
++++ b/src/client.cpp
+@@ -22,14 +22,14 @@
+ #include "client.h"
+ #include "kodi/xbmc_pvr_dll.h"
+ #include "kodi/libKODI_guilib.h"
+-#include "platform/util/util.h"
++#include "p8-platform/util/util.h"
+ #include "Tvheadend.h"
+ #include "tvheadend/Settings.h"
+ #include "tvheadend/utilities/Logger.h"
+ 
+ using namespace std;
+ using namespace ADDON;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ using namespace tvheadend;
+ using namespace tvheadend::utilities;
+ 
+diff --git a/src/client.h b/src/client.h
+index 3a5f950..a10659b 100644
+--- a/src/client.h
++++ b/src/client.h
+@@ -20,8 +20,8 @@
+  *
+  */
+ 
+-#include "platform/os.h"
+-#include "platform/threads/mutex.h"
++#include "p8-platform/os.h"
++#include "p8-platform/threads/mutex.h"
+ #include "kodi/libXBMC_addon.h"
+ #include "kodi/libXBMC_pvr.h"
+ #include "kodi/libXBMC_codec.h"
+diff --git a/src/tvheadend/Subscription.cpp b/src/tvheadend/Subscription.cpp
+index 182ca7f..e18af1e 100644
+--- a/src/tvheadend/Subscription.cpp
++++ b/src/tvheadend/Subscription.cpp
+@@ -23,7 +23,7 @@
+ #include "utilities/Logger.h"
+ #include "../Tvheadend.h"
+ 
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ using namespace tvheadend;
+ using namespace tvheadend::utilities;
+ 
+diff --git a/src/tvheadend/Subscription.h b/src/tvheadend/Subscription.h
+index b03bcce..363e5ef 100644
+--- a/src/tvheadend/Subscription.h
++++ b/src/tvheadend/Subscription.h
+@@ -22,7 +22,7 @@
+  */
+ 
+ #include <string>
+-#include "platform/threads/mutex.h"
++#include "p8-platform/threads/mutex.h"
+ 
+ extern "C"
+ {
+@@ -146,6 +146,6 @@ namespace tvheadend
+     std::string       m_profile;
+     CHTSPConnection   &m_conn;
+ 
+-    mutable PLATFORM::CMutex  m_mutex;
++    mutable P8PLATFORM::CMutex  m_mutex;
+   };
+ }
+diff --git a/src/tvheadend/utilities/AsyncState.cpp b/src/tvheadend/utilities/AsyncState.cpp
+index 0c30a93..1f4fdf3 100644
+--- a/src/tvheadend/utilities/AsyncState.cpp
++++ b/src/tvheadend/utilities/AsyncState.cpp
+@@ -22,7 +22,7 @@
+ #include "AsyncState.h"
+ 
+ using namespace tvheadend::utilities;
+-using namespace PLATFORM;
++using namespace P8PLATFORM;
+ 
+ struct Param {
+   eAsyncState state;
+@@ -37,7 +37,7 @@ AsyncState::AsyncState(int timeout)
+ 
+ eAsyncState AsyncState::GetState()
+ {
+-  PLATFORM::CLockObject lock(m_mutex);
++  P8PLATFORM::CLockObject lock(m_mutex);
+   return m_state;
+ }
+ 
+diff --git a/src/tvheadend/utilities/AsyncState.h b/src/tvheadend/utilities/AsyncState.h
+index 1d672da..0819cd8 100644
+--- a/src/tvheadend/utilities/AsyncState.h
++++ b/src/tvheadend/utilities/AsyncState.h
+@@ -22,7 +22,7 @@
+ #ifndef ASYNCSTATE_H
+ #define	ASYNCSTATE_H
+ 
+-#include "platform/threads/mutex.h"
++#include "p8-platform/threads/mutex.h"
+ 
+ namespace tvheadend {
+   namespace utilities {
+@@ -75,8 +75,8 @@ namespace tvheadend {
+       static bool PredicateCallback ( void *param );
+ 
+       eAsyncState m_state;
+-      PLATFORM::CMutex m_mutex;
+-      PLATFORM::CCondition<bool> m_condition;
++      P8PLATFORM::CMutex m_mutex;
++      P8PLATFORM::CCondition<bool> m_condition;
+       int m_timeout;
+ 
+     };
+-- 
+2.0.1
+

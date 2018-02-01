@@ -1,0 +1,25 @@
+From a91a3ba229dc5903935f7dd98dd03bbb4fe5ac1f Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Sat, 6 Feb 2016 15:43:01 +0100
+Subject: [PATCH 03/10] configure: don't try to run stuff to find tinyxml
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 34fe643..3132dc1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1043,7 +1043,7 @@ fi
+ AC_LANG_PUSH([C++])
+ PKG_CHECK_MODULES([TINYXML], [tinyxml >= 2.6.2],
+   [INCLUDES="$INCLUDES $TINYXML_CFLAGS"; LIBS="$LIBS $TINYXML_LIBS"],
+-  [AC_RUN_IFELSE(
++  [AC_COMPILE_IFELSE(
+    [AC_LANG_SOURCE([[
+ #include <stdlib.h>
+ #include <tinyxml.h>
+-- 
+2.10.2
+

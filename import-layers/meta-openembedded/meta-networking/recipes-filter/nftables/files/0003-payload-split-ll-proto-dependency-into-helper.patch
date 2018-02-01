@@ -1,0 +1,62 @@
+From 8d8cfe5ad6ca460a5262fb15fdbef3601058c784 Mon Sep 17 00:00:00 2001
+From: Florian Westphal <fw@strlen.de>
+Date: Thu, 18 May 2017 13:30:54 +0200
+Subject: [PATCH 1/4] payload: split ll proto dependency into helper
+
+will be re-used in folloup patch for icmp/icmpv6 depenency
+handling.
+
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+Upstream-Status: Backport
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ src/payload.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
+
+diff --git a/src/payload.c b/src/payload.c
+index 55128fe..31e5a02 100644
+--- a/src/payload.c
++++ b/src/payload.c
+@@ -224,21 +224,28 @@ static int payload_add_dependency(struct eval_ctx *ctx,
+ }
+ 
+ static const struct proto_desc *
++payload_get_get_ll_hdr(const struct eval_ctx *ctx)
++{
++	switch (ctx->pctx.family) {
++	case NFPROTO_INET:
++		return &proto_inet;
++	case NFPROTO_BRIDGE:
++		return &proto_eth;
++	case NFPROTO_NETDEV:
++		return &proto_netdev;
++	default:
++		break;
++	}
++
++	return NULL;
++}
++
++static const struct proto_desc *
+ payload_gen_special_dependency(struct eval_ctx *ctx, const struct expr *expr)
+ {
+ 	switch (expr->payload.base) {
+ 	case PROTO_BASE_LL_HDR:
+-		switch (ctx->pctx.family) {
+-		case NFPROTO_INET:
+-			return &proto_inet;
+-		case NFPROTO_BRIDGE:
+-			return &proto_eth;
+-		case NFPROTO_NETDEV:
+-			return &proto_netdev;
+-		default:
+-			break;
+-		}
+-		break;
++		return payload_get_get_ll_hdr(ctx);
+ 	case PROTO_BASE_TRANSPORT_HDR:
+ 		if (expr->payload.desc == &proto_icmp)
+ 			return &proto_ip;
+-- 
+2.11.0
+

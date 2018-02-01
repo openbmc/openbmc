@@ -8,21 +8,28 @@
 
   <!-- Bitbake versions which correspond to the metadata release -->
   <object model="orm.bitbakeversion" pk="1">
-    <field type="CharField" name="name">morty</field>
+    <field type="CharField" name="name">pyro</field>
     <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
-    <field type="CharField" name="branch">1.32</field>
+    <field type="CharField" name="branch">1.34</field>
   </object>
   <object model="orm.bitbakeversion" pk="2">
     <field type="CharField" name="name">HEAD</field>
+    <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
+    <field type="CharField" name="branch">HEAD</field>
+  </object>
+  <object model="orm.bitbakeversion" pk="3">
+    <field type="CharField" name="name">master</field>
+    <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
+    <field type="CharField" name="branch">master</field>
   </object>
 
   <!-- Releases available -->
   <object model="orm.release" pk="1">
-    <field type="CharField" name="name">morty</field>
-    <field type="CharField" name="description">Openembedded Morty</field>
+    <field type="CharField" name="name">pyro</field>
+    <field type="CharField" name="description">Openembedded Pyro</field>
     <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
-    <field type="CharField" name="branch_name">morty</field>
-    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=morty\"&gt;OpenEmbedded Morty&lt;/a&gt; branch.</field>
+    <field type="CharField" name="branch_name">pyro</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=pyro\"&gt;OpenEmbedded Pyro&lt;/a&gt; branch.</field>
   </object>
   <object model="orm.release" pk="2">
     <field type="CharField" name="name">local</field>
@@ -31,21 +38,36 @@
     <field type="CharField" name="branch_name">HEAD</field>
     <field type="TextField" name="helptext">Toaster will run your builds with the version of OpenEmbedded that you have cloned or downloaded to your computer.</field>
   </object>
+  <object model="orm.release" pk="3">
+    <field type="CharField" name="name">master</field>
+    <field type="CharField" name="description">OpenEmbedded core master</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">3</field>
+    <field type="CharField" name="branch_name">master</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"http://cgit.openembedded.org/openembedded-core/log/\"&gt;OpenEmbedded master&lt;/a&gt; branch.</field>
+  </object>
 
   <!-- Default layers for each release -->
   <object model="orm.releasedefaultlayer" pk="1">
     <field rel="ManyToOneRel" to="orm.release" name="release">1</field>
     <field type="CharField" name="layer_name">openembedded-core</field>
   </object>
-  <object model="orm.releasedefaultlayer" pk="4">
+  <object model="orm.releasedefaultlayer" pk="2">
     <field rel="ManyToOneRel" to="orm.release" name="release">2</field>
     <field type="CharField" name="layer_name">openembedded-core</field>
   </object>
+  <object model="orm.releasedefaultlayer" pk="3">
+    <field rel="ManyToOneRel" to="orm.release" name="release">3</field>
+    <field type="CharField" name="layer_name">openembedded-core</field>
+  </object>
 
-  <!-- TYPE_LOCAL = 0 Layers for the Local release -->
+
+  <!-- Layer for the Local release -->
   <object model="orm.layer" pk="1">
     <field type="CharField" name="name">openembedded-core</field>
     <field type="CharField" name="vcs_url">git://git.openembedded.org/openembedded-core</field>
+    <field type="CharField" name="vcs_web_url">http://cgit.openembedded.org/openembedded-core</field>
+    <field type="CharField" name="vcs_web_tree_base_url">http://cgit.openembedded.org/openembedded-core/tree/%path%?h=%branch%</field>
+    <field type="CharField" name="vcs_web_file_base_url">http://cgit.openembedded.org/openembedded-core/tree/%path%?h=%branch%</field>
   </object>
   <object model="orm.layer_version" pk="1">
     <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>

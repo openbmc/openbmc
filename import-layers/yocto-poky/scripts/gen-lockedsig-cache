@@ -62,7 +62,11 @@ for f in files:
         os.remove(dst)
     if (os.stat(src).st_dev == os.stat(destdir).st_dev):
         print('linking')
-        os.link(src, dst)
+        try:
+            os.link(src, dst)
+        except OSError as e:
+            print('hard linking failed, copying')
+            shutil.copyfile(src, dst)
     else:
         print('copying')
         shutil.copyfile(src, dst)

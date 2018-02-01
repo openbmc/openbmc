@@ -30,3 +30,5 @@ do_install_append() {
 }
 
 FILES_${PN} += "/usr/share/e-tasks/* /usr/share/applications/* /usr/share/pixmaps/*"
+
+PNBLACKLIST[e-tasks] ?= "Depends on blacklisted elementary - the recipe will be removed on 2017-09-01 unless the issue is fixed"

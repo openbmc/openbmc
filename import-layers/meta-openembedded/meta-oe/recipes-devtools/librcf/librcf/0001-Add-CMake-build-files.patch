@@ -1,0 +1,302 @@
+From 613297214d78ee10111e74e90e025166ebbcad9f Mon Sep 17 00:00:00 2001
+From: Peter Liu <peter.x.liu@external.atlascopco.com>
+Date: Sun, 5 Mar 2017 16:15:40 +0100
+Subject: [PATCH] Add CMake build files
+
+Upstream-Status: Pending
+
+Signed-off-by: Peter Liu <peter.x.liu@external.atlascopco.com>
+---
+ CMakeLists.txt     | 147 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ FindLibRcf.cmake   |  63 +++++++++++++++++++++++
+ VERSION.cmake      |  21 ++++++++
+ src/CMakeLists.txt |  25 +++++++++
+ 4 files changed, 256 insertions(+)
+ create mode 100644 CMakeLists.txt
+ create mode 100644 FindLibRcf.cmake
+ create mode 100644 VERSION.cmake
+ create mode 100755 src/CMakeLists.txt
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..f6e24be
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,147 @@
++PROJECT (librcf)
++
++CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
++
++####################################################################
++# OPTION                                                           #
++####################################################################
++OPTION (LIBRCF_USE_OPENSSL "Build with OpenSSL support?" OFF)
++OPTION (LIBRCF_OPENSSL_STATIC "Enable static linking to OpenSSL?" OFF)
++OPTION (LIBRCF_USE_ZLIB "Build with zlib support?" OFF)
++OPTION (LIBRCF_ZLIB_STATIC "Enable static linking to zlib?" OFF)
++OPTION (LIBRCF_USE_SF_SERIALIZATION "Build with SF serialization support?" ON)
++OPTION (LIBRCF_USE_BOOST_SERIALIZATION "Build with Boost.Serialization support?" OFF)
++OPTION (LIBRCF_USE_BOOST_FILESYSTEM "Build with Boost.Filesystem support (required for file transfer support)?" OFF)
++OPTION (LIBRCF_USE_BOOST_ASIO "Build with Boost asio support?" ON)
++OPTION (LIBRCF_USE_PROTOBUF "Build with Protocol Buffer support?" OFF)
++OPTION (LIBRCF_USE_JSON "Build with JSON Spirit (required for JSON-RPC support)?" OFF)
++OPTION (LIBRCF_USE_IPV6 "Build with IPv6 support?" OFF)
++OPTION (LIBRCF_USE_CUSTOM_ALLOCATOR "Build with custom allocator support?" OFF)
++OPTION (LIBRCF_BUILD_DLL "Build a DLL exporting RCF?" OFF)
++OPTION (LIBRCF_AUTO_INIT_DEINIT "Enable automatic RCF initialization and deinitialization?" OFF)
++OPTION (LIBRCF_BUILD_STATIC_LIBS "Build the static library?" ON)
++OPTION (LIBRCF_BUILD_SHARED_LIBS "Build the shared library?" ON)
++OPTION (LIBRCF_BUILD_DEMOS "Build demo programs?" ON)
++
++####################################################################
++# CONFIGURATION                                                    #
++####################################################################
++INCLUDE (${CMAKE_SOURCE_DIR}/VERSION.cmake)
++
++SET (LIBRCF_LIBRARIES "-lpthread -ldl")
++INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR}/include)
++
++IF (LIBRCF_USE_OPENSSL)
++  IF (NOT OPENSSL_FOUND)
++    FIND_PACKAGE (OpenSSL REQUIRED)
++  ENDIF (NOT OPENSSL_FOUND)
++  INCLUDE_DIRECTORIES (${OPENSSL_INCLUDE_DIR})
++  ADD_DEFINITIONS (-DRCF_USE_OPENSSL)
++ENDIF (LIBRCF_USE_OPENSSL)
++
++IF (LIBRCF_OPENSSL_STATIC)
++  LIST (APPEND LIBRCF_LIBRARIES ${OPENSSL_LIBRARIES})
++  ADD_DEFINITIONS (-DRCF_OPENSSL_STATIC)
++ENDIF (LIBRCF_OPENSSL_STATIC)
++
++IF (LIBRCF_USE_ZLIB)
++  IF (NOT ZLIB_FOUND)
++    FIND_PACKAGE (ZLIB REQUIRED)
++  ENDIF (NOT ZLIB_FOUND)
++  INCLUDE_DIRECTORIES (${ZLIB_INCLUDE_DIR})
++  ADD_DEFINITIONS (-DRCF_USE_ZLIB)
++ENDIF (LIBRCF_USE_ZLIB)
++
++IF (LIBRCF_ZLIB_STATIC)
++  LIST (APPEND LIBRCF_LIBRARIES ${ZLIB_LIBRARIES})
++  ADD_DEFINITIONS (-DRCF_ZLIB_STATIC)
++ENDIF (LIBRCF_ZLIB_STATIC)
++
++IF (LIBRCF_USE_SF_SERIALIZATION)
++  IF (NOT Boost_SYSTEM_FOUND)
++    FIND_PACKAGE (Boost REQUIRED COMPONENTS system)
++  ENDIF (NOT Boost_SYSTEM_FOUND)
++  INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIR})
++  LIST (APPEND LIBRCF_LIBRARIES ${Boost_SYSTEM_LIBRARY})
++  ADD_DEFINITIONS (-DRCF_USE_SF_SERIALIZATION)
++ENDIF (LIBRCF_USE_SF_SERIALIZATION)
++
++IF (LIBRCF_USE_BOOST_SERIALIZATION)
++  IF (NOT Boost_SERIALIZATION_FOUND)
++    FIND_PACKAGE (Boost REQUIRED COMPONENTS serialization)
++  ENDIF (NOT Boost_SERIALIZATION_FOUND)
++  INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIR})
++  LIST (APPEND LIBRCF_LIBRARIES ${Boost_SERIALIZATION_LIBRARY})
++  ADD_DEFINITIONS (-DRCF_USE_BOOST_SERIALIZATION)
++ENDIF (LIBRCF_USE_BOOST_SERIALIZATION)
++
++IF (LIBRCF_USE_BOOST_FILESYSTEM)
++  IF (NOT Boost_FILESYSTEM_FOUND)
++    FIND_PACKAGE (Boost REQUIRED COMPONENTS filesystem system)
++  ENDIF (NOT Boost_FILESYSTEM_FOUND)
++  INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIR})
++  LIST (APPEND LIBRCF_LIBRARIES ${Boost_FILESYSTEM_LIBRARY})
++  LIST (APPEND LIBRCF_LIBRARIES ${Boost_SYSTEM_LIBRARY})
++  ADD_DEFINITIONS (-DRCF_USE_BOOST_FILESYSTEM)
++ENDIF (LIBRCF_USE_BOOST_FILESYSTEM)
++
++IF (LIBRCF_USE_BOOST_ASIO)
++  IF (NOT Boost_FOUND)
++    FIND_PACKAGE (Boost REQUIRED)
++  ENDIF (NOT Boost_FOUND)
++  INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIR})
++  ADD_DEFINITIONS (-DRCF_USE_BOOST_ASIO)
++ENDIF (LIBRCF_USE_BOOST_ASIO)
++
++IF (LIBRCF_USE_PROTOBUF)
++  IF(NOT Protobuf_FOUND)
++    FIND_PACKAGE (Protobuf REQUIRED)
++  ENDIF (NOT Protobuf_FOUND)
++  INCLUDE_DIRECTORIES (${Protobuf_INCLUDE_DIR})
++  LIST (APPEND LIBRCF_LIBRARIES ${Protobuf_LIBRARIES})
++  ADD_DEFINITIONS (-DRCF_USE_PROTOBUF)
++ENDIF (LIBRCF_USE_PROTOBUF)
++
++IF (LIBRCF_USE_JSON)
++  IF (NOT LibJsonSpirit_FOUND)
++    FIND_PACKAGE (LibJsonSpirit REQUIRED)
++  ENDIF (NOT LibJsonSpirit_FOUND)
++  INCLUDE_DIRECTORIES (${LibJsonSpirit_INCLUDE_DIR})
++  LIST (APPEND LIBRCF_LIBRARIES ${LibJsonSpirit_LIBRARIES})
++  ADD_DEFINITIONS (-DRCF_USE_JSON)
++ENDIF (LIBRCF_USE_JSON)
++
++IF (LIBRCF_USE_IPV6)
++  ADD_DEFINITIONS (-DRCF_USE_IPV6)
++ENDIF (LIBRCF_USE_IPV6)
++
++IF (LIBRCF_USE_CUSTOM_ALLOCATOR)
++  ADD_DEFINITIONS (-DRCF_USE_CUSTOM_ALLOCATOR)
++ENDIF (LIBRCF_USE_CUSTOM_ALLOCATOR)
++
++IF (LIBRCF_BUILD_DLL)
++  ADD_DEFINITIONS (-DRCF_BUILD_DLL)
++ENDIF (LIBRCF_BUILD_DLL)
++
++IF (LIBRCF_AUTO_INIT_DEINIT)
++  ADD_DEFINITIONS (-DRCF_AUTO_INIT_DEINIT)
++ENDIF (LIBRCF_AUTO_INIT_DEINIT)
++
++####################################################################
++# SUBDIRECTORY                                                     #
++####################################################################
++ADD_SUBDIRECTORY (src)
++
++IF (LIBRCF_BUILD_DEMOS)
++  # Server
++  ADD_EXECUTABLE (RcfServer demo/Server.cpp)
++  TARGET_LINK_LIBRARIES (RcfServer rcf ${LIBRCF_LIBRARIES})
++  INSTALL (TARGETS RcfServer DESTINATION ${CMAKE_INSTALL_BINDIR})
++
++  # Client
++  ADD_EXECUTABLE (RcfClient demo/Client.cpp)
++  TARGET_LINK_LIBRARIES (RcfClient rcf ${LIBRCF_LIBRARIES})
++  INSTALL (TARGETS RcfClient DESTINATION ${CMAKE_INSTALL_BINDIR})
++ENDIF (LIBRCF_BUILD_DEMOS)
++
++INSTALL (FILES ${CMAKE_SOURCE_DIR}/FindLibRcf.cmake DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/Modules)
+diff --git a/FindLibRcf.cmake b/FindLibRcf.cmake
+new file mode 100644
+index 0000000..9d7d8cd
+--- /dev/null
++++ b/FindLibRcf.cmake
+@@ -0,0 +1,63 @@
++# FindLibRcf - Find librcf headers and libraries.
++#
++# Sample:
++#
++#   SET( LibRcf_USE_STATIC_LIBS OFF )
++#   FIND_PACKAGE( LibRcf REQUIRED )
++#   IF( LibRcf_FOUND )
++#      INCLUDE_DIRECTORIES( ${LibRcf_INCLUDE_DIRS} )
++#      TARGET_LINK_LIBRARIES( ... ${LibRcf_LIBRARIES} )
++#   ENDIF()
++#
++# Variables used by this module need to be set before calling find_package
++#
++#   LibRcf_USE_STATIC_LIBS	Can be set to ON to force the use of the static
++#				librcf libraries. Defaults to OFF.
++#
++# Variables provided by this module:
++#
++#   LibRcf_FOUND		Include dir, librcf libraries.
++#
++#   LibRcf_LIBRARIES		Link to these to use all the libraries you specified.
++#
++#   LibRcf_INCLUDE_DIRS		Include directories.
++#
++# For each component you specify in find_package(), the following (UPPER-CASE)
++# variables are set to pick and choose components instead of just using LibRcf_LIBRARIES:
++#
++#   LIBRCF_FOUND			TRUE if librcf was found
++#   LIBRCF_LIBRARY			librcf libraries
++#
++
++# Support preference of static libs by adjusting CMAKE_FIND_LIBRARY_SUFFIXES
++IF(LibRcf_USE_STATIC_LIBS)
++    SET( _ORIG_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
++    SET(CMAKE_FIND_LIBRARY_SUFFIXES .a )
++ENDIF()
++
++# Look for the header files
++UNSET(LibRcf_INCLUDE_DIRS CACHE)
++FIND_PATH(LibRcf_INCLUDE_DIRS NAMES RCF/RcfClient.hpp)
++
++# Look for the core library
++UNSET(LIBRCF_LIBRARY CACHE)
++FIND_LIBRARY(LIBRCF_LIBRARY NAMES rcf)
++FIND_PACKAGE_HANDLE_STANDARD_ARGS(LibRcf DEFAULT_MSG LIBRCF_LIBRARY LibRcf_INCLUDE_DIRS)
++MARK_AS_ADVANCED(
++    LIBRCF_FOUND
++    LIBRCF_LIBRARY
++)
++
++# Prepare return values and collectiong more components
++SET(LibRcf_FOUND ${LIBRCF_FOUND})
++SET(LibRcf_LIBRARIES ${LIBRCF_LIBRARY})
++MARK_AS_ADVANCED(
++    LibRcf_FOUND
++    LibRcf_LIBRARIES
++    LibRcf_INCLUDE_DIRS
++)
++
++# Restore CMAKE_FIND_LIBRARY_SUFFIXES
++IF(LibRcf_USE_STATIC_LIBS)
++    SET(CMAKE_FIND_LIBRARY_SUFFIXES ${_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES} )
++ENDIF()
+diff --git a/VERSION.cmake b/VERSION.cmake
+new file mode 100644
+index 0000000..8b4bcdc
+--- /dev/null
++++ b/VERSION.cmake
+@@ -0,0 +1,21 @@
++# ==================================================
++# Versioning
++# ==========
++#
++# MAJOR Major number for this branch.
++#
++# MINOR The most recent interface number this
++#     library implements.
++#
++# COMPATMINOR The latest binary compatible minor number
++#     this library implements.
++#
++# PATCH The implementation number of the current interface.
++#
++#
++# - The package VERSION will be MAJOR.MINOR.PATCH.
++#
++
++SET (LIBRCF_SOVERSION_MAJOR "2")
++SET (LIBRCF_SOVERSION_MINOR "2")
++SET (LIBRCF_SOVERSION_PATCH "0")
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+new file mode 100755
+index 0000000..c227901
+--- /dev/null
++++ b/src/CMakeLists.txt
+@@ -0,0 +1,25 @@
++IF (NOT LIBRCF_BUILD_SHARED_LIBS)
++  ADD_LIBRARY (rcf STATIC RCF/RCF.cpp)
++ELSE (NOT LIBRCF_BUILD_SHARED_LIBS)
++  ADD_LIBRARY (rcf SHARED RCF/RCF.cpp)
++  TARGET_LINK_LIBRARIES (rcf ${LIBRCF_LIBRARIES})
++  SET_TARGET_PROPERTIES (rcf PROPERTIES COMPILE_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
++  SET_TARGET_PROPERTIES (rcf PROPERTIES VERSION ${LIBRCF_SOVERSION_MAJOR}.${LIBRCF_SOVERSION_MINOR}.${LIBRCF_SOVERSION_PATCH})
++ENDIF (NOT LIBRCF_BUILD_SHARED_LIBS)
++
++SET_TARGET_PROPERTIES (rcf PROPERTIES PROJECT_LABEL "RCF Library")
++SET_TARGET_PROPERTIES (rcf PROPERTIES OUTPUT_NAME "rcf")
++SET_TARGET_PROPERTIES (rcf PROPERTIES SOVERSION ${LIBRCF_SOVERSION_MAJOR})
++SET_TARGET_PROPERTIES (rcf PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_LIBDIR})
++
++INSTALL (DIRECTORY "${CMAKE_SOURCE_DIR}/include/RCF" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++INSTALL (DIRECTORY "${CMAKE_SOURCE_DIR}/include/SF" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++INSTALL (TARGETS rcf LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
++
++IF (LIBRCF_BUILD_STATIC_LIBS AND LIBRCF_BUILD_SHARED_LIBS)
++  ADD_LIBRARY (rcf_static STATIC RCF/RCF.cpp)
++  SET_TARGET_PROPERTIES (rcf_static PROPERTIES PROJECT_LABEL "RCF Static Library")
++  SET_TARGET_PROPERTIES (rcf_static PROPERTIES OUTPUT_NAME "rcf")
++  SET_TARGET_PROPERTIES (rcf_static PROPERTIES SOVERSION ${LIBRCF_SOVERSION_MAJOR})
++  INSTALL (TARGETS rcf_static LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
++ENDIF (LIBRCF_BUILD_STATIC_LIBS AND LIBRCF_BUILD_SHARED_LIBS)
+-- 
+1.9.1
+

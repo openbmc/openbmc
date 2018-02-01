@@ -1,0 +1,13 @@
+Index: SDL2_ttf-2.0.14/Makefile.am
+===================================================================
+--- SDL2_ttf-2.0.14.orig/Makefile.am
++++ SDL2_ttf-2.0.14/Makefile.am
+@@ -1,6 +1,8 @@
+ # Makefile.am for the SDL truetype font loading library and viewer
+ lib_LTLIBRARIES = libSDL2_ttf.la
+ 
++AUTOMAKE_OPTIONS = foreign
++
+ libSDL2_ttfincludedir = $(includedir)/SDL2
+ libSDL2_ttfinclude_HEADERS =	\
+ 	SDL_ttf.h

@@ -1,0 +1,51 @@
+From 8fd74ddb3369572c594b22b396346131af00faee Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 19:12:10 -0700
+Subject: [PATCH 2/2] Replace __S_IEXEC with S_IEXEC
+
+S_IEXEC is portable
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ daemon/lookup.c        | 4 ++--
+ modules/lookup_multi.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/daemon/lookup.c b/daemon/lookup.c
+index 62071df..1bec97f 100644
+--- a/daemon/lookup.c
++++ b/daemon/lookup.c
+@@ -400,7 +400,7 @@ static int read_file_source_instance(struct autofs_point *ap, struct map_source
+ 	if (!S_ISREG(st.st_mode))
+ 		return NSS_STATUS_NOTFOUND;
+ 
+-	if (st.st_mode & __S_IEXEC)
++	if (st.st_mode & S_IEXEC)
+ 		type = src_prog;
+ 	else
+ 		type = src_file;
+@@ -890,7 +890,7 @@ static int lookup_name_file_source_instance(struct autofs_point *ap, struct map_
+ 	if (!S_ISREG(st.st_mode))
+ 		return NSS_STATUS_NOTFOUND;
+ 
+-	if (st.st_mode & __S_IEXEC)
++	if (st.st_mode & S_IEXEC)
+ 		type = src_prog;
+ 	else
+ 		type = src_file;
+diff --git a/modules/lookup_multi.c b/modules/lookup_multi.c
+index 6ec8434..88d081f 100644
+--- a/modules/lookup_multi.c
++++ b/modules/lookup_multi.c
+@@ -104,7 +104,7 @@ static struct lookup_mod *nss_open_lookup(const char *format, int argc, const ch
+ 				continue;
+ 			}
+ 
+-			if (st.st_mode & __S_IEXEC)
++			if (st.st_mode & S_IEXEC)
+ 				type = src_prog;
+ 			else
+ 				type = src_file;
+-- 
+2.12.1
+

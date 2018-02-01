@@ -1,0 +1,40 @@
+From f0dab6d6fe4b0aae4394eee93be86e9747c6ed5c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Nov 2016 05:07:38 +0000
+Subject: [PATCH] Fix checks for sse2/mmx
+
+Just checking for cmdline options is not enough
+its better to check for builtin defines to be
+sure, clang does not error out on sse2 options on
+arm e.g. and it ends up doing SSE2 stuff for arm
+which is not desired
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 47d2cf2..4be000c 100755
+--- a/configure
++++ b/configure
+@@ -118,8 +118,14 @@ fi
+ # Valiate compiler
+ check_cc || die 'No C compiler found'
+ check_cc_header execinfo
+-check_cc_option mmx
+-check_cc_option sse2
++check_cc_snippet mmx '#ifndef __MMX__
++error "MMX not supported"
++#endif
++'
++check_cc_snippet sse2 '#ifndef __SSE2__
++error "SSE2 not supported"
++#endif
++'
+ 
+ if check_cc '
+ #if !defined(__clang__)
+-- 
+1.9.1
+

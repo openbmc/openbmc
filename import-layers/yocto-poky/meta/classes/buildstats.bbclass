@@ -31,6 +31,11 @@ def get_process_cputime(pid):
                 i = f.readline().strip()
                 if not i:
                     break
+                if not ":" in i:
+                    # one more extra line is appended (empty or containing "0")
+                    # most probably due to race condition in kernel while
+                    # updating IO stats
+                    break
                 i = i.split(": ")
                 iostats[i[0]] = i[1]
     resources = resource.getrusage(resource.RUSAGE_SELF)
@@ -75,13 +80,13 @@ def get_buildtimedata(var, d):
     return timediff, cpuperc
 
 def write_task_data(status, logfile, e, d):
-    bn = d.getVar('BUILDNAME', True)
-    bsdir = os.path.join(d.getVar('BUILDSTATS_BASE', True), bn)
+    bn = d.getVar('BUILDNAME')
+    bsdir = os.path.join(d.getVar('BUILDSTATS_BASE'), bn)
     with open(os.path.join(logfile), "a") as f:
         elapsedtime = get_timedata("__timedata_task", d, e.time)
         if elapsedtime:
-            f.write(d.expand("${PF}: %s: Elapsed time: %0.2f seconds \n" %
-                                    (e.task, elapsedtime)))
+            f.write(d.expand("${PF}: %s\n" % e.task))
+            f.write(d.expand("Elapsed time: %0.2f seconds\n" % elapsedtime))
             cpu, iostats, resources, childres = get_process_cputime(os.getpid())
             if cpu:
                 f.write("utime: %s\n" % cpu['utime'])
@@ -106,9 +111,9 @@ python run_buildstats () {
     import bb.event
     import time, subprocess, platform
 
-    bn = d.getVar('BUILDNAME', True)
-    bsdir = os.path.join(d.getVar('BUILDSTATS_BASE', True), bn)
-    taskdir = os.path.join(bsdir, d.getVar('PF', True))
+    bn = d.getVar('BUILDNAME')
+    bsdir = os.path.join(d.getVar('BUILDSTATS_BASE'), bn)
+    taskdir = os.path.join(bsdir, d.getVar('PF'))
 
     if isinstance(e, bb.event.BuildStarted):
         ########################################################################
@@ -162,7 +167,7 @@ python run_buildstats () {
         if e.task == "do_rootfs":
             bs = os.path.join(bsdir, "build_stats")
             with open(bs, "a") as f:
-                rootfs = d.getVar('IMAGE_ROOTFS', True)
+                rootfs = d.getVar('IMAGE_ROOTFS')
                 if os.path.isdir(rootfs):
                     try:
                         rootfs_size = subprocess.check_output(["du", "-sh", rootfs],
@@ -188,3 +193,27 @@ python run_buildstats () {
 addhandler run_buildstats
 run_buildstats[eventmask] = "bb.event.BuildStarted bb.event.BuildCompleted bb.build.TaskStarted bb.build.TaskSucceeded bb.build.TaskFailed"
 
+python runqueue_stats () {
+    import buildstats
+    from bb import event, runqueue
+    # We should not record any samples before the first task has started,
+    # because that's the first activity shown in the process chart.
+    # Besides, at that point we are sure that the build variables
+    # are available that we need to find the output directory.
+    # The persistent SystemStats is stored in the datastore and
+    # closed when the build is done.
+    system_stats = d.getVar('_buildstats_system_stats', False)
+    if not system_stats and isinstance(e, (bb.runqueue.sceneQueueTaskStarted, bb.runqueue.runQueueTaskStarted)):
+        system_stats = buildstats.SystemStats(d)
+        d.setVar('_buildstats_system_stats', system_stats)
+    if system_stats:
+        # Ensure that we sample at important events.
+        done = isinstance(e, bb.event.BuildCompleted)
+        system_stats.sample(e, force=done)
+        if done:
+            system_stats.close()
+            d.delVar('_buildstats_system_stats')
+}
+
+addhandler runqueue_stats
+runqueue_stats[eventmask] = "bb.runqueue.sceneQueueTaskStarted bb.runqueue.runQueueTaskStarted bb.event.HeartbeatEvent bb.event.BuildCompleted bb.event.MonitorDiskEvent"

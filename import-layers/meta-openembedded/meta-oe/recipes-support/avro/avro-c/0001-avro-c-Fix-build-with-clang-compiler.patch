@@ -1,0 +1,37 @@
+From 518bb8ccfb3f3fc143fbd571782f3e40573d01b5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 10 Apr 2017 09:15:04 -0700
+Subject: [PATCH] avro-c: Fix build with clang compiler
+
+Clang advertizes itself to be compatible with gcc 4.2.1
+while that was true several years ago, it now supports
+a lot more newer features, the test to just check gcc
+version should be supplanted with clang check as well
+so atomic support in clang can be asserted as well
+
+Fixes
+
+lang/c/src/avro/refcount.h:301:2: error: "No atomic implementation!"
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lang/c/src/avro/refcount.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lang/c/src/avro/refcount.h b/lang/c/src/avro/refcount.h
+index 69afa4fc..d76ba057 100644
+--- a/lang/c/src/avro/refcount.h
++++ b/lang/c/src/avro/refcount.h
+@@ -118,7 +118,8 @@ avro_refcount_dec(volatile int *refcount)
+  * GCC intrinsics
+  */
+ 
+-#elif (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) > 40500
++#elif (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) > 40500 \
++|| defined(__clang__)
+ 
+ static inline void
+ avro_refcount_set(volatile int *refcount, int value)
+-- 
+2.12.2
+

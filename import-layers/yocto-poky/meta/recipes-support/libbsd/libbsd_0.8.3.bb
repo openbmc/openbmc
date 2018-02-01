@@ -35,6 +35,7 @@ SECTION = "libs"
 
 SRC_URI = " \
     http://libbsd.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
+    file://0001-src-libbsd-overlay.pc.in-Set-Cflags-to-use-I-instead.patch \
 "
 SRC_URI_append_libc-musl  = " \
     file://0001-Replace-__BEGIN_DECLS-and-__END_DECLS.patch \

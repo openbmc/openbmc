@@ -18,12 +18,14 @@ DESCRIPTION = "Linux container runtime \
  subtle and/or glaring issues. \
  "
 
-SRCREV = "7392c3b0ce0f9d3e918a321c66668c5d1ef4f689"
+SRCREV_docker = "49bf474f9ed7ce7143a59d1964ff7b7fd9b52178"
+SRCREV_libnetwork="0f534354b813003a754606689722fe253101bc4e"
 SRC_URI = "\
-	git://github.com/docker/docker.git;nobranch=1 \
-	file://docker.service \
+	git://github.com/docker/docker.git;nobranch=1;name=docker \
+	git://github.com/docker/libnetwork.git;branch=master;name=libnetwork;destsuffix=libnetwork \
 	file://docker.init \
 	file://hi.Dockerfile \
+	file://context-use-golang.org-x-net-pkg-until-we-move-to-go.patch \
 	"
 
 # Apache-2.0 for docker
@@ -32,11 +34,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=aadc30f9c14d876ded7bedc0afd2d3d7"
 
 S = "${WORKDIR}/git"
 
-DOCKER_VERSION = "1.12.5"
-PV = "${DOCKER_VERSION}+git${SRCREV}"
+DOCKER_VERSION = "1.13.0"
+PV = "${DOCKER_VERSION}+git${SRCREV_docker}"
 
 DEPENDS = " \
-    go-cross \
     go-cli \
     go-pty \
     go-context \
@@ -50,45 +51,32 @@ DEPENDS = " \
     go-systemd \
     btrfs-tools \
     sqlite3 \
-    go-distribution-digest \
+    go-distribution \
+    compose-file \
+    go-connections \
+    notary \
+    grpc-go \
     "
 
-DEPENDS_append_class-target = "lvm2"
+PACKAGES =+ "${PN}-contrib"
+
+DEPENDS_append_class-target = " lvm2"
 RDEPENDS_${PN} = "curl aufs-util git util-linux iptables \
                   ${@bb.utils.contains('DISTRO_FEATURES','systemd','','cgroup-lite',d)} \
                  "
-RDEPENDS_${PN} += "containerd runc"
+RDEPENDS_${PN} += "virtual/containerd virtual/runc"
+
 RRECOMMENDS_${PN} = "kernel-module-dm-thin-pool kernel-module-nf-nat"
-RSUGGESTS_${PN} = "lxc docker-registry rt-tests"
+RSUGGESTS_${PN} = "lxc rt-tests"
 DOCKER_PKG="github.com/docker/docker"
+
+inherit systemd update-rc.d
+inherit go
+inherit goarch
 
 do_configure[noexec] = "1"
 
 do_compile() {
-	case "${TARGET_ARCH}" in
-		arm)
-			GOARCH=arm
-			case "${TUNE_PKGARCH}" in
-				cortexa*)
-					export GOARM=7
-				;;
-			esac
-		;;
-		aarch64)
-			GOARCH=arm64
-		;;
-		i586|i686)
-			GOARCH=386
-		;;
-		x86_64)
-			GOARCH=amd64
-		;;
-		*)
-			GOARCH="${TARGET_ARCH}"
-		;;
-	esac
-	export GOARCH
-
 	# Set GOPATH. See 'PACKAGERS.md'. Don't rely on
 	# docker to download its dependencies but rather
 	# use dependencies packaged independently.
@@ -96,6 +84,10 @@ do_compile() {
 	rm -rf .gopath
 	mkdir -p .gopath/src/"$(dirname "${DOCKER_PKG}")"
 	ln -sf ../../../.. .gopath/src/"${DOCKER_PKG}"
+
+	mkdir -p .gopath/src/github.com/docker
+	ln -sf ../../../../../libnetwork .gopath/src/github.com/docker/libnetwork
+
 	export GOPATH="${S}/.gopath:${S}/vendor:${STAGING_DIR_TARGET}/${prefix}/local/go"
 	export GOROOT="${STAGING_DIR_NATIVE}/${nonarch_libdir}/${HOST_SYS}/go"
 	cd -
@@ -113,42 +105,50 @@ do_compile() {
 	# to build this:
 	DOCKER_GITCOMMIT="${SRCREV}" \
 	  ./hack/make.sh dynbinary
-}
 
-inherit systemd update-rc.d
+	# build the proxy
+	go build -o ${S}/docker-proxy github.com/docker/libnetwork/cmd/proxy
+}
 
 SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
 SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','systemd','docker.service','',d)}"
 
+SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+
 INITSCRIPT_PACKAGES += "${@bb.utils.contains('DISTRO_FEATURES','sysvinit','${PN}','',d)}"
 INITSCRIPT_NAME_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','sysvinit','docker.init','',d)}"
-INITSCRIPT_PARAMS_${PN} = "defaults"
+INITSCRIPT_PARAMS_${PN} = "${OS_DEFAULT_INITSCRIPT_PARAMS}"
 
 do_install() {
 	mkdir -p ${D}/${bindir}
 	cp ${S}/bundles/latest/dynbinary-client/docker ${D}/${bindir}/docker
 	cp ${S}/bundles/latest/dynbinary-daemon/dockerd ${D}/${bindir}/dockerd
-	cp ${S}/bundles/latest/dynbinary-daemon/docker-proxy ${D}/${bindir}/docker-proxy
+	cp ${S}/docker-proxy ${D}/${bindir}/docker-proxy
 
 	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
 		install -d ${D}${systemd_unitdir}/system
 		install -m 644 ${S}/contrib/init/systemd/docker.* ${D}/${systemd_unitdir}/system
 		# replaces one copied from above with one that uses the local registry for a mirror
-		install -m 644 ${WORKDIR}/docker.service ${D}/${systemd_unitdir}/system
+		install -m 644 ${S}/contrib/init/systemd/docker.service ${D}/${systemd_unitdir}/system
 	else
 		install -d ${D}${sysconfdir}/init.d
 		install -m 0755 ${WORKDIR}/docker.init ${D}${sysconfdir}/init.d/docker.init
 	fi
 
-	mkdir -p ${D}/usr/share/docker/
-	cp ${WORKDIR}/hi.Dockerfile ${D}/usr/share/docker/
+	mkdir -p ${D}${datadir}/docker/
+	cp ${WORKDIR}/hi.Dockerfile ${D}${datadir}/docker/
+	install -m 0755 ${S}/contrib/check-config.sh ${D}${datadir}/docker/
 }
 
 inherit useradd
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM_${PN} = "-r docker"
 
-FILES_${PN} += "/lib/systemd/system/*"
+FILES_${PN} += "${systemd_unitdir}/system/*"
+
+FILES_${PN}-contrib += "${datadir}/docker/check-config.sh"
+RDEPENDS_${PN}-contrib += "bash"
 
 # DO NOT STRIP docker
 INHIBIT_PACKAGE_STRIP = "1"
+INSANE_SKIP_${PN} += "ldflags"

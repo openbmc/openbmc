@@ -9,7 +9,7 @@ connection you would need and has several interesting built-in \
 capabilities."
 
 SECTION = "net"
-inherit update-alternatives gettext
+inherit update-alternatives gettext pkgconfig
 
 ALTERNATIVE_${PN} = "nc"
 

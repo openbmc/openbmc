@@ -12,16 +12,13 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  pkgconfig/gstreamer-gl.pc.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/pkgconfig/gstreamer-gl.pc.in b/pkgconfig/gstreamer-gl.pc.in
-index 5589e2a..b986450 100644
---- a/pkgconfig/gstreamer-gl.pc.in
-+++ b/pkgconfig/gstreamer-gl.pc.in
+Index: gst-plugins-bad-1.10.1/pkgconfig/gstreamer-gl.pc.in
+===================================================================
+--- gst-plugins-bad-1.10.1.orig/pkgconfig/gstreamer-gl.pc.in
++++ gst-plugins-bad-1.10.1/pkgconfig/gstreamer-gl.pc.in
 @@ -10,4 +10,4 @@ Version: @VERSION@
  Requires: gstreamer-base-@GST_API_VERSION@ gstreamer-@GST_API_VERSION@
  
  Libs: -L${libdir} -lgstgl-@GST_API_VERSION@ @GL_LIBS@
--Cflags: -I${includedir} @GL_CFLAGS@
-+Cflags: -I${includedir}
--- 
-2.7.0
-
+-Cflags: -I${includedir} -I${libdir}/gstreamer-@GST_API_VERSION@/include @GL_CFLAGS@
++Cflags: -I${includedir} -I${libdir}/gstreamer-@GST_API_VERSION@/include

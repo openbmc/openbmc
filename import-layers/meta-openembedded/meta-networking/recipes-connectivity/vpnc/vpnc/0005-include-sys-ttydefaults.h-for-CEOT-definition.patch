@@ -1,0 +1,30 @@
+From 1947ea776dc38c3377702dd89bd229670f4d948d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Mar 2017 23:06:52 -0700
+Subject: [PATCH 5/8] include sys/ttydefaults.h for CEOT definition
+
+Fixes
+
+config.c:146:25: error: use of undeclared identifier 'CEOT'
+                if (llen == 0 && c == CEOT)
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ config.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/config.c b/config.c
+index 804faa7..1883d12 100644
+--- a/config.c
++++ b/config.c
+@@ -31,6 +31,7 @@
+ #include <sys/types.h>
+ #include <sys/utsname.h>
+ #include <sys/wait.h>
++#include <sys/ttydefaults.h>
+ 
+ #include <gcrypt.h>
+ 
+-- 
+2.12.1
+

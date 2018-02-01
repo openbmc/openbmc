@@ -18,7 +18,7 @@ SRC_URI[sha256sum] = "989e51194c6adadbd156da3288e37bad847b93b3b876502e83033b7049
 #| /home/jenkins/oe/world/shr-core/tmp-eglibc/sysroots/x86_64-linux/usr/include/db_cxx.h:273:14: note: virtual int Db::set_bt_compare(int (*)(Db*, const Dbt*, const Dbt*, size_t*)) <near match>
 #| /home/jenkins/oe/world/shr-core/tmp-eglibc/sysroots/x86_64-linux/usr/include/db_cxx.h:273:14: note:   no known conversion for argument 1 from 'int (*)(DB*, const DBT*, const DBT*) {aka int (*)(__db*, const __db_dbt*, const __db_dbt*)}' to 'int (*)(Db*, const Dbt*, const Dbt*, size_t*) {aka int (*)(Db*, const Dbt*, const Dbt*, long unsigned int*)}'
 #| make[3]: *** [MapDb.o] Error 1
-PNBLACKLIST[zeroc-ice] ?= "BROKEN: not compatible with default db version"
+PNBLACKLIST[zeroc-ice] ?= "BROKEN: not compatible with default db version - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 S = "${WORKDIR}/Ice-${PV}"
 

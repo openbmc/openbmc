@@ -1,0 +1,52 @@
+From 575591caf1e8972f765885679b76787ef92de77b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 24 Apr 2017 04:24:10 -0400
+Subject: [PATCH] libntfs-3g/Makefile.am: fix install failed while host dir not exist
+
+While cross compiling, if the dir of "$(rootlibdir)" and "$(libdir)"
+(such as "/usr/lib64") do not exist on host system, the do_instal failed.
+-----------------------
+make[3]: Entering directory `tmp/work/core2-64-wrs-linux/ntfs-3g-ntfsprogs/2017.3.23-r0/build/libntfs-3g'
+if [ ! "/usr/lib64" -ef "/usr/lib64" ]; then \
+    mv -f "tmp/work/core2-64-wrs-linux/ntfs-3g-ntfsprogs/2017.3.23-r0/image//usr/lib64"/libntfs-3g.so* \
+        "tmp/work/core2-64-wrs-linux/ntfs-3g-ntfsprogs/2017.3.23-r0/image//usr/lib64";  \
+fi
+mv:...are the same file
+-----------------------
+
+Use `=' rather than `-ef' to compare them, the cross compile does not
+care about host dir.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ libntfs-3g/Makefile.am | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libntfs-3g/Makefile.am b/libntfs-3g/Makefile.am
+index d6b150e..806109d 100644
+--- a/libntfs-3g/Makefile.am
++++ b/libntfs-3g/Makefile.am
+@@ -59,15 +59,15 @@ endif
+ # And create ldscript or symbolic link from /usr
+ install-exec-hook: install-rootlibLTLIBRARIES
+ if INSTALL_LIBRARY
+-	if [ ! "$(rootlibdir)" -ef "$(libdir)" ]; then \
++	if [ "$(rootlibdir)" != "$(libdir)" ]; then \
+ 		$(MV) -f "$(DESTDIR)/$(libdir)"/libntfs-3g.so* "$(DESTDIR)/$(rootlibdir)";  \
+ 	fi
+ if GENERATE_LDSCRIPT
+-	if [ ! "$(rootlibdir)" -ef "$(libdir)" ]; then \
++	if [ "$(rootlibdir)" != "$(libdir)" ]; then \
+ 		$(install_sh_PROGRAM) "libntfs-3g.script.so" "$(DESTDIR)/$(libdir)/libntfs-3g.so"; \
+ 	fi
+ else
+-	if [ ! "$(rootlibdir)" -ef "$(libdir)" ]; then \
++	if [ "$(rootlibdir)" != "$(libdir)" ]; then \
+ 		$(LN_S) "$(rootlibdir)/libntfs-3g.so" "$(DESTDIR)/$(libdir)/libntfs-3g.so"; \
+ 	fi
+ endif
+-- 
+2.8.1
+

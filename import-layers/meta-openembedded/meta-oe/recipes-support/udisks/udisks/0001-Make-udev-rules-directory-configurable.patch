@@ -1,0 +1,91 @@
+From 32278297170ffb49116b5789e4a0588b99d02bd0 Mon Sep 17 00:00:00 2001
+From: Amarnath Valluri <amarnath.valluri@intel.com>
+Date: Thu, 9 Feb 2017 11:02:53 +0200
+Subject: [PATCH] Make udev rules directory configurable.
+
+udev rules directory can be configurable via undevrulesdir variable. And use
+libdir, sbindir for installing librares and binaries.
+
+Upstream-Status: Inappropriate[Embedded specific]
+
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+---
+ configure.ac            | 14 +++-----------
+ data/Makefile.am        |  1 -
+ src/probers/Makefile.am |  2 +-
+ tools/Makefile.am       |  2 +-
+ 4 files changed, 5 insertions(+), 14 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 8c4e4c2..a143397 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -227,15 +227,8 @@ if test "x$GCC" = "xyes"; then
+   LDFLAGS="-Wl,--as-needed $LDFLAGS"
+ fi
+ 
+-if test "$prefix" = "/usr" -o "$prefix" = "/usr/local" ; then
+-  slashlibdir=/lib
+-  slashsbindir=/sbin
+-else
+-  slashlibdir=$prefix/lib
+-  slashsbindir=$prefix/sbin
+-fi
+-AC_SUBST(slashlibdir)
+-AC_SUBST(slashsbindir)
++udevrulesdir=/lib/udev/udev.d
++AC_SUBST(udevrulesdir)
+ 
+ # *************
+ # Remote Access
+@@ -299,8 +292,7 @@ echo "
+         sysconfdir:                 ${sysconfdir}
+         localstatedir:              ${localstatedir}
+         docdir:                     ${docdir}
+-        slashlibdir:                ${slashlibdir}
+-        slashsbindir:               ${slashsbindir}
++        udevrulesdir:               ${udevrulesdir}
+         systemdsystemunitdir:       ${systemdsystemunitdir}
+ 
+         compiler:                   ${CC}
+diff --git a/data/Makefile.am b/data/Makefile.am
+index 411ea0f..4834960 100644
+--- a/data/Makefile.am
++++ b/data/Makefile.am
+@@ -34,7 +34,6 @@ $(systemdservice_DATA): $(systemdservice_in_files) Makefile
+ 	@sed -e "s|\@libexecdir\@|$(prefix)/lib/udisks|" $< > $@
+ endif
+ 
+-udevrulesdir = $(slashlibdir)/udev/rules.d
+ udevrules_DATA = 80-udisks.rules
+ 
+ pkgconfigdir = $(datadir)/pkgconfig
+diff --git a/src/probers/Makefile.am b/src/probers/Makefile.am
+index 01c693b..6a0361a 100644
+--- a/src/probers/Makefile.am
++++ b/src/probers/Makefile.am
+@@ -20,7 +20,7 @@ INCLUDES = \
+ # TODO: ideally move most of this to udev and/or util-linux
+ #
+ 
+-udevhelperdir = $(slashlibdir)/udev
++udevhelperdir = $(libdir)/udev
+ udevhelper_PROGRAMS =	udisks-part-id 			\
+ 			udisks-probe-sas-expander 	\
+ 			$(NULL)
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 18325f7..0aaec11 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -54,7 +54,7 @@ udisks_LDADD = 						\
+ 	$(DBUS_GLIB_LIBS)				\
+ 	$(POLKIT_DBUS_LIBS)
+ 
+-slashsbin_PROGRAMS = umount.udisks
++sbin_PROGRAMS = umount.udisks
+ 
+ umount_udisks_SOURCES = umount-udisks.c
+ umount_udisks_LDADD = $(DBUS_GLIB_LIBS) $(POLKIT_DBUS_LIBS)
+-- 
+2.7.4
+

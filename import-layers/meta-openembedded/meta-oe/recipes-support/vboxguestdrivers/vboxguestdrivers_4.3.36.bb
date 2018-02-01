@@ -41,6 +41,10 @@ do_export_sources() {
 # compile and install mount utility
 do_compile_append() {
     oe_runmake 'LD=${CC}' 'LDFLAGS=${LDFLAGS}' -C ${S}/utils
+    if ! [ -e vboxguest.ko -a -e vboxsf.ko -a -e vboxvideo.ko ] ; then
+        echo "ERROR: One of vbox*.ko modules wasn't built"
+        exit 1
+    fi
 }
 
 module_do_install() {
@@ -65,4 +69,4 @@ FILES_${PN} = "${base_sbindir}"
 KERNEL_MODULE_AUTOLOAD += "vboxguest vboxsf vboxvideo"
 
 # http://errors.yoctoproject.org/Errors/Details/83333/
-PNBLACKLIST[vboxguestdrivers] ?= "BROKEN: not compatible with default kernel version 4.8"
+PNBLACKLIST[vboxguestdrivers] ?= "BROKEN: not compatible with default kernel version 4.8 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

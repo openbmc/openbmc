@@ -29,4 +29,4 @@ FILES_${PN} += "${datadir}/xsessions ${datadir}/icons ${datadir}/gnome ${libdir}
 FILES_${PN}-dbg += "${libexecdir}/gnome-session/helpers/.debug"
 
 # http://errors.yoctoproject.org/Errors/Details/68621/
-PNBLACKLIST[gnome-session] ?= "BROKEN: fails to build with gcc-6"
+PNBLACKLIST[gnome-session] ?= "BROKEN: fails to build with gcc-6 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

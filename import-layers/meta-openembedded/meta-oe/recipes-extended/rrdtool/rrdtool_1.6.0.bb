@@ -19,11 +19,12 @@ inherit cpan autotools-brokensep gettext pythonnative python-dir systemd
 
 BBCLASSEXTEND = "native"
 
-SYSTEMD_SERVICE_${PN} = "rrdcached.socket rrdcached.service"
+SYSTEMD_PACKAGES = "rrdcached"
+SYSTEMD_SERVICE_rrdcached = "rrdcached.socket rrdcached.service"
 
 EXTRA_AUTORECONF = "-I m4"
 
-PACKAGECONFIG ??= "python perl ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
+PACKAGECONFIG ??= "python perl ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
 PACKAGECONFIG[python] = "--enable-python=yes \
 am_cv_python_pythondir=${STAGING_LIBDIR}/python${PYTHON_BASEVERSION}/site-packages \
@@ -99,6 +100,14 @@ do_configure() {
 }
 
 PACKAGES =+ "${PN}-perl ${PN}-python"
+PACKAGES =+ "rrdcached"
+
+DESCRIPTION_rrdcached = \
+"The rrdcached package contains the data caching daemon for RRDtool."
+
+FILES_rrdcached = "${bindir}/rrdcached \
+    ${systemd_unitdir}/system/rrdcached.service \
+    ${systemd_unitdir}/system/rrdcached.socket"
 
 FILES_${PN}-doc += "${datadir}/rrdtool/examples"
 

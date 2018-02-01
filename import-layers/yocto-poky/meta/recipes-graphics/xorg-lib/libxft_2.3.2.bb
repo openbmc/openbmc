@@ -28,6 +28,6 @@ XORG_PN = "libXft"
 BBCLASSEXTEND = "native"
 
 python () {
-        if d.getVar('DEBIAN_NAMES', True):
+        if d.getVar('DEBIAN_NAMES'):
             d.setVar('PKG_${PN}', '${MLPREFIX}libxft2')
 }

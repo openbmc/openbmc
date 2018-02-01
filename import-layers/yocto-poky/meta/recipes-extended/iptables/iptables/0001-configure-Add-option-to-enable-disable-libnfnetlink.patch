@@ -1,4 +1,7 @@
-[PATCH] configure: Add option to enable/disable libnfnetlink
+From c46db7c2e1f63ec525835553587e70c635565310 Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Tue, 21 Feb 2017 11:16:31 +0200
+Subject: [PATCH] configure: Add option to enable/disable libnfnetlink
 
 This changes the configure behaviour from autodetecting
 for libnfnetlink to having an option to disable it explicitly
@@ -8,20 +11,24 @@ Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
 ---
-diff -Naur iptables-1.6.0-old/configure.ac iptables-1.6.0/configure.ac
---- iptables-1.6.0-old/configure.ac	2015-12-28 18:40:35.255417976 +0200
-+++ iptables-1.6.0/configure.ac	2015-12-29 13:01:12.388840200 +0200
-@@ -63,6 +63,9 @@
+ configure.ac | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index eda7871..03ddc50 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -63,6 +63,9 @@ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
  AC_ARG_ENABLE([nftables],
  	AS_HELP_STRING([--disable-nftables], [Do not build nftables compat]),
  	[enable_nftables="$enableval"], [enable_nftables="yes"])
 +AC_ARG_ENABLE([libnfnetlink],
 +    AS_HELP_STRING([--disable-libnfnetlink], [Do not use netfilter netlink library]),
 +    [enable_libnfnetlink="$enableval"], [enable_libnfnetlink="yes"])
- 
- libiptc_LDFLAGS2="";
- AX_CHECK_LINKER_FLAGS([-Wl,--no-as-needed],
-@@ -123,9 +126,10 @@
+ AC_ARG_ENABLE([connlabel],
+ 	AS_HELP_STRING([--disable-connlabel],
+ 	[Do not build libnetfilter_conntrack]),
+@@ -115,9 +118,10 @@ if test "x$enable_bpfc" = "xyes" || test "x$enable_nfsynproxy" = "xyes"; then
  	AC_CHECK_LIB(pcap, pcap_compile,, AC_MSG_ERROR(missing libpcap library required by bpf compiler or nfsynproxy tool))
  fi
  
@@ -35,3 +42,6 @@ diff -Naur iptables-1.6.0-old/configure.ac iptables-1.6.0/configure.ac
  
  if test "x$enable_nftables" = "xyes"; then
  	PKG_CHECK_MODULES([libmnl], [libmnl >= 1.0], [mnl=1], [mnl=0])
+-- 
+2.4.0
+

@@ -1,0 +1,271 @@
+#!/usr/bin/python3
+#
+# Helper script for committing data to git and pushing upstream
+#
+# Copyright (c) 2017, Intel Corporation.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms and conditions of the GNU General Public License,
+# version 2, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+import argparse
+import glob
+import json
+import logging
+import math
+import os
+import re
+import sys
+from collections import namedtuple, OrderedDict
+from datetime import datetime, timedelta, tzinfo
+from operator import attrgetter
+
+# Import oe and bitbake libs
+scripts_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(scripts_path, 'lib'))
+import scriptpath
+scriptpath.add_bitbake_lib_path()
+scriptpath.add_oe_lib_path()
+
+from oeqa.utils.git import GitRepo, GitError
+from oeqa.utils.metadata import metadata_from_bb
+
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+log = logging.getLogger()
+
+
+class ArchiveError(Exception):
+    """Internal error handling of this script"""
+
+
+def format_str(string, fields):
+    """Format string using the given fields (dict)"""
+    try:
+        return string.format(**fields)
+    except KeyError as err:
+        raise ArchiveError("Unable to expand string '{}': unknown field {} "
+                           "(valid fields are: {})".format(
+                               string, err, ', '.join(sorted(fields.keys()))))
+
+
+def init_git_repo(path, no_create, bare):
+    """Initialize local Git repository"""
+    path = os.path.abspath(path)
+    if os.path.isfile(path):
+        raise ArchiveError("Invalid Git repo at {}: path exists but is not a "
+                           "directory".format(path))
+    if not os.path.isdir(path) or not os.listdir(path):
+        if no_create:
+            raise ArchiveError("No git repo at {}, refusing to create "
+                               "one".format(path))
+        if not os.path.isdir(path):
+            try:
+                os.mkdir(path)
+            except (FileNotFoundError, PermissionError) as err:
+                raise ArchiveError("Failed to mkdir {}: {}".format(path, err))
+        if not os.listdir(path):
+            log.info("Initializing a new Git repo at %s", path)
+            repo = GitRepo.init(path, bare)
+    try:
+        repo = GitRepo(path, is_topdir=True)
+    except GitError:
+        raise ArchiveError("Non-empty directory that is not a Git repository "
+                           "at {}\nPlease specify an existing Git repository, "
+                           "an empty directory or a non-existing directory "
+                           "path.".format(path))
+    return repo
+
+
+def git_commit_data(repo, data_dir, branch, message, exclude, notes):
+    """Commit data into a Git repository"""
+    log.info("Committing data into to branch %s", branch)
+    tmp_index = os.path.join(repo.git_dir, 'index.oe-git-archive')
+    try:
+        # Create new tree object from the data
+        env_update = {'GIT_INDEX_FILE': tmp_index,
+                      'GIT_WORK_TREE': os.path.abspath(data_dir)}
+        repo.run_cmd('add .', env_update)
+
+        # Remove files that are excluded
+        if exclude:
+            repo.run_cmd(['rm', '--cached'] + [f for f in exclude], env_update)
+
+        tree = repo.run_cmd('write-tree', env_update)
+
+        # Create new commit object from the tree
+        parent = repo.rev_parse(branch)
+        git_cmd = ['commit-tree', tree, '-m', message]
+        if parent:
+            git_cmd += ['-p', parent]
+        commit = repo.run_cmd(git_cmd, env_update)
+
+        # Create git notes
+        for ref, filename in notes:
+            ref = ref.format(branch_name=branch)
+            repo.run_cmd(['notes', '--ref', ref, 'add',
+                          '-F', os.path.abspath(filename), commit])
+
+        # Update branch head
+        git_cmd = ['update-ref', 'refs/heads/' + branch, commit]
+        if parent:
+            git_cmd.append(parent)
+        repo.run_cmd(git_cmd)
+
+        # Update current HEAD, if we're on branch 'branch'
+        if not repo.bare and repo.get_current_branch() == branch:
+            log.info("Updating %s HEAD to latest commit", repo.top_dir)
+            repo.run_cmd('reset --hard')
+
+        return commit
+    finally:
+        if os.path.exists(tmp_index):
+            os.unlink(tmp_index)
+
+
+def expand_tag_strings(repo, name_pattern, msg_subj_pattern, msg_body_pattern,
+                       keywords):
+    """Generate tag name and message, with support for running id number"""
+    keyws = keywords.copy()
+    # Tag number is handled specially: if not defined, we autoincrement it
+    if 'tag_number' not in keyws:
+        # Fill in all other fields than 'tag_number'
+        keyws['tag_number'] = '{tag_number}'
+        tag_re = format_str(name_pattern, keyws)
+        # Replace parentheses for proper regex matching
+        tag_re = tag_re.replace('(', '\(').replace(')', '\)') + '$'
+        # Inject regex group pattern for 'tag_number'
+        tag_re = tag_re.format(tag_number='(?P<tag_number>[0-9]{1,5})')
+
+        keyws['tag_number'] = 0
+        for existing_tag in repo.run_cmd('tag').splitlines():
+            match = re.match(tag_re, existing_tag)
+
+            if match and int(match.group('tag_number')) >= keyws['tag_number']:
+                keyws['tag_number'] = int(match.group('tag_number')) + 1
+
+    tag_name = format_str(name_pattern, keyws)
+    msg_subj= format_str(msg_subj_pattern.strip(), keyws)
+    msg_body = format_str(msg_body_pattern, keyws)
+    return tag_name, msg_subj + '\n\n' + msg_body
+
+
+def parse_args(argv):
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(
+            description="Commit data to git and push upstream",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('--debug', '-D', action='store_true',
+                        help="Verbose logging")
+    parser.add_argument('--git-dir', '-g', required=True,
+                        help="Local git directory to use")
+    parser.add_argument('--no-create', action='store_true',
+                        help="If GIT_DIR is not a valid Git repository, do not "
+                             "try to create one")
+    parser.add_argument('--bare', action='store_true',
+                        help="Initialize a bare repository when creating a "
+                             "new one")
+    parser.add_argument('--push', '-p', nargs='?', default=False, const=True,
+                        help="Push to remote")
+    parser.add_argument('--branch-name', '-b',
+                        default='{hostname}/{branch}/{machine}',
+                        help="Git branch name (pattern) to use")
+    parser.add_argument('--no-tag', action='store_true',
+                        help="Do not create Git tag")
+    parser.add_argument('--tag-name', '-t',
+                        default='{hostname}/{branch}/{machine}/{commit_count}-g{commit}/{tag_number}',
+                        help="Tag name (pattern) to use")
+    parser.add_argument('--commit-msg-subject',
+                        default='Results of {branch}:{commit} on {hostname}',
+                        help="Subject line (pattern) to use in the commit message")
+    parser.add_argument('--commit-msg-body',
+                        default='branch: {branch}\ncommit: {commit}\nhostname: {hostname}',
+                        help="Commit message body (pattern)")
+    parser.add_argument('--tag-msg-subject',
+                        default='Test run #{tag_number} of {branch}:{commit} on {hostname}',
+                        help="Subject line (pattern) of the tag message")
+    parser.add_argument('--tag-msg-body',
+                        default='',
+                        help="Tag message body (pattern)")
+    parser.add_argument('--exclude', action='append', default=[],
+                        help="Glob to exclude files from the commit. Relative "
+                             "to DATA_DIR. May be specified multiple times")
+    parser.add_argument('--notes', nargs=2, action='append', default=[],
+                        metavar=('GIT_REF', 'FILE'),
+                        help="Add a file as a note under refs/notes/GIT_REF. "
+                             "{branch_name} in GIT_REF will be expanded to the "
+                             "actual target branch name (specified by "
+                             "--branch-name). This option may be specified "
+                             "multiple times.")
+    parser.add_argument('data_dir', metavar='DATA_DIR',
+                        help="Data to commit")
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    """Script entry point"""
+    args = parse_args(argv)
+    if args.debug:
+        log.setLevel(logging.DEBUG)
+
+    try:
+        if not os.path.isdir(args.data_dir):
+            raise ArchiveError("Not a directory: {}".format(args.data_dir))
+
+        data_repo = init_git_repo(args.git_dir, args.no_create, args.bare)
+
+        # Get keywords to be used in tag and branch names and messages
+        metadata = metadata_from_bb()
+        keywords = {'hostname': metadata['hostname'],
+                    'branch': metadata['layers']['meta']['branch'],
+                    'commit': metadata['layers']['meta']['commit'],
+                    'commit_count': metadata['layers']['meta']['commit_count'],
+                    'machine': metadata['config']['MACHINE']}
+
+        # Expand strings early in order to avoid getting into inconsistent
+        # state (e.g. no tag even if data was committed)
+        commit_msg = format_str(args.commit_msg_subject.strip(), keywords)
+        commit_msg += '\n\n' + format_str(args.commit_msg_body, keywords)
+        branch_name = format_str(args.branch_name, keywords)
+        tag_name = None
+        if not args.no_tag and args.tag_name:
+            tag_name, tag_msg = expand_tag_strings(data_repo, args.tag_name,
+                                                   args.tag_msg_subject,
+                                                   args.tag_msg_body, keywords)
+
+        # Commit data
+        commit = git_commit_data(data_repo, args.data_dir, branch_name,
+                                 commit_msg, args.exclude, args.notes)
+
+        # Create tag
+        if tag_name:
+            log.info("Creating tag %s", tag_name)
+            data_repo.run_cmd(['tag', '-a', '-m', tag_msg, tag_name, commit])
+
+        # Push data to remote
+        if args.push:
+            cmd = ['push', '--tags']
+            # If no remote is given we push with the default settings from
+            # gitconfig
+            if args.push is not True:
+                notes_refs = ['refs/notes/' + ref.format(branch_name=branch_name)
+                                for ref, _ in args.notes]
+                cmd.extend([args.push, branch_name] + notes_refs)
+            log.info("Pushing data to remote")
+            data_repo.run_cmd(cmd)
+
+    except ArchiveError as err:
+        log.error(str(err))
+        return 1
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

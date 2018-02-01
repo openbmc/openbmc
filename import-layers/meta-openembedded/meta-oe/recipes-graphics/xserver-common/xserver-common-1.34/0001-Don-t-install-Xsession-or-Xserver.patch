@@ -1,0 +1,30 @@
+From c92ce6a4b3622874f820b5ec487a2b63f519826c Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 10 Nov 2016 14:33:05 +0200
+Subject: [PATCH] Don't install Xsession or Xserver
+
+The goal is to use Xsession and Xserver from xserver-nodm-init.
+Xsession scripts and xserver-common from this recipe will still
+be used as before.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ Makefile | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index caa5de1..7e36bbc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -20,7 +20,5 @@ install-program:
+ 	install -m 755 run-calibrate.sh $(DESTDIR)$(PREFIX)/bin/run-calibrate.sh
+ 	install -m 644 X11/Xdefaults $(DESTDIR)/etc/X11/Xdefaults
+ 	install -m 755 X11/Xinit $(DESTDIR)/etc/X11/Xinit
+-	install -m 755 X11/Xserver $(DESTDIR)/etc/X11/Xserver
+-	install -m 755 X11/Xsession $(DESTDIR)/etc/X11/Xsession
+ 	install -m 755 X11/xserver-common $(DESTDIR)/etc/X11/xserver-common
+ 	install -m 755 X11/functions $(DESTDIR)/etc/X11/functions
+ 	install -d $(DESTDIR)/etc/X11/xmodmap
+-- 
+2.1.4
+

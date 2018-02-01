@@ -132,7 +132,7 @@ python do_linkerpaths () {
 }
 
 python () {
-    overrides = d.getVar("OVERRIDES", True).split(":")
+    overrides = d.getVar("OVERRIDES").split(":")
     if "class-target" in overrides:
         bb.build.addtask('do_linkerpaths', 'do_configure', 'do_patch', d)
 }

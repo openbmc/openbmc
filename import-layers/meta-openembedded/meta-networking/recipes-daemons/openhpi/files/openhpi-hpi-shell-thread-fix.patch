@@ -1,0 +1,29 @@
+commit e9f9a73c9dba8dd59f3d6c3acd9988ec8361d55a
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Mon Dec 17 16:23:45 2012 -0500
+
+    Correct dangling g_thread_exit in session.c
+    
+    hpi_shell's session.c has its progress_bar
+    thread created using pthread_create but
+    exited using g_thread_exit. Use pthread_exit
+    instead to avoid unpredictable GLIB thread
+    errors.
+    
+    Upstream-Status: Pending
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/hpi_shell/session.c b/hpi_shell/session.c
+index 85c31bf..187da4c 100644
+--- a/hpi_shell/session.c
++++ b/hpi_shell/session.c
+@@ -66,7 +66,7 @@ static void* progress_bar(void *unused)
+ 		if (i < (PROGRESS_BUF_SIZE - mes_len - 1)) i++;
+ 		t++;
+ 	};
+-        g_thread_exit(0);
++        pthread_exit(0);
+ 	return (void *)1;
+ }
+ 

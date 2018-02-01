@@ -1,6 +1,6 @@
 # Report significant differences in the buildhistory repository since a specific revision
 #
-# Copyright (C) 2012 Intel Corporation
+# Copyright (C) 2012-2013, 2016-2017 Intel Corporation
 # Author: Paul Eggleton <paul.eggleton@linux.intel.com>
 #
 # Note: requires GitPython 0.3.1+
@@ -13,7 +13,10 @@ import os.path
 import difflib
 import git
 import re
+import hashlib
+import collections
 import bb.utils
+import bb.tinfoil
 
 
 # How to display fields
@@ -69,7 +72,22 @@ class ChangeRecord:
                     pkglist.append(k)
             return pkglist
 
+        def detect_renamed_dirs(aitems, bitems):
+            adirs = set(map(os.path.dirname, aitems))
+            bdirs = set(map(os.path.dirname, bitems))
+            files_ab = [(name, sorted(os.path.basename(item) for item in aitems if os.path.dirname(item) == name)) \
+                                for name in adirs - bdirs]
+            files_ba = [(name, sorted(os.path.basename(item) for item in bitems if os.path.dirname(item) == name)) \
+                                for name in bdirs - adirs]
+            renamed_dirs = [(dir1, dir2) for dir1, files1 in files_ab for dir2, files2 in files_ba if files1 == files2]
+            # remove files that belong to renamed dirs from aitems and bitems
+            for dir1, dir2 in renamed_dirs:
+                aitems = [item for item in aitems if os.path.dirname(item) not in (dir1, dir2)]
+                bitems = [item for item in bitems if os.path.dirname(item) not in (dir1, dir2)]
+            return renamed_dirs, aitems, bitems
+
         if self.fieldname in list_fields or self.fieldname in list_order_fields:
+            renamed_dirs = []
             if self.fieldname in ['RPROVIDES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RREPLACES', 'RCONFLICTS']:
                 (depvera, depverb) = compare_pkg_lists(self.oldvalue, self.newvalue)
                 aitems = pkglist_combine(depvera)
@@ -77,16 +95,29 @@ class ChangeRecord:
             else:
                 aitems = self.oldvalue.split()
                 bitems = self.newvalue.split()
+                if self.fieldname == 'FILELIST':
+                    renamed_dirs, aitems, bitems = detect_renamed_dirs(aitems, bitems)
+
             removed = list(set(aitems) - set(bitems))
             added = list(set(bitems) - set(aitems))
 
+            lines = []
+            if renamed_dirs:
+                for dfrom, dto in renamed_dirs:
+                    lines.append('directory renamed %s -> %s' % (dfrom, dto))
             if removed or added:
                 if removed and not bitems:
-                    out = '%s: removed all items "%s"' % (self.fieldname, ' '.join(removed))
+                    lines.append('removed all items "%s"' % ' '.join(removed))
                 else:
-                    out = '%s:%s%s' % (self.fieldname, ' removed "%s"' % ' '.join(removed) if removed else '', ' added "%s"' % ' '.join(added) if added else '')
+                    if removed:
+                        lines.append('removed "%s"' % ' '.join(removed))
+                    if added:
+                        lines.append('added "%s"' % ' '.join(added))
             else:
-                out = '%s changed order' % self.fieldname
+                lines.append('changed order')
+
+            out = '%s: %s' % (self.fieldname, ', '.join(lines))
+
         elif self.fieldname in numeric_fields:
             aval = int(self.oldvalue or 0)
             bval = int(self.newvalue or 0)
@@ -382,13 +413,115 @@ def compare_dict_blobs(path, ablob, bblob, report_all, report_ver):
     return changes
 
 
-def process_changes(repopath, revision1, revision2='HEAD', report_all=False, report_ver=False):
+def compare_siglists(a_blob, b_blob, taskdiff=False):
+    # FIXME collapse down a recipe's tasks?
+    alines = a_blob.data_stream.read().decode('utf-8').splitlines()
+    blines = b_blob.data_stream.read().decode('utf-8').splitlines()
+    keys = []
+    pnmap = {}
+    def readsigs(lines):
+        sigs = {}
+        for line in lines:
+            linesplit = line.split()
+            if len(linesplit) > 2:
+                sigs[linesplit[0]] = linesplit[2]
+                if not linesplit[0] in keys:
+                    keys.append(linesplit[0])
+                pnmap[linesplit[1]] = linesplit[0].rsplit('.', 1)[0]
+        return sigs
+    adict = readsigs(alines)
+    bdict = readsigs(blines)
+    out = []
+
+    changecount = 0
+    addcount = 0
+    removecount = 0
+    if taskdiff:
+        with bb.tinfoil.Tinfoil() as tinfoil:
+            tinfoil.prepare(config_only=True)
+
+            changes = collections.OrderedDict()
+
+            def compare_hashfiles(pn, taskname, hash1, hash2):
+                hashes = [hash1, hash2]
+                hashfiles = bb.siggen.find_siginfo(pn, taskname, hashes, tinfoil.config_data)
+
+                if not taskname:
+                    (pn, taskname) = pn.rsplit('.', 1)
+                    pn = pnmap.get(pn, pn)
+                desc = '%s.%s' % (pn, taskname)
+
+                if len(hashfiles) == 0:
+                    out.append("Unable to find matching sigdata for %s with hashes %s or %s" % (desc, hash1, hash2))
+                elif not hash1 in hashfiles:
+                    out.append("Unable to find matching sigdata for %s with hash %s" % (desc, hash1))
+                elif not hash2 in hashfiles:
+                    out.append("Unable to find matching sigdata for %s with hash %s" % (desc, hash2))
+                else:
+                    out2 = bb.siggen.compare_sigfiles(hashfiles[hash1], hashfiles[hash2], recursecb, collapsed=True)
+                    for line in out2:
+                        m = hashlib.sha256()
+                        m.update(line.encode('utf-8'))
+                        entry = changes.get(m.hexdigest(), (line, []))
+                        if desc not in entry[1]:
+                            changes[m.hexdigest()] = (line, entry[1] + [desc])
+
+            # Define recursion callback
+            def recursecb(key, hash1, hash2):
+                compare_hashfiles(key, None, hash1, hash2)
+                return []
+
+            for key in keys:
+                siga = adict.get(key, None)
+                sigb = bdict.get(key, None)
+                if siga is not None and sigb is not None and siga != sigb:
+                    changecount += 1
+                    (pn, taskname) = key.rsplit('.', 1)
+                    compare_hashfiles(pn, taskname, siga, sigb)
+                elif siga is None:
+                    addcount += 1
+                elif sigb is None:
+                    removecount += 1
+        for key, item in changes.items():
+            line, tasks = item
+            if len(tasks) == 1:
+                desc = tasks[0]
+            elif len(tasks) == 2:
+                desc = '%s and %s' % (tasks[0], tasks[1])
+            else:
+                desc = '%s and %d others' % (tasks[-1], len(tasks)-1)
+            out.append('%s: %s' % (desc, line))
+    else:
+        for key in keys:
+            siga = adict.get(key, None)
+            sigb = bdict.get(key, None)
+            if siga is not None and sigb is not None and siga != sigb:
+                out.append('%s changed from %s to %s' % (key, siga, sigb))
+                changecount += 1
+            elif siga is None:
+                out.append('%s was added' % key)
+                addcount += 1
+            elif sigb is None:
+                out.append('%s was removed' % key)
+                removecount += 1
+    out.append('Summary: %d tasks added, %d tasks removed, %d tasks modified (%.1f%%)' % (addcount, removecount, changecount, (changecount / float(len(bdict)) * 100)))
+    return '\n'.join(out)
+
+
+def process_changes(repopath, revision1, revision2='HEAD', report_all=False, report_ver=False, sigs=False, sigsdiff=False):
     repo = git.Repo(repopath)
     assert repo.bare == False
     commit = repo.commit(revision1)
     diff = commit.diff(revision2)
 
     changes = []
+
+    if sigs or sigsdiff:
+        for d in diff.iter_change_type('M'):
+            if d.a_blob.path == 'siglist.txt':
+                changes.append(compare_siglists(d.a_blob, d.b_blob, taskdiff=sigsdiff))
+        return changes
+
     for d in diff.iter_change_type('M'):
         path = os.path.dirname(d.a_blob.path)
         if path.startswith('packages/'):

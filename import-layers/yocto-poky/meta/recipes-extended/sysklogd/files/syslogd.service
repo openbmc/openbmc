@@ -1,0 +1,14 @@
+[Unit]
+Description=System Logging Service
+Requires=syslog.socket
+
+[Service]
+Type=forking
+ExecStart=/sbin/syslogd
+PIDFile=/var/run/syslogd.pid
+StandardOutput=null
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+Alias=syslog.service

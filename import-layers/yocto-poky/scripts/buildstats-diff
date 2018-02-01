@@ -22,7 +22,6 @@ import os
 import re
 import sys
 from collections import namedtuple
-from datetime import datetime, timedelta, tzinfo
 from operator import attrgetter
 
 # Setup logging
@@ -35,36 +34,9 @@ class ScriptError(Exception):
     pass
 
 
-class TimeZone(tzinfo):
-    """Simple fixed-offset tzinfo"""
-    def __init__(self, seconds, name):
-        self._offset = timedelta(seconds=seconds)
-        self._name = name
-
-    def utcoffset(self, dt):
-        return self._offset
-
-    def tzname(self, dt):
-        return self._name
-
-    def dst(self, dt):
-        return None
-
-TIMEZONES = {'UTC': TimeZone(0, 'UTC'),
-             'EET': TimeZone(7200, 'EET'),
-             'EEST': TimeZone(10800, 'EEST')}
-
 taskdiff_fields = ('pkg', 'pkg_op', 'task', 'task_op', 'value1', 'value2',
                    'absdiff', 'reldiff')
 TaskDiff = namedtuple('TaskDiff', ' '.join(taskdiff_fields))
-
-
-def to_datetime_obj(obj):
-    """Helper for getting timestamps in datetime format"""
-    if isinstance(obj, datetime):
-        return obj
-    else:
-        return datetime.utcfromtimestamp(obj).replace(tzinfo=TIMEZONES['UTC'])
 
 
 class BSTask(dict):
@@ -86,7 +58,7 @@ class BSTask(dict):
     @property
     def walltime(self):
         """Elapsed wall clock time"""
-        return self['elapsed_time'].total_seconds()
+        return self['elapsed_time']
 
     @property
     def read_bytes(self):
@@ -118,10 +90,10 @@ def read_buildstats_file(buildstat_file):
             key, val = line.split(':', 1)
             val = val.strip()
             if key == 'Started':
-                start_time = to_datetime_obj(float(val))
+                start_time = float(val)
                 bs_task['start_time'] = start_time
             elif key == 'Ended':
-                end_time = to_datetime_obj(float(val))
+                end_time = float(val)
             elif key.startswith('IO '):
                 split = key.split()
                 bs_task['iostat'][split[1]] = int(val)
@@ -329,7 +301,7 @@ def print_ver_diff(bs1, bs2):
         print("\nEPOCH CHANGED:")
         print("--------------")
         for pkg in sorted(echanged):
-            field1 = "{} -> {}".format(pkg, bs1[pkg]['epoch'], bs2[pkg]['epoch'])
+            field1 = "{} -> {}".format(bs1[pkg]['epoch'], bs2[pkg]['epoch'])
             field2 = "{} -> {}".format(bs1[pkg]['nevr'], bs2[pkg]['nevr'])
             print(fmt_str.format(pkg, field1, field2, maxlen=maxlen))
 

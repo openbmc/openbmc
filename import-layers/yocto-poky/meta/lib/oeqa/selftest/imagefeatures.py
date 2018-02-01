@@ -91,9 +91,9 @@ class ImageFeatures(oeSelfTest):
         AutomatedBy: Daniel Istrate <daniel.alexandrux.istrate@intel.com>
         """
 
-        features = 'DISTRO_FEATURES_append = " wayland"\n'
-        features += 'CORE_IMAGE_EXTRA_INSTALL += "wayland weston"'
-        self.write_config(features)
+        distro_features = get_bb_var('DISTRO_FEATURES')
+        if not ('opengl' in distro_features and 'wayland' in distro_features):
+            self.skipTest('neither opengl nor wayland present on DISTRO_FEATURES so core-image-weston cannot be built')
 
         # Build a core-image-weston
         bitbake('core-image-weston')

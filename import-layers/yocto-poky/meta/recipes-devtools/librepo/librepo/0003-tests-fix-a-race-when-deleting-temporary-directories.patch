@@ -1,0 +1,41 @@
+From b1a5c92dbd1d11f1afdc094fccea64de334d2783 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Dec 2016 18:06:24 +0200
+Subject: [PATCH 3/4] tests: fix a race when deleting temporary directories
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/python/tests/test_yum_repo_downloading.py | 2 +-
+ tests/python/tests/test_yum_repo_locating.py    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/python/tests/test_yum_repo_downloading.py b/tests/python/tests/test_yum_repo_downloading.py
+index ad597dc..4a32519 100644
+--- a/tests/python/tests/test_yum_repo_downloading.py
++++ b/tests/python/tests/test_yum_repo_downloading.py
+@@ -32,7 +32,7 @@ class TestCaseYumRepoDownloading(TestCaseWithFlask):
+             os.environ.pop('GNUPGHOME')
+         else:
+             os.environ['GNUPGHOME'] = self._gnupghome
+-        shutil.rmtree(self.tmpdir)
++        shutil.rmtree(self.tmpdir, True)
+ 
+     def test_download_repo_01(self):
+         h = librepo.Handle()
+diff --git a/tests/python/tests/test_yum_repo_locating.py b/tests/python/tests/test_yum_repo_locating.py
+index 8f4bea5..db4294c 100644
+--- a/tests/python/tests/test_yum_repo_locating.py
++++ b/tests/python/tests/test_yum_repo_locating.py
+@@ -34,7 +34,7 @@ class TestCaseYumRepoLocating(TestCase):
+             os.environ.pop('GNUPGHOME')
+         else:
+             os.environ['GNUPGHOME'] = self._gnupghome
+-        shutil.rmtree(self.tmpdir)
++        shutil.rmtree(self.tmpdir, True)
+ 
+     def test_read_mirrorlist(self):
+         h = librepo.Handle()
+-- 
+2.11.0
+

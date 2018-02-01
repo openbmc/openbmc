@@ -331,7 +331,6 @@ def write_patch_items(scripts_path, machine, patch_items):
     patch list [${machine}-user-patches.scc].
     """
     f = open_user_file(scripts_path, machine, machine+"-user-patches.scc", "w")
-    f.write("mark patching start\n")
     for item in patch_items:
         f.write("patch " + item + "\n")
     f.close()

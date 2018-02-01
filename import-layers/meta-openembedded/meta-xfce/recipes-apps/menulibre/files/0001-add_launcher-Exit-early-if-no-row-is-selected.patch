@@ -1,0 +1,37 @@
+From 1060e7ac8a63b93d56006718f0e9b1d9382b2226 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 31 Oct 2016 08:33:16 +0100
+Subject: [PATCH] add_launcher: Exit early if no row is selected
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Stolen from [1]
+
+[1] http://pkgs.fedoraproject.org/cgit/rpms/menulibre.git/tree/menulibre-add-launcher-none-check.patch
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ menulibre/MenulibreApplication.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/menulibre/MenulibreApplication.py b/menulibre/MenulibreApplication.py
+index e234800..ac73b03 100644
+--- a/menulibre/MenulibreApplication.py
++++ b/menulibre/MenulibreApplication.py
+@@ -1418,6 +1418,10 @@ class MenulibreWindow(Gtk.ApplicationWindow):
+         model, parent_data = self.treeview.get_parent_row_data()
+         model, row_data = self.treeview.get_selected_row_data()
+ 
++        # Exit early if no row is selected
++        if not row_data:
++            return
++
+         # Currently selected item is a directory, take its categories.
+         if row_data[2] == MenuItemTypes.DIRECTORY:
+             self.treeview.add_child(new_row_data)
+-- 
+2.5.5
+

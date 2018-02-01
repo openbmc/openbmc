@@ -7,7 +7,8 @@ SECTION = "libs"
 DEPENDS = "ncurses-native"
 DEPENDS_class-native = ""
 
-BINCONFIG = "${bindir}/ncurses5-config ${bindir}/ncursesw5-config"
+BINCONFIG = "${bindir}/ncurses5-config ${bindir}/ncursesw5-config \
+	${bindir}/ncurses6-config ${bindir}/ncursesw6-config"
 
 inherit autotools binconfig-disabled multilib_header pkgconfig
 
@@ -16,6 +17,8 @@ SRC_URI = "git://anonscm.debian.org/collab-maint/ncurses.git"
 
 EXTRA_AUTORECONF = "-I m4"
 CONFIG_SITE =+ "${WORKDIR}/config.cache"
+
+EXTRASITECONFIG = "CFLAGS='${CFLAGS} -I${SYSROOT_DESTDIR}${includedir}'"
 
 # Whether to enable separate widec libraries; must be 'true' or 'false'
 #
@@ -65,7 +68,6 @@ ncurses_configure() {
 	cd $1
 	shift
 	oe_runconf \
-	        --disable-static \
 	        --without-debug \
 	        --without-ada \
 	        --without-gpm \
@@ -278,6 +280,8 @@ FILES_${PN} = "\
   ${bindir}/tset \
   ${bindir}/ncurses5-config \
   ${bindir}/ncursesw5-config \
+  ${bindir}/ncurses6-config \
+  ${bindir}/ncursesw6-config \
   ${datadir}/tabset \
 "
 

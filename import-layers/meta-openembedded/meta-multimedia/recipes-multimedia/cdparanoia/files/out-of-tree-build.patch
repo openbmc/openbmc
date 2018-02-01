@@ -1,0 +1,42 @@
+Index: cdparanoia-III-10.2/Makefile.in
+===================================================================
+--- cdparanoia-III-10.2.orig/Makefile.in
++++ cdparanoia-III-10.2/Makefile.in
+@@ -6,6 +6,8 @@
+ VERSION=10.2
+ VPATH=@srcdir@
+ srcdir=@srcdir@
++top_srcdir=@top_srcdir@
++top_builddir=@top_builddir@
+ 
+ @SET_MAKE@
+ FLAGS=@TYPESIZES@ @CFLAGS@
+@@ -64,19 +66,19 @@ slib:
+ 
+ install:
+ 	$(INSTALL) -d -m 0755 $(DESTDIR)$(BINDIR)
+-	$(INSTALL) -m 755 $(srcdir)/cdparanoia $(DESTDIR)$(BINDIR)
++	$(INSTALL) -m 755 $(top_builddir)/cdparanoia $(DESTDIR)$(BINDIR)
+ 	$(INSTALL) -d -m 0755 $(DESTDIR)$(MANDIR)
+ 	$(INSTALL) -d -m 0755 $(DESTDIR)$(MANDIR)/man1
+-	$(INSTALL) -m 0644 $(srcdir)/cdparanoia.1 $(DESTDIR)$(MANDIR)/man1
++	$(INSTALL) -m 0644 $(top_srcdir)/cdparanoia.1 $(DESTDIR)$(MANDIR)/man1
+ 	$(INSTALL) -d -m 0755 $(DESTDIR)$(INCLUDEDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/paranoia/cdda_paranoia.h $(DESTDIR)$(INCLUDEDIR)
++	$(INSTALL) -m 0644 $(top_srcdir)/paranoia/cdda_paranoia.h $(DESTDIR)$(INCLUDEDIR)
+ 	$(INSTALL) -d -m 0755 $(DESTDIR)$(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/paranoia/libcdda_paranoia.so.0.$(VERSION) $(DESTDIR)$(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/paranoia/libcdda_paranoia.a $(DESTDIR)$(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/interface/cdda_interface.h $(DESTDIR)$(INCLUDEDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/interface/libcdda_interface.so.0.$(VERSION) $(DESTDIR)$(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/interface/libcdda_interface.a $(DESTDIR)$(LIBDIR)
+-	$(INSTALL) -m 0644 $(srcdir)/utils.h $(DESTDIR)$(INCLUDEDIR)
++	$(INSTALL) -m 0644 $(top_builddir)/paranoia/libcdda_paranoia.so.0.$(VERSION) $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 0644 $(top_builddir)/paranoia/libcdda_paranoia.a $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 0644 $(top_srcdir)/interface/cdda_interface.h $(DESTDIR)$(INCLUDEDIR)
++	$(INSTALL) -m 0644 $(top_builddir)/interface/libcdda_interface.so.0.$(VERSION) $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 0644 $(top_builddir)/interface/libcdda_interface.a $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 0644 $(top_srcdir)/utils.h $(DESTDIR)$(INCLUDEDIR)
+ 	ln -fs libcdda_interface.so.0.$(VERSION) \
+ 		$(DESTDIR)$(LIBDIR)/libcdda_interface.so.0
+ 	ln -fs libcdda_interface.so.0.$(VERSION) \

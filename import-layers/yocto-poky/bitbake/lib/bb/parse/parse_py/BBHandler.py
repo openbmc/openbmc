@@ -66,7 +66,7 @@ def inherit(files, fn, lineno, d):
             file = os.path.join('classes', '%s.bbclass' % file)
 
         if not os.path.isabs(file):
-            bbpath = d.getVar("BBPATH", True)
+            bbpath = d.getVar("BBPATH")
             abs_fn, attempts = bb.utils.which(bbpath, file, history=True)
             for af in attempts:
                 if af != abs_fn:
@@ -87,17 +87,17 @@ def get_statements(filename, absolute_filename, base_name):
     try:
         return cached_statements[absolute_filename]
     except KeyError:
-        file = open(absolute_filename, 'r')
-        statements = ast.StatementGroup()
+        with open(absolute_filename, 'r') as f:
+            statements = ast.StatementGroup()
 
-        lineno = 0
-        while True:
-            lineno = lineno + 1
-            s = file.readline()
-            if not s: break
-            s = s.rstrip()
-            feeder(lineno, s, filename, base_name, statements)
-        file.close()
+            lineno = 0
+            while True:
+                lineno = lineno + 1
+                s = f.readline()
+                if not s: break
+                s = s.rstrip()
+                feeder(lineno, s, filename, base_name, statements)
+
         if __inpython__:
             # add a blank line to close out any python definition
             feeder(lineno, "", filename, base_name, statements, eof=True)

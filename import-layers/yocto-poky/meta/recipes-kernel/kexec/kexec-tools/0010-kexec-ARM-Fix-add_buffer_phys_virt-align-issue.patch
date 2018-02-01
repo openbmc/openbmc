@@ -1,0 +1,52 @@
+From 78e497fb69950665e639cfab8f4fb50cc404a1eb Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Mon, 9 Jan 2017 15:26:29 +0800
+Subject: [PATCH] kexec: ARM: Fix add_buffer_phys_virt() align issue
+
+When "CONFIG_ARM_LPAE" is enabled,3 level page table
+is used by MMU, the "SECTION_SIZE" is defined with
+(1 << 21), but 'add_buffer_phys_virt()' hardcode this
+to (1 << 20).
+
+Upstream-Status: Pending
+
+Suggested-By:fredrik.markstrom@gmail.com
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+---
+ kexec/arch/arm/crashdump-arm.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/kexec/arch/arm/crashdump-arm.c b/kexec/arch/arm/crashdump-arm.c
+index 245c21a..12139c3 100644
+--- a/kexec/arch/arm/crashdump-arm.c
++++ b/kexec/arch/arm/crashdump-arm.c
+@@ -240,6 +240,7 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
+ 	void *buf;
+ 	int err;
+ 	int last_ranges;
++	unsigned short align_bit_shift = 20;
+ 
+ 	/*
+ 	 * First fetch all the memory (RAM) ranges that we are going to pass to
+@@ -281,6 +282,7 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
+ 
+ 		/* for support LPAE enabled kernel*/
+ 		elf_info.class = ELFCLASS64;
++		align_bit_shift = 21;
+ 
+ 		err = crash_create_elf64_headers(info, &elf_info,
+ 					 usablemem_rgns.ranges,
+@@ -302,8 +304,9 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
+ 	 * 1MB) so that available memory passed in kernel command line will be
+ 	 * aligned to 1MB. This is because kernel create_mapping() wants memory
+ 	 * regions to be aligned to SECTION_SIZE.
++	 * The SECTION_SIZE of LPAE kernel is '1UL << 21' defined in pgtable-3level.h
+ 	 */
+-	elfcorehdr = add_buffer_phys_virt(info, buf, bufsz, bufsz, 1 << 20,
++	elfcorehdr = add_buffer_phys_virt(info, buf, bufsz, bufsz, 1 << align_bit_shift,
+ 					  crash_kernel_mem.start,
+ 					  crash_kernel_mem.end, -1, 0);
+ 
+-- 
+1.9.1
+

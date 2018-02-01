@@ -92,6 +92,8 @@ class ProcessServer(Process, BaseImplServer):
         self.event = EventAdapter(event_queue)
         self.featurelist = featurelist
         self.quit = False
+        self.heartbeat_seconds = 1 # default, BB_HEARTBEAT_EVENT will be checked once we have a datastore.
+        self.next_heartbeat = time.time()
 
         self.quitin, self.quitout = Pipe()
         self.event_handle = multiprocessing.Value("i")
@@ -101,6 +103,14 @@ class ProcessServer(Process, BaseImplServer):
             self.event_queue.put(event)
         self.event_handle.value = bb.event.register_UIHhandler(self, True)
 
+        heartbeat_event = self.cooker.data.getVar('BB_HEARTBEAT_EVENT')
+        if heartbeat_event:
+            try:
+                self.heartbeat_seconds = float(heartbeat_event)
+            except:
+                # Throwing an exception here causes bitbake to hang.
+                # Just warn about the invalid setting and continue
+                bb.warn('Ignoring invalid BB_HEARTBEAT_EVENT=%s, must be a float specifying seconds.' % heartbeat_event)
         bb.cooker.server_main(self.cooker, self.main)
 
     def main(self):
@@ -160,6 +170,21 @@ class ProcessServer(Process, BaseImplServer):
                 del self._idlefuns[function]
                 self.quit = True
 
+        # Create new heartbeat event?
+        now = time.time()
+        if now >= self.next_heartbeat:
+            # We might have missed heartbeats. Just trigger once in
+            # that case and continue after the usual delay.
+            self.next_heartbeat += self.heartbeat_seconds
+            if self.next_heartbeat <= now:
+                self.next_heartbeat = now + self.heartbeat_seconds
+            heartbeat = bb.event.HeartbeatEvent(now)
+            bb.event.fire(heartbeat, self.cooker.data)
+        if nextsleep and now + nextsleep > self.next_heartbeat:
+            # Shorten timeout so that we we wake up in time for
+            # the heartbeat.
+            nextsleep = self.next_heartbeat - now
+
         if nextsleep is not None:
             select.select(fds,[],[],nextsleep)
 
@@ -199,7 +224,6 @@ class BitBakeProcessServerConnection(BitBakeBaseServerConnection):
                 if isinstance(event, logging.LogRecord):
                     logger.handle(event)
 
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
         self.procserver.stop()
 
         while self.procserver.is_alive():
@@ -209,6 +233,9 @@ class BitBakeProcessServerConnection(BitBakeBaseServerConnection):
         self.ui_channel.close()
         self.event_queue.close()
         self.event_queue.setexit()
+        # XXX: Call explicity close in _writer to avoid
+        # fd leakage because isn't called on Queue.close()
+        self.event_queue._writer.close()
 
 # Wrap Queue to provide API which isn't server implementation specific
 class ProcessEventQueue(multiprocessing.queues.Queue):
@@ -239,7 +266,6 @@ class ProcessEventQueue(multiprocessing.queues.Queue):
             if self.exit:
                 sys.exit(1)
             return None
-
 
 class BitBakeServer(BitBakeBaseServer):
     def initServer(self, single_use=True):

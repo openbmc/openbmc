@@ -1,0 +1,30 @@
+From 2ee0c51d81a0a08d64b64ab624074e5f7cd9615a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2017 00:07:32 -0700
+Subject: [PATCH] ftp: include sys/types.h for u_long
+
+fixes
+ftp.c:1091:2: error: unknown type name 'u_long'; did you mean 'long'?
+  u_long a1,a2,a3,a4,p1,p2;
+  ^~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ftp/ftp.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ftp/ftp.c b/ftp/ftp.c
+index 7a56af6..5dcb513 100644
+--- a/ftp/ftp.c
++++ b/ftp/ftp.c
+@@ -43,6 +43,7 @@ char ftp_rcsid[] =
+ #include <sys/socket.h>
+ #include <sys/time.h>
+ #include <sys/file.h>
++#include <sys/types.h>
+ 
+ #include <netinet/in.h>
+ #include <netinet/ip.h>
+-- 
+2.13.3
+

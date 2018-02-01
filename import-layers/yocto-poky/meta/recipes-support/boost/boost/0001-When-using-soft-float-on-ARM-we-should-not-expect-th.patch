@@ -1,0 +1,29 @@
+From 9ab0914207e6d0e6b75ce12147c54b96478feb64 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 21 Feb 2017 12:50:35 +0200
+Subject: [PATCH] When using soft-float, on ARM we should not expect the FE_*
+ symbols
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ boost/test/execution_monitor.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/boost/test/execution_monitor.hpp b/boost/test/execution_monitor.hpp
+index f53348a..86252d7 100644
+--- a/boost/test/execution_monitor.hpp
++++ b/boost/test/execution_monitor.hpp
+@@ -498,7 +498,7 @@ enum masks {
+ 
+     BOOST_FPE_ALL       = MCW_EM,
+ 
+-#elif defined(BOOST_NO_FENV_H) || defined(BOOST_CLANG) /* *** */
++#elif defined(BOOST_NO_FENV_H) || defined(BOOST_CLANG) || defined(__ARM_PCS) /* *** */
+     BOOST_FPE_ALL       = BOOST_FPE_OFF,
+ 
+ #else /* *** */
+-- 
+2.11.0
+

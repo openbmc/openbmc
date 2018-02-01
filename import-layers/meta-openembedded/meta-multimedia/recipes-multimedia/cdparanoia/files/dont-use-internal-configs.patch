@@ -1,0 +1,30 @@
+Index: cdparanoia-III-10.2/configure.in
+===================================================================
+--- cdparanoia-III-10.2.orig/configure.in
++++ cdparanoia-III-10.2/configure.in
+@@ -1,13 +1,8 @@
+ AC_INIT(interface/interface.c)
+ 
+-cp $srcdir/configure.guess $srcdir/config.guess
+-cp $srcdir/configure.sub $srcdir/config.sub
+-
+ AC_CANONICAL_HOST
+ 
+-if test -z "$CC"; then
+-	AC_PROG_CC	
+-fi
++AC_PROG_CC
+ AC_PROG_RANLIB
+ AC_CHECK_PROG(AR,ar,ar)
+ AC_CHECK_PROG(INSTALL,install,install)
+@@ -44,8 +39,8 @@ case 4 in
+ 	$ac_cv_sizeof_long) SIZE32="long";;
+ esac
+ 
+-AC_CHECK_TYPE(int16_t,SIZE16="int16_t",,)
+-AC_CHECK_TYPE(int32_t,SIZE32="size32_t",,)
++AC_CHECK_TYPES([int16_t], [SIZE16="int16_t"], [], [[#include <stdint.h>]])
++AC_CHECK_TYPES([int32_t], [SIZE32="int32_t"], [], [[#include <stdint.h>]])
+ 
+ if test -z "$SIZE16"; then
+ 	AC_MSG_ERROR(No 16 bit type found on this platform!)

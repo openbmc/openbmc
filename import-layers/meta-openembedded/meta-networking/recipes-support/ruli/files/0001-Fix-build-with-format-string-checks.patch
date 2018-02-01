@@ -1,0 +1,33 @@
+From 40848547abf592c8d29b85ef1346001514944435 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 17 Jun 2017 10:14:20 -0700
+Subject: [PATCH] Fix build with format string checks
+
+Fixes
+| ruli_addr.c:418:5: error: format not a string literal and no format arguments [-Werror=format-security]
+|      return fprintf(out, inet_ntoa(addr->ipv4));
+|      ^~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/ruli_addr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ruli_addr.c b/src/ruli_addr.c
+index 00d5d0d..f1eabae 100644
+--- a/src/ruli_addr.c
++++ b/src/ruli_addr.c
+@@ -415,7 +415,7 @@ int ruli_in_print(FILE *out, const _ruli_addr *addr, int family)
+ {
+   switch (family) {
+   case PF_INET:
+-    return fprintf(out, inet_ntoa(addr->ipv4));
++    return fprintf(out, "%s", inet_ntoa(addr->ipv4));
+ 
+   case PF_INET6:
+     return ruli_inet6_print(out, &addr->ipv6);
+-- 
+2.13.1
+

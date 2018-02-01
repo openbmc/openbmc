@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8a71d0475d08eee76d8b6d0c6dbec543"
 
 DEPENDS += "pixman"
 
-PNBLACKLIST[xf86-input-mtev] ?= "BROKEN: doesn't build with B!=S (Makefile without ${S} in sed call)"
+PNBLACKLIST[xf86-input-mtev] ?= "BROKEN: doesn't build with B!=S (Makefile without ${S} in sed call) - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 SRC_URI = "git://gitorious.org/xorg/xf86-input-mtev.git file://fix-it.patch"
 SRCREV = "1eb469166ffc095c5801475f057f911f97a6e641"

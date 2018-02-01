@@ -20,4 +20,4 @@ RDEPENDS_${PN} = "\
     python-core \
 "
 
-BBCLASSEXTEND = "nativesdk"
+BBCLASSEXTEND = "native nativesdk"

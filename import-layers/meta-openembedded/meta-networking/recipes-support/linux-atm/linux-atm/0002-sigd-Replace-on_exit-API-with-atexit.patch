@@ -1,0 +1,30 @@
+From 27fa80dc8045e71c30dd2abea835206d5c8f6c71 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 17 Jun 2017 16:18:56 -0700
+Subject: [PATCH 2/3] sigd: Replace on_exit() API with atexit()
+
+on_exit is not universally available
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/sigd/atmsigd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sigd/atmsigd.c b/src/sigd/atmsigd.c
+index 52e41c7..b766606 100644
+--- a/src/sigd/atmsigd.c
++++ b/src/sigd/atmsigd.c
+@@ -517,7 +517,7 @@ int main(int argc,char **argv)
+ 	    exit(0);
+ 	}
+     }
+-    (void) on_exit(trace_on_exit,NULL);
++    atexit(trace_on_exit);
+     poll_loop();
+     close_all();
+     for (sig = entities; sig; sig = sig->next) stop_saal(&sig->saal);
+-- 
+2.13.1
+

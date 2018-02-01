@@ -1,0 +1,145 @@
+From d8986cb065e770017ee1622fb7324387ead60203 Mon Sep 17 00:00:00 2001
+From: Ming Liu <peter.x.liu@external.atlascopco.com>
+Date: Tue, 7 Mar 2017 11:46:52 +0100
+Subject: [PATCH] Adjust the cmake files
+
+- Remove json_test which can not build with boost 1.61.0.
+- Build shared library as well with the original static library.
+- Add FindLibJsonSpirit.cmake to be able to be found by the dependers.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Ming Liu <peter.x.liu@external.atlascopco.com>
+---
+ CMakeLists.txt             |  8 +++---
+ FindLibJsonSpirit.cmake    | 64 ++++++++++++++++++++++++++++++++++++++++++++++
+ json_spirit/CMakeLists.txt | 16 +++++++++++-
+ 3 files changed, 83 insertions(+), 5 deletions(-)
+ create mode 100644 FindLibJsonSpirit.cmake
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4637a6c..b292f0f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+ 
+ PROJECT(json_spirit)
+-SUBDIRS(json_spirit json_demo json_headers_only_demo json_map_demo json_test)
++SUBDIRS(json_spirit json_demo json_headers_only_demo json_map_demo)
+ INCLUDE_DIRECTORIES(json_spirit)
+ 
+ INSTALL(
+@@ -16,11 +16,11 @@ INSTALL(
+   ${CMAKE_SOURCE_DIR}/json_spirit/json_spirit_writer.h
+   ${CMAKE_SOURCE_DIR}/json_spirit/json_spirit_writer_template.h
+   ${CMAKE_SOURCE_DIR}/json_spirit/json_spirit_writer_options.h
+-  DESTINATION include)
++  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+ 
+ INSTALL(
+   FILES
+-  ${CMAKE_BINARY_DIR}/json_spirit/libjson_spirit.a
+-  DESTINATION lib)
++  ${CMAKE_SOURCE_DIR}/FindLibJsonSpirit.cmake
++  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/Modules)
+ 
+ INCLUDE(CPack)
+diff --git a/FindLibJsonSpirit.cmake b/FindLibJsonSpirit.cmake
+new file mode 100644
+index 0000000..7ee7687
+--- /dev/null
++++ b/FindLibJsonSpirit.cmake
+@@ -0,0 +1,64 @@
++# FindLibJsonSpirit - Find libjson_spirit headers and libraries.
++#
++# Sample:
++#
++#   SET( LibJsonSpirit_USE_STATIC_LIBS OFF )
++#   FIND_PACKAGE( LibJsonSpirit REQUIRED )
++#   IF( LibJsonSpirit_FOUND )
++#      INCLUDE_DIRECTORIES( ${LibJsonSpirit_INCLUDE_DIRS} )
++#      TARGET_LINK_LIBRARIES( ... ${LibJsonSpirit_LIBRARIES} )
++#   ENDIF()
++#
++# Variables used by this module need to be set before calling find_package
++#
++#   LibJsonSpirit_USE_STATIC_LIBS	Can be set to ON to force the use of the static
++#					libjson_spirit libraries. Defaults to OFF.
++#
++# Variables provided by this module:
++#
++#   LibJsonSpirit_FOUND		Include dir, libjson_spirit libraries.
++#
++#   LibJsonSpirit_LIBRARIES	Link to these to use all the libraries you specified.
++#
++#   LibJsonSpirit_INCLUDE_DIRS	Include directories.
++#
++# For each component you specify in find_package(), the following (UPPER-CASE)
++# variables are set to pick and choose components instead of just using
++# LibJsonSpirit_LIBRARIES:
++#
++#   LIBJSONSPIRIT_FOUND			TRUE if libjson_spirit was found
++#   LIBJSONSPIRIT_LIBRARY		libjson_spirit library
++#
++
++# Support preference of static libs by adjusting CMAKE_FIND_LIBRARY_SUFFIXES
++IF(LibJsonSpirit_USE_STATIC_LIBS)
++    SET( _ORIG_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
++    SET(CMAKE_FIND_LIBRARY_SUFFIXES .a )
++ENDIF()
++
++# Look for the header files
++UNSET(LibJsonSpirit_INCLUDE_DIRS CACHE)
++FIND_PATH(LibJsonSpirit_INCLUDE_DIRS NAMES json_spirit.h)
++
++# Look for the core library
++UNSET(LIBJSONSPIRIT_LIBRARY CACHE)
++FIND_LIBRARY(LIBJSONSPIRIT_LIBRARY NAMES json_spirit)
++FIND_PACKAGE_HANDLE_STANDARD_ARGS(LibJsonSpirit DEFAULT_MSG LIBJSONSPIRIT_LIBRARY LibJsonSpirit_INCLUDE_DIRS)
++MARK_AS_ADVANCED(
++    LIBJSONSPIRIT_FOUND
++    LIBJSONSPIRIT_LIBRARY
++)
++
++# Prepare return values and collectiong more components
++SET(LibJsonSpirit_FOUND ${LIBJSONSPIRIT_FOUND})
++SET(LibJsonSpirit_LIBRARIES ${LIBJSONSPIRIT_LIBRARY})
++MARK_AS_ADVANCED(
++    LibJsonSpirit_FOUND
++    LibJsonSpirit_LIBRARIES
++    LibJsonSpirit_INCLUDE_DIRS
++)
++
++# Restore CMAKE_FIND_LIBRARY_SUFFIXES
++IF(LibJsonSpirit_USE_STATIC_LIBS)
++    SET(CMAKE_FIND_LIBRARY_SUFFIXES ${_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES} )
++ENDIF()
+diff --git a/json_spirit/CMakeLists.txt b/json_spirit/CMakeLists.txt
+index fb52818..c1613b2 100644
+--- a/json_spirit/CMakeLists.txt
++++ b/json_spirit/CMakeLists.txt
+@@ -13,5 +13,19 @@ json_spirit_writer_template.h )
+ FIND_PACKAGE(Boost 1.34 REQUIRED)
+ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+ 
+-ADD_LIBRARY(json_spirit STATIC ${JSON_SPIRIT_SRCS})
++SET(JSONSPIRIT_SOVERSION_MAJOR "4")
++SET(JSONSPIRIT_SOVERSION_MINOR "0")
++SET(JSONSPIRIT_SOVERSION_PATCH "8")
+ 
++ADD_LIBRARY(json_spirit SHARED ${JSON_SPIRIT_SRCS})
++SET_TARGET_PROPERTIES(json_spirit PROPERTIES PROJECT_LABEL "Json Spirit Library")
++SET_TARGET_PROPERTIES(json_spirit PROPERTIES COMPILE_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
++SET_TARGET_PROPERTIES(json_spirit PROPERTIES VERSION ${JSONSPIRIT_SOVERSION_MAJOR}.${JSONSPIRIT_SOVERSION_MINOR}.${JSONSPIRIT_SOVERSION_PATCH})
++SET_TARGET_PROPERTIES(json_spirit PROPERTIES SOVERSION ${JSONSPIRIT_SOVERSION_MAJOR})
++INSTALL(TARGETS json_spirit DESTINATION ${CMAKE_INSTALL_LIBDIR})
++
++ADD_LIBRARY(json_spirit_static STATIC ${JSON_SPIRIT_SRCS})
++SET_TARGET_PROPERTIES(json_spirit_static PROPERTIES PROJECT_LABEL "Json Spirit Static Library")
++SET_TARGET_PROPERTIES(json_spirit_static PROPERTIES OUTPUT_NAME "json_spirit")
++SET_TARGET_PROPERTIES(json_spirit_static PROPERTIES SOVERSION ${JSONSPIRIT_SOVERSION_MAJOR})
++INSTALL(TARGETS json_spirit_static DESTINATION ${CMAKE_INSTALL_LIBDIR})
+-- 
+1.9.1
+

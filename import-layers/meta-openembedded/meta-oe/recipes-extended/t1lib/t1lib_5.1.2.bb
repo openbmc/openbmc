@@ -9,7 +9,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8ca43cbc842c2336e835926c2166c28b \
 
 SRC_URI = "${DEBIAN_MIRROR}/main/t/t1lib/t1lib_${PV}.orig.tar.gz \
            file://configure.patch \
-           file://libtool.patch"
+           file://libtool.patch \
+           file://format_security.patch"
 SRC_URI[md5sum] = "a5629b56b93134377718009df1435f3c"
 SRC_URI[sha256sum] = "821328b5054f7890a0d0cd2f52825270705df3641dbd476d58d17e56ed957b59"
 

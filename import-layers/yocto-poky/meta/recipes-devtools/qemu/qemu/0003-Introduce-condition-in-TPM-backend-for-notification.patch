@@ -1,0 +1,79 @@
+From 732a8e046948fd62b32cd1dd76a6798eb1caf4d6 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Sat, 31 Dec 2016 11:23:32 -0500
+Subject: [PATCH 3/4] Introduce condition in TPM backend for notification
+
+TPM backends will suspend independently of the frontends. Also
+here we need to be able to wait for the TPM command to have been
+completely processed.
+
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+
+Upstream-Status: Pending [https://lists.nongnu.org/archive/html/qemu-devel/2016-06/msg00252.html]
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ hw/tpm/tpm_passthrough.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 050f2ba850..44739ebad2 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -75,6 +75,10 @@ struct TPMPassthruState {
+     TPMVersion tpm_version;
+     ptm_cap cuse_cap; /* capabilities of the CUSE TPM */
+     uint8_t cur_locty_number; /* last set locality */
++
++    QemuMutex state_lock;
++    QemuCond cmd_complete;  /* singnaled once tpm_busy is false */
++    bool tpm_busy;
+ };
+ 
+ typedef struct TPMPassthruState TPMPassthruState;
+@@ -274,6 +278,11 @@ static void tpm_passthrough_worker_thread(gpointer data,
+         thr_parms->recv_data_callback(thr_parms->tpm_state,
+                                       thr_parms->tpm_state->locty_number,
+                                       selftest_done);
++        /* result delivered */
++        qemu_mutex_lock(&tpm_pt->state_lock);
++        tpm_pt->tpm_busy = false;
++        qemu_cond_signal(&tpm_pt->cmd_complete);
++        qemu_mutex_unlock(&tpm_pt->state_lock);
+         break;
+     case TPM_BACKEND_CMD_INIT:
+     case TPM_BACKEND_CMD_END:
+@@ -401,6 +410,7 @@ static void tpm_passthrough_reset(TPMBackend *tb)
+     tpm_backend_thread_end(&tpm_pt->tbt);
+ 
+     tpm_pt->had_startup_error = false;
++    tpm_pt->tpm_busy = false;
+ }
+ 
+ static int tpm_passthrough_init(TPMBackend *tb, TPMState *s,
+@@ -478,6 +488,11 @@ static void tpm_passthrough_deliver_request(TPMBackend *tb)
+ {
+     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+ 
++    /* TPM considered busy once TPM Request scheduled for processing */
++    qemu_mutex_lock(&tpm_pt->state_lock);
++    tpm_pt->tpm_busy = true;
++    qemu_mutex_unlock(&tpm_pt->state_lock);
++
+     tpm_backend_thread_deliver_request(&tpm_pt->tbt);
+ }
+ 
+@@ -746,6 +761,11 @@ static const TPMDriverOps tpm_passthrough_driver = {
+ 
+ static void tpm_passthrough_inst_init(Object *obj)
+ {
++    TPMBackend *tb = TPM_BACKEND(obj);
++    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
++
++    qemu_mutex_init(&tpm_pt->state_lock);
++    qemu_cond_init(&tpm_pt->cmd_complete);
+ }
+ 
+ static void tpm_passthrough_inst_finalize(Object *obj)
+-- 
+2.11.0
+

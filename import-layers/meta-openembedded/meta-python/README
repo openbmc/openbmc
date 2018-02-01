@@ -17,12 +17,12 @@ The meta-python layer depends on:
 
 	URI: git://git.openembedded.org/openembedded-core
 	layers: meta
-	branch: morty
+	branch: pyro 
 	revision: HEAD
 
 	URI: git://git.openembedded.org/meta-openembedded
 	layers: meta-oe
-	branch: morty
+	branch:  pyro
 	revision: HEAD
 
 Please follow the recommended setup procedures of your OE distribution.
@@ -39,14 +39,12 @@ comments and patch review. It is subscriber only, so please register
 before posting.
 
 Send pull requests to openembedded-devel@lists.openembedded.org with
-'[meta-python]' in the subject.
+'[meta-python][pyro]' in the subject.
 
 When sending single patches, please use something like: 
-'git send-email -M -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix=meta-python][morty][PATCH'
+'git send-email -M -1 --to=openembedded-devel@lists.openembedded.org --subject-prefix=meta-python][pyro][PATCH'
 
 Maintenance
 -------------------------
-
-morty branch maintainer(s):
+pyro Branch Maintainer:
 Armin Kuster <akuster808@gmail.com>
-

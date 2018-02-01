@@ -1,0 +1,183 @@
+From e9178fa082116d4bf733b184a8b6951112c17900 Mon Sep 17 00:00:00 2001
+From: Matthew Waters <matthew@centricular.com>
+Date: Thu, 10 Nov 2016 17:18:36 +1100
+Subject: [PATCH] smoothstreaming: implement adaptivedemux's
+ get_live_seek_range()
+
+Allows seeking through the available fragments that are still available
+on the server as specified by the DVRWindowLength attribute in the
+manifest.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=774178
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ ext/smoothstreaming/gstmssdemux.c    | 13 ++++++
+ ext/smoothstreaming/gstmssmanifest.c | 84 ++++++++++++++++++++++++++++++++++++
+ ext/smoothstreaming/gstmssmanifest.h |  1 +
+ 3 files changed, 98 insertions(+)
+
+diff --git a/ext/smoothstreaming/gstmssdemux.c b/ext/smoothstreaming/gstmssdemux.c
+index 9d0aece2b..b66e19514 100644
+--- a/ext/smoothstreaming/gstmssdemux.c
++++ b/ext/smoothstreaming/gstmssdemux.c
+@@ -138,6 +138,8 @@ gst_mss_demux_get_manifest_update_interval (GstAdaptiveDemux * demux);
+ static GstFlowReturn
+ gst_mss_demux_update_manifest_data (GstAdaptiveDemux * demux,
+     GstBuffer * buffer);
++static gboolean gst_mss_demux_get_live_seek_range (GstAdaptiveDemux * demux,
++    gint64 * start, gint64 * stop);
+ 
+ static void
+ gst_mss_demux_class_init (GstMssDemuxClass * klass)
+@@ -192,6 +194,8 @@ gst_mss_demux_class_init (GstMssDemuxClass * klass)
+       gst_mss_demux_stream_update_fragment_info;
+   gstadaptivedemux_class->update_manifest_data =
+       gst_mss_demux_update_manifest_data;
++  gstadaptivedemux_class->get_live_seek_range =
++      gst_mss_demux_get_live_seek_range;
+ 
+   GST_DEBUG_CATEGORY_INIT (mssdemux_debug, "mssdemux", 0, "mssdemux plugin");
+ }
+@@ -659,3 +663,12 @@ gst_mss_demux_update_manifest_data (GstAdaptiveDemux * demux,
+   gst_mss_manifest_reload_fragments (mssdemux->manifest, buffer);
+   return GST_FLOW_OK;
+ }
++
++static gboolean
++gst_mss_demux_get_live_seek_range (GstAdaptiveDemux * demux, gint64 * start,
++    gint64 * stop)
++{
++  GstMssDemux *mssdemux = GST_MSS_DEMUX_CAST (demux);
++
++  return gst_mss_manifest_get_live_seek_range (mssdemux->manifest, start, stop);
++}
+diff --git a/ext/smoothstreaming/gstmssmanifest.c b/ext/smoothstreaming/gstmssmanifest.c
+index 1b72e8de1..317b3cef9 100644
+--- a/ext/smoothstreaming/gstmssmanifest.c
++++ b/ext/smoothstreaming/gstmssmanifest.c
+@@ -42,6 +42,7 @@ GST_DEBUG_CATEGORY_EXTERN (mssdemux_debug);
+ 
+ #define MSS_PROP_BITRATE              "Bitrate"
+ #define MSS_PROP_DURATION             "d"
++#define MSS_PROP_DVR_WINDOW_LENGTH    "DVRWindowLength"
+ #define MSS_PROP_LANGUAGE             "Language"
+ #define MSS_PROP_NUMBER               "n"
+ #define MSS_PROP_REPETITIONS          "r"
+@@ -94,6 +95,7 @@ struct _GstMssManifest
+   xmlNodePtr xmlrootnode;
+ 
+   gboolean is_live;
++  gint64 dvr_window;
+ 
+   GString *protection_system_id;
+   gchar *protection_data;
+@@ -330,6 +332,22 @@ gst_mss_manifest_new (GstBuffer * data)
+     xmlFree (live_str);
+   }
+ 
++  /* the entire file is always available for non-live streams */
++  if (!manifest->is_live) {
++    manifest->dvr_window = 0;
++  } else {
++    /* if 0, or non-existent, the length is infinite */
++    gchar *dvr_window_str = (gchar *) xmlGetProp (root,
++        (xmlChar *) MSS_PROP_DVR_WINDOW_LENGTH);
++    if (dvr_window_str) {
++      manifest->dvr_window = g_ascii_strtoull (dvr_window_str, NULL, 10);
++      xmlFree (dvr_window_str);
++      if (manifest->dvr_window <= 0) {
++        manifest->dvr_window = 0;
++      }
++    }
++  }
++
+   for (nodeiter = root->children; nodeiter; nodeiter = nodeiter->next) {
+     if (nodeiter->type == XML_ELEMENT_NODE
+         && (strcmp ((const char *) nodeiter->name, "StreamIndex") == 0)) {
+@@ -1406,3 +1424,69 @@ gst_mss_stream_get_lang (GstMssStream * stream)
+ {
+   return stream->lang;
+ }
++
++static GstClockTime
++gst_mss_manifest_get_dvr_window_length_clock_time (GstMssManifest * manifest)
++{
++  gint64 timescale;
++
++  /* the entire file is always available for non-live streams */
++  if (manifest->dvr_window == 0)
++    return GST_CLOCK_TIME_NONE;
++
++  timescale = gst_mss_manifest_get_timescale (manifest);
++  return (GstClockTime) gst_util_uint64_scale_round (manifest->dvr_window,
++      GST_SECOND, timescale);
++}
++
++static gboolean
++gst_mss_stream_get_live_seek_range (GstMssStream * stream, gint64 * start,
++    gint64 * stop)
++{
++  GList *l;
++  GstMssStreamFragment *fragment;
++  guint64 timescale = gst_mss_stream_get_timescale (stream);
++
++  g_return_val_if_fail (stream->active, FALSE);
++
++  /* XXX: assumes all the data in the stream is still available */
++  l = g_list_first (stream->fragments);
++  fragment = (GstMssStreamFragment *) l->data;
++  *start = gst_util_uint64_scale_round (fragment->time, GST_SECOND, timescale);
++
++  l = g_list_last (stream->fragments);
++  fragment = (GstMssStreamFragment *) l->data;
++  *stop = gst_util_uint64_scale_round (fragment->time + fragment->duration *
++      fragment->repetitions, GST_SECOND, timescale);
++
++  return TRUE;
++}
++
++gboolean
++gst_mss_manifest_get_live_seek_range (GstMssManifest * manifest, gint64 * start,
++    gint64 * stop)
++{
++  GSList *iter;
++  gboolean ret = FALSE;
++
++  for (iter = manifest->streams; iter; iter = g_slist_next (iter)) {
++    GstMssStream *stream = iter->data;
++
++    if (stream->active) {
++      /* FIXME: bound this correctly for multiple streams */
++      if (!(ret = gst_mss_stream_get_live_seek_range (stream, start, stop)))
++        break;
++    }
++  }
++
++  if (ret && gst_mss_manifest_is_live (manifest)) {
++    GstClockTime dvr_window =
++        gst_mss_manifest_get_dvr_window_length_clock_time (manifest);
++
++    if (GST_CLOCK_TIME_IS_VALID (dvr_window) && *stop - *start > dvr_window) {
++      *start = *stop - dvr_window;
++    }
++  }
++
++  return ret;
++}
+diff --git a/ext/smoothstreaming/gstmssmanifest.h b/ext/smoothstreaming/gstmssmanifest.h
+index af7419c23..6b7b1f971 100644
+--- a/ext/smoothstreaming/gstmssmanifest.h
++++ b/ext/smoothstreaming/gstmssmanifest.h
+@@ -54,6 +54,7 @@ void gst_mss_manifest_reload_fragments (GstMssManifest * manifest, GstBuffer * d
+ GstClockTime gst_mss_manifest_get_min_fragment_duration (GstMssManifest * manifest);
+ const gchar * gst_mss_manifest_get_protection_system_id (GstMssManifest * manifest);
+ const gchar * gst_mss_manifest_get_protection_data (GstMssManifest * manifest);
++gboolean gst_mss_manifest_get_live_seek_range (GstMssManifest * manifest, gint64 * start, gint64 * stop);
+ 
+ GstMssStreamType gst_mss_stream_get_type (GstMssStream *stream);
+ GstCaps * gst_mss_stream_get_caps (GstMssStream * stream);
+-- 
+2.11.0
+

@@ -49,6 +49,9 @@ class ReferenceTest(unittest.TestCase):
     def assertExecs(self, execs):
         self.assertEqual(self.execs, execs)
 
+    def assertContains(self, contains):
+        self.assertEqual(self.contains, contains)
+
 class VariableReferenceTest(ReferenceTest):
 
     def parseExpression(self, exp):
@@ -68,7 +71,7 @@ class VariableReferenceTest(ReferenceTest):
 
     def test_python_reference(self):
         self.setEmptyVars(["BAR"])
-        self.parseExpression("${@bb.data.getVar('BAR', d, True) + 'foo'}")
+        self.parseExpression("${@d.getVar('BAR') + 'foo'}")
         self.assertReferences(set(["BAR"]))
 
 class ShellReferenceTest(ReferenceTest):
@@ -201,6 +204,7 @@ class PythonReferenceTest(ReferenceTest):
 
         self.references = parsedvar.references | parser.references
         self.execs = parser.execs
+        self.contains = parser.contains
 
     @staticmethod
     def indent(value):
@@ -209,17 +213,17 @@ be. These unit tests are testing snippets."""
         return " " + value
 
     def test_getvar_reference(self):
-        self.parseExpression("bb.data.getVar('foo', d, True)")
+        self.parseExpression("d.getVar('foo')")
         self.assertReferences(set(["foo"]))
         self.assertExecs(set())
 
     def test_getvar_computed_reference(self):
-        self.parseExpression("bb.data.getVar('f' + 'o' + 'o', d, True)")
+        self.parseExpression("d.getVar('f' + 'o' + 'o')")
         self.assertReferences(set())
         self.assertExecs(set())
 
     def test_getvar_exec_reference(self):
-        self.parseExpression("eval('bb.data.getVar(\"foo\", d, True)')")
+        self.parseExpression("eval('d.getVar(\"foo\")')")
         self.assertReferences(set())
         self.assertExecs(set(["eval"]))
 
@@ -265,15 +269,35 @@ be. These unit tests are testing snippets."""
         self.assertExecs(set(["testget"]))
         del self.context["testget"]
 
+    def test_contains(self):
+        self.parseExpression('bb.utils.contains("TESTVAR", "one", "true", "false", d)')
+        self.assertContains({'TESTVAR': {'one'}})
+
+    def test_contains_multi(self):
+        self.parseExpression('bb.utils.contains("TESTVAR", "one two", "true", "false", d)')
+        self.assertContains({'TESTVAR': {'one two'}})
+
+    def test_contains_any(self):
+        self.parseExpression('bb.utils.contains_any("TESTVAR", "hello", "true", "false", d)')
+        self.assertContains({'TESTVAR': {'hello'}})
+
+    def test_contains_any_multi(self):
+        self.parseExpression('bb.utils.contains_any("TESTVAR", "one two three", "true", "false", d)')
+        self.assertContains({'TESTVAR': {'one', 'two', 'three'}})
+
+    def test_contains_filter(self):
+        self.parseExpression('bb.utils.filter("TESTVAR", "hello there world", d)')
+        self.assertContains({'TESTVAR': {'hello', 'there', 'world'}})
+
 
 class DependencyReferenceTest(ReferenceTest):
 
     pydata = """
-bb.data.getVar('somevar', d, True)
+d.getVar('somevar')
 def test(d):
     foo = 'bar %s' % 'foo'
 def test2(d):
-    d.getVar(foo, True)
+    d.getVar(foo)
     d.getVar('bar', False)
     test2(d)
 
@@ -285,9 +309,9 @@ def a():
 
 test(d)
 
-bb.data.expand(bb.data.getVar("something", False, d), d)
-bb.data.expand("${inexpand} somethingelse", d)
-bb.data.getVar(a(), d, False)
+d.expand(d.getVar("something", False))
+d.expand("${inexpand} somethingelse")
+d.getVar(a(), False)
 """
 
     def test_python(self):
@@ -369,6 +393,30 @@ esac
         deps, values = bb.data.build_dependencies("FOO", set(self.d.keys()), set(), set(), self.d)
 
         self.assertEqual(deps, set(["oe_libinstall"]))
+
+    def test_contains_vardeps(self):
+        expr = '${@bb.utils.filter("TESTVAR", "somevalue anothervalue", d)} \
+                ${@bb.utils.contains("TESTVAR", "testval testval2", "yetanothervalue", "", d)} \
+                ${@bb.utils.contains("TESTVAR", "testval2 testval3", "blah", "", d)} \
+                ${@bb.utils.contains_any("TESTVAR", "testval2 testval3", "lastone", "", d)}'
+        parsedvar = self.d.expandWithRefs(expr, None)
+        # Check contains
+        self.assertEqual(parsedvar.contains, {'TESTVAR': {'testval2 testval3', 'anothervalue', 'somevalue', 'testval testval2', 'testval2', 'testval3'}})
+        # Check dependencies
+        self.d.setVar('ANOTHERVAR', expr)
+        self.d.setVar('TESTVAR', 'anothervalue testval testval2')
+        deps, values = bb.data.build_dependencies("ANOTHERVAR", set(self.d.keys()), set(), set(), self.d)
+        self.assertEqual(sorted(values.splitlines()),
+                         sorted([expr,
+                          'TESTVAR{anothervalue} = Set',
+                          'TESTVAR{somevalue} = Unset',
+                          'TESTVAR{testval testval2} = Set',
+                          'TESTVAR{testval2 testval3} = Unset',
+                          'TESTVAR{testval2} = Set',
+                          'TESTVAR{testval3} = Unset'
+                          ]))
+        # Check final value
+        self.assertEqual(self.d.getVar('ANOTHERVAR').split(), ['anothervalue', 'yetanothervalue', 'lastone'])
 
     #Currently no wildcard support
     #def test_vardeps_wildcards(self):

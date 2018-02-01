@@ -13,3 +13,5 @@ S = "${WORKDIR}/git"
 SRCREV = "1ec0e7713c3ca901014811ff78277d9e2aaac981"
 
 DEPENDS += "elementary"
+
+PNBLACKLIST[elfe] ?= "Depends on blacklisted elementary - the recipe will be removed on 2017-09-01 unless the issue is fixed"

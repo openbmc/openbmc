@@ -42,6 +42,8 @@ import json
 import collections
 import re
 
+from toastergui.tablefilter import TableFilterMap
+
 try:
     from urllib import unquote_plus
 except ImportError:
@@ -49,8 +51,6 @@ except ImportError:
 
 import logging
 logger = logging.getLogger("toaster")
-
-from toastergui.tablefilter import TableFilterMap
 
 
 class NoFieldOrDataName(Exception):
@@ -259,9 +259,9 @@ class ToasterTable(TemplateView):
                     queries = query
 
             if search_queries:
-               search_queries &= queries
+                search_queries &= queries
             else:
-               search_queries = queries
+                search_queries = queries
 
         self.queryset = self.queryset.filter(search_queries)
 

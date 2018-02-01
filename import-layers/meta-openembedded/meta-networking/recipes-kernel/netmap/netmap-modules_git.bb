@@ -33,8 +33,8 @@ NETMAP_DRIVERS ??= ""
 NETMAP_ALL_DRIVERS = "ixgbe igb e1000e e1000 veth.c forcedeth.c virtio_net.c r8169.c"
 
 python __anonymous () {
-    drivers_list = d.getVar("NETMAP_DRIVERS", True).split()
-    all_drivers_list = d.getVar("NETMAP_ALL_DRIVERS", True).split()
+    drivers_list = d.getVar("NETMAP_DRIVERS").split()
+    all_drivers_list = d.getVar("NETMAP_ALL_DRIVERS").split()
     config_drivers = "--drivers=" + ",".join(drivers_list)
 
     extra_oeconf_drivers = bb.utils.contains_any('NETMAP_DRIVERS', all_drivers_list, config_drivers, '--no-drivers', d)
@@ -70,7 +70,7 @@ do_configure_append () {
 #define NETMAP_LINUX_HAVE_E1000E_DOWN2
 EOF
 
-if ${@ 'false' if (bb.utils.vercmp_string(d.getVar('KERNEL_VERSION', True) or "0", '3.17') < 0) else 'true' } ; then
+if ${@ 'false' if (bb.utils.vercmp_string(d.getVar('KERNEL_VERSION') or "0", '3.17') < 0) else 'true' } ; then
     echo OK
     cat >>  ${S}/LINUX/netmap_linux_config.h <<EOF
 #define NETMAP_LINUX_ALLOC_NETDEV_4ARGS
@@ -89,4 +89,4 @@ do_install () {
 }
 
 # http://errors.yoctoproject.org/Errors/Details/83335/
-PNBLACKLIST[netmap-modules] ?= "BROKEN: not compatible with default kernel version 4.8"
+PNBLACKLIST[netmap-modules] ?= "BROKEN: not compatible with default kernel version 4.8 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

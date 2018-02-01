@@ -29,7 +29,6 @@ import os
 import urllib.request, urllib.parse, urllib.error
 import bb
 import bb.utils
-from   bb import data
 from   bb.fetch2 import FetchMethod, FetchError
 from   bb.fetch2 import logger
 
@@ -63,17 +62,11 @@ class Local(FetchMethod):
         newpath = path
         if path[0] == "/":
             return [path]
-        filespath = data.getVar('FILESPATH', d, True)
+        filespath = d.getVar('FILESPATH')
         if filespath:
             logger.debug(2, "Searching for %s in paths:\n    %s" % (path, "\n    ".join(filespath.split(":"))))
             newpath, hist = bb.utils.which(filespath, path, history=True)
             searched.extend(hist)
-        if not newpath:
-            filesdir = data.getVar('FILESDIR', d, True)
-            if filesdir:
-                logger.debug(2, "Searching for %s in path: %s" % (path, filesdir))
-                newpath = os.path.join(filesdir, path)
-                searched.append(newpath)
         if (not newpath or not os.path.exists(newpath)) and path.find("*") != -1:
             # For expressions using '*', best we can do is take the first directory in FILESPATH that exists
             newpath, hist = bb.utils.which(filespath, ".", history=True)
@@ -81,7 +74,7 @@ class Local(FetchMethod):
             logger.debug(2, "Searching for %s in path: %s" % (path, newpath))
             return searched
         if not os.path.exists(newpath):
-            dldirfile = os.path.join(d.getVar("DL_DIR", True), path)
+            dldirfile = os.path.join(d.getVar("DL_DIR"), path)
             logger.debug(2, "Defaulting to %s for %s" % (dldirfile, path))
             bb.utils.mkdirhier(os.path.dirname(dldirfile))
             searched.append(dldirfile)
@@ -100,13 +93,10 @@ class Local(FetchMethod):
         # no need to fetch local files, we'll deal with them in place.
         if self.supports_checksum(urldata) and not os.path.exists(urldata.localpath):
             locations = []
-            filespath = data.getVar('FILESPATH', d, True)
+            filespath = d.getVar('FILESPATH')
             if filespath:
                 locations = filespath.split(":")
-            filesdir = data.getVar('FILESDIR', d, True)
-            if filesdir:
-                locations.append(filesdir)
-            locations.append(d.getVar("DL_DIR", True))
+            locations.append(d.getVar("DL_DIR"))
 
             msg = "Unable to find file " + urldata.url + " anywhere. The paths that were searched were:\n    " + "\n    ".join(locations)
             raise FetchError(msg)

@@ -1,0 +1,149 @@
+From c00e63e97d8718836ba011d9172128732eecf001 Mon Sep 17 00:00:00 2001
+From: Ismo Puustinen <ismo.puustinen@intel.com>
+Date: Tue, 24 Jan 2017 22:24:05 +0200
+Subject: [PATCH] scripts: remove bashisms.
+
+Convert bash scripts to more generic shell scripts. This removes the
+strict bash dependency and the scripts should now run with any posix
+shell. Also fix the issues reported by shellcheck while at it.
+
+Upstream-status: Accepted [https://github.com/gphoto/libgphoto2/commit/39b4395532058c0edb9a56d0ff04e48a472e4743]
+
+---
+ packaging/generic/check-ptp-camera          | 12 ++++++------
+ packaging/linux-hotplug/gphoto-set-procperm | 14 +++++++-------
+ packaging/linux-hotplug/usbcam.console      |  4 ++--
+ packaging/linux-hotplug/usbcam.group        |  2 +-
+ packaging/linux-hotplug/usbcam.user         |  2 +-
+ packaging/linux-hotplug/usbcam.x11-app      |  4 ++--
+ 6 files changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/packaging/generic/check-ptp-camera b/packaging/generic/check-ptp-camera
+index 1793fc8..bc3c6ac 100644
+--- a/packaging/generic/check-ptp-camera
++++ b/packaging/generic/check-ptp-camera
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+@@ -20,13 +20,13 @@ INTERFACE="${1:-06/01/01}"
+ 
+ BASENAME=${DEVPATH##*/}
+ for d in /sys/${DEVPATH}/${BASENAME}:*; do
+-	[[ -d ${d} ]] || continue
+-	INTERFACEID="$(< ${d}/bInterfaceClass)"
+-	INTERFACEID="${INTERFACEID}/$(< ${d}/bInterfaceSubClass)"
+-	INTERFACEID="${INTERFACEID}/$(< ${d}/bInterfaceProtocol)"
++	[ -d "${d}" ] || continue
++	INTERFACEID="$(cat "${d}"/bInterfaceClass)"
++	INTERFACEID="${INTERFACEID}/$(cat "${d}"/bInterfaceSubClass)"
++	INTERFACEID="${INTERFACEID}/$(cat "${d}"/bInterfaceProtocol)"
+ 
+ 	#echo ${d}: ${INTERFACEID}
+-	if [[ ${INTERFACE} == ${INTERFACEID} ]]; then
++	if [ "${INTERFACE}" = "${INTERFACEID}" ]; then
+ 		# Found interface
+ 		exit 0
+ 	fi
+diff --git a/packaging/linux-hotplug/gphoto-set-procperm b/packaging/linux-hotplug/gphoto-set-procperm
+index d72ee68..977cbf5 100644
+--- a/packaging/linux-hotplug/gphoto-set-procperm
++++ b/packaging/linux-hotplug/gphoto-set-procperm
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+@@ -18,22 +18,22 @@
+ # This is taken from Fedora Core gphoto2 package.
+ # http://cvs.fedora.redhat.com/viewcvs/*checkout*/devel/gphoto2/gphoto-set-procperm
+ 
+-console_user=`cat /var/run/console/console.lock` 
++console_user=$(cat /var/run/console/console.lock)
+ 
+ if [ -z "$console_user" ] ; then
+   exit 1 
+ fi
+ 
+-if [ -z "$HAL_PROP_USB_BUS_NUMBER" -o -z "$HAL_PROP_USB_LINUX_DEVICE_NUMBER" ] ; then
++if [ -z "$HAL_PROP_USB_BUS_NUMBER" ] || [ -z "$HAL_PROP_USB_LINUX_DEVICE_NUMBER" ] ; then
+   exit 1 
+ fi
+ 
+-if [ $HAL_PROP_USB_BUS_NUMBER -lt 0 -o  $HAL_PROP_USB_LINUX_DEVICE_NUMBER -lt 0 ] ; then
++if [ "$HAL_PROP_USB_BUS_NUMBER" -lt 0 ] || [ "$HAL_PROP_USB_LINUX_DEVICE_NUMBER" -lt 0 ] ; then
+   exit 1 
+ fi
+ 
+ 
+-bus_num=`printf %.3u $HAL_PROP_USB_BUS_NUMBER`
+-dev_num=`printf %.3u $HAL_PROP_USB_LINUX_DEVICE_NUMBER`
++bus_num=$(printf %.3u "$HAL_PROP_USB_BUS_NUMBER")
++dev_num=$(printf %.3u "$HAL_PROP_USB_LINUX_DEVICE_NUMBER")
+ 
+-chown $console_user /proc/bus/usb/$bus_num/$dev_num 
++chown "$console_user" /proc/bus/usb/"$bus_num"/"$dev_num"
+diff --git a/packaging/linux-hotplug/usbcam.console b/packaging/linux-hotplug/usbcam.console
+index d72128f..7ac6dc5 100755
+--- a/packaging/linux-hotplug/usbcam.console
++++ b/packaging/linux-hotplug/usbcam.console
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+@@ -50,7 +50,7 @@ then
+         /var/lock/console.lock
+     do
+         if [ -f "$conlock" ]; then
+-	    CONSOLEOWNER=`cat $conlock`
++            CONSOLEOWNER=$(cat $conlock)
+         fi
+     done
+     if [ -n "$CONSOLEOWNER" ]
+diff --git a/packaging/linux-hotplug/usbcam.group b/packaging/linux-hotplug/usbcam.group
+index f96c33d..8761fac 100755
+--- a/packaging/linux-hotplug/usbcam.group
++++ b/packaging/linux-hotplug/usbcam.group
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+diff --git a/packaging/linux-hotplug/usbcam.user b/packaging/linux-hotplug/usbcam.user
+index c46f155..a3ba71a 100644
+--- a/packaging/linux-hotplug/usbcam.user
++++ b/packaging/linux-hotplug/usbcam.user
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+diff --git a/packaging/linux-hotplug/usbcam.x11-app b/packaging/linux-hotplug/usbcam.x11-app
+index 023ae9b..618e7db 100644
+--- a/packaging/linux-hotplug/usbcam.x11-app
++++ b/packaging/linux-hotplug/usbcam.x11-app
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+@@ -69,7 +69,7 @@ then
+     if [ "${USER}" != "root" ]
+     then
+ 	# we don't want to run this as root. definitely not.
+-	cd "${DIRECTORY}"
++	cd "${DIRECTORY}" || exit 1
+ 	usrhome=~${USER}
+ 	"${SU}" "${USER}" -c "${ENV} DISPLAY=${DISPLAY} HOME=${usrhome} ${X11_APP}"
+     fi
+-- 
+2.9.3
+

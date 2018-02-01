@@ -38,4 +38,4 @@ do_install () {
     fi
 }
 
-BBCLASSEXTEND += "native nativesdk"
+BBCLASSEXTEND = "native nativesdk"

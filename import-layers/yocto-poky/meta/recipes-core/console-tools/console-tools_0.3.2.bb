@@ -16,6 +16,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/lct/console-tools-${PV}.tar.gz \
            file://no-dep-on-libfl.patch \
            file://0001-kbdtools-Include-sys-types.h-for-u_char-and-u_short-.patch \
            file://0001-Cover-the-else-with-__GLIBC__.patch \
+           file://0001-Fix-format-security-compilation-error.patch \
            file://lcmessage.m4 \
            file://Makevars"
 

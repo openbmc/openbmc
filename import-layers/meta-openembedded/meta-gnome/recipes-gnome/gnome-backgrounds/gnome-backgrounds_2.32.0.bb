@@ -17,3 +17,5 @@ GNOME_COMPRESS_TYPE="bz2"
 
 FILES_${PN} += "${datadir}/gnome-background-properties"
 
+
+PNBLACKLIST[gnome-backgrounds] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130647/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

@@ -1,0 +1,19 @@
+Add LDFLAGS variable to Makefile.am, make sure the extra linker flags can be passed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/swig/perl/Makefile.am b/swig/perl/Makefile.am
+index 2f9ee4c..3a18892 100644
+--- a/swig/perl/Makefile.am
++++ b/swig/perl/Makefile.am
+@@ -20,7 +20,7 @@ OpenIPMI_SRC = OpenIPMI_perl.c
+ OpenIPMI_OBJ = OpenIPMI_wrap.lo OpenIPMI_perl.lo
+ 
+ OpenIPMI.so: $(OpenIPMI_OBJ)
+-	$(LIBTOOL) --mode=link $(CC) -shared -module -avoid-version -o $(@:.so=.la) $^ $(OPENIPMI_SWIG_LIBS) $(PERL_POSIX_LIB) -rpath $(PERL_INSTALL_DIR)/auto/OpenIPMI
++	$(LIBTOOL) --mode=link $(CC) -shared -module -avoid-version $(LDFLAGS) -o $(@:.so=.la) $^ $(OPENIPMI_SWIG_LIBS) $(PERL_POSIX_LIB) -rpath $(PERL_INSTALL_DIR)/auto/OpenIPMI
+ 	rm -f OpenIPMI.so
+ 	mv .libs/OpenIPMI.so .
+ 

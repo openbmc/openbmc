@@ -42,4 +42,4 @@ do_install_prepend() {
 }
 
 # http://errors.yoctoproject.org/Errors/Details/81003/
-PNBLACKLIST[accel-ppp] ?= "BROKEN: fails to build with new binutils-2.27"
+PNBLACKLIST[accel-ppp] ?= "BROKEN: fails to build with new binutils-2.27 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

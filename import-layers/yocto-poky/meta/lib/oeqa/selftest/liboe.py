@@ -1,11 +1,16 @@
 from oeqa.selftest.base import oeSelfTest
-from oeqa.utils.commands import get_bb_var, bitbake, runCmd
+from oeqa.utils.commands import get_bb_var, get_bb_vars, bitbake, runCmd
 import oe.path
 import glob
 import os
 import os.path
 
 class LibOE(oeSelfTest):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp_dir = get_bb_var('TMPDIR')
+
     def test_copy_tree_special(self):
         """
         Summary:    oe.path.copytree() should copy files with special character
@@ -14,8 +19,7 @@ class LibOE(oeSelfTest):
         Product:    OE-Core
         Author:     Joshua Lock <joshua.g.lock@intel.com>
         """
-        tmp_dir = get_bb_var('TMPDIR')
-        testloc = oe.path.join(tmp_dir, 'liboetests')
+        testloc = oe.path.join(self.tmp_dir, 'liboetests')
         src = oe.path.join(testloc, 'src')
         dst = oe.path.join(testloc, 'dst')
         bb.utils.mkdirhier(testloc)
@@ -40,8 +44,7 @@ class LibOE(oeSelfTest):
         Product:    OE-Core
         Author:     Joshua Lock <joshua.g.lock@intel.com>
         """
-        tmp_dir = get_bb_var('TMPDIR')
-        testloc = oe.path.join(tmp_dir, 'liboetests')
+        testloc = oe.path.join(self.tmp_dir, 'liboetests')
         src = oe.path.join(testloc, 'src')
         dst = oe.path.join(testloc, 'dst')
         bb.utils.mkdirhier(testloc)
@@ -50,7 +53,11 @@ class LibOE(oeSelfTest):
 
         # ensure we have setfattr available
         bitbake("attr-native")
-        bindir = get_bb_var('STAGING_BINDIR_NATIVE')
+
+        bb_vars = get_bb_vars(['SYSROOT_DESTDIR', 'bindir'], 'attr-native')
+        destdir = bb_vars['SYSROOT_DESTDIR']
+        bindir = bb_vars['bindir']
+        bindir = destdir + bindir
 
         # create a file with xattr and copy it
         open(oe.path.join(src, testfilename), 'w+b').close()
@@ -70,8 +77,7 @@ class LibOE(oeSelfTest):
         Product:    OE-Core
         Author:     Joshua Lock <joshua.g.lock@intel.com>
         """
-        tmp_dir = get_bb_var('TMPDIR')
-        testloc = oe.path.join(tmp_dir, 'liboetests')
+        testloc = oe.path.join(self.tmp_dir, 'liboetests')
         src = oe.path.join(testloc, 'src')
         dst = oe.path.join(testloc, 'dst')
         bb.utils.mkdirhier(testloc)

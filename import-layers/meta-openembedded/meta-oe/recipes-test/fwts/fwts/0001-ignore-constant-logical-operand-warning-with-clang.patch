@@ -1,0 +1,83 @@
+From 953cff93c85d3cfd5cbcac56e14443dc5f6e5fbd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Oct 2016 01:57:16 +0000
+Subject: [PATCH] ignore constant-logical-operand warning with clang
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/dmi/dmicheck/dmicheck.c            | 3 +++
+ src/lib/src/fwts_acpi_tables.c         | 5 +++++
+ src/uefi/uefirtauthvar/uefirtauthvar.c | 5 +++++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/src/dmi/dmicheck/dmicheck.c b/src/dmi/dmicheck/dmicheck.c
+index ecd98223..7fca4a64 100644
+--- a/src/dmi/dmicheck/dmicheck.c
++++ b/src/dmi/dmicheck/dmicheck.c
+@@ -209,6 +209,8 @@ static const char *uuid_patterns[] = {
+ 	"0A0A0A0A-0A0A-0A0A-0A0A-0A0A0A0A0A0A",
+ 	NULL,
+ };
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wunneeded-internal-declaration"
+ 
+ static const fwts_chassis_type_map fwts_dmi_chassis_type[] = {
+ 	{ "Invalid",		FWTS_SMBIOS_CHASSIS_INVALID },
+@@ -245,6 +247,7 @@ static const fwts_chassis_type_map fwts_dmi_chassis_type[] = {
+ 	{ "Convertible",	FWTS_SMBIOS_CHASSIS_CONVERTIBLE },
+ 	{ "Detachable",		FWTS_SMBIOS_CHASSIS_DETACHABLE },
+ };
++#pragma clang diagnostic pop
+ 
+ /* Remapping table from buggy version numbers to correct values */
+ static const fwts_dmi_version dmi_versions[] = {
+diff --git a/src/lib/src/fwts_acpi_tables.c b/src/lib/src/fwts_acpi_tables.c
+index 30b4060e..d5339bf7 100644
+--- a/src/lib/src/fwts_acpi_tables.c
++++ b/src/lib/src/fwts_acpi_tables.c
+@@ -394,10 +394,14 @@ static int fwts_acpi_handle_fadt(
+ 	/* Determine FACS addr and load it.
+ 	 * Will ignore the missing FACS in the hardware-reduced mode.
+ 	 */
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Waddress-of-packed-member"
++
+ 	result = fwts_acpi_handle_fadt_tables(fw, fadt,
+ 			"FACS", "FIRMWARE_CTRL", "X_FIRMWARE_CTRL",
+ 			&fadt->firmware_control, &fadt->x_firmware_ctrl,
+ 			provenance);
++
+ 	if (result != FWTS_OK) {
+ 		if ((result == FWTS_NULL_POINTER) &&
+ 				fwts_acpi_is_reduced_hardware(fadt)) {
+@@ -416,6 +420,7 @@ static int fwts_acpi_handle_fadt(
+ 		return FWTS_ERROR;
+ 	}
+ 	return FWTS_OK;
++#pragma clang diagnostic pop
+ }
+ 
+ /*
+diff --git a/src/uefi/uefirtauthvar/uefirtauthvar.c b/src/uefi/uefirtauthvar/uefirtauthvar.c
+index cdfd7aa3..001e8cc8 100644
+--- a/src/uefi/uefirtauthvar/uefirtauthvar.c
++++ b/src/uefi/uefirtauthvar/uefirtauthvar.c
+@@ -142,6 +142,9 @@ static int uefirtauthvar_deinit(fwts_framework *fw)
+ 	return FWTS_OK;
+ }
+ 
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wconstant-logical-operand"
++
+ static int check_fw_support(fwts_framework *fw, uint64_t status)
+ {
+ 	if ((status == EFI_INVALID_PARAMETER) &&
+@@ -172,6 +175,8 @@ static int check_fw_support(fwts_framework *fw, uint64_t status)
+ 	return FWTS_OK;
+ }
+ 
++#pragma clang diagnostic pop
++
+ /*
+  * Set the created authenticated variable, AuthVarCreate,
+  * and checking the data size and data.

@@ -12,8 +12,9 @@ PACKAGES = ""
 
 EXTRA_OECONF += "--disable-shared"
 
-LIBGCCBUILDTREENAME = "gcc-build-internal-initial-"
-
-do_populate_sysroot[sstate-outputdirs] = "${STAGING_DIR_TCBOOTSTRAP}/"
+COMPILERINITIAL = "-initial"
 
 inherit nopackages
+
+# We really only want this built by things that need it, not any recrdeptask
+deltask do_build

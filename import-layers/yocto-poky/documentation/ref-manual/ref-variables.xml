@@ -37,7 +37,7 @@
        <link linkend='var-S'>S</link>
        <link linkend='var-T'>T</link>
        <link linkend='var-UBOOT_CONFIG'>U</link>
-<!--               <link linkend='var-glossary-v'>V</link> -->
+       <link linkend='var-VOLATILE_LOG_DIR'>V</link>
        <link linkend='var-WARN_QA'>W</link>
        <link linkend='var-XSERVER'>X</link>
 <!--               <link linkend='var-glossary-y'>Y</link> -->
@@ -484,6 +484,12 @@
                     in your recipe so that it does contain
                     <filename>${SRCPV}</filename>.
                 </para>
+
+                <para>
+                    For more information see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#automatically-incrementing-a-binary-package-revision-number'>Automatically Incrementing a Binary Package Revision Number</ulink>"
+                    section in the Yocto Project Development Manual.
+                    </para>
             </glossdef>
         </glossentry>
 
@@ -2364,6 +2370,160 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-COPYLEFT_LICENSE_EXCLUDE'><glossterm>COPYLEFT_LICENSE_EXCLUDE</glossterm>
+            <info>
+                COPYLEFT_LICENSE_EXCLUDE[doc] = "Licenses to exclude in the source archived by the archiver class."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A space-separated list of licenses to exclude from the
+                    source archived by the
+                    <link linkend='ref-classes-archiver'><filename>archiver</filename></link>
+                    class.
+                    In other words, if a license in a recipe's
+                    <link linkend='var-LICENSE'><filename>LICENSE</filename></link>
+                    value is in the value of
+                    <filename>COPYLEFT_LICENSE_EXCLUDE</filename>, then its
+                    source is not archived by the class.
+                    <note>
+                        The <filename>COPYLEFT_LICENSE_EXCLUDE</filename>
+                        variable takes precedence over the
+                        <link linkend='var-COPYLEFT_LICENSE_INCLUDE'><filename>COPYLEFT_LICENSE_INCLUDE</filename></link>
+                        variable.
+                    </note>
+                    The default value, which is "CLOSED Proprietary", for
+                    <filename>COPYLEFT_LICENSE_EXCLUDE</filename> is set
+                    by the
+                    <link linkend='ref-classes-copyleft_filter'><filename>copyleft_filter</filename></link>
+                    class, which is inherited by the
+                    <filename>archiver</filename> class.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-COPYLEFT_LICENSE_INCLUDE'><glossterm>COPYLEFT_LICENSE_INCLUDE</glossterm>
+            <info>
+                COPYLEFT_LICENSE_INCLUDE[doc] = "Licenses to include in the source archived by the archiver class."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A space-separated list of licenses to include in the
+                    source archived by the
+                    <link linkend='ref-classes-archiver'><filename>archiver</filename></link>
+                    class.
+                    In other words, if a license in a recipe's
+                    <link linkend='var-LICENSE'><filename>LICENSE</filename></link>
+                    value is in the value of
+                    <filename>COPYLEFT_LICENSE_INCLUDE</filename>, then its
+                    source is archived by the class.
+                </para>
+
+                <para>
+                    The default value is set by the
+                    <link linkend='ref-classes-copyleft_filter'><filename>copyleft_filter</filename></link>
+                    class, which is inherited by the
+                    <filename>archiver</filename> class.
+                    The default value includes "GPL*", "LGPL*", and "AGPL*".
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-COPYLEFT_PN_EXCLUDE'><glossterm>COPYLEFT_PN_EXCLUDE</glossterm>
+            <info>
+                COPYLEFT_PN_EXCLUDE[doc] = "Recipes to exclude in the source archived by the archiver class."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A list of recipes to exclude in the source archived
+                    by the
+                    <link linkend='ref-classes-archiver'><filename>archiver</filename></link>
+                    class.
+                    The <filename>COPYLEFT_PN_EXCLUDE</filename> variable
+                    overrides the license inclusion and exclusion caused
+                    through the
+                    <link linkend='var-COPYLEFT_LICENSE_INCLUDE'><filename>COPYLEFT_LICENSE_INCLUDE</filename></link>
+                    and
+                    <link linkend='var-COPYLEFT_LICENSE_EXCLUDE'><filename>COPYLEFT_LICENSE_EXCLUDE</filename></link>
+                    variables, respectively.
+                </para>
+
+                <para>
+                    The default value, which is "" indicating to not explicitly
+                    exclude any recipes by name, for
+                    <filename>COPYLEFT_PN_EXCLUDE</filename> is set
+                    by the
+                    <link linkend='ref-classes-copyleft_filter'><filename>copyleft_filter</filename></link>
+                    class, which is inherited by the
+                    <filename>archiver</filename> class.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-COPYLEFT_PN_INCLUDE'><glossterm>COPYLEFT_PN_INCLUDE</glossterm>
+            <info>
+                COPYLEFT_PN_INCLUDE[doc] = "Recipes to include in the source archived by the archiver class."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A list of recipes to include in the source archived
+                    by the
+                    <link linkend='ref-classes-archiver'><filename>archiver</filename></link>
+                    class.
+                    The <filename>COPYLEFT_PN_INCLUDE</filename> variable
+                    overrides the license inclusion and exclusion caused
+                    through the
+                    <link linkend='var-COPYLEFT_LICENSE_INCLUDE'><filename>COPYLEFT_LICENSE_INCLUDE</filename></link>
+                    and
+                    <link linkend='var-COPYLEFT_LICENSE_EXCLUDE'><filename>COPYLEFT_LICENSE_EXCLUDE</filename></link>
+                    variables, respectively.
+                </para>
+
+                <para>
+                    The default value, which is "" indicating to not explicitly
+                    include any recipes by name, for
+                    <filename>COPYLEFT_PN_INCLUDE</filename> is set
+                    by the
+                    <link linkend='ref-classes-copyleft_filter'><filename>copyleft_filter</filename></link>
+                    class, which is inherited by the
+                    <filename>archiver</filename> class.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-COPYLEFT_RECIPE_TYPES'><glossterm>COPYLEFT_RECIPE_TYPES</glossterm>
+            <info>
+                COPYLEFT_RECIPE_TYPES[doc] = "Recipe types to include in the source archived by the archiver class."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A space-separated list of recipe types to include
+                    in the source archived by the
+                    <link linkend='ref-classes-archiver'><filename>archiver</filename></link>
+                    class.
+                    Recipe types are <filename>target</filename>,
+                    <filename>native</filename>,
+                    <filename>nativesdk</filename>,
+                    <filename>cross</filename>,
+                    <filename>crosssdk</filename>, and
+                    <filename>cross-canadian</filename>.
+                </para>
+
+                <para>
+                    The default value, which is "target*", for
+                    <filename>COPYLEFT_RECIPE_TYPES</filename> is set
+                    by the
+                    <link linkend='ref-classes-copyleft_filter'><filename>copyleft_filter</filename></link>
+                    class, which is inherited by the
+                    <filename>archiver</filename> class.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-COPY_LIC_DIRS'><glossterm>COPY_LIC_DIRS</glossterm>
             <info>
                 COPY_LIC_DIRS[doc] = "If set to "1" along with the COPY_LIC_MANIFEST variable, the OpenEmbedded build system copies into the image the license files, which are located in /usr/share/common-licenses, for each package."
@@ -3463,6 +3623,47 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-DISTRO_FEATURES_FILTER_NATIVE'><glossterm>DISTRO_FEATURES_FILTER_NATIVE</glossterm>
+            <info>
+                DISTRO_FEATURES_FILTER_NATIVE[doc] = "Specifies a list of features that if present in the target DISTRO_FEATURES value should be included in DISTRO_FEATURES when building native recipes."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies a list of features that if present in
+                    the target
+                    <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>
+                    value should be included in
+                    <filename>DISTRO_FEATURES</filename> when building native
+                    recipes.
+                    This variable is used in addition to the features
+                    filtered using the
+                    <link linkend='var-DISTRO_FEATURES_NATIVE'><filename>DISTRO_FEATURES_NATIVE</filename></link>
+                    variable.
+               </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-DISTRO_FEATURES_FILTER_NATIVESDK'><glossterm>DISTRO_FEATURES_FILTER_NATIVESDK</glossterm>
+            <info>
+                DISTRO_FEATURES_FILTER_NATIVESDK[doc] = "Specifies a list of features that if present in the target DISTRO_FEATURES value should be included in DISTRO_FEATURES when building nativesdk recipes."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies a list of features that if present in the target
+                    <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>
+                    value should be included in
+                    <filename>DISTRO_FEATURES</filename> when building
+                    nativesdk recipes.
+                    This variable is used in addition to the features
+                    filtered using the
+                    <link linkend='var-DISTRO_FEATURES_NATIVESDK'><filename>DISTRO_FEATURES_NATIVESDK</filename></link>
+                    variable.
+               </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-DISTRO_FEATURES_LIBC'><glossterm>DISTRO_FEATURES_LIBC</glossterm>
             <info>
                 DISTRO_FEATURES_LIBC[doc] = "Specifies the list of distro features that are specific to the C library (libc)."
@@ -3476,6 +3677,42 @@
                     Typically, these features are prefixed with "libc-" and
                     control which features are enabled at during the build
                     within the C library itself.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-DISTRO_FEATURES_NATIVE'><glossterm>DISTRO_FEATURES_NATIVE</glossterm>
+            <info>
+                DISTRO_FEATURES_NATIVE[doc] = "Specifies a list of features that should be included in DISTRO_FEATURES when building native recipes."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies a list of features that should be included in
+                    <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>
+                    when building native recipes.
+                    This variable is used in addition to the features
+                    filtered using the
+                    <link linkend='var-DISTRO_FEATURES_FILTER_NATIVE'><filename>DISTRO_FEATURES_FILTER_NATIVE</filename></link>
+                    variable.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-DISTRO_FEATURES_NATIVESDK'><glossterm>DISTRO_FEATURES_NATIVESDK</glossterm>
+            <info>
+                DISTRO_FEATURES_NATIVESDK[doc] = "Specifies a list of features that should be included in DISTRO_FEATURES when building nativesdk recipes."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies a list of features that should be included in
+                    <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>
+                    when building nativesdk recipes.
+                    This variable is used in addition to the features
+                    filtered using the
+                    <link linkend='var-DISTRO_FEATURES_FILTER_NATIVESDK'><filename>DISTRO_FEATURES_FILTER_NATIVESDK</filename></link>
+                    variable.
                 </para>
             </glossdef>
         </glossentry>
@@ -3643,7 +3880,9 @@
                 <para>
                     See the
                     <link linkend='ref-classes-systemd-boot'><filename>systemd-boot</filename></link>
-                    class for more information.
+                    and
+                    <link linkend='ref-classes-image-live'><filename>image-live</filename></link>
+                    classes for more information.
                 </para>
             </glossdef>
         </glossentry>
@@ -4954,6 +5193,53 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-HOSTTOOLS'><glossterm>HOSTTOOLS</glossterm>
+            <info>
+                HOSTTOOLS[doc] = "A space-separated list (filter) of tools on the build host that should be allowed to be called from within build tasks."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A space-separated list (filter) of tools on the build host
+                    that should be allowed to be called from within build tasks.
+                    Using this filter helps reduce the possibility of host
+                    contamination.
+                    If a tool specified in the value of
+                    <filename>HOSTTOOLS</filename> is not found on the
+                    build host, the OpenEmbedded build system produces
+                    an error and the build is not started.
+                </para>
+
+                <para>
+                    For additional information, see
+                    <link linkend='var-HOSTTOOLS_NONFATAL'><filename>HOSTTOOLS_NONFATAL</filename></link>.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-HOSTTOOLS_NONFATAL'><glossterm>HOSTTOOLS_NONFATAL</glossterm>
+            <info>
+                HOSTTOOLS_NONFATAL[doc] = "A space-separated list (filter) of tools on the build host that should be allowed to be called from within build tasks."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    A space-separated list (filter) of tools on the build host
+                    that should be allowed to be called from within build tasks.
+                    Using this filter helps reduce the possibility of host
+                    contamination.
+                    Unlike
+                    <link linkend='var-HOSTTOOLS'><filename>HOSTTOOLS</filename></link>,
+                    the OpenEmbedded build system does not produce and error
+                    if a tool specified in the value of
+                    <filename>HOSTTOOLS_NONFATAL</filename> is not found on the
+                    build host.
+                    Thus, you can use <filename>HOSTTOOLS_NONFATAL</filename>
+                    to filter optional host tools.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-HOST_VENDOR'><glossterm>HOST_VENDOR</glossterm>
             <info>
                 HOST_VENDOR[doc] = "The name of the vendor. Normally same as the TARGET_VENDOR."
@@ -6030,14 +6316,24 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
         <glossentry id='var-INHERIT'><glossterm>INHERIT</glossterm>
             <info>
-                INHERIT[doc] = "Causes the named class to be inherited at this point during parsing. The variable is only valid in configuration files."
+                INHERIT[doc] = "Causes the named class or classes to be inherited globally."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Causes the named class to be inherited at
-                    this point during parsing.
-                    The variable is only valid in configuration files.
+                    Causes the named class or classes to be inherited globally.
+                    Anonymous functions in the class or classes
+                    are not executed for the
+                    base configuration and in each individual recipe.
+                    The OpenEmbedded build system ignores changes to
+                    <filename>INHERIT</filename> in individual recipes.
+                </para>
+
+                <para>
+                    For more information on <filename>INHERIT</filename>, see
+                    the
+                    "<ulink url="&YOCTO_DOCS_BB_URL;#inherit-configuration-directive"><filename>INHERIT</filename> Configuration Directive</ulink>"
+                    section in the Yocto Project Bitbake User Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -7145,21 +7441,30 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
         <glossentry id='var-LAYERDEPENDS'><glossterm>LAYERDEPENDS</glossterm>
             <info>
-                LAYERDEPENDS[doc] = "Lists the layers, separated by spaces, upon which this recipe depends. This variable is used in the conf/layer.conf file and must be suffixed with the name of the specific layer."
+                LAYERDEPENDS[doc] = "Lists the layers, separated by spaces, on which this recipe depends. This variable is used in the conf/layer.conf file and must be suffixed with the name of the specific layer."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Lists the layers that this recipe depends upon, separated by spaces.
-                    Optionally, you can specify a specific layer version for a dependency
-                    by adding it to the end of the layer name with a colon, (e.g. "anotherlayer:3"
-                    to be compared against
-                    <link linkend='var-LAYERVERSION'><filename>LAYERVERSION</filename></link><filename>_anotherlayer</filename>
-                    in this case).
-                    An error will be produced if any dependency is missing or
-                    the version numbers do not match exactly (if specified).
-                    This variable is used in the <filename>conf/layer.conf</filename> file
-                    and must be suffixed with the name of the specific layer (e.g.
+                    Lists the layers, separated by spaces, on which this
+                    recipe depends.
+                    Optionally, you can specify a specific layer version for a
+                    dependency by adding it to the end of the layer name.
+                    Here is an example:
+                    <literallayout class='monospaced'>
+     LAYERDEPENDS_mylayer = "anotherlayer (=3)"
+                    </literallayout>
+                    In this previous example, version 3 of "anotherlayer"
+                    is compared against
+                    <link linkend='var-LAYERVERSION'><filename>LAYERVERSION</filename></link><filename>_anotherlayer</filename>.
+                </para>
+
+                <para>
+                    An error is produced if any dependency is missing or
+                    the version numbers (if specified) do not match exactly.
+                    This variable is used in the
+                    <filename>conf/layer.conf</filename> file and must be
+                    suffixed with the name of the specific layer (e.g.
                     <filename>LAYERDEPENDS_mylayer</filename>).
                 </para>
             </glossdef>
@@ -7176,6 +7481,39 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     file, this variable provides the path of the current layer.
                     This variable is not available outside of <filename>layer.conf</filename>
                     and references are expanded immediately when parsing of the file completes.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-LAYERRECOMMENDS'><glossterm>LAYERRECOMMENDS</glossterm>
+            <info>
+                LAYERRECOMMENDS[doc] = "Lists the layers, separated by spaces, recommended for use with this layer."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Lists the layers, separated by spaces, recommended for
+                    use with this layer.
+                </para>
+
+                <para>
+                    Optionally, you can specify a specific layer version for a
+                    recommendation by adding the version to the end of the
+                    layer name.
+                    Here is an example:
+                    <literallayout class='monospaced'>
+     LAYERRECOMMENDS_mylayer = "anotherlayer (=3)"
+                    </literallayout>
+                    In this previous example, version 3 of "anotherlayer" is
+                    compared against
+                    <filename>LAYERVERSION_anotherlayer</filename>.
+                </para>
+
+                <para>
+                    This variable is used in the
+                    <filename>conf/layer.conf</filename> file and must be
+                    suffixed with the name of the specific layer (e.g.
+                    <filename>LAYERRECOMMENDS_mylayer</filename>).
                 </para>
             </glossdef>
         </glossentry>
@@ -8198,13 +8536,16 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+<!--
         <glossentry id='var-MULTIMACH_HOST_SYS'><glossterm>MULTIMACH_HOST_SYS</glossterm>
             <info>
                 MULTIMACH_HOST_SYS[doc] = "Separates files for different machines such that you can build for multiple host machines using the same output directories."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
+-->
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+<!--
                     Serves the same purpose as
                     <link linkend='var-MULTIMACH_TARGET_SYS'><filename>MULTIMACH_TARGET_SYS</filename></link>,
                     but for the "HOST" system, in situations that involve a
@@ -8222,6 +8563,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 </para>
             </glossdef>
         </glossentry>
+-->
 
         <glossentry id='var-MULTIMACH_TARGET_SYS'><glossterm>MULTIMACH_TARGET_SYS</glossterm>
             <info>
@@ -8251,9 +8593,6 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     See the
                     <link linkend='var-STAMP'><filename>STAMP</filename></link>
                     variable for an example.
-                    <link linkend='var-MULTIMACH_HOST_SYS'><filename>MULTIMACH_HOST_SYS</filename></link>
-                    is the corresponding variable for the host system in
-                    situations that involve a "HOST" and a "TARGET" system.
                     See the
                     <link linkend='var-STAGING_DIR_TARGET'><filename>STAGING_DIR_TARGET</filename></link>
                     variable for more information.
@@ -8332,7 +8671,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <filename>local.conf</filename> file or you can attach it to
                     a specific image recipe by using the recipe name override:
                     <literallayout class='monospaced'>
-     NO_RECOMMENDATIONS_pn-<replaceable>target_image</replaceable> = "<replaceable>package_name</replaceable>"
+     NO_RECOMMENDATIONS_pn-<replaceable>target_image</replaceable> = "1"
                     </literallayout>
                 </para>
 
@@ -9163,6 +9502,31 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-PACKAGE_WRITE_DEPS'><glossterm>PACKAGE_WRITE_DEPS</glossterm>
+            <info>
+                PACKAGE_WRITE_DEPS[doc] = "Specifies post-installation and pre-installation script dependencies on native/cross tools."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies a list of dependencies for post-installation and
+                    pre-installation scripts on native/cross tools.
+                    If your post-installation or pre-installation script can
+                    execute at rootfs creation time rather than on the
+                    target but depends on a native tool in order to execute,
+                    you need to list the tools in
+                    <filename>PACKAGE_WRITE_DEPENDS</filename>.
+                </para>
+
+                <para>
+                    For information on running post-installation scripts, see
+                    the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#new-recipe-post-installation-scripts'>Post-Installation Scripts</ulink>"
+                    section in the Yocto Project Development Manual.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-PACKAGECONFIG'><glossterm>PACKAGECONFIG</glossterm>
             <info>
                 PACKAGECONFIG[doc] = "This variable provides a means of enabling or disabling features of a recipe on a per-recipe basis."
@@ -9299,29 +9663,22 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     from the
                     <link linkend='var-PACKAGECONFIG'><filename>PACKAGECONFIG</filename></link>
                     setting.
-                    This list of options helps other classes and
-                    recipes take advantage of the
-                    <filename>PACKAGECONFIG</filename> mechanism without
-                    having to include options from
-                    <link linkend='var-EXTRA_OECONF'><filename>EXTRA_OECONF</filename></link>.
                 </para>
 
                 <para>
-                    To illustrate how to use
-                    <filename>PACKAGECONFIG_CONFARGS</filename>, consider the
-                    following example:
-                    <literallayout class='monospaced'>
-     PACKAGECONFIG_CONFARGS = " \
-          -prefix ${prefix} \
-          -sysroot ${STAGING_DIR_NATIVE} \
-          -no-gcc-sysroot
-          "
-                    </literallayout>
-                    In the previous example,
-                    <filename>PACKAGECONFIG_CONFARGS</filename> is set with
-                    three configuration options that can be passed using the
-                    <filename>PACKAGECONFIG</filename> mechanism, thus
-                    avoiding having to use <filename>EXTRA_OECONF</filename>.
+                    Classes such as
+                    <link linkend='ref-classes-autotools'><filename>autotools</filename></link>
+                    and
+                    <link linkend='ref-classes-cmake'><filename>cmake</filename></link>
+                    use <filename>PACKAGECONFIG_CONFARGS</filename> to pass
+                    <link linkend='var-PACKAGECONFIG'><filename>PACKAGECONFIG</filename></link>
+                    options to <filename>configure</filename> and
+                    <filename>cmake</filename>, respectively.
+                    If you are using
+                    <filename>PACKAGECONFIG</filename> but not a class that
+                    handles the <filename>do_configure</filename> task, then
+                    you need to use
+                    <filename>PACKAGECONFIG_CONFARGS</filename> appropriately.
                 </para>
 
                 <para>
@@ -12499,15 +12856,17 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     every time BitBake parses your recipe, you should specify
                     a <filename>SRCREV</filename> that is a
                     full revision identifier and not just a tag.
+                    <note>
+                        For information on limitations when inheriting the
+                        latest revision of software using
+                        <filename>SRCREV</filename>, see the
+                        <link linkend='var-AUTOREV'><filename>AUTOREV</filename></link>
+                        variable description and the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#automatically-incrementing-a-binary-package-revision-number'>Automatically Incrementing a Binary Package Revision Number</ulink>"
+                        section, which is in the Yocto Project Development Manual.
+                    </note>
                 </para>
 
-                <note>
-                    For information on limitations when inheriting the latest
-                    revision of software using <filename>SRCREV</filename>,
-                    see the
-                    <link linkend='var-AUTOREV'><filename>AUTOREV</filename></link>
-                    variable description.
-                </note>
             </glossdef>
         </glossentry>
 
@@ -12584,6 +12943,41 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
      file://.* http://<replaceable>someserver</replaceable>.tld/share/sstate/PATH;downloadfilename=PATH \n \
      file://.* file:///<replaceable>some-local-dir</replaceable>/sstate/PATH"
                     </literallayout>
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-SSTATE_SCAN_FILES'><glossterm>SSTATE_SCAN_FILES</glossterm>
+            <info>
+                SSTATE_SCAN_FILES[doc] = "Controls the list of files the OpenEmbedded build system scans for hardcoded installation paths."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Controls the list of files the OpenEmbedded build system
+                    scans for hardcoded installation paths. The variable uses a
+                    space-separated list of filenames (not paths) with standard
+                    wildcard characters allowed.
+                </para>
+
+                <para>
+                    During a build, the OpenEmbedded build system creates a
+                    shared state (sstate) object during the first stage of
+                    preparing the sysroots. That object is scanned for
+                    hardcoded paths for original installation locations.
+                    The list of files that are scanned for paths is controlled
+                    by the <filename>SSTATE_SCAN_FILES</filename> variable.
+                    Typically, recipes add files they want to be scanned to the
+                    value of <filename>SSTATE_SCAN_FILES</filename> rather than
+                    the variable being comprehensively set. The
+                    <link linkend='ref-classes-sstate'><filename>sstate</filename></link>
+                    class specifies the default list of files.
+                </para>
+
+                <para>
+                    For details on the process, see the
+                    <link linkend='ref-classes-staging'><filename>staging</filename></link>
+                    class.
                 </para>
             </glossdef>
         </glossentry>
@@ -12801,12 +13195,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                                 they make use of host headers and libraries.
                                 </para>
                                 </note>
-                           </para></listitem>
-                        <listitem><para>For native SDK
-                           recipes that build for the SDK
-                           (<filename>nativesdk</filename>), the value is
-                           "${STAGING_DIR}/${<link linkend='var-MULTIMACH_HOST_SYS'>MULTIMACH_HOST_SYS</link>}".
-                           </para></listitem>
+                            </para></listitem>
                     </itemizedlist>
                 </para>
             </glossdef>
@@ -13181,6 +13570,28 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
                 <para>
                     The class checks for and uses the variable as needed.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-SYSROOT_DESTDIR'><glossterm>SYSROOT_DESTDIR</glossterm>
+            <info>
+                SYSROOT_DESTDIR[doc] = "Points to the temporary work directory (default ${WORKDIR}/sysroot-destdir) where the files that will be populated into the sysroot are assembled during the do_populate_sysroot task."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Points to the temporary directory under the work directory
+                    (default
+                    <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}/sysroot-destidir</filename>)
+                    where the files
+                    that will be populated into the sysroot are assembled
+                    during the
+                    <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>
+                    task.
+                    <literallayout class='monospaced'>
+     SYSROOT_DESTDIR ?= "console=ttyS0,115200"
+                    </literallayout>
                 </para>
             </glossdef>
         </glossentry>
@@ -14197,8 +14608,9 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <note>
                         The <filename>TEST_SERVER_IP</filename> variable
                         is only used for a small number of tests such as
-                        the "smart" test suite, which needs to download
-                        packages from <filename>DEPLOY_DIR/rpm</filename>.
+                        the "dnf" test suite, which needs to download
+                        packages from
+                        <filename>WORKDIR/oe-rootfs-repo</filename>.
                     </note>
                 </para>
             </glossdef>
@@ -15544,8 +15956,30 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
     </glossdiv>
 
-<!--            <glossdiv id='var-glossary-v'><title>V</title>-->
-<!--            </glossdiv>-->
+    <glossdiv id='var-glossary-v'><title>V</title>
+
+        <glossentry id='var-VOLATILE_LOG_DIR'><glossterm>VOLATILE_LOG_DIR</glossterm>
+            <info>
+               VOLATILE_LOG_DIR[doc] = "Specifies the persistence of the target's /var/log directory, which is used to house postinstall target log files."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the persistence of the target's
+                    <filename>/var/log</filename> directory, which is used to
+                    house postinstall target log files.
+                </para>
+
+                <para>
+                    By default, <filename>VOLATILE_LOG_DIR</filename> is set
+                    to "yes", which means the file is not persistent.
+                    You can override this setting by setting the
+                    variable to "no" to make the log directory persistent.
+                </para>
+            </glossdef>
+        </glossentry>
+
+    </glossdiv>
 
     <glossdiv id='var-glossary-w'><title>W</title>
 
@@ -15564,6 +15998,50 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     see the
                     "<link linkend='ref-classes-insane'><filename>insane.bbclass</filename></link>"
                     section.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-WKS_FILE_DEPENDS'><glossterm>WKS_FILE_DEPENDS</glossterm>
+            <info>
+               WKS_FILE_DEPENDS[doc] = "Lists a recipe's build-time dependencies specific to Wic."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+                    When placed in the recipe that builds your image, this
+                    variable lists build-time dependencies.
+                    The <filename>WKS_FILE_DEPENDS</filename> variable is only
+                    applicable when Wic images are active (i.e. when
+                    <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
+                    contains entries related to Wic).
+                    If your recipe does not create Wic images, the variable
+                    has no effect.
+                </para>
+
+                <para>
+                    The <filename>WKS_FILE_DEPENDS</filename> variable is
+                    similar to the
+                    <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                    variable.
+                    When you use the variable in your recipe that builds the
+                    Wic image, dependencies you list in the
+                    <filename>WIC_FILE_DEPENDS</filename> variable are added to
+                    the <filename>DEPENDS</filename> variable.
+                </para>
+
+                <para>
+                    With the <filename>WKS_FILE_DEPENDS</filename> variable,
+                    you have the possibility to specify a list of additional
+                    dependencies (e.g. native tools, bootloaders, and so forth),
+                    that are required to build Wic images.
+                    Following is an example:
+                    <literallayout class='monospaced'>
+     WKS_FILE_DEPENDS = "<replaceable>some-native-tool</replaceable>"
+                    </literallayout>
+                    In the previous example,
+                    <replaceable>some-native-tool</replaceable> would be
+                    replaced with an actual native tool on which the build
+                    would depend.
                 </para>
             </glossdef>
         </glossentry>

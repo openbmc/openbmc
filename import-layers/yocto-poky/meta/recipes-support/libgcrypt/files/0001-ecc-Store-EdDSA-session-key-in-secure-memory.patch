@@ -2,7 +2,7 @@ CVE: CVE-2017-9526
 Upstream-Status: Backport
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
-From b3cab278eb9c2ceda79f980bc26460d97f260041 Mon Sep 17 00:00:00 2001
+From 4a1768d683f6572ad86d833508c70e6b3dc1efdc Mon Sep 17 00:00:00 2001
 From: Jo Van Bulck <jo.vanbulck@cs.kuleuven.be>
 Date: Thu, 19 Jan 2017 17:00:15 +0100
 Subject: [PATCH] ecc: Store EdDSA session key in secure memory.

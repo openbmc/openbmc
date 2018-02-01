@@ -1,0 +1,48 @@
+Index: git/ClntMessages/ClntMsgRequest.cpp
+===================================================================
+--- git.orig/ClntMessages/ClntMsgRequest.cpp
++++ git/ClntMessages/ClntMsgRequest.cpp
+@@ -142,7 +142,10 @@ TClntMsgRequest::TClntMsgRequest(List(TA
+     IsDone=false;
+     SPtr<TOpt> ptr;
+     ptr = new TOptDUID(OPTION_CLIENTID, ClntCfgMgr().getDUID(), this );
+-    Options.push_back( ptr );
++
++    if ( ptr ) { 
++        Options.push_back( ptr );
++    }
+ 
+     if (!srvDUID) {
+ 	Log(Error) << "Unable to send REQUEST: ServerId not specified.\n" << LogEnd;
+@@ -153,7 +156,9 @@ TClntMsgRequest::TClntMsgRequest(List(TA
+     ptr = new TOptDUID(OPTION_SERVERID, srvDUID,this);
+     // all IAs provided by checkSolicit
+     SPtr<TAddrIA> ClntAddrIA;
+-    Options.push_back( ptr );
++    if ( ptr ) {
++        Options.push_back( ptr );
++    }
+ 	
+     IAs.first();
+     while (ClntAddrIA = IAs.get()) 
+Index: git/Messages/Msg.cpp
+===================================================================
+--- git.orig/Messages/Msg.cpp
++++ git/Messages/Msg.cpp
+@@ -69,10 +69,15 @@ int TMsg::getSize()
+ {
+     int pktsize=0;
+     TOptList::iterator opt;
++    int optionCount = 0;
+     for (opt = Options.begin(); opt!=Options.end(); ++opt)
+     {
+-	pktsize += (*opt)->getSize();
++       Log(Info) << "### CPE Debug - Option with index  " << optionCount++ << LogEnd ;
++       Log(Info) << "### CPE Debug - Option with type " << (*opt)->getOptType() << LogEnd ;
++       pktsize += (*opt)->getSize();
+     }
++    Log(Info) << "### CPE Debug - Packet size of option (Add 4) " << pktsize << LogEnd ;
++
+     return pktsize + 4;
+ }
+ 

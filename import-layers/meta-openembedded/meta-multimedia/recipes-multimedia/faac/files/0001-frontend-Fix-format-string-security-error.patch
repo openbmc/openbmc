@@ -1,0 +1,26 @@
+From c1d7a8b992dc36d0012cc3d54b7d3abf4ad4d5d8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Mar 2017 21:33:01 -0700
+Subject: [PATCH 1/2] frontend: Fix format string security error
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ frontend/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/frontend/main.c b/frontend/main.c
+index 02146a8..cb9329c 100644
+--- a/frontend/main.c
++++ b/frontend/main.c
+@@ -715,7 +715,7 @@ int main(int argc, char *argv[])
+         break;
+ #endif
+         case 'L':
+-        fprintf(stderr, faac_copyright_string);
++        fprintf(stderr, "%s", faac_copyright_string);
+         dieMessage = license;
+         break;
+     case 'X':
+-- 
+2.12.1
+

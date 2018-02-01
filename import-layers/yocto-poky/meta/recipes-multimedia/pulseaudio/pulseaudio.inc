@@ -2,18 +2,71 @@ SUMMARY = "Sound server for Linux and Unix-like operating systems"
 HOMEPAGE = "http://www.pulseaudio.org"
 AUTHOR = "Lennart Poettering"
 SECTION = "libs/multimedia"
-LICENSE = "GPLv2+ & LGPLv2.1"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=d9ae089c8dc5339f8ac9d8563038a29f \
+
+# Most of PulseAudio code is under LGPLv2.1+. There are a few exceptions:
+#
+# The "adrian" echo canceller variant has code under a non-standard permissive
+# license. See src/modules/echo-cancel/adrian-license.txt for details. This
+# recipe disables the adrian echo canceller to avoid hassle with the unusual
+# license.
+#
+# The src/modules/reserve* and src/pulsecore/rtkit* files are under the MIT
+# license.
+#
+# The src/pulsecore/filter/ directory contains code under the 3-clause BSD
+# license.
+#
+# src/utils/qpaeq is licensed under AGPL. qpaeq is not installed by this
+# recipe, however, which is why AGPL is not mentioned in LICENSE.
+#
+# People who distribute PulseAudio binaries need to also consider that there
+# are some dependencies to GPL libraries. LGPL code that depends on GPL
+# libraries probably becomes effectively GPL-licensed (at compile-time? or at
+# at link-time?). I'm not a lawyer, though, so I'm not sure of the exact
+# implications. The GPL dependencies only affect the server, not the client
+# library, with the exception of libdbus that affects both. These are the GPL
+# library dependencies:
+#
+# One of the resampler implementations uses libsamplerate. This recipe doesn't
+# enable that resampler, however.
+#
+# One of the database implementations uses gdbm. This recipe doesn't enable
+# that database implementation, however.
+#
+# module-lirc (enabled by PACKAGECONFIG[lirc]) uses LIRC.
+#
+# module-equalizer-sink uses FFTW. This recipe disables that, however.
+#
+# The dependency with the most complicated licensing considerations is libdbus.
+# When PACKAGECONFIG[dbus] is enabled (like it is by default), libdbus will be
+# used by both the server and the client library (libpulse). Does this affect
+# applications that use libpulse? It should be also noted that libdbus is
+# dual-licensed: either GPLv2+ or AFL-2 terms apply. Whose decision is it which
+# of the licenses apply? What a mess. Some people hold the view that libdbus is
+# a system library that is covered by the "special exception" in GPLv2's
+# section 3, and therefore libdbus's GPL license doesn't affect PulseAudio.
+LICENSE = "LGPLv2.1+ & MIT & BSD-3-Clause"
+
+LIC_FILES_CHKSUM = "file://LICENSE;md5=a848e8d03f04976778eab2348b59ed2b \
                     file://GPL;md5=4325afd396febcb659c36b49533135d4 \
                     file://LGPL;md5=2d5025d4aa3495befef8f17206a5b0a1 \
-                    file://src/pulsecore/resampler.h;beginline=4;endline=21;md5=09794012ae16912c0270f3280cc8ff84"
+                    file://AGPL;md5=73f1eb20517c55bf9493b7dd6e480788 \
+                    file://src/modules/echo-cancel/adrian-license.txt;md5=abbab006a561fbffccedf1c3531f34ab \
+                    file://src/pulsecore/filter/LICENSE.WEBKIT;md5=49defbaffddf8c51faf606ff7fc3b1f7 \
+                    file://src/pulsecore/resampler.h;beginline=4;endline=21;md5=09794012ae16912c0270f3280cc8ff84 \
+                    file://src/modules/reserve.h;beginline=6;endline=28;md5=0e23094760367d51b6609750e9b31fbb \
+                    file://src/pulsecore/rtkit.h;beginline=6;endline=29;md5=3f00ff966716ae0817c31576d1473528 \
+                    file://src/utils/qpaeq;beginline=2;endline=16;md5=7f62515a4762f0c3fc3d4201858bb964 \
+                    file://src/modules/echo-cancel/adrian-aec.h;beginline=3;endline=12;md5=d3ed4fad1c073f8b06f37495dc5d1026 \
+                    file://src/pulsecore/filter/biquad.h;beginline=1;endline=4;md5=6d46d1365206528a20137355924233c1 \
+"
 
 DEPENDS = "libatomic-ops libsndfile1 libtool intltool-native"
 # optional
 DEPENDS += "udev alsa-lib glib-2.0 gconf"
-DEPENDS += "json-c gdbm speexdsp libxml-parser-perl-native libcap"
+DEPENDS += "speexdsp libxml-parser-perl-native libcap"
 
-inherit autotools bash-completion pkgconfig useradd gettext perlnative bluetooth systemd
+inherit autotools bash-completion pkgconfig useradd gettext perlnative bluetooth systemd manpages
 
 # *.desktop rules wont be generated during configure and build will fail
 # if using --disable-nls
@@ -25,9 +78,7 @@ EXTRA_OECONF = "\
 		--enable-tcpwrap=no \
 		--with-access-group=audio \
 		--disable-openssl \
-		--disable-xen \
 		--with-database=simple \
-		--without-fftw \
 		--without-zsh-completion-dir \
 		--with-udev-rules-dir=`pkg-config --variable=udevdir udev`/rules.d \
                 ac_cv_header_valgrind_memcheck_h=no \
@@ -38,12 +89,27 @@ EXTRA_OECONF = "\
 # oe-core nor meta-oe, so let's not add a PACKAGECONFIG entry for it for now.
 EXTRA_OECONF += "--without-soxr"
 
+# The FFTW dependency (for module-equalizer-sink) was removed in commit
+# ddbd713293 without explaining why it was not made a PACKAGECONFIG item
+# instead. Oh well, let's keep it disabled until someone expresses some
+# interest in having it enabled.
+#
+# One nice thing about disabling this is that it also prevents qpaeq from
+# being installed, so we avoid adding AGPL to the list of licenses (nothing
+# else in PulseAudio is licensed under AGPL).
+EXTRA_OECONF += "--without-fftw"
+
+# The "adrian" echo canceller implementation has a non-standard license
+# (src/modules/echo-cancel/adrian-license.txt). It's a permissive license, so
+# the licensing terms are probably not problematic, but it would be an extra
+# hassle to add the license to OE-Core's set of licenses. The canceller isn't
+# very good anyway, better alternatives exist (such as the webrtc canceller).
+EXTRA_OECONF += "--disable-adrian-aec"
+
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', '${BLUEZ}', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', '3g', 'ofono', '', d)} \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)} \
+                   ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6 systemd x11', d)} \
                    dbus \
                    "
 
@@ -62,6 +128,7 @@ PACKAGECONFIG[autospawn-for-root] = ",,,"
 PACKAGECONFIG[lirc] = "--enable-lirc,--disable-lirc,lirc"
 PACKAGECONFIG[webrtc] = "--enable-webrtc-aec,--disable-webrtc-aec,webrtc-audio-processing"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+PACKAGECONFIG[manpages] = "--enable-manpages, --disable-manpages, "
 
 EXTRA_OECONF_append_arm = "${@bb.utils.contains("TUNE_FEATURES", "neon", "", " --enable-neon-opt=no", d)}"
 EXTRA_OECONF_append_armeb = "${@bb.utils.contains("TUNE_FEATURES", "neon", "", " --enable-neon-opt=no", d)}"

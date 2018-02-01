@@ -1,0 +1,33 @@
+From 97e83a100aa8250be783304bfe0429761c6e6b6b Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Sun, 23 Apr 2017 13:55:49 +0930
+Subject: [PATCH] PR 21409, segfault in _bfd_dwarf2_find_nearest_line
+
+	PR 21409
+	* dwarf2.c (_bfd_dwarf2_find_nearest_line): Don't segfault when
+	no symbols.
+
+CVE: CVE-2017-8392
+Upstream-Status: Accepted
+
+Signed-off-by: Fan Xin <fan.xin@jp.fujitsu.com>
+---
+ bfd/dwarf2.c  | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletion(-)
+
+diff --git a/bfd/dwarf2.c b/bfd/dwarf2.c
+index 132a674..0ef3e1f 100644
+--- a/bfd/dwarf2.c
++++ b/bfd/dwarf2.c
+@@ -4205,7 +4205,7 @@ _bfd_dwarf2_find_nearest_line (bfd *abfd,
+          looking up the function by section + offset uses the
+          DW_AT_decl_line from the function DW_TAG_subprogram for the line,
+          which will be the line of the function name.  */
+-      if ((section->flags & SEC_CODE) == 0)
++      if (symbols != NULL && (section->flags & SEC_CODE) == 0)
+ 	{
+ 	  asymbol **tmp;
+ 
+-- 
+1.9.1
+

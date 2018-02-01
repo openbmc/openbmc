@@ -43,7 +43,6 @@ IETF secsh internet draft:
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import re, os
-from   bb import data
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
 from   bb.fetch2 import logger
@@ -87,11 +86,11 @@ class SSH(FetchMethod):
         m = __pattern__.match(urldata.url)
         path = m.group('path')
         host = m.group('host')
-        urldata.localpath = os.path.join(d.getVar('DL_DIR', True),
+        urldata.localpath = os.path.join(d.getVar('DL_DIR'),
                 os.path.basename(os.path.normpath(path)))
 
     def download(self, urldata, d):
-        dldir = d.getVar('DL_DIR', True)
+        dldir = d.getVar('DL_DIR')
 
         m = __pattern__.match(urldata.url)
         path = m.group('path')

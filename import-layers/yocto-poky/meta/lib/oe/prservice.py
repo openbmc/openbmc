@@ -1,7 +1,7 @@
 
 def prserv_make_conn(d, check = False):
     import prserv.serv
-    host_params = list([_f for _f in (d.getVar("PRSERV_HOST", True) or '').split(':') if _f])
+    host_params = list([_f for _f in (d.getVar("PRSERV_HOST") or '').split(':') if _f])
     try:
         conn = None
         conn = prserv.serv.PRServerConnection(host_params[0], int(host_params[1]))
@@ -15,11 +15,11 @@ def prserv_make_conn(d, check = False):
     return conn
 
 def prserv_dump_db(d):
-    if not d.getVar('PRSERV_HOST', True):
+    if not d.getVar('PRSERV_HOST'):
         bb.error("Not using network based PR service")
         return None
 
-    conn = d.getVar("__PRSERV_CONN", True)
+    conn = d.getVar("__PRSERV_CONN")
     if conn is None:
         conn = prserv_make_conn(d)
         if conn is None:
@@ -27,18 +27,18 @@ def prserv_dump_db(d):
             return None
 
     #dump db
-    opt_version = d.getVar('PRSERV_DUMPOPT_VERSION', True)
-    opt_pkgarch = d.getVar('PRSERV_DUMPOPT_PKGARCH', True)
-    opt_checksum = d.getVar('PRSERV_DUMPOPT_CHECKSUM', True)
-    opt_col = ("1" == d.getVar('PRSERV_DUMPOPT_COL', True))
+    opt_version = d.getVar('PRSERV_DUMPOPT_VERSION')
+    opt_pkgarch = d.getVar('PRSERV_DUMPOPT_PKGARCH')
+    opt_checksum = d.getVar('PRSERV_DUMPOPT_CHECKSUM')
+    opt_col = ("1" == d.getVar('PRSERV_DUMPOPT_COL'))
     return conn.export(opt_version, opt_pkgarch, opt_checksum, opt_col)
 
 def prserv_import_db(d, filter_version=None, filter_pkgarch=None, filter_checksum=None):
-    if not d.getVar('PRSERV_HOST', True):
+    if not d.getVar('PRSERV_HOST'):
         bb.error("Not using network based PR service")
         return None
 
-    conn = d.getVar("__PRSERV_CONN", True)
+    conn = d.getVar("__PRSERV_CONN")
     if conn is None:
         conn = prserv_make_conn(d)
         if conn is None:
@@ -58,7 +58,7 @@ def prserv_import_db(d, filter_version=None, filter_pkgarch=None, filter_checksu
                (filter_checksum and filter_checksum != checksum):
                continue
             try:
-                value = int(d.getVar(remain + '$' + version + '$' + pkgarch + '$' + checksum, True))
+                value = int(d.getVar(remain + '$' + version + '$' + pkgarch + '$' + checksum))
             except BaseException as exc:
                 bb.debug("Not valid value of %s:%s" % (v,str(exc)))
                 continue
@@ -72,8 +72,8 @@ def prserv_import_db(d, filter_version=None, filter_pkgarch=None, filter_checksu
 def prserv_export_tofile(d, metainfo, datainfo, lockdown, nomax=False):
     import bb.utils
     #initilize the output file
-    bb.utils.mkdirhier(d.getVar('PRSERV_DUMPDIR', True))
-    df = d.getVar('PRSERV_DUMPFILE', True)
+    bb.utils.mkdirhier(d.getVar('PRSERV_DUMPDIR'))
+    df = d.getVar('PRSERV_DUMPFILE')
     #write data
     lf = bb.utils.lockfile("%s.lock" % df)
     f = open(df, "a")
@@ -114,7 +114,7 @@ def prserv_export_tofile(d, metainfo, datainfo, lockdown, nomax=False):
     bb.utils.unlockfile(lf)
 
 def prserv_check_avail(d):
-    host_params = list([_f for _f in (d.getVar("PRSERV_HOST", True) or '').split(':') if _f])
+    host_params = list([_f for _f in (d.getVar("PRSERV_HOST") or '').split(':') if _f])
     try:
         if len(host_params) != 2:
             raise TypeError

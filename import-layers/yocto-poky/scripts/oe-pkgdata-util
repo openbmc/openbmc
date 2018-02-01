@@ -174,15 +174,16 @@ def read_value(args):
             logger.error("No packages specified")
             sys.exit(1)
 
-    def readvar(pkgdata_file, valuename):
+    def readvar(pkgdata_file, valuename, mappedpkg):
         val = ""
         with open(pkgdata_file, 'r') as f:
             for line in f:
-                if line.startswith(valuename + ":"):
+                if (line.startswith(valuename + ":") or
+                    line.startswith(valuename + "_" + mappedpkg + ":")):
                     val = line.split(': ', 1)[1].rstrip()
         return val
 
-    logger.debug("read-value('%s', '%s' '%s'" % (args.pkgdata_dir, args.valuename, packages))
+    logger.debug("read-value('%s', '%s' '%s')" % (args.pkgdata_dir, args.valuename, packages))
     for package in packages:
         pkg_split = package.split('_')
         pkg_name = pkg_split[0]
@@ -192,18 +193,17 @@ def read_value(args):
         if os.path.exists(revlink):
             mappedpkg = os.path.basename(os.readlink(revlink))
             qvar = args.valuename
+            value = readvar(revlink, qvar, mappedpkg)
             if qvar == "PKGSIZE":
-                # append packagename
-                qvar = "%s_%s" % (args.valuename, mappedpkg)
                 # PKGSIZE is now in bytes, but we we want it in KB
-                pkgsize = (int(readvar(revlink, qvar)) + 1024 // 2) // 1024
+                pkgsize = (int(value) + 1024 // 2) // 1024
                 value = "%d" % pkgsize
-            else:
-                value = readvar(revlink, qvar)
             if args.prefix_name:
                 print('%s %s' % (pkg_name, value))
             else:
                 print(value)
+        else:
+            logger.debug("revlink %s does not exist", revlink)
 
 def lookup_pkglist(pkgs, pkgdata_dir, reverse):
     if reverse:
@@ -325,8 +325,15 @@ def package_info(args):
             recipe_version = recipe_version + "-" + mappings[pkg]['PR']
         pkg_size = mappings[pkg]['PKGSIZE']
 
-        items.append("%s %s %s %s %s" %
-                     (pkg, pkg_version, recipe, recipe_version, pkg_size))
+        line = "%s %s %s %s %s" % (pkg, pkg_version, recipe, recipe_version, pkg_size)
+
+        if args.extra:
+            for var in args.extra:
+                val = mappings[pkg][var].strip()
+                val = re.sub(r'\s+', ' ', val)
+                line += ' "%s"' % val
+
+        items.append(line)
     print('\n'.join(items))
 
 def get_recipe_pkgs(pkgdata_dir, recipe, unpackaged):
@@ -530,6 +537,7 @@ def main():
                                           description='Looks up the specified runtime package(s) and display information')
     parser_package_info.add_argument('pkg', nargs='*', help='Runtime package name to look up')
     parser_package_info.add_argument('-f', '--file', help='Read package names from the specified file (one per line, first field only)')
+    parser_package_info.add_argument('-e', '--extra', help='Extra variables to display, e.g., LICENSE (can be specified multiple times)', action='append')
     parser_package_info.set_defaults(func=package_info)
 
     parser_find_path = subparsers.add_parser('find-path',
@@ -570,7 +578,7 @@ def main():
         logger.debug('Found bitbake path: %s' % bitbakepath)
         tinfoil = tinfoil_init()
         try:
-            args.pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR', True)
+            args.pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR')
         finally:
             tinfoil.shutdown()
         logger.debug('Value of PKGDATA_DIR is "%s"' % args.pkgdata_dir)

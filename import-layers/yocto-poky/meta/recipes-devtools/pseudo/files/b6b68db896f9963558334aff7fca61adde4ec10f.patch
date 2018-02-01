@@ -1,0 +1,48 @@
+From b6b68db896f9963558334aff7fca61adde4ec10f Mon Sep 17 00:00:00 2001
+From: Seebs <seebs@seebs.net>
+Date: Thu, 13 Apr 2017 18:12:01 -0500
+Subject: Prevent bash from segfaulting when unloading pseudo
+
+bash's extremely fancy internal awareness of how the environment looks
+means that, if you directly call the underlying libc "unsetenv" on
+a variable, bash can end up trying to access a null pointer. Fixing
+this generically is actually rather hard; you can't really avoid
+writing to environ on fork() or popen(), even if you change all
+execv*() functions to use the execv*e() variants. So for now, instead
+of unsetting the variable, set it to an empty string.
+
+Thanks to Saur in IRC for spotting this and helping debug it.
+
+Signed-off-by: Seebs <seebs@seebs.net>
+
+Upstream-Status: Backport
+
+diff --git a/ChangeLog.txt b/ChangeLog.txt
+index a2d30e9..8ba1ffa 100644
+--- a/ChangeLog.txt
++++ b/ChangeLog.txt
+@@ -1,3 +1,8 @@
++2017-04-13:
++	* (seebs) don't unset LD_PRELOAD or the like, because if you
++	  do that, bash can segfault because it "knows" how many
++	  fields are in environ.
++
+ 2017-02-24:
+ 	* (seebs) import posix_acl_default fix from Anton Gerasimov
+ 	  <anton@advancedtelematic.com>
+diff --git a/pseudo_util.c b/pseudo_util.c
+index 172990b..6a1fac2 100644
+--- a/pseudo_util.c
++++ b/pseudo_util.c
+@@ -844,7 +844,7 @@ void pseudo_dropenv() {
+ 		if (ld_preload && strlen(ld_preload)) {
+ 			SETENV(PRELINK_LIBRARIES, ld_preload, 1);
+ 		} else {
+-			UNSETENV(PRELINK_LIBRARIES);
++			SETENV(PRELINK_LIBRARIES, "", 1);
+ 		}
+ 	}
+ }
+-- 
+cgit v0.10.2
+

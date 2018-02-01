@@ -7,11 +7,13 @@ This package contains the core DBus services and some utilities."
 HOMEPAGE = "http://code.google.com/p/imsettings/"
 SECTION = "Applications/System"
 
-inherit autotools gtk-doc
+inherit autotools gtk-doc gobject-introspection
 
 SRC_URI = "https://bitbucket.org/tagoh/imsettings/downloads/${BPN}-${PV}.tar.bz2 \
            file://gtk-is-required-by-notify.patch \
-           file://multi-line-ACLOCAL_AMFLAGS-isnot-supported-by-autoreconf.patch"
+           file://multi-line-ACLOCAL_AMFLAGS-isnot-supported-by-autoreconf.patch \
+           file://0001-Rename-use-of-stdout-and-stderr.patch \
+           "
 
 SRC_URI[md5sum] = "ab439e21a7d86fa99fbc04586c755349"
 SRC_URI[sha256sum] = "12c35352386057ba68d69a0b7d9a1d0d01ebbd893aafe0a094c3158c8079ac9a"

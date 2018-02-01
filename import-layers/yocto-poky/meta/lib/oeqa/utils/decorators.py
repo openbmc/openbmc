@@ -172,18 +172,19 @@ def LogResults(original_class):
 
         #check status of tests and record it
 
+        tcid = self.id()
         for (name, msg) in result.errors:
-            if (self._testMethodName == str(name).split(' ')[0]) and (class_name in str(name).split(' ')[1]):
+            if tcid == name.id():
                 local_log.results("Testcase "+str(test_case)+": ERROR")
                 local_log.results("Testcase "+str(test_case)+":\n"+msg)
                 passed = False
         for (name, msg) in result.failures:
-            if (self._testMethodName == str(name).split(' ')[0]) and (class_name in str(name).split(' ')[1]):
+            if tcid == name.id():
                 local_log.results("Testcase "+str(test_case)+": FAILED")
                 local_log.results("Testcase "+str(test_case)+":\n"+msg)
                 passed = False
         for (name, msg) in result.skipped:
-            if (self._testMethodName == str(name).split(' ')[0]) and (class_name in str(name).split(' ')[1]):
+            if tcid == name.id():
                 local_log.results("Testcase "+str(test_case)+": SKIPPED")
                 passed = False
         if passed:

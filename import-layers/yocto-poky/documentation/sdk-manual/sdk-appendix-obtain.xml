@@ -96,16 +96,16 @@
                 <listitem><para>
                     By default, this toolchain does not build static binaries.
                     If you want to use the toolchain to build these types of
-                    libraries, you need to be sure your image has the
+                    libraries, you need to be sure your SDK has the
                     appropriate static development libraries.
                     Use the
-                    <ulink url='&YOCTO_DOCS_REF_URL;#var-IMAGE_INSTALL'><filename>IMAGE_INSTALL</filename></ulink>
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-TOOLCHAIN_TARGET_TASK'><filename>TOOLCHAIN_TARGET_TASK</filename></ulink>
                     variable inside your <filename>local.conf</filename> file
-                    to install the appropriate library packages.
-                    Following is an example using <filename>glibc</filename>
+                    to install the appropriate library packages in the SDK.
+                    Following is an example using <filename>libc</filename>
                     static development libraries:
                     <literallayout class='monospaced'>
-     IMAGE_INSTALL_append = " glibc-staticdev"
+     TOOLCHAIN_TARGET_TASK_append = " libc-staticdev"
                     </literallayout>
                     </para></listitem>
                 <listitem><para>

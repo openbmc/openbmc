@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import re
+import sys
+
+arg_parser = argparse.ArgumentParser(
+    description="""
+Reports time consumed for one or more task in a format similar to the standard
+Bash 'time' builtin. Optionally sorts tasks by real (wall-clock), user (user
+space CPU), or sys (kernel CPU) time.
+""")
+
+arg_parser.add_argument(
+    "paths",
+    metavar="path",
+    nargs="+",
+    help="""
+A path containing task buildstats. If the path is a directory, e.g.
+build/tmp/buildstats, then all task found (recursively) in it will be
+processed. If the path is a single task buildstat, e.g.
+build/tmp/buildstats/20161018083535/foo-1.0-r0/do_compile, then just that
+buildstat will be processed. Multiple paths can be specified to process all of
+them. Files whose names do not start with "do_" are ignored.
+""")
+
+arg_parser.add_argument(
+    "--sort",
+    choices=("none", "real", "user", "sys"),
+    default="none",
+    help="""
+The measurement to sort the output by. Defaults to 'none', which means to sort
+by the order paths were given on the command line. For other options, tasks are
+sorted in descending order from the highest value.
+""")
+
+args = arg_parser.parse_args()
+
+# Field names and regexes for parsing out their values from buildstat files
+field_regexes = (("elapsed",    ".*Elapsed time: ([0-9.]+)"),
+                 ("user",       "rusage ru_utime: ([0-9.]+)"),
+                 ("sys",        "rusage ru_stime: ([0-9.]+)"),
+                 ("child user", "Child rusage ru_utime: ([0-9.]+)"),
+                 ("child sys",  "Child rusage ru_stime: ([0-9.]+)"))
+
+# A list of (<path>, <dict>) tuples, where <path> is the path of a do_* task
+# buildstat file and <dict> maps fields from the file to their values
+task_infos = []
+
+def save_times_for_task(path):
+    """Saves information for the buildstat file 'path' in 'task_infos'."""
+
+    if not os.path.basename(path).startswith("do_"):
+        return
+
+    with open(path) as f:
+        fields = {}
+
+        for line in f:
+            for name, regex in field_regexes:
+                match = re.match(regex, line)
+                if match:
+                    fields[name] = float(match.group(1))
+                    break
+
+        # Check that all expected fields were present
+        for name, regex in field_regexes:
+            if name not in fields:
+                print("Warning: Skipping '{}' because no field matching '{}' could be found"
+                      .format(path, regex),
+                      file=sys.stderr)
+                return
+
+        task_infos.append((path, fields))
+
+def save_times_for_dir(path):
+    """Runs save_times_for_task() for each file in path and its subdirs, recursively."""
+
+    # Raise an exception for os.walk() errors instead of ignoring them
+    def walk_onerror(e):
+        raise e
+
+    for root, _, files in os.walk(path, onerror=walk_onerror):
+        for fname in files:
+            save_times_for_task(os.path.join(root, fname))
+
+for path in args.paths:
+    if os.path.isfile(path):
+        save_times_for_task(path)
+    else:
+        save_times_for_dir(path)
+
+def elapsed_time(task_info):
+    return task_info[1]["elapsed"]
+
+def tot_user_time(task_info):
+    return task_info[1]["user"] + task_info[1]["child user"]
+
+def tot_sys_time(task_info):
+    return task_info[1]["sys"] + task_info[1]["child sys"]
+
+if args.sort != "none":
+    sort_fn = {"real": elapsed_time, "user": tot_user_time, "sys": tot_sys_time}
+    task_infos.sort(key=sort_fn[args.sort], reverse=True)
+
+first_entry = True
+
+# Catching BrokenPipeError avoids annoying errors when the output is piped into
+# e.g. 'less' or 'head' and not completely read
+try:
+    for task_info in task_infos:
+        real = elapsed_time(task_info)
+        user = tot_user_time(task_info)
+        sys = tot_sys_time(task_info)
+
+        if not first_entry:
+            print()
+        first_entry = False
+
+        # Mimic Bash's 'time' builtin
+        print("{}:\n"
+              "real\t{}m{:.3f}s\n"
+              "user\t{}m{:.3f}s\n"
+              "sys\t{}m{:.3f}s"
+              .format(task_info[0],
+                      int(real//60), real%60,
+                      int(user//60), user%60,
+                      int(sys//60), sys%60))
+
+except BrokenPipeError:
+    pass

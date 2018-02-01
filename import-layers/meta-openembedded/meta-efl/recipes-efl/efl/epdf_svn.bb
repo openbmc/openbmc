@@ -25,3 +25,11 @@ EXTRA_OECONF = "\
 
 # Some upgrade path tweaking, as in evas
 AUTO_LIBNAME_PKGS = ""
+
+PNBLACKLIST[epdf] ?= "Depends on blacklisted ecore - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+
+PNBLACKLIST[epdf] ?= "Depends on blacklisted evas - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+
+PNBLACKLIST[epdf] ?= "Runtime depends on blacklisted epdf-dev - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+
+PNBLACKLIST[epdf] ?= "Runtime depends on blacklisted epdf - the recipe will be removed on 2017-09-01 unless the issue is fixed"

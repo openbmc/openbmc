@@ -14,9 +14,11 @@ EXTRA_OECONF = "--enable-job-control --without-bash-malloc"
 # This is what other major distros do. And this is what we wanted. See bug#5359 and bug#7137.
 CFLAGS += "-DNON_INTERACTIVE_LOGIN_SHELLS"
 
-ALTERNATIVE_${PN} = "sh"
+ALTERNATIVE_${PN} = "bash sh"
+ALTERNATIVE_LINK_NAME[bash] = "${base_bindir}/bash"
+ALTERNATIVE_TARGET[bash] = "${base_bindir}/bash"
 ALTERNATIVE_LINK_NAME[sh] = "${base_bindir}/sh"
-ALTERNATIVE_TARGET[sh] = "${base_bindir}/bash"
+ALTERNATIVE_TARGET[sh] = "${base_bindir}/bash.${BPN}"
 ALTERNATIVE_PRIORITY = "100"
 
 RDEPENDS_${PN} += "base-files"
@@ -63,3 +65,7 @@ pkg_postinst_${PN} () {
 pkg_postrm_${PN} () {
 	printf "$(grep -v "^${base_bindir}/bash$" $D${sysconfdir}/shells)\n" > $D${sysconfdir}/shells
 }
+
+PACKAGES += "${PN}-bashbug"
+FILES_${PN} = "${bindir}/bash ${base_bindir}/bash.bash"
+FILES_${PN}-bashbug = "${bindir}/bashbug"

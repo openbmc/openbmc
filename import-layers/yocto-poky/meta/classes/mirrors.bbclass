@@ -27,7 +27,7 @@ ${GNUPG_MIRROR}	ftp://mirrors.dotsrc.org/gcrypt \n \
 ftp://dante.ctan.org/tex-archive ftp://ftp.fu-berlin.de/tex/CTAN \n \
 ftp://dante.ctan.org/tex-archive http://sunsite.sut.ac.jp/pub/archives/ctan/ \n \
 ftp://dante.ctan.org/tex-archive http://ctan.unsw.edu.au/ \n \
-ftp://ftp.gnutls.org/gcrypt/gnutls ${GNUPG_MIRROR} \n \
+ftp://ftp.gnutls.org/gcrypt/gnutls ${GNUPG_MIRROR}/gnutls \n \
 http://ftp.info-zip.org/pub/infozip/src/ http://mirror.switch.ch/ftp/mirror/infozip/src/ \n \
 http://ftp.info-zip.org/pub/infozip/src/ ftp://sunsite.icm.edu.pl/pub/unix/archiving/info-zip/src/ \n \
 ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/  ftp://ftp.cerias.purdue.edu/pub/tools/unix/sysutils/lsof/ \n \
@@ -54,7 +54,7 @@ p4://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
 osc://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
 https?$://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
 ftp://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
-npm://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
+npm://.*/?.*    http://downloads.yoctoproject.org/mirror/sources/ \n \
 cvs://.*/.*     http://sources.openembedded.org/ \n \
 svn://.*/.*     http://sources.openembedded.org/ \n \
 git://.*/.*     http://sources.openembedded.org/ \n \
@@ -64,7 +64,18 @@ p4://.*/.*      http://sources.openembedded.org/ \n \
 osc://.*/.*     http://sources.openembedded.org/ \n \
 https?$://.*/.* http://sources.openembedded.org/ \n \
 ftp://.*/.*     http://sources.openembedded.org/ \n \
-npm://.*/.*     http://sources.openembedded.org/ \n \
+npm://.*/?.*    http://sources.openembedded.org/ \n \
 ${CPAN_MIRROR}  http://cpan.metacpan.org/ \n \
 ${CPAN_MIRROR}  http://search.cpan.org/CPAN/ \n \
+"
+
+# Use MIRRORS to provide git repo fallbacks using the https protocol, for cases
+# where git native protocol fetches may fail due to local firewall rules, etc.
+
+MIRRORS += "\
+git://anonscm.debian.org/.*   git://anonscm.debian.org/git/PATH;protocol=https \n \
+git://git.gnome.org/.*        git://git.gnome.org/browse/PATH;protocol=https \n \
+git://git.savannah.gnu.org/.* git://git.savannah.gnu.org/git/PATH;protocol=https \n \
+git://git.yoctoproject.org/.* git://git.yoctoproject.org/git/PATH;protocol=https \n \
+git://.*/.*                   git://HOST/PATH;protocol=https \n \
 "

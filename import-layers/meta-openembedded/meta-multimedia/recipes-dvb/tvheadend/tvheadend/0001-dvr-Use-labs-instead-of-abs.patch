@@ -1,0 +1,37 @@
+From a715671eadcbf989fdaf05f62e71b93ac1749615 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Nov 2016 06:08:31 +0000
+Subject: [PATCH] dvr: Use labs() instead of abs()
+
+Makes clang happy
+
+dvr/dvr_db.c:853:10: error: absolute value function
+'abs' given an argument of type 'long' but has parameter of type 'int' which may cause truncation of value [-Werror,-Wabsolute-value]
+if ((abs(de->de_start - e->start) < 600) && (abs(de->de_stop - e->stop) < 600)) {
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/dvr/dvr_db.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/dvr/dvr_db.c b/src/dvr/dvr_db.c
+index 165caa6..5656569 100644
+--- a/src/dvr/dvr_db.c
++++ b/src/dvr/dvr_db.c
+@@ -414,11 +414,11 @@ dvr_entry_fuzzy_match(dvr_entry_t *de, epg_broadcast_t *e)
+   /* Wrong length (+/-20%) */
+   t1 = de->de_stop - de->de_start;
+   t2  = e->stop - e->start;
+-  if ( abs(t2 - t1) > (t1 / 5) )
++  if ( labs(t2 - t1) > (t1 / 5) )
+     return 0;
+ 
+   /* Outside of window */
+-  if (abs(e->start - de->de_start) > de->de_config->dvr_update_window)
++  if (labs(e->start - de->de_start) > de->de_config->dvr_update_window)
+     return 0;
+   
+   /* Title match (or contains?) */
+-- 
+1.9.1
+

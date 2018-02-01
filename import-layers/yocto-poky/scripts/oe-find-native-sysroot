@@ -2,14 +2,14 @@
 #
 # Find a native sysroot to use - either from an in-tree OE build or
 # from a toolchain installation. It then ensures the variable
-# $OECORE_NATIVE_SYSROOT is set to the sysroot's base directory, and sets 
+# $OECORE_NATIVE_SYSROOT is set to the sysroot's base directory, and sets
 # $PSEUDO to the path of the pseudo binary.
 #
 # This script is intended to be run within other scripts by source'ing
 # it, e.g:
 #
 # SYSROOT_SETUP_SCRIPT=`which oe-find-native-sysroot`
-# . $SYSROOT_SETUP_SCRIPT
+# . $SYSROOT_SETUP_SCRIPT <recipe>
 #
 # This script will terminate execution of your calling program unless
 # you set a variable $SKIP_STRICT_SYSROOT_CHECK to a non-empty string
@@ -30,6 +30,38 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+if [ "$1" = '--help' -o "$1" = '-h' -o $# -ne 1 ] ; then
+    echo 'Usage: oe-find-native-sysroot <recipe> [-h|--help]'
+    echo ''
+    echo 'OpenEmbedded find-native-sysroot - helper script to set'
+    echo 'environment variables OECORE_NATIVE_SYSROOT and PSEUDO'
+    echo 'to the path of the native sysroot directory and pseudo'
+    echo 'executable binary'
+    echo ''
+    echo 'options:'
+    echo '  recipe              its STAGING_DIR_NATIVE is used as native sysroot'
+    echo '  -h, --help          show this help message and exit'
+    echo ''
+    exit 2
+fi
+
+# Global vars
+BITBAKE_E=""
+set_oe_native_sysroot(){
+    echo "Running bitbake -e $1"
+    BITBAKE_E="`bitbake -e $1`"
+    OECORE_NATIVE_SYSROOT=`echo "$BITBAKE_E" | grep ^STAGING_DIR_NATIVE | cut -d '"' -f2`
+
+    if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then
+        # This indicates that there was an error running bitbake -e that
+        # the user needs to be informed of
+        echo "There was an error running bitbake to determine STAGING_DIR_NATIVE"
+        echo "Here is the output from bitbake -e $1"
+        echo $BITBAKE_E
+        exit 1
+    fi
+}
+
 if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then
     BITBAKE=`which bitbake 2> /dev/null`
     if [ "x$BITBAKE" != "x" ]; then
@@ -40,10 +72,10 @@ if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then
                 exit 1
             fi
             touch conf/sanity.conf
-            OECORE_NATIVE_SYSROOT=`bitbake -e | grep ^STAGING_DIR_NATIVE | cut -d '"' -f2`
+            set_oe_native_sysroot $1
             rm -f conf/sanity.conf
         else
-            OECORE_NATIVE_SYSROOT=`bitbake -e | grep ^STAGING_DIR_NATIVE | cut -d '"' -f2`
+            set_oe_native_sysroot $1
         fi
     else
         echo "Error: Unable to locate bitbake command."
@@ -55,21 +87,15 @@ if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then
     fi
 fi
 
-if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then
-    # This indicates that there was an error running bitbake -e that
-    # the user needs to be informed of
-    echo "There was an error running bitbake to determine STAGING_DIR_NATIVE"
-    echo "Here is the output from bitbake -e"
-    bitbake -e
-    exit 1
-fi
-
-# Set up pseudo command
-if [ ! -e "$OECORE_NATIVE_SYSROOT/usr/bin/pseudo" ]; then
-    echo "Error: Unable to find pseudo binary in $OECORE_NATIVE_SYSROOT/usr/bin/"
+if [ ! -e "$OECORE_NATIVE_SYSROOT/" ]; then
+    echo "Error: $OECORE_NATIVE_SYSROOT doesn't exist."
 
     if [ "x$OECORE_DISTRO_VERSION" = "x" ]; then
-        echo "Have you run 'bitbake meta-ide-support'?"
+        if [[ $1 =~ .*native.* ]]; then
+            echo "Have you run 'bitbake $1 -caddto_recipe_sysroot'?"
+        else
+            echo "Have you run 'bitbake $1 '?"
+        fi
     else
         echo "This shouldn't happen - something is wrong with your toolchain installation"
     fi
@@ -78,4 +104,12 @@ if [ ! -e "$OECORE_NATIVE_SYSROOT/usr/bin/pseudo" ]; then
         exit 1
     fi
 fi
-PSEUDO="$OECORE_NATIVE_SYSROOT/usr/bin/pseudo"
+
+# Set up pseudo command
+pseudo="$OECORE_NATIVE_SYSROOT/usr/bin/pseudo"
+if [ -e "$pseudo" ]; then
+    echo "PSEUDO=$pseudo"
+    PSEUDO="$pseudo"
+else
+    echo "PSEUDO $pseudo is not found."
+fi

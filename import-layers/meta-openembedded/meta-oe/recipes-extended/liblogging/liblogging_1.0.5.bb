@@ -19,5 +19,5 @@ inherit autotools pkgconfig
 
 EXTRA_OECONF = "--disable-man-pages"
 
-PACKAGECONFIG ??= "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "systemd", "", d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "--enable-journal, --disable-journal, systemd"

@@ -17,4 +17,4 @@ S = "${WORKDIR}/yaml-${PV}"
 
 inherit autotools
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

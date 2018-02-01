@@ -8,5 +8,12 @@ HOMEPAGE = "http://github.com/mongodb/mongo-python-driver"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2a944942e1496af1886903d274dedb13"
 
-SRC_URI[md5sum] = "42cd12a5014fb7d3e1987ca04f5c651f"
-SRC_URI[sha256sum] = "3d45302fc2622fabf34356ba274c69df41285bac71bbd229f1587283b851b91e"
+SRC_URI[md5sum] = "aa77f88e51e281c9f328cea701bb6f3e"
+SRC_URI[sha256sum] = "d359349c6c9ff9f482805f89e66e476846317dc7b1eea979d7da9c0857ee2721"
+
+RDEPENDS_${PN} += " \
+    ${PYTHON_PN}-datetime \
+    ${PYTHON_PN}-netclient \
+    ${PYTHON_PN}-numbers \
+    ${PYTHON_PN}-threading \
+"

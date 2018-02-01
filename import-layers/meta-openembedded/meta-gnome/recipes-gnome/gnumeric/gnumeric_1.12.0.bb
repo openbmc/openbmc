@@ -46,4 +46,4 @@ python populate_packages_prepend () {
         prepend=True)
 }
 
-PNBLACKLIST[gnumeric] ?= "Depends on broken libgnomeprint"
+PNBLACKLIST[gnumeric] ?= "Depends on broken libgnomeprint - the recipe will be removed on 2017-09-01 unless the issue is fixed"

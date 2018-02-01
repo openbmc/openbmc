@@ -1,0 +1,30 @@
+From 8d4d452d733bac8c5b55a90bddec8cc323cc9fa8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Mar 2017 19:20:07 -0700
+Subject: [PATCH 1/2] ppoe: Dont include linux/if_ether.h
+
+Fixes build with musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/pppoe.h | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/src/pppoe.h b/src/pppoe.h
+index ec067a0..281879c 100644
+--- a/src/pppoe.h
++++ b/src/pppoe.h
+@@ -127,10 +127,6 @@ typedef unsigned long UINT32_t;
+ #error Could not find a 32-bit integer type
+ #endif
+ 
+-#ifdef HAVE_LINUX_IF_ETHER_H
+-#include <linux/if_ether.h>
+-#endif
+-
+ #include <netinet/in.h>
+ 
+ #ifdef HAVE_NETINET_IF_ETHER_H
+-- 
+2.12.1
+

@@ -24,4 +24,4 @@ inherit distutils
 RDEPENDS_${PN} += "python-stringold python-codecs python-math parted (>= 2.3)"
 RDEPENDS_${PN}_class-native = ""
 
-BBCLASSEXTEND += "native"
+BBCLASSEXTEND = "native"

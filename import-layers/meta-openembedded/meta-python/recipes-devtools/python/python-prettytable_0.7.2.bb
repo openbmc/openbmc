@@ -15,8 +15,11 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 inherit setuptools
 
 do_install_append() {
-    perm_files=`find "${D}${PYTHON_SITEPACKAGES_DIR}/" -name "top_level.txt"`
+    perm_files=`find "${D}${PYTHON_SITEPACKAGES_DIR}/" -name "*.txt" -o -name "PKG-INFO"`
     for f in $perm_files; do
         chmod 644 "${f}"
     done
 }
+
+UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/PrettyTable/"
+UPSTREAM_CHECK_REGEX = "/PrettyTable/(?P<pver>(\d+[\.\-_]*)+)"

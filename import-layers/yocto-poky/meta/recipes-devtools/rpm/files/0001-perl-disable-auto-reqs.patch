@@ -1,0 +1,32 @@
+perl: disable auto requires
+
+When generating automatic requirements, it's possible for perl scripts to
+declare 'optional' dependencies.  These seem to often be incorrect and will
+cause installation failures in OE.  Instead of fixing the perl scripts, it
+was decided it is better to simply disable the automatic dependency
+generation.  This matches the behavior from the previous RPM5 implementation.
+
+Upstream-Status: Inappropriate [OE specific configuration]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: git/fileattrs/perl.attr
+===================================================================
+--- git.orig/fileattrs/perl.attr
++++ git/fileattrs/perl.attr
+@@ -1,3 +1,3 @@
+-%__perl_requires	%{_rpmconfigdir}/perl.req
++#__perl_requires	%{_rpmconfigdir}/perl.req
+ %__perl_magic		^.*[Pp]erl .*$
+ %__perl_flags		exeonly
+Index: git/fileattrs/perllib.attr
+===================================================================
+--- git.orig/fileattrs/perllib.attr
++++ git/fileattrs/perllib.attr
+@@ -1,5 +1,5 @@
+ %__perllib_provides	%{_rpmconfigdir}/perl.prov
+-%__perllib_requires	%{_rpmconfigdir}/perl.req
++#__perllib_requires	%{_rpmconfigdir}/perl.req
+ %__perllib_magic	^Perl[[:digit:]] module source.*
+ %__perllib_path		\\.pm$
+ %__perllib_flags	magic_and_path

@@ -1,0 +1,38 @@
+Index: dmalloc-5.5.2/Makefile.in
+===================================================================
+--- dmalloc-5.5.2.orig/Makefile.in
++++ dmalloc-5.5.2/Makefile.in
+@@ -260,7 +260,7 @@ shlib : $(BUILD_SL)
+ # work on your operating system.  Please send feedback to the author
+ # via: http://256.com/gray/email.html
+ $(LIB_SL) : $(OBJS_SL) $(NORMAL_OBJS_SL)
+-	$(CC) -shared -Wl,-soname,libdmalloc.so.5 -o $@ $(OBJS_SL) $(NORMAL_OBJS_SL)
++	$(CC) $(LDFLAGS) -shared -Wl,-soname,libdmalloc.so.5 -o $@ $(OBJS_SL) $(NORMAL_OBJS_SL)
+ 
+ $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
+ 	ar cr $@ $?
+@@ -271,21 +271,21 @@ $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
+ 	@RANLIB@ $@
+ 
+ $(LIB_TH_SL) : $(OBJS_SL) $(THREAD_OBJS_SL)
+-	$(CC) -shared -Wl,-soname,libdmallocth.so.5 -o $@ $(OBJS_SL) $(THREAD_OBJS_SL)
++	$(CC) $(LDFLAGS) -shared -Wl,-soname,libdmallocth.so.5 -o $@ $(OBJS_SL) $(THREAD_OBJS_SL)
+ 
+ $(LIB_CXX) : $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
+ 	ar cr $@ $?
+ 	@RANLIB@ $@
+ 
+ $(LIB_CXX_SL) : $(OBJS_SL) $(NORMAL_OBJS_SL) $(CXX_OBJS_SL)
+-	$(CC) -shared -Wl,-soname,libdmalloccxx.so.5 -o $@ $(OBJS_SL) $(NORMAL_OBJS_SL) $(CXX_OBJS_SL)
++	$(CC) $(LDFLAGS) -shared -Wl,-soname,libdmalloccxx.so.5 -o $@ $(OBJS_SL) $(NORMAL_OBJS_SL) $(CXX_OBJS_SL)
+ 
+ $(LIB_TH_CXX) : $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
+ 	ar cr $@ $?
+ 	@RANLIB@ $@
+ 
+ $(LIB_TH_CXX_SL) : $(OBJS_SL) $(THREAD_OBJS_SL) $(CXX_OBJS_SL)
+-	$(CC) -shared -Wl,-soname,libdmallocthcxx.so.5 -o $@ $(OBJS_SL) $(THREAD_OBJS_SL) $(CXX_OBJS_SL)
++	$(CC) $(LDFLAGS) -shared -Wl,-soname,libdmallocthcxx.so.5 -o $@ $(OBJS_SL) $(THREAD_OBJS_SL) $(CXX_OBJS_SL)
+ 
+ threadssl : $(LIB_TH_SL)$(ver)
+ 

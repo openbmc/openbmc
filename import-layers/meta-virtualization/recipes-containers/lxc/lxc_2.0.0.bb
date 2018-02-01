@@ -10,6 +10,7 @@ RDEPENDS_${PN} = " \
 		libcap-bin \
 		bridge-utils \
 		dnsmasq \
+		initscripts \
 		perl-module-strict \
 		perl-module-getopt-long \
 		perl-module-vars \
@@ -18,8 +19,11 @@ RDEPENDS_${PN} = " \
 		perl-module-constant \
 		perl-module-overload \
 		perl-module-exporter-heavy \
+"
+RDEPENDS_${PN}_append_libc-glibc = "\
 		glibc-utils \
 "
+
 RDEPENDS_${PN}-ptest += "file make"
 
 SRC_URI = "http://linuxcontainers.org/downloads/${BPN}-${PV}.tar.gz \
@@ -30,6 +34,7 @@ SRC_URI = "http://linuxcontainers.org/downloads/${BPN}-${PV}.tar.gz \
 	file://lxc-fix-B-S.patch \
 	file://lxc-doc-upgrade-to-use-docbook-3.1-DTD.patch \
 	file://logs-optionally-use-base-filenames-to-report-src-fil.patch \
+	file://Use-AC_HEADER_MAJOR-to-detect-major-minor-makedev.patch \
 	"
 
 SRC_URI[md5sum] = "04a7245a614cd3296b0ae9ceeeb83fbb"
@@ -50,9 +55,6 @@ EXTRA_OECONF += "--enable-log-src-basename"
 
 CFLAGS_append = " -Wno-error=deprecated-declarations"
 
-# disable problematic GCC 5.2 optimizations [YOCTO #8291]
-FULL_OPTIMIZATION_append_arm = " -fno-schedule-insns2"
-
 PACKAGECONFIG ??= "templates \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)} \
 "
@@ -63,6 +65,7 @@ PACKAGECONFIG[templates] = ",,, ${PN}-templates"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux,libselinux"
 PACKAGECONFIG[seccomp] ="--enable-seccomp,--disable-seccomp,libseccomp,libseccomp"
 PACKAGECONFIG[python] = "--enable-python,--disable-python,python3,python3-core"
+PACKAGECONFIG[lua] = "--enable-lua,--disable-lua,lua,lua"
 
 # required by python3 to run setup.py
 export BUILD_SYS
@@ -84,17 +87,19 @@ FILES_${PN}-doc = "${mandir} ${infodir}"
 # For LXC the docdir only contains example configuration files and should be included in the lxc package
 FILES_${PN} += "${docdir}"
 FILES_${PN} += "${libdir}/python3*"
-FILES_${PN}-dbg += "${libexecdir}/lxc/.debug"
+FILES_${PN} += "${datadir}/lua/*"
+FILES_${PN} += "${libdir}/lua/lxc/*"
+FILES_${PN}-dbg += "${libdir}/lua/lxc/.debug"
+FILES_${PN}-dbg += "${libexecdir}/lxc/.debug ${libexecdir}/lxc/hooks/.debug"
 PACKAGES =+ "${PN}-templates ${PN}-setup ${PN}-networking"
 FILES_${PN}-templates += "${datadir}/lxc/templates"
 RDEPENDS_${PN}-templates += "bash"
 
 ALLOW_EMPTY_${PN}-networking = "1"
 
-FILES_${PN}-setup += "/etc/tmpfiles.d"
-FILES_${PN}-setup += "/lib/systemd/system"
-FILES_${PN}-setup += "/usr/lib/systemd/system"
-FILES_${PN}-setup += "/etc/init.d"
+FILES_${PN}-setup += "${sysconfdir}/tmpfiles.d"
+FILES_${PN}-setup += "${systemd_system_unitdir}"
+FILES_${PN}-setup += "${sysconfdir}/init.d"
 
 PRIVATE_LIBS_${PN}-ptest = "liblxc.so.1"
 

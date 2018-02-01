@@ -104,11 +104,17 @@ STAGING_BINDIR_TOOLCHAIN=$(echo "$BITBAKE_VARS" | grep ^STAGING_BINDIR_TOOLCHAIN
   | cut -d '=' -f2 | cut -d '"' -f2)
 STAGING_BINDIR_TOOLPREFIX=$(echo "$BITBAKE_VARS" | grep ^TARGET_PREFIX \
   | cut -d '=' -f2 | cut -d '"' -f2)
-SYSTEMTAP_HOST_INSTALLDIR=$(echo "$BITBAKE_VARS" | grep ^STAGING_DIR_NATIVE \
-  | cut -d '=' -f2 | cut -d '"' -f2)
 TARGET_ARCH=$(echo "$BITBAKE_VARS" | grep ^TRANSLATED_TARGET_ARCH \
   | cut -d '=' -f2 | cut -d '"' -f2)
 TARGET_KERNEL_BUILDDIR=$(echo "$BITBAKE_VARS" | grep ^B= \
+  | cut -d '=' -f2 | cut -d '"' -f2)
+
+# Build and populate the recipe-sysroot-native with systemtap-native
+pushd $PWD
+cd $BUILDDIR
+BITBAKE_VARS=`bitbake -e systemtap-native`
+popd
+SYSTEMTAP_HOST_INSTALLDIR=$(echo "$BITBAKE_VARS" | grep ^STAGING_DIR_NATIVE \
   | cut -d '=' -f2 | cut -d '"' -f2)
 
 systemtap_target_arch "$TARGET_ARCH"
@@ -125,6 +131,7 @@ if [ ! -f $SYSTEMTAP_HOST_INSTALLDIR/usr/bin/stap ]; then
     echo -e "\nError: Native (host) systemtap not found."
     echo -e "Did you accidentally build a local non-sdk image? (or forget to"
     echo -e "add 'tools-profile' to EXTRA_IMAGE_FEATURES in your local.conf)?"
+    echo -e "You can also: bitbake -c addto_recipe_sysroot systemtap-native"
     setup_usage
     exit 1
 fi

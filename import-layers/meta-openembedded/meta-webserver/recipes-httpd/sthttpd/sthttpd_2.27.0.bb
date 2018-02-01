@@ -4,6 +4,8 @@ HOMEPAGE = "http://opensource.dyc.edu/sthttpd"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://src/thttpd.c;beginline=1;endline=26;md5=0c5762c2c34dcbe9eb18815516502872"
 
+DEPENDS += "base-passwd"
+
 SRC_URI = "http://opensource.dyc.edu/pub/sthttpd/sthttpd-${PV}.tar.gz \
            file://thttpd.service \
            file://thttpd.conf \
@@ -49,4 +51,3 @@ SYSTEMD_SERVICE_${PN} = "thttpd.service"
 
 FILES_${PN} += "${SRV_DIR}"
 FILES_${PN}-dbg += "${SRV_DIR}/cgi-bin/.debug"
-

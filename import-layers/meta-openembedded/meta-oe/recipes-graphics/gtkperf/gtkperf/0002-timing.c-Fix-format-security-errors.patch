@@ -1,0 +1,42 @@
+From 47974b8473c5b928f6742caee466f5c2d4d2e9eb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 08:22:26 -0700
+Subject: [PATCH 2/2] timing.c: Fix format-security errors
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/timing.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/timing.c b/src/timing.c
+index 0b8f0eb..c0668c9 100644
+--- a/src/timing.c
++++ b/src/timing.c
+@@ -97,7 +97,7 @@ add_test_info_time (AppData * appdata)
+ 	gtk_text_buffer_insert (appdata->textview_info_buffer, &iter,
+ 				timestring, -1);
+ 
+-	g_printf (timestring);
++	g_printf ("%s", timestring);
+ 
+ }
+ 
+@@ -129,7 +129,7 @@ add_test_info_end (AppData * appdata)
+ 	gtk_statusbar_push (GTK_STATUSBAR (appdata->statusbar_main), 0,
+ 			    " Test Finished");
+ 
+-	g_printf (timestring);
++	g_printf ("%s", timestring);
+ 
+ }
+ 
+@@ -154,5 +154,5 @@ add_test_info_start (AppData * appdata)
+ 	gtk_statusbar_push (GTK_STATUSBAR (appdata->statusbar_main), 0,
+ 			    " Running tests...");
+ 
+-	g_printf (timestring);
++	g_printf ("%s", timestring);
+ }
+-- 
+2.13.2
+

@@ -1,0 +1,49 @@
+From b75879e8c3e24d338c0e5843d616bc9b02da4d04 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Aug 2017 09:52:17 -0700
+Subject: [PATCH] bonobo-ui-node: qualify functions with G_GNUC_PRINTF
+
+This helps compiler in doing format checking correctly
+Fixes
+bonobo-ui-node.c:864:38: error: format string is not a string literal [-Werror,-Wformat-nonliteral]
+|         g_logv   ("XML", G_LOG_LEVEL_ERROR, msg, args);
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ bonobo/bonobo-ui-node.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/bonobo/bonobo-ui-node.c b/bonobo/bonobo-ui-node.c
+index 9bab5e5..6ec66e2 100644
+--- a/bonobo/bonobo-ui-node.c
++++ b/bonobo/bonobo-ui-node.c
+@@ -835,7 +835,7 @@ uiCharacters (ParseState *ps, const xmlChar *chars, int len)
+ 	g_string_append_len (ps->content, chars, len);
+ }
+ 
+-static void
++static G_GNUC_PRINTF(2, 3) void
+ uiWarning (ParseState *ps, const char *msg, ...)
+ {
+ 	va_list args;
+@@ -845,7 +845,7 @@ uiWarning (ParseState *ps, const char *msg, ...)
+ 	va_end   (args);
+ }
+ 
+-static void
++static G_GNUC_PRINTF(2, 3) void
+ uiError (ParseState *ps, const char *msg, ...)
+ {
+ 	va_list args;
+@@ -855,7 +855,7 @@ uiError (ParseState *ps, const char *msg, ...)
+ 	va_end   (args);
+ }
+ 
+-static void
++static G_GNUC_PRINTF(2, 3) void
+ uiFatalError (ParseState *ps, const char *msg, ...)
+ {
+ 	va_list args;
+-- 
+2.14.1
+

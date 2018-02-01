@@ -1,0 +1,21 @@
+From: Luca Falavigna <dktrkranz@debian.org>
+Date: Tue, 27 Jan 2015 01:26:04 +0000
+Subject: format_string
+
+---
+ client_examples/gtkvncviewer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client_examples/gtkvncviewer.c b/client_examples/gtkvncviewer.c
+index 261b2da..861e4e3 100644
+--- a/client_examples/gtkvncviewer.c
++++ b/client_examples/gtkvncviewer.c
+@@ -588,7 +588,7 @@ static void GtkDefaultLog (const char *format, ...)
+ 
+ 	time (&log_clock);
+ 	strftime (buf, 255, "%d/%m/%Y %X ", localtime (&log_clock));
+-	fprintf (stdout, buf);
++	fprintf (stdout, "%s", buf);
+ 
+ 	vfprintf (stdout, format, args);
+ 	fflush (stdout);

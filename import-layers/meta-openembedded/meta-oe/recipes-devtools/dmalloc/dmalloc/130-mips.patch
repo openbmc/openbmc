@@ -1,0 +1,90 @@
+Patch to correctly handle the MIPS case.
+
+It was build up by Yann E. MORIN <yann.morin.1998@anciens.enib.fr> from some
+bits gathered from buildroot, which is LGPL v2.1
+License for dmalloc is:
+ * Permission to use, copy, modify, and distribute this software for
+ * any purpose and without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies, and that the name of Gray Watson not be used in advertising
+ * or publicity pertaining to distribution of the document or software
+ * without specific, written prior permission.
+ *
+ * Gray Watson makes no representations about the suitability of the
+ * software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
+
+I personnaly believe that the resulting code should therefore be
+LGPL v2.1, but don't believe me, ask your lawyers!
+
+Index: dmalloc-5.5.2/return.h
+===================================================================
+--- dmalloc-5.5.2.orig/return.h
++++ dmalloc-5.5.2/return.h
+@@ -106,26 +106,16 @@
+ /*************************************/
+ 
+ /*
+- * For DEC Mips machines running Ultrix
++ * For Mips machines running Linux
+  */
+ #if __mips
+ 
+ /*
+- * I have no idea how to get inline assembly with the default cc.
+- * Anyone know how?
+- */
+-
+-#if 0
+-
+-/*
+  * NOTE: we assume here that file is global.
+  *
+- * $31 is the frame pointer.  $2 looks to be the return address but maybe
+- * not consistently.
++ * $31 is the return address.
+  */
+-#define GET_RET_ADDR(file)	asm("sw $2, file")
+-
+-#endif
++#define GET_RET_ADDR(file)	asm("sw $31, %0" : "=m" (file))
+ 
+ #endif /* __mips */
+ 
+Index: dmalloc-5.5.2/configure.ac
+===================================================================
+--- dmalloc-5.5.2.orig/configure.ac
++++ dmalloc-5.5.2/configure.ac
+@@ -585,31 +585,7 @@ int main() { return 1; }
+ # check if the return.h macros work
+ #
+ AC_MSG_CHECKING([return.h macros work])
+-AC_RUN_IFELSE([
+-
+-#define __CONF_H__
+-#define USE_RETURN_MACROS 1
+-#define RETURN_MACROS_WORK 1
+-
+-#include "return.h"
+-
+-static void foo (void)
+-{
+-  char	*ret_addr;
+-  GET_RET_ADDR(ret_addr);
+-}
+-
+-main()
+-{
+-  foo();
+-  exit(0);
+-}
+-],
+-[ AC_DEFINE(RETURN_MACROS_WORK, 1) AC_MSG_RESULT([yes]) ],
+-[ AC_DEFINE(RETURN_MACROS_WORK, 0) AC_MSG_RESULT([no]) ],
+-[ AC_DEFINE(RETURN_MACROS_WORK, 0) AC_MSG_RESULT([no]) ]
+-)
+-
++AC_DEFINE(RETURN_MACROS_WORK, 1)
+ ##############################################################################
+ 
+ #

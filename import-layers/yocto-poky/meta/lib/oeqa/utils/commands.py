@@ -97,8 +97,16 @@ class Result(object):
     pass
 
 
-def runCmd(command, ignore_status=False, timeout=None, assert_error=True, **options):
+def runCmd(command, ignore_status=False, timeout=None, assert_error=True,
+          native_sysroot=None, limit_exc_output=0, **options):
     result = Result()
+
+    if native_sysroot:
+        extra_paths = "%s/sbin:%s/usr/sbin:%s/usr/bin" % \
+                      (native_sysroot, native_sysroot, native_sysroot)
+        nenv = dict(options.get('env', os.environ))
+        nenv['PATH'] = extra_paths + ':' + nenv.get('PATH', '')
+        options['env'] = nenv
 
     cmd = Command(command, timeout=timeout, **options)
     cmd.run()
@@ -110,10 +118,16 @@ def runCmd(command, ignore_status=False, timeout=None, assert_error=True, **opti
     result.pid = cmd.process.pid
 
     if result.status and not ignore_status:
+        exc_output = result.output
+        if limit_exc_output > 0:
+            split = result.output.splitlines()
+            if len(split) > limit_exc_output:
+                exc_output = "\n... (last %d lines of output)\n" % limit_exc_output + \
+                             '\n'.join(split[-limit_exc_output:])
         if assert_error:
-            raise AssertionError("Command '%s' returned non-zero exit status %d:\n%s" % (command, result.status, result.output))
+            raise AssertionError("Command '%s' returned non-zero exit status %d:\n%s" % (command, result.status, exc_output))
         else:
-            raise CommandError(result.status, command, result.output)
+            raise CommandError(result.status, command, exc_output)
 
     return result
 
@@ -149,7 +163,9 @@ def get_bb_vars(variables=None, target=None, postconfig=None):
     """Get values of multiple bitbake variables"""
     bbenv = get_bb_env(target, postconfig=postconfig)
 
-    var_re = re.compile(r'^(export )?(?P<var>\w+)="(?P<value>.*)"$')
+    if variables is not None:
+        variables = variables.copy()
+    var_re = re.compile(r'^(export )?(?P<var>\w+(_.*)?)="(?P<value>.*)"$')
     unset_re = re.compile(r'^unset (?P<var>\w+)$')
     lastline = None
     values = {}
@@ -209,21 +225,30 @@ def create_temp_layer(templayerdir, templayername, priority=999, recipepathspec=
 
 
 @contextlib.contextmanager
-def runqemu(pn, ssh=True):
+def runqemu(pn, ssh=True, runqemuparams='', image_fstype=None, launch_cmd=None, qemuparams=None, overrides={}, discard_writes=True):
+    """
+    launch_cmd means directly run the command, don't need set rootfs or env vars.
+    """
 
     import bb.tinfoil
     import bb.build
 
     tinfoil = bb.tinfoil.Tinfoil()
-    tinfoil.prepare(False)
+    tinfoil.prepare(config_only=False, quiet=True)
     try:
         tinfoil.logger.setLevel(logging.WARNING)
         import oeqa.targetcontrol
         tinfoil.config_data.setVar("TEST_LOG_DIR", "${WORKDIR}/testimage")
         tinfoil.config_data.setVar("TEST_QEMUBOOT_TIMEOUT", "1000")
-        import oe.recipeutils
-        recipefile = oe.recipeutils.pn_to_recipe(tinfoil.cooker, pn)
-        recipedata = oe.recipeutils.parse_recipe(tinfoil.cooker, recipefile, [])
+        # Tell QemuTarget() whether need find rootfs/kernel or not
+        if launch_cmd:
+            tinfoil.config_data.setVar("FIND_ROOTFS", '0')
+        else:
+            tinfoil.config_data.setVar("FIND_ROOTFS", '1')
+
+        recipedata = tinfoil.parse_recipe(pn)
+        for key, value in overrides.items():
+            recipedata.setVar(key, value)
 
         # The QemuRunner log is saved out, but we need to ensure it is at the right
         # log level (and then ensure that since it's a child of the BitBake logger,
@@ -231,9 +256,9 @@ def runqemu(pn, ssh=True):
         logger = logging.getLogger('BitBake.QemuRunner')
         logger.setLevel(logging.DEBUG)
         logger.propagate = False
-        logdir = recipedata.getVar("TEST_LOG_DIR", True)
+        logdir = recipedata.getVar("TEST_LOG_DIR")
 
-        qemu = oeqa.targetcontrol.QemuTarget(recipedata)
+        qemu = oeqa.targetcontrol.QemuTarget(recipedata, image_fstype)
     finally:
         # We need to shut down tinfoil early here in case we actually want
         # to run tinfoil-using utilities with the running QEMU instance.
@@ -253,7 +278,7 @@ def runqemu(pn, ssh=True):
     try:
         qemu.deploy()
         try:
-            qemu.start(ssh=ssh)
+            qemu.start(params=qemuparams, ssh=ssh, runqemuparams=runqemuparams, launch_cmd=launch_cmd, discard_writes=discard_writes)
         except bb.build.FuncFailed:
             raise Exception('Failed to start QEMU - see the logs in %s' % logdir)
 

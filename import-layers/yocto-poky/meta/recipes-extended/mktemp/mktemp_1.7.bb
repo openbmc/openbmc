@@ -20,9 +20,11 @@ inherit autotools update-alternatives
 EXTRA_OECONF = "--with-libc"
 
 do_install_append () {
-	install -d ${D}${base_bindir}
-	mv ${D}${bindir}/mktemp ${D}${base_bindir}/mktemp
-	rmdir ${D}${bindir}
+	if [ "${base_bindir}" != "${bindir}" ] ; then
+		install -d ${D}${base_bindir}
+		mv ${D}${bindir}/mktemp ${D}${base_bindir}/mktemp
+		rmdir ${D}${bindir}
+	fi
 }
 
 ALTERNATIVE_${PN} = "mktemp"

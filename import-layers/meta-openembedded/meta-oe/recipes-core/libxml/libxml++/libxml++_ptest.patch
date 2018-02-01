@@ -1,21 +1,21 @@
-diff --git a/Makefile.am b/Makefile.am
-index d4aadb1..0e36756 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -253,5 +253,8 @@ post-html: docs/index.html
- 	rsync $(rsync_args) -r docs/index.html $$USER,libxmlplusplus@web.sourceforge.net:$(web_path_project)
- 	rsync $(rsync_args) -r examples $$USER,libxmlplusplus@web.sourceforge.net:$(web_path_project)
+Index: libxml++-2.40.1/Makefile.am
+===================================================================
+--- libxml++-2.40.1.orig/Makefile.am
++++ libxml++-2.40.1/Makefile.am
+@@ -24,5 +24,8 @@ dist_noinst_SCRIPTS = autogen.sh
+ 
+ DISTCLEANFILES = MSVC_Net2010/libxml++/libxml++config.h
  
 +install-ptest:
 +	make -C examples install-ptest
 +
  # Optional: auto-generate the ChangeLog file from the git log on make dist
- include $(top_srcdir)/macros/dist-changelog.am
-diff --git a/examples/Makefile.am b/examples/Makefile.am
-index d9541ca..c27e088 100644
---- a/examples/Makefile.am
-+++ b/examples/Makefile.am
-@@ -19,6 +19,8 @@ AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) -I. $(LIBXMLXX_CFLAGS)
+ include $(top_srcdir)/build/dist-changelog.am
+Index: libxml++-2.40.1/examples/Makefile.am
+===================================================================
+--- libxml++-2.40.1.orig/examples/Makefile.am
++++ libxml++-2.40.1/examples/Makefile.am
+@@ -19,6 +19,8 @@ AM_CPPFLAGS = -I$(top_builddir) -I$(top_
  AM_CXXFLAGS = $(LIBXMLXX_WXXFLAGS)
  LDADD = $(top_builddir)/libxml++/libxml++-$(LIBXMLXX_API_VERSION).la $(LIBXMLXX_LIBS)
  
@@ -24,7 +24,7 @@ index d9541ca..c27e088 100644
  check_PROGRAMS = \
    dom_build/dom_build \
    dom_parse_entities/dom_parse_entities \
-@@ -36,6 +38,23 @@ check_PROGRAMS = \
+@@ -37,6 +39,23 @@ check_PROGRAMS = \
    schemavalidation/schemavalidation \
    textreader/textreader
  
@@ -48,7 +48,7 @@ index d9541ca..c27e088 100644
  # Shell scripts that call the example programs.
  check_SCRIPTS = \
    dom_build/make_check.sh \
-@@ -147,10 +166,10 @@ dist_noinst_DATA = \
+@@ -154,10 +173,10 @@ dist_noinst_DATA = \
  # file are located in different directories.
  dom_read_write/make_check.sh: Makefile
  	echo '# Generated and used by "make check"' >$@
@@ -61,7 +61,7 @@ index d9541ca..c27e088 100644
  standard_scripts = $(filter-out dom_read_write/make_check.sh,$(check_SCRIPTS))
  
  # All other script files are generated like so:
-@@ -162,3 +181,18 @@ $(standard_scripts): Makefile
+@@ -169,3 +188,18 @@ $(standard_scripts): Makefile
  CLEANFILES = \
    dom_read_write/example_output.xml \
    $(check_SCRIPTS)
@@ -77,6 +77,6 @@ index d9541ca..c27e088 100644
 +	cd $(srcdir) && cp --parents $(dist_noinst_DATA) $(DESTDIR)/examples
 +	cp Makefile $(DESTDIR)/examples
 +	$(MKDIR_P) $(DESTDIR)/macros
-+	cp $(srcdir)/../macros/test-driver $(DESTDIR)/macros
++	cp $(top_srcdir)/build/test-driver $(DESTDIR)/macros
 +	sed -i -e 's|^Makefile:|_Makefile:|' $(DESTDIR)/examples/Makefile
 +

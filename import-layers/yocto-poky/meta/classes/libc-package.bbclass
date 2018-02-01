@@ -9,25 +9,27 @@
 
 GLIBC_INTERNAL_USE_BINARY_LOCALE ?= "ondevice"
 
-python __anonymous () {
-    enabled = d.getVar("ENABLE_BINARY_LOCALE_GENERATION", True)
+GLIBC_SPLIT_LC_PACKAGES ?= "0"
 
-    pn = d.getVar("PN", True)
+python __anonymous () {
+    enabled = d.getVar("ENABLE_BINARY_LOCALE_GENERATION")
+
+    pn = d.getVar("PN")
     if pn.endswith("-initial"):
         enabled = False
 
     if enabled and int(enabled):
         import re
 
-        target_arch = d.getVar("TARGET_ARCH", True)
-        binary_arches = d.getVar("BINARY_LOCALE_ARCHES", True) or ""
-        use_cross_localedef = d.getVar("LOCALE_GENERATION_WITH_CROSS-LOCALEDEF", True) or ""
+        target_arch = d.getVar("TARGET_ARCH")
+        binary_arches = d.getVar("BINARY_LOCALE_ARCHES") or ""
+        use_cross_localedef = d.getVar("LOCALE_GENERATION_WITH_CROSS-LOCALEDEF") or ""
 
         for regexp in binary_arches.split(" "):
             r = re.compile(regexp)
 
             if r.match(target_arch):
-                depends = d.getVar("DEPENDS", True)
+                depends = d.getVar("DEPENDS")
                 if use_cross_localedef == "1" :
                     depends = "%s cross-localedef-native" % depends
                 else:
@@ -92,21 +94,21 @@ inherit qemu
 
 python package_do_split_gconvs () {
     import re
-    if (d.getVar('PACKAGE_NO_GCONV', True) == '1'):
+    if (d.getVar('PACKAGE_NO_GCONV') == '1'):
         bb.note("package requested not splitting gconvs")
         return
 
-    if not d.getVar('PACKAGES', True):
+    if not d.getVar('PACKAGES'):
         return
 
-    mlprefix = d.getVar("MLPREFIX", True) or ""
+    mlprefix = d.getVar("MLPREFIX") or ""
 
-    bpn = d.getVar('BPN', True)
-    libdir = d.getVar('libdir', True)
+    bpn = d.getVar('BPN')
+    libdir = d.getVar('libdir')
     if not libdir:
         bb.error("libdir not defined")
         return
-    datadir = d.getVar('datadir', True)
+    datadir = d.getVar('datadir')
     if not datadir:
         bb.error("datadir not defined")
         return
@@ -114,7 +116,7 @@ python package_do_split_gconvs () {
     gconv_libdir = base_path_join(libdir, "gconv")
     charmap_dir = base_path_join(datadir, "i18n", "charmaps")
     locales_dir = base_path_join(datadir, "i18n", "locales")
-    binary_locales_dir = d.getVar('localedir', True)
+    binary_locales_dir = d.getVar('localedir')
 
     def calc_gconv_deps(fn, pkg, file_regex, output_pattern, group):
         deps = []
@@ -181,13 +183,13 @@ python package_do_split_gconvs () {
         description='locale definition for %s', hook=calc_locale_deps, extra_depends='')
     d.setVar('PACKAGES', d.getVar('PACKAGES', False) + ' ' + d.getVar('MLPREFIX', False) + bpn + '-gconv')
 
-    use_bin = d.getVar("GLIBC_INTERNAL_USE_BINARY_LOCALE", True)
+    use_bin = d.getVar("GLIBC_INTERNAL_USE_BINARY_LOCALE")
 
     dot_re = re.compile("(.*)\.(.*)")
 
     # Read in supported locales and associated encodings
     supported = {}
-    with open(base_path_join(d.getVar('WORKDIR', True), "SUPPORTED")) as f:
+    with open(base_path_join(d.getVar('WORKDIR'), "SUPPORTED")) as f:
         for line in f.readlines():
             try:
                 locale, charset = line.rstrip().split()
@@ -196,7 +198,7 @@ python package_do_split_gconvs () {
             supported[locale] = charset
 
     # GLIBC_GENERATE_LOCALES var specifies which locales to be generated. empty or "all" means all locales
-    to_generate = d.getVar('GLIBC_GENERATE_LOCALES', True)
+    to_generate = d.getVar('GLIBC_GENERATE_LOCALES')
     if not to_generate or to_generate == 'all':
         to_generate = sorted(supported.keys())
     else:
@@ -213,33 +215,32 @@ python package_do_split_gconvs () {
     def output_locale_source(name, pkgname, locale, encoding):
         d.setVar('RDEPENDS_%s' % pkgname, '%slocaledef %s-localedata-%s %s-charmap-%s' % \
         (mlprefix, mlprefix+bpn, legitimize_package_name(locale), mlprefix+bpn, legitimize_package_name(encoding)))
-        d.setVar('pkg_postinst_%s' % pkgname, d.getVar('locale_base_postinst', True) \
+        d.setVar('pkg_postinst_%s' % pkgname, d.getVar('locale_base_postinst') \
         % (locale, encoding, locale))
-        d.setVar('pkg_postrm_%s' % pkgname, d.getVar('locale_base_postrm', True) % \
+        d.setVar('pkg_postrm_%s' % pkgname, d.getVar('locale_base_postrm') % \
         (locale, encoding, locale))
 
     def output_locale_binary_rdepends(name, pkgname, locale, encoding):
-        m = re.match("(.*)\.(.*)", name)
-        if m:
-            libc_name = "%s.%s" % (m.group(1), m.group(2).lower())
-        else:
-            libc_name = name
-        d.setVar('RDEPENDS_%s' % pkgname, legitimize_package_name('%s-binary-localedata-%s' \
-            % (mlprefix+bpn, libc_name)))
+        dep = legitimize_package_name('%s-binary-localedata-%s' % (bpn, name))
+        lcsplit = d.getVar('GLIBC_SPLIT_LC_PACKAGES')
+        if lcsplit and int(lcsplit):
+            d.appendVar('PACKAGES', ' ' + dep)
+            d.setVar('ALLOW_EMPTY_%s' % dep, '1')
+        d.setVar('RDEPENDS_%s' % pkgname, mlprefix + dep)
 
     commands = {}
 
     def output_locale_binary(name, pkgname, locale, encoding):
-        treedir = base_path_join(d.getVar("WORKDIR", True), "locale-tree")
-        ldlibdir = base_path_join(treedir, d.getVar("base_libdir", True))
-        path = d.getVar("PATH", True)
+        treedir = base_path_join(d.getVar("WORKDIR"), "locale-tree")
+        ldlibdir = base_path_join(treedir, d.getVar("base_libdir"))
+        path = d.getVar("PATH")
         i18npath = base_path_join(treedir, datadir, "i18n")
         gconvpath = base_path_join(treedir, "iconvdata")
         outputpath = base_path_join(treedir, binary_locales_dir)
 
-        use_cross_localedef = d.getVar("LOCALE_GENERATION_WITH_CROSS-LOCALEDEF", True) or "0"
+        use_cross_localedef = d.getVar("LOCALE_GENERATION_WITH_CROSS-LOCALEDEF") or "0"
         if use_cross_localedef == "1":
-            target_arch = d.getVar('TARGET_ARCH', True)
+            target_arch = d.getVar('TARGET_ARCH')
             locale_arch_options = { \
                 "arm":     " --uint32-align=4 --little-endian ", \
                 "armeb":   " --uint32-align=4 --big-endian ",    \
@@ -278,7 +279,7 @@ python package_do_split_gconvs () {
                 --inputfile=%s/i18n/locales/%s --charmap=%s %s" \
                 % (treedir, datadir, locale, encoding, name)
 
-            qemu_options = d.getVar('QEMU_OPTIONS', True)
+            qemu_options = d.getVar('QEMU_OPTIONS')
 
             cmd = "PSEUDO_RELOADED=YES PATH=\"%s\" I18NPATH=\"%s\" %s -L %s \
                 -E LD_LIBRARY_PATH=%s %s %s/bin/localedef %s" % \
@@ -291,7 +292,7 @@ python package_do_split_gconvs () {
     def output_locale(name, locale, encoding):
         pkgname = d.getVar('MLPREFIX', False) + 'locale-base-' + legitimize_package_name(name)
         d.setVar('ALLOW_EMPTY_%s' % pkgname, '1')
-        d.setVar('PACKAGES', '%s %s' % (pkgname, d.getVar('PACKAGES', True)))
+        d.setVar('PACKAGES', '%s %s' % (pkgname, d.getVar('PACKAGES')))
         rprovides = ' %svirtual-locale-%s' % (mlprefix, legitimize_package_name(name))
         m = re.match("(.*)_(.*)", name)
         if m:
@@ -310,8 +311,8 @@ python package_do_split_gconvs () {
         bb.note("preparing tree for binary locale generation")
         bb.build.exec_func("do_prep_locale_tree", d)
 
-    utf8_only = int(d.getVar('LOCALE_UTF8_ONLY', True) or 0)
-    utf8_is_default = int(d.getVar('LOCALE_UTF8_IS_DEFAULT', True) or 0)
+    utf8_only = int(d.getVar('LOCALE_UTF8_ONLY') or 0)
+    utf8_is_default = int(d.getVar('LOCALE_UTF8_IS_DEFAULT') or 0)
 
     encodings = {}
     for locale in to_generate:
@@ -337,8 +338,13 @@ python package_do_split_gconvs () {
             else:
                 output_locale('%s.%s' % (base, charset), base, charset)
 
+    def metapkg_hook(file, pkg, pattern, format, basename):
+        name = basename.split('/', 1)[0]
+        metapkg = legitimize_package_name('%s-binary-localedata-%s' % (mlprefix+bpn, name))
+        d.appendVar('RDEPENDS_%s' % metapkg, ' ' + pkg)
+
     if use_bin == "compile":
-        makefile = base_path_join(d.getVar("WORKDIR", True), "locale-tree", "Makefile")
+        makefile = base_path_join(d.getVar("WORKDIR"), "locale-tree", "Makefile")
         m = open(makefile, "w")
         m.write("all: %s\n\n" % " ".join(commands.keys()))
         for cmd in commands:
@@ -350,13 +356,18 @@ python package_do_split_gconvs () {
         bb.build.exec_func("oe_runmake", d)
         bb.note("collecting binary locales from locale tree")
         bb.build.exec_func("do_collect_bins_from_locale_tree", d)
-        do_split_packages(d, binary_locales_dir, file_regex='(.*)', \
-            output_pattern=bpn+'-binary-localedata-%s', \
-            description='binary locale definition for %s', extra_depends='', allow_dirs=True)
-    elif use_bin == "precompiled":
-        do_split_packages(d, binary_locales_dir, file_regex='(.*)', \
-            output_pattern=bpn+'-binary-localedata-%s', \
-            description='binary locale definition for %s', extra_depends='', allow_dirs=True)
+
+    if use_bin in ('compile', 'precompiled'):
+        lcsplit = d.getVar('GLIBC_SPLIT_LC_PACKAGES')
+        if lcsplit and int(lcsplit):
+            do_split_packages(d, binary_locales_dir, file_regex='^(.*/LC_\w+)', \
+                output_pattern=bpn+'-binary-localedata-%s', \
+                description='binary locale definition for %s', recursive=True,
+                hook=metapkg_hook, extra_depends='', allow_dirs=True, match_path=True)
+        else:
+            do_split_packages(d, binary_locales_dir, file_regex='(.*)', \
+                output_pattern=bpn+'-binary-localedata-%s', \
+                description='binary locale definition for %s', extra_depends='', allow_dirs=True)
     else:
         bb.note("generation of binary locales disabled. this may break i18n!")
 

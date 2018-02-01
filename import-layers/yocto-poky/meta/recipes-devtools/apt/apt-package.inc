@@ -32,12 +32,18 @@ FILES_${PN} = "${bindir}/apt-cdrom ${bindir}/apt-get \
 	       ${bindir}/apt-config ${bindir}/apt-cache \
 	       ${libdir}/apt ${libdir}/libapt*.so.* \
 	       ${localstatedir} ${sysconfdir} \
-	       ${libdir}/dpkg"
+	       ${libdir}/dpkg \
+	       ${systemd_unitdir}/system \
+           "
 FILES_${PN}-utils = "${bindir}/apt-sortpkgs ${bindir}/apt-extracttemplates"
-FILES_${PN}-doc = "${@get_files_apt_doc(d, bb, d.getVar('apt-manpages', True))} \
+FILES_${PN}-doc = "${@get_files_apt_doc(d, bb, d.getVar('apt-manpages'))} \
 		   ${docdir}/apt"
-FILES_${PN}-utils-doc = "${@get_files_apt_doc(d, bb, d.getVar('apt-utils-manpages', True))}"
+FILES_${PN}-utils-doc = "${@get_files_apt_doc(d, bb, d.getVar('apt-utils-manpages'))}"
 FILES_${PN}-dev = "${libdir}/libapt*.so ${includedir}"
+
+inherit systemd
+
+SYSTEMD_SERVICE_${PN} = "apt-daily.timer"
 
 do_install () {
 	set -x
@@ -75,4 +81,13 @@ do_install () {
 
 	install -d ${D}${includedir}/apt-pkg/
 	install -m 0644 include/apt-pkg/*.h ${D}${includedir}/apt-pkg/
+
+	install -d ${D}${systemd_unitdir}/system/
+	install -m 0644 ${S}/debian/apt.systemd.daily ${D}${libdir}/apt/
+	install -m 0644 ${S}/debian/apt-daily.service ${D}${systemd_unitdir}/system/
+	sed -i 's#/usr/lib/apt/#${libdir}/apt/#g' ${D}${systemd_unitdir}/system/apt-daily.service
+	install -m 0644 ${S}/debian/apt-daily.timer ${D}${systemd_unitdir}/system/
+	install -d ${D}${sysconfdir}/cron.daily/
+	install -m 0755 ${S}/debian/apt.apt-compat.cron.daily ${D}${sysconfdir}/cron.daily/
+	sed -i 's#/usr/lib/apt/#${libdir}/apt/#g' ${D}${sysconfdir}/cron.daily/apt.apt-compat.cron.daily
 }

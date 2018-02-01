@@ -1,0 +1,106 @@
+commit f63cbe944107b5cd8f150ceaaec43b26099d5688
+Author: Adam Jackson <ajax@redhat.com>
+Date:   Tue Feb 16 10:05:25 2016 -0500
+
+    demos: Don't build tri or cube
+    
+    There are more interesting demos, all we really want here is vulkaninfo.
+    This helps because we don't need to pre-build glslang/llvm/lunarglass
+    just to get the loader and layers.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+--- a/demos/CMakeLists.txt
++++ b/demos/CMakeLists.txt
+@@ -61,46 +61,6 @@
+ else()
+ endif()
+ 
+-if(WIN32)
+-    # For Windows, since 32-bit and 64-bit items can co-exist, we build each in its own build directory.
+-    # 32-bit target data goes in build32, and 64-bit target data goes into build.  So, include/link the
+-    # appropriate data at build time.
+-    if (CMAKE_CL_64)
+-        set (BUILDTGT_DIR build)
+-    else ()
+-        set (BUILDTGT_DIR build32)
+-    endif()
+-
+-    # Use static MSVCRT libraries
+-    foreach(configuration in CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_RELWITHDEBINFO
+-                             CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+-        if(${configuration} MATCHES "/MD")
+-            string(REGEX REPLACE "/MD" "/MT" ${configuration} "${${configuration}}")
+-        endif()
+-    endforeach()
+-
+-    add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/demos/cube-vert.spv
+-       COMMAND ${GLSLANG_VALIDATOR} -s -V -o ${CMAKE_BINARY_DIR}/demos/cube-vert.spv ${PROJECT_SOURCE_DIR}/demos/cube.vert
+-       DEPENDS cube.vert ${GLSLANG_VALIDATOR}
+-       )
+-    add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/demos/cube-frag.spv
+-       COMMAND ${GLSLANG_VALIDATOR} -s -V -o ${CMAKE_BINARY_DIR}/demos/cube-frag.spv ${PROJECT_SOURCE_DIR}/demos/cube.frag
+-       DEPENDS cube.frag ${GLSLANG_VALIDATOR}
+-       )
+-   file(COPY cube.vcxproj.user DESTINATION ${CMAKE_BINARY_DIR}/demos)
+-   file(COPY vulkaninfo.vcxproj.user DESTINATION ${CMAKE_BINARY_DIR}/demos)
+-else()
+-    if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
+-        add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/demos/cube-vert.spv
+-            COMMAND ${GLSLANG_VALIDATOR} -s -V -o cube-vert.spv ${PROJECT_SOURCE_DIR}/demos/cube.vert
+-            DEPENDS cube.vert ${GLSLANG_VALIDATOR}
+-            )
+-        add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/demos/cube-frag.spv
+-            COMMAND ${GLSLANG_VALIDATOR} -s -V -o cube-frag.spv ${PROJECT_SOURCE_DIR}/demos/cube.frag
+-            DEPENDS cube.frag ${GLSLANG_VALIDATOR}
+-            )
+-    endif()         
+-endif()
+ 
+ if(WIN32)
+     include_directories (
+@@ -114,43 +74,6 @@
+ add_executable(${API_LOWERCASE}info vulkaninfo.c)
+ target_link_libraries(${API_LOWERCASE}info ${LIBRARIES})
+ 
+-if(NOT WIN32)
+-    if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
+-        add_executable(cube cube.c ${CMAKE_BINARY_DIR}/demos/cube-vert.spv ${CMAKE_BINARY_DIR}/demos/cube-frag.spv)
+-        target_link_libraries(cube ${LIBRARIES})
+-    endif()
+-else()
+-    if (CMAKE_CL_64)
+-        set (LIB_DIR "Win64")
+-    else()
+-        set (LIB_DIR "Win32")
+-    endif()
+-
+-    add_executable(cube WIN32 cube.c ${CMAKE_BINARY_DIR}/demos/cube-vert.spv ${CMAKE_BINARY_DIR}/demos/cube-frag.spv)
+-    target_link_libraries(cube ${LIBRARIES})
+-endif()
+-
+-if(NOT WIN32)
+-    if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
+-        add_executable(cubepp cube.cpp ${CMAKE_BINARY_DIR}/demos/cube-vert.spv ${CMAKE_BINARY_DIR}/demos/cube-frag.spv)
+-        target_link_libraries(cubepp ${LIBRARIES})
+-    endif()
+-else()
+-    if (CMAKE_CL_64)
+-        set (LIB_DIR "Win64")
+-    else()
+-        set (LIB_DIR "Win32")
+-    endif()
+-
+-    add_executable(cubepp WIN32 cube.cpp ${CMAKE_BINARY_DIR}/demos/cube-vert.spv ${CMAKE_BINARY_DIR}/demos/cube-frag.spv)
+-    target_link_libraries(cubepp ${LIBRARIES})
+-endif()
+-
+-if ((${CMAKE_SYSTEM_PROCESSOR} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR}))
+-    if  ((DEMOS_WSI_SELECTION STREQUAL "XCB") OR (DEMOS_WSI_SELECTION STREQUAL "WAYLAND") OR WIN32 OR (CMAKE_SYSTEM_NAME STREQUAL "Android"))
+-        add_subdirectory(smoke)
+-    endif()
+-endif()
+ 
+ if(UNIX)
+     install(TARGETS ${API_LOWERCASE}info DESTINATION ${CMAKE_INSTALL_BINDIR})

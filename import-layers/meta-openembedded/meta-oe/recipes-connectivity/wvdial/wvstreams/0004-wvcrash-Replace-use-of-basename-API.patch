@@ -1,0 +1,28 @@
+From bfe68126693f9159f7ac66a69217e0b5f43e5781 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Jul 2017 21:11:21 -0700
+Subject: [PATCH 4/5] wvcrash: Replace use of basename API
+
+musl does not have this API
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/wvcrash.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/utils/wvcrash.cc b/utils/wvcrash.cc
+index 0417759..3d160b7 100644
+--- a/utils/wvcrash.cc
++++ b/utils/wvcrash.cc
+@@ -404,7 +404,7 @@ extern void __wvcrash_init_buffers(const char *program_name);
+ void wvcrash_setup(const char *_argv0, const char *_desc)
+ {
+     if (_argv0)
+-	argv0 = basename(_argv0);
++	argv0 = strrchr(_argv0, '/') ? strrchr(_argv0, '/')+1 : _argv0;
+     __wvcrash_init_buffers(argv0);
+     if (_desc)
+     {
+-- 
+2.13.3
+

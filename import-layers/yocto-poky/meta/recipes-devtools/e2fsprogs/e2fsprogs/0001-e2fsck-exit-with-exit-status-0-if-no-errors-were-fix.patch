@@ -1,4 +1,4 @@
-From b9bb77a0dd712f06b262a12766972b99cd801269 Mon Sep 17 00:00:00 2001
+From bf9f3b6d5b10d19218b4ed904c12b22e36ec57dd Mon Sep 17 00:00:00 2001
 From: Theodore Ts'o <tytso@mit.edu>
 Date: Thu, 16 Feb 2017 22:02:35 -0500
 Subject: [PATCH] e2fsck: exit with exit status 0 if no errors were fixed
@@ -13,15 +13,12 @@ Upstream-Status: Backport
 
 Signed-off-by: Theodore Ts'o <tytso@mit.edu>
 Signed-off-by: Daniel Schultz <d.schultz@phytec.de>
-
-Conflicts:
-	e2fsck/e2fsck.conf.5.in
 ---
- e2fsck/e2fsck.conf.5.in                     | 34 +++++++++++++++++++++++++++++
+ e2fsck/e2fsck.conf.5.in                     |  7 +++++++
  e2fsck/journal.c                            |  1 +
- e2fsck/problem.c                            |  8 ++++---
+ e2fsck/problem.c                            |  8 +++++---
  e2fsck/problemP.h                           |  1 +
- e2fsck/unix.c                               | 20 +++++++++++++----
+ e2fsck/unix.c                               | 20 ++++++++++++++++----
  tests/f_collapse_extent_tree/expect.1       |  2 +-
  tests/f_compress_extent_tree_level/expect.1 |  2 +-
  tests/f_convert_bmap/expect.1               |  2 +-
@@ -33,16 +30,16 @@ Conflicts:
  tests/f_orphan_extents_inode/expect.1       |  2 +-
  tests/f_rehash_dir/expect.1                 |  2 +-
  tests/f_unsorted_EAs/expect.1               |  2 +-
- 16 files changed, 68 insertions(+), 18 deletions(-)
+ 16 files changed, 41 insertions(+), 18 deletions(-)
 
 diff --git a/e2fsck/e2fsck.conf.5.in b/e2fsck/e2fsck.conf.5.in
-index 1f80a04..6a205ce 100644
+index 1848bdb..0bfc76a 100644
 --- a/e2fsck/e2fsck.conf.5.in
 +++ b/e2fsck/e2fsck.conf.5.in
-@@ -326,6 +326,40 @@ defaults to true.
- This relation controls whether or not the scratch file directory is used
- instead of an in-memory data structure when tracking inode counts.  It
- defaults to true.
+@@ -303,6 +303,13 @@ of 'should this problem be fixed?'.  The
+ option even overrides the
+ .B -y
+ option given on the command-line (just for the specific problem, of course).
 +.TP
 +.I not_a_fix
 +This boolean option, it set to true, marks the problem as
@@ -50,38 +47,11 @@ index 1f80a04..6a205ce 100644
 +it does not mean that the file system had a problem which has since
 +been fixed.  This is used for requests to optimize the file system's
 +data structure, such as pruning an extent tree.
-+@TDB_MAN_COMMENT@.SH THE [scratch_files] STANZA
-+@TDB_MAN_COMMENT@The following relations are defined in the
-+@TDB_MAN_COMMENT@.I [scratch_files]
-+@TDB_MAN_COMMENT@stanza.
-+@TDB_MAN_COMMENT@.TP
-+@TDB_MAN_COMMENT@.I directory
-+@TDB_MAN_COMMENT@If the directory named by this relation exists and is
-+@TDB_MAN_COMMENT@writeable, then e2fsck will attempt to use this
-+@TDB_MAN_COMMENT@directory to store scratch files instead of using
-+@TDB_MAN_COMMENT@in-memory data structures.
-+@TDB_MAN_COMMENT@.TP
-+@TDB_MAN_COMMENT@.I numdirs_threshold
-+@TDB_MAN_COMMENT@If this relation is set, then in-memory data structures
-+@TDB_MAN_COMMENT@be used if the number of directories in the filesystem
-+@TDB_MAN_COMMENT@are fewer than amount specified.
-+@TDB_MAN_COMMENT@.TP
-+@TDB_MAN_COMMENT@.I dirinfo
-+@TDB_MAN_COMMENT@This relation controls whether or not the scratch file
-+@TDB_MAN_COMMENT@directory is used instead of an in-memory data
-+@TDB_MAN_COMMENT@structure for directory information.  It defaults to
-+@TDB_MAN_COMMENT@true.
-+@TDB_MAN_COMMENT@.TP
-+@TDB_MAN_COMMENT@.I icount
-+@TDB_MAN_COMMENT@This relation controls whether or not the scratch file
-+@TDB_MAN_COMMENT@directory is used instead of an in-memory data
-+@TDB_MAN_COMMENT@structure when tracking inode counts.  It defaults to
-+@TDB_MAN_COMMENT@true.
- .SH LOGGING
- E2fsck has the facility to save the information from an e2fsck run in a
- directory so that a system administrator can review its output at their
+ @TDB_MAN_COMMENT@.SH THE [scratch_files] STANZA
+ @TDB_MAN_COMMENT@The following relations are defined in the
+ @TDB_MAN_COMMENT@.I [scratch_files]
 diff --git a/e2fsck/journal.c b/e2fsck/journal.c
-index c8ac57d..b4cf329 100644
+index 46fe7b4..c4f58f1 100644
 --- a/e2fsck/journal.c
 +++ b/e2fsck/journal.c
 @@ -572,6 +572,7 @@ static void clear_v2_journal_fields(journal_t *journal)
@@ -93,10 +63,10 @@ index c8ac57d..b4cf329 100644
  	       ctx->fs->blocksize-V1_SB_SIZE);
  	mark_buffer_dirty(journal->j_sb_buffer);
 diff --git a/e2fsck/problem.c b/e2fsck/problem.c
-index 1e645e4..2b01ffc 100644
+index 34a671e..4b25069 100644
 --- a/e2fsck/problem.c
 +++ b/e2fsck/problem.c
-@@ -1261,12 +1261,12 @@ static struct e2fsck_problem problem_table[] = {
+@@ -1276,12 +1276,12 @@ static struct e2fsck_problem problem_table[] = {
  	/* Inode extent tree could be shorter */
  	{ PR_1E_CAN_COLLAPSE_EXTENT_TREE,
  	  N_("@i %i @x tree (at level %b) could be shorter.  "),
@@ -111,7 +81,7 @@ index 1e645e4..2b01ffc 100644
  
  	/* Pass 2 errors */
  
-@@ -2146,6 +2146,7 @@ int fix_problem(e2fsck_t ctx, problem_t code, struct problem_context *pctx)
+@@ -2166,6 +2166,7 @@ int fix_problem(e2fsck_t ctx, problem_t code, struct problem_context *pctx)
  		reconfigure_bool(ctx, ptr, key, PR_NO_NOMSG, "no_nomsg");
  		reconfigure_bool(ctx, ptr, key, PR_PREEN_NOHDR, "preen_noheader");
  		reconfigure_bool(ctx, ptr, key, PR_FORCE_NO, "force_no");
@@ -119,7 +89,7 @@ index 1e645e4..2b01ffc 100644
  		profile_get_integer(ctx->profile, "options",
  				    "max_count_problems", 0, 0,
  				    &ptr->max_count);
-@@ -2263,7 +2264,8 @@ int fix_problem(e2fsck_t ctx, problem_t code, struct problem_context *pctx)
+@@ -2283,7 +2284,8 @@ int fix_problem(e2fsck_t ctx, problem_t code, struct problem_context *pctx)
  	if (ptr->flags & PR_AFTER_CODE)
  		answer = fix_problem(ctx, ptr->second_code, pctx);
  
@@ -139,10 +109,10 @@ index 7944cd6..63bb8df 100644
  #define PR_FORCE_NO	0x100000 /* Force the answer to be no */
 +#define PR_NOT_A_FIX	0x200000 /* Yes doesn't mean a problem was fixed */
 diff --git a/e2fsck/unix.c b/e2fsck/unix.c
-index 004a6e5..d33d7fd 100644
+index eb9f311..9e4d31a 100644
 --- a/e2fsck/unix.c
 +++ b/e2fsck/unix.c
-@@ -1896,11 +1896,23 @@ no_journal:
+@@ -1901,11 +1901,23 @@ no_journal:
  		fix_problem(ctx, PR_6_IO_FLUSH, &pctx);
  
  	if (was_changed) {

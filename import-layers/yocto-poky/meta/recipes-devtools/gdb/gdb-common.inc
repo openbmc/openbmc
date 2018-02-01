@@ -6,12 +6,7 @@ DEPENDS = "expat zlib ncurses virtual/libiconv ${LTTNGUST}"
 LTTNGUST = "lttng-ust"
 LTTNGUST_aarch64 = ""
 LTTNGUST_libc-uclibc = ""
-LTTNGUST_mips = ""
-LTTNGUST_mipsel = ""
-LTTNGUST_mips64 = ""
-LTTNGUST_mips64el = ""
-LTTNGUST_mips64n32 = ""
-LTTNGUST_mips64eln32 = ""
+LTTNGUST_mipsarch = ""
 LTTNGUST_sh4 = ""
 LTTNGUST_libc-musl = ""
 
@@ -52,11 +47,12 @@ do_configure () {
 }
 
 # we don't want gdb to provide bfd/iberty/opcodes, which instead will override the
-# right bits installed by binutils.
+# right bits installed by binutils.  Same for bfd.info -- also from binutils.
 do_install_append() {
 	rm -rf ${D}${libdir}
 	rm -rf ${D}${includedir}
 	rm -rf ${D}${datadir}/locale
+	rm -f ${D}${infodir}/bfd.info
 }
 
 RRECOMMENDS_gdb_append_linux = " glibc-thread-db "

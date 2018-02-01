@@ -1,0 +1,64 @@
+From 2ab61e6ad5a9cfcde838379bc36babfaaa61afb8 Mon Sep 17 00:00:00 2001
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Fri, 20 Jan 2017 13:50:17 +0100
+Subject: [PATCH] rename yy_scan_string manually
+
+flex 2.6.0 used to generate code where yy_scan_string was mapped
+to <custom prefix>_scan_string directly in the generated .c code.
+
+For example, generate/unix/iasl/obj/prparserlex.c:
+
+int
+PrInitLexer (
+    char                    *String)
+{
+
+    LexBuffer = PrParser_scan_string (String);
+    return (LexBuffer == NULL);
+}
+
+flex 2.6.3 no longer does that, leading to a compiler warning
+and link error about yy_scan_string().
+
+Both versions generate a preamble in the beginning of prparserlex.c
+that maps several yy_* names, but yy_scan_string is not among those:
+
+...
+...
+
+Upstream-Status: Inappropriate [workaround for https://github.com/westes/flex/issues/164]
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ source/compiler/dtparser.l | 2 +-
+ source/compiler/prparser.l | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/source/compiler/dtparser.l b/source/compiler/dtparser.l
+index 3f4c2f3..eaa43ff 100644
+--- a/source/compiler/dtparser.l
++++ b/source/compiler/dtparser.l
+@@ -120,7 +120,7 @@ DtInitLexer (
+     char                    *String)
+ {
+ 
+-    LexBuffer = yy_scan_string (String);
++    LexBuffer = DtParser_scan_string (String);
+     return (LexBuffer == NULL);
+ }
+ 
+diff --git a/source/compiler/prparser.l b/source/compiler/prparser.l
+index 10bd130..9cb3573 100644
+--- a/source/compiler/prparser.l
++++ b/source/compiler/prparser.l
+@@ -127,7 +127,7 @@ PrInitLexer (
+     char                    *String)
+ {
+ 
+-    LexBuffer = yy_scan_string (String);
++    LexBuffer = PrParser_scan_string (String);
+     return (LexBuffer == NULL);
+ }
+ 
+-- 
+2.11.0
+

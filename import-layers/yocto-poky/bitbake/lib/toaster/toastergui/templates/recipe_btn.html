@@ -5,7 +5,13 @@
  >
   Build recipe
 </a>
-<a class="btn btn-default btn-block layerbtn layer-add-{{data.layer_version.pk}}" data-layer='{ "id": {{data.layer_version.pk}}, "name":  "{{data.layer_version.layer.name}}", "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.pk%}"}' data-directive="add"
+<a class="btn btn-default btn-block layerbtn layer-add-{{data.layer_version.pk}}" 
+  data-layer='{
+  "id": {{data.layer_version.pk}},
+  "name":  "{{data.layer_version.layer.name}}",
+  "layerdetailurl": "{%url "layerdetails" extra.pid data.layer_version.pk%}",
+   "xhrLayerUrl": "{% url "xhr_layer" extra.pid data.layer_version.pk %}"
+   }' data-directive="add"
     {% if data.layer_version.pk in extra.current_layers %}
      style="display:none;"
     {% endif %}

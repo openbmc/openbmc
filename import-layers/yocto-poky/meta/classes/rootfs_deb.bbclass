@@ -3,7 +3,6 @@
 #
 
 ROOTFS_PKGMANAGE = "dpkg apt"
-ROOTFS_PKGMANAGE_BOOTSTRAP  = "run-postinsts"
 
 do_rootfs[depends] += "dpkg-native:do_populate_sysroot apt-native:do_populate_sysroot"
 do_populate_sdk[depends] += "dpkg-native:do_populate_sysroot apt-native:do_populate_sysroot bzip2-native:do_populate_sysroot"
@@ -12,9 +11,10 @@ do_rootfs[vardeps] += "PACKAGE_FEED_URIS"
 
 do_rootfs[lockfiles] += "${DEPLOY_DIR_DEB}/deb.lock"
 do_populate_sdk[lockfiles] += "${DEPLOY_DIR_DEB}/deb.lock"
+do_populate_sdk_ext[lockfiles] += "${DEPLOY_DIR_DEB}/deb.lock"
 
 python rootfs_deb_bad_recommendations() {
-    if d.getVar("BAD_RECOMMENDATIONS", True):
+    if d.getVar("BAD_RECOMMENDATIONS"):
         bb.warn("Debian package install does not support BAD_RECOMMENDATIONS")
 }
 do_rootfs[prefuncs] += "rootfs_deb_bad_recommendations"
@@ -25,7 +25,7 @@ opkglibdir = "${localstatedir}/lib/opkg"
 
 python () {
     # Map TARGET_ARCH to Debian's ideas about architectures
-    darch = d.getVar('SDK_ARCH', True)
+    darch = d.getVar('SDK_ARCH')
     if darch in ["x86", "i486", "i586", "i686", "pentium"]:
          d.setVar('DEB_SDK_ARCH', 'i386')
     elif darch == "x86_64":

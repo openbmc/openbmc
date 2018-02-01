@@ -27,4 +27,4 @@ FILES_${PN}-dbg += "${PYTHON_SITEPACKAGES_DIR}/*/.debug \
                     ${PYTHON_SITEPACKAGES_DIR}/.debug"
 
 # http://errors.yoctoproject.org/Errors/Details/81001/
-PNBLACKLIST[gnome-menus] ?= "BROKEN: fails to build because of python"
+PNBLACKLIST[gnome-menus] ?= "BROKEN: fails to build because of python + conflicts with gnome-menu3 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

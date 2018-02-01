@@ -20,11 +20,11 @@ python uninative_event_fetchloader() {
     loader isn't already present.
     """
 
-    chksum = d.getVarFlag("UNINATIVE_CHECKSUM", d.getVar("BUILD_ARCH", True), True)
+    chksum = d.getVarFlag("UNINATIVE_CHECKSUM", d.getVar("BUILD_ARCH"))
     if not chksum:
-        bb.fatal("Uninative selected but not configured correctly, please set UNINATIVE_CHECKSUM[%s]" % d.getVar("BUILD_ARCH", True))
+        bb.fatal("Uninative selected but not configured correctly, please set UNINATIVE_CHECKSUM[%s]" % d.getVar("BUILD_ARCH"))
 
-    loader = d.getVar("UNINATIVE_LOADER", True)
+    loader = d.getVar("UNINATIVE_LOADER")
     loaderchksum = loader + ".chksum"
     if os.path.exists(loader) and os.path.exists(loaderchksum):
         with open(loaderchksum, "r") as f:
@@ -37,13 +37,13 @@ python uninative_event_fetchloader() {
         # Save and restore cwd as Fetch.download() does a chdir()
         olddir = os.getcwd()
 
-        tarball = d.getVar("UNINATIVE_TARBALL", True)
-        tarballdir = os.path.join(d.getVar("UNINATIVE_DLDIR", True), chksum)
+        tarball = d.getVar("UNINATIVE_TARBALL")
+        tarballdir = os.path.join(d.getVar("UNINATIVE_DLDIR"), chksum)
         tarballpath = os.path.join(tarballdir, tarball)
 
         if not os.path.exists(tarballpath):
             bb.utils.mkdirhier(tarballdir)
-            if d.getVar("UNINATIVE_URL", True) == "unset":
+            if d.getVar("UNINATIVE_URL") == "unset":
                 bb.fatal("Uninative selected but not configured, please set UNINATIVE_URL")
 
             localdata = bb.data.createCopy(d)
@@ -59,8 +59,17 @@ python uninative_event_fetchloader() {
             if localpath != tarballpath and os.path.exists(localpath) and not os.path.exists(tarballpath):
                     os.symlink(localpath, tarballpath)
 
-        cmd = d.expand("mkdir -p ${UNINATIVE_STAGING_DIR}-uninative; cd ${UNINATIVE_STAGING_DIR}-uninative; tar -xjf ${UNINATIVE_DLDIR}/%s/${UNINATIVE_TARBALL}; ${UNINATIVE_STAGING_DIR}-uninative/relocate_sdk.py ${UNINATIVE_STAGING_DIR}-uninative/${BUILD_ARCH}-linux ${UNINATIVE_LOADER} ${UNINATIVE_LOADER} ${UNINATIVE_STAGING_DIR}-uninative/${BUILD_ARCH}-linux/${bindir_native}/patchelf-uninative ${UNINATIVE_STAGING_DIR}-uninative/${BUILD_ARCH}-linux${base_libdir_native}/libc*.so" % chksum)
-        subprocess.check_call(cmd, shell=True)
+        cmd = d.expand("\
+mkdir -p ${UNINATIVE_STAGING_DIR}-uninative; \
+cd ${UNINATIVE_STAGING_DIR}-uninative; \
+tar -xjf ${UNINATIVE_DLDIR}/%s/${UNINATIVE_TARBALL}; \
+${UNINATIVE_STAGING_DIR}-uninative/relocate_sdk.py \
+  ${UNINATIVE_STAGING_DIR}-uninative/${BUILD_ARCH}-linux \
+  ${UNINATIVE_LOADER} \
+  ${UNINATIVE_LOADER} \
+  ${UNINATIVE_STAGING_DIR}-uninative/${BUILD_ARCH}-linux/${bindir_native}/patchelf-uninative \
+  ${UNINATIVE_STAGING_DIR}-uninative/${BUILD_ARCH}-linux${base_libdir_native}/libc*.so" % chksum)
+        subprocess.check_output(cmd, shell=True)
 
         with open(loaderchksum, "w") as f:
             f.write(chksum)
@@ -86,12 +95,13 @@ python uninative_event_enable() {
 }
 
 def enable_uninative(d):
-    loader = d.getVar("UNINATIVE_LOADER", True)
+    loader = d.getVar("UNINATIVE_LOADER")
     if os.path.exists(loader):
         bb.debug(2, "Enabling uninative")
         d.setVar("NATIVELSBSTRING", "universal%s" % oe.utils.host_gcc_version(d))
         d.appendVar("SSTATEPOSTUNPACKFUNCS", " uninative_changeinterp")
-        d.prependVar("PATH", "${UNINATIVE_STAGING_DIR}-uninative/${BUILD_ARCH}-linux${bindir_native}:")
+        d.appendVarFlag("SSTATEPOSTUNPACKFUNCS", "vardepvalueexclude", "| uninative_changeinterp")
+        d.prependVar("PATH", "${STAGING_DIR}-uninative/${BUILD_ARCH}-linux${bindir_native}:")
 
 python uninative_changeinterp () {
     import subprocess
@@ -101,7 +111,7 @@ python uninative_changeinterp () {
     if not (bb.data.inherits_class('native', d) or bb.data.inherits_class('crosssdk', d) or bb.data.inherits_class('cross', d)):
         return
 
-    sstateinst = d.getVar('SSTATE_INSTDIR', True)
+    sstateinst = d.getVar('SSTATE_INSTDIR')
     for walkroot, dirs, files in os.walk(sstateinst):
         for file in files:
             if file.endswith(".so") or ".so." in file:
@@ -120,11 +130,5 @@ python uninative_changeinterp () {
             if not elf.isDynamic():
                 continue
 
-            try:
-                subprocess.check_output(("patchelf-uninative", "--set-interpreter",
-                                         d.getVar("UNINATIVE_LOADER", True), f),
-                                        stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError as e:
-                bb.fatal("'%s' failed with exit code %d and the following output:\n%s" %
-                         (e.cmd, e.returncode, e.output))
+            subprocess.check_output(("patchelf-uninative", "--set-interpreter", d.getVar("UNINATIVE_LOADER"), f), stderr=subprocess.STDOUT)
 }

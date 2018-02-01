@@ -1,0 +1,44 @@
+From 93c51144c3f664d4e9709da75a1d0fa00ea0fe95 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Sun, 12 Feb 2017 21:51:34 +0100
+Subject: [PATCH] libasm: Fix one GCC7 -Wformat-truncation=2 warning.
+
+Make sure that if we have really lots of labels the tempsym doesn't get
+truncated because it is too small to hold the whole name.
+
+This doesn't enable -Wformat-truncation=2 or fix other "issues" pointed
+out by enabling this warning because there are currently some issues
+with it. https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79448
+
+Signed-off-by: Mark Wielaard <mark@klomp.org>
+
+Upstream-Status: Backport (https://sourceware.org/git/?p=elfutils.git;a=commit;h=93c51144c3f664d4e9709da75a1d0fa00ea0fe95)
+Signed-off-by: Joshua Lock <joshua.g.lock@intel.com>
+
+---
+ libasm/ChangeLog    | 6 +++++-
+ libasm/asm_newsym.c | 6 ++++--
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+Index: elfutils-0.168/libasm/asm_newsym.c
+===================================================================
+--- elfutils-0.168.orig/libasm/asm_newsym.c
++++ elfutils-0.168/libasm/asm_newsym.c
+@@ -1,5 +1,5 @@
+ /* Define new symbol for current position in given section.
+-   Copyright (C) 2002, 2005, 2016 Red Hat, Inc.
++   Copyright (C) 2002, 2005, 2016, 2017 Red Hat, Inc.
+    This file is part of elfutils.
+    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
+ 
+@@ -44,7 +44,9 @@ AsmSym_t *
+ asm_newsym (AsmScn_t *asmscn, const char *name, GElf_Xword size,
+ 	    int type, int binding)
+ {
+-#define TEMPSYMLEN 10
++/* We don't really expect labels with many digits, but in theory it could
++   be 10 digits (plus ".L" and a zero terminator).  */
++#define TEMPSYMLEN 13
+   char tempsym[TEMPSYMLEN];
+   AsmSym_t *result;
+ 

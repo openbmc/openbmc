@@ -16,11 +16,31 @@
                 Permission is granted to copy, distribute and/or modify this document under
                 the terms of the <ulink type="http" url="http://creativecommons.org/licenses/by-sa/2.0/uk/">Creative Commons Attribution-Share Alike 2.0 UK: England &amp; Wales</ulink> as published by Creative Commons.
             </para>
-            <note>
-                For the latest version of this manual associated with this
-                Yocto Project release, see the
-                <ulink url='&YOCTO_DOCS_QS_URL;'>Yocto Project Quick Start</ulink>
-                from the Yocto Project website.
+            <note><title>Manual Notes</title>
+                <itemizedlist>
+                    <listitem><para>
+                        For the latest version of the Yocto Project Quick
+                        Start associated with this Yocto Project release
+                        (version &YOCTO_DOC_VERSION;),
+                        see the Yocto Project Quick Start from the
+                        <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>.
+                        </para></listitem>
+                    <listitem><para>
+                        This version of the manual is version
+                        &YOCTO_DOC_VERSION;.
+                        For later releases of the Yocto Project (if they exist),
+                        go to the
+                        <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                        and use the drop-down "Active Releases" button
+                        and choose the Yocto Project version for which you want
+                        the manual.
+                        </para></listitem>
+                    <listitem><para>
+                        For an in-development version of the Yocto Project
+                        Quick Start, see
+                        <ulink url='&YOCTO_DOCS_URL;/latest/yocto-project-qs/yocto-project-qs.html'></ulink>.
+                        </para></listitem>
+                </itemizedlist>
             </note>
         </legalnotice>
 
@@ -44,7 +64,8 @@
             tool, to construct complete Linux images.
             The BitBake and OE components are combined together to form
             a reference build host, historically known as
-            <ulink url='&YOCTO_DOCS_DEV_URL;#poky'>Poky</ulink>.
+            <ulink url='&YOCTO_DOCS_DEV_URL;#poky'>Poky</ulink>
+            (<emphasis>Pah</emphasis>-key).
         </para>
 
         <para>
@@ -125,11 +146,8 @@
         <mediaobject>
             <imageobject>
                 <imagedata fileref="figures/yocto-environment.png"
-                    format="PNG" align='center' scalefit='1' width="100%"/>
+                    format="PNG" align='center' width="8in"/>
             </imageobject>
-            <caption>
-                <para>The Yocto Project Development Environment</para>
-            </caption>
          </mediaobject>
 
         <para>
@@ -302,8 +320,7 @@
                 <itemizedlist>
                     <listitem><para><emphasis>Ubuntu and Debian</emphasis>
                         <literallayout class='monospaced'>
-     $ sudo apt-get install &UBUNTU_HOST_PACKAGES_ESSENTIAL; \
-     libsdl1.2-dev xterm
+     $ sudo apt-get install &UBUNTU_HOST_PACKAGES_ESSENTIAL; libsdl1.2-dev xterm
                         </literallayout>
                         </para></listitem>
                     <listitem><para><emphasis>Fedora</emphasis>
@@ -313,22 +330,31 @@
                         </para></listitem>
                     <listitem><para><emphasis>OpenSUSE</emphasis>
                         <literallayout class='monospaced'>
-     $ sudo zypper install &OPENSUSE_HOST_PACKAGES_ESSENTIAL; \
-     libSDL-devel xterm
+     $ sudo zypper install &OPENSUSE_HOST_PACKAGES_ESSENTIAL; libSDL-devel xterm
                         </literallayout>
                         </para></listitem>
                     <listitem><para><emphasis>CentOS</emphasis>
                         <literallayout class='monospaced'>
-     $ sudo yum install &CENTOS_HOST_PACKAGES_ESSENTIAL; \
-     SDL-devel xterm
+     $ sudo yum install &CENTOS_HOST_PACKAGES_ESSENTIAL; SDL-devel xterm
                         </literallayout>
-                        <note>
-                            CentOS 6.x users need to ensure that the required
-                            versions of Git, tar and Python are available.
-                            For details, See the
-                            "<ulink url='&YOCTO_DOCS_REF_URL;#required-git-tar-and-python-versions'>Required Git, tar, and Python Versions</ulink>"
-                            section in the Yocto Project Reference Manual for
-                            information.
+                        <note><title>Notes</title>
+                            <itemizedlist>
+                                <listitem><para>
+                                    Extra Packages for Enterprise Linux
+                                    (i.e. <filename>epel-release</filename>)
+                                    is a collection of packages from Fedora
+                                    built on RHEL/CentOS for easy installation
+                                    of packages not included in enterprise
+                                    Linux by default.
+                                    You need to install these packages
+                                    separately.
+                                    </para></listitem>
+                                <listitem><para>
+                                    The <filename>makecache</filename> command
+                                    consumes additional Metadata from
+                                    <filename>epel-release</filename>.
+                                    </para></listitem>
+                            </itemizedlist>
                         </note>
                         </para></listitem>
                 </itemizedlist>
@@ -357,11 +383,12 @@
                 <literallayout class='monospaced'>
      $ git clone git://git.yoctoproject.org/poky
      Cloning into 'poky'...
-     remote: Counting objects: 226790, done.
-     remote: Compressing objects: 100% (57465/57465), done.
-     remote: Total 226790 (delta 165212), reused 225887 (delta 164327)
-     Receiving objects: 100% (226790/226790), 100.98 MiB | 263 KiB/s, done.
-     Resolving deltas: 100% (165212/165212), done.
+     remote: Counting objects: 361782, done.
+     remote: Compressing objects: 100% (87100/87100), done.
+     remote: Total 361782 (delta 268619), reused 361439 (delta 268277)
+     Receiving objects: 100% (361782/361782), 131.94 MiB | 6.88 MiB/s, done.
+     Resolving deltas: 100% (268619/268619), done.
+     Checking connectivity... done.
      $ git checkout &DISTRO_NAME_NO_CAP;
                 </literallayout>
                 You can also get the Yocto Project Files by downloading
@@ -569,14 +596,47 @@
                         <note>
                             Depending on the number of processors and cores, the
                             amount of RAM, the speed of your Internet connection
-                            and other factors, the build process could take several
-                            hours the first time you run it.
+                            and other factors, the build process could take
+                            several hours the first time you run it.
                             Subsequent builds run much faster since parts of the
                             build are cached.
                         </note>
                         <literallayout class='monospaced'>
      $ bitbake core-image-sato
                         </literallayout>
+                        <note>
+                            <para>
+                                If you experience a build error due to resources
+                                temporarily being unavailable and it appears you
+                                should not be having this issue, it might be due
+                                to the combination of a 4.3+ Linux kernel and
+                                <filename>systemd</filename> version 228+
+                                (i.e. see this
+                                <ulink url='http://unix.stackexchange.com/questions/253903/creating-threads-fails-with-resource-temporarily-unavailable-with-4-3-kernel'>link</ulink>
+                                for information).
+                            </para>
+
+                            <para>
+                                To work around this issue, you can try either
+                                of the following:
+                                <itemizedlist>
+                                    <listitem><para>
+                                        Try the build again.
+                                        </para></listitem>
+                                    <listitem><para>
+                                        Modify the "DefaultTasksMax"
+                                        <filename>systemd</filename> parameter
+                                        by uncommenting it and setting it to
+                                        "infinity".
+                                        You can find this parameter in the
+                                        <filename>system.conf</filename> file
+                                        located in
+                                        <filename>/etc/systemd</filename>
+                                        on most systems.
+                                        </para></listitem>
+                                </itemizedlist>
+                            </para>
+                        </note>
                         For information on using the
                         <filename>bitbake</filename> command, see the
                         "<ulink url='&YOCTO_DOCS_REF_URL;#usingpoky-components-bitbake'>BitBake</ulink>"
@@ -599,8 +659,8 @@
                         </para></listitem>
                     <listitem><para><emphasis>Exit QEMU:</emphasis>
                         Exit QEMU by either clicking on the shutdown icon or by
-                        opening a terminal, typing
-                        <filename>poweroff</filename>, and then pressing "Enter".
+                        typing <filename>Ctrl-C</filename> in the QEMU
+                        transcript window from which you evoked QEMU.
                         </para></listitem>
                 </orderedlist>
             </para>
@@ -639,11 +699,11 @@
      $ cd $HOME/poky
      $ git clone git://git.yoctoproject.org/meta-intel
      Cloning into 'meta-intel'...
-     remote: Counting objects: 11988, done.
-     remote: Compressing objects: 100% (3884/3884), done.
-     Receiving objects: 100% (11988/11988), 2.93 MiB | 2.51 MiB/s, done.
-     remote: Total 11988 (delta 6881), reused 11752 (delta 6645)
-     Resolving deltas: 100% (6881/6881), done.
+     remote: Counting objects: 14039, done.
+     remote: Compressing objects: 100% (4471/4471), done.
+     remote: Total 14039 (delta 8130), reused 13837 (delta 7947)
+     Receiving objects: 100% (14039/14039), 4.27 MiB | 3.98 MiB/s, done.
+     Resolving deltas: 100% (8130/8130), done.
      Checking connectivity... done.
                         </literallayout>
                         By default when you clone a Git repository, the
@@ -727,6 +787,39 @@
                         <literallayout class='monospaced'>
      $ bitbake core-image-base
                         </literallayout>
+                        <note>
+                            <para>
+                                If you experience a build error due to resources
+                                temporarily being unavailable and it appears you
+                                should not be having this issue, it might be due
+                                to the combination of a 4.3+ Linux kernel and
+                                <filename>systemd</filename> version 228+
+                                (i.e. see this
+                                <ulink url='http://unix.stackexchange.com/questions/253903/creating-threads-fails-with-resource-temporarily-unavailable-with-4-3-kernel'>link</ulink>
+                                for information).
+                            </para>
+
+                            <para>
+                                To work around this issue, you can try either
+                                of the following:
+                                <itemizedlist>
+                                    <listitem><para>
+                                        Try the build again.
+                                        </para></listitem>
+                                    <listitem><para>
+                                        Modify the "DefaultTasksMax"
+                                        <filename>systemd</filename> parameter
+                                        by uncommenting it and setting it to
+                                        "infinity".
+                                        You can find this parameter in the
+                                        <filename>system.conf</filename> file
+                                        located in
+                                        <filename>/etc/systemd</filename>
+                                        on most systems.
+                                        </para></listitem>
+                                </itemizedlist>
+                            </para>
+                        </note>
                         Once the build completes, the resulting console-only image
                         is located in the Build Directory here:
                         <literallayout class='monospaced'>

@@ -32,6 +32,7 @@ KERNEL_DEVICETREE ?= " \
     overlays/lirc-rpi.dtbo \
     overlays/pitft22.dtbo \
     overlays/pitft28-resistive.dtbo \
+    overlays/pitft35-resistive.dtbo \
     overlays/pps-gpio.dtbo \
     overlays/rpi-ft5406.dtbo \
     overlays/w1-gpio.dtbo \
@@ -52,7 +53,44 @@ MACHINE_EXTRA_RRECOMMENDS += " kernel-modules"
 # Set Raspberrypi splash image
 SPLASH = "psplash-raspberrypi"
 
-IMAGE_BOOT_FILES ?= "bcm2835-bootfiles/* ${KERNEL_IMAGETYPE};${SDIMG_KERNELIMAGE}"
+def make_dtb_boot_files(d):
+    # Generate IMAGE_BOOT_FILES entries for device tree files listed in
+    # KERNEL_DEVICETREE.
+    alldtbs = d.getVar('KERNEL_DEVICETREE')
+    imgtyp = d.getVar('KERNEL_IMAGETYPE')
+
+    def transform(dtb):
+        if dtb.endswith('dtb'):
+            # eg: whatever/bcm2708-rpi-b.dtb has:
+            #     DEPLOYDIR file: ${KERNEL_IMAGETYPE}-bcm2708-rpi-b.dtb
+            #     destination: bcm2708-rpi-b.dtb
+            base = os.path.basename(dtb)
+            src = '{}-{}'.format(imgtyp, base)
+            dst = base
+            return '{};{}'.format(src, dst)
+        elif dtb.endswith('dtbo'):
+            # overlay dtb:
+            # eg: overlays/hifiberry-amp.dtbo has:
+            #     DEPLOYDIR file: ${KERNEL_IMAGETYPE}-hifiberry-amp.dtbo
+            #     destination: overlays/hifiberry-amp.dtbo
+            base = os.path.basename(dtb)
+            src = '{}-{}'.format(imgtyp, base)
+            dst = dtb
+            return '{};{}'.format(src, dtb)
+
+    return ' '.join([transform(dtb) for dtb in alldtbs.split(' ') if dtb])
+
+
+IMAGE_BOOT_FILES ?= "bcm2835-bootfiles/* \
+                 ${@make_dtb_boot_files(d)} \
+                 ${@bb.utils.contains('KERNEL_IMAGETYPE', 'uImage', \
+                    '${KERNEL_IMAGETYPE} u-boot.bin;${SDIMG_KERNELIMAGE} boot.scr', \
+                    '${KERNEL_IMAGETYPE};${SDIMG_KERNELIMAGE}', d)} \
+                 "
+do_image_wic[depends] += " \
+    bcm2835-bootfiles:do_deploy \
+    ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot:do_deploy', '',d)} \
+    "
 
 # The kernel image is installed into the FAT32 boot partition and does not need
 # to also be installed into the rootfs.

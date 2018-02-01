@@ -17,18 +17,24 @@ RDEPENDS_${PN} += "\
     perl-module-vars "
 
 RDEPENDS_${PN}_class-native = "autoconf-native hostperl-runtime-native"
+RDEPENDS_${PN}_class-nativesdk = "nativesdk-autoconf"
 
-SRC_URI += " file://python-libdir.patch \
+SRC_URI += "file://python-libdir.patch \
             file://buildtest.patch \
             file://performance.patch \
             file://new_rt_path_for_test-driver.patch \
+            file://automake-replace-w-option-in-shebangs-with-modern-use-warnings.patch \
             file://0001-automake-port-to-Perl-5.22-and-later.patch \
             "
 
 SRC_URI[md5sum] = "716946a105ca228ab545fc37a70df3a3"
 SRC_URI[sha256sum] = "7946e945a96e28152ba5a6beb0625ca715c6e32ac55f2e353ef54def0c8ed924"
 
-CACHED_CONFIGUREVARS += "ac_cv_path_PERL=${USRBINPATH}/perl"
+PERL = "${USRBINPATH}/perl"
+PERL_class-native = "${USRBINPATH}/env perl"
+PERL_class-nativesdk = "${USRBINPATH}/env perl"
+
+CACHED_CONFIGUREVARS += "ac_cv_path_PERL='${PERL}'"
 
 do_install_append () {
     install -d ${D}${datadir}

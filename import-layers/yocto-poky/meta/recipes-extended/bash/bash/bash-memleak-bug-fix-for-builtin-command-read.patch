@@ -1,0 +1,35 @@
+From d3b6303a6853f612a56848ee4e59eaa0b0ab9489 Mon Sep 17 00:00:00 2001
+From: Zhang Xiao <xiao.zhang@windriver.com>
+Date: Tue, 21 Feb 2017 11:30:14 +0800
+Subject: [PATCH] bash: memleak bug fix for builtin command read
+
+Built in command "read" with "-e" use Readline to obtain the line
+in an interactive shell. In this process, a string "rlbuf" is
+just allocated without free operation thus cause memory leak. Fix it.
+
+Upstream-Status: Submitted [http://lists.gnu.org/archive/html/bug-bash/2017-02/msg00061.html]
+
+Signed-off-by: Zhang Xiao <xiao.zhang@windriver.com>
+---
+ builtins/read.def | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/builtins/read.def b/builtins/read.def
+index 4397154..ee0c5a6 100644
+--- a/builtins/read.def
++++ b/builtins/read.def
+@@ -674,6 +674,11 @@ add_char:
+   input_string[i] = '\0';
+   CHECK_ALRM;
+ 
++#if defined (READLINE)
++  if (edit)
++    xfree (rlbuf);
++#endif
++
+   if (retval < 0)
+     {
+       t_errno = errno;
+-- 
+1.9.1
+

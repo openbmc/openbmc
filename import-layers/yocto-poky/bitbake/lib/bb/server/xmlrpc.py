@@ -190,7 +190,7 @@ class BitBakeXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
         self.send_header("Content-type", "text/plain")
         self.send_header("Content-length", str(len(response)))
         self.end_headers()
-        self.wfile.write(response)
+        self.wfile.write(bytes(response, 'utf-8'))
 
 
 class XMLRPCProxyServer(BaseImplServer):

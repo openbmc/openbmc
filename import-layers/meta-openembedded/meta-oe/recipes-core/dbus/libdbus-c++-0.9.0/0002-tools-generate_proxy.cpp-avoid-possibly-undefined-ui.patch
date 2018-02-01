@@ -1,0 +1,58 @@
+From c673a76857cbe0ca82fa11aea9b70f94c3e5b041 Mon Sep 17 00:00:00 2001
+From: Peter Williams <peter@newton.cx>
+Date: Sat, 19 Dec 2015 21:08:46 -0500
+Subject: [PATCH] tools/generate_proxy.cpp: avoid possibly undefined 'uint'
+ type
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+Upstream-Status: Backport [https://github.com/andreas-volz/dbus-cplusplus/commit/43f119a2b3fe951c0f1d88cc61170d4c81a88880]
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ tools/generate_proxy.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tools/generate_proxy.cpp b/tools/generate_proxy.cpp
+index bf1094a..ebb75fa 100644
+--- a/tools/generate_proxy.cpp
++++ b/tools/generate_proxy.cpp
+@@ -352,7 +352,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
+         if (!arg_name.length())
+         {
+           arg_name = "argin";
+-          arg_name += toString <uint> (i);
++          arg_name += toString <unsigned int> (i);
+         }
+ 
+         // generate extra code to wrap object
+@@ -445,7 +445,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
+ 
+           if (!arg_name.length())
+           {
+-            arg_name = "argout" + toString <uint> (i);
++            arg_name = "argout" + toString <unsigned int> (i);
+           }
+ 
+           if (arg_object.length())
+@@ -569,7 +569,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
+         // use a default if no arg name given
+         if (!arg_name.length())
+         {
+-          arg_name = "arg" + toString <uint> (i);
++          arg_name = "arg" + toString <unsigned int> (i);
+         }
+ 
+         body << arg_name << ";" << endl;
+@@ -605,7 +605,7 @@ void generate_proxy(Xml::Document &doc, const char *filename)
+ 
+         if (!arg_name.length())
+         {
+-          arg_name = "arg" + toString <uint> (j);
++          arg_name = "arg" + toString <unsigned int> (j);
+         }
+ 
+         if (arg_object.length())
+-- 
+2.10.2
+

@@ -23,6 +23,7 @@ import sys
 import subprocess
 import logging
 import re
+import codecs
 
 logger = logging.getLogger('devtool')
 
@@ -67,10 +68,10 @@ def exec_watch(cmd, **options):
         cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **options
     )
 
+    reader = codecs.getreader('utf-8')(process.stdout)
     buf = ''
     while True:
-        out = process.stdout.read(1)
-        out = out.decode('utf-8')
+        out = reader.read(1, 1)
         if out:
             sys.stdout.write(out)
             sys.stdout.flush()
@@ -86,13 +87,13 @@ def exec_watch(cmd, **options):
 def exec_fakeroot(d, cmd, **kwargs):
     """Run a command under fakeroot (pseudo, in fact) so that it picks up the appropriate file permissions"""
     # Grab the command and check it actually exists
-    fakerootcmd = d.getVar('FAKEROOTCMD', True)
+    fakerootcmd = d.getVar('FAKEROOTCMD')
     if not os.path.exists(fakerootcmd):
         logger.error('pseudo executable %s could not be found - have you run a build yet? pseudo-native should install this and if you have run any build then that should have been built')
         return 2
     # Set up the appropriate environment
     newenv = dict(os.environ)
-    fakerootenv = d.getVar('FAKEROOTENV', True)
+    fakerootenv = d.getVar('FAKEROOTENV')
     for varvalue in fakerootenv.split():
         if '=' in varvalue:
             splitval = varvalue.split('=', 1)
@@ -113,40 +114,40 @@ def setup_tinfoil(config_only=False, basepath=None, tracking=False):
 
         import bb.tinfoil
         tinfoil = bb.tinfoil.Tinfoil(tracking=tracking)
-        tinfoil.prepare(config_only)
-        tinfoil.logger.setLevel(logger.getEffectiveLevel())
+        try:
+            tinfoil.prepare(config_only)
+            tinfoil.logger.setLevel(logger.getEffectiveLevel())
+        except bb.tinfoil.TinfoilUIException:
+            tinfoil.shutdown()
+            raise DevtoolError('Failed to start bitbake environment')
+        except:
+            tinfoil.shutdown()
+            raise
     finally:
         os.chdir(orig_cwd)
     return tinfoil
 
-def get_recipe_file(cooker, pn):
-    """Find recipe file corresponding a package name"""
-    import oe.recipeutils
-    recipefile = oe.recipeutils.pn_to_recipe(cooker, pn)
-    if not recipefile:
-        skipreasons = oe.recipeutils.get_unavailable_reasons(cooker, pn)
-        if skipreasons:
-            logger.error('\n'.join(skipreasons))
-        else:
-            logger.error("Unable to find any recipe file matching %s" % pn)
-    return recipefile
-
 def parse_recipe(config, tinfoil, pn, appends, filter_workspace=True):
-    """Parse recipe of a package"""
-    import oe.recipeutils
-    recipefile = get_recipe_file(tinfoil.cooker, pn)
-    if not recipefile:
-        # Error already logged
+    """Parse the specified recipe"""
+    try:
+        recipefile = tinfoil.get_recipe_file(pn)
+    except bb.providers.NoProvider as e:
+        logger.error(str(e))
         return None
     if appends:
-        append_files = tinfoil.cooker.collection.get_file_appends(recipefile)
+        append_files = tinfoil.get_file_appends(recipefile)
         if filter_workspace:
             # Filter out appends from the workspace
             append_files = [path for path in append_files if
                             not path.startswith(config.workspace_path)]
     else:
         append_files = None
-    return oe.recipeutils.parse_recipe(tinfoil.cooker, recipefile, append_files)
+    try:
+        rd = tinfoil.parse_recipe_file(recipefile, appends, append_files)
+    except Exception as e:
+        logger.error(str(e))
+        return None
+    return rd
 
 def check_workspace_recipe(workspace, pn, checksrc=True, bbclassextend=False):
     """
@@ -190,7 +191,7 @@ def use_external_build(same_dir, no_same_dir, d):
         logger.info('Using source tree as build directory since --same-dir specified')
     elif bb.data.inherits_class('autotools-brokensep', d):
         logger.info('Using source tree as build directory since recipe inherits autotools-brokensep')
-    elif d.getVar('B', True) == os.path.abspath(d.getVar('S', True)):
+    elif d.getVar('B') == os.path.abspath(d.getVar('S')):
         logger.info('Using source tree as build directory since that would be the default for this recipe')
     else:
         b_is_s = False
@@ -260,23 +261,28 @@ def get_bbclassextend_targets(recipefile, pn):
                 targets.append('%s-%s' % (pn, variant))
     return targets
 
-def ensure_npm(config, basepath, fixed_setup=False):
+def ensure_npm(config, basepath, fixed_setup=False, check_exists=True):
     """
     Ensure that npm is available and either build it or show a
     reasonable error message
     """
-    tinfoil = setup_tinfoil(config_only=True, basepath=basepath)
-    try:
-        nativepath = tinfoil.config_data.getVar('STAGING_BINDIR_NATIVE', True)
-    finally:
-        tinfoil.shutdown()
+    if check_exists:
+        tinfoil = setup_tinfoil(config_only=False, basepath=basepath)
+        try:
+            rd = tinfoil.parse_recipe('nodejs-native')
+            nativepath = rd.getVar('STAGING_BINDIR_NATIVE')
+        finally:
+            tinfoil.shutdown()
+        npmpath = os.path.join(nativepath, 'npm')
+        build_npm = not os.path.exists(npmpath)
+    else:
+        build_npm = True
 
-    npmpath = os.path.join(nativepath, 'npm')
-    if not os.path.exists(npmpath):
+    if build_npm:
         logger.info('Building nodejs-native')
         try:
             exec_build_env_command(config.init_path, basepath,
-                                'bitbake -q nodejs-native', watch=True)
+                                'bitbake -q nodejs-native -c addto_recipe_sysroot', watch=True)
         except bb.process.ExecutionError as e:
             if "Nothing PROVIDES 'nodejs-native'" in e.stdout:
                 if fixed_setup:
@@ -286,5 +292,3 @@ def ensure_npm(config, basepath, fixed_setup=False):
                 raise DevtoolError(msg)
             else:
                 raise
-        if not os.path.exists(npmpath):
-            raise DevtoolError('Built nodejs-native but npm binary still could not be found at %s' % npmpath)

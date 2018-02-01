@@ -1,0 +1,29 @@
+From 4313ced1320594013795f11f6db00381e3f4cc45 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 26 Jan 2017 16:25:47 +0200
+Subject: [PATCH] Do not hardcode /etc and systemd unit directories
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6a319935..db20ccd4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -7,8 +7,8 @@ if (NOT PYTHON_DESIRED)
+     set (PYTHON_DESIRED "2")
+ endif()
+ 
+-SET( SYSCONFDIR /etc)
+-SET( SYSTEMD_DIR /usr/lib/systemd/system)
++SET( SYSCONFDIR ${CMAKE_INSTALL_SYSCONFDIR})
++SET( SYSTEMD_DIR $ENV{systemd_system_unitdir})
+ 
+ if (${PYTHON_DESIRED} STREQUAL "2")
+ 	FIND_PACKAGE (PythonInterp REQUIRED)
+-- 
+2.11.0
+

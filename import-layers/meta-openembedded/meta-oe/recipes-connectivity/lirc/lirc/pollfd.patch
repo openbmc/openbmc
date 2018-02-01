@@ -1,0 +1,101 @@
+Index: lirc-0.9.4d/daemons/lircrcd.cpp
+===================================================================
+--- lirc-0.9.4d.orig/daemons/lircrcd.cpp
++++ lirc-0.9.4d/daemons/lircrcd.cpp
+@@ -29,10 +29,12 @@
+ #include <sys/un.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
++#include <poll.h>
+ #include <syslog.h>
+ 
+ #include "lirc_client.h"
+ #include "lirc/lirc_log.h"
++#include "lirc/curl_poll.h"
+ 
+ #define MAX_CLIENTS 100
+ #define WHITE_SPACE " \t"
+Index: lirc-0.9.4d/lib/curl_poll.c
+===================================================================
+--- lirc-0.9.4d.orig/lib/curl_poll.c
++++ lirc-0.9.4d/lib/curl_poll.c
+@@ -36,6 +36,7 @@
+ #include <stdlib.h>
+ #include <sys/time.h>
+ #include <sys/types.h>
++#include <sys/poll.h>
+ 
+ #include "lirc_log.h"
+ #include "curl_poll.h"
+@@ -67,7 +68,7 @@ static const logchannel_t logchannel = L
+ 
+ #ifdef HAVE_POLL_FINE
+ 
+-int curl_poll(struct pollfd ufds[], unsigned int nfds, int timeout_ms)
++int curl_poll(struct pollfd *ufds, unsigned int nfds, int timeout_ms)
+ {
+ 	return poll(ufds, nfds, timeout_ms);
+ }
+@@ -112,7 +113,7 @@ static int verify_sock(int s)
+ }
+ 
+ 
+-int curl_poll(struct pollfd ufds[], unsigned int nfds, int timeout_ms)
++int curl_poll(struct pollfd *ufds, unsigned int nfds, int timeout_ms)
+ {
+ 	struct timeval pending_tv;
+ 	struct timeval* ptimeout;
+Index: lirc-0.9.4d/lib/curl_poll.h
+===================================================================
+--- lirc-0.9.4d.orig/lib/curl_poll.h
++++ lirc-0.9.4d/lib/curl_poll.h
+@@ -1,5 +1,5 @@
+-#ifndef _POLL_H
+-#define _POLL_H
++#ifndef _LIB_CURL_POLL_H
++#define _LIB_CURL_POLL_H
+ /***************************************************************************
+  *                                  _   _ ____  _
+  *  Project                     ___| | | |  _ \| |
+@@ -29,13 +29,9 @@
+ extern "C" {
+ #endif
+ 
+-#ifdef HAVE_SYS_POLL_H
+-#include <sys/poll.h>
+-#else
+ #include <poll.h>
+-#endif
+ 
+-int curl_poll(struct pollfd ufds[], unsigned int nfds, int timeout_ms);
++int curl_poll(struct pollfd *ufds, unsigned int nfds, int timeout_ms);
+ 
+ #ifdef __cplusplus
+ }
+Index: lirc-0.9.4d/lib/lirc/curl_poll.h
+===================================================================
+--- lirc-0.9.4d.orig/lib/lirc/curl_poll.h
++++ lirc-0.9.4d/lib/lirc/curl_poll.h
+@@ -1,5 +1,5 @@
+-#ifndef _POLL_H
+-#define _POLL_H
++#ifndef _LIRC_CURL_POLL_H
++#define _LIRC_CURL_POLL_H
+ /***************************************************************************
+  *                                  _   _ ____  _
+  *  Project                     ___| | | |  _ \| |
+@@ -29,13 +29,9 @@
+ extern "C" {
+ #endif
+ 
+-#ifdef HAVE_SYS_POLL_H
+-#include <sys/poll.h>
+-#else
+ #include <poll.h>
+-#endif
+ 
+-int curl_poll(struct pollfd ufds[], unsigned int nfds, int timeout_ms);
++int curl_poll(struct pollfd *ufds, unsigned int nfds, int timeout_ms);
+ 
+ #ifdef __cplusplus
+ }

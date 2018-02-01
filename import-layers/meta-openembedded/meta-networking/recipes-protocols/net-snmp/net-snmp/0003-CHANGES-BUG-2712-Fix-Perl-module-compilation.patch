@@ -1,0 +1,186 @@
+From e57fc809ad6ae522670f3dc157aadde20d968ca7 Mon Sep 17 00:00:00 2001
+From: Bart Van Assche <bvanassche@acm.org>
+Date: Wed, 24 May 2017 17:05:03 +0800
+Subject: [PATCH 3/4] CHANGES: BUG: 2712: Fix Perl module compilation
+
+Avoid that building the Net-SNMP Perl modules fails as follows:
+
+ERROR from evaluation of /sources/net-snmp-5.7.3/perl/ASN/Makefile.PL: Bizarre \ copy of HASH in list assignment at /usr/lib/perl5/site_perl/5.24.0/Carp.pm line\ 229.
+
+See also https://sourceforge.net/p/net-snmp/bugs/2712/.
+
+This patch comes from git://git.code.sf.net/p/net-snmp/code,
+the commit is 4e793461e96a2b4fd81142ab312d074d5c8841fa.
+
+Signed-off-by: Wenlin Kang <wenlin.kang@windriver.com>
+---
+ perl/ASN/Makefile.PL                 | 4 +---
+ perl/Makefile.PL                     | 4 +---
+ perl/OID/Makefile.PL                 | 5 +----
+ perl/SNMP/Makefile.PL                | 5 +----
+ perl/TrapReceiver/Makefile.PL        | 5 +----
+ perl/agent/Makefile.PL               | 5 +----
+ perl/agent/Support/Makefile.PL       | 5 +----
+ perl/agent/default_store/Makefile.PL | 5 +----
+ perl/default_store/Makefile.PL       | 5 +----
+ 9 files changed, 9 insertions(+), 34 deletions(-)
+
+diff --git a/perl/ASN/Makefile.PL b/perl/ASN/Makefile.PL
+index 4576781..c33d8ba 100644
+--- a/perl/ASN/Makefile.PL
++++ b/perl/ASN/Makefile.PL
+@@ -7,9 +7,7 @@ my $lib_version;
+ # See lib/ExtUtils/MakeMaker.pm for details of how to influence
+ # the contents of the Makefile that is written.
+ 
+-%MakeParams = InitMakeParams();
+-
+-WriteMakefile(%MakeParams);
++WriteMakefile(InitMakeParams());
+ 
+ Check_Version();
+ 
+diff --git a/perl/Makefile.PL b/perl/Makefile.PL
+index 31fdc40..48aba2a 100644
+--- a/perl/Makefile.PL
++++ b/perl/Makefile.PL
+@@ -3,9 +3,7 @@ use Config;
+ use Getopt::Long;
+ require 5;
+ 
+-%MakeParams = InitMakeParams();
+-
+-WriteMakefile(%MakeParams);
++WriteMakefile(InitMakeParams());
+ 
+ sub InitMakeParams {
+     $nsconfig="net-snmp-config"; # in path by default
+diff --git a/perl/OID/Makefile.PL b/perl/OID/Makefile.PL
+index 6bb1616..2589985 100644
+--- a/perl/OID/Makefile.PL
++++ b/perl/OID/Makefile.PL
+@@ -6,11 +6,8 @@ require 5;
+ use Config;
+ use Getopt::Long;
+ my $lib_version;
+-my %MakeParams = ();
+ 
+-%MakeParams = InitMakeParams();
+-
+-WriteMakefile(%MakeParams);
++WriteMakefile(InitMakeParams());
+ 
+ Check_Version();
+ 
+diff --git a/perl/SNMP/Makefile.PL b/perl/SNMP/Makefile.PL
+index e617cb7..8aab9a9 100644
+--- a/perl/SNMP/Makefile.PL
++++ b/perl/SNMP/Makefile.PL
+@@ -3,15 +3,12 @@ require 5;
+ use Config;
+ use Getopt::Long;
+ my $lib_version;
+-my %MakeParams = ();
+ my $opts;
+ 
+ # See lib/ExtUtils/MakeMaker.pm for details of how to influence
+ # the contents of the Makefile that is written.
+ 
+-%MakeParams = InitMakeParams();
+-
+-WriteMakefile(%MakeParams);
++WriteMakefile(InitMakeParams());
+ 
+ Check_Version();
+ 
+diff --git a/perl/TrapReceiver/Makefile.PL b/perl/TrapReceiver/Makefile.PL
+index 874ee21..7e9e58e 100644
+--- a/perl/TrapReceiver/Makefile.PL
++++ b/perl/TrapReceiver/Makefile.PL
+@@ -3,11 +3,8 @@ require 5;
+ use Config;
+ use Getopt::Long;
+ my $lib_version;
+-my %MakeParams = ();
+ 
+-%MakeParams = InitMakeParams();
+-
+-WriteMakefile(%MakeParams);
++WriteMakefile(InitMakeParams());
+ 
+ Check_Version();
+ 
+diff --git a/perl/agent/Makefile.PL b/perl/agent/Makefile.PL
+index 4f7bee3..003c0d1 100644
+--- a/perl/agent/Makefile.PL
++++ b/perl/agent/Makefile.PL
+@@ -3,11 +3,8 @@ require 5;
+ use Config;
+ use Getopt::Long;
+ my $lib_version;
+-my %MakeParams = ();
+ 
+-%MakeParams = InitMakeParams();
+-
+-WriteMakefile(%MakeParams);
++WriteMakefile(InitMakeParams());
+ 
+ Check_Version();
+ 
+diff --git a/perl/agent/Support/Makefile.PL b/perl/agent/Support/Makefile.PL
+index 48815b6..2325e10 100644
+--- a/perl/agent/Support/Makefile.PL
++++ b/perl/agent/Support/Makefile.PL
+@@ -3,14 +3,11 @@ require 5;
+ use Config;
+ use Getopt::Long;
+ my $lib_version;
+-my %MakeParams = ();
+ 
+ # See lib/ExtUtils/MakeMaker.pm for details of how to influence
+ # the contents of the Makefile that is written.
+ 
+-%MakeParams = InitMakeParams();
+-
+-WriteMakefile(%MakeParams);
++WriteMakefile(InitMakeParams());
+ 
+ Check_Version();
+ 
+diff --git a/perl/agent/default_store/Makefile.PL b/perl/agent/default_store/Makefile.PL
+index ed6483a..31cfbee 100644
+--- a/perl/agent/default_store/Makefile.PL
++++ b/perl/agent/default_store/Makefile.PL
+@@ -3,11 +3,8 @@ require 5;
+ use Config;
+ use Getopt::Long;
+ my $lib_version;
+-my %MakeParams = ();
+ 
+-%MakeParams = InitMakeParams();
+-
+-WriteMakefile(%MakeParams);
++WriteMakefile(InitMakeParams());
+ 
+ Check_Version();
+ 
+diff --git a/perl/default_store/Makefile.PL b/perl/default_store/Makefile.PL
+index 7c671b8..01c8dd0 100644
+--- a/perl/default_store/Makefile.PL
++++ b/perl/default_store/Makefile.PL
+@@ -3,11 +3,8 @@ require 5;
+ use Config;
+ use Getopt::Long;
+ my $lib_version;
+-my %MakeParams = ();
+ 
+-%MakeParams = InitMakeParams();
+-
+-WriteMakefile(%MakeParams);
++WriteMakefile(InitMakeParams());
+ 
+ 
+ sub InitMakeParams {
+-- 
+1.9.1
+

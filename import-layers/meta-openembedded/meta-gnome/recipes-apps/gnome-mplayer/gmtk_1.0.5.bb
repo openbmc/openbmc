@@ -14,3 +14,5 @@ SRC_URI[sha256sum] = "a07130d62719e8c1244f8405dd97445798df5204fc0f3f2f2b669b1251
 EXTRA_OECONF = "--disable-gconf --with-gio --with-alsa --enable-keystore"
 
 inherit gettext pkgconfig autotools gconf
+
+PNBLACKLIST[gmtk] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130661/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

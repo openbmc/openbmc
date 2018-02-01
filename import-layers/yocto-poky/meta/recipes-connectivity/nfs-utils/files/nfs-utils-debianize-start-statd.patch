@@ -9,17 +9,18 @@ Signed-off-by: Li Wang <li.wang@windriver.com>
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ---
- utils/statd/start-statd | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ utils/statd/start-statd | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/utils/statd/start-statd b/utils/statd/start-statd
-index ec9383b..3969b8c 100755
+index 2fd6039..f591b34 100755
 --- a/utils/statd/start-statd
 +++ b/utils/statd/start-statd
-@@ -6,6 +6,13 @@
- # site.
- PATH="/sbin:/usr/sbin:/bin:/usr/bin"
- 
+@@ -17,6 +17,14 @@ then
+     # statd already running - must have been slow to respond.
+     exit 0
+ fi
++
 +# Read config
 +DEFAULTFILE=/etc/default/nfs-common
 +NEED_IDMAPD=
@@ -28,14 +29,14 @@ index ec9383b..3969b8c 100755
 +fi
 +
  # First try systemd if it's installed.
- if systemctl --help >/dev/null 2>&1; then
+ if [ -d /run/systemd/system ]; then
      # Quit only if the call worked.
-@@ -13,4 +20,4 @@ if systemctl --help >/dev/null 2>&1; then
- fi
+@@ -25,4 +33,4 @@ fi
  
+ cd /
  # Fall back to launching it ourselves.
 -exec rpc.statd --no-notify
 +exec rpc.statd --no-notify $STATDOPTS
 -- 
-1.9.1
+2.6.6
 

@@ -158,11 +158,19 @@
                     Toaster, which is a web interface to the Yocto Project's
                     <link linkend='build-system-term'>OpenEmbedded Build System</link>.
                     </para></listitem>
+<!--
                 <listitem><para><emphasis>
                     <ulink url='http://www.youtube.com/watch?v=3ZlOu-gLsh0'>
                     Eclipse IDE Yocto Plug-in</ulink>:</emphasis>
                     A step-by-step instructional video that
                     demonstrates how an application developer uses Yocto Plug-in features within
+                    the Eclipse IDE.
+                    </para></listitem>
+-->
+                <listitem><para><emphasis>
+                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-appendix-latest-yp-eclipse-plug-in'>Eclipse IDE Yocto Plug-in</ulink>:</emphasis>
+                    Instructions that demonstrate how an application developer
+                    uses the Eclipse Yocto Project Plug-in feature within
                     the Eclipse IDE.
                     </para></listitem>
                 <listitem><para><emphasis>

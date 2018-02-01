@@ -13,24 +13,24 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  gst-libs/gst/mpegts/Makefile.am    | 2 +-
  3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/gst-libs/gst/gl/Makefile.am b/gst-libs/gst/gl/Makefile.am
-index f968357..7cc2c7a 100644
---- a/gst-libs/gst/gl/Makefile.am
-+++ b/gst-libs/gst/gl/Makefile.am
-@@ -167,7 +167,7 @@ GstGL-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstgl-@GST_API_VERSION@
- 		--library=libgstgl-@GST_API_VERSION@.la \
+Index: gst-plugins-bad-1.10.1/gst-libs/gst/gl/Makefile.am
+===================================================================
+--- gst-plugins-bad-1.10.1.orig/gst-libs/gst/gl/Makefile.am
++++ gst-plugins-bad-1.10.1/gst-libs/gst/gl/Makefile.am
+@@ -171,7 +171,7 @@ GstGL-@GST_API_VERSION@.gir: $(INTROSPEC
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
+ 		--include=GstVideo-@GST_API_VERSION@ \
 -		--libtool="$(top_builddir)/libtool" \
 +		--libtool="$(LIBTOOL)" \
  		--pkg gstreamer-@GST_API_VERSION@ \
  		--pkg gstreamer-base-@GST_API_VERSION@ \
  		--pkg gstreamer-video-@GST_API_VERSION@ \
-diff --git a/gst-libs/gst/insertbin/Makefile.am b/gst-libs/gst/insertbin/Makefile.am
-index 09eb97c..b746885 100644
---- a/gst-libs/gst/insertbin/Makefile.am
-+++ b/gst-libs/gst/insertbin/Makefile.am
-@@ -44,7 +44,7 @@ GstInsertBin-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstinsertbin-@GS
+Index: gst-plugins-bad-1.10.1/gst-libs/gst/insertbin/Makefile.am
+===================================================================
+--- gst-plugins-bad-1.10.1.orig/gst-libs/gst/insertbin/Makefile.am
++++ gst-plugins-bad-1.10.1/gst-libs/gst/insertbin/Makefile.am
+@@ -45,7 +45,7 @@ GstInsertBin-@GST_API_VERSION@.gir: $(IN
  		--library=libgstinsertbin-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
@@ -39,11 +39,11 @@ index 09eb97c..b746885 100644
  		--pkg gstreamer-@GST_API_VERSION@ \
  		--pkg gstreamer-base-@GST_API_VERSION@ \
  		--pkg-export gstreamer-insertbin-@GST_API_VERSION@ \
-diff --git a/gst-libs/gst/mpegts/Makefile.am b/gst-libs/gst/mpegts/Makefile.am
-index 2511d49..c1cbce6 100644
---- a/gst-libs/gst/mpegts/Makefile.am
-+++ b/gst-libs/gst/mpegts/Makefile.am
-@@ -78,7 +78,7 @@ GstMpegts-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstmpegts-@GST_API_
+Index: gst-plugins-bad-1.10.1/gst-libs/gst/mpegts/Makefile.am
+===================================================================
+--- gst-plugins-bad-1.10.1.orig/gst-libs/gst/mpegts/Makefile.am
++++ gst-plugins-bad-1.10.1/gst-libs/gst/mpegts/Makefile.am
+@@ -79,7 +79,7 @@ GstMpegts-@GST_API_VERSION@.gir: $(INTRO
  		--add-include-path=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-video-@GST_API_VERSION@` \
  		--library=libgstmpegts-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
@@ -52,6 +52,3 @@ index 2511d49..c1cbce6 100644
  		--pkg gstreamer-@GST_API_VERSION@ \
  		--pkg gstreamer-video-@GST_API_VERSION@ \
  		--pkg-export gstreamer-mpegts-@GST_API_VERSION@ \
--- 
-2.6.2
-

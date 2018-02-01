@@ -1,0 +1,50 @@
+From 94d1ca0266a0f9c0446f1299b54f752e87b8a695 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 3 Mar 2017 22:24:17 +0100
+Subject: [PATCH] explicitly link libapr against phtread to make gold happy on
+ test
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_mutexattr_init'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_mutexattr_settype'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_mutexattr_destroy'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_mutex_trylock'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_attr_setstacksize'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_create'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_join'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_detach'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_sigmask'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_once'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_key_create'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_getspecific'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_key_delete'
+| ../.libs/libapr-1.so: error: undefined reference to 'pthread_setspecific'
+| collect2: error: ld returned 1 exit status
+| Makefile:114: recipe for target 'globalmutexchild' failed
+| make[1]: *** [globalmutexchild] Error 1
+| make[1]: Leaving directory '/home/superandy/tmp/oe-core-glibc/work/cortexa7t2hf-neon-vfpv4-angstrom-linux-gnueabi/apr/1.5.2-r0/apr-1.5.2/test'
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.in b/configure.in
+index 5b19940..cdf4d58 100644
+--- a/configure.in
++++ b/configure.in
+@@ -766,6 +766,7 @@ else
+           APR_PTHREADS_CHECK_RESTORE ] )
+     fi
+     if test "$pthreadh" = "1"; then
++        APR_ADDTO(LIBS,[-lpthread])
+         APR_CHECK_PTHREAD_GETSPECIFIC_TWO_ARGS
+         APR_CHECK_PTHREAD_ATTR_GETDETACHSTATE_ONE_ARG
+         APR_CHECK_PTHREAD_RECURSIVE_MUTEX
+-- 
+2.9.3
+

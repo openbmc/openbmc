@@ -8,6 +8,11 @@ inherit autotools pkgconfig
 inherit obmc-phosphor-systemd
 
 DEPENDS += "autoconf-archive-native"
+
+# Drop gnome-common-native if AX_CODE_COVERAGE ever comes back to
+# autoconf-archive upstream.
+DEPENDS += "gnome-common-native"
+
 DEPENDS += "systemd"
 DEPENDS += "phosphor-logging"
 RDEPENDS_${PN} += "libsystemd"

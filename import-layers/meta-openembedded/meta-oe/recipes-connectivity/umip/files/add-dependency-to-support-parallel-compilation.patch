@@ -1,0 +1,23 @@
+When "make -j10", the compilation will fail,
+because scan.c has included gram.h, but gram.h was produced
+after scan.c was compiled
+
+So add this dependency to ensure that gram.h is produced
+before scan.c is produced.
+
+Upstream-Status: Inappropriate [upstream is not active]
+
+Signed-off-by: Roy.Li <RongQing.Li@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ src/Makefile.am |    2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -81,3 +81,5 @@ CLEANFILES = gram.c gram.h \
+ 
+ DISTCLEANFILES = $(BUILT_SOURCES)
+ MAINTAINERCLEANFILES = Makefile.in
++
++scan.c: gram.h

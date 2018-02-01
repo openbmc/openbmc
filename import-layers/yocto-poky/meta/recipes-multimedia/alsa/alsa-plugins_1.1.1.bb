@@ -31,7 +31,7 @@ inherit autotools pkgconfig
 PACKAGECONFIG ??= "\
         samplerate \
         speexdsp \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio', '', d)} \
+        ${@bb.utils.filter('DISTRO_FEATURES', 'pulseaudio', d)} \
 "
 PACKAGECONFIG[avcodec] = "--enable-avcodec,--disable-avcodec,libav"
 PACKAGECONFIG[jack] = "--enable-jack,--disable-jack,jack"
@@ -59,7 +59,7 @@ do_install_append() {
 }
 
 python populate_packages_prepend() {
-    plugindir = bb.data.expand('${libdir}/alsa-lib/', d)
+    plugindir = d.expand('${libdir}/alsa-lib/')
     packages = " ".join(do_split_packages(d, plugindir, '^libasound_module_(.*)\.so$', 'libasound-module-%s', 'Alsa plugin for %s', extra_depends=''))
     d.setVar("RDEPENDS_alsa-plugins", packages)
 }

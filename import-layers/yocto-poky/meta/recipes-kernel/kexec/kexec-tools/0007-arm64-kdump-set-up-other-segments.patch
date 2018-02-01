@@ -1,0 +1,35 @@
+From 07ad14e12665221d754fde8e47c32ac18c24586a Mon Sep 17 00:00:00 2001
+From: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Date: Fri, 31 Jul 2015 20:01:39 +0900
+Subject: [PATCH 7/9] arm64: kdump: set up other segments
+
+We make sure that all the other segments, initrd and device-tree blob,
+also be loaded into the reserved memory of crash dump kernel.
+
+Upstream-Status: Backport [https://git.linaro.org/people/takahiro.akashi/kexec-tools.git]
+
+Signed-off-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ kexec/arch/arm64/kexec-arm64.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/kexec/arch/arm64/kexec-arm64.c b/kexec/arch/arm64/kexec-arm64.c
+index cec4e41..78a0035 100644
+--- a/kexec/arch/arm64/kexec-arm64.c
++++ b/kexec/arch/arm64/kexec-arm64.c
+@@ -374,7 +374,10 @@ int arm64_load_other_segments(struct kexec_info *info,
+ 	/* Put the other segments after the image. */
+ 
+ 	hole_min = image_base + arm64_mem.image_size;
+-	hole_max = ULONG_MAX;
++	if (info->kexec_flags & KEXEC_ON_CRASH)
++		hole_max = crash_reserved_mem.end;
++	else
++		hole_max = ULONG_MAX;
+ 
+ 	if (arm64_opts.initrd) {
+ 		initrd_buf = slurp_file(arm64_opts.initrd, &initrd_size);
+-- 
+1.9.1
+

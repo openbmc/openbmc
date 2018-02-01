@@ -1,0 +1,32 @@
+From 906d95695af95970bf551ea55b6c3e70332c6b97 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Nov 2016 05:22:32 +0000
+Subject: [PATCH] disable varargs warning on clang
+
+The issue is that 'len' is an unsigned char and we violate the promotion rules
+for passing the value to va_start.
+
+passing an object that undergoes defau
+lt argument promotion to 'va_start' has undefined behavior [-Wvarargs]
+|   va_start(ap, len);
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile b/Makefile
+index 8c5e380..f41ef1a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -53,6 +53,7 @@ ifeq ($(COMPILER), clang)
+ CFLAGS  += -Wno-microsoft -Qunused-arguments -Wno-unused-function
+ CFLAGS  += -Wno-unused-value -Wno-tautological-constant-out-of-range-compare
+ CFLAGS  += -Wno-parentheses-equality -Wno-incompatible-pointer-types
++CFLAGS  += -Wno-error=varargs
+ endif
+ 
+ ifeq ($(CONFIG_LIBFFMPEG_STATIC),yes)
+-- 
+1.9.1
+

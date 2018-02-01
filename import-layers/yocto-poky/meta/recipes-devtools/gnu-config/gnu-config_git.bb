@@ -11,7 +11,7 @@ INHIBIT_DEFAULT_DEPS = "1"
 SRCREV = "b576fa87c140b824466ef1638e945e87dc5c0343"
 PV = "20150728+git${SRCPV}"
 
-SRC_URI = "git://git.sv.gnu.org/config.git \
+SRC_URI = "git://git.savannah.gnu.org/config.git \
            file://gnu-configize.in"
 
 S = "${WORKDIR}/git"

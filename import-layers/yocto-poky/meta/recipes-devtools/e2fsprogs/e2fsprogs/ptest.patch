@@ -1,5 +1,5 @@
 diff --git a/tests/Makefile.in b/tests/Makefile.in
-index 60cf655..ce220f1 100644
+index c130f4a..d2ade03 100644
 --- a/tests/Makefile.in
 +++ b/tests/Makefile.in
 @@ -18,7 +18,7 @@ test_one: $(srcdir)/test_one.in Makefile mke2fs.conf
@@ -7,21 +7,21 @@ index 60cf655..ce220f1 100644
  	@echo "HTREE=y" >> test_one
  	@echo "QUOTA=y" >> test_one
 -	@echo "SRCDIR=@srcdir@" >> test_one
-+	@echo "SRCDIR=/usr/lib/e2fsprogs/ptest/test" >> test_one
++	@echo "SRCDIR=${prefix}${libdir}/e2fsprogs/ptest/test" >> test_one
  	@echo "DIFF_OPTS=@UNI_DIFF_OPTS@" >> test_one
+ 	@echo "SIZEOF_TIME_T=@SIZEOF_TIME_T@" >> test_one
  	@cat $(srcdir)/test_one.in >> test_one
- 	@chmod +x test_one
-@@ -26,7 +26,7 @@ test_one: $(srcdir)/test_one.in Makefile mke2fs.conf
+@@ -27,7 +27,7 @@ test_one: $(srcdir)/test_one.in Makefile mke2fs.conf
  test_script: test_one test_script.in Makefile mke2fs.conf
  	@echo "Creating test_script..."
  	@echo "#!/bin/sh" > test_script
 -	@echo "SRCDIR=@srcdir@" >> test_script
-+	@echo "SRCDIR=/usr/lib/e2fsprogs/ptest/test" >> test_script
++	@echo "SRCDIR=${prefix}${libdir}/e2fsprogs/ptest/test" >> test_script
  	@cat $(srcdir)/test_script.in >> test_script
  	@chmod +x test_script
  
 diff --git a/tests/test_config b/tests/test_config
-index 7f39157..c815a44 100644
+index 547ef4c..e11e6f4 100644
 --- a/tests/test_config
 +++ b/tests/test_config
 @@ -3,24 +3,24 @@
@@ -65,3 +65,16 @@ index 7f39157..c815a44 100644
  CLEAN_OUTPUT="sed -f $cmd_dir/filter.sed"
  LD_LIBRARY_PATH=../lib:../lib/ext2fs:../lib/e2p:../lib/et:../lib/ss:${LD_LIBRARY_PATH}
  DYLD_LIBRARY_PATH=../lib:../lib/ext2fs:../lib/e2p:../lib/et:../lib/ss:${DYLD_LIBRARY_PATH}
+diff --git a/tests/test_script.in b/tests/test_script.in
+index 9959e30..442999d 100644
+--- a/tests/test_script.in
++++ b/tests/test_script.in
+@@ -39,7 +39,7 @@ for i; do
+ done
+ 
+ if test "$TESTS"x = x ; then
+-    if test -n "DO_FAILED"; then
++    if test -n "$DO_FAILED"; then
+ 	exit 0
+     fi
+     TESTS=`ls -d $SRCDIR/[a-zA-Z]_*`

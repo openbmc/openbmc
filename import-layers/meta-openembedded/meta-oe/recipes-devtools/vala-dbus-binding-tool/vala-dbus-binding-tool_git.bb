@@ -16,3 +16,5 @@ SRC_URI = "git://github.com/freesmartphone/vala-dbus-binding-tool.git;protocol=h
     file://0001-configure.ac-don-t-use-dash-in-m4-macro-names.patch \
 "
 S = "${WORKDIR}/git"
+
+PNBLACKLIST[vala-dbus-binding-tool] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130581/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

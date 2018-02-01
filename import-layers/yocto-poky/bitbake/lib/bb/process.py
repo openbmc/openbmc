@@ -162,9 +162,9 @@ def run(cmd, input=None, log=None, extrafiles=None, **options):
         stdout, stderr = _logged_communicate(pipe, log, input, extrafiles)
     else:
         stdout, stderr = pipe.communicate(input)
-        if stdout:
+        if not stdout is None:
             stdout = stdout.decode("utf-8")
-        if stderr:
+        if not stderr is None:
             stderr = stderr.decode("utf-8")
 
     if pipe.returncode != 0:

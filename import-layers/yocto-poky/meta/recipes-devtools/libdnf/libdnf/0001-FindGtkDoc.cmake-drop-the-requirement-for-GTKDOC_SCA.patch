@@ -1,0 +1,31 @@
+From 9bb7630915c3e787732463a3e2064fe0e177101b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 24 Nov 2016 14:33:07 +0200
+Subject: [PATCH 1/4] FindGtkDoc.cmake: drop the requirement for
+ GTKDOC_SCANGOBJ_WRAPPER
+
+For some reason cmake is not able to find it when building in openembedded,
+and it's bundled with the source code anyway.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ cmake/modules/FindGtkDoc.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/modules/FindGtkDoc.cmake b/cmake/modules/FindGtkDoc.cmake
+index 92b2cc7..39f34bd 100644
+--- a/cmake/modules/FindGtkDoc.cmake
++++ b/cmake/modules/FindGtkDoc.cmake
+@@ -52,7 +52,7 @@ find_program(GTKDOC_MKHTML_EXE gtkdoc-mkhtml PATH "${GLIB_PREFIX}/bin")
+ find_program(GTKDOC_FIXXREF_EXE gtkdoc-fixxref PATH "${GLIB_PREFIX}/bin")
+ 
+ find_package_handle_standard_args(GtkDoc
+-    REQUIRED_VARS GTKDOC_SCAN_EXE GTKDOC_SCANGOBJ_EXE GTKDOC_SCANGOBJ_WRAPPER GTKDOC_MKDB_EXE GTKDOC_MKHTML_EXE GTKDOC_FIXXREF_EXE
++    REQUIRED_VARS GTKDOC_SCAN_EXE GTKDOC_SCANGOBJ_EXE GTKDOC_MKDB_EXE GTKDOC_MKHTML_EXE GTKDOC_FIXXREF_EXE
+     VERSION_VAR GtkDoc_VERSION)
+ 
+ # ::
+-- 
+2.11.0
+

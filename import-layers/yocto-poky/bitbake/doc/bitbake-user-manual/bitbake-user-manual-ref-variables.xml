@@ -1539,24 +1539,6 @@
             </glossdef>
         </glossentry>
 
-        <glossentry id='var-FILESDIR'><glossterm>FILESDIR</glossterm>
-            <glossdef>
-                <para>
-                    Specifies directories BitBake uses when searching for
-                    patches and files.
-                    The "local" fetcher module uses these directories when
-                    handling <filename>file://</filename> URLs if the file
-                    was not found using
-                    <link linkend='var-FILESPATH'><filename>FILESPATH</filename></link>.
-                    <note>
-                        The <filename>FILESDIR</filename> variable is
-                        deprecated and you should use
-                        <filename>FILESPATH</filename> in all new code.
-                    </note>
-                </para>
-            </glossdef>
-        </glossentry>
-
         <glossentry id='var-FILESPATH'><glossterm>FILESPATH</glossterm>
             <glossdef>
                 <para>

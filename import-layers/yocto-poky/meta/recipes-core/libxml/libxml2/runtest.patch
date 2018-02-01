@@ -2,12 +2,13 @@ Add 'install-ptest' rule.
 Print a standard result line for each test.
 
 Signed-off-by: Mihaela Sendrea <mihaela.sendrea@enea.com>
-Upstream-Status: Pending
+Signed-off-by: Andrej Valek <andrej.valek@enea.com>
+Upstream-Status: Backport
 
 diff -uNr a/Makefile.am b/Makefile.am
---- a/Makefile.am	2013-04-17 14:51:42.633386477 +0200
-+++ b/Makefile.am	2013-04-19 14:47:51.544720568 +0200
-@@ -202,10 +202,19 @@
+--- a/Makefile.am	2016-05-22 03:49:02.000000000 +0200
++++ b/Makefile.am	2017-06-14 10:38:43.381305385 +0200
+@@ -202,10 +202,24 @@
  #testOOM_DEPENDENCIES = $(DEPS)
  #testOOM_LDADD= $(LDADDS)
  
@@ -24,10 +25,24 @@ diff -uNr a/Makefile.am b/Makefile.am
  	[ -d test   ] || $(LN_S) $(srcdir)/test   .
  	[ -d result ] || $(LN_S) $(srcdir)/result .
 -	$(CHECKER) ./runtest$(EXEEXT) && $(CHECKER) ./testrecurse$(EXEEXT) &&$(CHECKER) ./testapi$(EXEEXT) && $(CHECKER) ./testchar$(EXEEXT)&& $(CHECKER) ./testdict$(EXEEXT) && $(CHECKER) ./runxmlconf$(EXEEXT)
-+	./runtest$(EXEEXT) ; ./testrecurse$(EXEEXT) ; ./testapi$(EXEEXT) ; ./testchar$(EXEEXT) ; ./testdict$(EXEEXT) ; ./runxmlconf$(EXEEXT)
++	$(CHECKER) ./runtest$(EXEEXT) && \
++	    $(CHECKER) ./testrecurse$(EXEEXT) && \
++	    ASAN_OPTIONS="$$ASAN_OPTIONS:detect_leaks=0" $(CHECKER) ./testapi$(EXEEXT) && \
++	    $(CHECKER) ./testchar$(EXEEXT) && \
++	    $(CHECKER) ./testdict$(EXEEXT) && \
++	    $(CHECKER) ./runxmlconf$(EXEEXT)
  	@(if [ "$(PYTHON_SUBDIR)" != "" ] ; then cd python ; \
  	    $(MAKE) tests ; fi)
  
+@@ -229,7 +243,7 @@
+ 
+ APItests: testapi$(EXEEXT)
+ 	@echo "## Running the API regression tests this may take a little while"
+-	-@($(CHECKER) $(top_builddir)/testapi -q)
++	-@(ASAN_OPTIONS="$$ASAN_OPTIONS:detect_leaks=0" $(CHECKER) $(top_builddir)/testapi -q)
+ 
+ HTMLtests : testHTML$(EXEEXT)
+ 	@(echo > .memdump)
 diff -uNr a/runsuite.c b/runsuite.c
 --- a/runsuite.c	2013-04-12 16:17:11.462823238 +0200
 +++ b/runsuite.c	2013-04-17 14:07:24.352693211 +0200

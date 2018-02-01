@@ -35,4 +35,4 @@ do_install () {
     oe_runmake install-dev
 }
 
-PNBLACKLIST[xfsdump] ?= "Depends on broken xfsprogs"
+PNBLACKLIST[xfsdump] ?= "Depends on broken xfsprogs - the recipe will be removed on 2017-09-01 unless the issue is fixed"

@@ -252,8 +252,8 @@ LSB_STOP_CMD="/opt/lsb/test/manager/bin/dist-checker-stop.pl"
 
 PLATFORM_FILE="/etc/rpm/platform"
 
-RPM_INSTALL_CMD="rpm --quiet --nodeps --replacepkgs --nosignature -i"
-RPM_INSTALL_CMD_NOSCRIPTS="rpm --quiet --nodeps --replacepkgs --noscripts --nosignature -i"
+RPM_INSTALL_CMD="rpm --quiet --nodeps --replacepkgs --nosignature -i --ignoreos"
+RPM_INSTALL_CMD_NOSCRIPTS="rpm --quiet --nodeps --replacepkgs --noscripts --nosignature -i --ignoreos"
 
 # If the lsb has been started, stop it first.
 if [ -x ${LSB_STOP_CMD} ]

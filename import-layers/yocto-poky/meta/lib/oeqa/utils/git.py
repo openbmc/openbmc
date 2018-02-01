@@ -16,8 +16,17 @@ class GitError(Exception):
 class GitRepo(object):
     """Class representing a Git repository clone"""
     def __init__(self, path, is_topdir=False):
-        self.top_dir = self._run_git_cmd_at(['rev-parse', '--show-toplevel'],
-                                            path)
+        git_dir = self._run_git_cmd_at(['rev-parse', '--git-dir'], path)
+        git_dir = git_dir if os.path.isabs(git_dir) else os.path.join(path, git_dir)
+        self.git_dir = os.path.realpath(git_dir)
+
+        if self._run_git_cmd_at(['rev-parse', '--is-bare-repository'], path) == 'true':
+            self.bare = True
+            self.top_dir = self.git_dir
+        else:
+            self.bare = False
+            self.top_dir = self._run_git_cmd_at(['rev-parse', '--show-toplevel'],
+                                                path)
         realpath = os.path.realpath(path)
         if is_topdir and realpath != self.top_dir:
             raise GitError("{} is not a Git top directory".format(realpath))
@@ -36,9 +45,12 @@ class GitRepo(object):
         return ret.output.strip()
 
     @staticmethod
-    def init(path):
+    def init(path, bare=False):
         """Initialize a new Git repository"""
-        GitRepo._run_git_cmd_at('init', cwd=path)
+        cmd = ['init']
+        if bare:
+            cmd.append('--bare')
+        GitRepo._run_git_cmd_at(cmd, cwd=path)
         return GitRepo(path, is_topdir=True)
 
     def run_cmd(self, git_args, env_update=None):

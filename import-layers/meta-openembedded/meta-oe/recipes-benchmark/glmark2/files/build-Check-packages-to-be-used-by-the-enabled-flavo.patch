@@ -18,9 +18,9 @@ index cab62a3..e7eaed0 100644
 --- a/wscript
 +++ b/wscript
 @@ -121,13 +121,17 @@ def configure(ctx):
-                 ('mirclient','mirclient', '0.13', list_contains(Options.options.flavors, 'mir')),
-                 ('wayland-client','wayland-client', None, list_contains(Options.options.flavors, 'wayland')),
-                 ('wayland-egl','wayland-egl', None, list_contains(Options.options.flavors, 'wayland'))]
+                 ('mirclient','mirclient', '0.13', list_contains(ctx.options.flavors, 'mir')),
+                 ('wayland-client','wayland-client', None, list_contains(ctx.options.flavors, 'wayland')),
+                 ('wayland-egl','wayland-egl', None, list_contains(ctx.options.flavors, 'wayland'))]
 -    for (pkg, uselib, atleast, mandatory) in opt_pkgs:
 +    for (pkg, uselib, atleast, check) in opt_pkgs:
 +        # Check packages required by the flavors

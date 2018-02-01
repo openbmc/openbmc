@@ -62,11 +62,9 @@ SRC_URI = "sftp://user@host.example.com/dir/path.file.txt"
 import os
 import bb
 import urllib.request, urllib.parse, urllib.error
-from bb import data
 from bb.fetch2 import URI
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import runfetchcmd
-
 
 class SFTP(FetchMethod):
     """Class to fetch urls via 'sftp'"""
@@ -92,7 +90,7 @@ class SFTP(FetchMethod):
         else:
             ud.basename = os.path.basename(ud.path)
 
-        ud.localfile = data.expand(urllib.parse.unquote(ud.basename), d)
+        ud.localfile = d.expand(urllib.parse.unquote(ud.basename))
 
     def download(self, ud, d):
         """Fetch urls"""
@@ -104,7 +102,7 @@ class SFTP(FetchMethod):
             port = '-P %d' % urlo.port
             urlo.port = None
 
-        dldir = data.getVar('DL_DIR', d, True)
+        dldir = d.getVar('DL_DIR')
         lpath = os.path.join(dldir, ud.localfile)
 
         user = ''

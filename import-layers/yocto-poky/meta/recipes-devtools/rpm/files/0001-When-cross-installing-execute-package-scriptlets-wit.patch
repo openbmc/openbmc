@@ -1,0 +1,37 @@
+From a6f269f879221f2777169c5f7291322afe6b661b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 17 Jan 2017 14:07:17 +0200
+Subject: [PATCH] When cross-installing, execute package scriptlets without
+ chrooting into destination rootfs
+
+This is triggered only when RPM_NO_CHROOT_FOR_SCRIPTS environment variable is defined.
+Otherwise they will trigger an explosion of failures, obviously.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ lib/rpmscript.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/lib/rpmscript.c b/lib/rpmscript.c
+index 98d3f420d..b95b5d606 100644
+--- a/lib/rpmscript.c
++++ b/lib/rpmscript.c
+@@ -467,7 +467,13 @@ rpmRC rpmScriptRun(rpmScript script, int arg1, int arg2, FD_t scriptFd,
+ 
+     if (rc != RPMRC_FAIL) {
+ 	if (script_type & RPMSCRIPTLET_EXEC) {
+-	    rc = runExtScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, &script->nextFileFunc);
++	    if (getenv("RPM_NO_CHROOT_FOR_SCRIPTS") != NULL) {
++		rpmChrootOut();
++		rc = runExtScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, &script->nextFileFunc);
++		rpmChrootIn();
++	    } else {
++		rc = runExtScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, &script->nextFileFunc);
++	    }
+ 	} else {
+ 	    rc = runLuaScript(plugins, prefixes, script->descr, lvl, scriptFd, &args, script->body, arg1, arg2, &script->nextFileFunc);
+ 	}
+-- 
+2.11.0
+

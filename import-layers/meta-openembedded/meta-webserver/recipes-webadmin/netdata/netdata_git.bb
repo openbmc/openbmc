@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=747afe070ea9d6c2be0a31353609a35b"
 
 SRC_URI = "git://github.com/firehol/netdata.git;protocol=https"
 SRCREV = "36c1304e37094174ea51001903058e65053107ca"
+PV = "1.0.1+git${SRCPV}"
 
 # patch to disable timeout because timeout are not available with actual version
 # of core-utils
@@ -17,6 +18,8 @@ SRC_URI += "file://netdata.conf"
 SRC_URI += "file://netdata.service"
 
 S = "${WORKDIR}/git"
+
+DEPENDS += "zlib"
 
 inherit pkgconfig autotools useradd systemd
 

@@ -1,0 +1,26 @@
+From a0ad5128d14b022239445e251cf4a9826e86aa96 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 07:48:31 -0700
+Subject: [PATCH] Add format string to fprintf() call
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/vt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vt.c b/src/vt.c
+index 795d393..a533d3d 100644
+--- a/src/vt.c
++++ b/src/vt.c
+@@ -499,7 +499,7 @@ static int vt_cmd_dump_candidates(const struct vt_handle *vh,
+ 		}
+ 		llen += cmdlen;
+ 
+-		ret = fprintf(vh->vh_stream, e->cmd);
++		ret = fprintf(vh->vh_stream, "%s", e->cmd);
+ 		if (ret < 0)
+ 			return ret;
+ 
+-- 
+2.13.2
+

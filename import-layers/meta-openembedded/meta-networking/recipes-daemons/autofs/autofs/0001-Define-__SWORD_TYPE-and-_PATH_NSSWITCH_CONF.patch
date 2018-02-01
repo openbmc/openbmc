@@ -1,0 +1,50 @@
+From 933e065cf8aecfa0cce5f8f92abbed5baaaf3f77 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 19:10:57 -0700
+Subject: [PATCH 1/2] Define __SWORD_TYPE and _PATH_NSSWITCH_CONF
+
+if they are not defined as is in musl then define
+them here
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/automount.h | 8 ++++++++
+ include/nsswitch.h  | 3 +++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/include/automount.h b/include/automount.h
+index 219b07d..b12c22a 100644
+--- a/include/automount.h
++++ b/include/automount.h
+@@ -42,6 +42,14 @@
+ 
+ #define ENABLE_CORES	1
+ 
++#ifndef __SWORD_TYPE
++# if __WORDSIZE == 32  /* System word size */
++#  define __SWORD_TYPE int
++# else /* __WORDSIZE == 64 */
++#  define __SWORD_TYPE long int
++# endif
++#endif
++
+ /* We MUST have the paths to mount(8) and umount(8) */
+ #ifndef HAVE_MOUNT
+ #error Failed to locate mount(8)!
+diff --git a/include/nsswitch.h b/include/nsswitch.h
+index 2b445a9..3db77b2 100644
+--- a/include/nsswitch.h
++++ b/include/nsswitch.h
+@@ -24,6 +24,9 @@
+ #include <netdb.h>
+ #include "list.h"
+ 
++#ifndef _PATH_NSSWITCH_CONF
++#define _PATH_NSSWITCH_CONF     "/etc/nsswitch.conf"
++#endif
+ #define NSSWITCH_FILE _PATH_NSSWITCH_CONF
+ 
+ enum nsswitch_status {
+-- 
+2.12.1
+

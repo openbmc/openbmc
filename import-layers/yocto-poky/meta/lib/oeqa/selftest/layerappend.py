@@ -55,7 +55,7 @@ SRC_URI_append += "file://appendtest.txt"
     @testcase(1196)
     def test_layer_appends(self):
         corebase = get_bb_var("COREBASE")
-        stagingdir = get_bb_var("STAGING_DIR_TARGET")
+
         for l in ["0", "1", "2"]:
             layer = os.path.join(corebase, "meta-layertest" + l)
             self.assertFalse(os.path.exists(layer))
@@ -83,6 +83,7 @@ SRC_URI_append += "file://appendtest.txt"
 
         self.layerappend = "BBLAYERS += \"{0}/meta-layertest0 {0}/meta-layertest1 {0}/meta-layertest2\"".format(corebase)
         ftools.append_file(self.builddir + "/conf/bblayers.conf", self.layerappend)
+        stagingdir = get_bb_var("SYSROOT_DESTDIR", "layerappendtest")
         bitbake("layerappendtest")
         data = ftools.read_file(stagingdir + "/appendtest.txt")
         self.assertEqual(data, "Layer 2 test")

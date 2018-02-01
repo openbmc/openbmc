@@ -26,19 +26,23 @@ SRC_URI = "http://www.rsyslog.com/download/files/download/rsyslog/${BPN}-${PV}.t
            file://rsyslog-fix-ptest-not-finish.patch \
 "
 
+SRC_URI_append_libc-musl = " \
+    file://0001-Undefine-GLOB_BRACE.patch \
+    file://0001-Include-sys-time-h.patch \
+"
+
 SRC_URI[md5sum] = "ad0f25f429aa2daa326732950a5eeb6c"
 SRC_URI[sha256sum] = "06e2884181333dccecceaca82827ae24ca7a258b4fbf7b1e07a80d4caae640ca"
 
-inherit autotools pkgconfig systemd update-rc.d update-alternatives ptest
+inherit autotools pkgconfig systemd update-rc.d ptest
 
-EXTRA_OECONF += "--disable-generate-man-pages"
+EXTRA_OECONF += "--disable-generate-man-pages ap_cv_atomic_builtins=yes"
 
 # first line is default yes in configure
 PACKAGECONFIG ??= " \
     rsyslogd rsyslogrt klog inet regexp uuid libgcrypt \
     imdiag gnutls imfile \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'snmp', 'snmp', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'snmp systemd', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'testbench relp ${VALGRIND}', '', d)} \
 "
 
@@ -114,7 +118,7 @@ do_install_ptest() {
 
 do_install_append() {
     install -d "${D}${sysconfdir}/init.d"
-    install -m 755 ${WORKDIR}/initscript ${D}${sysconfdir}/init.d/syslog.${BPN}
+    install -m 755 ${WORKDIR}/initscript ${D}${sysconfdir}/init.d/syslog
     install -m 644 ${WORKDIR}/rsyslog.conf ${D}${sysconfdir}/rsyslog.conf
     install -m 644 ${WORKDIR}/rsyslog.logrotate ${D}${sysconfdir}/logrotate.rsyslog
 }
@@ -124,19 +128,9 @@ FILES_${PN} += "${bindir}"
 INITSCRIPT_NAME = "syslog"
 INITSCRIPT_PARAMS = "defaults"
 
-# higher than sysklogd's 100
-ALTERNATIVE_PRIORITY = "110"
-
-ALTERNATIVE_${PN} = "syslogd syslog-conf syslog-logrotate"
-
-ALTERNATIVE_LINK_NAME[syslogd] = "${base_sbindir}/syslogd"
-ALTERNATIVE_TARGET[syslogd] = "${sbindir}/rsyslogd"
-ALTERNATIVE_LINK_NAME[syslog-conf] = "${sysconfdir}/syslog.conf"
-ALTERNATIVE_TARGET[syslog-conf] = "${sysconfdir}/rsyslog.conf"
-ALTERNATIVE_LINK_NAME[syslog-logrotate] = "${sysconfdir}/logrotate.d/syslog"
-ALTERNATIVE_TARGET[syslog-logrotate] = "${sysconfdir}/logrotate.rsyslog"
-
 CONFFILES_${PN} = "${sysconfdir}/rsyslog.conf"
+
+RCONFLICTS_${PN} = "busybox-syslog sysklogd syslog-ng"
 
 RPROVIDES_${PN} += "${PN}-systemd"
 RREPLACES_${PN} += "${PN}-systemd"
@@ -154,19 +148,3 @@ VALGRIND_arm = ""
 VALGRIND_aarch64 = ""
 RDEPENDS_${PN}-ptest += "make diffutils gzip bash gawk coreutils procps"
 RRECOMMENDS_${PN}-ptest += "${TCLIBC}-dbg ${VALGRIND}"
-
-# no syslog-init for systemd
-python () {
-    if bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):
-        pn = d.getVar('PN', True)
-        sysconfdir = d.getVar('sysconfdir', True)
-        d.appendVar('ALTERNATIVE_%s' % (pn), ' syslog-init')
-        d.setVarFlag('ALTERNATIVE_LINK_NAME', 'syslog-init', '%s/init.d/syslog' % (sysconfdir))
-        d.setVarFlag('ALTERNATIVE_TARGET', 'syslog-init', '%s/init.d/syslog.%s' % (d.getVar('sysconfdir', True), d.getVar('BPN', True)))
-
-    if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d):
-        pn = d.getVar('PN', True)
-        d.appendVar('ALTERNATIVE_%s' % (pn), ' syslog-service')
-        d.setVarFlag('ALTERNATIVE_LINK_NAME', 'syslog-service', '%s/systemd/system/syslog.service' % (d.getVar('sysconfdir', True)))
-        d.setVarFlag('ALTERNATIVE_TARGET', 'syslog-service', '%s/system/rsyslog.service' % (d.getVar('systemd_unitdir', True)))
-}

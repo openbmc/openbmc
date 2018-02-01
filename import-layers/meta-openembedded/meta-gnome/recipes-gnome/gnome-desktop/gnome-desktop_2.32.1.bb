@@ -12,7 +12,7 @@ SRC_URI[archive.md5sum] = "5c80d628a240eb9d9ff78913b31f2f67"
 SRC_URI[archive.sha256sum] = "55cbecf67efe1fa1e57ac966520a7c46d799c8ba3c652a1219f60cafccb3739d"
 GNOME_COMPRESS_TYPE="bz2"
 
-DEPENDS += "gconf libxrandr virtual/libx11 gtk+ glib-2.0 gnome-doc-utils startup-notification intltool-native"
+DEPENDS += "gconf libxrandr virtual/libx11 gtk+ glib-2.0 gnome-doc-utils startup-notification intltool-native gnome-common-native"
 
 EXTRA_OECONF = "--disable-scrollkeeper --disable-desktop-docs --disable-gnome-about"
 
@@ -24,3 +24,5 @@ do_configure_prepend () {
 PACKAGES =+ "libgnome-desktop"
 FILES_libgnome-desktop = "${libdir}/lib*${SOLIBS} ${datadir}/libgnome-desktop/pnp.ids"
 FILES_${PN} += "${datadir}/gnome-about"
+
+PNBLACKLIST[gnome-desktop] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130595/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

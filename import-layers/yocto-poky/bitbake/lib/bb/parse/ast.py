@@ -30,8 +30,6 @@ import itertools
 from bb import methodpool
 from bb.parse import logger
 
-_bbversions_re = re.compile(r"\[(?P<from>[0-9]+)-(?P<to>[0-9]+)\]")
-
 class StatementGroup(list):
     def eval(self, data):
         for statement in self:
@@ -132,7 +130,6 @@ class DataNode(AstNode):
                 val = groupd["value"]
         elif "colon" in groupd and groupd["colon"] != None:
             e = data.createCopy()
-            bb.data.update_data(e)
             op = "immediate"
             val = e.expand(groupd["value"], key + "[:=]")
         elif "append" in groupd and groupd["append"] != None:
@@ -347,19 +344,18 @@ def finalize(fn, d, variant = None):
         if not handlerfn:
             bb.fatal("Undefined event handler function '%s'" % var)
         handlerln = int(d.getVarFlag(var, "lineno", False))
-        bb.event.register(var, d.getVar(var, False), (d.getVarFlag(var, "eventmask", True) or "").split(), handlerfn, handlerln)
+        bb.event.register(var, d.getVar(var, False), (d.getVarFlag(var, "eventmask") or "").split(), handlerfn, handlerln)
 
     bb.event.fire(bb.event.RecipePreFinalise(fn), d)
 
     bb.data.expandKeys(d)
-    bb.data.update_data(d)
     code = []
     for funcname in d.getVar("__BBANONFUNCS", False) or []:
         code.append("%s(d)" % funcname)
     bb.utils.better_exec("\n".join(code), {"d": d})
-    bb.data.update_data(d)
 
     tasklist = d.getVar('__BBTASKS', False) or []
+    bb.event.fire(bb.event.RecipeTaskPreProcess(fn, list(tasklist)), d)
     bb.build.add_tasks(tasklist, d)
 
     bb.parse.siggen.finalise(fn, d, variant)
@@ -385,29 +381,8 @@ def _create_variants(datastores, names, function, onlyfinalise):
             else:
                 create_variant("%s-%s" % (variant, name), datastores[variant], name)
 
-def _expand_versions(versions):
-    def expand_one(version, start, end):
-        for i in range(start, end + 1):
-            ver = _bbversions_re.sub(str(i), version, 1)
-            yield ver
-
-    versions = iter(versions)
-    while True:
-        try:
-            version = next(versions)
-        except StopIteration:
-            break
-
-        range_ver = _bbversions_re.search(version)
-        if not range_ver:
-            yield version
-        else:
-            newversions = expand_one(version, int(range_ver.group("from")),
-                                     int(range_ver.group("to")))
-            versions = itertools.chain(newversions, versions)
-
 def multi_finalize(fn, d):
-    appends = (d.getVar("__BBAPPEND", True) or "").split()
+    appends = (d.getVar("__BBAPPEND") or "").split()
     for append in appends:
         logger.debug(1, "Appending .bbappend file %s to %s", append, fn)
         bb.parse.BBHandler.handle(append, d, True)
@@ -422,51 +397,7 @@ def multi_finalize(fn, d):
         d.setVar("__SKIPPED", e.args[0])
     datastores = {"": safe_d}
 
-    versions = (d.getVar("BBVERSIONS", True) or "").split()
-    if versions:
-        pv = orig_pv = d.getVar("PV", True)
-        baseversions = {}
-
-        def verfunc(ver, d, pv_d = None):
-            if pv_d is None:
-                pv_d = d
-
-            overrides = d.getVar("OVERRIDES", True).split(":")
-            pv_d.setVar("PV", ver)
-            overrides.append(ver)
-            bpv = baseversions.get(ver) or orig_pv
-            pv_d.setVar("BPV", bpv)
-            overrides.append(bpv)
-            d.setVar("OVERRIDES", ":".join(overrides))
-
-        versions = list(_expand_versions(versions))
-        for pos, version in enumerate(list(versions)):
-            try:
-                pv, bpv = version.split(":", 2)
-            except ValueError:
-                pass
-            else:
-                versions[pos] = pv
-                baseversions[pv] = bpv
-
-        if pv in versions and not baseversions.get(pv):
-            versions.remove(pv)
-        else:
-            pv = versions.pop()
-
-            # This is necessary because our existing main datastore
-            # has already been finalized with the old PV, we need one
-            # that's been finalized with the new PV.
-            d = bb.data.createCopy(safe_d)
-            verfunc(pv, d, safe_d)
-            try:
-                finalize(fn, d)
-            except bb.parse.SkipRecipe as e:
-                d.setVar("__SKIPPED", e.args[0])
-
-        _create_variants(datastores, versions, verfunc, onlyfinalise)
-
-    extended = d.getVar("BBCLASSEXTEND", True) or ""
+    extended = d.getVar("BBCLASSEXTEND") or ""
     if extended:
         # the following is to support bbextends with arguments, for e.g. multilib
         # an example is as follows:
@@ -484,7 +415,7 @@ def multi_finalize(fn, d):
             else:
                 extendedmap[ext] = ext
 
-        pn = d.getVar("PN", True)
+        pn = d.getVar("PN")
         def extendfunc(name, d):
             if name != extendedmap[name]:
                 d.setVar("BBEXTENDCURR", extendedmap[name])

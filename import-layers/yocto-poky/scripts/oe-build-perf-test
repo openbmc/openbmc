@@ -17,21 +17,23 @@
 import argparse
 import errno
 import fcntl
+import json
 import logging
 import os
+import re
 import shutil
 import sys
-import unittest
 from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + '/lib')
 import scriptpath
 scriptpath.add_oe_lib_path()
+scriptpath.add_bitbake_lib_path()
 import oeqa.buildperf
 from oeqa.buildperf import (BuildPerfTestLoader, BuildPerfTestResult,
                             BuildPerfTestRunner, KernelDropCaches)
 from oeqa.utils.commands import runCmd
-from oeqa.utils.git import GitRepo, GitError
+from oeqa.utils.metadata import metadata_from_bb, write_metadata_file
 
 
 # Set-up logging
@@ -71,31 +73,6 @@ def pre_run_sanity_check():
         return False
     return True
 
-def init_git_repo(path):
-    """Check/create Git repository where to store results"""
-    path = os.path.abspath(path)
-    if os.path.isfile(path):
-        log.error("Invalid Git repo %s: path exists but is not a directory", path)
-        return False
-    if not os.path.isdir(path):
-        try:
-            os.mkdir(path)
-        except (FileNotFoundError, PermissionError) as err:
-            log.error("Failed to mkdir %s: %s", path, err)
-            return False
-    if not os.listdir(path):
-        log.info("Initializing a new Git repo at %s", path)
-        GitRepo.init(path)
-    try:
-        GitRepo(path, is_topdir=True)
-    except GitError:
-        log.error("No Git repository but a non-empty directory found at %s.\n"
-                  "Please specify a Git repository, an empty directory or "
-                  "a non-existing directory", path)
-        return False
-    return True
-
-
 def setup_file_logging(log_file):
     """Setup loggin to file"""
     log_dir = os.path.dirname(log_file)
@@ -115,6 +92,38 @@ def archive_build_conf(out_dir):
     shutil.copytree(src_dir, tgt_dir)
 
 
+def update_globalres_file(result_obj, filename, metadata):
+    """Write results to globalres csv file"""
+    # Map test names to time and size columns in globalres
+    # The tuples represent index and length of times and sizes
+    # respectively
+    gr_map = {'test1': ((0, 1), (8, 1)),
+              'test12': ((1, 1), (None, None)),
+              'test13': ((2, 1), (9, 1)),
+              'test2': ((3, 1), (None, None)),
+              'test3': ((4, 3), (None, None)),
+              'test4': ((7, 1), (10, 2))}
+
+    values = ['0'] * 12
+    for status, test, _ in result_obj.all_results():
+        if status in ['ERROR', 'SKIPPED']:
+            continue
+        (t_ind, t_len), (s_ind, s_len) = gr_map[test.name]
+        if t_ind is not None:
+            values[t_ind:t_ind + t_len] = test.times
+        if s_ind is not None:
+            values[s_ind:s_ind + s_len] = test.sizes
+
+    log.debug("Writing globalres log to %s", filename)
+    rev_info = metadata['layers']['meta']
+    with open(filename, 'a') as fobj:
+        fobj.write('{},{}:{},{},'.format(metadata['hostname'],
+                                         rev_info['branch'],
+                                         rev_info['commit'],
+                                         rev_info['commit']))
+        fobj.write(','.join(values) + '\n')
+
+
 def parse_args(argv):
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(
@@ -131,20 +140,13 @@ def parse_args(argv):
     parser.add_argument('-o', '--out-dir', default='results-{date}',
                         type=os.path.abspath,
                         help="Output directory for test results")
+    parser.add_argument('-x', '--xml', action='store_true',
+                        help='Enable JUnit xml output')
     parser.add_argument('--log-file',
                         default='{out_dir}/oe-build-perf-test.log',
                         help="Log file of this script")
     parser.add_argument('--run-tests', nargs='+', metavar='TEST',
                         help="List of tests to run")
-    parser.add_argument('--commit-results', metavar='GIT_DIR',
-                        type=os.path.abspath,
-                        help="Commit result data to a (local) git repository")
-    parser.add_argument('--commit-results-branch', metavar='BRANCH',
-                        default="{git_branch}",
-                        help="Commit results to branch BRANCH.")
-    parser.add_argument('--commit-results-tag', metavar='TAG',
-                        default="{git_branch}/{git_commit_count}-g{git_commit}/{tag_num}",
-                        help="Tag results commit with TAG.")
 
     return parser.parse_args(argv)
 
@@ -167,9 +169,6 @@ def main(argv=None):
 
     if not pre_run_sanity_check():
         return 1
-    if args.commit_results:
-        if not init_git_repo(args.commit_results):
-            return 1
 
     # Check our capability to drop caches and ask pass if needed
     KernelDropCaches.check()
@@ -181,7 +180,19 @@ def main(argv=None):
     else:
         suite = loader.loadTestsFromModule(oeqa.buildperf)
 
+    # Save test metadata
+    metadata = metadata_from_bb()
+    log.info("Testing Git revision branch:commit %s:%s (%s)",
+             metadata['layers']['meta']['branch'],
+             metadata['layers']['meta']['commit'],
+             metadata['layers']['meta']['commit_count'])
+    if args.xml:
+        write_metadata_file(os.path.join(out_dir, 'metadata.xml'), metadata)
+    else:
+        with open(os.path.join(out_dir, 'metadata.json'), 'w') as fobj:
+            json.dump(metadata, fobj, indent=2)
     archive_build_conf(out_dir)
+
     runner = BuildPerfTestRunner(out_dir, verbosity=2)
 
     # Suppress logger output to stderr so that the output from unittest
@@ -194,12 +205,13 @@ def main(argv=None):
     # Restore logger output to stderr
     log.handlers[0].setLevel(log.level)
 
+    if args.xml:
+        result.write_results_xml()
+    else:
+        result.write_results_json()
+    result.write_buildstats_json()
     if args.globalres_file:
-        result.update_globalres_file(args.globalres_file)
-    if args.commit_results:
-        result.git_commit_results(args.commit_results,
-                                  args.commit_results_branch,
-                                  args.commit_results_tag)
+        update_globalres_file(result, args.globalres_file, metadata)
     if result.wasSuccessful():
         return 0
 

@@ -9,7 +9,8 @@ SRCNAME = "gocapability"
 PKG_NAME = "github.com/syndtr/${SRCNAME}"
 SRC_URI = "git://${PKG_NAME}.git"
 
-SRCREV = "8e4cdcb3c22b40d5e330ade0b68cb2e2a3cf6f98"
+SRCREV = "2c00daeb6c3b45114c80ac44119e7b8801fdd852"
+PV = "0.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

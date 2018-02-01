@@ -38,16 +38,18 @@ class Trace:
         self.min = None
         self.max = None
         self.headers = None
-        self.disk_stats = None
+        self.disk_stats =  []
         self.ps_stats = None
         self.taskstats = None
-        self.cpu_stats = None
+        self.cpu_stats = []
         self.cmdline = None
         self.kernel = None
         self.kernel_tree = None
         self.filename = None
         self.parent_map = None
-        self.mem_stats = None
+        self.mem_stats = []
+        self.monitor_disk = None
+        self.times = [] # Always empty, but expected by draw.py when drawing system charts.
 
         if len(paths):
             parse_paths (writer, self, paths)
@@ -57,6 +59,19 @@ class Trace:
             if options.full_time:
                 self.min = min(self.start.keys())
                 self.max = max(self.end.keys())
+
+
+        # Rendering system charts depends on start and end
+        # time. Provide them where the original drawing code expects
+        # them, i.e. in proc_tree.
+        class BitbakeProcessTree:
+            def __init__(self, start_time, end_time):
+                self.start_time = start_time
+                self.end_time = end_time
+                self.duration = self.end_time - self.start_time
+        self.proc_tree = BitbakeProcessTree(min(self.start.keys()),
+                                            max(self.end.keys()))
+
 
         return
 
@@ -427,7 +442,13 @@ def _parse_proc_stat_log(file):
         # skip the rest of statistics lines
     return samples
 
-def _parse_proc_disk_stat_log(file, numCpu):
+def _parse_reduced_log(file, sample_class):
+    samples = []
+    for time, lines in _parse_timed_blocks(file):
+        samples.append(sample_class(time, *[float(x) for x in lines[0].split()]))
+    return samples
+
+def _parse_proc_disk_stat_log(file):
     """
     Parse file for disk stats, but only look at the whole device, eg. sda,
     not sda1, sda2 etc. The format of relevant lines should be:
@@ -462,11 +483,30 @@ def _parse_proc_disk_stat_log(file, numCpu):
         sums = [ a - b for a, b in zip(sample1.diskdata, sample2.diskdata) ]
         readTput = sums[0] / 2.0 * 100.0 / interval
         writeTput = sums[1] / 2.0 * 100.0 / interval
-        util = float( sums[2] ) / 10 / interval / numCpu
+        util = float( sums[2] ) / 10 / interval
         util = max(0.0, min(1.0, util))
         disk_stats.append(DiskSample(sample2.time, readTput, writeTput, util))
 
     return disk_stats
+
+def _parse_reduced_proc_meminfo_log(file):
+    """
+    Parse file for global memory statistics with
+    'MemTotal', 'MemFree', 'Buffers', 'Cached', 'SwapTotal', 'SwapFree' values
+    (in that order) directly stored on one line.
+    """
+    used_values = ('MemTotal', 'MemFree', 'Buffers', 'Cached', 'SwapTotal', 'SwapFree',)
+
+    mem_stats = []
+    for time, lines in _parse_timed_blocks(file):
+        sample = MemSample(time)
+        for name, value in zip(used_values, lines[0].split()):
+            sample.add_value(name, int(value))
+
+        if sample.valid():
+            mem_stats.append(DrawMemSample(sample))
+
+    return mem_stats
 
 def _parse_proc_meminfo_log(file):
     """
@@ -484,13 +524,36 @@ def _parse_proc_meminfo_log(file):
         for line in lines:
             match = meminfo_re.match(line)
             if not match:
-                raise ParseError("Invalid meminfo line \"%s\"" % match.groups(0))
+                raise ParseError("Invalid meminfo line \"%s\"" % line)
             sample.add_value(match.group(1), int(match.group(2)))
 
         if sample.valid():
-            mem_stats.append(sample)
+            mem_stats.append(DrawMemSample(sample))
 
     return mem_stats
+
+def _parse_monitor_disk_log(file):
+    """
+    Parse file with information about amount of diskspace used.
+    The format of relevant lines should be: ^volume path: number-of-bytes?
+    """
+    disk_stats = []
+    diskinfo_re = re.compile(r'^(.+):\s*(\d+)$')
+
+    for time, lines in _parse_timed_blocks(file):
+        sample = DiskSpaceSample(time)
+
+        for line in lines:
+            match = diskinfo_re.match(line)
+            if not match:
+                raise ParseError("Invalid monitor_disk line \"%s\"" % line)
+            sample.add_value(match.group(1), int(match.group(2)))
+
+        if sample.valid():
+            disk_stats.append(sample)
+
+    return disk_stats
+
 
 # if we boot the kernel with: initcall_debug printk.time=1 we can
 # get all manner of interesting data from the dmesg output
@@ -628,6 +691,20 @@ def _parse_cmdline_log(writer, file):
             cmdLines[pid] = values
     return cmdLines
 
+def _parse_bitbake_buildstats(writer, state, filename, file):
+    paths = filename.split("/")
+    task = paths[-1]
+    pn = paths[-2]
+    start = None
+    end = None
+    for line in file:
+        if line.startswith("Started:"):
+            start = int(float(line.split()[-1]))
+        elif line.startswith("Ended:"):
+            end = int(float(line.split()[-1]))
+    if start and end:
+        state.add_process(pn + ":" + task, start, end)
+
 def get_num_cpus(headers):
     """Get the number of CPUs from the system.cpu header property. As the
     CPU utilization graphs are relative, the number of CPUs currently makes
@@ -647,18 +724,25 @@ def get_num_cpus(headers):
 def _do_parse(writer, state, filename, file):
     writer.info("parsing '%s'" % filename)
     t1 = clock()
-    paths = filename.split("/")
-    task = paths[-1]
-    pn = paths[-2]
-    start = None
-    end = None
-    for line in file:
-        if line.startswith("Started:"):
-            start = int(float(line.split()[-1]))
-        elif line.startswith("Ended:"):
-            end = int(float(line.split()[-1]))
-    if start and end:
-        state.add_process(pn + ":" + task, start, end)
+    name = os.path.basename(filename)
+    if name == "proc_diskstats.log":
+        state.disk_stats = _parse_proc_disk_stat_log(file)
+    elif name == "reduced_proc_diskstats.log":
+        state.disk_stats = _parse_reduced_log(file, DiskSample)
+    elif name == "proc_stat.log":
+        state.cpu_stats = _parse_proc_stat_log(file)
+    elif name == "reduced_proc_stat.log":
+        state.cpu_stats = _parse_reduced_log(file, CPUSample)
+    elif name == "proc_meminfo.log":
+        state.mem_stats = _parse_proc_meminfo_log(file)
+    elif name == "reduced_proc_meminfo.log":
+        state.mem_stats = _parse_reduced_proc_meminfo_log(file)
+    elif name == "cmdline2.log":
+        state.cmdline = _parse_cmdline_log(writer, file)
+    elif name == "monitor_disk.log":
+        state.monitor_disk = _parse_monitor_disk_log(file)
+    elif not filename.endswith('.log'):
+        _parse_bitbake_buildstats(writer, state, filename, file)
     t2 = clock()
     writer.info("  %s seconds" % str(t2-t1))
     return state

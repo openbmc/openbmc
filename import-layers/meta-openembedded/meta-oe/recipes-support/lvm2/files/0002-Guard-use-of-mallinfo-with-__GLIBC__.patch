@@ -1,0 +1,30 @@
+From 3ae9c0b607ec33fb07f32a41e9d28cc9068dd39a Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Tue, 25 Oct 2016 11:52:44 +0000
+Subject: [PATCH] Guard use of mallinfo() with __GLIBC__
+
+This API is glibc-only
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+
+---
+ lib/mm/memlock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/mm/memlock.c b/lib/mm/memlock.c
+index da90144..f34f890 100644
+--- a/lib/mm/memlock.c
++++ b/lib/mm/memlock.c
+@@ -150,7 +150,7 @@ static void _touch_memory(void *mem, size_t size)
+ 
+ static void _allocate_memory(void)
+ {
+-#ifndef VALGRIND_POOL
++#if !defined(VALGRIND_POOL) && defined(__GLIBC__)
+ 	void *stack_mem;
+ 	struct rlimit limit;
+ 	int i, area = 0, missing = _size_malloc_tmp, max_areas = 32, hblks;
+-- 
+2.12.0
+

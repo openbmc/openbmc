@@ -1,0 +1,33 @@
+From 3c3c21f4735eb215206273bc714c57c969926d3d Mon Sep 17 00:00:00 2001
+From: Ming Liu <peter.x.liu@external.atlascopco.com>
+Date: Sun, 26 Feb 2017 14:10:21 +0100
+Subject: [PATCH] Include sys/time.h
+
+struct timeval is defined in sys/time.h with a musl libc.
+
+Upstream-Status: Inappropriate [musl libc specific]
+
+Signed-off-by: Ming Liu <peter.x.liu@external.atlascopco.com>
+---
+ tests/msleep.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/tests/msleep.c b/tests/msleep.c
+index 26a8206..ca818be 100644
+--- a/tests/msleep.c
++++ b/tests/msleep.c
+@@ -26,11 +26,7 @@
+ #include "config.h"
+ #include <stdio.h>
+ #include <stdlib.h>
+-#if defined(__FreeBSD__)
+ #include <sys/time.h>
+-#else
+-#include <time.h>
+-#endif
+ 
+ int main(int argc, char *argv[])
+ {
+-- 
+1.9.1
+

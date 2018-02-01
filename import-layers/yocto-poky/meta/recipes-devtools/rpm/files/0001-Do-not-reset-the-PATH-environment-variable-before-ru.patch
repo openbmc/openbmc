@@ -1,0 +1,30 @@
+From ffb5301a8594140ad7a58bc0f2053be8ca2b2946 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 20 Jan 2017 13:32:06 +0200
+Subject: [PATCH 1/2] Do not reset the PATH environment variable before running
+ scriptlets.
+
+We add lots of native stuff into it and scriptlets rely on that.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ lib/rpmscript.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/rpmscript.c b/lib/rpmscript.c
+index 92f949fa2..7c1aa75a8 100644
+--- a/lib/rpmscript.c
++++ b/lib/rpmscript.c
+@@ -201,7 +201,7 @@ static void doScriptExec(ARGV_const_t argv, ARGV_const_t prefixes,
+ 	if (ipath && ipath[5] != '%')
+ 	    path = ipath;
+ 
+-	xx = setenv("PATH", path, 1);
++	//xx = setenv("PATH", path, 1);
+ 	free(ipath);
+     }
+ 
+-- 
+2.11.0
+

@@ -1,0 +1,38 @@
+From ed0a954983d50267c2fc0bc13aba929ea0cad971 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Tue, 2 May 2017 06:34:40 +0000
+Subject: [PATCH] Add -lpthread to link
+
+When building the php-5.6.26, the following errors occured:
+
+    ld: TSRM/.libs/TSRM.o: undefined reference to symbol
+    'pthread_sigmask@@GLIBC_2.2.5'
+
+    error adding symbols: DSO missing from command line
+
+This is because no pthread to link, so we should add it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ configure.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index a467dff1..9afef652 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1058,7 +1058,8 @@ case $php_sapi_module in
+     ;;
+ esac
+ 
+-EXTRA_LIBS="$EXTRA_LIBS $DLIBS $LIBS"
++PTHREAD_LIBS="-lpthread"
++EXTRA_LIBS="$EXTRA_LIBS $DLIBS $LIBS $PTHREAD_LIBS"
+ 
+ dnl this has to be here to prevent the openssl crypt() from
+ dnl overriding the system provided crypt().
+-- 
+2.11.0
+

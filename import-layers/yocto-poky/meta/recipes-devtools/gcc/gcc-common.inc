@@ -5,40 +5,52 @@ LICENSE = "GPL"
 
 NATIVEDEPS = ""
 
+CVE_PRODUCT = "gcc"
+
 inherit autotools gettext texinfo
 
 BPN = "gcc"
+COMPILERINITIAL = ""
+COMPILERDEP = "virtual/${MLPREFIX}${TARGET_PREFIX}gcc${COMPILERINITIAL}:do_gcc_stash_builddir"
+COMPILERDEP_class-nativesdk = "virtual/${TARGET_PREFIX}gcc${COMPILERINITIAL}-crosssdk:do_gcc_stash_builddir"
+
+python extract_stashed_builddir () {
+    src = d.expand("${COMPONENTS_DIR}/${BUILD_ARCH}/gcc-stashed-builddir${COMPILERINITIAL}-${TARGET_SYS}")
+    dest = d.getVar("B")
+    oe.path.copyhardlinktree(src, dest)
+    staging_processfixme([src + "/fixmepath"], dest, dest, dest, d)
+}
 
 def get_gcc_float_setting(bb, d):
-    if d.getVar('ARMPKGSFX_EABI', True) == "hf" and d.getVar('TRANSLATED_TARGET_ARCH', True) == "arm":
+    if d.getVar('ARMPKGSFX_EABI') == "hf" and d.getVar('TRANSLATED_TARGET_ARCH') == "arm":
         return "--with-float=hard"
-    if d.getVar('TARGET_FPU', True) in [ 'soft' ]:
+    if d.getVar('TARGET_FPU') in [ 'soft' ]:
         return "--with-float=soft"
-    if d.getVar('TARGET_FPU', True) in [ 'ppc-efd' ]:
+    if d.getVar('TARGET_FPU') in [ 'ppc-efd' ]:
         return "--enable-e500_double"
     return ""
 
 get_gcc_float_setting[vardepvalue] = "${@get_gcc_float_setting(bb, d)}"
 
 def get_gcc_mips_plt_setting(bb, d):
-    if d.getVar('TRANSLATED_TARGET_ARCH', True) in [ 'mips', 'mipsel' ] and bb.utils.contains('DISTRO_FEATURES', 'mplt', True, False, d):
+    if d.getVar('TRANSLATED_TARGET_ARCH') in [ 'mips', 'mipsel' ] and bb.utils.contains('DISTRO_FEATURES', 'mplt', True, False, d):
         return "--with-mips-plt"
     return ""
 
 def get_gcc_ppc_plt_settings(bb, d):
-    if d.getVar('TRANSLATED_TARGET_ARCH', True) in [ 'powerpc' ] and not bb.utils.contains('DISTRO_FEATURES', 'bssplt', True, False, d):
+    if d.getVar('TRANSLATED_TARGET_ARCH') in [ 'powerpc' ] and not bb.utils.contains('DISTRO_FEATURES', 'bssplt', True, False, d):
         return "--enable-secureplt"
     return ""
 
 def get_long_double_setting(bb, d):
-    if d.getVar('TRANSLATED_TARGET_ARCH', True) in [ 'powerpc', 'powerpc64' ] and d.getVar('TCLIBC', True) in [ 'uclibc', 'glibc' ]:
+    if d.getVar('TRANSLATED_TARGET_ARCH') in [ 'powerpc', 'powerpc64' ] and d.getVar('TCLIBC') in [ 'uclibc', 'glibc' ]:
         return "--with-long-double-128"
     else:
         return "--without-long-double-128"
     return ""
 
 def get_gcc_multiarch_setting(bb, d):
-    target_arch = d.getVar('TRANSLATED_TARGET_ARCH', True)
+    target_arch = d.getVar('TRANSLATED_TARGET_ARCH')
     multiarch_options = {
         "i586":    "--enable-targets=all",
         "i686":    "--enable-targets=all",
@@ -54,26 +66,25 @@ def get_gcc_multiarch_setting(bb, d):
 
 # this is used by the multilib setup of gcc
 def get_tune_parameters(tune, d):
-    availtunes = d.getVar('AVAILTUNES', True)
+    availtunes = d.getVar('AVAILTUNES')
     if tune not in availtunes.split():
         bb.error('The tune: %s is not one of the available tunes: %s' % (tune or None, availtunes))
 
     localdata = bb.data.createCopy(d)
     override = ':tune-' + tune
     localdata.setVar('OVERRIDES', localdata.getVar('OVERRIDES', False) + override)
-    bb.data.update_data(localdata)
 
     retdict = {}
     retdict['tune'] = tune
-    retdict['ccargs'] = localdata.getVar('TUNE_CCARGS', True)
-    retdict['features'] = localdata.getVar('TUNE_FEATURES', True)
+    retdict['ccargs'] = localdata.getVar('TUNE_CCARGS')
+    retdict['features'] = localdata.getVar('TUNE_FEATURES')
     # BASELIB is used by the multilib code to change library paths
-    retdict['baselib'] = localdata.getVar('BASE_LIB', True) or localdata.getVar('BASELIB', True)
-    retdict['arch'] = localdata.getVar('TUNE_ARCH', True)
-    retdict['abiextension'] = localdata.getVar('ABIEXTENSION', True)
-    retdict['target_fpu'] = localdata.getVar('TARGET_FPU', True)
-    retdict['pkgarch'] = localdata.getVar('TUNE_PKGARCH', True)
-    retdict['package_extra_archs'] = localdata.getVar('PACKAGE_EXTRA_ARCHS', True)
+    retdict['baselib'] = localdata.getVar('BASE_LIB') or localdata.getVar('BASELIB')
+    retdict['arch'] = localdata.getVar('TUNE_ARCH')
+    retdict['abiextension'] = localdata.getVar('ABIEXTENSION')
+    retdict['target_fpu'] = localdata.getVar('TARGET_FPU')
+    retdict['pkgarch'] = localdata.getVar('TUNE_PKGARCH')
+    retdict['package_extra_archs'] = localdata.getVar('PACKAGE_EXTRA_ARCHS')
     return retdict
 
 get_tune_parameters[vardepsexclude] = "AVAILTUNES TUNE_CCARGS OVERRIDES TUNE_FEATURES BASE_LIB BASELIB TUNE_ARCH ABIEXTENSION TARGET_FPU TUNE_PKGARCH PACKAGE_EXTRA_ARCHS"

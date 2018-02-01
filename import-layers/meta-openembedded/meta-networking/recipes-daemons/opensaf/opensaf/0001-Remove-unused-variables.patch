@@ -1,0 +1,43 @@
+From a441a75fbb8451268a8a57616c7158cddc1823aa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Apr 2017 12:40:19 -0700
+Subject: [PATCH] Remove unused variables
+
+Fixes build errors with gcc7 e.g.
+
+../opensaf-5.2.0/src/amf/amfd/imm.cc: In member function 'bool ImmObjCreate::immobj_update_required()':
+../opensaf-5.2.0/src/amf/amfd/imm.cc:2174:28: error: unused variable 'pos' [-Werror=unused-variable]
+     std::string::size_type pos;
+                            ^~~
+../opensaf-5.2.0/src/amf/amfd/imm.cc:2215:28: error: unused variable 'pos' [-Werror=unused-variable]
+     std::string::size_type pos;
+                            ^~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/amf/amfd/imm.cc | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/amf/amfd/imm.cc b/src/amf/amfd/imm.cc
+index 7932364..4f47b65 100644
+--- a/src/amf/amfd/imm.cc
++++ b/src/amf/amfd/imm.cc
+@@ -2171,7 +2171,6 @@ bool ImmObjCreate::immobj_update_required() {
+   if (class_type == AVSV_SA_AMF_SI_ASSIGNMENT) {
+     std::string su_name;
+     std::string sisu_name;
+-    std::string::size_type pos;
+     while ((attribute = attrValues_[i++]) != nullptr) {
+       if (!strcmp(attribute->attrName, "safSISU")) {
+         sisu_name = Amf::to_string(
+@@ -2212,7 +2211,6 @@ bool ImmObjCreate::immobj_update_required() {
+   } else if (class_type == AVSV_SA_AMF_CSI_ASSIGNMENT) {
+     std::string comp_name;
+     std::string csicomp_name;
+-    std::string::size_type pos;
+     AVD_CSI *csi = nullptr;
+     AVD_COMP *comp = nullptr;
+     AVD_COMP_CSI_REL *compcsi = nullptr;
+-- 
+2.12.2
+

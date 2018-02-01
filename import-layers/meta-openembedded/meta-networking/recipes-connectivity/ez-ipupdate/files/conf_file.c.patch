@@ -1,0 +1,18 @@
+Dont assume errno type
+
+--- ez-ipupdate-3.0.11b7/conf_file.c.orig	2014-07-02 14:01:19.174029328 -0600
++++ ez-ipupdate-3.0.11b7/conf_file.c	2014-07-02 14:08:42.982026223 -0600
+@@ -38,11 +38,11 @@
+ #include <conf_file.h>
+ 
+ #if HAVE_STRERROR
+-extern int errno;
++#  include <errno.h>
+ #  define error_string strerror(errno)
+ #elif HAVE_SYS_ERRLIST
+ extern const char *const sys_errlist[];
+-extern int errno;
++#  include <errno.h>
+ #  define error_string (sys_errlist[errno])
+ #else
+ #  define error_string "error message not found"

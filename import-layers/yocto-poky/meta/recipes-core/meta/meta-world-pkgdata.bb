@@ -19,20 +19,20 @@ do_collect_packagedata[sstate-outputdirs] = "${STAGING_DIR_HOST}/world-pkgdata"
 
 python do_collect_packagedata() {
     import oe.copy_buildsystem
-    outdir = os.path.join(d.getVar('WORLD_PKGDATADIR', True))
+    outdir = os.path.join(d.getVar('WORLD_PKGDATADIR'))
     bb.utils.mkdirhier(outdir)
     sigfile = os.path.join(outdir, 'locked-sigs-pkgdata.inc')
     oe.copy_buildsystem.generate_locked_sigs(sigfile, d)
 }
 
-do_fetch[noexec] = "1"
-do_unpack[noexec] = "1"
-do_patch[noexec] = "1"
-do_configure[noexec] = "1"
-do_compile[noexec] = "1"
-do_install[noexec] = "1"
+deltask do_fetch
+deltask do_unpack
+deltask do_patch
+deltask do_configure
+deltask do_compile
+deltask do_install
 
-do_configure[deptask] = ""
+do_prepare_recipe_sysroot[deptask] = ""
 
 WORLD_PKGDATA_EXCLUDE ?= ""
 

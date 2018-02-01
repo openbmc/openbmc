@@ -1,0 +1,18 @@
+Description: Fix LOCK_THREADS in settings.dist
+ This patch takes into account that if --enable-threads is used, LOCK_THREADS
+ doesn't get updated
+Author: Markus Stenberg <markus.stenberg@conformiq.com>
+Author: Daniel Rus Morales <danirus@tol-project.org>
+Bug-Debian: http://bugs.debian.org/276457
+
+--- dmalloc-5.5.1.orig/settings.dist	2007-03-25 21:16:43.000000000 +0200
++++ dmalloc-5.5.1/settings.dist	2007-04-27 20:56:49.000000000 +0200
+@@ -409,7 +409,7 @@
+  */
+ 
+ #ifndef LOCK_THREADS
+-#define LOCK_THREADS 0
++#define LOCK_THREADS 1
+ #endif
+ 
+ #if LOCK_THREADS

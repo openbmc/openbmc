@@ -1,0 +1,88 @@
+From: Christopher Covington
+Date: Wed, 28 Dec 2016 15:04:33 -0500
+Subject: [Qemu-devel] [PATCH v3] build: include sys/sysmacros.h for major() and minor()a
+
+The definition of the major() and minor() macros are moving within glibc to
+<sys/sysmacros.h>. Include this header when it is available to avoid the
+following sorts of build-stopping messages:
+
+qga/commands-posix.c: In function ‘dev_major_minor’:
+qga/commands-posix.c:656:13: error: In the GNU C Library, "major" is defined
+ by <sys/sysmacros.h>. For historical compatibility, it is
+ currently defined by <sys/types.h> as well, but we plan to
+ remove this soon. To use "major", include <sys/sysmacros.h>
+ directly. If you did not intend to use a system-defined macro
+ "major", you should undefine it after including <sys/types.h>. [-Werror]
+         *devmajor = major(st.st_rdev);
+             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+qga/commands-posix.c:657:13: error: In the GNU C Library, "minor" is defined
+ by <sys/sysmacros.h>. For historical compatibility, it is
+ currently defined by <sys/types.h> as well, but we plan to
+ remove this soon. To use "minor", include <sys/sysmacros.h>
+ directly. If you did not intend to use a system-defined macro
+ "minor", you should undefine it after including <sys/types.h>. [-Werror]
+         *devminor = minor(st.st_rdev);
+             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The additional include allows the build to complete on Fedora 26 (Rawhide)
+with glibc version 2.24.90.
+
+Signed-off-by: Christopher Covington <address@hidden>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+Upstream-Status: Submitted https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg03548.html
+
+diff -uNr qemu-2.8.0.orig/configure qemu-2.8.0/configure
+--- qemu-2.8.0.orig/configure  2017-02-21 19:05:13.180094708 +0100
++++ qemu-2.8.0/configure       2017-02-21 19:08:53.114087084 +0100
+@@ -4727,6 +4727,20 @@
+ then
+ fi
+ 
+ ##########################################
++# check for sysmacros.h
++
++have_sysmacros=no
++cat > $TMPC << EOF
++#include <sys/sysmacros.h>
++int main(void) {
++    return makedev(0, 0);
++}
++EOF
++if compile_prog "" "" ; then
++    have_sysmacros=yes
++fi
++
++##########################################
+ # End of CC checks
+ # After here, no more $cc or $ld runs
+ 
+diff -uNr qemu-2.8.0.orig/configure qemu-2.8.0/configure
+--- qemu-2.8.0.orig/configure  2017-02-21 19:05:13.180094708 +0100
++++ qemu-2.8.0/configure       2017-02-21 19:08:53.114087084 +0100
+@@ -5695,6 +5709,10 @@
+   echo "CONFIG_AF_VSOCK=y" >> $config_host_mak
+ fi
+ 
++if test "$have_sysmacros" = "yes" ; then
++  echo "CONFIG_SYSMACROS=y" >> $config_host_mak
++fi
++
+ # Hold two types of flag:
+ #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the name on
+ #                                     a thread we have a handle to
+diff -uNr qemu-2.8.0.orig/include/sysemu/os-posix.h qemu-2.8.0/include/sysemu/os-posix.h
+--- qemu-2.8.0.orig/include/sysemu/os-posix.h	2016-12-20 21:16:48.000000000 +0100
++++ qemu-2.8.0/include/sysemu/os-posix.h	2017-02-21 19:07:18.009090381 +0100
+@@ -34,6 +34,10 @@
+ #include <netdb.h>
+ #include <sys/un.h>
+ 
++#ifdef CONFIG_SYSMACROS
++#include <sys/sysmacros.h>
++#endif
++
+ void os_set_line_buffering(void);
+ void os_set_proc_name(const char *s);
+ void os_setup_signal_handling(void);

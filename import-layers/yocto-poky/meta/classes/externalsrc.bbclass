@@ -4,7 +4,7 @@
 # Copyright (C) 2009 Chris Larson <clarson@kergoth.com>
 # Released under the MIT license (see COPYING.MIT for the terms)
 #
-# externalsrc.bbclass enables use of an existing source tree, usually external to 
+# externalsrc.bbclass enables use of an existing source tree, usually external to
 # the build system to build a piece of software rather than the usual fetch/unpack/patch
 # process.
 #
@@ -28,34 +28,34 @@ SRCTREECOVEREDTASKS ?= "do_patch do_unpack do_fetch"
 EXTERNALSRC_SYMLINKS ?= "oe-workdir:${WORKDIR} oe-logs:${T}"
 
 python () {
-    externalsrc = d.getVar('EXTERNALSRC', True)
+    externalsrc = d.getVar('EXTERNALSRC')
 
     # If this is the base recipe and EXTERNALSRC is set for it or any of its
     # derivatives, then enable BB_DONT_CACHE to force the recipe to always be
     # re-parsed so that the file-checksums function for do_compile is run every
     # time.
-    bpn = d.getVar('BPN', True)
-    if bpn == d.getVar('PN', True):
-        classextend = (d.getVar('BBCLASSEXTEND', True) or '').split()
+    bpn = d.getVar('BPN')
+    if bpn == d.getVar('PN'):
+        classextend = (d.getVar('BBCLASSEXTEND') or '').split()
         if (externalsrc or
                 ('native' in classextend and
-                 d.getVar('EXTERNALSRC_pn-%s-native' % bpn, True)) or
+                 d.getVar('EXTERNALSRC_pn-%s-native' % bpn)) or
                 ('nativesdk' in classextend and
-                 d.getVar('EXTERNALSRC_pn-nativesdk-%s' % bpn, True)) or
+                 d.getVar('EXTERNALSRC_pn-nativesdk-%s' % bpn)) or
                 ('cross' in classextend and
-                 d.getVar('EXTERNALSRC_pn-%s-cross' % bpn, True))):
+                 d.getVar('EXTERNALSRC_pn-%s-cross' % bpn))):
             d.setVar('BB_DONT_CACHE', '1')
 
     if externalsrc:
         d.setVar('S', externalsrc)
-        externalsrcbuild = d.getVar('EXTERNALSRC_BUILD', True)
+        externalsrcbuild = d.getVar('EXTERNALSRC_BUILD')
         if externalsrcbuild:
             d.setVar('B', externalsrcbuild)
         else:
             d.setVar('B', '${WORKDIR}/${BPN}-${PV}/')
 
         local_srcuri = []
-        fetch = bb.fetch2.Fetch((d.getVar('SRC_URI', True) or '').split(), d)
+        fetch = bb.fetch2.Fetch((d.getVar('SRC_URI') or '').split(), d)
         for url in fetch.urls:
             url_data = fetch.ud[url]
             parm = url_data.parm
@@ -69,7 +69,7 @@ python () {
             # Dummy value because the default function can't be called with blank SRC_URI
             d.setVar('SRCPV', '999')
 
-        tasks = filter(lambda k: d.getVarFlag(k, "task", True), d.keys())
+        tasks = filter(lambda k: d.getVarFlag(k, "task"), d.keys())
 
         for task in tasks:
             if task.endswith("_setscene"):
@@ -94,7 +94,7 @@ python () {
         # Note that we cannot use d.appendVarFlag() here because deps is expected to be a list object, not a string
         d.setVarFlag('do_configure', 'deps', (d.getVarFlag('do_configure', 'deps', False) or []) + ['do_unpack'])
 
-        for task in d.getVar("SRCTREECOVEREDTASKS", True).split():
+        for task in d.getVar("SRCTREECOVEREDTASKS").split():
             if local_srcuri and task in fetch_tasks:
                 continue
             bb.build.deltask(task, d)
@@ -106,24 +106,31 @@ python () {
         d.setVarFlag('do_configure', 'file-checksums', '${@srctree_configure_hash_files(d)}')
 
         # We don't want the workdir to go away
-        d.appendVar('RM_WORK_EXCLUDE', ' ' + d.getVar('PN', True))
+        d.appendVar('RM_WORK_EXCLUDE', ' ' + d.getVar('PN'))
+
+        bb.build.addtask('do_buildclean',
+                         'do_clean' if d.getVar('S') == d.getVar('B') else None,
+                         None, d)
 
         # If B=S the same builddir is used even for different architectures.
         # Thus, use a shared CONFIGURESTAMPFILE and STAMP directory so that
         # change of do_configure task hash is correctly detected and stamps are
         # invalidated if e.g. MACHINE changes.
-        if d.getVar('S', True) == d.getVar('B', True):
+        if d.getVar('S') == d.getVar('B'):
             configstamp = '${TMPDIR}/work-shared/${PN}/${EXTENDPE}${PV}-${PR}/configure.sstate'
             d.setVar('CONFIGURESTAMPFILE', configstamp)
             d.setVar('STAMP', '${STAMPS_DIR}/work-shared/${PN}/${EXTENDPE}${PV}-${PR}')
+            d.setVar('STAMPCLEAN', '${STAMPS_DIR}/work-shared/${PN}/*-*')
 }
 
 python externalsrc_configure_prefunc() {
+    s_dir = d.getVar('S')
     # Create desired symlinks
-    symlinks = (d.getVar('EXTERNALSRC_SYMLINKS', True) or '').split()
+    symlinks = (d.getVar('EXTERNALSRC_SYMLINKS') or '').split()
+    newlinks = []
     for symlink in symlinks:
         symsplit = symlink.split(':', 1)
-        lnkfile = os.path.join(d.getVar('S', True), symsplit[0])
+        lnkfile = os.path.join(s_dir, symsplit[0])
         target = d.expand(symsplit[1])
         if len(symsplit) > 1:
             if os.path.islink(lnkfile):
@@ -135,19 +142,43 @@ python externalsrc_configure_prefunc() {
                 # File/dir exists with same name as link, just leave it alone
                 continue
             os.symlink(target, lnkfile)
+            newlinks.append(symsplit[0])
+    # Hide the symlinks from git
+    try:
+        git_exclude_file = os.path.join(s_dir, '.git/info/exclude')
+        if os.path.exists(git_exclude_file):
+            with open(git_exclude_file, 'r+') as efile:
+                elines = efile.readlines()
+                for link in newlinks:
+                    if link in elines or '/'+link in elines:
+                        continue
+                    efile.write('/' + link + '\n')
+    except IOError as ioe:
+        bb.note('Failed to hide EXTERNALSRC_SYMLINKS from git')
 }
 
 python externalsrc_compile_prefunc() {
     # Make it obvious that this is happening, since forgetting about it could lead to much confusion
-    bb.plain('NOTE: %s: compiling from external source tree %s' % (d.getVar('PN', True), d.getVar('EXTERNALSRC', True)))
+    bb.plain('NOTE: %s: compiling from external source tree %s' % (d.getVar('PN'), d.getVar('EXTERNALSRC')))
 }
 
-def srctree_hash_files(d):
+do_buildclean[dirs] = "${S} ${B}"
+do_buildclean[nostamp] = "1"
+do_buildclean[doc] = "Call 'make clean' or equivalent in ${B}"
+externalsrc_do_buildclean() {
+	if [ -e Makefile -o -e makefile -o -e GNUmakefile ]; then
+		oe_runmake clean || die "make failed"
+	else
+		bbnote "nothing to do - no makefile found"
+	fi
+}
+
+def srctree_hash_files(d, srcdir=None):
     import shutil
     import subprocess
     import tempfile
 
-    s_dir = d.getVar('EXTERNALSRC', True)
+    s_dir = srcdir or d.getVar('EXTERNALSRC')
     git_dir = os.path.join(s_dir, '.git')
     oe_hash_file = os.path.join(git_dir, 'oe-devtool-tree-sha1')
 
@@ -159,13 +190,13 @@ def srctree_hash_files(d):
             # Update our custom index
             env = os.environ.copy()
             env['GIT_INDEX_FILE'] = tmp_index.name
-            subprocess.check_output(['git', 'add', '.'], cwd=s_dir, env=env)
+            subprocess.check_output(['git', 'add', '-A', '.'], cwd=s_dir, env=env)
             sha1 = subprocess.check_output(['git', 'write-tree'], cwd=s_dir, env=env).decode("utf-8")
         with open(oe_hash_file, 'w') as fobj:
             fobj.write(sha1)
         ret = oe_hash_file + ':True'
     else:
-        ret = d.getVar('EXTERNALSRC', True) + '/*:True'
+        ret = s_dir + '/*:True'
     return ret
 
 def srctree_configure_hash_files(d):
@@ -173,7 +204,7 @@ def srctree_configure_hash_files(d):
     Get the list of files that should trigger do_configure to re-execute,
     based on the value of CONFIGURE_FILES
     """
-    in_files = (d.getVar('CONFIGURE_FILES', True) or '').split()
+    in_files = (d.getVar('CONFIGURE_FILES') or '').split()
     out_items = []
     search_files = []
     for entry in in_files:
@@ -182,9 +213,11 @@ def srctree_configure_hash_files(d):
         else:
             search_files.append(entry)
     if search_files:
-        s_dir = d.getVar('EXTERNALSRC', True)
+        s_dir = d.getVar('EXTERNALSRC')
         for root, _, files in os.walk(s_dir):
             for f in files:
                 if f in search_files:
                     out_items.append('%s:True' % os.path.join(root, f))
     return ' '.join(out_items)
+
+EXPORT_FUNCTIONS do_buildclean

@@ -18,6 +18,15 @@ def children (elem, name=None):
         l = [e for e in l if e.tag == name]
     return l
 
+if len(sys.argv) < 2 or sys.argv[1] in ('-h', '--help'):
+    print('oe-trim-schemas: error: the following arguments are required: schema\n'
+          'Usage: oe-trim-schemas schema\n\n'
+          'OpenEmbedded trim schemas - remove unneeded schema locale translations\n'
+          '                            from gconf schema files\n\n'
+          'arguments:\n'
+          '  schema                gconf schema file to trim\n')
+    sys.exit(2)
+
 xml = etree.parse(sys.argv[1])
 
 for schema in child(xml.getroot(), "schemalist").getchildren():

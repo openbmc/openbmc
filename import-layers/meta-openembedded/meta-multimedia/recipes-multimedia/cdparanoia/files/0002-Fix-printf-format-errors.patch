@@ -1,0 +1,32 @@
+From f4f81bdadb9515938b3b5d13707bd4b9322fd967 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 26 Jun 2017 22:37:13 -0700
+Subject: [PATCH 2/2] Fix printf format errors
+
+error: format not a string literal and no format arguments
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/main.c b/main.c
+index 664acac..d568fb1 100644
+--- a/main.c
++++ b/main.c
+@@ -588,10 +588,10 @@ static void callback(long inpos, int function){
+ 	    buffer[aheadposition+19]='>';
+ 	}
+    
+-	fprintf(stderr,buffer);
++	fprintf(stderr, "%s", buffer);
+        
+ 	if (logfile != NULL && function==-1) {
+-	  fprintf(logfile,buffer+1);
++	  fprintf(logfile, "%s", buffer+1);
+ 	  fprintf(logfile,"\n\n");
+ 	  fflush(logfile);
+ 	}
+-- 
+2.13.2
+

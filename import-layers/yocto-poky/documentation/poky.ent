@@ -1,12 +1,12 @@
-<!ENTITY DISTRO "2.2.2">
-<!ENTITY DISTRO_COMPRESSED "222">
-<!ENTITY DISTRO_NAME_NO_CAP "morty">
-<!ENTITY DISTRO_NAME "Morty">
-<!ENTITY YOCTO_DOC_VERSION "2.2.2">
-<!ENTITY POKYVERSION "17.0.1">
-<!ENTITY POKYVERSION_COMPRESSED "1702">
+<!ENTITY DISTRO "2.3.4">
+<!ENTITY DISTRO_COMPRESSED "234">
+<!ENTITY DISTRO_NAME_NO_CAP "pyro">
+<!ENTITY DISTRO_NAME "Pyro">
+<!ENTITY YOCTO_DOC_VERSION "2.3.4">
+<!ENTITY POKYVERSION "18.0.4">
+<!ENTITY POKYVERSION_COMPRESSED "1804">
 <!ENTITY YOCTO_POKY "poky-&DISTRO_NAME_NO_CAP;-&POKYVERSION;">
-<!ENTITY COPYRIGHT_YEAR "2010-2017">
+<!ENTITY COPYRIGHT_YEAR "2010-2018">
 <!ENTITY YOCTO_DL_URL "http://downloads.yoctoproject.org">
 <!ENTITY YOCTO_HOME_URL "http://www.yoctoproject.org">
 <!ENTITY YOCTO_LISTS_URL "http://lists.yoctoproject.org">
@@ -61,15 +61,18 @@
 <!ENTITY OE_INIT_PATH "&YOCTO_POKY;/oe-init-build-env">
 <!ENTITY OE_INIT_FILE "oe-init-build-env">
 <!ENTITY UBUNTU_HOST_PACKAGES_ESSENTIAL "gawk wget git-core diffstat unzip texinfo gcc-multilib \
-     build-essential chrpath socat cpio python python3 python3-pip python3-pexpect">
+     build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
+     xz-utils debianutils iputils-ping">
 <!ENTITY FEDORA_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath \
      ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue perl-bignum socat \
-     findutils which file cpio python python3-pip python3-pexpect">
+     python3-pexpect findutils which file cpio python python3-pip xz">
 <!ENTITY OPENSUSE_HOST_PACKAGES_ESSENTIAL "python gcc gcc-c++ git chrpath make wget python-xml \
      diffstat makeinfo python-curses patch socat python3 python3-curses tar python3-pip \
-     python3-pexpect">
-<!ENTITY CENTOS_HOST_PACKAGES_ESSENTIAL "gawk make wget tar bzip2 gzip python unzip perl patch \
+     python3-pexpect xz which">
+<!ENTITY CENTOS_HOST_PACKAGES_ESSENTIAL "-y epel-release
+     $ sudo yum makecache
+     $ sudo yum install gawk make wget tar bzip2 gzip python unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath socat \
-     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python3-pip python3-pexpect">
-
+     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python34-pip xz \
+     which">

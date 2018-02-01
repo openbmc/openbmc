@@ -3,7 +3,8 @@ inherit useradd_base
 # base-passwd-cross provides the default passwd and group files in the
 # target sysroot, and shadow -native and -sysroot provide the utilities
 # and support files needed to add and modify user and group accounts
-DEPENDS_append_class-target = " base-files shadow-native shadow-sysroot shadow"
+DEPENDS_append_class-target = " base-files shadow-native shadow-sysroot shadow base-passwd"
+PACKAGE_WRITE_DEPS += "shadow-native"
 
 # This preinstall function can be run in four different contexts:
 #
@@ -31,7 +32,7 @@ if test "x$D" != "x"; then
 	fi
 
 	# user/group lookups should match useradd/groupadd --root
-	export PSEUDO_PASSWD="$SYSROOT:${STAGING_DIR_NATIVE}"
+	export PSEUDO_PASSWD="$SYSROOT"
 fi
 
 # If we're not doing a special SSTATE/SYSROOT install
@@ -96,14 +97,29 @@ fi
 }
 
 useradd_sysroot () {
-	# Pseudo may (do_install) or may not (do_populate_sysroot_setscene) be running 
+	# Pseudo may (do_prepare_recipe_sysroot) or may not (do_populate_sysroot_setscene) be running 
 	# at this point so we're explicit about the environment so pseudo can load if 
 	# not already present.
-	export PSEUDO="${FAKEROOTENV} PSEUDO_LOCALSTATEDIR=${STAGING_DIR_TARGET}${localstatedir}/pseudo ${STAGING_DIR_NATIVE}${bindir_native}/pseudo"
+	export PSEUDO="${FAKEROOTENV} ${PSEUDO_SYSROOT}${bindir_native}/pseudo"
 
 	# Explicitly set $D since it isn't set to anything
-	# before do_install
+	# before do_prepare_recipe_sysroot
 	D=${STAGING_DIR_TARGET}
+
+	# base-passwd's postinst may not have run yet in which case we'll get called later, just exit.
+	# Beware that in some cases we might see the fake pseudo passwd here, in which case we also must
+	# exit.
+	if [ ! -f $D${sysconfdir}/passwd ] ||
+			grep -q this-is-the-pseudo-passwd $D${sysconfdir}/passwd; then
+		exit 0
+	fi
+
+	# It is also possible we may be in a recipe which doesn't have useradd dependencies and hence the
+	# useradd/groupadd tools are unavailable. If there is no dependency, we assume we don't want to
+	# create users in the sysroot
+	if ! command -v useradd; then
+		exit 0
+	fi
 
 	# Add groups and users defined for all recipe packages
 	GROUPADD_PARAM="${@get_all_cmd_params(d, 'groupadd')}"
@@ -116,48 +132,42 @@ useradd_sysroot () {
 	useradd_preinst
 }
 
-useradd_sysroot_sstate () {
-	if [ "${BB_CURRENTTASK}" = "package_setscene" -o "${BB_CURRENTTASK}" = "populate_sysroot_setscene" ]
-	then
-		useradd_sysroot
-	fi
+# The export of PSEUDO in useradd_sysroot() above contains references to
+# ${COMPONENTS_DIR} and ${PSEUDO_LOCALSTATEDIR}. Additionally, the logging
+# shell functions use ${LOGFIFO}. These need to be handled when restoring
+# postinst-useradd-${PN} from the sstate cache.
+EXTRA_STAGING_FIXMES += "COMPONENTS_DIR PSEUDO_LOCALSTATEDIR LOGFIFO"
+
+python useradd_sysroot_sstate () {
+    task = d.getVar("BB_CURRENTTASK")
+    if task == "package_setscene":
+        bb.build.exec_func("useradd_sysroot", d)
+    elif task == "prepare_recipe_sysroot":
+        # Used to update this recipe's own sysroot so the user/groups are available to do_install
+        scriptfile = d.expand("${RECIPE_SYSROOT}${bindir}/postinst-useradd-${PN}")
+        bb.utils.mkdirhier(os.path.dirname(scriptfile))
+        with open(scriptfile, 'w') as script:
+            script.write("#!/bin/sh\n")
+            bb.data.emit_func("useradd_sysroot", script, d)
+            script.write("useradd_sysroot\n")
+        os.chmod(scriptfile, 0o755)
+        bb.build.exec_func("useradd_sysroot", d)
+    elif task == "populate_sysroot":
+        # Used when installed in dependent task sysroots
+        scriptfile = d.expand("${SYSROOT_DESTDIR}${bindir}/postinst-useradd-${PN}")
+        bb.utils.mkdirhier(os.path.dirname(scriptfile))
+        with open(scriptfile, 'w') as script:
+            script.write("#!/bin/sh\n")
+            bb.data.emit_func("useradd_sysroot", script, d)
+            script.write("useradd_sysroot\n")
+        os.chmod(scriptfile, 0o755)
 }
 
-userdel_sysroot_sstate () {
-if test "x${STAGING_DIR_TARGET}" != "x"; then
-    if [ "${BB_CURRENTTASK}" = "clean" ]; then
-        export PSEUDO="${FAKEROOTENV} PSEUDO_LOCALSTATEDIR=${STAGING_DIR_TARGET}${localstatedir}/pseudo ${STAGING_DIR_NATIVE}${bindir_native}/pseudo"
-        OPT="--root ${STAGING_DIR_TARGET}"
-
-        # Remove groups and users defined for package
-        GROUPADD_PARAM="${@get_all_cmd_params(d, 'groupadd')}"
-        USERADD_PARAM="${@get_all_cmd_params(d, 'useradd')}"
-
-        user=`echo "$USERADD_PARAM" | cut -d ';' -f 1 | awk '{ print $NF }'`
-        remaining=`echo "$USERADD_PARAM" | cut -d ';' -f 2- -s | sed -e 's#[ \t]*$##'`
-        while test "x$user" != "x"; do
-            perform_userdel "${STAGING_DIR_TARGET}" "$OPT $user"
-            user=`echo "$remaining" | cut -d ';' -f 1 | awk '{ print $NF }'`
-            remaining=`echo "$remaining" | cut -d ';' -f 2- -s | sed -e 's#[ \t]*$##'`
-        done
-
-        user=`echo "$GROUPADD_PARAM" | cut -d ';' -f 1 | awk '{ print $NF }'`
-        remaining=`echo "$GROUPADD_PARAM" | cut -d ';' -f 2- -s | sed -e 's#[ \t]*$##'`
-        while test "x$user" != "x"; do
-            perform_groupdel "${STAGING_DIR_TARGET}" "$OPT $user"
-            user=`echo "$remaining" | cut -d ';' -f 1 | awk '{ print $NF }'`
-            remaining=`echo "$remaining" | cut -d ';' -f 2- -s | sed -e 's#[ \t]*$##'`
-        done
-
-    fi
-fi
-}
-
-SSTATECLEANFUNCS_append_class-target = " userdel_sysroot_sstate"
-
-do_install[prefuncs] += "${SYSROOTFUNC}"
-SYSROOTFUNC_class-target = "useradd_sysroot"
+do_prepare_recipe_sysroot[postfuncs] += "${SYSROOTFUNC}"
+SYSROOTFUNC_class-target = "useradd_sysroot_sstate"
 SYSROOTFUNC = ""
+
+SYSROOT_PREPROCESS_FUNCS += "${SYSROOTFUNC}"
 
 SSTATEPREINSTFUNCS_append_class-target = " useradd_sysroot_sstate"
 
@@ -168,13 +178,13 @@ USERADDSETSCENEDEPS = ""
 
 # Recipe parse-time sanity checks
 def update_useradd_after_parse(d):
-    useradd_packages = d.getVar('USERADD_PACKAGES', True)
+    useradd_packages = d.getVar('USERADD_PACKAGES')
 
     if not useradd_packages:
         bb.fatal("%s inherits useradd but doesn't set USERADD_PACKAGES" % d.getVar('FILE', False))
 
     for pkg in useradd_packages.split():
-        if not d.getVar('USERADD_PARAM_%s' % pkg, True) and not d.getVar('GROUPADD_PARAM_%s' % pkg, True) and not d.getVar('GROUPMEMS_PARAM_%s' % pkg, True):
+        if not d.getVar('USERADD_PARAM_%s' % pkg) and not d.getVar('GROUPADD_PARAM_%s' % pkg) and not d.getVar('GROUPMEMS_PARAM_%s' % pkg):
             bb.fatal("%s inherits useradd but doesn't set USERADD_PARAM, GROUPADD_PARAM or GROUPMEMS_PARAM for package %s" % (d.getVar('FILE', False), pkg))
 
 python __anonymous() {
@@ -191,9 +201,9 @@ def get_all_cmd_params(d, cmd_type):
     param_type = cmd_type.upper() + "_PARAM_%s"
     params = []
 
-    useradd_packages = d.getVar('USERADD_PACKAGES', True) or ""
+    useradd_packages = d.getVar('USERADD_PACKAGES') or ""
     for pkg in useradd_packages.split():
-        param = d.getVar(param_type % pkg, True)
+        param = d.getVar(param_type % pkg)
         if param:
             params.append(param.rstrip(" ;"))
 
@@ -209,20 +219,20 @@ fakeroot python populate_packages_prepend () {
         required to execute on the target. Not doing so may cause
         useradd preinst to be invoked twice, causing unwanted warnings.
         """
-        preinst = d.getVar('pkg_preinst_%s' % pkg, True) or d.getVar('pkg_preinst', True)
+        preinst = d.getVar('pkg_preinst_%s' % pkg) or d.getVar('pkg_preinst')
         if not preinst:
             preinst = '#!/bin/sh\n'
         preinst += 'bbnote () {\n\techo "NOTE: $*"\n}\n'
         preinst += 'bbwarn () {\n\techo "WARNING: $*"\n}\n'
         preinst += 'bbfatal () {\n\techo "ERROR: $*"\n\texit 1\n}\n'
-        preinst += 'perform_groupadd () {\n%s}\n' % d.getVar('perform_groupadd', True)
-        preinst += 'perform_useradd () {\n%s}\n' % d.getVar('perform_useradd', True)
-        preinst += 'perform_groupmems () {\n%s}\n' % d.getVar('perform_groupmems', True)
-        preinst += d.getVar('useradd_preinst', True)
+        preinst += 'perform_groupadd () {\n%s}\n' % d.getVar('perform_groupadd')
+        preinst += 'perform_useradd () {\n%s}\n' % d.getVar('perform_useradd')
+        preinst += 'perform_groupmems () {\n%s}\n' % d.getVar('perform_groupmems')
+        preinst += d.getVar('useradd_preinst')
         d.setVar('pkg_preinst_%s' % pkg, preinst)
 
         # RDEPENDS setup
-        rdepends = d.getVar("RDEPENDS_%s" % pkg, True) or ""
+        rdepends = d.getVar("RDEPENDS_%s" % pkg) or ""
         rdepends += ' ' + d.getVar('MLPREFIX', False) + 'base-passwd'
         rdepends += ' ' + d.getVar('MLPREFIX', False) + 'shadow'
         # base-files is where the default /etc/skel is packaged
@@ -233,7 +243,7 @@ fakeroot python populate_packages_prepend () {
     # to packages specified by USERADD_PACKAGES
     if not bb.data.inherits_class('nativesdk', d) \
         and not bb.data.inherits_class('native', d):
-        useradd_packages = d.getVar('USERADD_PACKAGES', True) or ""
+        useradd_packages = d.getVar('USERADD_PACKAGES') or ""
         for pkg in useradd_packages.split():
             update_useradd_package(pkg)
 }

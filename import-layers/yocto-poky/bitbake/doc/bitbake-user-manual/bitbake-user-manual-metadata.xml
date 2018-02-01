@@ -61,6 +61,48 @@
             </para>
         </section>
 
+        <section id='line-joining'>
+            <title>Line Joining</title>
+
+            <para>
+                Outside of
+                <link linkend='functions'>functions</link>, BitBake joins
+                any line ending in a backslash character ("\")
+                with the following line before parsing statements.
+                The most common use for the "\" character is to split variable
+                assignments over multiple lines, as in the following example:
+                <literallayout class='monospaced'>
+     FOO = "bar \
+            baz \
+            qaz"
+                </literallayout>
+                Both the "\" character and the newline character
+                that follow it are removed when joining lines.
+                Thus, no newline characters end up in the value of
+                <filename>FOO</filename>.
+            </para>
+
+            <para>
+                Consider this additional example where the two
+                assignments both assign "barbaz" to
+                <filename>FOO</filename>:
+                <literallayout class='monospaced'>
+     FOO = "barbaz"
+
+     FOO = "bar\
+     baz"
+                </literallayout>
+                <note>
+                    BitBake does not interpret escape sequences like
+                    "\n" in variable values.
+                    For these to have an effect, the value must be passed
+                    to some utility that interprets escape sequences,
+                    such as <filename>printf</filename> or
+                    <filename>echo -n</filename>.
+                </note>
+            </para>
+        </section>
+
         <section id='variable-expansion'>
             <title>Variable Expansion</title>
 
@@ -463,14 +505,14 @@
             <title>Unseting variables</title>
 
             <para>
-                It is possible to completely remove a variable or a variable flag 
+                It is possible to completely remove a variable or a variable flag
                 from BitBake's internal data dictionary by using the "unset" keyword.
                 Here is an example:
                 <literallayout class='monospaced'>
         unset DATE
         unset do_fetch[noexec]
                 </literallayout>
-                These two statements remove the <filename>DATE</filename> and the 
+                These two statements remove the <filename>DATE</filename> and the
                 <filename>do_fetch[noexec]</filename> flag.
             </para>
 
@@ -1165,7 +1207,7 @@
                 <literallayout class='monospaced'>
      python some_python_function () {
          d.setVar("TEXT", "Hello World")
-         print d.getVar("TEXT", True)
+         print d.getVar("TEXT")
      }
                 </literallayout>
                 Because the Python "bb" and "os" modules are already
@@ -1180,7 +1222,7 @@
                     to freely set variable values to expandable expressions
                     without having them expanded prematurely.
                     If you do wish to expand a variable within a Python
-                    function, use <filename>d.getVar("X", True)</filename>.
+                    function, use <filename>d.getVar("X")</filename>.
                     Or, for more complicated expressions, use
                     <filename>d.expand()</filename>.
                 </note>
@@ -1232,7 +1274,7 @@
                 Here is an example:
                 <literallayout class='monospaced'>
      def get_depends(d):
-         if d.getVar('SOMECONDITION', True):
+         if d.getVar('SOMECONDITION'):
              return "dependencywithcond"
          else:
              return "dependency"
@@ -1367,7 +1409,7 @@
                 based on the value of  another variable:
                 <literallayout class='monospaced'>
      python () {
-         if d.getVar('SOMEVAR', True) == 'value':
+         if d.getVar('SOMEVAR') == 'value':
              d.setVar('ANOTHERVAR', 'value2')
      }
                 </literallayout>
@@ -1942,128 +1984,194 @@
         <title>Events</title>
 
         <para>
-            BitBake allows installation of event handlers within
-            recipe and class files.
-            Events are triggered at certain points during operation,
-            such as the beginning of an operation against a given recipe
-            (<filename>*.bb</filename> file), the start of a given task,
-            task failure, task success, and so forth.
+            BitBake allows installation of event handlers within recipe
+            and class files.
+            Events are triggered at certain points during operation, such
+            as the beginning of operation against a given recipe
+            (i.e. <filename>*.bb</filename>), the start of a given task,
+            a task failure, a task success, and so forth.
             The intent is to make it easy to do things like email
-            notification on build failure.
+            notification on build failures.
         </para>
 
         <para>
-            Following is an example event handler that
-            prints the name of the event and the content of
-            the <filename>FILE</filename> variable:
+            Following is an example event handler that prints the name
+            of the event and the content of the
+            <filename>FILE</filename> variable:
             <literallayout class='monospaced'>
      addhandler myclass_eventhandler
      python myclass_eventhandler() {
          from bb.event import getName
-         from bb import data
          print("The name of the Event is %s" % getName(e))
-         print("The file we run for is %s" % data.getVar('FILE', e.data, True))
+         print("The file we run for is %s" % d.getVar('FILE'))
      }
+     myclass_eventhandler[eventmask] = "bb.event.BuildStarted bb.event.BuildCompleted"
             </literallayout>
-            This event handler gets called every time an event is
-            triggered.
-            A global variable "<filename>e</filename>" is defined and
-            "<filename>e.data</filename>" contains an instance of
-            "<filename>bb.data</filename>".
-            With the <filename>getName(e)</filename> method, one can get
+            In the previous example, an eventmask has been set so that
+            the handler only sees the "BuildStarted" and "BuildCompleted"
+            events.
+            This event handler gets called every time an event matching
+            the eventmask is triggered.
+            A global variable "e" is defined, which represents the current
+            event.
+            With the <filename>getName(e)</filename> method, you can get
             the name of the triggered event.
+            The global datastore is available as "d".
+            In legacy code, you might see "e.data" used to get the datastore.
+            However, realize that "e.data" is deprecated and you should use
+            "d" going forward.
         </para>
 
         <para>
-            Because you probably are only interested in a subset of events,
-            you would likely use the <filename>[eventmask]</filename> flag
-            for your event handler to be sure that only certain events
-            trigger the handler.
-            Given the previous example, suppose you only wanted the
-            <filename>bb.build.TaskFailed</filename> event to trigger that
-            event handler.
-            Use the flag as follows:
-            <literallayout class='monospaced'>
-     addhandler myclass_eventhandler
-     myclass_eventhandler[eventmask] = "bb.build.TaskFailed"
-     python myclass_eventhandler() {
-         from bb.event import getName
-         from bb import data
-         print("The name of the Event is %s" % getName(e))
-         print("The file we run for is %s" % data.getVar('FILE', e.data, True))
-     }
-            </literallayout>
+            The context of the datastore is appropriate to the event
+            in question.
+            For example, "BuildStarted" and "BuildCompleted" events run
+            before any tasks are executed so would be in the global
+            configuration datastore namespace.
+            No recipe-specific metadata exists in that namespace.
+            The "BuildStarted" and "buildCompleted" events also run in
+            the main cooker/server process rather than any worker context.
+            Thus, any changes made to the datastore would be seen by other
+            cooker/server events within the current build but not seen
+            outside of that build or in any worker context.
+            Task events run in the actual tasks in question consequently
+            have recipe-specific and task-specific contents.
+            These events run in the worker context and are discarded at
+            the end of task execution.
         </para>
 
         <para>
-            During a standard build, the following common events might occur:
+            During a standard build, the following common events might
+            occur.
+            The following events are the most common kinds of events that
+            most metadata might have an interest in viewing:
             <itemizedlist>
                 <listitem><para>
-                    <filename>bb.event.ConfigParsed()</filename>
+                    <filename>bb.event.ConfigParsed()</filename>:
+                    Fired when the base configuration; which consists of
+                    <filename>bitbake.conf</filename>,
+                    <filename>base.bbclass</filename> and any global
+                    <filename>INHERIT</filename> statements; has been parsed.
+                    You can see multiple such events when each of the
+                    workers parse the base configuration or if the server
+                    changes configuration and reparses.
+                    Any given datastore only has one such event executed
+                    against it, however.
+                    If
+                    <link linkende='var-BB_INVALIDCONF'><filename>BB_INVALIDCONF</filename></link>
+                    is set in the datastore by the event handler, the
+                    configuration is reparsed and a new event triggered,
+                    allowing the metadata to update configuration.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.ParseStarted()</filename>
+                    <filename>bb.event.HeartbeatEvent()</filename>:
+                    Fires at regular time intervals of one second.
+                    You can configure the interval time using the
+                    <filename>BB_HEARTBEAT_EVENT</filename> variable.
+                    The event's "time" attribute is the
+                    <filename>time.time()</filename> value when the
+                    event is triggered.
+                    This event is useful for activities such as
+                    system state monitoring.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.ParseProgress()</filename>
+                    <filename>bb.event.ParseStarted()</filename>:
+                    Fired when BitBake is about to start parsing recipes.
+                    This event's "total" attribute represents the number of
+                    recipes BitBake plans to parse.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.ParseCompleted()</filename>
+                    <filename>bb.event.ParseProgress()</filename>:
+                    Fired as parsing progresses.
+                    This event's "current" attribute is the number of
+                    recipes parsed as well as the "total" attribute.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.BuildStarted()</filename>
+                    <filename>bb.event.ParseCompleted()</filename>:
+                    Fired when parsing is complete.
+                    This event's "cached", "parsed", "skipped", "virtuals",
+                    "masked", and "errors" attributes provide statistics
+                    for the parsing results.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.build.TaskStarted()</filename>
+                    <filename>bb.event.BuildStarted()</filename>:
+                    Fired when a new build starts.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.build.TaskInvalid()</filename>
+                    <filename>bb.build.TaskStarted()</filename>:
+                    Fired when a task starts.
+                    This event's "taskfile" attribute points to the recipe
+                    from which the task originates.
+                    The "taskname" attribute, which is the task's name,
+                    includes the <filename>do_</filename> prefix, and the
+                    "logfile" attribute point to where the task's output is
+                    stored.
+                    Finally, the "time" attribute is the task's execution start
+                    time.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.build.TaskFailedSilent()</filename>
+                    <filename>bb.build.TaskInvalid()</filename>:
+                    Fired if BitBake tries to execute a task that does not exist.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.build.TaskFailed()</filename>
+                    <filename>bb.build.TaskFailedSilent()</filename>:
+                    Fired for setscene tasks that fail and should not be
+                    presented to the user verbosely.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.build.TaskSucceeded()</filename>
+                    <filename>bb.build.TaskFailed()</filename>:
+                    Fired for normal tasks that fail.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.BuildCompleted()</filename>
+                    <filename>bb.build.TaskSucceeded()</filename>:
+                    Fired when a task successfully completes.
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.cooker.CookerExit()</filename>
+                    <filename>bb.event.BuildCompleted()</filename>:
+                    Fired when a build finishes.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>bb.cooker.CookerExit()</filename>:
+                    Fired when the BitBake server/cooker shuts down.
+                    This event is usually only seen by the UIs as a
+                    sign they should also shutdown.
                     </para></listitem>
             </itemizedlist>
-            Here is a list of other events that occur based on specific requests
-            to the server:
+        </para>
+
+        <para>
+            This next list of example events occur based on specific
+            requests to the server.
+            These events are often used to communicate larger pieces of
+            information from the BitBake server to other parts of
+            BitBake such as user interfaces:
             <itemizedlist>
                 <listitem><para>
                     <filename>bb.event.TreeDataPreparationStarted()</filename>
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.TreeDataPreparationProgress</filename>
+                    <filename>bb.event.TreeDataPreparationProgress()</filename>
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.TreeDataPreparationCompleted</filename>
+                    <filename>bb.event.TreeDataPreparationCompleted()</filename>
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.DepTreeGenerated</filename>
+                    <filename>bb.event.DepTreeGenerated()</filename>
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.CoreBaseFilesFound</filename>
+                    <filename>bb.event.CoreBaseFilesFound()</filename>
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.ConfigFilePathFound</filename>
+                    <filename>bb.event.ConfigFilePathFound()</filename>
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.FilesMatchingFound</filename>
+                    <filename>bb.event.FilesMatchingFound()</filename>
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.ConfigFilesFound</filename>
+                    <filename>bb.event.ConfigFilesFound()</filename>
                     </para></listitem>
                 <listitem><para>
-                    <filename>bb.event.TargetsTreeGenerated</filename>
+                    <filename>bb.event.TargetsTreeGenerated()</filename>
                     </para></listitem>
             </itemizedlist>
         </para>

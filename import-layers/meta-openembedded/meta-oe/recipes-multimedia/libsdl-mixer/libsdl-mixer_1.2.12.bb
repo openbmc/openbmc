@@ -13,7 +13,7 @@ SRC_URI[sha256sum] = "1644308279a975799049e4826af2cfc787cad2abb11aa14562e402521f
 
 S = "${WORKDIR}/SDL_mixer-${PV}"
 
-inherit autotools-brokensep
+inherit autotools-brokensep pkgconfig
 
 EXTRA_AUTORECONF += "--include=acinclude"
 EXTRA_OECONF = "--disable-music-mp3 --enable-music-ogg --enable-music-ogg-tremor LIBS=-L${STAGING_LIBDIR}"
@@ -37,4 +37,3 @@ do_configure () {
         sed -i -e 's:-L/usr/lib:-L${STAGING_LIBDIR}:g' $i
     done
 }
-

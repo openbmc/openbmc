@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6a6e689d19255cf0557f3fe7d7068212 \
                     file://libedataserver/e-data-server-util.h;endline=20;md5=934502f03c84523aa059d4825887b380 \
                     file://calendar/libecal/e-cal.h;endline=24;md5=5d496b9b6fd2a4fdbbfc31ef9455c9d0"
 
-DEPENDS = "intltool-native glib-2.0 gtk+3 gconf dbus db gnome-common virtual/libiconv zlib libsoup-2.4 libglade libical libgnome-keyring gperf-native libgdata nss"
+DEPENDS = "intltool-native glib-2.0 gtk+3 gconf dbus db virtual/libiconv zlib libsoup-2.4 libglade libical libgnome-keyring gperf-native libgdata nss"
 
 SRCREV = "a9e4e74ec4473a4fd09e56b690bd4fa72f686687"
 
@@ -31,7 +31,7 @@ S = "${WORKDIR}/git"
 inherit autotools gtk-doc pkgconfig gettext gobject-introspection
 
 # -ldb needs this on some platforms
-LDFLAGS += "-lpthread"
+LDFLAGS += "-lpthread -lgmodule-2.0 -lgthread-2.0"
 
 # Parallel make shows many issues with this source code.
 # Current problems seem to be duplicate execution of the calander/backends
@@ -114,4 +114,3 @@ FILES_libedataserverui = "${libdir}/libedataserverui-*.so.* ${datadir}/evolution
 FILES_libedataserverui-dev = "${libdir}/libedataserverui-*.so \
                               ${libdir}/pkgconfig/libedataserverui-*.pc \
                               ${includedir}/evolution-data-server-*/libedataserverui/*.h"
-

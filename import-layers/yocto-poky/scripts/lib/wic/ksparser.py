@@ -27,11 +27,14 @@
 
 import os
 import shlex
+import logging
+
 from argparse import ArgumentParser, ArgumentError, ArgumentTypeError
 
-from wic import msger
+from wic.engine import find_canned
 from wic.partition import Partition
-from wic.utils.misc import find_canned
+
+logger = logging.getLogger('wic')
 
 class KickStartError(Exception):
     """Custom exception."""
@@ -113,6 +116,9 @@ def systemidtype(arg):
 class KickStart():
     """"Kickstart parser implementation."""
 
+    DEFAULT_EXTRA_SPACE = 10*1024
+    DEFAULT_OVERHEAD_FACTOR = 1.3
+
     def __init__(self, confpath):
 
         self.partitions = []
@@ -127,16 +133,27 @@ class KickStart():
         part.add_argument('mountpoint', nargs='?')
         part.add_argument('--active', action='store_true')
         part.add_argument('--align', type=int)
-        part.add_argument("--extra-space", type=sizetype, default=10*1024)
+        part.add_argument('--exclude-path', nargs='+')
+        part.add_argument("--extra-space", type=sizetype)
         part.add_argument('--fsoptions', dest='fsopts')
-        part.add_argument('--fstype')
+        part.add_argument('--fstype', default='vfat',
+                          choices=('ext2', 'ext3', 'ext4', 'btrfs',
+                                   'squashfs', 'vfat', 'msdos', 'swap'))
         part.add_argument('--label')
         part.add_argument('--no-table', action='store_true')
-        part.add_argument('--ondisk', '--ondrive', dest='disk')
-        part.add_argument("--overhead-factor", type=overheadtype, default=1.3)
+        part.add_argument('--ondisk', '--ondrive', dest='disk', default='sda')
+        part.add_argument("--overhead-factor", type=overheadtype)
         part.add_argument('--part-type')
         part.add_argument('--rootfs-dir')
-        part.add_argument('--size', type=sizetype, default=0)
+
+        # --size and --fixed-size cannot be specified together; options
+        # ----extra-space and --overhead-factor should also raise a parser
+        # --error, but since nesting mutually exclusive groups does not work,
+        # ----extra-space/--overhead-factor are handled later
+        sizeexcl = part.add_mutually_exclusive_group()
+        sizeexcl.add_argument('--size', type=sizetype, default=0)
+        sizeexcl.add_argument('--fixed-size', type=sizetype, default=0)
+
         part.add_argument('--source')
         part.add_argument('--sourceparams')
         part.add_argument('--system-id', type=systemidtype)
@@ -156,7 +173,7 @@ class KickStart():
 
         self._parse(parser, confpath)
         if not self.bootloader:
-            msger.warning('bootloader config not specified, using defaults')
+            logger.warning('bootloader config not specified, using defaults\n')
             self.bootloader = bootloader.parse_args([])
 
     def _parse(self, parser, confpath):
@@ -170,11 +187,33 @@ class KickStart():
                 lineno += 1
                 if line and line[0] != '#':
                     try:
-                        parsed = parser.parse_args(shlex.split(line))
+                        line_args = shlex.split(line)
+                        parsed = parser.parse_args(line_args)
                     except ArgumentError as err:
                         raise KickStartError('%s:%d: %s' % \
                                              (confpath, lineno, err))
                     if line.startswith('part'):
+                        # using ArgumentParser one cannot easily tell if option
+                        # was passed as argument, if said option has a default
+                        # value; --overhead-factor/--extra-space cannot be used
+                        # with --fixed-size, so at least detect when these were
+                        # passed with non-0 values ...
+                        if parsed.fixed_size:
+                            if parsed.overhead_factor or parsed.extra_space:
+                                err = "%s:%d: arguments --overhead-factor and --extra-space not "\
+                                      "allowed with argument --fixed-size" \
+                                      % (confpath, lineno)
+                                raise KickStartError(err)
+                        else:
+                            # ... and provide defaults if not using
+                            # --fixed-size iff given option was not used
+                            # (again, one cannot tell if option was passed but
+                            # with value equal to 0)
+                            if '--overhead-factor' not in line_args:
+                                parsed.overhead_factor = self.DEFAULT_OVERHEAD_FACTOR
+                            if '--extra-space' not in line_args:
+                                parsed.extra_space = self.DEFAULT_EXTRA_SPACE
+
                         self.partnum += 1
                         self.partitions.append(Partition(parsed, self.partnum))
                     elif line.startswith('include'):

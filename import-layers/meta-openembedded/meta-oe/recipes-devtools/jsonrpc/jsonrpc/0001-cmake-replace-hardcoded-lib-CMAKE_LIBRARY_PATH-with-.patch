@@ -1,0 +1,77 @@
+From ac61124df17ab76527508bbb9a3115d4d6cc1af6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 21 Nov 2016 11:26:26 -0800
+Subject: [PATCH] cmake: replace hardcoded lib/${CMAKE_LIBRARY_PATH} with
+ {CMAKE_INSTALL_LIBDIR}
+
+Fixes
+| CMake Error at src/jsonrpccpp/CMakeLists.txt:207 (install):
+|   install TARGETS given unknown argument "/lib".
+
+and
+
+Wrong install paths during cross compile
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/jsonrpccpp/CMakeLists.txt    | 8 ++++----
+ src/stubgenerator/CMakeLists.txt | 6 +++---
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/src/jsonrpccpp/CMakeLists.txt b/src/jsonrpccpp/CMakeLists.txt
+index e4a1eb5..13f9056 100644
+--- a/src/jsonrpccpp/CMakeLists.txt
++++ b/src/jsonrpccpp/CMakeLists.txt
+@@ -205,15 +205,15 @@ if (WIN32)
+ endif()
+ 
+ install(TARGETS ${ALL_LIBS}
+-	LIBRARY DESTINATION lib${LIB_SUFFIX}/${CMAKE_LIBRARY_PATH}
+-	ARCHIVE DESTINATION lib${LIB_SUFFIX}/${CMAKE_LIBRARY_PATH}
++	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+ 	RUNTIME DESTINATION bin
+ )
+ 
+ #set pkg-config
+ get_filename_component(FULL_PATH_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} ABSOLUTE)
+ set(FULL_PATH_INCLUDEDIR "${FULL_PATH_INSTALL_PREFIX}/include")
+-set(FULL_PATH_LIBDIR "${FULL_PATH_INSTALL_PREFIX}/lib/${CMAKE_LIBRARY_PATH}")
++set(FULL_PATH_LIBDIR "${FULL_PATH_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+ 
+ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/cmake/libjsonrpccpp-client.pc.cmake ${CMAKE_BINARY_DIR}/libjsonrpccpp-client.pc)
+ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/cmake/libjsonrpccpp-server.pc.cmake ${CMAKE_BINARY_DIR}/libjsonrpccpp-server.pc)
+@@ -223,6 +223,6 @@ INSTALL(FILES
+     "${CMAKE_BINARY_DIR}/libjsonrpccpp-server.pc"
+     "${CMAKE_BINARY_DIR}/libjsonrpccpp-client.pc"
+     "${CMAKE_BINARY_DIR}/libjsonrpccpp-common.pc"
+-    DESTINATION "lib${LIB_SUFFIX}/${CMAKE_LIBRARY_PATH}/pkgconfig")
++    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+ 
+ 
+diff --git a/src/stubgenerator/CMakeLists.txt b/src/stubgenerator/CMakeLists.txt
+index f9dbe4c..b57b0fe 100644
+--- a/src/stubgenerator/CMakeLists.txt
++++ b/src/stubgenerator/CMakeLists.txt
+@@ -58,15 +58,15 @@ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/libjsonrpccpp-stub.pc.cmake ${CMAKE_BIN
+ 
+ INSTALL(FILES
+     "${CMAKE_BINARY_DIR}/libjsonrpccpp-stub.pc"
+-    DESTINATION "lib/${CMAKE_LIBRARY_PATH}/pkgconfig")
++    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+ 
+ install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/stubgenerator/
+         DESTINATION include/jsonrpccpp/stubgen
+         FILES_MATCHING PATTERN "*.h")
+ 
+ install(TARGETS ${ALL_LIBS} jsonrpcstub
+-        LIBRARY DESTINATION lib${LIB_SUFFIX}/${CMAKE_LIBRARY_PATH}
+-        ARCHIVE DESTINATION lib${LIB_SUFFIX}/${CMAKE_LIBRARY_PATH}
++        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         RUNTIME DESTINATION bin
+ )
+ 
+-- 
+2.10.2
+

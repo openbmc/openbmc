@@ -1,0 +1,92 @@
+From 7a5b301e3adb8e054288518a325135a1883c1c6c Mon Sep 17 00:00:00 2001
+From: Mike Gilbert <floppym@gentoo.org>
+Date: Tue, 19 Apr 2016 14:27:22 -0400
+Subject: [PATCH] build: Use AC_HEADER_MAJOR to find device macros
+
+Depending on the OS/libc, device macros are defined in different
+headers. This change ensures we include the right one.
+
+sys/types.h - BSD
+sys/mkdev.h - Sun
+sys/sysmacros.h - glibc (Linux)
+
+glibc currently pulls sys/sysmacros.h into sys/types.h, but this may
+change in a future release.
+
+https://sourceware.org/ml/libc-alpha/2015-11/msg00253.html
+---
+Upstream-Status: Backport
+
+ configure.ac                         | 3 ++-
+ grub-core/osdep/devmapper/getroot.c  | 6 ++++++
+ grub-core/osdep/devmapper/hostdisk.c | 5 +++++
+ grub-core/osdep/linux/getroot.c      | 6 ++++++
+ grub-core/osdep/unix/getroot.c       | 4 +++-
+ 5 files changed, 22 insertions(+), 2 deletions(-)
+
+Index: grub-2.00/configure.ac
+===================================================================
+--- grub-2.00.orig/configure.ac
++++ grub-2.00/configure.ac
+@@ -326,7 +326,8 @@ fi
+ 
+ # Check for functions and headers.
+ AC_CHECK_FUNCS(posix_memalign memalign asprintf vasprintf getextmntent)
+-AC_CHECK_HEADERS(sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h limits.h)
++AC_CHECK_HEADERS(sys/param.h sys/mount.h sys/mnttab.h limits.h)
++AC_HEADER_MAJOR
+ 
+ AC_CHECK_MEMBERS([struct statfs.f_fstypename],,,[$ac_includes_default
+ #include <sys/param.h>
+Index: grub-2.00/grub-core/kern/emu/hostdisk.c
+===================================================================
+--- grub-2.00.orig/grub-core/kern/emu/hostdisk.c
++++ grub-2.00/grub-core/kern/emu/hostdisk.c
+@@ -41,6 +41,12 @@
+ #include <errno.h>
+ #include <limits.h>
+ 
++#if defined(MAJOR_IN_MKDEV)
++#include <sys/mkdev.h>
++#elif defined(MAJOR_IN_SYSMACROS)
++#include <sys/sysmacros.h>
++#endif
++
+ #ifdef __linux__
+ # include <sys/ioctl.h>         /* ioctl */
+ # include <sys/mount.h>
+Index: grub-2.00/util/getroot.c
+===================================================================
+--- grub-2.00.orig/util/getroot.c
++++ grub-2.00/util/getroot.c
+@@ -35,6 +35,13 @@
+ #ifdef HAVE_LIMITS_H
+ #include <limits.h>
+ #endif
++
++#if defined(MAJOR_IN_MKDEV)
++#include <sys/mkdev.h>
++#elif defined(MAJOR_IN_SYSMACROS)
++#include <sys/sysmacros.h>
++#endif
++
+ #include <grub/util/misc.h>
+ #include <grub/util/lvm.h>
+ #include <grub/cryptodisk.h>
+Index: grub-2.00/util/raid.c
+===================================================================
+--- grub-2.00.orig/util/raid.c
++++ grub-2.00/util/raid.c
+@@ -29,6 +29,12 @@
+ #include <errno.h>
+ #include <sys/types.h>
+ 
++#if defined(MAJOR_IN_MKDEV)
++#include <sys/mkdev.h>
++#elif defined(MAJOR_IN_SYSMACROS)
++#include <sys/sysmacros.h>
++#endif
++
+ #include <linux/types.h>
+ #include <linux/major.h>
+ #include <linux/raid/md_p.h>

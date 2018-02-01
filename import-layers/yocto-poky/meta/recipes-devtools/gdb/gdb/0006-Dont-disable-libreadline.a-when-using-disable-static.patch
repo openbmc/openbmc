@@ -1,4 +1,4 @@
-From f3932cb2960fd54655a448b13d5a5b80f356f8de Mon Sep 17 00:00:00 2001
+From 2a6e28ad5c0cad189a3697d96de031e4713052b8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 15:25:03 -0700
 Subject: [PATCH 06/10] Dont disable libreadline.a when using --disable-static
@@ -19,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile.def b/Makefile.def
-index ea8453e..0fc66c6 100644
+index ea8453e851..0fc66c694b 100644
 --- a/Makefile.def
 +++ b/Makefile.def
 @@ -104,7 +104,8 @@ host_modules= { module= libiconv;
@@ -33,10 +33,10 @@ index ea8453e..0fc66c6 100644
  host_modules= { module= sim; };
  host_modules= { module= texinfo; no_install= true; };
 diff --git a/Makefile.in b/Makefile.in
-index 2733c4d..3e04e80 100644
+index cb0136e8f8..55f9085c16 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -25380,7 +25380,7 @@ configure-readline:
+@@ -25385,7 +25385,7 @@ configure-readline:
  	  $$s/$$module_srcdir/configure \
  	  --srcdir=$${topdir}/$$module_srcdir \
  	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
@@ -46,5 +46,5 @@ index 2733c4d..3e04e80 100644
  @endif readline
  
 -- 
-2.8.2
+2.11.0
 

@@ -8,18 +8,15 @@
 
 python __anonymous () {
     import bb, re
-    uc_os = (re.match('.*uclibc*', d.getVar('TARGET_OS', True)) != None)
+    uc_os = (re.match('.*uclibc*', d.getVar('TARGET_OS')) != None)
     if uc_os:
         raise bb.parse.SkipPackage("incompatible with target %s" %
-                                   d.getVar('TARGET_OS', True))
+                                   d.getVar('TARGET_OS'))
 }
-
-# Set this to zero if you don't want ldconfig in the output package
-USE_LDCONFIG ?= "1"
 
 INHIBIT_SYSROOT_STRIP = "1"
 
-PACKAGES = "${PN}-dbg catchsegv sln nscd ldd tzcode ${PN}-utils glibc-thread-db ${PN}-pic libcidn libmemusage libsegfault ${PN}-pcprofile libsotruss ${PN} glibc-extra-nss ${PN}-dev ${PN}-staticdev ${PN}-doc"
+PACKAGES = "${PN}-dbg catchsegv sln nscd ldd tzcode glibc-thread-db ${PN}-pic libcidn libmemusage libsegfault ${PN}-pcprofile libsotruss ${PN} ${PN}-utils glibc-extra-nss ${PN}-dev ${PN}-staticdev ${PN}-doc"
 
 # The ld.so in this glibc supports the GNU_HASH
 RPROVIDES_${PN} = "eglibc rtld(GNU_HASH)"
@@ -37,7 +34,7 @@ libc_baselibs = "${base_libdir}/libcrypt*.so.* ${base_libdir}/libcrypt-*.so ${ba
 libc_baselibs_append_aarch64 = " /lib/ld-linux-aarch64*.so.1"
 INSANE_SKIP_${PN}_append_aarch64 = " libdir"
 
-FILES_${PN} = "${libc_baselibs} ${libexecdir}/* ${@base_conditional('USE_LDCONFIG', '1', '${base_sbindir}/ldconfig ${sysconfdir}/ld.so.conf', '', d)}"
+FILES_${PN} = "${libc_baselibs} ${libexecdir}/* ${base_sbindir}/ldconfig ${sysconfdir}/ld.so.conf"
 FILES_ldd = "${bindir}/ldd"
 FILES_libsegfault = "${base_libdir}/libSegFault*"
 FILES_libcidn = "${base_libdir}/libcidn-*.so ${base_libdir}/libcidn.so.*"
@@ -85,7 +82,7 @@ do_install_append () {
 		rmdir --ignore-fail-on-non-empty ${D}${libexecdir}
 	fi
 
-	oe_multilib_header bits/syscall.h
+	oe_multilib_header bits/syscall.h bits/long-double.h
 
 	if [ -f ${D}${bindir}/mtrace ]; then
 		sed -i -e '1s,#!.*perl,#! ${USRBINPATH}/env perl,' -e '2s,exec.*perl,exec ${USRBINPATH}/env perl,' ${D}${bindir}/mtrace
@@ -96,8 +93,8 @@ do_install_append () {
 		rm -f ${D}${infodir}/dir
 	fi
 
-	if [ "${USE_LDCONFIG}" != "1" ]; then
-		# We won't ship these files (see FILES above) so let's not install them
+	if ! ${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', 'true', 'false', d)}; then
+		# The distro doesn't want these files so let's not install them
 		rm -f ${D}${sysconfdir}/ld.so.conf
 		rm -f ${D}${base_sbindir}/ldconfig
 		# This directory will be empty now so remove it too.
@@ -143,10 +140,30 @@ do_install_append_aarch64 () {
 				${D}/lib/ld-linux-aarch64_be.so.1
 		fi
 	fi
+	do_install_armmultilib
 }
 
-do_install_locale () {
-	dest=${D}/${includedir}/glibc-locale-internal-${MULTIMACH_TARGET_SYS}
+do_install_append_arm () {
+	do_install_armmultilib
+}
+
+do_install_armmultilib () {
+
+	oe_multilib_header bits/endian.h bits/fcntl.h bits/fenv.h bits/fp-fast.h bits/hwcap.h bits/ipc.h bits/link.h bits/wordsize.h
+	oe_multilib_header bits/local_lim.h bits/mman.h bits/msq.h bits/pthreadtypes.h  bits/sem.h  bits/semaphore.h bits/setjmp.h
+	oe_multilib_header bits/shm.h bits/sigstack.h bits/stat.h bits/statfs.h bits/string.h bits/typesizes.h
+
+	oe_multilib_header fpu_control.h gnu/lib-names.h gnu/stubs.h ieee754.h
+
+	oe_multilib_header sys/elf.h sys/procfs.h sys/ptrace.h sys/ucontext.h sys/user.h
+}
+
+
+LOCALESTASH = "${WORKDIR}/stashed-locale"
+bashscripts = "mtrace sotruss xtrace"
+
+do_stash_locale () {
+	dest=${LOCALESTASH}
 	install -d ${dest}${base_libdir} ${dest}${bindir} ${dest}${libdir} ${dest}${datadir}
 	if [ "${base_libdir}" != "${libdir}" ]; then
 		cp -fpPR ${D}${base_libdir}/* ${dest}${base_libdir}
@@ -166,14 +183,8 @@ do_install_locale () {
 	cp -fpPR ${D}${datadir}/* ${dest}${datadir}
 	rm -rf ${D}${datadir}/locale/
 	cp -fpPR ${WORKDIR}/SUPPORTED ${dest}
-}
 
-addtask do_install_locale after do_install before do_populate_sysroot do_package
-
-bashscripts = "mtrace sotruss xtrace"
-
-do_evacuate_scripts () {
-	target=${D}${includedir}/glibc-scripts-internal-${MULTIMACH_TARGET_SYS}
+	target=${dest}/scripts
 	mkdir -p $target
 	for i in ${bashscripts}; do
 		if [ -f ${D}${bindir}/$i ]; then
@@ -182,22 +193,36 @@ do_evacuate_scripts () {
 	done
 }
 
-addtask evacuate_scripts after do_install before do_populate_sysroot do_package
+addtask do_stash_locale after do_install before do_populate_sysroot do_package
+do_stash_locale[dirs] = "${B}"
+do_stash_locale[cleandirs] = "${LOCALESTASH}"
+SSTATETASKS += "do_stash_locale"
+do_stash_locale[sstate-inputdirs] = "${LOCALESTASH}"
+do_stash_locale[sstate-outputdirs] = "${COMPONENTS_DIR}/${PACKAGE_ARCH}/glibc-stash-locale"
+do_stash_locale[sstate-fixmedir] = "${COMPONENTS_DIR}/${PACKAGE_ARCH}/glibc-stash-locale"
 
-PACKAGE_PREPROCESS_FUNCS += "glibc_package_preprocess"
+python do_stash_locale_setscene () {
+    sstate_setscene(d)
+}
+addtask do_stash_locale_setscene
 
-glibc_package_preprocess () {
-	rm -rf ${PKGD}/${includedir}/glibc-locale-internal-${MULTIMACH_TARGET_SYS}
-	rm -rf ${PKGD}/${includedir}/glibc-scripts-internal-${MULTIMACH_TARGET_SYS}
+do_poststash_install_cleanup () {
+	# Remove all files which do_stash_locale would remove (mv)
+	# since that task could have come from sstate and not get run.
 	for i in ${bashscripts}; do
-	    rm -f ${PKGD}${bindir}/$i
+	    rm -f ${D}${bindir}/$i
 	done
-	rm -rf ${PKGD}/${localedir}
+	rm -f ${D}${bindir}/localedef
+	rm -rf ${D}${datadir}/i18n
+	rm -rf ${D}${libdir}/gconv
+	rm -rf ${D}/${localedir}
+	rm -rf ${D}${datadir}/locale
 	if [ "${libdir}" != "${exec_prefix}/lib" ]; then
 		# This dir only exists to hold locales
-		rm -rf ${PKGD}${exec_prefix}/lib
+		rm -rf ${D}${exec_prefix}/lib
 	fi
 }
+addtask do_poststash_install_cleanup after do_stash_locale do_install before do_populate_sysroot do_package
 
 pkg_postinst_nscd () {
 	if [ -z "$D" ]; then

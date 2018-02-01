@@ -26,7 +26,6 @@ BitBake 'Fetch' implementation for perforce
 import os
 import logging
 import bb
-from   bb import data
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
 from   bb.fetch2 import logger
@@ -44,13 +43,13 @@ class Perforce(FetchMethod):
         provided by the env, use it.  If P4PORT is specified by the recipe, use
         its values, which may override the settings in P4CONFIG.
         """
-        ud.basecmd = d.getVar('FETCHCMD_p4', True)
+        ud.basecmd = d.getVar('FETCHCMD_p4')
         if not ud.basecmd:
             ud.basecmd = "/usr/bin/env p4"
 
-        ud.dldir = d.getVar('P4DIR', True)
+        ud.dldir = d.getVar('P4DIR')
         if not ud.dldir:
-            ud.dldir = '%s/%s' % (d.getVar('DL_DIR', True), 'p4')
+            ud.dldir = '%s/%s' % (d.getVar('DL_DIR'), 'p4')
 
         path = ud.url.split('://')[1]
         path = path.split(';')[0]
@@ -62,7 +61,7 @@ class Perforce(FetchMethod):
             ud.path = path
 
         ud.usingp4config = False
-        p4port = d.getVar('P4PORT', True)
+        p4port = d.getVar('P4PORT')
 
         if p4port:
             logger.debug(1, 'Using recipe provided P4PORT: %s' % p4port)
@@ -71,7 +70,7 @@ class Perforce(FetchMethod):
             logger.debug(1, 'Trying to use P4CONFIG to automatically set P4PORT...')
             ud.usingp4config = True
             p4cmd = '%s info | grep "Server address"' % ud.basecmd
-            bb.fetch2.check_network_access(d, p4cmd)
+            bb.fetch2.check_network_access(d, p4cmd, ud.url)
             ud.host = runfetchcmd(p4cmd, d, True)
             ud.host = ud.host.split(': ')[1].strip()
             logger.debug(1, 'Determined P4PORT to be: %s' % ud.host)
@@ -87,9 +86,9 @@ class Perforce(FetchMethod):
         cleanedhost = ud.host.replace(':', '.')
         ud.pkgdir = os.path.join(ud.dldir, cleanedhost, cleanedpath)
 
-        ud.setup_revisons(d)
+        ud.setup_revisions(d)
 
-        ud.localfile = data.expand('%s_%s_%s.tar.gz' % (cleanedhost, cleanedpath, ud.revision), d)
+        ud.localfile = d.expand('%s_%s_%s.tar.gz' % (cleanedhost, cleanedpath, ud.revision))
 
     def _buildp4command(self, ud, d, command, depot_filename=None):
         """
@@ -140,7 +139,7 @@ class Perforce(FetchMethod):
         'p4 files' command, including trailing '#rev' file revision indicator
         """
         p4cmd = self._buildp4command(ud, d, 'files')
-        bb.fetch2.check_network_access(d, p4cmd)
+        bb.fetch2.check_network_access(d, p4cmd, ud.url)
         p4fileslist = runfetchcmd(p4cmd, d, True)
         p4fileslist = [f.rstrip() for f in p4fileslist.splitlines()]
 
@@ -171,7 +170,7 @@ class Perforce(FetchMethod):
 
         for afile in filelist:
             p4fetchcmd = self._buildp4command(ud, d, 'print', afile)
-            bb.fetch2.check_network_access(d, p4fetchcmd)
+            bb.fetch2.check_network_access(d, p4fetchcmd, ud.url)
             runfetchcmd(p4fetchcmd, d, workdir=ud.pkgdir)
 
         runfetchcmd('tar -czf %s p4' % (ud.localpath), d, cleanup=[ud.localpath], workdir=ud.pkgdir)
@@ -191,7 +190,7 @@ class Perforce(FetchMethod):
     def _latest_revision(self, ud, d, name):
         """ Return the latest upstream scm revision number """
         p4cmd = self._buildp4command(ud, d, "changes")
-        bb.fetch2.check_network_access(d, p4cmd)
+        bb.fetch2.check_network_access(d, p4cmd, ud.url)
         tip = runfetchcmd(p4cmd, d, True)
 
         if not tip:

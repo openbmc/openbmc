@@ -34,7 +34,7 @@ acpaths = "-I ./m4"
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', '', 'file://fix-disable-ipv6.patch', d)}"
 
 PACKAGECONFIG ??= "ftp uucpd \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)} \
+                   ${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6 ping6', '', d)} \
                   "
 PACKAGECONFIG[ftp] = "--enable-ftp,--disable-ftp,readline"
@@ -58,14 +58,16 @@ do_configure_prepend () {
 }
 
 do_install_append () {
-    install -m 0755 -d ${D}${base_bindir}
     install -m 0755 -d ${D}${base_sbindir}
     install -m 0755 -d ${D}${sbindir}
     install -m 0755 -d ${D}${sysconfdir}/xinetd.d
-    mv ${D}${bindir}/ping* ${D}${base_bindir}/
+    if [ "${base_bindir}" != "${bindir}" ] ; then
+         install -m 0755 -d ${D}${base_bindir}
+         mv ${D}${bindir}/ping* ${D}${base_bindir}/
+         mv ${D}${bindir}/hostname ${D}${base_bindir}/
+    fi
     mv ${D}${bindir}/ifconfig ${D}${base_sbindir}/
     mv ${D}${libexecdir}/syslogd ${D}${base_sbindir}/
-    mv ${D}${bindir}/hostname ${D}${base_bindir}/
     mv ${D}${libexecdir}/tftpd ${D}${sbindir}/in.tftpd
     mv ${D}${libexecdir}/telnetd ${D}${sbindir}/in.telnetd
     mv ${D}${libexecdir}/rexecd ${D}${sbindir}/in.rexecd
@@ -104,9 +106,10 @@ ${PN}-rsh ${PN}-rshd"
 # provided by netkit, so add the corresponding -dbg packages
 # for them to avoid the confliction between the dbg package
 # of inetutils and netkit.
-PACKAGES += "${PN}-tftpd-dbg ${PN}-telnetd-dbg ${PN}-rshd-dbg"
+PACKAGES =+ "${PN}-tftpd-dbg ${PN}-telnetd-dbg ${PN}-rshd-dbg"
+NOAUTOPACKAGEDEBUG = "1"
 
-ALTERNATIVE_PRIORITY = "80"
+ALTERNATIVE_PRIORITY = "79"
 ALTERNATIVE_${PN} = "talk whois"
 ALTERNATIVE_LINK_NAME[talkd]  = "${sbindir}/in.talkd"
 ALTERNATIVE_LINK_NAME[uucpd]  = "${sbindir}/in.uucpd"
@@ -143,16 +146,23 @@ ALTERNATIVE_${PN}-traceroute = "traceroute"
 ALTERNATIVE_${PN}-hostname = "hostname"
 ALTERNATIVE_LINK_NAME[hostname]  = "${base_bindir}/hostname"
 
+ALTERNATIVE_${PN}-doc = "hostname.1 dnsdomainname.1 logger.1 syslogd.8"
+ALTERNATIVE_LINK_NAME[hostname.1] = "${mandir}/man1/hostname.1"
+ALTERNATIVE_LINK_NAME[dnsdomainname.1] = "${mandir}/man1/dnsdomainname.1"
+ALTERNATIVE_LINK_NAME[logger.1] = "${mandir}/man1/logger.1"
+ALTERNATIVE_LINK_NAME[syslogd.8] = "${mandir}/man8/syslogd.8"
+
 ALTERNATIVE_${PN}-ifconfig = "ifconfig"
 ALTERNATIVE_LINK_NAME[ifconfig]  = "${base_sbindir}/ifconfig"
 
 ALTERNATIVE_${PN}-ping = "ping"
 ALTERNATIVE_LINK_NAME[ping]   = "${base_bindir}/ping"
 
-ALTERNATIVE_${PN}-ping6 = "${@bb.utils.contains('PACKAGECONFIG', 'ping6', 'ping6', '', d)}"
+ALTERNATIVE_${PN}-ping6 = "${@bb.utils.filter('PACKAGECONFIG', 'ping6', d)}"
 ALTERNATIVE_LINK_NAME[ping6]  = "${base_bindir}/ping6"
 
 
+FILES_${PN}-dbg += "${base_bindir}/.debug ${base_sbindir}/.debug ${bindir}/.debug ${sbindir}/.debug"
 FILES_${PN}-ping = "${base_bindir}/ping.${BPN}"
 FILES_${PN}-ping6 = "${base_bindir}/ping6.${BPN}"
 FILES_${PN}-hostname = "${base_bindir}/hostname.${BPN}"

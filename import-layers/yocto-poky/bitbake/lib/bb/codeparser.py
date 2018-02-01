@@ -1,3 +1,22 @@
+"""
+BitBake code parser
+
+Parses actual code (i.e. python and shell) for functions and in-line
+expressions. Used mainly to determine dependencies on other functions
+and variables within the BitBake metadata. Also provides a cache for
+this information in order to speed up processing.
+
+(Not to be confused with the code that parses the metadata itself,
+see lib/bb/parse/ for that).
+
+NOTE: if you change how the parsers gather information you will almost
+certainly need to increment CodeParserCache.CACHE_VERSION below so that
+any existing codeparser cache gets invalidated. Additionally you'll need
+to increment __cache_version__ in cache.py in order to ensure that old
+recipe caches don't trigger "Taskhash mismatch" errors.
+
+"""
+
 import ast
 import sys
 import codegen
@@ -117,7 +136,11 @@ class shellCacheLine(object):
 
 class CodeParserCache(MultiProcessCache):
     cache_file_name = "bb_codeparser.dat"
-    CACHE_VERSION = 8
+    # NOTE: you must increment this if you change how the parsers gather information,
+    # so that an existing cache gets invalidated. Additionally you'll need
+    # to increment __cache_version__ in cache.py in order to ensure that old
+    # recipe caches don't trigger "Taskhash mismatch" errors.
+    CACHE_VERSION = 9
 
     def __init__(self):
         MultiProcessCache.__init__(self)
@@ -186,13 +209,15 @@ class BufferedLogger(Logger):
 
     def flush(self):
         for record in self.buffer:
-            self.target.handle(record)
+            if self.target.isEnabledFor(record.levelno):
+                self.target.handle(record)
         self.buffer = []
 
 class PythonParser():
     getvars = (".getVar", ".appendVar", ".prependVar")
     getvarflags = (".getVarFlag", ".appendVarFlag", ".prependVarFlag")
-    containsfuncs = ("bb.utils.contains", "base_contains", "bb.utils.contains_any")
+    containsfuncs = ("bb.utils.contains", "base_contains")
+    containsanyfuncs = ("bb.utils.contains_any",  "bb.utils.filter")
     execfuncs = ("bb.build.exec_func", "bb.build.exec_task")
 
     def warn(self, func, arg):
@@ -211,13 +236,17 @@ class PythonParser():
 
     def visit_Call(self, node):
         name = self.called_node_name(node.func)
-        if name and (name.endswith(self.getvars) or name.endswith(self.getvarflags) or name in self.containsfuncs):
+        if name and (name.endswith(self.getvars) or name.endswith(self.getvarflags) or name in self.containsfuncs or name in self.containsanyfuncs):
             if isinstance(node.args[0], ast.Str):
                 varname = node.args[0].s
                 if name in self.containsfuncs and isinstance(node.args[1], ast.Str):
                     if varname not in self.contains:
                         self.contains[varname] = set()
                     self.contains[varname].add(node.args[1].s)
+                elif name in self.containsanyfuncs and isinstance(node.args[1], ast.Str):
+                    if varname not in self.contains:
+                        self.contains[varname] = set()
+                    self.contains[varname].update(node.args[1].s.split())
                 elif name.endswith(self.getvarflags):
                     if isinstance(node.args[1], ast.Str):
                         self.references.add('%s[%s]' % (varname, node.args[1].s))

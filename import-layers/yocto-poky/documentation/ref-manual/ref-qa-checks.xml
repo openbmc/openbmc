@@ -1170,45 +1170,6 @@ can be found then it should be implemented.  I can't find one at the moment.
             </listitem>
         </itemizedlist>
     </para>
-
-<!--
-Here are some messages that might be documented in the future.
-Right now we are not documenting them because the QA checks are not
-enabled by default:
-
-    <para>
-        <itemizedlist>
-            <listitem><para>
-                <literallayout class='monospaced'>
-     Desktop file issue: &lt;error&gt; [desktop]
-                </literallayout>
-                NEED A DESCRIPTION AND SOLUTION
-                </para></listitem>
-        </itemizedlist>
-    </para>
-
-    <para>
-        <itemizedlist>
-            <listitem><para>
-                <literallayout class='monospaced'>
-     &lt;packagename&gt;: &lt;file&gt;, installed in the base_prefix, requires a shared library under exec_prefix (&lt;exec_prefix&t;g) [unsafe-references-in-binaries]
-                </literallayout>
-                NEED A DESCRIPTION AND SOLUTION
-                </para></listitem>
-        </itemizedlist>
-    </para>
-
-    <para>
-        <itemizedlist>
-            <listitem><para>
-                <literallayout class='monospaced'>
-     &lt;packagename&gt;: Found a reference to &lt;exec_prefix&gt;/ in &lt;path&gt; - Shell scripts in base_bindir and base_sbindir should not reference anything in exec_prefix [unsafe-references-in-scripts]
-                </literallayout>
-                NEED A DESCRIPTION AND SOLUTION
-                </para></listitem>
-        </itemizedlist>
-    </para>
--->
 </section>
 
 <section id='configuring-and-disabling-qa-checks'>

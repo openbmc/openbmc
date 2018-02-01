@@ -31,8 +31,7 @@ SYSTEMD_SERVICE_${PN} = "cfengine3.service cfengine3-web.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "disable"
 
 PACKAGECONFIG ??= "libpcre openssl \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)} \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
+                   ${@bb.utils.filter('DISTRO_FEATURES', 'pam systemd', d)} \
 "
 PACKAGECONFIG[libxml2] = "--with-libxml2=yes,--with-libxml2=no,libxml2,"
 PACKAGECONFIG[mysql] = "--with-mysql=yes,--with-mysql=no,mysql,"

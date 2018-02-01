@@ -20,7 +20,9 @@ SRC_URI = "http://www.progsoc.org/~wildfire/zeroconf/download/${BPN}-${PV}.tar.g
            file://compilefix.patch \
            file://makefile-add-ldflags.patch \
            file://zeroconf-default \
-           file://debian-zeroconf"
+           file://debian-zeroconf \
+           file://0001-zeroconf-Rename-arp_op-to-avoid-namespace-conflicts-.patch \
+           "
 
 SRC_URI[md5sum] = "bdafb16b008ebb5633e4e581f77821d2"
 SRC_URI[sha256sum] = "a8c74df127753e2310fa1e072f3c9ca44a404bb0bbce9cfec7a84c6dff8bec7b"

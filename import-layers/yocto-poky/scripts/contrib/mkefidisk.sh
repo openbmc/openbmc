@@ -20,6 +20,11 @@
 
 LANG=C
 
+echo
+echo "WARNING: This script is deprecated and will be removed soon."
+echo "Please consider using wic EFI images instead."
+echo
+
 # Set to 1 to enable additional output
 DEBUG=0
 OUT="/dev/null"
@@ -379,7 +384,7 @@ EFIDIR="$BOOTFS_MNT/EFI/BOOT"
 cp $HDDIMG_MNT/vmlinuz $BOOTFS_MNT >$OUT 2>&1 || error "Failed to copy vmlinuz"
 # Copy the efi loader and configs (booti*.efi and grub.cfg if it exists)
 cp -r $HDDIMG_MNT/EFI $BOOTFS_MNT >$OUT 2>&1 || error "Failed to copy EFI dir"
-# Silently ignore a missing gummiboot loader dir (we might just be a GRUB image)
+# Silently ignore a missing systemd-boot loader dir (we might just be a GRUB image)
 cp -r $HDDIMG_MNT/loader $BOOTFS_MNT >$OUT 2>&1
 
 # Update the boot loaders configurations for an installed image
@@ -405,25 +410,25 @@ if [ -e "$GRUB_CFG" ]; then
 	sed -i "s@vmlinuz @vmlinuz root=$TARGET_ROOTFS ro rootwait console=ttyS0 console=tty0 @" $GRUB_CFG
 fi
 
-# Look for a gummiboot installation
-GUMMI_ENTRIES="$BOOTFS_MNT/loader/entries"
-GUMMI_CFG="$GUMMI_ENTRIES/boot.conf"
-if [ -d "$GUMMI_ENTRIES" ]; then
-	info "Configuring Gummiboot"
+# Look for a systemd-boot installation
+SYSTEMD_BOOT_ENTRIES="$BOOTFS_MNT/loader/entries"
+SYSTEMD_BOOT_CFG="$SYSTEMD_BOOT_ENTRIES/boot.conf"
+if [ -d "$SYSTEMD_BOOT_ENTRIES" ]; then
+	info "Configuring SystemD-boot"
 	# remove the install target if it exists
-	rm $GUMMI_ENTRIES/install.conf >$OUT 2>&1
+	rm $SYSTEMD_BOOT_ENTRIES/install.conf >$OUT 2>&1
 
-	if [ ! -e "$GUMMI_CFG" ]; then
-		echo "ERROR: $GUMMI_CFG not found"
+	if [ ! -e "$SYSTEMD_BOOT_CFG" ]; then
+		echo "ERROR: $SYSTEMD_BOOT_CFG not found"
 	fi
 
-	sed -i "/initrd /d" $GUMMI_CFG
-	sed -i "s@ root=[^ ]*@ @" $GUMMI_CFG
-	sed -i "s@options *LABEL=boot @options LABEL=Boot root=$TARGET_ROOTFS ro rootwait console=ttyS0 console=tty0 @" $GUMMI_CFG
+	sed -i "/initrd /d" $SYSTEMD_BOOT_CFG
+	sed -i "s@ root=[^ ]*@ @" $SYSTEMD_BOOT_CFG
+	sed -i "s@options *LABEL=boot @options LABEL=Boot root=$TARGET_ROOTFS ro rootwait console=ttyS0 console=tty0 @" $SYSTEMD_BOOT_CFG
 fi
 
 # Ensure we have at least one EFI bootloader configured
-if [ ! -e $GRUB_CFG ] && [ ! -e $GUMMI_CFG ]; then
+if [ ! -e $GRUB_CFG ] && [ ! -e $SYSTEMD_BOOT_CFG ]; then
 	die "No EFI bootloader configuration found"
 fi
 
@@ -439,7 +444,7 @@ if [ -d $ROOTFS_MNT/etc/udev/ ] ; then
 fi
 
 # Add startup.nsh script for automated boot
-echo "fs0:\EFI\BOOT\bootx64.efi" > $BOOTFS_MNT/startup.nsh
+printf "fs0:\%s\BOOT\%s\n" "EFI" "bootx64.efi" > $BOOTFS_MNT/startup.nsh
 
 
 # Call cleanup to unmount devices and images and remove the TMPDIR

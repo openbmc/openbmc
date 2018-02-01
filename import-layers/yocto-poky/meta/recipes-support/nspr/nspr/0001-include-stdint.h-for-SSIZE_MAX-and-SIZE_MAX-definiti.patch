@@ -1,0 +1,30 @@
+From f7551ec58e2f0a892295e0c2a650083101e12c54 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 20 May 2017 13:24:26 -0700
+Subject: [PATCH] include stdint.h for SSIZE_MAX and SIZE_MAX definitions
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ pr/tests/prfz.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/pr/tests/prfz.c b/pr/tests/prfz.c
+index 0c5a432..9c17590 100644
+--- a/pr/tests/prfz.c
++++ b/pr/tests/prfz.c
+@@ -10,7 +10,9 @@
+ #include <sys/types.h>
+ #include <limits.h>
+ #include <string.h>
+-
++#ifdef XP_UNIX
++#include <stdint.h>
++#endif
+ int
+ main(int argc, char **argv)
+ {
+-- 
+2.13.0
+

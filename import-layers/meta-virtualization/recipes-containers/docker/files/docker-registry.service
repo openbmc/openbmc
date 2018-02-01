@@ -1,0 +1,19 @@
+[Unit]
+Description=docker private registry service
+After=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker kill registry
+ExecStartPre=-/usr/bin/docker rm registry
+ExecStart=/usr/bin/docker run --name registry -v /mirror/registry:/tmp/ -p 5000:5000 \
+                          -e "STANDALONE=true" \
+                          -e "MIRROR_SOURCE=https://registry-1.docker.io" \
+                          -e "MIRROR_SOURCE_INDEX=https://index.docker.io" \
+                          -e "SETTINGS_FLAVOR=local" \
+                          registry
+ExecStop=-/usr/bin/docker stop registry
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

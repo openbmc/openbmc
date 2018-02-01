@@ -1,0 +1,85 @@
+From aa0dc0783a6ff5fb56c914b640836223e3c192bb Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Mon, 29 Dec 2014 18:16:04 +0800
+Subject: [PATCH] remove host path from la_LDFLAGS
+
+Upstream-Status: Inappropriate [ cross compile specific ]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ cmdlang/Makefile.am |    2 +-
+ glib/Makefile.am    |    4 ++--
+ tcl/Makefile.am     |    2 +-
+ unix/Makefile.am    |    4 ++--
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/cmdlang/Makefile.am b/cmdlang/Makefile.am
+index 00c3d2b..0fa85d7 100644
+--- a/cmdlang/Makefile.am
++++ b/cmdlang/Makefile.am
+@@ -16,7 +16,7 @@ libOpenIPMIcmdlang_la_LIBADD = -lm \
+ 	$(top_builddir)/utils/libOpenIPMIutils.la \
+ 	$(top_builddir)/lib/libOpenIPMI.la
+ libOpenIPMIcmdlang_la_LDFLAGS = -rdynamic -version-info $(LD_VERSION) \
+-	-Wl,-Map -Wl,libOpenIPMIcmdlang.map -L$(libdir)
++	-Wl,-Map -Wl,libOpenIPMIcmdlang.map
+ 
+ bin_PROGRAMS = openipmish
+ 
+diff --git a/glib/Makefile.am b/glib/Makefile.am
+index 671cae2..eff55f3 100644
+--- a/glib/Makefile.am
++++ b/glib/Makefile.am
+@@ -11,14 +11,14 @@ libOpenIPMIglib_la_SOURCES = glib_os_hnd.c
+ libOpenIPMIglib_la_CFLAGS = $(GLIB_CFLAGS) $(AM_CFLAGS)
+ libOpenIPMIglib_la_LIBADD = $(GDBM_LIB)
+ libOpenIPMIglib_la_LDFLAGS = -rdynamic -version-info $(LD_VERSION) \
+-	-Wl,-Map -Wl,libOpenIPMIglib.map $(GLIB_LIBS) -L$(libdir) \
++	-Wl,-Map -Wl,libOpenIPMIglib.map $(GLIB_LIBS) \
+ 	-rpath $(libdir)
+ 
+ libOpenIPMIglib12_la_SOURCES = glib_os_hnd.c
+ libOpenIPMIglib12_la_CFLAGS = $(GLIB12_CFLAGS) $(AM_CFLAGS)
+ libOpenIPMIglib12_la_LIBADD = $(GDBM_LIB)
+ libOpenIPMIglib12_la_LDFLAGS = -rdynamic -version-info $(LD_VERSION) \
+-	-Wl,-Map -Wl,libOpenIPMIglib12.map $(GLIB12_LIBS) -L$(libdir) \
++	-Wl,-Map -Wl,libOpenIPMIglib12.map $(GLIB12_LIBS) \
+ 	-rpath $(libdir)
+ 
+ CLEANFILES = libOpenIPMIglib.map libOpenIPMIglib12.map
+diff --git a/tcl/Makefile.am b/tcl/Makefile.am
+index b702819..282619c 100644
+--- a/tcl/Makefile.am
++++ b/tcl/Makefile.am
+@@ -11,7 +11,7 @@ libOpenIPMItcl_la_SOURCES = tcl_os_hnd.c
+ libOpenIPMItcl_la_CFLAGS = $(TCL_CFLAGS) $(AM_CFLAGS)
+ libOpenIPMItcl_la_LIBADD = $(GDBM_LIB)
+ libOpenIPMItcl_la_LDFLAGS = -rdynamic -version-info $(LD_VERSION) \
+-	-Wl,-Map -Wl,libOpenIPMItcl.map $(TCL_LIBS) -L$(libdir) \
++	-Wl,-Map -Wl,libOpenIPMItcl.map $(TCL_LIBS) \
+ 	-rpath $(libdir)
+ 
+ noinst_PROGRAMS = test_handlers
+diff --git a/unix/Makefile.am b/unix/Makefile.am
+index a792147..a108bc6 100644
+--- a/unix/Makefile.am
++++ b/unix/Makefile.am
+@@ -11,13 +11,13 @@ libOpenIPMIpthread_la_SOURCES = posix_thread_os_hnd.c selector.c
+ libOpenIPMIpthread_la_LIBADD = -lpthread $(GDBM_LIB) \
+ 	$(top_builddir)/utils/libOpenIPMIutils.la
+ libOpenIPMIpthread_la_LDFLAGS = -rdynamic -version-info $(LD_VERSION) \
+-	-Wl,-Map -Wl,libOpenIPMIpthread.map -L$(libdir)
++	-Wl,-Map -Wl,libOpenIPMIpthread.map
+ 
+ libOpenIPMIposix_la_SOURCES = posix_os_hnd.c selector.c
+ libOpenIPMIposix_la_LIBADD = $(top_builddir)/utils/libOpenIPMIutils.la \
+ 	$(GDBM_LIB)
+ libOpenIPMIposix_la_LDFLAGS = -rdynamic -version-info $(LD_VERSION) \
+-	-Wl,-Map -Wl,libOpenIPMIposix.map -L$(libdir)
++	-Wl,-Map -Wl,libOpenIPMIposix.map
+ 
+ noinst_HEADERS = heap.h
+ 
+-- 
+1.7.1
+

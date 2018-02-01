@@ -132,3 +132,5 @@ RDEPENDS_dvb-scan =+ "libdvbapi libdvbcfg libdvbsec"
 RDEPENDS_dvb-apps =+ "libdvbapi libdvbcfg libdvbsec libdvben50221 libucsi"
 RDEPENDS_dvb-femon =+ "libdvbapi"
 RDEPENDS_dvbnet =+ "libdvbapi"
+
+PNBLACKLIST[dvb-apps] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130603/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

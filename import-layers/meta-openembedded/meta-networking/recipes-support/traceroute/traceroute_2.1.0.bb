@@ -33,10 +33,10 @@ do_install() {
 
     install -m755 wrappers/tcptraceroute ${D}${bindir}
 
-    install -d ${D}${mandir}
-    install -p -m644 ${BPN}/${BPN}.8 ${D}${mandir}
-    ln -s ${BPN}.8 ${D}${mandir}/${BPN}6.8
-    ln -s ${BPN}.8 ${D}${mandir}/tcptraceroute.8
+    install -d ${D}${mandir}/man8
+    install -p -m644 ${BPN}/${BPN}.8 ${D}${mandir}/man8
+    ln -s ${BPN}.8 ${D}${mandir}/man8/${BPN}6.8
+    ln -s ${BPN}.8 ${D}${mandir}/man8/tcptraceroute.8
 
 }
 

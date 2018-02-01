@@ -1,0 +1,46 @@
+From 5028ef46ff4ab0930224b71024a7349b05610d42 Mon Sep 17 00:00:00 2001
+From: Stefan Agner <stefan@agner.ch>
+Date: Thu, 22 Dec 2016 15:41:06 +0100
+Subject: [PATCH] modesetting: Fix 16 bit depth/bpp mode
+
+When setting DefaultDepth to 16 in the Screen section, the current
+code requests a 32 bpp framebuffer, however the X-Server seems to
+assumes 16 bpp.
+
+Fixes commit 21217d02168d ("modesetting: Implement 32->24 bpp
+conversion in shadow update")
+
+Signed-off-by: Stefan Agner <stefan@agner.ch>
+
+Upstream-Status: Submitted [1]
+
+[1] https://lists.x.org/archives/xorg-devel/2016-December/052113.html
+---
+ hw/xfree86/drivers/modesetting/driver.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/hw/xfree86/drivers/modesetting/driver.c b/hw/xfree86/drivers/modesetting/driver.c
+index d7030e5..647ad83 100644
+--- a/hw/xfree86/drivers/modesetting/driver.c
++++ b/hw/xfree86/drivers/modesetting/driver.c
+@@ -930,7 +930,7 @@ PreInit(ScrnInfoPtr pScrn, int flags)
+                    "Using 24bpp hw front buffer with 32bpp shadow\n");
+         defaultbpp = 32;
+     } else {
+-        ms->drmmode.kbpp = defaultbpp;
++        ms->drmmode.kbpp = 0;
+     }
+     bppflags = PreferConvert24to32 | SupportConvert24to32 | Support32bppFb;
+ 
+@@ -950,6 +950,8 @@ PreInit(ScrnInfoPtr pScrn, int flags)
+         return FALSE;
+     }
+     xf86PrintDepthBpp(pScrn);
++    if (!ms->drmmode.kbpp)
++        ms->drmmode.kbpp = pScrn->bitsPerPixel;
+ 
+     /* Process the options */
+     xf86CollectOptions(pScrn, NULL);
+-- 
+2.7.4
+

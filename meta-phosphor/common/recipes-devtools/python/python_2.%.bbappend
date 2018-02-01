@@ -1,6 +1,5 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://__init__.email_min.py"
-SRC_URI += "file://issue_27934_use-float-repr.patch"
 
 do_install_append_class-target() {
 	dir=${libdir}/python${PYTHON_MAJMIN}/email

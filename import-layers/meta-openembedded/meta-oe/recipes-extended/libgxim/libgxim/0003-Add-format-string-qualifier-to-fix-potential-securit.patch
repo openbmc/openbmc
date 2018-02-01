@@ -1,0 +1,30 @@
+From d05d7fa24ee128f1f33a2e905fc3601955dd27d4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Mar 2017 18:06:02 -0700
+Subject: [PATCH 3/3] Add format string qualifier to fix potential security
+ risk
+
+Fixes
+libgxim/gximprotocol10.c:2076:66: error: format string is not a string literal (potentially insecure) [-Werror,-Wformat-security]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libgxim/gximprotocol10.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libgxim/gximprotocol10.c b/libgxim/gximprotocol10.c
+index 04887a5..65bd4df 100644
+--- a/libgxim/gximprotocol10.c
++++ b/libgxim/gximprotocol10.c
+@@ -2073,7 +2073,7 @@ g_xim_protocol10_closure_real_parser_error(GXimProtocol *proto,
+ 	msg = g_strdup_printf("Unable to parse the protocol %s properly",
+ 			      g_xim_protocol_name(major_opcode));
+ 
+-	g_xim_messages_error(G_XIM_PROTOCOL_GET_IFACE (proto)->message, msg);
++	g_xim_messages_error(G_XIM_PROTOCOL_GET_IFACE (proto)->message, "%s", msg);
+ 	switch (major_opcode) {
+ 	    case G_XIM_CONNECT:
+ 	    case G_XIM_AUTH_REQUIRED:
+-- 
+2.12.1
+

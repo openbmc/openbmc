@@ -1,0 +1,30 @@
+From 465d98dbcdcb72375c198010a50b80b953e7d5a6 Mon Sep 17 00:00:00 2001
+From: Yuri <yuri@tsoft.com>
+Date: Sat, 28 May 2016 13:20:10 -0700
+Subject: [PATCH] Fixed undefined ssize_t for clang-3.8.0 on FreeBSD.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+Upstream-Status: Backport [https://github.com/andreas-volz/dbus-cplusplus/commit/463f5a4400d494b831c3b3348c0a21f0faf14f39]
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ include/dbus-c++/pipe.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/dbus-c++/pipe.h b/include/dbus-c++/pipe.h
+index 999f042..682646c 100644
+--- a/include/dbus-c++/pipe.h
++++ b/include/dbus-c++/pipe.h
+@@ -30,6 +30,8 @@
+ /* STD */
+ #include <cstdlib>
+ 
++#include <sys/types.h>
++
+ namespace DBus
+ {
+ 
+-- 
+2.10.2
+

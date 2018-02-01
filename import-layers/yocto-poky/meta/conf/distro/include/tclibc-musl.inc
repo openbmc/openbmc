@@ -4,7 +4,7 @@
 
 LIBCEXTENSION = "-musl"
 
-# Add uclibc overrides to the overrides.
+# Add musl libc overrides to the overrides.
 LIBCOVERRIDE = ":libc-musl"
 OVERRIDES .= "${LIBCOVERRIDE}"
 
@@ -25,7 +25,3 @@ LIBC_DEPENDENCIES = "\
     musl-dbg \
     musl-dev \
     "
-
-# GLib binaries trigger assertion failures and crash under qemu
-# when musl is in use
-DISTRO_FEATURES_BACKFILL_CONSIDERED += "gobject-introspection-data"

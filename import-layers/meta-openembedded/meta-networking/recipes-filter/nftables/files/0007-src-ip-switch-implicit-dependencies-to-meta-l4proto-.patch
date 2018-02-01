@@ -1,0 +1,86 @@
+From 0825c57d571bb7121e7048e198b9b023f7e7f358 Mon Sep 17 00:00:00 2001
+From: Florian Westphal <fw@strlen.de>
+Date: Sun, 7 May 2017 03:53:30 +0200
+Subject: [PATCH] src: ip: switch implicit dependencies to meta l4proto too
+
+after ip6 nexthdr also switch ip to meta l4proto instead of ip protocol.
+
+While its needed for ipv6 (due to extension headers) this isn't needed
+for ip but it has the advantage that
+
+tcp dport 22
+
+produces same expressions for ip/ip6/inet families.
+
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+Upstream-Status: Backport
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ src/payload.c | 17 +++++++++++------
+ src/proto.c   |  3 ++-
+ 2 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/src/payload.c b/src/payload.c
+index 8796ee5..11b6df3 100644
+--- a/src/payload.c
++++ b/src/payload.c
+@@ -118,17 +118,22 @@ static const struct expr_ops payload_expr_ops = {
+ };
+ 
+ /*
+- * ipv6 is special case, we normally use 'meta l4proto' to fetch the last
+- * l4 header of the ipv6 extension header chain so we will also match
++ * We normally use 'meta l4proto' to fetch the last l4 header of the
++ * ipv6 extension header chain so we will also match
+  * tcp after a fragmentation header, for instance.
++ * For consistency we also use meta l4proto for ipv4.
+  *
+- * If user specifically asks for nexthdr x, treat is as a full
+- * dependency rather than injecting another (useless) meta l4 one.
++ * If user specifically asks for nexthdr x, don't add another (useless)
++ * meta dependency.
+  */
+ static bool proto_key_is_protocol(const struct proto_desc *desc, unsigned int type)
+ {
+-	if (type == desc->protocol_key ||
+-	    (desc == &proto_ip6 && type == IP6HDR_NEXTHDR))
++	if (type == desc->protocol_key)
++		return true;
++
++	if (desc == &proto_ip6 && type == IP6HDR_NEXTHDR)
++		return true;
++	if (desc == &proto_ip && type == IPHDR_PROTOCOL)
+ 		return true;
+ 
+ 	return false;
+diff --git a/src/proto.c b/src/proto.c
+index 3b20a5f..2afedf7 100644
+--- a/src/proto.c
++++ b/src/proto.c
+@@ -587,7 +587,6 @@ const struct proto_desc proto_ip = {
+ 	.name		= "ip",
+ 	.base		= PROTO_BASE_NETWORK_HDR,
+ 	.checksum_key	= IPHDR_CHECKSUM,
+-	.protocol_key	= IPHDR_PROTOCOL,
+ 	.protocols	= {
+ 		PROTO_LINK(IPPROTO_ICMP,	&proto_icmp),
+ 		PROTO_LINK(IPPROTO_ESP,		&proto_esp),
+@@ -600,6 +599,7 @@ const struct proto_desc proto_ip = {
+ 		PROTO_LINK(IPPROTO_SCTP,	&proto_sctp),
+ 	},
+ 	.templates	= {
++		[0]	= PROTO_META_TEMPLATE("l4proto", &inet_protocol_type, NFT_META_L4PROTO, 8),
+ 		[IPHDR_VERSION]		= HDR_BITFIELD("version", &integer_type, 0, 4),
+ 		[IPHDR_HDRLENGTH]	= HDR_BITFIELD("hdrlength", &integer_type, 4, 4),
+ 		[IPHDR_DSCP]            = HDR_BITFIELD("dscp", &dscp_type, 8, 6),
+@@ -779,6 +779,7 @@ const struct proto_desc proto_inet_service = {
+ 		PROTO_LINK(IPPROTO_TCP,		&proto_tcp),
+ 		PROTO_LINK(IPPROTO_DCCP,	&proto_dccp),
+ 		PROTO_LINK(IPPROTO_SCTP,	&proto_sctp),
++		PROTO_LINK(IPPROTO_ICMP,	&proto_icmp),
+ 		PROTO_LINK(IPPROTO_ICMPV6,	&proto_icmp6),
+ 	},
+ 	.templates	= {
+-- 
+2.11.0
+

@@ -1,0 +1,25 @@
+From 12c263703a0b0ae92566de7e5440fce7b59cd9be Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Tue, 8 Nov 2016 13:16:19 -0500
+Subject: [PATCH] configure: drop selinux support
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index c1275acb253d..eaba7fbb57e2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -8,7 +8,6 @@ AC_USE_SYSTEM_EXTENSIONS
+ AC_SYS_LARGEFILE
+ 
+ PKG_CHECK_MODULES([YAJL], [yajl >= 2.0.0])
+-PKG_CHECK_MODULES([SELINUX], [libselinux >= 2.0.0])
+ PKG_CHECK_MODULES([LIBMOUNT], [mount >= 2.23.0])
+ 
+ AC_MSG_CHECKING([whether to disable argument checking])
+-- 
+2.4.0.53.g8440f74
+

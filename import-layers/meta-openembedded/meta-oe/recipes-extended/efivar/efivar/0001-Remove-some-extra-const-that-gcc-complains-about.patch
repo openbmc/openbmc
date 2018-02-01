@@ -1,0 +1,44 @@
+From 29a2dea16113b5a8e51de46437c6a9f7426c5867 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 6 Feb 2017 14:28:19 -0500
+Subject: [PATCH 1/2] Remove some extra "const" that gcc complains about.
+
+One of these days I'll get these right.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/include/efivar/efiboot-loadopt.h | 4 ++--
+ src/loadopt.c                        | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/include/efivar/efiboot-loadopt.h b/src/include/efivar/efiboot-loadopt.h
+index 07db5c4..efc29c6 100644
+--- a/src/include/efivar/efiboot-loadopt.h
++++ b/src/include/efivar/efiboot-loadopt.h
+@@ -32,8 +32,8 @@ extern ssize_t efi_loadopt_create(uint8_t *buf, ssize_t size,
+ 
+ extern efidp efi_loadopt_path(efi_load_option *opt, ssize_t limit)
+ 	__attribute__((__nonnull__ (1)));
+-extern const unsigned char const * efi_loadopt_desc(efi_load_option *opt,
+-						    ssize_t limit)
++extern const unsigned char * efi_loadopt_desc(efi_load_option *opt,
++					      ssize_t limit)
+ 	__attribute__((__visibility__ ("default")))
+ 	__attribute__((__nonnull__ (1)));
+ extern uint32_t efi_loadopt_attrs(efi_load_option *opt)
+diff --git a/src/loadopt.c b/src/loadopt.c
+index 64e333f..ec50722 100644
+--- a/src/loadopt.c
++++ b/src/loadopt.c
+@@ -336,7 +336,7 @@ teardown(void)
+ 
+ __attribute__((__nonnull__ (1)))
+ __attribute__((__visibility__ ("default")))
+-const unsigned char const *
++const unsigned char *
+ efi_loadopt_desc(efi_load_option *opt, ssize_t limit)
+ {
+ 	if (last_desc) {
+-- 
+2.12.2
+

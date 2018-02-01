@@ -1,0 +1,75 @@
+From a74c1e9c583375b9e55c29a36442485089e4b7f9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 16 Dec 2016 12:42:06 +0100
+Subject: [PATCH 2/3] fix build on gcc6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Stolen from [1]
+
+[1] http://pkgs.fedoraproject.org/cgit/rpms/audiofile.git/tree/audiofile-0.3.6-narrowing.patch
+
+Upstrem-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ test/NeXT.cpp | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/test/NeXT.cpp b/test/NeXT.cpp
+index 7e39850..a37cea1 100644
+--- a/test/NeXT.cpp
++++ b/test/NeXT.cpp
+@@ -37,13 +37,13 @@
+ 
+ #include "TestUtilities.h"
+ 
+-const char kDataUnspecifiedLength[] =
++const signed char kDataUnspecifiedLength[] =
+ {
+ 	'.', 's', 'n', 'd',
+ 	0, 0, 0, 24, // offset of 24 bytes
+-	0xff, 0xff, 0xff, 0xff, // unspecified length
++	-1, -1, -1, -1, // unspecified length
+ 	0, 0, 0, 3, // 16-bit linear
+-	0, 0, 172, 68, // 44100 Hz
++	0, 0, -84, 68, // 44100 Hz (0xAC44)
+ 	0, 0, 0, 1, // 1 channel
+ 	0, 1,
+ 	0, 1,
+@@ -57,13 +57,13 @@ const char kDataUnspecifiedLength[] =
+ 	0, 55
+ };
+ 
+-const char kDataTruncated[] =
++const signed char kDataTruncated[] =
+ {
+ 	'.', 's', 'n', 'd',
+ 	0, 0, 0, 24, // offset of 24 bytes
+ 	0, 0, 0, 20, // length of 20 bytes
+ 	0, 0, 0, 3, // 16-bit linear
+-	0, 0, 172, 68, // 44100 Hz
++	0, 0, -84, 68, // 44100 Hz (0xAC44)
+ 	0, 0, 0, 1, // 1 channel
+ 	0, 1,
+ 	0, 1,
+@@ -152,13 +152,13 @@ TEST(NeXT, Truncated)
+ 	ASSERT_EQ(::unlink(testFileName.c_str()), 0);
+ }
+ 
+-const char kDataZeroChannels[] =
++const signed char kDataZeroChannels[] =
+ {
+ 	'.', 's', 'n', 'd',
+ 	0, 0, 0, 24, // offset of 24 bytes
+ 	0, 0, 0, 2, // 2 bytes
+ 	0, 0, 0, 3, // 16-bit linear
+-	0, 0, 172, 68, // 44100 Hz
++	0, 0, -84, 68, // 44100 Hz (0xAC44)
+ 	0, 0, 0, 0, // 0 channels
+ 	0, 1
+ };
+-- 
+2.7.4
+

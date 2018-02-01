@@ -26,11 +26,15 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/net-snmp/net-snmp-${PV}.zip \
            file://0001-get_pid_from_inode-Include-limit.h.patch \
            file://0001-BUG-a2584-Fix-snmptrap-to-use-clientaddr-from-snmp.c.patch \
            file://0001-snmplib-UDPIPv6-transport-Add-a-missing-return-state.patch \
+           file://0001-configure-fix-check-for-enable-perl-cc-checks.patch \
+           file://0002-configure-fix-a-cc-check-issue.patch \
+           file://0003-CHANGES-BUG-2712-Fix-Perl-module-compilation.patch \
+           file://0004-configure-fix-incorrect-variable.patch \
            "
 SRC_URI[md5sum] = "9f682bd70c717efdd9f15b686d07baee"
 SRC_URI[sha256sum] = "e8dfc79b6539b71a6ff335746ce63d2da2239062ad41872fff4354cafed07a3e"
 
-inherit autotools update-rc.d siteinfo systemd pkgconfig
+inherit autotools-brokensep update-rc.d siteinfo systemd pkgconfig perlnative
 
 EXTRA_OEMAKE = "INSTALL_PREFIX=${D} OTHERLDFLAGS='${LDFLAGS}' HOST_CPPFLAGS='${BUILD_CPPFLAGS}'"
 
@@ -43,11 +47,13 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[elfutils] = "--with-elf, --without-elf, elfutils"
 PACKAGECONFIG[libnl] = "--with-nl, --without-nl, libnl"
 
-PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,,"
 
-EXTRA_OECONF = "--disable-embedded-perl \
-                --with-perl-modules=no \
+PACKAGECONFIG[perl] = "--enable-embedded-perl --with-perl-modules=yes, --disable-embedded-perl --with-perl-modules=no,\
+                       perl, perl perl-lib"
+
+EXTRA_OECONF = "--enable-shared \
                 --disable-manuals \
                 --with-defaults \
                 --with-install-prefix=${D} \
@@ -63,12 +69,38 @@ CACHED_CONFIGUREVARS = " \
     ac_cv_ETC_MNTTAB=/etc/mtab \
     lt_cv_shlibpath_overrides_runpath=yes \
 "
+export PERLPROG="${bindir}/env perl"
+PERLPROG_append = "${@bb.utils.contains('PACKAGECONFIG', 'perl', ' -I${WORKDIR}', '', d)}"
+
+HAS_PERL = "${@bb.utils.contains('PACKAGECONFIG', 'perl', '1', '0', d)}"
 
 do_configure_prepend() {
-    export PERLPROG="${bindir}/env perl"
     sed -i -e "s|I/usr/include|I${STAGING_INCDIR}|g" \
         "${S}"/configure \
         "${S}"/configure.d/config_os_libs2
+
+    if [ "${HAS_PERL}" = "1" ]; then
+        # this may need to be changed when package perl has any change.
+        cp -f ${STAGING_DIR_TARGET}/usr/lib*/perl/*/Config.pm ${WORKDIR}/
+        cp -f ${STAGING_DIR_TARGET}/usr/lib*/perl/*/Config_heavy.pl ${WORKDIR}/
+        sed -e "s@libpth => '/usr/lib.*@libpth => '${STAGING_DIR_TARGET}/${libdir} ${STAGING_DIR_TARGET}/${base_libdir}',@g" \
+            -e "s@privlibexp => '/usr@privlibexp => '${STAGING_DIR_TARGET}/usr@g" \
+            -e "s@scriptdir => '/usr@scriptdir => '${STAGING_DIR_TARGET}/usr@g" \
+            -e "s@sitearchexp => '/usr@sitearchexp => '${STAGING_DIR_TARGET}/usr@g" \
+            -e "s@sitelibexp => '/usr@sitearchexp => '${STAGING_DIR_TARGET}/usr@g" \
+            -e "s@vendorarchexp => '/usr@vendorarchexp => '${STAGING_DIR_TARGET}/usr@g" \
+            -e "s@vendorlibexp => '/usr@vendorlibexp => '${STAGING_DIR_TARGET}/usr@g" \
+            -i ${WORKDIR}/Config.pm
+    fi
+
+}
+
+do_configure_append() {
+    if [ "${HAS_PERL}" = "1" ]; then
+        sed -e "s@^NSC_INCLUDEDIR=.*@NSC_INCLUDEDIR=${STAGING_DIR_TARGET}\$\{includedir\}@g" \
+            -e "s@^NSC_LIBDIR=-L.*@NSC_LIBDIR=-L${STAGING_DIR_TARGET}\$\{libdir\}@g" \
+            -i ${B}/net-snmp-config
+    fi
 }
 
 do_install_append() {
@@ -84,6 +116,12 @@ do_install_append() {
         -i ${D}${bindir}/net-snmp-create-v3-user
     sed    -e "s@^NSC_SRCDIR=.*@NSC_SRCDIR=.@g" \
         -i ${D}${bindir}/net-snmp-config
+
+    if [ "${HAS_PERL}" = "1" ]; then
+        sed -e "s@^NSC_INCLUDEDIR=.*@NSC_INCLUDEDIR=\$\{includedir\}@g" \
+            -e "s@^NSC_LIBDIR=-L.*@NSC_LIBDIR=-L\$\{libdir\}@g" \
+            -i ${D}${bindir}/net-snmp-config
+    fi
 }
 
 do_install_ptest() {
@@ -122,8 +160,13 @@ net_snmp_sysroot_preprocess () {
 
 PACKAGES += "${PN}-libs ${PN}-mibs ${PN}-server ${PN}-client ${PN}-server-snmpd ${PN}-server-snmptrapd"
 
+# perl module
+PACKAGES += "${@bb.utils.contains('PACKAGECONFIG', 'perl', '${PN}-perl-modules', '', d)}"
+
 ALLOW_EMPTY_${PN} = "1"
 ALLOW_EMPTY_${PN}-server = "1"
+
+FILES_${PN}-perl-modules = "${libdir}/perl/*"
 
 FILES_${PN}-libs = "${libdir}/lib*${SOLIBS}"
 FILES_${PN}-mibs = "${datadir}/snmp/mibs"
@@ -158,11 +201,13 @@ SYSTEMD_PACKAGES = "${PN}-server-snmpd \
 SYSTEMD_SERVICE_${PN}-server-snmpd = "snmpd.service"
 SYSTEMD_SERVICE_${PN}-server-snmptrapd =  "snmptrapd.service"
 
+RDEPENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'perl', 'net-snmp-perl-modules', '', d)}"
 RDEPENDS_${PN} += "net-snmp-client"
 RDEPENDS_${PN}-server-snmpd += "net-snmp-mibs"
 RDEPENDS_${PN}-server-snmptrapd += "net-snmp-server-snmpd"
 RDEPENDS_${PN}-server += "net-snmp-server-snmpd net-snmp-server-snmptrapd"
-RDEPENDS_${PN}-client += "net-snmp-mibs"
+RDEPENDS_${PN}-client += "net-snmp-mibs net-snmp-libs"
+RDEPENDS_${PN}-libs += "libpci"
 RDEPENDS_${PN}-ptest += "perl \
                          perl-module-test \
                          perl-module-file-basename \

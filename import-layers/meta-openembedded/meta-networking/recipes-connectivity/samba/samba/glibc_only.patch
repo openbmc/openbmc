@@ -1,0 +1,15 @@
+Index: samba-4.6.2/ctdb/tests/src/test_mutex_raw.c
+===================================================================
+--- samba-4.6.2.orig/ctdb/tests/src/test_mutex_raw.c
++++ samba-4.6.2/ctdb/tests/src/test_mutex_raw.c
+@@ -166,8 +166,10 @@ int main(int argc, const char **argv)
+ 			if (ret == 0) {
+ 				pthread_mutex_unlock(mutex);
+ 			}
++#ifdef __GLIBC__
+ 		} else if (ret == EBUSY) {
+ 			printf("pid=%u\n", mutex->__data.__owner);
++#endif
+ 		} else if (ret == 0) {
+ 			pthread_mutex_unlock(mutex);
+ 		}

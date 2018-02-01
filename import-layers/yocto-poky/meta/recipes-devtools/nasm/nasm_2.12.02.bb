@@ -2,7 +2,6 @@ SUMMARY = "General-purpose x86 assembler"
 SECTION = "devel"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=90904486f8fbf1861cf42752e1a39efe"
-COMPATIBLE_HOST = '(x86_64|i.86).*-(linux|freebsd.*)'
 
 SRC_URI = "http://www.nasm.us/pub/nasm/releasebuilds/${PV}/nasm-${PV}.tar.bz2 "
 

@@ -1,0 +1,78 @@
+Upstream-Status: Backport
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+
+From 1550f81bf1886aa0520da0b6181cd61c1a75d4ad Mon Sep 17 00:00:00 2001
+From: Pratyush Anand <panand@redhat.com>
+Date: Tue, 14 Mar 2017 17:59:22 +0530
+Subject: [PATCH 1/2] x86/x86_64: Fix format warning with die()
+
+Fedora koji uses gcc version 7.0.1-0.12.fc27, and it generates a build
+warning
+
+   kexec/arch/i386/kexec-elf-x86.c:299:3: error: format not a string
+   literal and no format arguments [-Werror=format-security]
+       die(error_msg);
+       ^~~
+    cc1: some warnings being treated as errors
+
+error_msg can have a format specifier as well in string. In such cases,
+if there is no other arguments for the format variable then code will
+try to access a non existing argument. Therefore, use 1st argument as
+format specifier for string print and pass error_msg as the string to be
+printed.
+
+While doing that,also use const qualifier before "char *error_msg".
+
+Signed-off-by: Pratyush Anand <panand@redhat.com>
+Signed-off-by: Simon Horman <horms@verge.net.au>
+---
+ kexec/arch/i386/kexec-elf-x86.c      | 4 ++--
+ kexec/arch/x86_64/kexec-elf-x86_64.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/kexec/arch/i386/kexec-elf-x86.c b/kexec/arch/i386/kexec-elf-x86.c
+index de00dcb..fedf031 100644
+--- a/kexec/arch/i386/kexec-elf-x86.c
++++ b/kexec/arch/i386/kexec-elf-x86.c
+@@ -91,7 +91,7 @@ int elf_x86_load(int argc, char **argv, const char *buf, off_t len,
+ 	char *command_line = NULL, *modified_cmdline = NULL;
+ 	const char *append = NULL;
+ 	char *tmp_cmdline = NULL;
+-	char *error_msg = NULL;
++	const char *error_msg = NULL;
+ 	int result;
+ 	int command_line_len;
+ 	const char *ramdisk;
+@@ -296,6 +296,6 @@ out:
+ 	free(command_line);
+ 	free(modified_cmdline);
+ 	if (error_msg)
+-		die(error_msg);
++		die("%s", error_msg);
+ 	return result;
+ }
+diff --git a/kexec/arch/x86_64/kexec-elf-x86_64.c b/kexec/arch/x86_64/kexec-elf-x86_64.c
+index ae65692..ad22311 100644
+--- a/kexec/arch/x86_64/kexec-elf-x86_64.c
++++ b/kexec/arch/x86_64/kexec-elf-x86_64.c
+@@ -99,7 +99,7 @@ int elf_x86_64_load(int argc, char **argv, const char *buf, off_t len,
+ #define ARG_STYLE_NONE  2
+ 	int opt;
+ 	int result = 0;
+-	char *error_msg = NULL;
++	const char *error_msg = NULL;
+ 
+ 	/* See options.h and add any new options there too! */
+ 	static const struct option options[] = {
+@@ -276,6 +276,6 @@ out:
+ 	free(command_line);
+ 	free(modified_cmdline);
+ 	if (error_msg)
+-		die(error_msg);
++		die("%s", error_msg);
+ 	return result;
+ }
+-- 
+2.11.0
+

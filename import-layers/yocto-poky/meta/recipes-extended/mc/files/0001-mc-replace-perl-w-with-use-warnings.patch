@@ -1,0 +1,129 @@
+From cdc7c278212ae836eecb4cc9d42c29443cc128a0 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 6 Apr 2017 02:24:28 -0700
+Subject: [PATCH] mc: replace "perl -w" with "use warnings"
+
+The shebang's max length is usually 128 as defined in
+/usr/include/linux/binfmts.h:
+  #define BINPRM_BUF_SIZE 128
+
+There would be errors when @PERL@ is longer than 128, use
+'/usr/bin/env perl' can fix the problem, but '/usr/bin/env perl -w'
+doesn't work:
+
+/usr/bin/env: perl -w: No such file or directory
+
+So replace "perl -w" with "use warnings" to make it work.
+
+The man2hlp.in already has "use warnings;", so just remove '-w' is OK.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ src/man2hlp/man2hlp.in           | 2 +-
+ src/vfs/extfs/helpers/a+.in      | 4 +++-
+ src/vfs/extfs/helpers/mailfs.in  | 3 ++-
+ src/vfs/extfs/helpers/patchfs.in | 3 ++-
+ src/vfs/extfs/helpers/ulib.in    | 4 +++-
+ src/vfs/extfs/helpers/uzip.in    | 3 ++-
+ 6 files changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/src/man2hlp/man2hlp.in b/src/man2hlp/man2hlp.in
+index f095830..558a674 100644
+--- a/src/man2hlp/man2hlp.in
++++ b/src/man2hlp/man2hlp.in
+@@ -1,4 +1,4 @@
+-#! @PERL@ -w
++#! @PERL@
+ #
+ #  Man page to help file converter
+ #  Copyright (C) 1994, 1995, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
+diff --git a/src/vfs/extfs/helpers/a+.in b/src/vfs/extfs/helpers/a+.in
+index 579441c..fe446f4 100644
+--- a/src/vfs/extfs/helpers/a+.in
++++ b/src/vfs/extfs/helpers/a+.in
+@@ -1,4 +1,4 @@
+-#! @PERL@ -w
++#! @PERL@
+ #
+ # External filesystem for mc, using mtools
+ # Written Ludek Brukner <lubr@barco.cz>, 1997
+@@ -9,6 +9,8 @@
+ 
+ # These mtools components must be in PATH for this to work
+ 
++use warnings;
++
+ sub quote {
+     $_ = shift(@_);
+     s/([^\w\/.+-])/\\$1/g;
+diff --git a/src/vfs/extfs/helpers/mailfs.in b/src/vfs/extfs/helpers/mailfs.in
+index e9455be..059f41f 100644
+--- a/src/vfs/extfs/helpers/mailfs.in
++++ b/src/vfs/extfs/helpers/mailfs.in
+@@ -1,6 +1,7 @@
+-#! @PERL@ -w
++#! @PERL@
+ 
+ use bytes;
++use warnings;
+ 
+ # MC extfs for (possibly compressed) Berkeley style mailbox files
+ # Peter Daum <gator@cs.tu-berlin.de> (Jan 1998, mc-4.1.24)
+diff --git a/src/vfs/extfs/helpers/patchfs.in b/src/vfs/extfs/helpers/patchfs.in
+index ef407de..3ad4b53 100644
+--- a/src/vfs/extfs/helpers/patchfs.in
++++ b/src/vfs/extfs/helpers/patchfs.in
+@@ -1,4 +1,4 @@
+-#! @PERL@ -w
++#! @PERL@
+ #
+ # Written by Adam Byrtek <alpha@debian.org>, 2002
+ # Rewritten by David Sterba <dave@jikos.cz>, 2009
+@@ -9,6 +9,7 @@
+ 
+ use bytes;
+ use strict;
++use warnings;
+ use POSIX;
+ use File::Temp 'tempfile';
+ 
+diff --git a/src/vfs/extfs/helpers/ulib.in b/src/vfs/extfs/helpers/ulib.in
+index 418611f..82c7ccf 100644
+--- a/src/vfs/extfs/helpers/ulib.in
++++ b/src/vfs/extfs/helpers/ulib.in
+@@ -1,9 +1,11 @@
+-#! @PERL@ -w
++#! @PERL@
+ #
+ # VFS to manage the gputils archives.
+ # Written by Molnár Károly (proton7@freemail.hu) 2012
+ #
+ 
++use warnings;
++
+ my %month = ('jan' => '01', 'feb' => '02', 'mar' => '03',
+              'apr' => '04', 'may' => '05', 'jun' => '06',
+              'jul' => '07', 'aug' => '08', 'sep' => '09',
+diff --git a/src/vfs/extfs/helpers/uzip.in b/src/vfs/extfs/helpers/uzip.in
+index b1c4f90..c8eb335 100644
+--- a/src/vfs/extfs/helpers/uzip.in
++++ b/src/vfs/extfs/helpers/uzip.in
+@@ -1,4 +1,4 @@
+-#! @PERL@ -w
++#! @PERL@
+ #
+ # zip file archive Virtual File System for Midnight Commander
+ # Version 1.4.0 (2001-08-07).
+@@ -9,6 +9,7 @@
+ use POSIX;
+ use File::Basename;
+ use strict;
++use warnings;
+ 
+ #
+ # Configuration options
+-- 
+2.10.2
+

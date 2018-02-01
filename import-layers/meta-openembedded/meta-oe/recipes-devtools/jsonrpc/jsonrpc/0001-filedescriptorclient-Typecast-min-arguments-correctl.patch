@@ -1,0 +1,33 @@
+From 9500f12f5d827840634311d6ca972d9551211e4d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 21 Nov 2016 01:00:51 -0800
+Subject: [PATCH] filedescriptorclient: Typecast min() arguments correctly
+
+Fixes
+
+| /mnt/a/build/tmp-glibc/work/cortexa7hf-neon-vfpv4-oe-linux-gnueabi/jsonrpc/0.7.0-r0/git/src/jsonrpccp
+p/client/connectors/filedescriptorclient.cpp:47:92: note:   deduced conflicting types for parameter 'co
+nst _Tp' ('unsigned int' and 'long unsigned int')
+|      ssize_t byteWritten = write(outputfd, toSend.c_str(), min(toSend.size(), MAX_WRITE_SIZE));
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/jsonrpccpp/client/connectors/filedescriptorclient.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/jsonrpccpp/client/connectors/filedescriptorclient.cpp b/src/jsonrpccpp/client/connectors/filedescriptorclient.cpp
+index 77aac7e..6325b5c 100644
+--- a/src/jsonrpccpp/client/connectors/filedescriptorclient.cpp
++++ b/src/jsonrpccpp/client/connectors/filedescriptorclient.cpp
+@@ -43,7 +43,7 @@ void FileDescriptorClient::SendRPCMessage(const std::string& message,
+   string toSend = message;
+   do
+   {
+-    ssize_t byteWritten = write(outputfd, toSend.c_str(), min(toSend.size(), MAX_WRITE_SIZE));
++    ssize_t byteWritten = write(outputfd, toSend.c_str(), min((long unsigned int)toSend.size(), MAX_WRITE_SIZE));
+     if (byteWritten < 1)
+       throw JsonRpcException(Errors::ERROR_CLIENT_CONNECTOR,
+         "Unknown error occured while writing to the output file descriptor");
+-- 
+2.10.2
+

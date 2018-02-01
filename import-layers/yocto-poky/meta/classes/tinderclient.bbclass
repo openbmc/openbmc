@@ -55,22 +55,22 @@ def tinder_format_http_post(d,status,log):
 
     # the variables we will need to send on this form post
     variables =  {
-        "tree"         : d.getVar('TINDER_TREE', True),
-        "machine_name" : d.getVar('TINDER_MACHINE', True),
+        "tree"         : d.getVar('TINDER_TREE'),
+        "machine_name" : d.getVar('TINDER_MACHINE'),
         "os"           : os.uname()[0],
         "os_version"   : os.uname()[2],
         "compiler"     : "gcc",
-        "clobber"      : d.getVar('TINDER_CLOBBER', True) or "0",
-        "srcdate"      : d.getVar('SRCDATE', True),
-        "PN"           : d.getVar('PN', True),
-        "PV"           : d.getVar('PV', True),
-        "PR"           : d.getVar('PR', True),
-        "FILE"         : d.getVar('FILE', True) or "N/A",
-        "TARGETARCH"   : d.getVar('TARGET_ARCH', True),
-        "TARGETFPU"    : d.getVar('TARGET_FPU', True) or "Unknown",
-        "TARGETOS"     : d.getVar('TARGET_OS', True) or "Unknown",
-        "MACHINE"      : d.getVar('MACHINE', True) or "Unknown",
-        "DISTRO"       : d.getVar('DISTRO', True) or "Unknown",
+        "clobber"      : d.getVar('TINDER_CLOBBER') or "0",
+        "srcdate"      : d.getVar('SRCDATE'),
+        "PN"           : d.getVar('PN'),
+        "PV"           : d.getVar('PV'),
+        "PR"           : d.getVar('PR'),
+        "FILE"         : d.getVar('FILE') or "N/A",
+        "TARGETARCH"   : d.getVar('TARGET_ARCH'),
+        "TARGETFPU"    : d.getVar('TARGET_FPU') or "Unknown",
+        "TARGETOS"     : d.getVar('TARGET_OS') or "Unknown",
+        "MACHINE"      : d.getVar('MACHINE') or "Unknown",
+        "DISTRO"       : d.getVar('DISTRO') or "Unknown",
         "zecke-rocks"  : "sure",
     }
 
@@ -82,7 +82,7 @@ def tinder_format_http_post(d,status,log):
     # we only need on build_status.pl but sending it
     # always does not hurt
     try:
-        f = open(d.getVar('TMPDIR',True)+'/tinder-machine.id', 'r')
+        f = open(d.getVar('TMPDIR')+'/tinder-machine.id', 'r')
         id = f.read()
         variables['machine_id'] = id
     except:
@@ -106,8 +106,8 @@ def tinder_build_start(d):
 
     # get the body and type
     content_type, body = tinder_format_http_post(d,None,None)
-    server = d.getVar('TINDER_HOST', True )
-    url    = d.getVar('TINDER_URL', True )
+    server = d.getVar('TINDER_HOST')
+    url    = d.getVar('TINDER_URL')
 
     selector = url + "/xml/build_start.pl"
 
@@ -127,7 +127,7 @@ def tinder_build_start(d):
 
     # now we will need to save the machine number
     # we will override any previous numbers
-    f = open(d.getVar('TMPDIR', True)+"/tinder-machine.id", 'w')
+    f = open(d.getVar('TMPDIR')+"/tinder-machine.id", 'w')
     f.write(report)
 
 
@@ -137,8 +137,8 @@ def tinder_send_http(d, status, _log):
     """
 
     # get the body and type
-    server = d.getVar('TINDER_HOST', True)
-    url    = d.getVar('TINDER_URL', True)
+    server = d.getVar('TINDER_HOST')
+    url    = d.getVar('TINDER_URL')
 
     selector = url + "/xml/build_status.pl"
 
@@ -163,16 +163,16 @@ def tinder_print_info(d):
     time    = tinder_time_string()
     ops     = os.uname()[0]
     version = os.uname()[2]
-    url     = d.getVar( 'TINDER_URL' , True )
-    tree    = d.getVar( 'TINDER_TREE', True )
-    branch  = d.getVar( 'TINDER_BRANCH', True )
-    srcdate = d.getVar( 'SRCDATE', True )
-    machine = d.getVar( 'MACHINE', True )
-    distro  = d.getVar( 'DISTRO', True )
-    bbfiles = d.getVar( 'BBFILES', True )
-    tarch   = d.getVar( 'TARGET_ARCH', True )
-    fpu     = d.getVar( 'TARGET_FPU', True )
-    oerev   = d.getVar( 'OE_REVISION', True ) or "unknown"
+    url     = d.getVar('TINDER_URL')
+    tree    = d.getVar('TINDER_TREE')
+    branch  = d.getVar('TINDER_BRANCH')
+    srcdate = d.getVar('SRCDATE')
+    machine = d.getVar('MACHINE')
+    distro  = d.getVar('DISTRO')
+    bbfiles = d.getVar('BBFILES')
+    tarch   = d.getVar('TARGET_ARCH')
+    fpu     = d.getVar('TARGET_FPU')
+    oerev   = d.getVar('OE_REVISION') or "unknown"
 
     # there is a bug with tipple quoted strings
     # i will work around but will fix the original
@@ -278,7 +278,7 @@ def tinder_do_tinder_report(event):
 
         try:
             # truncate the tinder log file
-            f = open(event.data.getVar('TINDER_LOG', True), 'w')
+            f = open(event.data.getVar('TINDER_LOG'), 'w')
             f.write("")
             f.close()
         except:
@@ -287,7 +287,7 @@ def tinder_do_tinder_report(event):
         try:
             # write a status to the file. This is needed for the -k option
             # of BitBake
-            g = open(event.data.getVar('TMPDIR', True)+"/tinder-status", 'w')
+            g = open(event.data.getVar('TMPDIR')+"/tinder-status", 'w')
             g.write("")
             g.close()
         except IOError:
@@ -296,10 +296,10 @@ def tinder_do_tinder_report(event):
     # Append the Task-Log (compile,configure...) to the log file
     # we will send to the server
     if name == "TaskSucceeded" or name == "TaskFailed":
-        log_file = glob.glob("%s/log.%s.*" % (event.data.getVar('T', True), event.task))
+        log_file = glob.glob("%s/log.%s.*" % (event.data.getVar('T'), event.task))
 
         if len(log_file) != 0:
-            to_file  = event.data.getVar('TINDER_LOG', True)
+            to_file  = event.data.getVar('TINDER_LOG')
             log     += "".join(open(log_file[0], 'r').readlines())
 
     # set the right 'HEADER'/Summary for the TinderBox
@@ -310,23 +310,23 @@ def tinder_do_tinder_report(event):
     elif name == "TaskFailed":
         log += "<--- TINDERBOX Task %s failed (FAILURE)\n" % event.task
     elif name == "PkgStarted":
-        log += "---> TINDERBOX Package %s started\n" % event.data.getVar('PF', True)
+        log += "---> TINDERBOX Package %s started\n" % event.data.getVar('PF')
     elif name == "PkgSucceeded":
-        log += "<--- TINDERBOX Package %s done (SUCCESS)\n" % event.data.getVar('PF', True)
+        log += "<--- TINDERBOX Package %s done (SUCCESS)\n" % event.data.getVar('PF')
     elif name == "PkgFailed":
-        if not event.data.getVar('TINDER_AUTOBUILD', True) == "0":
+        if not event.data.getVar('TINDER_AUTOBUILD') == "0":
             build.exec_task('do_clean', event.data)
-        log += "<--- TINDERBOX Package %s failed (FAILURE)\n" % event.data.getVar('PF', True)
+        log += "<--- TINDERBOX Package %s failed (FAILURE)\n" % event.data.getVar('PF')
         status = 200
         # remember the failure for the -k case
-        h = open(event.data.getVar('TMPDIR', True)+"/tinder-status", 'w')
+        h = open(event.data.getVar('TMPDIR')+"/tinder-status", 'w')
         h.write("200")
     elif name == "BuildCompleted":
         log += "Build Completed\n"
         status = 100
         # Check if we have a old status...
         try:
-            h = open(event.data.getVar('TMPDIR',True)+'/tinder-status', 'r')
+            h = open(event.data.getVar('TMPDIR')+'/tinder-status', 'r')
             status = int(h.read())
         except:
             pass
@@ -342,7 +342,7 @@ def tinder_do_tinder_report(event):
         log += "Error:Was Runtime: %d\n" % event.isRuntime()
         status = 200
         # remember the failure for the -k case
-        h = open(event.data.getVar('TMPDIR', True)+"/tinder-status", 'w')
+        h = open(event.data.getVar('TMPDIR')+"/tinder-status", 'w')
         h.write("200")
 
     # now post the log
@@ -360,7 +360,7 @@ python tinderclient_eventhandler() {
     if e.data is None or bb.event.getName(e) == "MsgNote":
         return
 
-    do_tinder_report = e.data.getVar('TINDER_REPORT', True)
+    do_tinder_report = e.data.getVar('TINDER_REPORT')
     if do_tinder_report and do_tinder_report == "1":
         tinder_do_tinder_report(e)
 

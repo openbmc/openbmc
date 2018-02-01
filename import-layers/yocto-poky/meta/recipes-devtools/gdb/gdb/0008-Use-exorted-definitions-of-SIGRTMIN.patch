@@ -1,4 +1,4 @@
-From e54ead9d81f4d38412751b815f909db3cb144bb1 Mon Sep 17 00:00:00 2001
+From aacd77184da1328908da41c9fdb55ad881fa0e99 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 15:31:40 -0700
 Subject: [PATCH 08/10] Use exorted definitions of SIGRTMIN
@@ -20,10 +20,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/gdb/linux-nat.c b/gdb/linux-nat.c
-index 0829bcb..3b8a896 100644
+index 5d5efa0af4..e3420b49a0 100644
 --- a/gdb/linux-nat.c
 +++ b/gdb/linux-nat.c
-@@ -4845,6 +4845,6 @@ lin_thread_get_thread_signals (sigset_t *set)
+@@ -5022,6 +5022,6 @@ lin_thread_get_thread_signals (sigset_t *set)
    /* NPTL reserves the first two RT signals, but does not provide any
       way for the debugger to query the signal numbers - fortunately
       they don't change.  */
@@ -33,7 +33,7 @@ index 0829bcb..3b8a896 100644
 +  sigaddset (set, SIGRTMIN + 1);
  }
 diff --git a/gdb/nat/linux-nat.h b/gdb/nat/linux-nat.h
-index 2b485db..d058afc 100644
+index 2b485db141..d058afcde8 100644
 --- a/gdb/nat/linux-nat.h
 +++ b/gdb/nat/linux-nat.h
 @@ -85,4 +85,8 @@ extern enum target_stop_reason lwp_stop_reason (struct lwp_info *lwp);
@@ -46,5 +46,5 @@ index 2b485db..d058afc 100644
 +
  #endif /* LINUX_NAT_H */
 -- 
-2.8.2
+2.11.0
 

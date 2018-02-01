@@ -39,6 +39,8 @@ function tableInit(ctx){
                               ', .show-all-'+ctx.tableName);
 
   function loadData(tableParams){
+    table.trigger("table-loading");
+
     $.ajax({
         type: "GET",
         url: ctx.url,
@@ -200,6 +202,7 @@ function tableInit(ctx){
     }
 
     /* Add table header and column toggle menu */
+    var column_edit_entries = [];
     for (var i in tableData.columns){
       var col = tableData.columns[i];
       if (col.displayable === false) {
@@ -291,8 +294,16 @@ function tableInit(ctx){
         defaultHiddenCols.push(col.field_name);
       }
 
-      editColMenu.append(toggler);
+      /* Gather the Edit Column entries */
+      column_edit_entries.push({'title':col.title,'html':toggler});
+
     } /* End for each column */
+
+    /* Append the sorted Edit Column toggler entries */
+    column_edit_entries.sort(function(a,b) {return (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0);} );
+    for (var col in column_edit_entries){
+      editColMenu.append(column_edit_entries[col].html);
+    }
 
     tableChromeDone = true;
   }
@@ -835,4 +846,12 @@ function tableInit(ctx){
 
     $('#filter-modal-'+ctx.tableName).modal('hide');
   });
+
+  table.on("table-loading", function(){
+    table.css("opacity", 0.5);
+  });
+
+  table.on("table-done", function(){
+    table.css("opacity", 1);
+  })
 }

@@ -8,11 +8,11 @@ DEPENDS = "gtk+ gnome-doc-utils gnome-common libxml2 intltool-native"
 
 inherit autotools pkgconfig pythonnative gtk-icon-cache
 
-SRC_URI = " \
-    http://ftp.gnome.org/pub/GNOME/sources/glade3/3.8/glade3-${PV}.tar.xz \
-    file://0001-gnome-doc-utils.make-sysrooted-pkg-config.patch \
-    file://0002-fix-gcc-6-build.patch \
-"
+SRC_URI = "http://ftp.gnome.org/pub/GNOME/sources/glade3/3.8/glade3-${PV}.tar.xz \
+           file://0001-gnome-doc-utils.make-sysrooted-pkg-config.patch \
+           file://0002-fix-gcc-6-build.patch \
+           file://0001-Add-G_GNUC_PRINTF-on-functions-with-format-strings.patch \
+           "
 SRC_URI[md5sum] = "4e4b4f5ee34a03e017e4cef97d796c1f"
 SRC_URI[sha256sum] = "58a5f6e4df4028230ddecc74c564808b7ec4471b1925058e29304f778b6b2735"
 

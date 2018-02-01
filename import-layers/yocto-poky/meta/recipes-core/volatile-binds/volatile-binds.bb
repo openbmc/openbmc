@@ -49,7 +49,7 @@ do_compile () {
             -e "s#@whatparent@#${spec%/*}#g; s#@whereparent@#${mountpoint%/*}#g" \
             volatile-binds.service.in >$servicefile
     done <<END
-${@d.getVar('VOLATILE_BINDS', True).replace("\\n", "\n")}
+${@d.getVar('VOLATILE_BINDS').replace("\\n", "\n")}
 END
 
     if [ -e var-volatile-lib.service ]; then

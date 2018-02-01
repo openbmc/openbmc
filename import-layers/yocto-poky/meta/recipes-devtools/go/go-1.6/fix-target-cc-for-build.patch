@@ -1,0 +1,17 @@
+Put Quotes around CC_FOR_TARGET since it can be mutliple words e.g. in OE
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: go/src/make.bash
+===================================================================
+--- go.orig/src/make.bash	2015-07-29 13:28:11.334031696 -0700
++++ go/src/make.bash	2015-07-29 13:36:55.814465630 -0700
+@@ -158,7 +158,7 @@
+ fi
+ 
+ echo "##### Building packages and commands for $GOOS/$GOARCH."
+-CC=$CC_FOR_TARGET "$GOTOOLDIR"/go_bootstrap install $GO_FLAGS -gcflags "$GO_GCFLAGS" -ldflags "$GO_LDFLAGS" -v std cmd
++CC="$CC_FOR_TARGET" "$GOTOOLDIR"/go_bootstrap install $GO_FLAGS -gcflags "$GO_GCFLAGS" -ldflags "$GO_LDFLAGS" -v std cmd
+ echo
+ 
+ rm -f "$GOTOOLDIR"/go_bootstrap

@@ -11,4 +11,4 @@ do_configure_prepend() {
     sed -i -e s:\ po::g Makefile.am
 }
 
-PNBLACKLIST[news] ?= "if you want to use these modules with E18, then you need to update it to git recipe fetching newer sources from http://git.enlightenment.org/enlightenment/modules/news.git/"
+PNBLACKLIST[news] ?= "if you want to use these modules with E18, then you need to update it to git recipe fetching newer sources from http://git.enlightenment.org/enlightenment/modules/news.git/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

@@ -10,21 +10,22 @@
 # more details.
 #
 """Build performance test base classes and functionality"""
-import glob
 import json
 import logging
 import os
 import re
 import resource
-import shutil
 import socket
+import shutil
 import time
-import traceback
 import unittest
+import xml.etree.ElementTree as ET
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from functools import partial
 from multiprocessing import Process
 from multiprocessing import SimpleQueue
+from xml.dom import minidom
 
 import oe.path
 from oeqa.utils.commands import CommandError, runCmd, get_bb_vars
@@ -35,7 +36,7 @@ log = logging.getLogger('build-perf')
 
 # Our own version of runCmd which does not raise AssertErrors which would cause
 # errors to interpreted as failures
-runCmd2 = partial(runCmd, assert_error=False)
+runCmd2 = partial(runCmd, assert_error=False, limit_exc_output=40)
 
 
 class KernelDropCaches(object):
@@ -99,50 +100,34 @@ class BuildPerfTestResult(unittest.TextTestResult):
         super(BuildPerfTestResult, self).__init__(*args, **kwargs)
 
         self.out_dir = out_dir
-        # Get Git parameters
-        try:
-            self.repo = GitRepo('.')
-        except GitError:
-            self.repo = None
-        self.git_commit, self.git_commit_count, self.git_branch = \
-                self.get_git_revision()
         self.hostname = socket.gethostname()
         self.product = os.getenv('OE_BUILDPERFTEST_PRODUCT', 'oe-core')
         self.start_time = self.elapsed_time = None
         self.successes = []
-        log.info("Using Git branch:commit %s:%s (%s)", self.git_branch,
-                 self.git_commit, self.git_commit_count)
-
-    def get_git_revision(self):
-        """Get git branch and commit under testing"""
-        commit = os.getenv('OE_BUILDPERFTEST_GIT_COMMIT')
-        commit_cnt = os.getenv('OE_BUILDPERFTEST_GIT_COMMIT_COUNT')
-        branch = os.getenv('OE_BUILDPERFTEST_GIT_BRANCH')
-        if not self.repo and (not commit or not commit_cnt or not branch):
-            log.info("The current working directory doesn't seem to be a Git "
-                     "repository clone. You can specify branch and commit "
-                     "displayed in test results with OE_BUILDPERFTEST_GIT_BRANCH, "
-                     "OE_BUILDPERFTEST_GIT_COMMIT and "
-                     "OE_BUILDPERFTEST_GIT_COMMIT_COUNT environment variables")
-        else:
-            if not commit:
-                commit = self.repo.rev_parse('HEAD^0')
-                commit_cnt = self.repo.run_cmd(['rev-list', '--count', 'HEAD^0'])
-            if not branch:
-                branch = self.repo.get_current_branch()
-                if not branch:
-                    log.debug('Currently on detached HEAD')
-        return str(commit), str(commit_cnt), str(branch)
 
     def addSuccess(self, test):
         """Record results from successful tests"""
         super(BuildPerfTestResult, self).addSuccess(test)
-        self.successes.append((test, None))
+        self.successes.append(test)
+
+    def addError(self, test, err):
+        """Record results from crashed test"""
+        test.err = err
+        super(BuildPerfTestResult, self).addError(test, err)
+
+    def addFailure(self, test, err):
+        """Record results from failed test"""
+        test.err = err
+        super(BuildPerfTestResult, self).addFailure(test, err)
+
+    def addExpectedFailure(self, test, err):
+        """Record results from expectedly failed test"""
+        test.err = err
+        super(BuildPerfTestResult, self).addExpectedFailure(test, err)
 
     def startTest(self, test):
         """Pre-test hook"""
         test.base_dir = self.out_dir
-        os.mkdir(test.out_dir)
         log.info("Executing test %s: %s", test.name, test.shortDescription())
         self.stream.write(datetime.now().strftime("[%Y-%m-%d %H:%M:%S] "))
         super(BuildPerfTestResult, self).startTest(test)
@@ -154,141 +139,113 @@ class BuildPerfTestResult(unittest.TextTestResult):
     def stopTestRun(self):
         """Pre-run hook"""
         self.elapsed_time = datetime.utcnow() - self.start_time
-        self.write_results_json()
 
     def all_results(self):
-        result_map = {'SUCCESS': self.successes,
-                      'FAIL': self.failures,
-                      'ERROR': self.errors,
-                      'EXP_FAIL': self.expectedFailures,
-                      'UNEXP_SUCCESS': self.unexpectedSuccesses,
-                      'SKIPPED': self.skipped}
-        for status, tests in result_map.items():
-            for test in tests:
-                yield (status, test)
+        compound = [('SUCCESS', t, None) for t in self.successes] + \
+                   [('FAILURE', t, m) for t, m in self.failures] + \
+                   [('ERROR', t, m) for t, m in self.errors] + \
+                   [('EXPECTED_FAILURE', t, m) for t, m in self.expectedFailures] + \
+                   [('UNEXPECTED_SUCCESS', t, None) for t in self.unexpectedSuccesses] + \
+                   [('SKIPPED', t, m) for t, m in self.skipped]
+        return sorted(compound, key=lambda info: info[1].start_time)
 
 
-    def update_globalres_file(self, filename):
-        """Write results to globalres csv file"""
-        # Map test names to time and size columns in globalres
-        # The tuples represent index and length of times and sizes
-        # respectively
-        gr_map = {'test1': ((0, 1), (8, 1)),
-                  'test12': ((1, 1), (None, None)),
-                  'test13': ((2, 1), (9, 1)),
-                  'test2': ((3, 1), (None, None)),
-                  'test3': ((4, 3), (None, None)),
-                  'test4': ((7, 1), (10, 2))}
+    def write_buildstats_json(self):
+        """Write buildstats file"""
+        buildstats = OrderedDict()
+        for _, test, _ in self.all_results():
+            for key, val in test.buildstats.items():
+                buildstats[test.name + '.' + key] = val
+        with open(os.path.join(self.out_dir, 'buildstats.json'), 'w') as fobj:
+            json.dump(buildstats, fobj, cls=ResultsJsonEncoder)
 
-        if self.repo:
-            git_tag_rev = self.repo.run_cmd(['describe', self.git_commit])
-        else:
-            git_tag_rev = self.git_commit
-
-        values = ['0'] * 12
-        for status, (test, msg) in self.all_results():
-            if status in ['ERROR', 'SKIPPED']:
-                continue
-            (t_ind, t_len), (s_ind, s_len) = gr_map[test.name]
-            if t_ind is not None:
-                values[t_ind:t_ind + t_len] = test.times
-            if s_ind is not None:
-                values[s_ind:s_ind + s_len] = test.sizes
-
-        log.debug("Writing globalres log to %s", filename)
-        with open(filename, 'a') as fobj:
-            fobj.write('{},{}:{},{},'.format(self.hostname,
-                                             self.git_branch,
-                                             self.git_commit,
-                                             git_tag_rev))
-            fobj.write(','.join(values) + '\n')
 
     def write_results_json(self):
         """Write test results into a json-formatted file"""
-        results = {'tester_host': self.hostname,
-                   'git_branch': self.git_branch,
-                   'git_commit': self.git_commit,
-                   'git_commit_count': self.git_commit_count,
-                   'product': self.product,
-                   'start_time': self.start_time,
-                   'elapsed_time': self.elapsed_time}
+        results = OrderedDict([('tester_host', self.hostname),
+                               ('start_time', self.start_time),
+                               ('elapsed_time', self.elapsed_time),
+                               ('tests', OrderedDict())])
 
-        tests = {}
-        for status, (test, reason) in self.all_results():
-            tests[test.name] = {'name': test.name,
-                                'description': test.shortDescription(),
-                                'status': status,
-                                'start_time': test.start_time,
-                                'elapsed_time': test.elapsed_time,
-                                'cmd_log_file': os.path.relpath(test.cmd_log_file,
-                                                                self.out_dir),
-                                'measurements': test.measurements}
-        results['tests'] = tests
+        for status, test, reason in self.all_results():
+            test_result = OrderedDict([('name', test.name),
+                                       ('description', test.shortDescription()),
+                                       ('status', status),
+                                       ('start_time', test.start_time),
+                                       ('elapsed_time', test.elapsed_time),
+                                       ('measurements', test.measurements)])
+            if status in ('ERROR', 'FAILURE', 'EXPECTED_FAILURE'):
+                test_result['message'] = str(test.err[1])
+                test_result['err_type'] = test.err[0].__name__
+                test_result['err_output'] = reason
+            elif reason:
+                test_result['message'] = reason
+
+            results['tests'][test.name] = test_result
 
         with open(os.path.join(self.out_dir, 'results.json'), 'w') as fobj:
-            json.dump(results, fobj, indent=4, sort_keys=True,
+            json.dump(results, fobj, indent=4,
                       cls=ResultsJsonEncoder)
 
+    def write_results_xml(self):
+        """Write test results into a JUnit XML file"""
+        top = ET.Element('testsuites')
+        suite = ET.SubElement(top, 'testsuite')
+        suite.set('name', 'oeqa.buildperf')
+        suite.set('timestamp', self.start_time.isoformat())
+        suite.set('time', str(self.elapsed_time.total_seconds()))
+        suite.set('hostname', self.hostname)
+        suite.set('failures', str(len(self.failures) + len(self.expectedFailures)))
+        suite.set('errors', str(len(self.errors)))
+        suite.set('skipped', str(len(self.skipped)))
 
-    def git_commit_results(self, repo_path, branch=None, tag=None):
-        """Commit results into a Git repository"""
-        repo = GitRepo(repo_path, is_topdir=True)
-        if not branch:
-            branch = self.git_branch
-        else:
-            # Replace keywords
-            branch = branch.format(git_branch=self.git_branch,
-                                   tester_host=self.hostname)
+        test_cnt = 0
+        for status, test, reason in self.all_results():
+            test_cnt += 1
+            testcase = ET.SubElement(suite, 'testcase')
+            testcase.set('classname', test.__module__ + '.' + test.__class__.__name__)
+            testcase.set('name', test.name)
+            testcase.set('description', test.shortDescription())
+            testcase.set('timestamp', test.start_time.isoformat())
+            testcase.set('time', str(test.elapsed_time.total_seconds()))
+            if status in ('ERROR', 'FAILURE', 'EXP_FAILURE'):
+                if status in ('FAILURE', 'EXP_FAILURE'):
+                    result = ET.SubElement(testcase, 'failure')
+                else:
+                    result = ET.SubElement(testcase, 'error')
+                result.set('message', str(test.err[1]))
+                result.set('type', test.err[0].__name__)
+                result.text = reason
+            elif status == 'SKIPPED':
+                result = ET.SubElement(testcase, 'skipped')
+                result.text = reason
+            elif status not in ('SUCCESS', 'UNEXPECTED_SUCCESS'):
+                raise TypeError("BUG: invalid test status '%s'" % status)
 
-        log.info("Committing test results into %s %s", repo_path, branch)
-        tmp_index = os.path.join(repo_path, '.git', 'index.oe-build-perf')
-        try:
-            # Create new commit object from the new results
-            env_update = {'GIT_INDEX_FILE': tmp_index,
-                          'GIT_WORK_TREE': self.out_dir}
-            repo.run_cmd('add .', env_update)
-            tree = repo.run_cmd('write-tree', env_update)
-            parent = repo.rev_parse(branch)
-            msg = "Results of {}:{}\n".format(self.git_branch, self.git_commit)
-            git_cmd = ['commit-tree', tree, '-m', msg]
-            if parent:
-                git_cmd += ['-p', parent]
-            commit = repo.run_cmd(git_cmd, env_update)
+            for data in test.measurements.values():
+                measurement = ET.SubElement(testcase, data['type'])
+                measurement.set('name', data['name'])
+                measurement.set('legend', data['legend'])
+                vals = data['values']
+                if data['type'] == BuildPerfTestCase.SYSRES:
+                    ET.SubElement(measurement, 'time',
+                                  timestamp=vals['start_time'].isoformat()).text = \
+                        str(vals['elapsed_time'].total_seconds())
+                    attrib = dict((k, str(v)) for k, v in vals['iostat'].items())
+                    ET.SubElement(measurement, 'iostat', attrib=attrib)
+                    attrib = dict((k, str(v)) for k, v in vals['rusage'].items())
+                    ET.SubElement(measurement, 'rusage', attrib=attrib)
+                elif data['type'] == BuildPerfTestCase.DISKUSAGE:
+                    ET.SubElement(measurement, 'size').text = str(vals['size'])
+                else:
+                    raise TypeError('BUG: unsupported measurement type')
 
-            # Update branch head
-            git_cmd = ['update-ref', 'refs/heads/' + branch, commit]
-            if parent:
-                git_cmd.append(parent)
-            repo.run_cmd(git_cmd)
+        suite.set('tests', str(test_cnt))
 
-            # Update current HEAD, if we're on branch 'branch'
-            if repo.get_current_branch() == branch:
-                log.info("Updating %s HEAD to latest commit", repo_path)
-                repo.run_cmd('reset --hard')
-
-            # Create (annotated) tag
-            if tag:
-                # Find tags matching the pattern
-                tag_keywords = dict(git_branch=self.git_branch,
-                                    git_commit=self.git_commit,
-                                    git_commit_count=self.git_commit_count,
-                                    tester_host=self.hostname,
-                                    tag_num='[0-9]{1,5}')
-                tag_re = re.compile(tag.format(**tag_keywords) + '$')
-                tag_keywords['tag_num'] = 0
-                for existing_tag in repo.run_cmd('tag').splitlines():
-                    if tag_re.match(existing_tag):
-                        tag_keywords['tag_num'] += 1
-
-                tag = tag.format(**tag_keywords)
-                msg = "Test run #{} of {}:{}\n".format(tag_keywords['tag_num'],
-                                                       self.git_branch,
-                                                       self.git_commit)
-                repo.run_cmd(['tag', '-a', '-m', msg, tag, commit])
-
-        finally:
-            if os.path.exists(tmp_index):
-                os.unlink(tmp_index)
+        # Use minidom for pretty-printing
+        dom_doc = minidom.parseString(ET.tostring(top, 'utf-8'))
+        with open(os.path.join(self.out_dir, 'results.xml'), 'w') as fobj:
+            dom_doc.writexml(fobj, addindent='  ', newl='\n', encoding='utf-8')
 
 
 class BuildPerfTestCase(unittest.TestCase):
@@ -303,7 +260,10 @@ class BuildPerfTestCase(unittest.TestCase):
         self.base_dir = None
         self.start_time = None
         self.elapsed_time = None
-        self.measurements = []
+        self.measurements = OrderedDict()
+        self.buildstats = OrderedDict()
+        # self.err is supposed to be a tuple from sys.exc_info()
+        self.err = None
         self.bb_vars = get_bb_vars()
         # TODO: remove 'times' and 'sizes' arrays when globalres support is
         # removed
@@ -311,18 +271,23 @@ class BuildPerfTestCase(unittest.TestCase):
         self.sizes = []
 
     @property
-    def out_dir(self):
-        return os.path.join(self.base_dir, self.name)
+    def tmp_dir(self):
+        return os.path.join(self.base_dir, self.name + '.tmp')
 
-    @property
-    def cmd_log_file(self):
-        return os.path.join(self.out_dir, 'commands.log')
+    def shortDescription(self):
+        return super(BuildPerfTestCase, self).shortDescription() or ""
 
     def setUp(self):
         """Set-up fixture for each test"""
+        if not os.path.isdir(self.tmp_dir):
+            os.mkdir(self.tmp_dir)
         if self.build_target:
-            self.log_cmd_output(['bitbake', self.build_target,
-                                 '-c', 'fetchall'])
+            self.run_cmd(['bitbake', self.build_target, '-c', 'fetchall'])
+
+    def tearDown(self):
+        """Tear-down fixture for each test"""
+        if os.path.isdir(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
 
     def run(self, *args, **kwargs):
         """Run test"""
@@ -330,16 +295,22 @@ class BuildPerfTestCase(unittest.TestCase):
         super(BuildPerfTestCase, self).run(*args, **kwargs)
         self.elapsed_time = datetime.now() - self.start_time
 
-    def log_cmd_output(self, cmd):
-        """Run a command and log it's output"""
+    def run_cmd(self, cmd):
+        """Convenience method for running a command"""
         cmd_str = cmd if isinstance(cmd, str) else ' '.join(cmd)
         log.info("Logging command: %s", cmd_str)
         try:
-            with open(self.cmd_log_file, 'a') as fobj:
-                runCmd2(cmd, stdout=fobj)
+            runCmd2(cmd)
         except CommandError as err:
             log.error("Command failed: %s", err.retcode)
             raise
+
+    def _append_measurement(self, measurement):
+        """Simple helper for adding measurements results"""
+        if measurement['name'] in self.measurements:
+            raise ValueError('BUG: two measurements with the same name in {}'.format(
+                self.__class__.__name__))
+        self.measurements[measurement['name']] = measurement
 
     def measure_cmd_resources(self, cmd, name, legend, save_bs=False):
         """Measure system resource usage of a command"""
@@ -350,12 +321,12 @@ class BuildPerfTestCase(unittest.TestCase):
                 ret = runCmd2(cmd, **kwargs)
                 etime = datetime.now() - start_time
                 rusage_struct = resource.getrusage(resource.RUSAGE_CHILDREN)
-                iostat = {}
+                iostat = OrderedDict()
                 with open('/proc/{}/io'.format(os.getpid())) as fobj:
                     for line in fobj.readlines():
                         key, val = line.split(':')
                         iostat[key] = int(val)
-                rusage = {}
+                rusage = OrderedDict()
                 # Skip unused fields, (i.e. 'ru_ixrss', 'ru_idrss', 'ru_isrss',
                 # 'ru_nswap', 'ru_msgsnd', 'ru_msgrcv' and 'ru_nsignals')
                 for key in ['ru_utime', 'ru_stime', 'ru_maxrss', 'ru_minflt',
@@ -374,33 +345,28 @@ class BuildPerfTestCase(unittest.TestCase):
         log.info("Timing command: %s", cmd_str)
         data_q = SimpleQueue()
         try:
-            with open(self.cmd_log_file, 'a') as fobj:
-                proc = Process(target=_worker, args=(data_q, cmd,),
-                               kwargs={'stdout': fobj})
-                proc.start()
-                data = data_q.get()
-                proc.join()
+            proc = Process(target=_worker, args=(data_q, cmd,))
+            proc.start()
+            data = data_q.get()
+            proc.join()
             if isinstance(data, Exception):
                 raise data
         except CommandError:
-            log.error("Command '%s' failed, see %s for more details", cmd_str,
-                      self.cmd_log_file)
+            log.error("Command '%s' failed", cmd_str)
             raise
         etime = data['elapsed_time']
 
-        measurement = {'type': self.SYSRES,
-                       'name': name,
-                       'legend': legend}
-        measurement['values'] = {'start_time': data['start_time'],
-                                 'elapsed_time': etime,
-                                 'rusage': data['rusage'],
-                                 'iostat': data['iostat']}
+        measurement = OrderedDict([('type', self.SYSRES),
+                                   ('name', name),
+                                   ('legend', legend)])
+        measurement['values'] = OrderedDict([('start_time', data['start_time']),
+                                             ('elapsed_time', etime),
+                                             ('rusage', data['rusage']),
+                                             ('iostat', data['iostat'])])
         if save_bs:
-            bs_file = self.save_buildstats(legend)
-            measurement['values']['buildstats_file'] = \
-                    os.path.relpath(bs_file, self.base_dir)
+            self.save_buildstats(name)
 
-        self.measurements.append(measurement)
+        self._append_measurement(measurement)
 
         # Append to 'times' array for globalres log
         e_sec = etime.total_seconds()
@@ -418,15 +384,15 @@ class BuildPerfTestCase(unittest.TestCase):
         ret = runCmd2(cmd)
         size = int(ret.output.split()[0])
         log.debug("Size of %s path is %s", path, size)
-        measurement = {'type': self.DISKUSAGE,
-                       'name': name,
-                       'legend': legend}
-        measurement['values'] = {'size': size}
-        self.measurements.append(measurement)
+        measurement = OrderedDict([('type', self.DISKUSAGE),
+                                   ('name', name),
+                                   ('legend', legend)])
+        measurement['values'] = OrderedDict([('size', size)])
+        self._append_measurement(measurement)
         # Append to 'sizes' array for globalres log
         self.sizes.append(str(size))
 
-    def save_buildstats(self, label=None):
+    def save_buildstats(self, measurement_name):
         """Save buildstats"""
         def split_nevr(nevr):
             """Split name and version information from recipe "nevr" string"""
@@ -445,9 +411,9 @@ class BuildPerfTestCase(unittest.TestCase):
 
         def bs_to_json(filename):
             """Convert (task) buildstats file into json format"""
-            bs_json = {'iostat': {},
-                       'rusage': {},
-                       'child_rusage': {}}
+            bs_json = OrderedDict()
+            iostat = OrderedDict()
+            rusage = OrderedDict()
             with open(filename) as fobj:
                 for line in fobj.readlines():
                     key, val = line.split(':', 1)
@@ -459,7 +425,7 @@ class BuildPerfTestCase(unittest.TestCase):
                         end_time = datetime.utcfromtimestamp(float(val))
                     elif key.startswith('IO '):
                         split = key.split()
-                        bs_json['iostat'][split[1]] = int(val)
+                        iostat[split[1]] = int(val)
                     elif key.find('rusage') >= 0:
                         split = key.split()
                         ru_key = split[-1]
@@ -467,12 +433,12 @@ class BuildPerfTestCase(unittest.TestCase):
                             val = float(val)
                         else:
                             val = int(val)
-                        ru_type = 'rusage' if split[0] == 'rusage' else \
-                                                          'child_rusage'
-                        bs_json[ru_type][ru_key] = val
+                        rusage[ru_key] = rusage.get(ru_key, 0) + val
                     elif key == 'Status':
                         bs_json['status'] = val
             bs_json['elapsed_time'] = end_time - start_time
+            bs_json['rusage'] = rusage
+            bs_json['iostat'] = iostat
             return bs_json
 
         log.info('Saving buildstats in JSON format')
@@ -488,24 +454,17 @@ class BuildPerfTestCase(unittest.TestCase):
             if not os.path.isdir(recipe_dir):
                 continue
             name, epoch, version, revision = split_nevr(fname)
-            recipe_bs = {'name': name,
-                         'epoch': epoch,
-                         'version': version,
-                         'revision': revision,
-                         'tasks': {}}
+            recipe_bs = OrderedDict((('name', name),
+                                     ('epoch', epoch),
+                                     ('version', version),
+                                     ('revision', revision),
+                                     ('tasks', OrderedDict())))
             for task in os.listdir(recipe_dir):
                 recipe_bs['tasks'][task] = bs_to_json(os.path.join(recipe_dir,
                                                                    task))
             buildstats.append(recipe_bs)
 
-        # Write buildstats into json file
-        postfix = '.' + str_to_fn(label) if label else ''
-        postfix += '.json'
-        outfile = os.path.join(self.out_dir, 'buildstats' + postfix)
-        with open(outfile, 'w') as fobj:
-            json.dump(buildstats, fobj, indent=4, sort_keys=True,
-                      cls=ResultsJsonEncoder)
-        return outfile
+        self.buildstats[measurement_name] = buildstats
 
     def rm_tmp(self):
         """Cleanup temporary/intermediate files and directories"""
@@ -547,5 +506,5 @@ class BuildPerfTestRunner(unittest.TextTestRunner):
         self.out_dir = out_dir
 
     def _makeResult(self):
-       return BuildPerfTestResult(self.out_dir, self.stream, self.descriptions,
-                                  self.verbosity)
+        return BuildPerfTestResult(self.out_dir, self.stream, self.descriptions,
+                                   self.verbosity)

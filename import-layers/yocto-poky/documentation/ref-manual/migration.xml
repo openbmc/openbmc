@@ -3689,7 +3689,7 @@ $ runqemu qemux86-64 tmp/deploy/images/qemux86-64/core-image-minimal-qemux86-64.
                     by <filename>BB_SETSCENE_VERIFY_FUNCTION</filename>
                     needed to change signature.
                     Consequently, a new variable named
-                    <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_SETSCENE_VERIFY_FUNCTION2'><filename>BB_SETSCENE_VERIFY_FUNCTION2</filename></ulink>
+                    <filename>BB_SETSCENE_VERIFY_FUNCTION2</filename>
                     has been added allowing multiple versions of BitBake
                     to work with suitably written metadata, which includes
                     OpenEmbedded-Core and Poky.
@@ -3955,6 +3955,768 @@ $ runqemu qemux86-64 tmp/deploy/images/qemux86-64/core-image-minimal-qemux86-64.
     </section>
 </section>
 
+<section id='moving-to-the-yocto-project-2.3-release'>
+    <title>Moving to the Yocto Project 2.3 Release</title>
+
+    <para>
+        This section provides migration information for moving to the
+        Yocto Project 2.3 Release from the prior release.
+    </para>
+
+    <section id='migration-2.3-recipe-specific-sysroots'>
+        <title>Recipe-specific Sysroots</title>
+
+        <para>
+            The OpenEmbedded build system now uses one sysroot per
+            recipe to resolve long-standing issues with configuration
+            script auto-detection of undeclared dependencies.
+            Consequently, you might find that some of your previously
+            written custom recipes are missing declared dependencies,
+            particularly those dependencies that are incidentally built
+            earlier in a typical build process and thus are already likely
+            to be present in the shared sysroot in previous releases.
+        </para>
+
+        <para>
+            Consider the following:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis>Declare Build-Time Dependencies:</emphasis>
+                    Because of this new feature, you must explicitly
+                    declare all build-time dependencies for your recipe.
+                    If you do not declare these dependencies, they are not
+                    populated into the sysroot for the recipe.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Specify Pre-Installation and Post-Installation
+                    Native Tool Dependencies:</emphasis>
+                    You must specifically specify any special native tool
+                    dependencies of <filename>pkg_preinst</filename> and
+                    <filename>pkg_postinst</filename> scripts by using the
+                    <link linkend='var-PACKAGE_WRITE_DEPS'><filename>PACKAGE_WRITE_DEPS</filename></link>
+                    variable.
+                    Specifying these dependencies ensures that these tools
+                    are available if these scripts need to be run on the
+                    build host during the
+                    <link linkend='ref-tasks-rootfs'><filename>do_rootfs</filename></link>
+                    task.</para>
+
+                    <para>As an example, see the <filename>dbus</filename>
+                    recipe.
+                    You will see that this recipe has a
+                    <filename>pkg_postinst</filename> that calls
+                    <filename>systemctl</filename> if "systemd" is in
+                    <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>.
+                    In the example,
+                    <filename>systemd-systemctl-native</filename> is added to
+                    <filename>PACKAGE_WRITE_DEPS</filename>, which is also
+                    conditional on "systemd" being in
+                    <filename>DISTRO_FEATURES</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Examine Recipes that Use
+                    <filename>SSTATEPOSTINSTFUNCS</filename>:</emphasis>
+                    You need to examine any recipe that uses
+                    <filename>SSTATEPOSTINSTFUNCS</filename> and determine
+                    steps to take.</para>
+
+                    <para>Functions added to
+                    <filename>SSTATEPOSTINSTFUNCS</filename> are still
+                    called as they were in previous Yocto Project releases.
+                    However, since a separate sysroot is now being populated
+                    for every recipe and if existing functions being called
+                    through <filename>SSTATEPOSTINSTFUNCS</filename> are
+                    doing relocation, then you will need to change these
+                    to use a post-installation script that is installed by a
+                    function added to
+                    <link linkend='var-SYSROOT_PREPROCESS_FUNCS'><filename>SYSROOT_PREPROCESS_FUNCS</filename></link>.
+                    </para>
+
+                    <para>For an example, see the
+                    <filename>pixbufcache</filename> class in
+                    <filename>meta/classes/</filename> in the Yocto Project
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-repositories'>Source Repositories</ulink>.
+                    <note>
+                        The <filename>SSTATEPOSTINSTFUNCS</filename> variable
+                        itself is now deprecated in favor of the
+                        <filename>do_populate_sysroot[postfuncs]</filename>
+                        task.
+                        Consequently, if you do still have any function or
+                        functions that need to be called after the sysroot
+                        component is created for a recipe, then you would be
+                        well advised to take steps to use a post installation
+                        script as described previously.
+                        Taking these steps prepares your code for when
+                        <filename>SSTATEPOSTINSTFUNCS</filename> is
+                        removed in a future Yocto Project release.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Specify the Sysroot when Using Certain
+                    External Scripts:</emphasis>
+                    Because the shared sysroot is now gone, the scripts
+                    <filename>oe-find-native-sysroot</filename> and
+                    <filename>oe-run-native</filename> have been changed such
+                    that you need to specify which recipe's
+                    <link linkend='var-STAGING_DIR_NATIVE'><filename>STAGING_DIR_NATIVE</filename></link>
+                    is used.
+                    </para></listitem>
+            </itemizedlist>
+            <note>
+                You can find more information on how recipe-specific sysroots
+                work in the
+                "<link linkend='ref-classes-staging'><filename>staging.bbclass</filename></link>"
+                section.
+            </note>
+        </para>
+    </section>
+
+    <section id='migration-2.3-path-variable'>
+        <title><filename>PATH</filename> Variable</title>
+
+        <para>
+            Within the environment used to run build tasks, the environment
+            variable <filename>PATH</filename> is now sanitized such that
+            the normal native binary paths
+            (<filename>/bin</filename>, <filename>/sbin</filename>,
+            <filename>/usr/bin</filename> and so forth) are
+            removed and a directory containing symbolic links linking only
+            to the binaries from the host mentioned in the
+            <link linkend='var-HOSTTOOLS'><filename>HOSTTOOLS</filename></link>
+            and
+            <link linkend='var-HOSTTOOLS_NONFATAL'><filename>HOSTTOOLS_NONFATAL</filename></link>
+            variables is added to <filename>PATH</filename>.
+        </para>
+
+        <para>
+            Consequently, any native binaries provided by the host that you
+            need to call needs to be in one of these two variables at
+            the configuration level.
+        </para>
+
+        <para>
+            Alternatively, you can add a native recipe (i.e.
+            <filename>-native</filename>) that provides the
+            binary to the recipe's
+            <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+            value.
+            <note>
+                <filename>PATH</filename> is not sanitized in the same way
+                within <filename>devshell</filename>.
+                If it were, you would have difficulty running host tools for
+                development and debugging within the shell.
+            </note>
+        </para>
+    </section>
+
+    <section id='migration-2.3-scripts'>
+        <title>Changes to Scripts</title>
+
+        <para>
+            The following changes to scripts took place:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis><filename>oe-find-native-sysroot</filename>:</emphasis>
+                    The usage for the
+                    <filename>oe-find-native-sysroot</filename> script has
+                    changed to the following:
+                    <literallayout class='monospaced'>
+     $ . oe-find-native-sysroot <replaceable>recipe</replaceable>
+                    </literallayout>
+                    You must now supply a recipe for
+                    <replaceable>recipe</replaceable> as part of the command.
+                    Prior to the Yocto Project &DISTRO; release, it was not
+                    necessary to provide the script with the command.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>oe-run-native</filename>:</emphasis>
+                    The usage for the
+                    <filename>oe-run-native</filename> script has changed
+                    to the following:
+                    <literallayout class='monospaced'>
+     $ oe-run-native <replaceable>native_recipe</replaceable> <replaceable>tool</replaceable>
+                    </literallayout>
+                    You must supply the name of the native recipe and the tool
+                    you want to run as part of the command.
+                    Prior to the Yocto Project &DISTRO; release, it was not
+                    necessary to provide the native recipe with the command.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>cleanup-workdir</filename>:</emphasis>
+                    The <filename>cleanup-workdir</filename> script has been
+                    removed because the script was found to be deleting
+                    files it should not have, which lead to broken build
+                    trees.
+                    Rather than trying to delete portions of
+                    <link linkend='var-TMPDIR'><filename>TMPDIR</filename></link>
+                    and getting it wrong, it is recommended that you
+                    delete <filename>TMPDIR</filename> and have it restored
+                    from shared state (sstate) on subsequent builds.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>wipe-sysroot</filename>:</emphasis>
+                    The <filename>wipe-sysroot</filename> script has been
+                    removed as it is no longer needed with recipe-specific
+                    sysroots.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.3-functions'>
+        <title>Changes to Functions</title>
+
+        <para>
+            The previously deprecated
+            <filename>bb.data.getVar()</filename>,
+            <filename>bb.data.setVar()</filename>, and
+            related functions have been removed in favor of
+            <filename>d.getVar()</filename>,
+            <filename>d.setVar()</filename>, and so forth.
+        </para>
+
+        <para>
+            You need to fix any references to these old functions.
+        </para>
+    </section>
+
+    <section id='migration-2.3-bitbake-changes'>
+        <title>BitBake Changes</title>
+
+        <para>
+            The following changes took place for BitBake:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis>BitBake's Graphical Dependency Explorer UI Replaced:</emphasis>
+                    BitBake's graphical dependency explorer UI
+                    <filename>depexp</filename> was replaced by
+                    <filename>taskexp</filename> ("Task Explorer"), which
+                    provides a graphical way of exploring the
+                    <filename>task-depends.dot</filename> file.
+                    The data presented by Task Explorer is much more
+                    accurate than the data that was presented by
+                    <filename>depexp</filename>.
+                    Being able to visualize the data is an often requested
+                    feature as standard <filename>*.dot</filename> file
+                    viewers cannot usual cope with the size of
+                    the <filename>task-depends.dot</filename> file.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>BitBake "-g" Output Changes:</emphasis>
+                    The <filename>package-depends.dot</filename> and
+                    <filename>pn-depends.dot</filename> files as previously
+                    generated using the <filename>bitbake -g</filename> command
+                    have been removed.
+                    A <filename>recipe-depends.dot</filename> file
+                    is now generated as a collapsed version of
+                    <filename>task-depends.dot</filename> instead.
+                    </para>
+
+                    <para>The reason for this change is because
+                    <filename>package-depends.dot</filename> and
+                    <filename>pn-depends.dot</filename> largely date back
+                    to a time before task-based execution and do not take
+                    into account task-level dependencies between recipes,
+                    which could be misleading.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Mirror Variable Splitting Changes:</emphasis>
+                    Mirror variables including
+                    <link linkend='var-MIRRORS'><filename>MIRRORS</filename></link>,
+                    <link linkend='var-PREMIRRORS'><filename>PREMIRRORS</filename></link>,
+                    and
+                    <link linkend='var-SSTATE_MIRRORS'><filename>SSTATE_MIRRORS</filename></link>
+                    can now separate values entirely with spaces.
+                    Consequently, you no longer need "\\n".
+                    BitBake looks for pairs of values, which simplifies usage.
+                    There should be no change required to existing mirror
+                    variable values themselves.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>The Subversion (SVN) Fetcher Uses an "ssh" Parameter and Not an "rsh" Parameter:</emphasis>
+                    The SVN fetcher now takes an "ssh" parameter instead of an
+                    "rsh" parameter.
+                    This new optional parameter is used when the "protocol"
+                    parameter is set to "svn+ssh".
+                    You can only use the new parameter to specify the
+                    <filename>ssh</filename> program used by SVN.
+                    The SVN fetcher passes the new parameter through the
+                    <filename>SVN_SSH</filename> environment variable during
+                    the
+                    <link linkend='ref-tasks-fetch'><filename>do_fetch</filename></link>
+                    task.</para>
+
+                    <para>See the
+                    "<ulink url='&YOCTO_DOCS_BB_URL;#svn-fetcher'>Subversion (SVN) Fetcher (svn://)</ulink>"
+                    section in the Yocto Project BitBake User Manual for
+                    additional information.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>BB_SETSCENE_VERIFY_FUNCTION</filename>
+                    and <filename>BB_SETSCENE_VERIFY_FUNCTION2</filename>
+                    Removed:</emphasis>
+                    Because the mechanism they were part of is no longer
+                    necessary with recipe-specific sysroots, the
+                    <filename>BB_SETSCENE_VERIFY_FUNCTION</filename> and
+                    <filename>BB_SETSCENE_VERIFY_FUNCTION2</filename>
+                    variables have been removed.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.3-absolute-symlinks'>
+        <title>Absolute Symbolic Links</title>
+
+        <para>
+            Absolute symbolic links (symlinks) within staged files are no
+            longer permitted and now trigger an error.
+            Any explicit creation of symlinks can use the
+            <filename>lnr</filename> script, which is a replacement for
+            <filename>ln -r</filename>.
+        </para>
+
+        <para>
+            If the build scripts in the software that the recipe is building
+            are creating a number of absolute symlinks that need to be
+            corrected, you can inherit
+            <filename>relative_symlinks</filename> within the recipe to turn
+            those absolute symlinks into relative symlinks.
+        </para>
+    </section>
+
+    <section id='migration-2.3-gplv2-and-gplv3-moves'>
+        <title>GPLv2 Versions of GPLv3 Recipes Moved</title>
+
+        <para>
+            Older GPLv2 versions of GPLv3 recipes have moved to a
+            separate <filename>meta-gplv2</filename> layer.
+        </para>
+
+        <para>
+            If you use
+            <link linkend='var-INCOMPATIBLE_LICENSE'><filename>INCOMPATIBLE_LICENSE</filename></link>
+            to exclude GPLv3 or set
+            <link linkend='var-PREFERRED_VERSION'><filename>PREFERRED_VERSION</filename></link>
+            to substitute a GPLv2 version of a GPLv3 recipe, then you must add
+            the <filename>meta-gplv2</filename> layer to your configuration.
+            <note>
+                You can find <filename>meta-gplv2</filename> layer in the
+                OpenEmbedded layer index at
+                <ulink url='https://layers.openembedded.org/layerindex/branch/master/layer/meta-gplv2/'></ulink>.
+            </note>
+        </para>
+
+        <para>
+            These relocated GPLv2 recipes do not receive the same level of
+            maintenance as other core recipes.
+            The recipes do not get security fixes and upstream no longer
+            maintains them.
+            In fact, the upstream community is actively hostile towards people
+            that use the old versions of the recipes.
+            Moving these recipes into a separate layer both makes the different
+            needs of the recipes clearer and clearly identifies the number of
+            these recipes.
+            <note>
+                The long-term solution might be to move to BSD-licensed
+                replacements of the GPLv3 components for those that need to
+                exclude GPLv3-licensed components from the target system.
+                This solution will be investigated for future Yocto
+                Project releases.
+            </note>
+        </para>
+    </section>
+
+    <section id='migration-2.3-package-management-changes'>
+        <title>Package Management Changes</title>
+
+        <para>
+            The following package management changes took place:
+            <itemizedlist>
+                <listitem><para>
+                    Smart package manager is replaced by DNF package manager.
+                    Smart has become unmaintained upstream, is not ported
+                    to Python 3.x.
+                    Consequently, Smart needed to be replaced.
+                    DNF is the only feasible candidate.</para>
+                    <para>The change in functionality is that the on-target
+                    runtime package management from remote package feeds is
+                    now done with a different tool that has a
+                    different set of command-line options.
+                    If you have scripts that call the
+                    tool directly, or use its API, they need to be fixed.</para>
+                    <para>For more information, see the
+                    <ulink url='http://dnf.readthedocs.io/en/latest/'>DNF Documentation</ulink>.
+                    </para></listitem>
+                <listitem><para>
+                    Rpm 5.x is replaced with Rpm 4.x.
+                    This is done for two major reasons:
+                    <itemizedlist>
+                        <listitem><para>
+                            DNF is API-incompatible with Rpm 5.x and porting
+                            it and maintaining the port is non-trivial.
+                            </para></listitem>
+                        <listitem><para>
+                            Rpm 5.x itself has limited maintenance upstream,
+                            and the Yocto Project is one of the very few
+                            remaining users.
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para>
+                    Berkeley DB 6.x is removed and Berkeley DB 5.x becomes
+                    the default:
+                    <itemizedlist>
+                        <listitem><para>
+                            Version 6.x of Berkeley DB has largely been
+                            rejected by the open source community due to its
+                            AGPLv3 license.
+                            As a result, most mainstream open source projects
+                            that require DB are still developed and tested with
+                            DB 5.x.
+                            </para></listitem>
+                        <listitem><para>
+                            In OE-core, the only thing that was requiring
+                            DB 6.x was Rpm 5.x.
+                            Thus, no reason exists to continue carrying DB 6.x
+                            in OE-core.
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>createrepo</filename> is replaced with
+                    <filename>createrepo_c</filename>.</para>
+                    <para><filename>createrepo_c</filename> is the current
+                    incarnation of the tool that generates remote repository
+                    metadata.
+                    It is written in C as compared to
+                    <filename>createrepo</filename>, which is written in
+                    Python.
+                    <filename>createrepo_c</filename> is faster and is
+                    maintained.
+                    </para></listitem>
+                <listitem><para>
+                    Architecture-independent RPM packages are "noarch"
+                    instead of "all".</para>
+                    <para>This change was made because too many places in
+                    DNF/RPM4 stack already make that assumption.
+                    Only the filenames and the architecture tag has changed.
+                    Nothing else has changed in OE-core system, particularly
+                    in the
+                    <link linkend='ref-classes-allarch'><filename>allarch.bbclass</filename></link>
+                    class.
+                    </para></listitem>
+                <listitem><para>
+                    Signing of remote package feeds using
+                    <filename>PACKAGE_FEED_SIGN</filename>
+                    is not currently supported.
+                    This issue will be fully addressed in a future
+                    Yocto Project release.
+                    See <ulink url='https://bugzilla.yoctoproject.org/show_bug.cgi?id=11209'>defect 11209</ulink>
+                    for more information on a solution to package feed
+                    signing with RPM in the Yocto Project 2.3 release.
+                    </para></listitem>
+                <listitem><para>
+                    OPKG now uses the libsolv backend for resolving package
+                    dependencies by default.
+                    This is vastly superior to OPKG's internal ad-hoc solver
+                    that was previously used.
+                    This change does have a small impact on disk (around
+                    500 KB) and memory footprint.
+                    <note>
+                        For further details on this change, see the
+                        <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi/poky/commit/?
+id=f4d4f99cfbc2396e49c1613a7d237b9e57f06f81'>commit message</ulink>.
+                    </note>
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.3-removed-recipes'>
+        <title>Removed Recipes</title>
+
+        <para>
+            The following recipes have been removed:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis><filename>linux-yocto 4.8:</filename></emphasis>
+                    Version 4.8 has been removed.
+                    Versions 4.1 (LTSI), 4.4 (LTS), 4.9 (LTS/LTSI) and 4.10
+                    are now present.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>python-smartpm:</filename></emphasis>
+                    Functionally replaced by <filename>dnf</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>createrepo:</filename></emphasis>
+                    Replaced by the <filename>createrepo-c</filename> recipe.
+                    </para></listitem>
+                 <listitem><para>
+                    <emphasis><filename>rpmresolve:</filename></emphasis>
+                    No longer needed with the move to RPM 4 as RPM itself is
+                    used instead.
+                    </para></listitem>
+                 <listitem><para>
+                    <emphasis><filename>gstreamer:</filename></emphasis>
+                    Removed the GStreamer Git version recipes as they have
+                    been stale.
+                    <filename>1.10.</filename><replaceable>x</replaceable>
+                    recipes are still present.
+                    </para></listitem>
+                 <listitem><para>
+                    <emphasis><filename>alsa-conf-base:</filename></emphasis>
+                    Merged into <filename>alsa-conf</filename> since
+                    <filename>libasound</filename> depended on both.
+                    Essentially, no way existed to install only one of these.
+                    </para></listitem>
+                 <listitem><para>
+                    <emphasis><filename>tremor:</filename></emphasis>
+                    Moved to <filename>meta-multimedia</filename>.
+                    Fixed-integer Vorbis decoding is not
+                    needed by current hardware.
+                    Thus, GStreamer's ivorbis plugin has been disabled
+                    by default eliminating the need for the
+                    <filename>tremor</filename> recipe in OE-Core.
+                    </para></listitem>
+                 <listitem><para>
+                    <emphasis><filename>gummiboot:</filename></emphasis>
+                    Replaced by <filename>systemd-boot</filename>.
+                    </para></listitem>
+           </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.3-wic-changes'>
+        <title>Wic Changes</title>
+
+        <para>
+            The following changes have been made to Wic:
+            <note>
+                For more information on Wic, see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-partitioned-images'>Creating Partitioned Images</ulink>"
+                section in the Yocto Project Development Manual.
+            </note>
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis>Default Output Directory Changed:</emphasis>
+                    Wic's default output directory is now the current directory
+                    by default instead of the unusual
+                    <filename>/var/tmp/wic</filename>.</para>
+
+                    <para>The "-o" and "--outdir" options remain unchanged
+                    and are used to specify your preferred output directory
+                    if you do not want to use the default directory.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>fsimage Plug-in Removed:</emphasis>
+                    The Wic fsimage plug-in has been removed as it duplicates
+                    functionality of the rawcopy plug-in.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.3-qa-changes'>
+        <title>QA Changes</title>
+
+        <para>
+            The following QA checks have changed:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis><filename>unsafe-references-in-binaries</filename>:</emphasis>
+                    The <filename>unsafe-references-in-binaries</filename>
+                    QA check, which was disabled by default, has now been
+                    removed.
+                    This check was intended to detect binaries in
+                    <filename>/bin</filename> that link to libraries in
+                    <filename>/usr/lib</filename> and have the case where
+                    the user has <filename>/usr</filename> on a separate
+                    filesystem to <filename>/</filename>.</para>
+
+                    <para>The removed QA check was buggy.
+                    Additionally, <filename>/usr</filename> residing on a
+                    separate partition from <filename>/</filename> is now
+                    a rare configuration.
+                    Consequently,
+                    <filename>unsafe-references-in-binaries</filename> was
+                    removed.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>file-rdeps</filename>:</emphasis>
+                    The <filename>file-rdeps</filename> QA check is now an
+                    error by default instead of a warning.
+                    Because it is an error instead of a warning, you need to
+                    address missing runtime dependencies.</para>
+
+                    <para>For additional information, see the
+                    <link linkend='ref-classes-insane'><filename>insane</filename></link>
+                    class and the
+                    "<link linkend='qa-errors-and-warnings'>Errors and Warnings</link>"
+                    section.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='migration-2.3-miscellaneous-changes'>
+        <title>Miscellaneous Changes</title>
+
+        <para>
+            The following miscellaneous changes have occurred:
+            <itemizedlist>
+                <listitem><para>
+                    In this release, a number of recipes have been changed to
+                    ignore the <filename>largefile</filename>
+                    <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>
+                    item, enabling large file support unconditionally.
+                    This feature has always been enabled by default.
+                    Disabling the feature has not been widely tested.
+                    <note>
+                        Future releases of the Yocto Project will remove
+                        entirely the ability to disable the
+                        <filename>largefile</filename> feature,
+                        which would make it unconditionally enabled everywhere.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    If the
+                    <link linkend='var-DISTRO_VERSION'><filename>DISTRO_VERSION</filename></link>
+                    value contains the value of the
+                    <link linkend='var-DATE'><filename>DATE</filename></link>
+                    variable, which is the default between Poky releases,
+                    the <filename>DATE</filename> value is explicitly excluded
+                    from <filename>/etc/issue</filename> and
+                    <filename>/etc/issue.net</filename>, which is displayed at
+                    the login prompt, in order to avoid conflicts with
+                    Multilib enabled.
+                    Regardless, the <filename>DATE</filename> value is
+                    inaccurate if the <filename>base-files</filename>
+                    recipe is restored from shared state (sstate) rather
+                    than rebuilt.</para>
+
+                    <para>If you need the build date recorded in
+                    <filename>/etc/issue*</filename> or anywhere else in your
+                    image, a better method is to define a post-processing
+                    function to do it and have the function called from
+                    <link linkend='var-ROOTFS_POSTPROCESS_COMMAND'><filename>ROOTFS_POSTPROCESS_COMMAND</filename></link>.
+                    Doing so ensures the value is always up-to-date with the
+                    created image.
+                    </para></listitem>
+                <listitem><para>
+                    Dropbear's <filename>init</filename> script now disables
+                    DSA host keys by default.
+                    This change is in line with the systemd service
+                    file, which supports RSA keys only, and with recent
+                    versions of OpenSSH, which deprecates DSA host keys.
+                    </para></listitem>
+                <listitem><para>
+                    The
+                    <link linkend='ref-classes-buildhistory'><filename>buildhistory</filename></link>
+                    class now correctly uses tabs as separators between all
+                    columns in <filename>installed-package-sizes.txt</filename>
+                    in order to aid import into other tools.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>USE_LDCONFIG</filename> variable has been
+                    replaced with the "ldconfig"
+                    <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>
+                    feature.
+                    Distributions that previously set:
+                    <literallayout class='monospaced'>
+     USE_LDCONFIG = "0"
+                    </literallayout>
+                    should now instead use the following:
+                    <literallayout class='monospaced'>
+     DISTRO_FEATURES_BACKFILL_CONSIDERED_append = " ldconfig"
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    The default value of
+                    <link linkend='var-COPYLEFT_LICENSE_INCLUDE'><filename>COPYLEFT_LICENSE_INCLUDE</filename></link>
+                    now includes all versions of AGPL licenses in addition
+                    to GPL and LGPL.
+                    <note>
+                        The default list is not intended to be guaranteed
+                        as a complete safe list.
+                        You should seek legal advice based on what you are
+                        distributing if you are unsure.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    Kernel module packages are now suffixed with the kernel
+                    version in order to allow module packages from multiple
+                    kernel versions to co-exist on a target system.
+                    If you wish to return to the previous naming scheme
+                    that does not include the version suffix, use the
+                    following:
+                    <literallayout class='monospaced'>
+     KERNEL_MODULE_PACKAGE_SUFFIX to ""
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    Removal of <filename>libtool</filename>
+                    <filename>*.la</filename> files is now enabled by default.
+                    The <filename>*.la</filename> files are not actually
+                    needed on Linux and relocating them is an unnecessary
+                    burden.</para>
+
+                    <para>If you need to preserve these
+                    <filename>.la</filename> files (e.g. in a custom
+                    distribution), you must change
+                    <link linkend='var-INHERIT_DISTRO'><filename>INHERIT_DISTRO</filename></link>
+                    such that "remove-libtool" is not included in the value.
+                    </para></listitem>
+                <listitem><para>
+                    Extensible SDKs built for GCC 5+ now refuse to install on a
+                    distribution where the host GCC version is 4.8 or 4.9.
+                    This change resulted from the fact that the installation
+                    is known to fail due to the way the
+                    <filename>uninative</filename> shared state (sstate)
+                    package is built.
+                    See the
+                    <link linkend='ref-classes-uninative'><filename>uninative</filename></link>
+                    class for additional information.
+                    </para></listitem>
+                <listitem><para>
+                    All native and nativesdk recipes now use a separate
+                    <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>
+                    value instead of sharing the value used by recipes for the
+                    target, in order to avoid unnecessary rebuilds.</para>
+
+                    <para>The <filename>DISTRO_FEATURES</filename> for
+                    <filename>native</filename> recipes is
+                    <link linkend='var-DISTRO_FEATURES_NATIVE'><filename>DISTRO_FEATURES_NATIVE</filename></link>
+                    added to an intersection of
+                    <filename>DISTRO_FEATURES</filename> and
+                    <link linkend='var-DISTRO_FEATURES_FILTER_NATIVE'><filename>DISTRO_FEATURES_FILTER_NATIVE</filename></link>.
+                    </para>
+
+                    <para>For nativesdk recipes, the
+                    corresponding variables are
+                    <link linkend='var-DISTRO_FEATURES_NATIVESDK'><filename>DISTRO_FEATURES_NATIVESDK</filename></link>
+                    and
+                    <link linkend='var-DISTRO_FEATURES_FILTER_NATIVESDK'><filename>DISTRO_FEATURES_FILTER_NATIVESDK</filename></link>.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>FILESDIR</filename>
+                    variable, which was previously deprecated and rarely used,
+                    has now been removed.
+                    You should change any recipes that set
+                    <filename>FILESDIR</filename> to set
+                    <link linkend='var-FILESPATH'><filename>FILESPATH</filename></link>
+                    instead.
+                    </para></listitem>
+                <listitem><para>
+                    The <filename>MULTIMACH_HOST_SYS</filename>
+                    variable has been removed as it is no longer needed
+                    with recipe-specific sysroots.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
 </chapter>
 <!--
 vim: expandtab tw=80 ts=4

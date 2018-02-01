@@ -7,10 +7,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
                     file://opkg.py;beginline=1;endline=18;md5=15917491ad6bf7acc666ca5f7cc1e083"
 PROVIDES += "${@bb.utils.contains('PACKAGECONFIG', 'update-alternatives', 'virtual/update-alternatives', '', d)}"
 
-SRCREV = "3ffece9bf19a844edacc563aa092fd1fbfcffeee"
-PV = "0.3.2+git${SRCPV}"
+SRCREV = "1a708fd73d10c2b7677dd4cc4e017746ebbb9166"
+PV = "0.3.4+git${SRCPV}"
 
-SRC_URI = "git://git.yoctoproject.org/opkg-utils"
+SRC_URI = "git://git.yoctoproject.org/opkg-utils \
+"
 SRC_URI_append_class-native = " file://tar_ignore_error.patch"
 
 S = "${WORKDIR}/git"
@@ -43,4 +44,11 @@ RPROVIDES_update-alternatives-opkg = "update-alternatives update-alternatives-cw
 RREPLACES_update-alternatives-opkg = "update-alternatives-cworth"
 RCONFLICTS_update-alternatives-opkg = "update-alternatives-cworth"
 
+pkg_postrm_update-alternatives-opkg() {
+	rm -rf $D${nonarch_libdir}/opkg/alternatives
+	rmdir $D${nonarch_libdir}/opkg || true
+}
+
 BBCLASSEXTEND = "native nativesdk"
+
+CLEANBROKEN = "1"

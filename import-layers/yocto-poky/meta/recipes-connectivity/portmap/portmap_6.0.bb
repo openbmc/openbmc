@@ -4,7 +4,7 @@ DEPENDS_append_libc-musl = " libtirpc "
 
 PR = "r9"
 
-SRC_URI = "http://www.sourcefiles.org/Networking/Tools/Miscellanenous/portmap-6.0.tgz \
+SRC_URI = "https://fossies.org/linux/misc/old/portmap-6.0.tgz \
            file://destdir-no-strip.patch \
            file://tcpd-config.patch \
            file://portmap.init \

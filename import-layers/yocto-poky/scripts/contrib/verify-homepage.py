@@ -44,7 +44,7 @@ def verifyHomepage(bbhandler):
             if realfn in checked:
                 continue
             data = bbhandler.parse_recipe_file(realfn)
-            homepage = data.getVar("HOMEPAGE", True)
+            homepage = data.getVar("HOMEPAGE")
             if homepage:
                 try:
                     urllib.request.urlopen(homepage, timeout=5)

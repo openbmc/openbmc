@@ -48,12 +48,12 @@ PACKAGES_DYNAMIC = "${PN}-plugin-*"
 
 python populate_packages_prepend () {
     rygel_libdir = d.expand('${libdir}/rygel-${LIBV}')
-    postinst = d.getVar('plugin_postinst', True)
+    postinst = d.getVar('plugin_postinst')
     pkgs = []
 
     pkgs += do_split_packages(d, oe.path.join(rygel_libdir, "plugins"), 'librygel-(.*)\.so$', d.expand('${PN}-plugin-%s'), 'Rygel plugin for %s', postinst=postinst, extra_depends=d.expand('${PN}'))
     pkgs += do_split_packages(d, oe.path.join(rygel_libdir, "plugins"), '(.*)\.plugin$', d.expand('${PN}-plugin-%s'), 'Rygel plugin for %s', postinst=postinst, extra_depends=d.expand('${PN}'))
 
-    metapkg = d.getVar('PN', True) + '-meta'
+    metapkg = d.getVar('PN') + '-meta'
     d.setVar('RDEPENDS_' + metapkg, ' '.join(pkgs))
 }

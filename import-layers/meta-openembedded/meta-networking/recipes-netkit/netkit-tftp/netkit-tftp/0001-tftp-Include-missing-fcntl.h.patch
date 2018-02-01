@@ -1,0 +1,27 @@
+From fa57e161fc953264a75d50a787cb83983e60acc7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Aug 2017 18:30:02 -0700
+Subject: [PATCH] tftp: Include missing fcntl.h
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ tftp/main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tftp/main.c b/tftp/main.c
+index 8c54843..5c9b698 100644
+--- a/tftp/main.c
++++ b/tftp/main.c
+@@ -63,6 +63,7 @@ char main_rcsid[] =
+ #include <ctype.h>
+ #include <netdb.h>
+ #include <unistd.h>
++#include <fcntl.h>
+ 
+ #include "tftpsubs.h"  /* for mysignal() */
+ 
+-- 
+2.14.1
+

@@ -12,10 +12,13 @@ from oeqa.utils.decorators import testcase
 from oeqa.utils.network import get_free_port
 
 class BitbakePrTests(oeSelfTest):
- 
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pkgdata_dir = get_bb_var('PKGDATA_DIR')
+
     def get_pr_version(self, package_name):
-        pkgdata_dir = get_bb_var('PKGDATA_DIR')
-        package_data_file = os.path.join(pkgdata_dir, 'runtime', package_name)
+        package_data_file = os.path.join(self.pkgdata_dir, 'runtime', package_name)
         package_data = ftools.read_file(package_data_file)
         find_pr = re.search("PKGR: r[0-9]+\.([0-9]+)", package_data)
         self.assertTrue(find_pr, "No PKG revision found in %s" % package_data_file)

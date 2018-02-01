@@ -1,0 +1,24 @@
+Index: obexftp-0.24.2-Source/CMakeLists.txt
+===================================================================
+--- obexftp-0.24.2-Source.orig/CMakeLists.txt
++++ obexftp-0.24.2-Source/CMakeLists.txt
+@@ -58,9 +58,17 @@ add_subdirectory ( bfb )
+ add_subdirectory ( multicobex )
+ add_subdirectory ( obexftp )
+ add_subdirectory ( apps )
+-add_subdirectory ( fuse )
+-add_subdirectory ( swig )
+ add_subdirectory ( doc )
++
++option ( ENABLE_FUSE "Build the obexftp fuse module" OFF )
++if ( ENABLE_FUSE )
++  add_subdirectory ( fuse )
++endif ( ENABLE_FUSE )
++
++option ( ENABLE_SWIG "Build the obexftp swig module" OFF )
++if ( ENABLE_SWIG )
++  add_subdirectory ( swig )
++endif ( ENABLE_SWIG )
+ #examples
+ 
+ set ( prefix      "${CMAKE_INSTALL_PREFIX}" )

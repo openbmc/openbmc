@@ -13,7 +13,7 @@ python do_prepare_copyleft_sources () {
     import os.path
     import shutil
 
-    p = d.getVar('P', True)
+    p = d.getVar('P')
     included, reason = copyleft_should_include(d)
     if not included:
         bb.debug(1, 'copyleft: %s is excluded: %s' % (p, reason))
@@ -21,13 +21,13 @@ python do_prepare_copyleft_sources () {
     else:
         bb.debug(1, 'copyleft: %s is included: %s' % (p, reason))
 
-    sources_dir = d.getVar('COPYLEFT_SOURCES_DIR', True)
-    dl_dir = d.getVar('DL_DIR', True)
-    src_uri = d.getVar('SRC_URI', True).split()
+    sources_dir = d.getVar('COPYLEFT_SOURCES_DIR')
+    dl_dir = d.getVar('DL_DIR')
+    src_uri = d.getVar('SRC_URI').split()
     fetch = bb.fetch2.Fetch(src_uri, d)
     ud = fetch.ud
 
-    pf = d.getVar('PF', True)
+    pf = d.getVar('PF')
     dest = os.path.join(sources_dir, pf)
     shutil.rmtree(dest, ignore_errors=True)
     bb.utils.mkdirhier(dest)

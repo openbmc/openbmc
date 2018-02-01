@@ -1,0 +1,28 @@
+From 3ddf397febf47f8de9ca2805e92355ecb3ba0e9f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 8 Apr 2017 12:37:54 -0700
+Subject: [PATCH] Fix printf format errors with clang
+
+error: format string is not a string literal (potentially insecure)
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/jobs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/jobs.c b/src/jobs.c
+index c2c2332..dcb81c1 100644
+--- a/src/jobs.c
++++ b/src/jobs.c
+@@ -427,7 +427,7 @@ sprint_status(char *s, int status, int sigonly)
+ 				goto out;
+ #endif
+ 		}
+-		col = fmtstr(s, 32, strsignal(st));
++		col = fmtstr(s, 32, "%s", strsignal(st));
+ #ifdef WCOREDUMP
+ 		if (WCOREDUMP(status)) {
+ 			col += fmtstr(s + col, 16, " (core dumped)");
+-- 
+2.12.2
+

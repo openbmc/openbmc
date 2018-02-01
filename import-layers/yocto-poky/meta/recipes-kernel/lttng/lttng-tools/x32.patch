@@ -1,0 +1,16 @@
+Fix build for x32
+
+Upstream-Status: Pending
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+
+--- lttng-tools-2.6.0/src/bin/lttng/utils.c~	2015-01-26 18:17:15.000000000 +0100
++++ lttng-tools-2.6.0/src/bin/lttng/utils.c	2015-07-30 19:45:25.632045712 +0200
+@@ -130,7 +130,7 @@
+ #define HAS_FLS_U32
+ #endif
+ 
+-#if defined(__x86_64)
++#if defined(__x86_64) && !defined(__ILP32__)
+ static inline
+ unsigned int fls_u64(uint64_t x)
+ {

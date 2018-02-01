@@ -18,6 +18,15 @@ PV = "3.14+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
+export HOSTCC = "${BUILD_CC}"
+
+do_configure_prepend() {
+   # Replace sbin,bin paths with bitbake environment
+   sed -i -e 's;install_sbin: Tgt = ${DESTDIR}/sbin;install_sbin: Tgt = ${DESTDIR}/${base_sbindir};' \
+          -e 's;install_ubin: Tgt = ${DESTDIR}/usr/sbin;install_sbin: Tgt = ${DESTDIR}/${bindir};' \
+	  ${S}/Makefile
+}
+
 do_configure_append () {
     install -d ${S}/include/linux/
     cp ${WORKDIR}/aufs_type.h ${S}/include/linux/
@@ -34,7 +43,7 @@ do_compile () {
 }
 
 do_compile_class-native () {
-    oe_runmake tools CPPFLAGS="-I${S}/include -I${S}/libau"
+    oe_runmake tools CPPFLAGS="-I${S}/include -I${S}/libau" CC="${BUILD_CC}"
 }
 
 do_install () {

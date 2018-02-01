@@ -8,7 +8,7 @@ SRC_URI = "http://www.gnokii.org/download/gnokii/gnokii-${PV}.tar.bz2"
 DEPENDS = "glib-2.0 intltool-native"
 X11DEPENDS = " libxpm gtk+"
 
-PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG[bluez4] = "--enable-bluetooth,--disable-bluetooth,bluez4"
 PACKAGECONFIG[libical] = "--enable-libical,--disable-libical,libical"
 PACKAGECONFIG[pcsc-lite] = "--enable-libpcsclite,--disable-libpcsclite,pcsc-lite"
@@ -32,3 +32,5 @@ FILES_libgnokii = "${libdir}/libgnokii.so.*"
 
 SRC_URI[md5sum] = "d9627f4a1152d3ea7806df4532850d5f"
 SRC_URI[sha256sum] = "8f5a083b05c1a66a3402ca5cd80084e14c2c0632c991bb53b03c78e9adb02501"
+
+PNBLACKLIST[gnokii] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130662/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

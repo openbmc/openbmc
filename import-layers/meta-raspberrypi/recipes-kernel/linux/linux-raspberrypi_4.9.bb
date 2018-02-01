@@ -1,10 +1,10 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 
-LINUX_VERSION ?= "4.9.27"
+LINUX_VERSION ?= "4.9.59"
 
-SRCREV = "9a5f215eda12bad29b35040dff00d0346fe517e2"
-SRC_URI = "git://github.com/raspberrypi/linux.git;protocol=git;branch=rpi-4.9.y \
-"
+SRCREV = "e7976b2affa8c05bd299ead0ad9c36ddaf135b9d"
+SRC_URI = "git://github.com/raspberrypi/linux.git;branch=rpi-4.9.y"
+
 require linux-raspberrypi.inc
 
 # A LOADADDR is needed when building a uImage format kernel. This value is not

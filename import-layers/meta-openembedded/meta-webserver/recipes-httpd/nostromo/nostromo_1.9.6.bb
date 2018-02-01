@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "541494ecfeafec58c0876ccc90cc23b06e0144f6f42029af44c7cdb1f4
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
-DEPENDS = "openssl groff-native"
+DEPENDS = "openssl groff-native base-passwd"
 
 inherit update-rc.d
 

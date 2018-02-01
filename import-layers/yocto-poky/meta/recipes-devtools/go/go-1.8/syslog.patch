@@ -1,0 +1,62 @@
+Add timeouts to logger
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+diff -r -u go/src/log/syslog/syslog.go /home/achang/GOCOPY/go/src/log/syslog/syslog.go
+--- go/src/log/syslog/syslog.go	2013-11-28 13:38:28.000000000 -0800
++++ /home/achang/GOCOPY/go/src/log/syslog/syslog.go	2014-10-03 11:44:37.710403200 -0700
+@@ -33,6 +33,9 @@
+ const severityMask = 0x07
+ const facilityMask = 0xf8
+ 
++var writeTimeout = 1 * time.Second
++var connectTimeout = 1 * time.Second
++
+ const (
+ 	// Severity.
+ 
+@@ -100,6 +103,7 @@
+ type serverConn interface {
+ 	writeString(p Priority, hostname, tag, s, nl string) error
+ 	close() error
++	setWriteDeadline(t time.Time) error
+ }
+ 
+ type netConn struct {
+@@ -273,7 +277,11 @@
+ 		nl = "\n"
+ 	}
+ 
+-	err := w.conn.writeString(p, w.hostname, w.tag, msg, nl)
++	err := w.conn.setWriteDeadline(time.Now().Add(writeTimeout))
++	if err != nil {
++		return 0, err
++	}
++	err = w.conn.writeString(p, w.hostname, w.tag, msg, nl)
+ 	if err != nil {
+ 		return 0, err
+ 	}
+@@ -305,6 +313,10 @@
+ 	return n.conn.Close()
+ }
+ 
++func (n *netConn) setWriteDeadline(t time.Time) error {
++	return n.conn.SetWriteDeadline(t)
++}
++
+ // NewLogger creates a log.Logger whose output is written to
+ // the system log service with the specified priority. The logFlag
+ // argument is the flag set passed through to log.New to create
+diff -r -u go/src/log/syslog/syslog_unix.go /home/achang/GOCOPY/go/src/log/syslog/syslog_unix.go
+--- go/src/log/syslog/syslog_unix.go	2013-11-28 13:38:28.000000000 -0800
++++ /home/achang/GOCOPY/go/src/log/syslog/syslog_unix.go	2014-10-03 11:44:39.010403175 -0700
+@@ -19,7 +19,7 @@
+ 	logPaths := []string{"/dev/log", "/var/run/syslog"}
+ 	for _, network := range logTypes {
+ 		for _, path := range logPaths {
+-			conn, err := net.Dial(network, path)
++			conn, err := net.DialTimeout(network, path, connectTimeout)
+ 			if err != nil {
+ 				continue
+ 			} else {

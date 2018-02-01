@@ -41,7 +41,7 @@ def usage():
 class Sizes:
     def __init__(self, glob):
         self.title = glob
-        p = Popen("size -t " + glob, shell=True, stdout=PIPE, stderr=PIPE)
+        p = Popen("size -t " + str(glob), shell=True, stdout=PIPE, stderr=PIPE)
         output = p.communicate()[0].splitlines()
         if len(output) > 2:
             sizes = output[-1].split()[0:4]
@@ -62,18 +62,18 @@ class Report:
         r = Report(filename, title)
         path = os.path.dirname(filename)
 
-        p = Popen("ls " + path + "/*.o | grep -v built-in.o",
+        p = Popen("ls " + str(path) + "/*.o | grep -v built-in.o",
                   shell=True, stdout=PIPE, stderr=PIPE)
         glob = ' '.join(p.communicate()[0].splitlines())
-        oreport = Report(glob, path + "/*.o")
-        oreport.sizes.title = path + "/*.o"
+        oreport = Report(glob, str(path) + "/*.o")
+        oreport.sizes.title = str(path) + "/*.o"
         r.parts.append(oreport)
 
         if subglob:
             p = Popen("ls " + subglob, shell=True, stdout=PIPE, stderr=PIPE)
             for f in p.communicate()[0].splitlines():
                 path = os.path.dirname(f)
-                r.parts.append(Report.create(f, path, path + "/*/built-in.o"))
+                r.parts.append(Report.create(f, path, str(path) + "/*/built-in.o"))
             r.parts.sort(reverse=True)
 
         for b in r.parts:
@@ -115,6 +115,13 @@ class Report:
               (indent+"delta", self.deltas["total"], self.deltas["text"],
                self.deltas["data"], self.deltas["bss"]))
         print("\n")
+
+    def __lt__(this, that):
+        if that is None:
+            return 1
+        if not isinstance(that, Report):
+            raise TypeError
+        return this.sizes.total < that.sizes.total
 
     def __cmp__(this, that):
         if that is None:

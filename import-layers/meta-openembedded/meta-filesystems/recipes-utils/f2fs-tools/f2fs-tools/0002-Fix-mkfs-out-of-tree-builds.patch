@@ -1,0 +1,37 @@
+From 0731eefd389e01419f78a115e1363ed0c28cfd3a Mon Sep 17 00:00:00 2001
+From: "Yong, Jonathan" <jonathan.yong@intel.com>
+Date: Thu, 30 Mar 2017 08:03:37 +0000
+Subject: [PATCH] Fix mkfs out of tree builds
+
+Libraries are built in builddir, not srcdir, fix Makefile.am
+accordingly.
+
+Signed-off-by: Yong, Jonathan <jonathan.yong@intel.com>
+Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+
+The patch was imported from the f2fs-tools repo
+(git://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git)
+commit ID 0731eefd389e01419f78a115e1363ed0c28cfd3a.
+
+Upstream-Status: Accepted, expected to be included in 1.9.0.
+
+Signed-off-by: Yong, Jonathan <jonathan.yong@intel.com>
+
+---
+ mkfs/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mkfs/Makefile.am b/mkfs/Makefile.am
+index 162a0cf..0ea8b49 100644
+--- a/mkfs/Makefile.am
++++ b/mkfs/Makefile.am
+@@ -10,5 +10,5 @@ lib_LTLIBRARIES = libf2fs_format.la
+ libf2fs_format_la_SOURCES = f2fs_format_main.c f2fs_format.c f2fs_format_utils.c
+ libf2fs_format_la_CFLAGS = -DWITH_BLKDISCARD
+ libf2fs_format_la_CPPFLAGS = -I$(top_srcdir)/include
+-libf2fs_format_la_LDFLAGS = -luuid -L$(top_srcdir)/lib -lf2fs \
++libf2fs_format_la_LDFLAGS = -luuid -L$(top_builddir)/lib -lf2fs \
+ 	-version-info $(FMT_CURRENT):$(FMT_REVISION):$(FMT_AGE)
+-- 
+2.10.2
+

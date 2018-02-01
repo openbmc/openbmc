@@ -1,0 +1,25 @@
+From a6faf3b50d6af4768b7b853cb536944fb18e1450 Mon Sep 17 00:00:00 2001
+From: Bart De Schuymer <bdschuym@pandora.be>
+Date: Wed, 3 Jul 2013 22:12:47 +0200
+Subject: [PATCH 03/10] add info about -Wl,-no-as-needed
+
+---
+ INSTALL | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/INSTALL b/INSTALL
+index 4a05c67..e90d5c1 100644
+--- a/INSTALL
++++ b/INSTALL
+@@ -39,6 +39,8 @@ That's all
+ You can also use a base directory different from the root directory (/),
+ using the DESTDIR option. See the Makefile for more details.
+ 
++You might need to set LDFLAGS=-Wl,-no-as-needed to build ebtables correctly
++on your system.
+ 
+ ADDITIONAL PROGRAMS:
+ ----------------------
+-- 
+2.12.1
+

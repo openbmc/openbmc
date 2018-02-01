@@ -13,4 +13,4 @@ COMPATIBLE_HOST = "i.86.*-linux"
 RDEPENDS_${PN} += "xserver-xorg-module-exa"
 
 # 2_2.11.16-r21.0/xf86-video-geode-2.11.16/src/gx_driver.c:376:20: error: implicit declaration of function 'xf86MapVidMem' [-Werror=implicit-function-declaration]
-PNBLACKLIST[xf86-video-geode] ?= "BROKEN, fails to build"
+PNBLACKLIST[xf86-video-geode] ?= "BROKEN, fails to build - the recipe will be removed on 2017-09-01 unless the issue is fixed"

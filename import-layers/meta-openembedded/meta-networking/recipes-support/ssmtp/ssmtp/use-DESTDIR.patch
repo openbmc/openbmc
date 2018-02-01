@@ -1,0 +1,74 @@
+Use DESTDIR during  install/uninstall, this helps
+with cross or staged builds. Additionally pass LDFLAGS
+during linking.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+
+Index: ssmtp-2.64/Makefile.in
+===================================================================
+--- ssmtp-2.64.orig/Makefile.in
++++ ssmtp-2.64/Makefile.in
+@@ -46,40 +46,40 @@ all: ssmtp
+ 
+ .PHONY: install
+ install: ssmtp $(GEN_CONFIG)
+-	$(INSTALL) -d -m 755 $(bindir)
+-	$(INSTALL) -s -m 755 ssmtp $(bindir)/ssmtp
+-	$(INSTALL) -d -m 755 $(mandir)
+-	$(INSTALL) -m 644 $(srcdir)/ssmtp.8 $(mandir)/ssmtp.8
+-	$(INSTALL) -d -m 755 $(SSMTPCONFDIR)
+-	$(INSTALL) -m 644 $(srcdir)/revaliases $(INSTALLED_REVALIASES_FILE)
+-	$(GEN_CONFIG) $(INSTALLED_CONFIGURATION_FILE)
++	$(INSTALL) -d -m 755 $(DESTDIR)$(bindir)
++	$(INSTALL) -m 755 ssmtp $(DESTDIR)$(bindir)/ssmtp
++	$(INSTALL) -d -m 755 $(DESTDIR)$(mandir)
++	$(INSTALL) -m 644 $(srcdir)/ssmtp.8 $(DESTDIR)$(mandir)/ssmtp.8
++	$(INSTALL) -d -m 755 $(DESTDIR)$(SSMTPCONFDIR)
++	$(INSTALL) -m 644 $(srcdir)/revaliases $(DESTDIR)$(INSTALLED_REVALIASES_FILE)
++	$(GEN_CONFIG) $(DESTDIR)$(INSTALLED_CONFIGURATION_FILE)
+ 
+ 
+ .PHONY: install-sendmail
+ install-sendmail: install
+-	$(RM) $(bindir)/sendmail
+-	$(LN_S) ssmtp $(bindir)/sendmail
+-	$(INSTALL) -d -m 755 $(libexecdir)
+-	$(RM) $(libexecdir)/sendmail
+-	$(LN_S) sendmail /lib/sendmail
+-	$(RM) $(mandir)/sendmail.8
+-	$(LN_S) ssmtp.8 $(mandir)/sendmail.8
++	$(RM) $(DESTDIR)$(bindir)/sendmail
++	$(LN_S) ssmtp $(DESTDIR)$(bindir)/sendmail
++	$(INSTALL) -d -m 755 $(DESTDIR)$(libexecdir)
++	$(RM) $(DESTDIR)$(libexecdir)/sendmail
++	$(LN_S) sendmail $(DESTDIR)/lib/sendmail
++	$(RM) $(DESTDIR)$(mandir)/sendmail.8
++	$(LN_S) ssmtp.8 $(DESTDIR)$(mandir)/sendmail.8
+ 
+ .PHONY: uninstall
+ uninstall:
+-	$(RM) $(bindir)/ssmtp
+-	$(RM) $(mandir)/ssmtp.8
+-	$(RM) $(CONFIGURATION_FILE) $(REVALIASES_FILE)
+-	$(RM) -r $(SSMTPCONFDIR)
++	$(RM) $(DESTDIR)$(bindir)/ssmtp
++	$(RM) $(DESTDIR)$(mandir)/ssmtp.8
++	$(RM) $(DESTDIR)$(CONFIGURATION_FILE) $(DESTDIR)$(REVALIASES_FILE)
++	$(RM) -r $(DESTDIR)$(SSMTPCONFDIR)
+ 
+ .PHONY: uninstall-sendmail
+ uninstall-sendmail: uninstall
+-	$(RM)  $(bindir)/sendmail /lib/sendmail
+-	$(RM)  $(mandir)/sendmail.8
++	$(RM)  $(DESTDIR)$(bindir)/sendmail $(DESTDIR)/lib/sendmail
++	$(RM)  $(DESTDIR)$(mandir)/sendmail.8
+ 
+ # Binaries:
+ ssmtp: $(OBJS)
+-	$(CC) -o ssmtp $(OBJS) @LIBS@ $(CFLAGS)
++	$(CC) -o ssmtp $(OBJS) @LIBS@ $(CFLAGS) $(LDFLAGS)
+ 
+ .PHONY: clean
+ clean:

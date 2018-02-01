@@ -1,0 +1,28 @@
+From b3acc4c6407f9553f32582a9aee6a11b5fcd1d8a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Jul 2017 13:17:19 -0700
+Subject: [PATCH 2/3] contrib/test: Link mc_nextgen_test with libargp if needed
+
+musl depends on external argp implementation e.g.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ contrib/test/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/contrib/test/Makefile.am b/contrib/test/Makefile.am
+index 4641e21..e47b948 100644
+--- a/contrib/test/Makefile.am
++++ b/contrib/test/Makefile.am
+@@ -32,7 +32,7 @@ v4l2gl_LDFLAGS = $(X11_LIBS) $(GL_LIBS) $(GLU_LIBS) $(ARGP_LIBS)
+ v4l2gl_LDADD = ../../lib/libv4l2/libv4l2.la ../../lib/libv4lconvert/libv4lconvert.la
+ 
+ mc_nextgen_test_CFLAGS = $(LIBUDEV_CFLAGS)
+-mc_nextgen_test_LDFLAGS = $(LIBUDEV_LIBS)
++mc_nextgen_test_LDFLAGS = $(ARGP_LIBS) $(LIBUDEV_LIBS)
+ 
+ 
+ ioctl_test_SOURCES = ioctl-test.c ioctl-test.h ioctl_32.h ioctl_64.h
+-- 
+2.13.3
+

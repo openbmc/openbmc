@@ -1,0 +1,29 @@
+From 1f8d336a5cd88b87e15596d05980f6fe77a0f226 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Mar 2017 11:28:41 -0700
+Subject: [PATCH 1/4] Use -1 instead of WAIT_ANY
+
+WAIT_ANY is not supported by POSIX and some C libraries
+e.g. musl do not define this.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usl/usl_pid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usl/usl_pid.c b/usl/usl_pid.c
+index 103458b..9819473 100644
+--- a/usl/usl_pid.c
++++ b/usl/usl_pid.c
+@@ -78,7 +78,7 @@ int usl_pid_reap_children(int waitfor)
+ 
+ 	/* Wait for processes in our process group. */
+ 
+-	while (((pid = waitpid(WAIT_ANY, &status, (waitfor ? 0: WNOHANG))) != -1) && (pid != 0)) {
++	while (((pid = waitpid(-1, &status, (waitfor ? 0: WNOHANG))) != -1) && (pid != 0)) {
+ 		have_callback = 0;
+ 		usl_list_for_each(walk, tmp, &usl_child_list) {
+ 			child = usl_list_entry(walk, struct usl_pid_child, list);
+-- 
+2.12.1
+

@@ -1,0 +1,65 @@
+From 7f4f379f8343c0ce92aa30f3f9037288a089a902 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 18 Dec 2016 08:24:56 +0000
+Subject: [PATCH] include <sys/sysmacros.h> for major/minor definitions
+
+glibc 2.25 will error out if the applications are expecting
+this to come from sys/types.h, it is being removed from
+there.
+
+Fixes
+
+error: In the GNU C Library, "minor" is defined
+|  by <sys/sysmacros.h>. For historical compatibility, it is
+|  currently defined by <sys/types.h> as well, but we plan to
+|  remove this soon. To use "minor", include <sys/sysmacros.h>
+|  directly. If you did not intend to use a system-defined macro
+|  "minor", you should undefine it after including <sys/types.h>. [-Werror]
+|        ul_oct ((u_long) MINOR (arcn->sb.st_rdev), hd->devminor,
+|              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/cpio.c     | 2 +-
+ src/gen_subs.c | 2 +-
+ src/tar.c      | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+Index: pax-3.4/src/cpio.c
+===================================================================
+--- pax-3.4.orig/src/cpio.c
++++ pax-3.4/src/cpio.c
+@@ -36,6 +36,7 @@
+ #include "config.h"
+ #endif
+ 
++#include <sys/sysmacros.h>
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <sys/stat.h>
+Index: pax-3.4/src/gen_subs.c
+===================================================================
+--- pax-3.4.orig/src/gen_subs.c
++++ pax-3.4/src/gen_subs.c
+@@ -37,6 +37,7 @@
+ #include "config.h"
+ #endif
+ 
++#include <sys/sysmacros.h>
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <sys/stat.h>
+Index: pax-3.4/src/tar.c
+===================================================================
+--- pax-3.4.orig/src/tar.c
++++ pax-3.4/src/tar.c
+@@ -37,6 +37,7 @@
+ #include "config.h"
+ #endif
+ 
++#include <sys/sysmacros.h>
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <sys/stat.h>

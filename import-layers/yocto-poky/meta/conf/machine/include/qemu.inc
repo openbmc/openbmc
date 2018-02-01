@@ -6,10 +6,8 @@ PREFERRED_PROVIDER_virtual/libgles2 ?= "mesa"
 
 XSERVER ?= "xserver-xorg \
             ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'mesa-driver-swrast xserver-xorg-extension-glx', '', d)} \
-            xf86-input-evdev \
-            xf86-input-mouse \
             xf86-video-fbdev \
-            xf86-input-keyboard"
+            "
 
 MACHINE_FEATURES = "alsa bluetooth usbgadget screen"
 

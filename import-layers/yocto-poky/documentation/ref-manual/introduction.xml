@@ -296,7 +296,7 @@
                         Yocto Project documentation manuals:
                         <literallayout class='monospaced'>
      $ sudo dnf install make docbook-style-dsssl docbook-style-xsl \
-     docbook-dtds docbook-utils fop libxslt dblatex xmlto xsltproc
+     docbook-dtds docbook-utils fop libxslt dblatex xmlto
                         </literallayout></para></listitem>
                     <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
                         Packages needed if you are going to run
@@ -333,7 +333,7 @@
                         Packages needed if you are going to build out the
                         Yocto Project documentation manuals:
                         <literallayout class='monospaced'>
-     $ sudo zypper install make fop xsltproc dblatex xmlto
+     $ sudo zypper install make dblatex xmlto
                         </literallayout></para></listitem>
                     <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
                         Packages needed if you are going to run
@@ -351,25 +351,33 @@
             <para>
                 The following list shows the required packages by function
                 given a supported CentOS Linux distribution:
-                <note>
-                    For CentOS 6.x, some of the versions of the components
-                    provided by the distribution are too old (e.g. Git, Python,
-                    and tar).
-                    It is recommended that you install the buildtools in order
-                    to provide versions that will work with the OpenEmbedded
-                    build system.
-                    For information on how to install the buildtools tarball,
-                    see the
-                    "<link linkend='required-git-tar-and-python-versions'>Required Git, Tar, and Python Versions</link>"
-                    section.
-                </note>
                 <itemizedlist>
                     <listitem><para><emphasis>Essentials:</emphasis>
                         Packages needed to build an image for a headless
                         system:
                         <literallayout class='monospaced'>
-     $ sudo yum install &CENTOS_HOST_PACKAGES_ESSENTIAL;
-                        </literallayout></para></listitem>
+     $ sudo yum install &CENTOS_HOST_PACKAGES_ESSENTIAL; SDL-devel xterm
+                        </literallayout>
+                        <note><title>Notes</title>
+                            <itemizedlist>
+                                <listitem><para>
+                                    Extra Packages for Enterprise Linux
+                                    (i.e. <filename>epel-release</filename>)
+                                    is a collection of packages from Fedora
+                                    built on RHEL/CentOS for easy installation
+                                    of packages not included in enterprise
+                                    Linux by default.
+                                    You need to install these packages
+                                    separately.
+                                    </para></listitem>
+                                <listitem><para>
+                                    The <filename>makecache</filename> command
+                                    consumes additional Metadata from
+                                    <filename>epel-release</filename>.
+                                    </para></listitem>
+                            </itemizedlist>
+                        </note>
+                        </para></listitem>
                     <listitem><para><emphasis>Graphical and Eclipse Plug-In Extras:</emphasis>
                         Packages recommended if the host system has graphics
                         support or if you are going to use the Eclipse
@@ -382,7 +390,7 @@
                         Yocto Project documentation manuals:
                         <literallayout class='monospaced'>
      $ sudo yum install make docbook-style-dsssl docbook-style-xsl \
-     docbook-dtds docbook-utils fop libxslt dblatex xmlto xsltproc
+     docbook-dtds docbook-utils fop libxslt dblatex xmlto
                         </literallayout></para></listitem>
                     <listitem><para><emphasis>OpenEmbedded Self-Test (<filename>oe-selftest</filename>):</emphasis>
                         Packages needed if you are going to run

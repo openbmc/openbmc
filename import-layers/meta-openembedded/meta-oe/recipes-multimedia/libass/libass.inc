@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/libass/libass"
 SECTION = "libs/multimedia"
 
 LICENSE = "ISC"
-LIC_FILES_CHKSUM = "file://COPYING;md5=8ae98663bac55afe5d989919d296f28a"
+LIC_FILES_CHKSUM = "file://COPYING;md5=a42532a0684420bdb15556c3cdd49a75"
 
 DEPENDS = "enca fontconfig freetype libpng fribidi"
 

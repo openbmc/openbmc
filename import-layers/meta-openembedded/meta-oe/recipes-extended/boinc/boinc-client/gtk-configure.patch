@@ -1,0 +1,29 @@
+Check for gtk2+ only when manager is enabled
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: boinc-client_release-7.6-7.6.33/configure.ac
+===================================================================
+--- boinc-client_release-7.6-7.6.33.orig/configure.ac
++++ boinc-client_release-7.6-7.6.33/configure.ac
+@@ -1033,6 +1033,11 @@ else
+   AM_CONDITIONAL([GUI_GTK], false)
+ fi
+ 
++dnl ---------- GTK+2.0-----------------------------------------------------
++if test "X${no_x}" != "Xyes"; then
++  PKG_CHECK_MODULES([GTK2], [gtk+-2.0])
++fi
++
+ dnl ---------- libNotify --------------------------------------------------
+ if test "${enable_manager}" = yes ; then
+   PKG_CHECK_MODULES(LIBNOTIFY, [libnotify])
+@@ -1082,7 +1087,6 @@ AM_CONDITIONAL(ENABLE_BOINCCRYPT, [test
+ AM_CONDITIONAL(INSTALL_HEADERS, [test "${enable_install_headers}" = yes])
+ AM_CONDITIONAL(HAVE_CUDA_LIB, [test "${enable_client}" = yes -a -f ./coprocs/CUDA/posix/${boinc_platform}/libcudart.so])
+ 
+-PKG_CHECK_MODULES([GTK2], [gtk+-2.0])
+ 
+ dnl ======================================================================
+ dnl some more vodoo required for building portable client-binary (client, clientgui)

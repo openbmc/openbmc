@@ -1,0 +1,62 @@
+Add new option --target-only to build target components
+Separates the host and target pieces of build
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: go/src/make.bash
+===================================================================
+--- go.orig/src/make.bash
++++ go/src/make.bash
+@@ -154,13 +154,22 @@ if [ "$1" = "--no-clean" ]; then
+ 	buildall=""
+ 	shift
+ fi
+-./cmd/dist/dist bootstrap $buildall $GO_DISTFLAGS -v # builds go_bootstrap
++do_host_build="yes"
++do_target_build="yes"
++if [ "$1" = "--target-only" ]; then
++	do_host_build="no"
++	shift
++elif [ "$1" = "--host-only" ]; then
++	do_target_build="no"
++	shift
++fi
+ 
+-# Delay move of dist tool to now, because bootstrap may clear tool directory.
+-mv cmd/dist/dist "$GOTOOLDIR"/dist
+-echo
++if [ "$do_host_build" = "yes" ]; then
++	./cmd/dist/dist bootstrap $buildall $GO_DISTFLAGS -v # builds go_bootstrap
++	# Delay move of dist tool to now, because bootstrap may clear tool directory.
++	mv cmd/dist/dist "$GOTOOLDIR"/dist
++	echo
+ 
+-if [ "$GOHOSTARCH" != "$GOARCH" -o "$GOHOSTOS" != "$GOOS" ]; then
+ 	echo "##### Building packages and commands for host, $GOHOSTOS/$GOHOSTARCH."
+ 	# CC_FOR_TARGET is recorded as the default compiler for the go tool. When building for the host, however,
+ 	# use the host compiler, CC, from `cmd/dist/dist env` instead.
+@@ -169,11 +178,20 @@ if [ "$GOHOSTARCH" != "$GOARCH" -o "$GOH
+ 	echo
+ fi
+ 
+-echo "##### Building packages and commands for $GOOS/$GOARCH."
+-CC="$CC_FOR_TARGET" "$GOTOOLDIR"/go_bootstrap install $GO_FLAGS -gcflags "$GO_GCFLAGS" -ldflags "$GO_LDFLAGS" -v std cmd
+-echo
++if [ "$do_target_build" = "yes" ]; then
++    GO_INSTALL="${GO_TARGET_INSTALL:-std cmd}"
++    echo "##### Building packages and commands for $GOOS/$GOARCH."
++    if [ "$GOHOSTOS" = "$GOOS" -a "$GOHOSTARCH" = "$GOARCH" -a "$do_host_build" = "yes" ]; then
++	rm -rf ./host-tools
++	mkdir ./host-tools
++	mv "$GOTOOLDIR"/* ./host-tools
++	GOTOOLDIR="$PWD/host-tools"
++    fi
++    GOTOOLDIR="$GOTOOLDIR" CC="$CC_FOR_TARGET" "$GOTOOLDIR"/go_bootstrap install $GO_FLAGS -gcflags "$GO_GCFLAGS" -ldflags "$GO_LDFLAGS" -v ${GO_INSTALL}
++    echo
+ 
+-rm -f "$GOTOOLDIR"/go_bootstrap
++    rm -f "$GOTOOLDIR"/go_bootstrap
++fi
+ 
+ if [ "$1" != "--no-banner" ]; then
+ 	"$GOTOOLDIR"/dist banner

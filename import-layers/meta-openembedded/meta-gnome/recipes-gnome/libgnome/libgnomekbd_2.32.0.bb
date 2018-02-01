@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=6e29c688d912da12b66b73e32b03d812"
 
 SECTION = "x11/gnome/libs"
 
-DEPENDS = "gconf gtk+ glib-2.0 libxklavier intltool-native"
+DEPENDS = "gconf gtk+ glib-2.0 libxklavier intltool-native gnome-common-native"
 
 inherit gnome
 
@@ -17,3 +17,4 @@ do_configure_append() {
     find ${B} -name Makefile | xargs sed -i s:'-I/usr/include':'-I${STAGING_INCDIR}':g
 }
 
+PNBLACKLIST[libgnomekbd] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130608/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

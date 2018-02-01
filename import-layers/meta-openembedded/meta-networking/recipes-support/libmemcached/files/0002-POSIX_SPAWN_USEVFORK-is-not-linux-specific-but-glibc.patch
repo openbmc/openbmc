@@ -1,0 +1,30 @@
+From e95609e4ae40a794ed198924505fd22d7d86a124 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 Mar 2017 10:16:14 -0700
+Subject: [PATCH 2/2] POSIX_SPAWN_USEVFORK is not linux specific but glibc
+ specific
+
+Fixes
+cmdline.cc:206:12: error: use of undeclared identifier 'POSIX_SPAWN_USEVFORK'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libtest/cmdline.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libtest/cmdline.cc b/libtest/cmdline.cc
+index 29a22de..34f0a89 100644
+--- a/libtest/cmdline.cc
++++ b/libtest/cmdline.cc
+@@ -201,7 +201,7 @@ Application::error_t Application::run(const char *args[])
+ 
+   fatal_assert(posix_spawnattr_setsigmask(&spawnattr, &mask) == 0);
+ 
+-#if defined(POSIX_SPAWN_USEVFORK) || defined(__linux__)
++#if defined(POSIX_SPAWN_USEVFORK) || defined(__GLIBC__)
+   // Use USEVFORK on linux
+   flags |= POSIX_SPAWN_USEVFORK;
+ #endif
+-- 
+2.12.0
+

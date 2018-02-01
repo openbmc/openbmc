@@ -213,11 +213,11 @@ if __name__ == "__main__":
     print()
 
     print("a", a)
-    for x in a.items():
+    for x in a.iteritems():
         print(x)
     print("--")
     print("b", b)
-    for x in b.items():
+    for x in b.iteritems():
         print(x)
     print()
 
@@ -225,11 +225,11 @@ if __name__ == "__main__":
     b['a'] = 'c'
 
     print("a", a)
-    for x in a.items():
+    for x in a.iteritems():
         print(x)
     print("--")
     print("b", b)
-    for x in b.items():
+    for x in b.iteritems():
         print(x)
     print()
 
@@ -244,22 +244,22 @@ if __name__ == "__main__":
     a['set'].add("o2")
 
     print("a", a)
-    for x in a['set'].values():
+    for x in a['set'].itervalues():
         print(x)
     print("--")
     print("b", b)
-    for x in b['set'].values():
+    for x in b['set'].itervalues():
         print(x)
     print()
 
     b['set'].add('o3')
 
     print("a", a)
-    for x in a['set'].values():
+    for x in a['set'].itervalues():
         print(x)
     print("--")
     print("b", b)
-    for x in b['set'].values():
+    for x in b['set'].itervalues():
         print(x)
     print()
 
@@ -269,7 +269,7 @@ if __name__ == "__main__":
     a['set2'].add("o2")
 
     print("a", a)
-    for x in a.items():
+    for x in a.iteritems():
         print(x)
     print("--")
     print("b", b)
@@ -289,7 +289,7 @@ if __name__ == "__main__":
         print("Yay - has_key with delete works!")
 
     print("a", a)
-    for x in a.items():
+    for x in a.iteritems():
         print(x)
     print("--")
     print("b", b)
@@ -300,7 +300,7 @@ if __name__ == "__main__":
     b.__revertitem__('b')
 
     print("a", a)
-    for x in a.items():
+    for x in a.iteritems():
         print(x)
     print("--")
     print("b", b)
@@ -310,7 +310,7 @@ if __name__ == "__main__":
 
     b.__revertitem__('dict')
     print("a", a)
-    for x in a.items():
+    for x in a.iteritems():
         print(x)
     print("--")
     print("b", b)

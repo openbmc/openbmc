@@ -1,0 +1,37 @@
+From 0af30602502035155929dd2a14482b82a9747cf8 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 23 Feb 2017 15:23:15 +0200
+Subject: [PATCH] configure.ac: Use wayland-scanner in PATH
+
+pkg-config will give us the wrong wayland-scanner location.
+Use the one in path instead: it will be from native sysroot.
+
+This is a workaround and should be fixed upstream: preferably
+with the same fix as all the other wayland-scanner users
+(see YOCTO #11100).
+
+Upstream-Status: Inappropriate [workaround]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 64eddf2..5536f35 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -273,10 +273,7 @@ if test "$enable_wayland" = "yes"; then
+     PKG_CHECK_MODULES([WAYLAND], [wayland-client >= wayland_api_version],
+         [USE_WAYLAND="yes"], [:])
+     if test "$USE_WAYLAND" = "yes"; then
+-
+-        WAYLAND_PREFIX=`$PKG_CONFIG --variable=prefix wayland-client`
+-        AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner],,
+-                     [${WAYLAND_PREFIX}/bin$PATH_SEPARATOR$PATH])
++        AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner])
+ 
+         AC_DEFINE([HAVE_VA_WAYLAND], [1],
+                   [Defined to 1 if VA/Wayland API is built])
+-- 
+2.1.4
+

@@ -1,0 +1,33 @@
+From b6972f1c29ebf073cbe19a4a669ee093259792a0 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Mon, 30 Jan 2017 12:00:33 -0200
+Subject: [PATCH] src/libbsd-overlay.pc.in: Set Cflags to use -I instead of
+ -isystem
+Organization: O.S. Systems Software LTDA.
+
+pkg-config currently only handles -I and -L correctly, but misses
+-isystem, so we need to do this workaround to fix this issue.
+
+There's a open bug in:
+https://bugzilla.freedesktop.org/show_bug.cgi?id=99516
+
+Upstream-Status: Pending
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ src/libbsd-overlay.pc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libbsd-overlay.pc.in b/src/libbsd-overlay.pc.in
+index ac8bf89..65dc3ae 100644
+--- a/src/libbsd-overlay.pc.in
++++ b/src/libbsd-overlay.pc.in
+@@ -8,4 +8,4 @@ Description: Utility functions from BSD systems (overlay)
+ Version: @VERSION@
+ URL: https://libbsd.freedesktop.org/
+ Libs: -L${libdir} -lbsd
+-Cflags: -isystem ${includedir}/bsd -DLIBBSD_OVERLAY
++Cflags: -I${includedir}/bsd -DLIBBSD_OVERLAY
+-- 
+2.11.0
+

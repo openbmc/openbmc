@@ -1,0 +1,99 @@
+From 78dbd4c09d617a9cb730d796f94ee4d93840d3cc Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Fri, 9 Jun 2017 17:50:46 +0200
+Subject: [PATCH] Make ptest run the python tests if python is enabled
+
+One of the tests (tstLastError.py) needed a minor correction. It might
+be due to the fact that the tests are forced to run with Python 3.
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ Makefile.am                  |  2 +-
+ python/Makefile.am           |  9 +++++++++
+ python/tests/Makefile.am     | 12 ++++++++++--
+ python/tests/tstLastError.py |  2 +-
+ 4 files changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index e181ee0..7960e7d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -207,9 +207,9 @@ install-ptest:
+ 	install $(noinst_PROGRAMS) $(DESTDIR))
+ 	cp -r $(srcdir)/test $(DESTDIR)
+ 	cp -r $(srcdir)/result $(DESTDIR)
+-	cp -r $(srcdir)/python $(DESTDIR)
+ 	cp Makefile $(DESTDIR)
+ 	sed -i -e 's|^Makefile:|_Makefile:|' $(DESTDIR)/Makefile
++	$(MAKE) -C python install-ptest
+ 
+ runtests:
+ 	[ -d test   ] || $(LN_S) $(srcdir)/test   .
+diff --git a/python/Makefile.am b/python/Makefile.am
+index 34aed96..ba3ec6a 100644
+--- a/python/Makefile.am
++++ b/python/Makefile.am
+@@ -48,7 +48,16 @@ GENERATED = libxml2class.py libxml2class.txt $(BUILT_SOURCES)
+ 
+ $(GENERATED): $(srcdir)/generator.py $(API_DESC)
+ 	$(PYTHON) $(srcdir)/generator.py $(srcdir)
++
++install-ptest:
++	cp -r $(srcdir) $(DESTDIR)
++	sed -e 's|^Makefile:|_Makefile:|' \
++	    -e 's|^\(tests test:\) all|\1|' Makefile >$(DESTDIR)/python/Makefile
++	$(MAKE) -C tests install-ptest
++else
++install-ptest:
+ endif
+ 
++.PHONY: tests test
+ tests test: all
+ 	cd tests && $(MAKE) tests
+diff --git a/python/tests/Makefile.am b/python/tests/Makefile.am
+index 95ebead..418e21e 100644
+--- a/python/tests/Makefile.am
++++ b/python/tests/Makefile.am
+@@ -59,6 +59,11 @@ XMLS=		\
+ CLEANFILES = core tmp.xml *.pyc
+ 
+ if WITH_PYTHON
++install-ptest:
++	cp -r $(srcdir) $(DESTDIR)/python
++	sed -e 's|^Makefile:|_Makefile:|' \
++	    -e 's|^\(srcdir = \).*|\1.|' Makefile >$(DESTDIR)/python/tests/Makefile
++
+ tests: $(PYTESTS)
+ 	@for f in $(XMLS) ; do test -f $$f || $(LN_S) $(srcdir)/$$f . ; done
+ 	@echo "## running Python regression tests"
+@@ -68,8 +73,11 @@ tests: $(PYTESTS)
+ 	   export LD_LIBRARY_PATH; \
+ 	   for test in $(PYTESTS) ; \
+ 	   do log=`$(PYTHON) $(srcdir)/$$test` ; \
+-	   if [ "`echo $$log | grep OK`" = "" ] ; then \
+-	   echo "-- $$test" ; echo "$$log" ; fi ; done)
++	   if [ "`echo $$log | grep OK`" ]; then \
++	   echo "PASS: $$test"; else \
++	   echo "$$log"; echo "FAIL: $$test"; fi; done)
+ else
++install-ptest:
++
+ tests:
+ endif
+diff --git a/python/tests/tstLastError.py b/python/tests/tstLastError.py
+index d5f9be7..3e5bef8 100755
+--- a/python/tests/tstLastError.py
++++ b/python/tests/tstLastError.py
+@@ -25,7 +25,7 @@ class TestCase(unittest.TestCase):
+         when the exception is raised, check the libxml2.lastError for
+         expected values."""
+         # disable the default error handler
+-        libxml2.registerErrorHandler(None,None)
++        libxml2.registerErrorHandler(lambda ctx,str: None,None)
+         try:
+             f(*args)
+         except exc:
+-- 
+2.12.0
+

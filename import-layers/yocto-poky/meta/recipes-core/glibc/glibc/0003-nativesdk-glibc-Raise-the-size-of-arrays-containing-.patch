@@ -1,7 +1,7 @@
-From c99892f2018cd7fa0f37b53e6cebec99fa036472 Mon Sep 17 00:00:00 2001
+From e53968d61804b6bab32ec6e13cc0b3cd57214796 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
-Subject: [PATCH 03/25] nativesdk-glibc: Raise the size of arrays containing dl
+Subject: [PATCH 03/26] nativesdk-glibc: Raise the size of arrays containing dl
  paths
 
 This patch puts the dynamic loader path in the binaries, SYSTEM_DIRS strings
@@ -21,13 +21,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  elf/interp.c               | 2 +-
  elf/ldconfig.c             | 3 +++
  elf/rtld.c                 | 5 +++--
+ iconv/gconv_conf.c         | 2 +-
  sysdeps/generic/dl-cache.h | 4 ----
- 6 files changed, 13 insertions(+), 9 deletions(-)
+ 7 files changed, 14 insertions(+), 10 deletions(-)
 
-Index: git/elf/dl-cache.c
-===================================================================
---- git.orig/elf/dl-cache.c
-+++ git/elf/dl-cache.c
+diff --git a/elf/dl-cache.c b/elf/dl-cache.c
+index cfa335e..daa12ec 100644
+--- a/elf/dl-cache.c
++++ b/elf/dl-cache.c
 @@ -132,6 +132,10 @@ do									      \
  while (0)
  
@@ -39,11 +40,11 @@ Index: git/elf/dl-cache.c
  int
  internal_function
  _dl_cache_libcmp (const char *p1, const char *p2)
-Index: git/elf/dl-load.c
-===================================================================
---- git.orig/elf/dl-load.c
-+++ git/elf/dl-load.c
-@@ -106,8 +106,8 @@ static size_t max_capstrlen attribute_re
+diff --git a/elf/dl-load.c b/elf/dl-load.c
+index 3a3d112..a1410e4 100644
+--- a/elf/dl-load.c
++++ b/elf/dl-load.c
+@@ -106,8 +106,8 @@ static size_t max_capstrlen attribute_relro;
  /* Get the generated information about the trusted directories.  */
  #include "trusted-dirs.h"
  
@@ -54,10 +55,10 @@ Index: git/elf/dl-load.c
  {
    SYSTEM_DIRS_LEN
  };
-Index: git/elf/interp.c
-===================================================================
---- git.orig/elf/interp.c
-+++ git/elf/interp.c
+diff --git a/elf/interp.c b/elf/interp.c
+index 9448802..e7e8c70 100644
+--- a/elf/interp.c
++++ b/elf/interp.c
 @@ -18,5 +18,5 @@
  
  #include <runtime-linker.h>
@@ -65,10 +66,10 @@ Index: git/elf/interp.c
 -const char __invoke_dynamic_linker__[] __attribute__ ((section (".interp")))
 +const char __invoke_dynamic_linker__[4096] __attribute__ ((section (".interp")))
    = RUNTIME_LINKER;
-Index: git/elf/ldconfig.c
-===================================================================
---- git.orig/elf/ldconfig.c
-+++ git/elf/ldconfig.c
+diff --git a/elf/ldconfig.c b/elf/ldconfig.c
+index 467ca82..631a2a9 100644
+--- a/elf/ldconfig.c
++++ b/elf/ldconfig.c
 @@ -168,6 +168,9 @@ static struct argp argp =
    options, parse_opt, NULL, doc, NULL, more_help, NULL
  };
@@ -79,10 +80,10 @@ Index: git/elf/ldconfig.c
  /* Check if string corresponds to an important hardware capability or
     a platform.  */
  static int
-Index: git/elf/rtld.c
-===================================================================
---- git.orig/elf/rtld.c
-+++ git/elf/rtld.c
+diff --git a/elf/rtld.c b/elf/rtld.c
+index 4ec25d7..e159c12 100644
+--- a/elf/rtld.c
++++ b/elf/rtld.c
 @@ -99,6 +99,7 @@ uintptr_t __pointer_chk_guard_local
  strong_alias (__pointer_chk_guard_local, __pointer_chk_guard)
  #endif
@@ -91,7 +92,7 @@ Index: git/elf/rtld.c
  
  /* List of auditing DSOs.  */
  static struct audit_list
-@@ -873,12 +874,12 @@ of this helper program; chances are you
+@@ -854,12 +855,12 @@ of this helper program; chances are you did not intend to run this program.\n\
    --list                list all dependencies and how they are resolved\n\
    --verify              verify that given object really is a dynamically linked\n\
  			object we can handle\n\
@@ -106,10 +107,23 @@ Index: git/elf/rtld.c
  
        ++_dl_skip_args;
        --_dl_argc;
-Index: git/sysdeps/generic/dl-cache.h
-===================================================================
---- git.orig/sysdeps/generic/dl-cache.h
-+++ git/sysdeps/generic/dl-cache.h
+diff --git a/iconv/gconv_conf.c b/iconv/gconv_conf.c
+index e235188..569f72e 100644
+--- a/iconv/gconv_conf.c
++++ b/iconv/gconv_conf.c
+@@ -36,7 +36,7 @@
+ 
+ 
+ /* This is the default path where we look for module lists.  */
+-static const char default_gconv_path[] = GCONV_PATH;
++static char default_gconv_path[4096] __attribute__ ((section (".gccrelocprefix"))) = GCONV_PATH;
+ 
+ /* The path elements, as determined by the __gconv_get_path function.
+    All path elements end in a slash.  */
+diff --git a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
+index eb2f900..505804e 100644
+--- a/sysdeps/generic/dl-cache.h
++++ b/sysdeps/generic/dl-cache.h
 @@ -27,10 +27,6 @@
    ((flags) == 1 || (flags) == _DL_CACHE_DEFAULT_ID)
  #endif
@@ -121,51 +135,6 @@ Index: git/sysdeps/generic/dl-cache.h
  #ifndef add_system_dir
  # define add_system_dir(dir) add_dir (dir)
  #endif
-Index: git/iconv/gconv_conf.c
-===================================================================
---- git.orig/iconv/gconv_conf.c
-+++ git/iconv/gconv_conf.c
-@@ -36,7 +36,7 @@
- 
- 
- /* This is the default path where we look for module lists.  */
--static const char default_gconv_path[] = GCONV_PATH;
-+static char default_gconv_path[4096] __attribute__ ((section (".gccrelocprefix"))) = GCONV_PATH;
- 
- /* The path elements, as determined by the __gconv_get_path function.
-    All path elements end in a slash.  */
-Index: git/locale/findlocale.c
-===================================================================
---- git.orig/locale/findlocale.c
-+++ git/locale/findlocale.c
-@@ -56,7 +56,7 @@ struct __locale_data *const _nl_C[] attr
-    which are somehow addressed.  */
- struct loaded_l10nfile *_nl_locale_file_list[__LC_LAST];
- 
--const char _nl_default_locale_path[] attribute_hidden = COMPLOCALEDIR;
-+char _nl_default_locale_path[4096] __attribute__ ((section (".gccrelocprefix"))) attribute_hidden = COMPLOCALEDIR;
- 
- /* Checks if the name is actually present, that is, not NULL and not
-    empty.  */
-@@ -168,7 +168,7 @@ _nl_find_locale (const char *locale_path
- 
-       /* Nothing in the archive.  Set the default path to search below.  */
-       locale_path = _nl_default_locale_path;
--      locale_path_len = sizeof _nl_default_locale_path;
-+      locale_path_len = strlen(_nl_default_locale_path) + 1;
-     }
-   else
-     /* We really have to load some data.  First see whether the name is
-Index: git/locale/localeinfo.h
-===================================================================
---- git.orig/locale/localeinfo.h
-+++ git/locale/localeinfo.h
-@@ -322,7 +322,7 @@ _nl_lookup_word (locale_t l, int categor
- }
- 
- /* Default search path if no LOCPATH environment variable.  */
--extern const char _nl_default_locale_path[] attribute_hidden;
-+extern char _nl_default_locale_path[] attribute_hidden;
- 
- /* Load the locale data for CATEGORY from the file specified by *NAME.
-    If *NAME is "", use environment variables as specified by POSIX, and
+-- 
+2.10.2
+

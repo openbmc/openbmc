@@ -12,7 +12,7 @@ class LayerPlugin():
 
     def tinfoil_init(self, tinfoil):
         self.tinfoil = tinfoil
-        self.bblayers = (self.tinfoil.config_data.getVar('BBLAYERS', True) or "").split()
+        self.bblayers = (self.tinfoil.config_data.getVar('BBLAYERS') or "").split()
         layerconfs = self.tinfoil.config_data.varhistory.get_variable_items_files('BBFILE_COLLECTIONS', self.tinfoil.config_data)
         self.bbfile_collections = {layer: os.path.dirname(os.path.dirname(path)) for layer, path in layerconfs.items()}
 

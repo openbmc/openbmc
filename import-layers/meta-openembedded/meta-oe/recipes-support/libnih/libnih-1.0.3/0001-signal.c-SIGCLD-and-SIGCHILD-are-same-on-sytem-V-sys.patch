@@ -1,0 +1,28 @@
+From f1b9992caf9910f9f7afae401045e42572cc84ff Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 1 Apr 2017 08:50:35 -0700
+Subject: [PATCH] signal.c: SIGCLD and SIGCHILD are same on sytem V systems
+
+Musl drops the SIGCLD legacy
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ nih/signal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nih/signal.c b/nih/signal.c
+index a241df9..691c8e6 100644
+--- a/nih/signal.c
++++ b/nih/signal.c
+@@ -87,7 +87,7 @@ static const SignalName signal_names[] = {
+ 	{ SIGSTKFLT, "STKFLT" },
+ #endif
+ 	{ SIGCHLD,   "CHLD"   },
+-	{ SIGCLD,    "CLD"    },
++	{ SIGCHLD,    "CLD"   },
+ 	{ SIGCONT,   "CONT"   },
+ 	{ SIGSTOP,   "STOP"   },
+ 	{ SIGTSTP,   "TSTP"   },
+-- 
+2.12.1
+

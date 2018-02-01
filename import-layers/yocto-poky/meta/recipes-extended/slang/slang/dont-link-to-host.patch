@@ -1,0 +1,16 @@
+SLANG_INST_LIB is the location of where slang will end up, but when building for
+packaging this doesn't have DESTDIR appended so can potentially link to the host
+for cross builds and will trigger QA errors.
+
+As this is obviously wrong, delete it.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/slsh/Makefile.in b/slsh/Makefile.in
+index cba9d81..4c1c370 100644
+--- a/slsh/Makefile.in
++++ b/slsh/Makefile.in
+@@ -80 +80 @@ SHELL = /bin/sh
+-INST_LIBS = $(DEST_LIB_DIR) $(RPATH) $(SLANG_INST_LIB) -lslang $(READLINE_LIB) $(DYNAMIC_LIBS)
++INST_LIBS = $(DEST_LIB_DIR) $(RPATH) -lslang $(READLINE_LIB) $(DYNAMIC_LIBS)

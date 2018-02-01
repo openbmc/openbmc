@@ -1,0 +1,67 @@
+From 05e8bd664d0244cb8ab4376b962830b97860f6bf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 18:37:19 -0700
+Subject: [PATCH] check for strndupa before using it
+
+musl does not have strndupa
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ config.h.in                        |  4 ++++
+ configure.ac                       |  1 +
+ src/systemd/src/basic/alloc-util.h | 12 ++++++++++++
+ 3 files changed, 17 insertions(+)
+
+diff --git a/config.h.in b/config.h.in
+index db8c135..c4229ed 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -41,6 +41,10 @@
+    */
+ #undef HAVE_DCGETTEXT
+ 
++/* Define to 1 if you have the declaration of `strndupa', and to 0 if you
++   don't. */
++#undef HAVE_DECL_STRNDUPA
++
+ /* Define to 1 if you have the <dlfcn.h> header file. */
+ #undef HAVE_DLFCN_H
+ 
+diff --git a/configure.ac b/configure.ac
+index 2630f8d..d0a57fd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -54,6 +54,7 @@ AC_SUBST(NM_VERSION)
+ 
+ GIT_SHA_RECORD(NM_GIT_SHA)
+ 
++AC_CHECK_DECLS([strndupa], [], [], [[#include <string.h>]])
+ dnl
+ dnl Checks for typedefs, structures, and compiler characteristics.
+ dnl
+diff --git a/src/systemd/src/basic/alloc-util.h b/src/systemd/src/basic/alloc-util.h
+index ceeee51..924b59c 100644
+--- a/src/systemd/src/basic/alloc-util.h
++++ b/src/systemd/src/basic/alloc-util.h
+@@ -25,6 +25,18 @@
+ #include <string.h>
+ 
+ #include "macro.h"
++#include "config.h"
++
++#if !HAVE_DECL_STRNDUPA
++#define strndupa(s, n) \
++  ({ \
++    const char *__old = (s); \
++    size_t __len = strnlen(__old, (n)); \
++    char *__new = (char *)alloca(__len + 1); \
++    __new[__len] = '\0'; \
++    (char *)memcpy(__new, __old, __len); \
++  })
++#endif
+ 
+ #define new(t, n) ((t*) malloc_multiply(sizeof(t), (n)))
+ 
+-- 
+2.12.1
+

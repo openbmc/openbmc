@@ -27,39 +27,68 @@ import pickle
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
 
+import bb.tinfoil
 import bb.siggen
+import bb.msg
 
-def logger_create(name, output=sys.stderr):
-    logger = logging.getLogger(name)
-    console = logging.StreamHandler(output)
-    format = bb.msg.BBLogFormatter("%(levelname)s: %(message)s")
-    if output.isatty():
-        format.enable_color()
-    console.setFormatter(format)
-    logger.addHandler(console)
-    logger.setLevel(logging.INFO)
-    return logger
+logger = bb.msg.logger_create('bitbake-dumpsig')
 
-logger = logger_create('bitbake-dumpsig')
+def find_siginfo_task(bbhandler, pn, taskname):
+    """ Find the most recent signature file for the specified PN/task """
+
+    if not hasattr(bb.siggen, 'find_siginfo'):
+        logger.error('Metadata does not support finding signature data files')
+        sys.exit(1)
+
+    if not taskname.startswith('do_'):
+        taskname = 'do_%s' % taskname
+
+    filedates = bb.siggen.find_siginfo(pn, taskname, None, bbhandler.config_data)
+    latestfiles = sorted(filedates.keys(), key=lambda f: filedates[f])[-1:]
+    if not latestfiles:
+        logger.error('No sigdata files found matching %s %s' % (pn, taskname))
+        sys.exit(1)
+
+    return latestfiles[0]
 
 parser = optparse.OptionParser(
     description = "Dumps siginfo/sigdata files written out by BitBake",
     usage = """
+  %prog -t recipename taskname
   %prog sigdatafile""")
+
+parser.add_option("-D", "--debug",
+        help = "enable debug",
+        action = "store_true", dest="debug", default = False)
+
+parser.add_option("-t", "--task",
+        help = "find the signature data file for the specified task",
+        action="store", dest="taskargs", nargs=2, metavar='recipename taskname')
 
 options, args = parser.parse_args(sys.argv)
 
-if len(args) == 1:
-    parser.print_help()
-else:
-    try:
-        output = bb.siggen.dump_sigfile(args[1])
-    except IOError as e:
-        logger.error(str(e))
-        sys.exit(1)
-    except (pickle.UnpicklingError, EOFError):
-        logger.error('Invalid signature data - ensure you are specifying a sigdata/siginfo file')
-        sys.exit(1)
+if options.debug:
+    logger.setLevel(logging.DEBUG)
 
-    if output:
-        print('\n'.join(output))
+if options.taskargs:
+    tinfoil = bb.tinfoil.Tinfoil()
+    tinfoil.prepare(config_only = True)
+    file = find_siginfo_task(tinfoil, options.taskargs[0], options.taskargs[1])
+    logger.debug("Signature file: %s" % file)
+elif len(args) == 1:
+    parser.print_help()
+    sys.exit(0)
+else:
+    file = args[1]
+
+try:
+    output = bb.siggen.dump_sigfile(file)
+except IOError as e:
+    logger.error(str(e))
+    sys.exit(1)
+except (pickle.UnpicklingError, EOFError):
+    logger.error('Invalid signature data - ensure you are specifying a sigdata/siginfo file')
+    sys.exit(1)
+
+if output:
+    print('\n'.join(output))

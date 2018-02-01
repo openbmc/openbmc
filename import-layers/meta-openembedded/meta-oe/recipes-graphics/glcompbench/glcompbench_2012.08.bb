@@ -11,7 +11,8 @@ SRC_URI = "https://launchpad.net/glcompbench/trunk/${PV}/+download/${BPN}-${PV}.
            file://Fix_space_issues.patch \
            file://Fix_auto_ptr_deprecated.patch \
            file://0001-build-Specify-std-c-11-on-cmdline.patch \
-"
+           file://0001-waf-Disable-errors-due-to-Wdeprecated.patch \
+           "
 
 SRC_URI[md5sum] = "c939d9156fe940960098f38707fea827"
 SRC_URI[sha256sum] = "b04b738cec06c6786ceafa86e4735fd8b971c078265754854ef356b0379542ee"

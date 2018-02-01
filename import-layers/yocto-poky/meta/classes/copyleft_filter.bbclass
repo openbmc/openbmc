@@ -6,7 +6,7 @@
 #
 # vi:sts=4:sw=4:et
 
-COPYLEFT_LICENSE_INCLUDE ?= 'GPL* LGPL*'
+COPYLEFT_LICENSE_INCLUDE ?= 'GPL* LGPL* AGPL*'
 COPYLEFT_LICENSE_INCLUDE[type] = 'list'
 COPYLEFT_LICENSE_INCLUDE[doc] = 'Space separated list of globs which include licenses'
 
@@ -47,32 +47,32 @@ def copyleft_should_include(d):
     import oe.license
     from fnmatch import fnmatchcase as fnmatch
 
-    included, motive = False, 'recipe did not match anything'
-
-    recipe_type = d.getVar('COPYLEFT_RECIPE_TYPE', True)
+    recipe_type = d.getVar('COPYLEFT_RECIPE_TYPE')
     if recipe_type not in oe.data.typed_value('COPYLEFT_RECIPE_TYPES', d):
-        include, motive = False, 'recipe type "%s" is excluded' % recipe_type
-
-    include = oe.data.typed_value('COPYLEFT_LICENSE_INCLUDE', d)
-    exclude = oe.data.typed_value('COPYLEFT_LICENSE_EXCLUDE', d)
-
-    try:
-        is_included, reason = oe.license.is_included(d.getVar('LICENSE', True), include, exclude)
-    except oe.license.LicenseError as exc:
-        bb.fatal('%s: %s' % (d.getVar('PF', True), exc))
+        included, motive = False, 'recipe type "%s" is excluded' % recipe_type
     else:
-        if is_included:
-            if reason:
-                included, motive = True, 'recipe has included licenses: %s' % ', '.join(reason)
-            else:
-                included, motive = False, 'recipe does not include a copyleft license'
-        else:
-            included, motive = False, 'recipe has excluded licenses: %s' % ', '.join(reason)
+        included, motive = False, 'recipe did not match anything'
 
-    if any(fnmatch(d.getVar('PN', True), name) \
+        include = oe.data.typed_value('COPYLEFT_LICENSE_INCLUDE', d)
+        exclude = oe.data.typed_value('COPYLEFT_LICENSE_EXCLUDE', d)
+
+        try:
+            is_included, reason = oe.license.is_included(d.getVar('LICENSE'), include, exclude)
+        except oe.license.LicenseError as exc:
+            bb.fatal('%s: %s' % (d.getVar('PF'), exc))
+        else:
+            if is_included:
+                if reason:
+                    included, motive = True, 'recipe has included licenses: %s' % ', '.join(reason)
+                else:
+                    included, motive = False, 'recipe does not include a copyleft license'
+            else:
+                included, motive = False, 'recipe has excluded licenses: %s' % ', '.join(reason)
+
+    if any(fnmatch(d.getVar('PN'), name) \
             for name in oe.data.typed_value('COPYLEFT_PN_INCLUDE', d)):
         included, motive =  True, 'recipe included by name'
-    if any(fnmatch(d.getVar('PN', True), name) \
+    if any(fnmatch(d.getVar('PN'), name) \
             for name in oe.data.typed_value('COPYLEFT_PN_EXCLUDE', d)):
         included, motive = False, 'recipe excluded by name'
 

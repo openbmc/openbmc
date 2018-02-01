@@ -1,0 +1,79 @@
+From e3103459416616d3b8508e7176e897b0ae6c90f2 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Tue, 25 Oct 2016 11:49:40 +0000
+Subject: [PATCH] implement libc specific reopen_stream
+
+musl defines stdin/stdio/stderr as constant types which means
+we can not assign to them as we are doing here but works ok with glibc
+therefore abstract out the _reopen_stream definition depending upon if
+we are using glibc or otherwise
+
+Origin:
+http://git.alpinelinux.org/cgit/aports/tree/main/lvm2/fix-stdio-usage.patch
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+
+---
+ lib/log/log.c      | 6 ++++++
+ tools/lvmcmdline.c | 6 +++---
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/lib/log/log.c b/lib/log/log.c
+index c933154..3581084 100644
+--- a/lib/log/log.c
++++ b/lib/log/log.c
+@@ -161,6 +161,7 @@ static void _check_and_replace_standard_log_streams(FILE *old_stream, FILE *new_
+  * Close and reopen standard stream on file descriptor fd.
+  */
+ int reopen_standard_stream(FILE **stream, const char *mode)
++#ifdef __GLIBC__
+ {
+ 	int fd, fd_copy, new_fd;
+ 	const char *name;
+@@ -207,6 +208,11 @@ int reopen_standard_stream(FILE **stream, const char *mode)
+ 	*stream = new_stream;
+ 	return 1;
+ }
++#else
++{
++	return (freopen(NULL, mode, *stream) != NULL);
++}
++#endif
+ 
+ void init_log_fn(lvm2_log_fn_t log_fn)
+ {
+diff --git a/tools/lvmcmdline.c b/tools/lvmcmdline.c
+index 9a4deb7..f1f18e6 100644
+--- a/tools/lvmcmdline.c
++++ b/tools/lvmcmdline.c
+@@ -1818,7 +1818,7 @@ static int _check_standard_fds(void)
+ 	int err = is_valid_fd(STDERR_FILENO);
+ 
+ 	if (!is_valid_fd(STDIN_FILENO) &&
+-	    !(stdin = fopen(_PATH_DEVNULL, "r"))) {
++	    !freopen(_PATH_DEVNULL, "r", stdin)) {
+ 		if (err)
+ 			perror("stdin stream open");
+ 		else
+@@ -1828,7 +1828,7 @@ static int _check_standard_fds(void)
+ 	}
+ 
+ 	if (!is_valid_fd(STDOUT_FILENO) &&
+-	    !(stdout = fopen(_PATH_DEVNULL, "w"))) {
++	    !freopen(_PATH_DEVNULL, "w", stdout)) {
+ 		if (err)
+ 			perror("stdout stream open");
+ 		/* else no stdout */
+@@ -1836,7 +1836,7 @@ static int _check_standard_fds(void)
+ 	}
+ 
+ 	if (!is_valid_fd(STDERR_FILENO) &&
+-	    !(stderr = fopen(_PATH_DEVNULL, "w"))) {
++	    !freopen(_PATH_DEVNULL, "w", stderr)) {
+ 		printf("stderr stream open: %s\n",
+ 		       strerror(errno));
+ 		return 0;
+-- 
+2.12.0
+

@@ -8,14 +8,19 @@ import os
 import re
 import bb.utils
 import subprocess
+import tempfile
 from abc import ABCMeta, abstractmethod
 
 class BuildProject(metaclass=ABCMeta):
 
-    def __init__(self, d, uri, foldername=None, tmpdir="/tmp/"):
+    def __init__(self, d, uri, foldername=None, tmpdir=None):
         self.d = d
         self.uri = uri
         self.archive = os.path.basename(uri)
+        if not tmpdir:
+            tmpdir = self.d.getVar('WORKDIR')
+            if not tmpdir:
+                tmpdir = tempfile.mkdtemp(prefix='buildproject')
         self.localarchive = os.path.join(tmpdir,self.archive)
         if foldername:
             self.fname = foldername
@@ -24,8 +29,7 @@ class BuildProject(metaclass=ABCMeta):
 
     # Download self.archive to self.localarchive
     def _download_archive(self):
-
-        dl_dir = self.d.getVar("DL_DIR", True)
+        dl_dir = self.d.getVar("DL_DIR")
         if dl_dir and os.path.exists(os.path.join(dl_dir, self.archive)):
             bb.utils.copyfile(os.path.join(dl_dir, self.archive), self.localarchive)
             return
@@ -40,12 +44,12 @@ class BuildProject(metaclass=ABCMeta):
 
         cmd = ''
         for var in exportvars:
-            val = self.d.getVar(var, True)
+            val = self.d.getVar(var)
             if val:
                 cmd = 'export ' + var + '=\"%s\"; %s' % (val, cmd)
 
         cmd = cmd + "wget -O %s %s" % (self.localarchive, self.uri)
-        subprocess.check_call(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True)
 
     # This method should provide a way to run a command in the desired environment.
     @abstractmethod
@@ -73,7 +77,7 @@ class TargetBuildProject(BuildProject):
     def __init__(self, target, d, uri, foldername=None):
         self.target = target
         self.targetdir = "~/"
-        BuildProject.__init__(self, d, uri, foldername, tmpdir="/tmp")
+        BuildProject.__init__(self, d, uri, foldername)
 
     def download_archive(self):
 
@@ -103,8 +107,8 @@ class SDKBuildProject(BuildProject):
         self.testdir = testpath
         self.targetdir = testpath
         bb.utils.mkdirhier(testpath)
-        self.datetime = d.getVar('DATETIME', True)
-        self.testlogdir = d.getVar("TEST_LOG_DIR", True)
+        self.datetime = d.getVar('DATETIME')
+        self.testlogdir = d.getVar("TEST_LOG_DIR")
         bb.utils.mkdirhier(self.testlogdir)
         self.logfile = os.path.join(self.testlogdir, "sdk_target_log.%s" % self.datetime)
         BuildProject.__init__(self, d, uri, foldername, tmpdir=testpath)
@@ -114,7 +118,7 @@ class SDKBuildProject(BuildProject):
         self._download_archive()
 
         cmd = 'tar xf %s%s -C %s' % (self.targetdir, self.archive, self.targetdir)
-        subprocess.check_call(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True)
 
         #Change targetdir to project folder
         self.targetdir = os.path.join(self.targetdir, self.fname)

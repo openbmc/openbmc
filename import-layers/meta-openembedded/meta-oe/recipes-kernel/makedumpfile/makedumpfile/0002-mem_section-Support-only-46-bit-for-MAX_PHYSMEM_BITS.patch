@@ -1,0 +1,73 @@
+From 653fe8e724081d2f289c2245d1220d5f7170538d Mon Sep 17 00:00:00 2001
+From: Alexandru Moise <alexandru.moise@windriver.com>
+Date: Fri, 29 Apr 2016 07:40:46 +0000
+Subject: [PATCH] mem_section: Support only 46 bit for MAX_PHYSMEM_BITS on
+ PPC64
+
+Related to change:
+http://lists.infradead.org/pipermail/kexec/2013-January/007849.html
+
+Linux on PPC64 has supported only 46 bit MAX_PHYSMEM_BITS since commit:
+048ee0993ec8360abb0b51bdf8f8721e9ed62ec4
+
+Also remove set_ppc64_max_physmem_bits and set info->max_physmem_bits in
+get_machdep_info_ppc64 instead. set_ppc64_max_physmem_bits is broken
+for all kernels compiled with CONFIG_SPARSEMEM=n. makedumpfile is
+unable to get mem_section field from powerpc kernel since commit:
+fd59d231f81cb02870b9cf15f456a897f3669b4e
+
+Upstream-Status: Pending
+
+Signed-off-by: Alexandru Moise <alexandru.moise@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ arch/ppc64.c | 28 ++--------------------------
+ 1 file changed, 2 insertions(+), 26 deletions(-)
+
+diff --git a/arch/ppc64.c b/arch/ppc64.c
+index 89a7f05..6c928ab 100644
+--- a/arch/ppc64.c
++++ b/arch/ppc64.c
+@@ -302,37 +302,13 @@ ppc64_vtop_level4(unsigned long vaddr)
+ }
+ 
+ int
+-set_ppc64_max_physmem_bits(void)
+-{
+-	long array_len = ARRAY_LENGTH(mem_section);
+-	/*
+-	 * The older ppc64 kernels uses _MAX_PHYSMEM_BITS as 42 and the
+-	 * newer kernels 3.7 onwards uses 46 bits.
+-	 */
+-
+-	info->max_physmem_bits  = _MAX_PHYSMEM_BITS_ORIG ;
+-	if ((array_len == (NR_MEM_SECTIONS() / _SECTIONS_PER_ROOT_EXTREME()))
+-		|| (array_len == (NR_MEM_SECTIONS() / _SECTIONS_PER_ROOT())))
+-		return TRUE;
+-
+-	info->max_physmem_bits  = _MAX_PHYSMEM_BITS_3_7;
+-	if ((array_len == (NR_MEM_SECTIONS() / _SECTIONS_PER_ROOT_EXTREME()))
+-		|| (array_len == (NR_MEM_SECTIONS() / _SECTIONS_PER_ROOT())))
+-		return TRUE;
+-
+-	return FALSE;
+-}
+-
+-int
+ get_machdep_info_ppc64(void)
+ {
+ 	unsigned long vmlist, vmap_area_list, vmalloc_start;
+ 
+ 	info->section_size_bits = _SECTION_SIZE_BITS;
+-	if (!set_ppc64_max_physmem_bits()) {
+-		ERRMSG("Can't detect max_physmem_bits.\n");
+-		return FALSE;
+-	}
++	info->max_physmem_bits = _MAX_PHYSMEM_BITS_3_7;
++
+ 	info->page_offset = __PAGE_OFFSET;
+ 
+ 	if (SYMBOL(_stext) == NOT_FOUND_SYMBOL) {
+-- 
+2.5.0
+

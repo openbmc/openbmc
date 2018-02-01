@@ -1,29 +1,30 @@
-From 4a74b275acc8158850f2500928a1467c3482c986 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Fri, 8 Jan 2016 07:23:11 +0000
-Subject: [PATCH 27/32] sysconf01: Use _SC_2_C_VERSION conditionally
+From 1471012164ba8f26046d4b1ce5531a0d92805ef5 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Wed, 8 Feb 2017 16:21:16 +0800
+Subject: [PATCH 4/5] sysconf01: Use _SC_2_C_VERSION conditionally
 
 _SC_2_C_VERSION is not available on musl
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
 ---
  testcases/kernel/syscalls/sysconf/sysconf01.c | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/testcases/kernel/syscalls/sysconf/sysconf01.c b/testcases/kernel/syscalls/sysconf/sysconf01.c
-index 8542e77..e806943 100644
+index 583deef..de93695 100644
 --- a/testcases/kernel/syscalls/sysconf/sysconf01.c
 +++ b/testcases/kernel/syscalls/sysconf/sysconf01.c
-@@ -102,7 +102,9 @@ int main(void)
- 	test_sysconf(_SC_ATEXIT_MAX);
+@@ -103,7 +103,9 @@ int main(void)
  	test_sysconf(_SC_2_C_BIND);
  	test_sysconf(_SC_2_C_DEV);
+ #ifdef _SC_2_C_VERSION
 +#ifdef __GLIBC__
  	test_sysconf(_SC_2_C_VERSION);
 +#endif
- 	/* 21 - 25 */
- 	test_sysconf(_SC_2_CHAR_TERM);
- 	test_sysconf(_SC_2_FORT_DEV);
+ #else
+ 	tst_resm(TCONF, "_SC_2_C_VERSION not defined");
+ #endif
 -- 
-2.7.0
+2.7.4
 

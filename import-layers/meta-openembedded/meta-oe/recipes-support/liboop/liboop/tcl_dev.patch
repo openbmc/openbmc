@@ -1,0 +1,22 @@
+--- a/configure
++++ b/configure
+@@ -19935,7 +19935,7 @@
+ fi
+ 
+ if test xno != x$with_tcl; then
+-  for version in 8.4 8.3 8.2 8.1 8.0 ; do
++  for version in "" 8.4 8.3 8.2 8.1 8.0 ; do
+     CPPFLAGS="$save_cppflags -I/usr/include/tcl$version"
+     as_ac_Lib=`echo "ac_cv_lib_tcl$version''_Tcl_Main" | $as_tr_sh`
+ echo "$as_me:$LINENO: checking for Tcl_Main in -ltcl$version" >&5
+--- a/configure.ac
++++ b/configure.ac
+@@ -71,7 +71,7 @@
+ fi
+ 
+ if test xno != x$with_tcl; then
+-  for version in 8.4 8.3 8.2 8.1 8.0 ; do
++  for version in "" 8.4 8.3 8.2 8.1 8.0 ; do
+     CPPFLAGS="$save_cppflags -I/usr/include/tcl$version"
+     AC_CHECK_LIB(tcl$version,Tcl_Main,[
+     AC_CHECK_HEADER(tcl.h,[

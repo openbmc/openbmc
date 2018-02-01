@@ -312,5 +312,11 @@ function customRecipePageInit(ctx) {
     });
   });
 
+ /* Stop the download link from working if it is in disabled state
+  * http://getbootstrap.com/css/#forms-disabled-fieldsets
+  */
+ $("a[disabled=disabled]").click(function(e){
+   e.preventDefault();
+ });
 
 }

@@ -120,32 +120,6 @@ def objtojson(obj):
         raise TypeError("Unserializable object %s (%s) of type %s" % ( obj, dir(obj), type(obj)))
 
 
-def _template_renderer(template):
-    def func_wrapper(view):
-        def returned_wrapper(request, *args, **kwargs):
-            try:
-                context = view(request, *args, **kwargs)
-            except RedirectException as e:
-                return e.get_redirect_response()
-
-            if request.GET.get('format', None) == 'json':
-                # objects is a special keyword - it's a Page, but we need the actual objects here
-                # in XHR, the objects come in the "rows" property
-                if "objects" in context:
-                    context["rows"] = context["objects"].object_list
-                    del context["objects"]
-
-                # we're about to return; to keep up with the XHR API, we set the error to OK
-                context["error"] = "ok"
-
-                return HttpResponse(jsonfilter(context, default=objtojson ),
-                            content_type = "application/json; charset=utf-8")
-            else:
-                return render(request, template, context)
-        return returned_wrapper
-    return func_wrapper
-
-
 def _lv_to_dict(prj, x = None):
     if x is None:
         def wrapper(x):
@@ -1509,121 +1483,6 @@ if True:
             return HttpResponse(json.dumps({"error":str(e) + "\n" + traceback.format_exc()}), content_type = "application/json")
 
 
-    def xhr_importlayer(request):
-        if ('vcs_url' not in request.POST or
-            'name' not in request.POST or
-            'git_ref' not in request.POST or
-            'project_id' not in request.POST):
-          return HttpResponse(jsonfilter({"error": "Missing parameters; requires vcs_url, name, git_ref and project_id"}), content_type = "application/json")
-
-        layers_added = [];
-
-        # Rudimentary check for any possible html tags
-        for val in request.POST.values():
-            if "<" in val:
-                return HttpResponse(jsonfilter(
-                    {"error": "Invalid character <"}),
-                    content_type="application/json")
-
-        prj = Project.objects.get(pk=request.POST['project_id'])
-
-        # Strip trailing/leading whitespace from all values
-        # put into a new dict because POST one is immutable.
-        post_data = dict()
-        for key,val in request.POST.items():
-          post_data[key] = val.strip()
-
-
-        try:
-            layer, layer_created = Layer.objects.get_or_create(name=post_data['name'])
-        except MultipleObjectsReturned:
-            return HttpResponse(jsonfilter({"error": "hint-layer-exists"}), content_type = "application/json")
-
-        if layer:
-            if layer_created:
-                layer.vcs_url = post_data.get('vcs_url')
-                layer.local_source_dir = post_data.get('local_source_dir')
-                layer.up_date = timezone.now()
-                layer.save()
-            else:
-                # We have an existing layer by this name, let's see if the git
-                # url is the same, if it is then we can just create a new layer
-                # version for this layer. Otherwise we need to bail out.
-                if layer.vcs_url != post_data['vcs_url']:
-                    return HttpResponse(jsonfilter({"error": "hint-layer-exists-with-different-url" , "current_url" : layer.vcs_url, "current_id": layer.id }), content_type = "application/json")
-
-            layer_version, version_created = \
-                Layer_Version.objects.get_or_create(
-                        layer_source=LayerSource.TYPE_IMPORTED,
-                        layer=layer, project=prj,
-                        release=prj.release,
-                        branch=post_data['git_ref'],
-                        commit=post_data['git_ref'],
-                        dirpath=post_data['dir_path'])
-
-            if layer_version:
-                if not version_created:
-                    return HttpResponse(jsonfilter({"error":
-                                                    "hint-layer-version-exists",
-                                                    "existing_layer_version":
-                                                    layer_version.id }),
-                                        content_type = "application/json")
-
-                layer_version.layer_source = LayerSource.TYPE_IMPORTED
-
-                layer_version.up_date = timezone.now()
-                layer_version.save()
-
-                # Add the dependencies specified for this new layer
-                if ('layer_deps' in post_data and
-                    version_created and
-                    len(post_data["layer_deps"]) > 0):
-                    for layer_dep_id in post_data["layer_deps"].split(","):
-
-                        layer_dep_obj = Layer_Version.objects.get(pk=layer_dep_id)
-                        LayerVersionDependency.objects.get_or_create(layer_version=layer_version, depends_on=layer_dep_obj)
-                        # Now add them to the project, we could get an execption
-                        # if the project now contains the exact
-                        # dependency already (like modified on another page)
-                        try:
-                            prj_layer, prj_layer_created = ProjectLayer.objects.get_or_create(layercommit=layer_dep_obj, project=prj)
-                        except IntegrityError as e:
-                            logger.warning("Integrity error while saving Project Layers: %s (original %s)" % (e, e.__cause__))
-                            continue
-
-                        if prj_layer_created:
-                            layerdepdetailurl = reverse('layerdetails', args=(prj.id, layer_dep_obj.pk))
-                            layers_added.append({'id': layer_dep_obj.id, 'name': Layer.objects.get(id=layer_dep_obj.layer_id).name, 'layerdetailurl': layerdepdetailurl })
-
-
-                # If an old layer version exists in our project then remove it
-                for prj_layers in ProjectLayer.objects.filter(project=prj):
-                    dup_layer_v = Layer_Version.objects.filter(id=prj_layers.layercommit_id, layer_id=layer.id)
-                    if len(dup_layer_v) >0 :
-                        prj_layers.delete()
-
-                # finally add the imported layer (version id) to the project
-                ProjectLayer.objects.create(layercommit=layer_version, project=prj,optional=1)
-
-            else:
-                # We didn't create a layer version so back out now and clean up.
-                if layer_created:
-                    layer.delete()
-
-                return HttpResponse(jsonfilter({"error": "Uncaught error: Could not create layer version"}), content_type = "application/json")
-
-        layerdetailurl = reverse('layerdetails', args=(prj.id, layer_version.pk))
-
-        json_response = {"error": "ok",
-                         "imported_layer" : {
-                           "name" : layer.name,
-                           "id": layer_version.id,
-                           "layerdetailurl": layerdetailurl,
-                         },
-                         "deps_added": layers_added }
-
-        return HttpResponse(jsonfilter(json_response), content_type = "application/json")
-
     def customrecipe_download(request, pid, recipe_id):
         recipe = get_object_or_404(CustomImageRecipe, pk=recipe_id)
 
@@ -1643,8 +1502,6 @@ if True:
         }
         return render(request, template, context)
 
-    # TODO merge with api pseudo api here is used for deps modal
-    @_template_renderer('layerdetails.html')
     def layerdetails(request, pid, layerid):
         project = Project.objects.get(pk=pid)
         layer_version = Layer_Version.objects.get(pk=layerid)
@@ -1672,7 +1529,7 @@ if True:
             'projectlayers': list(project_layers)
         }
 
-        return context
+        return render(request, 'layerdetails.html', context)
 
 
     def get_project_configvars_context():
@@ -1692,7 +1549,6 @@ if True:
 
         return(vars_managed,sorted(vars_fstypes),vars_blacklist)
 
-    @_template_renderer("projectconf.html")
     def projectconf(request, pid):
 
         try:
@@ -1763,7 +1619,7 @@ if True:
         except (ProjectVariable.DoesNotExist, BuildEnvironment.DoesNotExist):
             pass
 
-        return context
+        return render(request, "projectconf.html", context)
 
     def _file_names_for_artifact(build, artifact_type, artifact_id):
         """

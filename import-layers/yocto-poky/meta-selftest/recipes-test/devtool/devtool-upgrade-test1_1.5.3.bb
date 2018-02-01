@@ -12,5 +12,7 @@ PR = "r5"
 
 S = "${WORKDIR}/pv-${PV}"
 
+EXCLUDE_FROM_WORLD = "1"
+
 inherit autotools
 

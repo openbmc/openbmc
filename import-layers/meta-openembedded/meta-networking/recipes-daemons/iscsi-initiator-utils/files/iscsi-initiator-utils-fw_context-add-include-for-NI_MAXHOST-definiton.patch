@@ -1,0 +1,35 @@
+From 79bea58a554205dd185509fbc4e76b5fc40f9038 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Tue, 15 Nov 2016 12:36:45 -0500
+Subject: [PATCH] fw_context: add include for NI_MAXHOST definiton
+
+This appears to build successfully with gcc 4.x but fails on gcc 5+, though it's
+not immediately clear why NI_MAXHOST isn't being defined from the include
+chain.  Currently engaging with the upstream devs to determine the best course
+of action, but this is an adequate workaround.
+
+Upstream-status: Pending
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ include/fw_context.h | 4 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/fw_context.h b/include/fw_context.h
+index 44053d8..0b05cea 100644
+--- a/include/fw_context.h
++++ b/include/fw_context.h
+@@ -21,6 +21,10 @@
+ #ifndef FWPARAM_CONTEXT_H_
+ #define FWPARAM_CONTEXT_H_
+ 
++#include <sys/socket.h>
++#ifndef NI_MAXHOST
++#define NI_MAXHOST 1025
++#endif
+ #include <netdb.h>
+ #include <net/if.h>
+ 
+-- 
+2.1.4
+

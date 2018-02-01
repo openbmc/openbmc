@@ -13,13 +13,13 @@ S = "${WORKDIR}/grub-${PV}"
 # Determine the target arch for the grub modules
 python __anonymous () {
     import re
-    target = d.getVar('TARGET_ARCH', True)
+    target = d.getVar('TARGET_ARCH')
     if target == "x86_64":
         grubtarget = 'x86_64'
-        grubimage = "bootx64.efi"
+        grubimage = "grub-efi-bootx64.efi"
     elif re.match('i.86', target):
         grubtarget = 'i386'
-        grubimage = "bootia32.efi"
+        grubimage = "grub-efi-bootia32.efi"
     else:
         raise bb.parse.SkipPackage("grub-efi is incompatible with target %s" % target)
     d.setVar("GRUB_TARGET", grubtarget)
@@ -31,9 +31,9 @@ inherit deploy
 CACHED_CONFIGUREVARS += "ac_cv_path_HELP2MAN="
 EXTRA_OECONF = "--with-platform=efi --disable-grub-mkfont \
                 --enable-efiemu=no --program-prefix='' \
-                --enable-liblzma=no --enable-device-mapper=no --enable-libzfs=no"
-
-EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'largefile', '--enable-largefile', '--disable-largefile', d)}"
+                --enable-liblzma=no --enable-device-mapper=no --enable-libzfs=no \
+                --enable-largefile \
+"
 
 # ldm.c:114:7: error: trampoline generated for nested function 'hook' [-Werror=trampolines]
 # and many other places in the grub code when compiled with some native gcc compilers (specifically, gentoo)
@@ -65,5 +65,8 @@ FILES_${PN} += "${libdir}/grub/${GRUB_TARGET}-efi \
                 ${datadir}/grub \
                 "
 
-BBCLASSEXTEND = "native"
+# 64-bit binaries are expected for the bootloader with an x32 userland
+INSANE_SKIP_${PN}_append_linux-gnux32 = " arch"
+INSANE_SKIP_${PN}-dbg_append_linux-gnux32 = " arch"
 
+BBCLASSEXTEND = "native"

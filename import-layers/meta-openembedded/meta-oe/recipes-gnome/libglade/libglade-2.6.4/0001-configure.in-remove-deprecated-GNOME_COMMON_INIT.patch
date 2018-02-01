@@ -1,0 +1,30 @@
+From ceefcb19cebf8bc3d45ee502f8eabd3bc5bd0aac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Sat, 11 Feb 2017 16:42:12 +0100
+Subject: [PATCH] configure.in: remove deprecated GNOME_COMMON_INIT
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.in | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 8905f1c..3901398 100644
+--- a/configure.in
++++ b/configure.in
+@@ -15,7 +15,6 @@ AC_CONFIG_HEADERS([config.h])
+ 
+ AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-bzip2])
+ 
+-GNOME_COMMON_INIT
+ 
+ if test "$enable_debug" != "no"; then
+   AC_DEFINE([DEBUG],[1],[enable use of LIBGLADE_DEBUG environment variable])
+-- 
+2.9.3
+

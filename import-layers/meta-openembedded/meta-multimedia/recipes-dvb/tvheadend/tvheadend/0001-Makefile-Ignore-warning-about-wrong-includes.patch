@@ -1,0 +1,31 @@
+From 7d672305c7ad2f716dfe1c487b525a1a92954d4a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Nov 2016 06:22:36 +0000
+Subject: [PATCH] Makefile: Ignore warning about wrong includes
+
+It happens on musl especially
+usr/include/sys/poll.h:1:2: error: redirecting incorrect #include <sys/poll.h> to <poll.h> [-Werror,-W#warnings]
+| #warning redirecting incorrect #include <sys/poll.h> to <poll.h>
+|  ^
+| In file included from src/avahi.c:48:
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile b/Makefile
+index f41ef1a..cc7b249 100644
+--- a/Makefile
++++ b/Makefile
+@@ -54,6 +54,7 @@ CFLAGS  += -Wno-microsoft -Qunused-arguments -Wno-unused-function
+ CFLAGS  += -Wno-unused-value -Wno-tautological-constant-out-of-range-compare
+ CFLAGS  += -Wno-parentheses-equality -Wno-incompatible-pointer-types
+ CFLAGS  += -Wno-error=varargs
++CFLAGS  += -Wno-error=\#warnings
+ endif
+ 
+ ifeq ($(CONFIG_LIBFFMPEG_STATIC),yes)
+-- 
+1.8.3.1
+

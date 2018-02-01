@@ -38,7 +38,8 @@ do_compile() {
 
 do_install() {
     install -d ${D}${bindir}
-    install -d ${D}${mandir}/man{1,5}
+    install -d ${D}${mandir}/man1
+    install -d ${D}${mandir}/man5
     oe_runmake -i BASENAME=${D}/usr MANDIR=${D}${mandir} install
     install -m 0644 debian/mailstat.1 ${D}${mandir}/man1
 }

@@ -1,0 +1,72 @@
+From 7ee62ef0083844ab2fffcd106e3ee2e5f29b2a91 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Jul 2017 18:53:56 -0700
+Subject: [PATCH] Rename use of stdout and stderr
+
+Since it shadow the standard definitions especially
+seen on musl where libc defines these as macros they
+cause all short of compilation errors on musl, using
+a leading underscore makes it unique
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ imsettings-daemon/imsettings-proc.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/imsettings-daemon/imsettings-proc.c b/imsettings-daemon/imsettings-proc.c
+index 915e78b..b78fcff 100644
+--- a/imsettings-daemon/imsettings-proc.c
++++ b/imsettings-daemon/imsettings-proc.c
+@@ -39,8 +39,8 @@
+ #define MAXRESTART 3
+ 
+ typedef struct _IMSettingsProcInfo {
+-	GIOChannel     *stdout;
+-	GIOChannel     *stderr;
++	GIOChannel     *_stdout;
++	GIOChannel     *_stderr;
+ 	GPid            pid;
+ 	GTimeVal        started_time;
+ 	guint           id;
+@@ -368,12 +368,12 @@ _start_process(IMSettingsProc     *proc,
+ 					     &ofd, &efd,
+ 					     error)) {
+ 			pinfo->pid = pid;
+-			pinfo->stdout = g_io_channel_unix_new(ofd);
+-			pinfo->stderr = g_io_channel_unix_new(efd);
+-			g_io_channel_set_close_on_unref(pinfo->stdout, TRUE);
+-			g_io_channel_set_close_on_unref(pinfo->stderr, TRUE);
+-			pinfo->oid = g_io_add_watch(pinfo->stdout, G_IO_IN, _log_write_cb, proc);
+-			pinfo->eid = g_io_add_watch(pinfo->stderr, G_IO_IN, _log_write_cb, proc);
++			pinfo->_stdout = g_io_channel_unix_new(ofd);
++			pinfo->_stderr = g_io_channel_unix_new(efd);
++			g_io_channel_set_close_on_unref(pinfo->_stdout, TRUE);
++			g_io_channel_set_close_on_unref(pinfo->_stderr, TRUE);
++			pinfo->oid = g_io_add_watch(pinfo->_stdout, G_IO_IN, _log_write_cb, proc);
++			pinfo->eid = g_io_add_watch(pinfo->_stderr, G_IO_IN, _log_write_cb, proc);
+ 			g_get_current_time(&pinfo->started_time);
+ 			pinfo->id = g_child_watch_add(pid, _watch_im_status_cb, proc);
+ 
+@@ -521,13 +521,13 @@ imsettings_proc_get_property(GObject    *object,
+ static void
+ imsettings_proc_info_finalize(IMSettingsProcInfo *pinfo)
+ {
+-	if (pinfo->stdout) {
+-		g_io_channel_unref(pinfo->stdout);
+-		pinfo->stdout = NULL;
++	if (pinfo->_stdout) {
++		g_io_channel_unref(pinfo->_stdout);
++		pinfo->_stdout = NULL;
+ 	}
+-	if (pinfo->stderr) {
+-		g_io_channel_unref(pinfo->stderr);
+-		pinfo->stderr = NULL;
++	if (pinfo->_stderr) {
++		g_io_channel_unref(pinfo->_stderr);
++		pinfo->_stderr = NULL;
+ 	}
+ 	if (pinfo->oid > 0) {
+ 		g_source_remove(pinfo->oid);
+-- 
+2.13.2
+

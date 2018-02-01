@@ -4,7 +4,7 @@ DEPENDS = "gtk+ libetpan openssl aspell curl libgcrypt"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e059bde2972c1790af786f3e86bac22e"
 
-PNBLACKLIST[claws-mail] ?= "depends on blacklisted libetpan"
+PNBLACKLIST[claws-mail] ?= "depends on blacklisted libetpan - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 inherit autotools pkgconfig gettext
 

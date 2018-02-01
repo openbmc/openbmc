@@ -14,3 +14,5 @@ SRC_URI[md5sum] = "d81cecf269ad7bab0da960e6e7228332"
 SRC_URI[sha256sum] = "2b299425203246090a4949e034f1d0efb3ff99cd1591d0e16c57370a530b361e"
 
 export CVSBUILD="no"
+
+PNBLACKLIST[minilite] ?= "Depends on blacklisted libgpewidget - the recipe will be removed on 2017-09-01 unless the issue is fixed"

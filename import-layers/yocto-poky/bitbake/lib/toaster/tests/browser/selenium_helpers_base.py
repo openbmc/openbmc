@@ -39,7 +39,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import NoSuchElementException, \
         StaleElementReferenceException, TimeoutException
 
-def create_selenium_driver(browser='chrome'):
+def create_selenium_driver(cls,browser='chrome'):
     # set default browser string based on env (if available)
     env_browser = os.environ.get('TOASTER_TESTS_BROWSER')
     if env_browser:
@@ -59,6 +59,15 @@ def create_selenium_driver(browser='chrome'):
         return webdriver.Ie()
     elif browser == 'phantomjs':
         return webdriver.PhantomJS()
+    elif browser == 'remote':
+        # if we were to add yet another env variable like TOASTER_REMOTE_BROWSER
+        # we could let people pick firefox or chrome, left for later
+        remote_hub= os.environ.get('TOASTER_REMOTE_HUB')
+        driver = webdriver.Remote(remote_hub,
+                                  webdriver.DesiredCapabilities.FIREFOX.copy())
+
+        driver.get("http://%s:%s"%(cls.server_thread.host,cls.server_thread.port))
+        return driver
     else:
         msg = 'Selenium driver for browser %s is not available' % browser
         raise RuntimeError(msg)
@@ -135,7 +144,7 @@ class SeleniumTestCaseBase(unittest.TestCase):
 
         # instantiate the Selenium webdriver once for all the test methods
         # in this test case
-        cls.driver = create_selenium_driver()
+        cls.driver = create_selenium_driver(cls)
         cls.driver.maximize_window()
 
     @classmethod

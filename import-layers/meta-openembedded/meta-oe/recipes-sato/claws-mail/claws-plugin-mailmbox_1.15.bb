@@ -4,7 +4,7 @@ DEPENDS = "claws-mail"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-PNBLACKLIST[claws-plugin-mailmbox] ?= "depends on blacklisted claws-mail"
+PNBLACKLIST[claws-plugin-mailmbox] ?= "depends on blacklisted claws-mail - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 SRC_URI = "http://www.claws-mail.org/downloads/plugins_obsolete/mailmbox-${PV}.tar.gz"
 SRC_URI[md5sum] = "7f72c68e6e1a8768f1247f455fd20b62"

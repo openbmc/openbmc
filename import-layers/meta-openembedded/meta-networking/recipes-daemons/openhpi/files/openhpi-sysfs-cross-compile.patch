@@ -1,0 +1,23 @@
+Fix sysfs when cross-compiling
+
+Use proper paths for sysfs plugins when cross-compiling
+
+Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+
+diff --git a/plugins/sysfs/sysfs2hpi.c b/plugins/sysfs/sysfs2hpi.c
+index a745214..3685598 100644
+--- a/plugins/sysfs/sysfs2hpi.c
++++ b/plugins/sysfs/sysfs2hpi.c
+@@ -18,7 +18,7 @@
+ 
+ #include <stdlib.h>
+ #include <string.h>
+-#include <libsysfs.h>
++#include <sysfs/libsysfs.h>
+ 
+ #include <SaHpi.h>
+ #include <oh_utils.h>

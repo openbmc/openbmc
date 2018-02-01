@@ -67,11 +67,12 @@
 
       <form id="select-machine-form" style="display:none;" class="form-inline">
         <span class="help-block">Machine suggestions come from the list of layers added to your project. If you don't see the machine you are looking for, <a href="{% url 'projectmachines' project.id %}">check the full list of machines</a></span>
-        <div class="form-group">
+        <div class="form-group" id="machine-input-form">
           <input class="form-control" id="machine-change-input" autocomplete="off" value="" data-provide="typeahead" data-minlength="1" data-autocomplete="off" type="text">
         </div>
         <button id="machine-change-btn" class="btn btn-default" type="button">Save</button>
         <a href="#" id="cancel-machine-change" class="btn btn-link">Cancel</a>
+        <span class="help-block text-danger" id="invalid-machine-name-help" style="display:none">A valid machine name cannot include spaces.</span>
         <p class="form-link"><a href="{% url 'projectmachines' project.id %}">View compatible machines</a></p>
       </form>
     </div>

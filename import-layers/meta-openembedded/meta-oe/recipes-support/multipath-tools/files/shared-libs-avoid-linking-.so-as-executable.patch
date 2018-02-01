@@ -1,0 +1,55 @@
+From 4311856200480288494df8df737f71ea316592d0 Mon Sep 17 00:00:00 2001
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Thu, 26 Jan 2017 15:28:34 +0100
+Subject: [PATCH] shared libs: avoid linking .so as executable
+
+When the OE build systems sets CFLAGS including -pie, gcc overrides
+the earlier -shared parameter and tries to link a binary, leading to
+errors about missing functions like main().
+
+Reordering the parameters so that -shared comes after CFLAGS
+fixes this.
+
+Upstream-Status: Inappropriate [OE specific, -pie shouldn't be in CFLAGS?!]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+diff --git a/libmpathcmd/Makefile b/libmpathcmd/Makefile
+index 457c4ca..f68c82c 100644
+--- a/libmpathcmd/Makefile
++++ b/libmpathcmd/Makefile
+@@ -9,7 +9,7 @@ OBJS = mpath_cmd.o
+ all: $(LIBS)
+ 
+ $(LIBS): $(OBJS)
+-	$(CC) $(LDFLAGS) $(SHARED_FLAGS) -Wl,-soname=$@ $(CFLAGS) -o $@ $(OBJS) $(LIBDEPS)
++	$(CC) $(LDFLAGS) $(CFLAGS) $(SHARED_FLAGS) -Wl,-soname=$@ -o $@ $(OBJS) $(LIBDEPS)
+ 	$(LN) $@ $(DEVLIB)
+ 
+ install: $(LIBS)
+diff --git a/libmpathpersist/Makefile b/libmpathpersist/Makefile
+index 6e43427..2486302 100644
+--- a/libmpathpersist/Makefile
++++ b/libmpathpersist/Makefile
+@@ -15,7 +15,7 @@ all: $(LIBS)
+ 
+ $(LIBS):
+ 	$(CC) -c $(CFLAGS) *.c
+-	$(CC) $(LDFLAGS) $(SHARED_FLAGS) $(LIBDEPS) -Wl,-soname=$@ $(CFLAGS) -o $@ $(OBJS)
++	$(CC) $(LDFLAGS) $(CFLAGS) $(SHARED_FLAGS) $(LIBDEPS) -Wl,-soname=$@ -o $@ $(OBJS)
+ 	$(LN) $(LIBS) $(DEVLIB)
+ 	$(GZIP) mpath_persistent_reserve_in.3 > mpath_persistent_reserve_in.3.gz
+ 	$(GZIP) mpath_persistent_reserve_out.3 > mpath_persistent_reserve_out.3.gz
+diff --git a/libmultipath/Makefile b/libmultipath/Makefile
+index 495cebe..752bcc0 100644
+--- a/libmultipath/Makefile
++++ b/libmultipath/Makefile
+@@ -55,7 +55,7 @@ OBJS = memory.o parser.o vector.o devmapper.o callout.o \
+ all: $(LIBS)
+ 
+ $(LIBS): $(OBJS)
+-	$(CC) $(LDFLAGS) $(SHARED_FLAGS) -Wl,-soname=$@ $(CFLAGS) -o $@ $(OBJS) $(LIBDEPS)
++	$(CC) $(LDFLAGS) $(CFLAGS) $(SHARED_FLAGS) -Wl,-soname=$@ -o $@ $(OBJS) $(LIBDEPS)
+ 	$(LN) $@ $(DEVLIB)
+ 
+ install:

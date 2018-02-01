@@ -33,3 +33,5 @@ ALTERNATIVE_LINK_NAME[eject] = "${bindir}/eject"
 ALTERNATIVE_PRIORITY[volname] = "100"
 ALTERNATIVE_PRIORITY[eject] = "100"
 
+ALTERNATIVE_${PN}-doc = "eject.1"
+ALTERNATIVE_LINK_NAME[eject.1] = "${mandir}/man1/eject.1"

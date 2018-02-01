@@ -43,6 +43,7 @@ PACKAGECONFIG[rtmp] = "--enable-rtmp,--disable-rtmp,rtmpdump"
 PACKAGECONFIG[voamrwbenc] = "--enable-voamrwbenc,--disable-voamrwbenc,vo-amrwbenc"
 PACKAGECONFIG[voaacenc] = "--enable-voaacenc,--disable-voaacenc,vo-aacenc"
 PACKAGECONFIG[resindvd] = "--enable-resindvd,--disable-resindvd,libdvdnav libdvdread"
+PACKAGECONFIG[zbar] = "--enable-zbar,--disable-zbar,zbar jpeg"
 
 ARM_INSTRUCTION_SET = "arm"
 

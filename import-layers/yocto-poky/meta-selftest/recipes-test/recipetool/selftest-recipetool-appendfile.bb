@@ -15,6 +15,8 @@ SRC_URI = "file://installscript.sh \
            file://selftest-replaceme-inst-todir-globfile \
            file://selftest-replaceme-inst-func"
 
+EXCLUDE_FROM_WORLD = "1"
+
 install_extrafunc() {
 	install -m 0644 ${WORKDIR}/selftest-replaceme-inst-func ${D}${datadir}/selftest-replaceme-inst-func
 }

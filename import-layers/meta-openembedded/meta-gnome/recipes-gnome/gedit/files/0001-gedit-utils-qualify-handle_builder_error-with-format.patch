@@ -1,0 +1,31 @@
+From 623ffac1f6e7725041b386e0f2933fe36809b5a9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Aug 2017 09:04:30 -0700
+Subject: [PATCH] gedit-utils: qualify handle_builder_error() with format
+ string parameters
+
+gedit-utils.c:1063:32: error: format string is not a string literal [-Werror,-Wformat-nonliteral]
+        msg_plain = g_strdup_vprintf (message, args);
+                                      ^~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gedit/gedit-utils.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gedit/gedit-utils.c b/gedit/gedit-utils.c
+index 41a5afd..c800828 100644
+--- a/gedit/gedit-utils.c
++++ b/gedit/gedit-utils.c
+@@ -1051,7 +1051,7 @@ gedit_utils_is_valid_uri (const gchar *uri)
+ 	return TRUE;
+ }
+ 
+-static GtkWidget *
++static G_GNUC_PRINTF(1, 2) GtkWidget *
+ handle_builder_error (const gchar *message, ...)
+ {
+ 	GtkWidget *label;
+-- 
+2.14.1
+

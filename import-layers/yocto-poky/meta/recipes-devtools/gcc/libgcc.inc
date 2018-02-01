@@ -33,8 +33,6 @@ FILES_${PN}-dev = "\
     ${libdir}/${TARGET_ARCH}${TARGET_VENDOR}* \
 "
 
-LIBGCCBUILDTREENAME = "gcc-build-internal-"
-
 do_package[depends] += "virtual/${MLPREFIX}libc:do_packagedata"
 do_package_write_ipk[depends] += "virtual/${MLPREFIX}libc:do_packagedata"
 do_package_write_deb[depends] += "virtual/${MLPREFIX}libc:do_packagedata"

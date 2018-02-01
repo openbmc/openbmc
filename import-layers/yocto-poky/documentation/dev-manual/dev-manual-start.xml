@@ -278,7 +278,7 @@
                 applications using the Eclipse Integrated Development Environment (IDE),
                 you will need this plug-in.
                 See the
-                "<ulink url='&YOCTO_DOCS_SDK_URL;#setting-up-the-eclipse-ide'>Setting up the Eclipse IDE</ulink>"
+                "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-appendix-latest-yp-eclipse-plug-in'>Using Eclipse</ulink>"
                 section in the Yocto Project Software Development Kit (SDK)
                 Developer's Guide for more information.</para></listitem>
         </itemizedlist>
@@ -325,6 +325,96 @@
             <listitem><para>Run the image either on the actual hardware or using the QEMU
                 emulator.</para></listitem>
         </orderedlist>
+    </para>
+</section>
+
+<section id='flashing-images-using-bmaptool'>
+    <title>Flashing Images Using <filename>bmaptool</filename></title>
+
+    <para>
+        An easy way to flash an image to a bootable device is to use
+        <filename>bmaptool</filename>, which is integrated into the
+        OpenEmbedded build system.
+    </para>
+
+    <para>
+        Following, is an example that shows how to flash a Wic image.
+        <note>
+            You can use <filename>bmaptool</filename> to flash any
+            type of image.
+        </note>
+        Use these steps to flash an image using
+        <filename>bmaptool</filename>:
+        <note>
+            Unless you are able to install the
+            <filename>bmap-tools</filename> package as mentioned in the note
+            in the second bullet of step 3 further down, you will need to build
+            <filename>bmaptool</filename> before using it.
+            Build the tool using the following command:
+            <literallayout class='monospaced'>
+     $ bitbake bmap-tools-native
+            </literallayout>
+        </note>
+        <orderedlist>
+            <listitem><para>
+                Add the following to your <filename>local.conf</filename>
+                file:
+                <literallayout class='monospaced'>
+     IMAGE_FSTYPES += "wic wic.bmap"
+                </literallayout>
+                </para></listitem>
+            <listitem><para>
+                Either have your image ready (pre-built) or take the step
+                build the image:
+                <literallayout class='monospaced'>
+     $ bitbake <replaceable>image</replaceable>
+                </literallayout>
+                </para></listitem>
+            <listitem><para>
+                Flash the image to the media by using
+                <filename>bmaptool</filename> depending on your particular
+                setup:
+                <itemizedlist>
+                    <listitem><para>
+                        If you have write access to the media,
+                        use this command form:
+                        <literallayout class='monospaced'>
+     $ oe-run-native bmaptool copy ./tmp/deploy/images/qemux86-64/core-image-minimal-<replaceable>machine</replaceable>.wic /dev/sd<replaceable>X</replaceable>
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        If you do not have write access to
+                        the media, use the following
+                        commands:
+                        <literallayout class='monospaced'>
+     $ sudo bash
+     $ PATH=tmp/sysroots/x86_64-linux/usr/bin/ bmaptool copy ./tmp/deploy/images/qemux86-64/core-image-minimal-<replaceable>machine</replaceable>.wic /dev/sd<replaceable>X</replaceable>
+                        </literallayout>
+                        <note>
+                            If you are using Ubuntu or Debian distributions,
+                            you can install the
+                            <filename>bmap-tools</filename> package using the
+                            following command and then use the tool
+                            without specifying
+                            <filename>PATH</filename> even from the
+                            root account:
+                            <literallayout class='monospaced'>
+     $ sudo apt-get install bmap-tools
+                            </literallayout>
+                        </note>
+                        </para></listitem>
+                </itemizedlist>
+                </para></listitem>
+        </orderedlist>
+    </para>
+
+    <para>
+        For help on the <filename>bmaptool</filename> command, use either of
+        the following commands:
+        <literallayout class='monospaced'>
+     $ bmaptool --help
+     $ oe-run-native bmaptool --help
+        </literallayout>
     </para>
 </section>
 

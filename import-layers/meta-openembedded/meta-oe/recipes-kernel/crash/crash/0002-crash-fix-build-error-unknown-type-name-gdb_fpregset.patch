@@ -1,0 +1,36 @@
+From 52fc1a7c17768fd52c3577d21dad84e8babb94b5 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 6 Apr 2017 23:01:14 -0400
+Subject: [PATCH 2/3] crash: fix build error unknown type name 'gdb_fpregset_t'
+
+Upstream-Status: Pending
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ gdb-7.6/gdb/gdb_proc_service.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/gdb-7.6/gdb/gdb_proc_service.h b/gdb-7.6/gdb/gdb_proc_service.h
+index 8bc6088..99c6496 100644
+--- a/gdb-7.6/gdb/gdb_proc_service.h
++++ b/gdb-7.6/gdb/gdb_proc_service.h
+@@ -20,6 +20,7 @@
+ #define GDB_PROC_SERVICE_H
+ 
+ #include <sys/types.h>
++#include "gregset.h"
+ 
+ #ifdef HAVE_PROC_SERVICE_H
+ #include <proc_service.h>
+@@ -53,8 +54,6 @@
+ #include <sys/procfs.h>
+ #endif
+ 
+-#include "gregset.h"
+-
+ /* Functions in this interface return one of these status codes.  */
+ typedef enum
+ {
+-- 
+2.8.1
+

@@ -1,0 +1,10 @@
+[Unit]
+Description=v2 Registry server for Docker
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/registry serve /etc/docker-distribution/registry/config.yml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

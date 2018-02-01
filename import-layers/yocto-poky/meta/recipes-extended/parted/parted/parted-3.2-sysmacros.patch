@@ -1,0 +1,32 @@
+https://bugs.gentoo.org/580022
+
+From dec8995fe80508374beba6356f6ecbba8ef6b18b Mon Sep 17 00:00:00 2001
+From: Mike Frysinger <vapier@gentoo.org>
+Date: Tue, 21 Jun 2016 15:01:08 -0400
+Subject: [PATCH] include sysmacros.h for major/minor/makedev
+
+Linux C libs are moving away from including this header implicitly via
+sys/types.h, so include it explicitly.
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+---
+ libparted/arch/linux.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libparted/arch/linux.c b/libparted/arch/linux.c
+index 326b95619d31..e5c168be3c68 100644
+--- a/libparted/arch/linux.c
++++ b/libparted/arch/linux.c
+@@ -37,6 +37,7 @@
+ #include <dirent.h>
+ #include <sys/ioctl.h>
+ #include <sys/stat.h>
++#include <sys/sysmacros.h>
+ #include <sys/types.h>
+ #include <sys/utsname.h>        /* for uname() */
+ #include <scsi/scsi.h>
+-- 
+2.8.2
+

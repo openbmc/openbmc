@@ -24,6 +24,29 @@ Usage: source toaster start|stop [webport=<address:port>] [noweb]
         [webport] Set the development server (default: localhost:8000)
 "
 
+databaseCheck()
+{
+    retval=0
+    # you can always add a superuser later via
+    # ../bitbake/lib/toaster/manage.py createsuperuser --username=<ME>
+    $MANAGE migrate --noinput || retval=1
+
+    if [ $retval -eq 1 ]; then
+        echo "Failed migrations, aborting system start" 1>&2
+        return $retval
+    fi
+    # Make sure that checksettings can pick up any value for TEMPLATECONF
+    export TEMPLATECONF
+    $MANAGE checksettings --traceback || retval=1
+
+    if [ $retval -eq 1 ]; then
+        printf "\nError while checking settings; aborting\n"
+        return $retval
+    fi
+
+    return $retval
+}
+
 webserverKillAll()
 {
     local pidfile
@@ -48,22 +71,9 @@ webserverStartAll()
     fi
 
     retval=0
-    # you can always add a superuser later via
-    # ../bitbake/lib/toaster/manage.py createsuperuser --username=<ME>
-    $MANAGE migrate --noinput || retval=1
 
-    if [ $retval -eq 1 ]; then
-        echo "Failed migrations, aborting system start" 1>&2
-        return $retval
-    fi
-    # Make sure that checksettings can pick up any value for TEMPLATECONF
-    export TEMPLATECONF
-    $MANAGE checksettings --traceback || retval=1
-
-    if [ $retval -eq 1 ]; then
-        printf "\nError while checking settings; aborting\n"
-        return $retval
-    fi
+    # check the database
+    databaseCheck || return 1
 
     echo "Starting webserver..."
 
@@ -111,7 +121,7 @@ verify_prereq() {
     if ! sed -n "$exp" $reqfile | python3 - ; then
         req=`grep ^Django $reqfile`
         echo "This program needs $req"
-        echo "Please install with pip install -r $reqfile"
+        echo "Please install with pip3 install -r $reqfile"
         return 2
     fi
 
@@ -151,14 +161,7 @@ fi
 
 unset OE_ROOT
 
-# this defines the dir toaster will use for
-# 1) clones of layers (in _toaster_clones )
-# 2) the build dir (in build)
-# 3) the sqlite db if that is being used.
-# 4) pid's we need to clean up on exit/shutdown
-# note: for future. in order to make this an arbitrary directory, we need to
-# make sure that the toaster.sqlite file doesn't default to `pwd` like it currently does.
-export TOASTER_DIR=`pwd`
+
 
 WEBSERVER=1
 ADDR_PORT="localhost:8000"
@@ -214,10 +217,8 @@ fi
 # 2) the build dir (in build)
 # 3) the sqlite db if that is being used.
 # 4) pid's we need to clean up on exit/shutdown
-# note: for future. in order to make this an arbitrary directory, we need to
-# make sure that the toaster.sqlite file doesn't default to `pwd`
-# like it currently does.
 export TOASTER_DIR=`dirname $BUILDDIR`
+export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE TOASTER_DIR"
 
 # Determine the action. If specified by arguments, fine, if not, toggle it
 if [ "$CMD" = "start" ] ; then
@@ -249,12 +250,25 @@ case $CMD in
         line='INHERIT+="toaster buildhistory"'
         grep -q "$line" $conf || echo $line >> $conf
 
+        if [ $WEBSERVER -eq 0 ] ; then
+            # Do not update the database for "noweb" unless
+            # it does not yet exist
+            if [ ! -f "$TOASTER_DIR/toaster.sqlite" ] ; then
+                if ! databaseCheck; then
+                    echo "Failed ${CMD}."
+                  return 4
+                fi
+            fi
+        fi
         if [ $WEBSERVER -gt 0 ] && ! webserverStartAll; then
             echo "Failed ${CMD}."
             return 4
         fi
         export BITBAKE_UI='toasterui'
-        $MANAGE runbuilds & echo $! >${BUILDDIR}/.runbuilds.pid
+        $MANAGE runbuilds \
+           </dev/null >>${BUILDDIR}/toaster_runbuilds.log 2>&1 \
+           & echo $! >${BUILDDIR}/.runbuilds.pid
+
         # set fail safe stop system on terminal exit
         trap stop_system SIGHUP
         echo "Successful ${CMD}."

@@ -16,7 +16,7 @@ SRC_URI = "git://gitosis.stanford.edu/openflow.git;protocol=git"
 DEPENDS = "virtual/libc"
 
 PACKAGECONFIG ??= "openssl"
-PACKAGECONFIG[openssl] = "--enable-ssl,--disable-ssl, openssl, libssl"
+PACKAGECONFIG[openssl] = "--enable-ssl,--disable-ssl, openssl openssl-native, libssl"
 
 EXTRA_OECONF += " \
                  KARCH=${TARGET_ARCH} \
@@ -25,11 +25,10 @@ EXTRA_OECONF += " \
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep
+inherit autotools-brokensep pkgconfig
 
-do_configure() {
+do_configure_prepend() {
     ./boot.sh
-    oe_runconf
 }
 
 do_install_append() {

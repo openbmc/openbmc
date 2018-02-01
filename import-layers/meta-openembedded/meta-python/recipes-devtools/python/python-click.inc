@@ -8,8 +8,10 @@ HOMEPAGE = "http://click.pocoo.org/"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=09e8b7869f94ba9e9a7b260d53c65dab"
 
-SRC_URI[md5sum] = "d0b09582123605220ad6977175f3e51d"
-SRC_URI[sha256sum] = "cc6a19da8ebff6e7074f731447ef7e112bd23adf3de5c597cf9989f2fd8defe9"
+SRC_URI[md5sum] = "fc4cc00c4863833230d3af92af48abd4"
+SRC_URI[sha256sum] = "f15516df478d5a56180fbf80e68f206010e6d160fc39fa508b65e035fd75130b"
+
+CLEANBROKEN = "1"
 
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-io \

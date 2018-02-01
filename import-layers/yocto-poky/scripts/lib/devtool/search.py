@@ -31,7 +31,7 @@ def search(args, config, basepath, workspace):
 
     tinfoil = setup_tinfoil(config_only=False, basepath=basepath)
     try:
-        pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR', True)
+        pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR')
         defsummary = tinfoil.config_data.getVar('SUMMARY', False) or ''
 
         keyword_rc = re.compile(args.keyword)
@@ -70,7 +70,7 @@ def search(args, config, basepath, workspace):
 
             if match:
                 rd = parse_recipe(config, tinfoil, fn, True)
-                summary = rd.getVar('SUMMARY', True)
+                summary = rd.getVar('SUMMARY')
                 if summary == rd.expand(defsummary):
                     summary = ''
                 print("%s  %s" % (fn.ljust(20), summary))

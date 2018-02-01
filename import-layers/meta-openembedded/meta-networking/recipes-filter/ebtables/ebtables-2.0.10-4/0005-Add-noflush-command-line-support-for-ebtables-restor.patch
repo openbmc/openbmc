@@ -1,0 +1,75 @@
+From 15d3ab8a4a167dc44396b003d2ec01841949972f Mon Sep 17 00:00:00 2001
+From: Sanket Shah <sanket.shah@cyberoam.com>
+Date: Wed, 31 Jul 2013 21:40:08 +0200
+Subject: [PATCH 05/10] Add --noflush command line support for ebtables-restore
+
+---
+ ebtables-restore.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/ebtables-restore.c b/ebtables-restore.c
+index ea02960..bb4d0cf 100644
+--- a/ebtables-restore.c
++++ b/ebtables-restore.c
+@@ -22,13 +22,25 @@
+ #include <string.h>
+ #include <errno.h>
+ #include <unistd.h>
++#include <getopt.h>
+ #include "include/ebtables_u.h"
+ 
++static const struct option options[] = {
++	{.name = "noflush", .has_arg = 0, .val = 'n'},
++	{ 0 }
++};
++
+ static struct ebt_u_replace replace[3];
+ void ebt_early_init_once();
+ 
+ #define OPT_KERNELDATA  0x800 /* Also defined in ebtables.c */
+ 
++static void print_usage()
++{
++	fprintf(stderr, "Usage: ebtables-restore [ --noflush ]\n");
++	exit(1);
++}
++
+ static void copy_table_names()
+ {
+ 	strcpy(replace[0].name, "filter");
+@@ -41,11 +53,20 @@ static void copy_table_names()
+ int main(int argc_, char *argv_[])
+ {
+ 	char *argv[EBTD_ARGC_MAX], cmdline[EBTD_CMDLINE_MAXLN];
+-	int i, offset, quotemode = 0, argc, table_nr = -1, line = 0, whitespace;
++	int i, offset, quotemode = 0, argc, table_nr = -1, line = 0, whitespace, c, flush = 1;
+ 	char ebtables_str[] = "ebtables";
+ 
+-	if (argc_ != 1)
+-		ebtrest_print_error("options are not supported");
++	while ((c = getopt_long(argc_, argv_, "n", options, NULL)) != -1) {
++		switch(c) {
++			case 'n':
++				flush = 0;
++				break;
++			default:
++				print_usage();
++				break;
++		}
++	}
++
+ 	ebt_silent = 0;
+ 	copy_table_names();
+ 	ebt_early_init_once();
+@@ -68,7 +89,7 @@ int main(int argc_, char *argv_[])
+ 				ebtrest_print_error("table '%s' was not recognized", cmdline+1);
+ 			table_nr = i;
+ 			replace[table_nr].command = 11;
+-			ebt_get_kernel_table(&replace[table_nr], 1);
++			ebt_get_kernel_table(&replace[table_nr], flush);
+ 			replace[table_nr].command = 0;
+ 			replace[table_nr].flags = OPT_KERNELDATA; /* Prevent do_command from initialising replace */
+ 			continue;
+-- 
+2.12.1
+

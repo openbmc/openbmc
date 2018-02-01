@@ -1,0 +1,36 @@
+From ede4ae8e25f9fb746a6f4e076d0ef029938d2880 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Mar 2017 11:46:56 -0700
+Subject: [PATCH 4/4] Adjust for linux-kernel headers assumptions on glibc
+
+Fixes build issues e.g.
+
+In file included from /mnt/a/build/tmp-musl/work/cortexa7hf-neon-vfpv4-oe-linux-musleabi/openl2tp/1.8-r0/recipe-sysroot/usr/include/linux/if_pppox.h:24:
+/mnt/a/build/tmp-musl/work/cortexa7hf-neon-vfpv4-oe-linux-musleabi/openl2tp/1.8-r0/recipe-sysroot/usr/include/linux/if.h:97:2: error: expected identifier
+        IFF_LOWER_UP                    = 1<<16, /* __volatile__ */
+        ^
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ plugins/ppp_unix.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/plugins/ppp_unix.c b/plugins/ppp_unix.c
+index 869066f..5c1e44f 100644
+--- a/plugins/ppp_unix.c
++++ b/plugins/ppp_unix.c
+@@ -21,6 +21,11 @@
+  * Plugin to use the standard UNIX pppd
+  */
+ 
++/* hack to make sure kernel headers understand that libc (musl)
++ * does define IFF_LOWER_UP et al.
++ */
++#define __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO 0
++
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <sys/types.h>
+-- 
+2.12.1
+

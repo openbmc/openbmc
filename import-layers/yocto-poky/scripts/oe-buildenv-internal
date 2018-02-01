@@ -18,6 +18,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+if ! $(return >/dev/null 2>&1) ; then
+    echo 'oe-buildenv-internal: error: this script must be sourced'
+    echo ''
+    echo 'Usage: . $OEROOT/scripts/oe-buildenv-internal &&'
+    echo ''
+    echo 'OpenEmbedded oe-buildenv-internal - an internal script that is'
+    echo 'used in oe-init-build-env and oe-init-build-env-memres to'
+    echo 'initialize oe build environment'
+    echo ''
+    exit 2
+fi
+
 # It is assumed OEROOT is already defined when this is called
 if [ -z "$OEROOT" ]; then
     echo >&2 "Error: OEROOT is not defined!"

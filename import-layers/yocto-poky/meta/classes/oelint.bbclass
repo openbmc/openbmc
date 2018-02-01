@@ -1,7 +1,7 @@
 addtask lint before do_build
 do_lint[nostamp] = "1"
 python do_lint() {
-    pkgname = d.getVar("PN", True)
+    pkgname = d.getVar("PN")
 
     ##############################
     # Test that DESCRIPTION exists
@@ -35,7 +35,7 @@ python do_lint() {
     # Check that all patches have Signed-off-by and Upstream-Status
     #
     srcuri = d.getVar("SRC_URI", False).split()
-    fpaths = (d.getVar('FILESPATH', True) or '').split(':')
+    fpaths = (d.getVar('FILESPATH') or '').split(':')
 
     def findPatch(patchname):
         for dir in fpaths:

@@ -1,0 +1,4 @@
+# short-description: Create an EFI disk image with just the EFI system partition
+
+part / --source rootfs --ondisk sda --fstype=vfat --align 1024
+bootloader --ptable gpt --timeout=5

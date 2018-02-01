@@ -1,0 +1,74 @@
+From 211c2d11200e6657132c52e7ac68f8c118231262 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 27 Feb 2017 14:43:21 +0200
+Subject: [PATCH] Fix build with musl C library.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac        | 3 ++-
+ misc/Makefile.am    | 3 +--
+ misc/rpmxprogname.c | 3 +--
+ 3 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 92ffd3d68..9c58467c1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -229,6 +229,7 @@ AC_SEARCH_LIBS(dlopen, [dl])
+ # Check for libelf library. Prefer external, otherwise none.
+ WITH_LIBELF_LIB=
+ AC_CHECK_HEADER([libelf.h])
++AC_CHECK_HEADERS([error.h], [WITH_ERROR_H=yes])
+ AC_CHECK_HEADERS([gelf.h], [
+ 	AC_CHECK_LIB(elf, gelf_getvernaux, [
+ 	    AC_DEFINE(HAVE_LIBELF, 1, [Define to 1 if you have the 'elf' library (-lelf).])
+@@ -237,7 +238,7 @@ AC_CHECK_HEADERS([gelf.h], [
+ 	])
+ ])
+ AC_SUBST(WITH_LIBELF_LIB)
+-AM_CONDITIONAL(LIBELF,[test "$WITH_LIBELF" = yes])
++AM_CONDITIONAL(LIBELF,[test "$WITH_LIBELF" = yes && test "$WITH_ERROR_H" = yes])
+ 
+ AC_CHECK_HEADERS([dwarf.h], [
+   WITH_LIBDWARF=yes
+diff --git a/misc/Makefile.am b/misc/Makefile.am
+index 8bf0093d9..b9db3d31a 100644
+--- a/misc/Makefile.am
++++ b/misc/Makefile.am
+@@ -5,10 +5,9 @@ AM_CPPFLAGS += -I$(top_srcdir)/misc
+ 
+ EXTRA_DIST = \
+ 	fnmatch.c	fnmatch.h \
+-	rpmxprogname.c	rpmxprogname.h \
+ 	stpcpy.c	stpncpy.c
+ 
+ noinst_LTLIBRARIES = libmisc.la
+ 
+-libmisc_la_SOURCES = fts.c fts.h
++libmisc_la_SOURCES = fts.c fts.h rpmxprogname.c rpmxprogname.h
+ libmisc_la_LIBADD = @LTLIBOBJS@
+diff --git a/misc/rpmxprogname.c b/misc/rpmxprogname.c
+index f89600613..e94625ea8 100644
+--- a/misc/rpmxprogname.c
++++ b/misc/rpmxprogname.c
+@@ -13,7 +13,7 @@ char *_rpmxgetprogname(void)
+ {
+   const char *empty = "";
+ 
+-  if (_rpmxprognam != NULL) /* never return NULL string */
++  if (_rpmxprogname != NULL) /* never return NULL string */
+     return _rpmxprogname;
+   else
+     return empty;
+@@ -30,4 +30,3 @@ void _rpmxsetprogname(const char *pn)
+   }
+ }
+ 
+-#endif /* _RPMXPROGNAME_H */
+-- 
+2.11.0
+

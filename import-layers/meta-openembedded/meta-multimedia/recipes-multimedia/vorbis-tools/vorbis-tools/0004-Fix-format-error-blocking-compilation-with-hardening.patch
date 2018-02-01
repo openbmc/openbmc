@@ -1,0 +1,26 @@
+From: Petter Reinholdtsen <pere@hungry.com>
+Date: Wed, 22 Oct 2014 13:25:21 +0200
+Subject: Fix format error blocking compilation with hardening
+
+Last-Update: 2014-10-22
+Forwarded: no
+
+Enabling hardening refuses to compile code with sprintf() calls
+with no formatting string. Adjust the code to work with hardening.
+---
+ ogg123/status.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ogg123/status.c b/ogg123/status.c
+index 92b8ff1..ccec389 100644
+--- a/ogg123/status.c
++++ b/ogg123/status.c
+@@ -148,7 +148,7 @@ int print_statistics_line (stat_format_t stats[])
+ 
+     switch (stats->type) {
+     case stat_noarg:
+-      len += sprintf(str+len, stats->formatstr);
++      len += sprintf(str+len, "%s", stats->formatstr);
+       break;
+     case stat_intarg:
+       len += sprintf(str+len, stats->formatstr, stats->arg.intarg);

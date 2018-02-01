@@ -1301,19 +1301,27 @@
     <title><filename>image-live.bbclass</filename></title>
 
     <para>
-        The <filename>image-live</filename> class supports building "live"
-        images.
+        This class controls building "live" (i.e. HDDIMG and ISO) images.
+        Live images contain syslinux for legacy booting, as well as the
+        bootloader specified by
+        <link linkend='var-EFI_PROVIDER'><filename>EFI_PROVIDER</filename></link>
+        if
+        <link linkend='var-MACHINE_FEATURES'><filename>MACHINE_FEATURES</filename></link>
+        contains "efi".
     </para>
 
     <para>
         Normally, you do not use this class directly.
         Instead, you add "live" to
         <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>.
+        You can selectively build just one of these types through the
+        <link linkend='var-NOISO'><filename>NOISO</filename></link>
+        and
+        <link linkend='var-NOHDD'><filename>NOHDD</filename></link> variables.
         For example, if you were building an ISO image, you would add "live"
         to <filename>IMAGE_FSTYPES</filename>, set the
-        <link linkend='var-NOISO'><filename>NOISO</filename></link> variable to
-        "0" and the build system would use the <filename>image-live</filename>
-        class to build the ISO image.
+        <filename>NOISO</filename> variable to "0" and the build system would
+        use the <filename>image-live</filename> class to build the ISO image.
     </para>
 </section>
 
@@ -1755,6 +1763,9 @@
                 <link linkend='qa-issue-textrel'><filename>ELF binary</filename></link>
                 message for more information regarding runtime performance issues.
                 </para></listitem>
+<!--
+This check was removed for YP 2.3 release
+
             <listitem><para><emphasis><filename>unsafe-references-in-binaries:</filename></emphasis>
                 Reports when a binary installed in
                 <filename>${base_libdir}</filename>,
@@ -1776,6 +1787,7 @@
                     <filename>/usr</filename>.
                 </note>
                 </para></listitem>
+-->
             <listitem><para><emphasis><filename>unsafe-references-in-scripts:</filename></emphasis>
                 Reports when a script file installed in
                 <filename>${base_libdir}</filename>,
@@ -2216,6 +2228,14 @@
                 functionality specific to the respective native or target
                 case.</para></listitem>
         </itemizedlist>
+        <note><title>Warning</title>
+            When creating a recipe, you must follow this naming convention:
+            <literallayout class='monospaced'>
+     native-<replaceable>myrecipe</replaceable>.bb
+            </literallayout>
+            Not doing so can lead to subtle problems because code exists
+            that depends on the naming convention.
+        </note>
     </para>
 
     <para>
@@ -2258,6 +2278,14 @@
                 functionality specific to the respective SDK machine or target
                 case.</para></listitem>
         </itemizedlist>
+        <note><title>Warning</title>
+            When creating a recipe, you must follow this naming convention:
+            <literallayout class='monospaced'>
+     nativesdk-<replaceable>myrecipe</replaceable>.bb
+            </literallayout>
+            Not doing so can lead to subtle problems because code exists
+            that depends on the naming convention.
+        </note>
     </para>
 
     <para>
@@ -2374,7 +2402,7 @@
 
     <para>
         If you take the optional step to set up a repository (package feed)
-        on the development host that can be used by Smart, you can
+        on the development host that can be used by DNF, you can
         install packages from the feed while you are running the image
         on the target (i.e. runtime installation of packages).
         For more information, see the
@@ -3190,13 +3218,144 @@
     <title><filename>staging.bbclass</filename></title>
 
     <para>
-        The <filename>staging</filename> class provides the
-        <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>
-        task, which stages files into the sysroot to make them available to
-        other recipes at build time.
-        The class is enabled by default because it is inherited by the
-        <link linkend='ref-classes-base'><filename>base</filename></link>
-        class.
+        The <filename>staging</filename> class installs files into individual
+        recipe work directories for sysroots.
+        The class contains the following key tasks:
+        <itemizedlist>
+            <listitem><para>
+                The
+                <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>
+                task, which is responsible for handing the files that end up
+                in the recipe sysroots.
+                </para></listitem>
+            <listitem><para>
+                The
+                <link linkend='ref-tasks-prepare_recipe_sysroot'><filename>do_prepare_recipe_sysroot</filename></link>
+                task (a "partner" task to the
+                <filename>populate_sysroot</filename> task), which installs
+                the files into the individual recipe work directories (i.e.
+                <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>).
+                </para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        The code in the <filename>staging</filename> class is complex and
+        basically works in two stages:
+        <itemizedlist>
+            <listitem><para>
+                <emphasis>Stage One:</emphasis>
+                The first stage addresses recipes that have files they want
+                to share with other recipes that have dependencies on the
+                originating recipe.
+                Normally these dependencies are installed through the
+                <link linkend='ref-tasks-install'><filename>do_install</filename></link>
+                task into
+                <filename>${</filename><link linkend='var-D'><filename>D</filename></link><filename>}</filename>.
+                The <filename>do_populate_sysroot</filename> task copies
+                a subset of these files into
+                <filename>${SYSROOT_DESTDIR}</filename>.
+                This subset of files is controlled by the
+                <link linkend='var-SYSROOT_DIRS'><filename>SYSROOT_DIRS</filename></link>,
+                <link linkend='var-SYSROOT_DIRS_NATIVE'><filename>SYSROOT_DIRS_NATIVE</filename></link>,
+                and
+                <link linkend='var-SYSROOT_DIRS_BLACKLIST'><filename>SYSROOT_DIRS_BLACKLIST</filename></link>
+                variables.
+                <note>
+                    Additionally, a recipe can customize the files further by
+                declaring a processing function in the
+                    <link linkend='var-SYSROOT_PREPROCESS_FUNCS'><filename>SYSROOT_PREPROCESS_FUNCS</filename></link>
+                    variable.
+                </note>
+                </para>
+
+                <para>
+                A shared state (sstate) object is built from these files
+                and the files are placed into a subdirectory of
+                <link linkend='structure-build-tmp-sysroots-components'><filename>tmp/sysroots-components/</filename></link>.
+                The files are scanned for hardcoded paths to the original
+                installation location.
+                If the location is found in text files, the hardcoded
+                locations are replaced by tokens and a list of the files
+                needing such replacements is created.
+                These adjustments are referred to as "FIXMEs".
+                The list of files that are scanned for paths is controlled by
+                the
+                <link linkend='var-SSTATE_SCAN_FILES'><filename>SSTATE_SCAN_FILES</filename></link>
+                variable.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Stage Two:</emphasis>
+                The second stage addresses recipes that want to use something
+                from another recipe and declare a dependency on that recipe
+                through the
+                <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
+                variable.
+                The recipe will have a
+                <link linkend='ref-tasks-prepare_recipe_sysroot'><filename>do_prepare_recipe_sysroot</filename></link>
+                task and when
+                this task executes, it creates the
+                <filename>recipe-sysroot</filename> and
+                <filename>recipe-sysroot-native</filename> in the recipe
+                work directory (i.e.
+                <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>).
+                The OpenEmbedded build system creates hard links to copies of the
+                relevant files from <filename>sysroots-components</filename>
+                into the recipe work directory.
+                <note>
+                    If hard links are not possible, the build system uses
+                    actual copies.
+                </note>
+                The build system then addresses any "FIXMEs" to paths as
+                defined from the list created in the first stage.
+                </para>
+
+                <para>
+                Finally, any files in <filename>${bindir}</filename>
+                within the sysroot that have the prefix
+                "<filename>postinst-</filename>" are executed.
+                <note>
+                    Although such sysroot post installation scripts are not
+                    recommended for general use, the files do allow some issues
+                    such as user creation and module indexes to be addressed.
+                </note>
+                </para>
+
+                <para>
+                Because recipes can have other dependencies outside of
+                <filename>DEPENDS</filename> (e.g.
+                <filename>do_unpack[depends] += "tar-native:do_populate_sysroot"</filename>),
+                the sysroot creation function
+                <filename>extend_recipe_sysroot</filename> is also added as
+                a pre-function for those tasks whose dependencies are not
+                through <filename>DEPENDS</filename> but operate similarly.
+                </para>
+
+                <para>
+                When installing dependencies into the sysroot, the code
+                traverses the dependency graph and processes dependencies
+                in exactly the same way as the dependencies would or would not
+                be when installed from sstate.
+                This processing means, for example, a native tool would have
+                its native dependencies added but a target library would not
+                have its dependencies traversed or installed.
+                The same sstate dependency code is used so that
+                builds should be identical regardless of whether sstate
+                was used or not.
+                For a closer look, see the
+                <filename>setscene_depvalid()</filename> function in the
+                <link linkend='ref-classes-sstate'><filename>sstate</filename></link>
+                class.
+                </para>
+
+                <para>
+                The build system is careful to maintain manifests of the files
+                it installs so that any given dependency can be installed as
+                needed.
+                The sstate hash of the installed item is also stored so that
+                if it changes, the build system can reinstall it.
+                </para></listitem>
+        </itemizedlist>
     </para>
 </section>
 
@@ -3531,6 +3690,14 @@
         <filename>UNINATIVE_CHECKSUM</filename> appropriately.
         For an example, see the
         <filename>meta/conf/distro/include/yocto-uninative.inc</filename>.
+    </para>
+
+    <para>
+        The <filename>uninative</filename> class is also used unconditionally
+        by the extensible SDK.
+        When building the extensible SDK,
+        <filename>uninative-tarball</filename> is built and the resulting
+        tarball is included within the SDK.
     </para>
 </section>
 

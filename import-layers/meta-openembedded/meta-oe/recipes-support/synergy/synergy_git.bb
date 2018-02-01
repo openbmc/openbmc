@@ -4,12 +4,13 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0f366945b209c5523e39889f636af00a"
 LICENSE = "GPL-2.0"
 SECTION = "x11/utils"
 
-DEPENDS = "virtual/libx11 libxtst libxinerama unzip-native curl openssl"
+DEPENDS = "virtual/libx11 libxtst libxinerama curl openssl"
+do_unpack_extra[depends] = "unzip-native:do_populate_sysroot"
 
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
-SRC_URI = "git://github.com/synergy/synergy.git;protocol=http"
+SRC_URI = "git://github.com/symless/synergy-core.git;protocol=https"
 
 # Version 1.7.4-rc8
 SRCREV ?= "588fb4b805dd452556d05dbc03fe29ea5b4e43c0"

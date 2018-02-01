@@ -1,0 +1,26 @@
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Thu Jun 7 12:28:34 2012 -0400
+
+    This patch was carried over from WRL4.3 (openipmi v2.0.16)
+    
+    It was updated for openipmi v2.0.19
+    
+    Disable making openipmigui man page since we don't need it
+    
+    Upstream-Status: Pending
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+    Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/man/Makefile.am b/man/Makefile.am
+index 632f55b..5ce79f5 100644
+--- a/man/Makefile.am
++++ b/man/Makefile.am
+@@ -1,6 +1,6 @@
+ 
+ man_MANS = ipmi_ui.1 openipmicmd.1 openipmish.1 ipmi_cmdlang.7 \
+-	openipmigui.1 openipmi_conparms.7 solterm.1 rmcp_ping.1 \
++	openipmi_conparms.7 solterm.1 rmcp_ping.1 \
+ 	openipmi_eventd.1
+ 
+ EXTRA_DIST = $(man_MANS)

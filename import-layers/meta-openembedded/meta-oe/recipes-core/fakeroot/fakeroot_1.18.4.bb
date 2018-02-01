@@ -27,4 +27,4 @@ SRC_URI[md5sum] = "706171d8d520b1ca1576ac73f2ceb4f3"
 SRC_URI[sha256sum] = "0a359efa3e9496c33234b3e9c89306a09bb4da9d33de43c261f1d8447e6ebea2"
 
 # http://errors.yoctoproject.org/Errors/Details/35143/
-PNBLACKLIST[fakeroot] ?= "BROKEN: QA Issue: -dev package contains non-symlink .so"
+PNBLACKLIST[fakeroot] ?= "BROKEN: QA Issue: -dev package contains non-symlink .so - the recipe will be removed on 2017-09-01 unless the issue is fixed"

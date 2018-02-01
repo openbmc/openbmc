@@ -1,0 +1,30 @@
+From fd9515f08dcdafea6ae03413fbe5a43a6438fe3e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Jul 2017 21:25:48 -0700
+Subject: [PATCH 5/5] check for libexecinfo during configure
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 188adfe..1ab4d3c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -159,6 +159,12 @@ AC_SEARCH_LIBS([argp_parse], [argp c], [], [
+       USE_WVSTREAMS_ARGP=1
+   fi
+ ])
++
++USE_LIBEXECINFO=0
++AC_SEARCH_LIBS([backtrace], [execinfo], [], [
++USE_LIBEXECINFO=1
++])
++
+ # Function checks
+ AC_HEADER_DIRENT
+ 
+-- 
+2.13.3
+

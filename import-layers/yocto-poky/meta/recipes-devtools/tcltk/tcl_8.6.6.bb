@@ -54,8 +54,8 @@ do_install() {
 	autotools_do_install install-private-headers
 	ln -sf ./tclsh${VER} ${D}${bindir}/tclsh
 	ln -sf tclsh8.6 ${D}${bindir}/tclsh${VER}
-	sed -i "s+-L${B}+-L${STAGING_LIBDIR}+g" tclConfig.sh
-	sed -i "s+${WORKDIR}+${STAGING_INCDIR}+g" tclConfig.sh
+	sed -i "s;-L${B};-L${STAGING_LIBDIR};g" tclConfig.sh
+	sed -i "s;'${WORKDIR};'${STAGING_INCDIR};g" tclConfig.sh
 	install -d ${D}${bindir_crossscripts}
 	install -m 0755 tclConfig.sh ${D}${bindir_crossscripts}
 	install -m 0755 tclConfig.sh ${D}${libdir}
@@ -78,7 +78,7 @@ RDEPENDS_${PN} += "tcl-lib"
 RDEPENDS_${PN}_class-native = ""
 RDEPENDS_${PN}-ptest += "libgcc"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 do_compile_ptest() {
 	oe_runmake tcltest

@@ -4,7 +4,7 @@
   <!-- pk=1 is DISTRO -->
   <object model="orm.toastersetting" pk="2">
     <field type="CharField" name="name">DEFAULT_RELEASE</field>
-    <field type="CharField" name="value">morty</field>
+    <field type="CharField" name="value">master</field>
   </object>
   <object model="orm.toastersetting" pk="3">
     <field type="CharField" name="name">DEFCONF_PACKAGE_CLASSES</field>

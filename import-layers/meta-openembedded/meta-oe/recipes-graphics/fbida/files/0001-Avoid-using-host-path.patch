@@ -1,0 +1,34 @@
+From 8d8fa9f22d9f6a95523bac63ac3af724faf5ff92 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Fri, 7 Apr 2017 23:26:09 +0200
+Subject: [PATCH] Avoid using host-path
+
+Remove the explicit reference to /usr/local/* , this is completely
+bogus and causes trouble during cross-compilation.
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Upstream-Status: Inappropriate [upstream requires this]
+---
+ mk/Variables.mk | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/mk/Variables.mk b/mk/Variables.mk
+index 99f787c..3ffd87a 100644
+--- a/mk/Variables.mk
++++ b/mk/Variables.mk
+@@ -42,12 +42,6 @@ CFLAGS		+= -Wall -Wmissing-prototypes -Wstrict-prototypes \
+ 		   -Wpointer-arith -Wunused
+ CXXFLAGS	+= -Wall -Wpointer-arith -Wunused
+ 
+-# add /usr/local to the search path if something is in there ...
+-ifneq ($(wildcard /usr/local/include/*.h),)
+-  CFLAGS  += -I/usr/local/include
+-  LDFLAGS += -L/usr/local/$(LIB)
+-endif
+-
+ # fixup include path for $(srcdir) != "."
+ ifneq ($(srcdir),.)
+   CFLAGS  += -I. -I$(srcdir)
+-- 
+2.11.0
+

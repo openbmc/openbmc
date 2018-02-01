@@ -1,15 +1,25 @@
-tests: also install tests app
+From 5c6eb43c2f6e7f2ee7c25c92e42f4e4403fa0527 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 21 Feb 2017 14:37:52 +0200
+Subject: [PATCH] tests: also install test apps
 
 Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Yu Ke <ke.yu@intel.com>
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ tests/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
 
-Index: libdrm-2.4.66/tests/Makefile.am
-===================================================================
---- libdrm-2.4.66.orig/tests/Makefile.am
-+++ libdrm-2.4.66/tests/Makefile.am
-@@ -73,3 +73,4 @@ TESTS +=					\
- endif
- 
- check_PROGRAMS += $(TESTS)
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 0355a92..b4882cd 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -45,3 +45,4 @@ TESTS = \
+ check_PROGRAMS = \
+ 	$(TESTS) \
+ 	drmdevice
 +bin_PROGRAMS = $(check_PROGRAMS)
+-- 
+2.1.4
+

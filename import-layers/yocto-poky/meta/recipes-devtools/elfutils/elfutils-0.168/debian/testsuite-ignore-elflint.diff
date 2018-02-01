@@ -1,0 +1,42 @@
+On many architectures this test fails because binaries/libs produced by
+binutils don't pass elflint. However elfutils shouldn't FTBFS because of this.
+
+So we run the tests on all archs to see what breaks, but if it breaks we ignore
+the result (exitcode 77 means: this test was skipped).
+
+Upstream-Status: Backport [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Index: b/tests/run-elflint-self.sh
+===================================================================
+--- a/tests/run-elflint-self.sh
++++ b/tests/run-elflint-self.sh
+@@ -18,4 +18,4 @@
+ 
+ . $srcdir/test-subr.sh
+ 
+-testrun_on_self ${abs_top_builddir}/src/elflint --quiet --gnu-ld
++testrun_on_self_skip ${abs_top_builddir}/src/elflint --quiet --gnu-ld
+Index: b/tests/test-subr.sh
+===================================================================
+--- a/tests/test-subr.sh
++++ b/tests/test-subr.sh
+@@ -152,3 +152,18 @@ testrun_on_self_quiet()
+   # Only exit if something failed
+   if test $exit_status != 0; then exit $exit_status; fi
+ }
++
++# Same as testrun_on_self(), but skip on failure.
++testrun_on_self_skip()
++{
++  exit_status=0
++
++  for file in $self_test_files; do
++      testrun $* $file \
++	  || { echo "*** failure in $* $file"; exit_status=77; }
++  done
++
++  # Only exit if something failed
++  if test $exit_status != 0; then exit $exit_status; fi
++}
++

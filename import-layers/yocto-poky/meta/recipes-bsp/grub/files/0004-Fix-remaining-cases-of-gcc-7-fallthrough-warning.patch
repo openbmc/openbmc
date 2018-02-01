@@ -1,0 +1,175 @@
+From d454509bb866d4eaefbb558d94dd0ef0228830eb Mon Sep 17 00:00:00 2001
+From: Vladimir Serbinenko <phcoder@gmail.com>
+Date: Wed, 12 Apr 2017 01:42:38 +0000
+Subject: [PATCH 4/4] Fix remaining cases of gcc 7 fallthrough warning.
+
+They are all intended, so just add the relevant comment.
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ grub-core/kern/ia64/dl.c                     | 1 +
+ grub-core/kern/mips/dl.c                     | 1 +
+ grub-core/kern/sparc64/dl.c                  | 1 +
+ grub-core/loader/i386/coreboot/chainloader.c | 1 +
+ 4 files changed, 4 insertions(+)
+
+Index: grub-2.00/grub-core/kern/ia64/dl.c
+===================================================================
+--- grub-2.00.orig/grub-core/kern/ia64/dl.c
++++ grub-2.00/grub-core/kern/ia64/dl.c
+@@ -257,6 +257,7 @@ grub_arch_dl_relocate_symbols (grub_dl_t
+ 		  case R_IA64_LTOFF22:
+ 		    if (ELF_ST_TYPE (sym->st_info) == STT_FUNC)
+ 		      value = *(grub_uint64_t *) sym->st_value + rel->r_addend;
++		  /* Fallthrough.  */
+ 		  case R_IA64_LTOFF_FPTR22:
+ 		    *gpptr = value;
+ 		    add_value_to_slot_21 (addr, (grub_addr_t) gpptr - (grub_addr_t) gp);
+Index: grub-2.00/grub-core/disk/diskfilter.c
+===================================================================
+--- grub-2.00.orig/grub-core/disk/diskfilter.c
++++ grub-2.00/grub-core/disk/diskfilter.c
+@@ -71,10 +71,12 @@ is_lv_readable (struct grub_diskfilter_l
+ 	case GRUB_DISKFILTER_RAID6:
+ 	  if (!easily)
+ 	    need--;
++	  /* Fallthrough.  */
+ 	case GRUB_DISKFILTER_RAID4:
+ 	case GRUB_DISKFILTER_RAID5:
+ 	  if (!easily)
+ 	    need--;
++	  /* Fallthrough.  */
+ 	case GRUB_DISKFILTER_STRIPED:
+ 	  break;
+ 
+@@ -507,6 +509,7 @@ read_segment (struct grub_diskfilter_seg
+       if (seg->node_count == 1)
+ 	return grub_diskfilter_read_node (&seg->nodes[0],
+ 					  sector, size, buf);
++    /* Fallthrough.  */
+     case GRUB_DISKFILTER_MIRROR:
+     case GRUB_DISKFILTER_RAID10:
+       {
+Index: grub-2.00/grub-core/font/font.c
+===================================================================
+--- grub-2.00.orig/grub-core/font/font.c
++++ grub-2.00/grub-core/font/font.c
+@@ -1297,6 +1297,7 @@ blit_comb (const struct grub_unicode_gly
+ 	    - grub_font_get_xheight (combining_glyphs[i]->font) - 1;
+ 	  if (space <= 0)
+ 	    space = 1 + (grub_font_get_xheight (main_glyph->font)) / 8;
++        /* Fallthrough.  */
+ 
+ 	case GRUB_UNICODE_STACK_ATTACHED_ABOVE:
+ 	  do_blit (combining_glyphs[i], targetx,
+@@ -1338,6 +1339,7 @@ blit_comb (const struct grub_unicode_gly
+ 		    + combining_glyphs[i]->height);
+ 	  if (space <= 0)
+ 	    space = 1 + (grub_font_get_xheight (main_glyph->font)) / 8;
++        /* Fallthrough.  */
+ 
+ 	case GRUB_UNICODE_STACK_ATTACHED_BELOW:
+ 	  do_blit (combining_glyphs[i], targetx, -(bounds.y - space));
+Index: grub-2.00/grub-core/fs/udf.c
+===================================================================
+--- grub-2.00.orig/grub-core/fs/udf.c
++++ grub-2.00/grub-core/fs/udf.c
+@@ -970,6 +970,7 @@ grub_udf_read_symlink (grub_fshelp_node_
+ 	case 1:
+ 	  if (ptr[1])
+ 	    goto fail;
++	  break;
+ 	case 2:
+ 	  /* in 4 bytes. out: 1 byte.  */
+ 	  optr = out;
+Index: grub-2.00/grub-core/lib/legacy_parse.c
+===================================================================
+--- grub-2.00.orig/grub-core/lib/legacy_parse.c
++++ grub-2.00/grub-core/lib/legacy_parse.c
+@@ -626,6 +626,7 @@ grub_legacy_parse (const char *buf, char
+ 	  {
+ 	  case TYPE_FILE_NO_CONSUME:
+ 	    hold_arg = 1;
++	  /* Fallthrough.  */
+ 	  case TYPE_PARTITION:
+ 	  case TYPE_FILE:
+ 	    args[i] = adjust_file (curarg, curarglen);
+Index: grub-2.00/grub-core/lib/libgcrypt-grub/cipher/rijndael.c
+===================================================================
+--- grub-2.00.orig/grub-core/lib/libgcrypt-grub/cipher/rijndael.c
++++ grub-2.00/grub-core/lib/libgcrypt-grub/cipher/rijndael.c
+@@ -96,7 +96,8 @@ do_setkey (RIJNDAEL_context *ctx, const
+   static int initialized = 0;
+   static const char *selftest_failed=0;
+   int ROUNDS;
+-  int i,j, r, t, rconpointer = 0;
++  unsigned int i, t, rconpointer = 0;
++  int j, r;
+   int KC;
+   union
+   {
+Index: grub-2.00/grub-core/mmap/efi/mmap.c
+===================================================================
+--- grub-2.00.orig/grub-core/mmap/efi/mmap.c
++++ grub-2.00/grub-core/mmap/efi/mmap.c
+@@ -72,6 +72,7 @@ grub_efi_mmap_iterate (grub_memory_hook_
+ 		    GRUB_MEMORY_AVAILABLE);
+ 	      break;
+ 	    }
++	  /* Fallthrough.  */
+ 	case GRUB_EFI_RUNTIME_SERVICES_CODE:
+ 	  hook (desc->physical_start, desc->num_pages * 4096,
+ 		GRUB_MEMORY_CODE);
+@@ -86,6 +87,7 @@ grub_efi_mmap_iterate (grub_memory_hook_
+ 	  grub_printf ("Unknown memory type %d, considering reserved\n",
+ 		       desc->type);
+ 
++	  /* Fallthrough.  */
+ 	case GRUB_EFI_BOOT_SERVICES_DATA:
+ 	  if (!avoid_efi_boot_services)
+ 	    {
+@@ -93,6 +95,7 @@ grub_efi_mmap_iterate (grub_memory_hook_
+ 		    GRUB_MEMORY_AVAILABLE);
+ 	      break;
+ 	    }
++	  /* Fallthrough.  */
+ 	case GRUB_EFI_RESERVED_MEMORY_TYPE:
+ 	case GRUB_EFI_RUNTIME_SERVICES_DATA:
+ 	case GRUB_EFI_MEMORY_MAPPED_IO:
+Index: grub-2.00/grub-core/normal/charset.c
+===================================================================
+--- grub-2.00.orig/grub-core/normal/charset.c
++++ grub-2.00/grub-core/normal/charset.c
+@@ -858,6 +858,7 @@ grub_bidi_line_logical_to_visual (const
+ 	  case GRUB_BIDI_TYPE_R:
+ 	  case GRUB_BIDI_TYPE_AL:
+ 	    bidi_needed = 1;
++	  /* Fallthrough.  */
+ 	  default:
+ 	    {
+ 	      if (join_state == JOIN_FORCE)
+Index: grub-2.00/grub-core/video/bochs.c
+===================================================================
+--- grub-2.00.orig/grub-core/video/bochs.c
++++ grub-2.00/grub-core/video/bochs.c
+@@ -351,6 +351,7 @@ grub_video_bochs_setup (unsigned int wid
+     case 32:
+       framebuffer.mode_info.reserved_mask_size = 8;
+       framebuffer.mode_info.reserved_field_pos = 24;
++      /* Fallthrough.  */
+ 
+     case 24:
+       framebuffer.mode_info.red_mask_size = 8;
+Index: grub-2.00/grub-core/video/cirrus.c
+===================================================================
+--- grub-2.00.orig/grub-core/video/cirrus.c
++++ grub-2.00/grub-core/video/cirrus.c
+@@ -431,6 +431,7 @@ grub_video_cirrus_setup (unsigned int wi
+     case 32:
+       framebuffer.mode_info.reserved_mask_size = 8;
+       framebuffer.mode_info.reserved_field_pos = 24;
++      /* Fallthrough.  */
+ 
+     case 24:
+       framebuffer.mode_info.red_mask_size = 8;

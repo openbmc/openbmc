@@ -1,0 +1,26 @@
+From f5416f1c2b2989f94163a2ae4b91c9b9fa13c620 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 13:32:31 -0700
+Subject: [PATCH 1/2] memset() and family needs to include string.h
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/jsonrpccpp/server/connectors/unixdomainsocketserver.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/jsonrpccpp/server/connectors/unixdomainsocketserver.cpp b/src/jsonrpccpp/server/connectors/unixdomainsocketserver.cpp
+index 9fca57b..e63c49e 100644
+--- a/src/jsonrpccpp/server/connectors/unixdomainsocketserver.cpp
++++ b/src/jsonrpccpp/server/connectors/unixdomainsocketserver.cpp
+@@ -16,7 +16,7 @@
+ #include <cstdio>
+ #include <fcntl.h>
+ #include <unistd.h>
+-#include <string>
++#include <cstring>
+ 
+ using namespace jsonrpc;
+ using namespace std;
+-- 
+2.12.1
+

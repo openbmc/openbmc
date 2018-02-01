@@ -12,7 +12,7 @@ Index: doc/Makefile.am
 +++ b/doc/Makefile.am
 @@ -1,4 +1,4 @@
 -SUBDIRS = . man examples
-+SUBDIRS = .
++SUBDIRS = . man
  
  dist_man_MANS = man/lttng-gen-tp.1 \
  	man/lttng-ust.3 \

@@ -1,0 +1,182 @@
+From 916ea0c70fd063ab7b81f16fd917a75dc02edf4f Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Fri, 17 Mar 2017 03:18:28 +0100
+Subject: [PATCH] Avoid bashisms in init scripts
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ scripts/blk_availability_init_red_hat.in      | 4 ++--
+ scripts/clvmd_init_red_hat.in                 | 6 +++---
+ scripts/cmirrord_init_red_hat.in              | 4 ++--
+ scripts/lvm2_cluster_activation_red_hat.sh.in | 4 ++--
+ scripts/lvm2_lvmetad_init_red_hat.in          | 4 ++--
+ scripts/lvm2_lvmpolld_init_red_hat.in         | 4 ++--
+ scripts/lvm2_monitoring_init_red_hat.in       | 4 ++--
+ scripts/lvm2_monitoring_init_rhel4            | 4 ++--
+ 8 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/scripts/blk_availability_init_red_hat.in b/scripts/blk_availability_init_red_hat.in
+index a84ffe7..6b855b7 100644
+--- a/scripts/blk_availability_init_red_hat.in
++++ b/scripts/blk_availability_init_red_hat.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # Copyright (C) 2012 Red Hat, Inc. All rights reserved.
+ #
+@@ -53,6 +53,6 @@ case "$1" in
+   status)
+ 	;;
+   *)
+-	echo $"Usage: $0 {start|stop|status}"
++	echo "Usage: $0 {start|stop|status}"
+ 	;;
+ esac
+diff --git a/scripts/clvmd_init_red_hat.in b/scripts/clvmd_init_red_hat.in
+index d7f3392..abc8011 100644
+--- a/scripts/clvmd_init_red_hat.in
++++ b/scripts/clvmd_init_red_hat.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # clvmd - Clustered LVM Daemon init script
+ #
+@@ -161,7 +161,7 @@ restart() {
+ 	fi
+ }
+ 
+-[ "$EUID" != "0" ] && {
++[ "$(id -u)" != "0" ] && {
+ 	echo "clvmd init script can only be executed as root user"
+ 	exit 4
+ }
+@@ -206,7 +206,7 @@ case "$1" in
+ 	;;
+ 
+   *)
+-	echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
++	echo "Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+ 	rtrn=2
+ 	;;
+ esac
+diff --git a/scripts/cmirrord_init_red_hat.in b/scripts/cmirrord_init_red_hat.in
+index d4b7e37..d442cbc 100755
+--- a/scripts/cmirrord_init_red_hat.in
++++ b/scripts/cmirrord_init_red_hat.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # chkconfig: - 22 78
+ # description: Starts and stops cmirrord
+@@ -101,7 +101,7 @@ case "$1" in
+ 		;;
+ 
+ 	*)
+-		echo $"Usage: $0 {start|stop|restart|status}"
++		echo "Usage: $0 {start|stop|restart|status}"
+ 		;;
+ esac
+ 
+diff --git a/scripts/lvm2_cluster_activation_red_hat.sh.in b/scripts/lvm2_cluster_activation_red_hat.sh.in
+index abea026..d8cba2e 100644
+--- a/scripts/lvm2_cluster_activation_red_hat.sh.in
++++ b/scripts/lvm2_cluster_activation_red_hat.sh.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ sbindir=@sbindir@
+ 
+@@ -54,7 +54,7 @@ case "$1" in
+ 	rtrn=$?
+ 	;;
+   *)
+-	echo $"Usage: $0 {activate|deactivate}"
++	echo "Usage: $0 {activate|deactivate}"
+ 	rtrn=3
+ 	;;
+ esac
+diff --git a/scripts/lvm2_lvmetad_init_red_hat.in b/scripts/lvm2_lvmetad_init_red_hat.in
+index b2f5d50..96269a9 100644
+--- a/scripts/lvm2_lvmetad_init_red_hat.in
++++ b/scripts/lvm2_lvmetad_init_red_hat.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # Copyright (C) 2012 Red Hat, Inc. All rights reserved.
+ #
+@@ -105,7 +105,7 @@ case "$1" in
+ 	;;
+ 
+   *)
+-	echo $"Usage: $0 {start|stop|force-stop|restart|condrestart|try-restart|status}"
++	echo "Usage: $0 {start|stop|force-stop|restart|condrestart|try-restart|status}"
+ 	;;
+ esac
+ 
+diff --git a/scripts/lvm2_lvmpolld_init_red_hat.in b/scripts/lvm2_lvmpolld_init_red_hat.in
+index c521955..cdbaece 100644
+--- a/scripts/lvm2_lvmpolld_init_red_hat.in
++++ b/scripts/lvm2_lvmpolld_init_red_hat.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # Copyright (C) 2015 Red Hat, Inc. All rights reserved.
+ #
+@@ -107,7 +107,7 @@ case "$1" in
+ 	;;
+ 
+   *)
+-	echo $"Usage: $0 {start|stop|force-stop|restart|condrestart|try-restart|status}"
++	echo "Usage: $0 {start|stop|force-stop|restart|condrestart|try-restart|status}"
+ 	;;
+ esac
+ 
+diff --git a/scripts/lvm2_monitoring_init_red_hat.in b/scripts/lvm2_monitoring_init_red_hat.in
+index de7ff0d..9ff6bb7 100644
+--- a/scripts/lvm2_monitoring_init_red_hat.in
++++ b/scripts/lvm2_monitoring_init_red_hat.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # Copyright (C) 2007-2009 Red Hat, Inc. All rights reserved.
+ #
+@@ -128,7 +128,7 @@ case "$1" in
+ 	;;
+ 
+   *)
+-	echo $"Usage: $0 {start|stop|restart|status|force-stop}"
++	echo "Usage: $0 {start|stop|restart|status|force-stop}"
+ 	;;
+ esac
+ 
+diff --git a/scripts/lvm2_monitoring_init_rhel4 b/scripts/lvm2_monitoring_init_rhel4
+index 8eb06c5..2e8d0f7 100644
+--- a/scripts/lvm2_monitoring_init_rhel4
++++ b/scripts/lvm2_monitoring_init_rhel4
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # Copyright (C) 2007 Red Hat, Inc. All rights reserved.
+ #
+@@ -93,7 +93,7 @@ case "$1" in
+ 	;;
+ 
+   *)
+-	echo $"Usage: $0 {start|stop|restart|status|force-stop}"
++	echo "Usage: $0 {start|stop|restart|status|force-stop}"
+ 	;;
+ esac
+ 
+-- 
+2.12.0
+

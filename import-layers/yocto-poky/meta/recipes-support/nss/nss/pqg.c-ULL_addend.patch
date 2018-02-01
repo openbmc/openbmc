@@ -13,11 +13,11 @@ Index: nss-3.24/nss/lib/freebl/pqg.c
 @@ -322,8 +322,8 @@ generate_h_candidate(SECItem *hit, mp_in
  
  static SECStatus
- addToSeed(const SECItem * seed,
--          unsigned long   addend,
--          int             seedlen, /* g in 186-1 */
+ addToSeed(const SECItem *seed,
+-          unsigned long addend,
+-          int seedlen, /* g in 186-1 */
 +          unsigned long long  addend,
 +          int                 seedlen, /* g in 186-1 */
-           SECItem * seedout)
+           SECItem *seedout)
  {
      mp_int s, sum, modulus, tmp;

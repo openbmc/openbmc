@@ -38,4 +38,4 @@ do_install() {
 FILES_${PN}-dev += "${datadir}/opencv/samples/*.c* ${datadir}/opencv/samples/*.vcp* ${datadir}/opencv/samples/build*"
 FILES_${PN} += "${bindir} ${datadir}/opencv"
 
-PNBLACKLIST[opencv-samples] ?= "Depends on blacklisted opencv"
+PNBLACKLIST[opencv-samples] ?= "Depends on blacklisted opencv - the recipe will be removed on 2017-09-01 unless the issue is fixed"

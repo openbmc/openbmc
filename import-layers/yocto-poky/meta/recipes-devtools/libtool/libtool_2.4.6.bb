@@ -11,6 +11,8 @@ SYSROOT_DIRS_BLACKLIST += " \
     ${datadir}/libtool/build-aux \
 "
 
+ACLOCALEXTRAPATH_class-target = ""
+
 do_install_append () {
         sed -e 's@--sysroot=${STAGING_DIR_HOST}@@g' \
             -e 's@${STAGING_DIR_HOST}@@g' \

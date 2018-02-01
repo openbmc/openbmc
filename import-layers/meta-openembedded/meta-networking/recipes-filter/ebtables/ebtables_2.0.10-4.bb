@@ -18,7 +18,17 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/ebtables/ebtables-v${PV}.tar.gz \
            file://ebtables.common \
            file://ebtables.service \
            file://no-as-needed.patch \
-"
+           file://0001-add-RARP-and-update-iana-url.patch \
+           file://0002-fix-compilation-warning.patch \
+           file://0003-add-info-about-Wl-no-as-needed.patch \
+           file://0004-workaround-for-kernel-regression-bug-IPv6-source-des.patch \
+           file://0005-Add-noflush-command-line-support-for-ebtables-restor.patch \
+           file://0006-don-t-print-IPv6-mask-if-it-s-all-ones-based-on-patc.patch \
+           file://0007-extensions-Use-stdint-types.patch \
+           file://0008-ethernetdb.h-Remove-C-specific-compiler-hint-macro-_.patch \
+           file://0009-ebtables-Allow-RETURN-target-rules-in-user-defined-c.patch \
+           file://0010-Adjust-header-include-sequence.patch \
+           "
 
 SRC_URI[md5sum] = "506742a3d44b9925955425a659c1a8d0"
 SRC_URI[sha256sum] = "dc6f7b484f207dc712bfca81645f45120cb6aee3380e77a1771e9c34a9a4455d"
@@ -30,8 +40,8 @@ inherit update-rc.d systemd
 python __anonymous () {
     import re
 
-    karch = d.getVar('KARCH', True)
-    multilib = d.getVar('MLPREFIX', True)
+    karch = d.getVar('KARCH')
+    multilib = d.getVar('MLPREFIX')
 
     if multilib and karch == 'powerpc64':
         searchstr = "lib.?32"
@@ -70,8 +80,10 @@ do_install () {
 
     # The script ebtables-save refernces perl in exec_prefix, so
     # move it to sbindir to avoid QA issue
-    install -d ${D}/${sbindir}
-    mv ${D}/${base_sbindir}/ebtables-save ${D}/${sbindir}
+    if ${base_sbindir} != ${sbindir} ; then
+       install -d ${D}/${sbindir}
+       mv ${D}/${base_sbindir}/ebtables-save ${D}/${sbindir}
+    fi
 
     # Install systemd service files
     install -d ${D}${systemd_unitdir}/system

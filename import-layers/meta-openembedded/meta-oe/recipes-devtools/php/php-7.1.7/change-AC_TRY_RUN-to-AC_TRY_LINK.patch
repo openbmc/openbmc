@@ -1,0 +1,56 @@
+[PATCH] config.m4: change AC_TRY_RUN to AC_TRY_LINK
+
+Upstream-Status: Pending
+
+AC_TRY_RUN is not suitable for cross-compile
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ ext/fileinfo/config.m4 | 31 ++++++-------------------------
+ 1 file changed, 6 insertions(+), 25 deletions(-)
+
+diff --git a/ext/fileinfo/config.m4 b/ext/fileinfo/config.m4
+index 7e98d62..8a8ea0e 100644
+--- a/ext/fileinfo/config.m4
++++ b/ext/fileinfo/config.m4
+@@ -14,31 +14,12 @@ if test "$PHP_FILEINFO" != "no"; then
+     libmagic/readcdf.c libmagic/softmagic.c"
+ 
+   AC_MSG_CHECKING([for strcasestr])
+-  AC_TRY_RUN([
+-#include <string.h>
+-#include <strings.h>
+-#include <stdlib.h>
+-
+-int main(void)
+-{
+-        char *s0, *s1, *ret;
+-
+-        s0 = (char *) malloc(42);
+-        s1 = (char *) malloc(8);
+-
+-        memset(s0, 'X', 42);
+-        s0[24] = 'Y';
+-        s0[26] = 'Z';
+-        s0[41] = '\0';
+-        memset(s1, 'x', 8);
+-        s1[0] = 'y';
+-        s1[2] = 'Z';
+-        s1[7] = '\0';
+-
+-        ret = strcasestr(s0, s1);
+-
+-        return !(NULL != ret);
+-}
++  AC_TRY_COMPILE([
++     #include <string.h>
++     #include <strings.h>
++     #include <stdlib.h>
++  ],[
++     strcasestr(NULL, NULL);
+   ],[
+     dnl using the platform implementation
+     AC_MSG_RESULT(yes)
+-- 
+1.9.1
+

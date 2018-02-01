@@ -1,0 +1,64 @@
+#! /bin/sh
+
+# /etc/default/ssh may set SYSCONFDIR and SSHD_OPTS
+if test -f /etc/default/ssh; then
+    . /etc/default/ssh
+fi
+
+[ -z "$SYSCONFDIR" ] && SYSCONFDIR=/etc/ssh
+mkdir -p $SYSCONFDIR
+
+# parse sshd options
+set -- ${SSHD_OPTS} --
+sshd_config=/etc/ssh/sshd_config
+while true ; do
+    case "$1" in
+    -f*) if [ "$1" = "-f" ] ; then
+            sshd_config="$2"
+            shift
+        else
+            sshd_config="${1#-f}"
+        fi
+        shift
+        ;;
+    --) shift; break;;
+    *) shift;;
+    esac
+done
+
+# parse location of keys
+HOST_KEY_RSA=$(grep ^HostKey "${sshd_config}" | grep _rsa_ | tail -1 | awk ' { print $2 } ')
+[ -z "${HOST_KEY_RSA}" ] && HOST_KEY_RSA=$(grep HostKey "${sshd_config}" | grep _rsa_ | tail -1 | awk ' { print $2 } ')
+[ -z "${HOST_KEY_RSA}" ] && HOST_KEY_RSA=$SYSCONFDIR/ssh_host_rsa_key
+HOST_KEY_DSA=$(grep ^HostKey "${sshd_config}" | grep _dsa_ | tail -1 | awk ' { print $2 } ')
+[ -z "${HOST_KEY_DSA}" ] && HOST_KEY_DSA=$(grep HostKey "${sshd_config}" | grep _dsa_ | tail -1 | awk ' { print $2 } ')
+[ -z "${HOST_KEY_DSA}" ] && HOST_KEY_DSA=$SYSCONFDIR/ssh_host_dsa_key
+HOST_KEY_ECDSA=$(grep ^HostKey "${sshd_config}" | grep _ecdsa_ | tail -1 | awk ' { print $2 } ')
+[ -z "${HOST_KEY_ECDSA}" ] && HOST_KEY_ECDSA=$(grep HostKey "${sshd_config}" | grep _ecdsa_ | tail -1 | awk ' { print $2 } ')
+[ -z "${HOST_KEY_ECDSA}" ] && HOST_KEY_ECDSA=$SYSCONFDIR/ssh_host_ecdsa_key
+HOST_KEY_ED25519=$(grep ^HostKey "${sshd_config}" | grep _ed25519_ | tail -1 | awk ' { print $2 } ')
+[ -z "${HOST_KEY_ED25519}" ] && HOST_KEY_ED25519=$(grep HostKey "${sshd_config}" | grep _ed25519_ | tail -1 | awk ' { print $2 } ')
+[ -z "${HOST_KEY_ED25519}" ] && HOST_KEY_ED25519=$SYSCONFDIR/ssh_host_ed25519_key
+
+# create keys if necessary
+if [ ! -f $HOST_KEY_RSA ]; then
+    echo "  generating ssh RSA key..."
+    mkdir -p $(dirname $HOST_KEY_RSA)
+    ssh-keygen -q -f $HOST_KEY_RSA -N '' -t rsa
+fi
+if [ ! -f $HOST_KEY_ECDSA ]; then
+    echo "  generating ssh ECDSA key..."
+    mkdir -p $(dirname $HOST_KEY_ECDSA)
+    ssh-keygen -q -f $HOST_KEY_ECDSA -N '' -t ecdsa
+fi
+if [ ! -f $HOST_KEY_DSA ]; then
+    echo "  generating ssh DSA key..."
+    mkdir -p $(dirname $HOST_KEY_DSA)
+    ssh-keygen -q -f $HOST_KEY_DSA -N '' -t dsa
+fi
+if [ ! -f $HOST_KEY_ED25519 ]; then
+    echo "  generating ssh ED25519 key..."
+    mkdir -p $(dirname $HOST_KEY_ED25519)
+    ssh-keygen -q -f $HOST_KEY_ED25519 -N '' -t ed25519
+fi
+

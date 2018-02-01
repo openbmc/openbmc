@@ -12,3 +12,5 @@ SRC_URI[sha256sum] = "73b6a98a0f13b29b34c3bfc07f99f78b1319211cb95a8585752873af2b
 inherit autotools pkgconfig gtk-doc gobject-introspection
 
 EXTRA_OECONF = "--disable-python"
+
+PNBLACKLIST[gupnp-igd] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130645/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

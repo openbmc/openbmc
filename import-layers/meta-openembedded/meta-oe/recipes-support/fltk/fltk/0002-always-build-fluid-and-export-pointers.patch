@@ -1,0 +1,31 @@
+From 16010cb1a69ea2326d8102b7f1e34b65aca4b278 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 28 Feb 2017 01:20:42 +0100
+Subject: [PATCH] always build fluid and export pointers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ CMake/export.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMake/export.cmake b/CMake/export.cmake
+index 968186a..95e04eb 100644
+--- a/CMake/export.cmake
++++ b/CMake/export.cmake
+@@ -21,7 +21,7 @@
+ # final config and export
+ #######################################################################
+ # Set the fluid executable path
+-if(CMAKE_CROSSCOMPILING)
++if(FALSE)
+    find_file(FLUID_PATH
+       NAMES fluid fluid.exe
+       PATHS ENV PATH
+-- 
+2.9.3
+

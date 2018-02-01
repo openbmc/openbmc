@@ -72,9 +72,9 @@ def process_binaries(d, params):
         return extract_bin_command
 
     if determine_if_poky_env(): # machine with poky environment
-        exportpath = d.getVar("TEST_EXPORT_DIR", True) if export_env else d.getVar("DEPLOY_DIR", True)
-        rpm_deploy_dir = d.getVar("DEPLOY_DIR_RPM", True)
-        arch = get_dest_folder(d.getVar("TUNE_FEATURES", True), os.listdir(rpm_deploy_dir))
+        exportpath = d.getVar("TEST_EXPORT_DIR") if export_env else d.getVar("DEPLOY_DIR")
+        rpm_deploy_dir = d.getVar("DEPLOY_DIR_RPM")
+        arch = get_dest_folder(d.getVar("TUNE_FEATURES"), os.listdir(rpm_deploy_dir))
         arch_rpm_dir = os.path.join(rpm_deploy_dir, arch)
         extracted_bin_dir = os.path.join(exportpath,"binaries", arch, "extracted_binaries")
         packaged_bin_dir = os.path.join(exportpath,"binaries", arch, "packaged_binaries")
@@ -92,7 +92,7 @@ def process_binaries(d, params):
                     return ""
                 for item in native_rpm_file_list:# will copy all versions of package. Used version will be selected on remote machine
                     bb.plain("Copying native package file: %s" % item)
-                    sh.copy(os.path.join(rpm_deploy_dir, native_rpm_dir, item), os.path.join(d.getVar("TEST_EXPORT_DIR", True), "binaries", "native"))
+                    sh.copy(os.path.join(rpm_deploy_dir, native_rpm_dir, item), os.path.join(d.getVar("TEST_EXPORT_DIR"), "binaries", "native"))
             else: # nothing to do here; running tests under bitbake, so we asume native binaries are in sysroots dir.
                 if param_list[1] or param_list[4]:
                     bb.warn("Native binary %s %s%s. Running tests under bitbake environment. Version can't be checked except when the test itself does it"
@@ -148,7 +148,7 @@ def process_binaries(d, params):
         else: # this is for target device
             if param_list[2] == "rpm":
                 return "No need to extract, this is an .rpm file"
-            arch = get_dest_folder(d.getVar("TUNE_FEATURES", True), os.listdir(binaries_path))
+            arch = get_dest_folder(d.getVar("TUNE_FEATURES"), os.listdir(binaries_path))
             extracted_bin_path = os.path.join(binaries_path, arch, "extracted_binaries")
             extracted_bin_list = [item for item in os.listdir(extracted_bin_path)]
             packaged_bin_path = os.path.join(binaries_path, arch, "packaged_binaries")
@@ -206,9 +206,9 @@ def send_bin_to_DUT(d,params):
     from oeqa.oetest import oeRuntimeTest
     param_list = params
     cleanup_list = list()
-    bins_dir = os.path.join(d.getVar("TEST_EXPORT_DIR", True), "binaries") if determine_if_poky_env() \
+    bins_dir = os.path.join(d.getVar("TEST_EXPORT_DIR"), "binaries") if determine_if_poky_env() \
                     else os.getenv("bin_dir")
-    arch = get_dest_folder(d.getVar("TUNE_FEATURES", True), os.listdir(bins_dir))
+    arch = get_dest_folder(d.getVar("TUNE_FEATURES"), os.listdir(bins_dir))
     arch_rpms_dir = os.path.join(bins_dir, arch, "packaged_binaries")
     extracted_bin_dir = os.path.join(bins_dir, arch, "extracted_binaries", param_list[0])
 

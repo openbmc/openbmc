@@ -16,6 +16,9 @@ SRCREV = "db0abbb4c80f2ecef6bc5d9639bca5bea28532a2"
 
 S = "${WORKDIR}/git"
 
+# use adjtimex on musl
+CFLAGS_append_libc-musl = " -Dntp_adjtime=adjtimex"
+
 EXTRA_OEMAKE = "\
     'CC=${CC}' \
     'CFLAGS=${CFLAGS}' \
@@ -23,11 +26,7 @@ EXTRA_OEMAKE = "\
 "
 
 do_configure () {
-    sh ./configure
-}
-
-do_compile () {
-    oe_runmake
+    sh ${S}/configure
 }
 
 do_install () {

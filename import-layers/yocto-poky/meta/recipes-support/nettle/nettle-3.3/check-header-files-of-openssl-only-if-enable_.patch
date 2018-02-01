@@ -1,0 +1,38 @@
+From ffee6b5f6204a0210f717968ec6ce514d70acca1 Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Fri, 9 Dec 2016 15:23:17 +0800
+Subject: [PATCH] nettle: check header files of openssl only if
+ 'enable_openssl=yes'.
+
+The original configure script checks openssl header files to generate
+config.h even if 'enable_openssl' is not set to yes, this made inconsistent
+building for nettle.
+
+Upstream-Status: Pending
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+---
+ configure.ac | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4ead52c..982760f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -185,9 +185,11 @@ AC_HEADER_TIME
+ AC_CHECK_SIZEOF(long)
+ AC_CHECK_SIZEOF(size_t)
+ 
+-AC_CHECK_HEADERS([openssl/blowfish.h openssl/des.h openssl/cast.h openssl/aes.h openssl/ecdsa.h],,
+-[enable_openssl=no
+- break])
++if test "x$enable_openssl" = "xyes"; then
++  AC_CHECK_HEADERS([openssl/blowfish.h openssl/des.h openssl/cast.h openssl/aes.h openssl/ecdsa.h],,
++  [enable_openssl=no
++  break])
++fi
+ 
+ AC_CHECK_HEADERS([valgrind/memcheck.h])
+ 
+-- 
+1.9.1
+

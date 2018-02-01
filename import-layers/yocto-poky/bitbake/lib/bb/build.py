@@ -91,14 +91,14 @@ class TaskBase(event.Event):
 
     def __init__(self, t, logfile, d):
         self._task = t
-        self._package = d.getVar("PF", True)
-        self._mc = d.getVar("BB_CURRENT_MC", True)
-        self.taskfile = d.getVar("FILE", True)
+        self._package = d.getVar("PF")
+        self._mc = d.getVar("BB_CURRENT_MC")
+        self.taskfile = d.getVar("FILE")
         self.taskname = self._task
         self.logfile = logfile
         self.time = time.time()
         event.Event.__init__(self)
-        self._message = "recipe %s: task %s: %s" % (d.getVar("PF", True), t, self.getDisplayName())
+        self._message = "recipe %s: task %s: %s" % (d.getVar("PF"), t, self.getDisplayName())
 
     def getTask(self):
         return self._task
@@ -195,13 +195,13 @@ def exec_func(func, d, dirs = None, pythonexception=False):
         oldcwd = None
 
     flags = d.getVarFlags(func)
-    cleandirs = flags.get('cleandirs')
+    cleandirs = flags.get('cleandirs') if flags else None
     if cleandirs:
         for cdir in d.expand(cleandirs).split():
             bb.utils.remove(cdir, True)
             bb.utils.mkdirhier(cdir)
 
-    if dirs is None:
+    if flags and dirs is None:
         dirs = flags.get('dirs')
         if dirs:
             dirs = d.expand(dirs).split()
@@ -227,17 +227,17 @@ def exec_func(func, d, dirs = None, pythonexception=False):
     else:
         lockfiles = None
 
-    tempdir = d.getVar('T', True)
+    tempdir = d.getVar('T')
 
     # or func allows items to be executed outside of the normal
     # task set, such as buildhistory
-    task = d.getVar('BB_RUNTASK', True) or func
+    task = d.getVar('BB_RUNTASK') or func
     if task == func:
         taskfunc = task
     else:
         taskfunc = "%s.%s" % (task, func)
 
-    runfmt = d.getVar('BB_RUNFMT', True) or "run.{func}.{pid}"
+    runfmt = d.getVar('BB_RUNFMT') or "run.{func}.{pid}"
     runfn = runfmt.format(taskfunc=taskfunc, task=task, func=func, pid=os.getpid())
     runfile = os.path.join(tempdir, runfn)
     bb.utils.mkdirhier(os.path.dirname(runfile))
@@ -369,7 +369,7 @@ exit $ret
 
     cmd = runfile
     if d.getVarFlag(func, 'fakeroot', False):
-        fakerootcmd = d.getVar('FAKEROOT', True)
+        fakerootcmd = d.getVar('FAKEROOT')
         if fakerootcmd:
             cmd = [fakerootcmd, runfile]
 
@@ -378,7 +378,7 @@ exit $ret
     else:
         logfile = sys.stdout
 
-    progress = d.getVarFlag(func, 'progress', True)
+    progress = d.getVarFlag(func, 'progress')
     if progress:
         if progress == 'percent':
             # Use default regex
@@ -430,7 +430,7 @@ exit $ret
             else:
                 break
 
-    tempdir = d.getVar('T', True)
+    tempdir = d.getVar('T')
     fifopath = os.path.join(tempdir, 'fifo.%s' % os.getpid())
     if os.path.exists(fifopath):
         os.unlink(fifopath)
@@ -443,7 +443,7 @@ exit $ret
                 with open(os.devnull, 'r+') as stdin:
                     bb.process.run(cmd, shell=False, stdin=stdin, log=logfile, extrafiles=[(fifo,readfifo)])
             except bb.process.CmdError:
-                logfn = d.getVar('BB_LOGFILE', True)
+                logfn = d.getVar('BB_LOGFILE')
                 raise FuncFailed(func, logfn)
         finally:
             os.unlink(fifopath)
@@ -474,18 +474,18 @@ def _exec_task(fn, task, d, quieterr):
     logger.debug(1, "Executing task %s", task)
 
     localdata = _task_data(fn, task, d)
-    tempdir = localdata.getVar('T', True)
+    tempdir = localdata.getVar('T')
     if not tempdir:
         bb.fatal("T variable not set, unable to build")
 
     # Change nice level if we're asked to
-    nice = localdata.getVar("BB_TASK_NICE_LEVEL", True)
+    nice = localdata.getVar("BB_TASK_NICE_LEVEL")
     if nice:
         curnice = os.nice(0)
         nice = int(nice) - curnice
         newnice = os.nice(nice)
         logger.debug(1, "Renice to %s " % newnice)
-    ionice = localdata.getVar("BB_TASK_IONICE_LEVEL", True)
+    ionice = localdata.getVar("BB_TASK_IONICE_LEVEL")
     if ionice:
         try:
             cls, prio = ionice.split(".", 1)
@@ -496,7 +496,7 @@ def _exec_task(fn, task, d, quieterr):
     bb.utils.mkdirhier(tempdir)
 
     # Determine the logfile to generate
-    logfmt = localdata.getVar('BB_LOGFMT', True) or 'log.{task}.{pid}'
+    logfmt = localdata.getVar('BB_LOGFMT') or 'log.{task}.{pid}'
     logbase = logfmt.format(task=task, pid=os.getpid())
 
     # Document the order of the tasks...
@@ -563,6 +563,7 @@ def _exec_task(fn, task, d, quieterr):
 
     localdata.setVar('BB_LOGFILE', logfn)
     localdata.setVar('BB_RUNTASK', task)
+    localdata.setVar('BB_TASK_LOGGER', bblogger)
 
     flags = localdata.getVarFlags(task)
 
@@ -628,7 +629,7 @@ def exec_task(fn, task, d, profile = False):
             quieterr = True
 
         if profile:
-            profname = "profile-%s.log" % (d.getVar("PN", True) + "-" + task)
+            profname = "profile-%s.log" % (d.getVar("PN") + "-" + task)
             try:
                 import cProfile as profile
             except:
@@ -668,9 +669,9 @@ def stamp_internal(taskname, d, file_name, baseonly=False, noextra=False):
         stamp = d.stamp[file_name]
         extrainfo = d.stamp_extrainfo[file_name].get(taskflagname) or ""
     else:
-        stamp = d.getVar('STAMP', True)
-        file_name = d.getVar('BB_FILENAME', True)
-        extrainfo = d.getVarFlag(taskflagname, 'stamp-extra-info', True) or ""
+        stamp = d.getVar('STAMP')
+        file_name = d.getVar('BB_FILENAME')
+        extrainfo = d.getVarFlag(taskflagname, 'stamp-extra-info') or ""
 
     if baseonly:
         return stamp
@@ -704,9 +705,9 @@ def stamp_cleanmask_internal(taskname, d, file_name):
         stamp = d.stampclean[file_name]
         extrainfo = d.stamp_extrainfo[file_name].get(taskflagname) or ""
     else:
-        stamp = d.getVar('STAMPCLEAN', True)
-        file_name = d.getVar('BB_FILENAME', True)
-        extrainfo = d.getVarFlag(taskflagname, 'stamp-extra-info', True) or ""
+        stamp = d.getVar('STAMPCLEAN')
+        file_name = d.getVar('BB_FILENAME')
+        extrainfo = d.getVarFlag(taskflagname, 'stamp-extra-info') or ""
 
     if not stamp:
         return []
@@ -742,7 +743,7 @@ def make_stamp(task, d, file_name = None):
     # as it completes
     if not task.endswith("_setscene") and task != "do_setscene" and not file_name:
         stampbase = stamp_internal(task, d, None, True)
-        file_name = d.getVar('BB_FILENAME', True)
+        file_name = d.getVar('BB_FILENAME')
         bb.parse.siggen.dump_sigtask(file_name, task, stampbase, True)
 
 def del_stamp(task, d, file_name = None):
@@ -764,7 +765,7 @@ def write_taint(task, d, file_name = None):
     if file_name:
         taintfn = d.stamp[file_name] + '.' + task + '.taint'
     else:
-        taintfn = d.getVar('STAMP', True) + '.' + task + '.taint'
+        taintfn = d.getVar('STAMP') + '.' + task + '.taint'
     bb.utils.mkdirhier(os.path.dirname(taintfn))
     # The specific content of the taint file is not really important,
     # we just need it to be random, so a random UUID is used
@@ -861,3 +862,46 @@ def deltask(task, d):
         if task in deps:
             deps.remove(task)
             d.setVarFlag(bbtask, 'deps', deps)
+
+def preceedtask(task, with_recrdeptasks, d):
+    """
+    Returns a set of tasks in the current recipe which were specified as
+    precondition by the task itself ("after") or which listed themselves
+    as precondition ("before"). Preceeding tasks specified via the
+    "recrdeptask" are included in the result only if requested. Beware
+    that this may lead to the task itself being listed.
+    """
+    preceed = set()
+    preceed.update(d.getVarFlag(task, 'deps') or [])
+    if with_recrdeptasks:
+        recrdeptask = d.getVarFlag(task, 'recrdeptask')
+        if recrdeptask:
+            preceed.update(recrdeptask.split())
+    return preceed
+
+def tasksbetween(task_start, task_end, d):
+    """
+    Return the list of tasks between two tasks in the current recipe,
+    where task_start is to start at and task_end is the task to end at
+    (and task_end has a dependency chain back to task_start).
+    """
+    outtasks = []
+    tasks = list(filter(lambda k: d.getVarFlag(k, "task"), d.keys()))
+    def follow_chain(task, endtask, chain=None):
+        if not chain:
+            chain = []
+        chain.append(task)
+        for othertask in tasks:
+            if othertask == task:
+                continue
+            if task == endtask:
+                for ctask in chain:
+                    if ctask not in outtasks:
+                        outtasks.append(ctask)
+            else:
+                deps = d.getVarFlag(othertask, 'deps', False)
+                if task in deps:
+                    follow_chain(othertask, endtask, chain)
+        chain.pop()
+    follow_chain(task_start, task_end)
+    return outtasks

@@ -210,7 +210,6 @@ fieldset.fields-apart-from-layer-name { margin-top: 20px; }
 #import-layer-name,
 #layer-subdir { width: 20%; }
 #layer-git-repo-url { width: 40%; }
-#layer-git-ref { width: 32%; }
 #local-dir-path { width: 45%; }
 #layer-dependency { width: 16em; }
 #layer-deps-list { margin-top: 0; }

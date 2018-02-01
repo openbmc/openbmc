@@ -1,0 +1,28 @@
+From fa0fe001a5373c1ef9ff2175555b14fc07399e1b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 Mar 2017 10:01:44 -0700
+Subject: [PATCH] configure.ac: Do not configure build-aux
+
+Fixes
+configure: error: cannot find install-sh, install.sh, or shtool
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 17b7351..0263112 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -17,7 +17,6 @@ AC_INIT([libmemcached],VERSION_NUMBER,[http://libmemcached.org/])
+ AC_PROG_CC([cc gcc clang])
+ AC_PROG_CXX([c++ g++ clang++])
+ 
+-AC_CONFIG_AUX_DIR([build-aux])
+ AC_CONFIG_MACRO_DIR([m4])
+ 
+ AC_CANONICAL_HOST
+-- 
+2.12.0
+

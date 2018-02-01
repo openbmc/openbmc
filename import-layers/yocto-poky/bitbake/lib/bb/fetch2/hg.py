@@ -29,7 +29,6 @@ import sys
 import logging
 import bb
 import errno
-from bb import data
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import FetchError
 from bb.fetch2 import MissingParameterError
@@ -67,7 +66,7 @@ class Hg(FetchMethod):
         else:
             ud.proto = "hg"
 
-        ud.setup_revisons(d)
+        ud.setup_revisions(d)
 
         if 'rev' in ud.parm:
             ud.revision = ud.parm['rev']
@@ -78,15 +77,15 @@ class Hg(FetchMethod):
         hgsrcname = '%s_%s_%s' % (ud.module.replace('/', '.'), \
                             ud.host, ud.path.replace('/', '.'))
         ud.mirrortarball = 'hg_%s.tar.gz' % hgsrcname
-        ud.fullmirror = os.path.join(d.getVar("DL_DIR", True), ud.mirrortarball)
+        ud.fullmirror = os.path.join(d.getVar("DL_DIR"), ud.mirrortarball)
 
-        hgdir = d.getVar("HGDIR", True) or (d.getVar("DL_DIR", True) + "/hg/")
+        hgdir = d.getVar("HGDIR") or (d.getVar("DL_DIR") + "/hg/")
         ud.pkgdir = os.path.join(hgdir, hgsrcname)
         ud.moddir = os.path.join(ud.pkgdir, ud.module)
         ud.localfile = ud.moddir
-        ud.basecmd = data.getVar("FETCHCMD_hg", d, True) or "/usr/bin/env hg"
+        ud.basecmd = d.getVar("FETCHCMD_hg") or "/usr/bin/env hg"
 
-        ud.write_tarballs = d.getVar("BB_GENERATE_MIRROR_TARBALLS", True)
+        ud.write_tarballs = d.getVar("BB_GENERATE_MIRROR_TARBALLS")
 
     def need_update(self, ud, d):
         revTag = ud.parm.get('rev', 'tip')
@@ -99,7 +98,7 @@ class Hg(FetchMethod):
     def try_premirror(self, ud, d):
         # If we don't do this, updating an existing checkout with only premirrors
         # is not possible
-        if d.getVar("BB_FETCH_PREMIRRORONLY", True) is not None:
+        if d.getVar("BB_FETCH_PREMIRRORONLY") is not None:
             return True
         if os.path.exists(ud.moddir):
             return False
@@ -221,7 +220,7 @@ class Hg(FetchMethod):
         """
         Compute tip revision for the url
         """
-        bb.fetch2.check_network_access(d, self._buildhgcommand(ud, d, "info"))
+        bb.fetch2.check_network_access(d, self._buildhgcommand(ud, d, "info"), ud.url)
         output = runfetchcmd(self._buildhgcommand(ud, d, "info"), d)
         return output.strip()
 

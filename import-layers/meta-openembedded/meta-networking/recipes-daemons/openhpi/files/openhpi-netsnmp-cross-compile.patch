@@ -1,0 +1,48 @@
+Fix net-snmp when cross-compiling
+
+Remove irrelevant references to net-snmp libs and flags
+when cross-compiling net-snmp
+
+Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ acinclude.m4 | 4 ++--
+ configure    | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 82c33f6..727e461 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -160,8 +160,8 @@ AC_DEFUN([OH_CHECK_NETSNMP],
+     ],
+     [
+         have_netsnmp=yes
+-        SNMPFLAGS=`${net_snmp_config:-net-snmp-config} --cflags | perl -p -e 's/-O\S*//g'`
+-        SNMPLIBS=`${net_snmp_config:-net-snmp-config} --libs`
++        SNMPFLAGS=""
++        SNMPLIBS=""
+         AC_MSG_RESULT(yes)
+     ],
+     [AC_MSG_RESULT(no.  No SNMP based plugins can be built!)])
+diff --git a/configure b/configure
+index 00067bc..36b913c 100755
+--- a/configure
++++ b/configure
+@@ -15949,8 +15949,8 @@ _ACEOF
+ if ac_fn_c_try_link "$LINENO"; then :
+ 
+         have_netsnmp=yes
+-        SNMPFLAGS=`${net_snmp_config:-net-snmp-config} --cflags | perl -p -e 's/-O\S*//g'`
+-        SNMPLIBS=`${net_snmp_config:-net-snmp-config} --libs`
++        SNMPFLAGS=""
++        SNMPLIBS=""
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+ $as_echo "yes" >&6; }
+ 
+-- 
+1.9.1
+

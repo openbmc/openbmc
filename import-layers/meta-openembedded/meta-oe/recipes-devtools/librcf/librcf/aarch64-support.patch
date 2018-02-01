@@ -1,0 +1,13 @@
+Index: RCF-2.2.0.0/src/RCF/ByteOrdering.cpp
+===================================================================
+--- RCF-2.2.0.0.orig/src/RCF/ByteOrdering.cpp
++++ RCF-2.2.0.0/src/RCF/ByteOrdering.cpp
+@@ -60,7 +60,7 @@ namespace RCF {
+ 
+     const ByteOrder MachineByteOrder = LittleEndian;
+ 
+-#elif defined(__arm__)
++#elif defined(__arm__) || defined(__aarch64__)
+ 
+     const ByteOrder MachineByteOrder = LittleEndian;
+ 

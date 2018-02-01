@@ -1,0 +1,112 @@
+From b8c8fbe0a2481e97fc57dd596346827a692a5768 Mon Sep 17 00:00:00 2001
+From: Dave Anderson <anderson@redhat.com>
+Date: Tue, 28 Mar 2017 15:44:40 -0400
+Subject: [PATCH 1/3] Fix for a compilation error if glibc-2.25 or later has
+ been installed on the host build machine.  Without the patch, the build fails
+ with the error message "amd64-linux-nat.c:496:1: error: conflicting types for
+ 'ps_get_thread_area'". (anderson@redhat.com)
+
+Upstream-Status: Backport
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ Makefile                     |  6 +++++
+ configure.c                  |  2 +-
+ gdb-7.6-proc_service.h.patch | 55 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 62 insertions(+), 1 deletion(-)
+ create mode 100644 gdb-7.6-proc_service.h.patch
+
+diff --git a/Makefile b/Makefile
+index 202ef8b..b6b7e80 100644
+--- a/Makefile
++++ b/Makefile
+@@ -264,6 +264,12 @@ gdb_patch:
+ 	if [ "${ARCH}" = "x86_64" ] && [ "${TARGET}" = "PPC64" ] && [ -f ${GDB}-ppc64le-support.patch ]; then \
+ 		patch -d ${GDB} -p1 -F0 < ${GDB}-ppc64le-support.patch ; \
+ 	fi
++	if [ -f /usr/include/proc_service.h ]; then \
++		grep 'extern ps_err_e ps_get_thread_area (struct' /usr/include/proc_service.h; \
++		if [ $$? -eq 0 ]; then \
++			patch -p0 < ${GDB}-proc_service.h.patch; \
++		fi; \
++	fi
+ 
+ library: make_build_data ${OBJECT_FILES}
+ 	ar -rs ${PROGRAM}lib.a ${OBJECT_FILES}
+diff --git a/configure.c b/configure.c
+index d63cdd7..776defe 100644
+--- a/configure.c
++++ b/configure.c
+@@ -240,7 +240,7 @@ struct supported_gdb_version {
+ 	    "7.6",
+ 	    "GDB_FILES=${GDB_7.6_FILES}",
+ 	    "GDB_OFILES=${GDB_7.6_OFILES}",
+-	    "GDB_PATCH_FILES=gdb-7.6.patch gdb-7.6-ppc64le-support.patch",
++	    "GDB_PATCH_FILES=gdb-7.6.patch gdb-7.6-ppc64le-support.patch gdb-7.6-proc_service.h.patch",
+ 	    "GDB_FLAGS=-DGDB_7_6",
+ 	    "GPLv3"
+ 	},
+diff --git a/gdb-7.6-proc_service.h.patch b/gdb-7.6-proc_service.h.patch
+new file mode 100644
+index 0000000..49d18bb
+--- /dev/null
++++ b/gdb-7.6-proc_service.h.patch
+@@ -0,0 +1,55 @@
++--- gdb-7.6/gdb/gdb_proc_service.h.orig
+++++ gdb-7.6/gdb/gdb_proc_service.h
++@@ -115,7 +115,7 @@ extern pid_t ps_getpid (struct ps_procha
++ /* Fetch the special per-thread address associated with the given LWP.
++    This call is only used on a few platforms (most use a normal register).
++    The meaning of the `int' parameter is machine-dependent.  */
++-extern ps_err_e ps_get_thread_area (const struct ps_prochandle *,
+++extern ps_err_e ps_get_thread_area (struct ps_prochandle *,
++ 				    lwpid_t, int, psaddr_t *);
++ 
++ 
++--- gdb-7.6/gdb/amd64-linux-nat.c.orig
+++++ gdb-7.6/gdb/amd64-linux-nat.c
++@@ -493,7 +493,7 @@ amd64_linux_new_fork (struct lwp_info *p
++    a request for a thread's local storage address.  */
++ 
++ ps_err_e
++-ps_get_thread_area (const struct ps_prochandle *ph,
+++ps_get_thread_area (struct ps_prochandle *ph,
++                     lwpid_t lwpid, int idx, void **base)
++ {
++   if (gdbarch_bfd_arch_info (target_gdbarch ())->bits_per_word == 32)
++--- gdb-7.6/gdb/aarch64-linux-nat.c.orig
+++++ gdb-7.6/gdb/aarch64-linux-nat.c
++@@ -750,7 +750,7 @@ aarch64_linux_new_fork (struct lwp_info
++    storage (or its descriptor).  */
++ 
++ ps_err_e
++-ps_get_thread_area (const struct ps_prochandle *ph,
+++ps_get_thread_area (struct ps_prochandle *ph,
++ 		    lwpid_t lwpid, int idx, void **base)
++ {
++   struct iovec iovec;
++--- gdb-7.6/gdb/arm-linux-nat.c.orig
+++++ gdb-7.6/gdb/arm-linux-nat.c
++@@ -613,7 +613,7 @@ supply_fpregset (struct regcache *regcac
++ /* Fetch the thread-local storage pointer for libthread_db.  */
++ 
++ ps_err_e
++-ps_get_thread_area (const struct ps_prochandle *ph,
+++ps_get_thread_area (struct ps_prochandle *ph,
++                     lwpid_t lwpid, int idx, void **base)
++ {
++   if (ptrace (PTRACE_GET_THREAD_AREA, lwpid, NULL, base) != 0)
++--- gdb-7.6/gdb/i386-linux-nat.c.orig
+++++ gdb-7.6/gdb/i386-linux-nat.c
++@@ -849,7 +849,7 @@ i386_linux_new_fork (struct lwp_info *pa
++    storage (or its descriptor).  */
++ 
++ ps_err_e
++-ps_get_thread_area (const struct ps_prochandle *ph, 
+++ps_get_thread_area (struct ps_prochandle *ph, 
++ 		    lwpid_t lwpid, int idx, void **base)
++ {
++   /* NOTE: cagney/2003-08-26: The definition of this buffer is found
+-- 
+2.8.1
+

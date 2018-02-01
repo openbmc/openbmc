@@ -18,4 +18,4 @@ do_install() {
 	oe_runmake install
 }
 
-BBCLASSEXTEND += "native nativesdk"
+BBCLASSEXTEND = "native nativesdk"

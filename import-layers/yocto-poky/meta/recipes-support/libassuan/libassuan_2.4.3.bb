@@ -28,4 +28,4 @@ do_configure_prepend () {
 	rm -f ${S}/m4/*.m4
 }
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

@@ -71,6 +71,7 @@
           inCurrentPrj : false,
           {% endif %}
           layerdetailurl : "{% url 'layerdetails' project.id layerversion.id  %}",
+          xhrLayerUrl: "{% url 'xhr_layer' project.id layerversion.id  %}",
           layer_source: {{layerversion.layer_source|json}},
         },
         layerSourceTypes: {{layer_source|json}},

@@ -25,7 +25,7 @@ class ClassExtender(object):
         return name
 
     def map_variable(self, varname, setvar = True):
-        var = self.d.getVar(varname, True)
+        var = self.d.getVar(varname)
         if not var:
             return ""
         var = var.split()
@@ -38,7 +38,7 @@ class ClassExtender(object):
         return newdata
 
     def map_regexp_variable(self, varname, setvar = True):
-        var = self.d.getVar(varname, True)
+        var = self.d.getVar(varname)
         if not var:
             return ""
         var = var.split()
@@ -60,7 +60,7 @@ class ClassExtender(object):
             return dep
         else:
             # Do not extend for that already have multilib prefix
-            var = self.d.getVar("MULTILIB_VARIANTS", True)
+            var = self.d.getVar("MULTILIB_VARIANTS")
             if var:
                 var = var.split()
                 for v in var:
@@ -74,7 +74,7 @@ class ClassExtender(object):
             varname = varname + "_" + suffix
         orig = self.d.getVar("EXTENDPKGV", False)
         self.d.setVar("EXTENDPKGV", "EXTENDPKGV")
-        deps = self.d.getVar(varname, True)
+        deps = self.d.getVar(varname)
         if not deps:
             self.d.setVar("EXTENDPKGV", orig)
             return
@@ -87,7 +87,7 @@ class ClassExtender(object):
         self.d.setVar("EXTENDPKGV", orig)
 
     def map_packagevars(self):
-        for pkg in (self.d.getVar("PACKAGES", True).split() + [""]):
+        for pkg in (self.d.getVar("PACKAGES").split() + [""]):
             self.map_depends_variable("RDEPENDS", pkg)
             self.map_depends_variable("RRECOMMENDS", pkg)
             self.map_depends_variable("RSUGGESTS", pkg)
@@ -97,7 +97,7 @@ class ClassExtender(object):
             self.map_depends_variable("PKG", pkg)
 
     def rename_packages(self):
-        for pkg in (self.d.getVar("PACKAGES", True) or "").split():
+        for pkg in (self.d.getVar("PACKAGES") or "").split():
             if pkg.startswith(self.extname):
                self.pkgs_mapping.append([pkg.split(self.extname + "-")[1], pkg])
                continue

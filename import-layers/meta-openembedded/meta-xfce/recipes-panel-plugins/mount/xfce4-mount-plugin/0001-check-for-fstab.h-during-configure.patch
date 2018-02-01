@@ -1,0 +1,87 @@
+From 09e325f8296eb9e63dc57ed137f4a9940f164563 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 21 Mar 2017 17:11:46 -0700
+Subject: [PATCH] check for fstab.h during configure
+
+fstab.h is not universally available, checking it during
+configure creates a knob to disable fstab reads in the
+plugin
+
+Makes it compile/build with musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Patch Reworked for xfce4-mount-plugin 0.6.4->1.1.2
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac           |  1 +
+ panel-plugin/devices.c | 22 +++++++++++++++++++---
+ 2 files changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b131117..c633fef 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -69,6 +69,7 @@ AC_CHECK_HEADERS([sys/socket.h])
+ AC_CHECK_HEADERS([sys/time.h])
+ AC_CHECK_HEADERS([unistd.h])
+ AC_CHECK_HEADERS([sys/sockio.h])
++AC_CHECK_HEADERS([fstab.h])
+ AC_HEADER_SYS_WAIT
+ AC_PROG_GCC_TRADITIONAL
+ AC_TYPE_SIZE_T
+diff --git a/panel-plugin/devices.c b/panel-plugin/devices.c
+index 797b079..d29df56 100644
+--- a/panel-plugin/devices.c
++++ b/panel-plugin/devices.c
+@@ -24,8 +24,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ #ifdef HAVE_CONFIG_H
+ #include <config.h>
+ #endif
+-
++#if HAVE_FSTAB_H
+ #include <fstab.h>
++#endif
++
+ #include <glib.h>
+ #include <stdio.h>
+ #include <string.h>
+@@ -468,11 +470,12 @@ disks_new (gboolean include_NFSs, gboolean *showed_fstab_dialog, gint length)
+ {
+     GPtrArray * pdisks; /* to be returned */
+     t_disk * pdisk;
+-    struct fstab *pfstab;
+     gboolean has_valid_mount_device;
+ 
+     pdisks = g_ptr_array_new();
+ 
++#if HAVE_FSTAB_H
++    struct fstab *pfstab;
+     /* open fstab */
+     if (setfsent()!=1)
+     {
+@@ -526,7 +529,20 @@ disks_new (gboolean include_NFSs, gboolean *showed_fstab_dialog, gint length)
+     } /* end for */
+ 
+     endfsent(); /* close file */
+-
++#else
++        /* popup notification dialog */
++        if (! (*showed_fstab_dialog) ) {
++            xfce_message_dialog (NULL,
++                               _("Xfce 4 Mount Plugin"),
++                               "dialog-info",
++                               _("Your /etc/fstab could not be read because fstab is not supported. This will severely degrade the plugin's abilities."),
++                               NULL,
++                               "gtk-ok",
++                               GTK_RESPONSE_OK,
++                               NULL);
++             *showed_fstab_dialog = TRUE;
++         }
++#endif
+     return pdisks;
+ }
+ 
+-- 
+2.9.3
+

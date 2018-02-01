@@ -1,0 +1,19 @@
+Do not add prefix/lib to library search path
+let sysroot take care of that
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate[Cross-compile specific]
+
+Index: boinc-client_release-7.6-7.6.33/m4/ax_check_gl.m4
+===================================================================
+--- boinc-client_release-7.6-7.6.33.orig/m4/ax_check_gl.m4
++++ boinc-client_release-7.6-7.6.33/m4/ax_check_gl.m4
+@@ -58,7 +58,7 @@ else
+     else
+       ax_try_lib="${ax_lib}"
+     fi
+-    LIBS="-L${prefix}/lib ${ax_try_lib} ${GL_LIBS} ${ax_save_LIBS}"
++    LIBS="${ax_try_lib} ${GL_LIBS} ${ax_save_LIBS}"
+     AC_LINK_IFELSE(
+     [AC_LANG_PROGRAM([[
+ # if HAVE_WINDOWS_H && defined(_WIN32)

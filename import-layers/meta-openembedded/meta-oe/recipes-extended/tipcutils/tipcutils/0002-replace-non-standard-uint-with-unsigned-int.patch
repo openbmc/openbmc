@@ -1,0 +1,211 @@
+From 3d091efa09478d0330be686184ae4793764504e7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 11 Apr 2017 14:22:23 -0700
+Subject: [PATCH 2/2] replace non-standard uint with unsigned int
+
+make it portable on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ demos/benchmark/client_tipc.c       | 34 +++++++++++++++++-----------------
+ demos/benchmark/common_tipc.h       |  2 +-
+ demos/benchmark/server_tipc.c       | 10 +++++-----
+ demos/inventory_sim/inventory_sim.c | 12 ++++++------
+ 4 files changed, 29 insertions(+), 29 deletions(-)
+
+diff --git a/demos/benchmark/client_tipc.c b/demos/benchmark/client_tipc.c
+index 5d889ee..d913e42 100644
+--- a/demos/benchmark/client_tipc.c
++++ b/demos/benchmark/client_tipc.c
+@@ -65,7 +65,7 @@ static const struct sockaddr_tipc master_clnt_addr = {
+ 
+ static int master_clnt_sd;
+ static int master_srv_sd;
+-static uint client_id;
++static unsigned int client_id;
+ static unsigned char *buf = NULL;
+ static int non_blk = 0;
+ static int select_ip(struct srv_info *sinfo, char *name);
+@@ -79,7 +79,7 @@ struct master_client_cmd {
+ 	__u32 bounce;
+ };
+ 
+-static void master_to_client(uint cmd, uint msglen, uint msgcnt, uint bounce)
++static void master_to_client(unsigned int cmd, unsigned int msglen, unsigned int msgcnt, unsigned int bounce)
+ {
+ 	struct master_client_cmd c;
+ 
+@@ -93,7 +93,7 @@ static void master_to_client(uint cmd, uint msglen, uint msgcnt, uint bounce)
+ 		die("Unable to send cmd %u to clients\n", cmd);
+ }
+ 
+-static void client_from_master(uint *cmd, uint *msglen, uint *msgcnt, uint *bounce)
++static void client_from_master(unsigned int *cmd, unsigned int *msglen, unsigned int *msgcnt, unsigned int *bounce)
+ {
+ 	struct master_client_cmd c;
+ 
+@@ -114,7 +114,7 @@ struct client_master_cmd {
+ 	__u32 cmd;
+ };
+ 
+-static void client_to_master(uint cmd)
++static void client_to_master(unsigned int cmd)
+ {
+ 	struct client_master_cmd c;
+ 
+@@ -125,7 +125,7 @@ static void client_to_master(uint cmd)
+ 		die("Client: Unable to send msg to master\n");
+ }
+ 
+-static void master_from_client(uint *cmd)
++static void master_from_client(unsigned int *cmd)
+ {
+ 	struct client_master_cmd c;
+ 
+@@ -137,7 +137,7 @@ static void master_from_client(uint *cmd)
+ 	*cmd = ntohl(c.cmd);
+ }
+ 
+-static void master_to_srv(uint cmd, uint msglen, uint msgcnt, uint echo)
++static void master_to_srv(unsigned int cmd, unsigned int msglen, unsigned int msgcnt, unsigned int echo)
+ {
+ 	struct master_srv_cmd c;
+ 
+@@ -151,7 +151,7 @@ static void master_to_srv(uint cmd, uint msglen, uint msgcnt, uint echo)
+ 		die("Unable to send cmd %u to servers\n", cmd);
+ }
+ 
+-static void master_from_srv(uint *cmd, struct srv_info *sinfo, __u32 *tipc_addr)
++static void master_from_srv(unsigned int *cmd, struct srv_info *sinfo, __u32 *tipc_addr)
+ {
+ 	struct srv_to_master_cmd c;
+ 
+@@ -290,7 +290,7 @@ static void client_main(unsigned int clnt_id, ushort tcp_port, int tcp_addr)
+ {
+ 	int peer_sd, efd = 0;
+ 	int imp = clnt_id % 4;
+-	uint cmd, msglen, msgcnt, echo;
++	unsigned int cmd, msglen, msgcnt, echo;
+ 	struct epoll_event event, revents;
+ 	struct sockaddr_in tcp_dest;
+ 	int rc;
+@@ -400,22 +400,22 @@ static void client_main(unsigned int clnt_id, ushort tcp_port, int tcp_addr)
+ int main(int argc, char *argv[], char *dummy[])
+ {
+ 	int c;
+-	uint cmd;
+-	uint latency_transf = DEFAULT_LAT_MSGS;
+-	uint thruput_transf = DEFAULT_THRU_MSGS;
+-	uint req_clients = DEFAULT_CLIENTS;
+-	uint first_msglen = DEFAULT_MSGLEN;
+-	uint last_msglen = TIPC_MAX_USER_MSG_SIZE;
++	unsigned int cmd;
++	unsigned int latency_transf = DEFAULT_LAT_MSGS;
++	unsigned int thruput_transf = DEFAULT_THRU_MSGS;
++	unsigned int req_clients = DEFAULT_CLIENTS;
++	unsigned int first_msglen = DEFAULT_MSGLEN;
++	unsigned int last_msglen = TIPC_MAX_USER_MSG_SIZE;
+ 	unsigned long long msglen;
+ 	unsigned long long num_clients;
+ 	struct timeval start_time;
+ 	unsigned long long elapsed;
+ 	unsigned long long msgcnt;
+ 	unsigned long long iter;
+-	uint clnt_id;
+-	uint conn_typ = TIPC_CONN;
++	unsigned int clnt_id;
++	unsigned int conn_typ = TIPC_CONN;
+ 	ushort tcp_port = 0;
+-	uint tcp_addr = 0;
++	unsigned int tcp_addr = 0;
+ 	struct srv_info sinfo;
+ 	__u32 peer_tipc_addr;
+ 	char ifname[16] = {0,};
+diff --git a/demos/benchmark/common_tipc.h b/demos/benchmark/common_tipc.h
+index 1765ba1..47947e0 100644
+--- a/demos/benchmark/common_tipc.h
++++ b/demos/benchmark/common_tipc.h
+@@ -256,7 +256,7 @@ static void get_ip_list(struct srv_info *sinfo, char *ifname)
+ 	}
+ }
+ 
+-static uint own_node(void)
++static unsigned int own_node(void)
+ {
+ 	struct sockaddr_tipc addr;
+ 	socklen_t sz = sizeof(addr);
+diff --git a/demos/benchmark/server_tipc.c b/demos/benchmark/server_tipc.c
+index 9d0e2be..3cd82b7 100644
+--- a/demos/benchmark/server_tipc.c
++++ b/demos/benchmark/server_tipc.c
+@@ -45,7 +45,7 @@ static int wait_for_connection(int listener_sd);
+ static void echo_messages(int peer_sd, int master_sd, int srv_id);
+ static __u32 own_node_addr;
+ 
+-static void srv_to_master(uint cmd, struct srv_info *sinfo)
++static void srv_to_master(unsigned int cmd, struct srv_info *sinfo)
+ {
+ 	struct srv_to_master_cmd c;
+ 
+@@ -62,7 +62,7 @@ static void srv_to_master(uint cmd, struct srv_info *sinfo)
+ 		die("Server: unable to send info to master\n");
+ }
+ 
+-static void srv_from_master(uint *cmd, uint* msglen, uint *msgcnt, uint *echo)
++static void srv_from_master(unsigned int *cmd, unsigned int* msglen, unsigned int *msgcnt, unsigned int *echo)
+ {
+ 	struct master_srv_cmd c;
+ 
+@@ -84,8 +84,8 @@ int main(int argc, char *argv[], char *dummy[])
+ {
+ 	ushort tcp_port = 4711;
+ 	struct srv_info sinfo;
+-	uint cmd;
+-	uint max_msglen;
++	unsigned int cmd;
++	unsigned int max_msglen;
+ 	struct sockaddr_in srv_addr;
+ 	int lstn_sd, peer_sd;
+ 	int srv_id = 0, srv_cnt = 0;;
+@@ -221,7 +221,7 @@ static int wait_for_connection(int lstn_sd)
+ 
+ static void echo_messages(int peer_sd, int master_sd, int srv_id)
+ {
+-	uint cmd, msglen, msgcnt, echo, rcvd = 0;
++	unsigned int cmd, msglen, msgcnt, echo, rcvd = 0;
+ 
+ 	do {
+ 		/* Get msg length and number to expect, and ack: */
+diff --git a/demos/inventory_sim/inventory_sim.c b/demos/inventory_sim/inventory_sim.c
+index 22c33d1..9bf5443 100644
+--- a/demos/inventory_sim/inventory_sim.c
++++ b/demos/inventory_sim/inventory_sim.c
+@@ -940,9 +940,9 @@ int simItem(int itemID, int lagTime, int speed)
+ 	char outMsg[MSG_SIZE_MAX];
+ 	char *marker;
+ 	int msgSize;
+-	uint zone;
+-	uint cluster;
+-	uint node;
++	unsigned int zone;
++	unsigned int cluster;
++	unsigned int node;
+ 	char itemName[NAME_SIZE];
+ 	int haveItem;
+ 	int res;
+@@ -1134,9 +1134,9 @@ int simCust(int itemID, int lagTime, int waitTime, int speed, int taskID)
+ 	char msg[MSG_SIZE_MAX];
+ 	char *marker;
+ 	int msgSize;
+-	uint zone;
+-	uint cluster;
+-	uint node;
++	unsigned int zone;
++	unsigned int cluster;
++	unsigned int node;
+ 	char custName[NAME_SIZE];
+ 	int transactionID;
+ 	int needItem;
+-- 
+2.12.2
+

@@ -1,0 +1,27 @@
+From 1f92aa5c8d910519e3a74b2e3a9199aa9026a16c Mon Sep 17 00:00:00 2001
+From: Arun Raghavan <git@arunraghavan.net>
+Date: Mon, 25 Jan 2016 08:41:42 +0530
+Subject: [PATCH 1/2] build-sys: Use C++11 for building
+
+This requirement was added by gtkmm at some point:
+
+http://www.murrayc.com/permalink/2015/07/31/gtkmm-now-uses-c11/
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 5b50e2d..8f28782 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -39,6 +39,7 @@ AC_PROG_CC
+ AC_PROG_LN_S
+ AC_TYPE_SIGNAL
+ AC_HEADER_STDC
++AX_CXX_COMPILE_STDCXX_11
+ 
+ AC_ARG_ENABLE(gtk3,
+    [AS_HELP_STRING([--disable-gtk3],
+-- 
+2.12.1
+

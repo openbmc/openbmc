@@ -1,0 +1,18 @@
+configure has a piece of logic to detect users "abusing" CC to hold compiler
+flags (which we do).  It also has logic to "correct" this by moving the flags
+from CC to CFLAGS, but the sed only handles a single argument in CC.
+
+Replace the sed with awk to filter out all words that start with a hyphen.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure b/configure
+index 7f31208..1a29cfc 100755
+--- a/configure
++++ b/configure
+@@ -2191,2 +2191,2 @@ echo "$as_me: WARNING: your environment misuses the CC variable to hold CFLAGS/C
+-	cf_flags=`echo "$CC" | sed -e 's/^.*[ 	]\(-[^ 	]\)/\1/'`
+-	CC=`echo "$CC " | sed -e 's/[ 	]-[^ 	].*$//' -e 's/[ 	]*$//'`
++	cf_flags=`echo "$CC" | awk  'BEGIN{ORS=" ";RS=" "} /^-.+/ {print $1}'`
++	CC=`echo "$CC " | awk  'BEGIN{ORS=" ";RS=" "} /^[^-].+/ {print $1}'`

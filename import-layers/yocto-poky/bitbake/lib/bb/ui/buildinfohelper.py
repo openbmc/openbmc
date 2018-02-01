@@ -42,10 +42,12 @@ from orm.models import Variable, VariableHistory
 from orm.models import Package, Package_File, Target_Installed_Package, Target_File
 from orm.models import Task_Dependency, Package_Dependency
 from orm.models import Recipe_Dependency, Provides
-from orm.models import Project, CustomImagePackage, CustomImageRecipe
+from orm.models import Project, CustomImagePackage
 from orm.models import signal_runbuilds
 
 from bldcontrol.models import BuildEnvironment, BuildRequest
+from bldcontrol.models import BRLayer
+from bldcontrol import bbcontroller
 
 from bb.msg import BBLogFormatter as formatter
 from django.db import models
@@ -361,11 +363,6 @@ class ORMWrapper(object):
 
     def get_update_layer_version_object(self, build_obj, layer_obj, layer_version_information):
         if isinstance(layer_obj, Layer_Version):
-            # Special case the toaster-custom-images layer which is created
-            # on the fly so don't update the values which may cause the layer
-            # to be duplicated on a future get_or_create
-            if layer_obj.layer.name == CustomImageRecipe.LAYER_NAME:
-                return layer_obj
             # We already found our layer version for this build so just
             # update it with the new build information
             logger.debug("We found our layer from toaster")
@@ -384,8 +381,8 @@ class ORMWrapper(object):
                 local_path=layer_version_information['local_path'],
             )
 
-            logger.info("created new historical layer version %d",
-                        layer_copy.pk)
+            logger.debug("Created new layer version %s for build history",
+                         layer_copy.layer.name)
 
             self.layer_version_built.append(layer_copy)
 
@@ -441,48 +438,33 @@ class ORMWrapper(object):
         else:
             br_id, be_id = brbe.split(":")
 
-            # find layer by checkout path;
-            from bldcontrol import bbcontroller
-            bc = bbcontroller.getBuildEnvironmentController(pk = be_id)
+            # Find the layer version by matching the layer event information
+            # against the metadata we have in Toaster
 
-            # we might have a race condition here, as the project layers may change between the build trigger and the actual build execution
-            # but we can only match on the layer name, so the worst thing can happen is a mis-identification of the layer, not a total failure
+            try:
+                br_layer = BRLayer.objects.get(req=br_id,
+                                               name=layer_information['name'])
+                return br_layer.layer_version
+            except (BRLayer.MultipleObjectsReturned, BRLayer.DoesNotExist):
+                # There are multiple of the same layer name or the name
+                # hasn't been determined by the toaster.bbclass layer
+                # so let's filter by the local_path
+                bc = bbcontroller.getBuildEnvironmentController(pk=be_id)
+                for br_layer in BRLayer.objects.filter(req=br_id):
+                    if br_layer.giturl and \
+                       layer_information['local_path'].endswith(
+                           bc.getGitCloneDirectory(br_layer.giturl,
+                                                   br_layer.commit)):
+                            return br_layer.layer_version
 
-            # note that this is different
-            buildrequest = BuildRequest.objects.get(pk = br_id)
-            for brl in buildrequest.brlayer_set.all():
-                if brl.local_source_dir:
-                    localdirname = os.path.join(brl.local_source_dir,
-                                                brl.dirpath)
-                else:
-                    localdirname = os.path.join(bc.getGitCloneDirectory(brl.giturl, brl.commit), brl.dirpath)
-                # we get a relative path, unless running in HEAD mode where the path is absolute
-                if not localdirname.startswith("/"):
-                    localdirname = os.path.join(bc.be.sourcedir, localdirname)
-                #logger.debug(1, "Localdirname %s lcal_path %s" % (localdirname, layer_information['local_path']))
-                if localdirname.startswith(layer_information['local_path']):
-                  # If the build request came from toaster this field
-                  # should contain the information from the layer_version
-                  # That created this build request.
-                    if brl.layer_version:
-                        return brl.layer_version
+                    if br_layer.local_source_dir == \
+                            layer_information['local_path']:
+                        return br_layer.layer_version
 
-                # This might be a local layer (i.e. no git info) so try
-                # matching local_source_dir
-                if brl.local_source_dir and brl.local_source_dir == layer_information["local_path"]:
-                    return brl.layer_version
-
-                    # we matched the BRLayer, but we need the layer_version that generated this BR; reverse of the Project.schedule_build()
-                    #logger.debug(1, "Matched %s to BRlayer %s" % (pformat(layer_information["local_path"]), localdirname))
-
-                    for pl in buildrequest.project.projectlayer_set.filter(layercommit__layer__name = brl.name):
-                        if pl.layercommit.layer.vcs_url == brl.giturl :
-                            layer = pl.layercommit.layer
-                            layer.save()
-                            return layer
-
-            raise NotExisting("Unidentified layer %s" % pformat(layer_information))
-
+        # We've reached the end of our search and couldn't find the layer
+        # we can continue but some data may be missing
+        raise NotExisting("Unidentified layer %s" %
+                          pformat(layer_information))
 
     def save_target_file_information(self, build_obj, target_obj, filedata):
         assert isinstance(build_obj, Build)
@@ -876,6 +858,12 @@ class MockEvent(object):
         self.pathname = None
         self.lineno = None
 
+    def getMessage(self):
+        """
+        Simulate LogRecord message return
+        """
+        return self.msg
+
 
 class BuildInfoHelper(object):
     """ This class gathers the build information from the server and sends it
@@ -983,9 +971,10 @@ class BuildInfoHelper(object):
         return task_information
 
     def _get_layer_version_for_dependency(self, pathRE):
-        """ Returns the layer in the toaster db that has a full regex match to the pathRE.
-        pathRE - the layer path passed as a regex in the event. It is created in
-          cooker.py as a collection for the layer priorities.
+        """ Returns the layer in the toaster db that has a full regex
+        match to the pathRE. pathRE - the layer path passed as a regex in the
+        event. It is created in cooker.py as a collection for the layer
+        priorities.
         """
         self._ensure_build()
 
@@ -993,19 +982,31 @@ class BuildInfoHelper(object):
             assert isinstance(layer_version, Layer_Version)
             return len(layer_version.local_path)
 
-        # we don't care if we match the trailing slashes
-        p = re.compile(re.sub("/[^/]*?$","",pathRE))
-        # Heuristics: we always match recipe to the deepest layer path in the discovered layers
-        for lvo in sorted(self.orm_wrapper.layer_version_objects, reverse=True, key=_sort_longest_path):
-            if p.fullmatch(lvo.local_path):
+        # Our paths don't append a trailing slash
+        if pathRE.endswith("/"):
+            pathRE = pathRE[:-1]
+
+        p = re.compile(pathRE)
+        path=re.sub(r'[$^]',r'',pathRE)
+        # Heuristics: we always match recipe to the deepest layer path in
+        # the discovered layers
+        for lvo in sorted(self.orm_wrapper.layer_version_objects,
+                          reverse=True, key=_sort_longest_path):
+            if p.fullmatch(os.path.abspath(lvo.local_path)):
                 return lvo
             if lvo.layer.local_source_dir:
-                if p.fullmatch(lvo.layer.local_source_dir):
+                if p.fullmatch(os.path.abspath(lvo.layer.local_source_dir)):
                     return lvo
-        #if we get here, we didn't read layers correctly; dump whatever information we have on the error log
-        logger.warning("Could not match layer dependency for path %s : %s", path, self.orm_wrapper.layer_version_objects)
+            if 0 == path.find(lvo.local_path):
+                # sub-layer path inside existing layer
+                return lvo
 
-
+        # if we get here, we didn't read layers correctly;
+        # dump whatever information we have on the error log
+        logger.warning("Could not match layer dependency for path %s : %s",
+                       pathRE,
+                       self.orm_wrapper.layer_version_objects)
+        return None
 
     def _get_layer_version_for_path(self, path):
         self._ensure_build()
@@ -1268,6 +1269,14 @@ class BuildInfoHelper(object):
                 candidates = [x for x in self.internal_state['taskdata'].keys() if x.endswith(identifier)]
                 if len(candidates) == 1:
                     identifier = candidates[0]
+                elif len(candidates) > 1 and hasattr(event,'_package'):
+                    if 'native-' in event._package:
+                        identifier = 'native:' + identifier
+                    if 'nativesdk-' in event._package:
+                        identifier = 'nativesdk:' + identifier
+                    candidates = [x for x in self.internal_state['taskdata'].keys() if x.endswith(identifier)]
+                    if len(candidates) == 1:
+                        identifier = candidates[0]
 
         assert identifier in self.internal_state['taskdata']
         identifierlist = identifier.split(":")
@@ -1398,9 +1407,9 @@ class BuildInfoHelper(object):
             for lv in event._depgraph['layer-priorities']:
                 (_, path, _, priority) = lv
                 layer_version_obj = self._get_layer_version_for_dependency(path)
-                assert layer_version_obj is not None
-                layer_version_obj.priority = priority
-                layer_version_obj.save()
+                if layer_version_obj:
+                    layer_version_obj.priority = priority
+                    layer_version_obj.save()
 
         # save recipe information
         self.internal_state['recipes'] = {}
@@ -1664,6 +1673,36 @@ class BuildInfoHelper(object):
                 endswith = True
                 break
         return endswith
+
+    def scan_task_artifacts(self, event):
+        """
+        The 'TaskArtifacts' event passes the manifest file content for the
+        tasks 'do_deploy', 'do_image_complete', 'do_populate_sdk', and
+        'do_populate_sdk_ext'. The first two will be implemented later.
+        """
+        task_vars = BuildInfoHelper._get_data_from_event(event)
+        task_name = task_vars['task'][task_vars['task'].find(':')+1:]
+        task_artifacts = task_vars['artifacts']
+
+        if task_name in ['do_populate_sdk', 'do_populate_sdk_ext']:
+            targets = [target for target in self.internal_state['targets'] \
+                if target.task == task_name[3:]]
+            if not targets:
+                logger.warning("scan_task_artifacts: SDK targets not found: %s\n", task_name)
+                return
+            for artifact_path in task_artifacts:
+                if not os.path.isfile(artifact_path):
+                    logger.warning("scan_task_artifacts: artifact file not found: %s\n", artifact_path)
+                    continue
+                for target in targets:
+                    # don't record the file if it's already been added
+                    # to this target
+                    matching_files = TargetSDKFile.objects.filter(
+                        target=target, file_name=artifact_path)
+                    if matching_files.count() == 0:
+                        artifact_size = os.stat(artifact_path).st_size
+                        self.orm_wrapper.save_target_sdk_file(
+                            target, artifact_path, artifact_size)
 
     def _get_image_files(self, deploy_dir_image, image_name, image_file_extensions):
         """

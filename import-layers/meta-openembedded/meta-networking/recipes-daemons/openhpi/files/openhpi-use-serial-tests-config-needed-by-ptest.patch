@@ -1,0 +1,31 @@
+From 36fbaa27e7299f63c1324b0ad22b970e9365d6a7 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Wed, 24 Dec 2014 10:54:59 +0800
+Subject: [PATCH] openhpi: use serial-tests config needed by ptest
+
+ptest needs buildtest-TESTS and runtest-TESTS targets.
+serial-tests is required to generate those targets.
+
+Upstream-Status: Inappropriate [default automake behavior incompatible with ptest]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure.ac |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4b51971..16136b3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -7,7 +7,7 @@ dnl   various hacks by Sean Dague <http://dague.net/sean> 4/23/03
+ AC_PREREQ(2.57)
+ AC_INIT(openhpi, 3.5.0)
+ AC_CONFIG_SRCDIR(openhpi.spec.in)
+-AM_INIT_AUTOMAKE([1.8])
++AM_INIT_AUTOMAKE([1.8 serial-tests])
+ 
+ AM_CONFIG_HEADER(config.h)
+ AH_TOP([#ifndef __OPENHPI_CONFIG_H
+-- 
+1.7.1
+

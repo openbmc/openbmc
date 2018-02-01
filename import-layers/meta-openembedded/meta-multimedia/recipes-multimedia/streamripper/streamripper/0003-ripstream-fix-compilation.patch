@@ -1,0 +1,42 @@
+From 6d59b60ff5108357ad2c2951a97112e713ee5368 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+Date: Thu, 3 Nov 2016 20:53:32 +0000
+Subject: [PATCH 3/3] ripstream: fix compilation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+| ../../streamripper-1.64.6/lib/ripstream.c: In function 'write_id3v2_frame':
+| ../../streamripper-1.64.6/lib/ripstream.c:717:5: error: unknown type name '__uint32_t'
+|      __uint32_t framesize = 0;
+|      ^~~~~~~~~~
+
+The already included srtypes.h does the right thing for all
+platforms (I think). It certainly works well here.
+
+Upstream-Status: Inappropriate [no upstream activity for 7+ years]
+Signed-off-by: André Draszik <git@andred.net>
+---
+ lib/ripstream.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/lib/ripstream.c b/lib/ripstream.c
+index c671e18..7f311c6 100644
+--- a/lib/ripstream.c
++++ b/lib/ripstream.c
+@@ -713,11 +713,7 @@ write_id3v2_frame(RIP_MANAGER_INFO* rmi, char* tag_name, mchar* data,
+     int rc;
+     char bigbuf[HEADER_SIZE] = "";
+     ID3V2frame id3v2frame;
+-#ifndef WIN32
+-    __uint32_t framesize = 0;
+-#else
+-    unsigned long int framesize = 0;
+-#endif
++    uint32_t framesize = 0;
+ 
+     memset(&id3v2frame, '\000', sizeof(id3v2frame));
+     strncpy(id3v2frame.id, tag_name, 4);
+-- 
+2.10.1
+

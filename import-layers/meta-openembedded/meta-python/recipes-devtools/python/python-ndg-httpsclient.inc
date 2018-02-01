@@ -8,12 +8,11 @@ SRC_URI[sha256sum] = "580987ef194334c50389e0d7de885fccf15605c13c6eecaabd8d6c4376
 
 PYPI_PACKAGE = "ndg_httpsclient"
 
-DEPENDS = " \
+DEPENDS += " \
     ${PYTHON_PN}-pyopenssl \
-"
-
-DEPENDS = " \
     ${PYTHON_PN}-pyasn1 \
 "
 
 BBCLASSEXTEND = "native nativesdk"
+
+UPSTREAM_CHECK_REGEX = ""

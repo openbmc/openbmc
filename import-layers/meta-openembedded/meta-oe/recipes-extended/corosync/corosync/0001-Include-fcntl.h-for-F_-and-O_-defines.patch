@@ -1,0 +1,28 @@
+From 85ea47fedbc96ed9180e08b0d371d9966e3a88da Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Aug 2017 17:28:55 -0700
+Subject: [PATCH] Include fcntl.h for F_* and O_* defines
+
+Fixes errors like
+utils.c:95:22: error: use of undeclared identifier 'O_WRONLY'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ qdevices/utils.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/qdevices/utils.c b/qdevices/utils.c
+index 41850b8c..87090853 100644
+--- a/qdevices/utils.c
++++ b/qdevices/utils.c
+@@ -39,6 +39,7 @@
+ 
+ #include <err.h>
+ #include <errno.h>
++#include <fcntl.h>
+ #include <inttypes.h>
+ #include <libgen.h>
+ #include <stdio.h>
+-- 
+2.14.1
+

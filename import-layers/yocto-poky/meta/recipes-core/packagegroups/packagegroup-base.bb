@@ -110,8 +110,8 @@ python __anonymous () {
     # If Distro want wifi and machine feature wifi/pci/pcmcia/usbhost (one of them)
     # then include packagegroup-base-wifi in packagegroup-base
 
-    distro_features = set(d.getVar("DISTRO_FEATURES", True).split())
-    machine_features= set(d.getVar("MACHINE_FEATURES", True).split())
+    distro_features = set(d.getVar("DISTRO_FEATURES").split())
+    machine_features= set(d.getVar("MACHINE_FEATURES").split())
 
     if "bluetooth" in distro_features and not "bluetooth" in machine_features and ("pcmcia" in machine_features or "pci" in machine_features or "usbhost" in machine_features):
         d.setVar("ADD_BT", "packagegroup-base-bluetooth")

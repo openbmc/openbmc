@@ -33,7 +33,6 @@ import logging
 import bb
 import bb.progress
 import urllib.request, urllib.parse, urllib.error
-from   bb import data
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
 from   bb.fetch2 import logger
@@ -84,18 +83,18 @@ class Wget(FetchMethod):
         else:
             ud.basename = os.path.basename(ud.path)
 
-        ud.localfile = data.expand(urllib.parse.unquote(ud.basename), d)
+        ud.localfile = d.expand(urllib.parse.unquote(ud.basename))
         if not ud.localfile:
-            ud.localfile = data.expand(urllib.parse.unquote(ud.host + ud.path).replace("/", "."), d)
+            ud.localfile = d.expand(urllib.parse.unquote(ud.host + ud.path).replace("/", "."))
 
-        self.basecmd = d.getVar("FETCHCMD_wget", True) or "/usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate"
+        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate"
 
     def _runwget(self, ud, d, command, quiet):
 
         progresshandler = WgetProgressHandler(d)
 
         logger.debug(2, "Fetching %s using command '%s'" % (ud.url, command))
-        bb.fetch2.check_network_access(d, command)
+        bb.fetch2.check_network_access(d, command, ud.url)
         runfetchcmd(command + ' --progress=dot -v', d, quiet, log=progresshandler)
 
     def download(self, ud, d):
@@ -104,7 +103,7 @@ class Wget(FetchMethod):
         fetchcmd = self.basecmd
 
         if 'downloadfilename' in ud.parm:
-            dldir = d.getVar("DL_DIR", True)
+            dldir = d.getVar("DL_DIR")
             bb.utils.mkdirhier(os.path.dirname(dldir + os.sep + ud.localfile))
             fetchcmd += " -O " + dldir + os.sep + ud.localfile
 
@@ -304,11 +303,23 @@ class Wget(FetchMethod):
             r = urllib.request.Request(uri)
             r.get_method = lambda: "HEAD"
 
-            if ud.user:
+            def add_basic_auth(login_str, request):
+                '''Adds Basic auth to http request, pass in login:password as string'''
                 import base64
-                encodeuser = base64.b64encode(ud.user.encode('utf-8')).decode("utf-8")
+                encodeuser = base64.b64encode(login_str.encode('utf-8')).decode("utf-8")
                 authheader =  "Basic %s" % encodeuser
                 r.add_header("Authorization", authheader)
+
+            if ud.user:
+                add_basic_auth(ud.user, r)
+
+            try:
+                import netrc, urllib.parse
+                n = netrc.netrc()
+                login, unused, password = n.authenticators(urllib.parse.urlparse(uri).hostname)
+                add_basic_auth("%s:%s" % (login, password), r)
+            except (TypeError, ImportError, IOError, netrc.NetrcParseError):
+                 pass
 
             opener.open(r)
         except urllib.error.URLError as e:
@@ -534,7 +545,7 @@ class Wget(FetchMethod):
 
         # src.rpm extension was added only for rpm package. Can be removed if the rpm
         # packaged will always be considered as having to be manually upgraded
-        psuffix_regex = "(tar\.gz|tgz|tar\.bz2|zip|xz|rpm|bz2|orig\.tar\.gz|tar\.xz|src\.tar\.gz|src\.tgz|svnr\d+\.tar\.bz2|stable\.tar\.gz|src\.rpm)"
+        psuffix_regex = "(tar\.gz|tgz|tar\.bz2|zip|xz|tar\.lz|rpm|bz2|orig\.tar\.gz|tar\.xz|src\.tar\.gz|src\.tgz|svnr\d+\.tar\.bz2|stable\.tar\.gz|src\.rpm)"
 
         # match name, version and archive type of a package
         package_regex_comp = re.compile("(?P<name>%s?\.?v?)(?P<pver>%s)(?P<arch>%s)?[\.-](?P<type>%s$)"
@@ -542,7 +553,7 @@ class Wget(FetchMethod):
         self.suffix_regex_comp = re.compile(psuffix_regex)
 
         # compile regex, can be specific by package or generic regex
-        pn_regex = d.getVar('UPSTREAM_CHECK_REGEX', True)
+        pn_regex = d.getVar('UPSTREAM_CHECK_REGEX')
         if pn_regex:
             package_custom_regex_comp = re.compile(pn_regex)
         else:
@@ -563,7 +574,7 @@ class Wget(FetchMethod):
         sanity check to ensure same name and type.
         """
         package = ud.path.split("/")[-1]
-        current_version = ['', d.getVar('PV', True), '']
+        current_version = ['', d.getVar('PV'), '']
 
         """possible to have no version in pkg name, such as spectrum-fw"""
         if not re.search("\d+", package):
@@ -578,7 +589,7 @@ class Wget(FetchMethod):
         bb.debug(3, "latest_versionstring, regex: %s" % (package_regex.pattern))
 
         uri = ""
-        regex_uri = d.getVar("UPSTREAM_CHECK_URI", True)
+        regex_uri = d.getVar("UPSTREAM_CHECK_URI")
         if not regex_uri:
             path = ud.path.split(package)[0]
 
@@ -587,7 +598,7 @@ class Wget(FetchMethod):
             dirver_regex = re.compile("(?P<dirver>[^/]*(\d+\.)*\d+([-_]r\d+)*)/")
             m = dirver_regex.search(path)
             if m:
-                pn = d.getVar('PN', True)
+                pn = d.getVar('PN')
                 dirver = m.group('dirver')
 
                 dirver_pn_regex = re.compile("%s\d?" % (re.escape(pn)))

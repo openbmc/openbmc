@@ -28,10 +28,12 @@
 import subprocess
 import logging
 
-from wic.plugin import pluginmgr, PLUGIN_TYPES
+from wic.pluginbase import PluginMgr, PLUGIN_TYPES
+
+logger = logging.getLogger('wic')
 
 def subcommand_error(args):
-    logging.info("invalid subcommand %s" % args[0])
+    logger.info("invalid subcommand %s", args[0])
 
 
 def display_help(subcommand, subcommands):
@@ -66,7 +68,7 @@ def get_wic_plugins_help():
     result = wic_plugins_help
     for plugin_type in PLUGIN_TYPES:
         result += '\n\n%s PLUGINS\n\n' % plugin_type.upper()
-        for name, plugin in pluginmgr.get_plugins(plugin_type).items():
+        for name, plugin in PluginMgr.get_plugins(plugin_type).items():
             result += "\n %s plugin:\n" % name
             if plugin.__doc__:
                 result += plugin.__doc__
@@ -81,13 +83,13 @@ def invoke_subcommand(args, parser, main_command_usage, subcommands):
     Should use argparse, but has to work in 2.6.
     """
     if not args:
-        logging.error("No subcommand specified, exiting")
+        logger.error("No subcommand specified, exiting")
         parser.print_help()
         return 1
     elif args[0] == "help":
         wic_help(args, main_command_usage, subcommands)
     elif args[0] not in subcommands:
-        logging.error("Unsupported subcommand %s, exiting\n" % (args[0]))
+        logger.error("Unsupported subcommand %s, exiting\n", args[0])
         parser.print_help()
         return 1
     else:
@@ -371,12 +373,7 @@ DESCRIPTION
 
     This scheme is extensible - adding more hooks is a simple matter
     of adding more plugin methods to SourcePlugin and derived classes.
-    The code that then needs to call the plugin methods uses
-    plugin.get_source_plugin_methods() to find the method(s) needed by
-    the call; this is done by filling up a dict with keys containing
-    the method names of interest - on success, these will be filled in
-    with the actual methods. Please see the implementation for
-    examples and details.
+    Please see the implementation for details.
 """
 
 wic_overview_help = """
@@ -646,6 +643,12 @@ DESCRIPTION
                  not specified, the size is in MB.
                  You do not need this option if you use --source.
 
+         --fixed-size: Exact partition size. Value format is the same
+                       as for --size option. This option cannot be
+                       specified along with --size. If partition data
+                       is larger than --fixed-size and error will be
+                       raised when assembling disk image.
+
          --source: This option is a wic-specific option that names the
                    source of the data that will populate the
                    partition.  The most common value for this option
@@ -684,6 +687,8 @@ DESCRIPTION
            apply to partitions created using '--source rootfs' (see
            --source above).  Valid values are:
 
+             vfat
+             msdos
              ext2
              ext3
              ext4
@@ -715,17 +720,25 @@ DESCRIPTION
                      partition table. It may be useful for
                      bootloaders.
 
+         --exclude-path: This option is specific to wic. It excludes the given
+                         relative path from the resulting image. If the path
+                         ends with a slash, only the content of the directory
+                         is omitted, not the directory itself. This option only
+                         has an effect with the rootfs source plugin.
+
          --extra-space: This option is specific to wic. It adds extra
                         space after the space filled by the content
                         of the partition. The final size can go
                         beyond the size specified by --size.
-                        By default, 10MB.
+                        By default, 10MB. This option cannot be used
+                        with --fixed-size option.
 
          --overhead-factor: This option is specific to wic. The
                             size of the partition is multiplied by
                             this factor. It has to be greater than or
-                            equal to 1.
-                            The default value is 1.3.
+                            equal to 1. The default value is 1.3.
+                            This option cannot be used with --fixed-size
+                            option.
 
          --part-type: This option is specific to wic. It specifies partition
                       type GUID for GPT partitions.

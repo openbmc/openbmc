@@ -1,0 +1,104 @@
+Make install rules use DESTDIR.
+Split installation of the utilitity from the global install.
+
+Copyright 2007 Yann E. MORIN <yann.morin.1998@anciens.enib.fr>
+Licensed to you as dmalloc-5.5.2 is.
+
+Index: dmalloc-5.5.2/Makefile.in
+===================================================================
+--- dmalloc-5.5.2.orig/Makefile.in
++++ dmalloc-5.5.2/Makefile.in
+@@ -178,66 +178,66 @@ distclean : clean
+ #	rm -f configure
+ 
+ installdirs :
+-	$(srcdir)/mkinstalldirs $(includedir) $(libdir) $(bindir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(includedir) $(DESTDIR)/$(libdir) $(DESTDIR)/$(bindir)
+ 
+ installincs : $(HFLS)
+-	$(srcdir)/mkinstalldirs $(includedir)
+-	$(INSTALL_DATA) $(HFLS) $(includedir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(includedir)
++	$(INSTALL_DATA) $(HFLS) $(DESTDIR)/$(includedir)
+ 
+ installthsl : $(LIB_TH_SL)
+-	$(srcdir)/mkinstalldirs $(shlibdir)
+-	$(INSTALL) $(LIB_TH_SL) $(shlibdir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(shlibdir)
++	$(INSTALL) $(LIB_TH_SL) $(DESTDIR)/$(shlibdir)
+ 
+ installth : $(INSTALL_THREADS)
+-	$(srcdir)/mkinstalldirs $(libdir)
+-	$(INSTALL) $(LIB_TH) $(libdir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(libdir)
++	$(INSTALL) $(LIB_TH) $(DESTDIR)/$(libdir)
+ @CXX_OFF@	@echo "Enter 'make installthcxx' to install the threaded C++ library"
+ @SL_OFF@	@echo "Enter 'make installthsl' to install the threaded shared-library"
+ 
+ installthcxxsl : $(LIB_TH_CXX_SL)
+-	$(srcdir)/mkinstalldirs $(shlibdir)
+-	$(INSTALL) $(LIB_TH_CXX_SL) $(shlibdir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(shlibdir)
++	$(INSTALL) $(LIB_TH_CXX_SL) $(DESTDIR)/$(shlibdir)
+ 
+ installthcxx : $(INSTALL_TH_CXX)
+-	$(srcdir)/mkinstalldirs $(libdir)
+-	$(INSTALL) $(LIB_TH_CXX) $(libdir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(libdir)
++	$(INSTALL) $(LIB_TH_CXX) $(DESTDIR)/$(libdir)
+ @SL_OFF@	@echo "Enter 'make installthcxxsl' to install the threaded C++ shared-library"
+ 
+ installcxxsl : $(LIB_CXX_SL)
+-	$(srcdir)/mkinstalldirs $(shlibdir)
+-	$(INSTALL) $(LIB_CXX_SL) $(shlibdir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(shlibdir)
++	$(INSTALL) $(LIB_CXX_SL) $(DESTDIR)/$(shlibdir)
+ 
+ installcxx : $(INSTALL_CXX)
+-	$(srcdir)/mkinstalldirs $(libdir)
+-	$(INSTALL) $(LIB_CXX) $(libdir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(libdir)
++	$(INSTALL) $(LIB_CXX) $(DESTDIR)/$(libdir)
+ @TH_OFF@	@echo "Enter 'make installthcxx' to install the threaded C++ library"
+ @SL_OFF@	@echo "Enter 'make installcxxsl' to install the C++ shared-library"
+ 
+ installsl : $(LIB_SL)
+-	$(srcdir)/mkinstalldirs $(shlibdir)
+-	$(INSTALL) $(LIB_SL) $(shlibdir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(shlibdir)
++	$(INSTALL) $(LIB_SL) $(DESTDIR)/$(shlibdir)
+ @CXX_OFF@	@echo "Enter 'make installcxxsl' to install the C++ shared-library"
+ @TH_OFF@	@echo "Enter 'make installthsl' to install thread shared-library"
+ 
+ installlib : $(INSTALL_LIB)
+-	$(srcdir)/mkinstalldirs $(libdir)
+-	$(INSTALL) $(LIBRARY) $(libdir)
+-	@RANLIB@ $(libdir)/$(LIBRARY)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(libdir)
++	$(INSTALL) $(LIBRARY) $(DESTDIR)/$(libdir)
++	@RANLIB@ $(DESTDIR)/$(libdir)/$(LIBRARY)
+ @SL_OFF@	@echo "Enter 'make installsl' to install $(LIB_SL) in $(shlibdir)"
+ @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
+ @TH_OFF@	@echo "Enter 'make installth' to install thread library"
+ 
+ installdocs : $(srcdir)/docs/$(HTMLFILE) $(srcdir)/docs/$(TEXIFILE) \
+ 		$(srcdir)/docs/$(PDFFILE)
+-	$(srcdir)/mkinstalldirs $(docdir)
+-	$(INSTALL_DATA) $(srcdir)/docs/$(HTMLFILE) $(docdir)
+-	$(INSTALL_DATA) $(srcdir)/docs/$(TEXIFILE) $(docdir)
+-	$(INSTALL_DATA) $(srcdir)/docs/$(PDFFILE) $(docdir)
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(docdir)
++	$(INSTALL_DATA) $(srcdir)/docs/$(HTMLFILE) $(DESTDIR)/$(docdir)
++	$(INSTALL_DATA) $(srcdir)/docs/$(TEXIFILE) $(DESTDIR)/$(docdir)
++	$(INSTALL_DATA) $(srcdir)/docs/$(PDFFILE) $(DESTDIR)/$(docdir)
+ 
+ install : installincs installlib $(UTIL)
+-	$(srcdir)/mkinstalldirs $(bindir)
+-	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
+-	@echo "Enter 'make installdocs' to install $(DOCFILES) in $(docdir)"
++	$(srcdir)/mkinstalldirs $(DESTDIR)/$(bindir)
++	$(INSTALL_PROGRAM) $(UTIL) $(DESTDIR)/$(bindir)
++	@echo "Enter 'make installdocs' to install $(DOCFILES) in $(DESTDIR)/$(docdir)"
+ 
+ dmalloc.h.2 : $(srcdir)/configure
+ 	$(SHELL) $(srcdir)/configure

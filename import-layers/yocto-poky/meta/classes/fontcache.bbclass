@@ -3,7 +3,7 @@
 # packages.
 #
 
-DEPENDS += "qemu-native"
+PACKAGE_WRITE_DEPS += "qemu-native"
 inherit qemu
 
 FONT_PACKAGES ??= "${PN}"
@@ -30,26 +30,26 @@ fi
 }
 
 python () {
-    font_pkgs = d.getVar('FONT_PACKAGES', True).split()
-    deps = d.getVar("FONT_EXTRA_RDEPENDS", True)
+    font_pkgs = d.getVar('FONT_PACKAGES').split()
+    deps = d.getVar("FONT_EXTRA_RDEPENDS")
 
     for pkg in font_pkgs:
         if deps: d.appendVar('RDEPENDS_' + pkg, ' '+deps)
 }
 
 python add_fontcache_postinsts() {
-    for pkg in d.getVar('FONT_PACKAGES', True).split():
+    for pkg in d.getVar('FONT_PACKAGES').split():
         bb.note("adding fonts postinst and postrm scripts to %s" % pkg)
-        postinst = d.getVar('pkg_postinst_%s' % pkg, True) or d.getVar('pkg_postinst', True)
+        postinst = d.getVar('pkg_postinst_%s' % pkg) or d.getVar('pkg_postinst')
         if not postinst:
             postinst = '#!/bin/sh\n'
-        postinst += d.getVar('fontcache_common', True)
+        postinst += d.getVar('fontcache_common')
         d.setVar('pkg_postinst_%s' % pkg, postinst)
 
-        postrm = d.getVar('pkg_postrm_%s' % pkg, True) or d.getVar('pkg_postrm', True)
+        postrm = d.getVar('pkg_postrm_%s' % pkg) or d.getVar('pkg_postrm')
         if not postrm:
             postrm = '#!/bin/sh\n'
-        postrm += d.getVar('fontcache_common', True)
+        postrm += d.getVar('fontcache_common')
         d.setVar('pkg_postrm_%s' % pkg, postrm)
 }
 

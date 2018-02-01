@@ -10,6 +10,9 @@ inherit packagegroup  distro_features_check
 # rdepends on libx11-dev
 REQUIRED_DISTRO_FEATURES = "x11"
 
+# rdepends on libgl
+REQUIRED_DISTRO_FEATURES += "opengl"
+
 PACKAGES = "\
     packagegroup-self-hosted \
     packagegroup-self-hosted-debug \

@@ -1,0 +1,33 @@
+Fix ipmi plugin's test dir compilation
+
+The ipmi plugin's test dir is not included
+in compilation since it does not compile
+properly with SSL
+
+Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ plugins/ipmi/Makefile.in | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/ipmi/Makefile.in b/plugins/ipmi/Makefile.in
+index 7c6b0a4..6204dbe 100644
+--- a/plugins/ipmi/Makefile.in
++++ b/plugins/ipmi/Makefile.in
+@@ -448,7 +448,9 @@ top_srcdir = @top_srcdir@
+ MAINTAINERCLEANFILES = Makefile.in
+ AM_CPPFLAGS = -DG_LOG_DOMAIN=\"ipmi\" @OPENHPI_INCLUDES@
+ EXTRA_DIST = ipmi.sym ekeyfru.h
+-SUBDIRS = t
++#SUBDIRS = t
++#Tests don't compile wih SSL properly so comment them out
++SUBDIRS =
+ AM_CFLAGS = @OPENIPMI_CFLAGS@
+ pkglib_LTLIBRARIES = libipmi.la
+ libipmi_la_SOURCES = ipmi.c 		\
+-- 
+1.9.1
+

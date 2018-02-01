@@ -6,7 +6,6 @@ development or external module builds"
 SECTION = "kernel"
 
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
 inherit linux-kernel-base
 
@@ -54,6 +53,13 @@ do_install() {
         # architecture (since scripts and helpers are native format).
         KBUILD_OUTPUT="$kerneldir"
         oe_runmake -C $kerneldir CC="${KERNEL_CC}" LD="${KERNEL_LD}" clean _mrproper_scripts
+        # make clean generates an absolute path symlink called "source"
+        # in $kerneldir points to $kerneldir, which doesn't make any
+        # sense, so remove it.
+        if [ -L $kerneldir/source ]; then
+            bbnote "Removing $kerneldir/source symlink"
+            rm -f $kerneldir/source
+        fi
 
         # As of Linux kernel version 3.0.1, the clean target removes
         # arch/powerpc/lib/crtsavres.o which is present in

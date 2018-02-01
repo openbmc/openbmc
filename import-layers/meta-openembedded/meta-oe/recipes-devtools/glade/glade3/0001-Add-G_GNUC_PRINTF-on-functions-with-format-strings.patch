@@ -1,0 +1,62 @@
+From fcf29abe59607b5791f9de18ddb86b9ae3c9b7cc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Aug 2017 23:50:05 -0700
+Subject: [PATCH] Add G_GNUC_PRINTF on functions with format strings
+
+This allows compilation with clang without errors, even when
+-Wformat-nonliteral is active (as long as there are no real cases of
+non literal formatting).
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gladeui/glade-command.c | 4 ++--
+ gladeui/glade-utils.c   | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gladeui/glade-command.c b/gladeui/glade-command.c
+index 9819766..4ac40ee 100644
+--- a/gladeui/glade-command.c
++++ b/gladeui/glade-command.c
+@@ -266,7 +266,7 @@ glade_command_collapse (GladeCommand  *command,
+  *
+  * Marks the begining of a group.
+  */
+-void
++G_GNUC_PRINTF(1, 2) void
+ glade_command_push_group (const gchar *fmt, ...)
+ {
+ 	va_list         args;
+@@ -655,7 +655,7 @@ glade_command_set_properties_list (GladeProject *project, GList *props)
+ 
+ 	multiple = g_list_length (me->sdata) > 1;
+ 	if (multiple)
+-		glade_command_push_group (cmd->description);
++		glade_command_push_group ("%s", cmd->description);
+ 
+ 
+ 	glade_command_check_group (GLADE_COMMAND (me));
+diff --git a/gladeui/glade-utils.c b/gladeui/glade-utils.c
+index ae52501..c51ae59 100644
+--- a/gladeui/glade-utils.c
++++ b/gladeui/glade-utils.c
+@@ -197,7 +197,7 @@ glade_utils_get_pspec_from_funcname (const gchar *funcname)
+  *          selected "OK", True if the @type was GLADE_UI_YES_OR_NO and
+  *          the user selected "YES"; False otherwise.
+  */
+-gint
++G_GNUC_PRINTF(4, 5) gint
+ glade_util_ui_message (GtkWidget           *parent, 
+ 		       GladeUIMessageType   type,
+ 		       GtkWidget           *widget,
+@@ -320,7 +320,7 @@ remove_message_timeout (FlashInfo * fi)
+  *
+  * Flash a temporary message on the statusbar.
+  */
+-void
++G_GNUC_PRINTF(3, 4) void
+ glade_util_flash_message (GtkWidget *statusbar, guint context_id, gchar *format, ...)
+ {
+ 	va_list args;
+-- 
+2.14.1
+

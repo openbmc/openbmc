@@ -45,6 +45,10 @@
             You can accomplish this through a recipe that is a BitBake append
             (<filename>.bbappend</filename>) file, which is described later
             in this section.
+            <note>
+                For general information on BSP layer structure, see the
+                <ulink url='&YOCTO_DOCS_BSP_URL;#bsp'>Board Support Packages (BSP) - Developer's Guide</ulink>.
+            </note>
         </para>
 
         <para>
@@ -108,7 +112,7 @@
             </para>
 
             <para>
-                Follow these general steps to create your layer:
+                Follow these general steps to create your layer without the aid of a script:
                 <orderedlist>
                     <listitem><para><emphasis>Check Existing Layers:</emphasis>
                         Before creating a new layer, you should be sure someone
@@ -233,7 +237,18 @@
                         <note>In order to be compliant with the Yocto Project,
                             a layer must contain a
                             <ulink url='&YOCTO_DOCS_BSP_URL;#bsp-filelayout-readme'>README file.</ulink>
-                            </note></para></listitem>
+                        </note>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Optionally Test for Compatibility:</emphasis>
+                        If you want permission to use the Yocto Project
+                        Compatibility logo with your layer or application that
+                        uses your layer, perform the steps to apply for
+                        compatibility.
+                        See the
+                        "<link linkend='making-sure-your-layer-is-compatible-with-yocto-project'>Making Sure Your Layer is Compatible With Yocto Project</link>"
+                        section for more information.
+                        </para></listitem>
                 </orderedlist>
             </para>
         </section>
@@ -408,6 +423,14 @@
                 <para>
                     We also recommend the following:
                     <itemizedlist>
+                        <listitem><para>If you want permission to use the
+                            Yocto Project Compatibility logo with your layer
+                            or application that uses your layer, perform the
+                            steps to apply for compatibility.
+                            See the
+                            "<link linkend='making-sure-your-layer-is-compatible-with-yocto-project'>Making Sure Your Layer is Compatible With Yocto Project</link>"
+                            section for more information.
+                            </para></listitem>
                         <listitem><para>Store custom layers in a Git repository
                             that uses the
                             <filename>meta-<replaceable>layer_name</replaceable></filename> format.
@@ -420,6 +443,204 @@
                      Following these recommendations keeps your Source Directory and
                      its configuration entirely inside the Yocto Project's core
                      base.
+                </para>
+            </section>
+        </section>
+
+        <section id='making-sure-your-layer-is-compatible-with-yocto-project'>
+            <title>Making Sure Your Layer is Compatible With Yocto Project</title>
+
+            <para>
+                When you create a layer used with the Yocto Project, it is
+                advantageous to make sure that the layer interacts well with
+                existing Yocto Project layers (i.e. the layer is compatible
+                with the Yocto Project).
+                Ensuring compatibility makes the layer easy to be consumed
+                by others in the Yocto Project community and allows you
+                permission to use the Yocto Project Compatibility logo.
+            </para>
+
+            <para>
+                Version 1.0 of the Yocto Project Compatibility Program has
+                been in existence for a number of releases.
+                This version of the program consists of the layer application
+                process that requests permission to use the Yocto Project
+                Compatibility logo for your layer and application.
+                You can find version 1.0 of the form at
+                <ulink url='https://www.yoctoproject.org/webform/yocto-project-compatible-registration'></ulink>.
+                To be granted permission to use the logo, you need to be able
+                to answer "Yes" to the questions or have an acceptable
+                explanation for any questions answered "No".
+            </para>
+
+            <para>
+                A second version (2.0) of the Yocto Project Compatibility
+                Program is currently under development.
+                Included as part of version 2.0 (and currently available) is
+                the <filename>yocto-compat-layer.py</filename> script.
+                When run against a layer, this script tests the layer against
+                tighter constraints based on experiences of how layers have
+                worked in the real world and where pitfalls have been found.
+            </para>
+
+            <para>
+                Part of the 2.0 version of the program that is not currently
+                available but is in development is an updated compatibility
+                application form.
+                This updated form, among other questions, specifically
+                asks if your layer has passed the test using the
+                <filename>yocto-compat-layer.py</filename> script.
+                <note><title>Tip</title>
+                    Even though the updated application form is currently
+                    unavailable for version 2.0 of the Yocto Project
+                    Compatibility Program, the
+                    <filename>yocto-compat-layer.py</filename> script is
+                    available in OE-Core.
+                    You can use the script to assess the status of your
+                    layers in advance of the 2.0 release of the program.
+                </note>
+            </para>
+
+            <para>
+                The remainder of this section presents information on the
+                version 1.0 registration form and on the
+                <filename>yocto-compat-layer.py</filename> script.
+            </para>
+
+            <section id='yocto-project-compatibility-program-application'>
+                <title>Yocto Project Compatibility Program Application</title>
+
+                <para>
+                    Use the 1.0 version of the form to apply for your
+                    layer's compatibility approval.
+                    Upon successful application, you can use the Yocto
+                    Project Compatibility logo with your layer and the
+                    application that uses your layer.
+                </para>
+
+                <para>
+                    To access the form, use this link:
+                    <ulink url='https://www.yoctoproject.org/webform/yocto-project-compatible-registration'></ulink>.
+                    Follow the instructions on the form to complete your
+                    application.
+                </para>
+
+                <para>
+                    The application consists of the following sections:
+                    <itemizedlist>
+                        <listitem><para>
+                            <emphasis>Contact Information:</emphasis>
+                            Provide your contact information as the fields
+                            require.
+                            Along with your information, provide the
+                            released versions of the Yocto Project for which
+                            your layer is compatible.
+                            </para></listitem>
+                        <listitem><para>
+                            <emphasis>Acceptance Criteria:</emphasis>
+                            Provide "Yes" or "No" answers for each of the
+                            items in the checklist.
+                            Space exists at the bottom of the form for any
+                            explanations for items for which you answered "No".
+                            </para></listitem>
+                        <listitem><para>
+                            <emphasis>Recommendations:</emphasis>
+                            Provide answers for the questions regarding Linux
+                            kernel use and build success.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+            </section>
+
+            <section id='yocto-compat-layer-py-script'>
+                <title><filename>yocto-compat-layer.py</filename> Script</title>
+
+                <para>
+                    The <filename>yocto-compat-layer.py</filename> script,
+                    which is currently available, provides you a way to
+                    assess how compatible your layer is with the Yocto
+                    Project.
+                    You should run this script prior to using the form to
+                    apply for compatibility as described in the previous
+                    section.
+                    <note>
+                        Because the script is part of the 2.0 release of the
+                        Yocto Project Compatibility Program, you are not
+                        required to successfully run your layer against it
+                        in order to be granted compatibility status.
+                        However, it is a good idea as it promotes
+                        well-behaved layers and gives you an idea of where your
+                        layer stands regarding compatibility.
+                    </note>
+                </para>
+
+                <para>
+                    The script divides tests into three areas: COMMON, BSD,
+                    and DISTRO.
+                    For example, given a distribution layer (DISTRO), the
+                    layer must pass both the COMMON and DISTRO related tests.
+                    Furthermore, if your layer is a BSP layer, the layer must
+                    pass the COMMON and BSP set of tests.
+                </para>
+
+                <para>
+                    To execute the script, enter the following commands from
+                    your build directory:
+                    <literallayout class='monospaced'>
+     $ source oe-init-build-env
+     $ yocto-compat-layer.py <replaceable>your_layer_directory</replaceable>
+                    </literallayout>
+                    Be sure to provide the actual directory for your layer
+                    as part of the command.
+                </para>
+
+                <para>
+                    Entering the command causes the script to determine the
+                    type of layer and then to execute a set of specific
+                    tests against the layer.
+                    The following list overviews the test:
+                    <itemizedlist>
+                        <listitem><para>
+                            <filename>common.test_readme</filename>:
+                            Tests if a <filename>README</filename> file
+                            exists in the layer and the file is not empty.
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>common.test_parse</filename>:
+                            Tests to make sure that BitBake can parse the
+                            files without error (i.e.
+                            <filename>bitbake -p</filename>).
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>common.test_show_environment</filename>:
+                            Tests that the global or per-recipe environment
+                            is in order without errors (i.e.
+                            <filename>bitbake -e</filename>).
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>common.test_signatures</filename>:
+                            Tests to be sure that BSP and DISTRO layers do not
+                            come with recipes that change signatures.
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>bsp.test_bsp_defines_machines</filename>:
+                            Tests if a BSP layer has machine configurations.
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>bsp.test_bsp_no_set_machine</filename>:
+                            Tests to ensure a BSP layer does not set the
+                            machine when the layer is added.
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>distro.test_distro_defines_distros</filename>:
+                            Tests if a DISTRO layer has distro configurations.
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>distro.test_distro_no_set_distro</filename>:
+                            Tests to ensure a DISTRO layer does not set the
+                            distribution when the layer is added.
+                            </para></listitem>
+                    </itemizedlist>
                 </para>
             </section>
         </section>
@@ -464,51 +685,52 @@
         </section>
 
         <section id='using-bbappend-files'>
-            <title>Using .bbappend Files</title>
+            <title>Using .bbappend Files in Your Layer</title>
 
             <para>
-                Recipes used to append Metadata to other recipes are called
-                BitBake append files.
-                BitBake append files use the <filename>.bbappend</filename> file
-                type suffix, while the corresponding recipes to which Metadata
-                is being appended use the <filename>.bb</filename> file type
-                suffix.
+                A recipe that appends Metadata to another recipe is called a
+                BitBake append file.
+                A BitBake append file uses the <filename>.bbappend</filename>
+                file type suffix, while the corresponding recipe to which
+                Metadata is being appended uses the <filename>.bb</filename>
+                file type suffix.
             </para>
 
             <para>
-                A <filename>.bbappend</filename> file allows your layer to make
-                additions or changes to the content of another layer's recipe
-                without having to copy the other recipe into your layer.
+                You can use a <filename>.bbappend</filename> file in your
+                layer to make additions or changes to the content of another
+                layer's recipe without having to copy the other layer's
+                recipe into your layer.
                 Your <filename>.bbappend</filename> file resides in your layer,
                 while the main <filename>.bb</filename> recipe file to
                 which you are appending Metadata resides in a different layer.
             </para>
 
             <para>
-                Append files must have the same root names as their corresponding
-                recipes.
+                Being able to append information to an existing recipe not only
+                avoids duplication, but also automatically applies recipe
+                changes from a different layer into your layer.
+                If you were copying recipes, you would have to manually merge
+                changes as they occur.
+            </para>
+
+            <para>
+                When you create an append file, you must use the same root
+                name as the corresponding recipe file.
                 For example, the append file
                 <filename>someapp_&DISTRO;.bbappend</filename> must apply to
                 <filename>someapp_&DISTRO;.bb</filename>.
-                This means the original recipe and append file names are version
-                number-specific.
+                This means the original recipe and append file names are
+                version number-specific.
                 If the corresponding recipe is renamed to update to a newer
-                version, the corresponding <filename>.bbappend</filename> file must
-                be renamed (and possibly updated) as well.
+                version, you must also rename and possibly update
+                the corresponding <filename>.bbappend</filename> as well.
                 During the build process, BitBake displays an error on starting
                 if it detects a <filename>.bbappend</filename> file that does
                 not have a corresponding recipe with a matching name.
                 See the
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-BB_DANGLINGAPPENDS_WARNONLY'><filename>BB_DANGLINGAPPENDS_WARNONLY</filename></ulink>
                 variable for information on how to handle this error.
-            </para>
-
-            <para>
-                Being able to append information to an existing recipe not only
-                avoids duplication, but also automatically applies recipe
-                changes in a different layer to your layer.
-                If you were copying recipes, you would have to manually merge
-                changes as they occur.
             </para>
 
             <para>
@@ -523,8 +745,7 @@
      SUMMARY = "Device formfactor information"
      SECTION = "base"
      LICENSE = "MIT"
-     LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d690 \
-                    file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+     LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
      PR = "r45"
 
      SRC_URI = "file://config file://machconfig"
@@ -540,8 +761,7 @@
 	     if [ -s "${S}/machconfig" ]; then
 	             install -m 0644 ${S}/machconfig ${D}${sysconfdir}/formfactor/
 	     fi
-     }
-                </literallayout>
+     }                </literallayout>
                 In the main recipe, note the
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
                 variable, which tells the OpenEmbedded build system where to
@@ -553,7 +773,8 @@
                 <filename>formfactor_0.0.bbappend</filename> and is from the
                 Raspberry Pi BSP Layer named
                 <filename>meta-raspberrypi</filename>.
-                The file is in <filename>recipes-bsp/formfactor</filename>:
+                The file is in the layer at
+                <filename>recipes-bsp/formfactor</filename>:
                 <literallayout class='monospaced'>
      FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
                 </literallayout>
@@ -573,12 +794,13 @@
             </para>
 
             <para>
-                The statement in this example extends the directories to include
+                The statement in this example extends the directories to
+                include
                 <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-THISDIR'><filename>THISDIR</filename></ulink><filename>}/${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PN'><filename>PN</filename></ulink><filename>}</filename>,
                 which resolves to a directory named
                 <filename>formfactor</filename> in the same directory
                 in which the append file resides (i.e.
-                <filename>meta-raspberrypi/recipes-bsp/formfactor/formfactor</filename>.
+                <filename>meta-raspberrypi/recipes-bsp/formfactor</filename>.
                 This implies that you must have the supporting directory
                 structure set up that will contain any files or patches you
                 will be including from the layer.
@@ -586,8 +808,8 @@
 
             <para>
                 Using the immediate expansion assignment operator
-                <filename>:=</filename> is important because of the reference to
-                <filename>THISDIR</filename>.
+                <filename>:=</filename> is important because of the reference
+                to <filename>THISDIR</filename>.
                 The trailing colon character is important as it ensures that
                 items in the list remain colon-separated.
                 <note>
@@ -2470,6 +2692,93 @@
             </para>
         </section>
 
+        <section id='new-recipe-using-headers-to-interface-with-devices'>
+            <title>Using Headers to Interface with Devices</title>
+
+            <para>
+                If your recipe builds an application that needs to
+                communicate with some device or needs an API into a custom
+                kernel, you will need to provide appropriate header files.
+                Under no circumstances should you ever modify the existing
+                <filename>meta/recipes-kernel/linux-libc-headers/linux-libc-headers.inc</filename>
+                file.
+                These headers are used to build <filename>libc</filename> and
+                must not be compromised with custom or machine-specific
+                header information.
+                If you customize <filename>libc</filename> through modified
+                headers all other applications that use
+                <filename>libc</filename> thus become affected.
+                <note><title>Warning</title>
+                    Never copy and customize the <filename>libc</filename>
+                    header file (i.e.
+                    <filename>meta/recipes-kernel/linux-libc-headers/linux-libc-headers.inc</filename>).
+                </note>
+                The correct way to interface to a device or custom kernel is
+                to use a separate package that provides the additional headers
+                for the driver or other unique interfaces.
+                When doing so, your application also becomes responsible for
+                creating a dependency on that specific provider.
+            </para>
+
+            <para>
+                Consider the following:
+                <itemizedlist>
+                    <listitem><para>
+                        Never modify
+                        <filename>linux-libc-headers.inc</filename>.
+                        Consider that file to be part of the
+                        <filename>libc</filename> system, and not something
+                        you use to access the kernel directly.
+                        You should access <filename>libc</filename> through
+                        specific <filename>libc</filename> calls.
+                        </para></listitem>
+                    <listitem><para>
+                        Applications that must talk directly to devices
+                        should either provide necessary headers themselves,
+                        or establish a dependency on a special headers package
+                        that is specific to that driver.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+
+            <para>
+                For example, suppose you want to modify an existing header
+                that adds I/O control or network support.
+                If the modifications are used by a small number programs,
+                providing a unique version of a header is easy and has little
+                impact.
+                When doing so, bear in mind the guidelines in the previous
+                list.
+                <note>
+                    If for some reason your changes need to modify the behavior
+                    of the <filename>libc</filename>, and subsequently all
+                    other applications on the system, use a
+                    <filename>.bbappend</filename> to modify the
+                    <filename>linux-kernel-headers.inc</filename> file.
+                    However, take care to not make the changes
+                    machine specific.
+                </note>
+            </para>
+
+            <para>
+                Consider a case where your kernel is older and you need
+                an older <filename>libc</filename> ABI.
+                The headers installed by your recipe should still be a
+                standard mainline kernel, not your own custom one.
+            </para>
+
+            <para>
+                When you use custom kernel headers you need to get them from
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-STAGING_KERNEL_DIR'><filename>STAGING_KERNEL_DIR</filename></ulink>,
+                which is the directory with kernel headers that are
+                required to build out-of-tree modules.
+                Your recipe will also need the following:
+                <literallayout class='monospaced'>
+     do_configure[depends] += "virtual/kernel:do_shared_workdir"
+                </literallayout>
+            </para>
+        </section>
+
         <section id='new-recipe-compilation'>
             <title>Compilation</title>
 
@@ -2883,15 +3192,16 @@
                 the build host.
                 For example, an application linking to a common library needs
                 access to the library itself and its associated headers.
-                The way this access is accomplished is by populating sysroot
+                The way this access is accomplished is by populating a sysroot
                 with files.
-                One sysroot exists per "machine" for which the image is
-                being built.
-                In practical terms, this means a sysroot exists for the target
-                machine, and a sysroot exists for the build host.
+                Each recipe has two sysroots in its work directory, one for
+                target files
+                (<filename>recipe-sysroot</filename>) and one for files that
+                are native to the build host
+                (<filename>recipe-sysroot-native</filename>).
                 <note>
                     You could find the term "staging" used within the Yocto
-                    project regarding files populating sysroot (e.g. the
+                    project regarding files populating sysroots (e.g. the
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-STAGING_DIR'><filename>STAGING_DIR</filename></ulink>
                     variable).
                 </note>
@@ -2906,12 +3216,6 @@
                 task within the
                 <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-D'><filename>D</filename></ulink><filename>}</filename>
                 directory.
-            </para>
-
-            <para>
-                A subset of these files, as defined by the
-                the <ulink url='&YOCTO_DOCS_REF_URL;#var-SYSROOT_DIRS'><filename>SYSROOT_DIRS</filename></ulink>
-                variable, automatically populates the sysroot.
                 The reason for this limitation is that almost all files that
                 populate the sysroot are cataloged in manifests in order to
                 ensure the files can be removed later when a recipe is either
@@ -2920,24 +3224,29 @@
             </para>
 
             <para>
+                A subset of the files installed by the
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-install'><filename>do_install</filename></ulink>
+                task are used by the
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></ulink>
+                task as defined by the the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SYSROOT_DIRS'><filename>SYSROOT_DIRS</filename></ulink>
+                variable to automatically populate the sysroot.
                 It is possible to modify the list of directories that populate
                 the sysroot.
                 The following example shows how you could add the
                 <filename>/opt</filename> directory to the list of
-                directories:
+                directories within a recipe:
                 <literallayout class='monospaced'>
      SYSROOT_DIRS += "/opt"
                 </literallayout>
             </para>
 
             <para>
-                For information on variables you can use to help control how
-                files sysroot is populated, see the
-                <ulink url='&YOCTO_DOCS_REF_URL;#var-SYSROOT_DIRS'><filename>SYSROOT_DIRS</filename></ulink>,
-                <ulink url='&YOCTO_DOCS_REF_URL;#var-SYSROOT_DIRS_NATIVE'><filename>SYSROOT_DIRS_NATIVE</filename></ulink>,
-                and
-                <ulink url='&YOCTO_DOCS_REF_URL;#var-SYSROOT_DIRS_BLACKLIST'><filename>SYSROOT_DIRS_BLACKLIST</filename></ulink>
-                variables.
+                For a more complete description of the
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></ulink>
+                task and its associated functions, see the
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-staging'><filename>staging</filename></ulink>
+                class.
             </para>
         </section>
 
@@ -2986,21 +3295,21 @@
                 a package on the target or during image creation when a
                 package is included in an image.
                 To add a post-installation script to a package, add a
-                <filename>pkg_postinst_PACKAGENAME()</filename> function to
+                <filename>pkg_postinst_</filename><replaceable>PACKAGENAME</replaceable><filename>()</filename> function to
                 the recipe file (<filename>.bb</filename>) and replace
-                <filename>PACKAGENAME</filename> with the name of the package
+                <replaceable>PACKAGENAME</replaceable> with the name of the package
                 you want to attach to the <filename>postinst</filename>
                 script.
                 To apply the post-installation script to the main package
                 for the recipe, which is usually what is required, specify
                 <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PN'><filename>PN</filename></ulink><filename>}</filename>
-                in place of <filename>PACKAGENAME</filename>.
+                in place of <replaceable>PACKAGENAME</replaceable>.
             </para>
 
             <para>
                 A post-installation function has the following structure:
                 <literallayout class='monospaced'>
-     pkg_postinst_PACKAGENAME() {
+     pkg_postinst_<replaceable>PACKAGENAME</replaceable>() {
      # Commands to carry out
      }
                 </literallayout>
@@ -3029,7 +3338,7 @@
                 To delay script execution until boot time, use the following
                 structure in the post-installation script:
                 <literallayout class='monospaced'>
-     pkg_postinst_PACKAGENAME() {
+     pkg_postinst_<replaceable>PACKAGENAME</replaceable>() {
      if [ x"$D" = "x" ]; then
           # Actions to carry out on the device go here
      else
@@ -3045,6 +3354,20 @@
                 points to the directory containing the image when
                 the root filesystem is created at build time but is unset
                 when executed on the first boot.
+            </para>
+
+            <para>
+                If you have recipes that use <filename>pkg_postinst</filename>
+                scripts and they require the use of non-standard native
+                tools that have dependencies during rootfs construction, you
+                need to use the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_WRITE_DEPS'><filename>PACKAGE_WRITE_DEPS</filename></ulink>
+                variable in your recipe to list these tools.
+                If you do not use this variable, the tools might be missing and
+                execution of the post-installation script is deferred until
+                first boot.
+                Deferring the script to first boot is undesirable and for
+                read-only rootfs impossible.
             </para>
 
             <note>
@@ -4475,7 +4798,7 @@
                         <listitem><para>
                             Wic is a completely independent
                             standalone utility that initially provides
-                            easier-to-use and more flexible replacements for a
+                            easier-to-use and more flexible replacements for an
                             existing functionality in OE Core's
                             <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-image-live'><filename>image-live</filename></ulink>
                             class and <filename>mkefidisk.sh</filename> script.
@@ -4786,7 +5109,7 @@
      Creating image(s)...
 
      Info: The new image(s) can be found here:
-      /var/tmp/wic/build/mkefidisk-201310230946-sda.direct
+      <replaceable>current_directory</replaceable>/build/mkefidisk-201310230946-sda.direct
 
      The following build artifacts were used to create the image(s):
       ROOTFS_DIR: /home/trz/yocto/yocto-image/build/tmp/work/minnow-poky-linux/core-image-minimal/1.0-r0/rootfs
@@ -4811,7 +5134,8 @@
 
                     <para>
                         The output specifies the exact image created as well as
-                        where it was created.
+                        where it was created, which is in the current
+                        directory by default.
                         The output also names the artifacts used and the exact
                         <filename>.wks</filename> script that was used to
                         generate the image.
@@ -4823,18 +5147,26 @@
                     </para>
 
                     <para>
-                        Continuing with the example, you can now directly
-                        <filename>dd</filename> the image to a USB stick, or
-                        whatever media for which you built your image,
-                        and boot the resulting media:
+                        Continuing with the example, you can now write the
+                        image to a USB stick, or whatever media for which you
+                        built your image, and boot the resulting media.
+                        You can write the image by using
+                        <filename>bmaptool</filename> or
+                        <filename>dd</filename>:
                         <literallayout class='monospaced'>
-     $ sudo dd if=/var/tmp/wic/build/mkefidisk-201310230946-sda.direct of=/dev/sdb
-     [sudo] password for trz:
-     182274+0 records in
-     182274+0 records out
-     93324288 bytes (93 MB) copied, 14.4777 s, 6.4 MB/s
-     [trz at empanada ~]$ sudo eject /dev/sdb
+     $ oe-run-native bmaptool copy build/mkefidisk-201310230946-sda.direct /dev/sd<replaceable>X</replaceable>
                         </literallayout>
+                        or
+                        <literallayout class='monospaced'>
+     $ sudo dd if=build/mkefidisk-201310230946-sda.direct of=/dev/sd<replaceable>X</replaceable>
+                        </literallayout>
+                        <note>
+                            For more information on how to use the
+                            <filename>bmaptool</filename> to flash a device
+                            with an image, see the
+                            "<link linkend='flashing-images-using-bmaptool'>Flashing Images Using <filename>bmaptool</filename></link>"
+                            section.
+                        </note>
                     </para>
                 </section>
 
@@ -4910,7 +5242,7 @@
      Creating image(s)...
 
      Info: The new image(s) can be found here:
-      /var/tmp/wic/build/directdisksdb-201310231131-sdb.direct
+      <replaceable>current_directory</replaceable>/build/directdisksdb-201310231131-sdb.direct
 
      The following build artifacts were used to create the image(s):
 
@@ -4927,7 +5259,7 @@
                         whatever media for which you built your image,
                         and boot the resulting media:
                         <literallayout class='monospaced'>
-     $ sudo dd if=/var/tmp/wic/build/directdisksdb-201310231131-sdb.direct of=/dev/sdb
+     $ sudo dd if=build/directdisksdb-201310231131-sdb.direct of=/dev/sdb
      86018+0 records in
      86018+0 records out
      44041216 bytes (44 MB) copied, 13.0734 s, 3.4 MB/s
@@ -4954,7 +5286,7 @@
      Creating image(s)...
 
      Info: The new image(s) can be found here:
-      /var/tmp/wic/build/directdisk-201309252350-sda.direct
+      <replaceable>current_directory</replaceable>/build/directdisk-201309252350-sda.direct
 
      The following build artifacts were used to create the image(s):
 
@@ -4977,8 +5309,8 @@
                         (runs in Raw Mode) and uses a modified kickstart file.
                         The example also uses the <filename>-o</filename> option
                         to cause Wic to create the output
-                        somewhere other than the default
-                        <filename>/var/tmp/wic</filename> directory:
+                        somewhere other than the default output directory,
+                        which is the current directory:
                         <literallayout class='monospaced'>
      $ wic create ~/test.wks -o /home/trz/testwic --rootfs-dir \
           /home/trz/yocto/yocto-image/build/tmp/work/crownbay_noemgd-poky-linux/core-image-minimal/1.0-r0/rootfs \
@@ -5030,6 +5362,14 @@
                     <filename>--source</filename> keyword to a
                     particular plug-in implementation that populates a
                     corresponding partition.
+                    <note>
+                        If you use plug-ins that have build-time dependencies
+                        (e.g. native tools, bootloaders, and so forth)
+                        when building a Wic image, you need to specify those
+                        dependencies using the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-WKS_FILE_DEPENDS'><filename>WKS_FILE_DEPENDS</filename></ulink>
+                        variable.
+                    </note>
                 </para>
 
                 <para>
@@ -5224,9 +5564,7 @@
                         <itemizedlist>
                             <listitem><para>
                                 <filename>/<replaceable>path</replaceable></filename>:
-                                For example, <filename>/</filename>,
-                                <filename>/usr</filename>, or
-                                <filename>/home</filename>
+                                For example, "/", "/usr", or "/home"
                                 </para></listitem>
                             <listitem><para>
                                 <filename>swap</filename>:
@@ -6234,7 +6572,7 @@
                         and <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
                         statements enable the OpenEmbedded build system to find the patch file.
                         For more information on using append files, see the
-                        "<link linkend='using-bbappend-files'>Using .bbappend Files</link>"
+                        "<link linkend='using-bbappend-files'>Using .bbappend Files in Your Layer</link>"
                         section.
                         </para></listitem>
                     <listitem><para><emphasis>Put the patch file in your layer</emphasis>:
@@ -6713,7 +7051,7 @@
                         <listitem><para>Add a <filename>psplash</filename>
                             append file for a branded splash screen.
                             For information on append files, see the
-                            "<link linkend='using-bbappend-files'>Using .bbappend Files</link>"
+                            "<link linkend='using-bbappend-files'>Using .bbappend Files in Your Layer</link>"
                             section.</para></listitem>
                         <listitem><para>Add any other append files to make
                             custom changes that are specific to individual
@@ -6994,7 +7332,7 @@
                         section of the Yocto Project Linux Kernel Development
                         Manual and the "<link linkend='creating-config-fragments'>Creating Configuration Fragments</link>"
                         section, which is in this manual.</para></listitem>
-                    <listitem><para><filename>bitbake -u depexp -g <replaceable>bitbake_target</replaceable></filename>:
+                    <listitem><para><filename>bitbake -u taskexp -g <replaceable>bitbake_target</replaceable></filename>:
                         Using the BitBake command with these options brings up
                         a Dependency Explorer from which you can view file
                         dependencies.
@@ -7042,7 +7380,7 @@
                 the Dependency Explorer UI with the BitBake command:
                 <literallayout class='monospaced'>
      $ cd <replaceable>image-directory</replaceable>
-     $ bitbake -u depexp -g <replaceable>image</replaceable>
+     $ bitbake -u taskexp -g <replaceable>image</replaceable>
                 </literallayout>
                 Use the interface to select potential packages you wish to
                 eliminate and see their dependency relationships.
@@ -7277,7 +7615,7 @@
             you much of a performance difference across the other systems
             as compared to using a more general tuning across all the builds
             (e.g. setting
-            <ulink url='var-DEFAULTTUNE'><filename>DEFAULTTUNE</filename></ulink>
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-DEFAULTTUNE'><filename>DEFAULTTUNE</filename></ulink>
             specifically for each machine's build).
             Rather than "max out" each build's tunings, you can take steps that
             cause the OpenEmbedded build system to reuse software across the
@@ -7456,7 +7794,7 @@
                     <link linkend='excluding-packages-from-an-image'>Excluding packages from an image</link>
                     </para></listitem>
                 <listitem><para>
-                    <link linkend='incrementing-a-package-revision-number'>Incrementing a package revision number</link>
+                    <link linkend='incrementing-a-binary-package-version'>Incrementing a binary package version</link>
                     </para></listitem>
                 <listitem><para>
                     <link linkend='handling-optional-module-packaging'>Handling optional module packaging</link>
@@ -7514,37 +7852,104 @@
             </para>
         </section>
 
-        <section id='incrementing-a-package-revision-number'>
-            <title>Incrementing a Package Revision Number</title>
+        <section id='incrementing-a-binary-package-version'>
+            <title>Incrementing a Package Version</title>
 
             <para>
-                If a committed change results in changing the package output,
-                then the value of the
-                <ulink url='&YOCTO_DOCS_REF_URL;#var-PR'><filename>PR</filename></ulink>
-                variable needs to be increased (or "bumped").
-                Increasing <filename>PR</filename> occurs one of two ways:
+                This section provides some background on how binary package
+                versioning is accomplished and presents some of the services,
+                variables, and terminology involved.
+            </para>
+
+            <para>
+                In order to understand binary package versioning, you need
+                to consider the following:
                 <itemizedlist>
-                    <listitem><para>Automatically using a Package Revision
-                        Service (PR Service).</para></listitem>
-                    <listitem><para>Manually incrementing the
-                        <filename>PR</filename> variable.</para></listitem>
+                    <listitem><para>
+                        Binary Package:  The binary package that is eventually
+                        built and installed into an image.
+                        </para></listitem>
+                    <listitem><para>
+                        Binary Package Version:  The binary package version
+                        is composed of two components - a version and a
+                        revision.
+                        <note>
+                            Technically, a third component, the "epoch" (i.e.
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-PE'><filename>PE</filename></ulink>)
+                            is involved but this discussion for the most part
+                            ignores <filename>PE</filename>.
+                        </note>
+                        The version and revision are taken from the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-PV'><filename>PV</filename></ulink>
+                        and
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-PR'><filename>PR</filename></ulink>
+                        variables, respectively.
+                        </para></listitem>
+                    <listitem><para>
+                        <filename>PV</filename>:  The recipe version.
+                        <filename>PV</filename> represents the version of the
+                        software being packaged.
+                        Do not confuse <filename>PV</filename> with the
+                        binary package version.
+                        </para></listitem>
+                    <listitem><para>
+                        <filename>PR</filename>:  The recipe revision.
+                        </para></listitem>
+                    <listitem><para>
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCPV'><filename>SRCPV</filename></ulink>:
+                        The OpenEmbedded build system uses this string
+                        to help define the value of <filename>PV</filename>
+                        when the source code revision needs to be included
+                        in it.
+                        </para></listitem>
+                    <listitem><para>
+                        <ulink url='https://wiki.yoctoproject.org/wiki/PR_Service'>PR Service</ulink>:
+                        A network-based service that helps automate keeping
+                        package feeds compatible with existing package
+                        manager applications such as RPM, APT, and OPKG.
+                        </para></listitem>
                 </itemizedlist>
             </para>
 
             <para>
-                Given that one of the challenges any build system and its
-                users face is how to maintain a package feed that is compatible
-                with existing package manager applications such as
-                RPM, APT, and OPKG, using an automated system is much
-                preferred over a manual system.
-                In either system, the main requirement is that version
-                numbering increases in a linear fashion and that a number of
-                version components exist that support that linear progression.
+                Whenever the binary package content changes, the binary package
+                version must change.
+                Changing the binary package version is accomplished by changing
+                or "bumping" the <filename>PR</filename> and/or
+                <filename>PV</filename> values.
+                Increasing these values occurs one of two ways:
+                <itemizedlist>
+                    <listitem><para>Automatically using a Package Revision
+                        Service (PR Service).
+                        </para></listitem>
+                    <listitem><para>Manually incrementing the
+                        <filename>PR</filename> and/or
+                        <filename>PV</filename> variables.
+                        </para></listitem>
+                </itemizedlist>
             </para>
 
             <para>
-                The following two sections provide information on the PR Service
-                and on manual <filename>PR</filename> bumping.
+                Given a primary challenge of any build system and its users
+                is how to maintain a package feed that is compatible with
+                existing package manager applications such as RPM, APT, and
+                OPKG, using an automated system is much preferred over a
+                manual system.
+                In either system, the main requirement is that binary package
+                version numbering increases in a linear fashion and that a
+                number of version components exist that support that linear
+                progression.
+                For information on how to ensure package revisioning remains
+                linear, see the
+                "<link linkend='automatically-incrementing-a-binary-package-revision-number'>Automatically Incrementing a Binary Package Revision Number</link>"
+                section.
+            </para>
+
+            <para>
+                The following three sections provide related information on the
+                PR Service, the manual method for "bumping"
+                <filename>PR</filename> and/or <filename>PV</filename>, and
+                on how to ensure binary package revisioning remains linear.
             </para>
 
             <section id='working-with-a-pr-service'>
@@ -7585,9 +7990,10 @@
                     All the inputs into a given task are represented by a
                     signature, which can trigger a rebuild when different.
                     Thus, the build system itself does not rely on the
-                    <filename>PR</filename> numbers to trigger a rebuild.
+                    <filename>PR</filename>, <filename>PV</filename>, and
+                    <filename>PE</filename> numbers to trigger a rebuild.
                     The signatures, however, can be used to generate
-                    <filename>PR</filename> values.
+                    these values.
                 </para>
 
                 <para>
@@ -7632,7 +8038,7 @@
                     </literallayout>
                     Once the service is started, packages will automatically
                     get increasing <filename>PR</filename> values and
-                    BitBake will take care of starting and stopping the server.
+                    BitBake takes care of starting and stopping the server.
                 </para>
 
                 <para>
@@ -7653,8 +8059,8 @@
 
                 <para>
                     It is also recommended you use build history, which adds
-                    some sanity checks to package versions, in conjunction with
-                    the server that is running the PR Service.
+                    some sanity checks to binary package versions, in
+                    conjunction with the server that is running the PR Service.
                     To enable build history, add the following to each building
                     system's <filename>local.conf</filename> file:
                     <literallayout class='monospaced'>
@@ -7668,18 +8074,23 @@
                 </para>
 
                 <note>
-                    <para>The OpenEmbedded build system does not maintain
-                    <filename>PR</filename> information as part of the
-                    shared state (sstate) packages.
-                    If you maintain an sstate feed, its expected that either
-                    all your building systems that contribute to the sstate
-                    feed use a shared PR Service, or you do not run a PR
-                    Service on any of your building systems.
-                    Having some systems use a PR Service while others do
-                    not leads to obvious problems.</para>
-                    <para>For more information on shared state, see the
-                    "<ulink url='&YOCTO_DOCS_REF_URL;#shared-state-cache'>Shared State Cache</ulink>"
-                    section in the Yocto Project Reference Manual.</para>
+                    <para>
+                        The OpenEmbedded build system does not maintain
+                        <filename>PR</filename> information as part of the
+                        shared state (sstate) packages.
+                        If you maintain an sstate feed, its expected that either
+                        all your building systems that contribute to the sstate
+                         feed use a shared PR Service, or you do not run a PR
+                        Service on any of your building systems.
+                        Having some systems use a PR Service while others do
+                        not leads to obvious problems.
+                    </para>
+
+                    <para>
+                        For more information on shared state, see the
+                        "<ulink url='&YOCTO_DOCS_REF_URL;#shared-state-cache'>Shared State Cache</ulink>"
+                        section in the Yocto Project Reference Manual.
+                    </para>
                 </note>
             </section>
 
@@ -7688,7 +8099,7 @@
 
                 <para>
                     The alternative to setting up a PR Service is to manually
-                    bump the
+                    "bump" the
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-PR'><filename>PR</filename></ulink>
                     variable.
                 </para>
@@ -7722,7 +8133,7 @@
                 </para>
 
                 <para>
-                    When upgrading the version of a package, assuming the
+                    When upgrading the version of a binary package, assuming the
                     <filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PV'>PV</ulink></filename>
                     changes, the <filename>PR</filename> variable should be
                     reset to "r0" (or "${INC_PR}.0" if you are using
@@ -7730,7 +8141,7 @@
                 </para>
 
                 <para>
-                    Usually, version increases occur only to packages.
+                    Usually, version increases occur only to binary packages.
                     However, if for some reason <filename>PV</filename> changes
                     but does not increase, you can increase the
                     <filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PE'>PE</ulink></filename>
@@ -7739,11 +8150,87 @@
                 </para>
 
                 <para>
-                    Version numbering strives to follow the
+                    Binary package version numbering strives to follow the
                     <ulink url='http://www.debian.org/doc/debian-policy/ch-controlfields.html'>
                     Debian Version Field Policy Guidelines</ulink>.
                     These guidelines define how versions are compared and what
                     "increasing" a version means.
+                </para>
+            </section>
+
+            <section id='automatically-incrementing-a-binary-package-revision-number'>
+                <title>Automatically Incrementing a Package Version Number</title>
+
+                <para>
+                    When fetching a repository, BitBake uses the
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>
+                    variable to determine the specific source code revision
+                    from which to build.
+                    You set the <filename>SRCREV</filename> variable to
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-AUTOREV'><filename>AUTOREV</filename></ulink>
+                    to cause the OpenEmbedded build system to automatically use the
+                    latest revision of the software:
+                    <literallayout class='monospaced'>
+     SRCREV = "${AUTOREV}"
+                    </literallayout>
+                </para>
+
+                <para>
+                    Furthermore, you need to reference <filename>SRCPV</filename>
+                    in <filename>PV</filename> in order to automatically update
+                    the version whenever the revision of the source code
+                    changes.
+                    Here is an example:
+                    <literallayout class='monospaced'>
+     PV = "1.0+git${SRCPV}"
+                    </literallayout>
+                    The OpenEmbedded build system substitutes
+                    <filename>SRCPV</filename> with the following:
+                    <literallayout class='monospaced'>
+     AUTOINC+<replaceable>source_code_revision</replaceable>
+                    </literallayout>
+                    The build system replaces the <filename>AUTOINC</filename> with
+                    a number.
+                    The number used depends on the state of the PR Service:
+                    <itemizedlist>
+                        <listitem><para>
+                            If PR Service is enabled, the build system increments
+                            the number, which is similar to the behavior of
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-PR'><filename>PR</filename></ulink>.
+                            This behavior results in linearly increasing package
+                            versions, which is desirable.
+                            Here is an example:
+                            <literallayout class='monospaced'>
+     hello-world-git_0.0+git0+b6558dd387-r0.0_armv7a-neon.ipk
+     hello-world-git_0.0+git1+dd2f5c3565-r0.0_armv7a-neon.ipk
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            If PR Service is not enabled, the build system
+                            replaces the <filename>AUTOINC</filename>
+                            placeholder with zero (i.e. "0").
+                            This results in changing the package version since
+                            the source revision is included.
+                            However, package versions are not increased linearly.
+                            Here is an example:
+                            <literallayout class='monospaced'>
+     hello-world-git_0.0+git0+b6558dd387-r0.0_armv7a-neon.ipk
+     hello-world-git_0.0+git0+dd2f5c3565-r0.0_armv7a-neon.ipk
+                            </literallayout>
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+
+                <para>
+                    In summary, the OpenEmbedded build system does not track the
+                    history of binary package versions for this purpose.
+                    <filename>AUTOINC</filename>, in this case, is comparable to
+                    <filename>PR</filename>.
+                    If PR server is not enabled, <filename>AUTOINC</filename>
+                    in the package version is simply replaced by "0".
+                    If PR server is enabled, the build system keeps track of the
+                    package versions and bumps the number when the package
+                    revision changes.
                 </para>
             </section>
         </section>
@@ -8226,13 +8713,14 @@
                     <title>Using RPM</title>
 
                     <para>
-                        The <filename>smart</filename> application performs
+                        The <filename>dnf</filename> application performs
                         runtime package management of RPM packages.
                         You must perform an initial setup for
-                        <filename>smart</filename> on the target machine
+                        <filename>dnf</filename> on the target machine
                         if the
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_FEED_ARCHS'><filename>PACKAGE_FEED_ARCHS</filename></ulink>,
-                        <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_FEED_BASE_PATHS'><filename>PACKAGE_FEED_BASE_PATHS</filename></ulink>, and
+                        <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_FEED_BASE_PATHS'><filename>PACKAGE_FEED_BASE_PATHS</filename></ulink>,
+                        and
                         <ulink url='&YOCTO_DOCS_REF_URL;#var-PACKAGE_FEED_URIS'><filename>PACKAGE_FEED_URIS</filename></ulink>
                         variables have not been set or the target image was
                         built before the variables were set.
@@ -8244,21 +8732,26 @@
                         <filename>all</filename>, <filename>i586</filename>,
                         and <filename>qemux86</filename> from a server named
                         <filename>my.server</filename>.
-                        You must inform <filename>smart</filename> of the
-                        availability of these databases by issuing the
-                        following commands on the target:
+                        You must inform <filename>dnf</filename> of the
+                        availability of these databases by creating a
+                        <filename>/etc/yum.repos.d/oe-packages.repo</filename>
+                        file with the following content:
                         <literallayout class='monospaced'>
-     # smart channel --add i585 type=rpm-md baseurl=http://my.server/rpm/i586
-     # smart channel --add qemux86 type=rpm-md baseurl=http://my.server/rpm/qemux86
-     # smart channel --add all type=rpm-md baseurl=http://my.server/rpm/all
+     [oe-packages]
+     baseurl="http://my.server/rpm/i586 http://my.server/rpm/qemux86 http://my.server/rpm/all"
                         </literallayout>
                         From the target machine, fetch the repository:
                         <literallayout class='monospaced'>
-     # smart update
+     # dnf makecache
                         </literallayout>
-                        After everything is set up, <filename>smart</filename>
+                        After everything is set up, <filename>dnf</filename>
                         is able to find, install, and upgrade packages from
                         the specified repository.
+                        <note>
+                            See the
+                            <ulink url='http://dnf.readthedocs.io/en/latest/'>DNF documentation</ulink>
+                            for additional information.
+                        </note>
                     </para>
                 </section>
 
@@ -8361,6 +8854,127 @@
                         specified repository.
                     </para>
                 </section>
+            </section>
+        </section>
+
+        <section id='generating-and-using-signed-packages'>
+            <title>Generating and Using Signed Packages</title>
+            <para>
+                In order to add security to RPM packages used during a build,
+                you can take steps to securely sign them.
+                Once a signature is verified, the OpenEmbedded build system
+                can use the package in the build.
+                If security fails for a signed package, the build system
+                aborts the build.
+            </para>
+
+            <para>
+                This section describes how to sign RPM packages during a build
+                and how to use signed package feeds (repositories) when
+                doing a build.
+            </para>
+
+            <section id='signing-rpm-packages'>
+                <title>Signing RPM Packages</title>
+
+                <para>
+                    To enable signing RPM packages, you must set up the
+                    following configurations in either your
+                    <filename>local.config</filename> or
+                    <filename>distro.config</filename> file:
+                    <literallayout class='monospaced'>
+     # Inherit sign_rpm.bbclass to enable signing functionality
+     INHERIT += " sign_rpm"
+     # Define the GPG key that will be used for signing.
+     RPM_GPG_NAME = "<replaceable>key_name</replaceable>"
+     # Provide passphrase for the key
+     RPM_GPG_PASSPHRASE = "<replaceable>passphrase</replaceable>"
+                    </literallayout>
+                    <note>
+                        Be sure to supply appropriate values for both
+                        <replaceable>key_name</replaceable> and
+                        <replaceable>passphrase</replaceable>
+                    </note>
+                    Aside from the
+                    <filename>RPM_GPG_NAME</filename> and
+                    <filename>RPM_GPG_PASSPHRASE</filename> variables in the
+                    previous example, two optional variables related to signing
+                    exist:
+                    <itemizedlist>
+                        <listitem><para>
+                            <emphasis><filename>GPG_BIN</filename>:</emphasis>
+                            Specifies a <filename>gpg</filename> binary/wrapper
+                            that is executed when the package is signed.
+                            </para></listitem>
+                        <listitem><para>
+                            <emphasis><filename>GPG_PATH</filename>:</emphasis>
+                            Specifies the <filename>gpg</filename> home
+                            directory used when the package is signed.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+            </section>
+
+            <section id='processing-package-feeds'>
+                <title>Processing Package Feeds</title>
+
+                <para>
+                    In addition to being able to sign RPM packages, you can
+                    also enable the OpenEmbedded build system to be able to
+                    handle previously signed package feeds for IPK
+                    packages.
+                    <note>
+                        The OpenEmbedded build system does not currently
+                        support signed DPKG or RPM package feeds.
+                    </note>
+                    The steps you need to take to enable signed package feed
+                    use are similar to the steps used to sign RPM packages.
+                    You must define the following in your
+                    <filename>local.config</filename> or
+                    <filename>distro.config</filename> file:
+                    <literallayout class='monospaced'>
+     INHERIT += "sign_package_feed"
+     PACKAGE_FEED_GPG_NAME = "<replaceable>key_name</replaceable>"
+     PACKAGE_FEED_GPG_PASSPHRASE_FILE = "<replaceable>path_to_file_containing_passphrase</replaceable>"
+                    </literallayout>
+                    For signed package feeds, the passphrase must exist in a
+                    separate file, which is pointed to by the
+                    <filename>PACKAGE_FEED_GPG_PASSPHRASE_FILE</filename>
+                    variable.
+                    Regarding security, keeping a plain text passphrase out of
+                    the configuration is more secure.
+                </para>
+
+                <para>
+                    Aside from the
+                    <filename>PACKAGE_FEED_GPG_NAME</filename> and
+                    <filename>PACKAGE_FEED_GPG_PASSPHRASE_FILE</filename>
+                    variables, three optional variables related to signed
+                    package feeds exist:
+                    <itemizedlist>
+                        <listitem><para>
+                            <emphasis><filename>GPG_BIN</filename>:</emphasis>
+                            Specifies a <filename>gpg</filename> binary/wrapper
+                            that is executed when the package is signed.
+                            </para></listitem>
+                        <listitem><para>
+                            <emphasis><filename>GPG_PATH</filename>:</emphasis>
+                            Specifies the <filename>gpg</filename> home
+                            directory used when the package is signed.
+                            </para></listitem>
+                        <listitem><para>
+                            <emphasis><filename>PACKAGE_FEED_GPG_SIGNATURE_TYPE</filename>:</emphasis>
+                            Specifies the type of <filename>gpg</filename>
+                            signature.
+                            This variable applies only to RPM and IPK package
+                            feeds.
+                            Allowable values for the
+                            <filename>PACKAGE_FEED_GPG_SIGNATURE_TYPE</filename>
+                            are "ASC", which is the default and specifies ascii
+                            armored, and "BIN", which specifies binary.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
             </section>
         </section>
 
@@ -9129,6 +9743,13 @@
             tests, run available tests, and write and add your own tests.
         </para>
 
+        <para>
+            For information on the test and QA infrastructure available
+            within the Yocto Project, see the
+            "<ulink url='&YOCTO_DOCS_REF_URL;#testing-and-quality-assurance'>Testing and Quality Assurance</ulink>"
+            section in the Yocto Project Reference Manual.
+        </para>
+
         <section id='enabling-tests'>
             <title>Enabling Tests</title>
 
@@ -9182,12 +9803,13 @@
                         <listitem><para><emphasis>Be sure your host's firewall
                             accepts incoming connections from
                             192.168.7.0/24:</emphasis>
-                            Some of the tests (in particular smart tests) start an
-                            HTTP server on a random high number port, which is
-                            used to serve files to the target.
-                            The smart module serves
-                            <filename>${DEPLOY_DIR}/rpm</filename> so it can run
-                            smart channel commands. That means your host's firewall
+                            Some of the tests (in particular DNF tests) start
+                            an HTTP server on a random high number port,
+                            which is used to serve files to the target.
+                            The DNF module serves
+                            <filename>${WORKDIR}/oe-rootfs-repo</filename>
+                            so it can run DNF channel commands.
+                            That means your host's firewall
                             must accept incoming connections from 192.168.7.0/24,
                             which is the default IP range used for tap devices
                             by <filename>runqemu</filename>.</para></listitem>
@@ -9687,7 +10309,7 @@
                     <listitem><para>The default tests for the image are defined
                         as:
                         <literallayout class='monospaced'>
-     DEFAULT_TEST_SUITES_pn-<replaceable>image</replaceable> = "ping ssh df connman syslog xorg scp vnc date rpm smart dmesg"
+     DEFAULT_TEST_SUITES_pn-<replaceable>image</replaceable> = "ping ssh df connman syslog xorg scp vnc date rpm dnf dmesg"
                         </literallayout></para></listitem>
                     <listitem><para>Add your own test to the list of the
                         by using the following:
@@ -9885,7 +10507,7 @@
                                             </para></listitem>
                                         <listitem><para><emphasis><filename>server_ip</filename>:</emphasis>
                                             The host's IP address, which is
-                                            usually used by the "smart" test
+                                            usually used by the DNF test
                                             suite.
                                             </para></listitem>
                                         <listitem><para><emphasis><filename>run(cmd, timeout=None)</filename>:</emphasis>
@@ -10044,16 +10666,16 @@
         </para>
 
         <para>
-            To help get past the previously mentioned constraints, you can use Gdbserver.
-            Gdbserver runs on the remote target and does not load any debugging information
-            from the debugged process.
+            To help get past the previously mentioned constraints, you can use
+            gdbserver, which runs on the remote target and does not load any
+            debugging information from the debugged process.
             Instead, a GDB instance processes the debugging information that is run on a
             remote computer - the host GDB.
-            The host GDB then sends control commands to Gdbserver to make it stop or start the debugged
+            The host GDB then sends control commands to gdbserver to make it stop or start the debugged
             program, as well as read or write memory regions of that debugged program.
             All the debugging information loaded and processed as well
             as all the heavy debugging is done by the host GDB.
-            Offloading these processes gives the Gdbserver running on the target a chance to remain
+            Offloading these processes gives the gdbserver running on the target a chance to remain
             small and fast.
         </para>
 
@@ -10064,7 +10686,7 @@
             with their debugging information and also be sure the target is compiled with no optimizations.
             The host GDB must also have local access to all the libraries used by the
             debugged program.
-            Because Gdbserver does not need any local debugging information, the binaries on
+            Because gdbserver does not need any local debugging information, the binaries on
             the remote target can remain stripped.
             However, the binaries must also be compiled without optimization
             so they match the host's binaries.
@@ -10107,7 +10729,7 @@
                     the partial filesystem with the full filesystem.
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Configure the system to include Gdbserver in
+                    <emphasis>Configure the system to include gdbserver in
                     the target filesystem:</emphasis></para>
 
                     <para>Make the following addition in either your
@@ -10204,18 +10826,18 @@
                 <listitem><para>
                     <emphasis>Debug a program:</emphasis></para>
 
-                    <para>Debugging a program involves running Gdbserver
+                    <para>Debugging a program involves running gdbserver
                     on the target and then running Gdb on the host.
                     The example in this step debugs
                     <filename>gzip</filename>:
                     <literallayout class='monospaced'>
      root@qemux86:~# gdbserver localhost:1234 /bin/gzip —help
                     </literallayout>
-                    For additional Gdbserver options, see the
-                    <ulink url='https://www.gnu.org/software/gdb/documentation/'>Gdb Server Documentation</ulink>.
+                    For additional gdbserver options, see the
+                    <ulink url='https://www.gnu.org/software/gdb/documentation/'>GDB Server Documentation</ulink>.
                     </para>
 
-                    <para>After running Gdbserver on the target, you need
+                    <para>After running gdbserver on the target, you need
                     to run Gdb on the host and configure it and connect to
                     the target.
                     Use these commands:
@@ -10285,10 +10907,10 @@
         </section>
 
         <section id="platdev-gdb-remotedebug-launch-gdbserver">
-            <title>Launch Gdbserver on the Target</title>
+            <title>Launch gdbserver on the Target</title>
 
             <para>
-                Make sure Gdbserver is installed on the target.
+                Make sure gdbserver is installed on the target.
                 If it is not, install the package
                 <filename>gdbserver</filename>, which needs the
                 <filename>libthread-db1</filename> package.
@@ -10296,15 +10918,15 @@
 
             <para>
                 Here is an example, that when entered from the host,
-                connects to the target and launches Gdbserver in order to
+                connects to the target and launches gdbserver in order to
                 "debug" a binary named <filename>helloworld</filename>:
                 <literallayout class='monospaced'>
      $ gdbserver localhost:2345 /usr/bin/helloworld
                 </literallayout>
-                Gdbserver should now be listening on port 2345 for debugging
+                gdbserver should now be listening on port 2345 for debugging
                 commands coming from a remote GDB process that is running on
                 the host computer.
-                Communication between Gdbserver and the host GDB are done
+                Communication between gdbserver and the host GDB are done
                 using TCP.
                 To use other communication protocols, please refer to the
                 <ulink url='http://www.gnu.org/software/gdb/'>Gdbserver documentation</ulink>.
@@ -10876,10 +11498,11 @@
 
             <para>
                 Before you employ <filename>DL_DIR</filename> or the
-                archiver class, you need to decide how you choose to
-                provide source.
-                The source archiver class can generate tarballs and SRPMs
-                and can create them with various levels of compliance in mind.
+                <filename>archiver</filename> class, you need to decide how
+                you choose to provide source.
+                The source <filename>archiver</filename> class can generate
+                tarballs and SRPMs and can create them with various levels of
+                compliance in mind.
             </para>
 
             <para>
@@ -10974,9 +11597,9 @@
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-COPY_LIC_DIRS'><filename>COPY_LIC_DIRS</filename></ulink>
                     and
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-COPY_LIC_MANIFEST'><filename>COPY_LIC_MANIFEST</filename></ulink>
-                    add a copy of the license when the image is built but do not
-                    offer a path for adding licenses for newly installed packages
-                    to an image.
+                    add a copy of the license when the image is built but do
+                    not offer a path for adding licenses for newly installed
+                    packages to an image.
                     <ulink url='&YOCTO_DOCS_REF_URL;#var-LICENSE_CREATE_PACKAGE'><filename>LICENSE_CREATE_PACKAGE</filename></ulink>
                     adds a separate package and an upgrade path for adding
                     licenses to an image.</para>
@@ -10984,7 +11607,8 @@
             </para>
 
             <para>
-                As the source archiver has already archived the original
+                As the source <filename>archiver</filename> class has already
+                archived the original
                 unmodified source that contains the license files,
                 you would have already met the requirements for inclusion
                 of the license information with source as defined by the GPL
@@ -10996,7 +11620,7 @@
             <title>Providing Compilation Scripts and Source Code Modifications</title>
 
             <para>
-                At this point, we have addressed all we need to address
+                At this point, we have addressed all we need to
                 prior to generating the image.
                 The next two requirements are addressed during the final
                 packaging of the release.
@@ -11015,7 +11639,7 @@
                 and a distro layer, and those those layers are used to patch,
                 compile, package, or modify (in any way) any open source
                 software included in your released images, you
-                might be required to to release those layers under section 3 of
+                might be required to release those layers under section 3 of
                 GPLv2 or section 1 of GPLv3.
                 One way of doing that is with a clean
                 checkout of the version of the Yocto Project and layers used

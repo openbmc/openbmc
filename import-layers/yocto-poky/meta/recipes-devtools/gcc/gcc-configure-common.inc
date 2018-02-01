@@ -23,7 +23,7 @@ GCCMULTILIB ?= "--disable-multilib"
 GCCTHREADS ?= "posix"
 
 EXTRA_OECONF = "\
-    ${@['--enable-clocale=generic', ''][d.getVar('USE_NLS', True) != 'no']} \
+    ${@['--enable-clocale=generic', ''][d.getVar('USE_NLS') != 'no']} \
     --with-gnu-ld \
     --enable-shared \
     --enable-languages=${LANGUAGES} \

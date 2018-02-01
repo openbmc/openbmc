@@ -15,6 +15,7 @@ do_install_append () {
 		echo "echo 'ERROR: $x should not be used, use an alternative such as pkg-config' >&2" >> ${D}$x
 		echo "echo '--should-not-have-used-$x'" >> ${D}$x
 		echo "exit 1" >> ${D}$x
+		chmod +x ${D}$x
 	done
 }
 

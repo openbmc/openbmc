@@ -10,5 +10,7 @@ SRC_URI[sha256sum] = "9dd45391806b0ed215abee4c5ac1597d018c386fe9c1f5afd2f6bc3b07
 
 S = "${WORKDIR}/pv-${PV}"
 
+EXCLUDE_FROM_WORLD = "1"
+
 inherit autotools
 

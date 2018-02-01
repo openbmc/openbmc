@@ -12,36 +12,29 @@ EXTRA_OECONF_PATHS = "\
 "
 
 do_configure () {
-    mtarget=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-    target=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-    if [ -d ${STAGING_INCDIR_NATIVE}/gcc-build-internal-$mtarget ]; then
-        hardlinkdir ${STAGING_INCDIR_NATIVE}/gcc-build-internal-$mtarget ${B}
-    fi
-
-    echo "Configuring libsanitizer"
-    rm -rf ${B}/$target/libsanitizer/
-    mkdir -p ${B}/$target/libsanitizer/
-    cd ${B}/$target/libsanitizer/
+    rm -rf ${B}/${TARGET_SYS}/libsanitizer/
+    mkdir -p ${B}/${TARGET_SYS}/libsanitizer/
+    cd ${B}/${TARGET_SYS}/libsanitizer/
     chmod a+x ${S}/libsanitizer/configure
-    relpath=${@os.path.relpath("${S}/libsanitizer", "${B}/$target/libsanitizer")}
+    relpath=${@os.path.relpath("${S}/libsanitizer", "${B}/${TARGET_SYS}/libsanitizer")}
     $relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
     # Easiest way to stop bad RPATHs getting into the library since we have a
     # broken libtool here
-    sed -i -e 's/hardcode_into_libs=yes/hardcode_into_libs=no/' ${B}/$target/libsanitizer/libtool
+    sed -i -e 's/hardcode_into_libs=yes/hardcode_into_libs=no/' ${B}/${TARGET_SYS}/libsanitizer/libtool
     # Link to the sysroot's libstdc++ instead of one gcc thinks it just built
-    sed -i -e '/LIBSTDCXX_RAW_CXX_\(CXXFLAGS\|LDFLAGS\)\s*=/d' ${B}/$target/libsanitizer/*/Makefile
+    sed -i -e '/LIBSTDCXX_RAW_CXX_\(CXXFLAGS\|LDFLAGS\)\s*=/d' ${B}/${TARGET_SYS}/libsanitizer/*/Makefile
 }
+EXTRACONFFUNCS += "extract_stashed_builddir"
+do_configure[depends] += "${COMPILERDEP}"
 
 do_compile () {
-    target=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-    cd ${B}/$target/libsanitizer/
-    oe_runmake MULTIBUILDTOP=${B}/$target/libsanitizer/
+    cd ${B}/${TARGET_SYS}/libsanitizer/
+    oe_runmake MULTIBUILDTOP=${B}/${TARGET_SYS}/libsanitizer/
 }
 
 do_install () {
-    target=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-    cd ${B}/$target/libsanitizer/
-    oe_runmake 'DESTDIR=${D}' MULTIBUILDTOP=${B}/$target/libsanitizer/ install
+    cd ${B}/${TARGET_SYS}/libsanitizer/
+    oe_runmake 'DESTDIR=${D}' MULTIBUILDTOP=${B}/${TARGET_SYS}/libsanitizer/ install
     if [ -d ${D}${infodir} ]; then
         rmdir --ignore-fail-on-non-empty -p ${D}${infodir}
     fi

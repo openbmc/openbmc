@@ -8,6 +8,7 @@ DEPENDS = "libubox"
 SRC_URI = "git://nbd.name/relayd.git"
 
 SRCREV = "2970ff60bac6b70ecb682779d5c776dc559dc0b9"
+PV = "0.0.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

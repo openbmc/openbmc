@@ -1,0 +1,23 @@
+Encode arm EABI ( hard/soft ) calling convention in ELF header
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: go/src/cmd/link/internal/ld/elf.go
+===================================================================
+--- go.orig/src/cmd/link/internal/ld/elf.go
++++ go/src/cmd/link/internal/ld/elf.go
+@@ -950,7 +950,13 @@ func Elfinit(ctxt *Link) {
+ 	case sys.ARM, sys.MIPS:
+ 		if SysArch.Family == sys.ARM {
+ 			// we use EABI on linux/arm, freebsd/arm, netbsd/arm.
+-			if Headtype == obj.Hlinux || Headtype == obj.Hfreebsd || Headtype == obj.Hnetbsd {
++			if Headtype == obj.Hlinux {
++				if obj.GOARM == 7 {
++					ehdr.flags = 0x5000402 // has entry point, Version5 EABI, hard float
++				} else {
++					ehdr.flags = 0x5000202 // has entry point, Version5 EABI, soft float
++				}
++			} else if Headtype == obj.Hfreebsd || Headtype == obj.Hnetbsd {
+ 				// We set a value here that makes no indication of which
+ 				// float ABI the object uses, because this is information
+ 				// used by the dynamic linker to compare executables and

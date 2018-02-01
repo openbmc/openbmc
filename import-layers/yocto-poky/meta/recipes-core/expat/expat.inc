@@ -7,12 +7,12 @@ LICENSE = "MIT"
 SRC_URI = "${SOURCEFORGE_MIRROR}/expat/expat-${PV}.tar.bz2 \
            file://autotools.patch \
 	  "
-
-inherit autotools lib_package gzipnative
+inherit autotools lib_package
 
 # This package uses an archive format known to have issue with some
 # versions of gzip
-do_unpack[depends] += "gzip-native:do_populate_sysroot"
+DEPENDS += "pigz-native"
+do_unpack[depends] += "pigz-native:do_populate_sysroot"
 
 do_configure_prepend () {
 	rm -f ${S}/conftools/libtool.m4

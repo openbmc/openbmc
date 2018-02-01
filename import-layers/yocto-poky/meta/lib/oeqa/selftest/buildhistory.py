@@ -3,14 +3,15 @@ import re
 import datetime
 
 from oeqa.selftest.base import oeSelfTest
-from oeqa.utils.commands import bitbake, get_bb_var
+from oeqa.utils.commands import bitbake, get_bb_vars
 from oeqa.utils.decorators import testcase
 
 
 class BuildhistoryBase(oeSelfTest):
 
     def config_buildhistory(self, tmp_bh_location=False):
-        if (not 'buildhistory' in get_bb_var('USER_CLASSES')) and (not 'buildhistory' in get_bb_var('INHERIT')):
+        bb_vars = get_bb_vars(['USER_CLASSES', 'INHERIT'])
+        if (not 'buildhistory' in bb_vars['USER_CLASSES']) and (not 'buildhistory' in bb_vars['INHERIT']):
             add_buildhistory_config = 'INHERIT += "buildhistory"\nBUILDHISTORY_COMMIT = "1"'
             self.append_config(add_buildhistory_config)
 

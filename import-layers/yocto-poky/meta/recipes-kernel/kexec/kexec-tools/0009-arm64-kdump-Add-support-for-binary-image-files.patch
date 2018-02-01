@@ -1,0 +1,52 @@
+From 5a4958f01a793c3e7f440f5bae75666a4349cc50 Mon Sep 17 00:00:00 2001
+From: Pratyush Anand <panand@redhat.com>
+Date: Thu, 14 May 2015 11:25:37 +0530
+Subject: [PATCH 9/9] arm64: kdump: Add support for binary image files
+
+This patch adds support to use binary image ie arch/arm64/boot/Image with
+kdump.
+
+Upstream-Status: Backport [https://git.linaro.org/people/takahiro.akashi/kexec-tools.git]
+
+Signed-off-by: Pratyush Anand <panand@redhat.com>
+[takahiro.akashi@linaro.org: a bit reworked]
+Signed-off-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ kexec/arch/arm64/kexec-image-arm64.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/kexec/arch/arm64/kexec-image-arm64.c b/kexec/arch/arm64/kexec-image-arm64.c
+index 960ed96..982e431 100644
+--- a/kexec/arch/arm64/kexec-image-arm64.c
++++ b/kexec/arch/arm64/kexec-image-arm64.c
+@@ -4,7 +4,9 @@
+ 
+ #define _GNU_SOURCE
+ 
++#include "crashdump-arm64.h"
+ #include "kexec-arm64.h"
++#include "kexec-syscall.h"
+ #include <limits.h>
+ 
+ int image_arm64_probe(const char *kernel_buf, off_t kernel_size)
+@@ -58,6 +60,16 @@ int image_arm64_load(int argc, char **argv, const char *kernel_buf,
+ 	dbgprintf("%s: PE format:      %s\n", __func__,
+ 		(arm64_header_check_pe_sig(header) ? "yes" : "no"));
+ 
++	if (info->kexec_flags & KEXEC_ON_CRASH) {
++		/* create and initialize elf core header segment */
++		result = load_crashdump_segments(info);
++		if (result) {
++			dbgprintf("%s: Creating eflcorehdr failed.\n",
++								__func__);
++			goto exit;
++		}
++	}
++
+ 	/* load the kernel */
+ 	add_segment_phys_virt(info, kernel_buf, kernel_size,
+ 			kernel_segment + arm64_mem.text_offset,
+-- 
+1.9.1
+

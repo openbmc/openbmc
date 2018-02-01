@@ -2,7 +2,7 @@ SUMMARY_${PN}-ptest ?= "${SUMMARY} - Package test files"
 DESCRIPTION_${PN}-ptest ?= "${DESCRIPTION}  \
 This package contains a test directory ${PTEST_PATH} for package test purposes."
 
-PTEST_PATH ?= "${libdir}/${PN}/ptest"
+PTEST_PATH ?= "${libdir}/${BPN}/ptest"
 FILES_${PN}-ptest = "${PTEST_PATH}"
 SECTION_${PN}-ptest = "devel"
 ALLOW_EMPTY_${PN}-ptest = "1"
@@ -61,7 +61,7 @@ python () {
         d.setVarFlag('do_install_ptest_base', 'fakeroot', '1')
 
     # Remove all '*ptest_base' tasks when ptest is not enabled
-    if not(d.getVar('PTEST_ENABLED', True) == "1"):
+    if not(d.getVar('PTEST_ENABLED') == "1"):
         for i in ['do_configure_ptest_base', 'do_compile_ptest_base', 'do_install_ptest_base']:
             bb.build.deltask(i, d)
 }

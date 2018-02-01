@@ -1,0 +1,36 @@
+From 7f01847d14a1a3af50f49499743b0551ddef1311 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Mar 2017 23:54:01 -0700
+Subject: [PATCH 8/8] include sysdep.h before net/if_tun.h
+
+Fixes duplicate defines in header errors
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdep.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sysdep.c b/sysdep.c
+index 2518ec1..5624ef1 100644
+--- a/sysdep.c
++++ b/sysdep.c
+@@ -57,6 +57,8 @@
+ #include <sys/cygwin.h>
+ #endif
+ 
++#include "sysdep.h"
++
+ #if defined(__DragonFly__)
+ #include <net/tun/if_tun.h>
+ #elif defined(__linux__)
+@@ -69,7 +71,6 @@
+ #include <net/if_tun.h>
+ #endif
+ 
+-#include "sysdep.h"
+ 
+ #if !defined(HAVE_VASPRINTF) || !defined(HAVE_ASPRINTF) || !defined(HAVE_ERROR)
+ #include <stdarg.h>
+-- 
+2.12.1
+

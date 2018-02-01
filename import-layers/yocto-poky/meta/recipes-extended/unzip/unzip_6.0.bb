@@ -16,7 +16,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/
 	file://11-cve-2014-8141-getzip64data.patch \
 	file://CVE-2015-7696.patch \
 	file://CVE-2015-7697.patch \
-        file://fix-security-format.patch \
+	file://fix-security-format.patch \
+	file://18-cve-2014-9913-unzip-buffer-overflow.patch \
+	file://19-cve-2016-9844-zipinfo-buffer-overflow.patch \
 "
 
 SRC_URI[md5sum] = "62b490407489521db863b523a7f86375"

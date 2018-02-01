@@ -6,7 +6,7 @@ SECTION = "x11/font"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=cffd5e9c4b61b3d74166ca74b99e460e"
 
-DEPENDS = "util-macros-native font-util-native bdftopcf-native"
+DEPENDS += "util-macros-native font-util-native bdftopcf-native font-util"
 RDEPENDS_${PN} = "encodings font-util"
 RDEPENDS_${PN}_class-native = "font-util-native"
 

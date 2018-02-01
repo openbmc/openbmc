@@ -15,3 +15,5 @@ RDEPENDS_${PN} = "\
     packagegroup-core-standalone-sdk-target \
     ${SDK-EFL} \
     ${SDK-EXTRAS}"
+
+PNBLACKLIST[packagegroup-efl-standalone-sdk-target] ?= "Runtime depends on blacklisted elementary-dev - the recipe will be removed on 2017-09-01 unless the issue is fixed"

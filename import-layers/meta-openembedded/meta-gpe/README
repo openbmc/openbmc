@@ -1,18 +1,17 @@
 This layer depends on:
 
 URI: git://github.com/openembedded/oe-core.git
-branch: morty
+branch: pyro
 revision: HEAD
 
 URI: git://github.com/openembedded/meta-oe.git
-branch: morty
+branch: pyro
 revision: HEAD
 
-Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-gpe]' in the subject'
+Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-gpe][pyro]' in the subject'
 
 When sending single patches, please using something like:
-'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix=meta-gpe][PATCH'
+'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix=meta-gpe][pyro][PATCH'
 
-morty branch maintainer(s):
+pyro Branch Maintainer:
 Armin Kuster <akuster808@gmail.com>
-

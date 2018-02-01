@@ -8,7 +8,7 @@ EXTRA_OECONF = "--program-prefix="
 
 # Compatability for the rare systems not using or having SYSV
 python () {
-    if d.getVar('HOST_NONSYSV', True) and d.getVar('HOST_NONSYSV', True) != '0':
+    if d.getVar('HOST_NONSYSV') and d.getVar('HOST_NONSYSV') != '0':
         d.setVar('EXTRA_OECONF', ' --with-ipc=tcp --program-prefix= ')
 }
 

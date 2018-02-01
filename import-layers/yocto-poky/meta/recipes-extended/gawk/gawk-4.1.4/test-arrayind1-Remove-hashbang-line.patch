@@ -1,0 +1,30 @@
+From a3a3f26078223c47871c7b53e5c015ad163ae045 Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Thu, 3 Nov 2016 14:50:52 -0200
+Subject: [PATCH] test/arrayind1: Remove hashbang line
+Organization: O.S. Systems Software LTDA.
+
+Remove "#!/usr/local/bin/awk -f" as none of the other awk scripts in the
+test suite have a hashbang.
+
+Upstream-Status: Submitted [1]
+
+[1] https://lists.gnu.org/archive/html/bug-gawk/2016-11/msg00003.html
+
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ test/arrayind1.awk | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/test/arrayind1.awk b/test/arrayind1.awk
+index 5d4a6f3..59e8b4e 100755
+--- a/test/arrayind1.awk
++++ b/test/arrayind1.awk
+@@ -1,4 +1,3 @@
+-#!/usr/local/bin/awk -f
+ # this script renums pedigrees with metafounders
+ # so that they are added *before*regular animals
+ # mf are ascertained because they are not in the 1st column
+-- 
+2.1.4
+

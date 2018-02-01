@@ -33,7 +33,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 python __anonymous () {
-    major = d.getVar("PV",True).split('.')[0]
+    major = d.getVar("PV").split('.')[0]
     if major == "3":
         d.setVar("HEADER_FETCH_VER", "3.0")
     elif major == "4":
@@ -42,11 +42,12 @@ python __anonymous () {
         d.setVar("HEADER_FETCH_VER", "2.6")
 }
 
-inherit kernel-arch
+inherit kernel-arch pkgconfig multilib_header
 
 KORG_ARCHIVE_COMPRESSION ?= "xz"
 
 SRC_URI = "${KERNELORG_MIRROR}/linux/kernel/v${HEADER_FETCH_VER}/linux-${PV}.tar.${KORG_ARCHIVE_COMPRESSION}"
+UPSTREAM_CHECK_URI = "https://www.kernel.org/"
 
 S = "${WORKDIR}/linux-${PV}"
 
@@ -68,9 +69,21 @@ do_install() {
 	find ${D}${includedir} -name ..install.cmd | xargs rm -f
 }
 
+do_install_append_aarch64 () {
+        do_install_armmultilib
+}
+
+do_install_append_arm () {
+	do_install_armmultilib
+}
+
+do_install_armmultilib () {
+	oe_multilib_header asm/auxvec.h asm/bitsperlong.h asm/byteorder.h asm/fcntl.h asm/hwcap.h asm/ioctls.h asm/kvm.h asm/mman.h asm/param.h asm/perf_regs.h
+	oe_multilib_header asm/posix_types.h asm/ptrace.h  asm/setup.h  asm/sigcontext.h asm/siginfo.h asm/signal.h asm/stat.h  asm/statfs.h asm/swab.h  asm/types.h asm/unistd.h
+}
+
 BBCLASSEXTEND = "nativesdk"
 
-#DEPENDS = "cross-linkage"
 RDEPENDS_${PN}-dev = ""
 RRECOMMENDS_${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
 

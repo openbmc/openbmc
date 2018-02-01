@@ -1,0 +1,34 @@
+From 3f97aac5a1f43ef57b02fb9ccdcadd41a6b69fa9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Tue, 27 Oct 2015 10:21:24 +0100
+Subject: [PATCH] configure.ac: do additional checks on libxml2 also when
+ detected by pkg-config
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Applied [1]
+
+[1] https://github.com/dajobe/raptor/pull/33
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 10ff870..35fa08e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -601,7 +601,7 @@ have_libxml=0
+ need_libxml=0
+ 
+ oCPPFLAGS="$CPPFLAGS"
+-if test "X$XML_CONFIG" != X; then
++if test "X$libxml_source" != X; then
+   CPPFLAGS="$LIBXML_CFLAGS $CPPFLAGS"
+   LIBS="$LIBS $LIBXML_LIBS"
+   AC_CHECK_FUNC(xmlCreatePushParserCtxt, have_xmlCreatePushParserCtxt=yes, have_xmlCreatePushParserCtxt=no)
+-- 
+2.1.0
+

@@ -1,0 +1,27 @@
+From f1fc9f4d523dd8b773a4535176547b0619ec05c6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Jul 2017 21:08:57 -0700
+Subject: [PATCH 3/5] wvtask: Check for HAVE_LIBC_STACK_END only on glibc
+ systems
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/wvtask.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/utils/wvtask.cc b/utils/wvtask.cc
+index c0bff7d..716344b 100644
+--- a/utils/wvtask.cc
++++ b/utils/wvtask.cc
+@@ -563,7 +563,7 @@ void WvTaskMan::do_task()
+ 
+ const void *WvTaskMan::current_top_of_stack()
+ {
+-#ifdef HAVE_LIBC_STACK_END
++#if defined(HAVE_LIBC_STACK_END) && defined(__GLIBC__)
+     extern const void *__libc_stack_end;
+     if (use_shared_stack() || current_task == NULL)
+         return __libc_stack_end;
+-- 
+2.13.3
+

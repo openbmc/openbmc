@@ -1,0 +1,103 @@
+Some distributions (like opensuse421) supported by the project
+comes with older gcc releases, -fstack-protector=strong is supported
+by GCC>=4.9.
+
+This causes a build failure when install perl-native from a sstate that
+comes from a machine supporting -fstack-protector=strong [1].
+
+So disable usage of this flag in perl-native builds, this patch could
+be removed when all supported distros comes with GCC>=4.9.
+
+[YOCTO #10338]
+
+Upstream-status: Inappropriate [configuration]
+
+[1] http://errors.yoctoproject.org/Errors/Details/109589/
+
+Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
+---
+ Configure | 54 ------------------------------------------------------
+ 1 file changed, 54 deletions(-)
+
+diff --git a/Configure b/Configure
+index efbdcfd..d5bd98c 100755
+--- a/Configure
++++ b/Configure
+@@ -5468,30 +5468,6 @@ default|recommended)
+ 		eval $checkccflag
+ 		;;
+ 	esac
+-
+-	# on x86_64 (at least) we require an extra library (libssp) in the
+-	# link command line. This library is not named, so I infer that it is
+-	# an implementation detail that may change. Hence the safest approach
+-	# is to add the flag to the flags passed to the compiler at link time,
+-	# as that way the compiler can do the right implementation dependant
+-	# thing. (NWC)
+-	case "$osname" in
+-	amigaos) ;; # -fstack-protector builds but doesn't work
+-	*)	case "$gccversion" in
+-		?*)	set stack-protector-strong -fstack-protector-strong
+-			eval $checkccflag
+-			case "$dflt" in
+-			*-fstack-protector-strong*) ;; # It got added.
+-			*) # Try the plain/older -fstack-protector.
+-			   set stack-protector -fstack-protector
+-			   eval $checkccflag
+-			   ;;
+-			esac
+-			;;
+-		esac
+-		;;
+-	esac
+-	;;
+ esac
+ 
+ case "$mips_type" in
+@@ -5634,21 +5610,6 @@ case "$ldflags" in
+ 	;;
+ *) dflt="$ldflags";;
+ esac
+-# See note above about -fstack-protector
+-case "$ccflags" in
+-*-fstack-protector-strong*)
+-	case "$dflt" in
+-	*-fstack-protector-strong*) ;; # Don't add it again
+-	*) dflt="$dflt -fstack-protector-strong" ;;
+-	esac
+-	;;
+-*-fstack-protector*)
+-	case "$dflt" in
+-	*-fstack-protector*) ;; # Don't add it again
+-	*) dflt="$dflt -fstack-protector" ;;
+-	esac
+-	;;
+-esac
+ 
+ : Try to guess additional flags to pick up local libraries.
+ for thislibdir in $libpth; do
+@@ -8571,21 +8532,6 @@ EOM
+ 	    ''|' ') dflt='none' ;;
+ 	esac
+ 
+-	case "$ldflags" in
+-	    *-fstack-protector-strong*)
+-		case "$dflt" in
+-		    *-fstack-protector-strong*) ;; # Don't add it again
+-		    *) dflt="$dflt -fstack-protector-strong" ;;
+-		esac
+-		;;
+-	    *-fstack-protector*)
+-		case "$dflt" in
+-		    *-fstack-protector*) ;; # Don't add it again
+-		    *) dflt="$dflt -fstack-protector" ;;
+-		esac
+-		;;
+-	esac
+-
+ 	rp="Any special flags to pass to $ld to create a dynamically loaded library?"
+ 	. ./myread
+ 	case "$ans" in
+-- 
+2.1.4
+

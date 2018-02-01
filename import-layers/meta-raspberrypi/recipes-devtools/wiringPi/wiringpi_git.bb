@@ -4,14 +4,13 @@ SECTION = "devel/libs"
 LICENSE = "LGPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
-# tag 2.32
-SRCREV = "b0a60c3302973ca1878d149d61f2f612c8f27fac"
+# tag 2.44
+SRCREV = "96344ff7125182989f98d3be8d111952a8f74e15"
 
 S = "${WORKDIR}/git"
 
 SRC_URI = "git://git.drogon.net/wiringPi \
            file://0001-Add-initial-cross-compile-support.patch \
-           file://0001-include-asm-ioctl.h-directly-for-_IOC_SIZEBITS.patch \
            "
 
 COMPATIBLE_MACHINE = "raspberrypi"

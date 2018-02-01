@@ -6,7 +6,7 @@ SECTION = "x11/font"
 LICENSE = "PD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=200c507f595ee97008c7c5c3e94ab9a8"
 
-DEPENDS = "util-macros-native font-util-native bdftopcf-native"
+DEPENDS = "util-macros-native font-util-native bdftopcf-native font-util"
 RDEPENDS_${PN} = "encodings font-util"
 
 inherit distro_features_check

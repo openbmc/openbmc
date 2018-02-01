@@ -62,7 +62,7 @@ FILES_${PN}-xtests = "${datadir}/Linux-PAM/xtests"
 PACKAGES_DYNAMIC += "^${MLPREFIX}pam-plugin-.*"
 
 def get_multilib_bit(d):
-    baselib = d.getVar('baselib', True) or ''
+    baselib = d.getVar('baselib') or ''
     return baselib.replace('lib', '')
 
 libpam_suffix = "suffix${@get_multilib_bit(d)}"
@@ -92,31 +92,31 @@ RRECOMMENDS_${PN}_class-native = ""
 python populate_packages_prepend () {
     def pam_plugin_append_file(pn, dir, file):
         nf = os.path.join(dir, file)
-        of = d.getVar('FILES_' + pn, True)
+        of = d.getVar('FILES_' + pn)
         if of:
             nf = of + " " + nf
         d.setVar('FILES_' + pn, nf)
 
     def pam_plugin_hook(file, pkg, pattern, format, basename):
-        pn = d.getVar('PN', True)
-        libpam_suffix = d.getVar('libpam_suffix', True)
+        pn = d.getVar('PN')
+        libpam_suffix = d.getVar('libpam_suffix')
 
-        rdeps = d.getVar('RDEPENDS_' + pkg, True)
+        rdeps = d.getVar('RDEPENDS_' + pkg)
         if rdeps:
             rdeps = rdeps + " " + pn + "-" + libpam_suffix
         else:
             rdeps = pn + "-" + libpam_suffix
         d.setVar('RDEPENDS_' + pkg, rdeps)
 
-        provides = d.getVar('RPROVIDES_' + pkg, True)
+        provides = d.getVar('RPROVIDES_' + pkg)
         if provides:
             provides = provides + " " + pkg + "-" + libpam_suffix
         else:
             provides = pkg + "-" + libpam_suffix
         d.setVar('RPROVIDES_' + pkg, provides)
 
-    mlprefix = d.getVar('MLPREFIX', True) or ''
-    dvar = bb.data.expand('${WORKDIR}/package', d, True)
+    mlprefix = d.getVar('MLPREFIX') or ''
+    dvar = d.expand('${WORKDIR}/package')
     pam_libdir = d.expand('${base_libdir}/security')
     pam_sbindir = d.expand('${sbindir}')
     pam_filterdir = d.expand('${base_libdir}/security/pam_filter')

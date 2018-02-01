@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+
+# prepare testing config
+CONF_USERS=`readlink -f /etc/raddb/users`
+mv ${CONF_USERS} ${CONF_USERS}_orig
+echo "testing Cleartext-Password := \"testpassword\"" > ${CONF_USERS}
+cat ${CONF_USERS}_orig >> ${CONF_USERS}
+
+# restart radiusd server
+systemctl restart radiusd || /etc/init.d/radiusd restart || {
+        echo "FAIL: Start radiusd service."
+        exit 1
+}
+
+# run teests
+perl test.pl
+
+# restore the config and restart
+mv ${CONF_USERS}_orig ${CONF_USERS}
+systemctl restart radiusd || /etc/init.d/radiusd restart

@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=92fe174bad6da3763f6e9e9eaff6df24"
 DEPENDS = "libgcrypt libotr pidgin intltool-native"
 
-PNBLACKLIST[pidgin-otr] ?= "depends on blacklisted pidgin"
+PNBLACKLIST[pidgin-otr] ?= "depends on blacklisted pidgin - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 SRC_URI = "http://www.cypherpunks.ca/otr/${BP}.tar.gz \
            file://ignore_extra-portability_warnings.patch \

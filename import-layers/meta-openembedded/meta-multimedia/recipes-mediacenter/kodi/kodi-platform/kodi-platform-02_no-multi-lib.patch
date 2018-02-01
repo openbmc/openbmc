@@ -1,0 +1,12 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9abe773..ae433fc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -9,7 +9,6 @@ find_package(kodi REQUIRED)
+ find_package(TinyXML REQUIRED)
+ find_package(Threads REQUIRED)
+ find_package(p8-platform REQUIRED)
+-include(UseMultiArch.cmake)
+ include(CheckAtomic.cmake)
+ 
+ set(kodiplatform_NAME kodiplatform)

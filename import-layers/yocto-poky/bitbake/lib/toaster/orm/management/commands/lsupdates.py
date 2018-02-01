@@ -90,7 +90,6 @@ class Command(NoArgsCommand):
             from urlparse import urlparse
 
         proxy_settings = os.environ.get("http_proxy", None)
-        oe_core_layer = 'openembedded-core'
 
         def _get_json_response(apiurl=DEFAULT_LAYERINDEX_SERVER):
             http_progress = Spinner()
@@ -154,41 +153,19 @@ class Command(NoArgsCommand):
 
         total = len(layers_info)
         for i, li in enumerate(layers_info):
-            # Special case for the openembedded-core layer
-            if li['name'] == oe_core_layer:
-                try:
-                    # If we have an existing openembedded-core for example
-                    # from the toasterconf.json augment the info using the
-                    # layerindex rather than duplicate it
-                    oe_core_l = Layer.objects.get(name=oe_core_layer)
-                    # Take ownership of the layer as now coming from the
-                    # layerindex
-                    oe_core_l.summary = li['summary']
-                    oe_core_l.description = li['description']
-                    oe_core_l.vcs_web_url = li['vcs_web_url']
-                    oe_core_l.vcs_web_tree_base_url = \
-                        li['vcs_web_tree_base_url']
-                    oe_core_l.vcs_web_file_base_url = \
-                        li['vcs_web_file_base_url']
-
-                    oe_core_l.save()
-                    li_layer_id_to_toaster_layer_id[li['id']] = oe_core_l.pk
-                    self.mini_progress("layers", i, total)
-                    continue
-
-                except Layer.DoesNotExist:
-                    pass
-
             try:
-                l, created = Layer.objects.get_or_create(name=li['name'],
-                                                         vcs_url=li['vcs_url'])
+                l, created = Layer.objects.get_or_create(name=li['name'])
                 l.up_date = li['updated']
-                l.vcs_url = li['vcs_url']
-                l.vcs_web_url = li['vcs_web_url']
-                l.vcs_web_tree_base_url = li['vcs_web_tree_base_url']
-                l.vcs_web_file_base_url = li['vcs_web_file_base_url']
                 l.summary = li['summary']
                 l.description = li['description']
+
+                if created:
+                    # predefined layers in the fixtures (for example poky.xml)
+                    # always preempt the Layer Index for these values
+                    l.vcs_url = li['vcs_url']
+                    l.vcs_web_url = li['vcs_web_url']
+                    l.vcs_web_tree_base_url = li['vcs_web_tree_base_url']
+                    l.vcs_web_file_base_url = li['vcs_web_file_base_url']
                 l.save()
             except Layer.MultipleObjectsReturned:
                 logger.info("Skipped %s as we found multiple layers and "
@@ -211,12 +188,14 @@ class Command(NoArgsCommand):
 
         total = len(layerbranches_info)
         for i, lbi in enumerate(layerbranches_info):
+            # release as defined by toaster map to layerindex branch
+            release = li_branch_id_to_toaster_release[lbi['branch']]
 
             try:
                 lv, created = Layer_Version.objects.get_or_create(
-                    layer_source=LayerSource.TYPE_LAYERINDEX,
                     layer=Layer.objects.get(
-                        pk=li_layer_id_to_toaster_layer_id[lbi['layer']])
+                        pk=li_layer_id_to_toaster_layer_id[lbi['layer']]),
+                    release=release
                 )
             except KeyError:
                 logger.warning(
@@ -224,11 +203,12 @@ class Command(NoArgsCommand):
                     lbi['layer'])
                 continue
 
-            lv.release = li_branch_id_to_toaster_release[lbi['branch']]
-            lv.up_date = lbi['updated']
-            lv.commit = lbi['actual_branch']
-            lv.dirpath = lbi['vcs_subdir']
-            lv.save()
+            if created:
+                lv.release = li_branch_id_to_toaster_release[lbi['branch']]
+                lv.up_date = lbi['updated']
+                lv.commit = lbi['actual_branch']
+                lv.dirpath = lbi['vcs_subdir']
+                lv.save()
 
             li_layer_branch_id_to_toaster_lv_id[lbi['id']] =\
                 lv.pk
@@ -255,9 +235,8 @@ class Command(NoArgsCommand):
                 layer_id = li_layer_id_to_toaster_layer_id[ldi['dependency']]
 
                 dependlist[lv].append(
-                    Layer_Version.objects.get(
-                        layer_source=LayerSource.TYPE_LAYERINDEX,
-                        layer__pk=layer_id))
+                    Layer_Version.objects.get(layer__pk=layer_id,
+                                              release=lv.release))
 
             except Layer_Version.DoesNotExist:
                 logger.warning("Cannot find layer version (ls:%s),"

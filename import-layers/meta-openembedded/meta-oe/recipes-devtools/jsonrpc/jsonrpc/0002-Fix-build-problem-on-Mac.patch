@@ -1,0 +1,27 @@
+From 79050ef9607f242e0d509969b19e9390220c3411 Mon Sep 17 00:00:00 2001
+From: Yongwei Wu <wuyongwei@gmail.com>
+Date: Sat, 31 Dec 2016 11:57:11 +0800
+Subject: [PATCH 2/2] Fix build problem on Mac.
+
+__suseconds_t is not defined on Mac/BSD; use the POSIX-conformant
+suseconds_t.
+---
+ src/jsonrpccpp/server/connectors/filedescriptorserver.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/jsonrpccpp/server/connectors/filedescriptorserver.cpp b/src/jsonrpccpp/server/connectors/filedescriptorserver.cpp
+index 8e019ca..68107f2 100644
+--- a/src/jsonrpccpp/server/connectors/filedescriptorserver.cpp
++++ b/src/jsonrpccpp/server/connectors/filedescriptorserver.cpp
+@@ -122,7 +122,7 @@ int FileDescriptorServer::WaitForRead() {
+   FD_ZERO(&except_fds);
+   FD_SET(inputfd, &read_fds);
+   timeout.tv_sec = 0;
+-  timeout.tv_usec = (__suseconds_t) (READ_TIMEOUT * 1000000);
++  timeout.tv_usec = (suseconds_t) (READ_TIMEOUT * 1000000);
+   // Wait for something to read
+   return select(inputfd + 1, &read_fds, &write_fds, &except_fds, &timeout);
+ }
+-- 
+2.12.1
+

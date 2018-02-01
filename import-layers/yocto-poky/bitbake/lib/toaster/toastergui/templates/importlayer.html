@@ -13,7 +13,8 @@
   <script>
   $(document).ready(function (){
     var ctx = {
-      xhrImportLayerUrl : "{% url 'xhr_importlayer' %}",
+      xhrLayerUrl : "{% url 'xhr_layer' project.id %}",
+      xhrGitRevTypeAheadUrl : "{% url 'xhr_gitrevtypeahead' %}",
     };
 
     try {
@@ -112,8 +113,10 @@
           Git revision
           <span class="glyphicon glyphicon-question-sign get-help" title="You can provide a Git branch, a tag or a commit SHA as the revision"></span>
         </label>
-        <input type="text" class="form-control" id="layer-git-ref" required>
-        <span class="help-inline" style="display:none;" id="invalid-layer-revision-hint"></span>
+        <span style="display: block">
+        <input type="text" class="form-control" id="layer-git-ref" autocomplete="off" data-minLength="1" data-autocomplete="off" data-provide="typeahead" required>
+        </span>
+        <span class="help-block has-error" style="display:none;" id="invalid-layer-revision-hint">The "HEAD" branch is reserved (only allowed for the "Local Yocto Project" layers)</span>
       </div>
     </fieldset>
 
@@ -123,7 +126,7 @@
         <label for="local-dir-path" class="control-label">Enter the absolute path to the layer directory</label>
         <input type="text" class="form-control" id="local-dir-path" required/>
         <p class="help-block" id="hintError-dir-path-starts-with-slash" style="display:none;">The absolute path must start with "/".</p>
-        <p class="help-block" id="hintError-dir-path" style="display:none;">The directory path cannot include spaces or any of these characters: . \ ? % * : | " " &lt; &gt;</p>
+        <p class="help-block" id="hintError-dir-path" style="display:none;">The directory path cannot include spaces or any of these characters: \ ? % * : | " " &lt; &gt;</p>
       </div>
     </fieldset>
 

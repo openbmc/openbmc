@@ -1,0 +1,28 @@
+From df490528d1e81a98ba2991c700c92a8e6c969083 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 6 Mar 2017 21:32:22 -0800
+Subject: [PATCH 1/2] Use correct enum type
+
+Clang warns about wrong enum initializtion
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeps/linux-gnu/aarch64/fetch.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sysdeps/linux-gnu/aarch64/fetch.c b/sysdeps/linux-gnu/aarch64/fetch.c
+index 2744df0..1dcf7cc 100644
+--- a/sysdeps/linux-gnu/aarch64/fetch.c
++++ b/sysdeps/linux-gnu/aarch64/fetch.c
+@@ -173,7 +173,7 @@ static struct fetch_script
+ pass_arg(struct fetch_context const *context,
+ 	 struct process *proc, struct arg_type_info *info)
+ {
+-	enum fetch_method cvt = CVT_NOP;
++	enum convert_method cvt = CVT_NOP;
+ 
+ 	size_t sz = type_sizeof(proc, info);
+ 	if (sz == (size_t) -1)
+-- 
+2.12.0
+

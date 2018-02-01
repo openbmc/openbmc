@@ -1,0 +1,26 @@
+From 079529b8d5e339e2211fa2f8c15543a738a627bc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 14:50:51 -0700
+Subject: [PATCH] wvRTF.c: Specify print format in rtf_output()
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ wvRTF.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wvRTF.c b/wvRTF.c
+index 361d258..4f24b30 100644
+--- a/wvRTF.c
++++ b/wvRTF.c
+@@ -192,7 +192,7 @@ output_rtfUserData (rtfUserData * ud)
+     rtf_output_char ('{');
+ 
+     /* font color */
+-    rtf_output (rtfColors[ud->cCol]);
++    rtf_output ("%s", rtfColors[ud->cCol]);
+ 
+     /* font face */
+     rtf_output ("\\f%d", ud->cFont);
+-- 
+2.13.2
+

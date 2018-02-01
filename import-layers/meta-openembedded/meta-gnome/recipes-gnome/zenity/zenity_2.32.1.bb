@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=3bf50002aefd002f49e7bb854063f7e7"
 
 PR = "r2"
 
-PNBLACKLIST[zenity] ?= "BROKEN: doesn't build with B!=S"
+PNBLACKLIST[zenity] ?= "BROKEN: doesn't build with B!=S - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 DEPENDS = "gtk+ glib-2.0 libnotify gnome-doc-utils"
 

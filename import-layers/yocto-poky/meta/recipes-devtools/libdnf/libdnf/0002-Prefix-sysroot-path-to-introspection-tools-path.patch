@@ -1,0 +1,36 @@
+From c8211ad99ccaa4af4a75e0ba639527267fcfd69e Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Dec 2016 18:17:19 +0200
+Subject: [PATCH 2/4] Prefix sysroot path to introspection tools path.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ libdnf/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libdnf/CMakeLists.txt b/libdnf/CMakeLists.txt
+index 63f07bf..837792b 100644
+--- a/libdnf/CMakeLists.txt
++++ b/libdnf/CMakeLists.txt
+@@ -133,7 +133,7 @@ if (GOBJECT_INTROSPECTION_FOUND)
+         set(GIR_TYPELIB "${GIR_PREFIX}.typelib")
+ 
+         add_custom_command(OUTPUT ${GIR_XML}
+-            COMMAND env CFLAGS=${CMAKE_C_FLAGS} ${GOBJECT_INTROSPECTION_1.0_G_IR_SCANNER}
++            COMMAND env CFLAGS=${CMAKE_C_FLAGS} $ENV{PKG_CONFIG_SYSROOT_DIR}${GOBJECT_INTROSPECTION_1.0_G_IR_SCANNER}
+                     --namespace=Dnf
+                     --nsversion=${DNF_SO_VERSION}.0
+                     --library-path=${CMAKE_CURRENT_BINARY_DIR}
+@@ -153,7 +153,7 @@ if (GOBJECT_INTROSPECTION_FOUND)
+             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+ 
+         add_custom_command(OUTPUT ${GIR_TYPELIB}
+-            COMMAND ${GOBJECT_INTROSPECTION_1.0_G_IR_COMPILER}
++            COMMAND $ENV{PKG_CONFIG_SYSROOT_DIR}${GOBJECT_INTROSPECTION_1.0_G_IR_COMPILER}
+                     -o ${GIR_TYPELIB}
+                     ${GIR_XML}
+             DEPENDS ${GIR_XML}
+-- 
+2.11.0
+

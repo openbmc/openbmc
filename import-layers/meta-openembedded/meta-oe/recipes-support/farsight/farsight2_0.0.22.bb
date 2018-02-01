@@ -9,7 +9,7 @@ PR = "r3"
 
 DEPENDS = "libnice glib-2.0 libxml2 zlib dbus gstreamer gst-plugins-base"
 
-inherit autotools
+inherit autotools pkgconfig
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[gupnp] = "--enable-gupnp,--disable-gupnp,gupnp-igd"
@@ -28,3 +28,7 @@ FILES_${PN}-dbg += "${libdir}/*/.debug"
 
 SRC_URI[md5sum] = "e1f540cf3ebab06c3d7db1f46b44ac88"
 SRC_URI[sha256sum] = "3ae59aa61a8071c9fad111e5fd606aabc27961eb4192f8729987a27dae6b3974"
+
+PNBLACKLIST[farsight2] ?= "Depends on blacklisted gstreamer - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+PNBLACKLIST[farsight2] ?= "Depends on blacklisted libnice - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+PNBLACKLIST[farsight2] ?= "Depends on blacklisted gst-plugins-base - the recipe will be removed on 2017-09-01 unless the issue is fixed"

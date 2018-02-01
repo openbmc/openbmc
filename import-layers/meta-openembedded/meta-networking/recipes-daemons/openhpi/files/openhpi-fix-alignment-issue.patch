@@ -1,0 +1,23 @@
+Fix alignment issue in ipmi_inventory.c
+
+Upstream-Status: Pending
+
+Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/plugins/ipmi/ipmi_inventory.c b/plugins/ipmi/ipmi_inventory.c
+index 5382186..01655c6 100644
+--- a/plugins/ipmi/ipmi_inventory.c
++++ b/plugins/ipmi/ipmi_inventory.c
+@@ -2546,8 +2546,11 @@ static SaErrorT modify_inventory(SaHpiIdrFieldT *field,
+ 			if (tb->DataLength == 0) {
+ 				rv = ipmi_fru_set_board_info_mfg_time(fru, 0);
+ 			} else {
++                time_t the_time;
++                /* tb->Data is not aligned -- copy to temp */
++                memcpy(&the_time, tb->Data, sizeof(the_time));
+ 				rv = ipmi_fru_set_board_info_mfg_time(fru,
+-					*(time_t *)tb->Data);
++					the_time);
+ 			}
+ 			break;
+ 		case SAHPI_IDR_FIELDTYPE_MANUFACTURER:

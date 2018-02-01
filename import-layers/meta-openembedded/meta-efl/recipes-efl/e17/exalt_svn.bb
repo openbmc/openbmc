@@ -32,3 +32,5 @@ do_install_append() {
 
 FILES_${PN} += "${datadir}/dbus-1"
 
+
+PNBLACKLIST[exalt] ?= "Depends on blacklisted elementary - the recipe will be removed on 2017-09-01 unless the issue is fixed"

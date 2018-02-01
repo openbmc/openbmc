@@ -1,0 +1,152 @@
+From 3bf20a6116ae3e1a5a3a6907bee7e881b17efb2f Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Mon, 15 May 2017 11:23:26 +0200
+Subject: [PATCH 13/13] Add a new option --alldeps to rpmdeps
+
+This will send the output from rpmfcPrint() to stdout. This is an
+alternative to using the --rpmfcdebug option, which will send the same
+output to stderr. The two options have totally different use cases
+though. While --alldeps is used when the output from rpmfcPrint() is
+what is wanted, --rpmfcdebug can be used together with the other
+output options, e.g., --requires, without affecting their output.
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/pull/220]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ build/rpmfc.c   | 27 ++++++++++++++-------------
+ build/rpmfc.h   |  1 -
+ tools/rpmdeps.c | 44 +++++++++++++++++++++++++-------------------
+ 3 files changed, 39 insertions(+), 33 deletions(-)
+
+diff --git a/build/rpmfc.c b/build/rpmfc.c
+index c8e2f876a..44f1cdc9a 100644
+--- a/build/rpmfc.c
++++ b/build/rpmfc.c
+@@ -732,7 +732,6 @@ static rpm_color_t rpmfcColor(const char * fmstr)
+ 
+ void rpmfcPrint(const char * msg, rpmfc fc, FILE * fp)
+ {
+-    rpm_color_t fcolor;
+     int ndx;
+     int dx;
+     int fx;
+@@ -744,21 +743,23 @@ void rpmfcPrint(const char * msg, rpmfc fc, FILE * fp)
+ 
+     if (fc)
+     for (fx = 0; fx < fc->nfiles; fx++) {
+-	rpmsid cx = fc->fcdictx[fx] + 1; /* id's are one off */
+-	fcolor = fc->fcolor[fx];
+-	ARGV_t fattrs = fc->fattrs[fx];
+-
+ 	fprintf(fp, "%3d %s", fx, fc->fn[fx]);
+-	if (fcolor != RPMFC_BLACK)
++	if (_rpmfc_debug) {
++	    rpmsid cx = fc->fcdictx[fx] + 1; /* id's are one off */
++	    rpm_color_t fcolor = fc->fcolor[fx];
++	    ARGV_t fattrs = fc->fattrs[fx];
++
++	    if (fcolor != RPMFC_BLACK)
+ 		fprintf(fp, "\t0x%x", fc->fcolor[fx]);
+-	else
++	    else
+ 		fprintf(fp, "\t%s", rpmstrPoolStr(fc->cdict, cx));
+-	if (fattrs) {
+-	    char *attrs = argvJoin(fattrs, ",");
+-	    fprintf(fp, " [%s]", attrs);
+-	    free(attrs);
+-	} else {
+-	    fprintf(fp, " [none]");
++	    if (fattrs) {
++		char *attrs = argvJoin(fattrs, ",");
++		fprintf(fp, " [%s]", attrs);
++		free(attrs);
++	    } else {
++		fprintf(fp, " [none]");
++	    }
+ 	}
+ 	fprintf(fp, "\n");
+ 
+diff --git a/build/rpmfc.h b/build/rpmfc.h
+index dae8ea5b1..3d87b31cf 100644
+--- a/build/rpmfc.h
++++ b/build/rpmfc.h
+@@ -45,7 +45,6 @@ typedef const struct rpmfcTokens_s * rpmfcToken;
+ 
+ /** \ingroup rpmfc
+  * Print results of file classification.
+- * @todo Remove debugging routine.
+  * @param msg		message prefix (NULL for none)
+  * @param fc		file classifier
+  * @param fp		output file handle (NULL for stderr)
+diff --git a/tools/rpmdeps.c b/tools/rpmdeps.c
+index a414b6343..f260a38c4 100644
+--- a/tools/rpmdeps.c
++++ b/tools/rpmdeps.c
+@@ -23,6 +23,8 @@ static int print_conflicts;
+ 
+ static int print_obsoletes;
+ 
++static int print_alldeps;
++
+ static void rpmdsPrint(const char * msg, rpmds ds, FILE * fp)
+ {
+     if (fp == NULL) fp = stderr;
+@@ -57,6 +59,8 @@ static struct poptOption optionsTable[] = {
+         NULL, NULL },
+  { "obsoletes", '\0', POPT_ARG_VAL, &print_obsoletes, -1,
+         NULL, NULL },
++ { "alldeps", '\0', POPT_ARG_VAL, &print_alldeps, -1,
++        NULL, NULL },
+ 
+    POPT_AUTOALIAS
+    POPT_AUTOHELP
+@@ -100,25 +104,27 @@ main(int argc, char *argv[])
+     if (rpmfcClassify(fc, av, NULL) || rpmfcApply(fc))
+ 	goto exit;
+ 
+-    if (_rpmfc_debug)
+-	rpmfcPrint(buf, fc, NULL);
+-
+-    if (print_provides)
+-	rpmdsPrint(NULL, rpmfcProvides(fc), stdout);
+-    if (print_requires)
+-	rpmdsPrint(NULL, rpmfcRequires(fc), stdout);
+-    if (print_recommends)
+-	rpmdsPrint(NULL, rpmfcRecommends(fc), stdout);
+-    if (print_suggests)
+-	rpmdsPrint(NULL, rpmfcSuggests(fc), stdout);
+-    if (print_supplements)
+-	rpmdsPrint(NULL, rpmfcSupplements(fc), stdout);
+-    if (print_enhances)
+-	rpmdsPrint(NULL, rpmfcEnhances(fc), stdout);
+-    if (print_conflicts)
+-	rpmdsPrint(NULL, rpmfcConflicts(fc), stdout);
+-    if (print_obsoletes)
+-	rpmdsPrint(NULL, rpmfcObsoletes(fc), stdout);
++    if (print_alldeps || _rpmfc_debug)
++	rpmfcPrint(NULL, fc, print_alldeps ? stdout : NULL);
++
++    if (!print_alldeps) {
++	if (print_provides)
++	    rpmdsPrint(NULL, rpmfcProvides(fc), stdout);
++	if (print_requires)
++	    rpmdsPrint(NULL, rpmfcRequires(fc), stdout);
++	if (print_recommends)
++	    rpmdsPrint(NULL, rpmfcRecommends(fc), stdout);
++	if (print_suggests)
++	    rpmdsPrint(NULL, rpmfcSuggests(fc), stdout);
++	if (print_supplements)
++	    rpmdsPrint(NULL, rpmfcSupplements(fc), stdout);
++	if (print_enhances)
++	    rpmdsPrint(NULL, rpmfcEnhances(fc), stdout);
++	if (print_conflicts)
++	    rpmdsPrint(NULL, rpmfcConflicts(fc), stdout);
++	if (print_obsoletes)
++	    rpmdsPrint(NULL, rpmfcObsoletes(fc), stdout);
++    }
+ 
+     ec = 0;
+ 
+-- 
+2.12.0
+

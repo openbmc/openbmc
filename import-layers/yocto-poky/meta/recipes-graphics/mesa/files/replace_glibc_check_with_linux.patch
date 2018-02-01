@@ -2,16 +2,25 @@ endianness check is OS wide and not specific to libc
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
-Index: mesa-11.1.1/src/gallium/include/pipe/p_config.h
-===================================================================
---- mesa-11.1.1.orig/src/gallium/include/pipe/p_config.h
-+++ mesa-11.1.1/src/gallium/include/pipe/p_config.h
-@@ -130,7 +130,7 @@
-  * Endian detection.
-  */
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ src/util/u_endian.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/util/u_endian.h b/src/util/u_endian.h
+index b9d563d..2d5eab9 100644
+--- a/src/util/u_endian.h
++++ b/src/util/u_endian.h
+@@ -27,7 +27,7 @@
+ #ifndef U_ENDIAN_H
+ #define U_ENDIAN_H
  
--#ifdef __GLIBC__
+-#if defined(__GLIBC__) || defined(ANDROID)
 +#if defined(__linux__)
  #include <endian.h>
  
  #if __BYTE_ORDER == __LITTLE_ENDIAN
+-- 
+2.1.4
+

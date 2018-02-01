@@ -1,0 +1,32 @@
+From bbd51cf010c80322034f7094e2c6a656aa1f17a7 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Fri, 13 Feb 2015 06:55:33 +0000
+Subject: [PATCH] openipmi: don't rm .libs
+
+Don't remove .libs after OpenIPMI.so generated, this may cause
+dummystuff.so fails to link from the second build with error:
+
+* error: .libs/dummystuff.o: No such file or directory
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ swig/perl/Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/swig/perl/Makefile.am b/swig/perl/Makefile.am
+index 12a282c..2f9ee4c 100644
+--- a/swig/perl/Makefile.am
++++ b/swig/perl/Makefile.am
+@@ -23,7 +23,6 @@ OpenIPMI.so: $(OpenIPMI_OBJ)
+ 	$(LIBTOOL) --mode=link $(CC) -shared -module -avoid-version -o $(@:.so=.la) $^ $(OPENIPMI_SWIG_LIBS) $(PERL_POSIX_LIB) -rpath $(PERL_INSTALL_DIR)/auto/OpenIPMI
+ 	rm -f OpenIPMI.so
+ 	mv .libs/OpenIPMI.so .
+-	rm -rf .libs
+ 
+ dummystuff.lo: dummystuff.c
+ 	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+-- 
+1.9.1
+

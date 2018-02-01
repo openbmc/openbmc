@@ -50,9 +50,30 @@ def make_relative_symlink(path):
     os.remove(path)
     os.symlink(base, path)
 
+def replace_absolute_symlinks(basedir, d):
+    """
+    Walk basedir looking for absolute symlinks and replacing them with relative ones.
+    The absolute links are assumed to be relative to basedir
+    (compared to make_relative_symlink above which tries to compute common ancestors
+    using pattern matching instead)
+    """
+    for walkroot, dirs, files in os.walk(basedir):
+        for file in files + dirs:
+            path = os.path.join(walkroot, file)
+            if not os.path.islink(path):
+                continue
+            link = os.readlink(path)
+            if not os.path.isabs(link):
+                continue
+            walkdir = os.path.dirname(path.rpartition(basedir)[2])
+            base = os.path.relpath(link, walkdir)
+            bb.debug(2, "Replacing absolute path %s with relative path %s" % (link, base))
+            os.remove(path)
+            os.symlink(base, path)
+
 def format_display(path, metadata):
     """ Prepare a path for display to the user. """
-    rel = relative(metadata.getVar("TOPDIR", True), path)
+    rel = relative(metadata.getVar("TOPDIR"), path)
     if len(rel) > len(path):
         return path
     else:
@@ -81,7 +102,6 @@ def copyhardlinktree(src, dst):
         subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
         source = ''
         if os.path.isdir(src):
-            import glob
             if len(glob.glob('%s/.??*' % src)) > 0:
                 source = './.??* '
             source += './*'
@@ -95,7 +115,14 @@ def copyhardlinktree(src, dst):
         copytree(src, dst)
 
 def remove(path, recurse=True):
-    """Equivalent to rm -f or rm -rf"""
+    """
+    Equivalent to rm -f or rm -rf
+    NOTE: be careful about passing paths that may contain filenames with
+    wildcards in them (as opposed to passing an actual wildcarded path) -
+    since we use glob.glob() to expand the path. Filenames containing
+    square brackets are particularly problematic since the they may not
+    actually expand to match the original filename.
+    """
     for name in glob.glob(path):
         try:
             os.unlink(name)

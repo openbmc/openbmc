@@ -1,0 +1,41 @@
+From 1570ad33dd7e5d83f3ee80bd104b114709ac1e34 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Dec 2016 18:05:36 +0200
+Subject: [PATCH 2/4] Do not try to obtain PYTHON_INSTALL_DIR by running
+ python.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ librepo/python/python2/CMakeLists.txt | 2 +-
+ librepo/python/python3/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/librepo/python/python2/CMakeLists.txt b/librepo/python/python2/CMakeLists.txt
+index 3615e17..cffa99f 100644
+--- a/librepo/python/python2/CMakeLists.txt
++++ b/librepo/python/python2/CMakeLists.txt
+@@ -1,6 +1,6 @@
+ FIND_PACKAGE (PythonLibs 2 )
+ FIND_PACKAGE (PythonInterp 2 REQUIRED)
+-EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from distutils import sysconfig; stdout.write(sysconfig.get_python_lib(True))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
++#EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from distutils import sysconfig; stdout.write(sysconfig.get_python_lib(True))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
+ INCLUDE_DIRECTORIES (${PYTHON_INCLUDE_PATH})
+ 
+ MESSAGE(STATUS "Python install dir is ${PYTHON_INSTALL_DIR}")
+diff --git a/librepo/python/python3/CMakeLists.txt b/librepo/python/python3/CMakeLists.txt
+index dfecac9..38bcc72 100644
+--- a/librepo/python/python3/CMakeLists.txt
++++ b/librepo/python/python3/CMakeLists.txt
+@@ -10,7 +10,7 @@ message("--- ${PYTHON_INCLUDE_DIR}")
+ 
+ FIND_PACKAGE(PythonLibs 3.0)
+ FIND_PACKAGE(PythonInterp 3.0 REQUIRED)
+-EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from distutils import sysconfig; stdout.write(sysconfig.get_python_lib(True))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
++#EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from distutils import sysconfig; stdout.write(sysconfig.get_python_lib(True))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
+ INCLUDE_DIRECTORIES (${PYTHON_INCLUDE_PATH})
+ 
+ MESSAGE(STATUS "Python3 install dir is ${PYTHON_INSTALL_DIR}")
+-- 
+2.11.0
+

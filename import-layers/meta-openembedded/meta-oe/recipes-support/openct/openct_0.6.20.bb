@@ -24,7 +24,7 @@ SRC_URI[sha256sum] = "6cd3e2933d29eb1f875c838ee58b8071fd61f0ec8ed5922a86c01c805d
 LICENSE = "LGPLv2+"
 LIC_FILES_CHKSUM = "file://LGPL-2.1;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
-inherit ${@bb.utils.contains('VIRTUAL-RUNTIME_init_manager','systemd','systemd','', d)}
+inherit ${@bb.utils.filter('VIRTUAL-RUNTIME_init_manager', 'systemd', d)}
 SYSTEMD_SERVICE_${PN} += "openct.service "
 SYSTEMD_AUTO_ENABLE = "enable"
 
@@ -34,7 +34,7 @@ EXTRA_OECONF=" \
     --enable-pcsc \
     --enable-doc \
     --enable-api-doc \
-    --with-udev=/lib/udev \
+    --with-udev=${nonarch_base_libdir}/udev \
     --with-bundle=${libdir}/pcsc/drivers \
 "
 
@@ -42,7 +42,7 @@ inherit autotools pkgconfig
 
 FILES_${PN} += " \
     ${libdir}/ctapi \
-    /lib/udev \
+    ${nonarch_base_libdir}/udev \
     ${libdir}/openct-ifd.so \
     ${libdir}/pcsc \
     /run/openct/status \
@@ -62,7 +62,7 @@ do_install_append() {
 do_install () {
     rm -rf ${D}
     install -d ${D}/etc
-    install -dm 755 ${D}/lib/udev
+    install -dm 755 ${D}${nonarch_base_libdir}/udev
     # fix up hardcoded paths
     sed -i -e 's,/etc/,${sysconfdir}/,' -e 's,/usr/sbin/,${sbindir}/,' \
         ${WORKDIR}/openct.service ${WORKDIR}/openct.init

@@ -20,4 +20,4 @@ RDEPENDS_${PN} = "${PN}-themes"
 
 SRC_URI += "file://configure.patch"
 
-PNBLACKLIST[elmdentica] ?= "OLD and depends on broken azy"
+PNBLACKLIST[elmdentica] ?= "OLD and depends on broken azy - the recipe will be removed on 2017-09-01 unless the issue is fixed"

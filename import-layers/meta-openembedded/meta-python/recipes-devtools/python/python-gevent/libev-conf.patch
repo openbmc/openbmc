@@ -1,0 +1,26 @@
+From 2294734ef9d5e2efb05820e9759a1635799bdea9 Mon Sep 17 00:00:00 2001
+From: Andrej Rode <andrej.rode@ettus.com>
+Date: Mon, 10 Apr 2017 19:25:18 -0700
+Subject: [PATCH] libev: make configure crosscompile compatible
+
+Signed-off-by: Andrej Rode <andrej.rode@ettus.com>
+---
+ deps/libev/configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/deps/libev/configure b/deps/libev/configure
+index 743817e..96c2366 100755
+--- a/deps/libev/configure
++++ b/deps/libev/configure
+@@ -2208,7 +2208,7 @@ fi
+ ac_ext=c
+ ac_cpp='$CPP $CPPFLAGS'
+ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_link='$CC -static -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+ 
+-- 
+2.10.2
+

@@ -1,0 +1,48 @@
+From 0cf47ee432cc26a706864fcc09b2c3adc342a679 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 22 Feb 2017 11:36:11 +0200
+Subject: [PATCH] nss: fix support cross compiling
+
+Let some make variables be assigned from outside makefile.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ nss/coreconf/arch.mk    | 2 +-
+ nss/lib/freebl/Makefile | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/nss/coreconf/arch.mk b/nss/coreconf/arch.mk
+index 06c276f..9c1eb51 100644
+--- a/nss/coreconf/arch.mk
++++ b/nss/coreconf/arch.mk
+@@ -30,7 +30,7 @@ OS_TEST := $(shell uname -m)
+ ifeq ($(OS_TEST),i86pc)
+     OS_RELEASE := $(shell uname -r)_$(OS_TEST)
+ else
+-    OS_RELEASE := $(shell uname -r)
++    OS_RELEASE ?= $(shell uname -r)
+ endif
+ 
+ #
+diff --git a/nss/lib/freebl/Makefile b/nss/lib/freebl/Makefile
+index 0ce1425..ebeb411 100644
+--- a/nss/lib/freebl/Makefile
++++ b/nss/lib/freebl/Makefile
+@@ -36,6 +36,12 @@ ifdef USE_64
+ 	DEFINES += -DNSS_USE_64
+ endif
+ 
++ifeq ($(OS_TEST),mips)
++ifndef USE_64
++       DEFINES += -DNS_PTR_LE_32
++endif
++endif
++
+ ifdef USE_ABI32_FPU
+ 	DEFINES += -DNSS_USE_ABI32_FPU
+ endif
+-- 
+2.11.0
+

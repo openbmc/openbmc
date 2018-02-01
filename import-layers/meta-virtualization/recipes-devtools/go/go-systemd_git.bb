@@ -9,8 +9,12 @@ SRCNAME = "systemd"
 PKG_NAME = "github.com/coreos/go-${SRCNAME}"
 SRC_URI = "git://${PKG_NAME}.git"
 
-SRCREV = "f743bc15d6bddd23662280b4ad20f7c874cdd5ad"
-PV = "2+git${SRCREV}"
+SRCREV = "b4a58d95188dd092ae20072bac14cece0e67c388"
+PV = "4+git${SRCREV}"
+
+DEPENDS += " \
+    bash \
+"
 
 S = "${WORKDIR}/git"
 

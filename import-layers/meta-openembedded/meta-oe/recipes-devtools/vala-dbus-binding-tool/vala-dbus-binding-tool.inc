@@ -1,6 +1,6 @@
 DESCRIPTION = "Vala DBus Binding Tool"
 SECTION = "devel"
-DEPENDS = "vala libgee libxml2 intltool-native"
+DEPENDS = "vala libgee libxml2"
 HOMEPAGE = "http://wiki.freesmartphone.org/index.php/Implementations/vala-dbus-binding-tool"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"

@@ -22,7 +22,7 @@ class Test1P1(BuildPerfTestCase):
     build_target = 'core-image-sato'
 
     def test1(self):
-        """Measure wall clock of bitbake core-image-sato and size of tmp dir"""
+        """Build core-image-sato"""
         self.rm_tmp()
         self.rm_sstate()
         self.rm_cache()
@@ -36,10 +36,10 @@ class Test1P2(BuildPerfTestCase):
     build_target = 'virtual/kernel'
 
     def test12(self):
-        """Measure bitbake virtual/kernel"""
+        """Build virtual/kernel"""
         # Build and cleans state in order to get all dependencies pre-built
-        self.log_cmd_output(['bitbake', self.build_target])
-        self.log_cmd_output(['bitbake', self.build_target, '-c', 'cleansstate'])
+        self.run_cmd(['bitbake', self.build_target])
+        self.run_cmd(['bitbake', self.build_target, '-c', 'cleansstate'])
 
         self.sync()
         self.measure_cmd_resources(['bitbake', self.build_target], 'build',
@@ -51,30 +51,28 @@ class Test1P3(BuildPerfTestCase):
 
     def test13(self):
         """Build core-image-sato with rm_work enabled"""
-        postfile = os.path.join(self.out_dir, 'postfile.conf')
+        postfile = os.path.join(self.tmp_dir, 'postfile.conf')
         with open(postfile, 'w') as fobj:
             fobj.write('INHERIT += "rm_work"\n')
-        try:
-            self.rm_tmp()
-            self.rm_sstate()
-            self.rm_cache()
-            self.sync()
-            cmd = ['bitbake', '-R', postfile, self.build_target]
-            self.measure_cmd_resources(cmd, 'build',
-                                       'bitbake' + self.build_target,
-                                       save_bs=True)
-            self.measure_disk_usage(self.bb_vars['TMPDIR'], 'tmpdir', 'tmpdir')
-        finally:
-            os.unlink(postfile)
+
+        self.rm_tmp()
+        self.rm_sstate()
+        self.rm_cache()
+        self.sync()
+        cmd = ['bitbake', '-R', postfile, self.build_target]
+        self.measure_cmd_resources(cmd, 'build',
+                                   'bitbake' + self.build_target,
+                                   save_bs=True)
+        self.measure_disk_usage(self.bb_vars['TMPDIR'], 'tmpdir', 'tmpdir')
 
 
 class Test2(BuildPerfTestCase):
     build_target = 'core-image-sato'
 
     def test2(self):
-        """Measure bitbake core-image-sato -c rootfs with sstate"""
+        """Run core-image-sato do_rootfs with sstate"""
         # Build once in order to populate sstate cache
-        self.log_cmd_output(['bitbake', self.build_target])
+        self.run_cmd(['bitbake', self.build_target])
 
         self.rm_tmp()
         self.rm_cache()
@@ -86,7 +84,7 @@ class Test2(BuildPerfTestCase):
 class Test3(BuildPerfTestCase):
 
     def test3(self):
-        """Parsing time metrics (bitbake -p)"""
+        """Bitbake parsing (bitbake -p)"""
         # Drop all caches and parse
         self.rm_cache()
         oe.path.remove(os.path.join(self.bb_vars['TMPDIR'], 'cache'), True)
@@ -106,8 +104,8 @@ class Test4(BuildPerfTestCase):
 
     def test4(self):
         """eSDK metrics"""
-        self.log_cmd_output("bitbake {} -c do_populate_sdk_ext".format(
-            self.build_target))
+        self.run_cmd(['bitbake', '-c', 'do_populate_sdk_ext',
+                     self.build_target])
         self.bb_vars = get_bb_vars(None, self.build_target)
         tmp_dir = self.bb_vars['TMPDIR']
         installer = os.path.join(

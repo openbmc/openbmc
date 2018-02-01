@@ -1,0 +1,2010 @@
+From cf17b2b404eed4778664b69d20e1943b619bfd38 Mon Sep 17 00:00:00 2001
+From: redi <redi@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Wed, 4 Jan 2017 10:54:59 +0000
+Subject: [PATCH 1/1] Support exception propagation without lock-free atomic
+ int
+
+2017-01-04  Pauli Nieminen  <suokkos@gmail.com>
+	    Jonathan Wakely  <jwakely@redhat.com>
+
+	PR libstdc++/64735
+	* acinclude.m4 (GLIBCXX_CHECK_EXCEPTION_PTR_SYMVER): Define.
+	* config.h.in: Regenerate.
+	* config/abi/pre/gnu.ver [HAVE_EXCEPTION_PTR_SINCE_GCC46]
+	(GLIBCXX_3.4.15, GLIBCXX_3.4.21, CXXABI_1.3.3, CXXABI_1.3.5): Make
+	exports for exception_ptr, nested_exception, and future conditional.
+	[HAVE_EXCEPTION_PTR_SINCE_GCC46] (GLIBCXX_3.4.23, CXXABI_1.3.11): Add
+	exports for exception_ptr, nested_exception, and future conditional.
+	* configure: Regenerate.
+	* configure.ac: Use GLIBCXX_CHECK_EXCEPTION_PTR_SYMVER.
+	* include/std/future: Remove check for ATOMIC_INT_LOCK_FREE
+	* libsupc++/eh_atomics.h: New file for internal use only.
+	(__eh_atomic_inc, __eh_atomic_dec): New.
+	* libsupc++/eh_ptr.cc (exception_ptr::_M_addref)
+	(exception_ptr::_M_release) (__gxx_dependent_exception_cleanup)
+	(rethrow_exception): Use eh_atomics.h reference counting helpers.
+	* libsupc++/eh_throw.cc (__gxx_exception_cleanup): Likewise.
+	* libsupc++/eh_tm.cc (free_any_cxa_exception): Likewise.
+	* libsupc++/exception: Remove check for ATOMIC_INT_LOCK_FREE.
+	* libsupc++/exception_ptr.h: Likewise.
+	* libsupc++/guard.cc: Include header for ATOMIC_INT_LOCK_FREE macro.
+	* libsupc++/nested_exception.cc: Remove check for
+	ATOMIC_INT_LOCK_FREE.
+	* libsupc++/nested_exception.h: Likewise.
+	* src/c++11/future.cc: Likewise.
+	* testsuite/18_support/exception_ptr/*: Remove atomic builtins checks.
+	* testsuite/18_support/nested_exception/*: Likewise.
+	* testsuite/30_threads/async/*: Likewise.
+	* testsuite/30_threads/future/*: Likewise.
+	* testsuite/30_threads/headers/future/types_std_c++0x.cc: Likewise.
+	* testsuite/30_threads/packaged_task/*: Likewise.
+	* testsuite/30_threads/promise/*: Likewise.
+	* testsuite/30_threads/shared_future/*: Likewise.
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@244051 138bc75d-0d04-0410-961f-82ee72b054a4
+
+This is a backport of the upstream commit.
+
+Signed-off-by: James Feist <james.feist@linux.intel.com>
+---
+ libstdc++-v3/ChangeLog                             | 38 +++++++++-
+ libstdc++-v3/acinclude.m4                          | 37 ++++++++++
+ libstdc++-v3/config.h.in                           |  3 +
+ libstdc++-v3/config/abi/pre/gnu.ver                | 10 +++
+ libstdc++-v3/configure                             | 49 +++++++++++++
+ libstdc++-v3/configure.ac                          |  3 +
+ libstdc++-v3/include/std/future                    |  4 +-
+ libstdc++-v3/libsupc++/eh_atomics.h                | 84 ++++++++++++++++++++++
+ libstdc++-v3/libsupc++/eh_ptr.cc                   | 14 ++--
+ libstdc++-v3/libsupc++/eh_throw.cc                 |  7 +-
+ libstdc++-v3/libsupc++/eh_tm.cc                    |  5 +-
+ libstdc++-v3/libsupc++/exception                   |  3 +-
+ libstdc++-v3/libsupc++/exception_ptr.h             |  4 --
+ libstdc++-v3/libsupc++/guard.cc                    |  1 +
+ libstdc++-v3/libsupc++/nested_exception.cc         |  2 -
+ libstdc++-v3/libsupc++/nested_exception.h          |  4 --
+ libstdc++-v3/src/c++11/future.cc                   |  3 +-
+ .../testsuite/18_support/exception_ptr/40296.cc    |  1 -
+ .../18_support/exception_ptr/60612-terminate.cc    |  1 -
+ .../18_support/exception_ptr/60612-unexpected.cc   |  1 -
+ .../testsuite/18_support/exception_ptr/62258.cc    |  1 -
+ .../testsuite/18_support/exception_ptr/64241.cc    |  1 -
+ .../18_support/exception_ptr/current_exception.cc  |  1 -
+ .../testsuite/18_support/exception_ptr/lifespan.cc |  1 -
+ .../18_support/exception_ptr/make_exception_ptr.cc |  1 -
+ .../testsuite/18_support/exception_ptr/move.cc     |  1 -
+ .../18_support/exception_ptr/requirements.cc       |  1 -
+ .../18_support/exception_ptr/requirements_neg.cc   |  1 -
+ .../18_support/exception_ptr/rethrow_exception.cc  |  1 -
+ .../testsuite/18_support/nested_exception/51438.cc |  1 -
+ .../testsuite/18_support/nested_exception/62154.cc |  1 -
+ .../testsuite/18_support/nested_exception/68139.cc |  1 -
+ .../testsuite/18_support/nested_exception/cons.cc  |  1 -
+ .../18_support/nested_exception/nested_ptr.cc      |  1 -
+ .../nested_exception/rethrow_if_nested.cc          |  1 -
+ .../18_support/nested_exception/rethrow_nested.cc  |  1 -
+ .../nested_exception/throw_with_nested.cc          |  1 -
+ libstdc++-v3/testsuite/30_threads/async/42819.cc   |  1 -
+ libstdc++-v3/testsuite/30_threads/async/49668.cc   |  1 -
+ libstdc++-v3/testsuite/30_threads/async/54297.cc   |  1 -
+ libstdc++-v3/testsuite/30_threads/async/any.cc     |  1 -
+ libstdc++-v3/testsuite/30_threads/async/async.cc   |  1 -
+ libstdc++-v3/testsuite/30_threads/async/except.cc  |  1 -
+ .../testsuite/30_threads/async/forced_unwind.cc    |  1 -
+ libstdc++-v3/testsuite/30_threads/async/launch.cc  |  1 -
+ libstdc++-v3/testsuite/30_threads/async/lwg2021.cc |  1 -
+ libstdc++-v3/testsuite/30_threads/async/sync.cc    |  1 -
+ .../testsuite/30_threads/future/cons/assign_neg.cc |  1 -
+ .../testsuite/30_threads/future/cons/constexpr.cc  |  1 -
+ .../testsuite/30_threads/future/cons/copy_neg.cc   |  1 -
+ .../testsuite/30_threads/future/cons/default.cc    |  1 -
+ .../testsuite/30_threads/future/cons/move.cc       |  1 -
+ .../30_threads/future/cons/move_assign.cc          |  1 -
+ .../testsuite/30_threads/future/members/45133.cc   |  1 -
+ .../testsuite/30_threads/future/members/get.cc     |  1 -
+ .../testsuite/30_threads/future/members/get2.cc    |  1 -
+ .../testsuite/30_threads/future/members/share.cc   |  1 -
+ .../testsuite/30_threads/future/members/valid.cc   |  1 -
+ .../testsuite/30_threads/future/members/wait.cc    |  1 -
+ .../30_threads/future/members/wait_for.cc          |  1 -
+ .../30_threads/future/members/wait_until.cc        |  1 -
+ .../future/requirements/explicit_instantiation.cc  |  1 -
+ .../30_threads/headers/future/types_std_c++0x.cc   |  1 -
+ .../testsuite/30_threads/packaged_task/49668.cc    |  1 -
+ .../testsuite/30_threads/packaged_task/60564.cc    |  1 -
+ .../testsuite/30_threads/packaged_task/cons/1.cc   |  1 -
+ .../testsuite/30_threads/packaged_task/cons/2.cc   |  1 -
+ .../testsuite/30_threads/packaged_task/cons/3.cc   |  1 -
+ .../30_threads/packaged_task/cons/56492.cc         |  1 -
+ .../30_threads/packaged_task/cons/alloc.cc         |  1 -
+ .../30_threads/packaged_task/cons/alloc2.cc        |  1 -
+ .../30_threads/packaged_task/cons/alloc_min.cc     |  1 -
+ .../30_threads/packaged_task/cons/assign_neg.cc    |  1 -
+ .../30_threads/packaged_task/cons/copy_neg.cc      |  1 -
+ .../30_threads/packaged_task/cons/move.cc          |  1 -
+ .../30_threads/packaged_task/cons/move_assign.cc   |  1 -
+ .../30_threads/packaged_task/forced_unwind.cc      |  1 -
+ .../packaged_task/members/at_thread_exit.cc        |  1 -
+ .../30_threads/packaged_task/members/get_future.cc |  1 -
+ .../packaged_task/members/get_future2.cc           |  1 -
+ .../30_threads/packaged_task/members/invoke.cc     |  1 -
+ .../30_threads/packaged_task/members/invoke2.cc    |  1 -
+ .../30_threads/packaged_task/members/invoke3.cc    |  1 -
+ .../30_threads/packaged_task/members/invoke4.cc    |  1 -
+ .../30_threads/packaged_task/members/invoke5.cc    |  1 -
+ .../30_threads/packaged_task/members/reset.cc      |  1 -
+ .../30_threads/packaged_task/members/reset2.cc     |  1 -
+ .../30_threads/packaged_task/members/swap.cc       |  1 -
+ .../30_threads/packaged_task/members/valid.cc      |  1 -
+ .../requirements/explicit_instantiation.cc         |  1 -
+ .../30_threads/packaged_task/uses_allocator.cc     |  1 -
+ libstdc++-v3/testsuite/30_threads/promise/60966.cc |  1 -
+ libstdc++-v3/testsuite/30_threads/promise/69106.cc |  1 -
+ .../testsuite/30_threads/promise/cons/1.cc         |  1 -
+ .../testsuite/30_threads/promise/cons/alloc.cc     |  1 -
+ .../testsuite/30_threads/promise/cons/alloc2.cc    |  1 -
+ .../testsuite/30_threads/promise/cons/alloc_min.cc |  1 -
+ .../30_threads/promise/cons/assign_neg.cc          |  1 -
+ .../testsuite/30_threads/promise/cons/copy_neg.cc  |  1 -
+ .../testsuite/30_threads/promise/cons/move.cc      |  1 -
+ .../30_threads/promise/cons/move_assign.cc         |  1 -
+ .../30_threads/promise/members/at_thread_exit.cc   |  1 -
+ .../30_threads/promise/members/get_future.cc       |  1 -
+ .../30_threads/promise/members/get_future2.cc      |  1 -
+ .../30_threads/promise/members/set_exception.cc    |  1 -
+ .../30_threads/promise/members/set_exception2.cc   |  1 -
+ .../30_threads/promise/members/set_value.cc        |  1 -
+ .../30_threads/promise/members/set_value2.cc       |  1 -
+ .../30_threads/promise/members/set_value3.cc       |  1 -
+ .../testsuite/30_threads/promise/members/swap.cc   |  1 -
+ .../promise/requirements/explicit_instantiation.cc |  1 -
+ .../testsuite/30_threads/promise/uses_allocator.cc |  1 -
+ .../30_threads/shared_future/cons/assign.cc        |  1 -
+ .../30_threads/shared_future/cons/constexpr.cc     |  1 -
+ .../30_threads/shared_future/cons/copy.cc          |  1 -
+ .../30_threads/shared_future/cons/default.cc       |  1 -
+ .../30_threads/shared_future/cons/move.cc          |  1 -
+ .../30_threads/shared_future/cons/move_assign.cc   |  1 -
+ .../30_threads/shared_future/members/45133.cc      |  1 -
+ .../30_threads/shared_future/members/get.cc        |  1 -
+ .../30_threads/shared_future/members/get2.cc       |  1 -
+ .../30_threads/shared_future/members/valid.cc      |  1 -
+ .../30_threads/shared_future/members/wait.cc       |  1 -
+ .../30_threads/shared_future/members/wait_for.cc   |  1 -
+ .../30_threads/shared_future/members/wait_until.cc |  1 -
+ .../requirements/explicit_instantiation.cc         |  1 -
+ 126 files changed, 236 insertions(+), 144 deletions(-)
+ create mode 100644 libstdc++-v3/libsupc++/eh_atomics.h
+
+
+Index: gcc-6.3.0/libstdc++-v3/acinclude.m4
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/acinclude.m4
++++ gcc-6.3.0/libstdc++-v3/acinclude.m4
+@@ -4517,6 +4517,43 @@ AC_DEFUN([GLIBCXX_CHECK_SIZE_T_MANGLING]
+     [Define to the letter to which size_t is mangled.])
+ ])
+ 
++dnl
++dnl Determine whether std::exception_ptr symbols should be exported with
++dnl the symbol versions from GCC 4.6.0 or GCC 7.1.0, depending on which
++dnl release first added support for std::exception_ptr. Originally it was
++dnl only supported for targets with always-lock-free atomics for int, but
++dnl since GCC 7.1 it is supported for all targets.
++dnl
++AC_DEFUN([GLIBCXX_CHECK_EXCEPTION_PTR_SYMVER], [
++  if test $enable_symvers != no; then
++    AC_MSG_CHECKING([for first version to support std::exception_ptr])
++    case ${target} in
++      aarch64-*-* | alpha-*-* | hppa*-*-* | i?86-*-* | x86_64-*-* | \
++      m68k-*-* | powerpc*-*-* | s390*-*-* | *-*-solaris* )
++        ac_exception_ptr_since_gcc46=yes
++        ;;
++      *)
++        # If the value of this macro changes then we will need to hardcode
++        # yes/no here for additional targets based on the original value.
++        AC_TRY_COMPILE([], [
++          #if __GCC_ATOMIC_INT_LOCK_FREE <= 1
++          # error atomic int not always lock free
++          #endif
++          ],
++          [ac_exception_ptr_since_gcc46=yes],
++          [ac_exception_ptr_since_gcc46=no])
++        ;;
++    esac
++    if test x"$ac_exception_ptr_since_gcc46" = x"yes" ; then
++      AC_DEFINE(HAVE_EXCEPTION_PTR_SINCE_GCC46, 1,
++        [Define to 1 if GCC 4.6 supported std::exception_ptr for the target])
++      AC_MSG_RESULT([4.6.0])
++    else
++      AC_MSG_RESULT([7.1.0])
++    fi
++  fi
++])
++
+ # Macros from the top-level gcc directory.
+ m4_include([../config/gc++filt.m4])
+ m4_include([../config/tls.m4])
+Index: gcc-6.3.0/libstdc++-v3/config.h.in
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/config.h.in
++++ gcc-6.3.0/libstdc++-v3/config.h.in
+@@ -120,6 +120,9 @@
+ /* Define if EWOULDBLOCK exists. */
+ #undef HAVE_EWOULDBLOCK
+ 
++/* Define to 1 if GCC 4.6 supported std::exception_ptr for the target */
++#undef HAVE_EXCEPTION_PTR_SINCE_GCC46
++
+ /* Define to 1 if you have the <execinfo.h> header file. */
+ #undef HAVE_EXECINFO_H
+ 
+Index: gcc-6.3.0/libstdc++-v3/config/abi/pre/gnu.ver
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/config/abi/pre/gnu.ver
++++ gcc-6.3.0/libstdc++-v3/config/abi/pre/gnu.ver
+@@ -1490,6 +1490,9 @@ GLIBCXX_3.4.15 {
+     _ZNSt14error_categoryC*;
+     _ZNSt14error_categoryD*;
+ 
++#ifdef HAVE_EXCEPTION_PTR_SINCE_GCC46
++    # std::future symbols are only present in this version when
++    # atomic operations on int are always lock-free.
+     _ZNSt13__future_base12_Result_baseC*;
+     _ZNSt13__future_base12_Result_baseD*;
+     _ZTINSt13__future_base12_Result_baseE;
+@@ -1498,6 +1501,7 @@ GLIBCXX_3.4.15 {
+     _ZNSt13__future_base11_State_baseD*;
+     _ZTINSt13__future_base11_State_baseE;
+     _ZTVNSt13__future_base11_State_baseE;
++#endif
+ 
+ } GLIBCXX_3.4.14;
+ 
+@@ -1674,8 +1678,10 @@ GLIBCXX_3.4.21 {
+ 
+     # std::notify_all_at_thread_exit
+     _ZSt25notify_all_at_thread_exitRSt18condition_variableSt11unique_lockISt5mutexE;
++#ifdef HAVE_EXCEPTION_PTR_SINCE_GCC46
+     # std::__future_base::_State_baseV2::_Make_ready::_M_set()
+     _ZNSt13__future_base13_State_baseV211_Make_ready6_M_setEv;
++#endif
+ 
+     # ABI-tagged std::basic_string
+     _ZNSt7__cxx1112basic_string*;
+@@ -2040,6 +2046,7 @@ CXXABI_1.3.3 {
+     _ZTIPDi;
+     _ZTIPKDi;
+ 
++#ifdef HAVE_EXCEPTION_PTR_SINCE_GCC46
+     # exception_ptr
+     _ZNSt15__exception_ptr13exception_ptrC1Ev;
+     _ZNSt15__exception_ptr13exception_ptrC2Ev;
+@@ -2059,6 +2066,7 @@ CXXABI_1.3.3 {
+ 
+     _ZSt17current_exceptionv;
+     _ZSt17rethrow_exceptionNSt15__exception_ptr13exception_ptrE;
++#endif
+ 
+ } CXXABI_1.3.2;
+ 
+@@ -2089,10 +2097,12 @@ CXXABI_1.3.5 {
+     # FNV hash.
+     _ZSt15_Fnv_hash_bytesPKv*;
+ 
++#ifdef HAVE_EXCEPTION_PTR_SINCE_GCC46
+     # std::nested_exception
+     _ZNSt16nested_exceptionD*;
+     _ZTISt16nested_exception;
+     _ZTVSt16nested_exception;
++#endif
+ 
+ } CXXABI_1.3.4;
+ 
+Index: gcc-6.3.0/libstdc++-v3/configure
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/configure
++++ gcc-6.3.0/libstdc++-v3/configure
+@@ -80655,6 +80655,55 @@ _ACEOF
+ 
+ 
+ 
++# Check which release added std::exception_ptr for the target
++
++  if test $enable_symvers != no; then
++    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for first version to support std::exception_ptr" >&5
++$as_echo_n "checking for first version to support std::exception_ptr... " >&6; }
++    case ${target} in
++      aarch64-*-* | alpha-*-* | hppa*-*-* | i?86-*-* | x86_64-*-* | \
++      m68k-*-* | powerpc*-*-* | s390*-*-* | *-*-solaris* )
++        ac_exception_ptr_since_gcc46=yes
++        ;;
++      *)
++        # If the value of this macro changes then we will need to hardcode
++        # yes/no here for additional targets based on the original value.
++        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++
++int
++main ()
++{
++
++          #if __GCC_ATOMIC_INT_LOCK_FREE <= 1
++          # error atomic int not always lock free
++          #endif
++
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_compile "$LINENO"; then :
++  ac_exception_ptr_since_gcc46=yes
++else
++  ac_exception_ptr_since_gcc46=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++        ;;
++    esac
++    if test x"$ac_exception_ptr_since_gcc46" = x"yes" ; then
++
++$as_echo "#define HAVE_EXCEPTION_PTR_SINCE_GCC46 1" >>confdefs.h
++
++      { $as_echo "$as_me:${as_lineno-$LINENO}: result: 4.6.0" >&5
++$as_echo "4.6.0" >&6; }
++    else
++      { $as_echo "$as_me:${as_lineno-$LINENO}: result: 7.1.0" >&5
++$as_echo "7.1.0" >&6; }
++    fi
++  fi
++
++
+ # Define documentation rules conditionally.
+ 
+ # See if makeinfo has been installed and is modern enough
+Index: gcc-6.3.0/libstdc++-v3/configure.ac
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/configure.ac
++++ gcc-6.3.0/libstdc++-v3/configure.ac
+@@ -411,6 +411,9 @@ GLIBCXX_CHECK_FILESYSTEM_DEPS
+ # For Transactional Memory TS
+ GLIBCXX_CHECK_SIZE_T_MANGLING
+ 
++# Check which release added std::exception_ptr for the target
++GLIBCXX_CHECK_EXCEPTION_PTR_SYMVER
++
+ # Define documentation rules conditionally.
+ 
+ # See if makeinfo has been installed and is modern enough
+Index: gcc-6.3.0/libstdc++-v3/include/std/future
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/include/std/future
++++ gcc-6.3.0/libstdc++-v3/include/std/future
+@@ -182,8 +182,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+     future<__async_result_of<_Fn, _Args...>>
+     async(_Fn&& __fn, _Args&&... __args);
+ 
+-#if defined(_GLIBCXX_HAS_GTHREADS) && defined(_GLIBCXX_USE_C99_STDINT_TR1) \
+-  && (ATOMIC_INT_LOCK_FREE > 1)
++#if defined(_GLIBCXX_HAS_GTHREADS) && defined(_GLIBCXX_USE_C99_STDINT_TR1)
+ 
+   /// Base class and enclosing scope.
+   struct __future_base
+@@ -1745,7 +1744,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 
+ #endif // _GLIBCXX_ASYNC_ABI_COMPAT
+ #endif // _GLIBCXX_HAS_GTHREADS && _GLIBCXX_USE_C99_STDINT_TR1
+-       // && ATOMIC_INT_LOCK_FREE
+ 
+   // @} group futures
+ _GLIBCXX_END_NAMESPACE_VERSION
+Index: gcc-6.3.0/libstdc++-v3/libsupc++/eh_atomics.h
+===================================================================
+--- /dev/null
++++ gcc-6.3.0/libstdc++-v3/libsupc++/eh_atomics.h
+@@ -0,0 +1,84 @@
++// Exception Handling support header for -*- C++ -*-
++
++// Copyright (C) 2016 Free Software Foundation, Inc.
++//
++// This file is part of GCC.
++//
++// GCC is free software; you can redistribute it and/or modify
++// it under the terms of the GNU General Public License as published by
++// the Free Software Foundation; either version 3, or (at your option)
++// any later version.
++//
++// GCC is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++//
++// Under Section 7 of GPL version 3, you are granted additional
++// permissions described in the GCC Runtime Library Exception, version
++// 3.1, as published by the Free Software Foundation.
++
++// You should have received a copy of the GNU General Public License and
++// a copy of the GCC Runtime Library Exception along with this program;
++// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++// <http://www.gnu.org/licenses/>.
++
++/** @file eh_atomics.h
++ *  This is an internal header file, included by library source files.
++ *  Do not attempt to use it directly.
++ */
++
++#ifndef _EH_ATOMICS_H
++#define _EH_ATOMICS_H 1
++
++#include <bits/c++config.h>
++#include <bits/atomic_word.h>
++#include <bits/atomic_lockfree_defines.h>
++#if ATOMIC_INT_LOCK_FREE <= 1
++# include <ext/atomicity.h>
++#endif
++
++#pragma GCC visibility push(default)
++extern "C++" {
++namespace __gnu_cxx
++{
++  void
++  __eh_atomic_inc (_Atomic_word* __count) __attribute__((always_inline));
++
++  bool
++  __eh_atomic_dec (_Atomic_word* __count) __attribute__((always_inline));
++
++  // Increments the count.
++  inline void
++  __eh_atomic_inc (_Atomic_word* __count)
++  {
++#if ATOMIC_INT_LOCK_FREE > 1
++    __atomic_add_fetch (__count, 1, __ATOMIC_ACQ_REL);
++#else
++    _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE (__count);
++    __gnu_cxx::__atomic_add_dispatch (__count, 1);
++    _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER (__count);
++#endif
++  }
++
++  // Decrements the count and returns true if it reached zero.
++  inline bool
++  __eh_atomic_dec (_Atomic_word* __count)
++  {
++#if ATOMIC_INT_LOCK_FREE > 1
++    return __atomic_sub_fetch (__count, 1, __ATOMIC_ACQ_REL) == 0;
++#else
++    _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE (__count);
++    if (__gnu_cxx::__exchange_and_add_dispatch (__count, -1) == 1)
++      {
++	_GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER (__count);
++	return true;
++      }
++    return false;
++#endif
++  }
++} // namespace __gnu_cxx
++}
++#pragma GCC visibility pop
++
++#endif // _EH_ATOMICS_H
+Index: gcc-6.3.0/libstdc++-v3/libsupc++/eh_ptr.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/libsupc++/eh_ptr.cc
++++ gcc-6.3.0/libstdc++-v3/libsupc++/eh_ptr.cc
+@@ -23,9 +23,7 @@
+ // <http://www.gnu.org/licenses/>.
+ 
+ #include <bits/c++config.h>
+-#include <bits/atomic_lockfree_defines.h>
+-
+-#if ATOMIC_INT_LOCK_FREE > 1
++#include "eh_atomics.h"
+ 
+ #define _GLIBCXX_EH_PTR_COMPAT
+ 
+@@ -103,7 +101,7 @@ std::__exception_ptr::exception_ptr::_M_
+     {
+       __cxa_refcounted_exception *eh =
+ 	__get_refcounted_exception_header_from_obj (_M_exception_object);
+-      __atomic_add_fetch (&eh->referenceCount, 1, __ATOMIC_ACQ_REL);
++      __gnu_cxx::__eh_atomic_inc (&eh->referenceCount);
+     }
+ }
+ 
+@@ -115,7 +113,7 @@ std::__exception_ptr::exception_ptr::_M_
+     {
+       __cxa_refcounted_exception *eh =
+ 	__get_refcounted_exception_header_from_obj (_M_exception_object);
+-      if (__atomic_sub_fetch (&eh->referenceCount, 1, __ATOMIC_ACQ_REL) == 0)
++      if (__gnu_cxx::__eh_atomic_dec (&eh->referenceCount))
+         {
+ 	  if (eh->exc.exceptionDestructor)
+ 	    eh->exc.exceptionDestructor (_M_exception_object);
+@@ -219,7 +217,7 @@ __gxx_dependent_exception_cleanup(_Unwin
+ 
+   __cxa_free_dependent_exception (dep);
+ 
+-  if (__atomic_sub_fetch (&header->referenceCount, 1, __ATOMIC_ACQ_REL) == 0)
++  if (__gnu_cxx::__eh_atomic_dec (&header->referenceCount))
+     {
+       if (header->exc.exceptionDestructor)
+ 	header->exc.exceptionDestructor (header + 1);
+@@ -238,7 +236,7 @@ std::rethrow_exception(std::exception_pt
+ 
+   __cxa_dependent_exception *dep = __cxa_allocate_dependent_exception ();
+   dep->primaryException = obj;
+-  __atomic_add_fetch (&eh->referenceCount, 1,  __ATOMIC_ACQ_REL);
++  __gnu_cxx::__eh_atomic_inc (&eh->referenceCount);
+ 
+   dep->unexpectedHandler = get_unexpected ();
+   dep->terminateHandler = get_terminate ();
+@@ -260,5 +258,3 @@ std::rethrow_exception(std::exception_pt
+ }
+ 
+ #undef _GLIBCXX_EH_PTR_COMPAT
+-
+-#endif
+Index: gcc-6.3.0/libstdc++-v3/libsupc++/eh_throw.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/libsupc++/eh_throw.cc
++++ gcc-6.3.0/libstdc++-v3/libsupc++/eh_throw.cc
+@@ -24,6 +24,7 @@
+ 
+ #include <bits/c++config.h>
+ #include "unwind-cxx.h"
++#include "eh_atomics.h"
+ 
+ using namespace __cxxabiv1;
+ 
+@@ -42,17 +43,13 @@ __gxx_exception_cleanup (_Unwind_Reason_
+   if (code != _URC_FOREIGN_EXCEPTION_CAUGHT && code != _URC_NO_REASON)
+     __terminate (header->exc.terminateHandler);
+ 
+-#if ATOMIC_INT_LOCK_FREE > 1
+-  if (__atomic_sub_fetch (&header->referenceCount, 1, __ATOMIC_ACQ_REL) == 0)
++  if (__gnu_cxx::__eh_atomic_dec (&header->referenceCount))
+     {
+-#endif
+       if (header->exc.exceptionDestructor)
+ 	header->exc.exceptionDestructor (header + 1);
+ 
+       __cxa_free_exception (header + 1);
+-#if ATOMIC_INT_LOCK_FREE > 1
+     }
+-#endif
+ }
+ 
+ 
+Index: gcc-6.3.0/libstdc++-v3/libsupc++/eh_tm.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/libsupc++/eh_tm.cc
++++ gcc-6.3.0/libstdc++-v3/libsupc++/eh_tm.cc
+@@ -24,6 +24,7 @@
+ 
+ #include <cstdlib>
+ #include "unwind-cxx.h"
++#include "eh_atomics.h"
+ 
+ using namespace __cxxabiv1;
+ 
+@@ -45,9 +46,7 @@ free_any_cxa_exception (_Unwind_Exceptio
+       __cxa_free_dependent_exception (dep);
+     }
+ 
+-#if __GCC_ATOMIC_INT_LOCK_FREE > 1
+-  if (__atomic_sub_fetch (&h->referenceCount, 1, __ATOMIC_ACQ_REL) == 0)
+-#endif
++  if (__gnu_cxx::__eh_atomic_dec (&h->referenceCount))
+     __cxa_free_exception (h + 1);
+ }
+ 
+Index: gcc-6.3.0/libstdc++-v3/libsupc++/exception
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/libsupc++/exception
++++ gcc-6.3.0/libstdc++-v3/libsupc++/exception
+@@ -35,7 +35,6 @@
+ #pragma GCC visibility push(default)
+ 
+ #include <bits/c++config.h>
+-#include <bits/atomic_lockfree_defines.h>
+ 
+ extern "C++" {
+ 
+@@ -166,7 +165,7 @@ _GLIBCXX_END_NAMESPACE_VERSION
+ 
+ #pragma GCC visibility pop
+ 
+-#if (__cplusplus >= 201103L) && (ATOMIC_INT_LOCK_FREE > 1)
++#if (__cplusplus >= 201103L)
+ #include <bits/exception_ptr.h>
+ #include <bits/nested_exception.h>
+ #endif
+Index: gcc-6.3.0/libstdc++-v3/libsupc++/exception_ptr.h
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/libsupc++/exception_ptr.h
++++ gcc-6.3.0/libstdc++-v3/libsupc++/exception_ptr.h
+@@ -36,10 +36,6 @@
+ #include <bits/c++config.h>
+ #include <bits/exception_defines.h>
+ 
+-#if ATOMIC_INT_LOCK_FREE < 2
+-#  error This platform does not support exception propagation.
+-#endif
+-
+ extern "C++" {
+ 
+ namespace std 
+Index: gcc-6.3.0/libstdc++-v3/libsupc++/guard.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/libsupc++/guard.cc
++++ gcc-6.3.0/libstdc++-v3/libsupc++/guard.cc
+@@ -30,6 +30,7 @@
+ #include <new>
+ #include <ext/atomicity.h>
+ #include <ext/concurrence.h>
++#include <bits/atomic_lockfree_defines.h>
+ #if defined(__GTHREADS) && defined(__GTHREAD_HAS_COND) \
+   && (ATOMIC_INT_LOCK_FREE > 1) && defined(_GLIBCXX_HAVE_LINUX_FUTEX)
+ # include <climits>
+Index: gcc-6.3.0/libstdc++-v3/libsupc++/nested_exception.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/libsupc++/nested_exception.cc
++++ gcc-6.3.0/libstdc++-v3/libsupc++/nested_exception.cc
+@@ -25,7 +25,5 @@
+ 
+ namespace std 
+ {
+-#if ATOMIC_INT_LOCK_FREE > 1
+   nested_exception::~nested_exception() noexcept = default;
+-#endif
+ } // namespace std
+Index: gcc-6.3.0/libstdc++-v3/libsupc++/nested_exception.h
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/libsupc++/nested_exception.h
++++ gcc-6.3.0/libstdc++-v3/libsupc++/nested_exception.h
+@@ -39,10 +39,6 @@
+ #include <bits/c++config.h>
+ #include <bits/move.h>
+ 
+-#if ATOMIC_INT_LOCK_FREE < 2
+-#  error This platform does not support exception propagation.
+-#endif
+-
+ extern "C++" {
+ 
+ namespace std
+Index: gcc-6.3.0/libstdc++-v3/src/c++11/future.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/src/c++11/future.cc
++++ gcc-6.3.0/libstdc++-v3/src/c++11/future.cc
+@@ -78,8 +78,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+   const char*
+   future_error::what() const noexcept { return logic_error::what(); }
+ 
+-#if defined(_GLIBCXX_HAS_GTHREADS) && defined(_GLIBCXX_USE_C99_STDINT_TR1) \
+-  && (ATOMIC_INT_LOCK_FREE > 1)
++#if defined(_GLIBCXX_HAS_GTHREADS) && defined(_GLIBCXX_USE_C99_STDINT_TR1)
+   __future_base::_Result_base::_Result_base() = default;
+ 
+   __future_base::_Result_base::~_Result_base() = default;
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/40296.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/40296.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/40296.cc
+@@ -1,6 +1,5 @@
+ // { dg-do compile }
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/60612-terminate.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/60612-terminate.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/60612-terminate.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/60612-unexpected.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/60612-unexpected.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/60612-unexpected.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/62258.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/62258.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/62258.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2015-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/64241.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/64241.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/64241.cc
+@@ -16,7 +16,6 @@
+ // <http://www.gnu.org/licenses/>.
+ 
+ // { dg-options "-std=gnu++11 -fno-exceptions -O0" }
+-// { dg-require-atomic-builtins "" }
+ 
+ #include <exception>
+ #include <testsuite_hooks.h>
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/current_exception.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/current_exception.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/current_exception.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // 2008-05-25  Sebastian Redl  <sebastian.redl@getdesigned.at>
+ 
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/lifespan.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/lifespan.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/lifespan.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // 2008-05-25  Sebastian Redl  <sebastian.redl@getdesigned.at>
+ 
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/make_exception_ptr.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/make_exception_ptr.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/make_exception_ptr.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/move.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/move.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/move.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/requirements.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/requirements.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/requirements.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/requirements_neg.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/requirements_neg.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/requirements_neg.cc
+@@ -1,6 +1,5 @@
+ // { dg-do compile }
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/rethrow_exception.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/exception_ptr/rethrow_exception.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/exception_ptr/rethrow_exception.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // 2008-05-25  Sebastian Redl  <sebastian.redl@getdesigned.at>
+ 
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/51438.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/nested_exception/51438.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/51438.cc
+@@ -1,6 +1,5 @@
+ // { dg-do compile }
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/62154.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/nested_exception/62154.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/62154.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/68139.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/nested_exception/68139.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/68139.cc
+@@ -1,6 +1,5 @@
+ // { dg-do compile }
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2015-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/cons.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/nested_exception/cons.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/cons.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/nested_ptr.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/nested_exception/nested_ptr.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/nested_ptr.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/rethrow_if_nested.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/nested_exception/rethrow_if_nested.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/rethrow_if_nested.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/rethrow_nested.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/nested_exception/rethrow_nested.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/rethrow_nested.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/throw_with_nested.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/18_support/nested_exception/throw_with_nested.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/18_support/nested_exception/throw_with_nested.cc
+@@ -1,5 +1,4 @@
+ // { dg-options "-std=gnu++11" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/42819.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/42819.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/42819.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/49668.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/49668.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/49668.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/54297.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/54297.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/54297.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ // { dg-require-sleep "" }
+ 
+ // Copyright (C) 2012-2016 Free Software Foundation, Inc.
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/any.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/any.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/any.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/async.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/async.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/async.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/except.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/except.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/except.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/forced_unwind.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/forced_unwind.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/forced_unwind.cc
+@@ -2,7 +2,6 @@
+ // { dg-options " -std=gnu++11 -pthread" { target *-*-linux* *-*-gnu* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/launch.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/launch.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/launch.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/lwg2021.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/lwg2021.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/lwg2021.cc
+@@ -21,7 +21,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // LWG 2021. Further incorrect usages of result_of
+ // Arguments to result_of should use decay.
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/sync.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/async/sync.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/async/sync.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/assign_neg.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/cons/assign_neg.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/assign_neg.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/constexpr.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/cons/constexpr.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/constexpr.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11 -fno-inline -g0" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ // { dg-final { scan-assembler-not "_ZNSt6futureIvEC2Ev" } }
+ // { dg-final { scan-assembler-not "_ZNSt6futureIiEC2Ev" } }
+ 
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/copy_neg.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/cons/copy_neg.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/copy_neg.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/default.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/cons/default.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/default.cc
+@@ -1,7 +1,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/move.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/cons/move.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/move.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/move_assign.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/cons/move_assign.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/cons/move_assign.cc
+@@ -1,7 +1,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/45133.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/members/45133.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/45133.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/get.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/members/get.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/get.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/get2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/members/get2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/get2.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/share.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/members/share.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/share.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/valid.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/members/valid.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/valid.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/wait.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/members/wait.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/wait.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/wait_for.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/members/wait_for.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/wait_for.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/wait_until.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/members/wait_until.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/members/wait_until.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/requirements/explicit_instantiation.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/future/requirements/explicit_instantiation.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/future/requirements/explicit_instantiation.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/headers/future/types_std_c++0x.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/headers/future/types_std_c++0x.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/headers/future/types_std_c++0x.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" } 
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/49668.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/49668.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/49668.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/60564.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/60564.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/60564.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/1.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/1.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/1.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/2.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/3.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/3.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/3.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/56492.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/56492.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/56492.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2013-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/alloc.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/alloc.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/alloc.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/alloc2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/alloc2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/alloc2.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/alloc_min.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/alloc_min.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/alloc_min.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/assign_neg.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/assign_neg.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/assign_neg.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/copy_neg.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/copy_neg.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/copy_neg.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/move.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/move.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/move.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/move_assign.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/cons/move_assign.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/cons/move_assign.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/forced_unwind.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/forced_unwind.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/forced_unwind.cc
+@@ -2,7 +2,6 @@
+ // { dg-options " -std=gnu++11 -pthread" { target *-*-linux* *-*-gnu* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/at_thread_exit.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/at_thread_exit.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/at_thread_exit.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/get_future.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/get_future.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/get_future.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/get_future2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/get_future2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/get_future2.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke2.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke3.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke3.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke3.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke4.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke4.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke4.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke5.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke5.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/invoke5.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/reset.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/reset.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/reset.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/reset2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/reset2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/reset2.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/swap.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/swap.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/swap.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/valid.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/members/valid.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/members/valid.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/requirements/explicit_instantiation.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/requirements/explicit_instantiation.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/requirements/explicit_instantiation.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/uses_allocator.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/packaged_task/uses_allocator.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/packaged_task/uses_allocator.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/60966.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/60966.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/60966.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/69106.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/69106.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/69106.cc
+@@ -19,7 +19,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ #include <future>
+ 
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/1.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/cons/1.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/1.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/alloc.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/cons/alloc.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/alloc.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/alloc2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/cons/alloc2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/alloc2.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/alloc_min.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/cons/alloc_min.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/alloc_min.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/assign_neg.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/cons/assign_neg.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/assign_neg.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/copy_neg.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/cons/copy_neg.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/copy_neg.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/move.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/cons/move.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/move.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/move_assign.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/cons/move_assign.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/cons/move_assign.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/at_thread_exit.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/members/at_thread_exit.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/at_thread_exit.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2014-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/get_future.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/members/get_future.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/get_future.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/get_future2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/members/get_future2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/get_future2.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_exception.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/members/set_exception.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_exception.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_exception2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/members/set_exception2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_exception2.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_value.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/members/set_value.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_value.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_value2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/members/set_value2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_value2.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_value3.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/members/set_value3.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/set_value3.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/swap.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/members/swap.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/members/swap.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/requirements/explicit_instantiation.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/requirements/explicit_instantiation.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/requirements/explicit_instantiation.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/uses_allocator.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/promise/uses_allocator.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/promise/uses_allocator.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2011-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/assign.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/cons/assign.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/assign.cc
+@@ -1,7 +1,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/constexpr.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/cons/constexpr.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/constexpr.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11 -fno-inline -g0" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ // { dg-final { scan-assembler-not "_ZNSt13shared_futureIvEC2Ev" } }
+ // { dg-final { scan-assembler-not "_ZNSt13shared_futureIiEC2Ev" } }
+ 
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/copy.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/cons/copy.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/copy.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/default.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/cons/default.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/default.cc
+@@ -1,7 +1,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/move.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/cons/move.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/move.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/move_assign.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/cons/move_assign.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/cons/move_assign.cc
+@@ -1,7 +1,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/45133.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/members/45133.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/45133.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/get.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/members/get.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/get.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/get2.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/members/get2.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/get2.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/valid.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/members/valid.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/valid.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2010-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/wait.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/members/wait.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/wait.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/wait_for.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/members/wait_for.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/wait_for.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/wait_until.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/members/wait_until.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/members/wait_until.cc
+@@ -4,7 +4,6 @@
+ // { dg-options " -std=gnu++11 " { target *-*-cygwin *-*-rtems* *-*-darwin* } }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/requirements/explicit_instantiation.cc
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/testsuite/30_threads/shared_future/requirements/explicit_instantiation.cc
++++ gcc-6.3.0/libstdc++-v3/testsuite/30_threads/shared_future/requirements/explicit_instantiation.cc
+@@ -2,7 +2,6 @@
+ // { dg-options "-std=gnu++11" }
+ // { dg-require-cstdint "" }
+ // { dg-require-gthreads "" }
+-// { dg-require-atomic-builtins "" }
+ 
+ // Copyright (C) 2009-2016 Free Software Foundation, Inc.
+ //
+Index: gcc-6.3.0/libstdc++-v3/ChangeLog
+===================================================================
+--- gcc-6.3.0.orig/libstdc++-v3/ChangeLog
++++ gcc-6.3.0/libstdc++-v3/ChangeLog
+@@ -2,6 +2,43 @@
+ 
+ 	* GCC 6.3.0 released.
+ 
++2017-01-04  Pauli Nieminen  <suokkos@gmail.com>
++           Jonathan Wakely  <jwakely@redhat.com>
++
++       PR libstdc++/64735
++       * acinclude.m4 (GLIBCXX_CHECK_EXCEPTION_PTR_SYMVER): Define.
++       * config.h.in: Regenerate.
++       * config/abi/pre/gnu.ver [HAVE_EXCEPTION_PTR_SINCE_GCC46]
++       (GLIBCXX_3.4.15, GLIBCXX_3.4.21, CXXABI_1.3.3, CXXABI_1.3.5): Make
++       exports for exception_ptr, nested_exception, and future conditional.
++       [HAVE_EXCEPTION_PTR_SINCE_GCC46] (GLIBCXX_3.4.23, CXXABI_1.3.11): Add
++       exports for exception_ptr, nested_exception, and future conditional.
++       * configure: Regenerate.
++       * configure.ac: Use GLIBCXX_CHECK_EXCEPTION_PTR_SYMVER.
++       * include/std/future: Remove check for ATOMIC_INT_LOCK_FREE
++       * libsupc++/eh_atomics.h: New file for internal use only.
++       (__eh_atomic_inc, __eh_atomic_dec): New.
++       * libsupc++/eh_ptr.cc (exception_ptr::_M_addref)
++       (exception_ptr::_M_release) (__gxx_dependent_exception_cleanup)
++       (rethrow_exception): Use eh_atomics.h reference counting helpers.
++       * libsupc++/eh_throw.cc (__gxx_exception_cleanup): Likewise.
++       * libsupc++/eh_tm.cc (free_any_cxa_exception): Likewise.
++       * libsupc++/exception: Remove check for ATOMIC_INT_LOCK_FREE.
++       * libsupc++/exception_ptr.h: Likewise.
++       * libsupc++/guard.cc: Include header for ATOMIC_INT_LOCK_FREE macro.
++       * libsupc++/nested_exception.cc: Remove check for
++       ATOMIC_INT_LOCK_FREE.
++       * libsupc++/nested_exception.h: Likewise.
++       * src/c++11/future.cc: Likewise.
++       * testsuite/18_support/exception_ptr/*: Remove atomic builtins checks.
++       * testsuite/18_support/nested_exception/*: Likewise.
++       * testsuite/30_threads/async/*: Likewise.
++       * testsuite/30_threads/future/*: Likewise.
++       * testsuite/30_threads/headers/future/types_std_c++0x.cc: Likewise.
++       * testsuite/30_threads/packaged_task/*: Likewise.
++       * testsuite/30_threads/promise/*: Likewise.
++       * testsuite/30_threads/shared_future/*: Likewise.
++
+ 2016-12-12  Jonathan Wakely  <jwakely@redhat.com>
+ 
+ 	Backport from mainline

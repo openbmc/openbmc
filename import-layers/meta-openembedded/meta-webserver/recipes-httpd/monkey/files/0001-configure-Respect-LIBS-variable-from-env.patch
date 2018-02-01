@@ -1,0 +1,29 @@
+From b0526a9b5325bd4758dad8d14efd85c98ef2ebff Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Jul 2017 18:25:23 -0700
+Subject: [PATCH] configure: Respect LIBS variable from env
+
+For musl we need to pass -lexecinfo from env
+this change accomodates that
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 4286c34..f1c65db 100755
+--- a/configure
++++ b/configure
+@@ -620,7 +620,7 @@ LIBDEFS = -DSHAREDLIB -fPIC \$(DEFS)
+ INCDIR  = ./include
+ LDFLAGS = $LDFLAGS
+ DESTDIR = ../bin/monkey
+-LIBS    = -ldl $libs
++LIBS    = -ldl $libs ${LIBS}
+ OBJ     = monkey.o mk_method.o mk_mimetype.o mk_vhost.o mk_request.o \\
+           mk_header.o mk_config.o mk_signals.o \\
+           mk_user.o mk_utils.o mk_epoll.o mk_scheduler.o \\
+-- 
+2.13.3
+

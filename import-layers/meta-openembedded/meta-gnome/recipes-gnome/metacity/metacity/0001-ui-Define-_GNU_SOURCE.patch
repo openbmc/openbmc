@@ -1,0 +1,27 @@
+From e7fd072f0df968f342878b77098e97ff07ed28d7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Jul 2017 10:26:31 -0700
+Subject: [PATCH] ui: Define _GNU_SOURCE
+
+it becomes portable across musl and glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/ui/theme.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/ui/theme.c b/src/ui/theme.c
+index 84b57a0..c7eafc8 100644
+--- a/src/ui/theme.c
++++ b/src/ui/theme.c
+@@ -60,6 +60,7 @@
+ #include <gtk/gtk.h>
+ #include <string.h>
+ #include <stdlib.h>
++#define _GNU_SOURCE
+ #define __USE_XOPEN
+ #include <math.h>
+ 
+-- 
+2.13.3
+

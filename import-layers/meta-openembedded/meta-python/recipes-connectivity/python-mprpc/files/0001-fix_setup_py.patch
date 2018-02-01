@@ -1,0 +1,34 @@
+From bda99eab9036d46e7bb06b446d11cab0b1dd8093 Mon Sep 17 00:00:00 2001
+From: Andrej Rode <andrej.rode@ettus.com>
+Date: Mon, 10 Apr 2017 16:49:50 -0700
+Subject: [PATCH] setup: remove find_packages and only install mprpc
+
+Signed-off-by: Andrej Rode <andrej.rode@ettus.com>
+---
+ setup.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 5001d0c..4c0ba75 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1,6 +1,6 @@
+ # -*- coding: utf-8 -*-
+ 
+-from setuptools import setup, Extension, find_packages
++from setuptools import setup, Extension
+ 
+ setup(
+     name='mprpc',
+@@ -10,7 +10,7 @@ setup(
+     author='Studio Ousia',
+     author_email='ikuya@ousia.jp',
+     url='http://github.com/studio-ousia/mprpc',
+-    packages=find_packages(),
++    packages=['mprpc'],
+     ext_modules=[
+         Extension('mprpc.client', ['mprpc/client.c']),
+         Extension('mprpc.server', ['mprpc/server.c'])
+-- 
+2.10.2
+

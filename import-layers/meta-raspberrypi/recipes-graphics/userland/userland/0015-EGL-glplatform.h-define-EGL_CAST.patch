@@ -1,0 +1,32 @@
+From 827907f2223df93918e680101a1ac6228ba0f07e Mon Sep 17 00:00:00 2001
+From: Andrea Galbusera <gizero@gmail.com>
+Date: Fri, 14 Jul 2017 09:52:54 +0200
+Subject: [PATCH 15/15] EGL/glplatform.h: define EGL_CAST
+
+C++ / C typecast macros for special EGL handle values: used by libepoxy code
+The definition comes from the updated version of this header in mesa.
+
+Upstream-Status: Pending
+---
+ interface/khronos/include/EGL/eglplatform.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/interface/khronos/include/EGL/eglplatform.h b/interface/khronos/include/EGL/eglplatform.h
+index 1f7c930..c39d425 100644
+--- a/interface/khronos/include/EGL/eglplatform.h
++++ b/interface/khronos/include/EGL/eglplatform.h
+@@ -202,4 +202,11 @@ EGLAPI void EGLAPIENTRY BEGL_GetDefaultDriverInterfaces(BEGL_DriverInterfaces *i
+ #include "interface/khronos/common/khrn_client_mangle.h"
+ #endif
+ 
++/* C++ / C typecast macros for special EGL handle values */
++#if defined(__cplusplus)
++#define EGL_CAST(type, value) (static_cast<type>(value))
++#else
++#define EGL_CAST(type, value) ((type) (value))
++#endif
++
+ #endif /* __eglplatform_h */
+-- 
+2.15.0
+

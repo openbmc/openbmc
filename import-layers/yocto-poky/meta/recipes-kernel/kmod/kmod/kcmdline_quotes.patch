@@ -1,0 +1,44 @@
+From 4a6f92a10680e7e36807f5e2ae8e497e8d73a048 Mon Sep 17 00:00:00 2001
+From: James Minor <james.minor@ni.com>
+Date: Fri, 20 Jan 2017 17:15:50 -0600
+Subject: [PATCH] libkmod: Fix handling of quotes in kernel command line
+
+If a module parameter on the command line contains quotes, any
+spaces inside those quotes should be included as part of the
+parameter.
+
+Signed-off-by: James Minor <james.minor@ni.com>
+
+Upstream-Status: Accepted
+---
+ libkmod/libkmod-config.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/libkmod/libkmod-config.c b/libkmod/libkmod-config.c
+index 57fbe37..ea40d19 100644
+--- a/libkmod/libkmod-config.c
++++ b/libkmod/libkmod-config.c
+@@ -497,6 +497,7 @@ static int kmod_config_parse_kcmdline(struct kmod_config *config)
+ 	char buf[KCMD_LINE_SIZE];
+ 	int fd, err;
+ 	char *p, *modname,  *param = NULL, *value = NULL, is_module = 1;
++	bool is_quoted = false;
+ 
+ 	fd = open("/proc/cmdline", O_RDONLY|O_CLOEXEC);
+ 	if (fd < 0) {
+@@ -514,6 +515,12 @@ static int kmod_config_parse_kcmdline(struct kmod_config *config)
+ 	}
+ 
+ 	for (p = buf, modname = buf; *p != '\0' && *p != '\n'; p++) {
++		if (*p == '"') {
++			is_quoted = !is_quoted;
++			continue;
++		}
++		if (is_quoted)
++			continue;
+ 		switch (*p) {
+ 		case ' ':
+ 			*p = '\0';
+-- 
+1.9.1
+

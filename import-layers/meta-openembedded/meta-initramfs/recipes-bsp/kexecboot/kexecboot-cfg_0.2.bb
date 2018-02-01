@@ -57,4 +57,4 @@ CMDLINE_DEBUG ?= "quiet"
 INHIBIT_DEFAULT_DEPS = "1"
 
 # Note: for qvga the label is currently limited to about 24 chars
-KEXECBOOT_LABEL ?= "${@d.getVar('DISTRO', True) or d.getVar('DISTRO_VERSION', True)}-${MACHINE}"
+KEXECBOOT_LABEL ?= "${@d.getVar('DISTRO') or d.getVar('DISTRO_VERSION')}-${MACHINE}"

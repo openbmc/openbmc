@@ -15,9 +15,10 @@ acpaths = ""
 PACKAGECONFIG ??= "cairo"
 PACKAGECONFIG[cairo] = "--with-cairo,--without-cairo,cairo pango"
 PACKAGECONFIG[lua] = "--with-lua,--without-lua,lua"
+# there's compilation failure if qt4 is enabled
+PACKAGECONFIG[qt4] = "--with-qt,--without-qt,qt4-x11-free"
 
 EXTRA_OECONF = "--with-readline=${STAGING_LIBDIR}/.. \
-                --without-lisp-files \
                 --without-tutorial \
                 --disable-wxwidgets"
 

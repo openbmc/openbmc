@@ -1,0 +1,40 @@
+From 99788b4557543c490493ce1b827538c49142c25d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 31 Oct 2016 09:08:51 +0100
+Subject: [PATCH] setup.py: avoid /usr/share/share paths
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ setup.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 5fc237d..c4fbf7c 100644
+--- a/setup.py
++++ b/setup.py
+@@ -143,7 +143,7 @@ class InstallAndUpdateDataDirectory(DistUtilsExtra.auto.install_auto):
+ 
+         if self.root:
+             target_data = os.path.relpath(self.install_data, self.root) + os.sep
+-            target_pkgdata = os.path.join(target_data, 'share', 'menulibre', '')
++            target_pkgdata = os.path.join(target_data, 'menulibre', '')
+             target_scripts = os.path.join(self.install_scripts, '')
+ 
+             data_dir = os.path.join(self.prefix, 'share', 'menulibre', '')
+@@ -152,7 +152,7 @@ class InstallAndUpdateDataDirectory(DistUtilsExtra.auto.install_auto):
+             # --user install
+             self.root = ''
+             target_data = os.path.relpath(self.install_data) + os.sep
+-            target_pkgdata = os.path.join(target_data, 'share', 'menulibre', '')
++            target_pkgdata = os.path.join(target_data, 'menulibre', '')
+             target_scripts = os.path.join(self.install_scripts, '')
+ 
+             # Use absolute paths
+-- 
+2.5.5
+

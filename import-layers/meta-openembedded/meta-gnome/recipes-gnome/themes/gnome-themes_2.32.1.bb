@@ -5,7 +5,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=2b543dc97eb7594d026af39d9b54204b"
 PR = "r3"
 
 SECTION = "x11/gnome"
-DEPENDS = "gtk-engines icon-naming-utils icon-naming-utils-native glib-2.0 intltool-native libxml-simple-perl-native"
+DEPENDS = "gtk-engines icon-naming-utils icon-naming-utils-native \
+           glib-2.0 intltool-native libxml-simple-perl-native \
+           glib-2.0-native \
+"
 RDEPENDS_${PN} = "adwaita-icon-theme"
 
 EXTRA_OECONF += "--enable-all-themes \
@@ -31,3 +34,4 @@ SRC_URI += "file://iconpath-option.patch \
 SRC_URI[archive.md5sum] = "41db9e3cb25d35af2675c599e67944d1"
 SRC_URI[archive.sha256sum] = "8601ee24c2e096593221cbd6ebdb6686042225a03c02a01c0d67c163f9febd1a"
 GNOME_COMPRESS_TYPE="bz2"
+

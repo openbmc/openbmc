@@ -32,6 +32,9 @@ MIPSPKGSFX_BYTE - This is defined as either blank and "64" for MIPS64 CPUs.
 MIPSPKGSFX_ENDIAN - For bigendian hardware this is blank, otherwise it's
 defined as "el".
 
+MIPSPKGSFX_ENDIAN2 - For bigendian hardware this is "eb", otherwise it's
+defined as "el".
+
 MIPSPKGSFX_VARIANT_tune-<tune> - In the default tunings it is set to the
 same value as TUNE_ARCH.  In custom, optimized tunings, the value should
 be modified to more precisely describe the tuning.

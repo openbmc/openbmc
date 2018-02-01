@@ -17,15 +17,15 @@ do_install() {
 }
 
 def get_libc_fpu_setting(bb, d):
-    if d.getVar('TARGET_FPU', True) in [ 'soft', 'ppc-efd' ]:
+    if d.getVar('TARGET_FPU') in [ 'soft', 'ppc-efd' ]:
         return "--without-fp"
     return ""
 
 python populate_packages_prepend () {
-    if d.getVar('DEBIAN_NAMES', True):
-        pkgs = d.getVar('PACKAGES', True).split()
-        bpn = d.getVar('BPN', True)
-        prefix = d.getVar('MLPREFIX', True) or ""
+    if d.getVar('DEBIAN_NAMES'):
+        pkgs = d.getVar('PACKAGES').split()
+        bpn = d.getVar('BPN')
+        prefix = d.getVar('MLPREFIX') or ""
         # Set the base package...
         d.setVar('PKG_' + prefix + bpn, prefix + 'libc6')
         libcprefix = prefix + bpn + '-'

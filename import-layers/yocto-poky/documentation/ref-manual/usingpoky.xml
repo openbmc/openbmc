@@ -69,6 +69,39 @@
             <literallayout class='monospaced'>
      $ bitbake <replaceable>target</replaceable>
             </literallayout>
+            <note>
+                <para>
+                    If you experience a build error due to resources
+                    temporarily being unavailable and it appears you
+                    should not be having this issue, it might be due
+                    to the combination of a 4.3+ Linux kernel and
+                    <filename>systemd</filename> version 228+
+                    (i.e. see this
+                    <ulink url='http://unix.stackexchange.com/questions/253903/creating-threads-fails-with-resource-temporarily-unavailable-with-4-3-kernel'>link</ulink>
+                    for information).
+                </para>
+
+                <para>
+                    To work around this issue, you can try either
+                    of the following:
+                    <itemizedlist>
+                        <listitem><para>
+                            Try the build again.
+                            </para></listitem>
+                        <listitem><para>
+                            Modify the "DefaultTasksMax"
+                            <filename>systemd</filename> parameter
+                            by uncommenting it and setting it to
+                            "infinity".
+                            You can find this parameter in the
+                            <filename>system.conf</filename> file
+                            located in
+                            <filename>/etc/systemd</filename>
+                            on most systems.
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+            </note>
         </para>
 
         <para>
@@ -392,14 +425,6 @@
                     are not listed.
                     </para></listitem>
                 <listitem><para>
-                    <filename>pn-depends.dot</filename>: A graph showing
-                    dependencies between build-time targets (recipes).
-                    </para></listitem>
-                <listitem><para>
-                    <filename>package-depends.dot</filename>: A graph showing
-                    known dependencies between runtime targets.
-                    </para></listitem>
-                <listitem><para>
                     <filename>task-depends.dot</filename>: A graph showing
                     dependencies between tasks.
                     </para></listitem>
@@ -455,7 +480,7 @@
             You can use a different method to view dependency information
             by using the following command:
             <literallayout class='monospaced'>
-     $ bitbake -g -u depexp <replaceable>recipename</replaceable>
+     $ bitbake -g -u taskexp <replaceable>recipename</replaceable>
             </literallayout>
             This command displays a GUI window from which you can view
             build-time and runtime dependencies for the recipes involved in
@@ -709,79 +734,6 @@
             The results appear as output to the console and are also in the
             file <filename>${WORKDIR}/temp/log.do_listtasks</filename>.
         </para>
-    </section>
-
-    <section id='checking-for-missing-build-time-dependencies'>
-        <title>Checking for Missing Build-Time Dependencies</title>
-
-        <para>
-            A recipe might build successfully even though some of its
-            build-time dependencies are missing from
-            <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>.
-            Following are the two most common ways in which that can happen:
-            <itemizedlist>
-                <listitem><para>
-                    The build-time dependency just happens to already exist in
-                    the staging sysroot
-                    (<link linkend='var-STAGING_DIR_HOST'><filename>STAGING_DIR_HOST</filename></link>)
-                    by the time the recipe is built.
-                    This situation occurs when the build-time dependency is
-                    built earlier during recipe processing.
-                    </para></listitem>
-                <listitem><para>
-                    The component built by the recipe conditionally enables
-                    functionality depending on whether it can find the
-                    build-time dependency in the staging sysroot.
-                    If the build-time dependency is missing, the corresponding
-                    functionality is disabled.
-                    This condition is known as a "floating dependency".
-                    </para></listitem>
-            </itemizedlist>
-        </para>
-
-        <para>
-            Because dealing with the second case is more complex, focus will
-            be on the first case.
-            The
-            <link linkend='ref-classes-insane'><filename>build-deps</filename></link>
-            QA check checks that every library the component linked against is
-            declared as a build-time dependency.
-            If that is not the case, then the first situation described in the
-            previous list exists, and <filename>build-deps</filename> reports
-            a missing build-time dependency.
-        </para>
-
-        <para>
-            Another, more manual, way to check a recipe for missing build-time
-            dependencies of the first type is to build with an empty staging
-            sysroot.
-            This method can also find missing build-time dependencies
-            that are not in the form of libraries, which the
-            <filename>build-deps</filename> QA check is unable to find.
-        </para>
-
-        <para>
-            An easy way to empty the staging sysroots is to simply remove
-            <link linkend='var-TMPDIR'><filename>TMPDIR</filename></link>,
-            which is usually
-            <filename>${</filename><link linkend='var-BUILDDIR'><filename>BUILDDIR</filename></link><filename>}/tmp</filename>,
-            as it includes the staging sysroots.
-            Another, faster method to empty the staging sysroots is to use the
-            <filename>scripts/wipe-sysroot</filename> script,
-            which removes just the staging sysroots and keeps everything else
-            in <filename>TMPDIR</filename>.
-            <note>
-                The <filename>scripts/</filename> directory appears in
-                <filename>PATH</filename> after running the build environment
-                initialization script (i.e.
-                <link linkend='structure-core-script'><filename>oe-init-build-env</filename></link>
-                or
-                <link linkend='structure-memres-core-script'><filename>oe-init-build-env-memres</filename></link>),
-                which results in the ability to to run
-                <filename>wipe-sysroot</filename> immediately.
-            </note>
-        </para>
-
     </section>
 
     <section id='usingpoky-debugging-bitbake'>

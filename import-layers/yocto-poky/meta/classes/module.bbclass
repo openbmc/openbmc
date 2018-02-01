@@ -1,15 +1,16 @@
-inherit module-base kernel-module-split
+inherit module-base kernel-module-split pkgconfig
 
-addtask make_scripts after do_patch before do_compile
+addtask make_scripts after do_prepare_recipe_sysroot before do_compile
 do_make_scripts[lockfiles] = "${TMPDIR}/kernel-scripts.lock"
 do_make_scripts[depends] += "virtual/kernel:do_shared_workdir"
 
 EXTRA_OEMAKE += "KERNEL_SRC=${STAGING_KERNEL_DIR}"
 
 MODULES_INSTALL_TARGET ?= "modules_install"
+MODULES_MODULE_SYMVERS_LOCATION ?= ""
 
 python __anonymous () {
-    depends = d.getVar('DEPENDS', True)
+    depends = d.getVar('DEPENDS')
     extra_symbols = []
     for dep in depends.split():
         if dep.startswith("kernel-module-"):
@@ -30,15 +31,22 @@ module_do_compile() {
 
 module_do_install() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
-	oe_runmake DEPMOD=echo INSTALL_MOD_PATH="${D}" \
+	oe_runmake DEPMOD=echo MODLIB="${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}" \
 	           CC="${KERNEL_CC}" LD="${KERNEL_LD}" \
 	           O=${STAGING_KERNEL_BUILDDIR} \
 	           ${MODULES_INSTALL_TARGET}
 
-	install -d -m0755 ${D}${includedir}/${BPN}
-	cp -a --no-preserve=ownership ${B}/Module.symvers ${D}${includedir}/${BPN}
-	# it doesn't actually seem to matter which path is specified here
-	sed -e 's:${B}/::g' -i ${D}${includedir}/${BPN}/Module.symvers
+	if [ ! -e "${B}/${MODULES_MODULE_SYMVERS_LOCATION}/Module.symvers" ] ; then
+		bbwarn "Module.symvers not found in ${B}/${MODULES_MODULE_SYMVERS_LOCATION}"
+		bbwarn "Please consider setting MODULES_MODULE_SYMVERS_LOCATION to a"
+		bbwarn "directory below B to get correct inter-module dependencies"
+	else
+		install -Dm0644 "${B}/${MODULES_MODULE_SYMVERS_LOCATION}"/Module.symvers ${D}${includedir}/${BPN}/Module.symvers
+		# Module.symvers contains absolute path to the build directory.
+		# While it doesn't actually seem to matter which path is specified,
+		# clear them out to avoid confusion
+		sed -e 's:${B}/::g' -i ${D}${includedir}/${BPN}/Module.symvers
+	fi
 }
 
 EXPORT_FUNCTIONS do_compile do_install

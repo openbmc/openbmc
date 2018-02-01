@@ -490,6 +490,21 @@
         </para>
     </section>
 
+    <section id='ref-tasks-prepare_recipe_sysroot'>
+        <title><filename>do_prepare_recipe_sysroot</filename></title>
+
+        <para>
+            Installs the files into the individual recipe specific sysroots
+            (i.e.
+            <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}</filename>
+            based upon the dependencies specified by
+            <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>.
+            See the
+            "<link linkend='ref-classes-staging'><filename>staging</filename></link>"
+            class for more information.
+        </para>
+    </section>
+
     <section id='ref-tasks-rm_work'>
         <title><filename>do_rm_work</filename></title>
 
@@ -853,7 +868,10 @@
         <title><filename>do_compile_kernelmodules</filename></title>
 
         <para>
-            Compiles loadable modules for the Linux kernel.
+            Runs the step that builds the kernel modules (if needed).
+            Building a kernel consists of two steps: 1) the kernel
+            (<filename>vmlinux</filename>) is built, and 2) the modules
+            are built (i.e. <filename>make modules</filename>).
         </para>
     </section>
 
@@ -861,9 +879,21 @@
         <title><filename>do_diffconfig</filename></title>
 
         <para>
-            Compares the old and new config files after running the
-            <link linkend='ref-tasks-menuconfig'><filename>do_menuconfig</filename></link>
-            task for the kernel.
+            When invoked by the user, this task creates a file containing the
+            differences between the original config as produced by
+            <link linkend='ref-tasks-kernel_configme'><filename>do_kernel_configme</filename></link>
+            task and the changes made by the user with other methods
+            (i.e. using
+            (<link linkend='ref-tasks-kernel_menuconfig'><filename>do_kernel_menuconfig</filename></link>).
+            Once the file of differences is created, it can be used to create
+            a config fragment that only contains the differences.
+            You can invoke this task from the command line as follows:
+            <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c diffconfig
+            </literallayout>
+            For more information, see the
+            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#generating-configuration-files'>Generating Configuration Files</ulink>"
+            section in the Yocto Project Linux Kernel Development Manual.
         </para>
     </section>
 
@@ -871,7 +901,12 @@
         <title><filename>do_kernel_checkout</filename></title>
 
         <para>
-            Checks out source/meta branches for a linux-yocto style kernel.
+            Converts the newly unpacked kernel source into a form with which
+            the OpenEmbedded build system can work.
+            Because the kernel source can be fetched in several different ways,
+            the <filename>do_kernel_checkout</filename> task makes sure that
+            subsequent tasks are given a clean working tree copy of the kernel
+            with the correct branches checked out.
         </para>
     </section>
 
@@ -879,7 +914,21 @@
         <title><filename>do_kernel_configcheck</filename></title>
 
         <para>
-            Validates the kernel configuration for a linux-yocto style kernel.
+            Validates the configuration produced by the
+            <link linkend='ref-tasks-kernel_menuconfig'><filename>do_kernel_menuconfig</filename></link>
+            task.
+            The <filename>do_kernel_configcheck</filename> task produces
+            warnings when a requested configuration does not appear in the
+            final <filename>.config</filename> file or when you override a
+            policy configuration in a hardware configuration fragment.
+            You can run this task explicitly and view the output by using
+            the following command:
+            <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c kernel_configcheck -f
+            </literallayout>
+            For more information, see the
+            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#generating-configuration-files'>Generating Configuration Files</ulink>"
+            section in the Yocto Project Linux Kernel Development Manual.
         </para>
     </section>
 
@@ -887,17 +936,41 @@
         <title><filename>do_kernel_configme</filename></title>
 
         <para>
-            Assembles the kernel configuration for a linux-yocto style kernel.
+            After the kernel is patched by the
+            <link linkend='ref-tasks-patch'><filename>do_patch</filename></link>
+            task, the <filename>do_kernel_configme</filename> task assembles
+            and merges all the kernel config fragments into a merged
+            configuration that can then be passed to the kernel configuration
+            phase proper.
+            This is also the time during which user-specified defconfigs
+            are applied if present, and where configuration modes such as
+            <filename>--allnoconfig</filename> are applied.
         </para>
     </section>
 
-    <section id='ref-tasks-kernel_link_vmlinux'>
-        <title><filename>do_kernel_link_vmlinux</filename></title>
+    <section id='ref-tasks-kernel_menuconfig'>
+        <title><filename>do_kernel_menuconfig</filename></title>
 
         <para>
-            Creates a symbolic link in
-            <filename>arch/$arch/boot</filename> for vmlinux kernel
-            images.
+            Invoked by the user to manipulate the
+            <filename>.config</filename> file used to build a linux-yocto
+            recipe.
+            This task starts the Linux kernel configuration tool, which you
+            then use to modify the kernel configuration.
+            <note>
+                You can also invoke this tool from the command line as
+                follows:
+                <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c menuconfig
+                </literallayout>
+            </note>
+            See the
+            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#generating-configuration-files'>Generating Configuration Files</ulink>"
+            section in the Yocto Project Linux Kernel Development Manual
+            for more information on this configuration tool.
+            You can also reference the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#using-menuconfig'>Using <filename>menuconfig</filename></ulink>"
+            section in the Yocto Project Development Manual.
         </para>
     </section>
 
@@ -905,8 +978,16 @@
         <title><filename>do_kernel_metadata</filename></title>
 
         <para>
-            Collects kernel metadata for a
-            <filename>linux-yocto</filename> style kernel.
+            Collects all the features required for a given kernel build,
+            whether the features come from
+            <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+            or from Git repositories.
+            After collection, the <filename>do_kernel_metadata</filename> task
+            processes the features into a series of config fragments and
+            patches, which can then be applied by subsequent tasks such as
+            <link linkend='ref-tasks-patch'><filename>do_patch</filename></link>
+            and
+            <link linkend='ref-tasks-kernel_configme'><filename>do_kernel_configme</filename></link>.
         </para>
     </section>
 
@@ -925,7 +1006,17 @@
         <title><filename>do_savedefconfig</filename></title>
 
         <para>
-            Creates a minimal Linux kernel configuration file.
+            When invoked by the user, creates a defconfig file that can be
+            used instead of the default defconfig.
+            The saved defconfig contains the differences between the default
+            defconfig and the changes made by the user using other methods
+            (i.e. the
+            <link linkend='ref-tasks-kernel_menuconfig'><filename>do_kernel_menuconfig</filename></link>
+            task.
+            You can invoke the task using the following command:
+            <literallayout class='monospaced'>
+     $ bitbake linux-yocto -c savedefconfig
+            </literallayout>
         </para>
     </section>
 
@@ -933,7 +1024,14 @@
         <title><filename>do_shared_workdir</filename></title>
 
         <para>
-            Creates the shared working directory for the kernel.
+            After the kernel has been compiled but before the kernel modules
+            have been compiled, this task copies files required for module
+            builds and which are generated from the  kernel build into the
+            shared work directory.
+            With these copies successfully copied, the
+            <link linkend='ref-tasks-compile_kernelmodules'><filename>do_compile_kernelmodules</filename></link>
+            task can successfully build the kernel modules in the next step
+            of the build.
         </para>
     </section>
 
@@ -941,9 +1039,12 @@
         <title><filename>do_sizecheck</filename></title>
 
         <para>
-            Checks the size of the kernel image against
-            <link linkend='var-KERNEL_IMAGE_MAXSIZE'><filename>KERNEL_IMAGE_MAXSIZE</filename></link>
-            when set.
+            After the kernel has been built, this task checks the size of the
+            stripped kernel image against
+            <link linkend='var-KERNEL_IMAGE_MAXSIZE'><filename>KERNEL_IMAGE_MAXSIZE</filename></link>.
+            If that variable was set and the size of the stripped kernel
+            exceeds that size, the kernel build produces a warning to that
+            effect.
         </para>
     </section>
 
@@ -951,15 +1052,13 @@
         <title><filename>do_strip</filename></title>
 
         <para>
-            Strips unneeded sections out of the Linux kernel image.
-        </para>
-    </section>
-
-    <section id='ref-tasks-uboot_mkimage'>
-        <title><filename>do_uboot_mkimage</filename></title>
-
-        <para>
-            Creates a uImage file from the kernel for the U-Boot bootloader.
+            If
+            <filename>KERNEL_IMAGE_STRIP_EXTRA_SECTIONS</filename> is defined,
+            this task strips the sections named in that variable from
+            <filename>vmlinux</filename>.
+            This stripping is typically used to remove nonessential sections
+            such as <filename>.comment</filename> sections from a
+            size-sensitive configuration.
         </para>
     </section>
 
@@ -967,10 +1066,14 @@
         <title><filename>do_validate_branches</filename></title>
 
         <para>
-            Ensures that the source, metadata (or both) branches are on the
-            locations specified by their
-            <link linkend='var-SRCREV'><filename>SRCREV</filename></link>
-            values for a linux-yocto style kernel.
+            After the kernel is unpacked but before it is patched, this task
+            makes sure that the machine and metadata branches as specified
+            by the <link linkend='var-SRCREV'><filename>SRCREV</filename></link>
+            variables actually exist on the specified branches.
+            If these branches do not exist and
+            <link linkend='var-AUTOREV'><filename>AUTOREV</filename></link>
+            is not being used, the <filename>do_validate_branches</filename>
+            task fails during the build.
         </para>
     </section>
 </section>

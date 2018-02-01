@@ -22,8 +22,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 #def distro_feed_configs(d):
 #    import bb
-#    parchs = d.getVar( "PACKAGE_EXTRA_ARCHS", 1 ).split()
-#    march = d.getVar( "MACHINE_ARCH", 1 ).split()
+#    parchs = d.getVar("PACKAGE_EXTRA_ARCHS").split()
+#    march = d.getVar("MACHINE_ARCH").split()
 #    archs = [ "all" ] + parchs + march
 #    confs = [ ( "${sysconfdir}/opkg/%s-feed.conf" % feed ) for feed in archs ]
 #    return " ".join( confs )

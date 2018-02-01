@@ -51,7 +51,7 @@ def setvar(args):
     if args.recipe_only:
         patches = [oe.recipeutils.patch_recipe_file(args.recipefile, varvalues, patch=args.patch)]
     else:
-        rd = oe.recipeutils.parse_recipe(tinfoil.cooker, args.recipefile, None)
+        rd = tinfoil.parse_recipe_file(args.recipefile, False)
         if not rd:
             return 1
         patches = oe.recipeutils.patch_recipe(rd, args.recipefile, varvalues, patch=args.patch)

@@ -20,9 +20,6 @@ S = "${WORKDIR}/docbook-xsl-${PV}"
 inherit allarch
 BBCLASSEXTEND = "native"
 
-SSTATEPOSTINSTFUNCS_append_class-native = " docbook_xsl_stylesheets_sstate_postinst"
-SYSROOT_PREPROCESS_FUNCS_append_class-native = " docbook_xsl_stylesheets_sysroot_preprocess"
-
 do_configure (){
 	:
 }
@@ -55,18 +52,10 @@ do_install () {
 
 }
 
-docbook_xsl_stylesheets_sstate_postinst () {
-    if [ "${BB_CURRENTTASK}" = "populate_sysroot" -o "${BB_CURRENTTASK}" = "populate_sysroot_setscene" ]
-    then
-        # Ensure that the catalog file sgml-docbook.cat is properly
-        # updated when the package is installed from sstate cache.
-        sed -i -e "s|file://.*/usr/share/xml|file://${datadir}/xml|g" ${SYSROOT_DESTDIR}${sysconfdir}/xml/docbook-xsl.xml
-    fi
-}
-
-docbook_xsl_stylesheets_sysroot_preprocess () {
-    # Update the hardcode dir in docbook-xml.xml
-    sed -i -e "s|file:///usr/share/xml|file://${datadir}/xml|g" ${SYSROOT_DESTDIR}${sysconfdir}/xml/docbook-xsl.xml
+do_install_append_class-native () {
+	# Ensure that the catalog file sgml-docbook.cat is properly
+	# updated when the package is installed from sstate cache.
+	sed -i -e "s|file://.*/usr/share/xml|file://${datadir}/xml|g" ${D}${sysconfdir}/xml/docbook-xsl.xml
 }
 
 RDEPENDS_${PN} += "perl"

@@ -31,7 +31,7 @@ python __anonymous () {
     namemap["packagegroup-core-full-cmdline-initscripts"] = "packagegroup-core-initscripts"
     namemap["packagegroup-core-full-cmdline-sys-services"] = "packagegroup-core-sys-services"
 
-    packages = d.getVar("PACKAGES", True).split()
+    packages = d.getVar("PACKAGES").split()
     for pkg in packages:
         if pkg.endswith('-dev'):
             mapped = namemap.get(pkg[:-4], None)

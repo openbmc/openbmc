@@ -1,0 +1,37 @@
+We cant run tests during cross compile therefore pin to 4k pages
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: dmalloc-5.5.2/configure.ac
+===================================================================
+--- dmalloc-5.5.2.orig/configure.ac
++++ dmalloc-5.5.2/configure.ac
+@@ -348,26 +348,8 @@ AC_MSG_RESULT([$ac_cv_use_mmap])
+ #
+ AC_CHECK_FUNCS(getpagesize)
+ AC_MSG_CHECKING([basic-block size])
+-ac_cv_page_size=0
+-if test $ac_cv_page_size = 0; then
+-   AC_RUN_IFELSE([main() { if (getpagesize()<=2048) exit(0); else exit(1); }],
+-	[ ac_cv_page_size=11 ] )
+-fi
+-if test $ac_cv_page_size = 0; then
+-   AC_RUN_IFELSE([main() { if (getpagesize()<=4096) exit(0); else exit(1); }],
+-	[ ac_cv_page_size=12 ] )
+-fi
+-if test $ac_cv_page_size = 0; then
+-   AC_RUN_IFELSE([main() { if (getpagesize()<=8192) exit(0); else exit(1); }],
+-	[ ac_cv_page_size=13 ] )
+-fi
+-if test $ac_cv_page_size = 0; then
+-   AC_RUN_IFELSE([main() { if (getpagesize()<=16384) exit(0); else exit(1); }],
+-	[ ac_cv_page_size=14 ] )
+-fi
+-if test $ac_cv_page_size = 0; then
+-    ac_cv_page_size=15
+-fi
++# fix to 4K for now
++ac_cv_page_size=12
+ AC_DEFINE_UNQUOTED([BASIC_BLOCK],[$ac_cv_page_size])
+ AC_MSG_RESULT([$ac_cv_page_size])
+ 

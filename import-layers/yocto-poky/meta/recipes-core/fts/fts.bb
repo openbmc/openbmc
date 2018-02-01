@@ -22,10 +22,7 @@ S = "${WORKDIR}/${BPN}"
 
 do_configure[noexec] = "1"
 
-HASHSTYLE_mips = "sysv"
-HASHSTYLE_mipsel = "sysv"
-HASHSTYLE_mips64 = "sysv"
-HASHSTYLE_mips64el = "sysv"
+HASHSTYLE_mipsarch = "sysv"
 HASHSTYLE = "gnu"
 
 VER = "0"

@@ -80,7 +80,7 @@ python toaster_layerinfo_dumpdata() {
         return layer_info
 
 
-    bblayers = e.data.getVar("BBLAYERS", True)
+    bblayers = e.data.getVar("BBLAYERS")
 
     llayerinfo = {}
 
@@ -119,10 +119,10 @@ python toaster_package_dumpdata() {
     """
 
     # No need to try and dumpdata if the recipe isn't generating packages
-    if not d.getVar('PACKAGES', True):
+    if not d.getVar('PACKAGES'):
         return
 
-    pkgdatadir = d.getVar('PKGDESTWORK', True)
+    pkgdatadir = d.getVar('PKGDESTWORK')
     lpkgdata = {}
     datadir = os.path.join(pkgdatadir, 'runtime')
 
@@ -142,7 +142,7 @@ python toaster_artifact_dumpdata() {
     """
 
     event_data = {
-      "TOOLCHAIN_OUTPUTNAME": d.getVar("TOOLCHAIN_OUTPUTNAME", True)
+      "TOOLCHAIN_OUTPUTNAME": d.getVar("TOOLCHAIN_OUTPUTNAME")
     }
 
     bb.event.fire(bb.event.MetadataEvent("SDKArtifactInfo", event_data), d)
@@ -157,10 +157,10 @@ python toaster_collect_task_stats() {
     import bb.utils
     import os
 
-    toaster_statlist_file = os.path.join(e.data.getVar('BUILDSTATS_BASE', True), "toasterstatlist")
-
-    if not e.data.getVar('BUILDSTATS_BASE', True):
+    if not e.data.getVar('BUILDSTATS_BASE'):
         return  # if we don't have buildstats, we cannot collect stats
+
+    toaster_statlist_file = os.path.join(e.data.getVar('BUILDSTATS_BASE'), "toasterstatlist")
 
     def stat_to_float(value):
         return float(value.strip('% \n\r'))
@@ -246,7 +246,7 @@ python toaster_buildhistory_dump() {
     import re
     BUILDHISTORY_DIR = e.data.expand("${TOPDIR}/buildhistory")
     BUILDHISTORY_DIR_IMAGE_BASE = e.data.expand("%s/images/${MACHINE_ARCH}/${TCLIBC}/"% BUILDHISTORY_DIR)
-    pkgdata_dir = e.data.getVar("PKGDATA_DIR", True)
+    pkgdata_dir = e.data.getVar("PKGDATA_DIR")
 
 
     # scan the build targets for this build
@@ -265,28 +265,33 @@ python toaster_buildhistory_dump() {
             with open("%s/installed-package-sizes.txt" % installed_img_path, "r") as fin:
                 for line in fin:
                     line = line.rstrip(";")
-                    psize, px = line.split("\t")
-                    punit, pname = px.split(" ")
+                    psize, punit, pname = line.split()
                     # this size is "installed-size" as it measures how much space it takes on disk
                     images[target][pname.strip()] = {'size':int(psize)*1024, 'depends' : []}
 
             with open("%s/depends.dot" % installed_img_path, "r") as fin:
-                p = re.compile(r' -> ')
-                dot = re.compile(r'.*style=dotted')
+                p = re.compile(r'\s*"(?P<name>[^"]+)"\s*->\s*"(?P<dep>[^"]+)"(?P<rec>.*?\[style=dotted\])?')
                 for line in fin:
-                    line = line.rstrip(';')
-                    linesplit = p.split(line)
-                    if len(linesplit) == 2:
-                        pname = linesplit[0].rstrip('"').strip('"')
-                        dependsname = linesplit[1].split(" ")[0].strip().strip(";").strip('"').rstrip('"')
-                        deptype = "depends"
-                        if dot.match(line):
-                            deptype = "recommends"
-                        if not pname in images[target]:
-                            images[target][pname] = {'size': 0, 'depends' : []}
-                        if not dependsname in images[target]:
-                            images[target][dependsname] = {'size': 0, 'depends' : []}
-                        images[target][pname]['depends'].append((dependsname, deptype))
+                    m = p.match(line)
+                    if not m:
+                        continue
+                    pname = m.group('name')
+                    dependsname = m.group('dep')
+                    deptype = 'recommends' if m.group('rec') else 'depends'
+
+                    # If RPM is used for packaging, then there may be
+                    # dependencies such as "/bin/sh", which will confuse
+                    # _toaster_load_pkgdatafile() later on. While at it, ignore
+                    # any dependencies that contain parentheses, e.g.,
+                    # "libc.so.6(GLIBC_2.7)".
+                    if dependsname.startswith('/') or '(' in dependsname:
+                        continue
+
+                    if not pname in images[target]:
+                        images[target][pname] = {'size': 0, 'depends' : []}
+                    if not dependsname in images[target]:
+                        images[target][dependsname] = {'size': 0, 'depends' : []}
+                    images[target][pname]['depends'].append((dependsname, deptype))
 
             # files-in-image.txt is only generated if an image file is created,
             # so the file entries ('syms', 'dirs', 'files') for a target will be
@@ -329,8 +334,18 @@ python toaster_artifacts() {
     if e.taskname in ["do_deploy", "do_image_complete", "do_populate_sdk", "do_populate_sdk_ext"]:
         d2 = d.createCopy()
         d2.setVar('FILE', e.taskfile)
-        d2.setVar('SSTATE_MANMACH', d2.expand("${MACHINE}"))
+        # Use 'stamp-extra-info' if present, else use workaround
+        # to determine 'SSTATE_MANMACH'
+        extrainf = d2.getVarFlag(e.taskname, 'stamp-extra-info')
+        if extrainf:
+            d2.setVar('SSTATE_MANMACH', extrainf)
+        else:
+            if "do_populate_sdk" == e.taskname:
+                d2.setVar('SSTATE_MANMACH', d2.expand("${MACHINE}${SDKMACHINE}"))
+            else:
+                d2.setVar('SSTATE_MANMACH', d2.expand("${MACHINE}"))
         manifest = oe.sstatesig.sstate_get_manifest_filename(e.taskname[3:], d2)[0]
+
         if os.access(manifest, os.R_OK):
             with open(manifest) as fmanifest:
                 artifacts = [fname.strip() for fname in fmanifest]
@@ -357,8 +372,9 @@ do_packagedata_setscene[vardepsexclude] += "toaster_package_dumpdata "
 do_package[postfuncs] += "toaster_package_dumpdata "
 do_package[vardepsexclude] += "toaster_package_dumpdata "
 
-do_populate_sdk[postfuncs] += "toaster_artifact_dumpdata "
-do_populate_sdk[vardepsexclude] += "toaster_artifact_dumpdata "
+#do_populate_sdk[postfuncs] += "toaster_artifact_dumpdata "
+#do_populate_sdk[vardepsexclude] += "toaster_artifact_dumpdata "
 
-do_populate_sdk_ext[postfuncs] += "toaster_artifact_dumpdata "
-do_populate_sdk_ext[vardepsexclude] += "toaster_artifact_dumpdata "
+#do_populate_sdk_ext[postfuncs] += "toaster_artifact_dumpdata "
+#do_populate_sdk_ext[vardepsexclude] += "toaster_artifact_dumpdata "
+

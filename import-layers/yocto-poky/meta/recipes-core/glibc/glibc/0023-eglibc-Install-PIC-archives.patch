@@ -1,7 +1,7 @@
-From 1947f211fab4001e84bb52868cddbd401e597889 Mon Sep 17 00:00:00 2001
+From 101568daf48d99e71b280a2fdd85460fe740d583 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:57:01 +0000
-Subject: [PATCH 23/25] eglibc: Install PIC archives
+Subject: [PATCH 23/26] eglibc: Install PIC archives
 
 Forward port from eglibc
 
@@ -29,10 +29,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 40 insertions(+), 2 deletions(-)
 
 diff --git a/Makerules b/Makerules
-index 53eabfa..1cd2a53 100644
+index 61a0240..373e628 100644
 --- a/Makerules
 +++ b/Makerules
-@@ -694,6 +694,9 @@ ifeq ($(build-shared),yes)
+@@ -762,6 +762,9 @@ ifeq ($(build-shared),yes)
  $(common-objpfx)libc.so: $(common-objpfx)libc.map
  endif
  common-generated += libc.so libc_pic.os
@@ -42,7 +42,7 @@ index 53eabfa..1cd2a53 100644
  ifdef libc.so-version
  $(common-objpfx)libc.so$(libc.so-version): $(common-objpfx)libc.so
  	$(make-link)
-@@ -936,6 +939,7 @@ endif
+@@ -1004,6 +1007,7 @@ endif
  
  install: check-install-supported
  
@@ -50,7 +50,7 @@ index 53eabfa..1cd2a53 100644
  install: $(installed-libcs)
  $(installed-libcs): $(inst_libdir)/lib$(libprefix)%: lib $(+force)
  	$(make-target-directory)
-@@ -964,6 +968,22 @@ versioned := $(strip $(foreach so,$(install-lib.so),\
+@@ -1032,6 +1036,22 @@ versioned := $(strip $(foreach so,$(install-lib.so),\
  install-lib.so-versioned := $(filter $(versioned), $(install-lib.so))
  install-lib.so-unversioned := $(filter-out $(versioned), $(install-lib.so))
  
@@ -73,7 +73,7 @@ index 53eabfa..1cd2a53 100644
  # For versioned libraries, we install three files:
  #	$(inst_libdir)/libfoo.so	-- for linking, symlink or ld script
  #	$(inst_slibdir)/libfoo.so.NN	-- for loading by SONAME, symlink
-@@ -1206,9 +1226,22 @@ $(addprefix $(inst_includedir)/,$(headers-nonh)): $(inst_includedir)/%: \
+@@ -1275,9 +1295,22 @@ $(addprefix $(inst_includedir)/,$(headers-nonh)): $(inst_includedir)/%: \
  endif	# headers-nonh
  endif	# headers
  
@@ -97,7 +97,7 @@ index 53eabfa..1cd2a53 100644
  install-bin-nosubdir: $(addprefix $(inst_bindir)/,$(install-bin))
  install-bin-script-nosubdir: $(addprefix $(inst_bindir)/,$(install-bin-script))
  install-rootsbin-nosubdir: \
-@@ -1221,6 +1254,10 @@ install-data-nosubdir: $(addprefix $(inst_datadir)/,$(install-data))
+@@ -1290,6 +1323,10 @@ install-data-nosubdir: $(addprefix $(inst_datadir)/,$(install-data))
  install-headers-nosubdir: $(addprefix $(inst_includedir)/,$(headers))
  install-others-nosubdir: $(install-others)
  install-others-programs-nosubdir: $(install-others-programs)
@@ -108,7 +108,7 @@ index 53eabfa..1cd2a53 100644
  
  # We need all the `-nosubdir' targets so that `install' in the parent
  # doesn't depend on several things which each iterate over the subdirs.
-@@ -1230,7 +1267,8 @@ install-%:: install-%-nosubdir ;
+@@ -1299,7 +1336,8 @@ install-%:: install-%-nosubdir ;
  
  .PHONY: install install-no-libc.a-nosubdir
  install-no-libc.a-nosubdir: install-headers-nosubdir install-data-nosubdir \
@@ -119,5 +119,5 @@ index 53eabfa..1cd2a53 100644
  install-no-libc.a-nosubdir: install-bin-nosubdir install-bin-script-nosubdir \
  			    install-rootsbin-nosubdir install-sbin-nosubdir \
 -- 
-2.8.2
+2.10.2
 

@@ -63,8 +63,5 @@ ${localstatedir}/volatile/tmp	01777	root	root	false - - -
 # Set 0700
 ${ROOT_HOME}			0700	root	root	false - - -
 
-# Set 755-lsb
-/srv				0755	root	root	false - - -
-
 # Set 2775-lsb
-/var/mail			02775	root	mail	false - - -
+${localstatedir}/mail		02775	root	mail	false - - -

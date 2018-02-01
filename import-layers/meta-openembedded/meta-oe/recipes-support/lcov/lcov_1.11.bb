@@ -23,6 +23,5 @@ SRC_URI[sha256sum] = "c282de8d678ecbfda32ce4b5c85fc02f77c2a39a062f068bd8e774d29d
 
 do_install() {
     oe_runmake install PREFIX=${D}
-    sed -i -e '1s,#!.*perl,#! ${USRBINPATH}/env perl,' ${D}${bindir}/*
 }
 

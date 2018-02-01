@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=de54b60fbbc35123ba193fea8ee216f2"
 SRC_URI = "https://s3.amazonaws.com/json-c_releases/releases/${BP}.tar.gz \
            file://0001-json_tokener-requires-INF-and-NAN.patch \
            file://0001-Link-against-libm-when-needed.patch \
+           file://0001-Add-FALLTHRU-comment-to-handle-GCC7-warnings.patch \
           "
 
 SRC_URI[md5sum] = "3ca4bbb881dfc4017e8021b5e0a8c491"

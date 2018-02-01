@@ -1,0 +1,34 @@
+From 400b8f235377f677a7a760f1e3a1cd26d95140bc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Jun 2017 22:58:18 -0700
+Subject: [PATCH] Add printf format and silence format-security warnings
+
+Fix
+
+vconfig.c:66:4: error: format not a string literal and no format arguments [-Werror=format-security]
+    fprintf(stdout,usage);
+    ^~~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ vconfig.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/vconfig.c b/vconfig.c
+index 5057cfd..83137ba 100644
+--- a/vconfig.c
++++ b/vconfig.c
+@@ -63,7 +63,7 @@ static char* usage =
+ "            is OFF.\n";
+ 
+ void show_usage() {
+-   fprintf(stdout,usage);
++   fprintf(stdout, "%s", usage);
+ }
+ 
+ int hex_to_bytes(char* bytes, int bytes_length, char* hex_str) {
+-- 
+2.13.1
+

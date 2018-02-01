@@ -164,8 +164,6 @@ do_install () {
     install -m 770 -d ${D}${localstatedir}/spool/postfix
     chown postfix:postfix ${D}${localstatedir}/spool/postfix
 
-    install -m 2755 -d ${D}${localstatedir}/spool/mail
-    chown postfix:nogroup ${D}${localstatedir}/spool/mail
     install -m 0755 -d ${D}${localstatedir}/lib/postfix
     chown postfix:nogroup ${D}${localstatedir}/lib/postfix
     install -m 0755 -d ${D}${localstatedir}/spool/postfix
@@ -214,7 +212,7 @@ do_install_append_class-native() {
 
 do_install_append_class-target() {
     # Remove references to buildmachine paths in target makedefs.out
-    sed -i -e 's:--sysroot=${STAGING_DIR_TARGET}::g' ${D}/etc/postfix/makedefs.out
+    sed -i 's:-fdebug-prefix-map[^ ]*::g; s:--sysroot=${STAGING_DIR_TARGET}::g' ${D}/etc/postfix/makedefs.out
 }
 
 NATIVE_INSTALL_WORKS = "1"

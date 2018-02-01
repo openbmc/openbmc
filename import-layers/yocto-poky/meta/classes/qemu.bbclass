@@ -4,12 +4,12 @@
 #
 
 def qemu_target_binary(data):
-    package_arch = data.getVar("PACKAGE_ARCH", True)
-    qemu_target_binary = (data.getVar("QEMU_TARGET_BINARY_%s" % package_arch, True) or "")
+    package_arch = data.getVar("PACKAGE_ARCH")
+    qemu_target_binary = (data.getVar("QEMU_TARGET_BINARY_%s" % package_arch) or "")
     if qemu_target_binary:
         return qemu_target_binary
 
-    target_arch = data.getVar("TARGET_ARCH", True)
+    target_arch = data.getVar("TARGET_ARCH")
     if target_arch in ("i486", "i586", "i686"):
         target_arch = "i386"
     elif target_arch == "powerpc":
@@ -26,7 +26,7 @@ def qemu_wrapper_cmdline(data, rootfs_path, library_paths):
     if qemu_binary == "qemu-allarch":
         qemu_binary = "qemuwrapper"
 
-    qemu_options = data.getVar("QEMU_OPTIONS", True)    
+    qemu_options = data.getVar("QEMU_OPTIONS")    
 
     return "PSEUDO_UNLOAD=1 " + qemu_binary + " " + qemu_options + " -L " + rootfs_path\
             + " -E LD_LIBRARY_PATH=" + ":".join(library_paths) + " "
@@ -52,7 +52,7 @@ def qemu_run_binary(data, rootfs_path, binary):
 # this dance). For others (e.g. arm) a -cpu option is not necessary, since the
 # qemu-arm default CPU supports all required architecture levels.
 
-QEMU_OPTIONS = "-r ${OLDEST_KERNEL} ${@d.getVar("QEMU_EXTRAOPTIONS_%s" % d.getVar('PACKAGE_ARCH', True), True) or ""}"
+QEMU_OPTIONS = "-r ${OLDEST_KERNEL} ${@d.getVar("QEMU_EXTRAOPTIONS_%s" % d.getVar('PACKAGE_ARCH')) or ""}"
 QEMU_OPTIONS[vardeps] += "QEMU_EXTRAOPTIONS_${PACKAGE_ARCH}"
 
 QEMU_EXTRAOPTIONS_ppce500v2 = " -cpu e500v2"

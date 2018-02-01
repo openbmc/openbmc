@@ -49,11 +49,11 @@ fi
 
 USERID="-u $1"
 GROUP="-g $2"
-NATIVE_SYSROOT_DIR=$3
+STAGING_BINDIR_NATIVE=$3
 
-TUNCTL=$NATIVE_SYSROOT_DIR/usr/bin/tunctl
+TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
 if [ ! -x "$TUNCTL" ]; then
-       echo "Error: Unable to find tunctl binary in '$NATIVE_SYSROOT_DIR/usr/bin', please bitbake qemu-helper-native"
+       echo "Error: Unable to find tunctl binary in '$STAGING_BINDIR_NATIVE', please bitbake qemu-helper-native"
 	exit 1
 fi
 

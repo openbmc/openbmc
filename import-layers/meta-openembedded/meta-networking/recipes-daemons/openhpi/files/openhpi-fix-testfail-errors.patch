@@ -1,0 +1,31 @@
+Fix for saftest failures.
+
+Upstream-Status: Pending
+
+Signed-off-by: yanjun.zhu <yanjun.zhu@windriver.com>
+
+diff -urpN a/openhpid/safhpi.c b/openhpid/safhpi.c
+--- a/openhpid/safhpi.c
++++ b/openhpid/safhpi.c
+@@ -1976,7 +1976,7 @@ SaErrorT SAHPI_API saHpiSensorThresholds
+         oh_release_domain(d); /* Unlock domain */
+ 
+         OH_CALL_ABI(h, set_sensor_thresholds, SA_ERR_HPI_INVALID_CMD, rv,
+-                    ResourceId, SensorNum, SensorThresholds);
++                    ResourceId, SensorNum, &tmp);
+         oh_release_handler(h);
+ 
+         return rv;
+diff -urpN a/utils/sahpi_struct_utils.c b/utils/sahpi_struct_utils.c
+--- a/utils/sahpi_struct_utils.c
++++ b/utils/sahpi_struct_utils.c
+@@ -3855,6 +3855,9 @@ SaHpiBoolT oh_valid_textbuffer(SaHpiText
+                                         /* found a unpaired surrogate */
+                                         return SAHPI_FALSE;
+                                 }
++                        } else {
++                            /*the first 2 bytes wrong*/
++                            return SAHPI_FALSE;
+                         }
+                 }
+                 break;

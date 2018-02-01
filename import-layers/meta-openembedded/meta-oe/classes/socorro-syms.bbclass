@@ -21,10 +21,10 @@ FILES_${PN}-socorro-syms = "/usr/share/socorro-syms"
 
 python symbol_file_preprocess() {
 
-    package_dir = d.getVar("PKGD", True)
-    breakpad_bin = d.getVar("BREAKPAD_BIN", True)
+    package_dir = d.getVar("PKGD")
+    breakpad_bin = d.getVar("BREAKPAD_BIN")
     if not breakpad_bin:
-        package_name = d.getVar("PN", True)
+        package_name = d.getVar("PN")
         bb.error("Package %s depends on Breakpad via socorro-syms. See "
             "breakpad.bbclass for instructions on setting up the Breakpad "
             "configuration." % package_name)
@@ -106,7 +106,7 @@ def repository_path(d, source_file_path):
         # child of the build directory TOPDIR.
         git_root_dir = run_command(
             "git rev-parse --show-toplevel", os.path.dirname(source_file_path))
-        if not git_root_dir.startswith(d.getVar("TOPDIR", True)):
+        if not git_root_dir.startswith(d.getVar("TOPDIR")):
             return None
 
         return git_repository_path(source_file_path)

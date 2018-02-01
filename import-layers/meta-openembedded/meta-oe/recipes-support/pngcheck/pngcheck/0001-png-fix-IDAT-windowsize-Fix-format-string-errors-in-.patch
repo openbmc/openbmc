@@ -1,0 +1,36 @@
+From d4d8257953bd1e7be167aed24c0578362cc5f675 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Apr 2017 13:12:30 -0700
+Subject: [PATCH 1/2] png-fix-IDAT-windowsize: Fix format string errors in
+ fprintf
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gpl/png-fix-IDAT-windowsize.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gpl/png-fix-IDAT-windowsize.c b/gpl/png-fix-IDAT-windowsize.c
+index 6d4ef9c..d212017 100644
+--- a/gpl/png-fix-IDAT-windowsize.c
++++ b/gpl/png-fix-IDAT-windowsize.c
+@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
+             fprintf(stderr, "  Compiled with zlib %s; using zlib %s.\n",
+               ZLIB_VERSION, zlib_version);
+             fprintf(stderr, "\n");
+-            fprintf(stderr, png_fix_IDAT_windowsize_usage);
++            fprintf(stderr, "%s", png_fix_IDAT_windowsize_usage);
+             fflush(stderr);
+             return 1;
+         }
+@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
+     fflush(stdout);
+ 
+     if ( argn == argc ) {
+-        fprintf(stderr, png_fix_IDAT_windowsize_usage);
++        fprintf(stderr, "%s", png_fix_IDAT_windowsize_usage);
+         fflush(stderr);
+         return 5;
+     } else {
+-- 
+2.12.2
+

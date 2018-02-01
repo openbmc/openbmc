@@ -12,6 +12,7 @@ PV = "0.5.1+git${SRCPV}"
 SRCREV = "adfddb3486276a5ed2f5008c9e43a811e1271cc9"
 SRC_URI = "git://github.com/profusion/lightmediascanner.git \
            file://id3-plugin-support-out-of-tree-build.patch \
+           file://0001-Define-comparison_fn_t-for-non-glibc-systems.patch \
           "
 
 S = "${WORKDIR}/git"
@@ -57,6 +58,6 @@ python populate_packages_prepend () {
     pkgs = []
 
     pkgs += do_split_packages(d, oe.path.join(lms_libdir, "plugins"), '^(.*)\.so$', d.expand('${PN}-plugin-%s'), 'LightMediaScanner plugin for %s', prepend=True, extra_depends=d.expand('${PN}'))
-    metapkg = d.getVar('PN', True) + '-meta'
+    metapkg = d.getVar('PN') + '-meta'
     d.setVar('RDEPENDS_' + metapkg, ' '.join(pkgs))
 }

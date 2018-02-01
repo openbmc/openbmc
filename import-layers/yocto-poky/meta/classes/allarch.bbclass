@@ -2,16 +2,12 @@
 # This class is used for architecture independent recipes/data files (usually scripts)
 #
 
-# Expand STAGING_DIR_HOST since for cross-canadian/native/nativesdk, this will
-# point elsewhere after these changes.
-STAGING_DIR_HOST := "${STAGING_DIR_HOST}"
-
 PACKAGE_ARCH = "all"
 
 python () {
     # Allow this class to be included but overridden - only set
     # the values if we're still "all" package arch.
-    if d.getVar("PACKAGE_ARCH", True) == "all":
+    if d.getVar("PACKAGE_ARCH") == "all":
         # No need for virtual/libc or a cross compiler
         d.setVar("INHIBIT_DEFAULT_DEPS","1")
 
@@ -25,13 +21,16 @@ python () {
         d.setVar("TARGET_AS_ARCH", "none")
         d.setVar("TARGET_FPU", "")
         d.setVar("TARGET_PREFIX", "")
-        d.setVar("PACKAGE_EXTRA_ARCHS", "")
+        # Expand PACKAGE_EXTRA_ARCHS since the staging code needs this
+        # (this removes any dependencies from the hash perspective)
+        d.setVar("PACKAGE_EXTRA_ARCHS", d.getVar("PACKAGE_EXTRA_ARCHS"))
         d.setVar("SDK_ARCH", "none")
         d.setVar("SDK_CC_ARCH", "none")
         d.setVar("TARGET_CPPFLAGS", "none")
         d.setVar("TARGET_CFLAGS", "none")
         d.setVar("TARGET_CXXFLAGS", "none")
         d.setVar("TARGET_LDFLAGS", "none")
+        d.setVar("POPULATESYSROOTDEPS", "")
 
         # Avoid this being unnecessarily different due to nuances of
         # the target machine that aren't important for "all" arch
@@ -47,6 +46,6 @@ python () {
         d.setVarFlag("emit_pkgdata", "vardepsexclude", "MULTILIB_VARIANTS")
         d.setVarFlag("write_specfile", "vardepsexclude", "MULTILIBS")
     elif bb.data.inherits_class('packagegroup', d) and not bb.data.inherits_class('nativesdk', d):
-        bb.error("Please ensure recipe %s sets PACKAGE_ARCH before inherit packagegroup" % d.getVar("FILE", True))
+        bb.error("Please ensure recipe %s sets PACKAGE_ARCH before inherit packagegroup" % d.getVar("FILE"))
 }
 

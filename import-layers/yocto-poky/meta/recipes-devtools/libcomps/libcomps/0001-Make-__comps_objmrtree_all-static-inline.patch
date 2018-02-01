@@ -1,0 +1,35 @@
+From 91a324f8771818b81017fdf4daaad0c8c4b6987c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 20 Mar 2017 11:38:54 -0700
+Subject: [PATCH] Make __comps_objmrtree_all() static inline
+
+This helps compilers to scope the symbol correctly
+and apply the inlining optimizations, clang e.g.
+emits the functions and calls in code which is
+suboptimal, therefore give a little help to compiler
+this function is not used anywhere else to have
+a global scope.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libcomps/src/comps_objmradix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libcomps/src/comps_objmradix.c b/libcomps/src/comps_objmradix.c
+index 9be6648..55f7793 100644
+--- a/libcomps/src/comps_objmradix.c
++++ b/libcomps/src/comps_objmradix.c
+@@ -604,7 +604,7 @@ inline void comps_objmrtree_pair_destroy_v(void * pair) {
+     free(pair);
+ }
+ 
+-inline COMPS_HSList* __comps_objmrtree_all(COMPS_ObjMRTree * rt, char keyvalpair) {
++static inline COMPS_HSList* __comps_objmrtree_all(COMPS_ObjMRTree * rt, char keyvalpair) {
+     COMPS_HSList *to_process, *ret;
+     COMPS_HSListItem *hsit, *oldit;
+     size_t x;
+-- 
+2.12.0
+

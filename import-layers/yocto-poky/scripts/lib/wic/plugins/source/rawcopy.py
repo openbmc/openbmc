@@ -15,12 +15,15 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+import logging
 import os
 
-from wic import msger
+from wic import WicError
 from wic.pluginbase import SourcePlugin
-from wic.utils.oe.misc import exec_cmd, get_bitbake_var
+from wic.utils.misc import exec_cmd, get_bitbake_var
 from wic.filemap import sparse_copy
+
+logger = logging.getLogger('wic')
 
 class RawCopyPlugin(SourcePlugin):
     """
@@ -30,25 +33,6 @@ class RawCopyPlugin(SourcePlugin):
     name = 'rawcopy'
 
     @classmethod
-    def do_install_disk(cls, disk, disk_name, cr, workdir, oe_builddir,
-                        bootimg_dir, kernel_dir, native_sysroot):
-        """
-        Called after all partitions have been prepared and assembled into a
-        disk image. Do nothing.
-        """
-        pass
-
-    @classmethod
-    def do_configure_partition(cls, part, source_params, cr, cr_workdir,
-                               oe_builddir, bootimg_dir, kernel_dir,
-                               native_sysroot):
-        """
-        Called before do_prepare_partition(). Possibly prepare
-        configuration files of some sort.
-        """
-        pass
-
-    @classmethod
     def do_prepare_partition(cls, part, source_params, cr, cr_workdir,
                              oe_builddir, bootimg_dir, kernel_dir,
                              rootfs_dir, native_sysroot):
@@ -56,18 +40,17 @@ class RawCopyPlugin(SourcePlugin):
         Called to do the actual content population for a partition i.e. it
         'prepares' the partition to be incorporated into the image.
         """
-        if not bootimg_dir:
-            bootimg_dir = get_bitbake_var("DEPLOY_DIR_IMAGE")
-            if not bootimg_dir:
-                msger.error("Couldn't find DEPLOY_DIR_IMAGE, exiting\n")
+        if not kernel_dir:
+            kernel_dir = get_bitbake_var("DEPLOY_DIR_IMAGE")
+            if not kernel_dir:
+                raise WicError("Couldn't find DEPLOY_DIR_IMAGE, exiting")
 
-        msger.debug('Bootimg dir: %s' % bootimg_dir)
+        logger.debug('Kernel dir: %s', kernel_dir)
 
         if 'file' not in source_params:
-            msger.error("No file specified\n")
-            return
+            raise WicError("No file specified")
 
-        src = os.path.join(bootimg_dir, source_params['file'])
+        src = os.path.join(kernel_dir, source_params['file'])
         dst = os.path.join(cr_workdir, "%s.%s" % (source_params['file'], part.lineno))
 
         if 'skip' in source_params:
@@ -84,4 +67,3 @@ class RawCopyPlugin(SourcePlugin):
             part.size = filesize
 
         part.source_file = dst
-

@@ -1,0 +1,48 @@
+From f9150a0dc092ab2cbd47ee428436b747dce323a9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 23 Apr 2017 10:28:28 -0700
+Subject: [PATCH] SquidNew: use noexcept instead of throw for C++11 compilers
+
+Fixes errors with gcc7 which is more pedantic about c++11
+conformance regarding deprecated features
+
+include/SquidNew.h:21:51: error: dynamic exception specifications are deprecated in C++11
+_SQUID_EXTERNNEW_ void *operator new[] (size_t size) throw (std::bad_alloc)
+                                                       ^~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/SquidNew.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/SquidNew.h b/include/SquidNew.h
+index 39fcee0..c960347 100644
+--- a/include/SquidNew.h
++++ b/include/SquidNew.h
+@@ -18,19 +18,19 @@
+  */
+ #include <new>
+ 
+-_SQUID_EXTERNNEW_ void *operator new(size_t size) throw (std::bad_alloc)
++_SQUID_EXTERNNEW_ void *operator new(size_t size) noexcept(false)
+ {
+     return xmalloc(size);
+ }
+-_SQUID_EXTERNNEW_ void operator delete (void *address) throw()
++_SQUID_EXTERNNEW_ void operator delete (void *address) noexcept(true)
+ {
+     xfree(address);
+ }
+-_SQUID_EXTERNNEW_ void *operator new[] (size_t size) throw (std::bad_alloc)
++_SQUID_EXTERNNEW_ void *operator new[] (size_t size) noexcept(false)
+ {
+     return xmalloc(size);
+ }
+-_SQUID_EXTERNNEW_ void operator delete[] (void *address) throw()
++_SQUID_EXTERNNEW_ void operator delete[] (void *address) noexcept(true)
+ {
+     xfree(address);
+ }
+-- 
+2.12.2
+

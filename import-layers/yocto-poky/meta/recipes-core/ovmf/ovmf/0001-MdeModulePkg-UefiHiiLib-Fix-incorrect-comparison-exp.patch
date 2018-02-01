@@ -1,0 +1,39 @@
+From 73692710d50da1f421b0e6ddff784ca3135389b3 Mon Sep 17 00:00:00 2001
+From: Dandan Bi <dandan.bi@intel.com>
+Date: Sat, 1 Apr 2017 10:31:14 +0800
+Subject: [PATCH] MdeModulePkg/UefiHiiLib:Fix incorrect comparison expression
+
+Fix the incorrect comparison between pointer and constant zero character.
+
+https://bugzilla.tianocore.org/show_bug.cgi?id=416
+
+V2: The pointer StringPtr points to a string returned
+by ExtractConfig/ExportConfig, if it is NULL, function
+InternalHiiIfrValueAction will return FALSE. So in
+current usage model, the StringPtr can not be NULL before
+using it, so we can add ASSERT here.
+
+Cc: Eric Dong <eric.dong@intel.com>
+Cc: Liming Gao <liming.gao@intel.com>
+Contributed-under: TianoCore Contribution Agreement 1.0
+Signed-off-by: Dandan Bi <dandan.bi@intel.com>
+Reviewed-by: Eric Dong <eric.dong@intel.com>
+---
+Upstream-Status: Backport
+
+ MdeModulePkg/Library/UefiHiiLib/HiiLib.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+Index: git/MdeModulePkg/Library/UefiHiiLib/HiiLib.c
+===================================================================
+--- git.orig/MdeModulePkg/Library/UefiHiiLib/HiiLib.c
++++ git/MdeModulePkg/Library/UefiHiiLib/HiiLib.c
+@@ -2180,6 +2180,8 @@ InternalHiiIfrValueAction (
+   }
+   
+   StringPtr = ConfigAltResp;
++
++  ASSERT (StringPtr != NULL);
+   
+   while (StringPtr != L'\0') {
+     //

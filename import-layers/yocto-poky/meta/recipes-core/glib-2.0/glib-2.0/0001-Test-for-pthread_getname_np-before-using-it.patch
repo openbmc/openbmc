@@ -1,0 +1,70 @@
+From f627fe16099a2b08d8b4e9023ae6b4f352451967 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 6 Nov 2016 08:59:08 -0800
+Subject: [PATCH] Test for pthread_getname_np before using it
+
+Its a GNU extention and not all libc implement it
+musl e.g. implements the setname API but not getname
+in any case, it seems to be safer to check for the
+function before using it.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ config.h.in         |  3 +++
+ configure.ac        | 10 ++++++++++
+ glib/tests/thread.c |  2 +-
+ 3 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/config.h.in b/config.h.in
+index 2c35ff1..da7ac30 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -326,6 +326,9 @@
+ #undef HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE_NP
+ 
+ /* Have function pthread_setname_np(const char*) */
++#undef HAVE_PTHREAD_GETNAME_NP
++
++/* Have function pthread_setname_np(const char*) */
+ #undef HAVE_PTHREAD_SETNAME_NP_WITHOUT_TID
+ 
+ /* Have function pthread_setname_np(pthread_t, const char*) */
+diff --git a/configure.ac b/configure.ac
+index 4309671..209770a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2121,6 +2121,16 @@ AS_IF([ test x"$have_threads" = xposix], [
+              AC_DEFINE(HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE_NP,1,
+                 [Have function pthread_cond_timedwait_relative_np])],
+             [AC_MSG_RESULT(no)])
++        dnl gets thread names
++        AC_MSG_CHECKING(for pthread_getname_np(pthread_t, char*, size_t))
++        AC_LINK_IFELSE(
++            [AC_LANG_PROGRAM(
++                [#include <pthread.h>],
++                [pthread_getname_np(pthread_self(),"example",0)])],
++            [AC_MSG_RESULT(yes)
++             AC_DEFINE(HAVE_PTHREAD_GETNAME_NP,1,
++                [Have function pthread_setname_np(const char*)])],
++            [AC_MSG_RESULT(no)])
+         dnl Sets thread names on OS X 10.6, iOS 3.2 (and higher)
+         AC_MSG_CHECKING(for pthread_setname_np(const char*))
+         AC_LINK_IFELSE(
+diff --git a/glib/tests/thread.c b/glib/tests/thread.c
+index 5447836..2f248a6 100644
+--- a/glib/tests/thread.c
++++ b/glib/tests/thread.c
+@@ -174,7 +174,7 @@ test_thread5 (void)
+ static gpointer
+ thread6_func (gpointer data)
+ {
+-#ifdef HAVE_PTHREAD_SETNAME_NP_WITH_TID
++#if defined(HAVE_PTHREAD_SETNAME_NP_WITH_TID) && defined(HAVE_PTHREAD_GETNAME_NP)
+   char name[16];
+ 
+   pthread_getname_np (pthread_self(), name, 16);
+-- 
+2.10.2
+

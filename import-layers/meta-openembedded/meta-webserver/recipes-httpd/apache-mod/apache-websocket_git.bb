@@ -6,7 +6,7 @@ LICENSE = "Apache-2.0"
 
 inherit autotools-brokensep pkgconfig
 
-DEPENDS = "apache2 apache2-native"
+DEPENDS = "apache2 apache2-native pbzip2-native"
 RDEPENDS_${PN} += "apache2"
 
 # Original (github.com/disconnect/apache-websocket) is dead since 2012, the

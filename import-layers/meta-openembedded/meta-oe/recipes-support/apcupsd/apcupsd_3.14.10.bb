@@ -7,7 +7,7 @@ SRC_URI = "http://garr.dl.sourceforge.net/project/apcupsd/apcupsd%20-%20Stable/3
 SRC_URI[md5sum] = "5928822d855c5cf7ac29655e3e0b8c23"
 SRC_URI[sha256sum] = "0707b5ec9916fbde9e44eb8d18037c8d8f75dfd6aeef51aba5487e189eef2032"
 
-PNBLACKLIST[apcupsd] ?= "BROKEN: doesn't build with B!=S"
+PNBLACKLIST[apcupsd] ?= "BROKEN: doesn't build with B!=S - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 inherit autotools
 

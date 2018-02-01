@@ -1,0 +1,25 @@
+From aca8473a516a8dc013866105da141fe1cd947474 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Mar 2017 19:24:53 -0700
+Subject: [PATCH 2/2] Enable support for the kernel module
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/configure.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/configure.in b/src/configure.in
+index cae0976..951a042 100644
+--- a/src/configure.in
++++ b/src/configure.in
+@@ -33,6 +33,7 @@ AC_CHECK_HEADERS(linux/if_pppox.h, [], [],
+ #include<net/ethernet.h>
+ #include<linux/if.h>
+ #include<linux/in.h>
++#include<linux/in6.h>
+ ])
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+-- 
+2.12.1
+

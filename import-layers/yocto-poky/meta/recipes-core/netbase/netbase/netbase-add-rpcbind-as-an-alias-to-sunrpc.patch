@@ -1,4 +1,7 @@
-netbase: add rpcbind as an alias to sunrpc
+From 76989205a1411f16d7ab09ff9d279539a73dc259 Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Thu, 12 Jan 2017 16:50:58 +0200
+Subject: [PATCH] netbase: add rpcbind as an alias to sunrpc
 
 the patch comes from:
 https://bugs.archlinux.org/task/20273
@@ -6,9 +9,10 @@ https://bugs.archlinux.org/task/20273
 Upstream-Status: Pending
 
 Signed-off-by: Li Wang <li.wang@windriver.com>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
 ---
- etc-rpc      |    2 +-
- etc-services |    4 ++--
+ etc-rpc      | 2 +-
+ etc-services | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/etc-rpc b/etc-rpc
@@ -25,20 +29,20 @@ index 1b30625..9a9a81a 100644
  rusersd		100002	rusers
  nfs		100003	nfsprog
 diff --git a/etc-services b/etc-services
-index 9d64a52..a19f7c8 100644
+index e3202ec..a039d7e 100644
 --- a/etc-services
 +++ b/etc-services
-@@ -72,8 +72,8 @@ pop2		109/tcp		postoffice pop-2 # POP version 2
- pop2		109/udp		pop-2
+@@ -64,8 +64,8 @@ csnet-ns	105/udp		cso-ns
+ rtelnet		107/tcp				# Remote Telnet
+ rtelnet		107/udp
  pop3		110/tcp		pop-3		# POP version 3
- pop3		110/udp		pop-3
 -sunrpc		111/tcp		portmapper	# RPC 4.0 portmapper
 -sunrpc		111/udp		portmapper
-+sunrpc		111/tcp		portmapper rpcbind	# RPC 4.0 portmapper
++sunrpc		111/tcp		portmapper rpcbind # RPC 4.0 portmapper
 +sunrpc		111/udp		portmapper rpcbind
  auth		113/tcp		authentication tap ident
  sftp		115/tcp
- uucp-path	117/tcp
+ nntp		119/tcp		readnews untp	# USENET News Transfer Protocol
 -- 
-1.7.9.5
+2.4.0
 

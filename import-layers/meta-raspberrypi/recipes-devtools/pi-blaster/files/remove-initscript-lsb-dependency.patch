@@ -1,13 +1,28 @@
-Remove dependencies on LSB functions
+From 1338f98a279616f4e5e9ea30a25d1dfa0c7df5d6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petter=20Mab=C3=A4cker?= <petter@technux.se>
+Date: Sun, 4 Jun 2017 12:22:40 +0200
+Subject: [PATCH] Remove dependencies on LSB functions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+See this as a rebase of the previous 'Remove dependencies on LSB
+functions patch' with only minor modifications from the original version,
+based on the work done by Alex Lennon <ajlennon@dynamicdevices.co.uk> in
+'25fd817 pi-blaster: Added recipe'.
 
 Upstream-Status: Inappropriate [configuration]
 
-Signed-off-by: Alex Lennon <ajlennon@dynamicdevices.co.uk>
+Signed-off-by: Petter Mabäcker <petter@technux.se>
+---
+ debian/pi-blaster.init | 38 +++++++-------------------------------
+ 1 file changed, 7 insertions(+), 31 deletions(-)
 
-diff -ur git.org/pi-blaster.boot.sh git/pi-blaster.boot.sh
---- git.org/pi-blaster.boot.sh	2014-05-20 14:49:44.378582168 +0100
-+++ git/pi-blaster.boot.sh	2014-05-20 14:51:08.330582386 +0100
-@@ -28,12 +28,12 @@
+diff --git a/debian/pi-blaster.init b/debian/pi-blaster.init
+index b142d70..01a686c 100644
+--- a/debian/pi-blaster.init
++++ b/debian/pi-blaster.init
+@@ -28,12 +28,12 @@ SCRIPTNAME=/etc/init.d/$NAME
  [ -r /etc/default/$NAME ] && . /etc/default/$NAME
  
  # Load the VERBOSE setting and other rcS variables
@@ -22,7 +37,7 @@ diff -ur git.org/pi-blaster.boot.sh git/pi-blaster.boot.sh
  
  #
  # Function that starts the daemon/service
-@@ -77,48 +77,23 @@
+@@ -77,48 +77,24 @@ do_stop()
  
  case "$1" in
    start)
@@ -52,6 +67,7 @@ diff -ur git.org/pi-blaster.boot.sh git/pi-blaster.boot.sh
  	# 'force-reload' alias
  	#
 -	log_daemon_msg "Restarting $DESC" "$NAME"
++	echo "Restarting $DESC" "$NAME"
  	do_stop
 -	case "$?" in
 -	  0|1)
@@ -67,11 +83,14 @@ diff -ur git.org/pi-blaster.boot.sh git/pi-blaster.boot.sh
 -		log_end_msg 1
 -		;;
 -	esac
-+	do_start
++    do_start
  	;;
    *)
 -	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
-+	echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2
++	echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
  	exit 3
  	;;
  esac
+-- 
+1.9.1
+

@@ -43,8 +43,8 @@ class FakeTarget(object):
         self.ip = None
         self.server_ip = None
         self.datetime = time.strftime('%Y%m%d%H%M%S',time.gmtime())
-        self.testdir = d.getVar("TEST_LOG_DIR", True)
-        self.pn = d.getVar("PN", True)
+        self.testdir = d.getVar("TEST_LOG_DIR")
+        self.pn = d.getVar("PN")
 
     def exportStart(self):
         self.sshlog = os.path.join(self.testdir, "ssh_target_log.%s" % self.datetime)
@@ -130,8 +130,8 @@ def extract_sdk(d):
     """
 
     export_dir = os.path.dirname(os.path.realpath(__file__))
-    tools_dir = d.getVar("TEST_EXPORT_SDK_DIR", True)
-    tarball_name = "%s.sh" % d.getVar("TEST_EXPORT_SDK_NAME", True)
+    tools_dir = d.getVar("TEST_EXPORT_SDK_DIR")
+    tarball_name = "%s.sh" % d.getVar("TEST_EXPORT_SDK_NAME")
     tarball_path = os.path.join(export_dir, tools_dir, tarball_name)
     extract_path = os.path.join(export_dir, "sysroot")
     if os.path.isfile(tarball_path):

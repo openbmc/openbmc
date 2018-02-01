@@ -1,0 +1,34 @@
+From 20525add1df8e1fb13fef90ac068f982def8b958 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Wed, 8 Mar 2017 13:23:58 +0200
+Subject: [PATCH] Use getenv() if secure_getenv() does not exist
+
+musl does not implement secure version: default to getenv() in that
+case.
+
+https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers/issues/1538
+
+Upstream-Status: Pending
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ loader/loader.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/loader/loader.c b/loader/loader.c
+index 24758f4..bff79c1 100644
+--- a/loader/loader.c
++++ b/loader/loader.c
+@@ -54,6 +54,10 @@
+ #endif
+ #endif
+ 
++#if !defined(__secure_getenv)
++#define __secure_getenv getenv
++#endif
++
+ struct loader_struct loader = {0};
+ // TLS for instance for alloc/free callbacks
+ THREAD_LOCAL_DECL struct loader_instance *tls_instance;
+-- 
+2.1.4
+

@@ -13,7 +13,10 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 GNOME_COMPRESS_TYPE = "xz"
 
-SRC_URI += "file://remove-yelp-help-rules-var.patch"
+SRC_URI = "${GNOME_MIRROR}/${GNOMEBN}/${@gnome_verdir("${PV}")}/${GNOMEBN}-${PV}.tar.${GNOME_COMPRESS_TYPE};name=archive \
+           file://remove-yelp-help-rules-var.patch \
+           file://0001-ui-Define-_GNU_SOURCE.patch \
+           "
 SRC_URI[archive.md5sum] = "6d89b71672d4fa49fc87f83d610d0ef6"
 SRC_URI[archive.sha256sum] = "8cf4dbf0da0a6f36357ce7db7f829ec685908a7792453c662fb8184572b91075"
 

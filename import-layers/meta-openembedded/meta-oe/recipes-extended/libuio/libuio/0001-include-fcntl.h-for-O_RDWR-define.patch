@@ -1,0 +1,38 @@
+From d39c78d322585a32f9a55c67c25a99602ce08b12 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 1 Apr 2017 09:01:33 -0700
+Subject: [PATCH] include fcntl.h for O_RDWR define
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/lsuio.c | 1 +
+ tools/rwuio.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/tools/lsuio.c b/tools/lsuio.c
+index 58eb922..4769446 100644
+--- a/tools/lsuio.c
++++ b/tools/lsuio.c
+@@ -19,6 +19,7 @@
+ #include <stdio.h>
+ #include <sys/types.h>
+ #include <getopt.h>
++#include <fcntl.h>
+ 
+ #include "system.h"
+ #include "uio_helper.h"
+diff --git a/tools/rwuio.c b/tools/rwuio.c
+index aef9e90..ebc71e1 100644
+--- a/tools/rwuio.c
++++ b/tools/rwuio.c
+@@ -20,6 +20,7 @@
+ */
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <fcntl.h>
+ #include <sys/types.h>
+ #include <getopt.h>
+ 
+-- 
+2.12.1
+

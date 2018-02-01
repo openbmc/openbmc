@@ -1,0 +1,30 @@
+From a5c59f6a1479947d33dba5191724cc5fc88a614b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Apr 2017 10:39:57 -0700
+Subject: [PATCH 2/2] cfparse: clear memory equal to size of array
+
+Fixes compiler error
+cfparse.y: In function 'set_isakmp_proposal':
+cfparse.y:2567:3: error: 'memset' used with length equal to number of elements without multiplication by element size [-Werror=memset-elt-size]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/racoon/cfparse.y | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/racoon/cfparse.y b/src/racoon/cfparse.y
+index 0d9bd67..5d9c67b 100644
+--- a/src/racoon/cfparse.y
++++ b/src/racoon/cfparse.y
+@@ -2564,7 +2564,7 @@ set_isakmp_proposal(rmconf)
+ 		plog(LLV_DEBUG2, LOCATION, NULL,
+ 			"encklen=%d\n", s->encklen);
+ 
+-		memset(types, 0, ARRAYLEN(types));
++		memset(types, 0, sizeof(types));
+ 		types[algclass_isakmp_enc] = s->algclass[algclass_isakmp_enc];
+ 		types[algclass_isakmp_hash] = s->algclass[algclass_isakmp_hash];
+ 		types[algclass_isakmp_dh] = s->algclass[algclass_isakmp_dh];
+-- 
+2.12.2
+

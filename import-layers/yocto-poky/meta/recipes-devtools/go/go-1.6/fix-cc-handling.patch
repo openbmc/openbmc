@@ -1,0 +1,50 @@
+Accept CC with multiple words in its name
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: go/src/cmd/go/build.go
+===================================================================
+--- go.orig/src/cmd/go/build.go	2015-07-29 14:48:40.323185807 -0700
++++ go/src/cmd/go/build.go	2015-07-30 07:37:40.529818586 -0700
+@@ -2805,12 +2805,24 @@
+ 	return b.ccompilerCmd("CC", defaultCC, objdir)
+ }
+ 
++// gccCmd returns a gcc command line prefix
++// defaultCC is defined in zdefaultcc.go, written by cmd/dist.
++func (b *builder) gccCmdForReal() []string {
++	return envList("CC", defaultCC)
++}
++
+ // gxxCmd returns a g++ command line prefix
+ // defaultCXX is defined in zdefaultcc.go, written by cmd/dist.
+ func (b *builder) gxxCmd(objdir string) []string {
+ 	return b.ccompilerCmd("CXX", defaultCXX, objdir)
+ }
+ 
++// gxxCmd returns a g++ command line prefix
++// defaultCXX is defined in zdefaultcc.go, written by cmd/dist.
++func (b *builder) gxxCmdForReal() []string {
++	return envList("CXX", defaultCXX)
++}
++
+ // ccompilerCmd returns a command line prefix for the given environment
+ // variable and using the default command when the variable is empty.
+ func (b *builder) ccompilerCmd(envvar, defcmd, objdir string) []string {
+Index: go/src/cmd/go/env.go
+===================================================================
+--- go.orig/src/cmd/go/env.go	2015-07-29 14:48:40.323185807 -0700
++++ go/src/cmd/go/env.go	2015-07-30 07:40:54.461655721 -0700
+@@ -52,10 +52,9 @@
+ 
+ 	if goos != "plan9" {
+ 		cmd := b.gccCmd(".")
+-		env = append(env, envVar{"CC", cmd[0]})
++		env = append(env, envVar{"CC", strings.Join(b.gccCmdForReal(), " ")})
+ 		env = append(env, envVar{"GOGCCFLAGS", strings.Join(cmd[3:], " ")})
+-		cmd = b.gxxCmd(".")
+-		env = append(env, envVar{"CXX", cmd[0]})
++		env = append(env, envVar{"CXX", strings.Join(b.gxxCmdForReal(), " ")})
+ 	}
+ 
+ 	if buildContext.CgoEnabled {

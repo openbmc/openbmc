@@ -1,4 +1,5 @@
-DEPENDS += "gconf gconf-native"
+DEPENDS += "gconf"
+PACKAGE_WRITE_DEPS += "gconf-native"
 
 # These are for when gconftool is used natively and the prefix isn't necessarily
 # the sysroot.  TODO: replicate the postinst logic for -native packages going
@@ -42,8 +43,8 @@ done
 
 python populate_packages_append () {
     import re
-    packages = d.getVar('PACKAGES', True).split()
-    pkgdest =  d.getVar('PKGDEST', True)
+    packages = d.getVar('PACKAGES').split()
+    pkgdest =  d.getVar('PKGDEST')
     
     for pkg in packages:
         schema_dir = '%s/%s/etc/gconf/schemas' % (pkgdest, pkg)
@@ -56,15 +57,15 @@ python populate_packages_append () {
         if schemas != []:
             bb.note("adding gconf postinst and prerm scripts to %s" % pkg)
             d.setVar('SCHEMA_FILES', " ".join(schemas))
-            postinst = d.getVar('pkg_postinst_%s' % pkg, True)
+            postinst = d.getVar('pkg_postinst_%s' % pkg)
             if not postinst:
                 postinst = '#!/bin/sh\n'
-            postinst += d.getVar('gconf_postinst', True)
+            postinst += d.getVar('gconf_postinst')
             d.setVar('pkg_postinst_%s' % pkg, postinst)
-            prerm = d.getVar('pkg_prerm_%s' % pkg, True)
+            prerm = d.getVar('pkg_prerm_%s' % pkg)
             if not prerm:
                 prerm = '#!/bin/sh\n'
-            prerm += d.getVar('gconf_prerm', True)
+            prerm += d.getVar('gconf_prerm')
             d.setVar('pkg_prerm_%s' % pkg, prerm)
             d.appendVar("RDEPENDS_%s" % pkg, ' ' + d.getVar('MLPREFIX', False) + 'gconf')
 }

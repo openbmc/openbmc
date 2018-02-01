@@ -73,13 +73,14 @@ def main():
         logger.error("Unable to find bitbake by searching parent directory of this script or PATH")
         sys.exit(1)
     logger.debug('Found bitbake path: %s' % bitbakepath)
+    scriptpath.add_oe_lib_path()
 
     scriptutils.logger_setup_color(logger, global_args.color)
 
     tinfoil = tinfoil_init(False)
     try:
-        for path in ([scripts_path] +
-                    tinfoil.config_data.getVar('BBPATH', True).split(':')):
+        for path in (tinfoil.config_data.getVar('BBPATH').split(':')
+                     + [scripts_path]):
             pluginpath = os.path.join(path, 'lib', 'recipetool')
             scriptutils.load_plugins(logger, plugins, pluginpath)
 

@@ -1,0 +1,98 @@
+From 2366ed9ffcb4f5f5341f10f0a1d1a4688d37ad87 Mon Sep 17 00:00:00 2001
+From: Florian Westphal <fw@strlen.de>
+Date: Wed, 22 Mar 2017 15:08:48 +0100
+Subject: [PATCH 3/4] src: ipv6: switch implicit dependencies to meta l4proto
+
+when using rule like
+
+ip6 filter input tcp dport 22
+nft generates:
+  [ payload load 1b @ network header + 6 => reg 1 ]
+  [ cmp eq reg 1 0x00000006 ]
+  [ payload load 2b @ transport header + 2 => reg 1 ]
+  [ cmp eq reg 1 0x00001600 ]
+
+which is: ip6 filter input ip6 nexthdr tcp dport 22
+IOW, such a rule won't match if e.g. a fragment header is in place.
+
+This changes ip6_proto to use 'meta l4proto' which is the protocol header
+found by exthdr walk.
+
+A side effect is that for bridge we get a shorter dependency chain as it
+no longer needs to prepend 'ether proto ipv6' for old 'ip6 nexthdr' dep.
+
+Only problem:
+
+ip6 nexthdr tcp tcp dport 22
+will now inject a (useless) meta l4 dependency as ip6 nexthdr is no
+longer flagged as EXPR_F_PROTOCOL, to avoid this add a small helper
+that skips the unneded meta dependency in that case.
+
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+Upstream-Status: Backport
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ src/payload.c | 19 ++++++++++++++++++-
+ src/proto.c   |  2 +-
+ 2 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/src/payload.c b/src/payload.c
+index 31e5a02..38db15e 100644
+--- a/src/payload.c
++++ b/src/payload.c
+@@ -117,6 +117,23 @@ static const struct expr_ops payload_expr_ops = {
+ 	.pctx_update	= payload_expr_pctx_update,
+ };
+ 
++/*
++ * ipv6 is special case, we normally use 'meta l4proto' to fetch the last
++ * l4 header of the ipv6 extension header chain so we will also match
++ * tcp after a fragmentation header, for instance.
++ *
++ * If user specifically asks for nexthdr x, treat is as a full
++ * dependency rather than injecting another (useless) meta l4 one.
++ */
++static bool proto_key_is_protocol(const struct proto_desc *desc, unsigned int type)
++{
++	if (type == desc->protocol_key ||
++	    (desc == &proto_ip6 && type == IP6HDR_NEXTHDR))
++		return true;
++
++	return false;
++}
++
+ struct expr *payload_expr_alloc(const struct location *loc,
+ 				const struct proto_desc *desc,
+ 				unsigned int type)
+@@ -129,7 +146,7 @@ struct expr *payload_expr_alloc(const struct location *loc,
+ 	if (desc != NULL) {
+ 		tmpl = &desc->templates[type];
+ 		base = desc->base;
+-		if (type == desc->protocol_key)
++		if (proto_key_is_protocol(desc, type))
+ 			flags = EXPR_F_PROTOCOL;
+ 	} else {
+ 		tmpl = &proto_unknown_template;
+diff --git a/src/proto.c b/src/proto.c
+index fcdfbe7..3b20a5f 100644
+--- a/src/proto.c
++++ b/src/proto.c
+@@ -707,7 +707,6 @@ const struct proto_desc proto_icmp6 = {
+ const struct proto_desc proto_ip6 = {
+ 	.name		= "ip6",
+ 	.base		= PROTO_BASE_NETWORK_HDR,
+-	.protocol_key	= IP6HDR_NEXTHDR,
+ 	.protocols	= {
+ 		PROTO_LINK(IPPROTO_ESP,		&proto_esp),
+ 		PROTO_LINK(IPPROTO_AH,		&proto_ah),
+@@ -720,6 +719,7 @@ const struct proto_desc proto_ip6 = {
+ 		PROTO_LINK(IPPROTO_ICMPV6,	&proto_icmp6),
+ 	},
+ 	.templates	= {
++		[0]	= PROTO_META_TEMPLATE("l4proto", &inet_protocol_type, NFT_META_L4PROTO, 8),
+ 		[IP6HDR_VERSION]	= HDR_BITFIELD("version", &integer_type, 0, 4),
+ 		[IP6HDR_DSCP]		= HDR_BITFIELD("dscp", &dscp_type, 4, 6),
+ 		[IP6HDR_ECN]		= HDR_BITFIELD("ecn", &ecn_type, 10, 2),
+-- 
+2.11.0
+

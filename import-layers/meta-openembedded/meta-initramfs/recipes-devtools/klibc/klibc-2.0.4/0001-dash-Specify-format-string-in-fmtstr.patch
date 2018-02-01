@@ -1,0 +1,31 @@
+From 2fff607fd0b5550e5072a6fffcbb01c29d5207d2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 9 Jul 2017 13:51:25 -0700
+Subject: [PATCH] dash: Specify format string in fmtstr()
+
+Fixes build with hardening flags
+
+usr/dash/jobs.c:429:3: error: format not a string literal and no format arguments [-Werror=format-security]
+   col = fmtstr(s, 32, strsignal(st));
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usr/dash/jobs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/dash/jobs.c b/usr/dash/jobs.c
+index 009bbfee..299bcacc 100644
+--- a/usr/dash/jobs.c
++++ b/usr/dash/jobs.c
+@@ -426,7 +426,7 @@ sprint_status(char *s, int status, int sigonly)
+ 				goto out;
+ #endif
+ 		}
+-		col = fmtstr(s, 32, strsignal(st));
++		col = fmtstr(s, 32, "%s", strsignal(st));
+ #ifdef WCOREDUMP
+ 		if (WCOREDUMP(status)) {
+ 			col += fmtstr(s + col, 16, " (core dumped)");
+-- 
+2.13.2
+

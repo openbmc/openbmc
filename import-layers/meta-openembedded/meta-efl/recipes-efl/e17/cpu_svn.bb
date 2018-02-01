@@ -8,3 +8,5 @@ PR = "${INC_PR}.0"
 require e-module.inc
 
 SRC_URI += "file://configure.patch"
+
+PNBLACKLIST[cpu] ?= "Depends on blacklisted e-wm - the recipe will be removed on 2017-09-01 unless the issue is fixed"

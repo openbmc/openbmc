@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=bbb4b1bdc2c3b6743da3c39d03249095"
 
 COMPATIBLE_HOST = '(x86_64.*).*-linux|aarch64.*-linux'
 
-inherit autotools-brokensep gettext setuptools update-rc.d systemd deploy
+inherit autotools-brokensep setuptools update-rc.d systemd deploy
 
 require xen-arch.inc
 
@@ -22,14 +22,16 @@ FLASK_POLICY_FILE ?= "xenpolicy-${PV}"
 PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,virtual/libsdl,"
 PACKAGECONFIG[xsm] = "--enable-xsmpolicy,--disable-xsmpolicy,checkpolicy-native,"
 PACKAGECONFIG[systemd] = "--enable-systemd,--disable-systemd,systemd,"
-PACKAGECONFIG[hvm] = "--with-system-seabios="${STAGING_DIR_HOST}/usr/share/firmware/bios.bin",--disable-seabios,seabios ipxe vgabios,"
+PACKAGECONFIG[hvm] = "--with-system-seabios="/usr/share/firmware/bios.bin",--disable-seabios,seabios ipxe vgabios,"
 
 DEPENDS = " \
     bison-native \
     dev86-native \
     flex-native \
     file-native \
+    gettext-native \
     iasl-native \
+    ncurses-native \
     util-linux-native \
     xz-native \
     bridge-utils \
@@ -178,6 +180,8 @@ PACKAGES = "\
     ${PN}-libxencall-dev \
     ${PN}-libxenctrl \
     ${PN}-libxenctrl-dev \
+    ${PN}-libxendevicemodel \
+    ${PN}-libxendevicemodel-dev \
     ${PN}-libxenevtchn \
     ${PN}-libxenevtchn-dev \
     ${PN}-libxenforeignmemory \
@@ -275,25 +279,52 @@ FILES_${PN}-staticdev += "\
     "
 
 FILES_${PN}-libblktapctl = "${libdir}/libblktapctl.so.*"
-FILES_${PN}-libblktapctl-dev = "${libdir}/libblktapctl.so"
+FILES_${PN}-libblktapctl-dev = " \
+    ${libdir}/libblktapctl.so \
+    ${datadir}/pkgconfig/xenblktapctl.pc \
+    "
 
 FILES_${PN}-libxencall = "${libdir}/libxencall.so.*"
-FILES_${PN}-libxencall-dev = "${libdir}/libxencall.so"
+FILES_${PN}-libxencall-dev = " \
+    ${libdir}/libxencall.so \
+    ${datadir}/pkgconfig/xencall.pc \
+    "
 
 FILES_${PN}-libxenctrl = "${libdir}/libxenctrl.so.*"
-FILES_${PN}-libxenctrl-dev = "${libdir}/libxenctrl.so"
+FILES_${PN}-libxenctrl-dev = " \
+    ${libdir}/libxenctrl.so \
+    ${datadir}/pkgconfig/xencontrol.pc \
+    "
+
+FILES_${PN}-libxendevicemodel = "${libdir}/libxendevicemodel.so.*"
+FILES_${PN}-libxendevicemodel-dev = " \
+    ${libdir}/libxendevicemodel.so \
+    ${datadir}/pkgconfig/xendevicemodel.pc \
+    "
 
 FILES_${PN}-libxenevtchn = "${libdir}/libxenevtchn.so.*"
-FILES_${PN}-libxenevtchn-dev = "${libdir}/libxenevtchn.so"
+FILES_${PN}-libxenevtchn-dev = " \
+    ${libdir}/libxenevtchn.so \
+    ${datadir}/pkgconfig/xenevtchn.pc \
+    "
 
 FILES_${PN}-libxenforeignmemory = "${libdir}/libxenforeignmemory.so.*"
-FILES_${PN}-libxenforeignmemory-dev = "${libdir}/libxenforeignmemory.so"
+FILES_${PN}-libxenforeignmemory-dev = " \
+    ${libdir}/libxenforeignmemory.so \
+    ${datadir}/pkgconfig/xenforeignmemory.pc \
+    "
 
 FILES_${PN}-libxengnttab = "${libdir}/libxengnttab.so.*"
-FILES_${PN}-libxengnttab-dev = "${libdir}/libxengnttab.so"
+FILES_${PN}-libxengnttab-dev = " \
+    ${libdir}/libxengnttab.so \
+    ${datadir}/pkgconfig/xengnttab.pc \
+    "
 
 FILES_${PN}-libxenguest = "${libdir}/libxenguest.so.*"
-FILES_${PN}-libxenguest-dev = "${libdir}/libxenguest.so"
+FILES_${PN}-libxenguest-dev = " \
+    ${libdir}/libxenguest.so \
+    ${datadir}/pkgconfig/xenguest.pc \
+    "
 
 FILES_${PN}-libxenlight = "${libdir}/libxenlight.so.*"
 FILES_${PN}-libxenlight-dev = " \
@@ -302,16 +333,28 @@ FILES_${PN}-libxenlight-dev = " \
     "
 
 FILES_${PN}-libxenstat = "${libdir}/libxenstat.so.*"
-FILES_${PN}-libxenstat-dev = "${libdir}/libxenstat.so"
+FILES_${PN}-libxenstat-dev = " \
+    ${libdir}/libxenstat.so \
+    ${datadir}/pkgconfig/xenstat.pc \
+    "
 
 FILES_${PN}-libxenstore = "${libdir}/libxenstore.so.*"
-FILES_${PN}-libxenstore-dev = "${libdir}/libxenstore.so"
+FILES_${PN}-libxenstore-dev = " \
+    ${libdir}/libxenstore.so \
+    ${datadir}/pkgconfig/xenstore.pc \
+    "
 
 FILES_${PN}-libxentoollog = "${libdir}/libxentoollog.so.*"
-FILES_${PN}-libxentoollog-dev = "${libdir}/libxentoollog.so"
+FILES_${PN}-libxentoollog-dev = " \
+    ${libdir}/libxentoollog.so \
+    ${datadir}/pkgconfig/xentoollog.pc \
+    "
 
 FILES_${PN}-libxenvchan = "${libdir}/libxenvchan.so.*"
-FILES_${PN}-libxenvchan-dev = "${libdir}/libxenvchan.so"
+FILES_${PN}-libxenvchan-dev = " \
+    ${libdir}/libxenvchan.so \
+    ${datadir}/pkgconfig/xenvchan.pc \
+    "
 
 FILES_${PN}-libxlutil = "${libdir}/libxlutil.so.*"
 FILES_${PN}-libxlutil-dev = " \
@@ -319,13 +362,22 @@ FILES_${PN}-libxlutil-dev = " \
     ${datadir}/pkgconfig/xlutil.pc \
     "
 FILES_${PN}-libvhd = "${libdir}/libvhd.so.*"
-FILES_${PN}-libvhd-dev = "${libdir}/libvhd.so"
+FILES_${PN}-libvhd-dev = " \
+    ${libdir}/libvhd.so \
+    ${datadir}/pkgconfig/vhd.pc \
+    "
 
 FILES_${PN}-libblktap = "${libdir}/libblktap.so.*"
-FILES_${PN}-libblktap-dev = "${libdir}/libblktap.so"
+FILES_${PN}-libblktap-dev = " \
+    ${libdir}/libblktap.so \
+    ${datadir}/pkgconfig/blktap.pc \
+    "
 
 FILES_${PN}-libfsimage = "${libdir}/libfsimage.so.*"
-FILES_${PN}-libfsimage-dev = "${libdir}/libfsimage.so"
+FILES_${PN}-libfsimage-dev = " \
+    ${libdir}/libfsimage.so \
+    ${datadir}/pkgconfig/fsimage.pc \
+    "
 
 FILES_${PN}-fsimage = "${libdir}/fs/*/*fsimage.so"
 
@@ -720,7 +772,7 @@ INITSCRIPT_PARAMS_${PN}-devd = "defaults 82"
 
 # systemd packages
 SYSTEMD_PACKAGES = "${PN}-xen-watchdog ${PN}-xencommons ${PN}-xendomains"
-SYSTEMD_SERVICE_${PN}-watchdog = "xen-watchdog.service"
+SYSTEMD_SERVICE_${PN}-xen-watchdog = "xen-watchdog.service"
 SYSTEMD_SERVICE_${PN}-xencommons = " \
     proc-xen.mount \
     var-lib-xenstored.mount \
@@ -740,12 +792,12 @@ export STAGING_INCDIR
 export STAGING_LIBDIR
 
 # specify xen hypervisor to build/target
-export XEN_TARGET_ARCH = "${@map_xen_arch(d.getVar('TARGET_ARCH', True), d)}"
-export XEN_COMPILE_ARCH = "${@map_xen_arch(d.getVar('BUILD_ARCH', True), d)}"
+export XEN_TARGET_ARCH = "${@map_xen_arch(d.getVar('TARGET_ARCH'), d)}"
+export XEN_COMPILE_ARCH = "${@map_xen_arch(d.getVar('BUILD_ARCH'), d)}"
 
 python () {
-    if d.getVar('XEN_TARGET_ARCH', True) == 'INVALID':
-        raise bb.parse.SkipPackage('Cannot map `%s` to a xen architecture' % d.getVar('TARGET_ARCH', True))
+    if d.getVar('XEN_TARGET_ARCH') == 'INVALID':
+        raise bb.parse.SkipPackage('Cannot map `%s` to a xen architecture' % d.getVar('TARGET_ARCH'))
 }
 
 # Yocto appends ${PN} to libexecdir by default and Xen appends 'xen' as well
@@ -805,7 +857,7 @@ EXTRA_OEMAKE += "GIT=/bin/false"
 
 # check for XSM in package config to allow XSM_ENABLE to be set
 python () {
-    pkgconfig = d.getVar('PACKAGECONFIG', True)
+    pkgconfig = d.getVar('PACKAGECONFIG')
     if ('xsm') in pkgconfig.split():
         d.setVar('XSM_ENABLED', '1')
     else:
@@ -953,3 +1005,37 @@ do_deploy() {
 }
 
 addtask deploy after do_populate_sysroot
+
+# Enable use of menuconfig directly from bitbake and also within the devshell
+OE_TERMINAL_EXPORTS += "HOST_EXTRACFLAGS HOSTLDFLAGS TERMINFO"
+HOST_EXTRACFLAGS = "${BUILD_CFLAGS} ${BUILD_LDFLAGS}"
+HOSTLDFLAGS = "${BUILD_LDFLAGS}"
+TERMINFO = "${STAGING_DATADIR_NATIVE}/terminfo"
+do_devshell[depends] += "ncurses-native:do_populate_sysroot"
+
+KCONFIG_CONFIG_COMMAND ??= "menuconfig"
+python do_menuconfig() {
+    import shutil
+
+    try:
+        mtime = os.path.getmtime("xen/.config")
+        shutil.copy("xen/.config", "xen/.config.orig")
+    except OSError:
+        mtime = 0
+
+    oe_terminal("${SHELL} -c \"cd xen; XEN_CONFIG_EXPERT=y make %s; if [ \$? -ne 0 ]; then echo 'Command failed.'; printf 'Press any key to continue... '; read r; fi\"" % d.getVar('KCONFIG_CONFIG_COMMAND'),
+        d.getVar('PN') + ' Configuration', d)
+
+    try:
+        newmtime = os.path.getmtime("xen/.config")
+    except OSError:
+        newmtime = 0
+
+    if newmtime > mtime:
+        bb.note("Configuration changed, recompile will be forced")
+        bb.build.write_taint('do_compile', d)
+}
+do_menuconfig[depends] += "ncurses-native:do_populate_sysroot"
+do_menuconfig[nostamp] = "1"
+do_menuconfig[dirs] = "${B}"
+addtask menuconfig after do_configure

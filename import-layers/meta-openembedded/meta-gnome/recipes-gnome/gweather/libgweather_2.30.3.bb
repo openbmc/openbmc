@@ -21,4 +21,4 @@ PACKAGES =+ "${PN}-locationdata"
 FILES_${PN}-locationdata = "${datadir}/libgweather/Locations*"
 
 # http://errors.yoctoproject.org/Errors/Details/68608/
-PNBLACKLIST[libgweather] ?= "BROKEN: fails to build with gcc-6"
+PNBLACKLIST[libgweather] ?= "BROKEN: fails to build with gcc-6 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

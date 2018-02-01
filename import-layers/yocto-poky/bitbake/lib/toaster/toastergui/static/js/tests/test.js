@@ -5,6 +5,7 @@
 QUnit.test("Layer alert notification", function(assert) {
   var layer = {
     "layerdetailurl":"/toastergui/project/1/layer/22",
+    "xhrLayerUrl":"/toastergui/xhr_layer/1/9",
     "vcs_url":"git://example.com/example.git",
     "detail":"[ git://example.com/example.git | master ]",
     "vcs_reference":"master",
@@ -15,6 +16,7 @@ QUnit.test("Layer alert notification", function(assert) {
   var layerDepsList = [
     {
     "layerdetailurl":"/toastergui/project/1/layer/9",
+    "xhrLayerUrl":"/toastergui/xhr_layer/1/9",
     "vcs_url":"git://example.com/example.git",
     "detail":"[ git://example.com/example.git | master ]",
     "vcs_reference":"master",
@@ -23,6 +25,7 @@ QUnit.test("Layer alert notification", function(assert) {
     },
     {
     "layerdetailurl":"/toastergui/project/1/layer/9",
+    "xhrLayerUrl":"/toastergui/xhr_layer/1/9",
     "vcs_url":"git://example.com/example.git",
     "detail":"[ git://example.com/example.git | master ]",
     "vcs_reference":"master",
@@ -66,7 +69,8 @@ QUnit.test("Show notification", function(assert){
 var layer = {
   "id": 1,
   "name":  "meta-testing",
-  "layerdetailurl": "/toastergui/project/1/layer/1"
+  "layerdetailurl": "/toastergui/project/1/layer/1",
+  "xhrLayerUrl": "/toastergui/xhr_layer/1/1"
 };
 
 QUnit.test("Add layer", function(assert){
@@ -144,7 +148,7 @@ QUnit.test("Make typeaheads", function(assert){
 /* Page init functions */
 
 QUnit.test("Import layer page init", function(assert){
-  assert.throws(importLayerPageInit());
+  assert.throws(importLayerPageInit({ xhrGitRevTypeAheadUrl: "url" }));
 });
 
 QUnit.test("Project page init", function(assert){

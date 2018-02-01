@@ -38,8 +38,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-TOASTER_SQLITE_DEFAULT_DIR = os.path.join(os.environ.get('TOASTER_DIR', ''),
-                                          'build')
+TOASTER_SQLITE_DEFAULT_DIR = os.environ.get('TOASTER_DIR')
 
 DATABASES = {
     'default': {

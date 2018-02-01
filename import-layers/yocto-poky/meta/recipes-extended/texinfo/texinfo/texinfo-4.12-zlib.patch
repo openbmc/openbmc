@@ -1,19 +1,22 @@
-From 20e1d8a9481dc13dd1d4d168b90e0ed2ff097b98 Mon Sep 17 00:00:00 2001
-From: Jussi Kukkonen <jussi.kukkonen@intel.com>
-Date: Thu, 6 Aug 2015 14:29:57 +0300
+From fe4f00459601efe0cfa75d92749a32237800a530 Mon Sep 17 00:00:00 2001
+From: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
+Date: Tue, 29 Nov 2016 12:27:17 -0600
 Subject: [PATCH] texinfo-4.12-zlib
 
 Upstream-Status: Pending
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Signed-off-by: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
 ---
- install-info/Makefile.in    |  2 +-
- install-info/install-info.c | 67 +++++++++++++++++++++++++++------------------
- 2 files changed, 42 insertions(+), 27 deletions(-)
+ install-info/Makefile.in    | 12 ++-----
+ install-info/install-info.c | 79 +++++++++++++++++++++++++++------------------
+ 2 files changed, 49 insertions(+), 42 deletions(-)
 
 diff --git a/install-info/Makefile.in b/install-info/Makefile.in
-index ad73abb..eaa2153 100644
+index 837d020..ba96579 100644
 --- a/install-info/Makefile.in
 +++ b/install-info/Makefile.in
-@@ -241,7 +241,7 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
+@@ -216,7 +208,7 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
  PROGRAMS = $(bin_PROGRAMS)
  am_ginstall_info_OBJECTS = install-info.$(OBJEXT)
  ginstall_info_OBJECTS = $(am_ginstall_info_OBJECTS)
@@ -23,7 +26,7 @@ index ad73abb..eaa2153 100644
  ginstall_info_DEPENDENCIES = $(top_builddir)/gnulib/lib/libgnu.a \
  	$(am__DEPENDENCIES_1)
 diff --git a/install-info/install-info.c b/install-info/install-info.c
-index b454c15..4e39122 100644
+index e58189c..8617787 100644
 --- a/install-info/install-info.c
 +++ b/install-info/install-info.c
 @@ -22,6 +22,7 @@
@@ -43,7 +46,7 @@ index b454c15..4e39122 100644
  open_possibly_compressed_file (char *filename,
      void (*create_callback) (char *),
 -    char **opened_filename, char **compression_program) 
-+    char **opened_filename, char **compression_program, int *is_pipe) 
++    char **opened_filename, char **compression_program, int *is_pipe)
  {
    char *local_opened_filename, *local_compression_program;
    int nread;
@@ -119,7 +122,7 @@ index b454c15..4e39122 100644
            if (!f)
              return 0;
          }
-@@ -767,12 +768,12 @@ open_possibly_compressed_file (char *filename,
+@@ -767,26 +768,26 @@ open_possibly_compressed_file (char *filename,
  
    /* Read first few bytes of file rather than relying on the filename.
       If the file is shorter than this it can't be usable anyway.  */
@@ -128,14 +131,34 @@ index b454c15..4e39122 100644
 +  nread = gzread (f, data, sizeof (data));
 +  if (nread != sizeof (data))
      {
-       /* Empty files don't set errno.  Calling code can check for
-          this, so make sure errno == 0 just in case it isn't already. */
 -      if (nread == 0)
 +      if (nread >= 0)
-         errno = 0;
-       return 0;
-     }
-@@ -838,35 +839,40 @@ open_possibly_compressed_file (char *filename,
+         {
+           /* Try to create the file if its empty. */
+-          if (feof (f) && create_callback)
++          if (gzeof(f) && create_callback)
+             {
+-              if (fclose (f) != 0)
++              if (gzclose(f) != 0)
+                 return 0; /* unknown error closing file */
+ 
+-              if (remove (filename) != 0)
++              if (remove(filename) != 0)
+                 return 0; /* unknown error deleting file */
+ 
+               (*create_callback) (filename);
+-              f = fopen (*opened_filename, FOPEN_RBIN);
++              f = gzopen (*opened_filename, FOPEN_RBIN);
+               if (!f)
+                 return 0;
+-              nread = fread (data, sizeof (data), 1, f);
+-              if (nread == 0)
++              nread = gzread(f, data, sizeof (data));
++              if (nread >= 0)
+                 return 0;
+               goto determine_file_type; /* success */
+             }
+@@ -857,35 +858,40 @@ determine_file_type:
      *compression_program = NULL;
  
    /* Seek back over the magic bytes.  */
@@ -183,7 +206,7 @@ index b454c15..4e39122 100644
      }
  
    return f;
-@@ -885,7 +891,8 @@ readfile (char *filename, int *sizep,
+@@ -904,7 +910,8 @@ readfile (char *filename, int *sizep,
      void (*create_callback) (char *), char **opened_filename,
      char **compression_program)
  {
@@ -193,7 +216,7 @@ index b454c15..4e39122 100644
    int filled = 0;
    int data_size = 8192;
    char *data = xmalloc (data_size);
-@@ -893,14 +900,20 @@ readfile (char *filename, int *sizep,
+@@ -912,14 +919,20 @@ readfile (char *filename, int *sizep,
    /* If they passed the space for the file name to return, use it.  */
    f = open_possibly_compressed_file (filename, create_callback,
                                       opened_filename,
@@ -216,7 +239,7 @@ index b454c15..4e39122 100644
        if (nread < 0)
          return 0;
        if (nread == 0)
-@@ -919,8 +932,10 @@ readfile (char *filename, int *sizep,
+@@ -938,8 +951,10 @@ readfile (char *filename, int *sizep,
    /* We need to close the stream, since on some systems the pipe created
       by popen is simulated by a temporary file which only gets removed
       inside pclose.  */
@@ -229,5 +252,5 @@ index b454c15..4e39122 100644
    *sizep = filled;
    return data;
 -- 
-2.1.4
+2.9.3
 

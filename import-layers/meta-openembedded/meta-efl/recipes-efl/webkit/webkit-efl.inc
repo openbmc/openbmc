@@ -66,4 +66,4 @@ FILES_${PN}launcher-dbg = "${bindir}/.debug/EWebLauncher"
 FILES_${PN}-inspector += "${datadir}/ewebkit2-1/inspector"
 
 # http://errors.yoctoproject.org/Errors/Details/40659/
-PNBLACKLIST[webkit-efl] ?= "Old and unmaintaned fork with many security issues"
+PNBLACKLIST[webkit-efl] ?= "Old and unmaintaned fork with many security issues - the recipe will be removed on 2017-09-01 unless the issue is fixed"

@@ -1,0 +1,14 @@
+[Unit]
+Description=Kodi media thing
+
+[Service]
+User=root
+Type=simple
+SuccessExitStatus=0 1
+IOSchedulingClass=realtime
+IOSchedulingPriority=0
+
+ExecStart=/usr/bin/xinit /usr/bin/kodi-standalone -- /usr/bin/X :0 
+
+[Install]
+WantedBy=basic.target

@@ -1,0 +1,66 @@
+From b8dc608dad7d9fc3a4c16acd0327d97b81c23b95 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Nov 2016 01:32:31 +0000
+Subject: [PATCH] apps/CMakeLists.txt: Explicitly link libbfb and libmulticobex
+
+Transitive linking is disabled now for multicobex and
+obexftp, This ends up with linking errors for apps, therefore
+they are required to be added to link line explicitly.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ apps/CMakeLists.txt | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+Index: obexftp-0.24.2-Source/apps/CMakeLists.txt
+===================================================================
+--- obexftp-0.24.2-Source.orig/apps/CMakeLists.txt
++++ obexftp-0.24.2-Source/apps/CMakeLists.txt
+@@ -5,14 +5,23 @@ add_definitions( -DVERSION="${obexftp_VE
+ add_definitions ( -DHAVE_USB )
+ 
+ add_executable ( obexftp_app obexftp.c )
+-target_link_libraries ( obexftp_app obexftp )
++target_link_libraries ( obexftp_app
++  PRIVATE multicobex
++  PRIVATE bfb
++  obexftp
++)
+ set_target_properties ( obexftp_app PROPERTIES
+   OUTPUT_NAME obexftp
+ )
+ 
+ 
+ add_executable ( obexftpd_app obexftpd.c )
+-target_link_libraries ( obexftpd_app obexftp openobex )
++target_link_libraries ( obexftpd_app
++  PRIVATE multicobex
++  PRIVATE bfb
++  obexftp
++  openobex
++)
+ set_target_properties ( obexftpd_app PROPERTIES
+   OUTPUT_NAME obexftpd
+ )
+Index: obexftp-0.24.2-Source/fuse/CMakeLists.txt
+===================================================================
+--- obexftp-0.24.2-Source.orig/fuse/CMakeLists.txt
++++ obexftp-0.24.2-Source/fuse/CMakeLists.txt
+@@ -13,6 +13,8 @@ if ( Fuse_FOUND )
+   )
+ 
+   target_link_libraries ( obexfs
++    PRIVATE multicobex
++    PRIVATE bfb
+     obexftp
+     ${Fuse_LIBRARIES}
+     ${EXPAT_LIBRARIES}
+@@ -23,6 +25,8 @@ if ( Fuse_FOUND )
+   )
+ 
+   target_link_libraries ( obexautofs
++    PRIVATE multicobex
++    PRIVATE bfb
+     obexftp
+     ${Fuse_LIBRARIES}
+   )

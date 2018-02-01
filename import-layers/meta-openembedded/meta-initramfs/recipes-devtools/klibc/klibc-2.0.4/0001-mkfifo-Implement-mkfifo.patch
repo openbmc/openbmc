@@ -1,0 +1,29 @@
+From b4e120f5edf06e6df138b1804a8b5180584cea6b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 10 Jul 2017 20:42:50 -0700
+Subject: [PATCH] mkfifo: Implement mkfifo
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usr/utils/mkfifo.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/usr/utils/mkfifo.c b/usr/utils/mkfifo.c
+index 5a758b2a..f1f577e6 100644
+--- a/usr/utils/mkfifo.c
++++ b/usr/utils/mkfifo.c
+@@ -26,6 +26,11 @@ static int make_fifo(char *dir)
+ 	return 0;
+ }
+ 
++int mkfifo (const char *__p, mode_t __m)
++{
++	return mknod(__p, (__m & ~S_IFMT) | S_IFIFO, (dev_t) 0);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	int c, ret = 0;
+-- 
+2.13.2
+

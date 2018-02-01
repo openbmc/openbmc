@@ -25,7 +25,7 @@
 #   u-boot:do_concat_dtb
 #   u-boot:do_install
 #
-# For more details on signature process, please refer to U-boot documentation.
+# For more details on signature process, please refer to U-Boot documentation.
 
 # Signature activation.
 UBOOT_SIGN_ENABLE ?= "0"
@@ -80,9 +80,9 @@ do_concat_dtb () {
 }
 
 python () {
-	uboot_pn = d.getVar('PREFERRED_PROVIDER_u-boot', True) or 'u-boot'
-	if d.getVar('UBOOT_SIGN_ENABLE', True) == '1' and d.getVar('PN', True) == uboot_pn:
-		kernel_pn = d.getVar('PREFERRED_PROVIDER_virtual/kernel', True)
+	uboot_pn = d.getVar('PREFERRED_PROVIDER_u-boot') or 'u-boot'
+	if d.getVar('UBOOT_SIGN_ENABLE') == '1' and d.getVar('PN') == uboot_pn:
+		kernel_pn = d.getVar('PREFERRED_PROVIDER_virtual/kernel')
 
 		# u-boot.dtb and u-boot-nodtb.bin are deployed _before_ do_deploy
 		# Thus, do_deploy_setscene will also populate them in DEPLOY_IMAGE_DIR

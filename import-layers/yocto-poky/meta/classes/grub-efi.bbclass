@@ -40,13 +40,15 @@ efi_populate() {
 
 	install -d ${DEST}${EFIDIR}
 
-	GRUB_IMAGE="bootia32.efi"
+	GRUB_IMAGE="grub-efi-bootia32.efi"
+	DEST_IMAGE="bootia32.efi"
 	if [ "${TARGET_ARCH}" = "x86_64" ]; then
-		GRUB_IMAGE="bootx64.efi"
+		GRUB_IMAGE="grub-efi-bootx64.efi"
+		DEST_IMAGE="bootx64.efi"
 	fi
-	install -m 0644 ${DEPLOY_DIR_IMAGE}/${GRUB_IMAGE} ${DEST}${EFIDIR}
+	install -m 0644 ${DEPLOY_DIR_IMAGE}/${GRUB_IMAGE} ${DEST}${EFIDIR}/${DEST_IMAGE}
 	EFIPATH=$(echo "${EFIDIR}" | sed 's/\//\\/g')
-	printf 'fs0:%s\%s\n' "$EFIPATH" "$GRUB_IMAGE" >${DEST}/startup.nsh
+	printf 'fs0:%s\%s\n' "$EFIPATH" "$DEST_IMAGE" >${DEST}/startup.nsh
 
 	install -m 0644 ${GRUB_CFG} ${DEST}${EFIDIR}/grub.cfg
 }
@@ -72,14 +74,14 @@ efi_hddimg_populate() {
 python build_efi_cfg() {
     import sys
 
-    workdir = d.getVar('WORKDIR', True)
+    workdir = d.getVar('WORKDIR')
     if not workdir:
         bb.error("WORKDIR not defined, unable to package")
         return
 
-    gfxserial = d.getVar('GRUB_GFXSERIAL', True) or ""
+    gfxserial = d.getVar('GRUB_GFXSERIAL') or ""
 
-    labels = d.getVar('LABELS', True)
+    labels = d.getVar('LABELS')
     if not labels:
         bb.debug(1, "LABELS not defined, nothing to do")
         return
@@ -88,7 +90,7 @@ python build_efi_cfg() {
         bb.debug(1, "No labels, nothing to do")
         return
 
-    cfile = d.getVar('GRUB_CFG', True)
+    cfile = d.getVar('GRUB_CFG')
     if not cfile:
         bb.fatal('Unable to read GRUB_CFG')
 
@@ -99,39 +101,38 @@ python build_efi_cfg() {
 
     cfgfile.write('# Automatically created by OE\n')
 
-    opts = d.getVar('GRUB_OPTS', True)
+    opts = d.getVar('GRUB_OPTS')
     if opts:
         for opt in opts.split(';'):
             cfgfile.write('%s\n' % opt)
 
     cfgfile.write('default=%s\n' % (labels.split()[0]))
 
-    timeout = d.getVar('GRUB_TIMEOUT', True)
+    timeout = d.getVar('GRUB_TIMEOUT')
     if timeout:
         cfgfile.write('timeout=%s\n' % timeout)
     else:
         cfgfile.write('timeout=50\n')
 
-    root = d.getVar('GRUB_ROOT', True)
+    root = d.getVar('GRUB_ROOT')
     if not root:
         bb.fatal('GRUB_ROOT not defined')
 
     if gfxserial == "1":
         btypes = [ [ " graphics console", "" ],
-            [ " serial console", d.getVar('GRUB_SERIAL', True) or "" ] ]
+            [ " serial console", d.getVar('GRUB_SERIAL') or "" ] ]
     else:
         btypes = [ [ "", "" ] ]
 
     for label in labels.split():
         localdata = d.createCopy()
 
-        overrides = localdata.getVar('OVERRIDES', True)
+        overrides = localdata.getVar('OVERRIDES')
         if not overrides:
             bb.fatal('OVERRIDES not defined')
 
         for btype in btypes:
             localdata.setVar('OVERRIDES', label + ':' + overrides)
-            bb.data.update_data(localdata)
 
             cfgfile.write('\nmenuentry \'%s%s\'{\n' % (label, btype[0]))
             lb = label
@@ -141,8 +142,8 @@ python build_efi_cfg() {
 
             cfgfile.write(' %s' % replace_rootfs_uuid(d, root))
 
-            append = localdata.getVar('APPEND', True)
-            initrd = localdata.getVar('INITRD', True)
+            append = localdata.getVar('APPEND')
+            initrd = localdata.getVar('INITRD')
 
             if append:
                 append = replace_rootfs_uuid(d, append)

@@ -1,0 +1,29 @@
+From 6d2718b925453f9a6915001f489606eb8e4086c8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Dec 2016 18:24:50 +0200
+Subject: [PATCH 4/4] Set libsolv variables with pkg-config (cmake's own module
+ doesn't work properly).
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ CMakeLists.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8edb627..b531da1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -28,7 +28,8 @@ find_package (PkgConfig REQUIRED)
+ SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+ PKG_CHECK_MODULES(GLIB gio-unix-2.0>=2.44.0 REQUIRED)
+ FIND_LIBRARY (RPMDB_LIBRARY NAMES rpmdb)
+-find_package (LibSolv 0.6.21 REQUIRED COMPONENTS ext)
++PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
++set(LIBSOLV_LIBRARY ${LIBSOLV_LIBRARIES})
+ pkg_check_modules (CHECK REQUIRED check)
+ pkg_check_modules (REPO REQUIRED librepo)
+ FIND_PROGRAM (VALGRIND_PROGRAM NAMES valgrind PATH /usr/bin /usr/local/bin)
+-- 
+2.11.0
+

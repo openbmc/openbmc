@@ -27,6 +27,10 @@ import argparse
 import scriptutils
 import errno
 import bb
+
+devtool_path = os.path.dirname(os.path.realpath(__file__)) + '/../../../meta/lib'
+sys.path = sys.path + [devtool_path]
+
 import oe.recipeutils
 from devtool import standard
 from devtool import exec_build_env_command, setup_tinfoil, DevtoolError, parse_recipe, use_external_build
@@ -68,7 +72,7 @@ def _remove_patch_dirs(recipefolder):
             shutil.rmtree(os.path.join(root,d))
 
 def _recipe_contains(rd, var):
-    rf = rd.getVar('FILE', True)
+    rf = rd.getVar('FILE')
     varfiles = oe.recipeutils.get_var_files(rf, [var], rd)
     for var, fn in varfiles.items():
         if fn and fn.startswith(os.path.dirname(rf) + os.sep):
@@ -117,7 +121,7 @@ def _write_append(rc, srctree, same_dir, no_same_dir, rev, copied, workspace, d)
     brf = os.path.basename(os.path.splitext(rc)[0]) # rc basename
 
     srctree = os.path.abspath(srctree)
-    pn = d.getVar('PN',True)
+    pn = d.getVar('PN')
     af = os.path.join(appendpath, '%s.bbappend' % brf)
     with open(af, 'w') as f:
         f.write('FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n\n')
@@ -132,7 +136,7 @@ def _write_append(rc, srctree, same_dir, no_same_dir, rev, copied, workspace, d)
         if rev:
             f.write('# initial_rev: %s\n' % rev)
         if copied:
-            f.write('# original_path: %s\n' % os.path.dirname(d.getVar('FILE', True)))
+            f.write('# original_path: %s\n' % os.path.dirname(d.getVar('FILE')))
             f.write('# original_files: %s\n' % ' '.join(copied))
     return af
 
@@ -154,7 +158,7 @@ def _upgrade_error(e, rf, srctree):
     raise DevtoolError(e)
 
 def _get_uri(rd):
-    srcuris = rd.getVar('SRC_URI', True).split()
+    srcuris = rd.getVar('SRC_URI').split()
     if not len(srcuris):
         raise DevtoolError('SRC_URI not found on recipe')
     # Get first non-local entry in SRC_URI - usually by convention it's
@@ -185,7 +189,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tin
 
     crd = rd.createCopy()
 
-    pv = crd.getVar('PV', True)
+    pv = crd.getVar('PV')
     crd.setVar('PV', newpv)
 
     tmpsrctree = None
@@ -270,15 +274,15 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tin
 def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, workspace, tinfoil, rd):
     """Creates the new recipe under workspace"""
 
-    bpn = rd.getVar('BPN', True)
+    bpn = rd.getVar('BPN')
     path = os.path.join(workspace, 'recipes', bpn)
     bb.utils.mkdirhier(path)
     copied, _ = oe.recipeutils.copy_recipe_files(rd, path)
 
-    oldpv = rd.getVar('PV', True)
+    oldpv = rd.getVar('PV')
     if not newpv:
         newpv = oldpv
-    origpath = rd.getVar('FILE', True)
+    origpath = rd.getVar('FILE')
     fullpath = _rename_recipe_files(origpath, bpn, oldpv, newpv, path)
     logger.debug('Upgraded %s => %s' % (origpath, fullpath))
 
@@ -320,7 +324,7 @@ def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, workspace, tinfoil
         newvalues['SRC_URI[md5sum]'] = md5
         newvalues['SRC_URI[sha256sum]'] = sha256
 
-    rd = oe.recipeutils.parse_recipe(tinfoil.cooker, fullpath, None)
+    rd = tinfoil.parse_recipe_file(fullpath, False)
     oe.recipeutils.patch_recipe(rd, fullpath, newvalues)
 
     return fullpath, copied
@@ -341,7 +345,7 @@ def upgrade(args, config, basepath, workspace):
         if not rd:
             return 1
 
-        pn = rd.getVar('PN', True)
+        pn = rd.getVar('PN')
         if pn != args.recipename:
             logger.info('Mapping %s to %s' % (args.recipename, pn))
         if pn in workspace:
@@ -353,17 +357,17 @@ def upgrade(args, config, basepath, workspace):
             srctree = standard.get_default_srctree(config, pn)
 
         standard._check_compatible_recipe(pn, rd)
-        old_srcrev = rd.getVar('SRCREV', True)
+        old_srcrev = rd.getVar('SRCREV')
         if old_srcrev == 'INVALID':
             old_srcrev = None
         if old_srcrev and not args.srcrev:
             raise DevtoolError("Recipe specifies a SRCREV value; you must specify a new one when upgrading")
-        if rd.getVar('PV', True) == args.version and old_srcrev == args.srcrev:
+        if rd.getVar('PV') == args.version and old_srcrev == args.srcrev:
             raise DevtoolError("Current and upgrade versions are the same version")
 
         rf = None
         try:
-            rev1 = standard._extract_source(srctree, False, 'devtool-orig', False, rd)
+            rev1 = standard._extract_source(srctree, False, 'devtool-orig', False, rd, tinfoil)
             rev2, md5, sha256 = _extract_new_source(args.version, srctree, args.no_patch,
                                                     args.srcrev, args.branch, args.keep_temp,
                                                     tinfoil, rd)

@@ -65,7 +65,3 @@ FILES_${PN} = " ${sysconfdir} \
 		${systemd_unitdir}/system/distcc.service"
 FILES_distcc-distmon-gnome = "  ${bindir}/distccmon-gnome \
 				${datadir}/distcc"
-
-pkg_postrm_${PN} () {
-	deluser distcc || true
-}

@@ -8,9 +8,11 @@ LIC_FILES_CHKSUM = "file://src/main.c;beginline=1;endline=10;md5=e98469a8efa024a
 PR = "r7"
 
 SRC_URI = "http://www.hwaci.com/sw/sqlite/sqlite-${PV}.tar.gz \
-    file://mainmk_build_dynamic.patch \
-    file://mainmk_no_tcl.patch \
-    file://sqlite.pc"
+           file://mainmk_build_dynamic.patch \
+           file://mainmk_no_tcl.patch \
+           file://sqlite.pc \
+           file://0001-shell.c-Fix-format-not-a-string-literal-warning.patch \
+           "
 
 SOURCES = "attach.o auth.o btree.o btree_rb.o build.o copy.o date.o delete.o \
            expr.o func.o hash.o insert.o main.o opcodes.o os.o pager.o \

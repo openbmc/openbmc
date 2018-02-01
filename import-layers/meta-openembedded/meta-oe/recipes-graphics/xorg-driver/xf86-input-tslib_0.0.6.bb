@@ -28,8 +28,8 @@ do_configure_prepend() {
 do_install_append() {
     install -d ${D}/${datadir}/hal/fdi/policy/20thirdparty
     install -m 0644 ${WORKDIR}/10-x11-input-tslib.fdi ${D}/${datadir}/hal/fdi/policy/20thirdparty
-    install -d ${D}/lib/udev/rules.d
-    install -m 0644 ${WORKDIR}/99-xf86-input-tslib.rules ${D}/lib/udev/rules.d/
+    install -d ${D}${nonarch_base_libdir}/udev/rules.d
+    install -m 0644 ${WORKDIR}/99-xf86-input-tslib.rules ${D}${nonarch_base_libdir}/udev/rules.d/
 }
 
-FILES_${PN} += "${datadir}/hal /lib/udev"
+FILES_${PN} += "${datadir}/hal ${nonarch_base_libdir}/udev"

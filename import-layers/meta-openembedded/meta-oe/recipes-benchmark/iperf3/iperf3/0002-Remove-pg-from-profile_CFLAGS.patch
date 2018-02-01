@@ -1,0 +1,31 @@
+From 6db0e28f906bc3784019dfb5bb011237a8034fda Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Jul 2017 13:00:16 -0700
+Subject: [PATCH 2/2] Remove -pg from profile_CFLAGS
+
+musl fails to link with missing gcrt1.o
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 23b0c72..6268145 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -49,9 +49,9 @@ iperf3_LDFLAGS          = -g
+ iperf3_profile_SOURCES  = main.c \
+ 						  $(libiperf_la_SOURCES)
+ 
+-iperf3_profile_CFLAGS   = -pg -g
++iperf3_profile_CFLAGS   = -g
+ iperf3_profile_LDADD    = libiperf.la
+-iperf3_profile_LDFLAGS  = -pg -g
++iperf3_profile_LDFLAGS  = -g
+ 
+ # Specify the sources and various flags for the test cases
+ t_timer_SOURCES         = t_timer.c
+-- 
+2.13.3
+

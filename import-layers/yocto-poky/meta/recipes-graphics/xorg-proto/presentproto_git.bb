@@ -9,15 +9,13 @@ DESCRIPTION = "The Present extension provides a way for applications to update t
 
 LICENSE = "GPLv2"
 
-SRCREV = "24f3a56e541b0a9e6c6ee76081f441221a120ef9"
-PV = "1.0+git${SRCPV}"
+SRCREV = "bfdc7e052302c79c5803ad95a73c9b63b350c40c"
+PV = "1.1+git${SRCPV}"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=47e508ca280fde97906eacb77892c3ac"
 
 SRC_URI = "git://anongit.freedesktop.org/git/xorg/proto/presentproto"
 S = "${WORKDIR}/git"
-
-PR = "r1"
 
 inherit autotools
 

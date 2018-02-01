@@ -14,6 +14,8 @@ SRC_URI += "file://check-automake-cross-warning.patch \
             file://autotest-automake-result-format.patch \
             file://add_musl_config.patch \
             file://performance.patch \
+            file://AC_HEADER_MAJOR-port-to-glibc-2.25.patch \
+            file://autoconf-replace-w-option-in-shebangs-with-modern-use-warnings.patch \
            "
 
 SRC_URI[md5sum] = "82d05e03b93e45f5a39b828dc9c6c29b"

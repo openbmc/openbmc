@@ -1,0 +1,31 @@
+From 3215783732b147723e3613cc3c3f83cdcf2ae832 Mon Sep 17 00:00:00 2001
+From: Akira TAGOH <akira@tagoh.org>
+Date: Wed, 22 Jan 2014 18:59:32 +0900
+Subject: [PATCH 2/3] Update autotools macro
+
+---
+ configure.ac | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d559491..8b846a6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -11,10 +11,12 @@ dnl V=0 to make.
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ 
+ AM_MAINTAINER_MODE
+-AM_CONFIG_HEADER([config.h])
++AC_CONFIG_HEADERS([config.h])
+ AC_CONFIG_MACRO_DIR([m4macros])
+ 
+-AC_PROG_LIBTOOL
++LT_PREREQ([2.2])
++LT_INIT([disable-static])
++
+ AC_PROG_INTLTOOL
+ 
+ AC_PROG_CC
+-- 
+2.12.1
+

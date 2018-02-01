@@ -1,0 +1,76 @@
+From 4d3ec1a514f9b1df8ce3a1b04c8a2823d977377f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 6 Mar 2017 21:34:01 -0800
+Subject: [PATCH 2/2] Fix const qualifier error
+
+Fixes clang warning
+error: duplicate 'const' declaration specifier [-Werror,-Wduplicate-decl-specifier]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dict.h    | 2 +-
+ library.c | 2 +-
+ vect.h    | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+Index: git/dict.h
+===================================================================
+--- git.orig/dict.h
++++ git/dict.h
+@@ -90,7 +90,7 @@ int dict_clone(struct dict *target, cons
+ 		assert(_source_d->values.elt_size == sizeof(VALUE_TYPE)); \
+ 		/* Check that callbacks are typed properly.  */		\
+ 		void (*_key_dtor_cb)(KEY_TYPE *, void *) = DTOR_KEY;	\
+-		int (*_key_clone_cb)(KEY_TYPE *, const KEY_TYPE *,	\
++		int (*_key_clone_cb)(KEY_TYPE *, KEY_TYPE *,	\
+ 				     void *) = CLONE_KEY;		\
+ 		void (*_value_dtor_cb)(VALUE_TYPE *, void *) = DTOR_VALUE; \
+ 		int (*_value_clone_cb)(VALUE_TYPE *, const VALUE_TYPE *, \
+Index: git/library.c
+===================================================================
+--- git.orig/library.c
++++ git/library.c
+@@ -353,7 +353,7 @@ static void
+ library_exported_names_init(struct library_exported_names *names)
+ {
+ 	DICT_INIT(&names->names,
+-		  const char*, uint64_t,
++		  char*, uint64_t,
+ 		  dict_hash_string, dict_eq_string, NULL);
+ 	DICT_INIT(&names->addrs,
+ 		  uint64_t, struct vect*,
+Index: git/vect.h
+===================================================================
+--- git.orig/vect.h
++++ git/vect.h
+@@ -66,7 +66,7 @@ int vect_clone(struct vect *target, cons
+ 		assert(_source_vec->elt_size == sizeof(ELT_TYPE));	\
+ 		/* Check that callbacks are typed properly.  */		\
+ 		void (*_dtor_callback)(ELT_TYPE *, void *) = DTOR;	\
+-		int (*_clone_callback)(ELT_TYPE *, const ELT_TYPE *,	\
++		int (*_clone_callback)(ELT_TYPE *, ELT_TYPE *,	\
+ 				       void *) = CLONE;			\
+ 		vect_clone((TGT_VEC), _source_vec,			\
+ 			   (int (*)(void *, const void *,		\
+Index: git/value_dict.c
+===================================================================
+--- git.orig/value_dict.c
++++ git/value_dict.c
+@@ -40,7 +40,7 @@ val_dict_init(struct value_dict *dict)
+ }
+ 
+ static int
+-value_clone_cb(struct value *tgt, const struct value *src, void *data)
++value_clone_cb(struct value *tgt, struct value *src, void *data)
+ {
+ 	return value_clone(tgt, src);
+ }
+@@ -53,7 +53,7 @@ value_dtor(struct value *val, void *data
+ 
+ static int
+ named_value_clone(struct named_value *tgt,
+-		  const struct named_value *src, void *data)
++		  struct named_value *src, void *data)
+ {
+ 	tgt->name = strdup(src->name);
+ 	if (tgt->name == NULL)

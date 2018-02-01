@@ -18,4 +18,4 @@ SRC_URI[sha256sum] = "2b142b1027fb0a62c41347600e01a53fa274dad15445a7da48083c830c
 inherit autotools
 
 # http://errors.yoctoproject.org/Errors/Details/68667/
-PNBLACKLIST[open-vcdiff] ?= "BROKEN: fails to build with gcc-6"
+PNBLACKLIST[open-vcdiff] ?= "BROKEN: fails to build with gcc-6 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

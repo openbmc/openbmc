@@ -45,11 +45,29 @@ class NpmRecipeHandler(RecipeHandler):
             license = data['license']
             if isinstance(license, dict):
                 license = license.get('type', None)
+            if license:
+                if 'OR' in license:
+                    license = license.replace('OR', '|')
+                    license = license.replace('AND', '&')
+                    license = license.replace(' ', '_')
+                    if not license[0] == '(':
+                        license = '(' + license + ')'
+                    print('LICENSE: {}'.format(license))
+                else:
+                    license = license.replace('AND', '&')
+                    if license[0] == '(':
+                        license = license[1:]
+                    if license[-1] == ')':
+                        license = license[:-1]
+                license = license.replace('MIT/X11', 'MIT')
+                license = license.replace('Public Domain', 'PD')
+                license = license.replace('SEE LICENSE IN EULA',
+                                          'SEE-LICENSE-IN-EULA')
         return license
 
-    def _shrinkwrap(self, srctree, localfilesdir, extravalues, lines_before):
+    def _shrinkwrap(self, srctree, localfilesdir, extravalues, lines_before, d):
         try:
-            runenv = dict(os.environ, PATH=tinfoil.config_data.getVar('PATH', True))
+            runenv = dict(os.environ, PATH=d.getVar('PATH'))
             bb.process.run('npm shrinkwrap', cwd=srctree, stderr=subprocess.STDOUT, env=runenv, shell=True)
         except bb.process.ExecutionError as e:
             logger.warn('npm shrinkwrap failed:\n%s' % e.stdout)
@@ -61,8 +79,8 @@ class NpmRecipeHandler(RecipeHandler):
         extravalues['extrafiles']['npm-shrinkwrap.json'] = tmpfile
         lines_before.append('NPM_SHRINKWRAP := "${THISDIR}/${PN}/npm-shrinkwrap.json"')
 
-    def _lockdown(self, srctree, localfilesdir, extravalues, lines_before):
-        runenv = dict(os.environ, PATH=tinfoil.config_data.getVar('PATH', True))
+    def _lockdown(self, srctree, localfilesdir, extravalues, lines_before, d):
+        runenv = dict(os.environ, PATH=d.getVar('PATH'))
         if not NpmRecipeHandler.lockdownpath:
             NpmRecipeHandler.lockdownpath = tempfile.mkdtemp('recipetool-npm-lockdown')
             bb.process.run('npm install lockdown --prefix %s' % NpmRecipeHandler.lockdownpath,
@@ -83,7 +101,7 @@ class NpmRecipeHandler(RecipeHandler):
         extravalues['extrafiles']['lockdown.json'] = tmpfile
         lines_before.append('NPM_LOCKDOWN := "${THISDIR}/${PN}/lockdown.json"')
 
-    def _handle_dependencies(self, d, deps, lines_before, srctree):
+    def _handle_dependencies(self, d, deps, optdeps, devdeps, lines_before, srctree):
         import scriptutils
         # If this isn't a single module we need to get the dependencies
         # and add them to SRC_URI
@@ -92,8 +110,21 @@ class NpmRecipeHandler(RecipeHandler):
                 if not origvalue.startswith('npm://'):
                     src_uri = origvalue.split()
                     changed = False
-                    for dep, depdata in deps.items():
-                        version = self.get_node_version(dep, depdata, d)
+                    deplist = {}
+                    for dep, depver in optdeps.items():
+                        depdata = self.get_npm_data(dep, depver, d)
+                        if self.check_npm_optional_dependency(depdata):
+                            deplist[dep] = depdata
+                    for dep, depver in devdeps.items():
+                        depdata = self.get_npm_data(dep, depver, d)
+                        if self.check_npm_optional_dependency(depdata):
+                            deplist[dep] = depdata
+                    for dep, depver in deps.items():
+                        depdata = self.get_npm_data(dep, depver, d)
+                        deplist[dep] = depdata
+
+                    for dep, depdata in deplist.items():
+                        version = depdata.get('version', None)
                         if version:
                             url = 'npm://registry.npmjs.org;name=%s;version=%s;subdir=node_modules/%s' % (dep, version, dep)
                             scriptutils.fetch_uri(d, url, srctree)
@@ -157,7 +188,9 @@ class NpmRecipeHandler(RecipeHandler):
 
         files = RecipeHandler.checkfiles(srctree, ['package.json'])
         if files:
-            check_npm(tinfoil.config_data)
+            d = bb.data.createCopy(tinfoil.config_data)
+            npm_bindir = check_npm(tinfoil, self._devtool)
+            d.prependVar('PATH', '%s:' % npm_bindir)
 
             data = read_package_json(files[0])
             if 'name' in data and 'version' in data:
@@ -170,18 +203,19 @@ class NpmRecipeHandler(RecipeHandler):
                 if 'homepage' in data:
                     extravalues['HOMEPAGE'] = data['homepage']
 
-                deps = data.get('dependencies', {})
-                updated = self._handle_dependencies(tinfoil.config_data, deps, lines_before, srctree)
+                fetchdev = extravalues['fetchdev'] or None
+                deps, optdeps, devdeps = self.get_npm_package_dependencies(data, fetchdev)
+                updated = self._handle_dependencies(d, deps, optdeps, devdeps, lines_before, srctree)
                 if updated:
                     # We need to redo the license stuff
-                    self._replace_license_vars(srctree, lines_before, handled, extravalues, tinfoil.config_data)
+                    self._replace_license_vars(srctree, lines_before, handled, extravalues, d)
 
                 # Shrinkwrap
                 localfilesdir = tempfile.mkdtemp(prefix='recipetool-npm')
-                self._shrinkwrap(srctree, localfilesdir, extravalues, lines_before)
+                self._shrinkwrap(srctree, localfilesdir, extravalues, lines_before, d)
 
                 # Lockdown
-                self._lockdown(srctree, localfilesdir, extravalues, lines_before)
+                self._lockdown(srctree, localfilesdir, extravalues, lines_before, d)
 
                 # Split each npm module out to is own package
                 npmpackages = oe.package.npm_split_package_dirs(srctree)
@@ -207,7 +241,9 @@ class NpmRecipeHandler(RecipeHandler):
                     packages = OrderedDict((x,y[0]) for x,y in npmpackages.items())
                     packages['${PN}'] = ''
                     pkglicenses = split_pkg_licenses(licvalues, packages, lines_after, licenses)
-                    all_licenses = list(set([item for pkglicense in pkglicenses.values() for item in pkglicense]))
+                    all_licenses = list(set([item.replace('_', ' ') for pkglicense in pkglicenses.values() for item in pkglicense]))
+                    if '&' in all_licenses:
+                        all_licenses.remove('&')
                     # Go back and update the LICENSE value since we have a bit more
                     # information than when that was written out (and we know all apply
                     # vs. there being a choice, so we can join them with &)
@@ -251,17 +287,58 @@ class NpmRecipeHandler(RecipeHandler):
 
     # FIXME this is effectively duplicated from lib/bb/fetch2/npm.py
     # (split out from _getdependencies())
-    def get_node_version(self, pkg, version, d):
+    def get_npm_data(self, pkg, version, d):
         import bb.fetch2
         pkgfullname = pkg
         if version != '*' and not '/' in version:
             pkgfullname += "@'%s'" % version
         logger.debug(2, "Calling getdeps on %s" % pkg)
-        runenv = dict(os.environ, PATH=d.getVar('PATH', True))
+        runenv = dict(os.environ, PATH=d.getVar('PATH'))
         fetchcmd = "npm view %s --json" % pkgfullname
         output, _ = bb.process.run(fetchcmd, stderr=subprocess.STDOUT, env=runenv, shell=True)
         data = self._parse_view(output)
-        return data.get('version', None)
+        return data
+
+    # FIXME this is effectively duplicated from lib/bb/fetch2/npm.py
+    # (split out from _getdependencies())
+    def get_npm_package_dependencies(self, pdata, fetchdev):
+        dependencies = pdata.get('dependencies', {})
+        optionalDependencies = pdata.get('optionalDependencies', {})
+        dependencies.update(optionalDependencies)
+        if fetchdev:
+            devDependencies = pdata.get('devDependencies', {})
+            dependencies.update(devDependencies)
+        else:
+            devDependencies = {}
+        depsfound = {}
+        optdepsfound = {}
+        devdepsfound = {}
+        for dep in dependencies:
+            if dep in optionalDependencies:
+                optdepsfound[dep] = dependencies[dep]
+            elif dep in devDependencies:
+                devdepsfound[dep] = dependencies[dep]
+            else:
+                depsfound[dep] = dependencies[dep]
+        return depsfound, optdepsfound, devdepsfound
+
+    # FIXME this is effectively duplicated from lib/bb/fetch2/npm.py
+    # (split out from _getdependencies())
+    def check_npm_optional_dependency(self, pdata):
+        pkg_os = pdata.get('os', None)
+        if pkg_os:
+            if not isinstance(pkg_os, list):
+                pkg_os = [pkg_os]
+            blacklist = False
+            for item in pkg_os:
+                if item.startswith('!'):
+                    blacklist = True
+                    break
+            if (not blacklist and 'linux' not in pkg_os) or '!linux' in pkg_os:
+                logger.debug(2, "Skipping %s since it's incompatible with Linux" % pkg)
+                return False
+        return True
+
 
 def register_recipe_handlers(handlers):
     handlers.append((NpmRecipeHandler(), 60))

@@ -1,0 +1,36 @@
+From 90098d835b62b38ac396d55b80a684770dbaacde Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Mon, 31 Oct 2016 15:50:52 +0100
+Subject: [PATCH] MenulibreXdg.py: fix loading of desktop files
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+fixes:
+| UnicodeDecodeError: 'ascii' codec can't decode byet 0xd9 in position 235: ordinal not in range(128)
+
+and information display not properly filled.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ menulibre/MenulibreXdg.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/menulibre/MenulibreXdg.py b/menulibre/MenulibreXdg.py
+index e04c5e6..14b2593 100644
+--- a/menulibre/MenulibreXdg.py
++++ b/menulibre/MenulibreXdg.py
+@@ -74,7 +74,7 @@ class MenulibreDesktopEntry:
+ 
+     def load_properties(self, filename):
+         """Load the properties."""
+-        input_file = open(filename)
++        input_file = open(filename, 'rt', encoding='utf-8')
+         self.load_properties_from_text(input_file.read())
+         input_file.close()
+ 
+-- 
+2.5.5
+

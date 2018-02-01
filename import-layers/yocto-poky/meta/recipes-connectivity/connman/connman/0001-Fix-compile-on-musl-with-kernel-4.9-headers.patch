@@ -1,0 +1,64 @@
+From c8bfad4ee9d2c505c00ccbb8b2139543b5ad6fcb Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Mon, 23 Jan 2017 17:41:39 +0200
+Subject: [PATCH] Fix compile on musl with kernel 4.9 headers
+
+Kernel headers break when musl defines IFF_LOWER_UP. While
+waiting for more proper fix in musl, add a hack to connman.
+
+Upstream-Status: Inappropriate [Workaround]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ src/6to4.c     | 4 ++++
+ src/firewall.c | 4 ++++
+ src/iptables.c | 4 ++++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/src/6to4.c b/src/6to4.c
+index 71a2882..1938afb 100644
+--- a/src/6to4.c
++++ b/src/6to4.c
+@@ -24,6 +24,10 @@
+ #include <config.h>
+ #endif
+ 
++/* hack to make sure kernel headers understand that libc (musl)
++   does define IFF_LOWER_UP et al. */
++#define __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO 0
++
+ #include <errno.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/src/firewall.c b/src/firewall.c
+index c440df6..c83def9 100644
+--- a/src/firewall.c
++++ b/src/firewall.c
+@@ -23,6 +23,10 @@
+ #include <config.h>
+ #endif
+ 
++/* hack to make sure kernel headers understand that libc (musl)
++   does define IFF_LOWER_UP et al. */
++#define __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO 0
++
+ #include <errno.h>
+ 
+ #include <xtables.h>
+diff --git a/src/iptables.c b/src/iptables.c
+index 82e3ac4..46ad9e2 100644
+--- a/src/iptables.c
++++ b/src/iptables.c
+@@ -23,6 +23,10 @@
+ #include <config.h>
+ #endif
+ 
++/* hack to make sure kernel headers understand that libc (musl)
++   does define IFF_LOWER_UP et al. */
++#define __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO 0
++
+ #include <getopt.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+-- 
+2.1.4
+

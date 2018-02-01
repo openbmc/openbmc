@@ -4,7 +4,6 @@ vtysh_enable=yes
 
 # Bind all daemons to loopback only by default
 zebra_options=" --daemon -A 127.0.0.1"
-babeld_options="--daemon -A 127.0.0.1"
 bgpd_options="  --daemon -A 127.0.0.1"
 ospfd_options=" --daemon -A 127.0.0.1"
 ospf6d_options="--daemon -A ::1"

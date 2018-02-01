@@ -24,7 +24,7 @@ def handlelink(filep, subdir):
     os.symlink(os.path.relpath(topdir+link, subdir), filep)
 
 for subdir, dirs, files in os.walk(topdir):
-    for f in files:
+    for f in dirs + files:
         filep = os.path.join(subdir, f)
         if os.path.islink(filep):
             #print("Considering %s" % filep)

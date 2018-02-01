@@ -1,0 +1,137 @@
+From 4079c93ac5453ef5f7889ab64920c1e9427690ef Mon Sep 17 00:00:00 2001
+From: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Date: Tue, 17 Feb 2015 16:06:55 +0900
+Subject: [PATCH 6/9] arm64: kdump: set up kernel image segment
+
+On arm64, we can use the same kernel image as 1st kernel, but
+we have to modify the entry point as well as segments' addresses
+in the kernel's elf header in order to load them into correct places.
+
+Upstream-Status: Backport [https://git.linaro.org/people/takahiro.akashi/kexec-tools.git]
+
+Signed-off-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ kexec/arch/arm64/crashdump-arm64.c | 23 +++++++++++++++++++++++
+ kexec/arch/arm64/crashdump-arm64.h |  1 +
+ kexec/arch/arm64/kexec-arm64.c     | 25 ++++++++++++++++++++-----
+ kexec/arch/arm64/kexec-elf-arm64.c | 10 +++++++++-
+ 4 files changed, 53 insertions(+), 6 deletions(-)
+
+diff --git a/kexec/arch/arm64/crashdump-arm64.c b/kexec/arch/arm64/crashdump-arm64.c
+index 8346131..9517329 100644
+--- a/kexec/arch/arm64/crashdump-arm64.c
++++ b/kexec/arch/arm64/crashdump-arm64.c
+@@ -213,3 +213,26 @@ int load_crashdump_segments(struct kexec_info *info)
+ 
+ 	return 0;
+ }
++
++/*
++ * e_entry and p_paddr are actually in virtual address space.
++ * Those values will be translated to physcal addresses by
++ * using virt_to_phys().
++ * So let's get ready for later use so the memory base (phys_offset)
++ * will be correctly replaced with crash_reserved_mem.start.
++ */
++void modify_ehdr_for_crashdump(struct mem_ehdr *ehdr)
++{
++	struct mem_phdr *phdr;
++	int i;
++
++	ehdr->e_entry += - arm64_mem.phys_offset + crash_reserved_mem.start;
++
++	for (i = 0; i < ehdr->e_phnum; i++) {
++		phdr = &ehdr->e_phdr[i];
++		if (phdr->p_type != PT_LOAD)
++			continue;
++		phdr->p_paddr +=
++			(-arm64_mem.phys_offset + crash_reserved_mem.start);
++	}
++}
+diff --git a/kexec/arch/arm64/crashdump-arm64.h b/kexec/arch/arm64/crashdump-arm64.h
+index da75a2d..382f571 100644
+--- a/kexec/arch/arm64/crashdump-arm64.h
++++ b/kexec/arch/arm64/crashdump-arm64.h
+@@ -21,5 +21,6 @@ extern struct memory_range crash_reserved_mem;
+ extern struct memory_range elfcorehdr_mem;
+ 
+ extern int load_crashdump_segments(struct kexec_info *info);
++extern void modify_ehdr_for_crashdump(struct mem_ehdr *ehdr);
+ 
+ #endif /* CRASHDUMP_ARM64_H */
+diff --git a/kexec/arch/arm64/kexec-arm64.c b/kexec/arch/arm64/kexec-arm64.c
+index 8ac811d..cec4e41 100644
+--- a/kexec/arch/arm64/kexec-arm64.c
++++ b/kexec/arch/arm64/kexec-arm64.c
+@@ -307,12 +307,27 @@ unsigned long arm64_locate_kernel_segment(struct kexec_info *info)
+ {
+ 	unsigned long hole;
+ 
+-	hole = locate_hole(info,
+-		arm64_mem.text_offset + arm64_mem.image_size,
+-		MiB(2), 0, ULONG_MAX, 1);
++	if (info->kexec_flags & KEXEC_ON_CRASH) {
++		unsigned long hole_end;
++
++		hole = (crash_reserved_mem.start < mem_min ?
++				mem_min : crash_reserved_mem.start);
++		hole = _ALIGN_UP(hole, MiB(2));
++		hole_end = hole + arm64_mem.text_offset + arm64_mem.image_size;
++
++		if ((hole_end > mem_max) ||
++		    (hole_end > crash_reserved_mem.end)) {
++			dbgprintf("%s: Crash kernel out of range\n", __func__);
++			hole = ULONG_MAX;
++		}
++	} else {
++		hole = locate_hole(info,
++			arm64_mem.text_offset + arm64_mem.image_size,
++			MiB(2), 0, ULONG_MAX, 1);
+ 
+-	if (hole == ULONG_MAX)
+-		dbgprintf("%s: locate_hole failed\n", __func__);
++		if (hole == ULONG_MAX)
++			dbgprintf("%s: locate_hole failed\n", __func__);
++	}
+ 
+ 	return hole;
+ }
+diff --git a/kexec/arch/arm64/kexec-elf-arm64.c b/kexec/arch/arm64/kexec-elf-arm64.c
+index c70a37a..842ce21 100644
+--- a/kexec/arch/arm64/kexec-elf-arm64.c
++++ b/kexec/arch/arm64/kexec-elf-arm64.c
+@@ -9,6 +9,7 @@
+ #include <stdlib.h>
+ #include <linux/elf.h>
+ 
++#include "crashdump-arm64.h"
+ #include "kexec-arm64.h"
+ #include "kexec-elf.h"
+ #include "kexec-syscall.h"
+@@ -105,7 +106,8 @@ int elf_arm64_load(int argc, char **argv, const char *kernel_buf,
+ 	}
+ 
+ 	arm64_mem.vp_offset = _ALIGN_DOWN(ehdr.e_entry, MiB(2));
+-	arm64_mem.vp_offset -= kernel_segment - get_phys_offset();
++	if (!(info->kexec_flags & KEXEC_ON_CRASH))
++		arm64_mem.vp_offset -= kernel_segment - get_phys_offset();
+ 
+ 	dbgprintf("%s: kernel_segment: %016lx\n", __func__, kernel_segment);
+ 	dbgprintf("%s: text_offset:    %016lx\n", __func__,
+@@ -127,6 +129,12 @@ int elf_arm64_load(int argc, char **argv, const char *kernel_buf,
+ 								__func__);
+ 			goto exit;
+ 		}
++
++		/*
++		 * offset addresses in order to fit vmlinux
++		 * (elf_exec) into crash kernel's memory
++		 */
++		modify_ehdr_for_crashdump(&ehdr);
+ 	}
+ 
+ 	/* load the kernel */
+-- 
+1.9.1
+

@@ -21,8 +21,8 @@ class BuildSystem(object):
     def __init__(self, context, d):
         self.d = d
         self.context = context
-        self.layerdirs = [os.path.abspath(pth) for pth in d.getVar('BBLAYERS', True).split()]
-        self.layers_exclude = (d.getVar('SDK_LAYERS_EXCLUDE', True) or "").split()
+        self.layerdirs = [os.path.abspath(pth) for pth in d.getVar('BBLAYERS').split()]
+        self.layers_exclude = (d.getVar('SDK_LAYERS_EXCLUDE') or "").split()
 
     def copy_bitbake_and_layers(self, destdir, workspace_name=None):
         # Copy in all metadata layers + bitbake (as repositories)
@@ -30,7 +30,7 @@ class BuildSystem(object):
         bb.utils.mkdirhier(destdir)
         layers = list(self.layerdirs)
 
-        corebase = os.path.abspath(self.d.getVar('COREBASE', True))
+        corebase = os.path.abspath(self.d.getVar('COREBASE'))
         layers.append(corebase)
 
         # Exclude layers
@@ -46,7 +46,7 @@ class BuildSystem(object):
                 extranum += 1
                 workspace_newname = '%s-%d' % (workspace_name, extranum)
 
-        corebase_files = self.d.getVar('COREBASE_FILES', True).split()
+        corebase_files = self.d.getVar('COREBASE_FILES').split()
         corebase_files = [corebase + '/' +x for x in corebase_files]
         # Make sure bitbake goes in
         bitbake_dir = bb.__file__.rsplit('/', 3)[0]
@@ -100,7 +100,7 @@ class BuildSystem(object):
                 # Drop all bbappends except the one for the image the SDK is being built for
                 # (because of externalsrc, the workspace bbappends will interfere with the
                 # locked signatures if present, and we don't need them anyway)
-                image_bbappend = os.path.splitext(os.path.basename(self.d.getVar('FILE', True)))[0] + '.bbappend'
+                image_bbappend = os.path.splitext(os.path.basename(self.d.getVar('FILE')))[0] + '.bbappend'
                 appenddir = os.path.join(layerdestpath, 'appends')
                 if os.path.isdir(appenddir):
                     for fn in os.listdir(appenddir):
@@ -208,7 +208,7 @@ def create_locked_sstate_cache(lockedsigs, input_sstate_cache, output_sstate_cac
     import shutil
     bb.note('Generating sstate-cache...')
 
-    nativelsbstring = d.getVar('NATIVELSBSTRING', True)
+    nativelsbstring = d.getVar('NATIVELSBSTRING')
     bb.process.run("gen-lockedsig-cache %s %s %s %s %s" % (lockedsigs, input_sstate_cache, output_sstate_cache, nativelsbstring, filterfile or ''))
     if fixedlsbstring and nativelsbstring != fixedlsbstring:
         nativedir = output_sstate_cache + '/' + nativelsbstring

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{# Scripts, for visualization#}
+<!--START-OF-SCRIPTS-->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+google.charts.load('current', {'packages':['corechart']});
+var chartsDrawing = 0;
+</script>
+
+{# Render measurement result charts #}
+{% for test in test_data %}
+  {% if test.status == 'SUCCESS' %}
+    {% for measurement in test.measurements %}
+      {% set chart_elem_id = test.name + '_' + measurement.name + '_chart' %}
+      {% include 'measurement_chart.html' %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+
+<!--END-OF-SCRIPTS-->
+
+{# Styles #}
+<style>
+.meta-table {
+  font-size: 14px;
+  text-align: left;
+  border-collapse: collapse;
+}
+.meta-table tr:nth-child(even){background-color: #f2f2f2}
+meta-table th, .meta-table td {
+  padding: 4px;
+}
+.summary {
+  margin: 0;
+  font-size: 14px;
+  text-align: left;
+  border-collapse: collapse;
+}
+summary th, .meta-table td {
+  padding: 4px;
+}
+.measurement {
+  padding: 8px 0px 8px 8px;
+  border: 2px solid #f0f0f0;
+  margin-bottom: 10px;
+}
+.details {
+  margin: 0;
+  font-size: 12px;
+  text-align: left;
+  border-collapse: collapse;
+}
+.details th {
+  font-weight: normal;
+  padding-right: 8px;
+}
+.preformatted {
+  font-family: monospace;
+  white-space: pre-wrap;
+  background-color: #f0f0f0;
+  margin-left: 10px;
+}
+hr {
+  color: #f0f0f0;
+}
+h2 {
+  font-size: 20px;
+  margin-bottom: 0px;
+  color: #707070;
+}
+h3 {
+  font-size: 16px;
+  margin: 0px;
+  color: #707070;
+}
+</style>
+
+<title>{{ title }}</title>
+</head>
+
+{% macro poky_link(commit) -%}
+    <a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?id={{ commit }}">{{ commit[0:11] }}</a>
+{%- endmacro %}
+
+<body><div style="width: 700px">
+  {# Test metadata #}
+  <h2>General</h2>
+  <hr>
+  <table class="meta-table" style="width: 100%">
+    <tr>
+      <th></th>
+      <th>Current commit</th>
+      <th>Comparing with</th>
+    </tr>
+    {% for key, item in metadata.items() %}
+    <tr>
+      <th>{{ item.title }}</th>
+      {%if key == 'commit' %}
+        <td>{{ poky_link(item.value) }}</td>
+        <td>{{ poky_link(item.value_old) }}</td>
+      {% else %}
+        <td>{{ item.value }}</td>
+        <td>{{ item.value_old }}</td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+
+  {# Test result summary #}
+  <h2>Test result summary</h2>
+  <hr>
+  <table class="summary" style="width: 100%">
+    {% for test in test_data %}
+      {% if loop.index is even %}
+        {% set row_style = 'style="background-color: #f2f2f2"' %}
+      {% else %}
+        {% set row_style = 'style="background-color: #ffffff"' %}
+      {% endif %}
+      <tr {{ row_style }}><td>{{ test.name }}: {{ test.description }}</td>
+      {% if test.status == 'SUCCESS' %}
+        {% for measurement in test.measurements %}
+          {# add empty cell in place of the test name#}
+          {% if loop.index > 1 %}<td></td>{% endif %}
+          {% if measurement.absdiff > 0 %}
+            {% set result_style = "color: red" %}
+          {% elif measurement.absdiff == measurement.absdiff %}
+            {% set result_style = "color: green" %}
+          {% else %}
+            {% set result_style = "color: orange" %}
+          {%endif %}
+          <td>{{ measurement.description }}</td>
+          <td style="font-weight: bold">{{ measurement.value.mean }}</td>
+          <td style="{{ result_style }}">{{ measurement.absdiff_str }}</td>
+          <td style="{{ result_style }}">{{ measurement.reldiff }}</td>
+          </tr><tr {{ row_style }}>
+        {% endfor %}
+      {% else %}
+        <td style="font-weight: bold; color: red;">{{test.status }}</td>
+        <td></td> <td></td> <td></td> <td></td>
+      {% endif %}
+      </tr>
+    {% endfor %}
+  </table>
+
+  {# Detailed test results #}
+  {% for test in test_data %}
+  <h2>{{ test.name }}: {{ test.description }}</h2>
+  <hr>
+    {% if test.status == 'SUCCESS' %}
+      {% for measurement in test.measurements %}
+        <div class="measurement">
+          <h3>{{ measurement.description }}</h3>
+          <div style="font-weight:bold;">
+            <span style="font-size: 23px;">{{ measurement.value.mean }}</span>
+            <span style="font-size: 20px; margin-left: 12px">
+            {% if measurement.absdiff > 0 %}
+            <span style="color: red">
+            {% elif measurement.absdiff == measurement.absdiff %}
+            <span style="color: green">
+            {% else %}
+            <span style="color: orange">
+            {% endif %}
+            {{ measurement.absdiff_str }} ({{measurement.reldiff}})
+            </span></span>
+          </div>
+          <table style="width: 100%">
+            <tr>
+              <td style="width: 75%">
+                {# Linechart #}
+                <div id="{{ test.name }}_{{ measurement.name }}_chart"></div>
+              </td>
+              <td>
+                {# Measurement statistics #}
+                <table class="details">
+                  <tr>
+                    <th>Test runs</th><td>{{ measurement.value.sample_cnt }}</td>
+                  </tr><tr>
+                    <th>-/+</th><td>-{{ measurement.value.minus }} / +{{ measurement.value.plus }}</td>
+                  </tr><tr>
+                    <th>Min</th><td>{{ measurement.value.min }}</td>
+                  </tr><tr>
+                    <th>Max</th><td>{{ measurement.value.max }}</td>
+                  </tr><tr>
+                    <th>Stdev</th><td>{{ measurement.value.stdev }}</td>
+                  </tr><tr>
+                    <th><div id="{{ test.name }}_{{ measurement.name }}_chart_png"></div></th>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
+      {% endfor %}
+    {# Unsuccessful test #}
+    {% else %}
+      <span style="font-size: 150%; font-weight: bold; color: red;">{{ test.status }}
+      {% if test.err_type %}<span style="font-size: 75%; font-weight: normal">({{ test.err_type }})</span>{% endif %}
+      </span>
+      <div class="preformatted">{{ test.message }}</div>
+    {% endif %}
+  {% endfor %}
+</div></body>
+</html>
+

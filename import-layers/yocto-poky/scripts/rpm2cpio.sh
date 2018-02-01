@@ -1,53 +1,55 @@
-#!/bin/sh
+#!/bin/sh -efu
 
-# This comes from the RPM5 5.4.0 distribution.
+# This file comes from rpm 4.x distribution
 
-pkg=$1
-if [ "$pkg" = "" -o ! -e "$pkg" ]; then
-    echo "no package supplied" 1>&2
-   exit 1
-fi
+fatal() {
+	echo "$*" >&2
+	exit 1
+}
 
-leadsize=96
-o=`expr $leadsize + 8`
-set `od -j $o -N 8 -t u1 $pkg`
-il=`expr 256 \* \( 256 \* \( 256 \* $2 + $3 \) + $4 \) + $5`
-dl=`expr 256 \* \( 256 \* \( 256 \* $6 + $7 \) + $8 \) + $9`
-# echo "sig il: $il dl: $dl"
+pkg="$1"
+[ -n "$pkg" -a -e "$pkg" ] ||
+	fatal "No package supplied"
 
-sigsize=`expr 8 + 16 \* $il + $dl`
-o=`expr $o + $sigsize + \( 8 - \( $sigsize \% 8 \) \) \% 8 + 8`
-set `od -j $o -N 8 -t u1 $pkg`
-il=`expr 256 \* \( 256 \* \( 256 \* $2 + $3 \) + $4 \) + $5`
-dl=`expr 256 \* \( 256 \* \( 256 \* $6 + $7 \) + $8 \) + $9`
-# echo "hdr il: $il dl: $dl"
+_dd() {
+	local o="$1"; shift
+	dd if="$pkg" skip="$o" iflag=skip_bytes status=none $*
+}
 
-hdrsize=`expr 8 + 16 \* $il + $dl`
-o=`expr $o + $hdrsize`
-EXTRACTOR="dd if=$pkg ibs=$o skip=1"
+calcsize() {
+	offset=$(($1 + 8))
 
-COMPRESSION=`($EXTRACTOR |file -) 2>/dev/null`
-if echo $COMPRESSION |grep -iq gzip; then
-	DECOMPRESSOR=gunzip
-elif echo $COMPRESSION |grep -iq bzip2; then
-	DECOMPRESSOR=bunzip2
-elif echo $COMPRESSION |grep -iq xz; then
-	DECOMPRESSOR=unxz
-elif echo $COMPRESSION |grep -iq cpio; then
-	DECOMPRESSOR=cat
-else
-	# Most versions of file don't support LZMA, therefore we assume
-	# anything not detected is LZMA
-	DECOMPRESSOR=`which unlzma 2>/dev/null`
-	case "$DECOMPRESSOR" in
-	    /* ) ;;
-	    *  ) DECOMPRESSOR=`which lzmash 2>/dev/null`
-	         case "$DECOMPRESSOR" in
-	             /* ) DECOMPRESSOR="lzmash -d -c" ;;
-	             *  ) DECOMPRESSOR=cat ;;
-	         esac
-	         ;;
-	esac
-fi
+	local i b b0 b1 b2 b3 b4 b5 b6 b7
 
-$EXTRACTOR 2>/dev/null | $DECOMPRESSOR
+	i=0
+	while [ $i -lt 8 ]; do
+		b="$(_dd $(($offset + $i)) bs=1 count=1)"
+		[ -z "$b" ] &&
+			b="0" ||
+			b="$(exec printf '%u\n' "'$b")"
+		eval "b$i=\$b"
+		i=$(($i + 1))
+	done
+
+	rsize=$((8 + ((($b0 << 24) + ($b1 << 16) + ($b2 << 8) + $b3) << 4) + ($b4 << 24) + ($b5 << 16) + ($b6 << 8) + $b7))
+	offset=$(($offset + $rsize))
+}
+
+case "$(_dd 0 bs=8 count=1)" in
+	"$(printf '\355\253\356\333')"*) ;; # '\xed\xab\xee\xdb'
+	*) fatal "File doesn't look like rpm: $pkg" ;;
+esac
+
+calcsize 96
+sigsize=$rsize
+
+calcsize $(($offset + (8 - ($sigsize % 8)) % 8))
+hdrsize=$rsize
+
+case "$(_dd $offset bs=3 count=1)" in
+	"$(printf '\102\132')"*) _dd $offset | bunzip2 ;; # '\x42\x5a'
+	"$(printf '\037\213')"*) _dd $offset | gunzip  ;; # '\x1f\x8b'
+	"$(printf '\375\067')"*) _dd $offset | xzcat   ;; # '\xfd\x37'
+	"$(printf '\135\000')"*) _dd $offset | unlzma  ;; # '\x5d\x00'
+	*) fatal "Unrecognized rpm file: $pkg" ;;
+esac

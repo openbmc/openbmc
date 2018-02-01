@@ -1,0 +1,30 @@
+From 2e0c5c66786016f6443da2c1ff15ad77f018ec9b Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Mon, 24 Apr 2017 16:12:05 -0400
+Subject: [PATCH] lib/Makefile: overwrite install-lib, to allow multiarch
+
+I am not sure why Yocto installs python modules in arch specific
+/usr/libXX directories but it does. Allow the recipe to pass this via
+INSTALL_LIB.
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ lib/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Makefile b/lib/Makefile
+index f1c0821..c714d12 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -56,7 +56,7 @@ install: lib-c lib-py ../crit/crit c/criu.pc.in
+ 	$(Q) sed -e 's,@version@,$(CRIU_VERSION),' -e 's,@libdir@,$(LIBDIR),' -e 's,@includedir@,$(dir $(INCLUDEDIR)),' c/criu.pc.in > c/criu.pc
+ 	$(Q) install -m 644 c/criu.pc $(DESTDIR)$(LIBDIR)/pkgconfig
+ 	$(E) "  INSTALL " crit
+-	$(Q) python ../scripts/crit-setup.py install --root=$(DESTDIR) --prefix=$(PREFIX) --record $(CRIT_SETUP_FILES)
++	$(Q) python ../scripts/crit-setup.py install --root=$(DESTDIR) --prefix=$(PREFIX) --record $(CRIT_SETUP_FILES) --install-lib=$(INSTALL_LIB)
+ .PHONY: install
+ 
+ uninstall:
+-- 
+2.7.4
+

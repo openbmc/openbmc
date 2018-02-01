@@ -40,49 +40,28 @@ done
 if [ $readonly_rootfs = "1" ]; then
   mkdir -p /var/lib/dropbear
   DROPBEAR_RSAKEY_DEFAULT="/var/lib/dropbear/dropbear_rsa_host_key"
-  DROPBEAR_DSSKEY_DEFAULT="/var/lib/dropbear/dropbear_dss_host_key"
 else
   DROPBEAR_RSAKEY_DEFAULT="/etc/dropbear/dropbear_rsa_host_key"
-  DROPBEAR_DSSKEY_DEFAULT="/etc/dropbear/dropbear_dss_host_key"
 fi
 
 test -z "$DROPBEAR_BANNER" || \
   DROPBEAR_EXTRA_ARGS="$DROPBEAR_EXTRA_ARGS -b $DROPBEAR_BANNER"
 test -n "$DROPBEAR_RSAKEY" || \
   DROPBEAR_RSAKEY=$DROPBEAR_RSAKEY_DEFAULT
-test -n "$DROPBEAR_DSSKEY" || \
-  DROPBEAR_DSSKEY=$DROPBEAR_DSSKEY_DEFAULT
-test -n "$DROPBEAR_KEYTYPES" || \
-  DROPBEAR_KEYTYPES="rsa"
 
 gen_keys() {
-for t in $DROPBEAR_KEYTYPES; do
-  case $t in
-    rsa)
-        if [ -f "$DROPBEAR_RSAKEY" -a ! -s "$DROPBEAR_RSAKEY" ]; then
-                rm $DROPBEAR_RSAKEY || true
-        fi
-        test -f $DROPBEAR_RSAKEY || dropbearkey -t rsa -f $DROPBEAR_RSAKEY $DROPBEAR_RSAKEY_ARGS
-	;;
-    dsa)
-        if [ -f "$DROPBEAR_DSSKEY" -a ! -s "$DROPBEAR_DSSKEY" ]; then
-                rm $DROPBEAR_DSSKEY || true
-        fi
-        test -f $DROPBEAR_DSSKEY || dropbearkey -t dss -f $DROPBEAR_DSSKEY $DROPBEAR_DSSKEY_ARGS
-	;;
-  esac
-done
+    if [ -f "$DROPBEAR_RSAKEY" -a ! -s "$DROPBEAR_RSAKEY" ]; then
+        rm $DROPBEAR_RSAKEY || true
+    fi
+    test -f $DROPBEAR_RSAKEY || dropbearkey -t rsa -f $DROPBEAR_RSAKEY $DROPBEAR_RSAKEY_ARGS
 }
 
 case "$1" in
   start)
 	echo -n "Starting $DESC: "
 	gen_keys
-	KEY_ARGS=""
-	test -f $DROPBEAR_DSSKEY && KEY_ARGS="$KEY_ARGS -d $DROPBEAR_DSSKEY"
-	test -f $DROPBEAR_RSAKEY && KEY_ARGS="$KEY_ARGS -r $DROPBEAR_RSAKEY"
 	start-stop-daemon -S -p $PIDFILE \
-	  -x "$DAEMON" -- $KEY_ARGS \
+	  -x "$DAEMON" -- -r $DROPBEAR_RSAKEY \
 	    -p "$DROPBEAR_PORT" $DROPBEAR_EXTRA_ARGS
 	echo "$NAME."
 	;;
@@ -95,11 +74,8 @@ case "$1" in
 	echo -n "Restarting $DESC: "
 	start-stop-daemon -K -x "$DAEMON" -p $PIDFILE
 	sleep 1
-	KEY_ARGS=""
-	test -f $DROPBEAR_DSSKEY && KEY_ARGS="$KEY_ARGS -d $DROPBEAR_DSSKEY"
-	test -f $DROPBEAR_RSAKEY && KEY_ARGS="$KEY_ARGS -r $DROPBEAR_RSAKEY"
 	start-stop-daemon -S -p $PIDFILE \
-	  -x "$DAEMON" -- $KEY_ARGS \
+	  -x "$DAEMON" -- -r $DROPBEAR_RSAKEY \
 	    -p "$DROPBEAR_PORT" $DROPBEAR_EXTRA_ARGS
 	echo "$NAME."
 	;;

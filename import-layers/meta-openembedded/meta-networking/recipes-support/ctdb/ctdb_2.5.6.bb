@@ -27,6 +27,9 @@ PACKAGECONFIG[libtdb] = "--without-included-tdb,--with-included-tdb,libtdb"
 PARALLEL_MAKE = ""
 
 DEPENDS += "popt libtevent libtalloc libldb"
+DEPENDS_append_libc-musl = " libtirpc"
+CFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc"
+LDFLAGS_append_libc-musl = " -ltirpc"
 
 # ctdbd_wrapper requires pgrep, hence procps
 RDEPENDS_${PN} += "procps"

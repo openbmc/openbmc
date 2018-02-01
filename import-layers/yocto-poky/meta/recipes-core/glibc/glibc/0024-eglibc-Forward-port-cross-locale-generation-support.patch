@@ -1,7 +1,7 @@
-From 11d7633178301add26a24657e2f1596a2f7dddce Mon Sep 17 00:00:00 2001
+From 82516e3ed372f618c886a2de4f9498f597aa8a8b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:33:49 +0000
-Subject: [PATCH 24/25] eglibc: Forward port cross locale generation support
+Subject: [PATCH 24/26] eglibc: Forward port cross locale generation support
 
 Upstream-Status: Pending
 
@@ -91,7 +91,7 @@ index 0000000..9fad357
 +    [LC_ALL] = sizeof ("LC_ALL") - 1
 +  };
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index 94627f3..d0db77b 100644
+index 1f4da92..7f68935 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
 @@ -224,7 +224,7 @@ __libc_tsd_define (extern, __locale_t, LOCALE)
@@ -363,10 +363,10 @@ index b885f65..0afb631 100644
    size_t bufmax = 56;
  
 diff --git a/locale/programs/localedef.c b/locale/programs/localedef.c
-index 6becd9a..8ddd080 100644
+index b4c48f1..ed08d48 100644
 --- a/locale/programs/localedef.c
 +++ b/locale/programs/localedef.c
-@@ -114,6 +114,7 @@ void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+@@ -108,6 +108,7 @@ void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
  #define OPT_LIST_ARCHIVE 309
  #define OPT_LITTLE_ENDIAN 400
  #define OPT_BIG_ENDIAN 401
@@ -374,7 +374,7 @@ index 6becd9a..8ddd080 100644
  
  /* Definitions of arguments for argp functions.  */
  static const struct argp_option options[] =
-@@ -150,6 +151,8 @@ static const struct argp_option options[] =
+@@ -143,6 +144,8 @@ static const struct argp_option options[] =
      N_("Generate little-endian output") },
    { "big-endian", OPT_BIG_ENDIAN, NULL, 0,
      N_("Generate big-endian output") },
@@ -383,7 +383,7 @@ index 6becd9a..8ddd080 100644
    { NULL, 0, NULL, 0, NULL }
  };
  
-@@ -239,12 +242,14 @@ main (int argc, char *argv[])
+@@ -232,12 +235,14 @@ main (int argc, char *argv[])
       ctype locale.  (P1003.2 4.35.5.2)  */
    setlocale (LC_CTYPE, "POSIX");
  
@@ -398,7 +398,7 @@ index 6becd9a..8ddd080 100644
  
    /* Process charmap file.  */
    charmap = charmap_read (charmap_file, verbose, 1, be_quiet, 1);
-@@ -338,6 +343,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
+@@ -328,6 +333,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
      case OPT_BIG_ENDIAN:
        set_big_endian (true);
        break;
@@ -562,5 +562,5 @@ index 69b3141..1cef0be 100644
  # define WEAK_POSTLOAD(postload) weak_extern (postload)
  #else
 -- 
-2.8.2
+2.10.2
 

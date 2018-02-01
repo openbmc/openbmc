@@ -3,8 +3,8 @@ inherit linux-kernel-base
 def get_dts(d, ver=None):
     import re
 
-    staging_dir = d.getVar("STAGING_KERNEL_BUILDDIR", True)
-    dts = d.getVar("KERNEL_DEVICETREE", True)
+    staging_dir = d.getVar("STAGING_KERNEL_BUILDDIR")
+    dts = d.getVar("KERNEL_DEVICETREE")
 
     # d.getVar() might return 'None' as a normal string
     # leading to 'is None' check isn't enough.

@@ -1,0 +1,53 @@
+From db1d9cc82b68f6593360d66ef40cb6b0fc377e6e Mon Sep 17 00:00:00 2001
+From: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
+Date: Fri, 19 May 2017 04:27:50 +0900
+Subject: [PATCH] To fix errors as following:
+
+"test_main.cpp:45: undefined reference to `parseCustomOptions(int, char**)'"
+"perf_abs.cpp:13: undefined reference to `cvtest::param_seed'"
+"test_superres.cpp:270: undefined reference to `checkIppStatus()'"
+
+Signed-off-by: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
+---
+ modules/ts/include/opencv2/ts.hpp        | 4 ++--
+ modules/ts/include/opencv2/ts/ts_ext.hpp | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/ts/include/opencv2/ts.hpp b/modules/ts/include/opencv2/ts.hpp
+index c573905..7ff6cc1 100644
+--- a/modules/ts/include/opencv2/ts.hpp
++++ b/modules/ts/include/opencv2/ts.hpp
+@@ -539,7 +539,7 @@ protected:
+     }
+ };
+ 
+-extern uint64 param_seed;
++CV_EXPORTS extern uint64 param_seed;
+ 
+ struct CV_EXPORTS DefaultRngAuto
+ {
+@@ -602,7 +602,7 @@ void dumpOpenCLDevice();
+ #define TEST_DUMP_OCL_INFO
+ #endif
+ 
+-void parseCustomOptions(int argc, char **argv);
++CV_EXPORTS void parseCustomOptions(int argc, char **argv);
+ 
+ #define CV_TEST_MAIN(resourcesubdir, ...) \
+ int main(int argc, char **argv) \
+diff --git a/modules/ts/include/opencv2/ts/ts_ext.hpp b/modules/ts/include/opencv2/ts/ts_ext.hpp
+index 05ccc63..8075065 100644
+--- a/modules/ts/include/opencv2/ts/ts_ext.hpp
++++ b/modules/ts/include/opencv2/ts/ts_ext.hpp
+@@ -9,7 +9,7 @@
+ #define OPENCV_TS_EXT_HPP
+ 
+ namespace cvtest {
+-void checkIppStatus();
++CV_EXPORTS void checkIppStatus();
+ }
+ 
+ #define CV_TEST_INIT \
+-- 
+2.7.4
+

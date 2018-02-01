@@ -11,7 +11,7 @@ diff --git a/src/useradd.c b/src/useradd.c
 index 4bd969d..cb5dd6c 100644
 --- a/src/useradd.c
 +++ b/src/useradd.c
-@@ -1893,6 +1893,35 @@ static void usr_update (void)
+@@ -1896,6 +1896,35 @@ static void usr_update (void)
  }
  
  /*
@@ -47,7 +47,7 @@ index 4bd969d..cb5dd6c 100644
   * create_home - create the user's home directory
   *
   *	create_home() creates the user's home directory if it does not
-@@ -1907,36 +1936,33 @@ static void create_home (void)
+@@ -1910,39 +1939,36 @@ static void create_home (void)
  			fail_exit (E_HOMEDIR);
  		}
  #endif
@@ -67,6 +67,9 @@ index 4bd969d..cb5dd6c 100644
 -		chown (user_home, user_id, user_gid);
 -		chmod (user_home,
 -		       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
+-#ifdef WITH_ATTR
+-		attr_copy_file (def_template, user_home, NULL, NULL);
+-#endif
 -		home_added = true;
 +		mkdir_p(user_home);
 +	}
@@ -88,6 +91,9 @@ index 4bd969d..cb5dd6c 100644
 +	chown (user_home, user_id, user_gid);
 +	chmod (user_home,
 +	       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
++#ifdef WITH_ATTR
++	attr_copy_file (def_template, user_home, NULL, NULL);
++#endif
 +	home_added = true;
 +#ifdef WITH_AUDIT
 +	audit_logger (AUDIT_ADD_USER, Prog,

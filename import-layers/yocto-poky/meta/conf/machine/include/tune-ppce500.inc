@@ -11,7 +11,7 @@ TARGET_FPU .= "${@bb.utils.contains('TUNE_FEATURES', [ 'ppce500' , 'spe' ], 'ppc
 
 # spe is defined potentially in two places, so we want to be sure it will
 # only write spe once to the ABIEXTENSIONS field.
-SPEABIEXTENSION = "${@bb.utils.contains('TUNE_FEATURES', 'spe', 'spe', '', d)}"
+SPEABIEXTENSION = "${@bb.utils.filter('TUNE_FEATURES', 'spe', d)}"
 ABIEXTENSION .= "${SPEABIEXTENSION}"
 
 AVAILTUNES += "ppce500"

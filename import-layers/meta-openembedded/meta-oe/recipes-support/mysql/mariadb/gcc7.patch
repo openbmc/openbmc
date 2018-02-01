@@ -1,0 +1,13 @@
+Index: mariadb-5.5.55/client/mysql.cc
+===================================================================
+--- mariadb-5.5.55.orig/client/mysql.cc
++++ mariadb-5.5.55/client/mysql.cc
+@@ -2850,7 +2850,7 @@ You can turn off this feature to get a q
+         mysql_free_result(fields);
+         break;
+       }
+-      field_names[i][num_fields*2]= '\0';
++      field_names[i][num_fields*2][0]= '\0';
+       j=0;
+       while ((sql_field=mysql_fetch_field(fields)))
+       {

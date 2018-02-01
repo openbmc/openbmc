@@ -1,0 +1,48 @@
+From 9c8d545152b35d8943be72b9503414a53e1ebf7c Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Dec 2016 18:29:37 +0200
+Subject: [PATCH 30/30] Run python scripts using env
+
+Otherwise the build tools hardcode the python path into them.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ bin/dnf-automatic.in | 2 +-
+ bin/dnf.in           | 2 +-
+ bin/yum.in           | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/bin/dnf-automatic.in b/bin/dnf-automatic.in
+index 5b06aa26..9f6f703e 100755
+--- a/bin/dnf-automatic.in
++++ b/bin/dnf-automatic.in
+@@ -1,4 +1,4 @@
+-#!@PYTHON_EXECUTABLE@
++#!/usr/bin/env python3
+ # dnf-automatic executable.
+ #
+ # Copyright (C) 2014-2016 Red Hat, Inc.
+diff --git a/bin/dnf.in b/bin/dnf.in
+index 645d0f06..ab141abd 100755
+--- a/bin/dnf.in
++++ b/bin/dnf.in
+@@ -1,4 +1,4 @@
+-#!@PYTHON_EXECUTABLE@
++#!/usr/bin/env python3
+ # The dnf executable script.
+ #
+ # Copyright (C) 2012-2016 Red Hat, Inc.
+diff --git a/bin/yum.in b/bin/yum.in
+index f1fee071..013dc8c5 100755
+--- a/bin/yum.in
++++ b/bin/yum.in
+@@ -1,4 +1,4 @@
+-#!@PYTHON_EXECUTABLE@
++#!/usr/bin/env python3
+ # The dnf executable script.
+ #
+ # Copyright (C) 2016 Red Hat, Inc.
+-- 
+2.11.0
+

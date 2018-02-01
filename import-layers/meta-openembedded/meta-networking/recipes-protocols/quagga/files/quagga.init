@@ -26,7 +26,7 @@ D_PATH=/usr/sbin
 C_PATH=/etc/quagga
 
 # Keep zebra first and do not list watchquagga!
-DAEMONS="zebra bgpd ripd ripngd ospfd ospf6d isisd babeld"
+DAEMONS="zebra bgpd ripd ripngd ospfd ospf6d isisd"
 
 # Print the name of the pidfile.
 pidfile()

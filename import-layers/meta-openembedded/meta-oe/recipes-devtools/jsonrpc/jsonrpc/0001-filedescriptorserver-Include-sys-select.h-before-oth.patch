@@ -1,0 +1,34 @@
+From c7aad10628949e126f50e3264b5bc7eb417347c6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 21 Nov 2016 01:25:10 -0800
+Subject: [PATCH] filedescriptorserver: Include sys/select.h before other
+ headers
+
+Fixes errors e.g.
+| /mnt/a/build/tmp-glibc/work/cortexa7hf-neon-vfpv4-oe-linux-gnueabi/jsonrpc/0.7.0-r0/git/src/jsonrpccp
+p/server/connectors/filedescriptorserver.h:63:7: error: unknown type name 'fd_set'
+|       fd_set read_fds;
+|       ^
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/jsonrpccpp/server/connectors/filedescriptorserver.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/jsonrpccpp/server/connectors/filedescriptorserver.cpp b/src/jsonrpccpp/server/connectors/filedescriptorserver.cpp
+index 9d74223..8e019ca 100644
+--- a/src/jsonrpccpp/server/connectors/filedescriptorserver.cpp
++++ b/src/jsonrpccpp/server/connectors/filedescriptorserver.cpp
+@@ -7,8 +7,8 @@
+  * @license See attached LICENSE.txt
+  ************************************************************************/
+ 
+-#include "filedescriptorserver.h"
+ #include <sys/select.h>
++#include "filedescriptorserver.h"
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
+-- 
+2.10.2
+

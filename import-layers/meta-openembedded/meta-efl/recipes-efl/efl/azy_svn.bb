@@ -34,4 +34,4 @@ S = "${WORKDIR}/${SRCNAME}"
 # sysroots/qemuarm/usr/include/c++/5.2.0/bits/basic_string.h:4780:5: error: reference to 'basic_string' is ambiguous
 #     basic_string<_CharT, _Traits, _Alloc>
 #     ^
-PNBLACKLIST[azy] ?= "OLD and doesn't build with gcc-5"
+PNBLACKLIST[azy] ?= "OLD and doesn't build with gcc-5 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

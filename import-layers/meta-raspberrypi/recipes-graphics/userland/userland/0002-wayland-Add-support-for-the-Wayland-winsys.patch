@@ -1,7 +1,7 @@
-From e3d2d0007e1c6c32ab7d9a28f1e399d42b511333 Mon Sep 17 00:00:00 2001
+From 15fb270f438f4ef1413192b5ce1e0dc784b45d9e Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH 02/12] wayland: Add support for the Wayland winsys
+Subject: [PATCH 02/15] wayland: Add support for the Wayland winsys
 
 * Adds EGL_WL_bind_wayland_display extension
 * Adds wayland-egl library
@@ -17,7 +17,7 @@ TODO: wl_dispmanx_server_buffer should probably be defined in a
 private header that can be included from EGL and vc_* instead of in
 vc_vchi_dispmanx.h
 ---
- .gitignore                                         |   2 +
+ .gitignore                                         |   1 +
  CMakeLists.txt                                     |  11 +
  README.md                                          |   4 +
  buildme                                            |  10 +-
@@ -47,7 +47,7 @@ vc_vchi_dispmanx.h
  interface/vmcs_host/vc_vchi_dispmanx.h             |  15 ++
  interface/wayland/dispmanx.xml                     | 123 +++++++++++
  makefiles/cmake/Wayland.cmake                      |  72 ++++++
- 30 files changed, 1258 insertions(+), 98 deletions(-)
+ 30 files changed, 1257 insertions(+), 98 deletions(-)
  create mode 100644 interface/khronos/common/linux/khrn_wayland.c
  copy interface/{vmcs_host/vc_vchi_dispmanx.h => khronos/common/linux/khrn_wayland.h} (56%)
  create mode 100644 interface/khronos/ext/egl_wayland.c
@@ -58,17 +58,16 @@ vc_vchi_dispmanx.h
  create mode 100644 makefiles/cmake/Wayland.cmake
 
 diff --git a/.gitignore b/.gitignore
-index 4a88665..5da71a9 100644
+index 63570f1..1459436 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -13,3 +13,5 @@ build/
- *.lai
- *.la
- *.a
-+
+@@ -30,3 +30,4 @@ build/
+ *.pts
+ *.ppm
+ *.mkv
 +*~
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 98252c3..d6ae907 100644
+index cfc8ae5..673a5ad 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -24,6 +24,17 @@ include(makefiles/cmake/global_settings.cmake)
@@ -102,7 +101,7 @@ index 358d2b4..4da4448 100644
 +
 +$ BUILD_WAYLAND=1 ./buildme.
 diff --git a/buildme b/buildme
-index 1061745..d0e6e54 100755
+index b8fd440..a780bb6 100755
 --- a/buildme
 +++ b/buildme
 @@ -8,6 +8,10 @@ fi
@@ -117,7 +116,7 @@ index 1061745..d0e6e54 100755
  	# Native compile on the Raspberry Pi
  	mkdir -p build/raspberry/$BUILDSUBDIR
 @@ -32,9 +36,13 @@ elif [ "$1" = "--native" ]; then
- 	make -j 6 $*
+ 	make -j `nproc` $*
  else
  	# Cross compile on a more capable machine
 +	if [ -n "$BUILD_WAYLAND" ]; then
@@ -128,7 +127,7 @@ index 1061745..d0e6e54 100755
  	pushd build/arm-linux/$BUILDSUBDIR
 -	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ../../..
 +	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE $WAYLAND_VARS ../../..
- 	make -j 6
+ 	make -j `nproc`
  
  	if [ "$1" != "" ]; then
 diff --git a/host_applications/linux/apps/raspicam/CMakeLists.txt b/host_applications/linux/apps/raspicam/CMakeLists.txt
@@ -808,16 +807,16 @@ index b8bb374..03fe67b 100644
  /*
  TODO: do an RPC call to make sure the Khronos vll is loaded (and that it stays loaded until eglTerminate)
  Also affects global image (and possibly others?)
-@@ -451,6 +444,9 @@ EGLAPI const char EGLAPIENTRY * eglQueryString(EGLDisplay dpy, EGLint name)
+@@ -450,6 +443,9 @@ EGLAPI const char EGLAPIENTRY * eglQueryString(EGLDisplay dpy, EGLint name)
+ #ifdef EGL_KHR_fence_sync
              "EGL_KHR_fence_sync "
  #endif
- #endif
++#endif
 +#if EGL_WL_bind_wayland_display
 +            "EGL_WL_bind_wayland_display "
-+#endif
+ #endif
              ;
           break;
-       case EGL_VENDOR:
 @@ -655,8 +651,7 @@ EGLAPI EGLSurface EGLAPIENTRY eglCreateWindowSurface(EGLDisplay dpy, EGLConfig c
                                  false,
                                  EGL_NO_TEXTURE,
@@ -1542,7 +1541,7 @@ index 0000000..8bafc15
 +Libs: -L${libdir} -lwayland-egl
 +Cflags: -I${includedir}
 diff --git a/interface/vmcs_host/CMakeLists.txt b/interface/vmcs_host/CMakeLists.txt
-index 0b3adc9..f44d01f 100755
+index fde18da..6718215 100755
 --- a/interface/vmcs_host/CMakeLists.txt
 +++ b/interface/vmcs_host/CMakeLists.txt
 @@ -9,13 +9,24 @@ add_definitions(-fno-strict-aliasing)
@@ -1551,12 +1550,12 @@ index 0b3adc9..f44d01f 100755
  
 -add_library(vchostif
 -            ${VMCS_TARGET}/vcfilesys.c ${VMCS_TARGET}/vcmisc.c
--            vc_vchi_gencmd.c vc_vchi_filesys.c
+-            vc_vchi_gencmd.c vc_vchi_filesys.c vc_vchi_gpuserv.c
 -            vc_vchi_tvservice.c vc_vchi_cecservice.c
 -            vc_vchi_dispmanx.c vc_service_common.c)
 +set(VCHOSTIF_SOURCE
 +    ${VMCS_TARGET}/vcfilesys.c ${VMCS_TARGET}/vcmisc.c
-+    vc_vchi_gencmd.c vc_vchi_filesys.c
++    vc_vchi_gencmd.c vc_vchi_filesys.c vc_vchi_gpuserv.c
 +    vc_vchi_tvservice.c vc_vchi_cecservice.c
 +    vc_vchi_dispmanx.c vc_service_common.c)
  #            ${VMCS_TARGET}/vmcs_main.c
@@ -1604,7 +1603,7 @@ index 37fdae1..fe3619a 100755
  }
  #endif
 diff --git a/interface/vmcs_host/vc_vchi_dispmanx.c b/interface/vmcs_host/vc_vchi_dispmanx.c
-index 133e86d..45f4cff 100755
+index 7a6cdcd..eab146e 100755
 --- a/interface/vmcs_host/vc_vchi_dispmanx.c
 +++ b/interface/vmcs_host/vc_vchi_dispmanx.c
 @@ -1319,3 +1319,45 @@ static void *dispmanx_notify_func( void *arg ) {
@@ -1885,5 +1884,5 @@ index 0000000..ad90d30
 +    set(${_sources} ${${_sources}} PARENT_SCOPE)
 +endfunction()
 -- 
-2.10.2
+2.15.0
 

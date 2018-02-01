@@ -39,3 +39,5 @@ INITSCRIPT_NAME = "exquisite"
 INITSCRIPT_PARAMS = "start 01 S . stop 20 0 1 6 ."
 
 FILES_${PN} += "/mnt/.splash/"
+
+PNBLACKLIST[exquisite] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130619/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

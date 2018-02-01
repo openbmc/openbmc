@@ -274,9 +274,13 @@ var libtoaster = (function () {
   }
 
   function _addRmLayer(layerObj, add, doneCb){
+    if (layerObj.xhrLayerUrl === undefined){
+      throw("xhrLayerUrl is undefined")
+    }
+
     if (add === true) {
       /* If adding get the deps for this layer */
-      libtoaster.getLayerDepsForProject(layerObj.layerdetailurl,
+      libtoaster.getLayerDepsForProject(layerObj.xhrLayerUrl,
         function (layers) {
 
         /* got result for dependencies */
@@ -542,11 +546,9 @@ $(document).ready(function() {
     }
 
     /*
-     * PrettyPrint plugin.
-     *
+     * highlight plugin.
      */
-    // Init
-    prettyPrint();
+    hljs.initHighlightingOnLoad();
 
     // Prevent invalid links from jumping page scroll
     $('a[href=#]').click(function() {

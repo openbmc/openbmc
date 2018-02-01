@@ -1,0 +1,26 @@
+From 97f0b7b25474fab25f5757f7c50a77e20be5d05b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Dvo=C5=99=C3=A1k?= <valtri@civ.zcu.cz>
+Date: Mon, 7 Sep 2015 15:00:48 +0200
+Subject: [PATCH] Use the API properly in the example (format security error
+ fixed).
+
+---
+ examples/helloworld1/mylog.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/helloworld1/mylog.h b/examples/helloworld1/mylog.h
+index 280f3dc..57e5369 100644
+--- a/examples/helloworld1/mylog.h
++++ b/examples/helloworld1/mylog.h
+@@ -39,7 +39,7 @@ static LOG4C_INLINE int mylog_fini(){
+ 
+ static LOG4C_INLINE void mylog_msg(char *catName,int a_priority, char *msg){
+ #ifndef WITHOUT_LOG4C
+-	log4c_category_log(log4c_category_get(catName), a_priority, msg);
++	log4c_category_log(log4c_category_get(catName), a_priority, "%s", msg);
+ #else
+ 	printf(msg);
+ #endif
+-- 
+2.12.0
+

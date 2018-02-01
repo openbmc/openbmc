@@ -1,0 +1,590 @@
+libxml2-2.9.4: Avoid reparsing and simplify control flow in xmlParseStartTag2
+
+[No upstream tracking]
+
+parser: Avoid reparsing in xmlParseStartTag2
+
+The code in xmlParseStartTag2 must handle the case that the input
+buffer was grown and reallocated which can invalidate pointers to
+attribute values. Before, this was handled by detecting changes of
+the input buffer "base" pointer and, in case of a change, jumping
+back to the beginning of the function and reparsing the start tag.
+
+The major problem of this approach is that whether an input buffer is
+reallocated is nondeterministic, resulting in seemingly random test
+failures. See the mailing list thread "runtest mystery bug: name2.xml
+error case regression test" from 2012, for example.
+
+If a reallocation was detected, the code also made no attempts to
+continue parsing in case of errors which makes a difference in
+the lax "recover" mode.
+
+Now we store the current input buffer "base" pointer for each (not
+separately allocated) attribute in the namespace URI field, which isn't
+used until later. After the whole start tag was parsed, the pointers to
+the attribute values are reconstructed using the offset between the
+new and the old input buffer. This relies on arithmetic on dangling
+pointers which is technically undefined behavior. But it seems like
+the easiest and most efficient fix and a similar approach is used in
+xmlParserInputGrow.
+
+This changes the error output of several tests, typically making it
+more verbose because we try harder to continue parsing in case of errors.
+
+(Another possible solution is to check not only the "base" pointer
+but the size of the input buffer as well. But this would result in
+even more reparsing.)
+
+Remove some goto labels and deduplicate a bit of code after handling
+namespaces.
+
+There were two bugs where parameter-entity references could lead to an
+unexpected change of the input buffer in xmlParseNameComplex and
+xmlDictLookup being called with an invalid pointer.
+
+
+Upstream-Status: Backport
+ - [https://git.gnome.org/browse/libxml2/commit/?id=07b7428b69c368611d215a140fe630b2d1e61349]
+ - [https://git.gnome.org/browse/libxml2/commit/?id=855c19efb7cd30d927d673b3658563c4959ca6f0]
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+
+diff --git a/parser.c b/parser.c
+index 609a270..74016e3 100644
+--- a/parser.c
++++ b/parser.c
+@@ -43,6 +43,7 @@
+ #include <limits.h>
+ #include <string.h>
+ #include <stdarg.h>
++#include <stddef.h>
+ #include <libxml/xmlmemory.h>
+ #include <libxml/threads.h>
+ #include <libxml/globals.h>
+@@ -9377,8 +9378,7 @@ xmlParseStartTag2(xmlParserCtxtPtr ctxt, const xmlChar **pref,
+     const xmlChar **atts = ctxt->atts;
+     int maxatts = ctxt->maxatts;
+     int nratts, nbatts, nbdef;
+-    int i, j, nbNs, attval, oldline, oldcol, inputNr;
+-    const xmlChar *base;
++    int i, j, nbNs, attval;
+     unsigned long cur;
+     int nsNr = ctxt->nsNr;
+ 
+@@ -9392,13 +9392,8 @@ xmlParseStartTag2(xmlParserCtxtPtr ctxt, const xmlChar **pref,
+      *       The Shrinking is only possible once the full set of attribute
+      *       callbacks have been done.
+      */
+-reparse:
+     SHRINK;
+-    base = ctxt->input->base;
+     cur = ctxt->input->cur - ctxt->input->base;
+-    inputNr = ctxt->inputNr;
+-    oldline = ctxt->input->line;
+-    oldcol = ctxt->input->col;
+     nbatts = 0;
+     nratts = 0;
+     nbdef = 0;
+@@ -9422,8 +9417,6 @@ reparse:
+      */
+     SKIP_BLANKS;
+     GROW;
+-    if ((ctxt->input->base != base) || (inputNr != ctxt->inputNr))
+-        goto base_changed;
+ 
+     while (((RAW != '>') &&
+ 	   ((RAW != '/') || (NXT(1) != '>')) &&
+@@ -9434,203 +9427,174 @@ reparse:
+ 
+ 	attname = xmlParseAttribute2(ctxt, prefix, localname,
+ 	                             &aprefix, &attvalue, &len, &alloc);
+-	if ((ctxt->input->base != base) || (inputNr != ctxt->inputNr)) {
+-	    if ((attvalue != NULL) && (alloc != 0))
+-	        xmlFree(attvalue);
+-	    attvalue = NULL;
+-	    goto base_changed;
+-	}
+-        if ((attname != NULL) && (attvalue != NULL)) {
+-	    if (len < 0) len = xmlStrlen(attvalue);
+-            if ((attname == ctxt->str_xmlns) && (aprefix == NULL)) {
+-	        const xmlChar *URL = xmlDictLookup(ctxt->dict, attvalue, len);
+-		xmlURIPtr uri;
+-
+-                if (URL == NULL) {
+-		    xmlErrMemory(ctxt, "dictionary allocation failure");
+-		    if ((attvalue != NULL) && (alloc != 0))
+-			xmlFree(attvalue);
+-		    return(NULL);
+-		}
+-                if (*URL != 0) {
+-		    uri = xmlParseURI((const char *) URL);
+-		    if (uri == NULL) {
+-			xmlNsErr(ctxt, XML_WAR_NS_URI,
+-			         "xmlns: '%s' is not a valid URI\n",
+-					   URL, NULL, NULL);
+-		    } else {
+-			if (uri->scheme == NULL) {
+-			    xmlNsWarn(ctxt, XML_WAR_NS_URI_RELATIVE,
+-				      "xmlns: URI %s is not absolute\n",
+-				      URL, NULL, NULL);
+-			}
+-			xmlFreeURI(uri);
+-		    }
+-		    if (URL == ctxt->str_xml_ns) {
+-			if (attname != ctxt->str_xml) {
+-			    xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
+-			 "xml namespace URI cannot be the default namespace\n",
+-				     NULL, NULL, NULL);
+-			}
+-			goto skip_default_ns;
+-		    }
+-		    if ((len == 29) &&
+-			(xmlStrEqual(URL,
+-				 BAD_CAST "http://www.w3.org/2000/xmlns/"))) {
+-			xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
+-			     "reuse of the xmlns namespace name is forbidden\n",
+-				 NULL, NULL, NULL);
+-			goto skip_default_ns;
+-		    }
+-		}
+-		/*
+-		 * check that it's not a defined namespace
+-		 */
+-		for (j = 1;j <= nbNs;j++)
+-		    if (ctxt->nsTab[ctxt->nsNr - 2 * j] == NULL)
+-			break;
+-		if (j <= nbNs)
+-		    xmlErrAttributeDup(ctxt, NULL, attname);
+-		else
+-		    if (nsPush(ctxt, NULL, URL) > 0) nbNs++;
+-skip_default_ns:
+-		if ((attvalue != NULL) && (alloc != 0)) {
+-		    xmlFree(attvalue);
+-		    attvalue = NULL;
+-		}
+-		if ((RAW == '>') || (((RAW == '/') && (NXT(1) == '>'))))
+-		    break;
+-		if (!IS_BLANK_CH(RAW)) {
+-		    xmlFatalErrMsg(ctxt, XML_ERR_SPACE_REQUIRED,
+-				   "attributes construct error\n");
+-		    break;
+-		}
+-		SKIP_BLANKS;
+-		if ((ctxt->input->base != base) || (inputNr != ctxt->inputNr))
+-		    goto base_changed;
+-		continue;
+-	    }
+-            if (aprefix == ctxt->str_xmlns) {
+-	        const xmlChar *URL = xmlDictLookup(ctxt->dict, attvalue, len);
+-		xmlURIPtr uri;
+-
+-                if (attname == ctxt->str_xml) {
+-		    if (URL != ctxt->str_xml_ns) {
+-		        xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
+-			         "xml namespace prefix mapped to wrong URI\n",
+-			         NULL, NULL, NULL);
+-		    }
+-		    /*
+-		     * Do not keep a namespace definition node
+-		     */
+-		    goto skip_ns;
+-		}
++        if ((attname == NULL) || (attvalue == NULL))
++            goto next_attr;
++	if (len < 0) len = xmlStrlen(attvalue);
++
++        if ((attname == ctxt->str_xmlns) && (aprefix == NULL)) {
++            const xmlChar *URL = xmlDictLookup(ctxt->dict, attvalue, len);
++            xmlURIPtr uri;
++
++            if (URL == NULL) {
++                xmlErrMemory(ctxt, "dictionary allocation failure");
++                if ((attvalue != NULL) && (alloc != 0))
++                    xmlFree(attvalue);
++                return(NULL);
++            }
++            if (*URL != 0) {
++                uri = xmlParseURI((const char *) URL);
++                if (uri == NULL) {
++                    xmlNsErr(ctxt, XML_WAR_NS_URI,
++                             "xmlns: '%s' is not a valid URI\n",
++                                       URL, NULL, NULL);
++                } else {
++                    if (uri->scheme == NULL) {
++                        xmlNsWarn(ctxt, XML_WAR_NS_URI_RELATIVE,
++                                  "xmlns: URI %s is not absolute\n",
++                                  URL, NULL, NULL);
++                    }
++                    xmlFreeURI(uri);
++                }
+                 if (URL == ctxt->str_xml_ns) {
+-		    if (attname != ctxt->str_xml) {
+-		        xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
+-			         "xml namespace URI mapped to wrong prefix\n",
+-			         NULL, NULL, NULL);
+-		    }
+-		    goto skip_ns;
+-		}
+-                if (attname == ctxt->str_xmlns) {
+-		    xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
+-			     "redefinition of the xmlns prefix is forbidden\n",
+-			     NULL, NULL, NULL);
+-		    goto skip_ns;
+-		}
+-		if ((len == 29) &&
+-		    (xmlStrEqual(URL,
+-		                 BAD_CAST "http://www.w3.org/2000/xmlns/"))) {
+-		    xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
+-			     "reuse of the xmlns namespace name is forbidden\n",
+-			     NULL, NULL, NULL);
+-		    goto skip_ns;
+-		}
+-		if ((URL == NULL) || (URL[0] == 0)) {
+-		    xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
+-		             "xmlns:%s: Empty XML namespace is not allowed\n",
+-			          attname, NULL, NULL);
+-		    goto skip_ns;
+-		} else {
+-		    uri = xmlParseURI((const char *) URL);
+-		    if (uri == NULL) {
+-			xmlNsErr(ctxt, XML_WAR_NS_URI,
+-			     "xmlns:%s: '%s' is not a valid URI\n",
+-					   attname, URL, NULL);
+-		    } else {
+-			if ((ctxt->pedantic) && (uri->scheme == NULL)) {
+-			    xmlNsWarn(ctxt, XML_WAR_NS_URI_RELATIVE,
+-				      "xmlns:%s: URI %s is not absolute\n",
+-				      attname, URL, NULL);
+-			}
+-			xmlFreeURI(uri);
+-		    }
+-		}
+-
+-		/*
+-		 * check that it's not a defined namespace
+-		 */
+-		for (j = 1;j <= nbNs;j++)
+-		    if (ctxt->nsTab[ctxt->nsNr - 2 * j] == attname)
+-			break;
+-		if (j <= nbNs)
+-		    xmlErrAttributeDup(ctxt, aprefix, attname);
+-		else
+-		    if (nsPush(ctxt, attname, URL) > 0) nbNs++;
+-skip_ns:
+-		if ((attvalue != NULL) && (alloc != 0)) {
+-		    xmlFree(attvalue);
+-		    attvalue = NULL;
+-		}
+-		if ((RAW == '>') || (((RAW == '/') && (NXT(1) == '>'))))
+-		    break;
+-		if (!IS_BLANK_CH(RAW)) {
+-		    xmlFatalErrMsg(ctxt, XML_ERR_SPACE_REQUIRED,
+-				   "attributes construct error\n");
+-		    break;
+-		}
+-		SKIP_BLANKS;
+-		if ((ctxt->input->base != base) || (inputNr != ctxt->inputNr))
+-		    goto base_changed;
+-		continue;
+-	    }
++                    if (attname != ctxt->str_xml) {
++                        xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
++                     "xml namespace URI cannot be the default namespace\n",
++                                 NULL, NULL, NULL);
++                    }
++                    goto next_attr;
++                }
++                if ((len == 29) &&
++                    (xmlStrEqual(URL,
++                             BAD_CAST "http://www.w3.org/2000/xmlns/"))) {
++                    xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
++                         "reuse of the xmlns namespace name is forbidden\n",
++                             NULL, NULL, NULL);
++                    goto next_attr;
++                }
++            }
++            /*
++             * check that it's not a defined namespace
++             */
++            for (j = 1;j <= nbNs;j++)
++                if (ctxt->nsTab[ctxt->nsNr - 2 * j] == NULL)
++                    break;
++            if (j <= nbNs)
++                xmlErrAttributeDup(ctxt, NULL, attname);
++            else
++                if (nsPush(ctxt, NULL, URL) > 0) nbNs++;
++
++        } else if (aprefix == ctxt->str_xmlns) {
++            const xmlChar *URL = xmlDictLookup(ctxt->dict, attvalue, len);
++            xmlURIPtr uri;
++
++            if (attname == ctxt->str_xml) {
++                if (URL != ctxt->str_xml_ns) {
++                    xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
++                             "xml namespace prefix mapped to wrong URI\n",
++                             NULL, NULL, NULL);
++                }
++                /*
++                 * Do not keep a namespace definition node
++                 */
++                goto next_attr;
++            }
++            if (URL == ctxt->str_xml_ns) {
++                if (attname != ctxt->str_xml) {
++                    xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
++                             "xml namespace URI mapped to wrong prefix\n",
++                             NULL, NULL, NULL);
++                }
++                goto next_attr;
++            }
++            if (attname == ctxt->str_xmlns) {
++                xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
++                         "redefinition of the xmlns prefix is forbidden\n",
++                         NULL, NULL, NULL);
++                goto next_attr;
++            }
++            if ((len == 29) &&
++                (xmlStrEqual(URL,
++                             BAD_CAST "http://www.w3.org/2000/xmlns/"))) {
++                xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
++                         "reuse of the xmlns namespace name is forbidden\n",
++                         NULL, NULL, NULL);
++                goto next_attr;
++            }
++            if ((URL == NULL) || (URL[0] == 0)) {
++                xmlNsErr(ctxt, XML_NS_ERR_XML_NAMESPACE,
++                         "xmlns:%s: Empty XML namespace is not allowed\n",
++                              attname, NULL, NULL);
++                goto next_attr;
++            } else {
++                uri = xmlParseURI((const char *) URL);
++                if (uri == NULL) {
++                    xmlNsErr(ctxt, XML_WAR_NS_URI,
++                         "xmlns:%s: '%s' is not a valid URI\n",
++                                       attname, URL, NULL);
++                } else {
++                    if ((ctxt->pedantic) && (uri->scheme == NULL)) {
++                        xmlNsWarn(ctxt, XML_WAR_NS_URI_RELATIVE,
++                                  "xmlns:%s: URI %s is not absolute\n",
++                                  attname, URL, NULL);
++                    }
++                    xmlFreeURI(uri);
++                }
++            }
+ 
+-	    /*
+-	     * Add the pair to atts
+-	     */
+-	    if ((atts == NULL) || (nbatts + 5 > maxatts)) {
+-	        if (xmlCtxtGrowAttrs(ctxt, nbatts + 5) < 0) {
+-		    if (attvalue[len] == 0)
+-			xmlFree(attvalue);
+-		    goto failed;
+-		}
+-	        maxatts = ctxt->maxatts;
+-		atts = ctxt->atts;
+-	    }
+-	    ctxt->attallocs[nratts++] = alloc;
+-	    atts[nbatts++] = attname;
+-	    atts[nbatts++] = aprefix;
+-	    atts[nbatts++] = NULL; /* the URI will be fetched later */
+-	    atts[nbatts++] = attvalue;
+-	    attvalue += len;
+-	    atts[nbatts++] = attvalue;
+-	    /*
+-	     * tag if some deallocation is needed
+-	     */
+-	    if (alloc != 0) attval = 1;
+-	} else {
+-	    if ((attvalue != NULL) && (attvalue[len] == 0))
+-		xmlFree(attvalue);
+-	}
++            /*
++             * check that it's not a defined namespace
++             */
++            for (j = 1;j <= nbNs;j++)
++                if (ctxt->nsTab[ctxt->nsNr - 2 * j] == attname)
++                    break;
++            if (j <= nbNs)
++                xmlErrAttributeDup(ctxt, aprefix, attname);
++            else
++                if (nsPush(ctxt, attname, URL) > 0) nbNs++;
++
++        } else {
++            /*
++             * Add the pair to atts
++             */
++            if ((atts == NULL) || (nbatts + 5 > maxatts)) {
++                if (xmlCtxtGrowAttrs(ctxt, nbatts + 5) < 0) {
++                    goto next_attr;
++                }
++                maxatts = ctxt->maxatts;
++                atts = ctxt->atts;
++            }
++            ctxt->attallocs[nratts++] = alloc;
++            atts[nbatts++] = attname;
++            atts[nbatts++] = aprefix;
++            /*
++             * The namespace URI field is used temporarily to point at the
++             * base of the current input buffer for non-alloced attributes.
++             * When the input buffer is reallocated, all the pointers become
++             * invalid, but they can be reconstructed later.
++             */
++            if (alloc)
++                atts[nbatts++] = NULL;
++            else
++                atts[nbatts++] = ctxt->input->base;
++            atts[nbatts++] = attvalue;
++            attvalue += len;
++            atts[nbatts++] = attvalue;
++            /*
++             * tag if some deallocation is needed
++             */
++            if (alloc != 0) attval = 1;
++            attvalue = NULL; /* moved into atts */
++        }
+ 
+-failed:
++next_attr:
++        if ((attvalue != NULL) && (alloc != 0)) {
++            xmlFree(attvalue);
++            attvalue = NULL;
++        }
+ 
+ 	GROW
+         if (ctxt->instate == XML_PARSER_EOF)
+             break;
+-	if ((ctxt->input->base != base) || (inputNr != ctxt->inputNr))
+-	    goto base_changed;
+ 	if ((RAW == '>') || (((RAW == '/') && (NXT(1) == '>'))))
+ 	    break;
+ 	if (!IS_BLANK_CH(RAW)) {
+@@ -9646,8 +9610,20 @@ failed:
+ 	    break;
+ 	}
+         GROW;
+-	if ((ctxt->input->base != base) || (inputNr != ctxt->inputNr))
+-	    goto base_changed;
++    }
++
++    /* Reconstruct attribute value pointers. */
++    for (i = 0, j = 0; j < nratts; i += 5, j++) {
++        if (atts[i+2] != NULL) {
++            /*
++             * Arithmetic on dangling pointers is technically undefined
++             * behavior, but well...
++             */
++            ptrdiff_t offset = ctxt->input->base - atts[i+2];
++            atts[i+2]  = NULL;    /* Reset repurposed namespace URI */
++            atts[i+3] += offset;  /* value */
++            atts[i+4] += offset;  /* valuend */
++        }
+     }
+ 
+     /*
+@@ -9804,34 +9780,6 @@ failed:
+     }
+ 
+     return(localname);
+-
+-base_changed:
+-    /*
+-     * the attribute strings are valid iif the base didn't changed
+-     */
+-    if (attval != 0) {
+-	for (i = 3,j = 0; j < nratts;i += 5,j++)
+-	    if ((ctxt->attallocs[j] != 0) && (atts[i] != NULL))
+-	        xmlFree((xmlChar *) atts[i]);
+-    }
+-
+-    /*
+-     * We can't switch from one entity to another in the middle
+-     * of a start tag
+-     */
+-    if (inputNr != ctxt->inputNr) {
+-        xmlFatalErrMsg(ctxt, XML_ERR_ENTITY_BOUNDARY,
+-		    "Start tag doesn't start and stop in the same entity\n");
+-	return(NULL);
+-    }
+-
+-    ctxt->input->cur = ctxt->input->base + cur;
+-    ctxt->input->line = oldline;
+-    ctxt->input->col = oldcol;
+-    if (ctxt->wellFormed == 1) {
+-	goto reparse;
+-    }
+-    return(NULL);
+ }
+ 
+ /**
+diff --git a/result/errors/759398.xml.err b/result/errors/759398.xml.err
+index e08d9bf..f6036a3 100644
+--- a/result/errors/759398.xml.err
++++ b/result/errors/759398.xml.err
+@@ -1,9 +1,12 @@
+ ./test/errors/759398.xml:210: parser error : StartTag: invalid element name
+ need to worry about parsers whi<! don't expand PErefs finding
+                                 ^
+-./test/errors/759398.xml:309: parser error : Opening and ending tag mismatch: spec line 50 and termdef
++./test/errors/759398.xml:309: parser error : Opening and ending tag mismatch: №№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№m line 308 and termdef
+ and provide access to their content and structure.</termdef> <termdef
+                                                             ^
+-./test/errors/759398.xml:309: parser error : Extra content at the end of the document
+-and provide access to their content and structure.</termdef> <termdef
+-                                                             ^
++./test/errors/759398.xml:314: parser error : Opening and ending tag mismatch: spec line 50 and p
++data and the information it must provide to the application.</p>
++                                                                ^
++./test/errors/759398.xml:316: parser error : Extra content at the end of the document
++<div2 id='sec-origin-goals'>
++^
+diff --git a/result/errors/attr1.xml.err b/result/errors/attr1.xml.err
+index 4f08538..c4c4fc8 100644
+--- a/result/errors/attr1.xml.err
++++ b/result/errors/attr1.xml.err
+@@ -1,6 +1,9 @@
+ ./test/errors/attr1.xml:2: parser error : AttValue: ' expected
+ 
+ ^
+-./test/errors/attr1.xml:1: parser error : Extra content at the end of the document
+-<foo foo="oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+- ^
++./test/errors/attr1.xml:2: parser error : attributes construct error
++
++^
++./test/errors/attr1.xml:2: parser error : Couldn't find end of Start Tag foo line 1
++
++^
+diff --git a/result/errors/attr2.xml.err b/result/errors/attr2.xml.err
+index c8a9c7d..77e342e 100644
+--- a/result/errors/attr2.xml.err
++++ b/result/errors/attr2.xml.err
+@@ -1,6 +1,9 @@
+ ./test/errors/attr2.xml:2: parser error : AttValue: ' expected
+ 
+ ^
+-./test/errors/attr2.xml:1: parser error : Extra content at the end of the document
+-<foo foo=">ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+- ^
++./test/errors/attr2.xml:2: parser error : attributes construct error
++
++^
++./test/errors/attr2.xml:2: parser error : Couldn't find end of Start Tag foo line 1
++
++^
+diff --git a/result/errors/name2.xml.err b/result/errors/name2.xml.err
+index a6649a1..8a6acee 100644
+--- a/result/errors/name2.xml.err
++++ b/result/errors/name2.xml.err
+@@ -1,6 +1,9 @@
+ ./test/errors/name2.xml:2: parser error : Specification mandate value for attribute foooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+ 
+ ^
+-./test/errors/name2.xml:1: parser error : Extra content at the end of the document
+-<foo foooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+- ^
++./test/errors/name2.xml:2: parser error : attributes construct error
++
++^
++./test/errors/name2.xml:2: parser error : Couldn't find end of Start Tag foo line 1
++
++^

@@ -1,4 +1,4 @@
-# polkit must prepare polkid group
+# polkit must prepare polkitd group
 DEPENDS += "polkit"
 
 inherit useradd

@@ -18,4 +18,4 @@ do_compile_prepend() {
 SRC_URI[md5sum] = "9356e5e9dcb3f1481977009720a2ccf8"
 SRC_URI[sha256sum] = "1b4a5b5e48ad5e61a21586b7b59d5c0a88691a981e73e2c6dc5868197461791b"
 
-PNBLACKLIST[benchfft] ?= "does not build with distroless qemuarm as reported in 'State of bitbake world' thread, nobody volunteered to fix them"
+PNBLACKLIST[benchfft] ?= "does not build with distroless qemuarm as reported in 'State of bitbake world' thread, nobody volunteered to fix them - the recipe will be removed on 2017-09-01 unless the issue is fixed"

@@ -1,0 +1,69 @@
+From 549773fdaf1fb003b84f25df386a07d299cdeb3e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 18 Jul 2017 21:25:33 -0700
+Subject: [PATCH] zeroconf: Rename arp_op to avoid namespace conflicts with C
+ library
+
+on musl e.g. we get
+In file included from /mnt/a/oe/build/tmp/work/corei7-64-bec-linux-musl/zeroconf/0.9-r1/recipe-sysroot/usr/include/net/ethernet.h:10:0,
+
+This is because in musl arp_op is a define which is included
+and causes the conflict
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ zeroconf.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/zeroconf.c b/zeroconf.c
+index 812d34b..f27e907 100644
+--- a/zeroconf.c
++++ b/zeroconf.c
+@@ -14,8 +14,6 @@
+ 
+ #include <sys/types.h>
+ #include <sys/socket.h>
+-#include <linux/rtnetlink.h>
+-#include <linux/if.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -34,6 +32,8 @@
+ #include <sys/time.h>
+ #include <signal.h>
+ #include <limits.h>
++#include <linux/rtnetlink.h>
++#include <linux/if.h>
+ 
+ #include "delay.h"
+ 
+@@ -108,7 +108,7 @@ int  arp_conflict(struct intf *intf, struct arp_packet *pkt);
+ void arp_packet_dump(struct arp_packet *pkt);
+ void arp_packet_send(int as,
+ 		     struct intf *intf,
+-		     short int arp_op,
++		     short int arpop,
+ 		     int null_sender);
+ void arp_probe(int as, struct intf *intf);
+ void arp_claim(int as, struct intf *intf);
+@@ -1591,7 +1591,7 @@ int  arp_conflict(struct intf *intf, struct arp_packet *pkt)
+ 
+ void arp_packet_send(int as,
+ 		     struct intf *intf,
+-		     short int arp_op,
++		     short int arpop,
+ 		     int null_sender)
+ {
+ 
+@@ -1605,7 +1605,7 @@ void arp_packet_send(int as,
+   ap.arp.ar_pro = htons(ARP_IP_PROTO);
+   ap.arp.ar_hln = ETH_ALEN;
+   ap.arp.ar_pln = 4; /* octets in IPv4 address */
+-  ap.arp.ar_op = htons(arp_op);
++  ap.arp.ar_op = htons(arpop);
+ 
+   /* filling with 0xff sets the destination to
+    * the broadcast link-layer address for free
+-- 
+2.13.3
+

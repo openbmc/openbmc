@@ -14,4 +14,4 @@ SRC_URI[sha256sum] = "89d1de025eca0466c125dcd6a11b64341bdf98ee4c03c3e5a12321d77c
 
 inherit autotools
 
-PNBLACKLIST[gst123] ?= "gst123 is still "sometimes" using wrong sysroot"
+PNBLACKLIST[gst123] ?= "gst123 is still "sometimes" using wrong sysroot - the recipe will be removed on 2017-09-01 unless the issue is fixed"

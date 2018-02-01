@@ -1,0 +1,45 @@
+From dd35afc9ce1004128a754d5eeb8c5c2cb32ae420 Mon Sep 17 00:00:00 2001
+From: Bart De Schuymer <bdschuym@pandora.be>
+Date: Tue, 3 Jul 2012 18:47:32 +0000
+Subject: [PATCH 01/10] add RARP and update iana url
+
+---
+ ethertypes | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/ethertypes b/ethertypes
+index 5e700f6..813177b 100644
+--- a/ethertypes
++++ b/ethertypes
+@@ -5,6 +5,7 @@
+ #
+ # This list could be found on:
+ #         http://www.iana.org/assignments/ethernet-numbers
++#         http://www.iana.org/assignments/ieee-802-numbers
+ #
+ # <name>    <hexnumber> <alias1>...<alias35> #Comment
+ #
+@@ -21,15 +22,16 @@ LAT		6004			# DEC LAT
+ DIAG		6005			# DEC Diagnostics
+ CUST		6006			# DEC Customer use
+ SCA		6007			# DEC Systems Comms Arch
+-TEB		6558             	# Trans Ether Bridging   [RFC1701]
+-RAW_FR  	6559                   	# Raw Frame Relay        [RFC1701]
++TEB		6558			# Trans Ether Bridging   [RFC1701]
++RAW_FR  	6559			# Raw Frame Relay        [RFC1701]
++RARP		8035			# Reverse ARP            [RFC903]
+ AARP		80F3			# Appletalk AARP
+-ATALK		809B                  	# Appletalk
++ATALK		809B			# Appletalk
+ 802_1Q		8100	8021q 1q 802.1q	dot1q # 802.1Q Virtual LAN tagged frame
+ IPX		8137			# Novell IPX
+ NetBEUI		8191			# NetBEUI
+ IPv6		86DD	ip6 		# IP version 6
+-PPP		880B                    # PPP
++PPP		880B			# PPP
+ ATMMPOA		884C			# MultiProtocol over ATM
+ PPP_DISC	8863			# PPPoE discovery messages
+ PPP_SES		8864			# PPPoE session messages
+-- 
+2.12.1
+

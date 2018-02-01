@@ -20,7 +20,9 @@ SRC_URI = " \
     file://nginx.service \
 "
 
-inherit update-rc.d useradd
+inherit update-rc.d useradd systemd
+
+SYSTEMD_SERVICE_${PN} = "nginx.service"
 
 CFLAGS_append = " -fPIE -pie"
 CXXFLAGS_append = " -fPIE -pie"
@@ -61,6 +63,11 @@ do_configure () {
     --conf-path=${sysconfdir}/nginx/nginx.conf \
     --http-log-path=${localstatedir}/log/nginx/access.log \
     --error-log-path=${localstatedir}/log/nginx/error.log \
+    --http-client-body-temp-path=/run/nginx/client_body_temp \
+    --http-proxy-temp-path=/run/nginx/proxy_temp \
+    --http-fastcgi-temp-path=/run/nginx/fastcgi_temp \
+    --http-uwsgi-temp-path=/run/nginx/uwsgi_temp \
+    --http-scgi-temp-path=/run/nginx/scgi_temp \
     --pid-path=/run/nginx/nginx.pid \
     --prefix=${prefix} \
     --with-http_ssl_module \
@@ -98,6 +105,7 @@ do_install () {
     install -d ${D}${sysconfdir}/default/volatiles
     install -m 0644 ${WORKDIR}/nginx-volatile.conf ${D}${sysconfdir}/default/volatiles/99_nginx
     sed -i 's,/var/,${localstatedir}/,g' ${D}${sysconfdir}/default/volatiles/99_nginx
+    sed -i 's,@NGINX_USER@,${NGINX_USER},g' ${D}${sysconfdir}/default/volatiles/99_nginx
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
         install -d ${D}${systemd_unitdir}/system

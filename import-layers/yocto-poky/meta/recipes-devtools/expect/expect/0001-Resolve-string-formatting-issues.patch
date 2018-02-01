@@ -1,0 +1,29 @@
+From 107cc370705d8520ba42f1416d89ed3544277c83 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 23 Mar 2017 13:44:41 +0200
+Subject: [PATCH] Resolve string formatting issues.
+
+Upstream-Status: Inappropriate [upstream seems dead]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ exp_clib.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/exp_clib.c b/exp_clib.c
+index 172c05e..809200e 100644
+--- a/exp_clib.c
++++ b/exp_clib.c
+@@ -1476,8 +1476,8 @@ expDiagLogU(str)
+      char *str;
+ {
+   if (exp_is_debugging) {
+-    fprintf(stderr,str);
+-    if (exp_logfile) fprintf(exp_logfile,str);
++    fprintf(stderr, "%s", str);
++    if (exp_logfile) fprintf(exp_logfile, "%s", str);
+   }
+ }
+ 
+-- 
+2.11.0
+

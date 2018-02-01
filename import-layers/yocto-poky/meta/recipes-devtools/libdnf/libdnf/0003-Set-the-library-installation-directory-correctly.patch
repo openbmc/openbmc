@@ -1,0 +1,29 @@
+From 8d29879fe3606c78769c1bcdddf0bcfc7191c710 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Dec 2016 18:20:01 +0200
+Subject: [PATCH 3/4] Set the library installation directory correctly.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d35f0d7..8edb627 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -62,7 +62,9 @@ ADD_DEFINITIONS(-DPACKAGE_VERSION=\\"${LIBDNF_VERSION}\\")
+ IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
+   SET (LIB_SUFFIX "64")
+ ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
+-SET (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
++#SET (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
++SET (LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
++
+ 
+ ADD_SUBDIRECTORY (libdnf)
+ ENABLE_TESTING()
+-- 
+2.11.0
+

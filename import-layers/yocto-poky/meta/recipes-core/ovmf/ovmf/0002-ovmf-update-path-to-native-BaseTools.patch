@@ -1,0 +1,32 @@
+From 9e632e3f9edd09632cc877dff6ea57608f979aab Mon Sep 17 00:00:00 2001
+From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
+Date: Thu, 9 Jun 2016 02:23:01 -0700
+Subject: [PATCH] ovmf: update path to native BaseTools
+
+BaseTools is a set of utilities to build EDK-based firmware. These utilities
+are used during the build process. Thus, they need to be built natively.
+When cross-compiling, we need to provide a path to the location of these
+tools. The BBAKE_EDK_TOOLS_PATH string is used as a pattern to be replaced
+with the appropriate location before building.
+
+Signed-off-by: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
+---
+ OvmfPkg/build.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/OvmfPkg/build.sh b/OvmfPkg/build.sh
+index eb5eb73..9058fca 100755
+--- a/OvmfPkg/build.sh
++++ b/OvmfPkg/build.sh
+@@ -30,7 +30,7 @@ then
+ # this assumes svn pulls have the same root dir
+ #  export EDK_TOOLS_PATH=`pwd`/../BaseTools
+ # This version is for the tools source in edk2
+-  export EDK_TOOLS_PATH=`pwd`/BaseTools
++  export EDK_TOOLS_PATH=BBAKE_EDK_TOOLS_PATH/BaseTools
+   echo $EDK_TOOLS_PATH
+   source edksetup.sh BaseTools
+ else
+-- 
+2.8.1
+

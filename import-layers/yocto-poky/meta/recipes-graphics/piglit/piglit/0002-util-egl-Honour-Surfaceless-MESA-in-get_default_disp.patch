@@ -1,0 +1,54 @@
+From a6608f218b5023cef36b3de5ec3c5f00b0211d1c Mon Sep 17 00:00:00 2001
+From: Daniel Diaz <daniel.diaz@linaro.org>
+Date: Wed, 17 May 2017 18:00:15 -0500
+Subject: [PATCH 2/4] util/egl: Honour Surfaceless MESA in get_default_display
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The EGL_MESA_platform_surfaceless extension was introduced not too long
+ago. Add support for it our helper.
+
+Upstream-Status: Accepted, since git 7b74602.
+
+Signed-off-by: Daniel Díaz <daniel.diaz@linaro.org>
+Reviewed-by: Emil Velikov <emil.velikov@collabora.com>
+---
+ tests/util/piglit-util-egl.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/tests/util/piglit-util-egl.c b/tests/util/piglit-util-egl.c
+index 106c735..389fe12 100644
+--- a/tests/util/piglit-util-egl.c
++++ b/tests/util/piglit-util-egl.c
+@@ -85,6 +85,7 @@ piglit_egl_get_default_display(EGLenum platform)
+ 	static bool has_x11 = false;
+ 	static bool has_wayland = false;
+ 	static bool has_gbm = false;
++	static bool has_surfaceless_mesa = false;
+ 
+ 	static EGLDisplay (*peglGetPlatformDisplayEXT)(EGLenum platform, void *native_display, const EGLint *attrib_list);
+ 
+@@ -99,6 +100,7 @@ piglit_egl_get_default_display(EGLenum platform)
+ 		has_x11 = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_x11");
+ 		has_wayland = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_wayland");
+ 		has_gbm = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_gbm");
++		has_surfaceless_mesa = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_MESA_platform_surfaceless");
+ 
+ 		peglGetPlatformDisplayEXT = (void*) eglGetProcAddress("eglGetPlatformDisplayEXT");
+ 	}
+@@ -123,6 +125,11 @@ piglit_egl_get_default_display(EGLenum platform)
+ 			return EGL_NO_DISPLAY;
+ 		}
+ 		break;
++	case EGL_PLATFORM_SURFACELESS_MESA:
++		if (!has_surfaceless_mesa) {
++			return EGL_NO_DISPLAY;
++		}
++		break;
+ 	default:
+ 		fprintf(stderr, "%s: unrecognized platform %#x\n", __func__, platform);
+ 		return EGL_NO_DISPLAY;
+-- 
+1.9.1
+

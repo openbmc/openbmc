@@ -24,43 +24,19 @@ import logging
 import os
 import sys
 import argparse
+import signal
 
 bindir = os.path.dirname(__file__)
 topdir = os.path.dirname(bindir)
 sys.path[0:0] = [os.path.join(topdir, 'lib')]
 
 import bb.tinfoil
+import bb.msg
 
-
-def tinfoil_init(parserecipes):
-    import bb.tinfoil
-    tinfoil = bb.tinfoil.Tinfoil(tracking=True)
-    tinfoil.prepare(not parserecipes)
-    tinfoil.logger.setLevel(logger.getEffectiveLevel())
-    return tinfoil
-
-
-def logger_create(name, output=sys.stderr):
-    logger = logging.getLogger(name)
-    loggerhandler = logging.StreamHandler(output)
-    loggerhandler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
-    logger.addHandler(loggerhandler)
-    logger.setLevel(logging.INFO)
-    return logger
-
-def logger_setup_color(logger, color='auto'):
-    from bb.msg import BBLogFormatter
-    console = logging.StreamHandler(sys.stdout)
-    formatter = BBLogFormatter("%(levelname)s: %(message)s")
-    console.setFormatter(formatter)
-    logger.handlers = [console]
-    if color == 'always' or (color == 'auto' and console.stream.isatty()):
-        formatter.enable_color()
-
-
-logger = logger_create('bitbake-layers', sys.stdout)
+logger = bb.msg.logger_create('bitbake-layers', sys.stdout)
 
 def main():
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     parser = argparse.ArgumentParser(
         description="BitBake layers utility",
         epilog="Use %(prog)s <subcommand> --help to get help on a specific command",
@@ -83,13 +59,17 @@ def main():
     elif global_args.quiet:
         logger.setLevel(logging.ERROR)
 
-    logger_setup_color(logger, global_args.color)
+    # Need to re-run logger_create with color argument
+    # (will be the same logger since it has the same name)
+    bb.msg.logger_create('bitbake-layers', output=sys.stdout, color=global_args.color)
 
     plugins = []
-    tinfoil = tinfoil_init(False)
+    tinfoil = bb.tinfoil.Tinfoil(tracking=True)
+    tinfoil.logger.setLevel(logger.getEffectiveLevel())
     try:
+        tinfoil.prepare(True)
         for path in ([topdir] +
-                    tinfoil.config_data.getVar('BBPATH', True).split(':')):
+                    tinfoil.config_data.getVar('BBPATH').split(':')):
             pluginpath = os.path.join(path, 'lib', 'bblayers')
             bb.utils.load_plugins(logger, plugins, pluginpath)
 

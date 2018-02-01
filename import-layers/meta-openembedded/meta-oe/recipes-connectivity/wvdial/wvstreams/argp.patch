@@ -1,0 +1,37 @@
+Check for argp_parse in libargp and then in libc before using internal version
+
+Index: wvstreams-4.6.1/configure.ac
+===================================================================
+--- wvstreams-4.6.1.orig/configure.ac
++++ wvstreams-4.6.1/configure.ac
+@@ -142,20 +142,21 @@ CPPFLAGS="$CPPFLAGS_save"
+ # argp
+ USE_WVSTREAMS_ARGP=0
+ AC_CHECK_HEADERS(argp.h)
+-AC_CHECK_FUNC(argp_parse)
+-if test "$ac_cv_func_argp_parse" != yes \
+-    -o "$ac_cv_header_argp_h" != yes ; then
+-    (
+-    	echo
++AC_SEARCH_LIBS([argp_parse], [argp c], [], [
++
++  if test "$ac_cv_func_argp_parse" != yes \
++      -o "$ac_cv_header_argp_h" != yes ; then
++      (
++       	echo
+     	echo 'configuring argp...'
+     	cd argp
+     	./configure --host=$host_cpu-$host_os || exit $?
+     	echo 'argp configured.'
+     	echo
+-    ) || exit $?
+-    USE_WVSTREAMS_ARGP=1
+-fi
+-
++      ) || exit $?
++      USE_WVSTREAMS_ARGP=1
++  fi
++])
+ # Function checks
+ AC_HEADER_DIRENT
+ 

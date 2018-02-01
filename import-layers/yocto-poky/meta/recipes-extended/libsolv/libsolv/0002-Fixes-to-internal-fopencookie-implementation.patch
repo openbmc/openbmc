@@ -1,0 +1,104 @@
+From 99b10cdf6a0f8a24e1670c1813b1d9563ae3f5b5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Neal=20Gompa=20=28=E3=83=8B=E3=83=BC=E3=83=AB=E3=83=BB?=
+ =?UTF-8?q?=E3=82=B3=E3=82=99=E3=83=B3=E3=83=8F=E3=82=9A=29?=
+ <ngompa13@gmail.com>
+Date: Mon, 23 Nov 2015 18:19:41 -0500
+Subject: [PATCH 2/2] Fixes to internal fopencookie() implementation
+
+Credits to the fixes go to nsz on #musl on Freenode,
+who gloriously fixed the implementation such that
+the tests all pass.
+
+Upstream-Status: Denied [https://github.com/openSUSE/libsolv/pull/112]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ ext/solv_xfopen_fallback_fopencookie.c | 19 ++++++++++---------
+ ext/solv_xfopen_fallback_fopencookie.h | 10 +++++-----
+ 2 files changed, 15 insertions(+), 14 deletions(-)
+
+diff --git a/ext/solv_xfopen_fallback_fopencookie.c b/ext/solv_xfopen_fallback_fopencookie.c
+index 0ce2571..89426a9 100644
+--- a/ext/solv_xfopen_fallback_fopencookie.c
++++ b/ext/solv_xfopen_fallback_fopencookie.c
+@@ -1,10 +1,10 @@
+-/* 
++/*
+  *	Provides a very limited fopencookie() for environments with a libc
+  *	that lacks it.
+- *	
+- *	Author: zhasha
++ *
++ *	Authors: zhasha & nsz
+  *	Modified for libsolv by Neal Gompa
+- *	
++ *
+  *	This program is licensed under the BSD license, read LICENSE.BSD
+  *	for further information.
+  *
+@@ -33,7 +33,7 @@ static void *proxy(void *arg)
+ {
+     struct ctx *ctx = arg;
+     ssize_t r;
+-    size_t n;
++    size_t n, k;
+ 
+     pthread_detach(pthread_self());
+ 
+@@ -47,17 +47,18 @@ static void *proxy(void *arg)
+         }
+         if (r == 0) { break; }
+ 
++        n = r, k = 0;
+         while (n > 0) {
+             r = ctx->io.write ?
+-                (ctx->io.write)(ctx->cookie, ctx->buf + ((size_t)r - n), n) :
+-                write(ctx->fd, ctx->buf + ((size_t)r - n), n);
++                (ctx->io.write)(ctx->cookie, ctx->buf + k, n) :
++                write(ctx->fd, ctx->buf + k, n);
+             if (r < 0) {
+                 if (errno != EINTR) { break; }
+                 continue;
+             }
+             if (r == 0) { break; }
+ 
+-            n -= (size_t)r;
++            n -= r, k += r;
+         }
+         if (n > 0) { break; }
+     }
+@@ -77,8 +78,8 @@ FILE *fopencookie(void *cookie, const char *mode, struct cookie_io_functions_t i
+ 
+     switch (mode[0]) {
+         case 'a':
+-        case 'r': rd = 1; break;
+         case 'w': wr = 1; break;
++        case 'r': rd = 1; break;
+         default:
+             errno = EINVAL;
+             return NULL;
+diff --git a/ext/solv_xfopen_fallback_fopencookie.h b/ext/solv_xfopen_fallback_fopencookie.h
+index 6a7bfee..7223e3f 100644
+--- a/ext/solv_xfopen_fallback_fopencookie.h
++++ b/ext/solv_xfopen_fallback_fopencookie.h
+@@ -1,13 +1,13 @@
+-/* 
++/*
+  *	Provides a very limited fopencookie() for environments with a libc
+  *	that lacks it.
+- *	
+- *	Author: zhasha
++ *
++ *	Authors: zhasha & nsz
+  *	Modified for libsolv by Neal Gompa
+- *	
++ *
+  *	This program is licensed under the BSD license, read LICENSE.BSD
+  *	for further information.
+- *	
++ *
+  */
+ 
+ #ifndef SOLV_XFOPEN_FALLBACK_FOPENCOOKIE_H
+-- 
+2.11.0
+

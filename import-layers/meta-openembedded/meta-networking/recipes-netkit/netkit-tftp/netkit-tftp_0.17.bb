@@ -6,9 +6,10 @@ DEPENDS = "tcp-wrappers"
 LIC_FILES_CHKSUM = "file://tftp/tftp.c;beginline=2;endline=3;md5=84d2cfe1e60863a7d82648734ba4d30c"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/n/${BPN}/${BPN}_${PV}.orig.tar.gz;name=archive \
-    ${DEBIAN_MIRROR}/main/n/${BPN}/${BPN}_${PV}-18.diff.gz;name=patch18 \
-    file://tftp.conf \
-"
+           ${DEBIAN_MIRROR}/main/n/${BPN}/${BPN}_${PV}-18.diff.gz;name=patch18 \
+           file://tftp.conf \
+           file://0001-tftp-Include-missing-fcntl.h.patch \
+           "
 
 SRC_URI[archive.md5sum] = "b7262c798e2ff50e29c2ff50dfd8d6a8"
 SRC_URI[archive.sha256sum] = "3a43c0010d4e61f412563fd83769d4667d8b8e82903526d21cb9205fe55ad14d"

@@ -1,0 +1,14 @@
+Index: fbida-2.13/GNUmakefile
+===================================================================
+--- fbida-2.13.orig/GNUmakefile
++++ fbida-2.13/GNUmakefile
+@@ -53,8 +53,7 @@ include $(srcdir)/mk/Autoconf.mk
+ 
+ ac_jpeg_ver = $(shell \
+ 	$(call ac_init,for libjpeg version);\
+-	$(call ac_s_cmd,echo JPEG_LIB_VERSION \
+-		| cpp -include jpeglib.h | tail -n 1);\
++	$(call ac_s_cmd,cpp -include jpeglib.h -dM -E -x c /dev/null  | grep 'define JPEG_LIB_VERSION' | cut -f 3 -d' ');\
+ 	$(call ac_fini))
+ 
+ define make-config

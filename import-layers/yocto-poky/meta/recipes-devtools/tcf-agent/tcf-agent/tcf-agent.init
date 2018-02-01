@@ -33,16 +33,7 @@ case "$1" in
 
     stop)
         echo -n "Stopping $DAEMON_NAME: "
-        count=0
-        while [ -n "`/bin/pidof $DAEMON_PATH`" -a $count -lt 10 ] ; do
-            killproc $DAEMON_PATH >& /dev/null
-            sleep 1
-            RETVAL=$?
-            if [ $RETVAL != 0 -o -n "`/bin/pidof $DAEMON_PATH`" ] ; then
-                sleep 3
-            fi
-            count=`expr $count + 1`
-        done
+        start-stop-daemon -K -q -x $DAEMON_PATH -s USR2
         rm -f /var/lock/subsys/$DAEMON_NAME
         if [ -n "`/bin/pidof $DAEMON_PATH`" ] ; then
             echo "FAIL"
@@ -72,4 +63,3 @@ case "$1" in
 esac
 
 exit $RETVAL
-

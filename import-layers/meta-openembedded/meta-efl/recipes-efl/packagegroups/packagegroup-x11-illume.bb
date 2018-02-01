@@ -22,3 +22,9 @@ RDEPENDS_${PN} = "\
     e-wm \
     ${ECONFIG} \
 "
+
+PNBLACKLIST[packagegroup-x11-illume] ?= "Runtime depends on blacklisted e-wm - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+
+PNBLACKLIST[packagegroup-x11-illume] ?= "Runtime depends on blacklisted e-wm-config-mobile - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+
+PNBLACKLIST[packagegroup-x11-illume] ?= "Runtime depends on blacklisted e-wm-theme-default - the recipe will be removed on 2017-09-01 unless the issue is fixed"

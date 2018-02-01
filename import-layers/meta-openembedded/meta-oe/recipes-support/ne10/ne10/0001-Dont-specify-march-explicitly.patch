@@ -1,0 +1,38 @@
+From 66d332e4b631eef800c6f62cd347b164ee3b59d4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Apr 2017 10:11:21 -0700
+Subject: [PATCH] Dont specify -march explicitly
+
+it assumes armv7-a for all armv7 based machines but that may
+not be true e.g. machines based on armv7ve and cortexa-7
+it causes conflicts in OE builds because it specifies -march
+in recipes anyway so this is redundant in CMakeLists.txt
+
+Fixes
+
+| cc1: warning: switch -mcpu=cortex-a7 conflicts with -march=armv7-a switch
+| cc1: warning: switch -mcpu=cortex-a7 conflicts with -march=armv7-a switch
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 68da920..a4b94b9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -138,8 +138,8 @@ if(ANDROID_PLATFORM)
+     ${CMAKE_C_FLAGS}")
+ elseif(GNULINUX_PLATFORM)
+     if("${NE10_TARGET_ARCH}" STREQUAL "armv7")
+-      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mthumb -march=armv7-a -mfpu=vfp3 -funsafe-math-optimizations")
+-      set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -mthumb -march=armv7-a -mfpu=neon")
++      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mthumb -mfpu=vfp3 -funsafe-math-optimizations")
++      set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -mthumb -mfpu=neon")
+       # Turn on asm optimization for Linux on ARM v7.
+       set(NE10_ASM_OPTIMIZATION on)
+     endif()
+-- 
+2.12.2
+

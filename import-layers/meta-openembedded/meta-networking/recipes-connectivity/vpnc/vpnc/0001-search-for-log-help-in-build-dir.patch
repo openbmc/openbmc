@@ -1,0 +1,26 @@
+From 48e16e9ae7d8e4c42282bd82cbbd9a6d346a5c00 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 2 Dec 2012 02:16:54 +0100
+Subject: [PATCH 1/8] search for log-help in build dir
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ makeman.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/makeman.pl b/makeman.pl
+index cf241a1..2d73432 100755
+--- a/makeman.pl
++++ b/makeman.pl
+@@ -30,7 +30,7 @@ my $vpnc = './vpnc';
+ # indenting lists (those originally starting with an asterisk). I hope
+ # this pays off when converting the manpage to HTML or such.
+ 
+-open my $LONGHELP, '-|', "$vpnc --long-help";
++open my $LONGHELP, '-|', "cat ./long-help";
+ my $vpnc_options    = '';
+ my $relative_indent = 0;
+ my $indent_needed   = 0;
+-- 
+2.12.1
+

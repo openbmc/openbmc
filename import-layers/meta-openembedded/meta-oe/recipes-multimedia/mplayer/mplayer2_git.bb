@@ -156,4 +156,4 @@ do_install() {
 }
 
 # http://errors.yoctoproject.org/Errors/Details/40734/
-PNBLACKLIST[mplayer2] ?= "Not compatible with currently used ffmpeg 3"
+PNBLACKLIST[mplayer2] ?= "Not compatible with currently used ffmpeg 3 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

@@ -29,7 +29,7 @@ SRC_URI_append_class-native = " file://pkg-config-native.patch"
 SRC_URI[archive.md5sum] = "0dc6570953112a464a409fb99258ccbc"
 SRC_URI[archive.sha256sum] = "1ea46ed400e6501f975acaafea31479cea8f32f911dca4dff036f59e6464fd42"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 # Do not check for XML catalogs when building because that
 # information is not used for anything during build. Recipe

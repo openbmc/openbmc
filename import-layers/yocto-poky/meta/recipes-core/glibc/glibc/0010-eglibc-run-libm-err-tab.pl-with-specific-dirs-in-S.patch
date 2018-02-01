@@ -1,7 +1,7 @@
-From 91af416408b8718b004c83d93a6daa1f34cba48d Mon Sep 17 00:00:00 2001
+From d7e74670825330f5421a55f5aa2a1ce6fda7d7fb Mon Sep 17 00:00:00 2001
 From: Ting Liu <b28495@freescale.com>
 Date: Wed, 19 Dec 2012 04:39:57 -0600
-Subject: [PATCH 10/25] eglibc: run libm-err-tab.pl with specific dirs in ${S}
+Subject: [PATCH 10/26] eglibc: run libm-err-tab.pl with specific dirs in ${S}
 
 libm-err-tab.pl will parse all the files named "libm-test-ulps"
 in the given dir recursively. To avoid parsing the one in
@@ -32,5 +32,5 @@ index f2f694f..e062833 100644
  	touch $@
  
 -- 
-2.8.2
+2.10.2
 

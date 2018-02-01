@@ -8,7 +8,9 @@ SRC_URI = "${DEBIAN_MIRROR}/main/n/netkit-rwho/netkit-rwho_${PV}.orig.tar.gz;nam
            ${DEBIAN_MIRROR}/main/n/netkit-rwho/netkit-rwho_${PV}-13.debian.tar.gz;name=patch13 \
            file://rwhod \
            file://rwhod.default \
-"
+           file://0001-Add-missing-include-path-to-I-options.patch \
+           file://0002-Fix-build-issues-found-with-musl.patch \
+           "
 SRC_URI[archive.md5sum] = "0f71620d45d472f89134ba0d74242e75"
 SRC_URI[archive.sha256sum] = "0409e2ce4bfdb2dacb2c193d0fedfc49bb975cb057c5c6b0ffcca603a1188da7"
 SRC_URI[patch13.md5sum] = "82ed5a3c6b0bbf00b36508b9787963b9"

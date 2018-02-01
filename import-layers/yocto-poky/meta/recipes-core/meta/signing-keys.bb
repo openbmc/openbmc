@@ -3,8 +3,6 @@
 
 SUMMARY = "Makes public keys of the signing keys available"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d690 \
-                    file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 
 inherit allarch deploy
@@ -23,23 +21,23 @@ FILES_${PN}-packagefeed = "${sysconfdir}/pki/packagefeed-gpg"
 python do_get_public_keys () {
     from oe.gpg_sign import get_signer
 
-    if d.getVar("RPM_SIGN_PACKAGES", True):
+    if d.getVar("RPM_SIGN_PACKAGES"):
         # Export public key of the rpm signing key
-        signer = get_signer(d, d.getVar('RPM_GPG_BACKEND', True))
+        signer = get_signer(d, d.getVar('RPM_GPG_BACKEND'))
         signer.export_pubkey(os.path.join(d.expand('${B}'), 'rpm-key'),
-                             d.getVar('RPM_GPG_NAME', True))
+                             d.getVar('RPM_GPG_NAME'))
 
-    if d.getVar("IPK_SIGN_PACKAGES", True):
+    if d.getVar("IPK_SIGN_PACKAGES"):
         # Export public key of the ipk signing key
-        signer = get_signer(d, d.getVar('IPK_GPG_BACKEND', True))
+        signer = get_signer(d, d.getVar('IPK_GPG_BACKEND'))
         signer.export_pubkey(os.path.join(d.expand('${B}'), 'ipk-key'),
-                             d.getVar('IPK_GPG_NAME', True))
+                             d.getVar('IPK_GPG_NAME'))
 
-    if d.getVar('PACKAGE_FEED_SIGN', True) == '1':
+    if d.getVar('PACKAGE_FEED_SIGN') == '1':
         # Export public key of the feed signing key
-        signer = get_signer(d, d.getVar('PACKAGE_FEED_GPG_BACKEND', True))
+        signer = get_signer(d, d.getVar('PACKAGE_FEED_GPG_BACKEND'))
         signer.export_pubkey(os.path.join(d.expand('${B}'), 'pf-key'),
-                             d.getVar('PACKAGE_FEED_GPG_NAME', True))
+                             d.getVar('PACKAGE_FEED_GPG_NAME'))
 }
 do_get_public_keys[cleandirs] = "${B}"
 addtask get_public_keys before do_install

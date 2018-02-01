@@ -1,0 +1,22 @@
+# Running eventreplay tests
+
+These tests use event log files produced by bitbake <target> -w <event log file>
+You need to have event log files produced before running this tests.
+
+At the moment of writing this document tests use 2 event log files: zlib.events
+and core-image-minimal.events. They're not provided with the tests due to their
+significant size.
+
+Here is how to produce them:
+
+$ . oe-init-build-env
+$ rm -r tmp sstate-cache
+$ bitbake core-image-minimal -w core-image-minimal.events
+$ rm -rf tmp sstate-cache
+$ bitbake zlib -w zlib.events
+
+After that it should be possible to run eventreplay tests this way:
+
+$ EVENTREPLAY_DIR=./ DJANGO_SETTINGS_MODULE=toastermain.settings_test ../bitbake/lib/toaster/manage.py test -v2 tests.eventreplay
+
+Note that environment variable EVENTREPLAY_DIR should point to the directory with event log files.

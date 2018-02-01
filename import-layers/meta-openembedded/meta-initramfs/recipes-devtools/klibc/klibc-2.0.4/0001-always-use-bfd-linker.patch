@@ -1,0 +1,30 @@
+From 9ea19bd9636806a73bcf29cfcee40a268f91eb4c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 11 Jul 2017 08:09:52 -0700
+Subject: [PATCH] always use bfd linker
+
+its possible that distros choose to default to gold linker
+therefore explicitly asking for bfd linker would fix the
+linking issues on such distros
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index dc10fc5d..40647be4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -20,7 +20,7 @@ include $(srctree)/scripts/Kbuild.include
+ KLIBCROSS	?= $(CROSS_COMPILE)
+ export KLIBCROSS
+ export CC	:= $(KLIBCROSS)gcc
+-export LD	:= $(KLIBCROSS)ld
++export LD	:= $(KLIBCROSS)ld.bfd
+ export AR	:= $(KLIBCROSS)ar
+ export RANLIB	:= $(KLIBCROSS)ranlib
+ export STRIP	:= $(KLIBCROSS)strip
+-- 
+2.13.2
+

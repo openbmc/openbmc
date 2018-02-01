@@ -12,4 +12,4 @@ S = "${WORKDIR}/${SRCNAME}"
 
 # engrave.l:5:35: fatal error: libengrave_la-engrave.h: No such file or directory
 # http://errors.yoctoproject.org/Errors/Details/56597/
-PNBLACKLIST[engrave] ?= "BROKEN: fails to build with latest oe-core"
+PNBLACKLIST[engrave] ?= "BROKEN: fails to build with latest oe-core - the recipe will be removed on 2017-09-01 unless the issue is fixed"

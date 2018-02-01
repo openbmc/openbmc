@@ -101,7 +101,7 @@ def main():
                 for name, value in srcrevs.items():
                     orig = orig_srcrevs.get(name, orig_srcrev)
                     if options.reportall or value != orig:
-                        all_srcrevs[curdir].append((pn, name, srcrev))
+                        all_srcrevs[curdir].append((pn, name, value))
 
     for curdir, srcrevs in sorted(all_srcrevs.items()):
         if srcrevs:

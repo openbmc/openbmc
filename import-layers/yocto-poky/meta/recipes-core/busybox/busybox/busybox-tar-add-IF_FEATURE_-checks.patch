@@ -1,0 +1,70 @@
+From f94412f6bb49136694c5478d0aecb19118d1b08d Mon Sep 17 00:00:00 2001
+From: Ming Liu <peter.x.liu@external.atlascopco.com>
+Date: Wed, 31 May 2017 11:48:09 +0200
+Subject: [PATCH] tar: add IF_FEATURE_* checks
+
+A following linking error was observed:
+| ==========
+| archival/lib.a(tar.o): In function `tar_main':
+| archival/tar.c:1168: undefined reference to `unpack_Z_stream'
+| archival/tar.c:1168: undefined reference to `unpack_Z_stream'
+| ld: busybox_unstripped: hidden symbol `unpack_Z_stream' isn't defined
+| ld: final link failed: Bad value
+
+this happened with clang compiler, with the following configs:
+| CONFIG_TAR=y
+| # CONFIG_FEATURE_SEAMLESS_Z is not set
+
+which can be fixed by adding IF_FEATURE_* checks in.
+
+Upstream-Status: Pending [ Sent to busybox upstream on 2017-06-02 ]
+
+Signed-off-by: Ming Liu <peter.x.liu@external.atlascopco.com>
+---
+ archival/tar.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
+
+diff --git a/archival/tar.c b/archival/tar.c
+index b70e00a..7598b71 100644
+--- a/archival/tar.c
++++ b/archival/tar.c
+@@ -1216,21 +1216,26 @@ int tar_main(int argc UNUSED_PARAM, char **argv)
+ 		USE_FOR_MMU(IF_DESKTOP(long long) int FAST_FUNC (*xformer)(transformer_state_t *xstate);)
+ 		USE_FOR_NOMMU(const char *xformer_prog;)
+ 
+-		if (opt & OPT_COMPRESS)
+-			USE_FOR_MMU(xformer = unpack_Z_stream;)
++		if (opt & OPT_COMPRESS) {
++			USE_FOR_MMU(IF_FEATURE_SEAMLESS_Z(xformer = unpack_Z_stream;))
+ 			USE_FOR_NOMMU(xformer_prog = "uncompress";)
+-		if (opt & OPT_GZIP)
+-			USE_FOR_MMU(xformer = unpack_gz_stream;)
++		}
++		if (opt & OPT_GZIP) {
++			USE_FOR_MMU(IF_FEATURE_SEAMLESS_GZ(xformer = unpack_gz_stream;))
+ 			USE_FOR_NOMMU(xformer_prog = "gunzip";)
+-		if (opt & OPT_BZIP2)
+-			USE_FOR_MMU(xformer = unpack_bz2_stream;)
++		}
++		if (opt & OPT_BZIP2) {
++			USE_FOR_MMU(IF_FEATURE_SEAMLESS_BZ2(xformer = unpack_bz2_stream;))
+ 			USE_FOR_NOMMU(xformer_prog = "bunzip2";)
+-		if (opt & OPT_LZMA)
+-			USE_FOR_MMU(xformer = unpack_lzma_stream;)
++		}
++		if (opt & OPT_LZMA) {
++			USE_FOR_MMU(IF_FEATURE_SEAMLESS_LZMA(xformer = unpack_lzma_stream;))
+ 			USE_FOR_NOMMU(xformer_prog = "unlzma";)
+-		if (opt & OPT_XZ)
+-			USE_FOR_MMU(xformer = unpack_xz_stream;)
++		}
++		if (opt & OPT_XZ) {
++			USE_FOR_MMU(IF_FEATURE_SEAMLESS_XZ(xformer = unpack_xz_stream;))
+ 			USE_FOR_NOMMU(xformer_prog = "unxz";)
++		}
+ 
+ 		fork_transformer_with_sig(tar_handle->src_fd, xformer, xformer_prog);
+ 		/* Can't lseek over pipes */
+-- 
+2.7.4
+

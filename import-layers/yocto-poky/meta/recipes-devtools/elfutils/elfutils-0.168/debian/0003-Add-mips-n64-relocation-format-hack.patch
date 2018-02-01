@@ -1,0 +1,229 @@
+From 59d4b8c48e5040af7e02b34eb26ea602ec82a38e Mon Sep 17 00:00:00 2001
+From: James Cowgill <james410@cowgill.org.uk>
+Date: Mon, 5 Jan 2015 15:17:02 +0000
+Subject: [PATCH 3/3] Add mips n64 relocation format hack
+
+MIPSEL N64 ELF files use a slightly different format for storing relocation
+entries which is incompatible with the normal R_SYM / R_INFO macros.
+To workaround this, we rearrange the bytes in the relocation's r_info field
+when reading and writing the relocations.
+
+This patch also ensures that strip.c sets the correct value of e_machine
+before manipulating relocations so that these changes take effect.
+
+Signed-off-by: James Cowgill <james410@cowgill.org.uk>
+
+Upstream-Status: Backport [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ libelf/gelf_getrel.c      | 25 +++++++++++++++++++++++--
+ libelf/gelf_getrela.c     | 25 +++++++++++++++++++++++--
+ libelf/gelf_update_rel.c  | 20 +++++++++++++++++++-
+ libelf/gelf_update_rela.c | 20 +++++++++++++++++++-
+ src/strip.c               | 17 +++++++++++++++++
+ 5 files changed, 101 insertions(+), 6 deletions(-)
+
+Index: b/libelf/gelf_getrel.c
+===================================================================
+--- a/libelf/gelf_getrel.c
++++ b/libelf/gelf_getrel.c
+@@ -36,6 +36,7 @@
+ 
+ #include "libelfP.h"
+ 
++#define EF_MIPS_ABI	0x0000F000
+ 
+ GElf_Rel *
+ gelf_getrel (Elf_Data *data, int ndx, GElf_Rel *dst)
+@@ -89,8 +90,28 @@ gelf_getrel (Elf_Data *data, int ndx, GE
+ 	  result = NULL;
+ 	}
+       else
+-	result = memcpy (dst, &((Elf64_Rel *) data_scn->d.d_buf)[ndx],
+-			 sizeof (Elf64_Rel));
++        {
++          GElf_Ehdr hdr;
++          result = memcpy (dst, &((Elf64_Rel *) data_scn->d.d_buf)[ndx],
++                           sizeof (Elf64_Rel));
++
++          if (gelf_getehdr(scn->elf, &hdr) != NULL &&
++              hdr.e_ident[EI_DATA] == ELFDATA2LSB &&
++              hdr.e_machine == EM_MIPS &&
++              (hdr.e_flags & EF_MIPS_ABI) == 0)
++            {
++              /*
++               * The relocation format is mangled on MIPSEL N64
++               *  We'll adjust it so at least R_SYM will work on it
++               */
++              GElf_Xword r_info = dst->r_info;
++              dst->r_info = (r_info << 32) |
++                            ((r_info >> 8) & 0xFF000000) |
++                            ((r_info >> 24) & 0x00FF0000) |
++                            ((r_info >> 40) & 0x0000FF00) |
++                            ((r_info >> 56) & 0x000000FF);
++            }
++        }
+     }
+ 
+   rwlock_unlock (scn->elf->lock);
+Index: b/libelf/gelf_getrela.c
+===================================================================
+--- a/libelf/gelf_getrela.c
++++ b/libelf/gelf_getrela.c
+@@ -36,6 +36,7 @@
+ 
+ #include "libelfP.h"
+ 
++#define EF_MIPS_ABI	0x0000F000
+ 
+ GElf_Rela *
+ gelf_getrela (Elf_Data *data, int ndx, GElf_Rela *dst)
+@@ -90,8 +91,28 @@ gelf_getrela (Elf_Data *data, int ndx, G
+ 	  result = NULL;
+ 	}
+       else
+-	result = memcpy (dst, &((Elf64_Rela *) data_scn->d.d_buf)[ndx],
+-			 sizeof (Elf64_Rela));
++        {
++          GElf_Ehdr hdr;
++          result = memcpy (dst, &((Elf64_Rela *) data_scn->d.d_buf)[ndx],
++                           sizeof (Elf64_Rela));
++
++          if (gelf_getehdr(scn->elf, &hdr) != NULL &&
++              hdr.e_ident[EI_DATA] == ELFDATA2LSB &&
++              hdr.e_machine == EM_MIPS &&
++              (hdr.e_flags & EF_MIPS_ABI) == 0)
++            {
++              /*
++               * The relocation format is mangled on MIPSEL N64
++               *  We'll adjust it so at least R_SYM will work on it
++               */
++              GElf_Xword r_info = dst->r_info;
++              dst->r_info = (r_info << 32) |
++                            ((r_info >> 8) & 0xFF000000) |
++                            ((r_info >> 24) & 0x00FF0000) |
++                            ((r_info >> 40) & 0x0000FF00) |
++                            ((r_info >> 56) & 0x000000FF);
++            }
++        }
+     }
+ 
+   rwlock_unlock (scn->elf->lock);
+Index: b/libelf/gelf_update_rel.c
+===================================================================
+--- a/libelf/gelf_update_rel.c
++++ b/libelf/gelf_update_rel.c
+@@ -36,6 +36,7 @@
+ 
+ #include "libelfP.h"
+ 
++#define EF_MIPS_ABI	0x0000F000
+ 
+ int
+ gelf_update_rel (Elf_Data *dst, int ndx, GElf_Rel *src)
+@@ -86,6 +87,9 @@ gelf_update_rel (Elf_Data *dst, int ndx,
+     }
+   else
+     {
++      GElf_Ehdr hdr;
++      GElf_Rel value = *src;
++
+       /* Check whether we have to resize the data buffer.  */
+       if (INVALID_NDX (ndx, Elf64_Rel, &data_scn->d))
+ 	{
+@@ -93,7 +97,21 @@ gelf_update_rel (Elf_Data *dst, int ndx,
+ 	  goto out;
+ 	}
+ 
+-      ((Elf64_Rel *) data_scn->d.d_buf)[ndx] = *src;
++      if (gelf_getehdr(scn->elf, &hdr) != NULL &&
++          hdr.e_ident[EI_DATA] == ELFDATA2LSB &&
++          hdr.e_machine == EM_MIPS &&
++          (hdr.e_flags & EF_MIPS_ABI) == 0)
++        {
++          /* Undo the MIPSEL N64 hack from gelf_getrel */
++          GElf_Xword r_info = value.r_info;
++          value.r_info = (r_info >> 32) |
++                         ((r_info << 8) &  0x000000FF00000000) |
++                         ((r_info << 24) & 0x0000FF0000000000) |
++                         ((r_info << 40) & 0x00FF000000000000) |
++                         ((r_info << 56) & 0xFF00000000000000);
++        }
++
++      ((Elf64_Rel *) data_scn->d.d_buf)[ndx] = value;
+     }
+ 
+   result = 1;
+Index: b/libelf/gelf_update_rela.c
+===================================================================
+--- a/libelf/gelf_update_rela.c
++++ b/libelf/gelf_update_rela.c
+@@ -36,6 +36,7 @@
+ 
+ #include "libelfP.h"
+ 
++#define EF_MIPS_ABI	0x0000F000
+ 
+ int
+ gelf_update_rela (Elf_Data *dst, int ndx, GElf_Rela *src)
+@@ -89,6 +90,9 @@ gelf_update_rela (Elf_Data *dst, int ndx
+     }
+   else
+     {
++      GElf_Ehdr hdr;
++      GElf_Rela value = *src;
++
+       /* Check whether we have to resize the data buffer.  */
+       if (INVALID_NDX (ndx, Elf64_Rela, &data_scn->d))
+ 	{
+@@ -96,7 +100,21 @@ gelf_update_rela (Elf_Data *dst, int ndx
+ 	  goto out;
+ 	}
+ 
+-      ((Elf64_Rela *) data_scn->d.d_buf)[ndx] = *src;
++      if (gelf_getehdr(scn->elf, &hdr) != NULL &&
++          hdr.e_ident[EI_DATA] == ELFDATA2LSB &&
++          hdr.e_machine == EM_MIPS &&
++          (hdr.e_flags & EF_MIPS_ABI) == 0)
++        {
++          /* Undo the MIPSEL N64 hack from gelf_getrel */
++          GElf_Xword r_info = value.r_info;
++          value.r_info = (r_info >> 32) |
++                         ((r_info << 8) &  0x000000FF00000000) |
++                         ((r_info << 24) & 0x0000FF0000000000) |
++                         ((r_info << 40) & 0x00FF000000000000) |
++                         ((r_info << 56) & 0xFF00000000000000);
++        }
++
++      ((Elf64_Rela *) data_scn->d.d_buf)[ndx] = value;
+     }
+ 
+   result = 1;
+Index: b/src/strip.c
+===================================================================
+--- a/src/strip.c
++++ b/src/strip.c
+@@ -532,6 +532,23 @@ handle_elf (int fd, Elf *elf, const char
+       goto fail;
+     }
+ 
++  /* Copy identity part of the ELF header now */
++  newehdr = gelf_getehdr (newelf, &newehdr_mem);
++  if (newehdr == NULL)
++    INTERNAL_ERROR (fname);
++
++  memcpy (newehdr->e_ident, ehdr->e_ident, EI_NIDENT);
++  newehdr->e_type = ehdr->e_type;
++  newehdr->e_machine = ehdr->e_machine;
++  newehdr->e_version = ehdr->e_version;
++
++  if (gelf_update_ehdr (newelf, newehdr) == 0)
++    {
++      error (0, 0, gettext ("%s: error while creating ELF header: %s"),
++	     fname, elf_errmsg (-1));
++      return 1;
++    }
++
+   /* Copy over the old program header if needed.  */
+   if (ehdr->e_type != ET_REL)
+     for (cnt = 0; cnt < phnum; ++cnt)

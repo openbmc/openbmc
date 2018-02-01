@@ -5,6 +5,8 @@ After=network.target
 [Service]
 Type=forking
 ExecStart=@SBINDIR@/tcf-agent -d -L- -l0
+KillSignal=USR2
+SuccessExitStatus=USR2
 
 [Install]
 WantedBy=multi-user.target

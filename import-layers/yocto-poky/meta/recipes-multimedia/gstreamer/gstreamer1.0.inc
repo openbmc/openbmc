@@ -24,7 +24,7 @@ PACKAGECONFIG[debug] = "--enable-debug,--disable-debug"
 PACKAGECONFIG[tests] = "--enable-tests,--disable-tests"
 PACKAGECONFIG[valgrind] = "--enable-valgrind,--disable-valgrind,valgrind,"
 PACKAGECONFIG[gst-tracer-hooks] = "--enable-gst-tracer-hooks,--disable-gst-tracer-hooks,"
-PACKAGECONFIG[trace-historic] = "--enable-trace,--disable-trace,"
+PACKAGECONFIG[unwind] = "--with-unwind,--without-unwind,libunwind"
 
 EXTRA_OECONF = " \
     --disable-dependency-tracking \

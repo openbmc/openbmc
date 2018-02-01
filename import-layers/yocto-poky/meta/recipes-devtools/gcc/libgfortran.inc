@@ -6,32 +6,27 @@ EXTRA_OECONF_PATHS = "\
 "
 
 do_configure () {
-	mtarget=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-	target=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-	hardlinkdir ${STAGING_INCDIR_NATIVE}/gcc-build-internal-$mtarget ${B}
-
-	echo "Configuring libgfortran"
-	rm -rf ${B}/$target/libgfortran/
-	mkdir -p ${B}/$target/libgfortran/
-	cd ${B}/$target/libgfortran/
+	rm -rf ${B}/${TARGET_SYS}/libgfortran/
+	mkdir -p ${B}/${TARGET_SYS}/libgfortran/
+	cd ${B}/${TARGET_SYS}/libgfortran/
 	chmod a+x ${S}/libgfortran/configure
-	relpath=${@os.path.relpath("${S}/libgfortran", "${B}/$target/libgfortran")}
+	relpath=${@os.path.relpath("${S}/libgfortran", "${B}/${TARGET_SYS}/libgfortran")}
 	$relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
 	# Easiest way to stop bad RPATHs getting into the library since we have a
 	# broken libtool here
-	sed -i -e 's/hardcode_into_libs=yes/hardcode_into_libs=no/' ${B}/$target/libgfortran/libtool
+	sed -i -e 's/hardcode_into_libs=yes/hardcode_into_libs=no/' ${B}/${TARGET_SYS}/libgfortran/libtool
 }
+EXTRACONFFUNCS += "extract_stashed_builddir"
+do_configure[depends] += "${COMPILERDEP}"
 
 do_compile () {
-	target=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-	cd ${B}/$target/libgfortran/
-	oe_runmake MULTIBUILDTOP=${B}/$target/libgfortran/
+	cd ${B}/${TARGET_SYS}/libgfortran/
+	oe_runmake MULTIBUILDTOP=${B}/${TARGET_SYS}/libgfortran/
 }
 
 do_install () {
-	target=`echo ${TARGET_SYS} | sed -e s#-${SDKPKGSUFFIX}##`
-	cd ${B}/$target/libgfortran/
-	oe_runmake 'DESTDIR=${D}' MULTIBUILDTOP=${B}/$target/libgfortran/ install
+	cd ${B}/${TARGET_SYS}/libgfortran/
+	oe_runmake 'DESTDIR=${D}' MULTIBUILDTOP=${B}/${TARGET_SYS}/libgfortran/ install
 	if [ -d ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/finclude ]; then
 		rmdir --ignore-fail-on-non-empty -p ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/finclude
 	fi
@@ -69,7 +64,7 @@ do_package_write_deb[depends] += "virtual/${MLPREFIX}libc:do_packagedata"
 do_package_write_rpm[depends] += "virtual/${MLPREFIX}libc:do_packagedata"
 
 python __anonymous () {
-    f = d.getVar("FORTRAN", True)
+    f = d.getVar("FORTRAN")
     if "fortran" not in f:
         raise bb.parse.SkipPackage("libgfortran needs fortran support to be enabled in the compiler")
 }

@@ -1,0 +1,40 @@
+From c3767e189e90965407937b6178adbbd8cdafe31d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Nov 2016 05:59:10 +0000
+Subject: [PATCH] hdhomerun: Override forced overrdiing og CC/STRIP and CFLAGS
+
+This is required for cross compiling otherwise it ends up
+using build host gcc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.hdhomerun | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.hdhomerun b/Makefile.hdhomerun
+index 943ffec..8bd14ff 100644
+--- a/Makefile.hdhomerun
++++ b/Makefile.hdhomerun
+@@ -18,8 +18,8 @@
+ 
+ include $(dir $(lastword $(MAKEFILE_LIST))).config.mk
+ 
+-unexport CFLAGS
+-unexport LDFLAGS
++#unexport CFLAGS
++#unexport LDFLAGS
+ 
+ define DOWNLOAD
+ 	@mkdir -p $(LIBHDHRDIR)/build
+@@ -75,6 +75,8 @@ $(LIBHDHRDIR)/$(LIBHDHR)/.tvh_download:
+ 	$(call DOWNLOAD,$(LIBHDHR_URL),$(LIBHDHRDIR)/$(LIBHDHR_TB),$(LIBHDHR_SHA1))
+ 	$(call UNTAR,$(LIBHDHR_TB),z)
+ 	ln -sf libhdhomerun $(LIBHDHRDIR)/$(LIBHDHR)
++	@sed -i -e "s/CC.*:=/CC ?=/" $(LIBHDHRDIR)/$(LIBHDHR)/Makefile
++	@sed -i -e "s/STRIP.*:=/STRIP ?=/" $(LIBHDHRDIR)/$(LIBHDHR)/Makefile
+ 	@touch $@
+ 
+ $(LIBHDHRDIR)/$(LIBHDHR)/.tvh_build: \
+-- 
+1.9.1
+

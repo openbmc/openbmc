@@ -1,0 +1,28 @@
+From 330fa6777d51d41eefacff8e98e4250d210fde35 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Javi=20Mart=C3=ADnez?= <javi@flamingalah.net>
+Date: Tue, 13 Dec 2016 22:31:13 +0100
+Subject: [PATCH] Improve/fix installation of Python bindings
+
+Upstream-Status: Backport
+
+dist-packages is a Debian-specific directory for distribution packages (and used in derivatives such as Ubuntu). Therefore changed to site-packages.
+---
+ src/libcec/cmake/CheckPlatformSupport.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libcec/cmake/CheckPlatformSupport.cmake b/src/libcec/cmake/CheckPlatformSupport.cmake
+index fcd0ef7..7661107 100644
+--- a/src/libcec/cmake/CheckPlatformSupport.cmake
++++ b/src/libcec/cmake/CheckPlatformSupport.cmake
+@@ -195,9 +195,9 @@ else()
+               RENAME      __init__.py)
+     else()
+       install(TARGETS     ${SWIG_MODULE_cec_REAL_NAME}
+-              DESTINATION lib/python${PYTHON_VERSION}/dist-packages/cec)
++              DESTINATION lib/python${PYTHON_VERSION}/site-packages/cec)
+       install(FILES       ${CMAKE_BINARY_DIR}/src/libcec/cec.py
+-              DESTINATION lib/python${PYTHON_VERSION}/dist-packages/cec
++              DESTINATION lib/python${PYTHON_VERSION}/site-packages/cec
+               RENAME      __init__.py)
+     endif()
+   endif()

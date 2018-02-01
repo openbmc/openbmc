@@ -12,3 +12,7 @@ index b61e974..a3e5db2 100644
 -# For the socket module
 -AC_PATH_XTRA
 -
+--- a/modules/Makefile.in
++++ b/modules/Makefile.in
+@@ -67 +66,0 @@ ZLIB_LIB        = @Z_LIB@ -lz
+-SOCKET_LIBS = @X_EXTRA_LIBS@

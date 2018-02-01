@@ -84,12 +84,12 @@ python build_syslinux_cfg () {
     import copy
     import sys
 
-    workdir = d.getVar('WORKDIR', True)
+    workdir = d.getVar('WORKDIR')
     if not workdir:
         bb.error("WORKDIR not defined, unable to package")
         return
         
-    labels = d.getVar('LABELS', True)
+    labels = d.getVar('LABELS')
     if not labels:
         bb.debug(1, "LABELS not defined, nothing to do")
         return
@@ -98,7 +98,7 @@ python build_syslinux_cfg () {
         bb.debug(1, "No labels, nothing to do")
         return
 
-    cfile = d.getVar('SYSLINUX_CFG', True)
+    cfile = d.getVar('SYSLINUX_CFG')
     if not cfile:
         bb.fatal('Unable to read SYSLINUX_CFG')
 
@@ -109,39 +109,39 @@ python build_syslinux_cfg () {
 
     cfgfile.write('# Automatically created by OE\n')
 
-    opts = d.getVar('SYSLINUX_OPTS', True)
+    opts = d.getVar('SYSLINUX_OPTS')
 
     if opts:
         for opt in opts.split(';'):
             cfgfile.write('%s\n' % opt)
 
-    allowoptions = d.getVar('SYSLINUX_ALLOWOPTIONS', True)
+    allowoptions = d.getVar('SYSLINUX_ALLOWOPTIONS')
     if allowoptions:
         cfgfile.write('ALLOWOPTIONS %s\n' % allowoptions)
     else:
         cfgfile.write('ALLOWOPTIONS 1\n')
 
-    syslinux_default_console = d.getVar('SYSLINUX_DEFAULT_CONSOLE', True)
-    syslinux_serial_tty = d.getVar('SYSLINUX_SERIAL_TTY', True)
-    syslinux_serial = d.getVar('SYSLINUX_SERIAL', True)
+    syslinux_default_console = d.getVar('SYSLINUX_DEFAULT_CONSOLE')
+    syslinux_serial_tty = d.getVar('SYSLINUX_SERIAL_TTY')
+    syslinux_serial = d.getVar('SYSLINUX_SERIAL')
     if syslinux_serial:
         cfgfile.write('SERIAL %s\n' % syslinux_serial)
 
-    menu = (d.getVar('AUTO_SYSLINUXMENU', True) == "1")
+    menu = (d.getVar('AUTO_SYSLINUXMENU') == "1")
 
     if menu and syslinux_serial:
         cfgfile.write('DEFAULT Graphics console %s\n' % (labels.split()[0]))
     else:
         cfgfile.write('DEFAULT %s\n' % (labels.split()[0]))
 
-    timeout = d.getVar('SYSLINUX_TIMEOUT', True)
+    timeout = d.getVar('SYSLINUX_TIMEOUT')
 
     if timeout:
         cfgfile.write('TIMEOUT %s\n' % timeout)
     else:
         cfgfile.write('TIMEOUT 50\n')
 
-    prompt = d.getVar('SYSLINUX_PROMPT', True)
+    prompt = d.getVar('SYSLINUX_PROMPT')
     if prompt:
         cfgfile.write('PROMPT %s\n' % prompt)
     else:
@@ -151,38 +151,37 @@ python build_syslinux_cfg () {
         cfgfile.write('ui vesamenu.c32\n')
         cfgfile.write('menu title Select kernel options and boot kernel\n')
         cfgfile.write('menu tabmsg Press [Tab] to edit, [Return] to select\n')
-        splash = d.getVar('SYSLINUX_SPLASH', True)
+        splash = d.getVar('SYSLINUX_SPLASH')
         if splash:
             cfgfile.write('menu background splash.lss\n')
     
     for label in labels.split():
         localdata = bb.data.createCopy(d)
 
-        overrides = localdata.getVar('OVERRIDES', True)
+        overrides = localdata.getVar('OVERRIDES')
         if not overrides:
             bb.fatal('OVERRIDES not defined')
 
         localdata.setVar('OVERRIDES', label + ':' + overrides)
-        bb.data.update_data(localdata)
     
         btypes = [ [ "", syslinux_default_console ] ]
         if menu and syslinux_serial:
             btypes = [ [ "Graphics console ", syslinux_default_console  ],
                 [ "Serial console ", syslinux_serial_tty ] ]
 
-        root= d.getVar('SYSLINUX_ROOT', True)
+        root= d.getVar('SYSLINUX_ROOT')
         if not root:
             bb.fatal('SYSLINUX_ROOT not defined')
 
         for btype in btypes:
             cfgfile.write('LABEL %s%s\nKERNEL /vmlinuz\n' % (btype[0], label))
 
-            exargs = d.getVar('SYSLINUX_KERNEL_ARGS', True)
+            exargs = d.getVar('SYSLINUX_KERNEL_ARGS')
             if exargs:
                 btype[1] += " " + exargs
 
-            append = localdata.getVar('APPEND', True)
-            initrd = localdata.getVar('INITRD', True)
+            append = localdata.getVar('APPEND')
+            initrd = localdata.getVar('INITRD')
 
             append = root + " " + append
             cfgfile.write('APPEND ')

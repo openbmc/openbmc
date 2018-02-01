@@ -1,0 +1,36 @@
+From 77808db4036dc4a012c47aca36255549ed764a6a Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Tue, 16 May 2017 10:58:18 +0200
+Subject: [PATCH 12/13] Use conditional to access %{_docdir} in macros.in
+
+This avoids the following warning:
+
+warning: Ignoring invalid regex %{_docdir}
+
+when runing `rpmdeps -R <file>`, since %{_docdir} is only defined when
+parsing a spec file (in parseSpec()).
+
+Upstream-Status: Accepted [https://github.com/rpm-software-management/rpm/pull/216]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ macros.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/macros.in b/macros.in
+index 84ae25275..cca67a500 100644
+--- a/macros.in
++++ b/macros.in
+@@ -200,8 +200,8 @@ package or when debugging this package.\
+ # Their purpouse is to set up global filtering for all packages. If you need
+ # to set up specific filtering for your package use %__requires_exclude_from
+ # and %__provides_exclude_from instead.
+-%__global_requires_exclude_from		%{_docdir}
+-%__global_provides_exclude_from		%{_docdir}
++%__global_requires_exclude_from		%{?_docdir:%{_docdir}}
++%__global_provides_exclude_from		%{?_docdir:%{_docdir}}
+ 
+ #	The path to the gzip executable (legacy, use %{__gzip} instead).
+ %_gzipbin		%{__gzip}
+-- 
+2.12.0
+

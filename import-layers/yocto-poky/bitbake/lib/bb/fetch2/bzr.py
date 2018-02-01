@@ -27,7 +27,6 @@ import os
 import sys
 import logging
 import bb
-from bb import data
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import FetchError
 from bb.fetch2 import runfetchcmd
@@ -43,14 +42,14 @@ class Bzr(FetchMethod):
         """
         # Create paths to bzr checkouts
         relpath = self._strip_leading_slashes(ud.path)
-        ud.pkgdir = os.path.join(data.expand('${BZRDIR}', d), ud.host, relpath)
+        ud.pkgdir = os.path.join(d.expand('${BZRDIR}'), ud.host, relpath)
 
-        ud.setup_revisons(d)
+        ud.setup_revisions(d)
 
         if not ud.revision:
             ud.revision = self.latest_revision(ud, d)
 
-        ud.localfile = data.expand('bzr_%s_%s_%s.tar.gz' % (ud.host, ud.path.replace('/', '.'), ud.revision), d)
+        ud.localfile = d.expand('bzr_%s_%s_%s.tar.gz' % (ud.host, ud.path.replace('/', '.'), ud.revision))
 
     def _buildbzrcommand(self, ud, d, command):
         """
@@ -58,7 +57,7 @@ class Bzr(FetchMethod):
         command is "fetch", "update", "revno"
         """
 
-        basecmd = data.expand('${FETCHCMD_bzr}', d)
+        basecmd = d.expand('${FETCHCMD_bzr}')
 
         proto =  ud.parm.get('protocol', 'http')
 

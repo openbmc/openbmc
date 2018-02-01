@@ -22,4 +22,4 @@ do_install() {
 }
 
 # http://errors.yoctoproject.org/Errors/Details/35132/
-PNBLACKLIST[gtk-theme-torturer] ?= "BROKEN: gmacros.h:182:53: error: size of array '_GStaticAssertCompileTimeAssertion_2' is negative"
+PNBLACKLIST[gtk-theme-torturer] ?= "BROKEN: gmacros.h:182:53: error: size of array '_GStaticAssertCompileTimeAssertion_2' is negative - the recipe will be removed on 2017-09-01 unless the issue is fixed"

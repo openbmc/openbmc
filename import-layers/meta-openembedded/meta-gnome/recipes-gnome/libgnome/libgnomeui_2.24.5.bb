@@ -3,7 +3,7 @@ LICENSE = "LGPLv2"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=55ca817ccb7d5b5b66355690e9abc605"
 
 SECTION = "x11/gnome/libs"
-DEPENDS = "libgnome libgnomecanvas libbonoboui libgnome-keyring intltool-native"
+DEPENDS = "libgnome libgnomecanvas libbonoboui libgnome-keyring intltool-native gnome-common-native"
 
 inherit gnome
 
@@ -27,3 +27,5 @@ EXTRA_OECONF = "--disable-gtk-doc"
 do_configure_prepend() {
     install -m 0644 ${WORKDIR}/gnome-stock-pixbufs.h ${S}/libgnomeui/pixmaps/gnome-stock-pixbufs.h
 }
+
+LDFLAGS += "-lm"

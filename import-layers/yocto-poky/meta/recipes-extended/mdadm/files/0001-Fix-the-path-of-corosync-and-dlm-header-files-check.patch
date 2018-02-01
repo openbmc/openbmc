@@ -10,6 +10,17 @@ Upstream-Status: Inappropriate [Yocto specific]
 
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
 ---
+mdadm only works with corosync 2.x which provides header file corosync/cmap.h.
+If build mdadm with corosync 1.x, it fails with:
+
+| member.c:12:27: fatal error: corosync/cmap.h: No such file or directory
+|  #include <corosync/cmap.h>
+|                            ^
+
+Build with corosync only header file corosync/cmap.h exists.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
@@ -23,7 +34,7 @@ index fd79cfb..34150a9 100644
  
 -COROSYNC:=$(shell [ -d /usr/include/corosync ] || echo -DNO_COROSYNC)
 -DLM:=$(shell [ -f /usr/include/libdlm.h ] || echo -DNO_DLM)
-+COROSYNC:=$(shell [ -d $(SYSROOT)/usr/include/corosync ] || echo -DNO_COROSYNC)
++COROSYNC:=$(shell [ -f $(SYSROOT)/usr/include/corosync/cmap.h ] || echo -DNO_COROSYNC)
 +DLM:=$(shell [ -f $(SYSROOT)/usr/include/libdlm.h ] || echo -DNO_DLM)
  
  DIRFLAGS = -DMAP_DIR=\"$(MAP_DIR)\" -DMAP_FILE=\"$(MAP_FILE)\"

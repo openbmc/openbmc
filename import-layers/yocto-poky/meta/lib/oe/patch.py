@@ -81,7 +81,7 @@ class PatchSet(object):
                 patch[param] = PatchSet.defaults[param]
 
         if patch.get("remote"):
-            patch["file"] = bb.data.expand(bb.fetch2.localpath(patch["remote"], self.d), self.d)
+            patch["file"] = self.d.expand(bb.fetch2.localpath(patch["remote"], self.d))
 
         patch["filemd5"] = bb.utils.md5_file(patch["file"])
 
@@ -281,8 +281,8 @@ class GitApplyTree(PatchTree):
 
     def __init__(self, dir, d):
         PatchTree.__init__(self, dir, d)
-        self.commituser = d.getVar('PATCH_GIT_USER_NAME', True)
-        self.commitemail = d.getVar('PATCH_GIT_USER_EMAIL', True)
+        self.commituser = d.getVar('PATCH_GIT_USER_NAME')
+        self.commitemail = d.getVar('PATCH_GIT_USER_EMAIL')
 
     @staticmethod
     def extractPatchHeader(patchfile):
@@ -371,8 +371,8 @@ class GitApplyTree(PatchTree):
     @staticmethod
     def gitCommandUserOptions(cmd, commituser=None, commitemail=None, d=None):
         if d:
-            commituser = d.getVar('PATCH_GIT_USER_NAME', True)
-            commitemail = d.getVar('PATCH_GIT_USER_EMAIL', True)
+            commituser = d.getVar('PATCH_GIT_USER_NAME')
+            commitemail = d.getVar('PATCH_GIT_USER_EMAIL')
         if commituser:
             cmd += ['-c', 'user.name="%s"' % commituser]
         if commitemail:
@@ -428,6 +428,7 @@ class GitApplyTree(PatchTree):
     def extractPatches(tree, startcommit, outdir, paths=None):
         import tempfile
         import shutil
+        import re
         tempdir = tempfile.mkdtemp(prefix='oepatch')
         try:
             shellcmd = ["git", "format-patch", startcommit, "-o", tempdir]
@@ -443,10 +444,13 @@ class GitApplyTree(PatchTree):
                         try:
                             with open(srcfile, 'r', encoding=encoding) as f:
                                 for line in f:
-                                    if line.startswith(GitApplyTree.patch_line_prefix):
+                                    checkline = line
+                                    if checkline.startswith('Subject: '):
+                                        checkline = re.sub(r'\[.+?\]\s*', '', checkline[9:])
+                                    if checkline.startswith(GitApplyTree.patch_line_prefix):
                                         outfile = line.split()[-1].strip()
                                         continue
-                                    if line.startswith(GitApplyTree.ignore_commit_prefix):
+                                    if checkline.startswith(GitApplyTree.ignore_commit_prefix):
                                         continue
                                     patchlines.append(line)
                         except UnicodeDecodeError:
@@ -547,7 +551,7 @@ class GitApplyTree(PatchTree):
 
 class QuiltTree(PatchSet):
     def _runcmd(self, args, run = True):
-        quiltrc = self.d.getVar('QUILTRCFILE', True)
+        quiltrc = self.d.getVar('QUILTRCFILE')
         if not run:
             return ["quilt"] + ["--quiltrc"] + [quiltrc] + args
         runcmd(["quilt"] + ["--quiltrc"] + [quiltrc] + args, self.dir)
@@ -723,7 +727,7 @@ class UserResolver(Resolver):
             # Patch application failed
             patchcmd = self.patchset.Push(True, False, False)
 
-            t = self.patchset.d.getVar('T', True)
+            t = self.patchset.d.getVar('T')
             if not t:
                 bb.msg.fatal("Build", "T not set")
             bb.utils.mkdirhier(t)
@@ -765,3 +769,110 @@ class UserResolver(Resolver):
             os.chdir(olddir)
             raise
         os.chdir(olddir)
+
+
+def patch_path(url, fetch, workdir, expand=True):
+    """Return the local path of a patch, or None if this isn't a patch"""
+
+    local = fetch.localpath(url)
+    base, ext = os.path.splitext(os.path.basename(local))
+    if ext in ('.gz', '.bz2', '.xz', '.Z'):
+        if expand:
+            local = os.path.join(workdir, base)
+        ext = os.path.splitext(base)[1]
+
+    urldata = fetch.ud[url]
+    if "apply" in urldata.parm:
+        apply = oe.types.boolean(urldata.parm["apply"])
+        if not apply:
+            return
+    elif ext not in (".diff", ".patch"):
+        return
+
+    return local
+
+def src_patches(d, all=False, expand=True):
+    workdir = d.getVar('WORKDIR')
+    fetch = bb.fetch2.Fetch([], d)
+    patches = []
+    sources = []
+    for url in fetch.urls:
+        local = patch_path(url, fetch, workdir, expand)
+        if not local:
+            if all:
+                local = fetch.localpath(url)
+                sources.append(local)
+            continue
+
+        urldata = fetch.ud[url]
+        parm = urldata.parm
+        patchname = parm.get('pname') or os.path.basename(local)
+
+        apply, reason = should_apply(parm, d)
+        if not apply:
+            if reason:
+                bb.note("Patch %s %s" % (patchname, reason))
+            continue
+
+        patchparm = {'patchname': patchname}
+        if "striplevel" in parm:
+            striplevel = parm["striplevel"]
+        elif "pnum" in parm:
+            #bb.msg.warn(None, "Deprecated usage of 'pnum' url parameter in '%s', please use 'striplevel'" % url)
+            striplevel = parm["pnum"]
+        else:
+            striplevel = '1'
+        patchparm['striplevel'] = striplevel
+
+        patchdir = parm.get('patchdir')
+        if patchdir:
+            patchparm['patchdir'] = patchdir
+
+        localurl = bb.fetch.encodeurl(('file', '', local, '', '', patchparm))
+        patches.append(localurl)
+
+    if all:
+        return sources
+
+    return patches
+
+
+def should_apply(parm, d):
+    if "mindate" in parm or "maxdate" in parm:
+        pn = d.getVar('PN')
+        srcdate = d.getVar('SRCDATE_%s' % pn)
+        if not srcdate:
+            srcdate = d.getVar('SRCDATE')
+
+        if srcdate == "now":
+            srcdate = d.getVar('DATE')
+
+        if "maxdate" in parm and parm["maxdate"] < srcdate:
+            return False, 'is outdated'
+
+        if "mindate" in parm and parm["mindate"] > srcdate:
+            return False, 'is predated'
+
+
+    if "minrev" in parm:
+        srcrev = d.getVar('SRCREV')
+        if srcrev and srcrev < parm["minrev"]:
+            return False, 'applies to later revisions'
+
+    if "maxrev" in parm:
+        srcrev = d.getVar('SRCREV')
+        if srcrev and srcrev > parm["maxrev"]:
+            return False, 'applies to earlier revisions'
+
+    if "rev" in parm:
+        srcrev = d.getVar('SRCREV')
+        if srcrev and parm["rev"] not in srcrev:
+            return False, "doesn't apply to revision"
+
+    if "notrev" in parm:
+        srcrev = d.getVar('SRCREV')
+        if srcrev and parm["notrev"] in srcrev:
+            return False, "doesn't apply to revision"
+
+    return True, None
+

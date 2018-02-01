@@ -1,0 +1,35 @@
+From 22be02612adc757f6a43cefc6ee65ecaef68f0d9 Mon Sep 17 00:00:00 2001
+From: Carlos Rafael Giani <dv@pseudoterminal.org>
+Date: Thu, 23 Mar 2017 22:13:05 +0100
+Subject: [PATCH] v4l2object: Also add videometa if there is padding to the
+ right and bottom
+
+https://bugzilla.gnome.org/show_bug.cgi?id=780478
+
+Upstream-Status: Backport [1.10.5]
+
+Signed-off-by: Carlos Rafael Giani <dv@pseudoterminal.org>
+---
+ sys/v4l2/gstv4l2object.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/sys/v4l2/gstv4l2object.c b/sys/v4l2/gstv4l2object.c
+index 91c8ff0..ed4654e 100644
+--- a/sys/v4l2/gstv4l2object.c
++++ b/sys/v4l2/gstv4l2object.c
+@@ -3070,9 +3070,10 @@ store_info:
+   GST_DEBUG_OBJECT (v4l2object->element, "Got sizeimage %" G_GSIZE_FORMAT,
+       info->size);
+ 
+-  /* to avoid copies we need video meta if top or left padding */
++  /* to avoid copies we need video meta if there is padding */
+   v4l2object->need_video_meta =
+-      ((align->padding_top + align->padding_left) != 0);
++      ((align->padding_top + align->padding_left + align->padding_right +
++          align->padding_bottom) != 0);
+ 
+   /* ... or if stride is non "standard" */
+   if (!standard_stride)
+-- 
+2.7.4
+

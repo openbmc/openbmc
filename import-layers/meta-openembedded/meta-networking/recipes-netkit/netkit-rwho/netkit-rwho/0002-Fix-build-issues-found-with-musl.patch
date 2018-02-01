@@ -1,0 +1,71 @@
+From 2108213242638fa355f662382f55495d91301858 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Aug 2017 18:13:17 -0700
+Subject: [PATCH 2/2] Fix build issues found with musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ ruptime/ruptime.c | 1 +
+ rwho/rwho.c       | 1 +
+ rwhod/rwhod.c     | 5 +++--
+ 3 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/ruptime/ruptime.c b/ruptime/ruptime.c
+index 1d4f7b6..f1f043c 100644
+--- a/ruptime/ruptime.c
++++ b/ruptime/ruptime.c
+@@ -53,6 +53,7 @@ char ruptime_rcsid[] =
+ #include <string.h>
+ #include <errno.h>
+ #include <time.h>
++#include <fcntl.h>
+ 
+ struct hs {
+ 	char	hs_hostname[MAXHOSTNAMELEN];
+diff --git a/rwho/rwho.c b/rwho/rwho.c
+index 63919ac..71aec9e 100644
+--- a/rwho/rwho.c
++++ b/rwho/rwho.c
+@@ -49,6 +49,7 @@ char rcsid[] = "$Id: rwho.c,v 1.7 1999/08/01 20:44:18 dholland Exp $";
+ #include <assert.h>
+ #include <stdio.h>
+ #include <time.h>
++#include <fcntl.h>
+ #include <protocols/rwhod.h>
+ 
+ #include "../version.h"
+diff --git a/rwhod/rwhod.c b/rwhod/rwhod.c
+index 54498d0..40cabcf 100644
+--- a/rwhod/rwhod.c
++++ b/rwhod/rwhod.c
+@@ -76,6 +76,7 @@ char rcsid[] =
+ #include <grp.h>
+ #include <time.h>
+ #include <stdint.h>
++#include <fcntl.h>
+ 
+ #include "../version.h"
+ 
+@@ -102,7 +103,7 @@ struct	nlist nl[] = {
+ static void	broadcaster(void);
+ static int	configure(int s);
+ static int	verify(const char *name);
+-#if __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 2)
++#if defined(__GLIBC__) &&  (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 2))
+ static int	getloadavg(double ptr[3], int n);
+ #endif
+ 
+@@ -549,7 +550,7 @@ sendpacket(struct whod *wd)
+ 	}
+ }
+ 
+-#if __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 2)
++#if defined(__GLIBC__) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 2))
+ /*
+  * Taken from:
+  *
+-- 
+2.14.1
+

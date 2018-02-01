@@ -1,0 +1,32 @@
+From 9f69f3f5ef22bf1bcffb0e651efc260889cfaa46 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 13 Mar 2017 20:33:30 -0700
+Subject: [PATCH] autoopts/mk-tpl-config.sh: fix perl path
+
+Use "which perl" as shebang doesn't work when it is longer than
+BINPRM_BUF_SIZE which is 128 usually. So use "/usr/bin/env perl" to
+instead of.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ autoopts/mk-tpl-config.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/autoopts/mk-tpl-config.sh b/autoopts/mk-tpl-config.sh
+index 093e808..8dfc6dd 100755
+--- a/autoopts/mk-tpl-config.sh
++++ b/autoopts/mk-tpl-config.sh
+@@ -98,7 +98,7 @@ fix_scripts() {
+         st=`sed 1q $f`
+ 
+         case "$st" in
+-        *perl ) echo '#!' `which perl`
++        *perl ) echo '#!/usr/bin/env perl'
+                  sed 1d $f
+                  ;;
+ 
+-- 
+2.10.2
+

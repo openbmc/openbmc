@@ -1,10 +1,12 @@
 SUMMARY = "VLAN provides vconfig utility"
 SECTION = "misc"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://vconfig.c;md5=293ef69c4e88434d37a5ee577a5288cb"
+LIC_FILES_CHKSUM = "file://vconfig.c;beginline=1;endline=19;md5=094ca47de36c20c598b15b32c270ce0a"
 
 SRC_URI = "http://${BPN}.sourcearchive.com/downloads/${PV}-3ubuntu9/${BPN}_${PV}.orig.tar.gz \
-           file://no-HOME-includes.patch"
+           file://no-HOME-includes.patch \
+           file://0001-Add-printf-format-and-silence-format-security-warnin.patch \
+"
 
 SRC_URI[md5sum] = "5f0c6060b33956fb16e11a15467dd394"
 SRC_URI[sha256sum] = "3b8f0a1bf0d3642764e5f646e1f3bbc8b1eeec474a77392d9aeb4868842b4cca"

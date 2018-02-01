@@ -1,0 +1,44 @@
+From 4ebab8add4a549c16ab8b124137546c0a7b46a9b Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Tue, 15 Nov 2016 11:11:30 -0500
+Subject: [PATCH] Do not clean kernel source
+
+The default behaviour should not be to attempt to clean the kernel source
+tree when building userspace.  When not cross-compiling, however, this action is
+harmless, but when attempting to build within the sysroot and since this package
+is purely userspace, the clean step will fail.
+
+Removing the clean step eliminates an unnecessary dependency on the kernel build
+infrastructure.
+
+Upstream-status: Inappropriate (embedded specific)
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index c8cd00e..9576bba 100644
+--- a/Makefile
++++ b/Makefile
+@@ -37,7 +37,7 @@ endif
+ 
+ all: user
+ 
+-user: iscsiuio/Makefile
++user:
+ 	$(MAKE) -C utils/sysdeps
+ 	$(MAKE) -C utils/fwparam_ibft
+ 	$(MAKE) -C usr
+@@ -75,7 +75,6 @@ clean:
+ 	$(MAKE) -C utils/fwparam_ibft clean
+ 	$(MAKE) -C utils clean
+ 	$(MAKE) -C usr clean
+-	$(MAKE) -C kernel clean
+ 	[ ! -f iscsiuio/Makefile ] || $(MAKE) -C iscsiuio clean
+ 	[ ! -f iscsiuio/Makefile ] || $(MAKE) -C iscsiuio distclean
+ 
+-- 
+1.9.1
+

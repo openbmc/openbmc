@@ -56,7 +56,7 @@ class LayerIndexPlugin(ActionPlugin):
         r = conn.getresponse()
         if r.status != 200:
             raise Exception("Failed to read " + path + ": %d %s" % (r.status, r.reason))
-        return json.loads(r.read())
+        return json.loads(r.read().decode())
 
     def get_layer_deps(self, layername, layeritems, layerbranches, layerdependencies, branchnum, selfname=False):
         def layeritems_info_id(items_name, layeritems):
@@ -151,7 +151,7 @@ class LayerIndexPlugin(ActionPlugin):
     def do_layerindex_fetch(self, args):
         """Fetches a layer from a layer index along with its dependent layers, and adds them to conf/bblayers.conf.
 """
-        apiurl = self.tinfoil.config_data.getVar('BBLAYERS_LAYERINDEX_URL', True)
+        apiurl = self.tinfoil.config_data.getVar('BBLAYERS_LAYERINDEX_URL')
         if not apiurl:
             logger.error("Cannot get BBLAYERS_LAYERINDEX_URL")
             return 1
@@ -173,8 +173,8 @@ class LayerIndexPlugin(ActionPlugin):
             return 1
 
         ignore_layers = []
-        for collection in self.tinfoil.config_data.getVar('BBFILE_COLLECTIONS', True).split():
-            lname = self.tinfoil.config_data.getVar('BBLAYERS_LAYERINDEX_NAME_%s' % collection, True)
+        for collection in self.tinfoil.config_data.getVar('BBFILE_COLLECTIONS').split():
+            lname = self.tinfoil.config_data.getVar('BBLAYERS_LAYERINDEX_NAME_%s' % collection)
             if lname:
                 ignore_layers.append(lname)
 
@@ -225,7 +225,7 @@ class LayerIndexPlugin(ActionPlugin):
             printedlayers.append(dependency)
 
         if repourls:
-            fetchdir = self.tinfoil.config_data.getVar('BBLAYERS_FETCH_DIR', True)
+            fetchdir = self.tinfoil.config_data.getVar('BBLAYERS_FETCH_DIR')
             if not fetchdir:
                 logger.error("Cannot get BBLAYERS_FETCH_DIR")
                 return 1

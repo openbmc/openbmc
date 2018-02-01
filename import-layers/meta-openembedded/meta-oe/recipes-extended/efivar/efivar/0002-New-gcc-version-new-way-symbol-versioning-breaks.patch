@@ -1,0 +1,66 @@
+From 31e655d2b5f66e772d9714422b7332bbaa60d2e6 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 6 Feb 2017 14:41:58 -0500
+Subject: [PATCH 2/2] New gcc version, new way symbol versioning breaks.
+
+Apparently I get to redo this every time there's a compiler release.
+Yaaaaaay.
+
+Anyway, the current method is to define the two compat things from the
+land before time as @libefivar.so.0 symbols and list them there in the
+link map.  Then we have the real one defined with another name, and set
+as efi_set_variable@@LIBEFIVAR_0.24.  Then to make there actually be a
+efi_set_variable symbol to link against, we create it as a weak alias.
+
+This is all completely absurd.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/lib.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/src/lib.c b/src/lib.c
+index 6a9b392..afa7d94 100644
+--- a/src/lib.c
++++ b/src/lib.c
+@@ -49,7 +49,7 @@ _efi_set_variable(efi_guid_t guid, const char *name, uint8_t *data,
+ {
+ 	return ops->set_variable(guid, name, data, data_size, attributes, 0600);
+ }
+-__asm__(".symver _efi_set_variable,_efi_set_variable@");
++__asm__(".symver _efi_set_variable,_efi_set_variable@libefivar.so.0");
+ 
+ int
+ __attribute__((__nonnull__ (2, 3)))
+@@ -59,17 +59,24 @@ _efi_set_variable_variadic(efi_guid_t guid, const char *name, uint8_t *data,
+ {
+ 	return ops->set_variable(guid, name, data, data_size, attributes, 0600);
+ }
+-__asm__(".symver _efi_set_variable_variadic,efi_set_variable@");
++__asm__(".symver _efi_set_variable_variadic,efi_set_variable@libefivar.so.0");
+ 
+ int
+ __attribute__((__nonnull__ (2, 3)))
+ __attribute__((__visibility__ ("default")))
+-efi_set_variable(efi_guid_t guid, const char *name, uint8_t *data,
+-		 size_t data_size, uint32_t attributes, mode_t mode)
++_efi_set_variable_mode(efi_guid_t guid, const char *name, uint8_t *data,
++		       size_t data_size, uint32_t attributes, mode_t mode)
+ {
+ 	return ops->set_variable(guid, name, data, data_size, attributes, mode);
+ }
+-__asm__(".symver efi_set_variable,efi_set_variable@@LIBEFIVAR_0.24");
++__asm__(".symver _efi_set_variable_mode,efi_set_variable@@LIBEFIVAR_0.24");
++
++int
++__attribute__((__nonnull__ (2, 3)))
++__attribute__((__visibility__ ("default")))
++efi_set_variable(efi_guid_t guid, const char *name, uint8_t *data,
++		 size_t data_size, uint32_t attributes, mode_t mode)
++	__attribute((weak, alias ("_efi_set_variable_mode")));
+ 
+ int
+ __attribute__((__nonnull__ (2, 3)))
+-- 
+2.12.2
+

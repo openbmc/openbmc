@@ -30,6 +30,10 @@ LIBAV_EXTRA_CONFIGURE_COMMON_ARG = "--target-os=linux \
   ${GSTREAMER_1_0_DEBUG} \
   --cross-prefix='${HOST_PREFIX}'"
 
+# Disable assembly optimizations for X32, as this libav lacks the support
+PACKAGECONFIG_remove_linux-gnux32 = "yasm"
+LIBAV_EXTRA_CONFIGURE_COMMON_ARG_append_linux-gnux32 = " --disable-asm"
+
 LIBAV_EXTRA_CONFIGURE_COMMON = \
 '${LIBAV_EXTRA_CONFIGURE}="${LIBAV_EXTRA_CONFIGURE_COMMON_ARG}"'
 

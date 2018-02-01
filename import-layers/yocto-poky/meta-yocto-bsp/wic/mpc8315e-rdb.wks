@@ -1,0 +1,4 @@
+# short-description: Create SD card image for MPC8315E-RDB
+# long-description: Create a partitioned SD card image for Freescale MPC8315E-RDB reference hardware.
+part /boot --source bootimg-partition --ondisk sdb --fstype=ext3 --label boot
+part / --source rootfs --ondisk sdb --fstype=ext3 --label root

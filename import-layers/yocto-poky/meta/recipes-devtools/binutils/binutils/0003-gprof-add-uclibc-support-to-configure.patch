@@ -1,0 +1,31 @@
+From 7893d2b24d0303bda3a0049846489619ffd1387b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 2 Mar 2015 01:07:33 +0000
+Subject: [PATCH 03/15] gprof: add uclibc support to configure
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gprof/configure | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/gprof/configure b/gprof/configure
+index 9e6b8f3525..38a4c0b0e5 100755
+--- a/gprof/configure
++++ b/gprof/configure
+@@ -5874,6 +5874,11 @@ linux* | k*bsd*-gnu | kopensolaris*-gnu)
+   lt_cv_deplibs_check_method=pass_all
+   ;;
+ 
++linux-uclibc*)
++  lt_cv_deplibs_check_method=pass_all
++  lt_cv_file_magic_test_file=`echo /lib/libuClibc-*.so`
++  ;;
++
+ netbsd*)
+   if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
+     lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
+-- 
+2.12.0
+

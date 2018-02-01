@@ -1,0 +1,49 @@
+# Copyright (C) 2009  Andreas Gruenbacher <agruen@suse.de>
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+AC_INIT(include/acl.h)
+AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_HEADER(include/config.h)
+AC_PREFIX_DEFAULT(/usr)
+
+AC_PROG_LIBTOOL
+
+AC_ARG_ENABLE(shared,
+[ --enable-shared=[yes/no] Enable use of shared libraries [default=yes]],,
+	enable_shared=yes)
+AC_SUBST(enable_shared)
+
+AC_ARG_ENABLE(gettext,
+[ --enable-gettext=[yes/no] Enable alternate language support [default=yes]],,
+	enable_gettext=yes)
+AC_SUBST(enable_gettext)
+
+AC_ARG_ENABLE(lib64,
+[ --enable-lib64=[yes/no] Enable lib64 support [default=no]],,
+	enable_lib64=no)
+AC_SUBST(enable_lib64)
+
+AC_PACKAGE_GLOBALS(acl)
+AC_PACKAGE_UTILITIES(acl)
+AC_PACKAGE_NEED_ATTR_XATTR_H
+AC_PACKAGE_NEED_ATTR_ERROR_H
+AC_MULTILIB($enable_lib64)
+AC_PACKAGE_NEED_GETXATTR_LIBATTR
+AC_MANUAL_FORMAT
+
+AC_FUNC_GCC_VISIBILITY
+
+AC_OUTPUT(include/builddefs)

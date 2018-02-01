@@ -15,7 +15,7 @@ python prexport_handler () {
     if isinstance(e, bb.event.RecipeParsed):
         import oe.prservice
         #get all PR values for the current PRAUTOINX
-        ver = e.data.getVar('PRSERV_DUMPOPT_VERSION', True)
+        ver = e.data.getVar('PRSERV_DUMPOPT_VERSION')
         ver = ver.replace('%','-')
         retval = oe.prservice.prserv_dump_db(e.data)
         if not retval:
@@ -40,7 +40,7 @@ python prexport_handler () {
         import oe.prservice
         oe.prservice.prserv_check_avail(e.data)
         #remove dumpfile
-        bb.utils.remove(e.data.getVar('PRSERV_DUMPFILE', True))
+        bb.utils.remove(e.data.getVar('PRSERV_DUMPFILE'))
     elif isinstance(e, bb.event.ParseCompleted):
         import oe.prservice
         #dump meta info of tables

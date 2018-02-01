@@ -1,0 +1,37 @@
+--- a/configure.ac	2016-01-01 17:42:27.000000000 +0100
++++ b/configure.ac	2017-04-20 14:03:37.238254471 +0200
+@@ -284,24 +284,12 @@
+ AC_SUBST(LIBS)
+ AC_SUBST(ADDITIONAL_OBJECTS)
+ 
+-# Check for asciidoc
+-AC_PATH_PROG(A2X, a2x, no)
+-AM_CONDITIONAL(HAVE_A2X, test "x$A2X" != "xno")
+-if test x"$A2X" = x"no"; then
+-  AC_MSG_ERROR([Test for asciidoc failed. See the file 'INSTALL' for help.])
+-fi
+-
+ AC_CONFIG_FILES([
+ Makefile
+ src/Makefile
+ data/Makefile
+ data/templates/Makefile
+ etc/Makefile
+-docs/Makefile
+-docs/man5/Makefile
+-docs/man5/tinyproxy.conf.txt
+-docs/man8/Makefile
+-docs/man8/tinyproxy.txt
+ m4macros/Makefile
+ tests/Makefile
+ tests/scripts/Makefile
+--- a/Makefile.am	2016-01-01 17:42:27.000000000 +0100
++++ b/Makefile.am	2017-04-20 14:03:53.842822997 +0200
+@@ -2,7 +2,6 @@
+ 	src \
+ 	data \
+ 	etc \
+-	docs \
+ 	m4macros \
+ 	tests
+ 

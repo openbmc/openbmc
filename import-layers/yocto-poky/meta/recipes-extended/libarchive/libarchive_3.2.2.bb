@@ -11,18 +11,16 @@ PACKAGECONFIG ?= "zlib bz2"
 
 PACKAGECONFIG_append_class-target = "\
 	libxml2 \
-	${@bb.utils.contains('DISTRO_FEATURES', 'acl', 'acl', '', d)} \
-	${@bb.utils.contains('DISTRO_FEATURES', 'xattr', 'xattr', '', d)} \
-	${@bb.utils.contains('DISTRO_FEATURES', 'largefile', 'largefile', '', d)} \
+	${@bb.utils.filter('DISTRO_FEATURES', 'acl xattr', d)} \
 "
 
-PACKAGECONFIG_append_class-nativesdk = " largefile"
+DEPENDS_BZIP2 = "bzip2-replacement-native"
+DEPENDS_BZIP2_class-target = "bzip2"
 
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl,"
 PACKAGECONFIG[xattr] = "--enable-xattr,--disable-xattr,attr,"
-PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile,,"
 PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib,"
-PACKAGECONFIG[bz2] = "--with-bz2lib,--without-bz2lib,bzip2,"
+PACKAGECONFIG[bz2] = "--with-bz2lib,--without-bz2lib,${DEPENDS_BZIP2},"
 PACKAGECONFIG[xz] = "--with-lzmadec --with-lzma,--without-lzmadec --without-lzma,xz,"
 PACKAGECONFIG[openssl] = "--with-openssl,--without-openssl,openssl,"
 PACKAGECONFIG[libxml2] = "--with-xml2,--without-xml2,libxml2,"
@@ -31,7 +29,12 @@ PACKAGECONFIG[lzo] = "--with-lzo2,--without-lzo2,lzo,"
 PACKAGECONFIG[nettle] = "--with-nettle,--without-nettle,nettle,"
 PACKAGECONFIG[lz4] = "--with-lz4,--without-lz4,lz4,"
 
+EXTRA_OECONF += "--enable-largefile"
+
 SRC_URI = "http://libarchive.org/downloads/libarchive-${PV}.tar.gz \
+           file://non-recursive-extract-and-list.patch \
+	   file://0001-archive_write_disk_posix.c-make-_fsobj-functions-mor.patch \
+	   file://0002-Fix-extracting-hardlinks-over-symlinks.patch \
            "
 
 SRC_URI[md5sum] = "1ec00b7dcaf969dd2a5712f85f23c764"

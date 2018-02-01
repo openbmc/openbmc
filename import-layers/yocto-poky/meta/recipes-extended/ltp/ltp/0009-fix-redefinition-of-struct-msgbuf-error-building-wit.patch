@@ -1,0 +1,35 @@
+From 2d7ea67e8eaa41cbd6816f7ab654254b40b530a1 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 9 Feb 2017 17:17:37 +0800
+Subject: [PATCH] fix redefinition of 'struct msgbuf' error building with musl
+
+When building with musl the file "sys/msg.h" already contain 'struct msgbuf'
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+Upstream-Status: Pending
+---
+ testcases/kernel/syscalls/ipc/msgrcv/msgrcv08.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/ipc/msgrcv/msgrcv08.c b/testcases/kernel/syscalls/ipc/msgrcv/msgrcv08.c
+index a757c0d..e023114 100644
+--- a/testcases/kernel/syscalls/ipc/msgrcv/msgrcv08.c
++++ b/testcases/kernel/syscalls/ipc/msgrcv/msgrcv08.c
+@@ -47,11 +47,13 @@ const char *TCID = "msgrcv08";
+ const int TST_TOTAL = 1;
+ 
+ #if __WORDSIZE == 32
+-
++#ifdef __GLIBC__
+ struct msgbuf {
+ 	long mtype;     /* message type, must be > 0 */
+ 	char mtext[16]; /* message data */
+ };
++#else
++#endif
+ 
+ static void msr(int msqid)
+ {
+-- 
+2.7.4
+

@@ -31,7 +31,7 @@ python() {
     # This assumes that the package_write task is called package_write_<pkgtype>
     # and that the directory in which packages should be written is
     # pointed to by the variable DEPLOY_DIR_<PKGTYPE>
-    for pkgclass in (d.getVar('PACKAGE_CLASSES', True) or '').split():
+    for pkgclass in (d.getVar('PACKAGE_CLASSES') or '').split():
         if pkgclass.startswith('package_'):
             pkgtype = pkgclass.split('_', 1)[1]
             pkgwritefunc = 'do_package_write_%s' % pkgtype
@@ -51,7 +51,7 @@ python() {
 
             d.appendVarFlag('do_build', 'recrdeptask', ' ' + pkgcomparefunc)
 
-            if d.getVarFlag(pkgwritefunc, 'noexec', True) or not d.getVarFlag(pkgwritefunc, 'task', True):
+            if d.getVarFlag(pkgwritefunc, 'noexec') or not d.getVarFlag(pkgwritefunc, 'task'):
                 # Packaging is disabled for this recipe, we shouldn't do anything
                 continue
 
@@ -71,7 +71,7 @@ python() {
 # This isn't the real task function - it's a template that we use in the
 # anonymous python code above
 fakeroot python do_package_compare () {
-    currenttask = d.getVar('BB_CURRENTTASK', True)
+    currenttask = d.getVar('BB_CURRENTTASK')
     pkgtype = currenttask.rsplit('_', 1)[1]
     package_compare_impl(pkgtype, d)
 }
@@ -83,12 +83,12 @@ def package_compare_impl(pkgtype, d):
     import subprocess
     import oe.sstatesig
 
-    pn = d.getVar('PN', True)
-    deploydir = d.getVar('DEPLOY_DIR_%s' % pkgtype.upper(), True)
+    pn = d.getVar('PN')
+    deploydir = d.getVar('DEPLOY_DIR_%s' % pkgtype.upper())
     prepath = deploydir + '-prediff/'
 
     # Find out PKGR values are
-    pkgdatadir = d.getVar('PKGDATA_DIR', True)
+    pkgdatadir = d.getVar('PKGDATA_DIR')
     packages = []
     try:
         with open(os.path.join(pkgdatadir, pn), 'r') as f:
@@ -138,7 +138,7 @@ def package_compare_impl(pkgtype, d):
     files = []
     docopy = False
     manifest, _ = oe.sstatesig.sstate_get_manifest_filename(pkgwritetask, d)
-    mlprefix = d.getVar('MLPREFIX', True)
+    mlprefix = d.getVar('MLPREFIX')
     # Copy recipe's all packages if one of the packages are different to make
     # they have the same PR.
     with open(manifest, 'r') as f:
@@ -215,7 +215,7 @@ def package_compare_impl(pkgtype, d):
                 # multilib), they're identical in theory, but sstate.bbclass
                 # copies it again, so keep align with that.
                 if os.path.exists(destpath) and pkgtype == 'rpm' \
-                        and d.getVar('PACKAGE_ARCH', True) == 'all':
+                        and d.getVar('PACKAGE_ARCH') == 'all':
                     os.unlink(destpath)
                 if (os.stat(srcpath).st_dev == os.stat(destdir).st_dev):
                     # Use a hard link to save space
@@ -229,10 +229,10 @@ def package_compare_impl(pkgtype, d):
 do_cleansstate[postfuncs] += "pfs_cleanpkgs"
 python pfs_cleanpkgs () {
     import errno
-    for pkgclass in (d.getVar('PACKAGE_CLASSES', True) or '').split():
+    for pkgclass in (d.getVar('PACKAGE_CLASSES') or '').split():
         if pkgclass.startswith('package_'):
             pkgtype = pkgclass.split('_', 1)[1]
-            deploydir = d.getVar('DEPLOY_DIR_%s' % pkgtype.upper(), True)
+            deploydir = d.getVar('DEPLOY_DIR_%s' % pkgtype.upper())
             prepath = deploydir + '-prediff'
             pcmanifest = os.path.join(prepath, d.expand('pkg-compare-manifest-${MULTIMACH_TARGET_SYS}-${PN}'))
             try:

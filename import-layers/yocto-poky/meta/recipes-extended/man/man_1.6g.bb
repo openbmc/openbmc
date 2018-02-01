@@ -10,8 +10,8 @@ PR = "r1"
 DEPENDS = "groff less"
 
 def compress_pkg(d):
-    if "compress_doc" in (d.getVar("INHERIT", True) or "").split():
-         compress = d.getVar("DOC_COMPRESS", True)
+    if "compress_doc" in (d.getVar("INHERIT") or "").split():
+         compress = d.getVar("DOC_COMPRESS")
          if compress == "gz":
              return "gzip"
          elif compress == "bz2":

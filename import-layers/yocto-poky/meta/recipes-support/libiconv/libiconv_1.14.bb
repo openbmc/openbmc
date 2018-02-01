@@ -23,9 +23,9 @@ S = "${WORKDIR}/libiconv-${PV}"
 inherit autotools pkgconfig gettext
 
 python __anonymous() {
-    if d.getVar("TARGET_OS", True) != "linux":
+    if d.getVar("TARGET_OS") != "linux":
         return
-    if d.getVar("TCLIBC", True) == "glibc":
+    if d.getVar("TCLIBC") == "glibc":
         raise bb.parse.SkipPackage("libiconv is provided for use with uClibc only - glibc already provides iconv")
 }
 

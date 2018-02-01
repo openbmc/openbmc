@@ -1,0 +1,40 @@
+From 36e64cf2f0676ee422c1fd41456967f3015b2fa3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Apr 2017 17:10:45 -0700
+Subject: [PATCH] lxml.etree: Add empty variadic argument
+
+format checker says that argument 4 is a printf formatted argument
+but there is no more arguments to follow
+
+Fixes libxslt format warnings
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lxml/lxml.etree.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/lxml/lxml.etree.c b/src/lxml/lxml.etree.c
+index d482091..faab06c 100644
+--- a/src/lxml/lxml.etree.c
++++ b/src/lxml/lxml.etree.c
+@@ -186086,7 +186086,7 @@ static void __pyx_f_4lxml_5etree__callExtensionElement(xsltTransformContext *__p
+  *         except:
+  */
+             __pyx_t_26 = __Pyx_PyObject_AsString(__pyx_v_message); if (unlikely((!__pyx_t_26) && PyErr_Occurred())) __PYX_ERR(19, 228, __pyx_L18_except_error)
+-            xsltTransformError(__pyx_v_c_ctxt, NULL, __pyx_v_c_inst_node, __pyx_t_26);
++            xsltTransformError(__pyx_v_c_ctxt, NULL, __pyx_v_c_inst_node, __pyx_t_26, "");
+ 
+             /* "src/lxml/xsltext.pxi":229
+  *                 c_inst_node.name, _cstr(e))
+@@ -186136,7 +186136,7 @@ static void __pyx_f_4lxml_5etree__callExtensionElement(xsltTransformContext *__p
+  *     except:
+  */
+             __pyx_t_26 = __Pyx_PyObject_AsString(__pyx_v_message); if (unlikely((!__pyx_t_26) && PyErr_Occurred())) __PYX_ERR(19, 234, __pyx_L18_except_error)
+-            xsltTransformError(__pyx_v_c_ctxt, NULL, __pyx_v_c_inst_node, __pyx_t_26);
++            xsltTransformError(__pyx_v_c_ctxt, NULL, __pyx_v_c_inst_node, __pyx_t_26, "");
+ 
+             /* "src/lxml/xsltext.pxi":235
+  *                 "Error executing extension element '%s'", c_inst_node.name)
+-- 
+2.12.2
+

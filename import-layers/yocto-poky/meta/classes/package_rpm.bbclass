@@ -7,15 +7,33 @@ RPMBUILD="rpmbuild"
 
 PKGWRITEDIRRPM = "${WORKDIR}/deploy-rpms"
 
-# Maintaining the perfile dependencies has singificant overhead when writing the 
+# Maintaining the perfile dependencies has singificant overhead when writing the
 # packages. When set, this value merges them for efficiency.
 MERGEPERFILEDEPS = "1"
 
+# Filter dependencies based on a provided function.
+def filter_deps(var, f):
+    import collections
+
+    depends_dict = bb.utils.explode_dep_versions2(var)
+    newdeps_dict = collections.OrderedDict()
+    for dep in depends_dict:
+        if f(dep):
+            newdeps_dict[dep] = depends_dict[dep]
+    return bb.utils.join_deps(newdeps_dict, commasep=False)
+
+# Filter out absolute paths (typically /bin/sh and /usr/bin/env) and any perl
+# dependencies for nativesdk packages.
+def filter_nativesdk_deps(srcname, var):
+    if var and srcname.startswith("nativesdk-"):
+        var = filter_deps(var, lambda dep: not dep.startswith('/') and dep != 'perl' and not dep.startswith('perl('))
+    return var
+
 # Construct per file dependencies file
 def write_rpm_perfiledata(srcname, d):
-    workdir = d.getVar('WORKDIR', True)
-    packages = d.getVar('PACKAGES', True)
-    pkgd = d.getVar('PKGD', True)
+    workdir = d.getVar('WORKDIR')
+    packages = d.getVar('PACKAGES')
+    pkgd = d.getVar('PKGD')
 
     def dump_filerdeps(varname, outfile, d):
         outfile.write("#!/usr/bin/env python\n\n")
@@ -23,10 +41,11 @@ def write_rpm_perfiledata(srcname, d):
         outfile.write('deps = {\n')
         for pkg in packages.split():
             dependsflist_key = 'FILE' + varname + 'FLIST' + "_" + pkg
-            dependsflist = (d.getVar(dependsflist_key, True) or "")
+            dependsflist = (d.getVar(dependsflist_key) or "")
             for dfile in dependsflist.split():
                 key = "FILE" + varname + "_" + dfile + "_" + pkg
-                depends_dict = bb.utils.explode_dep_versions(d.getVar(key, True) or "")
+                deps = filter_nativesdk_deps(srcname, d.getVar(key) or "")
+                depends_dict = bb.utils.explode_dep_versions(deps)
                 file = dfile.replace("@underscore@", "_")
                 file = file.replace("@closebrace@", "]")
                 file = file.replace("@openbrace@", "[")
@@ -55,10 +74,7 @@ def write_rpm_perfiledata(srcname, d):
     # OE-core dependencies a.k.a. RPM requires
     outdepends = workdir + "/" + srcname + ".requires"
 
-    try:
-        dependsfile = open(outdepends, 'w')
-    except OSError:
-        bb.fatal("unable to open spec file for writing")
+    dependsfile = open(outdepends, 'w')
 
     dump_filerdeps('RDEPENDS', dependsfile, d)
 
@@ -68,10 +84,7 @@ def write_rpm_perfiledata(srcname, d):
     # OE-core / RPM Provides
     outprovides = workdir + "/" + srcname + ".provides"
 
-    try:
-        providesfile = open(outprovides, 'w')
-    except OSError:
-        bb.fatal("unable to open spec file for writing")
+    providesfile = open(outprovides, 'w')
 
     dump_filerdeps('RPROVIDES', providesfile, d)
 
@@ -86,15 +99,15 @@ python write_specfile () {
 
     # append information for logs and patches to %prep
     def add_prep(d,spec_files_bottom):
-        if d.getVarFlag('ARCHIVER_MODE', 'srpm', True) == '1' and bb.data.inherits_class('archiver', d):
-            spec_files_bottom.append('%%prep -n %s' % d.getVar('PN', True) )
+        if d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and bb.data.inherits_class('archiver', d):
+            spec_files_bottom.append('%%prep -n %s' % d.getVar('PN') )
             spec_files_bottom.append('%s' % "echo \"include logs and patches, Please check them in SOURCES\"")
             spec_files_bottom.append('')
 
     # append the name of tarball to key word 'SOURCE' in xxx.spec.
     def tail_source(d):
-        if d.getVarFlag('ARCHIVER_MODE', 'srpm', True) == '1' and bb.data.inherits_class('archiver', d):
-            ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
+        if d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and bb.data.inherits_class('archiver', d):
+            ar_outdir = d.getVar('ARCHIVER_OUTDIR')
             if not os.path.exists(ar_outdir):
                 return
             source_list = os.listdir(ar_outdir)
@@ -107,27 +120,6 @@ python write_specfile () {
                 os.chown(f, 0, 0)
                 spec_preamble_top.append('Source%s: %s' % (source_number, source))
                 source_number += 1
-    # We need a simple way to remove the MLPREFIX from the package name,
-    # and dependency information...
-    def strip_multilib(name, d):
-        multilibs = d.getVar('MULTILIBS', True) or ""
-        for ext in multilibs.split():
-            eext = ext.split(':')
-            if len(eext) > 1 and eext[0] == 'multilib' and name and name.find(eext[1] + '-') >= 0:
-                name = "".join(name.split(eext[1] + '-'))
-        return name
-
-    def strip_multilib_deps(deps, d):
-        depends = bb.utils.explode_dep_versions2(deps or "")
-        newdeps = {}
-        for dep in depends:
-            newdeps[strip_multilib(dep, d)] = depends[dep]
-        return bb.utils.join_deps(newdeps)
-
-#        ml = d.getVar("MLPREFIX", True)
-#        if ml and name and len(ml) != 0 and name.find(ml) == 0:
-#            return ml.join(name.split(ml, 1)[1:])
-#        return name
 
     # In RPM, dependencies are of the format: pkg <>= Epoch:Version-Release
     # This format is similar to OE, however there are restrictions on the
@@ -144,7 +136,7 @@ python write_specfile () {
     # after renaming we cannot look up the dependencies in the packagedata
     # store.
     def translate_vers(varname, d):
-        depends = d.getVar(varname, True)
+        depends = d.getVar(varname)
         if depends:
             depends_dict = bb.utils.explode_dep_versions2(depends)
             newdeps_dict = {}
@@ -197,6 +189,8 @@ python write_specfile () {
             if path.endswith("DEBIAN") or path.endswith("CONTROL"):
                 continue
             path = path.replace("%", "%%%%%%%%")
+            path = path.replace("[", "?")
+            path = path.replace("]", "?")
 
             # Treat all symlinks to directories as normal files.
             # os.walk() lists them as directories.
@@ -216,6 +210,8 @@ python write_specfile () {
                     if dir == "CONTROL" or dir == "DEBIAN":
                         continue
                     dir = dir.replace("%", "%%%%%%%%")
+                    dir = dir.replace("[", "?")
+                    dir = dir.replace("]", "?")
                     # All packages own the directories their files are in...
                     target.append('%dir "' + path + '/' + dir + '"')
             else:
@@ -230,6 +226,8 @@ python write_specfile () {
                 if file == "CONTROL" or file == "DEBIAN":
                     continue
                 file = file.replace("%", "%%%%%%%%")
+                file = file.replace("[", "?")
+                file = file.replace("]", "?")
                 if conffiles.count(path + '/' + file):
                     target.append('%config "' + path + '/' + file + '"')
                 else:
@@ -248,10 +246,10 @@ python write_specfile () {
     def get_perfile(varname, pkg, d):
         deps = []
         dependsflist_key = 'FILE' + varname + 'FLIST' + "_" + pkg
-        dependsflist = (d.getVar(dependsflist_key, True) or "")
+        dependsflist = (d.getVar(dependsflist_key) or "")
         for dfile in dependsflist.split():
             key = "FILE" + varname + "_" + dfile + "_" + pkg
-            depends = d.getVar(key, True)
+            depends = d.getVar(key)
             if depends:
                 deps.append(depends)
         return " ".join(deps)
@@ -269,33 +267,33 @@ python write_specfile () {
         else:
             spec_preamble.append('%s' % textwrap.fill(dedent_text, width=75))
 
-    packages = d.getVar('PACKAGES', True)
+    packages = d.getVar('PACKAGES')
     if not packages or packages == '':
         bb.debug(1, "No packages; nothing to do")
         return
 
-    pkgdest = d.getVar('PKGDEST', True)
+    pkgdest = d.getVar('PKGDEST')
     if not pkgdest:
         bb.fatal("No PKGDEST")
 
-    outspecfile = d.getVar('OUTSPECFILE', True)
+    outspecfile = d.getVar('OUTSPECFILE')
     if not outspecfile:
         bb.fatal("No OUTSPECFILE")
 
     # Construct the SPEC file...
-    srcname    = strip_multilib(d.getVar('PN', True), d)
-    srcsummary = (d.getVar('SUMMARY', True) or d.getVar('DESCRIPTION', True) or ".")
-    srcversion = d.getVar('PKGV', True).replace('-', '+')
-    srcrelease = d.getVar('PKGR', True)
-    srcepoch   = (d.getVar('PKGE', True) or "")
-    srclicense = d.getVar('LICENSE', True)
-    srcsection = d.getVar('SECTION', True)
-    srcmaintainer  = d.getVar('MAINTAINER', True)
-    srchomepage    = d.getVar('HOMEPAGE', True)
-    srcdescription = d.getVar('DESCRIPTION', True) or "."
+    srcname    = d.getVar('PN')
+    srcsummary = (d.getVar('SUMMARY') or d.getVar('DESCRIPTION') or ".")
+    srcversion = d.getVar('PKGV').replace('-', '+')
+    srcrelease = d.getVar('PKGR')
+    srcepoch   = (d.getVar('PKGE') or "")
+    srclicense = d.getVar('LICENSE')
+    srcsection = d.getVar('SECTION')
+    srcmaintainer  = d.getVar('MAINTAINER')
+    srchomepage    = d.getVar('HOMEPAGE')
+    srcdescription = d.getVar('DESCRIPTION') or "."
     srccustomtagschunk = get_package_additional_metadata("rpm", d)
 
-    srcdepends     = strip_multilib_deps(d.getVar('DEPENDS', True), d)
+    srcdepends     = d.getVar('DEPENDS')
     srcrdepends    = []
     srcrrecommends = []
     srcrsuggests   = []
@@ -318,8 +316,8 @@ python write_specfile () {
     spec_files_top = []
     spec_files_bottom = []
 
-    perfiledeps = (d.getVar("MERGEPERFILEDEPS", True) or "0") == "0"
-    extra_pkgdata = (d.getVar("RPM_EXTRA_PKGDATA", True) or "0") == "1"
+    perfiledeps = (d.getVar("MERGEPERFILEDEPS") or "0") == "0"
+    extra_pkgdata = (d.getVar("RPM_EXTRA_PKGDATA") or "0") == "1"
 
     for pkg in packages.split():
         localdata = bb.data.createCopy(d)
@@ -328,29 +326,27 @@ python write_specfile () {
 
         localdata.setVar('ROOT', '')
         localdata.setVar('ROOT_%s' % pkg, root)
-        pkgname = localdata.getVar('PKG_%s' % pkg, True)
+        pkgname = localdata.getVar('PKG_%s' % pkg)
         if not pkgname:
             pkgname = pkg
         localdata.setVar('PKG', pkgname)
 
         localdata.setVar('OVERRIDES', d.getVar("OVERRIDES", False) + ":" + pkg)
 
-        bb.data.update_data(localdata)
-
         conffiles = get_conffiles(pkg, d)
-        dirfiles = localdata.getVar('DIRFILES', True)
+        dirfiles = localdata.getVar('DIRFILES')
         if dirfiles is not None:
             dirfiles = dirfiles.split()
 
-        splitname    = strip_multilib(pkgname, d)
+        splitname    = pkgname
 
-        splitsummary = (localdata.getVar('SUMMARY', True) or localdata.getVar('DESCRIPTION', True) or ".")
-        splitversion = (localdata.getVar('PKGV', True) or "").replace('-', '+')
-        splitrelease = (localdata.getVar('PKGR', True) or "")
-        splitepoch   = (localdata.getVar('PKGE', True) or "")
-        splitlicense = (localdata.getVar('LICENSE', True) or "")
-        splitsection = (localdata.getVar('SECTION', True) or "")
-        splitdescription = (localdata.getVar('DESCRIPTION', True) or ".")
+        splitsummary = (localdata.getVar('SUMMARY') or localdata.getVar('DESCRIPTION') or ".")
+        splitversion = (localdata.getVar('PKGV') or "").replace('-', '+')
+        splitrelease = (localdata.getVar('PKGR') or "")
+        splitepoch   = (localdata.getVar('PKGE') or "")
+        splitlicense = (localdata.getVar('LICENSE') or "")
+        splitsection = (localdata.getVar('SECTION') or "")
+        splitdescription = (localdata.getVar('DESCRIPTION') or ".")
         splitcustomtagschunk = get_package_additional_metadata("rpm", localdata)
 
         translate_vers('RDEPENDS', localdata)
@@ -363,24 +359,26 @@ python write_specfile () {
         # Map the dependencies into their final form
         mapping_rename_hook(localdata)
 
-        splitrdepends    = strip_multilib_deps(localdata.getVar('RDEPENDS', True), d)
-        splitrrecommends = strip_multilib_deps(localdata.getVar('RRECOMMENDS', True), d)
-        splitrsuggests   = strip_multilib_deps(localdata.getVar('RSUGGESTS', True), d)
-        splitrprovides   = strip_multilib_deps(localdata.getVar('RPROVIDES', True), d)
-        splitrreplaces   = strip_multilib_deps(localdata.getVar('RREPLACES', True), d)
-        splitrconflicts  = strip_multilib_deps(localdata.getVar('RCONFLICTS', True), d)
+        splitrdepends    = localdata.getVar('RDEPENDS')
+        splitrrecommends = localdata.getVar('RRECOMMENDS')
+        splitrsuggests   = localdata.getVar('RSUGGESTS')
+        splitrprovides   = localdata.getVar('RPROVIDES')
+        splitrreplaces   = localdata.getVar('RREPLACES')
+        splitrconflicts  = localdata.getVar('RCONFLICTS')
         splitrobsoletes  = []
 
-        splitrpreinst  = localdata.getVar('pkg_preinst', True)
-        splitrpostinst = localdata.getVar('pkg_postinst', True)
-        splitrprerm    = localdata.getVar('pkg_prerm', True)
-        splitrpostrm   = localdata.getVar('pkg_postrm', True)
+        splitrpreinst  = localdata.getVar('pkg_preinst')
+        splitrpostinst = localdata.getVar('pkg_postinst')
+        splitrprerm    = localdata.getVar('pkg_prerm')
+        splitrpostrm   = localdata.getVar('pkg_postrm')
 
 
         if not perfiledeps:
             # Add in summary of per file dependencies
             splitrdepends = splitrdepends + " " + get_perfile('RDEPENDS', pkg, d)
             splitrprovides = splitrprovides + " " + get_perfile('RPROVIDES', pkg, d)
+
+        splitrdepends = filter_nativesdk_deps(srcname, splitrdepends)
 
         # Gather special src/first package data
         if srcname == splitname:
@@ -452,25 +450,10 @@ python write_specfile () {
         if splitrpostrm:
             print_deps(splitrdepends, "Requires(postun)", spec_preamble_bottom, d)
 
-        # Suggests in RPM are like recommends in OE-core!
-        print_deps(splitrrecommends, "Suggests", spec_preamble_bottom, d)
-        # While there is no analog for suggests... (So call them recommends for now)
-        print_deps(splitrsuggests,  "Recommends", spec_preamble_bottom, d)
+        print_deps(splitrrecommends, "Recommends", spec_preamble_bottom, d)
+        print_deps(splitrsuggests,  "Suggests", spec_preamble_bottom, d)
         print_deps(splitrprovides,  "Provides", spec_preamble_bottom, d)
         print_deps(splitrobsoletes, "Obsoletes", spec_preamble_bottom, d)
-
-        # conflicts can not be in a provide!  We will need to filter it.
-        if splitrconflicts:
-            depends_dict = bb.utils.explode_dep_versions2(splitrconflicts)
-            newdeps_dict = {}
-            for dep in depends_dict:
-                if dep not in splitrprovides:
-                    newdeps_dict[dep] = depends_dict[dep]
-            if newdeps_dict:
-                splitrconflicts = bb.utils.join_deps(newdeps_dict)
-            else:
-                splitrconflicts = ""
-
         print_deps(splitrconflicts,  "Conflicts", spec_preamble_bottom, d)
 
         spec_preamble_bottom.append('')
@@ -562,25 +545,10 @@ python write_specfile () {
     if srcrpostrm:
         print_deps(srcrdepends, "Requires(postun)", spec_preamble_top, d)
 
-    # Suggests in RPM are like recommends in OE-core!
-    print_deps(srcrrecommends, "Suggests", spec_preamble_top, d)
-    # While there is no analog for suggests... (So call them recommends for now)
-    print_deps(srcrsuggests, "Recommends", spec_preamble_top, d)
-    print_deps(srcrprovides, "Provides", spec_preamble_top, d)
+    print_deps(srcrrecommends, "Recommends", spec_preamble_top, d)
+    print_deps(srcrsuggests, "Suggests", spec_preamble_top, d)
+    print_deps(srcrprovides + (" /bin/sh" if srcname.startswith("nativesdk-") else ""), "Provides", spec_preamble_top, d)
     print_deps(srcrobsoletes, "Obsoletes", spec_preamble_top, d)
-    
-    # conflicts can not be in a provide!  We will need to filter it.
-    if srcrconflicts:
-        depends_dict = bb.utils.explode_dep_versions2(srcrconflicts)
-        newdeps_dict = {}
-        for dep in depends_dict:
-            if dep not in srcrprovides:
-                newdeps_dict[dep] = depends_dict[dep]
-        if newdeps_dict:
-            srcrconflicts = bb.utils.join_deps(newdeps_dict)
-        else:
-            srcrconflicts = ""
-
     print_deps(srcrconflicts, "Conflicts", spec_preamble_top, d)
 
     spec_preamble_top.append('')
@@ -614,14 +582,11 @@ python write_specfile () {
         spec_scriptlets_top.append('')
 
     # Write the SPEC file
-    try:
-        specfile = open(outspecfile, 'w')
-    except OSError:
-        bb.fatal("unable to open spec file for writing")
+    specfile = open(outspecfile, 'w')
 
     # RPMSPEC_PREAMBLE is a way to add arbitrary text to the top
     # of the generated spec file
-    external_preamble = d.getVar("RPMSPEC_PREAMBLE", True)
+    external_preamble = d.getVar("RPMSPEC_PREAMBLE")
     if external_preamble:
         specfile.write(external_preamble + "\n")
 
@@ -649,23 +614,15 @@ python write_specfile () {
 write_specfile[vardepsexclude] = "OVERRIDES"
 
 python do_package_rpm () {
-    # We need a simple way to remove the MLPREFIX from the package name,
-    # and dependency information...
-    def strip_multilib(name, d):
-        ml = d.getVar("MLPREFIX", True)
-        if ml and name and len(ml) != 0 and name.find(ml) >= 0:
-            return "".join(name.split(ml))
-        return name
-
-    workdir = d.getVar('WORKDIR', True)
-    tmpdir = d.getVar('TMPDIR', True)
-    pkgd = d.getVar('PKGD', True)
-    pkgdest = d.getVar('PKGDEST', True)
+    workdir = d.getVar('WORKDIR')
+    tmpdir = d.getVar('TMPDIR')
+    pkgd = d.getVar('PKGD')
+    pkgdest = d.getVar('PKGDEST')
     if not workdir or not pkgd or not tmpdir:
         bb.error("Variables incorrectly set, unable to package")
         return
 
-    packages = d.getVar('PACKAGES', True)
+    packages = d.getVar('PACKAGES')
     if not packages or packages == '':
         bb.debug(1, "No packages; nothing to do")
         return
@@ -674,42 +631,43 @@ python do_package_rpm () {
     # If the spec file already exist, and has not been stored into 
     # pseudo's files.db, it maybe cause rpmbuild src.rpm fail,
     # so remove it before doing rpmbuild src.rpm.
-    srcname    = strip_multilib(d.getVar('PN', True), d)
+    srcname    = d.getVar('PN')
     outspecfile = workdir + "/" + srcname + ".spec"
     if os.path.isfile(outspecfile):
         os.remove(outspecfile)
     d.setVar('OUTSPECFILE', outspecfile)
     bb.build.exec_func('write_specfile', d)
 
-    perfiledeps = (d.getVar("MERGEPERFILEDEPS", True) or "0") == "0"
+    perfiledeps = (d.getVar("MERGEPERFILEDEPS") or "0") == "0"
     if perfiledeps:
         outdepends, outprovides = write_rpm_perfiledata(srcname, d)
 
     # Setup the rpmbuild arguments...
-    rpmbuild = d.getVar('RPMBUILD', True)
-    targetsys = d.getVar('TARGET_SYS', True)
-    targetvendor = d.getVar('HOST_VENDOR', True)
-    package_arch = (d.getVar('PACKAGE_ARCH', True) or "").replace("-", "_")
-    sdkpkgsuffix = (d.getVar('SDKPKGSUFFIX', True) or "nativesdk").replace("-", "_")
-    if package_arch not in "all any noarch".split() and not package_arch.endswith(sdkpkgsuffix):
-        ml_prefix = (d.getVar('MLPREFIX', True) or "").replace("-", "_")
-        d.setVar('PACKAGE_ARCH_EXTEND', ml_prefix + package_arch)
-    else:
-        d.setVar('PACKAGE_ARCH_EXTEND', package_arch)
+    rpmbuild = d.getVar('RPMBUILD')
+    targetsys = d.getVar('TARGET_SYS')
+    targetvendor = d.getVar('HOST_VENDOR')
+    # Too many places in dnf stack assume that arch-independent packages are "noarch".
+    # Let's not fight against this.
+    package_arch = (d.getVar('PACKAGE_ARCH') or "").replace("-", "_").replace("all", "noarch")
+    sdkpkgsuffix = (d.getVar('SDKPKGSUFFIX') or "nativesdk").replace("-", "_")
+    d.setVar('PACKAGE_ARCH_EXTEND', package_arch)
     pkgwritedir = d.expand('${PKGWRITEDIRRPM}/${PACKAGE_ARCH_EXTEND}')
     d.setVar('RPM_PKGWRITEDIR', pkgwritedir)
-    bb.debug(1, 'PKGWRITEDIR: %s' % d.getVar('RPM_PKGWRITEDIR', True))
-    pkgarch = d.expand('${PACKAGE_ARCH_EXTEND}${HOST_VENDOR}-${HOST_OS}')
-    magicfile = d.expand('${STAGING_DIR_NATIVE}${datadir_native}/misc/magic.mgc')
+    bb.debug(1, 'PKGWRITEDIR: %s' % d.getVar('RPM_PKGWRITEDIR'))
+    pkgarch = d.expand('${PACKAGE_ARCH_EXTEND}${HOST_VENDOR}-linux')
     bb.utils.mkdirhier(pkgwritedir)
     os.chmod(pkgwritedir, 0o755)
 
     cmd = rpmbuild
-    cmd = cmd + " --nodeps --short-circuit --target " + pkgarch + " --buildroot " + pkgd
+    cmd = cmd + " --noclean --nodeps --short-circuit --target " + pkgarch + " --buildroot " + pkgd
     cmd = cmd + " --define '_topdir " + workdir + "' --define '_rpmdir " + pkgwritedir + "'"
-    cmd = cmd + " --define '_builddir " + d.getVar('S', True) + "'"
+    cmd = cmd + " --define '_builddir " + d.getVar('S') + "'"
     cmd = cmd + " --define '_build_name_fmt %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm'"
     cmd = cmd + " --define '_use_internal_dependency_generator 0'"
+    cmd = cmd + " --define '_binaries_in_noarch_packages_terminate_build 0'"
+    cmd = cmd + " --define '_build_id_links none'"
+    cmd = cmd + " --define '_binary_payload w6T.xzdio'"
+    cmd = cmd + " --define '_source_payload w6T.xzdio'"
     if perfiledeps:
         cmd = cmd + " --define '__find_requires " + outdepends + "'"
         cmd = cmd + " --define '__find_provides " + outprovides + "'"
@@ -718,11 +676,10 @@ python do_package_rpm () {
         cmd = cmd + " --define '__find_provides %{nil}'"
     cmd = cmd + " --define '_unpackaged_files_terminate_build 0'"
     cmd = cmd + " --define 'debug_package %{nil}'"
-    cmd = cmd + " --define '_rpmfc_magic_path " + magicfile + "'"
     cmd = cmd + " --define '_tmppath " + workdir + "'"
-    if d.getVarFlag('ARCHIVER_MODE', 'srpm', True) == '1' and bb.data.inherits_class('archiver', d):
-        cmd = cmd + " --define '_sourcedir " + d.getVar('ARCHIVER_OUTDIR', True) + "'"
-        cmdsrpm = cmd + " --define '_srcrpmdir " + d.getVar('ARCHIVER_OUTDIR', True) + "'"
+    if d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and bb.data.inherits_class('archiver', d):
+        cmd = cmd + " --define '_sourcedir " + d.getVar('ARCHIVER_OUTDIR') + "'"
+        cmdsrpm = cmd + " --define '_srcrpmdir " + d.getVar('ARCHIVER_OUTDIR') + "'"
         cmdsrpm = cmdsrpm + " -bs " + outspecfile
         # Build the .src.rpm
         d.setVar('SBUILDSPEC', cmdsrpm + "\n")
@@ -730,17 +687,20 @@ python do_package_rpm () {
         bb.build.exec_func('SBUILDSPEC', d)
     cmd = cmd + " -bb " + outspecfile
 
+    # rpm 4 creates various empty directories in _topdir, let's clean them up
+    cleanupcmd = "rm -rf %s/BUILDROOT %s/SOURCES %s/SPECS %s/SRPMS" % (workdir, workdir, workdir, workdir)
+
     # Build the rpm package!
-    d.setVar('BUILDSPEC', cmd + "\n")
+    d.setVar('BUILDSPEC', cmd + "\n" + cleanupcmd + "\n")
     d.setVarFlag('BUILDSPEC', 'func', '1')
     bb.build.exec_func('BUILDSPEC', d)
 
-    if d.getVar('RPM_SIGN_PACKAGES', True) == '1':
+    if d.getVar('RPM_SIGN_PACKAGES') == '1':
         bb.build.exec_func("sign_rpm", d)
 }
 
 python () {
-    if d.getVar('PACKAGES', True) != '':
+    if d.getVar('PACKAGES') != '':
         deps = ' rpm-native:do_populate_sysroot virtual/fakeroot-native:do_populate_sysroot'
         d.appendVarFlag('do_package_write_rpm', 'depends', deps)
         d.setVarFlag('do_package_write_rpm', 'fakeroot', '1')
@@ -766,9 +726,10 @@ python do_package_write_rpm () {
 do_package_write_rpm[dirs] = "${PKGWRITEDIRRPM}"
 do_package_write_rpm[cleandirs] = "${PKGWRITEDIRRPM}"
 do_package_write_rpm[umask] = "022"
+do_package_write_rpm[depends] += "${@oe.utils.build_depends_string(d.getVar('PACKAGE_WRITE_DEPS'), 'do_populate_sysroot')}"
 addtask package_write_rpm after do_packagedata do_package
 
 PACKAGEINDEXDEPS += "rpm-native:do_populate_sysroot"
-PACKAGEINDEXDEPS += "createrepo-native:do_populate_sysroot"
+PACKAGEINDEXDEPS += "createrepo-c-native:do_populate_sysroot"
 
 do_build[recrdeptask] += "do_package_write_rpm"

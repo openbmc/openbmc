@@ -26,11 +26,23 @@ import logging
 import scriptutils
 from urllib.parse import urlparse, urldefrag, urlsplit
 import hashlib
-
+import bb.fetch2
 logger = logging.getLogger('recipetool')
 
 tinfoil = None
 plugins = None
+
+def log_error_cond(message, debugonly):
+    if debugonly:
+        logger.debug(message)
+    else:
+        logger.error(message)
+
+def log_info_cond(message, debugonly):
+    if debugonly:
+        logger.debug(message)
+    else:
+        logger.info(message)
 
 def plugin_init(pluginlist):
     # Take a reference to the list so we can use it later
@@ -47,6 +59,9 @@ class RecipeHandler(object):
     recipecmakefilemap = {}
     recipebinmap = {}
 
+    def __init__(self):
+        self._devtool = False
+
     @staticmethod
     def load_libmap(d):
         '''Load library->recipe mapping'''
@@ -56,8 +71,8 @@ class RecipeHandler(object):
             return
         # First build up library->package mapping
         shlib_providers = oe.package.read_shlib_providers(d)
-        libdir = d.getVar('libdir', True)
-        base_libdir = d.getVar('base_libdir', True)
+        libdir = d.getVar('libdir')
+        base_libdir = d.getVar('base_libdir')
         libpaths = list(set([base_libdir, libdir]))
         libname_re = re.compile('^lib(.+)\.so.*$')
         pkglibmap = {}
@@ -73,7 +88,7 @@ class RecipeHandler(object):
                         logger.debug('unable to extract library name from %s' % lib)
 
         # Now turn it into a library->recipe mapping
-        pkgdata_dir = d.getVar('PKGDATA_DIR', True)
+        pkgdata_dir = d.getVar('PKGDATA_DIR')
         for libname, pkg in pkglibmap.items():
             try:
                 with open(os.path.join(pkgdata_dir, 'runtime', pkg)) as f:
@@ -97,9 +112,9 @@ class RecipeHandler(object):
         '''Build up development file->recipe mapping'''
         if RecipeHandler.recipeheadermap:
             return
-        pkgdata_dir = d.getVar('PKGDATA_DIR', True)
-        includedir = d.getVar('includedir', True)
-        cmakedir = os.path.join(d.getVar('libdir', True), 'cmake')
+        pkgdata_dir = d.getVar('PKGDATA_DIR')
+        includedir = d.getVar('includedir')
+        cmakedir = os.path.join(d.getVar('libdir'), 'cmake')
         for pkg in glob.glob(os.path.join(pkgdata_dir, 'runtime', '*-dev')):
             with open(os.path.join(pkgdata_dir, 'runtime', pkg)) as f:
                 pn = None
@@ -128,9 +143,9 @@ class RecipeHandler(object):
         '''Build up native binary->recipe mapping'''
         if RecipeHandler.recipebinmap:
             return
-        sstate_manifests = d.getVar('SSTATE_MANIFESTS', True)
-        staging_bindir_native = d.getVar('STAGING_BINDIR_NATIVE', True)
-        build_arch = d.getVar('BUILD_ARCH', True)
+        sstate_manifests = d.getVar('SSTATE_MANIFESTS')
+        staging_bindir_native = d.getVar('STAGING_BINDIR_NATIVE')
+        build_arch = d.getVar('BUILD_ARCH')
         fileprefix = 'manifest-%s-' % build_arch
         for fn in glob.glob(os.path.join(sstate_manifests, '%s*-native.populate_sysroot' % fileprefix)):
             with open(fn, 'r') as f:
@@ -222,7 +237,8 @@ class RecipeHandler(object):
         if deps:
             values['DEPENDS'] = ' '.join(deps)
 
-    def genfunction(self, outlines, funcname, content, python=False, forcespace=False):
+    @staticmethod
+    def genfunction(outlines, funcname, content, python=False, forcespace=False):
         if python:
             prefix = 'python '
         else:
@@ -323,7 +339,7 @@ def determine_from_url(srcuri):
                 pn = res.group(1).strip().replace('_', '-')
                 pv = res.group(2).strip().replace('_', '.')
 
-        if not pn and not pv:
+        if not pn and not pv and parseres.scheme not in ['git', 'gitsm', 'svn', 'hg']:
             srcfile = os.path.basename(parseres.path.rstrip('/'))
             pn, pv = determine_from_filename(srcfile)
 
@@ -335,7 +351,6 @@ def supports_srcrev(uri):
     # This is a bit sad, but if you don't have this set there can be some
     # odd interactions with the urldata cache which lead to errors
     localdata.setVar('SRCREV', '${AUTOREV}')
-    bb.data.update_data(localdata)
     try:
         fetcher = bb.fetch2.Fetch([uri], localdata)
         urldata = fetcher.ud
@@ -353,14 +368,31 @@ def reformat_git_uri(uri):
     '''Convert any http[s]://....git URI into git://...;protocol=http[s]'''
     checkuri = uri.split(';', 1)[0]
     if checkuri.endswith('.git') or '/git/' in checkuri or re.match('https?://github.com/[^/]+/[^/]+/?$', checkuri):
-        res = re.match('(http|https|ssh)://([^;]+(\.git)?)(;.*)?$', uri)
-        if res:
-            # Need to switch the URI around so that the git fetcher is used
-            return 'git://%s;protocol=%s%s' % (res.group(2), res.group(1), res.group(4) or '')
-        elif '@' in checkuri:
-            # Catch e.g. git@git.example.com:repo.git
-            return 'git://%s;protocol=ssh' % checkuri.replace(':', '/', 1)
-    return uri
+        # Appends scheme if the scheme is missing
+        if not '://' in uri:
+            uri = 'git://' + uri
+        scheme, host, path, user, pswd, parms = bb.fetch2.decodeurl(uri)
+        # Detection mechanism, this is required due to certain URL are formatter with ":" rather than "/"
+        # which causes decodeurl to fail getting the right host and path
+        if len(host.split(':')) > 1:
+            splitslash = host.split(':')
+            host = splitslash[0]
+            path = '/' + splitslash[1] + path
+        #Algorithm:
+        # if user is defined, append protocol=ssh or if a protocol is defined, then honor the user-defined protocol
+        # if no user & password is defined, check for scheme type and append the protocol with the scheme type
+        # finally if protocols or if the url is well-formed, do nothing and rejoin everything back to normal
+        # Need to repackage the arguments for encodeurl, the format is: (scheme, host, path, user, password, OrderedDict([('key', 'value')]))
+        if user:
+            if not 'protocol' in parms:
+                parms.update({('protocol', 'ssh')})
+        elif (scheme == "http" or scheme == 'https' or scheme == 'ssh') and not ('protocol' in parms):
+            parms.update({('protocol', scheme)})
+        # Always append 'git://'
+        fUrl = bb.fetch2.encodeurl(('git', host, path, user, pswd, parms))
+        return fUrl
+    else:
+        return uri
 
 def is_package(url):
     '''Check if a URL points to a package'''
@@ -404,12 +436,14 @@ def create_recipe(args):
             srcuri = rev_re.sub('', srcuri)
         tempsrc = tempfile.mkdtemp(prefix='recipetool-')
         srctree = tempsrc
+        d = bb.data.createCopy(tinfoil.config_data)
         if fetchuri.startswith('npm://'):
             # Check if npm is available
-            check_npm(tinfoil.config_data)
+            npm_bindir = check_npm(tinfoil, args.devtool)
+            d.prependVar('PATH', '%s:' % npm_bindir)
         logger.info('Fetching %s...' % srcuri)
         try:
-            checksums = scriptutils.fetch_uri(tinfoil.config_data, fetchuri, srctree, srcrev)
+            checksums = scriptutils.fetch_uri(d, fetchuri, srctree, srcrev)
         except bb.fetch2.BBFetchException as e:
             logger.error(str(e).rstrip())
             sys.exit(1)
@@ -448,8 +482,8 @@ def create_recipe(args):
 
                 if pkgfile:
                     if pkgfile.endswith(('.deb', '.ipk')):
-                        stdout, _ = bb.process.run('ar x %s control.tar.gz' % pkgfile, cwd=tmpfdir)
-                        stdout, _ = bb.process.run('tar xf control.tar.gz ./control', cwd=tmpfdir)
+                        stdout, _ = bb.process.run('ar x %s' % pkgfile, cwd=tmpfdir)
+                        stdout, _ = bb.process.run('tar xf control.tar.gz', cwd=tmpfdir)
                         values = convert_debian(tmpfdir)
                         extravalues.update(values)
                     elif pkgfile.endswith(('.rpm', '.srpm')):
@@ -554,7 +588,6 @@ def create_recipe(args):
         if name_pv and not realpv:
             realpv = name_pv
 
-
     if not srcuri:
         lines_before.append('# No information for SRC_URI yet (only an external source tree was specified)')
     lines_before.append('SRC_URI = "%s"' % srcuri)
@@ -588,6 +621,11 @@ def create_recipe(args):
         lines_after.append('INSANE_SKIP_${PN} += "already-stripped"')
         lines_after.append('')
 
+    if args.fetch_dev:
+        extravalues['fetchdev'] = True
+    else:
+        extravalues['fetchdev'] = None
+
     # Find all plugins that want to register handlers
     logger.debug('Loading recipe handlers')
     raw_handlers = []
@@ -604,6 +642,7 @@ def create_recipe(args):
     handlers.sort(key=lambda item: (item[1], -item[2]), reverse=True)
     for handler, priority, _ in handlers:
         logger.debug('Handler: %s (priority %d)' % (handler.__class__.__name__, priority))
+        setattr(handler, '_devtool', args.devtool)
     handlers = [item[0] for item in handlers]
 
     # Apply the handlers
@@ -640,7 +679,7 @@ def create_recipe(args):
 
     if not outfile:
         if not pn:
-            logger.error('Unable to determine short program name from source tree - please specify name with -N/--name or output file name with -o/--outfile')
+            log_error_cond('Unable to determine short program name from source tree - please specify name with -N/--name or output file name with -o/--outfile', args.devtool)
             # devtool looks for this specific exit code, so don't change it
             sys.exit(15)
         else:
@@ -710,6 +749,15 @@ def create_recipe(args):
         if not bbclassextend:
             lines_after.append('BBCLASSEXTEND = "native"')
 
+    postinst = ("postinst", extravalues.pop('postinst', None))
+    postrm = ("postrm", extravalues.pop('postrm', None))
+    preinst = ("preinst", extravalues.pop('preinst', None))
+    prerm = ("prerm", extravalues.pop('prerm', None))
+    funcs = [postinst, postrm, preinst, prerm]
+    for func in funcs:
+        if func[1]:
+            RecipeHandler.genfunction(lines_after, 'pkg_%s_${PN}' % func[0], func[1])
+
     outlines = []
     outlines.extend(lines_before)
     if classes:
@@ -736,7 +784,7 @@ def create_recipe(args):
         shutil.move(srctree, args.extract_to)
         if tempsrc == srctree:
             tempsrc = None
-        logger.info('Source extracted to %s' % args.extract_to)
+        log_info_cond('Source extracted to %s' % args.extract_to, args.devtool)
 
     if outfile == '-':
         sys.stdout.write('\n'.join(outlines) + '\n')
@@ -749,7 +797,7 @@ def create_recipe(args):
                     continue
                 f.write('%s\n' % line)
                 lastline = line
-        logger.info('Recipe %s has been created; further editing may be required to make it fully functional' % outfile)
+        log_info_cond('Recipe %s has been created; further editing may be required to make it fully functional' % outfile, args.devtool)
 
     if tempsrc:
         if args.keep_temp:
@@ -775,10 +823,12 @@ def handle_license_vars(srctree, lines_before, handled, extravalues, d):
         lines_before.append('# your responsibility to verify that the values are complete and correct.')
         if len(licvalues) > 1:
             lines_before.append('#')
-            lines_before.append('# NOTE: multiple licenses have been detected; if that is correct you should separate')
-            lines_before.append('# these in the LICENSE value using & if the multiple licenses all apply, or | if there')
-            lines_before.append('# is a choice between the multiple licenses. If in doubt, check the accompanying')
-            lines_before.append('# documentation to determine which situation is applicable.')
+            lines_before.append('# NOTE: multiple licenses have been detected; they have been separated with &')
+            lines_before.append('# in the LICENSE value for now since it is a reasonable assumption that all')
+            lines_before.append('# of the licenses apply. If instead there is a choice between the multiple')
+            lines_before.append('# licenses then you should change the value to separate the licenses with |')
+            lines_before.append('# instead of &. If there is any doubt, check the accompanying documentation')
+            lines_before.append('# to determine which situation is applicable.')
         if lic_unknown:
             lines_before.append('#')
             lines_before.append('# The following license files were not able to be identified and are')
@@ -802,7 +852,7 @@ def handle_license_vars(srctree, lines_before, handled, extravalues, d):
             licenses = [pkg_license]
         else:
             lines_before.append('# NOTE: Original package metadata indicates license is: %s' % pkg_license)
-    lines_before.append('LICENSE = "%s"' % ' '.join(licenses))
+    lines_before.append('LICENSE = "%s"' % ' & '.join(licenses))
     lines_before.append('LIC_FILES_CHKSUM = "%s"' % ' \\\n                    '.join(lic_files_chksum))
     lines_before.append('')
     handled.append(('license', licvalues))
@@ -813,7 +863,7 @@ def get_license_md5sums(d, static_only=False):
     md5sums = {}
     if not static_only:
         # Gather md5sums of license files in common license dir
-        commonlicdir = d.getVar('COMMON_LICENSE_DIR', True)
+        commonlicdir = d.getVar('COMMON_LICENSE_DIR')
         for fn in os.listdir(commonlicdir):
             md5value = bb.utils.md5_file(os.path.join(commonlicdir, fn))
             md5sums[md5value] = fn
@@ -983,7 +1033,7 @@ def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn
     return outlicenses
 
 def read_pkgconfig_provides(d):
-    pkgdatadir = d.getVar('PKGDATA_DIR', True)
+    pkgdatadir = d.getVar('PKGDATA_DIR')
     pkgmap = {}
     for fn in glob.glob(os.path.join(pkgdatadir, 'shlibs2', '*.pclist')):
         with open(fn, 'r') as f:
@@ -1044,6 +1094,25 @@ def convert_debian(debpath):
                     varname = value_map.get(key, None)
                     if varname:
                         values[varname] = value
+    postinst = os.path.join(debpath, 'postinst')
+    postrm = os.path.join(debpath, 'postrm')
+    preinst = os.path.join(debpath, 'preinst')
+    prerm = os.path.join(debpath, 'prerm')
+    sfiles = [postinst, postrm, preinst, prerm]
+    for sfile in sfiles:
+        if os.path.isfile(sfile):
+            logger.info("Converting %s file to recipe function..." %
+                    os.path.basename(sfile).upper())
+            content = []
+            with open(sfile) as f:
+                for line in f:
+                    if "#!/" in line:
+                        continue
+                    line = line.rstrip("\n")
+                    if line.strip():
+                        content.append(line)
+                if content:
+                    values[os.path.basename(f.name)] = content
 
     #if depends:
     #    values['DEPENDS'] = ' '.join(depends)
@@ -1073,10 +1142,21 @@ def convert_rpm_xml(xmlfile):
     return values
 
 
-def check_npm(d):
-    if not os.path.exists(os.path.join(d.getVar('STAGING_BINDIR_NATIVE', True), 'npm')):
-        logger.error('npm required to process specified source, but npm is not available - you need to build nodejs-native first')
+def check_npm(tinfoil, debugonly=False):
+    try:
+        rd = tinfoil.parse_recipe('nodejs-native')
+    except bb.providers.NoProvider:
+        # We still conditionally show the message and exit with the special
+        # return code, otherwise we can't show the proper message for eSDK
+        # users
+        log_error_cond('nodejs-native is required for npm but is not available - you will likely need to add a layer that provides nodejs', debugonly)
         sys.exit(14)
+    bindir = rd.getVar('STAGING_BINDIR_NATIVE')
+    npmpath = os.path.join(bindir, 'npm')
+    if not os.path.exists(npmpath):
+        log_error_cond('npm required to process specified source, but npm is not available - you need to run bitbake -c addto_recipe_sysroot nodejs-native first', debugonly)
+        sys.exit(14)
+    return bindir
 
 def register_commands(subparsers):
     parser_create = subparsers.add_parser('create',
@@ -1093,5 +1173,10 @@ def register_commands(subparsers):
     parser_create.add_argument('--src-subdir', help='Specify subdirectory within source tree to use', metavar='SUBDIR')
     parser_create.add_argument('-a', '--autorev', help='When fetching from a git repository, set SRCREV in the recipe to a floating revision instead of fixed', action="store_true")
     parser_create.add_argument('--keep-temp', action="store_true", help='Keep temporary directory (for debugging)')
-    parser_create.set_defaults(func=create_recipe)
+    parser_create.add_argument('--fetch-dev', action="store_true", help='For npm, also fetch devDependencies')
+    parser_create.add_argument('--devtool', action="store_true", help=argparse.SUPPRESS)
+    # FIXME I really hate having to set parserecipes for this, but given we may need
+    # to call into npm (and we don't know in advance if we will or not) and in order
+    # to do so we need to know npm's recipe sysroot path, there's not much alternative
+    parser_create.set_defaults(func=create_recipe, parserecipes=True)
 

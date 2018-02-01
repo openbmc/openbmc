@@ -459,7 +459,7 @@
                     release with the Yocto Project.
                     For information on how to use the Mars version of Eclipse
                     with the Yocto Project, see
-                    "<link linkend='sdk-appendix-mars'>Appendix C</link>.
+                    "<link linkend='sdk-appendix-latest-yp-eclipse-plug-in'>Appendix C</link>.
                 </note>
             </para>
 
@@ -501,7 +501,7 @@
                             <listitem><para>
                                 <emphasis>Locate the Neon Download:</emphasis>
                                 Open a browser and go to
-                                <ulink url='http://www.eclipse.org/mars/'>http://www.eclipse.org/neon/</ulink>.
+                                <ulink url='http://www.eclipse.org/neon/'>http://www.eclipse.org/neon/</ulink>.
                                 </para></listitem>
                             <listitem><para>
                                 <emphasis>Download the Tarball:</emphasis>

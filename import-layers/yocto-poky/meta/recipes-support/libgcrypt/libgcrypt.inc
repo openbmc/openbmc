@@ -12,7 +12,7 @@ LICENSE_dumpsexp-dev = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
                     file://COPYING.LIB;md5=bbb461211a33b134d42ed5ee802b37ff"
 
-DEPENDS = "libgpg-error libcap"
+DEPENDS = "libgpg-error"
 
 UPSTREAM_CHECK_URI = "https://gnupg.org/download/index.html"
 SRC_URI = "${GNUPG_MIRROR}/libgcrypt/libgcrypt-${PV}.tar.gz \
@@ -28,7 +28,10 @@ BINCONFIG = "${bindir}/libgcrypt-config"
 
 inherit autotools texinfo binconfig-disabled pkgconfig
 
-EXTRA_OECONF = "--disable-asm --with-capabilities"
+EXTRA_OECONF = "--disable-asm"
+
+PACKAGECONFIG ??= "capabilities"
+PACKAGECONFIG[capabilities] = "--with-capabilities,--without-capabilities,libcap"
 
 do_configure_prepend () {
 	# Else this could be used in preference to the one in aclocal-copy
@@ -48,4 +51,4 @@ FILES_dumpsexp-dev += "${bindir}/dumpsexp"
 
 ARM_INSTRUCTION_SET = "arm"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

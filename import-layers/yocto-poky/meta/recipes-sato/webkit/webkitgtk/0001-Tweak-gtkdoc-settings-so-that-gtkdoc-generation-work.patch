@@ -1,0 +1,50 @@
+From 9b09974003097c9a408bbeea568996768efe705b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 11 Aug 2016 17:13:51 +0300
+Subject: [PATCH 05/10] Tweak gtkdoc settings so that gtkdoc generation works
+ under OpenEmbedded build system
+
+This requires setting a few environment variables so that the transient
+binary is build and linked correctly, and disabling the tweaks to RUN
+variable from gtkdoc.py script so that our qemu wrapper is taken into use.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ Source/PlatformGTK.cmake | 2 +-
+ Tools/gtk/gtkdoc.py      | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Source/PlatformGTK.cmake b/Source/PlatformGTK.cmake
+index 50b5393..7a31db5 100644
+--- a/Source/PlatformGTK.cmake
++++ b/Source/PlatformGTK.cmake
+@@ -24,7 +24,7 @@ macro(ADD_GTKDOC_GENERATOR _stamp_name _extra_args)
+     add_custom_command(
+         OUTPUT "${CMAKE_BINARY_DIR}/${_stamp_name}"
+         DEPENDS ${DocumentationDependencies}
+-        COMMAND ${CMAKE_COMMAND} -E env "CC=${CMAKE_C_COMPILER}" "CFLAGS=${CMAKE_C_FLAGS} -Wno-unused-parameter" ${CMAKE_SOURCE_DIR}/Tools/gtk/generate-gtkdoc ${_extra_args}
++        COMMAND ${CMAKE_COMMAND} -E env "CC=${CMAKE_C_COMPILER}" "CFLAGS=${CMAKE_C_FLAGS} -Wno-unused-parameter" "LD=${CMAKE_C_COMPILER}" "LDFLAGS=${CMAKE_C_LINK_FLAGS}" "RUN=${CMAKE_BINARY_DIR}/gtkdoc-qemuwrapper" ${CMAKE_SOURCE_DIR}/Tools/gtk/generate-gtkdoc -v ${_extra_args}
+         COMMAND touch ${_stamp_name}
+         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+         VERBATIM
+diff --git a/Tools/gtk/gtkdoc.py b/Tools/gtk/gtkdoc.py
+index 03c8e8e..34fbaff 100644
+--- a/Tools/gtk/gtkdoc.py
++++ b/Tools/gtk/gtkdoc.py
+@@ -318,9 +318,9 @@ class GTKDoc(object):
+                     additional_ldflags = '%s %s' % (additional_ldflags, arg)
+             ldflags = ' "-L%s" %s ' % (self.library_path, additional_ldflags) + ldflags
+             current_ld_library_path = env.get('LD_LIBRARY_PATH')
+-            if current_ld_library_path:
++            if current_ld_library_path and 'RUN' not in env:
+                 env['LD_LIBRARY_PATH'] = '%s:%s' % (self.library_path, current_ld_library_path)
+-            else:
++            elif 'RUN' not in env:
+                 env['LD_LIBRARY_PATH'] = self.library_path
+ 
+         if ldflags:
+-- 
+2.15.1
+

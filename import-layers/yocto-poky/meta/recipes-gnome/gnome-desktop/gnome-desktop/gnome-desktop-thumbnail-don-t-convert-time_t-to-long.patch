@@ -1,0 +1,72 @@
+From adfa0c8f9fec1faac4bea6a94d947ea32e585923 Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Tue, 13 Dec 2016 20:39:51 -0700
+Subject: [PATCH] gnome-desktop-thumbnail: don't convert time_t to long
+
+Explicitly use strftime+strptime rather than snprintf+atol. This fixes the
+build for X32, where long's size doesn't match that of time_t.
+
+Upstream-Status: Pending
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+---
+ libgnome-desktop/gnome-desktop-thumbnail.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/libgnome-desktop/gnome-desktop-thumbnail.c b/libgnome-desktop/gnome-desktop-thumbnail.c
+index 3946309..b756333 100644
+--- a/libgnome-desktop/gnome-desktop-thumbnail.c
++++ b/libgnome-desktop/gnome-desktop-thumbnail.c
+@@ -126,6 +126,8 @@
+  * Since: 2.2
+  */
+ 
++#define _XOPEN_SOURCE
++
+ #include <config.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -1483,6 +1485,7 @@ save_thumbnail (GdkPixbuf  *pixbuf,
+   char *tmp_path = NULL;
+   int tmp_fd;
+   char mtime_str[21];
++  struct tm *tmp_mtime = NULL;
+   gboolean ret = FALSE;
+   GError *error = NULL;
+   const char *width, *height;
+@@ -1502,7 +1505,11 @@ save_thumbnail (GdkPixbuf  *pixbuf,
+     goto out;
+   close (tmp_fd);
+ 
+-  g_snprintf (mtime_str, 21, "%ld",  mtime);
++  tmp_mtime = localtime (&mtime);
++  if (!tmp_mtime)
++    goto out;
++  strftime (mtime_str, 21, "%s", tmp_mtime);
++  free (tmp_mtime);
+   width = gdk_pixbuf_get_option (pixbuf, "tEXt::Thumb::Image::Width");
+   height = gdk_pixbuf_get_option (pixbuf, "tEXt::Thumb::Image::Height");
+ 
+@@ -1695,6 +1702,7 @@ gnome_desktop_thumbnail_is_valid (GdkPixbuf          *pixbuf,
+ {
+   const char *thumb_uri, *thumb_mtime_str;
+   time_t thumb_mtime;
++  struct tm tmp_mtime;
+   
+   thumb_uri = gdk_pixbuf_get_option (pixbuf, "tEXt::Thumb::URI");
+   if (!thumb_uri)
+@@ -1705,7 +1713,11 @@ gnome_desktop_thumbnail_is_valid (GdkPixbuf          *pixbuf,
+   thumb_mtime_str = gdk_pixbuf_get_option (pixbuf, "tEXt::Thumb::MTime");
+   if (!thumb_mtime_str)
+     return FALSE;
+-  thumb_mtime = atol (thumb_mtime_str);
++  if (!strptime (thumb_mtime_str, "%s", &tmp_mtime))
++    return FALSE;
++  thumb_mtime = mktime (&tmp_mtime);
++  if (!thumb_mtime)
++    return FALSE;
+   if (mtime != thumb_mtime)
+     return FALSE;
+   
+-- 
+2.8.0
+

@@ -1,0 +1,35 @@
+From 0fff28f31aef9ad1d5a817216a3c98ba9d605106 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 19 Jun 2017 23:52:14 -0700
+Subject: [PATCH] makedumpfile: Add proper format string to print a string
+
+Fix
+makedumpfile.c: In function 'write_eraseinfo':
+makedumpfile.c:8273:4: error: format not a string literal and no format arguments [-Werror=format-security]
+    DEBUG_MSG(obuf);
+    ^~~~~~~~~
+makedumpfile.c:8273:4: error: format not a string literal and no format arguments [-Werror=format-security]
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ makedumpfile.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/makedumpfile.c b/makedumpfile.c
+index e69b6df..8b8a6b0 100644
+--- a/makedumpfile.c
++++ b/makedumpfile.c
+@@ -8270,7 +8270,7 @@ write_eraseinfo(struct cache_data *cd_page, unsigned long *size_out)
+ 			}
+ 			sprintf(obuf, "erase %s %s", erase_info[i].symbol_expr,
+ 							size_str);
+-			DEBUG_MSG(obuf);
++			DEBUG_MSG("%s", obuf);
+ 			if (!write_cache(cd_page, obuf, strlen(obuf)))
+ 				goto out;
+ 			size_eraseinfo += strlen(obuf);
+-- 
+2.13.1
+

@@ -5,7 +5,7 @@ cd ./test
 if [ $? -eq 0 ]
 then
 	echo "PASS: e2fsprogs"
-	rm test.log
+	rm ../test.log
 else
 	echo "FAIL: e2fsprogs"
 fi

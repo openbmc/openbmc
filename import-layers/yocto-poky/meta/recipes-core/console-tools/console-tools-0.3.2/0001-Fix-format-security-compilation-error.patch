@@ -1,0 +1,57 @@
+Subject: Fix 'format-security' compilation error.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ kbdtools/kbd_mode.c    | 6 +++---
+ kbdtools/setmetamode.c | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/kbdtools/kbd_mode.c b/kbdtools/kbd_mode.c
+index 02dca38..8dbcd39 100644
+--- a/kbdtools/kbd_mode.c
++++ b/kbdtools/kbd_mode.c
+@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
+       /* report mode */
+       if (ioctl(fd, KDGKBMODE, &mode)) 
+ 	{
+-	  fprintf(stderr, progname);
++	  fprintf(stderr, "%s", progname);
+ 	  perror(_(": error reading keyboard mode\n"));
+ 	  exit(1);
+ 	}
+@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
+     kbd_rep.period = rate;
+     if (ioctl(fd, KDKBDREP, &kbd_rep))
+       {
+-	fprintf(stderr, progname);
++	fprintf(stderr, "%s", progname);
+ 	perror(_(": error setting keyboard repeat mode\n"));
+ 	exit(1);
+       }
+@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
+   
+   if (ioctl(fd, KDSKBMODE, mode))
+     {
+-      fprintf(stderr, progname);
++      fprintf(stderr, "%s", progname);
+       perror(_(": error setting keyboard mode\n"));
+       exit(1);
+     }
+diff --git a/kbdtools/setmetamode.c b/kbdtools/setmetamode.c
+index 5bed945..0ba7676 100644
+--- a/kbdtools/setmetamode.c
++++ b/kbdtools/setmetamode.c
+@@ -42,7 +42,7 @@ void report(int meta)
+     default:
+       s = N_("Strange mode for Meta key?\n");
+     }
+-  printf(_(s));
++  printf("%s", _(s));
+ }
+ 
+ struct meta 
+-- 
+2.8.3
+

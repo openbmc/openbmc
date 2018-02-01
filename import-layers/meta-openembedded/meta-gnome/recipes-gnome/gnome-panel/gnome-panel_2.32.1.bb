@@ -45,4 +45,4 @@ FILES_${PN} =+ "${datadir}/gnome* \
                 ${libdir}/bonobo \
 "
 
-PNBLACKLIST[gnome-panel] ?= "Depends on broken libgweather"
+PNBLACKLIST[gnome-panel] ?= "Depends on broken libgweather - the recipe will be removed on 2017-09-01 unless the issue is fixed"

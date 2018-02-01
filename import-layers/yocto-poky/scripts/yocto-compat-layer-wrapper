@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Yocto Project compatibility layer tool wrapper
+#
+# Creates a temprary build directory to run Yocto Project Compatible
+# script to avoid a contaminated environment.
+#
+# Copyright (C) 2017 Intel Corporation
+# Released under the MIT license (see COPYING.MIT)
+
+if [ -z "$BUILDDIR" ]; then
+	echo "Please source oe-init-build-env before run this script."
+	exit 2
+fi
+
+base_dir=$(realpath $BUILDDIR/../)
+cd $base_dir
+
+build_dir=$(mktemp -p $base_dir -d -t build-XXXX)
+
+source oe-init-build-env $build_dir
+yocto-compat-layer.py "$@"
+retcode=$?
+
+rm -rf $build_dir
+
+exit $retcode

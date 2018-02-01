@@ -8,7 +8,6 @@ SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
 file://12-distutils-prefix-is-inside-staging-area.patch \
 file://python-config.patch \
 file://000-cross-compile.patch \
-file://020-dont-compile-python-files.patch \
 file://030-fixup-include-dirs.patch \
 file://070-dont-clean-ipkg-install.patch \
 file://080-distutils-dont_adjust_files.patch \
@@ -42,28 +41,7 @@ DEPENDS = "openssl-native bzip2-replacement-native zlib-native readline-native s
 
 inherit native
 
-RPROVIDES += " \
-    python3-compression-native \
-    python3-core-native \
-    python3-distutils-native \
-    python3-email-native \
-    python3-importlib-native \
-    python3-io-native \
-    python3-json-native \
-    python3-lang-native \
-    python3-misc-native \
-    python3-netclient-native \
-    python3-netserver-native \
-    python3-numbers-native \
-    python3-pkgutil-native \
-    python3-pprint-native \
-    python3-re-native \
-    python3-shell-native \
-    python3-subprocess-native \
-    python3-textutils-native \
-    python3-threading-native \
-    python3-unittest-native \
-"
+require python-native-${PYTHON_MAJMIN}-manifest.inc
 
 # uninative may be used on pre glibc 2.25 systems which don't have getentropy
 EXTRA_OECONF_append = " --bindir=${bindir}/${PN} --without-ensurepip ac_cv_func_getentropy=no"
@@ -97,4 +75,9 @@ do_install() {
 	for PYTHSCRIPT in `grep -rIl ${bindir}/${PN}/python ${D}${bindir}/${PN}`; do
 		sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' $PYTHSCRIPT
 	done
+
+	# Tests are large and we don't need them in the native sysroot
+	rm ${D}${libdir}/python${PYTHON_MAJMIN}/test -rf
 }
+
+RPROVIDES += "python3-misc-native"

@@ -65,9 +65,11 @@ ALTERNATIVE_PRIORITY = "10"
 # and include that vairable in the set.
 UPDALTVARS  = "ALTERNATIVE ALTERNATIVE_LINK_NAME ALTERNATIVE_TARGET ALTERNATIVE_PRIORITY"
 
+PACKAGE_WRITE_DEPS += "virtual/update-alternatives-native"
+
 def gen_updatealternativesvardeps(d):
-    pkgs = (d.getVar("PACKAGES", True) or "").split()
-    vars = (d.getVar("UPDALTVARS", True) or "").split()
+    pkgs = (d.getVar("PACKAGES") or "").split()
+    vars = (d.getVar("UPDALTVARS") or "").split()
 
     # First compute them for non_pkg versions
     for v in vars:
@@ -84,7 +86,7 @@ def gen_updatealternativesvardeps(d):
                 d.appendVar('%s_VARDEPS_%s' % (v,p), ' %s:%s' % (flag, d.getVarFlag('%s_%s' % (v,p), flag, False)))
 
 def ua_extend_depends(d):
-    if not 'virtual/update-alternatives' in d.getVar('PROVIDES', True):
+    if not 'virtual/update-alternatives' in d.getVar('PROVIDES'):
         d.appendVar('DEPENDS', ' virtual/${MLPREFIX}update-alternatives')
 
 python __anonymous() {
@@ -92,6 +94,10 @@ python __anonymous() {
     if bb.data.inherits_class('native', d) or \
        bb.data.inherits_class('cross', d) or bb.data.inherits_class('crosssdk', d) or \
        bb.data.inherits_class('cross-canadian', d):
+        return
+
+    # Disable when targeting mingw32 (no target support)
+    if d.getVar("TARGET_OS") == "mingw32":
         return
 
     # compute special vardeps
@@ -103,8 +109,8 @@ python __anonymous() {
 
 def gen_updatealternativesvars(d):
     ret = []
-    pkgs = (d.getVar("PACKAGES", True) or "").split()
-    vars = (d.getVar("UPDALTVARS", True) or "").split()
+    pkgs = (d.getVar("PACKAGES") or "").split()
+    vars = (d.getVar("UPDALTVARS") or "").split()
 
     for v in vars:
         ret.append(v + "_VARDEPS")
@@ -123,23 +129,23 @@ populate_packages[vardeps] += "${UPDALTVARS} ${@gen_updatealternativesvars(d)}"
 # place.
 python perform_packagecopy_append () {
     # Check for deprecated usage...
-    pn = d.getVar('BPN', True)
-    if d.getVar('ALTERNATIVE_LINKS', True) != None:
+    pn = d.getVar('BPN')
+    if d.getVar('ALTERNATIVE_LINKS') != None:
         bb.fatal('%s: Use of ALTERNATIVE_LINKS/ALTERNATIVE_PATH/ALTERNATIVE_NAME is no longer supported, please convert to the updated syntax, see update-alternatives.bbclass for more info.' % pn)
 
     # Do actual update alternatives processing
-    pkgdest = d.getVar('PKGD', True)
-    for pkg in (d.getVar('PACKAGES', True) or "").split():
+    pkgdest = d.getVar('PKGD')
+    for pkg in (d.getVar('PACKAGES') or "").split():
         # If the src == dest, we know we need to rename the dest by appending ${BPN}
         link_rename = {}
-        for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg, True) or "").split():
-            alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name, True)
+        for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
+            alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name)
             if not alt_link:
-                alt_link = "%s/%s" % (d.getVar('bindir', True), alt_name)
+                alt_link = "%s/%s" % (d.getVar('bindir'), alt_name)
                 d.setVarFlag('ALTERNATIVE_LINK_NAME', alt_name, alt_link)
 
-            alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name, True) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name, True)
-            alt_target   = alt_target or d.getVar('ALTERNATIVE_TARGET_%s' % pkg, True) or d.getVar('ALTERNATIVE_TARGET', True) or alt_link
+            alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name)
+            alt_target   = alt_target or d.getVar('ALTERNATIVE_TARGET_%s' % pkg) or d.getVar('ALTERNATIVE_TARGET') or alt_link
             # Sometimes alt_target is specified as relative to the link name.
             alt_target   = os.path.join(os.path.dirname(alt_link), alt_target)
 
@@ -189,23 +195,23 @@ python perform_packagecopy_append () {
 PACKAGESPLITFUNCS_prepend = "populate_packages_updatealternatives "
 
 python populate_packages_updatealternatives () {
-    pn = d.getVar('BPN', True)
+    pn = d.getVar('BPN')
 
     # Do actual update alternatives processing
-    pkgdest = d.getVar('PKGD', True)
-    for pkg in (d.getVar('PACKAGES', True) or "").split():
+    pkgdest = d.getVar('PKGD')
+    for pkg in (d.getVar('PACKAGES') or "").split():
         # Create post install/removal scripts
         alt_setup_links = "# Begin section update-alternatives\n"
         alt_remove_links = "# Begin section update-alternatives\n"
-        for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg, True) or "").split():
-            alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name, True)
-            alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name, True) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name, True)
-            alt_target   = alt_target or d.getVar('ALTERNATIVE_TARGET_%s' % pkg, True) or d.getVar('ALTERNATIVE_TARGET', True) or alt_link
+        for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
+            alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name)
+            alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name)
+            alt_target   = alt_target or d.getVar('ALTERNATIVE_TARGET_%s' % pkg) or d.getVar('ALTERNATIVE_TARGET') or alt_link
             # Sometimes alt_target is specified as relative to the link name.
             alt_target   = os.path.join(os.path.dirname(alt_link), alt_target)
 
-            alt_priority = d.getVarFlag('ALTERNATIVE_PRIORITY_%s' % pkg,  alt_name, True) or d.getVarFlag('ALTERNATIVE_PRIORITY',  alt_name, True)
-            alt_priority = alt_priority or d.getVar('ALTERNATIVE_PRIORITY_%s' % pkg, True) or d.getVar('ALTERNATIVE_PRIORITY', True)
+            alt_priority = d.getVarFlag('ALTERNATIVE_PRIORITY_%s' % pkg,  alt_name) or d.getVarFlag('ALTERNATIVE_PRIORITY',  alt_name)
+            alt_priority = alt_priority or d.getVar('ALTERNATIVE_PRIORITY_%s' % pkg) or d.getVar('ALTERNATIVE_PRIORITY')
 
             # This shouldn't trigger, as it should have been resolved earlier!
             if alt_link == alt_target:
@@ -227,14 +233,14 @@ python populate_packages_updatealternatives () {
 
         if len(alt_setup_links.splitlines()) > 2:
             # RDEPENDS setup
-            provider = d.getVar('VIRTUAL-RUNTIME_update-alternatives', True)
+            provider = d.getVar('VIRTUAL-RUNTIME_update-alternatives')
             if provider:
                 #bb.note('adding runtime requirement for update-alternatives for %s' % pkg)
                 d.appendVar('RDEPENDS_%s' % pkg, ' ' + d.getVar('MLPREFIX', False) + provider)
 
             bb.note('adding update-alternatives calls to postinst/prerm for %s' % pkg)
             bb.note('%s' % alt_setup_links)
-            postinst = d.getVar('pkg_postinst_%s' % pkg, True) or '#!/bin/sh\n'
+            postinst = d.getVar('pkg_postinst_%s' % pkg) or '#!/bin/sh\n'
             postinst = postinst.splitlines(True)
             try:
                 index = postinst.index('# Begin section update-rc.d\n')
@@ -245,7 +251,7 @@ python populate_packages_updatealternatives () {
             d.setVar('pkg_postinst_%s' % pkg, postinst)
 
             bb.note('%s' % alt_remove_links)
-            prerm = d.getVar('pkg_prerm_%s' % pkg, True) or '#!/bin/sh\n'
+            prerm = d.getVar('pkg_prerm_%s' % pkg) or '#!/bin/sh\n'
             prerm = prerm.splitlines(True)
             try:
                 index = prerm.index('# End section update-rc.d\n')
@@ -257,14 +263,14 @@ python populate_packages_updatealternatives () {
 }
 
 python package_do_filedeps_append () {
-    pn = d.getVar('BPN', True)
-    pkgdest = d.getVar('PKGDEST', True)
+    pn = d.getVar('BPN')
+    pkgdest = d.getVar('PKGDEST')
 
     for pkg in packages.split():
-        for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg, True) or "").split():
-            alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name, True)
-            alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name, True) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name, True)
-            alt_target   = alt_target or d.getVar('ALTERNATIVE_TARGET_%s' % pkg, True) or d.getVar('ALTERNATIVE_TARGET', True) or alt_link
+        for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
+            alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name)
+            alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name)
+            alt_target   = alt_target or d.getVar('ALTERNATIVE_TARGET_%s' % pkg) or d.getVar('ALTERNATIVE_TARGET') or alt_link
 
             if alt_link == alt_target:
                 bb.warn('%s: alt_link == alt_target: %s == %s' % (pn, alt_link, alt_target))
@@ -276,7 +282,7 @@ python package_do_filedeps_append () {
             # Add file provide
             trans_target = oe.package.file_translate(alt_target)
             d.appendVar('FILERPROVIDES_%s_%s' % (trans_target, pkg), " " + alt_link)
-            if not trans_target in (d.getVar('FILERPROVIDESFLIST_%s' % pkg, True) or ""):
+            if not trans_target in (d.getVar('FILERPROVIDESFLIST_%s' % pkg) or ""):
                 d.appendVar('FILERPROVIDESFLIST_%s' % pkg, " " + trans_target)
 }
 

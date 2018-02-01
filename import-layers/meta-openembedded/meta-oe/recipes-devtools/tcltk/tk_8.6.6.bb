@@ -32,7 +32,7 @@ SRC_URI[sha256sum] = "d62c371a71b4744ed830e3c21d27968c31dba74dd2c45f36b9b071e6d8
 S = "${WORKDIR}/${BPN}${PV}/unix"
 
 # Short version format: "8.6"
-VER = "${@os.path.splitext(d.getVar('PV', True))[0]}"
+VER = "${@os.path.splitext(d.getVar('PV'))[0]}"
 
 LDFLAGS += "-Wl,-rpath,${libdir}/tcltk/${PV}/lib"
 inherit autotools distro_features_check

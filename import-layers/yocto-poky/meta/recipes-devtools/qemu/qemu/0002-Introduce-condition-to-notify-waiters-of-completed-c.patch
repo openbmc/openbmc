@@ -1,0 +1,86 @@
+From b5ffd3aa4e9bd4edb09cc84c46f78da72697a946 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Sat, 31 Dec 2016 11:23:32 -0500
+Subject: [PATCH 2/4] Introduce condition to notify waiters of completed
+ command
+
+Introduce a lock and a condition to notify anyone waiting for the completion
+of the execution of a TPM command by the backend (thread). The backend
+uses the condition to signal anyone waiting for command completion.
+We need to place the condition in two locations: one is invoked by the
+backend thread, the other by the bottom half thread.
+We will use the signalling to wait for command completion before VM
+suspend.
+
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+
+Upstream-Status: Pending [https://lists.nongnu.org/archive/html/qemu-devel/2016-06/msg00252.html]
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ hw/tpm/tpm_int.h |  3 +++
+ hw/tpm/tpm_tis.c | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
+index 6b2c9c953a..70be1ad8d9 100644
+--- a/hw/tpm/tpm_int.h
++++ b/hw/tpm/tpm_int.h
+@@ -30,6 +30,9 @@ struct TPMState {
+     char *backend;
+     TPMBackend *be_driver;
+     TPMVersion be_tpm_version;
++
++    QemuMutex state_lock;
++    QemuCond cmd_complete;
+ };
+ 
+ #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 381e7266ea..14d9e83ea2 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -368,6 +368,8 @@ static void tpm_tis_receive_bh(void *opaque)
+     TPMTISEmuState *tis = &s->s.tis;
+     uint8_t locty = s->locty_number;
+ 
++    qemu_mutex_lock(&s->state_lock);
++
+     tpm_tis_sts_set(&tis->loc[locty],
+                     TPM_TIS_STS_VALID | TPM_TIS_STS_DATA_AVAILABLE);
+     tis->loc[locty].state = TPM_TIS_STATE_COMPLETION;
+@@ -384,6 +386,10 @@ static void tpm_tis_receive_bh(void *opaque)
+     tpm_tis_raise_irq(s, locty,
+                       TPM_TIS_INT_DATA_AVAILABLE | TPM_TIS_INT_STS_VALID);
+ #endif
++
++    /* notify of completed command */
++    qemu_cond_signal(&s->cmd_complete);
++    qemu_mutex_unlock(&s->state_lock);
+ }
+ 
+ /*
+@@ -403,6 +409,11 @@ static void tpm_tis_receive_cb(TPMState *s, uint8_t locty,
+         }
+     }
+ 
++    qemu_mutex_lock(&s->state_lock);
++    /* notify of completed command */
++    qemu_cond_signal(&s->cmd_complete);
++    qemu_mutex_unlock(&s->state_lock);
++
+     qemu_bh_schedule(tis->bh);
+ }
+ 
+@@ -1072,6 +1083,9 @@ static void tpm_tis_initfn(Object *obj)
+     memory_region_init_io(&s->mmio, OBJECT(s), &tpm_tis_memory_ops,
+                           s, "tpm-tis-mmio",
+                           TPM_TIS_NUM_LOCALITIES << TPM_TIS_LOCALITY_SHIFT);
++
++    qemu_mutex_init(&s->state_lock);
++    qemu_cond_init(&s->cmd_complete);
+ }
+ 
+ static void tpm_tis_class_init(ObjectClass *klass, void *data)
+-- 
+2.11.0
+

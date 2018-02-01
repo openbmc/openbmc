@@ -1,0 +1,28 @@
+From 46cc9298c38b9dd735fec3f39aa2d6e56a362410 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Mar 2017 21:33:36 -0700
+Subject: [PATCH 2/2] mp4v2: Define __STRING if cdefs.h does not exist
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ common/mp4v2/mp4util.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/common/mp4v2/mp4util.h b/common/mp4v2/mp4util.h
+index 1f9cb64..1e7aced 100644
+--- a/common/mp4v2/mp4util.h
++++ b/common/mp4v2/mp4util.h
+@@ -23,6 +23,10 @@
+ #define __MP4_UTIL_INCLUDED__
+ #include <assert.h>
+ 
++#ifndef __STRING
++#define __STRING(x)     #x
++#endif
++
+ #ifndef ASSERT
+ #define ASSERT(expr) \
+ 	if (!(expr)) { \
+-- 
+2.12.1
+

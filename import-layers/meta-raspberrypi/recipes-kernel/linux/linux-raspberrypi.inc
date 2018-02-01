@@ -21,7 +21,7 @@ KERNEL_DEFCONFIG_raspberrypi2 ?= "bcm2709_defconfig"
 KERNEL_DEFCONFIG_raspberrypi3-64 ?= "bcmrpi3_defconfig"
 
 # CMDLINE for raspberrypi
-CMDLINE = "dwc_otg.lpm_enable=0 console=serial0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait"
+CMDLINE ?= "dwc_otg.lpm_enable=0 console=serial0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait"
 
 # Add the kernel debugger over console kernel command line option if enabled
 CMDLINE_append = ' ${@base_conditional("ENABLE_KGDB", "1", "kgdboc=serial0,115200", "", d)}'
@@ -33,8 +33,8 @@ KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains("MACHINE_FEATURES", "pitft28r", 
 # Set programmatically some variables during recipe parsing
 # See http://www.yoctoproject.org/docs/current/bitbake-user-manual/bitbake-user-manual.html#anonymous-python-functions
 python __anonymous () {
-    kerneltype = d.getVar('KERNEL_IMAGETYPE', True)
-    kerneldt = get_dts(d, d.getVar('LINUX_VERSION', True))
+    kerneltype = d.getVar('KERNEL_IMAGETYPE')
+    kerneldt = get_dts(d, d.getVar('LINUX_VERSION'))
     d.setVar("KERNEL_DEVICETREE", kerneldt)
 }
 

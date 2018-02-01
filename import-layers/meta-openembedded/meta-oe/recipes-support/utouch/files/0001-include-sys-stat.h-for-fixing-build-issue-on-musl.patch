@@ -1,0 +1,29 @@
+From 08b17ec505e09e8f5a4d73ffc3aa61561ec2e0da Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 30 Mar 2017 00:27:54 -0700
+Subject: [PATCH] include sys/stat.h for fixing build issue on musl
+
+error: field has incomplete
+      type 'struct stat'
+        struct stat fs;
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/utouch-frame-test-mtdev.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/utouch-frame-test-mtdev.c b/tools/utouch-frame-test-mtdev.c
+index 5253320..2032af4 100644
+--- a/tools/utouch-frame-test-mtdev.c
++++ b/tools/utouch-frame-test-mtdev.c
+@@ -30,6 +30,7 @@
+ #include <stdio.h>
+ #include <unistd.h>
+ #include <fcntl.h>
++#include <sys/stat.h>
+ #include "common-defs.h"
+ 
+ struct frame_test {
+-- 
+2.12.1
+

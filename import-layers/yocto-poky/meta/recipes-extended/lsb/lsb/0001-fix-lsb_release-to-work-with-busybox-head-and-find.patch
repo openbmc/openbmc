@@ -1,0 +1,38 @@
+From cba901945c5a6da9586550498f8e3787c57c3098 Mon Sep 17 00:00:00 2001
+From: Athanasios Oikonomou <athoik@gmail.com>
+Date: Fri, 17 Feb 2017 21:04:04 +0200
+Subject: [PATCH] fix lsb_release to work with busybox head and find
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Athanasios Oikonomou <athoik@gmail.com>
+
+diff --git a/lsb_release b/lsb_release
+index e7d6024..233b8c1 100755
+--- a/lsb_release
++++ b/lsb_release
+@@ -209,7 +209,7 @@ EASE ($DISTRIB_CODENAME)"
+             || [ -n "$(echo $DISTRIB_DESCRIPTION |                            \
+                        sed -e "s/.*$DESCSTR_DELI.*//")" ]
+         then
+-            TMP_DISTRIB_DESC=$(head -1 $FILENAME 2>/dev/null)
++            TMP_DISTRIB_DESC=$(head -n 1 $FILENAME 2>/dev/null)
+             [ -z "$DISTRIB_DESCRIPTION" ]                                     \
+                 && DISTRIB_DESCRIPTION=$TMP_DISTRIB_DESC
+         else
+@@ -249,10 +249,10 @@ GetDistribInfo() {
+         then
+             CHECKFIRST=$(find $INFO_ROOT/ -maxdepth 1                         \
+                    -name \*$INFO_DISTRIB_SUFFIX                               \
+-                   -and ! -name $INFO_LSB_FILE                                \
+-                   -and -type f                                               \
++                   -type f                                                    \
+                    2>/dev/null                                                \
+-                   | head -1 ) # keep one of the files found (if many)
++                   | grep -v $INFO_LSB_FILE                                   \
++                   | head -n 1 ) # keep one of the files found (if many)
+         fi
+         InitDistribInfo $CHECKFIRST
+     fi
+-- 
+2.1.4
+

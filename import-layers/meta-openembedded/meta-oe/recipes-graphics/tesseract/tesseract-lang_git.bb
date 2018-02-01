@@ -18,7 +18,7 @@ do_install() {
 python populate_packages_prepend () {
     tessdata_dir= d.expand('${datadir}/tessdata')
     pkgs = do_split_packages(d, tessdata_dir, '^([a-z_]*)\.*', '${BPN}-%s', 'tesseract-ocr language files for %s', extra_depends='')
-    pn = d.getVar('PN', True)
+    pn = d.getVar('PN')
     d.appendVar('RDEPENDS_' + pn, ' '+' '.join(pkgs))
 }
 

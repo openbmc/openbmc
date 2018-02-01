@@ -1,0 +1,31 @@
+From ee43bcc3c8d69fe56a64c3487e2d3c780ea5d25e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jul 2017 06:53:35 -0700
+Subject: [PATCH] tests/document-saver.c: Define ACCESSPERMS if not defined
+ already
+
+Helps compile with musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/document-saver.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tests/document-saver.c b/tests/document-saver.c
+index 9f44d5a..811ade6 100644
+--- a/tests/document-saver.c
++++ b/tests/document-saver.c
+@@ -41,6 +41,10 @@
+ #define UNOWNED_GROUP_LOCAL_URI "/tmp/gedit-document-saver-unowned-group.txt"
+ #define UNOWNED_GROUP_REMOTE_URI "sftp://localhost/tmp/gedit-document-saver-unowned-group.txt"
+ 
++#if !defined(ACCESSPERMS)
++#define ACCESSPERMS (S_IRWXU|S_IRWXG|S_IRWXO) /* 0777 */
++#endif
++
+ static gboolean test_completed;
+ static gboolean mount_completed;
+ static gboolean mount_success;
+-- 
+2.13.2
+

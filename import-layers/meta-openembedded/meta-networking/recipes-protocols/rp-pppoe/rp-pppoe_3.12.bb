@@ -17,7 +17,10 @@ SRC_URI = "http://www.roaringpenguin.com/files/download/${BP}.tar.gz \
            file://pppoe-server.default \
            file://pppoe-server.init \
            file://configure.in-Error-fix.patch \
-           file://pppoe-server.service"
+           file://pppoe-server.service \
+           file://0001-ppoe-Dont-include-linux-if_ether.h.patch \
+           file://0002-Enable-support-for-the-kernel-module.patch \
+           "
 
 SRC_URI[md5sum] = "216eb52b69062b92a64ee37fd71f4b66"
 SRC_URI[sha256sum] = "00794e04031546b0e9b8cf286f2a6d1ccfc4a621b2a3abb2d7ef2a7ab7cc86c2"

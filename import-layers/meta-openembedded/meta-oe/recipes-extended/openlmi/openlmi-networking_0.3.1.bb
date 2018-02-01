@@ -28,3 +28,5 @@ do_configure_prepend() {
 
 FILES_${PN} =+ "${libdir}/cmpi/libcmpiLMI_Networking.so ${prefix}/libexec*"
 FILES_${PN}-dbg =+ "${libdir}/cmpi/.debug*"
+
+PNBLACKLIST[openlmi-networking] ?= "Depends on blacklisted openlmi-providers - the recipe will be removed on 2017-09-01 unless the issue is fixed"

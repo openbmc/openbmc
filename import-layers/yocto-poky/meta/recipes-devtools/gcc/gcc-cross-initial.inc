@@ -24,7 +24,7 @@ EXTRA_OECONF = "\
     --enable-languages=c \
     --program-prefix=${TARGET_PREFIX} \
     --with-sysroot=/not/exist \
-    --with-build-sysroot=${GCCCROSS_BUILDSYSROOT} \
+    --with-build-sysroot=${STAGING_DIR_TARGET} \
     ${EXTRA_OECONF_INITIAL} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', '--with-ld=${STAGING_BINDIR_TOOLCHAIN}/${TARGET_PREFIX}ld.bfd', '', d)} \
     ${EXTRA_OECONF_GCC_FLOAT} \
@@ -33,20 +33,10 @@ EXTRA_OECONF = "\
 
 EXTRA_OECONF += "--with-native-system-header-dir=${SYSTEMHEADERS}"
 
-GCCCROSS_BUILDSYSROOT = "${B}/tmpsysroot"
-
-do_configure_prepend () {
-	sysr=${GCCCROSS_BUILDSYSROOT}${target_includedir}
-	mkdir -p $sysr
-	for t in linux asm asm-generic; do
-		rm -f $sysr/$t
-		ln -s ${STAGING_DIR_TARGET}${target_includedir}/$t $sysr/
-	done
-}
-
 do_compile () {
     oe_runmake all-gcc configure-target-libgcc
 }
+
 do_install () {
 	( cd ${B}/${TARGET_SYS}/libgcc; oe_runmake 'DESTDIR=${D}' install-unwind_h )
 	oe_runmake 'DESTDIR=${D}' install-gcc
@@ -74,14 +64,6 @@ do_install () {
 	# so we overwirte the generated include-fixed/limits.h for gcc-cross-initial
 	# to get rid references to real limits.h
 	cp gcc/include-fixed/limits.h ${D}${gcclibdir}/${TARGET_SYS}/${BINV}/include/limits.h
-
-	# gcc-runtime installs libgcc into a special location in staging since it breaks doing a standalone build
-	case ${PN} in
-		*gcc-cross-initial-${TARGET_ARCH}|*gcc-crosssdk-initial-${SDK_SYS})
-			dest=${D}/${includedir}/gcc-build-internal-initial-${TARGET_SYS}
-			hardlinkdir . $dest
-		;;
-	esac
 }
 #
 # Override the default sysroot staging copy since this won't look like a target system
@@ -94,7 +76,13 @@ sysroot_stage_all() {
 	mv ${SYSROOT_DESTDIR}${target_libdir}/* ${SYSROOT_DESTDIR}${STAGING_DIR_TARGET}${target_libdir}/ || true
 }
 
-do_populate_sysroot[sstate-inputdirs] = "${SYSROOT_DESTDIR}/${STAGING_DIR_HOST}/ ${SYSROOT_DESTDIR}/${STAGING_DIR_TARGET}/${target_base_libdir}/"
-do_populate_sysroot[sstate-outputdirs] = "${STAGING_DIR_HOST}/ ${STAGING_DIR_TCBOOTSTRAP}/${target_base_libdir}/"
+do_populate_sysroot[sstate-inputdirs] = "${SYSROOT_DESTDIR}/${STAGING_DIR_HOST}/"
+do_populate_sysroot[sstate-outputdirs] = "${COMPONENTS_DIR}/${PACKAGE_ARCH}/${PN}"
 
 inherit nopackages
+
+COMPILERINITIAL = "-initial"
+
+
+# We really only want this built by things that need it, not any recrdeptask
+deltask do_build

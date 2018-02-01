@@ -13,23 +13,29 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  testcases/kernel/syscalls/rt_sigsuspend/Makefile | 3 +++
  2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/lapi/rt_sigaction.h b/include/lapi/rt_sigaction.h
-index 3a5a763..870918c 100644
---- a/include/lapi/rt_sigaction.h
-+++ b/include/lapi/rt_sigaction.h
-@@ -34,7 +34,7 @@
- #define INVAL_SA_PTR ((void *)-1)
- 
+Index: git/include/lapi/rt_sigaction.h
+===================================================================
+--- git.orig/include/lapi/rt_sigaction.h
++++ git/include/lapi/rt_sigaction.h
+@@ -36,12 +36,12 @@
+ #if defined(__mips__)
+ struct kernel_sigaction {
+ 	unsigned int sa_flags;
+-	__sighandler_t k_sa_handler;
++	sighandler_t k_sa_handler;
+ 	sigset_t sa_mask;
+ };
+ #else
  struct kernel_sigaction {
 -	__sighandler_t k_sa_handler;
 +	sighandler_t k_sa_handler;
  	unsigned long sa_flags;
  	void (*sa_restorer) (void);
  	sigset_t sa_mask;
-diff --git a/testcases/kernel/syscalls/rt_sigsuspend/Makefile b/testcases/kernel/syscalls/rt_sigsuspend/Makefile
-index 37bc3a9..2ca7f7c 100644
---- a/testcases/kernel/syscalls/rt_sigsuspend/Makefile
-+++ b/testcases/kernel/syscalls/rt_sigsuspend/Makefile
+Index: git/testcases/kernel/syscalls/rt_sigsuspend/Makefile
+===================================================================
+--- git.orig/testcases/kernel/syscalls/rt_sigsuspend/Makefile
++++ git/testcases/kernel/syscalls/rt_sigsuspend/Makefile
 @@ -19,4 +19,7 @@
  top_srcdir		?= ../../../..
  
@@ -38,6 +44,3 @@ index 37bc3a9..2ca7f7c 100644
 +CFLAGS	+= -D_GNU_SOURCE
 +
  include $(top_srcdir)/include/mk/generic_leaf_target.mk
--- 
-2.7.0
-

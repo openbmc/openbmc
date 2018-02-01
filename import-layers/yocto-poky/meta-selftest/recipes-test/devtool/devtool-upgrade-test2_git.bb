@@ -15,4 +15,6 @@ SRC_URI = "git://git.yoctoproject.org/dbus-wait"
 
 S = "${WORKDIR}/git"
 
+EXCLUDE_FROM_WORLD = "1"
+
 inherit autotools pkgconfig

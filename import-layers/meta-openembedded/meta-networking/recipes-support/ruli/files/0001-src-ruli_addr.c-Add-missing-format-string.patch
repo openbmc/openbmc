@@ -1,0 +1,35 @@
+From d3fb471f53712e710fb5777b1b0851c46b7be64c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 25 Jun 2017 01:23:03 -0700
+Subject: [PATCH] src/ruli_addr.c: Add missing format string
+
+fixes
+
+| ruli_addr.c: In function 'ruli_in_snprint':
+| ruli_addr.c:491:5: error: format not a string literal and no format arguments [-Werror=format-security]
+|      return snprintf(buf, size, inet_ntoa(addr->ipv4));
+|      ^~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/ruli_addr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ruli_addr.c b/src/ruli_addr.c
+index f1eabae..5f1fd4f 100644
+--- a/src/ruli_addr.c
++++ b/src/ruli_addr.c
+@@ -488,7 +488,7 @@ int ruli_in_snprint(char *buf, size_t size, const _ruli_addr *addr, int family)
+ {
+   switch (family) {
+   case PF_INET:
+-    return snprintf(buf, size, inet_ntoa(addr->ipv4));
++    return snprintf(buf, size, "%s", inet_ntoa(addr->ipv4));
+ 
+   case PF_INET6:
+     return ruli_inet6_snprint(buf, size, &addr->ipv6);    
+-- 
+2.13.1
+

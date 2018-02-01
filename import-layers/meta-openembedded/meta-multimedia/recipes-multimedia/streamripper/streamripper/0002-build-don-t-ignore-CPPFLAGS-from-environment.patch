@@ -1,0 +1,30 @@
+From 2fcf2b164e25c4b2523dea4b04094916e57ba19e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+Date: Thu, 3 Nov 2016 20:53:26 +0000
+Subject: [PATCH 2/3] build: don't ignore CPPFLAGS from environment
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [no upstream activity for 7+ years]
+Signed-off-by: André Draszik <git@andred.net>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 96300d6..1600c88 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -56,7 +56,7 @@ AC_ARG_WITH(curses,
+   [  --with-curses(=XXX) compile curses front-end (XXX is curses (default), ncurses, ncursesw, pdcurses or slang)])
+ 
+ 
+-CPPFLAGS="-D__UNIX__"
++CPPFLAGS="$CPPFLAGS -D__UNIX__"
+ AC_SUBST(CPPFLAGS)
+ 
+ 
+-- 
+2.10.1
+

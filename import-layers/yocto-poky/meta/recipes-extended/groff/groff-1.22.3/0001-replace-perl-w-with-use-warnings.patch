@@ -1,0 +1,102 @@
+From 5b574542070db286c89b3827e8f15ed4b3b39034 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 6 Apr 2017 01:46:00 -0700
+Subject: [PATCH] replace "perl -w" with "use warnings"
+
+The shebang's max length is usually 128 as defined in
+/usr/include/linux/binfmts.h:
+  #define BINPRM_BUF_SIZE 128
+
+There would be errors when @PERL@ is longer than 128, use
+'/usr/bin/env perl' can fix the problem, but '/usr/bin/env perl -w'
+doesn't work:
+
+/usr/bin/env: perl -w: No such file or directory
+
+So replace "perl -w" with "use warnings" to make it work.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ font/devpdf/util/BuildFoundries.pl | 3 ++-
+ src/devices/gropdf/gropdf.pl       | 3 ++-
+ src/devices/gropdf/pdfmom.pl       | 3 ++-
+ src/utils/afmtodit/afmtodit.pl     | 3 ++-
+ 4 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/font/devpdf/util/BuildFoundries.pl b/font/devpdf/util/BuildFoundries.pl
+index 39f2f0d..a2bfd8e 100644
+--- a/font/devpdf/util/BuildFoundries.pl
++++ b/font/devpdf/util/BuildFoundries.pl
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl -w
++#!/usr/bin/perl
+ #
+ #   BuildFoundries   : Given a Foundry file generate groff and download files
+ #   Deri James       : Monday 07 Feb 2011
+@@ -22,6 +22,7 @@
+ # along with this program. If not, see <http://www.gnu.org/licenses/>.
+ 
+ use strict;
++use warnings;
+ 
+ my $where=shift||'';
+ my $devps=shift||'../devps';
+diff --git a/src/devices/gropdf/gropdf.pl b/src/devices/gropdf/gropdf.pl
+index 035d123..b933b32 100644
+--- a/src/devices/gropdf/gropdf.pl
++++ b/src/devices/gropdf/gropdf.pl
+@@ -1,4 +1,4 @@
+-#!@PERL@ -w
++#!@PERL@
+ #
+ #	gropdf		: PDF post processor for groff
+ #
+@@ -21,6 +21,7 @@
+ # along with this program. If not, see <http://www.gnu.org/licenses/>.
+ 
+ use strict;
++use warnings;
+ use Getopt::Long qw(:config bundling);
+ use Compress::Zlib;
+ 
+diff --git a/src/devices/gropdf/pdfmom.pl b/src/devices/gropdf/pdfmom.pl
+index beec820..4b46ea4 100644
+--- a/src/devices/gropdf/pdfmom.pl
++++ b/src/devices/gropdf/pdfmom.pl
+@@ -1,4 +1,4 @@
+-#!@PERL@ -w
++#!@PERL@
+ #
+ #	pdfmom		: Frontend to run groff -mom to produce PDFs
+ #	Deri James	: Friday 16 Mar 2012
+@@ -24,6 +24,7 @@
+ # along with this program. If not, see <http://www.gnu.org/licenses/>.
+ 
+ use strict;
++use warnings;
+ use File::Temp qw/tempfile/;
+ my @cmd;
+ my $dev='pdf';
+diff --git a/src/utils/afmtodit/afmtodit.pl b/src/utils/afmtodit/afmtodit.pl
+index 4f2ce83..5c078ff 100644
+--- a/src/utils/afmtodit/afmtodit.pl
++++ b/src/utils/afmtodit/afmtodit.pl
+@@ -1,4 +1,4 @@
+-#! /usr/bin/perl -w
++#! /usr/bin/perl
+ # -*- Perl -*-
+ # Copyright (C) 1989-2014  Free Software Foundation, Inc.
+ #      Written by James Clark (jjc@jclark.com)
+@@ -19,6 +19,7 @@
+ # along with this program. If not, see <http://www.gnu.org/licenses/>.
+ 
+ use strict;
++use warnings;
+ 
+ @afmtodit.tables@
+ 
+-- 
+2.10.2
+

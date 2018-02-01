@@ -7,11 +7,11 @@ import oe.utils
 class LocalSigner(object):
     """Class for handling local (on the build host) signing"""
     def __init__(self, d):
-        self.gpg_bin = d.getVar('GPG_BIN', True) or \
+        self.gpg_bin = d.getVar('GPG_BIN') or \
                   bb.utils.which(os.getenv('PATH'), 'gpg')
-        self.gpg_path = d.getVar('GPG_PATH', True)
+        self.gpg_path = d.getVar('GPG_PATH')
         self.gpg_version = self.get_gpg_version()
-        self.rpm_bin = bb.utils.which(os.getenv('PATH'), "rpm")
+        self.rpm_bin = bb.utils.which(os.getenv('PATH'), "rpmsign")
 
     def export_pubkey(self, output_file, keyid, armor=True):
         """Export GPG public key to a file"""
@@ -31,9 +31,10 @@ class LocalSigner(object):
         """Sign RPM files"""
 
         cmd = self.rpm_bin + " --addsign --define '_gpg_name %s'  " % keyid
-        cmd += "--define '_gpg_passphrase %s' " % passphrase
+        gpg_args = '--batch --passphrase=%s' % passphrase
         if self.gpg_version > (2,1,):
-            cmd += "--define '_gpg_sign_cmd_extra_args --pinentry-mode=loopback' "
+            gpg_args += ' --pinentry-mode=loopback'
+        cmd += "--define '_gpg_sign_cmd_extra_args %s' " % gpg_args
         if self.gpg_bin:
             cmd += "--define '%%__gpg %s' " % self.gpg_bin
         if self.gpg_path:

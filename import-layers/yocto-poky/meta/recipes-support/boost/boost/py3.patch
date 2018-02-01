@@ -1,0 +1,269 @@
+Backport fixes from upstream (as of boost super-module commit 0d52b9) to improve
+the building of the Boost Python module with Python 3.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/build/Jamfile b/build/Jamfile
+index 313fdab..f14dc11 100644
+--- a/libs/python/build/Jamfile
++++ b/libs/python/build/Jamfile
+@@ -6,6 +6,7 @@ import os ;
+ import indirect ;
+ import modules ;
+ import feature ;
++import property ;
+ 
+ import python ;
+ 
+@@ -30,21 +31,8 @@ else
+         ;
+ }
+ 
+-rule find-py3-version
+-{
+-    local versions = [ feature.values python ] ;
+-    local py3ver ;
+-    for local v in $(versions)
+-    {
+-        if $(v) >= 3.0
+-        {
+-            py3ver = $(v) ;
+-        }
+-    }
+-    return $(py3ver) ;
+-}
+-
+-py3-version = [ find-py3-version ] ;
++py2-version = [ py-version 2 ] ;
++py3-version = [ py-version 3 ] ;
+ 
+ project boost/python
+   : source-location ../src
+@@ -52,11 +40,17 @@ project boost/python
+ 
+ rule cond ( test ? : yes * : no * ) { if $(test) { return $(yes) ; } else { return $(no) ; } }
+ rule unless ( test ? : yes * : no * ) { if ! $(test) { return $(yes) ; } else { return $(no) ; } }
++local rule eq ( a : b ) { if $(a) = $(b) { return 1 ; } }
+ 
+-rule lib_boost_python ( is-py3 ? )
+-{
++lib_boost_python(2) = boost_python ;
++lib_boost_python(3) = boost_python3 ;
+ 
+-    lib [ cond $(is-py3) : boost_python3 : boost_python ]
++lib_boost_python($(py2-version)) = $(lib_boost_python(2)) ;
++lib_boost_python($(py3-version)) = $(lib_boost_python(3)) ;
++
++rule lib_boost_python ( version )
++{
++    lib $(lib_boost_python($(version)))
+         : # sources
+         numeric.cpp
+         list.cpp
+@@ -112,11 +106,13 @@ rule lib_boost_python ( is-py3 ? )
+             <dependency>config-warning
+ 
+             <python-debugging>on:<define>BOOST_DEBUG_PYTHON
+-            [ cond $(is-py3) : <python>$(py3-version) ]
++            <python>$(version)
+ 
+             -<tag>@$(BOOST_JAMROOT_MODULE)%$(BOOST_JAMROOT_MODULE).tag
+             <tag>@$(BOOST_JAMROOT_MODULE)%$(BOOST_JAMROOT_MODULE).python-tag
+ 
++            <conditional>@python.require-py
++
+         :   # default build
+             <link>shared
+         :   # usage requirements
+@@ -125,51 +121,68 @@ rule lib_boost_python ( is-py3 ? )
+         ;
+ }
+ 
+-rule lib_boost_numpy ( is-py3 ? )
++lib_boost_numpy(2) = boost_numpy ;
++lib_boost_numpy(3) = boost_numpy3 ;
++
++lib_boost_numpy($(py2-version)) = $(lib_boost_python(2)) ;
++lib_boost_numpy($(py3-version)) = $(lib_boost_python(3)) ;
++
++rule lib_boost_numpy ( version )
+ {
+     numpy-include = [ python.numpy-include ] ;
+-    lib [ cond $(is-py3) : boost_numpy3 : boost_numpy ]
++    lib $(lib_boost_numpy($(version)))
+         : # sources
+         numpy/dtype.cpp
+         numpy/matrix.cpp
+         numpy/ndarray.cpp
+-	numpy/numpy.cpp
+-	numpy/scalars.cpp
+-	numpy/ufunc.cpp
++        numpy/numpy.cpp
++        numpy/scalars.cpp
++        numpy/ufunc.cpp
+         :   # requirements
++            <link>static:<define>BOOST_NUMPY_STATIC_LIB 
++            <define>BOOST_NUMPY_SOURCE
+             [ cond [ python.numpy ] : <library>/python//python_for_extensions ]
+             [ unless [ python.numpy ] : <build>no ]
+-	    <include>$(numpy-include)
+-	    <library>boost_python
++            <include>$(numpy-include)
++            <library>$(lib_boost_python($(version)))
+             <python-debugging>on:<define>BOOST_DEBUG_PYTHON
+-            [ cond $(is-py3) : <python>$(py3-version) ]
++            <python>$(version)
+ 
+             -<tag>@$(BOOST_JAMROOT_MODULE)%$(BOOST_JAMROOT_MODULE).tag
+             <tag>@$(BOOST_JAMROOT_MODULE)%$(BOOST_JAMROOT_MODULE).python-tag
+ 
++            <conditional>@python.require-py
++
+         :   # default build
+             <link>shared
+         :   # usage requirements
++			<link>static:<define>BOOST_NUMPY_STATIC_LIB
+             <python-debugging>on:<define>BOOST_DEBUG_PYTHON
+         ;
+ }
+ 
+-libraries = boost_python ;
+-libraries3 = boost_python3 ;
+-if [ python.numpy ]
+-{
+-    libraries += boost_numpy ;
+-    libraries3 += boost_numpy3 ;
+-}
+-
+-lib_boost_python ;
+-lib_boost_numpy ;
++libraries = ;
+ 
+-if $(py3-version)
++for local N in 2 3
+ {
+-    lib_boost_python yes ;
+-    lib_boost_numpy yes ;
+-    libraries += $(libraries3) ;
++    if $(py$(N)-version)
++    {
++        lib_boost_python $(py$(N)-version) ;
++        libraries += $(lib_boost_python($(py$(N)-version))) ;
++    }
++    else
++    {
++        alias $(lib_boost_python($(N))) ;
++    }
++    if $(py$(N)-version) && [ python.numpy ]
++    {
++        lib_boost_numpy $(py$(N)-version) ;
++        libraries += $(lib_boost_numpy($(py$(N)-version))) ;
++    }
++    else
++    {
++        alias $(lib_boost_numpy($(N))) ;
++    }
+ }
+ 
+ boost-install $(libraries) ;
+diff --git a/src/tools/python.jam b/src/tools/python.jam
+index cc13385..bf300b8 100644
+--- a/tools/build/src/tools/python.jam
++++ b/tools/build/src/tools/python.jam
+@@ -34,6 +34,7 @@ import path ;
+ import feature ;
+ import set ;
+ import builtin ;
++import property-set ;
+ 
+ 
+ # Make this module a project.
+@@ -60,6 +61,10 @@ lib rt ;
+ # installed in the development system's default paths.
+ feature.feature pythonpath : : free optional path ;
+ 
++# The best configured version of Python 2 and 3.
++py2-version = ;
++py3-version = ;
++
+ # Initializes the Python toolset. Note that all parameters are optional.
+ #
+ # - version -- the version of Python to use. Should be in Major.Minor format,
+@@ -861,6 +866,11 @@ local rule configure ( version ? : cmd-or-prefix ? : includes * : libraries ? :
+         if ! $(version) in [ feature.values python ]
+         {
+             feature.extend python : $(version) ;
++            py$(major-minor[1])-version ?= $(version) ;
++            if $(py$(major-minor[1])-version) < $(version)
++            {
++                py$(major-minor[1])-version = $(version) ;
++            }
+         }
+         target-requirements += <python>$(version:E=default) ;
+     }
+@@ -916,6 +926,9 @@ local rule configure ( version ? : cmd-or-prefix ? : includes * : libraries ? :
+         }
+     }
+ 
++    # In case we added duplicate requirements from what the user specified.
++    target-requirements = [ sequence.unique $(target-requirements) ] ;
++
+     # Global, but conditional, requirements to give access to the interpreter
+     # for general utilities, like other toolsets, that run Python scripts.
+     toolset.add-requirements
+@@ -934,19 +947,6 @@ local rule configure ( version ? : cmd-or-prefix ? : includes * : libraries ? :
+         toolset.add-requirements <target-os>$(target-os):<python>$(version:E=default) ;
+     }
+ 
+-    # We also set a default requirement that assigns the first python configured
+-    # for a particular target OS as the default. This makes it so that we can
+-    # select a python interpreter with only knowledge of the target OS. And hence
+-    # can configure different Pythons based on the target OS only.
+-    local toolset-requirements = [ toolset.requirements ] ;
+-    local toolset-target-os-requirements
+-        = [ property.evaluate-conditionals-in-context
+-            [ $(toolset-requirements).raw ] : <target-os>$(target-os) ] ;
+-    if ! <python> in $(toolset-target-os-requirements:G)
+-    {
+-        toolset.add-requirements <target-os>$(target-os):<python>$(version:E=default) ;
+-    }
+-
+     # Register the right suffix for extensions.
+     register-extension-suffix $(extension-suffix) : $(target-requirements) ;
+ 
+@@ -1038,6 +1038,22 @@ local rule configure ( version ? : cmd-or-prefix ? : includes * : libraries ? :
+             : $(usage-requirements)
+             ;
+     }
++    
++}
++
++# Conditional rule specification that will prevent building of a target
++# if there is no matching python configuration available with the given
++# required properties.
++rule require-py ( properties * )
++{
++    local py-ext-target = [ $(.project).find python_for_extensions ] ;
++    local property-set = [ property-set.create $(properties) ] ;
++    property-set = [ $(property-set).expand ] ;
++    local py-ext-alternative = [ $(py-ext-target).select-alternatives $(property-set) ] ;
++    if ! $(py-ext-alternative)
++    {
++        return <build>no ;
++    }
+ }
+ 
+ 
+@@ -1298,5 +1314,11 @@ rule numpy-test ( name : sources * : requirements * )
+         : $(name) ] ;
+ }
+ 
++rule py-version ( n )
++{
++    return $(py$(n)-version) ;
++}
++
+ IMPORT $(__name__) : bpl-test : : bpl-test ;
+ IMPORT $(__name__) : numpy-test : : numpy-test ;
++IMPORT $(__name__) : py-version : : py-version ;

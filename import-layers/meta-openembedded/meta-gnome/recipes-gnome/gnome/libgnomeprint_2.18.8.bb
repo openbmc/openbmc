@@ -25,4 +25,4 @@ FILES_${PN}-staticdev += "\
     ${libdir}/${PN}/${PV}/modules/*/*.a \
 "
 
-PNBLACKLIST[libgnomeprint] ?= "Depends on broken libgnomecups"
+PNBLACKLIST[libgnomeprint] ?= "Depends on broken libgnomecups - the recipe will be removed on 2017-09-01 unless the issue is fixed"

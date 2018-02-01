@@ -1,0 +1,29 @@
+From fa8371d348f6a8b0799b2e6c38247dd1399d85e3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 8 Apr 2017 08:49:48 -0700
+Subject: [PATCH] Fix build with clang
+
+ATTRIBUTE_FORMAT_ARG macro gets computed to be empty with clang
+whereas it does support format attribute, we hard code it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/shar-opts.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/shar-opts.h b/src/shar-opts.h
+index a287046..172676f 100644
+--- a/src/shar-opts.h
++++ b/src/shar-opts.h
+@@ -377,7 +377,7 @@ extern tOptions sharOptions;
+ #   define ATTRIBUTE_FORMAT_ARG(_a)
+ # endif
+ 
+-static inline char* aoGetsText(char const* pz) ATTRIBUTE_FORMAT_ARG(1);
++static inline char* aoGetsText(char const* pz) __attribute__ ((format_arg(1)));
+ static inline char* aoGetsText(char const* pz) {
+     if (pz == NULL) return NULL;
+     return (char*)gettext(pz);
+-- 
+2.12.2
+

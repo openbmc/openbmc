@@ -1,0 +1,38 @@
+= OEQA Framework =
+
+== Introduction ==
+
+This is the new OEQA framework the base clases of the framework
+are in this module oeqa/core the subsequent components needs to
+extend this classes.
+
+A new/unique runner was created called oe-test and is under scripts/
+oe-test, this new runner scans over oeqa module searching for test
+components that supports OETestContextExecutor implemented in context
+module (i.e. oeqa/core/context.py).
+
+For execute an example:
+
+$ source oe-init-build-env
+$ oe-test core
+
+For list supported components:
+
+$ oe-test -h
+
+== Create new Test component ==
+
+Usally for add a new Test component the developer needs to extend
+OETestContext/OETestContextExecutor in context.py and OETestCase in
+case.py.
+
+== How to run the testing of the OEQA framework ==
+
+Run all tests:
+
+$ PATH=$PATH:../../ python3 -m unittest discover -s tests
+
+Run some test:
+
+$ cd tests/
+$ ./test_data.py

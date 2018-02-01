@@ -1,0 +1,25 @@
+[PATCH] add libnetsnmp when link
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ plugins/snmp_bc/t/Makefile.am |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/snmp_bc/t/Makefile.am b/plugins/snmp_bc/t/Makefile.am
+index 57e77ac..9894620 100644
+--- a/plugins/snmp_bc/t/Makefile.am
++++ b/plugins/snmp_bc/t/Makefile.am
+@@ -74,7 +74,7 @@ nodist_libsnmp_bc_la_SOURCES = $(GENERATED_EVENT_CODE) $(REMOTE_SIM_SOURCES)
+ # libopenhpi_la_LIBADD    = $(top_builddir)/utils/libopenhpiutils.la
+ # libopenhpi_la_LDFLAGS   = -L$(top_builddir)/utils -version-info @HPI_LIB_VERSION@ -export-symbols $(top_srcdir)/src/hpi.sym
+ 
+-libsnmp_bc_la_LIBADD = -luuid @SNMPLIBS@ $(top_builddir)/utils/libopenhpiutils.la
++libsnmp_bc_la_LIBADD = -luuid @SNMPLIBS@ $(top_builddir)/utils/libopenhpiutils.la -lnetsnmp
+ libsnmp_bc_la_LDFLAGS = -L$(top_builddir)/utils -module -version-info @HPI_LIB_VERSION@
+ # libsnmp_bc_la_LDFLAGS = -version 0:0:0
+ 
+-- 
+1.7.10.4
+

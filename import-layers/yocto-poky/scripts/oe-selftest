@@ -46,6 +46,7 @@ import argparse_oe
 import oeqa.selftest
 import oeqa.utils.ftools as ftools
 from oeqa.utils.commands import runCmd, get_bb_var, get_test_layer
+from oeqa.utils.metadata import metadata_from_bb, write_metadata_file
 from oeqa.selftest.base import oeSelfTest, get_available_machines
 
 try:
@@ -61,7 +62,8 @@ log_prefix = "oe-selftest-" + t.strftime("%Y%m%d-%H%M%S")
 
 def logger_create():
     log_file = log_prefix + ".log"
-    if os.path.exists("oe-selftest.log"): os.remove("oe-selftest.log")
+    if os.path.lexists("oe-selftest.log"):
+        os.remove("oe-selftest.log")
     os.symlink(log_file, "oe-selftest.log")
 
     log = logging.getLogger("selftest")
@@ -85,7 +87,7 @@ def logger_create():
 log = logger_create()
 
 def get_args_parser():
-    description = "Script that runs unit tests agains bitbake and other Yocto related tools. The goal is to validate tools functionality and metadata integrity. Refer to https://wiki.yoctoproject.org/wiki/Oe-selftest for more information."
+    description = "Script that runs unit tests against bitbake and other Yocto related tools. The goal is to validate tools functionality and metadata integrity. Refer to https://wiki.yoctoproject.org/wiki/Oe-selftest for more information."
     parser = argparse_oe.ArgumentParser(description=description)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-r', '--run-tests', required=False, action='store', nargs='*', dest="run_tests", default=None, help='Select what tests to run (modules, classes or test methods). Format should be: <module>.<class>.<test_method>')
@@ -106,10 +108,16 @@ def get_args_parser():
                        help='List all tags that have been set to test cases.')
     parser.add_argument('--machine', required=False, dest='machine', choices=['random', 'all'], default=None,
                         help='Run tests on different machines (random/all).')
+    parser.add_argument('--repository', required=False, dest='repository', default='', action='store',
+                        help='Submit test results to a repository')
     return parser
+
+builddir = None
 
 
 def preflight_check():
+
+    global builddir
 
     log.info("Checking that everything is in order before running the tests")
 
@@ -123,7 +131,27 @@ def preflight_check():
         os.chdir(builddir)
 
     if not "meta-selftest" in get_bb_var("BBLAYERS"):
-        log.error("You don't seem to have the meta-selftest layer in BBLAYERS")
+        log.warn("meta-selftest layer not found in BBLAYERS, adding it")
+        meta_selftestdir = os.path.join(
+                get_bb_var("BBLAYERS_FETCH_DIR"),
+                'meta-selftest')
+        if os.path.isdir(meta_selftestdir):
+            runCmd("bitbake-layers add-layer %s" %meta_selftestdir)
+        else:
+            log.error("could not locate meta-selftest in:\n%s"
+                    %meta_selftestdir)
+            return False
+
+    if "buildhistory.bbclass" in get_bb_var("BBINCLUDED"):
+        log.error("You have buildhistory enabled already and this isn't recommended for selftest, please disable it first.")
+        return False
+
+    if get_bb_var("PRSERV_HOST"):
+        log.error("Please unset PRSERV_HOST in order to run oe-selftest")
+        return False
+
+    if get_bb_var("SANITY_TESTED_DISTROS"):
+        log.error("Please unset SANITY_TESTED_DISTROS in order to run oe-selftest")
         return False
 
     log.info("Running bitbake -p")
@@ -132,7 +160,7 @@ def preflight_check():
     return True
 
 def add_include():
-    builddir = os.environ.get("BUILDDIR")
+    global builddir
     if "#include added by oe-selftest.py" \
         not in ftools.read_file(os.path.join(builddir, "conf/local.conf")):
             log.info("Adding: \"include selftest.inc\" in local.conf")
@@ -146,7 +174,7 @@ def add_include():
                     "\n#include added by oe-selftest.py\ninclude bblayers.inc")
 
 def remove_include():
-    builddir = os.environ.get("BUILDDIR")
+    global builddir
     if builddir is None:
         return
     if "#include added by oe-selftest.py" \
@@ -162,18 +190,21 @@ def remove_include():
                     "\n#include added by oe-selftest.py\ninclude bblayers.inc")
 
 def remove_inc_files():
+    global builddir
+    if builddir is None:
+        return
     try:
-        os.remove(os.path.join(os.environ.get("BUILDDIR"), "conf/selftest.inc"))
+        os.remove(os.path.join(builddir, "conf/selftest.inc"))
         for root, _, files in os.walk(get_test_layer()):
             for f in files:
                 if f == 'test_recipe.inc':
                     os.remove(os.path.join(root, f))
-    except (AttributeError, OSError,) as e:    # AttributeError may happen if BUILDDIR is not set
+    except OSError as e:
         pass
 
     for incl_file in ['conf/bblayers.inc', 'conf/machine.inc']:
         try:
-            os.remove(os.path.join(os.environ.get("BUILDDIR"), incl_file))
+            os.remove(os.path.join(builddir, incl_file))
         except:
             pass
 
@@ -336,10 +367,15 @@ def list_testsuite_by(criteria, keyword):
     # Get a testsuite based on 'keyword'
     # criteria: name, class, module, id, tag
     # keyword: a list of tests, classes, modules, ids, tags
-
-    ts = sorted([ (tc.tcid, tc.tctag, tc.tcname, tc.tcclass, tc.tcmodule) for tc in get_testsuite_by(criteria, keyword) ])
-
-    print('%-4s\t%-20s\t%-60s\t%-25s\t%-20s' % ('id', 'tag', 'name', 'class', 'module'))
+    def tc_key(t):
+        if t[0] is None:
+            return  (0,) + t[1:]
+        return t
+    # tcid may be None if no ID was assigned, in which case sorted() will throw
+    # a TypeError as Python 3 does not allow comparison (<,<=,>=,>) of
+    # heterogeneous types, handle this by using a custom key generator
+    ts = sorted([ (tc.tcid, tc.tctag, tc.tcname, tc.tcclass, tc.tcmodule) \
+                  for tc in get_testsuite_by(criteria, keyword) ], key=tc_key)
     print('_' * 150)
     for t in ts:
         if isinstance(t[1], (tuple, list)):
@@ -386,7 +422,7 @@ def coverage_setup(coverage_source, coverage_include, coverage_omit):
     """ Set up the coverage measurement for the testcases to be run """
     import datetime
     import subprocess
-    builddir = os.environ.get("BUILDDIR")
+    global builddir
     pokydir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     curcommit= subprocess.check_output(["git", "--git-dir", os.path.join(pokydir, ".git"), "rev-parse", "HEAD"]).decode('utf-8')
     coveragerc = "%s/.coveragerc" % builddir
@@ -462,6 +498,9 @@ def main():
     layer_libdirs = [p for p in (os.path.join(l, 'lib') for l in bbpath) if os.path.exists(p)]
     sys.path.extend(layer_libdirs)
     imp.reload(oeqa.selftest)
+
+    # act like bitbake and enforce en_US.UTF-8 locale
+    os.environ["LC_ALL"] = "en_US.UTF-8"
 
     if args.run_tests_by and len(args.run_tests_by) >= 2:
         valid_options = ['name', 'class', 'module', 'id', 'tag']
@@ -564,6 +603,76 @@ def main():
 
         log.info("Finished")
 
+        if args.repository:
+            import git
+            # Commit tests results to repository
+            metadata = metadata_from_bb()
+            git_dir = os.path.join(os.getcwd(), 'selftest')
+            if not os.path.isdir(git_dir):
+                os.mkdir(git_dir)
+
+            log.debug('Checking for git repository in %s' % git_dir)
+            try:
+                repo = git.Repo(git_dir)
+            except git.exc.InvalidGitRepositoryError:
+                log.debug("Couldn't find git repository %s; "
+                         "cloning from %s" % (git_dir, args.repository))
+                repo = git.Repo.clone_from(args.repository, git_dir)
+
+            r_branches = repo.git.branch(r=True)
+            r_branches = set(r_branches.replace('origin/', '').split())
+            l_branches = {str(branch) for branch in repo.branches}
+            branch = '%s/%s/%s' % (metadata['hostname'],
+                                   metadata['layers']['meta'].get('branch', '(nogit)'),
+                                   metadata['config']['MACHINE'])
+
+            if branch in l_branches:
+                log.debug('Found branch in local repository, checking out')
+                repo.git.checkout(branch)
+            elif branch in r_branches:
+                log.debug('Found branch in remote repository, checking'
+                          ' out and pulling')
+                repo.git.checkout(branch)
+                repo.git.pull()
+            else:
+                log.debug('New branch %s' % branch)
+                repo.git.checkout('master')
+                repo.git.checkout(b=branch)
+
+            cleanResultsDir(repo)
+            xml_dir = os.path.join(os.getcwd(), log_prefix)
+            copyResultFiles(xml_dir, git_dir, repo)
+            metadata_file = os.path.join(git_dir, 'metadata.xml')
+            write_metadata_file(metadata_file, metadata)
+            repo.index.add([metadata_file])
+            repo.index.write()
+
+            # Get information for commit message
+            layer_info = ''
+            for layer, values in metadata['layers'].items():
+                layer_info = '%s%-17s = %s:%s\n' % (layer_info, layer,
+                              values.get('branch', '(nogit)'), values.get('commit', '0'*40))
+            msg = 'Selftest for build %s of %s for machine %s on %s\n\n%s' % (
+                   log_prefix[12:], metadata['distro']['pretty_name'],
+                   metadata['config']['MACHINE'], metadata['hostname'], layer_info)
+
+            log.debug('Commiting results to local repository')
+            repo.index.commit(msg)
+            if not repo.is_dirty():
+                try:
+                    if branch in r_branches:
+                        log.debug('Pushing changes to remote repository')
+                        repo.git.push()
+                    else:
+                        log.debug('Pushing changes to remote repository '
+                                  'creating new branch')
+                        repo.git.push('-u', 'origin', branch)
+                except GitCommandError:
+                    log.error('Falied to push to remote repository')
+                    return 1
+            else:
+                log.error('Local repository is dirty, not pushing commits')
+
         if result.wasSuccessful():
             return 0
         else:
@@ -646,6 +755,35 @@ def buildResultClass(args):
                             log.warn("Expected temporal file from coverage is missing, ignoring removal.")
 
     return StampedResult
+
+def cleanResultsDir(repo):
+    """ Remove result files from directory """
+
+    xml_files = []
+    directory = repo.working_tree_dir
+    for f in os.listdir(directory):
+        path = os.path.join(directory, f)
+        if os.path.isfile(path) and path.endswith('.xml'):
+            xml_files.append(f)
+    repo.index.remove(xml_files, working_tree=True)
+
+def copyResultFiles(src, dst, repo):
+    """ Copy result files from src to dst removing the time stamp. """
+
+    import shutil
+
+    re_time = re.compile("-[0-9]+")
+    file_list = []
+
+    for root, subdirs, files in os.walk(src):
+        tmp_dir = root.replace(src, '').lstrip('/')
+        for s in subdirs:
+            os.mkdir(os.path.join(dst, tmp_dir, s))
+        for f in files:
+            file_name = os.path.join(dst, tmp_dir, re_time.sub("", f))
+            shutil.copy2(os.path.join(root, f), file_name)
+            file_list.append(file_name)
+    repo.index.add(file_list)
 
 class TestRunner(_TestRunner):
     """Test runner class aware of exporting tests."""

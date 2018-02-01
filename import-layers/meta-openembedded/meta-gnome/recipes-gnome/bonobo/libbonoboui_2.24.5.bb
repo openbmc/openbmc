@@ -5,7 +5,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
 
 inherit gnomebase pkgconfig gtk-doc
 
-SRC_URI += "file://gcc5.patch"
+SRC_URI += "file://gcc5.patch \
+            file://0001-bonobo-ui-node-qualify-functions-with-G_GNUC_PRINTF.patch \
+            "
 
 SRC_URI[archive.md5sum] = "853be8e28aaa4ce48ba60be7d9046bf4"
 SRC_URI[archive.sha256sum] = "fab5f2ac6c842d949861c07cb520afe5bee3dce55805151ce9cd01be0ec46fcd"

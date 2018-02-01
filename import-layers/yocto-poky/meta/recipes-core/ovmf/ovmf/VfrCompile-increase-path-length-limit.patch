@@ -1,0 +1,33 @@
+From c7722d10c7bcf6be0adcf54abb1d406599dd7914 Mon Sep 17 00:00:00 2001
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Fri, 24 Feb 2017 01:40:02 +0100
+Subject: [PATCH] VfrCompile: increase path length limit
+
+The VfrCompile tool has a hard-coded maximum length for path names
+which turned out to be too small by around 20 characters in the Yocto
+autobuilder setup. Increasing the maximum by a factor of 4 is
+relatively easy and makes the problem less likely.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ BaseTools/Source/C/VfrCompile/EfiVfr.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/BaseTools/Source/C/VfrCompile/EfiVfr.h b/BaseTools/Source/C/VfrCompile/EfiVfr.h
+index d187902..9ad4a7b 100644
+--- a/BaseTools/Source/C/VfrCompile/EfiVfr.h
++++ b/BaseTools/Source/C/VfrCompile/EfiVfr.h
+@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+ #include "Common/UefiInternalFormRepresentation.h"
+ #include "Common/MdeModuleHii.h"
+ 
+-#define MAX_PATH                 255
++#define MAX_PATH                 1023
+ #define MAX_VFR_LINE_LEN         4096
+ 
+ #define EFI_IFR_MAX_LENGTH       0xFF
+-- 
+2.1.4
+

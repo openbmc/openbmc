@@ -54,4 +54,4 @@ do_install() {
 # | src/common/../../lib/boost/utf8_codecvt_facet/utf8_codecvt_facet.cpp:174:5: error: 'int mtx::utf8_codecvt_facet::do_length' is not a static data member of 'struct mtx::utf8_codecvt_facet'
 # |      BOOST_CODECVT_DO_LENGTH_CONST std::mbstate_t &,
 # |      ^
-PNBLACKLIST[mkvtoolnix] ?= "BROKEN: Failx to build with gcc-5"
+PNBLACKLIST[mkvtoolnix] ?= "BROKEN: Failx to build with gcc-5 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

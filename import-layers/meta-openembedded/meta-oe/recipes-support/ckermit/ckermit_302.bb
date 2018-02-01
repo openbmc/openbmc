@@ -24,6 +24,7 @@ EXTRA_OEMAKE = "-e MAKEFLAGS="
 # trying to look inside the stdio headers.
 CKERMIT_ADDITIONAL = ""
 CKERMIT_ADDITIONAL_libc-uclibc = "-DNOARROWKEYS"
+CKERMIT_ADDITIONAL_libc-musl = "-DNOARROWKEYS"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 

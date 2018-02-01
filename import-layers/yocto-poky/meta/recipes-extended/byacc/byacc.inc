@@ -6,7 +6,8 @@ SECTION = "devel"
 LICENSE = "PD"
 
 SRC_URI = "ftp://invisible-island.net/byacc/byacc-${PV}.tgz \
-           file://byacc-open.patch"
+           file://byacc-open.patch \
+           file://0001-byacc-do-not-reorder-CC-and-CFLAGS.patch"
 
 EXTRA_OECONF += "--program-transform-name='s,^,b,'"
 

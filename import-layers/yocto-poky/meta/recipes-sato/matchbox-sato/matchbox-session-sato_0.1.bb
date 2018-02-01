@@ -6,7 +6,6 @@ LICENSE = "GPLv2.0+"
 LIC_FILES_CHKSUM = "file://session;endline=3;md5=f8a5c5b9c279e52dc094d10e11c2be63"
 
 SECTION = "x11"
-DEPENDS = "gconf-native"
 RDEPENDS_${PN} = "formfactor matchbox-theme-sato matchbox-panel-2 matchbox-desktop matchbox-session gconf"
 PR = "r30"
 
@@ -43,6 +42,7 @@ do_install() {
         chmod +x ${D}/${sysconfdir}/matchbox/session
 }
 
+PACKAGE_WRITE_DEPS += "gconf-native"
 pkg_postinst_${PN} () {
 	set_value() {
 		#type, name, value

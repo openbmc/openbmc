@@ -1,0 +1,31 @@
+From c760c5d31f2412a5be5ac6896e6069d1cea08527 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 26 Jun 2017 22:31:45 -0700
+Subject: [PATCH 1/2] check for null buffer before trying a byteswap
+
+Author: Monty <paranoia@xiph.org>
+
+Patch from debian
+http://sources.debian.net/src/cdparanoia/3.10.2%2Bdebian-11/debian/patches/04-endian.patch
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ interface/interface.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/interface/interface.c b/interface/interface.c
+index 526c2a9..763a0ea 100644
+--- a/interface/interface.c
++++ b/interface/interface.c
+@@ -118,7 +118,7 @@ long cdda_read_timed(cdrom_drive *d, void *buffer, long beginsector, long sector
+ 	if(d->bigendianp==-1) /* not determined yet */
+ 	  d->bigendianp=data_bigendianp(d);
+ 	
+-	if(d->bigendianp!=bigendianp()){
++	if(buffer && d->bigendianp!=bigendianp()){
+ 	  int i;
+ 	  u_int16_t *p=(u_int16_t *)buffer;
+ 	  long els=sectors*CD_FRAMESIZE_RAW/2;
+-- 
+2.13.2
+

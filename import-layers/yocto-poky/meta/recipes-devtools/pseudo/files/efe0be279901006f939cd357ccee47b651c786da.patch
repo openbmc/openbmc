@@ -1,0 +1,99 @@
+From efe0be279901006f939cd357ccee47b651c786da Mon Sep 17 00:00:00 2001
+From: Seebs <seebs@seebs.net>
+Date: Fri, 24 Feb 2017 12:47:38 -0600
+Subject: Don't try to record 0-length posix_acl_default xattrs
+
+Based on a submission from Anton Gerasimov <anton@advancedtelematic.com>
+
+On some systems, with some kernel configs, "cp -a" apparently tries to
+set an empty ACL list, with a valid header but no contents, which causes
+strange and mysterious behavior later if we actually create such an entry.
+So filter that out, also sanity-check a couple of other things.
+
+Signed-off-by: Seebs <seebs@seebs.net>
+
+Upstream-Status: Backport
+
+diff --git a/ChangeLog.txt b/ChangeLog.txt
+index ae2a6e9..a2d30e9 100644
+--- a/ChangeLog.txt
++++ b/ChangeLog.txt
+@@ -1,3 +1,6 @@
++2017-02-24:
++	* (seebs) import posix_acl_default fix from Anton Gerasimov
++	  <anton@advancedtelematic.com>
+ 2017-02-01:
+    * (seebs) handle xattr deletion slightly more carefully.
+    * (seebs) tag this as 1.8.2
+diff --git a/ports/linux/xattr/pseudo_wrappers.c b/ports/linux/xattr/pseudo_wrappers.c
+index 46bc053..d69d53e 100644
+--- a/ports/linux/xattr/pseudo_wrappers.c
++++ b/ports/linux/xattr/pseudo_wrappers.c
+@@ -62,9 +62,9 @@ static int
+ posix_permissions(const acl_header *header, int entries, int *extra, int *mode) {
+ 	int acl_seen = 0;
+ 	if (le32(header->version) != 2) {
+-		pseudo_diag("Fatal: ACL support no available for header version %d.\n",
++		pseudo_diag("Fatal: ACL support not available for header version %d.\n",
+ 			le32(header->version));
+-		return 1;
++		return -1;
+ 	}
+ 	*mode = 0;
+ 	*extra = 0;
+@@ -140,12 +140,38 @@ static int shared_setxattr(const char *path, int fd, const char *name, const voi
+ 	pseudo_debug(PDBGF_XATTR, "setxattr(%s [fd %d], %s => '%.*s')\n",
+ 		path ? path : "<no path>", fd, name, (int) size, (char *) value);
+ 
++	/* Filter out erroneous sizes for POSIX ACL
++	 *  see posix_acl_xattr_count in include/linux/posix_acl_xattr.h of Linux source code */
++	/* I don't think there's any posix_acl_* values that aren't in this format */
++	if (!strncmp(name, "system.posix_acl_", 17)) {
++		// ACL is corrupt, issue an error
++		if(size < sizeof(acl_header) || (size - sizeof(acl_header)) % sizeof(acl_entry) != 0) {
++			pseudo_debug(PDBGF_XATTR, "invalid data size for %s: %d\n",
++				name, (int) size);
++			errno = EINVAL;
++			return -1;
++		}
++
++		// ACL is empty, do nothing
++		if((size - sizeof(acl_header)) / sizeof(acl_entry) == 0) {
++			/* on some systems, "cp -a" will attempt to clone the
++			 * posix_acl_default entry for a directory (which would specify
++			 * default ACLs for new files in that directory), but if the
++			 * original was empty, we get a header but no entries. With
++			 * real xattr, that ends up being silently discarded, apparently,
++			 * so we discard it too.
++			 */
++			pseudo_debug(PDBGF_XATTR, "0-length ACL entry %s.\n", name);
++			return 0;
++		}
++	}
+ 	/* this may be a plain chmod */
+ 	if (!strcmp(name, "system.posix_acl_access")) {
+ 		int extra;
+ 		int mode;
+ 		int entries = (size - sizeof(acl_header)) / sizeof(acl_entry);
+-		if (!posix_permissions(value, entries, &extra, &mode)) {
++		int res = posix_permissions(value, entries, &extra, &mode);
++		if (res == 0) {
+ 			pseudo_debug(PDBGF_XATTR, "posix_acl_access translated to mode %04o. Remaining attribute(s): %d.\n",
+ 				mode, extra);
+ 			buf.st_mode = mode;
+@@ -164,8 +190,12 @@ static int shared_setxattr(const char *path, int fd, const char *name, const voi
+ 			if (!extra) {
+ 				return 0;
+ 			}
++		} else if (res == -1) {
++			errno = EOPNOTSUPP;
++			return -1;
+ 		}
+ 	}
++
+ 	if (!strcmp(name, "user.pseudo_data")) {
+ 		pseudo_debug(PDBGF_XATTR | PDBGF_XATTRDB, "user.pseudo_data xattribute does not get to go in database.\n");
+ 		return -1;
+-- 
+cgit v0.10.2
+

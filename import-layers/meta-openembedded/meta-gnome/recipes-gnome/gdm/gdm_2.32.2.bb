@@ -105,4 +105,4 @@ pkg_postrm_${PN} () {
     sed -i /gdm/d ${sysconfdir}/X11/default-display-manager || true
 }
 
-PNBLACKLIST[gdm] ?= "Depends on broken gnome-panel"
+PNBLACKLIST[gdm] ?= "Depends on broken gnome-panel - the recipe will be removed on 2017-09-01 unless the issue is fixed"

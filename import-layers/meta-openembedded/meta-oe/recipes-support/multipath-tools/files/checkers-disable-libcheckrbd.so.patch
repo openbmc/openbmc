@@ -1,0 +1,31 @@
+From 148b848f45957e5e1c0466e8c79c84ba4a0bf241 Mon Sep 17 00:00:00 2001
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Fri, 27 Jan 2017 10:35:54 +0100
+Subject: [PATCH] checkers: disable libcheckrbd.so
+
+libcheckrbd.so depends on librados, which is not currently available
+as a recipe. These checkers seem to be optional, so for now we merely
+disable compilation of libcheckrbd.so.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ libmultipath/checkers/Makefile | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libmultipath/checkers/Makefile b/libmultipath/checkers/Makefile
+index 11ab76f..c848d50 100644
+--- a/libmultipath/checkers/Makefile
++++ b/libmultipath/checkers/Makefile
+@@ -14,7 +14,6 @@ LIBS= \
+ 	libcheckemc_clariion.so \
+ 	libcheckhp_sw.so \
+ 	libcheckrdac.so \
+-	libcheckrbd.so
+ 
+ all: $(LIBS)
+ 
+-- 
+2.11.0
+

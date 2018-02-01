@@ -14,3 +14,5 @@ do_configure_prepend() {
 RRECOMMENDS_${PN} += "eject"
 
 SRC_URI += "file://configure.patch"
+
+PNBLACKLIST[places] ?= "Depends on blacklisted e-wm - the recipe will be removed on 2017-09-01 unless the issue is fixed"

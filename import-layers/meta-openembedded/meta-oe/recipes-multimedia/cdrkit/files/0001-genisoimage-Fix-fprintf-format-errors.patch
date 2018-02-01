@@ -1,0 +1,49 @@
+From 8547f23c4416ed98f585c53c62e7d8afd8edab36 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 21:05:31 -0700
+Subject: [PATCH] genisoimage: Fix fprintf format errors
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ genisoimage/genisoimage.c | 4 ++--
+ genisoimage/tree.c        | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/genisoimage/genisoimage.c b/genisoimage/genisoimage.c
+index 46f0cb7..9089081 100644
+--- a/genisoimage/genisoimage.c
++++ b/genisoimage/genisoimage.c
+@@ -3406,7 +3406,7 @@ if (check_session == 0)
+ 	if (goof) {
+ 		fprintf(stderr, "ISO9660/Rock Ridge tree sort failed.\n");
+ 		if(merge_warn_msg)
+-			fprintf(stderr, merge_warn_msg);
++			fprintf(stderr, "%s", merge_warn_msg);
+ 		exit(1);
+ 	}
+ #ifdef UDF
+@@ -3419,7 +3419,7 @@ if (check_session == 0)
+ 	if (goof) {
+ 		fprintf(stderr, "Joliet tree sort failed. The -joliet-long switch may help you.\n");
+ 		if(merge_warn_msg)
+-			fprintf(stderr, merge_warn_msg);
++			fprintf(stderr, "%s", merge_warn_msg);
+ 		exit(1);
+ 	}
+ 	/*
+diff --git a/genisoimage/tree.c b/genisoimage/tree.c
+index 7805888..8412cc3 100644
+--- a/genisoimage/tree.c
++++ b/genisoimage/tree.c
+@@ -647,7 +647,7 @@ got_valid_name:
+      fprintf(stderr, "Unable to sort directory %s\n",
+            this_dir->whole_name);
+      if(merge_warn_msg)
+-        fprintf(stderr, merge_warn_msg);
++        fprintf(stderr, "%s", merge_warn_msg);
+      exit(1);
+ 	}
+ 	/*
+-- 
+2.13.2
+

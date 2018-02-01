@@ -7,31 +7,32 @@
 
 # TODO use a trigger so that this runs once per package operation run
 
-DEPENDS += "glib-2.0-native"
 
 RDEPENDS_${PN} += "glib-2.0-utils"
 
 FILES_${PN} += "${datadir}/glib-2.0/schemas"
+
+PACKAGE_WRITE_DEPS += "glib-2.0-native"
 
 gsettings_postinstrm () {
 	glib-compile-schemas $D${datadir}/glib-2.0/schemas
 }
 
 python populate_packages_append () {
-    pkg = d.getVar('PN', True)
+    pkg = d.getVar('PN')
     bb.note("adding gsettings postinst scripts to %s" % pkg)
 
-    postinst = d.getVar('pkg_postinst_%s' % pkg, True) or d.getVar('pkg_postinst', True)
+    postinst = d.getVar('pkg_postinst_%s' % pkg) or d.getVar('pkg_postinst')
     if not postinst:
         postinst = '#!/bin/sh\n'
-    postinst += d.getVar('gsettings_postinstrm', True)
+    postinst += d.getVar('gsettings_postinstrm')
     d.setVar('pkg_postinst_%s' % pkg, postinst)
 
     bb.note("adding gsettings postrm scripts to %s" % pkg)
 
-    postrm = d.getVar('pkg_postrm_%s' % pkg, True) or d.getVar('pkg_postrm', True)
+    postrm = d.getVar('pkg_postrm_%s' % pkg) or d.getVar('pkg_postrm')
     if not postrm:
         postrm = '#!/bin/sh\n'
-    postrm += d.getVar('gsettings_postinstrm', True)
+    postrm += d.getVar('gsettings_postinstrm')
     d.setVar('pkg_postrm_%s' % pkg, postrm)
 }

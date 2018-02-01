@@ -59,9 +59,9 @@ class Manifest(object, metaclass=ABCMeta):
 
         if manifest_dir is None:
             if manifest_type != self.MANIFEST_TYPE_IMAGE:
-                self.manifest_dir = self.d.getVar('SDK_DIR', True)
+                self.manifest_dir = self.d.getVar('SDK_DIR')
             else:
-                self.manifest_dir = self.d.getVar('WORKDIR', True)
+                self.manifest_dir = self.d.getVar('WORKDIR')
         else:
             self.manifest_dir = manifest_dir
 
@@ -82,7 +82,7 @@ class Manifest(object, metaclass=ABCMeta):
     This will be used for testing until the class is implemented properly!
     """
     def _create_dummy_initial(self):
-        image_rootfs = self.d.getVar('IMAGE_ROOTFS', True)
+        image_rootfs = self.d.getVar('IMAGE_ROOTFS')
         pkg_list = dict()
         if image_rootfs.find("core-image-sato-sdk") > 0:
             pkg_list[self.PKG_TYPE_MUST_INSTALL] = \
@@ -104,7 +104,7 @@ class Manifest(object, metaclass=ABCMeta):
             pkg_list['lgp'] = \
                 "locale-base-en-us locale-base-en-gb"
         elif image_rootfs.find("core-image-minimal") > 0:
-            pkg_list[self.PKG_TYPE_MUST_INSTALL] = "run-postinsts packagegroup-core-boot"
+            pkg_list[self.PKG_TYPE_MUST_INSTALL] = "packagegroup-core-boot"
 
         with open(self.initial_manifest, "w+") as manifest:
             manifest.write(self.initial_manifest_file_header)
@@ -195,7 +195,7 @@ class RpmManifest(Manifest):
         for pkg in pkg_list.split():
             pkg_type = self.PKG_TYPE_MUST_INSTALL
 
-            ml_variants = self.d.getVar('MULTILIB_VARIANTS', True).split()
+            ml_variants = self.d.getVar('MULTILIB_VARIANTS').split()
 
             for ml_variant in ml_variants:
                 if pkg.startswith(ml_variant + '-'):
@@ -216,13 +216,13 @@ class RpmManifest(Manifest):
 
             for var in self.var_maps[self.manifest_type]:
                 if var in self.vars_to_split:
-                    split_pkgs = self._split_multilib(self.d.getVar(var, True))
+                    split_pkgs = self._split_multilib(self.d.getVar(var))
                     if split_pkgs is not None:
                         pkgs = dict(list(pkgs.items()) + list(split_pkgs.items()))
                 else:
-                    pkg_list = self.d.getVar(var, True)
+                    pkg_list = self.d.getVar(var)
                     if pkg_list is not None:
-                        pkgs[self.var_maps[self.manifest_type][var]] = self.d.getVar(var, True)
+                        pkgs[self.var_maps[self.manifest_type][var]] = self.d.getVar(var)
 
             for pkg_type in pkgs:
                 for pkg in pkgs[pkg_type].split():
@@ -245,7 +245,7 @@ class OpkgManifest(Manifest):
         for pkg in pkg_list.split():
             pkg_type = self.PKG_TYPE_MUST_INSTALL
 
-            ml_variants = self.d.getVar('MULTILIB_VARIANTS', True).split()
+            ml_variants = self.d.getVar('MULTILIB_VARIANTS').split()
 
             for ml_variant in ml_variants:
                 if pkg.startswith(ml_variant + '-'):
@@ -266,13 +266,13 @@ class OpkgManifest(Manifest):
 
             for var in self.var_maps[self.manifest_type]:
                 if var in self.vars_to_split:
-                    split_pkgs = self._split_multilib(self.d.getVar(var, True))
+                    split_pkgs = self._split_multilib(self.d.getVar(var))
                     if split_pkgs is not None:
                         pkgs = dict(list(pkgs.items()) + list(split_pkgs.items()))
                 else:
-                    pkg_list = self.d.getVar(var, True)
+                    pkg_list = self.d.getVar(var)
                     if pkg_list is not None:
-                        pkgs[self.var_maps[self.manifest_type][var]] = self.d.getVar(var, True)
+                        pkgs[self.var_maps[self.manifest_type][var]] = self.d.getVar(var)
 
             for pkg_type in pkgs:
                 for pkg in pkgs[pkg_type].split():
@@ -310,7 +310,7 @@ class DpkgManifest(Manifest):
             manifest.write(self.initial_manifest_file_header)
 
             for var in self.var_maps[self.manifest_type]:
-                pkg_list = self.d.getVar(var, True)
+                pkg_list = self.d.getVar(var)
 
                 if pkg_list is None:
                     continue
@@ -332,7 +332,7 @@ def create_manifest(d, final_manifest=False, manifest_dir=None,
                     'ipk': OpkgManifest,
                     'deb': DpkgManifest}
 
-    manifest = manifest_map[d.getVar('IMAGE_PKGTYPE', True)](d, manifest_dir, manifest_type)
+    manifest = manifest_map[d.getVar('IMAGE_PKGTYPE')](d, manifest_dir, manifest_type)
 
     if final_manifest:
         manifest.create_final()

@@ -1,0 +1,12 @@
+[Unit]
+Description=IPMI Driver
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=@LIBEXECDIR@/openipmi-helper start
+ExecStop=@LIBEXECDIR@/openipmi-helper stop-all
+
+[Install]
+WantedBy=multi-user.target

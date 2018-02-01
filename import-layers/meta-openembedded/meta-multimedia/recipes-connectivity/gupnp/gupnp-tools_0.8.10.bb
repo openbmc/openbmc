@@ -10,3 +10,5 @@ SRC_URI[md5sum] = "ad8423d036e98bc6f877528d6b846f6a"
 SRC_URI[sha256sum] = "592c53289ff1cd70e676405c56ca87b28d2da37a385d34a3bb9b944ba9108d17"
 
 inherit autotools pkgconfig
+
+PNBLACKLIST[gupnp-tools] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130670/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

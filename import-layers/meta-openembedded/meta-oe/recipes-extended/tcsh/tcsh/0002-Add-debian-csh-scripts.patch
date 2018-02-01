@@ -1,0 +1,60 @@
+From 60271713025f6b17dda29721be012a8428e77185 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 22 Mar 2017 18:56:49 -0700
+Subject: [PATCH 2/2] Add debian csh scripts
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ csh.cshrc  | 15 +++++++++++++++
+ csh.login  |  8 ++++++++
+ csh.logout |  1 +
+ 3 files changed, 24 insertions(+)
+ create mode 100644 csh.cshrc
+ create mode 100644 csh.login
+ create mode 100644 csh.logout
+
+diff --git a/csh.cshrc b/csh.cshrc
+new file mode 100644
+index 0000000..29c934a
+--- /dev/null
++++ b/csh.cshrc
+@@ -0,0 +1,15 @@
++# /etc/csh.cshrc: system-wide .cshrc file for csh(1) and tcsh(1)
++
++if ($?tcsh && $?prompt) then
++
++	bindkey "\e[1~" beginning-of-line # Home
++	bindkey "\e[7~" beginning-of-line # Home rxvt
++	bindkey "\e[2~" overwrite-mode    # Ins
++	bindkey "\e[3~" delete-char       # Delete
++	bindkey "\e[4~" end-of-line       # End
++	bindkey "\e[8~" end-of-line       # End rxvt
++
++	set autoexpand
++	set autolist
++	set prompt = "%U%m%u:%B%~%b%# "
++endif
+diff --git a/csh.login b/csh.login
+new file mode 100644
+index 0000000..2455c3c
+--- /dev/null
++++ b/csh.login
+@@ -0,0 +1,8 @@
++# /etc/csh.login: system-wide .login file for csh(1) and tcsh(1)
++
++# allow for other packages/system admins to customize the shell environment
++if (-e /etc/csh/login.d && `/bin/ls /etc/csh/login.d` != "") then
++  foreach FILE (`/bin/ls /etc/csh/login.d/*`)
++    source $FILE;
++  end;
++endif
+diff --git a/csh.logout b/csh.logout
+new file mode 100644
+index 0000000..a207eba
+--- /dev/null
++++ b/csh.logout
+@@ -0,0 +1 @@
++# /etc/csh.logout: system-wide .logout file for csh(1) and tcsh(1)
+-- 
+2.12.1
+

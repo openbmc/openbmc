@@ -1,0 +1,30 @@
+From 98d7e3ae5b15e30af1bf5dd1d279e1a774bf2b86 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 16:05:05 -0700
+Subject: [PATCH 2/5] socket-util.h: Include linux/sockios.h on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/systemd/src/basic/socket-util.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/systemd/src/basic/socket-util.h b/src/systemd/src/basic/socket-util.h
+index 2536b08..76d6107 100644
+--- a/src/systemd/src/basic/socket-util.h
++++ b/src/systemd/src/basic/socket-util.h
+@@ -29,6 +29,12 @@
+ #include <linux/netlink.h>
+ #include <linux/if_packet.h>
+ 
++#if !defined(__GLIBC__)
++/* SIOCGSTAMPNS from linux/asm-generic.h
++ * for src/systemd/src/libsystemd-network/sd-lldp.c */
++#include <linux/sockios.h>
++#endif
++
+ #include "macro.h"
+ #include "util.h"
+ 
+-- 
+2.12.1
+

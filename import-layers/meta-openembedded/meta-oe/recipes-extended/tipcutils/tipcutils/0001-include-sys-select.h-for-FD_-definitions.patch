@@ -1,0 +1,25 @@
+From e291d720a7d9576063717969dde82c33bac7eecf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 11 Apr 2017 14:19:21 -0700
+Subject: [PATCH 1/2] include sys/select.h for FD_* definitions
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ demos/inventory_sim/inventory_sim.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/demos/inventory_sim/inventory_sim.c b/demos/inventory_sim/inventory_sim.c
+index fadf27b..22c33d1 100644
+--- a/demos/inventory_sim/inventory_sim.c
++++ b/demos/inventory_sim/inventory_sim.c
+@@ -132,6 +132,7 @@ Examples
+ #include <string.h>
+ #include <unistd.h>
+ #include <sys/socket.h>
++#include <sys/select.h>
+ #include <netinet/in.h>
+ #include <linux/tipc.h>
+ 
+-- 
+2.12.2
+

@@ -6,7 +6,28 @@ CVE_PRODUCT = "libtiff"
 
 SRC_URI = "http://download.osgeo.org/libtiff/tiff-${PV}.tar.gz \
            file://libtool2.patch \
-          "
+           file://libtiff-CVE-2017-5225.patch \
+           file://CVE-2017-9147.patch \
+           file://CVE-2017-9936.patch \
+           file://CVE-2017-10688.patch \
+           file://CVE-2017-11335.patch \
+           file://CVE-2016-10271.patch \
+           file://CVE-2016-10093.patch \
+           file://CVE-2016-10268.patch \
+           file://CVE-2016-10266.patch \
+           file://CVE-2016-10267.patch \
+           file://CVE-2016-10269.patch \
+           file://CVE-2016-10270.patch \
+           file://CVE-2017-7592.patch \
+           file://CVE-2017-7594-p1.patch \
+           file://CVE-2017-7594-p2.patch \
+           file://CVE-2017-7595.patch \
+           file://CVE-2017-7596.patch \
+           file://CVE-2017-7598.patch \
+           file://CVE-2017-7601.patch \
+           file://CVE-2017-7602.patch \
+           file://CVE-2017-7593.patch \
+        "
 
 SRC_URI[md5sum] = "77ae928d2c6b7fb46a21c3a29325157b"
 SRC_URI[sha256sum] = "9f43a2cfb9589e5cecaa66e16bf87f814c945f22df7ba600d63aac4632c4f019"

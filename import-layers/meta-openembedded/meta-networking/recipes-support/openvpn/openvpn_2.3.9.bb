@@ -25,7 +25,7 @@ EXTRA_OECONF += "--enable-iproute2"
 EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '', '--disable-plugin-auth-pam', d)}"
 
 # Explicitly specify IPROUTE to bypass the configure-time check for /sbin/ip on the host.
-EXTRA_OECONF += "IPROUTE=/sbin/ip"
+EXTRA_OECONF += "IPROUTE=${base_sbindir}/ip"
 
 do_install_append() {
     install -d ${D}/${sysconfdir}/init.d
@@ -47,11 +47,10 @@ do_install_append() {
         install -d ${D}/${localstatedir}
         install -d ${D}/${localstatedir}/lib
         install -d -m 710 ${D}/${localstatedir}/lib/openvpn
-        install -d -m 755 ${D}/${localstatedir}/run/
-        install -d -m 755 ${D}/${localstatedir}/run/openvpn
 
         install -d ${D}${sysconfdir}/tmpfiles.d
         install -m 0644 ${WORKDIR}/openvpn-volatile.conf ${D}${sysconfdir}/tmpfiles.d/openvpn.conf
+        sed -i -e 's#@LOCALSTATEDIR@#${localstatedir}#g' ${D}${sysconfdir}/tmpfiles.d/openvpn.conf
     fi
 }
 
@@ -61,7 +60,8 @@ RRECOMMENDS_${PN} = "kernel-module-tun"
 
 FILES_${PN}-dbg += "${libdir}/openvpn/plugins/.debug"
 FILES_${PN} += "${systemd_unitdir}/system/openvpn@.service \
-                /run"
+                ${sysconfdir}/tmpfiles.d \
+               "
 FILES_${PN}-sample += "${systemd_unitdir}/system/openvpn@loopback-server.service \
                        ${systemd_unitdir}/system/openvpn@loopback-client.service \
                        ${sysconfdir}/openvpn/sample/"

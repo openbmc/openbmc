@@ -20,7 +20,6 @@ DESCRIPTION = "\
 HOMEPAGE = "http://www.postgresql.com"
 LICENSE = "BSD"
 DEPENDS = "zlib readline tzcode-native"
-INC_PR = "r0"
 
 ARM_INSTRUCTION_SET = "arm"
 
@@ -38,9 +37,9 @@ LEAD_SONAME = "libpq.so"
 # LDFLAGS for shared libraries
 export LDFLAGS_SL = "${LDFLAGS}"
 
-inherit autotools pkgconfig perlnative pythonnative useradd update-rc.d systemd
+inherit autotools pkgconfig perlnative pythonnative useradd update-rc.d systemd gettext
 
-CFLAGS += "-I${STAGING_INCDIR}/${PYTHON_DIR}"
+CFLAGS += "-I${STAGING_INCDIR}/${PYTHON_DIR} -I${STAGING_INCDIR}/tcl8.6"
 
 SYSTEMD_SERVICE_${PN} = "postgresql.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "disable"
@@ -55,14 +54,13 @@ pkg_postinst_${PN} () {
     fi
 }
 
-enable_pam = "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)}"
+enable_pam = "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG ??= "${enable_pam} openssl python uuid libxml tcl nls libxml perl"
 PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam,"
 PACKAGECONFIG[openssl] = "--with-openssl,--without-openssl,openssl,"
 PACKAGECONFIG[python] = "--with-python,--without-python,python,python"
 PACKAGECONFIG[uuid] = "--with-ossp-uuid,--without-ossp-uuid,ossp-uuid,"
-# when tcl native package  is fixed change WORKDIR to STAGING_BINDIR_CROSS
-PACKAGECONFIG[tcl] = "--with-tcl --with-tclconfig=${STAGING_BINDIR_CROSS},--without-tcl,tcl,"
+PACKAGECONFIG[tcl] = "--with-tcl --with-tclconfig=${STAGING_BINDIR_CROSS},--without-tcl,tcl tcl-native,"
 PACKAGECONFIG[nls] = "--enable-nls,--disable-nls,,"
 PACKAGECONFIG[libxml] = "--with-libxml,--without-libxml,libxml2,libxml2"
 PACKAGECONFIG[perl] = "--with-perl,--without-perl,perl,perl"
@@ -91,7 +89,7 @@ python populate_packages_prepend() {
             fpack="${PN}-" + name + "-dbg" + " " + fpack
         d.setVar('PACKAGES', fpack)
 
-    conf=(d.getVar('PACKAGECONFIG', True) or "").split()
+    conf=(d.getVar('PACKAGECONFIG') or "").split()
     pack=d.getVar('PACKAGES', False) or ""
     bb.debug(1, "PACKAGECONFIG=%s" % conf)
     bb.debug(1, "PACKAGES1=%s" % pack )
@@ -105,7 +103,7 @@ python populate_packages_prepend() {
     if "python" in conf:
         fill_more("plpython")
 
-    pack=d.getVar('PACKAGES', True) or ""
+    pack=d.getVar('PACKAGES') or ""
     bb.debug(1, "PACKAGES2=%s" % pack)
 
 }
@@ -191,7 +189,7 @@ do_install_append() {
     # multiple server config directory
     install -d -m 700 ${D}${sysconfdir}/default/${BPN}
 
-    if [ "${@d.getVar('enable_pam', True)}" = "pam" ]; then
+    if [ "${@d.getVar('enable_pam')}" = "pam" ]; then
         install -d ${D}${sysconfdir}/pam.d
         install -m 644 ${WORKDIR}/postgresql.pam ${D}${sysconfdir}/pam.d/postgresql
     fi
@@ -221,7 +219,7 @@ FILES_${PN} += "${sysconfdir}/init.d/${BPN}-server \
     ${libdir}/${BPN}/libpqwalreceiver.so \
     ${libdir}/${BPN}/*_and_*.so \
     ${@'${sysconfdir}/pam.d/postgresql' \
-       if 'pam' == d.getVar('enable_pam', True) \
+       if 'pam' == d.getVar('enable_pam') \
        else ''} \
 "
 

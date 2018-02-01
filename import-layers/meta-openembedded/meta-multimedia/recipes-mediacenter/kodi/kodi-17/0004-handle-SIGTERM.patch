@@ -1,0 +1,163 @@
+From 49046c1685465a5486fe9e1c04b99c585aab6862 Mon Sep 17 00:00:00 2001
+From: Stefan Saraev <stefan@saraev.ca>
+Date: Wed, 2 Nov 2016 11:28:34 -0700
+Subject: [PATCH 04/10] handle SIGTERM
+
+0. CApplication::Stop cant be trusted. (deadlocks crashes and boo)
+
+so, when shutdown/reboot is requested:
+
+1. save an exit code (for CEC...)
+2. call CPowerManager::{Reboot,PowerDown}
+3. ... then systemd sends TERM and waits xx seconds before sending KILL
+4. CApplication::Stop has xx seconds to save guisettings.xml and boo
+5. CEC thread has xx seconds to switch off after it received OnQuit
+6. addons / pvrmanager / cec / everything else.. are free to deadlock / crash now, we dont care
+7. KILL
+
+Signed-off-by: Stefan Saraev <stefan@saraev.ca>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ xbmc/Application.cpp         | 17 ++++++++++++-----
+ xbmc/Application.h           |  1 +
+ xbmc/XBApplicationEx.cpp     |  1 +
+ xbmc/XBApplicationEx.h       |  1 +
+ xbmc/platform/posix/main.cpp | 15 +++++++++++++++
+ 5 files changed, 30 insertions(+), 5 deletions(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 100a2f2..fda892d 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -2426,12 +2426,12 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+   switch (pMsg->dwMessage)
+   {
+   case TMSG_POWERDOWN:
+-    Stop(EXITCODE_POWERDOWN);
++    SetExitCode(EXITCODE_POWERDOWN);
+     g_powerManager.Powerdown();
+     break;
+ 
+   case TMSG_QUIT:
+-    Stop(EXITCODE_QUIT);
++    SetExitCode(EXITCODE_QUIT);
+     break;
+   
+   case TMSG_SHUTDOWN:
+@@ -2452,12 +2452,13 @@ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+ 
+   case TMSG_RESTART:
+   case TMSG_RESET:
+-    Stop(EXITCODE_REBOOT);
++    SetExitCode(EXITCODE_REBOOT);
+     g_powerManager.Reboot();
+     break;
+ 
+   case TMSG_RESTARTAPP:
+ #if defined(TARGET_WINDOWS) || defined(TARGET_LINUX)
++    SetExitCode(EXITCODE_RESTARTAPP);
+     Stop(EXITCODE_RESTARTAPP);
+ #endif
+     break;
+@@ -2881,6 +2882,13 @@ bool CApplication::Cleanup()
+   }
+ }
+ 
++void CApplication::SetExitCode(int exitCode)
++{
++  // save it for CEC
++  m_ExitCode = exitCode;
++  m_ExitCodeSet = true;
++}
++
+ void CApplication::Stop(int exitCode)
+ {
+   try
+@@ -2888,7 +2896,7 @@ void CApplication::Stop(int exitCode)
+     m_frameMoveGuard.unlock();
+ 
+     CVariant vExitCode(CVariant::VariantTypeObject);
+-    vExitCode["exitcode"] = exitCode;
++    vExitCode["exitcode"] = m_ExitCode;
+     CAnnouncementManager::GetInstance().Announce(System, "xbmc", "OnQuit", vExitCode);
+ 
+     // Abort any active screensaver
+@@ -2922,7 +2930,6 @@ void CApplication::Stop(int exitCode)
+ 
+     m_bStop = true;
+     m_AppFocused = false;
+-    m_ExitCode = exitCode;
+     CLog::Log(LOGNOTICE, "stop all");
+ 
+     // cancel any jobs from the jobmanager
+diff --git a/xbmc/Application.h b/xbmc/Application.h
+index a9d9bf5..e536deb 100644
+--- a/xbmc/Application.h
++++ b/xbmc/Application.h
+@@ -159,6 +159,7 @@ public:
+   void StopPVRManager();
+   void ReinitPVRManager();
+   bool IsCurrentThread() const;
++  void SetExitCode(int exitCode);
+   void Stop(int exitCode);
+   void RestartApp();
+   void UnloadSkin(bool forReload = false);
+diff --git a/xbmc/XBApplicationEx.cpp b/xbmc/XBApplicationEx.cpp
+index 035aed2..34102f5 100644
+--- a/xbmc/XBApplicationEx.cpp
++++ b/xbmc/XBApplicationEx.cpp
+@@ -46,6 +46,7 @@ CXBApplicationEx::CXBApplicationEx()
+   m_bStop = false;
+   m_AppFocused = true;
+   m_ExitCode = EXITCODE_QUIT;
++  m_ExitCodeSet = false;
+   m_renderGUI = false;
+ }
+ 
+diff --git a/xbmc/XBApplicationEx.h b/xbmc/XBApplicationEx.h
+index 9bc14fa..f696b89 100644
+--- a/xbmc/XBApplicationEx.h
++++ b/xbmc/XBApplicationEx.h
+@@ -42,6 +42,7 @@ public:
+   // Variables for timing
+   bool m_bStop;
+   int  m_ExitCode;
++  bool m_ExitCodeSet;
+   bool m_AppFocused;
+   bool m_renderGUI;
+ 
+diff --git a/xbmc/platform/posix/main.cpp b/xbmc/platform/posix/main.cpp
+index a8b64e5..3d80032 100644
+--- a/xbmc/platform/posix/main.cpp
++++ b/xbmc/platform/posix/main.cpp
+@@ -41,12 +41,27 @@
+ #include "input/linux/LIRC.h"
+ #endif
+ #include "platform/XbmcContext.h"
++#include "Application.h"
++
++void xbmc_term_handler(int signum)
++{
++  CLog::Log(LOGINFO, "Received SIGTERM...");
++  if (!g_application.m_ExitCodeSet)
++    g_application.SetExitCode(EXITCODE_RESTARTAPP);
++  g_application.Stop(EXITCODE_RESTARTAPP);
++}
+ 
+ #ifdef __cplusplus
+ extern "C"
+ #endif
+ int main(int argc, char* argv[])
+ {
++  // SIGTERM handler
++  struct sigaction action;
++  memset(&action, 0, sizeof(struct sigaction));
++  action.sa_handler = xbmc_term_handler;
++  sigaction(SIGTERM, &action, NULL);
++
+   // set up some xbmc specific relationships
+   XBMC::Context context;
+ 
+-- 
+2.10.2
+

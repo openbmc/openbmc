@@ -129,11 +129,11 @@ class ELFFile:
         if cmd in self.objdump_output:
             return self.objdump_output[cmd]
 
-        objdump = d.getVar('OBJDUMP', True)
+        objdump = d.getVar('OBJDUMP')
 
         env = os.environ.copy()
         env["LC_ALL"] = "C"
-        env["PATH"] = d.getVar('PATH', True)
+        env["PATH"] = d.getVar('PATH')
 
         try:
             bb.note("%s %s %s" % (objdump, cmd, self.name))

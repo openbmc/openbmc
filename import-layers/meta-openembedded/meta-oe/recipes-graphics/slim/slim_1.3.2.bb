@@ -79,4 +79,4 @@ systemctl disable slim.service
 sed -i /slim/d $D${sysconfdir}/X11/default-display-manager || true
 }
 
-PNBLACKLIST[slim] ?= "does not build with distroless qemuarm as reported in 'State of bitbake world' thread, nobody volunteered to fix them"
+PNBLACKLIST[slim] ?= "does not build with distroless qemuarm as reported in 'State of bitbake world' thread, nobody volunteered to fix them - the recipe will be removed on 2017-09-01 unless the issue is fixed"

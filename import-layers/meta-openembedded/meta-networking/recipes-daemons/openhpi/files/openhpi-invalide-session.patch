@@ -1,0 +1,21 @@
+Upstream-Status: Submitted
+
+Package saftest run a test case to pass invalid session id to function
+saHpiResourceIdGet that expect return SA_ERR_HPI_INVALID_SESSION. But the check
+for SA_ERR_HPI_INVALID_SESSION is missed somehow in function saHpiResourceIdGet.
+
+Add check for SA_ERR_HPI_INVALID_SESSION.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+-----
+--- openhpi-3.4.0/baselib/safhpi.cpp.orig	2014-02-25 10:45:20.911734868 +0800
++++ openhpi-3.4.0/baselib/safhpi.cpp	2014-02-25 10:46:05.366925389 +0800
+@@ -477,6 +477,8 @@
+                                  &rpt_update_count );
+     if ( rv == SA_ERR_HPI_NOT_PRESENT ) {
+         return SA_ERR_HPI_NOT_PRESENT;
++    } else if ( rv == SA_ERR_HPI_INVALID_SESSION) {
++        return SA_ERR_HPI_INVALID_SESSION;
+     } else if ( rv != SA_OK ) {
+         return SA_ERR_HPI_UNKNOWN;
+     }

@@ -1,0 +1,248 @@
+From 4bd4a88725604471fdbd86316c91967a7f4dba5a Mon Sep 17 00:00:00 2001
+From: Andrei Borzenkov <arvidjaar@gmail.com>
+Date: Tue, 4 Apr 2017 19:23:55 +0300
+Subject: [PATCH 2/4] i386, x86_64, ppc: fix switch fallthrough cases with GCC7
+
+In util/getroot and efidisk slightly modify exitsing comment to mostly
+retain it but still make GCC7 compliant with respect to fall through
+annotation.
+
+In grub-core/lib/xzembed/xz_dec_lzma2.c it adds same comments as
+upstream.
+
+In grub-core/tests/setjmp_tets.c declare functions as "noreturn" to
+suppress GCC7 warning.
+
+In grub-core/gnulib/regexec.c use new __attribute__, because existing
+annotation is not recognized by GCC7 parser (which requires that comment
+immediately precedes case statement).
+
+Otherwise add FALLTHROUGH comment.
+
+Closes: 50598
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ grub-core/commands/hdparm.c           | 1 +
+ grub-core/commands/nativedisk.c       | 1 +
+ grub-core/disk/cryptodisk.c           | 1 +
+ grub-core/disk/efi/efidisk.c          | 2 +-
+ grub-core/efiemu/mm.c                 | 1 +
+ grub-core/gdb/cstub.c                 | 1 +
+ grub-core/gnulib/regexec.c            | 3 +++
+ grub-core/lib/xzembed/xz_dec_lzma2.c  | 4 ++++
+ grub-core/lib/xzembed/xz_dec_stream.c | 6 ++++++
+ grub-core/loader/i386/linux.c         | 3 +++
+ grub-core/tests/setjmp_test.c         | 5 ++++-
+ grub-core/video/ieee1275.c            | 1 +
+ grub-core/video/readers/jpeg.c        | 1 +
+ util/getroot.c                        | 2 +-
+ util/grub-install.c                   | 1 +
+ util/grub-mkimagexx.c                 | 1 +
+ util/grub-mount.c                     | 1 +
+ 17 files changed, 32 insertions(+), 3 deletions(-)
+
+Index: grub-2.00/grub-core/commands/hdparm.c
+===================================================================
+--- grub-2.00.orig/grub-core/commands/hdparm.c
++++ grub-2.00/grub-core/commands/hdparm.c
+@@ -328,6 +328,7 @@ grub_cmd_hdparm (grub_extcmd_context_t c
+ 	  ata = ((struct grub_scsi *) disk->data)->data;
+ 	  break;
+ 	}
++      /* FALLTHROUGH */
+     default:
+       return grub_error (GRUB_ERR_IO, "not an ATA device");
+     }
+Index: grub-2.00/grub-core/disk/cryptodisk.c
+===================================================================
+--- grub-2.00.orig/grub-core/disk/cryptodisk.c
++++ grub-2.00/grub-core/disk/cryptodisk.c
+@@ -268,6 +268,7 @@ grub_cryptodisk_endecrypt (struct grub_c
+ 	  break;
+ 	case GRUB_CRYPTODISK_MODE_IV_PLAIN64:
+ 	  iv[1] = grub_cpu_to_le32 (sector >> 32);
++	  /* FALLTHROUGH */
+ 	case GRUB_CRYPTODISK_MODE_IV_PLAIN:
+ 	  iv[0] = grub_cpu_to_le32 (sector & 0xFFFFFFFF);
+ 	  break;
+Index: grub-2.00/grub-core/disk/efi/efidisk.c
+===================================================================
+--- grub-2.00.orig/grub-core/disk/efi/efidisk.c
++++ grub-2.00/grub-core/disk/efi/efidisk.c
+@@ -262,7 +262,7 @@ name_devices (struct grub_efidisk_data *
+ 	    {
+ 	    case GRUB_EFI_HARD_DRIVE_DEVICE_PATH_SUBTYPE:
+ 	      is_hard_drive = 1;
+-	      /* Fall through by intention.  */
++	      /* Intentionally fall through.  */
+ 	    case GRUB_EFI_CDROM_DEVICE_PATH_SUBTYPE:
+ 	      {
+ 		struct grub_efidisk_data *parent, *parent2;
+Index: grub-2.00/grub-core/efiemu/mm.c
+===================================================================
+--- grub-2.00.orig/grub-core/efiemu/mm.c
++++ grub-2.00/grub-core/efiemu/mm.c
+@@ -410,6 +410,7 @@ grub_efiemu_mmap_fill (void)
+ 	default:
+ 	  grub_dprintf ("efiemu",
+ 			"Unknown memory type %d. Assuming unusable\n", type);
++	/* FALLTHROUGH */
+ 	case GRUB_MEMORY_RESERVED:
+ 	  return grub_efiemu_add_to_mmap (addr, size,
+ 					  GRUB_EFI_UNUSABLE_MEMORY);
+Index: grub-2.00/grub-core/gdb/cstub.c
+===================================================================
+--- grub-2.00.orig/grub-core/gdb/cstub.c
++++ grub-2.00/grub-core/gdb/cstub.c
+@@ -336,6 +336,7 @@ grub_gdb_trap (int trap_no)
+ 	/* sAA..AA: Step one instruction from AA..AA(optional).  */
+ 	case 's':
+ 	  stepping = 1;
++	  /* FALLTHROUGH */
+ 
+ 	/* cAA..AA: Continue at address AA..AA(optional).  */
+ 	case 'c':
+Index: grub-2.00/grub-core/gnulib/regexec.c
+===================================================================
+--- grub-2.00.orig/grub-core/gnulib/regexec.c
++++ grub-2.00/grub-core/gnulib/regexec.c
+@@ -4104,6 +4104,9 @@ check_node_accept (const re_match_contex
+     case OP_UTF8_PERIOD:
+       if (ch >= ASCII_CHARS)
+         return false;
++#if defined __GNUC__ && __GNUC__ >= 7
++      __attribute__ ((fallthrough));
++#endif
+       /* FALLTHROUGH */
+ #endif
+     case OP_PERIOD:
+Index: grub-2.00/grub-core/lib/xzembed/xz_dec_lzma2.c
+===================================================================
+--- grub-2.00.orig/grub-core/lib/xzembed/xz_dec_lzma2.c
++++ grub-2.00/grub-core/lib/xzembed/xz_dec_lzma2.c
+@@ -1042,6 +1042,8 @@ enum xz_ret xz_dec_lzma2_run(
+ 
+ 			s->lzma2.sequence = SEQ_LZMA_PREPARE;
+ 
++		/* Fall through */
++
+ 		case SEQ_LZMA_PREPARE:
+ 			if (s->lzma2.compressed < RC_INIT_BYTES)
+ 				return XZ_DATA_ERROR;
+@@ -1052,6 +1054,8 @@ enum xz_ret xz_dec_lzma2_run(
+ 			s->lzma2.compressed -= RC_INIT_BYTES;
+ 			s->lzma2.sequence = SEQ_LZMA_RUN;
+ 
++		/* Fall through */
++
+ 		case SEQ_LZMA_RUN:
+ 			/*
+ 			 * Set dictionary limit to indicate how much we want
+Index: grub-2.00/grub-core/lib/xzembed/xz_dec_stream.c
+===================================================================
+--- grub-2.00.orig/grub-core/lib/xzembed/xz_dec_stream.c
++++ grub-2.00/grub-core/lib/xzembed/xz_dec_stream.c
+@@ -749,6 +749,7 @@ static enum xz_ret dec_main(struct xz_de
+ 
+ 			s->sequence = SEQ_BLOCK_START;
+ 
++			/* FALLTHROUGH */
+ 		case SEQ_BLOCK_START:
+ 			/* We need one byte of input to continue. */
+ 			if (b->in_pos == b->in_size)
+@@ -772,6 +773,7 @@ static enum xz_ret dec_main(struct xz_de
+ 			s->temp.pos = 0;
+ 			s->sequence = SEQ_BLOCK_HEADER;
+ 
++			/* FALLTHROUGH */
+ 		case SEQ_BLOCK_HEADER:
+ 			if (!fill_temp(s, b))
+ 				return XZ_OK;
+@@ -782,6 +784,7 @@ static enum xz_ret dec_main(struct xz_de
+ 
+ 			s->sequence = SEQ_BLOCK_UNCOMPRESS;
+ 
++			/* FALLTHROUGH */
+ 		case SEQ_BLOCK_UNCOMPRESS:
+ 			ret = dec_block(s, b);
+ 			if (ret != XZ_STREAM_END)
+@@ -809,6 +812,7 @@ static enum xz_ret dec_main(struct xz_de
+ 
+ 			s->sequence = SEQ_BLOCK_CHECK;
+ 
++			/* FALLTHROUGH */
+ 		case SEQ_BLOCK_CHECK:
+ 			ret = hash_validate(s, b, 0);
+ 			if (ret != XZ_STREAM_END)
+@@ -863,6 +867,7 @@ static enum xz_ret dec_main(struct xz_de
+ 
+ 			s->sequence = SEQ_INDEX_CRC32;
+ 
++			/* FALLTHROUGH */
+ 		case SEQ_INDEX_CRC32:
+ 			ret = hash_validate(s, b, 1);
+ 			if (ret != XZ_STREAM_END)
+@@ -871,6 +876,7 @@ static enum xz_ret dec_main(struct xz_de
+ 			s->temp.size = STREAM_HEADER_SIZE;
+ 			s->sequence = SEQ_STREAM_FOOTER;
+ 
++			/* FALLTHROUGH */
+ 		case SEQ_STREAM_FOOTER:
+ 			if (!fill_temp(s, b))
+ 				return XZ_OK;
+Index: grub-2.00/grub-core/loader/i386/linux.c
+===================================================================
+--- grub-2.00.orig/grub-core/loader/i386/linux.c
++++ grub-2.00/grub-core/loader/i386/linux.c
+@@ -977,10 +977,13 @@ grub_cmd_linux (grub_command_t cmd __att
+ 	      {
+ 	      case 'g':
+ 		shift += 10;
++		/* FALLTHROUGH */
+ 	      case 'm':
+ 		shift += 10;
++		/* FALLTHROUGH */
+ 	      case 'k':
+ 		shift += 10;
++		/* FALLTHROUGH */
+ 	      default:
+ 		break;
+ 	      }
+Index: grub-2.00/grub-core/video/readers/jpeg.c
+===================================================================
+--- grub-2.00.orig/grub-core/video/readers/jpeg.c
++++ grub-2.00/grub-core/video/readers/jpeg.c
+@@ -701,6 +701,7 @@ grub_jpeg_decode_jpeg (struct grub_jpeg_
+ 	case JPEG_MARKER_SOS:	/* Start Of Scan.  */
+ 	  if (grub_jpeg_decode_sos (data))
+ 	    break;
++	  /* FALLTHROUGH */
+ 	case JPEG_MARKER_RST0:	/* Restart.  */
+ 	case JPEG_MARKER_RST1:
+ 	case JPEG_MARKER_RST2:
+Index: grub-2.00/util/grub-mkimagexx.c
+===================================================================
+--- grub-2.00.orig/util/grub-mkimagexx.c
++++ grub-2.00/util/grub-mkimagexx.c
+@@ -485,6 +485,7 @@ SUFFIX (relocate_addresses) (Elf_Ehdr *e
+ 									    + sym->st_value
+ 									    - image_target->vaddr_offset));
+ 		  }
++		/* FALLTHROUGH */
+ 		case R_IA64_LTOFF_FPTR22:
+ 		  *gpptr = grub_host_to_target64 (addend + sym_addr);
+ 		  add_value_to_slot_21 ((grub_addr_t) target,
+Index: grub-2.00/util/grub-mount.c
+===================================================================
+--- grub-2.00.orig/util/grub-mount.c
++++ grub-2.00/util/grub-mount.c
+@@ -487,6 +487,7 @@ argp_parser (int key, char *arg, struct
+       if (arg[0] != '-')
+ 	break;
+ 
++    /* FALLTHROUGH */
+     default:
+       if (!arg)
+ 	return 0;

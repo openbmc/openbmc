@@ -85,4 +85,4 @@ SRC_URI[md5sum] = "f3a871beeebf86fd752863ebd22af9ac"
 SRC_URI[sha256sum] = "9b59330aa2e9e09feee587ded895e9247f71fc25f46b023d616d9969314bc7f1"
 
 # http://errors.yoctoproject.org/Errors/Details/81007/
-PNBLACKLIST[tracker] ?= "BROKEN: fails to build with new binutils-2.27"
+PNBLACKLIST[tracker] ?= "BROKEN: fails to build with new binutils-2.27 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

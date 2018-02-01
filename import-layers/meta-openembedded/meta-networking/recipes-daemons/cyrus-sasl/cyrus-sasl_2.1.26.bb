@@ -24,10 +24,8 @@ EXTRA_OECONF += "--with-dblib=berkeley \
                  andrew_cv_runpath_switch=none"
 
 PACKAGECONFIG ??= "ntlm \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', 'ldap', '', d)} \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)} \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)} \
-        "
+    ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6 ldap pam', d)} \
+"
 PACKAGECONFIG[gssapi] = "--enable-gssapi=yes,--enable-gssapi=no,krb5,"
 PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam,"
 PACKAGECONFIG[opie] = "--with-opie,--without-opie,opie,"

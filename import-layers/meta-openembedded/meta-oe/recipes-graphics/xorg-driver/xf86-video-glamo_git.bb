@@ -21,3 +21,5 @@ S = "${WORKDIR}/git"
 SRCREV = "cb9ed17035a79e49dde26a1e7e2bc5f10fd8144b"
 
 EXTRA_OECONF = " --disable-kms "
+
+PNBLACKLIST[xf86-video-glamo] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130629/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

@@ -294,6 +294,8 @@ def action_init(conf, args):
                     # again. Uses the list of files created by tar (easier
                     # than walking the tree).
                     for file in files.split('\n'):
+                        if file.endswith(os.path.sep):
+                            continue
                         for pattern in exclude_patterns:
                             if fnmatch.fnmatch(file, pattern):
                                 os.unlink(os.path.join(*([extract_dir] + ['..'] * subdir_components + [file])))
@@ -329,7 +331,7 @@ def action_init(conf, args):
                         # one. The commit should be in both repos with
                         # the same tree, but better check here.
                         tree = runcmd('git show -s --pretty=format:%%T %s' % rev).strip()
-                        with tempfile.NamedTemporaryFile() as editor:
+                        with tempfile.NamedTemporaryFile(mode='wt') as editor:
                             editor.write('''cat >$1 <<EOF
 tree %s
 author %s
@@ -353,7 +355,7 @@ EOF
                 # Optional: rewrite history to change commit messages or to move files.
                 if 'hook' in repo or dest_dir != ".":
                     filter_branch = ['git', 'filter-branch', '--force']
-                    with tempfile.NamedTemporaryFile() as hookwrapper:
+                    with tempfile.NamedTemporaryFile(mode='wt') as hookwrapper:
                         if 'hook' in repo:
                             # Create a shell script wrapper around the original hook that
                             # can be used by git filter-branch. Hook may or may not have
@@ -426,7 +428,7 @@ file_exclude = %s''' % (name, file_filter or '<empty>', repo.get('file_exclude',
                 merge.append(name)
                 # Root all commits which have no parent in the common
                 # ancestor in the new repository.
-                for start in runcmd('git log --pretty=format:%%H --max-parents=0 %s' % name).split('\n'):
+                for start in runcmd('git log --pretty=format:%%H --max-parents=0 %s --' % name).split('\n'):
                     runcmd('git replace --graft %s %s' % (start, startrev))
             try:
                 runcmd(merge)
@@ -1137,7 +1139,7 @@ def update_with_history(conf, components, revisions, repos):
             if hook:
                 # Need to turn the verbatim commit message into something resembling a patch header
                 # for the hook.
-                with tempfile.NamedTemporaryFile(delete=False) as patch:
+                with tempfile.NamedTemporaryFile(mode='wt', delete=False) as patch:
                     patch.write('Subject: [PATCH] ')
                     patch.write(body)
                     patch.write('\n---\n')

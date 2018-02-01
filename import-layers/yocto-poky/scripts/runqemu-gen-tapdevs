@@ -23,11 +23,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 usage() {
-	echo "Usage: sudo $0 <uid> <gid> <num> <native-sysroot-basedir>"
+	echo "Usage: sudo $0 <uid> <gid> <num> <staging_bindir_native>"
         echo "Where <uid> is the numeric user id the tap devices will be owned by"
 	echo "Where <gid> is the numeric group id the tap devices will be owned by"
 	echo "<num> is the number of tap devices to create (0 to remove all)"
 	echo "<native-sysroot-basedir> is the path to the build system's native sysroot"
+	echo "e.g. $ bitbake qemu-helper-native"
+	echo "$ sudo $0 1000 1000 4 tmp/sysroots-components/x86_64/qemu-helper-native/usr/bin"
 	exit 1
 }
 
@@ -44,9 +46,9 @@ fi
 TUID=$1
 GID=$2
 COUNT=$3
-SYSROOT=$4
+STAGING_BINDIR_NATIVE=$4
 
-TUNCTL=$SYSROOT/usr/bin/tunctl
+TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
 if [[ ! -x "$TUNCTL" || -d "$TUNCTL" ]]; then
 	echo "Error: $TUNCTL is not an executable"
 	usage
@@ -85,7 +87,7 @@ if [ $COUNT -gt 0 ]; then
 	echo "Creating $COUNT tap devices for UID: $TUID GID: $GID..."
 	for ((index=0; index < $COUNT; index++)); do
 		echo "Creating tap$index"
-		ifup=`$RUNQEMU_IFUP $TUID $GID $SYSROOT 2>&1`
+		ifup=`$RUNQEMU_IFUP $TUID $GID $STAGING_BINDIR_NATIVE 2>&1`
 		if [ $? -ne 0 ]; then
 			echo "Error running tunctl: $ifup"
 			exit 1

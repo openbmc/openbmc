@@ -110,14 +110,14 @@ python bugzilla_eventhandler() {
         return
 
     if name == "TaskFailed":
-        xmlrpc  = data.getVar("BUGZILLA_XMLRPC", True)
-        user    = data.getVar("BUGZILLA_USER", True)
-        passw   = data.getVar("BUGZILLA_PASS", True)
-        product = data.getVar("BUGZILLA_PRODUCT", True)
-        compon  = data.getVar("BUGZILLA_COMPONENT", True)
-        version = data.getVar("BUGZILLA_VERSION", True)
+        xmlrpc  = data.getVar("BUGZILLA_XMLRPC")
+        user    = data.getVar("BUGZILLA_USER")
+        passw   = data.getVar("BUGZILLA_PASS")
+        product = data.getVar("BUGZILLA_PRODUCT")
+        compon  = data.getVar("BUGZILLA_COMPONENT")
+        version = data.getVar("BUGZILLA_VERSION")
 
-        proxy   = data.getVar('http_proxy', True )
+        proxy   = data.getVar('http_proxy')
         if (proxy):
             import urllib2
             s, u, p, hostport = urllib2._parse_proxy(proxy)
@@ -133,14 +133,14 @@ python bugzilla_eventhandler() {
             'component': compon}
 
         # evil hack to figure out what is going on
-        debug_file = open(os.path.join(data.getVar("TMPDIR", True),"..","bugzilla-log"),"a")
+        debug_file = open(os.path.join(data.getVar("TMPDIR"),"..","bugzilla-log"),"a")
 
         file = None
-        bugname = "%(package)s-%(pv)s-autobuild" % { "package" : data.getVar("PN", True),
-                                                           "pv"      : data.getVar("PV", True),
+        bugname = "%(package)s-%(pv)s-autobuild" % { "package" : data.getVar("PN"),
+                                                           "pv"      : data.getVar("PV"),
                                                            }
-        log_file = glob.glob("%s/log.%s.*" % (event.data.getVar('T', True), event.task))
-        text     = "The %s step in %s failed at %s for machine %s" % (e.task, data.getVar("PN", True), data.getVar('DATETIME', True), data.getVar( 'MACHINE', True ) )
+        log_file = glob.glob("%s/log.%s.*" % (event.data.getVar('T'), event.task))
+        text     = "The %s step in %s failed at %s for machine %s" % (e.task, data.getVar("PN"), data.getVar('DATETIME'), data.getVar('MACHINE') )
         if len(log_file) != 0:
             print >> debug_file, "Adding log file %s" % log_file[0]
             file = open(log_file[0], 'r')
@@ -168,7 +168,7 @@ python bugzilla_eventhandler() {
 
         if bug_number and log:
             print >> debug_file, "The bug is known as '%s'" % bug_number
-            desc = "Build log for machine %s" % (data.getVar('MACHINE', True))
+            desc = "Build log for machine %s" % (data.getVar('MACHINE'))
             if not bugzilla_create_attachment(debug_file, server, args.copy(), bug_number, text, log_file[0], log, desc):
                  print >> debug_file, "Failed to attach the build log for bug #%s" % bug_number
             else:

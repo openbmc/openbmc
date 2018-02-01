@@ -3,8 +3,6 @@ DESCRIPTION = "SDK type target for standalone tarball containing packages define
                This recipe is almost the same as buildtools-tarball"
 SUMMARY = "Standalone tarball for test systems with missing software"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d690 \
-                    file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 TEST_EXPORT_SDK_PACKAGES ??= ""
 

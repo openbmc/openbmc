@@ -1,0 +1,19 @@
+Use pkg-config first to look for external libnsl which is now
+split out from glibc, if it does not exist then see if its provided
+by glibc itself.
+
+-Khem
+
+Index: autofs-5.1.2/configure.in
+===================================================================
+--- autofs-5.1.2.orig/configure.in
++++ autofs-5.1.2/configure.in
+@@ -186,7 +186,7 @@ fi
+ #
+ # glibc/libc 6 new libraries
+ #
+-AC_CHECK_LIB(nsl, yp_match, LIBNSL="-lnsl")
++PKG_CHECK_MODULES([NSL], [libnsl], [], [AC_CHECK_LIB([nsl],[yp_match],[LIBNSL="-lnsl"],[LIBNSL=""])])
+ AC_SUBST(LIBNSL)
+ 
+ AC_CHECK_LIB(resolv, res_query, LIBRESOLV="-lresolv")

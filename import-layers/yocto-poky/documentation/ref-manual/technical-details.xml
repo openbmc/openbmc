@@ -432,7 +432,7 @@
         For information on how the OpenEmbedded build system
         works with packages and can
         track incrementing <filename>PR</filename> information, see the
-        "<ulink url='&YOCTO_DOCS_DEV_URL;#incrementing-a-package-revision-number'>Incrementing a Package Revision Number</ulink>"
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#automatically-incrementing-a-binary-package-revision-number'>Automatically Incrementing a Binary Package Revision Number</ulink>"
         section.
     </note>
 
@@ -1445,14 +1445,33 @@
 
             <para>
                 The <filename>LIC_FILES_CHKSUM</filename>
-                variable contains checksums of the license text in the source code for the recipe.
-                Following is an example of how to specify <filename>LIC_FILES_CHKSUM</filename>:
+                variable contains checksums of the license text in the source
+                code for the recipe.
+                Following is an example of how to specify
+                <filename>LIC_FILES_CHKSUM</filename>:
                 <literallayout class='monospaced'>
      LIC_FILES_CHKSUM = "file://COPYING;md5=xxxx \
                          file://licfile1.txt;beginline=5;endline=29;md5=yyyy \
                          file://licfile2.txt;endline=50;md5=zzzz \
                          ..."
                 </literallayout>
+                <note><title>Notes</title>
+                    <itemizedlist>
+                        <listitem><para>
+                            When using "beginline" and "endline", realize that
+                            line numbering begins with one and not zero.
+                            Also, the included lines are inclusive (i.e. lines
+                            five through and including 29 in the previous
+                            example for <filename>licfile1.txt</filename>).
+                            </para></listitem>
+                        <listitem><para>
+                            When a license check fails, the selected license
+                            text is included as part of the QA message.
+                            Using this output, you can determine the exact
+                            start and finish for the needed license text.
+                            </para></listitem>
+                    </itemizedlist>
+                </note>
             </para>
 
             <para>
@@ -1474,7 +1493,8 @@
 
             <para>
                 The first line locates a file in
-                <filename>${S}/src/ls.c</filename>.
+                <filename>${S}/src/ls.c</filename> and isolates lines five
+                through 16 as license text.
                 The second line refers to a file in
                 <filename><link linkend='var-WORKDIR'>WORKDIR</link></filename>.
             </para>

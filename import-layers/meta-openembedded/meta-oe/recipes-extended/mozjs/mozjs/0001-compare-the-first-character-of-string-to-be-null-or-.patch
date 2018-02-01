@@ -1,0 +1,32 @@
+From f36c9476d2816e0d3e61c9e13c22ed73883cb54a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 24 Apr 2017 12:13:43 -0700
+Subject: [PATCH] compare the first character of string to be null or not
+
+Fixes
+
+error: ISO C++ forbids comparison between pointer and integer [-fpermissive]
+|          if (value[0] == '\0')
+|                          ^~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ js/src/shell/jsoptparse.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/js/src/shell/jsoptparse.cpp b/js/src/shell/jsoptparse.cpp
+index b49d0a5..612aa00 100644
+--- a/js/src/shell/jsoptparse.cpp
++++ b/js/src/shell/jsoptparse.cpp
+@@ -243,7 +243,7 @@ OptionParser::extractValue(size_t argc, char **argv, size_t *i, char **value)
+     char *eq = strchr(argv[*i], '=');
+     if (eq) {
+         *value = eq + 1;
+-        if (value[0] == '\0')
++        if (value[0][0] == '\0')
+             return error("A value is required for option %.*s", eq - argv[*i], argv[*i]);
+         return Okay;
+     }
+-- 
+2.12.2
+

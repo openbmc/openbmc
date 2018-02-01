@@ -1,0 +1,30 @@
+From 4d1dd61c04f52a7c796debbdea5fc9139ffa271d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Mar 2017 22:45:05 -0700
+Subject: [PATCH 4/8] Use pkgconfig instead of libgcrypt-config
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a15782e..b537046 100644
+--- a/Makefile
++++ b/Makefile
+@@ -63,10 +63,10 @@ RELEASE_VERSION := $(shell cat VERSION)
+ CC ?= gcc
+ CFLAGS ?= -O3 -g
+ CFLAGS += -W -Wall -Wmissing-declarations -Wwrite-strings
+-CFLAGS +=  $(shell libgcrypt-config --cflags) $(CRYPTO_CFLAGS)
++CFLAGS +=  $(shell pkg-config libgcrypt --cflags) $(CRYPTO_CFLAGS)
+ CPPFLAGS += -DVERSION=\"$(VERSION)\"
+ LDFLAGS ?= -g
+-LIBS += $(shell libgcrypt-config --libs) $(CRYPTO_LDADD)
++LIBS += $(shell pkg-config libgcrypt --libs) $(CRYPTO_LDADD)
+ 
+ ifeq ($(shell uname -s), SunOS)
+ LIBS += -lnsl -lresolv -lsocket
+-- 
+2.12.1
+

@@ -1,0 +1,97 @@
+remove libasync.o and libbif.o from deps
+
+there are no implicit rules to build them and they get wrong CFLAGS
+when compiled with implicit rule.
+
+They are built as part of iozone_linux.o target anyway
+
+Only fixed linux targets for now
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+
+
+--- current/makefile.org	2016-12-06 02:19:10.367911020 +0000
++++ current/makefile	2016-12-06 02:21:38.767911020 +0000
+@@ -167,7 +167,7 @@
+ #
+ # GNU 'C' compiler Linux build with threads, largefiles, async I/O 
+ #
+-linux:	iozone_linux.o libasync.o libbif.o fileop_linux.o pit_server.o
++linux:	iozone_linux.o fileop_linux.o pit_server.o
+ 	$(CC)  -O3 $(LDFLAGS) iozone_linux.o libasync.o libbif.o -lpthread \
+ 		-lrt -o iozone
+ 	$(CC)  -O3 -Dlinux fileop_linux.o -o fileop
+@@ -176,7 +176,7 @@
+ #
+ # GNU 'C' compiler Linux build for powerpc chip with threads, largefiles, async I/O 
+ #
+-linux-powerpc: iozone_linux-powerpc.o  libbif.o libasync.o fileop_linux-ppc.o pit_server.o
++linux-powerpc: iozone_linux-powerpc.o fileop_linux-ppc.o pit_server.o
+ 	$(CC) -O3 $(LDFLAGS) iozone_linux-powerpc.o libasync.o \
+ 		libbif.o -lpthread  -lrt -o iozone
+ 	$(CC)  -O3 -Dlinux fileop_linux-ppc.o -o fileop
+@@ -184,7 +184,7 @@
+ #
+ # GNU 'C' compiler Linux build for sparc chip with threads, largefiles, async I/O 
+ #
+-linux-sparc: iozone_linux-sparc.o  libbif.o libasync.o fileop_linux.o pit_server.o
++linux-sparc: iozone_linux-sparc.o fileop_linux.o pit_server.o
+ 	$(CC) -O3 $(LDFLAGS) iozone_linux-sparc.o libasync.o libbif.o \
+ 		-lpthread -lrt -o iozone
+ 	$(CC) -O3 -Dlinux fileop_linux.o -o fileop
+@@ -193,7 +193,7 @@
+ #
+ # GNU 'C' compiler Linux build with threads, largefiles, async I/O 
+ #
+-linux-ia64:	iozone_linux-ia64.o  libbif.o libasync.o fileop_linux-ia64.o pit_server.o
++linux-ia64:	iozone_linux-ia64.o fileop_linux-ia64.o pit_server.o
+ 	$(CC) -O3 $(LDFLAGS) iozone_linux-ia64.o libbif.o libasync.o \
+ 		-lrt -lpthread -o iozone
+ 	$(CC)  -O3 -Dlinux fileop_linux-ia64.o -o fileop
+@@ -202,7 +202,7 @@
+ #
+ # GNU 'C' compiler Linux build for powerpc chip with threads, largefiles, async I/O 
+ #
+-linux-powerpc64: iozone_linux-powerpc64.o  libbif.o libasync.o fileop_linux-ppc64.o pit_server-linux-powerpc64.o
++linux-powerpc64: iozone_linux-powerpc64.o fileop_linux-ppc64.o pit_server-linux-powerpc64.o
+ 	$(CC) -O3 -Dunix -DHAVE_ANSIC_C -DSHARED_MEM -DASYNC_IO \
+ 		-D_LARGEFILE64_SOURCE -Dlinux \
+ 		iozone_linux-powerpc64.o libasync.o libbif.o -lpthread \
+@@ -213,7 +213,7 @@
+ #
+ # GNU 'C' compiler Linux build with threads, largefiles, async I/O
+ #
+-linux-arm:	iozone_linux-arm.o  libbif.o libasync.o fileop_linux-arm.o pit_server.o
++linux-arm:	iozone_linux-arm.o fileop_linux-arm.o pit_server.o
+ 	$(CC) -O3 $(LDFLAGS) iozone_linux-arm.o libbif.o libasync.o \
+ 		-lrt -lpthread -o iozone
+ 	$(CC) -O3 -Dlinux fileop_linux-arm.o -o fileop
+@@ -222,7 +222,7 @@
+ #
+ # GNU 'C' compiler Linux build with threads, largefiles, async I/O 
+ #
+-linux-AMD64:	iozone_linux-AMD64.o  libbif.o libasync.o fileop_linux-AMD64.o pit_server.o
++linux-AMD64:	iozone_linux-AMD64.o fileop_linux-AMD64.o pit_server.o
+ 	$(CC)  -O3 $(LDFLAGS) iozone_linux-AMD64.o libbif.o libasync.o \
+ 		-lrt -lpthread -o iozone
+ 	$(CC)  -O3 -Dlinux fileop_linux-AMD64.o -o fileop
+@@ -231,7 +231,7 @@
+ #
+ # GNU 'C' compiler Linux build with S/390, threads, largfiles, async I/O
+ #
+-linux-S390:	iozone_linux-s390.o libbif.o libasync.o fileop_linux-s390.o pit_server.o
++linux-S390:	iozone_linux-s390.o fileop_linux-s390.o pit_server.o
+ 	$(CC)  -O2 $(LDFLAGS) -lpthread -lrt iozone_linux-s390.o \
+ 		libbif.o libasync.o -o iozone
+ 	$(CC)  -O3 -Dlinux fileop_linux-s390.o -o fileop
+@@ -240,7 +240,7 @@
+ #
+ # GNU 'C' compiler Linux build with S/390, threads, largfiles, async I/O
+ #
+-linux-S390X:	iozone_linux-s390x.o libbif.o libasync.o fileop_linux-s390x.o pit_server.o
++linux-S390X:	iozone_linux-s390x.o fileop_linux-s390x.o pit_server.o
+ 	$(CC)  -O2 $(LDFLAGS) -lpthread -lrt iozone_linux-s390x.o \
+ 		libbif.o libasync.o -o iozone
+ 	$(CC)  -O3 -Dlinux fileop_linux-s390x.o -o fileop

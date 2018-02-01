@@ -1,0 +1,43 @@
+From e6fbad0c122ba8e87b67a9e2447505adcaafe204 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Mar 2017 16:31:38 -0700
+Subject: [PATCH] Remove runtime check for CLOCK_MONOTONIC
+
+Does not work during cross compile
+
+use a compile-time check to detect whether the
+monotonic clock is available. This check can run just fine when we are
+cross-compiling.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index fa13ae6..f4f0f46 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -175,9 +175,17 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+                  )
+ 
+ AC_MSG_CHECKING(for a working clock_getres(CLOCK_MONOTONIC, &ts))
+-AC_RUN_IFELSE([AC_LANG_PROGRAM(
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+ [[#include <time.h>]],
+-[[struct timespec ts; if(clock_getres(CLOCK_MONOTONIC, &ts)) return -1;]])],
++[[
++#include <unistd.h>
++int main() {
++#if !(defined(_POSIX_MONOTONIC_CLOCK) && _POSIX_MONOTONIC_CLOCK >= 0 && defined(CLOCK_MONOTONIC))
++        #error No monotonic clock
++#endif
++    return 0;
++
++]])],
+                     [
+                       AC_MSG_RESULT([yes])
+                       AC_DEFINE_UNQUOTED([HAVE_CLOCK_GETRES_MONOTONIC], 1, [Define to 1 if clock_getres(CLOCK_MONOTONIC, &ts) works])
+-- 
+2.12.1
+

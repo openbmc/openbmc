@@ -17,4 +17,10 @@ do_install() {
     install -m 0755 -D ${S}/debian/ifenslave.if-pre-up ${D}${sysconfdir}/network/if-pre-up.d/ifenslave
     install -m 0755 -D ${S}/debian/ifenslave.if-post-down ${D}${sysconfdir}/network/if-post-down.d/ifenslave
     install -m 0755 -D ${S}/debian/ifenslave.if-up ${D}${sysconfdir}/network/if-up.d/ifenslave
+    install -m 0644 -D ${S}/debian/ifenslave.8 ${D}${mandir}/man8/ifenslave.8
 }
+
+FILES_${PN}-doc_remove = "${mandir}"
+FILES_${PN} += "${mandir}/man8/ifenslave.8"
+
+RDEPENDS_${PN} = "man"

@@ -9,6 +9,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/acpid2/acpid-${PV}.tar.xz \
            file://acpid.service \
           "
 
+CVE_PRODUCT = "acpid2"
+
 inherit autotools update-rc.d systemd
 
 INITSCRIPT_NAME = "acpid"

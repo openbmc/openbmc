@@ -7,17 +7,17 @@ require recipes-kernel/linux/linux-yocto.inc
 # to build multiple virtual/kernel providers, e.g. as dependency of
 # core-image-rt-sdk, core-image-rt.
 python () {
-    if d.getVar("PREFERRED_PROVIDER_virtual/kernel", True) != "linux-yocto-rt":
+    if d.getVar("PREFERRED_PROVIDER_virtual/kernel") != "linux-yocto-rt":
         raise bb.parse.SkipPackage("Set PREFERRED_PROVIDER_virtual/kernel to linux-yocto-rt to enable it")
 }
 
-SRCREV_machine ?= "1af95315c6ab3672c8c7191873ef041a6c29ad70"
-SRCREV_meta ?= "d6733af2080f8c0775569adc0826eb0c8954fc5e"
+SRCREV_machine ?= "1e691db7af642fff0222a1f1d1e9043c172699d5"
+SRCREV_meta ?= "804d2b3164ec25ed519fd695de9aa0908460c92e"
 
 SRC_URI = "git://git.yoctoproject.org/linux-yocto-4.4.git;branch=${KBRANCH};name=machine \
            git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-4.4;destsuffix=${KMETA}"
 
-LINUX_VERSION ?= "4.4.60"
+LINUX_VERSION ?= "4.4.87"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 

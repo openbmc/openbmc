@@ -1,0 +1,30 @@
+From d750c738b5c23bba24531cb713292e4ab3f2ec56 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 10 May 2017 06:39:34 +0000
+Subject: [PATCH 14/15] GLES2/gl2ext.h: Define GL_R8_EXT and GL_RG8_EXT
+
+weston code uses these defines
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ interface/khronos/include/GLES2/gl2ext.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/interface/khronos/include/GLES2/gl2ext.h b/interface/khronos/include/GLES2/gl2ext.h
+index 4eacf7f..283e3e1 100644
+--- a/interface/khronos/include/GLES2/gl2ext.h
++++ b/interface/khronos/include/GLES2/gl2ext.h
+@@ -327,6 +327,9 @@ typedef void* GLeglImageOES;
+ #define GL_RGBX_BRCM                                            0x80EE
+ #endif
+ 
++#define GL_R8_EXT                                               0x8229
++#define GL_RG8_EXT                                              0x822B
++
+ /* GL_EXT_texture_type_2_10_10_10_REV */
+ #ifndef GL_EXT_texture_type_2_10_10_10_REV
+ #define GL_UNSIGNED_INT_2_10_10_10_REV_EXT                      0x8368
+-- 
+2.15.0
+

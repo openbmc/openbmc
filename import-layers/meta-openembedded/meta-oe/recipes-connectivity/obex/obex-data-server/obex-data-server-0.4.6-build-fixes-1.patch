@@ -1,0 +1,20 @@
+Submitted By:            Armin K. <krejzi at email dot com>
+Date:                    2012-07-06
+Initial Package Version: 0.4.6
+Upstream Status:         Unknown
+Origin:                  Self
+Description:             Some build fixes.
+
+Index: obex-data-server-0.4.6/src/ods-obex.c
+===================================================================
+--- obex-data-server-0.4.6.orig/src/ods-obex.c
++++ obex-data-server-0.4.6/src/ods-obex.c
+@@ -412,7 +412,7 @@ ods_obex_setup_usbtransport (OdsObexCont
+ 		goto err;
+ 	}
+ 
+-	interfaces_num = OBEX_FindInterfaces(obex_context->obex_handle, &obex_intf);
++	interfaces_num = OBEX_EnumerateInterfaces(obex_context->obex_handle);
+ 	if (intf_num >= interfaces_num) {
+ 		g_set_error (error, ODS_ERROR, ODS_ERROR_FAILED, "Invalid interface number");
+ 		goto err;

@@ -31,15 +31,19 @@
             (<filename>.bbappend</filename>) and provides a convenient
             mechanism to create your own recipe files
             (<filename>.bb</filename>).
-            For details on how to create and work with layers, see the following
-            sections in the Yocto Project Development Manual:
-            <itemizedlist>
-                <listitem><para>"<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and Creating Layers</ulink>" for
-                    general information on layers and how to create layers.</para></listitem>
-                <listitem><para>"<ulink url='&YOCTO_DOCS_DEV_URL;#set-up-your-layer-for-the-build'>Set Up Your Layer for the Build</ulink>" for
-                    specific instructions on setting up a layer for kernel
-                    development.</para></listitem>
-            </itemizedlist>
+            For details on how to create and work with layers, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and Creating Layers</ulink>"
+            section in the Yocto Project Development Manual.
+            <note><title>Tip</title>
+                The Yocto Project comes with many tools that simplify
+                tasks you need to perform.
+                One such tool is the <filename>yocto-layer create</filename>
+                script, which simplifies creating a new layer.
+                See the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-general-layer-using-the-yocto-layer-script'>Creating a General Layer Using the yocto-layer Script</ulink>"
+                section in the Yocto Project Development Manual for more
+                information.
+            </note>
         </para>
     </section>
 
@@ -84,11 +88,11 @@
                 You also name it accordingly based on the linux-yocto recipe
                 you are using.
                 For example, if you are modifying the
-                <filename>meta/recipes-kernel/linux/linux-yocto_3.19.bb</filename>
+                <filename>meta/recipes-kernel/linux/linux-yocto_4.4.bb</filename>
                 recipe, the append file will typically be located as follows
                 within your custom layer:
                 <literallayout class='monospaced'>
-     <replaceable>your-layer</replaceable>/recipes-kernel/linux/linux-yocto_3.19.bbappend
+     <replaceable>your-layer</replaceable>/recipes-kernel/linux/linux-yocto_4.4.bbappend
                 </literallayout>
                 The append file should initially extend the
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESPATH'><filename>FILESPATH</filename></ulink>
@@ -114,6 +118,151 @@
                     <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>.
                 </note>
             </para>
+
+            <para>
+                As an example, consider the following append file
+                used by the BSPs in <filename>meta-yocto-bsp</filename>:
+                <literallayout class='monospaced'>
+     meta-yocto-bsp/recipes-kernel/linux/linux-yocto_4.4.bbappend
+                </literallayout>
+                The following listing shows the file.
+                Be aware that the actual commit ID strings in this
+                example listing might be different than the actual strings
+                in the file from the <filename>meta-yocto-bsp</filename>
+                layer upstream.
+                <literallayout class='monospaced'>
+     KBRANCH_genericx86  = "standard/base"
+     KBRANCH_genericx86-64  = "standard/base"
+
+     KMACHINE_genericx86 ?= "common-pc"
+     KMACHINE_genericx86-64 ?= "common-pc-64"
+     KBRANCH_edgerouter = "standard/edgerouter"
+     KBRANCH_beaglebone = "standard/beaglebone"
+     KBRANCH_mpc8315e-rdb = "standard/fsl-mpc8315e-rdb"
+
+     SRCREV_machine_genericx86    ?= "ad8b1d659ddd2699ebf7d50ef9de8940b157bfc2"
+     SRCREV_machine_genericx86-64 ?= "ad8b1d659ddd2699ebf7d50ef9de8940b157bfc2"
+     SRCREV_machine_edgerouter ?= "cebe1ad56aebd89e0de29412e19433fb441bf13c"
+     SRCREV_machine_beaglebone ?= "cebe1ad56aebd89e0de29412e19433fb441bf13c"
+     SRCREV_machine_mpc8315e-rdb ?= "06c0dbdcba374ca7f92a53d69292d6bb7bc9b0f3"
+
+     COMPATIBLE_MACHINE_genericx86 = "genericx86"
+     COMPATIBLE_MACHINE_genericx86-64 = "genericx86-64"
+     COMPATIBLE_MACHINE_edgerouter = "edgerouter"
+     COMPATIBLE_MACHINE_beaglebone = "beaglebone"
+     COMPATIBLE_MACHINE_mpc8315e-rdb = "mpc8315e-rdb"
+
+     LINUX_VERSION_genericx86 = "4.4.41"
+     LINUX_VERSION_genericx86-64 = "4.4.41"
+     LINUX_VERSION_edgerouter = "4.4.53"
+     LINUX_VERSION_beaglebone = "4.4.53"
+     LINUX_VERSION_mpc8315e-rdb = "4.4.53"
+                </literallayout>
+                This append file contains statements used to support
+                several BSPs that ship with the Yocto Project.
+                The file defines machines using the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-COMPATIBLE_MACHINE'><filename>COMPATIBLE_MACHINE</filename></ulink>
+                variable and uses the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>
+                variable to ensure the machine name used by the OpenEmbedded
+                build system maps to the machine name used by the Linux Yocto
+                kernel.
+                The file also uses the optional
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KBRANCH'><filename>KBRANCH</filename></ulink>
+                variable to ensure the build process uses the
+                appropriate kernel branch.
+            </para>
+
+            <para>
+                Although this particular example does not use it, the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KERNEL_FEATURES'><filename>KERNEL_FEATURES</filename></ulink>
+                variable could be used to enable features specific to
+                the kernel.
+                The append file points to specific commits in the
+                <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                Git repository and the <filename>meta</filename> Git repository
+                branches to identify the exact kernel needed to build the
+                BSP.
+            </para>
+
+            <para>
+                One thing missing in this particular BSP, which you will
+                typically need when developing a BSP, is the kernel configuration
+                file (<filename>.config</filename>) for your BSP.
+                When developing a BSP, you probably have a kernel configuration
+                file or a set of kernel configuration files that, when taken
+                together, define the kernel configuration for your BSP.
+                You can accomplish this definition by putting the configurations
+                in a file or a set of files inside a directory located at the
+                same level as your kernel's append file and having the same
+                name as the kernel's main recipe file.
+                With all these conditions met, simply reference those files in the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                statement in the append file.
+            </para>
+
+            <para>
+                For example, suppose you had some configuration options
+                in a file called <filename>network_configs.cfg</filename>.
+                You can place that file inside a directory named
+                <filename>linux-yocto</filename> and then add
+                a <filename>SRC_URI</filename> statement such as the
+                following to the append file.
+                When the OpenEmbedded build system builds the kernel, the
+                configuration options are picked up and applied.
+                <literallayout class='monospaced'>
+     SRC_URI += "file://network_configs.cfg"
+                </literallayout>
+            </para>
+
+            <para>
+                To group related configurations into multiple files, you
+                perform a similar procedure.
+                Here is an example that groups separate configurations
+                specifically for Ethernet and graphics into their own
+                files and adds the configurations by using a
+                <filename>SRC_URI</filename> statement like the following
+                in your append file:
+                <literallayout class='monospaced'>
+     SRC_URI += "file://myconfig.cfg \
+                 file://eth.cfg \
+                 file://gfx.cfg"
+                </literallayout>
+            </para>
+
+            <para>
+                Another variable you can use in your kernel recipe append
+                file is the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>
+                variable.
+                When you use this statement, you are extending the locations
+                used by the OpenEmbedded system to look for files and
+                patches as the recipe is processed.
+            </para>
+
+            <note>
+                <para>
+                    Other methods exist to accomplish grouping and defining configuration options.
+                    For example, if you are working with a local clone of the kernel repository,
+                    you could checkout the kernel's <filename>meta</filename> branch, make your changes,
+                    and then push the changes to the local bare clone of the kernel.
+                    The result is that you directly add configuration options to the
+                    <filename>meta</filename> branch for your BSP.
+                    The configuration options will likely end up in that location anyway if the BSP gets
+                    added to the Yocto Project.
+                </para>
+
+                <para>
+                    In general, however, the Yocto Project maintainers take care of moving the
+                    <filename>SRC_URI</filename>-specified
+                    configuration options to the kernel's <filename>meta</filename> branch.
+                    Not only is it easier for BSP developers to not have to worry about putting those
+                    configurations in the branch, but having the maintainers do it allows them to apply
+                    'global' knowledge about the kinds of common configuration options multiple BSPs in
+                    the tree are typically using.
+                    This allows for promotion of common configurations into common features.
+                </para>
+            </note>
         </section>
 
         <section id='applying-patches'>

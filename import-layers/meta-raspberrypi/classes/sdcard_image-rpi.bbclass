@@ -72,6 +72,10 @@ SDIMG = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.rpi-sdimg"
 # Additional files and/or directories to be copied into the vfat partition from the IMAGE_ROOTFS.
 FATPAYLOAD ?= ""
 
+# SD card vfat partition image name
+SDIMG_VFAT = "${IMAGE_NAME}.vfat"
+SDIMG_LINK_VFAT = "${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.vfat"
+
 IMAGE_CMD_rpi-sdimg () {
 
 	# Align partitions
@@ -107,7 +111,7 @@ IMAGE_CMD_rpi-sdimg () {
 		DT_ROOT="${@split_overlays(d, 1)}"
 
 		# Copy board device trees to root folder
-		for DTB in ${DT_ROOT}; do
+		for DTB in $DT_ROOT; do
 			DTB_BASE_NAME=`basename ${DTB} .dtb`
 
 			mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTB_BASE_NAME}.dtb ::${DTB_BASE_NAME}.dtb
@@ -115,7 +119,7 @@ IMAGE_CMD_rpi-sdimg () {
 
 		# Copy device tree overlays to dedicated folder
 		mmd -i ${WORKDIR}/boot.img overlays
-		for DTB in ${DT_OVERLAYS}; do
+		for DTB in $DT_OVERLAYS; do
 				DTB_EXT=${DTB##*.}
 				DTB_BASE_NAME=`basename ${DTB} ."${DTB_EXT}"`
 
@@ -144,6 +148,16 @@ IMAGE_CMD_rpi-sdimg () {
 	# Add stamp file
 	echo "${IMAGE_NAME}" > ${WORKDIR}/image-version-info
 	mcopy -i ${WORKDIR}/boot.img -v ${WORKDIR}/image-version-info ::
+
+        # Deploy vfat partition (for u-boot case only)
+        case "${KERNEL_IMAGETYPE}" in
+        "uImage")
+                cp ${WORKDIR}/boot.img ${IMGDEPLOYDIR}/${SDIMG_VFAT}
+                ln -sf ${SDIMG_VFAT} ${SDIMG_LINK_VFAT}
+                ;;
+        *)
+                ;;
+        esac
 
 	# Burn Partitions
 	dd if=${WORKDIR}/boot.img of=${SDIMG} conv=notrunc seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync

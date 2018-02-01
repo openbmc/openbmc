@@ -10,6 +10,8 @@ SRC_URI = "http://dotat.at/prog/${BPN}/${BP}.tar.xz"
 SRC_URI[md5sum] = "337053fd8a7d9ab3adf5e50f88af95b7"
 SRC_URI[sha256sum] = "828ffc270ac262b88fe011136acef2780c05b0dc3c5435d005651740788d4537"
 
+UPSTREAM_CHECK_REGEX = "unifdef-(?P<pver>((\d+\.*)+)(?![a-f0-9]{6,})).tar"
+
 do_install() {
 	oe_runmake install DESTDIR=${D} prefix=${prefix}
 }

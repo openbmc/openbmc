@@ -132,16 +132,16 @@
           {% endif %}
           <li class="nav-header">Build</li>
             <li id="menu-configuration"><a href="{% url 'configuration' build.pk %}">Configuration</a></li>
-            <li><a href="{% url 'tasks' build.pk %}">Tasks</a></li>
-            <li><a href="{% url 'recipes' build.pk %}">Recipes</a></li>
-            <li><a href="{% url 'packages' build.pk %}">Packages</a></li>
+            <li id="menu-tasks"><a href="{% url 'tasks' build.pk %}">Tasks</a></li>
+            <li id="menu-recipes"><a href="{% url 'recipes' build.pk %}">Recipes</a></li>
+            <li id="menu-packages"><a href="{% url 'packages' build.pk %}">Packages</a></li>
             <li class="nav-header">Performance</li>
-            <li><a href="{% url 'buildtime' build.pk %}">Time</a></li>
-            <li><a href="{% url 'cputime' build.pk %}">CPU usage</a></li>
-            <li><a href="{% url 'diskio' build.pk %}">Disk I/O</a></li>
+            <li id="menu-time"><a href="{% url 'buildtime' build.pk %}">Time</a></li>
+            <li id="menu-cpu-time"><a href="{% url 'cputime' build.pk %}">CPU usage</a></li>
+            <li id="menu-disk-io"><a href="{% url 'diskio' build.pk %}">Disk I/O</a></li>
 
           <li class="nav-header">Actions</li>
-          <li>
+          <li id="menu-download-build-log">
             <a href="{% url 'build_artifact' build.id 'cookerlog' build.id %}">
               <span class="glyphicon glyphicon-download-alt"></span>
             Download build log
@@ -151,7 +151,7 @@
           {% with build.get_custom_image_recipes as custom_image_recipes %}
             {% if custom_image_recipes.count > 0 %}
               <!-- edit custom image built during this build -->
-              <li>
+              <li id="menu-edit-custom-image">
                 <a href="#" data-role="edit-custom-image-trigger">
                   <span class="glyphicon glyphicon-edit"></span>
                   Edit custom image
@@ -186,7 +186,7 @@
 
             <!-- new custom image from image recipe in this build -->
             {% if build.has_image_recipes %}
-            <li>
+            <li id="menu-new-custom-image">
               <a href="#"  data-role="new-custom-image-trigger">
                 <span class="glyphicon glyphicon-plus"></span>
                 New custom image
@@ -216,7 +216,7 @@
               </script>
             {% endif %}
 
-            <li>
+            <li  id="menu-delete-build">
             <a href="#delete-build-modal" id="delete-build" data-toggle="modal" data-target="#delete-build-modal" class="text-danger">
               <span class="glyphicon glyphicon-trash"></span>
               Delete build

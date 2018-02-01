@@ -1,0 +1,33 @@
+From 855145d5c03c4b4faf60736c38d7a299c682af4a Mon Sep 17 00:00:00 2001
+From: Shenghou Ma <minux@golang.org>
+Date: Sat, 7 Feb 2015 14:06:02 -0500
+Subject: [PATCH] cmd/ld: set alignment for the .rel.plt section on 32-bit
+ architectures
+
+Fixes #9802.
+
+Change-Id: I22c52a37bdb23a14cc4615c9519431bb14ca81ca
+Reviewed-on: https://go-review.googlesource.com/4170
+Reviewed-by: Ian Lance Taylor <iant@golang.org>
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ src/cmd/ld/elf.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/cmd/ld/elf.c b/src/cmd/ld/elf.c
+index 12ced98..97ed4bd 100644
+--- a/src/cmd/ld/elf.c
++++ b/src/cmd/ld/elf.c
+@@ -1363,6 +1363,7 @@ asmbelf(vlong symo)
+ 			sh->type = SHT_REL;
+ 			sh->flags = SHF_ALLOC;
+ 			sh->entsize = ELF32RELSIZE;
++			sh->addralign = 4;
+ 			sh->link = elfshname(".dynsym")->shnum;
+ 			shsym(sh, linklookup(ctxt, ".rel.plt", 0));
+ 
+-- 
+1.9.1
+

@@ -1,0 +1,26 @@
+From 0378cbb323c662a565f7f3de2dee3d8a646e7bd1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 09:32:42 -0700
+Subject: [PATCH 1/2] makefile: Pass CFLAGS to compile
+
+Set CC if not already set
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ host/tools/wmiconfig/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/host/tools/wmiconfig/Makefile b/host/tools/wmiconfig/Makefile
+index c6738c5..3253a7e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,4 +1,4 @@
+-CC :=$(ATH_CROSS_COMPILE_TYPE)gcc
++CC ?= $(ATH_CROSS_COMPILE_TYPE)gcc
+ 
+ all:
+-	$(CC) -Wall -DUSER_KEYS -g $(LDFLAGS) -I../../include -I../../../include -I../../wlan/include -I../../os/linux/include wmiconfig.c -o wmiconfig
++	$(CC) -Wall -DUSER_KEYS -g $(CFLAGS) $(LDFLAGS) -I../../include -I../../../include -I../../wlan/include -I../../os/linux/include wmiconfig.c -o wmiconfig
+-- 
+2.13.2
+

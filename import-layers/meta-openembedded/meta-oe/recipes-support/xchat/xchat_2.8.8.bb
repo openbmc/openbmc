@@ -35,3 +35,5 @@ FILES_${PN}-dbg += "${libdir}/xchat/plugins/.debug"
 
 SRC_URI[md5sum] = "6775c44f38e84d06c06c336b32c4a452"
 SRC_URI[sha256sum] = "0d6d69437b5e1e45f3e66270fe369344943de8a1190e498fafa5296315a27db0"
+
+PNBLACKLIST[xchat] ?= "Depends on blacklisted libsexy - the recipe will be removed on 2017-09-01 unless the issue is fixed"

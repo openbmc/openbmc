@@ -19,11 +19,6 @@ fi
 [ -z "$SYSCONFDIR" ] && SYSCONFDIR=/etc/ssh
 mkdir -p $SYSCONFDIR
 
-HOST_KEY_RSA=$SYSCONFDIR/ssh_host_rsa_key
-HOST_KEY_DSA=$SYSCONFDIR/ssh_host_dsa_key
-HOST_KEY_ECDSA=$SYSCONFDIR/ssh_host_ecdsa_key
-HOST_KEY_ED25519=$SYSCONFDIR/ssh_host_ed25519_key
-
 check_for_no_start() {
     # forget it if we're trying to start, and /etc/ssh/sshd_not_to_be_run exists
     if [ -e $SYSCONFDIR/sshd_not_to_be_run ]; then
@@ -44,33 +39,13 @@ check_config() {
 	/usr/sbin/sshd -t $SSHD_OPTS || exit 1
 }
 
-check_keys() {
-	# create keys if necessary
-	if [ ! -f $HOST_KEY_RSA ]; then
-		echo "  generating ssh RSA key..."
-		ssh-keygen -q -f $HOST_KEY_RSA -N '' -t rsa
-	fi
-	if [ ! -f $HOST_KEY_ECDSA ]; then
-		echo "  generating ssh ECDSA key..."
-		ssh-keygen -q -f $HOST_KEY_ECDSA -N '' -t ecdsa
-	fi
-	if [ ! -f $HOST_KEY_DSA ]; then
-		echo "  generating ssh DSA key..."
-		ssh-keygen -q -f $HOST_KEY_DSA -N '' -t dsa
-	fi
-	if [ ! -f $HOST_KEY_ED25519 ]; then
-		echo "  generating ssh ED25519 key..."
-		ssh-keygen -q -f $HOST_KEY_ED25519 -N '' -t ed25519
-	fi
-}
-
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
 
 case "$1" in
   start)
 	check_for_no_start
 	echo "Starting OpenBSD Secure Shell server: sshd"
-	check_keys
+	@LIBEXECDIR@/sshd_check_keys
 	check_privsep_dir
 	start-stop-daemon -S -p $PIDFILE -x /usr/sbin/sshd -- $SSHD_OPTS
         echo "done."
@@ -83,7 +58,7 @@ case "$1" in
 
   reload|force-reload)
 	check_for_no_start
-	check_keys
+	@LIBEXECDIR@/sshd_check_keys
 	check_config
         echo -n "Reloading OpenBSD Secure Shell server's configuration"
 	start-stop-daemon -K -p $PIDFILE -s 1 -x /usr/sbin/sshd
@@ -91,7 +66,7 @@ case "$1" in
 	;;
 
   restart)
-  	check_keys
+	@LIBEXECDIR@/sshd_check_keys
 	check_config
         echo -n "Restarting OpenBSD Secure Shell server: sshd"
 	start-stop-daemon -K -p $PIDFILE --oknodo -x /usr/sbin/sshd

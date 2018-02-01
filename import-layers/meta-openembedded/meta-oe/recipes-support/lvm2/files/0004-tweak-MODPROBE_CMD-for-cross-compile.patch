@@ -1,0 +1,38 @@
+From 0012ea63f6070a5d41fa380970f9c30b953237d2 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Tue, 25 Oct 2016 11:59:40 +0000
+Subject: [PATCH 4/4] tweak MODPROBE_CMD for cross compile
+
+Lvm uses variable MODPROBE_CMD at runtime, so build time detection of modprobe
+is incorrect.
+------
+|lvm lvcreate --thinpool wrl/pool00 --size 5556m --config  devices
+{ preferred_names=["^/dev/mapper/", "^/dev/md/", "^/dev/sd"]
+filter=["r|/loop1$|","r|/loop2$|","r|/loop3$|","r|/loop4$|","r|/loop5$|","r|/loop6$|","r|/loop7$|"] }
+|tmp/sysroots/x86_64-linux/usr/bin/modprobe: execvp failed: No such file or directory
+|tmp/sysroots/x86_64-linux/usr/bin/modprobe failed: 2
+------
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ configure.in | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index cc77aab..a3579f2 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1853,7 +1853,6 @@ if test "$UDEV_SYNC" = yes; then
+ fi
+ 
+ ################################################################################
+-AC_PATH_TOOL(MODPROBE_CMD, modprobe)
+ 
+ if test -n "$MODPROBE_CMD"; then
+ 	AC_DEFINE_UNQUOTED([MODPROBE_CMD], ["$MODPROBE_CMD"], [The path to 'modprobe', if available.])
+-- 
+2.9.3
+

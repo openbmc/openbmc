@@ -24,15 +24,17 @@
 # Tom Zanussi <tom.zanussi (at] linux.intel.com>
 #
 
+import logging
 import os
 
-from wic.utils.errors import ImageError
-from wic import msger
+from wic import WicError
+from wic.engine import get_custom_config
 from wic.utils import runner
-from wic.utils.misc import get_custom_config
 from wic.pluginbase import SourcePlugin
-from wic.utils.oe.misc import exec_cmd, exec_native_cmd, \
-                              get_bitbake_var, BOOTDD_EXTRA_SPACE
+from wic.utils.misc import (exec_cmd, exec_native_cmd,
+                            get_bitbake_var, BOOTDD_EXTRA_SPACE)
+
+logger = logging.getLogger('wic')
 
 class BootimgPcbiosPlugin(SourcePlugin):
     """
@@ -42,33 +44,45 @@ class BootimgPcbiosPlugin(SourcePlugin):
     name = 'bootimg-pcbios'
 
     @classmethod
+    def _get_bootimg_dir(cls, bootimg_dir, dirname):
+        """
+        Check if dirname exists in default bootimg_dir or
+        in wic-tools STAGING_DIR.
+        """
+        for result in (bootimg_dir, get_bitbake_var("STAGING_DATADIR", "wic-tools")):
+            if os.path.exists("%s/%s" % (result, dirname)):
+                return result
+
+        raise WicError("Couldn't find correct bootimg_dir, exiting")
+
+    @classmethod
     def do_install_disk(cls, disk, disk_name, creator, workdir, oe_builddir,
                         bootimg_dir, kernel_dir, native_sysroot):
         """
         Called after all partitions have been prepared and assembled into a
         disk image.  In this case, we install the MBR.
         """
+        bootimg_dir = cls._get_bootimg_dir(bootimg_dir, 'syslinux')
         mbrfile = "%s/syslinux/" % bootimg_dir
         if creator.ptable_format == 'msdos':
             mbrfile += "mbr.bin"
         elif creator.ptable_format == 'gpt':
             mbrfile += "gptmbr.bin"
         else:
-            msger.error("Unsupported partition table: %s" % creator.ptable_format)
+            raise WicError("Unsupported partition table: %s" %
+                           creator.ptable_format)
 
         if not os.path.exists(mbrfile):
-            msger.error("Couldn't find %s.  If using the -e option, do you "
-                        "have the right MACHINE set in local.conf?  If not, "
-                        "is the bootimg_dir path correct?" % mbrfile)
+            raise WicError("Couldn't find %s.  If using the -e option, do you "
+                           "have the right MACHINE set in local.conf?  If not, "
+                           "is the bootimg_dir path correct?" % mbrfile)
 
         full_path = creator._full_path(workdir, disk_name, "direct")
-        msger.debug("Installing MBR on disk %s as %s with size %s bytes" \
-                    % (disk_name, full_path, disk['min_size']))
+        logger.debug("Installing MBR on disk %s as %s with size %s bytes",
+                     disk_name, full_path, disk.min_size)
 
-        rcode = runner.show(['dd', 'if=%s' % mbrfile,
-                             'of=%s' % full_path, 'conv=notrunc'])
-        if rcode != 0:
-            raise ImageError("Unable to set MBR to %s" % full_path)
+        dd_cmd = "dd if=%s of=%s conv=notrunc" % (mbrfile, full_path)
+        exec_cmd(dd_cmd, native_sysroot)
 
     @classmethod
     def do_configure_partition(cls, part, source_params, creator, cr_workdir,
@@ -90,11 +104,11 @@ class BootimgPcbiosPlugin(SourcePlugin):
             if custom_cfg:
                 # Use a custom configuration for grub
                 syslinux_conf = custom_cfg
-                msger.debug("Using custom configuration file "
-                            "%s for syslinux.cfg" % bootloader.configfile)
+                logger.debug("Using custom configuration file %s "
+                             "for syslinux.cfg", bootloader.configfile)
             else:
-                msger.error("configfile is specified but failed to "
-                            "get it from %s." % bootloader.configfile)
+                raise WicError("configfile is specified but failed to "
+                               "get it from %s." % bootloader.configfile)
 
         if not custom_cfg:
             # Create syslinux configuration using parameters from wks file
@@ -122,8 +136,8 @@ class BootimgPcbiosPlugin(SourcePlugin):
             syslinux_conf += "APPEND label=boot root=%s %s\n" % \
                              (creator.rootdev, bootloader.append)
 
-        msger.debug("Writing syslinux config %s/hdd/boot/syslinux.cfg" \
-                    % cr_workdir)
+        logger.debug("Writing syslinux config %s/hdd/boot/syslinux.cfg",
+                     cr_workdir)
         cfg = open("%s/hdd/boot/syslinux.cfg" % cr_workdir, "w")
         cfg.write(syslinux_conf)
         cfg.close()
@@ -137,33 +151,25 @@ class BootimgPcbiosPlugin(SourcePlugin):
         'prepares' the partition to be incorporated into the image.
         In this case, prepare content for legacy bios boot partition.
         """
-        def _has_syslinux(dirname):
-            if dirname:
-                syslinux = "%s/syslinux" % dirname
-                if os.path.exists(syslinux):
-                    return True
-            return False
-
-        if not _has_syslinux(bootimg_dir):
-            bootimg_dir = get_bitbake_var("STAGING_DATADIR")
-            if not bootimg_dir:
-                msger.error("Couldn't find STAGING_DATADIR, exiting\n")
-            if not _has_syslinux(bootimg_dir):
-                msger.error("Please build syslinux first\n")
-            # just so the result notes display it
-            creator.set_bootimg_dir(bootimg_dir)
+        bootimg_dir = cls._get_bootimg_dir(bootimg_dir, 'syslinux')
 
         staging_kernel_dir = kernel_dir
 
         hdddir = "%s/hdd/boot" % cr_workdir
 
-        install_cmd = "install -m 0644 %s/bzImage %s/vmlinuz" \
-            % (staging_kernel_dir, hdddir)
-        exec_cmd(install_cmd)
+        cmds = ("install -m 0644 %s/bzImage %s/vmlinuz" %
+                (staging_kernel_dir, hdddir),
+                "install -m 444 %s/syslinux/ldlinux.sys %s/ldlinux.sys" %
+                (bootimg_dir, hdddir),
+                "install -m 0644 %s/syslinux/vesamenu.c32 %s/vesamenu.c32" %
+                (bootimg_dir, hdddir),
+                "install -m 444 %s/syslinux/libcom32.c32 %s/libcom32.c32" %
+                (bootimg_dir, hdddir),
+                "install -m 444 %s/syslinux/libutil.c32 %s/libutil.c32" %
+                (bootimg_dir, hdddir))
 
-        install_cmd = "install -m 444 %s/syslinux/ldlinux.sys %s/ldlinux.sys" \
-            % (bootimg_dir, hdddir)
-        exec_cmd(install_cmd)
+        for install_cmd in cmds:
+            exec_cmd(install_cmd)
 
         du_cmd = "du -bks %s" % hdddir
         out = exec_cmd(du_cmd)
@@ -176,8 +182,8 @@ class BootimgPcbiosPlugin(SourcePlugin):
 
         blocks += extra_blocks
 
-        msger.debug("Added %d extra blocks to %s to get to %d total blocks" % \
-                    (extra_blocks, part.mountpoint, blocks))
+        logger.debug("Added %d extra blocks to %s to get to %d total blocks",
+                     extra_blocks, part.mountpoint, blocks)
 
         # dosfs image, created by mkdosfs
         bootimg = "%s/boot.img" % cr_workdir
@@ -198,7 +204,5 @@ class BootimgPcbiosPlugin(SourcePlugin):
         out = exec_cmd(du_cmd)
         bootimg_size = out.split()[0]
 
-        part.size = int(out.split()[0])
+        part.size = int(bootimg_size)
         part.source_file = bootimg
-
-

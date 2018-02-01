@@ -15,11 +15,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 DEPENDS = "ncurses zlib"
 
-ATOP_VER = "${@'-'.join(d.getVar('PV', True).rsplit('.', 1))}"
+ATOP_VER = "${@'-'.join(d.getVar('PV').rsplit('.', 1))}"
 
 SRC_URI = " \
     http://www.atoptool.nl/download/${BPN}-${ATOP_VER}.tar.gz \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'file://volatiles.atop.conf', 'file://volatiles.99_atop', d)} \
+    file://0001-include-missing-header-files.patch \
     file://remove-bashisms.patch \
     file://fix-permissions.patch \
     file://sysvinit-implement-status.patch \

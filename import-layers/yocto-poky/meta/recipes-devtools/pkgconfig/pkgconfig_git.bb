@@ -8,10 +8,6 @@ SECTION = "console/utils"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-DEPENDS = "glib-2.0"
-DEPENDS_class-native = ""
-DEPENDS_class-nativesdk = ""
-
 SRCREV = "87152c05be88ca8be71a3a563f275b3686d32c28"
 PV = "0.29.1+git${SRCPV}"
 
@@ -26,9 +22,16 @@ S = "${WORKDIR}/git"
 
 inherit autotools
 
-EXTRA_OECONF = "--without-internal-glib"
-EXTRA_OECONF_class-native = "--with-internal-glib"
-EXTRA_OECONF_class-nativesdk = "--with-internal-glib"
+# Because of a faulty test, the current auto mode always evaluates to no,
+# so just continue that behaviour.
+#
+EXTRA_OECONF += "--disable-indirect-deps"
+
+PACKAGECONFIG ??= "glib"
+PACKAGECONFIG_class-native = ""
+PACKAGECONFIG_class-nativesdk = ""
+
+PACKAGECONFIG[glib] = "--without-internal-glib,--with-internal-glib,glib-2.0 pkgconfig-native"
 
 acpaths = "-I ."
 

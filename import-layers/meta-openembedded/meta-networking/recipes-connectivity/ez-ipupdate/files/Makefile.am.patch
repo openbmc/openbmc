@@ -1,0 +1,14 @@
+Remove EXTRASRC and EXTRAOBJ from obj list
+
+--- ez-ipupdate-3.0.11b7/Makefile.am.orig	2014-07-02 13:47:50.758034983 -0600
++++ ez-ipupdate-3.0.11b7/Makefile.am	2014-07-02 13:48:38.406034650 -0600
+@@ -1,7 +1,7 @@
+ 
+ bin_PROGRAMS = ez-ipupdate
+-ez_ipupdate_SOURCES = ez-ipupdate.c conf_file.c conf_file.h md5.c md5.h cache_file.c cache_file.h error.h pid_file.c pid_file.h dprintf.h @EXTRASRC@
+-ez_ipupdate_LDADD = @EXTRAOBJ@
++ez_ipupdate_SOURCES = ez-ipupdate.c conf_file.c conf_file.h md5.c md5.h cache_file.c cache_file.h error.h pid_file.c pid_file.h dprintf.h
++ez_ipupdate_LDADD =
+ 
+ EXTRA_DIST = getpass.c ez-ipupdate.lsm example.conf example-pgpow.conf example-dhs.conf example-dyndns.conf example-ods.conf example-tzo.conf example-gnudip.conf example-easydns.conf example-justlinux.conf example-dyns.conf CHANGELOG mkbinary example-heipv6tb.conf
+ 

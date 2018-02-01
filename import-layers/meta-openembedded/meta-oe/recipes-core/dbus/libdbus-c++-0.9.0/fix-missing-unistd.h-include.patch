@@ -1,0 +1,40 @@
+
+sniped from ChromiumOS
+
+https://bugs.gentoo.org/424707
+
+From 154f7861d19a2bd5c79c488f9989610971db451b Mon Sep 17 00:00:00 2001
+From: Han Shen <shenhan@google.com>
+Date: Thu, 31 May 2012 16:49:35 -0700
+Subject: [PATCH] Fixed dbus-c++ gcc 4.7 building problem.
+
+Just add "unistd.h" inclusion to eventloop-integration.h.
+
+BUG=None
+TEST=Manually built using gcc 4.7.
+
+Change-Id: I87bd1f90db6a4c974a5ed8134044e8be2034aff2
+Reviewed-on: https://gerrit.chromium.org/gerrit/24260
+Tested-by: Han Shen <shenhan@google.com>
+Reviewed-by: Yunlian Jiang <yunlian@chromium.org>
+Commit-Ready: Han Shen <shenhan@chromium.org>
+Upstream-Status: Inappropriate [ not author, no upstream ]
+Signed-off-by: Thilo Cestonaro <thilo.cestonaro@ts.fujitsu.com>
+---
+ include/dbus-c++/eventloop-integration.h |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/dbus-c++/eventloop-integration.h b/include/dbus-c++/eventloop-integration.h
+index 5108340..1b56ab5 100644
+--- a/include/dbus-c++/eventloop-integration.h
++++ b/include/dbus-c++/eventloop-integration.h
+@@ -27,6 +27,7 @@
+ 
+ #include <cstring>
+ #include <errno.h>
++#include <unistd.h>
+ #include "api.h"
+ #include "dispatcher.h"
+ #include "util.h"
+-- 
+1.7.9.7

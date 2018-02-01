@@ -1,12 +1,12 @@
-From 04cfd84423f693d879dc3ffebb0f6fe2680c254f Mon Sep 17 00:00:00 2001
-From: Haiqing Bai <Haiqing.Bai@windriver.com>
-Date: Fri, 18 Mar 2016 15:59:21 +0800
-Subject: [PATCH 3/3] remove des in pkcs11.
+From e816fc06e4f8070b09e677ead4d21768784e4c99 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 19 Jan 2017 03:21:40 -0500
+Subject: [PATCH 2/3] remove des in pkcs11.
 
 Upstream-Status: Pending
 
 Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
-
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
 ---
  pkcs11.h | 8 ++++++++
  1 file changed, 8 insertions(+)
@@ -66,5 +66,5 @@ index b01d58f..98b36e6 100644
  #define CKM_PBE_SHA1_RC2_40_CBC		(0x3ab)
  #define CKM_PKCS5_PBKD2			(0x3b0)
 -- 
-1.9.1
+2.8.1
 

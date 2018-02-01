@@ -1,21 +1,21 @@
-From 6d85e6cc3ab97c3f060e5e0a8e3f1945a14c86ba Mon Sep 17 00:00:00 2001
-From: Gianfranco Costamagna <gianfranco.costamagna@abinsula.com>
-Date: Mon, 12 Oct 2015 12:15:51 +0200
-Subject: [PATCH] Add initial cross compile support (rebase from Petter Mabäcker <petter@technux.se> version)
+From ca25788e2563bad0d554deb9f4300d1e7d062825 Mon Sep 17 00:00:00 2001
+From: Aurelian Zanoschi <aurelian17@gmail.com>
+Date: Mon, 31 Jul 2017 20:25:15 +0300
+Subject: [PATCH] Add initial cross compile support
 
 ---
- devLib/Makefile             |   54 ++++++++++++++++++++++++-------------------
- examples/Gertboard/Makefile |   22 +++++++++++-------
- examples/Makefile           |   22 +++++++++++-------
- examples/PiFace/Makefile    |   22 +++++++++++-------
- examples/PiGlow/Makefile    |    4 ++--
- examples/q2w/Makefile       |    4 ++--
- gpio/Makefile               |   29 ++++++++++++-----------
- wiringPi/Makefile           |   50 +++++++++++++++++++++------------------
- 8 files changed, 119 insertions(+), 88 deletions(-)
+ devLib/Makefile             | 54 +++++++++++++++++++++++++--------------------
+ examples/Gertboard/Makefile | 22 +++++++++++-------
+ examples/Makefile           | 22 +++++++++++-------
+ examples/PiFace/Makefile    | 22 +++++++++++-------
+ examples/PiGlow/Makefile    |  4 ++--
+ examples/q2w/Makefile       |  4 ++--
+ gpio/Makefile               | 29 ++++++++++++------------
+ wiringPi/Makefile           | 52 ++++++++++++++++++++++++-------------------
+ 8 files changed, 120 insertions(+), 89 deletions(-)
 
 diff --git a/devLib/Makefile b/devLib/Makefile
-index 0fb0033..cbea759 100644
+index cf665d6..040c03a 100644
 --- a/devLib/Makefile
 +++ b/devLib/Makefile
 @@ -31,15 +31,19 @@ ifneq ($V,1)
@@ -46,7 +46,7 @@ index 0fb0033..cbea759 100644
  
  LIBS    =
  
-@@ -66,16 +70,16 @@ $(STATIC):	$(OBJ)
+@@ -68,16 +72,16 @@ $(STATIC):	$(OBJ)
  
  $(DYNAMIC):	$(OBJ)
  	$Q echo "[Link (Dynamic)]"
@@ -66,7 +66,7 @@ index 0fb0033..cbea759 100644
  
  .PHONY:	tags
  tags:	$(SRC)
-@@ -86,22 +90,22 @@ tags:	$(SRC)
+@@ -88,22 +92,22 @@ tags:	$(SRC)
  .PHONY:	install
  install:	$(DYNAMIC)
  	$Q echo "[Install Headers]"
@@ -99,7 +99,7 @@ index 0fb0033..cbea759 100644
  
  .PHONY:	install-deb
  install-deb:	$(DYNAMIC)
-@@ -116,9 +120,11 @@ install-deb:	$(DYNAMIC)
+@@ -118,9 +122,11 @@ install-deb:	$(DYNAMIC)
  .PHONY:	uninstall
  uninstall:
  	$Q echo "[UnInstall]"
@@ -148,7 +148,7 @@ index 1939ad6..98d1415 100644
  # Should not alter anything below this line
  ###############################################################################
 diff --git a/examples/Makefile b/examples/Makefile
-index e6b9b71..931b167 100644
+index 6d87885..8623816 100644
 --- a/examples/Makefile
 +++ b/examples/Makefile
 @@ -26,14 +26,20 @@ ifneq ($V,1)
@@ -162,7 +162,7 @@ index e6b9b71..931b167 100644
 -CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
 -
 -LDFLAGS	= -L/usr/local/lib
--LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm
+-LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm -lcrypt -lrt
 +DESTDIR?=/usr
 +PREFIX?=/local
 +
@@ -176,12 +176,12 @@ index e6b9b71..931b167 100644
 +CFLAGS	?= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
 +
 +LDFLAGS	?= -L$(LIB_DIR)
-+LDLIBS    ?= -lwiringPi -lwiringPiDev -lpthread -lm
++LDLIBS    ?= -lwiringPi -lwiringPiDev -lpthread -lm -lcrypt -lrt
  
  # Should not alter anything below this line
  ###############################################################################
 diff --git a/examples/PiFace/Makefile b/examples/PiFace/Makefile
-index 4685adc..cfaf902 100644
+index f937c14..ad030b3 100644
 --- a/examples/PiFace/Makefile
 +++ b/examples/PiFace/Makefile
 @@ -26,14 +26,20 @@ ifneq ($V,1)
@@ -214,7 +214,7 @@ index 4685adc..cfaf902 100644
  # Should not alter anything below this line
  ###############################################################################
 diff --git a/examples/PiGlow/Makefile b/examples/PiGlow/Makefile
-index acd4818..dabd64e 100644
+index f182db7..d1ea74f 100644
 --- a/examples/PiGlow/Makefile
 +++ b/examples/PiGlow/Makefile
 @@ -29,10 +29,10 @@ endif
@@ -231,7 +231,7 @@ index acd4818..dabd64e 100644
  
  # Should not alter anything below this line
 diff --git a/examples/q2w/Makefile b/examples/q2w/Makefile
-index 6f50fa0..c5e9f6e 100644
+index 8f773bf..14aa6e4 100644
 --- a/examples/q2w/Makefile
 +++ b/examples/q2w/Makefile
 @@ -29,10 +29,10 @@ endif
@@ -248,7 +248,7 @@ index 6f50fa0..c5e9f6e 100644
  
  ###############################################################################
 diff --git a/gpio/Makefile b/gpio/Makefile
-index 7dcd090..83ec454 100644
+index f41a005..22753ee 100644
 --- a/gpio/Makefile
 +++ b/gpio/Makefile
 @@ -30,13 +30,17 @@ ifneq ($V,1)
@@ -259,7 +259,7 @@ index 7dcd090..83ec454 100644
 -DEBUG	= -O2
 -CC	= gcc
 -INCLUDE	= -I$(DESTDIR)$(PREFIX)/include
--CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
+-CFLAGS	= $(DEBUG) -Wall -Wextra $(INCLUDE) -Winline -pipe
 +INCLUDE_DIR?=$(DESTDIR)$(PREFIX)/include
 +LIB_DIR?=$(DESTDIR)$(PREFIX)/lib
 +BIN_DIR?=$(DESTDIR)$(PREFIX)/bin
@@ -269,10 +269,10 @@ index 7dcd090..83ec454 100644
 +DEBUG	?= -O2
 +CC	?= gcc
 +INCLUDE	?= -I$(INCLUDE_DIR)
-+CFLAGS	?= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
++CFLAGS	?= $(DEBUG) -Wall -Wextra $(INCLUDE) -Winline -pipe
 +
 +LDFLAGS	?= -L$(LIB_DIR)
- LIBS    = -lwiringPi -lwiringPiDev -lpthread
+ LIBS    = -lwiringPi -lwiringPiDev -lpthread -lrt -lm -lcrypt
  
  # May not need to  alter anything below this line
 @@ -72,13 +76,10 @@ tags:	$(SRC)
@@ -293,7 +293,7 @@ index 7dcd090..83ec454 100644
  
  .PHONY:	install-deb
  install-deb:	gpio
-@@ -89,7 +90,7 @@ install-deb:	gpio
+@@ -91,7 +92,7 @@ install-deb:	gpio
  .PHONY:	uninstall
  uninstall:
  	$Q echo "[UnInstall]"
@@ -303,10 +303,10 @@ index 7dcd090..83ec454 100644
  
  .PHONY:	depend
 diff --git a/wiringPi/Makefile b/wiringPi/Makefile
-index 6bbcc5d..5355b74 100644
+index e1868b9..750d290 100644
 --- a/wiringPi/Makefile
 +++ b/wiringPi/Makefile
-@@ -25,19 +25,23 @@ VERSION=$(shell cat ../VERSION)
+@@ -25,21 +25,25 @@ VERSION=$(shell cat ../VERSION)
  DESTDIR?=/usr
  PREFIX?=/local
  
@@ -334,19 +334,22 @@ index 6bbcc5d..5355b74 100644
 +CC	?= gcc
 +INCLUDE	?= -I.
  DEFS	= -D_GNU_SOURCE
- CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Winline $(INCLUDE) -pipe -fPIC
+-CFLAGS	= $(DEBUG) $(DEFS) -Wformat=2 -Wall -Wextra -Winline $(INCLUDE) -pipe -fPIC
++CFLAGS	= $(DEBUG) $(DEFS) $(INCLUDE) -Wformat=2 -Wall -Wextra -Winline -pipe -fPIC
  
-@@ -89,17 +93,17 @@ $(STATIC):	$(OBJ)
+ LIBS    = -lm -lpthread -lrt -lcrypt
+ 
+@@ -78,17 +82,17 @@ $(STATIC):	$(OBJ)
  
  $(DYNAMIC):	$(OBJ)
  	$Q echo "[Link (Dynamic)]"
--	$Q $(CC) -shared -Wl,-soname,libwiringPi.so$(WIRINGPI_SONAME_SUFFIX) -o libwiringPi.so.$(VERSION) -lpthread $(OBJ)
-+	$Q $(CC) $(LDFLAGS) -shared -Wl,-soname,$(BASE_NAME).so.$(DYN_VERS_MAJ) -o $(BASE_NAME).so -lpthread $(OBJ)
+-	$Q $(CC) -shared -Wl,-soname,libwiringPi.so$(WIRINGPI_SONAME_SUFFIX) -o libwiringPi.so.$(VERSION) $(LIBS) $(OBJ)
++	$Q $(CC) $(LDFLAGS) -shared -Wl,-soname,$(BASE_NAME).so.$(DYN_VERS_MAJ) -o $(BASE_NAME).so $(OBJ) $(LIBS)
  
  .c.o:
  	$Q echo [Compile] $<
 -	$Q $(CC) -c $(CFLAGS) $< -o $@
-+	$Q $(CC) -c $(CFLAGS) -fPIC $< -o $@
++	$Q $(CC) $(CFLAGS) $(LIBS) -c $< -o $@
  
  
  .PHONY:	clean
@@ -357,7 +360,7 @@ index 6bbcc5d..5355b74 100644
  
  .PHONY:	tags
  tags:	$(SRC)
-@@ -110,22 +114,22 @@ tags:	$(SRC)
+@@ -99,22 +103,22 @@ tags:	$(SRC)
  .PHONY:	install
  install:	$(DYNAMIC)
  	$Q echo "[Install Headers]"
@@ -390,7 +393,7 @@ index 6bbcc5d..5355b74 100644
  
  .PHONY:	install-deb
  install-deb:	$(DYNAMIC)
-@@ -140,9 +144,11 @@ install-deb:	$(DYNAMIC)
+@@ -129,9 +133,11 @@ install-deb:	$(DYNAMIC)
  .PHONY:	uninstall
  uninstall:
  	$Q echo "[UnInstall]"
@@ -406,5 +409,5 @@ index 6bbcc5d..5355b74 100644
  
  .PHONY:	depend
 -- 
-2.1.4
+2.7.4
 

@@ -18,23 +18,24 @@ def runstrip(arg):
         newmode = origmode | stat.S_IWRITE | stat.S_IREAD
         os.chmod(file, newmode)
 
-    extraflags = ""
+    stripcmd = [strip]
 
     # kernel module    
     if elftype & 16:
-        extraflags = "--strip-debug --remove-section=.comment --remove-section=.note --preserve-dates"
+        stripcmd.extend(["--strip-debug", "--remove-section=.comment",
+            "--remove-section=.note", "--preserve-dates"])
     # .so and shared library
     elif ".so" in file and elftype & 8:
-        extraflags = "--remove-section=.comment --remove-section=.note --strip-unneeded"
+        stripcmd.extend(["--remove-section=.comment", "--remove-section=.note", "--strip-unneeded"])
     # shared or executable:
     elif elftype & 8 or elftype & 4:
-        extraflags = "--remove-section=.comment --remove-section=.note"
+        stripcmd.extend(["--remove-section=.comment", "--remove-section=.note"])
 
-    stripcmd = "'%s' %s '%s'" % (strip, extraflags, file)
+    stripcmd.append(file)
     bb.debug(1, "runstrip: %s" % stripcmd)
 
     try:
-        output = subprocess.check_output(stripcmd, stderr=subprocess.STDOUT, shell=True)
+        output = subprocess.check_output(stripcmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
         bb.error("runstrip: '%s' strip command failed with %s (%s)" % (stripcmd, e.returncode, e.output))
 
@@ -60,32 +61,59 @@ def filedeprunner(arg):
     provides = {}
     requires = {}
 
-    r = re.compile(r'[<>=]+ +[^ ]*')
+    file_re = re.compile(r'\s+\d+\s(.*)')
+    dep_re = re.compile(r'\s+(\S)\s+(.*)')
+    r = re.compile(r'[<>=]+\s+\S*')
 
     def process_deps(pipe, pkg, pkgdest, provides, requires):
+        file = None
         for line in pipe:
-            f = line.decode("utf-8").split(" ", 1)[0].strip()
-            line = line.decode("utf-8").split(" ", 1)[1].strip()
+            line = line.decode("utf-8")
 
-            if line.startswith("Requires:"):
+            m = file_re.match(line)
+            if m:
+                file = m.group(1)
+                file = file.replace(pkgdest + "/" + pkg, "")
+                file = file_translate(file)
+                continue
+
+            m = dep_re.match(line)
+            if not m or not file:
+                continue
+
+            type, dep = m.groups()
+
+            if type == 'R':
                 i = requires
-            elif line.startswith("Provides:"):
+            elif type == 'P':
                 i = provides
             else:
+               continue
+
+            if dep.startswith("python("):
                 continue
 
-            file = f.replace(pkgdest + "/" + pkg, "")
-            file = file_translate(file)
-            value = line.split(":", 1)[1].strip()
-            value = r.sub(r'(\g<0>)', value)
+            # Ignore all perl(VMS::...) and perl(Mac::...) dependencies. These
+            # are typically used conditionally from the Perl code, but are
+            # generated as unconditional dependencies.
+            if dep.startswith('perl(VMS::') or dep.startswith('perl(Mac::'):
+                continue
 
-            if value.startswith("rpmlib("):
+            # Ignore perl dependencies on .pl files.
+            if dep.startswith('perl(') and dep.endswith('.pl)'):
                 continue
-            if value == "python":
-                continue
+
+            # Remove perl versions and perl module versions since they typically
+            # do not make sense when used as package versions.
+            if dep.startswith('perl') and r.search(dep):
+                dep = dep.split()[0]
+
+            # Put parentheses around any version specifications.
+            dep = r.sub(r'(\g<0>)',dep)
+
             if file not in i:
                 i[file] = []
-            i[file].append(value)
+            i[file].append(dep)
 
         return provides, requires
 
@@ -103,7 +131,7 @@ def read_shlib_providers(d):
     import re
 
     shlib_provider = {}
-    shlibs_dirs = d.getVar('SHLIBSDIRS', True).split()
+    shlibs_dirs = d.getVar('SHLIBSDIRS').split()
     list_re = re.compile('^(.*)\.list$')
     # Go from least to most specific since the last one found wins
     for dir in reversed(shlibs_dirs):
@@ -149,6 +177,7 @@ def npm_split_package_dirs(pkgdir):
                         continue
                     pkgitems.append(pathitem)
                 pkgname = '-'.join(pkgitems).replace('_', '-')
+                pkgname = pkgname.replace('@', '')
                 pkgfile = os.path.join(root, dn, 'package.json')
                 data = None
                 if os.path.exists(pkgfile):

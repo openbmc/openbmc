@@ -1,0 +1,33 @@
+From a41cbeee3cf660663a9baac80545050a8d960898 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Mar 2017 18:09:58 -0700
+Subject: [PATCH 2/2] user ipv6 structures
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ l2tp_api.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/l2tp_api.c b/l2tp_api.c
+index 9d6f60a..f0946fd 100644
+--- a/l2tp_api.c
++++ b/l2tp_api.c
+@@ -450,10 +450,12 @@ int l2tp_api_rpc_check_request(SVCXPRT *xprt)
+ 	 * non-loopback interface, reject the request.
+ 	 */
+ 	if ((!l2tp_opt_remote_rpc) &&
+-	    ((xprt->xp_raddr.sin_addr.s_addr != htonl(INADDR_LOOPBACK)) &&
+-	     (xprt->xp_raddr.sin_addr.s_addr != htonl(INADDR_ANY)))) {
++	    ((xprt->xp_raddr.sin6_addr.s6_addr != htonl(INADDR_LOOPBACK)) &&
++	     (xprt->xp_raddr.sin6_addr.s6_addr != htonl(INADDR_ANY)))) {
++		char straddr[INET6_ADDRSTRLEN];
++		inet_ntop(AF_INET6, &xprt->xp_raddr.sin6_addr, straddr, sizeof(straddr));
+ 		if (l2tp_opt_trace_flags & L2TP_DEBUG_API) {
+-			l2tp_log(LOG_ERR, "Rejecting RPC request from %s", inet_ntoa(xprt->xp_raddr.sin_addr));
++			l2tp_log(LOG_ERR, "Rejecting RPC request from %s", straddr);
+ 		}
+ 		svcerr_auth(xprt, AUTH_TOOWEAK);
+ 		return -EPERM;
+-- 
+2.12.1
+

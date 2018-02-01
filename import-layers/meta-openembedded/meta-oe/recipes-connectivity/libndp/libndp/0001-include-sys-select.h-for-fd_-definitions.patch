@@ -1,0 +1,25 @@
+From 94e9a082d76414f82794b0c9817d0c24e3868275 Mon Sep 17 00:00:00 2001
+From: Kylie McClain <somasis@exherbo.org>
+Date: Sat, 21 May 2016 21:24:36 -0400
+Subject: [PATCH] ndptool: Fix compilation on musl libc
+
+FD_ZERO, fd_set, etc are defined within sys/select.h on musl.
+
+Signed-off-by: Kylie McClain <somasis@exherbo.org>
+Signed-off-by: Jiri Pirko <jiri@mellanox.com>
+---
+ utils/ndptool.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/utils/ndptool.c b/utils/ndptool.c
+index 1d96f4c..96479fa 100644
+--- a/utils/ndptool.c
++++ b/utils/ndptool.c
+@@ -28,6 +28,7 @@
+ #include <arpa/inet.h>
+ #include <errno.h>
+ #include <ndp.h>
++#include <sys/select.h>
+ 
+ enum verbosity_level {
+ 	VERB1,

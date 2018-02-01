@@ -1,0 +1,29 @@
+From 9c2438e85e4d7deb9422be257a25e8ab16093821 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Dec 2016 14:02:02 -0800
+Subject: [PATCH] undefined strdup macro
+
+build fails due to strdup define in string2.h
+system header.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dmalloc.h.3 | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/dmalloc.h.3 b/dmalloc.h.3
+index 8bda997..b70c07e 100644
+--- a/dmalloc.h.3
++++ b/dmalloc.h.3
+@@ -1,5 +1,8 @@
+ /* NOTE: start of $Id: dmalloc.h.4,v 1.15 2007/05/14 17:23:37 gray Exp $ */
+ 
++#undef strndup
++#undef strdup
++
+ /* dmalloc version defines */
+ #define DMALLOC_VERSION_MAJOR	5	/* X.0.0 */
+ #define DMALLOC_VERSION_MINOR	5	/* 0.X.0 */
+-- 
+2.10.2
+

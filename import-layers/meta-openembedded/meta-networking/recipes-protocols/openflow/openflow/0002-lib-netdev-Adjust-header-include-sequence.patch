@@ -1,0 +1,59 @@
+From 5bba224edea38607e8732081f86679ffd8b218ab Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Jul 2017 04:29:04 -0700
+Subject: [PATCH 2/2] lib/netdev: Adjust header include sequence
+
+Specify libc headers before kernel UAPIs
+this helps compiling with musl where otherwise
+it uses the definition from kernel and complains
+about double definition in libc headers
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/netdev.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/lib/netdev.c b/lib/netdev.c
+index 3b6fbc5..c7de25e 100644
+--- a/lib/netdev.c
++++ b/lib/netdev.c
+@@ -39,7 +39,6 @@
+ #include <fcntl.h>
+ #include <arpa/inet.h>
+ #include <inttypes.h>
+-#include <linux/if_tun.h>
+ 
+ /* Fix for some compile issues we were experiencing when setting up openwrt
+  * with the 2.4 kernel. linux/ethtool.h seems to use kernel-style inttypes,
+@@ -57,10 +56,6 @@
+ #define s64 __s64
+ #endif
+ 
+-#include <linux/ethtool.h>
+-#include <linux/rtnetlink.h>
+-#include <linux/sockios.h>
+-#include <linux/version.h>
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+@@ -68,12 +63,16 @@
+ #include <net/ethernet.h>
+ #include <net/if.h>
+ #include <net/if_arp.h>
+-#include <net/if_packet.h>
+ #include <net/route.h>
+ #include <netinet/in.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <linux/ethtool.h>
++#include <linux/rtnetlink.h>
++#include <linux/sockios.h>
++#include <linux/version.h>
++#include <linux/if_tun.h>
+ 
+ #include "fatal-signal.h"
+ #include "list.h"
+-- 
+2.13.3
+

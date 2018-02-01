@@ -36,3 +36,4 @@ getcwd takes a NULL argument: OK
 Checking for small off_t: NO
 Checking whether blkcnt_t is 32 bit: NO
 Checking whether blkcnt_t is 64 bit: OK
+Checking whether fcntl lock supports open file description locks: OK

@@ -2,6 +2,8 @@
 
 SRC_URI += "file://relative-libdir.patch;striplevel=0 \
            "
+# This patch should be applied after '(attr\|acl)-Missing-configure.ac.patch' 
+SRC_URI_append = " file://0001-Added-configure-option-to-enable-disable-static-libr.patch"
 
 inherit autotools-brokensep gettext
 
@@ -10,7 +12,7 @@ inherit autotools-brokensep gettext
 EXTRA_AUTORECONF += "--exclude=autoheader"
 EXTRA_OECONF = "INSTALL_USER=root INSTALL_GROUP=root"
 EXTRA_OECONF_append_class-native = " --enable-gettext=no"
-EXTRA_OECONF_append_class-target = "${@['', ' --disable-gettext '][(d.getVar('USE_NLS', True) == 'no')]}"
+EXTRA_OECONF_append_class-target = "${@['', ' --disable-gettext '][(d.getVar('USE_NLS') == 'no')]}"
 
 EXTRA_OEMAKE = "PKG_LIB_DIR=${base_libdir} PKG_DEVLIB_DIR=${libdir}"
 
@@ -22,8 +24,8 @@ do_install_append_class-native () {
 	if test "${libdir}" = "${base_libdir}" ; then
 		return
 	fi
-	librelpath=${@os.path.relpath(d.getVar('libdir',True), d.getVar('base_libdir', True))}
-	baselibrelpath=${@os.path.relpath(d.getVar('base_libdir',True), d.getVar('libdir', True))}
+	librelpath=${@os.path.relpath(d.getVar('libdir'), d.getVar('base_libdir'))}
+	baselibrelpath=${@os.path.relpath(d.getVar('base_libdir'), d.getVar('libdir'))}
 
 	# Remove bad symlinks & create the correct symlinks
 	if test -L ${D}${libdir}/lib${BPN}.so ; then
@@ -46,5 +48,5 @@ FILES_lib${BPN} = "${base_libdir}/lib*${SOLIBS}"
 
 BBCLASSEXTEND = "native"
 # Only append ldflags for target recipe and if USE_NLS is enabled
-LDFLAGS_append_libc-uclibc_class-target = "${@['', ' -lintl '][(d.getVar('USE_NLS', True) == 'yes')]}"
-EXTRA_OECONF_append_libc-uclibc_class-target = "${@['', ' --disable-gettext '][(d.getVar('USE_NLS', True) == 'no')]}"
+LDFLAGS_append_libc-uclibc_class-target = "${@['', ' -lintl '][(d.getVar('USE_NLS') == 'yes')]}"
+EXTRA_OECONF_append_libc-uclibc_class-target = "${@['', ' --disable-gettext '][(d.getVar('USE_NLS') == 'no')]}"

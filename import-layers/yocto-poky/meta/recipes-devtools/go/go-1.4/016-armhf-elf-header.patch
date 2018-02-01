@@ -1,0 +1,24 @@
+Description: Use correct ELF header for armhf binaries.
+Author: Adam Conrad <adconrad@ubuntu.com>
+Last-Update: 2013-07-08
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: go/src/cmd/ld/elf.c
+===================================================================
+--- go.orig/src/cmd/ld/elf.c	2015-02-20 10:49:58.763451586 -0800
++++ go/src/cmd/ld/elf.c	2015-02-20 10:49:27.895478521 -0800
+@@ -57,7 +57,11 @@
+ 	case '5':
+ 		// we use EABI on both linux/arm and freebsd/arm.
+ 		if(HEADTYPE == Hlinux || HEADTYPE == Hfreebsd)
+-			hdr.flags = 0x5000002; // has entry point, Version5 EABI
++#ifdef __ARM_PCS_VFP
++			hdr.flags = 0x5000402; // has entry point, Version5 EABI, hard-float ABI
++#else
++			hdr.flags = 0x5000202; // has entry point, Version5 EABI, soft-float ABI
++#endif
+ 		// fallthrough
+ 	default:
+ 		hdr.phoff = ELF32HDRSIZE;	/* Must be be ELF32HDRSIZE: first PHdr must follow ELF header */

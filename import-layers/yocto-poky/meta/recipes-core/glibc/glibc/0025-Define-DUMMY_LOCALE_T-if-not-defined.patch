@@ -1,7 +1,7 @@
-From 89ec25290d34413ce5c8ba6c378e31dbae3a37c0 Mon Sep 17 00:00:00 2001
+From c2d8cdeab116caacdfedb35eeb3e743b44807bec Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 20 Apr 2016 21:11:00 -0700
-Subject: [PATCH 25/25] Define DUMMY_LOCALE_T if not defined
+Subject: [PATCH 25/26] Define DUMMY_LOCALE_T if not defined
 
 This is a hack to fix building the locale bits on an older
 CentOs 5.X machine
@@ -28,5 +28,5 @@ index f606365..0e5f8c3 100644
  #define PACKAGE _libc_intl_domainname
  #ifndef VERSION
 -- 
-2.8.2
+2.10.2
 

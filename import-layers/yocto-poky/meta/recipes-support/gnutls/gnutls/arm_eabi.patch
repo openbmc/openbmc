@@ -1,0 +1,19 @@
+Certain syscall's are not availabe for arm-eabi, so we eliminate
+reference to them.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+--- a/tests/seccomp.c
++++ b/tests/seccomp.c
+@@ -49,7 +49,9 @@ int disable_system_calls(void)
+ 	}
+ 
+ 	ADD_SYSCALL(nanosleep, 0);
++#if ! defined(__ARM_EABI__)
+ 	ADD_SYSCALL(time, 0);
++#endif
+ 	ADD_SYSCALL(getpid, 0);
+ 	ADD_SYSCALL(gettimeofday, 0);
+ #if defined(HAVE_CLOCK_GETTIME)

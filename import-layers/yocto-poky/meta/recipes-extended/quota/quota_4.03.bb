@@ -22,6 +22,8 @@ SRC_URI_append_libc-musl = " file://replace_getrpcbynumber_r.patch"
 SRC_URI[md5sum] = "6b09f9c93515c25a528be5754cdfb6f5"
 SRC_URI[sha256sum] = "9c6c4d9ae7bf30506dd2aa3d8056c4ff2f8d087930d7c721616f5c093bdc674b"
 
+CVE_PRODUCT = "linux_diskquota"
+
 UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/linuxquota/files/quota-tools/"
 UPSTREAM_CHECK_REGEX = "/quota-tools/(?P<pver>(\d+[\.\-_]*)+)/"
 

@@ -1,0 +1,40 @@
+From: Ian Jackson <ijackson@chiark.greenend.org.uk>
+Applied-Upstream: no
+Bug-Debian: http://bugs.debian.org/579604
+Subject: oop-read.h bugfixes
+
+Some years ago I contributed a feature for reading lines and records
+to liboop: oop-read.h and read.c.  Since it took a while for that
+feature to make it into distributed versions, for a long time I've
+been using my own copy of the source file.  It seems that I fixed a
+couple of bugs in my copy which are still in the Debian package.  I
+can't find any record of me having told anyone about them and now I
+find that 1.0-6 still has the bugs.
+
+There are two fixes:
+ * Initialise "rd->discard" properly
+ * Avoid rd->neednotcheck becoming negative
+
+--- a/read.c
++++ b/read.c
+@@ -114,6 +114,7 @@ oop_read *oop_rd_new(oop_source *oop, oo
+   rd->allocbuf= 0;
+   rd->used= 0;
+   rd->alloc= buf ? bufsz : 0;
++  rd->discard= 0;
+   rd->neednotcheck= 0;
+   rd->displacedchar= -1;
+   rd->style= *OOP_RD_STYLE_IMMED;
+@@ -235,7 +236,11 @@ static void *on_process(oop_source *oop,
+   
+   if (rd->discard) {
+     rd->used -= rd->discard;
+-    rd->neednotcheck -= rd->discard;
++    if (rd->neednotcheck > rd->discard) {
++      rd->neednotcheck -= rd->discard;
++    } else {
++      rd->neednotcheck= 0;
++    }
+     memmove(buf, buf + rd->discard, rd->used);
+     rd->discard= 0;
+   }

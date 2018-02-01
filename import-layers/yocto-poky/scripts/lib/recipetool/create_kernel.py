@@ -41,7 +41,7 @@ class KernelRecipeHandler(RecipeHandler):
         handled.append('buildsystem')
         del lines_after[:]
         del classes[:]
-        template = os.path.join(tinfoil.config_data.getVar('COREBASE', True), 'meta-skeleton', 'recipes-kernel', 'linux', 'linux-yocto-custom.bb')
+        template = os.path.join(tinfoil.config_data.getVar('COREBASE'), 'meta-skeleton', 'recipes-kernel', 'linux', 'linux-yocto-custom.bb')
         def handle_var(varname, origvalue, op, newlines):
             if varname in ['SRCREV', 'SRCREV_machine']:
                 while newlines[-1].startswith('#'):
@@ -85,7 +85,7 @@ class KernelRecipeHandler(RecipeHandler):
             elif varname == 'COMPATIBLE_MACHINE':
                 while newlines[-1].startswith('#'):
                     del newlines[-1]
-                machine = tinfoil.config_data.getVar('MACHINE', True)
+                machine = tinfoil.config_data.getVar('MACHINE')
                 return machine, op, 0, True
             return origvalue, op, 0, True
         with open(template, 'r') as f:

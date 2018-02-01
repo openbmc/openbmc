@@ -1,0 +1,47 @@
+From acec93540eba6899661c607408498ac72ab07a47 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Bollo?= <jose.bollo@iot.bzh>
+Date: Tue, 7 Mar 2017 16:03:03 +0100
+Subject: [PATCH] useradd: copy extended attributes of home
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The Home directory wasn't getting the extended attributes
+of /etc/skel. This patch fixes that issue and adds the copy
+of the extended attributes of the root of the home directory.
+
+Upstream-Status: Submitted [http://lists.alioth.debian.org/pipermail/pkg-shadow-commits/2017-March/003804.html]
+
+Change-Id: Icd633f7c6c494efd2a30cb8f04c306f749ad0c3b
+Signed-off-by: José Bollo <jose.bollo@iot.bzh>
+---
+ src/useradd.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/useradd.c b/src/useradd.c
+index a8a1f76..8aefb9c 100644
+--- a/src/useradd.c
++++ b/src/useradd.c
+@@ -52,6 +52,9 @@
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <time.h>
++#ifdef WITH_ATTR
++#include <attr/libattr.h>
++#endif
+ #include "chkname.h"
+ #include "defines.h"
+ #include "faillog.h"
+@@ -1915,6 +1918,9 @@ static void create_home (void)
+ 		chown (user_home, user_id, user_gid);
+ 		chmod (user_home,
+ 		       0777 & ~getdef_num ("UMASK", GETDEF_DEFAULT_UMASK));
++#ifdef WITH_ATTR
++		attr_copy_file (def_template, user_home, NULL, NULL);
++#endif
+ 		home_added = true;
+ #ifdef WITH_AUDIT
+ 		audit_logger (AUDIT_ADD_USER, Prog,
+-- 
+2.9.3
+

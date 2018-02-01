@@ -1,0 +1,17 @@
+help compile when S != B
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: ssmtp-2.64/Makefile.in
+===================================================================
+--- ssmtp-2.64.orig/Makefile.in
++++ ssmtp-2.64/Makefile.in
+@@ -24,7 +24,7 @@ INSTALLED_REVALIASES_FILE=$(REVALIASES_F
+ # Programs
+ GEN_CONFIG=$(srcdir)/generate_config
+ 
+-SRCS=ssmtp.c arpadate.c base64.c xgethostname.c @SRCS@
++SRCS=$(srcdir)/ssmtp.c $(srcdir)/arpadate.c $(srcdir)/base64.c $(srcdir)/xgethostname.c @SRCS@
+ 
+ OBJS=$(SRCS:.c=.o)
+ 

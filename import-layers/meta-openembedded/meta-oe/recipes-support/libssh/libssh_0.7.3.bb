@@ -16,7 +16,7 @@ EXTRA_OECMAKE = " \
     -DWITH_PCAP=1 \
     -DWITH_SFTP=1 \
     -DWITH_ZLIB=1 \
-    -DLIB_SUFFIX=${@d.getVar('baselib', True).replace('lib', '')} \
+    -DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')} \
     "
 
 PACKAGECONFIG ??=""
@@ -31,3 +31,4 @@ do_configure_prepend () {
 }
 
 FILES_${PN}-dev += "${libdir}/cmake"
+TOOLCHAIN = "gcc"

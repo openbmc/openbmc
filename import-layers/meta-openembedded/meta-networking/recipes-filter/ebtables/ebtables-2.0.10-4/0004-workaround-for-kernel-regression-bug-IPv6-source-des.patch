@@ -1,0 +1,28 @@
+From b0617af37b8b1aafb43e8019135bea44c2d94c28 Mon Sep 17 00:00:00 2001
+From: Luis Fernando <tdthp@terra.com.br>
+Date: Wed, 3 Jul 2013 22:19:55 +0200
+Subject: [PATCH 04/10] workaround for kernel regression bug: IPv6
+ source/destination addresses are potentially not matched correctly
+
+---
+ extensions/ebt_ip6.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/extensions/ebt_ip6.c b/extensions/ebt_ip6.c
+index 0465e77..bbdc4ae 100644
+--- a/extensions/ebt_ip6.c
++++ b/extensions/ebt_ip6.c
+@@ -312,6 +312,10 @@ static void init(struct ebt_entry_match *match)
+ 
+ 	ipinfo->invflags = 0;
+ 	ipinfo->bitmask = 0;
++	memset(ipinfo->saddr.s6_addr, 0, sizeof(ipinfo->saddr.s6_addr));
++	memset(ipinfo->smsk.s6_addr, 0, sizeof(ipinfo->smsk.s6_addr));
++	memset(ipinfo->daddr.s6_addr, 0, sizeof(ipinfo->daddr.s6_addr));
++	memset(ipinfo->dmsk.s6_addr, 0, sizeof(ipinfo->dmsk.s6_addr));
+ }
+ 
+ #define OPT_SOURCE 0x01
+-- 
+2.12.1
+

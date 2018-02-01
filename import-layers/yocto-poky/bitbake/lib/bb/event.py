@@ -48,6 +48,16 @@ class Event(object):
     def __init__(self):
         self.pid = worker_pid
 
+
+class HeartbeatEvent(Event):
+    """Triggered at regular time intervals of 10 seconds. Other events can fire much more often
+       (runQueueTaskStarted when there are many short tasks) or not at all for long periods
+       of time (again runQueueTaskStarted, when there is just one long-running task), so this
+       event is more suitable for doing some task-independent work occassionally."""
+    def __init__(self, time):
+        Event.__init__(self)
+        self.time = time
+
 Registered        = 10
 AlreadyRegistered = 14
 
@@ -351,6 +361,17 @@ class RecipeEvent(Event):
 class RecipePreFinalise(RecipeEvent):
     """ Recipe Parsing Complete but not yet finialised"""
 
+class RecipeTaskPreProcess(RecipeEvent):
+    """
+    Recipe Tasks about to be finalised
+    The list of tasks should be final at this point and handlers
+    are only able to change interdependencies
+    """
+    def __init__(self, fn, tasklist):
+        self.fn = fn
+        self.tasklist = tasklist
+        Event.__init__(self)
+
 class RecipeParsed(RecipeEvent):
     """ Recipe Parsing Complete """
 
@@ -372,7 +393,7 @@ class StampUpdate(Event):
     targets = property(getTargets)
 
 class BuildBase(Event):
-    """Base class for bbmake run events"""
+    """Base class for bitbake build events"""
 
     def __init__(self, n, p, failures = 0):
         self._name = n
@@ -417,13 +438,13 @@ class BuildInit(BuildBase):
         BuildBase.__init__(self, name, p)
 
 class BuildStarted(BuildBase, OperationStarted):
-    """bbmake build run started"""
+    """Event when builds start"""
     def __init__(self, n, p, failures = 0):
         OperationStarted.__init__(self, "Building Started")
         BuildBase.__init__(self, n, p, failures)
 
 class BuildCompleted(BuildBase, OperationCompleted):
-    """bbmake build run completed"""
+    """Event when builds have completed"""
     def __init__(self, total, n, p, failures=0, interrupted=0):
         if not failures:
             OperationCompleted.__init__(self, total, "Building Succeeded")
@@ -440,6 +461,23 @@ class DiskFull(Event):
         self._type = type
         self._free = freespace
         self._mountpoint = mountpoint
+
+class DiskUsageSample:
+    def __init__(self, available_bytes, free_bytes, total_bytes):
+        # Number of bytes available to non-root processes.
+        self.available_bytes = available_bytes
+        # Number of bytes available to root processes.
+        self.free_bytes = free_bytes
+        # Total capacity of the volume.
+        self.total_bytes = total_bytes
+
+class MonitorDiskEvent(Event):
+    """If BB_DISKMON_DIRS is set, then this event gets triggered each time disk space is checked.
+       Provides information about devices that are getting monitored."""
+    def __init__(self, disk_usage):
+        Event.__init__(self)
+        # hash of device root path -> DiskUsageSample
+        self.disk_usage = disk_usage
 
 class NoProvider(Event):
     """No Provider for an Event"""

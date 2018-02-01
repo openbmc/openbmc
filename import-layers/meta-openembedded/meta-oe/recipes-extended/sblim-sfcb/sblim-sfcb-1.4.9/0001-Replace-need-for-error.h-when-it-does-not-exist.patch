@@ -1,0 +1,124 @@
+From 394bf0f1ed07419d40f6024363cc1ffc7ef61bc6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Aug 2017 21:56:25 -0700
+Subject: [PATCH] Replace need for error.h when it does not exist
+
+helps fixing build on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ brokerUpc.c   |  5 ++++-
+ configure.ac  |  2 +-
+ httpAdapter.c |  4 +++-
+ support.c     | 14 +++++++++++++-
+ trace.c       |  4 +++-
+ 5 files changed, 24 insertions(+), 5 deletions(-)
+
+diff --git a/brokerUpc.c b/brokerUpc.c
+index 17cbd9b..fe2b347 100644
+--- a/brokerUpc.c
++++ b/brokerUpc.c
+@@ -20,8 +20,11 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#ifdef HAVE_ERROR_H
+ #include <error.h>
+-
++#else
++#include <err.h>
++#endif
+ #include "support.h"
+ #include "native.h"
+ #include <sfcCommon/utilft.h>
+diff --git a/configure.ac b/configure.ac
+index ab2964e..d4915a1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -517,7 +517,7 @@ fi
+ # Checks for header files.
+ AC_HEADER_STDC
+ AC_HEADER_SYS_WAIT
+-AC_CHECK_HEADERS([fcntl.h limits.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/time.h unistd.h zlib.h])
++AC_CHECK_HEADERS([error.h fcntl.h limits.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/time.h unistd.h zlib.h])
+ AC_CHECK_HEADERS([cmpi/cmpimacs.h cmpi/cmpift.h cmpi/cmpidt.h],[],[AC_MSG_ERROR([Could not find required CPMI header.])])
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+diff --git a/httpAdapter.c b/httpAdapter.c
+index 2719e6c..e768972 100644
+--- a/httpAdapter.c
++++ b/httpAdapter.c
+@@ -71,7 +71,9 @@
+ #ifdef HAVE_UDS
+ #include <grp.h>
+ #endif
+-
++#ifndef __SOCKADDR_ARG
++# define __SOCKADDR_ARG         struct sockaddr *__restrict
++#endif
+ /* should probably go into cimRequest.h */
+ #define CIM_PROTOCOL_ANY     0
+ #define CIM_PROTOCOL_CIM_XML 1
+diff --git a/support.c b/support.c
+index c7bba8b..5b3eef1 100644
+--- a/support.c
++++ b/support.c
+@@ -32,7 +32,11 @@
+ #include "support.h"
+ #include <stdio.h>
+ #include <stdlib.h>
++#ifdef HAVE_ERROR_H
+ #include <error.h>
++#else
++#include <err.h>
++#endif
+ #include <errno.h>
+ #include "native.h"
+ #include "trace.h"
+@@ -331,17 +335,25 @@ loadQualifierDeclMI(const char *provider,
+   _SFCB_RETURN(NULL);
+ };
+ 
++
+ /****************************************************************************/
+ 
+ /** Exits the program with a memory allocation error message in case the given 
+  *  condition holds.
+  */
++#if HAVE_ERROR_H
+ #define __ALLOC_ERROR(cond) \
+   if ( cond ) { \
+     error_at_line ( -1, errno, __FILE__, __LINE__, \
+ 		    "unable to allocate requested memory." ); \
+   }
+-
++#else
++#define __ALLOC_ERROR(cond) \
++  if ( cond ) { \
++    err(1, "%s:%d: %s", __FILE__, __LINE__, \
++		    "unable to allocate requested memory." ); \
++  }
++#endif
+ /**
+  * flag to ensure MM is initialized only once
+  */
+diff --git a/trace.c b/trace.c
+index d7f30db..438af46 100644
+--- a/trace.c
++++ b/trace.c
+@@ -279,7 +279,9 @@ _sfcb_trap(int tn)
+   }
+ #endif
+ }
+-
++#ifndef SA_INTERRUPT
++# define SA_INTERRUPT 0x20000000 /* from GLIBC's <bits/sigaction.h> */
++#endif
+ sigHandler     *
+ setSignal(int sn, sigHandler * sh, int flags)
+ {
+-- 
+2.14.1
+

@@ -1,0 +1,41 @@
+Subject: [PATCH] ipmi-init: fix the arguments
+
+The functions success/failure/warning defined in /etc/init.d/functions
+(provided by initscripts) only accepts numeric argument as return code,
+not a string.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ ipmi.init | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ipmi.init b/ipmi.init
+index 2ebcd94..d8161c5 100644
+--- a/ipmi.init
++++ b/ipmi.init
+@@ -45,17 +45,17 @@ elif [ -r /etc/init.d/functions ]; then
+ 	case "$ACTION" in
+ 	    success)
+ 		echo -n $*
+-		success "$*"
++		success 0
+ 		echo
+ 		;;
+ 	    failure)
+ 		echo -n $*
+-		failure "$*"
++		failure 1
+ 		echo
+ 		;;
+ 	    warning)
+ 		echo -n $*
+-		warning "$*"
++		warning 0
+ 		echo
+ 		;;
+ 	    *)
+-- 
+1.9.1
+

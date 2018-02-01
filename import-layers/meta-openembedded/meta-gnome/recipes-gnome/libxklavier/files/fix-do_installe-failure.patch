@@ -1,0 +1,36 @@
+From 2343283caf88d2390afee08fe034b4c970b20f2e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 16 Apr 2016 06:40:04 -0400
+Subject: [PATCH] fix do_installe failure
+
+| 18  /usr/bin/install -c -m 644 ../../libxklavier-5.4/libxklavier/libxklavier.vapi
+libxklavier.deps 'tmp/work/corei7-64-wrs-linux/libxklavier/5.4-r0/image/
+usr/share/vala/vapi'
+| 19 /usr/bin/install: cannot stat '../../libxklavier-5.4/libxklavier/
+libxklavier.vapi': No such file or directory
+| 20 Makefile:621: recipe for target 'install-vapiDATA' failed
+| 21 make[3]: *** [install-vapiDATA] Error 1
+| 22 make[3]: *** Waiting for unfinished jobs....
+
+Upstream-Stauts: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ libxklavier/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libxklavier/Makefile.am b/libxklavier/Makefile.am
+index c9c1bbe..f0efa32 100644
+--- a/libxklavier/Makefile.am
++++ b/libxklavier/Makefile.am
+@@ -131,6 +131,6 @@ libxklavier.deps:
+ 	done
+ 
+ vapidir = $(datadir)/vala/vapi
+-vapi_DATA = $(VAPIGEN_VAPIS) $(VAPIGEN_VAPIS:.vapi=.deps)
++vapi_DATA = $(VAPIGEN_VAPIS:.vapi=.deps)
+ endif
+ endif
+-- 
+1.9.1
+

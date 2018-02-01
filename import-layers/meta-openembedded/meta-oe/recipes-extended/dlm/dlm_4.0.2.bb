@@ -5,7 +5,9 @@ HOMEPAGE = "https://fedorahosted.org/cluster/wiki/HomePage"
 
 REQUIRED_DISTRO_FEATURES = "systemd"
 
-SRC_URI = "https://git.fedorahosted.org/cgit/dlm.git/snapshot/${BP}.tar.xz"
+SRC_URI = "https://git.fedorahosted.org/cgit/dlm.git/snapshot/${BP}.tar.xz \
+    file://respect-ldflags-also-from-bin_ldflags.patch \
+"
 
 SRC_URI[md5sum] = "efc2ee6093aa6aa0a88aaad83e998a3f"
 SRC_URI[sha256sum] = "b89bc557aaffbab0ac005398025f247718a5589cff6574d902eaffe2b20e683e"

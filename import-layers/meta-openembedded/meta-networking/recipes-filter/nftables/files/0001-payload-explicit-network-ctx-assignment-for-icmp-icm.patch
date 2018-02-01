@@ -1,0 +1,323 @@
+From 0011985554e269e1cc8f8e5b41eb9dcd795ebe8c Mon Sep 17 00:00:00 2001
+From: Arturo Borrero Gonzalez <arturo@debian.org>
+Date: Wed, 25 Jan 2017 12:51:08 +0100
+Subject: [PATCH] payload: explicit network ctx assignment for icmp/icmp6 in
+ special families
+
+In the inet, bridge and netdev families, we can add rules like these:
+
+% nft add rule inet t c ip protocol icmp icmp type echo-request
+% nft add rule inet t c ip6 nexthdr icmpv6 icmpv6 type echo-request
+
+However, when we print the ruleset:
+
+% nft list ruleset
+table inet t {
+	chain c {
+		icmpv6 type echo-request
+		icmp type echo-request
+	}
+}
+
+These rules we obtain can't be added again:
+
+% nft add rule inet t c icmp type echo-request
+<cmdline>:1:19-27: Error: conflicting protocols specified: inet-service vs. icmp
+add rule inet t c icmp type echo-request
+                  ^^^^^^^^^
+
+% nft add rule inet t c icmpv6 type echo-request
+<cmdline>:1:19-29: Error: conflicting protocols specified: inet-service vs. icmpv6
+add rule inet t c icmpv6 type echo-request
+                  ^^^^^^^^^^^
+
+Since I wouldn't expect an IP packet carrying ICMPv6, or IPv6 packet
+carrying ICMP, if the link layer is inet, the network layer protocol context
+can be safely update to 'ip' or 'ip6'.
+
+Moreover, nft currently generates a 'meta nfproto ipvX' depedency when
+using icmp or icmp6 in the inet family, and similar in netdev and bridge
+families.
+
+While at it, a bit of code factorization is introduced.
+
+Fixes: https://bugzilla.netfilter.org/show_bug.cgi?id=1073
+Signed-off-by: Arturo Borrero Gonzalez <arturo@debian.org>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+Upstream-Status: Backport
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ src/payload.c                       | 70 ++++++++++++++++---------------------
+ tests/py/any/icmpX.t.netdev         |  8 +++++
+ tests/py/any/icmpX.t.netdev.payload | 36 +++++++++++++++++++
+ tests/py/bridge/icmpX.t             |  8 +++++
+ tests/py/bridge/icmpX.t.payload     | 36 +++++++++++++++++++
+ tests/py/inet/icmpX.t               |  8 +++++
+ tests/py/inet/icmpX.t.payload       | 36 +++++++++++++++++++
+ 7 files changed, 162 insertions(+), 40 deletions(-)
+ create mode 100644 tests/py/any/icmpX.t.netdev
+ create mode 100644 tests/py/any/icmpX.t.netdev.payload
+ create mode 100644 tests/py/bridge/icmpX.t
+ create mode 100644 tests/py/bridge/icmpX.t.payload
+ create mode 100644 tests/py/inet/icmpX.t
+ create mode 100644 tests/py/inet/icmpX.t.payload
+
+diff --git a/src/payload.c b/src/payload.c
+index af533b2..74f8254 100644
+--- a/src/payload.c
++++ b/src/payload.c
+@@ -223,6 +223,34 @@ static int payload_add_dependency(struct eval_ctx *ctx,
+ 	return 0;
+ }
+ 
++static const struct proto_desc *
++payload_gen_special_dependency(struct eval_ctx *ctx, const struct expr *expr)
++{
++	switch (expr->payload.base) {
++	case PROTO_BASE_LL_HDR:
++		switch (ctx->pctx.family) {
++		case NFPROTO_INET:
++			return &proto_inet;
++		case NFPROTO_BRIDGE:
++			return &proto_eth;
++		case NFPROTO_NETDEV:
++			return &proto_netdev;
++		default:
++			break;
++		}
++		break;
++	case PROTO_BASE_TRANSPORT_HDR:
++		if (expr->payload.desc == &proto_icmp)
++			return &proto_ip;
++		if (expr->payload.desc == &proto_icmp6)
++			return &proto_ip6;
++		return &proto_inet_service;
++	default:
++		break;
++	}
++	return NULL;
++}
++
+ /**
+  * payload_gen_dependency - generate match expression on payload dependency
+  *
+@@ -276,46 +304,8 @@ int payload_gen_dependency(struct eval_ctx *ctx, const struct expr *expr,
+ 
+ 	desc = ctx->pctx.protocol[expr->payload.base - 1].desc;
+ 	/* Special case for mixed IPv4/IPv6 and bridge tables */
+-	if (desc == NULL) {
+-		switch (ctx->pctx.family) {
+-		case NFPROTO_INET:
+-			switch (expr->payload.base) {
+-			case PROTO_BASE_LL_HDR:
+-				desc = &proto_inet;
+-				break;
+-			case PROTO_BASE_TRANSPORT_HDR:
+-				desc = &proto_inet_service;
+-				break;
+-			default:
+-				break;
+-			}
+-			break;
+-		case NFPROTO_BRIDGE:
+-			switch (expr->payload.base) {
+-			case PROTO_BASE_LL_HDR:
+-				desc = &proto_eth;
+-				break;
+-			case PROTO_BASE_TRANSPORT_HDR:
+-				desc = &proto_inet_service;
+-				break;
+-			default:
+-				break;
+-			}
+-			break;
+-		case NFPROTO_NETDEV:
+-			switch (expr->payload.base) {
+-			case PROTO_BASE_LL_HDR:
+-				desc = &proto_netdev;
+-				break;
+-			case PROTO_BASE_TRANSPORT_HDR:
+-				desc = &proto_inet_service;
+-				break;
+-			default:
+-				break;
+-			}
+-			break;
+-		}
+-	}
++	if (desc == NULL)
++		desc = payload_gen_special_dependency(ctx, expr);
+ 
+ 	if (desc == NULL)
+ 		return expr_error(ctx->msgs, expr,
+diff --git a/tests/py/any/icmpX.t.netdev b/tests/py/any/icmpX.t.netdev
+new file mode 100644
+index 0000000..a327ce6
+--- /dev/null
++++ b/tests/py/any/icmpX.t.netdev
+@@ -0,0 +1,8 @@
++:ingress;type filter hook ingress device lo priority 0
++
++*netdev;test-netdev;ingress
++
++ip protocol icmp icmp type echo-request;ok;icmp type echo-request
++icmp type echo-request;ok
++ip6 nexthdr icmpv6 icmpv6 type echo-request;ok;icmpv6 type echo-request
++icmpv6 type echo-request;ok
+diff --git a/tests/py/any/icmpX.t.netdev.payload b/tests/py/any/icmpX.t.netdev.payload
+new file mode 100644
+index 0000000..8b8107c
+--- /dev/null
++++ b/tests/py/any/icmpX.t.netdev.payload
+@@ -0,0 +1,36 @@
++# ip protocol icmp icmp type echo-request
++netdev test-netdev ingress
++  [ meta load protocol => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++  [ payload load 1b @ network header + 9 => reg 1 ]
++  [ cmp eq reg 1 0x00000001 ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++
++# icmp type echo-request
++netdev test-netdev ingress
++  [ meta load protocol => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++  [ payload load 1b @ network header + 9 => reg 1 ]
++  [ cmp eq reg 1 0x00000001 ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++
++# ip6 nexthdr icmpv6 icmpv6 type echo-request
++netdev test-netdev ingress
++  [ meta load protocol => reg 1 ]
++  [ cmp eq reg 1 0x0000dd86 ]
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000080 ]
++
++# icmpv6 type echo-request
++netdev test-netdev ingress
++  [ meta load protocol => reg 1 ]
++  [ cmp eq reg 1 0x0000dd86 ]
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000080 ]
++
+diff --git a/tests/py/bridge/icmpX.t b/tests/py/bridge/icmpX.t
+new file mode 100644
+index 0000000..8c0a597
+--- /dev/null
++++ b/tests/py/bridge/icmpX.t
+@@ -0,0 +1,8 @@
++:input;type filter hook input priority 0
++
++*bridge;test-bridge;input
++
++ip protocol icmp icmp type echo-request;ok;icmp type echo-request
++icmp type echo-request;ok
++ip6 nexthdr icmpv6 icmpv6 type echo-request;ok;icmpv6 type echo-request
++icmpv6 type echo-request;ok
+diff --git a/tests/py/bridge/icmpX.t.payload b/tests/py/bridge/icmpX.t.payload
+new file mode 100644
+index 0000000..19efdd8
+--- /dev/null
++++ b/tests/py/bridge/icmpX.t.payload
+@@ -0,0 +1,36 @@
++# ip protocol icmp icmp type echo-request
++bridge test-bridge input
++  [ payload load 2b @ link header + 12 => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++  [ payload load 1b @ network header + 9 => reg 1 ]
++  [ cmp eq reg 1 0x00000001 ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++
++# icmp type echo-request
++bridge test-bridge input
++  [ payload load 2b @ link header + 12 => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++  [ payload load 1b @ network header + 9 => reg 1 ]
++  [ cmp eq reg 1 0x00000001 ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++
++# ip6 nexthdr icmpv6 icmpv6 type echo-request
++bridge test-bridge input
++  [ payload load 2b @ link header + 12 => reg 1 ]
++  [ cmp eq reg 1 0x0000dd86 ]
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000080 ]
++
++# icmpv6 type echo-request
++bridge test-bridge input
++  [ payload load 2b @ link header + 12 => reg 1 ]
++  [ cmp eq reg 1 0x0000dd86 ]
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000080 ]
++
+diff --git a/tests/py/inet/icmpX.t b/tests/py/inet/icmpX.t
+new file mode 100644
+index 0000000..1b467a1
+--- /dev/null
++++ b/tests/py/inet/icmpX.t
+@@ -0,0 +1,8 @@
++:input;type filter hook input priority 0
++
++*inet;test-inet;input
++
++ip protocol icmp icmp type echo-request;ok;icmp type echo-request
++icmp type echo-request;ok
++ip6 nexthdr icmpv6 icmpv6 type echo-request;ok;icmpv6 type echo-request
++icmpv6 type echo-request;ok
+diff --git a/tests/py/inet/icmpX.t.payload b/tests/py/inet/icmpX.t.payload
+new file mode 100644
+index 0000000..81ca774
+--- /dev/null
++++ b/tests/py/inet/icmpX.t.payload
+@@ -0,0 +1,36 @@
++# ip protocol icmp icmp type echo-request
++inet test-inet input
++  [ meta load nfproto => reg 1 ]
++  [ cmp eq reg 1 0x00000002 ]
++  [ payload load 1b @ network header + 9 => reg 1 ]
++  [ cmp eq reg 1 0x00000001 ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++
++# icmp type echo-request
++inet test-inet input
++  [ meta load nfproto => reg 1 ]
++  [ cmp eq reg 1 0x00000002 ]
++  [ payload load 1b @ network header + 9 => reg 1 ]
++  [ cmp eq reg 1 0x00000001 ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000008 ]
++
++# ip6 nexthdr icmpv6 icmpv6 type echo-request
++inet test-inet input
++  [ meta load nfproto => reg 1 ]
++  [ cmp eq reg 1 0x0000000a ]
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000080 ]
++
++# icmpv6 type echo-request
++inet test-inet input
++  [ meta load nfproto => reg 1 ]
++  [ cmp eq reg 1 0x0000000a ]
++  [ payload load 1b @ network header + 6 => reg 1 ]
++  [ cmp eq reg 1 0x0000003a ]
++  [ payload load 1b @ transport header + 0 => reg 1 ]
++  [ cmp eq reg 1 0x00000080 ]
++
+-- 
+2.11.0
+

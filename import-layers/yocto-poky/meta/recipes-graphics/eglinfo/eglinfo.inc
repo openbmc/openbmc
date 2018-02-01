@@ -11,6 +11,8 @@ SRC_URI = "git://github.com/dv1/eglinfo.git;branch=master \
           "
 SRCREV = "4b317648ec6cf39556a9e5d8078f605bc0edd5de"
 
+CVE_PRODUCT = "eglinfo"
+
 S = "${WORKDIR}/git"
 
 inherit waf distro_features_check

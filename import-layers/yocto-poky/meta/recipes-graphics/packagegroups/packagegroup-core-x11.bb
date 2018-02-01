@@ -5,13 +5,12 @@
 PR = "r40"
 
 inherit packagegroup distro_features_check
-# rdepends on x11-common
 REQUIRED_DISTRO_FEATURES = "x11"
 
 PACKAGES = "${PN} ${PN}-utils"
 
-# xserver-common, x11-common
-VIRTUAL-RUNTIME_xserver_common ?= "x11-common"
+# backwards compatibility for xserver-common
+VIRTUAL-RUNTIME_xserver_common ?= ""
 
 # elsa, xserver-nodm-init
 VIRTUAL-RUNTIME_graphical_init_manager ?= "xserver-nodm-init"
@@ -30,4 +29,8 @@ RDEPENDS_${PN}-utils = "\
     xhost \
     xset \
     xrandr \
+    xmodmap \
+    xdpyinfo \
+    xinput-calibrator \
+    dbus-x11 \
     "

@@ -1,0 +1,34 @@
+From 39e13b4e3f7a1d1dd748e80cee241d511865d4e8 Mon Sep 17 00:00:00 2001
+From: Pascal Bach <pascal.bach@nextrem.ch>
+Date: Mon, 16 Jan 2017 21:29:12 +0100
+Subject: [PATCH] Allow calling make clean without sphinx-build
+
+Currently make clean fails without sphinx-build installed
+However sphinx-build is not really necessary to do a clean.
+This trick makes the docs/Makefile use the false binary instead of
+sphinx-build for the check when a clean is done.
+
+Upstream-Status: Submitted https://github.com/aio-libs/multidict/pull/41
+
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 8f525f3..6d601e5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -51,8 +51,8 @@ clean:
+ 	rm -rf coverage
+ 	rm -rf build
+ 	rm -rf cover
+-	make -C docs clean
+-	python setup.py clean
++	make -C docs clean SPHINXBUILD=false
++	python3 setup.py clean
+ 	rm -f multidict/_multidict.html
+ 	rm -f multidict/_multidict.c
+ 	rm -f multidict/_multidict.*.so
+-- 
+2.7.4
+

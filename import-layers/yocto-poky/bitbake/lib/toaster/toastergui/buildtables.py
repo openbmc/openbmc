@@ -571,6 +571,7 @@ class BuildTimeTable(BuildTasksTable):
         super(BuildTimeTable, self).setup_columns(**kwargs)
 
         self.columns[self.toggle_columns['order']]['hidden'] = True
+        self.columns[self.toggle_columns['order']]['hideable'] = True
         self.columns[self.toggle_columns['sstate_result']]['hidden'] = True
         self.columns[self.toggle_columns['elapsed_time']]['hidden'] = False
 
@@ -586,6 +587,7 @@ class BuildCPUTimeTable(BuildTasksTable):
         super(BuildCPUTimeTable, self).setup_columns(**kwargs)
 
         self.columns[self.toggle_columns['order']]['hidden'] = True
+        self.columns[self.toggle_columns['order']]['hideable'] = True
         self.columns[self.toggle_columns['sstate_result']]['hidden'] = True
         self.columns[self.toggle_columns['cpu_time_sys']]['hidden'] = False
         self.columns[self.toggle_columns['cpu_time_user']]['hidden'] = False
@@ -602,5 +604,6 @@ class BuildIOTable(BuildTasksTable):
         super(BuildIOTable, self).setup_columns(**kwargs)
 
         self.columns[self.toggle_columns['order']]['hidden'] = True
+        self.columns[self.toggle_columns['order']]['hideable'] = True
         self.columns[self.toggle_columns['sstate_result']]['hidden'] = True
         self.columns[self.toggle_columns['disk_io']]['hidden'] = False

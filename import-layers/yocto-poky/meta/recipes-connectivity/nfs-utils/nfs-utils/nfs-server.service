@@ -1,7 +1,12 @@
 [Unit]
-Description=NFS Server
-Requires=rpcbind.service nfs-mountd.service
-After=rpcbind.service
+Description=NFS server and services
+DefaultDependencies=no
+Requires=network.target proc-fs-nfsd.mount
+Requires=nfs-mountd.service
+Wants=rpcbind.service
+After=local-fs.target
+After=network.target proc-fs-nfsd.mount rpcbind.service nfs-mountd.service
+ConditionPathExists=@SYSCONFDIR@/exports
 
 [Service]
 Type=oneshot
@@ -9,6 +14,7 @@ EnvironmentFile=-@SYSCONFDIR@/nfs-utils.conf
 ExecStartPre=@SBINDIR@/exportfs -r
 ExecStart=@SBINDIR@/rpc.nfsd $NFSD_OPTS $NFSD_COUNT
 ExecStop=@SBINDIR@/rpc.nfsd 0
+ExecStopPost=@SBINDIR@/exportfs -au
 ExecStopPost=@SBINDIR@/exportfs -f
 ExecReload=@SBINDIR@/exportfs -r
 StandardError=syslog

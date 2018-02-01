@@ -1,0 +1,65 @@
+Fix for cross compiling
+
+Fixed:
+| ./dftables src/pcre2_chartables.c
+| make: ./dftables: Command not found
+| make: *** [src/pcre2_chartables.c] Error 127
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+diff --git a/Makefile.am b/Makefile.am
+index 38f1d41..2bde083 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -298,9 +298,21 @@ bin_SCRIPTS = pcre2-config
+ ## to copy a distributed set of tables that are defined for ASCII code. In this
+ ## case, dftables is not needed.
+ 
++CC_FOR_BUILD = @CC_FOR_BUILD@
++CFLAGS_FOR_BUILD = @CFLAGS_FOR_BUILD@
++CCLD_FOR_BUILD = @CCLD_FOR_BUILD@
++LDFLAGS_FOR_BUILD = @LDFLAGS_FOR_BUILD@
++
+ if WITH_REBUILD_CHARTABLES
+ noinst_PROGRAMS += dftables
+ dftables_SOURCES = src/dftables.c
++
++dftables_LINK = $(CCLD_FOR_BUILD) -o $@
++dftables_LDFLAGS = $(LDFLAGS_FOR_BUILD)
++
++src/dftables.o: $(srcdir)/src/dftables.c
++	$(CC_FOR_BUILD) -c $(CFLAGS_FOR_BUILD) -o $@ $(srcdir)/src/dftables.c
++
+ src/pcre2_chartables.c: dftables$(EXEEXT)
+ 	rm -f $@
+ 	./dftables$(EXEEXT) $@
+diff --git a/configure.ac b/configure.ac
+index d7c57aa..d6eb0aa 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -59,6 +59,23 @@ then
+   fi
+ fi
+ 
++if test x"$cross_compiling" = xyes; then
++    CC_FOR_BUILD="${CC_FOR_BUILD-gcc}"
++    CCLD_FOR_BUILD="${CCLD_FOR_BUILD-gcc}"
++    CFLAGS_FOR_BUILD="${CFLAGS_FOR_BUILD}"
++    LDFLAGS_FOR_BUILD="${LDFLAGS_FOR_BUILD}"
++else
++    CC_FOR_BUILD="${CC_FOR_BUILD-\$(CC)}"
++    CCLD_FOR_BUILD="${CCLD_FOR_BUILD-\$(CCLD)}"
++    CFLAGS_FOR_BUILD="${CFLAGS_FOR_BUILD-\$(CFLAGS)}"
++    LDFLAGS_FOR_BUILD="${LDFLAGS_FOR_BUILD-\$(LDFLAGS)}"
++fi
++AC_ARG_VAR(CC_FOR_BUILD, [build system C compiler])
++AC_ARG_VAR(CCLD_FOR_BUILD, [build system C linker frontend])
++AC_ARG_VAR(CFLAGS_FOR_BUILD, [build system C compiler arguments])
++AC_ARG_VAR(LDFLAGS_FOR_BUILD, [build system C linker frontend arguments])
++
++
+ # Check for a 64-bit integer type
+ AC_TYPE_INT64_T
+ 

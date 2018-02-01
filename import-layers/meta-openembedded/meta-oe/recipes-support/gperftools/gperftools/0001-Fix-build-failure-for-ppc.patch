@@ -1,0 +1,28 @@
+Subject: Fix build failure for ppc
+
+Upstream-Status: Pending
+
+Fix the following build failure.
+
+  error: 'siginfo_t' does not name a type
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/stacktrace_powerpc-linux-inl.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/stacktrace_powerpc-linux-inl.h b/src/stacktrace_powerpc-linux-inl.h
+index 5d16fa1..a9bf775 100644
+--- a/src/stacktrace_powerpc-linux-inl.h
++++ b/src/stacktrace_powerpc-linux-inl.h
+@@ -44,6 +44,7 @@
+ 
+ #include <stdint.h>   // for uintptr_t
+ #include <stdlib.h>   // for NULL
++#include <signal.h>   // for siginfo_t
+ #include <gperftools/stacktrace.h>
+ #include <base/vdso_support.h>
+ 
+-- 
+2.8.3
+

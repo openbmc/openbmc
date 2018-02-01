@@ -1,0 +1,35 @@
+From 74fe72583472bcc3c89a52839cac2ebbad6c8a74 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Mar 2017 11:34:52 -0700
+Subject: [PATCH 3/4] cli: Define _GNU_SOURCE for getting sighandler_t
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cli/cli_readline.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cli/cli_readline.c b/cli/cli_readline.c
+index 127136c..931779b 100644
+--- a/cli/cli_readline.c
++++ b/cli/cli_readline.c
+@@ -17,7 +17,7 @@
+  *  Boston, MA 02110-1301 USA
+  *
+  *****************************************************************************/
+-
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <unistd.h>
+ #include <sys/types.h>
+@@ -634,7 +634,7 @@ static void cli_rl_uninstall_signal_handlers(void)
+ 
+ static int cli_rl_install_signal_handlers(void)
+ {
+-	__sighandler_t handler;
++	sighandler_t handler;
+ 
+ 	rl_catch_signals = 0;
+ 	rl_clear_signals();
+-- 
+2.12.1
+

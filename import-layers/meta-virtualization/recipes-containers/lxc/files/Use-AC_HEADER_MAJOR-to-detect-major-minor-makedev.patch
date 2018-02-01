@@ -1,0 +1,119 @@
+From 5c957671a511441b112b137b88bf0b1f31adac20 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <siarheit@google.com>
+Date: Sat, 21 Jan 2017 11:57:13 +0000
+Subject: [PATCH] Use AC_HEADER_MAJOR to detect major()/minor()/makedev()
+
+commit af6824fce9c9536fbcabef8d5547f6c486f55fdf from
+git://github.com/lxc/lxc.git
+
+Before the change build failed on Gentoo as:
+
+  bdev/lxclvm.c: In function 'lvm_detect':
+  bdev/lxclvm.c:140:4: error: implicit declaration of function 'major' [-Werror=implicit-function-declaration]
+    major(statbuf.st_rdev), minor(statbuf.st_rdev));
+    ^~~~~
+  bdev/lxclvm.c:140:28: error: implicit declaration of function 'minor' [-Werror=implicit-function-declaration]
+    major(statbuf.st_rdev), minor(statbuf.st_rdev));
+                            ^~~~~
+
+glibc plans to remove <sys/sysmacros.h> from glibc's <sys/types.h>:
+    https://sourceware.org/ml/libc-alpha/2015-11/msg00253.html
+
+Gentoo already applied glibc patch to experimental glibc-2.24
+to start preparingfor the change.
+
+Autoconf has AC_HEADER_MAJOR to find out which header defines
+reqiured macros:
+    https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Particular-Headers.html
+
+This change should also increase portability across other libcs.
+
+Bug: https://bugs.gentoo.org/604360
+Signed-off-by: Sergei Trofimovich <siarheit@google.com>
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ configure.ac           | 3 +++
+ src/lxc/bdev/lxclvm.c  | 9 +++++++++
+ src/lxc/conf.c         | 8 ++++++++
+ src/lxc/lxccontainer.c | 8 ++++++++
+ 4 files changed, 28 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 8f31c29..924baa1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -601,6 +601,9 @@ AC_CHECK_DECLS([PR_CAPBSET_DROP], [], [], [#include <sys/prctl.h>])
+ # Check for some headers
+ AC_CHECK_HEADERS([sys/signalfd.h pty.h ifaddrs.h sys/capability.h sys/personality.h utmpx.h sys/timerfd.h])
+ 
++# lookup major()/minor()/makedev()
++AC_HEADER_MAJOR
++
+ # Check for some syscalls functions
+ AC_CHECK_FUNCS([setns pivot_root sethostname unshare rand_r confstr faccessat])
+ 
+diff --git a/src/lxc/bdev/lxclvm.c b/src/lxc/bdev/lxclvm.c
+index 3d41b10..419d1c2 100644
+--- a/src/lxc/bdev/lxclvm.c
++++ b/src/lxc/bdev/lxclvm.c
+@@ -32,10 +32,19 @@
+ #include <sys/wait.h>
+ 
+ #include "bdev.h"
++#include "config.h"
+ #include "log.h"
+ #include "lxclvm.h"
+ #include "utils.h"
+ 
++/* major()/minor() */
++#ifdef MAJOR_IN_MKDEV
++#    include <sys/mkdev.h>
++#endif
++#ifdef MAJOR_IN_SYSMACROS
++#    include <sys/sysmacros.h>
++#endif
++
+ lxc_log_define(lxclvm, lxc);
+ 
+ extern char *dir_new_path(char *src, const char *oldname, const char *name,
+diff --git a/src/lxc/conf.c b/src/lxc/conf.c
+index 3b023ef..53406ca 100644
+--- a/src/lxc/conf.c
++++ b/src/lxc/conf.c
+@@ -39,6 +39,14 @@
+ #include <grp.h>
+ #include <time.h>
+ 
++/* makedev() */
++#ifdef MAJOR_IN_MKDEV
++#    include <sys/mkdev.h>
++#endif
++#ifdef MAJOR_IN_SYSMACROS
++#    include <sys/sysmacros.h>
++#endif
++
+ #ifdef HAVE_STATVFS
+ #include <sys/statvfs.h>
+ #endif
+diff --git a/src/lxc/lxccontainer.c b/src/lxc/lxccontainer.c
+index 9f12ca2..aa02833 100644
+--- a/src/lxc/lxccontainer.c
++++ b/src/lxc/lxccontainer.c
+@@ -61,6 +61,14 @@
+ #include "utils.h"
+ #include "version.h"
+ 
++/* major()/minor() */
++#ifdef MAJOR_IN_MKDEV
++#    include <sys/mkdev.h>
++#endif
++#ifdef MAJOR_IN_SYSMACROS
++#    include <sys/sysmacros.h>
++#endif
++
+ #if HAVE_IFADDRS_H
+ #include <ifaddrs.h>
+ #else
+-- 
+2.7.4
+

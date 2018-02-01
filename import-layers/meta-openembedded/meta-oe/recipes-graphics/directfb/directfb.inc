@@ -51,6 +51,8 @@ EXTRA_OECONF = "\
   --disable-sdl \
   --disable-vnc \
   --disable-x11 \
+  --disable-x11vdpau \
+  --disable-xine-vdpau \
 "
 
 #Once -fno-omit-frame-pointer option of gcc is added into TARGET_CLFAGS as default

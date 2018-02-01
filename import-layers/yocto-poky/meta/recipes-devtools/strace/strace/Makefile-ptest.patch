@@ -10,25 +10,26 @@ Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
  2 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
+index b2b03c6..464a9dc 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -36,7 +36,7 @@ AC_INIT([strace],
+@@ -39,7 +39,7 @@ AC_COPYRIGHT([Copyright (C) 1999-2017 The strace developers.])
  AC_CONFIG_SRCDIR([strace.c])
  AC_CONFIG_AUX_DIR([.])
  AC_CONFIG_HEADERS([config.h])
 -AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules parallel-tests])
 +AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules serial-tests])
+ AM_EXTRA_RECURSIVE_TARGETS([check-valgrind])
  AM_MAINTAINER_MODE
  AC_CANONICAL_HOST
- 
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index 9023029..e1917fa 100644
+index 311d3bb..72f9022 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -784,3 +784,21 @@ ksysent.h: $(srcdir)/ksysent.sed
- 
- BUILT_SOURCES = ksysent.h
+@@ -960,3 +960,21 @@ $(objects): scno.h
  CLEANFILES = ksysent.h $(TESTS:=.tmp)
+ 
+ include ../scno.am
 +
 +buildtest-TESTS: $(check_PROGRAMS) $(TESTS)
 +

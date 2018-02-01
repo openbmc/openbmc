@@ -1,0 +1,34 @@
+From 676a8a9001f06808b4dbe0a545d76b5d9a8ebf48 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 2 Feb 2017 13:51:27 -0500
+Subject: [PATCH] Mark our explicit fall through so -Wextra will work in gcc 7
+
+gcc 7 introduces detection of fall-through behavior in switch/case
+statements, and will warn if -Wimplicit-fallthrough is present and there
+is no comment stating that the fall-through is intentional.  This is
+also triggered by -Wextra, as it enables -Wimplicit-fallthrough=1.
+
+This patch adds the comment in the one place we use fall-through.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+Upstream-Status: Pending
+
+ lib/print.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/print.c b/lib/print.c
+index b8a9d38..cb732f0 100644
+--- a/lib/print.c
++++ b/lib/print.c
+@@ -1131,6 +1131,7 @@ Returns:
+             case 'X':
+                 Item.Width = Item.Long ? 16 : 8;
+                 Item.Pad = '0';
++		/* falls through */
+             case 'x':
+                 ValueToHex (
+                     Item.Scratch,
+-- 
+2.12.2
+

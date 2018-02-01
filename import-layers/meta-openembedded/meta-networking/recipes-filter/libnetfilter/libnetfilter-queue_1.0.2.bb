@@ -6,10 +6,14 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 DEPENDS = "libnfnetlink libmnl"
 
-SRC_URI = "http://www.netfilter.org/projects/libnetfilter_queue/files/libnetfilter_queue-${PV}.tar.bz2;name=tar"
-SRC_URI[tar.md5sum] = "df09befac35cb215865b39a36c96a3fa"
-SRC_URI[tar.sha256sum] = "838490eb5dbe358f9669823704982f5313a8d397111562373200203f93ac1a32"
+PV .= "+git${SRCREV}"
+SRCREV = "981025e103d887fb6a9c9bb49c74ec323108d098"
 
-S = "${WORKDIR}/libnetfilter_queue-${PV}"
+SRC_URI = "git://git.netfilter.org/libnetfilter_queue \
+           file://0001-Correct-typo-in-the-location-of-internal.h-in-includ.patch \
+           file://0001-libnetfilter-queue-Declare-the-define-visivility-attribute-together.patch \
+           "
+
+S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig

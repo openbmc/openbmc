@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c \
 "
 
-DEPENDS = "glib-2.0 libgudev"
+DEPENDS = "glib-2.0 glib-2.0-native libgudev"
 
 inherit autotools pkgconfig bash-completion
 

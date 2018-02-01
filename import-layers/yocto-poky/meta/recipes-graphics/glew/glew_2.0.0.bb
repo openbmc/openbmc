@@ -2,11 +2,8 @@ SUMMARY = "OpenGL extension loading library"
 DESCRIPTION = "The OpenGL Extension Wrangler Library (GLEW) is a cross-platform open-source C/C++ extension loading library."
 HOMEPAGE = "http://glew.sourceforge.net/"
 BUGTRACKER = "http://sourceforge.net/tracker/?group_id=67586"
-SECTION = "x11"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=2ac251558de685c6b9478d89be3149c2"
-
-DEPENDS = "virtual/libx11 virtual/libgl libglu libxext libxi libxmu"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/glew/glew/${PV}/glew-${PV}.tgz \
            file://no-strip.patch"
@@ -19,12 +16,18 @@ UPSTREAM_CHECK_REGEX = "/glew/(?P<pver>(\d+[\.\-_]*)+)/"
 
 inherit lib_package pkgconfig distro_features_check
 
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "opengl"
 
-# Override SYSTEM to avoid calling config.guess, we're cross-compiling.  Pass
-# our CFLAGS via POPT as that's the optimisation variable and safely
-# overwritten.
-EXTRA_OEMAKE = "SYSTEM='linux' \
+PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'opengl', 'egl-gles2', d)}"
+
+# The opengl and egl-XXX options are exclusive, enable only one.
+PACKAGECONFIG[opengl] = "SYSTEM='linux',,virtual/libx11 virtual/libgl libglu libxext libxi libxmu"
+PACKAGECONFIG[egl-gles2] = "SYSTEM='linux-egl' GLEW_NO_GLU='-DGLEW_NO_GLU' LDFLAGS.GL='-lEGL -lGLESv2',,virtual/egl virtual/libgles2"
+
+# Override SYSTEM (via PACKAGECONFIG_CONFARGS) to avoid calling config.guess,
+# we're cross-compiling. Pass our CFLAGS via POPT as that's the optimisation
+# variable and safely overwritten.
+EXTRA_OEMAKE = "${PACKAGECONFIG_CONFARGS} \
                 CC='${CC}' LD='${CC}' STRIP='' \
                 LDFLAGS.EXTRA='${LDFLAGS}' \
                 POPT='${CFLAGS}' \

@@ -1,4 +1,4 @@
-From add566b913e1b5cd4974a2167157dc08d8245ab0 Mon Sep 17 00:00:00 2001
+From f37c5b56376d9bb506da68bb11d0d7463e6e563b Mon Sep 17 00:00:00 2001
 From: Marek Vasut <marex@denx.de>
 Date: Tue, 9 Feb 2016 01:52:26 +0100
 Subject: [PATCH] Support for NIOS2 architecture
@@ -9,6 +9,7 @@ trivial too, since the CPU does not support SMP at all.
 
 Signed-off-by: Marek Vasut <marex@denx.de>
 Upstream-Status: Backport [ http://git.lttng.org/?p=userspace-rcu.git;a=commit;h=859050b3088aa3f0cb59d7f51ce24b9a0f18faa5 ]
+
 ---
  LICENSE              |  1 +
  README.md            |  1 +
@@ -44,12 +45,12 @@ index f6b290f..6fe9c1e 100644
    - ia64
    - Sparcv9 32/64
 diff --git a/configure.ac b/configure.ac
-index 39a7777..71a7d71 100644
+index eebed56..8014e1d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -124,6 +124,7 @@ AS_CASE([$host_cpu],
+@@ -136,6 +136,7 @@ AS_CASE([$host_cpu],
  	[arm*], [ARCHTYPE="arm"],
- 	[aarch64], [ARCHTYPE="aarch64"],
+ 	[aarch64*], [ARCHTYPE="aarch64"],
  	[mips*], [ARCHTYPE="mips"],
 +	[nios2*], [ARCHTYPE="nios2"],
  	[tile*], [ARCHTYPE="tile"],
@@ -57,7 +58,7 @@ index 39a7777..71a7d71 100644
  	[ARCHTYPE="unknown"]
 diff --git a/urcu/arch/nios2.h b/urcu/arch/nios2.h
 new file mode 100644
-index 0000000..030d1bc
+index 0000000..b4f3e50
 --- /dev/null
 +++ b/urcu/arch/nios2.h
 @@ -0,0 +1,40 @@
@@ -140,5 +141,5 @@ index 0000000..5b3c303
 +
 +#endif /* _URCU_UATOMIC_ARCH_NIOS2_H */
 -- 
-2.7.0
+2.10.2
 

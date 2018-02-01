@@ -79,7 +79,7 @@ class ConfigParameters(object):
                   "prefile", "postfile"]:
             options[o] = getattr(self.options, o)
 
-        ret, error = server.runCommand(["updateConfig", options, environment])
+        ret, error = server.runCommand(["updateConfig", options, environment, sys.argv])
         if error:
                 raise Exception("Unable to update the server configuration with local parameters: %s" % error)
 
@@ -146,6 +146,9 @@ class CookerConfiguration(object):
         self.tracking = False
         self.interface = []
         self.writeeventlog = False
+        self.server_only = False
+        self.limited_deps = False
+        self.runall = None
 
         self.env = {}
 
@@ -212,7 +215,7 @@ def _inherit(bbclass, data):
 
 def findConfigFile(configfile, data):
     search = []
-    bbpath = data.getVar("BBPATH", True)
+    bbpath = data.getVar("BBPATH")
     if bbpath:
         for i in bbpath.split(":"):
             search.append(os.path.join(i, "conf", configfile))
@@ -286,7 +289,7 @@ class CookerDataBuilder(object):
             self.data_hash = self.data.get_hash()
             self.mcdata[''] = self.data
 
-            multiconfig = (self.data.getVar("BBMULTICONFIG", True) or "").split()
+            multiconfig = (self.data.getVar("BBMULTICONFIG") or "").split()
             for config in multiconfig:
                 mcdata = self.parseConfigurationFiles(self.prefiles, self.postfiles, config)
                 bb.event.fire(bb.event.ConfigParsed(), mcdata)
@@ -320,7 +323,7 @@ class CookerDataBuilder(object):
             data.setVar("TOPDIR", os.path.dirname(os.path.dirname(layerconf)))
             data = parse_config_file(layerconf, data)
 
-            layers = (data.getVar('BBLAYERS', True) or "").split()
+            layers = (data.getVar('BBLAYERS') or "").split()
 
             data = bb.data.createCopy(data)
             approved = bb.utils.approved_variables()
@@ -343,7 +346,7 @@ class CookerDataBuilder(object):
             data.delVar('LAYERDIR_RE')
             data.delVar('LAYERDIR')
 
-        if not data.getVar("BBPATH", True):
+        if not data.getVar("BBPATH"):
             msg = "The BBPATH variable is not set"
             if not layerconf:
                 msg += (" and bitbake did not find a conf/bblayers.conf file in"
@@ -358,7 +361,7 @@ class CookerDataBuilder(object):
             data = parse_config_file(p, data)
 
         # Handle any INHERITs and inherit the base class
-        bbclasses  = ["base"] + (data.getVar('INHERIT', True) or "").split()
+        bbclasses  = ["base"] + (data.getVar('INHERIT') or "").split()
         for bbclass in bbclasses:
             data = _inherit(bbclass, data)
 
@@ -370,7 +373,7 @@ class CookerDataBuilder(object):
                 parselog.critical("Undefined event handler function '%s'" % var)
                 sys.exit(1)
             handlerln = int(data.getVarFlag(var, "lineno", False))
-            bb.event.register(var, data.getVar(var, False),  (data.getVarFlag(var, "eventmask", True) or "").split(), handlerfn, handlerln)
+            bb.event.register(var, data.getVar(var, False),  (data.getVarFlag(var, "eventmask") or "").split(), handlerfn, handlerln)
 
         data.setVar('BBINCLUDED',bb.parse.get_file_depends(data))
 

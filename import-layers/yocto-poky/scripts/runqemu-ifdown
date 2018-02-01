@@ -41,11 +41,11 @@ if [ $# -ne 2 ]; then
 fi
 
 TAP=$1
-NATIVE_SYSROOT_DIR=$2
+STAGING_BINDIR_NATIVE=$2
 
-TUNCTL=$NATIVE_SYSROOT_DIR/usr/bin/tunctl
+TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
 if [ ! -e "$TUNCTL" ]; then
-	echo "Error: Unable to find tunctl binary in '$NATIVE_SYSROOT_DIR/usr/bin', please bitbake qemu-helper-native"
+	echo "Error: Unable to find tunctl binary in '$STAGING_BINDIR_NATIVE', please bitbake qemu-helper-native"
 	exit 1
 fi
 

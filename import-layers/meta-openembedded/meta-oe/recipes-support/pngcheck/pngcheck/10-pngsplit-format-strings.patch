@@ -1,0 +1,40 @@
+From: Jari Aalto <jari.aalto@cante.net>
+Subject: Correct fomat strings fro hardened build flags
+
+---
+ gpl/pngsplit.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+--- a/gpl/pngsplit.c
++++ b/gpl/pngsplit.c
+@@ -141,8 +141,8 @@
+                   0 == strncmp( argv[argn], "-quiet", 2 ) )
+             verbose = 0;
+         else {
+-            fprintf(stderr, pngsplit_hdr);
+-            fprintf(stderr, pngsplit_usage);
++            fprintf(stderr, "%s", pngsplit_hdr);
++            fprintf(stderr, "%s", pngsplit_usage);
+             fflush(stderr);
+             return 1;
+         }
+@@ -150,8 +150,8 @@
+     }
+ 
+     if ( argn == argc ) {
+-        fprintf(stderr, pngsplit_hdr);
+-        fprintf(stderr, pngsplit_usage);
++        fprintf(stderr, "%s", pngsplit_hdr);
++        fprintf(stderr, "%s", pngsplit_usage);
+         fflush(stderr);
+         return 5;
+     } else {
+@@ -162,7 +162,7 @@
+ 
+     /*=============================  MAIN LOOP  =============================*/
+ 
+-    fprintf(stdout, pngsplit_hdr);
++    fprintf(stdout, "%s", pngsplit_hdr);
+     fflush(stdout);
+ 
+     while (argn <= argc) {

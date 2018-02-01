@@ -1,0 +1,37 @@
+From 2f68fcaaf4964e7feeb383f5c26851965cda037c Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 15 Nov 2016 15:20:49 +0200
+Subject: [PATCH] Simplify wayland-scanner lookup
+
+Don't use pkg-config to lookup the path of a binary that's in the path.
+
+Alternatively we'd have to prefix the path returned by pkg-config with
+PKG_CONFIG_SYSROOT_DIR.
+
+Upstream-Status: Pending
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e56e35a..a92005a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2020,12 +2020,7 @@ if test "x$with_egl_platforms" != "x" -a "x$enable_egl" != xyes; then
+     AC_MSG_ERROR([cannot build egl state tracker without EGL library])
+ fi
+ 
+-PKG_CHECK_MODULES([WAYLAND_SCANNER], [wayland-scanner],
+-        WAYLAND_SCANNER=`$PKG_CONFIG --variable=wayland_scanner wayland-scanner`,
+-        WAYLAND_SCANNER='')
+-if test "x$WAYLAND_SCANNER" = x; then
+-    AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner])
+-fi
++AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner])
+ 
+ # Do per-EGL platform setups and checks
+ egl_platforms=`IFS=', '; echo $with_egl_platforms`
+-- 
+2.1.4
+

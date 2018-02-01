@@ -1,0 +1,38 @@
+From 007f0b407f72314ec832d77e15b83ea40b160037 Mon Sep 17 00:00:00 2001
+From: Andrei Borzenkov <arvidjaar@gmail.com>
+Date: Tue, 4 Apr 2017 19:37:47 +0300
+Subject: [PATCH 3/4] Add gnulib-fix-gcc7-fallthrough.diff
+
+As long as the code is not upstream, add it as explicit patch for the
+case of gnulib refresh.
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ grub-core/gnulib-fix-gcc7-fallthrough.diff | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100644 grub-core/gnulib-fix-gcc7-fallthrough.diff
+
+diff --git a/grub-core/gnulib-fix-gcc7-fallthrough.diff b/grub-core/gnulib-fix-gcc7-fallthrough.diff
+new file mode 100644
+index 0000000..9802e2d
+--- /dev/null
++++ b/grub-core/gnulib-fix-gcc7-fallthrough.diff
+@@ -0,0 +1,14 @@
++diff --git grub-core/gnulib/regexec.c grub-core/gnulib/regexec.c
++index f632cd4..a7776f0 100644
++--- grub-core/gnulib/regexec.c
+++++ grub-core/gnulib/regexec.c
++@@ -4099,6 +4099,9 @@ check_node_accept (const re_match_context_t *mctx, const re_token_t *node,
++     case OP_UTF8_PERIOD:
++       if (ch >= ASCII_CHARS)
++         return false;
+++#if defined __GNUC__ && __GNUC__ >= 7
+++      __attribute__ ((fallthrough));
+++#endif
++       /* FALLTHROUGH */
++ #endif
++     case OP_PERIOD:
+-- 
+1.9.1
+

@@ -1,0 +1,69 @@
+From 85a0f6d77a9d5c0e7ef7948395f0f6b1612dc987 Mon Sep 17 00:00:00 2001
+From: Bart De Schuymer <bdschuym@pandora.be>
+Date: Mon, 14 Apr 2014 22:04:55 +0200
+Subject: [PATCH 06/10] don't print IPv6 mask if it's all ones (based on patch
+ by Mariusz Mazur <mmazur at axeos.com>)
+
+---
+ extensions/ebt_ip6.c |  4 ++--
+ include/ebtables_u.h |  1 +
+ useful_functions.c   | 13 +++++++++++++
+ 3 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/extensions/ebt_ip6.c b/extensions/ebt_ip6.c
+index bbdc4ae..e3e0956 100644
+--- a/extensions/ebt_ip6.c
++++ b/extensions/ebt_ip6.c
+@@ -449,14 +449,14 @@ static void print(const struct ebt_u_entry *entry,
+ 		if (ipinfo->invflags & EBT_IP6_SOURCE)
+ 			printf("! ");
+ 		printf("%s", ebt_ip6_to_numeric(&ipinfo->saddr));
+-		printf("/%s ", ebt_ip6_to_numeric(&ipinfo->smsk));
++		printf("%s ", ebt_ip6_mask_to_string(&ipinfo->smsk));
+ 	}
+ 	if (ipinfo->bitmask & EBT_IP6_DEST) {
+ 		printf("--ip6-dst ");
+ 		if (ipinfo->invflags & EBT_IP6_DEST)
+ 			printf("! ");
+ 		printf("%s", ebt_ip6_to_numeric(&ipinfo->daddr));
+-		printf("/%s ", ebt_ip6_to_numeric(&ipinfo->dmsk));
++		printf("%s ", ebt_ip6_mask_to_string(&ipinfo->dmsk));
+ 	}
+ 	if (ipinfo->bitmask & EBT_IP6_TCLASS) {
+ 		printf("--ip6-tclass ");
+diff --git a/include/ebtables_u.h b/include/ebtables_u.h
+index ab615c1..35a5bcc 100644
+--- a/include/ebtables_u.h
++++ b/include/ebtables_u.h
+@@ -303,6 +303,7 @@ char *ebt_mask_to_dotted(uint32_t mask);
+ void ebt_parse_ip6_address(char *address, struct in6_addr *addr, 
+ 						   struct in6_addr *msk);
+ char *ebt_ip6_to_numeric(const struct in6_addr *addrp);
++char *ebt_ip6_mask_to_string(const struct in6_addr *msk);
+ 
+ 
+ int do_command(int argc, char *argv[], int exec_style,
+diff --git a/useful_functions.c b/useful_functions.c
+index d20b68e..d14cbe9 100644
+--- a/useful_functions.c
++++ b/useful_functions.c
+@@ -411,3 +411,16 @@ char *ebt_ip6_to_numeric(const struct in6_addr *addrp)
+ 	static char buf[50+1];
+ 	return (char *)inet_ntop(AF_INET6, addrp, buf, sizeof(buf));
+ }
++
++char *ebt_ip6_mask_to_string(const struct in6_addr *msk)
++{
++   	/* /0000:0000:0000:0000:0000:000.000.000.000
++	 * /0000:0000:0000:0000:0000:0000:0000:0000 */
++	static char buf[51+1];
++	if (msk->s6_addr32[0] == 0xFFFFFFFFL && msk->s6_addr32[1] == 0xFFFFFFFFL &&
++	    msk->s6_addr32[2] == 0xFFFFFFFFL && msk->s6_addr32[3] == 0xFFFFFFFFL)
++		*buf = '\0';
++	else
++		sprintf(buf, "/%s", ebt_ip6_to_numeric(msk));
++	return buf;
++}
+-- 
+2.12.1
+

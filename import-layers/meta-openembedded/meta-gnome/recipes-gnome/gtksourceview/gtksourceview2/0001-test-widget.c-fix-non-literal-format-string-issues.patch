@@ -1,0 +1,31 @@
+From 0781b218beb8ba160ea223ff3d74a4fa2abf86fa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Apr 2017 16:21:14 -0700
+Subject: [PATCH] test-widget.c: fix non-literal format string issues
+
+clang errors out when using -Werror=format-nonliteral
+since the definition of g_strdup_vprintf() from glib-2.0
+is using va_list and clang seems to still warn where as
+gcc doesn't do that for va_list arguments
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/test-widget.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test-widget.c b/tests/test-widget.c
+index 46f5f4e..3f2e60f 100644
+--- a/tests/test-widget.c
++++ b/tests/test-widget.c
+@@ -260,7 +260,7 @@ static const gchar *buffer_ui_description =
+ 
+ /* File loading code ----------------------------------------------------------------- */
+ 
+-static void
++static void G_GNUC_PRINTF (2, 0)
+ error_dialog (GtkWindow *parent, const gchar *msg, ...)
+ {
+ 	va_list ap;
+-- 
+2.12.2
+

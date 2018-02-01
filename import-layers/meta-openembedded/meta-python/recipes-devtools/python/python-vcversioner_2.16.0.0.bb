@@ -20,5 +20,6 @@ do_install_append() {
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-subprocess \
     "
+RDEPENDS_${PN}_class-native = ""
 
 BBCLASSEXTEND = "native"

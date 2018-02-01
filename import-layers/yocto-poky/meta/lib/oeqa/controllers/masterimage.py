@@ -32,14 +32,14 @@ class MasterImageHardwareTarget(oeqa.targetcontrol.BaseTarget, metaclass=ABCMeta
         super(MasterImageHardwareTarget, self).__init__(d)
 
         # target ip
-        addr = d.getVar("TEST_TARGET_IP", True) or bb.fatal('Please set TEST_TARGET_IP with the IP address of the machine you want to run the tests on.')
+        addr = d.getVar("TEST_TARGET_IP") or bb.fatal('Please set TEST_TARGET_IP with the IP address of the machine you want to run the tests on.')
         self.ip = addr.split(":")[0]
         try:
             self.port = addr.split(":")[1]
         except IndexError:
             self.port = None
         bb.note("Target IP: %s" % self.ip)
-        self.server_ip = d.getVar("TEST_SERVER_IP", True)
+        self.server_ip = d.getVar("TEST_SERVER_IP")
         if not self.server_ip:
             try:
                 self.server_ip = subprocess.check_output(['ip', 'route', 'get', self.ip ]).split("\n")[0].split()[-1]
@@ -49,8 +49,8 @@ class MasterImageHardwareTarget(oeqa.targetcontrol.BaseTarget, metaclass=ABCMeta
 
         # test rootfs + kernel
         self.image_fstype = self.get_image_fstype(d)
-        self.rootfs = os.path.join(d.getVar("DEPLOY_DIR_IMAGE", True), d.getVar("IMAGE_LINK_NAME", True) + '.' + self.image_fstype)
-        self.kernel = os.path.join(d.getVar("DEPLOY_DIR_IMAGE", True), d.getVar("KERNEL_IMAGETYPE", False) + '-' + d.getVar('MACHINE', False) + '.bin')
+        self.rootfs = os.path.join(d.getVar("DEPLOY_DIR_IMAGE"), d.getVar("IMAGE_LINK_NAME") + '.' + self.image_fstype)
+        self.kernel = os.path.join(d.getVar("DEPLOY_DIR_IMAGE"), d.getVar("KERNEL_IMAGETYPE", False) + '-' + d.getVar('MACHINE', False) + '.bin')
         if not os.path.isfile(self.rootfs):
             # we could've checked that IMAGE_FSTYPES contains tar.gz but the config for running testimage might not be
             # the same as the config with which the image was build, ie
@@ -64,16 +64,16 @@ class MasterImageHardwareTarget(oeqa.targetcontrol.BaseTarget, metaclass=ABCMeta
         # master ssh connection
         self.master = None
         # if the user knows what they are doing, then by all means...
-        self.user_cmds = d.getVar("TEST_DEPLOY_CMDS", True)
+        self.user_cmds = d.getVar("TEST_DEPLOY_CMDS")
         self.deploy_cmds = None
 
         # this is the name of the command that controls the power for a board
         # e.g: TEST_POWERCONTROL_CMD = "/home/user/myscripts/powercontrol.py ${MACHINE} what-ever-other-args-the-script-wants"
         # the command should take as the last argument "off" and "on" and "cycle" (off, on)
-        self.powercontrol_cmd = d.getVar("TEST_POWERCONTROL_CMD", True) or None
+        self.powercontrol_cmd = d.getVar("TEST_POWERCONTROL_CMD") or None
         self.powercontrol_args = d.getVar("TEST_POWERCONTROL_EXTRA_ARGS", False) or ""
 
-        self.serialcontrol_cmd = d.getVar("TEST_SERIALCONTROL_CMD", True) or None
+        self.serialcontrol_cmd = d.getVar("TEST_SERIALCONTROL_CMD") or None
         self.serialcontrol_args = d.getVar("TEST_SERIALCONTROL_EXTRA_ARGS", False) or ""
 
         self.origenv = os.environ
@@ -82,7 +82,7 @@ class MasterImageHardwareTarget(oeqa.targetcontrol.BaseTarget, metaclass=ABCMeta
             # ssh + keys means we need the original user env
             bborigenv = d.getVar("BB_ORIGENV", False) or {}
             for key in bborigenv:
-                val = bborigenv.getVar(key, True)
+                val = bborigenv.getVar(key)
                 if val is not None:
                     self.origenv[key] = str(val)
 
@@ -159,10 +159,10 @@ class MasterImageHardwareTarget(oeqa.targetcontrol.BaseTarget, metaclass=ABCMeta
         self.power_cycle(self.connection)
 
 
-class GummibootTarget(MasterImageHardwareTarget):
+class SystemdbootTarget(MasterImageHardwareTarget):
 
     def __init__(self, d):
-        super(GummibootTarget, self).__init__(d)
+        super(SystemdbootTarget, self).__init__(d)
         # this the value we need to set in the LoaderEntryOneShot EFI variable
         # so the system boots the 'test' bootloader label and not the default
         # The first four bytes are EFI bits, and the rest is an utf-16le string

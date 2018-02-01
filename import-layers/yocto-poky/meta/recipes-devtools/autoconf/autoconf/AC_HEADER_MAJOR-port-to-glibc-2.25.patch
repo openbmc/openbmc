@@ -1,0 +1,162 @@
+From e17a30e987d7ee695fb4294a82d987ec3dc9b974 Mon Sep 17 00:00:00 2001
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 14 Sep 2016 08:17:06 -0500
+Subject: [PATCH] AC_HEADER_MAJOR: port to glibc 2.25
+
+glibc 2.25 is deprecating the namespace pollution of <sys/types.h>
+injecting major(), minor(), and makedev() into the compilation
+environment, with a warning that insists that users include
+<sys/sysmacros.h> instead.  However, because the expansion of
+AC_HEADER_MAJOR didn't bother checking sys/sysmacros.h until
+after probing whether sys/types.h pollutes the namespace, it was
+not defining MAJOR_IN_SYSMACROS, with the result that code
+compiled with -Werror chokes on the deprecation warnings because
+it was not including sysmacros.h.
+
+In addition to fixing autoconf (which only benefits projects
+that rebuild configure after this fix is released), we can also
+give a hint to distros on how they can populate config.site with
+a cache variable to force pre-existing configure scripts without
+the updated macro to behave sanely in the presence of glibc 2.25
+(the documentation is especially useful since that cache variable
+is no longer present in autoconf after this patch).
+
+Note that mingw lacks major/minor/makedev in any of its standard
+headers; for that platform, the behavior of this macro is unchanged
+(code using the recommended include formula will get a compile error
+when trying to use major(), whether before or after this patch); but
+for now, it is assumed that programs actually concerned with
+creating devices are not worried about portability to mingw.  If
+desired, a later patch could tighten AC_HEADER_MAJOR to fail at
+configure time if the macros are unavailable in any of the three
+system headers, but that semantic change is not worth mixing into
+this patch.
+
+* lib/autoconf/headers.m4 (AC_HEADER_MAJOR): Drop check for
+major within sys/types.h; it interferes with the need to check
+sysmacros.h first.
+* doc/autoconf.texi (Particular Headers) <AC_HEADER_MAJOR>: Expand
+details on usage, and on workarounds for non-updated projects.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+Upstream-Status: Backport
+
+ doc/autoconf.texi       |   35 +++++++++++++++++++++++++++++++----
+ lib/autoconf/headers.m4 |   30 ++++++++++++++----------------
+ 2 files changed, 45 insertions(+), 20 deletions(-)
+
+Index: autoconf-2.69/doc/autoconf.texi
+===================================================================
+--- autoconf-2.69.orig/doc/autoconf.texi
++++ autoconf-2.69/doc/autoconf.texi
+@@ -15,7 +15,7 @@
+ @c The ARG is an optional argument.  To be used for macro arguments in
+ @c their documentation (@defmac).
+ @macro ovar{varname}
+-@r{[}@var{\varname\}@r{]}@c
++@r{[}@var{\varname\}@r{]}
+ @end macro
+ 
+ @c @dvar(ARG, DEFAULT)
+@@ -23,7 +23,7 @@
+ @c The ARG is an optional argument, defaulting to DEFAULT.  To be used
+ @c for macro arguments in their documentation (@defmac).
+ @macro dvar{varname, default}
+-@r{[}@var{\varname\} = @samp{\default\}@r{]}@c
++@r{[}@var{\varname\} = @samp{\default\}@r{]}
+ @end macro
+ 
+ @c Handling the indexes with Texinfo yields several different problems.
+@@ -5926,10 +5926,37 @@ Also see @code{AC_STRUCT_DIRENT_D_INO} a
+ @cvindex MAJOR_IN_SYSMACROS
+ @hdrindex{sys/mkdev.h}
+ @hdrindex{sys/sysmacros.h}
+-If @file{sys/types.h} does not define @code{major}, @code{minor}, and
+-@code{makedev}, but @file{sys/mkdev.h} does, define
+-@code{MAJOR_IN_MKDEV}; otherwise, if @file{sys/sysmacros.h} does, define
+-@code{MAJOR_IN_SYSMACROS}.
++Detect the headers required to use @code{makedev}, @code{major}, and
++@code{minor}.  These functions may be defined by @file{sys/mkdev.h},
++@code{sys/sysmacros.h}, or @file{sys/types.h}.
++
++@code{AC_HEADER_MAJOR} defines @code{MAJOR_IN_MKDEV} if they are in
++@file{sys/mkdev.h}, or @code{MAJOR_IN_SYSMACROS} if they are in
++@file{sys/sysmacros.h}.  If neither macro is defined, they are either in
++@file{sys/types.h} or unavailable.
++
++To properly use these functions, your code should contain something
++like:
++
++@verbatim
++#include <sys/types.h>
++#ifdef MAJOR_IN_MKDEV
++# include <sys/mkdev.h>
++#elif defined MAJOR_IN_SYSMACROS
++# include <sys/sysmacros.h>
++#endif
++@end verbatim
++
++Note: Configure scripts built with Autoconf 2.69 or earlier will not
++detect a problem if @file{sys/types.h} contains definitions of
++@code{major}, @code{minor}, and/or @code{makedev} that trigger compiler
++warnings upon use.  This is known to occur with GNU libc 2.25, where
++those definitions are being deprecated to reduce namespace pollution.
++If it is not practical to use Autoconf 2.70 to regenerate the configure
++script of affected software, you can work around the problem by setting
++@samp{ac_cv_header_sys_types_h_makedev=no}, as an argument to
++@command{configure} or as part of a @file{config.site} site default file
++(@pxref{Site Defaults}).
+ @end defmac
+ 
+ @defmac AC_HEADER_RESOLV
+Index: autoconf-2.69/lib/autoconf/headers.m4
+===================================================================
+--- autoconf-2.69.orig/lib/autoconf/headers.m4
++++ autoconf-2.69/lib/autoconf/headers.m4
+@@ -502,31 +502,29 @@ fi
+ 
+ # AC_HEADER_MAJOR
+ # ---------------
++# Thanks to glibc 2.25 deprecating macros in sys/types.h, coupled with
++# back-compat to autoconf 2.69, we need the following logic:
++# Check whether <sys/types.h> compiles.
++# If <sys/mkdev.h> compiles, assume it provides major/minor/makedev.
++# Otherwise, if <sys/sysmacros.h> compiles, assume it provides the macros.
++# Otherwise, either the macros were provided by <sys/types.h>, or do
++# not exist on the platform.  Code trying to use these three macros is
++# assumed to not care about platforms that lack the macros.
+ AN_FUNCTION([major],     [AC_HEADER_MAJOR])
+ AN_FUNCTION([makedev],   [AC_HEADER_MAJOR])
+ AN_FUNCTION([minor],     [AC_HEADER_MAJOR])
+ AN_HEADER([sys/mkdev.h], [AC_HEADER_MAJOR])
+ AC_DEFUN([AC_HEADER_MAJOR],
+-[AC_CACHE_CHECK(whether sys/types.h defines makedev,
+-		ac_cv_header_sys_types_h_makedev,
+-[AC_LINK_IFELSE([AC_LANG_PROGRAM([[@%:@include <sys/types.h>]],
+-				 [[return makedev(0, 0);]])],
+-		[ac_cv_header_sys_types_h_makedev=yes],
+-		[ac_cv_header_sys_types_h_makedev=no])
+-])
+-
+-if test $ac_cv_header_sys_types_h_makedev = no; then
++[AC_CHECK_HEADERS_ONCE([sys/types.h])
+ AC_CHECK_HEADER(sys/mkdev.h,
+ 		[AC_DEFINE(MAJOR_IN_MKDEV, 1,
+ 			   [Define to 1 if `major', `minor', and `makedev' are
+ 			    declared in <mkdev.h>.])])
+-
+-  if test $ac_cv_header_sys_mkdev_h = no; then
+-    AC_CHECK_HEADER(sys/sysmacros.h,
+-		    [AC_DEFINE(MAJOR_IN_SYSMACROS, 1,
+-			       [Define to 1 if `major', `minor', and `makedev'
+-				are declared in <sysmacros.h>.])])
+-  fi
++if test $ac_cv_header_sys_mkdev_h = no; then
++  AC_CHECK_HEADER(sys/sysmacros.h,
++		  [AC_DEFINE(MAJOR_IN_SYSMACROS, 1,
++			     [Define to 1 if `major', `minor', and `makedev'
++			      are declared in <sysmacros.h>.])])
+ fi
+ ])# AC_HEADER_MAJOR
+ 

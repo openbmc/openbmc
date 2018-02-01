@@ -1,0 +1,603 @@
+Upstream-Status: Backport [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Index: b/backends/arm_init.c
+===================================================================
+--- a/backends/arm_init.c
++++ b/backends/arm_init.c
+@@ -35,20 +35,31 @@
+ #define RELOC_PREFIX	R_ARM_
+ #include "libebl_CPU.h"
+ 
++#include "libebl_arm.h"
++
+ /* This defines the common reloc hooks based on arm_reloc.def.  */
+ #include "common-reloc.c"
+ 
+ 
+ const char *
+-arm_init (Elf *elf __attribute__ ((unused)),
++arm_init (Elf *elf,
+ 	  GElf_Half machine __attribute__ ((unused)),
+ 	  Ebl *eh,
+ 	  size_t ehlen)
+ {
++  int soft_float = 0;
++
+   /* Check whether the Elf_BH object has a sufficent size.  */
+   if (ehlen < sizeof (Ebl))
+     return NULL;
+ 
++  if (elf) {
++    GElf_Ehdr ehdr_mem;
++    GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
++    if (ehdr && (ehdr->e_flags & EF_ARM_SOFT_FLOAT))
++      soft_float = 1;
++  }
++
+   /* We handle it.  */
+   eh->name = "ARM";
+   arm_init_reloc (eh);
+@@ -60,7 +71,10 @@ arm_init (Elf *elf __attribute__ ((unuse
+   HOOK (eh, core_note);
+   HOOK (eh, auxv_info);
+   HOOK (eh, check_object_attribute);
+-  HOOK (eh, return_value_location);
++  if (soft_float)
++    eh->return_value_location = arm_return_value_location_soft;
++  else
++    eh->return_value_location = arm_return_value_location_hard;
+   HOOK (eh, abi_cfi);
+   HOOK (eh, check_reloc_target_type);
+   HOOK (eh, symbol_type_name);
+Index: b/backends/arm_regs.c
+===================================================================
+--- a/backends/arm_regs.c
++++ b/backends/arm_regs.c
+@@ -31,6 +31,7 @@
+ #endif
+ 
+ #include <string.h>
++#include <stdio.h>
+ #include <dwarf.h>
+ 
+ #define BACKEND arm_
+@@ -76,6 +77,9 @@ arm_register_info (Ebl *ebl __attribute_
+       break;
+ 
+     case 16 + 0 ... 16 + 7:
++      /* AADWARF says that there are no registers in that range,
++       * but gcc maps FPA registers here
++       */
+       regno += 96 - 16;
+       /* Fall through.  */
+     case 96 + 0 ... 96 + 7:
+@@ -87,11 +91,139 @@ arm_register_info (Ebl *ebl __attribute_
+       namelen = 2;
+       break;
+ 
++    case 64 + 0 ... 64 + 9:
++      *setname = "VFP";
++      *bits = 32;
++      *type = DW_ATE_float;
++      name[0] = 's';
++      name[1] = regno - 64 + '0';
++      namelen = 2;
++      break;
++
++    case 64 + 10 ... 64 + 31:
++      *setname = "VFP";
++      *bits = 32;
++      *type = DW_ATE_float;
++      name[0] = 's';
++      name[1] = (regno - 64) / 10 + '0';
++      name[2] = (regno - 64) % 10 + '0';
++      namelen = 3;
++      break;
++
++    case 104 + 0 ... 104 + 7:
++      /* XXX TODO:
++       * This can be either intel wireless MMX general purpose/control
++       * registers or xscale accumulator, which have different usage.
++       * We only have the intel wireless MMX here now.
++       * The name needs to be changed for the xscale accumulator too. */
++      *setname = "MMX";
++      *type = DW_ATE_unsigned;
++      *bits = 32;
++      memcpy(name, "wcgr", 4);
++      name[4] = regno - 104 + '0';
++      namelen = 5;
++      break;
++
++    case 112 + 0 ... 112 + 9:
++      *setname = "MMX";
++      *type = DW_ATE_unsigned;
++      *bits = 64;
++      name[0] = 'w';
++      name[1] = 'r';
++      name[2] = regno - 112 + '0';
++      namelen = 3;
++      break;
++
++    case 112 + 10 ... 112 + 15:
++      *setname = "MMX";
++      *type = DW_ATE_unsigned;
++      *bits = 64;
++      name[0] = 'w';
++      name[1] = 'r';
++      name[2] = '1';
++      name[3] = regno - 112 - 10 + '0';
++      namelen = 4;
++      break;
++
+     case 128:
++      *setname = "state";
+       *type = DW_ATE_unsigned;
+       return stpcpy (name, "spsr") + 1 - name;
+ 
++    case 129:
++      *setname = "state";
++      *type = DW_ATE_unsigned;
++      return stpcpy(name, "spsr_fiq") + 1 - name;
++
++    case 130:
++      *setname = "state";
++      *type = DW_ATE_unsigned;
++      return stpcpy(name, "spsr_irq") + 1 - name;
++
++    case 131:
++      *setname = "state";
++      *type = DW_ATE_unsigned;
++      return stpcpy(name, "spsr_abt") + 1 - name;
++
++    case 132:
++      *setname = "state";
++      *type = DW_ATE_unsigned;
++      return stpcpy(name, "spsr_und") + 1 - name;
++
++    case 133:
++      *setname = "state";
++      *type = DW_ATE_unsigned;
++      return stpcpy(name, "spsr_svc") + 1 - name;
++
++    case 144 ... 150:
++      *setname = "integer";
++      *type = DW_ATE_signed;
++      *bits = 32;
++      return sprintf(name, "r%d_usr", regno - 144 + 8) + 1;
++
++    case 151 ... 157:
++      *setname = "integer";
++      *type = DW_ATE_signed;
++      *bits = 32;
++      return sprintf(name, "r%d_fiq", regno - 151 + 8) + 1;
++
++    case 158 ... 159:
++      *setname = "integer";
++      *type = DW_ATE_signed;
++      *bits = 32;
++      return sprintf(name, "r%d_irq", regno - 158 + 13) + 1;
++
++    case 160 ... 161:
++      *setname = "integer";
++      *type = DW_ATE_signed;
++      *bits = 32;
++      return sprintf(name, "r%d_abt", regno - 160 + 13) + 1;
++
++    case 162 ... 163:
++      *setname = "integer";
++      *type = DW_ATE_signed;
++      *bits = 32;
++      return sprintf(name, "r%d_und", regno - 162 + 13) + 1;
++
++    case 164 ... 165:
++      *setname = "integer";
++      *type = DW_ATE_signed;
++      *bits = 32;
++      return sprintf(name, "r%d_svc", regno - 164 + 13) + 1;
++
++    case 192 ... 199:
++     *setname = "MMX";
++      *bits = 32;
++      *type = DW_ATE_unsigned;
++      name[0] = 'w';
++      name[1] = 'c';
++      name[2] = regno - 192 + '0';
++      namelen = 3;
++      break;
++
+     case 256 + 0 ... 256 + 9:
++      /* XXX TODO: Neon also uses those registers and can contain
++       * both float and integers */
+       *setname = "VFP";
+       *type = DW_ATE_float;
+       *bits = 64;
+Index: b/backends/arm_retval.c
+===================================================================
+--- a/backends/arm_retval.c
++++ b/backends/arm_retval.c
+@@ -48,6 +48,13 @@ static const Dwarf_Op loc_intreg[] =
+ #define nloc_intreg	1
+ #define nloc_intregs(n)	(2 * (n))
+ 
++/* f1  */ /* XXX TODO: f0 can also have number 96 if program was compiled with -mabi=aapcs */
++static const Dwarf_Op loc_fpreg[] =
++  {
++    { .atom = DW_OP_reg16 },
++  };
++#define nloc_fpreg  1
++
+ /* The return value is a structure and is actually stored in stack space
+    passed in a hidden argument by the caller.  But, the compiler
+    helpfully returns the address of that space in r0.  */
+@@ -58,8 +65,9 @@ static const Dwarf_Op loc_aggregate[] =
+ #define nloc_aggregate 1
+ 
+ 
+-int
+-arm_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
++static int
++arm_return_value_location_ (Dwarf_Die *functypedie, const Dwarf_Op **locp,
++		            int soft_float)
+ {
+   /* Start with the function's type, and get the DW_AT_type attribute,
+      which is the type of the return value.  */
+@@ -98,6 +106,21 @@ arm_return_value_location (Dwarf_Die *fu
+ 	    else
+ 	      return -1;
+ 	  }
++	if (tag == DW_TAG_base_type)
++	  {
++	    Dwarf_Word encoding;
++	    if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_encoding,
++				 &attr_mem), &encoding) != 0)
++	      return -1;
++
++	    if ((encoding == DW_ATE_float) && !soft_float)
++	      {
++		*locp = loc_fpreg;
++		if (size <= 8)
++		  return nloc_fpreg;
++		goto aggregate;
++	      }
++	  }
+ 	if (size <= 16)
+ 	  {
+ 	  intreg:
+@@ -106,6 +129,7 @@ arm_return_value_location (Dwarf_Die *fu
+ 	  }
+ 
+       aggregate:
++	/* XXX TODO sometimes aggregates are returned in r0 (-mabi=aapcs) */
+ 	*locp = loc_aggregate;
+ 	return nloc_aggregate;
+       }
+@@ -125,3 +149,18 @@ arm_return_value_location (Dwarf_Die *fu
+      DWARF and might be valid.  */
+   return -2;
+ }
++
++/* return location for -mabi=apcs-gnu -msoft-float */
++int
++arm_return_value_location_soft (Dwarf_Die *functypedie, const Dwarf_Op **locp)
++{
++   return arm_return_value_location_ (functypedie, locp, 1);
++}
++
++/* return location for -mabi=apcs-gnu -mhard-float (current default) */
++int
++arm_return_value_location_hard (Dwarf_Die *functypedie, const Dwarf_Op **locp)
++{
++   return arm_return_value_location_ (functypedie, locp, 0);
++}
++
+Index: b/libelf/elf.h
+===================================================================
+--- a/libelf/elf.h
++++ b/libelf/elf.h
+@@ -2593,6 +2593,9 @@ enum
+ #define EF_ARM_EABI_VER4	0x04000000
+ #define EF_ARM_EABI_VER5	0x05000000
+ 
++/* EI_OSABI values */
++#define ELFOSABI_ARM_AEABI    64      /* Contains symbol versioning. */
++
+ /* Additional symbol types for Thumb.  */
+ #define STT_ARM_TFUNC		STT_LOPROC /* A Thumb function.  */
+ #define STT_ARM_16BIT		STT_HIPROC /* A Thumb label.  */
+@@ -2610,12 +2613,19 @@ enum
+ 
+ /* Processor specific values for the Phdr p_type field.  */
+ #define PT_ARM_EXIDX		(PT_LOPROC + 1)	/* ARM unwind segment.  */
++#define PT_ARM_UNWIND		PT_ARM_EXIDX
+ 
+ /* Processor specific values for the Shdr sh_type field.  */
+ #define SHT_ARM_EXIDX		(SHT_LOPROC + 1) /* ARM unwind section.  */
+ #define SHT_ARM_PREEMPTMAP	(SHT_LOPROC + 2) /* Preemption details.  */
+ #define SHT_ARM_ATTRIBUTES	(SHT_LOPROC + 3) /* ARM attributes section.  */
+ 
++/* Processor specific values for the Dyn d_tag field.  */
++#define DT_ARM_RESERVED1	(DT_LOPROC + 0)
++#define DT_ARM_SYMTABSZ		(DT_LOPROC + 1)
++#define DT_ARM_PREEMTMAB	(DT_LOPROC + 2)
++#define DT_ARM_RESERVED2	(DT_LOPROC + 3)
++#define DT_ARM_NUM		4
+ 
+ /* AArch64 relocs.  */
+ 
+@@ -2908,6 +2918,7 @@ enum
+ 					   TLS block (LDR, STR).  */
+ #define R_ARM_TLS_IE12GP	111	/* 12 bit GOT entry relative
+ 					   to GOT origin (LDR).  */
++/* 112 - 127 private range */
+ #define R_ARM_ME_TOO		128	/* Obsolete.  */
+ #define R_ARM_THM_TLS_DESCSEQ	129
+ #define R_ARM_THM_TLS_DESCSEQ16	129
+Index: b/backends/libebl_arm.h
+===================================================================
+--- /dev/null
++++ b/backends/libebl_arm.h
+@@ -0,0 +1,9 @@
++#ifndef _LIBEBL_ARM_H
++#define _LIBEBL_ARM_H 1
++
++#include <libdw.h>
++
++extern int arm_return_value_location_soft(Dwarf_Die *, const Dwarf_Op **locp);
++extern int arm_return_value_location_hard(Dwarf_Die *, const Dwarf_Op **locp);
++
++#endif
+Index: b/tests/run-allregs.sh
+===================================================================
+--- a/tests/run-allregs.sh
++++ b/tests/run-allregs.sh
+@@ -2672,7 +2672,28 @@ integer registers:
+ 	 13: sp (sp), address 32 bits
+ 	 14: lr (lr), address 32 bits
+ 	 15: pc (pc), address 32 bits
+-	128: spsr (spsr), unsigned 32 bits
++	144: r8_usr (r8_usr), signed 32 bits
++	145: r9_usr (r9_usr), signed 32 bits
++	146: r10_usr (r10_usr), signed 32 bits
++	147: r11_usr (r11_usr), signed 32 bits
++	148: r12_usr (r12_usr), signed 32 bits
++	149: r13_usr (r13_usr), signed 32 bits
++	150: r14_usr (r14_usr), signed 32 bits
++	151: r8_fiq (r8_fiq), signed 32 bits
++	152: r9_fiq (r9_fiq), signed 32 bits
++	153: r10_fiq (r10_fiq), signed 32 bits
++	154: r11_fiq (r11_fiq), signed 32 bits
++	155: r12_fiq (r12_fiq), signed 32 bits
++	156: r13_fiq (r13_fiq), signed 32 bits
++	157: r14_fiq (r14_fiq), signed 32 bits
++	158: r13_irq (r13_irq), signed 32 bits
++	159: r14_irq (r14_irq), signed 32 bits
++	160: r13_abt (r13_abt), signed 32 bits
++	161: r14_abt (r14_abt), signed 32 bits
++	162: r13_und (r13_und), signed 32 bits
++	163: r14_und (r14_und), signed 32 bits
++	164: r13_svc (r13_svc), signed 32 bits
++	165: r14_svc (r14_svc), signed 32 bits
+ FPA registers:
+ 	 16: f0 (f0), float 96 bits
+ 	 17: f1 (f1), float 96 bits
+@@ -2690,7 +2711,72 @@ FPA registers:
+ 	101: f5 (f5), float 96 bits
+ 	102: f6 (f6), float 96 bits
+ 	103: f7 (f7), float 96 bits
++MMX registers:
++	104: wcgr0 (wcgr0), unsigned 32 bits
++	105: wcgr1 (wcgr1), unsigned 32 bits
++	106: wcgr2 (wcgr2), unsigned 32 bits
++	107: wcgr3 (wcgr3), unsigned 32 bits
++	108: wcgr4 (wcgr4), unsigned 32 bits
++	109: wcgr5 (wcgr5), unsigned 32 bits
++	110: wcgr6 (wcgr6), unsigned 32 bits
++	111: wcgr7 (wcgr7), unsigned 32 bits
++	112: wr0 (wr0), unsigned 64 bits
++	113: wr1 (wr1), unsigned 64 bits
++	114: wr2 (wr2), unsigned 64 bits
++	115: wr3 (wr3), unsigned 64 bits
++	116: wr4 (wr4), unsigned 64 bits
++	117: wr5 (wr5), unsigned 64 bits
++	118: wr6 (wr6), unsigned 64 bits
++	119: wr7 (wr7), unsigned 64 bits
++	120: wr8 (wr8), unsigned 64 bits
++	121: wr9 (wr9), unsigned 64 bits
++	122: wr10 (wr10), unsigned 64 bits
++	123: wr11 (wr11), unsigned 64 bits
++	124: wr12 (wr12), unsigned 64 bits
++	125: wr13 (wr13), unsigned 64 bits
++	126: wr14 (wr14), unsigned 64 bits
++	127: wr15 (wr15), unsigned 64 bits
++	192: wc0 (wc0), unsigned 32 bits
++	193: wc1 (wc1), unsigned 32 bits
++	194: wc2 (wc2), unsigned 32 bits
++	195: wc3 (wc3), unsigned 32 bits
++	196: wc4 (wc4), unsigned 32 bits
++	197: wc5 (wc5), unsigned 32 bits
++	198: wc6 (wc6), unsigned 32 bits
++	199: wc7 (wc7), unsigned 32 bits
+ VFP registers:
++	 64: s0 (s0), float 32 bits
++	 65: s1 (s1), float 32 bits
++	 66: s2 (s2), float 32 bits
++	 67: s3 (s3), float 32 bits
++	 68: s4 (s4), float 32 bits
++	 69: s5 (s5), float 32 bits
++	 70: s6 (s6), float 32 bits
++	 71: s7 (s7), float 32 bits
++	 72: s8 (s8), float 32 bits
++	 73: s9 (s9), float 32 bits
++	 74: s10 (s10), float 32 bits
++	 75: s11 (s11), float 32 bits
++	 76: s12 (s12), float 32 bits
++	 77: s13 (s13), float 32 bits
++	 78: s14 (s14), float 32 bits
++	 79: s15 (s15), float 32 bits
++	 80: s16 (s16), float 32 bits
++	 81: s17 (s17), float 32 bits
++	 82: s18 (s18), float 32 bits
++	 83: s19 (s19), float 32 bits
++	 84: s20 (s20), float 32 bits
++	 85: s21 (s21), float 32 bits
++	 86: s22 (s22), float 32 bits
++	 87: s23 (s23), float 32 bits
++	 88: s24 (s24), float 32 bits
++	 89: s25 (s25), float 32 bits
++	 90: s26 (s26), float 32 bits
++	 91: s27 (s27), float 32 bits
++	 92: s28 (s28), float 32 bits
++	 93: s29 (s29), float 32 bits
++	 94: s30 (s30), float 32 bits
++	 95: s31 (s31), float 32 bits
+ 	256: d0 (d0), float 64 bits
+ 	257: d1 (d1), float 64 bits
+ 	258: d2 (d2), float 64 bits
+@@ -2723,6 +2809,13 @@ VFP registers:
+ 	285: d29 (d29), float 64 bits
+ 	286: d30 (d30), float 64 bits
+ 	287: d31 (d31), float 64 bits
++state registers:
++	128: spsr (spsr), unsigned 32 bits
++	129: spsr_fiq (spsr_fiq), unsigned 32 bits
++	130: spsr_irq (spsr_irq), unsigned 32 bits
++	131: spsr_abt (spsr_abt), unsigned 32 bits
++	132: spsr_und (spsr_und), unsigned 32 bits
++	133: spsr_svc (spsr_svc), unsigned 32 bits
+ EOF
+ 
+ # See run-readelf-mixed-corenote.sh for instructions to regenerate
+Index: b/tests/run-readelf-mixed-corenote.sh
+===================================================================
+--- a/tests/run-readelf-mixed-corenote.sh
++++ b/tests/run-readelf-mixed-corenote.sh
+@@ -31,12 +31,11 @@ Note segment of 892 bytes at offset 0x27
+     pid: 11087, ppid: 11063, pgrp: 11087, sid: 11063
+     utime: 0.000000, stime: 0.010000, cutime: 0.000000, cstime: 0.000000
+     orig_r0: -1, fpvalid: 1
+-    r0:             1  r1:   -1091672508  r2:   -1091672500
+-    r3:             0  r4:             0  r5:             0
+-    r6:         33728  r7:             0  r8:             0
+-    r9:             0  r10:  -1225703496  r11:  -1091672844
+-    r12:            0  sp:    0xbeee64f4  lr:    0xb6dc3f48
+-    pc:    0x00008500  spsr:  0x60000010
++    r0:            1  r1:  -1091672508  r2:  -1091672500  r3:            0
++    r4:            0  r5:            0  r6:        33728  r7:            0
++    r8:            0  r9:            0  r10: -1225703496  r11: -1091672844
++    r12:           0  sp:   0xbeee64f4  lr:   0xb6dc3f48  pc:   0x00008500
++    spsr:  0x60000010
+   CORE                 124  PRPSINFO
+     state: 0, sname: R, zomb: 0, nice: 0, flag: 0x00400500
+     uid: 0, gid: 0, pid: 11087, ppid: 11063, pgrp: 11087, sid: 11063
+Index: b/tests/run-addrcfi.sh
+===================================================================
+--- a/tests/run-addrcfi.sh
++++ b/tests/run-addrcfi.sh
+@@ -3554,6 +3554,38 @@ dwarf_cfi_addrframe (.eh_frame): no matc
+ 	FPA reg21 (f5): undefined
+ 	FPA reg22 (f6): undefined
+ 	FPA reg23 (f7): undefined
++	VFP reg64 (s0): undefined
++	VFP reg65 (s1): undefined
++	VFP reg66 (s2): undefined
++	VFP reg67 (s3): undefined
++	VFP reg68 (s4): undefined
++	VFP reg69 (s5): undefined
++	VFP reg70 (s6): undefined
++	VFP reg71 (s7): undefined
++	VFP reg72 (s8): undefined
++	VFP reg73 (s9): undefined
++	VFP reg74 (s10): undefined
++	VFP reg75 (s11): undefined
++	VFP reg76 (s12): undefined
++	VFP reg77 (s13): undefined
++	VFP reg78 (s14): undefined
++	VFP reg79 (s15): undefined
++	VFP reg80 (s16): undefined
++	VFP reg81 (s17): undefined
++	VFP reg82 (s18): undefined
++	VFP reg83 (s19): undefined
++	VFP reg84 (s20): undefined
++	VFP reg85 (s21): undefined
++	VFP reg86 (s22): undefined
++	VFP reg87 (s23): undefined
++	VFP reg88 (s24): undefined
++	VFP reg89 (s25): undefined
++	VFP reg90 (s26): undefined
++	VFP reg91 (s27): undefined
++	VFP reg92 (s28): undefined
++	VFP reg93 (s29): undefined
++	VFP reg94 (s30): undefined
++	VFP reg95 (s31): undefined
+ 	FPA reg96 (f0): undefined
+ 	FPA reg97 (f1): undefined
+ 	FPA reg98 (f2): undefined
+@@ -3562,7 +3594,66 @@ dwarf_cfi_addrframe (.eh_frame): no matc
+ 	FPA reg101 (f5): undefined
+ 	FPA reg102 (f6): undefined
+ 	FPA reg103 (f7): undefined
+-	integer reg128 (spsr): undefined
++	MMX reg104 (wcgr0): undefined
++	MMX reg105 (wcgr1): undefined
++	MMX reg106 (wcgr2): undefined
++	MMX reg107 (wcgr3): undefined
++	MMX reg108 (wcgr4): undefined
++	MMX reg109 (wcgr5): undefined
++	MMX reg110 (wcgr6): undefined
++	MMX reg111 (wcgr7): undefined
++	MMX reg112 (wr0): undefined
++	MMX reg113 (wr1): undefined
++	MMX reg114 (wr2): undefined
++	MMX reg115 (wr3): undefined
++	MMX reg116 (wr4): undefined
++	MMX reg117 (wr5): undefined
++	MMX reg118 (wr6): undefined
++	MMX reg119 (wr7): undefined
++	MMX reg120 (wr8): undefined
++	MMX reg121 (wr9): undefined
++	MMX reg122 (wr10): undefined
++	MMX reg123 (wr11): undefined
++	MMX reg124 (wr12): undefined
++	MMX reg125 (wr13): undefined
++	MMX reg126 (wr14): undefined
++	MMX reg127 (wr15): undefined
++	state reg128 (spsr): undefined
++	state reg129 (spsr_fiq): undefined
++	state reg130 (spsr_irq): undefined
++	state reg131 (spsr_abt): undefined
++	state reg132 (spsr_und): undefined
++	state reg133 (spsr_svc): undefined
++	integer reg144 (r8_usr): undefined
++	integer reg145 (r9_usr): undefined
++	integer reg146 (r10_usr): undefined
++	integer reg147 (r11_usr): undefined
++	integer reg148 (r12_usr): undefined
++	integer reg149 (r13_usr): undefined
++	integer reg150 (r14_usr): undefined
++	integer reg151 (r8_fiq): undefined
++	integer reg152 (r9_fiq): undefined
++	integer reg153 (r10_fiq): undefined
++	integer reg154 (r11_fiq): undefined
++	integer reg155 (r12_fiq): undefined
++	integer reg156 (r13_fiq): undefined
++	integer reg157 (r14_fiq): undefined
++	integer reg158 (r13_irq): undefined
++	integer reg159 (r14_irq): undefined
++	integer reg160 (r13_abt): undefined
++	integer reg161 (r14_abt): undefined
++	integer reg162 (r13_und): undefined
++	integer reg163 (r14_und): undefined
++	integer reg164 (r13_svc): undefined
++	integer reg165 (r14_svc): undefined
++	MMX reg192 (wc0): undefined
++	MMX reg193 (wc1): undefined
++	MMX reg194 (wc2): undefined
++	MMX reg195 (wc3): undefined
++	MMX reg196 (wc4): undefined
++	MMX reg197 (wc5): undefined
++	MMX reg198 (wc6): undefined
++	MMX reg199 (wc7): undefined
+ 	VFP reg256 (d0): undefined
+ 	VFP reg257 (d1): undefined
+ 	VFP reg258 (d2): undefined

@@ -1,0 +1,25 @@
+From 51539bcd2ee9f765595c0be16eebc1daee112b27 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 7 Apr 2017 16:52:59 -0700
+Subject: [PATCH 1/2] fileio: Include sys/param.h for MAXNAMLEN
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ fileio.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fileio.c b/fileio.c
+index 48a67a2..9b69665 100644
+--- a/fileio.c
++++ b/fileio.c
+@@ -12,6 +12,7 @@
+ #include <sys/time.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
++#include <sys/param.h>
+ #include <dirent.h>
+ #include <errno.h>
+ #include <fcntl.h>
+-- 
+2.12.2
+

@@ -1,0 +1,403 @@
+From 5cb589e246c91331ee6b3926b15f5e6cfc8ad95e Mon Sep 17 00:00:00 2001
+From: Felix Janda <felix.janda@posteo.de>
+Date: Sat, 16 May 2015 14:59:57 +0200
+Subject: [PATCH 6/6] src: Use stdint types everywhere
+
+Signed-off-by: Felix Janda <felix.janda@posteo.de>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+ include/libnfnetlink/libnfnetlink.h | 25 ++++++-------
+ src/iftable.c                       |  8 ++---
+ src/iftable.h                       |  4 +--
+ src/libnfnetlink.c                  | 72 ++++++++++++++++++-------------------
+ src/rtnl.c                          |  4 +--
+ src/rtnl.h                          |  2 +-
+ 6 files changed, 58 insertions(+), 57 deletions(-)
+
+diff --git a/include/libnfnetlink/libnfnetlink.h b/include/libnfnetlink/libnfnetlink.h
+index 1d8c49d..cd0be3d 100644
+--- a/include/libnfnetlink/libnfnetlink.h
++++ b/include/libnfnetlink/libnfnetlink.h
+@@ -15,6 +15,7 @@
+ #define aligned_u64 unsigned long long __attribute__((aligned(8)))
+ #endif
+ 
++#include <stdint.h>
+ #include <sys/socket.h>	/* for sa_family_t */
+ #include <linux/netlink.h>
+ #include <libnfnetlink/linux_nfnetlink.h>
+@@ -55,7 +56,7 @@ struct nfnlhdr {
+ struct nfnl_callback {
+ 	int (*call)(struct nlmsghdr *nlh, struct nfattr *nfa[], void *data);
+ 	void *data;
+-	u_int16_t attr_count;
++	uint16_t attr_count;
+ };
+ 
+ struct nfnl_handle;
+@@ -69,7 +70,7 @@ extern struct nfnl_handle *nfnl_open(void);
+ extern int nfnl_close(struct nfnl_handle *);
+ 
+ extern struct nfnl_subsys_handle *nfnl_subsys_open(struct nfnl_handle *, 
+-						   u_int8_t, u_int8_t, 
++						   uint8_t, uint8_t,
+ 						   unsigned int);
+ extern void nfnl_subsys_close(struct nfnl_subsys_handle *);
+ 
+@@ -88,8 +89,8 @@ extern int nfnl_sendiov(const struct nfnl_handle *nfnlh,
+ 			const struct iovec *iov, unsigned int num,
+ 			unsigned int flags);
+ extern void nfnl_fill_hdr(struct nfnl_subsys_handle *, struct nlmsghdr *,
+-			  unsigned int, u_int8_t, u_int16_t, u_int16_t,
+-			  u_int16_t);
++			  unsigned int, uint8_t, uint16_t, uint16_t,
++			  uint16_t);
+ extern __attribute__((deprecated)) int
+ nfnl_talk(struct nfnl_handle *, struct nlmsghdr *, pid_t,
+           unsigned, struct nlmsghdr *,
+@@ -103,8 +104,8 @@ nfnl_listen(struct nfnl_handle *,
+ /* receiving */
+ extern ssize_t nfnl_recv(const struct nfnl_handle *h, unsigned char *buf, size_t len);
+ extern int nfnl_callback_register(struct nfnl_subsys_handle *,
+-				  u_int8_t type, struct nfnl_callback *cb);
+-extern int nfnl_callback_unregister(struct nfnl_subsys_handle *, u_int8_t type);
++				  uint8_t type, struct nfnl_callback *cb);
++extern int nfnl_callback_unregister(struct nfnl_subsys_handle *, uint8_t type);
+ extern int nfnl_handle_packet(struct nfnl_handle *, char *buf, int len);
+ 
+ /* parsing */
+@@ -180,12 +181,12 @@ extern int nfnl_query(struct nfnl_handle *h, struct nlmsghdr *nlh);
+ 
+ /* nfnl attribute handling functions */
+ extern int nfnl_addattr_l(struct nlmsghdr *, int, int, const void *, int);
+-extern int nfnl_addattr8(struct nlmsghdr *, int, int, u_int8_t);
+-extern int nfnl_addattr16(struct nlmsghdr *, int, int, u_int16_t);
+-extern int nfnl_addattr32(struct nlmsghdr *, int, int, u_int32_t);
++extern int nfnl_addattr8(struct nlmsghdr *, int, int, uint8_t);
++extern int nfnl_addattr16(struct nlmsghdr *, int, int, uint16_t);
++extern int nfnl_addattr32(struct nlmsghdr *, int, int, uint32_t);
+ extern int nfnl_nfa_addattr_l(struct nfattr *, int, int, const void *, int);
+-extern int nfnl_nfa_addattr16(struct nfattr *, int, int, u_int16_t);
+-extern int nfnl_nfa_addattr32(struct nfattr *, int, int, u_int32_t);
++extern int nfnl_nfa_addattr16(struct nfattr *, int, int, uint16_t);
++extern int nfnl_nfa_addattr32(struct nfattr *, int, int, uint32_t);
+ extern int nfnl_parse_attr(struct nfattr **, int, struct nfattr *, int);
+ #define nfnl_parse_nested(tb, max, nfa) \
+ 	nfnl_parse_attr((tb), (max), NFA_DATA((nfa)), NFA_PAYLOAD((nfa)))
+@@ -197,7 +198,7 @@ extern int nfnl_parse_attr(struct nfattr **, int, struct nfattr *, int);
+ ({	(tail)->nfa_len = (void *) NLMSG_TAIL(nlh) - (void *) tail; })
+ 
+ extern void nfnl_build_nfa_iovec(struct iovec *iov, struct nfattr *nfa, 
+-				 u_int16_t type, u_int32_t len,
++				 uint16_t type, uint32_t len,
+ 				 unsigned char *val);
+ extern unsigned int nfnl_rcvbufsiz(const struct nfnl_handle *h, 
+ 				   unsigned int size);
+diff --git a/src/iftable.c b/src/iftable.c
+index 5976ed8..157f97b 100644
+--- a/src/iftable.c
++++ b/src/iftable.c
+@@ -27,10 +27,10 @@
+ struct ifindex_node {
+ 	struct list_head head;
+ 
+-	u_int32_t	index;
+-	u_int32_t	type;
+-	u_int32_t	alen;
+-	u_int32_t	flags;
++	uint32_t	index;
++	uint32_t	type;
++	uint32_t	alen;
++	uint32_t	flags;
+ 	char		addr[8];
+ 	char		name[16];
+ };
+diff --git a/src/iftable.h b/src/iftable.h
+index 8df7f24..655df6b 100644
+--- a/src/iftable.h
++++ b/src/iftable.h
+@@ -1,8 +1,8 @@
+ #ifndef _IFTABLE_H
+ #define _IFTABLE_H
+ 
+-int iftable_delete(u_int32_t dst, u_int32_t mask, u_int32_t gw, u_int32_t oif);
+-int iftable_insert(u_int32_t dst, u_int32_t mask, u_int32_t gw, u_int32_t oif);
++int iftable_delete(uint32_t dst, uint32_t mask, uint32_t gw, uint32_t oif);
++int iftable_insert(uint32_t dst, uint32_t mask, uint32_t gw, uint32_t oif);
+ 
+ int iftable_init(void);
+ void iftable_fini(void);
+diff --git a/src/libnfnetlink.c b/src/libnfnetlink.c
+index 398b7d7..df57533 100644
+--- a/src/libnfnetlink.c
++++ b/src/libnfnetlink.c
+@@ -72,9 +72,9 @@
+ 
+ struct nfnl_subsys_handle {
+ 	struct nfnl_handle 	*nfnlh;
+-	u_int32_t		subscriptions;
+-	u_int8_t		subsys_id;
+-	u_int8_t		cb_count;
++	uint32_t		subscriptions;
++	uint8_t			subsys_id;
++	uint8_t			cb_count;
+ 	struct nfnl_callback 	*cb;	/* array of callbacks */
+ };
+ 
+@@ -86,11 +86,11 @@ struct nfnl_handle {
+ 	int			fd;
+ 	struct sockaddr_nl	local;
+ 	struct sockaddr_nl	peer;
+-	u_int32_t		subscriptions;
+-	u_int32_t		seq;
+-	u_int32_t		dump;
+-	u_int32_t		rcv_buffer_size;	/* for nfnl_catch */
+-	u_int32_t		flags;
++	uint32_t		subscriptions;
++	uint32_t		seq;
++	uint32_t		dump;
++	uint32_t		rcv_buffer_size;	/* for nfnl_catch */
++	uint32_t		flags;
+ 	struct nlmsghdr 	*last_nlhdr;
+ 	struct nfnl_subsys_handle subsys[NFNL_MAX_SUBSYS+1];
+ };
+@@ -145,7 +145,7 @@ unsigned int nfnl_portid(const struct nfnl_handle *h)
+ static int recalc_rebind_subscriptions(struct nfnl_handle *nfnlh)
+ {
+ 	int i, err;
+-	u_int32_t new_subscriptions = nfnlh->subscriptions;
++	uint32_t new_subscriptions = nfnlh->subscriptions;
+ 
+ 	for (i = 0; i < NFNL_MAX_SUBSYS; i++)
+ 		new_subscriptions |= nfnlh->subsys[i].subscriptions;
+@@ -273,8 +273,8 @@ void nfnl_set_rcv_buffer_size(struct nfnl_handle *h, unsigned int size)
+  * a valid address that points to a nfnl_subsys_handle structure is returned.
+  */
+ struct nfnl_subsys_handle *
+-nfnl_subsys_open(struct nfnl_handle *nfnlh, u_int8_t subsys_id,
+-		 u_int8_t cb_count, u_int32_t subscriptions)
++nfnl_subsys_open(struct nfnl_handle *nfnlh, uint8_t subsys_id,
++		 uint8_t cb_count, uint32_t subscriptions)
+ {
+ 	struct nfnl_subsys_handle *ssh;
+ 
+@@ -435,10 +435,10 @@ int nfnl_sendiov(const struct nfnl_handle *nfnlh, const struct iovec *iov,
+  */
+ void nfnl_fill_hdr(struct nfnl_subsys_handle *ssh,
+ 		    struct nlmsghdr *nlh, unsigned int len, 
+-		    u_int8_t family,
+-		    u_int16_t res_id,
+-		    u_int16_t msg_type,
+-		    u_int16_t msg_flags)
++		    uint8_t family,
++		    uint16_t res_id,
++		    uint16_t msg_type,
++		    uint16_t msg_flags)
+ {
+ 	assert(ssh);
+ 	assert(nlh);
+@@ -815,7 +815,7 @@ int nfnl_addattr_l(struct nlmsghdr *n, int maxlen, int type, const void *data,
+ }
+ 
+ /**
+- * nfnl_nfa_addattr_l - Add variable length attribute to struct nfattr 
++ * nfnl_nfa_addattr_l - Add variable length attribute to struct nfattr
+  *
+  * @nfa: struct nfattr
+  * @maxlen: maximal length of nfattr buffer
+@@ -849,14 +849,14 @@ int nfnl_nfa_addattr_l(struct nfattr *nfa, int maxlen, int type,
+ }
+ 
+ /**
+- * nfnl_addattr8 - Add u_int8_t attribute to nlmsghdr
++ * nfnl_addattr8 - Add uint8_t attribute to nlmsghdr
+  *
+  * @n: netlink message header to which attribute is to be added
+  * @maxlen: maximum length of netlink message header
+  * @type: type of new attribute
+  * @data: content of new attribute
+  */
+-int nfnl_addattr8(struct nlmsghdr *n, int maxlen, int type, u_int8_t data)
++int nfnl_addattr8(struct nlmsghdr *n, int maxlen, int type, uint8_t data)
+ {
+ 	assert(n);
+ 	assert(maxlen > 0);
+@@ -866,7 +866,7 @@ int nfnl_addattr8(struct nlmsghdr *n, int maxlen, int type, u_int8_t data)
+ }
+ 
+ /**
+- * nfnl_nfa_addattr16 - Add u_int16_t attribute to struct nfattr 
++ * nfnl_nfa_addattr16 - Add uint16_t attribute to struct nfattr
+  *
+  * @nfa: struct nfattr
+  * @maxlen: maximal length of nfattr buffer
+@@ -875,7 +875,7 @@ int nfnl_addattr8(struct nlmsghdr *n, int maxlen, int type, u_int8_t data)
+  *
+  */
+ int nfnl_nfa_addattr16(struct nfattr *nfa, int maxlen, int type, 
+-		       u_int16_t data)
++		       uint16_t data)
+ {
+ 	assert(nfa);
+ 	assert(maxlen > 0);
+@@ -885,7 +885,7 @@ int nfnl_nfa_addattr16(struct nfattr *nfa, int maxlen, int type,
+ }
+ 
+ /**
+- * nfnl_addattr16 - Add u_int16_t attribute to nlmsghdr
++ * nfnl_addattr16 - Add uint16_t attribute to nlmsghdr
+  *
+  * @n: netlink message header to which attribute is to be added
+  * @maxlen: maximum length of netlink message header
+@@ -894,7 +894,7 @@ int nfnl_nfa_addattr16(struct nfattr *nfa, int maxlen, int type,
+  *
+  */
+ int nfnl_addattr16(struct nlmsghdr *n, int maxlen, int type,
+-		   u_int16_t data)
++		   uint16_t data)
+ {
+ 	assert(n);
+ 	assert(maxlen > 0);
+@@ -904,7 +904,7 @@ int nfnl_addattr16(struct nlmsghdr *n, int maxlen, int type,
+ }
+ 
+ /**
+- * nfnl_nfa_addattr32 - Add u_int32_t attribute to struct nfattr 
++ * nfnl_nfa_addattr32 - Add uint32_t attribute to struct nfattr
+  *
+  * @nfa: struct nfattr
+  * @maxlen: maximal length of nfattr buffer
+@@ -913,7 +913,7 @@ int nfnl_addattr16(struct nlmsghdr *n, int maxlen, int type,
+  *
+  */
+ int nfnl_nfa_addattr32(struct nfattr *nfa, int maxlen, int type, 
+-		       u_int32_t data)
++		       uint32_t data)
+ {
+ 	assert(nfa);
+ 	assert(maxlen > 0);
+@@ -923,7 +923,7 @@ int nfnl_nfa_addattr32(struct nfattr *nfa, int maxlen, int type,
+ }
+ 
+ /**
+- * nfnl_addattr32 - Add u_int32_t attribute to nlmsghdr
++ * nfnl_addattr32 - Add uint32_t attribute to nlmsghdr
+  *
+  * @n: netlink message header to which attribute is to be added
+  * @maxlen: maximum length of netlink message header
+@@ -932,7 +932,7 @@ int nfnl_nfa_addattr32(struct nfattr *nfa, int maxlen, int type,
+  *
+  */
+ int nfnl_addattr32(struct nlmsghdr *n, int maxlen, int type,
+-		   u_int32_t data)
++		   uint32_t data)
+ {
+ 	assert(n);
+ 	assert(maxlen > 0);
+@@ -980,7 +980,7 @@ int nfnl_parse_attr(struct nfattr *tb[], int max, struct nfattr *nfa, int len)
+  *
+  */ 
+ void nfnl_build_nfa_iovec(struct iovec *iov, struct nfattr *nfa, 
+-			  u_int16_t type, u_int32_t len, unsigned char *val)
++			  uint16_t type, uint32_t len, unsigned char *val)
+ {
+ 	assert(iov);
+ 	assert(nfa);
+@@ -1115,7 +1115,7 @@ struct nlmsghdr *nfnl_get_msg_next(struct nfnl_handle *h,
+  * appropiately.
+  */
+ int nfnl_callback_register(struct nfnl_subsys_handle *ssh,
+-			   u_int8_t type, struct nfnl_callback *cb)
++			   uint8_t type, struct nfnl_callback *cb)
+ {
+ 	assert(ssh);
+ 	assert(cb);
+@@ -1138,7 +1138,7 @@ int nfnl_callback_register(struct nfnl_subsys_handle *ssh,
+  * On sucess, 0 is returned. On error, -1 is returned and errno is
+  * set appropiately.
+  */
+-int nfnl_callback_unregister(struct nfnl_subsys_handle *ssh, u_int8_t type)
++int nfnl_callback_unregister(struct nfnl_subsys_handle *ssh, uint8_t type)
+ {
+ 	assert(ssh);
+ 
+@@ -1161,8 +1161,8 @@ int nfnl_check_attributes(const struct nfnl_handle *h,
+ 	assert(nfa);
+ 
+ 	int min_len;
+-	u_int8_t type = NFNL_MSG_TYPE(nlh->nlmsg_type);
+-	u_int8_t subsys_id = NFNL_SUBSYS_ID(nlh->nlmsg_type);
++	uint8_t type = NFNL_MSG_TYPE(nlh->nlmsg_type);
++	uint8_t subsys_id = NFNL_SUBSYS_ID(nlh->nlmsg_type);
+ 	const struct nfnl_subsys_handle *ssh;
+ 	struct nfnl_callback *cb;
+ 
+@@ -1212,8 +1212,8 @@ static int __nfnl_handle_msg(struct nfnl_handle *h, struct nlmsghdr *nlh,
+ 			     int len)
+ {
+ 	struct nfnl_subsys_handle *ssh;
+-	u_int8_t type = NFNL_MSG_TYPE(nlh->nlmsg_type);
+-	u_int8_t subsys_id = NFNL_SUBSYS_ID(nlh->nlmsg_type);
++	uint8_t type = NFNL_MSG_TYPE(nlh->nlmsg_type);
++	uint8_t subsys_id = NFNL_SUBSYS_ID(nlh->nlmsg_type);
+ 	int err = 0;
+ 
+ 	if (subsys_id > NFNL_MAX_SUBSYS)
+@@ -1243,7 +1243,7 @@ int nfnl_handle_packet(struct nfnl_handle *h, char *buf, int len)
+ {
+ 
+ 	while (len >= NLMSG_SPACE(0)) {
+-		u_int32_t rlen;
++		uint32_t rlen;
+ 		struct nlmsghdr *nlh = (struct nlmsghdr *)buf;
+ 
+ 		if (nlh->nlmsg_len < sizeof(struct nlmsghdr)
+@@ -1285,8 +1285,8 @@ static int nfnl_is_error(struct nfnl_handle *h, struct nlmsghdr *nlh)
+ static int nfnl_step(struct nfnl_handle *h, struct nlmsghdr *nlh)
+ {
+ 	struct nfnl_subsys_handle *ssh;
+-	u_int8_t type = NFNL_MSG_TYPE(nlh->nlmsg_type);
+-	u_int8_t subsys_id = NFNL_SUBSYS_ID(nlh->nlmsg_type);
++	uint8_t type = NFNL_MSG_TYPE(nlh->nlmsg_type);
++	uint8_t subsys_id = NFNL_SUBSYS_ID(nlh->nlmsg_type);
+ 
+ 	/* Is this an error message? */
+ 	if (nfnl_is_error(h, nlh)) {
+diff --git a/src/rtnl.c b/src/rtnl.c
+index 7b4ac7d..284eecd 100644
+--- a/src/rtnl.c
++++ b/src/rtnl.c
+@@ -30,7 +30,7 @@
+ #define rtnl_log(x, ...)
+ 
+ static inline struct rtnl_handler *
+-find_handler(struct rtnl_handle *rtnl_handle, u_int16_t type)
++find_handler(struct rtnl_handle *rtnl_handle, uint16_t type)
+ {
+ 	struct rtnl_handler *h;
+ 	for (h = rtnl_handle->handlers; h; h = h->next) {
+@@ -41,7 +41,7 @@ find_handler(struct rtnl_handle *rtnl_handle, u_int16_t type)
+ }
+ 
+ static int call_handler(struct rtnl_handle *rtnl_handle,
+-			u_int16_t type,
++			uint16_t type,
+ 			struct nlmsghdr *hdr)
+ {
+ 	struct rtnl_handler *h = find_handler(rtnl_handle, type);
+diff --git a/src/rtnl.h b/src/rtnl.h
+index 0c403dc..2cb22a8 100644
+--- a/src/rtnl.h
++++ b/src/rtnl.h
+@@ -7,7 +7,7 @@
+ struct rtnl_handler {
+ 	struct rtnl_handler *next;
+ 
+-	u_int16_t	nlmsg_type;
++	uint16_t	nlmsg_type;
+ 	int		(*handlefn)(struct nlmsghdr *h, void *arg);
+ 	void		*arg;
+ };
+-- 
+2.12.1
+

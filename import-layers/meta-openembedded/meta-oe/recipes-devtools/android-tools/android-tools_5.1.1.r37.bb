@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = " \
     file://${COMMON_LICENSE_DIR}/BSD-2-Clause;md5=8bef8e6712b1be5aa76af1ebde9d6378 \
     file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
 "
-DEPENDS = "libbsd libpcre openssl zlib"
+DEPENDS = "libbsd libpcre openssl zlib libcap"
 
 ANDROID_TAG = "android-5.1.1_r37"
 ANDROID_MIRROR = "android.googlesource.com"
@@ -23,14 +23,15 @@ SRC_URI = " \
     git://${LIBHARDWARE_REPO};name=libhardware;protocol=https;nobranch=1;destsuffix=git/hardware/libhardware;tag=${ANDROID_TAG} \
     git://${LIBSELINUX_REPO};name=libselinux;protocol=https;nobranch=1;destsuffix=git/external/libselinux;tag=${ANDROID_TAG} \
     git://${BUILD_REPO};name=build;protocol=https;nobranch=1;destsuffix=git/build;tag=${ANDROID_TAG} \
-    file://remove-selinux-android.patch;apply=yes \
-    file://use-capability.patch;apply=yes \
-    file://use-local-socket.patch;apply=yes \
-    file://preserve-ownership.patch;apply=yes \
-    file://mkbootimg-Add-dt-parameter-to-specify-DT-image.patch;apply=yes \
-    file://remove-bionic-android.patch;apply=yes \
-    file://define-shell-command.patch;apply=yes \
-    file://implicit-declaration-function-strlcat-strlcopy.patch;apply=yes \
+    file://remove-selinux-android.patch \
+    file://use-capability.patch \
+    file://use-local-socket.patch \
+    file://preserve-ownership.patch \
+    file://mkbootimg-Add-dt-parameter-to-specify-DT-image.patch \
+    file://remove-bionic-android.patch \
+    file://define-shell-command.patch \
+    file://implicit-declaration-function-strlcat-strlcopy.patch \
+    file://fix-big-endian-build.patch \
     file://android-tools-adbd.service \
     file://.gitignore;subdir=git \
     file://adb.mk;subdir=${BPN} \
@@ -42,6 +43,10 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/${BPN}"
+
+# http://errors.yoctoproject.org/Errors/Details/133881/
+ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET_armv5 = "arm"
 
 inherit systemd
 
@@ -160,4 +165,4 @@ FILES_${PN}-fstools = "\
     ${bindir}/mkuserimg \
 "
 
-BBCLASSEXTEND += "native"
+BBCLASSEXTEND = "native"

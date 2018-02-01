@@ -9,8 +9,8 @@ SRCNAME = "go-patricia"
 PKG_NAME = "github.com/tchap/${SRCNAME}"
 SRC_URI = "git://${PKG_NAME}.git"
 
-SRCREV = "f64d0a63cd3363481c898faa9339de04d12213f9"
-PV = "1.0.1+git${SRCPV}"
+SRCREV = "666120de432aea38ab06bd5c818f04f4129882c9"
+PV = "2.2.6+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

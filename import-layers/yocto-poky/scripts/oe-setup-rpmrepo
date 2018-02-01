@@ -23,16 +23,6 @@
 # Instead, use OE_TMPDIR for passing this in externally.
 TMPDIR="$OE_TMPDIR"
 
-function usage() {
-	echo "Usage: $0 <rpm-dir>"
-	echo "  <rpm-dir>: default is $TMPDIR/deploy/rpm"
-}
-
-if [ $# -gt 1 ]; then
-	usage
-	exit 1
-fi
-
 setup_tmpdir() {
     if [ -z "$TMPDIR" ]; then
         # Try to get TMPDIR from bitbake
@@ -53,6 +43,23 @@ setup_tmpdir() {
     fi
 }
 
+setup_tmpdir
+
+function usage() {
+    echo 'Usage: oe-setup-rpmrepo rpm-dir'
+    echo ''
+    echo 'OpenEmbedded setup-rpmrepo - setup rpm repository'
+    echo ''
+    echo 'arguments:'
+    echo "  rpm-dir               rpm repo directory, default is $TMPDIR/deploy/rpm"
+    echo ''
+}
+
+if [ $# -gt 1 -o "$1" = '--help' -o "$1" = '-h' ]; then
+    usage
+    exit 2
+fi
+
 setup_sysroot() {
 	# Toolchain installs set up $OECORE_NATIVE_SYSROOT in their
 	# environment script. If that variable isn't set, we're
@@ -68,7 +75,6 @@ setup_sysroot() {
 	fi 
 }
 
-setup_tmpdir
 setup_sysroot
 
 
@@ -83,7 +89,7 @@ if [ ! -d "$RPM_DIR" ]; then
 	exit 1
 fi
 
-CREATEREPO=$OECORE_NATIVE_SYSROOT/usr/bin/createrepo
+CREATEREPO=$OECORE_NATIVE_SYSROOT/usr/bin/createrepo_c
 if [ ! -e "$CREATEREPO" ]; then
    	echo "Error: can't find createrepo binary"
 	echo "please run bitbake createrepo-native first"

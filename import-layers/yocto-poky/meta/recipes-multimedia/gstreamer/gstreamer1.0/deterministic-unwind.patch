@@ -1,0 +1,24 @@
+Make the detection of libunwind deterministic.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index ac88fb2..182c19a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -829,3 +828,0 @@ AM_CONDITIONAL(HAVE_GTK, test "x$HAVE_GTK" = "xyes")
+-dnl libunwind is optionally used by the leaks tracer
+-PKG_CHECK_MODULES(UNWIND, libunwind, HAVE_UNWIND=yes, HAVE_UNWIND=no)
+-
+@@ -839,3 +836,7 @@ AC_CHECK_FUNC(backtrace, [
+-if test "x$HAVE_UNWIND" = "xyes"; then
+-  AC_DEFINE(HAVE_UNWIND, 1, [libunwind available])
+-fi
++dnl libunwind is optionally used by the leaks tracer
++AC_ARG_WITH([unwind],[AS_HELP_STRING([--with-unwind],[use libunwind])],
++            [], [with_unwind=yes])
++AS_IF([test "$with_unwind" = yes],
++      [PKG_CHECK_MODULES(UNWIND, libunwind)
++       AC_DEFINE(HAVE_UNWIND, 1, [libunwind available])]
++)

@@ -40,7 +40,7 @@ test "$NFS_SERVERS" != "" && test "$NFS_SERVERS" -gt 0 && test "$NFS_SERVERS" -l
 #mountd
 start_mountd(){
 	echo -n 'starting mountd: '
-	start-stop-daemon --start --exec "$NFS_MOUNTD" -- "-f /etc/exports $@"
+	start-stop-daemon --start --exec "$NFS_MOUNTD" -- "$@"
 	echo done
 }
 stop_mountd(){

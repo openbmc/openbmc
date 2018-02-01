@@ -6,7 +6,7 @@ valid_xen_archs = " \
 
 def map_xen_arch(a, d):
     import re
-    valid_archs = d.getVar('valid_xen_archs', True).split()
+    valid_archs = d.getVar('valid_xen_archs').split()
 
     if   re.match("i.86", a):        return "x86_32"
     elif re.match("x86.64", a):      return "x86_64"

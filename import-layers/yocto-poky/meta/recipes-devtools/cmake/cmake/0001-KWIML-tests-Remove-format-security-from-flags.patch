@@ -1,0 +1,33 @@
+From 0941395b146804abcd87004589ff6e7a2953412d Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 16 Mar 2017 14:39:04 +0200
+Subject: [PATCH] KWIML tests: Remove format-security from flags
+
+For the tests where "format" is removed from flags, "format-security"
+should be removed as well. Otherwise building cmake with
+"-Wformat -Wformat-security" fails:
+
+| cc1: error: -Wformat-security ignored without -Wformat [-Werror=format-security]
+
+Upstream-Status: Backport [part of commit f77420cfc9]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ Utilities/KWIML/test/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Utilities/KWIML/test/CMakeLists.txt b/Utilities/KWIML/test/CMakeLists.txt
+index 4f6f37b..1bf93bb 100644
+--- a/Utilities/KWIML/test/CMakeLists.txt
++++ b/Utilities/KWIML/test/CMakeLists.txt
+@@ -10,7 +10,7 @@ endif()
+ # Suppress printf/scanf format warnings; we test if the sizes match.
+ foreach(lang C CXX)
+   if(KWIML_LANGUAGE_${lang} AND CMAKE_${lang}_COMPILER_ID STREQUAL "GNU")
+-    set(CMAKE_${lang}_FLAGS "${CMAKE_${lang}_FLAGS} -Wno-format")
++    set(CMAKE_${lang}_FLAGS "${CMAKE_${lang}_FLAGS} -Wno-format -Wno-format-security")
+   endif()
+ endforeach()
+ 
+-- 
+2.1.4
+

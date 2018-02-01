@@ -6,9 +6,10 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://ftp/ftp.c;beginline=2;endline=3;md5=2d40a75a50d83b8f6317b3f53db72bfa"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/n/netkit-ftp/netkit-ftp_${PV}.orig.tar.gz;name=archive \
-            ${DEBIAN_MIRROR}/main/n/netkit-ftp/netkit-ftp_${PV}-31.debian.tar.xz;name=patch31 \
-            file://Add_ARG_MAX_define.patch \
-"
+           ${DEBIAN_MIRROR}/main/n/netkit-ftp/netkit-ftp_${PV}-31.debian.tar.xz;name=patch31 \
+           file://Add_ARG_MAX_define.patch \
+           file://0001-ftp-include-sys-types.h-for-u_long.patch \
+           "
 
 SRC_URI[archive.md5sum] = "94441610c9b86ef45c4c6ec609444060"
 SRC_URI[archive.sha256sum] = "61c913299b81a4671ff089aac821329f7db9bc111aa812993dd585798b700349"

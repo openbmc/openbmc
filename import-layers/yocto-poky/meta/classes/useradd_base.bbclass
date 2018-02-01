@@ -69,11 +69,21 @@ perform_groupdel () {
 	bbnote "${PN}: Performing groupdel with [$opts]"
 	local groupname=`echo "$opts" | awk '{ print $NF }'`
 	local group_exists="`grep "^$groupname:" $rootdir/etc/group || true`"
+
 	if test "x$group_exists" != "x"; then
-		eval flock -x $rootdir${sysconfdir} -c \"$PSEUDO groupdel \$opts\" || true
-		group_exists="`grep "^$groupname:" $rootdir/etc/group || true`"
-		if test "x$group_exists" != "x"; then
-			bbfatal "${PN}: groupdel command did not succeed."
+		local awk_input='BEGIN {FS=":"}; $1=="'$groupname'" { print $3 }'
+		local groupid=`echo "$awk_input" | awk -f- $rootdir/etc/group`
+		local awk_check_users='BEGIN {FS=":"}; $4=="'$groupid'" {print $1}'
+		local other_users=`echo "$awk_check_users" | awk -f- $rootdir/etc/passwd`
+
+		if test "x$other_users" = "x"; then
+			eval flock -x $rootdir${sysconfdir} -c \"$PSEUDO groupdel \$opts\" || true
+			group_exists="`grep "^$groupname:" $rootdir/etc/group || true`"
+			if test "x$group_exists" != "x"; then
+				bbfatal "${PN}: groupdel command did not succeed."
+			fi
+		else
+			bbnote "${PN}: '$groupname' is primary group for users '$other_users', not removing it"
 		fi
 	else
 		bbnote "${PN}: group $groupname doesn't exist, not removing it"

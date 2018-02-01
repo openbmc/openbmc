@@ -33,6 +33,12 @@ def main():
     parser.add_option("-a", "--report-all",
             help = "Report all changes, not just the default significant ones",
             action="store_true", dest="report_all", default=False)
+    parser.add_option("-s", "--signatures",
+            help = "Report list of signatures differing instead of output",
+            action="store_true", dest="sigs", default=False)
+    parser.add_option("-S", "--signatures-with-diff",
+            help = "Report on actual signature differences instead of output (requires signature data to have been generated, either by running the actual tasks or using bitbake -S)",
+            action="store_true", dest="sigsdiff", default=False)
 
     options, args = parser.parse_args(sys.argv)
 
@@ -45,6 +51,11 @@ def main():
         sys.stderr.write("Version of GitPython is too old, please install GitPython (python-git) 0.3.1 or later in order to use this script\n")
         sys.exit(1)
 
+    if not os.path.exists(options.buildhistory_dir):
+        if options.buildhistory_dir == 'buildhistory/':
+            cwd = os.getcwd()
+            if os.path.basename(cwd) == 'buildhistory':
+                options.buildhistory_dir = cwd
     if not os.path.exists(options.buildhistory_dir):
         sys.stderr.write('Buildhistory directory "%s" does not exist\n\n' % options.buildhistory_dir)
         parser.print_help()
@@ -81,7 +92,7 @@ def main():
 
     import gitdb
     try:
-        changes = oe.buildhistory_analysis.process_changes(options.buildhistory_dir, fromrev, torev, options.report_all, options.report_ver)
+        changes = oe.buildhistory_analysis.process_changes(options.buildhistory_dir, fromrev, torev, options.report_all, options.report_ver, options.sigs, options.sigsdiff)
     except gitdb.exc.BadObject as e:
         if len(args) == 1:
             sys.stderr.write("Unable to find previous build revision in buildhistory repository\n\n")

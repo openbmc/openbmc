@@ -1,0 +1,38 @@
+From 963428f914c42270d3312d4f0c0840565521534e Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Wed, 16 Nov 2016 00:41:51 +0200
+Subject: [PATCH 2/2] configure.ac: Fix wayland-scanner and protocols locations
+
+We want to use the wayland-scanner in path (native sysroot)
+instead of using pkg-config which gives us target paths.
+
+The protocols paths on the other hand need to be prefixed with the
+(allarch) sysroot because, again, pkg-config gives us target paths.
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 58f1567..383a7df 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2525,11 +2525,9 @@ if test "x$XWAYLAND" = xyes; then
+ 		AC_MSG_ERROR([Xwayland requires CLOCK_MONOTONIC support.])
+ 	fi
+ 
+-	WAYLAND_PREFIX=`$PKG_CONFIG --variable=prefix wayland-client`
+-	AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner],,
+-		     [${WAYLAND_PREFIX}/bin$PATH_SEPARATOR$PATH])
++	AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner])
+ 
+-	AC_SUBST(WAYLAND_PROTOCOLS_DATADIR, `$PKG_CONFIG --variable=pkgdatadir wayland-protocols`)
++	AC_SUBST(WAYLAND_PROTOCOLS_DATADIR, ${WAYLAND_PROTOCOLS_SYSROOT_DIR}`$PKG_CONFIG --variable=pkgdatadir wayland-protocols`)
+ fi
+ 
+ 
+-- 
+2.1.4
+

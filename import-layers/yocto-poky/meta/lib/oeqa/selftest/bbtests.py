@@ -3,7 +3,7 @@ import re
 
 import oeqa.utils.ftools as ftools
 from oeqa.selftest.base import oeSelfTest
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
 from oeqa.utils.decorators import testcase
 
 class BitbakeTests(oeSelfTest):
@@ -78,9 +78,10 @@ class BitbakeTests(oeSelfTest):
         # test 1 from bug 5875
         test_recipe = 'zlib'
         test_data = "Microsoft Made No Profit From Anyone's Zunes Yo"
-        image_dir = get_bb_var('D', test_recipe)
-        pkgsplit_dir = get_bb_var('PKGDEST', test_recipe)
-        man_dir = get_bb_var('mandir', test_recipe)
+        bb_vars = get_bb_vars(['D', 'PKGDEST', 'mandir'], test_recipe)
+        image_dir = bb_vars['D']
+        pkgsplit_dir = bb_vars['PKGDEST']
+        man_dir = bb_vars['mandir']
 
         bitbake('-c clean %s' % test_recipe)
         bitbake('-c package -f %s' % test_recipe)
@@ -112,17 +113,18 @@ class BitbakeTests(oeSelfTest):
 
     @testcase(167)
     def test_bitbake_g(self):
-        result = bitbake('-g core-image-full-cmdline')
-        for f in ['pn-buildlist', 'pn-depends.dot', 'package-depends.dot', 'task-depends.dot']:
+        result = bitbake('-g core-image-minimal')
+        for f in ['pn-buildlist', 'recipe-depends.dot', 'task-depends.dot']:
             self.addCleanup(os.remove, f)
-        self.assertTrue('NOTE: PN build list saved to \'pn-buildlist\'' in result.output, msg = "No dependency \"pn-buildlist\" file was generated for the given task target. bitbake output: %s" % result.output)
-        self.assertTrue('openssh' in ftools.read_file(os.path.join(self.builddir, 'pn-buildlist')), msg = "No \"openssh\" dependency found in pn-buildlist file.")
+        self.assertTrue('Task dependencies saved to \'task-depends.dot\'' in result.output, msg = "No task dependency \"task-depends.dot\" file was generated for the given task target. bitbake output: %s" % result.output)
+        self.assertTrue('busybox' in ftools.read_file(os.path.join(self.builddir, 'task-depends.dot')), msg = "No \"busybox\" dependency found in task-depends.dot file.")
 
     @testcase(899)
     def test_image_manifest(self):
         bitbake('core-image-minimal')
-        deploydir = get_bb_var("DEPLOY_DIR_IMAGE", target="core-image-minimal")
-        imagename = get_bb_var("IMAGE_LINK_NAME", target="core-image-minimal")
+        bb_vars = get_bb_vars(["DEPLOY_DIR_IMAGE", "IMAGE_LINK_NAME"], "core-image-minimal")
+        deploydir = bb_vars["DEPLOY_DIR_IMAGE"]
+        imagename = bb_vars["IMAGE_LINK_NAME"]
         manifest = os.path.join(deploydir, imagename + ".manifest")
         self.assertTrue(os.path.islink(manifest), msg="No manifest file created for image. It should have been created in %s" % manifest)
 
@@ -149,19 +151,21 @@ doesn't exist, yet fetcher didn't report any error. bitbake output: %s" % result
 
     @testcase(171)
     def test_rename_downloaded_file(self):
+        # TODO unique dldir instead of using cleanall
+        # TODO: need to set sstatedir?
         self.write_config("""DL_DIR = \"${TOPDIR}/download-selftest\"
 SSTATE_DIR = \"${TOPDIR}/download-selftest\"
 """)
         self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
 
-        data = 'SRC_URI_append = ";downloadfilename=test-aspell.tar.gz"'
+        data = 'SRC_URI = "${GNU_MIRROR}/aspell/aspell-${PV}.tar.gz;downloadfilename=test-aspell.tar.gz"'
         self.write_recipeinc('aspell', data)
-        bitbake('-ccleanall aspell')
-        result = bitbake('-c fetch aspell', ignore_status=True)
+        result = bitbake('-f -c fetch aspell', ignore_status=True)
         self.delete_recipeinc('aspell')
         self.assertEqual(result.status, 0, msg = "Couldn't fetch aspell. %s" % result.output)
-        self.assertTrue(os.path.isfile(os.path.join(get_bb_var("DL_DIR"), 'test-aspell.tar.gz')), msg = "File rename failed. No corresponding test-aspell.tar.gz file found under %s" % str(get_bb_var("DL_DIR")))
-        self.assertTrue(os.path.isfile(os.path.join(get_bb_var("DL_DIR"), 'test-aspell.tar.gz.done')), "File rename failed. No corresponding test-aspell.tar.gz.done file found under %s" % str(get_bb_var("DL_DIR")))
+        dl_dir = get_bb_var("DL_DIR")
+        self.assertTrue(os.path.isfile(os.path.join(dl_dir, 'test-aspell.tar.gz')), msg = "File rename failed. No corresponding test-aspell.tar.gz file found under %s" % dl_dir)
+        self.assertTrue(os.path.isfile(os.path.join(dl_dir, 'test-aspell.tar.gz.done')), "File rename failed. No corresponding test-aspell.tar.gz.done file found under %s" % dl_dir)
 
     @testcase(1028)
     def test_environment(self):
@@ -227,14 +231,12 @@ INHERIT_remove = \"report-error\"
 
     @testcase(1119)
     def test_non_gplv3(self):
-        data = 'INCOMPATIBLE_LICENSE = "GPLv3"'
-        conf = os.path.join(self.builddir, 'conf/local.conf')
-        ftools.append_file(conf ,data)
-        self.addCleanup(ftools.remove_from_file, conf ,data)
-        result = bitbake('readline', ignore_status=True)
+        self.write_config('INCOMPATIBLE_LICENSE = "GPLv3"')
+        result = bitbake('selftest-ed', ignore_status=True)
         self.assertEqual(result.status, 0, "Bitbake failed, exit code %s, output %s" % (result.status, result.output))
-        self.assertFalse(os.path.isfile(os.path.join(self.builddir, 'tmp/deploy/licenses/readline/generic_GPLv3')))
-        self.assertTrue(os.path.isfile(os.path.join(self.builddir, 'tmp/deploy/licenses/readline/generic_GPLv2')))
+        lic_dir = get_bb_var('LICENSE_DIRECTORY')
+        self.assertFalse(os.path.isfile(os.path.join(lic_dir, 'selftest-ed/generic_GPLv3')))
+        self.assertTrue(os.path.isfile(os.path.join(lic_dir, 'selftest-ed/generic_GPLv2')))
 
     @testcase(1422)
     def test_setscene_only(self):
@@ -255,8 +257,9 @@ INHERIT_remove = \"report-error\"
     def test_bbappend_order(self):
         """ Bitbake should bbappend to recipe in a predictable order """
         test_recipe = 'ed'
-        test_recipe_summary_before = get_bb_var('SUMMARY', test_recipe)
-        test_recipe_pv = get_bb_var('PV', test_recipe)
+        bb_vars = get_bb_vars(['SUMMARY', 'PV'], test_recipe)
+        test_recipe_summary_before = bb_vars['SUMMARY']
+        test_recipe_pv = bb_vars['PV']
         recipe_append_file = test_recipe + '_' + test_recipe_pv + '.bbappend'
         expected_recipe_summary = test_recipe_summary_before
 

@@ -9,12 +9,32 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=073dc31ccb2ebed70db54f1e8aeb4c33"
 DEPENDS = "rpm indent-native"
 
-SRC_URI = "git://git.umip.org/umip.git"
+SRC_URI = "git://git.umip.org/umip.git \
+           file://add-dependency-to-support-parallel-compilation.patch \
+           file://mip6d \
+           file://mip6d.service \
+           file://0001-Add-format-string-to-fprintf-call.patch \
+           "
 SRCREV = "428974c2d0d8e75a2750a3ab0488708c5dfdd8e3"
 
 S = "${WORKDIR}/git"
-EXTRA_OE_CONF = "--enable-vt"
 
-inherit autotools-brokensep
+EXTRA_OECONF = "--enable-vt"
 
-PARALLEL_MAKE = ""
+inherit autotools-brokensep systemd update-rc.d
+
+INITSCRIPT_NAME = "mip6d"
+INITSCRIPT_PARAMS = "start 64 . stop 36 0 1 2 3 4 5 6 ."
+
+SYSTEMD_SERVICE_${PN} = "mip6d.service"
+SYSTEMD_AUTO_ENABLE = "disable"
+
+do_install_append() {
+	install -D -m 0755 ${WORKDIR}/mip6d ${D}${sysconfdir}/init.d/mip6d
+	install -D -m 0644 ${WORKDIR}/mip6d.service ${D}${systemd_system_unitdir}/mip6d.service
+	sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' \
+	    -e 's,@SBINDIR@,${sbindir},g' \
+	    ${D}${systemd_system_unitdir}/mip6d.service
+}
+
+RRECOMMENDS_${PN} = "kernel-module-mip6 kernel-module-ipv6"

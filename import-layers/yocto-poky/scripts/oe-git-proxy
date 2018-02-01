@@ -18,6 +18,27 @@
 # AUTHORS
 # Darren Hart <dvhart@linux.intel.com>
 
+if [ $# -lt 2 -o "$1" = '--help' -o "$1" = '-h' ] ; then
+    echo 'oe-git-proxy: error: the following arguments are required: host port'
+    echo 'Usage: oe-git-proxy host port'
+    echo ''
+    echo 'OpenEmbedded git-proxy - a simple tool to be used via GIT_PROXY_COMMAND.'
+    echo 'It uses socat to make SOCKS or HTTPS proxy connections.'
+    echo 'It uses ALL_PROXY to determine the proxy server, protocol, and port.'
+    echo 'It uses NO_PROXY to skip using the proxy for a comma delimited list'
+    echo 'of hosts, host globs (*.example.com), IPs, or CIDR masks (192.168.1.0/24).'
+    echo 'It is known to work with both bash and dash shells.runs native tools'
+    echo ''
+    echo 'arguments:'
+    echo '  host                proxy host to use'
+    echo '  port                proxy port to use'
+    echo ''
+    echo 'options:'
+    echo '  -h, --help          show this help message and exit'
+    echo ''
+    exit 2
+fi
+
 # Locate the netcat binary
 SOCAT=$(which socat 2>/dev/null)
 if [ $? -ne 0 ]; then

@@ -205,7 +205,7 @@ do_configure_prepend () {
 }
 
 python do_package_prepend() {
-    d.setVar('PKGV', d.getVar("KERNEL_VERSION", True).split("-")[0])
+    d.setVar('PKGV', d.getVar("KERNEL_VERSION").split("-")[0])
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

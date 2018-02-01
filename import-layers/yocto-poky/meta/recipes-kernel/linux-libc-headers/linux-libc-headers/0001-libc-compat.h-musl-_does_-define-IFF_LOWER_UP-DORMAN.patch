@@ -1,0 +1,46 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [v2,2/3] uapi glibc compat: fix build if libc defines IFF_ECHO
+From: Hauke Mehrtens <hauke@hauke-m.de>
+X-Patchwork-Id: 9686293
+Message-Id: <20170418210036.26039-3-hauke@hauke-m.de>
+To: davem@davemloft.net, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, jarod@redhat.com, jogo@openwrt.org,
+ david.heidelberger@ixit.cz, maillist-linux@barfooze.de,
+ mikko.rapeli@iki.fi, dwmw2@infradead.org, Hauke Mehrtens <hauke@hauke-m.de>
+Date: Tue, 18 Apr 2017 23:00:35 +0200
+
+musl 1.1.15 defines IFF_ECHO and the other net_device_flags options.
+When a user application includes linux/if.h and net/if.h the compile
+will fail.
+
+Activate __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO only when
+it is needed. This should also make this work in case glibc will add
+these defines.
+
+Acked-by: Mikko Rapeli <mikko.rapeli@iki.fi>
+Signed-off-by: Hauke Mehrtens <hauke@hauke-m.de>
+---
+Upstream-Status: Submitted [https://patchwork.kernel.org/patch/9686293/]
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+Acked-by: Stephane Ayotte <sayotte@tycoint.com>
+ include/uapi/linux/libc-compat.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/uapi/linux/libc-compat.h b/include/uapi/linux/libc-compat.h
+index 43a81136ea6e..ce2fa8a4ced6 100644
+--- a/include/uapi/linux/libc-compat.h
++++ b/include/uapi/linux/libc-compat.h
+@@ -64,9 +64,11 @@
+ /* Everything up to IFF_DYNAMIC, matches net/if.h until glibc 2.23 */
+ #define __UAPI_DEF_IF_NET_DEVICE_FLAGS 0
+ /* For the future if glibc adds IFF_LOWER_UP, IFF_DORMANT and IFF_ECHO */
++#ifndef IFF_ECHO
+ #ifndef __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO
+ #define __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO 1
+ #endif /* __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO */
++#endif /* IFF_ECHO */
+ 
+ #else /* _NET_IF_H */
+ 

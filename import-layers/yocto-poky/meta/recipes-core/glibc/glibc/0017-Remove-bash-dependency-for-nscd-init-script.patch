@@ -1,7 +1,7 @@
-From 88ad88d014a5ee68b0e044d2def5ab13743c8ae0 Mon Sep 17 00:00:00 2001
+From c8814875b362efbfd778345d0d2777478bf11a30 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 14:33:02 -0800
-Subject: [PATCH 17/25] Remove bash dependency for nscd init script
+Subject: [PATCH 17/26] Remove bash dependency for nscd init script
 
 The nscd init script uses #! /bin/bash but only really uses one bashism
 (translated strings), so remove them and switch the shell to #!/bin/sh.
@@ -9,8 +9,6 @@ The nscd init script uses #! /bin/bash but only really uses one bashism
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
-
  nscd/nscd.init | 14 +++++++-------
  1 file changed, 7 insertions(+), 7 deletions(-)
 
@@ -71,5 +69,5 @@ index a882da7..b02986e 100644
  	;;
  esac
 -- 
-2.8.2
+2.10.2
 

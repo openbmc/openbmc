@@ -1,0 +1,31 @@
+From 41093d9634bfeddcaec866745d8d4022f4c6f8c1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Sun, 19 Feb 2017 21:01:39 +0100
+Subject: [PATCH] explicitly disable man generation --disable-documentation is
+ not enough
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index c01c54f..dcdf7a2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,6 +1,6 @@
+ NULL =
+ 
+-SUBDIRS=po man
++SUBDIRS=po
+ 
+ INCLUDES =					\
+ 	-I$(top_srcdir)				\
+-- 
+2.9.3
+

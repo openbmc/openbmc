@@ -6,7 +6,7 @@ whitelist = (
     # type is supported by dash
     'if type systemctl >/dev/null 2>/dev/null; then',
     'if type systemd-tmpfiles >/dev/null 2>/dev/null; then',
-    'if type update-rc.d >/dev/null 2>/dev/null; then',
+    'type update-rc.d >/dev/null 2>/dev/null; then',
     'command -v',
     # HOSTNAME is set locally
     'buildhistory_single_commit "$CMDLINE" "$HOSTNAME"',
@@ -22,7 +22,10 @@ def is_whitelisted(s):
             return True
     return False
 
-def process(recipe, function, script):
+SCRIPT_LINENO_RE = re.compile(r' line (\d+) ')
+BASHISM_WARNING = re.compile(r'^(possible bashism in.*)$', re.MULTILINE)
+
+def process(filename, function, lineno, script):
     import tempfile
 
     if not script.startswith("#!"):
@@ -40,18 +43,38 @@ def process(recipe, function, script):
         # TODO check exit code is 1
 
         # Replace the temporary filename with the function and split it
-        output = e.output.replace(fn.name, function).splitlines()
-        if len(results) % 2 != 0:
-            print("Unexpected output from checkbashism: %s" % str(output))
-            return
+        output = e.output.replace(fn.name, function)
+        if not output or not output.startswith('possible bashism'):
+            # Probably starts with or contains only warnings. Dump verbatim
+            # with one space indention. Can't do the splitting and whitelist
+            # checking below.
+            return '\n'.join([filename,
+                              ' Unexpected output from checkbashisms.pl'] +
+                             [' ' + x for x in output.splitlines()])
 
-        # Turn the output into a list of (message, source) values
+        # We know that the first line matches and that therefore the first
+        # list entry will be empty - skip it.
+        output = BASHISM_WARNING.split(output)[1:]
+        # Turn the output into a single string like this:
+        # /.../foobar.bb
+        #  possible bashism in updatercd_postrm line 2 (type):
+        #   if ${@use_updatercd(d)} && type update-rc.d >/dev/null 2>/dev/null; then
+        #  ...
+        #   ...
         result = []
         # Check the results against the whitelist
         for message, source in zip(output[0::2], output[1::2]):
             if not is_whitelisted(source):
-                result.append((message, source))
-        return result
+                if lineno is not None:
+                    message = SCRIPT_LINENO_RE.sub(lambda m: ' line %d ' % (int(m.group(1)) + int(lineno) - 1),
+                                                   message)
+                result.append(' ' + message.strip())
+                result.extend(['  %s' % x for x in source.splitlines()])
+        if result:
+            result.insert(0, filename)
+            return '\n'.join(result)
+        else:
+            return None
 
 def get_tinfoil():
     scripts_path = os.path.dirname(os.path.realpath(__file__))
@@ -68,8 +91,18 @@ def get_tinfoil():
 if __name__=='__main__':
     import shutil
     if shutil.which("checkbashisms.pl") is None:
-        print("Cannot find checkbashisms.pl on $PATH")
+        print("Cannot find checkbashisms.pl on $PATH, get it from https://anonscm.debian.org/cgit/collab-maint/devscripts.git/plain/scripts/checkbashisms.pl")
         sys.exit(1)
+
+    # The order of defining the worker function,
+    # initializing the pool and connecting to the
+    # bitbake server is crucial, don't change it.
+    def func(item):
+        (filename, key, lineno), script = item
+        return process(filename, key, lineno, script)
+
+    import multiprocessing
+    pool = multiprocessing.Pool()
 
     tinfoil = get_tinfoil()
 
@@ -83,34 +116,33 @@ if __name__=='__main__':
     else:
         initial_pns = sorted(pkg_pn)
 
-    pns = []
-    print("Generating file list...")
+    pns = set()
+    scripts = {}
+    print("Generating scripts...")
     for pn in initial_pns:
         for fn in pkg_pn[pn]:
             # There's no point checking multiple BBCLASSEXTENDed variants of the same recipe
+            # (at least in general - there is some risk that the variants contain different scripts)
             realfn, _, _ = bb.cache.virtualfn2realfn(fn)
             if realfn not in pns:
-                pns.append(realfn)
+                pns.add(realfn)
+                data = tinfoil.parse_recipe_file(realfn)
+                for key in data.keys():
+                    if data.getVarFlag(key, "func") and not data.getVarFlag(key, "python"):
+                        script = data.getVar(key, False)
+                        if script:
+                            filename = data.getVarFlag(key, "filename")
+                            lineno = data.getVarFlag(key, "lineno")
+                            # There's no point in checking a function multiple
+                            # times just because different recipes include it.
+                            # We identify unique scripts by file, name, and (just in case)
+                            # line number.
+                            attributes = (filename or realfn, key, lineno)
+                            scripts.setdefault(attributes, script)
 
-
-    def func(fn):
-        result = []
-        data = tinfoil.parse_recipe_file(fn)
-        for key in data.keys():
-            if data.getVarFlag(key, "func", True) and not data.getVarFlag(key, "python", True):
-                script = data.getVar(key, False)
-                if not script: continue
-                #print ("%s:%s" % (fn, key))
-                r = process(fn, key, script)
-                if r: result.extend(r)
-        return fn, result
 
     print("Scanning scripts...\n")
-    import multiprocessing
-    pool = multiprocessing.Pool()
-    for pn,results in pool.imap(func, pns):
-        if results:
-            print(pn)
-            for message,source in results:
-                print(" %s\n  %s" % (message, source))
-            print()
+    for result in pool.imap(func, scripts.items()):
+        if result:
+            print(result)
+    tinfoil.shutdown()

@@ -1,0 +1,24 @@
+Subject: fix to build with glibc 2.25
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/md.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/md.c b/src/md.c
+index 3725f9a..202225b 100644
+--- a/src/md.c
++++ b/src/md.c
+@@ -25,6 +25,7 @@
+ #include "utils_ignorelist.h"
+ 
+ #include <sys/ioctl.h>
++#include <sys/sysmacros.h>
+ 
+ #include <linux/major.h>
+ #include <linux/raid/md_u.h>
+-- 
+2.8.3
+

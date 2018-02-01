@@ -9,7 +9,8 @@ SRCNAME = "libtrust"
 PKG_NAME = "github.com/docker/${SRCNAME}"
 SRC_URI = "git://${PKG_NAME}.git"
 
-SRCREV = "230dfd18c2326f1e9d08238710e67a1040187d07"
+SRCREV = "9cbd2a1374f46905c68a4eb3694a130610adc62a"
+PV = "0.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

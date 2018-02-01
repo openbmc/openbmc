@@ -1,0 +1,33 @@
+From c7950ef5228adc52a500b4fc67d7e48c3c09c1df Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 6 Apr 2017 23:02:44 -0400
+Subject: [PATCH 3/3] crash: detect the sysroot's glibc header file
+
+This is cross compile, so let the Makefile detect the sysroot's glibc
+header file, not the host's glibc header file.
+
+Upstream-Status: Pending
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b6b7e80..94f21a5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -264,8 +264,8 @@ gdb_patch:
+ 	if [ "${ARCH}" = "x86_64" ] && [ "${TARGET}" = "PPC64" ] && [ -f ${GDB}-ppc64le-support.patch ]; then \
+ 		patch -d ${GDB} -p1 -F0 < ${GDB}-ppc64le-support.patch ; \
+ 	fi
+-	if [ -f /usr/include/proc_service.h ]; then \
+-		grep 'extern ps_err_e ps_get_thread_area (struct' /usr/include/proc_service.h; \
++	if [ -f ${RECIPE_SYSROOT}/usr/include/proc_service.h ]; then \
++		grep 'extern ps_err_e ps_get_thread_area (struct' ${RECIPE_SYSROOT}/usr/include/proc_service.h; \
+ 		if [ $$? -eq 0 ]; then \
+ 			patch -p0 < ${GDB}-proc_service.h.patch; \
+ 		fi; \
+-- 
+2.8.1
+

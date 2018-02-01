@@ -16,4 +16,7 @@ RDEPENDS_${PN} += " \
     python-pyparsing \
     python-mccabe \
     python-pep8 \
-    python-pyflakes"
+    python-pyflakes \
+    python-pbr \
+    python-funcsigs \
+"

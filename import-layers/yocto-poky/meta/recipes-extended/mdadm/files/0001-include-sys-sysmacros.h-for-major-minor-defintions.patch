@@ -1,0 +1,48 @@
+From 943616e5dffb79f307e4bd9b249d316212998750 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 18 Dec 2016 08:30:51 +0000
+Subject: [PATCH] include <sys/sysmacros.h> for major/minor defintions
+
+glibc 2.25 is warning about it if applications depend on
+sys/types.h for these macros, it expects to be included
+from <sys/sysmacros.h>
+
+Fixes
+| Grow.c:3534:13: error: In the GNU C Library, "minor" is defined
+|  by <sys/sysmacros.h>. For historical compatibility, it is
+|  currently defined by <sys/types.h> as well, but we plan to
+|  remove this soon. To use "minor", include <sys/sysmacros.h>
+|  directly. If you did not intend to use a system-defined macro
+|  "minor", you should undefine it after including <sys/types.h>. [-Werror]
+| Query.c: In function 'Query':
+| Query.c:105:13: error: In the GNU C Library, "makedev" is defined
+|  by <sys/sysmacros.h>. For historical compatibility, it is
+|  currently defined by <sys/types.h> as well, but we plan to
+|  remove this soon. To use "makedev", include <sys/sysmacros.h>
+|  directly. If you did not intend to use a system-defined macro
+|  "makedev", you should undefine it after including <sys/types.h>. [-Werror]
+|           makedev((unsigned)disc.major,(unsigned)disc.minor) == stb.st_rdev)
+|              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ mdadm.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mdadm.h b/mdadm.h
+index 8c8f4d1..3ce13b5 100755
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -34,6 +34,7 @@ extern __off64_t lseek64 __P ((int __fd, __off64_t __offset, int __whence));
+ #endif
+ 
+ #include	<sys/types.h>
++#include	<sys/sysmacros.h>
+ #include	<sys/stat.h>
+ #include	<stdint.h>
+ #include	<stdlib.h>
+-- 
+1.9.1
+

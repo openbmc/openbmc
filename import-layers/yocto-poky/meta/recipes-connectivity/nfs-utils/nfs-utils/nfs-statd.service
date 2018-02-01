@@ -1,8 +1,9 @@
 [Unit]
-Description=NFS file locking service
-After=rpcbind.service
-Requires=rpcbind.service
-Before=remote-fs-pre.target
+Description=NFS status monitor for NFSv2/3 locking.
+DefaultDependencies=no
+Conflicts=umount.target
+Requires=nss-lookup.target rpcbind.service
+After=network.target nss-lookup.target rpcbind.service
 
 [Service]
 EnvironmentFile=-@SYSCONFDIR@/nfs-utils.conf

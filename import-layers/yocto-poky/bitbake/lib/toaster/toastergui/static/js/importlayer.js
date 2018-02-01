@@ -45,7 +45,7 @@ function importLayerPageInit (ctx) {
     function(layer) {
     if (layer.results.length > 0) {
       currentLayerDepSelection = layer.results[0];
-      layerDepBtn.click();
+        layerDepBtn.click();
     }
   });
 
@@ -158,6 +158,7 @@ function importLayerPageInit (ctx) {
         project_id: libtoaster.ctx.projectId,
         layer_deps: layerDepsCsv,
         local_source_dir: $('#local-dir-path').val(),
+        add_to_project: true,
       };
 
       if ($('input[name=repo]:checked').val() == "git") {
@@ -168,13 +169,15 @@ function importLayerPageInit (ctx) {
       }
 
       $.ajax({
-          type: "POST",
-          url: ctx.xhrImportLayerUrl,
-          data: layerData,
+          type: "PUT",
+          url: ctx.xhrLayerUrl,
+          data: JSON.stringify(layerData),
           headers: { 'X-CSRFToken' : $.cookie('csrftoken')},
           success: function (data) {
             if (data.error != "ok") {
               console.log(data.error);
+              /* let the user know why nothing happened */
+              alert(data.error)
             } else {
               createImportedNotification(data);
               window.location.replace(libtoaster.ctx.projectPageUrl);
@@ -243,9 +246,18 @@ function importLayerPageInit (ctx) {
         enable_import_btn(true);
       }
 
-      if ($("#git-repo-radio").prop("checked") &&
-          vcsURLInput.val().length > 0 && gitRefInput.val().length > 0) {
-        enable_import_btn(true);
+      if ($("#git-repo-radio").prop("checked")) {
+        if (gitRefInput.val().length > 0 &&
+            gitRefInput.val() == 'HEAD') {
+          $('#invalid-layer-revision-hint').show();
+          $('#layer-revision-ctrl').addClass('has-error');
+          enable_import_btn(false);
+        } else if (vcsURLInput.val().length > 0 &&
+                   gitRefInput.val().length > 0) {
+          $('#invalid-layer-revision-hint').hide();
+          $('#layer-revision-ctrl').removeClass('has-error');
+          enable_import_btn(true);
+        }
       }
     }
 
@@ -332,19 +344,36 @@ function importLayerPageInit (ctx) {
     check_form();
   });
 
-  /* Have a guess at the layer name */
+  /* Setup 'blank' typeahead */
+  libtoaster.makeTypeahead(gitRefInput,
+                           ctx.xhrGitRevTypeAheadUrl,
+                           { git_url: null }, function(){});
+
+
   vcsURLInput.focusout(function (){
+    if (!$(this).val())
+      return;
+
     /* If we a layer name specified don't overwrite it or if there isn't a
      * url typed in yet return
      */
-    if (layerNameInput.val() || !$(this).val())
-      return;
-
-    if ($(this).val().search("/")){
+    if (!layerNameInput.val() && $(this).val().search("/")){
       var urlPts = $(this).val().split("/");
+      /* Add a suggestion of the layer name */
       var suggestion = urlPts[urlPts.length-1].replace(".git","");
       layerNameInput.val(suggestion);
     }
+
+    /* Now actually setup the typeahead properly with the git url entered */
+    gitRefInput._typeahead('destroy');
+
+    libtoaster.makeTypeahead(gitRefInput,
+                             ctx.xhrGitRevTypeAheadUrl,
+                             { git_url: $(this).val() },
+                             function(selected){
+                               gitRefInput._typeahead("close");
+                             });
+
   });
 
   function radioDisplay() {
@@ -389,7 +418,7 @@ function importLayerPageInit (ctx) {
       var input = $(this);
       var reBeginWithSlash = /^\//;
       var reCheckVariable = /^\$/;
-      var re = /([ <>\\|":\.%\?\*]+)/;
+      var re = /([ <>\\|":%\?\*]+)/;
 
       var invalidDir = re.test(input.val());
       var invalidSlash = reBeginWithSlash.test(input.val());

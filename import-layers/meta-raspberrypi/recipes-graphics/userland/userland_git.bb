@@ -10,13 +10,13 @@ PR = "r5"
 PROVIDES = "virtual/libgles2 \
             virtual/egl"
 
-RPROVIDES_${PN} += "libgles2 libgl"
+RPROVIDES_${PN} += "libgles2 egl libegl"
 
 COMPATIBLE_MACHINE = "raspberrypi"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "bb15afe33b313fe045d52277a78653d288e04f67"
+SRCREV = "bc3c52a51315399a9f31ed24049eb4bc81fd1c60"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=git;branch=${SRCBRANCH} \
@@ -32,6 +32,9 @@ SRC_URI = "\
     file://0010-Fix-for-framerate-with-nested-composition.patch \
     file://0011-build-shared-library-for-vchostif.patch \
     file://0012-implement-buffer-wrapping-interface-for-dispmanx.patch \
+    file://0013-Implement-triple-buffering-for-wayland.patch \
+    file://0014-GLES2-gl2ext.h-Define-GL_R8_EXT-and-GL_RG8_EXT.patch \
+    file://0015-EGL-glplatform.h-define-EGL_CAST.patch \
 "
 S = "${WORKDIR}/git"
 

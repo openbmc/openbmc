@@ -23,8 +23,9 @@ DEPENDS = "dbus libnih-native"
 DEPENDS_class-native = "dbus-native"
 
 SRC_URI = "https://launchpad.net/${BPN}/1.0/${PV}/+download/${BP}.tar.gz \
-    file://libnih_1.0.3-4ubuntu16.patch \
-"
+           file://libnih_1.0.3-4ubuntu16.patch \
+           file://0001-signal.c-SIGCLD-and-SIGCHILD-are-same-on-sytem-V-sys.patch \
+           "
 
 SRC_URI[md5sum] = "db7990ce55e01daffe19006524a1ccb0"
 SRC_URI[sha256sum] = "897572df7565c0a90a81532671e23c63f99b4efde2eecbbf11e7857fbc61f405"

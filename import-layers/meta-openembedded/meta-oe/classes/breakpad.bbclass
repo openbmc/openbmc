@@ -10,11 +10,11 @@ CXXFLAGS += "-I${STAGING_DIR_TARGET}${includedir}/breakpad "
 BREAKPAD_BIN ?= ""
 
 python () {
-    breakpad_bin = d.getVar("BREAKPAD_BIN", True)
+    breakpad_bin = d.getVar("BREAKPAD_BIN")
 
     if not breakpad_bin:
-       PN = d.getVar("PN", True)
-       FILE = os.path.basename(d.getVar("FILE", True))
+       PN = d.getVar("PN")
+       FILE = os.path.basename(d.getVar("FILE"))
        bb.error("To build %s, see breakpad.bbclass for instructions on \
                  setting up your Breakpad configuration" % PN)
        raise ValueError('BREAKPAD_BIN not defined in %s' % PN)

@@ -1,0 +1,31 @@
+From c6304a3e4b8441ff0a6464c0f1f6c5229092fa32 Mon Sep 17 00:00:00 2001
+From: Niels Baggesen <nba@users.sourceforge.net>
+Date: Wed, 24 May 2017 16:40:03 +0800
+Subject: [PATCH 1/4] configure: fix check for --enable-perl-cc-checks
+
+This patch comes from git://git.code.sf.net/p/net-snmp/code,
+the commit is 8f431d410b803603dc809d82e0893509615d9a11.
+
+Upstream-Status: Backport
+
+Signed-off-by: Wenlin Kang <wenlin.kang@windriver.com>
+---
+ configure.d/config_project_perl_python | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.d/config_project_perl_python b/configure.d/config_project_perl_python
+index 23f8c7e..475c843 100644
+--- a/configure.d/config_project_perl_python
++++ b/configure.d/config_project_perl_python
+@@ -84,7 +84,7 @@ if test "x$install_perl" != "xno" ; then
+ 
+     #       What compiler was used to build the perl binary?
+     #
+-    if test "xenable_perl_cc_checks" != "xno" ; then
++    if test "x$enable_perl_cc_checks" != "xno" ; then
+         AC_MSG_CHECKING([for Perl cc])
+         changequote(, )
+         PERLCC=`$myperl -V:cc | $myperl -n -e 'print if (s/^\s*cc=.([-=\w\s\/]+).;\s*/$1/);'`
+-- 
+1.9.1
+

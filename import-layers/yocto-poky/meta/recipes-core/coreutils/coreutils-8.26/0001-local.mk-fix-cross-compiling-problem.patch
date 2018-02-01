@@ -1,0 +1,26 @@
+Subject: local.mk: fix cross compiling problem
+
+We meet the following error when cross compiling.
+| Makefile:3418: *** Recursive variable 'INSTALL' references itself (eventually).  Stop.
+This patch fixes this problem.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/local.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/local.mk b/src/local.mk
+index 36dfa4e..c5898cc 100644
+--- a/src/local.mk
++++ b/src/local.mk
+@@ -649,4 +649,4 @@ cu_install_program = @INSTALL_PROGRAM@
+ else
+ cu_install_program = src/ginstall
+ endif
+-INSTALL = $(cu_install_program) -c
++INSTALL_PROGRAM = $(cu_install_program)
+-- 
+2.1.0
+

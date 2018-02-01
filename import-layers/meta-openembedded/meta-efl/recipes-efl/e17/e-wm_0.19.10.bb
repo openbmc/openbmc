@@ -17,3 +17,5 @@ SRC_URI = "\
 
 SRC_URI[md5sum] = "9063617760329445ada8635270a4e627"
 SRC_URI[sha256sum] = "484d305bcf403303b18c46a3a498445b93689cd325010ae8d0601551926469d8"
+
+PNBLACKLIST[e-wm] ?= "Depends on blacklisted elementary - the recipe will be removed on 2017-09-01 unless the issue is fixed"

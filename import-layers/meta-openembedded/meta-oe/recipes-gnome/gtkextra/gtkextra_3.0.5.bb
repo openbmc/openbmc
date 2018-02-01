@@ -16,4 +16,4 @@ DEPENDS = "gtk+"
 inherit autotools pkgconfig gobject-introspection
 
 # | ./.libs/libgtkextra-x11-3.0.so: error: undefined reference to 'roundint'
-PNBLACKLIST[gtkextra] ?= "BROKEN: Fails to build with gcc-5"
+PNBLACKLIST[gtkextra] ?= "BROKEN: Fails to build with gcc-5 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

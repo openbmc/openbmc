@@ -51,4 +51,4 @@ glib-compile-schemas ${datadir}/glib-2.0/schemas
 
 # 3.2.1-r4/nautilus-3.2.1/eel/eel-gnome-extensions.c:34:50: fatal error: libgnome-desktop/gnome-desktop-utils.h: No such file or directory
 # 3.2.1-r4/nautilus-3.2.1/eel/eel-editable-label.c:3105:55: error: 'GTK_STOCK_CUT' undeclared (first use in this function)
-PNBLACKLIST[nautilus3] ?= "BROKEN: fails to build, maybe missing dependency on gnome-desktop-utils.h provider"
+PNBLACKLIST[nautilus3] ?= "BROKEN: fails to build, maybe missing dependency on gnome-desktop-utils.h provider - the recipe will be removed on 2017-09-01 unless the issue is fixed"

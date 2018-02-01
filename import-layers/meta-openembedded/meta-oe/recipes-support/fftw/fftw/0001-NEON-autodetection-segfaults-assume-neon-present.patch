@@ -1,0 +1,80 @@
+From 97af5a2efbe30726ce4d7c921efed6afc32a314f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Sun, 25 Dec 2016 13:41:19 +0100
+Subject: [PATCH] NEON autodetection segfaults: assume neon present
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+If TUNE_FEATURES contain 'neon' we can assume our machine supports it
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ simd-support/neon.c | 46 +---------------------------------------------
+ 1 file changed, 1 insertion(+), 45 deletions(-)
+
+diff --git a/simd-support/neon.c b/simd-support/neon.c
+index 86b2cb6..8d6537e 100644
+--- a/simd-support/neon.c
++++ b/simd-support/neon.c
+@@ -23,54 +23,10 @@
+ 
+ #if HAVE_NEON
+ 
+-/* check for an environment where signals are known to work */
+-#if defined(unix) || defined(linux)
+-  # include <signal.h>
+-  # include <setjmp.h>
+-
+-  static jmp_buf jb;
+-
+-  static void sighandler(int x)
+-  {
+-       UNUSED(x);
+-       longjmp(jb, 1);
+-  }
+-
+-  static int really_have_neon(void)
+-  {
+-       void (*oldsig)(int);
+-       oldsig = signal(SIGILL, sighandler);
+-       if (setjmp(jb)) {
+-	    signal(SIGILL, oldsig);
+-	    return 0;
+-       } else {
+-	    /* paranoia: encode the instruction in binary because the
+-	       assembler may not recognize it without -mfpu=neon */
+-	    /*asm volatile ("vand q0, q0, q0");*/
+-	    asm volatile (".long 0xf2000150");
+-	    signal(SIGILL, oldsig);
+-	    return 1;
+-       }
+-  }
+-
+-  int X(have_simd_neon)(void)
+-  {
+-       static int init = 0, res;
+-
+-       if (!init) {
+-	    res = really_have_neon();
+-	    init = 1;
+-       }
+-       return res;
+-  }
+-
+-
+-#else
+-/* don't know how to autodetect NEON; assume it is present */
++/* autodetect NEON broken; assume it is present */
+   int X(have_simd_neon)(void)
+   {
+        return 1;
+   }
+-#endif
+ 
+ #endif
+-- 
+2.5.5
+

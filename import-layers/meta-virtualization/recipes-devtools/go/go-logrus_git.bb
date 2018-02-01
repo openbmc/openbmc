@@ -9,8 +9,8 @@ SRCNAME = "logrus"
 PKG_NAME = "github.com/Sirupsen/${SRCNAME}"
 SRC_URI = "git://${PKG_NAME}.git"
 
-SRCREV = "3fc34d061b9c78a70db853c7cb6b0576b6d4f32d"
-PV = "0.7.1+git${SRCREV}"
+SRCREV = "d26492970760ca5d33129d2d799e34be5c4782eb"
+PV = "0.11.0+git${SRCREV}"
 
 S = "${WORKDIR}/git"
 

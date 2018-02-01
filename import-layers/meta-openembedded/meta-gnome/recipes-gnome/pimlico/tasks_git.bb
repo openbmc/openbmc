@@ -9,4 +9,4 @@ PR = "r3"
 S = "${WORKDIR}/git"
 
 # ../../git/libkoto/koto-utils.c:81:3: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
-PNBLACKLIST[tasks] ?= "Fails to build with gcc-6"
+PNBLACKLIST[tasks] ?= "Fails to build with gcc-6 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

@@ -89,6 +89,19 @@ class TaskData:
 
         self.add_extra_deps(fn, dataCache)
 
+        # Common code for dep_name/depends = 'depends'/idepends and 'rdepends'/irdepends
+        def handle_deps(task, dep_name, depends, seen):
+            if dep_name in task_deps and task in task_deps[dep_name]:
+                ids = []
+                for dep in task_deps[dep_name][task].split():
+                    if dep:
+                        parts = dep.split(":")
+                        if len(parts) != 2:
+                            bb.msg.fatal("TaskData", "Error for %s:%s[%s], dependency %s in '%s' does not contain exactly one ':' character.\n Task '%s' should be specified in the form 'packagename:task'" % (fn, task, dep_name, dep, task_deps[dep_name][task], dep_name))
+                        ids.append((parts[0], parts[1]))
+                        seen(parts[0])
+                depends.extend(ids)
+
         for task in task_deps['tasks']:
 
             tid = "%s:%s" % (fn, task)
@@ -105,24 +118,8 @@ class TaskData:
             self.taskentries[tid].tdepends.extend(parentids)
 
             # Touch all intertask dependencies
-            if 'depends' in task_deps and task in task_deps['depends']:
-                ids = []
-                for dep in task_deps['depends'][task].split():
-                    if dep:
-                        if ":" not in dep:
-                            bb.msg.fatal("TaskData", "Error for %s, dependency %s does not contain ':' character\n. Task 'depends' should be specified in the form 'packagename:task'" % (fn, dep))
-                        ids.append(((dep.split(":")[0]), dep.split(":")[1]))
-                        self.seen_build_target(dep.split(":")[0])
-                self.taskentries[tid].idepends.extend(ids)
-            if 'rdepends' in task_deps and task in task_deps['rdepends']:
-                ids = []
-                for dep in task_deps['rdepends'][task].split():
-                    if dep:
-                        if ":" not in dep:
-                            bb.msg.fatal("TaskData", "Error for %s, dependency %s does not contain ':' character\n. Task 'rdepends' should be specified in the form 'packagename:task'" % (fn, dep))
-                        ids.append(((dep.split(":")[0]), dep.split(":")[1]))
-                        self.seen_run_target(dep.split(":")[0])
-                self.taskentries[tid].irdepends.extend(ids)
+            handle_deps(task, 'depends', self.taskentries[tid].idepends, self.seen_build_target)
+            handle_deps(task, 'rdepends', self.taskentries[tid].irdepends, self.seen_run_target)
 
         # Work out build dependencies
         if not fn in self.depids:

@@ -5,7 +5,9 @@ LIC_FILES_CHKSUM = "file://Legal.htm;md5=e3ce75dedd4043918d15979ae43e312e"
 
 PR = "ml3"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/numpy/Numeric-${PV}.tar.gz"
+SRC_URI = "${SOURCEFORGE_MIRROR}/numpy/Numeric-${PV}.tar.gz \
+           file://0001-it-tries-to-define-this-function-differently-than-it.patch \
+"
 S = "${WORKDIR}/Numeric-${PV}"
 
 inherit distutils

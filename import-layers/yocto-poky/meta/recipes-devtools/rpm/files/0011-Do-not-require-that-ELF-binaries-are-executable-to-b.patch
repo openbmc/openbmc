@@ -1,0 +1,32 @@
+From d65d6e8760afbd7f70b22a1f3297a037bc475fea Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Mon, 15 May 2017 10:21:08 +0200
+Subject: [PATCH 11/13] Do not require that ELF binaries are executable to be
+ identifiable
+
+There is nothing that requires, e.g., a DSO to be executable, but it
+is still an ELF binary and should be identified as such.
+
+Upstream probably expects all ELF binaries to be marked as executable,
+but rather than imposing such a limitation for OE, allow any file to
+be identified as an ELF binary regardless of whether it is executable
+or not.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ fileattrs/elf.attr | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fileattrs/elf.attr b/fileattrs/elf.attr
+index 595b33e09..bac52649d 100644
+--- a/fileattrs/elf.attr
++++ b/fileattrs/elf.attr
+@@ -1,4 +1,3 @@
+ %__elf_provides		%{_rpmconfigdir}/elfdeps --provides %{?__filter_GLIBC_PRIVATE:--filter-private}
+ %__elf_requires		%{_rpmconfigdir}/elfdeps --requires %{?__filter_GLIBC_PRIVATE:--filter-private}
+ %__elf_magic		^(setuid )?(setgid )?(sticky )?ELF (32|64)-bit.*$
+-%__elf_flags		exeonly
+-- 
+2.12.0
+

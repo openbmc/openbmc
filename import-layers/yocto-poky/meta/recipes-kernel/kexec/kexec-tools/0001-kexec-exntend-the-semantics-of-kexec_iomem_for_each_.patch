@@ -1,0 +1,78 @@
+From 02eed0f8f2748fd7579f69e5373445b52b2b8754 Mon Sep 17 00:00:00 2001
+From: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Date: Mon, 17 Oct 2016 13:56:58 +0900
+Subject: [PATCH 1/9] kexec: exntend the semantics of kexec_iomem_for_each_line
+
+The current kexec_iomem_for_each_line() counts up all the lines for which
+a callback function returns zero(0) or positive, and otherwise it stops
+further scanning.
+This behavior is incovenient in some cases. For instance, on arm64, we want
+to count up "System RAM" entries, but need to skip "reserved" entries.
+
+So this patch extends the semantics so that we will continue to scan
+succeeding entries but not count lines for which a callback function
+returns positive.
+
+The current users of kexec_iomem_for_each_line(), arm, sh and x86, will not
+be affected by this change because
+* arm
+  The callback function only returns -1 or 0, and the return value of
+  kexec_iomem_for_each_line() will never be used.
+* sh, x86
+  The callback function may return (-1 for sh,) 0 or 1, but always returns
+  1 once we have reached the maximum number of entries allowed.
+  Even so the current kexec_iomem_for_each_line() counts them up.
+  This change actually fixes this bug.
+
+Upstream-Status: Backport [https://git.linaro.org/people/takahiro.akashi/kexec-tools.git]
+
+Signed-off-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ kexec/kexec-iomem.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/kexec/kexec-iomem.c b/kexec/kexec-iomem.c
+index 485a2e8..0a0277a 100644
+--- a/kexec/kexec-iomem.c
++++ b/kexec/kexec-iomem.c
+@@ -18,6 +18,9 @@
+  * Iterate over each line in the file returned by proc_iomem(). If match is
+  * NULL or if the line matches with our match-pattern then call the
+  * callback if non-NULL.
++ * If match is NULL, callback should return a negative if error.
++ * Otherwise the interation goes on, incrementing nr but only if callback
++ * returns 0 (matched).
+  *
+  * Return the number of lines matched.
+  */
+@@ -37,7 +40,7 @@ int kexec_iomem_for_each_line(char *match,
+ 	char *str;
+ 	int consumed;
+ 	int count;
+-	int nr = 0;
++	int nr = 0, ret;
+ 
+ 	fp = fopen(iomem, "r");
+ 	if (!fp)
+@@ -50,11 +53,13 @@ int kexec_iomem_for_each_line(char *match,
+ 		str = line + consumed;
+ 		size = end - start + 1;
+ 		if (!match || memcmp(str, match, strlen(match)) == 0) {
+-			if (callback
+-			    && callback(data, nr, str, start, size) < 0) {
+-				break;
++			if (callback) {
++				ret = callback(data, nr, str, start, size);
++				if (ret < 0)
++					break;
++				else if (ret == 0)
++					nr++;
+ 			}
+-			nr++;
+ 		}
+ 	}
+ 
+-- 
+1.9.1
+

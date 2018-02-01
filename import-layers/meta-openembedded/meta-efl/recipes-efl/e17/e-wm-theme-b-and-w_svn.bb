@@ -29,3 +29,9 @@ do_install() {
 }
 
 FILES_${PN} = "${datadir}/enlightenment/data/themes/"
+
+PNBLACKLIST[e-wm-theme-b-and-w] ?= "Runtime depends on blacklisted e-wm - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+
+PNBLACKLIST[e-wm-theme-b-and-w] ?= "Runtime depends on blacklisted e-wm-theme-b-and-w - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+
+PNBLACKLIST[e-wm-theme-b-and-w] ?= "Runtime depends on blacklisted e-wm-theme-b-and-w-dev - the recipe will be removed on 2017-09-01 unless the issue is fixed"

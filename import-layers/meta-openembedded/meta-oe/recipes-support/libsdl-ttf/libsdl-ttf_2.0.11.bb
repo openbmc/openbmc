@@ -12,7 +12,9 @@ SRC_URI[sha256sum] = "724cd895ecf4da319a3ef164892b72078bd92632a5d812111261cde248
 
 S = "${WORKDIR}/SDL_ttf-${PV}"
 
-inherit autotools
+inherit autotools pkgconfig
+
+LDFLAGS += "-lm"
 
 do_configure_prepend() {
     # make autoreconf happy

@@ -1,0 +1,34 @@
+From c271503d7e233428ac0323c51d6517113e26bef7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Dec 2016 00:27:13 -0800
+Subject: [PATCH] Prepend PKG_CONFIG_SYSROOT_DIR to pkg-config output
+
+In cross environment we have to prepend the sysroot to the path found by
+pkgconfig since the path returned from pkgconfig does not have sysroot prefixed
+it ends up using the files from host system. If build host has wayland installed
+the build will succeed but if you dont have wayland-protocols installed on build host then
+it wont find the files on build host
+
+This should work ok with non sysrooted builds too since in those cases PKG_CONFIG_SYSROOT_DIR
+will be empty
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: gst-plugins-bad-1.10.1/configure.ac
+===================================================================
+--- gst-plugins-bad-1.10.1.orig/configure.ac
++++ gst-plugins-bad-1.10.1/configure.ac
+@@ -2233,7 +2233,7 @@ AG_GST_CHECK_FEATURE(WAYLAND, [wayland s
+     PKG_CHECK_MODULES(WAYLAND_PROTOCOLS, wayland-protocols >= 1.4, [
+       if test "x$wayland_scanner" != "x"; then
+         HAVE_WAYLAND="yes"
+-        AC_SUBST(WAYLAND_PROTOCOLS_DATADIR, `$PKG_CONFIG --variable=pkgdatadir wayland-protocols`)
++        AC_SUBST(WAYLAND_PROTOCOLS_DATADIR, ${WAYLAND_PROTOCOLS_SYSROOT_DIR}`$PKG_CONFIG --variable=pkgdatadir wayland-protocols`)
+       else
+         AC_MSG_RESULT([wayland-scanner is required to build the wayland plugin])
+         HAVE_WAYLAND="no"

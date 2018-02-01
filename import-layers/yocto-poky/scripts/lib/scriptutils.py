@@ -21,10 +21,12 @@ import logging
 import glob
 import argparse
 import subprocess
+import tempfile
+import shutil
 
-def logger_create(name):
+def logger_create(name, stream=None):
     logger = logging.getLogger(name)
-    loggerhandler = logging.StreamHandler()
+    loggerhandler = logging.StreamHandler(stream=stream)
     loggerhandler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
     logger.addHandler(loggerhandler)
     logger.setLevel(logging.INFO)
@@ -52,10 +54,14 @@ def load_plugins(logger, plugins, pluginpath):
             if fp:
                 fp.close()
 
+    def plugin_name(filename):
+        return os.path.splitext(os.path.basename(filename))[0]
+
+    known_plugins = [plugin_name(p.__name__) for p in plugins]
     logger.debug('Loading plugins from %s...' % pluginpath)
     for fn in glob.glob(os.path.join(pluginpath, '*.py')):
-        name = os.path.splitext(os.path.basename(fn))[0]
-        if name != '__init__':
+        name = plugin_name(fn)
+        if name != '__init__' and name not in known_plugins:
             plugin = load_plugin(name)
             if hasattr(plugin, 'plugin_init'):
                 plugin.plugin_init(plugins)
@@ -74,32 +80,47 @@ def git_convert_standalone_clone(repodir):
 
 def fetch_uri(d, uri, destdir, srcrev=None):
     """Fetch a URI to a local directory"""
-    import bb.data
-    bb.utils.mkdirhier(destdir)
-    localdata = bb.data.createCopy(d)
-    localdata.setVar('BB_STRICT_CHECKSUM', '')
-    localdata.setVar('SRCREV', srcrev)
-    ret = (None, None)
-    olddir = os.getcwd()
+    import bb
+    tmpparent = d.getVar('BASE_WORKDIR')
+    bb.utils.mkdirhier(tmpparent)
+    tmpworkdir = tempfile.mkdtemp(dir=tmpparent)
     try:
-        fetcher = bb.fetch2.Fetch([uri], localdata)
-        for u in fetcher.ud:
-            ud = fetcher.ud[u]
-            ud.ignore_checksums = True
-        fetcher.download()
-        for u in fetcher.ud:
-            ud = fetcher.ud[u]
-            if ud.localpath.rstrip(os.sep) == localdata.getVar('DL_DIR', True).rstrip(os.sep):
-                raise Exception('Local path is download directory - please check that the URI "%s" is correct' % uri)
-        fetcher.unpack(destdir)
-        for u in fetcher.ud:
-            ud = fetcher.ud[u]
-            if ud.method.recommends_checksum(ud):
-                md5value = bb.utils.md5_file(ud.localpath)
-                sha256value = bb.utils.sha256_file(ud.localpath)
-                ret = (md5value, sha256value)
+        bb.utils.mkdirhier(destdir)
+        localdata = bb.data.createCopy(d)
+
+        # Set some values to allow extend_recipe_sysroot to work here we're we are not running from a task
+        localdata.setVar('WORKDIR', tmpworkdir)
+        localdata.setVar('BB_RUNTASK', 'do_fetch')
+        localdata.setVar('PN', 'dummy')
+        localdata.setVar('BB_LIMITEDDEPS', '1')
+        bb.build.exec_func("extend_recipe_sysroot", localdata)
+
+        # Set some values for the benefit of the fetcher code
+        localdata.setVar('BB_STRICT_CHECKSUM', '')
+        localdata.setVar('SRCREV', srcrev)
+        ret = (None, None)
+        olddir = os.getcwd()
+        try:
+            fetcher = bb.fetch2.Fetch([uri], localdata)
+            for u in fetcher.ud:
+                ud = fetcher.ud[u]
+                ud.ignore_checksums = True
+            fetcher.download()
+            for u in fetcher.ud:
+                ud = fetcher.ud[u]
+                if ud.localpath.rstrip(os.sep) == localdata.getVar('DL_DIR').rstrip(os.sep):
+                    raise Exception('Local path is download directory - please check that the URI "%s" is correct' % uri)
+            fetcher.unpack(destdir)
+            for u in fetcher.ud:
+                ud = fetcher.ud[u]
+                if ud.method.recommends_checksum(ud):
+                    md5value = bb.utils.md5_file(ud.localpath)
+                    sha256value = bb.utils.sha256_file(ud.localpath)
+                    ret = (md5value, sha256value)
+        finally:
+            os.chdir(olddir)
     finally:
-        os.chdir(olddir)
+        shutil.rmtree(tmpworkdir)
     return ret
 
 def run_editor(fn):

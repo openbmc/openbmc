@@ -1,0 +1,41 @@
+From 75c1d3b8667328d874590a5321eb244256b7d932 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <Mingli.Yu@windriver.com>
+Date: Wed, 18 Jan 2017 07:35:58 +0000
+Subject: [PATCH] Makefile.am: add CFLAGS and LDFLAGS definiton
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* When build libatasmart, we need first build strpool in host
+  env. To build strpool, the compiler is host compiler, but
+  the CFLAGS and LDFLAGS are for cross-compiler, so unify them
+  to fix below error.
+  | make -C strpool strpool
+  | make[1]: Entering directory '../libatasmart/0.19-r0/build/strpool'
+  | gcc  -DHAVE_CONFIG_H -I. -I../../git/strpool -I..    -isystem../build/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe -O2 -pipe -g -fstack-protector-strong -pie -fpie -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -c -o strpool.o `test -f '../strpool.c' || echo '../../git/strpool/'`../strpool.c
+  | gcc: error: unrecognized command line option ‘-fstack-protector-strong’
+  | make[1]: *** [Makefile:404: strpool.o] Error 1
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+---
+ strpool/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/strpool/Makefile.am b/strpool/Makefile.am
+index b041cea..013fcd3 100644
+--- a/strpool/Makefile.am
++++ b/strpool/Makefile.am
+@@ -17,6 +17,8 @@
+ # <http://www.gnu.org/licenses/>.
+ 
+ CC = @CC_FOR_BUILD@
++CFLAGS = @BUILD_CFLAGS@
++LDFLAGS = @BUILD_LDFLAGS@
+ AM_CFLAGS = @BUILD_CFLAGS@
+ AM_LDFLAGS = @BUILD_LDFLAGS@
+ 
+-- 
+2.11.0
+

@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://PKG-INFO;startline=8;endline=9;md5=4f369b3c3c290b4aed
 SRC_URI[md5sum] = "42f77b0cce686dfa4da2e68480b1dd24"
 SRC_URI[sha256sum] = "f66073e5506e91d204ab0c614a148d5aa938bdbf104751be66f8ad7a222f5f86"
 
-PYPI_PACKAGE = "ujson"
 inherit pypi setuptools
 
 RDEPENDS_${PN} += "\

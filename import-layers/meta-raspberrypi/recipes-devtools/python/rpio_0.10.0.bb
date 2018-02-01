@@ -16,5 +16,10 @@ inherit setuptools
 
 COMPATIBLE_MACHINE = "raspberrypi"
 
+RDEPENDS_${PN} = "\
+    python-logging \
+    python-threading \
+"
+
 SRC_URI[md5sum] = "cefc45422833dcafcd59b78dffc540f4"
 SRC_URI[sha256sum] = "b89f75dec9de354681209ebfaedfe22b7c178aacd91a604a7bd6d92024e4cf7e"

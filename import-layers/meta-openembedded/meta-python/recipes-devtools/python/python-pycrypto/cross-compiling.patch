@@ -1,0 +1,23 @@
+Index: pycrypto-2.6/setup.py
+===================================================================
+--- pycrypto-2.6.orig/setup.py
++++ pycrypto-2.6/setup.py
+@@ -271,7 +271,8 @@ class PCTBuildConfigure(Command):
+         if not os.path.exists("config.status"):
+             if os.system("chmod 0755 configure") != 0:
+                 raise RuntimeError("chmod error")
+-            cmd = "sh configure"    # we use "sh" here so that it'll work on mingw32 with standard python.org binaries
++            host = os.environ.get("HOST_SYS")
++            cmd = "ac_cv_func_malloc_0_nonnull=yes sh configure --host " + host   # we use "sh" here so that it'll work on mingw32 with standard python.org binaries
+             if self.verbose < 1:
+                 cmd += " -q"
+             if os.system(cmd) != 0:
+@@ -370,7 +371,7 @@ kw = {'name':"pycrypto",
+       'ext_modules': plat_ext + [
+             # _fastmath (uses GNU mp library)
+             Extension("Crypto.PublicKey._fastmath",
+-                      include_dirs=['src/','/usr/include/'],
++                      include_dirs=['src/'],
+                       libraries=['gmp'],
+                       sources=["src/_fastmath.c"]),
+ 

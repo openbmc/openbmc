@@ -1,0 +1,21 @@
+From 8ce181714640315d2dd37ee794acbb22063cd669 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 26 Jan 2017 16:36:20 +0200
+Subject: [PATCH] Corretly install tmpfiles.d configuration
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ etc/tmpfiles.d/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/etc/tmpfiles.d/CMakeLists.txt b/etc/tmpfiles.d/CMakeLists.txt
+index f69c773e..3eb6d0e8 100644
+--- a/etc/tmpfiles.d/CMakeLists.txt
++++ b/etc/tmpfiles.d/CMakeLists.txt
+@@ -1 +1 @@
+-INSTALL (FILES dnf.conf DESTINATION /usr/lib/tmpfiles.d/)
++INSTALL (FILES dnf.conf DESTINATION ${SYSCONFDIR}/tmpfiles.d/)
+-- 
+2.11.0
+

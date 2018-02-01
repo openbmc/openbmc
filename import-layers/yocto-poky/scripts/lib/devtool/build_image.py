@@ -34,8 +34,8 @@ def _get_packages(tinfoil, workspace, config):
     result = []
     for recipe in workspace:
         data = parse_recipe(config, tinfoil, recipe, True)
-        if 'class-target' in data.getVar('OVERRIDES', True).split(':'):
-            if recipe in data.getVar('PACKAGES', True).split():
+        if 'class-target' in data.getVar('OVERRIDES').split(':'):
+            if recipe in data.getVar('PACKAGES').split():
                 result.append(recipe)
             else:
                 logger.warning("Skipping recipe %s as it doesn't produce a "
@@ -95,7 +95,7 @@ def build_image_task(config, basepath, workspace, image, add_packages=None, task
             raise TargetNotImageError()
 
         # Get the actual filename used and strip the .bb and full path
-        target_basename = rd.getVar('FILE', True)
+        target_basename = rd.getVar('FILE')
         target_basename = os.path.splitext(os.path.basename(target_basename))[0]
         config.set('SDK', 'target_basename', target_basename)
         config.write()
@@ -132,9 +132,9 @@ def build_image_task(config, basepath, workspace, image, add_packages=None, task
                             afile.write('%s\n' % line)
 
             if task in ['populate_sdk', 'populate_sdk_ext']:
-                outputdir = rd.getVar('SDK_DEPLOY', True)
+                outputdir = rd.getVar('SDK_DEPLOY')
             else:
-                outputdir = rd.getVar('DEPLOY_DIR_IMAGE', True)
+                outputdir = rd.getVar('DEPLOY_DIR_IMAGE')
 
             tmp_tinfoil = tinfoil
             tinfoil = None

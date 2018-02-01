@@ -48,4 +48,4 @@ python populate_packages_prepend () {
 }
 
 # | ../../goffice-0.10.1/goffice/math/go-complex.c:75:3: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
-PNBLACKLIST[goffice] ?= "BROKEN: fails to build with gcc-6"
+PNBLACKLIST[goffice] ?= "BROKEN: fails to build with gcc-6 - the recipe will be removed on 2017-09-01 unless the issue is fixed"

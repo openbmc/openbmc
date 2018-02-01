@@ -1,0 +1,34 @@
+From 5c99d7e4c2b5e7a957dc922aff03debfebbd6154 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Fri, 3 Mar 2017 21:49:15 +0100
+Subject: [PATCH] libparted_fs_resize: link against libuuid explicitly to
+ unbreak gold linking on test
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+| ../libparted/fs/.libs/libparted-fs-resize.so: error: undefined reference to 'uuid_generate'
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+---
+ libparted/fs/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libparted/fs/Makefile.am b/libparted/fs/Makefile.am
+index d3cc8bc..c301b0b 100644
+--- a/libparted/fs/Makefile.am
++++ b/libparted/fs/Makefile.am
+@@ -113,6 +113,8 @@ libparted_fs_resize_la_SOURCES = \
+   r/hfs/reloc_plus.c		\
+   r/hfs/reloc_plus.h
+ 
++libparted_fs_resize_la_LIBADD   = $(UUID_LIBS)
++
+ AM_CPPFLAGS = \
+   -I$(top_srcdir)/libparted/labels	\
+   $(partedincludedir)			\
+-- 
+2.9.3
+

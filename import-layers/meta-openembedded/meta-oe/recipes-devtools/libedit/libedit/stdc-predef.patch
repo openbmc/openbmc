@@ -1,0 +1,17 @@
+__STDC_ISO_10646__ is defined in stdc-predef.h
+therefore include it to see if its there on a platform
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: libedit-20160903-3.1/src/chartype.h
+===================================================================
+--- libedit-20160903-3.1.orig/src/chartype.h
++++ libedit-20160903-3.1/src/chartype.h
+@@ -29,6 +29,7 @@
+ #ifndef _h_chartype_f
+ #define _h_chartype_f
+ 
++#include <stdc-predef.h>
+ /* Ideally we should also test the value of the define to see if it
+  * supports non-BMP code points without requiring UTF-16, but nothing
+  * seems to actually advertise this properly, despite Unicode 3.1 having

@@ -9,7 +9,7 @@ DEPENDS = "gnutls"
 PR = "r1"
 
 # http://errors.yoctoproject.org/Errors/Details/25825/
-PNBLACKLIST[iksemel] ?= "Not compatible with gnutls version 3.4 currently in oe-core"
+PNBLACKLIST[iksemel] ?= "Not compatible with gnutls version 3.4 currently in oe-core - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 SRC_URI = "http://iksemel.googlecode.com/files/${BP}.tar.gz;name=archive \
            file://r25.diff"

@@ -9,10 +9,14 @@ inherit autotools-brokensep
 SRC_URI = "${SOURCEFORGE_MIRROR}/faac/${BP}.tar.gz \
            file://build-fix.patch \
            file://address-gcc-6-narrowing-errors.patch \
-"
+           file://0001-frontend-Fix-format-string-security-error.patch \
+           file://0002-mp4v2-Define-__STRING-if-cdefs.h-does-not-exist.patch \
+           "
 
 SRC_URI[md5sum] = "80763728d392c7d789cde25614c878f6"
 SRC_URI[sha256sum] = "c5141199f4cfb17d749c36ba8cfe4b25f838da67c22f0fec40228b6b9c3d19df"
+
+EXTRA_OECONF += "--without-mp4v2"
 
 PACKAGES =+ "lib${BPN} lib${BPN}-dev"
 

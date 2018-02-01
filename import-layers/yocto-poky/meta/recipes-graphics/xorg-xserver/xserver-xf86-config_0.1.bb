@@ -7,10 +7,6 @@ PR = "r33"
 
 SRC_URI = "file://xorg.conf"
 
-SRC_URI_append_libc-musl = "\
-          file://10-preload-modules.conf \
-"
-
 S = "${WORKDIR}"
 
 CONFFILES_${PN} = "${sysconfdir}/X11/xorg.conf"
@@ -24,8 +20,4 @@ do_install () {
 		install -d ${D}/${sysconfdir}/X11
 		install -m 0644 ${WORKDIR}/xorg.conf ${D}/${sysconfdir}/X11/
 	fi
-}
-
-do_install_append_libc-musl () {
-	install -Dm 0644 ${WORKDIR}/10-preload-modules.conf ${D}/${sysconfdir}/X11/xorg.conf.d/10-preload-modules.conf
 }

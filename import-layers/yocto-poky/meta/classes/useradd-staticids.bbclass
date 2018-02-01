@@ -8,11 +8,11 @@ def update_useradd_static_config(d):
 
     class myArgumentParser( argparse.ArgumentParser ):
         def _print_message(self, message, file=None):
-            bb.warn("%s - %s: %s" % (d.getVar('PN', True), pkg, message))
+            bb.warn("%s - %s: %s" % (d.getVar('PN'), pkg, message))
 
         # This should never be called...
         def exit(self, status=0, message=None):
-            message = message or ("%s - %s: useradd.bbclass: Argument parsing exited" % (d.getVar('PN', True), pkg))
+            message = message or ("%s - %s: useradd.bbclass: Argument parsing exited" % (d.getVar('PN'), pkg))
             error(message)
 
         def error(self, message):
@@ -52,14 +52,13 @@ def update_useradd_static_config(d):
 
     def handle_missing_id(id, type, pkg):
         # For backwards compatibility we accept "1" in addition to "error"
-        if d.getVar('USERADD_ERROR_DYNAMIC', True) == 'error' or d.getVar('USERADD_ERROR_DYNAMIC', True) == '1':
-            #bb.error("Skipping recipe %s, package %s which adds %sname %s does not have a static ID defined." % (d.getVar('PN', True),  pkg, type, id))
-            bb.fatal("%s - %s: %sname %s does not have a static ID defined." % (d.getVar('PN', True), pkg, type, id))
-        elif d.getVar('USERADD_ERROR_DYNAMIC', True) == 'warn':
-            bb.warn("%s - %s: %sname %s does not have a static ID defined." % (d.getVar('PN', True), pkg, type, id))
+        if d.getVar('USERADD_ERROR_DYNAMIC') == 'error' or d.getVar('USERADD_ERROR_DYNAMIC') == '1':
+            raise NotImplementedError("%s - %s: %sname %s does not have a static ID defined. Skipping it." % (d.getVar('PN'), pkg, type, id))
+        elif d.getVar('USERADD_ERROR_DYNAMIC') == 'warn':
+            bb.warn("%s - %s: %sname %s does not have a static ID defined." % (d.getVar('PN'), pkg, type, id))
 
     # We parse and rewrite the useradd components
-    def rewrite_useradd(params):
+    def rewrite_useradd(params, is_pkg):
         # The following comes from --help on useradd from shadow
         parser = myArgumentParser(prog='useradd')
         parser.add_argument("-b", "--base-dir", metavar="BASE_DIR", help="base directory for the home directory of the new account")
@@ -78,6 +77,7 @@ def update_useradd_static_config(d):
         parser.add_argument("-N", "--no-user-group", dest="user_group", help="do not create a group with the same name as the user", action="store_const", const=False)
         parser.add_argument("-o", "--non-unique", help="allow to create users with duplicate (non-unique UID)", action="store_true")
         parser.add_argument("-p", "--password", metavar="PASSWORD", help="encrypted password of the new account")
+        parser.add_argument("-P", "--clear-password", metavar="CLEAR_PASSWORD", help="use this clear password for the new account")
         parser.add_argument("-R", "--root", metavar="CHROOT_DIR", help="directory to chroot into")
         parser.add_argument("-r", "--system", help="create a system account", action="store_true")
         parser.add_argument("-s", "--shell", metavar="SHELL", help="login shell of the new account")
@@ -90,8 +90,8 @@ def update_useradd_static_config(d):
         # paths are resolved via BBPATH
         def get_passwd_list(d):
             str = ""
-            bbpath = d.getVar('BBPATH', True)
-            passwd_tables = d.getVar('USERADD_UID_TABLES', True)
+            bbpath = d.getVar('BBPATH')
+            passwd_tables = d.getVar('USERADD_UID_TABLES')
             if not passwd_tables:
                 passwd_tables = 'files/passwd'
             for conf_file in passwd_tables.split():
@@ -107,7 +107,7 @@ def update_useradd_static_config(d):
             try:
                 uaargs = parser.parse_args(re.split('''[ \t]+(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', param))
             except:
-                bb.fatal("%s: Unable to parse arguments for USERADD_PARAM_%s: '%s'" % (d.getVar('PN', True), pkg, param))
+                bb.fatal("%s: Unable to parse arguments for USERADD_PARAM_%s: '%s'" % (d.getVar('PN'), pkg, param))
 
             # Read all passwd files specified in USERADD_UID_TABLES or files/passwd
             # Use the standard passwd layout:
@@ -124,14 +124,14 @@ def update_useradd_static_config(d):
                 users = merge_files(get_passwd_list(d), 7)
 
             if uaargs.LOGIN not in users:
-                if not uaargs.uid or not uaargs.uid.isdigit() or not uaargs.gid:
-                    handle_missing_id(uaargs.LOGIN, 'user', pkg)
+                handle_missing_id(uaargs.LOGIN, 'user', pkg)
+                newparams.append(param)
                 continue
 
             field = users[uaargs.LOGIN]
 
             if uaargs.uid and field[2] and (uaargs.uid != field[2]):
-                bb.warn("%s: Changing username %s's uid from (%s) to (%s), verify configuration files!" % (d.getVar('PN', True), uaargs.LOGIN, uaargs.uid, field[2]))
+                bb.warn("%s: Changing username %s's uid from (%s) to (%s), verify configuration files!" % (d.getVar('PN'), uaargs.LOGIN, uaargs.uid, field[2]))
             uaargs.uid = field[2] or uaargs.uid
 
             # Determine the possible groupname
@@ -141,9 +141,13 @@ def update_useradd_static_config(d):
             # So if the implicit username-group creation is on, then the implicit groupname (LOGIN)
             # is used, and we disable the user_group option.
             #
-            user_group = uaargs.user_group is None or uaargs.user_group is True
-            uaargs.groupname = uaargs.LOGIN if user_group else uaargs.gid
-            uaargs.groupid = field[3] or uaargs.gid or uaargs.groupname
+            if uaargs.gid:
+                uaargs.groupname = uaargs.gid
+            elif uaargs.user_group is not False:
+                uaargs.groupname = uaargs.LOGIN
+            else:
+                uaargs.groupname = 'users'
+            uaargs.groupid = field[3] or uaargs.groupname
 
             if uaargs.groupid and uaargs.gid != uaargs.groupid:
                 newgroup = None
@@ -159,14 +163,16 @@ def update_useradd_static_config(d):
                     # We want to add a group, but we don't know it's name... so we can't add the group...
                     # We have to assume the group has previously been added or we'll fail on the adduser...
                     # Note: specifying the actual gid is very rare in OE, usually the group name is specified.
-                    bb.warn("%s: Changing gid for login %s to %s, verify configuration files!" % (d.getVar('PN', True), uaargs.LOGIN, uaargs.groupid))
+                    bb.warn("%s: Changing gid for login %s to %s, verify configuration files!" % (d.getVar('PN'), uaargs.LOGIN, uaargs.groupid))
 
                 uaargs.gid = uaargs.groupid
                 uaargs.user_group = None
-                if newgroup:
-                    groupadd = d.getVar("GROUPADD_PARAM_%s" % pkg, True)
+                if newgroup and is_pkg:
+                    groupadd = d.getVar("GROUPADD_PARAM_%s" % pkg)
                     if groupadd:
-                        d.setVar("GROUPADD_PARAM_%s" % pkg, "%s; %s" % (groupadd, newgroup))
+                        # Only add the group if not already specified
+                        if not uaargs.groupname in groupadd:
+                            d.setVar("GROUPADD_PARAM_%s" % pkg, "%s; %s" % (groupadd, newgroup))
                     else:
                         d.setVar("GROUPADD_PARAM_%s" % pkg, newgroup)
 
@@ -183,7 +189,7 @@ def update_useradd_static_config(d):
             newparam += ['', ' --base-dir %s' % uaargs.base_dir][uaargs.base_dir != None]
             newparam += ['', ' --comment %s' % uaargs.comment][uaargs.comment != None]
             newparam += ['', ' --home-dir %s' % uaargs.home_dir][uaargs.home_dir != None]
-            newparam += ['', ' --expiredata %s' % uaargs.expiredate][uaargs.expiredate != None]
+            newparam += ['', ' --expiredate %s' % uaargs.expiredate][uaargs.expiredate != None]
             newparam += ['', ' --inactive %s' % uaargs.inactive][uaargs.inactive != None]
             newparam += ['', ' --gid %s' % uaargs.gid][uaargs.gid != None]
             newparam += ['', ' --groups %s' % uaargs.groups][uaargs.groups != None]
@@ -194,7 +200,10 @@ def update_useradd_static_config(d):
             newparam += ['', ' --no-create-home'][uaargs.create_home is False]
             newparam += ['', ' --no-user-group'][uaargs.user_group is False]
             newparam += ['', ' --non-unique'][uaargs.non_unique]
-            newparam += ['', ' --password %s' % uaargs.password][uaargs.password != None]
+            if uaargs.password != None:
+                newparam += ['', ' --password %s' % uaargs.password][uaargs.password != None]
+            elif uaargs.clear_password:
+                newparam += ['', ' --clear-password %s' % uaargs.clear_password][uaargs.clear_password != None]
             newparam += ['', ' --root %s' % uaargs.root][uaargs.root != None]
             newparam += ['', ' --system'][uaargs.system]
             newparam += ['', ' --shell %s' % uaargs.shell][uaargs.shell != None]
@@ -207,7 +216,7 @@ def update_useradd_static_config(d):
         return ";".join(newparams).strip()
 
     # We parse and rewrite the groupadd components
-    def rewrite_groupadd(params):
+    def rewrite_groupadd(params, is_pkg):
         # The following comes from --help on groupadd from shadow
         parser = myArgumentParser(prog='groupadd')
         parser.add_argument("-f", "--force", help="exit successfully if the group already exists, and cancel -g if the GID is already used", action="store_true")
@@ -215,6 +224,7 @@ def update_useradd_static_config(d):
         parser.add_argument("-K", "--key", metavar="KEY=VALUE", help="override /etc/login.defs defaults")
         parser.add_argument("-o", "--non-unique", help="allow to create groups with duplicate (non-unique) GID", action="store_true")
         parser.add_argument("-p", "--password", metavar="PASSWORD", help="use this encrypted password for the new group")
+        parser.add_argument("-P", "--clear-password", metavar="CLEAR_PASSWORD", help="use this clear password for the new group")
         parser.add_argument("-R", "--root", metavar="CHROOT_DIR", help="directory to chroot into")
         parser.add_argument("-r", "--system", help="create a system account", action="store_true")
         parser.add_argument("GROUP", help="Group name of the new group")
@@ -224,8 +234,8 @@ def update_useradd_static_config(d):
         # paths are resolved via BBPATH
         def get_group_list(d):
             str = ""
-            bbpath = d.getVar('BBPATH', True)
-            group_tables = d.getVar('USERADD_GID_TABLES', True)
+            bbpath = d.getVar('BBPATH')
+            group_tables = d.getVar('USERADD_GID_TABLES')
             if not group_tables:
                 group_tables = 'files/group'
             for conf_file in group_tables.split():
@@ -242,7 +252,7 @@ def update_useradd_static_config(d):
                 # If we're processing multiple lines, we could have left over values here...
                 gaargs = parser.parse_args(re.split('''[ \t]+(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', param))
             except:
-                bb.fatal("%s: Unable to parse arguments for GROUPADD_PARAM_%s: '%s'" % (d.getVar('PN', True), pkg, param))
+                bb.fatal("%s: Unable to parse arguments for GROUPADD_PARAM_%s: '%s'" % (d.getVar('PN'), pkg, param))
 
             # Read all group files specified in USERADD_GID_TABLES or files/group
             # Use the standard group layout:
@@ -257,15 +267,15 @@ def update_useradd_static_config(d):
                 groups = merge_files(get_group_list(d), 4)
 
             if gaargs.GROUP not in groups:
-                if not gaargs.gid or not gaargs.gid.isdigit():
-                    handle_missing_id(gaargs.GROUP, 'group', pkg)
+                handle_missing_id(gaargs.GROUP, 'group', pkg)
+                newparams.append(param)
                 continue
 
             field = groups[gaargs.GROUP]
 
             if field[2]:
                 if gaargs.gid and (gaargs.gid != field[2]):
-                    bb.warn("%s: Changing groupname %s's gid from (%s) to (%s), verify configuration files!" % (d.getVar('PN', True), gaargs.GROUP, gaargs.gid, field[2]))
+                    bb.warn("%s: Changing groupname %s's gid from (%s) to (%s), verify configuration files!" % (d.getVar('PN'), gaargs.GROUP, gaargs.gid, field[2]))
                 gaargs.gid = field[2]
 
             if not gaargs.gid or not gaargs.gid.isdigit():
@@ -276,7 +286,10 @@ def update_useradd_static_config(d):
             newparam += ['', ' --gid %s' % gaargs.gid][gaargs.gid != None]
             newparam += ['', ' --key %s' % gaargs.key][gaargs.key != None]
             newparam += ['', ' --non-unique'][gaargs.non_unique]
-            newparam += ['', ' --password %s' % gaargs.password][gaargs.password != None]
+            if gaargs.password != None:
+                newparam += ['', ' --password %s' % gaargs.password][gaargs.password != None]
+            elif gaargs.clear_password:
+                newparam += ['', ' --clear-password %s' % gaargs.clear_password][gaargs.clear_password != None]
             newparam += ['', ' --root %s' % gaargs.root][gaargs.root != None]
             newparam += ['', ' --system'][gaargs.system]
             newparam += ' %s' % gaargs.GROUP
@@ -289,33 +302,58 @@ def update_useradd_static_config(d):
     # the files listed in USERADD_UID/GID_TABLES. We need to tell bitbake
     # about that explicitly to trigger re-parsing and thus re-execution of
     # this code when the files change.
-    bbpath = d.getVar('BBPATH', True)
+    bbpath = d.getVar('BBPATH')
     for varname, default in (('USERADD_UID_TABLES', 'files/passwd'),
                              ('USERADD_GID_TABLES', 'files/group')):
-        tables = d.getVar(varname, True)
+        tables = d.getVar(varname)
         if not tables:
             tables = default
         for conf_file in tables.split():
             bb.parse.mark_dependency(d, bb.utils.which(bbpath, conf_file))
 
     # Load and process the users and groups, rewriting the adduser/addgroup params
-    useradd_packages = d.getVar('USERADD_PACKAGES', True)
+    useradd_packages = d.getVar('USERADD_PACKAGES') or ""
 
     for pkg in useradd_packages.split():
         # Groupmems doesn't have anything we might want to change, so simply validating
         # is a bit of a waste -- only process useradd/groupadd
-        useradd_param = d.getVar('USERADD_PARAM_%s' % pkg, True)
+        useradd_param = d.getVar('USERADD_PARAM_%s' % pkg)
         if useradd_param:
             #bb.warn("Before: 'USERADD_PARAM_%s' - '%s'" % (pkg, useradd_param))
-            d.setVar('USERADD_PARAM_%s' % pkg, rewrite_useradd(useradd_param))
-            #bb.warn("After:  'USERADD_PARAM_%s' - '%s'" % (pkg, d.getVar('USERADD_PARAM_%s' % pkg, True)))
+            d.setVar('USERADD_PARAM_%s' % pkg, rewrite_useradd(useradd_param, True))
+            #bb.warn("After:  'USERADD_PARAM_%s' - '%s'" % (pkg, d.getVar('USERADD_PARAM_%s' % pkg)))
 
-        groupadd_param = d.getVar('GROUPADD_PARAM_%s' % pkg, True)
+        groupadd_param = d.getVar('GROUPADD_PARAM_%s' % pkg)
         if groupadd_param:
             #bb.warn("Before: 'GROUPADD_PARAM_%s' - '%s'" % (pkg, groupadd_param))
-            d.setVar('GROUPADD_PARAM_%s' % pkg, rewrite_groupadd(groupadd_param))
-            #bb.warn("After:  'GROUPADD_PARAM_%s' - '%s'" % (pkg, d.getVar('GROUPADD_PARAM_%s' % pkg, True)))
+            d.setVar('GROUPADD_PARAM_%s' % pkg, rewrite_groupadd(groupadd_param, True))
+            #bb.warn("After:  'GROUPADD_PARAM_%s' - '%s'" % (pkg, d.getVar('GROUPADD_PARAM_%s' % pkg)))
 
+    # Load and process extra users and groups, rewriting only adduser/addgroup params
+    pkg = d.getVar('PN')
+    extrausers = d.getVar('EXTRA_USERS_PARAMS') or ""
+
+    #bb.warn("Before:  'EXTRA_USERS_PARAMS' - '%s'" % (d.getVar('EXTRA_USERS_PARAMS')))
+    new_extrausers = []
+    for cmd in re.split('''[ \t]*;[ \t]*(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', extrausers):
+        cmd = cmd.strip()
+        if not cmd:
+            continue
+
+        if re.match('''useradd (.*)''', cmd):
+            useradd_param = re.match('''useradd (.*)''', cmd).group(1)
+            useradd_param = rewrite_useradd(useradd_param, False)
+            cmd = 'useradd %s' % useradd_param
+        elif re.match('''groupadd (.*)''', cmd):
+            groupadd_param = re.match('''groupadd (.*)''', cmd).group(1)
+            groupadd_param = rewrite_groupadd(groupadd_param, False)
+            cmd = 'groupadd %s' % groupadd_param
+
+        new_extrausers.append(cmd)
+
+    new_extrausers.append('')
+    d.setVar('EXTRA_USERS_PARAMS', ';'.join(new_extrausers))
+    #bb.warn("After:  'EXTRA_USERS_PARAMS' - '%s'" % (d.getVar('EXTRA_USERS_PARAMS')))
 
 
 python __anonymous() {
@@ -323,7 +361,7 @@ python __anonymous() {
         and not bb.data.inherits_class('native', d):
         try:
             update_useradd_static_config(d)
-        except bb.build.FuncFailed as f:
-            bb.debug(1, "Skipping recipe %s: %s" % (d.getVar('PN', True), f))
+        except NotImplementedError as f:
+            bb.debug(1, "Skipping recipe %s: %s" % (d.getVar('PN'), f))
             raise bb.parse.SkipPackage(f)
 }

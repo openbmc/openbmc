@@ -27,7 +27,7 @@ import shutil
 from django.db import transaction
 from django.db.models import Q
 from bldcontrol.models import BuildEnvironment, BRLayer, BRVariable, BRTarget, BRBitbake
-from orm.models import CustomImageRecipe, Layer, Layer_Version, ProjectLayer
+from orm.models import CustomImageRecipe, Layer, Layer_Version, ProjectLayer, ToasterSetting
 import subprocess
 
 from toastermain import settings
@@ -200,71 +200,92 @@ class LocalhostBEController(BuildEnvironmentController):
 
         logger.debug("localhostbecontroller: current layer list %s " % pformat(layerlist))
 
+        if self.pokydirname is None and os.path.exists(os.path.join(self.be.sourcedir, "oe-init-build-env")):
+            logger.debug("localhostbecontroller: selected poky dir name %s" % self.be.sourcedir)
+            self.pokydirname = self.be.sourcedir
+
         # 5. create custom layer and add custom recipes to it
-        layerpath = os.path.join(self.be.builddir,
-                                 CustomImageRecipe.LAYER_NAME)
         for target in targets:
             try:
-                customrecipe = CustomImageRecipe.objects.get(name=target.target,
-                                                             project=bitbake.req.project)
+                customrecipe = CustomImageRecipe.objects.get(
+                    name=target.target,
+                    project=bitbake.req.project)
+
+                custom_layer_path = self.setup_custom_image_recipe(
+                    customrecipe, layers)
+
+                if os.path.isdir(custom_layer_path):
+                    layerlist.append(custom_layer_path)
+
             except CustomImageRecipe.DoesNotExist:
-                continue # not a custom recipe, skip
+                continue  # not a custom recipe, skip
 
-            # create directory structure
-            for name in ("conf", "recipes"):
-                path = os.path.join(layerpath, name)
-                if not os.path.isdir(path):
-                    os.makedirs(path)
-
-            # create layer.oonf
-            config = os.path.join(layerpath, "conf", "layer.conf")
-            if not os.path.isfile(config):
-                with open(config, "w") as conf:
-                    conf.write('BBPATH .= ":${LAYERDIR}"\nBBFILES += "${LAYERDIR}/recipes/*.bb"\n')
-
-            # Update the Layer_Version dirpath that has our base_recipe in
-            # to be able to read the base recipe to then  generate the
-            # custom recipe.
-            br_layer_base_recipe = layers.get(
-                layer_version=customrecipe.base_recipe.layer_version)
-
-            br_layer_base_dirpath = \
-                    os.path.join(self.be.sourcedir,
-                                 self.getGitCloneDirectory(
-                                     br_layer_base_recipe.giturl,
-                                     br_layer_base_recipe.commit),
-                                 customrecipe.base_recipe.layer_version.dirpath
-                                )
-
-            customrecipe.base_recipe.layer_version.dirpath = \
-                         br_layer_base_dirpath
-
-            customrecipe.base_recipe.layer_version.save()
-
-            # create recipe
-            recipe_path = \
-                    os.path.join(layerpath, "recipes", "%s.bb" % target.target)
-            with open(recipe_path, "w") as recipef:
-                recipef.write(customrecipe.generate_recipe_file_contents())
-
-            # Update the layer and recipe objects
-            customrecipe.layer_version.dirpath = layerpath
-            customrecipe.layer_version.save()
-
-            customrecipe.file_path = recipe_path
-            customrecipe.save()
-
-            # create *Layer* objects needed for build machinery to work
-            BRLayer.objects.get_or_create(req=target.req,
-                                          name=layer.name,
-                                          dirpath=layerpath,
-                                          giturl="file://%s" % layerpath)
-        if os.path.isdir(layerpath):
-            layerlist.append(layerpath)
-
-        self.islayerset = True
         layerlist.extend(nongitlayerlist)
+        logger.debug("\n\nset layers gives this list %s" % pformat(layerlist))
+        self.islayerset = True
         return layerlist
+
+    def setup_custom_image_recipe(self, customrecipe, layers):
+        """ Set up toaster-custom-images layer and recipe files """
+        layerpath = os.path.join(self.be.builddir,
+                                 CustomImageRecipe.LAYER_NAME)
+
+        # create directory structure
+        for name in ("conf", "recipes"):
+            path = os.path.join(layerpath, name)
+            if not os.path.isdir(path):
+                os.makedirs(path)
+
+        # create layer.conf
+        config = os.path.join(layerpath, "conf", "layer.conf")
+        if not os.path.isfile(config):
+            with open(config, "w") as conf:
+                conf.write('BBPATH .= ":${LAYERDIR}"\nBBFILES += "${LAYERDIR}/recipes/*.bb"\n')
+
+        # Update the Layer_Version dirpath that has our base_recipe in
+        # to be able to read the base recipe to then  generate the
+        # custom recipe.
+        br_layer_base_recipe = layers.get(
+            layer_version=customrecipe.base_recipe.layer_version)
+
+        # If the layer is one that we've cloned we know where it lives
+        if br_layer_base_recipe.giturl and br_layer_base_recipe.commit:
+            layer_path = self.getGitCloneDirectory(
+                br_layer_base_recipe.giturl,
+                br_layer_base_recipe.commit)
+        # Otherwise it's a local layer
+        elif br_layer_base_recipe.local_source_dir:
+            layer_path = br_layer_base_recipe.local_source_dir
+        else:
+            logger.error("Unable to workout the dir path for the custom"
+                         " image recipe")
+
+        br_layer_base_dirpath = os.path.join(
+            self.be.sourcedir,
+            layer_path,
+            customrecipe.base_recipe.layer_version.dirpath)
+
+        customrecipe.base_recipe.layer_version.dirpath = br_layer_base_dirpath
+
+        customrecipe.base_recipe.layer_version.save()
+
+        # create recipe
+        recipe_path = os.path.join(layerpath, "recipes", "%s.bb" %
+                                   customrecipe.name)
+        with open(recipe_path, "w") as recipef:
+            recipef.write(customrecipe.generate_recipe_file_contents())
+
+        # Update the layer and recipe objects
+        customrecipe.layer_version.dirpath = layerpath
+        customrecipe.layer_version.layer.local_source_dir = layerpath
+        customrecipe.layer_version.layer.save()
+        customrecipe.layer_version.save()
+
+        customrecipe.file_path = recipe_path
+        customrecipe.save()
+
+        return layerpath
+
 
     def readServerLogFile(self):
         return open(os.path.join(self.be.builddir, "toaster_server.log"), "r").read()
@@ -277,23 +298,17 @@ class LocalhostBEController(BuildEnvironmentController):
         builddir = '%s-toaster-%d' % (self.be.builddir, bitbake.req.project.id)
         oe_init = os.path.join(self.pokydirname, 'oe-init-build-env')
         # init build environment
-        self._shellcmd("bash -c 'source %s %s'" % (oe_init, builddir),
+        try:
+            custom_script = ToasterSetting.objects.get(name="CUSTOM_BUILD_INIT_SCRIPT").value
+            custom_script = custom_script.replace("%BUILDDIR%" ,builddir)
+            self._shellcmd("bash -c 'source %s'" % (custom_script))
+        except ToasterSetting.DoesNotExist:
+            self._shellcmd("bash -c 'source %s %s'" % (oe_init, builddir),
                        self.be.sourcedir)
 
         # update bblayers.conf
-        bblconfpath = os.path.join(builddir, "conf/bblayers.conf")
-        conflines = open(bblconfpath, "r").readlines()
-        skip = False
+        bblconfpath = os.path.join(builddir, "conf/toaster-bblayers.conf")
         with open(bblconfpath, 'w') as bblayers:
-            for line in conflines:
-                if line.startswith("# line added by toaster"):
-                    skip = True
-                    continue
-                if skip:
-                    skip = False
-                else:
-                    bblayers.write(line)
-
             bblayers.write('# line added by toaster build control\n'
                            'BBLAYERS = "%s"' % ' '.join(layers))
 
@@ -306,9 +321,10 @@ class LocalhostBEController(BuildEnvironmentController):
 
         # run bitbake server from the clone
         bitbake = os.path.join(self.pokydirname, 'bitbake', 'bin', 'bitbake')
-        self._shellcmd('bash -c \"source %s %s; BITBAKE_UI="knotty" %s --read %s '
+        toasterlayers = os.path.join(builddir,"conf/toaster-bblayers.conf")
+        self._shellcmd('bash -c \"source %s %s; BITBAKE_UI="knotty" %s --read %s --read %s '
                        '--server-only -t xmlrpc -B 0.0.0.0:0\"' % (oe_init,
-                       builddir, bitbake, confpath), self.be.sourcedir)
+                       builddir, bitbake, confpath, toasterlayers), self.be.sourcedir)
 
         # read port number from bitbake.lock
         self.be.bbport = ""

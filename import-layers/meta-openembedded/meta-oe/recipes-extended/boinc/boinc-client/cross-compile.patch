@@ -1,0 +1,98 @@
+Remove rpath, its bad for cross compiling to encode
+build time rpaths
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: boinc-client_release-7.6-7.6.33/api/Makefile.am
+===================================================================
+--- boinc-client_release-7.6-7.6.33.orig/api/Makefile.am
++++ boinc-client_release-7.6-7.6.33/api/Makefile.am
+@@ -43,18 +43,18 @@ endif
+ 
+ lib_LTLIBRARIES = libboinc_api.la
+ libboinc_api_la_SOURCES = $(api_files)
+-libboinc_api_la_LDFLAGS = -L$(libdir) -rpath $(libdir) -version-number $(LIBBOINC_VERSION)
++libboinc_api_la_LDFLAGS = -version-number $(LIBBOINC_VERSION)
+ 
+ if BUILD_GRAPHICS_API
+ lib_LTLIBRARIES += libboinc_graphics2.la
+ libboinc_graphics2_la_SOURCES = $(graphics2_files)
+ libboinc_graphics2_la_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/lib -I$(top_srcdir)/samples/image_libs
+-libboinc_graphics2_la_LDFLAGS = -L$(libdir) -rpath $(libdir) -version-number $(LIBBOINC_VERSION) -ljpeg
++libboinc_graphics2_la_LDFLAGS = -version-number $(LIBBOINC_VERSION) -ljpeg
+ endif #BUILD_GRAPHICS_API
+ 
+ lib_LTLIBRARIES += libboinc_opencl.la
+ libboinc_opencl_la_SOURCES = $(opencl_files)
+-libboinc_opencl_la_LDFLAGS = -L$(libdir) -rpath $(libdir) -version-number $(LIBBOINC_VERSION)
++libboinc_opencl_la_LDFLAGS = -version-number $(LIBBOINC_VERSION)
+ 
+ if INSTALL_HEADERS
+ ## install only headers that are meant for exporting the API !!
+Index: boinc-client_release-7.6-7.6.33/lib/Makefile.am
+===================================================================
+--- boinc-client_release-7.6-7.6.33.orig/lib/Makefile.am
++++ boinc-client_release-7.6-7.6.33/lib/Makefile.am
+@@ -173,7 +173,7 @@ lib_LTLIBRARIES = libboinc.la
+ libboinc_la_SOURCES = $(generic_sources) $(mac_sources) $(win_sources)
+ libboinc_la_CFLAGS = $(AM_CFLAGS) $(PICFLAGS) $(PTHREAD_CFLAGS)
+ libboinc_la_CXXFLAGS = $(AM_CXXFLAGS) $(PICFLAGS) $(PTHREAD_CFLAGS)
+-libboinc_la_LDFLAGS = -L$(libdir) -rpath $(libdir) -static -version-number $(LIBBOINC_VERSION)
++libboinc_la_LDFLAGS = -static -version-number $(LIBBOINC_VERSION)
+ libboinc_la_LIBADD =
+ 
+ if ENABLE_BOINCCRYPT
+@@ -181,7 +181,7 @@ lib_LTLIBRARIES += libboinc_crypt.la
+ libboinc_crypt_la_SOURCES = crypt.cpp
+ libboinc_crypt_la_CFLAGS = $(AM_CFLAGS) $(PICFLAGS) $(PTHREAD_CFLAGS) $(SSL_CFLAGS)
+ libboinc_crypt_la_CXXFLAGS = $(AM_CXXFLAGS) $(PICFLAGS) $(PTHREAD_CFLAGS) $(SSL_CXXFLAGS)
+-libboinc_crypt_la_LDFLAGS = -L$(libdir) -rpath $(libdir) -static -version-number $(LIBBOINC_VERSION)
++libboinc_crypt_la_LDFLAGS = -static -version-number $(LIBBOINC_VERSION)
+ libboinc_crypt_la_LIBADD =
+ endif
+ 
+@@ -190,7 +190,7 @@ lib_LTLIBRARIES += libboinc_fcgi.la
+ libboinc_fcgi_la_SOURCES = $(libfcgi_sources) $(mac_sources) $(win_sources)
+ libboinc_fcgi_la_CFLAGS = -D_USING_FCGI_ $(AM_CFLAGS) $(PICFLAGS) $(PTHREAD_CFLAGS)
+ libboinc_fcgi_la_CXXFLAGS = -D_USING_FCGI_ $(AM_CXXFLAGS) $(PICFLAGS) $(PTHREAD_CFLAGS)
+-libboinc_fcgi_la_LDFLAGS = -L$(libdir) -rpath $(libdir) -version-number $(LIBBOINC_VERSION)
++libboinc_fcgi_la_LDFLAGS = -version-number $(LIBBOINC_VERSION)
+ libboinc_fcgi_la_LIBADD =
+ endif 
+ # end of "if ENABLE_FCGI"
+Index: boinc-client_release-7.6-7.6.33/sched/Makefile.am
+===================================================================
+--- boinc-client_release-7.6-7.6.33.orig/sched/Makefile.am
++++ boinc-client_release-7.6-7.6.33/sched/Makefile.am
+@@ -26,7 +26,7 @@ lib_LTLIBRARIES = libsched.la
+ libsched_la_SOURCES = $(libsched_sources)
+ libsched_la_CFLAGS = $(AM_CPPFLAGS)
+ libsched_la_CXXFLAGS = $(AM_CPPFLAGS)
+-libsched_la_LDFLAGS= -L$(libdir) -rpath $(libdir) -version-number $(LIBBOINC_VERSION)
++libsched_la_LDFLAGS= -version-number $(LIBBOINC_VERSION)
+ libsched_la_LIBADD= $(SSL_LIBS)
+ 
+ ## install only headers that are meant for exporting the API !!
+@@ -48,7 +48,7 @@ lib_LTLIBRARIES += libsched_fcgi.la
+ libsched_fcgi_la_SOURCES = $(libsched_sources)
+ libsched_fcgi_la_CFLAGS = -D_USING_FCGI_ $(AM_CPPFLAGS)
+ libsched_fcgi_la_CXXFLAGS = -D_USING_FCGI_ $(AM_CPPFLAGS)
+-libsched_fcgi_la_LDFLAGS= -L$(libdir) -rpath $(libdir) -version-number $(LIBBOINC_VERSION)
++libsched_fcgi_la_LDFLAGS= -version-number $(LIBBOINC_VERSION)
+ libsched_fcgi_la_LIBADD=
+ 
+ endif
+Index: boinc-client_release-7.6-7.6.33/zip/Makefile.am
+===================================================================
+--- boinc-client_release-7.6-7.6.33.orig/zip/Makefile.am
++++ boinc-client_release-7.6-7.6.33/zip/Makefile.am
+@@ -61,7 +61,7 @@ endif
+ 
+ lib_LTLIBRARIES = libboinc_zip.la
+ libboinc_zip_la_SOURCES = $(libboinc_zip_sources)
+-libboinc_zip_la_LDFLAGS = -L$(libdir) -rpath $(libdir) -version-number $(LIBBOINC_VERSION)
++libboinc_zip_la_LDFLAGS = -version-number $(LIBBOINC_VERSION)
+ libboinc_zip_la_LIBADD =
+ 
+ # Some OSs may not prefix libraries with lib.

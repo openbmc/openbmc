@@ -1,0 +1,66 @@
+From b6a027fe4da6f66552b533f1314e5005b16c5455 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 29 Mar 2017 23:52:36 -0700
+Subject: [PATCH 7/8] add error() API when error.h is not on platform
+
+sign-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdep.c | 24 ++++++++++++++++++++++++
+ sysdep.h |  2 ++
+ 2 files changed, 26 insertions(+)
+
+diff --git a/sysdep.c b/sysdep.c
+index d8f181d..2518ec1 100644
+--- a/sysdep.c
++++ b/sysdep.c
+@@ -17,6 +17,7 @@
+     GNU General Public License for more details.
+  */
+ 
++#define _GNU_SOURCE
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <stdlib.h>
+@@ -794,3 +795,26 @@ int setenv(const char *name, const char *value, int overwrite)
+ 	return ret;
+ }
+ #endif
++
++#ifndef _ERROR_H_
++#define _ERROR_H_
++#include <stdarg.h>
++#include <stdio.h>
++#include <errno.h>
++
++void error(int status, int errnum, const char* format, ...)
++{
++	va_list ap;
++
++	fflush(stdout);
++	fprintf(stderr, "%s: ", program_invocation_name);
++	va_start(ap, format);
++	vfprintf(stderr, format, ap);
++	va_end(ap);
++	if (errnum)
++		fprintf(stderr, ":%d", errnum);
++	if (status)
++		exit(status);
++}
++#endif  /* _ERROR_H_ */
++
+diff --git a/sysdep.h b/sysdep.h
+index 0122b95..4e60064 100644
+--- a/sysdep.h
++++ b/sysdep.h
+@@ -44,6 +44,8 @@ int tun_get_hwaddr(int fd, char *dev, uint8_t *hwaddr);
+ #if defined(__linux__)
+ #if defined(__GLIBC__)
+ #include <error.h>
++#else
++void error(int status, int errnum, const char* format, ...);
+ #endif
+ #define HAVE_VASPRINTF 1
+ #define HAVE_ASPRINTF  1
+-- 
+2.12.1
+

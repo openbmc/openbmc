@@ -17,7 +17,7 @@ UNKNOWN_CONFIGURE_WHITELIST_append = " --enable-introspection --disable-introspe
 
 # Generating introspection data depends on a combination of native and target
 # introspection tools, and qemu to run the target tools.
-DEPENDS_append_class-target = " gobject-introspection gobject-introspection-native qemu-native"
+DEPENDS_append_class-target = " gobject-introspection gobject-introspection-native qemu-native prelink-native"
 
 # Even though introspection is disabled on -native, gobject-introspection package is still
 # needed for m4 macros.

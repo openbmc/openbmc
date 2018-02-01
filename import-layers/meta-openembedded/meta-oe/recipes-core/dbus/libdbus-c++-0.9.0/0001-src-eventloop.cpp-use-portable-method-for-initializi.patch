@@ -1,0 +1,36 @@
+From 93fd4868d71aa7a26cdfd382d1e4c85112f069f9 Mon Sep 17 00:00:00 2001
+From: Peter Williams <peter@newton.cx>
+Date: Sat, 19 Dec 2015 21:07:37 -0500
+Subject: [PATCH] src/eventloop.cpp: use portable method for initializing
+ recursive mutex
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+Upstream-Status: Backport [https://github.com/andreas-volz/dbus-cplusplus/commit/cdaeaa825db191bd65aad3aaaeb3178738727f05]
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ src/eventloop.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/eventloop.cpp b/src/eventloop.cpp
+index 7fb06a3..f622812 100644
+--- a/src/eventloop.cpp
++++ b/src/eventloop.cpp
+@@ -85,8 +85,11 @@ DefaultMutex::DefaultMutex(bool recursive)
+ {
+   if (recursive)
+   {
+-    pthread_mutex_t recmutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+-    _mutex = recmutex;
++    pthread_mutexattr_t attr;
++
++    pthread_mutexattr_init(&attr);
++    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
++    pthread_mutex_init(&_mutex, &attr);
+   }
+   else
+   {
+-- 
+2.10.2
+

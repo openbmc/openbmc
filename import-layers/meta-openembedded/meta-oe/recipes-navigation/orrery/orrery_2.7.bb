@@ -10,7 +10,8 @@ inherit autotools-brokensep pkgconfig
 SRC_URI = "http://projects.openmoko.org/frs/download.php/923/orrery_2.7_clean.tar.gz \
            file://orrery.png \
            file://use.GdkPixbuf.patch \
-"
+           file://0001-orrery-Fix-sprintf-format.patch \
+           "
 
 SRC_URI[md5sum]    = "bd62a33e7554ee1030313dfcdefcda8b"
 SRC_URI[sha256sum] = "645166a5e05b2064ab630534a514697fc47b681951e7fe1d635c259cbdf7a5e6"

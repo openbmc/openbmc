@@ -15,4 +15,4 @@ S = "${WORKDIR}/git"
 
 inherit cmake lib_package
 
-EXTRA_OECMAKE = "-DLIB_SUFFIX=${@d.getVar('baselib', True).replace('lib', '')}"
+EXTRA_OECMAKE = "-DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')}"

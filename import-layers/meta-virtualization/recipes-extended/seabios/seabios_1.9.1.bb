@@ -23,6 +23,8 @@ TUNE_CCARGS = ""
 EXTRA_OEMAKE += "HOSTCC='${BUILD_CC}'"
 EXTRA_OEMAKE += "CROSS_PREFIX=${TARGET_PREFIX}"
 
+COMPATIBLE_HOST = "(i.86|x86_64).*-linux"
+
 do_configure() {
     oe_runmake defconfig
 }

@@ -1,0 +1,1148 @@
+From 5f6dfafb80bdc2566fe91d5fde96769175fabf35 Mon Sep 17 00:00:00 2001
+From: Faraz Shahbazker <faraz.shahbazker@imgtec.com>
+Date: Sat, 1 Jul 2017 10:56:59 -0700
+Subject: [PATCH] Add support for mips64 n32/n64
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+Source: http://lists.alioth.debian.org/pipermail/ltrace-devel/2015-May/001327.html
+
+ backend.h                            |   8 +
+ ltrace-elf.c                         |  12 ++
+ proc.h                               |   1 +
+ sysdeps/linux-gnu/mips/Makefile.am   |   1 +
+ sysdeps/linux-gnu/mips/abi.c         |  64 +++++++
+ sysdeps/linux-gnu/mips/arch.h        |  24 ++-
+ sysdeps/linux-gnu/mips/plt.c         |  68 ++++++--
+ sysdeps/linux-gnu/mips/signalent1.h  |  52 ++++++
+ sysdeps/linux-gnu/mips/syscallent1.h | 328 +++++++++++++++++++++++++++++++++++
+ sysdeps/linux-gnu/mips/trace.c       | 241 ++++++++++++++++++-------
+ sysdeps/linux-gnu/mksyscallent_mips  |   9 +-
+ 11 files changed, 728 insertions(+), 80 deletions(-)
+ create mode 100644 sysdeps/linux-gnu/mips/abi.c
+ create mode 100644 sysdeps/linux-gnu/mips/signalent1.h
+ create mode 100644 sysdeps/linux-gnu/mips/syscallent1.h
+
+diff --git a/backend.h b/backend.h
+index e25daa0..0d6926a 100644
+--- a/backend.h
++++ b/backend.h
+@@ -314,6 +314,14 @@ int arch_process_exec(struct process *proc);
+ int arch_get_sym_info(struct ltelf *lte, const char *filename, size_t sym_index,
+ 		      GElf_Rela *rela, GElf_Sym *sym);
+ 
++/* The following callback has to be implemented in backend if arch.h
++ * defines ARCH_HAVE_GET_ABI
++ *
++ * This is called from read_module just once, when reading the main module.
++ * The value returned is an architecture specific ID for the current ABI
++ * to be used later for ABI-specific operations. */
++char arch_get_abi(GElf_Ehdr ehdr);
++
+ enum plt_status {
+ 	PLT_FAIL,
+ 	PLT_OK,
+diff --git a/ltrace-elf.c b/ltrace-elf.c
+index f439cb0..a85edca 100644
+--- a/ltrace-elf.c
++++ b/ltrace-elf.c
+@@ -1131,6 +1131,14 @@ populate_symtab(struct process *proc, const char *filename,
+ 				    only_exported_names);
+ }
+ 
++#ifndef ARCH_HAVE_GET_ABI
++char
++arch_get_abi(GElf_Ehdr ehdr)
++{
++       return 0;
++}
++#endif
++
+ static int
+ read_module(struct library *lib, struct process *proc,
+ 	    const char *filename, GElf_Addr bias, int main)
+@@ -1151,6 +1159,10 @@ read_module(struct library *lib, struct process *proc,
+ 	 * with 32-bit ltrace.  It is desirable to preserve this.  */
+ 	proc->e_machine = lte.ehdr.e_machine;
+ 	proc->e_class = lte.ehdr.e_ident[EI_CLASS];
++	/* Another candidate for the ABI module. We probably
++	 * want to do all of the e_* stuff only once, for main */
++	if (main)
++		proc->e_abi = arch_get_abi(lte.ehdr);
+ 	get_arch_dep(proc);
+ 
+ 	/* Find out the base address.  For PIE main binaries we look
+diff --git a/proc.h b/proc.h
+index a611456..00094e1 100644
+--- a/proc.h
++++ b/proc.h
+@@ -117,6 +117,7 @@ struct process {
+ 	 * nauseam.  */
+ 	short e_machine;
+ 	char e_class;
++	char e_abi;
+ 
+ #if defined(HAVE_LIBDW)
+ 	/* Unwind info for leader, NULL for non-leader procs. */
+diff --git a/sysdeps/linux-gnu/mips/Makefile.am b/sysdeps/linux-gnu/mips/Makefile.am
+index 1fd8c2a..571ee0d 100644
+--- a/sysdeps/linux-gnu/mips/Makefile.am
++++ b/sysdeps/linux-gnu/mips/Makefile.am
+@@ -20,6 +20,7 @@ noinst_LTLIBRARIES = \
+ 	../libcpu.la
+ 
+ ___libcpu_la_SOURCES = \
++	abi.c \
+ 	plt.c \
+ 	regs.c \
+ 	trace.c
+diff --git a/sysdeps/linux-gnu/mips/abi.c b/sysdeps/linux-gnu/mips/abi.c
+new file mode 100644
+index 0000000..64e3c10
+--- /dev/null
++++ b/sysdeps/linux-gnu/mips/abi.c
+@@ -0,0 +1,64 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2015 Imagination Technologies Limited
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++#include <stdio.h>
++#include <gelf.h>
++#include "arch.h"
++
++/*
++ *  There is no bit in the header-flags to mark N64 ABI, it must be
++ *  determined by exclusion of other ABIs. The following values are
++ *  from elfcpp/mips.h in binutils sources
++ */
++enum
++{
++	E_MIPS_ABI_MASK = 0x0000F000,
++	E_MIPS_ABI_N32 	= 0x00000020,
++	E_MIPS_ABI_O32 	= 0x00001000,
++	E_MIPS_ABI_O64 	= 0x00002000,
++	E_MIPS_ABI_EABI32 = 0x00003000,
++	E_MIPS_ABI_EABI64 = 0x00004000,
++};
++
++char
++arch_get_abi(GElf_Ehdr ehdr)
++{
++	enum mips_abi_type abi;
++	switch (ehdr.e_flags & E_MIPS_ABI_MASK) {
++	case E_MIPS_ABI_O32:
++		abi = ABI_O32; break;
++	case E_MIPS_ABI_O64:
++		abi = ABI_O64; break;
++	case E_MIPS_ABI_EABI32:
++	case E_MIPS_ABI_EABI64:
++		fprintf(stderr, "%s: MIPS EABI is not supported\n", __func__);
++		abi = -1;
++		break;
++	default:
++		if (ehdr.e_flags & E_MIPS_ABI_N32)
++			abi = ABI_N32;
++		else
++			abi = ABI_N64;
++	}
++
++	return abi;
++}
++
++/**@}*/
+diff --git a/sysdeps/linux-gnu/mips/arch.h b/sysdeps/linux-gnu/mips/arch.h
+index 16273d2..8b75df2 100644
+--- a/sysdeps/linux-gnu/mips/arch.h
++++ b/sysdeps/linux-gnu/mips/arch.h
+@@ -1,5 +1,6 @@
+ /*
+  * This file is part of ltrace.
++ * Copyright (C) 2015 Imagination Technologies Limited
+  * Copyright (C) 2013,2014 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2006 Eric Vaitl
+  *
+@@ -38,8 +39,12 @@
+ #define BREAKPOINT_LENGTH 4
+ #define DECR_PC_AFTER_BREAK 0
+ 
+-#define LT_ELFCLASS	ELFCLASS32
++#ifdef __LP64__
++#define LT_ELFCLASS	ELFCLASS64
+ #define LT_ELF_MACHINE	EM_MIPS
++#endif /* __LP64__ */
++#define LT_ELFCLASS2	ELFCLASS32
++#define LT_ELF_MACHINE2 EM_MIPS
+ 
+ #define ARCH_HAVE_LTELF_DATA
+ struct arch_ltelf_data {
+@@ -53,8 +58,14 @@ struct arch_ltelf_data {
+ #define ARCH_HAVE_ADD_PLT_ENTRY
+ #define ARCH_HAVE_SW_SINGLESTEP
+ #define ARCH_HAVE_SYMBOL_RET
+-
++#define ARCH_HAVE_GET_ABI
+ #define ARCH_HAVE_LIBRARY_SYMBOL_DATA
++
++#ifdef __LP64__
++#define ARCH_HAVE_SIZEOF
++#define ARCH_HAVE_ALIGNOF
++#endif /* __LP64__ */
++
+ enum mips_plt_type
+ {
+ 	/* A symbol has associated PLT entry.  */
+@@ -73,7 +84,14 @@ enum mips_plt_type
+ 	MIPS_PLT_NEED_UNRESOLVE,
+ };
+ 
+-struct mips_unresolve_data;
++enum mips_abi_type
++{
++	ABI_O32,
++	ABI_N32,
++	ABI_N64,
++	ABI_O64,
++};
++
+ struct arch_library_symbol_data {
+ 	enum mips_plt_type type;
+ 	union {
+diff --git a/sysdeps/linux-gnu/mips/plt.c b/sysdeps/linux-gnu/mips/plt.c
+index f3c12da..2d85ad9 100644
+--- a/sysdeps/linux-gnu/mips/plt.c
++++ b/sysdeps/linux-gnu/mips/plt.c
+@@ -1,5 +1,6 @@
+ /*
+  * This file is part of ltrace.
++ * Copyright (C) 2015 Imagination Technologies Limited
+  * Copyright (C) 2012,2013,2014 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2012 Edgar E. Iglesias, Axis Communications
+  * Copyright (C) 2008,2009 Juan Cespedes
+@@ -182,6 +183,11 @@ arch_find_dl_debug(struct process *proc, arch_addr_t dyn_addr,
+ {
+ 	arch_addr_t rld_addr;
+ 	int r;
++#ifdef __LP64__
++	size_t addrsize = proc->mask_32bit ? 4 : (sizeof *ret);
++#else /* !__LP64__ */
++	size_t addrsize = sizeof *ret;
++#endif /* !__LP64__ */
+ 
+ 	/* MIPS puts the address of the r_debug structure into the
+ 	 * DT_MIPS_RLD_MAP entry instead of into the DT_DEBUG entry.  */
+@@ -189,7 +195,7 @@ arch_find_dl_debug(struct process *proc, arch_addr_t dyn_addr,
+ 					 DT_MIPS_RLD_MAP, &rld_addr);
+ 	if (r == 0) {
+ 		if (umovebytes(proc, rld_addr,
+-			       ret, sizeof *ret) != sizeof *ret) {
++			       ret, addrsize) != addrsize) {
+ 			r = -1;
+ 		}
+ 	}
+@@ -295,14 +301,25 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
+ 
+ 	for (j = 0; j < data->d_size / 16; ++j) {
+ 		uint32_t insn;
++		int got_size = 4;
++		uint32_t load_inst = 0x24180000U; /* addui t8,0,xx  */
++
++#ifdef __LP64__
++		if (arch_get_abi(lte->ehdr) == ABI_N64
++		    || arch_get_abi(lte->ehdr) == ABI_O64) {
++			got_size = 8;
++			load_inst = 0x64180000U; /* daddui t8,0,xx  */
++		}
++#endif /* __LP64__ */
++
+ 		if (elf_read_u32(data, j * 16 + 12, &insn) < 0)
+ 			goto fail_stubs;
+ 
+ 		if (insn == 0)
+ 			continue;
+ 
+-		/* 0x2418XXXX encodes lbu 0,t8,XXXX or li t8,XXXX.  */
+-		if ((insn & 0xffff0000U) != 0x24180000U)
++		/* 0x[62]418XXXX encodes [d]addiu t8, 0, XXXX.  */
++		if ((insn & 0xffff0000U) != load_inst)
+ 			goto fail_stubs;
+ 
+ 		unsigned idx = insn & 0xffff;
+@@ -323,8 +340,8 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
+ 			+ lte->arch.mips_local_gotno;
+ 		/* XXX Double cast.  */
+ 		arch_addr_t got_entry_addr
+-			= (arch_addr_t) (uintptr_t) lte->arch.pltgot_addr
+-			+ got_idx * 4;
++			= (arch_addr_t) (uintptr_t) (lte->arch.pltgot_addr
++						     + got_idx * got_size);
+ 
+ 		GElf_Rela rela = {
+ 			/* XXX double cast.  */
+@@ -336,7 +353,7 @@ arch_elf_init(struct ltelf *lte, struct library *lib)
+ 		if (VECT_PUSHBACK(&lte->plt_relocs, &rela) < 0)
+ 			goto fail_stubs;
+ 
+-		fprintf(stderr,
++		debug(2,
+ 			"added stub entry for symbol %u at %#lx, GOT @%p\n",
+ 			idx, (unsigned long) rela.r_addend, got_entry_addr);
+ 	}
+@@ -362,8 +379,17 @@ read_got_entry(struct process *proc, GElf_Addr addr, GElf_Addr *valp)
+ {
+ 	/* XXX double cast.  */
+ 	arch_addr_t a = (arch_addr_t) (uintptr_t) addr;
+-	uint32_t l;
+-	if (proc_read_32(proc, a, &l) < 0) {
++	uint64_t l = 0;
++	int result;
++
++#ifdef __LP64__
++	if (!proc->mask_32bit)
++		result = proc_read_64(proc, a, &l);
++	else
++#endif /* __LP64__ */
++		result = proc_read_32(proc, a, (uint32_t *) &l);
++
++	if (result < 0) {
+ 		fprintf(stderr, "ptrace read got entry @%#" PRIx64 ": %s\n",
+ 			addr, strerror(errno));
+ 		return -1;
+@@ -426,13 +452,13 @@ arch_elf_add_plt_entry(struct process *proc, struct ltelf *lte,
+ 	GElf_Addr stub_addr = rela->r_addend + lte->bias;
+ 
+ 	debug(2, "PLT-less arch_elf_add_plt_entry %s = %#llx\n",
+-	      a_name, stub_addr);
++	      a_name, (unsigned long long) stub_addr);
+ 
+ 	struct library_symbol *libsym = NULL;
+ 	if (default_elf_add_plt_entry(proc, lte, a_name, rela, ndx,
+ 				      &libsym) < 0) {
+-		fprintf(stderr, "%s: failed %s(%#llx): %s\n", __func__,
+-			a_name, stub_addr, strerror(errno));
++		fprintf(stderr, "%s: failed %s(%#lx): %s\n", __func__,
++			a_name, (unsigned long) stub_addr, strerror(errno));
+ 		goto fail;
+ 	}
+ 
+@@ -503,13 +529,27 @@ jump_to_entry_point(struct process *proc, struct breakpoint *bp)
+ static int
+ unresolve_got_entry(struct process *proc, GElf_Addr addr, GElf_Addr value)
+ {
+-	uint32_t v32 = (uint32_t) value;
+-	uint32_t a32 = (uint32_t) addr;
+-	if (ptrace(PTRACE_POKETEXT, proc->pid, a32, v32) < 0) {
++	arch_addr_t a = (arch_addr_t) (uintptr_t) addr;
++#ifdef __LP64__
++	/* To write 32-bit value in 64-bit mode, we must read-modify-write
++	   the 64-bit value with only the lower 32 bits modified.  */
++	if (proc->mask_32bit) {
++		GElf_Addr orig = ptrace(PTRACE_PEEKTEXT, proc->pid, a, 0);
++		char *obytes = (char *) &orig;
++		char *nbytes = (char *) &value;
++		unsigned i;
++
++		for (i = 0; i < 4; i++)
++			obytes[i] = nbytes[i];
++		value = orig;
++	}
++#endif /* __LP64__ */
++	if (ptrace(PTRACE_POKETEXT, proc->pid, a, (unsigned long) value) < 0) {
+ 		fprintf(stderr, "failed to unresolve GOT entry: %s\n",
+ 			strerror(errno));
+ 		return -1;
+ 	}
++
+ 	return 0;
+ }
+ 
+diff --git a/sysdeps/linux-gnu/mips/signalent1.h b/sysdeps/linux-gnu/mips/signalent1.h
+new file mode 100644
+index 0000000..9e9d1f7
+--- /dev/null
++++ b/sysdeps/linux-gnu/mips/signalent1.h
+@@ -0,0 +1,52 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2015 Imagination Technologies Limited
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++	"SIG_0",           /* 0 */
++	"SIGHUP",          /* 1 */
++	"SIGINT",          /* 2 */
++	"SIGQUIT",         /* 3 */
++	"SIGILL",          /* 4 */
++	"SIGTRAP",         /* 5 */
++	"SIGIOT",          /* 6 */
++	"SIGEMT",          /* 7 */
++	"SIGFPE",          /* 8 */
++	"SIGKILL",         /* 9 */
++	"SIGBUS",          /* 10 */
++	"SIGSEGV",         /* 11 */
++	"SIGSYS",          /* 12 */
++	"SIGPIPE",         /* 13 */
++	"SIGALRM",         /* 14 */
++	"SIGTERM",         /* 15 */
++	"SIGUSR1",         /* 16 */
++	"SIGUSR2",         /* 17 */
++	"SIGCHLD",         /* 18 */
++	"SIGPWR",          /* 19 */
++	"SIGWINCH",        /* 20 */
++	"SIGURG",          /* 21 */
++	"SIGIO",           /* 22 */
++	"SIGSTOP",         /* 23 */
++	"SIGTSTP",         /* 24 */
++	"SIGCONT",         /* 25 */
++	"SIGTTIN",         /* 26 */
++	"SIGTTOU",         /* 27 */
++	"SIGVTALRM",       /* 28 */
++	"SIGPROF",         /* 29 */
++	"SIGXCPU",         /* 30 */
++	"SIGXFSZ",         /* 31 */
+diff --git a/sysdeps/linux-gnu/mips/syscallent1.h b/sysdeps/linux-gnu/mips/syscallent1.h
+new file mode 100644
+index 0000000..dfa4954
+--- /dev/null
++++ b/sysdeps/linux-gnu/mips/syscallent1.h
+@@ -0,0 +1,328 @@
++/*
++ * This file is part of ltrace.
++ * Copyright (C) 2015 Imagination Technologies Limited
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
++ * 02110-1301 USA
++ */
++
++/* MIPS64 */
++
++	"read",                            /* 0 */
++	"write",                           /* 1 */
++	"open",                            /* 2 */
++	"close",                           /* 3 */
++	"stat",                            /* 4 */
++	"fstat",                           /* 5 */
++	"lstat",                           /* 6 */
++	"poll",                            /* 7 */
++	"lseek",                           /* 8 */
++	"mmap",                            /* 9 */
++	"mprotect",                        /* 10 */
++	"munmap",                          /* 11 */
++	"brk",                             /* 12 */
++	"rt_sigaction",                    /* 13 */
++	"rt_sigprocmask",                  /* 14 */
++	"ioctl",                           /* 15 */
++	"pread64",                         /* 16 */
++	"pwrite64",                        /* 17 */
++	"readv",                           /* 18 */
++	"writev",                          /* 19 */
++	"access",                          /* 20 */
++	"pipe",                            /* 21 */
++	"_newselect",                      /* 22 */
++	"sched_yield",                     /* 23 */
++	"mremap",                          /* 24 */
++	"msync",                           /* 25 */
++	"mincore",                         /* 26 */
++	"madvise",                         /* 27 */
++	"shmget",                          /* 28 */
++	"shmat",                           /* 29 */
++	"shmctl",                          /* 30 */
++	"dup",                             /* 31 */
++	"dup2",                            /* 32 */
++	"pause",                           /* 33 */
++	"nanosleep",                       /* 34 */
++	"getitimer",                       /* 35 */
++	"setitimer",                       /* 36 */
++	"alarm",                           /* 37 */
++	"getpid",                          /* 38 */
++	"sendfile",                        /* 39 */
++	"socket",                          /* 40 */
++	"connect",                         /* 41 */
++	"accept",                          /* 42 */
++	"sendto",                          /* 43 */
++	"recvfrom",                        /* 44 */
++	"sendmsg",                         /* 45 */
++	"recvmsg",                         /* 46 */
++	"shutdown",                        /* 47 */
++	"bind",                            /* 48 */
++	"listen",                          /* 49 */
++	"getsockname",                     /* 50 */
++	"getpeername",                     /* 51 */
++	"socketpair",                      /* 52 */
++	"setsockopt",                      /* 53 */
++	"getsockopt",                      /* 54 */
++	"clone",                           /* 55 */
++	"fork",                            /* 56 */
++	"execve",                          /* 57 */
++	"exit",                            /* 58 */
++	"wait4",                           /* 59 */
++	"kill",                            /* 60 */
++	"uname",                           /* 61 */
++	"semget",                          /* 62 */
++	"semop",                           /* 63 */
++	"semctl",                          /* 64 */
++	"shmdt",                           /* 65 */
++	"msgget",                          /* 66 */
++	"msgsnd",                          /* 67 */
++	"msgrcv",                          /* 68 */
++	"msgctl",                          /* 69 */
++	"fcntl",                           /* 70 */
++	"flock",                           /* 71 */
++	"fsync",                           /* 72 */
++	"fdatasync",                       /* 73 */
++	"truncate",                        /* 74 */
++	"ftruncate",                       /* 75 */
++	"getdents",                        /* 76 */
++	"getcwd",                          /* 77 */
++	"chdir",                           /* 78 */
++	"fchdir",                          /* 79 */
++	"rename",                          /* 80 */
++	"mkdir",                           /* 81 */
++	"rmdir",                           /* 82 */
++	"creat",                           /* 83 */
++	"link",                            /* 84 */
++	"unlink",                          /* 85 */
++	"symlink",                         /* 86 */
++	"readlink",                        /* 87 */
++	"chmod",                           /* 88 */
++	"fchmod",                          /* 89 */
++	"chown",                           /* 90 */
++	"fchown",                          /* 91 */
++	"lchown",                          /* 92 */
++	"umask",                           /* 93 */
++	"gettimeofday",                    /* 94 */
++	"getrlimit",                       /* 95 */
++	"getrusage",                       /* 96 */
++	"sysinfo",                         /* 97 */
++	"times",                           /* 98 */
++	"ptrace",                          /* 99 */
++	"getuid",                          /* 100 */
++	"syslog",                          /* 101 */
++	"getgid",                          /* 102 */
++	"setuid",                          /* 103 */
++	"setgid",                          /* 104 */
++	"geteuid",                         /* 105 */
++	"getegid",                         /* 106 */
++	"setpgid",                         /* 107 */
++	"getppid",                         /* 108 */
++	"getpgrp",                         /* 109 */
++	"setsid",                          /* 110 */
++	"setreuid",                        /* 111 */
++	"setregid",                        /* 112 */
++	"getgroups",                       /* 113 */
++	"setgroups",                       /* 114 */
++	"setresuid",                       /* 115 */
++	"getresuid",                       /* 116 */
++	"setresgid",                       /* 117 */
++	"getresgid",                       /* 118 */
++	"getpgid",                         /* 119 */
++	"setfsuid",                        /* 120 */
++	"setfsgid",                        /* 121 */
++	"getsid",                          /* 122 */
++	"capget",                          /* 123 */
++	"capset",                          /* 124 */
++	"rt_sigpending",                   /* 125 */
++	"rt_sigtimedwait",                 /* 126 */
++	"rt_sigqueueinfo",                 /* 127 */
++	"rt_sigsuspend",                   /* 128 */
++	"sigaltstack",                     /* 129 */
++	"utime",                           /* 130 */
++	"mknod",                           /* 131 */
++	"personality",                     /* 132 */
++	"ustat",                           /* 133 */
++	"statfs",                          /* 134 */
++	"fstatfs",                         /* 135 */
++	"sysfs",                           /* 136 */
++	"getpriority",                     /* 137 */
++	"setpriority",                     /* 138 */
++	"sched_setparam",                  /* 139 */
++	"sched_getparam",                  /* 140 */
++	"sched_setscheduler",              /* 141 */
++	"sched_getscheduler",              /* 142 */
++	"sched_get_priority_max",          /* 143 */
++	"sched_get_priority_min",          /* 144 */
++	"sched_rr_get_interval",           /* 145 */
++	"mlock",                           /* 146 */
++	"munlock",                         /* 147 */
++	"mlockall",                        /* 148 */
++	"munlockall",                      /* 149 */
++	"vhangup",                         /* 150 */
++	"pivot_root",                      /* 151 */
++	"_sysctl",                         /* 152 */
++	"prctl",                           /* 153 */
++	"adjtimex",                        /* 154 */
++	"setrlimit",                       /* 155 */
++	"chroot",                          /* 156 */
++	"sync",                            /* 157 */
++	"acct",                            /* 158 */
++	"settimeofday",                    /* 159 */
++	"mount",                           /* 160 */
++	"umount2",                         /* 161 */
++	"swapon",                          /* 162 */
++	"swapoff",                         /* 163 */
++	"reboot",                          /* 164 */
++	"sethostname",                     /* 165 */
++	"setdomainname",                   /* 166 */
++	"create_module",                   /* 167 */
++	"init_module",                     /* 168 */
++	"delete_module",                   /* 169 */
++	"get_kernel_syms",                 /* 170 */
++	"query_module",                    /* 171 */
++	"quotactl",                        /* 172 */
++	"nfsservctl",                      /* 173 */
++	"getpmsg",                         /* 174 */
++	"putpmsg",                         /* 175 */
++	"afs_syscall",                     /* 176 */
++	"reserved177",                     /* 177 */
++	"gettid",                          /* 178 */
++	"readahead",                       /* 179 */
++	"setxattr",                        /* 180 */
++	"lsetxattr",                       /* 181 */
++	"fsetxattr",                       /* 182 */
++	"getxattr",                        /* 183 */
++	"lgetxattr",                       /* 184 */
++	"fgetxattr",                       /* 185 */
++	"listxattr",                       /* 186 */
++	"llistxattr",                      /* 187 */
++	"flistxattr",                      /* 188 */
++	"removexattr",                     /* 189 */
++	"lremovexattr",                    /* 190 */
++	"fremovexattr",                    /* 191 */
++	"tkill",                           /* 192 */
++	"reserved193",                     /* 193 */
++	"futex",                           /* 194 */
++	"sched_setaffinity",               /* 195 */
++	"sched_getaffinity",               /* 196 */
++	"cacheflush",                      /* 197 */
++	"cachectl",                        /* 198 */
++	"sysmips",                         /* 199 */
++	"io_setup",                        /* 200 */
++	"io_destroy",                      /* 201 */
++	"io_getevents",                    /* 202 */
++	"io_submit",                       /* 203 */
++	"io_cancel",                       /* 204 */
++	"exit_group",                      /* 205 */
++	"lookup_dcookie",                  /* 206 */
++	"epoll_create",                    /* 207 */
++	"epoll_ctl",                       /* 208 */
++	"epoll_wait",                      /* 209 */
++	"remap_file_pages",                /* 210 */
++	"rt_sigreturn",                    /* 211 */
++	"set_tid_address",                 /* 212 */
++	"restart_syscall",                 /* 213 */
++	"semtimedop",                      /* 214 */
++	"fadvise64",                       /* 215 */
++	"timer_create",                    /* 216 */
++	"timer_settime",                   /* 217 */
++	"timer_gettime",                   /* 218 */
++	"timer_getoverrun",                /* 219 */
++	"timer_delete",                    /* 220 */
++	"clock_settime",                   /* 221 */
++	"clock_gettime",                   /* 222 */
++	"clock_getres",                    /* 223 */
++	"clock_nanosleep",                 /* 224 */
++	"tgkill",                          /* 225 */
++	"utimes",                          /* 226 */
++	"mbind",                           /* 227 */
++	"get_mempolicy",                   /* 228 */
++	"set_mempolicy",                   /* 229 */
++	"mq_open",                         /* 230 */
++	"mq_unlink",                       /* 231 */
++	"mq_timedsend",                    /* 232 */
++	"mq_timedreceive",                 /* 233 */
++	"mq_notify",                       /* 234 */
++	"mq_getsetattr",                   /* 235 */
++	"vserver",                         /* 236 */
++	"waitid",                          /* 237 */
++	"238",                             /* 238 */
++	"add_key",                         /* 239 */
++	"request_key",                     /* 240 */
++	"keyctl",                          /* 241 */
++	"set_thread_area",                 /* 242 */
++	"inotify_init",                    /* 243 */
++	"inotify_add_watch",               /* 244 */
++	"inotify_rm_watch",                /* 245 */
++	"migrate_pages",                   /* 246 */
++	"openat",                          /* 247 */
++	"mkdirat",                         /* 248 */
++	"mknodat",                         /* 249 */
++	"fchownat",                        /* 250 */
++	"futimesat",                       /* 251 */
++	"newfstatat",                      /* 252 */
++	"unlinkat",                        /* 253 */
++	"renameat",                        /* 254 */
++	"linkat",                          /* 255 */
++	"symlinkat",                       /* 256 */
++	"readlinkat",                      /* 257 */
++	"fchmodat",                        /* 258 */
++	"faccessat",                       /* 259 */
++	"pselect6",                        /* 260 */
++	"ppoll",                           /* 261 */
++	"unshare",                         /* 262 */
++	"splice",                          /* 263 */
++	"sync_file_range",                 /* 264 */
++	"tee",                             /* 265 */
++	"vmsplice",                        /* 266 */
++	"move_pages",                      /* 267 */
++	"set_robust_list",                 /* 268 */
++	"get_robust_list",                 /* 269 */
++	"kexec_load",                      /* 270 */
++	"getcpu",                          /* 271 */
++	"epoll_pwait",                     /* 272 */
++	"ioprio_set",                      /* 273 */
++	"ioprio_get",                      /* 274 */
++	"utimensat",                       /* 275 */
++	"signalfd",                        /* 276 */
++	"timerfd",                         /* 277 */
++	"eventfd",                         /* 278 */
++	"fallocate",                       /* 279 */
++	"timerfd_create",                  /* 280 */
++	"timerfd_gettime",                 /* 281 */
++	"timerfd_settime",                 /* 282 */
++	"signalfd4",                       /* 283 */
++	"eventfd2",                        /* 284 */
++	"epoll_create1",                   /* 285 */
++	"dup3",                            /* 286 */
++	"pipe2",                           /* 287 */
++	"inotify_init1",                   /* 288 */
++	"preadv",                          /* 289 */
++	"pwritev",                         /* 290 */
++	"rt_tgsigqueueinfo",               /* 291 */
++	"perf_event_open",                 /* 292 */
++	"accept4",                         /* 293 */
++	"recvmmsg",                        /* 294 */
++	"fanotify_init",                   /* 295 */
++	"fanotify_mark",                   /* 296 */
++	"prlimit64",                       /* 297 */
++	"name_to_handle_at",               /* 298 */
++	"open_by_handle_at",               /* 299 */
++	"clock_adjtime",                   /* 300 */
++	"syncfs",                          /* 301 */
++	"sendmmsg",                        /* 302 */
++	"setns",                           /* 303 */
++	"process_vm_readv",                /* 304 */
++	"process_vm_writev",               /* 305 */
+diff --git a/sysdeps/linux-gnu/mips/trace.c b/sysdeps/linux-gnu/mips/trace.c
+index e81b374..d54818e 100644
+--- a/sysdeps/linux-gnu/mips/trace.c
++++ b/sysdeps/linux-gnu/mips/trace.c
+@@ -1,5 +1,6 @@
+ /*
+  * This file is part of ltrace.
++ * Copyright (C) 2015 Imagination Technologies Limited
+  * Copyright (C) 2013 Petr Machata, Red Hat Inc.
+  * Copyright (C) 2012 Edgar E. Iglesias, Axis Communications
+  * Copyright (C) 2010 Arnaud Patard, Mandriva SA
+@@ -29,6 +30,7 @@
+ #include <signal.h>
+ #include <sys/ptrace.h>
+ #include <asm/ptrace.h>
++#include <asm/unistd.h>
+ #include <assert.h>
+ #include <asm/unistd.h>
+ 
+@@ -68,6 +70,44 @@
+ void
+ get_arch_dep(struct process *proc)
+ {
++#ifdef __LP64__
++	proc->mask_32bit = (proc->e_class == ELFCLASS32);
++#endif /* __LP64__ */
++	/* n32 personality is best approximated by n64,
++	   at least for syscall numbers */
++	proc->personality = (proc->e_class == ELFCLASS64
++			     || proc->e_abi == ABI_N32);
++}
++
++/**
++   \param abi ABI of current process, from mips_abi_type enum
++   \param list An array of 4 elements, each corresponding to an ABI, in
++   the order: o32, n32, n64, o64
++
++   return value from array corresponding to requested ABI
++ */
++static int
++abi_select(const int abi, const int list[])
++{
++	int retval;
++	switch (abi)
++	{
++	case ABI_N32:
++		retval = list[1];
++		break;
++	case ABI_N64:
++		retval = list[2];
++		break;
++	case ABI_O64:
++		retval = list[3];
++		break;
++	case ABI_O32:
++	default:
++		retval = list[0];
++		break;
++	}
++
++	return retval;
+ }
+ 
+ /**
+@@ -90,53 +130,94 @@ get_arch_dep(struct process *proc)
+ int
+ syscall_p(struct process *proc, int status, int *sysnum)
+ {
+-	if (WIFSTOPPED(status)
+-			&& WSTOPSIG(status) == (SIGTRAP | proc->tracesysgood)) {
+-		/* get the user's pc (plus 8) */
+-		long pc = (long)get_instruction_pointer(proc);
+-		/* fetch the SWI instruction */
+-		int insn = ptrace(PTRACE_PEEKTEXT, proc->pid, pc - 4, 0);
+-		int num = ptrace(PTRACE_PEEKTEXT, proc->pid, pc - 8, 0);
+-
+-		/*
+-		   On a mips,  syscall looks like:
+-		   24040fa1    li v0, 0x0fa1   # 4001 --> _exit syscall
+-		   0000000c    syscall
+-		 */
+-		if(insn!=0x0000000c){
+-			/* sigreturn returns control to the point
+-			   where the signal was received; skip check 
+-			   for preceeding syscall instruction */
+-			int depth = proc->callstack_depth;
+-			struct callstack_element *top = NULL;
+-			if (depth > 0)
+-				top = &proc->callstack[depth - 1];
+-
+-			if (top != NULL &&  top->is_syscall &&
+-			    (top->c_un.syscall == (__NR_rt_sigreturn -
+-						   __NR_Linux) ||
+-			     top->c_un.syscall == (__NR_sigreturn -
+-						   __NR_Linux))) {
+-				*sysnum = top->c_un.syscall;
+-				return 2;
+-			}
+-			else
+-				return 0;
+-		}
+-
+-		*sysnum = (num & 0xFFFF) - 4000;
+-		/* if it is a syscall, return 1 or 2 */
+-		if (proc->callstack_depth > 0 &&
+-				proc->callstack[proc->callstack_depth - 1].is_syscall &&
+-				proc->callstack[proc->callstack_depth - 1].c_un.syscall == *sysnum) {
++	unsigned long pc;
++	int insn, prev;
++	int min_syscall, max_syscall, sigreturn, rt_sigreturn;
++	struct callstack_element *top = NULL;
++	int depth = proc->callstack_depth;
++	const int syscallbase[] = {__NR_O32_Linux, __NR_N32_Linux,
++				   __NR_64_Linux, __NR_O32_Linux};
++	const int syscallnum[] = {__NR_O32_Linux_syscalls,
++				  __NR_N32_Linux_syscalls,
++				  __NR_64_Linux_syscalls,
++				  __NR_O32_Linux_syscalls};
++	const int rt_sigreturn_list[] = {193, 211, 211, 193};
++	const int sigreturn_list[] = {119, -1, -1, 119};
++
++	if (!WIFSTOPPED(status)
++	    || WSTOPSIG(status) != (SIGTRAP | proc->tracesysgood))
++		return 0;
++
++	/* get the user's pc (plus 8) */
++	pc = (unsigned long)get_instruction_pointer(proc);
++	/* fetch the SWI instruction */
++	insn = ptrace(PTRACE_PEEKTEXT, proc->pid, pc - 4, 0);
++	prev = ptrace(PTRACE_PEEKTEXT, proc->pid, pc - 8, 0);
++
++	if (depth > 0)
++		top = &proc->callstack[depth - 1];
++
++	/* Range of syscall numbers varies with ABI; ref:asm/unistd.h */
++	min_syscall = abi_select(proc->e_abi, syscallbase);
++	max_syscall = min_syscall + abi_select(proc->e_abi, syscallnum);
++	sigreturn = min_syscall + abi_select(proc->e_abi, sigreturn_list);
++	rt_sigreturn = min_syscall + abi_select(proc->e_abi, rt_sigreturn_list);
++
++	/* not a syscall instruction */
++	if(insn!=0x0000000c){
++		/* sigreturn returns control to the point where the signal was
++		   received; skip check for preceeding syscall instruction */
++		if (top != NULL &&  top->is_syscall
++		    && (top->c_un.syscall == (rt_sigreturn - min_syscall)
++			|| top->c_un.syscall == (sigreturn - min_syscall))) {
++			*sysnum = top->c_un.syscall;
+ 			return 2;
+ 		}
++		else
++			return 0;
++	}
+ 
+-		if (*sysnum >= 0) {
+-			return 1;
+-		}
++	/*
++	  On a mips,  syscall looks like:
++	  24020fa1    li v0, 0x0fa1   # 4001 --> _exit syscall
++	  0000000c    syscall
++	*/
++	if ((prev & 0xFFFF0000) == 0x24020000) {
++		*sysnum = (prev & 0xFFFF) - min_syscall;
+ 	}
+-	return 0;
++	/*
++	  The above is not necessary in Linux kernel > v2.6.35. Recent
++	  kernels have a fancy-pants method of restarting syscalls.
++	  We must read v0 instead, to get the syscall number.
++
++	  Unfortunately, v0 is not preserved till the point of return.
++	  If already in syscall and v0 is invalid, assume this event
++	  to be a return without attempting to match previous syscall.
++
++	  Caveat: logic fails if v0 incidentally contains a valid
++	  syscall number, distinct from the current syscall number,
++	  at the point of return from a nested syscall.
++	*/
++	else {
++		int v0 = ptrace(PTRACE_PEEKUSER, proc->pid, off_v0, 0);
++
++		if ((v0 >= min_syscall) && (v0 <= max_syscall))
++			*sysnum = v0 - min_syscall;
++		else if (depth > 0 && top->is_syscall)
++			*sysnum = top->c_un.syscall;
++		else /* syscall instruction without valid number - ignored */
++			return 0;
++	}
++
++	/* if it is a syscall, return 1 or 2 */
++	if (depth > 0 && top->is_syscall && top->c_un.syscall == *sysnum) {
++		return 2;
++	}
++
++	if (*sysnum >= 0)
++		return 1;
++	else
++		return 0;
+ }
+ 
+ /* Based on GDB code.  */
+@@ -162,9 +243,11 @@ mips32_relative_offset (uint32_t inst)
+   return ((itype_immediate(inst) ^ 0x8000) - 0x8000) << 2;
+ }
+ 
+-int mips_next_pcs(struct process *proc, uint32_t pc, uint32_t *newpc)
++int mips_next_pcs(struct process *proc, unsigned long pc,
++		  unsigned long *newpc)
+ {
+-	uint32_t inst, rx;
++	uint32_t inst;
++	unsigned long rx;
+ 	int op;
+ 	int rn;
+ 	int nr = 0;
+@@ -277,8 +360,8 @@ int mips_next_pcs(struct process *proc, uint32_t pc, uint32_t *newpc)
+ 	return nr;
+ 
+ fail:
+-	printf("nr=%d pc=%x\n", nr, pc);
+-	printf("pc=%x %x\n", newpc[0], newpc[1]);
++	printf("nr=%d pc=%lx\n", nr, pc);
++	printf("pc=%lx %lx\n", newpc[0], newpc[1]);
+ 	return 0;
+ }
+ 
+@@ -304,17 +387,27 @@ fail:
+  * branches within the LL-SC sequence.
+  */
+ #define inrange(x,lo,hi) ((x)<=(hi) && (x)>=(lo))
++/* Instruction encodings for atomic operations */
++#ifdef __mips64
++#define op_SC_p(op)	(op == 0x38 || op == 0x3c)
++#define op_LL_p(op)	(op == 0x30 || op == 0x34)
++#else /* !__mips64 */
++#define op_SC_p(op)	(op == 0x38)
++#define op_LL_p(op)	(op == 0x30)
++#endif /* !__mips64 */
++
+ static int
+-mips_atomic_next_pcs(struct process *proc, uint32_t lladdr, uint32_t *newpcs)
++mips_atomic_next_pcs(struct process *proc, unsigned long lladdr,
++		     unsigned long *newpcs)
+ {
+ 	int nr = 0;
+ 
+-	uint32_t scaddr;
++	unsigned long scaddr;
+ 	for (scaddr = lladdr + 4; scaddr - lladdr <= 2048; scaddr += 4) {
+ 		/* Found SC, now stepover trailing branch */
+ 		uint32_t inst;
+ 		if (proc_read_32(proc, (arch_addr_t)scaddr, &inst) >= 0 &&
+-		    itype_op(inst) == 0x38) {
++		    op_SC_p (itype_op(inst))) {
+ 			newpcs[nr++] = scaddr + 4;
+ 			break;
+ 		}
+@@ -327,16 +420,16 @@ mips_atomic_next_pcs(struct process *proc, uint32_t lladdr, uint32_t *newpcs)
+ 	}
+ 
+ 	/* Scan LL<->SC range for branches going outside that range */
+-	uint32_t spc;
++	unsigned long spc;
+ 	for (spc = lladdr + 4; spc < scaddr; spc += 4) {
+-		uint32_t scanpcs[2];
++		unsigned long scanpcs[2];
+ 		int snr = mips_next_pcs(proc, spc, scanpcs);
+ 
+ 		int i;
+ 		for (i = 0; i < snr; ++i) {
+ 			if (!inrange(scanpcs[i], lladdr, scaddr)) {
+-				uint32_t *tmp = realloc(newpcs, (nr + 1) *
+-							sizeof *newpcs);
++				unsigned long *tmp = realloc(newpcs, (nr + 1)
++							     * sizeof *newpcs);
+ 				if (tmp == NULL) {
+ 					perror("malloc atomic next pcs");
+ 					return -1;
+@@ -357,8 +450,8 @@ arch_sw_singlestep(struct process *proc, struct breakpoint *bp,
+ 		   int (*add_cb)(arch_addr_t, struct sw_singlestep_data *),
+ 		   struct sw_singlestep_data *add_cb_data)
+ {
+-	uint32_t pc = (uint32_t) get_instruction_pointer(proc);
+-	uint32_t *newpcs;
++	unsigned long pc = (unsigned long) get_instruction_pointer(proc);
++	unsigned long *newpcs;
+ 	int nr;
+ 	uint32_t inst;
+ 
+@@ -369,7 +462,7 @@ arch_sw_singlestep(struct process *proc, struct breakpoint *bp,
+ 		return SWS_FAIL;
+ 
+ 	/* Starting an atomic read-modify-write sequence */
+-	if (itype_op(inst) == 0x30)
++	if (op_LL_p(itype_op(inst)))
+ 		nr = mips_atomic_next_pcs(proc, pc, newpcs);
+ 	else
+ 		nr = mips_next_pcs(proc, pc, newpcs);
+@@ -462,7 +555,7 @@ gimme_arg(enum tof type, struct process *proc, int arg_num,
+ 				debug(2,"ret = %#lx",addr);
+ 				return addr;
+ 			}
+-			ret = addr + 4*arg_num;
++			ret = addr + sizeof(long) * arg_num;
+ 			ret=ptrace(PTRACE_PEEKTEXT,proc->pid,addr,0);
+ 			debug(2,"ret = %#lx",ret);
+ 			return ret;
+@@ -474,7 +567,7 @@ gimme_arg(enum tof type, struct process *proc, int arg_num,
+ 			debug(2,"ret = %#lx",addr);
+ 			return addr;
+ 		}
+-		ret = addr + 4*arg_num;
++		ret = addr + sizeof(long) * arg_num;
+ 		ret=ptrace(PTRACE_PEEKTEXT,proc->pid,addr,0);
+ 		debug(2,"ret = %#lx",ret);
+ 		return ret;
+@@ -483,4 +576,34 @@ gimme_arg(enum tof type, struct process *proc, int arg_num,
+ 	return 0;
+ }
+ 
++#ifdef __LP64__
++size_t
++arch_type_sizeof(struct process *proc, struct arg_type_info *info)
++{
++	if (proc == NULL)
++		return (size_t)-2;
++
++	switch (info->type) {
++	case ARGTYPE_LONG:
++	case ARGTYPE_ULONG:
++		return proc->mask_32bit ? 4 : sizeof (long);
++
++	case ARGTYPE_POINTER:
++		return proc->mask_32bit ? 4 : sizeof (void *);
++
++	default:
++		/* Use default value.  */
++		return (size_t)-2;
++	}
++}
++
++size_t
++arch_type_alignof(struct process *proc, struct arg_type_info *info)
++{
++	if (proc == NULL)
++		return (size_t)-2;
++
++	return arch_type_sizeof(proc, info);
++}
++#endif /* __LP64__ */
+ /**@}*/
+diff --git a/sysdeps/linux-gnu/mksyscallent_mips b/sysdeps/linux-gnu/mksyscallent_mips
+index f3961b4..f8dcfe1 100755
+--- a/sysdeps/linux-gnu/mksyscallent_mips
++++ b/sysdeps/linux-gnu/mksyscallent_mips
+@@ -19,9 +19,7 @@
+ 
+ # hack expression to generate arch/syscallent.h from <asm/unistd.h>
+ # It reads from stdin and writes to stdout
+-# It should work OK on i386,m68k,arm,ia64
+-# It does NOT work in mips, s390
+-# It is untested in other architectures
++# Default is o32; arch=mips64 generates n64 syscalls
+ 
+ BEGIN {
+ 	max=0;
+@@ -31,7 +29,10 @@ BEGIN {
+ {
+ 	#debug
+ 	#printf("/%s/%s/%s/%s/\n", $1, $2, $3, $4);
+-	if ($2 ~ /__NR_Linux/ && $3 ~ /4000/) {
++        min=4000
++        if (arch ~ "mips64") min=5000
++
++	if ($2 ~ /__NR_Linux/ && $3 ~ min) {
+ 		syscall=1;
+ 	}
+ 	if ($2 ~ /__NR_Linux_syscalls/) {
+-- 
+2.13.2
+

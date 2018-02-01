@@ -83,13 +83,14 @@
         The linux-yocto style recipes can optionally define the following
         variables:
         <literallayout class='monospaced'>
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-KERNEL_FEATURES'>KERNEL_FEATURES</ulink>
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'>LINUX_KERNEL_TYPE</ulink>
+     KERNEL_FEATURES
+     LINUX_KERNEL_TYPE
         </literallayout>
     </para>
 
     <para>
-        <filename>LINUX_KERNEL_TYPE</filename> defines the kernel type to be
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'><filename>LINUX_KERNEL_TYPE</filename></ulink>
+        defines the kernel type to be
         used in assembling the configuration.
         If you do not specify a <filename>LINUX_KERNEL_TYPE</filename>,
         it defaults to "standard".
@@ -134,7 +135,9 @@
     </para>
 
     <para>
-        You can use the <filename>KERNEL_FEATURES</filename> variable
+        You can use the
+        <ulink url='&YOCTO_DOCS_REF_URL;#var-KERNEL_FEATURES'><filename>KERNEL_FEATURES</filename></ulink>
+        variable
         to include features (configuration fragments, patches, or both) that
         are not already included by the <filename>KMACHINE</filename> and
         <filename>LINUX_KERNEL_TYPE</filename> variable combination.
@@ -165,175 +168,6 @@
 	        releases of the Yocto Project.
         </note>
     </para>
-</section>
-
-<section id='kernel-metadata-location'>
-    <title>Kernel Metadata Location</title>
-
-    <para>
-        Kernel Metadata always exists outside of the kernel tree either
-        defined in a kernel recipe (recipe-space) or outside of the recipe.
-        Where you choose to define the Metadata depends on what you want
-        to do and how you intend to work.
-        Regardless of where you define the kernel Metadata, the syntax used
-        applies equally.
-    </para>
-
-    <para>
-        If you are unfamiliar with the Linux kernel and only wish
-        to apply a configuration and possibly a couple of patches provided to
-        you by others, the recipe-space method is recommended.
-        This method is also a good approach if you are working with Linux kernel
-        sources you do not control or if you just do not want to maintain a
-        Linux kernel Git repository on your own.
-        For partial information on how you can define kernel Metadata in
-        the recipe-space, see the
-        "<link linkend='modifying-an-existing-recipe'>Modifying an Existing Recipe</link>"
-        section.
-    </para>
-
-    <para>
-        Conversely, if you are actively developing a kernel and are already
-        maintaining a Linux kernel Git repository of your own, you might find
-        it more convenient to work with kernel Metadata kept outside the
-        recipe-space.
-        Working with Metadata in this area can make iterative development of
-        the Linux kernel more efficient outside of the BitBake environment.
-    </para>
-
-    <section id='recipe-space-metadata'>
-        <title>Recipe-Space Metadata</title>
-
-        <para>
-            When stored in recipe-space, the kernel Metadata files reside in a
-            directory hierarchy below
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>.
-            For a linux-yocto recipe or for a Linux kernel recipe derived
-            by copying and modifying
-            <filename>oe-core/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb</filename>
-            to a recipe in your layer, <filename>FILESEXTRAPATHS</filename>
-            is typically set to
-            <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-THISDIR'><filename>THISDIR</filename></ulink><filename>}/${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PN'><filename>PN</filename></ulink><filename>}</filename>.
-            See the "<link linkend='modifying-an-existing-recipe'>Modifying an Existing Recipe</link>"
-            section for more information.
-        </para>
-
-        <para>
-            Here is an example that shows a trivial tree of kernel Metadata
-            stored in recipe-space within a BSP layer:
-            <literallayout class='monospaced'>
-     meta-<replaceable>my_bsp_layer</replaceable>/
-     `-- recipes-kernel
-         `-- linux
-             `-- linux-yocto
-                 |-- bsp-standard.scc
-                 |-- bsp.cfg
-                 `-- standard.cfg
-            </literallayout>
-        </para>
-
-        <para>
-            When the Metadata is stored in recipe-space, you must take
-            steps to ensure BitBake has the necessary information to decide
-            what files to fetch and when they need to be fetched again.
-            It is only necessary to specify the <filename>.scc</filename>
-            files on the
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>.
-            BitBake parses them and fetches any files referenced in the
-            <filename>.scc</filename> files by the <filename>include</filename>,
-            <filename>patch</filename>, or <filename>kconf</filename> commands.
-            Because of this, it is necessary to bump the recipe
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-PR'><filename>PR</filename></ulink>
-            value when changing the content of files not explicitly listed
-            in the <filename>SRC_URI</filename>.
-        </para>
-    </section>
-
-    <section id='metadata-outside-the-recipe-space'>
-        <title>Metadata Outside the Recipe-Space</title>
-
-        <para>
-            When stored outside of the recipe-space, the kernel Metadata
-            files reside in a separate repository.
-            The OpenEmbedded build system adds the Metadata to the build as
-            a "ktype=meta" repository through the
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
-            variable.
-            As an example, consider the following <filename>SRC_URI</filename>
-            statement from the <filename>linux-yocto_4.4.bb</filename>
-            kernel recipe:
-            <literallayout class='monospaced'>
-     SRC_URI = "git://git.yoctoproject.org/linux-yocto-4.4.git;name=machine;branch=${KBRANCH}; \
-                git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-4.4;destsuffix=${KMETA}"
-            </literallayout>
-            <filename>${KMETA}</filename>, in this context, is simply used to
-            name the directory into which the Git fetcher places the Metadata.
-            This behavior is no different than any multi-repository
-            <filename>SRC_URI</filename> statement used in a recipe.
-        </para>
-
-        <para>
-            You can keep kernel Metadata in a "kernel-cache", which is a
-            directory containing configuration fragments.
-            As with any Metadata kept outside the recipe-space, you simply
-            need to use the <filename>SRC_URI</filename> statement with the
-            "type=kmeta" attribute.
-            Doing so makes the kernel Metadata available during the
-            configuration phase.
-        </para>
-
-<!--
-
-
-        <para>
-            Following is an example that shows how a trivial tree of Metadata
-            is stored in a custom Linux kernel Git repository:
-            <literallayout class='monospaced'>
-     meta/
-     `&dash;&dash; cfg
-         `&dash;&dash; kernel-cache
-             |&dash;&dash; bsp-standard.scc
-             |&dash;&dash; bsp.cfg
-             `&dash;&dash; standard.cfg
-            </literallayout>
-        </para>
-
-        <para>
-            To use a branch different from where the sources reside,
-            specify the branch in the <filename>KMETA</filename> variable
-            in your Linux kernel recipe.
-            Here is an example:
-            <literallayout class='monospaced'>
-     KMETA = "meta"
-            </literallayout>
-            To use the same branch as the sources, set
-            <filename>KMETA</filename> to an empty string:
-            <literallayout class='monospaced'>
-     KMETA = ""
-            </literallayout>
-            If you are working with your own sources and want to create an
-            orphan <filename>meta</filename> branch, use these commands
-            from within your Linux kernel Git repository:
-            <literallayout class='monospaced'>
-     $ git checkout &dash;&dash;orphan meta
-     $ git rm -rf .
-     $ git commit &dash;&dash;allow-empty -m "Create orphan meta branch"
-            </literallayout>
-        </para>
--->
-
-        <para>
-            If you modify the Metadata, you must not forget to update the
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>
-            statements in the kernel's recipe.
-            In particular, you need to update the
-            <filename>SRCREV_meta</filename> variable to match the commit in
-            the <filename>KMETA</filename> branch you wish to use.
-            Changing the data in these branches and not updating the
-            <filename>SRCREV</filename> statements to match will cause the
-            build to fetch an older commit.
-        </para>
-    </section>
 </section>
 
 <section id='kernel-metadata-syntax'>
@@ -690,170 +524,219 @@
         <title>BSP Descriptions</title>
 
         <para>
-            BSP descriptions combine kernel types with hardware-specific
-            features.
-            The hardware-specific portion is typically defined
-            independently, and then aggregated with each supported kernel
-            type.
-            Consider this simple BSP description that supports the
-            <replaceable>mybsp</replaceable> machine:
-            <literallayout class='monospaced'>
-     <replaceable>mybsp</replaceable>.scc:
-        define KMACHINE <replaceable>mybsp</replaceable>
-        define KTYPE standard
-        define KARCH i386
-
-        kconf <replaceable>mybsp</replaceable>.cfg
-            </literallayout>
-            Every BSP description should define the
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>,
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-KTYPE'><filename>KTYPE</filename></ulink>,
-            and <ulink url='&YOCTO_DOCS_REF_URL;#var-KARCH'><filename>KARCH</filename></ulink>
-            variables.
-            These variables allow the OpenEmbedded build system to identify
-            the description as meeting the criteria set by the recipe being
-            built.
-            This simple example supports the "mybsp" machine for the "standard"
-            kernel and the "i386" architecture.
-        </para>
-
-        <para>
-            Be aware that a hard link between the
-            <filename>KTYPE</filename> variable and a kernel type
-            description file does not exist.
-            Thus, if you do not have kernel types defined in your kernel
-            Metadata, you only need to ensure that the kernel recipe's
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'><filename>LINUX_KERNEL_TYPE</filename></ulink>
-            variable and the <filename>KTYPE</filename> variable in the
-            BSP description file match.
+            BSP descriptions (i.e. <filename>*.scc</filename> files)
+            combine kernel types with hardware-specific features.
+            The hardware-specific Metadata is typically defined
+            independently in the BSP layer, and then aggregated with each
+            supported kernel type.
             <note>
-                Future versions of the tooling make the specification of
-                <filename>KTYPE</filename> in the BSP optional.
+                For BSPs supported by the Yocto Project, the BSP description
+                files are located in the <filename>bsp</filename> directory
+                of the <filename>yocto-kernel-cache</filename> repository
+                organized under the "Yocto Linux Kernel" heading in the
+                <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi'>Yocto Project Source Repositories</ulink>.
             </note>
         </para>
 
         <para>
-            If you did want to separate your kernel policy from your
-            hardware configuration, you could do so by specifying a kernel
-            type, such as "standard" and including that description file
-            in the BSP description file.
-            See the "<link linkend='kernel-types'>Kernel Types</link>" section
-            for more information.
+            This section provides a BSP description structural overview along
+            with aggregation concepts as well as a detailed example using
+            a BSP supported by the Yocto Project (i.e. Minnow Board).
         </para>
 
-        <para>
-            You might also have multiple hardware configurations that you
-            aggregate into a single hardware description file that you
-            could include in the BSP description file, rather than referencing
-            a single <filename>.cfg</filename> file.
-            Consider the following:
-            <literallayout class='monospaced'>
-     <replaceable>mybsp</replaceable>.scc:
-        define KMACHINE mybsp
-        define KTYPE standard
-        define KARCH i386
+        <section id='bsp-description-file-overview'>
+            <title>Overview</title>
 
-        include standard.scc
-        include <replaceable>mybsp</replaceable>-hw.scc
-            </literallayout>
-        </para>
+            <para>
+                For simplicity, consider the following top-level BSP
+                description file.
+                Top-level BSP descriptions files employ both a structure
+                and naming convention for consistency.
+                The naming convention for the file is as follows:
+                <literallayout class='monospaced'>
+     <replaceable>bsp_name</replaceable>-<replaceable>kernel_type</replaceable>.scc
+                </literallayout>
+                Here are some example top-level BSP filenames for the
+                Minnow Board BSP, which is supported by the Yocto Project:
+                <literallayout class='monospaced'>
+     minnow-standard.scc
+     minnow-preempt-rt.scc
+     minnow-tiny.scc
+                </literallayout>
+                Each file uses the BSP name followed by the kernel type.
+            </para>
 
-        <para>
-            In the above example, <filename>standard.scc</filename>
-            aggregates all the configuration fragments, patches, and
-            features that make up your standard kernel policy whereas
-            <replaceable>mybsp</replaceable><filename>-hw.scc</filename>
-            aggregates all those necessary
-            to support the hardware available on the
-            <replaceable>mybsp</replaceable> machine.
-            For information on how to break a complete
-            <filename>.config</filename> file into the various
-            configuration fragments, see the
-            "<link linkend='generating-configuration-files'>Generating Configuration Files</link>"
-            section.
-        </para>
+            <para>
+                is simple BSP description file whose name has the
+                form
+                <replaceable>mybsp</replaceable><filename>-standard</filename>
+                and supports the <replaceable>mybsp</replaceable> machine using
+                a standard kernel:
+                <literallayout class='monospaced'>
+     define KMACHINE <replaceable>mybsp</replaceable>
+     define KTYPE standard
+     define KARCH i386
 
-        <para>
-            Many real-world examples are more complex.
-            Like any other <filename>.scc</filename> file, BSP
-            descriptions can aggregate features.
-            Consider the Minnow BSP definition from the
-            <filename>linux-yocto-3.19</filename>
-            Git repository:
-            <literallayout class='monospaced'>
+     include ktypes/standard
+
+     include <replaceable>mybsp</replaceable>.scc
+
+     kconf hardware <replaceable>mybsp</replaceable>-<replaceable>extra</replaceable>.cfg
+                </literallayout>
+                Every top-level BSP description file should define the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KTYPE'><filename>KTYPE</filename></ulink>,
+                and <ulink url='&YOCTO_DOCS_REF_URL;#var-KARCH'><filename>KARCH</filename></ulink>
+                variables.
+                These variables allow the OpenEmbedded build system to identify
+                the description as meeting the criteria set by the recipe being
+                built.
+                This simple example supports the "mybsp" machine for the "standard"
+                kernel and the "i386" architecture.
+            </para>
+
+            <para>
+                Be aware that a hard link between the
+                <filename>KTYPE</filename> variable and a kernel type description
+                file does not exist.
+                Thus, if you do not have kernel types defined in your kernel
+                Metadata, you only need to ensure that the kernel recipe's
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-LINUX_KERNEL_TYPE'><filename>LINUX_KERNEL_TYPE</filename></ulink>
+                variable and the <filename>KTYPE</filename> variable in the
+                BSP description file match.
+                <note>
+                    Future versions of the tooling make the specification of
+                    <filename>KTYPE</filename> in the BSP optional.
+                </note>
+            </para>
+
+            <para>
+                To separate your kernel policy from your hardware configuration,
+                you include a kernel type (<filename>ktype</filename>), such as
+                "standard".
+                In the previous example, this is done using the following:
+                <literallayout class='monospaced'>
+     include ktypes/standard
+                </literallayout>
+                In the previous example, <filename>ktypes/standard.scc</filename>
+                aggregates all the configuration fragments, patches, and
+                features that make up your standard kernel policy.
+                See the "<link linkend='kernel-types'>Kernel Types</link>" section
+                for more information.
+            </para>
+
+            <para>
+                To aggregate common configurations and features specific to the
+                kernel for <replaceable>mybsp</replaceable>, use the following:
+                <literallayout class='monospaced'>
+     include <replaceable>mybsp</replaceable>.scc
+                </literallayout>
+                For information on how to break a complete
+                <filename>.config</filename> file into the various
+                configuration fragments, see the
+                "<link linkend='generating-configuration-files'>Generating Configuration Files</link>"
+                section.
+            </para>
+
+            <para>
+                Finally, if you have any configurations specific to the
+                hardware that are not in a <filename>*.scc</filename> file,
+                you can include them as follows:
+                <literallayout class='monospaced'>
+     kconf hardware <replaceable>mybsp</replaceable>-<replaceable>extra</replaceable>.cfg
+                </literallayout>
+            </para>
+        </section>
+
+        <section id='bsp-description-file-example-minnow'>
+            <title>Example</title>
+
+            <para>
+                Many real-world examples are more complex.
+                Like any other <filename>.scc</filename> file, BSP
+                descriptions can aggregate features.
+                Consider the Minnow BSP definition from the
+                <filename>linux-yocto-4.4</filename> in the
+                Yocto Project
+                <ulink url='&YOCTO_DOCS_DEV_URL;#source-repositories'>Source Repositories</ulink>
+                (i.e.
+                <filename>yocto-kernel-cache/bsp/minnow</filename>):
+                <literallayout class='monospaced'>
      minnow.scc:
-        include cfg/x86.scc
-        include features/eg20t/eg20t.scc
-        include cfg/dmaengine.scc
-        include features/power/intel.scc
-        include cfg/efi.scc
-        include features/usb/ehci-hcd.scc
-        include features/usb/ohci-hcd.scc
-        include features/usb/usb-gadgets.scc
-        include features/usb/touchscreen-composite.scc
-        include cfg/timer/hpet.scc
-        include cfg/timer/rtc.scc
-        include features/leds/leds.scc
-        include features/spi/spidev.scc
-        include features/i2c/i2cdev.scc
+         include cfg/x86.scc
+         include features/eg20t/eg20t.scc
+         include cfg/dmaengine.scc
+         include features/power/intel.scc
+         include cfg/efi.scc
+         include features/usb/ehci-hcd.scc
+         include features/usb/ohci-hcd.scc
+         include features/usb/usb-gadgets.scc
+         include features/usb/touchscreen-composite.scc
+         include cfg/timer/hpet.scc
+         include features/leds/leds.scc
+         include features/spi/spidev.scc
+         include features/i2c/i2cdev.scc
+         include features/mei/mei-txe.scc
 
-        # Earlyprintk and port debug requires 8250
-        kconf hardware cfg/8250.cfg
+         # Earlyprintk and port debug requires 8250
+         kconf hardware cfg/8250.cfg
 
-        kconf hardware minnow.cfg
-        kconf hardware minnow-dev.cfg
-            </literallayout>
-        </para>
+         kconf hardware minnow.cfg
+         kconf hardware minnow-dev.cfg
+                </literallayout>
+            </para>
 
-        <para>
-            The <filename>minnow.scc</filename> description file includes
-            a hardware configuration fragment
-            (<filename>minnow.cfg</filename>) specific to the Minnow
-            BSP as well as several more general configuration
-            fragments and features enabling hardware found on the
-            machine.
-            This description file is then included in each of the three
-            "minnow" description files for the supported kernel types
-            (i.e. "standard", "preempt-rt", and "tiny").
-            Consider the "minnow" description for the "standard" kernel
-            type:
-            <literallayout class='monospaced'>
+            <para>
+                The <filename>minnow.scc</filename> description file includes
+                a hardware configuration fragment
+                (<filename>minnow.cfg</filename>) specific to the Minnow
+                BSP as well as several more general configuration
+                fragments and features enabling hardware found on the
+                machine.
+                This <filename>minnow.scc</filename> description file is then
+                included in each of the three
+                "minnow" description files for the supported kernel types
+                (i.e. "standard", "preempt-rt", and "tiny").
+                Consider the "minnow" description for the "standard" kernel
+                type:
+                <literallayout class='monospaced'>
      minnow-standard.scc:
-        define KMACHINE minnow
-        define KTYPE standard
-        define KARCH i386
+         define KMACHINE minnow
+         define KTYPE standard
+         define KARCH i386
 
-        include ktypes/standard
+         include ktypes/standard
 
-        include minnow.scc
+         include minnow.scc
 
-        # Extra minnow configs above the minimal defined in minnow.scc
-        include cfg/efi-ext.scc
-        include features/media/media-all.scc
-        include features/sound/snd_hda_intel.scc
+         # Extra minnow configs above the minimal defined in minnow.scc
+         include cfg/efi-ext.scc
+         include features/media/media-all.scc
+         include features/sound/snd_hda_intel.scc
 
-        # The following should really be in standard.scc
-        # USB live-image support
-        include cfg/usb-mass-storage.scc
-        include cfg/boot-live.scc
+         # The following should really be in standard.scc
+         # USB live-image support
+         include cfg/usb-mass-storage.scc
+         include cfg/boot-live.scc
 
-        # Basic profiling
-        include features/latencytop/latencytop.scc
-        include features/profiling/profiling.scc
+         # Basic profiling
+         include features/latencytop/latencytop.scc
+         include features/profiling/profiling.scc
 
-        # Requested drivers that don't have an existing scc
-        kconf hardware minnow-drivers-extra.cfg
-            </literallayout>
-            The <filename>include</filename> command midway through the file
-            includes the <filename>minnow.scc</filename> description that
-            defines all hardware enablements for the BSP that is common to all
-            kernel types.
-            Using this command significantly reduces duplication.
-        </para>
+         # Requested drivers that don't have an existing scc
+         kconf hardware minnow-drivers-extra.cfg
+                </literallayout>
+                The <filename>include</filename> command midway through the file
+                includes the <filename>minnow.scc</filename> description that
+                defines all enabled hardware for the BSP that is common to
+                all kernel types.
+                Using this command significantly reduces duplication.
+            </para>
 
-        <para>
-            Now consider the "minnow" description for the "tiny" kernel type:
-            <literallayout class='monospaced'>
+            <para>
+                Now consider the "minnow" description for the "tiny" kernel
+                type:
+                <literallayout class='monospaced'>
      minnow-tiny.scc:
         define KMACHINE minnow
         define KTYPE tiny
@@ -862,21 +745,205 @@
         include ktypes/tiny
 
         include minnow.scc
-            </literallayout>
-            As you might expect, the "tiny" description includes quite a
-            bit less.
-            In fact, it includes only the minimal policy defined by the
-            "tiny" kernel type and the hardware-specific configuration required
-            for booting the machine along with the most basic functionality of
-            the system as defined in the base "minnow" description file.
+                </literallayout>
+                As you might expect, the "tiny" description includes quite a
+                bit less.
+                In fact, it includes only the minimal policy defined by the
+                "tiny" kernel type and the hardware-specific configuration
+                required for booting the machine along with the most basic
+                functionality of the system as defined in the base "minnow"
+                description file.
+            </para>
+
+            <para>
+                Notice again the three critical variables:
+                <filename>KMACHINE</filename>, <filename>KTYPE</filename>,
+                and <filename>KARCH</filename>.
+                Of these variables, only the <filename>KTYPE</filename> has changed.
+                It is now set to "tiny".
+            </para>
+        </section>
+    </section>
+</section>
+
+<section id='kernel-metadata-location'>
+    <title>Kernel Metadata Location</title>
+
+    <para>
+        Kernel Metadata always exists outside of the kernel tree either
+        defined in a kernel recipe (recipe-space) or outside of the recipe.
+        Where you choose to define the Metadata depends on what you want
+        to do and how you intend to work.
+        Regardless of where you define the kernel Metadata, the syntax used
+        applies equally.
+    </para>
+
+    <para>
+        If you are unfamiliar with the Linux kernel and only wish
+        to apply a configuration and possibly a couple of patches provided to
+        you by others, the recipe-space method is recommended.
+        This method is also a good approach if you are working with Linux kernel
+        sources you do not control or if you just do not want to maintain a
+        Linux kernel Git repository on your own.
+        For partial information on how you can define kernel Metadata in
+        the recipe-space, see the
+        "<link linkend='modifying-an-existing-recipe'>Modifying an Existing Recipe</link>"
+        section.
+    </para>
+
+    <para>
+        Conversely, if you are actively developing a kernel and are already
+        maintaining a Linux kernel Git repository of your own, you might find
+        it more convenient to work with kernel Metadata kept outside the
+        recipe-space.
+        Working with Metadata in this area can make iterative development of
+        the Linux kernel more efficient outside of the BitBake environment.
+    </para>
+
+    <section id='recipe-space-metadata'>
+        <title>Recipe-Space Metadata</title>
+
+        <para>
+            When stored in recipe-space, the kernel Metadata files reside in a
+            directory hierarchy below
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>.
+            For a linux-yocto recipe or for a Linux kernel recipe derived
+            by copying and modifying
+            <filename>oe-core/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb</filename>
+            to a recipe in your layer, <filename>FILESEXTRAPATHS</filename>
+            is typically set to
+            <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-THISDIR'><filename>THISDIR</filename></ulink><filename>}/${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PN'><filename>PN</filename></ulink><filename>}</filename>.
+            See the "<link linkend='modifying-an-existing-recipe'>Modifying an Existing Recipe</link>"
+            section for more information.
         </para>
 
         <para>
-            Notice again the three critical variables:
-            <filename>KMACHINE</filename>, <filename>KTYPE</filename>,
-            and <filename>KARCH</filename>.
-            Of these variables, only the <filename>KTYPE</filename> has changed.
-            It is now set to "tiny".
+            Here is an example that shows a trivial tree of kernel Metadata
+            stored in recipe-space within a BSP layer:
+            <literallayout class='monospaced'>
+     meta-<replaceable>my_bsp_layer</replaceable>/
+     `-- recipes-kernel
+         `-- linux
+             `-- linux-yocto
+                 |-- bsp-standard.scc
+                 |-- bsp.cfg
+                 `-- standard.cfg
+            </literallayout>
+        </para>
+
+        <para>
+            When the Metadata is stored in recipe-space, you must take
+            steps to ensure BitBake has the necessary information to decide
+            what files to fetch and when they need to be fetched again.
+            It is only necessary to specify the <filename>.scc</filename>
+            files on the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>.
+            BitBake parses them and fetches any files referenced in the
+            <filename>.scc</filename> files by the <filename>include</filename>,
+            <filename>patch</filename>, or <filename>kconf</filename> commands.
+            Because of this, it is necessary to bump the recipe
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-PR'><filename>PR</filename></ulink>
+            value when changing the content of files not explicitly listed
+            in the <filename>SRC_URI</filename>.
+        </para>
+
+        <para>
+            If the BSP description is in recipe space, you cannot simply list
+            the <filename>*.scc</filename> in the <filename>SRC_URI</filename>
+            statement.
+            You need to use the following form from your kernel append file:
+            <literallayout class='monospaced'>
+     SRC_URI_append_<replaceable>myplatform</replaceable> = " \
+        file://<replaceable>myplatform</replaceable>;type=kmeta;destsuffix=<replaceable>myplatform</replaceable> \
+        "
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='metadata-outside-the-recipe-space'>
+        <title>Metadata Outside the Recipe-Space</title>
+
+        <para>
+            When stored outside of the recipe-space, the kernel Metadata
+            files reside in a separate repository.
+            The OpenEmbedded build system adds the Metadata to the build as
+            a "ktype=meta" repository through the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+            variable.
+            As an example, consider the following <filename>SRC_URI</filename>
+            statement from the <filename>linux-yocto_4.4.bb</filename>
+            kernel recipe:
+            <literallayout class='monospaced'>
+     SRC_URI = "git://git.yoctoproject.org/linux-yocto-4.4.git;name=machine;branch=${KBRANCH}; \
+                git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-4.4;destsuffix=${KMETA}"
+            </literallayout>
+            <filename>${KMETA}</filename>, in this context, is simply used to
+            name the directory into which the Git fetcher places the Metadata.
+            This behavior is no different than any multi-repository
+            <filename>SRC_URI</filename> statement used in a recipe (e.g.
+            see the previous section).
+        </para>
+
+        <para>
+            You can keep kernel Metadata in a "kernel-cache", which is a
+            directory containing configuration fragments.
+            As with any Metadata kept outside the recipe-space, you simply
+            need to use the <filename>SRC_URI</filename> statement with the
+            "type=kmeta" attribute.
+            Doing so makes the kernel Metadata available during the
+            configuration phase.
+        </para>
+
+<!--
+
+
+        <para>
+            Following is an example that shows how a trivial tree of Metadata
+            is stored in a custom Linux kernel Git repository:
+            <literallayout class='monospaced'>
+     meta/
+     `&dash;&dash; cfg
+         `&dash;&dash; kernel-cache
+             |&dash;&dash; bsp-standard.scc
+             |&dash;&dash; bsp.cfg
+             `&dash;&dash; standard.cfg
+            </literallayout>
+        </para>
+
+        <para>
+            To use a branch different from where the sources reside,
+            specify the branch in the <filename>KMETA</filename> variable
+            in your Linux kernel recipe.
+            Here is an example:
+            <literallayout class='monospaced'>
+     KMETA = "meta"
+            </literallayout>
+            To use the same branch as the sources, set
+            <filename>KMETA</filename> to an empty string:
+            <literallayout class='monospaced'>
+     KMETA = ""
+            </literallayout>
+            If you are working with your own sources and want to create an
+            orphan <filename>meta</filename> branch, use these commands
+            from within your Linux kernel Git repository:
+            <literallayout class='monospaced'>
+     $ git checkout &dash;&dash;orphan meta
+     $ git rm -rf .
+     $ git commit &dash;&dash;allow-empty -m "Create orphan meta branch"
+            </literallayout>
+        </para>
+-->
+
+        <para>
+            If you modify the Metadata, you must not forget to update the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>
+            statements in the kernel's recipe.
+            In particular, you need to update the
+            <filename>SRCREV_meta</filename> variable to match the commit in
+            the <filename>KMETA</filename> branch you wish to use.
+            Changing the data in these branches and not updating the
+            <filename>SRCREV</filename> statements to match will cause the
+            build to fetch an older commit.
         </para>
     </section>
 </section>

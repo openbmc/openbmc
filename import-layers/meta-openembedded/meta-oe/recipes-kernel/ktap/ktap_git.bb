@@ -5,7 +5,7 @@ require ktap.inc
 SUMMARY = "KTAP is a scripting dynamic tracing tool for Linux"
 DEPENDS = "ktap-module"
 
-PNBLACKLIST[ktap] ?= "Depends on blacklisted kernel-module-ktapvm"
+PNBLACKLIST[ktap] ?= "Depends on blacklisted kernel-module-ktapvm - the recipe will be removed on 2017-09-01 unless the issue is fixed"
 
 # Only build the userspace app
 EXTRA_OEMAKE += "ktap"

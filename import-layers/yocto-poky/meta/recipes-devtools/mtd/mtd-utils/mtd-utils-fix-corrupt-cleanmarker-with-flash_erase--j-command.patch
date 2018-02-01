@@ -49,8 +49,8 @@ v2 : get length of availble freeoob bytes from oobinfo information,
 
 diff --git a/flash_erase.c b/flash_erase.c
 index 933373a..4b9d84b 100644
---- a/flash_erase.c
-+++ b/flash_erase.c
+--- a/misc-utils/flash_erase.c
++++ b/misc-utils/flash_erase.c
 @@ -99,6 +99,7 @@ int main(int argc, char *argv[])
  	bool isNAND;
  	int error = 0;

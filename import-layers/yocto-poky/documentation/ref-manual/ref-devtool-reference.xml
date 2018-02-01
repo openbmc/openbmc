@@ -215,6 +215,17 @@
             The <filename>.bbappend</filename> file is created to point
             to the external source tree.
         </para>
+
+        <note>
+            If your recipe has runtime dependencies defined, you must be sure
+            that these packages exist on the target hardware before attempting
+            to run your application.
+            If dependent packages (e.g. libraries) do not exist on the target,
+            your application, when run, will fail to find those functions.
+            For more information, see the
+            "<link linkend='devtool-deploying-your-software-on-the-target-machine'>Deploying Your Software on the Target Machine</link>"
+            section.
+        </note>
     </section>
 
     <section id='devtool-extracting-the-source-for-an-existing-recipe'>
@@ -500,6 +511,40 @@
                     used in production.
                 </para>
             </note>
+        </para>
+
+        <para>
+            Some conditions exist that could prevent a deployed application
+            from behaving as expected.
+            When both of the following conditions exist, your application has
+            the potential to not behave correctly when run on the target:
+            <itemizedlist>
+                <listitem><para>
+                    You are deploying a new application to the target and
+                    the recipe you used to build the application had
+                    correctly defined runtime dependencies.
+                    </para></listitem>
+                <listitem><para>
+                    The target does not physically have the packages on which
+                    the application depends installed.
+                    </para></listitem>
+            </itemizedlist>
+            If both of these conditions exist, your application will not
+            behave as expected.
+            The reason for this misbehavior is because the
+            <filename>devtool deploy-target</filename> command does not deploy
+            the packages (e.g. libraries) on which your new application
+            depends.
+            The assumption is that the packages are already on the target.
+            Consequently, when a runtime call is made in the application
+            for a dependent function (e.g. a library call), the function
+            cannot be found.
+        </para>
+
+        <para>
+            To be sure you have all the dependencies local to the target, you
+            need to be sure that the packages are pre-deployed (installed)
+            on the target before attempting to run your application.
         </para>
     </section>
 

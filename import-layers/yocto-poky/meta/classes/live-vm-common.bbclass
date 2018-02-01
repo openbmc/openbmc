@@ -4,11 +4,11 @@ def set_live_vm_vars(d, suffix):
     vars = ['GRUB_CFG', 'SYSLINUX_CFG', 'ROOT', 'LABELS', 'INITRD']
     for var in vars:
         var_with_suffix = var + '_' + suffix
-        if d.getVar(var, True):
+        if d.getVar(var):
             bb.warn('Found potential conflicted var %s, please use %s rather than %s' % \
                 (var, var_with_suffix, var))
-        elif d.getVar(var_with_suffix, True):
-            d.setVar(var, d.getVar(var_with_suffix, True))
+        elif d.getVar(var_with_suffix):
+            d.setVar(var, d.getVar(var_with_suffix))
 
 
 EFI = "${@bb.utils.contains("MACHINE_FEATURES", "efi", "1", "0", d)}"
@@ -25,7 +25,7 @@ def pcbios(d):
     return pcbios
 
 PCBIOS = "${@pcbios(d)}"
-PCBIOS_CLASS = "${@['','syslinux'][d.getVar('PCBIOS', True) == '1']}"
+PCBIOS_CLASS = "${@['','syslinux'][d.getVar('PCBIOS') == '1']}"
 
 inherit ${EFI_CLASS}
 inherit ${PCBIOS_CLASS}

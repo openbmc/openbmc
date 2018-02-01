@@ -20,6 +20,8 @@ inherit cpan
 do_configure_append() {
 	sed 's:--sysroot=.*\(\s\|$\):--sysroot=${STAGING_DIR_TARGET} :g' -i Makefile Expat/Makefile
 	sed 's:^FULL_AR = .*:FULL_AR = ${AR}:g' -i Expat/Makefile
+	# make sure these two do not build in parallel
+	sed 's!^$(INST_DYNAMIC):!$(INST_DYNAMIC): $(BOOTSTRAP)!' -i Expat/Makefile
 }
 
 do_compile() {
@@ -31,4 +33,4 @@ do_compile_class-native() {
 	cpan_do_compile
 }
 
-BBCLASSEXTEND="native"
+BBCLASSEXTEND="native nativesdk"

@@ -1,0 +1,93 @@
+From 2153109e60e362e0d09215d529bf00176f31a3e7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 16:09:41 -0700
+Subject: [PATCH 4/5] Define missing features to cater for musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/systemd/sd-adapt/nm-sd-adapt.h | 2 +-
+ src/systemd/src/basic/parse-util.c | 5 ++++-
+ src/systemd/src/basic/stdio-util.h | 2 ++
+ src/systemd/src/basic/util.h       | 5 +++++
+ src/systemd/src/systemd/sd-event.h | 4 ----
+ 5 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/src/systemd/sd-adapt/nm-sd-adapt.h b/src/systemd/sd-adapt/nm-sd-adapt.h
+index cf27c1a..72c1b89 100644
+--- a/src/systemd/sd-adapt/nm-sd-adapt.h
++++ b/src/systemd/sd-adapt/nm-sd-adapt.h
+@@ -119,7 +119,7 @@ G_STMT_START { \
+ #  ifdef HAVE___SECURE_GETENV
+ #    define secure_getenv __secure_getenv
+ #  else
+-#    error neither secure_getenv nor __secure_getenv is available
++#    define secure_getenv getenv
+ #  endif
+ #endif
+ 
+diff --git a/src/systemd/src/basic/parse-util.c b/src/systemd/src/basic/parse-util.c
+index 2738663..9c21e5a 100644
+--- a/src/systemd/src/basic/parse-util.c
++++ b/src/systemd/src/basic/parse-util.c
+@@ -25,8 +25,11 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#ifdef __GLIBC__
+ #include <xlocale.h>
+-
++#else
++#include <locale.h>
++#endif
+ #include "alloc-util.h"
+ #include "extract-word.h"
+ #include "macro.h"
+diff --git a/src/systemd/src/basic/stdio-util.h b/src/systemd/src/basic/stdio-util.h
+index bd1144b..c92e935 100644
+--- a/src/systemd/src/basic/stdio-util.h
++++ b/src/systemd/src/basic/stdio-util.h
+@@ -19,7 +19,9 @@
+   along with systemd; If not, see <http://www.gnu.org/licenses/>.
+ ***/
+ 
++#ifdef __GLIBC__
+ #include <printf.h>
++#endif
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <sys/types.h>
+diff --git a/src/systemd/src/basic/util.h b/src/systemd/src/basic/util.h
+index bb2fc31..fe074a5 100644
+--- a/src/systemd/src/basic/util.h
++++ b/src/systemd/src/basic/util.h
+@@ -46,6 +46,11 @@
+ #include "missing.h"
+ #include "time-util.h"
+ 
++#if !defined(__GLIBC__)
++typedef int (*__compar_fn_t) (const void*, const void*);
++typedef __compar_fn_t comparison_fn_t;
++#endif
++
+ size_t page_size(void) _pure_;
+ #define PAGE_ALIGN(l) ALIGN_TO((l), page_size())
+ 
+diff --git a/src/systemd/src/systemd/sd-event.h b/src/systemd/src/systemd/sd-event.h
+index cc26b7d..c7e0004 100644
+--- a/src/systemd/src/systemd/sd-event.h
++++ b/src/systemd/src/systemd/sd-event.h
+@@ -69,11 +69,7 @@ typedef int (*sd_event_handler_t)(sd_event_source *s, void *userdata);
+ typedef int (*sd_event_io_handler_t)(sd_event_source *s, int fd, uint32_t revents, void *userdata);
+ typedef int (*sd_event_time_handler_t)(sd_event_source *s, uint64_t usec, void *userdata);
+ typedef int (*sd_event_signal_handler_t)(sd_event_source *s, const struct signalfd_siginfo *si, void *userdata);
+-#if defined __USE_POSIX199309 || defined __USE_XOPEN_EXTENDED
+ typedef int (*sd_event_child_handler_t)(sd_event_source *s, const siginfo_t *si, void *userdata);
+-#else
+-typedef void* sd_event_child_handler_t;
+-#endif
+ 
+ int sd_event_default(sd_event **e);
+ 
+-- 
+2.12.1
+

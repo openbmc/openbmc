@@ -1,0 +1,77 @@
+From 12de53b0f24c478ea4ff6b4e2c55366dbd2f02b1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+Date: Fri, 25 Nov 2016 09:33:20 +0000
+Subject: [PATCH] use POSIX poll.h instead of sys/poll.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+POSIX specifies that <poll.h> is the correct header to
+include for poll()
+  http://pubs.opengroup.org/onlinepubs/009695399/functions/poll.html
+whereas <sys/poll.h> is only needed for ancient glibc (<2.3),
+so let's follow POSIX instead.
+
+As a side-effect, this silences compilation warnings when
+compiling against the musl C-library such as:
+
+| In file included from ../../libdbus-c++-0.9.0/src/eventloop.cpp:31:0:
+| <sysroot>/usr/include/sys/poll.h:1:2: warning: #warning redirecting incorrect #include <sys/poll.h> to <poll.h> [-Wcpp]
+|  #warning redirecting incorrect #include <sys/poll.h> to <poll.h>
+|   ^~~~~~~
+| In file included from ../../libdbus-c++-0.9.0/src/eventloop-integration.cpp:39:0:
+| <sysroot>/usr/include/sys/poll.h:1:2: warning: #warning redirecting incorrect #include <sys/poll.h> to <poll.h> [-Wcpp]
+|  #warning redirecting incorrect #include <sys/poll.h> to <poll.h>
+|   ^~~~~~~
+
+Signed-off-by: André Draszik <git@andred.net>
+---
+Upstream-Status: Submitted [https://github.com/andreas-volz/dbus-cplusplus/pull/3]
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ src/eventloop-integration.cpp | 2 +-
+ src/eventloop.cpp             | 2 +-
+ src/pipe.cpp                  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/eventloop-integration.cpp b/src/eventloop-integration.cpp
+index 5776971..271b503 100644
+--- a/src/eventloop-integration.cpp
++++ b/src/eventloop-integration.cpp
+@@ -36,7 +36,7 @@
+ /* STD */
+ #include <string.h>
+ #include <cassert>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+ 
+diff --git a/src/eventloop.cpp b/src/eventloop.cpp
+index f622812..7790e1e 100644
+--- a/src/eventloop.cpp
++++ b/src/eventloop.cpp
+@@ -28,7 +28,7 @@
+ #include <dbus-c++/eventloop.h>
+ #include <dbus-c++/debug.h>
+ 
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/time.h>
+ 
+ #include <dbus/dbus.h>
+diff --git a/src/pipe.cpp b/src/pipe.cpp
+index 01211b3..45c2ba6 100644
+--- a/src/pipe.cpp
++++ b/src/pipe.cpp
+@@ -32,7 +32,7 @@
+ 
+ /* STD */
+ #include <unistd.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <cassert>
+-- 
+2.10.2
+

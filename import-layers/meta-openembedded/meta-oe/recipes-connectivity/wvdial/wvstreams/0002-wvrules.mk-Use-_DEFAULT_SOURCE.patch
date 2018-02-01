@@ -1,0 +1,29 @@
+From 4afff42714a15cb796d3589d87c6fac4558b2c95 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 24 Aug 2017 22:33:32 -0700
+Subject: [PATCH 2/2] wvrules.mk: Use _DEFAULT_SOURCE
+
+Fixes warnings with newer glibc
+warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ wvrules.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wvrules.mk b/wvrules.mk
+index 877f700..124bffd 100644
+--- a/wvrules.mk
++++ b/wvrules.mk
+@@ -83,7 +83,7 @@ runtests:
+ 
+ INCFLAGS=$(addprefix -I,$(WVSTREAMS_INC) $(XPATH))
+ CPPFLAGS+=$(INCFLAGS) \
+-	-D_BSD_SOURCE -D_GNU_SOURCE $(OSDEFINE) \
++	-D_DEFAULT_SOURCE $(OSDEFINE) \
+ 	-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
+ 	-DUNSTABLE
+ 
+-- 
+2.14.1
+

@@ -76,7 +76,7 @@ def collect_pkgs(data_dict):
     for fn in data_dict:
         pkgconfigflags = data_dict[fn].getVarFlags("PACKAGECONFIG")
         pkgconfigflags.pop('doc', None)
-        pkgname = data_dict[fn].getVar("P", True)
+        pkgname = data_dict[fn].getVar("P")
         pkg_dict[pkgname] = sorted(pkgconfigflags.keys())
 
     return pkg_dict
@@ -124,9 +124,9 @@ def display_all(data_dict):
     ''' Display all pkgs and PACKAGECONFIG information '''
     print(str("").ljust(50, '='))
     for fn in data_dict:
-        print('%s' % data_dict[fn].getVar("P", True))
+        print('%s' % data_dict[fn].getVar("P"))
         print(fn)
-        packageconfig = data_dict[fn].getVar("PACKAGECONFIG", True) or ''
+        packageconfig = data_dict[fn].getVar("PACKAGECONFIG") or ''
         if packageconfig.strip() == '':
             packageconfig = 'None'
         print('PACKAGECONFIG %s' % packageconfig)

@@ -1,0 +1,26 @@
+From 6faa6acdf20aa6f738eed1483b7dceed94286adb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 14:39:10 -0700
+Subject: [PATCH] lat_http.c: Add printf format
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lat_http.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lat_http.c b/src/lat_http.c
+index c630d59..28d04f7 100644
+--- a/src/lat_http.c
++++ b/src/lat_http.c
+@@ -27,7 +27,7 @@ http(char *server, char *file, int prog)
+ 	sock = tcp_connect(server, prog, SOCKOPT_REUSE);
+ 	sprintf(buf, "GET /%s HTTP/1.0\r\n\r\n\n", file);
+ 	if (debug) {
+-		printf(buf);
++		printf("%s", buf);
+ 	}
+ 	write(sock, buf, strlen(buf));
+ 	while ((n = read(sock, buf, XFERSIZE)) > 0) {
+-- 
+2.13.2
+

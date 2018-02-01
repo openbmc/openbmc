@@ -52,14 +52,14 @@ def get_git_pkgv(d, use_tags):
     import bb
     from pipes import quote
 
-    src_uri = d.getVar('SRC_URI', 1).split()
+    src_uri = d.getVar('SRC_URI').split()
     fetcher = bb.fetch2.Fetch(src_uri, d)
     ud = fetcher.ud
 
     #
     # If SRCREV_FORMAT is set respect it for tags
     #
-    format = d.getVar('SRCREV_FORMAT', True)
+    format = d.getVar('SRCREV_FORMAT')
     if not format:
         names = []
         for url in ud.values():
@@ -110,9 +110,9 @@ def get_git_pkgv(d, use_tags):
                             d, quiet=True).strip()
                         ver = gitpkgv_drop_tag_prefix(output)
                     except Exception:
-                        ver = "0.0-%s-g%s" % (commits, rev[:7])
+                        ver = "0.0-%s-g%s" % (commits, vars['rev'][:7])
                 else:
-                    ver = "%s+%s" % (commits, rev[:7])
+                    ver = "%s+%s" % (commits, vars['rev'][:7])
 
                 format = format.replace(name, ver)
 

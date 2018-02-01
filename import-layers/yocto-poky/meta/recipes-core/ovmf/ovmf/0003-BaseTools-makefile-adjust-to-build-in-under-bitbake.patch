@@ -1,0 +1,39 @@
+From 2320650c6d381b914fe91b2dedaa5870279a8bcf Mon Sep 17 00:00:00 2001
+From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
+Date: Sun, 27 Nov 2016 18:42:55 -0800
+Subject: [PATCH] BaseTools: makefile: adjust to build in under bitbake
+
+Prepend the build flags with those of bitbake. This is to build
+using the bitbake native sysroot include and library directories.
+
+Signed-off-by: Ricardo Neri <ricardo.neri@linux.intel.com>
+---
+ BaseTools/Source/C/Makefiles/header.makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/BaseTools/Source/C/Makefiles/header.makefile b/BaseTools/Source/C/Makefiles/header.makefile
+index 821d114..fe0f08b 100644
+--- a/BaseTools/Source/C/Makefiles/header.makefile
++++ b/BaseTools/Source/C/Makefiles/header.makefile
+@@ -44,14 +44,14 @@ ARCH_INCLUDE = -I $(MAKEROOT)/Include/AArch64/
+ endif
+ 
+ INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE) 
+-BUILD_CPPFLAGS = $(INCLUDE) -O2
++BUILD_CPPFLAGS := $(BUILD_CPPFLAGS) $(INCLUDE) -O2
+ ifeq ($(DARWIN),Darwin)
+ # assume clang or clang compatible flags on OS X
+-BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -c -g
++BUILD_CFLAGS := $(BUILD_CFLAGS) -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -c -g
+ else
+-BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-unused-result -nostdlib -c -g
++BUILD_CFLAGS := $(BUILD_CFLAGS) -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-unused-result -nostdlib -c -g
+ endif
+-BUILD_LFLAGS =
++BUILD_LFLAGS := $(LDFLAGS)
+ BUILD_CXXFLAGS =
+ 
+ ifeq ($(ARCH), IA32)
+-- 
+2.9.3
+

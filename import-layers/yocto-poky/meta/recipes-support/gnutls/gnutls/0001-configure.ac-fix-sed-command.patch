@@ -1,6 +1,6 @@
-From 67c638c7e209554d9b19627e9402a20fdabead21 Mon Sep 17 00:00:00 2001
+From eaab55bb6d48643163eebbc9ca575a9ca2a8e03f Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Fri, 4 Dec 2015 13:19:28 +0200
+Date: Tue, 21 Feb 2017 17:10:07 +0200
 Subject: [PATCH] configure.ac: fix sed command
 
 The "sed 's/.bak//g'" matchs "bitbake", which would cause strange errors
@@ -15,18 +15,18 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index e634236..dc9e6a8 100644
+index 6907b21..7c70d9e 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -549,7 +549,7 @@ if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
- 		dnl replace libopts-generated files with distributed backups, if present
- 		missing_baks=
- 		for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
--			nam=`echo $i|sed 's/.bak//g'`
-+                        nam=`echo $i|sed 's/\.bak$//'`
- 			if test -f $i;then
- 				cp -f $i $nam
- 			else
+@@ -948,7 +948,7 @@ YEAR=`date +%Y`
+ AC_SUBST([YEAR], $YEAR)
+ 
+ for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
+-	nam=$(basename $i|sed 's/.bak//g')
++	nam=$(basename $i|sed 's/\.bak$//')
+ 	if test "$create_libopts_links" = "yes";then
+ 		rm -f "src/$nam"
+ 		AC_CONFIG_LINKS([src/$nam:$i])
 -- 
-2.6.2
+2.11.0
 

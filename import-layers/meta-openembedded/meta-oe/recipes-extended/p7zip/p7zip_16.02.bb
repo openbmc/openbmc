@@ -36,4 +36,4 @@ EOF
     chmod 0755 ${D}${bindir}/7z
 }
 
-BBCLASSEXTEND += "native"
+BBCLASSEXTEND = "native"

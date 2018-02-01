@@ -1,0 +1,35 @@
+From affaa2021a54c30353e4e1fee09c13a4de2196be Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Fri, 17 Mar 2017 14:24:29 +0200
+Subject: [PATCH] Add header dependency to nciattach.o
+
+This can happen when compiling nciattach.o:
+
+| In file included from ../neard-0.16/tools/nciattach.c:47:0:
+| ../neard-0.16/src/near.h:30:27: fatal error: near/nfc_copy.h: No such
+file or directory
+|  #include <near/nfc_copy.h>
+
+Add the missing dependency to local headers.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Submitted [mailinglist]
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index fa552ee..acef6ba 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -253,6 +253,7 @@ se/builtin.h: src/genbuiltin $(builtin_se_sources)
+ 
+ $(src_neard_OBJECTS) \
+ $(tools_nfctool_nfctool_OBJECTS) \
++$(tools_nciattach_OBJECTS) \
+ $(plugin_objects) \
+ $(se_seeld_OBJECTS) \
+ $(unit_test_ndef_parse_OBJECTS) \
+-- 
+2.11.0
+

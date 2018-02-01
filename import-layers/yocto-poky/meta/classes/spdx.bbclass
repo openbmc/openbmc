@@ -26,20 +26,20 @@ python do_spdx () {
     import json, shutil
 
     info = {} 
-    info['workdir'] = d.getVar('WORKDIR', True)
-    info['sourcedir'] = d.getVar('SPDX_S', True)
-    info['pn'] = d.getVar('PN', True)
-    info['pv'] = d.getVar('PV', True)
-    info['spdx_version'] = d.getVar('SPDX_VERSION', True)
-    info['data_license'] = d.getVar('DATA_LICENSE', True)
+    info['workdir'] = d.getVar('WORKDIR')
+    info['sourcedir'] = d.getVar('SPDX_S')
+    info['pn'] = d.getVar('PN')
+    info['pv'] = d.getVar('PV')
+    info['spdx_version'] = d.getVar('SPDX_VERSION')
+    info['data_license'] = d.getVar('DATA_LICENSE')
 
-    sstatedir = d.getVar('SPDXSSTATEDIR', True)
+    sstatedir = d.getVar('SPDXSSTATEDIR')
     sstatefile = os.path.join(sstatedir, info['pn'] + info['pv'] + ".spdx")
 
-    manifest_dir = d.getVar('SPDX_MANIFEST_DIR', True)
+    manifest_dir = d.getVar('SPDX_MANIFEST_DIR')
     info['outfile'] = os.path.join(manifest_dir, info['pn'] + ".spdx" )
 
-    info['spdx_temp_dir'] = d.getVar('SPDX_TEMP_DIR', True)
+    info['spdx_temp_dir'] = d.getVar('SPDX_TEMP_DIR')
     info['tar_file'] = os.path.join(info['workdir'], info['pn'] + ".tar.gz" )
 
     # Make sure important dirs exist
@@ -74,9 +74,9 @@ python do_spdx () {
         foss_license_info = cached_spdx['Licenses']
     else:
         ## setup fossology command
-        foss_server = d.getVar('FOSS_SERVER', True)
-        foss_flags = d.getVar('FOSS_WGET_FLAGS', True)
-        foss_full_spdx = d.getVar('FOSS_FULL_SPDX', True) == "true" or False
+        foss_server = d.getVar('FOSS_SERVER')
+        foss_flags = d.getVar('FOSS_WGET_FLAGS')
+        foss_full_spdx = d.getVar('FOSS_FULL_SPDX') == "true" or False
         foss_command = "wget %s --post-file=%s %s"\
             % (foss_flags, info['tar_file'], foss_server)
         

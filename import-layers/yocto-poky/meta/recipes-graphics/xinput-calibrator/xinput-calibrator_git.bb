@@ -2,7 +2,7 @@ SUMMARY = "Touchscreen calibration program for X11"
 HOMEPAGE = "http://www.freedesktop.org/wiki/Software/xinput_calibrator"
 LICENSE = "MIT-X"
 LIC_FILES_CHKSUM = "file://src/calibrator.cpp;endline=22;md5=1bcba08f67cdb56f34021557898e4b5a"
-DEPENDS = "virtual/libx11 libxi"
+DEPENDS = "virtual/libx11 libxi libxrandr"
 
 PV = "0.7.5+git${SRCPV}"
 PR = "r6"
@@ -11,11 +11,10 @@ inherit autotools pkgconfig distro_features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
-SRCREV = "c01c5af807cb4b0157b882ab07a893df9a810111"
+SRCREV = "03dadf55109bd43d3380f040debe9f82f66f2f35"
 SRC_URI = "git://github.com/tias/xinput_calibrator.git \
            file://30xinput_calibrate.sh \
-           file://Allow-xinput_calibrator_pointercal.sh-to-be-run-as-n.patch \
-           file://add-geometry-input-when-calibrating.patch"
+           file://Allow-xinput_calibrator_pointercal.sh-to-be-run-as-n.patch"
 
 S = "${WORKDIR}/git"
 
@@ -34,5 +33,5 @@ do_install_append() {
 }
 
 FILES_${PN} += "${sysconfdir}/xdg/autostart"
-RDEPENDS_${PN} = "xinput formfactor xrandr"
+RDEPENDS_${PN} = "xinput formfactor"
 RRECOMMENDS_${PN} = "pointercal-xinput"

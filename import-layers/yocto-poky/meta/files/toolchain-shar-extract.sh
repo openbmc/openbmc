@@ -8,8 +8,25 @@
 [ -f /etc/environment ] && . /etc/environment
 export PATH=`echo "$PATH" | sed -e 's/:\.//' -e 's/::/:/'`
 
+tweakpath () {
+    case ":${PATH}:" in
+        *:"$1":*)
+            ;;
+        *)
+            PATH=$PATH:$1
+    esac
+}
+
+# Some systems don't have /usr/sbin or /sbin in the cleaned environment PATH but we make need it 
+# for the system's host tooling checks
+tweakpath /usr/sbin
+tweakpath /sbin
+
 INST_ARCH=$(uname -m | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
 SDK_ARCH=$(echo @SDK_ARCH@ | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
+
+INST_GCC_VER=$(gcc --version | sed -ne 's/.* \([0-9]\+\.[0-9]\+\)\.[0-9]\+.*/\1/p')
+SDK_GCC_VER='@SDK_GCC_VER@'
 
 verlte () {
 	[  "$1" = "`printf "$1\n$2" | sort -V | head -n1`" ]
@@ -112,6 +129,11 @@ fi
 # SDK_EXTENSIBLE is exposed from the SDK_PRE_INSTALL_COMMAND above
 if [ "$SDK_EXTENSIBLE" = "1" ]; then
 	DEFAULT_INSTALL_DIR="@SDKEXTPATH@"
+	if [ "$INST_GCC_VER" = '4.8' -a "$SDK_GCC_VER" = '4.9' ] || [ "$INST_GCC_VER" = '4.8' -a "$SDK_GCC_VER" = '' ] || \
+		[ "$INST_GCC_VER" = '4.9' -a "$SDK_GCC_VER" = '' ]; then
+		echo "Error: Incompatible SDK installer! Your host gcc version is $INST_GCC_VER and this SDK was built by gcc higher version."
+		exit 1
+	fi
 fi
 
 if [ "$target_sdk_dir" = "" ]; then

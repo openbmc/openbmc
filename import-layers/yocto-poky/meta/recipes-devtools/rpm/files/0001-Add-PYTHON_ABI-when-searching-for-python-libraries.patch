@@ -1,0 +1,30 @@
+From 36cf0ff26ece53e529e8b4f2d2f09acd8794b055 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 24 Mar 2017 15:35:47 +0200
+Subject: [PATCH] Add PYTHON_ABI when searching for python libraries.
+
+It has a value of 'm' when using Python3, and so without it
+configure will not find the libraries.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9c58467c1..a506ec819 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -642,7 +642,7 @@ AS_IF([test "$enable_python" = yes],[
+       ])
+     CPPFLAGS="$save_CPPFLAGS"
+     save_LIBS="$LIBS"
+-    AC_SEARCH_LIBS([Py_Main],[python${PYTHON_VERSION} python],[
++    AC_SEARCH_LIBS([Py_Main],[python${PYTHON_VERSION}${PYTHON_ABI} python],[
+       WITH_PYTHON_LIB="$ac_res"
+     ],[AC_MSG_ERROR([missing python library])
+     ])
+-- 
+2.11.0
+

@@ -1,0 +1,36 @@
+From 1d2425febf2020e38db70188df582acc9f37b136 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 30 Mar 2017 13:01:33 -0700
+Subject: [PATCH] check for libexecinfo providing backtrace() APIs
+
+on musl it depends on external library to provide backtrace APIs
+unlike glibc where it is bundled in
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index aa3291c..b15f65d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -15,6 +15,7 @@ AM_PROG_CC_C_O
+ 
+ # Checks for libraries.
+ AC_CHECK_LIB([crypt], [crypt])
++AC_CHECK_LIB([execinfo], [backtrace])
+ 
+ # Check for PAM support
+ AC_ARG_WITH(pam, AC_HELP_STRING([--with-pam],[Use PAM for authentication]),
+@@ -33,6 +34,7 @@ AM_CONDITIONAL(HAVE_PAM, [test -n "$USE_PAM" -a "x$USE_PAM" != xno ])
+ # Checks for header files.
+ AC_PATH_X
+ AC_CHECK_HEADERS([shadow.h stdlib.h string.h unistd.h utmpx.h])
++AC_CHECK_HEADERS([execinfo.h])
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+ AC_TYPE_PID_T
+-- 
+2.12.1
+

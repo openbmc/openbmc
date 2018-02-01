@@ -134,7 +134,7 @@
                     <ulink url="http://www.mail-archive.com/yocto@yoctoproject.org/msg09379.html">Mailing List post - The BitBake equivalent of "Hello, World!"</ulink>
                     </para></listitem>
                 <listitem><para>
-                    <ulink url="http://hambedded.org/blog/2012/11/24/from-bitbake-hello-world-to-an-image/">Hambedded Linux blog post - From Bitbake Hello World to an Image</ulink>
+                    <ulink url="https://web.archive.org/web/20150325165911/http://hambedded.org/blog/2012/11/24/from-bitbake-hello-world-to-an-image/">Hambedded Linux blog post - From Bitbake Hello World to an Image</ulink>
                     </para></listitem>
             </itemizedlist>
         </note>
@@ -269,7 +269,7 @@
                 and define some key BitBake variables.
                 For more information on the <filename>bitbake.conf</filename>,
                 see
-                <ulink url='http://hambedded.org/blog/2012/11/24/from-bitbake-hello-world-to-an-image/#an-overview-of-bitbakeconf'></ulink>
+                <ulink url='https://web.archive.org/web/20150325165911/http://hambedded.org/blog/2012/11/24/from-bitbake-hello-world-to-an-image/#an-overview-of-bitbakeconf'></ulink>
                 </para>
                 <para>Use the following commands to create the <filename>conf</filename>
                 directory in the project directory:
@@ -354,7 +354,7 @@ ERROR: Unable to parse base: ParseError in configuration INHERITs: Could not inh
                 supporting.
                 For more information on the <filename>base.bbclass</filename> file,
                 you can look at
-                <ulink url='http://hambedded.org/blog/2012/11/24/from-bitbake-hello-world-to-an-image/#tasks'></ulink>.
+                <ulink url='https://web.archive.org/web/20150325165911/http://hambedded.org/blog/2012/11/24/from-bitbake-hello-world-to-an-image/#tasks'></ulink>.
                 </para></listitem>
             <listitem><para><emphasis>Run Bitbake:</emphasis>
                 After making sure that the <filename>classes/base.bbclass</filename>
@@ -376,7 +376,7 @@ ERROR: Unable to parse base: ParseError in configuration INHERITs: Could not inh
                 Thus, this example creates and uses a layer called "mylayer".
                 <note>
                     You can find additional information on adding a layer at
-                    <ulink url='http://hambedded.org/blog/2012/11/24/from-bitbake-hello-world-to-an-image/#adding-an-example-layer'></ulink>.
+                    <ulink url='https://web.archive.org/web/20150325165911/http://hambedded.org/blog/2012/11/24/from-bitbake-hello-world-to-an-image/#adding-an-example-layer'></ulink>.
                 </note>
                 </para>
                 <para>Minimally, you need a recipe file and a layer configuration

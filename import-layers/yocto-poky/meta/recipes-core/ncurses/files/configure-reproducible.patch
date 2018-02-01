@@ -1,0 +1,20 @@
+"configure" enforces -U for ar flags, breaking deterministic builds.
+The flag was added to fix some vaguely specified "recent POSIX binutil
+build problems" in 2015. 
+
+Upstream-Status: Pending
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+diff --git a/configure b/configure
+index 7f31208..aa80911 100755
+--- a/configure
++++ b/configure
+@@ -4428,7 +4428,7 @@ if test "${cf_cv_ar_flags+set}" = set; then
+ else
+ 
+ 	cf_cv_ar_flags=unknown
+-	for cf_ar_flags in -curvU -curv curv -crv crv -cqv cqv -rv rv
++	for cf_ar_flags in -curv curv -crv crv -cqv cqv -rv rv
+ 	do
+ 
+ 		# check if $ARFLAGS already contains this choice

@@ -1,0 +1,264 @@
+From d0c4e39d12f903e06db262656cff2e24d267bed7 Mon Sep 17 00:00:00 2001
+From: Kevin Cernekee <cernekee@chromium.org>
+Date: Wed, 4 Jan 2017 14:30:25 -0800
+Subject: Use __EXPORTED rather than EXPORT_SYMBOL
+
+clang is sensitive to the ordering of
+__attribute__((visibility("default"))) relative to the function
+body.  gcc is not.  So if we try to re-declare an existing function
+with default visibility, clang prints a warning and generates
+a broken .so file in which nfct_timeout_* are not exported to library
+callers.
+
+Move the attribute up into the function definition to make clang happy.
+
+Signed-off-by: Kevin Cernekee <cernekee@chromium.org>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+ doxygen.cfg.in               |  2 +-
+ src/internal.h               |  5 ++---
+ src/libnetfilter_cttimeout.c | 44 +++++++++++++++++---------------------------
+ 3 files changed, 20 insertions(+), 31 deletions(-)
+
+diff --git a/doxygen.cfg.in b/doxygen.cfg.in
+index 8e5d449..09c3ce0 100644
+--- a/doxygen.cfg.in
++++ b/doxygen.cfg.in
+@@ -72,7 +72,7 @@ RECURSIVE              = YES
+ EXCLUDE                = 
+ EXCLUDE_SYMLINKS       = NO
+ EXCLUDE_PATTERNS       = */.git/* .*.d
+-EXCLUDE_SYMBOLS        = EXPORT_SYMBOL nfct_timeout _container_policy_cb
++EXCLUDE_SYMBOLS        = nfct_timeout _container_policy_cb
+ EXAMPLE_PATH           = 
+ EXAMPLE_PATTERNS       = 
+ EXAMPLE_RECURSIVE      = NO
+diff --git a/src/internal.h b/src/internal.h
+index 3a88d1a..5d78171 100644
+--- a/src/internal.h
++++ b/src/internal.h
+@@ -3,10 +3,9 @@
+ 
+ #include "config.h"
+ #ifdef HAVE_VISIBILITY_HIDDEN
+-#	define __visible	__attribute__((visibility("default")))
+-#	define EXPORT_SYMBOL(x)	typeof(x) (x) __visible
++#	define __EXPORTED	__attribute__((visibility("default")))
+ #else
+-#	define EXPORT_SYMBOL
++#	define __EXPORTED
+ #endif
+ 
+ #endif
+diff --git a/src/libnetfilter_cttimeout.c b/src/libnetfilter_cttimeout.c
+index 7844a1f..a0a7185 100644
+--- a/src/libnetfilter_cttimeout.c
++++ b/src/libnetfilter_cttimeout.c
+@@ -187,7 +187,7 @@ struct nfct_timeout {
+  * In case of success, this function returns a valid pointer, otherwise NULL
+  * s returned and errno is appropriately set.
+  */
+-struct nfct_timeout *nfct_timeout_alloc(void)
++struct nfct_timeout __EXPORTED *nfct_timeout_alloc(void)
+ {
+ 	struct nfct_timeout *t;
+ 
+@@ -197,19 +197,17 @@ struct nfct_timeout *nfct_timeout_alloc(void)
+ 
+ 	return t;
+ }
+-EXPORT_SYMBOL(nfct_timeout_alloc);
+ 
+ /**
+  * nfct_timeout_free - release one conntrack timeout object
+  * \param t pointer to the conntrack timeout object
+  */
+-void nfct_timeout_free(struct nfct_timeout *t)
++void __EXPORTED nfct_timeout_free(struct nfct_timeout *t)
+ {
+ 	if (t->timeout)
+ 		free(t->timeout);
+ 	free(t);
+ }
+-EXPORT_SYMBOL(nfct_timeout_free);
+ 
+ /**
+  * nfct_timeout_attr_set - set one attribute of the conntrack timeout object
+@@ -217,7 +215,7 @@ EXPORT_SYMBOL(nfct_timeout_free);
+  * \param type attribute type you want to set
+  * \param data pointer to data that will be used to set this attribute
+  */
+-int
++int __EXPORTED
+ nfct_timeout_attr_set(struct nfct_timeout *t, uint32_t type, const void *data)
+ {
+ 	switch(type) {
+@@ -236,7 +234,6 @@ nfct_timeout_attr_set(struct nfct_timeout *t, uint32_t type, const void *data)
+ 	t->attrset |= (1 << type);
+ 	return 0;
+ }
+-EXPORT_SYMBOL(nfct_timeout_attr_set);
+ 
+ /**
+  * nfct_timeout_attr_set_u8 - set one attribute of the conntrack timeout object
+@@ -244,12 +241,11 @@ EXPORT_SYMBOL(nfct_timeout_attr_set);
+  * \param type attribute type you want to set
+  * \param data pointer to data that will be used to set this attribute
+  */
+-int
++int __EXPORTED
+ nfct_timeout_attr_set_u8(struct nfct_timeout *t, uint32_t type, uint8_t data)
+ {
+ 	return nfct_timeout_attr_set(t, type, &data);
+ }
+-EXPORT_SYMBOL(nfct_timeout_attr_set_u8);
+ 
+ /**
+  * nfct_timeout_attr_set_u16 - set one attribute of the conntrack timeout object
+@@ -257,23 +253,21 @@ EXPORT_SYMBOL(nfct_timeout_attr_set_u8);
+  * \param type attribute type you want to set
+  * \param data pointer to data that will be used to set this attribute
+  */
+-int
++int __EXPORTED
+ nfct_timeout_attr_set_u16(struct nfct_timeout *t, uint32_t type, uint16_t data)
+ {
+ 	return nfct_timeout_attr_set(t, type, &data);
+ }
+-EXPORT_SYMBOL(nfct_timeout_attr_set_u16);
+ 
+ /**
+  * nfct_timeout_attr_unset - unset one attribute of the conntrack timeout object
+  * \param t pointer to the conntrack timeout object
+  * \param type attribute type you want to set
+  */
+-void nfct_timeout_attr_unset(struct nfct_timeout *t, uint32_t type)
++void __EXPORTED nfct_timeout_attr_unset(struct nfct_timeout *t, uint32_t type)
+ {
+ 	t->attrset &= ~(1 << type);
+ }
+-EXPORT_SYMBOL(nfct_timeout_attr_unset);
+ 
+ /**
+  * nfct_timeout_policy_attr_set_u32 - set one attribute of the policy
+@@ -281,7 +275,7 @@ EXPORT_SYMBOL(nfct_timeout_attr_unset);
+  * \param type attribute type you want to set
+  * \param data data that will be used to set this attribute
+  */
+-int
++int __EXPORTED
+ nfct_timeout_policy_attr_set_u32(struct nfct_timeout *t,
+ 				 uint32_t type, uint32_t data)
+ {
+@@ -319,18 +313,17 @@ nfct_timeout_policy_attr_set_u32(struct nfct_timeout *t,
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL(nfct_timeout_policy_attr_set_u32);
+ 
+ /**
+  * nfct_timeout_policy_attr_unset - unset one attribute of the policy
+  * \param t pointer to the conntrack timeout object
+  * \param type attribute type you want to set
+  */
+-void nfct_timeout_policy_attr_unset(struct nfct_timeout *t, uint32_t type)
++void __EXPORTED
++nfct_timeout_policy_attr_unset(struct nfct_timeout *t, uint32_t type)
+ {
+ 	t->attrset &= ~(1 << type);
+ }
+-EXPORT_SYMBOL(nfct_timeout_policy_attr_unset);
+ 
+ /**
+  * nfct_timeout_policy_attr_to_name - get state name from protocol state number
+@@ -340,7 +333,8 @@ EXPORT_SYMBOL(nfct_timeout_policy_attr_unset);
+  * This function returns NULL if unsupported protocol or state number is passed.
+  * Otherwise, a pointer to valid string is returned.
+  */
+-const char *nfct_timeout_policy_attr_to_name(uint8_t l4proto, uint32_t state)
++const char __EXPORTED *
++nfct_timeout_policy_attr_to_name(uint8_t l4proto, uint32_t state)
+ {
+ 	if (timeout_protocol[l4proto].state_to_name == NULL) {
+ 		printf("no array state name\n");
+@@ -354,7 +348,6 @@ const char *nfct_timeout_policy_attr_to_name(uint8_t l4proto, uint32_t state)
+ 
+ 	return timeout_protocol[l4proto].state_to_name[state];
+ }
+-EXPORT_SYMBOL(nfct_timeout_policy_attr_to_name);
+ 
+ /**
+  * @}
+@@ -438,8 +431,9 @@ nfct_timeout_snprintf_default(char *buf, size_t size,
+  * This function returns -1 in case that some mandatory attributes are
+  * missing. On sucess, it returns 0.
+  */
+-int nfct_timeout_snprintf(char *buf, size_t size, const struct nfct_timeout *t,
+-			  unsigned int type, unsigned int flags)
++int __EXPORTED
++nfct_timeout_snprintf(char *buf, size_t size, const struct nfct_timeout *t,
++		      unsigned int type, unsigned int flags)
+ {
+ 	int ret = 0;
+ 
+@@ -454,7 +448,6 @@ int nfct_timeout_snprintf(char *buf, size_t size, const struct nfct_timeout *t,
+ 
+ 	return ret;
+ }
+-EXPORT_SYMBOL(nfct_timeout_snprintf);
+ 
+ /**
+  * @}
+@@ -477,7 +470,7 @@ EXPORT_SYMBOL(nfct_timeout_snprintf);
+  * - CTNL_MSG_TIMEOUT_GET: get conntrack timeout object.
+  * - CTNL_MSG_TIMEOUT_DEL: delete conntrack timeout object.
+  */
+-struct nlmsghdr *
++struct nlmsghdr __EXPORTED *
+ nfct_timeout_nlmsg_build_hdr(char *buf, uint8_t cmd,
+ 			     uint16_t flags, uint32_t seq)
+ {
+@@ -496,14 +489,13 @@ nfct_timeout_nlmsg_build_hdr(char *buf, uint8_t cmd,
+ 
+ 	return nlh;
+ }
+-EXPORT_SYMBOL(nfct_timeout_nlmsg_build_hdr);
+ 
+ /**
+  * nfct_timeout_nlmsg_build_payload - build payload from ct timeout object
+  * \param nlh: netlink message that you want to use to add the payload.
+  * \param t: pointer to a conntrack timeout object
+  */
+-void
++void __EXPORTED
+ nfct_timeout_nlmsg_build_payload(struct nlmsghdr *nlh,
+ 				 const struct nfct_timeout *t)
+ {
+@@ -532,7 +524,6 @@ nfct_timeout_nlmsg_build_payload(struct nlmsghdr *nlh,
+ 	}
+ 
+ }
+-EXPORT_SYMBOL(nfct_timeout_nlmsg_build_payload);
+ 
+ static int
+ timeout_nlmsg_parse_attr_cb(const struct nlattr *attr, void *data)
+@@ -629,7 +620,7 @@ timeout_parse_attr_data(struct nfct_timeout *t, const struct nlattr *nest)
+  * This function returns -1 in case that some mandatory attributes are
+  * missing. On sucess, it returns 0.
+  */
+-int
++int __EXPORTED
+ nfct_timeout_nlmsg_parse_payload(const struct nlmsghdr *nlh,
+ 				 struct nfct_timeout *t)
+ {
+@@ -654,7 +645,6 @@ nfct_timeout_nlmsg_parse_payload(const struct nlmsghdr *nlh,
+ 	}
+ 	return 0;
+ }
+-EXPORT_SYMBOL(nfct_timeout_nlmsg_parse_payload);
+ 
+ /**
+  * @}
+-- 
+cgit v1.1
+

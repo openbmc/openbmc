@@ -3,7 +3,7 @@
 # bitbake-diffsigs
 # BitBake task signature data comparison utility
 #
-# Copyright (C) 2012-2013 Intel Corporation
+# Copyright (C) 2012-2013, 2017 Intel Corporation
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -22,7 +22,7 @@ import os
 import sys
 import warnings
 import fnmatch
-import optparse
+import argparse
 import logging
 import pickle
 
@@ -30,28 +30,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), '
 
 import bb.tinfoil
 import bb.siggen
+import bb.msg
 
-def logger_create(name, output=sys.stderr):
-    logger = logging.getLogger(name)
-    console = logging.StreamHandler(output)
-    format = bb.msg.BBLogFormatter("%(levelname)s: %(message)s")
-    if output.isatty():
-        format.enable_color()
-    console.setFormatter(format)
-    logger.addHandler(console)
-    logger.setLevel(logging.INFO)
-    return logger
+logger = bb.msg.logger_create('bitbake-diffsigs')
 
-logger = logger_create('bitbake-diffsigs')
-
-def find_compare_task(bbhandler, pn, taskname):
+def find_compare_task(bbhandler, pn, taskname, sig1=None, sig2=None, color=False):
     """ Find the most recent signature files for the specified PN/task and compare them """
-
-    def get_hashval(siginfo):
-        if siginfo.endswith('.siginfo'):
-            return siginfo.rpartition(':')[2].partition('_')[0]
-        else:
-            return siginfo.rpartition('.')[2]
 
     if not hasattr(bb.siggen, 'find_siginfo'):
         logger.error('Metadata does not support finding signature data files')
@@ -60,79 +44,119 @@ def find_compare_task(bbhandler, pn, taskname):
     if not taskname.startswith('do_'):
         taskname = 'do_%s' % taskname
 
-    filedates = bb.siggen.find_siginfo(pn, taskname, None, bbhandler.config_data)
-    latestfiles = sorted(filedates.keys(), key=lambda f: filedates[f])[-3:]
-    if not latestfiles:
-        logger.error('No sigdata files found matching %s %s' % (pn, taskname))
-        sys.exit(1)
-    elif len(latestfiles) < 2:
-        logger.error('Only one matching sigdata file found for the specified task (%s %s)' % (pn, taskname))
-        sys.exit(1)
+    if sig1 and sig2:
+        sigfiles = bb.siggen.find_siginfo(pn, taskname, [sig1, sig2], bbhandler.config_data)
+        if len(sigfiles) == 0:
+            logger.error('No sigdata files found matching %s %s matching either %s or %s' % (pn, taskname, sig1, sig2))
+            sys.exit(1)
+        elif not sig1 in sigfiles:
+            logger.error('No sigdata files found matching %s %s with signature %s' % (pn, taskname, sig1))
+            sys.exit(1)
+        elif not sig2 in sigfiles:
+            logger.error('No sigdata files found matching %s %s with signature %s' % (pn, taskname, sig2))
+            sys.exit(1)
+        latestfiles = [sigfiles[sig1], sigfiles[sig2]]
     else:
-        # It's possible that latestfiles contain 3 elements and the first two have the same hash value.
-        # In this case, we delete the second element.
-        # The above case is actually the most common one. Because we may have sigdata file and siginfo
-        # file having the same hash value. Comparing such two files makes no sense.
-        if len(latestfiles) == 3:
-            hash0 = get_hashval(latestfiles[0])
-            hash1 = get_hashval(latestfiles[1])
-            if hash0 == hash1:
-                latestfiles.pop(1)
+        filedates = bb.siggen.find_siginfo(pn, taskname, None, bbhandler.config_data)
+        latestfiles = sorted(filedates.keys(), key=lambda f: filedates[f])[-3:]
+        if not latestfiles:
+            logger.error('No sigdata files found matching %s %s' % (pn, taskname))
+            sys.exit(1)
+        elif len(latestfiles) < 2:
+            logger.error('Only one matching sigdata file found for the specified task (%s %s)' % (pn, taskname))
+            sys.exit(1)
 
-        # Define recursion callback
-        def recursecb(key, hash1, hash2):
-            hashes = [hash1, hash2]
-            hashfiles = bb.siggen.find_siginfo(key, None, hashes, bbhandler.config_data)
+    # Define recursion callback
+    def recursecb(key, hash1, hash2):
+        hashes = [hash1, hash2]
+        hashfiles = bb.siggen.find_siginfo(key, None, hashes, bbhandler.config_data)
 
-            recout = []
-            if len(hashfiles) == 2:
-                out2 = bb.siggen.compare_sigfiles(hashfiles[hash1], hashfiles[hash2], recursecb)
-                recout.extend(list('  ' + l for l in out2))
-            else:
-                recout.append("Unable to find matching sigdata for %s with hashes %s or %s" % (key, hash1, hash2))
+        recout = []
+        if len(hashfiles) == 0:
+            recout.append("Unable to find matching sigdata for %s with hashes %s or %s" % (key, hash1, hash2))
+        elif not hash1 in hashfiles:
+            recout.append("Unable to find matching sigdata for %s with hash %s" % (key, hash1))
+        elif not hash2 in hashfiles:
+            recout.append("Unable to find matching sigdata for %s with hash %s" % (key, hash2))
+        else:
+            out2 = bb.siggen.compare_sigfiles(hashfiles[hash1], hashfiles[hash2], recursecb, color=color)
+            for change in out2:
+                for line in change.splitlines():
+                    recout.append('  ' + line)
 
-            return recout
+        return recout
 
-        # Recurse into signature comparison
-        output = bb.siggen.compare_sigfiles(latestfiles[0], latestfiles[1], recursecb)
-        if output:
-            print('\n'.join(output))
+    # Recurse into signature comparison
+    logger.debug("Signature file (previous): %s" % latestfiles[-2])
+    logger.debug("Signature file (latest): %s" % latestfiles[-1])
+    output = bb.siggen.compare_sigfiles(latestfiles[-2], latestfiles[-1], recursecb, color=color)
+    if output:
+        print('\n'.join(output))
     sys.exit(0)
 
 
 
-parser = optparse.OptionParser(
-    description = "Compares siginfo/sigdata files written out by BitBake",
-    usage = """
-  %prog -t recipename taskname
-  %prog sigdatafile1 sigdatafile2
-  %prog sigdatafile1""")
+parser = argparse.ArgumentParser(
+    description="Compares siginfo/sigdata files written out by BitBake")
 
-parser.add_option("-t", "--task",
-        help = "find the signature data files for last two runs of the specified task and compare them",
-        action="store", dest="taskargs", nargs=2, metavar='recipename taskname')
+parser.add_argument('-d', '--debug',
+                    help='Enable debug output',
+                    action='store_true')
 
-options, args = parser.parse_args(sys.argv)
+parser.add_argument('--color',
+        help='Colorize output (where %(metavar)s is %(choices)s)',
+        choices=['auto', 'always', 'never'], default='auto', metavar='color')
+
+parser.add_argument("-t", "--task",
+        help="find the signature data files for last two runs of the specified task and compare them",
+        action="store", dest="taskargs", nargs=2, metavar=('recipename', 'taskname'))
+
+parser.add_argument("-s", "--signature",
+        help="With -t/--task, specify the signatures to look for instead of taking the last two",
+        action="store", dest="sigargs", nargs=2, metavar=('fromsig', 'tosig'))
+
+parser.add_argument("sigdatafile1",
+        help="First signature file to compare (or signature file to dump, if second not specified). Not used when using -t/--task.",
+        action="store", nargs='?')
+
+parser.add_argument("sigdatafile2",
+        help="Second signature file to compare",
+        action="store", nargs='?')
+
+
+options = parser.parse_args()
+
+if options.debug:
+    logger.setLevel(logging.DEBUG)
+
+color = (options.color == 'always' or (options.color == 'auto' and sys.stdout.isatty()))
 
 if options.taskargs:
     with bb.tinfoil.Tinfoil() as tinfoil:
         tinfoil.prepare(config_only=True)
-        find_compare_task(tinfoil, options.taskargs[0], options.taskargs[1])
+        if options.sigargs:
+            find_compare_task(tinfoil, options.taskargs[0], options.taskargs[1], options.sigargs[0], options.sigargs[1], color=color)
+        else:
+            find_compare_task(tinfoil, options.taskargs[0], options.taskargs[1], color=color)
 else:
-    if len(args) == 1:
-        parser.print_help()
-    else:
-        try:
-            if len(args) == 2:
-                output = bb.siggen.dump_sigfile(sys.argv[1])
-            else:
-                output = bb.siggen.compare_sigfiles(sys.argv[1], sys.argv[2])
-        except IOError as e:
-            logger.error(str(e))
+    if options.sigargs:
+        logger.error('-s/--signature can only be used together with -t/--task')
+        sys.exit(1)
+    try:
+        if options.sigdatafile1 and options.sigdatafile2:
+            output = bb.siggen.compare_sigfiles(options.sigdatafile1, options.sigdatafile2, color=color)
+        elif options.sigdatafile1:
+            output = bb.siggen.dump_sigfile(options.sigdatafile1)
+        else:
+            logger.error('Must specify signature file(s) or -t/--task')
+            parser.print_help()
             sys.exit(1)
-        except (pickle.UnpicklingError, EOFError):
-            logger.error('Invalid signature data - ensure you are specifying sigdata/siginfo files')
-            sys.exit(1)
+    except IOError as e:
+        logger.error(str(e))
+        sys.exit(1)
+    except (pickle.UnpicklingError, EOFError):
+        logger.error('Invalid signature data - ensure you are specifying sigdata/siginfo files')
+        sys.exit(1)
 
-        if output:
-            print('\n'.join(output))
+    if output:
+        print('\n'.join(output))

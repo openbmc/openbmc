@@ -1,7 +1,7 @@
-From a56e7aa2fd10b178b9498f88a7a2ca8aad671a53 Mon Sep 17 00:00:00 2001
+From 0b95f34207ffed3aa53fa949662bfbccc7c864a4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 14:35:35 -0800
-Subject: [PATCH 04/25] nativesdk-glibc: Allow 64 bit atomics for x86
+Subject: [PATCH 04/26] nativesdk-glibc: Allow 64 bit atomics for x86
 
 The fix consist of allowing 64bit atomic ops for x86.
 This should be safe for i586 and newer CPUs.
@@ -11,8 +11,6 @@ Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
-
  sysdeps/i386/atomic-machine.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
@@ -30,5 +28,5 @@ index ce62b33..4fe44ea 100644
  
  
 -- 
-2.8.2
+2.10.2
 

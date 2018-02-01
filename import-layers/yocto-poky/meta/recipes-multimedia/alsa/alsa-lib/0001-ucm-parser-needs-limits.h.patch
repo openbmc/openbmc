@@ -1,0 +1,33 @@
+From 005ac9d2fa000912c8fb8257020a0471b1c6176c Mon Sep 17 00:00:00 2001
+From: Gustavo Zacarias <gustavo@zacarias.com.ar>
+Date: Wed, 21 Dec 2016 19:46:34 -0300
+Subject: [PATCH] ucm: parser needs limits.h
+
+It's using PATH_MAX which is defined there, otherwise the build fails on
+musl libc.
+
+Signed-off-by: Gustavo Zacarias <gustavo@zacarias.com.ar>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+
+Upstream-Status: Accepted [expected in 1.1.4]
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ src/ucm/parser.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/ucm/parser.c b/src/ucm/parser.c
+index c98373a9..f520abc5 100644
+--- a/src/ucm/parser.c
++++ b/src/ucm/parser.c
+@@ -32,6 +32,7 @@
+ 
+ #include "ucm_local.h"
+ #include <dirent.h>
++#include <limits.h>
+ 
+ /** The name of the environment variable containing the UCM directory */
+ #define ALSA_CONFIG_UCM_VAR "ALSA_CONFIG_UCM"
+-- 
+2.11.0
+

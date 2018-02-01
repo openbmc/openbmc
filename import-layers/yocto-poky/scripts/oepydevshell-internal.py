@@ -22,9 +22,16 @@ def cbreaknoecho(fd):
     old[3] = old[3] &~ termios.ECHO &~ termios.ICANON
     termios.tcsetattr(fd, termios.TCSADRAIN, old)
 
-if len(sys.argv) != 3:
-    print("Incorrect parameters")
-    sys.exit(1)
+if len(sys.argv) != 3 or sys.argv[1] in ('-h', '--help'):
+    print('oepydevshell-internal.py: error: the following arguments are required: pty, pid\n'
+          'Usage: oepydevshell-internal.py pty pid\n\n'
+          'OpenEmbedded oepydevshell-internal.py - internal script called from meta/classes/devshell.bbclass\n\n'
+          'arguments:\n'
+          '  pty                   pty device name\n'
+          '  pid                   parent process id\n\n'
+          'options:\n'
+          '  -h, --help            show this help message and exit\n')
+    sys.exit(2)
 
 pty = open(sys.argv[1], "w+b", 0)
 parent = int(sys.argv[2])
@@ -38,7 +45,7 @@ readline.parse_and_bind("tab: complete")
 try:
     readline.read_history_file(histfile)
 except IOError:
-    pass 
+    pass
 
 try:
 

@@ -23,7 +23,7 @@ def gitrev_run(cmd, path):
 def get_git_pv(d, tagadjust=None):
     import os
 
-    srcdir = d.getVar("EXTERNALSRC", True) or d.getVar("S", True)
+    srcdir = d.getVar("EXTERNALSRC") or d.getVar("S")
     gitdir = os.path.abspath(os.path.join(srcdir, ".git"))
     try:
         ver = gitrev_run("git describe --tags", gitdir)
@@ -45,11 +45,11 @@ def get_git_pv(d, tagadjust=None):
 def get_git_hash(d):
     import os
 
-    srcdir = d.getVar("EXTERNALSRC", True) or d.getVar("S", True)
+    srcdir = d.getVar("EXTERNALSRC") or d.getVar("S")
     gitdir = os.path.abspath(os.path.join(srcdir, ".git"))
     try:
-        return gitrev_run("git rev-parse HEAD", gitdir)
-
+        rev = gitrev_run("git rev-list HEAD -1")
+        return rev[:7]
     except Exception as exc:
         bb.fatal(str(exc))
 
@@ -79,6 +79,6 @@ def mark_recipe_dependencies(path, d):
         mark_dependency(d, tagdir)
 
 python () {
-    srcdir = d.getVar("EXTERNALSRC", True) or d.getVar("S", True)
+    srcdir = d.getVar("EXTERNALSRC") or d.getVar("S")
     mark_recipe_dependencies(srcdir, d)
 }

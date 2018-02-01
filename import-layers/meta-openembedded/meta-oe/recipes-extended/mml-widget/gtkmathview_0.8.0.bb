@@ -1,5 +1,5 @@
 HOMEPAGE = "http://helm.cs.unibo.it/mml-widget/"
-DEPENDS = "t1lib gtk+ popt libxslt libxml2"
+DEPENDS = "t1lib gtk+ popt libxslt-native libxml2"
 
 LICENSE = "LGPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6a6a8e020838b23406c81b19c1d46df6"

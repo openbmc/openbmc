@@ -20,8 +20,12 @@ def sstate_rundepfilter(siggen, fn, recipename, task, dep, depname, dataCache):
     def isImage(fn):
         return "/image.bbclass" in " ".join(dataCache.inherits[fn])
 
-    # Always include our own inter-task dependencies
+    # (Almost) always include our own inter-task dependencies.
+    # The exception is the special do_kernel_configme->do_unpack_and_patch
+    # dependency from archiver.bbclass.
     if recipename == depname:
+        if task == "do_kernel_configme" and dep.endswith(".do_unpack_and_patch"):
+            return False
         return True
 
     # Quilt (patch application) changing isn't likely to affect anything
@@ -63,10 +67,10 @@ def sstate_rundepfilter(siggen, fn, recipename, task, dep, depname, dataCache):
 
 def sstate_lockedsigs(d):
     sigs = {}
-    types = (d.getVar("SIGGEN_LOCKEDSIGS_TYPES", True) or "").split()
+    types = (d.getVar("SIGGEN_LOCKEDSIGS_TYPES") or "").split()
     for t in types:
         siggen_lockedsigs_var = "SIGGEN_LOCKEDSIGS_%s" % t
-        lockedsigs = (d.getVar(siggen_lockedsigs_var, True) or "").split()
+        lockedsigs = (d.getVar(siggen_lockedsigs_var) or "").split()
         for ls in lockedsigs:
             pn, task, h = ls.split(":", 2)
             if pn not in sigs:
@@ -77,8 +81,8 @@ def sstate_lockedsigs(d):
 class SignatureGeneratorOEBasic(bb.siggen.SignatureGeneratorBasic):
     name = "OEBasic"
     def init_rundepcheck(self, data):
-        self.abisaferecipes = (data.getVar("SIGGEN_EXCLUDERECIPES_ABISAFE", True) or "").split()
-        self.saferecipedeps = (data.getVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS", True) or "").split()
+        self.abisaferecipes = (data.getVar("SIGGEN_EXCLUDERECIPES_ABISAFE") or "").split()
+        self.saferecipedeps = (data.getVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS") or "").split()
         pass
     def rundep_check(self, fn, recipename, task, dep, depname, dataCache = None):
         return sstate_rundepfilter(self, fn, recipename, task, dep, depname, dataCache)
@@ -86,15 +90,15 @@ class SignatureGeneratorOEBasic(bb.siggen.SignatureGeneratorBasic):
 class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
     name = "OEBasicHash"
     def init_rundepcheck(self, data):
-        self.abisaferecipes = (data.getVar("SIGGEN_EXCLUDERECIPES_ABISAFE", True) or "").split()
-        self.saferecipedeps = (data.getVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS", True) or "").split()
+        self.abisaferecipes = (data.getVar("SIGGEN_EXCLUDERECIPES_ABISAFE") or "").split()
+        self.saferecipedeps = (data.getVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS") or "").split()
         self.lockedsigs = sstate_lockedsigs(data)
         self.lockedhashes = {}
         self.lockedpnmap = {}
         self.lockedhashfn = {}
-        self.machine = data.getVar("MACHINE", True)
+        self.machine = data.getVar("MACHINE")
         self.mismatch_msgs = []
-        self.unlockedrecipes = (data.getVar("SIGGEN_UNLOCKED_RECIPES", True) or
+        self.unlockedrecipes = (data.getVar("SIGGEN_UNLOCKED_RECIPES") or
                                 "").split()
         self.unlockedrecipes = { k: "" for k in self.unlockedrecipes }
         pass
@@ -197,7 +201,8 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
             types[t].append(k)
 
         with open(sigfile, "w") as f:
-            for t in types:
+            l = sorted(types)
+            for t in l:
                 f.write('SIGGEN_LOCKEDSIGS_%s = "\\\n' % t)
                 types[t].sort()
                 sortedk = sorted(types[t], key=lambda k: self.lockedpnmap[k.rsplit(".",1)[0]])
@@ -208,7 +213,17 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
                         continue
                     f.write("    " + self.lockedpnmap[fn] + ":" + task + ":" + self.taskhash[k] + " \\\n")
                 f.write('    "\n')
-            f.write('SIGGEN_LOCKEDSIGS_TYPES_%s = "%s"' % (self.machine, " ".join(list(types.keys()))))
+            f.write('SIGGEN_LOCKEDSIGS_TYPES_%s = "%s"' % (self.machine, " ".join(l)))
+
+    def dump_siglist(self, sigfile):
+        with open(sigfile, "w") as f:
+            tasks = []
+            for taskitem in self.taskhash:
+                (fn, task) = taskitem.rsplit(".", 1)
+                pn = self.lockedpnmap[fn]
+                tasks.append((pn, task, fn, self.taskhash[taskitem]))
+            for (pn, task, fn, taskhash) in sorted(tasks):
+                f.write('%s.%s %s %s\n' % (pn, task, fn, taskhash))
 
     def checkhashes(self, missed, ret, sq_fn, sq_task, sq_hash, sq_hashfn, d):
         warn_msgs = []
@@ -224,13 +239,13 @@ class SignatureGeneratorOEBasicHash(bb.siggen.SignatureGeneratorBasicHash):
                         sstate_missing_msgs.append("Locked sig is set for %s:%s (%s) yet not in sstate cache?"
                                                % (pn, sq_task[task], sq_hash[task]))
 
-        checklevel = d.getVar("SIGGEN_LOCKEDSIGS_TASKSIG_CHECK", True)
+        checklevel = d.getVar("SIGGEN_LOCKEDSIGS_TASKSIG_CHECK")
         if checklevel == 'warn':
             warn_msgs += self.mismatch_msgs
         elif checklevel == 'error':
             error_msgs += self.mismatch_msgs
 
-        checklevel = d.getVar("SIGGEN_LOCKEDSIGS_SSTATE_EXISTS_CHECK", True)
+        checklevel = d.getVar("SIGGEN_LOCKEDSIGS_SSTATE_EXISTS_CHECK")
         if checklevel == 'warn':
             warn_msgs += sstate_missing_msgs
         elif checklevel == 'error':
@@ -253,9 +268,6 @@ def find_siginfo(pn, taskname, taskhashlist, d):
     import fnmatch
     import glob
 
-    if taskhashlist:
-        hashfiles = {}
-
     if not taskname:
         # We have to derive pn and taskname
         key = pn
@@ -265,7 +277,14 @@ def find_siginfo(pn, taskname, taskhashlist, d):
         if key.startswith('virtual:native:'):
             pn = pn + '-native'
 
+    hashfiles = {}
     filedates = {}
+
+    def get_hashval(siginfo):
+        if siginfo.endswith('.siginfo'):
+            return siginfo.rpartition(':')[2].partition('_')[0]
+        else:
+            return siginfo.rpartition('.')[2]
 
     # First search in stamps dir
     localdata = d.createCopy()
@@ -274,7 +293,7 @@ def find_siginfo(pn, taskname, taskhashlist, d):
     localdata.setVar('PV', '*')
     localdata.setVar('PR', '*')
     localdata.setVar('EXTENDPE', '')
-    stamp = localdata.getVar('STAMP', True)
+    stamp = localdata.getVar('STAMP')
     if pn.startswith("gcc-source"):
         # gcc-source shared workdir is a special case :(
         stamp = localdata.expand("${STAMPS_DIR}/work-shared/gcc-${PV}-${PR}")
@@ -296,6 +315,8 @@ def find_siginfo(pn, taskname, taskhashlist, d):
                 filedates[fullpath] = os.stat(fullpath).st_mtime
             except OSError:
                 continue
+            hashval = get_hashval(fullpath)
+            hashfiles[hashval] = fullpath
 
     if not taskhashlist or (len(filedates) < 2 and not foundall):
         # That didn't work, look in sstate-cache
@@ -309,30 +330,25 @@ def find_siginfo(pn, taskname, taskhashlist, d):
             localdata.setVar('PV', '*')
             localdata.setVar('PR', '*')
             localdata.setVar('BB_TASKHASH', hashval)
-            swspec = localdata.getVar('SSTATE_SWSPEC', True)
+            swspec = localdata.getVar('SSTATE_SWSPEC')
             if taskname in ['do_fetch', 'do_unpack', 'do_patch', 'do_populate_lic', 'do_preconfigure'] and swspec:
                 localdata.setVar('SSTATE_PKGSPEC', '${SSTATE_SWSPEC}')
             elif pn.endswith('-native') or "-cross-" in pn or "-crosssdk-" in pn:
                 localdata.setVar('SSTATE_EXTRAPATH', "${NATIVELSBSTRING}/")
             sstatename = taskname[3:]
-            filespec = '%s_%s.*.siginfo' % (localdata.getVar('SSTATE_PKG', True), sstatename)
+            filespec = '%s_%s.*.siginfo' % (localdata.getVar('SSTATE_PKG'), sstatename)
 
-            if hashval != '*':
-                sstatedir = "%s/%s" % (d.getVar('SSTATE_DIR', True), hashval[:2])
-            else:
-                sstatedir = d.getVar('SSTATE_DIR', True)
-
-            for root, dirs, files in os.walk(sstatedir):
-                for fn in files:
-                    fullpath = os.path.join(root, fn)
-                    if fnmatch.fnmatch(fullpath, filespec):
-                        if taskhashlist:
-                            hashfiles[hashval] = fullpath
-                        else:
-                            try:
-                                filedates[fullpath] = os.stat(fullpath).st_mtime
-                            except:
-                                continue
+            matchedfiles = glob.glob(filespec)
+            for fullpath in matchedfiles:
+                actual_hashval = get_hashval(fullpath)
+                if actual_hashval in hashfiles:
+                    continue
+                hashfiles[hashval] = fullpath
+                if not taskhashlist:
+                    try:
+                        filedates[fullpath] = os.stat(fullpath).st_mtime
+                    except:
+                        continue
 
     if taskhashlist:
         return hashfiles
@@ -348,7 +364,7 @@ def sstate_get_manifest_filename(task, d):
     Also returns the datastore that can be used to query related variables.
     """
     d2 = d.createCopy()
-    extrainf = d.getVarFlag("do_" + task, 'stamp-extra-info', True)
+    extrainf = d.getVarFlag("do_" + task, 'stamp-extra-info')
     if extrainf:
         d2.setVar("SSTATE_MANMACH", extrainf)
     return (d2.expand("${SSTATE_MANFILEPREFIX}.%s" % task), d2)

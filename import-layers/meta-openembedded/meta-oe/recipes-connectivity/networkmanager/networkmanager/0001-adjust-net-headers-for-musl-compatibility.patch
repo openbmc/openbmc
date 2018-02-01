@@ -1,0 +1,82 @@
+From 047d3bf96b510740f64687480333c378e414995f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 15:57:05 -0700
+Subject: [PATCH 1/5] adjust net/ headers for musl compatibility
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libnm-core/nm-utils.c          | 12 +++++++-----
+ libnm-core/nm-utils.h          |  5 ++---
+ src/platform/wifi/wifi-utils.h |  2 +-
+ 3 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/libnm-core/nm-utils.c b/libnm-core/nm-utils.c
+index df75d56..868224e 100644
+--- a/libnm-core/nm-utils.c
++++ b/libnm-core/nm-utils.c
+@@ -19,24 +19,26 @@
+  * Copyright 2005 - 2014 Red Hat, Inc.
+  */
+ 
+-#include "nm-default.h"
+-
+-#include "nm-utils.h"
+-
+ #include <string.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-#include <netinet/ether.h>
+ #include <arpa/inet.h>
+ #include <uuid/uuid.h>
+ #include <libintl.h>
+ #include <gmodule.h>
+ #include <sys/stat.h>
++//#include <net/if_arp.h>
++//#include <net/ethernet.h>
++#include <netinet/ether.h>
++
++#include "nm-default.h"
+ 
++#include "nm-utils.h"
+ #if WITH_JANSSON
+ #include <jansson.h>
+ #endif
+ 
++
+ #include "nm-common-macros.h"
+ #include "nm-utils-private.h"
+ #include "nm-setting-private.h"
+diff --git a/libnm-core/nm-utils.h b/libnm-core/nm-utils.h
+index 407c14e..156ccae 100644
+--- a/libnm-core/nm-utils.h
++++ b/libnm-core/nm-utils.h
+@@ -27,11 +27,10 @@
+ 
+ #include <glib.h>
+ 
+-#include <netinet/in.h>
+-
+ /* For ETH_ALEN and INFINIBAND_ALEN */
+-#include <linux/if_ether.h>
++//#include <linux/if_ether.h>
+ #include <linux/if_infiniband.h>
++#include <netinet/in.h>
+ 
+ #include "nm-core-enum-types.h"
+ #include "nm-setting-wireless-security.h"
+diff --git a/src/platform/wifi/wifi-utils.h b/src/platform/wifi/wifi-utils.h
+index 8e2b93f..84f5ce9 100644
+--- a/src/platform/wifi/wifi-utils.h
++++ b/src/platform/wifi/wifi-utils.h
+@@ -22,7 +22,7 @@
+ #ifndef __WIFI_UTILS_H__
+ #define __WIFI_UTILS_H__
+ 
+-#include <net/ethernet.h>
++//#include <net/ethernet.h>
+ 
+ #include "nm-dbus-interface.h"
+ 
+-- 
+2.12.1
+

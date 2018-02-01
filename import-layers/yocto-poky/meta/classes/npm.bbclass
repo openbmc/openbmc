@@ -13,7 +13,8 @@ def npm_oe_arch_map(target_arch, d):
     elif re.match('arm64$', target_arch): return 'arm'
     return target_arch
 
-NPM_ARCH ?= "${@npm_oe_arch_map(d.getVar('TARGET_ARCH', True), d)}"
+NPM_ARCH ?= "${@npm_oe_arch_map(d.getVar('TARGET_ARCH'), d)}"
+NPM_INSTALL_DEV = "0"
 
 npm_do_compile() {
 	# Copy in any additionally fetched modules
@@ -23,17 +24,32 @@ npm_do_compile() {
 	# changing the home directory to the working directory, the .npmrc will
 	# be created in this directory
 	export HOME=${WORKDIR}
-	npm config set dev false
+	if [  "${NPM_INSTALL_DEV}" = "1" ]; then
+		npm config set dev true
+	else
+		npm config set dev false
+	fi
 	npm set cache ${WORKDIR}/npm_cache
 	# clear cache before every build
 	npm cache clear
 	# Install pkg into ${S} without going to the registry
-	npm --arch=${NPM_ARCH} --target_arch=${NPM_ARCH} --production --no-registry install
+	if [  "${NPM_INSTALL_DEV}" = "1" ]; then
+		npm --arch=${NPM_ARCH} --target_arch=${NPM_ARCH} --no-registry install
+	else
+		npm --arch=${NPM_ARCH} --target_arch=${NPM_ARCH} --production --no-registry install
+	fi
 }
 
 npm_do_install() {
+	# changing the home directory to the working directory, the .npmrc will
+	# be created in this directory
+	export HOME=${WORKDIR}
 	mkdir -p ${NPM_INSTALLDIR}/
-	cp -a ${S}/* ${NPM_INSTALLDIR}/ --no-preserve=ownership
+	npm install --prefix ${D}${prefix} -g --arch=${NPM_ARCH} --target_arch=${NPM_ARCH} --production --no-registry
+	if [ -d ${D}${prefix}/etc ] ; then
+		# This will be empty
+		rmdir ${D}${prefix}/etc
+	fi
 }
 
 python populate_packages_prepend () {
@@ -55,7 +71,7 @@ python populate_packages_prepend () {
             description = pdata.get('description', None)
             if description:
                 d.setVar('SUMMARY_%s' % expanded_pkgname, description.replace(u"\u2018", "'").replace(u"\u2019", "'"))
-    d.appendVar('RDEPENDS_%s' % d.getVar('PN', True), ' %s' % ' '.join(pkgnames).replace('_', '-'))
+    d.appendVar('RDEPENDS_%s' % d.getVar('PN'), ' %s' % ' '.join(pkgnames).replace('_', '-'))
 }
 
 FILES_${PN} += " \
