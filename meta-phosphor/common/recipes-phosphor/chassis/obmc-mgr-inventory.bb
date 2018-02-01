@@ -21,5 +21,4 @@ RDEPENDS_${PN} += "\
         "
 
 SKELETON_DIR = "pyinventorymgr"
-DBUS_SERVICE_${PN} += "org.openbmc.Inventory.service"
 SYSTEMD_SERVICE_${PN} += "obmc-sync-inventory-item@.service"
