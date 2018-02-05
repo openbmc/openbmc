@@ -1,5 +1,0 @@
----
-org.openbmc.settings.Host:
-    settings:
-        powerpolicy:
-            default: "ALWAYS_POWER_ON"

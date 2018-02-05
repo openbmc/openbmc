@@ -1,7 +1,0 @@
----
-org.openbmc.settings.Host:
-    settings:
-        TimeOwner:
-            default: "HOST"
-        TimeMode:
-            default: "MANUAL"

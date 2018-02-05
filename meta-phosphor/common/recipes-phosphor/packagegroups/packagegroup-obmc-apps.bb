@@ -112,7 +112,7 @@ RDEPENDS_${PN}-debug-collector = " \
 
 SUMMARY_${PN}-settings = "Settings applications"
 RDEPENDS_${PN}-settings = " \
-        ${VIRTUAL-RUNTIME_obmc-settings-mgr} \
+        ${VIRTUAL-RUNTIME_obmc-settings-mgmt} \
         "
 
 SUMMARY_${PN}-network = "BMC Network Manager"

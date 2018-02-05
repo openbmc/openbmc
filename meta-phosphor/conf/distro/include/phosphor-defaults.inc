@@ -112,7 +112,6 @@ VIRTUAL-RUNTIME_obmc-dump-manager ?= "phosphor-debug-collector-manager"
 # Provide support for monitoring BMC core dumps
 VIRTUAL-RUNTIME_obmc-dump-monitor ?= "phosphor-debug-collector-monitor"
 
-PREFERRED_PROVIDER_virtual/obmc-settings-mgmt ?= "phosphor-settings"
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt ?= "obmc-phosphor-sysd"
 PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
 
@@ -123,10 +122,10 @@ PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
 VIRTUAL-RUNTIME_phosphor-hwmon-config ?= \
     "${@cf_enabled(d, 'obmc-mrw', 'phosphor-hwmon-config-mrw')}"
 
-# obmc-settings-mgr
+# obmc-settings-mgmt
 #
 # Provides a manager for user settings.
-VIRTUAL-RUNTIME_obmc-settings-mgr ?= "phosphor-settings-manager"
+VIRTUAL-RUNTIME_obmc-settings-mgmt ?= "phosphor-settings-manager"
 
 # obmc-network-manager
 #

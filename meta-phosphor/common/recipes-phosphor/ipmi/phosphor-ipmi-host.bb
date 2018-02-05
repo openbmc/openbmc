@@ -47,7 +47,8 @@ RDEPENDS_${PN} += "virtual/obmc-watchdog"
 
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 
-RRECOMMENDS_${PN} += "virtual-obmc-settings-mgmt"
+RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-settings-mgmt}"
+
 
 require ${PN}.inc
 
