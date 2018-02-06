@@ -109,3 +109,9 @@
       Properties:
           PowerSupplyRedundancyEnabled:
              Default: 'true'
+
+/xyz/openbmc_project/control/host0/turbo_allowed:
+    - Interface: xyz.openbmc_project.Control.Host.TurboAllowed
+      Properties:
+          TurboAllowed:
+             Default: 'true'
