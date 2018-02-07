@@ -140,8 +140,15 @@ ubi_ro() {
 
   ubi_remove_volumes
 
-  # Create a static ubi volume
-  # TODO Get the actual image size openbmc/openbmc#1840
+  if [ -z "${imgfile}" ]; then
+    echo "Unable to create read-only volume. Image file not specified."
+    return 1
+  fi
+
+  # Create a ubi volume, dynamically sized to fit BMC image if size unspecified
+  img="/tmp/images/${version}/${imgfile}"
+  imgsize="$(stat -c '%s' ${img})"
+
   vol="$(findubi "${name}")"
   if [ ! -z "${vol}" ]; then
     # Allow a duplicate kernel volume on the alt mtd
@@ -403,7 +410,6 @@ case "$1" in
     name="$3"
     version="$4"
     imgfile="image-rofs"
-    imgsize="16MiB"
     ubi_ro
     ubi_updatevol
     ubi_block
@@ -414,7 +420,6 @@ case "$1" in
     name="$3"
     version="$4"
     imgfile="image-kernel"
-    imgsize="4MiB"
     ubi_ro
     ubi_updatevol
     create_vol_in_alt
