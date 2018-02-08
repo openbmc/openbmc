@@ -2,7 +2,7 @@
 #@NAME: Aspeed AST2500
 #@DESCRIPTION: Common machine configuration for the Aspeed AST2500 Chip
 
-PREFERRED_PROVIDER_virtual/kernel ?= "linux-obmc"
+require conf/machine/include/aspeed.inc
 
 UBOOT_MACHINE ?= "ast_g5_ncsi_config"
 UBOOT_ENTRYPOINT ?= "0x80001000"
