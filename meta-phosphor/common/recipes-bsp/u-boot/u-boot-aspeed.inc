@@ -1,13 +1,14 @@
 inherit image_version
 
-SRC_URI_append = " file://0001-configs-ast-Add-redundnant-env.patch"
+SRC_URI_append_aspeed = " file://0001-configs-ast-Add-redundnant-env.patch"
 
-SRC_URI_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
+SRC_URI_append_aspeed = " ${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
     'file://0001-config-ast-common-hack-bootopts.patch \
      file://0004-config-ast-common-ubi-bootops.patch \
      file://0001-config-ast-common-Add-conditional-factory-reset-comm.patch', '', d)}"
 
-python do_configure () {
+
+python do_configure_aspeed () {
     if "obmc-ubi-fs" in d.getVar("MACHINE_FEATURES", True):
         version_id=do_get_versionID(d)
         d.setVar('VERSION_ID', version_id)
