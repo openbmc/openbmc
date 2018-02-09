@@ -93,7 +93,15 @@ SUMMARY_${PN}-software = "Software applications"
 RDEPENDS_${PN}-software = " \
         ${VIRTUAL-RUNTIME_obmc-bmc-download-mgr} \
         ${VIRTUAL-RUNTIME_obmc-bmc-updater} \
+        ${VIRTUAL-RUNTIME_obmc-bmc-version} \
         "
+# Determine if the non-UBI flash packages are required
+RDEPENDS_${PN}-software += " \
+        ${@mf_enabled(d, 'obmc-ubi-fs', \
+            '', \
+            'obmc-flash-bmc obmc-mgr-download')} \
+        "
+
 SUMMARY_${PN}-debug-collector = "BMC debug collector"
 RDEPENDS_${PN}-debug-collector = " \
         ${VIRTUAL-RUNTIME_obmc-dump-manager} \

@@ -83,6 +83,12 @@ VIRTUAL-RUNTIME_obmc-leds-sysfs ?= "phosphor-led-sysfs"
 # interface.
 VIRTUAL-RUNTIME_obmc-bmc-download-mgr ?= "phosphor-software-manager-download-mgr"
 
+# obmc-bmc-version
+#
+# Provides an implementation of the xyz.openbmc_project.Software.Version
+# interface.
+VIRTUAL-RUNTIME_obmc-bmc-version ?= "phosphor-software-manager-version"
+
 # obmc-bmc-updater
 #
 # Provides an implementation of the xyz.openbmc_project.Software.Activation
