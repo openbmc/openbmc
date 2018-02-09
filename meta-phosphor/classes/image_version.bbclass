@@ -1,9 +1,11 @@
 # Base image version class extension
 
+DEPENDS_append = " os-release"
+
 def do_get_version(d):
     import configparser
     import io
-    path = d.getVar('STAGING_DIR_HOST', True) + d.getVar('sysconfdir', True)
+    path = d.getVar('STAGING_DIR_TARGET', True) + d.getVar('sysconfdir', True)
     path = os.path.join(path, 'os-release')
     parser = configparser.SafeConfigParser(strict=False)
     parser.optionxform = str
