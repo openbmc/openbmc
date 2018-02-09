@@ -11,3 +11,5 @@ events:
             paths:
                 - /system/chassis/power_supply0
                 - /system/chassis/power_supply1
+                - /system/chassis/powersupply0
+                - /system/chassis/powersupply1

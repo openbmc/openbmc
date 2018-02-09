@@ -7,14 +7,14 @@
   group: path
   members:
     - meta: POWER SUPPLY
-      path: /xyz/openbmc_project/inventory/system/chassis/powersupply0
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0
 
 - name: power supply1
   class: group
   group: path
   members:
     - meta: POWER SUPPLY
-      path: /xyz/openbmc_project/inventory/system/chassis/powersupply1
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1
 
 - name: power supplies
   description: >
@@ -23,9 +23,9 @@
   group: path
   members:
     - meta: POWER SUPPLY
-      path: /xyz/openbmc_project/inventory/system/chassis/powersupply0
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0
     - meta: POWER SUPPLY
-      path: /xyz/openbmc_project/inventory/system/chassis/powersupply1
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1
 
 - name: chassis state
   description: >
@@ -142,7 +142,7 @@
   error: xyz::openbmc_project::Inventory::Error::NotPresent
   metadata:
     - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
-      value: /xyz/openbmc_project/inventory/system/chassis/powersupply0
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0
       type: string
 
 - name: notpresent power supply1 error
@@ -153,7 +153,7 @@
   error: xyz::openbmc_project::Inventory::Error::NotPresent
   metadata:
     - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
-      value: /xyz/openbmc_project/inventory/system/chassis/powersupply1
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1
       type: string
 
 - name: resolve power supply0 errors if present
@@ -187,14 +187,14 @@
   callback: resolve callout
   paths: power supply0
   properties: power supply present
-  callout: /xyz/openbmc_project/inventory/system/chassis/powersupply0
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0
 
 - name: resolve power supply1 errors
   class: callback
   callback: resolve callout
   paths: power supply1
   properties: power supply present
-  callout: /xyz/openbmc_project/inventory/system/chassis/powersupply1
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1
 
 - name: watch power supply0 present for resolving error logs
   description: >
