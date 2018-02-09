@@ -89,7 +89,9 @@ ${PN}-software-extras = " \
         obmc-mgr-download \
         "
 
-${PN}-software-extras_df-obmc-ubi-fs = ""
+${PN}-software-extras_df-obmc-ubi-fs = " \
+        phosphor-image-signing \
+        "
 
 SUMMARY_${PN}-software = "Software applications"
 RDEPENDS_${PN}-software = " \

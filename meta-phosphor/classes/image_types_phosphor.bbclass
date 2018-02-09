@@ -44,6 +44,10 @@ FLASH_RWFS_OFFSET ?= "28672"
 FLASH_UBI_RWFS_SIZE ?= "6144"
 FLASH_UBI_RWFS_TXT_SIZE ?= "6MiB"
 
+SIGNING_KEY ?= "${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv"
+INSECURE_KEY = "${@'${SIGNING_KEY}' == '${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv'}"
+SIGNING_KEY_DEPENDS = "${@oe.utils.conditional('INSECURE_KEY', 'True', 'phosphor-insecure-signing-key-native:do_populate_sysroot', '', d)}"
+
 python() {
     # Compute rwfs LEB count and LEB size.
     page_size = d.getVar('FLASH_PAGE_SIZE', True)
@@ -277,27 +281,64 @@ do_generate_static_tar[vardepsexclude] = "DATETIME"
 
 do_generate_ubi_tar() {
 	ln -sf ${S}/MANIFEST MANIFEST
+	ln -sf ${S}/publickey publickey
 	make_image_links ${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_BASETYPE}
-	make_tar_of_images ubi MANIFEST
+	for file in image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey; do
+		openssl dgst -sha256 -sign ${SIGNING_KEY} -out "${file}.sig" $file
+	done
+	make_tar_of_images ubi MANIFEST publickey *.sig
 }
 do_generate_ubi_tar[dirs] = " ${S}/ubi"
 do_generate_ubi_tar[depends] += " \
         ${PN}:do_image_${@d.getVar('FLASH_UBI_BASETYPE', True).replace('-', '_')} \
         virtual/kernel:do_deploy \
         u-boot:do_populate_sysroot \
+        openssl-native:do_populate_sysroot \
+        ${SIGNING_KEY_DEPENDS} \
+        ${PN}:do_copy_signing_pubkey \
         "
+
+def get_pubkey_basedir(d):
+    return os.path.join(
+        d.getVar('STAGING_DIR_TARGET', True),
+        d.getVar('sysconfdir', True).strip(os.sep),
+        'activationdata')
+
+def get_pubkey_type(d):
+    return os.listdir(get_pubkey_basedir(d))[0]
+
+def get_pubkey_path(d):
+    return os.path.join(
+        get_pubkey_basedir(d),
+        get_pubkey_type(d),
+        'publickey')
 
 python do_generate_phosphor_manifest() {
     version = do_get_version(d)
     with open('MANIFEST', 'w') as fd:
         fd.write('purpose=xyz.openbmc_project.Software.Version.VersionPurpose.BMC\n')
         fd.write('version={}\n'.format(version.strip('"')))
+        fd.write('KeyType={}\n'.format(get_pubkey_type(d)))
+        fd.write('HashType=RSA-SHA256\n')
 }
 do_generate_phosphor_manifest[dirs] = "${S}"
 do_generate_phosphor_manifest[depends] += " \
         os-release:do_populate_sysroot \
+        phosphor-image-signing:do_populate_sysroot \
         "
 
+python do_copy_signing_pubkey() {
+    with open(get_pubkey_path(d), 'r') as read_fd:
+        with open('publickey', 'w') as write_fd:
+            write_fd.write(read_fd.read())
+}
+
+do_copy_signing_pubkey[dirs] = "${S}"
+do_copy_signing_pubkey[depends] += " \
+        phosphor-image-signing:do_populate_sysroot \
+        "
+
+addtask copy_signing_pubkey after do_rootfs
 addtask generate_phosphor_manifest after do_rootfs
 addtask generate_rwfs_static after do_rootfs
 addtask generate_rwfs_ubi after do_rootfs
