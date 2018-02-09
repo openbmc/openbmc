@@ -16,7 +16,6 @@ BBLAYERS ?= " \
   ##OEROOT##/import-layers/meta-virtualization \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
-  ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2500 \
   ##OEROOT##/meta-openbmc-machines/meta-x86 \
   ##OEROOT##/meta-openbmc-machines/meta-x86/meta-intel \
   ##OEROOT##/meta-openbmc-machines/meta-x86/meta-intel/meta-s2600wf \

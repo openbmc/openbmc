@@ -15,7 +15,6 @@ BBLAYERS ?= " \
   ##OEROOT##/import-layers/meta-virtualization \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
-  ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2500 \
   ##OEROOT##/meta-openbmc-machines/meta-evb \
   ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-aspeed \
   ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-aspeed/meta-evb-ast2500 \
@@ -30,7 +29,6 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/import-layers/meta-virtualization \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
-  ##OEROOT##/meta-openbmc-bsp/meta-aspeed/meta-ast2500 \
   ##OEROOT##/meta-openbmc-machines/meta-evb \
   ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-aspeed \
   ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-aspeed/meta-evb-ast2500 \
