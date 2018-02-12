@@ -1,0 +1,9 @@
+[Unit]
+Description=Control UART mux for obmc-console-client
+
+[Service]
+ExecStart=/usr/bin/env centriq-2400rep-console-client.sh
+SyslogIdentifier=centriq-2400rep-console-client.sh
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
