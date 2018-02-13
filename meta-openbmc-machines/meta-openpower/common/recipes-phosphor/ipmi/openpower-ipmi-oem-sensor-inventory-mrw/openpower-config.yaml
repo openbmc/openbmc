@@ -19,6 +19,7 @@ hb_volatile_sensor:
   path: /org/open_power/control/volatile
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.Object.Enable:
       Enabled:
