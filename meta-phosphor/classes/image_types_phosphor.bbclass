@@ -52,8 +52,8 @@ FLASH_ROFS_OFFSET ?= "4864"
 FLASH_RWFS_OFFSET ?= "28672"
 
 # UBI volume sizes in KB unless otherwise noted.
-FLASH_UBI_RWFS_SIZE ?= "4096"
-FLASH_UBI_RWFS_TXT_SIZE ?= "4MiB"
+FLASH_UBI_RWFS_SIZE ?= "6144"
+FLASH_UBI_RWFS_TXT_SIZE ?= "6MiB"
 
 python() {
     # Compute rwfs LEB count and LEB size.

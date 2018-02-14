@@ -21,7 +21,7 @@ index 14191e4ab0..aaa5155e00 100644
  #define CONFIG_ENV_SIZE			0x10000	/* Total Size of Environment Sector */
  #define CONFIG_ENV_SIZE_REDUND		0x10000
  
-+#define CONFIG_RWFS_SIZE		0x400000
++#define CONFIG_RWFS_SIZE		0x600000
 +
  #define CONFIG_BOOTCOMMAND		"run set_bootargs; run obmc_bootcmd"
  #define CONFIG_ENV_OVERWRITE

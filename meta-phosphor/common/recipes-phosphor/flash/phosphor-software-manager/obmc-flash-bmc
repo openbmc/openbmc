@@ -108,10 +108,14 @@ ubi_rw() {
   rw="${rwmtd#mtd}"
   ubidev="/dev/ubi${rw}"
 
-  # Create a ubi volume of size 4MB, that is the current size of the rwfs image
+  rwsize="$(fw_printenv -n rwfs_size)"
+  if [[ "${imgsize}" != "${rwsize}" ]]; then
+    fw_setenv rwfs_size "${imgsize}"
+  fi
+
   vol="$(findubi "${name}")"
   if [ -z "${vol}" ]; then
-    ubimkvol "${ubidev}" -N "${name}" -s 4MiB
+    ubimkvol "${ubidev}" -N "${name}" -s "${imgsize}"
   fi
 }
 
@@ -387,6 +391,7 @@ case "$1" in
   ubirw)
     reqmtd="$2"
     name="$3"
+    imgsize="$4"
     ubi_rw
     ;;
   ubiro)

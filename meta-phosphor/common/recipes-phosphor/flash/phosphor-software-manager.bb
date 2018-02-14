@@ -86,9 +86,11 @@ SYSTEMD_SERVICE_${PN}-updater += " \
 BMC_RW_MTD ??= "bmc"
 BMC_RO_MTD ??= "bmc"
 BMC_KERNEL_MTD ??= "bmc"
+BMC_RW_SIZE ??= "0x600000"
 SYSTEMD_SUBSTITUTIONS += "RW_MTD:${BMC_RW_MTD}:obmc-flash-bmc-ubirw.service"
 SYSTEMD_SUBSTITUTIONS += "RO_MTD:${BMC_RO_MTD}:obmc-flash-bmc-ubiro@.service"
 SYSTEMD_SUBSTITUTIONS += "KERNEL_MTD:${BMC_KERNEL_MTD}:obmc-flash-bmc-ubiro@.service"
+SYSTEMD_SUBSTITUTIONS += "RW_SIZE:${BMC_RW_SIZE}:obmc-flash-bmc-ubirw.service"
 
 SRC_URI += "file://obmc-flash-bmc"
 do_install_append() {
