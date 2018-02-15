@@ -10,7 +10,7 @@ inherit mrw-xml
 DEPENDS += " \
            mrw-native \
            mrw-perl-tools-native \
-           packagegroup-obmc-ipmi-sensors \
+           phosphor-ipmi-sensor-config-native \
            phosphor-ipmi-sensor-inventory-mrw-config-native \
            "
 
