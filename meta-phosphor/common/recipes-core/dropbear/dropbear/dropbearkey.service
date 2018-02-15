@@ -1,10 +1,17 @@
 [Unit]
 Description=SSH Key Generation
-ConditionPathExists=|!/etc/dropbear/dropbear_rsa_host_key
 
 [Service]
+# Set the default RSA key path then load environment variables from the
+# environment file, which might override the default RSA key path.
+Environment="DROPBEAR_RSAKEY_DIR=/etc/dropbear"
+EnvironmentFile=-/etc/default/dropbear
 Type=oneshot
-ExecStart=@SBINDIR@/dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
+ExecStart=@BASE_BINDIR@/sh -c \
+    "if [[ ! -f ${DROPBEAR_RSAKEY_DIR}/dropbear_rsa_host_key ]]; then \
+        @BASE_BINDIR@/mkdir -p ${DROPBEAR_RSAKEY_DIR}; \
+        @SBINDIR@/dropbearkey -t rsa -f ${DROPBEAR_RSAKEY_DIR}/dropbear_rsa_host_key; \
+     fi"
 RemainAfterExit=yes
 
 [Install]
