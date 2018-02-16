@@ -182,6 +182,16 @@ gpu_func_sensor:
             type: "bool"
             assert: true
             deassert: false
+# Field replacable doesn't come as a sensor data
+# but we know that GPU is Field replacable so setting
+# true in both cases.
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+      FieldReplaceable:
+        Offsets:
+          0x07:
+            type: "bool"
+            assert: true
+            deassert: true
 
 host_auto_reboot_control_sensor:
   path: /xyz/openbmc_project/control/host0/auto_reboot
