@@ -1,11 +1,7 @@
 SUMMARY = "U-Boot bootloader fw_printenv/setenv utilities"
-LICENSE = "GPLv2+"
-SECTION = "bootloader"
 DEPENDS = "mtd-utils"
 
-require u-boot.inc
-
-S = "${WORKDIR}/git"
+require u-boot-common.inc
 
 INSANE_SKIP_${PN} = "already-stripped"
 EXTRA_OEMAKE_class-target = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${CC} ${CFLAGS} ${LDFLAGS}" V=1'
