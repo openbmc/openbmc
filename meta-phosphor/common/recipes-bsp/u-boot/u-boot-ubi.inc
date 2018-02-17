@@ -1,8 +1,8 @@
 inherit image_version
 
-SRC_URI += "file://0001-configs-ast-Add-redundnant-env.patch"
+SRC_URI_append = " file://0001-configs-ast-Add-redundnant-env.patch"
 
-SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
+SRC_URI_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
     'file://0001-config-ast-common-hack-bootopts.patch \
      file://0004-config-ast-common-ubi-bootops.patch \
      file://0001-config-ast-common-Add-conditional-factory-reset-comm.patch', '', d)}"
