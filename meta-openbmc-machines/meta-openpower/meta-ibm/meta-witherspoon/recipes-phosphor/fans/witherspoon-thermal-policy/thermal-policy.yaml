@@ -140,6 +140,7 @@
   countbound: 3
   op: '>='
   bound: 115000
+  oneshot: true
 
 - name: log and shutdown
   description: >
@@ -148,7 +149,6 @@
   callback: group
   members:
     - shutdown
-    - log
     - create criticalhigh error
     - create shutdown error
 
@@ -167,28 +167,15 @@
     - value: replace
       type: string
 
-- name: log
-  description: >
-    'Log a shutdown event to the systemd journal.'
-  class: callback
-  callback: journal
-  paths: core sensors
-  properties: core temp
-  severity: ERR
-  message: The system is too hot.  Shutting down.
-
 - name: create criticalhigh error
   description: >
     'Create a CriticalHigh Error log.'
   class: callback
-  callback: elog
+  callback: elog_with_metadata
   paths: core sensors
   properties: core temp
   error: xyz::openbmc_project::Sensor::Threshold::Error::CriticalHigh
-  metadata:
-    - name: xyz::openbmc_project::Sensor::Threshold::CriticalHigh::SENSOR_TYPE
-      value: temperature
-      type: string
+  metadata: xyz::openbmc_project::Sensor::Threshold::CriticalHigh::SENSOR_DATA
 
 - name: create shutdown error
   description: >
