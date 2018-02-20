@@ -1,5 +1,6 @@
 fans:
   - inventory: /system/chassis/motherboard/fan0
+    functional_delay: 5
     allowed_out_of_range_time: 30
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
@@ -10,6 +11,7 @@ fans:
         has_target: false
 
   - inventory: /system/chassis/motherboard/fan1
+    functional_delay: 5
     allowed_out_of_range_time: 30
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
@@ -20,6 +22,7 @@ fans:
         has_target: false
 
   - inventory: /system/chassis/motherboard/fan2
+    functional_delay: 5
     allowed_out_of_range_time: 30
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
@@ -30,6 +33,7 @@ fans:
         has_target: false
 
   - inventory: /system/chassis/motherboard/fan3
+    functional_delay: 5
     allowed_out_of_range_time: 30
     deviation: 15
     num_sensors_nonfunc_for_fan_nonfunc: 1
@@ -41,8 +45,19 @@ fans:
 
 sensor_trust_groups:
   - class: NonzeroSpeed
-    sensors:
+    group:
+        # Include all _1 fans to determine trust
       - name: fan0_1
       - name: fan1_1
       - name: fan2_1
       - name: fan3_1
+        # Add all _0 fans to be included in trust result effects,
+        # but not in determining trust
+      - name: fan0_0
+        in_trust: false
+      - name: fan1_0
+        in_trust: false
+      - name: fan2_0
+        in_trust: false
+      - name: fan3_0
+        in_trust: false
