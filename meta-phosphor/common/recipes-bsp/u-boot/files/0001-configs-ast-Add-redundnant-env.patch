@@ -1,7 +1,7 @@
-From ba7cf47befb92e2565bf6169ccc5b766647de222 Mon Sep 17 00:00:00 2001
+From 8ef2f4dcd208e072ab491874c06722c3a8ec69e3 Mon Sep 17 00:00:00 2001
 From: "Edward A. James" <eajames@us.ibm.com>
 Date: Thu, 13 Jul 2017 13:42:18 -0500
-Subject: [PATCH u-boot] configs/ast: Add redundnant env
+Subject: [PATCH 1/4] configs/ast: Add redundnant env
 
 Configure ast chips to run redundant u-boot environments.
 
@@ -11,10 +11,10 @@ Signed-off-by: Edward A. James <eajames@us.ibm.com>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
-index 110c780..15e1db4 100644
+index eff6d2b529..a0243083bd 100644
 --- a/include/configs/ast-common.h
 +++ b/include/configs/ast-common.h
-@@ -92,9 +92,12 @@
+@@ -104,9 +104,12 @@
  #define CONFIG_SYS_MAX_FLASH_SECT	(8192)		/* max number of sectors on one chip */
  #define CONFIG_ENV_IS_IN_FLASH		1
  #define CONFIG_ENV_ADDR			(AST_FMC_CS0_BASE + 0x60000)
@@ -26,8 +26,8 @@ index 110c780..15e1db4 100644
 +#define CONFIG_ENV_SIZE			0x10000	/* Total Size of Environment Sector */
 +#define CONFIG_ENV_SIZE_REDUND		0x10000
  
- #define CONFIG_BOOTCOMMAND	\
- 	"fdt addr 20080000; " \
+ #define CONFIG_BOOTCOMMAND		"bootm 20080000"
+ #define CONFIG_ENV_OVERWRITE
 -- 
-1.8.3.1
+2.14.3
 

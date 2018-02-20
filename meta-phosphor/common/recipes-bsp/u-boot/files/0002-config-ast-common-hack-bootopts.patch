@@ -1,0 +1,28 @@
+From c678bbdad037604850613e775baacc52ed92c9c1 Mon Sep 17 00:00:00 2001
+From: Patrick Williams <patrick@stwcx.xyz>
+Date: Fri, 21 Jul 2017 16:30:01 -0500
+Subject: [PATCH 2/4] config/ast-common: hack bootopts
+
+Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
+---
+ include/configs/ast-common.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
+index a0243083bd..7ddba62298 100644
+--- a/include/configs/ast-common.h
++++ b/include/configs/ast-common.h
+@@ -96,7 +96,10 @@
+ #define CONFIG_CMD_MTDPARTS
+ #endif
+ 
++#if 0
+ #define CONFIG_BOOTARGS			"console=ttyS4,115200n8 root=/dev/ram rw"
++#endif
++#define CONFIG_BOOTARGS                         "console=ttyS4,115200n8 root=/dev/mtdblock4 ro"
+ 
+ #define CONFIG_AST_SPI_NOR    /* AST SPI NOR Flash */
+ #define CONFIG_FMC_CS			1
+-- 
+2.14.3
+

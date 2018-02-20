@@ -1,7 +1,7 @@
-From 90cdc1aa6079d0f2d5894807cbfee4e8125e2b5b Mon Sep 17 00:00:00 2001
+From 878651bbaa8a7da203fafccb164ca7b32287b8f9 Mon Sep 17 00:00:00 2001
 From: "Edward A. James" <eajames@us.ibm.com>
 Date: Thu, 9 Nov 2017 11:39:10 -0600
-Subject: [PATCH] config/ast-common: Add conditional factory reset command
+Subject: [PATCH 4/4] config/ast-common: Add conditional factory reset command
 
 Factory reset (removing persistant rwfs) has to occur before we've
 mounted the rwfs. However, the variable to determine whether or not to
@@ -14,7 +14,7 @@ Signed-off-by: Edward A. James <eajames@us.ibm.com>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
-index 8150265..41d196a 100644
+index 14191e4ab0..aaa5155e00 100644
 --- a/include/configs/ast-common.h
 +++ b/include/configs/ast-common.h
 @@ -121,6 +121,8 @@
@@ -23,10 +23,10 @@ index 8150265..41d196a 100644
  
 +#define CONFIG_RWFS_SIZE		0x400000
 +
- #if 0
- #define CONFIG_BOOTCOMMAND	\
- 	"fdt addr 20080000; " \
-@@ -137,11 +139,13 @@
+ #define CONFIG_BOOTCOMMAND		"run set_bootargs; run obmc_bootcmd"
+ #define CONFIG_ENV_OVERWRITE
+ 
+@@ -130,11 +132,13 @@
  	"kernelname=kernel-0 \0" \
  	"loadaddr=" __stringify(CONFIG_LOADADDR) "\0" \
  	"set_bootargs=setenv bootargs " CONFIG_BOOTARGS " ubi.block=\${ubiblock} root=\${root} \0" \
@@ -42,5 +42,5 @@ index 8150265..41d196a 100644
  
  #endif	/* __AST_COMMON_CONFIG_H */
 -- 
-1.8.3.1
+2.14.3
 
