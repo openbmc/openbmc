@@ -11,7 +11,7 @@ RDEPENDS_class-native = ""
 
 MAJ_VER = "${@d.getVar('PV',1).split('.')[0]}.${@d.getVar('PV',1).split('.')[1]}"
 
-SRC_URI = "${GNOME_MIRROR}/pygobject/${MAJ_VER}/pygobject-${PV}.tar.bz2 \
+SRC_URI = "${GNOME_MIRROR}/pygobject/${MAJ_VER}/pygobject-${PV}.tar.xz \
            file://obsolete_automake_macros.patch \
 "
 
@@ -28,8 +28,8 @@ SRC_URI = "${GNOME_MIRROR}/pygobject/${MAJ_VER}/pygobject-${PV}.tar.bz2 \
 # defining the whole function. Give up and disable parallel make in native builds.
 PARALLEL_MAKEINST_class-native = ""
 
-SRC_URI[md5sum] = "aa64900b274c4661a5c32e52922977f9"
-SRC_URI[sha256sum] = "7da88c169a56efccc516cebd9237da3fe518a343095a664607b368fe21df95b6"
+SRC_URI[md5sum] = "ae48b60c690c4aa894e69e0c97802745"
+SRC_URI[sha256sum] = "bb9d25a3442ca7511385a7c01b057492095c263784ef31231ffe589d83a96a5a"
 S = "${WORKDIR}/pygobject-${PV}"
 
 EXTRA_OECONF += "--disable-introspection"
