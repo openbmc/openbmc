@@ -3,7 +3,8 @@ FILES_${PN}-catalog-extralocales = \
 PACKAGES =+ "${PN}-catalog-extralocales"
 PACKAGECONFIG_append = " networkd coredump"
 PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight localed \
-                        quotacheck kdbus ima smack polkit logind bootchart utmp"
+                        quotacheck kdbus ima smack polkit logind bootchart utmp \
+                        manpages"
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
 SRC_URI += "file://service-restart-policy.conf"
