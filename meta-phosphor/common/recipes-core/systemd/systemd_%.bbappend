@@ -1,7 +1,7 @@
 FILES_${PN}-catalog-extralocales = \
             "${exec_prefix}/lib/systemd/catalog/*.*.catalog"
 PACKAGES =+ "${PN}-catalog-extralocales"
-PACKAGECONFIG_append = " networkd coredump"
+PACKAGECONFIG_append = " networkd coredump journald-dbus"
 PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight localed \
                         quotacheck kdbus ima smack polkit logind bootchart utmp \
                         manpages"
@@ -16,6 +16,11 @@ SRC_URI += "file://0004-basic-Use-path-escaping-when-mangling-path-instances.pat
 #https://github.com/openbmc/openbmc/issues/2016
 SRC_URI += "file://0005-dont-return-error-if-unable-to-create-network-namespace.patch"
 SRC_URI += "file://0006-journal-Create-journald-dbus-object.patch"
+
+# Extra configuration for journald-dbus patch
+PACKAGECONFIG[journald-dbus] = "--enable-journald-dbus,--disable-journald-dbus"
+FILES_${PN} += "${datadir}/dbus-1/system.d/org.freedesktop.journal1.conf"
+
 SRC_URI += "file://0007-journal-Add-Synchronize-dbus-method.patch"
 SRC_URI += "${@mf_enabled(d, 'obmc-ubi-fs', 'file://software.conf')}"
 SRC_URI += "file://0008-man-update-machine-id-5-with-a-note-about-privacy-46.patch"
