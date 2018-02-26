@@ -10,7 +10,7 @@ be removed when all supported distros comes with GCC>=4.9.
 
 [YOCTO #10338]
 
-Upstream-status: Inappropriate [configuration]
+Upstream-Status: Inappropriate [configuration]
 
 [1] http://errors.yoctoproject.org/Errors/Details/109589/
 

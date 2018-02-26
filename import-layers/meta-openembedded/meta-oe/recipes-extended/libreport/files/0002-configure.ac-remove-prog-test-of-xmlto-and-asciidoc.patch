@@ -1,0 +1,48 @@
+From d8c49e6a15ab28f4ca94e03b2a53ed8df63346cd Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 26 Apr 2017 03:49:45 -0400
+Subject: [PATCH 2/3] configure.ac: remove prog test of xmlto and asciidoc
+
+The prog of xmlto and asciidoc were used to generate documents,
+and since the doc module has already been disabled, so we should
+remove the prog test.
+
+Upstream-Status:  Inappropriate workaround
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 18 ------------------
+ 1 file changed, 18 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index ccefe50..ed48c88 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -68,24 +68,6 @@ if test -z "$PYTHON3"; then
+     exit 1
+ fi
+ 
+-AC_PATH_PROG([ASCIIDOC], [asciidoc], [no])
+-[if test "$ASCIIDOC" = "no"]
+-[then]
+-    [echo "The asciidoc program was not found in the search path. Please ensure"]
+-    [echo "that it is installed and its directory is included in the search path."]
+-    [echo "Then run configure again before attempting to build libreport."]
+-    [exit 1]
+-[fi]
+-
+-AC_PATH_PROG([XMLTO], [xmlto], [no])
+-[if test "$XMLTO" = "no"]
+-[then]
+-    [echo "The xmlto program was not found in the search path. Please ensure"]
+-    [echo "that it is installed and its directory is included in the search path."]
+-    [echo "Then run configure again before attempting to build libreport."]
+-    [exit 1]
+-[fi]
+-
+ AC_ARG_WITH(bugzilla,
+ AS_HELP_STRING([--with-bugzilla],[use Bugzilla plugin (default is YES)]),
+ LIBREPORT_PARSE_WITH([bugzilla]))
+-- 
+2.8.1
+

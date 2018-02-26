@@ -31,7 +31,7 @@ PACKAGECONFIG[gd] = ",--without-gdlib,gd"
 PACKAGECONFIG[serial] = "--enable-serial,--disable-serial,lockdev"
 
 do_configure_append() {
-    cp ${STAGING_DATADIR}/gettext/po/Makefile.in.in ${S}/libgphoto2_port/po/
+    cp ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/libgphoto2_port/po/
     cd ${S}/libgphoto2_port/
     autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF} $acpaths
     cd ${S}

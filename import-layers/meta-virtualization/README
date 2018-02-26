@@ -4,6 +4,28 @@ meta-virtualization
 This layer provides support for building Xen, KVM, Libvirt, and associated
 packages necessary for constructing OE-based virtualized solutions.
 
+The bbappend files for some recipe (e.g. linux-yocto) in this layer needs to
+have 'virtualization' in DISTRO_FEATURES to have effect. To enable them, add
+in configuration file the following line.
+
+  DISTRO_FEATURES_append = " virtualization"
+
+If meta-virtualization is included, but virtualization is not enabled as a
+distro feature a warning is printed at parse time:
+
+    You have included the meta-virtualization layer, but
+    'virtualization' has not been enabled in your DISTRO_FEATURES. Some bbappend files
+    may not take effect. See the meta-virtualization README for details on enabling
+    virtualization support.
+
+If you know what you are doing, this warning can be disabled by setting the following
+variable in your configuration:
+
+  SKIP_META_VIRT_SANITY_CHECK = 1
+
+Also note that there are kvm and xen specific distro flags/features that depending
+on your use case.
+
 Dependencies
 ------------
 This layer depends on:

@@ -1,0 +1,27 @@
+From 29dbf92ffdbdda29662b4190a2f8eb09caad8b51 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 17 Jun 2017 00:06:32 -0700
+Subject: [PATCH 5/5] command: Move the fall through comment to right scope
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/helper/command.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/helper/command.c b/src/helper/command.c
+index 5deaee859..287c14857 100644
+--- a/src/helper/command.c
++++ b/src/helper/command.c
+@@ -1456,8 +1456,8 @@ COMMAND_HELPER(handle_command_parse_bool, bool *out, const char *label)
+ 				LOG_ERROR("%s: argument '%s' is not valid", CMD_NAME, in);
+ 				return ERROR_COMMAND_SYNTAX_ERROR;
+ 			}
+-			/* fall through */
+ 		}
++		/* fall through */
+ 		case 0:
+ 			LOG_INFO("%s is %s", label, *out ? "enabled" : "disabled");
+ 			break;
+-- 
+2.13.1
+

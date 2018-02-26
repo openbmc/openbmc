@@ -3,8 +3,8 @@ HOMEPAGE = "http://python-requests.org"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://MANIFEST.in;md5=ce22c0cd986d2de3f7073cd6b5523ae0"
 
-SRC_URI[md5sum] = "b3a958c0e9aaf4d3f8dd933f46f8c1a9"
-SRC_URI[sha256sum] = "580987ef194334c50389e0d7de885fccf15605c13c6eecaabd8d6c43768eb8ac"
+SRC_URI[md5sum] = "59a2f0a5b3b60e6c520a9cc7be9aff87"
+SRC_URI[sha256sum] = "7bfd8c5cfcbc241a93ca6a4e45f952650f5c7ecf7c49b1dbcf5f4d390240be0b"
 
 PYPI_PACKAGE = "ndg_httpsclient"
 

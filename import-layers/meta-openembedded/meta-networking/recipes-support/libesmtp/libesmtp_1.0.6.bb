@@ -9,7 +9,9 @@ SECTION = "libs"
 DEPENDS = "openssl"
 
 SRC_URI = "http://www.stafford.uklinux.net/libesmtp/libesmtp-${PV}.tar.bz2 \
-           file://include-topdir.patch"
+           file://include-topdir.patch \
+           file://snprintf.patch \
+          "
 SRC_URI[md5sum] = "bf3915e627fd8f35524a8fdfeed979c8"
 SRC_URI[sha256sum] = "d0a61a5c52d99fa7ce7d00ed0a07e341dbda67101dbed1ab0cdae3f37db4eb0b"
 

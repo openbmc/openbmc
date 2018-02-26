@@ -1,0 +1,34 @@
+The compiled .pyc files contain time stamp corresponding to the compile time.
+This prevents binary reproducibility. This patch allows to achieve binary
+reproducibility by overriding the build time stamp by the value 
+exported via SOURCE_DATE_EPOCH. 
+
+Patch by Bernhard M. Wiedemann
+
+Upstream-Status: Backport
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+Fri Feb 24 17:08:25 UTC 2017 - bwiedemann@suse.com
+
+- Add reproducible.patch to allow reproducible builds of various
+  python packages like python-amqp
+  Upstream: https://github.com/python/cpython/pull/296
+
+
+@@ -0,0 +1,15 @@
+Index: Python-2.7.13/Lib/py_compile.py
+===================================================================
+--- Python-2.7.13.orig/Lib/py_compile.py
++++ Python-2.7.13/Lib/py_compile.py
+@@ -108,6 +108,10 @@ def compile(file, cfile=None, dfile=None
+             timestamp = long(os.fstat(f.fileno()).st_mtime)
+         except AttributeError:
+             timestamp = long(os.stat(file).st_mtime)
++        sde = os.environ.get('SOURCE_DATE_EPOCH')
++        if sde and timestamp > int(sde):
++            timestamp = int(sde)
++            os.utime(file, (timestamp, timestamp))
+         codestring = f.read()
+     try:
+         codeobject = __builtin__.compile(codestring, dfile or file,'exec')

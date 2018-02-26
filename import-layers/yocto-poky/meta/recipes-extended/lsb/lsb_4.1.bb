@@ -22,6 +22,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/lsb/lsb_release/1.4/lsb-release-1.4.tar
            file://lsb_pidofproc \
            file://lsb_start_daemon \
            "
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 SRC_URI[md5sum] = "30537ef5a01e0ca94b7b8eb6a36bb1e4"
 SRC_URI[sha256sum] = "99321288f8d62e7a1d485b7c6bdccf06766fb8ca603c6195806e4457fdf17172"
@@ -90,11 +91,13 @@ do_install_append() {
        install -m 0755 ${WORKDIR}/init-functions ${D}${nonarch_base_libdir}/lsb
 
        # create links for LSB test
-       if [ "${nonarch_base_libdir}" != "${nonarch_libdir}" ] ; then
-               install -d ${D}${nonarch_libdir}/lsb
+       if [ -e ${sbindir}/chkconfig ]; then
+               if [ "${nonarch_base_libdir}" != "${nonarch_libdir}" ] ; then
+                       install -d ${D}${nonarch_libdir}/lsb
+               fi
+               ln -sf ${sbindir}/chkconfig ${D}${nonarch_libdir}/lsb/install_initd
+               ln -sf ${sbindir}/chkconfig ${D}${nonarch_libdir}/lsb/remove_initd
        fi
-       ln -sf ${sbindir}/chkconfig ${D}${nonarch_libdir}/lsb/install_initd
-       ln -sf ${sbindir}/chkconfig ${D}${nonarch_libdir}/lsb/remove_initd
 
        if [ "${TARGET_ARCH}" = "x86_64" ]; then
                if [ "${base_libdir}" != "${base_prefix}/lib64" ]; then

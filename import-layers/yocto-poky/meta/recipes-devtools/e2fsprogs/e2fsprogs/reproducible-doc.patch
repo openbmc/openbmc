@@ -1,0 +1,21 @@
+
+Suppport for binary reproducibility.
+When compressing, do not save the original file name and time stamp.
+
+Upstream-Status: Submitted [Theodore Ts'o tytso@mit.edu (maintainer)]
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+diff --git a/doc/Makefile.in b/doc/Makefile.in
+index 9cb584c..0bee4e4 100644
+--- a/doc/Makefile.in
++++ b/doc/Makefile.in
+@@ -28,7 +28,7 @@ install-doc-libs: libext2fs.info libext2fs.dvi
+ 		$(INSTALL_DATA) $$i $(DESTDIR)$(infodir)/$$i ; \
+ 	done
+ 	$(E) "	GZIP $(infodir)/libext2fs.info*"
+-	-$(Q) gzip -9 $(DESTDIR)$(infodir)/libext2fs.info*
++	-$(Q) gzip -9 -n $(DESTDIR)$(infodir)/libext2fs.info*
+ 
+ uninstall-doc-libs:
+ 	$(RM) -rf $(DESTDIR)$(infodir)/libext2fs.info*

@@ -1,0 +1,18 @@
+From 032fc6b1f7691bd537fd2a6bd13821fcf3c45e64 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Mon, 11 Sep 2017 02:21:55 -0400
+Subject: [PATCH] ovmf: enable long path file
+
+Upstream-Status: Pending
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ BaseTools/Source/C/Common/CommonLib.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/BaseTools/Source/C/Common/CommonLib.h b/BaseTools/Source/C/Common/CommonLib.h
+index 2041b89e2d..8116aa2e35 100644
+--- a/BaseTools/Source/C/Common/CommonLib.h
++++ b/BaseTools/Source/C/Common/CommonLib.h
+@@ -22 +22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-#define MAX_LONG_FILE_PATH 500
++#define MAX_LONG_FILE_PATH 1023

@@ -1,0 +1,76 @@
+From e6e747b883114bfad51ad93f823e65f5a4d6438a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 1 Jun 2017 15:12:29 +0800
+Subject: [PATCH 2/4] pykickstart/parser.py: add lock for readKickstart and
+ support https without certification
+
+- Add lock for readKickstart to fix race issue
+
+- Support to download kickstart file through https without certification
+
+Upstream-Status: Inappropriate[oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pykickstart/load.py   |  2 +-
+ pykickstart/parser.py | 24 ++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/pykickstart/load.py b/pykickstart/load.py
+index 0f5741b..48c8276 100644
+--- a/pykickstart/load.py
++++ b/pykickstart/load.py
+@@ -30,7 +30,7 @@ from requests.exceptions import SSLError, RequestException
+ 
+ _is_url = lambda location: '://' in location # RFC 3986
+ 
+-SSL_VERIFY = True
++SSL_VERIFY = False
+ 
+ def load_to_str(location, user=None, passwd=None):
+     '''Load a destination URL or file into a string.
+diff --git a/pykickstart/parser.py b/pykickstart/parser.py
+index 26b5de9..264ba05 100644
+--- a/pykickstart/parser.py
++++ b/pykickstart/parser.py
+@@ -57,6 +57,26 @@ STATE_COMMANDS = "commands"
+ 
+ ver = version.DEVEL
+ 
++import logging
++log = logging.getLogger("anaconda")
++
++import inspect
++import threading
++_private_ks_lock = threading.RLock()
++
++class KsLock(object):
++    def __enter__(self):
++        log.info("%s %s" % (self.__class__.__name__, inspect.stack()[0][3]))
++        _private_ks_lock.acquire()
++        return _private_ks_lock
++
++    def __exit__(self, exc_type, exc_val, exc_tb):
++        log.info("%s %s" % (self.__class__.__name__, inspect.stack()[0][3]))
++        _private_ks_lock.release()
++
++
++_ks_lock = KsLock()
++
+ def _preprocessStateMachine (lineIter):
+     l = None
+     lineno = 0
+@@ -774,6 +794,10 @@ class KickstartParser(object):
+         self._stateMachine (i)
+ 
+     def readKickstart(self, f, reset=True, username=None, password=None):
++        with _ks_lock:
++            self._readKickstart(f, reset=reset, username=username, password=password)
++
++    def _readKickstart(self, f, reset=True, username=None, password=None):
+         """Process a kickstart file, given by the filename f."""
+         if reset:
+             self._reset()
+-- 
+2.7.4
+

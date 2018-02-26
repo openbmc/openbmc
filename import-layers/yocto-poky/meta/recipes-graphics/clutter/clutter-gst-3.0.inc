@@ -15,3 +15,7 @@ PACKAGES  =+ "${PN}-examples"
 FILES_${PN}          += "${libdir}/gstreamer-1.0/lib*.so"
 FILES_${PN}-dev      += "${libdir}/gstreamer-1.0/*.la"
 FILES_${PN}-examples  = "${bindir}/video-player ${bindir}/video-sink"
+
+# Needs to be disable due to a dependency on gstreamer-plugins introspection files
+EXTRA_OECONF_append_mips64 = " --disable-introspection "
+

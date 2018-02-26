@@ -1,0 +1,82 @@
+From d2a03b3e43043b596a79803bcb93f70e513bbb50 Mon Sep 17 00:00:00 2001
+From: Patrick Georgi <pgeorgi@google.com>
+Date: Mon, 13 Mar 2017 13:48:03 +0100
+Subject: [PATCH] Remove undefined behavior
+
+Per clang-3.9, the compiler fails on #define ...defined(...) statements
+as they're undefined behavior (apparently with different behavior
+between gcc/clang and msvc, too).
+
+See clang's cfe repo commit r258128 for details.
+
+Change-Id: I82b6235e11b425fae45eebbe06b08f81c5bdbb98
+Signed-off-by: Patrick Georgi <pgeorgi@google.com>
+Reviewed-on: https://review.coreboot.org/18792
+Reviewed-by: Stefan Reinauer <stefan.reinauer@coreboot.org>
+Tested-by: build bot (Jenkins) <no-reply@coreboot.org>
+---
+ hwaccess.c | 18 +++++++++++++++---
+ platform.h | 18 +++++++++++++++---
+ 2 files changed, 30 insertions(+), 6 deletions(-)
+
+diff --git a/hwaccess.c b/hwaccess.c
+index aede7e3..2bf6f42 100644
+--- a/hwaccess.c
++++ b/hwaccess.c
+@@ -37,9 +37,21 @@
+ #error "Unknown operating system"
+ #endif
+ 
+-#define USE_IOPL	(IS_LINUX || IS_MACOSX || defined(__NetBSD__) || defined(__OpenBSD__))
+-#define USE_DEV_IO	(defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__))
+-#define USE_IOPERM	(defined(__gnu_hurd__))
++#if IS_LINUX || IS_MACOSX || defined(__NetBSD__) || defined(__OpenBSD__)
++#define USE_IOPL 1
++#else
++#define USE_IOPL 0
++#endif
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__)
++#define USE_DEV_IO 1
++#else
++#define USE_DEV_IO 0
++#endif
++#if defined(__gnu_hurd__)
++#define USE_IOPERM 1
++#else
++#define USE_IOPERM 0
++#endif
+ 
+ #if USE_IOPERM
+ #include <sys/io.h>
+diff --git a/platform.h b/platform.h
+index c5a52ef..b2fdcd0 100644
+--- a/platform.h
++++ b/platform.h
+@@ -25,9 +25,21 @@
+ #define __PLATFORM_H__ 1
+ 
+ // Helper defines for operating systems
+-#define IS_LINUX	(defined(__gnu_linux__) || defined(__linux__))
+-#define IS_MACOSX	(defined(__APPLE__) && defined(__MACH__)) /* yes, both. */
+-#define IS_WINDOWS	(defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__WINDOWS__))
++#if defined(__gnu_linux__) || defined(__linux__)
++#define IS_LINUX 1
++#else
++#define IS_LINUX 0
++#endif
++#if defined(__APPLE__) && defined(__MACH__) /* yes, both. */
++#define IS_MACOSX 1
++#else
++#define IS_MACOSX 0
++#endif
++#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__WINDOWS__)
++#define IS_WINDOWS 1
++#else
++#define IS_WINDOWS 0
++#endif
+ 
+ // Likewise for target architectures
+ #if defined (__i386__) || defined (__x86_64__) || defined(__amd64__)
+-- 
+2.13.3
+

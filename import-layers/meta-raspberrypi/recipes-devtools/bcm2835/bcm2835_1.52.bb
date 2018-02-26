@@ -8,7 +8,7 @@ AUTHOR = "Mike McCauley (mikem@open.com.au)"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-COMPATIBLE_MACHINE = "raspberrypi"
+COMPATIBLE_MACHINE = "^rpi$"
 
 SRC_URI = "http://www.airspayce.com/mikem/bcm2835/bcm2835-${PV}.tar.gz"
 

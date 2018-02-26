@@ -25,8 +25,18 @@ COREDEF="00_core"
 [ "${VERBOSE}" != "no" ] && echo "Populating volatile Filesystems."
 
 create_file() {
+	EXEC=""
+	[ -z "$2" ] && {
+		EXEC="
+		touch \"$1\";
+		"
+	} || {
+		EXEC="
+		cp \"$2\" \"$1\";
+		"
+	}
 	EXEC="
-	touch \"$1\";
+	${EXEC}
 	chown ${TUSER}.${TGROUP} $1 || echo \"Failed to set owner -${TUSER}- for -$1-.\" >/dev/tty0 2>&1;
 	chmod ${TMODE} $1 || echo \"Failed to set mode -${TMODE}- for -$1-.\" >/dev/tty0 2>&1 "
 
@@ -187,7 +197,9 @@ apply_cfgfile() {
 
 		case "${TTYPE}" in
 			"f")  [ "${VERBOSE}" != "no" ] && echo "Creating file -${TNAME}-."
-				create_file "${TNAME}"
+				TSOURCE="$TLTARGET"
+				[ "${TSOURCE}" = "none" ] && TSOURCE=""
+				create_file "${TNAME}" "${TSOURCE}" &
 				;;
 			"d")  [ "${VERBOSE}" != "no" ] && echo "Creating directory -${TNAME}-."
 				mk_dir "${TNAME}"

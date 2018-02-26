@@ -84,6 +84,10 @@ boot_live_root() {
     # device node creation events were handled, to avoid unexpected behavior
     killall -9 "${_UDEV_DAEMON##*/}" 2>/dev/null
 
+    # Don't run systemd-update-done on systemd-based live systems
+    # because it triggers a slow rebuild of ldconfig caches.
+    touch ${ROOT_MOUNT}/etc/.updated ${ROOT_MOUNT}/var/.updated
+
     # Allow for identification of the real root even after boot
     mkdir -p  ${ROOT_MOUNT}/media/realroot
     mount -n --move "/run/media/${ROOT_DISK}" ${ROOT_MOUNT}/media/realroot

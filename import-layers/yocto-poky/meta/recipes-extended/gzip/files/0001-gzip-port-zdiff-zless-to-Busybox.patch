@@ -1,0 +1,59 @@
+From 5f712621829ed81a758077431226a86df37fbc3b Mon Sep 17 00:00:00 2001
+From: Denys Zagorui <denys.zagorui@globallogic.com>
+Date: Thu, 8 Jun 2017 16:05:50 +0300
+Subject: [PATCH] gzip: port zdiff, zless to Busybox
+
+Problem reported by Denys Zagorui (Bug#26088).
+* tests/zdiff: Check that diff uses POSIX-format output.
+* zless.in (less_version): Don't exit merely because 'less -V'
+fails; instead, assume 'less' is compatible with an old version of
+the original 'less'.  Busybox 'less -V' fails, but apparently its
+'less' works anyway somehow.
+
+Signed-off-by: Denys Zagorui <denys.zagorui@globallogic.com>
+
+Upstream-Status: Accepted
+---
+ tests/zdiff | 4 +++-
+ zless.in    | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tests/zdiff b/tests/zdiff
+index 0bb7c7d..9cd4fd4 100755
+--- a/tests/zdiff
++++ b/tests/zdiff
+@@ -22,7 +22,6 @@
+ 
+ echo a > a || framework_failure_
+ echo b > b || framework_failure_
+-gzip a b || framework_failure_
+ 
+ cat <<EOF > exp
+ 1c1
+@@ -31,7 +30,10 @@ cat <<EOF > exp
+ > b
+ EOF
+ 
++diff a b | diff exp - || skip_ "diff output format is incompatible with POSIX"
++
+ fail=0
++gzip a b || fail=1
+ zdiff a.gz b.gz > out 2>&1
+ test $? = 1 || fail=1
+ 
+diff --git a/zless.in b/zless.in
+index e634af6..9759ae6 100644
+--- a/zless.in
++++ b/zless.in
+@@ -47,7 +47,7 @@ if test "${LESSMETACHARS+set}" != set; then
+   export LESSMETACHARS
+ fi
+ 
+-less_version=`less -V` || exit
++less_version=`less -V 2>/dev/null`
+ case $less_version in
+ less' '45[1-9]* | \
+ less' '4[6-9][0-9]* | \
+-- 
+1.9.1
+

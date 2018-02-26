@@ -216,3 +216,10 @@ def logger_create(name, output=sys.stderr, level=logging.INFO, preserve_handlers
         logger.handlers = [console]
     logger.setLevel(level)
     return logger
+
+def has_console_handler(logger):
+    for handler in logger.handlers:
+        if isinstance(handler, logging.StreamHandler):
+            if handler.stream in [sys.stderr, sys.stdout]:
+                return True
+    return False

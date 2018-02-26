@@ -23,7 +23,7 @@ class OETestCase(unittest.TestCase):
 
     # td_vars has the variables needed by a test class
     # or test case instance, if some var isn't into td a
-    # OEMissingVariable exception is raised
+    # OEQAMissingVariable exception is raised
     td_vars = None
 
     @classmethod

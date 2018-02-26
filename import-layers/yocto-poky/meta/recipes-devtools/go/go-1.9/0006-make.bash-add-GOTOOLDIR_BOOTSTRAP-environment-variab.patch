@@ -1,0 +1,36 @@
+From aae74d1045ca03306ba4159206ee3bac72bcdfbb Mon Sep 17 00:00:00 2001
+From: Matt Madison <matt@madison.systems>
+Date: Wed, 13 Sep 2017 08:23:23 -0700
+Subject: [PATCH 6/7] make.bash: add GOTOOLDIR_BOOTSTRAP environment variable
+
+For cross-canadian builds, we need to use the native
+GOTOOLDIR during the bootstrap phase, so provide a way
+to pass that setting into the build script.
+
+Upstream-Status: Pending
+
+Signed-off-by: Matt Madison <matt@madison.systems>
+---
+ src/make.bash | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/make.bash b/src/make.bash
+index 9553623..2e6fb05 100755
+--- a/src/make.bash
++++ b/src/make.bash
+@@ -172,10 +172,11 @@ if [ "$do_host_build" = "yes" ]; then
+ 	mv cmd/dist/dist "$GOTOOLDIR"/dist
+ 	echo
+ 
++	GOTOOLDIR_BOOTSTRAP="${GOTOOLDIR_BOOTSTRAP:-$GOTOOLDIR}"
+ 	echo "##### Building packages and commands for host, $GOHOSTOS/$GOHOSTARCH."
+ 	# CC_FOR_TARGET is recorded as the default compiler for the go tool. When building for the host, however,
+ 	# use the host compiler, CC, from `cmd/dist/dist env` instead.
+-	CC=$CC GOOS=$GOHOSTOS GOARCH=$GOHOSTARCH \
++	CC=$CC GOOS=$GOHOSTOS GOARCH=$GOHOSTARCH GOTOOLDIR="$GOTOOLDIR_BOOTSTRAP" \
+ 		"$GOTOOLDIR"/go_bootstrap install -gcflags "$GO_GCFLAGS" -ldflags "$GO_LDFLAGS" -v std cmd
+ 	echo
+ fi
+-- 
+2.7.4
+

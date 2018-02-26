@@ -1,0 +1,50 @@
+From 4b423cd2e5e4296abca3be553bf64d8cc287180a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 20 Jul 2017 17:09:05 +0800
+Subject: [PATCH 1/4] tigervnc: remove includedir
+
+Upstream-Status: Pending
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+
+It fixes host contamination
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ unix/xserver/hw/vnc/Makefile.am | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/unix/xserver/hw/vnc/Makefile.am b/unix/xserver/hw/vnc/Makefile.am
+index 0d6a4ac..854f078 100644
+--- a/unix/xserver/hw/vnc/Makefile.am
++++ b/unix/xserver/hw/vnc/Makefile.am
+@@ -22,7 +22,7 @@ libvnccommon_la_SOURCES = $(HDRS) \
+ 
+ libvnccommon_la_CPPFLAGS = -DVENDOR_RELEASE="$(VENDOR_RELEASE)" \
+ 	-DVENDOR_STRING="\"$(VENDOR_STRING)\"" -I$(TIGERVNC_SRCDIR)/common -UHAVE_CONFIG_H \
+-	-I$(TIGERVNC_SRCDIR)/unix/vncconfig $(XVNC_CPPFLAGS) ${XSERVERLIBS_CFLAGS} -I$(includedir) \
++	-I$(TIGERVNC_SRCDIR)/unix/vncconfig $(XVNC_CPPFLAGS) ${XSERVERLIBS_CFLAGS} \
+ 	-I$(top_srcdir)/include
+ 
+ bin_PROGRAMS = Xvnc
+@@ -42,7 +42,7 @@ Xvnc_CPPFLAGS = $(XVNC_CPPFLAGS) -DTIGERVNC -DNO_MODULE_EXTS \
+ 	-UHAVE_CONFIG_H \
+ 	-DXFree86Server -DVENDOR_RELEASE="$(VENDOR_RELEASE)" \
+ 	-DVENDOR_STRING="\"$(VENDOR_STRING)\"" -I$(TIGERVNC_SRCDIR)/common \
+-	-I$(top_srcdir)/include ${XSERVERLIBS_CFLAGS} -I$(includedir)
++	-I$(top_srcdir)/include ${XSERVERLIBS_CFLAGS}
+ 
+ Xvnc_LDADD = $(XVNC_LIBS) libvnccommon.la $(COMMON_LIBS) \
+ 	$(XSERVER_LIBS) $(XSERVER_SYS_LIBS) $(XVNC_SYS_LIBS) -lX11
+@@ -62,7 +62,7 @@ libvnc_la_CPPFLAGS = $(XVNC_CPPFLAGS) -I$(TIGERVNC_SRCDIR)/common -UHAVE_CONFIG_
+ 	-I$(top_srcdir)/hw/xfree86/os-support \
+ 	-I$(top_srcdir)/hw/xfree86/os-support/bus \
+ 	-I$(top_srcdir)/include \
+-	${XSERVERLIBS_CFLAGS} -I$(includedir)
++	${XSERVERLIBS_CFLAGS}
+ 
+ libvnc_la_LDFLAGS = -module -avoid-version -Wl,-z,now
+ 
+-- 
+2.7.4
+

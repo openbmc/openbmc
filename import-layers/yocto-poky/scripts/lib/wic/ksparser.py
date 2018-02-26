@@ -114,7 +114,7 @@ def systemidtype(arg):
     return arg
 
 class KickStart():
-    """"Kickstart parser implementation."""
+    """Kickstart parser implementation."""
 
     DEFAULT_EXTRA_SPACE = 10*1024
     DEFAULT_OVERHEAD_FACTOR = 1.3
@@ -139,10 +139,12 @@ class KickStart():
         part.add_argument('--fstype', default='vfat',
                           choices=('ext2', 'ext3', 'ext4', 'btrfs',
                                    'squashfs', 'vfat', 'msdos', 'swap'))
+        part.add_argument('--mkfs-extraopts', default='')
         part.add_argument('--label')
         part.add_argument('--no-table', action='store_true')
         part.add_argument('--ondisk', '--ondrive', dest='disk', default='sda')
         part.add_argument("--overhead-factor", type=overheadtype)
+        part.add_argument('--part-name')
         part.add_argument('--part-type')
         part.add_argument('--rootfs-dir')
 

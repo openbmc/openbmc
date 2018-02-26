@@ -64,7 +64,9 @@
   </div>
 
   <div data-build-state="<%:state%>">
-    <%if state == 'Parsing'%>
+    <%if state == 'Cloning'%>
+      <%include tmpl='#cloning-repos-build-template'/%>
+    <%else state == 'Parsing'%>
       <%include tmpl='#parsing-recipes-build-template'/%>
     <%else state == 'Queued'%>
       <%include tmpl='#queued-build-template'/%>
@@ -94,6 +96,31 @@
 
   <div class="col-md-4">
     <!-- cancel button -->
+    <%include tmpl='#cancel-template'/%>
+  </div>
+</script>
+
+<!-- cloning repos build -->
+<script id="cloning-repos-build-template" type="text/x-jsrender">
+  <!-- progress bar and parse completion percentage -->
+  <div data-role="build-status" class="col-md-4 col-md-offset-1 progress-info">
+    <!-- progress bar -->
+    <div class="progress">
+      <div id="repos-cloned-percentage-bar-<%:id%>"
+           style="width: <%:repos_cloned_percentage%>%;"
+           class="progress-bar">
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 progress-info">
+    <!-- parse completion percentage -->
+    <span class="glyphicon glyphicon-question-sign get-help get-help-blue"
+          title="Toaster is cloning the repos required for your build">
+    </span>
+
+    Cloning <span id="repos-cloned-percentage-<%:id%>"><%:repos_cloned_percentage%></span>% complete
+
     <%include tmpl='#cancel-template'/%>
   </div>
 </script>

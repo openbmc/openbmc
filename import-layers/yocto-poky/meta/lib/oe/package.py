@@ -45,6 +45,115 @@ def runstrip(arg):
     return
 
 
+def strip_execs(pn, dstdir, strip_cmd, libdir, base_libdir, qa_already_stripped=False):
+    """
+    Strip executable code (like executables, shared libraries) _in_place_
+    - Based on sysroot_strip in staging.bbclass
+    :param dstdir: directory in which to strip files
+    :param strip_cmd: Strip command (usually ${STRIP})
+    :param libdir: ${libdir} - strip .so files in this directory
+    :param base_libdir: ${base_libdir} - strip .so files in this directory
+    :param qa_already_stripped: Set to True if already-stripped' in ${INSANE_SKIP}
+    This is for proper logging and messages only.
+    """
+    import stat, errno, oe.path, oe.utils, mmap
+
+    # Detect .ko module by searching for "vermagic=" string
+    def is_kernel_module(path):
+        with open(path) as f:
+            return mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ).find(b"vermagic=") >= 0
+
+    # Return type (bits):
+    # 0 - not elf
+    # 1 - ELF
+    # 2 - stripped
+    # 4 - executable
+    # 8 - shared library
+    # 16 - kernel module
+    def is_elf(path):
+        exec_type = 0
+        ret, result = oe.utils.getstatusoutput(
+            "file \"%s\"" % path.replace("\"", "\\\""))
+
+        if ret:
+            bb.error("split_and_strip_files: 'file %s' failed" % path)
+            return exec_type
+
+        if "ELF" in result:
+            exec_type |= 1
+            if "not stripped" not in result:
+                exec_type |= 2
+            if "executable" in result:
+                exec_type |= 4
+            if "shared" in result:
+                exec_type |= 8
+            if "relocatable" in result and is_kernel_module(path):
+                exec_type |= 16
+        return exec_type
+
+    elffiles = {}
+    inodes = {}
+    libdir = os.path.abspath(dstdir + os.sep + libdir)
+    base_libdir = os.path.abspath(dstdir + os.sep + base_libdir)
+    exec_mask = stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+    #
+    # First lets figure out all of the files we may have to process
+    #
+    for root, dirs, files in os.walk(dstdir):
+        for f in files:
+            file = os.path.join(root, f)
+
+            try:
+                ltarget = oe.path.realpath(file, dstdir, False)
+                s = os.lstat(ltarget)
+            except OSError as e:
+                (err, strerror) = e.args
+                if err != errno.ENOENT:
+                    raise
+                # Skip broken symlinks
+                continue
+            if not s:
+                continue
+            # Check its an excutable
+            if s[stat.ST_MODE] & exec_mask \
+                    or ((file.startswith(libdir) or file.startswith(base_libdir)) and ".so" in f) \
+                    or file.endswith('.ko'):
+                # If it's a symlink, and points to an ELF file, we capture the readlink target
+                if os.path.islink(file):
+                    continue
+
+                # It's a file (or hardlink), not a link
+                # ...but is it ELF, and is it already stripped?
+                elf_file = is_elf(file)
+                if elf_file & 1:
+                    if elf_file & 2:
+                        if qa_already_stripped:
+                            bb.note("Skipping file %s from %s for already-stripped QA test" % (file[len(dstdir):], pn))
+                        else:
+                            bb.warn("File '%s' from %s was already stripped, this will prevent future debugging!" % (file[len(dstdir):], pn))
+                        continue
+
+                    if s.st_ino in inodes:
+                        os.unlink(file)
+                        os.link(inodes[s.st_ino], file)
+                    else:
+                        # break hardlinks so that we do not strip the original.
+                        inodes[s.st_ino] = file
+                        bb.utils.copyfile(file, file)
+                        elffiles[file] = elf_file
+
+    #
+    # Now strip them (in parallel)
+    #
+    sfiles = []
+    for file in elffiles:
+        elf_file = int(elffiles[file])
+        sfiles.append((file, elf_file, strip_cmd))
+
+    oe.utils.multiprocess_exec(sfiles, runstrip)
+
+
+
 def file_translate(file):
     ft = file.replace("@", "@at@")
     ft = ft.replace(" ", "@space@")
@@ -67,8 +176,7 @@ def filedeprunner(arg):
 
     def process_deps(pipe, pkg, pkgdest, provides, requires):
         file = None
-        for line in pipe:
-            line = line.decode("utf-8")
+        for line in pipe.split("\n"):
 
             m = file_re.match(line)
             if m:
@@ -117,12 +225,8 @@ def filedeprunner(arg):
 
         return provides, requires
 
-    try:
-        dep_popen = subprocess.Popen(shlex.split(rpmdeps) + pkgfiles, stdout=subprocess.PIPE)
-        provides, requires = process_deps(dep_popen.stdout, pkg, pkgdest, provides, requires)
-    except OSError as e:
-        bb.error("rpmdeps: '%s' command failed, '%s'" % (shlex.split(rpmdeps) + pkgfiles, e))
-        raise e
+    output = subprocess.check_output(shlex.split(rpmdeps) + pkgfiles, stderr=subprocess.STDOUT).decode("utf-8")
+    provides, requires = process_deps(output, pkg, pkgdest, provides, requires)
 
     return (pkg, provides, requires)
 

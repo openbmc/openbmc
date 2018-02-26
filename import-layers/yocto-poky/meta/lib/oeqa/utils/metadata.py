@@ -10,19 +10,9 @@ from collections.abc import MutableMapping
 from xml.dom.minidom import parseString
 from xml.etree.ElementTree import Element, tostring
 
+from oe.lsb import get_os_release
 from oeqa.utils.commands import runCmd, get_bb_vars
 
-def get_os_release():
-    """Get info from /etc/os-release as a dict"""
-    data = OrderedDict()
-    os_release_file = '/etc/os-release'
-    if not os.path.exists(os_release_file):
-        return None
-    with open(os_release_file) as fobj:
-        for line in fobj:
-            key, value = line.split('=', 1)
-            data[key.strip().lower()] = value.strip().strip('"')
-    return data
 
 def metadata_from_bb():
     """ Returns test's metadata as OrderedDict.
@@ -45,9 +35,9 @@ def metadata_from_bb():
     os_release = get_os_release()
     if os_release:
         info_dict['host_distro'] = OrderedDict()
-        for key in ('id', 'version_id', 'pretty_name'):
+        for key in ('ID', 'VERSION_ID', 'PRETTY_NAME'):
             if key in os_release:
-                info_dict['host_distro'][key] = os_release[key]
+                info_dict['host_distro'][key.lower()] = os_release[key]
 
     info_dict['layers'] = get_layers(data_dict['BBLAYERS'])
     info_dict['bitbake'] = git_rev_info(os.path.dirname(bb.__file__))

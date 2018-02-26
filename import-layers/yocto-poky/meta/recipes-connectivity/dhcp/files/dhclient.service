@@ -1,0 +1,13 @@
+[Unit]
+Description=Dynamic Host Configuration Protocol (DHCP)
+Wants=network.target
+Before=network.target
+After=systemd-udevd.service
+
+[Service]
+EnvironmentFile=-@SYSCONFDIR@/default/dhcp-client
+ExecStart=@BASE_SBINDIR@/dhclient-systemd-wrapper
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

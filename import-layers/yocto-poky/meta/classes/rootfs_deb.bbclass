@@ -33,6 +33,3 @@ python () {
     elif darch == "arm":
          d.setVar('DEB_SDK_ARCH', 'armel')
 }
-
-# This will of course only work after rootfs_deb_do_rootfs or populate_sdk_deb has been called
-DPKG_QUERY_COMMAND = "${STAGING_BINDIR_NATIVE}/dpkg-query --admindir=$INSTALL_ROOTFS_DEB/var/lib/dpkg"

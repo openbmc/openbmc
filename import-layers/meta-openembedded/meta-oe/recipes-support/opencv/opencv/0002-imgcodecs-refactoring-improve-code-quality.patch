@@ -1,0 +1,656 @@
+Upstream-Status: Backport [https://github.com/opencv/opencv/pull/9376/commits/999f41fb4f4aa94a0cb47256919ae8b5c29ca5f3]
+
+Fix CVEs for opencv 3.3:
+
+* CVE-2017-12597
+* CVE-2017-12598
+* CVE-2017-12599
+* CVE-2017-12600
+* CVE-2017-12601
+* CVE-2017-12602
+* CVE-2017-12603
+* CVE-2017-12604
+* CVE-2017-12605
+* CVE-2017-12606
+* CVE-2017-12862
+* CVE-2017-12863
+* CVE-2017-12864
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From 999f41fb4f4aa94a0cb47256919ae8b5c29ca5f3 Mon Sep 17 00:00:00 2001
+From: Alexander Alekhin <alexander.a.alekhin@gmail.com>
+Date: Tue, 15 Aug 2017 22:04:55 +0000
+Subject: [PATCH 2/3] imgcodecs: refactoring, improve code quality
+
+---
+ modules/imgcodecs/src/bitstrm.cpp   |   2 +
+ modules/imgcodecs/src/bitstrm.hpp   |  19 +++--
+ modules/imgcodecs/src/grfmt_bmp.cpp |  13 ++-
+ modules/imgcodecs/src/grfmt_pxm.cpp | 122 ++++++++++++++++-----------
+ modules/imgcodecs/src/loadsave.cpp  | 164 +++++++++++++++++++++++++++++-------
+ 5 files changed, 231 insertions(+), 89 deletions(-)
+
+diff --git a/modules/imgcodecs/src/bitstrm.cpp b/modules/imgcodecs/src/bitstrm.cpp
+index a7e187fa0..0a8941aec 100644
+--- a/modules/imgcodecs/src/bitstrm.cpp
++++ b/modules/imgcodecs/src/bitstrm.cpp
+@@ -209,6 +209,8 @@ int  RLByteStream::getByte()
+         current = m_current;
+     }
+ 
++    CV_Assert(current < m_end);
++
+     val = *((uchar*)current);
+     m_current = current + 1;
+     return val;
+diff --git a/modules/imgcodecs/src/bitstrm.hpp b/modules/imgcodecs/src/bitstrm.hpp
+index 465c0a847..26947971f 100644
+--- a/modules/imgcodecs/src/bitstrm.hpp
++++ b/modules/imgcodecs/src/bitstrm.hpp
+@@ -48,13 +48,20 @@
+ namespace cv
+ {
+ 
+-enum
+-{
+-    RBS_THROW_EOS=-123,  // <end of stream> exception code
+-    RBS_THROW_FORB=-124,  // <forrbidden huffman code> exception code
+-    RBS_HUFF_FORB=2047,  // forrbidden huffman code "value"
+-    RBS_BAD_HEADER=-125 // invalid header
++#define DECLARE_RBS_EXCEPTION(name) \
++class RBS_ ## name ## _Exception : public cv::Exception \
++{ \
++public: \
++    RBS_ ## name ## _Exception(int code_, const String& err_, const String& func_, const String& file_, int line_) : \
++        cv::Exception(code_, err_, func_, file_, line_) \
++    {} \
+ };
++DECLARE_RBS_EXCEPTION(THROW_EOS)
++#define RBS_THROW_EOS RBS_THROW_EOS_Exception(cv::Error::StsError, "Unexpected end of input stream", CV_Func, __FILE__, __LINE__)
++DECLARE_RBS_EXCEPTION(THROW_FORB)
++#define RBS_THROW_FORB RBS_THROW_FORB_Exception(cv::Error::StsError, "Forrbidden huffman code", CV_Func, __FILE__, __LINE__)
++DECLARE_RBS_EXCEPTION(BAD_HEADER)
++#define RBS_BAD_HEADER RBS_BAD_HEADER_Exception(cv::Error::StsError, "Invalid header", CV_Func, __FILE__, __LINE__)
+ 
+ typedef unsigned long ulong;
+ 
+diff --git a/modules/imgcodecs/src/grfmt_bmp.cpp b/modules/imgcodecs/src/grfmt_bmp.cpp
+index 86cacd316..257f97c2d 100644
+--- a/modules/imgcodecs/src/grfmt_bmp.cpp
++++ b/modules/imgcodecs/src/grfmt_bmp.cpp
+@@ -118,8 +118,9 @@ bool  BmpDecoder::readHeader()
+ 
+                 if( m_bpp <= 8 )
+                 {
+-                    memset( m_palette, 0, sizeof(m_palette));
+-                    m_strm.getBytes( m_palette, (clrused == 0? 1<<m_bpp : clrused)*4 );
++                    CV_Assert(clrused < 256);
++                    memset(m_palette, 0, sizeof(m_palette));
++                    m_strm.getBytes(m_palette, (clrused == 0? 1<<m_bpp : clrused)*4 );
+                     iscolor = IsColorPalette( m_palette, m_bpp );
+                 }
+                 else if( m_bpp == 16 && m_rle_code == BMP_BITFIELDS )
+@@ -290,7 +291,9 @@ bool  BmpDecoder::readData( Mat& img )
+                     else if( code > 2 ) // absolute mode
+                     {
+                         if( data + code*nch > line_end ) goto decode_rle4_bad;
+-                        m_strm.getBytes( src, (((code + 1)>>1) + 1) & -2 );
++                        int sz = (((code + 1)>>1) + 1) & (~1);
++                        CV_Assert((size_t)sz < _src.size());
++                        m_strm.getBytes(src, sz);
+                         if( color )
+                             data = FillColorRow4( data, src, code, m_palette );
+                         else
+@@ -379,7 +382,9 @@ decode_rle4_bad: ;
+ 
+                         if( data + code3 > line_end )
+                             goto decode_rle8_bad;
+-                        m_strm.getBytes( src, (code + 1) & -2 );
++                        int sz = (code + 1) & (~1);
++                        CV_Assert((size_t)sz < _src.size());
++                        m_strm.getBytes(src, sz);
+                         if( color )
+                             data = FillColorRow8( data, src, code, m_palette );
+                         else
+diff --git a/modules/imgcodecs/src/grfmt_pxm.cpp b/modules/imgcodecs/src/grfmt_pxm.cpp
+index 1750cb705..68bd8fd93 100644
+--- a/modules/imgcodecs/src/grfmt_pxm.cpp
++++ b/modules/imgcodecs/src/grfmt_pxm.cpp
+@@ -43,50 +43,58 @@
+ #include "precomp.hpp"
+ #include "utils.hpp"
+ #include "grfmt_pxm.hpp"
++#include <iostream>
+ 
+ namespace cv
+ {
+ 
+ ///////////////////////// P?M reader //////////////////////////////
+ 
+-static int ReadNumber( RLByteStream& strm, int maxdigits )
++static int ReadNumber(RLByteStream& strm, int maxdigits = 0)
+ {
+     int code;
+-    int val = 0;
++    int64 val = 0;
+     int digits = 0;
+ 
+     code = strm.getByte();
+ 
+-    if( !isdigit(code))
++    while (!isdigit(code))
+     {
+-        do
++        if (code == '#' )
+         {
+-            if( code == '#' )
++            do
+             {
+-                do
+-                {
+-                    code = strm.getByte();
+-                }
+-                while( code != '\n' && code != '\r' );
++                code = strm.getByte();
+             }
+-
++            while (code != '\n' && code != '\r');
+             code = strm.getByte();
+-
+-            while( isspace(code))
++        }
++        else if (isspace(code))
++        {
++            while (isspace(code))
+                 code = strm.getByte();
+         }
+-        while( !isdigit( code ));
++        else
++        {
++#if 1
++            CV_ErrorNoReturn_(Error::StsError, ("PXM: Unexpected code in ReadNumber(): 0x%x (%d)", code, code));
++#else
++            code = strm.getByte();
++#endif
++        }
+     }
+ 
+     do
+     {
+-        val = val*10 + code - '0';
+-        if( ++digits >= maxdigits ) break;
++        val = val*10 + (code - '0');
++        CV_Assert(val <= INT_MAX && "PXM: ReadNumber(): result is too large");
++        digits++;
++        if (maxdigits != 0 && digits >= maxdigits) break;
+         code = strm.getByte();
+     }
+-    while( isdigit(code));
++    while (isdigit(code));
+ 
+-    return val;
++    return (int)val;
+ }
+ 
+ 
+@@ -122,13 +130,13 @@ ImageDecoder PxMDecoder::newDecoder() const
+     return makePtr<PxMDecoder>();
+ }
+ 
+-void  PxMDecoder::close()
++void PxMDecoder::close()
+ {
+     m_strm.close();
+ }
+ 
+ 
+-bool  PxMDecoder::readHeader()
++bool PxMDecoder::readHeader()
+ {
+     bool result = false;
+ 
+@@ -158,10 +166,10 @@ bool  PxMDecoder::readHeader()
+         m_binary = code >= '4';
+         m_type = m_bpp > 8 ? CV_8UC3 : CV_8UC1;
+ 
+-        m_width = ReadNumber( m_strm, INT_MAX );
+-        m_height = ReadNumber( m_strm, INT_MAX );
++        m_width = ReadNumber(m_strm);
++        m_height = ReadNumber(m_strm);
+ 
+-        m_maxval = m_bpp == 1 ? 1 : ReadNumber( m_strm, INT_MAX );
++        m_maxval = m_bpp == 1 ? 1 : ReadNumber(m_strm);
+         if( m_maxval > 65535 )
+             throw RBS_BAD_HEADER;
+ 
+@@ -175,8 +183,14 @@ bool  PxMDecoder::readHeader()
+             result = true;
+         }
+     }
+-    catch(...)
++    catch (const cv::Exception&)
++    {
++        throw;
++    }
++    catch (...)
+     {
++        std::cerr << "PXM::readHeader(): unknown C++ exception" << std::endl << std::flush;
++        throw;
+     }
+ 
+     if( !result )
+@@ -189,33 +203,28 @@ bool  PxMDecoder::readHeader()
+ }
+ 
+ 
+-bool  PxMDecoder::readData( Mat& img )
++bool PxMDecoder::readData( Mat& img )
+ {
+     int color = img.channels() > 1;
+     uchar* data = img.ptr();
+     PaletteEntry palette[256];
+     bool   result = false;
+-    int  bit_depth = CV_ELEM_SIZE1(m_type)*8;
+-    int  src_pitch = (m_width*m_bpp*bit_depth/8 + 7)/8;
++    const int bit_depth = CV_ELEM_SIZE1(m_type)*8;
++    const int src_pitch = divUp(m_width*m_bpp*(bit_depth/8), 8);
+     int  nch = CV_MAT_CN(m_type);
+     int  width3 = m_width*nch;
+-    int  i, x, y;
+ 
+     if( m_offset < 0 || !m_strm.isOpened())
+         return false;
+ 
+-    AutoBuffer<uchar> _src(src_pitch + 32);
+-    uchar* src = _src;
+-    AutoBuffer<uchar> _gray_palette;
+-    uchar* gray_palette = _gray_palette;
++    uchar gray_palette[256] = {0};
+ 
+     // create LUT for converting colors
+     if( bit_depth == 8 )
+     {
+-        _gray_palette.allocate(m_maxval + 1);
+-        gray_palette = _gray_palette;
++        CV_Assert(m_maxval < 256);
+ 
+-        for( i = 0; i <= m_maxval; i++ )
++        for (int i = 0; i <= m_maxval; i++)
+             gray_palette[i] = (uchar)((i*255/m_maxval)^(m_bpp == 1 ? 255 : 0));
+ 
+         FillGrayPalette( palette, m_bpp==1 ? 1 : 8 , m_bpp == 1 );
+@@ -229,12 +238,16 @@ bool  PxMDecoder::readData( Mat& img )
+         {
+         ////////////////////////// 1 BPP /////////////////////////
+         case 1:
++            CV_Assert(CV_MAT_DEPTH(m_type) == CV_8U);
+             if( !m_binary )
+             {
+-                for( y = 0; y < m_height; y++, data += img.step )
++                AutoBuffer<uchar> _src(m_width);
++                uchar* src = _src;
++
++                for (int y = 0; y < m_height; y++, data += img.step)
+                 {
+-                    for( x = 0; x < m_width; x++ )
+-                        src[x] = ReadNumber( m_strm, 1 ) != 0;
++                    for (int x = 0; x < m_width; x++)
++                        src[x] = ReadNumber(m_strm, 1) != 0;
+ 
+                     if( color )
+                         FillColorRow8( data, src, m_width, palette );
+@@ -244,7 +257,10 @@ bool  PxMDecoder::readData( Mat& img )
+             }
+             else
+             {
+-                for( y = 0; y < m_height; y++, data += img.step )
++                AutoBuffer<uchar> _src(src_pitch);
++                uchar* src = _src;
++
++                for (int y = 0; y < m_height; y++, data += img.step)
+                 {
+                     m_strm.getBytes( src, src_pitch );
+ 
+@@ -260,13 +276,17 @@ bool  PxMDecoder::readData( Mat& img )
+         ////////////////////////// 8 BPP /////////////////////////
+         case 8:
+         case 24:
+-            for( y = 0; y < m_height; y++, data += img.step )
++        {
++            AutoBuffer<uchar> _src(std::max<size_t>(width3*2, src_pitch));
++            uchar* src = _src;
++
++            for (int y = 0; y < m_height; y++, data += img.step)
+             {
+                 if( !m_binary )
+                 {
+-                    for( x = 0; x < width3; x++ )
++                    for (int x = 0; x < width3; x++)
+                     {
+-                        int code = ReadNumber( m_strm, INT_MAX );
++                        int code = ReadNumber(m_strm);
+                         if( (unsigned)code > (unsigned)m_maxval ) code = m_maxval;
+                         if( bit_depth == 8 )
+                             src[x] = gray_palette[code];
+@@ -279,7 +299,7 @@ bool  PxMDecoder::readData( Mat& img )
+                     m_strm.getBytes( src, src_pitch );
+                     if( bit_depth == 16 && !isBigEndian() )
+                     {
+-                        for( x = 0; x < width3; x++ )
++                        for (int x = 0; x < width3; x++)
+                         {
+                             uchar v = src[x * 2];
+                             src[x * 2] = src[x * 2 + 1];
+@@ -290,7 +310,7 @@ bool  PxMDecoder::readData( Mat& img )
+ 
+                 if( img.depth() == CV_8U && bit_depth == 16 )
+                 {
+-                    for( x = 0; x < width3; x++ )
++                    for (int x = 0; x < width3; x++)
+                     {
+                         int v = ((ushort *)src)[x];
+                         src[x] = (uchar)(v >> 8);
+@@ -331,12 +351,19 @@ bool  PxMDecoder::readData( Mat& img )
+             }
+             result = true;
+             break;
++        }
+         default:
+-            assert(0);
++            CV_ErrorNoReturn(Error::StsError, "m_bpp is not supported");
+         }
+     }
+-    catch(...)
++    catch (const cv::Exception&)
++    {
++        throw;
++    }
++    catch (...)
+     {
++        std::cerr << "PXM::readData(): unknown exception" << std::endl << std::flush;
++        throw;
+     }
+ 
+     return result;
+@@ -412,8 +439,9 @@ bool  PxMEncoder::write( const Mat& img, const std::vector<int>& params )
+     char* buffer = _buffer;
+ 
+     // write header;
+-    sprintf( buffer, "P%c\n%d %d\n%d\n",
++    sprintf( buffer, "P%c\n# Generated by OpenCV %s\n%d %d\n%d\n",
+              '2' + (channels > 1 ? 1 : 0) + (isBinary ? 3 : 0),
++             CV_VERSION,
+              width, height, (1 << depth) - 1 );
+ 
+     strm.putBytes( buffer, (int)strlen(buffer) );
+diff --git a/modules/imgcodecs/src/loadsave.cpp b/modules/imgcodecs/src/loadsave.cpp
+index 3b2366217..5ee4ca354 100644
+--- a/modules/imgcodecs/src/loadsave.cpp
++++ b/modules/imgcodecs/src/loadsave.cpp
+@@ -55,6 +55,27 @@
+ /****************************************************************************************\
+ *                                      Image Codecs                                      *
+ \****************************************************************************************/
++
++namespace cv {
++
++// TODO Add runtime configuration
++#define CV_IO_MAX_IMAGE_PARAMS (50)
++#define CV_IO_MAX_IMAGE_WIDTH (1<<20)
++#define CV_IO_MAX_IMAGE_HEIGHT (1<<20)
++#define CV_IO_MAX_IMAGE_PIXELS (1<<30) // 1 Gigapixel
++
++static Size validateInputImageSize(const Size& size)
++{
++    CV_Assert(size.width > 0);
++    CV_Assert(size.width <= CV_IO_MAX_IMAGE_WIDTH);
++    CV_Assert(size.height > 0);
++    CV_Assert(size.height <= CV_IO_MAX_IMAGE_HEIGHT);
++    uint64 pixels = (uint64)size.width * (uint64)size.height;
++    CV_Assert(pixels <= CV_IO_MAX_IMAGE_PIXELS);
++    return size;
++}
++
++
+ namespace {
+ 
+ class ByteStreamBuffer: public std::streambuf
+@@ -94,9 +115,6 @@ protected:
+ 
+ }
+ 
+-namespace cv
+-{
+-
+ /**
+  * @struct ImageCodecInitializer
+  *
+@@ -408,14 +426,26 @@ imread_( const String& filename, int flags, int hdrtype, Mat* mat=0 )
+     /// set the filename in the driver
+     decoder->setSource( filename );
+ 
+-   // read the header to make sure it succeeds
+-   if( !decoder->readHeader() )
++    try
++    {
++        // read the header to make sure it succeeds
++        if( !decoder->readHeader() )
++            return 0;
++    }
++    catch (const cv::Exception& e)
++    {
++        std::cerr << "imread_('" << filename << "'): can't read header: " << e.what() << std::endl << std::flush;
+         return 0;
++    }
++    catch (...)
++    {
++        std::cerr << "imread_('" << filename << "'): can't read header: unknown exception" << std::endl << std::flush;
++        return 0;
++    }
++
+ 
+     // established the required input image size
+-    CvSize size;
+-    size.width = decoder->width();
+-    size.height = decoder->height();
++    Size size = validateInputImageSize(Size(decoder->width(), decoder->height()));
+ 
+     // grab the decoded type
+     int type = decoder->type();
+@@ -451,7 +481,21 @@ imread_( const String& filename, int flags, int hdrtype, Mat* mat=0 )
+     }
+ 
+     // read the image data
+-    if( !decoder->readData( *data ))
++    bool success = false;
++    try
++    {
++        if (decoder->readData(*data))
++            success = true;
++    }
++    catch (const cv::Exception& e)
++    {
++        std::cerr << "imread_('" << filename << "'): can't read data: " << e.what() << std::endl << std::flush;
++    }
++    catch (...)
++    {
++        std::cerr << "imread_('" << filename << "'): can't read data: unknown exception" << std::endl << std::flush;
++    }
++    if (!success)
+     {
+         cvReleaseImage( &image );
+         cvReleaseMat( &matrix );
+@@ -504,8 +548,22 @@ imreadmulti_(const String& filename, int flags, std::vector<Mat>& mats)
+     decoder->setSource(filename);
+ 
+     // read the header to make sure it succeeds
+-    if (!decoder->readHeader())
++    try
++    {
++        // read the header to make sure it succeeds
++        if( !decoder->readHeader() )
++            return 0;
++    }
++    catch (const cv::Exception& e)
++    {
++        std::cerr << "imreadmulti_('" << filename << "'): can't read header: " << e.what() << std::endl << std::flush;
+         return 0;
++    }
++    catch (...)
++    {
++        std::cerr << "imreadmulti_('" << filename << "'): can't read header: unknown exception" << std::endl << std::flush;
++        return 0;
++    }
+ 
+     for (;;)
+     {
+@@ -523,17 +581,32 @@ imreadmulti_(const String& filename, int flags, std::vector<Mat>& mats)
+                 type = CV_MAKETYPE(CV_MAT_DEPTH(type), 1);
+         }
+ 
++        // established the required input image size
++        Size size = validateInputImageSize(Size(decoder->width(), decoder->height()));
++
+         // read the image data
+-        Mat mat(decoder->height(), decoder->width(), type);
+-        if (!decoder->readData(mat))
++        Mat mat(size.height, size.width, type);
++        bool success = false;
++        try
+         {
+-            // optionally rotate the data if EXIF' orientation flag says so
+-            if( (flags & IMREAD_IGNORE_ORIENTATION) == 0 && flags != IMREAD_UNCHANGED )
+-            {
+-                ApplyExifOrientation(filename, mat);
+-            }
+-
++            if (decoder->readData(mat))
++                success = true;
++        }
++        catch (const cv::Exception& e)
++        {
++            std::cerr << "imreadmulti_('" << filename << "'): can't read data: " << e.what() << std::endl << std::flush;
++        }
++        catch (...)
++        {
++            std::cerr << "imreadmulti_('" << filename << "'): can't read data: unknown exception" << std::endl << std::flush;
++        }
++        if (!success)
+             break;
++
++        // optionally rotate the data if EXIF' orientation flag says so
++        if( (flags & IMREAD_IGNORE_ORIENTATION) == 0 && flags != IMREAD_UNCHANGED )
++        {
++            ApplyExifOrientation(filename, mat);
+         }
+ 
+         mats.push_back(mat);
+@@ -616,6 +689,7 @@ static bool imwrite_( const String& filename, const Mat& image,
+     }
+ 
+     encoder->setDestination( filename );
++    CV_Assert(params.size() <= CV_IO_MAX_IMAGE_PARAMS*2);
+     bool code = encoder->write( *pimage, params );
+ 
+     //    CV_Assert( code );
+@@ -663,22 +737,35 @@ imdecode_( const Mat& buf, int flags, int hdrtype, Mat* mat=0 )
+         decoder->setSource(filename);
+     }
+ 
+-    if( !decoder->readHeader() )
++    bool success = false;
++    try
++    {
++        if (decoder->readHeader())
++            success = true;
++    }
++    catch (const cv::Exception& e)
++    {
++        std::cerr << "imdecode_('" << filename << "'): can't read header: " << e.what() << std::endl << std::flush;
++    }
++    catch (...)
++    {
++        std::cerr << "imdecode_('" << filename << "'): can't read header: unknown exception" << std::endl << std::flush;
++    }
++    if (!success)
+     {
+         decoder.release();
+-        if ( !filename.empty() )
++        if (!filename.empty())
+         {
+-            if ( remove(filename.c_str()) != 0 )
++            if (0 != remove(filename.c_str()))
+             {
+-                CV_Error( CV_StsError, "unable to remove temporary file" );
++                std::cerr << "unable to remove temporary file:" << filename << std::endl << std::flush;
+             }
+         }
+         return 0;
+     }
+ 
+-    CvSize size;
+-    size.width = decoder->width();
+-    size.height = decoder->height();
++    // established the required input image size
++    Size size = validateInputImageSize(Size(decoder->width(), decoder->height()));
+ 
+     int type = decoder->type();
+     if( (flags & IMREAD_LOAD_GDAL) != IMREAD_LOAD_GDAL && flags != IMREAD_UNCHANGED )
+@@ -712,17 +799,30 @@ imdecode_( const Mat& buf, int flags, int hdrtype, Mat* mat=0 )
+         temp = cvarrToMat(image);
+     }
+ 
+-    bool code = decoder->readData( *data );
++    success = false;
++    try
++    {
++        if (decoder->readData(*data))
++            success = true;
++    }
++    catch (const cv::Exception& e)
++    {
++        std::cerr << "imdecode_('" << filename << "'): can't read data: " << e.what() << std::endl << std::flush;
++    }
++    catch (...)
++    {
++        std::cerr << "imdecode_('" << filename << "'): can't read data: unknown exception" << std::endl << std::flush;
++    }
+     decoder.release();
+-    if ( !filename.empty() )
++    if (!filename.empty())
+     {
+-        if ( remove(filename.c_str()) != 0 )
++        if (0 != remove(filename.c_str()))
+         {
+-            CV_Error( CV_StsError, "unable to remove temporary file" );
++            std::cerr << "unable to remove temporary file:" << filename << std::endl << std::flush;
+         }
+     }
+ 
+-    if( !code )
++    if (!success)
+     {
+         cvReleaseImage( &image );
+         cvReleaseMat( &matrix );
+@@ -859,7 +959,7 @@ cvSaveImage( const char* filename, const CvArr* arr, const int* _params )
+     if( _params )
+     {
+         for( ; _params[i] > 0; i += 2 )
+-            ;
++            CV_Assert(i < CV_IO_MAX_IMAGE_PARAMS*2); // Limit number of params for security reasons
+     }
+     return cv::imwrite_(filename, cv::cvarrToMat(arr),
+         i > 0 ? std::vector<int>(_params, _params+i) : std::vector<int>(),
+@@ -890,7 +990,7 @@ cvEncodeImage( const char* ext, const CvArr* arr, const int* _params )
+     if( _params )
+     {
+         for( ; _params[i] > 0; i += 2 )
+-            ;
++            CV_Assert(i < CV_IO_MAX_IMAGE_PARAMS*2); // Limit number of params for security reasons
+     }
+     cv::Mat img = cv::cvarrToMat(arr);
+     if( CV_IS_IMAGE(arr) && ((const IplImage*)arr)->origin == IPL_ORIGIN_BL )
+-- 
+2.14.1
+

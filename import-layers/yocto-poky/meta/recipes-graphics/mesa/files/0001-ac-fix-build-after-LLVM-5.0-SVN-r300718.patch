@@ -1,0 +1,40 @@
+From 9861437e58fdd0de01193a102608d34e5952953f Mon Sep 17 00:00:00 2001
+From: Christoph Haag <haagch+mesadev@frickel.club>
+Date: Thu, 20 Apr 2017 10:34:18 +0200
+Subject: [PATCH 1/2] ac: fix build after LLVM 5.0 SVN r300718
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+v2: previously getWithDereferenceableBytes() exists, but addAttr() doesn't take that type
+
+Signed-off-by: Christoph Haag <haagch+mesadev@frickel.club>
+Reviewed-by: Nicolai Hähnle <nicolai.haehnle@amd.com>
+Tested-and-reviewed-by: Mike Lothian <mike@fireburn.co.uk>
+---
+Upstream-Status: Backport
+
+ src/amd/common/ac_llvm_helper.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/amd/common/ac_llvm_helper.cpp b/src/amd/common/ac_llvm_helper.cpp
+index d9ea4b1..11fa809 100644
+--- a/src/amd/common/ac_llvm_helper.cpp
++++ b/src/amd/common/ac_llvm_helper.cpp
+@@ -44,9 +44,13 @@ typedef AttributeSet AttributeList;
+ void ac_add_attr_dereferenceable(LLVMValueRef val, uint64_t bytes)
+ {
+    llvm::Argument *A = llvm::unwrap<llvm::Argument>(val);
++#if HAVE_LLVM < 0x0500
+    llvm::AttrBuilder B;
+    B.addDereferenceableAttr(bytes);
+    A->addAttr(llvm::AttributeList::get(A->getContext(), A->getArgNo() + 1,  B));
++#else
++   A->addAttr(llvm::Attribute::getWithDereferenceableBytes(A->getContext(), bytes));
++#endif
+ }
+ 
+ bool ac_is_sgpr_param(LLVMValueRef arg)
+-- 
+2.13.3
+

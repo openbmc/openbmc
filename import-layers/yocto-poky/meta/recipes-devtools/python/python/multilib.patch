@@ -1,6 +1,6 @@
 Rebased for python-2.7.9
 Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
-
+Upstream-Status: Pending
 Index: Python-2.7.13/configure.ac
 ===================================================================
 --- Python-2.7.13.orig/configure.ac

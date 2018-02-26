@@ -1,0 +1,28 @@
+From 65e8e3c9c69f41778b6308c2f8f3262c82c6f3e1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Jun 2017 13:57:53 -0700
+Subject: [PATCH] configure.ac: Do not demand linker hash-style
+
+This helps fixing on architectures e.g. mips where gnu hash
+is not supported
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index e1dba23..7bcc039 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -65,7 +65,6 @@ CC_CHECK_CFLAGS_APPEND([ \
+         -ffunction-sections \
+         -fdata-sections \
+ 	-Wl,-O1 \
+-	-Wl,--hash-style=gnu \
+         -Wl,--as-needed \
+         -Wl,--gc-sections])
+ 
+-- 
+2.13.2
+

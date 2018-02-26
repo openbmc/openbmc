@@ -1,0 +1,28 @@
+From 5759878e5d278f11a1063e8fccd1e6b7b54caadf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 2 Aug 2017 16:25:37 -0700
+Subject: [PATCH 2/2] d_state.cpp: Add missing dependenncy on
+ local_sharding_info
+
+Fixes
+| src/mongo/s/d_state.cpp:81: error: undefined reference to 'mongo::enableLocalShardingInfo(mongo::ServiceContext*, std::function<bool (mongo::OperationContext*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)>)'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mongo/s/SConscript | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/mongo/s/SConscript b/src/mongo/s/SConscript
+index 71720be517..51bd199127 100644
+--- a/src/mongo/s/SConscript
++++ b/src/mongo/s/SConscript
+@@ -317,5 +317,6 @@ env.Library(
+         "$BUILD_DIR/mongo/db/s/sharding",
+         "$BUILD_DIR/mongo/executor/network_interface_factory",
+         "$BUILD_DIR/mongo/s/client/shard_local",
++        "$BUILD_DIR/mongo/s/local_sharding_info",
+     ],
+ )
+-- 
+2.13.3
+

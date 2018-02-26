@@ -1,5 +1,5 @@
 SUMMARY = "GObject wrapper for libudev"
-
+HOMEPAGE = "https://wiki.gnome.org/Projects/libgudev"
 SRC_URI[archive.md5sum] = "916c10c51ec61131e244c3936bbb2e0c"
 SRC_URI[archive.sha256sum] = "3b1ef99d4a8984c35044103d8ddfc3cc52c80035c36abab2bcc5e3532e063f96"
 

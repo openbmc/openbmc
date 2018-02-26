@@ -3,9 +3,6 @@
 
 . /etc/init.d/functions
 
-test -x /usr/sbin/snmpd || exit 0
-test -x /usr/sbin/snmptrapd || exit 0
-
 # Defaults
 export MIBDIRS=/usr/share/snmp/mibs
 SNMPDRUN=yes
@@ -17,6 +14,9 @@ SPIDFILE=/var/run/snmptrapd.pid
 
 # Reads config file if exists (will override defaults above)
 [ -r /etc/default/snmpd ] && . /etc/default/snmpd
+
+[ "$SNMPDRUN" = "yes" ] && { test -x /usr/sbin/snmpd || exit 0; }
+[ "$TRAPDRUN" = "yes" ] && { test -x /usr/sbin/snmptrapd || exit 0; }
 
 case "$1" in
   start)

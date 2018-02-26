@@ -1,0 +1,26 @@
+From a4dfc92ff342e59596ab64267a8d4f22f173c23b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 2 Sep 2017 12:40:41 -0700
+Subject: [PATCH 1/4] Use strerror_r only on glibc systems
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mongo/util/log.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/mongo/util/log.cpp b/src/mongo/util/log.cpp
+index 1957eb4791..ddf3908818 100644
+--- a/src/mongo/util/log.cpp
++++ b/src/mongo/util/log.cpp
+@@ -101,7 +101,7 @@ string errnoWithDescription(int errNumber) {
+     char buf[kBuflen];
+     char* msg{nullptr};
+ 
+-#if defined(__GNUC__) && defined(_GNU_SOURCE)
++#if defined(__GNUC__) && defined(_GNU_SOURCE) && defined(__GLIBC__)
+     msg = strerror_r(errNumber, buf, kBuflen);
+ #elif defined(_WIN32)
+ 
+-- 
+2.14.1
+

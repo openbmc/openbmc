@@ -10,10 +10,15 @@ do_configure[cleandirs] = "${B}"
 MESON_SOURCEPATH = "${S}"
 
 # These variables in the environment override the *native* tools, not the cross.
+export CPPFLAGS = "${BUILD_CPPFLAGS}"
 export CC = "${BUILD_CC}"
+export CFLAGS = "${BUILD_CFLAGS}"
 export CXX = "${BUILD_CXX}"
+export CXXFLAGS = "${BUILD_CXXFLAGS}"
 export LD = "${BUILD_LD}"
+export LDFLAGS = "${BUILD_LDFLAGS}"
 export AR = "${BUILD_AR}"
+export PKG_CONFIG = "pkg-config-native"
 
 def noprefix(var, d):
     return d.getVar(var, True).replace(d.getVar('prefix', True) + '/', '', 1)
@@ -27,12 +32,12 @@ MESONOPTS = " --prefix ${prefix} \
               --includedir ${@noprefix('includedir', d)} \
               --mandir ${@noprefix('mandir', d)} \
               --infodir ${@noprefix('infodir', d)} \
-              --localedir ${@noprefix('localedir', d)} \
               --sysconfdir ${sysconfdir} \
               --localstatedir ${localstatedir} \
               --sharedstatedir ${sharedstatedir}"
 
-MESON_C_ARGS = "${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
+MESON_C_ARGS = "${TARGET_CC_ARCH}${TOOLCHAIN_OPTIONS}"
+MESON_LINK_ARGS = "${MESON_C_ARGS} ${LDFLAGS}"
 
 MESON_HOST_ENDIAN = "${@bb.utils.contains('SITEINFO_ENDIANNESS', 'be', 'big', 'little', d)}"
 MESON_TARGET_ENDIAN = "${@bb.utils.contains('TUNE_FEATURES', 'bigendian', 'big', 'little', d)}"
@@ -60,10 +65,11 @@ readelf = '${HOST_PREFIX}readelf'
 pkgconfig = 'pkg-config'
 
 [properties]
+needs_exe_wrapper = true
 c_args = [${@meson_array('MESON_C_ARGS', d)}]
-cpp_args = [${@meson_array('TOOLCHAIN_OPTIONS', d)}]
-c_link_args = [${@meson_array('TOOLCHAIN_OPTIONS', d)}]
-cpp_link_args = [${@meson_array('TOOLCHAIN_OPTIONS', d)}]
+c_link_args = [${@meson_array('MESON_LINK_ARGS', d)}]
+cpp_args = [${@meson_array('MESON_C_ARGS', d)}]
+cpp_link_args = [${@meson_array('MESON_LINK_ARGS', d)}]
 
 [host_machine]
 system = '${HOST_OS}'

@@ -2,11 +2,24 @@
 
 # run-ptest - 'ptest' test infrastructure shell script that
 #   wraps the valgrind regression script vg_regtest. 
-#   Must be run in the /usr/lib/valgrind/ptest directory. 
 #
 # Dave Lerner <dave.lerner@windriver.com>
 ###############################################################
 VALGRINDLIB=@libdir@/valgrind
-tests/vg_regtest --all \
+LOG="${VALGRINDLIB}/ptest/valgrind_ptest_$(date +%Y%m%d-%H%M%S).log"
+
+cd ${VALGRINDLIB}/ptest && ./tests/vg_regtest --all \
     --valgrind=/usr/bin/valgrind --valgrind-lib=$VALGRINDLIB \
-	--yocto-ptest
+    --yocto-ptest 2>&1|tee ${LOG}
+
+passed=`grep PASS: ${LOG}|wc -l`
+failed=`grep FAIL: ${LOG}|wc -l`
+skipped=`grep SKIP: ${LOG}|wc -l`
+all=$((passed + failed + skipped))
+
+( echo "=== Test Summary ==="
+  echo "TOTAL: ${all}"
+  echo "PASSED: ${passed}"
+  echo "FAILED: ${failed}"
+  echo "SKIPPED: ${skipped}"
+) | tee -a /${LOG}

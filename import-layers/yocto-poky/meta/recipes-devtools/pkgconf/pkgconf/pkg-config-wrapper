@@ -1,0 +1,16 @@
+#!/bin/sh
+# pkgconf wrapper to deal with pkg-config/pkgconf compatibility issues
+#
+# Copyright (C) 2015 Christopher Larson <chris_larson@mentor.com>
+# License: MIT (see COPYING.MIT at the root of the repository for terms)
+
+for arg; do
+    case "$arg" in
+        --variable|--variable=*)
+            # pkg-config doesn't sysroot-prefix user variables
+            unset PKG_CONFIG_SYSROOT_DIR
+            ;;
+    esac
+done
+
+exec pkgconf "$@"

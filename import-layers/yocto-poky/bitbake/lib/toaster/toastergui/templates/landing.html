@@ -14,12 +14,20 @@
 
               <p>A web interface to <a href="http://www.openembedded.org">OpenEmbedded</a> and <a href="http://www.yoctoproject.org/tools-resources/projects/bitbake">BitBake</a>, the <a href="http://www.yoctoproject.org">Yocto Project</a> build system.</p>
 
+		          <p class="top-air">
+		            <a class="btn btn-info btn-lg" href="http://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-setup-and-use">
+			            Toaster is ready to capture your command line builds
+		            </a>
+		          </p>
+
 		          {% if lvs_nos %}
+                    {% if project_enable %}
 		            <p class="top-air">
 		              <a class="btn btn-primary btn-lg" href="{% url 'newproject' %}">
-			              To start building, create your first Toaster project
+			              Create your first Toaster project to run manage builds
 		              </a>
 		            </p>
+                    {% endif %}
 		          {% else %}
                 <div class="alert alert-info lead top-air">
                   Toaster has no layer information. Without layer information, you cannot run builds. To generate layer information you can:

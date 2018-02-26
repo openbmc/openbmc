@@ -1,0 +1,64 @@
+From a0d0de10e4c5ab55bc2fa48798079e2876b1211d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Aug 2017 10:29:37 -0700
+Subject: [PATCH] makedefs: Use native compiler to build makedefs.test
+
+Its a binary used during build
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ makedefs | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/makedefs b/makedefs
+index 9fd4bc2..5ee7747 100644
+--- a/makedefs
++++ b/makedefs
+@@ -526,7 +526,7 @@ int     main(int argc, char **argv)
+     exit(0);
+ }
+ EOF
+-			   ${CC-gcc} -o makedefs.test makedefs.test.c || exit 1
++			   ${BUILD_CC-gcc} -o makedefs.test makedefs.test.c || exit 1
+ 			   rm -f makedefs.test makedefs.test.[co]
+ 		       fi;;
+ 		esac
+@@ -762,7 +762,7 @@ int     main(int argc, char **argv)
+     exit(0);
+ }
+ EOF
+-		   ${CC-gcc} -o makedefs.test makedefs.test.c || exit 1
++		   ${BUILD_CC-gcc} -o makedefs.test makedefs.test.c || exit 1
+ 		   ./makedefs.test 2>/dev/null ||
+ 			CCARGS="$CCARGS -DNO_SIGSETJMP"
+ 		   rm -f makedefs.test makedefs.test.[co]
+@@ -796,7 +796,7 @@ int main(int argc, char **argv)
+ 				  &error) != 14);
+ }
+ EOF
+-		    ${CC-gcc} -o makedefs.test makedefs.test.c $icu_cppflags \
++		    ${BUILD_CC-gcc} -o makedefs.test makedefs.test.c $icu_cppflags \
+ 			$icu_ldflags >/dev/null 2>&1
+ 		    if ./makedefs.test 2>/dev/null ; then
+ 			CCARGS="$CCARGS $icu_cppflags"
+@@ -911,7 +911,7 @@ int     main(void)
+     exit(ferror(stdout) ? 1 : 0);
+ }
+ EOF
+-    eval ${CC-gcc} ${CCARGS} -o makedefs.test makedefs.test.c || exit 1
++    eval ${BUILD_CC-gcc} ${CCARGS} -o makedefs.test makedefs.test.c || exit 1
+     ./makedefs.test || exit 1
+     rm -f makedefs.test makedefs.test.[co]
+ }
+@@ -1067,7 +1067,7 @@ int     main(void)
+     exit(ferror(stdout) ? 1 : 0);
+ }
+ EOF
+-	eval ${CC-gcc} ${CCARGS} -o makedefs.test makedefs.test.c || exit 1
++	eval ${BUILD_CC-gcc} ${CCARGS} -o makedefs.test makedefs.test.c || exit 1
+ 	parm_val=`./makedefs.test` || exit 1
+ 	rm -f makedefs.test makedefs.test.[co]
+ 	eval ${parm_name}=\""\$parm_val"\"
+-- 
+2.14.1
+

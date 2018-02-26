@@ -1,6 +1,6 @@
 SUMMARY = "libebml is a C++ libary to parse EBML files"
 LICENSE = "LGPLv2.1"
-LIC_FILES_CHKSUM = "file://LICENSE.LGPL;md5=f14599a2f089f6ff8c97e2baa4e3d575"
+LIC_FILES_CHKSUM = "file://LICENSE.LGPL;md5=7fbc338309ac38fefcd64b04bb903e34"
 
 SRC_URI = "\
     http://dl.matroska.org/downloads/libebml/libebml-${PV}.tar.bz2 \
@@ -10,15 +10,7 @@ SRC_URI = "\
 SRC_URI[md5sum] = "efec729bf5a51e649e1d9d1f61c0ae7a"
 SRC_URI[sha256sum] = "83b074d6b62715aa0080406ea84d33df2e44b5d874096640233a4db49b8096de"
 
-do_unpack[postfuncs] += "dos2unix"
-
-dos2unix () {
-    cr="$(printf '\r')"
-    for f in ${S}/make/*/Makefile; do
-        tr -d "$cr" <"$f" >"$f.new" && \
-            mv "$f.new" "$f"
-    done
-}
+inherit dos2unix
 
 LIBEBML_OS = "Unknown"
 LIBEBML_OS_linux = "Linux"

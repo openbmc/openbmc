@@ -1,0 +1,45 @@
+From 6f661a511eea096c073888c7adb836a9a880b476 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 8 May 2017 16:33:15 +0800
+Subject: [PATCH 08/13] tweak btrfs packages
+
+In oe-cre/yocto, we name btrfs package with btrfs-tools,
+rather than btrfs-progs.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/devices/btrfs.py | 2 +-
+ blivet/formats/fs.py    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/blivet/devices/btrfs.py b/blivet/devices/btrfs.py
+index c5cb21f..9d417b2 100644
+--- a/blivet/devices/btrfs.py
++++ b/blivet/devices/btrfs.py
+@@ -55,7 +55,7 @@ class BTRFSDevice(StorageDevice):
+ 
+     """ Base class for BTRFS volume and sub-volume devices. """
+     _type = "btrfs"
+-    _packages = ["btrfs-progs"]
++    _packages = ["btrfs-tools"]
+     _external_dependencies = [availability.BLOCKDEV_BTRFS_PLUGIN]
+ 
+     def __init__(self, *args, **kwargs):
+diff --git a/blivet/formats/fs.py b/blivet/formats/fs.py
+index a49826f..e8f216d 100644
+--- a/blivet/formats/fs.py
++++ b/blivet/formats/fs.py
+@@ -918,7 +918,7 @@ class BTRFS(FS):
+     _formattable = True
+     _linux_native = True
+     _supported = True
+-    _packages = ["btrfs-progs"]
++    _packages = ["btrfs-tools"]
+     _min_size = Size("256 MiB")
+     _max_size = Size("16 EiB")
+     _mkfs_class = fsmkfs.BTRFSMkfs
+-- 
+2.7.4
+

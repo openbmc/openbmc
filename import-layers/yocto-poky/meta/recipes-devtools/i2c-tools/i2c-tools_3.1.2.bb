@@ -1,4 +1,5 @@
 SUMMARY = "Set of i2c tools for linux"
+HOMEPAGE = "https://i2c.wiki.kernel.org/index.php/I2C_Tools"
 SECTION = "base"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"

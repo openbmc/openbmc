@@ -1,0 +1,35 @@
+From d78851b6f87f2472f041102d7b3726ffc009bfad Mon Sep 17 00:00:00 2001
+From: Ming Liu <peter.x.liu@external.atlascopco.com>
+Date: Tue, 6 Jun 2017 05:54:20 +0200
+Subject: [PATCH] ClientStub.hpp: fix a clang compiling issue
+
+A error was observed with clang compiler, as follows:
+| src/RCF/RCF.cpp:49:
+| src/RCF/ClientStub.cpp:28:
+| include/RCF/Future.hpp:49:26: error: 'enrol' is a private member of 'RCF::ClientStub'
+
+it can be fixed by declaring Future as a friend class of ClientStub.
+
+Upstream-Status: Pending
+
+Signed-off-by: Ming Liu <peter.x.liu@external.atlascopco.com>
+---
+ include/RCF/ClientStub.hpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/RCF/ClientStub.hpp b/include/RCF/ClientStub.hpp
+index 9882cf4..8465625 100755
+--- a/include/RCF/ClientStub.hpp
++++ b/include/RCF/ClientStub.hpp
+@@ -372,6 +372,8 @@ namespace RCF {
+ 
+     private:
+ 
++        template<typename U>
++        friend class Future;
+         friend class FutureImplBase;
+ 
+         template<
+-- 
+2.7.4
+

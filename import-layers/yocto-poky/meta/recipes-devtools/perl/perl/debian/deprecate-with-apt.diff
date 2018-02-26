@@ -15,6 +15,7 @@ warnings will still be useful, so modify them slightly to point to the
 separate packages instead.
 
 Patch-Name: debian/deprecate-with-apt.diff
+Upstream-Status: Pending
 ---
  lib/deprecate.pm | 15 ++++++++++++++-
  1 file changed, 14 insertions(+), 1 deletion(-)

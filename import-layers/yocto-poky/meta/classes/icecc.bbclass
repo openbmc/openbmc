@@ -116,7 +116,7 @@ def use_icecc(bb,d):
     # for one reason or the other
     # this is the old list (which doesn't seem to be valid anymore, because I was able to build
     # all these with icecc enabled)
-    # system_package_blacklist = [ "uclibc", "glibc", "gcc", "bind", "u-boot", "dhcp-forwarder", "enchant", "connman", "orbit2" ]
+    # system_package_blacklist = [ "glibc", "gcc", "bind", "u-boot", "dhcp-forwarder", "enchant", "connman", "orbit2" ]
     # when adding new entry, please document why (how it failed) so that we can re-evaluate it later
     # e.g. when there is new version
     # building libgcc-initial with icecc fails with CPP sanity check error if host sysroot contains cross gcc built for another target tune/variant

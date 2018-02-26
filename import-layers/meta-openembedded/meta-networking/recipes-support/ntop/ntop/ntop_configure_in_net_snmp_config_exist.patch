@@ -1,0 +1,21 @@
+Check net-snmp-config's existence in case user specified the
+ac_cv_prog_NETSNMP to avoid HAVE_SNMP defined if the specified
+net-snmp-config doesn't exist.
+
+Upstream-Status: Inappropriate [Embedded specific]
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+---
+diff --git a/configure.in b/configure.in
+index 6f3e88f..8ddf017 100755
+--- a/configure.in
++++ b/configure.in
+@@ -1423,7 +1423,7 @@ dnl> NET-SNMP
+ dnl>
+ if test ".${ac_disable_snmp}" != ".yes"; then
+   AC_CHECK_TOOL(NETSNMP, net-snmp-config)
+-  if test -n "$NETSNMP"; then
++  if test -n "$NETSNMP" -a -e "$NETSNMP"; then
+     AC_DEFINE_UNQUOTED(HAVE_SNMP, 1, [SNMP is supported])
+     SNMPLIBS="`$NETSNMP --libs`"
+     SNMPLIBS="`echo ${SNMPLIBS}|sed -e s,'-R../lib',,g`"

@@ -1,6 +1,7 @@
 # Copyright (c) 2013  LG Electronics, Inc.
 
 SUMMARY = "libnih library"
+HOMEPAGE = "https://launchpad.net/libnih"
 DESCRIPTION = "libnih is a small library for C application development \
     containing functions that, despite its name, are not implemented \
     elsewhere in the standard library set. \

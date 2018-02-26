@@ -37,8 +37,8 @@ class BitbakeController(object):
     """
 
     def __init__(self, be):
-        import bb.server.xmlrpc
-        self.connection = bb.server.xmlrpc._create_server(be.bbaddress,
+        import bb.server.xmlrpcclient
+        self.connection = bb.server.xmlrpcclient._create_server(be.bbaddress,
                                                           int(be.bbport))[0]
 
     def _runCommand(self, command):

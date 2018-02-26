@@ -1,0 +1,93 @@
+From 624c029abcc73c724020ccea9a2b4b5b5c00f2a6 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 31 Mar 2017 15:42:46 +0300
+Subject: [PATCH] cross-compile support
+
+We cross compile python. This patch uses tools from host/native
+python instead of in-tree tools
+
+-Khem
+
+Upstream-Status: Inappropriate[Configuration Specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile.pre.in | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index a88b7d5..7cb8bb3 100644
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -221,6 +221,7 @@ LIBOBJS=	@LIBOBJS@
+ 
+ PYTHON=		python$(EXE)
+ BUILDPYTHON=	python$(BUILDEXE)
++HOSTPYTHON=    $(BUILDPYTHON)
+ 
+ PYTHON_FOR_GEN=@PYTHON_FOR_GEN@
+ PYTHON_FOR_BUILD=@PYTHON_FOR_BUILD@
+@@ -280,6 +281,7 @@ LIBFFI_INCLUDEDIR=	@LIBFFI_INCLUDEDIR@
+ ##########################################################################
+ # Parser
+ PGEN=		Parser/pgen$(EXE)
++HOSTPGEN=	$(PGEN)$(EXE)
+ 
+ PSRCS=		\
+ 		Parser/acceler.c \
+@@ -510,7 +512,7 @@ build_all_generate_profile:
+ 
+ run_profile_task:
+ 	: # FIXME: can't run for a cross build
+-	$(LLVM_PROF_FILE) $(RUNSHARED) ./$(BUILDPYTHON) $(PROFILE_TASK) || true
++	$(LLVM_PROF_FILE) $(RUNSHARED) $(HOSTPYTHON) $(PROFILE_TASK) || true
+ 
+ build_all_merge_profile:
+ 	$(LLVM_PROF_MERGER)
+@@ -787,7 +789,7 @@ $(IO_OBJS): $(IO_H)
+ 
+ $(GRAMMAR_H): @GENERATED_COMMENT@ $(GRAMMAR_INPUT) $(PGEN)
+ 	@$(MKDIR_P) Include
+-	$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
++	$(HOSTPGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
+ $(GRAMMAR_C): @GENERATED_COMMENT@ $(GRAMMAR_H)
+ 	touch $(GRAMMAR_C)
+ 
+@@ -976,7 +978,7 @@ $(LIBRARY_OBJS) $(MODOBJS) Programs/python.o: $(PYTHON_HEADERS)
+ ######################################################################
+ 
+ TESTOPTS=	$(EXTRATESTOPTS)
+-TESTPYTHON=	$(RUNSHARED) ./$(BUILDPYTHON) $(TESTPYTHONOPTS)
++TESTPYTHON=	$(RUNSHARED) $(HOSTPYTHON) $(TESTPYTHONOPTS)
+ TESTRUNNER=	$(TESTPYTHON) $(srcdir)/Tools/scripts/run_tests.py
+ TESTTIMEOUT=	3600
+ 
+@@ -1468,7 +1470,7 @@ frameworkinstallstructure:	$(LDLIBRARY)
+ 		fi; \
+ 	done
+ 	$(LN) -fsn include/python$(LDVERSION) $(DESTDIR)$(prefix)/Headers
+-	sed 's/%VERSION%/'"`$(RUNSHARED) ./$(BUILDPYTHON) -c 'import platform; print(platform.python_version())'`"'/g' < $(RESSRCDIR)/Info.plist > $(DESTDIR)$(prefix)/Resources/Info.plist
++	sed 's/%VERSION%/'"`$(RUNSHARED) $(HOSTPYTHON) -c 'import platform; print(platform.python_version())'`"'/g' < $(RESSRCDIR)/Info.plist > $(DESTDIR)$(prefix)/Resources/Info.plist
+ 	$(LN) -fsn $(VERSION) $(DESTDIR)$(PYTHONFRAMEWORKINSTALLDIR)/Versions/Current
+ 	$(LN) -fsn Versions/Current/$(PYTHONFRAMEWORK) $(DESTDIR)$(PYTHONFRAMEWORKINSTALLDIR)/$(PYTHONFRAMEWORK)
+ 	$(LN) -fsn Versions/Current/Headers $(DESTDIR)$(PYTHONFRAMEWORKINSTALLDIR)/Headers
+@@ -1534,7 +1536,7 @@ config.status:	$(srcdir)/configure
+ 
+ # Run reindent on the library
+ reindent:
+-	./$(BUILDPYTHON) $(srcdir)/Tools/scripts/reindent.py -r $(srcdir)/Lib
++	$(HOSTPYTHON) $(srcdir)/Tools/scripts/reindent.py -r $(srcdir)/Lib
+ 
+ # Rerun configure with the same options as it was run last time,
+ # provided the config.status script exists
+@@ -1674,7 +1676,7 @@ funny:
+ 
+ # Perform some verification checks on any modified files.
+ patchcheck: all
+-	$(RUNSHARED) ./$(BUILDPYTHON) $(srcdir)/Tools/scripts/patchcheck.py
++	$(RUNSHARED) ./$(HOSTPYTHON) $(srcdir)/Tools/scripts/patchcheck.py
+ 
+ # Dependencies
+ 
+-- 
+2.11.0
+

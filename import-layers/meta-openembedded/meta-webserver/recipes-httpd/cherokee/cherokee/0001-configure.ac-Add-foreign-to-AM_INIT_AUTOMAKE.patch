@@ -1,0 +1,30 @@
+From 4591b5b40d66c19edc73b951ad091dac639454c9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 25 Jul 2017 16:00:34 -0700
+Subject: [PATCH] configure.ac: Add foreign to AM_INIT_AUTOMAKE
+
+Fixes errors like
+| Makefile.am: error: required file './README' not found
+| Makefile.am: error: required file './ChangeLog' not found
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index d6298f27..98cab791 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -32,7 +32,7 @@ dnl Init autoconf and automake
+ AC_INIT([cherokee], [cherokee_version], [http://bugs.cherokee-project.com/], [cherokee])
+ AC_CONFIG_SRCDIR([cherokee/server.c])
+ AC_CONFIG_MACRO_DIR([m4])
+-AM_INIT_AUTOMAKE([no-define])
++AM_INIT_AUTOMAKE([no-define foreign])
+ 
+ dnl Define version
+ AC_DEFINE(PACKAGE_MAJOR_VERSION, "cherokee_major_version", [Version string])
+-- 
+2.13.3
+

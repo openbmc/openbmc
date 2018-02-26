@@ -1,0 +1,30 @@
+From 47aef26198431f7ad568c2277dded158bda3e36f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Jul 2017 16:00:35 -0700
+Subject: [PATCH 2/3] link with libtirpc
+
+musl needs it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 439a978..ea821eb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -83,8 +83,8 @@ endif
+ 
+ CPPFLAGS+=		$(CPPFLAGS.ippooltest)
+ CFLAGS+=			-I. -Iusl -Icli -MMD -Wall -g $(CPPFLAGS) $(CPPFLAGS.dmalloc)
+-LDFLAGS.ippoold=	$(LDFLAGS) -Wl,-E -L. -Lusl -lusl -lnsl -ldl $(LIBS.dmalloc) -lc
+-LDFLAGS.ippoolconfig=	$(LDFLAGS) -Lcli -lcli -lreadline -lcurses -lnsl $(LIBS.dmalloc) -lc
++LDFLAGS.ippoold=	$(LDFLAGS) -Wl,-E -L. -Lusl -lusl -ldl $(LIBS.dmalloc) -lc -ltirpc
++LDFLAGS.ippoolconfig=	$(LDFLAGS) -Lcli -lcli -lreadline -lcurses $(LIBS.dmalloc) -lc -ltirpc
+ 
+ OPT_CFLAGS?=		-O
+ 
+-- 
+2.13.3
+

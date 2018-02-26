@@ -8,7 +8,7 @@ class GalculatorTest(OESDKTestCase):
 
     @classmethod
     def setUpClass(self):
-        if not (self.tc.hasTargetPackage("gtk+3") or\
+        if not (self.tc.hasTargetPackage("gtk\+3") or\
                 self.tc.hasTargetPackage("libgtk-3.0")):
             raise unittest.SkipTest("GalculatorTest class: SDK don't support gtk+3")
 

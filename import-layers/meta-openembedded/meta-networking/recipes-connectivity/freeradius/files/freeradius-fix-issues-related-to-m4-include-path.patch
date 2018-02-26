@@ -1,0 +1,236 @@
+From d8e251ef97869ab2c1c82bd374016f402083997c Mon Sep 17 00:00:00 2001
+From: Jorge Pereira <jpereiran@gmail.com>
+Date: Mon, 7 Dec 2015 16:51:07 -0200
+Subject: [PATCH] Fixing issues related to m4 include path
+
+Upstream-Status: Submitted [1]
+
+[1]: https://github.com/FreeRADIUS/freeradius-server/pull/1428
+
+Submmited by: Jorge Pereira <jpereiran@gmail.com>
+---
+ src/modules/rlm_example/config.h.in                | 39 ++--------------------
+ src/modules/rlm_ldap/configure                     |  2 +-
+ src/modules/rlm_pam/config.h.in                    |  3 ++
+ src/modules/rlm_perl/config.h.in                   |  3 ++
+ src/modules/rlm_perl/configure.ac                  |  2 +-
+ src/modules/rlm_radutmp/config.h.in                |  3 ++
+ src/modules/rlm_ruby/configure                     |  1 +
+ src/modules/rlm_ruby/configure.ac                  |  9 ++---
+ src/modules/rlm_smsotp/config.h.in                 |  3 ++
+ .../rlm_sql/drivers/rlm_sql_mysql/config.h.in      |  3 ++
+ src/modules/rlm_unix/config.h.in                   |  6 ++++
+ 11 files changed, 32 insertions(+), 42 deletions(-)
+
+diff --git a/src/modules/rlm_example/config.h.in b/src/modules/rlm_example/config.h.in
+index 2a81ef5..f80de9c 100644
+--- a/src/modules/rlm_example/config.h.in
++++ b/src/modules/rlm_example/config.h.in
+@@ -1,38 +1,5 @@
+ /* config.h.in.  Generated from configure.ac by autoheader.  */
+ 
+-/* Define to 1 if you have the <inttypes.h> header file. */
+-#undef HAVE_INTTYPES_H
+-
+-/* Define to 1 if you have the <memory.h> header file. */
+-#undef HAVE_MEMORY_H
+-
+-/* Define to 1 if you have the `printf' function. */
+-#undef HAVE_PRINTF
+-
+-/* Define to 1 if you have the <stdint.h> header file. */
+-#undef HAVE_STDINT_H
+-
+-/* Define to 1 if you have the <stdio.h> header file. */
+-#undef HAVE_STDIO_H
+-
+-/* Define to 1 if you have the <stdlib.h> header file. */
+-#undef HAVE_STDLIB_H
+-
+-/* Define to 1 if you have the <strings.h> header file. */
+-#undef HAVE_STRINGS_H
+-
+-/* Define to 1 if you have the <string.h> header file. */
+-#undef HAVE_STRING_H
+-
+-/* Define to 1 if you have the <sys/stat.h> header file. */
+-#undef HAVE_SYS_STAT_H
+-
+-/* Define to 1 if you have the <sys/types.h> header file. */
+-#undef HAVE_SYS_TYPES_H
+-
+-/* Define to 1 if you have the <unistd.h> header file. */
+-#undef HAVE_UNISTD_H
+-
+ /* Define to the address where bug reports for this package should be sent. */
+ #undef PACKAGE_BUGREPORT
+ 
+@@ -45,8 +12,8 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+-
+-/* Define to 1 if you have the ANSI C header files. */
+-#undef STDC_HEADERS
+diff --git a/src/modules/rlm_ldap/configure b/src/modules/rlm_ldap/configure
+index e0c15d9..cdf96d5 100755
+--- a/src/modules/rlm_ldap/configure
++++ b/src/modules/rlm_ldap/configure
+@@ -3992,7 +3992,7 @@ smart_prefix=
+ $as_echo "#define WITH_SASL 1" >>confdefs.h
+ 
+ 	    SASL=sasl.c
+-          fi
++	  fi
+ 	fi
+ 
+ 	targetname=rlm_ldap
+diff --git a/src/modules/rlm_pam/config.h.in b/src/modules/rlm_pam/config.h.in
+index 32ef6ff..1ad20c5 100644
+--- a/src/modules/rlm_pam/config.h.in
++++ b/src/modules/rlm_pam/config.h.in
+@@ -45,6 +45,9 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+ 
+diff --git a/src/modules/rlm_perl/config.h.in b/src/modules/rlm_perl/config.h.in
+index 989ed53..f80de9c 100644
+--- a/src/modules/rlm_perl/config.h.in
++++ b/src/modules/rlm_perl/config.h.in
+@@ -12,5 +12,8 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+diff --git a/src/modules/rlm_perl/configure.ac b/src/modules/rlm_perl/configure.ac
+index 44c5fc9..6b2a043 100644
+--- a/src/modules/rlm_perl/configure.ac
++++ b/src/modules/rlm_perl/configure.ac
+@@ -3,7 +3,7 @@ AC_INIT(rlm_perl.c)
+ AC_REVISION($Revision$)
+ AC_DEFUN(modname,[rlm_perl])
+ 
+-m4_include([ax_with_prog.m4])
++m4_include([m4/ax_with_prog.m4])
+ 
+ if test x$with_[]modname != xno; then
+ 	AC_PROG_CC
+diff --git a/src/modules/rlm_radutmp/config.h.in b/src/modules/rlm_radutmp/config.h.in
+index 9a883cc..750b434 100644
+--- a/src/modules/rlm_radutmp/config.h.in
++++ b/src/modules/rlm_radutmp/config.h.in
+@@ -42,6 +42,9 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+ 
+diff --git a/src/modules/rlm_ruby/configure b/src/modules/rlm_ruby/configure
+index 15868ab..c728af2 100755
+--- a/src/modules/rlm_ruby/configure
++++ b/src/modules/rlm_ruby/configure
+@@ -1875,6 +1875,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+ 
+ 
++
+ # ===========================================================================
+ #    http://www.gnu.org/software/autoconf-archive/ax_compare_version.html
+ # ===========================================================================
+diff --git a/src/modules/rlm_ruby/configure.ac b/src/modules/rlm_ruby/configure.ac
+index 9306382..f1c8118 100644
+--- a/src/modules/rlm_ruby/configure.ac
++++ b/src/modules/rlm_ruby/configure.ac
+@@ -3,15 +3,16 @@ AC_INIT(rlm_ruby.c)
+ AC_REVISION($Revision: 1.9 $)
+ AC_DEFUN(modname,[rlm_ruby])
+ 
+-m4_include([ax_with_prog.m4])
++m4_include([m4/ax_with_prog.m4])
+ 
+ AC_DEFUN([AX_WITH_RUBY],[
+     AX_WITH_PROG([RUBY],[ruby],[not-found],[${PATH}:/usr/bin:/usr/local/bin])
+ ])
+ 
+-m4_include([ax_compare_version.m4])
+-m4_include([ax_prog_ruby_version.m4])
+-m4_include([ax_ruby_devel.m4])
++
++m4_include([m4/ax_compare_version.m4])
++m4_include([m4/ax_prog_ruby_version.m4])
++m4_include([m4/ax_ruby_devel.m4])
+ 
+ targetname=modname
+ mod_cflags=
+diff --git a/src/modules/rlm_smsotp/config.h.in b/src/modules/rlm_smsotp/config.h.in
+index 5feaf91..9e69f85 100644
+--- a/src/modules/rlm_smsotp/config.h.in
++++ b/src/modules/rlm_smsotp/config.h.in
+@@ -42,6 +42,9 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+ 
+diff --git a/src/modules/rlm_sql/drivers/rlm_sql_mysql/config.h.in b/src/modules/rlm_sql/drivers/rlm_sql_mysql/config.h.in
+index e03d1a9..6262c48 100644
+--- a/src/modules/rlm_sql/drivers/rlm_sql_mysql/config.h.in
++++ b/src/modules/rlm_sql/drivers/rlm_sql_mysql/config.h.in
+@@ -18,5 +18,8 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+diff --git a/src/modules/rlm_unix/config.h.in b/src/modules/rlm_unix/config.h.in
+index dcb9aa2..70b4680 100644
+--- a/src/modules/rlm_unix/config.h.in
++++ b/src/modules/rlm_unix/config.h.in
+@@ -1,5 +1,8 @@
+ /* config.h.in.  Generated from configure.ac by autoheader.  */
+ 
++/* Define to 1 if you have the `getpwnam' function. */
++#undef HAVE_GETPWNAM
++
+ /* Define to 1 if you have the `getspnam' function. */
+ #undef HAVE_GETSPNAM
+ 
+@@ -54,6 +57,9 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+ 
+-- 
+2.3.5
+

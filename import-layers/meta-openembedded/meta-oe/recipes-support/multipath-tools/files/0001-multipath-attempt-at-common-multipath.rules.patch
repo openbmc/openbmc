@@ -1,0 +1,107 @@
+From 5ab50e0cb888e553a2635bbbf81eea3cdeffee60 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 12 Apr 2017 09:07:51 -0500
+Subject: [PATCH 01/14] multipath: attempt at common multipath.rules
+
+This is a proposal to try and bring the Redhat and SuSE multipath.rules
+closer. There are a couple of changes that I'd like some input on.
+
+The big change is moving the kpartx call into the multipath rules.  Half
+of the current kpartx.rules file is about creating symlinks for multiple
+types of dm devices. The other half auto-creates kpartx devices on top
+of multipath devices. Since it is only creating kpartx devices on top of
+multipath devices, I've moved the these rules into multipath.rules, or
+rather, I've replaced them with the redhat rules in multipath.rules. The
+biggest difference is the kpartx isn't run on every reload.  It works
+with the 11-dm-mpath.rules code to not run kpartx on multipathd
+generated reloads or when there aren't any working paths. It does
+remember if it didn't get to run kpartx when it was supposed to (because
+there were no valid paths or the device was suspended) and will make
+sure to run it on the next possible uevent.
+
+The other change is the redhat multipath rules remove the partition
+device nodes for devices claimed by multipath. The udev rule will only
+do this one time (both to keep from running partx on every event, and so
+that if users manually reread the partition table, we don't keep
+removing them when clearly they are wanted). Redhat does this because we
+had multiple customer issues where they were using the scsi partitions
+instead of the kpartx devices. Obviously, with setting the partition
+devices to not ready and clearing their fs_type, this isn't essential,
+but it has helped make customers do the right thing.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ kpartx/kpartx.rules       |  8 --------
+ multipath/multipath.rules | 27 ++++++++++++++++++++++++---
+ 2 files changed, 24 insertions(+), 11 deletions(-)
+
+diff --git a/kpartx/kpartx.rules b/kpartx/kpartx.rules
+index a958791..906e320 100644
+--- a/kpartx/kpartx.rules
++++ b/kpartx/kpartx.rules
+@@ -34,12 +34,4 @@ ENV{ID_FS_LABEL_ENC}=="?*", IMPORT{db}="ID_FS_LABEL_ENC"
+ ENV{ID_FS_USAGE}=="filesystem|other", ENV{ID_FS_LABEL_ENC}=="?*", \
+ 	SYMLINK+="disk/by-label/$env{ID_FS_LABEL_ENC}"
+ 
+-# Create dm tables for partitions
+-ENV{DM_ACTION}=="PATH_FAILED|PATH_REINSTATED", GOTO="kpartx_end"
+-ENV{DM_NR_VALID_PATHS}=="0", GOTO="kpartx_end"
+-ENV{ENV{DM_UDEV_PRIMARY_SOURCE_FLAG}!="1", IMPORT{db}="DM_SUBSYSTEM_UDEV_FLAG1"
+-ENV{DM_SUBSYSTEM_UDEV_FLAG1}=="1", GOTO="kpartx_end"
+-ENV{DM_STATE}!="SUSPENDED", ENV{DM_UUID}=="mpath-*", \
+-	RUN+="/sbin/kpartx -un -p -part /dev/$name"
+-
+ LABEL="kpartx_end"
+diff --git a/multipath/multipath.rules b/multipath/multipath.rules
+index 86defc0..616a04c 100644
+--- a/multipath/multipath.rules
++++ b/multipath/multipath.rules
+@@ -1,13 +1,13 @@
+ # Set DM_MULTIPATH_DEVICE_PATH if the device should be handled by multipath
+ SUBSYSTEM!="block", GOTO="end_mpath"
+ ACTION!="add|change", GOTO="end_mpath"
+-KERNEL!="sd*|dasd*", GOTO="end_mpath"
+-
++KERNEL!="sd*|dasd*|rbd*|dm-*", GOTO="end_mpath"
+ IMPORT{cmdline}="nompath"
+ ENV{nompath}=="?*", GOTO="end_mpath"
+ IMPORT{cmdline}="multipath"
+ ENV{multipath}=="off", GOTO="end_mpath"
+ 
++KERNEL=="dm-*", GOTO="check_kpartx"
+ ENV{DEVTYPE}!="partition", GOTO="test_dev"
+ IMPORT{parent}="DM_MULTIPATH_DEVICE_PATH"
+ ENV{DM_MULTIPATH_DEVICE_PATH}=="1", ENV{ID_FS_TYPE}="none", \
+@@ -21,7 +21,28 @@ TEST!="$env{MPATH_SBIN_PATH}/multipath", ENV{MPATH_SBIN_PATH}="/usr/sbin"
+ 
+ ENV{DM_MULTIPATH_DEVICE_PATH}!="1", \
+ 	PROGRAM=="$env{MPATH_SBIN_PATH}/multipath -u %k", \
+-	ENV{DM_MULTIPATH_DEVICE_PATH}="1", ENV{ID_FS_TYPE}="none", \
++	ENV{DM_MULTIPATH_DEVICE_PATH}="1", ENV{ID_FS_TYPE}="mpath_member", \
+ 	ENV{SYSTEMD_READY}="0"
+ 
++ENV{DM_MULTIPATH_DEVICE_PATH}!="1", GOTO="end_mpath"
++
++IMPORT{db}="DM_MULTIPATH_WIPE_PARTS"
++ENV{DM_MULTIPATH_WIPE_PARTS}!="1", ENV{DM_MULTIPATH_WIPE_PARTS}="1", \
++	RUN+="/sbin/partx -d --nr 1-1024 $env{DEVNAME}"
++GOTO="end_mpath"
++
++LABEL="check_kpartx"
++
++IMPORT{db}="DM_MULTIPATH_NEED_KPARTX"
++ENV{DM_UDEV_PRIMARY_SOURCE_FLAG}!="1", IMPORT{db}="DM_SUBSYSTEM_UDEV_FLAG1"
++ENV{DM_SUBSYSTEM_UDEV_FLAG1}=="1", GOTO="end_mpath"
++ACTION!="change", GOTO="end_mpath"
++ENV{DM_UUID}!="mpath-?*", GOTO="end_mpath"
++ENV{DM_ACTIVATION}=="1", ENV{DM_MULTIPATH_NEED_KPARTX}="1"
++ENV{DM_SUSPENDED}=="1", GOTO="end_mpath"
++ENV{DM_ACTION}=="PATH_FAILED", GOTO="end_mpath"
++ENV{DM_ACTIVATION}!="1", ENV{DM_MULTIPATH_NEED_KPARTX}!="1", GOTO="end_mpath"
++RUN+="/sbin/kpartx -un -p -part /dev/$name"
++ENV{DM_MULTIPATH_NEED_KPARTX}=""
++
+ LABEL="end_mpath"
+-- 
+2.8.1
+

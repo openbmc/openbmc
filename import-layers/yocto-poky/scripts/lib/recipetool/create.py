@@ -1,6 +1,6 @@
 # Recipe creation tool - create command plugin
 #
-# Copyright (C) 2014-2016 Intel Corporation
+# Copyright (C) 2014-2017 Intel Corporation
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -156,10 +156,12 @@ class RecipeHandler(object):
                         RecipeHandler.recipebinmap[prog] = pn
 
     @staticmethod
-    def checkfiles(path, speclist, recursive=False):
+    def checkfiles(path, speclist, recursive=False, excludedirs=None):
         results = []
         if recursive:
-            for root, _, files in os.walk(path):
+            for root, dirs, files in os.walk(path, topdown=True):
+                if excludedirs:
+                    dirs[:] = [d for d in dirs if d not in excludedirs]
                 for fn in files:
                     for spec in speclist:
                         if fnmatch.fnmatch(fn, spec):
@@ -339,9 +341,14 @@ def determine_from_url(srcuri):
                 pn = res.group(1).strip().replace('_', '-')
                 pv = res.group(2).strip().replace('_', '.')
 
-        if not pn and not pv and parseres.scheme not in ['git', 'gitsm', 'svn', 'hg']:
-            srcfile = os.path.basename(parseres.path.rstrip('/'))
-            pn, pv = determine_from_filename(srcfile)
+        if not pn and not pv:
+            if parseres.scheme not in ['git', 'gitsm', 'svn', 'hg']:
+                srcfile = os.path.basename(parseres.path.rstrip('/'))
+                pn, pv = determine_from_filename(srcfile)
+            elif parseres.scheme in ['git', 'gitsm']:
+                pn = os.path.basename(parseres.path.rstrip('/')).lower().replace('_', '-')
+                if pn.endswith('.git'):
+                    pn = pn[:-4]
 
     logger.debug('Determined from source URL: name = "%s", version = "%s"' % (pn, pv))
     return (pn, pv)
@@ -412,11 +419,15 @@ def create_recipe(args):
         pkgarch = "${MACHINE_ARCH}"
 
     extravalues = {}
-    checksums = (None, None)
+    checksums = {}
     tempsrc = ''
     source = args.source
     srcsubdir = ''
     srcrev = '${AUTOREV}'
+    srcbranch = ''
+    scheme = ''
+    storeTagName = ''
+    pv_srcpv = False
 
     if os.path.isfile(source):
         source = 'file://%s' % os.path.abspath(source)
@@ -432,24 +443,65 @@ def create_recipe(args):
         rev_re = re.compile(';rev=([^;]+)')
         res = rev_re.search(srcuri)
         if res:
+            if args.srcrev:
+                logger.error('rev= parameter and -S/--srcrev option cannot both be specified - use one or the other')
+                sys.exit(1)
+            if args.autorev:
+                logger.error('rev= parameter and -a/--autorev option cannot both be specified - use one or the other')
+                sys.exit(1)
             srcrev = res.group(1)
             srcuri = rev_re.sub('', srcuri)
-        tempsrc = tempfile.mkdtemp(prefix='recipetool-')
-        srctree = tempsrc
-        d = bb.data.createCopy(tinfoil.config_data)
-        if fetchuri.startswith('npm://'):
-            # Check if npm is available
-            npm_bindir = check_npm(tinfoil, args.devtool)
-            d.prependVar('PATH', '%s:' % npm_bindir)
-        logger.info('Fetching %s...' % srcuri)
-        try:
-            checksums = scriptutils.fetch_uri(d, fetchuri, srctree, srcrev)
-        except bb.fetch2.BBFetchException as e:
-            logger.error(str(e).rstrip())
+        elif args.srcrev:
+            srcrev = args.srcrev
+
+        # Check whether users provides any branch info in fetchuri.
+        # If true, we will skip all branch checking process to honor all user's input.
+        scheme, network, path, user, passwd, params = bb.fetch2.decodeurl(fetchuri)
+        srcbranch = params.get('branch')
+        if args.srcbranch:
+            if srcbranch:
+                logger.error('branch= parameter and -B/--srcbranch option cannot both be specified - use one or the other')
+                sys.exit(1)
+            srcbranch = args.srcbranch
+        nobranch = params.get('nobranch')
+        if nobranch and srcbranch:
+            logger.error('nobranch= cannot be used if you specify a branch')
             sys.exit(1)
+        tag = params.get('tag')
+        if not srcbranch and not nobranch and srcrev != '${AUTOREV}':
+            # Append nobranch=1 in the following conditions:
+            # 1. User did not set 'branch=' in srcuri, and
+            # 2. User did not set 'nobranch=1' in srcuri, and
+            # 3. Source revision is not '${AUTOREV}'
+            params['nobranch'] = '1'
+        if tag:
+            # Keep a copy of tag and append nobranch=1 then remove tag from URL.
+            # Bitbake fetcher unable to fetch when {AUTOREV} and tag is set at the same time.
+            storeTagName = params['tag']
+            params['nobranch'] = '1'
+            del params['tag']
+        if scheme == 'npm':
+            params['noverify'] = '1'
+        fetchuri = bb.fetch2.encodeurl((scheme, network, path, user, passwd, params))
+
+        tmpparent = tinfoil.config_data.getVar('BASE_WORKDIR')
+        bb.utils.mkdirhier(tmpparent)
+        tempsrc = tempfile.mkdtemp(prefix='recipetool-', dir=tmpparent)
+        srctree = os.path.join(tempsrc, 'source')
+
+        try:
+            checksums, ftmpdir = scriptutils.fetch_url(tinfoil, fetchuri, srcrev, srctree, logger, preserve_tmp=args.keep_temp)
+        except scriptutils.FetchUrlFailure as e:
+            logger.error(str(e))
+            sys.exit(1)
+
+        if ftmpdir and args.keep_temp:
+            logger.info('Fetch temp directory is %s' % ftmpdir)
+
         dirlist = os.listdir(srctree)
-        if 'git.indirectionsymlink' in dirlist:
-            dirlist.remove('git.indirectionsymlink')
+        filterout = ['git.indirectionsymlink']
+        dirlist = [x for x in dirlist if x not in filterout]
+        logger.debug('Directory listing (excluding filtered out):\n  %s' % '\n  '.join(dirlist))
         if len(dirlist) == 1:
             singleitem = os.path.join(srctree, dirlist[0])
             if os.path.isdir(singleitem):
@@ -457,30 +509,74 @@ def create_recipe(args):
                 srcsubdir = dirlist[0]
                 srctree = os.path.join(srctree, srcsubdir)
             else:
-                with open(singleitem, 'r', errors='surrogateescape') as f:
-                    if '<html' in f.read(100).lower():
-                        logger.error('Fetching "%s" returned a single HTML page - check the URL is correct and functional' % fetchuri)
-                        sys.exit(1)
+                check_single_file(dirlist[0], fetchuri)
+        elif len(dirlist) == 0:
+            if '/' in fetchuri:
+                fn = os.path.join(tinfoil.config_data.getVar('DL_DIR'), fetchuri.split('/')[-1])
+                if os.path.isfile(fn):
+                    check_single_file(fn, fetchuri)
+            # If we've got to here then there's no source so we might as well give up
+            logger.error('URL %s resulted in an empty source tree' % fetchuri)
+            sys.exit(1)
+
+        # We need this checking mechanism to improve the recipe created by recipetool and devtool
+        # is able to parse and build by bitbake.
+        # If there is no input for branch name, then check for branch name with SRCREV provided.
+        if not srcbranch and not nobranch and srcrev and (srcrev != '${AUTOREV}') and scheme in ['git', 'gitsm']:
+            try:
+                cmd = 'git branch -r --contains'
+                check_branch, check_branch_err = bb.process.run('%s %s' % (cmd, srcrev), cwd=srctree)
+            except bb.process.ExecutionError as err:
+                logger.error(str(err))
+                sys.exit(1)
+            get_branch = [x.strip() for x in check_branch.splitlines()]
+            # Remove HEAD reference point and drop remote prefix
+            get_branch = [x.split('/', 1)[1] for x in get_branch if not x.startswith('origin/HEAD')]
+            if 'master' in get_branch:
+                # If it is master, we do not need to append 'branch=master' as this is default.
+                # Even with the case where get_branch has multiple objects, if 'master' is one
+                # of them, we should default take from 'master'
+                srcbranch = ''
+            elif len(get_branch) == 1:
+                # If 'master' isn't in get_branch and get_branch contains only ONE object, then store result into 'srcbranch'
+                srcbranch = get_branch[0]
+            else:
+                # If get_branch contains more than one objects, then display error and exit.
+                mbrch = '\n  ' + '\n  '.join(get_branch)
+                logger.error('Revision %s was found on multiple branches: %s\nPlease provide the correct branch with -B/--srcbranch' % (srcrev, mbrch))
+                sys.exit(1)
+
+        # Since we might have a value in srcbranch, we need to
+        # recontruct the srcuri to include 'branch' in params.
+        scheme, network, path, user, passwd, params = bb.fetch2.decodeurl(srcuri)
+        if srcbranch:
+            params['branch'] = srcbranch
+
+        if storeTagName and scheme in ['git', 'gitsm']:
+            # Check srcrev using tag and check validity of the tag
+            cmd = ('git rev-parse --verify %s' % (storeTagName))
+            try:
+                check_tag, check_tag_err = bb.process.run('%s' % cmd, cwd=srctree)
+                srcrev = check_tag.split()[0]
+            except bb.process.ExecutionError as err:
+                logger.error(str(err))
+                logger.error("Possibly wrong tag name is provided")
+                sys.exit(1)
+            # Drop tag from srcuri as it will have conflicts with SRCREV during recipe parse.
+            del params['tag']
+        srcuri = bb.fetch2.encodeurl((scheme, network, path, user, passwd, params))
+
         if os.path.exists(os.path.join(srctree, '.gitmodules')) and srcuri.startswith('git://'):
             srcuri = 'gitsm://' + srcuri[6:]
             logger.info('Fetching submodules...')
             bb.process.run('git submodule update --init --recursive', cwd=srctree)
 
         if is_package(fetchuri):
-            tmpfdir = tempfile.mkdtemp(prefix='recipetool-')
-            try:
-                pkgfile = None
+            localdata = bb.data.createCopy(tinfoil.config_data)
+            pkgfile = bb.fetch2.localpath(fetchuri, localdata)
+            if pkgfile:
+                tmpfdir = tempfile.mkdtemp(prefix='recipetool-')
                 try:
-                    fileuri = fetchuri + ';unpack=0'
-                    scriptutils.fetch_uri(tinfoil.config_data, fileuri, tmpfdir, srcrev)
-                    for root, _, files in os.walk(tmpfdir):
-                        for f in files:
-                            pkgfile = os.path.join(root, f)
-                            break
-                except bb.fetch2.BBFetchException as e:
-                    logger.warn('Second fetch to get metadata failed: %s' % str(e).rstrip())
-
-                if pkgfile:
                     if pkgfile.endswith(('.deb', '.ipk')):
                         stdout, _ = bb.process.run('ar x %s' % pkgfile, cwd=tmpfdir)
                         stdout, _ = bb.process.run('tar xf control.tar.gz', cwd=tmpfdir)
@@ -490,8 +586,8 @@ def create_recipe(args):
                         stdout, _ = bb.process.run('rpm -qp --xml %s > pkginfo.xml' % pkgfile, cwd=tmpfdir)
                         values = convert_rpm_xml(os.path.join(tmpfdir, 'pkginfo.xml'))
                         extravalues.update(values)
-            finally:
-                shutil.rmtree(tmpfdir)
+                finally:
+                    shutil.rmtree(tmpfdir)
     else:
         # Assume we're pointing to an existing source tree
         if args.extract_to:
@@ -519,9 +615,9 @@ def create_recipe(args):
 
     if args.src_subdir:
         srcsubdir = os.path.join(srcsubdir, args.src_subdir)
-        srctree_use = os.path.join(srctree, args.src_subdir)
+        srctree_use = os.path.abspath(os.path.join(srctree, args.src_subdir))
     else:
-        srctree_use = srctree
+        srctree_use = os.path.abspath(srctree)
 
     if args.outfile and os.path.isdir(args.outfile):
         outfile = None
@@ -543,9 +639,10 @@ def create_recipe(args):
     # We need a blank line here so that patch_recipe_lines can rewind before the LICENSE comments
     lines_before.append('')
 
-    handled = []
-    licvalues = handle_license_vars(srctree_use, lines_before, handled, extravalues, tinfoil.config_data)
+    # We'll come back and replace this later in handle_license_vars()
+    lines_before.append('##LICENSE_PLACEHOLDER##')
 
+    handled = []
     classes = []
 
     # FIXME This is kind of a hack, we probably ought to be using bitbake to do this
@@ -581,30 +678,31 @@ def create_recipe(args):
     else:
         realpv = None
 
-    if srcuri and not realpv or not pn:
-        name_pn, name_pv = determine_from_url(srcuri)
-        if name_pn and not pn:
-            pn = name_pn
-        if name_pv and not realpv:
-            realpv = name_pv
-
     if not srcuri:
         lines_before.append('# No information for SRC_URI yet (only an external source tree was specified)')
     lines_before.append('SRC_URI = "%s"' % srcuri)
-    (md5value, sha256value) = checksums
-    if md5value:
-        lines_before.append('SRC_URI[md5sum] = "%s"' % md5value)
-    if sha256value:
-        lines_before.append('SRC_URI[sha256sum] = "%s"' % sha256value)
+    for key, value in sorted(checksums.items()):
+        lines_before.append('SRC_URI[%s] = "%s"' % (key, value))
     if srcuri and supports_srcrev(srcuri):
         lines_before.append('')
         lines_before.append('# Modify these as desired')
-        lines_before.append('PV = "%s+git${SRCPV}"' % (realpv or '1.0'))
+        # Note: we have code to replace realpv further down if it gets set to some other value
+        scheme, _, _, _, _, _ = bb.fetch2.decodeurl(srcuri)
+        if scheme in ['git', 'gitsm']:
+            srcpvprefix = 'git'
+        elif scheme == 'svn':
+            srcpvprefix = 'svnr'
+        else:
+            srcpvprefix = scheme
+        lines_before.append('PV = "%s+%s${SRCPV}"' % (realpv or '1.0', srcpvprefix))
+        pv_srcpv = True
         if not args.autorev and srcrev == '${AUTOREV}':
             if os.path.exists(os.path.join(srctree, '.git')):
                 (stdout, _) = bb.process.run('git rev-parse HEAD', cwd=srctree)
             srcrev = stdout.rstrip()
         lines_before.append('SRCREV = "%s"' % srcrev)
+    if args.provides:
+        lines_before.append('PROVIDES = "%s"' % args.provides)
     lines_before.append('')
 
     if srcsubdir and not args.binary:
@@ -677,6 +775,15 @@ def create_recipe(args):
             if '_' in pn:
                 pn = pn.replace('_', '-')
 
+    if srcuri and not realpv or not pn:
+        name_pn, name_pv = determine_from_url(srcuri)
+        if name_pn and not pn:
+            pn = name_pn
+        if name_pv and not realpv:
+            realpv = name_pv
+
+    licvalues = handle_license_vars(srctree_use, lines_before, handled, extravalues, tinfoil.config_data)
+
     if not outfile:
         if not pn:
             log_error_cond('Unable to determine short program name from source tree - please specify name with -N/--name or output file name with -o/--outfile', args.devtool)
@@ -726,10 +833,11 @@ def create_recipe(args):
                 skipblank = True
                 continue
         elif line.startswith('SRC_URI = '):
-            if realpv:
+            if realpv and not pv_srcpv:
                 line = line.replace(realpv, '${PV}')
         elif line.startswith('PV = '):
             if realpv:
+                # Replace the first part of the PV value
                 line = re.sub('"[^+]*\+', '"%s+' % realpv, line)
         lines_before.append(line)
 
@@ -768,9 +876,6 @@ def create_recipe(args):
     outlines.extend(lines_after)
 
     if extravalues:
-        if 'LICENSE' in extravalues and not licvalues:
-            # Don't blow away 'CLOSED' value that comments say we set
-            del extravalues['LICENSE']
         _, outlines = oe.recipeutils.patch_recipe_lines(outlines, extravalues, trailing_newline=False)
 
     if args.extract_to:
@@ -807,54 +912,101 @@ def create_recipe(args):
 
     return 0
 
+def check_single_file(fn, fetchuri):
+    """Determine if a single downloaded file is something we can't handle"""
+    with open(fn, 'r', errors='surrogateescape') as f:
+        if '<html' in f.read(100).lower():
+            logger.error('Fetching "%s" returned a single HTML page - check the URL is correct and functional' % fetchuri)
+            sys.exit(1)
+
+def split_value(value):
+    if isinstance(value, str):
+        return value.split()
+    else:
+        return value
+
 def handle_license_vars(srctree, lines_before, handled, extravalues, d):
+    lichandled = [x for x in handled if x[0] == 'license']
+    if lichandled:
+        # Someone else has already handled the license vars, just return their value
+        return lichandled[0][1]
+
     licvalues = guess_license(srctree, d)
+    licenses = []
     lic_files_chksum = []
     lic_unknown = []
+    lines = []
     if licvalues:
-        licenses = []
         for licvalue in licvalues:
             if not licvalue[0] in licenses:
                 licenses.append(licvalue[0])
             lic_files_chksum.append('file://%s;md5=%s' % (licvalue[1], licvalue[2]))
             if licvalue[0] == 'Unknown':
                 lic_unknown.append(licvalue[1])
-        lines_before.append('# WARNING: the following LICENSE and LIC_FILES_CHKSUM values are best guesses - it is')
-        lines_before.append('# your responsibility to verify that the values are complete and correct.')
-        if len(licvalues) > 1:
-            lines_before.append('#')
-            lines_before.append('# NOTE: multiple licenses have been detected; they have been separated with &')
-            lines_before.append('# in the LICENSE value for now since it is a reasonable assumption that all')
-            lines_before.append('# of the licenses apply. If instead there is a choice between the multiple')
-            lines_before.append('# licenses then you should change the value to separate the licenses with |')
-            lines_before.append('# instead of &. If there is any doubt, check the accompanying documentation')
-            lines_before.append('# to determine which situation is applicable.')
         if lic_unknown:
-            lines_before.append('#')
-            lines_before.append('# The following license files were not able to be identified and are')
-            lines_before.append('# represented as "Unknown" below, you will need to check them yourself:')
+            lines.append('#')
+            lines.append('# The following license files were not able to be identified and are')
+            lines.append('# represented as "Unknown" below, you will need to check them yourself:')
             for licfile in lic_unknown:
-                lines_before.append('#   %s' % licfile)
-            lines_before.append('#')
-    else:
-        lines_before.append('# Unable to find any files that looked like license statements. Check the accompanying')
-        lines_before.append('# documentation and source headers and set LICENSE and LIC_FILES_CHKSUM accordingly.')
-        lines_before.append('#')
-        lines_before.append('# NOTE: LICENSE is being set to "CLOSED" to allow you to at least start building - if')
-        lines_before.append('# this is not accurate with respect to the licensing of the software being built (it')
-        lines_before.append('# will not be in most cases) you must specify the correct value before using this')
-        lines_before.append('# recipe for anything other than initial testing/development!')
-        licenses = ['CLOSED']
-    pkg_license = extravalues.pop('LICENSE', None)
-    if pkg_license:
+                lines.append('#   %s' % licfile)
+
+    extra_license = split_value(extravalues.pop('LICENSE', []))
+    if '&' in extra_license:
+        extra_license.remove('&')
+    if extra_license:
         if licenses == ['Unknown']:
-            lines_before.append('# NOTE: The following LICENSE value was determined from the original package metadata')
-            licenses = [pkg_license]
+            licenses = extra_license
         else:
-            lines_before.append('# NOTE: Original package metadata indicates license is: %s' % pkg_license)
-    lines_before.append('LICENSE = "%s"' % ' & '.join(licenses))
-    lines_before.append('LIC_FILES_CHKSUM = "%s"' % ' \\\n                    '.join(lic_files_chksum))
-    lines_before.append('')
+            for item in extra_license:
+                if item not in licenses:
+                    licenses.append(item)
+    extra_lic_files_chksum = split_value(extravalues.pop('LIC_FILES_CHKSUM', []))
+    for item in extra_lic_files_chksum:
+        if item not in lic_files_chksum:
+            lic_files_chksum.append(item)
+
+    if lic_files_chksum:
+        # We are going to set the vars, so prepend the standard disclaimer
+        lines.insert(0, '# WARNING: the following LICENSE and LIC_FILES_CHKSUM values are best guesses - it is')
+        lines.insert(1, '# your responsibility to verify that the values are complete and correct.')
+    else:
+        # Without LIC_FILES_CHKSUM we set LICENSE = "CLOSED" to allow the
+        # user to get started easily
+        lines.append('# Unable to find any files that looked like license statements. Check the accompanying')
+        lines.append('# documentation and source headers and set LICENSE and LIC_FILES_CHKSUM accordingly.')
+        lines.append('#')
+        lines.append('# NOTE: LICENSE is being set to "CLOSED" to allow you to at least start building - if')
+        lines.append('# this is not accurate with respect to the licensing of the software being built (it')
+        lines.append('# will not be in most cases) you must specify the correct value before using this')
+        lines.append('# recipe for anything other than initial testing/development!')
+        licenses = ['CLOSED']
+
+    if extra_license and sorted(licenses) != sorted(extra_license):
+        lines.append('# NOTE: Original package / source metadata indicates license is: %s' % ' & '.join(extra_license))
+
+    if len(licenses) > 1:
+        lines.append('#')
+        lines.append('# NOTE: multiple licenses have been detected; they have been separated with &')
+        lines.append('# in the LICENSE value for now since it is a reasonable assumption that all')
+        lines.append('# of the licenses apply. If instead there is a choice between the multiple')
+        lines.append('# licenses then you should change the value to separate the licenses with |')
+        lines.append('# instead of &. If there is any doubt, check the accompanying documentation')
+        lines.append('# to determine which situation is applicable.')
+
+    lines.append('LICENSE = "%s"' % ' & '.join(licenses))
+    lines.append('LIC_FILES_CHKSUM = "%s"' % ' \\\n                    '.join(lic_files_chksum))
+    lines.append('')
+
+    # Replace the placeholder so we get the values in the right place in the recipe file
+    try:
+        pos = lines_before.index('##LICENSE_PLACEHOLDER##')
+    except ValueError:
+        pos = -1
+    if pos == -1:
+        lines_before.extend(lines)
+    else:
+        lines_before[pos:pos+1] = lines
+
     handled.append(('license', licvalues))
     return licvalues
 
@@ -951,6 +1103,10 @@ def crunch_license(licfile):
     crunched_md5sums['1daebd9491d1e8426900b4fa5a422814'] = 'LGPLv2.1'
     # https://github.com/FFmpeg/FFmpeg/blob/master/COPYING.LGPLv3
     crunched_md5sums['2ebfb3bb49b9a48a075cc1425e7f4129'] = 'LGPLv3'
+    # https://raw.githubusercontent.com/eclipse/mosquitto/v1.4.14/epl-v10
+    crunched_md5sums['efe2cb9a35826992b9df68224e3c2628'] = 'EPL-1.0'
+    # https://raw.githubusercontent.com/eclipse/mosquitto/v1.4.14/edl-v10
+    crunched_md5sums['0a9c78c0a398d1bbce4a166757d60387'] = 'EDL-1.0'
     lictext = []
     with open(licfile, 'r', errors='surrogateescape') as f:
         for line in f:
@@ -983,7 +1139,7 @@ def guess_license(srctree, d):
     md5sums = get_license_md5sums(d)
 
     licenses = []
-    licspecs = ['*LICEN[CS]E*', 'COPYING*', '*[Ll]icense*', 'LEGAL*', '[Ll]egal*', '*GPL*', 'README.lic*', 'COPYRIGHT*', '[Cc]opyright*']
+    licspecs = ['*LICEN[CS]E*', 'COPYING*', '*[Ll]icense*', 'LEGAL*', '[Ll]egal*', '*GPL*', 'README.lic*', 'COPYRIGHT*', '[Cc]opyright*', 'e[dp]l-v10']
     licfiles = []
     for root, dirs, files in os.walk(srctree):
         for fn in files:
@@ -1142,28 +1298,13 @@ def convert_rpm_xml(xmlfile):
     return values
 
 
-def check_npm(tinfoil, debugonly=False):
-    try:
-        rd = tinfoil.parse_recipe('nodejs-native')
-    except bb.providers.NoProvider:
-        # We still conditionally show the message and exit with the special
-        # return code, otherwise we can't show the proper message for eSDK
-        # users
-        log_error_cond('nodejs-native is required for npm but is not available - you will likely need to add a layer that provides nodejs', debugonly)
-        sys.exit(14)
-    bindir = rd.getVar('STAGING_BINDIR_NATIVE')
-    npmpath = os.path.join(bindir, 'npm')
-    if not os.path.exists(npmpath):
-        log_error_cond('npm required to process specified source, but npm is not available - you need to run bitbake -c addto_recipe_sysroot nodejs-native first', debugonly)
-        sys.exit(14)
-    return bindir
-
 def register_commands(subparsers):
     parser_create = subparsers.add_parser('create',
                                           help='Create a new recipe',
                                           description='Creates a new recipe from a source tree')
     parser_create.add_argument('source', help='Path or URL to source')
     parser_create.add_argument('-o', '--outfile', help='Specify filename for recipe to create')
+    parser_create.add_argument('-p', '--provides', help='Specify an alias for the item provided by the recipe')
     parser_create.add_argument('-m', '--machine', help='Make recipe machine-specific as opposed to architecture-specific', action='store_true')
     parser_create.add_argument('-x', '--extract-to', metavar='EXTRACTPATH', help='Assuming source is a URL, fetch it and extract it to the directory specified as %(metavar)s')
     parser_create.add_argument('-N', '--name', help='Name to use within recipe (PN)')
@@ -1171,12 +1312,13 @@ def register_commands(subparsers):
     parser_create.add_argument('-b', '--binary', help='Treat the source tree as something that should be installed verbatim (no compilation, same directory structure)', action='store_true')
     parser_create.add_argument('--also-native', help='Also add native variant (i.e. support building recipe for the build host as well as the target machine)', action='store_true')
     parser_create.add_argument('--src-subdir', help='Specify subdirectory within source tree to use', metavar='SUBDIR')
-    parser_create.add_argument('-a', '--autorev', help='When fetching from a git repository, set SRCREV in the recipe to a floating revision instead of fixed', action="store_true")
+    group = parser_create.add_mutually_exclusive_group()
+    group.add_argument('-a', '--autorev', help='When fetching from a git repository, set SRCREV in the recipe to a floating revision instead of fixed', action="store_true")
+    group.add_argument('-S', '--srcrev', help='Source revision to fetch if fetching from an SCM such as git (default latest)')
+    parser_create.add_argument('-B', '--srcbranch', help='Branch in source repository if fetching from an SCM such as git (default master)')
     parser_create.add_argument('--keep-temp', action="store_true", help='Keep temporary directory (for debugging)')
     parser_create.add_argument('--fetch-dev', action="store_true", help='For npm, also fetch devDependencies')
     parser_create.add_argument('--devtool', action="store_true", help=argparse.SUPPRESS)
-    # FIXME I really hate having to set parserecipes for this, but given we may need
-    # to call into npm (and we don't know in advance if we will or not) and in order
-    # to do so we need to know npm's recipe sysroot path, there's not much alternative
-    parser_create.set_defaults(func=create_recipe, parserecipes=True)
+    parser_create.add_argument('--mirrors', action="store_true", help='Enable PREMIRRORS and MIRRORS for source tree fetching (disabled by default).')
+    parser_create.set_defaults(func=create_recipe)
 

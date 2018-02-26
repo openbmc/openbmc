@@ -1,0 +1,58 @@
+From d8bb25e34d6533ba78eaae697771ee499a66706f Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 2 Aug 2017 03:41:37 -0400
+Subject: [PATCH] do not build manual
+
+On some host (ubuntu 1404), build manual failed.
+...
+./tools/man-generator --primary lvscan lvscan.8_des
+Failed to stat description file lvscan.8_des.
+...
+
+Do not build man to workaround the issue.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.in  | 4 ++--
+ configure.in | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 31d428d..24f89a2 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -18,7 +18,7 @@ top_builddir = @top_builddir@
+ abs_top_builddir = @abs_top_builddir@
+ abs_top_srcdir = @abs_top_srcdir@
+ 
+-SUBDIRS = conf daemons include lib libdaemon libdm man scripts tools
++SUBDIRS = conf daemons include lib libdaemon libdm scripts tools
+ 
+ ifeq ("@UDEV_RULES@", "yes")
+   SUBDIRS += udev
+@@ -69,7 +69,7 @@ liblvm.device-mapper: include.device-mapper
+ daemons.device-mapper: libdm.device-mapper
+ tools.device-mapper: libdm.device-mapper
+ scripts.device-mapper: include.device-mapper
+-device-mapper: tools.device-mapper daemons.device-mapper man.device-mapper
++device-mapper: tools.device-mapper daemons.device-mapper
+ 
+ ifeq ("@INTL@", "yes")
+ lib.pofile: include.pofile
+diff --git a/configure.in b/configure.in
+index 1dc8819..108ace4 100644
+--- a/configure.in
++++ b/configure.in
+@@ -2213,7 +2213,6 @@ libdm/Makefile
+ libdm/libdevmapper.pc
+ liblvm/Makefile
+ liblvm/liblvm2app.pc
+-man/Makefile
+ po/Makefile
+ python/Makefile
+ python/setup.py
+-- 
+2.8.1
+

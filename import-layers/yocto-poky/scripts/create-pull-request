@@ -34,7 +34,7 @@ RFC=0
 usage() {
 CMD=$(basename $0)
 cat <<EOM
-Usage: $CMD [-h] [-o output_dir] [-m msg_body_file] [-s subject] [-r relative_to] [-i commit_id] [-d relative_dir] -u remote [-b branch]
+Usage: $CMD [-h] [-o output_dir] [-m msg_body_file] [-s subject] [-r relative_to] [-i commit_id] [-d relative_dir] -u remote [-b branch] [-- <format-patch options>]
   -b branch           Branch name in the specified remote (default: current branch)
   -l local branch     Local branch name (default: HEAD)
   -c                  Create an RFC (Request for Comment) patch series
@@ -57,6 +57,7 @@ Usage: $CMD [-h] [-o output_dir] [-m msg_body_file] [-s subject] [-r relative_to
    $CMD -u contrib -r master -i misc -b nitin/misc -o pull-misc
    $CMD -u contrib -p "RFC PATCH" -b nitin/experimental
    $CMD -u contrib -i misc -b nitin/misc -d ./bitbake
+   $CMD -u contrib -r origin/master -o /tmp/out.v3 -- -v3 --in-reply-to=20170511120134.XX7799@site.com
 EOM
 }
 
@@ -108,8 +109,15 @@ while getopts "b:acd:hi:m:o:p:r:s:u:l:" OPT; do
 	a)
 		CPR_CONTRIB_AUTO_PUSH="1"
 		;;
+	--)
+		shift
+		break
+		;;
 	esac
 done
+
+shift "$((OPTIND - 1))"
+extraopts="$@"
 
 if [ -z "$REMOTE" ]; then
 	echo "ERROR: Missing parameter -u or CPR_CONTRIB_REMOTE in env, no git remote!"
@@ -201,7 +209,7 @@ if [ -n "$RELDIR" ]; then
 	ODIR=$(realpath $ODIR)
 	pdir=$(pwd)
 	cd $RELDIR
-	extraopts="--relative"
+	extraopts="$extraopts --relative"
 fi
 
 # Generate the patches and cover letter
@@ -218,7 +226,7 @@ fi
 [ -n "$RELDIR" ] && cd $pdir
 
 # Customize the cover letter
-CL="$ODIR/0000-cover-letter.patch"
+CL="$(echo $ODIR/*0000-cover-letter.patch)"
 PM="$ODIR/pull-msg"
 GIT_VERSION=$(`git --version` | tr -d '[:alpha:][:space:].' | sed 's/\(...\).*/\1/')
 NEWER_GIT_VERSION=210

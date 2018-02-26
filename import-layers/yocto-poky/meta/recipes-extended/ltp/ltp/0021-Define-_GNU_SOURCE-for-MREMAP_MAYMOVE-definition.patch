@@ -10,6 +10,8 @@ Fixes errors like
 error: 'MREMAP_MAYMOVE' undeclared (first use in this function)
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
 ---
  testcases/kernel/syscalls/mremap/mremap01.c | 4 +++-
  testcases/kernel/syscalls/mremap/mremap02.c | 2 ++

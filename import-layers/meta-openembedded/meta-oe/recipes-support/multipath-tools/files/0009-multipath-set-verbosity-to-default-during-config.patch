@@ -1,0 +1,40 @@
+From 526e539628e051128abf46a60ec22e18c9b5d84f Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 31 May 2017 15:03:02 -0500
+Subject: [PATCH 09/14] multipath: set verbosity to default during config
+
+condlog was setting the verbosity to 0 if there was no configuration.
+This keeps multipath from printing warning messages about config file
+problems that are found while loading the configuration. Instead, it
+should use the default config level until it loads the configuration
+to find the current value.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/debug.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libmultipath/debug.c b/libmultipath/debug.c
+index fbe171a..f89b264 100644
+--- a/libmultipath/debug.c
++++ b/libmultipath/debug.c
+@@ -11,6 +11,7 @@
+ #include "../third-party/valgrind/drd.h"
+ #include "vector.h"
+ #include "config.h"
++#include "defaults.h"
+ 
+ void dlog (int sink, int prio, const char * fmt, ...)
+ {
+@@ -21,7 +22,7 @@ void dlog (int sink, int prio, const char * fmt, ...)
+ 	va_start(ap, fmt);
+ 	conf = get_multipath_config();
+ 	ANNOTATE_IGNORE_READS_BEGIN();
+-	thres = (conf) ? conf->verbosity : 0;
++	thres = (conf) ? conf->verbosity : DEFAULT_VERBOSITY;
+ 	ANNOTATE_IGNORE_READS_END();
+ 	put_multipath_config(conf);
+ 
+-- 
+2.8.1
+

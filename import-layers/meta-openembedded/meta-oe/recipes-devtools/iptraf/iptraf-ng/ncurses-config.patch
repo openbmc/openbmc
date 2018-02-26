@@ -1,0 +1,81 @@
+Use pkg-config to search for ncurses libraries
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: iptraf-ng-1.1.4/Makefile
+===================================================================
+--- iptraf-ng-1.1.4.orig/Makefile
++++ iptraf-ng-1.1.4/Makefile
+@@ -205,8 +205,8 @@ endif
+ 
+ ifndef NCURSES_LDFLAGS
+ ifdef NEEDS_NCURSES5
+-	NCURSES_CFLAGS := $(shell ncurses5-config --cflags 2>/dev/null)
+-	NCURSES_LDFLAGS := $(shell ncurses5-config --libs 2>/dev/null)
++	NCURSES_CFLAGS := $(shell pkg-config ncurses --cflags 2>/dev/null)
++	NCURSES_LDFLAGS := $(shell pkg-config ncurses --libs 2>/dev/null)
+ 	ifndef NO_PANEL
+ 		NCURSES_LDFLAGS += -lpanel
+ 	endif
+@@ -215,8 +215,8 @@ endif
+ 
+ ifndef NCURSES_LDFLAGS
+ ifdef NEEDS_NCURSESW5
+-	NCURSES_CFLAGS := $(shell ncursesw5-config --cflags 2>/dev/null)
+-	NCURSES_LDFLAGS := $(shell ncursesw5-config --libs 2>/dev/null)
++	NCURSES_CFLAGS := $(shell p[k-config ncursesw --cflags 2>/dev/null)
++	NCURSES_LDFLAGS := $(shell pkg-config ncursesw --libs 2>/dev/null)
+ 	ifndef NO_PANEL
+ 		NCURSES_LDFLAGS += -lpanel
+ 	endif
+@@ -225,8 +225,8 @@ endif
+ 
+ ifndef NCURSES_LDFLAGS
+ ifdef NEEDS_NCURSES6
+-	NCURSES_CFLAGS := $(shell ncurses6-config --cflags 2>/dev/null)
+-	NCURSES_LDFLAGS := $(shell ncurses6-config --libs 2>/dev/null)
++	NCURSES_CFLAGS := $(shell pkg-config ncurses6 --cflags 2>/dev/null)
++	NCURSES_LDFLAGS := $(shell pkg-config ncurses6 --libs 2>/dev/null)
+ 	ifndef NO_PANEL
+ 		NCURSES_LDFLAGS += -lpanel
+ 	endif
+@@ -235,8 +235,8 @@ endif
+ 
+ ifndef NCURSES_LDFLAGS
+ ifdef NEEDS_NCURSESW6
+-	NCURSES_CFLAGS := $(shell ncursesw6-config --cflags 2>/dev/null)
+-	NCURSES_LDFLAGS := $(shell ncursesw6-config --libs 2>/dev/null)
++	NCURSES_CFLAGS := $(shell pkg-config ncursesw --cflags 2>/dev/null)
++	NCURSES_LDFLAGS := $(shell pkg-config ncursesw --libs 2>/dev/null)
+ 	ifndef NO_PANEL
+ 		NCURSES_LDFLAGS += -lpanel
+ 	endif
+@@ -246,17 +246,17 @@ endif
+ # try find ncuses by autodetect
+ ifndef NCURSES_LDFLAGS
+ 	ifneq ($(shell ncursesw6-config --libs 2>/dev/null),)
+-		NCURSES_CFLAGS := $(shell ncursesw6-config --cflags 2>/dev/null)
+-		NCURSES_LDFLAGS := $(shell ncursesw6-config --libs 2>/dev/null)
+-	else ifneq ($(shell ncurses6-config --libs 2>/dev/null),)
+-		NCURSES_CFLAGS := $(shell ncurses6-config --cflags 2>/dev/null)
+-		NCURSES_LDFLAGS := $(shell ncurses6-config --libs 2>/dev/null)
+-	else ifneq ($(shell ncursesw5-config --libs 2>/dev/null),)
+-		NCURSES_CFLAGS := $(shell ncursesw5-config --cflags 2>/dev/null)
+-		NCURSES_LDFLAGS := $(shell ncursesw5-config --libs 2>/dev/null)
+-	else ifneq ($(shell ncurses5-config --libs 2>/dev/null),)
+-		NCURSES_CFLAGS := $(shell ncurses5-config --cflags 2>/dev/null)
+-		NCURSES_LDFLAGS := $(shell ncurses5-config --libs 2>/dev/null)
++		NCURSES_CFLAGS := $(shell pkg-config ncursesw --cflags 2>/dev/null)
++		NCURSES_LDFLAGS := $(shell pkg-config ncursesw --libs 2>/dev/null)
++	else ifneq ($(shell pkg-config ncurses --libs 2>/dev/null),)
++		NCURSES_CFLAGS := $(shell pkg-config ncurses --cflags 2>/dev/null)
++		NCURSES_LDFLAGS := $(shell pkg-config ncurses --libs 2>/dev/null)
++	else ifneq ($(shell pkg-config ncursesw --libs 2>/dev/null),)
++		NCURSES_CFLAGS := $(shell pkg-config ncursesw --cflags 2>/dev/null)
++		NCURSES_LDFLAGS := $(shell pkg-config ncursesw --libs 2>/dev/null)
++	else ifneq ($(shell pkg-config ncurses --libs 2>/dev/null),)
++		NCURSES_CFLAGS := $(shell pkg-config ncurses --cflags 2>/dev/null)
++		NCURSES_LDFLAGS := $(shell pkg-config ncurses --libs 2>/dev/null)
+ 	endif
+ 
+ 	ifneq ($(NCURSES_LDFLAGS),)

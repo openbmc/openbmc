@@ -1,0 +1,19 @@
+Remove hardcode path refer to host to avoid host contamination.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/devices/devs.mak b/devices/devs.mak
+index 3070d2e..df663f0 100644
+--- a/devices/devs.mak
++++ b/devices/devs.mak
+@@ -546,7 +546,7 @@ $(DEVOBJ)gdevxalt.$(OBJ) : $(DEVSRC)gdevxalt.c $(GDEVX) $(math__h) $(memory__h)\
+ ### NON PORTABLE, ONLY UNIX WITH GCC SUPPORT
+ 
+ $(DEVOBJ)X11.so : $(x11alt_) $(x11_) $(DEVS_MAK) $(MAKEDIRS)
+-	$(CCLD) $(LDFLAGS) -shared -o $(DEVOBJ)X11.so $(x11alt_) $(x11_) -L/usr/X11R6/lib -lXt -lSM -lICE -lXext -lX11 $(XLIBDIRS)
++	$(CCLD) $(LDFLAGS) -shared -o $(DEVOBJ)X11.so $(x11alt_) $(x11_) -lXt -lSM -lICE -lXext -lX11 $(XLIBDIRS)
+ 
+ ###### --------------- Memory-buffered printer devices --------------- ######
+ 

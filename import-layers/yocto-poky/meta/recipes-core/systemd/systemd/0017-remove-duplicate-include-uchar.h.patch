@@ -6,6 +6,7 @@ Subject: [PATCH 17/19] remove duplicate include uchar.h
 missing.h already includes it
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
 ---
  src/basic/escape.h | 1 -
  src/basic/utf8.h   | 1 -

@@ -7,6 +7,8 @@ Fixes musl build errors like
 error: 'SA_NOMASK' undeclared (first use in this function)
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
 ---
  testcases/misc/crash/crash01.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -9,7 +9,7 @@ include recipes-bsp/common/firmware.inc
 
 RDEPENDS_${PN} = "rpi-config"
 
-COMPATIBLE_MACHINE = "raspberrypi"
+COMPATIBLE_MACHINE = "^rpi$"
 
 S = "${RPIFW_S}/boot"
 

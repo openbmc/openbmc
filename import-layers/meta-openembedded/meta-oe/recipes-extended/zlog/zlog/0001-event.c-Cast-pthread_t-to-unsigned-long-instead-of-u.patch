@@ -1,0 +1,32 @@
+From b97f62fdf3b78eb5cfcb3a1b12c6fd62f735717b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2017 09:29:33 -0700
+Subject: [PATCH] event.c: Cast pthread_t to unsigned long instead of unsigned
+ int
+
+On 64bit machines it ends up in errors
+
+event.c:85:67: error: cast from pointer to integer of different size [-Werror=pointer-to-int-cast]
+  a_event->tid_hex_str_len = sprintf(a_event->tid_hex_str, "0x%x", (unsigned int)a_event->tid);
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/event.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/event.c b/src/event.c
+index 8f988b5..c632c33 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -82,7 +82,7 @@ zlog_event_t *zlog_event_new(int time_cache_count)
+ 	a_event->tid = pthread_self();
+ 
+ 	a_event->tid_str_len = sprintf(a_event->tid_str, "%lu", (unsigned long)a_event->tid);
+-	a_event->tid_hex_str_len = sprintf(a_event->tid_hex_str, "0x%x", (unsigned int)a_event->tid);
++	a_event->tid_hex_str_len = sprintf(a_event->tid_hex_str, "0x%lu", (unsigned long)a_event->tid);
+ 
+ 	//zlog_event_profile(a_event, ZC_DEBUG);
+ 	return a_event;
+-- 
+2.13.3
+

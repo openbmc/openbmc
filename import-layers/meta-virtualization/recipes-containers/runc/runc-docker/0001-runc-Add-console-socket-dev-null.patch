@@ -1,0 +1,33 @@
+From 3fff2a3505fba1d1ff0074edff15708a77f6cfa9 Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Wed, 12 Jul 2017 13:35:03 -0700
+Subject: [PATCH] runc: Add --console-socket=/dev/null
+
+This allows for setting up a detached session where you do not want to
+set the terminal to false in the config.json.  More or less this is a
+runtime override.
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+---
+ utils_linux.go | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/utils_linux.go b/utils_linux.go
+index 8085f7fe..e6d31b35 100644
+--- a/src/import/utils_linux.go
++++ b/src/import/utils_linux.go
+@@ -227,6 +227,11 @@ type runner struct {
+ }
+ 
+ func (r *runner) run(config *specs.Process) (int, error) {
++	if (r.consoleSocket == "/dev/null") {
++		r.detach = false
++		r.consoleSocket = ""
++		config.Terminal = false
++	}
+ 	if err := r.checkTerminal(config); err != nil {
+ 		r.destroy()
+ 		return -1, err
+-- 
+2.11.0
+

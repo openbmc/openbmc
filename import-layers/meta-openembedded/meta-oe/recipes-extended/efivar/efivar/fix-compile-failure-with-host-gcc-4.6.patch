@@ -20,10 +20,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  gcc.specs | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/gcc.specs b/gcc.specs
-index 0d4bbda..3802ca6 100644
---- a/gcc.specs
-+++ b/gcc.specs
+Index: git/gcc.specs
+===================================================================
+--- git.orig/gcc.specs
++++ git/gcc.specs
 @@ -2,13 +2,13 @@
  + -D_GNU_SOURCE
  
@@ -35,11 +35,8 @@ index 0d4bbda..3802ca6 100644
  + %(efivar_cpp_options)
  
  *cc1_options:
--+ %(efivar_cpp_options) -Wmaybe-uninitialized -fno-merge-constants -flto -fvisibility=hidden %{!r:%{!fpie:%{!fPIE:%{!fpic:%{!fPIC:%{!fno-pic:-fPIE}}}}}}
+-+ %(efivar_cpp_options) -Wmaybe-uninitialized -fno-merge-constants -fvisibility=hidden %{!r:%{!fpie:%{!fPIE:%{!fpic:%{!fPIC:%{!fno-pic:-fPIE}}}}}}
 ++ %(efivar_cpp_options) -fno-merge-constants -fvisibility=hidden %{!r:%{!fpie:%{!fPIE:%{!fpic:%{!fPIC:%{!fno-pic:-fPIE}}}}}}
  
  *self_spec:
  + %{!shared:%{!static:%{!r:-pie}}} %{static:-Wl,-no-fatal-warnings -Wl,-static -static -Wl,-z,relro,-z,now}
--- 
-2.8.1
-

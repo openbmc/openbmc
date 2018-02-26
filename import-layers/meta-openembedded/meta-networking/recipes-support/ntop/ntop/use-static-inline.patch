@@ -1,0 +1,32 @@
+[PATCH] replace 'inline' with 'static inline' for gcc 5.x
+
+gcc 5.x defaults to -std=gnu11 instead of -std=gnu89 which change
+the semantics for inline functions and the standalone 'inline'
+causes error with "gcc5 -g -o0"
+ 
+Replace inline with static inline to be compatible with both gcc 4
+and 5.
+
+Upstream-status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ nDPI/src/lib/protocols/ssl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nDPI/src/lib/protocols/ssl.c b/nDPI/src/lib/protocols/ssl.c
+index 245b8c3..72beda9 100644
+--- a/nDPI/src/lib/protocols/ssl.c
++++ b/nDPI/src/lib/protocols/ssl.c
+@@ -39,7 +39,7 @@ static void ipoque_int_ssl_add_connection(struct ipoque_detection_module_struct
+ 
+ #ifdef HAVE_NTOP
+ #ifndef WIN32
+-inline int min(int a, int b) { return(a < b ? a : b); }
++static inline int min(int a, int b) { return(a < b ? a : b); }
+ #endif
+ 
+ static void stripCertificateTrailer(char *buffer, int buffer_len) {
+-- 
+1.9.1
+

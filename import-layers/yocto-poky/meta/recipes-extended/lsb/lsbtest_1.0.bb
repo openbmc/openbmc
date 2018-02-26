@@ -1,4 +1,5 @@
 SUMMARY = "Automates Linux Standard Base (LSB) tests"
+HOMEPAGE = "https://wiki.debian.org/LSBInitScripts"
 SECTION = "console/utils"
 LICENSE = "GPLv2"
 PR = "r3"

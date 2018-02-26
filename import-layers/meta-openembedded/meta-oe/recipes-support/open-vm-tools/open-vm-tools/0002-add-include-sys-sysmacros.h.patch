@@ -1,0 +1,33 @@
+From 5818acc8032e3247257730376e947330340a07b3 Mon Sep 17 00:00:00 2001
+From: Martin Kelly <mkelly@xevo.com>
+Date: Mon, 22 May 2017 17:00:05 -0700
+Subject: [PATCH 2/2] add #include <sys/sysmacros.h>
+
+In newer glibc versions, the definition for major() has been moved to
+sys/sysmacros.h, and using the older version in <sys/types.h> has been
+deprecated. So, add an include for <sys/sysmacros.h>.
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Kelly <mkelly@xevo.com>
+---
+ lib/wiper/wiperPosix.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/open-vm-tools/lib/wiper/wiperPosix.c b/open-vm-tools/lib/wiper/wiperPosix.c
+index d389eee..1f221fc 100644
+--- a/lib/wiper/wiperPosix.c
++++ b/lib/wiper/wiperPosix.c
+@@ -40,6 +40,9 @@
+ #  include <libgen.h>
+ # endif /* __FreeBSD_version >= 500000 */
+ #endif
++#if defined(__linux__)
++#include <sys/sysmacros.h>
++#endif
+ #include <unistd.h>
+ 
+ #include "vmware.h"
+-- 
+2.7.4
+

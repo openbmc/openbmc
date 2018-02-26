@@ -49,6 +49,7 @@
         recipesTypeAheadUrl: {% url 'xhr_recipestypeahead' project.id as paturl%}{{paturl|json}},
         layersTypeAheadUrl: {% url 'xhr_layerstypeahead' project.id as paturl%}{{paturl|json}},
         machinesTypeAheadUrl: {% url 'xhr_machinestypeahead' project.id as paturl%}{{paturl|json}},
+        distrosTypeAheadUrl: {% url 'xhr_distrostypeahead' project.id as paturl%}{{paturl|json}},
         projectBuildsUrl: {% url 'projectbuilds' project.id as pburl %}{{pburl|json}},
         xhrCustomRecipeUrl : "{% url 'xhr_customrecipe' %}",
         projectId : {{project.id}},
@@ -109,6 +110,7 @@
                 All builds
               </a>
               </li>
+              {% if project_enable %}
               <li id="navbar-all-projects"
               {% if request.resolver_match.url_name == 'all-projects'  %}
               class="active"
@@ -118,6 +120,7 @@
                 All projects
               </a>
               </li>
+              {% endif %}
             {% endif %}
               <li id="navbar-docs">
               <a target="_blank" href="http://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html">
@@ -126,7 +129,9 @@
               </a>
               </li>
             </ul>
+            {% if project_enable %}
             <a class="btn btn-default navbar-btn navbar-right" id="new-project-button" href="{% url 'newproject' %}">New project</a>
+            {% endif %}
           </div>
       </div>
     </nav>

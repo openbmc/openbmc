@@ -35,7 +35,7 @@ Notes
    run as non root. The runqemu-gen-tapdevs script can also be used by
    root to prepopulate the appropriate network devices.
  - You can access the host computer at 192.168.7.1 within the image.
- - Your qemu system will be accessible as 192.16.7.2.
+ - Your qemu system will be accessible as 192.168.7.2.
  - The script extracts the root filesystem specified under pseudo and sets up a userspace
    NFS server to share the image over by default meaning the filesystem can be accessed by
    both the host and guest systems.

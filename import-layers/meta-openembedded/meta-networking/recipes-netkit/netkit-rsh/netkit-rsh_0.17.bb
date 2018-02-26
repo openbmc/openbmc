@@ -70,7 +70,7 @@ do_install () {
         install -m 0644 debian/hosts.equiv ${D}/${sysconfdir}
         install -m 0644 ${WORKDIR}/rexec.pam ${D}/${sysconfdir}/pam.d/rexec
         install -m 0644 ${WORKDIR}/rlogin.pam ${D}/${sysconfdir}/pam.d/rlogin
-        install -m 0664 ${WORKDIR}/rsh.pam ${D}/${sysconfdir}/pam.d/rsh
+        install -m 0644 ${WORKDIR}/rsh.pam ${D}/${sysconfdir}/pam.d/rsh
     fi
     cp ${WORKDIR}/rexec.xinetd.netkit  ${D}/${sysconfdir}/xinetd.d/rexec
     cp ${WORKDIR}/rlogin.xinetd.netkit  ${D}/${sysconfdir}/xinetd.d/rlogin

@@ -1,0 +1,67 @@
+From adc0668b854289a11cfc29597b5566ba1869d17e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 07:32:09 -0700
+Subject: [PATCH 2/2] user format string in g_dbus_message_new_method_error ()
+
+This fixes format errors with -Werror=format-security
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/nm-manager.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/nm-manager.c b/src/nm-manager.c
+index c3d65cd..e814912 100644
+--- a/src/nm-manager.c
++++ b/src/nm-manager.c
+@@ -4871,6 +4871,7 @@ prop_set_auth_done_cb (NMAuthChain *chain,
+ 	if (error || (result != NM_AUTH_CALL_RESULT_YES)) {
+ 		reply = g_dbus_message_new_method_error (pfd->message,
+ 		                                         NM_PERM_DENIED_ERROR,
++		                                         "%s",
+ 		                                         (error_message = "Not authorized to perform this operation"));
+ 		if (error)
+ 			error_message = error->message;
+@@ -4882,6 +4883,7 @@ prop_set_auth_done_cb (NMAuthChain *chain,
+ 	if (!object) {
+ 		reply = g_dbus_message_new_method_error (pfd->message,
+ 		                                         "org.freedesktop.DBus.Error.UnknownObject",
++		                                         "%s",
+ 		                                         (error_message = "Object doesn't exist."));
+ 		goto done;
+ 	}
+@@ -4890,6 +4892,7 @@ prop_set_auth_done_cb (NMAuthChain *chain,
+ 	if (!nm_exported_object_get_interface_by_type (object, pfd->interface_type)) {
+ 		reply = g_dbus_message_new_method_error (pfd->message,
+ 		                                         "org.freedesktop.DBus.Error.InvalidArgs",
++		                                         "%s",
+ 		                                         (error_message = "Object is of unexpected type."));
+ 		goto done;
+ 	}
+@@ -4905,6 +4908,7 @@ prop_set_auth_done_cb (NMAuthChain *chain,
+ 		if (global_dns && !nm_global_dns_config_is_internal (global_dns)) {
+ 			reply = g_dbus_message_new_method_error (pfd->message,
+ 			                                         NM_PERM_DENIED_ERROR,
++			                                         "%s",
+ 			                                         (error_message = "Global DNS configuration already set via configuration file"));
+ 			goto done;
+ 		}
+@@ -4949,6 +4953,7 @@ do_set_property_check (gpointer user_data)
+ 	if (!pfd->subject) {
+ 		reply = g_dbus_message_new_method_error (pfd->message,
+ 		                                         NM_PERM_DENIED_ERROR,
++		                                         "%s",
+ 		                                         (error_message = "Could not determine request UID."));
+ 		goto out;
+ 	}
+@@ -4958,6 +4963,7 @@ do_set_property_check (gpointer user_data)
+ 	if (!chain) {
+ 		reply = g_dbus_message_new_method_error (pfd->message,
+ 		                                         NM_PERM_DENIED_ERROR,
++		                                         "%s",
+ 		                                         (error_message = "Could not authenticate request."));
+ 		goto out;
+ 	}
+-- 
+2.13.2
+

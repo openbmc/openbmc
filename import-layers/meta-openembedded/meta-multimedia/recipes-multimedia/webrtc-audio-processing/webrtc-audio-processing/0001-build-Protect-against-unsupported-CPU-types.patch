@@ -1,0 +1,29 @@
+From 4945dca11bc4ddec60bd858f45212dc8f39638e0 Mon Sep 17 00:00:00 2001
+From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
+Date: Tue, 5 Jul 2016 18:07:45 -0400
+Subject: [PATCH 1/6] build: Protect against unsupported CPU types
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+Upstream-Status: Accepted [expected in 0.4]
+---
+ configure.ac | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6f9553b..f5304b8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,8 +70,9 @@ AS_CASE(["${host_cpu}"],
+         [
+          HAVE_ARM=1
+          ARCH_CFLAGS="-DWEBRTC_ARCH_ARM"
+-        ]
++        ],
+     # FIXME: Add MIPS support, see webrtc/BUILD.gn for defines
++    [AC_MSG_ERROR([Unsupported CPU type $host_cpu])]
+ )
+ AM_CONDITIONAL(HAVE_X86, [test "x${HAVE_X86}" = "x1"])
+ AM_CONDITIONAL(HAVE_ARM, [test "x${HAVE_ARM}" = "x1"])
+-- 
+2.11.0
+

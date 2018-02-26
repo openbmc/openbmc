@@ -5,14 +5,11 @@ LIC_FILES_CHKSUM = "file://gtk/gtk-play.c;beginline=1;endline=20;md5=f8c72dae3d3
 DEPENDS = "glib-2.0 gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gtk+3 glib-2.0-native"
 
 SRC_URI = "git://github.com/sdroege/gst-player.git \
-           file://filechooser.patch;apply=0 \
-           file://Fix-pause-play.patch;apply=0 \
-           file://Add-error-signal-emission-for-missing-plugins.patch;apply=0 \
-           file://0001-gtk-play-Disable-visualizations.patch \
            file://gst-player.desktop"
 
 SRCREV = "ee3c226c82767a089743e4e06058743e67f73cdb"
 PV = "0.0.1+git${SRCPV}"
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 S = "${WORKDIR}/git"
 

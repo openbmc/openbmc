@@ -1,0 +1,76 @@
+Remove host information from version.h
+
+make lsof not include host information
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ dialects/linux/Makefile |   50 +++++++++--------------------------------------
+ 1 file changed, 9 insertions(+), 41 deletions(-)
+
+diff --git a/dialects/linux/Makefile b/dialects/linux/Makefile
+index 2bea108..792142b 100644
+--- a/dialects/linux/Makefile
++++ b/dialects/linux/Makefile
+@@ -76,48 +76,16 @@ version.h:	FRC
+ 	@echo Constructing version.h
+ 	@rm -f version.h
+ 	@echo '#define	LSOF_BLDCMT	"${LSOF_BLDCMT}"' > version.h;
+-	@echo '#define	LSOF_CC		"${CC}"' >> version.h
+-	@echo '#define	LSOF_CCV	"${CCV}"' >> version.h
+-	@echo '#define	LSOF_CCDATE	"'`date`'"' >> version.h
+-	@echo '#define	LSOF_CCFLAGS	"'`echo ${CFLAGS} | sed 's/\\\\(/\\(/g' | sed 's/\\\\)/\\)/g' | sed 's/"/\\\\"/g'`'"' >> version.h
++	@echo '#define	LSOF_CC		""' >> version.h
++	@echo '#define	LSOF_CCV	""' >> version.h
++	@echo '#define	LSOF_CCDATE	""' >> version.h
++	@echo '#define	LSOF_CCFLAGS	""' >> version.h
+ 	@echo '#define	LSOF_CINFO	"${CINFO}"' >> version.h
+-	@if [ "X${LSOF_HOST}" = "X" ]; then \
+-	  echo '#define	LSOF_HOST	"'`uname -n`'"' >> version.h; \
+-	else \
+-	  if [ "${LSOF_HOST}" = "none" ]; then \
+-	    echo '#define	LSOF_HOST	""' >> version.h; \
+-	  else \
+-	    echo '#define	LSOF_HOST	"${LSOF_HOST}"' >> version.h; \
+-	  fi \
+-	fi
+-	@echo '#define	LSOF_LDFLAGS	"${CFGL}"' >> version.h
+-	@if [ "X${LSOF_LOGNAME}" = "X" ]; then \
+-	  echo '#define	LSOF_LOGNAME	"${LOGNAME}"' >> version.h; \
+-	else \
+-	  if [ "${LSOF_LOGNAME}" = "none" ]; then \
+-	    echo '#define	LSOF_LOGNAME	""' >> version.h; \
+-	  else \
+-	    echo '#define	LSOF_LOGNAME	"${LSOF_LOGNAME}"' >> version.h; \
+-	  fi; \
+-	fi
+-	@if [ "X${LSOF_SYSINFO}" = "X" ]; then \
+-	    echo '#define	LSOF_SYSINFO	"'`uname -a`'"' >> version.h; \
+-	else \
+-	  if [ "${LSOF_SYSINFO}" = "none" ]; then \
+-	    echo '#define	LSOF_SYSINFO	""' >> version.h; \
+-	  else \
+-	    echo '#define	LSOF_SYSINFO	"${LSOF_SYSINFO}"' >> version.h; \
+-	  fi \
+-	fi
+-	@if [ "X${LSOF_USER}" = "X" ]; then \
+-	  echo '#define	LSOF_USER	"${USER}"' >> version.h; \
+-	else \
+-	  if [ "${LSOF_USER}" = "none" ]; then \
+-	    echo '#define	LSOF_USER	""' >> version.h; \
+-	  else \
+-	    echo '#define	LSOF_USER	"${LSOF_USER}"' >> version.h; \
+-	  fi \
+-	fi
++	@echo '#define	LSOF_HOST	""' >> version.h;
++	@echo '#define	LSOF_LDFLAGS	""' >> version.h
++	@echo '#define	LSOF_LOGNAME	""' >> version.h;
++	@echo '#define	LSOF_SYSINFO	""' >> version.h;
++	@echo '#define	LSOF_USER	""' >> version.h;
+ 	@sed '/VN/s/.ds VN \(.*\)/#define	LSOF_VERSION	"\1"/' < version >> version.h
+ 
+ FRC:
+-- 
+1.7.9.5
+

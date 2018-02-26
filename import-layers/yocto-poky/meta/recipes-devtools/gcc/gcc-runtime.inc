@@ -34,7 +34,6 @@ RUNTIMETARGET_remove_libc-musl = "libmpx"
 
 do_configure () {
 	export CXX="${CXX} -nostdinc++ -nostdlib++"
-
 	for d in libgcc ${RUNTIMETARGET}; do
 		echo "Configuring $d"
 		rm -rf ${B}/${TARGET_SYS}/$d/
@@ -43,6 +42,9 @@ do_configure () {
 		chmod a+x ${S}/$d/configure
 		relpath=${@os.path.relpath("${S}/$d", "${B}/${TARGET_SYS}/$d")}
 		$relpath/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
+		if [ "$d" = "libgcc" ]; then
+			(cd ${B}/${TARGET_SYS}/libgcc; oe_runmake enable-execute-stack.c unwind.h md-unwind-support.h sfp-machine.h gthr-default.h)
+		fi
 	done
 }
 EXTRACONFFUNCS += "extract_stashed_builddir"
@@ -99,8 +101,8 @@ do_install_append_class-target () {
 
 	if [ "${TCLIBC}" != "glibc" ]; then
 		case "${TARGET_OS}" in
-			"linux-musl" | "linux-uclibc" | "linux-*spe") extra_target_os="linux";;
-			"linux-musleabi" | "linux-uclibceabi") extra_target_os="linux-gnueabi";;
+			"linux-musl" | "linux-*spe") extra_target_os="linux";;
+			"linux-musleabi") extra_target_os="linux-gnueabi";;
 			*) extra_target_os="linux";;
 		esac
 		ln -s ${TARGET_SYS} ${D}${includedir}/c++/${BINV}/${TARGET_ARCH}${TARGET_VENDOR}-$extra_target_os

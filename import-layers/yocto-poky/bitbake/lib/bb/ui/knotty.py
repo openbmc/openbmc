@@ -207,8 +207,10 @@ class TerminalFilter(object):
             self.interactive = False
             bb.note("Unable to use interactive mode for this terminal, using fallback")
             return
-        console.addFilter(InteractConsoleLogFilter(self, format))
-        errconsole.addFilter(InteractConsoleLogFilter(self, format))
+        if console:
+            console.addFilter(InteractConsoleLogFilter(self, format))
+        if errconsole:
+            errconsole.addFilter(InteractConsoleLogFilter(self, format))
 
         self.main_progress = None
 
@@ -310,6 +312,32 @@ class TerminalFilter(object):
             fd = sys.stdin.fileno()
             self.termios.tcsetattr(fd, self.termios.TCSADRAIN, self.stdinbackup)
 
+def print_event_log(event, includelogs, loglines, termfilter):
+    # FIXME refactor this out further
+    logfile = event.logfile
+    if logfile and os.path.exists(logfile):
+        termfilter.clearFooter()
+        bb.error("Logfile of failure stored in: %s" % logfile)
+        if includelogs and not event.errprinted:
+            print("Log data follows:")
+            f = open(logfile, "r")
+            lines = []
+            while True:
+                l = f.readline()
+                if l == '':
+                    break
+                l = l.rstrip()
+                if loglines:
+                    lines.append(' | %s' % l)
+                    if len(lines) > int(loglines):
+                        lines.pop(0)
+                else:
+                    print('| %s' % l)
+            f.close()
+            if lines:
+                for line in lines:
+                    print(line)
+
 def _log_settings_from_server(server, observe_only):
     # Get values of variables which control our output
     includelogs, error = server.runCommand(["getVariable", "BBINCLUDELOGS"])
@@ -342,6 +370,9 @@ _evt_list = [ "bb.runqueue.runQueueExitWait", "bb.event.LogExecTTY", "logging.Lo
 
 def main(server, eventHandler, params, tf = TerminalFilter):
 
+    if not params.observe_only:
+        params.updateToServer(server, os.environ.copy())
+
     includelogs, loglines, consolelogfile = _log_settings_from_server(server, params.observe_only)
 
     if sys.stdin.isatty() and sys.stdout.isatty():
@@ -365,8 +396,9 @@ def main(server, eventHandler, params, tf = TerminalFilter):
     bb.msg.addDefaultlogFilter(errconsole, bb.msg.BBLogFilterStdErr)
     console.setFormatter(format)
     errconsole.setFormatter(format)
-    logger.addHandler(console)
-    logger.addHandler(errconsole)
+    if not bb.msg.has_console_handler(logger):
+        logger.addHandler(console)
+        logger.addHandler(errconsole)
 
     bb.utils.set_process_name("KnottyUI")
 
@@ -395,7 +427,6 @@ def main(server, eventHandler, params, tf = TerminalFilter):
     universe = False
     if not params.observe_only:
         params.updateFromServer(server)
-        params.updateToServer(server, os.environ.copy())
         cmdline = params.parseActions()
         if not cmdline:
             print("Nothing to do.  Use 'bitbake world' to build everything, or run 'bitbake --help' for usage information.")
@@ -471,11 +502,11 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                         continue
 
                     # Prefix task messages with recipe/task
-                    if event.taskpid in helper.running_tasks:
+                    if event.taskpid in helper.running_tasks and event.levelno != format.PLAIN:
                         taskinfo = helper.running_tasks[event.taskpid]
                         event.msg = taskinfo['title'] + ': ' + event.msg
                 if hasattr(event, 'fn'):
-                        event.msg = event.fn + ': ' + event.msg
+                    event.msg = event.fn + ': ' + event.msg
                 logger.handle(event)
                 continue
 
@@ -484,29 +515,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                 continue
             if isinstance(event, bb.build.TaskFailed):
                 return_value = 1
-                logfile = event.logfile
-                if logfile and os.path.exists(logfile):
-                    termfilter.clearFooter()
-                    bb.error("Logfile of failure stored in: %s" % logfile)
-                    if includelogs and not event.errprinted:
-                        print("Log data follows:")
-                        f = open(logfile, "r")
-                        lines = []
-                        while True:
-                            l = f.readline()
-                            if l == '':
-                                break
-                            l = l.rstrip()
-                            if loglines:
-                                lines.append(' | %s' % l)
-                                if len(lines) > int(loglines):
-                                    lines.pop(0)
-                            else:
-                                print('| %s' % l)
-                        f.close()
-                        if lines:
-                            for line in lines:
-                                print(line)
+                print_event_log(event, includelogs, loglines, termfilter)
             if isinstance(event, bb.build.TaskBase):
                 logger.info(event._message)
                 continue
@@ -559,7 +568,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                 return_value = event.exitcode
                 if event.error:
                     errors = errors + 1
-                    logger.error("Command execution failed: %s", event.error)
+                    logger.error(str(event))
                 main.shutdown = 2
                 continue
             if isinstance(event, bb.command.CommandExit):
@@ -570,39 +579,16 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                 main.shutdown = 2
                 continue
             if isinstance(event, bb.event.MultipleProviders):
-                logger.info("multiple providers are available for %s%s (%s)", event._is_runtime and "runtime " or "",
-                            event._item,
-                            ", ".join(event._candidates))
-                rtime = ""
-                if event._is_runtime:
-                    rtime = "R"
-                logger.info("consider defining a PREFERRED_%sPROVIDER entry to match %s" % (rtime, event._item))
+                logger.info(str(event))
                 continue
             if isinstance(event, bb.event.NoProvider):
-                if event._runtime:
-                    r = "R"
-                else:
-                    r = ""
-
-                extra = ''
-                if not event._reasons:
-                    if event._close_matches:
-                        extra = ". Close matches:\n  %s" % '\n  '.join(event._close_matches)
-
                 # For universe builds, only show these as warnings, not errors
-                h = logger.warning
                 if not universe:
                     return_value = 1
                     errors = errors + 1
-                    h = logger.error
-
-                if event._dependees:
-                    h("Nothing %sPROVIDES '%s' (but %s %sDEPENDS on or otherwise requires it)%s", r, event._item, ", ".join(event._dependees), r, extra)
+                    logger.error(str(event))
                 else:
-                    h("Nothing %sPROVIDES '%s'%s", r, event._item, extra)
-                if event._reasons:
-                    for reason in event._reasons:
-                        h("%s", reason)
+                    logger.warning(str(event))
                 continue
 
             if isinstance(event, bb.runqueue.sceneQueueTaskStarted):
@@ -624,13 +610,11 @@ def main(server, eventHandler, params, tf = TerminalFilter):
             if isinstance(event, bb.runqueue.runQueueTaskFailed):
                 return_value = 1
                 taskfailures.append(event.taskstring)
-                logger.error("Task (%s) failed with exit code '%s'",
-                             event.taskstring, event.exitcode)
+                logger.error(str(event))
                 continue
 
             if isinstance(event, bb.runqueue.sceneQueueTaskFailed):
-                logger.warning("Setscene task (%s) failed with exit code '%s' - real task will be run instead",
-                               event.taskstring, event.exitcode)
+                logger.warning(str(event))
                 continue
 
             if isinstance(event, bb.event.DepTreeGenerated):
@@ -663,6 +647,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                                   bb.event.MetadataEvent,
                                   bb.event.StampUpdate,
                                   bb.event.ConfigParsed,
+                                  bb.event.MultiConfigParsed,
                                   bb.event.RecipeParsed,
                                   bb.event.RecipePreFinalise,
                                   bb.runqueue.runQueueEvent,

@@ -17,14 +17,14 @@
         </mediaobject>
 
         <title>
-            Yocto Project Development Manual
+            Yocto Project Development Tasks Manual
         </title>
 
         <authorgroup>
             <author>
                 <firstname>Scott</firstname> <surname>Rifenbark</surname>
                 <affiliation>
-                    <orgname>Intel Corporation</orgname>
+                    <orgname>Scotty's Documentation Services, INC</orgname>
                 </affiliation>
                 <email>srifenbark@gmail.com</email>
             </author>
@@ -97,24 +97,19 @@
                 <revremark>Released with the Yocto Project 2.3 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.3.1</revnumber>
-                <date>June 2017</date>
-                <revremark>Released with the Yocto Project 2.3.1 Release.</revremark>
+                <revnumber>2.4</revnumber>
+                <date>October 2017</date>
+                <revremark>Released with the Yocto Project 2.4 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.3.2</revnumber>
-                <date>September 2017</date>
-                <revremark>Released with the Yocto Project 2.3.2 Release.</revremark>
-            </revision>
-            <revision>
-                <revnumber>2.3.3</revnumber>
+                <revnumber>2.4.1</revnumber>
                 <date>January 2018</date>
-                <revremark>Released with the Yocto Project 2.3.3 Release.</revremark>
+                <revremark>Released with the Yocto Project 2.4.1 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.3.4</revnumber>
-                <date>April 2018</date>
-                <revremark>Released with the Yocto Project 2.3.4 Release.</revremark>
+                <revnumber>2.4.2</revnumber>
+                <date>March 2018</date>
+                <revremark>Released with the Yocto Project 2.4.2 Release.</revremark>
             </revision>
         </revhistory>
 
@@ -130,33 +125,34 @@
           Creative Commons Attribution-Share Alike 2.0 UK: England &amp; Wales</ulink> as published by
           Creative Commons.
       </para>
-
-            <note><title>Manual Notes</title>
-                <itemizedlist>
-                    <listitem><para>
-                        For the latest version of the Yocto Project Development
-                        Manual associated with this Yocto Project release
-                        (version &YOCTO_DOC_VERSION;),
-                        see the Yocto Project Development Manual from the
-                        <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>.
+           <note><title>Manual Notes</title>
+               <itemizedlist>
+                   <listitem><para>
+                       This version of the
+                       <emphasis>Yocto Project Development Tasks Manual</emphasis>
+                       is for the &YOCTO_DOC_VERSION; release of the
+                       Yocto Project.
+                       To be sure you have the latest version of the manual
+                       for this release, use the manual from the
+                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>.
+                       </para></listitem>
+                   <listitem><para>
+                       For manuals associated with other releases of the Yocto
+                       Project, go to the
+                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                       and use the drop-down "Active Releases" button
+                       and choose the manual associated with the desired
+                       Yocto Project.
+                       </para></listitem>
+                   <listitem><para>
+                        To report any inaccuracies or problems with this
+                        manual, send an email to the Yocto Project
+                        discussion group at
+                        <filename>yocto@yoctoproject.com</filename> or log into
+                        the freenode <filename>#yocto</filename> channel.
                         </para></listitem>
-                    <listitem><para>
-                        This version of the manual is version
-                        &YOCTO_DOC_VERSION;.
-                        For later releases of the Yocto Project (if they exist),
-                        go to the
-                        <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
-                        and use the drop-down "Active Releases" button
-                        and choose the Yocto Project version for which you want
-                        the manual.
-                        </para></listitem>
-                    <listitem><para>
-                        For an in-development version of the Yocto Project
-                        Development Manual, see
-                        <ulink url='&YOCTO_DOCS_URL;/latest/dev-manual/dev-manual.html'></ulink>.
-                        </para></listitem>
-                </itemizedlist>
-            </note>
+               </itemizedlist>
+           </note>
     </legalnotice>
 
     </bookinfo>
@@ -166,8 +162,6 @@
     <xi:include href="dev-manual-start.xml"/>
 
     <xi:include href="dev-manual-newbie.xml"/>
-
-    <xi:include href="dev-manual-model.xml"/>
 
     <xi:include href="dev-manual-common-tasks.xml"/>
 

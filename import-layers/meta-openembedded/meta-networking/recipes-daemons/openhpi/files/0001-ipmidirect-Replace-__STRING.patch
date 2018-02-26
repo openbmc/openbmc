@@ -1,0 +1,31 @@
+From be40b3f11460cf495bbbef45692e7763afda0c2b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Sep 2017 17:56:31 -0700
+Subject: [PATCH] ipmidirect: Replace __STRING
+
+__STRING is not universally available e.g.
+musl does not define it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ plugins/ipmidirect/t/test.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/ipmidirect/t/test.h b/plugins/ipmidirect/t/test.h
+index 8d71381..978d5ff 100644
+--- a/plugins/ipmidirect/t/test.h
++++ b/plugins/ipmidirect/t/test.h
+@@ -22,7 +22,7 @@ TestFunction( const char *str, const char *file, int line, bool expr )
+ }
+ 
+ 
+-#define Test(expr) TestFunction( __STRING(expr), __FILE__, __LINE__, expr )
++#define Test(expr) TestFunction( #expr, __FILE__, __LINE__, expr )
+ 
+ 
+ static int
+-- 
+2.14.1
+

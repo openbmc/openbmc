@@ -7,13 +7,13 @@
 # Most of the tests are commands run on target image over ssh.
 # To use it add testimage to global inherit and call your target image with -c testimage
 # You can try it out like this:
-# - first build a qemu core-image-sato
-# - add IMAGE_CLASSES += "testimage" in local.conf
+# - first add IMAGE_CLASSES += "testimage" in local.conf
+# - build a qemu core-image-sato
 # - then bitbake core-image-sato -c testimage. That will run a standard suite of tests.
 
 # You can set (or append to) TEST_SUITES in local.conf to select the tests
 # which you want to run for your target.
-# The test names are the module names in meta/lib/oeqa/runtime.
+# The test names are the module names in meta/lib/oeqa/runtime/cases.
 # Each name in TEST_SUITES represents a required test for the image. (no skipping allowed)
 # Appending "auto" means that it will try to run all tests that are suitable for the image (each test decides that on it's own).
 # Note that order in TEST_SUITES is relevant: tests are run in an order such that
@@ -49,10 +49,10 @@ DEFAULT_TEST_SUITES_pn-core-image-x11 = "${MINTESTSUITE}"
 DEFAULT_TEST_SUITES_pn-core-image-lsb = "${NETTESTSUITE} pam parselogs ${RPMTESTSUITE}"
 DEFAULT_TEST_SUITES_pn-core-image-sato = "${NETTESTSUITE} connman xorg parselogs ${RPMTESTSUITE} \
     ${@bb.utils.contains('IMAGE_PKGTYPE', 'rpm', 'python', '', d)}"
-DEFAULT_TEST_SUITES_pn-core-image-sato-sdk = "${NETTESTSUITE} buildcpio buildiptables buildgalculator \
+DEFAULT_TEST_SUITES_pn-core-image-sato-sdk = "${NETTESTSUITE} buildcpio buildlzip buildgalculator \
     connman ${DEVTESTSUITE} logrotate perl parselogs python ${RPMTESTSUITE} xorg"
 DEFAULT_TEST_SUITES_pn-core-image-lsb-dev = "${NETTESTSUITE} pam perl python parselogs ${RPMTESTSUITE}"
-DEFAULT_TEST_SUITES_pn-core-image-lsb-sdk = "${NETTESTSUITE} buildcpio buildiptables buildgalculator \
+DEFAULT_TEST_SUITES_pn-core-image-lsb-sdk = "${NETTESTSUITE} buildcpio buildlzip buildgalculator \
     connman ${DEVTESTSUITE} logrotate pam parselogs perl python ${RPMTESTSUITE}"
 DEFAULT_TEST_SUITES_pn-meta-toolchain = "auto"
 
@@ -61,7 +61,7 @@ DEFAULT_TEST_SUITES_remove_aarch64 = "xorg"
 
 # qemumips is quite slow and has reached the timeout limit several times on the YP build cluster,
 # mitigate this by removing build tests for qemumips machines.
-MIPSREMOVE ??= "buildcpio buildiptables buildgalculator"
+MIPSREMOVE ??= "buildcpio buildlzip buildgalculator"
 DEFAULT_TEST_SUITES_remove_qemumips = "${MIPSREMOVE}"
 DEFAULT_TEST_SUITES_remove_qemumips64 = "${MIPSREMOVE}"
 
@@ -248,7 +248,7 @@ def testimage_main(d):
 
     # the robot dance
     target = OERuntimeTestContextExecutor.getTarget(
-        d.getVar("TEST_TARGET"), None, d.getVar("TEST_TARGET_IP"),
+        d.getVar("TEST_TARGET"), logger, d.getVar("TEST_TARGET_IP"),
         d.getVar("TEST_SERVER_IP"), **target_kwargs)
 
     # test context
@@ -257,7 +257,7 @@ def testimage_main(d):
 
     # Load tests before starting the target
     test_paths = get_runtime_paths(d)
-    test_modules = d.getVar('TEST_SUITES')
+    test_modules = d.getVar('TEST_SUITES').split()
     tc.loadTests(test_paths, modules=test_modules)
 
     if not getSuiteCases(tc.suites):
@@ -291,11 +291,11 @@ def testimage_main(d):
 
     # Show results (if we have them)
     if not results:
-        bb.fatal('%s - FAILED - tests were interrupted during execution' % pn)
-    tc.logSummary(results, pn)
-    tc.logDetails()
+        bb.fatal('%s - FAILED - tests were interrupted during execution' % pn, forcelog=True)
+    results.logDetails()
+    results.logSummary(pn)
     if not results.wasSuccessful():
-        bb.fatal('%s - FAILED - check the task log and the ssh log' % pn)
+        bb.fatal('%s - FAILED - check the task log and the ssh log' % pn, forcelog=True)
 
 def get_runtime_paths(d):
     """

@@ -1,0 +1,42 @@
+From 39925f090c21ab571ebc6ec250696f7f7093a2a6 Mon Sep 17 00:00:00 2001
+From: Will Page <Will.Page@ni.com>
+Date: Wed, 30 Aug 2017 18:14:00 -0700
+Subject: [PATCH 1/1] Reduce lifetime value to widely-compatible value
+
+Current proposed lifetime value (2147483 seconds, which equates to
+MAXINT ms, or ~25 days) is rejected by Fortigate vpn devices because
+"peer SA proposal does not match local policy".  It seems default
+policy for these devices constrains lifetime where similar VPN devices
+don't.
+
+Reducing the lifetime from its current value to 28800 (exactly 8 hours)
+causes it to start working with fortigate devices.
+---
+ vpnc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/vpnc.c b/vpnc.c
+index 36dd0f3..3e0fcba 100644
+--- a/vpnc.c
++++ b/vpnc.c
+@@ -1135,7 +1135,7 @@ static struct isakmp_attribute *make_transform_ike(int dh_group, int crypt, int
+ 	a->af = isakmp_attr_lots;
+ 	a->u.lots.length = 4;
+ 	a->u.lots.data = xallocc(a->u.lots.length);
+-	*((uint32_t *) a->u.lots.data) = htonl(2147483);
++	*((uint32_t *) a->u.lots.data) = htonl(28800);
+ 	a = new_isakmp_attribute_16(IKE_ATTRIB_LIFE_TYPE, IKE_LIFE_TYPE_SECONDS, a);
+ 	a = new_isakmp_attribute_16(IKE_ATTRIB_AUTH_METHOD, auth, a);
+ 	a = new_isakmp_attribute_16(IKE_ATTRIB_GROUP_DESC, dh_group, a);
+@@ -2561,7 +2561,7 @@ static struct isakmp_attribute *make_transform_ipsec(struct sa_block *s, int dh_
+ 	a->af = isakmp_attr_lots;
+ 	a->u.lots.length = 4;
+ 	a->u.lots.data = xallocc(a->u.lots.length);
+-	*((uint32_t *) a->u.lots.data) = htonl(2147483);
++	*((uint32_t *) a->u.lots.data) = htonl(28800);
+ 	a = new_isakmp_attribute_16(ISAKMP_IPSEC_ATTRIB_SA_LIFE_TYPE, IPSEC_LIFE_SECONDS, a);
+ 
+ 	if (dh_group)
+-- 
+2.7.4
+

@@ -1,0 +1,872 @@
+From 3100e23c50e38bff0c2ec77bc30049c113c29414 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Jun 2017 20:44:31 -0700
+Subject: [PATCH 1/6] Use pragma once unconditionally
+
+in OE we do not worry about supporting
+gcc 3.4 anyway
+
+Upstream-Status: Inappropriate[Bumps required gcc to be > 3.4]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/efi/efi.h                     | 2 --
+ lib/engine/ahci.h                 | 2 --
+ lib/engine/ahci_cdrom.h           | 2 --
+ lib/engine/ahci_disk.h            | 2 --
+ lib/engine/ahci_multiplier.h      | 2 --
+ lib/engine/ahci_multiplier_phy.h  | 2 --
+ lib/engine/ahci_multiplier_port.h | 2 --
+ lib/engine/ahci_phy.h             | 2 --
+ lib/engine/ahci_port.h            | 2 --
+ lib/engine/ahci_raid_info.h       | 2 --
+ lib/engine/ahci_tape.h            | 2 --
+ lib/engine/array.h                | 2 --
+ lib/engine/block_device.h         | 2 --
+ lib/engine/cache.h                | 2 --
+ lib/engine/container.h            | 2 --
+ lib/engine/context_manager.h      | 2 --
+ lib/engine/controller.h           | 2 --
+ lib/engine/enclosure.h            | 2 --
+ lib/engine/end_device.h           | 2 --
+ lib/engine/event.h                | 2 --
+ lib/engine/event_manager.h        | 2 --
+ lib/engine/exception.h            | 2 --
+ lib/engine/filesystem.h           | 2 --
+ lib/engine/isci.h                 | 2 --
+ lib/engine/isci_cdrom.h           | 2 --
+ lib/engine/isci_disk.h            | 2 --
+ lib/engine/isci_expander.h        | 2 --
+ lib/engine/isci_expander_phy.h    | 2 --
+ lib/engine/isci_expander_port.h   | 2 --
+ lib/engine/isci_phy.h             | 2 --
+ lib/engine/isci_port.h            | 2 --
+ lib/engine/isci_raid_info.h       | 2 --
+ lib/engine/isci_tape.h            | 2 --
+ lib/engine/list.h                 | 2 --
+ lib/engine/mdadm_config.h         | 2 --
+ lib/engine/multimedia_device.h    | 2 --
+ lib/engine/nondisk_device.h       | 2 --
+ lib/engine/object.h               | 2 --
+ lib/engine/pci_header.h           | 2 --
+ lib/engine/phy.h                  | 2 --
+ lib/engine/port.h                 | 2 --
+ lib/engine/raid_device.h          | 2 --
+ lib/engine/raid_info.h            | 2 --
+ lib/engine/remote_port.h          | 2 --
+ lib/engine/routing_device.h       | 2 --
+ lib/engine/session.h              | 2 --
+ lib/engine/session_manager.h      | 2 --
+ lib/engine/storage_device.h       | 2 --
+ lib/engine/stream_device.h        | 2 --
+ lib/engine/string.h               | 2 --
+ lib/engine/unique_id_manager.h    | 2 --
+ lib/engine/utils.h                | 2 --
+ lib/engine/volume.h               | 2 --
+ lib/log/log.h                     | 2 --
+ lib/mpb/machine_bytes.h           | 2 --
+ lib/mpb/mpb.h                     | 2 --
+ lib/orom/orom.h                   | 2 --
+ 57 files changed, 114 deletions(-)
+
+diff --git a/lib/efi/efi.h b/lib/efi/efi.h
+index 9e7e41b..804e567 100644
+--- a/lib/efi/efi.h
++++ b/lib/efi/efi.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __EFI_H__INCLUDED__
+ #define __EFI_H__INCLUDED__
+diff --git a/lib/engine/ahci.h b/lib/engine/ahci.h
+index e883d1a..80a9699 100644
+--- a/lib/engine/ahci.h
++++ b/lib/engine/ahci.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_H__INCLUDED__
+ #define __AHCI_H__INCLUDED__
+diff --git a/lib/engine/ahci_cdrom.h b/lib/engine/ahci_cdrom.h
+index 442f301..d8ca042 100644
+--- a/lib/engine/ahci_cdrom.h
++++ b/lib/engine/ahci_cdrom.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_CDROM_H__INCLUDED__
+ #define __AHCI_CDROM_H__INCLUDED__
+diff --git a/lib/engine/ahci_disk.h b/lib/engine/ahci_disk.h
+index 7892a53..1bad9ad 100644
+--- a/lib/engine/ahci_disk.h
++++ b/lib/engine/ahci_disk.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_DISK_H__INCLUDED__
+ #define __AHCI_DISK_H__INCLUDED__
+diff --git a/lib/engine/ahci_multiplier.h b/lib/engine/ahci_multiplier.h
+index d63e9bc..1029af2 100644
+--- a/lib/engine/ahci_multiplier.h
++++ b/lib/engine/ahci_multiplier.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_MULTIPLIER_H__INCLUDED__
+ #define __AHCI_MULTIPLIER_H__INCLUDED__
+diff --git a/lib/engine/ahci_multiplier_phy.h b/lib/engine/ahci_multiplier_phy.h
+index 58ecebc..2132c23 100644
+--- a/lib/engine/ahci_multiplier_phy.h
++++ b/lib/engine/ahci_multiplier_phy.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_MULTIPLIER_PHY_H__INCLUDED__
+ #define __AHCI_MULTIPLIER_PHY_H__INCLUDED__
+diff --git a/lib/engine/ahci_multiplier_port.h b/lib/engine/ahci_multiplier_port.h
+index 5ff4cf7..2402473 100644
+--- a/lib/engine/ahci_multiplier_port.h
++++ b/lib/engine/ahci_multiplier_port.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_MULTIPLIER_PORT_H__INCLUDED__
+ #define __AHCI_MULTIPLIER_PORT_H__INCLUDED__
+diff --git a/lib/engine/ahci_phy.h b/lib/engine/ahci_phy.h
+index e2254e7..a44dae0 100644
+--- a/lib/engine/ahci_phy.h
++++ b/lib/engine/ahci_phy.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_PHY_H__INCLUDED__
+ #define __AHCI_PHY_H__INCLUDED__
+diff --git a/lib/engine/ahci_port.h b/lib/engine/ahci_port.h
+index f9e3308..03c109b 100644
+--- a/lib/engine/ahci_port.h
++++ b/lib/engine/ahci_port.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_PORT_H__INCLUDED__
+ #define __AHCI_PORT_H__INCLUDED__
+diff --git a/lib/engine/ahci_raid_info.h b/lib/engine/ahci_raid_info.h
+index e1c81ae..c70e63e 100644
+--- a/lib/engine/ahci_raid_info.h
++++ b/lib/engine/ahci_raid_info.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_RAID_INFO_H__INCLUDED__
+ #define __AHCI_RAID_INFO_H__INCLUDED__
+diff --git a/lib/engine/ahci_tape.h b/lib/engine/ahci_tape.h
+index cdd9f13..a91fd2c 100644
+--- a/lib/engine/ahci_tape.h
++++ b/lib/engine/ahci_tape.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __AHCI_TAPE_H__INCLUDED__
+ #define __AHCI_TAPE_H__INCLUDED__
+diff --git a/lib/engine/array.h b/lib/engine/array.h
+index 36fb4a4..0986ce3 100644
+--- a/lib/engine/array.h
++++ b/lib/engine/array.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ARRAY_H__INCLUDED__
+ #define __ARRAY_H__INCLUDED__
+diff --git a/lib/engine/block_device.h b/lib/engine/block_device.h
+index 4503914..45dd3db 100644
+--- a/lib/engine/block_device.h
++++ b/lib/engine/block_device.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __BLOCK_DEVICE_H__INCLUDED__
+ #define __BLOCK_DEVICE_H__INCLUDED__
+diff --git a/lib/engine/cache.h b/lib/engine/cache.h
+index 72cf521..72da20b 100644
+--- a/lib/engine/cache.h
++++ b/lib/engine/cache.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3,4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __CACHE_H__INCLUDED__
+ #define __CACHE_H__INCLUDED__
+diff --git a/lib/engine/container.h b/lib/engine/container.h
+index 53867b0..c71180c 100644
+--- a/lib/engine/container.h
++++ b/lib/engine/container.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3,4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __CONTAINER_H__INCLUDED__
+ #define __CONTAINER_H__INCLUDED__
+diff --git a/lib/engine/context_manager.h b/lib/engine/context_manager.h
+index fe9c256..6b4a2e7 100644
+--- a/lib/engine/context_manager.h
++++ b/lib/engine/context_manager.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3,4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __CONTEXT_H__INCLUDED__
+ #define __CONTEXT_H__INCLUDED__
+diff --git a/lib/engine/controller.h b/lib/engine/controller.h
+index a2f188a..6bd078f 100644
+--- a/lib/engine/controller.h
++++ b/lib/engine/controller.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __CONTROLLER_H__INCLUDED__
+ #define __CONTROLLER_H__INCLUDED__
+diff --git a/lib/engine/enclosure.h b/lib/engine/enclosure.h
+index 3faef0c..f4b13cc 100644
+--- a/lib/engine/enclosure.h
++++ b/lib/engine/enclosure.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ENCLOSURE_H__INCLUDED__
+ #define __ENCLOSURE_H__INCLUDED__
+diff --git a/lib/engine/end_device.h b/lib/engine/end_device.h
+index f147e41..269b236 100644
+--- a/lib/engine/end_device.h
++++ b/lib/engine/end_device.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __END_DEVICE_H__INCLUDED__
+ #define __END_DEVICE_H__INCLUDED__
+diff --git a/lib/engine/event.h b/lib/engine/event.h
+index cf9bb4f..11a4926 100644
+--- a/lib/engine/event.h
++++ b/lib/engine/event.h
+@@ -12,9 +12,7 @@ Redistribution and use in source and binary forms, with or without modification,
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __EVENT_H__INCLUDED__
+ #define __EVENT_H__INCLUDED__
+diff --git a/lib/engine/event_manager.h b/lib/engine/event_manager.h
+index 65007b9..a7a8fc3 100644
+--- a/lib/engine/event_manager.h
++++ b/lib/engine/event_manager.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __EVENT_MANAGER_H__INCLUDED__
+ #define __EVENT_MANAGER_H__INCLUDED__
+diff --git a/lib/engine/exception.h b/lib/engine/exception.h
+index 171e45d..183ebb5 100644
+--- a/lib/engine/exception.h
++++ b/lib/engine/exception.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __EXCEPTION_H__INCLUDED__
+ #define __EXCEPTION_H__INCLUDED__
+diff --git a/lib/engine/filesystem.h b/lib/engine/filesystem.h
+index 9c2ce39..b49df07 100644
+--- a/lib/engine/filesystem.h
++++ b/lib/engine/filesystem.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __FILESYSTEM_H__INCLUDED__
+ #define __FILESYSTEM_H__INCLUDED__
+diff --git a/lib/engine/isci.h b/lib/engine/isci.h
+index ea35cd4..0fa602a 100644
+--- a/lib/engine/isci.h
++++ b/lib/engine/isci.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_H__INCLUDED__
+ #define __ISCI_H__INCLUDED__
+diff --git a/lib/engine/isci_cdrom.h b/lib/engine/isci_cdrom.h
+index 87b7e7b..25637f9 100644
+--- a/lib/engine/isci_cdrom.h
++++ b/lib/engine/isci_cdrom.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_CDROM_H__INCLUDED__
+ #define __ISCI_CDROM_H__INCLUDED__
+diff --git a/lib/engine/isci_disk.h b/lib/engine/isci_disk.h
+index 596c3cf..8dd0dae 100644
+--- a/lib/engine/isci_disk.h
++++ b/lib/engine/isci_disk.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_DISK_H__INCLUDED__
+ #define __ISCI_DISK_H__INCLUDED__
+diff --git a/lib/engine/isci_expander.h b/lib/engine/isci_expander.h
+index ca7c2f1..7dc1920 100644
+--- a/lib/engine/isci_expander.h
++++ b/lib/engine/isci_expander.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_EXPANDER_H__INCLUDED__
+ #define __ISCI_EXPANDER_H__INCLUDED__
+diff --git a/lib/engine/isci_expander_phy.h b/lib/engine/isci_expander_phy.h
+index c9cd770..d3d2832 100644
+--- a/lib/engine/isci_expander_phy.h
++++ b/lib/engine/isci_expander_phy.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_EXPANDER_PHY_H__INCLUDED__
+ #define __ISCI_EXPANDER_PHY_H__INCLUDED__
+diff --git a/lib/engine/isci_expander_port.h b/lib/engine/isci_expander_port.h
+index e65a124..4fc9310 100644
+--- a/lib/engine/isci_expander_port.h
++++ b/lib/engine/isci_expander_port.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_EXPANDER_PORT_H__INCLUDED__
+ #define __ISCI_EXPANDER_PORT_H__INCLUDED__
+diff --git a/lib/engine/isci_phy.h b/lib/engine/isci_phy.h
+index 767a5b2..105c697 100644
+--- a/lib/engine/isci_phy.h
++++ b/lib/engine/isci_phy.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_PHY_H__INCLUDED__
+ #define __ISCI_PHY_H__INCLUDED__
+diff --git a/lib/engine/isci_port.h b/lib/engine/isci_port.h
+index b80be7f..5ccc151 100644
+--- a/lib/engine/isci_port.h
++++ b/lib/engine/isci_port.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_PORT_H__INCLUDED__
+ #define __ISCI_PORT_H__INCLUDED__
+diff --git a/lib/engine/isci_raid_info.h b/lib/engine/isci_raid_info.h
+index 1df6477..b0b046a 100644
+--- a/lib/engine/isci_raid_info.h
++++ b/lib/engine/isci_raid_info.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_RAID_INFO_H__INCLUDED__
+ #define __ISCI_RAID_INFO_H__INCLUDED__
+diff --git a/lib/engine/isci_tape.h b/lib/engine/isci_tape.h
+index 985f767..a2cef2d 100644
+--- a/lib/engine/isci_tape.h
++++ b/lib/engine/isci_tape.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ISCI_TAPE_H__INCLUDED__
+ #define __ISCI_TAPE_H__INCLUDED__
+diff --git a/lib/engine/list.h b/lib/engine/list.h
+index 9a7c3c3..6395830 100644
+--- a/lib/engine/list.h
++++ b/lib/engine/list.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __LIST_H__INCLUDED__
+ #define __LIST_H__INCLUDED__
+diff --git a/lib/engine/mdadm_config.h b/lib/engine/mdadm_config.h
+index c94020f..e415b4f 100644
+--- a/lib/engine/mdadm_config.h
++++ b/lib/engine/mdadm_config.h
+@@ -11,9 +11,7 @@ Redistribution and use in source and binary forms, with or without modification,
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __MDADM_CONFIG_H__INCLUDED__
+ #define __MDADM_CONFIG_H__INCLUDED__
+diff --git a/lib/engine/multimedia_device.h b/lib/engine/multimedia_device.h
+index 533370e..694e2a5 100644
+--- a/lib/engine/multimedia_device.h
++++ b/lib/engine/multimedia_device.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __MULTIMEDIA_DEVICE_H__INCLUDED__
+ #define __MULTIMEDIA_DEVICE_H__INCLUDED__
+diff --git a/lib/engine/nondisk_device.h b/lib/engine/nondisk_device.h
+index 70ebb32..0f00e52 100644
+--- a/lib/engine/nondisk_device.h
++++ b/lib/engine/nondisk_device.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __CHARACTER_DEVICE_H__INCLUDED__
+ #define __CHARACTER_DEVICE_H__INCLUDED__
+diff --git a/lib/engine/object.h b/lib/engine/object.h
+index b52d3d3..345d58c 100644
+--- a/lib/engine/object.h
++++ b/lib/engine/object.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __OBJECT_H__INCLUDED__
+ #define __OBJECT_H__INCLUDED__
+diff --git a/lib/engine/pci_header.h b/lib/engine/pci_header.h
+index 376f296..c5129a0 100644
+--- a/lib/engine/pci_header.h
++++ b/lib/engine/pci_header.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __PCI_HEADER_H__INCLUDED__
+ #define __PCI_HEADER_H__INCLUDED__
+diff --git a/lib/engine/phy.h b/lib/engine/phy.h
+index f5730a0..c59f7c8 100644
+--- a/lib/engine/phy.h
++++ b/lib/engine/phy.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __PHY_H__INCLUDED__
+ #define __PHY_H__INCLUDED__
+diff --git a/lib/engine/port.h b/lib/engine/port.h
+index 2f33876..cc48c7c 100644
+--- a/lib/engine/port.h
++++ b/lib/engine/port.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3,4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __PORT_H__INCLUDED__
+ #define __PORT_H__INCLUDED__
+diff --git a/lib/engine/raid_device.h b/lib/engine/raid_device.h
+index 998e80c..2174162 100644
+--- a/lib/engine/raid_device.h
++++ b/lib/engine/raid_device.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __RAID_DEVICE_H__INCLUDED__
+ #define __RAID_DEVICE_H__INCLUDED__
+diff --git a/lib/engine/raid_info.h b/lib/engine/raid_info.h
+index 174698a..302be9b 100644
+--- a/lib/engine/raid_info.h
++++ b/lib/engine/raid_info.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __RAID_INFO_H__INCLUDED__
+ #define __RAID_INFO_H__INCLUDED__
+diff --git a/lib/engine/remote_port.h b/lib/engine/remote_port.h
+index c086656..4ddfee3 100644
+--- a/lib/engine/remote_port.h
++++ b/lib/engine/remote_port.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __REMOTE_PORT_H__INCLUDED__
+ #define __REMOTE_PORT_H__INCLUDED__
+diff --git a/lib/engine/routing_device.h b/lib/engine/routing_device.h
+index 5f857a6..284621e 100644
+--- a/lib/engine/routing_device.h
++++ b/lib/engine/routing_device.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ROUTING_DEVICE_H__INCLUDED__
+ #define __ROUTING_DEVICE_H__INCLUDED__
+diff --git a/lib/engine/session.h b/lib/engine/session.h
+index a901d1c..3200da1 100644
+--- a/lib/engine/session.h
++++ b/lib/engine/session.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __SESSION_H__INCLUDED__
+ #define __SESSION_H__INCLUDED__
+diff --git a/lib/engine/session_manager.h b/lib/engine/session_manager.h
+index 7177064..87e16c3 100644
+--- a/lib/engine/session_manager.h
++++ b/lib/engine/session_manager.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __SESSION_MANAGER_H__INCLUDED__
+ #define __SESSION_MANAGER_H__INCLUDED__
+diff --git a/lib/engine/storage_device.h b/lib/engine/storage_device.h
+index ddeb66f..20bdab2 100644
+--- a/lib/engine/storage_device.h
++++ b/lib/engine/storage_device.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __STORAGE_DEVICE_H__INCLUDED__
+ #define __STORAGE_DEVICE_H__INCLUDED__
+diff --git a/lib/engine/stream_device.h b/lib/engine/stream_device.h
+index 9bc111a..b29bd68 100644
+--- a/lib/engine/stream_device.h
++++ b/lib/engine/stream_device.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __STREAM_DEVICE_H__INCLUDED__
+ #define __STREAM_DEVICE_H__INCLUDED__
+diff --git a/lib/engine/string.h b/lib/engine/string.h
+index 3007dc7..6f348c9 100644
+--- a/lib/engine/string.h
++++ b/lib/engine/string.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __STRING_H__INCLUDED__
+ #define __STRING_H__INCLUDED__
+diff --git a/lib/engine/unique_id_manager.h b/lib/engine/unique_id_manager.h
+index fe79eac..4a13627 100644
+--- a/lib/engine/unique_id_manager.h
++++ b/lib/engine/unique_id_manager.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __UNIQUE_ID_MANAGER_H__INCLUDED__
+ #define __UNIQUE_ID_MANAGER_H__INCLUDED__
+diff --git a/lib/engine/utils.h b/lib/engine/utils.h
+index 86c20cf..5525303 100644
+--- a/lib/engine/utils.h
++++ b/lib/engine/utils.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __UTILS_H__INCLUDED__
+ #define __UTILS_H__INCLUDED__
+diff --git a/lib/engine/volume.h b/lib/engine/volume.h
+index 9a63cbf..3347b31 100644
+--- a/lib/engine/volume.h
++++ b/lib/engine/volume.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ // Forward declarations
+ class Array;
+diff --git a/lib/log/log.h b/lib/log/log.h
+index c0bd63e..8b5f171 100644
+--- a/lib/log/log.h
++++ b/lib/log/log.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __LOG_H__INCLUDED__
+ #define __LOG_H__INCLUDED__
+diff --git a/lib/mpb/machine_bytes.h b/lib/mpb/machine_bytes.h
+index 7fbb0e9..800b120 100644
+--- a/lib/mpb/machine_bytes.h
++++ b/lib/mpb/machine_bytes.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __ENDIAN_H__INCLUDED__
+ #define __ENDIAN_H__INCLUDED__
+diff --git a/lib/mpb/mpb.h b/lib/mpb/mpb.h
+index 01782af..c42cdfb 100644
+--- a/lib/mpb/mpb.h
++++ b/lib/mpb/mpb.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __MPB_H__INCLUDED__
+ #define __MPB_H__INCLUDED__
+diff --git a/lib/orom/orom.h b/lib/orom/orom.h
+index f76e3ee..e10311d 100644
+--- a/lib/orom/orom.h
++++ b/lib/orom/orom.h
+@@ -15,9 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ 
+ 
+ 
+-#if __GNUC_PREREQ(3, 4)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
+ 
+ #ifndef __OROM_H__INCLUDED__
+ #define __OROM_H__INCLUDED__
+-- 
+2.13.1
+

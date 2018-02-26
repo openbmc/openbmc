@@ -1,22 +1,10 @@
 # In order to support a deterministic set of 'dynamic' users/groups,
 # we need a function to reformat the params based on a static file
 def update_useradd_static_config(d):
-    import argparse
     import itertools
     import re
     import errno
-
-    class myArgumentParser( argparse.ArgumentParser ):
-        def _print_message(self, message, file=None):
-            bb.warn("%s - %s: %s" % (d.getVar('PN'), pkg, message))
-
-        # This should never be called...
-        def exit(self, status=0, message=None):
-            message = message or ("%s - %s: useradd.bbclass: Argument parsing exited" % (d.getVar('PN'), pkg))
-            error(message)
-
-        def error(self, message):
-            bb.fatal(message)
+    import oe.useradd
 
     def list_extend(iterable, length, obj = None):
         """Ensure that iterable is the specified length by extending with obj
@@ -50,62 +38,44 @@ def update_useradd_static_config(d):
 
         return id_table
 
-    def handle_missing_id(id, type, pkg):
+    def handle_missing_id(id, type, pkg, files, var, value):
         # For backwards compatibility we accept "1" in addition to "error"
-        if d.getVar('USERADD_ERROR_DYNAMIC') == 'error' or d.getVar('USERADD_ERROR_DYNAMIC') == '1':
-            raise NotImplementedError("%s - %s: %sname %s does not have a static ID defined. Skipping it." % (d.getVar('PN'), pkg, type, id))
-        elif d.getVar('USERADD_ERROR_DYNAMIC') == 'warn':
-            bb.warn("%s - %s: %sname %s does not have a static ID defined." % (d.getVar('PN'), pkg, type, id))
+        error_dynamic = d.getVar('USERADD_ERROR_DYNAMIC')
+        msg = "%s - %s: %sname %s does not have a static ID defined." % (d.getVar('PN'), pkg, type, id)
+        if files:
+            msg += " Add %s to one of these files: %s" % (id, files)
+        else:
+            msg += " %s file(s) not found in BBPATH: %s" % (var, value)
+        if error_dynamic == 'error' or error_dynamic == '1':
+            raise NotImplementedError(msg)
+        elif error_dynamic == 'warn':
+            bb.warn(msg)
+        elif error_dynamic == 'skip':
+            raise bb.parse.SkipRecipe(msg)
+
+    # Return a list of configuration files based on either the default
+    # files/group or the contents of USERADD_GID_TABLES, resp.
+    # files/passwd for USERADD_UID_TABLES.
+    # Paths are resolved via BBPATH.
+    def get_table_list(d, var, default):
+        files = []
+        bbpath = d.getVar('BBPATH', True)
+        tables = d.getVar(var, True)
+        if not tables:
+            tables = default
+        for conf_file in tables.split():
+            files.append(bb.utils.which(bbpath, conf_file))
+        return (' '.join(files), var, default)
 
     # We parse and rewrite the useradd components
     def rewrite_useradd(params, is_pkg):
-        # The following comes from --help on useradd from shadow
-        parser = myArgumentParser(prog='useradd')
-        parser.add_argument("-b", "--base-dir", metavar="BASE_DIR", help="base directory for the home directory of the new account")
-        parser.add_argument("-c", "--comment", metavar="COMMENT", help="GECOS field of the new account")
-        parser.add_argument("-d", "--home-dir", metavar="HOME_DIR", help="home directory of the new account")
-        parser.add_argument("-D", "--defaults", help="print or change default useradd configuration", action="store_true")
-        parser.add_argument("-e", "--expiredate", metavar="EXPIRE_DATE", help="expiration date of the new account")
-        parser.add_argument("-f", "--inactive", metavar="INACTIVE", help="password inactivity period of the new account")
-        parser.add_argument("-g", "--gid", metavar="GROUP", help="name or ID of the primary group of the new account")
-        parser.add_argument("-G", "--groups", metavar="GROUPS", help="list of supplementary groups of the new account")
-        parser.add_argument("-k", "--skel", metavar="SKEL_DIR", help="use this alternative skeleton directory")
-        parser.add_argument("-K", "--key", metavar="KEY=VALUE", help="override /etc/login.defs defaults")
-        parser.add_argument("-l", "--no-log-init", help="do not add the user to the lastlog and faillog databases", action="store_true")
-        parser.add_argument("-m", "--create-home", help="create the user's home directory", action="store_const", const=True)
-        parser.add_argument("-M", "--no-create-home", dest="create_home", help="do not create the user's home directory", action="store_const", const=False)
-        parser.add_argument("-N", "--no-user-group", dest="user_group", help="do not create a group with the same name as the user", action="store_const", const=False)
-        parser.add_argument("-o", "--non-unique", help="allow to create users with duplicate (non-unique UID)", action="store_true")
-        parser.add_argument("-p", "--password", metavar="PASSWORD", help="encrypted password of the new account")
-        parser.add_argument("-P", "--clear-password", metavar="CLEAR_PASSWORD", help="use this clear password for the new account")
-        parser.add_argument("-R", "--root", metavar="CHROOT_DIR", help="directory to chroot into")
-        parser.add_argument("-r", "--system", help="create a system account", action="store_true")
-        parser.add_argument("-s", "--shell", metavar="SHELL", help="login shell of the new account")
-        parser.add_argument("-u", "--uid", metavar="UID", help="user ID of the new account")
-        parser.add_argument("-U", "--user-group", help="create a group with the same name as the user", action="store_const", const=True)
-        parser.add_argument("LOGIN", help="Login name of the new user")
-
-        # Return a list of configuration files based on either the default
-        # files/passwd or the contents of USERADD_UID_TABLES
-        # paths are resolved via BBPATH
-        def get_passwd_list(d):
-            str = ""
-            bbpath = d.getVar('BBPATH')
-            passwd_tables = d.getVar('USERADD_UID_TABLES')
-            if not passwd_tables:
-                passwd_tables = 'files/passwd'
-            for conf_file in passwd_tables.split():
-                str += " %s" % bb.utils.which(bbpath, conf_file)
-            return str
+        parser = oe.useradd.build_useradd_parser()
 
         newparams = []
         users = None
-        for param in re.split('''[ \t]*;[ \t]*(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', params):
-            param = param.strip()
-            if not param:
-                continue
+        for param in oe.useradd.split_commands(params):
             try:
-                uaargs = parser.parse_args(re.split('''[ \t]+(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', param))
+                uaargs = parser.parse_args(oe.useradd.split_args(param))
             except:
                 bb.fatal("%s: Unable to parse arguments for USERADD_PARAM_%s: '%s'" % (d.getVar('PN'), pkg, param))
 
@@ -121,10 +91,12 @@ def update_useradd_static_config(d):
             # all new users get the default ('*' which prevents login) until the user is
             # specifically configured by the system admin.
             if not users:
-                users = merge_files(get_passwd_list(d), 7)
+                files, table_var, table_value = get_table_list(d, 'USERADD_UID_TABLES', 'files/passwd')
+                users = merge_files(files, 7)
 
+            type = 'system user' if uaargs.system else 'normal user'
             if uaargs.LOGIN not in users:
-                handle_missing_id(uaargs.LOGIN, 'user', pkg)
+                handle_missing_id(uaargs.LOGIN, type, pkg, files, table_var, table_value)
                 newparams.append(param)
                 continue
 
@@ -182,7 +154,7 @@ def update_useradd_static_config(d):
 
             # Should be an error if a specific option is set...
             if not uaargs.uid or not uaargs.uid.isdigit() or not uaargs.gid:
-                 handle_missing_id(uaargs.LOGIN, 'user', pkg)
+                 handle_missing_id(uaargs.LOGIN, type, pkg, files, table_var, table_value)
 
             # Reconstruct the args...
             newparam  = ['', ' --defaults'][uaargs.defaults]
@@ -217,40 +189,14 @@ def update_useradd_static_config(d):
 
     # We parse and rewrite the groupadd components
     def rewrite_groupadd(params, is_pkg):
-        # The following comes from --help on groupadd from shadow
-        parser = myArgumentParser(prog='groupadd')
-        parser.add_argument("-f", "--force", help="exit successfully if the group already exists, and cancel -g if the GID is already used", action="store_true")
-        parser.add_argument("-g", "--gid", metavar="GID", help="use GID for the new group")
-        parser.add_argument("-K", "--key", metavar="KEY=VALUE", help="override /etc/login.defs defaults")
-        parser.add_argument("-o", "--non-unique", help="allow to create groups with duplicate (non-unique) GID", action="store_true")
-        parser.add_argument("-p", "--password", metavar="PASSWORD", help="use this encrypted password for the new group")
-        parser.add_argument("-P", "--clear-password", metavar="CLEAR_PASSWORD", help="use this clear password for the new group")
-        parser.add_argument("-R", "--root", metavar="CHROOT_DIR", help="directory to chroot into")
-        parser.add_argument("-r", "--system", help="create a system account", action="store_true")
-        parser.add_argument("GROUP", help="Group name of the new group")
-
-        # Return a list of configuration files based on either the default
-        # files/group or the contents of USERADD_GID_TABLES
-        # paths are resolved via BBPATH
-        def get_group_list(d):
-            str = ""
-            bbpath = d.getVar('BBPATH')
-            group_tables = d.getVar('USERADD_GID_TABLES')
-            if not group_tables:
-                group_tables = 'files/group'
-            for conf_file in group_tables.split():
-                str += " %s" % bb.utils.which(bbpath, conf_file)
-            return str
+        parser = oe.useradd.build_groupadd_parser()
 
         newparams = []
         groups = None
-        for param in re.split('''[ \t]*;[ \t]*(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', params):
-            param = param.strip()
-            if not param:
-                continue
+        for param in oe.useradd.split_commands(params):
             try:
                 # If we're processing multiple lines, we could have left over values here...
-                gaargs = parser.parse_args(re.split('''[ \t]+(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', param))
+                gaargs = parser.parse_args(oe.useradd.split_args(param))
             except:
                 bb.fatal("%s: Unable to parse arguments for GROUPADD_PARAM_%s: '%s'" % (d.getVar('PN'), pkg, param))
 
@@ -264,10 +210,12 @@ def update_useradd_static_config(d):
             # Note: similar to the passwd file, the 'password' filed is ignored
             # Note: group_members is ignored, group members must be configured with the GROUPMEMS_PARAM
             if not groups:
-                groups = merge_files(get_group_list(d), 4)
+                files, table_var, table_value = get_table_list(d, 'USERADD_GID_TABLES', 'files/group')
+                groups = merge_files(files, 4)
 
+            type = 'system group' if gaargs.system else 'normal group'
             if gaargs.GROUP not in groups:
-                handle_missing_id(gaargs.GROUP, 'group', pkg)
+                handle_missing_id(gaargs.GROUP, type, pkg, files, table_var, table_value)
                 newparams.append(param)
                 continue
 
@@ -279,7 +227,7 @@ def update_useradd_static_config(d):
                 gaargs.gid = field[2]
 
             if not gaargs.gid or not gaargs.gid.isdigit():
-                handle_missing_id(gaargs.GROUP, 'group', pkg)
+                handle_missing_id(gaargs.GROUP, type, pkg, files, table_var, table_value)
 
             # Reconstruct the args...
             newparam  = ['', ' --force'][gaargs.force]
@@ -335,11 +283,7 @@ def update_useradd_static_config(d):
 
     #bb.warn("Before:  'EXTRA_USERS_PARAMS' - '%s'" % (d.getVar('EXTRA_USERS_PARAMS')))
     new_extrausers = []
-    for cmd in re.split('''[ \t]*;[ \t]*(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', extrausers):
-        cmd = cmd.strip()
-        if not cmd:
-            continue
-
+    for cmd in oe.useradd.split_commands(extrausers):
         if re.match('''useradd (.*)''', cmd):
             useradd_param = re.match('''useradd (.*)''', cmd).group(1)
             useradd_param = rewrite_useradd(useradd_param, False)

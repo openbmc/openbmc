@@ -1,0 +1,19 @@
+change osName to version as it prints out "ntop Version".
+
+Upstream-Status: Pending
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+---
+diff --git a/webInterface.c b/webInterface.c
+index 5622e69..8cb7a67 100644
+--- a/webInterface.c
++++ b/webInterface.c
+@@ -5816,7 +5816,7 @@ static void printNtopConfigInfoData(int textPrintFlag, UserPref *pref) {
+   printInfoSectionTitle(textPrintFlag, "Basic Information");
+ 
+   safe_snprintf(__FILE__, __LINE__, formatBuf, sizeof(formatBuf), "%s (%d bit)",
+-		osName, sizeof(long) == 8 ? 64 : 32);
++		version, sizeof(long) == 8 ? 64 : 32);
+   printFeatureConfigInfo(textPrintFlag, "ntop Version", formatBuf);
+ 
+ #ifndef WIN32

@@ -11,7 +11,7 @@ processes embedding perl when upgrading to a newer version,
 compatible, but built on a different machine.
 
 Patch-Name: debian/errno_ver.diff
-
+Upstream-Status: Pending
 ---
  ext/Errno/Errno_pm.PL | 5 -----
  1 file changed, 5 deletions(-)

@@ -1,0 +1,45 @@
+From e47c60dc7f649959f63e56bc62355de4bdfd73f4 Mon Sep 17 00:00:00 2001
+From: Marian Florea <marian.florea@windriver.com>
+Date: Thu, 20 Jul 2017 16:55:24 +0800
+Subject: [PATCH] net snmp: fix engineBoots value on SIGHUP
+
+Upstream-Status: Pending
+
+Signed-off-by: Marian Florea <marian.florea@windriver.com>
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ agent/snmpd.c    | 1 +
+ snmplib/snmpv3.c | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/agent/snmpd.c b/agent/snmpd.c
+index 056048a..12a7ea1 100644
+--- a/agent/snmpd.c
++++ b/agent/snmpd.c
+@@ -1246,6 +1246,7 @@ receive(void)
+ 	    snmp_log(LOG_INFO, "NET-SNMP version %s restarted\n",
+ 		     netsnmp_get_version());
+             update_config();
++            snmp_store(app_name);
+             send_easy_trap(SNMP_TRAP_ENTERPRISESPECIFIC, 3);
+ #if HAVE_SIGHOLD
+             sigrelse(SIGHUP);
+diff --git a/snmplib/snmpv3.c b/snmplib/snmpv3.c
+index 435cafd..6ad8208 100644
+--- a/snmplib/snmpv3.c
++++ b/snmplib/snmpv3.c
+@@ -984,9 +984,9 @@ init_snmpv3_post_config(int majorid, int minorid, void *serverarg,
+     /*
+      * if our engineID has changed at all, the boots record must be set to 1 
+      */
+-    if (engineIDLen != oldEngineIDLength ||
++    if (oldEngineIDLength != (size_t)0 && (engineIDLen != oldEngineIDLength ||
+         oldEngineID == NULL || c_engineID == NULL ||
+-        memcmp(oldEngineID, c_engineID, engineIDLen) != 0) {
++        memcmp(oldEngineID, c_engineID, engineIDLen) != 0)) {
+         engineBoots = 1;
+     }
+ 
+-- 
+1.9.1
+

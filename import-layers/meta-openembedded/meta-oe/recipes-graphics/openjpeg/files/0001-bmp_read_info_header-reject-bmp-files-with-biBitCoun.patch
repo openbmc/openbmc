@@ -1,0 +1,31 @@
+From 226f07e4b49c2757b181c62e6841000c512054e3 Mon Sep 17 00:00:00 2001
+From: Even Rouault <even.rouault@spatialys.com>
+Date: Mon, 14 Aug 2017 17:26:58 +0200
+Subject: [PATCH] bmp_read_info_header(): reject bmp files with biBitCount == 0
+ (#983)
+
+Upstream-Status: Backport [https://github.com/uclouvain/openjpeg/commit/baf0c1ad4572daa89caa3b12985bdd93530f0dd7]
+CVE: CVE-2017-12982
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ src/bin/jp2/convertbmp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/bin/jp2/convertbmp.c b/src/bin/jp2/convertbmp.c
+index b49e7a0..2715fdf 100644
+--- a/src/bin/jp2/convertbmp.c
++++ b/src/bin/jp2/convertbmp.c
+@@ -392,6 +392,10 @@ static OPJ_BOOL bmp_read_info_header(FILE* IN, OPJ_BITMAPINFOHEADER* header)
+ 
+     header->biBitCount  = (OPJ_UINT16)getc(IN);
+     header->biBitCount |= (OPJ_UINT16)((OPJ_UINT32)getc(IN) << 8);
++    if (header->biBitCount == 0) {
++        fprintf(stderr, "Error, invalid biBitCount %d\n", 0);
++        return OPJ_FALSE;
++    }
+ 
+     if (header->biSize >= 40U) {
+         header->biCompression  = (OPJ_UINT32)getc(IN);
+-- 
+2.8.1
+

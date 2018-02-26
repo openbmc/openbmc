@@ -1,0 +1,666 @@
+From b972600a26f3a930e53e2fce2625266a5d29813e Mon Sep 17 00:00:00 2001
+From: Andreas Gruenbacher <andreas.gruenbacher@gmail.com>
+Date: Tue, 14 Apr 2015 23:53:11 +0200
+Subject: [PATCH 1/2] Remove the section 2 man pages
+
+Commit 8d1263bca95722d66a6f8e83450f49d0956ea534 from upstream
+https://git.savannah.nongnu.org/git/attr.git/
+
+The section 2 man pages have long since been added to the man-pages package
+which documents all system calls; they were disabled in attr by default since
+January 2014.  Get rid of them here.
+
+Upstream-Status: Backport
+
+[MA: modified to apply directly to v2.4.47]
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ man/Makefile           |   2 +-
+ man/man2/Makefile      |  35 -----------
+ man/man2/getxattr.2    | 143 --------------------------------------------
+ man/man2/listxattr.2   | 158 -------------------------------------------------
+ man/man2/removexattr.2 | 111 ----------------------------------
+ man/man2/setxattr.2    | 143 --------------------------------------------
+ 6 files changed, 1 insertion(+), 591 deletions(-)
+ delete mode 100644 man/man2/Makefile
+ delete mode 100644 man/man2/getxattr.2
+ delete mode 100644 man/man2/listxattr.2
+ delete mode 100644 man/man2/removexattr.2
+ delete mode 100644 man/man2/setxattr.2
+
+diff --git a/man/Makefile b/man/Makefile
+index 9535426..755daed 100644
+--- a/man/Makefile
++++ b/man/Makefile
+@@ -19,7 +19,7 @@
+ TOPDIR = ..
+ include $(TOPDIR)/include/builddefs
+ 
+-SUBDIRS = man1 man2 man3 man5
++SUBDIRS = man1 man3 man5
+ 
+ default : $(SUBDIRS)
+ 
+diff --git a/man/man2/Makefile b/man/man2/Makefile
+deleted file mode 100644
+index d77309d..0000000
+--- a/man/man2/Makefile
++++ /dev/null
+@@ -1,35 +0,0 @@
+-#
+-# Copyright (c) 2000-2002 Silicon Graphics, Inc.  All Rights Reserved.
+-# Copyright (C) 2009  Andreas Gruenbacher <agruen@suse.de>
+-#
+-# This program is free software: you can redistribute it and/or modify it
+-# under the terms of the GNU General Public License as published by
+-# the Free Software Foundation, either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-#
+-
+-TOPDIR = ../..
+-include $(TOPDIR)/include/builddefs
+-
+-MAN_SECTION	= 2
+-
+-MAN_PAGES	= $(shell echo *.$(MAN_SECTION))
+-MAN_DEST	= $(PKG_MAN_DIR)/man$(MAN_SECTION)
+-LSRCFILES	= $(MAN_PAGES)
+-
+-default install : $(MAN_PAGES)
+-
+-include $(BUILDRULES)
+-
+-install-dev : default
+-	$(INSTALL) -m 755 -d $(MAN_DEST)
+-	$(INSTALL_MAN)
+-install-lib:
+diff --git a/man/man2/getxattr.2 b/man/man2/getxattr.2
+deleted file mode 100644
+index 405ad89..0000000
+--- a/man/man2/getxattr.2
++++ /dev/null
+@@ -1,143 +0,0 @@
+-.\"
+-.\" Extended attributes system calls manual pages
+-.\"
+-.\" (C) Andreas Gruenbacher, February 2001
+-.\" (C) Silicon Graphics Inc, September 2001
+-.\"
+-.\" This is free documentation; you can redistribute it and/or
+-.\" modify it under the terms of the GNU General Public License as
+-.\" published by the Free Software Foundation; either version 2 of
+-.\" the License, or (at your option) any later version.
+-.\"
+-.\" The GNU General Public License's references to "object code"
+-.\" and "executables" are to be interpreted as the output of any
+-.\" document formatting or typesetting system, including
+-.\" intermediate and printed output.
+-.\"
+-.\" This manual is distributed in the hope that it will be useful,
+-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-.\" GNU General Public License for more details.
+-.\"
+-.\" You should have received a copy of the GNU General Public
+-.\" License along with this manual.  If not, see
+-.\" <http://www.gnu.org/licenses/>.
+-.\"
+-.TH GETXATTR 2 "Extended Attributes" "Dec 2001" "System calls"
+-.SH NAME
+-getxattr, lgetxattr, fgetxattr \- retrieve an extended attribute value
+-.SH SYNOPSIS
+-.fam C
+-.nf
+-.B #include <sys/types.h>
+-.B #include <attr/xattr.h>
+-.sp
+-.BI "ssize_t getxattr (const char\ *" path ", const char\ *" name ",
+-.BI "\t\t\t\t void\ *" value ", size_t " size );
+-.BI "ssize_t lgetxattr (const char\ *" path ", const char\ *" name ",
+-.BI "\t\t\t\t void\ *" value ", size_t " size );
+-.BI "ssize_t fgetxattr (int " filedes ", const char\ *" name ",
+-.BI "\t\t\t\t void\ *" value ", size_t " size );
+-.fi
+-.fam T
+-.SH DESCRIPTION
+-Extended attributes are
+-.IR name :\c
+-.I value
+-pairs associated with inodes (files, directories, symlinks, etc).
+-They are extensions to the normal attributes which are associated
+-with all inodes in the system (i.e. the
+-.BR stat (2)
+-data).
+-A complete overview of extended attributes concepts can be found in
+-.BR attr (5).
+-.PP
+-.B getxattr
+-retrieves the
+-.I value
+-of the extended attribute identified by
+-.I name
+-and associated with the given
+-.I path
+-in the filesystem.
+-The length of the attribute
+-.I value
+-is returned.
+-.PP
+-.B lgetxattr
+-is identical to 
+-.BR getxattr ,
+-except in the case of a symbolic link, where the link itself is
+-interrogated, not the file that it refers to.
+-.PP
+-.B fgetxattr
+-is identical to
+-.BR getxattr ,
+-only the open file pointed to by
+-.I filedes
+-(as returned by
+-.BR open (2))
+-is interrogated in place of
+-.IR path .
+-.PP
+-An extended attribute
+-.I name
+-is a simple NULL-terminated string.
+-The name includes a namespace prefix \- there may be several, disjoint
+-namespaces associated with an individual inode.
+-The value of an extended attribute is a chunk of arbitrary textual or
+-binary data of specified length.
+-.PP
+-An empty buffer of
+-.I size
+-zero can be passed into these calls to return the current size of the
+-named extended attribute, which can be used to estimate the size of a
+-buffer which is sufficiently large to hold the value associated with
+-the extended attribute.
+-.PP
+-The interface is designed to allow guessing of initial buffer
+-sizes, and to enlarge buffers when the return value indicates
+-that the buffer provided was too small.
+-.SH RETURN VALUE
+-On success, a positive number is returned indicating the size of the
+-extended attribute value.
+-On failure, \-1 is returned and
+-.I errno
+-is set appropriately.
+-.PP
+-If the named attribute does not exist, or the process has no access to
+-this attribute,
+-.I errno
+-is set to ENOATTR.
+-.PP
+-If the
+-.I size
+-of the
+-.I value
+-buffer is too small to hold the result,
+-.I errno
+-is set to ERANGE.
+-.PP
+-If extended attributes are not supported by the filesystem, or are disabled,
+-.I errno
+-is set to ENOTSUP.
+-.PP
+-The errors documented for the
+-.BR stat (2)
+-system call are also applicable here.
+-.SH AUTHORS
+-Andreas Gruenbacher,
+-.RI < a.gruenbacher@bestbits.at >
+-and the SGI XFS development team,
+-.RI < linux-xfs@oss.sgi.com >.
+-Please send any bug reports or comments to these addresses.
+-.SH SEE ALSO
+-.BR getfattr (1),
+-.BR setfattr (1),
+-.BR open (2),
+-.BR stat (2),
+-.BR setxattr (2),
+-.BR listxattr (2),
+-.BR removexattr (2),
+-and
+-.BR attr (5).
+diff --git a/man/man2/listxattr.2 b/man/man2/listxattr.2
+deleted file mode 100644
+index 8b4371c..0000000
+--- a/man/man2/listxattr.2
++++ /dev/null
+@@ -1,158 +0,0 @@
+-.\"
+-.\" Extended attributes system calls manual pages
+-.\"
+-.\" (C) Andreas Gruenbacher, February 2001
+-.\" (C) Silicon Graphics Inc, September 2001
+-.\"
+-.\" This is free documentation; you can redistribute it and/or
+-.\" modify it under the terms of the GNU General Public License as
+-.\" published by the Free Software Foundation; either version 2 of
+-.\" the License, or (at your option) any later version.
+-.\"
+-.\" The GNU General Public License's references to "object code"
+-.\" and "executables" are to be interpreted as the output of any
+-.\" document formatting or typesetting system, including
+-.\" intermediate and printed output.
+-.\"
+-.\" This manual is distributed in the hope that it will be useful,
+-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-.\" GNU General Public License for more details.
+-.\"
+-.\" You should have received a copy of the GNU General Public
+-.\" License along with this manual.  If not, see
+-.\" <http://www.gnu.org/licenses/>.
+-.\"
+-.TH LISTXATTR 2 "Extended Attributes" "Dec 2001" "System calls"
+-.SH NAME
+-listxattr, llistxattr, flistxattr \- list extended attribute names
+-.SH SYNOPSIS
+-.fam C
+-.nf
+-.B #include <sys/types.h>
+-.B #include <attr/xattr.h>
+-.sp
+-.BI "ssize_t listxattr (const char\ *" path ",
+-.BI "\t\t\t\t char\ *" list ", size_t " size );
+-.BI "ssize_t llistxattr (const char\ *" path ",
+-.BI "\t\t\t\t char\ *" list ", size_t " size );
+-.BI "ssize_t flistxattr (int " filedes ",
+-.BI "\t\t\t\t char\ *" list ", size_t " size );
+-.fi
+-.fam T
+-.SH DESCRIPTION
+-Extended attributes are name:value
+-pairs associated with inodes (files, directories, symlinks, etc).
+-They are extensions to the normal attributes which are associated
+-with all inodes in the system (i.e. the
+-.BR stat (2)
+-data).
+-A complete overview of extended attributes concepts can be found in
+-.BR attr (5).
+-.PP
+-.B listxattr
+-retrieves the
+-.I list
+-of extended attribute names associated with the given
+-.I path
+-in the filesystem.
+-The list is the set of (NULL-terminated) names, one after the other.
+-Names of extended attributes to which the calling process does not
+-have access may be omitted from the list.
+-The length of the attribute name
+-.I list
+-is returned.
+-.PP
+-.B llistxattr
+-is identical to
+-.BR listxattr ,
+-except in the case of a symbolic link, where the list of names of
+-extended attributes associated with the link itself is retrieved,
+-not the file that it refers to.
+-.I list
+-is a caller-allocated buffer of size
+-.IR size .
+-.PP
+-.B flistxattr
+-is identical to
+-.BR listxattr ,
+-only the open file pointed to by
+-.I filedes
+-(as returned by
+-.BR open (2))
+-is interrogated in place of
+-.IR path .
+-.PP
+-A single extended attribute
+-.I name
+-is a simple NULL-terminated string.
+-The name includes a namespace prefix \- there may be several, disjoint
+-namespaces associated with an individual inode.
+-.PP
+-An empty buffer of
+-.I size
+-zero can be passed into these calls to return the current size of the
+-list of extended attribute names, which can be used to estimate the
+-size of a buffer which is sufficiently large to hold the list of names.
+-.SH EXAMPLES
+-The
+-.I list
+-of names is returned as an unordered array of NULL-terminated character
+-strings (attribute names are separated by NULL characters), like this:
+-.fam C
+-.RS
+-.nf
+-user.name1\\0system.name1\\0user.name2\\0
+-.fi
+-.RE
+-.fam T
+-.P
+-Filesystems like ext2, ext3 and XFS which implement POSIX ACLs using
+-extended attributes, might return a
+-.I list
+-like this:
+-.fam C
+-.RS
+-.nf
+-system.posix_acl_access\\0system.posix_acl_default\\0
+-.fi
+-.RE
+-.fam T
+-.SH RETURN VALUE
+-On success, a positive number is returned indicating the size of the
+-extended attribute name list.
+-On failure, \-1 is returned and
+-.I errno
+-is set appropriately.
+-.PP
+-If the
+-.I size
+-of the
+-.I list
+-buffer is too small to hold the result,
+-.I errno
+-is set to ERANGE.
+-.PP
+-If extended attributes are not supported by the filesystem, or are disabled,
+-.I errno
+-is set to ENOTSUP.
+-.PP
+-The errors documented for the
+-.BR stat (2)
+-system call are also applicable here.
+-.SH AUTHORS
+-Andreas Gruenbacher,
+-.RI < a.gruenbacher@bestbits.at >
+-and the SGI XFS development team,
+-.RI < linux-xfs@oss.sgi.com >.
+-Please send any bug reports or comments to these addresses.
+-.SH SEE ALSO
+-.BR getfattr (1),
+-.BR setfattr (1),
+-.BR open (2),
+-.BR stat (2),
+-.BR getxattr (2),
+-.BR setxattr (2),
+-.BR removexattr (2),
+-and
+-.BR attr (5).
+diff --git a/man/man2/removexattr.2 b/man/man2/removexattr.2
+deleted file mode 100644
+index 2c7d934..0000000
+--- a/man/man2/removexattr.2
++++ /dev/null
+@@ -1,111 +0,0 @@
+-.\"
+-.\" Extended attributes system calls manual pages
+-.\"
+-.\" (C) Andreas Gruenbacher, February 2001
+-.\" (C) Silicon Graphics Inc, September 2001
+-.\"
+-.\" This is free documentation; you can redistribute it and/or
+-.\" modify it under the terms of the GNU General Public License as
+-.\" published by the Free Software Foundation; either version 2 of
+-.\" the License, or (at your option) any later version.
+-.\"
+-.\" The GNU General Public License's references to "object code"
+-.\" and "executables" are to be interpreted as the output of any
+-.\" document formatting or typesetting system, including
+-.\" intermediate and printed output.
+-.\"
+-.\" This manual is distributed in the hope that it will be useful,
+-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-.\" GNU General Public License for more details.
+-.\"
+-.\" You should have received a copy of the GNU General Public
+-.\" License along with this manual.  If not, see
+-.\" <http://www.gnu.org/licenses/>.
+-.\"
+-.TH REMOVEXATTR 2 "Extended Attributes" "Dec 2001" "System calls"
+-.SH NAME
+-removexattr, lremovexattr, fremovexattr \- remove an extended attribute
+-.SH SYNOPSIS
+-.fam C
+-.nf
+-.B #include <sys/types.h>
+-.B #include <attr/xattr.h>
+-.sp
+-.BI "int removexattr (const char\ *" path ", const char\ *" name );
+-.BI "int lremovexattr (const char\ *" path ", const char\ *" name );
+-.BI "int fremovexattr (int " filedes ", const char\ *" name );
+-.fi
+-.fam T
+-.SH DESCRIPTION
+-Extended attributes are
+-.IR name :\c
+-value pairs associated with inodes (files, directories, symlinks, etc).
+-They are extensions to the normal attributes which are associated
+-with all inodes in the system (i.e. the
+-.BR stat (2)
+-data).
+-A complete overview of extended attributes concepts can be found in
+-.BR attr (5).
+-.PP
+-.B removexattr
+-removes the extended attribute identified by
+-.I name
+-and associated with the given
+-.I path
+-in the filesystem.
+-.PP
+-.B lremovexattr
+-is identical to 
+-.BR removexattr ,
+-except in the case of a symbolic link, where the extended attribute is
+-removed from the link itself, not the file that it refers to.
+-.PP
+-.B fremovexattr
+-is identical to
+-.BR removexattr ,
+-only the extended attribute is removed from the open file pointed to by
+-.I filedes
+-(as returned by
+-.BR open (2))
+-in place of
+-.IR path .
+-.PP
+-An extended attribute name is a simple NULL-terminated string.
+-The
+-.I name
+-includes a namespace prefix \- there may be several, disjoint
+-namespaces associated with an individual inode.
+-.SH RETURN VALUE
+-On success, zero is returned.
+-On failure, \-1 is returned and
+-.I errno
+-is set appropriately.
+-.PP
+-If the named attribute does not exist,
+-.I errno
+-is set to ENOATTR.
+-.PP
+-If extended attributes are not supported by the filesystem, or are disabled,
+-.I errno
+-is set to ENOTSUP.
+-.PP
+-The errors documented for the
+-.BR stat (2)
+-system call are also applicable here.
+-.SH AUTHORS
+-Andreas Gruenbacher,
+-.RI < a.gruenbacher@bestbits.at >
+-and the SGI XFS development team,
+-.RI < linux-xfs@oss.sgi.com >.
+-Please send any bug reports or comments to these addresses.
+-.SH SEE ALSO
+-.BR getfattr (1),
+-.BR setfattr (1),
+-.BR open (2),
+-.BR stat (2),
+-.BR setxattr (2),
+-.BR getxattr (2),
+-.BR listxattr (2),
+-and
+-.BR attr (5).
+diff --git a/man/man2/setxattr.2 b/man/man2/setxattr.2
+deleted file mode 100644
+index b20dc9f..0000000
+--- a/man/man2/setxattr.2
++++ /dev/null
+@@ -1,143 +0,0 @@
+-.\"
+-.\" Extended attributes system calls manual pages
+-.\"
+-.\" (C) Andreas Gruenbacher, February 2001
+-.\" (C) Silicon Graphics Inc, September 2001
+-.\"
+-.\" This is free documentation; you can redistribute it and/or
+-.\" modify it under the terms of the GNU General Public License as
+-.\" published by the Free Software Foundation; either version 2 of
+-.\" the License, or (at your option) any later version.
+-.\"
+-.\" The GNU General Public License's references to "object code"
+-.\" and "executables" are to be interpreted as the output of any
+-.\" document formatting or typesetting system, including
+-.\" intermediate and printed output.
+-.\"
+-.\" This manual is distributed in the hope that it will be useful,
+-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-.\" GNU General Public License for more details.
+-.\"
+-.\" You should have received a copy of the GNU General Public
+-.\" License along with this manual.  If not, see
+-.\" <http://www.gnu.org/licenses/>.
+-.\"
+-.TH SETXATTR 2 "Extended Attributes" "Dec 2001" "System calls"
+-.SH NAME
+-setxattr, lsetxattr, fsetxattr \- set an extended attribute value
+-.SH SYNOPSIS
+-.fam C
+-.nf
+-.B #include <sys/types.h>
+-.B #include <attr/xattr.h>
+-.sp
+-.BI "int setxattr (const char\ *" path ", const char\ *" name ",
+-.BI "\t\t\t const void\ *" value ", size_t " size ", int " flags );
+-.BI "int lsetxattr (const char\ *" path ", const char\ *" name ",
+-.BI "\t\t\t const void\ *" value ", size_t " size ", int " flags );
+-.BI "int fsetxattr (int " filedes ", const char\ *" name ",
+-.BI "\t\t\t const void\ *" value ", size_t " size ", int " flags );
+-.fi
+-.fam T
+-.SH DESCRIPTION
+-Extended attributes are
+-.IR name :\c
+-.I value
+-pairs associated with inodes (files, directories, symlinks, etc).
+-They are extensions to the normal attributes which are associated
+-with all inodes in the system (i.e. the
+-.BR stat (2)
+-data).
+-A complete overview of extended attributes concepts can be found in
+-.BR attr (5).
+-.PP
+-.B setxattr
+-sets the
+-.I value
+-of the extended attribute identified by
+-.I name
+-and associated with the given
+-.I path
+-in the filesystem.
+-The
+-.I size
+-of the
+-.I value
+-must be specified.
+-.PP
+-.B lsetxattr
+-is identical to 
+-.BR setxattr ,
+-except in the case of a symbolic link, where the extended attribute is
+-set on the link itself, not the file that it refers to.
+-.PP
+-.B fsetxattr
+-is identical to
+-.BR setxattr ,
+-only the extended attribute is set on the open file pointed to by
+-.I filedes
+-(as returned by
+-.BR open (2))
+-in place of
+-.IR path .
+-.PP
+-An extended attribute name is a simple NULL-terminated string.
+-The
+-.I name
+-includes a namespace prefix \- there may be several, disjoint
+-namespaces associated with an individual inode.
+-The
+-.I value
+-of an extended attribute is a chunk of arbitrary textual or
+-binary data of specified length.
+-.PP
+-The
+-.I flags
+-parameter can be used to refine the semantics of the operation.
+-XATTR_CREATE specifies a pure create, which fails if the named
+-attribute exists already.
+-XATTR_REPLACE specifies a pure replace operation, which fails if the
+-named attribute does not already exist.
+-By default (no flags), the extended attribute will be created if
+-need be, or will simply replace the value if the attribute exists.
+-.SH RETURN VALUE
+-On success, zero is returned.
+-On failure, \-1 is returned and
+-.I errno
+-is set appropriately.
+-.PP
+-If XATTR_CREATE is specified, and the attribute exists already,
+-.I errno
+-is set to EEXIST.
+-If XATTR_REPLACE is specified, and the attribute does not exist,
+-.I errno
+-is set to ENOATTR.
+-.PP
+-If there is insufficient space remaining to store the extended attribute,
+-.I errno
+-is set to either ENOSPC, or EDQUOT if quota enforcement was the cause.
+-.PP
+-If extended attributes are not supported by the filesystem, or are disabled,
+-.I errno
+-is set to ENOTSUP.
+-.PP
+-The errors documented for the
+-.BR stat (2)
+-system call are also applicable here.
+-.SH AUTHORS
+-Andreas Gruenbacher,
+-.RI < a.gruenbacher@bestbits.at >
+-and the SGI XFS development team,
+-.RI < linux-xfs@oss.sgi.com >.
+-Please send any bug reports or comments to these addresses.
+-.SH SEE ALSO
+-.BR getfattr (1),
+-.BR setfattr (1),
+-.BR open (2),
+-.BR stat (2),
+-.BR getxattr (2),
+-.BR listxattr (2),
+-.BR removexattr (2),
+-and
+-.BR attr (5).
+-- 
+2.7.4
+

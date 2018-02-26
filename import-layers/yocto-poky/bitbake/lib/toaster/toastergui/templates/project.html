@@ -77,6 +77,22 @@
       </form>
     </div>
 
+    <div class="well well-transparent" id="distro-section">
+      <h3>Distro</h3>
+
+      <p class="lead"><span id="project-distro-name"></span> <span class="glyphicon glyphicon-edit" id="change-distro-toggle"></span></p>
+
+      <form id="select-distro-form" style="display:none;" class="form-inline">
+        <span class="help-block">Distro suggestions come from the Layer Index</a></span>
+        <div class="form-group">
+          <input class="form-control" id="distro-change-input" autocomplete="off" value="" data-provide="typeahead" data-minlength="1" data-autocomplete="off" type="text">
+        </div>
+        <button id="distro-change-btn" class="btn btn-default" type="button">Save</button>
+        <a href="#" id="cancel-distro-change" class="btn btn-link">Cancel</a>
+        <p class="form-link"><a href="{% url 'projectdistros' project.id %}">View compatible distros</a></p>
+      </form>
+    </div>
+
     <div class="well well-transparent">
       <h3>Most built recipes</h3>
 

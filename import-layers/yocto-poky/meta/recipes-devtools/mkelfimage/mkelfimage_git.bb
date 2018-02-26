@@ -17,20 +17,27 @@ SRC_URI = "git://review.coreboot.org/p/coreboot;protocol=http \
            "
 SRC_URI_append_class-native = " \
            file://fix-makefile-to-find-libz.patch   \
+           file://convert.bin.c \
 "
 
 CLEANBROKEN = "1"
 
 S = "${WORKDIR}/git/util/mkelfImage"
 
-CFLAGS += "-fno-stack-protector"
 CACHED_CONFIGUREVARS += "\
     HOST_CC='${BUILD_CC}' \
     HOST_CFLAGS='${BUILD_CFLAGS}' \
     HOST_CPPFLAGS='${BUILD_CPPFLAGS}' \
+    I386_CFLAGS='-fno-stack-protector' \
+    IA64_CFLAGS='-fno-stack-protector' \
 "
+EXTRA_OECONF_append_x86-64 = " --with-i386=${HOST_SYS}"
 
 inherit autotools-brokensep
+
+do_configure_prepend-class-native() {
+	cp ${WORKDIR}/convert.bin.c ${S}/linux-i386/
+}
 
 do_install_append() {
 	rmdir ${D}${datadir}/mkelfImage/elf32-i386

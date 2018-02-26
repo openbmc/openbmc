@@ -9,7 +9,7 @@ LICENSE = "BSD-2-Clause"
 
 SECTION = "net"
 
-DEPENDS = "libpcre gzip openssl"
+DEPENDS = "libpcre zlib openssl"
 
 SRC_URI = " \
     http://nginx.org/download/nginx-${PV}.tar.gz \
@@ -72,7 +72,7 @@ do_configure () {
     --prefix=${prefix} \
     --with-http_ssl_module \
     --with-http_gzip_static_module \
-    ${EXTRA_OECONF}
+    ${EXTRA_OECONF} ${PACKAGECONFIG_CONFARGS}
 }
 
 do_install () {

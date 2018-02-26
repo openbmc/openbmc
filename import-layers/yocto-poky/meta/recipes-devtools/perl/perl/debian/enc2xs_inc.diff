@@ -11,6 +11,7 @@ Bug-Debian: http://bugs.debian.org/290336
   issues with follow => 1 (see #603686 and [rt.cpan.org #64585])
 
 Patch-Name: debian/enc2xs_inc.diff
+Upstream-Status: Pending
 ---
  cpan/Encode/bin/enc2xs | 8 ++++----
  t/porting/customized.t | 3 +++

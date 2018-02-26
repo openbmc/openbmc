@@ -186,6 +186,13 @@ parted ${device} mkpart swap linux-swap $swap_start 100%
 
 parted ${device} print
 
+echo "Waiting for device nodes..."
+C=0
+while [ $C -ne 3 ] && [ ! -e $bootfs  -o ! -e $rootfs -o ! -e $swap ]; do
+    C=$(( C + 1 ))
+    sleep 1
+done
+
 echo "Formatting $bootfs to vfat..."
 mkfs.vfat $bootfs
 

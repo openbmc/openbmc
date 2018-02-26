@@ -1,0 +1,47 @@
+From be665d9513cca7e8b64c79ae424cf44ac166b052 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Sep 2017 17:07:58 -0700
+Subject: [PATCH] plugins: Check for PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+ before use
+
+musl does not define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+so we can not assume that all Linux systems support PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+its a glibc specific define so check for it being defined before using it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ plugins/dynamic_simulator/thread.cpp | 2 +-
+ plugins/ipmidirect/thread.cpp        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/dynamic_simulator/thread.cpp b/plugins/dynamic_simulator/thread.cpp
+index d663be0..9210fd7 100644
+--- a/plugins/dynamic_simulator/thread.cpp
++++ b/plugins/dynamic_simulator/thread.cpp
+@@ -229,7 +229,7 @@ cThread::Exit( void *rv )
+ /**
+  * Constructor
+  **/
+-#if ( defined(__sun) && defined(__SVR4) ) || defined(__FreeBSD__)
++#ifndef PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+ cThreadLock::cThreadLock()
+ {
+   pthread_mutexattr_t attr;
+diff --git a/plugins/ipmidirect/thread.cpp b/plugins/ipmidirect/thread.cpp
+index 5c52557..48e83fa 100644
+--- a/plugins/ipmidirect/thread.cpp
++++ b/plugins/ipmidirect/thread.cpp
+@@ -167,7 +167,7 @@ cThread::Exit( void *rv )
+ //                  cThreadLock
+ //////////////////////////////////////////////////
+ 
+-#if ( defined(__sun) && defined(__SVR4) ) || defined(__FreeBSD__)
++#ifndef PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+ cThreadLock::cThreadLock()
+ {
+   pthread_mutexattr_t attr;
+-- 
+2.14.1
+

@@ -28,6 +28,8 @@ import logging
 import optparse
 import warnings
 import fcntl
+import time
+import traceback
 
 import bb
 from bb import event
@@ -37,9 +39,15 @@ from bb import ui
 from bb import server
 from bb import cookerdata
 
+import bb.server.process
+import bb.server.xmlrpcclient
+
 logger = logging.getLogger("BitBake")
 
 class BBMainException(Exception):
+    pass
+
+class BBMainFatal(bb.BBHandledException):
     pass
 
 def present_options(optionlist):
@@ -58,9 +66,6 @@ class BitbakeHelpFormatter(optparse.IndentedHelpFormatter):
         if option.dest == 'ui':
             valid_uis = list_extension_modules(bb.ui, 'main')
             option.help = option.help.replace('@CHOICES@', present_options(valid_uis))
-        elif option.dest == 'servertype':
-            valid_server_types = list_extension_modules(bb.server, 'BitBakeServer')
-            option.help = option.help.replace('@CHOICES@', present_options(valid_server_types))
 
         return optparse.IndentedHelpFormatter.format_option(self, option)
 
@@ -148,11 +153,6 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
                                "failed and anything depending on it cannot be built, as much as "
                                "possible will be built before stopping.")
 
-        parser.add_option("-a", "--tryaltconfigs", action="store_true",
-                          dest="tryaltconfigs", default=False,
-                          help="Continue with builds by trying to use alternative providers "
-                               "where possible.")
-
         parser.add_option("-f", "--force", action="store_true", dest="force", default=False,
                           help="Force the specified targets/task to run (invalidating any "
                                "existing stamp file).")
@@ -238,11 +238,6 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
                           default=os.environ.get('BITBAKE_UI', 'knotty'),
                           help="The user interface to use (@CHOICES@ - default %default).")
 
-        # @CHOICES@ is substituted out by BitbakeHelpFormatter above
-        parser.add_option("-t", "--servertype", action="store", dest="servertype",
-                          default=["process", "xmlrpc"]["BBSERVER" in os.environ],
-                          help="Choose which server type to use (@CHOICES@ - default %default).")
-
         parser.add_option("", "--token", action="store", dest="xmlrpctoken",
                           default=os.environ.get("BBTOKEN"),
                           help="Specify the connection token to be used when connecting "
@@ -258,15 +253,14 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
                           help="Run bitbake without a UI, only starting a server "
                                "(cooker) process.")
 
-        parser.add_option("", "--foreground", action="store_true",
-                          help="Run bitbake server in foreground.")
-
         parser.add_option("-B", "--bind", action="store", dest="bind", default=False,
-                          help="The name/address for the bitbake server to bind to.")
+                          help="The name/address for the bitbake xmlrpc server to bind to.")
 
-        parser.add_option("-T", "--idle-timeout", type=int,
-                          default=int(os.environ.get("BBTIMEOUT", "0")),
-                          help="Set timeout to unload bitbake server due to inactivity")
+        parser.add_option("-T", "--idle-timeout", type=float, dest="server_timeout",
+                          default=os.getenv("BB_SERVER_TIMEOUT"),
+                          help="Set timeout to unload bitbake server due to inactivity, "
+                                "set to -1 means no unload, "
+                                "default: Environment variable BB_SERVER_TIMEOUT.")
 
         parser.add_option("", "--no-setscene", action="store_true",
                           dest="nosetscene", default=False,
@@ -283,7 +277,7 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
 
         parser.add_option("-m", "--kill-server", action="store_true",
                           dest="kill_server", default=False,
-                          help="Terminate the remote server.")
+                          help="Terminate any running bitbake server.")
 
         parser.add_option("", "--observe-only", action="store_true",
                           dest="observe_only", default=False,
@@ -322,68 +316,18 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
             eventlog = "bitbake_eventlog_%s.json" % datetime.now().strftime("%Y%m%d%H%M%S")
             options.writeeventlog = eventlog
 
-        # if BBSERVER says to autodetect, let's do that
-        if options.remote_server:
-            port = -1
-            if options.remote_server != 'autostart':
-                host, port = options.remote_server.split(":", 2)
+        if options.bind:
+            try:
+                #Checking that the port is a number and is a ':' delimited value
+                (host, port) = options.bind.split(':')
                 port = int(port)
-            # use automatic port if port set to -1, means read it from
-            # the bitbake.lock file; this is a bit tricky, but we always expect
-            # to be in the base of the build directory if we need to have a
-            # chance to start the server later, anyway
-            if port == -1:
-                lock_location = "./bitbake.lock"
-                # we try to read the address at all times; if the server is not started,
-                # we'll try to start it after the first connect fails, below
-                try:
-                    lf = open(lock_location, 'r')
-                    remotedef = lf.readline()
-                    [host, port] = remotedef.split(":")
-                    port = int(port)
-                    lf.close()
-                    options.remote_server = remotedef
-                except Exception as e:
-                    if options.remote_server != 'autostart':
-                        raise BBMainException("Failed to read bitbake.lock (%s), invalid port" % str(e))
+            except (ValueError,IndexError):
+                raise BBMainException("FATAL: Malformed host:port bind parameter")
+            options.xmlrpcinterface = (host, port)
+        else:
+            options.xmlrpcinterface = (None, 0)
 
         return options, targets[1:]
-
-
-def start_server(servermodule, configParams, configuration, features):
-    server = servermodule.BitBakeServer()
-    single_use = not configParams.server_only and os.getenv('BBSERVER') != 'autostart'
-    if configParams.bind:
-        (host, port) = configParams.bind.split(':')
-        server.initServer((host, int(port)), single_use=single_use,
-                          idle_timeout=configParams.idle_timeout)
-        configuration.interface = [server.serverImpl.host, server.serverImpl.port]
-    else:
-        server.initServer(single_use=single_use)
-        configuration.interface = []
-
-    try:
-        configuration.setServerRegIdleCallback(server.getServerIdleCB())
-
-        cooker = bb.cooker.BBCooker(configuration, features)
-
-        server.addcooker(cooker)
-        server.saveConnectionDetails()
-    except Exception as e:
-        while hasattr(server, "event_queue"):
-            import queue
-            try:
-                event = server.event_queue.get(block=False)
-            except (queue.Empty, IOError):
-                break
-            if isinstance(event, logging.LogRecord):
-                logger.handle(event)
-        raise
-    if not configParams.foreground:
-        server.detach()
-        cooker.shutdown()
-    cooker.lock.close()
-    return server
 
 
 def bitbake_main(configParams, configuration):
@@ -406,44 +350,14 @@ def bitbake_main(configParams, configuration):
 
     configuration.setConfigParameters(configParams)
 
-    if configParams.server_only:
-        if configParams.servertype != "xmlrpc":
-            raise BBMainException("FATAL: If '--server-only' is defined, we must set the "
-                                  "servertype as 'xmlrpc'.\n")
-        if not configParams.bind:
-            raise BBMainException("FATAL: The '--server-only' option requires a name/address "
-                                  "to bind to with the -B option.\n")
-        else:
-            try:
-                #Checking that the port is a number
-                int(configParams.bind.split(":")[1])
-            except (ValueError,IndexError):
-                raise BBMainException(
-                        "FATAL: Malformed host:port bind parameter")
-        if configParams.remote_server:
+    if configParams.server_only and configParams.remote_server:
             raise BBMainException("FATAL: The '--server-only' option conflicts with %s.\n" %
                                   ("the BBSERVER environment variable" if "BBSERVER" in os.environ \
                                    else "the '--remote-server' option"))
 
-    elif configParams.foreground:
-        raise BBMainException("FATAL: The '--foreground' option can only be used "
-                              "with --server-only.\n")
-
-    if configParams.bind and configParams.servertype != "xmlrpc":
-        raise BBMainException("FATAL: If '-B' or '--bind' is defined, we must "
-                              "set the servertype as 'xmlrpc'.\n")
-
-    if configParams.remote_server and configParams.servertype != "xmlrpc":
-        raise BBMainException("FATAL: If '--remote-server' is defined, we must "
-                              "set the servertype as 'xmlrpc'.\n")
-
-    if configParams.observe_only and (not configParams.remote_server or configParams.bind):
+    if configParams.observe_only and not (configParams.remote_server or configParams.bind):
         raise BBMainException("FATAL: '--observe-only' can only be used by UI clients "
                               "connecting to a server.\n")
-
-    if configParams.kill_server and not configParams.remote_server:
-        raise BBMainException("FATAL: '--kill-server' can only be used to "
-                              "terminate a remote server")
 
     if "BBDEBUG" in os.environ:
         level = int(os.environ["BBDEBUG"])
@@ -453,9 +367,13 @@ def bitbake_main(configParams, configuration):
     bb.msg.init_msgconfig(configParams.verbose, configuration.debug,
                           configuration.debug_domains)
 
-    server, server_connection, ui_module = setup_bitbake(configParams, configuration)
-    if server_connection is None and configParams.kill_server:
-        return 0
+    server_connection, ui_module = setup_bitbake(configParams, configuration)
+    # No server connection
+    if server_connection is None:
+        if configParams.status_only:
+            return 1
+        if configParams.kill_server:
+            return 0
 
     if not configParams.server_only:
         if configParams.status_only:
@@ -463,16 +381,15 @@ def bitbake_main(configParams, configuration):
             return 0
 
         try:
+            for event in bb.event.ui_queue:
+                server_connection.events.queue_event(event)
+            bb.event.ui_queue = []
+
             return ui_module.main(server_connection.connection, server_connection.events,
                                   configParams)
         finally:
-            bb.event.ui_queue = []
             server_connection.terminate()
     else:
-        print("Bitbake server address: %s, server port: %s" % (server.serverImpl.host,
-                                                               server.serverImpl.port))
-        if configParams.foreground:
-            server.serverImpl.serve_forever()
         return 0
 
     return 1
@@ -495,58 +412,93 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
         # Collect the feature set for the UI
         featureset = getattr(ui_module, "featureSet", [])
 
-    if configParams.server_only:
-        for param in ('prefile', 'postfile'):
-            value = getattr(configParams, param)
-            if value:
-                setattr(configuration, "%s_server" % param, value)
-                param = "%s_server" % param
-
     if extrafeatures:
         for feature in extrafeatures:
             if not feature in featureset:
                 featureset.append(feature)
 
-    servermodule = import_extension_module(bb.server,
-                                            configParams.servertype,
-                                            'BitBakeServer')
+    server_connection = None
+
     if configParams.remote_server:
-        if os.getenv('BBSERVER') == 'autostart':
-            if configParams.remote_server == 'autostart' or \
-               not servermodule.check_connection(configParams.remote_server, timeout=2):
-                configParams.bind = 'localhost:0'
-                srv = start_server(servermodule, configParams, configuration, featureset)
-                configParams.remote_server = '%s:%d' % tuple(configuration.interface)
-                bb.event.ui_queue = []
-        # we start a stub server that is actually a XMLRPClient that connects to a real server
-        from bb.server.xmlrpc import BitBakeXMLRPCClient
-        server = servermodule.BitBakeXMLRPCClient(configParams.observe_only,
-                                                  configParams.xmlrpctoken)
-        server.saveConnectionDetails(configParams.remote_server)
+        # Connect to a remote XMLRPC server
+        server_connection = bb.server.xmlrpcclient.connectXMLRPC(configParams.remote_server, featureset,
+                                                                 configParams.observe_only, configParams.xmlrpctoken)
     else:
-        # we start a server with a given configuration
-        server = start_server(servermodule, configParams, configuration, featureset)
+        retries = 8
+        while retries:
+            try:
+                topdir, lock = lockBitbake()
+                sockname = topdir + "/bitbake.sock"
+                if lock:
+                    if configParams.status_only or configParams.kill_server:
+                        logger.info("bitbake server is not running.")
+                        lock.close()
+                        return None, None
+                    # we start a server with a given configuration
+                    logger.info("Starting bitbake server...")
+                    # Clear the event queue since we already displayed messages
+                    bb.event.ui_queue = []
+                    server = bb.server.process.BitBakeServer(lock, sockname, configuration, featureset)
+
+                else:
+                    logger.info("Reconnecting to bitbake server...")
+                    if not os.path.exists(sockname):
+                        print("Previous bitbake instance shutting down?, waiting to retry...")
+                        i = 0
+                        lock = None
+                        # Wait for 5s or until we can get the lock
+                        while not lock and i < 50:
+                            time.sleep(0.1)
+                            _, lock = lockBitbake()
+                            i += 1
+                        if lock:
+                            bb.utils.unlockfile(lock)
+                        raise bb.server.process.ProcessTimeout("Bitbake still shutting down as socket exists but no lock?")
+                if not configParams.server_only:
+                    try:
+                        server_connection = bb.server.process.connectProcessServer(sockname, featureset)
+                    except EOFError:
+                        # The server may have been shutting down but not closed the socket yet. If that happened,
+                        # ignore it.
+                        pass
+
+                if server_connection or configParams.server_only:
+                    break
+            except BBMainFatal:
+                raise
+            except (Exception, bb.server.process.ProcessTimeout) as e:
+                if not retries:
+                    raise
+                retries -= 1
+                if isinstance(e, (bb.server.process.ProcessTimeout, BrokenPipeError)):
+                    logger.info("Retrying server connection...")
+                else:
+                    logger.info("Retrying server connection... (%s)" % traceback.format_exc())
+            if not retries:
+                bb.fatal("Unable to connect to bitbake server, or start one")
+            if retries < 5:
+                time.sleep(5)
+
+    if configParams.kill_server:
+        server_connection.connection.terminateServer()
+        server_connection.terminate()
         bb.event.ui_queue = []
+        logger.info("Terminated bitbake server.")
+        return None, None
 
-    if configParams.server_only:
-        server_connection = None
-    else:
-        try:
-            server_connection = server.establishConnection(featureset)
-        except Exception as e:
-            bb.fatal("Could not connect to server %s: %s" % (configParams.remote_server, str(e)))
+    # Restore the environment in case the UI needs it
+    for k in cleanedvars:
+        os.environ[k] = cleanedvars[k]
 
-        if configParams.kill_server:
-            server_connection.connection.terminateServer()
-            bb.event.ui_queue = []
-            return None, None, None
+    logger.removeHandler(handler)
 
-        server_connection.setupEventQueue()
+    return server_connection, ui_module
 
-        # Restore the environment in case the UI needs it
-        for k in cleanedvars:
-            os.environ[k] = cleanedvars[k]
+def lockBitbake():
+    topdir = bb.cookerdata.findTopdir()
+    if not topdir:
+        bb.error("Unable to find conf/bblayers.conf or conf/bitbake.conf. BBAPTH is unset and/or not in a build directory?")
+        raise BBMainFatal
+    lockfile = topdir + "/bitbake.lock"
+    return topdir, bb.utils.lockfile(lockfile, False, False)
 
-        logger.removeHandler(handler)
-
-    return server, server_connection, ui_module

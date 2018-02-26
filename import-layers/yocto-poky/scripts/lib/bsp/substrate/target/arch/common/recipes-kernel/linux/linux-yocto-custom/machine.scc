@@ -14,5 +14,3 @@ kconf hardware {{=machine}}.cfg
 # These are used by yocto-kernel to add config fragments and features.
 # Don't remove if you plan on using yocto-kernel with this BSP.
 
-kconf hardware {{=machine}}-user-config.cfg
-include {{=machine}}-user-patches.scc

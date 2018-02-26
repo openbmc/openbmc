@@ -1,0 +1,65 @@
+From 27442e2dd287d393d7b3f8bf164a887affef84df Mon Sep 17 00:00:00 2001
+From: Natanael Copa <ncopa@alpinelinux.org>
+Date: Wed, 18 Nov 2015 10:27:51 +0000
+Subject: [PATCH 10/11] gnu-ucontext
+
+---
+ open-vm-tools/lib/include/sigPosixRegs.h | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+Index: open-vm-tools/lib/include/sigPosixRegs.h
+===================================================================
+--- open-vm-tools.orig/lib/include/sigPosixRegs.h
++++ open-vm-tools/lib/include/sigPosixRegs.h
+@@ -33,7 +33,7 @@
+ #include "includeCheck.h"
+ 
+ 
+-#if __linux__         // We need the REG_foo offsets in the gregset_t;
++#if defined(__GLIBC__) // We need the REG_foo offsets in the gregset_t;
+ #  define _GNU_SOURCE // _GNU_SOURCE maps to __USE_GNU
+ 
+ /* And, the REG_foo definitions conflict with our own in x86.h */
+@@ -73,7 +73,7 @@
+ #include <sys/ucontext.h>
+ #endif
+ 
+-#if __linux__
++#if defined(__GLIBC__)
+ #  if defined(__x86_64__)
+ #    undef REG_RAX
+ #    undef REG_RBX
+@@ -199,7 +199,7 @@
+ #define SC_ESP(uc) ((unsigned long) (uc)->uc_mcontext.mc_esp)
+ #define SC_EIP(uc) ((unsigned long) (uc)->uc_mcontext.mc_eip)
+ #endif
+-#elif defined (sun)
++#elif !defined (__GLIBC__)
+ #ifdef __x86_64__
+ #define SC_EAX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_RAX])
+ #define SC_EBX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_RBX])
+@@ -219,15 +219,15 @@
+ #define SC_R14(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_R14])
+ #define SC_R15(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_R15])
+ #else
+-#define SC_EAX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[EAX])
+-#define SC_EBX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[EBX])
+-#define SC_ECX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[ECX])
+-#define SC_EDX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[EDX])
+-#define SC_EDI(uc) ((unsigned long) (uc)->uc_mcontext.gregs[EDI])
+-#define SC_ESI(uc) ((unsigned long) (uc)->uc_mcontext.gregs[ESI])
+-#define SC_EBP(uc) ((unsigned long) (uc)->uc_mcontext.gregs[EBP])
+-#define SC_ESP(uc) ((unsigned long) (uc)->uc_mcontext.gregs[ESP])
+-#define SC_EIP(uc) ((unsigned long) (uc)->uc_mcontext.gregs[EIP])
++#define SC_EAX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_EAX])
++#define SC_EBX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_EBX])
++#define SC_ECX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_ECX])
++#define SC_EDX(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_EDX])
++#define SC_EDI(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_EDI])
++#define SC_ESI(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_ESI])
++#define SC_EBP(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_EBP])
++#define SC_ESP(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_ESP])
++#define SC_EIP(uc) ((unsigned long) (uc)->uc_mcontext.gregs[REG_EIP])
+ #endif
+ #elif defined(ANDROID_X86)
+ #define SC_EAX(uc) ((unsigned long) (uc)->uc_mcontext.eax)

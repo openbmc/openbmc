@@ -1,0 +1,33 @@
+From 5da889032e2d99751ed9fe60016146e9ae8114cd Mon Sep 17 00:00:00 2001
+From: Xiao Ni <xni@redhat.com>
+Date: Sat, 18 Mar 2017 10:33:45 +0800
+Subject: [PATCH 4/5] mdadm: Forced type conversion to avoid truncation
+
+Gcc reports it needs 19 bytes to right to disk->serial. Because the
+type of argument i is int. But the meaning of i is failed disk
+number. So it doesn't need to use 19 bytes.  Just add a type
+conversion to avoid this building error
+
+Signed-off-by: Xiao Ni <xni@redhat.com>
+Signed-off-by: Jes Sorensen <Jes.Sorensen@gmail.com>
+---
+Upstream-Status: Backport
+ super-intel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/super-intel.c b/super-intel.c
+index 5499098..4e466ff 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -5228,7 +5228,7 @@ static int init_super_imsm_volume(struct supertype *st, mdu_array_info_t *info,
+ 			disk->status = CONFIGURED_DISK | FAILED_DISK;
+ 			disk->scsi_id = __cpu_to_le32(~(__u32)0);
+ 			snprintf((char *) disk->serial, MAX_RAID_SERIAL_LEN,
+-				 "missing:%d", i);
++				 "missing:%d", (__u8)i);
+ 		}
+ 		find_missing(super);
+ 	} else {
+-- 
+2.12.2
+

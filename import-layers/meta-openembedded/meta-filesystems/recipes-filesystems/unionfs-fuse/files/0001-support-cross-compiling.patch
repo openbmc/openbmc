@@ -1,0 +1,32 @@
+From 449cec34c123b86b792627553c6ec7471d2ee7ed Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 30 Jun 2017 14:46:51 +0800
+Subject: [PATCH] support cross compiling
+
+Do not override OE CMAKE variables
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,9 +10,9 @@ IF(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+ ENDIF(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+ 
+ # Select flags.
+-SET(CMAKE_C_FLAGS "-pipe -W -Wall -DFORTIFY_SOURCE=2")
++SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe -W -Wall -DFORTIFY_SOURCE=2")
+ SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
+-SET(CMAKE_C_FLAGS_RELEASE "-O2")
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
+ SET(CMAKE_C_FLAGS_DEBUG "-O0 -g -DDEBUG")
+ 
+ if (UNIX AND APPLE)
+-- 
+2.8.1
+

@@ -1,0 +1,10 @@
+[Unit]
+Description=Tftp Server
+Requires=tftpd-hpa.socket
+
+[Service]
+ExecStart=@SBINDIR@/in.tftpd-hpa -s /var/lib/tftpboot
+StandardInput=socket
+
+[Install]
+Also=tftpd-hpa.socket

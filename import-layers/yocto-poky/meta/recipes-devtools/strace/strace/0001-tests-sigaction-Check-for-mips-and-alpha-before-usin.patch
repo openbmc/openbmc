@@ -1,0 +1,37 @@
+From 9f3fd388ae7c46420bccba405468690ed46d669a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 18 Sep 2017 22:51:32 -0700
+Subject: [PATCH] tests/sigaction: Check for mips and alpha before using
+ sa_restorer
+
+local structure does not define restorer member for mips and alpha
+in definition, we need to match that assumption here where they are
+being set
+
+Fixes
+| ../../strace-4.18/tests/sigaction.c:177:36: error: 'struct_set_sa {aka struct set_sa}' has no member named 'restorer'
+|  # define SA_RESTORER_ARGS , new_act->restorer
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ tests/sigaction.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/sigaction.c b/tests/sigaction.c
+index 7b46944..f46cda7 100644
+--- a/tests/sigaction.c
++++ b/tests/sigaction.c
+@@ -170,7 +170,7 @@ main(void)
+ 	sigdelset(mask.libc, SIGHUP);
+ 
+ 	memcpy(new_act->mask, mask.old, sizeof(mask.old));
+-#ifdef SA_RESTORER
++#if defined(SA_RESTORER) && !defined(MIPS) && !defined(ALPHA)
+ 	new_act->flags = SA_RESTORER;
+ 	new_act->restorer = (unsigned long) 0xdeadfacecafef00dULL;
+ # define SA_RESTORER_FMT ", sa_flags=SA_RESTORER, sa_restorer=%#lx"
+-- 
+2.14.1
+

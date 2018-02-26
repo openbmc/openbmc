@@ -1,0 +1,46 @@
+From f65e9cc025278387b494c2383c5d9ff3bed98687 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 11 Jun 2017 00:47:24 -0700
+Subject: [PATCH] ia32: Dont use -pie
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ BaseTools/Conf/tools_def.template | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: git/BaseTools/Conf/tools_def.template
+===================================================================
+--- git.orig/BaseTools/Conf/tools_def.template
++++ git/BaseTools/Conf/tools_def.template
+@@ -4336,7 +4336,7 @@ RELEASE_*_*_OBJCOPY_ADDDEBUGFLAG   =
+ NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
+ 
+ DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -include AutoGen.h -fno-common
+-DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -O2 -mno-stack-arg-probe
++DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -O2 -mno-stack-arg-probe -fno-PIE -no-pie
+ DEFINE GCC_X64_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mno-red-zone -Wno-address -mno-stack-arg-probe
+ DEFINE GCC_IPF_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -minline-int-divide-min-latency
+ DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -mabi=aapcs -fno-short-enums -funsigned-char -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address -mthumb -mfloat-abi=soft -fno-pic -fno-pie
+@@ -4369,9 +4369,9 @@ DEFINE GCC_ARM_RC_FLAGS            = -I
+ DEFINE GCC_AARCH64_RC_FLAGS        = -I binary -O elf64-littleaarch64 -B aarch64 --rename-section .data=.hii
+ 
+ DEFINE GCC44_ALL_CC_FLAGS            = -g -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -include AutoGen.h -fno-common -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
+-DEFINE GCC44_IA32_CC_FLAGS           = DEF(GCC44_ALL_CC_FLAGS) -m32 -march=i586 -malign-double -fno-stack-protector -D EFI32 -fno-asynchronous-unwind-tables
++DEFINE GCC44_IA32_CC_FLAGS           = DEF(GCC44_ALL_CC_FLAGS) -m32 -march=i586 -malign-double -fno-stack-protector -D EFI32 -fno-asynchronous-unwind-tables -fno-PIE -no-pie
+ DEFINE GCC44_X64_CC_FLAGS            = DEF(GCC44_ALL_CC_FLAGS) -m64 -fno-stack-protector "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables
+-DEFINE GCC44_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x20
++DEFINE GCC44_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x20 -no-pie
+ DEFINE GCC44_IA32_X64_ASLDLINK_FLAGS = DEF(GCC44_IA32_X64_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
+ DEFINE GCC44_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map
+ DEFINE GCC44_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(GCC_DLINK2_FLAGS_COMMON)
+@@ -4451,7 +4451,7 @@ DEFINE GCC48_AARCH64_ASLDLINK_FLAGS  = D
+ 
+ DEFINE GCC49_IA32_CC_FLAGS           = DEF(GCC48_IA32_CC_FLAGS)
+ DEFINE GCC49_X64_CC_FLAGS            = DEF(GCC48_X64_CC_FLAGS)
+-DEFINE GCC49_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x40
++DEFINE GCC49_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x40 -no-pie
+ DEFINE GCC49_IA32_X64_ASLDLINK_FLAGS = DEF(GCC49_IA32_X64_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
+ DEFINE GCC49_IA32_X64_DLINK_FLAGS    = DEF(GCC49_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map
+ DEFINE GCC49_IA32_DLINK2_FLAGS       = DEF(GCC48_IA32_DLINK2_FLAGS)

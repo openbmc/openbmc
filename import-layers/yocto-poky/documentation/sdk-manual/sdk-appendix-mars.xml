@@ -14,8 +14,8 @@
         from start to finish.
         For general information on using the Eclipse IDE and the Yocto
         Project Eclipse Plug-In, see the
-        "<link linkend='sdk-developing-applications-using-eclipse'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></link>"
-        section.
+        "<link linkend='sdk-eclipse-project'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></link>"
+        Chapter.
     </para>
 
     <section id='mars-setting-up-the-eclipse-ide'>
@@ -392,7 +392,7 @@
                                         <filename>Build System Derived Toolchain:</filename></emphasis>
                                         Select this type if you built the
                                         toolchain as part of the
-                                        <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                                        <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>.
                                         When you select
                                         <filename>Build system derived toolchain</filename>,
                                         you are using the toolchain built and
@@ -418,7 +418,7 @@
                             toolchain, the path you provide for the
                             <filename>Toolchain Root Location</filename>
                             field is the
-                            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                            <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
                             from which you run the
                             <filename>bitbake</filename> command (e.g
                             <filename>/home/scottrif/poky/build</filename>).</para>
@@ -431,14 +431,22 @@
                             the target hardware resides.
                             </para>
                             <para>This location depends on where you
-                            separately extracted and installed the target
-                            filesystem.
+                            separately extracted and installed the
+                            target filesystem when you either built
+                            it or downloaded it.
+                            <note>
+                                If you downloaded the root filesystem
+                                for the target hardware rather than
+                                built it, you must download the
+                                <filename>sato-sdk</filename> image
+                                in order to build any c/c++ projects.
+                            </note>
                             As an example, suppose you prepared an image
                             using the steps in the
                             <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
                             If so, the <filename>MY_QEMU_ROOTFS</filename>
                             directory is found in the
-                            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                            <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
                             and you would browse to and select that directory
                             (e.g. <filename>/home/scottrif/build/MY_QEMU_ROOTFS</filename>).
                             </para>
@@ -487,7 +495,7 @@
                             <filename>Build system derived toolchain</filename>,
                             the target kernel you built will be located in
                             the
-                            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                            <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
                             in
                             <filename>tmp/deploy/images/<replaceable>machine</replaceable></filename>
                             directory.
@@ -692,7 +700,7 @@
             <note>
                 See the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-qemu'>Using the Quick EMUlator (QEMU)</ulink>"
-                chapter in the Yocto Project Development Manual
+                chapter in the Yocto Project Development Tasks Manual
                 for more information on using QEMU.
             </note>
             <orderedlist>
@@ -804,7 +812,7 @@
                     by clicking on "new".</para></listitem>
                 <listitem><para>Select <filename>SSH</filename>, which means
                     Secure Socket Shell.
-                    Optionally, you can select an TCF connection instead.
+                    Optionally, you can select a TCF connection instead.
                     </para></listitem>
                 <listitem><para>Click "Next".
                     </para></listitem>
@@ -848,11 +856,30 @@
                     launch.
                     Eclipse is helpful in that it auto fills your application
                     name for you assuming you browsed to a directory.
-                    <note>
-                        If you are prompted to provide a username and to
-                        optionally set a password, be sure you provide
-                        "root" as the username and you leave the password
-                        field blank.
+                    <note><title>Tips</title>
+                        <itemizedlist>
+                            <listitem><para>
+                                If you are prompted to provide a username
+                                and to optionally set a password, be sure
+                                you provide "root" as the username and you
+                                leave the password field blank.
+                                </para></listitem>
+                            <listitem><para>
+                                If browsing to a directory fails or times
+                                out, but you can
+                                <filename>ssh</filename> into your QEMU
+                                or target from the command line and you
+                                have proxies set up, it is likely that
+                                Eclipse is sending the SSH traffic to a
+                                proxy.
+                                In this case, either use TCF , or click on
+                                "Configure proxy settings" in the
+                                connection dialog and add the target IP
+                                address to the "bypass proxy" section.
+                                You might also need to change
+                                "Active Provider" from Native to Manual.
+                                </para></listitem>
+                        </itemizedlist>
                     </note>
                     </para></listitem>
                 <listitem><para>

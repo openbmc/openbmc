@@ -1,0 +1,28 @@
+From 8cf48da5f645dd7bbb1ccbeab5bb0964f40f17f7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jul 2017 23:18:47 -0700
+Subject: [PATCH 1/5] Include fcntl.h for O_EXCL
+
+Fix
+error: 'O_CREAT' undeclared (first use in this function)
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ invutil/invidx.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/invutil/invidx.c b/invutil/invidx.c
+index 67efdf7..325a9a1 100644
+--- a/invutil/invidx.c
++++ b/invutil/invidx.c
+@@ -27,6 +27,7 @@
+ #include <sys/stat.h>
+ #include <string.h>
+ #include <uuid/uuid.h>
++#include <fcntl.h>
+ 
+ #include "types.h"
+ #include "mlog.h"
+-- 
+2.13.2
+

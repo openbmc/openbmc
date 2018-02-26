@@ -1,0 +1,51 @@
+From 1f7d752193f02d15d5923cee992e8f46d4c6df1b Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Mon, 28 Aug 2017 13:51:49 +0300
+Subject: [PATCH] configure.ac: Always check for expat
+
+expat was not checked if dri was not built leading to build failure
+in vulkan driver: backport a fix (a combination of multiple commits
+that should end up in 17.3).
+
+Upstream-Status: Backport
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index fd346c8aa2..662faecefa 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1777,6 +1777,12 @@ if test "x$with_dri_drivers" = xno; then
+     with_dri_drivers=''
+ fi
+ 
++# Check for expat
++PKG_CHECK_MODULES([EXPAT], [expat])
++PKG_CHECK_MODULES([EXPAT], [expat],,
++    [PKG_CHECK_MODULES([EXPAT], [expat21])]
++)
++
+ dnl If $with_dri_drivers is yes, drivers will be added through
+ dnl platform checks. Set DEFINES and LIB_DEPS
+ if test "x$enable_dri" = xyes; then
+@@ -1810,15 +1816,6 @@ if test "x$enable_dri" = xyes; then
+         with_dri_drivers="i915 i965 nouveau r200 radeon swrast"
+     fi
+ 
+-    # Check for expat
+-    PKG_CHECK_MODULES([EXPAT], [expat], [],
+-        # expat version 2.0 and earlier do not provide expat.pc
+-        [AC_CHECK_HEADER([expat.h],[],
+-                         [AC_MSG_ERROR([Expat headers required for DRI not found])])
+-         AC_CHECK_LIB([expat],[XML_ParserCreate],[],
+-                     [AC_MSG_ERROR([Expat library required for DRI not found])])
+-         EXPAT_LIBS="-lexpat"])
+-
+     # put all the necessary libs together
+     DRI_LIB_DEPS="$DRI_LIB_DEPS $SELINUX_LIBS $LIBDRM_LIBS $EXPAT_LIBS -lm $PTHREAD_LIBS $DLOPEN_LIBS"
+ fi
+-- 
+2.14.1
+

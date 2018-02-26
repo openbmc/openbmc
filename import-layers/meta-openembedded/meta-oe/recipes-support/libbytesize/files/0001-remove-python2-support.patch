@@ -1,0 +1,30 @@
+From 2ddc97b30792817d162f51ec3818376aefbf184e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 3 May 2017 02:05:33 -0400
+Subject: [PATCH] remove python2 support
+
+We use python3 rather than python2 support
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/python/Makefile.am | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/src/python/Makefile.am b/src/python/Makefile.am
+index 567d0d7..8d9f446 100644
+--- a/src/python/Makefile.am
++++ b/src/python/Makefile.am
+@@ -1,8 +1,3 @@
+-pylibdir = $(shell python -c "import distutils.sysconfig; print(distutils.sysconfig.get_python_lib(1,0,prefix='${exec_prefix}'))")
+-
+-pybytesizedir     = $(pylibdir)/bytesize
+-dist_pybytesize_DATA = bytesize.py __init__.py
+-
+ if WITH_PYTHON3
+ py3libdir = $(shell python3 -c "import distutils.sysconfig; print(distutils.sysconfig.get_python_lib(1,0,prefix='${exec_prefix}'))")
+ py3bytesizedir    = $(py3libdir)/bytesize
+-- 
+2.8.1
+

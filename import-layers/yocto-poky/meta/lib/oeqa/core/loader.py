@@ -2,25 +2,30 @@
 # Released under the MIT license (see COPYING.MIT)
 
 import os
+import re
 import sys
 import unittest
+import inspect
 
 from oeqa.core.utils.path import findFile
 from oeqa.core.utils.test import getSuiteModules, getCaseID
 
+from oeqa.core.exception import OEQATestNotFound
 from oeqa.core.case import OETestCase
 from oeqa.core.decorator import decoratorClasses, OETestDecorator, \
         OETestFilter, OETestDiscover
 
-def _make_failed_test(classname, methodname, exception, suiteClass):
-    """
-        When loading tests unittest framework stores the exception in a new
-        class created for be displayed into run().
-
-        For our purposes will be better to raise the exception in loading 
-        step instead of wait to run the test suite.
-    """
-    raise exception
+# When loading tests, the unittest framework stores any exceptions and
+# displays them only when the run method is called.
+#
+# For our purposes, it is better to raise the exceptions in the loading
+# step rather than waiting to run the test suite.
+#
+# Generate the function definition because this differ across python versions
+# Python >= 3.4.4 uses tree parameters instead four but for example Python 3.5.3
+# ueses four parameters so isn't incremental.
+_failed_test_args = inspect.getargspec(unittest.loader._make_failed_test).args
+exec("""def _make_failed_test(%s): raise exception""" % ', '.join(_failed_test_args))
 unittest.loader._make_failed_test = _make_failed_test
 
 def _find_duplicated_modules(suite, directory):
@@ -28,6 +33,28 @@ def _find_duplicated_modules(suite, directory):
         path = findFile('%s.py' % module, directory)
         if path:
             raise ImportError("Duplicated %s module found in %s" % (module, path))
+
+def _built_modules_dict(modules):
+    modules_dict = {}
+
+    if modules == None:
+        return modules_dict
+
+    for module in modules:
+        # Assumption: package and module names do not contain upper case
+        # characters, whereas class names do
+        m = re.match(r'^([^A-Z]+)(?:\.([A-Z][^.]*)(?:\.([^.]+))?)?$', module)
+
+        module_name, class_name, test_name = m.groups()
+
+        if module_name and module_name not in modules_dict:
+            modules_dict[module_name] = {}
+        if class_name and class_name not in modules_dict[module_name]:
+            modules_dict[module_name][class_name] = []
+        if test_name and test_name not in modules_dict[module_name][class_name]:
+            modules_dict[module_name][class_name].append(test_name)
+
+    return modules_dict
 
 class OETestLoader(unittest.TestLoader):
     caseClass = OETestCase
@@ -39,7 +66,8 @@ class OETestLoader(unittest.TestLoader):
             filters, *args, **kwargs):
         self.tc = tc
 
-        self.modules = modules
+        self.modules = _built_modules_dict(modules)
+
         self.tests = tests
         self.modules_required = modules_required
 
@@ -62,6 +90,8 @@ class OETestLoader(unittest.TestLoader):
                 setattr(self, kwname, kwargs[kwname])
 
         self._patchCaseClass(self.caseClass)
+
+        super(OETestLoader, self).__init__()
 
     def _patchCaseClass(self, testCaseClass):
         # Adds custom attributes to the OETestCase class
@@ -116,7 +146,35 @@ class OETestLoader(unittest.TestLoader):
         """
             Returns True if test case must be filtered, False otherwise.
         """
-        if self.filters:
+        # XXX; If the module has more than one namespace only use
+        # the first to support run the whole module specifying the
+        # <module_name>.[test_class].[test_name]
+        module_name_small = case.__module__.split('.')[0]
+        module_name = case.__module__
+
+        class_name = case.__class__.__name__
+        test_name = case._testMethodName
+
+        if self.modules:
+            module = None
+            try:
+                module = self.modules[module_name_small]
+            except KeyError:
+                try:
+                    module = self.modules[module_name]
+                except KeyError:
+                    return True
+
+            if module:
+                if not class_name in module:
+                    return True
+
+                if module[class_name]:
+                    if test_name not in module[class_name]:
+                        return True
+
+        # Decorator filters
+        if self.filters and isinstance(case, OETestCase):
             filters = self.filters.copy()
             case_decorators = [cd for cd in case.decorators
                                if cd.__class__ in self.used_filters]
@@ -134,7 +192,8 @@ class OETestLoader(unittest.TestLoader):
         return False
 
     def _getTestCase(self, testCaseClass, tcName):
-        if not hasattr(testCaseClass, '__oeqa_loader'):
+        if not hasattr(testCaseClass, '__oeqa_loader') and \
+                issubclass(testCaseClass, OETestCase):
             # In order to support data_vars validation
             # monkey patch the default setUp/tearDown{Class} to use
             # the ones provided by OETestCase
@@ -161,7 +220,8 @@ class OETestLoader(unittest.TestLoader):
             setattr(testCaseClass, '__oeqa_loader', True)
 
         case = testCaseClass(tcName)
-        setattr(case, 'decorators', [])
+        if isinstance(case, OETestCase):
+            setattr(case, 'decorators', [])
 
         return case
 
@@ -173,9 +233,9 @@ class OETestLoader(unittest.TestLoader):
             raise TypeError("Test cases should not be derived from TestSuite." \
                                 " Maybe you meant to derive %s from TestCase?" \
                                 % testCaseClass.__name__)
-        if not issubclass(testCaseClass, self.caseClass):
+        if not issubclass(testCaseClass, unittest.case.TestCase):
             raise TypeError("Test %s is not derived from %s" % \
-                    (testCaseClass.__name__, self.caseClass.__name__))
+                    (testCaseClass.__name__, unittest.case.TestCase.__name__))
 
         testCaseNames = self.getTestCaseNames(testCaseClass)
         if not testCaseNames and hasattr(testCaseClass, 'runTest'):
@@ -196,6 +256,28 @@ class OETestLoader(unittest.TestLoader):
 
         return self.suiteClass(suite)
 
+    def _required_modules_validation(self):
+        """
+            Search in Test context registry if a required
+            test is found, raise an exception when not found.
+        """
+
+        for module in self.modules_required:
+            found = False
+
+            # The module name is splitted to only compare the
+            # first part of a test case id.
+            comp_len = len(module.split('.'))
+            for case in self.tc._registry['cases']:
+                case_comp = '.'.join(case.split('.')[0:comp_len])
+                if module == case_comp:
+                    found = True
+                    break
+
+            if not found:
+                raise OEQATestNotFound("Not found %s in loaded test cases" % \
+                        module)
+
     def discover(self):
         big_suite = self.suiteClass()
         for path in self.module_paths:
@@ -210,7 +292,40 @@ class OETestLoader(unittest.TestLoader):
         for clss in discover_classes:
             cases = clss.discover(self.tc._registry)
 
+        if self.modules_required:
+            self._required_modules_validation()
+
         return self.suiteClass(cases) if cases else big_suite
+
+    def _filterModule(self, module):
+        if module.__name__ in sys.builtin_module_names:
+            msg = 'Tried to import %s test module but is a built-in'
+            raise ImportError(msg % module.__name__)
+
+        # XXX; If the module has more than one namespace only use
+        # the first to support run the whole module specifying the
+        # <module_name>.[test_class].[test_name]
+        module_name_small = module.__name__.split('.')[0]
+        module_name = module.__name__
+
+        # Normal test modules are loaded if no modules were specified,
+        # if module is in the specified module list or if 'all' is in
+        # module list.
+        # Underscore modules are loaded only if specified in module list.
+        load_module = True if not module_name.startswith('_') \
+                              and (not self.modules \
+                                   or module_name in self.modules \
+                                   or module_name_small in self.modules \
+                                   or 'all' in self.modules) \
+                           else False
+
+        load_underscore = True if module_name.startswith('_') \
+                                  and (module_name in self.modules or \
+                                  module_name_small in self.modules) \
+                               else False
+
+        return (load_module, load_underscore)
+
 
     # XXX After Python 3.5, remove backward compatibility hacks for
     # use_load_tests deprecation via *args and **kws.  See issue 16662.
@@ -219,23 +334,7 @@ class OETestLoader(unittest.TestLoader):
             """
                 Returns a suite of all tests cases contained in module.
             """
-            if module.__name__ in sys.builtin_module_names:
-                msg = 'Tried to import %s test module but is a built-in'
-                raise ImportError(msg % module.__name__)
-
-            # Normal test modules are loaded if no modules were specified,
-            # if module is in the specified module list or if 'all' is in
-            # module list.
-            # Underscore modules are loaded only if specified in module list.
-            load_module = True if not module.__name__.startswith('_') \
-                                  and (not self.modules \
-                                       or module.__name__ in self.modules \
-                                       or 'all' in self.modules) \
-                               else False
-
-            load_underscore = True if module.__name__.startswith('_') \
-                                      and module.__name__ in self.modules \
-                                   else False
+            load_module, load_underscore = self._filterModule(module)
 
             if load_module or load_underscore:
                 return super(OETestLoader, self).loadTestsFromModule(
@@ -247,23 +346,7 @@ class OETestLoader(unittest.TestLoader):
             """
                 Returns a suite of all tests cases contained in module.
             """
-            if module.__name__ in sys.builtin_module_names:
-                msg = 'Tried to import %s test module but is a built-in'
-                raise ImportError(msg % module.__name__)
-
-            # Normal test modules are loaded if no modules were specified,
-            # if module is in the specified module list or if 'all' is in
-            # module list.
-            # Underscore modules are loaded only if specified in module list.
-            load_module = True if not module.__name__.startswith('_') \
-                                  and (not self.modules \
-                                       or module.__name__ in self.modules \
-                                       or 'all' in self.modules) \
-                               else False
-
-            load_underscore = True if module.__name__.startswith('_') \
-                                      and module.__name__ in self.modules \
-                                   else False
+            load_module, load_underscore = self._filterModule(module)
 
             if load_module or load_underscore:
                 return super(OETestLoader, self).loadTestsFromModule(

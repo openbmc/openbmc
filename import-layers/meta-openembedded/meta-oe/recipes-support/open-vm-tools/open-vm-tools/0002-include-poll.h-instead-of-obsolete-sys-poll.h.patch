@@ -1,0 +1,24 @@
+From d44c7c9de7380ad7b284231bd5b5c99b5c19758d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Jul 2017 07:37:59 -0700
+Subject: [PATCH 02/11] include poll.h instead of obsolete sys/poll.h
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/asyncsocket/asyncSocketInt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: open-vm-tools/lib/asyncsocket/asyncSocketInt.h
+===================================================================
+--- open-vm-tools.orig/lib/asyncsocket/asyncSocketInt.h
++++ open-vm-tools/lib/asyncsocket/asyncSocketInt.h
+@@ -71,8 +71,8 @@
+ #else
+ #include <stddef.h>
+ #include <ctype.h>
++#include <poll.h>
+ #include <sys/types.h>
+-#include <sys/poll.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ #include <netdb.h>

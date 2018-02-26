@@ -9,8 +9,7 @@ class BuildCpioTest(OERuntimeTestCase):
 
     @classmethod
     def setUpClass(cls):
-        uri = 'https://ftp.gnu.org/gnu/cpio'
-        uri = '%s/cpio-2.12.tar.bz2' % uri
+        uri = 'https://downloads.yoctoproject.org/mirror/sources/cpio-2.12.tar.gz'
         cls.project = TargetBuildProject(cls.tc.target,
                                          uri,
                                          dl_dir = cls.tc.td['DL_DIR'])

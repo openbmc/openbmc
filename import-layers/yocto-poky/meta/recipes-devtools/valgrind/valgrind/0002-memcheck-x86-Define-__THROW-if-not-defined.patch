@@ -1,0 +1,32 @@
+From 67d199dbdcbb3feff5f8928f87725fc64c0307d7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Jul 2017 17:36:42 -0700
+Subject: [PATCH 2/3] memcheck/x86: Define __THROW if not defined
+
+musl does not have __THROW, therefore make it null
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ memcheck/tests/x86-linux/scalar.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/memcheck/tests/x86-linux/scalar.h b/memcheck/tests/x86-linux/scalar.h
+index ef28b03..52f742e 100644
+--- a/memcheck/tests/x86-linux/scalar.h
++++ b/memcheck/tests/x86-linux/scalar.h
+@@ -11,6 +11,10 @@
+ #include <sys/types.h>
+ #include <sys/mman.h>
+ 
++#ifndef __THROW
++#define __THROW
++#endif
++
+ // Since we use vki_unistd.h, we can't include <unistd.h>.  So we have to
+ // declare this ourselves.
+ extern long int syscall (long int __sysno, ...) __THROW;
+-- 
+2.13.2
+

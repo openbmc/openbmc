@@ -29,10 +29,9 @@ import os
 
 from wic import WicError
 from wic.engine import get_custom_config
-from wic.utils import runner
 from wic.pluginbase import SourcePlugin
-from wic.utils.misc import (exec_cmd, exec_native_cmd,
-                            get_bitbake_var, BOOTDD_EXTRA_SPACE)
+from wic.misc import (exec_cmd, exec_native_cmd,
+                      get_bitbake_var, BOOTDD_EXTRA_SPACE)
 
 logger = logging.getLogger('wic')
 
@@ -46,10 +45,9 @@ class BootimgPcbiosPlugin(SourcePlugin):
     @classmethod
     def _get_bootimg_dir(cls, bootimg_dir, dirname):
         """
-        Check if dirname exists in default bootimg_dir or
-        in wic-tools STAGING_DIR.
+        Check if dirname exists in default bootimg_dir or in STAGING_DIR.
         """
-        for result in (bootimg_dir, get_bitbake_var("STAGING_DATADIR", "wic-tools")):
+        for result in (bootimg_dir, get_bitbake_var("STAGING_DATADIR")):
             if os.path.exists("%s/%s" % (result, dirname)):
                 return result
 
@@ -186,7 +184,7 @@ class BootimgPcbiosPlugin(SourcePlugin):
                      extra_blocks, part.mountpoint, blocks)
 
         # dosfs image, created by mkdosfs
-        bootimg = "%s/boot.img" % cr_workdir
+        bootimg = "%s/boot%s.img" % (cr_workdir, part.lineno)
 
         dosfs_cmd = "mkdosfs -n boot -S 512 -C %s %d" % (bootimg, blocks)
         exec_native_cmd(dosfs_cmd, native_sysroot)

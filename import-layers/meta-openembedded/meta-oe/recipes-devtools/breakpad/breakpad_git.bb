@@ -17,23 +17,36 @@ PE = "1"
 
 PV = "1.0+git${SRCPV}"
 
-SRCREV_FORMAT = "breakpad_glog_gmock_gtest_protobuf_lss"
+SRCREV_FORMAT = "breakpad_gtest_protobuf_lss_gyp"
 
-SRCREV_breakpad = "2f6cb866d615d6240a18c7535c994c6bb93b1ba5"
-SRCREV_glog = "d8cb47f77d1c31779f3ff890e1a5748483778d6a"
-SRCREV_gmock = "f7d03d2734759ee12b57d2dbcb695607d89e8e05"
+SRCREV_breakpad = "dea867e76f24e4a68395684b9d1cf24bcef82f20"
 SRCREV_gtest = "ec44c6c1675c25b9827aacd08c02433cccde7780"
 SRCREV_protobuf = "cb6dd4ef5f82e41e06179dcd57d3b1d9246ad6ac"
-SRCREV_lss = "1549d20f6d3e7d66bb4e687c0ab9da42c2bff2ac"
+SRCREV_lss = "a91633d172407f6c83dd69af11510b37afebb7f9"
+SRCREV_gyp = "324dd166b7c0b39d513026fa52d6280ac6d56770"
 
 SRC_URI = "git://github.com/google/breakpad;name=breakpad \
-           git://github.com/google/glog.git;destsuffix=git/src/third_party/glog;name=glog \
-           git://github.com/google/googlemock.git;destsuffix=git/src/testing;name=gmock \
            git://github.com/google/googletest.git;destsuffix=git/src/testing/gtest;name=gtest \
            git://github.com/google/protobuf.git;destsuffix=git/src/third_party/protobuf/protobuf;name=protobuf \
            git://chromium.googlesource.com/linux-syscall-support;protocol=https;destsuffix=git/src/third_party/lss;name=lss \
+           git://chromium.googlesource.com/external/gyp;protocol=https;destsuffix=git/src/tools/gyp;name=gyp \
+           file://0001-Replace-use-of-struct-ucontext-with-ucontext_t.patch \
+           file://0001-include-sys-reg.h-to-get-__WORDSIZE-on-musl-libc.patch \
+           file://0002-Avoid-using-basename.patch \
+           file://0003-Fix-conflict-between-musl-libc-dirent.h-and-lss.patch \
+           file://0001-Turn-off-sign-compare-for-musl-libc.patch \
+           file://0002-sys-signal.h-is-a-nonportable-alias-for-signal.h.patch \
+           file://0003-Dont-include-stab.h.patch \
+           file://0004-elf_reader.cc-include-sys-reg.h-to-get-__WORDSIZE-on.patch \
+           file://0005-md2core-Replace-basename.patch \
+           file://0002-Use-_fpstate-instead-of-_libc_fpstate-on-linux.patch \
+           file://mcontext.patch \
+           file://0001-lss-Match-syscalls-to-match-musl.patch;patchdir=src/third_party/lss \
+           file://mips_asm_sgidefs.patch;patchdir=src/third_party/lss \
 "
 S = "${WORKDIR}/git"
+
+CXXFLAGS += "-D_GNU_SOURCE"
 
 COMPATIBLE_MACHINE_powerpc = "(!.*ppc).*"
 
@@ -67,7 +80,7 @@ do_install_append() {
         install -m 0644 ${S}/src/google_breakpad/common/minidump_format.h ${D}${includedir}/breakpad/google_breakpad/common/minidump_format.h
         install -m 0644 ${S}/src/google_breakpad/common/minidump_cpu_amd64.h ${D}${includedir}/breakpad/google_breakpad/common/minidump_cpu_amd64.h
         install -m 0644 ${S}/src/google_breakpad/common/minidump_cpu_arm.h ${D}${includedir}/breakpad/google_breakpad/common/minidump_cpu_arm.h
-        install -m 0644 ${S}/src/google_breakpad/common/minidump_cpu_arm.h ${D}${includedir}/breakpad/google_breakpad/common/minidump_cpu_arm64.h
+        install -m 0644 ${S}/src/google_breakpad/common/minidump_cpu_arm64.h ${D}${includedir}/breakpad/google_breakpad/common/minidump_cpu_arm64.h
         install -m 0644 ${S}/src/google_breakpad/common/minidump_cpu_mips.h ${D}${includedir}/breakpad/google_breakpad/common/minidump_cpu_mips.h
         install -m 0644 ${S}/src/google_breakpad/common/minidump_cpu_ppc64.h ${D}${includedir}/breakpad/google_breakpad/common/minidump_cpu_ppc64.h
         install -m 0644 ${S}/src/google_breakpad/common/minidump_cpu_ppc.h ${D}${includedir}/breakpad/google_breakpad/common/minidump_cpu_ppc.h

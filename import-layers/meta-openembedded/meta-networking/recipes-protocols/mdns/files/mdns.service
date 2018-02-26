@@ -1,0 +1,15 @@
+[Unit]
+Description=Zero-configuration networking
+After=network.target
+
+[Service]
+Type=forking
+ExecStartPre=/bin/rm -f /var/run/mdnsd.pid
+ExecStart=/usr/sbin/mdnsd
+ExecReload=/bin/kill -HUP $MAINPID
+PIDFile=/var/run/mdnsd.pid
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

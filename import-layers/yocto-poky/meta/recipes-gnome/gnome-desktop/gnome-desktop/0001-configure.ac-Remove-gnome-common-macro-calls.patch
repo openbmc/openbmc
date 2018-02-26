@@ -1,0 +1,33 @@
+From 834bc861921fe0361f2d6a5b5716fc97a9519478 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 6 Jul 2017 13:13:45 +0300
+Subject: [PATCH] configure.ac: Remove gnome-common macro calls
+
+gnome-common is deprecated and these aren't doing much for us.
+
+Upstreamable fix would probably involve using autoconf-archive:
+Trying to avoid that dependency for now.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 7adcf0e..bb7659d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -71,9 +71,6 @@ AC_SUBST(GNOME_DATE)
+ AC_SUBST(GNOME_DATE_COMMENT_START)
+ AC_SUBST(GNOME_DATE_COMMENT_END)
+ 
+-GNOME_COMPILE_WARNINGS([maximum])
+-GNOME_MAINTAINER_MODE_DEFINES
+-
+ AC_ARG_ENABLE(deprecation_flags,
+               [AC_HELP_STRING([--enable-deprecation-flags],
+                               [use *_DISABLE_DEPRECATED flags @<:@default=no@:>@])],,
+-- 
+2.1.4
+

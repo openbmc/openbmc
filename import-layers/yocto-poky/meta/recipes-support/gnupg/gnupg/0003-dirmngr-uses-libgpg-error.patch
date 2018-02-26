@@ -1,0 +1,32 @@
+From 9c3858ffda6246bf9e1e6aeeb920532a56b19408 Mon Sep 17 00:00:00 2001
+From: Saul Wold <sgw@linux.intel.com>
+Date: Wed, 16 Aug 2017 11:18:01 +0800
+Subject: [PATCH 3/4] dirmngr uses libgpg error
+
+Upstream-Status: Pending
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+Rebase to 2.1.23
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ dirmngr/Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/dirmngr/Makefile.am b/dirmngr/Makefile.am
+index b404165..d3f916e 100644
+--- a/dirmngr/Makefile.am
++++ b/dirmngr/Makefile.am
+@@ -82,7 +82,8 @@ endif
+ dirmngr_LDADD = $(libcommonpth) \
+         $(DNSLIBS) $(LIBASSUAN_LIBS) \
+ 	$(LIBGCRYPT_LIBS) $(KSBA_LIBS) $(NPTH_LIBS) \
+-	$(NTBTLS_LIBS) $(LIBGNUTLS_LIBS) $(LIBINTL) $(LIBICONV)
++	$(NTBTLS_LIBS) $(LIBGNUTLS_LIBS) $(LIBINTL) $(LIBICONV) \
++	$(GPG_ERROR_LIBS)
+ if USE_LDAP
+ dirmngr_LDADD += $(ldaplibs)
+ endif
+-- 
+1.8.3.1
+

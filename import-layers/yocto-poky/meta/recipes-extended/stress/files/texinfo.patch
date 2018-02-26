@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 --- a/doc/stress.texi
 +++ b/doc/stress.texi
 @@ -62,47 +62,47 @@

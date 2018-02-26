@@ -13,8 +13,8 @@ RDEPENDS_${PN} = "\
     ${PYTHON_PN}-threading \
 "
 
-RSRC_URI[md5sum] = "6afe4c2e47bcec6eb7051b8c1ce19d52"
-SRC_URI[sha256sum] = "2949cddffc2b05683065a3cd2345114b1a49b08df8cb843d69ba99dc3e19edc2"
+SRC_URI[md5sum] = "ed6183b15519a0ae96675e9c3330c69b"
+SRC_URI[sha256sum] = "6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627"
 
 inherit pypi
 

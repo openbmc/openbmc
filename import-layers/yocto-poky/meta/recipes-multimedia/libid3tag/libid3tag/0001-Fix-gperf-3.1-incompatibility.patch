@@ -1,0 +1,40 @@
+From 91fcf66b9182c75cd2b96d88991d5a1c6307d4b4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 2 Aug 2017 16:27:52 +0300
+Subject: [PATCH] Fix gperf 3.1 incompatibility.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ compat.h    | 2 +-
+ frametype.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/compat.h b/compat.h
+index 8af71ec..b3d80d9 100644
+--- a/compat.h
++++ b/compat.h
+@@ -34,7 +34,7 @@ struct id3_compat {
+ };
+ 
+ struct id3_compat const *id3_compat_lookup(register char const *,
+-					   register unsigned int);
++					   register size_t);
+ 
+ int id3_compat_fixup(struct id3_tag *);
+ 
+diff --git a/frametype.h b/frametype.h
+index dd064b2..b5b7593 100644
+--- a/frametype.h
++++ b/frametype.h
+@@ -37,6 +37,6 @@ extern struct id3_frametype const id3_frametype_unknown;
+ extern struct id3_frametype const id3_frametype_obsolete;
+ 
+ struct id3_frametype const *id3_frametype_lookup(register char const *,
+-						 register unsigned int);
++						 register size_t);
+ 
+ # endif
+-- 
+2.13.2
+

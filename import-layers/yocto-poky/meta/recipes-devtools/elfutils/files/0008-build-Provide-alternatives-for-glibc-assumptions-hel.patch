@@ -1,0 +1,1031 @@
+From 010b0c57e748440eb1ceb3d977875f2488d2b4ce Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 16 Aug 2017 10:06:26 +0800
+Subject: [PATCH] build: Provide alternatives for glibc assumptions helps
+ compiling it on musl
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Rebase to 0.170
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.am                      |  2 +-
+ lib/color.c                      |  3 ++-
+ lib/fixedsizehash.h              |  1 -
+ lib/system.h                     | 10 ++++++++++
+ lib/xmalloc.c                    |  2 +-
+ libasm/asm_end.c                 |  2 +-
+ libasm/asm_newscn.c              |  2 +-
+ libcpu/i386_gendis.c             |  2 +-
+ libcpu/i386_lex.c                |  2 +-
+ libcpu/i386_parse.c              |  2 +-
+ libdw/Makefile.am                |  3 ++-
+ libdw/libdw_alloc.c              |  2 +-
+ libdwfl/dwfl_build_id_find_elf.c |  3 ++-
+ libdwfl/dwfl_error.c             |  4 +++-
+ libdwfl/dwfl_module_getdwarf.c   |  1 +
+ libdwfl/find-debuginfo.c         |  2 +-
+ libdwfl/libdwfl_crc32_file.c     |  9 +++++++++
+ libdwfl/linux-kernel-modules.c   |  1 +
+ libebl/eblopenbackend.c          |  2 +-
+ libelf/elf.h                     |  8 ++++++--
+ libelf/libelf.h                  |  1 +
+ libelf/libelfP.h                 |  1 +
+ src/addr2line.c                  |  2 +-
+ src/ar.c                         |  2 +-
+ src/arlib.c                      |  2 +-
+ src/arlib2.c                     |  2 +-
+ src/elfcmp.c                     |  2 +-
+ src/elflint.c                    |  2 +-
+ src/findtextrel.c                |  2 +-
+ src/nm.c                         |  2 +-
+ src/objdump.c                    |  2 +-
+ src/ranlib.c                     |  2 +-
+ src/readelf.c                    |  2 +-
+ src/size.c                       |  2 +-
+ src/stack.c                      |  2 +-
+ src/strings.c                    |  2 +-
+ src/strip.c                      |  2 +-
+ src/unstrip.c                    |  2 +-
+ tests/addrscopes.c               |  2 +-
+ tests/allregs.c                  |  2 +-
+ tests/backtrace-data.c           |  2 +-
+ tests/backtrace-dwarf.c          |  2 +-
+ tests/backtrace.c                |  2 +-
+ tests/buildid.c                  |  2 +-
+ tests/debugaltlink.c             |  2 +-
+ tests/debuglink.c                |  2 +-
+ tests/deleted.c                  |  2 +-
+ tests/dwfl-addr-sect.c           |  2 +-
+ tests/dwfl-bug-addr-overflow.c   |  2 +-
+ tests/dwfl-bug-fd-leak.c         |  2 +-
+ tests/dwfl-bug-getmodules.c      |  2 +-
+ tests/dwfl-report-elf-align.c    |  2 +-
+ tests/dwfllines.c                |  2 +-
+ tests/dwflmodtest.c              |  2 +-
+ tests/dwflsyms.c                 |  2 +-
+ tests/early-offscn.c             |  2 +-
+ tests/ecp.c                      |  2 +-
+ tests/find-prologues.c           |  2 +-
+ tests/funcretval.c               |  2 +-
+ tests/funcscopes.c               |  2 +-
+ tests/getsrc_die.c               |  2 +-
+ tests/line2addr.c                |  2 +-
+ tests/low_high_pc.c              |  2 +-
+ tests/md5-sha1-test.c            |  2 +-
+ tests/rdwrmmap.c                 |  2 +-
+ tests/saridx.c                   |  2 +-
+ tests/sectiondump.c              |  2 +-
+ tests/varlocs.c                  |  2 +-
+ tests/vdsosyms.c                 |  2 +-
+ 69 files changed, 95 insertions(+), 64 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2ff444e..41f77df 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -28,7 +28,7 @@ pkginclude_HEADERS = version.h
+ 
+ # Add doc back when we have some real content.
+ SUBDIRS = config m4 lib libelf libebl libdwelf libdwfl libdw libcpu libasm \
+-	  backends src po tests
++	  backends po tests
+ 
+ EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING \
+ 	     COPYING COPYING-GPLV2 COPYING-LGPLV3
+diff --git a/lib/color.c b/lib/color.c
+index f62389d..a2a84b4 100644
+--- a/lib/color.c
++++ b/lib/color.c
+@@ -32,13 +32,14 @@
+ #endif
+ 
+ #include <argp.h>
+-#include <error.h>
++#include <err.h>
+ #include <libintl.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+ #include "libeu.h"
+ #include "color.h"
++#include "system.h"
+ 
+ /* Prototype for option handler.  */
+ static error_t parse_opt (int key, char *arg, struct argp_state *state);
+diff --git a/lib/fixedsizehash.h b/lib/fixedsizehash.h
+index dac2a5f..43016fc 100644
+--- a/lib/fixedsizehash.h
++++ b/lib/fixedsizehash.h
+@@ -30,7 +30,6 @@
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <sys/cdefs.h>
+ 
+ #include <system.h>
+ 
+diff --git a/lib/system.h b/lib/system.h
+index 9203335..1a60131 100644
+--- a/lib/system.h
++++ b/lib/system.h
+@@ -50,6 +50,16 @@
+ #else
+ # error "Unknown byte order"
+ #endif
++#ifndef TEMP_FAILURE_RETRY
++#define TEMP_FAILURE_RETRY(expression) \
++  (__extension__							      \
++    ({ long int __result;						      \
++       do __result = (long int) (expression);				      \
++       while (__result == -1L && errno == EINTR);			      \
++       __result; }))
++#endif
++
++#define error(status, errno, ...) err(status, __VA_ARGS__)
+ 
+ #ifndef MAX
+ #define MAX(m, n) ((m) < (n) ? (n) : (m))
+diff --git a/lib/xmalloc.c b/lib/xmalloc.c
+index 0cde384..217b054 100644
+--- a/lib/xmalloc.c
++++ b/lib/xmalloc.c
+@@ -30,7 +30,7 @@
+ # include <config.h>
+ #endif
+ 
+-#include <error.h>
++#include <err.h>
+ #include <libintl.h>
+ #include <stddef.h>
+ #include <stdlib.h>
+diff --git a/libasm/asm_end.c b/libasm/asm_end.c
+index ced24f5..4ad918c 100644
+--- a/libasm/asm_end.c
++++ b/libasm/asm_end.c
+@@ -32,7 +32,7 @@
+ #endif
+ 
+ #include <assert.h>
+-#include <error.h>
++#include <err.h>
+ #include <libintl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/libasm/asm_newscn.c b/libasm/asm_newscn.c
+index ddbb25d..74a598d 100644
+--- a/libasm/asm_newscn.c
++++ b/libasm/asm_newscn.c
+@@ -32,7 +32,7 @@
+ #endif
+ 
+ #include <assert.h>
+-#include <error.h>
++#include <err.h>
+ #include <libintl.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/libcpu/i386_gendis.c b/libcpu/i386_gendis.c
+index aae5eae..6d76016 100644
+--- a/libcpu/i386_gendis.c
++++ b/libcpu/i386_gendis.c
+@@ -31,7 +31,7 @@
+ # include <config.h>
+ #endif
+ 
+-#include <error.h>
++#include <err.h>
+ #include <errno.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/libcpu/i386_lex.c b/libcpu/i386_lex.c
+index ba5f4aa..b1e4191 100644
+--- a/libcpu/i386_lex.c
++++ b/libcpu/i386_lex.c
+@@ -577,7 +577,7 @@ char *i386_text;
+ #endif
+ 
+ #include <ctype.h>
+-#include <error.h>
++#include <err.h>
+ #include <libintl.h>
+ 
+ #include <libeu.h>
+diff --git a/libcpu/i386_parse.c b/libcpu/i386_parse.c
+index ef1ac35..48f2e64 100644
+--- a/libcpu/i386_parse.c
++++ b/libcpu/i386_parse.c
+@@ -107,7 +107,7 @@
+ #include <assert.h>
+ #include <ctype.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <inttypes.h>
+ #include <libintl.h>
+ #include <math.h>
+diff --git a/libdw/Makefile.am b/libdw/Makefile.am
+index ff8c291..89e792a 100644
+--- a/libdw/Makefile.am
++++ b/libdw/Makefile.am
+@@ -105,7 +105,8 @@ am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
+ libdw_so_LIBS = libdw_pic.a ../libdwelf/libdwelf_pic.a \
+ 	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a
+ libdw_so_DEPS = ../lib/libeu.a ../libelf/libelf.so
+-libdw_so_LDLIBS = $(libdw_so_DEPS) -ldl -lz $(argp_LDADD) $(zip_LIBS)
++fts_LDADD = -lfts
++libdw_so_LDLIBS = $(libdw_so_DEPS) -ldl -lz $(argp_LDADD) $(zip_LIBS) $(fts_LDADD)
+ libdw_so_SOURCES =
+ libdw.so$(EXEEXT): $(srcdir)/libdw.map $(libdw_so_LIBS) $(libdw_so_DEPS)
+ # The rpath is necessary for libebl because its $ORIGIN use will
+diff --git a/libdw/libdw_alloc.c b/libdw/libdw_alloc.c
+index 28a8cf6..29aeb3f 100644
+--- a/libdw/libdw_alloc.c
++++ b/libdw/libdw_alloc.c
+@@ -31,7 +31,7 @@
+ # include <config.h>
+ #endif
+ 
+-#include <error.h>
++#include <err.h>
+ #include <errno.h>
+ #include <stdlib.h>
+ #include "libdwP.h"
+diff --git a/libdwfl/dwfl_build_id_find_elf.c b/libdwfl/dwfl_build_id_find_elf.c
+index ee0c164..b06ab59 100644
+--- a/libdwfl/dwfl_build_id_find_elf.c
++++ b/libdwfl/dwfl_build_id_find_elf.c
+@@ -31,6 +31,7 @@
+ #endif
+ 
+ #include "libdwflP.h"
++#include "system.h"
+ #include <inttypes.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+@@ -99,7 +100,7 @@ __libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug, char **file_name,
+ 	{
+ 	  if (*file_name != NULL)
+ 	    free (*file_name);
+-	  *file_name = canonicalize_file_name (name);
++	  *file_name = realpath (name, NULL);
+ 	  if (*file_name == NULL)
+ 	    {
+ 	      *file_name = name;
+diff --git a/libdwfl/dwfl_error.c b/libdwfl/dwfl_error.c
+index 7bcf61c..c345797 100644
+--- a/libdwfl/dwfl_error.c
++++ b/libdwfl/dwfl_error.c
+@@ -140,6 +140,7 @@ __libdwfl_seterrno (Dwfl_Error error)
+ const char *
+ dwfl_errmsg (int error)
+ {
++  static __thread char s[64] = "";
+   if (error == 0 || error == -1)
+     {
+       int last_error = global_error;
+@@ -154,7 +155,8 @@ dwfl_errmsg (int error)
+   switch (error &~ 0xffff)
+     {
+     case OTHER_ERROR (ERRNO):
+-      return strerror_r (error & 0xffff, "bad", 0);
++      strerror_r (error & 0xffff, s, sizeof(s));
++      return s;
+     case OTHER_ERROR (LIBELF):
+       return elf_errmsg (error & 0xffff);
+     case OTHER_ERROR (LIBDW):
+diff --git a/libdwfl/dwfl_module_getdwarf.c b/libdwfl/dwfl_module_getdwarf.c
+index 9775ace..511c4a6 100644
+--- a/libdwfl/dwfl_module_getdwarf.c
++++ b/libdwfl/dwfl_module_getdwarf.c
+@@ -35,6 +35,7 @@
+ #include <fcntl.h>
+ #include <string.h>
+ #include <unistd.h>
++#include "system.h"
+ #include "../libdw/libdwP.h"	/* DWARF_E_* values are here.  */
+ #include "../libelf/libelfP.h"
+ #include "system.h"
+diff --git a/libdwfl/find-debuginfo.c b/libdwfl/find-debuginfo.c
+index 6d5a42a..9267788 100644
+--- a/libdwfl/find-debuginfo.c
++++ b/libdwfl/find-debuginfo.c
+@@ -389,7 +389,7 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod,
+       /* If FILE_NAME is a symlink, the debug file might be associated
+ 	 with the symlink target name instead.  */
+ 
+-      char *canon = canonicalize_file_name (file_name);
++      char *canon = realpath (file_name, NULL);
+       if (canon != NULL && strcmp (file_name, canon))
+ 	fd = find_debuginfo_in_path (mod, canon,
+ 				     debuglink_file, debuglink_crc,
+diff --git a/libdwfl/libdwfl_crc32_file.c b/libdwfl/libdwfl_crc32_file.c
+index f849128..6f0aca1 100644
+--- a/libdwfl/libdwfl_crc32_file.c
++++ b/libdwfl/libdwfl_crc32_file.c
+@@ -29,6 +29,15 @@
+ # include <config.h>
+ #endif
+ 
++#ifndef TEMP_FAILURE_RETRY
++#define TEMP_FAILURE_RETRY(expression) \
++  (__extension__                                                             \
++    ({ long int __result;                                                    \
++       do __result = (long int) (expression);                                \
++       while (__result == -1L && errno == EINTR);                            \
++       __result; }))
++#endif
++
+ #define crc32_file attribute_hidden __libdwfl_crc32_file
+ #define crc32 __libdwfl_crc32
+ #include <libdwflP.h>
+diff --git a/libdwfl/linux-kernel-modules.c b/libdwfl/linux-kernel-modules.c
+index 9d0fef2..9fc09b8 100644
+--- a/libdwfl/linux-kernel-modules.c
++++ b/libdwfl/linux-kernel-modules.c
+@@ -40,6 +40,7 @@
+ #include <system.h>
+ 
+ #include "libdwflP.h"
++#include "system.h"
+ #include <inttypes.h>
+ #include <errno.h>
+ #include <stdio.h>
+diff --git a/libebl/eblopenbackend.c b/libebl/eblopenbackend.c
+index 5371396..2e66dfd 100644
+--- a/libebl/eblopenbackend.c
++++ b/libebl/eblopenbackend.c
+@@ -32,7 +32,7 @@
+ 
+ #include <assert.h>
+ #include <dlfcn.h>
+-#include <error.h>
++#include <err.h>
+ #include <libelfP.h>
+ #include <dwarf.h>
+ #include <stdlib.h>
+diff --git a/libelf/elf.h b/libelf/elf.h
+index 5cf2b93..990b3af 100644
+--- a/libelf/elf.h
++++ b/libelf/elf.h
+@@ -21,7 +21,9 @@
+ 
+ #include <features.h>
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /* Standard ELF types.  */
+ 
+@@ -3705,6 +3707,8 @@ enum
+ #define R_BPF_NONE		0	/* No reloc */
+ #define R_BPF_MAP_FD		1	/* Map fd to pointer */
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif	/* elf.h */
+diff --git a/libelf/libelf.h b/libelf/libelf.h
+index 547c0f5..dd78799 100644
+--- a/libelf/libelf.h
++++ b/libelf/libelf.h
+@@ -29,6 +29,7 @@
+ #ifndef _LIBELF_H
+ #define _LIBELF_H 1
+ 
++#include <fcntl.h>
+ #include <stdint.h>
+ #include <sys/types.h>
+ 
+diff --git a/libelf/libelfP.h b/libelf/libelfP.h
+index 7ee6625..5840899 100644
+--- a/libelf/libelfP.h
++++ b/libelf/libelfP.h
+@@ -32,6 +32,7 @@
+ 
+ #include <ar.h>
+ #include <gelf.h>
++#include <libelf.h>
+ 
+ #include <errno.h>
+ #include <stdbool.h>
+diff --git a/src/addr2line.c b/src/addr2line.c
+index ba414a7..04b7116 100644
+--- a/src/addr2line.c
++++ b/src/addr2line.c
+@@ -23,7 +23,7 @@
+ #include <argp.h>
+ #include <assert.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
+ #include <libdwfl.h>
+diff --git a/src/ar.c b/src/ar.c
+index ec32cee..4efd729 100644
+--- a/src/ar.c
++++ b/src/ar.c
+@@ -22,7 +22,7 @@
+ 
+ #include <argp.h>
+ #include <assert.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <libintl.h>
+diff --git a/src/arlib.c b/src/arlib.c
+index e0839aa..1143658 100644
+--- a/src/arlib.c
++++ b/src/arlib.c
+@@ -21,7 +21,7 @@
+ #endif
+ 
+ #include <assert.h>
+-#include <error.h>
++#include <err.h>
+ #include <gelf.h>
+ #include <inttypes.h>
+ #include <libintl.h>
+diff --git a/src/arlib2.c b/src/arlib2.c
+index 553fc57..46443d0 100644
+--- a/src/arlib2.c
++++ b/src/arlib2.c
+@@ -20,7 +20,7 @@
+ # include <config.h>
+ #endif
+ 
+-#include <error.h>
++#include <err.h>
+ #include <libintl.h>
+ #include <limits.h>
+ #include <string.h>
+diff --git a/src/elfcmp.c b/src/elfcmp.c
+index 5046420..cff183f 100644
+--- a/src/elfcmp.c
++++ b/src/elfcmp.c
+@@ -23,7 +23,7 @@
+ #include <argp.h>
+ #include <assert.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <locale.h>
+ #include <libintl.h>
+diff --git a/src/elflint.c b/src/elflint.c
+index 51e53c2..da0b0dc 100644
+--- a/src/elflint.c
++++ b/src/elflint.c
+@@ -24,7 +24,7 @@
+ #include <assert.h>
+ #include <byteswap.h>
+ #include <endian.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <inttypes.h>
+diff --git a/src/findtextrel.c b/src/findtextrel.c
+index 8f1e239..71463af 100644
+--- a/src/findtextrel.c
++++ b/src/findtextrel.c
+@@ -23,7 +23,7 @@
+ #include <argp.h>
+ #include <assert.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <libdw.h>
+diff --git a/src/nm.c b/src/nm.c
+index 969c6d3..3113c04 100644
+--- a/src/nm.c
++++ b/src/nm.c
+@@ -26,7 +26,7 @@
+ #include <ctype.h>
+ #include <dwarf.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <inttypes.h>
+diff --git a/src/objdump.c b/src/objdump.c
+index 860cfac..61e67bf 100644
+--- a/src/objdump.c
++++ b/src/objdump.c
+@@ -21,7 +21,7 @@
+ #endif
+ 
+ #include <argp.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
+ #include <libintl.h>
+diff --git a/src/ranlib.c b/src/ranlib.c
+index cc0ee23..ae851e4 100644
+--- a/src/ranlib.c
++++ b/src/ranlib.c
+@@ -24,7 +24,7 @@
+ #include <argp.h>
+ #include <assert.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <libintl.h>
+diff --git a/src/readelf.c b/src/readelf.c
+index 346eccd..c831aa8 100644
+--- a/src/readelf.c
++++ b/src/readelf.c
+@@ -25,7 +25,7 @@
+ #include <ctype.h>
+ #include <dwarf.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <inttypes.h>
+diff --git a/src/size.c b/src/size.c
+index ad8dbcb..fd83be0 100644
+--- a/src/size.c
++++ b/src/size.c
+@@ -21,7 +21,7 @@
+ #endif
+ 
+ #include <argp.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <inttypes.h>
+diff --git a/src/stack.c b/src/stack.c
+index 6f2ff69..6da0243 100644
+--- a/src/stack.c
++++ b/src/stack.c
+@@ -18,7 +18,7 @@
+ #include <config.h>
+ #include <assert.h>
+ #include <argp.h>
+-#include <error.h>
++#include <err.h>
+ #include <stdlib.h>
+ #include <inttypes.h>
+ #include <stdio.h>
+diff --git a/src/strings.c b/src/strings.c
+index d214356..76cb26b 100644
+--- a/src/strings.c
++++ b/src/strings.c
+@@ -25,7 +25,7 @@
+ #include <ctype.h>
+ #include <endian.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <inttypes.h>
+diff --git a/src/strip.c b/src/strip.c
+index c7830ec..0d7f148 100644
+--- a/src/strip.c
++++ b/src/strip.c
+@@ -24,7 +24,7 @@
+ #include <assert.h>
+ #include <byteswap.h>
+ #include <endian.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <fnmatch.h>
+ #include <gelf.h>
+diff --git a/src/unstrip.c b/src/unstrip.c
+index 5074909..3d4f952 100644
+--- a/src/unstrip.c
++++ b/src/unstrip.c
+@@ -31,7 +31,7 @@
+ #include <argp.h>
+ #include <assert.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <fnmatch.h>
+ #include <libintl.h>
+diff --git a/tests/addrscopes.c b/tests/addrscopes.c
+index 791569f..54f4311 100644
+--- a/tests/addrscopes.c
++++ b/tests/addrscopes.c
+@@ -25,7 +25,7 @@
+ #include <stdio_ext.h>
+ #include <locale.h>
+ #include <stdlib.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ 
+ 
+diff --git a/tests/allregs.c b/tests/allregs.c
+index 286f7e3..c9de089 100644
+--- a/tests/allregs.c
++++ b/tests/allregs.c
+@@ -21,7 +21,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <error.h>
++#include <err.h>
+ #include <locale.h>
+ #include <argp.h>
+ #include <assert.h>
+diff --git a/tests/backtrace-data.c b/tests/backtrace-data.c
+index a387d8f..955c27d 100644
+--- a/tests/backtrace-data.c
++++ b/tests/backtrace-data.c
+@@ -27,7 +27,7 @@
+ #include <dirent.h>
+ #include <stdlib.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <unistd.h>
+ #include <dwarf.h>
+ #if defined(__x86_64__) && defined(__linux__)
+diff --git a/tests/backtrace-dwarf.c b/tests/backtrace-dwarf.c
+index 2dc8a9a..24ca7fb 100644
+--- a/tests/backtrace-dwarf.c
++++ b/tests/backtrace-dwarf.c
+@@ -22,7 +22,7 @@
+ #include <stdio_ext.h>
+ #include <locale.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <unistd.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+diff --git a/tests/backtrace.c b/tests/backtrace.c
+index 21abe8a..d733248 100644
+--- a/tests/backtrace.c
++++ b/tests/backtrace.c
+@@ -24,7 +24,7 @@
+ #include <dirent.h>
+ #include <stdlib.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <unistd.h>
+ #include <dwarf.h>
+ #ifdef __linux__
+diff --git a/tests/buildid.c b/tests/buildid.c
+index 87c1877..2953e6b 100644
+--- a/tests/buildid.c
++++ b/tests/buildid.c
+@@ -23,7 +23,7 @@
+ #include ELFUTILS_HEADER(elf)
+ #include ELFUTILS_HEADER(dwelf)
+ #include <stdio.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ #include <stdlib.h>
+ #include <sys/types.h>
+diff --git a/tests/debugaltlink.c b/tests/debugaltlink.c
+index 6d97d50..ee7e559 100644
+--- a/tests/debugaltlink.c
++++ b/tests/debugaltlink.c
+@@ -23,7 +23,7 @@
+ #include ELFUTILS_HEADER(dw)
+ #include ELFUTILS_HEADER(dwelf)
+ #include <stdio.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ #include <stdlib.h>
+ #include <sys/types.h>
+diff --git a/tests/debuglink.c b/tests/debuglink.c
+index 935d102..741cb81 100644
+--- a/tests/debuglink.c
++++ b/tests/debuglink.c
+@@ -21,7 +21,7 @@
+ #include <errno.h>
+ #include ELFUTILS_HEADER(dwelf)
+ #include <stdio.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ #include <stdlib.h>
+ #include <sys/types.h>
+diff --git a/tests/deleted.c b/tests/deleted.c
+index 6be35bc..0190711 100644
+--- a/tests/deleted.c
++++ b/tests/deleted.c
+@@ -21,7 +21,7 @@
+ #include <unistd.h>
+ #include <assert.h>
+ #include <stdio.h>
+-#include <error.h>
++#include <err.h>
+ #include <errno.h>
+ #ifdef __linux__
+ #include <sys/prctl.h>
+diff --git a/tests/dwfl-addr-sect.c b/tests/dwfl-addr-sect.c
+index 21e470a..1ea1e3b 100644
+--- a/tests/dwfl-addr-sect.c
++++ b/tests/dwfl-addr-sect.c
+@@ -23,7 +23,7 @@
+ #include <stdio_ext.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <error.h>
++#include <err.h>
+ #include <locale.h>
+ #include <argp.h>
+ #include ELFUTILS_HEADER(dwfl)
+diff --git a/tests/dwfl-bug-addr-overflow.c b/tests/dwfl-bug-addr-overflow.c
+index aa8030e..02c8bef 100644
+--- a/tests/dwfl-bug-addr-overflow.c
++++ b/tests/dwfl-bug-addr-overflow.c
+@@ -20,7 +20,7 @@
+ #include <inttypes.h>
+ #include <stdio.h>
+ #include <stdio_ext.h>
+-#include <error.h>
++#include <err.h>
+ #include <locale.h>
+ #include ELFUTILS_HEADER(dwfl)
+ 
+diff --git a/tests/dwfl-bug-fd-leak.c b/tests/dwfl-bug-fd-leak.c
+index 689cdd7..5973da3 100644
+--- a/tests/dwfl-bug-fd-leak.c
++++ b/tests/dwfl-bug-fd-leak.c
+@@ -24,7 +24,7 @@
+ #include <dirent.h>
+ #include <stdlib.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <unistd.h>
+ #include <dwarf.h>
+ 
+diff --git a/tests/dwfl-bug-getmodules.c b/tests/dwfl-bug-getmodules.c
+index 1ee989f..fd62e65 100644
+--- a/tests/dwfl-bug-getmodules.c
++++ b/tests/dwfl-bug-getmodules.c
+@@ -18,7 +18,7 @@
+ #include <config.h>
+ #include ELFUTILS_HEADER(dwfl)
+ 
+-#include <error.h>
++#include <err.h>
+ 
+ static const Dwfl_Callbacks callbacks =
+   {
+diff --git a/tests/dwfl-report-elf-align.c b/tests/dwfl-report-elf-align.c
+index a4e97d3..f471587 100644
+--- a/tests/dwfl-report-elf-align.c
++++ b/tests/dwfl-report-elf-align.c
+@@ -20,7 +20,7 @@
+ #include <inttypes.h>
+ #include <stdio.h>
+ #include <stdio_ext.h>
+-#include <error.h>
++#include <err.h>
+ #include <locale.h>
+ #include <string.h>
+ #include <stdlib.h>
+diff --git a/tests/dwfllines.c b/tests/dwfllines.c
+index 90379dd..cbdf6c4 100644
+--- a/tests/dwfllines.c
++++ b/tests/dwfllines.c
+@@ -27,7 +27,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <error.h>
++#include <err.h>
+ 
+ int
+ main (int argc, char *argv[])
+diff --git a/tests/dwflmodtest.c b/tests/dwflmodtest.c
+index 0027f96..e68d3bc 100644
+--- a/tests/dwflmodtest.c
++++ b/tests/dwflmodtest.c
+@@ -23,7 +23,7 @@
+ #include <stdio_ext.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <error.h>
++#include <err.h>
+ #include <locale.h>
+ #include <argp.h>
+ #include ELFUTILS_HEADER(dwfl)
+diff --git a/tests/dwflsyms.c b/tests/dwflsyms.c
+index 49ac334..cf07830 100644
+--- a/tests/dwflsyms.c
++++ b/tests/dwflsyms.c
+@@ -25,7 +25,7 @@
+ #include <stdio.h>
+ #include <stdio_ext.h>
+ #include <stdlib.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ 
+ static const char *
+diff --git a/tests/early-offscn.c b/tests/early-offscn.c
+index 924cb9e..6f60d5a 100644
+--- a/tests/early-offscn.c
++++ b/tests/early-offscn.c
+@@ -19,7 +19,7 @@
+ #endif
+ 
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <stdio.h>
+diff --git a/tests/ecp.c b/tests/ecp.c
+index 38a6859..743cea5 100644
+--- a/tests/ecp.c
++++ b/tests/ecp.c
+@@ -20,7 +20,7 @@
+ #endif
+ 
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <stdlib.h>
+diff --git a/tests/find-prologues.c b/tests/find-prologues.c
+index ba8ae37..76f5f04 100644
+--- a/tests/find-prologues.c
++++ b/tests/find-prologues.c
+@@ -25,7 +25,7 @@
+ #include <stdio_ext.h>
+ #include <locale.h>
+ #include <stdlib.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ #include <fnmatch.h>
+ 
+diff --git a/tests/funcretval.c b/tests/funcretval.c
+index 8d19d11..c8aaa93 100644
+--- a/tests/funcretval.c
++++ b/tests/funcretval.c
+@@ -25,7 +25,7 @@
+ #include <stdio_ext.h>
+ #include <locale.h>
+ #include <stdlib.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ #include <fnmatch.h>
+ 
+diff --git a/tests/funcscopes.c b/tests/funcscopes.c
+index 9c90185..dbccb89 100644
+--- a/tests/funcscopes.c
++++ b/tests/funcscopes.c
+@@ -25,7 +25,7 @@
+ #include <stdio_ext.h>
+ #include <locale.h>
+ #include <stdlib.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ #include <fnmatch.h>
+ 
+diff --git a/tests/getsrc_die.c b/tests/getsrc_die.c
+index 055aede..9c394dd 100644
+--- a/tests/getsrc_die.c
++++ b/tests/getsrc_die.c
+@@ -19,7 +19,7 @@
+ #endif
+ 
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
+ #include <libelf.h>
+diff --git a/tests/line2addr.c b/tests/line2addr.c
+index e0d65d3..9bf0023 100644
+--- a/tests/line2addr.c
++++ b/tests/line2addr.c
+@@ -26,7 +26,7 @@
+ #include <locale.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <error.h>
++#include <err.h>
+ 
+ 
+ static void
+diff --git a/tests/low_high_pc.c b/tests/low_high_pc.c
+index d0f4302..8da4fbd 100644
+--- a/tests/low_high_pc.c
++++ b/tests/low_high_pc.c
+@@ -25,7 +25,7 @@
+ #include <stdio_ext.h>
+ #include <locale.h>
+ #include <stdlib.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ #include <fnmatch.h>
+ 
+diff --git a/tests/md5-sha1-test.c b/tests/md5-sha1-test.c
+index d50355e..3c41f40 100644
+--- a/tests/md5-sha1-test.c
++++ b/tests/md5-sha1-test.c
+@@ -19,7 +19,7 @@
+ #endif
+ 
+ #include <string.h>
+-#include <error.h>
++#include <err.h>
+ 
+ #include "md5.h"
+ #include "sha1.h"
+diff --git a/tests/rdwrmmap.c b/tests/rdwrmmap.c
+index 6f027df..1ce5e6e 100644
+--- a/tests/rdwrmmap.c
++++ b/tests/rdwrmmap.c
+@@ -19,7 +19,7 @@
+ #endif
+ 
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <stdio.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+diff --git a/tests/saridx.c b/tests/saridx.c
+index 8a450d8..b387801 100644
+--- a/tests/saridx.c
++++ b/tests/saridx.c
+@@ -17,7 +17,7 @@
+ 
+ #include <config.h>
+ 
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <stdio.h>
+diff --git a/tests/sectiondump.c b/tests/sectiondump.c
+index 3033fed..8e888db 100644
+--- a/tests/sectiondump.c
++++ b/tests/sectiondump.c
+@@ -18,7 +18,7 @@
+ #include <config.h>
+ 
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <fcntl.h>
+ #include <gelf.h>
+ #include <inttypes.h>
+diff --git a/tests/varlocs.c b/tests/varlocs.c
+index c3fba89..e043ea2 100644
+--- a/tests/varlocs.c
++++ b/tests/varlocs.c
+@@ -25,7 +25,7 @@
+ #include <dwarf.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include <error.h>
++#include <err.h>
+ #include <string.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+diff --git a/tests/vdsosyms.c b/tests/vdsosyms.c
+index b876c10..afb2823 100644
+--- a/tests/vdsosyms.c
++++ b/tests/vdsosyms.c
+@@ -18,7 +18,7 @@
+ #include <config.h>
+ #include <assert.h>
+ #include <errno.h>
+-#include <error.h>
++#include <err.h>
+ #include <inttypes.h>
+ #include <stdio.h>
+ #include <string.h>
+-- 
+1.8.3.1
+

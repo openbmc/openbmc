@@ -4,6 +4,8 @@ hardcoding paths.
 
 RP 2015/2/3
 
+Upstream-Status: Inappropriate
+
 Index: libtool-2.4.5/libtoolize.in
 ===================================================================
 --- libtool-2.4.5.orig/libtoolize.in

@@ -19,6 +19,9 @@ inherit autotools
 
 CFLAGS += "-fPIC -U__OPTIMIZE__"
 
+RDEPENDS_${PN}-dev = ""
+RDEPENDS_${PN}-staticdev = ""
+
 do_install() {
 	install -D -m 0644 ${B}/libargp.a ${D}${libdir}/libargp.a
 	install -D -m 0644 ${S}/argp.h ${D}${includedir}/argp.h

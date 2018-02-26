@@ -1,0 +1,53 @@
+From 1498338970a093fccbda3e33f5588a289ef2c66a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 5 Jul 2017 02:59:46 -0400
+Subject: [PATCH 13/14] Always use devmapper
+
+Do not try to compute several _API_ make variables
+from host information when cross-compiling.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+Rebase to 0.7.1
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ libmultipath/Makefile | 19 ++++---------------
+ 1 file changed, 4 insertions(+), 15 deletions(-)
+
+diff --git a/libmultipath/Makefile b/libmultipath/Makefile
+index b3244fc..9006b3f 100644
+--- a/libmultipath/Makefile
++++ b/libmultipath/Makefile
+@@ -20,21 +20,10 @@ ifdef SYSTEMD
+ 	endif
+ endif
+ 
+-ifneq ($(call check_func,dm_task_no_flush,/usr/include/libdevmapper.h),0)
+-	CFLAGS += -DLIBDM_API_FLUSH -D_GNU_SOURCE
+-endif
+-
+-ifneq ($(call check_func,dm_task_set_cookie,/usr/include/libdevmapper.h),0)
+-	CFLAGS += -DLIBDM_API_COOKIE
+-endif
+-
+-ifneq ($(call check_func,udev_monitor_set_receive_buffer_size,/usr/include/libudev.h),0)
+-	CFLAGS += -DLIBUDEV_API_RECVBUF
+-endif
+-
+-ifneq ($(call check_func,dm_task_deferred_remove,/usr/include/libdevmapper.h),0)
+-	CFLAGS += -DLIBDM_API_DEFERRED
+-endif
++CFLAGS += -DLIBDM_API_FLUSH -D_GNU_SOURCE
++CFLAGS += -DLIBDM_API_COOKIE
++CFLAGS += -DLIBUDEV_API_RECVBUF
++CFLAGS += -DLIBDM_API_DEFERRED
+ 
+ OBJS = memory.o parser.o vector.o devmapper.o callout.o \
+ 	hwtable.o blacklist.o util.o dmparser.o config.o \
+-- 
+2.8.1
+

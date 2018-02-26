@@ -14,7 +14,9 @@ SRC_URI = "git://git.tartarus.org/simon/puzzles.git \
            file://0001-Use-labs-instead-of-abs.patch \
            file://0001-palisade-Fix-warnings-with-clang-on-arm.patch \
            file://0001-Clarify-conditions-to-avoid-compiler-errors.patch \
-"
+           file://0001-Use-Wno-error-format-overflow-if-the-compiler-suppor.patch \
+           "
+UPSTREAM_VERSION_UNKNOWN = "1"
 SRCREV = "8dfe5cec31e784e4ece2955ecc8cc35ee7e8fbb3"
 PE = "1"
 PV = "0.0+git${SRCPV}"

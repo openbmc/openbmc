@@ -1,0 +1,56 @@
+From 62dcf34987b680e95873eb947b3f4d802199c667 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C5=81ukasz=20Langa?= <lukasz@langa.pl>
+Date: Fri, 10 Feb 2017 00:14:55 -0800
+Subject: [PATCH] Fix #29519: weakref spewing exceptions during interp
+ finalization
+
+commit 9cd7e17640a49635d1c1f8c2989578a8fc2c1de6
+from https://github.com/python/cpython
+
+Upstream-Status: Backport
+
+Signed-off-by: Lukasz Langa <lukasz@langa.pl>
+---
+ Lib/weakref.py | 4 ++--
+ Misc/NEWS      | 3 +++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/Lib/weakref.py b/Lib/weakref.py
+index aaebd0c..787e33a 100644
+--- a/Lib/weakref.py
++++ b/Lib/weakref.py
+@@ -106,7 +106,7 @@ class WeakValueDictionary(collections.MutableMapping):
+         self, *args = args
+         if len(args) > 1:
+             raise TypeError('expected at most 1 arguments, got %d' % len(args))
+-        def remove(wr, selfref=ref(self)):
++        def remove(wr, selfref=ref(self), _atomic_removal=_remove_dead_weakref):
+             self = selfref()
+             if self is not None:
+                 if self._iterating:
+@@ -114,7 +114,7 @@ class WeakValueDictionary(collections.MutableMapping):
+                 else:
+                     # Atomic removal is necessary since this function
+                     # can be called asynchronously by the GC
+-                    _remove_dead_weakref(d, wr.key)
++                    _atomic_removal(d, wr.key)
+         self._remove = remove
+         # A list of keys to be removed
+         self._pending_removals = []
+diff --git a/Misc/NEWS b/Misc/NEWS
+index 41cfdba..6d89f52 100644
+--- a/Misc/NEWS
++++ b/Misc/NEWS
+@@ -5719,6 +5719,9 @@ Core and Builtins
+ Library
+ -------
+ 
++- Issue #29519: Fix weakref spewing exceptions during interpreter shutdown
++  when used with a rare combination of multiprocessing and custom codecs.
++
+ - Issue #20154: Deadlock in asyncio.StreamReader.readexactly().
+ 
+ - Issue #16113: Remove sha3 module again.
+-- 
+2.7.4
+

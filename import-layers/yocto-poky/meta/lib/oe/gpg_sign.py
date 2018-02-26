@@ -15,7 +15,7 @@ class LocalSigner(object):
 
     def export_pubkey(self, output_file, keyid, armor=True):
         """Export GPG public key to a file"""
-        cmd = '%s --batch --yes --export -o %s ' % \
+        cmd = '%s --no-permission-warning --batch --yes --export -o %s ' % \
                 (self.gpg_bin, output_file)
         if self.gpg_path:
             cmd += "--homedir %s " % self.gpg_path
@@ -27,22 +27,27 @@ class LocalSigner(object):
             raise bb.build.FuncFailed('Failed to export gpg public key (%s): %s' %
                                       (keyid, output))
 
-    def sign_rpms(self, files, keyid, passphrase):
+    def sign_rpms(self, files, keyid, passphrase, digest, sign_chunk, fsk=None, fsk_password=None):
         """Sign RPM files"""
 
         cmd = self.rpm_bin + " --addsign --define '_gpg_name %s'  " % keyid
-        gpg_args = '--batch --passphrase=%s' % passphrase
+        gpg_args = '--no-permission-warning --batch --passphrase=%s' % passphrase
         if self.gpg_version > (2,1,):
             gpg_args += ' --pinentry-mode=loopback'
         cmd += "--define '_gpg_sign_cmd_extra_args %s' " % gpg_args
+        cmd += "--define '_binary_filedigest_algorithm %s' " % digest
         if self.gpg_bin:
-            cmd += "--define '%%__gpg %s' " % self.gpg_bin
+            cmd += "--define '__gpg %s' " % self.gpg_bin
         if self.gpg_path:
             cmd += "--define '_gpg_path %s' " % self.gpg_path
+        if fsk:
+            cmd += "--signfiles --fskpath %s " % fsk
+            if fsk_password:
+                cmd += "--define '_file_signing_key_password %s' " % fsk_password
 
-        # Sign in chunks of 100 packages
-        for i in range(0, len(files), 100):
-            status, output = oe.utils.getstatusoutput(cmd + ' '.join(files[i:i+100]))
+        # Sign in chunks
+        for i in range(0, len(files), sign_chunk):
+            status, output = oe.utils.getstatusoutput(cmd + ' '.join(files[i:i+sign_chunk]))
             if status:
                 raise bb.build.FuncFailed("Failed to sign RPM packages: %s" % output)
 
@@ -53,8 +58,8 @@ class LocalSigner(object):
         if passphrase_file and passphrase:
             raise Exception("You should use either passphrase_file of passphrase, not both")
 
-        cmd = [self.gpg_bin, '--detach-sign', '--batch', '--no-tty', '--yes',
-               '--passphrase-fd', '0', '-u', keyid]
+        cmd = [self.gpg_bin, '--detach-sign', '--no-permission-warning', '--batch',
+               '--no-tty', '--yes', '--passphrase-fd', '0', '-u', keyid]
 
         if self.gpg_path:
             cmd += ['--homedir', self.gpg_path]
@@ -93,7 +98,7 @@ class LocalSigner(object):
         """Return the gpg version as a tuple of ints"""
         import subprocess
         try:
-            ver_str = subprocess.check_output((self.gpg_bin, "--version")).split()[2].decode("utf-8")
+            ver_str = subprocess.check_output((self.gpg_bin, "--version", "--no-permission-warning")).split()[2].decode("utf-8")
             return tuple([int(i) for i in ver_str.split('.')])
         except subprocess.CalledProcessError as e:
             raise bb.build.FuncFailed("Could not get gpg version: %s" % e)
@@ -101,7 +106,7 @@ class LocalSigner(object):
 
     def verify(self, sig_file):
         """Verify signature"""
-        cmd = self.gpg_bin + " --verify "
+        cmd = self.gpg_bin + " --verify --no-permission-warning "
         if self.gpg_path:
             cmd += "--homedir %s " % self.gpg_path
         cmd += sig_file

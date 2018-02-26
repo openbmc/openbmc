@@ -1,0 +1,43 @@
+From ddddc7335539fb8a6d30beba21781762df159186 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 16 Mar 2016 05:39:59 -0400
+Subject: [PATCH 42/47] Reuse -fdebug-prefix-map to replace -ffile-prefix-map
+
+The oe-core may use external toolchain to compile,
+which may not support -ffile-prefix-map.
+
+Since we use -fdebug-prefix-map to do the same thing,
+so we could reuse it to replace -ffile-prefix-map.
+
+Upstream-Status: Inappropriate[oe-core specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ gcc/opts-global.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gcc/opts-global.c b/gcc/opts-global.c
+index 50bad77c347..32b1d286721 100644
+--- a/gcc/opts-global.c
++++ b/gcc/opts-global.c
+@@ -31,6 +31,7 @@ along with GCC; see the file COPYING3.  If not see
+ #include "langhooks.h"
+ #include "dbgcnt.h"
+ #include "debug.h"
++#include "file-map.h"
+ #include "output.h"
+ #include "plugin.h"
+ #include "toplev.h"
+@@ -357,6 +358,9 @@ handle_common_deferred_options (void)
+ 
+ 	case OPT_fdebug_prefix_map_:
+ 	  add_debug_prefix_map (opt->arg);
++
++	  /* Reuse -fdebug-prefix-map to replace -ffile-prefix-map */
++	  add_file_prefix_map (opt->arg);
+ 	  break;
+ 
+ 	case OPT_fdump_:
+-- 
+2.12.2
+

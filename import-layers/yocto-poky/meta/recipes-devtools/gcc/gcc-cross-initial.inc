@@ -35,10 +35,11 @@ EXTRA_OECONF += "--with-native-system-header-dir=${SYSTEMHEADERS}"
 
 do_compile () {
     oe_runmake all-gcc configure-target-libgcc
+    (cd ${B}/${TARGET_SYS}/libgcc; oe_runmake enable-execute-stack.c unwind.h md-unwind-support.h sfp-machine.h gthr-default.h)
 }
 
 do_install () {
-	( cd ${B}/${TARGET_SYS}/libgcc; oe_runmake 'DESTDIR=${D}' install-unwind_h )
+	( cd ${B}/${TARGET_SYS}/libgcc; oe_runmake 'DESTDIR=${D}' install-unwind_h-forbuild install-unwind_h)
 	oe_runmake 'DESTDIR=${D}' install-gcc
 
 	# We don't really need this (here shares/ contains man/, info/, locale/).

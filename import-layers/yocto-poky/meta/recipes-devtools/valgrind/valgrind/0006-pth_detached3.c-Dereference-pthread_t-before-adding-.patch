@@ -1,0 +1,32 @@
+From a6547fc17c120dbd95b852f50b0c4bdee4fedb9a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 10 Jun 2017 01:20:32 -0700
+Subject: [PATCH 6/6] pth_detached3.c: Dereference pthread_t before adding
+ offset to it
+
+Fixes
+error: invalid use of undefined type 'struct __pthread'
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ drd/tests/pth_detached3.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drd/tests/pth_detached3.c b/drd/tests/pth_detached3.c
+index c02eef1..35d43a6 100644
+--- a/drd/tests/pth_detached3.c
++++ b/drd/tests/pth_detached3.c
+@@ -21,7 +21,7 @@ int main(int argc, char** argv)
+   pthread_detach(thread);
+ 
+   /* Invoke pthread_detach() with an invalid thread ID. */
+-  pthread_detach(thread + 8);
++  pthread_detach((pthread_t*)(&thread + 8));
+ 
+   fprintf(stderr, "Finished.\n");
+ 
+-- 
+2.13.1
+

@@ -1,0 +1,36 @@
+Use python3 rather default python which maybe links to python2 for oe. And add
+option for setup.py to install files to right directory.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/bin/python/Makefile.in b/bin/python/Makefile.in
+index a43a3c1..2e727f2 100644
+--- a/bin/python/Makefile.in
++++ b/bin/python/Makefile.in
+@@ -55,9 +55,9 @@ install:: ${TARGETS} installdirs
+ 	${INSTALL_DATA} ${srcdir}/dnssec-coverage.8 ${DESTDIR}${mandir}/man8
+ 	if test -n "${PYTHON}" ; then \
+ 		if test -n "${DESTDIR}" ; then \
+-			${PYTHON} ${srcdir}/setup.py install --root=${DESTDIR} --prefix=${prefix} ; \
++			${PYTHON} ${srcdir}/setup.py install --root=${DESTDIR} --prefix=${prefix} --install-lib=${PYTHON_SITEPACKAGES_DIR} ; \
+ 		else \
+-			${PYTHON} ${srcdir}/setup.py install --prefix=${prefix} ; \
++			${PYTHON} ${srcdir}/setup.py install --prefix=${prefix} --install-lib=${PYTHON_SITEPACKAGES_DIR} ; \
+ 		fi \
+ 	fi
+ 
+diff --git a/configure.in b/configure.in
+index 314bb90..867923e 100644
+--- a/configure.in
++++ b/configure.in
+@@ -227,7 +227,7 @@ AC_ARG_WITH(python,
+ [  --with-python=PATH      specify path to python interpreter],
+     use_python="$withval", use_python="unspec")
+ 
+-python="python python3 python3.5 python3.4 python3.3 python3.2 python2 python2.7"
++python="python3 python3.5 python3.4 python3.3 python3.2 python2 python2.7"
+ 
+ testargparse='try: import argparse
+ except: exit(1)'

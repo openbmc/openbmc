@@ -86,9 +86,9 @@ class RecipeInfoCommon(object):
 class CoreRecipeInfo(RecipeInfoCommon):
     __slots__ = ()
 
-    cachefile = "bb_cache.dat"   
+    cachefile = "bb_cache.dat"
 
-    def __init__(self, filename, metadata):      
+    def __init__(self, filename, metadata):
         self.file_depends = metadata.getVar('__depends', False)
         self.timestamp = bb.parse.cached_mtime(filename)
         self.variants = self.listvar('__VARIANTS', metadata) + ['']
@@ -107,7 +107,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
 
         self.pn = self.getvar('PN', metadata)
         self.packages = self.listvar('PACKAGES', metadata)
-        if not self.pn in self.packages:
+        if not self.packages:
             self.packages.append(self.pn)
 
         self.basetaskhashes = self.taskvar('BB_BASEHASH', self.tasks, metadata)
@@ -122,7 +122,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
         self.defaultpref = self.intvar('DEFAULT_PREFERENCE', metadata)
         self.not_world = self.getvar('EXCLUDE_FROM_WORLD', metadata)
         self.stamp = self.getvar('STAMP', metadata)
-        self.stampclean = self.getvar('STAMPCLEAN', metadata)        
+        self.stampclean = self.getvar('STAMPCLEAN', metadata)
         self.stamp_extrainfo = self.flaglist('stamp-extra-info', self.tasks, metadata)
         self.file_checksums = self.flaglist('file-checksums', self.tasks, metadata, True)
         self.packages_dynamic = self.listvar('PACKAGES_DYNAMIC', metadata)
@@ -217,7 +217,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
             cachedata.packages_dynamic[package].append(fn)
 
         # Build hash of runtime depends and recommends
-        for package in self.packages + [self.pn]:
+        for package in self.packages:
             cachedata.rundeps[fn][package] = list(self.rdepends) + self.rdepends_pkg[package]
             cachedata.runrecs[fn][package] = list(self.rrecommends) + self.rrecommends_pkg[package]
 
@@ -375,8 +375,8 @@ class Cache(NoCache):
         data = databuilder.data
 
         # Pass caches_array information into Cache Constructor
-        # It will be used later for deciding whether we 
-        # need extra cache file dump/load support 
+        # It will be used later for deciding whether we
+        # need extra cache file dump/load support
         self.caches_array = caches_array
         self.cachedir = data.getVar("CACHE")
         self.clean = set()
@@ -421,7 +421,7 @@ class Cache(NoCache):
                 cachesize += os.fstat(cachefile.fileno()).st_size
 
         bb.event.fire(bb.event.CacheLoadStarted(cachesize), self.data)
-        
+
         for cache_class in self.caches_array:
             cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
             with open(cachefile, "rb") as cachefile:
@@ -438,8 +438,8 @@ class Cache(NoCache):
                     logger.info('Cache version mismatch, rebuilding...')
                     return
                 elif bitbake_ver != bb.__version__:
-                     logger.info('Bitbake version mismatch, rebuilding...')
-                     return
+                    logger.info('Bitbake version mismatch, rebuilding...')
+                    return
 
                 # Load the rest of the cache file
                 current_progress = 0
@@ -616,13 +616,13 @@ class Cache(NoCache):
                     a = fl.find(":True")
                     b = fl.find(":False")
                     if ((a < 0) and b) or ((b > 0) and (b < a)):
-                       f = fl[:b+6]
-                       fl = fl[b+7:]
+                        f = fl[:b+6]
+                        fl = fl[b+7:]
                     elif ((b < 0) and a) or ((a > 0) and (a < b)):
-                       f = fl[:a+5]
-                       fl = fl[a+6:]
+                        f = fl[:a+5]
+                        fl = fl[a+6:]
                     else:
-                       break
+                        break
                     fl = fl.strip()
                     if "*" in f:
                         continue
@@ -886,4 +886,3 @@ class MultiProcessCache(object):
             p.dump([data, self.__class__.CACHE_VERSION])
 
         bb.utils.unlockfile(glf)
-

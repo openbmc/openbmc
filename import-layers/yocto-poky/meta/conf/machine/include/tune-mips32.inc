@@ -6,7 +6,8 @@ TUNEVALID[mips32] = "Enable mips32 specific processor optimizations"
 TUNECONFLICTS[mips32] = "n64 n32"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'mips32', ' -march=mips32', '', d)}"
 
-AVAILTUNES += "mips32 mips32el mips32-nf mips32el-nf"
+# Base Tunes (Hard Float)
+AVAILTUNES += "mips32 mips32el"
 
 TUNE_FEATURES_tune-mips32 = "${TUNE_FEATURES_tune-mips} mips32"
 MIPSPKGSFX_VARIANT_tune-mips32 = "mips32"
@@ -15,6 +16,9 @@ PACKAGE_EXTRA_ARCHS_tune-mips32 = "mips mips32"
 TUNE_FEATURES_tune-mips32el = "${TUNE_FEATURES_tune-mipsel} mips32"
 MIPSPKGSFX_VARIANT_tune-mips32el = "mips32el"
 PACKAGE_EXTRA_ARCHS_tune-mips32el = "mipsel mips32el"
+
+# Soft Float
+AVAILTUNES += "mips32-nf mips32el-nf"
 
 TUNE_FEATURES_tune-mips32-nf = "${TUNE_FEATURES_tune-mips-nf} mips32"
 MIPSPKGSFX_VARIANT_tune-mips32-nf = "mips32"

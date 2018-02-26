@@ -1,0 +1,34 @@
+From 508ea7c0d67243feb1684eaa83569cb687561d64 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 15 Sep 2017 10:09:03 -0700
+Subject: [PATCH] immpbe_dump.cc: Use sys/wait.h instead of wait.h
+
+Fixes
+redirecting incorrect #include <wait.h> to <sys/wait.h>
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/imm/common/immpbe_dump.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/imm/common/immpbe_dump.cc b/src/imm/common/immpbe_dump.cc
+index 100222f37..33e47ce3c 100644
+--- a/src/imm/common/immpbe_dump.cc
++++ b/src/imm/common/immpbe_dump.cc
+@@ -26,12 +26,12 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <time.h>
+-#include <wait.h>
+ #include <unistd.h>
+ #include <iostream>
+ #include <sstream>
+ #include <stdint.h>
+ #include <sys/stat.h>
++#include <sys/wait.h>
+ #include <libgen.h>
+ 
+ #include <saAis.h>
+-- 
+2.14.1
+

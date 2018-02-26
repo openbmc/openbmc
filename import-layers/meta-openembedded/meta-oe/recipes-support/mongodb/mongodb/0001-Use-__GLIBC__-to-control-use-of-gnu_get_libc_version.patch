@@ -1,0 +1,50 @@
+From 3eed8388b49d5d3cbc2db74fee1b017eb4b40d0a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 2 Sep 2017 10:06:24 -0700
+Subject: [PATCH] Use __GLIBC__ to control use of gnu_get_libc_version
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+ src/mongo/util/processinfo_linux.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/mongo/util/processinfo_linux.cpp b/src/mongo/util/processinfo_linux.cpp
+index 910015215e..bf8c1ffd15 100644
+--- a/src/mongo/util/processinfo_linux.cpp
++++ b/src/mongo/util/processinfo_linux.cpp
+@@ -40,7 +40,7 @@
+ #include <sys/mman.h>
+ #include <sys/utsname.h>
+ #include <unistd.h>
+-#ifdef __UCLIBC__
++#ifndef __GLIBC__
+ #include <features.h>
+ #else
+ #include <gnu/libc-version.h>
+@@ -451,11 +451,13 @@ double ProcessInfo::getSystemMemoryPressurePercentage() {
+ }
+ 
+ void ProcessInfo::getExtraInfo(BSONObjBuilder& info) {
++#if defined(__GLIBC__)
+     LinuxProc p(_pid);
+     if (p._maj_flt <= std::numeric_limits<long long>::max())
+         info.appendNumber("page_faults", static_cast<long long>(p._maj_flt));
+     else
+         info.appendNumber("page_faults", static_cast<double>(p._maj_flt));
++#endif
+ }
+ 
+ /**
+@@ -491,7 +493,7 @@ void ProcessInfo::SystemInfo::collectSystemInfo() {
+     stringstream ss;
+     ss << "uClibc-" << __UCLIBC_MAJOR__ << "." << __UCLIBC_MINOR__ << "." << __UCLIBC_SUBLEVEL__;
+     bExtra.append("libcVersion", ss.str());
+-#else
++#elif defined(__GLIBC__)
+     bExtra.append("libcVersion", gnu_get_libc_version());
+ #endif
+     if (!verSig.empty())
+-- 
+2.14.1
+

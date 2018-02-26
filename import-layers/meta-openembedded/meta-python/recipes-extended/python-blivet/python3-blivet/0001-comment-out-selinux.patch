@@ -1,0 +1,70 @@
+From 7d483c27ac0a23ca3bba7f320918afc40013bd8e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 8 May 2017 14:25:52 +0800
+Subject: [PATCH 01/13] comment out selinux
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/flags.py | 5 +++--
+ blivet/util.py  | 6 +++++-
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/blivet/flags.py b/blivet/flags.py
+index 06822db..b55a93f 100644
+--- a/blivet/flags.py
++++ b/blivet/flags.py
+@@ -20,7 +20,7 @@
+ #
+ 
+ import shlex
+-import selinux
++#import selinux
+ 
+ 
+ class Flags(object):
+@@ -49,7 +49,8 @@ class Flags(object):
+         #
+         # enable/disable functionality
+         #
+-        self.selinux = selinux.is_selinux_enabled()
++        #self.selinux = selinux.is_selinux_enabled()
++        self.selinux = False
+         self.multipath = True
+         self.dmraid = True
+         self.ibft = True
+diff --git a/blivet/util.py b/blivet/util.py
+index e3e71ce..0cf5188 100644
+--- a/blivet/util.py
++++ b/blivet/util.py
+@@ -4,7 +4,7 @@ import glob
+ import itertools
+ import os
+ import shutil
+-import selinux
++#import selinux
+ import subprocess
+ import re
+ import sys
+@@ -431,6 +431,8 @@ def get_cow_sysfs_path(dev_path, dev_sysfsPath):
+ def match_path_context(path):
+     """ Return the default SELinux context for the given path. """
+     context = None
++    return context
++
+     try:
+         context = selinux.matchpathcon(os.path.normpath(path), 0)[1]
+     except OSError as e:
+@@ -455,6 +457,8 @@ def set_file_context(path, context, root=None):
+ 
+             True if successful, False if not.
+     """
++    return False
++
+     if root is None:
+         root = '/'
+ 
+-- 
+2.7.4
+

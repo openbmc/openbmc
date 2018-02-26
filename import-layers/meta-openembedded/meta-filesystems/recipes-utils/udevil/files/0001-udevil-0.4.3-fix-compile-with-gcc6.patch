@@ -1,0 +1,12 @@
+Fix compilation with GCC6
+
+--- a/src/device-info.c	2013-12-09 14:59:27.000000000 +0100
++++ b/src/device-info.c	2017-03-13 07:06:25.506666680 +0100
+@@ -3,6 +3,7 @@
+  * contains code excerpts from udisks v1.0.4
+ ************************************************************************** */
+ 
++#include <sys/stat.h>
+ #include "device-info.h"
+ 
+ static char *

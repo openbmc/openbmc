@@ -118,6 +118,7 @@ useradd_sysroot () {
 	# useradd/groupadd tools are unavailable. If there is no dependency, we assume we don't want to
 	# create users in the sysroot
 	if ! command -v useradd; then
+		bbwarn "command useradd not found!"
 		exit 0
 	fi
 
@@ -139,22 +140,19 @@ useradd_sysroot () {
 EXTRA_STAGING_FIXMES += "COMPONENTS_DIR PSEUDO_LOCALSTATEDIR LOGFIFO"
 
 python useradd_sysroot_sstate () {
+    scriptfile = None
     task = d.getVar("BB_CURRENTTASK")
     if task == "package_setscene":
         bb.build.exec_func("useradd_sysroot", d)
     elif task == "prepare_recipe_sysroot":
         # Used to update this recipe's own sysroot so the user/groups are available to do_install
         scriptfile = d.expand("${RECIPE_SYSROOT}${bindir}/postinst-useradd-${PN}")
-        bb.utils.mkdirhier(os.path.dirname(scriptfile))
-        with open(scriptfile, 'w') as script:
-            script.write("#!/bin/sh\n")
-            bb.data.emit_func("useradd_sysroot", script, d)
-            script.write("useradd_sysroot\n")
-        os.chmod(scriptfile, 0o755)
         bb.build.exec_func("useradd_sysroot", d)
     elif task == "populate_sysroot":
         # Used when installed in dependent task sysroots
         scriptfile = d.expand("${SYSROOT_DESTDIR}${bindir}/postinst-useradd-${PN}")
+
+    if scriptfile:
         bb.utils.mkdirhier(os.path.dirname(scriptfile))
         with open(scriptfile, 'w') as script:
             script.write("#!/bin/sh\n")

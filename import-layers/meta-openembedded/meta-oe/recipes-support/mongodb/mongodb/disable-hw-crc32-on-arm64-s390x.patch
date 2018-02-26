@@ -1,0 +1,50 @@
+imported from debian
+
+Upstream-Status: Pending
+Index: git/src/third_party/wiredtiger/SConscript
+===================================================================
+--- git.orig/src/third_party/wiredtiger/SConscript
++++ git/src/third_party/wiredtiger/SConscript
+@@ -169,7 +169,9 @@ if useSnappy:
+ # If not available at runtime, we fall back to software in some cases.
+ #
+ # On zSeries we may disable because SLES 11 kernel doe not support the instructions.
+-if not (env['TARGET_ARCH'] == 's390x' and get_option("use-s390x-crc32") == "off"):
++# Debian: disable hardware-assisted crc32 on s390x and arm64, as at least the
++# buildd's do not support the instructions.
++if env['TARGET_ARCH'] not in ('s390x', 'arm64', 'aarch64'):
+     env.Append(CPPDEFINES=["HAVE_CRC32_HARDWARE"])
+ 
+ wtlib = env.Library(
+Index: git/src/third_party/wiredtiger/dist/filelist
+===================================================================
+--- git.orig/src/third_party/wiredtiger/dist/filelist
++++ git/src/third_party/wiredtiger/dist/filelist
+@@ -54,7 +54,6 @@ src/checksum/power8/crc32_wrapper.c	POWE
+ src/checksum/software/checksum.c
+ src/checksum/x86/crc32-x86.c		X86_HOST
+ src/checksum/zseries/crc32-s390x.c	ZSERIES_HOST
+-src/checksum/zseries/crc32le-vx.sx	ZSERIES_HOST
+ src/config/config.c
+ src/config/config_api.c
+ src/config/config_check.c
+Index: git/src/third_party/wiredtiger/src/checksum/zseries/crc32-s390x.c
+===================================================================
+--- git.orig/src/third_party/wiredtiger/src/checksum/zseries/crc32-s390x.c
++++ git/src/third_party/wiredtiger/src/checksum/zseries/crc32-s390x.c
+@@ -78,6 +78,7 @@ unsigned int __wt_crc32c_le(unsigned int
+ 		return crc;                                                 \
+ 	}
+ 
++#if defined(HAVE_CRC32_HARDWARE)
+ /* Main CRC-32 functions */
+ DEFINE_CRC32_VX(__wt_crc32c_le_vx, __wt_crc32c_le_vgfm_16, __wt_crc32c_le)
+ 
+@@ -90,6 +91,7 @@ __wt_checksum_hw(const void *chunk, size
+ {
+ 	return (~__wt_crc32c_le_vx(0xffffffff, chunk, len));
+ }
++#endif
+ 
+ #endif
+ 

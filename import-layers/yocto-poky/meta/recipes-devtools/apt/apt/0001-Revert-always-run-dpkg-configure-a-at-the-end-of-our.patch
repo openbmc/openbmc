@@ -22,10 +22,10 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  3 files changed, 11 insertions(+), 18 deletions(-)
 
 diff --git a/apt-pkg/deb/dpkgpm.cc b/apt-pkg/deb/dpkgpm.cc
-index 834cb0e..84ded3a 100644
+index 533d9b367..6ce81bbd9 100644
 --- a/apt-pkg/deb/dpkgpm.cc
 +++ b/apt-pkg/deb/dpkgpm.cc
-@@ -1037,12 +1037,6 @@ void pkgDPkgPM::BuildPackagesProgressMap()
+@@ -1041,12 +1041,6 @@ void pkgDPkgPM::BuildPackagesProgressMap()
  	 PackagesTotal++;
        }
     }
@@ -38,7 +38,7 @@ index 834cb0e..84ded3a 100644
  }
                                                                          /*}}}*/
  bool pkgDPkgPM::Go(int StatusFd)
-@@ -1250,8 +1244,9 @@ bool pkgDPkgPM::Go(APT::Progress::PackageManager *progress)
+@@ -1268,8 +1262,9 @@ bool pkgDPkgPM::Go(APT::Progress::PackageManager *progress)
  
     // support subpressing of triggers processing for special
     // cases like d-i that runs the triggers handling manually
@@ -50,7 +50,7 @@ index 834cb0e..84ded3a 100644
  
     // for the progress
 diff --git a/test/integration/test-apt-progress-fd-deb822 b/test/integration/test-apt-progress-fd-deb822
-index 58fd732..3359762 100755
+index a8d59608d..0c6a9bbbf 100755
 --- a/test/integration/test-apt-progress-fd-deb822
 +++ b/test/integration/test-apt-progress-fd-deb822
 @@ -27,36 +27,36 @@ Message: Installing testing (amd64)
@@ -69,19 +69,19 @@ index 58fd732..3359762 100755
  
  Status: progress
  Package: testing:amd64
--Percent: 50
-+Percent: 60
+-Percent: 50.0000
++Percent: 60.0000
  Message: Preparing to configure testing (amd64)
  
  Status: progress
--Percent: 50
-+Percent: 60
+-Percent: 50.0000
++Percent: 60.0000
  Message: Running dpkg
  
  Status: progress
  Package: testing:amd64
--Percent: 50
-+Percent: 60
+-Percent: 50.0000
++Percent: 60.0000
  Message: Configuring testing (amd64)
  
  Status: progress
@@ -98,7 +98,7 @@ index 58fd732..3359762 100755
  
  Status: progress
 diff --git a/test/integration/test-no-fds-leaked-to-maintainer-scripts b/test/integration/test-no-fds-leaked-to-maintainer-scripts
-index d86e638..ef6d23b 100755
+index d86e638cd..ef6d23be2 100755
 --- a/test/integration/test-no-fds-leaked-to-maintainer-scripts
 +++ b/test/integration/test-no-fds-leaked-to-maintainer-scripts
 @@ -59,8 +59,7 @@ startup packages configure
@@ -122,5 +122,5 @@ index d86e638..ef6d23b 100755
  checkpurge
  
 -- 
-2.1.4
+2.11.0
 

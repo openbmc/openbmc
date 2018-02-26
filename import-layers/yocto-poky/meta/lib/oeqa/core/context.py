@@ -7,15 +7,14 @@ import json
 import time
 import logging
 import collections
-import re
 
 from oeqa.core.loader import OETestLoader
-from oeqa.core.runner import OETestRunner, OEStreamLogger, xmlEnabled
+from oeqa.core.runner import OETestRunner
+from oeqa.core.exception import OEQAMissingManifest, OEQATestNotFound
 
 class OETestContext(object):
     loaderClass = OETestLoader
     runnerClass = OETestRunner
-    streamLoggerClass = OEStreamLogger
 
     files_dir = os.path.abspath(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), "../files"))
@@ -32,7 +31,7 @@ class OETestContext(object):
 
     def _read_modules_from_manifest(self, manifest):
         if not os.path.exists(manifest):
-            raise
+            raise OEQAMissingManifest("Manifest does not exist on %s" % manifest)
 
         modules = []
         for line in open(manifest).readlines():
@@ -41,6 +40,14 @@ class OETestContext(object):
                 modules.append(line)
 
         return modules
+
+    def skipTests(self, skips):
+        if not skips:
+            return
+        for test in self.suites:
+            for skip in skips:
+                if test.id().startswith(skip):
+                    setattr(test, 'setUp', lambda: test.skipTest('Skip by the command line argument "%s"' % skip))
 
     def loadTests(self, module_paths, modules=[], tests=[],
             modules_manifest="", modules_required=[], filters={}):
@@ -51,9 +58,11 @@ class OETestContext(object):
                 modules_required, filters)
         self.suites = self.loader.discover()
 
-    def runTests(self):
-        streamLogger = self.streamLoggerClass(self.logger)
-        self.runner = self.runnerClass(self, stream=streamLogger, verbosity=2)
+    def runTests(self, skips=[]):
+        self.runner = self.runnerClass(self, descriptions=False, verbosity=2)
+
+        # Dinamically skip those tests specified though arguments
+        self.skipTests(skips)
 
         self._run_start_time = time.time()
         result = self.runner.run(self.suites)
@@ -61,94 +70,13 @@ class OETestContext(object):
 
         return result
 
-    def logSummary(self, result, component, context_msg=''):
-        self.logger.info("SUMMARY:")
-        self.logger.info("%s (%s) - Ran %d test%s in %.3fs" % (component,
-            context_msg, result.testsRun, result.testsRun != 1 and "s" or "",
-            (self._run_end_time - self._run_start_time)))
-
-        if result.wasSuccessful():
-            msg = "%s - OK - All required tests passed" % component
-        else:
-            msg = "%s - FAIL - Required tests failed" % component
-        skipped = len(self._results['skipped'])
-        if skipped: 
-            msg += " (skipped=%d)" % skipped
-        self.logger.info(msg)
-
-    def _getDetailsNotPassed(self, case, type, desc):
-        found = False
-
-        for (scase, msg) in self._results[type]:
-            # XXX: When XML reporting is enabled scase is
-            # xmlrunner.result._TestInfo instance instead of
-            # string.
-            if xmlEnabled:
-                if case.id() == scase.test_id:
-                    found = True
-                    break
-                scase_str = scase.test_id
-            else:
-                if case == scase:
-                    found = True
-                    break
-                scase_str = str(scase)
-
-            # When fails at module or class level the class name is passed as string
-            # so figure out to see if match
-            m = re.search("^setUpModule \((?P<module_name>.*)\)$", scase_str)
-            if m:
-                if case.__class__.__module__ == m.group('module_name'):
-                    found = True
-                    break
-
-            m = re.search("^setUpClass \((?P<class_name>.*)\)$", scase_str)
-            if m:
-                class_name = "%s.%s" % (case.__class__.__module__,
-                        case.__class__.__name__)
-
-                if class_name == m.group('class_name'):
-                    found = True
-                    break
-
-        if found:
-            return (found, msg)
-
-        return (found, None)
-
-    def logDetails(self):
-        self.logger.info("RESULTS:")
-        for case_name in self._registry['cases']:
-            case = self._registry['cases'][case_name]
-
-            result_types = ['failures', 'errors', 'skipped', 'expectedFailures']
-            result_desc = ['FAILED', 'ERROR', 'SKIPPED', 'EXPECTEDFAIL']
-
-            fail = False
-            desc = None
-            for idx, name in enumerate(result_types):
-                (fail, msg) = self._getDetailsNotPassed(case, result_types[idx],
-                        result_desc[idx])
-                if fail:
-                    desc = result_desc[idx]
-                    break
-
-            oeid = -1
-            for d in case.decorators:
-                if hasattr(d, 'oeid'):
-                    oeid = d.oeid
-            
-            if fail:
-                self.logger.info("RESULTS - %s - Testcase %s: %s" % (case.id(),
-                    oeid, desc))
-                if msg:
-                    self.logger.info(msg)
-            else:
-                self.logger.info("RESULTS - %s - Testcase %s: %s" % (case.id(),
-                    oeid, 'PASSED'))
+    def listTests(self, display_type):
+        self.runner = self.runnerClass(self, verbosity=2)
+        return self.runner.list_tests(self.suites, display_type)
 
 class OETestContextExecutor(object):
     _context_class = OETestContext
+    _script_executor = 'oe-test'
 
     name = 'core'
     help = 'core test component example'
@@ -168,9 +96,14 @@ class OETestContextExecutor(object):
         self.parser.add_argument('--output-log', action='store',
                 default=self.default_output_log,
                 help="results output log, default: %s" % self.default_output_log)
-        self.parser.add_argument('--run-tests', action='store',
+
+        group = self.parser.add_mutually_exclusive_group()
+        group.add_argument('--run-tests', action='store', nargs='+',
                 default=self.default_tests,
-                help="tests to run in <module>[.<class>[.<name>]] format. Just works for modules now")
+                help="tests to run in <module>[.<class>[.<name>]]")
+        group.add_argument('--list-tests', action='store',
+                choices=('module', 'class', 'name'),
+                help="lists available tests")
 
         if self.default_test_data:
             self.parser.add_argument('--test-data-file', action='store',
@@ -206,7 +139,8 @@ class OETestContextExecutor(object):
         self.tc_kwargs = {}
         self.tc_kwargs['init'] = {}
         self.tc_kwargs['load'] = {}
-        self.tc_kwargs['run'] = {}
+        self.tc_kwargs['list'] = {}
+        self.tc_kwargs['run']  = {}
 
         self.tc_kwargs['init']['logger'] = self._setup_logger(logger, args)
         if args.test_data_file:
@@ -215,22 +149,36 @@ class OETestContextExecutor(object):
         else:
             self.tc_kwargs['init']['td'] = {}
 
-
         if args.run_tests:
-            self.tc_kwargs['load']['modules'] = args.run_tests.split()
+            self.tc_kwargs['load']['modules'] = args.run_tests
+            self.tc_kwargs['load']['modules_required'] = args.run_tests
         else:
-            self.tc_kwargs['load']['modules'] = None
+            self.tc_kwargs['load']['modules'] = []
+
+        self.tc_kwargs['run']['skips'] = []
 
         self.module_paths = args.CASES_PATHS
+
+    def _pre_run(self):
+        pass
 
     def run(self, logger, args):
         self._process_args(logger, args)
 
         self.tc = self._context_class(**self.tc_kwargs['init'])
-        self.tc.loadTests(self.module_paths, **self.tc_kwargs['load'])
-        rc = self.tc.runTests(**self.tc_kwargs['run'])
-        self.tc.logSummary(rc, self.name)
-        self.tc.logDetails()
+        try:
+            self.tc.loadTests(self.module_paths, **self.tc_kwargs['load'])
+        except OEQATestNotFound as ex:
+            logger.error(ex)
+            sys.exit(1)
+
+        if args.list_tests:
+            rc = self.tc.listTests(args.list_tests, **self.tc_kwargs['list'])
+        else:
+            self._pre_run()
+            rc = self.tc.runTests(**self.tc_kwargs['run'])
+            rc.logDetails()
+            rc.logSummary(self.name)
 
         output_link = os.path.join(os.path.dirname(args.output_log),
                 "%s-results.log" % self.name)

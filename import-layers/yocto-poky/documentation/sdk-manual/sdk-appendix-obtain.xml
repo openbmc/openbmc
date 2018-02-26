@@ -18,37 +18,78 @@
     </para>
 
     <para>
-        You can find SDK installers here:
-        <itemizedlist>
-            <listitem><para><emphasis>Standard SDK Installers:</emphasis>
+        Follow these steps to locate and hand-install the toolchain:
+        <orderedlist>
+            <listitem><para>
+                <emphasis>Go to the Installers Directory:</emphasis>
                 Go to <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'></ulink>
-                and find the folder that matches your host development system
-                (i.e. <filename>i686</filename> for 32-bit machines or
-                <filename>x86_64</filename> for 64-bit machines).</para>
-
-                <para>Go into that folder and download the SDK installer
-                whose name includes the appropriate target architecture.
-                The toolchains provided by the Yocto Project are based off of
-                the <filename>core-image-sato</filename> image and contain
-                libraries appropriate for developing against that image.
-                For example, if your host development system is a 64-bit x86
-                system and you are going to use your cross-toolchain for a
-                32-bit x86 target, go into the <filename>x86_64</filename>
-                folder and download the following installer:
-                <literallayout class='monospaced'>
-     poky-glibc-x86_64-core-image-sato-i586-toolchain-&DISTRO;.sh
-                </literallayout>
                 </para></listitem>
-            <listitem><para><emphasis>Extensible SDK Installers:</emphasis>
-                Installers for the extensible SDK are also located in
-                <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'></ulink>.
-                These installers have the string
-                <filename>ext</filename> as part of their names:
+            <listitem><para>
+                <emphasis>Open the Folder for Your Development System:</emphasis>
+                Open the folder that matches your host development system
+                (i.e. <filename>i686</filename> for 32-bit machines or
+                <filename>x86_64</filename> for 64-bit machines).
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Locate and Download the SDK Installer:</emphasis>
+                You need to find and download the installer appropriate for
+                your development system, target hardware, and image type.
+                </para>
+
+                <para>The installer files (<filename>*.sh</filename>) follow
+                this naming convention:
+                <literallayout class='monospaced'>
+     poky-eglibc-<replaceable>host_system</replaceable>-core-image-<replaceable>type</replaceable>-<replaceable>arch</replaceable>-toolchain-ext-<replaceable>release</replaceable>.sh
+
+     Where:
+         <replaceable>host_system</replaceable> is a string representing your development system:
+                i686 or x86_64.
+
+         <replaceable>type</replaceable> is a string representing either a "sato" or "minimal"
+                image.
+
+         <replaceable>arch</replaceable> is a string representing the target architecture:
+                aarch64, armv5e, core2-64, coretexa8hf-neon, i586, mips3242,
+                mips64, or ppc7400.
+
+         <replaceable>release</replaceable> is the version of Yocto Project.
+
+         NOTE:
+            The standard SDK installer does not have the "-ext" string as
+            part of the filename.
+
+                </literallayout>
+                The toolchains provided by the Yocto Project are based off of
+                the <filename>core-image-sato</filename> and
+                <filename>core-image-minimal</filename> images and contain
+                libraries appropriate for developing against those images.
+                </para>
+
+                <para>For example, if your host development system is a
+                64-bit x86 system and you are need an extended SDK for a
+                64-bit core2 target, go into the <filename>x86_64</filename>
+                folder and download the following installer:
                 <literallayout class='monospaced'>
      poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
                 </literallayout>
                 </para></listitem>
-        </itemizedlist>
+            <listitem><para>
+                <emphasis>Run the Installer:</emphasis>
+                Be sure you have execution privileges and run the installer.
+                Following is an example from the <filename>Downloads</filename>
+                directory:
+                <literallayout class='monospaced'>
+     $ ~/Downloads/poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
+                </literallayout>
+                During execution of the script, you choose the root location
+                for the toolchain.
+                See the
+                "<link linkend='sdk-installed-standard-sdk-directory-structure'>Installed Standard SDK Directory Structure</link>"
+                section and the
+                "<link linkend='sdk-installed-extensible-sdk-directory-structure'>Installed Extensible SDK Directory Structure</link>"
+                section for more information.
+                </para></listitem>
+        </orderedlist>
     </para>
 </section>
 
@@ -57,65 +98,135 @@
 
     <para>
         As an alternative to locating and downloading a SDK installer,
-        you can build the SDK installer assuming you have first sourced
-        the environment setup script.
-        See the
-        "<ulink url='&YOCTO_DOCS_QS_URL;#qs-building-images'>Building Images</ulink>"
-        section in the Yocto Project Quick Start for steps that show you
-        how to set up the Yocto Project environment.
-        In particular, you need to be sure the
-        <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
-        variable matches the architecture for which you are building and that
-        the
-        <ulink url='&YOCTO_DOCS_REF_URL;#var-SDKMACHINE'><filename>SDKMACHINE</filename></ulink>
-        variable is correctly set if you are building a toolchain designed to
-        run on an architecture that differs from your current development host
-        machine (i.e. the build machine).
-    </para>
-
-    <para>
-        To build the SDK installer for a standard SDK and populate
-        the SDK image, use the following command:
-        <literallayout class='monospaced'>
+        you can build the SDK installer.
+        Follow these steps:
+        <orderedlist>
+            <listitem><para>
+                <emphasis>Set Up the Build Environment:</emphasis>
+                Be sure you are set up to use BitBake in a shell.
+                See the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Setting Up the Development Host to Use the Yocto Project</ulink>"
+                section in the Yocto Project Development Tasks Manual for
+                information on how to get a build host ready that is either a
+                native Linux machine or a machine that uses CROPS.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Clone the <filename>poky</filename> Repository:</emphasis>
+                You need to have a local copy of the Yocto Project
+                <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>
+                (i.e. a local <filename>poky</filename> repository).
+                See the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#cloning-the-poky-repository'>Cloning the <filename>poky</filename> Repository</ulink>"
+                and possibly the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#checking-out-by-branch-in-poky'>Checking Out by Branch in Poky</ulink>"
+                and
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#checkout-out-by-tag-in-poky'>Checking Out by Tag in Poky</ulink>"
+                sections all in the Yocto Project Development Tasks Manual for
+                information on how to clone the <filename>poky</filename>
+                repository and check out the appropriate branch for your work.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Initialize the Build Environment:</emphasis>
+                While in the root directory of the Source Directory (i.e.
+                <filename>poky</filename>), run the
+                <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
+                environment setup script to define the OpenEmbedded
+                build environment on your build host.
+                <literallayout class='monospaced'>
+     $ source &OE_INIT_FILE;
+                </literallayout>
+                Among other things, the script creates the
+                <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>,
+                which is <filename>build</filename> in this case
+                and is located in the
+                <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>.
+                After the script runs, your current working directory
+                is set to the <filename>build</filename> directory.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Make Sure You Are Building an Installer for the Correct Machine:</emphasis>
+                Check to be sure that your
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
+                variable in the <filename>local.conf</filename> file in your
+                <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
+                matches the architecture for which you are building.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Make Sure Your SDK Machine is Correctly Set:</emphasis>
+                If you are building a toolchain designed to run on an
+                architecture that differs from your current development host
+                machine (i.e. the build machine), be sure that the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-SDKMACHINE'><filename>SDKMACHINE</filename></ulink>
+                variable in the <filename>local.conf</filename> file in your
+                Build Directory is correctly set.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Build the SDK Installer:</emphasis>
+                To build the SDK installer for a standard SDK and populate
+                the SDK image, use the following command form.
+                Be sure to replace <replaceable>image</replaceable> with
+                an image (e.g. "core-image-sato"):
+                <literallayout class='monospaced'>
      $ bitbake <replaceable>image</replaceable> -c populate_sdk
-        </literallayout>
-        You can do the same for the extensible SDK using this command:
-        <literallayout class='monospaced'>
+                </literallayout>
+                You can do the same for the extensible SDK using this command
+                form:
+                <literallayout class='monospaced'>
      $ bitbake <replaceable>image</replaceable> -c populate_sdk_ext
-        </literallayout>
-        These commands result in a SDK installer that contains the sysroot
-        that matches your target root filesystem.
-    </para>
+                </literallayout>
+                These commands result in a SDK installer that contains the
+                sysroot that matches your target root filesystem.</para>
 
-    <para>
-        When the <filename>bitbake</filename> command completes, the SDK
-        installer will be in
-        <filename>tmp/deploy/sdk</filename> in the Build Directory.
-        <note><title>Notes</title>
-            <itemizedlist>
-                <listitem><para>
-                    By default, this toolchain does not build static binaries.
-                    If you want to use the toolchain to build these types of
-                    libraries, you need to be sure your SDK has the
-                    appropriate static development libraries.
-                    Use the
-                    <ulink url='&YOCTO_DOCS_REF_URL;#var-TOOLCHAIN_TARGET_TASK'><filename>TOOLCHAIN_TARGET_TASK</filename></ulink>
-                    variable inside your <filename>local.conf</filename> file
-                    to install the appropriate library packages in the SDK.
-                    Following is an example using <filename>libc</filename>
-                    static development libraries:
-                    <literallayout class='monospaced'>
+                <para>When the <filename>bitbake</filename> command completes,
+                the SDK installer will be in
+                <filename>tmp/deploy/sdk</filename> in the Build Directory.
+                <note><title>Notes</title>
+                    <itemizedlist>
+                        <listitem><para>
+                            By default, this toolchain does not build static
+                            binaries.
+                            If you want to use the toolchain to build these
+                            types of libraries, you need to be sure your SDK
+                            has the appropriate static development libraries.
+                            Use the
+                            <ulink url='&YOCTO_DOCS_REF_URL;#var-TOOLCHAIN_TARGET_TASK'><filename>TOOLCHAIN_TARGET_TASK</filename></ulink>
+                            variable inside your <filename>local.conf</filename>
+                            file to install the appropriate library packages
+                            in the SDK.
+                            Following is an example using
+                            <filename>libc</filename> static development
+                            libraries:
+                            <literallayout class='monospaced'>
      TOOLCHAIN_TARGET_TASK_append = " libc-staticdev"
-                    </literallayout>
-                    </para></listitem>
-                <listitem><para>
-                    For additional information on building the installer,
-                    see the
-                    <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
-                    wiki page.
-                    </para></listitem>
-            </itemizedlist>
-        </note>
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            For additional information on building the
+                            installer, see the
+                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
+                            wiki page.
+                            </para></listitem>
+                    </itemizedlist>
+                </note>
+            </para></listitem>
+            <listitem><para>
+                <emphasis>Run the Installer:</emphasis>
+                You can now run the SDK installer from
+                <filename>tmp/deploy/sdk</filename> in the Build Directory.
+                Following is an example:
+                <literallayout class='monospaced'>
+     $ cd ~/poky/build/tmp/deploy/sdk
+     $ ./poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
+                </literallayout>
+                During execution of the script, you choose the root location
+                for the toolchain.
+                See the
+                "<link linkend='sdk-installed-standard-sdk-directory-structure'>Installed Standard SDK Directory Structure</link>"
+                section and the
+                "<link linkend='sdk-installed-extensible-sdk-directory-structure'>Installed Extensible SDK Directory Structure</link>"
+                section for more information.
+                </para></listitem>
+        </orderedlist>
     </para>
 </section>
 
@@ -126,55 +237,106 @@
         After installing the toolchain, for some use cases you
         might need to separately extract a root filesystem:
         <itemizedlist>
-            <listitem><para>You want to boot the image using NFS.
+            <listitem><para>
+                You want to boot the image using NFS.
                 </para></listitem>
-            <listitem><para>You want to use the root filesystem as the
+            <listitem><para>
+                You want to use the root filesystem as the
                 target sysroot.
                 For example, the Eclipse IDE environment with the Eclipse
                 Yocto Plug-in installed allows you to use QEMU to boot
-                under NFS.</para></listitem>
-            <listitem><para>You want to develop your target application
+                under NFS.
+                </para></listitem>
+            <listitem><para>
+                You want to develop your target application
                 using the root filesystem as the target sysroot.
                 </para></listitem>
         </itemizedlist>
     </para>
 
     <para>
-        To extract the root filesystem, first <filename>source</filename>
-        the cross-development environment setup script to establish
-        necessary environment variables.
-        If you built the toolchain in the Build Directory, you will find
-        the toolchain environment script in the
-        <filename>tmp</filename> directory.
-        If you installed the toolchain by hand, the environment setup
-        script is located in <filename>/opt/poky/&DISTRO;</filename>.
-    </para>
+        Follow these steps to extract the root filesystem:
+        <orderedlist>
+            <listitem><para>
+                <emphasis>Locate and Download the Tarball for the Pre-Built
+                Root Filesystem Image File:</emphasis>
+                You need to find and download the root filesystem image
+                file that is appropriate for your target system.
+                These files are kept in the
+                <ulink url='&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;/machines/'>Index of Releases</ulink>
+                in the "machines" directory.</para>
 
-    <para>
-        After sourcing the environment script, use the
-        <filename>runqemu-extract-sdk</filename> command and provide the
-        filesystem image.
-    </para>
+                <para>The "machines" directory contains tarballs
+                (<filename>*.tar.bz2</filename>) for supported machines.
+                The directory also contains flattened root filesystem
+                image files (<filename>*.ext4</filename>), which you can use
+                with QEMU directly.</para>
 
-    <para>
-        Following is an example.
-        The second command sets up the environment.
-        In this case, the setup script is located in the
-        <filename>/opt/poky/&DISTRO;</filename> directory.
-        The third command extracts the root filesystem from a previously
-        built filesystem that is located in the
-        <filename>~/Downloads</filename> directory.
-        Furthermore, this command extracts the root filesystem into the
-        <filename>qemux86-sato</filename> directory:
-        <literallayout class='monospaced'>
-     $ cd ~
-     $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
-     $ runqemu-extract-sdk \
-        ~/Downloads/core-image-sato-sdk-qemux86-2011091411831.rootfs.tar.bz2 \
-        $HOME/qemux86-sato
-        </literallayout>
-        You could now point to the target sysroot at
-        <filename>qemux86-sato</filename>.
+                <para>The pre-built root filesystem image files
+                follow these naming conventions:
+                <literallayout class='monospaced'>
+     core-image-<replaceable>profile</replaceable>-<replaceable>arch</replaceable>.tar.bz2
+
+     Where:
+         <replaceable>profile</replaceable> is the filesystem image's profile:
+                   lsb, lsb-dev, lsb-sdk, lsb-qt3, minimal, minimal-dev, sato,
+                   sato-dev, sato-sdk, minimal-initramfs, or sdk-ptest. For
+                   information on these types of image profiles, see the
+                   "Images" chapter in the Yocto Project Reference Manual.
+
+         <replaceable>arch</replaceable> is a string representing the target architecture:
+                beaglebone, edgerouter, genericx86, genericx86-64, mpc8315e-rdb,
+                qemuarm, qemuarm64, qemumips, qemumips64, qemuppc, qemux86, or
+                qemux86-64.
+
+                </literallayout>
+                The root filesystems provided by the Yocto Project are based
+                off of the <filename>core-image-sato</filename> and
+                <filename>core-image-minimal</filename> images.
+                </para>
+
+                <para>For example, if your target hardware system is a
+                BeagleBone board and your image is a
+                <filename>core-image-minimal</filename> image, you need
+                to download the following root filesystem image file:
+                <literallayout class='monospaced'>
+     core-image-minimal-beaglebone.tar.bz2
+                </literallayout>
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Initialize the Cross-Development Environment:</emphasis>
+                You must <filename>source</filename>
+                the cross-development environment setup script to establish
+                necessary environment variables.</para>
+
+                <para>This script is located in the top-level directory in
+                which you installed the toolchain (e.g.
+                <filename>poky_sdk</filename>).</para>
+
+                <para>Following is an example for the Core2 64-bit
+                architecture:
+                <literallayout class='monospaced'>
+     $ source ~/poky_sdk/environment-setup-core2-64-poky-linux
+                </literallayout>
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Extract the Root Filesystem:</emphasis>
+                Use the <filename>runqemu-extract-sdk</filename> command
+                and provide the root filesystem image.</para>
+
+                <para>Following is an example command that extracts the root
+                filesystem from a previously built root filesystem image that
+                was downloaded from the
+                <ulink url='&YOCTO_DOCS_REF_URL;#index-downloads'>Index of Releases</ulink>.
+                This command extracts the root filesystem into the
+                <filename>core2-64-sato</filename> directory:
+                <literallayout class='monospaced'>
+     $ runqemu-extract-sdk ~/Downloads/core-image-sato-core2-64.tar.bz2 ~/core2-64-sato
+                </literallayout>
+                You could now point to the target sysroot at
+                <filename>core2-64-sato</filename>.
+                </para></listitem>
+        </orderedlist>
     </para>
 </section>
 

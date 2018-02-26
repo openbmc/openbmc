@@ -1,0 +1,46 @@
+From c72ef9b6ae83a0a2fbbefd5c050335f65f0d2bc9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Tue, 22 Aug 2017 11:48:46 -0500
+Subject: [PATCH 2/3] Revert "use de-localed std::put_time instead rolling our
+ own"
+
+This reverts commit 4ed2a17ab4334f019c00512aa54a162f0bf083c4.
+
+After we drop debian8 and centos7 that has gcc < 5 (std::put_time not available) 
+versions this patch can be remove.
+
+Signed-off-by: Anibal Limon <limon.anibal@gmail.com>
+
+Upstream-Status: Inappropriate [embedded specific]
+---
+ apt-pkg/contrib/strutl.cc | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/apt-pkg/contrib/strutl.cc b/apt-pkg/contrib/strutl.cc
+index c2ff01d..e9ef2be 100644
+--- a/apt-pkg/contrib/strutl.cc
++++ b/apt-pkg/contrib/strutl.cc
+@@ -760,11 +760,15 @@ string TimeRFC1123(time_t Date)
+    if (gmtime_r(&Date, &Conv) == NULL)
+       return "";
+ 
+-   auto const posix = std::locale::classic();
+-   std::ostringstream datestr;
+-   datestr.imbue(posix);
+-   datestr << std::put_time(&Conv, "%a, %d %b %Y %H:%M:%S GMT");
+-   return datestr.str();
++   char Buf[300];
++   const char *Day[] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
++   const char *Month[] = {"Jan","Feb","Mar","Apr","May","Jun","Jul",
++                          "Aug","Sep","Oct","Nov","Dec"};
++
++   snprintf(Buf, sizeof(Buf), "%s, %02i %s %i %02i:%02i:%02i GMT",Day[Conv.tm_wday],
++	   Conv.tm_mday,Month[Conv.tm_mon],Conv.tm_year+1900,Conv.tm_hour,
++	   Conv.tm_min,Conv.tm_sec);
++   return Buf;
+ }
+ 									/*}}}*/
+ // ReadMessages - Read messages from the FD				/*{{{*/
+-- 
+2.1.4
+

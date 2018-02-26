@@ -1,0 +1,47 @@
+From c850b654e71677e0d6292f1345207b9b5acffc33 Mon Sep 17 00:00:00 2001
+From: Emil Renner Berthing <systemd@esmil.dk>
+Date: Mon, 23 Oct 2017 11:31:03 -0700
+Subject: [PATCH 04/12] src/basic/missing.h: check for missing __compar_fn_t
+ typedef
+
+include missing.h for missing __compar_fn_t
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/basic/missing.h | 5 +++++
+ src/basic/strbuf.c  | 1 +
+ 2 files changed, 6 insertions(+)
+
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index 8009888ad..671f341c6 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -1063,6 +1063,11 @@ struct input_mask {
+ #define RENAME_NOREPLACE (1 << 0)
+ #endif
+ 
++#ifndef __COMPAR_FN_T
++#define __COMPAR_FN_T
++typedef int (*__compar_fn_t)(const void *, const void *);
++#endif
++
+ #ifndef KCMP_FILE
+ #define KCMP_FILE 0
+ #endif
+diff --git a/src/basic/strbuf.c b/src/basic/strbuf.c
+index 00aaf9e62..9dc4a584a 100644
+--- a/src/basic/strbuf.c
++++ b/src/basic/strbuf.c
+@@ -23,6 +23,7 @@
+ 
+ #include "alloc-util.h"
+ #include "strbuf.h"
++#include "missing.h"
+ 
+ /*
+  * Strbuf stores given strings in a single continuous allocated memory
+-- 
+2.14.2
+

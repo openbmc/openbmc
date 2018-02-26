@@ -13,9 +13,9 @@ LICENSE  = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
                     file://src/main.c;beginline=1;endline=20;md5=486a279a6ab0c8d152bcda3a5b5edc36"
 
-inherit autotools pkgconfig systemd update-rc.d bluetooth
+inherit autotools pkgconfig systemd update-rc.d bluetooth update-alternatives
 
-DEPENDS  = "dbus glib-2.0 ppp iptables readline"
+DEPENDS  = "dbus glib-2.0 ppp readline"
 
 INC_PR = "r20"
 
@@ -33,6 +33,7 @@ EXTRA_OECONF += "\
 PACKAGECONFIG ??= "wispr \
                    ${@bb.utils.filter('DISTRO_FEATURES', '3g systemd wifi', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
+                   iptables \
 "
 
 # If you want ConnMan to support VPN, add following statement into
@@ -50,6 +51,8 @@ PACKAGECONFIG[l2tp] = "--enable-l2tp --with-l2tp=${sbindir}/xl2tpd,--disable-l2t
 PACKAGECONFIG[pptp] = "--enable-pptp --with-pptp=${sbindir}/pptp,--disable-pptp,,pptp-linux"
 # WISPr support for logging into hotspots, requires TLS
 PACKAGECONFIG[wispr] = "--enable-wispr,--disable-wispr,gnutls,"
+PACKAGECONFIG[nftables] = "--with-firewall=nftables ,,libmnl libnftnl,,kernel-module-nf-tables-ipv4 kernel-module-nft-chain-nat-ipv4 kernel-module-nft-chain-route-ipv4 kernel-module-nft-meta kernel-module-nft-masq-ipv4 kernel-module-nft-nat"
+PACKAGECONFIG[iptables] = "--with-firewall=iptables ,,iptables,iptables"
 
 INITSCRIPT_NAME = "connman"
 INITSCRIPT_PARAMS = "start 05 5 2 3 . stop 22 0 1 6 ."
@@ -65,6 +68,11 @@ python __anonymous () {
 SYSTEMD_SERVICE_${PN} = "connman.service"
 SYSTEMD_SERVICE_${PN}-vpn = "connman-vpn.service"
 SYSTEMD_SERVICE_${PN}-wait-online = "connman-wait-online.service"
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','systemd','resolv-conf','',d)}"
+ALTERNATIVE_TARGET[resolv-conf] = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${sysconfdir}/resolv-conf.connman','',d)}"
+ALTERNATIVE_LINK_NAME[resolv-conf] = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${sysconfdir}/resolv.conf','',d)}"
 
 do_install_append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
@@ -86,6 +94,11 @@ do_install_append() {
 	# Automake 1.12 won't install empty directories, but we need the
 	# plugins directory to be present for ownership
 	mkdir -p ${D}${libdir}/connman/plugins
+
+    # For read-only filesystem, do not create links during bootup
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        ln -sf ../run/connman/resolv.conf ${D}${sysconfdir}/resolv-conf.connman
+    fi
 }
 
 # These used to be plugins, but now they are core

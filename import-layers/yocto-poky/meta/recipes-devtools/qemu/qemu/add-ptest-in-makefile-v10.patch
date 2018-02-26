@@ -1,0 +1,28 @@
+From 4201a5791fc4798a45a9b9f881602d7bacb74ed1 Mon Sep 17 00:00:00 2001
+From: Juro Bystricky <juro.bystricky@intel.com>
+Date: Thu, 31 Aug 2017 11:06:56 -0700
+Subject: Add subpackage -ptest which runs all unit test cases for qemu.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f08b741..3d1b3e9 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -924,4 +924,12 @@ all: $(QEMU_IOTESTS_HELPERS-y)
+ -include $(wildcard tests/*.d)
+ -include $(wildcard tests/libqos/*.d)
+ 
++buildtest-TESTS: $(check-unit-y)
++
++runtest-TESTS:
++	for f in $(check-unit-y); do \
++		nf=$$(echo $$f | sed 's/tests\//\.\//g'); \
++		$$nf; \
++	done
++
+ endif

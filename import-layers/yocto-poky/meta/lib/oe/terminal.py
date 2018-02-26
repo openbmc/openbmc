@@ -292,6 +292,8 @@ def check_terminal_version(terminalName):
             vernum = ver.split(' ')[-1]
         if ver.startswith('GNOME Terminal'):
             vernum = ver.split(' ')[-1]
+        if ver.startswith('MATE Terminal'):
+            vernum = ver.split(' ')[-1]
         if ver.startswith('tmux'):
             vernum = ver.split()[-1]
     return vernum

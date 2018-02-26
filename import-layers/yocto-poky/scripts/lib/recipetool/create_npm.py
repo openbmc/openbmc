@@ -21,7 +21,7 @@ import subprocess
 import tempfile
 import shutil
 import json
-from recipetool.create import RecipeHandler, split_pkg_licenses, handle_license_vars, check_npm
+from recipetool.create import RecipeHandler, split_pkg_licenses, handle_license_vars
 
 logger = logging.getLogger('recipetool')
 
@@ -35,6 +35,27 @@ def tinfoil_init(instance):
 
 class NpmRecipeHandler(RecipeHandler):
     lockdownpath = None
+
+    def _ensure_npm(self, fixed_setup=False):
+        if not tinfoil.recipes_parsed:
+            tinfoil.parse_recipes()
+        try:
+            rd = tinfoil.parse_recipe('nodejs-native')
+        except bb.providers.NoProvider:
+            if fixed_setup:
+                msg = 'nodejs-native is required for npm but is not available within this SDK'
+            else:
+                msg = 'nodejs-native is required for npm but is not available - you will likely need to add a layer that provides nodejs'
+            logger.error(msg)
+            return None
+        bindir = rd.getVar('STAGING_BINDIR_NATIVE')
+        npmpath = os.path.join(bindir, 'npm')
+        if not os.path.exists(npmpath):
+            tinfoil.build_targets('nodejs-native', 'addto_recipe_sysroot')
+            if not os.path.exists(npmpath):
+                logger.error('npm required to process specified source, but nodejs-native did not seem to populate it')
+                return None
+        return bindir
 
     def _handle_license(self, data):
         '''
@@ -109,7 +130,6 @@ class NpmRecipeHandler(RecipeHandler):
             if varname == 'SRC_URI':
                 if not origvalue.startswith('npm://'):
                     src_uri = origvalue.split()
-                    changed = False
                     deplist = {}
                     for dep, depver in optdeps.items():
                         depdata = self.get_npm_data(dep, depver, d)
@@ -123,14 +143,15 @@ class NpmRecipeHandler(RecipeHandler):
                         depdata = self.get_npm_data(dep, depver, d)
                         deplist[dep] = depdata
 
+                    extra_urls = []
                     for dep, depdata in deplist.items():
                         version = depdata.get('version', None)
                         if version:
                             url = 'npm://registry.npmjs.org;name=%s;version=%s;subdir=node_modules/%s' % (dep, version, dep)
-                            scriptutils.fetch_uri(d, url, srctree)
-                            src_uri.append(url)
-                            changed = True
-                    if changed:
+                            extra_urls.append(url)
+                    if extra_urls:
+                        scriptutils.fetch_url(tinfoil, ' '.join(extra_urls), None, srctree, logger)
+                        src_uri.extend(extra_urls)
                         return src_uri, None, -1, True
             return origvalue, None, 0, True
         updated, newlines = bb.utils.edit_metadata(lines_before, ['SRC_URI'], varfunc)
@@ -143,40 +164,9 @@ class NpmRecipeHandler(RecipeHandler):
                 lines_before.append(line)
         return updated
 
-    def _replace_license_vars(self, srctree, lines_before, handled, extravalues, d):
-        for item in handled:
-            if isinstance(item, tuple):
-                if item[0] == 'license':
-                    del item
-                    break
-
-        calledvars = []
-        def varfunc(varname, origvalue, op, newlines):
-            if varname in ['LICENSE', 'LIC_FILES_CHKSUM']:
-                for i, e in enumerate(reversed(newlines)):
-                    if not e.startswith('#'):
-                        stop = i
-                        while stop > 0:
-                            newlines.pop()
-                            stop -= 1
-                        break
-                calledvars.append(varname)
-                if len(calledvars) > 1:
-                    # The second time around, put the new license text in
-                    insertpos = len(newlines)
-                    handle_license_vars(srctree, newlines, handled, extravalues, d)
-                return None, None, 0, True
-            return origvalue, None, 0, True
-        updated, newlines = bb.utils.edit_metadata(lines_before, ['LICENSE', 'LIC_FILES_CHKSUM'], varfunc)
-        if updated:
-            del lines_before[:]
-            lines_before.extend(newlines)
-        else:
-            raise Exception('Did not find license variables')
-
     def process(self, srctree, classes, lines_before, lines_after, handled, extravalues):
         import bb.utils
-        import oe
+        import oe.package
         from collections import OrderedDict
 
         if 'buildsystem' in handled:
@@ -189,7 +179,9 @@ class NpmRecipeHandler(RecipeHandler):
         files = RecipeHandler.checkfiles(srctree, ['package.json'])
         if files:
             d = bb.data.createCopy(tinfoil.config_data)
-            npm_bindir = check_npm(tinfoil, self._devtool)
+            npm_bindir = self._ensure_npm()
+            if not npm_bindir:
+                sys.exit(14)
             d.prependVar('PATH', '%s:' % npm_bindir)
 
             data = read_package_json(files[0])
@@ -205,10 +197,7 @@ class NpmRecipeHandler(RecipeHandler):
 
                 fetchdev = extravalues['fetchdev'] or None
                 deps, optdeps, devdeps = self.get_npm_package_dependencies(data, fetchdev)
-                updated = self._handle_dependencies(d, deps, optdeps, devdeps, lines_before, srctree)
-                if updated:
-                    # We need to redo the license stuff
-                    self._replace_license_vars(srctree, lines_before, handled, extravalues, d)
+                self._handle_dependencies(d, deps, optdeps, devdeps, lines_before, srctree)
 
                 # Shrinkwrap
                 localfilesdir = tempfile.mkdtemp(prefix='recipetool-npm')
@@ -219,11 +208,14 @@ class NpmRecipeHandler(RecipeHandler):
 
                 # Split each npm module out to is own package
                 npmpackages = oe.package.npm_split_package_dirs(srctree)
+                licvalues = None
                 for item in handled:
                     if isinstance(item, tuple):
                         if item[0] == 'license':
                             licvalues = item[1]
                             break
+                if not licvalues:
+                    licvalues = handle_license_vars(srctree, lines_before, handled, extravalues, d)
                 if licvalues:
                     # Augment the license list with information we have in the packages
                     licenses = {}
@@ -244,13 +236,7 @@ class NpmRecipeHandler(RecipeHandler):
                     all_licenses = list(set([item.replace('_', ' ') for pkglicense in pkglicenses.values() for item in pkglicense]))
                     if '&' in all_licenses:
                         all_licenses.remove('&')
-                    # Go back and update the LICENSE value since we have a bit more
-                    # information than when that was written out (and we know all apply
-                    # vs. there being a choice, so we can join them with &)
-                    for i, line in enumerate(lines_before):
-                        if line.startswith('LICENSE = '):
-                            lines_before[i] = 'LICENSE = "%s"' % ' & '.join(all_licenses)
-                            break
+                    extravalues['LICENSE'] = ' & '.join(all_licenses)
 
                 # Need to move S setting after inherit npm
                 for i, line in enumerate(lines_before):

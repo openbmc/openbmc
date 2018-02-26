@@ -14,10 +14,8 @@ LICENSE = "GPLv2 & LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LICENSE.GPL2;md5=751419260aa954499f7abaabaa882bbe \
                     file://LICENSE.LGPL2.1;md5=4fbd65380cdd255951079008b364516c"
 
-SRCREV = "a1e2ef7ec912902d8142e7cb5830cbfb47dba86c"
+SRCREV = "c1edab7ad1e7ccc9be693bedfd464cd1cbffb395"
 
 SRC_URI = "git://github.com/systemd/systemd.git;protocol=git"
 
 S = "${WORKDIR}/git"
-
-LDFLAGS_append_libc-uclibc = " -lrt -lssp_nonshared -lssp "

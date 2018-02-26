@@ -1,6 +1,6 @@
 # Development tool - upgrade command plugin
 #
-# Copyright (C) 2014-2015 Intel Corporation
+# Copyright (C) 2014-2017 Intel Corporation
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -33,7 +33,7 @@ sys.path = sys.path + [devtool_path]
 
 import oe.recipeutils
 from devtool import standard
-from devtool import exec_build_env_command, setup_tinfoil, DevtoolError, parse_recipe, use_external_build
+from devtool import exec_build_env_command, setup_tinfoil, DevtoolError, parse_recipe, use_external_build, update_unlockedsigs
 
 logger = logging.getLogger('devtool')
 
@@ -180,7 +180,7 @@ def _get_uri(rd):
             srcuri = rev_re.sub('', srcuri)
     return srcuri, srcrev
 
-def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tinfoil, rd):
+def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, keep_temp, tinfoil, rd):
     """Extract sources of a recipe with a new version"""
 
     def __run(cmd):
@@ -202,14 +202,37 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tin
         __run('git tag -f devtool-base-new')
         md5 = None
         sha256 = None
+        if not srcbranch:
+            check_branch, check_branch_err = __run('git branch -r --contains %s' % srcrev)
+            get_branch = [x.strip() for x in check_branch.splitlines()]
+            # Remove HEAD reference point and drop remote prefix
+            get_branch = [x.split('/', 1)[1] for x in get_branch if not x.startswith('origin/HEAD')]
+            if 'master' in get_branch:
+                # If it is master, we do not need to append 'branch=master' as this is default.
+                # Even with the case where get_branch has multiple objects, if 'master' is one
+                # of them, we should default take from 'master'
+                srcbranch = ''
+            elif len(get_branch) == 1:
+                # If 'master' isn't in get_branch and get_branch contains only ONE object, then store result into 'srcbranch'
+                srcbranch = get_branch[0]
+            else:
+                # If get_branch contains more than one objects, then display error and exit.
+                mbrch = '\n  ' + '\n  '.join(get_branch)
+                raise DevtoolError('Revision %s was found on multiple branches: %s\nPlease provide the correct branch in the devtool command with "--srcbranch" or "-B" option.' % (srcrev, mbrch))
     else:
         __run('git checkout devtool-base -b devtool-%s' % newpv)
 
         tmpdir = tempfile.mkdtemp(prefix='devtool')
         try:
-            md5, sha256 = scriptutils.fetch_uri(tinfoil.config_data, uri, tmpdir, rev)
-        except bb.fetch2.FetchError as e:
+            checksums, ftmpdir = scriptutils.fetch_url(tinfoil, uri, rev, tmpdir, logger, preserve_tmp=keep_temp)
+        except scriptutils.FetchUrlFailure as e:
             raise DevtoolError(e)
+
+        if ftmpdir and keep_temp:
+            logger.info('Fetch temp directory is %s' % ftmpdir)
+
+        md5 = checksums['md5sum']
+        sha256 = checksums['sha256sum']
 
         tmpsrctree = _get_srctree(tmpdir)
         srctree = os.path.abspath(srctree)
@@ -269,7 +292,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, branch, keep_temp, tin
         else:
             shutil.rmtree(tmpsrctree)
 
-    return (rev, md5, sha256)
+    return (rev, md5, sha256, srcbranch)
 
 def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, workspace, tinfoil, rd):
     """Creates the new recipe under workspace"""
@@ -277,7 +300,10 @@ def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, workspace, tinfoil
     bpn = rd.getVar('BPN')
     path = os.path.join(workspace, 'recipes', bpn)
     bb.utils.mkdirhier(path)
-    copied, _ = oe.recipeutils.copy_recipe_files(rd, path)
+    copied, _ = oe.recipeutils.copy_recipe_files(rd, path, all_variants=True)
+    if not copied:
+        raise DevtoolError('Internal error - no files were copied for recipe %s' % bpn)
+    logger.debug('Copied %s to %s' % (copied, path))
 
     oldpv = rd.getVar('PV')
     if not newpv:
@@ -329,6 +355,29 @@ def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, workspace, tinfoil
 
     return fullpath, copied
 
+
+def _check_git_config():
+    def getconfig(name):
+        try:
+            value = bb.process.run('git config --global %s' % name)[0].strip()
+        except bb.process.ExecutionError as e:
+            if e.exitcode == 1:
+                value = None
+            else:
+                raise
+        return value
+
+    username = getconfig('user.name')
+    useremail = getconfig('user.email')
+    configerr = []
+    if not username:
+        configerr.append('Please set your name using:\n  git config --global user.name')
+    if not useremail:
+        configerr.append('Please set your email using:\n  git config --global user.email')
+    if configerr:
+        raise DevtoolError('Your git configuration is incomplete which will prevent rebases from working:\n' + '\n'.join(configerr))
+
+
 def upgrade(args, config, basepath, workspace):
     """Entry point for the devtool 'upgrade' subcommand"""
 
@@ -338,6 +387,8 @@ def upgrade(args, config, basepath, workspace):
         raise DevtoolError("You must provide a version using the --version/-V option, or for recipes that fetch from an SCM such as git, the --srcrev/-S option")
     if args.srcbranch and not args.srcrev:
         raise DevtoolError("If you specify --srcbranch/-B then you must use --srcrev/-S to specify the revision" % args.recipename)
+
+    _check_git_config()
 
     tinfoil = setup_tinfoil(basepath=basepath, tracking=True)
     try:
@@ -367,11 +418,11 @@ def upgrade(args, config, basepath, workspace):
 
         rf = None
         try:
-            rev1 = standard._extract_source(srctree, False, 'devtool-orig', False, rd, tinfoil)
-            rev2, md5, sha256 = _extract_new_source(args.version, srctree, args.no_patch,
-                                                    args.srcrev, args.branch, args.keep_temp,
+            rev1 = standard._extract_source(srctree, False, 'devtool-orig', False, config, basepath, workspace, args.fixed_setup, rd, tinfoil)
+            rev2, md5, sha256, srcbranch = _extract_new_source(args.version, srctree, args.no_patch,
+                                                    args.srcrev, args.srcbranch, args.branch, args.keep_temp,
                                                     tinfoil, rd)
-            rf, copied = _create_new_recipe(args.version, md5, sha256, args.srcrev, args.srcbranch, config.workspace_path, tinfoil, rd)
+            rf, copied = _create_new_recipe(args.version, md5, sha256, args.srcrev, srcbranch, config.workspace_path, tinfoil, rd)
         except bb.process.CmdError as e:
             _upgrade_error(e, rf, srctree)
         except DevtoolError as e:
@@ -381,6 +432,9 @@ def upgrade(args, config, basepath, workspace):
         af = _write_append(rf, srctree, args.same_dir, args.no_same_dir, rev2,
                         copied, config.workspace_path, rd)
         standard._add_md5(config, pn, af)
+
+        update_unlockedsigs(basepath, workspace, [pn], args.fixed_setup)
+
         logger.info('Upgraded source extracted to %s' % srctree)
         logger.info('New recipe is %s' % rf)
     finally:
@@ -406,4 +460,4 @@ def register_commands(subparsers, context):
     group.add_argument('--same-dir', '-s', help='Build in same directory as source', action="store_true")
     group.add_argument('--no-same-dir', help='Force build in a separate build directory', action="store_true")
     parser_upgrade.add_argument('--keep-temp', action="store_true", help='Keep temporary directory (for debugging)')
-    parser_upgrade.set_defaults(func=upgrade)
+    parser_upgrade.set_defaults(func=upgrade, fixed_setup=context.fixed_setup)

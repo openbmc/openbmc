@@ -143,6 +143,10 @@ python perform_packagecopy_append () {
             if not alt_link:
                 alt_link = "%s/%s" % (d.getVar('bindir'), alt_name)
                 d.setVarFlag('ALTERNATIVE_LINK_NAME', alt_name, alt_link)
+            if alt_link.startswith(os.path.join(d.getVar('sysconfdir', True), 'init.d')):
+                # Managing init scripts does not work (bug #10433), foremost
+                # because of a race with update-rc.d
+                bb.fatal("Using update-alternatives for managing SysV init scripts is not supported")
 
             alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name)
             alt_target   = alt_target or d.getVar('ALTERNATIVE_TARGET_%s' % pkg) or d.getVar('ALTERNATIVE_TARGET') or alt_link
@@ -201,8 +205,8 @@ python populate_packages_updatealternatives () {
     pkgdest = d.getVar('PKGD')
     for pkg in (d.getVar('PACKAGES') or "").split():
         # Create post install/removal scripts
-        alt_setup_links = "# Begin section update-alternatives\n"
-        alt_remove_links = "# Begin section update-alternatives\n"
+        alt_setup_links = ""
+        alt_remove_links = ""
         for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
             alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name)
             alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name)
@@ -225,13 +229,10 @@ python populate_packages_updatealternatives () {
             # Default to generate shell script.. eventually we may want to change this...
             alt_target = os.path.normpath(alt_target)
 
-            alt_setup_links  += 'update-alternatives --install %s %s %s %s\n' % (alt_link, alt_name, alt_target, alt_priority)
-            alt_remove_links += 'update-alternatives --remove  %s %s\n' % (alt_name, alt_target)
+            alt_setup_links  += '\tupdate-alternatives --install %s %s %s %s\n' % (alt_link, alt_name, alt_target, alt_priority)
+            alt_remove_links += '\tupdate-alternatives --remove  %s %s\n' % (alt_name, alt_target)
 
-        alt_setup_links += "# End section update-alternatives\n"
-        alt_remove_links += "# End section update-alternatives\n"
-
-        if len(alt_setup_links.splitlines()) > 2:
+        if alt_setup_links:
             # RDEPENDS setup
             provider = d.getVar('VIRTUAL-RUNTIME_update-alternatives')
             if provider:
@@ -241,24 +242,12 @@ python populate_packages_updatealternatives () {
             bb.note('adding update-alternatives calls to postinst/prerm for %s' % pkg)
             bb.note('%s' % alt_setup_links)
             postinst = d.getVar('pkg_postinst_%s' % pkg) or '#!/bin/sh\n'
-            postinst = postinst.splitlines(True)
-            try:
-                index = postinst.index('# Begin section update-rc.d\n')
-                postinst.insert(index, alt_setup_links)
-            except ValueError:
-                postinst.append(alt_setup_links)
-            postinst = ''.join(postinst)
+            postinst += alt_setup_links
             d.setVar('pkg_postinst_%s' % pkg, postinst)
 
             bb.note('%s' % alt_remove_links)
             prerm = d.getVar('pkg_prerm_%s' % pkg) or '#!/bin/sh\n'
-            prerm = prerm.splitlines(True)
-            try:
-                index = prerm.index('# End section update-rc.d\n')
-                prerm.insert(index + 1, alt_remove_links)
-            except ValueError:
-                prerm.append(alt_remove_links)
-            prerm = ''.join(prerm)
+            prerm += alt_remove_links
             d.setVar('pkg_prerm_%s' % pkg, prerm)
 }
 

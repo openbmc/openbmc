@@ -13,7 +13,7 @@ SRC_URI = "git://git.drogon.net/wiringPi \
            file://0001-Add-initial-cross-compile-support.patch \
            "
 
-COMPATIBLE_MACHINE = "raspberrypi"
+COMPATIBLE_MACHINE = "^rpi$"
 
 CFLAGS_prepend = "-I${S}/wiringPi -I${S}/devLib "
 

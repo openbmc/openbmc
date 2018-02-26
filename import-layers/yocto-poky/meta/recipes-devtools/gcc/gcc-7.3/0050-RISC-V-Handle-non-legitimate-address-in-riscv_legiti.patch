@@ -1,0 +1,51 @@
+From 16210e6270e200cd4892a90ecef608906be3a130 Mon Sep 17 00:00:00 2001
+From: Kito Cheng <kito.cheng@gmail.com>
+Date: Thu, 4 May 2017 02:11:13 +0800
+Subject: [PATCH] RISC-V: Handle non-legitimate address in
+ riscv_legitimize_move
+
+GCC may generate non-legitimate address due to we allow some
+load/store with non-legitimate address in pic.md.
+
+  2017-05-12  Kito Cheng  <kito.cheng@gmail.com>
+
+      * config/riscv/riscv.c (riscv_legitimize_move): Handle
+      non-legitimate address.
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ gcc/ChangeLog            |  5 +++++
+ gcc/config/riscv/riscv.c | 16 ++++++++++++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/gcc/config/riscv/riscv.c b/gcc/config/riscv/riscv.c
+index f7fec4bfcf8..d519be1659a 100644
+--- a/gcc/config/riscv/riscv.c
++++ b/gcc/config/riscv/riscv.c
+@@ -1385,6 +1385,22 @@ riscv_legitimize_move (enum machine_mode mode, rtx dest, rtx src)
+       return true;
+     }
+ 
++  /* RISC-V GCC may generate non-legitimate address due to we provide some
++     pattern for optimize access PIC local symbol and it's make GCC generate
++     unrecognizable instruction during optmizing.  */
++
++  if (MEM_P (dest) && !riscv_legitimate_address_p (mode, XEXP (dest, 0),
++						   reload_completed))
++    {
++      XEXP (dest, 0) = riscv_force_address (XEXP (dest, 0), mode);
++    }
++
++  if (MEM_P (src) && !riscv_legitimate_address_p (mode, XEXP (src, 0),
++						  reload_completed))
++    {
++      XEXP (src, 0) = riscv_force_address (XEXP (src, 0), mode);
++    }
++
+   return false;
+ }
+ 
+-- 
+2.14.2
+

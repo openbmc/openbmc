@@ -1,0 +1,126 @@
+From 43403468298ef4167baa5d84de2ee2eaf7f4007a Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Fri, 9 Jan 2015 18:34:04 +0000
+Subject: [PATCH 1/2] build: allow builds to work with separate build dir
+
+Remove assumptions in include paths that assume the build
+is happening in the source directories.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ diod/Makefile.am              | 2 +-
+ libdiod/Makefile.am           | 2 +-
+ liblsd/Makefile.am            | 2 +-
+ libnpclient/Makefile.am       | 2 +-
+ scripts/Makefile.am           | 6 +++---
+ tests/kern/dbench/Makefile.am | 4 ++--
+ utils/Makefile.am             | 2 +-
+ 7 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/diod/Makefile.am b/diod/Makefile.am
+index 7644be7..fdaf130 100644
+--- a/diod/Makefile.am
++++ b/diod/Makefile.am
+@@ -1,7 +1,7 @@
+ AM_CFLAGS = @GCCWARN@
+ 
+ AM_CPPFLAGS = \
+-	-I../libnpfs -I../liblsd -I../libdiod
++	-I$(srcdir)/../libnpfs -I$(srcdir)/../liblsd -I$(srcdir)/../libdiod
+ 
+ sbin_PROGRAMS = diod
+ 
+diff --git a/libdiod/Makefile.am b/libdiod/Makefile.am
+index 4810e14..6905cdd 100644
+--- a/libdiod/Makefile.am
++++ b/libdiod/Makefile.am
+@@ -1,7 +1,7 @@
+ AM_CFLAGS = @GCCWARN@
+ 
+ AM_CPPFLAGS = \
+-	-I../libnpfs -I../libnpclient -I../liblsd
++	-I$(srcdir)/../libnpfs -I$(srcdir)/../libnpclient -I$(srcdir)/../liblsd
+ 
+ noinst_LIBRARIES = libdiod.a
+ 
+diff --git a/liblsd/Makefile.am b/liblsd/Makefile.am
+index c3e5658..7e18bf8 100644
+--- a/liblsd/Makefile.am
++++ b/liblsd/Makefile.am
+@@ -1,6 +1,6 @@
+ AM_CFLAGS = @GCCWARN@
+ 
+-AM_CPPFLAGS = -I../libdiod
++AM_CPPFLAGS = -I$(srcdir)/../libdiod
+ 
+ noinst_LIBRARIES = liblsd.a
+ 
+diff --git a/libnpclient/Makefile.am b/libnpclient/Makefile.am
+index 5305df9..cbaf266 100644
+--- a/libnpclient/Makefile.am
++++ b/libnpclient/Makefile.am
+@@ -1,7 +1,7 @@
+ AM_CFLAGS = @GCCWARN@
+ 
+ AM_CPPFLAGS = \
+-	-I../libnpfs
++	-I$(srcdir)/../libnpfs
+ 
+ noinst_LIBRARIES = libnpclient.a
+ 
+diff --git a/scripts/Makefile.am b/scripts/Makefile.am
+index 51c24a3..2aba728 100644
+--- a/scripts/Makefile.am
++++ b/scripts/Makefile.am
+@@ -1,9 +1,9 @@
+-systemddir=$(sysconfdir)/systemd/system
++systemddir=/lib/systemd/system
+ 
+ install-data-local:
+-	$(top_srcdir)/config/install-sh -m 755 $(srcdir)/auto.diod \
++	$(top_srcdir)/config/install-sh -m 755 ./auto.diod \
+ 		$(DESTDIR)$(sysconfdir)/auto.diod
+-	$(top_srcdir)/config/install-sh -m 755 $(srcdir)/diod.service \
++	$(top_srcdir)/config/install-sh -m 644 ./diod.service \
+ 		$(DESTDIR)$(systemddir)/diod.service
+ 
+ uninstall-local:
+diff --git a/tests/kern/dbench/Makefile.am b/tests/kern/dbench/Makefile.am
+index e0cdefa..1704f9f 100644
+--- a/tests/kern/dbench/Makefile.am
++++ b/tests/kern/dbench/Makefile.am
+@@ -2,7 +2,7 @@ AM_CFLAGS = -w
+ 
+ # VERSION=4.00
+ 
+-AM_CPPFLAGS = -DDATADIR=\"$(X_DATADIR)\"
++AM_CPPFLAGS = -I. -DDATADIR=\"$(X_DATADIR)\"
+ 
+ LDADD = $(LIBPOPT)
+ 
+@@ -25,6 +25,6 @@ BUILT_SOURCES = proto.h
+ CLEANFILES = proto.h
+ 
+ proto.h: $(dbench_SOURCES) mkproto.pl
+-	perl mkproto.pl $(dbench_SOURCES) > proto.h
++	$(srcdir)/mkproto.pl $(patsubst %,$(srcdir),$(dbench_SOURCES)) > proto.h
+ 
+ EXTRA_DIST = mkproto.pl
+diff --git a/utils/Makefile.am b/utils/Makefile.am
+index 169b6c4..91d571d 100644
+--- a/utils/Makefile.am
++++ b/utils/Makefile.am
+@@ -1,7 +1,7 @@
+ AM_CFLAGS = @GCCWARN@
+ 
+ AM_CPPFLAGS = \
+-	-I../libnpfs -I../liblsd -I../libdiod -I../libnpclient
++	-I$(srcdir)/../libnpfs -I$(srcdir)/../liblsd -I$(srcdir)/../libdiod -I$(srcdir)/../libnpclient
+ 
+ sbin_PROGRAMS = diodmount diodcat dtop diodload diodls diodshowmount dioddate
+ 
+-- 
+2.11.0
+

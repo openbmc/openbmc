@@ -1,0 +1,26 @@
+From 0e96d9f23b2b166e7444e7c8e0a6d4b83c2eccd7 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 26 Apr 2017 03:51:03 -0400
+Subject: [PATCH 3/3] without build plugins
+
+Upstream-Status:  Inappropriate workaround
+
+Rebase to 2.9.1
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index c15928c..bac02b1 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -8,4 +8,4 @@ if BUILD_NEWT
+ sub_dirs += report-newt
+ endif
+ 
+-SUBDIRS = include lib plugins report-python cli client-python workflows $(sub_dirs)
++SUBDIRS = include lib report-python cli client-python workflows $(sub_dirs)
+-- 
+2.8.1
+

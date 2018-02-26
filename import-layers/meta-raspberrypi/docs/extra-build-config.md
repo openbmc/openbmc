@@ -95,14 +95,22 @@ this variable in local.conf:
 
     ENABLE_KGDB = "1"
 
+## Disable rpi boot logo
+
+To disable rpi boot logo, set this variable in local.conf:
+
+    DISABLE_RPI_BOOT_LOGO = "1"
+
 ## Boot to U-Boot
 
 To have u-boot load kernel image, set in your local.conf:
 
-    KERNEL_IMAGETYPE = "uImage"
+    RPI_USE_U_BOOT = "1"
 
-This will make kernel.img be u-boot image which will load uImage. By default,
-kernel.img is the actual kernel image (ex. Image).
+This will select the appropriate image format for use with u-boot automatically.
+For further customisation the KERNEL_IMAGETYPE and KERNEL_BOOTCMD variables can
+be overridden to select the exact kernel image type (eg. zImage) and u-boot
+command (eg. bootz) to be used.
 
 ## Image with Initramfs
 

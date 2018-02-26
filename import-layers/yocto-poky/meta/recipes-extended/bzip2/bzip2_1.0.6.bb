@@ -34,7 +34,6 @@ ALTERNATIVE_${PN} = "bunzip2 bzcat"
 EXTRA_OECONF_append_class-native = " --bindir=${STAGING_BINDIR_NATIVE}/${PN}"
 
 do_install_ptest () {
-	cp -f ${B}/Makefile ${D}${PTEST_PATH}/Makefile
 	sed -i -e "s|^Makefile:|_Makefile:|" ${D}${PTEST_PATH}/Makefile
 }
 

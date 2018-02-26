@@ -113,7 +113,7 @@ def copy_needed_files(d, tc):
     oe.path.remove(cases_path)
     bb.utils.mkdirhier(cases_path)
     test_paths = get_runtime_paths(d)
-    test_modules = d.getVar('TEST_SUITES')
+    test_modules = d.getVar('TEST_SUITES').split()
     tc.loadTests(test_paths, modules=test_modules)
     for f in getSuiteCasesFiles(tc.suites):
         shutil.copy2(f, cases_path)

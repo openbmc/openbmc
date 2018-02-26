@@ -1,0 +1,113 @@
+From a9d5595d2fa2ab252f1cabf63f4b65c3efbafeb9 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 10 Aug 2017 15:27:03 +0800
+Subject: [PATCH] ltp: fix PAGE_SIZE redefinition and O_CREAT undeclear when
+ build with musl
+
+error 1:
+
+|stack_clash.c:50:22: error: expected identifier or '(' before numeric constant
+| static unsigned long PAGE_SIZE;
+
+This is because the musl libc already contain PAGE_SIZE definition in limits.c,
+we can check it here:
+
+    https://git.musl-libc.org/cgit/musl/tree/include/limits.h#n43
+
+error 2:
+
+|ck01.c:157:22: error: 'O_CREAT' undeclared (first use in this function); did you mean 'S_IREAD'?
+|   fd = open(filename, O_CREAT | O_TRUNC | O_RDWR, 0644);
+|                       ^~~~~~~
+|                       S_IREAD
+
+This is because the musl libc put those in fcntl.h, so we should include that
+file.
+
+Upstream-Status: Submitted [ https://github.com/linux-test-project/ltp/pull/194 ]
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ testcases/cve/stack_clash.c               | 12 ++++++------
+ testcases/kernel/syscalls/flock/flock01.c |  1 +
+ testcases/kernel/syscalls/flock/flock02.c |  1 +
+ 3 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/testcases/cve/stack_clash.c b/testcases/cve/stack_clash.c
+index 2ef1a82..7c45991 100644
+--- a/testcases/cve/stack_clash.c
++++ b/testcases/cve/stack_clash.c
+@@ -47,7 +47,7 @@
+ #include "tst_test.h"
+ #include "tst_safe_stdio.h"
+ 
+-static unsigned long PAGE_SIZE;
++static unsigned long PAGE_SIZE_tst;
+ static unsigned long PAGE_MASK;
+ static unsigned long GAP_PAGES = 256;
+ static unsigned long THRESHOLD;
+@@ -66,7 +66,7 @@ void exhaust_stack_into_sigsegv(void)
+ 	exhaust_stack_into_sigsegv();
+ }
+ 
+-#define MAPPED_LEN PAGE_SIZE
++#define MAPPED_LEN PAGE_SIZE_tst
+ static unsigned long mapped_addr;
+ 
+ void segv_handler(int sig, siginfo_t *info, void *data LTP_ATTRIBUTE_UNUSED)
+@@ -150,7 +150,7 @@ void do_child(void)
+ 	stack_t signal_stack;
+ 	struct sigaction segv_sig = {.sa_sigaction = segv_handler, .sa_flags = SA_ONSTACK|SA_SIGINFO};
+ 	void *map;
+-	unsigned long gap = GAP_PAGES * PAGE_SIZE;
++	unsigned long gap = GAP_PAGES * PAGE_SIZE_tst;
+ 	struct rlimit rlimit;
+ 
+ 	rlimit.rlim_cur = rlimit.rlim_max = RLIM_INFINITY;
+@@ -200,8 +200,8 @@ void setup(void)
+ {
+ 	char buf[4096], *p;
+ 
+-	PAGE_SIZE = sysconf(_SC_PAGESIZE);
+-	PAGE_MASK = ~(PAGE_SIZE - 1);
++	PAGE_SIZE_tst = sysconf(_SC_PAGESIZE);
++	PAGE_MASK = ~(PAGE_SIZE_tst - 1);
+ 
+ 	buf[4095] = '\0';
+ 	SAFE_FILE_SCANF("/proc/cmdline", "%4095[^\n]", buf);
+@@ -214,7 +214,7 @@ void setup(void)
+ 		tst_res(TINFO, "stack_guard_gap = %ld", GAP_PAGES);
+ 	}
+ 
+-	THRESHOLD = (GAP_PAGES - 1) * PAGE_SIZE;
++	THRESHOLD = (GAP_PAGES - 1) * PAGE_SIZE_tst;
+ 
+ 	{
+ 		volatile int *a = alloca(128);
+diff --git a/testcases/kernel/syscalls/flock/flock01.c b/testcases/kernel/syscalls/flock/flock01.c
+index 3e17be4..06d89e3 100644
+--- a/testcases/kernel/syscalls/flock/flock01.c
++++ b/testcases/kernel/syscalls/flock/flock01.c
+@@ -69,6 +69,7 @@
+ #include <stdio.h>
+ #include <sys/wait.h>
+ #include <sys/file.h>
++#include <fcntl.h>
+ #include "test.h"
+ 
+ void setup(void);
+diff --git a/testcases/kernel/syscalls/flock/flock02.c b/testcases/kernel/syscalls/flock/flock02.c
+index 414df68..9ddf729 100644
+--- a/testcases/kernel/syscalls/flock/flock02.c
++++ b/testcases/kernel/syscalls/flock/flock02.c
+@@ -75,6 +75,7 @@
+ #include <sys/types.h>
+ #include <sys/file.h>
+ #include <sys/wait.h>
++#include <fcntl.h>
+ #include <errno.h>
+ #include <stdio.h>
+ #include "test.h"
+-- 
+2.7.4
+

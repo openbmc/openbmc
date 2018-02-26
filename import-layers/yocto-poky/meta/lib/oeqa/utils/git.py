@@ -64,7 +64,7 @@ class GitRepo(object):
     def rev_parse(self, revision):
         """Do git rev-parse"""
         try:
-            return self.run_cmd(['rev-parse', revision])
+            return self.run_cmd(['rev-parse', '--verify', revision])
         except GitError:
             # Revision does not exist
             return None

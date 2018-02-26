@@ -1,0 +1,54 @@
+From 04e8b99d8195a0e39982ecd27802421610633724 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Jun 2017 22:18:31 -0700
+Subject: [PATCH 4/6] engine: Fix indentation and missing semi-colon
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/engine/mdadm_config.cpp      | 5 +++--
+ lib/engine/unique_id_manager.cpp | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/lib/engine/mdadm_config.cpp b/lib/engine/mdadm_config.cpp
+index 1914ddc..e40c2c7 100644
+--- a/lib/engine/mdadm_config.cpp
++++ b/lib/engine/mdadm_config.cpp
+@@ -118,9 +118,10 @@ void check_configuration()
+         attr >> config;
+         configOk = correct_config(config);
+     } catch (Exception ex) {
+-        if (ex != E_NOT_FOUND)
++        if (ex != E_NOT_FOUND) {
+             dlog("Warning: mdadm config file cannot be read, new one will be written");
+             backup = false;
++        }
+     }
+ 
+     if (configOk && monitor_running()) {
+@@ -134,7 +135,7 @@ void check_configuration()
+             dlog("Warning: failed to update mdadm.conf");
+     }
+     if (restart_monitor() == 0)
+-        dlog("Monitor restarted successfully")
++        dlog("Monitor restarted successfully");
+     else
+         dlog("Error starting Monitor");
+ }
+diff --git a/lib/engine/unique_id_manager.cpp b/lib/engine/unique_id_manager.cpp
+index 99c153c..87d6ddc 100644
+--- a/lib/engine/unique_id_manager.cpp
++++ b/lib/engine/unique_id_manager.cpp
+@@ -185,7 +185,7 @@ void UniqueIdManager::refresh()
+         keyFile >> keyList;
+         keyList += "\n";
+     } catch (...) {
+-        dlog("ssi.keys file missing")
++        dlog("ssi.keys file missing");
+         /* no file? that's ok */
+     }
+     /* process the list to update IdCaches */
+-- 
+2.13.1
+

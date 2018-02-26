@@ -1,0 +1,35 @@
+From 939c994f3756c2d6d3cab2e6a04d05fa7c2b1d56 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 16 Aug 2017 14:45:27 +0800
+Subject: [PATCH 2/2] configure: reproducible
+
+"configure" enforces -U for ar flags, breaking deterministic builds.
+The flag was added to fix some vaguely specified "recent POSIX binutil
+build problems" in 2015.
+
+Upstream-Status: Pending
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+Rebase to Rebase to 6.0+20170715
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 7d7d2c1..f444354 100755
+--- a/configure
++++ b/configure
+@@ -4458,7 +4458,7 @@ if test "${cf_cv_ar_flags+set}" = set; then
+ else
+ 
+ 	cf_cv_ar_flags=unknown
+-	for cf_ar_flags in -curvU -curv curv -crv crv -cqv cqv -rv rv
++	for cf_ar_flags in -curv curv -crv crv -cqv cqv -rv rv
+ 	do
+ 
+ 		# check if $ARFLAGS already contains this choice
+-- 
+1.8.3.1
+

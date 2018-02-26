@@ -9,6 +9,14 @@ EXTRA_OECONF_PATHS = "\
 
 EXTRA_OECONF_append_linuxstdbase = " --enable-clocale=gnu"
 
+# ARMv6+ adds atomic instructions that affect the ABI in libraries built
+# with TUNE_CCARGS in gcc-runtime.  Make the compiler default to a
+# compatible architecture.  armv6 and armv7a cover the minimum tune
+# features used in OE.
+EXTRA_OECONF_append_armv6 = " --with-arch=armv6"
+EXTRA_OECONF_append_armv7a = " --with-arch=armv7-a"
+EXTRA_OECONF_append_armv7ve = " --with-arch=armv7-a"
+
 # libcc1 requres gcc_cv_objdump when cross build, but gcc_cv_objdump is
 # set in subdir gcc, so subdir libcc1 can't use it, export it here to
 # fix the problem.

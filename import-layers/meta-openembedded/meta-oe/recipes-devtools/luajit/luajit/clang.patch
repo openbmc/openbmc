@@ -1,0 +1,19 @@
+clang pretends to be gcc 4.2.0 which is a big lie when it comes
+to features, its same as latest gcc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Index: LuaJIT-2.0.5/src/lj_arch.h
+===================================================================
+--- LuaJIT-2.0.5.orig/src/lj_arch.h
++++ LuaJIT-2.0.5/src/lj_arch.h
+@@ -313,7 +313,7 @@
+ #error "Need at least GCC 4.2 or newer"
+ #endif
+ #elif !LJ_TARGET_PS3
+-#if (__GNUC__ < 4) || ((__GNUC__ == 4) && __GNUC_MINOR__ < 3)
++#if (__GNUC__ < 4) || ((__GNUC__ == 4) && __GNUC_MINOR__ < 3) && !defined(__clang__)
+ #error "Need at least GCC 4.3 or newer"
+ #endif
+ #endif

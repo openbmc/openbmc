@@ -1,14 +1,11 @@
-From 9522ac8e5d5b20a472f3ffc356d388d36f7f582c Mon Sep 17 00:00:00 2001
+From 7b24f8bd95ad4f7d00c93ca2ad998c14a0266dbe Mon Sep 17 00:00:00 2001
 From: marxin <mliska@suse.cz>
 Date: Tue, 21 Mar 2017 08:42:11 +0100
 Subject: [PATCH] Add FALLTHRU comment to handle GCC7 warnings.
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
 ---
-Upstream-Status: Backport [https://github.com/json-c/json-c/commit/014924ba899f659917bb64392bbff7d3c803afc2]
-Signed-off-by: André Draszik <adraszik@tycoint.com>
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
  json_object.c  |  1 +
  json_tokener.c |  1 +
@@ -28,10 +25,10 @@ index 6cc73bc..77e8b21 100644
      return 0;
    }
 diff --git a/json_tokener.c b/json_tokener.c
-index 7fa32ae..b32d657 100644
+index 9a76293..ae7b1ae 100644
 --- a/json_tokener.c
 +++ b/json_tokener.c
-@@ -306,6 +306,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
+@@ -305,6 +305,7 @@ struct json_object* json_tokener_parse_ex(struct json_tokener *tok,
              tok->err = json_tokener_error_parse_unexpected;
              goto out;
          }
@@ -73,5 +70,5 @@ index 712c387..74e3b0f 100644
               break;
      case 0 : return c;
 -- 
-2.14.1
+2.12.2
 

@@ -1,0 +1,32 @@
+From 1fe92fd3dd64c7228f6ff41e3fc16c4f2392471a Mon Sep 17 00:00:00 2001
+From: Juro Bystricky <juro.bystricky@intel.com>
+Date: Fri, 27 Oct 2017 08:28:25 -0700
+Subject: mkhelp.pl: support reproducible build
+
+Do not generate line with the current date, such as:
+
+* Generation time: Tue Oct-24 18:01:41 2017
+
+This will improve reproducibility. The generated string is only
+part of a comment, so there should be no adverse consequences.
+
+Upstream-Status: Submitted [ https://github.com/curl/curl/pull/2026 ]
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+diff --git a/src/mkhelp.pl b/src/mkhelp.pl
+index 270daa2..757f024 100755
+--- a/src/mkhelp.pl
++++ b/src/mkhelp.pl
+@@ -102,11 +102,9 @@ while(<READ>) {
+ }
+ close(READ);
+ 
+-$now = localtime;
+ print <<HEAD
+ /*
+  * NEVER EVER edit this manually, fix the mkhelp.pl script instead!
+- * Generation time: $now
+  */
+ #ifdef USE_MANUAL
+ #include "tool_hugehelp.h"

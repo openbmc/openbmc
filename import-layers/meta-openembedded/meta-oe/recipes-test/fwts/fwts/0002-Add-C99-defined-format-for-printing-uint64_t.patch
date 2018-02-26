@@ -1,0 +1,53 @@
+From 25f18b9ac37960dc12a3b648a5c866bd56ef2cbe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 8 Jun 2017 16:50:23 -0700
+Subject: [PATCH 2/3] Add C99 defined format for printing uint64_t
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/opal/reserv_mem.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/opal/reserv_mem.c b/src/opal/reserv_mem.c
+index eeec2947..f0672e05 100644
+--- a/src/opal/reserv_mem.c
++++ b/src/opal/reserv_mem.c
+@@ -185,7 +185,7 @@ static int reserv_mem_limits_test(fwts_framework *fw)
+ 		regions[j].start = (uint64_t)be64toh(ranges[2 * j]);
+ 		regions[j].len = (uint64_t)be64toh(ranges[2 * j + 1]);
+ 		fwts_log_info(fw, "Region name %80s"
+-			" start: 0x%08lx, len: 0x%08lx\n",
++			" start: 0x%08" PRIx64 ", len: 0x%08" PRIx64 "\n",
+ 			regions[j].name, regions[j].start, regions[j].len);
+ 	}
+ 
+@@ -248,7 +248,7 @@ static int reserv_mem_limits_test(fwts_framework *fw)
+ 				fwts_failed(fw, LOG_LEVEL_MEDIUM,
+ 					"ImageSizeMismatch",
+ 					"Mismatch in homer-image size, "
+-					"expected: 0x%lx, actual: 0x%lx",
++					"expected: 0x%" PRIx64 ", actual: 0x%" PRIx64 "",
+ 					configstruct.homer, regions[j].len);
+ 				ok = false;
+ 			} else
+@@ -261,7 +261,7 @@ static int reserv_mem_limits_test(fwts_framework *fw)
+ 				fwts_failed(fw, LOG_LEVEL_MEDIUM,
+ 					"ImageSizeMismatch",
+ 					"Mismatch in slw-image size, "
+-					"expected: 0x%lx, actual: 0x%lx",
++					"expected: 0x%" PRIx64 ", actual: 0x%" PRIx64 "",
+ 					configstruct.slw, regions[j].len);
+ 				ok = false;
+ 			} else
+@@ -274,7 +274,7 @@ static int reserv_mem_limits_test(fwts_framework *fw)
+ 				fwts_failed(fw, LOG_LEVEL_MEDIUM,
+ 					"ImageSizeMismatch",
+ 					"Mismatch in occ-common-area size, "
+-					"expected: 0x%lx, actual: 0x%lx",
++					"expected: 0x%" PRIx64", actual: 0x%" PRIx64"",
+ 					configstruct.occ_common,
+ 					regions[j].len);
+ 				ok = false;
+-- 
+2.13.1
+

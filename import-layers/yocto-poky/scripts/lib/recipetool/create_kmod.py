@@ -40,7 +40,7 @@ class KernelModuleRecipeHandler(RecipeHandler):
 
         makefiles = []
 
-        files = RecipeHandler.checkfiles(srctree, ['*.c', '*.h'], recursive=True)
+        files = RecipeHandler.checkfiles(srctree, ['*.c', '*.h'], recursive=True, excludedirs=['contrib', 'test', 'examples'])
         if files:
             for cfile in files:
                 # Look in same dir or parent for Makefile

@@ -1,7 +1,7 @@
 Description: remove -Werror flag
 Forwarded: not-needed
 Author: Fathi Boudra <fathi.boudra@linaro.org>
-
+Upstream-Status: Pending
 ---
  generate/unix/iasl/Makefile |   12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)

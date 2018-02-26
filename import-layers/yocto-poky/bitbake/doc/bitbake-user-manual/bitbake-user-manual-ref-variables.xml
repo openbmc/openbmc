@@ -1143,8 +1143,6 @@
             <glossdef>
                 <para>
                     Sets the base location where layers are stored.
-                    By default, this location is set to
-                    <filename>${COREBASE}</filename>.
                     This setting is used in conjunction with
                     <filename>bitbake-layers layerindex-fetch</filename> and
                     tells <filename>bitbake-layers</filename> where to place
@@ -1596,9 +1594,19 @@
         <glossentry id='var-INHERIT'><glossterm>INHERIT</glossterm>
             <glossdef>
                 <para>
-                    Causes the named class to be inherited at
-                    this point during parsing.
-                    The variable is only valid in configuration files.
+                    Causes the named class or classes to be inherited globally.
+                    Anonymous functions in the class or classes
+                    are not executed for the
+                    base configuration and in each individual recipe.
+                    The OpenEmbedded build system ignores changes to
+                    <filename>INHERIT</filename> in individual recipes.
+                </para>
+
+                <para>
+                    For more information on <filename>INHERIT</filename>, see
+                    the
+                    "<link linkend="inherit-configuration-directive"><filename>INHERIT</filename> Configuration Directive</link>"
+                    section.
                 </para>
             </glossdef>
         </glossentry>
@@ -1893,7 +1901,7 @@
                     Here are two examples:
                     <literallayout class='monospaced'>
      PREFERRED_VERSION_python = "2.7.3"
-     PREFERRED_VERSION_linux-yocto = "3.10%"
+     PREFERRED_VERSION_linux-yocto = "4.12%"
                     </literallayout>
                 </para>
             </glossdef>

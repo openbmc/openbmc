@@ -23,6 +23,10 @@ do_install_append() {
 
     install -m 0644 glib/glibmmconfig.h ${D}${datadir}/glibmm-2.4/
     install -m 0644 scripts/glibmm_check_perl.m4 ${D}${datadir}/aclocal/ || true
+
+    for i in generate_wrap_init.pl gmmproc; do
+        sed -i -e '1s,.*,#!${bindir}/env perl,' ${D}${libdir}/glibmm-2.4/proc/$i
+    done
 }
 
 FILES_${PN} = "${libdir}/lib*.so.*"

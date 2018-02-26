@@ -1,7 +1,7 @@
-From e53968d61804b6bab32ec6e13cc0b3cd57214796 Mon Sep 17 00:00:00 2001
+From 490a0eb4da1af726ea5d68e3efc0d18ba94c4054 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
-Subject: [PATCH 03/26] nativesdk-glibc: Raise the size of arrays containing dl
+Subject: [PATCH 03/25] nativesdk-glibc: Raise the size of arrays containing dl
  paths
 
 This patch puts the dynamic loader path in the binaries, SYSTEM_DIRS strings
@@ -26,10 +26,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  7 files changed, 14 insertions(+), 10 deletions(-)
 
 diff --git a/elf/dl-cache.c b/elf/dl-cache.c
-index cfa335e..daa12ec 100644
+index e9632da0b3..4de529d2cf 100644
 --- a/elf/dl-cache.c
 +++ b/elf/dl-cache.c
-@@ -132,6 +132,10 @@ do									      \
+@@ -133,6 +133,10 @@ do									      \
  while (0)
  
  
@@ -41,7 +41,7 @@ index cfa335e..daa12ec 100644
  internal_function
  _dl_cache_libcmp (const char *p1, const char *p2)
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 3a3d112..a1410e4 100644
+index 19c1db9948..70c259b400 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
 @@ -106,8 +106,8 @@ static size_t max_capstrlen attribute_relro;
@@ -56,7 +56,7 @@ index 3a3d112..a1410e4 100644
    SYSTEM_DIRS_LEN
  };
 diff --git a/elf/interp.c b/elf/interp.c
-index 9448802..e7e8c70 100644
+index b6e8f04444..47c20415bc 100644
 --- a/elf/interp.c
 +++ b/elf/interp.c
 @@ -18,5 +18,5 @@
@@ -67,7 +67,7 @@ index 9448802..e7e8c70 100644
 +const char __invoke_dynamic_linker__[4096] __attribute__ ((section (".interp")))
    = RUNTIME_LINKER;
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index 467ca82..631a2a9 100644
+index 99caf9e9bb..36ea5df5f1 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
 @@ -168,6 +168,9 @@ static struct argp argp =
@@ -81,18 +81,18 @@ index 467ca82..631a2a9 100644
     a platform.  */
  static int
 diff --git a/elf/rtld.c b/elf/rtld.c
-index 4ec25d7..e159c12 100644
+index 65647fb1c8..cd8381cb33 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -99,6 +99,7 @@ uintptr_t __pointer_chk_guard_local
- strong_alias (__pointer_chk_guard_local, __pointer_chk_guard)
- #endif
- 
+@@ -128,6 +128,7 @@ dso_name_valid_for_suid (const char *p)
+     }
+   return *p != '\0';
+ }
 +extern const char LD_SO_CACHE[4096] __attribute__ ((section (".ldsocache")));
  
- /* List of auditing DSOs.  */
- static struct audit_list
-@@ -854,12 +855,12 @@ of this helper program; chances are you did not intend to run this program.\n\
+ /* LD_AUDIT variable contents.  Must be processed before the
+    audit_list below.  */
+@@ -999,12 +1000,12 @@ of this helper program; chances are you did not intend to run this program.\n\
    --list                list all dependencies and how they are resolved\n\
    --verify              verify that given object really is a dynamically linked\n\
  			object we can handle\n\
@@ -108,7 +108,7 @@ index 4ec25d7..e159c12 100644
        ++_dl_skip_args;
        --_dl_argc;
 diff --git a/iconv/gconv_conf.c b/iconv/gconv_conf.c
-index e235188..569f72e 100644
+index 5aa055de6e..b9a14b9bd3 100644
 --- a/iconv/gconv_conf.c
 +++ b/iconv/gconv_conf.c
 @@ -36,7 +36,7 @@
@@ -121,7 +121,7 @@ index e235188..569f72e 100644
  /* The path elements, as determined by the __gconv_get_path function.
     All path elements end in a slash.  */
 diff --git a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
-index eb2f900..505804e 100644
+index 1f0b8f629d..acbe68399d 100644
 --- a/sysdeps/generic/dl-cache.h
 +++ b/sysdeps/generic/dl-cache.h
 @@ -27,10 +27,6 @@
@@ -136,5 +136,5 @@ index eb2f900..505804e 100644
  # define add_system_dir(dir) add_dir (dir)
  #endif
 -- 
-2.10.2
+2.13.2
 

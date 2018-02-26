@@ -31,7 +31,7 @@ from glob import glob
 
 from wic import WicError
 from wic.pluginbase import SourcePlugin
-from wic.utils.misc import exec_cmd, get_bitbake_var
+from wic.misc import exec_cmd, get_bitbake_var
 
 logger = logging.getLogger('wic')
 
@@ -54,7 +54,7 @@ class BootimgPartitionPlugin(SourcePlugin):
         - sets up a vfat partition
         - copies all files listed in IMAGE_BOOT_FILES variable
         """
-        hdddir = "%s/boot" % cr_workdir
+        hdddir = "%s/boot.%d" % (cr_workdir, part.lineno)
         install_cmd = "install -d %s" % hdddir
         exec_cmd(install_cmd)
 
@@ -65,10 +65,19 @@ class BootimgPartitionPlugin(SourcePlugin):
 
         logger.debug('Kernel dir: %s', bootimg_dir)
 
-        boot_files = get_bitbake_var("IMAGE_BOOT_FILES")
+        boot_files = None
+        for (fmt, id) in (("_uuid-%s", part.uuid), ("_label-%s", part.label), (None, None)):
+            if fmt:
+                var = fmt % id
+            else:
+                var = ""
 
-        if not boot_files:
-            raise WicError('No boot files defined, IMAGE_BOOT_FILES unset')
+            boot_files = get_bitbake_var("IMAGE_BOOT_FILES" + var)
+            if boot_files is not None:
+                break
+
+        if boot_files is None:
+            raise WicError('No boot files defined, IMAGE_BOOT_FILES unset for entry #%d' % part.lineno)
 
         logger.debug('Boot files: %s', boot_files)
 

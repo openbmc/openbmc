@@ -25,11 +25,11 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  Makefile | 24 ++----------------------
  1 file changed, 2 insertions(+), 22 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index eade234..2275865 100644
---- a/Makefile
-+++ b/Makefile
-@@ -16,28 +16,13 @@ endif
+Index: git/Makefile
+===================================================================
+--- git.orig/Makefile
++++ git/Makefile
+@@ -16,28 +16,11 @@ endif
  
  TESTS = tests
  
@@ -37,7 +37,7 @@ index eade234..2275865 100644
 -	ftl_format flash_erase nanddump doc_loadbios \
 -	ftl_check mkfs.jffs2 flash_lock flash_unlock \
 -	flash_otp_info flash_otp_dump flash_otp_lock flash_otp_write \
--	mtd_debug flashcp nandwrite nandtest \
+-	mtd_debug flashcp nandwrite nandtest mtdpart \
 -	jffs2dump \
 -	nftldump nftl_format docfdisk \
 -	rfddump rfdformat \
@@ -51,15 +51,15 @@ index eade234..2275865 100644
 -BINS += mkfs.ubifs/mkfs.ubifs
 -BINS += $(addprefix ubi-utils/,$(UBI_BINS))
 -SCRIPTS = flash_eraseall
-+BINS = $(addprefix ubi-utils/,$(UBI_BINS))
- 
- TARGETS = $(BINS)
+-
+-TARGETS = $(BINS)
 -TARGETS += lib/libmtd.a
 -TARGETS += ubi-utils/libubi.a
++BINS = $(addprefix ubi-utils/,$(UBI_BINS))
  
  OBJDEPS = $(BUILDDIR)/include/version.h
  
-@@ -61,12 +46,9 @@ endif
+@@ -61,12 +44,9 @@ endif
  	rm -f $(BUILDDIR)/include/version.h
  	$(MAKE) -C $(TESTS) clean
  
@@ -73,7 +73,7 @@ index eade234..2275865 100644
  
  tests::
  	$(MAKE) -C $(TESTS)
-@@ -91,8 +73,6 @@ LDLIBS_mkfs.jffs2  = -lz $(LZOLDLIBS)
+@@ -91,8 +71,6 @@ LDLIBS_mkfs.jffs2  = -lz $(LZOLDLIBS)
  LDFLAGS_jffs2reader = $(ZLIBLDFLAGS) $(LZOLDFLAGS)
  LDLIBS_jffs2reader  = -lz $(LZOLDLIBS)
  
@@ -82,6 +82,3 @@ index eade234..2275865 100644
  #
  # Common libmtd
  #
--- 
-1.9.1
-

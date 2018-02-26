@@ -40,9 +40,8 @@ def tinfoil_init():
     import bb.tinfoil
     import logging
     tinfoil = bb.tinfoil.Tinfoil()
-    tinfoil.prepare(True)
-
     tinfoil.logger.setLevel(logging.WARNING)
+    tinfoil.prepare(True)
     return tinfoil
 
 
@@ -198,6 +197,10 @@ def read_value(args):
                 # PKGSIZE is now in bytes, but we we want it in KB
                 pkgsize = (int(value) + 1024 // 2) // 1024
                 value = "%d" % pkgsize
+            if args.unescape:
+                import codecs
+                # escape_decode() unescapes backslash encodings in byte streams
+                value = codecs.escape_decode(bytes(value, "utf-8"))[0].decode("utf-8")
             if args.prefix_name:
                 print('%s %s' % (pkg_name, value))
             else:
@@ -553,6 +556,7 @@ def main():
     parser_read_value.add_argument('pkg', nargs='*', help='Runtime package name to look up')
     parser_read_value.add_argument('-f', '--file', help='Read package names from the specified file (one per line, first field only)')
     parser_read_value.add_argument('-n', '--prefix-name', help='Prefix output with package name', action='store_true')
+    parser_read_value.add_argument('-u', '--unescape', help='Expand escapes such as \\n', action='store_true')
     parser_read_value.set_defaults(func=read_value)
 
     parser_glob = subparsers.add_parser('glob',

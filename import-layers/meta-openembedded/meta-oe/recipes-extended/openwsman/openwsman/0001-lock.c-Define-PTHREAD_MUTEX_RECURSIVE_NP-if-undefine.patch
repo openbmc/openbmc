@@ -1,0 +1,29 @@
+From e05bad73f5fe4be1626560d92465893a5fc931e5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 15 Sep 2017 00:01:19 -0700
+Subject: [PATCH] lock.c: Define PTHREAD_MUTEX_RECURSIVE_NP if undefined
+
+Check for PTHREAD_MUTEX_RECURSIVE_NP being defined instead of
+checking for OS
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/u/lock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/u/lock.c b/src/lib/u/lock.c
+index 025eea4c..b31c77b5 100644
+--- a/src/lib/u/lock.c
++++ b/src/lib/u/lock.c
+@@ -50,7 +50,7 @@
+ extern int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type);
+ #endif
+ 
+-#if defined (__SVR4) && defined (__sun)
++#ifndef PTHREAD_MUTEX_RECURSIVE_NP
+ #define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
+ #endif
+ 
+-- 
+2.14.1
+

@@ -1,0 +1,57 @@
+From 60282514ea01af004d7f9e66dd3929223b7d2e7b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 18 Apr 2017 09:16:12 -0700
+Subject: [PATCH 2/2] Define glibc specific macros
+
+Check and define
+rawmemchr, __asprintf, __mempcpy, __strtok_r
+__always_inline, TEMP_FAILURE_RETRY
+
+if not existing. Helps compiling with musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+diff --git a/src/rpcsvc/nis.h b/src/rpcsvc/nis.h
+index 88cbca0..23fc20c 100644
+--- a/src/rpcsvc/nis.h
++++ b/src/rpcsvc/nis.h
+@@ -57,6 +57,34 @@ __BEGIN_DECLS
+  *                                              <kukuk@suse.de>
+  */
+ 
++#ifndef rawmemchr
++#define rawmemchr(s,c) memchr((s),(size_t)-1,(c))
++#endif
++
++#ifndef __asprintf
++#define __asprintf asprintf
++#endif
++
++#ifndef __mempcpy
++#define __mempcpy mempcpy
++#endif
++
++#ifndef __strtok_r
++#define __strtok_r strtok_r
++#endif
++
++#ifndef __always_inline
++#define __always_inline __attribute__((__always_inline__))
++#endif
++
++#ifndef TEMP_FAILURE_RETRY
++#define TEMP_FAILURE_RETRY(exp) ({ \
++typeof (exp) _rc; \
++ do { \
++  _rc = (exp); \
++ } while (_rc == -1 && errno == EINTR); \
++ _rc; })
++#endif
+ 
+ #ifndef __nis_object_h
+ #define __nis_object_h
+-- 
+2.12.2
+

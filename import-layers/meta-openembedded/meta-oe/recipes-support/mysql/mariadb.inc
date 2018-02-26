@@ -4,7 +4,7 @@ SECTION = "libs"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = "http://downloads.mariadb.com/MariaDB/mariadb-${PV}/source/mariadb-${PV}.tar.gz \
+SRC_URI = "https://downloads.mariadb.org/f/${BP}/source/${BP}.tar.gz \
            file://fix-cmake-module-path.patch \
            file://remove-bad-path.patch \
            file://fix-mysqlclient-r-version.patch \
@@ -17,10 +17,10 @@ SRC_URI = "http://downloads.mariadb.com/MariaDB/mariadb-${PV}/source/mariadb-${P
            file://fix-a-building-failure.patch \
            file://change-cc-to-cc-version.patch \
            file://0001-disable-ucontext-on-musl.patch \
-           file://gcc7.patch \
           "
-SRC_URI[md5sum] = "54a0bbbc9b67308e7c076622d02f0fcd"
-SRC_URI[sha256sum] = "cb94e315d0fc90c62db5a6c7829c9966f674285d99b3ba3ffa575fb4a26edc86"
+
+SRC_URI[md5sum] = "2d4104aae0b9e5efa8878918bd329cb4"
+SRC_URI[sha256sum] = "5dbde98d7e4a5a1721b6cbed7898b2549a88866247951cf586057975c6cea641"
 
 S = "${WORKDIR}/mariadb-${PV}"
 
@@ -81,6 +81,9 @@ EXTRA_OECMAKE = "-DWITH_EMBEDDED_SERVER=ON \
                  -DMYSQL_DATADIR:PATH=/var/mysql \
                  -DCAT_EXECUTABLE=`which cat` \
                  -DCMAKE_AR:FILEPATH=${AR}"
+
+ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET_armv5 = "arm"
 
 do_configure_append() {
     # handle distros with different values of ${libexecdir}
@@ -255,6 +258,7 @@ FILES_${PN}-server = "\
     ${bindir}/mysqlbinlog \
     ${bindir}/mysqld_multi \
     ${bindir}/mysqld_safe \
+    ${bindir}/mysqld_safe_helper \
     ${bindir}/mysqlhotcopy \
     ${bindir}/mysqltest \
     ${bindir}/ndb_delete_all \

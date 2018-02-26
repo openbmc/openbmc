@@ -1,0 +1,40 @@
+From a5b945cb3c62a18dcd7047f62707c09076c4e48b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Jul 2017 15:35:51 -0700
+Subject: [PATCH 2/2] teamd: Re-adjust include header order
+
+So it gets the library definition before kernel definition
+
+usr/include/ne
+tinet/if_ether.h:101:8: error: redefinition of 'struct ethhdr'
+ struct ethhdr {
+        ^~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ teamd/teamd_runner_lacp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/teamd/teamd_runner_lacp.c b/teamd/teamd_runner_lacp.c
+index 9c77fae..8800854 100644
+--- a/teamd/teamd_runner_lacp.c
++++ b/teamd/teamd_runner_lacp.c
+@@ -23,6 +23,7 @@
+ #include <unistd.h>
+ #include <limits.h>
+ #include <sys/ioctl.h>
++#include <net/ethernet.h>
+ #include <linux/if_ether.h>
+ #include <sys/socket.h>
+ #include <linux/netdevice.h>
+@@ -30,7 +31,6 @@
+ #include <errno.h>
+ #include <team.h>
+ #include <private/misc.h>
+-#include <net/ethernet.h>
+ 
+ #include "teamd.h"
+ #include "teamd_config.h"
+-- 
+2.13.2
+

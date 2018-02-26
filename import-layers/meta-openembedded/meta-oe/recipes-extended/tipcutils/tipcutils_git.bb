@@ -17,6 +17,8 @@ inherit autotools pkgconfig
 
 DEPENDS += "libdaemon"
 
+RDEPENDS_${PN} = "iproute2-tipc"
+
 S = "${WORKDIR}/git"
 
 do_configure_prepend() {

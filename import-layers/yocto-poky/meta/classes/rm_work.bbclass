@@ -35,21 +35,11 @@ do_rm_work () {
         fi
     done
 
-    cd ${WORKDIR}
-    for dir in *
-    do
-        # Retain only logs and other files in temp, safely ignore
-        # failures of removing pseudo folers on NFS2/3 server.
-        if [ $dir = 'pseudo' ]; then
-            rm -rf $dir 2> /dev/null || true
-        elif ! echo '${RM_WORK_EXCLUDE_ITEMS}' | grep -q -w "$dir"; then
-            rm -rf $dir
-        fi
-    done
-
     # Need to add pseudo back or subsqeuent work in this workdir
     # might fail since setscene may not rerun to recreate it
     mkdir -p ${WORKDIR}/pseudo/
+
+    excludes='${RM_WORK_EXCLUDE_ITEMS}'
 
     # Change normal stamps into setscene stamps as they better reflect the
     # fact WORKDIR is now empty
@@ -71,11 +61,22 @@ do_rm_work () {
                 i=dummy
                 break
                 ;;
-            *do_rootfs*|*do_image*|*do_bootimg*|*do_bootdirectdisk*|*do_vmimg*|*do_write_qemuboot_conf*)
+            *do_image_complete*)
+                mv $i `echo $i | sed -e "s#do_image_complete#do_image_complete_setscene#"`
+                i=dummy
+                break
+                ;;
+            *do_rootfs*|*do_image*|*do_bootimg*|*do_write_qemuboot_conf*)
                 i=dummy
                 break
                 ;;
             *do_build*)
+                i=dummy
+                break
+                ;;
+            *do_addto_recipe_sysroot*)
+                # Preserve recipe-sysroot-native if do_addto_recipe_sysroot has been used
+                excludes="$excludes recipe-sysroot-native"
                 i=dummy
                 break
                 ;;
@@ -100,6 +101,18 @@ do_rm_work () {
             esac
         done
         rm -f $i
+    done
+
+    cd ${WORKDIR}
+    for dir in *
+    do
+        # Retain only logs and other files in temp, safely ignore
+        # failures of removing pseudo folers on NFS2/3 server.
+        if [ $dir = 'pseudo' ]; then
+            rm -rf $dir 2> /dev/null || true
+        elif ! echo "$excludes" | grep -q -w "$dir"; then
+            rm -rf $dir
+        fi
     done
 }
 do_rm_work_all () {
@@ -152,6 +165,10 @@ python inject_rm_work() {
     # itself or our own special do_rm_work_all.
     deps = set(bb.build.preceedtask('do_build', True, d))
     deps.difference_update(('do_build', 'do_rm_work_all'))
+
+    # deps can be empty if do_build doesn't exist, e.g. *-inital recipes
+    if not deps:
+        deps = ["do_populate_sysroot", "do_populate_lic"]
 
     if pn in excludes:
         d.delVarFlag('rm_work_rootfs', 'cleandirs')

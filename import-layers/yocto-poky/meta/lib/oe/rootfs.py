@@ -261,15 +261,22 @@ class Rootfs(object, metaclass=ABCMeta):
             # Remove components that we don't need if it's a read-only rootfs
             unneeded_pkgs = self.d.getVar("ROOTFS_RO_UNNEEDED").split()
             pkgs_installed = image_list_installed_packages(self.d)
-            # Make sure update-alternatives is last on the command line, so
-            # that it is removed last. This makes sure that its database is
-            # available while uninstalling packages, allowing alternative
-            # symlinks of packages to be uninstalled to be managed correctly.
+            # Make sure update-alternatives is removed last. This is
+            # because its database has to available while uninstalling
+            # other packages, allowing alternative symlinks of packages
+            # to be uninstalled or to be managed correctly otherwise.
             provider = self.d.getVar("VIRTUAL-RUNTIME_update-alternatives")
             pkgs_to_remove = sorted([pkg for pkg in pkgs_installed if pkg in unneeded_pkgs], key=lambda x: x == provider)
 
+            # update-alternatives provider is removed in its own remove()
+            # call because all package managers do not guarantee the packages
+            # are removed in the order they given in the list (which is
+            # passed to the command line). The sorting done earlier is
+            # utilized to implement the 2-stage removal.
+            if len(pkgs_to_remove) > 1:
+                self.pm.remove(pkgs_to_remove[:-1], False)
             if len(pkgs_to_remove) > 0:
-                self.pm.remove(pkgs_to_remove, False)
+                self.pm.remove([pkgs_to_remove[-1]], False)
 
         if delayed_postinsts:
             self._save_postinsts()
@@ -302,10 +309,11 @@ class Rootfs(object, metaclass=ABCMeta):
             bb.note("> Executing %s intercept ..." % script)
 
             try:
-                subprocess.check_output(script_full)
+                output = subprocess.check_output(script_full, stderr=subprocess.STDOUT)
+                if output: bb.note(output.decode("utf-8"))
             except subprocess.CalledProcessError as e:
-                bb.warn("The postinstall intercept hook '%s' failed (exit code: %d)! See log for details! (Output: %s)" %
-                        (script, e.returncode, e.output))
+                bb.warn("The postinstall intercept hook '%s' failed, details in log.do_rootfs" % script)
+                bb.note("Exit code %d. Output:\n%s" % (e.returncode, e.output.decode("utf-8")))
 
                 with open(script_full) as intercept:
                     registered_pkgs = None
@@ -524,7 +532,8 @@ class RpmRootfs(Rootfs):
             self.pm.save_rpmpostinst(pkg)
 
     def _cleanup(self):
-        pass
+        self.pm._invoke_dnf(["clean", "all"])
+
 
 class DpkgOpkgRootfs(Rootfs):
     def __init__(self, d, progress_reporter=None, logcatcher=None):

@@ -68,7 +68,7 @@ UBOOT_EXTLINUX_MENU_DESCRIPTION_linux ??= "${DISTRO_NAME}"
 
 UBOOT_EXTLINUX_CONFIG = "${B}/extlinux.conf"
 
-python create_extlinux_config() {
+python do_create_extlinux_config() {
     if d.getVar("UBOOT_EXTLINUX") != "1":
       return
 
@@ -149,4 +149,4 @@ python create_extlinux_config() {
         bb.fatal('Unable to open %s' % (cfile))
 }
 
-do_install[prefuncs] += "create_extlinux_config"
+addtask create_extlinux_config before do_install do_deploy after do_compile

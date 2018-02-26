@@ -1,5 +1,5 @@
 DESCRIPTION = "This package contains the Parser.pm module with friends."
-
+HOMEPAGE = "https://metacpan.org/release/HTML-Parser"
 SECTION = "libs"
 LICENSE = "Artistic-1.0 | GPL-1.0+"
 

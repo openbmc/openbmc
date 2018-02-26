@@ -1,4 +1,5 @@
 SUMMARY = "Perl module for using and building Perl SAX2 XML processors"
+HOMEPAGE = "http://search.cpan.org/dist/XML-SAX/"
 DESCRIPTION = "XML::SAX consists of several framework classes for using and \
 building Perl SAX2 XML parsers, filters, and drivers.  It is designed \ 
 around the need to be able to "plug in" different SAX parsers to an \

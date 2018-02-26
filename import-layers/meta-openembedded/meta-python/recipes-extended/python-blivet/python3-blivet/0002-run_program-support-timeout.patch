@@ -1,0 +1,102 @@
+From 86744d408b91acdcb086a03d7779fcda152f2ac3 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 8 May 2017 14:39:56 +0800
+Subject: [PATCH 02/13] run_program support timeout
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/util.py | 68 +++++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 39 insertions(+), 29 deletions(-)
+
+diff --git a/blivet/util.py b/blivet/util.py
+index 0cf5188..d4bd9bb 100644
+--- a/blivet/util.py
++++ b/blivet/util.py
+@@ -158,6 +158,30 @@ class Path(str):
+     def __hash__(self):
+         return self._path.__hash__()
+ 
++def timeout_command(argv, timeout, *args, **kwargs):
++    """call shell-command and either return its output or kill it
++    if it doesn't normally exit within timeout seconds and return None"""
++    import subprocess, datetime, os, time, signal
++    start = datetime.datetime.now()
++
++    try:
++        proc = subprocess.Popen(argv, *args, **kwargs)
++        while proc.poll() is None:
++            time.sleep(0.1)
++            now = datetime.datetime.now()
++            if (now - start).seconds> timeout:
++                os.kill(proc.pid, signal.SIGKILL)
++                os.waitpid(-1, os.WNOHANG)
++                program_log.debug("%d seconds timeout" % timeout)
++                return (-1, None)
++
++
++    except OSError as e:
++        program_log.error("Error running %s: %s", argv[0], e.strerror)
++        raise
++
++    program_log.debug("Return code: %d", proc.returncode)
++    return (proc.returncode, proc.stdout.read())
+ 
+ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=False, binary_output=False):
+     if env_prune is None:
+@@ -180,36 +204,22 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
+             stderr_dir = subprocess.STDOUT
+         else:
+             stderr_dir = subprocess.PIPE
+-        try:
+-            proc = subprocess.Popen(argv,
+-                                    stdin=stdin,
+-                                    stdout=subprocess.PIPE,
+-                                    stderr=stderr_dir,
+-                                    close_fds=True,
+-                                    preexec_fn=chroot, cwd=root, env=env)
+-
+-            out, err = proc.communicate()
+-            if not binary_output and six.PY3:
+-                out = out.decode("utf-8")
+-            if out:
+-                if not stderr_to_stdout:
+-                    program_log.info("stdout:")
+-                for line in out.splitlines():
+-                    program_log.info("%s", line)
+-
+-            if not stderr_to_stdout and err:
+-                program_log.info("stderr:")
+-                for line in err.splitlines():
+-                    program_log.info("%s", line)
+-
+-        except OSError as e:
+-            program_log.error("Error running %s: %s", argv[0], e.strerror)
+-            raise
+-
+-        program_log.debug("Return code: %d", proc.returncode)
+-
+-    return (proc.returncode, out)
+ 
++        res, out = timeout_command(argv, 10,
++                                   stdin=stdin,
++                                   stdout=subprocess.PIPE,
++                                   stderr=stderr_dir,
++                                   close_fds=True,
++                                   preexec_fn=chroot, cwd=root, env=env)
++        if not binary_output and six.PY3:
++            out = out.decode("utf-8")
++        if out:
++            if not stderr_to_stdout:
++                program_log.info("stdout:")
++            for line in out.splitlines():
++                program_log.info("%s", line)
++
++    return (res, out)
+ 
+ def run_program(*args, **kwargs):
+     return _run_program(*args, **kwargs)[0]
+-- 
+2.7.4
+

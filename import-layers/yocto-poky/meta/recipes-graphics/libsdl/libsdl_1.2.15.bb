@@ -17,6 +17,7 @@ PR = "r3"
 SRC_URI = "http://www.libsdl.org/release/SDL-${PV}.tar.gz \
            file://libsdl-1.2.15-xdata32.patch \
            file://pkgconfig.patch \
+           file://0001-build-Pass-tag-CC-explictly-when-using-libtool.patch \
           "
 
 UPSTREAM_CHECK_REGEX = "SDL-(?P<pver>\d+(\.\d+)+)\.tar"
@@ -52,6 +53,10 @@ PACKAGECONFIG[tslib] = "--enable-input-tslib, --disable-input-tslib, tslib"
 PACKAGECONFIG[directfb] = "--enable-video-directfb, --disable-video-directfb, directfb"
 PACKAGECONFIG[opengl] = "--enable-video-opengl, --disable-video-opengl, virtual/libgl libglu"
 PACKAGECONFIG[x11] = "--enable-video-x11 --disable-x11-shared, --disable-video-x11, virtual/libx11 libxext libxrandr libxrender"
+
+# The following two options should only enabled with mingw support
+PACKAGECONFIG[stdio-redirect] = "--enable-stdio-redirect,--disable-stdio-redirect"
+PACKAGECONFIG[directx] = "--enable-directx,--disable-directx"
 
 EXTRA_AUTORECONF += "--include=acinclude --exclude=autoheader"
 

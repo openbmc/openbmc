@@ -1,0 +1,45 @@
+From a0983d84185f04c4e40778fe951fde4439894882 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Jul 2017 07:37:03 -0700
+Subject: [PATCH 01/11] Remove assumptions about glibc being only libc
+ implementation on linux
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/file/fileIOPosix.c      | 2 +-
+ open-vm-tools/lib/include/vm_basic_defs.h | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+Index: open-vm-tools/lib/file/fileIOPosix.c
+===================================================================
+--- open-vm-tools.orig/lib/file/fileIOPosix.c
++++ open-vm-tools/lib/file/fileIOPosix.c
+@@ -205,7 +205,7 @@ static AlignedPool alignedPool;
+  * are not available in any header file.
+  */
+ 
+-#if defined(__linux__) && !defined(__ANDROID__)
++#if defined(__linux__) && defined(__GLIBC__)
+    #if defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS == 64)
+       /*
+        * We want preadv/pwritev. But due to FOB=64, the symbols are -64.
+Index: open-vm-tools/lib/include/vm_basic_defs.h
+===================================================================
+--- open-vm-tools.orig/lib/include/vm_basic_defs.h
++++ open-vm-tools/lib/include/vm_basic_defs.h
+@@ -571,6 +571,7 @@ typedef int pid_t;
+ #if defined __linux__ && !defined __KERNEL__ && !defined MODULE && \
+                          !defined VMM && !defined FROBOS && !defined __ANDROID__
+ #include <features.h>
++#if __GLIBC__
+ #if __GLIBC_PREREQ(2, 1) && !defined GLIBC_VERSION_21
+ #define GLIBC_VERSION_21
+ #endif
+@@ -590,6 +591,7 @@ typedef int pid_t;
+ #define GLIBC_VERSION_212
+ #endif
+ #endif
++#endif
+ 
+ /*
+  * Convenience definitions of unicode characters.

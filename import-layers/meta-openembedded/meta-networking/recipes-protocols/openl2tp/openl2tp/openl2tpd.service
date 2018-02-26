@@ -1,0 +1,17 @@
+[Unit]
+Description=The open L2TP implementation
+After=network.target remote-fs.target nss-lookup.target rpcbind.target
+Requires=rpcbind.service
+
+[Service]
+Type=forking
+PIDFile=@STATEDIR@/run/openl2tpd.pid
+EnvironmentFile=@SYSCONFDIR@/default/openl2tpd
+ExecStartPre=@BASE_BINDIR@/sh -c "@BASE_SBINDIR@/modprobe -sq l2tp_ppp || @BASE_SBINDIR@/modprobe -sq pppol2tp"
+ExecStart=@SBINDIR@/openl2tpd $OPENL2TPDARGS
+ExecStartPost=@BASE_BINDIR@/sh -c 'if [ -n "$OPENL2TPD_CONFIG_FILE" ]; then sleep 1; @BINDIR@/l2tpconfig config restore file=$OPENL2TPD_CONFIG_FILE; fi'
+ExecStopPost=@BASE_BINDIR@/sh -c "@BASE_SBINDIR@/modprobe -rsq l2tp_ppp || @BASE_SBINDIR@/modprobe -rsq pppol2tp"
+SuccessExitStatus=1
+
+[Install]
+WantedBy=multi-user.target

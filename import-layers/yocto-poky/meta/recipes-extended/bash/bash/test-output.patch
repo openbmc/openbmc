@@ -1,25 +1,42 @@
-Add FAIL/PASS output to test output.
+From 28eb06047ebd2deaa8c7cd2bf6655ef6a469dc14 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 15 Aug 2017 10:01:56 +0800
+Subject: [PATCH 1/2] Add FAIL/PASS output to test output.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 Signed-off-by: Björn Stenberg <bjst@enea.com>
 Upstream-Status: Pending
+
+Rebase to 4.4
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
-diff -uNr a/tests/run-all b/tests/run-all
---- a/tests/run-all	1999-10-08 17:07:46.000000000 +0200
-+++ b/tests/run-all	2012-10-27 21:04:18.663331887 +0200
-@@ -22,7 +22,15 @@
+ tests/run-all | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/tests/run-all b/tests/run-all
+index 2882fe0..e21d026 100644
+--- a/tests/run-all
++++ b/tests/run-all
+@@ -33,7 +33,16 @@ do
  	case $x in
  	$0|run-minimal|run-gprof)	;;
  	*.orig|*~) ;;
--	*)	echo $x ; sh $x ;;
-+    *)  echo $x
-+         output=`sh $x`
-+         if [ -n "$output" ]; then
-+             echo "$output"
-+             echo "FAIL: $x"
-+         else
-+             echo "PASS: $x"
-+         fi
-+         ;;
+-	*)	echo $x ; sh $x ; rm -f ${BASH_TSTOUT} ;;
++	*)	echo $x
++		output=`sh $x`
++		if [ -n "$output" ]; then
++			echo "$output"
++			echo "FAIL: $x"
++		else
++			echo "PASS: $x"
++		fi
++		rm -f ${BASH_TSTOUT}
++		;;
  	esac
  done
  
+-- 
+1.8.3.1
+

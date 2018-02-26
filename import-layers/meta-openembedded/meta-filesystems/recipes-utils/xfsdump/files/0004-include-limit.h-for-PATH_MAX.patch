@@ -1,0 +1,29 @@
+From 98c7d96f0f2c6eddf60aa4a1a08d7d4467645930 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jul 2017 23:28:10 -0700
+Subject: [PATCH 4/5] include limit.h for PATH_MAX
+
+fixed
+var.c:42:12: error: 'PATH_MAX' undeclared (first use in this function); did you mean 'RAND_MAX'?
+  char path[PATH_MAX];`
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dump/var.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dump/var.c b/dump/var.c
+index 645caab..8156d37 100644
+--- a/dump/var.c
++++ b/dump/var.c
+@@ -16,6 +16,7 @@
+  * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#include <limits.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <sys/stat.h>
+-- 
+2.13.2
+

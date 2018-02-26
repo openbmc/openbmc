@@ -1,0 +1,47 @@
+From 5a9e09dc5de833db11607530351cd87cecbfd17e Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Thu, 22 Jun 2017 06:32:30 +0000
+Subject: [PATCH 2/2] auto.diod.in: remove bashisms
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ scripts/auto.diod.in | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/auto.diod.in b/scripts/auto.diod.in
+index f63e004..4d5fc3a 100755
+--- a/scripts/auto.diod.in
++++ b/scripts/auto.diod.in
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ #
+ # auto.diod - executable automounter map for diod file systems
+ #
+@@ -41,15 +41,15 @@ dcatopts="${DIOD_TIMEOUT:+-t $DIOD_TIMEOUT}"
+ for server in $DIOD_SERVERS; do
+     $DIOD_DIODCAT -s $server $dcatopts exports | awk '{print $1}' |\
+     while read path; do
+-        if [ "$path" == "/" ]; then
+-            if [ "$key" == "ROOT" ]; then
++        if [ "$path" = "/" ]; then
++            if [ "$key" = "ROOT" ]; then
+                 echo "$prefix $server:$path"
+                 exit 0
+             fi
+-        elif [ "$key" == "$(echo $path|sed -e's/^\///' -e's/\//./g')" ] \
+-          || [ "$key" == "$(echo $path|sed -e's/^\///' -e's/\//_/g')" ] \
+-          || [ "$key" == "$(echo $path|sed -e's/^\///' -e's/\//-/g')" ] \
+-          || [ "$key" == "$(basename $path)" ]; then
++        elif [ "$key" = "$(echo $path|sed -e's/^\///' -e's/\//./g')" ] \
++          || [ "$key" = "$(echo $path|sed -e's/^\///' -e's/\//_/g')" ] \
++          || [ "$key" = "$(echo $path|sed -e's/^\///' -e's/\//-/g')" ] \
++          || [ "$key" = "$(basename $path)" ]; then
+             echo "$prefix $server:$path"
+             exit 0
+         fi
+-- 
+2.11.0
+

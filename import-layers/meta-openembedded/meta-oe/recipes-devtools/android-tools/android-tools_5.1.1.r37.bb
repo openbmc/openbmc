@@ -32,6 +32,8 @@ SRC_URI = " \
     file://define-shell-command.patch \
     file://implicit-declaration-function-strlcat-strlcopy.patch \
     file://fix-big-endian-build.patch \
+    file://0001-add-base64-implementation.patch \
+    file://0002-adb-Musl-fixes.patch \
     file://android-tools-adbd.service \
     file://.gitignore;subdir=git \
     file://adb.mk;subdir=${BPN} \
@@ -51,24 +53,6 @@ ARM_INSTRUCTION_SET_armv5 = "arm"
 inherit systemd
 
 SYSTEMD_SERVICE_${PN} = "android-tools-adbd.service"
-
-# Get rid of files uneeded to build Android tools
-do_unpack_extra() {
-    cd ${S}
-    rm -rf \
-      system/core/.git \
-      system/extras/.git \
-      hardware/libhardware/.git \
-      external/libselinux/.git \
-      build/.git
-    git init
-    git add .
-    git commit -m \
-      "Initial import - committed ${ANDROID_TAG}"
-    git clean -fdx
-}
-
-addtask unpack_extra after do_unpack before do_patch
 
 # Find libbsd headers during native builds
 CC_append_class-native = " -I${STAGING_INCDIR}"

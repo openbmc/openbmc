@@ -1,0 +1,31 @@
+From cdb0b3c898c6b6b6c8259d9ddb8b00163ac5e419 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Jul 2017 09:43:18 -0700
+Subject: [PATCH 04/11] Add -Wno-incompatible-pointer-types and
+ -Wno-error=address
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/dynxdr/Makefile.am | 2 +-
+ open-vm-tools/lib/file/Makefile.am   | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+Index: open-vm-tools/lib/dynxdr/Makefile.am
+===================================================================
+--- open-vm-tools.orig/lib/dynxdr/Makefile.am
++++ open-vm-tools/lib/dynxdr/Makefile.am
+@@ -20,4 +20,4 @@ noinst_LTLIBRARIES = libDynxdr.la
+ libDynxdr_la_SOURCES = 
+ libDynxdr_la_SOURCES += dynxdr.c
+ libDynxdr_la_SOURCES += xdrutil.c
+-
++libDynxdr_la_CPPFLAGS = -Wno-incompatible-pointer-types
+Index: open-vm-tools/lib/file/Makefile.am
+===================================================================
+--- open-vm-tools.orig/lib/file/Makefile.am
++++ open-vm-tools/lib/file/Makefile.am
+@@ -27,3 +27,4 @@ libFile_la_SOURCES += fileLockPrimitive.
+ libFile_la_SOURCES += fileLockPosix.c
+ libFile_la_SOURCES += fileTempPosix.c
+ libFile_la_SOURCES += fileTemp.c
++libFile_la_CPPFLAGS = -Wno-error=address

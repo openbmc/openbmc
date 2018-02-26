@@ -440,7 +440,7 @@
                     Build Checkout:</emphasis>
                     A final possibility for getting a copy of BitBake is that it
                     already comes with your checkout of a larger Bitbake-based build
-                    system, such as Poky or Yocto Project.
+                    system, such as Poky.
                     Rather than manually checking out individual layers and
                     gluing them together yourself, you can check
                     out an entire build system.

@@ -1,0 +1,41 @@
+From 97570ef271ea1fb7b5ca903eec88f68407b0ec76 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 16 Aug 2017 10:44:41 +0800
+Subject: [PATCH 2/4] libgcrypt: fix building error with '-O2' in sysroot path
+
+Upstream-Status: Pending
+
+Characters like '-O2' or '-Ofast' will be replaced by '-O1' when
+compiling cipher.
+If we are cross compiling libgcrypt and sysroot contains such
+characters, we would
+get compile errors because the sysroot path has been modified.
+
+Fix this by adding blank spaces before and after the original matching
+pattern in the
+sed command.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
+Rebase to 1.8.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ cipher/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cipher/Makefile.am b/cipher/Makefile.am
+index 95c4510..bd52ec7 100644
+--- a/cipher/Makefile.am
++++ b/cipher/Makefile.am
+@@ -116,7 +116,7 @@ gost-s-box: gost-s-box.c
+ 
+ 
+ if ENABLE_O_FLAG_MUNGING
+-o_flag_munging = sed -e 's/-O\([2-9s][2-9s]*\)/-O1/' -e 's/-Ofast/-O1/g'
++o_flag_munging = sed -e 's/ -O\([2-9s][2-9s]*\) / -O1 /' -e 's/ -Ofast / -O1 /g'
+ else
+ o_flag_munging = cat
+ endif
+-- 
+1.8.3.1
+

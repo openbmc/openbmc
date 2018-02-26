@@ -1,0 +1,40 @@
+From df1d56d6b6a6b15d0137619eb8a4b623de6c9633 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Jun 2017 22:28:59 -0700
+Subject: [PATCH 6/6] tools: Add missing includes and use realpath() instead of
+ canonicalize_file_name
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/ssieventmonitor.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tools/ssieventmonitor.cpp b/tools/ssieventmonitor.cpp
+index 0553386..f04b8f0 100644
+--- a/tools/ssieventmonitor.cpp
++++ b/tools/ssieventmonitor.cpp
+@@ -18,7 +18,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ #include <unistd.h>
+ #include <dirent.h>
+ #include <errno.h>
+-#include <sys/fcntl.h>
++#include <limits.h>
++#include <fcntl.h>
++#include <libgen.h>
+ #include <sys/select.h>
+ #include <sys/wait.h>
+ #include <sys/inotify.h>
+@@ -99,7 +101,7 @@ static int _exec_ssimsg(void)
+     int status;
+     switch (pid) {
+ 	case 0: {
+-	    cp = canonicalize_file_name("/proc/self/exe");
++	    cp = realpath("/proc/self/exe", NULL);
+ 	    if (cp) {
+ 		strcpy(buffer, cp);
+ 		free(cp);
+-- 
+2.13.1
+

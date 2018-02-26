@@ -1,0 +1,31 @@
+From cf25576428903168cd41b183fb1ca9c2b7e2666e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Aug 2017 07:28:10 -0700
+Subject: [PATCH 2/3] Mark first element of a string as null
+
+Fixes
+cli_lib.c:427:20: error: expression which evaluates to zero treated as a null pointer constant of type 'char *' [-Werror,-Wnon-literal-null-conversion]
+                                        values[arg] = '\0';
+                                                      ^~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cli/cli_lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cli/cli_lib.c b/cli/cli_lib.c
+index 41a0b06..e4d2fd5 100644
+--- a/cli/cli_lib.c
++++ b/cli/cli_lib.c
+@@ -424,7 +424,7 @@ int cli_find_args(int argc, char *argv[], struct cli_node *cmd, struct cli_node
+ 			if (arg_string[1] == '\0') {
+ 				/* no arg value - only allowed for string args */
+ 				if (node->arg->parser == cli_arg_parse_string) {
+-					values[arg] = '\0';
++					*values[arg] = '\0';
+ 				} else {
+ 					result = -EINVAL;
+ 					break;
+-- 
+2.14.1
+

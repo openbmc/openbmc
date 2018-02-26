@@ -1,0 +1,26 @@
+Index: postfix-3.2.2/postfix-install
+===================================================================
+--- postfix-3.2.2.orig/postfix-install
++++ postfix-3.2.2/postfix-install
+@@ -843,7 +843,7 @@ IFS="$BACKUP_IFS"
+ # the wrong place when Postfix is being upgraded.
+ 
+ case "$mail_version" in
+-"") mail_version="`$POSTCONF -dhx mail_version`" || exit 1
++"") mail_version="`$POSTCONF -c $CONFIG_DIRECTORY -dhx mail_version`" || exit 1
+ esac
+ 
+ # Undo MAIL_VERSION expansion at the end of a parameter value. If
+Index: postfix-3.2.2/Makefile.in
+===================================================================
+--- postfix-3.2.2.orig/Makefile.in
++++ postfix-3.2.2/Makefile.in
+@@ -20,7 +20,7 @@ META	= meta/main.cf.proto meta/master.cf
+ EXPAND	= sed -e "s;\$${LIB_PREFIX};$(LIB_PREFIX);" \
+ 	    -e "s;\$${LIB_SUFFIX};$(LIB_SUFFIX);"
+ SHLIB_DIR_OVERRIDE = \
+-	$${shlib_directory:-`$(SHLIB_ENV) bin/postconf -dhx shlib_directory`}
++	$${shlib_directory:-`$(SHLIB_ENV) $(POSTCONF) -dhx shlib_directory`}
+ 
+ default: update
+ 

@@ -1,0 +1,72 @@
+From 4058ce3186a99fd5f03350fc11a7fc8d38b6a381 Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Mon, 8 May 2017 10:53:18 +0300
+Subject: [PATCH] firewall-nftables: fix build with libnftnl-1.0.7
+
+We need these updates to accommodate the changes caused by the following
+commit in libnftnl-1.0.7
+
+commit 907a9f8e5a93f5bcd449643eb3916a656d634758
+Author: Pablo Neira Ayuso <pablo@netfilter.org>
+Date:   Tue Dec 20 13:47:11 2016 +0100
+
+src: get rid of aliases and compat
+
+This machinery was introduced to avoid sudden compilation breakage of
+old nftables releases. With the upcoming release of 0.7 (and 0.6 which
+is now 6 months old) this is not required anymore.
+
+Moreover, users gain nothing from older releases since they are
+half-boiled and buggy.
+
+So let's get rid of aliases now. Bump LIBVERSION and update map file.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ src/firewall-nftables.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/src/firewall-nftables.c b/src/firewall-nftables.c
+index 583d1c4..83b137b 100644
+--- a/src/firewall-nftables.c
++++ b/src/firewall-nftables.c
+@@ -387,9 +387,9 @@ static int add_cmp(struct nftnl_rule *rule, uint32_t sreg, uint32_t op,
+         if (!expr)
+                 return -ENOMEM;
+ 
+-        nftnl_expr_set_u32(expr, NFT_EXPR_CMP_SREG, sreg);
+-        nftnl_expr_set_u32(expr, NFT_EXPR_CMP_OP, op);
+-        nftnl_expr_set(expr, NFT_EXPR_CMP_DATA, data, data_len);
++        nftnl_expr_set_u32(expr, NFTNL_EXPR_CMP_SREG, sreg);
++        nftnl_expr_set_u32(expr, NFTNL_EXPR_CMP_OP, op);
++        nftnl_expr_set(expr, NFTNL_EXPR_CMP_DATA, data, data_len);
+ 
+         nftnl_rule_add_expr(rule, expr);
+ 
+@@ -575,8 +575,8 @@ static int build_rule_nat(const char *address, unsigned char prefixlen,
+ 	expr = nftnl_expr_alloc("meta");
+ 	if (!expr)
+ 		goto err;
+-	nftnl_expr_set_u32(expr, NFT_EXPR_META_KEY, NFT_META_OIFNAME);
+-	nftnl_expr_set_u32(expr, NFT_EXPR_META_DREG, NFT_REG_1);
++	nftnl_expr_set_u32(expr, NFTNL_EXPR_META_KEY, NFT_META_OIFNAME);
++	nftnl_expr_set_u32(expr, NFTNL_EXPR_META_DREG, NFT_REG_1);
+ 	nftnl_rule_add_expr(rule, expr);
+ 	err = add_cmp(rule, NFT_REG_1, NFT_CMP_EQ, interface,
+ 			strlen(interface) + 1);
+@@ -677,8 +677,8 @@ static int build_rule_snat(int index, const char *address,
+ 	expr = nftnl_expr_alloc("meta");
+ 	if (!expr)
+ 		goto err;
+-	nftnl_expr_set_u32(expr, NFT_EXPR_META_KEY, NFT_META_OIF);
+-	nftnl_expr_set_u32(expr, NFT_EXPR_META_DREG, NFT_REG_1);
++	nftnl_expr_set_u32(expr, NFTNL_EXPR_META_KEY, NFT_META_OIF);
++	nftnl_expr_set_u32(expr, NFTNL_EXPR_META_DREG, NFT_REG_1);
+ 	nftnl_rule_add_expr(rule, expr);
+ 	err = add_cmp(rule, NFT_REG_1, NFT_CMP_EQ, &index, sizeof(index));
+ 	if (err < 0)
+-- 
+2.4.0
+

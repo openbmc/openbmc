@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:26:00 +0200
 Subject: [PATCH 2/2] Set library installation path correctly
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libcomps/pull/32]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  libcomps/src/CMakeLists.txt | 2 +-

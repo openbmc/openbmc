@@ -7,6 +7,7 @@ This is needed to satisfy Debian policy regarding group-writable
 site directories.
 
 Patch-Name: fixes/respect_umask.diff
+Upstream-Status: Pending
 ---
  cpan/ExtUtils-Install/lib/ExtUtils/Install.pm   | 18 +++++++++---------
  cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm | 18 +++++++++---------

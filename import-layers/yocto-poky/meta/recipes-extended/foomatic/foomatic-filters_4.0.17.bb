@@ -1,4 +1,5 @@
 SUMMARY = "OpenPrinting printer support - filters"
+HOMEPAGE = "https://wiki.linuxfoundation.org/openprinting/start"
 DESCRIPTION = "Foomatic is a printer database designed to make it easier to set up \
 common printers for use with UNIX-like operating systems.\
 It provides the "glue" between a print spooler (like CUPS or lpr) and \

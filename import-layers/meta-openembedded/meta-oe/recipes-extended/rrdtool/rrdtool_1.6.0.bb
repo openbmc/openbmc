@@ -22,7 +22,7 @@ BBCLASSEXTEND = "native"
 SYSTEMD_PACKAGES = "rrdcached"
 SYSTEMD_SERVICE_rrdcached = "rrdcached.socket rrdcached.service"
 
-EXTRA_AUTORECONF = "-I m4"
+EXTRA_AUTORECONF = "-I m4 --exclude=autopoint"
 
 PACKAGECONFIG ??= "python perl ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
@@ -49,6 +49,7 @@ EXTRA_OECONF = " \
     --disable-lua \
     --disable-tcl \
     --disable-rpath \
+    --enable-nls=${USE_NLS} \
 "
 
 export STAGING_LIBDIR

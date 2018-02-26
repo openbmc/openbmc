@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRC_URI_append_raspberrypi3 = " \
+BCM_BT_SOURCES =  " \
     file://BCM43430A1.hcd \
     file://0001-bcm43xx-Add-bcm43xx-3wire-variant.patch \
     file://0002-bcm43xx-The-UART-speed-must-be-reset-after-the-firmw.patch \
@@ -9,7 +9,7 @@ SRC_URI_append_raspberrypi3 = " \
     file://brcm43438.service \
     "
 
-do_install_append_raspberrypi3() {
+enable_bcm_bluetooth() {
     install -d ${D}/lib/firmware/brcm/
     install -m 0644 ${WORKDIR}/BCM43430A1.hcd ${D}/lib/firmware/brcm/BCM43430A1.hcd
 
@@ -19,8 +19,30 @@ do_install_append_raspberrypi3() {
     fi
 }
 
-FILES_${PN}_append_raspberrypi3 = " \
+BCM_BT_FIRMWARE =  " \
     /lib/firmware/brcm/BCM43430A1.hcd \
     "
 
-SYSTEMD_SERVICE_${PN}_append_raspberrypi3 = " brcm43438.service"
+BCM_BT_SERVICE =  " brcm43438.service"
+
+# for raspberrypi3
+SRC_URI_append_raspberrypi3 = " ${BCM_BT_SOURCES}"
+
+do_install_append_raspberrypi3() {
+    enable_bcm_bluetooth
+}
+
+FILES_${PN}_append_raspberrypi3 = " ${BCM_BT_FIRMWARE}"
+
+SYSTEMD_SERVICE_${PN}_append_raspberrypi3 = " ${BCM_BT_SERVICE}"
+
+# for raspberrypi0-wifi
+SRC_URI_append_raspberrypi0-wifi = " ${BCM_BT_SOURCES}"
+
+do_install_append_raspberrypi0-wifi() {
+    enable_bcm_bluetooth
+}
+
+FILES_${PN}_append_raspberrypi0-wifi = " ${BCM_BT_FIRMWARE}"
+
+SYSTEMD_SERVICE_${PN}_append_raspberrypi0-wifi = " ${BCM_BT_SERVICE}"

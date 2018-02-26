@@ -91,9 +91,10 @@ class Npm(FetchMethod):
         ud.prefixdir = prefixdir
 
         ud.write_tarballs = ((d.getVar("BB_GENERATE_MIRROR_TARBALLS") or "0") != "0")
-        ud.mirrortarball = 'npm_%s-%s.tar.xz' % (ud.pkgname, ud.version)
-        ud.mirrortarball = ud.mirrortarball.replace('/', '-')
-        ud.fullmirror = os.path.join(d.getVar("DL_DIR"), ud.mirrortarball)
+        mirrortarball = 'npm_%s-%s.tar.xz' % (ud.pkgname, ud.version)
+        mirrortarball = mirrortarball.replace('/', '-')
+        ud.fullmirror = os.path.join(d.getVar("DL_DIR"), mirrortarball)
+        ud.mirrortarballs = [mirrortarball]
 
     def need_update(self, ud, d):
         if os.path.exists(ud.localpath):
@@ -262,26 +263,27 @@ class Npm(FetchMethod):
             runfetchcmd("tar -xJf %s" % (ud.fullmirror), d, workdir=dest)
             return
 
-        shwrf = d.getVar('NPM_SHRINKWRAP')
-        logger.debug(2, "NPM shrinkwrap file is %s" % shwrf)
-        if shwrf:
-            try:
-                with open(shwrf) as datafile:
-                    shrinkobj = json.load(datafile)
-            except Exception as e:
-                raise FetchError('Error loading NPM_SHRINKWRAP file "%s" for %s: %s' % (shwrf, ud.pkgname, str(e)))
-        elif not ud.ignore_checksums:
-            logger.warning('Missing shrinkwrap file in NPM_SHRINKWRAP for %s, this will lead to unreliable builds!' % ud.pkgname)
-        lckdf = d.getVar('NPM_LOCKDOWN')
-        logger.debug(2, "NPM lockdown file is %s" % lckdf)
-        if lckdf:
-            try:
-                with open(lckdf) as datafile:
-                    lockdown = json.load(datafile)
-            except Exception as e:
-                raise FetchError('Error loading NPM_LOCKDOWN file "%s" for %s: %s' % (lckdf, ud.pkgname, str(e)))
-        elif not ud.ignore_checksums:
-            logger.warning('Missing lockdown file in NPM_LOCKDOWN for %s, this will lead to unreproducible builds!' % ud.pkgname)
+        if ud.parm.get("noverify", None) != '1':
+            shwrf = d.getVar('NPM_SHRINKWRAP')
+            logger.debug(2, "NPM shrinkwrap file is %s" % shwrf)
+            if shwrf:
+                try:
+                    with open(shwrf) as datafile:
+                        shrinkobj = json.load(datafile)
+                except Exception as e:
+                    raise FetchError('Error loading NPM_SHRINKWRAP file "%s" for %s: %s' % (shwrf, ud.pkgname, str(e)))
+            elif not ud.ignore_checksums:
+                logger.warning('Missing shrinkwrap file in NPM_SHRINKWRAP for %s, this will lead to unreliable builds!' % ud.pkgname)
+            lckdf = d.getVar('NPM_LOCKDOWN')
+            logger.debug(2, "NPM lockdown file is %s" % lckdf)
+            if lckdf:
+                try:
+                    with open(lckdf) as datafile:
+                        lockdown = json.load(datafile)
+                except Exception as e:
+                    raise FetchError('Error loading NPM_LOCKDOWN file "%s" for %s: %s' % (lckdf, ud.pkgname, str(e)))
+            elif not ud.ignore_checksums:
+                logger.warning('Missing lockdown file in NPM_LOCKDOWN for %s, this will lead to unreproducible builds!' % ud.pkgname)
 
         if ('name' not in shrinkobj):
             self._getdependencies(ud.pkgname, jsondepobj, ud.version, d, ud)

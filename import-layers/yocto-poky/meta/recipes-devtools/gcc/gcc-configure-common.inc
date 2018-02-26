@@ -22,6 +22,8 @@ EXTRA_OECONF_INITIAL ?= ""
 GCCMULTILIB ?= "--disable-multilib"
 GCCTHREADS ?= "posix"
 
+GCCPIE ??= ""
+
 EXTRA_OECONF = "\
     ${@['--enable-clocale=generic', ''][d.getVar('USE_NLS') != 'no']} \
     --with-gnu-ld \
@@ -29,6 +31,7 @@ EXTRA_OECONF = "\
     --enable-languages=${LANGUAGES} \
     --enable-threads=${GCCTHREADS} \
     ${GCCMULTILIB} \
+    ${GCCPIE} \
     --enable-c99 \
     --enable-long-long \
     --enable-symvers=gnu \
@@ -53,9 +56,7 @@ export gcc_cv_collect2_libs = 'none required'
 # in the config.log files (which might not get generated until do_compile
 # hence being missed by the insane do_configure check).
 
-# Build uclibc compilers without cxa_atexit support
 EXTRA_OECONF_append_linux = " --enable-__cxa_atexit"
-EXTRA_OECONF_append_libc-uclibc = " --enable-__cxa_atexit"
 
 EXTRA_OECONF_append_mips64 = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
 EXTRA_OECONF_append_mips64el = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
@@ -65,14 +66,6 @@ EXTRA_OECONF_append_mipsisa32r6el = " --with-abi=32 --with-arch=mips32r6"
 EXTRA_OECONF_append_mipsisa32r6 = " --with-abi=32 --with-arch=mips32r6"
 EXTRA_OECONF_append_mipsisa64r6el = " --with-abi=64 --with-arch-64=mips64r6"
 EXTRA_OECONF_append_mipsisa64r6 = " --with-abi=64 --with-arch-64=mips64r6"
-
-# ARMv6+ adds atomic instructions that affect the ABI in libraries built
-# with TUNE_CCARGS in gcc-runtime.  Make the compiler default to a
-# compatible architecture.  armv6 and armv7a cover the minimum tune
-# features used in OE.
-EXTRA_OECONF_append_armv6 = " --with-arch=armv6"
-EXTRA_OECONF_append_armv7a = " --with-arch=armv7-a"
-EXTRA_OECONF_append_armv7ve = " --with-arch=armv7-a"
 
 EXTRA_OECONF_GCC_FLOAT ??= ""
 CPPFLAGS = ""

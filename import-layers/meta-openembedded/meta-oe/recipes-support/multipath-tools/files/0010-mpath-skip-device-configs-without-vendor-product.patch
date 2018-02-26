@@ -1,0 +1,37 @@
+From f88d60a93e98d86ae294f2317a122c4efde276f0 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 31 May 2017 17:58:59 -0500
+Subject: [PATCH 10/14] mpath: skip device configs without vendor/product
+
+Right now if multipath.conf includes a device configuration without a
+vendor or product string, it will automatically be applied to all
+devices, skipping all other configs entirely.  This is clearly wrong.
+This patch makes sure that user added configs include vendor and
+product strings
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/config.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/libmultipath/config.c b/libmultipath/config.c
+index c485748..bdde113 100644
+--- a/libmultipath/config.c
++++ b/libmultipath/config.c
+@@ -452,6 +452,13 @@ restart:
+ 			break;
+ 		j = n;
+ 		vector_foreach_slot_after(hw, hwe2, j) {
++			/* drop invalid device configs */
++			if (!hwe2->vendor || !hwe2->product) {
++				condlog(0, "device config missing vendor or product parameter");
++				vector_del_slot(hw, j--);
++				free_hwe(hwe2);
++				continue;
++			}
+ 			if (hwe_regmatch(hwe1, hwe2))
+ 				continue;
+ 			/* dup */
+-- 
+2.8.1
+

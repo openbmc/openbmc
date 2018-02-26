@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2011 O.S. Systems Software LTDA.
+# Copyright (C) 2011, 2017 O.S. Systems Software LTDA.
 # Licensed on MIT
 
 mdev_enabled() {
@@ -25,6 +25,6 @@ mdev_run() {
 
 	# load modules for devices
 	find /sys -name modalias | while read m; do
-		load_kernel_module $(cat $m)
+		load_kernel_module $(cat "$m")
 	done
 }

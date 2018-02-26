@@ -1,0 +1,31 @@
+From 3bb73e5e5649b455e15d5ca3a7ad1a90c4960972 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 10 Jun 2017 11:54:36 -0700
+Subject: [PATCH] arm64: Disable PIC
+
+Fix
+| cc1: sorry, unimplemented: code model 'large' with -fPIC
+| make: *** [Makefile:118: purgatory/arch/arm64/entry.o] Error 1
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ purgatory/arch/arm64/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/purgatory/arch/arm64/Makefile b/purgatory/arch/arm64/Makefile
+index 636abea..80068ca 100644
+--- a/purgatory/arch/arm64/Makefile
++++ b/purgatory/arch/arm64/Makefile
+@@ -1,6 +1,7 @@
+ 
+ arm64_PURGATORY_EXTRA_CFLAGS = \
+ 	-mcmodel=large \
++	-fno-PIC \
+ 	-fno-stack-protector \
+ 	-fno-asynchronous-unwind-tables \
+ 	-Wundef \
+-- 
+2.13.1
+

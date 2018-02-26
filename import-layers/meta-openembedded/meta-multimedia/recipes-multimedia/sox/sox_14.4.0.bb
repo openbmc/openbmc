@@ -6,6 +6,9 @@ SECTION = "audio"
 
 DEPENDS = "libpng ffmpeg libsndfile1 libvorbis"
 
+# While this item does not require it, it depends on ffmpeg which does
+LICENSE_FLAGS = "commercial"
+
 PR = "r2"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'alsa pulseaudio', d)} \

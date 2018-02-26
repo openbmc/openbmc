@@ -1,5 +1,5 @@
 require python.inc
-DEPENDS = "python-native libffi bzip2 db gdbm openssl readline sqlite3 zlib"
+DEPENDS = "python-native libffi bzip2 gdbm openssl readline sqlite3 zlib"
 PR = "${INC_PR}"
 
 DISTRO_SRC_URI ?= "file://sitecustomize.py"
@@ -27,6 +27,8 @@ SRC_URI += "\
   file://use_sysroot_ncurses_instead_of_host.patch \
   file://add-CROSSPYTHONPATH-for-PYTHON_FOR_BUILD.patch \
   file://Don-t-use-getentropy-on-Linux.patch \
+  file://pass-missing-libraries-to-Extension-for-mul.patch \
+  file://support_SOURCE_DATE_EPOCH_in_py_compile_2.7.patch \
 "
 
 S = "${WORKDIR}/Python-${PV}"
@@ -36,6 +38,9 @@ inherit autotools multilib_header python-dir pythonnative
 CONFIGUREOPTS += " --with-system-ffi "
 
 EXTRA_OECONF += "ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no"
+
+PACKAGECONFIG ??= "bdb"
+PACKAGECONFIG[bdb] = ",,db"
 
 do_configure_append() {
 	rm -f ${S}/Makefile.orig
@@ -116,6 +121,10 @@ do_install() {
 	fi
 
 	oe_multilib_header python${PYTHON_MAJMIN}/pyconfig.h
+
+    if [ -z "${@bb.utils.filter('PACKAGECONFIG', 'bdb', d)}" ]; then
+        rm -rf ${D}/${libdir}/python${PYTHON_MAJMIN}/bsddb
+    fi
 }
 
 do_install_append_class-nativesdk () {
@@ -152,7 +161,9 @@ FILES_lib${BPN}2 = "${libdir}/libpython*.so.*"
 PACKAGES += "${PN}-misc"
 FILES_${PN}-misc = "${libdir}/python${PYTHON_MAJMIN}"
 RDEPENDS_${PN}-modules += "${PN}-misc"
-RDEPENDS_${PN}-ptest = "${PN}-modules"
+
+# ptest
+RDEPENDS_${PN}-ptest = "${PN}-modules ${PN}-tests"
 #inherit ptest after "require python-${PYTHON_MAJMIN}-manifest.inc" so PACKAGES doesn't get overwritten
 inherit ptest
 
@@ -162,10 +173,23 @@ do_install_ptest() {
 	sed -e s:LIBDIR/python/ptest:${PTEST_PATH}:g \
 	 -e s:LIBDIR:${libdir}:g \
 	 -i ${D}${PTEST_PATH}/run-ptest
+
+	#Remove build host references
+	sed -i \
+		-e 's:--with-libtool-sysroot=${STAGING_DIR_TARGET}'::g \
+	    -e 's:--sysroot=${STAGING_DIR_TARGET}::g' \
+	    -e 's|${DEBUG_PREFIX_MAP}||g' \
+	    -e 's:${HOSTTOOLS_DIR}/::g' \
+	    -e 's:${RECIPE_SYSROOT}::g' \
+	    -e 's:${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}::g' \
+	${D}/${PTEST_PATH}/Makefile
 }
 
 # catch manpage
 PACKAGES += "${PN}-man"
 FILES_${PN}-man = "${datadir}/man"
+
+# Nasty but if bdb isn't enabled the package won't be generated
+RDEPENDS_${PN}-modules_remove = "${@bb.utils.contains('PACKAGECONFIG', 'bdb', '', '${PN}-bsddb', d)}"
 
 BBCLASSEXTEND = "nativesdk"

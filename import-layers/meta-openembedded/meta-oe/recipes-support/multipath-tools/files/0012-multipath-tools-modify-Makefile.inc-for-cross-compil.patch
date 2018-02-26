@@ -1,0 +1,58 @@
+From 6864ba28dec61609662ce5dc8bc7ed1925abb546 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 5 Jul 2017 02:56:13 -0400
+Subject: [PATCH 12/14] multipath-tools: modify Makefile.inc for
+ cross-compilation
+
+Do not look for systemd info on the host, and allow us to pass in CFLAGS
+using the OPTFLAGS variable.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+Update for version 0.5.0-144-g770e6d0
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Update for version 0.7.1
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.inc | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index e084fd1..c7f45fa 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -35,12 +35,6 @@ ifndef RUN
+ 	endif
+ endif
+ 
+-ifndef SYSTEMD
+-	ifeq ($(shell systemctl --version > /dev/null 2>&1 && echo 1), 1)
+-		SYSTEMD = $(shell systemctl --version 2> /dev/null |  sed -n 's/systemd \([0-9]*\)/\1/p')
+-	endif
+-endif
+-
+ ifndef SYSTEMDPATH
+ 	SYSTEMDPATH=usr/lib
+ endif
+@@ -82,11 +76,13 @@ TEST_CC_OPTION = $(shell \
+ 
+ STACKPROT := $(call TEST_CC_OPTION,-fstack-protector-strong,-fstack-protector)
+ 
++ifndef OPTFLAGS
+ OPTFLAGS	= -O2 -g -pipe -Wall -Wextra -Wformat=2 -Werror=implicit-int \
+ 		  -Werror=implicit-function-declaration -Werror=format-security \
+ 		  -Wno-sign-compare -Wno-unused-parameter -Wno-clobbered \
+ 		  -Wp,-D_FORTIFY_SOURCE=2 $(STACKPROT) \
+ 		  --param=ssp-buffer-size=4
++endif
+ 
+ CFLAGS		= $(OPTFLAGS) -DLIB_STRING=\"${LIB}\" -DRUN_DIR=\"${RUN}\"
+ BIN_CFLAGS	= -fPIE -DPIE
+-- 
+2.8.1
+

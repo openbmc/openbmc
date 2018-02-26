@@ -18,44 +18,18 @@ from oeqa.utils.dump import TargetDumper
 from oeqa.controllers.testtargetloader import TestTargetLoader
 from abc import ABCMeta, abstractmethod
 
-logger = logging.getLogger('BitBake.QemuRunner')
-
-def get_target_controller(d):
-    testtarget = d.getVar("TEST_TARGET")
-    # old, simple names
-    if testtarget == "qemu":
-        return QemuTarget(d)
-    elif testtarget == "simpleremote":
-        return SimpleRemoteTarget(d)
-    else:
-        # use the class name
-        try:
-            # is it a core class defined here?
-            controller = getattr(sys.modules[__name__], testtarget)
-        except AttributeError:
-            # nope, perhaps a layer defined one
-            try:
-                bbpath = d.getVar("BBPATH").split(':')
-                testtargetloader = TestTargetLoader()
-                controller = testtargetloader.get_controller_module(testtarget, bbpath)
-            except ImportError as e:
-                bb.fatal("Failed to import {0} from available controller modules:\n{1}".format(testtarget,traceback.format_exc()))
-            except AttributeError as e:
-                bb.fatal("Invalid TEST_TARGET - " + str(e))
-        return controller(d)
-
-
 class BaseTarget(object, metaclass=ABCMeta):
 
     supported_image_fstypes = []
 
-    def __init__(self, d):
+    def __init__(self, d, logger):
         self.connection = None
         self.ip = None
         self.server_ip = None
         self.datetime = d.getVar('DATETIME')
         self.testdir = d.getVar("TEST_LOG_DIR")
         self.pn = d.getVar("PN")
+        self.logger = logger
 
     @abstractmethod
     def deploy(self):
@@ -65,7 +39,7 @@ class BaseTarget(object, metaclass=ABCMeta):
         if os.path.islink(sshloglink):
             os.unlink(sshloglink)
         os.symlink(self.sshlog, sshloglink)
-        logger.info("SSH log file: %s" %  self.sshlog)
+        self.logger.info("SSH log file: %s" %  self.sshlog)
 
     @abstractmethod
     def start(self, params=None, ssh=True, extra_bootparams=None):
@@ -115,9 +89,9 @@ class QemuTarget(BaseTarget):
 
     supported_image_fstypes = ['ext3', 'ext4', 'cpio.gz', 'wic']
 
-    def __init__(self, d, image_fstype=None):
+    def __init__(self, d, logger, image_fstype=None):
 
-        super(QemuTarget, self).__init__(d)
+        super(QemuTarget, self).__init__(d, logger)
 
         self.rootfs = ''
         self.kernel = ''
@@ -145,7 +119,7 @@ class QemuTarget(BaseTarget):
         self.qemurunnerlog = os.path.join(self.testdir, 'qemurunner_log.%s' % self.datetime)
         loggerhandler = logging.FileHandler(self.qemurunnerlog)
         loggerhandler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
-        logger.addHandler(loggerhandler)
+        self.logger.addHandler(loggerhandler)
         oe.path.symlink(os.path.basename(self.qemurunnerlog), os.path.join(self.testdir, 'qemurunner_log'), force=True)
 
         if d.getVar("DISTRO") == "poky-tiny":
@@ -156,7 +130,8 @@ class QemuTarget(BaseTarget):
                             display = d.getVar("BB_ORIGENV", False).getVar("DISPLAY"),
                             logfile = self.qemulog,
                             kernel = self.kernel,
-                            boottime = int(d.getVar("TEST_QEMUBOOT_TIMEOUT")))
+                            boottime = int(d.getVar("TEST_QEMUBOOT_TIMEOUT")),
+                            logger = logger)
         else:
             self.runner = QemuRunner(machine=d.getVar("MACHINE"),
                             rootfs=self.rootfs,
@@ -167,7 +142,8 @@ class QemuTarget(BaseTarget):
                             boottime = int(d.getVar("TEST_QEMUBOOT_TIMEOUT")),
                             use_kvm = use_kvm,
                             dump_dir = dump_dir,
-                            dump_host_cmds = d.getVar("testimage_dump_host"))
+                            dump_host_cmds = d.getVar("testimage_dump_host"),
+                            logger = logger)
 
         self.target_dumper = TargetDumper(dump_target_cmds, dump_dir, self.runner)
 
@@ -179,8 +155,8 @@ class QemuTarget(BaseTarget):
             os.unlink(qemuloglink)
         os.symlink(self.qemulog, qemuloglink)
 
-        logger.info("rootfs file: %s" %  self.rootfs)
-        logger.info("Qemu log file: %s" % self.qemulog)
+        self.logger.info("rootfs file: %s" %  self.rootfs)
+        self.logger.info("Qemu log file: %s" % self.qemulog)
         super(QemuTarget, self).deploy()
 
     def start(self, params=None, ssh=True, extra_bootparams='', runqemuparams='', launch_cmd='', discard_writes=True):
@@ -232,14 +208,14 @@ class SimpleRemoteTarget(BaseTarget):
             self.port = addr.split(":")[1]
         except IndexError:
             self.port = None
-        logger.info("Target IP: %s" % self.ip)
+        self.logger.info("Target IP: %s" % self.ip)
         self.server_ip = d.getVar("TEST_SERVER_IP")
         if not self.server_ip:
             try:
                 self.server_ip = subprocess.check_output(['ip', 'route', 'get', self.ip ]).split("\n")[0].split()[-1]
             except Exception as e:
                 bb.fatal("Failed to determine the host IP address (alternatively you can set TEST_SERVER_IP with the IP address of this machine): %s" % e)
-        logger.info("Server IP: %s" % self.server_ip)
+        self.logger.info("Server IP: %s" % self.server_ip)
 
     def deploy(self):
         super(SimpleRemoteTarget, self).deploy()

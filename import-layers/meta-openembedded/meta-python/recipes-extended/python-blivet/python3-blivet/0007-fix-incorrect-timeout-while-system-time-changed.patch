@@ -1,0 +1,48 @@
+From 78ee2b9090f9400ccc4f730e674f5ae972740ccb Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 26 Aug 2016 02:02:49 -0400
+Subject: [PATCH 07/13] fix incorrect timeout while system time changed
+
+While system time changed by NTP, invoking timeout_command
+breaks with incorrect timeout.
+--------
+|05:40:55,872 INFO program: Running... mount -t ext2 -o
+  defaults,ro /dev/sda2 /mnt/sysimage
+|01:40:55,086 DEBUG program: 10 seconds timeout
+--------
+
+Use numbert count to replace current time count could workaround
+the issue.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/util.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/blivet/util.py b/blivet/util.py
+index 44a2da5..b3c45ac 100644
+--- a/blivet/util.py
++++ b/blivet/util.py
+@@ -163,14 +163,14 @@ def timeout_command(argv, timeout, *args, **kwargs):
+     """call shell-command and either return its output or kill it
+     if it doesn't normally exit within timeout seconds and return None"""
+     import subprocess, datetime, os, time, signal
+-    start = datetime.datetime.now()
++    count = 0
+ 
+     try:
+         proc = subprocess.Popen(argv, *args, **kwargs)
+         while proc.poll() is None:
+             time.sleep(0.1)
+-            now = datetime.datetime.now()
+-            if timeout != -1 and (now - start).seconds> timeout:
++            count += 1
++            if timeout != -1 and count > timeout*10:
+                 os.kill(proc.pid, signal.SIGKILL)
+                 os.waitpid(-1, os.WNOHANG)
+                 program_log.debug("%d seconds timeout" % timeout)
+-- 
+2.7.4
+

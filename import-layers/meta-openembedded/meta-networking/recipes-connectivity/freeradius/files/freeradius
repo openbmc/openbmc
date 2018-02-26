@@ -1,0 +1,110 @@
+#!/bin/sh
+# Start/stop the FreeRADIUS daemon.
+
+### BEGIN INIT INFO
+# Provides:          freeradius
+# Required-Start:    $remote_fs $network $syslog
+# Should-Start:      $time mysql slapd postgresql samba krb5-kdc
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Radius Daemon
+# Description:       Extensible, configurable radius daemon
+### END INIT INFO
+
+set -e
+
+# Source function library.
+. /etc/init.d/functions
+
+if [ -f /lib/lsb/init-functions ]; then
+  . /lib/lsb/init-functions
+fi
+
+PROG="radiusd"
+PROGRAM="/usr/sbin/radiusd"
+PIDFILE="/var/run/radiusd/radiusd.pid"
+DESCR="FreeRADIUS daemon"
+
+if [ -r /etc/default/$PROG ]; then
+  . /etc/default/$PROG
+fi
+
+test -f $PROGRAM || exit 0
+
+check_certs() {
+	if [ ! -f /etc/raddb/certs/server.pem ]; then
+		echo -n "Creating certificates for freeradius..."
+		if sudo -u radiusd /etc/raddb/certs/bootstrap 1> /dev/null 2> /dev/null; then
+			echo "done"
+		else
+			echo "failed!"
+		fi
+	fi
+
+}
+
+# /var/run may be a tmpfs
+if [ ! -d /var/run/radiusd ]; then
+  mkdir -p /var/run/radiusd
+  chown radiusd:radiusd /var/run/radiusd
+fi
+
+if [ ! -d /var/log/radius ]; then
+  mkdir -p /var/log/radius
+  touch /var/log/radius/radius.log
+  chown radiusd:radiusd /var/run/radius
+fi
+
+if [ ! -f ${PIDFILE} ]; then
+  touch ${PIDFILE}
+  chown radiusd:radiusd ${PIDFILE}
+fi
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+ret=0
+
+case "$1" in
+        start)
+		check_certs
+                echo -n "Starting $DESCR" "$PROG"
+                start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $PROGRAM -- $FREERADIUS_OPTIONS || ret=$?
+                [ "$ret" == 0 ] && echo " Success" || echo " Failed"
+                exit $ret
+                ;;
+        stop)
+                echo -n "Stopping $DESCR" "$PROG"
+                if [ -f "$PIDFILE" ] ; then
+                  start-stop-daemon --stop --retry=TERM/30/KILL/5 --quiet --pidfile $PIDFILE || ret=$?
+                else
+                  echo -n "$PIDFILE not found"
+                  ret=1
+                fi
+                [ "$ret" == 0 ] && echo " Success" || echo " Failed"
+                ;;
+        status)
+                status $PROGRAM;
+                exit $?
+                ;;
+        restart)
+                $0 stop
+                $0 start
+                ;;
+        reload|force-reload)
+                echo -n "Reloading $DESCR" "$PROG"
+                if [ -f "$PIDFILE" ] ; then
+                  start-stop-daemon --stop --signal HUP --quiet --pidfile $PIDFILE || ret=$?
+                else
+                  echo -n "$PIDFILE not found"
+                  ret=1
+                fi
+                [ "$ret" == 0 ] && echo " Success" || echo " Failed"
+                ;;
+        *)
+                echo "Usage: $0 start|stop|status|restart|force-reload|reload"
+                exit 1
+                ;;
+esac
+
+exit 0

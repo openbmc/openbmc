@@ -1,0 +1,202 @@
+From 2911eaabab92ec2cdea2b173c3429db4a52bee2f Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Wed, 20 Sep 2017 23:28:52 -0400
+Subject: [PATCH] Revert "implement add/set function for hooks items"
+
+This reverts commit df3a46feb971386f922c7c2c2822b88301f87cb0.
+---
+ cmd/oci-runtime-tool/generate.go | 12 ++++++------
+ generate/generate.go             | 42 ++++++----------------------------------
+ 2 files changed, 12 insertions(+), 42 deletions(-)
+
+diff --git a/src/import/cmd/oci-runtime-tool/generate.go b/src/import/cmd/oci-runtime-tool/generate.go
+index ed11fe8f3729..7121ce5fe07e 100644
+--- a/src/import/cmd/oci-runtime-tool/generate.go
++++ b/src/import/cmd/oci-runtime-tool/generate.go
+@@ -354,7 +354,7 @@ func setupSpec(g *generate.Generator, context *cli.Context) error {
+ 		for _, postStartEnv := range postStartEnvs {
+ 			path, env, err := parseHookEnv(postStartEnv)
+ 			if err != nil {
+-				return err
++				return nil
+ 			}
+ 			g.AddPostStartHookEnv(path, env)
+ 		}
+@@ -387,7 +387,7 @@ func setupSpec(g *generate.Generator, context *cli.Context) error {
+ 		for _, postStopEnv := range postStopEnvs {
+ 			path, env, err := parseHookEnv(postStopEnv)
+ 			if err != nil {
+-				return err
++				return nil
+ 			}
+ 			g.AddPostStopHookEnv(path, env)
+ 		}
+@@ -398,7 +398,7 @@ func setupSpec(g *generate.Generator, context *cli.Context) error {
+ 		for _, postStopTimeout := range postStopTimeouts {
+ 			path, timeout, err := parseHookTimeout(postStopTimeout)
+ 			if err != nil {
+-				return err
++				return nil
+ 			}
+ 			g.AddPostStopHookTimeout(path, timeout)
+ 		}
+@@ -409,7 +409,7 @@ func setupSpec(g *generate.Generator, context *cli.Context) error {
+ 		for _, hook := range preStartHooks {
+ 			path, args, err := parseHook(hook)
+ 			if err != nil {
+-				return err
++				return nil
+ 			}
+ 			g.AddPreStartHook(path, args)
+ 		}
+@@ -420,7 +420,7 @@ func setupSpec(g *generate.Generator, context *cli.Context) error {
+ 		for _, preStartEnv := range preStartEnvs {
+ 			path, env, err := parseHookEnv(preStartEnv)
+ 			if err != nil {
+-				return err
++				return nil
+ 			}
+ 			g.AddPreStartHookEnv(path, env)
+ 		}
+@@ -431,7 +431,7 @@ func setupSpec(g *generate.Generator, context *cli.Context) error {
+ 		for _, preStartTimeout := range preStartTimeouts {
+ 			path, timeout, err := parseHookTimeout(preStartTimeout)
+ 			if err != nil {
+-				return err
++				return nil
+ 			}
+ 			g.AddPreStartHookTimeout(path, timeout)
+ 		}
+diff --git a/src/import/generate/generate.go b/src/import/generate/generate.go
+index 84762c3cbd05..ef5d2cc95b3c 100644
+--- a/src/import/generate/generate.go
++++ b/src/import/generate/generate.go
+@@ -744,39 +744,29 @@ func (g *Generator) ClearPreStartHooks() {
+ func (g *Generator) AddPreStartHook(path string, args []string) {
+ 	g.initSpecHooks()
+ 	hook := rspec.Hook{Path: path, Args: args}
+-	for i, hook := range g.spec.Hooks.Prestart {
+-		if hook.Path == path {
+-			g.spec.Hooks.Prestart[i] = hook
+-			return
+-		}
+-	}
+ 	g.spec.Hooks.Prestart = append(g.spec.Hooks.Prestart, hook)
+ }
+ 
+ // AddPreStartHookEnv adds envs of a prestart hook into g.spec.Hooks.Prestart.
+ func (g *Generator) AddPreStartHookEnv(path string, envs []string) {
+-	g.initSpecHooks()
++	g.initSpec()
+ 	for i, hook := range g.spec.Hooks.Prestart {
+ 		if hook.Path == path {
+ 			g.spec.Hooks.Prestart[i].Env = envs
+ 			return
+ 		}
+ 	}
+-	hook := rspec.Hook{Path: path, Env: envs}
+-	g.spec.Hooks.Prestart = append(g.spec.Hooks.Prestart, hook)
+ }
+ 
+ // AddPreStartHookTimeout adds timeout of a prestart hook into g.spec.Hooks.Prestart.
+ func (g *Generator) AddPreStartHookTimeout(path string, timeout int) {
+-	g.initSpecHooks()
++	g.initSpec()
+ 	for i, hook := range g.spec.Hooks.Prestart {
+ 		if hook.Path == path {
+ 			g.spec.Hooks.Prestart[i].Timeout = &timeout
+ 			return
+ 		}
+ 	}
+-	hook := rspec.Hook{Path: path, Timeout: &timeout}
+-	g.spec.Hooks.Prestart = append(g.spec.Hooks.Prestart, hook)
+ }
+ 
+ // ClearPostStopHooks clear g.spec.Hooks.Poststop.
+@@ -794,39 +784,29 @@ func (g *Generator) ClearPostStopHooks() {
+ func (g *Generator) AddPostStopHook(path string, args []string) {
+ 	g.initSpecHooks()
+ 	hook := rspec.Hook{Path: path, Args: args}
+-	for i, hook := range g.spec.Hooks.Poststop {
+-		if hook.Path == path {
+-			g.spec.Hooks.Poststop[i] = hook
+-			return
+-		}
+-	}
+ 	g.spec.Hooks.Poststop = append(g.spec.Hooks.Poststop, hook)
+ }
+ 
+ // AddPostStopHookEnv adds envs of a poststop hook into g.spec.Hooks.Poststop.
+ func (g *Generator) AddPostStopHookEnv(path string, envs []string) {
+-	g.initSpecHooks()
++	g.initSpec()
+ 	for i, hook := range g.spec.Hooks.Poststop {
+ 		if hook.Path == path {
+ 			g.spec.Hooks.Poststop[i].Env = envs
+ 			return
+ 		}
+ 	}
+-	hook := rspec.Hook{Path: path, Env: envs}
+-	g.spec.Hooks.Poststop = append(g.spec.Hooks.Poststop, hook)
+ }
+ 
+ // AddPostStopHookTimeout adds timeout of a poststop hook into g.spec.Hooks.Poststop.
+ func (g *Generator) AddPostStopHookTimeout(path string, timeout int) {
+-	g.initSpecHooks()
++	g.initSpec()
+ 	for i, hook := range g.spec.Hooks.Poststop {
+ 		if hook.Path == path {
+ 			g.spec.Hooks.Poststop[i].Timeout = &timeout
+ 			return
+ 		}
+ 	}
+-	hook := rspec.Hook{Path: path, Timeout: &timeout}
+-	g.spec.Hooks.Poststop = append(g.spec.Hooks.Poststop, hook)
+ }
+ 
+ // ClearPostStartHooks clear g.spec.Hooks.Poststart.
+@@ -844,39 +824,29 @@ func (g *Generator) ClearPostStartHooks() {
+ func (g *Generator) AddPostStartHook(path string, args []string) {
+ 	g.initSpecHooks()
+ 	hook := rspec.Hook{Path: path, Args: args}
+-	for i, hook := range g.spec.Hooks.Poststart {
+-		if hook.Path == path {
+-			g.spec.Hooks.Poststart[i] = hook
+-			return
+-		}
+-	}
+ 	g.spec.Hooks.Poststart = append(g.spec.Hooks.Poststart, hook)
+ }
+ 
+ // AddPostStartHookEnv adds envs of a poststart hook into g.spec.Hooks.Poststart.
+ func (g *Generator) AddPostStartHookEnv(path string, envs []string) {
+-	g.initSpecHooks()
++	g.initSpec()
+ 	for i, hook := range g.spec.Hooks.Poststart {
+ 		if hook.Path == path {
+ 			g.spec.Hooks.Poststart[i].Env = envs
+ 			return
+ 		}
+ 	}
+-	hook := rspec.Hook{Path: path, Env: envs}
+-	g.spec.Hooks.Poststart = append(g.spec.Hooks.Poststart, hook)
+ }
+ 
+ // AddPostStartHookTimeout adds timeout of a poststart hook into g.spec.Hooks.Poststart.
+ func (g *Generator) AddPostStartHookTimeout(path string, timeout int) {
+-	g.initSpecHooks()
++	g.initSpec()
+ 	for i, hook := range g.spec.Hooks.Poststart {
+ 		if hook.Path == path {
+ 			g.spec.Hooks.Poststart[i].Timeout = &timeout
+ 			return
+ 		}
+ 	}
+-	hook := rspec.Hook{Path: path, Timeout: &timeout}
+-	g.spec.Hooks.Poststart = append(g.spec.Hooks.Poststart, hook)
+ }
+ 
+ // AddTmpfsMount adds a tmpfs mount into g.spec.Mounts.
+-- 
+2.4.0.53.g8440f74
+

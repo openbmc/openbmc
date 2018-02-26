@@ -1,0 +1,48 @@
+From 545646cccba243236e10362fe7325f89be57da1f Mon Sep 17 00:00:00 2001
+From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
+Date: Tue, 18 Jul 2017 11:28:37 -0400
+Subject: [PATCH] v4l2: Fix 4K colorimetry
+
+Since 1.6, the transfer function for BT2020 has been changed from BT709
+to BT2020_12. It's the same function, but with more precision. As a side
+effect, the V4L2 colorpsace didn't match GStreamer colorspace. When
+GStreamer ended up making a guess, it would not match anything supported
+by V4L2 anymore. This this by using BT2020_12 for BT2020 colorspace and
+BT2020 transfer function in replacement of BT709 whenever a 4K
+resolution is detected.
+
+Upstream-Status: Backport
+Signed-off-by: Nicolas Dechesne <nicolas.dechesne@linaro.org>
+
+---
+ sys/v4l2/gstv4l2object.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/sys/v4l2/gstv4l2object.c b/sys/v4l2/gstv4l2object.c
+index 61244455f..aae2c55e7 100644
+--- a/sys/v4l2/gstv4l2object.c
++++ b/sys/v4l2/gstv4l2object.c
+@@ -1960,7 +1960,7 @@ gst_v4l2_object_get_colorspace (struct v4l2_format *fmt,
+     case V4L2_COLORSPACE_BT2020:
+       cinfo->range = GST_VIDEO_COLOR_RANGE_16_235;
+       cinfo->matrix = GST_VIDEO_COLOR_MATRIX_BT2020;
+-      cinfo->transfer = GST_VIDEO_TRANSFER_BT709;
++      cinfo->transfer = GST_VIDEO_TRANSFER_BT2020_12;
+       cinfo->primaries = GST_VIDEO_COLOR_PRIMARIES_BT2020;
+       break;
+     case V4L2_COLORSPACE_SMPTE240M:
+@@ -2062,7 +2062,10 @@ gst_v4l2_object_get_colorspace (struct v4l2_format *fmt,
+ 
+   switch (transfer) {
+     case V4L2_XFER_FUNC_709:
+-      cinfo->transfer = GST_VIDEO_TRANSFER_BT709;
++      if (fmt->fmt.pix.height > 2160)
++        cinfo->transfer = GST_VIDEO_TRANSFER_BT2020_12;
++      else
++        cinfo->transfer = GST_VIDEO_TRANSFER_BT709;
+       break;
+     case V4L2_XFER_FUNC_SRGB:
+       cinfo->transfer = GST_VIDEO_TRANSFER_SRGB;
+-- 
+2.14.1
+

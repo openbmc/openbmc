@@ -1,0 +1,26 @@
+From b36cafdbcbe2193f5b669e703c608e19e23f80a3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2017 11:16:42 -0700
+Subject: [PATCH 3/4] include missing time.h for time_t
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ util.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util.h b/util.h
+index e912f19..3c634c1 100644
+--- a/util.h
++++ b/util.h
+@@ -22,7 +22,7 @@
+ 
+ #include "ddt.h"
+ #include "ether.h"
+-
++#include <time.h>
+ /**
+  * Table of human readable strings, one for each port state.
+  */
+-- 
+2.13.3
+

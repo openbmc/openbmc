@@ -1,0 +1,67 @@
+From a4951489d649c2b609cbb80f6cfb49fdcad8bd43 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 2 Sep 2017 10:03:37 -0700
+Subject: [PATCH] Use long long instead of int64_t
+
+Fixes
+error: call to member function 'appendNumber' is ambiguous
+since this function expects long long as parameter and not int64_t
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+ src/mongo/util/procparser.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/mongo/util/procparser.cpp b/src/mongo/util/procparser.cpp
+index 36f2ae0254..2c164bcbf3 100644
+--- a/src/mongo/util/procparser.cpp
++++ b/src/mongo/util/procparser.cpp
+@@ -260,7 +260,7 @@ Status parseProcStat(const std::vector<StringData>& keys,
+ 
+                     StringData stringValue((*partIt).begin(), (*partIt).end() - (*partIt).begin());
+ 
+-                    uint64_t value;
++                    long long  value;
+ 
+                     if (!parseNumberFromString(stringValue, &value).isOK()) {
+                         value = 0;
+@@ -272,7 +272,7 @@ Status parseProcStat(const std::vector<StringData>& keys,
+             } else {
+                 StringData stringValue((*partIt).begin(), (*partIt).end() - (*partIt).begin());
+ 
+-                uint64_t value;
++                long long value;
+ 
+                 if (!parseNumberFromString(stringValue, &value).isOK()) {
+                     value = 0;
+@@ -365,7 +365,7 @@ Status parseProcMemInfo(const std::vector<StringData>& keys,
+ 
+             StringData stringValue((*partIt).begin(), (*partIt).end());
+ 
+-            uint64_t value;
++            long long value;
+ 
+             if (!parseNumberFromString(stringValue, &value).isOK()) {
+                 value = 0;
+@@ -426,7 +426,7 @@ Status parseProcDiskStats(const std::vector<StringData>& disks,
+                           StringData data,
+                           BSONObjBuilder* builder) {
+     bool foundKeys = false;
+-    std::vector<uint64_t> stats;
++    std::vector<long long> stats;
+     stats.reserve(kDiskFieldCount);
+ 
+     using string_split_iterator = boost::split_iterator<StringData::const_iterator>;
+@@ -501,7 +501,7 @@ Status parseProcDiskStats(const std::vector<StringData>& disks,
+ 
+                 StringData stringValue((*partIt).begin(), (*partIt).end());
+ 
+-                uint64_t value;
++                long long value;
+ 
+                 if (!parseNumberFromString(stringValue, &value).isOK()) {
+                     value = 0;
+-- 
+2.14.1
+

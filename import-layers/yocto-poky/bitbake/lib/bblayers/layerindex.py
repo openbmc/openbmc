@@ -247,6 +247,7 @@ class LayerIndexPlugin(ActionPlugin):
                         logger.plain("Adding layer \"%s\" to conf/bblayers.conf" % name)
                     localargs = argparse.Namespace()
                     localargs.layerdir = layerdir
+                    localargs.force = args.force
                     self.do_add_layer(localargs)
                 else:
                     break

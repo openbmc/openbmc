@@ -17,6 +17,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a52a18a472d4f7e45479b06563717c02"
 SRC_URI = "http://www.jedsoft.org/releases/${BPN}/${BP}.tar.bz2 \
            file://no-x.patch \
            file://dont-link-to-host.patch \
+           file://test-add-output-in-the-format-result-testname.patch \
+           file://terminfo_fixes.patch \
+           file://run-ptest \
           "
 
 SRC_URI[md5sum] = "c5235313042ed0e71ec708f7b85ec241"
@@ -25,7 +28,7 @@ SRC_URI[sha256sum] = "54f0c3007fde918039c058965dffdfd6c5aec0bad0f4227192cc486021
 UPSTREAM_CHECK_URI = "http://www.jedsoft.org/releases/slang/"
 PREMIRRORS_append = "\n http://www.jedsoft.org/releases/slang/.* http://www.jedsoft.org/releases/slang/old/ \n"
 
-inherit autotools-brokensep
+inherit autotools-brokensep ptest
 CLEANBROKEN = "1"
 
 EXTRA_OECONF = "--without-onig"
@@ -47,6 +50,27 @@ do_configure_prepend() {
     # For the same reason we also need to run autoconf manually.
     autoconf && mv configure ..
     cd ${B}
+}
+
+do_compile_ptest() {
+	oe_runmake -C src static
+	oe_runmake -C src/test sltest
+}
+
+do_install_ptest() {
+	mkdir ${D}${PTEST_PATH}/test
+	for f in Makefile sltest runtests.sh *.sl *.inc; do
+		cp ${S}/src/test/$f ${D}${PTEST_PATH}/test/
+	done
+	sed -e 's/\ \$(TEST_PGM)\.c\ assoc\.c\ list\.c\ \$(SLANGLIB)\/libslang\.a//' \
+	    -e '/\$(CC).*(TEST_PGM)/d' \
+	    -i ${D}${PTEST_PATH}/test/Makefile
+
+	cp ${S}/slsh/lib/require.sl ${D}${PTEST_PATH}/test/
+	sed -i 's/\.\.\/\.\.\/slsh\/lib\/require\.sl/require\.sl/' ${D}${PTEST_PATH}/test/req.sl
+
+	cp ${S}/doc/text/slangfun.txt ${D}${PTEST_PATH}/test/
+	sed -i 's/\.\.\/\.\.\/doc\/text\/slangfun\.txt/slangfun\.txt/' ${D}${PTEST_PATH}/test/docfun.sl
 }
 
 FILES_${PN} += "${libdir}/${BPN}/v2/modules/ ${datadir}/slsh/"

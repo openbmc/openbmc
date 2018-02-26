@@ -321,6 +321,22 @@ class Project(models.Model):
 
         return queryset
 
+    def get_available_distros(self):
+        """ Returns QuerySet of all Distros which are provided by the
+        Layers currently added to the Project """
+        queryset = Distro.objects.filter(
+            layer_version__in=self.get_project_layer_versions())
+
+        return queryset
+
+    def get_all_compatible_distros(self):
+        """ Returns QuerySet of all the compatible Wind River distros available to the
+        project including ones from Layers not currently added """
+        queryset = Distro.objects.filter(
+            layer_version__in=self.get_all_compatible_layer_versions())
+
+        return queryset
+
     def get_available_recipes(self):
         """ Returns QuerySet of all the recipes that are provided by layers
         added to this project """
@@ -435,7 +451,13 @@ class Build(models.Model):
     recipes_to_parse = models.IntegerField(default=1)
 
     # number of recipes parsed so far for this build
-    recipes_parsed = models.IntegerField(default=0)
+    recipes_parsed = models.IntegerField(default=1)
+
+    # number of repos to clone for this build
+    repos_to_clone = models.IntegerField(default=1)
+
+    # number of repos cloned so far for this build (default off)
+    repos_cloned = models.IntegerField(default=1)
 
     @staticmethod
     def get_recent(project=None):
@@ -486,7 +508,7 @@ class Build(models.Model):
         tf = Task.objects.filter(build = self)
         tfc = tf.count()
         if tfc > 0:
-            completeper = tf.exclude(order__isnull=True).count()*100 // tfc
+            completeper = tf.exclude(outcome=Task.OUTCOME_NA).count()*100 // tfc
         else:
             completeper = 0
         return completeper
@@ -667,6 +689,13 @@ class Build(models.Model):
         else:
             return False
 
+    def is_cloning(self):
+        """
+        True if the build is still cloning repos
+        """
+        return self.outcome == Build.IN_PROGRESS and \
+            self.repos_cloned < self.repos_to_clone
+
     def is_parsing(self):
         """
         True if the build is still parsing recipes
@@ -680,10 +709,11 @@ class Build(models.Model):
         tasks.
 
         Note that the mechanism for testing whether a Task is "done" is whether
-        its order field is set, as per the completeper() method.
+        its outcome field is set, as per the completeper() method.
         """
         return self.outcome == Build.IN_PROGRESS and \
-            self.task_build.filter(order__isnull=False).count() == 0
+            self.task_build.exclude(outcome=Task.OUTCOME_NA).count() == 0
+
 
     def get_state(self):
         """
@@ -698,6 +728,8 @@ class Build(models.Model):
             return 'Cancelling';
         elif self.is_queued():
             return 'Queued'
+        elif self.is_cloning():
+            return 'Cloning'
         elif self.is_parsing():
             return 'Parsing'
         elif self.is_starting():
@@ -1485,12 +1517,12 @@ class Layer_Version(models.Model):
         return self._handle_url_path(self.layer.vcs_web_tree_base_url, '')
 
     def get_vcs_reference(self):
+        if self.commit is not None and len(self.commit) > 0:
+            return self.commit
         if self.branch is not None and len(self.branch) > 0:
             return self.branch
         if self.release is not None:
             return self.release.name
-        if self.commit is not None and len(self.commit) > 0:
-            return self.commit
         return 'N/A'
 
     def get_detailspage_url(self, project_id=None):
@@ -1626,7 +1658,7 @@ class CustomImageRecipe(Recipe):
 
     def get_base_recipe_file(self):
         """Get the base recipe file path if it exists on the file system"""
-        path_schema_one = "%s/%s" % (self.base_recipe.layer_version.dirpath,
+        path_schema_one = "%s/%s" % (self.base_recipe.layer_version.local_path,
                                      self.base_recipe.file_path)
 
         path_schema_two = self.base_recipe.file_path
@@ -1779,6 +1811,21 @@ def signal_runbuilds():
             os.kill(int(pidf.read()), SIGUSR1)
     except FileNotFoundError:
         logger.info("Stopping existing runbuilds: no current process found")
+
+class Distro(models.Model):
+    search_allowed_fields = ["name", "description", "layer_version__layer__name"]
+    up_date = models.DateTimeField(null = True, default = None)
+
+    layer_version = models.ForeignKey('Layer_Version')
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+
+    def get_vcs_distro_file_link_url(self):
+        path = self.name+'.conf'
+        return self.layer_version.get_vcs_file_link_url(path)
+
+    def __unicode__(self):
+        return "Distro " + self.name + "(" + self.description + ")"
 
 django.db.models.signals.post_save.connect(invalidate_cache)
 django.db.models.signals.post_delete.connect(invalidate_cache)

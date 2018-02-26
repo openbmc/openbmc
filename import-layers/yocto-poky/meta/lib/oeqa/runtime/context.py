@@ -92,6 +92,12 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
     def getTarget(target_type, logger, target_ip, server_ip, **kwargs):
         target = None
 
+        if target_ip:
+            target_ip_port = target_ip.split(':')
+            if len(target_ip_port) == 2:
+                target_ip = target_ip_port[0]
+                kwargs['port'] = target_ip_port[1]
+
         if target_type == 'simpleremote':
             target = OESSHTarget(logger, target_ip, server_ip, **kwargs)
         elif target_type == 'qemu':

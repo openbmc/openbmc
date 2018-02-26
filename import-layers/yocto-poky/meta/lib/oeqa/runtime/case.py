@@ -8,10 +8,10 @@ class OERuntimeTestCase(OETestCase):
     # target instance set by OERuntimeTestLoader.
     target = None
 
-    def _oeSetUp(self):
-        super(OERuntimeTestCase, self)._oeSetUp()
+    def setUp(self):
+        super(OERuntimeTestCase, self).setUp()
         install_package(self)
 
-    def _oeTearDown(self):
-        super(OERuntimeTestCase, self)._oeTearDown()
+    def tearDown(self):
+        super(OERuntimeTestCase, self).tearDown()
         uninstall_package(self)

@@ -17,7 +17,8 @@ S = "${WORKDIR}/trunk"
 # Only subversion url left in OE-Core, use a mirror tarball instead since
 # this rarely changes.
 # svn://svn.code.sf.net/p/unfs3/code;module=trunk;rev=${MOD_PV};protocol=http
-SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/trunk_svn.code.sf.net_.p.unfs3.code_497_.tar.gz \
+# rename the tarball in mirror to avoid clash with user local svn tarball
+SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/unfs3-0.9.22.r497.tar.gz \
            file://unfs3_parallel_build.patch \
            file://alternate_rpc_ports.patch \
            file://fix_pid_race_parent_writes_child_pid.patch \

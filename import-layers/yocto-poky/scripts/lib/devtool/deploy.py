@@ -16,12 +16,16 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """Devtool plugin containing the deploy subcommands"""
 
-import os
-import subprocess
 import logging
-import tempfile
+import os
 import shutil
+import subprocess
+import tempfile
+
+import bb.utils
 import argparse_oe
+import oe.types
+
 from devtool import exec_fakeroot, setup_tinfoil, check_workspace_recipe, DevtoolError
 
 logger = logging.getLogger('devtool')
@@ -64,7 +68,7 @@ def _prepare_remote_script(deploy, verbose=False, dryrun=False, undeployall=Fals
         lines.append('                rmdir $file > /dev/null 2>&1 || true')
         lines.append('            fi')
         lines.append('        else')
-        lines.append('            rm $file')
+        lines.append('            rm -f $file')
         lines.append('        fi')
     lines.append('    done')
     if not dryrun:
@@ -119,7 +123,11 @@ def _prepare_remote_script(deploy, verbose=False, dryrun=False, undeployall=Fals
         # Put any preserved files back
         lines.append('if [ -d $preservedir ] ; then')
         lines.append('    cd $preservedir')
-        lines.append('    find . -type f -exec mv {} /{} \;')
+        # find from busybox might not have -exec, so we don't use that
+        lines.append('    find . -type f | while read file')
+        lines.append('    do')
+        lines.append('        mv $file /$file')
+        lines.append('    done')
         lines.append('    cd /')
         lines.append('    rm -rf $preservedir')
         lines.append('fi')
@@ -136,11 +144,12 @@ def _prepare_remote_script(deploy, verbose=False, dryrun=False, undeployall=Fals
     return '\n'.join(lines)
 
 
+
 def deploy(args, config, basepath, workspace):
     """Entry point for the devtool 'deploy' subcommand"""
-    import re
     import math
     import oe.recipeutils
+    import oe.package
 
     check_workspace_recipe(workspace, args.recipename, checksrc=False)
 
@@ -166,6 +175,17 @@ def deploy(args, config, basepath, workspace):
                             'recipe? If so, the install step has not installed '
                             'any files.' % args.recipename)
 
+        if args.strip and not args.dry_run:
+            # Fakeroot copy to new destination
+            srcdir = recipe_outdir
+            recipe_outdir = os.path.join(rd.getVar('WORKDIR'), 'deploy-target-stripped')
+            if os.path.isdir(recipe_outdir):
+                bb.utils.remove(recipe_outdir, True)
+            exec_fakeroot(rd, "cp -af %s %s" % (os.path.join(srcdir, '.'), recipe_outdir), shell=True)
+            os.environ['PATH'] = ':'.join([os.environ['PATH'], rd.getVar('PATH') or ''])
+            oe.package.strip_execs(args.recipename, recipe_outdir, rd.getVar('STRIP'), rd.getVar('libdir'),
+                        rd.getVar('base_libdir'))
+
         filelist = []
         ftotalsize = 0
         for root, _, files in os.walk(recipe_outdir):
@@ -184,7 +204,6 @@ def deploy(args, config, basepath, workspace):
             for item, _ in filelist:
                 print('  %s' % item)
             return 0
-
 
         extraoptions = ''
         if args.no_host_check:
@@ -297,6 +316,7 @@ def undeploy(args, config, basepath, workspace):
 
 def register_commands(subparsers, context):
     """Register devtool subcommands from the deploy plugin"""
+
     parser_deploy = subparsers.add_parser('deploy-target',
                                           help='Deploy recipe output files to live target machine',
                                           description='Deploys a recipe\'s build output (i.e. the output of the do_install task) to a live target machine over ssh. By default, any existing files will be preserved instead of being overwritten and will be restored if you run devtool undeploy-target. Note: this only deploys the recipe itself and not any runtime dependencies, so it is assumed that those have been installed on the target beforehand.',
@@ -309,6 +329,15 @@ def register_commands(subparsers, context):
     parser_deploy.add_argument('-p', '--no-preserve', help='Do not preserve existing files', action='store_true')
     parser_deploy.add_argument('--no-check-space', help='Do not check for available space before deploying', action='store_true')
     parser_deploy.add_argument('-P', '--port', default='22', help='Port to use for connection to the target')
+
+    strip_opts = parser_deploy.add_mutually_exclusive_group(required=False)
+    strip_opts.add_argument('-S', '--strip',
+                               help='Strip executables prior to deploying (default: %(default)s). '
+                                    'The default value of this option can be controlled by setting the strip option in the [Deploy] section to True or False.',
+                               default=oe.types.boolean(context.config.get('Deploy', 'strip', default='0')),
+                               action='store_true')
+    strip_opts.add_argument('--no-strip', help='Do not strip executables prior to deploy', dest='strip', action='store_false')
+
     parser_deploy.set_defaults(func=deploy)
 
     parser_undeploy = subparsers.add_parser('undeploy-target',

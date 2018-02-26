@@ -1,6 +1,6 @@
 require ${BPN}.inc
 
-DEPENDS = "alsa-lib zlib jpeg libpng libxext libxft  ${BPN}-native"
+DEPENDS = "alsa-lib zlib jpeg libpng libxext libxft"
 
 inherit binconfig lib_package gtk-icon-cache mime
 

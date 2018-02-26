@@ -38,3 +38,5 @@ CXXFLAGS_prepend = "-I${S} "
 do_configure_prepend () {
     sed -i -e's,^V_RPATH_OPT=.*$,V_RPATH_OPT=,' ${S}/pcap-config.in
 }
+
+BBCLASSEXTEND = "native"

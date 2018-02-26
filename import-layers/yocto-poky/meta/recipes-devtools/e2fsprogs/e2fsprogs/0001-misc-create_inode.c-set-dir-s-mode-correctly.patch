@@ -1,0 +1,41 @@
+From f6d188580c2c9599319076fee22f2424652c711c Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Wed, 13 Sep 2017 19:55:35 -0700
+Subject: [PATCH] misc/create_inode.c: set dir's mode correctly
+
+The dir's mode has been set by ext2fs_mkdir() with umask, so
+reset it to the source's mode in set_inode_extra().
+
+Fixed when source dir's mode is 521, but tarball would be 721, this was
+incorrect.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ misc/create_inode.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/misc/create_inode.c b/misc/create_inode.c
+index 8ce3faf..50fbaa8 100644
+--- a/misc/create_inode.c
++++ b/misc/create_inode.c
+@@ -116,7 +116,14 @@ static errcode_t set_inode_extra(ext2_filsys fs, ext2_ino_t ino,
+ 
+ 	inode.i_uid = st->st_uid;
+ 	inode.i_gid = st->st_gid;
+-	inode.i_mode |= st->st_mode;
++	/*
++	 * The dir's mode has been set by ext2fs_mkdir() with umask, so
++	 * reset it to the source's mode
++	 */
++	if S_ISDIR(st->st_mode)
++		inode.i_mode = LINUX_S_IFDIR | st->st_mode;
++	else
++		inode.i_mode |= st->st_mode;
+ 	inode.i_atime = st->st_atime;
+ 	inode.i_mtime = st->st_mtime;
+ 	inode.i_ctime = st->st_ctime;
+-- 
+2.10.2
+

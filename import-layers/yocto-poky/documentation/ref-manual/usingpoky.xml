@@ -42,11 +42,9 @@
 
         <para>
             The first thing you need to do is set up the OpenEmbedded build
-            environment by sourcing an environment setup script
+            environment by sourcing the environment setup script
             (i.e.
-            <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>
-            or
-            <link linkend='structure-memres-core-script'><filename>oe-init-build-env-memres</filename></link>).
+            <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>).
             Here is an example:
             <literallayout class='monospaced'>
      $ source &OE_INIT_FILE; [<replaceable>build_dir</replaceable>]
@@ -56,7 +54,8 @@
         <para>
             The <replaceable>build_dir</replaceable> argument is optional and specifies the directory the
             OpenEmbedded build system uses for the build -
-            the <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+            the
+            <link linkend='build-directory'>Build Directory</link>.
             If you do not specify a Build Directory, it defaults to a directory
             named <filename>build</filename> in your current working directory.
             A common practice is to use a different Build Directory for different targets.
@@ -108,7 +107,7 @@
             The <replaceable>target</replaceable> is the name of the recipe you want to build.
             Common targets are the images in <filename>meta/recipes-core/images</filename>,
             <filename>meta/recipes-sato/images</filename>, etc. all found in the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+            <link linkend='source-directory'>Source Directory</link>.
             Or, the target can be the name of a recipe for a specific piece of software such as
             BusyBox.
             For more details about the images the OpenEmbedded build system supports, see the
@@ -142,11 +141,12 @@
     <para>
         Once an image has been built, it often needs to be installed.
         The images and kernels built by the OpenEmbedded build system are placed in the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink> in
+        <link linkend='build-directory'>Build Directory</link> in
         <filename class="directory">tmp/deploy/images</filename>.
         For information on how to run pre-built images such as <filename>qemux86</filename>
         and <filename>qemuarm</filename>, see the
-        <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
+        <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Application Development and the Extensible Software Development Kit (eSDK)</ulink>
+        manual.
         For information about how to install these images, see the documentation for your
         particular board or machine.
     </para>
@@ -177,16 +177,17 @@
         going wrong.
         For information on how to enable and use this feature, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#using-the-error-reporting-tool'>Using the Error Reporting Tool</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 
     <para>
         For discussions on debugging, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-gdb-remotedebug'>Debugging With the GNU Project Debugger (GDB) Remotely</ulink>" section
-        in the Yocto Project Developer's Manual
+        in the Yocto Project Development Tasks Manual
         and the
         "<ulink url='&YOCTO_DOCS_SDK_URL;#adt-eclipse'>Working within Eclipse</ulink>"
-        section in the Yocto Project Software Development Kit (SDK) Developer's Guide.
+        section in the Yocto Project Application Development and the
+        Extensible Software Development Kit (eSDK) manual.
     </para>
 
     <note>
@@ -208,7 +209,7 @@
             (<filename>qemux86</filename>) might be in
             <filename>tmp/work/qemux86-poky-linux/core-image-minimal/1.0-r0/temp/log.do_compile</filename>.
             To see the commands
-            <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink> ran
+            <link linkend='bitbake-term'>BitBake</link> ran
             to generate a log, look at the corresponding
             <filename>run.do_</filename><replaceable>taskname</replaceable>
             file in the same directory.
@@ -874,7 +875,7 @@
             class implements these functions.
             See that class in the
             <filename>meta/classes</filename> folder of the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            <link linkend='source-directory'>Source Directory</link>
             for information.
         </para>
 
@@ -978,7 +979,7 @@
                     Removing
                     <link linkend='var-TMPDIR'><filename>TMPDIR</filename></link>
                     (usually <filename>tmp/</filename>, within the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>)
+                    <link linkend='build-directory'>Build Directory</link>)
                     can often fix temporary build issues.
                     Removing <filename>TMPDIR</filename> is usually a
                     relatively cheap operation, because task output will be
@@ -1031,15 +1032,388 @@
                     the Yocto Project implementation of
                     <ulink url='https://bugzilla.yoctoproject.org/'>Bugzilla</ulink>.
                     For general information on how to submit a bug against
-                    the Yocto Project, see the
-                    "<ulink url='&YOCTO_DOCS_DEV_URL;#tracking-bugs'>Tracking Bugs</ulink>"
-                    section in the Yocto Project Development Manual.
+                    the Yocto Project, see the Yocto Project Bugzilla
+                    <ulink url='&YOCTO_WIKI_URL;/wiki/Bugzilla_Configuration_and_Bug_Tracking'>wiki page</ulink>"
+                    or the
+                    <ulink url='&YOCTO_DOCS_DEV_URL;#submitting-a-defect-against-the-yocto-project'>Submitting a Defect Against the Yocto Project</ulink>"
+                    section, which is in the Yocto Project Development Tasks
+                    Manual.
                     <note>
                         The manuals might not be the right place to document
                         variables that are purely internal and have a limited
                         scope (e.g. internal variables used to implement a
                         single <filename>.bbclass</filename> file).
                     </note>
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
+
+<section id='ref-quick-emulator-qemu'>
+    <title>Quick EMUlator (QEMU)</title>
+
+    <para>
+        The Yocto Project uses an implementation of the Quick EMUlator (QEMU)
+        Open Source project as part of the Yocto Project development "tool
+        set".
+    </para>
+
+    <para>
+        Within the context of the Yocto Project, QEMU is an
+        emulator and virtualization machine that allows you to run a complete
+        image you have built using the Yocto Project as just another task
+        on your build system.
+        QEMU is useful for running and testing images and applications on
+        supported Yocto Project architectures without having actual hardware.
+        Among other things, the Yocto Project uses QEMU to run automated
+        Quality Assurance (QA) tests on final images shipped with each
+        release.
+        <note>
+            This implementation is not the same as QEMU in general.
+        </note>
+        This section provides a brief reference for the Yocto Project
+        implementation of QEMU.
+    </para>
+
+    <para>
+        For official information and documentation on QEMU in general, see the
+        following references:
+        <itemizedlist>
+            <listitem><para>
+                <emphasis><ulink url='http://wiki.qemu.org/Main_Page'>QEMU Website</ulink>:</emphasis>
+                The official website for the QEMU Open Source project.
+                </para></listitem>
+            <listitem><para>
+                <emphasis><ulink url='http://wiki.qemu.org/Manual'>Documentation</ulink>:</emphasis>
+                The QEMU user manual.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        For information on how to use the Yocto Project implementation of
+        QEMU, see the
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-qemu'>Using the Quick EMUlator (QEMU)</ulink>"
+        chapter in the Yocto Project Development Tasks Manual.
+    </para>
+
+    <section id='qemu-availability'>
+        <title>QEMU Availability</title>
+
+        <para>
+            QEMU is made available with the Yocto Project a number of ways.
+            One method is to install a Software Development Kit (SDK).
+            For more information on how to make sure you have
+            QEMU available, see
+            "<ulink url='&YOCTO_DOCS_SDK_URL;#the-qemu-emulator'>The QEMU Emulator</ulink>"
+            section in the Yocto Project Application Development and the
+            Extensible Software Development Kit (eSDK) manual.
+        </para>
+    </section>
+
+    <section id='qemu-performance'>
+        <title>QEMU Performance</title>
+
+        <para>
+            Using QEMU to emulate your hardware can result in speed issues
+            depending on the target and host architecture mix.
+            For example, using the <filename>qemux86</filename> image in the
+            emulator on an Intel-based 32-bit (x86) host machine is fast
+            because the target and host architectures match.
+            On the other hand, using the <filename>qemuarm</filename> image
+            on the same Intel-based host can be slower.
+            But, you still achieve faithful emulation of ARM-specific issues.
+        </para>
+
+        <para>
+            To speed things up, the QEMU images support using
+            <filename>distcc</filename> to call a cross-compiler outside the
+            emulated system.
+            If you used <filename>runqemu</filename> to start QEMU, and the
+            <filename>distccd</filename> application is present on the host
+            system, any BitBake cross-compiling toolchain available from the
+            build system is automatically used from within QEMU simply by
+            calling <filename>distcc</filename>.
+            You can accomplish this by defining the cross-compiler variable
+            (e.g. <filename>export CC="distcc"</filename>).
+            Alternatively, if you are using a suitable SDK image or the
+            appropriate stand-alone toolchain is present, the toolchain is
+            also automatically used.
+        </para>
+
+        <note>
+            Several mechanisms exist that let you connect to the system
+            running on the QEMU emulator:
+            <itemizedlist>
+                <listitem><para>
+                    QEMU provides a framebuffer interface that makes standard
+                    consoles available.
+                    </para></listitem>
+                <listitem><para>
+                    Generally, headless embedded devices have a serial port.
+                    If so, you can configure the operating system of the
+                    running image to use that port to run a console.
+                    The connection uses standard IP networking.
+                    </para></listitem>
+                <listitem><para>
+                    SSH servers exist in some QEMU images.
+                    The <filename>core-image-sato</filename> QEMU image has a
+                    Dropbear secure shell (SSH) server that runs with the root
+                    password disabled.
+                    The <filename>core-image-full-cmdline</filename> and
+                    <filename>core-image-lsb</filename> QEMU images
+                    have OpenSSH instead of Dropbear.
+                    Including these SSH servers allow you to use standard
+                    <filename>ssh</filename> and <filename>scp</filename>
+                    commands.
+                    The <filename>core-image-minimal</filename> QEMU image,
+                    however, contains no SSH server.
+                    </para></listitem>
+                <listitem><para>
+                    You can use a provided, user-space NFS server to boot
+                    the QEMU session using a local copy of the root
+                    filesystem on the host.
+                    In order to make this connection, you must extract a
+                    root filesystem tarball by using the
+                    <filename>runqemu-extract-sdk</filename> command.
+                    After running the command, you must then point the
+                    <filename>runqemu</filename>
+                    script to the extracted directory instead of a root
+                    filesystem image file.
+                    See the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#qemu-running-under-a-network-file-system-nfs-server'>Running Under a Network File System (NFS) Server</ulink>"
+                    section in the Yocto Project Development Tasks Manual for
+                    more information.
+                    </para></listitem>
+            </itemizedlist>
+        </note>
+    </section>
+
+    <section id='qemu-command-line-syntax'>
+        <title>QEMU Command-Line Syntax</title>
+
+        <para>
+            The basic <filename>runqemu</filename> command syntax is as
+            follows:
+            <literallayout class='monospaced'>
+     $ runqemu [<replaceable>option</replaceable> ]  [...]
+            </literallayout>
+            Based on what you provide on the command line,
+            <filename>runqemu</filename> does a good job of figuring out what
+            you are trying to do.
+            For example, by default, QEMU looks for the most recently built
+            image according to the timestamp when it needs to look for an
+            image.
+            Minimally, through the use of options, you must provide either
+            a machine name, a virtual machine image
+            (<filename>*wic.vmdk</filename>), or a kernel image
+            (<filename>*.bin</filename>).
+        </para>
+
+        <para>
+            Following is the command-line help output for the
+            <filename>runqemu</filename> command:
+            <literallayout class='monospaced'>
+     $ runqemu --help
+
+     Usage: you can run this script with any valid combination
+     of the following environment variables (in any order):
+       KERNEL - the kernel image file to use
+       ROOTFS - the rootfs image file or nfsroot directory to use
+       MACHINE - the machine name (optional, autodetected from KERNEL filename if unspecified)
+       Simplified QEMU command-line options can be passed with:
+         nographic - disable video console
+         serial - enable a serial console on /dev/ttyS0
+         slirp - enable user networking, no root privileges is required
+         kvm - enable KVM when running x86/x86_64 (VT-capable CPU required)
+         kvm-vhost - enable KVM with vhost when running x86/x86_64 (VT-capable CPU required)
+         publicvnc - enable a VNC server open to all hosts
+         audio - enable audio
+         [*/]ovmf* - OVMF firmware file or base name for booting with UEFI
+       tcpserial=&lt;port&gt; - specify tcp serial port number
+       biosdir=&lt;dir&gt; - specify custom bios dir
+       biosfilename=&lt;filename&gt; - specify bios filename
+       qemuparams=&lt;xyz&gt; - specify custom parameters to QEMU
+       bootparams=&lt;xyz&gt; - specify custom kernel parameters during boot
+       help, -h, --help: print this text
+
+     Examples:
+       runqemu
+       runqemu qemuarm
+       runqemu tmp/deploy/images/qemuarm
+       runqemu tmp/deploy/images/qemux86/&lt;qemuboot.conf&gt;
+       runqemu qemux86-64 core-image-sato ext4
+       runqemu qemux86-64 wic-image-minimal wic
+       runqemu path/to/bzImage-qemux86.bin path/to/nfsrootdir/ serial
+       runqemu qemux86 iso/hddimg/wic.vmdk/wic.qcow2/wic.vdi/ramfs/cpio.gz...
+       runqemu qemux86 qemuparams="-m 256"
+       runqemu qemux86 bootparams="psplash=false"
+       runqemu path/to/&lt;image&gt;-&lt;machine&gt;.wic
+       runqemu path/to/&lt;image&gt;-&lt;machine&gt;.wic.vmdk
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='runqemu-command-line-options'>
+        <title><filename>runqemu</filename> Command-Line Options</title>
+
+        <para>
+            Following is a description of <filename>runqemu</filename>
+            options you can provide on the command line:
+            <note><title>Tip</title>
+                If you do provide some "illegal" option combination or perhaps
+                you do not provide enough in the way of options,
+                <filename>runqemu</filename> provides appropriate error
+                messaging to help you correct the problem.
+            </note>
+            <itemizedlist>
+                <listitem><para>
+                    <replaceable>QEMUARCH</replaceable>:
+                    The QEMU machine architecture, which must be "qemuarm",
+                    "qemuarm64", "qemumips", "qemumips64", "qemuppc",
+                    "qemux86", or "qemux86-64".
+                    </para></listitem>
+                <listitem><para>
+                    <filename><replaceable>VM</replaceable></filename>:
+                    The virtual machine image, which must be a
+                    <filename>.wic.vmdk</filename> file.
+                    Use this option when you want to boot a
+                    <filename>.wic.vmdk</filename> image.
+                    The image filename you provide must contain one of the
+                    following strings: "qemux86-64", "qemux86", "qemuarm",
+                    "qemumips64", "qemumips", "qemuppc", or "qemush4".
+                    </para></listitem>
+                <listitem><para>
+                    <replaceable>ROOTFS</replaceable>:
+                    A root filesystem that has one of the following
+                    filetype extensions: "ext2", "ext3", "ext4", "jffs2",
+                    "nfs", or "btrfs".
+                    If the filename you provide for this option uses “nfs”, it
+                    must provide an explicit root filesystem path.
+                    </para></listitem>
+                <listitem><para>
+                    <replaceable>KERNEL</replaceable>:
+                    A kernel image, which is a <filename>.bin</filename> file.
+                    When you provide a <filename>.bin</filename> file,
+                    <filename>runqemu</filename> detects it and assumes the
+                    file is a kernel image.
+                    </para></listitem>
+                <listitem><para>
+                    <replaceable>MACHINE</replaceable>:
+                    The architecture of the QEMU machine, which must be one
+                    of the following: "qemux86", "qemux86-64", "qemuarm",
+                    "qemuarm64", "qemumips", “qemumips64", or "qemuppc".
+                    The <replaceable>MACHINE</replaceable> and
+                    <replaceable>QEMUARCH</replaceable> options are basically
+                    identical.
+                    If you do not provide a <replaceable>MACHINE</replaceable>
+                    option, <filename>runqemu</filename> tries to determine
+                    it based on other options.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>ramfs</filename>:
+                    Indicates you are booting an initial RAM disk (initramfs)
+                    image, which means the <filename>FSTYPE</filename> is
+                    <filename>cpio.gz</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>iso</filename>:
+                    Indicates you are booting an ISO image, which means the
+                    <filename>FSTYPE</filename> is
+                    <filename>.iso</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>nographic</filename>:
+                    Disables the video console, which sets the console to
+                    "ttys0".
+                    </para></listitem>
+                <listitem><para>
+                    <filename>serial</filename>:
+                    Enables a serial console on
+                    <filename>/dev/ttyS0</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>biosdir</filename>:
+                    Establishes a custom directory for BIOS, VGA BIOS and
+                    keymaps.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>biosfilename</filename>:
+                    Establishes a custom BIOS name.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>qemuparams=\"<replaceable>xyz</replaceable>\"</filename>:
+                    Specifies custom QEMU parameters.
+                    Use this option to pass options other than the simple
+                    "kvm" and "serial" options.
+                    </para></listitem>
+                <listitem><para><filename>bootparams=\"<replaceable>xyz</replaceable>\"</filename>:
+                    Specifies custom boot parameters for the kernel.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>audio</filename>:
+                    Enables audio in QEMU.
+                    The <replaceable>MACHINE</replaceable> option must be
+                    either "qemux86" or "qemux86-64" in order for audio to be
+                    enabled.
+                    Additionally, the <filename>snd_intel8x0</filename>
+                    or <filename>snd_ens1370</filename> driver must be
+                    installed in linux guest.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>slirp</filename>:
+                    Enables "slirp" networking, which is a different way
+                    of networking that does not need root access
+                    but also is not as easy to use or comprehensive
+                    as the default.
+                    </para></listitem>
+                <listitem><para id='kvm-cond'>
+                    <filename>kvm</filename>:
+                    Enables KVM when running "qemux86" or "qemux86-64"
+                    QEMU architectures.
+                    For KVM to work, all the following conditions must be met:
+                    <itemizedlist>
+                        <listitem><para>
+                            Your <replaceable>MACHINE</replaceable> must be either
+qemux86" or "qemux86-64".
+                            </para></listitem>
+                        <listitem><para>
+                            Your build host has to have the KVM modules
+                            installed, which are
+                            <filename>/dev/kvm</filename>.
+                            </para></listitem>
+                        <listitem><para>
+                            The  build host <filename>/dev/kvm</filename>
+                            directory has to be both writable and readable.
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>kvm-vhost</filename>:
+                    Enables KVM with VHOST support when running "qemux86"
+                    or "qemux86-64" QEMU architectures.
+                    For KVM with VHOST to work, the following conditions must
+                    be met:
+                    <itemizedlist>
+                        <listitem><para>
+                            <link linkend='kvm-cond'>kvm</link> option
+                            conditions must be met.
+                            </para></listitem>
+                        <listitem><para>
+                            Your build host has to have virtio net device, which
+                            are <filename>/dev/vhost-net</filename>.
+                            </para></listitem>
+                        <listitem><para>
+                            The build host <filename>/dev/vhost-net</filename>
+                            directory has to be either readable or writable
+                            and “slirp-enabled”.
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para>
+                    <filename>publicvnc</filename>:
+                    Enables a VNC server open to all hosts.
                     </para></listitem>
             </itemizedlist>
         </para>
@@ -1099,15 +1473,15 @@
             <link linkend='var-BUILDHISTORY_COMMIT'><filename>BUILDHISTORY_COMMIT</filename></link>
             variable to "1" at the end of your
             <filename>conf/local.conf</filename> file found in the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>:
+            <link linkend='build-directory'>Build Directory</link>:
             <literallayout class='monospaced'>
      INHERIT += "buildhistory"
      BUILDHISTORY_COMMIT = "1"
             </literallayout>
-            Enabling build history as previously described
-            causes the build process to collect build
-            output information and commit it to a local
-            <ulink url='&YOCTO_DOCS_DEV_URL;#git'>Git</ulink> repository.
+            Enabling build history as previously described causes the
+            OpenEmbedded build system to collect build output information and
+            commit it as a single commit to a local
+            <link linkend='git'>Git</link> repository.
             <note>
                 Enabling build history increases your build times slightly,
                 particularly for images, and increases the amount of disk
@@ -1357,7 +1731,7 @@
                 you can enable writing only image information without
                 any history by adding the following to your
                 <filename>conf/local.conf</filename> file found in the
-                <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>:
+                <link linkend='build-directory'>Build Directory</link>:
                 <literallayout class='monospaced'>
      INHERIT += "buildhistory"
      BUILDHISTORY_COMMIT = "0"
@@ -1643,7 +2017,7 @@
                 <filename>sync()</filename> calls into the
                 file system on the principle that if there was a significant
                 failure, the
-                <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                <link linkend='build-directory'>Build Directory</link>
                 contents could easily be rebuilt.
                 </para></listitem>
             <listitem><para>

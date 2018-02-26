@@ -1,0 +1,34 @@
+From 914ae4a3f7529fb069467bf0ded57dd24ee2e763 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 16 Aug 2017 11:23:22 +0800
+Subject: [PATCH 4/4] autogen.sh: fix find-version for beta checking
+
+find-version always assumes that gnupg is beta if autogen.sh is run
+out of git-repo. This doesn't work for users whom just take release
+tarball and re-run autoconf in their local build dir.
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+
+Rebase to 2.1.23
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ autogen.sh | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/autogen.sh b/autogen.sh
+index e5ba5bf..05e0e11 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -245,7 +245,6 @@ if [ "$myhost" = "find-version" ]; then
+       rvd=$((0x$(echo ${rev} | dd bs=1 count=4 2>/dev/null)))
+     else
+       ingit=no
+-      beta=yes
+       tmp="-unknown"
+       rev="0000000"
+       rvd="0"
+-- 
+1.8.3.1
+

@@ -1,0 +1,49 @@
+From 398c6db66c643ed6133cc2b028ab1e27a17c5295 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 1 May 2017 19:10:09 +0000
+Subject: [PATCH] Fix build failures with gcc7
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ plugins/ipmidirect/ipmi_mc_vendor.cpp | 2 +-
+ plugins/ipmidirect/ipmi_resource.cpp  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/plugins/ipmidirect/ipmi_mc_vendor.cpp b/plugins/ipmidirect/ipmi_mc_vendor.cpp
+index 2c6c090..557771c 100644
+--- a/plugins/ipmidirect/ipmi_mc_vendor.cpp
++++ b/plugins/ipmidirect/ipmi_mc_vendor.cpp
+@@ -322,7 +322,7 @@ cIpmiMcVendor::CreateResources( cIpmiDomain *domain, cIpmiMc *source_mc, cIpmiSd
+       if ( addr.m_channel != source_mc->GetChannel() ) 
+           stdlog << "WARNING : SDR channel " << addr.m_channel << " NOT equal to MC channel " << source_mc->GetChannel() << "\n";
+ 
+-       if ( FindOrCreateResource( domain, source_mc, fru_id, sdr, sdrs ) == false ) {
++       if ( !FindOrCreateResource( domain, source_mc, fru_id, sdr, sdrs ) ) {
+ 	    return false;
+ 	}
+      }
+diff --git a/plugins/ipmidirect/ipmi_resource.cpp b/plugins/ipmidirect/ipmi_resource.cpp
+index c438e74..2552673 100644
+--- a/plugins/ipmidirect/ipmi_resource.cpp
++++ b/plugins/ipmidirect/ipmi_resource.cpp
+@@ -73,7 +73,7 @@ cIpmiResource::SendCommandReadLock( const cIpmiMsg &msg, cIpmiMsg &rsp,
+ 
+   domain->ReadLock();
+ 
+-  if ( domain->VerifyResource( resource ) == false )
++  if ( !domain->VerifyResource( resource ) )
+        return SA_ERR_HPI_NOT_PRESENT;
+ 
+   return rv;
+@@ -91,7 +91,7 @@ cIpmiResource::SendCommandReadLock( cIpmiRdr *rdr, const cIpmiMsg &msg, cIpmiMsg
+   
+   domain->ReadLock();
+   
+-  if ( domain->VerifyRdr( rdr ) == false )
++  if ( !domain->VerifyRdr( rdr ) )
+        return SA_ERR_HPI_NOT_PRESENT;
+ 
+   return rv;
+-- 
+1.9.1
+

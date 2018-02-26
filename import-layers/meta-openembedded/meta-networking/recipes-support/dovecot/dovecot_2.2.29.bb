@@ -1,4 +1,5 @@
 SUMMARY = "Dovecot is an open source IMAP and POP3 email server"
+HOMEPAGE = "https://www.dovecot.org/"
 DESCRIPTION = "Dovecot is an open source IMAP and POP3 email server for Linux/UNIX-like systems, written with security primarily in mind. Dovecot is an excellent choice for both small and large installations. It's fast, simple to set up, requires no special administration and it uses very little memory."
 SECTION = "mail"
 LICENSE = "LGPLv2.1 & MIT"
@@ -7,7 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a981379bd0f1c362f8d1d21515e5b30b"
 SRC_URI = "http://dovecot.org/releases/2.2/dovecot-${PV}.tar.gz \
            file://0001-configure.ac-convert-AC_TRY_RUN-to-AC_TRY_LINK-state.patch \
            file://dovecot.service \
-           file://dovecot.socket"
+           file://dovecot.socket \
+           file://0001-doveadm-Fix-parallel-build.patch \
+           "
 
 SRC_URI[md5sum] = "ff95486a5c43025a2c3f5a712e7962b9"
 SRC_URI[sha256sum] = "d939ea99126eb8a8c6955390b422b6e27ec0fa43a3b59b2b3218cb5ad67139a6"

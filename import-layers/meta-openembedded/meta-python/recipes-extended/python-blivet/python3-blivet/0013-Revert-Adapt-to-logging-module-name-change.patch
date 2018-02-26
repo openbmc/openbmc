@@ -1,0 +1,30 @@
+From bfdaf79a2109ac6aed408f0c94f69766991e60e2 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 27 Jul 2017 14:34:30 +0800
+Subject: [PATCH 13/13] Revert "Adapt to logging module name change"
+
+Upstream-Status: Inappropriate [oe specific, sync with anaconda f26-release]
+
+This reverts commit c367d62a516e541ad28636c8259321f1c53417ce.
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blivet/__init__.py b/blivet/__init__.py
+index 49277cb..a01e487 100644
+--- a/blivet/__init__.py
++++ b/blivet/__init__.py
+@@ -124,7 +124,7 @@ def enable_installer_mode():
+         from pyanaconda.constants import ROOT_PATH  # pylint: disable=redefined-outer-name,no-name-in-module
+         _storage_root = _sysroot = ROOT_PATH
+ 
+-    from pyanaconda.anaconda_logging import program_log_lock
++    from pyanaconda.anaconda_log import program_log_lock
+     util.program_log_lock = program_log_lock
+ 
+     flags.installer_mode = True
+-- 
+2.7.4
+

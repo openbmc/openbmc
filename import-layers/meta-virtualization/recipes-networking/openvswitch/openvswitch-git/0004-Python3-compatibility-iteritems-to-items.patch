@@ -1,0 +1,102 @@
+From 0f318e472d9897d99395adcfb17cbeaff05677ba Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Thu, 29 Jun 2017 20:33:23 -0700
+Subject: [PATCH 4/8] Python3 compatibility: iteritems to items
+
+Commit 4ab665623cbb4c6506e48b82e0c9fe8585f42e13 from
+https://github.com/openvswitch/ovs.git
+
+Allow compability with python3 and python2 by changing iteritems() to
+items().
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+Signed-off-by: Ben Pfaff <blp@ovn.org>
+---
+ build-aux/extract-ofp-actions | 2 +-
+ build-aux/extract-ofp-errors  | 2 +-
+ build-aux/extract-ofp-fields  | 2 +-
+ ovsdb/ovsdb-idlc.in           | 8 ++++----
+ 4 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/build-aux/extract-ofp-actions b/build-aux/extract-ofp-actions
+index 874e6b4..c11297c 100755
+--- a/build-aux/extract-ofp-actions
++++ b/build-aux/extract-ofp-actions
+@@ -13,7 +13,7 @@ version_map = {"1.0": 0x01,
+                "1.3": 0x04,
+                "1.4": 0x05,
+                "1.5": 0x06}
+-version_reverse_map = dict((v, k) for (k, v) in version_map.iteritems())
++version_reverse_map = dict((v, k) for (k, v) in version_map.items())
+ 
+ # Map from vendor name to the length of the action header.
+ vendor_map = {"OF": (0x00000000,  4),
+diff --git a/build-aux/extract-ofp-errors b/build-aux/extract-ofp-errors
+index 336a240..71ae0bd 100755
+--- a/build-aux/extract-ofp-errors
++++ b/build-aux/extract-ofp-errors
+@@ -14,7 +14,7 @@ version_map = {"1.0": 0x01,
+                "1.4": 0x05,
+                "1.5": 0x06,
+                "1.6": 0x07}
+-version_reverse_map = dict((v, k) for (k, v) in version_map.iteritems())
++version_reverse_map = dict((v, k) for (k, v) in version_map.items())
+ 
+ token = None
+ line = ""
+diff --git a/build-aux/extract-ofp-fields b/build-aux/extract-ofp-fields
+index 61e752b..ef997dd 100755
+--- a/build-aux/extract-ofp-fields
++++ b/build-aux/extract-ofp-fields
+@@ -16,7 +16,7 @@ VERSION = {"1.0": 0x01,
+            "1.3": 0x04,
+            "1.4": 0x05,
+            "1.5": 0x06}
+-VERSION_REVERSE = dict((v,k) for k, v in VERSION.iteritems())
++VERSION_REVERSE = dict((v,k) for k, v in VERSION.items())
+ 
+ TYPES = {"u8":       (1,   False),
+          "be16":     (2,   False),
+diff --git a/ovsdb/ovsdb-idlc.in b/ovsdb/ovsdb-idlc.in
+index 3fa1a0f..615548f 100755
+--- a/ovsdb/ovsdb-idlc.in
++++ b/ovsdb/ovsdb-idlc.in
+@@ -138,7 +138,7 @@ def printCIDLHeader(schemaFile):
+ #include "smap.h"
+ #include "uuid.h"''' % {'prefix': prefix.upper()})
+ 
+-    for tableName, table in sorted(schema.tables.iteritems()):
++    for tableName, table in sorted(schema.tables.items()):
+         structName = "%s%s" % (prefix, tableName.lower())
+ 
+         print("")
+@@ -300,7 +300,7 @@ def printCIDLSource(schemaFile):
+ ''' % schema.idlHeader)
+ 
+     # Cast functions.
+-    for tableName, table in sorted(schema.tables.iteritems()):
++    for tableName, table in sorted(schema.tables.items()):
+         structName = "%s%s" % (prefix, tableName.lower())
+         print('''
+ static struct %(s)s *
+@@ -311,7 +311,7 @@ static struct %(s)s *
+ ''' % {'s': structName})
+ 
+ 
+-    for tableName, table in sorted(schema.tables.iteritems()):
++    for tableName, table in sorted(schema.tables.items()):
+         structName = "%s%s" % (prefix, tableName.lower())
+         print("")
+         print("/* %s table. */" % (tableName))
+@@ -1025,7 +1025,7 @@ void
+     # Table classes.
+     print("")
+     print("struct ovsdb_idl_table_class %stable_classes[%sN_TABLES] = {" % (prefix, prefix.upper()))
+-    for tableName, table in sorted(schema.tables.iteritems()):
++    for tableName, table in sorted(schema.tables.items()):
+         structName = "%s%s" % (prefix, tableName.lower())
+         if table.is_root:
+             is_root = "true"
+-- 
+2.5.0
+

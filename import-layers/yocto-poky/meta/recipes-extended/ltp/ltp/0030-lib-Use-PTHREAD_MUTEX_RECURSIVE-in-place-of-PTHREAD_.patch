@@ -8,6 +8,8 @@ e.g. musl does not implement the _NP mutex types
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Dengke Du <dengke.du@windriver.com>
+
+Upstream-Status: Pending
 ---
  lib/tst_res.c | 4 ++++
  1 file changed, 4 insertions(+)

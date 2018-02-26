@@ -6,7 +6,7 @@ PRIORITY = "optional"
 
 DEPENDS = "yajl util-linux"
 
-SRCREV = "ca515c1f399bd0b16e94b7c34aa1ef20498beca6"
+SRCREV = "1ac958a4197a9ea52174812fc7d7d036af8140d3"
 SRC_URI = "git://github.com/projectatomic/oci-systemd-hook \
            file://0001-selinux-drop-selinux-support.patch \
            file://0001-configure-drop-selinux-support.patch \

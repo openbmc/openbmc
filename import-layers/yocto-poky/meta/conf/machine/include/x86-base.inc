@@ -10,7 +10,8 @@ MACHINE_FEATURES += "screen keyboard pci usbhost ext2 ext3 x86 \
 
 MACHINE_EXTRA_RRECOMMENDS += "kernel-modules"
 
-IMAGE_FSTYPES += "live"
+IMAGE_FSTYPES ?= "live"
+NOISO ?= "1"
 
 KERNEL_IMAGETYPE ?= "bzImage"
 
@@ -20,7 +21,7 @@ SERIAL_CONSOLE ?= "115200 ttyS0"
 # kernel-related variables
 #
 PREFERRED_PROVIDER_virtual/kernel ??= "linux-yocto"
-PREFERRED_VERSION_linux-yocto ??= "4.10%"
+PREFERRED_VERSION_linux-yocto ??= "4.12%"
 
 #
 # XSERVER subcomponents, used to build the XSERVER variable

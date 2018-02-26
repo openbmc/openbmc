@@ -1,0 +1,49 @@
+From 6e9d2bcaa6f886b2384c1c35a04e4ebc148aea68 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Oct 2017 12:40:25 -0700
+Subject: [PATCH 10/12] test-sizeof.c: Disable tests for missing typedefs in
+ musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/test/test-sizeof.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/test/test-sizeof.c b/src/test/test-sizeof.c
+index 269adfd18..ba7855dff 100644
+--- a/src/test/test-sizeof.c
++++ b/src/test/test-sizeof.c
+@@ -18,7 +18,6 @@
+ ***/
+ 
+ #include <stdio.h>
+-
+ #include "time-util.h"
+ 
+ /* Print information about various types. Useful when diagnosing
+@@ -48,8 +47,10 @@ int main(void) {
+         info(unsigned);
+         info(long unsigned);
+         info(long long unsigned);
++#ifdef __GLIBC__
+         info(__syscall_ulong_t);
+         info(__syscall_slong_t);
++#endif
+ 
+         info(float);
+         info(double);
+@@ -59,7 +60,9 @@ int main(void) {
+         info(ssize_t);
+         info(time_t);
+         info(usec_t);
++#ifdef __GLIBC__
+         info(__time_t);
++#endif
+ 
+         info(enum Enum);
+         info(enum BigEnum);
+-- 
+2.14.2
+

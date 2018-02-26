@@ -33,7 +33,7 @@
             <author>
                 <firstname>Scott</firstname> <surname>Rifenbark</surname>
                 <affiliation>
-                    <orgname>Intel Corporation</orgname>
+                    <orgname>Scotty's Documentation Services, INC</orgname>
                 </affiliation>
                 <email>srifenbark@gmail.com</email>
             </author>
@@ -66,24 +66,19 @@
                 <revremark>Released with the Yocto Project 2.3 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.3.1</revnumber>
-                <date>June 2017</date>
-                <revremark>Released with the Yocto Project 2.3.1 Release.</revremark>
+                <revnumber>2.4</revnumber>
+                <date>October 2017</date>
+                <revremark>Released with the Yocto Project 2.4 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.3.2</revnumber>
-                <date>September 2017</date>
-                <revremark>Released with the Yocto Project 2.3.2 Release.</revremark>
-            </revision>
-            <revision>
-                <revnumber>2.3.3</revnumber>
+                <revnumber>2.4.1</revnumber>
                 <date>January 2018</date>
-                <revremark>Released with the Yocto Project 2.3.3 Release.</revremark>
+                <revremark>Released with the Yocto Project 2.4.1 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.3.4</revnumber>
-                <date>April 2018</date>
-                <revremark>Released with the Yocto Project 2.3.4 Release.</revremark>
+                <revnumber>2.4.2</revnumber>
+                <date>March 2018</date>
+                <revremark>Released with the Yocto Project 2.4.2 Release.</revremark>
             </revision>
        </revhistory>
 
@@ -100,27 +95,29 @@
            <note><title>Manual Notes</title>
                <itemizedlist>
                    <listitem><para>
-                       For the latest version of the Yocto Project
-                       Mega-Manual associated with this Yocto Project release
-                       (version &YOCTO_DOC_VERSION;),
-                       see the Yocto Project Mega-Manual from the
+                       This version of the
+                       <emphasis>Yocto Project Mega-Manual</emphasis>
+                       is for the &YOCTO_DOC_VERSION; release of the
+                       Yocto Project.
+                       To be sure you have the latest version of the manual
+                       for this release, use the manual from the
                        <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>.
                        </para></listitem>
                    <listitem><para>
-                       This version of the manual is version
-                       &YOCTO_DOC_VERSION;.
-                       For later releases of the Yocto Project (if they exist),
-                       go to the
+                       For manuals associated with other releases of the Yocto
+                       Project, go to the
                        <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
                        and use the drop-down "Active Releases" button
-                       and choose the Yocto Project version for which you want
-                       the manual.
+                       and choose the manual associated with the desired
+                       Yocto Project.
                        </para></listitem>
                    <listitem><para>
-                       For an in-development version of the Yocto Project
-                       Mega-Manual, see
-                       <ulink url='&YOCTO_DOCS_URL;/latest/mega-manual/mega-manual.html'></ulink>.
-                       </para></listitem>
+                        To report any inaccuracies or problems with this
+                        manual, send an email to the Yocto Project
+                        discussion group at
+                        <filename>yocto@yoctoproject.com</filename> or log into
+                        the freenode <filename>#yocto</filename> channel.
+                        </para></listitem>
                </itemizedlist>
            </note>
 
@@ -146,8 +143,6 @@
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../dev-manual/dev-manual-newbie.xml"/>
     <xi:include
-        xmlns:xi="http://www.w3.org/2003/XInclude" href="../dev-manual/dev-manual-model.xml"/>
-    <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../dev-manual/dev-manual-common-tasks.xml"/>
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../dev-manual/dev-manual-qemu.xml"/>
@@ -166,6 +161,8 @@
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-using.xml"/>
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-working-projects.xml"/>
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-eclipse-project.xml"/>
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../sdk-manual/sdk-appendix-obtain.xml"/>
     <xi:include
@@ -229,7 +226,7 @@
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/usingpoky.xml"/>
 
     <xi:include
-        xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/closer-look.xml"/>
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/ref-development-environment.xml"/>
 
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/technical-details.xml"/>
@@ -251,6 +248,9 @@
 
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/ref-devtool-reference.xml"/>
+
+    <xi:include
+        xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/ref-kickstart.xml"/>
 
     <xi:include
         xmlns:xi="http://www.w3.org/2003/XInclude" href="../ref-manual/ref-qa-checks.xml"/>

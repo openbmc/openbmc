@@ -1,0 +1,30 @@
+Do not compute platform, this does not work in cross compile environment
+since it pokes at the system for getting architecture values
+
+Upstream-Status: Inappropriate
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: M2Crypto-0.26.0/setup.py
+===================================================================
+--- M2Crypto-0.26.0.orig/setup.py
++++ M2Crypto-0.26.0/setup.py
+@@ -141,19 +141,6 @@ class _M2CryptoBuildExt(build_ext.build_
+                 self.include_dirs.append(
+                     os.path.join(self.openssl, 'include', 'openssl'))
+ 
+-            # For RedHat-based distros, the '-D__{arch}__' option for
+-            # Swig needs to be normalized, particularly on i386.
+-            mach = platform.machine().lower()
+-            if mach in ('i386', 'i486', 'i586', 'i686'):
+-                arch = '__i386__'
+-            elif mach in ('ppc64', 'powerpc64'):
+-                arch = '__powerpc64__'
+-            elif mach in ('ppc', 'powerpc'):
+-                arch = '__powerpc__'
+-            else:
+-                arch = '__%s__' % mach
+-            self.swig_opts.append('-D%s' % arch)
+-
+         self.swig_opts.extend(['-I%s' % i for i in self.include_dirs])
+         self.swig_opts.append('-includeall')
+         self.swig_opts.append('-modern')

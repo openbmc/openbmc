@@ -1,0 +1,89 @@
+From 56ef434e454bcc82c162a83d9bcb076d4fc72b7f Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 9 Jan 2014 14:30:26 +0800
+Subject: [PATCH] Fix libtool detection
+
+Upstream-Status: pending
+
+Use LT_INIT instead of the deprecated AC_PROG_LIBTOOL to detect libtool, so it
+can work with our libtoolize and libtool.
+
+Simplify the detection of ltdl. It will find the ltdl from the sysroot; the
+switch --with-system-libltdl is no longer needed. The code is copied from
+pulseaudio configure.ac, together with the comment paragraph.
+
+Also patch autogen.sh so it uses autoreconf, which handles libtoolize better.
+
+Signed-off-by: Jesse Zhang <sen.zhang@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ autogen.sh   |  5 +----
+ configure.ac | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+), 4 deletions(-)
+
+diff --git a/autogen.sh b/autogen.sh
+index 3418673..e42c3d5 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -5,10 +5,7 @@ parentdir=`dirname $0`
+ cd $parentdir
+ parentdir=`pwd`
+ 
+-libtoolize -f -c
+-#aclocal
+-autoheader
+-autoconf
++autoreconf -Wcross --verbose --install --force
+ 
+ mysubdirs="$mysubdirs `find src/modules/ -name configure -print | sed 's%/configure%%'`"
+ mysubdirs=`echo $mysubdirs`
+diff --git a/configure.ac b/configure.ac
+index e73e4ad..066d3d7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -205,6 +205,42 @@ dnl #  See if we have Git.
+ dnl #
+ AC_CHECK_PROG(GIT, git, yes, no)
+ 
++#### libtool stuff ####
++
++dnl set this shit so it doesn't force CFLAGS...
++LTCFLAGS=" "
++
++LT_PREREQ(2.2)
++LT_INIT([dlopen disable-static])
++
++dnl Unfortunately, even up to libtool 2.2.6a there is no way to know
++dnl exactly which version of libltdl is present in the system, so we
++dnl just assume that it's a working version as long as we have the
++dnl library and the header files.
++dnl
++dnl As an extra safety device, check for lt_dladvise_init() which is
++dnl only implemented in libtool 2.x, and refine as we go if we have
++dnl refined requirements.
++dnl
++dnl Check the header files first since the system may have a
++dnl libltdl.so for runtime, but no headers, and we want to bail out as
++dnl soon as possible.
++dnl
++dnl We don't need any special variable for this though, since the user
++dnl can give the proper place to find libltdl through the standard
++dnl variables like LDFLAGS and CPPFLAGS.
++
++AC_CHECK_HEADER([ltdl.h],
++    [AC_CHECK_LIB([ltdl], [lt_dladvise_init], [LIBLTDL=-lltdl], [LIBLTDL=])],
++    [LIBLTDL=])
++
++AS_IF([test "x$LIBLTDL" = "x"],
++    [AC_MSG_ERROR([Unable to find libltdl version 2. Makes sure you have libtool 2.2 or later installed.])])
++AC_SUBST([LIBLTDL])
++LTDL_SUBDIRS=
++INCLTDL=-DWITH_SYSTEM_LTDL
++AC_SUBST(LTDL_SUBDIRS)
++
+ dnl Put this in later, when all distributed modules use autoconf.
+ dnl AC_ARG_WITH(disablemodulefoo,
+ dnl [  --without-rlm_foo         Disables module compilation.  Module list:]
+-- 
+1.8.3
+

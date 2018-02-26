@@ -1,0 +1,82 @@
+From c0e63f0d3c09bdabb0ad2c88b7cc73e7618dd86a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 15 Jun 2017 17:35:33 +0800
+Subject: [PATCH 4/4] load.py: retry to invoke request with timeout
+
+While networkless, use request to fetch kickstart file from
+network, it failed and wait 300s to break, we should retry
+to invoke request with timeout explicitly. So if it the
+network is up, the fetch works.
+
+Upstream-Status: inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pykickstart/load.py | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/pykickstart/load.py b/pykickstart/load.py
+index 48c8276..74b266b 100644
+--- a/pykickstart/load.py
++++ b/pykickstart/load.py
+@@ -21,6 +21,7 @@ import requests
+ from requests.auth import HTTPDigestAuth
+ from requests.auth import HTTPBasicAuth
+ 
++import time
+ import shutil
+ import six
+ 
+@@ -28,6 +29,9 @@ from pykickstart.errors import KickstartError, KickstartAuthError
+ from pykickstart.i18n import _
+ from requests.exceptions import SSLError, RequestException
+ 
++import logging
++log = logging.getLogger("anaconda")
++
+ _is_url = lambda location: '://' in location # RFC 3986
+ 
+ SSL_VERIFY = False
+@@ -74,6 +78,29 @@ def load_to_file(location, destination):
+         _copy_file(location, destination)
+         return destination
+ 
++def _access_url(location):
++    status = False
++
++    # Retry 45 times, wait 45s~135s
++    i = 0
++    while i < 45:
++
++        try:
++            request = requests.get(location, verify=SSL_VERIFY, timeout=2)
++        except RequestException as e:
++            log.info("Try '%s' %d times, %s" % (location, i, str(e)))
++            status = False
++            i += 1
++            time.sleep(1)
++            continue
++
++        else:
++            status = True
++            return status
++
++    return status
++
++
+ def _get_auth(location, user=None, passwd=None):
+ 
+     auth = None
+@@ -96,6 +123,9 @@ def _get_auth(location, user=None, passwd=None):
+ def _load_url(location, user=None, passwd=None):
+     '''Load a location (URL or filename) and return contents as string'''
+ 
++    if not _access_url(location):
++        raise KickstartError(_("Connection %s failed" % location))
++
+     auth = _get_auth(location, user=user, passwd=passwd)
+ 
+     try:
+-- 
+2.7.4
+

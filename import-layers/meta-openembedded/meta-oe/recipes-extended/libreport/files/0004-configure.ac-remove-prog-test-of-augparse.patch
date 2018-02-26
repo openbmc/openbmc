@@ -1,0 +1,36 @@
+From cf3b646facc19078ed29f828e36dd2e552283518 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 27 Apr 2017 02:15:02 -0400
+Subject: [PATCH] configure.ac: remove prog test of augparse
+
+The build time does not require it.
+
+Upstream-Status:  Inappropriate workaround
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c06af2d..b90f49e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -288,14 +288,6 @@ AC_ARG_WITH(augeaslenslibdir,
+                            [Directory for librepor lens (default: /usr/share/augeas/lenses)])],
+             [], [with_augeaslenslibdir="/usr/share/augeas/lenses"])
+ AC_SUBST([AUGEAS_LENS_LIB_DIR], [$with_augeaslenslibdir])
+-AC_PATH_PROG(AUGPARSE, augparse, no)
+-[if test "$AUGPARSE" = "no"]
+-[then]
+-    [echo "The augparse program was not found in the search path. Please ensure"]
+-    [echo "that it is installed and its directory is included in the search path."]
+-    [echo "Then run configure again before attempting to build libreport."]
+-    [exit 1]
+-[fi]
+ 
+ AC_ARG_WITH([defaultdumpdirmode],
+             AS_HELP_STRING([--with-defaultdumpdirmode=OCTAL-MODE],
+-- 
+2.8.1
+

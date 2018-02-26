@@ -1,0 +1,46 @@
+From 44ef80688b56beea85c0070840dea1e2a4e34aed Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 13 Jun 2017 12:12:52 -0700
+Subject: [PATCH 49/49] gcc: Enable static PIE
+
+Static PIE support in GCC
+see
+https://gcc.gnu.org/ml/gcc/2015-06/msg00008.html
+
+startfiles before patch:
+ -static -> crt1.o crti.o crtbeginT.o
+ -static -PIE -> crt1.o crti.o crtbeginT.o
+ 
+after patch:
+ -static -> crt1.o crti.o crtbeginT.o
+ -static -PIE -> rcrt1.o crti.o crtbeginS.o
+ 
+Upstream-Status: Pending
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+---
+ gcc/config/gnu-user.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/gcc/config/gnu-user.h b/gcc/config/gnu-user.h
+index de605b0..b035bbe 100644
+--- a/gcc/config/gnu-user.h
++++ b/gcc/config/gnu-user.h
+@@ -52,11 +52,11 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ #define GNU_USER_TARGET_STARTFILE_SPEC \
+   "%{shared:; \
+      pg|p|profile:gcrt1.o%s; \
+-     static:crt1.o%s; \
++     static: %{" PIE_SPEC ": rcrt1.o%s; :crt1.o%s}; \
+      " PIE_SPEC ":Scrt1.o%s; \
+      :crt1.o%s} \
+    crti.o%s \
+-   %{static:crtbeginT.o%s; \
++   %{static: %{" PIE_SPEC ": crtbeginS.o%s; :crtbeginT.o%s}; \
+      shared|" PIE_SPEC ":crtbeginS.o%s; \
+      :crtbegin.o%s} \
+    %{fvtable-verify=none:%s; \
+
+2.13.1
+

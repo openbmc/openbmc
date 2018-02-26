@@ -1,0 +1,25 @@
+Upstream-Status: Inappropriate [1]
+
+[1] Not the author, the patch is from:
+http://vault.centos.org/5.8/os/SRPMS/rdist-6.1.5-44.src.rpm
+
+--- rdist-6.1.5/src/client.c.hardlink	Thu Jun  3 13:56:31 1999
++++ rdist-6.1.5/src/client.c	Thu Jun  3 14:00:06 1999
+@@ -348,7 +348,7 @@
+ 		lp->target = strdup(Tdest);
+ 	else
+ 		lp->target = NULL;
+-	if (!lp->pathname || !lp->src || !(Tdest && lp->target))
++	if (!lp->pathname || !lp->src || (Tdest && !lp->target))
+ 		fatalerr("Cannot malloc memory in linkinfo.");
+ 
+ 	return((struct linkbuf *) NULL);
+@@ -370,7 +370,7 @@
+ 	       "sendhardlink: rname='%s' pathname='%s' src='%s' target='%s'\n",
+ 		 rname, lp->pathname, lp->src, lp->target);
+ 		 
+-	if (*lp->target == CNULL)
++	if (lp->target == NULL || *lp->target == CNULL)
+ 		(void) sendcmd(C_RECVHARDLINK, "%o %s %s", 
+ 			       opts, lp->pathname, rname);
+ 	else {

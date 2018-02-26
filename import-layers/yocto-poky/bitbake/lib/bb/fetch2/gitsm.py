@@ -117,14 +117,19 @@ class GitSM(Git):
     def download(self, ud, d):
         Git.download(self, ud, d)
 
-        submodules = self.uses_submodules(ud, d, ud.clonedir)
-        if submodules:
-            self.update_submodules(ud, d)
+        if not ud.shallow or ud.localpath != ud.fullshallow:
+            submodules = self.uses_submodules(ud, d, ud.clonedir)
+            if submodules:
+                self.update_submodules(ud, d)
+
+    def clone_shallow_local(self, ud, dest, d):
+        super(GitSM, self).clone_shallow_local(ud, dest, d)
+
+        runfetchcmd('cp -fpPRH "%s/modules" "%s/"' % (ud.clonedir, os.path.join(dest, '.git')), d)
 
     def unpack(self, ud, destdir, d):
         Git.unpack(self, ud, destdir, d)
-        
-        submodules = self.uses_submodules(ud, d, ud.destdir)
-        if submodules:
+
+        if self.uses_submodules(ud, d, ud.destdir):
             runfetchcmd(ud.basecmd + " checkout " + ud.revisions[ud.names[0]], d, workdir=ud.destdir)
             runfetchcmd(ud.basecmd + " submodule update --init --recursive", d, workdir=ud.destdir)

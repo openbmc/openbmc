@@ -3,7 +3,6 @@ inherit toolchain-scripts-base siteinfo kernel-arch
 # We want to be able to change the value of MULTIMACH_TARGET_SYS, because it
 # doesn't always match our expectations... but we default to the stock value
 REAL_MULTIMACH_TARGET_SYS ?= "${MULTIMACH_TARGET_SYS}"
-TARGET_CC_ARCH_append_libc-uclibc = " -muclibc"
 TARGET_CC_ARCH_append_libc-musl = " -mmusl"
 
 # default debug prefix map isn't valid in the SDK
@@ -25,6 +24,21 @@ toolchain_create_sdk_env_script () {
 	script=${1:-${SDK_OUTPUT}/${SDKPATH}/environment-setup-$multimach_target_sys}
 	rm -f $script
 	touch $script
+
+	echo '# Check for LD_LIBRARY_PATH being set, which can break SDK and generally is a bad practice' >> $script
+	echo '# http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html#AEN80' >> $script
+	echo '# http://xahlee.info/UnixResource_dir/_/ldpath.html' >> $script
+	echo '# Only disable this check if you are absolutely know what you are doing!' >> $script
+	echo 'if [ ! -z "$LD_LIBRARY_PATH" ]; then' >> $script
+	echo "    echo \"Your environment is misconfigured, you probably need to 'unset LD_LIBRARY_PATH'\"" >> $script
+	echo "    echo \"but please check why this was set in the first place and that it's safe to unset.\"" >> $script
+	echo '    echo "The SDK will not operate correctly in most cases when LD_LIBRARY_PATH is set."' >> $script
+	echo '    echo "For more references see:"' >> $script
+	echo '    echo "  http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html#AEN80"' >> $script
+	echo '    echo "  http://xahlee.info/UnixResource_dir/_/ldpath.html"' >> $script
+	echo '    return 1' >> $script
+	echo 'fi' >> $script
+
 	echo 'export SDKTARGETSYSROOT='"$sysroot" >> $script
 	EXTRAPATH=""
 	for i in ${CANADIANEXTRAOS}; do

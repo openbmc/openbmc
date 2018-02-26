@@ -1,0 +1,27 @@
+From 19a3e590c97420bd3952301bf376067c75d0ee32 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 18 Sep 2017 23:45:54 -0700
+Subject: [PATCH] mips/plt.c: Delete include error.h
+
+Its not needed
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeps/linux-gnu/mips/plt.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/sysdeps/linux-gnu/mips/plt.c b/sysdeps/linux-gnu/mips/plt.c
+index 2d85ad9..9c3ae2f 100644
+--- a/sysdeps/linux-gnu/mips/plt.c
++++ b/sysdeps/linux-gnu/mips/plt.c
+@@ -24,7 +24,6 @@
+ 
+ #include <sys/ptrace.h>
+ #include <errno.h>
+-#include <error.h>
+ #include <gelf.h>
+ #include <inttypes.h>
+ #include <string.h>
+-- 
+2.14.1
+

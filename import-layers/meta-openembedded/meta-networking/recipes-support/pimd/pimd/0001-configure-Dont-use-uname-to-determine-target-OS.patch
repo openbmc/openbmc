@@ -1,0 +1,28 @@
+From f3e04281bad361249a8dad0cde150a801d720f67 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Jul 2017 18:46:52 -0700
+Subject: [PATCH] configure: Dont use uname to determine target OS
+
+Helps with cross-compiling
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 6c35a72..f9714e2 100755
+--- a/configure
++++ b/configure
+@@ -31,7 +31,7 @@
+ #DEFS += -DSCOPED_ACL
+ #
+ 
+-OS=`uname`
++OS="Linux"
+ CFG=config.mk
+ TMP=`mktemp /tmp/XXXXXX`
+ BUGREPORT_URL="https://github.com/troglobit/pimd/issues"
+-- 
+2.13.3
+

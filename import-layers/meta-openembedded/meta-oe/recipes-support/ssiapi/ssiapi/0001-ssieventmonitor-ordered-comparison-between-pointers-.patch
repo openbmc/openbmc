@@ -1,0 +1,39 @@
+From ea9ecf4bf305f9509d5822b3823658a40162f43c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 25 Jul 2017 19:08:21 -0700
+Subject: [PATCH] ssieventmonitor: ordered comparison between pointers and
+ zero, actually with NULL
+
+Comparing which is large or small between a pointer and NULL
+however, looks completely illogical. Ordered comparison of
+two valid pointers is legit, but no pointer will be smaller
+than NULL , so comparing if a pointer is larger than NULL
+simply means if the pointer is not NULL.
+
+Fixes errors found with clang e.g.
+
+| ssieventmonitor.cpp:339:53: error: ordered comparison between pointer and zero ('char *' and 'int')
+|                 if (fgets(nextline, sizeof(nextline) - 1, mdstat) < 0) {
+|                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/ssieventmonitor.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/ssieventmonitor.cpp b/tools/ssieventmonitor.cpp
+index f04b8f0..7a00122 100644
+--- a/tools/ssieventmonitor.cpp
++++ b/tools/ssieventmonitor.cpp
+@@ -336,7 +336,7 @@ static int _read_mdstat(int fd)
+ 	if (!strncmp(line, "md", 2)) {
+ 	    if (strstr(line, INACTIVE_STR)) { /* possibly container */
+ 		char nextline[1024];
+-		if (fgets(nextline, sizeof(nextline) - 1, mdstat) < 0) {
++		if (fgets(nextline, sizeof(nextline) - 1, mdstat) != (char *) NULL) {
+ 		    fclose(mdstat);
+ 		    return 1;
+ 		}
+-- 
+2.13.3
+

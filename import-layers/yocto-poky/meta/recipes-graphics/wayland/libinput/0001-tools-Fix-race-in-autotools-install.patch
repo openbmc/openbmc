@@ -1,0 +1,37 @@
+From 5e8864c5b7a2e258eea041b0ef66dac7fcab9b7f Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Wed, 9 Aug 2017 09:47:14 +0300
+Subject: [PATCH] tools: Fix race in (autotools) install
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+exec/data distinction is done based on install dir so compat scripts
+must be moved in exec hook.
+
+This should fix this occasional failure:
+| install: cannot change permissions of
+| ‘/usr/bin/libinput-debug-events.compat’: No such file or directory
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Submitted
+---
+ tools/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 2c8660b..7ee8b90 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -63,7 +63,7 @@ endif
+ 
+ EXTRA_DIST = make-ptraccel-graphs.sh install-compat-scripts.sh $(bin_SCRIPTS)
+ 
+-install-data-hook:
++install-exec-hook:
+ 	(cd $(DESTDIR)$(bindir) && mv libinput-list-devices.compat libinput-list-devices)
+ 	(cd $(DESTDIR)$(bindir) && mv libinput-debug-events.compat libinput-debug-events)
+ 
+-- 
+2.13.3
+

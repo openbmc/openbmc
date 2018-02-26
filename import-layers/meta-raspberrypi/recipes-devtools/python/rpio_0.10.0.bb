@@ -14,7 +14,7 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 inherit setuptools
 
-COMPATIBLE_MACHINE = "raspberrypi"
+COMPATIBLE_MACHINE = "^rpi$"
 
 RDEPENDS_${PN} = "\
     python-logging \

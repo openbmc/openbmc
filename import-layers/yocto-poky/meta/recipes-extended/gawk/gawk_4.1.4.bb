@@ -41,9 +41,9 @@ inherit ptest
 
 do_install_ptest() {
 	mkdir ${D}${PTEST_PATH}/test
-	for i in `grep -vE "@|^$|#|Gt-dummy" ${S}/test/Maketests |awk -F: '{print $1}'` Maketests; \
+	for i in `grep -vE "@|^$|#|Gt-dummy" ${S}/test/Maketests |awk -F: '{print $1}'` Maketests inclib.awk; \
 	  do cp ${S}/test/$i* ${D}${PTEST_PATH}/test; \
 	done
 }
 
-BBCLASSEXTEND = "nativesdk"
+BBCLASSEXTEND = "native nativesdk"

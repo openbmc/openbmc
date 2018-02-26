@@ -1,0 +1,32 @@
+This patch is needed to avoid double definitions of functions
+especially when building with security flags turned on. The double
+definitions causes the sed.sh script in configure to fail since it
+starts to spit out double outputs e.g.
+
+wi_cv_gethostname_size_t size_t size_t
+
+which then caused almost all subsequent compile time tests to fail since
+this gets into confdefs.h file
+
+removing this include causes only one definitions to be emitted into
+the genrated protos.h file and thus avoiding the above failure.
+
+Other solution would to fix sed.sh to ignore double definitions
+
+Upstream-Status: Pending
+
+Signed-of-by: Khem Raj <raj.khem@gmail.com>
+
+
+Index: ncftp-3.2.6/configure
+===================================================================
+--- ncftp-3.2.6.orig/configure
++++ ncftp-3.2.6/configure
+@@ -7859,7 +7859,6 @@ chmod 755 "$wi_tmpdir/prpp.pl"
+ cat << 'EOF' > "$wi_tmpdir/unistd.c"
+ #include <confdefs.h>
+ 
+-#include <unistd.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>

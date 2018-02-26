@@ -1,0 +1,62 @@
+From 10411fa8658621822ae394160daffaced4a4cd7f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jul 2017 23:07:29 -0700
+Subject: [PATCH] unionfs: Define IOCPARM_LEN if undefined
+
+musl does not have sysctl.h which defines this
+for glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/unionfs.c |  8 --------
+ src/unionfs.h | 15 +++++++++++++++
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/src/unionfs.c b/src/unionfs.c
+index a34d34e..51684a7 100644
+--- a/src/unionfs.c
++++ b/src/unionfs.c
+@@ -21,14 +21,6 @@
+ #include "opts.h"
+ #include "usyslog.h"
+ 
+-#ifndef _IOC_SIZE
+-#ifdef IOCPARM_LEN
+-#define _IOC_SIZE(x) IOCPARM_LEN(x)
+-#else
+-#error "No mechanism for determining ioctl length found."
+-#endif
+-#endif
+-
+ static struct fuse_opt unionfs_opts[] = {
+ 	FUSE_OPT_KEY("chroot=%s,", KEY_CHROOT),
+ 	FUSE_OPT_KEY("cow", KEY_COW),
+diff --git a/src/unionfs.h b/src/unionfs.h
+index 8f5e0bf..b02de5a 100644
+--- a/src/unionfs.h
++++ b/src/unionfs.h
+@@ -17,6 +17,21 @@
+ #define FUSE_META_FILE ".fuse_hidden"
+ #define FUSE_META_LENGTH 12
+ 
++#ifndef IOCPARM_MASK
++#define IOCPARM_MASK      0x1FFF
++#endif
++#ifndef IOCPARM_LEN
++#define IOCPARM_LEN(a)    (((a) >> 16) & IOCPARM_MASK)
++#endif
++
++#ifndef _IOC_SIZE
++#ifdef IOCPARM_LEN
++#define _IOC_SIZE(x) IOCPARM_LEN(x)
++#else
++#error "No mechanism for determining ioctl length found."
++#endif
++#endif
++
+ // file access protection mask
+ #define S_PROT_MASK (S_ISUID| S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO)
+ 
+-- 
+2.13.2
+

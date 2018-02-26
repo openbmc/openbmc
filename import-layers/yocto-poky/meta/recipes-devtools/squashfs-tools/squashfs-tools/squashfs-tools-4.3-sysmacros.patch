@@ -1,0 +1,32 @@
+From https://gitweb.gentoo.org/repo/gentoo.git/tree/sys-fs/squashfs-tools/files/squashfs-tools-4.3-sysmacros.patch
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+Upstream-Status: Pending
+
+
+sys/types.h might not always include sys/sysmacros.h for major/minor/makedev
+
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -59,6 +59,7 @@
+ #else
+ #include <endian.h>
+ #include <sys/sysinfo.h>
++#include <sys/sysmacros.h>
+ #endif
+ 
+ #include "squashfs_fs.h"
+--- a/squashfs-tools/unsquashfs.c
++++ b/squashfs-tools/unsquashfs.c
+@@ -38,6 +38,10 @@
+ #include <limits.h>
+ #include <ctype.h>
+ 
++#ifdef linux
++#include <sys/sysmacros.h>
++#endif
++
+ struct cache *fragment_cache, *data_cache;
+ struct queue *to_reader, *to_inflate, *to_writer, *from_writer;
+ pthread_t *thread, *inflator_thread;

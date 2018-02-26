@@ -3,7 +3,7 @@
 #
 # This is a copy on write dictionary and set which abuses classes to try and be nice and fast.
 #
-# Copyright (C) 2006 Tim Amsell
+# Copyright (C) 2006 Tim Ansell
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as

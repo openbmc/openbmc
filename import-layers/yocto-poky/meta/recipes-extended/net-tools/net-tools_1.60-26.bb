@@ -37,9 +37,7 @@ UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/n/net-tools/"
 
 inherit gettext
 
-do_patch[depends] = "quilt-native:do_populate_sysroot"
-
-LDFLAGS_append_libc-uclibc = " -lintl "
+do_patch[depends] += "quilt-native:do_populate_sysroot"
 
 # The Makefile is lame, no parallel build
 PARALLEL_MAKE = ""
@@ -83,20 +81,12 @@ do_configure() {
 
 do_compile() {
 	# net-tools use COPTS/LOPTS to allow adding custom options
-	export COPTS="$CFLAGS"
-	export LOPTS="$LDFLAGS"
-	unset CFLAGS
-	unset LDFLAGS
-
-	oe_runmake
+	oe_runmake COPTS="$CFLAGS" LOPTS="$LDFLAGS"
 }
 
 do_install() {
-	export COPTS="$CFLAGS"
-	export LOPTS="$LDFLAGS"
-	unset CFLAGS
-	unset LDFLAGS
-	oe_runmake 'BASEDIR=${D}' install
+	# We don't need COPTS or LOPTS, but let's be consistent.
+	oe_runmake COPTS="$CFLAGS" LOPTS="$LDFLAGS" 'BASEDIR=${D}' install
 
 	if [ "${base_bindir}" != "/bin" ]; then
 		mkdir -p ${D}/${base_bindir}

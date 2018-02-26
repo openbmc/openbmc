@@ -1,0 +1,27 @@
+From 87f868918a9ae1dcf93e01f3e177d185c19a149a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jul 2017 14:32:09 -0700
+Subject: [PATCH] makefile: Do not build contrib dir
+
+It contains debian build iteams anyway
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 3ccf82f8..a852e529 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -52,7 +52,6 @@ SUBDIRS = \
+ 	src \
+ 	system \
+ 	web \
+-	contrib \
+ 	$(NULL)
+ 
+ dist_noinst_DATA= \
+-- 
+2.13.2
+

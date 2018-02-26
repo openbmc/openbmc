@@ -181,15 +181,15 @@ class BBCooker:
         self.confignotifier = pyinotify.Notifier(self.configwatcher, self.config_notifications)
         self.watchmask = pyinotify.IN_CLOSE_WRITE | pyinotify.IN_CREATE | pyinotify.IN_DELETE | \
                          pyinotify.IN_DELETE_SELF | pyinotify.IN_MODIFY | pyinotify.IN_MOVE_SELF | \
-                         pyinotify.IN_MOVED_FROM | pyinotify.IN_MOVED_TO 
+                         pyinotify.IN_MOVED_FROM | pyinotify.IN_MOVED_TO
         self.watcher = pyinotify.WatchManager()
         self.watcher.bbseen = []
         self.watcher.bbwatchedfiles = []
         self.notifier = pyinotify.Notifier(self.watcher, self.notifications)
 
-        # If being called by something like tinfoil, we need to clean cached data 
+        # If being called by something like tinfoil, we need to clean cached data
         # which may now be invalid
-        bb.parse.__mtime_cache = {}
+        bb.parse.clear_cache()
         bb.parse.BBHandler.cached_statements = {}
 
         self.ui_cmdline = None
@@ -205,31 +205,11 @@ class BBCooker:
 
         self.inotify_modified_files = []
 
-        def _process_inotify_updates(server, notifier_list, abort):
-            for n in notifier_list:
-                if n.check_events(timeout=0):
-                    # read notified events and enqeue them
-                    n.read_events()
-                    n.process_events()
+        def _process_inotify_updates(server, cooker, abort):
+            cooker.process_inotify_updates()
             return 1.0
 
-        self.configuration.server_register_idlecallback(_process_inotify_updates, [self.confignotifier, self.notifier])
-
-        self.baseconfig_valid = True
-        self.parsecache_valid = False
-
-        # Take a lock so only one copy of bitbake can run against a given build
-        # directory at a time
-        if not self.lockBitbake():
-            bb.fatal("Only one copy of bitbake should be run against a build directory")
-        try:
-            self.lock.seek(0)
-            self.lock.truncate()
-            if len(configuration.interface) >= 2:
-                self.lock.write("%s:%s\n" % (configuration.interface[0], configuration.interface[1]));
-            self.lock.flush()
-        except:
-            pass
+        self.configuration.server_register_idlecallback(_process_inotify_updates, self)
 
         # TOSTOP must not be set or our children will hang when they output
         try:
@@ -253,10 +233,19 @@ class BBCooker:
         # Let SIGHUP exit as SIGTERM
         signal.signal(signal.SIGHUP, self.sigterm_exception)
 
+    def process_inotify_updates(self):
+        for n in [self.confignotifier, self.notifier]:
+            if n.check_events(timeout=0):
+                # read notified events and enqeue them
+                n.read_events()
+                n.process_events()
+
     def config_notifications(self, event):
         if event.maskname == "IN_Q_OVERFLOW":
             bb.warn("inotify event queue overflowed, invalidating caches.")
+            self.parsecache_valid = False
             self.baseconfig_valid = False
+            bb.parse.clear_cache()
             return
         if not event.pathname in self.configwatcher.bbwatchedfiles:
             return
@@ -268,6 +257,10 @@ class BBCooker:
         if event.maskname == "IN_Q_OVERFLOW":
             bb.warn("inotify event queue overflowed, invalidating caches.")
             self.parsecache_valid = False
+            bb.parse.clear_cache()
+            return
+        if event.pathname.endswith("bitbake-cookerdaemon.log") \
+                or event.pathname.endswith("bitbake.lock"):
             return
         if not event.pathname in self.inotify_modified_files:
             self.inotify_modified_files.append(event.pathname)
@@ -288,7 +281,7 @@ class BBCooker:
             watchtarget = None
             while True:
                 # We try and add watches for files that don't exist but if they did, would influence
-                # the parser. The parent directory of these files may not exist, in which case we need 
+                # the parser. The parent directory of these files may not exist, in which case we need
                 # to watch any parent that does exist for changes.
                 try:
                     watcher.add_watch(f, self.watchmask, quiet=False)
@@ -382,6 +375,15 @@ class BBCooker:
         self.data.renameVar("__depends", "__base_depends")
         self.add_filewatch(self.data.getVar("__base_depends", False), self.configwatcher)
 
+        self.baseconfig_valid = True
+        self.parsecache_valid = False
+
+    def handlePRServ(self):
+        # Setup a PR Server based on the new configuration
+        try:
+            self.prhost = prserv.serv.auto_start(self.data)
+        except prserv.serv.PRServiceConfigError as e:
+            bb.fatal("Unable to start PR Server, exitting")
 
     def enableDataTracking(self):
         self.configuration.tracking = True
@@ -392,138 +394,6 @@ class BBCooker:
         self.configuration.tracking = False
         if hasattr(self, "data"):
             self.data.disableTracking()
-
-    def modifyConfigurationVar(self, var, val, default_file, op):
-        if op == "append":
-            self.appendConfigurationVar(var, val, default_file)
-        elif op == "set":
-            self.saveConfigurationVar(var, val, default_file, "=")
-        elif op == "earlyAssign":
-            self.saveConfigurationVar(var, val, default_file, "?=")
-
-
-    def appendConfigurationVar(self, var, val, default_file):
-        #add append var operation to the end of default_file
-        default_file = bb.cookerdata.findConfigFile(default_file, self.data)
-
-        total = "#added by hob"
-        total += "\n%s += \"%s\"\n" % (var, val)
-
-        with open(default_file, 'a') as f:
-            f.write(total)
-
-        #add to history
-        loginfo = {"op":"append", "file":default_file, "line":total.count("\n")}
-        self.data.appendVar(var, val, **loginfo)
-
-    def saveConfigurationVar(self, var, val, default_file, op):
-
-        replaced = False
-        #do not save if nothing changed
-        if str(val) == self.data.getVar(var, False):
-            return
-
-        conf_files = self.data.varhistory.get_variable_files(var)
-
-        #format the value when it is a list
-        if isinstance(val, list):
-            listval = ""
-            for value in val:
-                listval += "%s   " % value
-            val = listval
-
-        topdir = self.data.getVar("TOPDIR", False)
-
-        #comment or replace operations made on var
-        for conf_file in conf_files:
-            if topdir in conf_file:
-                with open(conf_file, 'r') as f:
-                    contents = f.readlines()
-
-                lines = self.data.varhistory.get_variable_lines(var, conf_file)
-                for line in lines:
-                    total = ""
-                    i = 0
-                    for c in contents:
-                        total += c
-                        i = i + 1
-                        if i==int(line):
-                            end_index = len(total)
-                    index = total.rfind(var, 0, end_index)
-
-                    begin_line = total.count("\n",0,index)
-                    end_line = int(line)
-
-                    #check if the variable was saved before in the same way
-                    #if true it replace the place where the variable was declared
-                    #else it comments it
-                    if contents[begin_line-1]== "#added by hob\n":
-                        contents[begin_line] = "%s %s \"%s\"\n" % (var, op, val)
-                        replaced = True
-                    else:
-                        for ii in range(begin_line, end_line):
-                            contents[ii] = "#" + contents[ii]
-
-                with open(conf_file, 'w') as f:
-                    f.writelines(contents)
-
-        if replaced == False:
-            #remove var from history
-            self.data.varhistory.del_var_history(var)
-
-            #add var to the end of default_file
-            default_file = bb.cookerdata.findConfigFile(default_file, self.data)
-
-            #add the variable on a single line, to be easy to replace the second time
-            total = "\n#added by hob"
-            total += "\n%s %s \"%s\"\n" % (var, op, val)
-
-            with open(default_file, 'a') as f:
-                f.write(total)
-
-            #add to history
-            loginfo = {"op":"set", "file":default_file, "line":total.count("\n")}
-            self.data.setVar(var, val, **loginfo)
-
-    def removeConfigurationVar(self, var):
-        conf_files = self.data.varhistory.get_variable_files(var)
-        topdir = self.data.getVar("TOPDIR", False)
-
-        for conf_file in conf_files:
-            if topdir in conf_file:
-                with open(conf_file, 'r') as f:
-                    contents = f.readlines()
-
-                lines = self.data.varhistory.get_variable_lines(var, conf_file)
-                for line in lines:
-                    total = ""
-                    i = 0
-                    for c in contents:
-                        total += c
-                        i = i + 1
-                        if i==int(line):
-                            end_index = len(total)
-                    index = total.rfind(var, 0, end_index)
-
-                    begin_line = total.count("\n",0,index)
-
-                    #check if the variable was saved before in the same way
-                    if contents[begin_line-1]== "#added by hob\n":
-                        contents[begin_line-1] = contents[begin_line] = "\n"
-                    else:
-                        contents[begin_line] = "\n"
-                    #remove var from history
-                    self.data.varhistory.del_var_history(var, conf_file, line)
-                    #remove variable
-                    self.data.delVar(var)
-
-                with open(conf_file, 'w') as f:
-                    f.writelines(contents)
-
-    def createConfigFile(self, name):
-        path = os.getcwd()
-        confpath = os.path.join(path, "conf", name)
-        open(confpath, 'w').close()
 
     def parseConfiguration(self):
         # Set log file verbosity
@@ -547,21 +417,27 @@ class BBCooker:
 
         self.handleCollections(self.data.getVar("BBFILE_COLLECTIONS"))
 
+        self.parsecache_valid = False
+
     def updateConfigOpts(self, options, environment, cmdline):
         self.ui_cmdline = cmdline
         clean = True
         for o in options:
             if o in ['prefile', 'postfile']:
+                # Only these options may require a reparse
+                try:
+                    if getattr(self.configuration, o) == options[o]:
+                        # Value is the same, no need to mark dirty
+                        continue
+                except AttributeError:
+                    pass
+                logger.debug(1, "Marking as dirty due to '%s' option change to '%s'" % (o, options[o]))
+                print("Marking as dirty due to '%s' option change to '%s'" % (o, options[o]))
                 clean = False
-                server_val = getattr(self.configuration, "%s_server" % o)
-                if not options[o] and server_val:
-                    # restore value provided on server start
-                    setattr(self.configuration, o, server_val)
-                    continue
             setattr(self.configuration, o, options[o])
         for k in bb.utils.approved_variables():
             if k in environment and k not in self.configuration.env:
-                logger.debug(1, "Updating environment variable %s to %s" % (k, environment[k]))
+                logger.debug(1, "Updating new environment variable %s to %s" % (k, environment[k]))
                 self.configuration.env[k] = environment[k]
                 clean = False
             if k in self.configuration.env and k not in environment:
@@ -569,14 +445,13 @@ class BBCooker:
                 del self.configuration.env[k]
                 clean = False
             if k not in self.configuration.env and k not in environment:
-                 continue
+                continue
             if environment[k] != self.configuration.env[k]:
-                logger.debug(1, "Updating environment variable %s to %s" % (k, environment[k]))
+                logger.debug(1, "Updating environment variable %s from %s to %s" % (k, self.configuration.env[k], environment[k]))
                 self.configuration.env[k] = environment[k]
                 clean = False
         if not clean:
             logger.debug(1, "Base environment change, triggering reparse")
-            self.baseconfig_valid = False        
             self.reset()
 
     def runCommands(self, server, data, abort):
@@ -615,6 +490,12 @@ class BBCooker:
         envdata = None
         if not pkgs_to_build:
             pkgs_to_build = []
+
+        orig_tracking = self.configuration.tracking
+        if not orig_tracking:
+            self.enableDataTracking()
+            self.reset()
+
 
         if buildfile:
             # Parse the configuration here. We need to do it explicitly here since
@@ -660,6 +541,9 @@ class BBCooker:
             if envdata.getVarFlag(e, 'func', False) and envdata.getVarFlag(e, 'python', False):
                 logger.plain("\npython %s () {\n%s}\n", e, envdata.getVar(e, False))
 
+        if not orig_tracking:
+            self.disableDataTracking()
+            self.reset()
 
     def buildTaskData(self, pkgs_to_build, task, abort, allowincomplete=False):
         """
@@ -817,12 +701,12 @@ class BBCooker:
                     depend_tree["pn"][pn][ei] = vars(self.recipecaches[mc])[ei][taskfn]
 
 
+            dotname = "%s.%s" % (pn, bb.runqueue.taskname_from_tid(tid))
+            if not dotname in depend_tree["tdepends"]:
+                depend_tree["tdepends"][dotname] = []
             for dep in rq.rqdata.runtaskentries[tid].depends:
                 (depmc, depfn, deptaskname, deptaskfn) = bb.runqueue.split_tid_mcfn(dep)
                 deppn = self.recipecaches[mc].pkg_fn[deptaskfn]
-                dotname = "%s.%s" % (pn, bb.runqueue.taskname_from_tid(tid))
-                if not dotname in depend_tree["tdepends"]:
-                    depend_tree["tdepends"][dotname] = []
                 depend_tree["tdepends"][dotname].append("%s.%s" % (deppn, bb.runqueue.taskname_from_tid(dep)))
             if taskfn not in seen_fns:
                 seen_fns.append(taskfn)
@@ -913,13 +797,13 @@ class BBCooker:
                 seen_fns.append(taskfn)
 
                 depend_tree["depends"][pn] = []
-                for item in taskdata[mc].depids[taskfn]:
+                for dep in taskdata[mc].depids[taskfn]:
                     pn_provider = ""
                     if dep in taskdata[mc].build_targets and taskdata[mc].build_targets[dep]:
                         fn_provider = taskdata[mc].build_targets[dep][0]
                         pn_provider = self.recipecaches[mc].pkg_fn[fn_provider]
                     else:
-                        pn_provider = item
+                        pn_provider = dep
                     pn_provider = self.add_mc_prefix(mc, pn_provider)
                     depend_tree["depends"][pn].append(pn_provider)
 
@@ -1045,18 +929,6 @@ class BBCooker:
                 if providee in self.recipecaches[mc].preferred and self.recipecaches[mc].preferred[providee] != provider:
                     providerlog.error("conflicting preferences for %s: both %s and %s specified", providee, provider, self.recipecaches[mc].preferred[providee])
                 self.recipecaches[mc].preferred[providee] = provider
-
-    def findCoreBaseFiles(self, subdir, configfile):
-        corebase = self.data.getVar('COREBASE') or ""
-        paths = []
-        for root, dirs, files in os.walk(corebase + '/' + subdir):
-            for d in dirs:
-                configfilepath = os.path.join(root, d, configfile)
-                if os.path.exists(configfilepath):
-                    paths.append(os.path.join(root, d))
-
-        if paths:
-            bb.event.fire(bb.event.CoreBaseFilesFound(paths), self.data)
 
     def findConfigFilePath(self, configfile):
         """
@@ -1314,12 +1186,26 @@ class BBCooker:
         """
         Setup any variables needed before starting a build
         """
-        t = time.gmtime() 
-        if not self.data.getVar("BUILDNAME", False):
-            self.data.setVar("BUILDNAME", "${DATE}${TIME}")
-        self.data.setVar("BUILDSTART", time.strftime('%m/%d/%Y %H:%M:%S', t))
-        self.data.setVar("DATE", time.strftime('%Y%m%d', t))
-        self.data.setVar("TIME", time.strftime('%H%M%S', t))
+        t = time.gmtime()
+        for mc in self.databuilder.mcdata:
+            ds = self.databuilder.mcdata[mc]
+            if not ds.getVar("BUILDNAME", False):
+                ds.setVar("BUILDNAME", "${DATE}${TIME}")
+            ds.setVar("BUILDSTART", time.strftime('%m/%d/%Y %H:%M:%S', t))
+            ds.setVar("DATE", time.strftime('%Y%m%d', t))
+            ds.setVar("TIME", time.strftime('%H%M%S', t))
+
+    def reset_mtime_caches(self):
+        """
+        Reset mtime caches - this is particularly important when memory resident as something
+        which is cached is not unlikely to have changed since the last invocation (e.g. a
+        file associated with a recipe might have been modified by the user).
+        """
+        build.reset_cache()
+        bb.fetch._checksum_cache.mtime_cache.clear()
+        siggen_cache = getattr(bb.parse.siggen, 'checksum_cache', None)
+        if siggen_cache:
+            bb.parse.siggen.checksum_cache.mtime_cache.clear()
 
     def matchFiles(self, bf):
         """
@@ -1360,16 +1246,22 @@ class BBCooker:
             raise NoSpecificMatch
         return matches[0]
 
-    def buildFile(self, buildfile, task, hidewarning=False):
+    def buildFile(self, buildfile, task):
         """
         Build the file matching regexp buildfile
         """
         bb.event.fire(bb.event.BuildInit(), self.data)
 
-        if not hidewarning:
-            # Too many people use -b because they think it's how you normally
-            # specify a target to be built, so show a warning
-            bb.warn("Buildfile specified, dependencies will not be handled. If this is not what you want, do not use -b / --buildfile.")
+        # Too many people use -b because they think it's how you normally
+        # specify a target to be built, so show a warning
+        bb.warn("Buildfile specified, dependencies will not be handled. If this is not what you want, do not use -b / --buildfile.")
+
+        self.buildFileInternal(buildfile, task)
+
+    def buildFileInternal(self, buildfile, task, fireevents=True, quietlog=False):
+        """
+        Build the file matching regexp buildfile
+        """
 
         # Parse the configuration here. We need to do it explicitly here since
         # buildFile() doesn't use the cache
@@ -1385,6 +1277,7 @@ class BBCooker:
         fn = self.matchFile(fn)
 
         self.buildSetVars()
+        self.reset_mtime_caches()
 
         bb_cache = bb.cache.Cache(self.databuilder, self.data_hash, self.caches_array)
 
@@ -1411,8 +1304,8 @@ class BBCooker:
         # Remove external dependencies
         self.recipecaches[mc].task_deps[fn]['depends'] = {}
         self.recipecaches[mc].deps[fn] = []
-        self.recipecaches[mc].rundeps[fn] = []
-        self.recipecaches[mc].runrecs[fn] = []
+        self.recipecaches[mc].rundeps[fn] = defaultdict(list)
+        self.recipecaches[mc].runrecs[fn] = defaultdict(list)
 
         # Invalidate task for target if force mode active
         if self.configuration.force:
@@ -1422,10 +1315,15 @@ class BBCooker:
         # Setup taskdata structure
         taskdata = {}
         taskdata[mc] = bb.taskdata.TaskData(self.configuration.abort)
-        taskdata[mc].add_provider(self.data, self.recipecaches[mc], item)
+        taskdata[mc].add_provider(self.databuilder.mcdata[mc], self.recipecaches[mc], item)
 
-        buildname = self.data.getVar("BUILDNAME")
-        bb.event.fire(bb.event.BuildStarted(buildname, [item]), self.data)
+        if quietlog:
+            rqloglevel = bb.runqueue.logger.getEffectiveLevel()
+            bb.runqueue.logger.setLevel(logging.WARNING)
+
+        buildname = self.databuilder.mcdata[mc].getVar("BUILDNAME")
+        if fireevents:
+            bb.event.fire(bb.event.BuildStarted(buildname, [item]), self.databuilder.mcdata[mc])
 
         # Execute the runqueue
         runlist = [[mc, item, task, fn]]
@@ -1452,11 +1350,20 @@ class BBCooker:
                 retval = False
             except SystemExit as exc:
                 self.command.finishAsyncCommand(str(exc))
+                if quietlog:
+                    bb.runqueue.logger.setLevel(rqloglevel)
                 return False
 
             if not retval:
-                bb.event.fire(bb.event.BuildCompleted(len(rq.rqdata.runtaskentries), buildname, item, failures, interrupted), self.data)
+                if fireevents:
+                    bb.event.fire(bb.event.BuildCompleted(len(rq.rqdata.runtaskentries), buildname, item, failures, interrupted), self.databuilder.mcdata[mc])
                 self.command.finishAsyncCommand(msg)
+                # We trashed self.recipecaches above
+                self.parsecache_valid = False
+                self.configuration.limited_deps = False
+                bb.parse.siggen.reset(self.data)
+                if quietlog:
+                    bb.runqueue.logger.setLevel(rqloglevel)
                 return False
             if retval is True:
                 return True
@@ -1491,14 +1398,17 @@ class BBCooker:
                 return False
 
             if not retval:
-                bb.event.fire(bb.event.BuildCompleted(len(rq.rqdata.runtaskentries), buildname, targets, failures, interrupted), self.data)
-                self.command.finishAsyncCommand(msg)
+                try:
+                    for mc in self.multiconfigs:
+                        bb.event.fire(bb.event.BuildCompleted(len(rq.rqdata.runtaskentries), buildname, targets, failures, interrupted), self.databuilder.mcdata[mc])
+                finally:
+                    self.command.finishAsyncCommand(msg)
                 return False
             if retval is True:
                 return True
             return retval
 
-        build.reset_cache()
+        self.reset_mtime_caches()
         self.buildSetVars()
 
         # If we are told to do the None task then query the default task
@@ -1523,7 +1433,8 @@ class BBCooker:
                 ntargets.append("multiconfig:%s:%s:%s" % (target[0], target[1], target[2]))
             ntargets.append("%s:%s" % (target[1], target[2]))
 
-        bb.event.fire(bb.event.BuildStarted(buildname, ntargets), self.data)
+        for mc in self.multiconfigs:
+            bb.event.fire(bb.event.BuildStarted(buildname, ntargets), self.databuilder.mcdata[mc])
 
         rq = bb.runqueue.RunQueue(self, self.data, self.recipecaches, taskdata, runlist)
         if 'universe' in targets:
@@ -1556,55 +1467,6 @@ class BBCooker:
         return dump
 
 
-    def generateNewImage(self, image, base_image, package_queue, timestamp, description):
-        '''
-        Create a new image with a "require"/"inherit" base_image statement
-        '''
-        if timestamp:
-            image_name = os.path.splitext(image)[0]
-            timestr = time.strftime("-%Y%m%d-%H%M%S")
-            dest = image_name + str(timestr) + ".bb"
-        else:
-            if not image.endswith(".bb"):
-                dest = image + ".bb"
-            else:
-                dest = image
-
-        basename = False
-        if base_image:
-            with open(base_image, 'r') as f:
-                require_line = f.readline()
-                p = re.compile("IMAGE_BASENAME *=")
-                for line in f:
-                    if p.search(line):
-                        basename = True
-
-        with open(dest, "w") as imagefile:
-            if base_image is None:
-                imagefile.write("inherit core-image\n")
-            else:
-                topdir = self.data.getVar("TOPDIR", False)
-                if topdir in base_image:
-                    base_image = require_line.split()[1]
-                imagefile.write("require " + base_image + "\n")
-            image_install = "IMAGE_INSTALL = \""
-            for package in package_queue:
-                image_install += str(package) + " "
-            image_install += "\"\n"
-            imagefile.write(image_install)
-
-            description_var = "DESCRIPTION = \"" + description + "\"\n"
-            imagefile.write(description_var)
-
-            if basename:
-                # If this is overwritten in a inherited image, reset it to default
-                image_basename = "IMAGE_BASENAME = \"${PN}\"\n"
-                imagefile.write(image_basename)
-
-        self.state = state.initial
-        if timestamp:
-            return timestr
-
     def updateCacheSync(self):
         if self.state == state.running:
             return
@@ -1619,8 +1481,7 @@ class BBCooker:
         if not self.baseconfig_valid:
             logger.debug(1, "Reloading base configuration data")
             self.initConfigurationData()
-            self.baseconfig_valid = True
-            self.parsecache_valid = False
+            self.handlePRServ()
 
     # This is called for all async commands when self.state != running
     def updateCache(self):
@@ -1636,6 +1497,7 @@ class BBCooker:
             self.updateCacheSync()
 
         if self.state != state.parsing and not self.parsecache_valid:
+            bb.parse.siggen.reset(self.data)
             self.parseConfiguration ()
             if CookerFeatures.SEND_SANITYEVENTS in self.featureset:
                 for mc in self.multiconfigs:
@@ -1723,46 +1585,14 @@ class BBCooker:
         return pkgs_to_build
 
     def pre_serve(self):
-        # Empty the environment. The environment will be populated as
-        # necessary from the data store.
-        #bb.utils.empty_environment()
-        try:
-            self.prhost = prserv.serv.auto_start(self.data)
-        except prserv.serv.PRServiceConfigError:
-            bb.event.fire(CookerExit(), self.data)
-            self.state = state.error
+        # We now are in our own process so we can call this here.
+        # PRServ exits if its parent process exits
+        self.handlePRServ()
         return
 
     def post_serve(self):
-        prserv.serv.auto_shutdown(self.data)
+        prserv.serv.auto_shutdown()
         bb.event.fire(CookerExit(), self.data)
-        lockfile = self.lock.name
-        self.lock.close()
-        self.lock = None
-
-        while not self.lock:
-            with bb.utils.timeout(3):
-                self.lock = bb.utils.lockfile(lockfile, shared=False, retry=False, block=True)
-                if not self.lock:
-                    # Some systems may not have lsof available
-                    procs = None
-                    try:
-                        procs = subprocess.check_output(["lsof", '-w', lockfile], stderr=subprocess.STDOUT)
-                    except OSError as e:
-                        if e.errno != errno.ENOENT:
-                            raise
-                    if procs is None:
-                        # Fall back to fuser if lsof is unavailable
-                        try:
-                            procs = subprocess.check_output(["fuser", '-v', lockfile], stderr=subprocess.STDOUT)
-                        except OSError as e:
-                            if e.errno != errno.ENOENT:
-                                raise
-
-                    msg = "Delaying shutdown due to active processes which appear to be holding bitbake.lock"
-                    if procs:
-                        msg += ":\n%s" % str(procs)
-                    print(msg)
 
 
     def shutdown(self, force = False):
@@ -1784,46 +1614,12 @@ class BBCooker:
 
     def clientComplete(self):
         """Called when the client is done using the server"""
-        if self.configuration.server_only:
-            self.finishcommand()
-        else:
-            self.shutdown(True)
+        self.finishcommand()
+        self.extraconfigdata = {}
+        self.command.reset()
+        self.databuilder.reset()
+        self.data = self.databuilder.data
 
-    def lockBitbake(self):
-        if not hasattr(self, 'lock'):
-            self.lock = None
-            if self.data:
-                lockfile = self.data.expand("${TOPDIR}/bitbake.lock")
-                if lockfile:
-                    self.lock = bb.utils.lockfile(lockfile, False, False)
-        return self.lock
-
-    def unlockBitbake(self):
-        if hasattr(self, 'lock') and self.lock:
-            bb.utils.unlockfile(self.lock)
-
-def server_main(cooker, func, *args):
-    cooker.pre_serve()
-
-    if cooker.configuration.profile:
-        try:
-            import cProfile as profile
-        except:
-            import profile
-        prof = profile.Profile()
-
-        ret = profile.Profile.runcall(prof, func, *args)
-
-        prof.dump_stats("profile.log")
-        bb.utils.process_profilelog("profile.log")
-        print("Raw profiling information saved to profile.log and processed statistics to profile.log.processed")
-
-    else:
-        ret = func(*args)
-
-    cooker.post_serve()
-
-    return ret
 
 class CookerExit(bb.event.Event):
     """
@@ -1890,15 +1686,23 @@ class CookerCollectFiles(object):
 
         # We need to track where we look so that we can add inotify watches. There
         # is no nice way to do this, this is horrid. We intercept the os.listdir()
-        # calls while we run glob().
+        # (or os.scandir() for python 3.6+) calls while we run glob().
         origlistdir = os.listdir
+        if hasattr(os, 'scandir'):
+            origscandir = os.scandir
         searchdirs = []
 
         def ourlistdir(d):
             searchdirs.append(d)
             return origlistdir(d)
 
+        def ourscandir(d):
+            searchdirs.append(d)
+            return origscandir(d)
+
         os.listdir = ourlistdir
+        if hasattr(os, 'scandir'):
+            os.scandir = ourscandir
         try:
             # Can't use set here as order is important
             newfiles = []
@@ -1918,6 +1722,8 @@ class CookerCollectFiles(object):
                             newfiles.append(g)
         finally:
             os.listdir = origlistdir
+            if hasattr(os, 'scandir'):
+                os.scandir = origscandir
 
         bbmask = config.getVar('BBMASK')
 

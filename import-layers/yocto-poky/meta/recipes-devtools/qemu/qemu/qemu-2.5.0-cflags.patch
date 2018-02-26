@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/configure
 +++ b/configure
 @@ -4468,10 +4468,6 @@ fi

@@ -17,11 +17,6 @@ UPSTREAM_CHECK_URI = "https://01.org/powertop/downloads"
 
 inherit autotools gettext pkgconfig
 
-# we need to explicitly link with libintl in uClibc systems
-EXTRA_LDFLAGS ?= ""
-EXTRA_LDFLAGS_libc-uclibc = "-lintl"
-LDFLAGS += "${EXTRA_LDFLAGS}"
-
 # we do not want libncursesw if we can
 do_configure_prepend() {
     # configure.ac checks for delwin() in "ncursesw ncurses" so let's drop first one

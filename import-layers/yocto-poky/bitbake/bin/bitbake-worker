@@ -17,7 +17,7 @@ from multiprocessing import Lock
 from threading import Thread
 
 if sys.getfilesystemencoding() != "utf-8":
-    sys.exit("Please use a locale setting which supports utf-8.\nPython can't change the filesystem locale after loading so we need a utf-8 when python starts or things won't work.")
+    sys.exit("Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).\nPython can't change the filesystem locale after loading so we need a UTF-8 when Python starts or things won't work.")
 
 # Users shouldn't be running this code directly
 if len(sys.argv) != 2 or not sys.argv[1].startswith("decafbad"):
@@ -499,4 +499,3 @@ worker_thread.join()
 
 workerlog_write("exitting")
 sys.exit(0)
-

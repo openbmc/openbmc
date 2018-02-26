@@ -1,0 +1,58 @@
+From 994d9575374d3cdb34b1b0f70c3c53ae76fe578e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Aug 2017 07:41:05 -0700
+Subject: [PATCH 3/3] cli: Mark return of strtol as long int
+
+strtol does not return unsigned long
+
+error: taking the absolute value of unsigned type 'unsigned long' has no effect [-Werror,-Wabsolute-value]
+        if ((*endp == '\0') && (labs(tmp) < 32768)) {
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cli/cli_lib.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/cli/cli_lib.c b/cli/cli_lib.c
+index e4d2fd5..5f487dc 100644
+--- a/cli/cli_lib.c
++++ b/cli/cli_lib.c
+@@ -522,7 +522,7 @@ int cli_arg_parse_int32(struct cli_node *arg, const char *val, void *result)
+ int cli_arg_parse_int16(struct cli_node *arg, const char *val, void *result)
+ {
+ 	int16_t *intval = result;
+-	unsigned long tmp;
++	long tmp;
+ 	char *endp;
+ 	int ret = 0;
+ 
+@@ -539,7 +539,7 @@ int cli_arg_parse_int16(struct cli_node *arg, const char *val, void *result)
+ int cli_arg_parse_int8(struct cli_node *arg, const char *val, void *result)
+ {
+ 	int8_t *intval = result;
+-	unsigned long tmp;
++	long tmp;
+ 	char *endp;
+ 	int ret = 0;
+ 
+@@ -573,7 +573,7 @@ int cli_arg_parse_uint32(struct cli_node *arg, const char *val, void *result)
+ int cli_arg_parse_uint16(struct cli_node *arg, const char *val, void *result)
+ {
+ 	uint16_t *intval = result;
+-	unsigned long tmp;
++	long tmp;
+ 	char *endp;
+ 	int ret = 0;
+ 
+@@ -590,7 +590,7 @@ int cli_arg_parse_uint16(struct cli_node *arg, const char *val, void *result)
+ int cli_arg_parse_uint8(struct cli_node *arg, const char *val, void *result)
+ {
+ 	uint8_t *intval = result;
+-	unsigned long tmp;
++	long tmp;
+ 	char *endp;
+ 	int ret = 0;
+ 
+-- 
+2.14.1
+

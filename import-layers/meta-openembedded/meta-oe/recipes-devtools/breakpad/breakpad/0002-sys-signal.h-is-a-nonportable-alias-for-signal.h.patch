@@ -1,0 +1,26 @@
+From 15582e19c2545d5ffe8ff07f957d0ed602aeca74 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Sep 2017 23:15:09 -0700
+Subject: [PATCH 2/5] <sys/signal.h> is a nonportable alias for <signal.h>
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/client/linux/handler/exception_handler.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/client/linux/handler/exception_handler.cc b/src/client/linux/handler/exception_handler.cc
+index 05936d28..cca023fd 100644
+--- a/src/client/linux/handler/exception_handler.cc
++++ b/src/client/linux/handler/exception_handler.cc
+@@ -78,7 +78,7 @@
+ #include <sys/wait.h>
+ #include <unistd.h>
+ 
+-#include <sys/signal.h>
++#include <signal.h>
+ #include <sys/ucontext.h>
+ #include <sys/user.h>
+ #include <ucontext.h>
+-- 
+2.14.1
+

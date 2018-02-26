@@ -1,0 +1,40 @@
+From a2e3a2e332c406ea3c56a8d74b61978107df68e6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Jun 2017 22:23:08 -0700
+Subject: [PATCH 5/6] engine: Define SENTINEL
+
+Fix warnings with gcc7
+test.cpp:12: warning: missing sentinel in function call
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/engine/utils.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/engine/utils.cpp b/lib/engine/utils.cpp
+index 44579a1..8812a8c 100644
+--- a/lib/engine/utils.cpp
++++ b/lib/engine/utils.cpp
+@@ -35,7 +35,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ #include "filesystem.h"
+ #include "utils.h"
+ #include "log/log.h"
+-
++#define SENTINEL (const char *)0
+ /**
+  * @brief capture shell output as binary data
+  *
+@@ -139,7 +139,7 @@ int shell(const String &s)
+          * Before switching into new executable close all non standard
+          * file handlers.*/
+         close_parent_fds();
+-        execl("/bin/sh", "sh", "-c", cmd.get(), NULL);
++        execl("/bin/sh", "sh", "-c", cmd.get(), SENTINEL);
+         /* If we're here then execl failed*/
+         exit(-1);
+         break;
+-- 
+2.13.1
+

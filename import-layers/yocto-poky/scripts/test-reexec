@@ -38,9 +38,9 @@ mkdir -p $LOGS
 function clearsstate {
 	target=$1
 
-	sstate_dir=`bitbake $target -e | grep "^SSTATE_DIR" | cut -d "\"" -f 2`
-	sstate_pkgspec=`bitbake $target -e | grep "^SSTATE_PKGSPEC" | cut -d "\"" -f 2`
-	sstasks=`bitbake $target -e | grep "^SSTATETASKS" | cut -d "\"" -f 2`
+	sstate_dir=`bitbake $target -e | grep "^SSTATE_DIR=" | cut -d "\"" -f 2`
+	sstate_pkgspec=`bitbake $target -e | grep "^SSTATE_PKGSPEC=" | cut -d "\"" -f 2`
+	sstasks=`bitbake $target -e | grep "^SSTATETASKS=" | cut -d "\"" -f 2`
 
 	for sstask in $sstasks
 	do

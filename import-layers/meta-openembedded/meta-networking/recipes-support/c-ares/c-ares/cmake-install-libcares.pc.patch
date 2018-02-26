@@ -1,0 +1,105 @@
+From 7e1ae687916fd5878ee755afbdea6b10494e0b92 Mon Sep 17 00:00:00 2001
+From: Alexey Firago <alexey_firago@mentor.com>
+Date: Wed, 26 Jul 2017 23:21:25 +0300
+Subject: [PATCH] cmake: Install libcares.pc
+
+Prepare and install libcares.pc file during cmake build, so libraries
+using pkg-config to find libcares will not fail.
+
+Signed-off-by: Alexey Firago <alexey_firago@mentor.com>
+---
+ CMakeLists.txt      | 21 +++++++++++++++++++++
+ libcares.pc.cmakein | 20 ++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
+ create mode 100644 libcares.pc.cmakein
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 364b6c7..0016b67 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -173,21 +173,29 @@ ADD_DEFINITIONS(${SYSFLAGS})
+ 
+ 
+ # Tell C-Ares about libraries to depend on
++# Also pass these libraries to pkg-config file
++SET(CARES_PRIVATE_LIBS_LIST)
+ IF (HAVE_LIBRESOLV)
+ 	LIST (APPEND CARES_DEPENDENT_LIBS resolv)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lresolv")
+ ENDIF ()
+ IF (HAVE_LIBNSL)
+ 	LIST (APPEND CARES_DEPENDENT_LIBS nsl)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lnsl")
+ ENDIF ()
+ IF (HAVE_LIBSOCKET)
+ 	LIST (APPEND CARES_DEPENDENT_LIBS socket)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lsocket")
+ ENDIF ()
+ IF (HAVE_LIBRT)
+ 	LIST (APPEND CARES_DEPENDENT_LIBS rt)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lrt")
+ ENDIF ()
+ IF (WIN32)
+ 	LIST (APPEND CARES_DEPENDENT_LIBS ws2_32)
++	LIST (APPEND CARES_PRIVATE_LIBS_LIST "-lws2_32")
+ ENDIF ()
++string (REPLACE ";" " " CARES_PRIVATE_LIBS "${CARES_PRIVATE_LIBS_LIST}")
+ 
+ 
+ # When checking for symbols, we need to make sure we set the proper
+@@ -489,6 +497,13 @@ CONFIGURE_FILE (ares_build.h.cmake ${PROJECT_BINARY_DIR}/ares_build.h)
+ # Write ares_config.h configuration file.  This is used only for the build.
+ CONFIGURE_FILE (ares_config.h.cmake ${PROJECT_BINARY_DIR}/ares_config.h)
+ 
++# Pass required CFLAGS to pkg-config in case of static library
++IF (CARES_STATIC)
++	SET (CPPFLAG_CARES_STATICLIB "-DCARES_STATICLIB")
++ENDIF()
++
++# Write ares_config.h configuration file.  This is used only for the build.
++CONFIGURE_FILE (libcares.pc.cmakein ${PROJECT_BINARY_DIR}/libcares.pc @ONLY)
+ 
+ # TRANSFORM_MAKEFILE_INC
+ #
+@@ -625,6 +640,12 @@ IF (CARES_INSTALL)
+ 	INSTALL (FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake" DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+ ENDIF ()
+ 
++# pkg-config file
++IF (CARES_INSTALL)
++	SET (PKGCONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
++	INSTALL (FILES "${CMAKE_CURRENT_BINARY_DIR}/libcares.pc" DESTINATION ${PKGCONFIG_INSTALL_DIR})
++ENDIF ()
++
+ # Legacy chain-building variables (provided for compatibility with old code).
+ # Don't use these, external code should be updated to refer to the aliases directly (e.g., Cares::cares).
+ SET (CARES_FOUND 1 CACHE INTERNAL "CARES LIBRARY FOUND")
+diff --git a/libcares.pc.cmakein b/libcares.pc.cmakein
+new file mode 100644
+index 0000000..f29fede
+--- /dev/null
++++ b/libcares.pc.cmakein
+@@ -0,0 +1,20 @@
++#***************************************************************************
++# Project        ___       __ _ _ __ ___  ___ 
++#               / __|____ / _` | '__/ _ \/ __|
++#              | (_|_____| (_| | | |  __/\__ \
++#               \___|     \__,_|_|  \___||___/
++#
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=@CMAKE_INSTALL_PREFIX@
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
++
++Name: c-ares
++URL: http://daniel.haxx.se/projects/c-ares/
++Description: asynchronous DNS lookup library
++Version: @VERSION@
++Requires: 
++Requires.private: 
++Cflags: -I${includedir} @CPPFLAG_CARES_STATICLIB@
++Libs: -L${libdir} -lcares
++Libs.private: @CARES_PRIVATE_LIBS@
+-- 
+2.7.4
+

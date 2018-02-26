@@ -39,7 +39,9 @@ SRC_URI = "https://github.com/BOINC/boinc/archive/client_release/7.6/${PV}.tar.g
 SRC_URI[md5sum] = "437b4b98e384b4bda4ef7056e68166ac"
 SRC_URI[sha256sum] = "c4b1c29b9655013e0ac61dddf47ad7f30f38c46159f02a9d9dc8ab854e99aa6d"
 
-inherit gettext autotools-brokensep pkgconfig
+inherit gettext autotools-brokensep pkgconfig distro_features_check
+
+REQUIRED_DISTRO_FEATURES += "opengl"
 
 S = "${WORKDIR}/${BPN}_release-7.6-${PV}"
 

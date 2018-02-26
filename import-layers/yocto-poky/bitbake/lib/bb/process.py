@@ -94,45 +94,52 @@ def _logged_communicate(pipe, log, input, extrafiles):
                 if data is not None:
                     func(data)
 
+    def read_all_pipes(log, rin, outdata, errdata):
+        rlist = rin
+        stdoutbuf = b""
+        stderrbuf = b""
+
+        try:
+            r,w,e = select.select (rlist, [], [], 1)
+        except OSError as e:
+            if e.errno != errno.EINTR:
+                raise
+
+        readextras(r)
+
+        if pipe.stdout in r:
+            data = stdoutbuf + pipe.stdout.read()
+            if data is not None and len(data) > 0:
+                try:
+                    data = data.decode("utf-8")
+                    outdata.append(data)
+                    log.write(data)
+                    log.flush()
+                    stdoutbuf = b""
+                except UnicodeDecodeError:
+                    stdoutbuf = data
+
+        if pipe.stderr in r:
+            data = stderrbuf + pipe.stderr.read()
+            if data is not None and len(data) > 0:
+                try:
+                    data = data.decode("utf-8")
+                    errdata.append(data)
+                    log.write(data)
+                    log.flush()
+                    stderrbuf = b""
+                except UnicodeDecodeError:
+                    stderrbuf = data
+
     try:
+        # Read all pipes while the process is open
         while pipe.poll() is None:
-            rlist = rin
-            stdoutbuf = b""
-            stderrbuf = b""
-            try:
-                r,w,e = select.select (rlist, [], [], 1)
-            except OSError as e:
-                if e.errno != errno.EINTR:
-                    raise
+            read_all_pipes(log, rin, outdata, errdata)
 
-            if pipe.stdout in r:
-                data = stdoutbuf + pipe.stdout.read()
-                if data is not None and len(data) > 0:
-                    try:
-                        data = data.decode("utf-8")
-                        outdata.append(data)
-                        log.write(data)
-                        stdoutbuf = b""
-                    except UnicodeDecodeError:
-                        stdoutbuf = data
-
-            if pipe.stderr in r:
-                data = stderrbuf + pipe.stderr.read()
-                if data is not None and len(data) > 0:
-                    try:
-                        data = data.decode("utf-8")
-                        errdata.append(data)
-                        log.write(data)
-                        stderrbuf = b""
-                    except UnicodeDecodeError:
-                        stderrbuf = data
-
-            readextras(r)
-
-    finally:    
+        # Pocess closed, drain all pipes...
+        read_all_pipes(log, rin, outdata, errdata)
+    finally:
         log.flush()
-
-    readextras([fobj for fobj, _ in extrafiles])
 
     if pipe.stdout is not None:
         pipe.stdout.close()

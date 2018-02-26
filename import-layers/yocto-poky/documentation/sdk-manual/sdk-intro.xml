@@ -9,8 +9,8 @@
     <title>Introduction</title>
 
     <para>
-        Welcome to the Yocto Project Software Development Kit (SDK)
-        Developer's Guide.
+        Welcome to the Yocto Project Application Development and the
+        Extensible Software Development Kit (eSDK) manual.
         This manual provides information that explains how to use both the
         Yocto Project extensible and standard SDKs to develop
         applications and images.
@@ -52,7 +52,7 @@
         new applications and libraries to an image, modify the source of an
         existing component, test changes on the target hardware, and easily
         integrate an application into the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#build-system-term'>OpenEmbedded build system</ulink>.
+        <ulink url='&YOCTO_DOCS_REF_URL;#build-system-term'>OpenEmbedded build system</ulink>.
     </para>
 
     <para>
@@ -93,7 +93,7 @@
                 matching sysroots (target and native) all built by the
                 OpenEmbedded build system (e.g. the SDK).
                 The toolchain and sysroots are based on a
-                <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+                <ulink url='&YOCTO_DOCS_REF_URL;#metadata'>Metadata</ulink>
                 configuration and extensions,
                 which allows you to cross-develop on the host machine for the
                 target hardware.
@@ -207,7 +207,7 @@
 
         <para>
             The
-            <ulink url='&YOCTO_DOCS_DEV_URL;#cross-development-toolchain'>Cross-Development Toolchain</ulink>
+            <ulink url='&YOCTO_DOCS_REF_URL;#cross-development-toolchain'>Cross-Development Toolchain</ulink>
             consists of a cross-compiler, cross-linker, and cross-debugger
             that are used to develop user-space applications for targeted
             hardware.
@@ -215,7 +215,7 @@
             built-in <filename>devtool</filename> functionality.
             This toolchain is created by running a SDK installer script
             or through a
-            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+            <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
             that is based on your Metadata configuration or extension for
             your targeted device.
             The cross-toolchain works with a matching target sysroot.
@@ -245,16 +245,15 @@
                 <listitem><para>
                     If you have cloned the <filename>poky</filename> Git
                     repository to create a
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>
                     and you have sourced the environment setup script, QEMU is
                     installed and automatically available.
                     </para></listitem>
                 <listitem><para>
                     If you have downloaded a Yocto Project release and unpacked
-                    it to create a
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
-                    and you have sourced the environment setup script, QEMU is
-                    installed and automatically available.
+                    it to create a Source Directory and you have sourced the
+                    environment setup script, QEMU is installed and
+                    automatically available.
                     </para></listitem>
                 <listitem><para>
                     If you have installed the cross-toolchain tarball and you
@@ -295,8 +294,8 @@
             For information about the application development workflow that
             uses the Eclipse IDE and for a detailed example of how to install
             and configure the Eclipse Yocto Project Plug-in, see the
-            "<link linkend='sdk-developing-applications-using-eclipse'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></link>"
-            section.
+            "<link linkend='sdk-eclipse-project'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></link>"
+            Chapter.
         </para>
     </section>
 
@@ -385,7 +384,7 @@
                 to download and learn about the emulator.
                 See the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-qemu'>Using the Quick EMUlator (QEMU)</ulink>"
-                chapter in the Yocto Project Development Manual
+                chapter in the Yocto Project Development Tasks Manual
                 for information on using QEMU within the Yocto
                 Project.</para></listitem>
         </orderedlist>

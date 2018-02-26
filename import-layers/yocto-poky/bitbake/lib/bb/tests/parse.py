@@ -83,7 +83,28 @@ unset B[flag]
         self.assertEqual(d.getVar("A"), None)
         self.assertEqual(d.getVarFlag("A","flag"), None)
         self.assertEqual(d.getVar("B"), "2")
-        
+
+    exporttest = """
+A = "a"
+export B = "b"
+export C
+exportD = "d"
+"""
+
+    def test_parse_exports(self):
+        f = self.parsehelper(self.exporttest)
+        d = bb.parse.handle(f.name, self.d)['']
+        self.assertEqual(d.getVar("A"), "a")
+        self.assertIsNone(d.getVarFlag("A", "export"))
+        self.assertEqual(d.getVar("B"), "b")
+        self.assertEqual(d.getVarFlag("B", "export"), 1)
+        self.assertIsNone(d.getVar("C"))
+        self.assertEqual(d.getVarFlag("C", "export"), 1)
+        self.assertIsNone(d.getVar("D"))
+        self.assertIsNone(d.getVarFlag("D", "export"))
+        self.assertEqual(d.getVar("exportD"), "d")
+        self.assertIsNone(d.getVarFlag("exportD", "export"))
+
 
     overridetest = """
 RRECOMMENDS_${PN} = "a"

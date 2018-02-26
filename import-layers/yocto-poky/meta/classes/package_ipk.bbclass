@@ -12,15 +12,34 @@ OPKGBUILDCMD ??= "opkg-build"
 
 OPKG_ARGS += "--force_postinstall --prefer-arch-to-version"
 OPKG_ARGS += "${@['', '--no-install-recommends'][d.getVar("NO_RECOMMENDATIONS") == "1"]}"
-OPKG_ARGS += "${@['', '--add-exclude ' + ' --add-exclude '.join((d.getVar('PACKAGE_EXCLUDE') or "").split())][(d.getVar("PACKAGE_EXCLUDE") or "") != ""]}"
+OPKG_ARGS += "${@['', '--add-exclude ' + ' --add-exclude '.join((d.getVar('PACKAGE_EXCLUDE') or "").split())][(d.getVar("PACKAGE_EXCLUDE") or "").strip() != ""]}"
 
 OPKGLIBDIR = "${localstatedir}/lib"
 
 python do_package_ipk () {
-    import re, copy
-    import textwrap
-    import subprocess
-    import collections
+    import multiprocessing
+    import traceback
+
+    class IPKWritePkgProcess(multiprocessing.Process):
+        def __init__(self, *args, **kwargs):
+            multiprocessing.Process.__init__(self, *args, **kwargs)
+            self._pconn, self._cconn = multiprocessing.Pipe()
+            self._exception = None
+
+        def run(self):
+            try:
+                multiprocessing.Process.run(self)
+                self._cconn.send(None)
+            except Exception as e:
+                tb = traceback.format_exc()
+                self._cconn.send((e, tb))
+
+        @property
+        def exception(self):
+            if self._pconn.poll():
+                self._exception = self._pconn.recv()
+            return self._exception
+
 
     oldcwd = os.getcwd()
 
@@ -42,20 +61,55 @@ python do_package_ipk () {
     if os.access(os.path.join(tmpdir, "stamps", "IPK_PACKAGE_INDEX_CLEAN"), os.R_OK):
         os.unlink(os.path.join(tmpdir, "stamps", "IPK_PACKAGE_INDEX_CLEAN"))
 
+    max_process = int(d.getVar("BB_NUMBER_THREADS") or os.cpu_count() or 1)
+    launched = []
+    error = None
+    pkgs = packages.split()
+    while not error and pkgs:
+        if len(launched) < max_process:
+            p = IPKWritePkgProcess(target=ipk_write_pkg, args=(pkgs.pop(), d))
+            p.start()
+            launched.append(p)
+        for q in launched:
+            # The finished processes are joined when calling is_alive()
+            if not q.is_alive():
+                launched.remove(q)
+            if q.exception:
+                error, traceback = q.exception
+                break
+
+    for p in launched:
+        p.join()
+
+    os.chdir(oldcwd)
+
+    if error:
+        raise error
+}
+do_package_ipk[vardeps] += "ipk_write_pkg"
+do_package_ipk[vardepsexclude] = "BB_NUMBER_THREADS"
+
+def ipk_write_pkg(pkg, d):
+    import re, copy
+    import subprocess
+    import textwrap
+    import collections
+
     def cleanupcontrol(root):
         for p in ['CONTROL', 'DEBIAN']:
             p = os.path.join(root, p)
             if os.path.exists(p):
                 bb.utils.prunedir(p)
 
+    outdir = d.getVar('PKGWRITEDIRIPK')
+    pkgdest = d.getVar('PKGDEST')
     recipesource = os.path.basename(d.getVar('FILE'))
 
-    for pkg in packages.split():
-        localdata = bb.data.createCopy(d)
-        root = "%s/%s" % (pkgdest, pkg)
+    localdata = bb.data.createCopy(d)
+    root = "%s/%s" % (pkgdest, pkg)
 
-        lf = bb.utils.lockfile(root + ".lock")
-
+    lf = bb.utils.lockfile(root + ".lock")
+    try:
         localdata.setVar('ROOT', '')
         localdata.setVar('ROOT_%s' % pkg, root)
         pkgname = localdata.getVar('PKG_%s' % pkg)
@@ -100,8 +154,7 @@ python do_package_ipk () {
         g = glob('*')
         if not g and localdata.getVar('ALLOW_EMPTY', False) != "1":
             bb.note("Not creating empty archive for %s-%s-%s" % (pkg, localdata.getVar('PKGV'), localdata.getVar('PKGR')))
-            bb.utils.unlockfile(lf)
-            continue
+            return
 
         controldir = os.path.join(root, 'CONTROL')
         bb.utils.mkdirhier(controldir)
@@ -142,16 +195,9 @@ python do_package_ipk () {
                 description = localdata.getVar('DESCRIPTION') or "."
                 description = textwrap.dedent(description).strip()
                 if '\\n' in description:
-                    # Manually indent
+                    # Manually indent: multiline description includes a leading space
                     for t in description.split('\\n'):
-                        # We don't limit the width when manually indent, but we do
-                        # need the textwrap.fill() to set the initial_indent and
-                        # subsequent_indent, so set a large width
-                        line = textwrap.fill(t.strip(),
-                                             width=100000,
-                                             initial_indent=' ',
-                                             subsequent_indent=' ') or '.'
-                        ctrlfile.write('%s\n' % line)
+                        ctrlfile.write(' %s\n' % (t.strip() or ' .'))
                 else:
                     # Auto indent
                     ctrlfile.write('%s\n' % textwrap.fill(description, width=74, initial_indent=' ', subsequent_indent=' '))
@@ -228,20 +274,22 @@ python do_package_ipk () {
 
         os.chdir(basedir)
         subprocess.check_output("PATH=\"%s\" %s %s %s" % (localdata.getVar("PATH"),
-                                                          d.getVar("OPKGBUILDCMD"), pkg, pkgoutdir), shell=True)
+                                                          d.getVar("OPKGBUILDCMD"), pkg, pkgoutdir),
+                                stderr=subprocess.STDOUT,
+                                shell=True)
 
         if d.getVar('IPK_SIGN_PACKAGES') == '1':
             ipkver = "%s-%s" % (d.getVar('PKGV'), d.getVar('PKGR'))
             ipk_to_sign = "%s/%s_%s_%s.ipk" % (pkgoutdir, pkgname, ipkver, d.getVar('PACKAGE_ARCH'))
             sign_ipk(d, ipk_to_sign)
 
+    finally:
         cleanupcontrol(root)
         bb.utils.unlockfile(lf)
 
-    os.chdir(oldcwd)
-}
 # Otherwise allarch packages may change depending on override configuration
-do_package_ipk[vardepsexclude] = "OVERRIDES"
+ipk_write_pkg[vardepsexclude] = "OVERRIDES"
+
 
 SSTATETASKS += "do_package_write_ipk"
 do_package_write_ipk[sstate-inputdirs] = "${PKGWRITEDIRIPK}"

@@ -26,3 +26,8 @@ INSANE_SKIP_${PN} = "dev-so"
 # Doesn't compile in MIPS16e mode due to use of hand-written
 # assembly
 MIPS_INSTRUCTION_SET = "mips"
+
+# thumb1 is unsupported
+ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET_armv4 = "arm"
+

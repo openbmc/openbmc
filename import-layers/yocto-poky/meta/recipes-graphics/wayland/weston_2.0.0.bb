@@ -12,7 +12,6 @@ SRC_URI = "https://wayland.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
            file://0001-configure.ac-Fix-wayland-protocols-path.patch \
            file://xwayland.weston-start \
            file://0001-weston-launch-Provide-a-default-version-that-doesn-t.patch \
-           file://weston-gl-renderer-Set-pitch-correctly-for-subsampled-textures.patch \
 "
 SRC_URI[md5sum] = "15f38945942bf2a91fe2687145fb4c7d"
 SRC_URI[sha256sum] = "b4e446ac27f118196f1609dab89bb3cb3e81652d981414ad860e733b355365d8"

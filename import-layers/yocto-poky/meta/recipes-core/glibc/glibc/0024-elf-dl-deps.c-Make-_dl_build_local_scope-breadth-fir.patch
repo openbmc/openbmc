@@ -1,0 +1,56 @@
+From a784742739c90eea0d4ccbbd073a067d55ca95e8 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@windriver.com>
+Date: Thu, 18 Aug 2016 14:07:58 -0500
+Subject: [PATCH 24/25] elf/dl-deps.c: Make _dl_build_local_scope breadth first
+
+According to the ELF specification:
+
+When resolving symbolic references, the dynamic linker examines the symbol
+tables with a breadth-first search.
+
+This function was using a depth first search.  By doing so the conflict
+resolution reported to the prelinker (when LD_TRACE_PRELINKING=1 is set)
+was incorrect.  This caused problems when their were various circular
+dependencies between libraries.  The problem usually manifested itself by
+the wrong IFUNC being executed.
+
+[BZ# 20488]
+
+Upstream-Status: Submitted [libc-alpha]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+---
+ elf/dl-deps.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/elf/dl-deps.c b/elf/dl-deps.c
+index 1b8bac6593..c616808f31 100644
+--- a/elf/dl-deps.c
++++ b/elf/dl-deps.c
+@@ -73,13 +73,19 @@ _dl_build_local_scope (struct link_map **list, struct link_map *map)
+ {
+   struct link_map **p = list;
+   struct link_map **q;
++  struct link_map **r;
+ 
+   *p++ = map;
+   map->l_reserved = 1;
+-  if (map->l_initfini)
+-    for (q = map->l_initfini + 1; *q; ++q)
+-      if (! (*q)->l_reserved)
+-	p += _dl_build_local_scope (p, *q);
++
++  for (r = list; r < p; ++r)
++    if ((*r)->l_initfini)
++      for (q = (*r)->l_initfini + 1; *q; ++q)
++	if (! (*q)->l_reserved)
++	  {
++	    *p++ = *q;
++	    (*q)->l_reserved = 1;
++	  }
+   return p - list;
+ }
+ 
+-- 
+2.13.2
+

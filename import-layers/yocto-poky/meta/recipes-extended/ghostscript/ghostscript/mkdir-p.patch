@@ -1,0 +1,36 @@
+ghostscript: allow directories to be created more than once
+
+When doing parallel builds, we might try to create directories
+more than once.  This should not cause an error.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+--- a/base/unix-end.mak
++++ b/base/unix-end.mak
+@@ -17,15 +17,14 @@
+ UNIX_END_MAK=$(GLSRC)unix-end.mak $(TOP_MAKEFILES)
+ # Define the rule for building standard configurations.
+ directories: $(UNIX_END_MAK)
+-	@if test "$(BINDIR)"    != "" -a ! -d $(BINDIR);        then mkdir $(BINDIR);        fi
+-	@if test "$(GLGENDIR)"  != "" -a ! -d $(GLGENDIR);      then mkdir $(GLGENDIR);      fi
+-	@if test "$(GLOBJDIR)"  != "" -a ! -d $(GLOBJDIR);      then mkdir $(GLOBJDIR);      fi
+-	@if test "$(DEVGENDIR)" != "" -a ! -d $(DEVGENDIR);     then mkdir $(DEVGENDIR);     fi
+-	@if test "$(DEVOBJDIR)" != "" -a ! -d $(DEVOBJDIR);     then mkdir $(DEVOBJDIR);     fi
+-	@if test "$(AUXDIR)"    != "" -a ! -d $(AUXDIR);        then mkdir $(AUXDIR);        fi
+-	@if test "$(PSGENDIR)"  != "" -a ! -d $(PSGENDIR);      then mkdir $(PSGENDIR);      fi
+-	@if test "$(PSGENDIR)"  != "" -a ! -d $(PSGENDIR)/cups; then mkdir $(PSGENDIR)/cups; fi
+-	@if test "$(PSOBJDIR)"  != "" -a ! -d $(PSOBJDIR);      then mkdir $(PSOBJDIR);      fi
++	@if test "$(BINDIR)"    != "" -a ! -d $(BINDIR);        then mkdir -p $(BINDIR);        fi
++	@if test "$(GLGENDIR)"  != "" -a ! -d $(GLGENDIR);      then mkdir -p $(GLGENDIR);      fi
++	@if test "$(GLOBJDIR)"  != "" -a ! -d $(GLOBJDIR);      then mkdir -p $(GLOBJDIR);      fi
++	@if test "$(DEVGENDIR)" != "" -a ! -d $(DEVGENDIR);     then mkdir -p $(DEVGENDIR);     fi
++	@if test "$(DEVOBJDIR)" != "" -a ! -d $(DEVOBJDIR);     then mkdir -p $(DEVOBJDIR);     fi
++	@if test "$(AUXDIR)"    != "" -a ! -d $(AUXDIR);        then mkdir -p $(AUXDIR);        fi
++	@if test "$(PSGENDIR)"  != "" -a ! -d $(PSGENDIR)/cups; then mkdir -p $(PSGENDIR)/cups; fi
++	@if test "$(PSOBJDIR)"  != "" -a ! -d $(PSOBJDIR);      then mkdir -p $(PSOBJDIR);      fi
+ 
+ 
+ gs: .gssubtarget $(UNIX_END_MAK)

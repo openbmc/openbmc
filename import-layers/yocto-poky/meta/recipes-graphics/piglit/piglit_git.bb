@@ -5,14 +5,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b2beded7103a3d8a442a2a0391d607b0"
 SRC_URI = "git://anongit.freedesktop.org/piglit \
            file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0001-tests-Use-FE_UPWARD-only-if-its-defined-in-fenv.h.patch \
-           file://0001-CMake-define-GBM_BO_MAP-only-when-symbol-is-found.patch \
-           file://0002-util-egl-Honour-Surfaceless-MESA-in-get_default_disp.patch \
-           file://0003-egl_mesa_platform_surfaceless-Don-t-use-eglGetPlatfo.patch \
-           file://0004-egl_mesa_platform_surfaceless-Use-EXT-functions-for-.patch \
            "
+UPSTREAM_VERSION_UNKNOWN = "1"
 
-# From 2017-02-06
-SRCREV = "ca58eec0b965655c7eba592a634cbf4aadfbc675"
+# From 2017-07-03
+SRCREV = "c8f4fd9eeb298a2ef0855927f22634f794ef3eff"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 

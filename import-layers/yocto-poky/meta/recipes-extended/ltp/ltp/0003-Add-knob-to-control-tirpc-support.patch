@@ -8,6 +8,7 @@ does not yet work.
 
 Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
 ---
  configure.ac | 9 +++++++++
  1 file changed, 9 insertions(+)

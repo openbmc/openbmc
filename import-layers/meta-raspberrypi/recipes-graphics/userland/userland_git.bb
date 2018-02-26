@@ -12,7 +12,7 @@ PROVIDES = "virtual/libgles2 \
 
 RPROVIDES_${PN} += "libgles2 egl libegl"
 
-COMPATIBLE_MACHINE = "raspberrypi"
+COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"

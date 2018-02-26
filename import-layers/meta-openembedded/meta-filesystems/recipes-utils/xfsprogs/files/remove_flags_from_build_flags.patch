@@ -1,0 +1,13 @@
+Index: xfsprogs-4.12.0/include/builddefs.in
+===================================================================
+--- xfsprogs-4.12.0.orig/include/builddefs.in
++++ xfsprogs-4.12.0/include/builddefs.in
+@@ -164,7 +164,7 @@ ifeq ($(ENABLE_GETTEXT),yes)
+ GCFLAGS += -DENABLE_GETTEXT
+ endif
+ 
+-BUILD_CFLAGS += $(GCFLAGS) $(PCFLAGS)
++BUILD_CFLAGS += $(GCFLAGS)
+ # First, Global, Platform, Local CFLAGS
+ CFLAGS += $(FCFLAGS) $(OPTIMIZER) $(GCFLAGS) $(PCFLAGS) $(LCFLAGS)
+ 

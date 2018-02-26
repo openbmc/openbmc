@@ -1,0 +1,117 @@
+From be7540d31c356e80ee02e90e8bf162b7ac6e5ba5 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 15 Aug 2017 14:56:56 +0800
+Subject: [PATCH 02/11] dhclient dbus
+
+upstream-Status: Inappropriate [distribution]
+
+Rebase to 4.3.6
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ client/scripts/bsdos   | 5 +++++
+ client/scripts/freebsd | 5 +++++
+ client/scripts/linux   | 5 +++++
+ client/scripts/netbsd  | 5 +++++
+ client/scripts/openbsd | 5 +++++
+ client/scripts/solaris | 5 +++++
+ 6 files changed, 30 insertions(+)
+
+diff --git a/client/scripts/bsdos b/client/scripts/bsdos
+index d69d0d8..095b143 100755
+--- a/client/scripts/bsdos
++++ b/client/scripts/bsdos
+@@ -45,6 +45,11 @@ exit_with_hooks() {
+     . /etc/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+diff --git a/client/scripts/freebsd b/client/scripts/freebsd
+index 8f3e2a2..ad7fb44 100755
+--- a/client/scripts/freebsd
++++ b/client/scripts/freebsd
+@@ -89,6 +89,11 @@ exit_with_hooks() {
+     . /etc/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+diff --git a/client/scripts/linux b/client/scripts/linux
+index 5fb1612..3d447b6 100755
+--- a/client/scripts/linux
++++ b/client/scripts/linux
+@@ -174,6 +174,11 @@ exit_with_hooks() {
+         exit_status=$?
+     fi
+ 
++    if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++        dbus-send --system --dest=com.redhat.dhcp \
++           --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++           'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++    fi
+     exit $exit_status
+ }
+ 
+diff --git a/client/scripts/netbsd b/client/scripts/netbsd
+index 07383b7..aaba8e8 100755
+--- a/client/scripts/netbsd
++++ b/client/scripts/netbsd
+@@ -45,6 +45,11 @@ exit_with_hooks() {
+     . /etc/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+diff --git a/client/scripts/openbsd b/client/scripts/openbsd
+index e7f4746..56b980c 100644
+--- a/client/scripts/openbsd
++++ b/client/scripts/openbsd
+@@ -45,6 +45,11 @@ exit_with_hooks() {
+     . /etc/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+diff --git a/client/scripts/solaris b/client/scripts/solaris
+index af553b9..4a2aa69 100755
+--- a/client/scripts/solaris
++++ b/client/scripts/solaris
+@@ -26,6 +26,11 @@ exit_with_hooks() {
+     . /etc/dhclient-exit-hooks
+   fi
+ # probably should do something with exit status of the local script
++  if [ x$dhc_dbus != x -a $exit_status -eq 0 ]; then
++    dbus-send --system --dest=com.redhat.dhcp \
++      --type=method_call /com/redhat/dhcp/$interface com.redhat.dhcp.set \
++      'string:'"`env | grep -Ev '^(PATH|SHLVL|_|PWD|dhc_dbus)\='`"
++  fi
+   exit $exit_status
+ }
+ 
+-- 
+1.8.3.1
+

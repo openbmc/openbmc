@@ -10,6 +10,7 @@ Subject: [PATCH] Robert Yang <liezhi.yang@windriver.com> Date: Fri, 30 Jan
 2015 00:40:22 -0800  Subject: [PATCH] contrib.mak: fix for parallel build
 
 Signed-off-by: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
+Upstream-Status: Pending
 ---
  contrib/contrib.mak | 2 ++
  1 file changed, 2 insertions(+)

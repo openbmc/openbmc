@@ -49,3 +49,6 @@ patch_gtk_doc_makefiles() {
 do_configure[prefuncs] += " delete_pkg_m4_file patch_gtk_doc_makefiles"
 
 PACKAGES_DYNAMIC = "^${PN}-.*"
+
+# qemu-mips64: error while loading shared libraries: .../recipe-sysroot/usr/lib/libgthread-2.0.so.0: ELF file data encoding not little-endian
+EXTRA_OECONF_append_mips64 = " --disable-introspection "

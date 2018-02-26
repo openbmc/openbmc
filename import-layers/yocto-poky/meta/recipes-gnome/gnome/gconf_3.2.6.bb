@@ -1,5 +1,6 @@
 SUMMARY = "GNOME configuration system"
 SECTION = "x11/gnome"
+HOMEPAGE = "https://projects.gnome.org/gconf/"
 LICENSE = "LGPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=55ca817ccb7d5b5b66355690e9abc605"
 
@@ -22,9 +23,8 @@ EXTRA_OECONF = "--enable-shared --disable-static \
 
 # Disable PolicyKit by default
 PACKAGECONFIG ??= ""
-# We really don't want PolicyKit for native or uclibc
+# We really don't want PolicyKit for native
 PACKAGECONFIG_class-native = ""
-PACKAGECONFIG_libc-uclibc = ""
 
 PACKAGECONFIG[policykit] = "--enable-defaults-service,--disable-defaults-service,polkit"
 PACKAGECONFIG[debug] = "--enable-debug=yes, --enable-debug=minimum"

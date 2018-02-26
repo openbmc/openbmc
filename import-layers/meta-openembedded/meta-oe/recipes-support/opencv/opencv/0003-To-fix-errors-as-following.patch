@@ -1,0 +1,80 @@
+From ace48a628dca34d742615598afeef42ed323a029 Mon Sep 17 00:00:00 2001
+From: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
+Date: Fri, 19 May 2017 04:27:50 +0900
+Subject: [PATCH 3/3] To fix errors as following:
+
+"test_main.cpp:45: undefined reference to `parseCustomOptions(int, char**)'"
+"perf_abs.cpp:13: undefined reference to `cvtest::param_seed'"
+"test_superres.cpp:270: undefined reference to `checkIppStatus()'"
+
+Signed-off-by: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
+
+Also add the visibility changes for certain OpenCL-related functions in
+ts module.
+
+Signed-off-by: Ismo Puustinen <ismo.puustinen@intel.com>
+---
+ modules/ts/include/opencv2/ts.hpp          | 6 +++---
+ modules/ts/include/opencv2/ts/ocl_test.hpp | 2 +-
+ modules/ts/include/opencv2/ts/ts_ext.hpp   | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/modules/ts/include/opencv2/ts.hpp b/modules/ts/include/opencv2/ts.hpp
+index 41a76b13e..205646140 100644
+--- a/modules/ts/include/opencv2/ts.hpp
++++ b/modules/ts/include/opencv2/ts.hpp
+@@ -555,7 +555,7 @@ protected:
+     }
+ };
+ 
+-extern uint64 param_seed;
++CV_EXPORTS extern uint64 param_seed;
+ 
+ struct CV_EXPORTS DefaultRngAuto
+ {
+@@ -611,14 +611,14 @@ CV_EXPORTS std::string findDataFile(const std::string& relative_path, bool requi
+ 
+ #ifdef HAVE_OPENCL
+ namespace ocl {
+-void dumpOpenCLDevice();
++CV_EXPORTS void dumpOpenCLDevice();
+ }
+ #define TEST_DUMP_OCL_INFO cvtest::ocl::dumpOpenCLDevice();
+ #else
+ #define TEST_DUMP_OCL_INFO
+ #endif
+ 
+-void parseCustomOptions(int argc, char **argv);
++CV_EXPORTS void parseCustomOptions(int argc, char **argv);
+ 
+ #define CV_TEST_INIT0_NOOP (void)0
+ 
+diff --git a/modules/ts/include/opencv2/ts/ocl_test.hpp b/modules/ts/include/opencv2/ts/ocl_test.hpp
+index 54b33ece8..ef56bf9ef 100644
+--- a/modules/ts/include/opencv2/ts/ocl_test.hpp
++++ b/modules/ts/include/opencv2/ts/ocl_test.hpp
+@@ -82,7 +82,7 @@ inline UMat ToUMat(InputArray src)
+     return dst;
+ }
+ 
+-extern int test_loop_times;
++CV_EXPORTS extern int test_loop_times;
+ 
+ #define MAX_VALUE 357
+ 
+diff --git a/modules/ts/include/opencv2/ts/ts_ext.hpp b/modules/ts/include/opencv2/ts/ts_ext.hpp
+index 0bdd346dd..2cd34dfce 100644
+--- a/modules/ts/include/opencv2/ts/ts_ext.hpp
++++ b/modules/ts/include/opencv2/ts/ts_ext.hpp
+@@ -9,7 +9,7 @@
+ #define OPENCV_TS_EXT_HPP
+ 
+ namespace cvtest {
+-void checkIppStatus();
++CV_EXPORTS void checkIppStatus();
+ }
+ 
+ #define CV_TEST_INIT \
+-- 
+2.13.4
+

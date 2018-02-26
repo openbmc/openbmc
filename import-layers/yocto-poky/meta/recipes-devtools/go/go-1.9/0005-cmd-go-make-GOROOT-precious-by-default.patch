@@ -1,0 +1,41 @@
+From 44f961975dac6cf464a77b5f6dd0c47cc192c4fd Mon Sep 17 00:00:00 2001
+From: Matt Madison <matt@madison.systems>
+Date: Wed, 13 Sep 2017 08:19:52 -0700
+Subject: [PATCH 5/7] cmd/go: make GOROOT precious by default
+
+For OE builds, we never want packages that have
+already been installed into the build root to be
+modified, so prevent the go build tool from checking
+if they should be rebuilt.
+
+Also add an environment variable to override this
+behavior, just for building the Go runtime.
+
+Upstream-Status: Pending
+
+Signed-off-by: Matt Madison <matt@madison.systems>
+---
+ src/cmd/go/internal/load/pkg.go | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/cmd/go/internal/load/pkg.go b/src/cmd/go/internal/load/pkg.go
+index 60de666..2660d3f 100644
+--- a/src/cmd/go/internal/load/pkg.go
++++ b/src/cmd/go/internal/load/pkg.go
+@@ -1530,6 +1530,13 @@ func isStale(p *Package) (bool, string) {
+ 		return true, "build ID mismatch"
+ 	}
+ 
++	// For OE builds, make anything in GOROOT non-stale,
++	// to prevent a package build from overwriting the
++	// build root.
++	if p.Goroot && os.Getenv("GOROOT_OVERRIDE") != "1" {
++		return false, "GOROOT-resident packages do not get rebuilt"
++	}
++
+ 	// Package is stale if a dependency is.
+ 	for _, p1 := range p.Internal.Deps {
+ 		if p1.Stale {
+-- 
+2.7.4
+

@@ -1,0 +1,28 @@
+From 5d7f20c045b3c74dad2c53d65e30bd4840250082 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 15:17:19 -0700
+Subject: [PATCH] usl_timer: Check for return value of write() API
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usl/usl_timer.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/usl/usl_timer.c b/usl/usl_timer.c
+index fda752b..d8414a6 100644
+--- a/usl/usl_timer.c
++++ b/usl/usl_timer.c
+@@ -94,7 +94,9 @@ void usl_timer_tick(void)
+ 
+ 	if (!usl_tick_pending) {
+ 		usl_tick_pending = 1;
+-		write(usl_tick_pipe[1], &msg, sizeof(msg));
++		if (write(usl_tick_pipe[1], &msg, sizeof(msg)) != sizeof(msg)) {
++			fprintf(stderr, "write to fd %i failed: %s\n", usl_tick_pipe[1], strerror(errno));
++		}
+ 	}
+ }
+ 
+-- 
+2.13.2
+

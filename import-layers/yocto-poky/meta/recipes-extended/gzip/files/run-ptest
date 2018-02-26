@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd src/tests
+
+make check
+

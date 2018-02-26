@@ -9,11 +9,11 @@ redefine PR_RUN_DIR as ${localstatedir}/run
 Signed-off-By: Armin Kuster <akuster808@gmail.com>
 
 
-Index: proftpd-1.3.5/Make.rules.in
+Index: proftpd-1.3.6/Make.rules.in
 ===================================================================
---- proftpd-1.3.5.orig/Make.rules.in
-+++ proftpd-1.3.5/Make.rules.in
-@@ -29,9 +29,9 @@ INSTALL=@INSTALL@
+--- proftpd-1.3.6.orig/Make.rules.in
++++ proftpd-1.3.6/Make.rules.in
+@@ -30,9 +30,9 @@ INSTALL=@INSTALL@
  INSTALL_STRIP=@INSTALL_STRIP@
  INSTALL_USER=@install_user@
  INSTALL_GROUP=@install_group@
@@ -26,10 +26,10 @@ Index: proftpd-1.3.5/Make.rules.in
  
  RM=rm -f
  SHELL=@CONFIG_SHELL@
-Index: proftpd-1.3.5/Makefile.in
+Index: proftpd-1.3.6/Makefile.in
 ===================================================================
---- proftpd-1.3.5.orig/Makefile.in
-+++ proftpd-1.3.5/Makefile.in
+--- proftpd-1.3.6.orig/Makefile.in
++++ proftpd-1.3.6/Makefile.in
 @@ -105,7 +105,6 @@ check: proftpd$(EXEEXT)
  $(DESTDIR)$(localedir) $(DESTDIR)$(includedir) $(DESTDIR)$(includedir)/proftpd $(DESTDIR)$(libdir) $(DESTDIR)$(pkgconfigdir) $(DESTDIR)$(libdir)/proftpd $(DESTDIR)$(libexecdir) $(DESTDIR)$(localstatedir) $(DESTDIR)$(sysconfdir) $(DESTDIR)$(bindir) $(DESTDIR)$(sbindir) $(DESTDIR)$(mandir) $(DESTDIR)$(mandir)/man1 $(DESTDIR)$(mandir)/man5 $(DESTDIR)$(mandir)/man8:
  	@if [ ! -d $@ ]; then \
@@ -60,11 +60,11 @@ Index: proftpd-1.3.5/Makefile.in
  		           $(top_srcdir)/sample-configurations/basic.conf \
  	       	           $(DESTDIR)$(sysconfdir)/proftpd.conf ; \
  	fi
-Index: proftpd-1.3.5/configure
+Index: proftpd-1.3.6/configure
 ===================================================================
---- proftpd-1.3.5.orig/configure
-+++ proftpd-1.3.5/configure
-@@ -38255,7 +38255,7 @@ _ACEOF
+--- proftpd-1.3.6.orig/configure
++++ proftpd-1.3.6/configure
+@@ -41777,7 +41777,7 @@ _ACEOF
  
  
  cat >>confdefs.h <<_ACEOF
@@ -72,9 +72,9 @@ Index: proftpd-1.3.5/configure
 +#define PR_RUN_DIR "`eval echo "${localstatedir}"/run/`"
  _ACEOF
  
- cat >>confdefs.h <<_ACEOF
-@@ -38263,7 +38263,7 @@ cat >>confdefs.h <<_ACEOF
- _ACEOF
+ 
+@@ -41787,7 +41787,7 @@ _ACEOF
+ 
  
  cat >>confdefs.h <<_ACEOF
 -#define PR_PID_FILE_PATH "`eval echo "${localstatedir}/proftpd.pid"`"
@@ -82,25 +82,25 @@ Index: proftpd-1.3.5/configure
  _ACEOF
  
  
-Index: proftpd-1.3.5/configure.in
+Index: proftpd-1.3.6/configure.in
 ===================================================================
---- proftpd-1.3.5.orig/configure.in
-+++ proftpd-1.3.5/configure.in
-@@ -2971,8 +2971,8 @@ locale_dir="`eval echo ${locale_dir}`"
- AC_DEFINE_UNQUOTED(PR_LOCALE_DIR, "`eval echo "${locale_dir}"`")
+--- proftpd-1.3.6.orig/configure.in
++++ proftpd-1.3.6/configure.in
+@@ -3833,8 +3833,8 @@ locale_dir="`eval echo ${locale_dir}`"
+ AC_DEFINE_UNQUOTED(PR_LOCALE_DIR, "`eval echo "${locale_dir}"`", [Define the locale directory])
  
- AC_DEFINE_UNQUOTED(PR_RUN_DIR, "`eval echo "${localstatedir}"`")
--AC_DEFINE_UNQUOTED(PR_CONFIG_FILE_PATH, "`eval echo "${sysconfdir}/proftpd.conf"`")
--AC_DEFINE_UNQUOTED(PR_PID_FILE_PATH, "`eval echo "${localstatedir}/proftpd.pid"`")
-+AC_DEFINE_UNQUOTED(PR_CONFIG_FILE_PATH, "`eval echo "${sysconfdir}/run/proftpd.conf"`")
-+AC_DEFINE_UNQUOTED(PR_PID_FILE_PATH, "`eval echo "${localstatedir}/run/proftpd.pid"`")
+ AC_DEFINE_UNQUOTED(PR_RUN_DIR, "`eval echo "${localstatedir}"`", [Define the run directory])
+-AC_DEFINE_UNQUOTED(PR_CONFIG_FILE_PATH, "`eval echo "${sysconfdir}/proftpd.conf"`", [Define the configuration file path])
+-AC_DEFINE_UNQUOTED(PR_PID_FILE_PATH, "`eval echo "${localstatedir}/proftpd.pid"`", [Define the PID file path])
++AC_DEFINE_UNQUOTED(PR_CONFIG_FILE_PATH, "`eval echo "${sysconfdir}/run/proftpd.conf"`", [Define the configuration file path])
++AC_DEFINE_UNQUOTED(PR_PID_FILE_PATH, "`eval echo "${localstatedir}/run/proftpd.pid"`", [Define the PID file path])
  
  prefix="$pr_saved_prefix"
  exec_prefix="$pr_saved_exec_prefix"
-Index: proftpd-1.3.5/lib/libcap/Makefile
+Index: proftpd-1.3.6/lib/libcap/Makefile
 ===================================================================
---- proftpd-1.3.5.orig/lib/libcap/Makefile
-+++ proftpd-1.3.5/lib/libcap/Makefile
+--- proftpd-1.3.6.orig/lib/libcap/Makefile
++++ proftpd-1.3.6/lib/libcap/Makefile
 @@ -26,7 +26,7 @@ OBJS=$(addsuffix .o, $(FILES))
  all: $(LIBNAME)
  

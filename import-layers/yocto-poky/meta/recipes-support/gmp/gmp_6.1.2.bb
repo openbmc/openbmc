@@ -25,8 +25,11 @@ EXTRA_OECONF_mipsarchr6_append = " --disable-assembly"
 PACKAGES =+ "libgmpxx"
 FILES_libgmpxx = "${libdir}/libgmpxx${SOLIBS}"
 
-do_install_append_class-target() {
-        sed -i "s|--sysroot=${STAGING_DIR_HOST}||g" ${D}${includedir}/gmp.h
+do_install_prepend_class-target() {
+        sed -i \
+        -e "s|--sysroot=${STAGING_DIR_HOST}||g" \
+        -e "s|${DEBUG_PREFIX_MAP}||g" \
+         ${B}/gmp.h
 }
 
 SSTATE_SCAN_FILES += "gmp.h"

@@ -10,14 +10,27 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 DEPENDS = "libpcre libav virtual/egl boost freetype dbus openssl samba libssh libomxil coreutils-native curl-native"
 PR = "r4"
 
-SRCREV = "061425a5eabf6e9ee43229911c073a863d144038"
+SRCREV_default = "b8ff59dccd9307f10dad71bec2525a95bd6c603b"
+
+# omxplayer builds its own copy of ffmpeg from source instead of using the
+# system's ffmpeg library. This isn't ideal but it's ok for now. We do however
+# want to keep control of the exact version of ffmpeg used instead of just
+# fetching the latest commit on a release branch (which is what the checkout job
+# in Makefile.ffmpeg in the omxplayer source tree does).
+#
+# This SRCREV corresponds to the v3.1.10 release of ffmpeg.
+SRCREV_ffmpeg = "afa34cb36edca0ff809b7e58474bbce12271ecba"
+
 SRC_URI = "git://github.com/popcornmix/omxplayer.git;protocol=git;branch=master \
+           git://source.ffmpeg.org/ffmpeg;branch=release/3.1;protocol=git;depth=1;name=ffmpeg;destsuffix=git/ffmpeg \
            file://0001-Remove-Makefile.include-which-includes-hardcoded.patch \
            file://0002-Libraries-and-headers-from-ffmpeg-are-installed-in-u.patch \
            file://0003-Remove-strip-step-in-Makefile.patch \
            file://0004-Add-FFMPEG_EXTRA_CFLAGS-and-FFMPEG_EXTRA_LDFLAGS.patch \
            file://fix-tar-command-with-DIST.patch \
            file://use-native-pkg-config.patch \
+           file://0005-Don-t-require-internet-connection-during-build.patch \
+           file://0006-Prevent-ffmpeg-configure-compile-race-condition.patch \
            "
 S = "${WORKDIR}/git"
 
@@ -53,7 +66,8 @@ do_compile() {
     # Needed for compiler test in ffmpeg's configure
     mkdir -p tmp
 
-    oe_runmake ffmpeg
+    oe_runmake -f Makefile.ffmpeg
+    oe_runmake -f Makefile.ffmpeg install
     oe_runmake
 }
 

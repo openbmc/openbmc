@@ -1,0 +1,224 @@
+From d6e15a60e84c1511523aa81272b7db7a6ec441d0 Mon Sep 17 00:00:00 2001
+From: Ovidiu Panait <ovidiu.panait@windriver.com>
+Date: Tue, 26 Sep 2017 08:04:58 +0000
+Subject: [PATCH] libparted: Use read only when probing devices on linux
+ (#1245144)
+
+When a device is opened for RW closing it can trigger other actions,
+like udev scanning it for partition changes. Use read only for the
+init_* methods and RW for actual changes to the device.
+
+This adds _device_open which takes mode flags as an argument and turns
+linux_open into a wrapper for it with RW_MODE.
+
+_device_open_ro is added to open the device with RD_MODE and increment
+the open_counter. This is used in the init_* functions.
+
+_device_close is a wrapper around linux_close that decrements the
+open_counter and is used in the init_* functions.
+
+All of these changes are self-contained with no external API changes.
+The only visible change in behavior is that when a new PedDevice is
+created the device is opened in RO_MODE instead of RW_MODE.
+
+Resolves: rhbz#1245144
+
+Upstream-Status: Backport
+
+Author: Brian C. Lane <bcl@redhat.com>
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ libparted/arch/linux.c | 62 +++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 44 insertions(+), 18 deletions(-)
+
+diff --git a/libparted/arch/linux.c b/libparted/arch/linux.c
+index f612617..0a06a54 100644
+--- a/libparted/arch/linux.c
++++ b/libparted/arch/linux.c
+@@ -294,7 +294,9 @@ struct blkdev_ioctl_param {
+ static char* _device_get_part_path (PedDevice const *dev, int num);
+ static int _partition_is_mounted_by_path (const char* path);
+ static unsigned int _device_get_partition_range(PedDevice const* dev);
+-
++static int _device_open (PedDevice* dev, int flags);
++static int _device_open_ro (PedDevice* dev);
++static int _device_close (PedDevice* dev);
+ 
+ static int
+ _read_fd (int fd, char **buf)
+@@ -913,7 +915,7 @@ init_ide (PedDevice* dev)
+         if (!_device_stat (dev, &dev_stat))
+                 goto error;
+ 
+-        if (!ped_device_open (dev))
++        if (!_device_open_ro (dev))
+                 goto error;
+ 
+         if (ioctl (arch_specific->fd, HDIO_GET_IDENTITY, &hdi)) {
+@@ -982,11 +984,11 @@ init_ide (PedDevice* dev)
+         if (!_device_probe_geometry (dev))
+                 goto error_close_dev;
+ 
+-        ped_device_close (dev);
++        _device_close (dev);
+         return 1;
+ 
+ error_close_dev:
+-        ped_device_close (dev);
++        _device_close (dev);
+ error:
+         return 0;
+ }
+@@ -1119,7 +1121,7 @@ init_scsi (PedDevice* dev)
+         char* vendor;
+         char* product;
+ 
+-        if (!ped_device_open (dev))
++        if (!_device_open_ro (dev))
+                 goto error;
+ 
+         if (ioctl (arch_specific->fd, SCSI_IOCTL_GET_IDLUN, &idlun) < 0) {
+@@ -1133,7 +1135,7 @@ init_scsi (PedDevice* dev)
+                         goto error_close_dev;
+                 if (!_device_probe_geometry (dev))
+                         goto error_close_dev;
+-                ped_device_close (dev);
++                _device_close (dev);
+                 return 1;
+         }
+ 
+@@ -1155,11 +1157,11 @@ init_scsi (PedDevice* dev)
+         if (!_device_probe_geometry (dev))
+                 goto error_close_dev;
+ 
+-        ped_device_close (dev);
++        _device_close (dev);
+         return 1;
+ 
+ error_close_dev:
+-        ped_device_close (dev);
++        _device_close (dev);
+ error:
+         return 0;
+ }
+@@ -1171,7 +1173,7 @@ init_file (PedDevice* dev)
+ 
+         if (!_device_stat (dev, &dev_stat))
+                 goto error;
+-        if (!ped_device_open (dev))
++        if (!_device_open_ro (dev))
+                 goto error;
+ 
+         dev->sector_size = PED_SECTOR_SIZE_DEFAULT;
+@@ -1198,7 +1200,7 @@ init_file (PedDevice* dev)
+                 goto error_close_dev;
+         }
+ 
+-        ped_device_close (dev);
++        _device_close (dev);
+ 
+         dev->bios_geom.cylinders = dev->length / 4 / 32;
+         dev->bios_geom.heads = 4;
+@@ -1209,7 +1211,7 @@ init_file (PedDevice* dev)
+         return 1;
+ 
+ error_close_dev:
+-        ped_device_close (dev);
++        _device_close (dev);
+ error:
+         return 0;
+ }
+@@ -1225,7 +1227,7 @@ init_dasd (PedDevice* dev, const char* model_name)
+         if (!_device_stat (dev, &dev_stat))
+                 goto error;
+ 
+-        if (!ped_device_open (dev))
++        if (!_device_open_ro (dev))
+                 goto error;
+ 
+         LinuxSpecific* arch_specific = LINUX_SPECIFIC (dev);
+@@ -1265,11 +1267,11 @@ init_dasd (PedDevice* dev, const char* model_name)
+ 
+         dev->model = strdup (model_name);
+ 
+-        ped_device_close (dev);
++        _device_close (dev);
+         return 1;
+ 
+ error_close_dev:
+-        ped_device_close (dev);
++        _device_close (dev);
+ error:
+         return 0;
+ }
+@@ -1284,7 +1286,7 @@ init_generic (PedDevice* dev, const char* model_name)
+         if (!_device_stat (dev, &dev_stat))
+                 goto error;
+ 
+-        if (!ped_device_open (dev))
++        if (!_device_open_ro (dev))
+                 goto error;
+ 
+         ped_exception_fetch_all ();
+@@ -1332,11 +1334,11 @@ init_generic (PedDevice* dev, const char* model_name)
+ 
+         dev->model = strdup (model_name);
+ 
+-        ped_device_close (dev);
++        _device_close (dev);
+         return 1;
+ 
+ error_close_dev:
+-        ped_device_close (dev);
++        _device_close (dev);
+ error:
+         return 0;
+ }
+@@ -1623,12 +1625,27 @@ retry:
+ }
+ 
+ static int
++_device_open_ro (PedDevice* dev)
++{
++    int rc = _device_open (dev, RD_MODE);
++    if (rc)
++        dev->open_count++;
++    return rc;
++}
++
++static int
+ linux_open (PedDevice* dev)
+ {
++    return _device_open (dev, RW_MODE);
++}
++
++static int
++_device_open (PedDevice* dev, int flags)
++{
+         LinuxSpecific*  arch_specific = LINUX_SPECIFIC (dev);
+ 
+ retry:
+-        arch_specific->fd = open (dev->path, RW_MODE);
++        arch_specific->fd = open (dev->path, flags);
+ 
+         if (arch_specific->fd == -1) {
+                 char*   rw_error_msg = strerror (errno);
+@@ -1697,6 +1714,15 @@ linux_refresh_close (PedDevice* dev)
+         return 1;
+ }
+ 
++static int
++_device_close (PedDevice* dev)
++{
++    int rc = linux_close (dev);
++    if (dev->open_count > 0)
++        dev->open_count--;
++    return rc;
++}
++
+ #if SIZEOF_OFF_T < 8
+ 
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,20)
+-- 
+2.11.0
+

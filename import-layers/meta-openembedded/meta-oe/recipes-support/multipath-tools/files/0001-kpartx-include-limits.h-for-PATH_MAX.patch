@@ -1,0 +1,29 @@
+From 330028a5a904a0da3788141030e614569dc5aaa7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Jul 2017 23:28:12 -0700
+Subject: [PATCH] kpartx: include limits.h for PATH_MAX
+
+lopart.c:76:12: error: 'PATH_MAX' undeclared (first use in this function); did you mean 'INT8_MAX'?
+  char path[PATH_MAX];
+            ^~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ kpartx/lopart.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/kpartx/lopart.c b/kpartx/lopart.c
+index 7005445..5efe5dc 100644
+--- a/kpartx/lopart.c
++++ b/kpartx/lopart.c
+@@ -22,6 +22,7 @@
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <limits.h>
+ #include <sys/ioctl.h>
+ #include <sys/stat.h>
+ #include <sys/mman.h>
+-- 
+2.13.3
+

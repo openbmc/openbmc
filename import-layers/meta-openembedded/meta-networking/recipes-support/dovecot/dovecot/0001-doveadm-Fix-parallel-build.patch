@@ -1,0 +1,38 @@
+From be9b3809b86fe593dbb16f0b981b3d315a27b799 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 22 Oct 2017 22:10:41 -0700
+Subject: [PATCH] doveadm: Fix parallel build
+
+Sometimes dovetail build fails with errors like
+
+doveadm-util.o: file not recognized: File truncated
+collect2: error: ld returned 1 exit status
+make[4]: *** [Makefile:812: test-doveadm-util] Error 1
+
+This is partial backport from
+
+https://github.com/dovecot/core/commit/b200bc3875fa06d42c8619865cc306c3297fcacc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/doveadm/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/doveadm/Makefile.am b/src/doveadm/Makefile.am
+index c644646..6ae9144 100644
+--- a/src/doveadm/Makefile.am
++++ b/src/doveadm/Makefile.am
+@@ -180,8 +180,8 @@ test_libs = \
+ 	../lib/liblib.la
+ test_deps = $(noinst_LTLIBRARIES) $(test_libs)
+ 
+-test_doveadm_util_SOURCES = test-doveadm-util.c
+-test_doveadm_util_LDADD = doveadm-util.o $(test_libs) $(MODULE_LIBS)
++test_doveadm_util_SOURCES = doveadm-util.c test-doveadm-util.c
++test_doveadm_util_LDADD = $(test_libs) $(MODULE_LIBS)
+ test_doveadm_util_DEPENDENCIES = $(test_deps)
+ 
+ check: check-am check-test
+-- 
+2.14.2
+

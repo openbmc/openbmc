@@ -1,4 +1,5 @@
 SUMMARY = "Extends Python unittest to make testing easier"
+HOMEPAGE = "http://readthedocs.org/docs/nose/"
 DESCRIPTION = "nose extends the test loading and running features of unittest, \
 making it easier to write, find and run tests."
 SECTION = "devel/python"

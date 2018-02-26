@@ -8,7 +8,7 @@ SECTION = "fonts"
 LICENSE = "OFL-1.1"
 LIC_FILES_CHKSUM = "file://OFL.TXT;md5=9cadb26f4c5c005618c5ae74f041ec54"
 
-DEPENDS = "hostperl-runtime-native gzip-native"
+DEPENDS = "hostperl-runtime-native gzip-native bdftopcf-native"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz"
 SRC_URI[md5sum] = "a8e792fe6e84c86ed2b6ed3e2a12ba66"
@@ -43,5 +43,3 @@ PACKAGES += "${PN}-consolefonts ${PN}-consoletrans ${PN}-pcf"
 FILES_${PN}-consolefonts = "${datadir}/consolefonts"
 FILES_${PN}-consoletrans = "${datadir}/consoletrans"
 FILES_${PN}-pcf = "${datadir}/fonts/terminus"
-
-PNBLACKLIST[terminus-font] ?= "Fails to build with RSS http://errors.yoctoproject.org/Errors/Details/130638/ - the recipe will be removed on 2017-09-01 unless the issue is fixed"

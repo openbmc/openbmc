@@ -1,0 +1,31 @@
+From 064ae4441e2c11329748a18157988f9e953f9752 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 13 Apr 2017 16:40:27 +0300
+Subject: [PATCH 5/5] gpgme-config: skip all /lib* or /usr/lib* directories in
+ output
+
+The logic was not working in multilib setups which use other
+directory names than plain /lib or /usr/lib.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/gpgme-config.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gpgme-config.in b/src/gpgme-config.in
+index a4d152e..8342865 100644
+--- a/src/gpgme-config.in
++++ b/src/gpgme-config.in
+@@ -154,7 +154,7 @@ while test $# -gt 0; do
+             for i in $libs $tmp_l $assuan_libs $gpg_error_libs $tmp_x; do
+               skip=no
+               case $i in
+-                  -L/usr/lib|-L/lib)
++                  -L/usr/lib*|-L/lib*)
+                       skip=yes
+                       ;;
+                   -L*|-l*)
+-- 
+2.8.1
+

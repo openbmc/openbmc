@@ -1,0 +1,31 @@
+From 9c2ffe825e28d63e2a771135f297e8ffac0dbe81 Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Tue, 11 Jul 2017 14:35:30 +0200
+Subject: [PATCH] configure.ac: fix cross-compiling issue
+
+Avoid checking for file existence when cross compiling.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ configure.ac | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9978852..06b16e3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -120,9 +120,6 @@ AC_ARG_WITH(unicode-version,
+   AC_HELP_STRING(--with-unicode-version=VERSION,
+   [version of Unicode Standard @<:@default=current version@:>@]),
+   UNICODE_VERSION=$withval,UNICODE_VERSION=$DEFAULT_UNICODE_VERSION)
+-AC_CHECK_FILE([lib/$UNICODE_VERSION.c],
+-  AC_MSG_RESULT($UNICODE_VERSION),
+-  AC_MSG_ERROR(Unknown Unicode version $UNICODE_VERSION.))
+ AC_SUBST(UNICODE_VERSION)
+ 
+ # check if code to debug memory allocation is enabled.
+-- 
+2.7.4
+

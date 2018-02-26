@@ -1,0 +1,123 @@
+From 1338ee4e69c465f8f381ec3bfe5058080236edba Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Jun 2017 22:08:35 -0700
+Subject: [PATCH 2/6] Convert macros into functions
+
+This helps in fixing the security format warnings
+add -fno-builtin-log
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/engine/Makefile.am |  3 ++-
+ lib/log/Makefile.am    |  2 ++
+ lib/log/log.h          | 34 +++++++++++++++++++++-------------
+ src/Makefile.am        |  3 ++-
+ 4 files changed, 27 insertions(+), 15 deletions(-)
+
+Index: ssiapi.1.0.1/lib/engine/Makefile.am
+===================================================================
+--- ssiapi.1.0.1.orig/lib/engine/Makefile.am
++++ ssiapi.1.0.1/lib/engine/Makefile.am
+@@ -113,4 +113,5 @@ libengine_la_SOURCES =          \
+ libengine_la_CPPFLAGS =         \
+         -I$(top_srcdir)         \
+         -I$(top_srcdir)/include \
+-        -I$(top_srcdir)/lib
++        -I$(top_srcdir)/lib     \
++        -fno-builtin-log
+Index: ssiapi.1.0.1/lib/log/Makefile.am
+===================================================================
+--- ssiapi.1.0.1.orig/lib/log/Makefile.am
++++ ssiapi.1.0.1/lib/log/Makefile.am
+@@ -5,3 +5,5 @@ noinst_LTLIBRARIES = liblog.la
+ liblog_la_SOURCES =     \
+         log.c           \
+         log.h
++
++liblog_la_CPPFLAGS = -fno-builtin-log
+Index: ssiapi.1.0.1/lib/log/log.h
+===================================================================
+--- ssiapi.1.0.1.orig/lib/log/log.h
++++ ssiapi.1.0.1/lib/log/log.h
+@@ -23,7 +23,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIG
+ #if defined(__cplusplus)
+ extern "C" {
+ #endif /* __cplusplus */
+-
++#include <stdarg.h>
+ /* */
+ enum log_level {
+     LOG_FIRST = 0,
+@@ -37,26 +37,34 @@ enum log_level {
+ };
+ 
+ /* */
+-#define log(__level, __format, ...)                             \
+-    do { if (log_get_level() >= (enum log_level)(__level))      \
+-        __log(__level, __format, ## __VA_ARGS__);               \
+-    } while (0)
+-
+-#define dlog(__format, ...)                             \
+-	log(LOG_DEBUG, __format, ## __VA_ARGS__);
++void __log(enum log_level level, const char *format, ...)
++    __attribute__((format(printf, 2, 3)));
+ 
+ /* */
+-void log_init(enum log_level level, const char *path);
++enum log_level log_get_level(void);
+ 
+ /* */
+-void log_fini(void);
+-
++static inline void log(enum log_level __level, const char* __format, ...) {
++    va_list ap;
++    va_start(ap, __format);
++    do {
++         if (log_get_level() >= (enum log_level)(__level))
++            __log(__level, __format, ap);
++    } while (0);
++    va_end(ap);
++}
++
++static inline void dlog(const char* __format, ...) {
++    va_list ap;
++    va_start(ap, __format);
++	log(LOG_DEBUG, __format, ap);
++    va_end(ap);
++}
+ /* */
+-void __log(enum log_level level, const char *format, ...)
+-    __attribute__((format(printf, 2, 3)));
++void log_init(enum log_level level, const char *path);
+ 
+ /* */
+-enum log_level log_get_level(void);
++void log_fini(void);
+ 
+ /* */
+ void log_set_level(enum log_level level);
+Index: ssiapi.1.0.1/src/Makefile.am
+===================================================================
+--- ssiapi.1.0.1.orig/src/Makefile.am
++++ ssiapi.1.0.1/src/Makefile.am
+@@ -7,7 +7,8 @@ lib_LTLIBRARIES = libssi.la
+ libssi_la_CPPFLAGS =                    \
+         -I$(top_srcdir)                 \
+         -I$(top_srcdir)/include         \
+-        -I$(top_srcdir)/lib
++        -I$(top_srcdir)/lib             \
++        -fno-builtin-log
+ 
+ libssi_la_LDFLAGS =                     \
+         $(SGUTILS_LDFLAGS)              \
+Index: ssiapi.1.0.1/lib/efi/Makefile.am
+===================================================================
+--- ssiapi.1.0.1.orig/lib/efi/Makefile.am
++++ ssiapi.1.0.1/lib/efi/Makefile.am
+@@ -5,3 +5,4 @@ noinst_LTLIBRARIES = libefi.la
+ libefi_la_SOURCES =             \
+     efi.cpp                       \
+     efi.h
++libefi_la_CPPFLAGS = -fno-builtin-log

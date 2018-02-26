@@ -155,7 +155,7 @@ def sdk_update(args, config, basepath, workspace):
         if os.path.exists(os.path.join(basepath, 'layers/.git')):
             out = subprocess.check_output("git status --porcelain", shell=True, cwd=layers_dir)
             if not out:
-                ret = subprocess.call("git fetch --all; git reset --hard", shell=True, cwd=layers_dir)
+                ret = subprocess.call("git fetch --all; git reset --hard @{u}", shell=True, cwd=layers_dir)
             else:
                 logger.error("Failed to update metadata as there have been changes made to it. Aborting.");
                 logger.error("Changed files:\n%s" % out);

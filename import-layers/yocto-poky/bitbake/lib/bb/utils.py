@@ -771,13 +771,14 @@ def movefile(src, dest, newmtime = None, sstat = None):
             return None
 
     renamefailed = 1
+    # os.rename needs to know the dest path ending with file name
+    # so append the file name to a path only if it's a dir specified
+    srcfname = os.path.basename(src)
+    destpath = os.path.join(dest, srcfname) if os.path.isdir(dest) \
+                else dest
+
     if sstat[stat.ST_DEV] == dstat[stat.ST_DEV]:
         try:
-            # os.rename needs to know the dest path ending with file name
-            # so append the file name to a path only if it's a dir specified
-            srcfname = os.path.basename(src)
-            destpath = os.path.join(dest, srcfname) if os.path.isdir(dest) \
-                        else dest
             os.rename(src, destpath)
             renamefailed = 0
         except Exception as e:
@@ -791,8 +792,8 @@ def movefile(src, dest, newmtime = None, sstat = None):
         didcopy = 0
         if stat.S_ISREG(sstat[stat.ST_MODE]):
             try: # For safety copy then move it over.
-                shutil.copyfile(src, dest + "#new")
-                os.rename(dest + "#new", dest)
+                shutil.copyfile(src, destpath + "#new")
+                os.rename(destpath + "#new", destpath)
                 didcopy = 1
             except Exception as e:
                 print('movefile: copy', src, '->', dest, 'failed.', e)
@@ -813,9 +814,9 @@ def movefile(src, dest, newmtime = None, sstat = None):
             return None
 
     if newmtime:
-        os.utime(dest, (newmtime, newmtime))
+        os.utime(destpath, (newmtime, newmtime))
     else:
-        os.utime(dest, (sstat[stat.ST_ATIME], sstat[stat.ST_MTIME]))
+        os.utime(destpath, (sstat[stat.ST_ATIME], sstat[stat.ST_MTIME]))
         newmtime = sstat[stat.ST_MTIME]
     return newmtime
 
@@ -1502,7 +1503,7 @@ def export_proxies(d):
 
 def load_plugins(logger, plugins, pluginpath):
     def load_plugin(name):
-        logger.debug('Loading plugin %s' % name)
+        logger.debug(1, 'Loading plugin %s' % name)
         fp, pathname, description = imp.find_module(name, [pluginpath])
         try:
             return imp.load_module(name, fp, pathname, description)
@@ -1510,7 +1511,7 @@ def load_plugins(logger, plugins, pluginpath):
             if fp:
                 fp.close()
 
-    logger.debug('Loading plugins from %s...' % pluginpath)
+    logger.debug(1, 'Loading plugins from %s...' % pluginpath)
 
     expanded = (glob.glob(os.path.join(pluginpath, '*' + ext))
                 for ext in python_extensions)

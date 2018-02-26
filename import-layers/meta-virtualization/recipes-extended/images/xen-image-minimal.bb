@@ -10,11 +10,16 @@ IMAGE_INSTALL += " \
     kernel-module-xen-gntalloc \
     kernel-module-xen-gntdev \
     kernel-module-xen-netback \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'pci', 'kernel-module-xen-pciback', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'pci', "${XEN_PCIBACK_MODULE}", '', d)} \
     kernel-module-xen-wdt \
     xen-base \
     qemu \
     "
+
+# Linux kernel option CONFIG_XEN_PCIDEV_BACKEND depends on X86
+XEN_PCIBACK_MODULE = ""
+XEN_PCIBACK_MODULE_x86    = "kernel-module-xen-pciback"
+XEN_PCIBACK_MODULE_x86-64 = "kernel-module-xen-pciback"
 
 LICENSE = "MIT"
 
@@ -42,7 +47,7 @@ grubefi_populate_append() {
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/xen-${MACHINE}.gz ${DEST}${EFIDIR}/xen.gz
 }
 
-populate_append() {
+syslinux_populate_append() {
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/xen-${MACHINE}.gz ${DEST}/xen.gz
 }
 
@@ -50,12 +55,12 @@ SYSLINUX_XEN_ARGS ?= "loglvl=all guest_loglvl=all console=com1,vga com1=115200,8
 SYSLINUX_KERNEL_ARGS ?= "ramdisk_size=32768 root=/dev/ram0 rw console=hvc0 earlyprintk=xen console=tty0 panic=10 LABEL=boot debugshell=5"
 
 build_syslinux_cfg () {
-	echo "ALLOWOPTIONS 1" > ${SYSLINUXCFG}
-	echo "DEFAULT boot" >> ${SYSLINUXCFG}
-	echo "TIMEOUT 10" >> ${SYSLINUXCFG}
-	echo "PROMPT 1" >> ${SYSLINUXCFG}
-	echo "LABEL boot" >> ${SYSLINUXCFG}
-	echo "  KERNEL mboot.c32" >> ${SYSLINUXCFG}
-	echo "  APPEND /xen.gz ${SYSLINUX_XEN_ARGS} --- /vmlinuz ${SYSLINUX_KERNEL_ARGS} --- /initrd" >> ${SYSLINUXCFG}
+	echo "ALLOWOPTIONS 1" > ${SYSLINUX_CFG}
+	echo "DEFAULT boot" >> ${SYSLINUX_CFG}
+	echo "TIMEOUT 10" >> ${SYSLINUX_CFG}
+	echo "PROMPT 1" >> ${SYSLINUX_CFG}
+	echo "LABEL boot" >> ${SYSLINUX_CFG}
+	echo "  KERNEL mboot.c32" >> ${SYSLINUX_CFG}
+	echo "  APPEND /xen.gz ${SYSLINUX_XEN_ARGS} --- /vmlinuz ${SYSLINUX_KERNEL_ARGS} --- /initrd" >> ${SYSLINUX_CFG}
 }
 

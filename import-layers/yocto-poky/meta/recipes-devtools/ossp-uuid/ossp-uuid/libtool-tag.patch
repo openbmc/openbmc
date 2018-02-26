@@ -1,0 +1,21 @@
+Repect LIBTOOLFLAGS
+
+This add a knob that can be controlled from env to set generic options
+for libtool
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: uuid-1.6.2/Makefile.in
+===================================================================
+--- uuid-1.6.2.orig/Makefile.in
++++ uuid-1.6.2/Makefile.in
+@@ -56,7 +56,7 @@ RM          = rm -f
+ CP          = cp
+ RMDIR       = rmdir
+ SHTOOL      = $(S)/shtool
+-LIBTOOL     = @LIBTOOL@
++LIBTOOL     = @LIBTOOL@ $(LIBTOOLFLAGS)
+ TRUE        = true
+ POD2MAN     = pod2man
+ PERL        = @PERL@

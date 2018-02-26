@@ -1,0 +1,77 @@
+map the mcontext_t structure for musl
+
+Upstream-Status: Inappropriate[need to consider Android]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Index: git/src/client/linux/dump_writer_common/thread_info.cc
+===================================================================
+--- git.orig/src/client/linux/dump_writer_common/thread_info.cc
++++ git/src/client/linux/dump_writer_common/thread_info.cc
+@@ -229,7 +229,6 @@ void ThreadInfo::FillCPUContext(RawConte
+ }
+ 
+ #elif defined(__mips__)
+-
+ uintptr_t ThreadInfo::GetInstructionPointer() const {
+   return mcontext.pc;
+ }
+@@ -263,8 +262,11 @@ void ThreadInfo::FillCPUContext(RawConte
+   out->cause = 0; // Not stored in mcontext
+ 
+   for (int i = 0; i < MD_FLOATINGSAVEAREA_MIPS_FPR_COUNT; ++i)
++#ifdef __GLIBC__
+     out->float_save.regs[i] = mcontext.fpregs.fp_r.fp_fregs[i]._fp_fregs;
+-
++#else
++    out->float_save.regs[i] = mcontext.fpregs[i];
++#endif
+   out->float_save.fpcsr = mcontext.fpc_csr;
+ #if _MIPS_SIM == _ABIO32
+   out->float_save.fir = mcontext.fpc_eir;
+Index: git/src/client/linux/dump_writer_common/ucontext_reader.cc
+===================================================================
+--- git.orig/src/client/linux/dump_writer_common/ucontext_reader.cc
++++ git/src/client/linux/dump_writer_common/ucontext_reader.cc
+@@ -247,8 +247,11 @@ void UContextReader::FillCPUContext(RawC
+   out->cause = 0;  // Not reported in signal context.
+ 
+   for (int i = 0; i < MD_FLOATINGSAVEAREA_MIPS_FPR_COUNT; ++i)
++#ifdef __GLIBC__
+     out->float_save.regs[i] = uc->uc_mcontext.fpregs.fp_r.fp_dregs[i];
+-
++#else
++    out->float_save.regs[i] = uc->uc_mcontext.fpregs[i];
++#endif
+   out->float_save.fpcsr = uc->uc_mcontext.fpc_csr;
+ #if _MIPS_SIM == _ABIO32
+   out->float_save.fir = uc->uc_mcontext.fpc_eir;  // Unused.
+Index: git/src/client/linux/minidump_writer/linux_core_dumper.cc
+===================================================================
+--- git.orig/src/client/linux/minidump_writer/linux_core_dumper.cc
++++ git/src/client/linux/minidump_writer/linux_core_dumper.cc
+@@ -196,7 +196,7 @@ bool LinuxCoreDumper::EnumerateThreads()
+         info.tgid = status->pr_pgrp;
+         info.ppid = status->pr_ppid;
+ #if defined(__mips__)
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) || !defined(__GLIBC__)
+         for (int i = EF_R0; i <= EF_R31; i++)
+           info.mcontext.gregs[i - EF_R0] = status->pr_reg[i];
+ #else  // __ANDROID__
+Index: git/src/tools/linux/md2core/minidump-2-core.cc
+===================================================================
+--- git.orig/src/tools/linux/md2core/minidump-2-core.cc
++++ git/src/tools/linux/md2core/minidump-2-core.cc
+@@ -516,8 +516,12 @@ ParseThreadRegisters(CrashedProcess::Thr
+   thread->mcontext.lo3 = rawregs->lo[2];
+ 
+   for (int i = 0; i < MD_FLOATINGSAVEAREA_MIPS_FPR_COUNT; ++i) {
++#ifdef __GLIBC__
+     thread->mcontext.fpregs.fp_r.fp_fregs[i]._fp_fregs =
+         rawregs->float_save.regs[i];
++#else
++    thread->mcontext.fpregs[i] = rawregs->float_save.regs[i];
++#endif
+   }
+ 
+   thread->mcontext.fpc_csr = rawregs->float_save.fpcsr;

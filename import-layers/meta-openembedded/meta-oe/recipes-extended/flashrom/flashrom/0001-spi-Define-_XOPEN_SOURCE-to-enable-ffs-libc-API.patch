@@ -1,0 +1,28 @@
+From 7c65a465a3ddeb7afb9a7c49d010ae7e5d5b1ad1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 18 Jul 2017 20:25:49 -0700
+Subject: [PATCH] spi: Define _XOPEN_SOURCE to enable ffs() libc API
+
+musl exposes this issue
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ spi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/spi.c b/spi.c
+index 894f73f..aeb6518 100644
+--- a/spi.c
++++ b/spi.c
+@@ -21,7 +21,7 @@
+ /*
+  * Contains the generic SPI framework
+  */
+-
++#define _XOPEN_SOURCE
+ #include <strings.h>
+ #include <string.h>
+ #include "flash.h"
+-- 
+2.13.3
+

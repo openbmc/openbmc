@@ -1,0 +1,36 @@
+Upstream-Status: Submitted (https://github.com/skvadrik/re2c/pull/191)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From bccc10c60523f88c8f81413151cdcd612eb16198 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Mon, 31 Jul 2017 15:43:41 +0100
+Subject: [PATCH] Makefile.am: create target directory before writing into it
+
+In some situations src/parse/ may not exist before a file is copied into the
+directory. Ensure that this doesn't happen by creating the directory first.
+---
+ re2c/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/re2c/Makefile.am b/re2c/Makefile.am
+index 3b3b2c5e..0707fc5a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -187,6 +187,7 @@ CLEANFILES = \
+ 	$(DOC)
+ 
+ $(AUTOGEN_PARSER): $(CUSTOM_PARSER)
++	$(AM_V_at)$(MKDIR_P) $(dir $@)
+ 	$(AM_V_GEN) if test $(BISON) = "no"; \
+ 	then \
+ 		cp $(top_srcdir)/$(BOOTSTRAP_PARSER) $@ && \
+@@ -211,6 +212,7 @@ $(BOOTSTRAP_PARSER): $(CUSTOM_PARSER)
+ 		$(top_srcdir)/$(CUSTOM_PARSER);
+ 
+ .re.cc:
++	$(AM_V_at)$(MKDIR_P) $(dir $@)
+ 	$(AM_V_GEN) if test -x $(RE2C); \
+ 	then \
+ 		$(top_builddir)/$(RE2C) $(RE2CFLAGS) -o $@ $< && \
+-- 
+2.11.0

@@ -15,8 +15,7 @@ SRC_URI = "http://distcache.freebsd.org/local-distfiles/itetcu/${BP}.tar.bz2 \
 SRC_URI[md5sum] = "8e9e81c554c1c5d735bc877448e92b91"
 SRC_URI[sha256sum] = "c9a21913e7fdac8ef6b33250b167aa1fc0a7b8a175145e26913a4c19d8a59b1f"
 
-CFLAGS += "-fno-omit-frame-pointer"
-CFLAGS += " -D_GNU_SOURCE"
+CFLAGS += "-fno-omit-frame-pointer  -D_GNU_SOURCE"
 
 do_install() {
     install -D -m 0744 ${S}/execinfo.h ${D}${includedir}/execinfo.h

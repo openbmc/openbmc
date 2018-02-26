@@ -1,0 +1,33 @@
+From 03e6c339d4fb712fbb8c4ca6ef2fc7100dcdb3d7 Mon Sep 17 00:00:00 2001
+From: Matt Madison <matt@madison.systems>
+Date: Thu, 14 Sep 2017 05:38:10 -0700
+Subject: [PATCH 8/8] make.bash: add GOHOSTxx indirection for cross-canadian
+ builds
+
+Add environment variables for specifying the host OS/arch
+that we are building the compiler for, so it can differ from
+the build host OS/arch.
+
+Upstream-Status: Pending
+
+Signed-off-by: Matt Madison <matt@madison.systems>
+---
+ src/make.bash | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/make.bash b/src/make.bash
+index 2e6fb05..0bdadc6 100755
+--- a/src/make.bash
++++ b/src/make.bash
+@@ -173,6 +173,8 @@ if [ "$do_host_build" = "yes" ]; then
+ 	echo
+ 
+ 	GOTOOLDIR_BOOTSTRAP="${GOTOOLDIR_BOOTSTRAP:-$GOTOOLDIR}"
++	GOHOSTOS="${GOHOSTOS_CROSS:-$GOHOSTOS}"
++	GOHOSTARCH="${GOHOSTARCH_CROSS:-$GOHOSTARCH}"
+ 	echo "##### Building packages and commands for host, $GOHOSTOS/$GOHOSTARCH."
+ 	# CC_FOR_TARGET is recorded as the default compiler for the go tool. When building for the host, however,
+ 	# use the host compiler, CC, from `cmd/dist/dist env` instead.
+-- 
+2.7.4
+

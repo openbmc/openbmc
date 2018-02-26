@@ -39,6 +39,7 @@ import errno
 import bb.persist_data, bb.utils
 import bb.checksum
 import bb.process
+import bb.event
 
 __version__ = "2"
 _checksum_cache = bb.checksum.FileChecksumCache()
@@ -48,11 +49,11 @@ logger = logging.getLogger("BitBake.Fetcher")
 class BBFetchException(Exception):
     """Class all fetch exceptions inherit from"""
     def __init__(self, message):
-         self.msg = message
-         Exception.__init__(self, message)
+        self.msg = message
+        Exception.__init__(self, message)
 
     def __str__(self):
-         return self.msg
+        return self.msg
 
 class UntrustedUrl(BBFetchException):
     """Exception raised when encountering a host not listed in BB_ALLOWED_NETWORKS"""
@@ -68,24 +69,24 @@ class UntrustedUrl(BBFetchException):
 class MalformedUrl(BBFetchException):
     """Exception raised when encountering an invalid url"""
     def __init__(self, url, message=''):
-         if message:
-             msg = message
-         else:
-             msg = "The URL: '%s' is invalid and cannot be interpreted" % url
-         self.url = url
-         BBFetchException.__init__(self, msg)
-         self.args = (url,)
+        if message:
+            msg = message
+        else:
+            msg = "The URL: '%s' is invalid and cannot be interpreted" % url
+        self.url = url
+        BBFetchException.__init__(self, msg)
+        self.args = (url,)
 
 class FetchError(BBFetchException):
     """General fetcher exception when something happens incorrectly"""
     def __init__(self, message, url = None):
-         if url:
+        if url:
             msg = "Fetcher failure for URL: '%s'. %s" % (url, message)
-         else:
+        else:
             msg = "Fetcher failure: %s" % message
-         self.url = url
-         BBFetchException.__init__(self, msg)
-         self.args = (message, url)
+        self.url = url
+        BBFetchException.__init__(self, msg)
+        self.args = (message, url)
 
 class ChecksumError(FetchError):
     """Exception when mismatched checksum encountered"""
@@ -99,48 +100,55 @@ class NoChecksumError(FetchError):
 class UnpackError(BBFetchException):
     """General fetcher exception when something happens incorrectly when unpacking"""
     def __init__(self, message, url):
-         msg = "Unpack failure for URL: '%s'. %s" % (url, message)
-         self.url = url
-         BBFetchException.__init__(self, msg)
-         self.args = (message, url)
+        msg = "Unpack failure for URL: '%s'. %s" % (url, message)
+        self.url = url
+        BBFetchException.__init__(self, msg)
+        self.args = (message, url)
 
 class NoMethodError(BBFetchException):
     """Exception raised when there is no method to obtain a supplied url or set of urls"""
     def __init__(self, url):
-         msg = "Could not find a fetcher which supports the URL: '%s'" % url
-         self.url = url
-         BBFetchException.__init__(self, msg)
-         self.args = (url,)
+        msg = "Could not find a fetcher which supports the URL: '%s'" % url
+        self.url = url
+        BBFetchException.__init__(self, msg)
+        self.args = (url,)
 
 class MissingParameterError(BBFetchException):
     """Exception raised when a fetch method is missing a critical parameter in the url"""
     def __init__(self, missing, url):
-         msg = "URL: '%s' is missing the required parameter '%s'" % (url, missing)
-         self.url = url
-         self.missing = missing
-         BBFetchException.__init__(self, msg)
-         self.args = (missing, url)
+        msg = "URL: '%s' is missing the required parameter '%s'" % (url, missing)
+        self.url = url
+        self.missing = missing
+        BBFetchException.__init__(self, msg)
+        self.args = (missing, url)
 
 class ParameterError(BBFetchException):
     """Exception raised when a url cannot be proccessed due to invalid parameters."""
     def __init__(self, message, url):
-         msg = "URL: '%s' has invalid parameters. %s" % (url, message)
-         self.url = url
-         BBFetchException.__init__(self, msg)
-         self.args = (message, url)
+        msg = "URL: '%s' has invalid parameters. %s" % (url, message)
+        self.url = url
+        BBFetchException.__init__(self, msg)
+        self.args = (message, url)
 
 class NetworkAccess(BBFetchException):
     """Exception raised when network access is disabled but it is required."""
     def __init__(self, url, cmd):
-         msg = "Network access disabled through BB_NO_NETWORK (or set indirectly due to use of BB_FETCH_PREMIRRORONLY) but access requested with command %s (for url %s)" % (cmd, url)
-         self.url = url
-         self.cmd = cmd
-         BBFetchException.__init__(self, msg)
-         self.args = (url, cmd)
+        msg = "Network access disabled through BB_NO_NETWORK (or set indirectly due to use of BB_FETCH_PREMIRRORONLY) but access requested with command %s (for url %s)" % (cmd, url)
+        self.url = url
+        self.cmd = cmd
+        BBFetchException.__init__(self, msg)
+        self.args = (url, cmd)
 
 class NonLocalMethod(Exception):
     def __init__(self):
         Exception.__init__(self)
+
+class MissingChecksumEvent(bb.event.Event):
+    def __init__(self, url, md5sum, sha256sum):
+        self.url = url
+        self.checksums = {'md5sum': md5sum,
+                          'sha256sum': sha256sum}
+        bb.event.Event.__init__(self)
 
 
 class URI(object):
@@ -403,8 +411,6 @@ def encodeurl(decoded):
 
     type, host, path, user, pswd, p = decoded
 
-    if not path:
-        raise MissingParameterError('path', "encoded from the data %s" % str(decoded))
     if not type:
         raise MissingParameterError('type', "encoded from the data %s" % str(decoded))
     url = '%s://' % type
@@ -415,17 +421,18 @@ def encodeurl(decoded):
         url += "@"
     if host and type != "file":
         url += "%s" % host
-    # Standardise path to ensure comparisons work
-    while '//' in path:
-        path = path.replace("//", "/")
-    url += "%s" % urllib.parse.quote(path)
+    if path:
+        # Standardise path to ensure comparisons work
+        while '//' in path:
+            path = path.replace("//", "/")
+        url += "%s" % urllib.parse.quote(path)
     if p:
         for parm in p:
             url += ";%s=%s" % (parm, p[parm])
 
     return url
 
-def uri_replace(ud, uri_find, uri_replace, replacements, d):
+def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
     if not ud.url or not uri_find or not uri_replace:
         logger.error("uri_replace: passed an undefined value, not replacing")
         return None
@@ -455,7 +462,7 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d):
                 result_decoded[loc][k] = uri_replace_decoded[loc][k]
         elif (re.match(regexp, uri_decoded[loc])):
             if not uri_replace_decoded[loc]:
-                result_decoded[loc] = ""    
+                result_decoded[loc] = ""
             else:
                 for k in replacements:
                     uri_replace_decoded[loc] = uri_replace_decoded[loc].replace(k, replacements[k])
@@ -464,9 +471,9 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d):
             if loc == 2:
                 # Handle path manipulations
                 basename = None
-                if uri_decoded[0] != uri_replace_decoded[0] and ud.mirrortarball:
+                if uri_decoded[0] != uri_replace_decoded[0] and mirrortarball:
                     # If the source and destination url types differ, must be a mirrortarball mapping
-                    basename = os.path.basename(ud.mirrortarball)
+                    basename = os.path.basename(mirrortarball)
                     # Kill parameters, they make no sense for mirror tarballs
                     uri_decoded[5] = {}
                 elif ud.localpath and ud.method.supports_checksum(ud):
@@ -583,6 +590,14 @@ def verify_checksum(ud, d, precomputed={}):
                              (ud.localpath, ud.md5_name, md5data,
                               ud.sha256_name, sha256data))
             raise NoChecksumError('Missing SRC_URI checksum', ud.url)
+
+        bb.event.fire(MissingChecksumEvent(ud.url, md5data, sha256data), d)
+
+        if strict == "ignore":
+            return {
+                _MD5_KEY: md5data,
+                _SHA256_KEY: sha256data
+            }
 
         # Log missing sums so user can more easily add them
         logger.warning('Missing md5 SRC_URI checksum for %s, consider adding to the recipe:\n'
@@ -733,7 +748,7 @@ def get_srcrev(d, method_name='sortable_revision'):
     In the multi SCM case, we build a value based on SRCREV_FORMAT which must
     have been set.
 
-    The idea here is that we put the string "AUTOINC+" into return value if the revisions are not 
+    The idea here is that we put the string "AUTOINC+" into return value if the revisions are not
     incremental, other code is then responsible for turning that into an increasing value (if needed)
 
     A method_name can be supplied to retrieve an alternatively formatted revision from a fetcher, if
@@ -785,7 +800,7 @@ def get_srcrev(d, method_name='sortable_revision'):
     format = re.sub(name_to_rev_re, lambda match: name_to_rev[match.group(0)], format)
 
     if seenautoinc:
-       format = "AUTOINC+" + format
+        format = "AUTOINC+" + format
 
     return format
 
@@ -892,45 +907,47 @@ def build_mirroruris(origud, mirrors, ld):
     replacements["BASENAME"] = origud.path.split("/")[-1]
     replacements["MIRRORNAME"] = origud.host.replace(':','.') + origud.path.replace('/', '.').replace('*', '.')
 
-    def adduri(ud, uris, uds, mirrors):
+    def adduri(ud, uris, uds, mirrors, tarballs):
         for line in mirrors:
             try:
                 (find, replace) = line
             except ValueError:
                 continue
-            newuri = uri_replace(ud, find, replace, replacements, ld)
-            if not newuri or newuri in uris or newuri == origud.url:
-                continue
 
-            if not trusted_network(ld, newuri):
-                logger.debug(1, "Mirror %s not in the list of trusted networks, skipping" %  (newuri))
-                continue
+            for tarball in tarballs:
+                newuri = uri_replace(ud, find, replace, replacements, ld, tarball)
+                if not newuri or newuri in uris or newuri == origud.url:
+                    continue
 
-            # Create a local copy of the mirrors minus the current line
-            # this will prevent us from recursively processing the same line
-            # as well as indirect recursion A -> B -> C -> A
-            localmirrors = list(mirrors)
-            localmirrors.remove(line)
+                if not trusted_network(ld, newuri):
+                    logger.debug(1, "Mirror %s not in the list of trusted networks, skipping" %  (newuri))
+                    continue
 
-            try:
-                newud = FetchData(newuri, ld)
-                newud.setup_localpath(ld)
-            except bb.fetch2.BBFetchException as e:
-                logger.debug(1, "Mirror fetch failure for url %s (original url: %s)" % (newuri, origud.url))
-                logger.debug(1, str(e))
+                # Create a local copy of the mirrors minus the current line
+                # this will prevent us from recursively processing the same line
+                # as well as indirect recursion A -> B -> C -> A
+                localmirrors = list(mirrors)
+                localmirrors.remove(line)
+
                 try:
-                    # setup_localpath of file:// urls may fail, we should still see 
-                    # if mirrors of the url exist
-                    adduri(newud, uris, uds, localmirrors)
-                except UnboundLocalError:
-                    pass
-                continue   
-            uris.append(newuri)
-            uds.append(newud)
+                    newud = FetchData(newuri, ld)
+                    newud.setup_localpath(ld)
+                except bb.fetch2.BBFetchException as e:
+                    logger.debug(1, "Mirror fetch failure for url %s (original url: %s)" % (newuri, origud.url))
+                    logger.debug(1, str(e))
+                    try:
+                        # setup_localpath of file:// urls may fail, we should still see
+                        # if mirrors of the url exist
+                        adduri(newud, uris, uds, localmirrors, tarballs)
+                    except UnboundLocalError:
+                        pass
+                    continue
+                uris.append(newuri)
+                uds.append(newud)
 
-            adduri(newud, uris, uds, localmirrors)
+                adduri(newud, uris, uds, localmirrors, tarballs)
 
-    adduri(origud, uris, uds, mirrors)
+    adduri(origud, uris, uds, mirrors, origud.mirrortarballs or [None])
 
     return uris, uds
 
@@ -975,8 +992,8 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
         # We may be obtaining a mirror tarball which needs further processing by the real fetcher
         # If that tarball is a local file:// we need to provide a symlink to it
         dldir = ld.getVar("DL_DIR")
-        if origud.mirrortarball and os.path.basename(ud.localpath) == os.path.basename(origud.mirrortarball) \
-                and os.path.basename(ud.localpath) != os.path.basename(origud.localpath):
+
+        if origud.mirrortarballs and os.path.basename(ud.localpath) in origud.mirrortarballs and os.path.basename(ud.localpath) != os.path.basename(origud.localpath):
             # Create donestamp in old format to avoid triggering a re-download
             if ud.donestamp:
                 bb.utils.mkdirhier(os.path.dirname(ud.donestamp))
@@ -993,7 +1010,7 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
                     pass
             if not verify_donestamp(origud, ld) or origud.method.need_update(origud, ld):
                 origud.method.download(origud, ld)
-                if hasattr(origud.method,"build_mirror_data"):
+                if hasattr(origud.method, "build_mirror_data"):
                     origud.method.build_mirror_data(origud, ld)
             return origud.localpath
         # Otherwise the result is a local file:// and we symlink to it
@@ -1015,7 +1032,7 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
 
     except IOError as e:
         if e.errno in [os.errno.ESTALE]:
-            logger.warn("Stale Error Observed %s." % ud.url)
+            logger.warning("Stale Error Observed %s." % ud.url)
             return False
         raise
 
@@ -1115,7 +1132,7 @@ def srcrev_internal_helper(ud, d, name):
     attempts.append("SRCREV")
 
     for a in attempts:
-        srcrev = d.getVar(a)              
+        srcrev = d.getVar(a)
         if srcrev and srcrev != "INVALID":
             break
 
@@ -1130,7 +1147,7 @@ def srcrev_internal_helper(ud, d, name):
         if srcrev == "INVALID" or not srcrev:
             return parmrev
         if srcrev != parmrev:
-            raise FetchError("Conflicting revisions (%s from SRCREV and %s from the url) found, please spcify one valid value" % (srcrev, parmrev))
+            raise FetchError("Conflicting revisions (%s from SRCREV and %s from the url) found, please specify one valid value" % (srcrev, parmrev))
         return parmrev
 
     if srcrev == "INVALID" or not srcrev:
@@ -1190,7 +1207,7 @@ class FetchData(object):
         self.localfile = ""
         self.localpath = None
         self.lockfile = None
-        self.mirrortarball = None
+        self.mirrortarballs = []
         self.basename = None
         self.basepath = None
         (self.type, self.host, self.path, self.user, self.pswd, self.parm) = decodeurl(d.expand(url))
@@ -1228,7 +1245,7 @@ class FetchData(object):
         for m in methods:
             if m.supports(self, d):
                 self.method = m
-                break                
+                break
 
         if not self.method:
             raise NoMethodError(url)
@@ -1263,7 +1280,7 @@ class FetchData(object):
         elif self.basepath or self.basename:
             basepath = dldir + os.sep + (self.basepath or self.basename)
         else:
-             bb.fatal("Can't determine lock path for url %s" % url)
+            bb.fatal("Can't determine lock path for url %s" % url)
 
         self.donestamp = basepath + '.done'
         self.lockfile = basepath + '.lock'
@@ -1326,13 +1343,13 @@ class FetchMethod(object):
         if os.path.isdir(urldata.localpath) == True:
             return False
         if urldata.localpath.find("*") != -1:
-             return False
+            return False
 
         return True
 
     def recommends_checksum(self, urldata):
         """
-        Is the backend on where checksumming is recommended (should warnings 
+        Is the backend on where checksumming is recommended (should warnings
         be displayed if there is no checksum)?
         """
         return False
@@ -1542,6 +1559,14 @@ class FetchMethod(object):
         key = self._revision_key(ud, d, name)
         return "%s-%s" % (key, d.getVar("PN") or "")
 
+    def latest_versionstring(self, ud, d):
+        """
+        Compute the latest release name like "x.y.x" in "x.y.x+gitHASH"
+        by searching through the tags output of ls-remote, comparing
+        versions and returning the highest match as a (version, revision) pair.
+        """
+        return ('', '')
+
 class Fetch(object):
     def __init__(self, urls, d, cache = True, localonly = False, connection_cache = None):
         if localonly and cache:
@@ -1612,7 +1637,7 @@ class Fetch(object):
 
             try:
                 self.d.setVar("BB_NO_NETWORK", network)
- 
+
                 if verify_donestamp(ud, self.d) and not m.need_update(ud, self.d):
                     localpath = ud.localpath
                 elif m.try_premirror(ud, self.d):
@@ -1708,9 +1733,8 @@ class Fetch(object):
             ret = try_mirrors(self, self.d, ud, mirrors, True)
             if not ret:
                 # Next try checking from the original uri, u
-                try:
-                    ret = m.checkstatus(self, ud, self.d)
-                except:
+                ret = m.checkstatus(self, ud, self.d)
+                if not ret:
                     # Finally, try checking uri, u, from MIRRORS
                     mirrors = mirror_from_string(self.d.getVar('MIRRORS'))
                     ret = try_mirrors(self, self.d, ud, mirrors, True)
@@ -1720,7 +1744,7 @@ class Fetch(object):
 
     def unpack(self, root, urls=None):
         """
-        Check all urls exist upstream
+        Unpack urls to root
         """
 
         if not urls:

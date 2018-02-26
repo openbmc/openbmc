@@ -1,0 +1,46 @@
+From 3d9199423d48766649a2b2ebb3924e892ed16fa4 Mon Sep 17 00:00:00 2001
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
+Date: Tue, 20 Jun 2017 15:32:08 -0400
+Subject: [PATCH] openssl: Force soft link to avoid rare race
+
+This patch works around a rare parallel build race condition. 
+The error seen is:
+
+ln: failed to create symbolic link 'libssl.so': File exists
+make[4]: *** [Makefile.shared:171: link_a.gnu] Error 1
+make[4]: Leaving directory
+'/.../build/tmp-glibc/work/x86_64-linux/openssl-native/1.0.2k-r0/openssl-1.0.2k'
+
+The openssl team is rewriting their build files so it's not
+appropriate for openssl upstream and fixing the root cause of
+the Makefile race condition was also not pursued.
+
+Upstream-Status: Inappropriate [build rules rewrite in progress]
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+---
+ Makefile.shared | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.shared b/Makefile.shared
+index e8d222a..1bff92f 100644
+--- a/Makefile.shared
++++ b/Makefile.shared
+@@ -118,14 +118,14 @@
+ 		if [ -n "$$SHLIB_COMPAT" ]; then \
+ 			for x in $$SHLIB_COMPAT; do \
+ 				( $(SET_X); rm -f $$SHLIB$$x$$SHLIB_SUFFIX; \
+-				  ln -s $$prev $$SHLIB$$x$$SHLIB_SUFFIX ); \
++				  ln -sf $$prev $$SHLIB$$x$$SHLIB_SUFFIX ); \
+ 				prev=$$SHLIB$$x$$SHLIB_SUFFIX; \
+ 			done; \
+ 		fi; \
+ 		if [ -n "$$SHLIB_SOVER" ]; then \
+ 			[ -e "$$SHLIB$$SHLIB_SUFFIX" ] || \
+ 			( $(SET_X); rm -f $$SHLIB$$SHLIB_SUFFIX; \
+-			  ln -s $$prev $$SHLIB$$SHLIB_SUFFIX ); \
++			  ln -sf $$prev $$SHLIB$$SHLIB_SUFFIX ); \
+ 		fi; \
+ 	fi
+ 
+-- 
+2.9.3

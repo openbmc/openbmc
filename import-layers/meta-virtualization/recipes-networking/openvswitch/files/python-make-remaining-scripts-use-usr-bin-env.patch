@@ -33,7 +33,7 @@ index f79f235..c7b8730 100755
 +++ b/build-aux/check-structs
 @@ -1,4 +1,4 @@
 -#! /usr/bin/python
-+#! /usr/bin/env python
++#! /usr/bin/env python3
  
  import os.path
  import sys
@@ -43,7 +43,7 @@ index 184447b..92ea18d 100755
 +++ b/build-aux/extract-ofp-actions
 @@ -1,4 +1,4 @@
 -#! /usr/bin/python
-+#! /usr/bin/env python
++#! /usr/bin/env python3
  
  import sys
  import os.path
@@ -53,7 +53,7 @@ index 9642593..11e6de7 100755
 +++ b/build-aux/extract-ofp-errors
 @@ -1,4 +1,4 @@
 -#! /usr/bin/python
-+#! /usr/bin/env python
++#! /usr/bin/env python3
  
  import sys
  import os.path
@@ -63,7 +63,7 @@ index 498b887..5d6bcec 100755
 +++ b/build-aux/extract-ofp-fields
 @@ -1,4 +1,4 @@
 -#! /usr/bin/python
-+#! /usr/bin/env python
++#! /usr/bin/env python3
  
  import getopt
  import sys
@@ -73,7 +73,7 @@ index 1813638..e9e3c25 100755
 +++ b/build-aux/extract-ofp-msgs
 @@ -1,4 +1,4 @@
 -#! /usr/bin/python
-+#! /usr/bin/env python
++#! /usr/bin/env python3
  
  import sys
  import os.path
@@ -83,7 +83,7 @@ index bd4e879..9d81503 100755
 +++ b/build-aux/xml2nroff
 @@ -1,4 +1,4 @@
 -#! /usr/bin/python
-+#! /usr/bin/env python
++#! /usr/bin/env python3
  
  # Copyright (c) 2010, 2011, 2012, 2013, 2014, 2015, 2016 Nicira, Inc.
  #
@@ -93,7 +93,7 @@ index 52de3db..c90f02b 100755
 +++ b/ovn/utilities/ovn-docker-overlay-driver
 @@ -1,4 +1,4 @@
 -#! /usr/bin/python
-+#! /usr/bin/env python
++#! /usr/bin/env python3
  # Copyright (C) 2015 Nicira, Inc.
  #
  # Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,7 +103,7 @@ index 2c9c4b6..89b804c 100755
 +++ b/ovn/utilities/ovn-docker-underlay-driver
 @@ -1,4 +1,4 @@
 -#! /usr/bin/python
-+#! /usr/bin/env python
++#! /usr/bin/env python3
  # Copyright (C) 2015 Nicira, Inc.
  #
  # Licensed under the Apache License, Version 2.0 (the "License");
@@ -113,7 +113,7 @@ index 5cf26ee..f76f4bd 100755
 +++ b/ovsdb/ovsdb-doc
 @@ -1,4 +1,4 @@
 -#! /usr/bin/python
-+#! /usr/bin/env python
++#! /usr/bin/env python3
  
  # Copyright (c) 2010, 2011, 2012, 2013, 2014, 2015 Nicira, Inc.
  #

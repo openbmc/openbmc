@@ -1,0 +1,44 @@
+From 6e82af54714392dcdf74a8aedaae7de7d0af1080 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 27 Apr 2017 16:37:24 +0300
+Subject: [PATCH] Move python helper scripts (used only in tests) to Python 3
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/gpt-header-move | 2 +-
+ tests/msdos-overlap   | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/gpt-header-move b/tests/gpt-header-move
+index 05cdc65..3cbcb7e 100755
+--- a/tests/gpt-header-move
++++ b/tests/gpt-header-move
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ 
+ # open img file, subtract 33 from altlba address, and move the last 33 sectors
+ # back by 33 sectors
+diff --git a/tests/msdos-overlap b/tests/msdos-overlap
+index 5bddfb0..3de7d2e 100755
+--- a/tests/msdos-overlap
++++ b/tests/msdos-overlap
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ """
+     Write an overlapping partition to a msdos disk
+ 
+@@ -14,7 +14,7 @@ BAD_ENTRY = (0x72, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+ OFFSET = 0x1b8
+ 
+ if len(sys.argv) < 2:
+-    print "%s: <image or device>"
++    print("%s: <image or device>")
+     sys.exit(1)
+ 
+ data = "".join(chr(c) for c in BAD_ENTRY)
+-- 
+2.11.0
+

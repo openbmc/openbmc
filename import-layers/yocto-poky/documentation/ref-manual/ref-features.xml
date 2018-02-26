@@ -36,7 +36,7 @@
     <para>
         One method you can use to determine which recipes are checking to see if a
         particular feature is contained or not is to <filename>grep</filename> through
-        the <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+        the <link linkend='metadata'>Metadata</link>
         for the feature.
         Here is an example that discovers the recipes whose build is potentially
         changed based on a given feature:
@@ -132,7 +132,7 @@
             These select features make sense to be controlled both at
             the machine and distribution configuration level.
             See the
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-COMBINED_FEATURES'><filename>COMBINED_FEATURES</filename></ulink>
+            <link linkend='var-COMBINED_FEATURES'><filename>COMBINED_FEATURES</filename></link>
             variable for more information.
         </para>
 
@@ -151,8 +151,8 @@
                     is used.
                     See the
                     "<ulink url='&YOCTO_DOCS_SDK_URL;#adding-api-documentation-to-the-standard-sdk'>Adding API Documentation to the Standard SDK</ulink>"
-                    section in the Yocto Project Software Development Kit (SDK)
-                    Developer's Guide for more information.
+                    section in the Yocto Project Application Development and
+                    the Extensible Software Development Kit (eSDK) manual.
                     </para></listitem>
                 <listitem><para><emphasis>bluetooth:</emphasis> Include
                     bluetooth support (integrated BT only).</para></listitem>
@@ -217,7 +217,7 @@
                     the package tests where supported by individual recipes.
                     For more information on package tests, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#testing-packages-with-ptest'>Testing Packages With ptest</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                     </para></listitem>
                 <listitem><para><emphasis>smbfs:</emphasis> Include SMB networks
                     client support (for mounting Samba/Microsoft Windows shares
@@ -304,7 +304,7 @@
                     <note>
                         To make the <filename>/var/log</filename> directory
                         on the target persistent, use the
-                        <ulink url='&YOCTO_DOCS_REF_URL;#var-VOLATILE_LOG_DIR'><filename>VOLATILE_LOG_DIR</filename></ulink>
+                        <link linkend='var-VOLATILE_LOG_DIR'><filename>VOLATILE_LOG_DIR</filename></link>
                         variable by setting it to "no".
                     </note>
                     </para></listitem>
@@ -315,8 +315,8 @@
                     Creates an image whose root filesystem is read-only.
                     See the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-read-only-root-filesystem'>Creating a Read-Only Root Filesystem</ulink>"
-                    section in the Yocto Project Development Manual for more
-                    information.
+                    section in the Yocto Project Development Tasks Manual for
+                    more information.
                     </para></listitem>
                 <listitem><para><emphasis>splash:</emphasis>
                     Enables showing a splash screen during boot.
@@ -356,7 +356,8 @@
                     <filename>perf</filename>, <filename>systemtap</filename>,
                     and <filename>LTTng</filename>.
                     For general information on user-space tools, see the
-                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
+                    <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Application Development and the Extensible Software Development Kit (eSDK)</ulink>
+                    manual.
                     </para></listitem>
                 <listitem><para><emphasis>ssh-server-dropbear:</emphasis>
                     Installs the Dropbear minimal SSH server.
@@ -374,7 +375,7 @@
                     <filename>strace</filename> and <filename>gdb</filename>.
                     For information on GDB, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-gdb-remotedebug'>Debugging With the GNU Project Debugger (GDB) Remotely</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                     For information on tracing and profiling, see the
                     <ulink url='&YOCTO_DOCS_PROF_URL;'>Yocto Project Profiling and Tracing Manual</ulink>.
                     </para></listitem>

@@ -1,4 +1,5 @@
 SUMMARY = "backport of Python 3.4's enum package"
+HOMEPAGE = "https://bitbucket.org/stoneleaf/enum34"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://enum/LICENSE;md5=0a97a53a514564c20efd7b2e8976c87e"
 

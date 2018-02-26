@@ -1,0 +1,39 @@
+From de692e359801a1f0488c76267e4f904dd2efe754 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 10 Jun 2017 00:39:07 -0700
+Subject: [PATCH] str_tester.c: Limit rawmemchr() test to glibc
+
+rawmemchr() is a GNU extention therefore mark it so
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ memcheck/tests/str_tester.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/memcheck/tests/str_tester.c b/memcheck/tests/str_tester.c
+index 9f7790a..47e4b4a 100644
+--- a/memcheck/tests/str_tester.c
++++ b/memcheck/tests/str_tester.c
+@@ -504,7 +504,7 @@ test_strchrnul (void)
+ #endif
+ 
+ // DDD: better done by testing for the function.
+-#if !defined(__APPLE__) && !defined(__sun)
++#if !defined(__APPLE__) && !defined(__sun) && defined(__GLIBC__)
+ static void
+ test_rawmemchr (void)
+ {
+@@ -1442,7 +1442,7 @@ main (void)
+   test_strchrnul ();
+ # endif
+ 
+-# if !defined(__APPLE__) && !defined(__sun)
++# if !defined(__APPLE__) && !defined(__sun) && defined(__GLIBC__)
+   /* rawmemchr.  */
+   test_rawmemchr ();
+ # endif
+-- 
+2.13.1
+

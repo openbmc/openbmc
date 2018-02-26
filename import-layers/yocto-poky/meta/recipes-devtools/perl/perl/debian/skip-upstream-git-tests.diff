@@ -9,6 +9,7 @@ upstream. This complicates things needlessly for downstream packagers.
 Skip the tests altogether even if the .git directory exists.
 
 Patch-Name: debian/skip-upstream-git-tests.diff
+Upstream-Status: Pending
 ---
  t/test.pl | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -1,0 +1,28 @@
+From 420cb6927553bbca5b49b7681cf208e6df6e4d7c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Sep 2017 08:42:45 -0700
+Subject: [PATCH 1/2] ypbind3_binding_dup.c: Include string.h for strdup
+ declaration
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ lib/ypbind3_binding_dup.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/ypbind3_binding_dup.c b/lib/ypbind3_binding_dup.c
+index ce4aadf..8199c0b 100644
+--- a/lib/ypbind3_binding_dup.c
++++ b/lib/ypbind3_binding_dup.c
+@@ -19,6 +19,7 @@
+ 
+ #if defined(HAVE_YPBIND3)
+ 
++#include <string.h>
+ #include <rpcsvc/yp_prot.h>
+ #include "internal.h"
+ 
+-- 
+2.14.1
+

@@ -3,8 +3,7 @@ DESCRIPTION = "An image containing the build system that you can boot and run us
 HOMEPAGE = "http://www.yoctoproject.org/documentation/build-appliance"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d690 \
-                    file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 IMAGE_INSTALL = "packagegroup-core-boot packagegroup-core-ssh-openssh packagegroup-self-hosted \
                  kernel-dev kernel-devsrc connman connman-plugin-ethernet dhcp-client \
@@ -19,12 +18,12 @@ IMAGE_ROOTFS_EXTRA_SPACE = "41943040"
 APPEND += "rootfstype=ext4 quiet"
 
 DEPENDS = "zip-native python3-pip-native"
-IMAGE_FSTYPES = "vmdk"
+IMAGE_FSTYPES = "wic.vmdk"
 
 inherit core-image module-base setuptools3
 
-SRCREV ?= "b859272ad4053185d4980cac05481b430e05345f"
-SRC_URI = "git://git.yoctoproject.org/poky;branch=pyro \
+SRCREV ?= "a9588646fcec17e53199e1ea7e7b8dccf140817e"
+SRC_URI = "git://git.yoctoproject.org/poky;branch=rocko \
            file://Yocto_Build_Appliance.vmx \
            file://Yocto_Build_Appliance.vmxf \
            file://README_VirtualBox_Guest_Additions.txt \
@@ -101,7 +100,11 @@ fakeroot do_populate_poky_src () {
 	export STAGING_INCDIR=${STAGING_INCDIR_NATIVE}
 	export HOME=${IMAGE_ROOTFS}/home/builder
 	mkdir -p ${IMAGE_ROOTFS}/home/builder/.cache/pip
-	pip3 install --user -I -U -v -r ${IMAGE_ROOTFS}/home/builder/poky/bitbake/toaster-requirements.txt
+	pip3_install_params="--user -I -U -v -r ${IMAGE_ROOTFS}/home/builder/poky/bitbake/toaster-requirements.txt"
+	if [ -n "${http_proxy}" ]; then
+	   pip3_install_params="${pip3_install_params} --proxy ${http_proxy}"
+	fi
+	pip3 install ${pip3_install_params}
 	chown -R builder.builder ${IMAGE_ROOTFS}/home/builder/.local
 	chown -R builder.builder ${IMAGE_ROOTFS}/home/builder/.cache
 }
@@ -120,7 +123,7 @@ create_bundle_files () {
 	cd ${WORKDIR}
 	mkdir -p Yocto_Build_Appliance
 	cp *.vmx* Yocto_Build_Appliance
-	ln -sf ${IMGDEPLOYDIR}/${IMAGE_NAME}.vmdk Yocto_Build_Appliance/Yocto_Build_Appliance.vmdk
+	ln -sf ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.wic.vmdk Yocto_Build_Appliance/Yocto_Build_Appliance.vmdk
 	zip -r ${IMGDEPLOYDIR}/Yocto_Build_Appliance-${DATETIME}.zip Yocto_Build_Appliance
 	ln -sf Yocto_Build_Appliance-${DATETIME}.zip ${IMGDEPLOYDIR}/Yocto_Build_Appliance.zip
 }
@@ -130,4 +133,4 @@ python do_bundle_files() {
     bb.build.exec_func('create_bundle_files', d)
 }
 
-addtask bundle_files after do_vmimg before do_image_complete
+addtask bundle_files after do_image_wic before do_image_complete

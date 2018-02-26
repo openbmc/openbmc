@@ -62,10 +62,8 @@ def siteinfo_data(d):
         "linux-gnun32": "common-linux common-glibc",
         "linux-gnueabi": "common-linux common-glibc",
         "linux-gnuspe": "common-linux common-glibc",
-        "linux-uclibc": "common-linux common-uclibc",
-        "linux-uclibceabi": "common-linux common-uclibc",
-        "linux-uclibcspe": "common-linux common-uclibc",
         "linux-musl": "common-linux common-musl",
+        "linux-muslx32": "common-linux common-musl",
         "linux-musleabi": "common-linux common-musl",
         "linux-muslspe": "common-linux common-musl",
         "uclinux-uclibc": "common-uclibc",
@@ -79,9 +77,7 @@ def siteinfo_data(d):
         "aarch64_be-linux-musl": "aarch64_be-linux",
         "arm-linux-gnueabi": "arm-linux",
         "arm-linux-musleabi": "arm-linux",
-        "arm-linux-uclibceabi": "arm-linux-uclibc",
         "armeb-linux-gnueabi": "armeb-linux",
-        "armeb-linux-uclibceabi": "armeb-linux-uclibc",
         "armeb-linux-musleabi": "armeb-linux",
         "mips-linux-musl": "mips-linux",
         "mipsel-linux-musl": "mipsel-linux",
@@ -93,10 +89,8 @@ def siteinfo_data(d):
         "mipsisa64r6el-linux-gnun32": "mipsisa32r6el-linux bit-32",
         "powerpc-linux": "powerpc32-linux",
         "powerpc-linux-musl": "powerpc-linux powerpc32-linux",
-        "powerpc-linux-uclibc": "powerpc-linux powerpc32-linux",
         "powerpc-linux-gnuspe": "powerpc-linux powerpc32-linux",
         "powerpc-linux-muslspe": "powerpc-linux powerpc32-linux",
-        "powerpc-linux-uclibcspe": "powerpc-linux powerpc32-linux powerpc-linux-uclibc",
         "powerpc64-linux-gnuspe": "powerpc-linux powerpc64-linux",
         "powerpc64-linux-muslspe": "powerpc-linux powerpc64-linux",
         "powerpc64-linux": "powerpc-linux",
@@ -106,7 +100,7 @@ def siteinfo_data(d):
         "x86_64-darwin9": "bit-64",
         "x86_64-linux": "bit-64",
         "x86_64-linux-musl": "x86_64-linux bit-64",
-        "x86_64-linux-uclibc": "bit-64",
+        "x86_64-linux-muslx32": "bit-32 ix86-common x32-linux",
         "x86_64-elf": "bit-64",
         "x86_64-linux-gnu": "bit-64 x86_64-linux",
         "x86_64-linux-gnux32": "bit-32 ix86-common x32-linux",
@@ -159,7 +153,7 @@ python () {
         bb.fatal("Please add your architecture to siteinfo.bbclass")
 }
 
-def siteinfo_get_files(d, aclocalcache = False):
+def siteinfo_get_files(d, sysrootcache = False):
     sitedata = siteinfo_data(d)
     sitefiles = ""
     for path in d.getVar("BBPATH").split(":"):
@@ -168,18 +162,11 @@ def siteinfo_get_files(d, aclocalcache = False):
             if os.path.exists(filename):
                 sitefiles += filename + " "
 
-    if not aclocalcache:
+    if not sysrootcache:
         return sitefiles
 
-    # Now check for siteconfig cache files in the directory setup by autotools.bbclass to
-    # avoid races.
-    #
-    # ACLOCALDIR may or may not exist so cache should only be set to True from autotools.bbclass
-    # after files have been copied into this location. To do otherwise risks parsing/signature
-    # issues and the directory being created/removed whilst this code executes. This can happen
-    # when a multilib recipe is parsed along with its base variant which may be running at the time
-    # causing rare but nasty failures
-    path_siteconfig = d.getVar('ACLOCALDIR')
+    # Now check for siteconfig cache files in sysroots
+    path_siteconfig = d.getVar('SITECONFIG_SYSROOTCACHE')
     if path_siteconfig and os.path.isdir(path_siteconfig):
         for i in os.listdir(path_siteconfig):
             if not i.endswith("_config"):

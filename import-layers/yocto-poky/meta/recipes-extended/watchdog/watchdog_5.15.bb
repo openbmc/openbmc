@@ -21,8 +21,7 @@ SRC_URI[sha256sum] = "ffdc865137ad5d8e53664bd22bad4de6ca136d1b4636720320cb52af0c
 UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/watchdog/files/watchdog/"
 UPSTREAM_CHECK_REGEX = "/watchdog/(?P<pver>(\d+[\.\-_]*)+)/"
 
-inherit autotools
-inherit update-rc.d
+inherit autotools update-rc.d systemd
 
 DEPENDS_append_libc-musl = " libtirpc "
 CFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc "
@@ -37,12 +36,18 @@ INITSCRIPT_PARAMS_${PN} = "start 15 1 2 3 4 5 . stop 85 0 6 ."
 INITSCRIPT_NAME_${PN}-keepalive = "wd_keepalive"
 INITSCRIPT_PARAMS_${PN}-keepalive = "start 15 1 2 3 4 5 . stop 85 0 6 ."
 
-do_install_append() {
-	install -D ${S}/redhat/watchdog.init ${D}/${sysconfdir}/init.d/watchdog.sh
-    install -Dm 0755 ${WORKDIR}/wd_keepalive.init ${D}${sysconfdir}/init.d/wd_keepalive
+SYSTEMD_SERVICE_${PN} = "watchdog.service wd_keepalive.service"
 
-    # watchdog.conf is provided by the watchdog-config recipe
-    rm ${D}${sysconfdir}/watchdog.conf
+do_install_append() {
+	install -d ${D}${systemd_system_unitdir}
+	install -m 0644 ${S}/debian/watchdog.service ${D}${systemd_system_unitdir}
+	install -m 0644 ${S}/debian/wd_keepalive.service ${D}${systemd_system_unitdir}
+
+	install -D ${S}/redhat/watchdog.init ${D}/${sysconfdir}/init.d/watchdog.sh
+	install -Dm 0755 ${WORKDIR}/wd_keepalive.init ${D}${sysconfdir}/init.d/wd_keepalive
+
+	# watchdog.conf is provided by the watchdog-config recipe
+	rm ${D}${sysconfdir}/watchdog.conf
 }
 
 PACKAGES =+ "${PN}-keepalive"

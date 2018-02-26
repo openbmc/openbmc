@@ -1355,12 +1355,7 @@ class RunQueue:
                 logger.info("Tasks Summary: Attempted %d tasks of which %d didn't need to be rerun and all succeeded.", self.rqexe.stats.completed, self.rqexe.stats.skipped)
 
         if self.state is runQueueFailed:
-            if not self.rqdata.taskData[''].tryaltconfigs:
-                raise bb.runqueue.TaskFailure(self.rqexe.failed_tids)
-            for tid in self.rqexe.failed_tids:
-                (mc, fn, tn, _) = split_tid_mcfn(tid)
-                self.rqdata.taskData[mc].fail_fn(fn)
-            self.rqdata.reset()
+            raise bb.runqueue.TaskFailure(self.rqexe.failed_tids)
 
         if self.state is runQueueComplete:
             # All done
@@ -1839,7 +1834,7 @@ class RunQueueExecuteTasks(RunQueueExecute):
         Run the tasks in a queue prepared by rqdata.prepare()
         """
 
-        if self.rqdata.setscenewhitelist and not self.rqdata.setscenewhitelist_checked:
+        if self.rqdata.setscenewhitelist is not None and not self.rqdata.setscenewhitelist_checked:
             self.rqdata.setscenewhitelist_checked = True
 
             # Check tasks that are going to run against the whitelist
@@ -1932,7 +1927,7 @@ class RunQueueExecuteTasks(RunQueueExecute):
                         self.rq.state = runQueueFailed
                         self.stats.taskFailed()
                         return True
-                self.rq.fakeworker[mc].process.stdin.write(b"<runtask>" + pickle.dumps((taskfn, task, taskname, False, self.cooker.collection.get_file_appends(fn), taskdepdata, self.rqdata.setscene_enforce)) + b"</runtask>")
+                self.rq.fakeworker[mc].process.stdin.write(b"<runtask>" + pickle.dumps((taskfn, task, taskname, False, self.cooker.collection.get_file_appends(taskfn), taskdepdata, self.rqdata.setscene_enforce)) + b"</runtask>")
                 self.rq.fakeworker[mc].process.stdin.flush()
             else:
                 self.rq.worker[mc].process.stdin.write(b"<runtask>" + pickle.dumps((taskfn, task, taskname, False, self.cooker.collection.get_file_appends(taskfn), taskdepdata, self.rqdata.setscene_enforce)) + b"</runtask>")
@@ -2254,7 +2249,7 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
         self.scenequeue_updatecounters(task)
 
     def check_taskfail(self, task):
-        if self.rqdata.setscenewhitelist:
+        if self.rqdata.setscenewhitelist is not None:
             realtask = task.split('_setscene')[0]
             (mc, fn, taskname, taskfn) = split_tid_mcfn(realtask)
             pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
@@ -2372,7 +2367,7 @@ class RunQueueExecuteScenequeue(RunQueueExecute):
         self.rq.scenequeue_covered = self.scenequeue_covered
         self.rq.scenequeue_notcovered = self.scenequeue_notcovered
 
-        logger.debug(1, 'We can skip tasks %s', sorted(self.rq.scenequeue_covered))
+        logger.debug(1, 'We can skip tasks %s', "\n".join(sorted(self.rq.scenequeue_covered)))
 
         self.rq.state = runQueueRunInit
 
@@ -2488,6 +2483,9 @@ class runQueueTaskFailed(runQueueEvent):
         runQueueEvent.__init__(self, task, stats, rq)
         self.exitcode = exitcode
 
+    def __str__(self):
+        return "Task (%s) failed with exit code '%s'" % (self.taskstring, self.exitcode)
+
 class sceneQueueTaskFailed(sceneQueueEvent):
     """
     Event notifying a setscene task failed
@@ -2495,6 +2493,9 @@ class sceneQueueTaskFailed(sceneQueueEvent):
     def __init__(self, task, stats, exitcode, rq):
         sceneQueueEvent.__init__(self, task, stats, rq)
         self.exitcode = exitcode
+
+    def __str__(self):
+        return "Setscene task (%s) failed with exit code '%s' - real task will be run instead" % (self.taskstring, self.exitcode)
 
 class sceneQueueComplete(sceneQueueEvent):
     """
@@ -2602,7 +2603,7 @@ def get_setscene_enforce_whitelist(d):
 
 def check_setscene_enforce_whitelist(pn, taskname, whitelist):
     import fnmatch
-    if whitelist:
+    if whitelist is not None:
         item = '%s:%s' % (pn, taskname)
         for whitelist_item in whitelist:
             if fnmatch.fnmatch(item, whitelist_item):

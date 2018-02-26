@@ -1,0 +1,26 @@
+From 2bc6bb9831d07f035fea74ea745cea43dd5f9ef9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 9 Sep 2017 23:48:31 -0700
+Subject: [PATCH] Dont use isystem
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ cmake/OpenCVPCHSupport.cmake | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+Index: git/cmake/OpenCVPCHSupport.cmake
+===================================================================
+--- git.orig/cmake/OpenCVPCHSupport.cmake
++++ git/cmake/OpenCVPCHSupport.cmake
+@@ -17,7 +17,8 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
+     IF(NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.2.0")
+         SET(PCHSupport_FOUND TRUE)
+     ENDIF()
+-
++    SET(CMAKE_INCLUDE_SYSTEM_FLAG_C "-I")
++    SET(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-I")
+     SET(_PCH_include_prefix "-I")
+     SET(_PCH_isystem_prefix "-isystem")
+     SET(_PCH_define_prefix "-D")

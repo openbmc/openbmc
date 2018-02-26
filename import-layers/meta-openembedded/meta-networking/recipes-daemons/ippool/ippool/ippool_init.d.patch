@@ -1,0 +1,65 @@
+Fix start error if lsb init-functions doesn't exist
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/debian/init.d b/debian/init.d
+index 363ba89..0327fec 100644
+--- a/debian/init.d
++++ b/debian/init.d
+@@ -10,6 +10,9 @@
+ # Description:       Start ippool daemon
+ ### END INIT INFO
+ 
++# Source function library.
++. /etc/init.d/functions
++
+ DAEMON=/usr/sbin/ippoold
+ NAME=ippoold
+ MODULE=pppol2tp
+@@ -18,7 +21,23 @@ MODULE=pppol2tp
+ test -x $DAEMON || exit 0
+ 
+ # Get lsb functions
+-. /lib/lsb/init-functions
++if [ -f /lib/lsb/init-functions ]
++then
++  . /lib/lsb/init-functions
++else
++  log_begin_msg() {
++    echo -n $*
++  }
++
++  log_end_msg() {
++    if [ $1 -eq 0 ]; then
++      echo "done"
++    else
++      echo "failed"
++    fi
++  }
++fi
++
+ . /etc/default/rcS
+ 
+ case "$1" in
+@@ -35,6 +54,10 @@ case "$1" in
+     fi
+     log_end_msg $?
+     ;;
++  status)
++    status /usr/sbin/ippoold;
++    exit $?
++    ;;
+   restart)
+     $0 stop
+     sleep 1
+@@ -46,7 +69,7 @@ case "$1" in
+     log_end_msg $?
+     ;;
+   *)
+-    log_success_msg "Usage: /etc/init.d/ippoold {start|stop|restart|reload|force-reload}"
++    log_success_msg "Usage: /etc/init.d/ippoold {start|stop|status|restart|reload|force-reload}"
+     exit 1
+ esac
+ 

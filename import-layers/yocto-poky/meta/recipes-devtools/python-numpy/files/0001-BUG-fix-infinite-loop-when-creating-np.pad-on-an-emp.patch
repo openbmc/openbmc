@@ -1,0 +1,45 @@
+From 4170b98e0d5864ef4db1c5704a6e9428c3be9fb8 Mon Sep 17 00:00:00 2001
+From: Iryna Shcherbina <ishcherb@redhat.com>
+Date: Thu, 24 Aug 2017 18:01:43 +0200
+Subject: [PATCH] BUG: fix infinite loop when creating np.pad on an empty array
+
+Upstream-Status: Backport [https://github.com/numpy/numpy/pull/9599/commits/6f9ea0abbd305d53f9017debab3a3a591fe0e249]
+CVE: CVE-2017-12852
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ numpy/lib/arraypad.py            | 3 +++
+ numpy/lib/tests/test_arraypad.py | 4 ++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/numpy/lib/arraypad.py b/numpy/lib/arraypad.py
+index 2dad99c..294a689 100644
+--- a/numpy/lib/arraypad.py
++++ b/numpy/lib/arraypad.py
+@@ -1406,6 +1406,9 @@ def pad(array, pad_width, mode, **kwargs):
+             newmat = _append_min(newmat, pad_after, chunk_after, axis)
+ 
+     elif mode == 'reflect':
++        if narray.size == 0:
++            raise ValueError("There aren't any elements to reflect in `array`")
++
+         for axis, (pad_before, pad_after) in enumerate(pad_width):
+             # Recursive padding along any axis where `pad_amt` is too large
+             # for indexing tricks. We can only safely pad the original axis
+diff --git a/numpy/lib/tests/test_arraypad.py b/numpy/lib/tests/test_arraypad.py
+index 056aa45..0f71d32 100644
+--- a/numpy/lib/tests/test_arraypad.py
++++ b/numpy/lib/tests/test_arraypad.py
+@@ -1014,6 +1014,10 @@ class ValueError1(TestCase):
+         assert_raises(ValueError, pad, arr, ((-2, 3), (3, 2)),
+                       **kwargs)
+ 
++    def test_check_empty_array(self):
++        assert_raises(ValueError, pad, [], 4, mode='reflect')
++        assert_raises(ValueError, pad, np.ndarray(0), 4, mode='reflect')
++
+ 
+ class ValueError2(TestCase):
+     def test_check_negative_pad_amount(self):
+-- 
+2.8.1
+

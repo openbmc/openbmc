@@ -1,7 +1,7 @@
 SUMMARY = "Synergy - control multiple computers with one keyboard and mouse"
 HOMEPAGE = "http://synergy-project.org"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=0f366945b209c5523e39889f636af00a"
-LICENSE = "GPL-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=d2ba51ca68e055566aade24662f9eb41"
+LICENSE = "GPL-2.0-with-OpenSSL-exception"
 SECTION = "x11/utils"
 
 DEPENDS = "virtual/libx11 libxtst libxinerama curl openssl"
@@ -10,11 +10,11 @@ do_unpack_extra[depends] = "unzip-native:do_populate_sysroot"
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
-SRC_URI = "git://github.com/symless/synergy-core.git;protocol=https"
+SRC_URI = "git://github.com/symless/synergy.git;protocol=http"
 
-# Version 1.7.4-rc8
-SRCREV ?= "588fb4b805dd452556d05dbc03fe29ea5b4e43c0"
-PV = "1.7.3+1.7.4-rc8+${SRCPV}"
+# Version 1.8.8-stable
+SRCREV ?= "c30301e23424db1125664da17deb8c3aa6aec52d"
+PV = "1.8.8+${SRCPV}"
 
 S = "${WORKDIR}/git"
 

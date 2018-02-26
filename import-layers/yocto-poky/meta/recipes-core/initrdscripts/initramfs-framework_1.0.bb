@@ -3,7 +3,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_base-utils}"
 
-PR = "r2"
+PR = "r4"
 
 inherit allarch
 
@@ -13,7 +13,8 @@ SRC_URI = "file://init \
            file://mdev \
            file://udev \
            file://e2fs \
-           file://debug"
+           file://debug \
+          "
 
 S = "${WORKDIR}"
 
@@ -48,7 +49,8 @@ PACKAGES = "${PN}-base \
             initramfs-module-udev \
             initramfs-module-e2fs \
             initramfs-module-rootfs \
-            initramfs-module-debug"
+            initramfs-module-debug \
+           "
 
 FILES_${PN}-base = "/init /init.d/99-finish /dev"
 

@@ -1,0 +1,107 @@
+Upstream-Status: Pending
+
+written by: Jeff Polk <jeff.polk@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+--- a/Makefile
++++ b/Makefile
+@@ -126,6 +126,10 @@ ifeq ($(AUTH_METHOD),shadow)
+ vlock-main : override LDLIBS += $(CRYPT_LIB)
+ endif
+ 
++ifneq ($(ENABLE_FAIL_COUNT),yes)
++vlock-main.o : override CFLAGS += -DNO_FAIL_COUNT
++endif
++
+ ifeq ($(ENABLE_PLUGINS),yes)
+ vlock-main: plugins.o plugin.o module.o process.o script.o tsort.o list.o
+ # -rdynamic is needed so that the all plugin can access the symbols from console_switch.o
+--- a/configure
++++ b/configure
+@@ -44,6 +44,7 @@ Optional Features:
+   --enable-shadow         enable shadow authentication [disabled]
+   --enable-root-password  enable unlogging with root password [enabled]
+   --enable-debug          enable debugging
++  --enable-fail-count     enable failed login attempt summary [enabled]
+ 
+ Additional configuration:
+   --with-scripts=SCRIPTS  enable the named scripts []
+@@ -78,6 +79,9 @@ enable_feature() {
+     root-password)
+       ENABLE_ROOT_PASSWORD="$2"
+     ;;
++    fail-count)
++      ENABLE_FAIL_COUNT="$2"
++    ;;
+     pam|shadow)
+       if [ "$2" = "yes" ] ; then
+         if [ -n "$auth_method" ] && [ "$auth_method" != "$1" ] ; then
+@@ -232,6 +232,7 @@ set_defaults() {
+   AUTH_METHOD="pam"
+   ENABLE_ROOT_PASSWORD="yes"
+   ENABLE_PLUGINS="yes"
++  ENABLE_FAIL_COUNT="yes"
+   SCRIPTS=""
+ 
+   VLOCK_GROUP="vlock"
+@@ -356,10 +356,14 @@ ENABLE_PLUGINS = ${ENABLE_PLUGINS}
+ # which plugins should be build
+ MODULES = ${MODULES}
+ # which scripts should be installed
+ SCRIPTS = ${SCRIPTS}
+ 
++# display a summary of failed authentication attempts after successfully
++# unlocking?
++ENABLE_FAIL_COUNT = ${ENABLE_FAIL_COUNT}
++
+ # root's group
+ ROOT_GROUP = ${ROOT_GROUP}
+ 
+ # group for privileged plugins
+ VLOCK_GROUP = ${VLOCK_GROUP}
+--- a/src/vlock-main.c
++++ b/src/vlock-main.c
+@@ -111,7 +111,9 @@ static void restore_terminal(void)
+   (void) tcsetattr(STDIN_FILENO, TCSANOW, &term);
+ }
+ 
++#ifdef ENABLE_FAIL_COUNT
+ static int auth_tries;
++#endif /* ENABLE_FAIL_COUNT */
+ 
+ static void auth_loop(const char *username)
+ {
+@@ -181,7 +183,9 @@ static void auth_loop(const char *userna
+     }
+ #endif
+ 
++#ifdef ENABLE_FAIL_COUNT
+     auth_tries++;
++#endif /* ENABLE_FAIL_COUNT */
+   }
+ 
+   /* Free timeouts memory. */
+@@ -189,11 +193,13 @@ static void auth_loop(const char *userna
+   free(prompt_timeout);
+ }
+ 
++#ifdef ENABLE_FAIL_COUNT
+ void display_auth_tries(void)
+ {
+   if (auth_tries > 0)
+     fprintf(stderr, "%d failed authentication %s.\n", auth_tries, auth_tries > 1 ? "tries" : "try");
+ }
++#endif /* ENABLE_FAIL_COUNT */
+ 
+ #ifdef USE_PLUGINS
+ static void call_end_hook(void)
+@@ -216,7 +222,9 @@ int main(int argc, char *const argv[])
+   if (username == NULL)
+     fatal_perror("vlock: could not get username");
+ 
++#ifdef ENABLE_FAIL_COUNT
+   ensure_atexit(display_auth_tries);
++#endif /* ENABLE_FAIL_COUNT */
+ 
+ #ifdef USE_PLUGINS
+   for (int i = 1; i < argc; i++)

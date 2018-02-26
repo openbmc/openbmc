@@ -1,0 +1,26 @@
+From 8b44dc65d98d50b462843ac9dab6fe3fc25abe36 Mon Sep 17 00:00:00 2001
+From: Pascal Bach <pascal.bach@siemens.com>
+Date: Fri, 12 May 2017 13:54:49 +0200
+Subject: [PATCH] correct version for so lib
+
+Upstream-Status: Pending
+
+---
+ CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3670afe..f4fcd2c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -172,6 +172,7 @@ endif()
+ if(FLATBUFFERS_BUILD_SHAREDLIB)
+   add_library(flatbuffers_shared SHARED ${FlatBuffers_Library_SRCS})
+   set_target_properties(flatbuffers_shared PROPERTIES OUTPUT_NAME flatbuffers)
++  set_target_properties(flatbuffers_shared PROPERTIES VERSION "${PV}")
+ endif()
+ 
+ function(compile_flatbuffers_schema_to_cpp SRC_FBS)
+-- 
+2.1.4
+

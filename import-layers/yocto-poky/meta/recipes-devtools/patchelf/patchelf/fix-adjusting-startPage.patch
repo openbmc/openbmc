@@ -1,0 +1,38 @@
+commit 1cc234fea5600190d872329aca60e2365cefc39e
+Author: Ed Bartosh <ed.bartosh@linux.intel.com>
+Date:   Fri Jul 21 12:33:53 2017 +0300
+
+fix adjusting startPage
+
+startPage is adjusted unconditionally for all executables.
+This results in incorrect addresses assigned to INTERP and LOAD
+program headers, which breaks patched executable.
+
+Adjusting startPage variable only when startOffset > startPage
+should fix this.
+
+This change is related to the issue NixOS#10
+
+Signed-off-by: Ed Bartosh <ed.bartosh@linux.intel.com>
+
+Github PR: https://github.com/NixOS/patchelf/pull/127
+
+Upstream-Status: Submitted
+
+diff --git a/src/patchelf.cc b/src/patchelf.cc
+index cbd36c0..e9d7ea5 100644
+--- a/src/patchelf.cc
++++ b/src/patchelf.cc
+@@ -720,10 +720,8 @@ void ElfFile<ElfFileParamNames>::rewriteSectionsLibrary()
+        since DYN executables tend to start at virtual address 0, so
+        rewriteSectionsExecutable() won't work because it doesn't have
+        any virtual address space to grow downwards into. */
+-    if (isExecutable) {
+-        if (startOffset >= startPage) {
+-            debug("shifting new PT_LOAD segment by %d bytes to work around a Linux kernel bug\n", startOffset - startPage);
+-        }
++    if (isExecutable && startOffset > startPage) {
++        debug("shifting new PT_LOAD segment by %d bytes to work around a Linux kernel bug\n", startOffset - startPage);
+         startPage = startOffset;
+     }
+ 

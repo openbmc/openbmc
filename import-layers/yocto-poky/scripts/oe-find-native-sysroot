@@ -50,7 +50,7 @@ BITBAKE_E=""
 set_oe_native_sysroot(){
     echo "Running bitbake -e $1"
     BITBAKE_E="`bitbake -e $1`"
-    OECORE_NATIVE_SYSROOT=`echo "$BITBAKE_E" | grep ^STAGING_DIR_NATIVE | cut -d '"' -f2`
+    OECORE_NATIVE_SYSROOT=`echo "$BITBAKE_E" | grep ^STAGING_DIR_NATIVE= | cut -d '"' -f2`
 
     if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then
         # This indicates that there was an error running bitbake -e that

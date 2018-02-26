@@ -34,7 +34,7 @@ EXTRA_OECONF += "--enable-gtk3=no --enable-password=yes --with-x -with-xconn=xcb
 "
 
 do_configure_prepend() {
-    cp ${STAGING_DATADIR}/gettext/po/Makefile.in.in ${S}/po/
+    cp ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/po/
 }
 
 do_compile_append() {

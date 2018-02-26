@@ -41,7 +41,17 @@ KERNEL_DEVICETREE ?= " \
     overlays/pi3-miniuart-bt.dtbo \
     overlays/vc4-kms-v3d.dtbo \
     "
-KERNEL_IMAGETYPE ?= "Image"
+
+# By default:
+#
+# * When u-boot is disabled use the "Image" format which can be directly loaded
+#   by the rpi firmware.
+#
+# * When u-boot is enabled use the "uImage" format and the "bootm" command
+#   within u-boot to load the kernel.
+KERNEL_BOOTCMD ??= "bootm"
+KERNEL_IMAGETYPE_UBOOT ??= "uImage"
+KERNEL_IMAGETYPE ?= "${@bb.utils.contains('RPI_USE_U_BOOT', '1', '${KERNEL_IMAGETYPE_UBOOT}', 'Image', d)}"
 
 MACHINE_FEATURES += "apm usbhost keyboard vfat ext2 screen touchscreen alsa bluetooth wifi sdio"
 
@@ -83,7 +93,7 @@ def make_dtb_boot_files(d):
 
 IMAGE_BOOT_FILES ?= "bcm2835-bootfiles/* \
                  ${@make_dtb_boot_files(d)} \
-                 ${@bb.utils.contains('KERNEL_IMAGETYPE', 'uImage', \
+                 ${@bb.utils.contains('RPI_USE_U_BOOT', '1', \
                     '${KERNEL_IMAGETYPE} u-boot.bin;${SDIMG_KERNELIMAGE} boot.scr', \
                     '${KERNEL_IMAGETYPE};${SDIMG_KERNELIMAGE}', d)} \
                  "

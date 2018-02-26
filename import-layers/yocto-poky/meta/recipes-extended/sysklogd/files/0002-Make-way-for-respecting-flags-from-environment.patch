@@ -1,0 +1,35 @@
+From b22f244732cd0f475af2f82fc7eecec49f90623b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 1 Jul 2017 00:01:50 -0700
+Subject: [PATCH 2/2] Make way for respecting flags from environment
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 5af1689..af699d2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,14 +17,12 @@
+ #   along with this program; if not, write to the Free Software
+ #   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
+-CC= gcc
+ #SKFLAGS= -g -DSYSV -Wall
+ #LDFLAGS= -g
+-SKFLAGS= $(RPM_OPT_FLAGS) -O3 -DSYSV -fomit-frame-pointer -Wall -fno-strength-reduce
++SKFLAGS = $(CFLAGS) $(CPPFLAGS) -DSYSV -Wall -fno-strength-reduce
+ # -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+ # -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
+ # $(shell getconf LFS_SKFLAGS)
+-LDFLAGS= -s
+ 
+ # Look where your install program is.
+ INSTALL = /usr/bin/install
+-- 
+2.13.2
+

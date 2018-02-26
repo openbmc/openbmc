@@ -9,6 +9,8 @@ This was not possible to override from the command line and in OpenEmbedded
 through the use of qemu target emulation.
 
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+Upstream-Status: Pending
 ---
  Source/cmake/OptionsGTK.cmake | 6 ------
  1 file changed, 6 deletions(-)

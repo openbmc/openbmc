@@ -192,7 +192,7 @@ python buildhistory_emit_pkghistory() {
     pe = d.getVar('PE') or "0"
     pv = d.getVar('PV')
     pr = d.getVar('PR')
-    layer = bb.utils.get_file_layer(d.getVar('FILE', True), d)
+    layer = bb.utils.get_file_layer(d.getVar('FILE'), d)
 
     pkgdata_dir = d.getVar('PKGDATA_DIR')
     packages = ""
@@ -348,6 +348,7 @@ def write_recipehistory(rcpinfo, d):
         f.write(u"PACKAGES = %s\n" %  rcpinfo.packages)
         f.write(u"LAYER = %s\n" %  rcpinfo.layer)
 
+    write_latest_srcrev(d, pkghistdir)
 
 def write_pkghistory(pkginfo, d):
     bb.debug(2, "Writing package history for package %s" % pkginfo.name)
@@ -600,26 +601,19 @@ END
 
 python buildhistory_get_extra_sdkinfo() {
     import operator
-    import math
+    from oe.sdk import get_extra_sdkinfo
+
+    sstate_dir = d.expand('${SDK_OUTPUT}/${SDKPATH}/sstate-cache')
+    extra_info = get_extra_sdkinfo(sstate_dir)
 
     if d.getVar('BB_CURRENTTASK') == 'populate_sdk_ext' and \
             "sdk" in (d.getVar('BUILDHISTORY_FEATURES') or "").split():
-        tasksizes = {}
-        filesizes = {}
-        for root, _, files in os.walk(d.expand('${SDK_OUTPUT}/${SDKPATH}/sstate-cache')):
-            for fn in files:
-                if fn.endswith('.tgz'):
-                    fsize = int(math.ceil(float(os.path.getsize(os.path.join(root, fn))) / 1024))
-                    task = fn.rsplit(':', 1)[1].split('_', 1)[1].split('.')[0]
-                    origtotal = tasksizes.get(task, 0)
-                    tasksizes[task] = origtotal + fsize
-                    filesizes[fn] = fsize
         with open(d.expand('${BUILDHISTORY_DIR_SDK}/sstate-package-sizes.txt'), 'w') as f:
-            filesizes_sorted = sorted(filesizes.items(), key=operator.itemgetter(1, 0), reverse=True)
+            filesizes_sorted = sorted(extra_info['filesizes'].items(), key=operator.itemgetter(1, 0), reverse=True)
             for fn, size in filesizes_sorted:
                 f.write('%10d KiB %s\n' % (size, fn))
         with open(d.expand('${BUILDHISTORY_DIR_SDK}/sstate-task-sizes.txt'), 'w') as f:
-            tasksizes_sorted = sorted(tasksizes.items(), key=operator.itemgetter(1, 0), reverse=True)
+            tasksizes_sorted = sorted(extra_info['tasksizes'].items(), key=operator.itemgetter(1, 0), reverse=True)
             for task, size in tasksizes_sorted:
                 f.write('%10d KiB %s\n' % (size, task))
 }
@@ -715,20 +709,23 @@ def buildhistory_get_sdkvars(d):
 
 
 def buildhistory_get_cmdline(d):
-    if sys.argv[0].endswith('bin/bitbake'):
-        bincmd = 'bitbake'
-    else:
-        bincmd = sys.argv[0]
-    return '%s %s' % (bincmd, ' '.join(sys.argv[1:]))
+    argv = d.getVar('BB_CMDLINE', False)
+    if argv:
+        if argv[0].endswith('bin/bitbake'):
+            bincmd = 'bitbake'
+        else:
+            bincmd = argv[0]
+        return '%s %s' % (bincmd, ' '.join(argv[1:]))
+    return ''
 
 
 buildhistory_single_commit() {
 	if [ "$3" = "" ] ; then
 		commitopts="${BUILDHISTORY_DIR}/ --allow-empty"
-		item="No changes"
+		shortlogprefix="No changes: "
 	else
-		commitopts="$3 metadata-revs"
-		item="$3"
+		commitopts=""
+		shortlogprefix=""
 	fi
 	if [ "${BUILDHISTORY_BUILD_FAILURES}" = "0" ] ; then
 		result="succeeded"
@@ -745,7 +742,7 @@ buildhistory_single_commit() {
 	esac
 	commitmsgfile=`mktemp`
 	cat > $commitmsgfile << END
-$item: Build ${BUILDNAME} of ${DISTRO} ${DISTRO_VERSION} for machine ${MACHINE} on $2
+${shortlogprefix}Build ${BUILDNAME} of ${DISTRO} ${DISTRO_VERSION} for machine ${MACHINE} on $2
 
 cmd: $1
 
@@ -789,9 +786,7 @@ END
 			git add -A .
 			# porcelain output looks like "?? packages/foo/bar"
 			# Ensure we commit metadata-revs with the first commit
-			for entry in `echo "$repostatus" | awk '{print $2}' | awk -F/ '{print $1}' | sort | uniq` ; do
-				buildhistory_single_commit "$CMDLINE" "$HOSTNAME" "$entry"
-			done
+			buildhistory_single_commit "$CMDLINE" "$HOSTNAME" dummy
 			git gc --auto --quiet
 		else
 			buildhistory_single_commit "$CMDLINE" "$HOSTNAME"
@@ -829,6 +824,8 @@ python buildhistory_eventhandler() {
                 interrupted = getattr(e, '_interrupted', 0)
                 localdata.setVar('BUILDHISTORY_BUILD_INTERRUPTED', str(interrupted))
                 bb.build.exec_func("buildhistory_commit", localdata)
+            else:
+                bb.note("No commit since BUILDHISTORY_COMMIT != '1'")
 }
 
 addhandler buildhistory_eventhandler
@@ -874,7 +871,10 @@ def _get_srcrev_values(d):
 do_fetch[postfuncs] += "write_srcrev"
 do_fetch[vardepsexclude] += "write_srcrev"
 python write_srcrev() {
-    pkghistdir = d.getVar('BUILDHISTORY_DIR_PACKAGE')
+    write_latest_srcrev(d, d.getVar('BUILDHISTORY_DIR_PACKAGE'))
+}
+
+def write_latest_srcrev(d, pkghistdir):
     srcrevfile = os.path.join(pkghistdir, 'latest_srcrev')
 
     srcrevs, tag_srcrevs = _get_srcrev_values(d)
@@ -912,4 +912,33 @@ python write_srcrev() {
     else:
         if os.path.exists(srcrevfile):
             os.remove(srcrevfile)
+
+do_testimage[postfuncs] += "write_ptest_result"
+do_testimage[vardepsexclude] += "write_ptest_result"
+
+python write_ptest_result() {
+    write_latest_ptest_result(d, d.getVar('BUILDHISTORY_DIR'))
 }
+
+def write_latest_ptest_result(d, histdir):
+    import glob
+    import subprocess
+    test_log_dir = d.getVar('TEST_LOG_DIR')
+    input_ptest = os.path.join(test_log_dir, 'ptest_log')
+    output_ptest = os.path.join(histdir, 'ptest')
+    if os.path.exists(input_ptest):
+        try:
+            # Lock it avoid race issue
+            lock = bb.utils.lockfile(output_ptest + "/ptest.lock")
+            bb.utils.mkdirhier(output_ptest)
+            oe.path.copytree(input_ptest, output_ptest)
+            # Sort test result
+            for result in glob.glob('%s/pass.fail.*' % output_ptest):
+                bb.debug(1, 'Processing %s' % result)
+                cmd = ['sort', result, '-o', result]
+                bb.debug(1, 'Running %s' % cmd)
+                ret = subprocess.call(cmd)
+                if ret != 0:
+                    bb.error('Failed to run %s!' % cmd)
+        finally:
+            bb.utils.unlockfile(lock)

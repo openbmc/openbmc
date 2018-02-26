@@ -646,9 +646,13 @@ python do_package_rpm () {
     rpmbuild = d.getVar('RPMBUILD')
     targetsys = d.getVar('TARGET_SYS')
     targetvendor = d.getVar('HOST_VENDOR')
+
     # Too many places in dnf stack assume that arch-independent packages are "noarch".
     # Let's not fight against this.
-    package_arch = (d.getVar('PACKAGE_ARCH') or "").replace("-", "_").replace("all", "noarch")
+    package_arch = (d.getVar('PACKAGE_ARCH') or "").replace("-", "_")
+    if package_arch == "all":
+        package_arch = "noarch"
+
     sdkpkgsuffix = (d.getVar('SDKPKGSUFFIX') or "nativesdk").replace("-", "_")
     d.setVar('PACKAGE_ARCH_EXTEND', package_arch)
     pkgwritedir = d.expand('${PKGWRITEDIRRPM}/${PACKAGE_ARCH_EXTEND}')

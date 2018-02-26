@@ -1,4 +1,5 @@
 SUMMARY = "Generates traces of I/O traffic on block devices"
+HOMEPAGE = "http://brick.kernel.dk/snaps/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 

@@ -31,6 +31,7 @@ SRC_URI = "http://web.mit.edu/kerberos/dist/${BPN}/${SHRT_VER}/${BP}.tar.gz \
            file://krb5-kdc.service \
            file://krb5-admin-server.service \
            file://fix-CVE-2017-11368.patch;striplevel=2 \
+           file://CVE-2017-11462.patch;striplevel=2 \
 "
 SRC_URI[md5sum] = "8022f3a1cde8463e44fd35ef42731f85"
 SRC_URI[sha256sum] = "437c8831ddd5fde2a993fef425dedb48468109bb3d3261ef838295045a89eb45"

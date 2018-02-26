@@ -6,6 +6,7 @@ Subject: [PATCH 18/32] guard mallocopt() with __GLIBC__
 mallocopt is not available on non glibc implementations
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
 ---
  utils/benchmark/ebizzy-0.3/ebizzy.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

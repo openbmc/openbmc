@@ -8,7 +8,7 @@
 
     <para>
         BitBake is a program written in Python that interprets the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink> used by
+        <link linkend='metadata'>Metadata</link> used by
         the OpenEmbedded build system.
         At some point, developers wonder what actually happens when you enter:
         <literallayout class='monospaced'>
@@ -24,7 +24,7 @@
         BitBake strives to be a generic "task" executor that is capable of handling complex dependency relationships.
         As such, it has no real knowledge of what the tasks being executed actually do.
         BitBake just considers a list of tasks with dependencies and handles
-        <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+        <link linkend='metadata'>Metadata</link>
         consisting of variables in a certain format that get passed to the tasks.
     </note>
 
@@ -36,9 +36,10 @@
         </para>
 
         <para>
-            The first thing BitBake does is look for the <filename>bitbake.conf</filename> file.
+            The first thing BitBake does is look for the
+            <filename>bitbake.conf</filename> file.
             This file resides in the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            <link linkend='source-directory'>Source Directory</link>
             within the <filename>meta/conf/</filename> directory.
             BitBake finds it by examining its
             <link linkend='var-BBPATH'><filename>BBPATH</filename></link> environment
@@ -92,8 +93,8 @@
             <filename>meta/recipes-*/</filename> directory within Poky.
             Adding extra content to <filename>BBFILES</filename> is best achieved through the use of
             BitBake layers as described in the
-            "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and
-            Creating Layers</ulink>" section of the Yocto Project Development Manual.
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and Creating Layers</ulink>"
+            section of the Yocto Project Development Tasks Manual.
         </para>
 
         <para>
@@ -227,13 +228,14 @@
 
         <para>
             Dependencies are defined through several variables.
-            You can find information about variables BitBake uses in the BitBake documentation,
-            which is found in the <filename>bitbake/doc/manual</filename> directory within the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+            You can find information about variables BitBake uses in the
+            BitBake documentation, which is found in the
+            <filename>bitbake/doc/manual</filename> directory within the
+            <link linkend='source-directory'>Source Directory</link>.
             At a basic level, it is sufficient to know that BitBake uses the
             <filename><link linkend='var-DEPENDS'>DEPENDS</link></filename> and
-            <filename><link linkend='var-RDEPENDS'>RDEPENDS</link></filename> variables when
-            calculating dependencies.
+            <filename><link linkend='var-RDEPENDS'>RDEPENDS</link></filename>
+            variables when calculating dependencies.
         </para>
     </section>
 
@@ -448,20 +450,23 @@ Options:
             You can find information about the options and formats of entries for specific
             fetchers in the BitBake manual located in the
             <filename>bitbake/doc/manual</filename> directory of the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+            <link linkend='source-directory'>Source Directory</link>.
         </para>
 
         <para>
-            One useful feature for certain Source Code Manager (SCM) fetchers is the ability to
-            "auto-update" when the upstream SCM changes version.
-            Since this ability requires certain functionality from the SCM, not all
-            systems support it.
-            Currently Subversion, Bazaar and to a limited extent, Git support the ability to "auto-update".
+            One useful feature for certain Source Code Manager (SCM) fetchers
+            is the ability to "auto-update" when the upstream SCM changes
+            version.
+            Since this ability requires certain functionality from the SCM,
+            not all systems support it.
+            Currently Subversion, Bazaar and to a limited extent, Git support
+            the ability to "auto-update".
             This feature works using the <filename><link linkend='var-SRCREV'>SRCREV</link></filename>
             variable.
             See the
-            "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-srcrev'>Using an External SCM</ulink>" section
-            in the Yocto Project Development Manual for more information.
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-srcrev'>Using an External SCM</ulink>"
+            section in the Yocto Project Development Tasks Manual for more
+            information.
         </para>
 
     </section>

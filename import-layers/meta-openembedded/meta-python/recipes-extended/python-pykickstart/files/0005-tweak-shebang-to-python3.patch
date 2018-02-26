@@ -1,0 +1,25 @@
+From 8a1f598223bd4cbcc877eb2aba3f5586c75c9d14 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 21 Aug 2017 10:05:06 +0800
+Subject: [PATCH] tweak shebang to python3
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ tools/ksvalidator.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/ksvalidator.py b/tools/ksvalidator.py
+index d6051d5..c3682e8 100755
+--- a/tools/ksvalidator.py
++++ b/tools/ksvalidator.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ #
+ # Chris Lumens <clumens@redhat.com>
+ #
+-- 
+1.8.3.1
+

@@ -14,6 +14,7 @@ the test more robust by first clearing all the locale relevant variables.
 Bug: https://rt.perl.org/Ticket/Display.html?id=124310
 Bug-Debian: https://bugs.debian.org/782068
 Patch-Name: debian/locale-robustness.diff
+Upstream-Status: Pending
 ---
  t/run/locale.t | 7 +++----
  1 file changed, 3 insertions(+), 4 deletions(-)

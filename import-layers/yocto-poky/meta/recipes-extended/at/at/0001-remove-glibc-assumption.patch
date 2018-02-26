@@ -1,6 +1,6 @@
-From 7f811d9c4ebc9444e613e251c31d6bf537a24dc1 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Mon, 13 Apr 2015 16:35:30 -0700
+From f446686916e503dfb9fb928252d1b72a07573b29 Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Tue, 18 Jul 2017 03:42:56 -0400
 Subject: [PATCH] remove glibc assumption
 
 glibc time.h header has an undocumented __isleap macro
@@ -9,9 +9,11 @@ Since it is undocumented & does not appear
 on any other libc, stop using it and just define the macro in
 locally  instead.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [ https://lists.debian.org/debian-accessibility/2017/07/msg00044.html ]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
 ---
  parsetime.y | 11 +++++++----
  1 file changed, 7 insertions(+), 4 deletions(-)
@@ -53,5 +55,5 @@ index 7005e88..324e6d3 100644
  			{
  			    yyerror("Error in day of month");
 -- 
-2.1.4
+2.8.1
 

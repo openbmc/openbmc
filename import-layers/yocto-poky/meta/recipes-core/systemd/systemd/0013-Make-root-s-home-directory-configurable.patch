@@ -1,7 +1,7 @@
-From 79e64a07840e0d97d66e46111f1c086bf83981b7 Mon Sep 17 00:00:00 2001
+From 479e1f4aa2b9f1c911a4d0dd18e222d241a978ea Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 9 Nov 2016 20:35:30 -0800
-Subject: [PATCH 13/19] Make root's home directory configurable
+Subject: [PATCH 42/48] Make root's home directory configurable
 
 OpenEmbedded has a configurable home directory for root. Allow
 systemd to be built using its idea of what root's home directory
@@ -14,6 +14,7 @@ https://github.com/systemd/systemd/issues/541
 
 Signed-off-by: Dan McGregor <dan.mcgregor@usask.ca>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  Makefile.am                | 2 ++
  configure.ac               | 7 +++++++
@@ -24,18 +25,18 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  6 files changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 420e0e0..3010b01 100644
+index 1bcd932c2..c2b4a99d2 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -213,6 +213,7 @@ AM_CPPFLAGS = \
+@@ -226,6 +226,7 @@ AM_CPPFLAGS = \
  	-DLIBDIR=\"$(libdir)\" \
  	-DROOTLIBDIR=\"$(rootlibdir)\" \
  	-DROOTLIBEXECDIR=\"$(rootlibexecdir)\" \
 +	-DROOTHOMEDIR=\"$(roothomedir)\" \
- 	-DTEST_DIR=\"$(abs_top_srcdir)/test\" \
  	-I $(top_srcdir)/src \
  	-I $(top_builddir)/src/basic \
-@@ -6057,6 +6058,7 @@ substitutions = \
+ 	-I $(top_srcdir)/src/basic \
+@@ -6356,6 +6357,7 @@ substitutions = \
         '|rootlibdir=$(rootlibdir)|' \
         '|rootlibexecdir=$(rootlibexecdir)|' \
         '|rootbindir=$(rootbindir)|' \
@@ -44,10 +45,10 @@ index 420e0e0..3010b01 100644
         '|SYSTEMCTL=$(rootbindir)/systemctl|' \
         '|SYSTEMD_NOTIFY=$(rootbindir)/systemd-notify|' \
 diff --git a/configure.ac b/configure.ac
-index b10c952..dfc0bd3 100644
+index 0354ffe6a..b53ca1f1a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1513,6 +1513,11 @@ AC_ARG_WITH([rootlibdir],
+@@ -1641,6 +1641,11 @@ AC_ARG_WITH([rootlibdir],
          [with_rootlibdir=${libdir}])
  AX_NORMALIZE_PATH([with_rootlibdir])
  
@@ -57,29 +58,29 @@ index b10c952..dfc0bd3 100644
 +        [with_roothomedir=/root])
 +
  AC_ARG_WITH([pamlibdir],
-         AS_HELP_STRING([--with-pamlibdir=DIR], [Directory for PAM modules]),
+         AS_HELP_STRING([--with-pamlibdir=DIR], [directory for PAM modules]),
          [],
-@@ -1598,6 +1603,7 @@ AC_SUBST([pamlibdir], [$with_pamlibdir])
- AC_SUBST([pamconfdir], [$with_pamconfdir])
+@@ -1733,6 +1738,7 @@ AC_SUBST([pamconfdir], [$with_pamconfdir])
+ AC_SUBST([rpmmacrosdir], [$with_rpmmacrosdir])
  AC_SUBST([rootprefix], [$with_rootprefix])
  AC_SUBST([rootlibdir], [$with_rootlibdir])
 +AC_SUBST([roothomedir], [$with_roothomedir])
  
  AC_CONFIG_FILES([
          Makefile
-@@ -1688,6 +1694,7 @@ AC_MSG_RESULT([
+@@ -1829,6 +1835,7 @@ AC_MSG_RESULT([
          includedir:                        ${includedir}
          lib dir:                           ${libdir}
          rootlib dir:                       ${with_rootlibdir}
 +        root home dir:                     ${with_roothomedir}
          SysV init scripts:                 ${SYSTEM_SYSVINIT_PATH}
          SysV rc?.d directories:            ${SYSTEM_SYSVRCND_PATH}
-         Build Python:                      ${PYTHON}
+         build Python:                      ${PYTHON}
 diff --git a/src/basic/user-util.c b/src/basic/user-util.c
-index 938533d..3f9fdc4 100644
+index c619dad52..662682adf 100644
 --- a/src/basic/user-util.c
 +++ b/src/basic/user-util.c
-@@ -127,7 +127,7 @@ int get_user_creds(
+@@ -129,7 +129,7 @@ int get_user_creds(
                          *gid = 0;
  
                  if (home)
@@ -88,7 +89,7 @@ index 938533d..3f9fdc4 100644
  
                  if (shell)
                          *shell = "/bin/sh";
-@@ -387,7 +387,7 @@ int get_home_dir(char **_h) {
+@@ -389,7 +389,7 @@ int get_home_dir(char **_h) {
          /* Hardcode home directory for root to avoid NSS */
          u = getuid();
          if (u == 0) {
@@ -98,10 +99,10 @@ index 938533d..3f9fdc4 100644
                          return -ENOMEM;
  
 diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index 19b47cd..e42bf19 100644
+index 8a5fedd4b..7b01ec078 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
-@@ -2798,7 +2798,7 @@ static int inner_child(
+@@ -2291,7 +2291,7 @@ static int inner_child(
          if (envp[n_env])
                  n_env++;
  
@@ -110,8 +111,8 @@ index 19b47cd..e42bf19 100644
              (asprintf((char**)(envp + n_env++), "USER=%s", arg_user ? arg_user : "root") < 0) ||
              (asprintf((char**)(envp + n_env++), "LOGNAME=%s", arg_user ? arg_user : "root") < 0))
                  return log_oom();
-@@ -2882,7 +2882,7 @@ static int inner_child(
-         else {
+@@ -2373,7 +2373,7 @@ static int inner_child(
+         } else {
                  if (!arg_chdir)
                          /* If we cannot change the directory, we'll end up in /, that is expected. */
 -                        (void) chdir(home ?: "/root");
@@ -120,7 +121,7 @@ index 19b47cd..e42bf19 100644
                  execle("/bin/bash", "-bash", NULL, env_use);
                  execle("/bin/sh", "-sh", NULL, env_use);
 diff --git a/units/emergency.service.in b/units/emergency.service.in
-index da68eb8..e25f879 100644
+index e9eb238b9..32588e48a 100644
 --- a/units/emergency.service.in
 +++ b/units/emergency.service.in
 @@ -15,8 +15,8 @@ Conflicts=syslog.socket
@@ -131,11 +132,11 @@ index da68eb8..e25f879 100644
 -WorkingDirectory=-/root
 +Environment=HOME=@roothomedir@
 +WorkingDirectory=-@roothomedir@
- ExecStartPre=-/bin/plymouth --wait quit
- ExecStartPre=-/bin/echo -e 'You are in emergency mode. After logging in, type "journalctl -xb" to view\\nsystem logs, "systemctl reboot" to reboot, "systemctl default" or ^D to\\ntry again to boot into default mode.'
- ExecStart=-/bin/sh -c "@SULOGIN@; @SYSTEMCTL@ --job-mode=fail --no-block default"
+ ExecStart=-@rootlibexecdir@/systemd-sulogin-shell emergency
+ Type=idle
+ StandardInput=tty-force
 diff --git a/units/rescue.service.in b/units/rescue.service.in
-index 5feff69..a83439e 100644
+index 4ab66f485..bd9898f2c 100644
 --- a/units/rescue.service.in
 +++ b/units/rescue.service.in
 @@ -14,8 +14,8 @@ After=sysinit.target plymouth-start.service
@@ -146,9 +147,9 @@ index 5feff69..a83439e 100644
 -WorkingDirectory=-/root
 +Environment=HOME=@roothomedir@
 +WorkingDirectory=-@roothomedir@
- ExecStartPre=-/bin/plymouth --wait quit
- ExecStartPre=-/bin/echo -e 'You are in rescue mode. After logging in, type "journalctl -xb" to view\\nsystem logs, "systemctl reboot" to reboot, "systemctl default" or ^D to\\nboot into default mode.'
- ExecStart=-/bin/sh -c "@SULOGIN@; @SYSTEMCTL@ --job-mode=fail --no-block default"
+ ExecStart=-@rootlibexecdir@/systemd-sulogin-shell rescue
+ Type=idle
+ StandardInput=tty-force
 -- 
-2.10.2
+2.13.2
 

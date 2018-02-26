@@ -1,0 +1,38 @@
+libarchive-3.3.2: Fix bug929
+
+[No upstream tracking] -- https://github.com/libarchive/libarchive/pull/929
+
+archive_read_support_format_cpio: header_newc(): Avoid overflow when reading corrupt
+cpio archive
+
+A cpio "newc" archive with a namelength of "FFFFFFFF", if read on a
+system with a 32-bit size_t, would result in namelength + name_pad
+overflowing 32 bits and libarchive attempting to copy 2^32-1 bytes
+from a 2-byte buffer, with appropriately hilarious results.
+
+Check for this overflow and fail; there's no legitimate reason for a
+cpio archive to contain a file with a name over 4 billion characters
+in length.
+
+Upstream-Status: Backport [https://github.com/libarchive/libarchive/commit/bac4659e0b970990e7e3f3a3d239294e96311630]
+Bug: 929
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+
+diff --git a/libarchive/archive_read_support_format_cpio.c b/libarchive/archive_read_support_format_cpio.c
+index ad9f782..1faa64d 100644
+--- a/libarchive/archive_read_support_format_cpio.c
++++ b/libarchive/archive_read_support_format_cpio.c
+@@ -633,6 +633,13 @@ header_newc(struct archive_read *a, struct cpio *cpio,
+ 	/* Pad name to 2 more than a multiple of 4. */
+ 	*name_pad = (2 - *namelength) & 3;
+ 
++	/* Make sure that the padded name length fits into size_t. */
++	if ((size_t)(*namelength + *name_pad) < *namelength) {
++		archive_set_error(&a->archive, ARCHIVE_ERRNO_FILE_FORMAT,
++		    "cpio archive has invalid namelength");
++		return (ARCHIVE_FATAL);
++	}
++
+ 	/*
+ 	 * Note: entry_bytes_remaining is at least 64 bits and
+ 	 * therefore guaranteed to be big enough for a 33-bit file

@@ -17,6 +17,10 @@ S = "${WORKDIR}/nose-${PV}"
 
 inherit setuptools3
 
+do_install_append() {
+    mv ${D}${bindir}/nosetests ${D}${bindir}/nosetests3
+}
+
 RDEPENDS_${PN}_class-target = "\
   python3-unittest \
   "

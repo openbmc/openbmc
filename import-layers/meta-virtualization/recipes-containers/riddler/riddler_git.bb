@@ -1,11 +1,12 @@
 HOMEPAGE = "https://github.com/jfrazelle/riddler"
 SUMMARY = "Convert `docker inspect` to opencontainers (OCI compatible) runc spec."
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=20ce4c6a4f32d6ee4a68e3a7506db3f1"
+LIC_FILES_CHKSUM = "file://src/import/LICENSE;md5=20ce4c6a4f32d6ee4a68e3a7506db3f1"
 
 SRC_URI = "git://github.com/jfrazelle/riddler;branch=master"
 SRCREV = "23befa0b232877b5b502b828e24161d801bd67f6"
 PV = "0.1.0+git${SRCPV}"
+GO_IMPORT = "import"
 
 S = "${WORKDIR}/git"
 
@@ -26,10 +27,10 @@ do_compile() {
 	#
 	# We also need to link in the ipallocator directory as that is not under
 	# a src directory.
-	ln -sfn . "${S}/vendor/src"
-	mkdir -p "${S}/vendor/src/github.com/jessfraz/riddler"
-	ln -sfn "${S}/parse" "${S}/vendor/src/github.com/jessfraz/riddler/parse"
-	export GOPATH="${S}/vendor"
+	ln -sfn . "${S}/src/import/vendor/src"
+	mkdir -p "${S}/src/import/vendor/src/github.com/jessfraz/riddler"
+	ln -sfn "${S}/src/import/parse" "${S}/src/import/vendor/src/github.com/jessfraz/riddler/parse"
+	export GOPATH="${S}/src/import/vendor"
 
 	# Pass the needed cflags/ldflags so that cgo
 	# can find the needed headers files and libraries
@@ -38,11 +39,12 @@ do_compile() {
 	export LDFLAGS=""
 	export CGO_CFLAGS="${BUILDSDK_CFLAGS} --sysroot=${STAGING_DIR_TARGET}"
 	export CGO_LDFLAGS="${BUILDSDK_LDFLAGS} --sysroot=${STAGING_DIR_TARGET}"
+	cd ${S}/src/import
 
 	oe_runmake static
 }
 
 do_install() {
 	install -d ${D}/${sbindir}
-	install ${S}/riddler ${D}/${sbindir}/riddler
+	install ${S}/src/import/riddler ${D}/${sbindir}/riddler
 }

@@ -4,7 +4,7 @@
 #
 # BitBake Toaster Implementation
 #
-# Copyright (C) 2016        Intel Corporation
+# Copyright (C) 2016-2017   Intel Corporation
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -19,10 +19,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 from orm.models import LayerSource, Layer, Release, Layer_Version
 from orm.models import LayerVersionDependency, Machine, Recipe
+from orm.models import Distro
+from orm.models import ToasterSetting
 
 import os
 import sys
@@ -56,7 +58,7 @@ class Spinner(threading.Thread):
         self.signal = False
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     args = ""
     help = "Updates locally cached information from a layerindex server"
 
@@ -80,6 +82,8 @@ class Command(NoArgsCommand):
         os.system('setterm -cursor off')
 
         self.apiurl = DEFAULT_LAYERINDEX_SERVER
+        if ToasterSetting.objects.filter(name='CUSTOM_LAYERINDEX_SERVER').count() == 1:
+            self.apiurl = ToasterSetting.objects.get(name = 'CUSTOM_LAYERINDEX_SERVER').value
 
         assert self.apiurl is not None
         try:
@@ -91,7 +95,9 @@ class Command(NoArgsCommand):
 
         proxy_settings = os.environ.get("http_proxy", None)
 
-        def _get_json_response(apiurl=DEFAULT_LAYERINDEX_SERVER):
+        def _get_json_response(apiurl=None):
+            if None == apiurl:
+                apiurl=self.apiurl
             http_progress = Spinner()
             http_progress.start()
 
@@ -251,6 +257,24 @@ class Command(NoArgsCommand):
                                                              depends_on=lvd)
             self.mini_progress("Layer version dependencies", i, total)
 
+        # update Distros
+        logger.info("Fetching distro information")
+        distros_info = _get_json_response(
+            apilinks['distros'] + "?filter=layerbranch__branch__name:%s" %
+            "OR".join(whitelist_branch_names))
+
+        total = len(distros_info)
+        for i, di in enumerate(distros_info):
+            distro, created = Distro.objects.get_or_create(
+                name=di['name'],
+                layer_version=Layer_Version.objects.get(
+                    pk=li_layer_branch_id_to_toaster_lv_id[di['layerbranch']]))
+            distro.up_date = di['updated']
+            distro.name = di['name']
+            distro.description = di['description']
+            distro.save()
+            self.mini_progress("distros", i, total)
+
         # update machines
         logger.info("Fetching machine information")
         machines_info = _get_json_response(
@@ -309,5 +333,5 @@ class Command(NoArgsCommand):
 
         os.system('setterm -cursor on')
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         self.update()

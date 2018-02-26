@@ -7,6 +7,7 @@ remote machine.  This program and TFTP provide very little security, \
 and should not be enabled unless it is expressly needed."
 DEPENDS = "tcp-wrappers readline"
 SECTION = "net"
+HOMEPAGE = "http://freecode.com/projects/tftp-hpa"
 LICENSE = "BSD-4-Clause"
 LIC_FILES_CHKSUM = "file://MCONFIG.in;beginline=1;endline=9;md5=c28ba5adb43041fae4629db05c83cbdd \
                     file://tftp/tftp.c;beginline=1;endline=32;md5=988c1cba99d70858a26cd877209857f4"
@@ -26,12 +27,15 @@ SRC_URI = "http://kernel.org/pub/software/network/tftp/tftp-hpa/tftp-hpa-${PV}.t
            file://add-error-check-for-disk-filled-up.patch \
            file://tftp-hpa-bug-fix-on-separated-CR-and-LF.patch \
            file://fix-writing-emtpy-file.patch \
+           file://0001-__progname-is-provided-by-libc.patch \
+           file://tftpd-hpa.socket \
+           file://tftpd-hpa.service \
 "
 
 SRC_URI[md5sum] = "46c9bd20bbffa62f79c958c7b99aac21"
 SRC_URI[sha256sum] = "0a9f88d4c1c02687b4853b02ab5dd8779d4de4ffdb9b2e5c9332841304d1a269"
 
-inherit autotools-brokensep update-rc.d update-alternatives
+inherit autotools-brokensep update-rc.d update-alternatives systemd
 
 export AR = "${HOST_PREFIX}ar cq"
 
@@ -60,6 +64,11 @@ do_install() {
 
     install -d ${D}${sysconfdir}/default
     install -m 0644 ${WORKDIR}/default ${D}${sysconfdir}/default/tftpd-hpa
+
+    install -d ${D}${systemd_unitdir}/system
+    install -m 0644 ${WORKDIR}/tftpd-hpa.socket ${D}${systemd_unitdir}/system
+    install -m 0644 ${WORKDIR}/tftpd-hpa.service ${D}${systemd_unitdir}/system
+    sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/tftpd-hpa.service
 }
 
 FILES_${PN} = "${bindir}"
@@ -77,3 +86,6 @@ ALTERNATIVE_${PN} = "tftp"
 ALTERNATIVE_TARGET[tftp] = "${bindir}/tftp-hpa"
 ALTERNATIVE_PRIORITY = "60"
 
+SYSTEMD_PACKAGES = "tftp-hpa-server"
+SYSTEMD_SERVICE_tftp-hpa-server = "tftpd-hpa.socket tftpd-hpa.service"
+SYSTEMD_AUTO_ENABLE_tftp-hpa-server = "enable"

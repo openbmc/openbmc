@@ -1,0 +1,31 @@
+From 166833a88a928a574bf9143b9b65f544be482c77 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 18 Aug 2017 15:55:15 +0300
+Subject: [PATCH] Check conf.releasever instead of releasever
+
+The substitutions may actually set the conf.releasever correctly,
+and so the check should use that instead of the passed-in function
+parameter.
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/dnf/pull/901]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ dnf/cli/cli.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf/cli/cli.py b/dnf/cli/cli.py
+index 2d63420c..167943b8 100644
+--- a/dnf/cli/cli.py
++++ b/dnf/cli/cli.py
+@@ -914,7 +914,7 @@ class Cli(object):
+         conf.releasever = releasever
+         subst = conf.substitutions
+         subst.update_from_etc(conf.installroot)
+-        if releasever is None:
++        if conf.releasever is None:
+             logger.warning(_("Unable to detect release version (use '--releasever' to specify "
+                              "release version)"))
+ 
+-- 
+2.14.1
+

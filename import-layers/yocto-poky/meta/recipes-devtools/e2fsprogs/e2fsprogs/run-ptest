@@ -1,11 +1,10 @@
 #!/bin/sh
 
 cd ./test
-./test_script &>../test.log
-if [ $? -eq 0 ]
-then
-	echo "PASS: e2fsprogs"
-	rm ../test.log
-else
-	echo "FAIL: e2fsprogs"
-fi
+./test_script | sed -u -e '/:[[:space:]]ok/s/^/PASS: /' -e '/:[[:space:]]failed/s/^/FAIL: /' -e '/:[[:space:]]skipped/s/^/SKIP: /'
+rm -rf /var/volatile/tmp/*e2fsprogs*
+rm -f tmp-*
+rm -f *.tmp
+rm -f *.ok
+rm -f *.failed
+rm -f *.log

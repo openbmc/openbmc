@@ -43,6 +43,7 @@ def main():
         add_help=False)
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
     parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
+    parser.add_argument('-F', '--force', help='Force add without recipe parse verification', action='store_true')
     parser.add_argument('--color', choices=['auto', 'always', 'never'], default='auto', help='Colorize output (where %(metavar)s is %(choices)s)', metavar='COLOR')
 
     global_args, unparsed_args = parser.parse_known_args()
@@ -89,7 +90,7 @@ def main():
 
         if getattr(args, 'parserecipes', False):
             tinfoil.config_data.disableTracking()
-            tinfoil.parseRecipes()
+            tinfoil.parse_recipes()
             tinfoil.config_data.enableTracking()
 
         return args.func(args)

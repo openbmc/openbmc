@@ -6,6 +6,8 @@ Subject: [PATCH 23/32] ptrace:  Use int instead of enum __ptrace_request
 __ptrace_request is only available with glibc
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
 ---
  testcases/kernel/syscalls/ptrace/ptrace03.c           | 4 ++++
  testcases/kernel/syscalls/ptrace/spawn_ptrace_child.h | 4 ++++

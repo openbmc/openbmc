@@ -27,6 +27,8 @@ The same for the following hardcoded types for cross compiling:
 Change the above correspondingly.
 
 Signed-off-by: Dengke Du <dengke.du@windriver.com>
+
+Upstream-Status: Pending
 ---
  configure.in | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)

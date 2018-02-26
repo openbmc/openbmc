@@ -1,0 +1,22 @@
+Check for header and library separately and check for GLESv2 before egl
+this is to overcome an annoying issue with rpi/userland where egl depends
+on sysmbols from libGLESv2
+
+-Khem
+Index: gst-plugins-gl-0.10.3/configure.ac
+===================================================================
+--- gst-plugins-gl-0.10.3.orig/configure.ac
++++ gst-plugins-gl-0.10.3/configure.ac
+@@ -183,8 +183,10 @@ case $host in
+     else
+       AC_CHECK_HEADERS([EGL/egl.h], [HAVE_EGL=yes], [HAVE_EGL=no])
+       if test "x$HAVE_EGL" = "xyes"; then
+-        AG_GST_CHECK_LIBHEADER(EGL, EGL, eglGetError,, EGL/egl.h,, AC_MSG_ERROR([EGL is required]))
+-        AG_GST_CHECK_LIBHEADER(GLES2, GLESv2, glTexImage2D,, GLES2/gl2.h,, AC_MSG_ERROR([OpenGLES2 is required]))
++        AC_CHECK_HEADERS([GLES2/gl2.h],, AC_MSG_ERROR([OpenGLES2 is required]))
++        AC_CHECK_LIB(GLESv2,[glTexImage2D],, AC_MSG_ERROR([OpenGLES2 is required]))
++        AC_CHECK_HEADERS([EGL/egl.h],, AC_MSG_ERROR([EGL is required]))
++        AC_CHECK_LIB(EGL,[eglGetError],, AC_MSG_ERROR([EGL is required]))
+         GL_LIBS="$LIBS $X_LIBS -lEGL -lGLESv2"
+         GL_BACKEND=x11ES2
+         GL_TYPE=gles

@@ -16,7 +16,7 @@ LIC_FILES_CHKSUM = "file://license.terms;md5=fbf2de7e9102505b1439db06fc36ce5c"
 DEPENDS += "tcl"
 RDEPENDS_${PN} = "tcl"
 
-inherit autotools
+inherit autotools update-alternatives
 
 PR = "r1"
 
@@ -56,6 +56,11 @@ EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
                  ${TCL_INCLUDE_PATH} \
                 "
 EXTRA_OEMAKE_install = " 'SCRIPTS=' "
+
+ALTERNATIVE_${PN}  = "mkpasswd"
+ALTERNATIVE_LINK_NAME[mkpasswd] = "${bindir}/mkpasswd"
+# Use lower priority than busybox's mkpasswd (created when built with CONFIG_CRYPTPW)
+ALTERNATIVE_PRIORITY[mkpasswd] = "40"
 
 FILES_${PN}-dev = "${libdir_native}/expect${PV}/libexpect*.so \
                    ${includedir}/expect.h \

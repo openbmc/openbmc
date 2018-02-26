@@ -1,4 +1,4 @@
-From aacd77184da1328908da41c9fdb55ad881fa0e99 Mon Sep 17 00:00:00 2001
+From d3f240b38eed7cd08f6c50ea896572f1327b437a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 15:31:40 -0700
 Subject: [PATCH 08/10] Use exorted definitions of SIGRTMIN
@@ -20,10 +20,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/gdb/linux-nat.c b/gdb/linux-nat.c
-index 5d5efa0af4..e3420b49a0 100644
+index 8b29245c3d..f424ae9711 100644
 --- a/gdb/linux-nat.c
 +++ b/gdb/linux-nat.c
-@@ -5022,6 +5022,6 @@ lin_thread_get_thread_signals (sigset_t *set)
+@@ -5021,6 +5021,6 @@ lin_thread_get_thread_signals (sigset_t *set)
    /* NPTL reserves the first two RT signals, but does not provide any
       way for the debugger to query the signal numbers - fortunately
       they don't change.  */
@@ -33,12 +33,12 @@ index 5d5efa0af4..e3420b49a0 100644
 +  sigaddset (set, SIGRTMIN + 1);
  }
 diff --git a/gdb/nat/linux-nat.h b/gdb/nat/linux-nat.h
-index 2b485db141..d058afcde8 100644
+index 7dd18fefff..35137ab34f 100644
 --- a/gdb/nat/linux-nat.h
 +++ b/gdb/nat/linux-nat.h
-@@ -85,4 +85,8 @@ extern enum target_stop_reason lwp_stop_reason (struct lwp_info *lwp);
+@@ -90,4 +90,8 @@ extern void linux_stop_lwp (struct lwp_info *lwp);
  
- extern void linux_stop_lwp (struct lwp_info *lwp);
+ extern int lwp_is_stepping (struct lwp_info *lwp);
  
 +#ifndef W_STOPCODE
 +#define W_STOPCODE(sig) ((sig) << 8 | 0x7f)
@@ -46,5 +46,5 @@ index 2b485db141..d058afcde8 100644
 +
  #endif /* LINUX_NAT_H */
 -- 
-2.11.0
+2.13.1
 

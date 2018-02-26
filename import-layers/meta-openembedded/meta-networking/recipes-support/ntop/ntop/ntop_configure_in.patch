@@ -1,0 +1,164 @@
+1)add --with-pcap-config option to use libpcap's pcap-config
+2)add AC_CHECK_LIB if user didn't specify PCAP_ROOT and pcap-config
+  put it before host check to make cross-compiling easier.
+  pcap doesn't need extra include and libs so it is fine.
+3)remove old rrd configure code but use pkg-config to config rrd
+  rrdtool should have the pkg-config file installed.
+4)fix python-config
+5)change AC_TRY_RUN to AC_COMPILE_IFELSE for pthread_rwlock_t checking
+6)fix a net-snmp-config bug
+
+Upstream-Status: Pending
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+---
+diff --git a/configure.in b/configure.in
+index 0c7c0a5..cad40be 100644
+--- a/configure.in
++++ b/configure.in
+@@ -230,14 +230,14 @@ dnl>
+ AC_ARG_WITH(void,
+               [  +-External-source-locations:-------------------------------------------------+])
+ 
+-AC_ARG_WITH(  rrd-home,
+-              [  --with-rrd-home=DIR        Usually /usr/local/rrdtool-1.2.x],
+-              RRD_HOME="$withval",
+-              RRD_HOME=/usr/local/rrdtool-1.2.19)
+ AC_ARG_WITH(  pcap-root,
+               [  --with-pcap-root=DIR        LBNL pcap located in DIR],
+               PCAP_ROOT="$withval",
+               PCAP_ROOT=)
++AC_ARG_WITH(  pcap-config,
++              [  --with-pcap-config=path/pcap-config where to find pcap-config],
++              PCAP_CONFIG="$withval",
++              PCAP_CONFIG=)
+ AC_ARG_WITH(  gdbm-root,
+               [  --with-gdbm-root=DIR        gdbm located in DIR],
+               GDBM_DIRECTORY="$withval",
+@@ -556,6 +556,7 @@ if test ".${PCAPRING_DIR}" != .; then
+ else
+ 
+ TMP_ROOT=${HOME}/PF_RING/userland/libpcap/
++FOUND_PCAP=1
+ if test ".${PCAP_ROOT}" == . &&
+    test -d ${TMP_ROOT} &&
+    test -r ${TMP_ROOT}/libpcap.a; then
+@@ -563,6 +564,18 @@ if test ".${PCAP_ROOT}" == . &&
+        CORELIBS="${CORELIBS} -L${TMP_ROOT} -L${HOME}/PF_RING/userland/lib -lpfring -lpcap "
+        INCS="${INCS} -I ${PCAP_ROOT}"
+        AC_MSG_RESULT([found in $PCAP_ROOT])
++elif test -n "${PCAP_CONFIG}" && test -x "${PCAP_CONFIG}"; then
++       CORELIBS="${CORELIBS} $(${PCAP_CONFIG} --libs)" 
++       INCS="${INCS} $(${PCAP_CONFIG} --cflags)"
++       AC_DEFINE_UNQUOTED(HAVE_LIBPCAP, 1, [have libpcap ])
++       AC_MSG_RESULT([found pcap-config: $PCAP_CONFIG, libs:$(${PCAP_CONFIG} --libs) cflags:$(${PCAP_CONFIG} --cflags)])
++else
++     AC_CHECK_LIB(pcap, pcap_lookupdev, ,
++        [FOUND_PCAP=])
++fi
++
++if test -n "$FOUND_PCAP"; then
++	:
+ elif test ".${PCAP_ROOT}" != .; then
+   if test -d $PCAP_ROOT &&
+      test -r $PCAP_ROOT/lib/libpcap.a &&
+@@ -880,44 +893,11 @@ AC_CHECK_LIB([z], [zlibVersion], [], [
+         exit -1
+         ])
+ 
+-# RRD
+-if test -d "$RRD_HOME"; then
+-   AC_MSG_RESULT(checking for RRD home... yes)
+-else
+-   RRD_HOME=/usr/local/rrdtool
+-   if test -d "$RRD_HOME"; then
+-      AC_MSG_RESULT(Checking rrdtool in $RRD_HOME)
+-   else
+-      RRD_HOME=/usr/local
+-   fi
+-fi
+-
+-RRD_LIB="-L${RRD_HOME}/lib -lrrd_th"
+-
+-if test -f "$RRD_HOME/lib/librrd_th.so"; then
+-   AC_MSG_RESULT(checking for rrdtool... yes)
+-else
+-  if test -f "$RRD_HOME/lib/librrd_th.dylib"; then # OSX
+-     AC_MSG_RESULT(checking for rrdtool... yes)
+-  else
+-     if test -f "$RRD_HOME/lib/librrd_th.a"; then
+-       AC_MSG_RESULT(checking for rrdtool... yes)
+-     else
+-       AC_CHECK_LIB([rrd_th], [main])
+-       if test ".${ac_cv_lib_rrd_th_main}" != ".yes"; then
+-         AC_MSG_ERROR(Unable to find RRD at $RRD_HOME: please use --with-rrd-home=DIR);
+-	 AC_MSG_ERROR(RRD source can be downloaded from http://www.rrdtool.org/);
+-       else
+-         RRD_LIB=
+-       fi
+-     fi
+-  fi
+-fi
+-
+-RRD_INC=
+-if test -d "${RRD_HOME}/include"; then
+-  RRD_INC="-I${RRD_HOME}/include"
+-fi
++PKG_CHECK_MODULES( [RRD], [librrd] )
++AC_SUBST(RRD_CFLAGS)
++AC_SUBST(RRD_LIBS)
++RRD_INC=$RRD_FLAGS
++RRD_LIB=$RRD_LIBS
+ 
+ dnl> The failed recheck stuff below is courtesy of Chris Turbeville [turbo@verio.net]
+ dnl> Chris developed this for Solaris 9, confirming work I had done earlier for FreeBSD
+@@ -1041,7 +1021,7 @@ AC_CHECK_HEADERS([sched.h sys/sched.h])
+ AC_CHECK_HEADERS([pthread.h])
+ 
+ AC_MSG_CHECKING([if r/w locks are supported])
+-AC_TRY_RUN([
++AC_COMPILE_IFELSE([
+ #include <pthread.h>
+ 
+ int main()
+@@ -1443,15 +1423,15 @@ dnl> NET-SNMP
+ dnl>
+ if test ".${ac_disable_snmp}" != ".yes"; then
+   AC_CHECK_TOOL(NETSNMP, net-snmp-config)
+-  if test "x$ac_cv_prog_ac_ct_NETSNMP" = "xnet-snmp-config"; then
++  if test -n "$NETSNMP"; then
+     AC_DEFINE_UNQUOTED(HAVE_SNMP, 1, [SNMP is supported])
+-    SNMPLIBS="`net-snmp-config --libs`"
++    SNMPLIBS="`$NETSNMP --libs`"
+     SNMPLIBS="`echo ${SNMPLIBS}|sed -e s,'-R../lib',,g`"
+     echo "net-snmp libs: ${SNMPLIBS}"
+     LIBS="${LIBS} ${SNMPLIBS}"
+ dnl remove unecessary path
+     LIBS=`echo ${LIBS}|sed -e s,'-R../lib',,g`
+-    INCS="${INCS} `net-snmp-config --cflags`"
++    INCS="${INCS} `$NETSNMP --cflags`"
+   else
+     AC_MSG_RESULT(NETSNMP is not present: SNMP support is disabled)
+   fi
+@@ -1464,10 +1444,9 @@ SAVED_LIBS=$LIBS
+ dnl>
+ dnl> PYTHON
+ dnl>
+-  AC_CHECK_TOOL(PYTHON, python-config)
+-  PYTHON_CONFIG=""
++  AC_CHECK_TOOL(PYTHON_CONFIG, python-config)
+ 
+-  if test "x$ac_cv_prog_ac_ct_PYTHON" != "xpython-config"; then   
++  if test -z "$PYTHON_CONFIG"; then   
+        if test -f "/etc/debian_version"; then
+        	   AC_MSG_RESULT(Please install python-dev and rerun configure)
+ 	   exit 1
+@@ -1481,8 +1460,6 @@ dnl>
+           PYTHON_CONFIG="python-config"
+         fi
+      fi
+-  else
+-     PYTHON_CONFIG="python-config"
+   fi
+ 
+   if test "x$PYTHON_CONFIG" != "x"; then

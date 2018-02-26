@@ -1,0 +1,17 @@
+Taken from void linux
+
+Index: git/src/linux.c
+===================================================================
+--- git.orig/src/linux.c
++++ git/src/linux.c
+@@ -40,6 +40,10 @@
+ #include <efivar.h>
+ #include <efiboot.h>
+ 
++#if !defined(__GLIBC__)
++#define strndupa(x,s) strncpy(alloca(strlen(x)+1),x,s)
++#endif
++
+ #include "dp.h"
+ #include "linux.h"
+ #include "util.h"

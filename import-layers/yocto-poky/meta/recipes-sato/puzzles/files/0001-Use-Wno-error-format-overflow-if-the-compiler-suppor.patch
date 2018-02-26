@@ -1,0 +1,32 @@
+From 337799e40350b3db2441cc98f65ec36a74dfb356 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 21 Apr 2017 12:18:08 -0700
+Subject: [PATCH] Use -Wno-error=format-overflow= if the compiler supports it
+
+we need this warning to be suppressed with gcc7+
+however older compilers dont support it so we need
+a way to disble it only if compiler supports it
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3a38c95..bb9035e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -42,7 +42,7 @@ fi
+ if test "x$GCC" = "xyes"; then
+   AC_MSG_CHECKING([for usable gcc warning flags])
+   gccwarningflags=
+-  for flag in -Wall -Werror -std=c89 -pedantic; do
++  for flag in -Wall -Werror -std=c89 -pedantic -Wno-error=format-overflow=; do
+     ac_save_CFLAGS="$CFLAGS"
+     ac_save_LIBS="$LIBS"
+     CFLAGS="$CFLAGS$gccwarningflags $flag $GTK_CFLAGS"
+-- 
+2.12.2
+

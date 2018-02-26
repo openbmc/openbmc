@@ -108,7 +108,7 @@ PKG_CONFIG_SYSROOT_DIR = ""
 PKG_CONFIG_SYSTEM_LIBRARY_PATH[unexport] = "1"
 PKG_CONFIG_SYSTEM_INCLUDE_PATH[unexport] = "1"
 
-# we dont want libc-uclibc or libc-glibc to kick in for native recipes
+# we dont want libc-*libc to kick in for native recipes
 LIBCOVERRIDE = ""
 CLASSOVERRIDE = "class-native"
 MACHINEOVERRIDES = ""

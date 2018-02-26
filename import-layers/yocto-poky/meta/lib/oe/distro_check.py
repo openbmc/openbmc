@@ -77,17 +77,10 @@ def get_latest_released_fedora_source_package_list(d):
 
 def get_latest_released_opensuse_source_package_list(d):
     "Returns list of all the name os packages in the latest opensuse distro"
-    latest = find_latest_numeric_release("http://download.opensuse.org/source/distribution/",d)
+    latest = find_latest_numeric_release("http://download.opensuse.org/source/distribution/leap", d)
 
-    package_names = get_source_package_list_from_url("http://download.opensuse.org/source/distribution/%s/repo/oss/suse/src/" % latest, "main", d)
-    package_names |= get_source_package_list_from_url("http://download.opensuse.org/update/%s/src/" % latest, "updates", d)
-    return latest, package_names
-
-def get_latest_released_mandriva_source_package_list(d):
-    "Returns list of all the name os packages in the latest mandriva distro"
-    latest = find_latest_numeric_release("http://distrib-coffee.ipsl.jussieu.fr/pub/linux/MandrivaLinux/official/", d)
-    package_names = get_source_package_list_from_url("http://distrib-coffee.ipsl.jussieu.fr/pub/linux/MandrivaLinux/official/%s/SRPMS/main/release/" % latest, "main", d)
-    package_names |= get_source_package_list_from_url("http://distrib-coffee.ipsl.jussieu.fr/pub/linux/MandrivaLinux/official/%s/SRPMS/main/updates/" % latest, "updates", d)
+    package_names = get_source_package_list_from_url("http://download.opensuse.org/source/distribution/leap/%s/repo/oss/suse/src/" % latest, "main", d)
+    package_names |= get_source_package_list_from_url("http://download.opensuse.org/update/leap/%s/oss/src/" % latest, "updates", d)
     return latest, package_names
 
 def get_latest_released_clear_source_package_list(d):
@@ -161,8 +154,7 @@ def create_distro_packages_list(distro_check_dir, d):
                             ("Debian", get_latest_released_debian_source_package_list),
                             ("Ubuntu", get_latest_released_ubuntu_source_package_list),
                             ("Fedora", get_latest_released_fedora_source_package_list),
-                            ("OpenSuSE", get_latest_released_opensuse_source_package_list),
-                            ("Mandriva", get_latest_released_mandriva_source_package_list),
+                            ("openSUSE", get_latest_released_opensuse_source_package_list),
                             ("Clear", get_latest_released_clear_source_package_list),
                            )
 

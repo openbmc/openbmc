@@ -14,7 +14,7 @@ DEPENDS = "bridge-utils gnutls libxml2 lvm2 avahi parted curl libpcap util-linux
 #
 RDEPENDS_${PN} = "gettext-runtime"
 
-RDEPENDS_${PN}-ptest += "make gawk"
+RDEPENDS_${PN}-ptest += "make gawk perl"
 
 RDEPENDS_libvirt-libvirtd += "bridge-utils iptables pm-utils dnsmasq netcat-openbsd"
 RDEPENDS_libvirt-libvirtd_append_x86-64 = " dmidecode"

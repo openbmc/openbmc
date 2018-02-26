@@ -863,6 +863,10 @@ class SpecFileRecipeHandler(RecipeHandler):
                             break
                     if len(foundvalues) == len(valuemap):
                         break
+        # Drop values containing unexpanded RPM macros
+        for k in list(foundvalues.keys()):
+            if '%' in foundvalues[k]:
+                del foundvalues[k]
         if 'PV' in foundvalues:
             if not validate_pv(foundvalues['PV']):
                 del foundvalues['PV']

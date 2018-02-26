@@ -61,9 +61,9 @@
     <para>
         Each major release receives a codename that identifies the release in
         the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#yocto-project-repositories'>Yocto Project Source Repositories</ulink>.
+        <link linkend='yocto-project-repositories'>Yocto Project Source Repositories</link>.
         The concept is that branches of
-        <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+        <link linkend='metadata'>Metadata</link>
         with the same codename are likely to be compatible and thus
         work together.
         <note>
@@ -131,7 +131,7 @@
         Yocto Project.
         For information on how to run available tests on your projects, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 
     <para>
@@ -206,7 +206,8 @@
     <para>
         The Yocto Project's main Autobuilder
         (<filename>autobuilder.yoctoproject.org</filename>) publicly tests
-        each Yocto Project release's code in the OE-Core, Poky, and BitBake
+        each Yocto Project release's code in the
+        <link linkend='oe-core'>OE-Core</link>, Poky, and BitBake
         repositories.
         The testing occurs for both the current state of the
         "master" branch and also for submitted patches.
@@ -216,7 +217,7 @@
         in the <filename>poky</filename> repository.
         <note>
             You can find all these branches in the Yocto Project
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-repositories'>Source Repositories</ulink>.
+            <link linkend='source-repositories'>Source Repositories</link>.
         </note>
         Testing within these public branches ensures in a publicly visible way
         that all of the main supposed architectures and recipes in OE-Core

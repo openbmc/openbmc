@@ -1,0 +1,33 @@
+From f58bcb43c31d08de58853b088681cbe4df36cbf9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 26 Jun 2017 22:50:56 -0700
+Subject: [PATCH] src/rdate: Fix printf format errors
+
+Fixes
+
+rdate.c:85:41: error: format not a string literal and no format arguments [-Werror=format-security]
+|    syslog(is_error?LOG_WARNING:LOG_INFO, buf);
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ src/rdate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/rdate.c b/src/rdate.c
+index 5c3e829..943d481 100644
+--- a/src/rdate.c
++++ b/src/rdate.c
+@@ -82,7 +82,7 @@ write_log(int is_error, char *format, ...)
+ 		return; /* Error, which we can't report because this _is_ the error
+ 				reporting mechanism */
+ 	if(log_mode)
+-		syslog(is_error?LOG_WARNING:LOG_INFO, buf);
++		syslog(is_error?LOG_WARNING:LOG_INFO, "%s", buf);
+ 	if(is_error || print_mode)
+ 		fprintf(is_error?stderr:stdout, "%s: %s\n", argv0, buf);
+ }
+-- 
+2.13.2
+

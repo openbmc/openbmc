@@ -1,0 +1,117 @@
+From 92875f5cc44914515e50c11c503a09cec90497b2 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 11 Jun 2016 22:51:44 -0400
+Subject: [PATCH 08/11] tweak to support external bind
+
+Tweak the external bind to oe-core's sysroot rather than
+external bind source build.
+
+Upstream-Status: Inappropriate <oe-core specific>
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ client/Makefile.am       | 2 +-
+ client/tests/Makefile.am | 2 +-
+ common/tests/Makefile.am | 2 +-
+ dhcpctl/Makefile.am      | 2 +-
+ omapip/Makefile.am       | 2 +-
+ relay/Makefile.am        | 2 +-
+ server/Makefile.am       | 2 +-
+ server/tests/Makefile.am | 2 +-
+ 8 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/client/Makefile.am b/client/Makefile.am
+index 4730bb3..84d8131 100644
+--- a/client/Makefile.am
++++ b/client/Makefile.am
+@@ -4,7 +4,7 @@
+ # production code. Sadly, we are not there yet.
+ SUBDIRS = . tests
+ 
+-BINDLIBDIR = @BINDDIR@/lib
++BINDLIBDIR = @BINDDIR@
+ 
+ AM_CPPFLAGS = -DCLIENT_PATH='"PATH=$(sbindir):/sbin:/bin:/usr/sbin:/usr/bin"' \
+ 	      -DLOCALSTATEDIR='"$(localstatedir)"' -I$(top_srcdir)/includes
+diff --git a/client/tests/Makefile.am b/client/tests/Makefile.am
+index 5031d0c..a8dfd26 100644
+--- a/client/tests/Makefile.am
++++ b/client/tests/Makefile.am
+@@ -1,6 +1,6 @@
+ SUBDIRS = .
+ 
+-BINDLIBDIR = @BINDDIR@/lib
++BINDLIBDIR = @BINDDIR@
+ 
+ AM_CPPFLAGS = $(ATF_CFLAGS) -DUNIT_TEST -I$(top_srcdir)/includes
+ AM_CPPFLAGS += -I@BINDDIR@/include -I$(top_srcdir)
+diff --git a/common/tests/Makefile.am b/common/tests/Makefile.am
+index f6a43e4..2f98d22 100644
+--- a/common/tests/Makefile.am
++++ b/common/tests/Makefile.am
+@@ -1,6 +1,6 @@
+ SUBDIRS = .
+ 
+-BINDLIBDIR = @BINDDIR@/lib
++BINDLIBDIR = @BINDDIR@
+ 
+ AM_CPPFLAGS = $(ATF_CFLAGS) -I$(top_srcdir)/includes
+ 
+diff --git a/dhcpctl/Makefile.am b/dhcpctl/Makefile.am
+index ba8dd8b..9b2486e 100644
+--- a/dhcpctl/Makefile.am
++++ b/dhcpctl/Makefile.am
+@@ -1,4 +1,4 @@
+-BINDLIBDIR = @BINDDIR@/lib
++BINDLIBDIR = @BINDDIR@
+ 
+ AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_srcdir)
+ 
+diff --git a/omapip/Makefile.am b/omapip/Makefile.am
+index dd1afa0..e4a8599 100644
+--- a/omapip/Makefile.am
++++ b/omapip/Makefile.am
+@@ -1,4 +1,4 @@
+-BINDLIBDIR = @BINDDIR@/lib
++BINDLIBDIR = @BINDDIR@
+ AM_CPPFLAGS = -I$(top_srcdir)/includes
+ 
+ lib_LIBRARIES = libomapi.a
+diff --git a/relay/Makefile.am b/relay/Makefile.am
+index 6d652f6..b3bf578 100644
+--- a/relay/Makefile.am
++++ b/relay/Makefile.am
+@@ -1,4 +1,4 @@
+-BINDLIBDIR = @BINDDIR@/lib
++BINDLIBDIR = @BINDDIR@
+ 
+ AM_CPPFLAGS = -DLOCALSTATEDIR='"@localstatedir@"' -I$(top_srcdir)/includes
+ 
+diff --git a/server/Makefile.am b/server/Makefile.am
+index 3990b9c..b5d8c2d 100644
+--- a/server/Makefile.am
++++ b/server/Makefile.am
+@@ -4,7 +4,7 @@
+ # production code. Sadly, we are not there yet.
+ SUBDIRS = . tests
+ 
+-BINDLIBDIR = @BINDDIR@/lib
++BINDLIBDIR = @BINDDIR@
+ 
+ AM_CPPFLAGS = -I$(top_srcdir) -DLOCALSTATEDIR='"@localstatedir@"' -I$(top_srcdir)/includes
+ 
+diff --git a/server/tests/Makefile.am b/server/tests/Makefile.am
+index a87c5e7..9821081 100644
+--- a/server/tests/Makefile.am
++++ b/server/tests/Makefile.am
+@@ -1,6 +1,6 @@
+ SUBDIRS = .
+ 
+-BINDLIBDIR = @BINDDIR@/lib
++BINDLIBDIR = @BINDDIR@
+ 
+ AM_CPPFLAGS = $(ATF_CFLAGS) -DUNIT_TEST -I$(top_srcdir)/includes
+ AM_CPPFLAGS += -I@BINDDIR@/include -I$(top_srcdir)
+-- 
+1.8.3.1
+

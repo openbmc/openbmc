@@ -49,6 +49,12 @@ python uninative_event_fetchloader() {
             localdata = bb.data.createCopy(d)
             localdata.setVar('FILESPATH', "")
             localdata.setVar('DL_DIR', tarballdir)
+            # Our games with path manipulation of DL_DIR mean standard PREMIRRORS don't work
+            # and we can't easily put 'chksum' into the url path from a url parameter with
+            # the current fetcher url handling
+            ownmirror = d.getVar('SOURCE_MIRROR_URL')
+            if ownmirror:
+                localdata.appendVar("PREMIRRORS", " ${UNINATIVE_URL}${UNINATIVE_TARBALL} ${SOURCE_MIRROR_URL}/uninative/%s/${UNINATIVE_TARBALL}" % chksum)
 
             srcuri = d.expand("${UNINATIVE_URL}${UNINATIVE_TARBALL};sha256sum=%s" % chksum)
             bb.note("Fetching uninative binary shim from %s" % srcuri)
@@ -57,7 +63,19 @@ python uninative_event_fetchloader() {
             fetcher.download()
             localpath = fetcher.localpath(srcuri)
             if localpath != tarballpath and os.path.exists(localpath) and not os.path.exists(tarballpath):
+                # Follow the symlink behavior from the bitbake fetch2.
+                # This will cover the case where an existing symlink is broken
+                # as well as if there are two processes trying to create it
+                # at the same time.
+                if os.path.islink(tarballpath):
+                    # Broken symbolic link
+                    os.unlink(tarballpath)
+
+                # Deal with two processes trying to make symlink at once
+                try:
                     os.symlink(localpath, tarballpath)
+                except FileExistsError:
+                    pass
 
         cmd = d.expand("\
 mkdir -p ${UNINATIVE_STAGING_DIR}-uninative; \

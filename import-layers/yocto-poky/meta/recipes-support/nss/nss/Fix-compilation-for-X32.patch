@@ -6,6 +6,8 @@ Subject: [PATCH 7/7] Fix compilation for X32
 X32 uses 32-bit pointers, not 64-bit.
 
 Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+
+Upstream-Status: Pending
 ---
  nss/lib/freebl/poly1305-donna-x64-sse2-incremental-source.c | 4 ++++
  1 file changed, 4 insertions(+)

@@ -1,0 +1,43 @@
+From ab07574ef90fa510f293c37897d577066a88fe0d Mon Sep 17 00:00:00 2001
+From: Nathan Lynch <nathan_lynch@mentor.com>
+Date: Tue, 25 Apr 2017 16:26:57 -0500
+Subject: [PATCH] BUILD_RUNTIME_BUG_ON vs gcc7
+
+Avoid using LTTng's BUILD_RUNTIME_BUG_ON macro, as it appears to run
+into a similar problem as Linux experienced with ilog2.
+
+See:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=474c90156c8dcc2fa815e6716cc9394d7930cb9c
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=72785
+
+Upstream-Status: Pending
+Signed-off-by: Nathan Lynch <nathan_lynch@mentor.com>
+---
+ lib/align.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/align.h b/lib/align.h
+index 5b91ae87410b..5e134cd485fe 100644
+--- a/lib/align.h
++++ b/lib/align.h
+@@ -48,7 +48,7 @@
+  */
+ #define offset_align(align_drift, alignment)				       \
+ 	({								       \
+-		BUILD_RUNTIME_BUG_ON((alignment) == 0			       \
++		BUG_ON((alignment) == 0					       \
+ 				   || ((alignment) & ((alignment) - 1)));      \
+ 		(((alignment) - (align_drift)) & ((alignment) - 1));	       \
+ 	})
+@@ -63,7 +63,7 @@
+  */
+ #define offset_align_floor(align_drift, alignment)			       \
+ 	({								       \
+-		BUILD_RUNTIME_BUG_ON((alignment) == 0			       \
++		BUG_ON((alignment) == 0					       \
+ 				   || ((alignment) & ((alignment) - 1)));      \
+ 		(((align_drift) - (alignment)) & ((alignment) - 1));	       \
+ 	})
+-- 
+2.9.3
+

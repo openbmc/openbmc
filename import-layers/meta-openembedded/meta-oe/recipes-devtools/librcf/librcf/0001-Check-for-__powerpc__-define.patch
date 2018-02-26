@@ -1,0 +1,28 @@
+From ac7316679e30f7013604b19aa0949a0744e91d2f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 1 Jul 2017 13:06:30 -0700
+Subject: [PATCH] Check for __powerpc__ define
+
+Also check for gcc's internal define for ppc platform
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/RCF/ByteOrdering.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/RCF/ByteOrdering.cpp b/src/RCF/ByteOrdering.cpp
+index 278ca80..9f9c446 100755
+--- a/src/RCF/ByteOrdering.cpp
++++ b/src/RCF/ByteOrdering.cpp
+@@ -36,7 +36,7 @@ namespace RCF {
+ 
+     const ByteOrder MachineByteOrder = BigEndian;
+ 
+-#elif defined( __ppc__ )
++#elif defined( __ppc__ ) || defined( __powerpc__ )
+ 
+     const ByteOrder MachineByteOrder = BigEndian;
+ 
+-- 
+2.13.2
+

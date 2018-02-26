@@ -9,5 +9,8 @@ DEPENDS_append = " ${PYTHON_PN}-native "
 export STAGING_INCDIR
 export STAGING_LIBDIR
 
+# suppress host user's site-packages dirs.
+export PYTHONNOUSERSITE = "1"
+
 # autoconf macros will use their internal default preference otherwise
 export PYTHON

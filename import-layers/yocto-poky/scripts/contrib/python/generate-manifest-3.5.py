@@ -31,6 +31,7 @@ class MakefileMaker:
     def __init__( self, outfile, isNative ):
         """initialize"""
         self.packages = {}
+        self.excluded_pkgs = []
         self.targetPrefix = "${libdir}/python%s/" % VERSION[:3]
         self.isNative = isNative
         self.output = outfile
@@ -55,7 +56,7 @@ class MakefileMaker:
         self.out( """ """ )
         self.out( "" )
 
-    def addPackage( self, name, description, dependencies, filenames ):
+    def addPackage( self, name, description, dependencies, filenames, mod_exclude = False ):
         """add a package to the Makefile"""
         if type( filenames ) == type( "" ):
             filenames = filenames.split()
@@ -67,6 +68,8 @@ class MakefileMaker:
                                                  self.pycachePath( filename ) ) )
             else:
                 fullFilenames.append( filename )
+        if mod_exclude:
+            self.excluded_pkgs.append( name )
         self.packages[name] = description, dependencies, fullFilenames
 
     def pycachePath( self, filename ):
@@ -87,13 +90,11 @@ class MakefileMaker:
         #
 
         if self.isNative:
-            rprovideLine = 'RPROVIDES+="'
-            for name in sorted(self.packages):
-                rprovideLine += "%s-native " % name.replace( '${PN}', 'python3' )
-            rprovideLine += '"'
+            pkglist = []
+            for name in ['${PN}-modules'] + sorted(self.packages):
+                pkglist.append('%s-native' % name.replace('${PN}', 'python3'))
 
-            self.out( rprovideLine )
-            self.out( "" )
+            self.out('RPROVIDES += "%s"' % " ".join(pkglist))
             return
 
         #
@@ -162,7 +163,7 @@ class MakefileMaker:
         line = 'RDEPENDS_${PN}-modules="'
 
         for name, data in sorted(self.packages.items()):
-            if name not in ['${PN}-dev', '${PN}-distutils-staticdev']:
+            if name not in ['${PN}-dev', '${PN}-distutils-staticdev'] and name not in self.excluded_pkgs:
                 line += "%s " % name
 
         self.out( "%s \"" % line )
@@ -224,7 +225,7 @@ if __name__ == "__main__":
     "${base_libdir}/*.o " +
     "${datadir}/aclocal " +
     "${datadir}/pkgconfig " +
-    "config/Makefile ")
+    "config*/Makefile ")
 
     m.addPackage( "${PN}-2to3", "Python automated Python 2 to 3 code translator", "${PN}-core",
     "lib2to3" ) # package
@@ -254,7 +255,7 @@ if __name__ == "__main__":
     "py_compile.* compileall.*" )
 
     m.addPackage( "${PN}-compression", "Python high-level compression support", "${PN}-core ${PN}-codecs ${PN}-importlib ${PN}-threading ${PN}-shell",
-    "gzip.* zipfile.* tarfile.* lib-dynload/bz2.*.so lib-dynload/zlib.*.so" )
+    "gzip.* zipfile.* tarfile.* lib-dynload/bz2.*.so lib-dynload/zlib.*.so bz2.py lzma.py _compression.py" )
 
     m.addPackage( "${PN}-crypt", "Python basic cryptographic and hashing support", "${PN}-core",
     "hashlib.* md5.* sha.* lib-dynload/crypt.*.so lib-dynload/_hashlib.*.so lib-dynload/_sha256.*.so lib-dynload/_sha512.*.so" )
@@ -402,8 +403,8 @@ if __name__ == "__main__":
     m.addPackage( "${PN}-terminal", "Python terminal controlling support", "${PN}-core ${PN}-io",
     "pty.* tty.*" )
 
-    m.addPackage( "${PN}-tests", "Python tests", "${PN}-core",
-    "test" ) # package
+    m.addPackage( "${PN}-tests", "Python tests", "${PN}-core ${PN}-compression",
+    "test", True ) # package
 
     m.addPackage( "${PN}-threading", "Python threading & synchronization support", "${PN}-core ${PN}-lang",
     "_threading_local.* dummy_thread.* dummy_threading.* mutex.* threading.* queue.*" )

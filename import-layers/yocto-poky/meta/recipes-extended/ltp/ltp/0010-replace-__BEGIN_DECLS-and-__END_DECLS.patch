@@ -10,6 +10,8 @@ Include <asm-generic/types.h> to get __s32 definitions
 its not a generally available typedef
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
 ---
  testcases/kernel/syscalls/epoll2/include/epoll.h | 8 ++++++--
  utils/sctp/include/netinet/sctp.h                | 9 +++++++--

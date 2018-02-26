@@ -1,0 +1,27 @@
+From e4ec992984983ac9107efae1f1cc552007e4229e Mon Sep 17 00:00:00 2001
+From: Vishal Biswas <vshlbiswas@ymail.com>
+Date: Mon, 8 May 2017 11:06:11 +0530
+Subject: [PATCH] Remove INITARGS from xserver119.patch
+
+Upstream-Status: Backport
+
+---
+ unix/xserver119.patch | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/unix/xserver119.patch b/unix/xserver119.patch
+index 614f104..7adf314 100644
+--- a/unix/xserver119.patch
++++ b/unix/xserver119.patch
+@@ -66,7 +66,7 @@ diff -up xserver/mi/miinitext.c.xserver116-rebased xserver/mi/miinitext.c
+  #include "globals.h"
+  
+ +#ifdef TIGERVNC
+-+extern void vncExtensionInit(INITARGS);
+++extern void vncExtensionInit(void);
+ +#endif
+ +
+  /* The following is only a small first step towards run-time
+-- 
+2.7.4
+

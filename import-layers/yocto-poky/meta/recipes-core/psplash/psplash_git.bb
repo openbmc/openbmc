@@ -5,13 +5,14 @@ SECTION = "base"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://psplash.h;beginline=1;endline=16;md5=840fb2356b10a85bed78dd09dc7745c6"
 
-SRCREV = "88343ad23c90fa1dd8d79ac0d784a691aa0c6d2b"
+SRCREV = "2015f7073e98dd9562db0936a254af5ef56356cf"
 PV = "0.1+git${SRCPV}"
 PR = "r15"
 
 SRC_URI = "git://git.yoctoproject.org/${BPN} \
            file://psplash-init \
            ${SPLASH_IMAGES}"
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 SPLASH_IMAGES = "file://psplash-poky-img.h;outsuffix=default"
 

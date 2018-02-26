@@ -8,7 +8,6 @@ DEPENDS = "libpcap"
 SRC_URI = " \
     http://www.tcpdump.org/release/${BP}.tar.gz \
     file://unnecessary-to-check-libpcap.patch \
-    file://tcpdump-configure-dlpi.patch \
     file://add-ptest.patch \
     file://run-ptest \
 "

@@ -1,46 +1,36 @@
+This patch:
+* ensures we link correctly
+* allows us to optionally pass target information to configure rather than using uname
+* select linux as the platform in most cases we care about
+
+This is a merge of various tweaks to allow us to build pciutils including 
+work from:
+
+7/30/2010 - Qing He <qing.he@intel.com>
+1/22/2012 - Shane Wang <shane.wang@intel.com>
+Ionut Radu <ionutx.radu@intel.com>
+2017/6/15 - RP - Cleanups and merging patches
+
 Upstream-Status: Inappropriate [embedded specific]
 
-#
-# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
-#
----
-
-7/30/2010 - rebased to 3.1.5 by Qing He <qing.he@intel.com>
-1/22/2012 - rebased to 3.1.9 by Shane Wang <shane.wang@intel.com>
-
-diff -r af2b10cc3c14 Makefile
---- a/Makefile	Sun Jan 22 18:36:34 2012 +0800
-+++ b/Makefile	Sun Jan 22 18:38:54 2012 +0800
-@@ -37,7 +37,6 @@
- # Commands
- INSTALL=install
- DIRINSTALL=install -d
--STRIP=-s
- CC=$(CROSS_COMPILE)gcc
- AR=$(CROSS_COMPILE)ar
- RANLIB=$(CROSS_COMPILE)ranlib
-@@ -86,7 +85,7 @@
+Index: pciutils-3.5.4/Makefile
+===================================================================
+--- pciutils-3.5.4.orig/Makefile
++++ pciutils-3.5.4/Makefile
+@@ -96,7 +95,7 @@ example: example.o lib/$(PCILIB)
  example.o: example.c $(PCIINC)
  
  %: %.o
 -	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
-+	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LIB_LDLIBS) -o $@
++	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LIB_LDLIBS) $(LDLIBS) -o $@
  
  %.8 %.7: %.man
  	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)/;s#@IDSDIR@#$(IDSDIR)#"
-@@ -101,7 +100,7 @@
- install: all
- # -c is ignored on Linux, but required on FreeBSD
- 	$(DIRINSTALL) -m 755 $(DESTDIR)$(SBINDIR) $(DESTDIR)$(IDSDIR) $(DESTDIR)$(MANDIR)/man8 $(DESTDIR)$(MANDIR)/man7
--	$(INSTALL) -c -m 755 $(STRIP) lspci setpci $(DESTDIR)$(SBINDIR)
-+	$(INSTALL) -c -m 755 lspci setpci $(DESTDIR)$(SBINDIR)
- 	$(INSTALL) -c -m 755 update-pciids $(DESTDIR)$(SBINDIR)
- 	$(INSTALL) -c -m 644 $(PCI_IDS) $(DESTDIR)$(IDSDIR)
- 	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(DESTDIR)$(MANDIR)/man8
-diff -r af2b10cc3c14 lib/configure
---- a/lib/configure	Sun Jan 22 18:36:34 2012 +0800
-+++ b/lib/configure	Sun Jan 22 18:38:54 2012 +0800
-@@ -14,6 +14,10 @@
+Index: pciutils-3.5.4/lib/configure
+===================================================================
+--- pciutils-3.5.4.orig/lib/configure
++++ pciutils-3.5.4/lib/configure
+@@ -14,6 +14,10 @@ echo_n() {
  	fi
  }
  
@@ -51,7 +41,7 @@ diff -r af2b10cc3c14 lib/configure
  if [ -z "$VERSION" -o -z "$IDSDIR" ] ; then
  	echo >&2 "Please run the configure script from the top-level Makefile"
  	exit 1
-@@ -21,8 +25,8 @@
+@@ -21,8 +25,8 @@ fi
  
  echo_n "Configuring libpci for your system..."
  if [ -z "$HOST" ] ; then
@@ -62,7 +52,7 @@ diff -r af2b10cc3c14 lib/configure
  	realsys="$sys"
  	if [ "$sys" = "AIX" -a -x /usr/bin/oslevel -a -x /usr/sbin/lsattr ]
  	then
-@@ -30,7 +34,7 @@
+@@ -30,7 +34,7 @@ if [ -z "$HOST" ] ; then
  		proc=`/usr/sbin/lsdev -C -c processor -S available -F name | head -1`
  		cpu=`/usr/sbin/lsattr -F value -l $proc -a type | sed 's/_.*//'`
  	else
@@ -71,7 +61,7 @@ diff -r af2b10cc3c14 lib/configure
  	fi
  	if [ "$sys" = "GNU/kFreeBSD" -o "$sys" = "DragonFly" ]
  	then
-@@ -40,7 +44,7 @@
+@@ -40,7 +44,7 @@ if [ -z "$HOST" ] ; then
  	then
  		sys=cygwin
  	fi
@@ -80,24 +70,11 @@ diff -r af2b10cc3c14 lib/configure
  fi
  [ -n "$RELEASE" ] && rel="${RELEASE}"
  # CAVEAT: tr on Solaris is a bit weird and the extra [] is otherwise harmless.
-@@ -49,6 +53,21 @@
+@@ -49,6 +53,8 @@ cpu=`echo $host | sed 's/^\([^-]*\)-\([^
  sys=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
  echo " $host $rel $cpu $sys"
  
-+if [ "$host" = "linux--gnueabi" ]
-+then
-+	sys=linux
-+fi
-+
-+if [ "$host" = "linux--uclibc" ]
-+then
-+	sys=linux
-+fi
-+
-+if [ "$host" = "linux--uclibceabi" ]
-+then
-+	sys=linux
-+fi
++{ echo "$host" | grep linux; } && sys=linux
 +
  c=config.h
  m=config.mk

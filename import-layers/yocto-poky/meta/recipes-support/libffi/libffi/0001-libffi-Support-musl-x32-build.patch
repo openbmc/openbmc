@@ -1,0 +1,30 @@
+From 69c3906c85c791716bf650aa36d9361d22acf3fb Mon Sep 17 00:00:00 2001
+From: sweeaun <swee.aun.khor@intel.com>
+Date: Thu, 6 Jul 2017 16:32:46 -0700
+Subject: [PATCH] libffi: Support musl x32 build
+
+Support libffi build with target musl-x32.
+
+Upstream-Status: Pending
+
+Signed-off-by: sweeaun <swee.aun.khor@intel.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index a7bf5ee..8ebe99c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -177,7 +177,7 @@ case "$host" in
+ 	TARGETDIR=x86
+ 	if test $ac_cv_sizeof_size_t = 4; then
+ 	  case "$host" in
+-	    *-gnux32)
++	    *-gnux32 | *-muslx32)
+ 	      TARGET=X86_64
+ 	      ;;
+ 	    *)
+-- 
+2.7.4
+

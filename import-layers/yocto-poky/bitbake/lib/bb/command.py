@@ -50,6 +50,8 @@ class CommandFailed(CommandExit):
     def __init__(self, message):
         self.error = message
         CommandExit.__init__(self, 1)
+    def __str__(self):
+        return "Command execution failed: %s" % self.error
 
 class CommandError(Exception):
     pass
@@ -76,7 +78,8 @@ class Command:
                 if not hasattr(command_method, 'readonly') or False == getattr(command_method, 'readonly'):
                     return None, "Not able to execute not readonly commands in readonly mode"
             try:
-                if getattr(command_method, 'needconfig', False):
+                self.cooker.process_inotify_updates()
+                if getattr(command_method, 'needconfig', True):
                     self.cooker.updateCacheSync()
                 result = command_method(self, commandline)
             except CommandError as exc:
@@ -96,6 +99,7 @@ class Command:
 
     def runAsyncCommand(self):
         try:
+            self.cooker.process_inotify_updates()
             if self.cooker.state in (bb.cooker.state.error, bb.cooker.state.shutdown, bb.cooker.state.forceshutdown):
                 # updateCache will trigger a shutdown of the parser
                 # and then raise BBHandledException triggering an exit
@@ -140,6 +144,9 @@ class Command:
             bb.event.fire(CommandCompleted(), self.cooker.data)
         self.currentAsyncCommand = None
         self.cooker.finishcommand()
+
+    def reset(self):
+        self.remotedatastores = bb.remotedata.RemoteDatastores(self.cooker)
 
 def split_mc_pn(pn):
     if pn.startswith("multiconfig:"):
@@ -233,59 +240,15 @@ class CommandsSync:
         command.cooker.configuration.postfile = postfiles
     setPrePostConfFiles.needconfig = False
 
-    def getCpuCount(self, command, params):
-        """
-        Get the CPU count on the bitbake server
-        """
-        return bb.utils.cpu_count()
-    getCpuCount.readonly = True
-    getCpuCount.needconfig = False
-
     def matchFile(self, command, params):
         fMatch = params[0]
         return command.cooker.matchFile(fMatch)
     matchFile.needconfig = False
 
-    def generateNewImage(self, command, params):
-        image = params[0]
-        base_image = params[1]
-        package_queue = params[2]
-        timestamp = params[3]
-        description = params[4]
-        return command.cooker.generateNewImage(image, base_image,
-                        package_queue, timestamp, description)
-
-    def ensureDir(self, command, params):
-        directory = params[0]
-        bb.utils.mkdirhier(directory)
-    ensureDir.needconfig = False
-
-    def setVarFile(self, command, params):
-        """
-        Save a variable in a file; used for saving in a configuration file
-        """
-        var = params[0]
-        val = params[1]
-        default_file = params[2]
-        op = params[3]
-        command.cooker.modifyConfigurationVar(var, val, default_file, op)
-    setVarFile.needconfig = False
-
-    def removeVarFile(self, command, params):
-        """
-        Remove a variable declaration from a file
-        """
-        var = params[0]
-        command.cooker.removeConfigurationVar(var)
-    removeVarFile.needconfig = False
-
-    def createConfigFile(self, command, params):
-        """
-        Create an extra configuration file
-        """
-        name = params[0]
-        command.cooker.createConfigFile(name)
-    createConfigFile.needconfig = False
+    def getUIHandlerNum(self, command, params):
+        return bb.event.get_uihandler()
+    getUIHandlerNum.needconfig = False
+    getUIHandlerNum.readonly = True
 
     def setEventMask(self, command, params):
         handlerNum = params[0]
@@ -323,6 +286,7 @@ class CommandsSync:
     parseConfiguration.needconfig = False
 
     def getLayerPriorities(self, command, params):
+        command.cooker.parseConfiguration()
         ret = []
         # regex objects cannot be marshalled by xmlrpc
         for collection, pattern, regex, pri in command.cooker.bbfile_config_priorities:
@@ -353,6 +317,38 @@ class CommandsSync:
             mc = ''
         return command.cooker.recipecaches[mc].pkg_pepvpr
     getRecipeVersions.readonly = True
+
+    def getRecipeProvides(self, command, params):
+        try:
+            mc = params[0]
+        except IndexError:
+            mc = ''
+        return command.cooker.recipecaches[mc].fn_provides
+    getRecipeProvides.readonly = True
+
+    def getRecipePackages(self, command, params):
+        try:
+            mc = params[0]
+        except IndexError:
+            mc = ''
+        return command.cooker.recipecaches[mc].packages
+    getRecipePackages.readonly = True
+
+    def getRecipePackagesDynamic(self, command, params):
+        try:
+            mc = params[0]
+        except IndexError:
+            mc = ''
+        return command.cooker.recipecaches[mc].packages_dynamic
+    getRecipePackagesDynamic.readonly = True
+
+    def getRProviders(self, command, params):
+        try:
+            mc = params[0]
+        except IndexError:
+            mc = ''
+        return command.cooker.recipecaches[mc].rproviders
+    getRProviders.readonly = True
 
     def getRuntimeDepends(self, command, params):
         ret = []
@@ -592,11 +588,14 @@ class CommandsAsync:
         bfile = params[0]
         task = params[1]
         if len(params) > 2:
-            hidewarning = params[2]
+            internal = params[2]
         else:
-            hidewarning = False
+            internal = False
 
-        command.cooker.buildFile(bfile, task, hidewarning)
+        if internal:
+            command.cooker.buildFileInternal(bfile, task, fireevents=False, quietlog=True)
+        else:
+            command.cooker.buildFile(bfile, task)
     buildFile.needcache = False
 
     def buildTargets(self, command, params):
@@ -645,17 +644,6 @@ class CommandsAsync:
         command.cooker.generateTargetsTree(klass, pkg_list)
         command.finishAsyncCommand()
     generateTargetsTree.needcache = True
-
-    def findCoreBaseFiles(self, command, params):
-        """
-        Find certain files in COREBASE directory. i.e. Layers
-        """
-        subdir = params[0]
-        filename = params[1]
-
-        command.cooker.findCoreBaseFiles(subdir, filename)
-        command.finishAsyncCommand()
-    findCoreBaseFiles.needcache = False
 
     def findConfigFiles(self, command, params):
         """
@@ -764,3 +752,14 @@ class CommandsAsync:
         command.finishAsyncCommand()
     clientComplete.needcache = False
 
+    def findSigInfo(self, command, params):
+        """
+        Find signature info files via the signature generator
+        """
+        pn = params[0]
+        taskname = params[1]
+        sigs = params[2]
+        res = bb.siggen.find_siginfo(pn, taskname, sigs, command.cooker.data)
+        bb.event.fire(bb.event.FindSigInfoResult(res), command.cooker.data)
+        command.finishAsyncCommand()
+    findSigInfo.needcache = False

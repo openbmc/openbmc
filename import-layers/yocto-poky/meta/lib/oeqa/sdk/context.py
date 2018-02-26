@@ -6,9 +6,10 @@ import sys
 import glob
 import re
 
-from oeqa.core.context import OETestContext, OETestContextExecutor
+from oeqa.core.context import OETestContextExecutor
+from oeqa.core.threaded import OETestContextThreaded
 
-class OESDKTestContext(OETestContext):
+class OESDKTestContext(OETestContextThreaded):
     sdk_files_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
 
     def __init__(self, td=None, logger=None, sdk_dir=None, sdk_env=None,
@@ -44,8 +45,6 @@ class OESDKTestContextExecutor(OETestContextExecutor):
     default_test_data = None
 
     def register_commands(self, logger, subparsers):
-        import argparse_oe
-
         super(OESDKTestContextExecutor, self).register_commands(logger, subparsers)
 
         sdk_group = self.parser.add_argument_group('sdk options')
@@ -109,6 +108,8 @@ class OESDKTestContextExecutor(OETestContextExecutor):
             log(env)
 
     def run(self, logger, args):
+        import argparse_oe
+
         if not args.sdk_dir:
             raise argparse_oe.ArgumentUsageError("No SDK directory "\
                    "specified please do, --sdk-dir SDK_DIR", self.name)
@@ -128,6 +129,6 @@ class OESDKTestContextExecutor(OETestContextExecutor):
                    "environment (%s) specified" % args.sdk_env, self.name)
 
         self.sdk_env = sdk_envs[args.sdk_env]
-        super(OESDKTestContextExecutor, self).run(logger, args)
+        return super(OESDKTestContextExecutor, self).run(logger, args)
 
 _executor_class = OESDKTestContextExecutor

@@ -6,6 +6,7 @@ import time
 import select
 import logging
 import subprocess
+import codecs
 
 from . import OETarget
 
@@ -82,7 +83,7 @@ class OESSHTarget(OETarget):
             processTimeout = self.timeout
 
         status, output = self._run(sshCmd, processTimeout, True)
-        self.logger.info('\nCommand: %s\nOutput:  %s\n' % (command, output))
+        self.logger.debug('Command: %s\nOutput:  %s\n' % (command, output))
         return (status, output)
 
     def copyTo(self, localSrc, remoteDst):
@@ -206,12 +207,12 @@ def SSHCall(command, logger, timeout=None, **opts):
                 logger.debug('time: %s, endtime: %s' % (time.time(), endtime))
                 try:
                     if select.select([process.stdout], [], [], 5)[0] != []:
-                        data = os.read(process.stdout.fileno(), 1024)
+                        reader = codecs.getreader('utf-8')(process.stdout)
+                        data = reader.read(1024, 1024)
                         if not data:
                             process.stdout.close()
                             eof = True
                         else:
-                            data = data.decode("utf-8")
                             output += data
                             logger.debug('Partial data from SSH call: %s' % data)
                             endtime = time.time() + timeout
@@ -233,7 +234,7 @@ def SSHCall(command, logger, timeout=None, **opts):
                 output += lastline
 
         else:
-            output = process.communicate()[0].decode("utf-8")
+            output = process.communicate()[0].decode("utf-8", errors='replace')
             logger.debug('Data from SSH call: %s' % output.rstrip())
 
     options = {

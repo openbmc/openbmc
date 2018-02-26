@@ -1,0 +1,30 @@
+From 10fb440795a7796140bd657ee028847ec7c34447 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Sep 2017 23:10:54 -0700
+Subject: [PATCH] Kbuild.klibc: Add path to compiler headers via -isystem
+
+We need to include this path so it can find compiler headers e.g.
+stdarg.h which is called from wrapper stdarg.h using include_next
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ scripts/Kbuild.klibc | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Kbuild.klibc b/scripts/Kbuild.klibc
+index f500d535..1d5cdc43 100644
+--- a/scripts/Kbuild.klibc
++++ b/scripts/Kbuild.klibc
+@@ -105,7 +105,8 @@ KLIBCOBJCOPY     := $(OBJCOPY)
+ KLIBCOBJDUMP     := $(OBJDUMP)
+ 
+ # klibc include paths
+-KLIBCCPPFLAGS    := -nostdinc -iwithprefix include \
++KLIBCCPPFLAGS    := -nostdinc -iwithprefix include      \
++		    -isystem $(shell $(CC) -print-file-name=include) \
+ 		    -I$(KLIBCINC)/arch/$(KLIBCARCHDIR)	\
+                     -I$(KLIBCINC)/bits$(KLIBCBITSIZE)	\
+ 		    -I$(KLIBCOBJ)/../include		\
+-- 
+2.14.1
+

@@ -1,4 +1,4 @@
-#! /usr/bin/env python2.7
+#! /usr/bin/env python3
 
 # template.py (and other filenames)
 # By Max Eliaser (max.eliaser@intel.com)
@@ -71,7 +71,7 @@ assert this_binary in valid_binaries, \
        this_binary + " is not one of " + ', '.join (valid_binaries)
 
 if "--version" in sys.argv:
-    print version_str
+    print(version_str)
     sys.exit (0)
 
 # For debugging

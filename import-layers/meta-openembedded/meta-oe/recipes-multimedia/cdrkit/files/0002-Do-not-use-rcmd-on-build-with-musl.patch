@@ -1,0 +1,31 @@
+From 510838b2c96a9b097b3ee2694cba1c3623b0bac7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Sep 2017 22:38:05 -0700
+Subject: [PATCH 2/2] Do not use rcmd on build with musl
+
+cdrkit unconditionally enables code using rcmd(3), which isn't available
+on musl.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/xconfig.h.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/xconfig.h.in b/include/xconfig.h.in
+index 476c00b..6b4b298 100644
+--- a/include/xconfig.h.in
++++ b/include/xconfig.h.in
+@@ -186,8 +186,9 @@
+  *	Instead use the tests AC_SMALL_FSEEKO/AC_SMALL/STELLO and make sure
+  *	they are placed before the large file tests.
+  */
+-
++#ifdef __GLIBC__
+ #define HAVE_RCMD 1		/* rcmd() is present in libc/libsocket */
++#endif
+ #define HAVE_SOCKET 1		/* socket() is present in libc/libsocket */
+ #define HAVE_SOCKETPAIR 1		/* socketpair() is present in libc/libsocket */
+ #define HAVE_GETSERVBYNAME 1	/* getservbyname() is present in libc/libsocket */
+-- 
+2.14.1
+

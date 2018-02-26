@@ -1,0 +1,87 @@
+Backport a patch from upstream to fix test compilation for PPC where
+system headers don't get included.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+r16450 | mjw | 2017-06-16 10:33:35 +0100 (Fri, 16 Jun 2017) | 7 lines
+
+ppc64 doesn't compile test_isa_2_06_partx.c without VSX support
+
+The #ifdef HAS_VSX guard is wrongly placed. It makes the standard
+include headers not be used. Causing a build failure. Fix by moving
+the #ifdef HAS_VSX after the standard includes.
+
+Index: none/tests/ppc32/test_isa_2_06_part3.c
+===================================================================
+--- a/none/tests/ppc32/test_isa_2_06_part3.c	(revision 16449)
++++ b/none/tests/ppc32/test_isa_2_06_part3.c	(revision 16450)
+@@ -20,17 +20,18 @@
+  The GNU General Public License is contained in the file COPYING.
+  */
+ 
+-#ifdef HAS_VSX
+-
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <malloc.h>
+-#include <altivec.h>
+ #include <math.h>
+ #include <unistd.h>    // getopt
+ 
++#ifdef HAS_VSX
++
++#include <altivec.h>
++
+ #ifndef __powerpc64__
+ typedef uint32_t HWord_t;
+ #else
+Index: none/tests/ppc32/test_isa_2_06_part1.c
+===================================================================
+--- a/none/tests/ppc32/test_isa_2_06_part1.c	(revision 16449)
++++ b/none/tests/ppc32/test_isa_2_06_part1.c	(revision 16450)
+@@ -20,13 +20,14 @@
+  The GNU General Public License is contained in the file COPYING.
+  */
+ 
+-#ifdef HAS_VSX
+-
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <malloc.h>
++
++#ifdef HAS_VSX
++
+ #include <altivec.h>
+ 
+ #ifndef __powerpc64__
+Index: none/tests/ppc32/test_isa_2_06_part2.c
+===================================================================
+--- a/none/tests/ppc32/test_isa_2_06_part2.c	(revision 16449)
++++ b/none/tests/ppc32/test_isa_2_06_part2.c	(revision 16450)
+@@ -20,17 +20,18 @@
+  The GNU General Public License is contained in the file COPYING.
+  */
+ 
+-#ifdef HAS_VSX
+-
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <malloc.h>
+-#include <altivec.h>
+ #include <math.h>
+ #include <unistd.h>    // getopt
+ 
++#ifdef HAS_VSX
++
++#include <altivec.h>
++
+ #ifndef __powerpc64__
+ typedef uint32_t HWord_t;
+ #else

@@ -1,0 +1,41 @@
+From 929150608c16644695f19cd2e0cc8a06a41cd497 Mon Sep 17 00:00:00 2001
+From: Martin Kelly <mkelly@xevo.com>
+Date: Fri, 7 Apr 2017 15:20:30 -0700
+Subject: [PATCH] configure.ac: don't use dnet-config
+
+The dnet-config tool doesn't know about cross-compilation, so it injects
+-I/usr/include into the path, causing compiler errors. So instead find dnet via
+-ldnet.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Martin Kelly <mkelly@xevo.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3400b86..7d6119e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -942,7 +942,7 @@ if test "$with_dnet" = "yes"; then
+       AC_VMW_CHECK_LIB([dnet],
+                        [DNET],
+                        [],
+-                       [dnet-config],
++                       [],
+                        [],
+                        [dnet.h],
+                        [intf_open],
+@@ -952,7 +952,7 @@ if test "$with_dnet" = "yes"; then
+ 
+    if test $have_dnet = "no"; then
+ 		AC_MSG_ERROR(
+-		   [dnet-config was not found on your PATH. Please configure without dnet (using --without-dnet) or install dnet - http://libdnet.sourceforge.net])
++		   [dnet was not found. Please configure without dnet (using --without-dnet) or install dnet - http://libdnet.sourceforge.net])
+ 	fi
+ fi
+ 
+-- 
+2.1.4
+

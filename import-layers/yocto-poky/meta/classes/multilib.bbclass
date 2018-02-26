@@ -4,7 +4,9 @@ python multilib_virtclass_handler () {
     if cls != "multilib" or not variant:
         return
 
-    e.data.setVar('STAGING_KERNEL_DIR', e.data.getVar('STAGING_KERNEL_DIR'))
+    localdata = bb.data.createCopy(e.data)
+    localdata.delVar('TMPDIR')
+    e.data.setVar('STAGING_KERNEL_DIR', localdata.getVar('STAGING_KERNEL_DIR'))
 
     # There should only be one kernel in multilib configs
     # We also skip multilib setup for module packages.

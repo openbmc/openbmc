@@ -1,0 +1,719 @@
+From 5e9dd9063f514447ea4f54046793f4f01c297ed4 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Sat, 31 Dec 2016 11:23:32 -0500
+Subject: [PATCH 4/4] Add support for VM suspend/resume for TPM TIS
+
+Extend the TPM TIS code to support suspend/resume. In case a command
+is being processed by the external TPM when suspending, wait for the command
+to complete to catch the result. In case the bottom half did not run,
+run the one function the bottom half is supposed to run. This then
+makes the resume operation work.
+
+The passthrough backend does not support suspend/resume operation
+and is therefore blocked from suspend/resume and migration.
+
+The CUSE TPM's supported capabilities are tested and if sufficient
+capabilities are implemented, suspend/resume, snapshotting and
+migration are supported by the CUSE TPM.
+
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+
+Upstream-Status: Pending [https://lists.nongnu.org/archive/html/qemu-devel/2016-06/msg00252.html]
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ hw/tpm/tpm_passthrough.c     | 130 +++++++++++++++++++++++--
+ hw/tpm/tpm_tis.c             | 137 +++++++++++++++++++++++++-
+ hw/tpm/tpm_tis.h             |   2 +
+ hw/tpm/tpm_util.c            | 223 +++++++++++++++++++++++++++++++++++++++++++
+ hw/tpm/tpm_util.h            |   7 ++
+ include/sysemu/tpm_backend.h |  12 +++
+ 6 files changed, 503 insertions(+), 8 deletions(-)
+
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 44739ebad2..bc8072d0bc 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -34,6 +34,8 @@
+ #include "tpm_tis.h"
+ #include "tpm_util.h"
+ #include "tpm_ioctl.h"
++#include "migration/migration.h"
++#include "qapi/error.h"
+ 
+ #define DEBUG_TPM 0
+ 
+@@ -49,6 +51,7 @@
+ #define TYPE_TPM_CUSE "tpm-cuse"
+ 
+ static const TPMDriverOps tpm_passthrough_driver;
++static const VMStateDescription vmstate_tpm_cuse;
+ 
+ /* data structures */
+ typedef struct TPMPassthruThreadParams {
+@@ -79,6 +82,10 @@ struct TPMPassthruState {
+     QemuMutex state_lock;
+     QemuCond cmd_complete;  /* singnaled once tpm_busy is false */
+     bool tpm_busy;
++
++    Error *migration_blocker;
++
++    TPMBlobBuffers tpm_blobs;
+ };
+ 
+ typedef struct TPMPassthruState TPMPassthruState;
+@@ -306,6 +313,10 @@ static void tpm_passthrough_shutdown(TPMPassthruState *tpm_pt)
+                          strerror(errno));
+         }
+     }
++    if (tpm_pt->migration_blocker) {
++        migrate_del_blocker(tpm_pt->migration_blocker);
++        error_free(tpm_pt->migration_blocker);
++    }
+ }
+ 
+ /*
+@@ -360,12 +371,14 @@ static int tpm_passthrough_cuse_check_caps(TPMPassthruState *tpm_pt)
+ /*
+  * Initialize the external CUSE TPM
+  */
+-static int tpm_passthrough_cuse_init(TPMPassthruState *tpm_pt)
++static int tpm_passthrough_cuse_init(TPMPassthruState *tpm_pt,
++                                     bool is_resume)
+ {
+     int rc = 0;
+-    ptm_init init = {
+-        .u.req.init_flags = PTM_INIT_FLAG_DELETE_VOLATILE,
+-    };
++    ptm_init init;
++    if (is_resume) {
++        init.u.req.init_flags = PTM_INIT_FLAG_DELETE_VOLATILE;
++    }
+ 
+     if (TPM_PASSTHROUGH_USES_CUSE_TPM(tpm_pt)) {
+         if (ioctl(tpm_pt->tpm_fd, PTM_INIT, &init) < 0) {
+@@ -394,7 +407,7 @@ static int tpm_passthrough_startup_tpm(TPMBackend *tb)
+                               tpm_passthrough_worker_thread,
+                               &tpm_pt->tpm_thread_params);
+ 
+-    tpm_passthrough_cuse_init(tpm_pt);
++    tpm_passthrough_cuse_init(tpm_pt, false);
+ 
+     return 0;
+ }
+@@ -466,6 +479,32 @@ static int tpm_passthrough_reset_tpm_established_flag(TPMBackend *tb,
+     return rc;
+ }
+ 
++static int tpm_cuse_get_state_blobs(TPMBackend *tb,
++                                    bool decrypted_blobs,
++                                    TPMBlobBuffers *tpm_blobs)
++{
++    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
++
++    assert(TPM_PASSTHROUGH_USES_CUSE_TPM(tpm_pt));
++
++    return tpm_util_cuse_get_state_blobs(tpm_pt->tpm_fd, decrypted_blobs,
++                                         tpm_blobs);
++}
++
++static int tpm_cuse_set_state_blobs(TPMBackend *tb,
++                                    TPMBlobBuffers *tpm_blobs)
++{
++    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
++
++    assert(TPM_PASSTHROUGH_USES_CUSE_TPM(tpm_pt));
++
++    if (tpm_util_cuse_set_state_blobs(tpm_pt->tpm_fd, tpm_blobs)) {
++        return 1;
++    }
++
++    return tpm_passthrough_cuse_init(tpm_pt, true);
++}
++
+ static bool tpm_passthrough_get_startup_error(TPMBackend *tb)
+ {
+     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+@@ -488,7 +527,7 @@ static void tpm_passthrough_deliver_request(TPMBackend *tb)
+ {
+     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+ 
+-    /* TPM considered busy once TPM Request scheduled for processing */
++    /* TPM considered busy once TPM request scheduled for processing */
+     qemu_mutex_lock(&tpm_pt->state_lock);
+     tpm_pt->tpm_busy = true;
+     qemu_mutex_unlock(&tpm_pt->state_lock);
+@@ -601,6 +640,25 @@ static int tpm_passthrough_open_sysfs_cancel(TPMBackend *tb)
+     return fd;
+ }
+ 
++static void tpm_passthrough_block_migration(TPMPassthruState *tpm_pt)
++{
++    ptm_cap caps;
++
++    if (TPM_PASSTHROUGH_USES_CUSE_TPM(tpm_pt)) {
++        caps = PTM_CAP_GET_STATEBLOB | PTM_CAP_SET_STATEBLOB |
++               PTM_CAP_STOP;
++        if (!TPM_CUSE_IMPLEMENTS_ALL(tpm_pt, caps)) {
++            error_setg(&tpm_pt->migration_blocker,
++                       "Migration disabled: CUSE TPM lacks necessary capabilities");
++            migrate_add_blocker(tpm_pt->migration_blocker);
++        }
++    } else {
++        error_setg(&tpm_pt->migration_blocker,
++                   "Migration disabled: Passthrough TPM does not support migration");
++        migrate_add_blocker(tpm_pt->migration_blocker);
++    }
++}
++
+ static int tpm_passthrough_handle_device_opts(QemuOpts *opts, TPMBackend *tb)
+ {
+     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+@@ -642,7 +700,7 @@ static int tpm_passthrough_handle_device_opts(QemuOpts *opts, TPMBackend *tb)
+             goto err_close_tpmdev;
+         }
+         /* init TPM for probing */
+-        if (tpm_passthrough_cuse_init(tpm_pt)) {
++        if (tpm_passthrough_cuse_init(tpm_pt, false)) {
+             goto err_close_tpmdev;
+         }
+     }
+@@ -659,6 +717,7 @@ static int tpm_passthrough_handle_device_opts(QemuOpts *opts, TPMBackend *tb)
+         }
+     }
+ 
++    tpm_passthrough_block_migration(tpm_pt);
+ 
+     return 0;
+ 
+@@ -766,10 +825,13 @@ static void tpm_passthrough_inst_init(Object *obj)
+ 
+     qemu_mutex_init(&tpm_pt->state_lock);
+     qemu_cond_init(&tpm_pt->cmd_complete);
++
++    vmstate_register(NULL, -1, &vmstate_tpm_cuse, obj);
+ }
+ 
+ static void tpm_passthrough_inst_finalize(Object *obj)
+ {
++    vmstate_unregister(NULL, &vmstate_tpm_cuse, obj);
+ }
+ 
+ static void tpm_passthrough_class_init(ObjectClass *klass, void *data)
+@@ -802,6 +864,60 @@ static const char *tpm_passthrough_cuse_create_desc(void)
+     return "CUSE TPM backend driver";
+ }
+ 
++static void tpm_cuse_pre_save(void *opaque)
++{
++    TPMPassthruState *tpm_pt = opaque;
++    TPMBackend *tb = &tpm_pt->parent;
++
++     qemu_mutex_lock(&tpm_pt->state_lock);
++     /* wait for TPM to finish processing */
++     if (tpm_pt->tpm_busy) {
++        qemu_cond_wait(&tpm_pt->cmd_complete, &tpm_pt->state_lock);
++     }
++     qemu_mutex_unlock(&tpm_pt->state_lock);
++
++    /* get the decrypted state blobs from the TPM */
++    tpm_cuse_get_state_blobs(tb, TRUE, &tpm_pt->tpm_blobs);
++}
++
++static int tpm_cuse_post_load(void *opaque,
++                              int version_id __attribute__((unused)))
++{
++    TPMPassthruState *tpm_pt = opaque;
++    TPMBackend *tb = &tpm_pt->parent;
++
++    return tpm_cuse_set_state_blobs(tb, &tpm_pt->tpm_blobs);
++}
++
++static const VMStateDescription vmstate_tpm_cuse = {
++    .name = "cuse-tpm",
++    .version_id = 1,
++    .minimum_version_id = 0,
++    .minimum_version_id_old = 0,
++    .pre_save  = tpm_cuse_pre_save,
++    .post_load = tpm_cuse_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(tpm_blobs.permanent_flags, TPMPassthruState),
++        VMSTATE_UINT32(tpm_blobs.permanent.size, TPMPassthruState),
++        VMSTATE_VBUFFER_ALLOC_UINT32(tpm_blobs.permanent.buffer,
++                                     TPMPassthruState, 1, NULL,
++                                     tpm_blobs.permanent.size),
++
++        VMSTATE_UINT32(tpm_blobs.volatil_flags, TPMPassthruState),
++        VMSTATE_UINT32(tpm_blobs.volatil.size, TPMPassthruState),
++        VMSTATE_VBUFFER_ALLOC_UINT32(tpm_blobs.volatil.buffer,
++                                     TPMPassthruState, 1, NULL,
++                                     tpm_blobs.volatil.size),
++
++        VMSTATE_UINT32(tpm_blobs.savestate_flags, TPMPassthruState),
++        VMSTATE_UINT32(tpm_blobs.savestate.size, TPMPassthruState),
++        VMSTATE_VBUFFER_ALLOC_UINT32(tpm_blobs.savestate.buffer,
++                                     TPMPassthruState, 1, NULL,
++                                     tpm_blobs.savestate.size),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const TPMDriverOps tpm_cuse_driver = {
+     .type                     = TPM_TYPE_CUSE_TPM,
+     .opts                     = tpm_passthrough_cmdline_opts,
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 14d9e83ea2..9b660cf737 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -368,6 +368,8 @@ static void tpm_tis_receive_bh(void *opaque)
+     TPMTISEmuState *tis = &s->s.tis;
+     uint8_t locty = s->locty_number;
+ 
++    tis->bh_scheduled = false;
++
+     qemu_mutex_lock(&s->state_lock);
+ 
+     tpm_tis_sts_set(&tis->loc[locty],
+@@ -415,6 +417,8 @@ static void tpm_tis_receive_cb(TPMState *s, uint8_t locty,
+     qemu_mutex_unlock(&s->state_lock);
+ 
+     qemu_bh_schedule(tis->bh);
++
++    tis->bh_scheduled = true;
+ }
+ 
+ /*
+@@ -1030,9 +1034,140 @@ static void tpm_tis_reset(DeviceState *dev)
+     tpm_tis_do_startup_tpm(s);
+ }
+ 
++
++/* persistent state handling */
++
++static void tpm_tis_pre_save(void *opaque)
++{
++    TPMState *s = opaque;
++    TPMTISEmuState *tis = &s->s.tis;
++    uint8_t locty = tis->active_locty;
++
++    DPRINTF("tpm_tis: suspend: locty = %d : r_offset = %d, w_offset = %d\n",
++            locty, tis->loc[0].r_offset, tis->loc[0].w_offset);
++#ifdef DEBUG_TIS
++    tpm_tis_dump_state(opaque, 0);
++#endif
++
++    qemu_mutex_lock(&s->state_lock);
++
++    /* wait for outstanding request to complete */
++    if (TPM_TIS_IS_VALID_LOCTY(locty) &&
++        tis->loc[locty].state == TPM_TIS_STATE_EXECUTION) {
++        /*
++         * If we get here when the bh is scheduled but did not run,
++         * we won't get notified...
++         */
++        if (!tis->bh_scheduled) {
++            /* backend thread to notify us */
++            qemu_cond_wait(&s->cmd_complete, &s->state_lock);
++        }
++        if (tis->loc[locty].state == TPM_TIS_STATE_EXECUTION) {
++            /* bottom half did not run - run its function */
++            qemu_mutex_unlock(&s->state_lock);
++            tpm_tis_receive_bh(opaque);
++            qemu_mutex_lock(&s->state_lock);
++        }
++    }
++
++    qemu_mutex_unlock(&s->state_lock);
++
++    /* copy current active read or write buffer into the buffer
++       written to disk */
++    if (TPM_TIS_IS_VALID_LOCTY(locty)) {
++        switch (tis->loc[locty].state) {
++        case TPM_TIS_STATE_RECEPTION:
++            memcpy(tis->buf,
++                   tis->loc[locty].w_buffer.buffer,
++                   MIN(sizeof(tis->buf),
++                       tis->loc[locty].w_buffer.size));
++            tis->offset = tis->loc[locty].w_offset;
++        break;
++        case TPM_TIS_STATE_COMPLETION:
++            memcpy(tis->buf,
++                   tis->loc[locty].r_buffer.buffer,
++                   MIN(sizeof(tis->buf),
++                       tis->loc[locty].r_buffer.size));
++            tis->offset = tis->loc[locty].r_offset;
++        break;
++        default:
++            /* leak nothing */
++            memset(tis->buf, 0x0, sizeof(tis->buf));
++        break;
++        }
++    }
++}
++
++static int tpm_tis_post_load(void *opaque,
++                             int version_id __attribute__((unused)))
++{
++    TPMState *s = opaque;
++    TPMTISEmuState *tis = &s->s.tis;
++
++    uint8_t locty = tis->active_locty;
++
++    if (TPM_TIS_IS_VALID_LOCTY(locty)) {
++        switch (tis->loc[locty].state) {
++        case TPM_TIS_STATE_RECEPTION:
++            memcpy(tis->loc[locty].w_buffer.buffer,
++                   tis->buf,
++                   MIN(sizeof(tis->buf),
++                       tis->loc[locty].w_buffer.size));
++            tis->loc[locty].w_offset = tis->offset;
++        break;
++        case TPM_TIS_STATE_COMPLETION:
++            memcpy(tis->loc[locty].r_buffer.buffer,
++                   tis->buf,
++                   MIN(sizeof(tis->buf),
++                       tis->loc[locty].r_buffer.size));
++            tis->loc[locty].r_offset = tis->offset;
++        break;
++        default:
++        break;
++        }
++    }
++
++    DPRINTF("tpm_tis: resume : locty = %d : r_offset = %d, w_offset = %d\n",
++            locty, tis->loc[0].r_offset, tis->loc[0].w_offset);
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_locty = {
++    .name = "loc",
++    .version_id = 1,
++    .minimum_version_id = 0,
++    .minimum_version_id_old = 0,
++    .fields      = (VMStateField[]) {
++        VMSTATE_UINT32(state, TPMLocality),
++        VMSTATE_UINT32(inte, TPMLocality),
++        VMSTATE_UINT32(ints, TPMLocality),
++        VMSTATE_UINT8(access, TPMLocality),
++        VMSTATE_UINT32(sts, TPMLocality),
++        VMSTATE_UINT32(iface_id, TPMLocality),
++        VMSTATE_END_OF_LIST(),
++    }
++};
++
+ static const VMStateDescription vmstate_tpm_tis = {
+     .name = "tpm",
+-    .unmigratable = 1,
++    .version_id = 1,
++    .minimum_version_id = 0,
++    .minimum_version_id_old = 0,
++    .pre_save  = tpm_tis_pre_save,
++    .post_load = tpm_tis_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(s.tis.offset, TPMState),
++        VMSTATE_BUFFER(s.tis.buf, TPMState),
++        VMSTATE_UINT8(s.tis.active_locty, TPMState),
++        VMSTATE_UINT8(s.tis.aborting_locty, TPMState),
++        VMSTATE_UINT8(s.tis.next_locty, TPMState),
++
++        VMSTATE_STRUCT_ARRAY(s.tis.loc, TPMState, TPM_TIS_NUM_LOCALITIES, 1,
++                             vmstate_locty, TPMLocality),
++
++        VMSTATE_END_OF_LIST()
++    }
+ };
+ 
+ static Property tpm_tis_properties[] = {
+diff --git a/hw/tpm/tpm_tis.h b/hw/tpm/tpm_tis.h
+index a1df41fa21..b7fc0ea1a9 100644
+--- a/hw/tpm/tpm_tis.h
++++ b/hw/tpm/tpm_tis.h
+@@ -54,6 +54,8 @@ typedef struct TPMLocality {
+ 
+ typedef struct TPMTISEmuState {
+     QEMUBH *bh;
++    bool bh_scheduled; /* bh scheduled but did not run yet */
++
+     uint32_t offset;
+     uint8_t buf[TPM_TIS_BUFFER_MAX];
+ 
+diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+index 7b35429725..b6ff74d946 100644
+--- a/hw/tpm/tpm_util.c
++++ b/hw/tpm/tpm_util.c
+@@ -22,6 +22,17 @@
+ #include "qemu/osdep.h"
+ #include "tpm_util.h"
+ #include "tpm_int.h"
++#include "tpm_ioctl.h"
++#include "qemu/error-report.h"
++
++#define DEBUG_TPM 0
++
++#define DPRINTF(fmt, ...) do { \
++    if (DEBUG_TPM) { \
++        fprintf(stderr, fmt, ## __VA_ARGS__); \
++    } \
++} while (0)
++
+ 
+ /*
+  * A basic test of a TPM device. We expect a well formatted response header
+@@ -125,3 +136,215 @@ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version)
+ 
+     return 1;
+ }
++
++static void tpm_sized_buffer_reset(TPMSizedBuffer *tsb)
++{
++    g_free(tsb->buffer);
++    tsb->buffer = NULL;
++    tsb->size = 0;
++}
++
++/*
++ * Transfer a TPM state blob from the TPM into a provided buffer.
++ *
++ * @fd: file descriptor to talk to the CUSE TPM
++ * @type: the type of blob to transfer
++ * @decrypted_blob: whether we request to receive decrypted blobs
++ * @tsb: the TPMSizeBuffer to fill with the blob
++ * @flags: the flags to return to the caller
++ */
++static int tpm_util_cuse_get_state_blob(int fd,
++                                        uint8_t type,
++                                        bool decrypted_blob,
++                                        TPMSizedBuffer *tsb,
++                                        uint32_t *flags)
++{
++    ptm_getstate pgs;
++    uint16_t offset = 0;
++    ptm_res res;
++    ssize_t n;
++    size_t to_read;
++
++    tpm_sized_buffer_reset(tsb);
++
++    pgs.u.req.state_flags = (decrypted_blob) ? PTM_STATE_FLAG_DECRYPTED : 0;
++    pgs.u.req.type = type;
++    pgs.u.req.offset = offset;
++
++    if (ioctl(fd, PTM_GET_STATEBLOB, &pgs) < 0) {
++        error_report("CUSE TPM PTM_GET_STATEBLOB ioctl failed: %s",
++                     strerror(errno));
++        goto err_exit;
++    }
++    res = pgs.u.resp.tpm_result;
++    if (res != 0 && (res & 0x800) == 0) {
++        error_report("Getting the stateblob (type %d) failed with a TPM "
++                     "error 0x%x", type, res);
++        goto err_exit;
++    }
++
++    *flags = pgs.u.resp.state_flags;
++
++    tsb->buffer = g_malloc(pgs.u.resp.totlength);
++    memcpy(tsb->buffer, pgs.u.resp.data, pgs.u.resp.length);
++    tsb->size = pgs.u.resp.length;
++
++    /* if there are bytes left to get use read() interface */
++    while (tsb->size < pgs.u.resp.totlength) {
++        to_read = pgs.u.resp.totlength - tsb->size;
++        if (unlikely(to_read > SSIZE_MAX)) {
++            to_read = SSIZE_MAX;
++        }
++
++        n = read(fd, &tsb->buffer[tsb->size], to_read);
++        if (n != to_read) {
++            error_report("Could not read stateblob (type %d) : %s",
++                         type, strerror(errno));
++            goto err_exit;
++        }
++        tsb->size += to_read;
++    }
++
++    DPRINTF("tpm_util: got state blob type %d, %d bytes, flags 0x%08x, "
++            "decrypted=%d\n", type, tsb->size, *flags, decrypted_blob);
++
++    return 0;
++
++err_exit:
++    return 1;
++}
++
++int tpm_util_cuse_get_state_blobs(int tpm_fd,
++                                  bool decrypted_blobs,
++                                  TPMBlobBuffers *tpm_blobs)
++{
++    if (tpm_util_cuse_get_state_blob(tpm_fd, PTM_BLOB_TYPE_PERMANENT,
++                                     decrypted_blobs,
++                                     &tpm_blobs->permanent,
++                                     &tpm_blobs->permanent_flags) ||
++       tpm_util_cuse_get_state_blob(tpm_fd, PTM_BLOB_TYPE_VOLATILE,
++                                     decrypted_blobs,
++                                     &tpm_blobs->volatil,
++                                     &tpm_blobs->volatil_flags) ||
++       tpm_util_cuse_get_state_blob(tpm_fd, PTM_BLOB_TYPE_SAVESTATE,
++                                     decrypted_blobs,
++                                     &tpm_blobs->savestate,
++                                     &tpm_blobs->savestate_flags)) {
++        goto err_exit;
++    }
++
++    return 0;
++
++ err_exit:
++    tpm_sized_buffer_reset(&tpm_blobs->volatil);
++    tpm_sized_buffer_reset(&tpm_blobs->permanent);
++    tpm_sized_buffer_reset(&tpm_blobs->savestate);
++
++    return 1;
++}
++
++static int tpm_util_cuse_do_set_stateblob_ioctl(int fd,
++                                                uint32_t flags,
++                                                uint32_t type,
++                                                uint32_t length)
++{
++    ptm_setstate pss;
++
++    pss.u.req.state_flags = flags;
++    pss.u.req.type = type;
++    pss.u.req.length = length;
++
++    if (ioctl(fd, PTM_SET_STATEBLOB, &pss) < 0) {
++        error_report("CUSE TPM PTM_SET_STATEBLOB ioctl failed: %s",
++                     strerror(errno));
++        return 1;
++    }
++
++    if (pss.u.resp.tpm_result != 0) {
++        error_report("Setting the stateblob (type %d) failed with a TPM "
++                     "error 0x%x", type, pss.u.resp.tpm_result);
++        return 1;
++    }
++
++    return 0;
++}
++
++
++/*
++ * Transfer a TPM state blob to the CUSE TPM.
++ *
++ * @fd: file descriptor to talk to the CUSE TPM
++ * @type: the type of TPM state blob to transfer
++ * @tsb: TPMSizeBuffer containing the TPM state blob
++ * @flags: Flags describing the (encryption) state of the TPM state blob
++ */
++static int tpm_util_cuse_set_state_blob(int fd,
++                                        uint32_t type,
++                                        TPMSizedBuffer *tsb,
++                                        uint32_t flags)
++{
++    uint32_t offset = 0;
++    ssize_t n;
++    size_t to_write;
++
++    /* initiate the transfer to the CUSE TPM */
++    if (tpm_util_cuse_do_set_stateblob_ioctl(fd, flags, type, 0)) {
++        return 1;
++    }
++
++    /* use the write() interface for transferring the state blob */
++    while (offset < tsb->size) {
++        to_write = tsb->size - offset;
++        if (unlikely(to_write > SSIZE_MAX)) {
++            to_write = SSIZE_MAX;
++        }
++
++        n = write(fd, &tsb->buffer[offset], to_write);
++        if (n != to_write) {
++            error_report("Writing the stateblob (type %d) failed: %s",
++                         type, strerror(errno));
++            goto err_exit;
++        }
++        offset += to_write;
++    }
++
++    /* inidicate that the transfer is finished */
++    if (tpm_util_cuse_do_set_stateblob_ioctl(fd, flags, type, 0)) {
++        goto err_exit;
++    }
++
++    DPRINTF("tpm_util: set the state blob type %d, %d bytes, flags 0x%08x\n",
++            type, tsb->size, flags);
++
++    return 0;
++
++err_exit:
++    return 1;
++}
++
++int tpm_util_cuse_set_state_blobs(int tpm_fd,
++                                  TPMBlobBuffers *tpm_blobs)
++{
++    ptm_res res;
++
++    if (ioctl(tpm_fd, PTM_STOP, &res) < 0) {
++        error_report("tpm_passthrough: Could not stop "
++                     "the CUSE TPM: %s (%i)",
++                     strerror(errno), errno);
++        return 1;
++    }
++
++    if (tpm_util_cuse_set_state_blob(tpm_fd, PTM_BLOB_TYPE_PERMANENT,
++                                     &tpm_blobs->permanent,
++                                     tpm_blobs->permanent_flags) ||
++        tpm_util_cuse_set_state_blob(tpm_fd, PTM_BLOB_TYPE_VOLATILE,
++                                     &tpm_blobs->volatil,
++                                     tpm_blobs->volatil_flags) ||
++        tpm_util_cuse_set_state_blob(tpm_fd, PTM_BLOB_TYPE_SAVESTATE,
++                                     &tpm_blobs->savestate,
++                                     tpm_blobs->savestate_flags)) {
++        return 1;
++    }
++
++    return 0;
++}
+diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+index df76245e6e..c24071d812 100644
+--- a/hw/tpm/tpm_util.h
++++ b/hw/tpm/tpm_util.h
+@@ -26,4 +26,11 @@
+ 
+ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
+ 
++int tpm_util_cuse_get_state_blobs(int tpm_fd,
++                                  bool decrypted_blobs,
++                                  TPMBlobBuffers *tpm_blobs);
++
++int tpm_util_cuse_set_state_blobs(int tpm_fd,
++                                  TPMBlobBuffers *tpm_blobs);
++
+ #endif /* TPM_TPM_UTIL_H */
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index b58f52d39f..3403821b9d 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -62,6 +62,18 @@ typedef struct TPMSizedBuffer {
+     uint8_t  *buffer;
+ } TPMSizedBuffer;
+ 
++/* blobs from the TPM; part of VM state when migrating */
++typedef struct TPMBlobBuffers {
++    uint32_t permanent_flags;
++    TPMSizedBuffer permanent;
++
++    uint32_t volatil_flags;
++    TPMSizedBuffer volatil;
++
++    uint32_t savestate_flags;
++    TPMSizedBuffer savestate;
++} TPMBlobBuffers;
++
+ struct TPMDriverOps {
+     enum TpmType type;
+     const QemuOptDesc *opts;
+-- 
+2.11.0
+

@@ -1,0 +1,37 @@
+Upstream-Status: Inappropriate [configuration]
+
+written by: Jeff Polk <jeff.polk@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+Index: vlock-2.2.2/man/vlock.1
+===================================================================
+--- vlock-2.2.2.orig/man/vlock.1	2010-07-26 14:12:42.000000000 -0400
++++ vlock-2.2.2/man/vlock.1	2010-07-26 14:13:06.000000000 -0400
+@@ -111,11 +111,6 @@
+ to an invalid value or 0 no timeout is used.  \fBWarning\fR: If this value is
+ too low, you may not be able to unlock your session.
+ .PP
+-.SH FILES
+-.B ~/.vlockrc
+-.IP
+-This file is read by \fBvlock\fR on startup if it exists.  All the variables
+-mentioned above can be set here.
+ .SH SECURITY
+ See the SECURITY file in the \fBvlock\fR distribution for more information.
+ .PP
+Index: vlock-2.2.2/src/vlock.sh
+===================================================================
+--- vlock-2.2.2.orig/src/vlock.sh	2010-07-26 14:12:32.000000000 -0400
++++ vlock-2.2.2/src/vlock.sh	2010-07-26 14:13:33.000000000 -0400
+@@ -35,11 +35,6 @@
+ 
+ ${VLOCK_ENTER_PROMPT}"
+ 
+-# Read user settings.
+-if [ -r "${HOME}/.vlockrc" ] ; then
+-  . "${HOME}/.vlockrc"
+-fi
+-
+ # "Compile" time variables.
+ VLOCK_MAIN="%PREFIX%/sbin/vlock-main"
+ VLOCK_VERSION="%VLOCK_VERSION%"

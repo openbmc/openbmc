@@ -1,0 +1,17 @@
+sgidef.h does not exist on musl and its not needed to compile
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+Index: git/src/base/linux_syscall_support.h
+===================================================================
+--- git.orig/src/base/linux_syscall_support.h
++++ git/src/base/linux_syscall_support.h
+@@ -164,7 +164,7 @@ extern "C" {
+ #include <endian.h>
+ #include <fcntl.h>
+ 
+-#ifdef __mips__
++#if defined(__mips__) && defined(__glibc__)
+ /* Include definitions of the ABI currently in use.                          */
+ #include <sgidefs.h>
+ #endif

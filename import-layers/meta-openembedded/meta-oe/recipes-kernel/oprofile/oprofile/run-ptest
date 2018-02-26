@@ -1,0 +1,19 @@
+#!/bin/sh
+
+saved_dir=$PWD
+for dir in */tests ; do
+	cd $dir
+	for atest in * ; do
+		if [ \( -x $atest \) -a \( -f $atest \) ] ; then
+			./$atest > ${atest}.stdout 2> ${atest}.stderr
+			if [ $? = 0 ] ; then
+				echo "PASS: $dir $atest"
+				rm ${atest}.stdout ${atest}.stderr
+			else
+				echo "FAIL: ${dir}/${atest}"
+			fi
+		fi
+	done
+	cd $saved_dir
+done
+

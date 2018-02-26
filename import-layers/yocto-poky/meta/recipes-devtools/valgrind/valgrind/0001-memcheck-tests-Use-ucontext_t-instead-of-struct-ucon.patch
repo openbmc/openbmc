@@ -1,0 +1,30 @@
+From 629ac492b1d9bc709d17337eb9b1c28603eca250 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 28 Jun 2017 11:01:25 -0700
+Subject: [PATCH] memcheck/tests: Use ucontext_t instead of struct ucontext
+
+glibc 2.26 does not expose struct ucontext anymore
+
+Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=381769]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ memcheck/tests/linux/stack_changes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/memcheck/tests/linux/stack_changes.c b/memcheck/tests/linux/stack_changes.c
+index ffb49c6..acc4109 100644
+--- a/memcheck/tests/linux/stack_changes.c
++++ b/memcheck/tests/linux/stack_changes.c
+@@ -11,7 +11,7 @@
+ // checks that Valgrind notices their stack changes properly.
+ 
+ #ifdef __GLIBC__
+-typedef  struct ucontext  mycontext;
++typedef ucontext_t  mycontext;
+ 
+ mycontext ctx1, ctx2, oldc;
+ int count;
+-- 
+2.13.2
+

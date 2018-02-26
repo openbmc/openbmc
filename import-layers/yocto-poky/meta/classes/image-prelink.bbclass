@@ -1,6 +1,6 @@
 do_rootfs[depends] += "prelink-native:do_populate_sysroot"
 
-IMAGE_PREPROCESS_COMMAND += "prelink_setup; prelink_image; "
+IMAGE_PREPROCESS_COMMAND_append_libc-glibc = " prelink_setup; prelink_image; "
 
 python prelink_setup () {
     oe.utils.write_ld_so_conf(d)
@@ -36,7 +36,17 @@ prelink_image () {
 	dynamic_loader=$(linuxloader)
 
 	# prelink!
-	${STAGING_SBINDIR_NATIVE}/prelink --root ${IMAGE_ROOTFS} -amR -N -c ${sysconfdir}/prelink.conf --dynamic-linker $dynamic_loader
+	if [ "$BUILD_REPRODUCIBLE_BINARIES" = "1" ]; then
+		bbnote " prelink: BUILD_REPRODUCIBLE_BINARIES..."
+		if [ "$REPRODUCIBLE_TIMESTAMP_ROOTFS" = "" ]; then
+			export PRELINK_TIMESTAMP=`git log -1 --pretty=%ct `
+		else
+			export PRELINK_TIMESTAMP=$REPRODUCIBLE_TIMESTAMP_ROOTFS
+		fi
+		${STAGING_SBINDIR_NATIVE}/prelink --root ${IMAGE_ROOTFS} -am -N -c ${sysconfdir}/prelink.conf --dynamic-linker $dynamic_loader
+	else
+		${STAGING_SBINDIR_NATIVE}/prelink --root ${IMAGE_ROOTFS} -amR -N -c ${sysconfdir}/prelink.conf --dynamic-linker $dynamic_loader
+	fi
 
 	# Remove the prelink.conf if we had to add it.
 	if [ "$dummy_prelink_conf" = "true" ]; then

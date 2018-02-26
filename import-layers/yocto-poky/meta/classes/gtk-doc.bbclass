@@ -48,6 +48,7 @@ do_compile_prepend_class-target () {
 # which may then get deleted (or their dependencies) and potentially segfault
 export GIO_MODULE_DIR=${STAGING_LIBDIR}/gio/modules-dummy
 
+GIR_EXTRA_LIBS_PATH=\`find ${B} -name *.so -printf "%h\n"|sort|uniq| tr '\n' ':'\`\$GIR_EXTRA_LIBS_PATH
 GIR_EXTRA_LIBS_PATH=\`find ${B} -name .libs| tr '\n' ':'\`\$GIR_EXTRA_LIBS_PATH
 
 if [ -d ".libs" ]; then

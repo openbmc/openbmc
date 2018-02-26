@@ -12,6 +12,7 @@ SRC_URI = "git://github.com/mirror/x264;branch=stable \
            file://don-t-default-to-cortex-a9-with-neon.patch \
            file://Fix-X32-build-by-disabling-asm.patch \
            "
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 SRCREV = "2b741f81e51f92d053d87a49f59ff1026553a0f6"
 

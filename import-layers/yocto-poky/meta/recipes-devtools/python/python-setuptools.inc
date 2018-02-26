@@ -3,14 +3,14 @@ HOMEPAGE = "https://pypi.python.org/pypi/setuptools"
 SECTION = "devel/python"
 LICENSE = "MIT"
 
-LIC_FILES_CHKSUM = "file://setup.py;beginline=146;endline=146;md5=3e8df024d6c1442d18e84acf8fbbc475"
+LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=19;md5=9a33897f1bca1160d7aad3835152e158"
 
 SRCNAME = "setuptools"
 
-SRC_URI = "https://files.pythonhosted.org/packages/source/s/${SRCNAME}/${SRCNAME}-${PV}.tar.gz"
+SRC_URI = "https://files.pythonhosted.org/packages/source/s/${SRCNAME}/${SRCNAME}-${PV}.zip"
 
-SRC_URI[md5sum] = "8b67868c3430e978833ebd0d1b766694"
-SRC_URI[sha256sum] = "8303fb24306385f09bf8b0e5a385c1548e42e8efc08558d64049bc0d55ea012d"
+SRC_URI[md5sum] = "b9e6c049617bac0f9e908a41ab4a29ac"
+SRC_URI[sha256sum] = "b0fe5d432d922df595e918577c51458d63f245115d141b309ac32ecfca329df5"
 
 UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/setuptools"
 

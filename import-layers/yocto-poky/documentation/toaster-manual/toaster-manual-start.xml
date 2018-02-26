@@ -41,7 +41,7 @@
             The requirements file is located in the
             <filename>bitbake</filename> directory, which is located in the
             root directory of the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>
             (e.g. <filename>poky/bitbake/toaster-requirements.txt</filename>).
             The dependencies appear in a <filename>pip</filename>,
             install-compatible format.
@@ -54,7 +54,7 @@
                 You need to install the packages that Toaster requires.
                 Use this command:
                 <literallayout class='monospaced'>
-     $ $ pip3 install --user -r bitbake/toaster-requirements.txt
+     $ pip3 install --user -r bitbake/toaster-requirements.txt
                 </literallayout>
                 The previous command installs the necessary Toaster modules
                 into a local python 3 cache in your

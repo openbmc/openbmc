@@ -1,7 +1,7 @@
 HOMEPAGE = "https://github.com/opencontainers/image-tools"
 SUMMARY = "A collection of tools for working with the OCI image format specification"
 LICENSE = "Apache-2"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
+LIC_FILES_CHKSUM = "file://src/import/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 DEPENDS = "\
            oci-image-spec \
@@ -12,11 +12,13 @@ DEPENDS = "\
            spf13-pflag \
           "
 
-SRC_URI = "git://github.com/opencontainers/image-tools.git"
-SRCREV = "a358e03fde4e3628bf9fb7656bf643b63f975636"
-PV = "0.1.0+git${SRCPV}"
+SRC_URI = "git://github.com/opencontainers/image-tools.git \
+           file://0001-image-manifest-Recursively-remove-pre-existing-entri.patch \
+           file://0002-image-manifest-Split-unpackLayerEntry-into-its-own-f.patch"
 
-S = "${WORKDIR}/git"
+SRCREV = "4abe1a166f9be97e8e71b1bb4d7599cc29323011"
+PV = "0.2.0-dev+git${SRCPV}"
+GO_IMPORT = "import"
 
 inherit goarch
 inherit go
@@ -35,10 +37,11 @@ do_compile() {
 	#
 	# We also need to link in the ipallocator directory as that is not under
 	# a src directory.
-	ln -sfn . "${S}/vendor/src"
-	mkdir -p "${S}/vendor/src/github.com/opencontainers/image-tools/"
-	ln -sfn "${S}/image" "${S}/vendor/src/github.com/opencontainers/image-tools/image"
-	export GOPATH="${S}/vendor"
+	ln -sfn . "${S}/src/import/vendor/src"
+	mkdir -p "${S}/src/import/vendor/src/github.com/opencontainers/image-tools/"
+	ln -sfn "${S}/src/import/image" "${S}/src/import/vendor/src/github.com/opencontainers/image-tools/image"
+	ln -sfn "${S}/src/import/version" "${S}/src/import/vendor/src/github.com/opencontainers/image-tools/version"
+	export GOPATH="${S}/src/import/vendor"
 
 	# Pass the needed cflags/ldflags so that cgo
 	# can find the needed headers files and libraries
@@ -47,15 +50,14 @@ do_compile() {
 	export LDFLAGS=""
 	export CGO_CFLAGS="${BUILDSDK_CFLAGS} --sysroot=${STAGING_DIR_TARGET}"
 	export CGO_LDFLAGS="${BUILDSDK_LDFLAGS} --sysroot=${STAGING_DIR_TARGET}"
+	cd ${S}/src/import
 
-	oe_runmake tools
+	oe_runmake tool
 }
 
 do_install() {
 	install -d ${D}/${sbindir}
-	install ${S}/oci-create-runtime-bundle ${D}/${sbindir}/
-	install ${S}/oci-image-validate ${D}/${sbindir}/
-	install ${S}/oci-unpack ${D}/${sbindir}/
+	install ${S}/src/import/oci-image-tool ${D}/${sbindir}/
 }
 
 INSANE_SKIP_${PN} += "ldflags"

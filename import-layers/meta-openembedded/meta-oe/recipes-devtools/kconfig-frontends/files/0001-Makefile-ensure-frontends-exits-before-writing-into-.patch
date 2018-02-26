@@ -1,0 +1,32 @@
+From 780b0b8e48551ba49b011caeeb09101a09c14a61 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Fri, 26 May 2017 17:11:32 +0100
+Subject: [PATCH] Makefile: ensure frontends/ exits before writing into it
+
+As previously, if GCC dependencies are not being written and the build is out of
+tree then frontends/ won't exist so we need to create it.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
+(cherry picked from commit f7986375129d1ada7dc6abeeec5b9d00ef6f7149)
+Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 1baa110..434db5d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -171,6 +171,7 @@ if COND_kconfig
+ bin_SCRIPTS += frontends/kconfig
+ 
+ frontends/kconfig: frontends/kconfig.in
++	$(MKDIR_P) $(@D)
+ 	$(AM_V_GEN)$(SED) -e 's/@KCFG_LIST@/$(kcfg_list)/g' \
+ 		$< >$@
+ 	@chmod +x $@
+-- 
+2.12.0
+

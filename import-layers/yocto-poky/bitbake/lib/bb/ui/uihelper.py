@@ -61,6 +61,9 @@ class BBUIHelper:
                 self.running_tasks[event.pid]['progress'] = event.progress
                 self.running_tasks[event.pid]['rate'] = event.rate
                 self.needUpdate = True
+        else:
+            return False
+        return True
 
     def getTasks(self):
         self.needUpdate = False

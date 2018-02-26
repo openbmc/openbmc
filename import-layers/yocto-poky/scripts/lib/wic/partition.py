@@ -26,10 +26,9 @@
 
 import logging
 import os
-import tempfile
 
 from wic import WicError
-from wic.utils.misc import exec_cmd, exec_native_cmd, get_bitbake_var
+from wic.misc import exec_cmd, exec_native_cmd, get_bitbake_var
 from wic.pluginbase import PluginMgr
 
 logger = logging.getLogger('wic')
@@ -47,10 +46,12 @@ class Partition():
         self.fsopts = args.fsopts
         self.fstype = args.fstype
         self.label = args.label
+        self.mkfs_extraopts = args.mkfs_extraopts
         self.mountpoint = args.mountpoint
         self.no_table = args.no_table
         self.num = None
         self.overhead_factor = args.overhead_factor
+        self.part_name = args.part_name
         self.part_type = args.part_type
         self.rootfs_dir = args.rootfs_dir
         self.size = args.size
@@ -205,7 +206,7 @@ class Partition():
         """
         p_prefix = os.environ.get("PSEUDO_PREFIX", "%s/usr" % native_sysroot)
         p_localstatedir = os.environ.get("PSEUDO_LOCALSTATEDIR",
-                                         "%s/../pseudo" % rootfs_dir)
+                                         "%s/../pseudo" %  get_bitbake_var("IMAGE_ROOTFS"))
         p_passwd = os.environ.get("PSEUDO_PASSWD", rootfs_dir)
         p_nosymlinkexp = os.environ.get("PSEUDO_NOSYMLINKEXP", "1")
         pseudo = "export PSEUDO_PREFIX=%s;" % p_prefix
@@ -257,14 +258,14 @@ class Partition():
         with open(rootfs, 'w') as sparse:
             os.ftruncate(sparse.fileno(), rootfs_size * 1024)
 
-        extra_imagecmd = "-i 8192"
+        extraopts = self.mkfs_extraopts or "-F -i 8192"
 
         label_str = ""
         if self.label:
             label_str = "-L %s" % self.label
 
-        mkfs_cmd = "mkfs.%s -F %s %s %s -d %s" % \
-            (self.fstype, extra_imagecmd, rootfs, label_str, rootfs_dir)
+        mkfs_cmd = "mkfs.%s %s %s %s -d %s" % \
+            (self.fstype, extraopts, rootfs, label_str, rootfs_dir)
         exec_native_cmd(mkfs_cmd, native_sysroot, pseudo=pseudo)
 
         mkfs_cmd = "fsck.%s -pvfD %s" % (self.fstype, rootfs)
@@ -290,8 +291,9 @@ class Partition():
         if self.label:
             label_str = "-L %s" % self.label
 
-        mkfs_cmd = "mkfs.%s -b %d -r %s %s %s" % \
-            (self.fstype, rootfs_size * 1024, rootfs_dir, label_str, rootfs)
+        mkfs_cmd = "mkfs.%s -b %d -r %s %s %s %s" % \
+            (self.fstype, rootfs_size * 1024, rootfs_dir, label_str,
+             self.mkfs_extraopts, rootfs)
         exec_native_cmd(mkfs_cmd, native_sysroot, pseudo=pseudo)
 
     def prepare_rootfs_msdos(self, rootfs, oe_builddir, rootfs_dir,
@@ -313,8 +315,10 @@ class Partition():
         if self.fstype == 'msdos':
             size_str = "-F 16" # FAT 16
 
-        dosfs_cmd = "mkdosfs %s -S 512 %s -C %s %d" % (label_str, size_str,
-                                                       rootfs, rootfs_size)
+        extraopts = self.mkfs_extraopts or '-S 512'
+
+        dosfs_cmd = "mkdosfs %s %s %s -C %s %d" % \
+                    (label_str, size_str, extraopts, rootfs, rootfs_size)
         exec_native_cmd(dosfs_cmd, native_sysroot)
 
         mcopy_cmd = "mcopy -i %s -s %s/* ::/" % (rootfs, rootfs_dir)
@@ -330,8 +334,9 @@ class Partition():
         """
         Prepare content for a squashfs rootfs partition.
         """
-        squashfs_cmd = "mksquashfs %s %s -noappend" % \
-                       (rootfs_dir, rootfs)
+        extraopts = self.mkfs_extraopts or '-noappend'
+        squashfs_cmd = "mksquashfs %s %s %s" % \
+                       (rootfs_dir, rootfs, extraopts)
         exec_native_cmd(squashfs_cmd, native_sysroot, pseudo=pseudo)
 
     def prepare_empty_partition_ext(self, rootfs, oe_builddir,
@@ -343,14 +348,14 @@ class Partition():
         with open(rootfs, 'w') as sparse:
             os.ftruncate(sparse.fileno(), size * 1024)
 
-        extra_imagecmd = "-i 8192"
+        extraopts = self.mkfs_extraopts or "-i 8192"
 
         label_str = ""
         if self.label:
             label_str = "-L %s" % self.label
 
         mkfs_cmd = "mkfs.%s -F %s %s %s" % \
-            (self.fstype, extra_imagecmd, label_str, rootfs)
+            (self.fstype, extraopts, label_str, rootfs)
         exec_native_cmd(mkfs_cmd, native_sysroot)
 
     def prepare_empty_partition_btrfs(self, rootfs, oe_builddir,
@@ -366,8 +371,9 @@ class Partition():
         if self.label:
             label_str = "-L %s" % self.label
 
-        mkfs_cmd = "mkfs.%s -b %d %s %s" % \
-            (self.fstype, self.size * 1024, label_str, rootfs)
+        mkfs_cmd = "mkfs.%s -b %d %s %s %s" % \
+                   (self.fstype, self.size * 1024, label_str,
+                    self.mkfs_extraopts, rootfs)
         exec_native_cmd(mkfs_cmd, native_sysroot)
 
     def prepare_empty_partition_msdos(self, rootfs, oe_builddir,
@@ -385,8 +391,11 @@ class Partition():
         if self.fstype == 'msdos':
             size_str = "-F 16" # FAT 16
 
-        dosfs_cmd = "mkdosfs %s -S 512 %s -C %s %d" % (label_str, size_str,
-                                                       rootfs, blocks)
+        extraopts = self.mkfs_extraopts or '-S 512'
+
+        dosfs_cmd = "mkdosfs %s %s %s -C %s %d" % \
+                    (label_str, extraopts, size_str, rootfs, blocks)
+
         exec_native_cmd(dosfs_cmd, native_sysroot)
 
         chmod_cmd = "chmod 644 %s" % rootfs

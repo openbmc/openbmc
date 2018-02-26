@@ -2,7 +2,12 @@ SUMMARY = "C#-like programming language for easing GObject programming"
 DESCRIPTION = "Vala is a C#-like language dedicated to ease GObject programming. \
 Vala compiles to plain C and has no runtime environment nor penalities whatsoever."
 SECTION = "devel"
-DEPENDS = "bison-native flex-native libxslt-native glib-2.0"
+DEPENDS = "bison-native flex-native glib-2.0"
+
+# Appending libxslt-native to dependencies has an effect
+# of rebuilding the manual, which is very slow. Let's do this
+# only when api-documentation distro feature is enabled.
+DEPENDS_append_class-target = " ${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'libxslt-native', '', d)}"
 
 # vala-native contains a native version of vapigen, which we use instead of the target one
 DEPENDS_append_class-target = " vala-native"

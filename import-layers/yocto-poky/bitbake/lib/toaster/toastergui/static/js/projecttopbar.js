@@ -73,14 +73,14 @@ function projectTopBarInit(ctx) {
 
   newBuildTargetBuildBtn.click(function (e) {
     e.preventDefault();
-    if (!newBuildTargetInput.val()) {
+    if (!newBuildTargetInput.val().trim()) {
       return;
     }
     /* We use the value of the input field so as to maintain any command also
      * added e.g. core-image-minimal:clean and because we can build targets
      * that toaster doesn't yet know about
      */
-    selectedTarget = { name: newBuildTargetInput.val() };
+    selectedTarget = { name: newBuildTargetInput.val().trim() };
 
     /* Fire off the build */
     libtoaster.startABuild(null, selectedTarget.name,

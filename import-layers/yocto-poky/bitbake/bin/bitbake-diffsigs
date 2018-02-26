@@ -34,18 +34,39 @@ import bb.msg
 
 logger = bb.msg.logger_create('bitbake-diffsigs')
 
+def find_siginfo(tinfoil, pn, taskname, sigs=None):
+    result = None
+    tinfoil.set_event_mask(['bb.event.FindSigInfoResult',
+                            'logging.LogRecord',
+                            'bb.command.CommandCompleted',
+                            'bb.command.CommandFailed'])
+    ret = tinfoil.run_command('findSigInfo', pn, taskname, sigs)
+    if ret:
+        while True:
+            event = tinfoil.wait_event(1)
+            if event:
+                if isinstance(event, bb.command.CommandCompleted):
+                    break
+                elif isinstance(event, bb.command.CommandFailed):
+                    logger.error(str(event))
+                    sys.exit(2)
+                elif isinstance(event, bb.event.FindSigInfoResult):
+                    result = event.result
+                elif isinstance(event, logging.LogRecord):
+                    logger.handle(event)
+    else:
+        logger.error('No result returned from findSigInfo command')
+        sys.exit(2)
+    return result
+
 def find_compare_task(bbhandler, pn, taskname, sig1=None, sig2=None, color=False):
     """ Find the most recent signature files for the specified PN/task and compare them """
-
-    if not hasattr(bb.siggen, 'find_siginfo'):
-        logger.error('Metadata does not support finding signature data files')
-        sys.exit(1)
 
     if not taskname.startswith('do_'):
         taskname = 'do_%s' % taskname
 
     if sig1 and sig2:
-        sigfiles = bb.siggen.find_siginfo(pn, taskname, [sig1, sig2], bbhandler.config_data)
+        sigfiles = find_siginfo(bbhandler, pn, taskname, [sig1, sig2])
         if len(sigfiles) == 0:
             logger.error('No sigdata files found matching %s %s matching either %s or %s' % (pn, taskname, sig1, sig2))
             sys.exit(1)
@@ -57,7 +78,7 @@ def find_compare_task(bbhandler, pn, taskname, sig1=None, sig2=None, color=False
             sys.exit(1)
         latestfiles = [sigfiles[sig1], sigfiles[sig2]]
     else:
-        filedates = bb.siggen.find_siginfo(pn, taskname, None, bbhandler.config_data)
+        filedates = find_siginfo(bbhandler, pn, taskname)
         latestfiles = sorted(filedates.keys(), key=lambda f: filedates[f])[-3:]
         if not latestfiles:
             logger.error('No sigdata files found matching %s %s' % (pn, taskname))
@@ -69,7 +90,7 @@ def find_compare_task(bbhandler, pn, taskname, sig1=None, sig2=None, color=False
     # Define recursion callback
     def recursecb(key, hash1, hash2):
         hashes = [hash1, hash2]
-        hashfiles = bb.siggen.find_siginfo(key, None, hashes, bbhandler.config_data)
+        hashfiles = find_siginfo(bbhandler, key, None, hashes)
 
         recout = []
         if len(hashfiles) == 0:

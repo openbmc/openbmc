@@ -1,0 +1,43 @@
+From 08face4353d80111973aba9c1304c92158cfad0e Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 28 Mar 2017 16:40:12 +0300
+Subject: [PATCH] Take linking flags from LDFLAGS env var
+
+This fixes "No GNU_HASH in the elf binary" issues.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Configurations/unix-Makefile.tmpl | 2 +-
+ Configure                         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
+index c029817..43b769b 100644
+--- a/Configurations/unix-Makefile.tmpl
++++ b/Configurations/unix-Makefile.tmpl
+@@ -173,7 +173,7 @@ CROSS_COMPILE= {- $config{cross_compile_prefix} -}
+ CC= $(CROSS_COMPILE){- $target{cc} -}
+ CFLAGS={- our $cflags2 = join(" ",(map { "-D".$_} @{$target{defines}}, @{$config{defines}}),"-DOPENSSLDIR=\"\\\"\$(OPENSSLDIR)\\\"\"","-DENGINESDIR=\"\\\"\$(ENGINESDIR)\\\"\"") -} {- $target{cflags} -} {- $config{cflags} -}
+ CFLAGS_Q={- $cflags2 =~ s|([\\"])|\\$1|g; $cflags2 -} {- $config{cflags} -}
+-LDFLAGS= {- $target{lflags} -}
++LDFLAGS= {- $target{lflags}." ".$ENV{'LDFLAGS'} -}
+ PLIB_LDFLAGS= {- $target{plib_lflags} -}
+ EX_LIBS= {- $target{ex_libs} -} {- $config{ex_libs} -}
+ LIB_CFLAGS={- $target{shared_cflag} || "" -}
+diff --git a/Configure b/Configure
+index aee7cc3..274d236 100755
+--- a/Configure
++++ b/Configure
+@@ -979,7 +979,7 @@ $config{build_file} = $target{build_file};
+ $config{defines} = [];
+ $config{cflags} = "";
+ $config{ex_libs} = "";
+-$config{shared_ldflag} = "";
++$config{shared_ldflag} = $ENV{'LDFLAGS'};
+ 
+ # Make sure build_scheme is consistent.
+ $target{build_scheme} = [ $target{build_scheme} ]
+-- 
+2.11.0
+

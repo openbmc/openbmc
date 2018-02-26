@@ -1,0 +1,56 @@
+From 97cb9405f281f54d4083f3126d441c8b44eafb89 Mon Sep 17 00:00:00 2001
+From: Paul Barker <pbarker@toganlabs.com>
+Date: Thu, 7 Sep 2017 19:14:20 +0000
+Subject: [PATCH] Don't require internet connection during build
+
+The following issues break offline builds:
+
+* Building the man page uses a web service hosted on heroku.
+
+* Makefile.ffmpeg explicitly does a "git clone" from the internet.
+
+Signed-off-by: Paul Barker <pbarker@toganlabs.com>
+Upstream-status: Inappropriate
+---
+ Makefile        | 6 ++----
+ Makefile.ffmpeg | 2 +-
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 60501b1..6471f0f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -79,14 +79,12 @@ ffmpeg:
+ 	make -f Makefile.ffmpeg
+ 	make -f Makefile.ffmpeg install
+ 
+-dist: omxplayer.bin omxplayer.1
++dist: omxplayer.bin
+ 	mkdir -p $(DIST)/usr/lib/omxplayer
+ 	mkdir -p $(DIST)/usr/bin
+ 	mkdir -p $(DIST)/usr/share/doc/omxplayer
+-	mkdir -p $(DIST)/usr/share/man/man1
+ 	cp omxplayer omxplayer.bin $(DIST)/usr/bin
+ 	cp COPYING $(DIST)/usr/share/doc/omxplayer
+ 	cp README.md $(DIST)/usr/share/doc/omxplayer/README
+-	cp omxplayer.1 $(DIST)/usr/share/man/man1
+ 	cp -P ffmpeg_compiled/usr/lib/*.so* $(DIST)/usr/lib/omxplayer/
+-	tar -czf omxplayer-dist.tar.gz $(DIST)
+\ No newline at end of file
++	tar -czf omxplayer-dist.tar.gz $(DIST)
+diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
+index 22d495c..8651724 100644
+--- a/Makefile.ffmpeg
++++ b/Makefile.ffmpeg
+@@ -6,7 +6,7 @@ FFMPEG_EXTRA_CFLAGS?=-mfpu=vfp -mfloat-abi=$(FLOAT) -mno-apcs-stack-check -mstru
+ WORK=$(PWD)
+ 
+ .PHONY : all
+-all: checkout configure compile
++all: configure compile
+ 
+ .PHONY : copy
+ copy:
+-- 
+2.7.4
+

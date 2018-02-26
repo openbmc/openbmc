@@ -1,0 +1,33 @@
+From b5226c096a0b7049874858e94a59d43e10ba3fd2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Sep 2017 10:22:56 -0700
+Subject: [PATCH] hevcpred_msa.c: Fix build by Including libavcodec/hevcdec.h
+
+src/libavcodec/mips/hevcpred_msa.c:1913:32: error: unknown type name 'HEVCContext'; did you mean 'HEVCPredContext'?
+ void ff_intra_pred_8_16x16_msa(HEVCContext *s, int x0, int y0, int c_idx)
+                                ^~~~~~~~~~~
+                                HEVCPredContext
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ gst-libs/ext/libav/libavcodec/mips/hevcpred_msa.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gst-libs/ext/libav/libavcodec/mips/hevcpred_msa.c b/gst-libs/ext/libav/libavcodec/mips/hevcpred_msa.c
+index 6a3b281..963c64c 100644
+--- a/gst-libs/ext/libav/libavcodec/mips/hevcpred_msa.c
++++ b/gst-libs/ext/libav/libavcodec/mips/hevcpred_msa.c
+@@ -18,7 +18,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
+-#include "libavcodec/hevc.h"
++#include "libavcodec/hevcdec.h"
+ #include "libavutil/mips/generic_macros_msa.h"
+ #include "hevcpred_mips.h"
+ 
+-- 
+2.14.1
+

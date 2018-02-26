@@ -1,4 +1,5 @@
 SUMMARY = "Architecture-dependent configuration for opkg"
+HOMEPAGE = "http://code.google.com/p/opkg/"
 LICENSE = "MIT"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 PR = "r1"

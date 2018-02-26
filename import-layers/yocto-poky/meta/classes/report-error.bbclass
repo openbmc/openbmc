@@ -29,6 +29,13 @@ python errorreport_handler () {
         import json
         import codecs
 
+        def nativelsb():
+            nativelsbstr = e.data.getVar("NATIVELSBSTRING")
+            # provide a bit more host info in case of uninative build
+            if e.data.getVar('UNINATIVE_URL') != 'unset':
+                return '/'.join([nativelsbstr, lsb_distro_identifier(e.data)])
+            return nativelsbstr
+
         logpath = e.data.getVar('ERR_REPORT_DIR')
         datafile = os.path.join(logpath, "error-report.txt")
 
@@ -38,7 +45,7 @@ python errorreport_handler () {
             machine = e.data.getVar("MACHINE")
             data['machine'] = machine
             data['build_sys'] = e.data.getVar("BUILD_SYS")
-            data['nativelsb'] = e.data.getVar("NATIVELSBSTRING")
+            data['nativelsb'] = nativelsb()
             data['distro'] = e.data.getVar("DISTRO")
             data['target_sys'] = e.data.getVar("TARGET_SYS")
             data['failures'] = []

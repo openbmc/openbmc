@@ -1,0 +1,41 @@
+From 0c332b7d94f8425c4f33344ddf406b6eea458861 Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Mon, 8 May 2017 17:01:49 +0300
+Subject: [PATCH 4/6] typedefs.h: add support for 64-bit and big endian MIPS
+
+The 64-bit check is taken from the upstream webrtc project, the big
+endian check is my own addition.
+
+Upstream-Status: Pending
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ webrtc/typedefs.h | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/webrtc/typedefs.h b/webrtc/typedefs.h
+index d875490..d1b2f54 100644
+--- a/webrtc/typedefs.h
++++ b/webrtc/typedefs.h
+@@ -41,9 +41,18 @@
+ //#define WEBRTC_ARCH_ARMEL
+ #define WEBRTC_ARCH_32_BITS
+ #define WEBRTC_ARCH_LITTLE_ENDIAN
+-#elif defined(__MIPSEL__)
++#elif defined(__MIPSEL__) || defined(__MIPSEB__)
++#define WEBRTC_ARCH_MIPS_FAMILY
++#if defined(__LP64__)
++#define WEBRTC_ARCH_64_BITS
++#else
+ #define WEBRTC_ARCH_32_BITS
++#endif
++#if defined(__MIPSEL__)
+ #define WEBRTC_ARCH_LITTLE_ENDIAN
++#else
++#define WEBRTC_ARCH_BIG_ENDIAN
++#endif
+ #elif defined(__pnacl__)
+ #define WEBRTC_ARCH_32_BITS
+ #define WEBRTC_ARCH_LITTLE_ENDIAN
+-- 
+2.11.0
+

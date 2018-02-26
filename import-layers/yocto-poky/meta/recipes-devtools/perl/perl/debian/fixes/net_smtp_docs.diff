@@ -7,6 +7,7 @@ Bug-Debian: http://bugs.debian.org/100195
 Bug: http://rt.cpan.org/Public/Bug/Display.html?id=36038
 
 Patch-Name: fixes/net_smtp_docs.diff
+Upstream-Status: Pending
 ---
  cpan/libnet/lib/Net/SMTP.pm | 1 +
  1 file changed, 1 insertion(+)

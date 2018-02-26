@@ -1,0 +1,27 @@
+From 9488f92c1d0c7931c3e17950d1f9eea2aeb3e2bd Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 14 Jun 2017 15:56:18 +0300
+Subject: [PATCH] Include limits.h so that PATH_MAX is defined (an issue on
+ musl).
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ trace-listen.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/trace-listen.c b/trace-listen.c
+index 17ff9d8..838d6bc 100644
+--- a/trace-listen.c
++++ b/trace-listen.c
+@@ -31,6 +31,7 @@
+ #include <fcntl.h>
+ #include <signal.h>
+ #include <errno.h>
++#include <limits.h>
+ 
+ #include "trace-local.h"
+ #include "trace-msg.h"
+-- 
+2.11.0
+

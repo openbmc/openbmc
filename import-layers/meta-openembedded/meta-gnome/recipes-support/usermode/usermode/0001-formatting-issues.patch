@@ -1,0 +1,34 @@
+From 7a316dad0697af2ef4e8079a5af51565a8195aa6 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 24 Jul 2017 01:42:30 -0400
+Subject: [PATCH] userhelper.c: fix formatting issues
+
+Fixed when compile with "-Wformat -Wformat-security -Werror=format-security":
+|../usermode-1.111/userhelper.c:585:4: error: format not a string
+literal and no format arguments [-Werror=format-security]
+|    text = g_strdup_printf(dgettext(data->domain, data->banner));
+|    ^~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ userhelper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/userhelper.c b/userhelper.c
+index 76ad492..ee0da49 100644
+--- a/userhelper.c
++++ b/userhelper.c
+@@ -582,7 +582,7 @@ converse_console(int num_msg, const struct pam_message **msg,
+ 
+ 	if (banner == 0) {
+ 		if ((data->banner != NULL) && (data->domain != NULL)) {
+-			text = g_strdup_printf(dgettext(data->domain, data->banner));
++			text = g_strdup_printf("%s", dgettext(data->domain, data->banner));
+ 		} else {
+ 			if ((service != NULL) && (strlen(service) > 0)) {
+ 				if (data->fallback_allowed) {
+-- 
+2.8.1
+

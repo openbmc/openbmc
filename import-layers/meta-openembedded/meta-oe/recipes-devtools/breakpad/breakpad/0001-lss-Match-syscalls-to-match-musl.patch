@@ -1,0 +1,45 @@
+From 5f7333e4f7b7485598bd71aa80967e1a16a7f901 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Sep 2017 22:57:52 -0700
+Subject: [PATCH] lss: Match syscalls to match musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ linux_syscall_support.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+Index: lss/linux_syscall_support.h
+===================================================================
+--- lss.orig/linux_syscall_support.h
++++ lss/linux_syscall_support.h
+@@ -793,6 +793,9 @@ struct kernel_statfs {
+ #define FUTEX_TRYLOCK_PI_PRIVATE  (FUTEX_TRYLOCK_PI | FUTEX_PRIVATE_FLAG)
+ #endif
+ 
++#ifndef __NR_fstatat
++#define __NR_fstatat __NR_fstatat64
++#endif
+ 
+ #if defined(__x86_64__)
+ #ifndef ARCH_SET_GS
+@@ -924,6 +927,7 @@ struct kernel_statfs {
+ #ifndef __NR_fallocate
+ #define __NR_fallocate          324
+ #endif
++
+ /* End of i386 definitions                                                   */
+ #elif defined(__ARM_ARCH_3__) || defined(__ARM_EABI__)
+ #ifndef __NR_setresuid
+@@ -1211,6 +1215,12 @@ struct kernel_statfs {
+ #ifndef __NR_fallocate
+ #define __NR_fallocate          285
+ #endif
++#ifndef __NR_pread
++#define __NR_pread __NR_pread64
++#endif
++#ifndef __NR_pwrite
++#define __NR_pwrite __NR_pwrite64
++#endif
+ /* End of x86-64 definitions                                                 */
+ #elif defined(__mips__)
+ #if _MIPS_SIM == _MIPS_SIM_ABI32

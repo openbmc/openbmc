@@ -69,7 +69,7 @@ class BuildProject(metaclass=ABCMeta):
 
     def clean(self):
         self._run('rm -rf %s' % self.targetdir)
-        subprocess.call('rm -f %s' % self.localarchive, shell=True)
+        subprocess.check_call('rm -f %s' % self.localarchive, shell=True)
         pass
 
 class TargetBuildProject(BuildProject):
@@ -136,4 +136,4 @@ class SDKBuildProject(BuildProject):
 
     def _run(self, cmd):
         self.log("Running . %s; " % self.sdkenv + cmd)
-        return subprocess.call(". %s; " % self.sdkenv + cmd, shell=True)
+        return subprocess.check_call(". %s; " % self.sdkenv + cmd, shell=True)

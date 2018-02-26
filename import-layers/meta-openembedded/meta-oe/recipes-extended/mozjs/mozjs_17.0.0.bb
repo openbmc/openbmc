@@ -1,4 +1,5 @@
 SUMMARY = "SpiderMonkey is Mozilla's JavaScript engine written in C/C++"
+HOMEPAGE = "http://www.mozilla.org/js/"
 LICENSE = "MPL-2.0"
 LIC_FILES_CHKSUM = "file://../../LICENSE;md5=815ca599c9df247a0c7f619bab123dad"
 
@@ -51,6 +52,9 @@ PACKAGECONFIG[x11] = "--with-x --x-includes=${STAGING_INCDIR} --x-libraries=${ST
 
 # mozjs requires autoreconf 2.13
 do_configure() {
+    export HOST_CFLAGS="${BUILD_CFLAGS}"
+    export HOST_CXXFLAGS="${BUILD_CPPFLAGS}"
+    export HOST_LDFLAGS="${BUILD_LDFLAGS}"
     ( cd ${S}
       gnu-configize --force
       mv config.guess config.sub build/autoconf )

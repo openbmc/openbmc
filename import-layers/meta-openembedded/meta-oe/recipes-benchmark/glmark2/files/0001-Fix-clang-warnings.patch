@@ -1,0 +1,31 @@
+From 35e9f80518d666db5f9c62e8072ffbc307b4af4f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Aug 2017 08:30:01 -0700
+Subject: [PATCH] Fix clang warnings
+
+../src/native-state-drm.cpp:334:20: error: cannot pass object of non-trivial type 'std::__cxx11::basic_string<char>' through variadic function; call will abort at runtime [-Wnon-pod-varargs]
+                   dev_path);
+                   ^
+1 error generated.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/native-state-drm.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/native-state-drm.cpp b/src/native-state-drm.cpp
+index dc2b323..62566ee 100644
+--- a/src/native-state-drm.cpp
++++ b/src/native-state-drm.cpp
+@@ -331,7 +331,7 @@ static int open_using_udev_scan()
+     if (!valid_fd(fd)) {
+         // %m is GLIBC specific... Maybe use strerror here...
+         Log::error("Tried to use '%s' but failed.\nReason : %m",
+-                   dev_path);
++                   dev_path.c_str());
+     }
+     else
+         Log::debug("Success!\n");
+-- 
+2.14.1
+

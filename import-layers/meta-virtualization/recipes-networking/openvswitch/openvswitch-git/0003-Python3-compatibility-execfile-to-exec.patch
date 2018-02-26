@@ -1,0 +1,33 @@
+From 9cbae86be03756df76560c15720756f9ac088144 Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Thu, 29 Jun 2017 20:33:23 -0700
+Subject: [PATCH 3/8] Python3 compatibility: execfile to exec
+
+Commit a4d10a7ca937d73873f6f98619d88682e69f5dbe from
+https://github.com/openvswitch/ovs.git
+
+Allow compability with python3 and python2 by changing execfile() to
+exec().
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+Signed-off-by: Ben Pfaff <blp@ovn.org>
+---
+ ovsdb/ovsdb-idlc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ovsdb/ovsdb-idlc.in b/ovsdb/ovsdb-idlc.in
+index 8b85f0d..3fa1a0f 100755
+--- a/ovsdb/ovsdb-idlc.in
++++ b/ovsdb/ovsdb-idlc.in
+@@ -17,7 +17,7 @@ def parseSchema(filename):
+ 
+ def annotateSchema(schemaFile, annotationFile):
+     schemaJson = ovs.json.from_file(schemaFile)
+-    execfile(annotationFile, globals(), {"s": schemaJson})
++    exec(compile(open(annotationFile, "rb").read(), annotationFile, 'exec'), globals(), {"s": schemaJson})
+     ovs.json.to_stream(schemaJson, sys.stdout)
+     sys.stdout.write('\n')
+ 
+-- 
+2.5.0
+

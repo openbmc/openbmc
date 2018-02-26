@@ -31,7 +31,7 @@ gcc/Changelog:
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Rejected
+Upstream-Status: Denied
 
  gcc/config/i386/i386.c       | 4 ++--
  libgcc/config/i386/cpuinfo.c | 6 +++---

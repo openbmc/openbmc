@@ -1,17 +1,18 @@
-From a59f13fab31a6e25bb03b2c2bc3aea576f857b6c Mon Sep 17 00:00:00 2001
+From 6ff255eff4fea6350b5e0462fee176fadc26fc1c Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Sun, 12 Jun 2016 18:32:49 +0300
 Subject: [PATCH] configure.ac: install GtkBuilder interface files for GTK+3
  too
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/lathiat/avahi/pull/130]
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
 ---
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index aebb716..48bdf63 100644
+index 87a9a17..9860dcc 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -965,7 +965,7 @@ AC_SUBST(avahi_socket)
@@ -24,5 +25,5 @@ index aebb716..48bdf63 100644
  	AC_SUBST(interfacesdir)
  fi
 -- 
-2.1.4
+2.8.1
 

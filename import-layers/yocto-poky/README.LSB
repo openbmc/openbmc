@@ -1,0 +1,25 @@
+OE-Core aims to be able to provide basic LSB compatible images. There
+are some challenges for OE as LSB isn't always 100% relevant to its
+target embedded and IoT audiences. 
+
+One challenge is that the LSB spec is no longer being actively
+developed [https://github.com/LinuxStandardBase/lsb] and has 
+components which are end of life or significantly dated. OE 
+therefore provides compatibility with the following caveats:
+
+* Qt4 is provided by the separate meta-qt4 layer. Its noted that Qt4 
+  is end of life and this isn't something the core project regularly 
+  tests any longer. Users are recommended to group together to support
+  maintenance of that layer. [http://git.yoctoproject.org/cgit/cgit.cgi/meta-qt4/]
+
+* mailx has been dropped since its no longer being developed upstream 
+  and there are better, more modern replacements such as s-nail 
+  (http://sdaoden.eu/code.html) or mailutils (http://mailutils.org/).
+
+* A few perl modules that were required by LSB 4.x aren't provided:
+  libclass-isa, libenv, libdumpvalue, libfile-checktree,
+  libi18n-collate, libpod-plainer.
+
+* libpng 1.2 isn't provided; oe-core includes the latest release of libpng
+  instead.
+

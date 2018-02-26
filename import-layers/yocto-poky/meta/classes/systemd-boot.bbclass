@@ -7,10 +7,9 @@
 #                        maintenance.
 #
 # Set EFI_PROVIDER = "systemd-boot" to use systemd-boot on your live images instead of grub-efi
-# (images built by image-live.bbclass or image-vm.bbclass)
+# (images built by image-live.bbclass)
 
 do_bootimg[depends] += "${MLPREFIX}systemd-boot:do_deploy"
-do_bootdirectdisk[depends] += "${MLPREFIX}systemd-boot:do_deploy"
 
 EFIDIR = "/EFI/BOOT"
 
@@ -100,6 +99,8 @@ python build_efi_cfg() {
             bb.fatal('OVERRIDES not defined')
 
         entryfile = "%s/%s.conf" % (s, label)
+        if not os.path.exists(s):
+            os.makedirs(s)
         d.appendVar("SYSTEMD_BOOT_ENTRIES", " " + entryfile)
         try:
             entrycfg = open(entryfile, "w")

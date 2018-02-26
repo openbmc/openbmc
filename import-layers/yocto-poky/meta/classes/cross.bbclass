@@ -50,7 +50,7 @@ SSTATE_SCAN_CMD ?= "${SSTATE_SCAN_CMD_NATIVE}"
 # Path mangling needed by the cross packaging
 # Note that we use := here to ensure that libdir and includedir are
 # target paths.
-target_base_prefix := "${base_prefix}"
+target_base_prefix := "${root_prefix}"
 target_prefix := "${prefix}"
 target_exec_prefix := "${exec_prefix}"
 target_base_libdir = "${target_base_prefix}/${baselib}"

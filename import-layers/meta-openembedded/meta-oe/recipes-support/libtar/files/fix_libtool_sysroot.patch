@@ -1,0 +1,19 @@
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 4623100..1c6b43d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -13,6 +13,7 @@ AC_CONFIG_MACRO_DIR([autoconf])
+ AM_INIT_AUTOMAKE([dist-bzip2])
+ ENCAP_PKG([], [postinstall-encap])
+ 
++LT_INIT
+ 
+ dnl ### Load subdirectory modules. ##################################
+ PSG_MODULE([compat])
+-- 
+2.8.1
+

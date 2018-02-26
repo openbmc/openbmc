@@ -1,0 +1,76 @@
+Ensure FASTOP messages get an ACK reply so that the client can be sure the server
+recieved them. This means if connections are terminated, data isn't lost.
+
+RP 2017/9/22
+
+Upstream-Status: Submitted
+
+Index: pseudo-1.8.2/pseudo_client.c
+===================================================================
+--- pseudo-1.8.2.orig/pseudo_client.c
++++ pseudo-1.8.2/pseudo_client.c
+@@ -1331,21 +1331,19 @@ pseudo_client_request(pseudo_msg_t *msg,
+ 		 * indicating a successful send.
+ 		 */
+ 		pseudo_debug(PDBGF_CLIENT | PDBGF_VERBOSE, "sent!\n");
+-		if (msg->type != PSEUDO_MSG_FASTOP) {
+-			response = pseudo_msg_receive(connect_fd);
+-			if (!response) {
+-				pseudo_debug(PDBGF_CLIENT, "expected response did not occur; retrying\n");
++		response = pseudo_msg_receive(connect_fd);
++		if (!response) {
++			pseudo_debug(PDBGF_CLIENT, "expected response did not occur; retrying\n");
++		} else {
++			if (response->type != PSEUDO_MSG_ACK) {
++				pseudo_debug(PDBGF_CLIENT, "got non-ack response %d\n", response->type);
++				return 0;
++			} else if (msg->type != PSEUDO_MSG_FASTOP) {
++				pseudo_debug(PDBGF_CLIENT | PDBGF_VERBOSE, "got response type %d\n", response->type);
++				return response;
+ 			} else {
+-				if (response->type != PSEUDO_MSG_ACK) {
+-					pseudo_debug(PDBGF_CLIENT, "got non-ack response %d\n", response->type);
+-					return 0;
+-				} else {
+-					pseudo_debug(PDBGF_CLIENT | PDBGF_VERBOSE, "got response type %d\n", response->type);
+-					return response;
+-				}
++				return 0;
+ 			}
+-		} else {
+-			return 0;
+ 		}
+ 	}
+ 	pseudo_diag("pseudo: server connection persistently failed, aborting.\n");
+Index: pseudo-1.8.2/pseudo_server.c
+===================================================================
+--- pseudo-1.8.2.orig/pseudo_server.c
++++ pseudo-1.8.2/pseudo_server.c
+@@ -463,6 +463,11 @@ close_client(int client) {
+ 			--highest_client;
+ }
+ 
++static pseudo_msg_t server_fastop_reply = { 
++        .type = PSEUDO_MSG_ACK,
++        .op = OP_NONE,
++};
++
+ /* Actually process a request.
+  */
+ static int
+@@ -515,8 +520,14 @@ serve_client(int i) {
+ 		 * pseudo_server_response.
+ 		 */
+ 		if (in->type != PSEUDO_MSG_SHUTDOWN) {
+-                        if (in->type == PSEUDO_MSG_FASTOP)
++                        if (in->type == PSEUDO_MSG_FASTOP) {
+                                 send_response = 0;
++                                /* For fastops we reply now to say we got the data */
++                                if ((rc = pseudo_msg_send(clients[i].fd, &server_fastop_reply, 0, NULL)) != 0) {
++                                            pseudo_debug(PDBGF_SERVER, "failed to send fastop ack to client %d [%d]: %d (%s)\n",
++                                                    i, (int) clients[i].pid, rc, strerror(errno));
++                                }
++                        }
+ 			/* most messages don't need these, but xattr may */
+ 			response_path = 0;
+ 			response_pathlen = -1;

@@ -24,6 +24,7 @@ SRC_URI = "git://github.com/xinetd-org/xinetd.git;protocol=https \
       file://0001-configure-Use-HAVE_SYS_RESOURCE_H-to-guard-sys-resou.patch \
       file://xinetd.service \
       "
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 SRCREV = "68bb9ab9e9f214ad8a2322f28ac1d6733e70bc24"
 

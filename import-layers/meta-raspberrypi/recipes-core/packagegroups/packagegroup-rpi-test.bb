@@ -4,8 +4,13 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 
 inherit packagegroup
 
+COMPATIBLE_MACHINE = "^rpi$"
+
+OMXPLAYER_rpi = "omxplayer"
+OMXPLAYER_rpi_aarch64 = ""
+
 RDEPENDS_${PN} = "\
-    omxplayer \
+    ${OMXPLAYER} \
     bcm2835-tests \
     wiringpi \
     rpio \

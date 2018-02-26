@@ -1,0 +1,35 @@
+From 48e7c0f5b2f5d777a16ac5584dc4f50f1dfa832c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Oct 2017 12:27:53 -0700
+Subject: [PATCH 08/12] Do not enable nss tests
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 3cc8f3451..df20a9a11 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -5290,6 +5290,7 @@ EXTRA_DIST += \
+ 	src/timesync/timesyncd.conf.in
+ 
+ # ------------------------------------------------------------------------------
++if ENABLE_NSS_SYSTEMD
+ test_nss_SOURCES = \
+ 	src/test/test-nss.c
+ 
+@@ -5302,7 +5303,6 @@ manual_tests += \
+ 	test-nss
+ 
+ # ------------------------------------------------------------------------------
+-if ENABLE_NSS_SYSTEMD
+ libnss_systemd_la_SOURCES = \
+ 	src/nss-systemd/nss-systemd.sym \
+ 	src/nss-systemd/nss-systemd.c
+-- 
+2.14.2
+

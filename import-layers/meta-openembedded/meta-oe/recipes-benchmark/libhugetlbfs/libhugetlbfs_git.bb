@@ -33,6 +33,8 @@ EXTRA_OEMAKE = "'ARCH=${LIBHUGETLBFS_ARCH}' 'OPT=${CFLAGS}' 'CC=${CC}' ${LIBARGS
 PARALLEL_MAKE = ""
 CFLAGS += "-fexpensive-optimizations -frename-registers -fomit-frame-pointer -g0"
 
+export HUGETLB_LDSCRIPT_PATH="${S}/ldscripts"
+
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 #The CUSTOM_LDSCRIPTS doesn't work with the gold linker

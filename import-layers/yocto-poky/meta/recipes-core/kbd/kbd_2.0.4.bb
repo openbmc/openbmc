@@ -1,4 +1,5 @@
 SUMMARY = "Keytable files and keyboard utilities"
+HOMEPAGE = "http://www.kbd-project.org/"
 # everything minus console-fonts is GPLv2+
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a5fcc36121d93e1f69d96a313078c8b5"

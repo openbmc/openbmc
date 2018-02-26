@@ -1,0 +1,26 @@
+From 2a3ab04bbdc4624792886aa51579eadb427ef99e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 07:42:11 -0700
+Subject: [PATCH] memory.h: Include stdint.h for uintptr_t
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libstrongswan/utils/utils/memory.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/libstrongswan/utils/utils/memory.h b/src/libstrongswan/utils/utils/memory.h
+index b978e7c..55aaaf5 100644
+--- a/src/libstrongswan/utils/utils/memory.h
++++ b/src/libstrongswan/utils/utils/memory.h
+@@ -22,6 +22,8 @@
+ #ifndef MEMORY_H_
+ #define MEMORY_H_
+ 
++#include <stdint.h>
++
+ /**
+  * Helper function that compares two binary blobs for equality
+  */
+-- 
+2.13.2
+

@@ -47,7 +47,7 @@ class TaskData:
     """
     BitBake Task Data implementation
     """
-    def __init__(self, abort = True, tryaltconfigs = False, skiplist = None, allowincomplete = False):
+    def __init__(self, abort = True, skiplist = None, allowincomplete = False):
         self.build_targets = {}
         self.run_targets = {}
 
@@ -66,7 +66,6 @@ class TaskData:
         self.failed_fns = []
 
         self.abort = abort
-        self.tryaltconfigs = tryaltconfigs
         self.allowincomplete = allowincomplete
 
         self.skiplist = skiplist

@@ -1,0 +1,208 @@
+From 76c370a929e5ab5dbc81c2fbcf4e50f4fbc08ce9 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Tue, 15 Aug 2017 15:53:37 +0800
+Subject: [PATCH 10/11] build shared libs
+
+Upstream-Status: Pending
+
+Port patches from Fedora to build shared libs rather than static libs.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase to 4.3.6
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ client/Makefile.am       |  4 ++--
+ common/tests/Makefile.am | 13 +++++--------
+ configure.ac             | 12 ++----------
+ dhcpctl/Makefile.am      | 14 ++++++--------
+ omapip/Makefile.am       |  7 +++----
+ relay/Makefile.am        |  5 ++---
+ server/Makefile.am       |  7 +++----
+ server/tests/Makefile.am |  7 +++----
+ 8 files changed, 26 insertions(+), 43 deletions(-)
+
+diff --git a/client/Makefile.am b/client/Makefile.am
+index 84d8131..e776bf0 100644
+--- a/client/Makefile.am
++++ b/client/Makefile.am
+@@ -15,7 +15,7 @@ dhclient_SOURCES = $(srcdir)/clparse.c $(srcdir)/dhclient.c $(srcdir)/dhc6.c \
+ 		   scripts/bsdos scripts/freebsd scripts/linux scripts/macos \
+ 		   scripts/netbsd scripts/nextstep scripts/openbsd \
+ 		   scripts/solaris scripts/openwrt
+-dhclient_LDADD = ../common/libdhcp.a ../omapip/libomapi.a $(BINDLIBDIR)/libirs.a \
+-		 $(BINDLIBDIR)/libdns.a $(BINDLIBDIR)/libisccfg.a $(BINDLIBDIR)/libisc.a
++dhclient_LDADD = ../common/libdhcp.a ../omapip/libomapi.la \
++		  -L$(BINDLIBDIR) -lirs -ldns -lisccfg -lisc
+ man_MANS = dhclient.8 dhclient-script.8 dhclient.conf.5 dhclient.leases.5
+ EXTRA_DIST = $(man_MANS)
+diff --git a/common/tests/Makefile.am b/common/tests/Makefile.am
+index 2f98d22..8745e88 100644
+--- a/common/tests/Makefile.am
++++ b/common/tests/Makefile.am
+@@ -15,26 +15,23 @@ ATF_TESTS += alloc_unittest dns_unittest misc_unittest ns_name_unittest
+ alloc_unittest_SOURCES = test_alloc.c $(top_srcdir)/tests/t_api_dhcp.c
+ alloc_unittest_LDADD = $(ATF_LDFLAGS)
+ alloc_unittest_LDADD += ../libdhcp.a  \
+-	../../omapip/libomapi.a $(BINDLIBDIR)/libirs.a \
+-	$(BINDLIBDIR)/libdns.a $(BINDLIBDIR)/libisccfg.a  $(BINDLIBDIR)/libisc.a
++	../../omapip/libomapi.la -L$(BINDLIBDIR) -ldns -lisccfg -lisc
+ 
+ dns_unittest_SOURCES = dns_unittest.c $(top_srcdir)/tests/t_api_dhcp.c
+ dns_unittest_LDADD = $(ATF_LDFLAGS)
+ dns_unittest_LDADD += ../libdhcp.a  \
+-	../../omapip/libomapi.a $(BINDLIBDIR)/libirs.a \
+-	$(BINDLIBDIR)/libdns.a $(BINDLIBDIR)/libisccfg.a  $(BINDLIBDIR)/libisc.a
++	../../omapip/libomapi.la -L$(BINDLIBDIR) -ldns -lisccfg -lisc
+ 
+ misc_unittest_SOURCES = misc_unittest.c $(top_srcdir)/tests/t_api_dhcp.c
+ misc_unittest_LDADD = $(ATF_LDFLAGS)
+ misc_unittest_LDADD += ../libdhcp.a  \
+-	../../omapip/libomapi.a $(BINDLIBDIR)/libirs.a \
+-	$(BINDLIBDIR)/libdns.a $(BINDLIBDIR)/libisccfg.a  $(BINDLIBDIR)/libisc.a
++	../../omapip/libomapi.la -L$(BINDLIBDIR) -ldns -lisccfg -lisc
+ 
+ ns_name_unittest_SOURCES = ns_name_test.c $(top_srcdir)/tests/t_api_dhcp.c
+ ns_name_unittest_LDADD = $(ATF_LDFLAGS)
+ ns_name_unittest_LDADD += ../libdhcp.a  \
+-	../../omapip/libomapi.a $(BINDLIBDIR)/libirs.a \
+-	$(BINDLIBDIR)/libdns.a $(BINDLIBDIR)/libisccfg.a  $(BINDLIBDIR)/libisc.a
++	../../omapip/libomapi.a -L$(BINDLIBDIR) \
++	-ldns -lisccfg -lisc
+ 
+ check: $(ATF_TESTS)
+ 	@if test $(top_srcdir) != ${top_builddir}; then \
+diff --git a/configure.ac b/configure.ac
+index 8e9f509..bfe988a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -47,16 +47,8 @@ AM_CONDITIONAL(CROSS_COMPILING, test "$cross_compiling" = "yes")
+ # Use this to define _GNU_SOURCE to pull in the IPv6 Advanced Socket API.
+ AC_USE_SYSTEM_EXTENSIONS
+ 
+-AC_PROG_RANLIB
+-
+-AC_PATH_PROG(AR, ar)
+-AC_SUBST(AR)
+-
+-if test "X$AR" = "X"; then
+-	AC_MSG_ERROR([
+-ar program not found.  Please fix your PATH to include the directory in
+-which ar resides, or set AR in the environment with the full path to ar.])
+-fi
++# Use libtool to simplify building of shared libraries
++AC_PROG_LIBTOOL
+ 
+ AC_CONFIG_HEADERS([includes/config.h])
+ 
+diff --git a/dhcpctl/Makefile.am b/dhcpctl/Makefile.am
+index 9b2486e..784cdf7 100644
+--- a/dhcpctl/Makefile.am
++++ b/dhcpctl/Makefile.am
+@@ -3,19 +3,17 @@ BINDLIBDIR = @BINDDIR@
+ AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_srcdir)
+ 
+ bin_PROGRAMS = omshell
+-lib_LIBRARIES = libdhcpctl.a
++lib_LTLIBRARIES = libdhcpctl.la
+ noinst_PROGRAMS = cltest
+ man_MANS = omshell.1 dhcpctl.3
+ EXTRA_DIST = $(man_MANS)
+ 
+ omshell_SOURCES = omshell.c
+-omshell_LDADD = libdhcpctl.a ../common/libdhcp.a ../omapip/libomapi.a \
+-	        $(BINDLIBDIR)/libirs.a $(BINDLIBDIR)/libdns.a \
+-	        $(BINDLIBDIR)/libisccfg.a $(BINDLIBDIR)/libisc.a
++omshell_LDADD = libdhcpctl.la ../common/libdhcp.a ../omapip/libomapi.la \
++	        -L$(BINDLIBDIR) -lirs -ldns -lisccfg -lisc
+ 
+-libdhcpctl_a_SOURCES = dhcpctl.c callback.c remote.c
++libdhcpctl_la_SOURCES = dhcpctl.c callback.c remote.c
+ 
+ cltest_SOURCES = cltest.c
+-cltest_LDADD = libdhcpctl.a ../common/libdhcp.a ../omapip/libomapi.a \
+-	       $(BINDLIBDIR)/libirs.a $(BINDLIBDIR)/libdns.a \
+-               $(BINDLIBDIR)/libisccfg.a $(BINDLIBDIR)/libisc.a
++cltest_LDADD = libdhcpctl.la ../common/libdhcp.a ../omapip/libomapi.la \
++	       -L$(BINDLIBDIR) -lirs -ldns -lisccfg -lisc
+diff --git a/omapip/Makefile.am b/omapip/Makefile.am
+index e4a8599..c0c7a1e 100644
+--- a/omapip/Makefile.am
++++ b/omapip/Makefile.am
+@@ -1,10 +1,10 @@
+ BINDLIBDIR = @BINDDIR@
+ AM_CPPFLAGS = -I$(top_srcdir)/includes
+ 
+-lib_LIBRARIES = libomapi.a
++lib_LTLIBRARIES = libomapi.la
+ noinst_PROGRAMS = svtest
+ 
+-libomapi_a_SOURCES = protocol.c buffer.c alloc.c result.c connection.c \
++libomapi_la_SOURCES = protocol.c buffer.c alloc.c result.c connection.c \
+ 		     errwarn.c listener.c dispatch.c generic.c support.c \
+ 		     handle.c message.c convert.c hash.c auth.c inet_addr.c \
+ 		     array.c trace.c toisc.c iscprint.c isclib.c
+@@ -13,6 +13,5 @@ man_MANS = omapi.3
+ EXTRA_DIST = $(man_MANS)
+ 
+ svtest_SOURCES = test.c
+-svtest_LDADD = libomapi.a $(BINDLIBDIR)/libirs.a $(BINDLIBDIR)/libdns.a \
+-		$(BINDLIBDIR)/libisccfg.a $(BINDLIBDIR)/libisc.a
++svtest_LDADD = libomapi.la -L$(BINDLIBDIR) -lirs -ldns -lisccfg -lisc
+ 
+diff --git a/relay/Makefile.am b/relay/Makefile.am
+index b3bf578..f47009f 100644
+--- a/relay/Makefile.am
++++ b/relay/Makefile.am
+@@ -4,9 +4,8 @@ AM_CPPFLAGS = -DLOCALSTATEDIR='"@localstatedir@"' -I$(top_srcdir)/includes
+ 
+ sbin_PROGRAMS = dhcrelay
+ dhcrelay_SOURCES = dhcrelay.c
+-dhcrelay_LDADD = ../common/libdhcp.a ../omapip/libomapi.a \
+-		 $(BINDLIBDIR)/libirs.a $(BINDLIBDIR)/libdns.a \
+-		 $(BINDLIBDIR)/libisccfg.a $(BINDLIBDIR)/libisc.a
++dhcrelay_LDADD = ../common/libdhcp.a ../omapip/libomapi.la \
++		 -L$(BINDLIBDIR) -lirs -ldns -lisccfg -lisc
+ man_MANS = dhcrelay.8
+ EXTRA_DIST = $(man_MANS)
+ 
+diff --git a/server/Makefile.am b/server/Makefile.am
+index b5d8c2d..d7f876d 100644
+--- a/server/Makefile.am
++++ b/server/Makefile.am
+@@ -15,10 +15,9 @@ dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c confpars.c db.c class.c failover.c \
+ 		dhcpv6.c mdb6.c ldap.c ldap_casa.c leasechain.c ldap_krb_helper.c
+ 
+ dhcpd_CFLAGS = $(LDAP_CFLAGS)
+-dhcpd_LDADD = ../common/libdhcp.a ../omapip/libomapi.a \
+-	      ../dhcpctl/libdhcpctl.a $(BINDLIBDIR)/libirs.a \
+-	      $(BINDLIBDIR)/libdns.a $(BINDLIBDIR)/libisccfg.a \
+-	      $(BINDLIBDIR)/libisc.a $(LDAP_LIBS)
++dhcpd_LDADD = ../common/libdhcp.a ../omapip/libomapi.la \
++	      ../dhcpctl/libdhcpctl.la -L$(BINDLIBDIR) \
++	      -lirs -ldns -lisccfg -lisc $(LDAP_LIBS)
+ 
+ man_MANS = dhcpd.8 dhcpd.conf.5 dhcpd.leases.5
+ EXTRA_DIST = $(man_MANS)
+diff --git a/server/tests/Makefile.am b/server/tests/Makefile.am
+index 9821081..de95872 100644
+--- a/server/tests/Makefile.am
++++ b/server/tests/Makefile.am
+@@ -19,10 +19,9 @@ DHCPSRC = ../dhcp.c ../bootp.c ../confpars.c ../db.c ../class.c      \
+           ../ddns.c ../dhcpleasequery.c ../dhcpv6.c ../mdb6.c        \
+           ../ldap.c ../ldap_casa.c ../dhcpd.c ../leasechain.c
+ 
+-DHCPLIBS = $(top_builddir)/common/libdhcp.a $(top_builddir)/omapip/libomapi.a \
+-          $(top_builddir)/dhcpctl/libdhcpctl.a $(BINDLIBDIR)/libirs.a \
+-	  $(BINDLIBDIR)/libdns.a $(BINDLIBDIR)/libisccfg.a \
+-	  $(BINDLIBDIR)/libisc.a
++DHCPLIBS = $(top_builddir)/common/libdhcp.a $(top_builddir)/omapip/libomapi.la \
++          $(top_builddir)/dhcpctl/libdhcpctl.la \
++          -L$(BINDLIBDIR) -lirs -ldns -lisccfg -lisc
+ 
+ ATF_TESTS =
+ if HAVE_ATF
+-- 
+1.8.3.1
+

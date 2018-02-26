@@ -1,0 +1,82 @@
+From 71447f04979b267f8866573b67a4340b2719d799 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 4 Aug 2017 14:10:43 +0800
+Subject: [PATCH] setup.py: pass missing libraries to Extension for multiprocessing module
+
+In the following commit:
+...
+commit e711cafab13efc9c1fe6c5cd75826401445eb585
+Author: Benjamin Peterson <benjamin@python.org>
+Date:   Wed Jun 11 16:44:04 2008 +0000
+
+    Merged revisions 64104,64117 via svnmerge from
+    svn+ssh://pythondev@svn.python.org/python/trunk
+...
+(see diff in setup.py)
+It assigned libraries for multiprocessing module according
+the host_platform, but not pass it to Extension.
+
+In glibc, the following commit caused two definition of
+sem_getvalue are different.
+https://sourceware.org/git/?p=glibc.git;a=commit;h=042e1521c794a945edc43b5bfa7e69ad70420524
+(see diff in nptl/sem_getvalue.c for detail)
+`__new_sem_getvalue' is the latest sem_getvalue@@GLIBC_2.1
+and `__old_sem_getvalue' is to compat the old version
+sem_getvalue@GLIBC_2.0.
+
+To build python for embedded Linux systems:
+http://www.yoctoproject.org/docs/2.3.1/yocto-project-qs/yocto-project-qs.html
+If not explicitly link to library pthread (-lpthread), it will
+load glibc's sem_getvalue randomly at runtime.
+
+Such as build python on linux x86_64 host and run the python
+on linux x86_32 target. If not link library pthread, it caused
+multiprocessing bounded semaphore could not work correctly.
+...
+>>> import multiprocessing
+>>> pool_sema = multiprocessing.BoundedSemaphore(value=1)
+>>> pool_sema.acquire()
+True
+>>> pool_sema.release()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: semaphore or lock released too many times
+...
+
+And the semaphore issue also caused multiprocessing.Queue().put() hung.
+
+Upstream-Status: Submitted [https://github.com/python/cpython/pull/2999]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ setup.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 54054c2..9646bfc 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1586,8 +1586,10 @@ class PyBuildExt(build_ext):
+         elif host_platform.startswith('netbsd'):
+             macros = dict()
+             libraries = []
+-
+-        else:                                   # Linux and other unices
++        elif host_platform.startswith(('linux')):
++            macros = dict()
++            libraries = ['pthread']
++        else:                                   # Other unices
+             macros = dict()
+             libraries = ['rt']
+ 
+@@ -1610,6 +1612,7 @@ class PyBuildExt(build_ext):
+         if sysconfig.get_config_var('WITH_THREAD'):
+             exts.append ( Extension('_multiprocessing', multiprocessing_srcs,
+                                     define_macros=macros.items(),
++                                    libraries=libraries,
+                                     include_dirs=["Modules/_multiprocessing"]))
+         else:
+             missing.append('_multiprocessing')
+-- 
+2.7.4
+

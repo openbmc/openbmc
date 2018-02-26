@@ -11,11 +11,11 @@ HOMEPAGE = "http://openvswitch.org/"
 SECTION = "networking"
 LICENSE = "Apache-2"
 
-DEPENDS += "bridge-utils openssl python perl python-six-native coreutils-native"
+DEPENDS += "bridge-utils openssl python3 perl python3-six-native coreutils-native"
 
 RDEPENDS_${PN} += "util-linux-uuidgen util-linux-libuuid coreutils \
-	python perl perl-module-strict ${PN}-switch \
-        bash python-twisted python-six"
+        python3 perl perl-module-strict ${PN}-switch \
+        bash python3-twisted python3-six"
 RDEPENDS_${PN}-testcontroller = "${PN} lsb ${PN}-pki"
 RDEPENDS_${PN}-switch = "${PN} openssl procps util-linux-uuidgen"
 RDEPENDS_${PN}-pki = "${PN}"
@@ -34,7 +34,7 @@ SRC_URI = "\
 	"
 
 EXTRA_OECONF += "\
-	PYTHON=python \
+	PYTHON=python3 \
 	PYTHON3=python3 \
 	PERL=${bindir}/perl \
 	"
@@ -70,7 +70,7 @@ FILES_${PN} += "${datadir}/ovsdbmonitor"
 FILES_${PN} += "/run"
 
 FILES_${PN} += "${libdir}/python${PYTHON_BASEVERSION}/"
-inherit autotools update-rc.d systemd pythonnative
+inherit autotools update-rc.d systemd python3native
 
 SYSTEMD_PACKAGES = "${PN}-switch"
 SYSTEMD_SERVICE_${PN}-switch = " \
@@ -85,6 +85,12 @@ INITSCRIPT_PARAMS_${PN}-switch = "defaults 71"
 
 INITSCRIPT_NAME_${PN}-testcontroller = "openvswitch-testcontroller"
 INITSCRIPT_PARAMS_${PN}-testcontroller = "defaults 72"
+
+do_configure_prepend() {
+	# Work around the for Makefile CC=$(if ....) by swapping out any
+	# "-Wa," assembly directives with "-Xassembler
+	CC=`echo '${CC}' | sed 's/-Wa,/-Xassembler /g'`
+}
 
 do_install_append() {
 	install -d ${D}/${sysconfdir}/default/

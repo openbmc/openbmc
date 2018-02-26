@@ -17,17 +17,10 @@ from oe.gpg_sign import get_signer
 def create_index(arg):
     index_cmd = arg
 
-    try:
-        bb.note("Executing '%s' ..." % index_cmd)
-        result = subprocess.check_output(index_cmd, stderr=subprocess.STDOUT, shell=True).decode("utf-8")
-    except subprocess.CalledProcessError as e:
-        return("Index creation command '%s' failed with return code %d:\n%s" %
-               (e.cmd, e.returncode, e.output.decode("utf-8")))
-
+    bb.note("Executing '%s' ..." % index_cmd)
+    result = subprocess.check_output(index_cmd, stderr=subprocess.STDOUT, shell=True).decode("utf-8")
     if result:
         bb.note(result)
-
-    return None
 
 """
 This method parse the output from the package managerand return
@@ -104,12 +97,24 @@ class Indexer(object, metaclass=ABCMeta):
 class RpmIndexer(Indexer):
     def write_index(self):
         if self.d.getVar('PACKAGE_FEED_SIGN') == '1':
-            raise NotImplementedError('Package feed signing not yet implementd for rpm')
+            signer = get_signer(self.d, self.d.getVar('PACKAGE_FEED_GPG_BACKEND'))
+        else:
+            signer = None
 
         createrepo_c = bb.utils.which(os.environ['PATH'], "createrepo_c")
         result = create_index("%s --update -q %s" % (createrepo_c, self.deploy_dir))
         if result:
             bb.fatal(result)
+
+        # Sign repomd
+        if signer:
+            sig_type = self.d.getVar('PACKAGE_FEED_GPG_SIGNATURE_TYPE')
+            is_ascii_sig = (sig_type.upper() != "BIN")
+            signer.detach_sign(os.path.join(self.deploy_dir, 'repodata', 'repomd.xml'),
+                               self.d.getVar('PACKAGE_FEED_GPG_NAME'),
+                               self.d.getVar('PACKAGE_FEED_GPG_PASSPHRASE_FILE'),
+                               armor=is_ascii_sig)
+
 
 class OpkgIndexer(Indexer):
     def write_index(self):
@@ -152,9 +157,7 @@ class OpkgIndexer(Indexer):
             bb.note("There are no packages in %s!" % self.deploy_dir)
             return
 
-        result = oe.utils.multiprocess_exec(index_cmds, create_index)
-        if result:
-            bb.fatal('%s' % ('\n'.join(result)))
+        oe.utils.multiprocess_exec(index_cmds, create_index)
 
         if signer:
             feed_sig_type = self.d.getVar('PACKAGE_FEED_GPG_SIGNATURE_TYPE')
@@ -220,7 +223,7 @@ class DpkgIndexer(Indexer):
 
             cmd = "cd %s; PSEUDO_UNLOAD=1 %s packages . > Packages;" % (arch_dir, apt_ftparchive)
 
-            cmd += "%s -fc Packages > Packages.gz;" % gzip
+            cmd += "%s -fcn Packages > Packages.gz;" % gzip
 
             with open(os.path.join(arch_dir, "Release"), "w+") as release:
                 release.write("Label: %s\n" % arch)
@@ -235,9 +238,7 @@ class DpkgIndexer(Indexer):
             bb.note("There are no packages in %s" % self.deploy_dir)
             return
 
-        result = oe.utils.multiprocess_exec(index_cmds, create_index)
-        if result:
-            bb.fatal('%s' % ('\n'.join(result)))
+        oe.utils.multiprocess_exec(index_cmds, create_index)
         if self.d.getVar('PACKAGE_FEED_SIGN') == '1':
             raise NotImplementedError('Package feed signing not implementd for dpkg')
 
@@ -548,6 +549,14 @@ class RpmPM(PackageManager):
         if feed_uris == "":
             return
 
+        gpg_opts = ''
+        if self.d.getVar('PACKAGE_FEED_SIGN') == '1':
+            gpg_opts += 'repo_gpgcheck=1\n'
+            gpg_opts += 'gpgkey=file://%s/pki/packagefeed-gpg/PACKAGEFEED-GPG-KEY-%s-%s\n' % (self.d.getVar('sysconfdir'), self.d.getVar('DISTRO'), self.d.getVar('DISTRO_CODENAME'))
+
+        if self.d.getVar('RPM_SIGN_PACKAGES') == '0':
+            gpg_opts += 'gpgcheck=0\n'
+
         bb.utils.mkdirhier(oe.path.join(self.target_rootfs, "etc", "yum.repos.d"))
         remote_uris = self.construct_uris(feed_uris.split(), feed_base_paths.split())
         for uri in remote_uris:
@@ -558,12 +567,12 @@ class RpmPM(PackageManager):
                     repo_id   = "oe-remote-repo"  + "-".join(urlparse(repo_uri).path.split("/"))
                     repo_name = "OE Remote Repo:" + " ".join(urlparse(repo_uri).path.split("/"))
                     open(oe.path.join(self.target_rootfs, "etc", "yum.repos.d", repo_base + ".repo"), 'a').write(
-                             "[%s]\nname=%s\nbaseurl=%s\n\n" % (repo_id, repo_name, repo_uri))
+                             "[%s]\nname=%s\nbaseurl=%s\n%s\n" % (repo_id, repo_name, repo_uri, gpg_opts))
             else:
                 repo_name = "OE Remote Repo:" + " ".join(urlparse(uri).path.split("/"))
                 repo_uri = uri
                 open(oe.path.join(self.target_rootfs, "etc", "yum.repos.d", repo_base + ".repo"), 'w').write(
-                             "[%s]\nname=%s\nbaseurl=%s\n" % (repo_base, repo_name, repo_uri))
+                             "[%s]\nname=%s\nbaseurl=%s\n%s" % (repo_base, repo_name, repo_uri, gpg_opts))
 
     def _prepare_pkg_transaction(self):
         os.environ['D'] = self.target_rootfs
@@ -608,10 +617,12 @@ class RpmPM(PackageManager):
             self._invoke_dnf(["remove"] + pkgs)
         else:
             cmd = bb.utils.which(os.getenv('PATH'), "rpm")
-            args = ["-e", "--nodeps", "--root=%s" %self.target_rootfs]
+            args = ["-e", "-v", "--nodeps", "--root=%s" %self.target_rootfs]
 
             try:
+                bb.note("Running %s" % ' '.join([cmd] + args + pkgs))
                 output = subprocess.check_output([cmd] + args + pkgs, stderr=subprocess.STDOUT).decode("utf-8")
+                bb.note(output)
             except subprocess.CalledProcessError as e:
                 bb.fatal("Could not invoke rpm. Command "
                      "'%s' returned %d:\n%s" % (' '.join([cmd] + args + pkgs), e.returncode, e.output.decode("utf-8")))
@@ -682,7 +693,7 @@ class RpmPM(PackageManager):
         return packages
 
     def update(self):
-        self._invoke_dnf(["makecache"])
+        self._invoke_dnf(["makecache", "--refresh"])
 
     def _invoke_dnf(self, dnf_args, fatal = True, print_output = True ):
         os.environ['RPM_ETCCONFIGDIR'] = self.target_rootfs
@@ -1145,7 +1156,7 @@ class OpkgPM(OpkgDpkgPM):
 
         # Create an temp dir as opkg root for dummy installation
         temp_rootfs = self.d.expand('${T}/opkg')
-        opkg_lib_dir = self.d.getVar('OPKGLIBDIR', True)
+        opkg_lib_dir = self.d.getVar('OPKGLIBDIR')
         if opkg_lib_dir[0] == "/":
             opkg_lib_dir = opkg_lib_dir[1:]
         temp_opkg_dir = os.path.join(temp_rootfs, opkg_lib_dir, 'opkg')

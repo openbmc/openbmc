@@ -1,0 +1,79 @@
+From c98fee41d130cb946aa4e60fefaa6cbf203f6790 Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Thu, 29 Jun 2017 20:33:23 -0700
+Subject: [PATCH 2/8] Python3 compatibility: exception cleanup
+
+Commit 52e4a477f0b3c0a0ece7adeede6e06e07814f8b9 from
+https://github.com/openvswitch/ovs.git
+
+The exception syntax which is compatible with python2 and python3 is
+to use the "as" form for "except:".
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+Signed-off-by: Ben Pfaff <blp@ovn.org>
+---
+ build-aux/extract-ofp-fields | 2 +-
+ ovsdb/ovsdb-doc              | 4 ++--
+ ovsdb/ovsdb-idlc.in          | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/build-aux/extract-ofp-fields b/build-aux/extract-ofp-fields
+index 425a85f..61e752b 100755
+--- a/build-aux/extract-ofp-fields
++++ b/build-aux/extract-ofp-fields
+@@ -784,7 +784,7 @@ if __name__ == "__main__":
+     try:
+         options, args = getopt.gnu_getopt(sys.argv[1:], 'h',
+                                           ['help', 'ovs-version='])
+-    except getopt.GetoptError, geo:
++    except getopt.GetoptError as geo:
+         sys.stderr.write("%s: %s\n" % (argv0, geo.msg))
+         sys.exit(1)
+ 
+diff --git a/ovsdb/ovsdb-doc b/ovsdb/ovsdb-doc
+index b34fb11..918e88a 100755
+--- a/ovsdb/ovsdb-doc
++++ b/ovsdb/ovsdb-doc
+@@ -278,7 +278,7 @@ if __name__ == "__main__":
+             options, args = getopt.gnu_getopt(sys.argv[1:], 'hV',
+                                               ['er-diagram=',
+                                                'version=', 'help'])
+-        except getopt.GetoptError, geo:
++        except getopt.GetoptError as geo:
+             sys.stderr.write("%s: %s\n" % (argv0, geo.msg))
+             sys.exit(1)
+ 
+@@ -306,7 +306,7 @@ if __name__ == "__main__":
+             if len(line):
+                 print(line)
+ 
+-    except error.Error, e:
++    except error.Error as e:
+         sys.stderr.write("%s: %s\n" % (argv0, e.msg))
+         sys.exit(1)
+ 
+diff --git a/ovsdb/ovsdb-idlc.in b/ovsdb/ovsdb-idlc.in
+index 1064448..8b85f0d 100755
+--- a/ovsdb/ovsdb-idlc.in
++++ b/ovsdb/ovsdb-idlc.in
+@@ -1098,7 +1098,7 @@ if __name__ == "__main__":
+                                               ['directory',
+                                                'help',
+                                                'version'])
+-        except getopt.GetoptError, geo:
++        except getopt.GetoptError as geo:
+             sys.stderr.write("%s: %s\n" % (argv0, geo.msg))
+             sys.exit(1)
+ 
+@@ -1136,7 +1136,7 @@ if __name__ == "__main__":
+             sys.exit(1)
+ 
+         func(*args[1:])
+-    except ovs.db.error.Error, e:
++    except ovs.db.error.Error as e:
+         sys.stderr.write("%s: %s\n" % (argv0, e))
+         sys.exit(1)
+ 
+-- 
+2.5.0
+

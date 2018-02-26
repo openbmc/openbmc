@@ -1,4 +1,5 @@
 SUMMARY = "VLAN provides vconfig utility"
+HOMEPAGE = "http://www.candelatech.com/~greear/vlan.html"
 SECTION = "misc"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://vconfig.c;beginline=1;endline=19;md5=094ca47de36c20c598b15b32c270ce0a"

@@ -1,14 +1,18 @@
-From 14d469bc82c758116aef7d549abd49c131b4170f Mon Sep 17 00:00:00 2001
+From b459c55e4968321e5a82272cb39aa69d4054990f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 22 Apr 2017 11:54:57 -0700
 Subject: [PATCH] configure: Check for -Wno-error=format-truncation compiler
  option
 
 If this option is supported by compiler then disable it ( gcc7+)
+Use -Werror to elevate the warning to an error in case compiler like clang
+which warn about unknown options but not error out unless asked for
+
 Fixes
 client.c:834:23: error: '%s' directive output may be truncated writing up to 1023 bytes into a region of size 1010 [-Werror=format-truncation=]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  configure.ac                |  3 +-
  m4/ax_check_compile_flag.m4 | 74 +++++++++++++++++++++++++++++++++++++++++++++
@@ -16,7 +20,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  create mode 100644 m4/ax_check_compile_flag.m4
 
 diff --git a/configure.ac b/configure.ac
-index 8854542..f3a6b57 100644
+index 8854542..edb8cfb 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -4,7 +4,6 @@ AC_INIT([collectd],[m4_esyscmd(./version-gen.sh)])
@@ -31,7 +35,7 @@ index 8854542..f3a6b57 100644
          AM_CFLAGS="$AM_CFLAGS -Werror"
          AM_CXXFLAGS="$AM_CXXFLAGS -Werror"
  fi
-+AX_CHECK_COMPILE_FLAG([-Werror=format-truncation],[AM_CFLAGS="$AM_CFLAGS -Wno-error=format-truncation" AM_CXXFLAGS="$AM_CXXFLAGS -Wno-error=format-truncation"])
++AX_CHECK_COMPILE_FLAG([-Werror -Werror=format-truncation],[AM_CFLAGS="$AM_CFLAGS -Wno-error=format-truncation" AM_CXXFLAGS="$AM_CXXFLAGS -Wno-error=format-truncation"])
 +
  AC_SUBST([AM_CFLAGS])
  AC_SUBST([AM_CXXFLAGS])
@@ -117,5 +121,5 @@ index 0000000..dcabb92
 +AS_VAR_POPDEF([CACHEVAR])dnl
 +])dnl AX_CHECK_COMPILE_FLAGS
 -- 
-2.12.2
+2.13.4
 

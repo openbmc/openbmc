@@ -4,7 +4,7 @@ HOMEPAGE = "http://www.sudo.ws"
 BUGTRACKER = "http://www.sudo.ws/bugs/"
 SECTION = "admin"
 LICENSE = "ISC & BSD & Zlib"
-LIC_FILES_CHKSUM = "file://doc/LICENSE;md5=f600a47c2a2cdde5899e449607810ed1 \
+LIC_FILES_CHKSUM = "file://doc/LICENSE;md5=652fb4334c13b511597d7940ef8b3323 \
                     file://plugins/sudoers/redblack.c;beginline=1;endline=41;md5=cfe41112f96c19a074934d128f45c693 \
                     file://lib/util/reallocarray.c;beginline=3;endline=16;md5=85b0905b795d4d58bf2e00635649eec6 \
                     file://lib/util/fnmatch.c;beginline=3;endline=27;md5=67f83ee9bd456557397082f8f1be0efd \
@@ -27,6 +27,12 @@ EXTRA_OECONF_append_libc-musl = " --disable-hardening "
 
 # mksigname/mksiglist are used on build host to generate source files
 do_compile_prepend () {
+	# Remove build host references from sudo_usage.h
+	sed -i  \
+	    -e 's,--with-libtool-sysroot=${STAGING_DIR_TARGET},,g' \
+	    -e 's,--build=${BUILD_SYS},,g' \
+	    -e 's,--host=${HOST_SYS},,g' \
+	    ${B}/src/sudo_usage.h
 	oe_runmake SSP_CFLAGS="" SSP_LDFLAGS="" CC="$BUILD_CC" CFLAGS="$BUILD_CFLAGS" CPPFLAGS="$BUILD_CPPFLAGS -I${S}/include -I${S} -I${B}"  -C lib/util mksigname mksiglist
 }
 

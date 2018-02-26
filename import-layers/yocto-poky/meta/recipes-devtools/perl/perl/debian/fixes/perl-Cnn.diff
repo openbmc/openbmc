@@ -12,6 +12,7 @@ Bug: https://rt.perl.org/Ticket/Display.html?id=125381
 Bug-Debian: https://bugs.debian.org/788636
 Origin: upstream, http://perl5.git.perl.org/perl.git/commit/89d84ff965
 Patch-Name: fixes/perl-Cnn.diff
+Upstream-Status: Pending
 ---
  t/run/switchC.t |  7 ++++++-
  util.c          | 17 ++++++++---------

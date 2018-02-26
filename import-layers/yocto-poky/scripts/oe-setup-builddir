@@ -133,13 +133,6 @@ EOM
 #    unset SHOWYPDOC
 fi
 
-cat <<EOM
-
-### Shell environment set up for builds. ###
-
-You can now run 'bitbake <target>'
-
-EOM
 if [ -z "$OECORENOTESCONF" ]; then
     OECORENOTESCONF="$OEROOT/meta/conf/conf-notes.txt"
 fi

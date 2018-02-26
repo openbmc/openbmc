@@ -1,0 +1,44 @@
+From 342311dbb190735b7b32ab20f81c1d8dbcfe717a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 11 Oct 2017 15:40:42 +0800
+Subject: [PATCH] Makefile.vulkan.am: explictly add lib expat to intel
+ libvulkan's lib depends
+
+While built with "-fvisibility=default"
+...
+|i586-oe-linux-gcc ... -fvisibility=default ... -o common/.libs/common_libintel_common_la-gen_decoder.o
+...
+
+It triggered the failure
+...
+|i586-oe-linux-g++  ... common/.libs/libintel_common.a ... -o vulkan/.libs/libvulkan_intel.so
+|common/.libs/libintel_common.a(common_libintel_common_la-gen_decoder.o):
+|In function `start_element':
+|/usr/src/debug/mesa/2_17.1.7-r0/mesa-17.1.7/src/intel/common/gen_decoder.c:371:
+undefined reference to `XML_GetCurrentLineNumber'
+...
+
+explictly add EXPAT_LIBS to intel's VULKAN_LIB_DEPS
+
+Upstream-Status: Submitted [mesa-dev@lists.freedesktop.org]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/intel/Makefile.vulkan.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/intel/Makefile.vulkan.am b/src/intel/Makefile.vulkan.am
+index 271b0a5..8fbe2c8 100644
+--- a/src/intel/Makefile.vulkan.am
++++ b/src/intel/Makefile.vulkan.am
+@@ -144,6 +144,7 @@ VULKAN_LIB_DEPS = \
+ 	$(LIBDRM_LIBS) \
+ 	$(PTHREAD_LIBS) \
+ 	$(DLOPEN_LIBS) \
++	$(EXPAT_LIBS) \
+ 	-lm
+ 
+ if HAVE_PLATFORM_X11
+-- 
+2.7.4
+

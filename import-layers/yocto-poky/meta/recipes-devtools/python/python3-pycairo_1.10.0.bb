@@ -19,6 +19,8 @@ S = "${WORKDIR}/pycairo-${PV}"
 
 inherit distutils3 pkgconfig
 
+CFLAGS += "-fPIC"
+
 BBCLASSEXTEND = "native"
 
 do_configure() {

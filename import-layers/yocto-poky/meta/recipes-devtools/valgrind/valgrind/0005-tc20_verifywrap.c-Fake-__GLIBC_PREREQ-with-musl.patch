@@ -1,0 +1,30 @@
+From b4b9f072c22f96844e02cb9d68f7ff2408680817 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 10 Jun 2017 01:07:59 -0700
+Subject: [PATCH 5/6] tc20_verifywrap.c: Fake __GLIBC_PREREQ with musl
+
+similar to sun
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ helgrind/tests/tc20_verifywrap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/helgrind/tests/tc20_verifywrap.c b/helgrind/tests/tc20_verifywrap.c
+index c110000..a311a49 100644
+--- a/helgrind/tests/tc20_verifywrap.c
++++ b/helgrind/tests/tc20_verifywrap.c
+@@ -20,7 +20,7 @@
+ 
+ #if !defined(__APPLE__)
+ 
+-#if defined(__sun__)
++#if defined(__sun__) || (defined(__linux__) && !defined(__GLIBC__))
+ /* Fake __GLIBC_PREREQ on Solaris. Pretend glibc >= 2.4. */
+ # define __GLIBC_PREREQ
+ #else
+-- 
+2.13.1
+

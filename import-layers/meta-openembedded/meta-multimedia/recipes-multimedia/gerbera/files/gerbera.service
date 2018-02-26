@@ -1,0 +1,13 @@
+[Unit]
+Description=Start Gerbera, an UPnP media server
+After=multi-user.target network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/gerbera
+Environment='HOME=/root'
+Type=simple
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -27,6 +27,7 @@ SRC_URI = "http://snapshot.debian.org/archive/debian/20160728T043443Z/pool/main/
 	   file://uuid-nostrip.patch \
            file://install-pc.patch \
            file://ldflags.patch \
+           file://libtool-tag.patch \
 	  "
 SRC_URI[md5sum] = "5db0d43a9022a6ebbbc25337ae28942f"
 SRC_URI[sha256sum] = "11a615225baa5f8bb686824423f50e4427acd3f70d394765bdff32801f0fd5b0"
@@ -37,6 +38,7 @@ inherit autotools update-alternatives
 
 EXTRA_OECONF = "--without-dce --without-cxx --without-perl --without-perl-compat --without-php --without-pgsql"
 EXTRA_OECONF = "--includedir=${includedir}/ossp"
+EXTRA_OEMAKE_class-target = "LIBTOOLFLAGS='--tag=CC'"
 
 do_configure_prepend() {
   # This package has a completely custom aclocal.m4, which should be acinclude.m4.

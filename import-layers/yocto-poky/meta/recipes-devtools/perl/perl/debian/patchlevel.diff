@@ -10,6 +10,7 @@ The list of packaged patches is in patchlevel-debian.h, which is generated
 from the debian/patches/ directory when building the package.
 
 Patch-Name: debian/patchlevel.diff
+Upstream-Status: Pending
 ---
  patchlevel.h | 3 +++
  1 file changed, 3 insertions(+)

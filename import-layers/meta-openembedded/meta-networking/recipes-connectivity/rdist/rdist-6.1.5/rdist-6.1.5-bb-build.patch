@@ -1,0 +1,75 @@
+From 244861e2c9bb9cc44f4bd246964ba850a7cf1216 Mon Sep 17 00:00:00 2001
+From: Xin Ouyang <Xin.Ouyang@windriver.com>
+Date: Tue, 15 May 2012 15:06:43 +0800
+Subject: [PATCH] rdist: bitbake build
+
+Upstream-Status: Inappropriate [OE specific]
+
+---
+ Makefile.local    |    8 ++++----
+ doc/Makefile.real |    4 +++-
+ src/Makefile.real |    1 +
+ 3 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.local b/Makefile.local
+index 26092b2..389cb84 100644
+--- a/Makefile.local
++++ b/Makefile.local
+@@ -14,7 +14,7 @@
+ # BIN_DIR variable, you would uncomment the following line
+ # or add your own line.
+ #
+-#BIN_DIR	= /usr/bin
++BIN_DIR	= ${DESTDIR}/${bindir}
+ 
+ #
+ # Add any local definitions you want pass to the compiler to DEFS_LOCAL
+@@ -46,13 +46,13 @@ LIBS_LOCAL	=
+ # Set a site specific install program to use.  Must support BSD style
+ # install(1) arguments.
+ #
+-#INSTALL		= install
++INSTALL		= install
+ 
+ #
+ # Site specific Man Page configuration.
+ #
+-#MAN_1_DIR	= /usr/local/man/man1
+-#MAN_8_DIR	= /usr/local/man/man8
++MAN_1_DIR	= ${DESTDIR}/${mandir}/man1
++MAN_8_DIR	= ${DESTDIR}/${mandir}/man8
+ #MAN_OWNER	= bin
+ #MAN_GROUP	= bin
+ #MAN_MODE	= 644
+diff --git a/doc/Makefile.real b/doc/Makefile.real
+index 42cabec..e32c30b 100644
+--- a/doc/Makefile.real
++++ b/doc/Makefile.real
+@@ -16,9 +16,11 @@ all:
+ 
+ doc:
+ 
+-install:
++install: install.man
+ 
+ install.man: rdist.man rdistd.man
++	test -d ${MAN_1_DIR} || ${INSTALL} -d ${MAN_1_DIR}
++	test -d ${MAN_8_DIR} || ${INSTALL} -d ${MAN_8_DIR}
+ 	${INSTALL} ${INSTALL_ARGS} rdist.man ${CLIENT_DEST}
+ 	${INSTALL} ${INSTALL_ARGS} rdistd.man ${SERVER_DEST}
+ 
+diff --git a/src/Makefile.real b/src/Makefile.real
+index 02179e4..9ec551d 100644
+--- a/src/Makefile.real
++++ b/src/Makefile.real
+@@ -52,6 +52,7 @@ clean:
+ 		$(COMMONOBJS) $(MISSINGOBJS)
+ 
+ install:
++	test -d $(BIN_DIR) || $(INSTALL) -d $(BIN_DIR)
+ 	$(INSTALL) ${IN_ARGS} -o $(BIN_OWNER) -m ${RDIST_MODE} \
+ 		$(CLIENT_BIN) $(BIN_DIR)/$(CLIENT)
+ 	$(INSTALL) ${IN_ARGS} -o ${BIN_OWNER} -m ${RDISTD_MODE} \
+-- 
+1.7.5.4
+

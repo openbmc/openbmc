@@ -1,0 +1,116 @@
+From 7d31da8ef93987000f297d435dbacaf7d436107b Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Thu, 15 Jun 2017 18:38:30 +0300
+Subject: [PATCH 6/6] common_audio: implement endianness conversion in wav file
+ handling
+
+The code didn't build for big endian machines due to the missing
+endianness conversions.
+
+Upstream-Status: Pending
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ webrtc/common_audio/wav_file.cc   | 27 +++++++++++++++++++++------
+ webrtc/common_audio/wav_header.cc | 32 +++++++++++++++++++++++++++++++-
+ 2 files changed, 52 insertions(+), 7 deletions(-)
+
+diff --git a/webrtc/common_audio/wav_file.cc b/webrtc/common_audio/wav_file.cc
+index b14b620..e2f7738 100644
+--- a/webrtc/common_audio/wav_file.cc
++++ b/webrtc/common_audio/wav_file.cc
+@@ -64,9 +64,6 @@ WavReader::~WavReader() {
+ }
+ 
+ size_t WavReader::ReadSamples(size_t num_samples, int16_t* samples) {
+-#ifndef WEBRTC_ARCH_LITTLE_ENDIAN
+-#error "Need to convert samples to big-endian when reading from WAV file"
+-#endif
+   // There could be metadata after the audio; ensure we don't read it.
+   num_samples = std::min(rtc::checked_cast<uint32_t>(num_samples),
+                          num_samples_remaining_);
+@@ -76,6 +73,13 @@ size_t WavReader::ReadSamples(size_t num_samples, int16_t* samples) {
+   RTC_CHECK(read == num_samples || feof(file_handle_));
+   RTC_CHECK_LE(read, num_samples_remaining_);
+   num_samples_remaining_ -= rtc::checked_cast<uint32_t>(read);
++
++#ifdef WEBRTC_ARCH_BIG_ENDIAN
++  // Convert the read samples from little-endian to big-endian.
++  for (size_t i = 0; i < read; i++)
++    samples[i] = ((uint16_t) samples[i] >> 8) | ((uint16_t) samples[i] << 8);
++#endif
++
+   return read;
+ }
+ 
+@@ -119,11 +123,22 @@ WavWriter::~WavWriter() {
+ }
+ 
+ void WavWriter::WriteSamples(const int16_t* samples, size_t num_samples) {
+-#ifndef WEBRTC_ARCH_LITTLE_ENDIAN
+-#error "Need to convert samples to little-endian when writing to WAV file"
+-#endif
++#ifdef WEBRTC_ARCH_BIG_ENDIAN
++  // Convert the samples from big-endian samples to little-endian.
++  int16_t* converted_samples = static_cast<int16_t*>(malloc(num_samples * sizeof(*samples)));
++  RTC_CHECK(converted_samples) << "Out of memory.";
++  for (int i = 0; i < num_samples; i++)
++    converted_samples[i] =
++        ((uint16_t) samples[i] >> 8) | ((uint16_t) samples[i] << 8);
++
++  const size_t written =
++      fwrite(converted_samples, sizeof(*converted_samples), num_samples,
++             file_handle_);
++  free(converted_samples);
++#else
+   const size_t written =
+       fwrite(samples, sizeof(*samples), num_samples, file_handle_);
++#endif
+   RTC_CHECK_EQ(num_samples, written);
+   num_samples_ += static_cast<uint32_t>(written);
+   RTC_CHECK(written <= std::numeric_limits<uint32_t>::max() ||
+diff --git a/webrtc/common_audio/wav_header.cc b/webrtc/common_audio/wav_header.cc
+index 61cfffe..382bfc7 100644
+--- a/webrtc/common_audio/wav_header.cc
++++ b/webrtc/common_audio/wav_header.cc
+@@ -129,7 +129,37 @@ static inline std::string ReadFourCC(uint32_t x) {
+   return std::string(reinterpret_cast<char*>(&x), 4);
+ }
+ #else
+-#error "Write be-to-le conversion functions"
++static inline void WriteLE16(uint16_t* f, uint16_t x) {
++  *f = x >> 8 | x << 8;
++}
++static inline void WriteLE32(uint32_t* f, uint32_t x) {
++  *f = x >> 24
++      | (x && 0xFF0000) >> 8
++      | (x && 0xFF00) << 8
++      | x << 24;
++}
++static inline void WriteFourCC(uint32_t* f, char a, char b, char c, char d) {
++  *f = static_cast<uint32_t>(d)
++      | static_cast<uint32_t>(c) << 8
++      | static_cast<uint32_t>(b) << 16
++      | static_cast<uint32_t>(a) << 24;
++}
++
++static inline uint32_t ReadLE16(uint16_t x) {
++  return x >> 8 | x << 8;
++}
++
++static inline uint32_t ReadLE32(uint32_t x) {
++  return x >> 24
++      | (x && 0xFF0000) >> 8
++      | (x && 0xFF00) << 8
++      | x << 24;
++}
++
++static inline std::string ReadFourCC(uint32_t x) {
++  x = ReadLE32(x);
++  return std::string(reinterpret_cast<char*>(&x), 4);
++}
+ #endif
+ 
+ static inline uint32_t RiffChunkSize(uint32_t bytes_in_payload) {
+-- 
+2.11.0
+

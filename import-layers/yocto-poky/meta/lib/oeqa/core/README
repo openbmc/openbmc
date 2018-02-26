@@ -1,38 +1,76 @@
-= OEQA Framework =
+= OEQA (v2) Framework =
 
 == Introduction ==
 
-This is the new OEQA framework the base clases of the framework
-are in this module oeqa/core the subsequent components needs to
-extend this classes.
+This is version 2 of the OEQA framework. Base clases are located in the
+'oeqa/core' directory and subsequent components must extend from these.
 
-A new/unique runner was created called oe-test and is under scripts/
-oe-test, this new runner scans over oeqa module searching for test
-components that supports OETestContextExecutor implemented in context
-module (i.e. oeqa/core/context.py).
+The main design consideration was to implement the needed functionality on
+top of the Python unittest framework. To achieve this goal, the following
+modules are used:
 
-For execute an example:
+    * oeqa/core/runner.py: Provides OETestResult and OETestRunner base
+      classes extending the unittest class. These classes support exporting
+      results to different formats; currently RAW and XML support exist.
 
-$ source oe-init-build-env
-$ oe-test core
+    * oeqa/core/loader.py: Provides OETestLoader extending the unittest class.
+      It also features a unified implementation of decorator support and
+      filtering test cases.
 
-For list supported components:
+    * oeqa/core/case.py: Provides OETestCase base class extending
+      unittest.TestCase and provides access to the Test data (td), Test context
+      and Logger functionality.
 
-$ oe-test -h
+    * oeqa/core/decorator: Provides OETestDecorator, a new class to implement
+      decorators for Test cases.
 
-== Create new Test component ==
+    * oeqa/core/context: Provides OETestContext, a high-level API for
+      loadTests and runTests of certain Test component and
+      OETestContextExecutor a base class to enable oe-test to discover/use
+      the Test component.
 
-Usally for add a new Test component the developer needs to extend
-OETestContext/OETestContextExecutor in context.py and OETestCase in
-case.py.
+Also, a new 'oe-test' runner is located under 'scripts', allowing scans for components
+that supports OETestContextExecutor (see below).
 
-== How to run the testing of the OEQA framework ==
+== Terminology ==
+
+    * Test component: The area of testing in the Project, for example: runtime, SDK, eSDK, selftest.
+
+    * Test data: Data associated with the Test component. Currently we use bitbake datastore as
+      a Test data input.
+
+    * Test context: A context of what tests needs to be run and how to do it; this additionally
+      provides access to the Test data and could have custom methods and/or attrs.
+
+== oe-test ==
+
+The new tool, oe-test, has the ability to scan the code base for test components and provide
+a unified way to run test cases. Internally it scans folders inside oeqa module in order to find
+specific classes that implement a test component.
+
+== Usage ==
+
+Executing the example test component
+
+    $ source oe-init-build-env
+    $ oe-test core
+
+Getting help
+
+    $ oe-test -h
+
+== Creating new Test Component ==
+
+Adding a new test component the developer needs to extend OETestContext/OETestContextExecutor
+(from context.py) and OETestCase (from case.py)
+
+== Selftesting the framework ==
 
 Run all tests:
 
-$ PATH=$PATH:../../ python3 -m unittest discover -s tests
+    $ PATH=$PATH:../../ python3 -m unittest discover -s tests
 
 Run some test:
 
-$ cd tests/
-$ ./test_data.py
+    $ cd tests/
+    $ ./test_data.py

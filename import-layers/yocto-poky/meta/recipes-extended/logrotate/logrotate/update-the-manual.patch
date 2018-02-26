@@ -1,4 +1,4 @@
-From e0b0fe30e9c49234994a20a86aacfaf80e690087 Mon Sep 17 00:00:00 2001
+From bf22e8805df69344f6f20cea390e829a22fa741b Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Tue, 17 Feb 2015 21:14:37 -0800
 Subject: [PATCH] Update the manual
@@ -9,14 +9,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 ---
- logrotate.8 |   10 ++++------
+ logrotate.8.in | 10 ++++------
  1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/logrotate.8 b/logrotate.8
-index e4e5f48..84407d0 100644
---- a/logrotate.8
-+++ b/logrotate.8
-@@ -405,12 +405,10 @@ Do not rotate the log if it is empty (this overrides the \fBifempty\fR option).
+diff --git a/logrotate.8.in b/logrotate.8.in
+index 951e406..581bf48 100644
+--- a/logrotate.8.in
++++ b/logrotate.8.in
+@@ -445,12 +445,10 @@ Do not rotate the log if it is empty (this overrides the \fBifempty\fR option).
  
  .TP
  \fBolddir \fIdirectory\fR
@@ -34,5 +34,5 @@ index e4e5f48..84407d0 100644
  
  .TP
 -- 
-1.7.9.5
+1.8.3.1
 

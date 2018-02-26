@@ -31,6 +31,9 @@ OECMAKE_FIND_ROOT_PATH_MODE_PROGRAM_class-native = "BOTH"
 
 EXTRA_OECMAKE_append = " ${PACKAGECONFIG_CONFARGS}"
 
+EXTRA_OECMAKE_BUILD_prepend_task-compile = "${PARALLEL_MAKE} "
+EXTRA_OECMAKE_BUILD_prepend_task-install = "${PARALLEL_MAKEINST} "
+
 # CMake expects target architectures in the format of uname(2),
 # which do not always match TARGET_ARCH, so all the necessary
 # conversions should happen here.
@@ -135,13 +138,13 @@ cmake_do_configure() {
 
 do_compile[progress] = "percent"
 cmake_do_compile()  {
-	cd ${B}
-	base_do_compile VERBOSE=1
+	bbnote VERBOSE=1 cmake --build '${B}' -- ${EXTRA_OECMAKE_BUILD}
+	VERBOSE=1 cmake --build '${B}' -- ${EXTRA_OECMAKE_BUILD}
 }
 
 cmake_do_install() {
-	cd ${B}
-	oe_runmake 'DESTDIR=${D}' install
+	bbnote DESTDIR='${D}' cmake --build '${B}' --target install -- ${EXTRA_OECMAKE_BUILD}
+	DESTDIR='${D}' cmake --build '${B}' --target install -- ${EXTRA_OECMAKE_BUILD}
 }
 
 EXPORT_FUNCTIONS do_configure do_compile do_install do_generate_toolchain_file

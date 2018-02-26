@@ -17,6 +17,7 @@ The rationale being that an admin (via site), or module packager
 version than is included in core.
 
 Patch-Name: debian/mod_paths.diff
+Upstream-Status: Pending
 ---
  perl.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 58 insertions(+)

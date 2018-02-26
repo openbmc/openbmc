@@ -1,0 +1,193 @@
+#!/bin/sh
+# 
+# Init script for vblade (ATA over Ethernet daemon)
+# 
+# chkconfig: - 30 70
+# description: vblade AoE daemon
+# 
+# processname: vblade
+# config: /etc/vblade.conf
+# 
+# Shamelessly hacked together from other init scripts (sshd, mostly)
+# integrate vblade.init from Fedora's vblade-14-6.fc12.src.rpm
+# 
+
+RETVAL=0
+prog=vblade
+
+spawn_vblade() {
+  ALLOWMACS=""
+  [ -n "$5" ] && ALLOWMACS="-m $5"
+  ID="$1-e$2.$3"
+  if [ ! -d "/var/run/$prog" ]; then
+    mkdir /var/run/$prog
+  fi
+  PID_FILE=/var/run/$prog/${ID}.pid
+  $prog $ALLOWMACS $2 $3 $1 $4 >> /var/log/$prog.log 2>&1 &
+  pid=$!
+  RETVAL=$?
+  echo $pid > $PID_FILE
+  echo -n $"$4 (e$2.$3@$1) [pid $pid]"
+  [ "$RETVAL" = 0 ] && echo "success" || echo "failure"
+  echo
+}
+
+start() {
+  local ret
+
+  echo $"Starting up $prog: "
+  
+  #/var/lock/subsys/$prog exists?
+  status $prog 2>&1 > /dev/null
+  ret=$?
+
+  if [ "$ret" = "2" ]; then
+    echo "$prog dead but subsys locked"
+    echo
+    return 2
+  else 
+    if [ "$ret" = "0" ]; then
+      #is running
+      echo "already running"
+      return 0
+    fi
+  fi
+
+  if [ 0 -ne `grep -vc '^#\|^$' /etc/$prog.conf` ]
+  then
+    grep -v '^#' /etc/$prog.conf | sed -e 's/	/ /g' -e 's/  / /g' | while read line
+    do
+      spawn_vblade $line
+    done
+    touch /var/lock/subsys/$prog
+  else
+    echo -n "empty $prog.conf?"
+    echo " passed"
+    echo
+  fi
+}
+
+stop() {
+  echo -n $"Shutting down $prog: "
+  for pidfile in `ls /var/run/$prog/*.pid 2>/dev/null`
+  do
+    kill -TERM `cat $pidfile`
+    rm -f $pidfile
+  done
+  echo "success"
+  echo
+  rm -f /var/lock/subsys/$prog
+}
+
+__pids_var_run() {
+        local base=${1##*/}
+        local pid_file=${2:-/var/run/$base.pid}
+
+        pid=
+        if [ -f "$pid_file" ] ; then
+                local line p
+
+                while : ; do
+                        read line
+                        [ -z "$line" ] && break
+                        for p in $line ; do
+                                [ -z "${p//[0-9]/}" -a -d "/proc/$p" ] && pid="$pid $p"
+                        done
+                done < "$pid_file"
+
+                if [ -n "$pid" ]; then
+                        return 0
+                fi
+                return 1 # "Program is dead and /var/run pid file exists"
+        fi
+        return 3 # "Program is not running"
+}
+
+__pids_pidof() {
+        pidof "$1" || pidof "${1##*/}"
+}
+
+status() {
+        local base pid lock_file= pid_file=
+
+        # Test syntax.
+        if [ "$#" = 0 ] ; then
+                echo $"Usage: status [-p pidfile] {program}"
+                return 1
+        fi
+        if [ "$1" = "-p" ]; then
+                pid_file=$2
+                shift 2
+        fi
+        if [ "$1" = "-l" ]; then
+                lock_file=$2
+                shift 2
+        fi
+        base=${1##*/}
+
+        # First try "pidof"
+        __pids_var_run "$1" "$pid_file"
+        RC=$?
+        if [ -z "$pid_file" -a -z "$pid" ]; then
+                pid="$(__pids_pidof "$1")"
+        fi
+        if [ -n "$pid" ]; then
+                echo $"${base} (pid $pid) is running..."
+                return 0
+        fi
+
+        case "$RC" in
+                0)
+                        echo $"${base} (pid $pid) is running..."
+                        return 0
+                        ;;
+                1)
+                        echo $"${base} dead but pid file exists"
+                        return 1
+                        ;;
+        esac
+        if [ -z "${lock_file}" ]; then
+                lock_file=${base}
+        fi
+        # See if /var/lock/subsys/${lock_file} exists
+        if [ -f /var/lock/subsys/${lock_file} ]; then
+                echo $"${base} dead but subsys locked"
+                return 2
+        fi
+        echo $"${base} is stopped"
+        return 3
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart)
+		stop
+		start
+		;;
+	reload)
+		# yes, this sucks, but the vblade processes die on SIGHUP
+		stop
+		start
+		;;
+	condrestart)
+		if [ -f /var/lock/subsys/$prog ]; then
+			stop
+			# avoid race
+			sleep 3
+			start
+		fi
+		;;
+	status)
+		status $prog
+		RETVAL=$?
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|restart|reload|condrestart|status}"
+		RETVAL=1
+esac
+exit $RETVAL

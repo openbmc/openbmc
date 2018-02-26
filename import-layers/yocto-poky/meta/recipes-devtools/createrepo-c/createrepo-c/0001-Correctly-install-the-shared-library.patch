@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 2 Jan 2017 17:23:59 +0200
 Subject: [PATCH] Correctly install the shared library
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/rpm-software-management/createrepo_c/pull/78]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  src/CMakeLists.txt | 3 ++-

@@ -6,6 +6,8 @@ Subject: [PATCH] Prevents omapfb from from crashing when pixelclock of 0 is
 
 Due to a Linux design bug it is easy to get a pixelclock set to zero
 when changing displays at runtime.
+
+Upstream-Status: Pending
 ---
  src/omapfb-output.c | 9 +++++++--
  1 file changed, 7 insertions(+), 2 deletions(-)

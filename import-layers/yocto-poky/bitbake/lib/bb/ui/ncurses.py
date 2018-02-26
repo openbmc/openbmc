@@ -315,7 +315,7 @@ class NCursesUI:
                     # also allow them to now exit with a single ^C
                     shutdown = 2
                 if isinstance(event, bb.command.CommandFailed):
-                    mw.appendText("Command execution failed: %s" % event.error)
+                    mw.appendText(str(event))
                     time.sleep(2)
                     exitflag = True
                 if isinstance(event, bb.command.CommandExit):

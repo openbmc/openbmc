@@ -17,24 +17,28 @@ problem.
 Upstream-Status: Pending
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+Update context(trailing whitespace) for version 9.10.5-P3.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  bin/confgen/Makefile.in |    4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/bin/confgen/Makefile.in b/bin/confgen/Makefile.in
-index 8b3e5aa..4868a24 100644
+index dca272f..02becce 100644
 --- a/bin/confgen/Makefile.in
 +++ b/bin/confgen/Makefile.in
 @@ -74,11 +74,11 @@ rndc-confgen.@O@: rndc-confgen.c
  ddns-confgen.@O@: ddns-confgen.c
  	${LIBTOOL_MODE_COMPILE} ${CC} ${ALL_CFLAGS} -c ${srcdir}/ddns-confgen.c
  
--rndc-confgen@EXEEXT@: rndc-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS} ${CONFDEPLIBS} 
+-rndc-confgen@EXEEXT@: rndc-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS} ${CONFDEPLIBS}
 +rndc-confgen@EXEEXT@: rndc-confgen.@O@ util.@O@ keygen.@O@ ${CONFDEPLIBS} $(SUBDIRS)
  	export BASEOBJS="rndc-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS}"; \
  	${FINALBUILDCMD}
  
--ddns-confgen@EXEEXT@: ddns-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS} ${CONFDEPLIBS} 
+-ddns-confgen@EXEEXT@: ddns-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS} ${CONFDEPLIBS}
 +ddns-confgen@EXEEXT@: ddns-confgen.@O@ util.@O@ keygen.@O@ ${CONFDEPLIBS} $(SUBDIRS)
  	export BASEOBJS="ddns-confgen.@O@ util.@O@ keygen.@O@ ${UOBJS}"; \
  	${FINALBUILDCMD}

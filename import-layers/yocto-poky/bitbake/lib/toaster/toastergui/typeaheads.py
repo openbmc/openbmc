@@ -100,6 +100,36 @@ class MachinesTypeAhead(ToasterTypeAhead):
         return results
 
 
+class DistrosTypeAhead(ToasterTypeAhead):
+    """ Typeahead for all the distros available in the current project's
+    configuration """
+    def __init__(self):
+        super(DistrosTypeAhead, self).__init__()
+
+    def apply_search(self, search_term, prj, request):
+        distros = prj.get_available_distros()
+        distros = distros.order_by("name")
+
+        primary_results = distros.filter(name__istartswith=search_term)
+        secondary_results = distros.filter(name__icontains=search_term).exclude(pk__in=primary_results)
+        tertiary_results = distros.filter(layer_version__layer__name__icontains=search_term).exclude(pk__in=primary_results).exclude(pk__in=secondary_results)
+
+        results = []
+
+        for distro in list(primary_results) + list(secondary_results) + list(tertiary_results):
+
+            detail = "[ %s ]" % (distro.layer_version.layer.name)
+            needed_fields = {
+                'id' : distro.pk,
+                'name' : distro.name,
+                'detail' : detail,
+            }
+
+            results.append(needed_fields)
+
+        return results
+
+
 class RecipesTypeAhead(ToasterTypeAhead):
     """ Typeahead for all the recipes available in the current project's
     configuration """

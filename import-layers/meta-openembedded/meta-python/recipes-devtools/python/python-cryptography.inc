@@ -1,4 +1,5 @@
 SUMMARY = "Provides cryptographic recipes and primitives to python developers"
+HOMEPAGE = "https://cryptography.io/"
 LICENSE = "Apache-2.0 | BSD"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d5ede125ed08d4fd14ec44d334bdb388"
 
@@ -9,8 +10,8 @@ DEPENDS += " \
     ${PYTHON_PN}-six \
 "
 
-SRC_URI[md5sum] = "fade66de437392ed1ba6980768626204"
-SRC_URI[sha256sum] = "878cb68b3da3d493ffd68f36db11c29deee623671d3287c3f8d685117ffda9a9"
+SRC_URI[md5sum] = "24cbdab3fda22be31dd3aef2808f5d2f"
+SRC_URI[sha256sum] = "d04bb2425086c3fe86f7bc48915290b13e798497839fbb18ab7f6dffcf98cc3a"
 
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-cffi \
@@ -53,5 +54,7 @@ do_install_ptest() {
 FILES_${PN}-dbg += " \
     ${libdir}/${PYTHON_PN}2.7/site-packages/${SRCNAME}/hazmat/bindings/.debug \
 "
+
+LDFLAGS_append = " -pthread"
 
 BBCLASSEXTEND = "native nativesdk"

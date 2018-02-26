@@ -2,7 +2,6 @@
 from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
 
-
 # Borrowed from CalledProcessError
 
 class CommandError(Exception):
@@ -66,3 +65,39 @@ def make_logger_bitbake_compatible(logger):
     logger.info = _bitbake_log_info
 
     return logger
+
+def load_test_components(logger, executor):
+    import sys
+    import os
+    import importlib
+
+    from oeqa.core.context import OETestContextExecutor
+
+    components = {}
+
+    for path in sys.path:
+        base_dir = os.path.join(path, 'oeqa')
+        if os.path.exists(base_dir) and os.path.isdir(base_dir):
+            for file in os.listdir(base_dir):
+                comp_name = file
+                comp_context = os.path.join(base_dir, file, 'context.py')
+                if os.path.exists(comp_context):
+                    comp_plugin = importlib.import_module('oeqa.%s.%s' % \
+                            (comp_name, 'context'))
+                    try:
+                        if not issubclass(comp_plugin._executor_class,
+                                OETestContextExecutor):
+                            raise TypeError("Component %s in %s, _executor_class "\
+                                "isn't derived from OETestContextExecutor."\
+                                % (comp_name, comp_context))
+
+                        if comp_plugin._executor_class._script_executor \
+                                != executor:
+                            continue
+
+                        components[comp_name] = comp_plugin._executor_class()
+                    except AttributeError:
+                        raise AttributeError("Component %s in %s don't have "\
+                                "_executor_class defined." % (comp_name, comp_context))
+
+    return components

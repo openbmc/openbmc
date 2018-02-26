@@ -20,6 +20,7 @@ SRC_URI = "git://github.com/ndpgroup/vpnc \
            file://0006-sysdep-Add-header-include-sequence-to-adjust-for-mus.patch \
            file://0007-add-error-API-when-error.h-is-not-on-platform.patch \
            file://0008-include-sysdep.h-before-net-if_tun.h.patch \
+           file://0009-reduce-lifetime-value.patch \
            "
 
 PACKAGECONFIG ?= "gnutls"

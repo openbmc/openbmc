@@ -18,11 +18,20 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 
 HELP="
-Usage: source toaster start|stop [webport=<address:port>] [noweb]
+Usage: source toaster start|stop [webport=<address:port>] [noweb] [nobuild]
     Optional arguments:
-        [noweb] Setup the environment for building with toaster but don't start the development server
+        [nobuild] Setup the environment for capturing builds with toaster but disable managed builds
+        [noweb] Setup the environment for capturing builds with toaster but don't start the web server
         [webport] Set the development server (default: localhost:8000)
 "
+
+custom_extention()
+{
+    custom_extension=$BBBASEDIR/lib/toaster/orm/fixtures/custom_toaster_append.sh
+    if [ -f $custom_extension ] ; then
+        $custom_extension $*
+    fi
+}
 
 databaseCheck()
 {
@@ -50,6 +59,11 @@ databaseCheck()
 webserverKillAll()
 {
     local pidfile
+    if [ -f ${BUILDDIR}/.toastermain.pid ] ; then
+        custom_extention web_stop_postpend
+    else
+        custom_extention noweb_stop_postpend
+    fi
     for pidfile in ${BUILDDIR}/.toastermain.pid ${BUILDDIR}/.runbuilds.pid; do
         if [ -f ${pidfile} ]; then
             pid=`cat ${pidfile}`
@@ -89,6 +103,7 @@ webserverStartAll()
     else
         echo "Toaster development webserver started at http://$ADDR_PORT"
         echo -e "\nYou can now run 'bitbake <target>' on the command line and monitor your build in Toaster.\nYou can also use a Toaster project to configure and run a build.\n"
+        custom_extention web_start_postpend $ADDR_PORT
     fi
 
     return $retval
@@ -116,8 +131,14 @@ verify_prereq() {
     # Verify Django version
     reqfile=$(python3 -c "import os; print(os.path.realpath('$BBBASEDIR/toaster-requirements.txt'))")
     exp='s/Django\([><=]\+\)\([^,]\+\),\([><=]\+\)\(.\+\)/'
-    exp=$exp'import sys,django;version=django.get_version().split(".");'
-    exp=$exp'sys.exit(not (version \1 "\2".split(".") and version \3 "\4".split(".")))/p'
+    # expand version parts to 2 digits to support 1.10.x > 1.8
+    # (note:helper functions hard to insert in-line)
+    exp=$exp'import sys,django;'
+    exp=$exp'version=["%02d" % int(n) for n in django.get_version().split(".")];'
+    exp=$exp'vmin=["%02d" % int(n) for n in "\2".split(".")];'
+    exp=$exp'vmax=["%02d" % int(n) for n in "\4".split(".")];'
+    exp=$exp'sys.exit(not (version \1 vmin and version \3 vmax))'
+    exp=$exp'/p'
     if ! sed -n "$exp" $reqfile | python3 - ; then
         req=`grep ^Django $reqfile`
         echo "This program needs $req"
@@ -162,14 +183,17 @@ fi
 unset OE_ROOT
 
 
-
 WEBSERVER=1
+export TOASTER_BUILDSERVER=1
 ADDR_PORT="localhost:8000"
 unset CMD
 for param in $*; do
     case $param in
     noweb )
             WEBSERVER=0
+    ;;
+    nobuild )
+            TOASTER_BUILDSERVER=0
     ;;
     start )
             CMD=$param
@@ -235,6 +259,7 @@ fi
 echo "The system will $CMD."
 
 # Execute the commands
+custom_extention toaster_prepend $CMD $ADDR_PORT
 
 case $CMD in
     start )
@@ -256,22 +281,28 @@ case $CMD in
             if [ ! -f "$TOASTER_DIR/toaster.sqlite" ] ; then
                 if ! databaseCheck; then
                     echo "Failed ${CMD}."
-                  return 4
+                    return 4
                 fi
             fi
+            custom_extention noweb_start_postpend $ADDR_PORT
         fi
         if [ $WEBSERVER -gt 0 ] && ! webserverStartAll; then
             echo "Failed ${CMD}."
             return 4
         fi
         export BITBAKE_UI='toasterui'
-        $MANAGE runbuilds \
-           </dev/null >>${BUILDDIR}/toaster_runbuilds.log 2>&1 \
-           & echo $! >${BUILDDIR}/.runbuilds.pid
+        if [ $TOASTER_BUILDSERVER -eq 1 ] ; then
+            $MANAGE runbuilds \
+               </dev/null >>${BUILDDIR}/toaster_runbuilds.log 2>&1 \
+               & echo $! >${BUILDDIR}/.runbuilds.pid
+        else
+            echo "Toaster build server not started."
+        fi
 
         # set fail safe stop system on terminal exit
         trap stop_system SIGHUP
         echo "Successful ${CMD}."
+        custom_extention toaster_postpend $CMD $ADDR_PORT
         return 0
     ;;
     stop )
@@ -279,3 +310,5 @@ case $CMD in
         echo "Successful ${CMD}."
     ;;
 esac
+custom_extention toaster_postpend $CMD $ADDR_PORT
+

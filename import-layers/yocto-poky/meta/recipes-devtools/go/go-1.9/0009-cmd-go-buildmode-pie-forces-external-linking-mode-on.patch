@@ -1,0 +1,47 @@
+From aae44527c8065d54f6acaf87c82cba1ac96fae59 Mon Sep 17 00:00:00 2001
+From: Ian Lance Taylor <iant@golang.org>
+Date: Fri, 18 Aug 2017 17:46:03 -0700
+Subject: [PATCH] cmd/go: -buildmode=pie forces external linking mode on all
+ systems
+
+The go tool assumed that -buildmode=pie implied internal linking on
+linux-amd64. However, that was changed by CL 36417 for issue #18968.
+
+Fixes #21452
+
+Change-Id: I8ed13aea52959cc5c53223f4c41ba35329445545
+Reviewed-on: https://go-review.googlesource.com/57231
+Run-TryBot: Ian Lance Taylor <iant@golang.org>
+TryBot-Result: Gobot Gobot <gobot@golang.org>
+Reviewed-by: Avelino <t@avelino.xxx>
+Reviewed-by: Rob Pike <r@golang.org>
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ src/cmd/go/internal/load/pkg.go | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/cmd/go/internal/load/pkg.go b/src/cmd/go/internal/load/pkg.go
+index 2660d3f..d40773b 100644
+--- a/src/cmd/go/internal/load/pkg.go
++++ b/src/cmd/go/internal/load/pkg.go
+@@ -954,11 +954,12 @@ func (p *Package) load(stk *ImportStack, bp *build.Package, err error) *Package
+ 
+ 	if cfg.BuildContext.CgoEnabled && p.Name == "main" && !p.Goroot {
+ 		// Currently build modes c-shared, pie (on systems that do not
+-		// support PIE with internal linking mode), plugin, and
+-		// -linkshared force external linking mode, as of course does
++		// support PIE with internal linking mode (currently all
++		// systems: issue #18968)), plugin, and -linkshared force
++		// external linking mode, as of course does
+ 		// -ldflags=-linkmode=external. External linking mode forces
+ 		// an import of runtime/cgo.
+-		pieCgo := cfg.BuildBuildmode == "pie" && (cfg.BuildContext.GOOS != "linux" || cfg.BuildContext.GOARCH != "amd64")
++		pieCgo := cfg.BuildBuildmode == "pie"
+ 		linkmodeExternal := false
+ 		for i, a := range cfg.BuildLdflags {
+ 			if a == "-linkmode=external" {
+-- 
+2.14.1
+

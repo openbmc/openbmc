@@ -13,6 +13,7 @@ consistent.  Thanks, Niko Tyni.
 Bug-Debian: http://bugs.debian.org/759405
 Origin: upstream
 Patch-Name: fixes/pod_man_reproducible_date.diff
+Upstream-Status: Pending
 ---
  cpan/podlators/lib/Pod/Man.pm  | 69 +++++++++++++++++++++++++++++++-----------
  cpan/podlators/t/devise-date.t | 29 +++++++++++++-----

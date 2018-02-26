@@ -32,6 +32,7 @@ do_install_append () {
     rm -f ${D}${includedir}/libfm-1.0/fm-xml-file.h
     rm -f ${D}${includedir}/libfm-1.0/fm-version.h
     rm -f ${D}${includedir}/libfm-1.0/fm-extra.h
+    rm -f ${D}${includedir}/libfm
     rm -f ${D}${libdir}/pkgconfig/libfm-extra.pc
     rm -f ${D}${libdir}/libfm-extra.so*
     rm -f ${D}${libdir}/libfm-extra.a

@@ -20,24 +20,21 @@ python () {
     ubootbinaries = d.getVar('UBOOT_BINARIES')
     # The "doc" varflag is special, we don't want to see it here
     ubootconfigflags.pop('doc', None)
+    ubootconfig = (d.getVar('UBOOT_CONFIG') or "").split()
 
-    if not ubootmachine and not ubootconfigflags:
+    if not ubootmachine and not ubootconfig:
         PN = d.getVar("PN")
         FILE = os.path.basename(d.getVar("FILE"))
         bb.debug(1, "To build %s, see %s for instructions on \
                  setting up your machine config" % (PN, FILE))
         raise bb.parse.SkipPackage("Either UBOOT_MACHINE or UBOOT_CONFIG must be set in the %s machine configuration." % d.getVar("MACHINE"))
 
-    if ubootmachine and ubootconfigflags:
+    if ubootmachine and ubootconfig:
         raise bb.parse.SkipPackage("You cannot use UBOOT_MACHINE and UBOOT_CONFIG at the same time.")
 
     if ubootconfigflags and ubootbinaries:
         raise bb.parse.SkipPackage("You cannot use UBOOT_BINARIES as it is internal to uboot_config.bbclass.")
 
-    if not ubootconfigflags:
-        return
-
-    ubootconfig = (d.getVar('UBOOT_CONFIG') or "").split()
     if len(ubootconfig) > 0:
         for config in ubootconfig:
             for f, v in ubootconfigflags.items():
@@ -57,6 +54,4 @@ python () {
                         bb.debug(1, "Appending '%s' to UBOOT_BINARIES." % ubootbinary)
                         d.appendVar('UBOOT_BINARIES', ' ' + ubootbinary)
                     break
-    elif len(ubootconfig) == 0:
-       raise bb.parse.SkipPackage('You must set a default in UBOOT_CONFIG.')
 }

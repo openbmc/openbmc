@@ -1,0 +1,90 @@
+From 037283cbc74739b72f36dfec827d120faa243406 Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer at redhat dot com>
+Date: Thu, 6 Jul 2017 11:50:55 +0200
+Subject: [PATCH 26/26] assert: Suppress pedantic warning caused by statement
+ expression [BZ# 21242]
+
+On 07/05/2017 10:15 PM, Zack Weinberg wrote:
+> On Wed, Jul 5, 2017 at 11:51 AM, Florian Weimer <fweimer@redhat.com> wrote:
+>> On 07/05/2017 05:46 PM, Zack Weinberg wrote:
+>>> A problem occurs to me: expressions involving VLAs _are_ evaluated
+>>> inside sizeof.
+>>
+>> The type of the sizeof argument would still be int (due to the
+>> comparison against 0), so this doesn't actually occur.
+>
+> I rechecked what C99 says about sizeof and VLAs, and you're right -
+> the operand of sizeof is only evaluated when sizeof is _directly_
+> applied to a VLA.  So this is indeed safe, but I think this wrinkle
+> should be mentioned in the comment.  Perhaps
+>
+> /* The first occurrence of EXPR is not evaluated due to the sizeof,
+>    but will trigger any pedantic warnings masked by the __extension__
+>    for the second occurrence.  The explicit comparison against zero
+>    ensures that sizeof is not directly applied to a function pointer or
+>    bit-field (which would be ill-formed) or VLA (which would be evaluated).  */
+>
+> zw
+
+What about the attached patch?
+
+Siddhesh, is this okay during the freeze?  I'd like to backport it to
+2.25 as well.
+
+Thanks,
+Florian
+
+assert: Suppress pedantic warning caused by statement expression
+
+2017-07-06  Florian Weimer  <fweimer@redhat.com>
+
+	[BZ #21242]
+	* assert/assert.h [__GNUC__ && !__STRICT_ANSI__] (assert):
+	Suppress pedantic warning resulting from statement expression.
+	(__ASSERT_FUNCTION): Add missing __extendsion__.
+---
+
+Upstream-Status: Submitted
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ assert/assert.h | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/assert/assert.h b/assert/assert.h
+index 22f019537c..6801cfeb10 100644
+--- a/assert/assert.h
++++ b/assert/assert.h
+@@ -91,13 +91,19 @@ __END_DECLS
+      ? __ASSERT_VOID_CAST (0)						\
+      : __assert_fail (#expr, __FILE__, __LINE__, __ASSERT_FUNCTION))
+ # else
++/* The first occurrence of EXPR is not evaluated due to the sizeof,
++   but will trigger any pedantic warnings masked by the __extension__
++   for the second occurrence.  The explicit comparison against zero is
++   required to support function pointers and bit fields in this
++   context, and to suppress the evaluation of variable length
++   arrays.  */
+ #  define assert(expr)							\
+-    ({									\
++  ((void) sizeof ((expr) == 0), __extension__ ({			\
+       if (expr)								\
+         ; /* empty */							\
+       else								\
+         __assert_fail (#expr, __FILE__, __LINE__, __ASSERT_FUNCTION);	\
+-    })
++    }))
+ # endif
+ 
+ # ifdef	__USE_GNU
+@@ -113,7 +119,7 @@ __END_DECLS
+    C9x has a similar variable called __func__, but prefer the GCC one since
+    it demangles C++ function names.  */
+ # if defined __cplusplus ? __GNUC_PREREQ (2, 6) : __GNUC_PREREQ (2, 4)
+-#   define __ASSERT_FUNCTION	__PRETTY_FUNCTION__
++#   define __ASSERT_FUNCTION	__extension__ __PRETTY_FUNCTION__
+ # else
+ #  if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+ #   define __ASSERT_FUNCTION	__func__
+-- 
+2.13.3
+

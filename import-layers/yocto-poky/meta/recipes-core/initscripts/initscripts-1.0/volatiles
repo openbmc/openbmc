@@ -27,7 +27,6 @@ d root root 1777 /run/lock none
 d root root 0755 /var/volatile/log none
 d root root 1777 /var/volatile/tmp none
 l root root 1777 /var/lock /run/lock
-l root root 0755 /var/log /var/volatile/log
 l root root 0755 /var/run /run
 l root root 1777 /var/tmp /var/volatile/tmp
 l root root 1777 /tmp /var/tmp

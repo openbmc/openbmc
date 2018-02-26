@@ -10,6 +10,7 @@ Compiling XS extensions without $Config{ccflags} can break the
 binary interface on some platforms.
 
 Patch-Name: fixes/document_makemaker_ccflags.diff
+Upstream-Status: Pending
 ---
  cpan/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm | 4 ++++
  1 file changed, 4 insertions(+)

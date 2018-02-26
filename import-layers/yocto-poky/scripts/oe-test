@@ -8,7 +8,6 @@
 import os
 import sys
 import argparse
-import importlib
 import logging
 
 scripts_path = os.path.dirname(os.path.realpath(__file__))
@@ -25,35 +24,10 @@ try:
 except ImportError:
     pass
 
-from oeqa.core.context import OETestContextExecutor
+from oeqa.utils import load_test_components
+from oeqa.core.exception import OEQAPreRun
 
-logger = scriptutils.logger_create('oe-test')
-
-def _load_test_components(logger):
-    components = {}
-
-    for path in sys.path:
-        base_dir = os.path.join(path, 'oeqa')
-        if os.path.exists(base_dir) and os.path.isdir(base_dir):
-            for file in os.listdir(base_dir):
-                comp_name = file
-                comp_context = os.path.join(base_dir, file, 'context.py')
-                if os.path.exists(comp_context):
-                    comp_plugin = importlib.import_module('oeqa.%s.%s' % \
-                            (comp_name, 'context'))
-                    try:
-                        if not issubclass(comp_plugin._executor_class,
-                                OETestContextExecutor):
-                            raise TypeError("Component %s in %s, _executor_class "\
-                                "isn't derived from OETestContextExecutor."\
-                                % (comp_name, comp_context))
-
-                        components[comp_name] = comp_plugin._executor_class()
-                    except AttributeError:
-                        raise AttributeError("Component %s in %s don't have "\
-                                "_executor_class defined." % (comp_name, comp_context))
-
-    return components
+logger = scriptutils.logger_create('oe-test', stream=sys.stdout)
 
 def main():
     parser = argparse_oe.ArgumentParser(description="OpenEmbedded test tool",
@@ -73,7 +47,7 @@ def main():
     elif global_args.quiet:
         logger.setLevel(logging.ERROR)
 
-    components = _load_test_components(logger)
+    components = load_test_components(logger, 'oe-test')
 
     subparsers = parser.add_subparsers(dest="subparser_name", title='subcommands', metavar='<subcommand>')
     subparsers.add_subparser_group('components', 'Test components')
@@ -92,6 +66,8 @@ def main():
         ret = err.code
     except argparse_oe.ArgumentUsageError as ae:
         parser.error_subcommand(ae.message, ae.subcommand)
+    except OEQAPreRun as pr:
+        ret = 1
 
     return ret
 

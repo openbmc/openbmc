@@ -141,7 +141,7 @@ ACLOCALEXTRAPATH_class-nativesdk = " -I ${STAGING_DATADIR_NATIVE}/aclocal/"
 
 python autotools_aclocals () {
     # Refresh variable with cache files
-    d.setVar("CONFIG_SITE", siteinfo_get_files(d, aclocalcache=True))
+    d.setVar("CONFIG_SITE", siteinfo_get_files(d, sysrootcache=True))
 }
 
 CONFIGURE_FILES = "${S}/configure.in ${S}/configure.ac ${S}/config.h.in ${S}/acinclude.m4 Makefile.am"

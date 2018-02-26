@@ -63,7 +63,9 @@ class PackageReverseDepView(Gtk.TreeView):
         self.current = None
         self.filter_model = model.filter_new()
         self.filter_model.set_visible_func(self._filter)
-        self.set_model(self.filter_model)
+        self.sort_model = self.filter_model.sort_new_with_model()
+        self.sort_model.set_sort_column_id(COL_DEP_PARENT, Gtk.SortType.ASCENDING)
+        self.set_model(self.sort_model)
         self.append_column(Gtk.TreeViewColumn(label, Gtk.CellRendererText(), text=COL_DEP_PARENT))
 
     def _filter(self, model, iter, data):
@@ -286,23 +288,7 @@ def main(server, eventHandler, params):
                 continue
 
             if isinstance(event, bb.event.NoProvider):
-                if event._runtime:
-                    r = "R"
-                else:
-                    r = ""
-
-                extra = ''
-                if not event._reasons:
-                    if event._close_matches:
-                        extra = ". Close matches:\n  %s" % '\n  '.join(event._close_matches)
-
-                if event._dependees:
-                    print("Nothing %sPROVIDES '%s' (but %s %sDEPENDS on or otherwise requires it)%s" % (r, event._item, ", ".join(event._dependees), r, extra))
-                else:
-                    print("Nothing %sPROVIDES '%s'%s" % (r, event._item, extra))
-                if event._reasons:
-                    for reason in event._reasons:
-                        print(reason)
+                print(str(event))
 
                 _, error = server.runCommand(["stateShutdown"])
                 if error:
@@ -310,7 +296,7 @@ def main(server, eventHandler, params):
                 break
 
             if isinstance(event, bb.command.CommandFailed):
-                print("Command execution failed: %s" % event.error)
+                print(str(event))
                 return event.exitcode
 
             if isinstance(event, bb.command.CommandExit):

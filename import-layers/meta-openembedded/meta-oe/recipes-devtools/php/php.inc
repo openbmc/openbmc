@@ -203,6 +203,7 @@ MODPHP_PACKAGE = "${@bb.utils.contains('PACKAGECONFIG', 'apache2', '${PN}-modphp
 
 PACKAGES = "${PN}-dbg ${PN}-cli ${PN}-cgi ${PN}-fpm ${PN}-fpm-apache2 ${PN}-pear ${PN}-phar ${MODPHP_PACKAGE} ${PN}-dev ${PN}-staticdev ${PN}-doc ${PN}"
 
+RDEPENDS_${PN} += "libgcc"
 RDEPENDS_${PN}-pear = "${PN}"
 RDEPENDS_${PN}-phar = "${PN}-cli"
 RDEPENDS_${PN}-cli = "${PN}"

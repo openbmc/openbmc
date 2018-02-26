@@ -1,0 +1,60 @@
+From 5235a7f3692a4c3c90dd4ac1be3c670388904bbe Mon Sep 17 00:00:00 2001
+From: Tatu Frisk <tatu.frisk@ge.com>
+Date: Tue, 14 Mar 2017 14:41:27 +0200
+Subject: [PATCH] Fix hanging issue in _XReply
+
+Assume event queue is empty if another thread is blocking waiting for event.
+
+If one thread was blocking waiting for an event and another thread sent a
+reply to the X server, both threads got blocked until an event was
+received.
+
+Upstream-Status: Submitted [https://patchwork.freedesktop.org/patch/171458/]
+
+This patch needs to be removed once the corresponding patch has been merged upstream.
+
+https://patchwork.freedesktop.org/patch/171458/
+
+Signed-off-by: Tatu Frisk <tatu.frisk@ge.com>
+Signed-off-by: Jose Alarcon <jose.alarcon@ge.com>
+---
+ src/xcb_io.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
+
+diff --git a/src/xcb_io.c b/src/xcb_io.c
+index 5987329..c64eb04 100644
+--- a/src/xcb_io.c
++++ b/src/xcb_io.c
+@@ -609,22 +609,17 @@ Status _XReply(Display *dpy, xReply *rep, int extra, Bool discard)
+ 		 * letting anyone else process this sequence number, we
+ 		 * need to process any events that should have come
+ 		 * earlier. */
+-
+ 		if(dpy->xcb->event_owner == XlibOwnsEventQueue)
+ 		{
+ 			xcb_generic_reply_t *event;
+-			/* If some thread is already waiting for events,
+-			 * it will get the first one. That thread must
+-			 * process that event before we can continue. */
+-			/* FIXME: That event might be after this reply,
+-			 * and might never even come--or there might be
+-			 * multiple threads trying to get events. */
+-			while(dpy->xcb->event_waiter)
+-			{ /* need braces around ConditionWait */
+-				ConditionWait(dpy, dpy->xcb->event_notify);
++
++			/* Assume event queue is empty if another thread is blocking
++			 * waiting for event. */
++			if(!dpy->xcb->event_waiter)
++			{
++				while((event = poll_for_response(dpy)))
++					handle_response(dpy, event, True);
+ 			}
+-			while((event = poll_for_event(dpy)))
+-				handle_response(dpy, event, True);
+ 		}
+ 
+ 		req->reply_waiter = 0;
+-- 
+2.10.1
+

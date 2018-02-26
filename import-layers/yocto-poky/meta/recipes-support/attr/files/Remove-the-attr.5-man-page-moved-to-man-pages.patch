@@ -1,0 +1,240 @@
+From 6047c8522b91235ad1e835f44f5e36472d9d49b2 Mon Sep 17 00:00:00 2001
+From: Andreas Gruenbacher <andreas.gruenbacher@gmail.com>
+Date: Wed, 22 Apr 2015 11:46:59 +0200
+Subject: [PATCH 2/2] Remove the attr.5 man page (moved to man-pages)
+
+Commit dce9b4448c7f2b22bd206cd068fb05cb2f3255b9 from
+https://git.savannah.nongnu.org/git/attr.git
+
+The attr.5 page is part of the extended attribute system call documentation,
+which has been moved into the man-pages package. Move the attr.5 page there
+as well.
+
+Upstream-Status: Backport
+
+[MA: updated to apply directly to v2.4.47]
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ man/Makefile      |   2 +-
+ man/man5/Makefile |  35 -------------
+ man/man5/attr.5   | 153 ------------------------------------------------------
+ 3 files changed, 1 insertion(+), 189 deletions(-)
+ delete mode 100644 man/man5/Makefile
+ delete mode 100644 man/man5/attr.5
+
+diff --git a/man/Makefile b/man/Makefile
+index 755daed..9301f09 100644
+--- a/man/Makefile
++++ b/man/Makefile
+@@ -19,7 +19,7 @@
+ TOPDIR = ..
+ include $(TOPDIR)/include/builddefs
+ 
+-SUBDIRS = man1 man3 man5
++SUBDIRS = man1 man3
+ 
+ default : $(SUBDIRS)
+ 
+diff --git a/man/man5/Makefile b/man/man5/Makefile
+deleted file mode 100644
+index 6b70d3d..0000000
+--- a/man/man5/Makefile
++++ /dev/null
+@@ -1,35 +0,0 @@
+-#
+-# Copyright (c) 2000, 2002 Silicon Graphics, Inc.  All Rights Reserved.
+-# Copyright (C) 2009  Andreas Gruenbacher <agruen@suse.de>
+-#
+-# This program is free software: you can redistribute it and/or modify it
+-# under the terms of the GNU General Public License as published by
+-# the Free Software Foundation, either version 2 of the License, or
+-# (at your option) any later version.
+-#
+-# This program is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-# GNU General Public License for more details.
+-#
+-# You should have received a copy of the GNU General Public License
+-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-#
+-
+-TOPDIR = ../..
+-include $(TOPDIR)/include/builddefs
+-
+-MAN_SECTION	= 5
+-
+-MAN_PAGES	= $(shell echo *.$(MAN_SECTION))
+-MAN_DEST	= $(PKG_MAN_DIR)/man$(MAN_SECTION)
+-LSRCFILES	= $(MAN_PAGES)
+-
+-default : $(MAN_PAGES)
+-
+-include $(BUILDRULES)
+-
+-install : default
+-	$(INSTALL) -m 755 -d $(MAN_DEST)
+-	$(INSTALL_MAN)
+-install-dev install-lib:
+diff --git a/man/man5/attr.5 b/man/man5/attr.5
+deleted file mode 100644
+index a02757d..0000000
+--- a/man/man5/attr.5
++++ /dev/null
+@@ -1,153 +0,0 @@
+-.\" Extended attributes manual page
+-.\"
+-.\" Copyright (C) 2000, 2002, 2007  Andreas Gruenbacher <agruen@suse.de>
+-.\" Copyright (C) 2001, 2002, 2004, 2007 Silicon Graphics, Inc.
+-.\" All rights reserved.
+-.\"
+-.\" This is free documentation; you can redistribute it and/or
+-.\" modify it under the terms of the GNU General Public License as
+-.\" published by the Free Software Foundation; either version 2 of
+-.\" the License, or (at your option) any later version.
+-.\"
+-.\" The GNU General Public License's references to "object code"
+-.\" and "executables" are to be interpreted as the output of any
+-.\" document formatting or typesetting system, including
+-.\" intermediate and printed output.
+-.\"
+-.\" This manual is distributed in the hope that it will be useful,
+-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-.\" GNU General Public License for more details.
+-.\"
+-.\" You should have received a copy of the GNU General Public
+-.\" License along with this manual.  If not, see
+-.\" <http://www.gnu.org/licenses/>.
+-.\"
+-.TH ATTR 5
+-.SH NAME
+-attr - Extended attributes
+-.SH DESCRIPTION
+-Extended attributes are name:value pairs associated permanently with
+-files and directories, similar to the environment strings associated
+-with a process.
+-An attribute may be defined or undefined.
+-If it is defined, its value may be empty or non-empty.
+-.PP
+-Extended attributes are extensions to the normal attributes which are
+-associated with all inodes in the system (i.e. the
+-.BR stat (2)
+-data).
+-They are often used to provide additional functionality
+-to a filesystem \- for example, additional security features such as
+-Access Control Lists (ACLs) may be implemented using extended attributes.
+-.PP
+-Users with search access to a file or directory may retrieve a list of
+-attribute names defined for that file or directory.
+-.PP
+-Extended attributes are accessed as atomic objects.
+-Reading retrieves the whole value of an attribute and stores it in a buffer.
+-Writing replaces any previous value with the new value.
+-.PP
+-Space consumed for extended attributes is counted towards the disk quotas
+-of the file owner and file group.
+-.PP
+-Currently, support for extended attributes is implemented on Linux by the
+-ext2, ext3, ext4, XFS, JFS and reiserfs filesystems.
+-.SH EXTENDED ATTRIBUTE NAMESPACES
+-Attribute names are zero-terminated strings.
+-The attribute name is always specified in the fully qualified
+-.IR namespace.attribute
+-form, eg.
+-.IR user.mime_type ,
+-.IR trusted.md5sum ,
+-.IR system.posix_acl_access ,
+-or
+-.IR security.selinux .
+-.PP
+-The namespace mechanism is used to define different classes of extended
+-attributes.
+-These different classes exist for several reasons, e.g. the permissions
+-and capabilities required for manipulating extended attributes of one
+-namespace may differ to another.
+-.PP
+-Currently the
+-.IR security ,
+-.IR system ,
+-.IR trusted ,
+-and
+-.IR user
+-extended attribute classes are defined as described below. Additional
+-classes may be added in the future.
+-.SS Extended security attributes
+-The security attribute namespace is used by kernel security modules,
+-such as Security Enhanced Linux.  
+-Read and write access permissions to security attributes depend on the
+-policy implemented for each security attribute by the security module.
+-When no security module is loaded, all processes have read access to
+-extended security attributes, and write access is limited to processes
+-that have the CAP_SYS_ADMIN capability.
+-.SS Extended system attributes
+-Extended system attributes are used by the kernel to store system
+-objects such as Access Control Lists and Capabilities.  Read and write
+-access permissions to system attributes depend on the policy implemented
+-for each system attribute implemented by filesystems in the kernel.
+-.SS Trusted extended attributes
+-Trusted extended attributes are visible and accessible only to processes that
+-have the CAP_SYS_ADMIN capability (the super user usually has this
+-capability).
+-Attributes in this class are used to implement mechanisms in user
+-space (i.e., outside the kernel) which keep information in extended attributes
+-to which ordinary processes should not have access.
+-.SS Extended user attributes
+-Extended user attributes may be assigned to files and directories for
+-storing arbitrary additional information such as the mime type,
+-character set or encoding of a file. The access permissions for user
+-attributes are defined by the file permission bits.
+-.PP
+-The file permission bits of regular files and directories are
+-interpreted differently from the file permission bits of special files
+-and symbolic links. For regular files and directories the file
+-permission bits define access to the file's contents, while for device special
+-files they define access to the device described by the special file.
+-The file permissions of symbolic links are not used in access
+-checks. These differences would allow users to consume filesystem resources in
+-a way not controllable by disk quotas for group or world writable special files and directories.
+-.PP
+-For this reason, extended user attributes are only allowed for regular files and directories, and access to extended user attributes is restricted to the
+-owner and to users with appropriate capabilities for directories with the
+-sticky bit set (see the
+-.BR chmod (1)
+-manual page for an explanation of Sticky Directories).
+-.SH FILESYSTEM DIFFERENCES
+-The kernel and the filesystem may place limits on the maximum number
+-and size of extended attributes that can be associated with a file.
+-Some file systems, such as ext2/3 and reiserfs, require the filesystem
+-to be mounted with the
+-.B user_xattr
+-mount option in order for extended user attributes to be used.
+-.PP
+-In the current ext2, ext3 and ext4 filesystem implementations, each
+-extended attribute must fit on a single filesystem block (1024, 2048
+-or 4096 bytes, depending on the block size specified when the
+-filesystem was created).
+-.PP
+-In the XFS and reiserfs filesystem implementations, there is no
+-practical limit on the number or size of extended attributes
+-associated with a file, and the algorithms used to store extended
+-attribute information on disk are scalable.
+-.PP
+-In the JFS filesystem implementation, names can be up to 255 bytes and
+-values up to 65,535 bytes.
+-.SH ADDITIONAL NOTES
+-Since the filesystems on which extended attributes are stored might also
+-be used on architectures with a different byte order and machine word
+-size, care should be taken to store attribute values in an architecture
+-independent format.
+-.SH AUTHORS
+-Andreas Gruenbacher,
+-.RI < a.gruenbacher@bestbits.at >
+-and the SGI XFS development team,
+-.RI < linux-xfs@oss.sgi.com >.
+-.SH SEE ALSO
+-getfattr(1),
+-setfattr(1).
+-- 
+2.7.4
+

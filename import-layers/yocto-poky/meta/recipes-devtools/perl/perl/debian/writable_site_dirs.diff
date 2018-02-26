@@ -6,6 +6,7 @@ Subject: Set umask approproately for site install directories
 Policy requires group writable site directories
 
 Patch-Name: debian/writable_site_dirs.diff
+Upstream-Status: Pending
 ---
  cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)

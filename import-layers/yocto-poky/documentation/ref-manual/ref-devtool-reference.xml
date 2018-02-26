@@ -20,8 +20,8 @@
         For more information on how to apply the command when using the
         extensible SDK, see the
         "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-extensible'>Using the Extensible SDK</ulink>"
-        section in the Yocto Project Software Development Kit (SDK) Developer's
-        Guide.
+        section in the Yocto Project Application Development and the
+        Extensible Software Development Kit (eSDK) manual.
     </para>
 
     <section id='devtool-getting-help'>
@@ -35,45 +35,59 @@
             the commands:
             <literallayout class='monospaced'>
      $ devtool --help
-     usage: devtool [--basepath BASEPATH] [--bbpath BBPATH] [-d] [-q]
-                    [--color COLOR] [-h]
-                    &lt;subcommand&gt; ...
+     usage: devtool add [-h] [--same-dir | --no-same-dir] [--fetch URI]
+                        [--fetch-dev] [--version VERSION] [--no-git]
+                        [--srcrev SRCREV | --autorev] [--srcbranch SRCBRANCH]
+                        [--binary] [--also-native] [--src-subdir SUBDIR]
+                        [--mirrors] [--provides PROVIDES]
+                        [recipename] [srctree] [fetchuri]
 
-     OpenEmbedded development tool
+     Adds a new recipe to the workspace to build a specified source tree. Can
+     optionally fetch a remote URI and unpack it to create the source tree.
+
+     arguments:
+       recipename            Name for new recipe to add (just name - no version,
+                             path or extension). If not specified, will attempt
+                             to auto-detect it.
+       srctree               Path to external source tree. If not specified, a
+                             subdirectory of
+                             /home/<replaceable>user</replaceable>/poky/build/workspace/sources will be
+                             used.
+       fetchuri              Fetch the specified URI and extract it to create
+                             the source tree
 
      options:
-       --basepath BASEPATH  Base directory of SDK / build directory
-       --bbpath BBPATH      Explicitly specify the BBPATH, rather than getting it
-                            from the metadata
-       -d, --debug          Enable debug output
-       -q, --quiet          Print only errors
-       --color COLOR        Colorize output (where COLOR is auto, always, never)
-       -h, --help           show this help message and exit
-
-     subcommands:
-       Beginning work on a recipe:
-         add                  Add a new recipe
-         modify               Modify the source for an existing recipe
-         upgrade              Upgrade an existing recipe
-       Getting information:
-         status               Show workspace status
-         search               Search available recipes
-       Working on a recipe in the workspace:
-         edit-recipe          Edit a recipe file in your workspace
-         configure-help       Get help on configure script options
-         build                Build a recipe
-         update-recipe        Apply changes from external source tree to recipe
-         reset                Remove a recipe from your workspace
-         finish               Finish working on a recipe in your workspace
-       Testing changes on target:
-         deploy-target        Deploy recipe output files to live target machine
-         undeploy-target      Undeploy recipe output files in live target machine
-         build-image          Build image including workspace recipe packages
-       Advanced:
-         create-workspace     Set up workspace in an alternative location
-         extract              Extract the source for an existing recipe
-         sync                 Synchronize the source tree for an existing recipe
-     Use devtool &lt;subcommand&gt; --help to get help on a specific command
+       -h, --help            show this help message and exit
+       --same-dir, -s        Build in same directory as source
+       --no-same-dir         Force build in a separate build directory
+       --fetch URI, -f URI   Fetch the specified URI and extract it to create
+                             the source tree (deprecated - pass as positional
+                             argument instead)
+       --fetch-dev           For npm, also fetch devDependencies
+       --version VERSION, -V VERSION
+                             Version to use within recipe (PV)
+       --no-git, -g          If fetching source, do not set up source tree as a
+                             git repository
+       --srcrev SRCREV, -S SRCREV
+                             Source revision to fetch if fetching from an SCM
+                             such as git (default latest)
+       --autorev, -a         When fetching from a git repository, set SRCREV in
+                             the recipe to a floating revision instead of fixed
+       --srcbranch SRCBRANCH, -B SRCBRANCH
+                             Branch in source repository if fetching from an SCM
+                             such as git (default master)
+       --binary, -b          Treat the source tree as something that should be
+                             installed verbatim (no compilation, same directory
+                             structure). Useful with binary packages e.g. RPMs.
+       --also-native         Also add native variant (i.e. support building
+                             recipe for the build host as well as the target
+                             machine)
+       --src-subdir SUBDIR   Specify subdirectory within source tree to use
+       --mirrors             Enable PREMIRRORS and MIRRORS for source tree
+                             fetching (disable by default).
+       --provides PROVIDES, -p PROVIDES
+                             Specify an alias for the item provided by the
+                             recipe. E.g. virtual/libgl
             </literallayout>
         </para>
 
@@ -194,9 +208,9 @@
             The following example creates and adds a new recipe named
             <filename>jackson</filename> to a workspace layer the tool creates.
             The source code built by the recipes resides in
-            <filename>/home/scottrif/sources/jackson</filename>:
+            <filename>/home/<replaceable>user</replaceable>/sources/jackson</filename>:
             <literallayout class='monospaced'>
-     $ devtool add jackson /home/scottrif/sources/jackson
+     $ devtool add jackson /home/<replaceable>user</replaceable>/sources/jackson
             </literallayout>
         </para>
 
@@ -214,18 +228,52 @@
             append files, and source files into the existing workspace layer.
             The <filename>.bbappend</filename> file is created to point
             to the external source tree.
+            <note>
+                If your recipe has runtime dependencies defined, you must be sure
+                that these packages exist on the target hardware before attempting
+                to run your application.
+                If dependent packages (e.g. libraries) do not exist on the target,
+                your application, when run, will fail to find those functions.
+                For more information, see the
+                "<link linkend='devtool-deploying-your-software-on-the-target-machine'>Deploying Your Software on the Target Machine</link>"
+                section.
+            </note>
         </para>
 
-        <note>
-            If your recipe has runtime dependencies defined, you must be sure
-            that these packages exist on the target hardware before attempting
-            to run your application.
-            If dependent packages (e.g. libraries) do not exist on the target,
-            your application, when run, will fail to find those functions.
-            For more information, see the
-            "<link linkend='devtool-deploying-your-software-on-the-target-machine'>Deploying Your Software on the Target Machine</link>"
-            section.
-        </note>
+        <para>
+            By default, <filename>devtool add</filename> uses the latest
+            revision (i.e. master) when unpacking files from a remote URI.
+            In some cases, you might want to specify a source revision by
+            branch, tag, or commit hash. You can specify these options when
+            using the <filename>devtool add</filename> command:
+            <itemizedlist>
+                <listitem><para>
+                    To specify a source branch, use the
+                    <filename>--srcbranch</filename> option:
+                    <literallayout class='monospaced'>
+     $ devtool add --srcbranch &DISTRO_NAME_NO_CAP; jackson /home/<replaceable>user</replaceable>/sources/jackson
+                    </literallayout>
+                    In the previous example, you are checking out the
+                    &DISTRO_NAME_NO_CAP; branch.
+                    </para></listitem>
+                <listitem><para>
+                    To specify a specific tag or commit hash, use the
+                    <filename>--srcrev</filename> option:
+                    <literallayout class='monospaced'>
+     $ devtool add --srcrev &DISTRO_REL_TAG; jackson /home/<replaceable>user</replaceable>/sources/jackson
+     $ devtool add --srcrev <replaceable>some_commit_hash</replaceable> /home/<replaceable>user</replaceable>/sources/jackson
+                    </literallayout>
+                    The previous examples check out the &DISTRO_REL_TAG; tag
+                    and the commit associated with the
+                    <replaceable>some_commit_hash</replaceable> hash.
+                    </para></listitem>
+            </itemizedlist>
+            <note>
+                If you prefer to use the latest revision every time the recipe is
+                built, use the options <filename>--autorev</filename>
+                or <filename>-a</filename>.
+            </note>
+        </para>
     </section>
 
     <section id='devtool-extracting-the-source-for-an-existing-recipe'>
@@ -276,7 +324,7 @@
             Use the <filename>devtool modify</filename> command to begin
             modifying the source of an existing recipe.
             This command is very similar to the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#devtool-adding-a-new-recipe-to-the-workspace'><filename>add</filename></ulink>
+            <link linkend='devtool-adding-a-new-recipe-to-the-workspace'><filename>add</filename></link>
             command except that it does not physically create the
             recipe in the workspace layer because the recipe already
             exists in an another layer.
@@ -334,7 +382,7 @@
             to the source files.
             For example, if you know you are going to work on some
             code, you could first use the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#devtool-modifying-a-recipe'><filename>devtool modify</filename></ulink>
+            <link linkend='devtool-modifying-a-recipe'><filename>devtool modify</filename></link>
             command to extract the code and set up the workspace.
             After which, you could modify, compile, and test the code.
         </para>
@@ -556,7 +604,7 @@
             remove deployed build output from the target machine.
             For the <filename>devtool undeploy-target</filename> command to
             work, you must have previously used the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#devtool-deploying-your-software-on-the-target-machine'><filename>devtool deploy-target</filename></ulink>
+            <link linkend='devtool-deploying-your-software-on-the-target-machine'><filename>devtool deploy-target</filename></link>
             command.
             <literallayout class='monospaced'>
      $ devtool undeploy-target <replaceable>recipe</replaceable>&nbsp;<replaceable>target</replaceable>
@@ -573,7 +621,7 @@
         <para>
             Use the <filename>devtool create-workspace</filename> command to
             create a new workspace layer in your
-            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+            <link linkend='build-directory'>Build Directory</link>.
             When you create a new workspace layer, it is populated with the
             <filename>README</filename> file and the
             <filename>conf</filename> directory only.
@@ -616,7 +664,7 @@
      $ devtool status
             </literallayout>
             Following is sample output after using
-            <ulink url='&YOCTO_DOCS_DEV_URL;#devtool-adding-a-new-recipe-to-the-workspace'><filename>devtool add</filename></ulink>
+            <link linkend='devtool-adding-a-new-recipe-to-the-workspace'><filename>devtool add</filename></link>
             to create and add the <filename>mtr_0.86.bb</filename> recipe
             to the <filename>workspace</filename> directory:
             <literallayout class='monospaced'>

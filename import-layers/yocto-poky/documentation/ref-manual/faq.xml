@@ -13,11 +13,11 @@
         </question>
         <answer>
             <para>
-                The term "<ulink url='&YOCTO_DOCS_DEV_URL;#poky'>Poky</ulink>"
+                The term "<link link='poky'>Poky</link>"
                 refers to the specific reference build system that
                 the Yocto Project provides.
-                Poky is based on <ulink url='&YOCTO_DOCS_DEV_URL;#oe-core'>OE-Core</ulink>
-                and <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink>.
+                Poky is based on <link linkend='oe-core'>OE-Core</link>
+                and <link linkend='bitbake-term'>BitBake</link>.
                 Thus, the generic term used here for the build system is
                 the "OpenEmbedded build system."
                 Development in the Yocto Project using Poky is closely tied to OpenEmbedded, with
@@ -60,7 +60,7 @@
                 There are three areas that help with stability;
                 <itemizedlist>
                     <listitem><para>The Yocto Project team keeps
-                        <ulink url='&YOCTO_DOCS_DEV_URL;#oe-core'>OE-Core</ulink> small
+                        <link linkend='oe-core'>OE-Core</link> small
                         and focused, containing around 830 recipes as opposed to the thousands
                         available in other OpenEmbedded community layers.
                         Keeping it small makes it easy to test and maintain.</para></listitem>
@@ -86,7 +86,7 @@
                 Board Support Package (BSP) layer for it.
                 For more information on how to create a BSP layer, see the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and Creating Layers</ulink>"
-                section in the Yocto Project Development Manual and the
+                section in the Yocto Project Development Tasks Manual and the
                 <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>.
             </para>
             <para>
@@ -143,7 +143,7 @@
                 To add a package, you need to create a BitBake recipe.
                 For information on how to create a BitBake recipe, see the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#new-recipe-writing-a-new-recipe'>Writing a New Recipe</ulink>"
-                in the Yocto Project Development Manual.
+                in the Yocto Project Development Tasks Manual.
             </para>
         </answer>
     </qandaentry>
@@ -235,8 +235,9 @@
     <qandaentry>
         <question>
             <para>
-                I see lots of 404 responses for files on
-                <filename>&YOCTO_HOME_URL;/sources/*</filename>. Is something wrong?
+                I see lots of 404 responses for files when the OpenEmbedded
+                build system is trying to download sources.
+                Is something wrong?
             </para>
         </question>
         <answer>
@@ -416,9 +417,9 @@
 
             <para>
                 You can find more information on licensing in the
-                "<ulink url='&YOCTO_DOCS_DEV_URL;#licensing'>Licensing</ulink>"
-                and "<ulink url='&YOCTO_DOCS_DEV_URL;#maintaining-open-source-license-compliance-during-your-products-lifecycle'>Maintaining Open Source License Compliance During Your Product's Lifecycle</ulink>"
-                sections, both of which are in the Yocto Project Development
+                "<link linkend='licensing'>Licensing</link>" section and in the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#maintaining-open-source-license-compliance-during-your-products-lifecycle'>Maintaining Open Source License Compliance During Your Product's Lifecycle</ulink>"
+                section, which is in the Yocto Project Development Tasks
                 Manual.
             </para>
         </answer>
@@ -547,7 +548,7 @@
                 file to include from the
                 <filename>meta/conf/distro/include</filename> directory within
                 the
-                <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                <link linkend='source-directory'>Source Directory</link>.
             </para>
 
             <para>
@@ -699,10 +700,9 @@
                 When you use BitBake to build an image, all the build output
                 goes into the directory created when you run the
                 build environment setup script (i.e.
-                <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>
-                or
-                <link linkend='structure-memres-core-script'><filename>oe-init-build-env-memres</filename></link>).
-                By default, this <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>).
+                By default, this
+                <link linkend='build-directory'>Build Directory</link>
                 is named <filename>build</filename> but can be named
                 anything you want.
             </para>
@@ -765,7 +765,7 @@
 
             <para>
                 Meanwhile, <filename>DESTDIR</filename> is a path within the
-                <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                <link linkend='build-directory'>Build Directory</link>.
                 However, when the recipe builds a native program (i.e. one
                 that is intended to run on the build machine), that program
                 is never installed directly to the build machine's root
@@ -810,7 +810,7 @@
             <para>
                 This situation results when a build system does
                 not recognize the environment variables supplied to it by
-                <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink>.
+                <link linkend='bitbake-term'>BitBake</link>.
                 The incident that prompted this FAQ entry involved a Makefile
                 that used an environment variable named
                 <filename>BINDIR</filename> instead of the more standard

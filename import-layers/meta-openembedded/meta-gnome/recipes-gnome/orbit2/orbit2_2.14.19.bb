@@ -1,4 +1,5 @@
 SUMMARY = "CORBA ORB"
+HOMEPAGE = "http://www.gnome.org/projects/ORBit2"
 SECTION = "x11/gnome/libs"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"

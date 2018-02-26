@@ -7,6 +7,8 @@ getdents/getdents64 are implemented in musl and when we define static
 functions with same name, it errors out.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
 ---
  testcases/kernel/syscalls/getdents/getdents.h | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)

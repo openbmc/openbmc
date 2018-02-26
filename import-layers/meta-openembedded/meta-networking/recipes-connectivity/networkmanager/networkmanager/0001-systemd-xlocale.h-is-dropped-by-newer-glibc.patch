@@ -1,0 +1,29 @@
+From a9bfe6f2029d75caf28fcdf3e740843cf6359615 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 Jun 2017 07:31:25 -0700
+Subject: [PATCH 1/2] systemd: xlocale.h is dropped by newer glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/systemd/src/basic/parse-util.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/src/systemd/src/basic/parse-util.c b/src/systemd/src/basic/parse-util.c
+index 9c21e5a..dd95d1f 100644
+--- a/src/systemd/src/basic/parse-util.c
++++ b/src/systemd/src/basic/parse-util.c
+@@ -25,11 +25,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#ifdef __GLIBC__
+-#include <xlocale.h>
+-#else
+ #include <locale.h>
+-#endif
+ #include "alloc-util.h"
+ #include "extract-word.h"
+ #include "macro.h"
+-- 
+2.13.2
+

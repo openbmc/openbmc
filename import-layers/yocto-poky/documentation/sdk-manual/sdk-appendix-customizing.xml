@@ -148,9 +148,7 @@
             <listitem><para>
                 If your OpenEmbedded build system setup uses a different
                 environment setup script other than
-                <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
-                or
-                <ulink url='&YOCTO_DOCS_REF_URL;#structure-memres-core-script'><filename>oe-init-build-env-memres</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>,
                 then you must set
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-OE_INIT_ENV_SCRIPT'><filename>OE_INIT_ENV_SCRIPT</filename></ulink>
                 to point to the environment setup script you use.
@@ -289,7 +287,7 @@
                         for the SDK alone, create a
                         <filename>conf/sdk-extra.conf</filename> either in
                         your
-                        <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                        <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
                         or within any layer and put your
                         <filename>SSTATE_MIRRORS</filename> setting within
                         that file.

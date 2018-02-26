@@ -1,4 +1,5 @@
 SUMMARY = "Linux Virtual Server administration Utility"
+HOMEPAGE = "http://www.linux-vs.org/software/index.html"
 DESCRIPTION = "Ipvsadm  is  used  to set up, maintain or inspect the virtual server \
 table in the Linux kernel. The Linux Virtual  Server  can  be  used  to \
 build  scalable  network  services  based  on  a cluster of two or more nodes. \

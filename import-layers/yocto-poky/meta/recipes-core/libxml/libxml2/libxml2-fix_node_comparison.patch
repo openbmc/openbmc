@@ -5,10 +5,10 @@ xpath:
  - Add sanity check for empty stack.
  - Include comparation in changes from xmlXPathCmpNodesExt to xmlXPathCmpNodes
 
-Upstream-Status: Backported
+Upstream-Status: Backport
  - [https://git.gnome.org/browse/libxml2/commit/?id=c1d1f7121194036608bf555f08d3062a36fd344b]
  - [https://git.gnome.org/browse/libxml2/commit/?id=a005199330b86dada19d162cae15ef9bdcb6baa8]
-CVE: necessary changes for fixing CVE-2016-5131
+CVE: CVE-2016-5131
 Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
 Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
 

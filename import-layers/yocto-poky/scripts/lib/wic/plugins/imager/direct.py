@@ -26,17 +26,20 @@
 
 import logging
 import os
+import random
 import shutil
 import tempfile
 import uuid
 
 from time import strftime
 
+from oe.path import copyhardlinktree
+
 from wic import WicError
 from wic.filemap import sparse_copy
 from wic.ksparser import KickStart, KickStartError
 from wic.pluginbase import PluginMgr, ImagerPlugin
-from wic.utils.misc import get_bitbake_var, exec_cmd, exec_native_cmd
+from wic.misc import get_bitbake_var, exec_cmd, exec_native_cmd
 
 logger = logging.getLogger('wic')
 
@@ -68,6 +71,7 @@ class DirectPlugin(ImagerPlugin):
         self.outdir = options.outdir
         self.compressor = options.compressor
         self.bmap = options.bmap
+        self.no_fstab_update = options.no_fstab_update
 
         self.name = "%s-%s" % (os.path.splitext(os.path.basename(wks_file))[0],
                                strftime("%Y%m%d%H%M"))
@@ -115,24 +119,33 @@ class DirectPlugin(ImagerPlugin):
             fstab_lines = fstab.readlines()
 
         if self._update_fstab(fstab_lines, self.parts):
-            shutil.copyfile(fstab_path, fstab_path + ".orig")
+            # copy rootfs dir to workdir to update fstab
+            # as rootfs can be used by other tasks and can't be modified
+            new_rootfs = os.path.realpath(os.path.join(self.workdir, "rootfs_copy"))
+            copyhardlinktree(image_rootfs, new_rootfs)
+            fstab_path = os.path.join(new_rootfs, 'etc/fstab')
+
+            os.unlink(fstab_path)
 
             with open(fstab_path, "w") as fstab:
                 fstab.writelines(fstab_lines)
 
-            return fstab_path
+            return new_rootfs
 
     def _update_fstab(self, fstab_lines, parts):
         """Assume partition order same as in wks"""
         updated = False
         for part in parts:
             if not part.realnum or not part.mountpoint \
-               or part.mountpoint in ("/", "/boot"):
+               or part.mountpoint == "/":
                 continue
 
-            # mmc device partitions are named mmcblk0p1, mmcblk0p2..
-            prefix = 'p' if  part.disk.startswith('mmcblk') else ''
-            device_name = "/dev/%s%s%d" % (part.disk, prefix, part.realnum)
+            if part.use_uuid:
+                device_name = "PARTUUID=%s" % part.uuid
+            else:
+                # mmc device partitions are named mmcblk0p1, mmcblk0p2..
+                prefix = 'p' if  part.disk.startswith('mmcblk') else ''
+                device_name = "/dev/%s%s%d" % (part.disk, prefix, part.realnum)
 
             opts = part.fsopts if part.fsopts else "defaults"
             line = "\t".join([device_name, part.mountpoint, part.fstype,
@@ -156,7 +169,13 @@ class DirectPlugin(ImagerPlugin):
         filesystems from the artifacts directly and combine them into
         a partitioned image.
         """
-        fstab_path = self._write_fstab(self.rootfs_dir.get("ROOTFS_DIR"))
+        if self.no_fstab_update:
+            new_rootfs = None
+        else:
+            new_rootfs = self._write_fstab(self.rootfs_dir.get("ROOTFS_DIR"))
+        if new_rootfs:
+            # rootfs was copied to update fstab
+            self.rootfs_dir['ROOTFS_DIR'] = new_rootfs
 
         for part in self.parts:
             # get rootfs size from bitbake variable if it's not set in .ks file
@@ -173,10 +192,6 @@ class DirectPlugin(ImagerPlugin):
                         part.size = int(round(float(rsize_bb)))
 
         self._image.prepare(self)
-
-        if fstab_path:
-            shutil.move(fstab_path + ".orig", fstab_path)
-
         self._image.layout_partitions()
         self._image.create()
 
@@ -205,8 +220,10 @@ class DirectPlugin(ImagerPlugin):
         # Generate .bmap
         if self.bmap:
             logger.debug("Generating bmap file for %s", disk_name)
-            exec_native_cmd("bmaptool create %s -o %s.bmap" % (full_path, full_path),
-                            self.native_sysroot)
+            python = os.path.join(self.native_sysroot, 'usr/bin/python3-native/python3')
+            bmaptool = os.path.join(self.native_sysroot, 'usr/bin/bmaptool')
+            exec_native_cmd("%s %s create %s -o %s.bmap" % \
+                            (python, bmaptool, full_path, full_path), self.native_sysroot)
         # Compress the image
         if self.compressor:
             logger.debug("Compressing disk %s with %s", disk_name, self.compressor)
@@ -296,7 +313,7 @@ class PartitionedImage():
                           # all partitions (in bytes)
         self.ptable_format = ptable_format  # Partition table format
         # Disk system identifier
-        self.identifier = int.from_bytes(os.urandom(4), 'little')
+        self.identifier = random.SystemRandom().randint(1, 0xffffffff)
 
         self.partitions = partitions
         self.partimages = []
@@ -312,7 +329,7 @@ class PartitionedImage():
                 part.realnum = 0
             else:
                 realnum += 1
-                if self.ptable_format == 'msdos' and realnum > 3:
+                if self.ptable_format == 'msdos' and realnum > 3 and len(partitions) > 4:
                     part.realnum = realnum + 1
                     continue
                 part.realnum = realnum
@@ -351,6 +368,10 @@ class PartitionedImage():
         # Go through partitions in the order they are added in .ks file
         for num in range(len(self.partitions)):
             part = self.partitions[num]
+
+            if self.ptable_format == 'msdos' and part.part_name:
+                raise WicError("setting custom partition name is not " \
+                               "implemented for msdos partitions")
 
             if self.ptable_format == 'msdos' and part.part_type:
                 # The --part-type can also be implemented for MBR partitions,
@@ -505,6 +526,13 @@ class PartitionedImage():
             self._create_partition(self.path, part.type,
                                    parted_fs_type, part.start, part.size_sec)
 
+            if part.part_name:
+                logger.debug("partition %d: set name to %s",
+                             part.num, part.part_name)
+                exec_native_cmd("sgdisk --change-name=%d:%s %s" % \
+                                         (part.num, part.part_name,
+                                          self.path), self.native_sysroot)
+
             if part.part_type:
                 logger.debug("partition %d: set type UID to %s",
                              part.num, part.part_type)
@@ -550,7 +578,7 @@ class PartitionedImage():
             source = part.source_file
             if source:
                 # install source_file contents into a partition
-                sparse_copy(source, self.path, part.start * self.sector_size)
+                sparse_copy(source, self.path, seek=part.start * self.sector_size)
 
                 logger.debug("Installed %s in partition %d, sectors %d-%d, "
                              "size %d sectors", source, part.num, part.start,

@@ -1,0 +1,30 @@
+From 03ccabb6264c008430c4b1739351df5a63829f8e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Sep 2017 08:52:32 -0700
+Subject: [PATCH 2/2] yp_dump_bindings.c: Include string.h for memset
+
+Fixes
+error: implicitly declaring library function 'memset'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ src/yp_dump_binding.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/yp_dump_binding.c b/src/yp_dump_binding.c
+index a5ab920..d75e2c2 100644
+--- a/src/yp_dump_binding.c
++++ b/src/yp_dump_binding.c
+@@ -26,6 +26,7 @@
+ #include <libintl.h>
+ #include <locale.h>
+ #include <getopt.h>
++#include <string.h>
+ #include <sys/stat.h>
+ #include <arpa/inet.h>
+ #include <rpcsvc/ypclnt.h>
+-- 
+2.14.1
+

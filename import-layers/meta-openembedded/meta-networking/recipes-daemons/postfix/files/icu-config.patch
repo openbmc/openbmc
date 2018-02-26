@@ -1,0 +1,21 @@
+do not entertain cppflags from icu, this is because
+icu-config feeds the -I path without sysroot which
+caused native headers to be included and build is
+corrupted in any case its just adding -I/usr/include
+to the CCARGS which we loose nothing if its not
+entertained.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: postfix-3.2.2/makedefs
+===================================================================
+--- postfix-3.2.2.orig/makedefs
++++ postfix-3.2.2/makedefs
+@@ -799,7 +799,6 @@ EOF
+ 		    ${BUILD_CC-gcc} -o makedefs.test makedefs.test.c $icu_cppflags \
+ 			$icu_ldflags >/dev/null 2>&1
+ 		    if ./makedefs.test 2>/dev/null ; then
+-			CCARGS="$CCARGS $icu_cppflags"
+ 			SYSLIBS="$SYSLIBS $icu_ldflags"
+ 		    else
+ 			CCARGS="$CCARGS -DNO_EAI"

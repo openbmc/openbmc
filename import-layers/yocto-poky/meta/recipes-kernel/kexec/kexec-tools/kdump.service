@@ -1,0 +1,12 @@
+[Unit]
+Description=Reboot and dump vmcore via kexec
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=@LIBEXECDIR@/kdump-helper start
+ExecStop=@LIBEXECDIR@/kdump-helper stop
+
+[Install]
+WantedBy=multi-user.target

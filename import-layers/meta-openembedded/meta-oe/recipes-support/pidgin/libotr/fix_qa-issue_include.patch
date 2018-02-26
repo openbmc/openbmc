@@ -11,8 +11,8 @@ Signed-off-by: Jakob Drexel <jake42@rommel.stw.uni-erlangen.de>
 --- a/toolkit/Makefile.am	2012-05-03 15:52:22.000000000 +0200
 +++ b/toolkit/Makefile.am	2014-01-13 12:12:26.030369357 +0100
 @@ -1,4 +1,4 @@
--INCLUDES = -I$(includedir) -I../src @LIBGCRYPT_CFLAGS@
-+INCLUDES = -I../src @LIBGCRYPT_CFLAGS@
+-AM_CPPFLAGS = -I$(includedir) -I../src @LIBGCRYPT_CFLAGS@
++AM_CPPFLAGS = -I../src @LIBGCRYPT_CFLAGS@
  
  noinst_HEADERS = aes.h ctrmode.h parse.h sesskeys.h readotr.h sha1hmac.h
  

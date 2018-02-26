@@ -46,8 +46,6 @@ inherit toolchain-scripts-base
 inherit nopackages
 
 deltask install
-deltask package
-deltask packagedata
 deltask populate_sysroot
 
 do_populate_sdk[stamp-extra-info] = "${PACKAGE_ARCH}"

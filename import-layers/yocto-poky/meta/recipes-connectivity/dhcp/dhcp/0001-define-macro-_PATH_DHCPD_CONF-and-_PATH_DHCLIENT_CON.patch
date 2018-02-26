@@ -1,0 +1,30 @@
+From 7cc29144535a622fc671dc86eb1da65b0473a7c4 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 15 Aug 2017 16:14:22 +0800
+Subject: [PATCH 01/11] define macro _PATH_DHCPD_CONF and _PATH_DHCLIENT_CONF
+
+Upstream-Status: Inappropriate [OE specific]
+
+Rebase to 4.3.6
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ includes/site.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/includes/site.h b/includes/site.h
+index b2f7fd7..280fbb9 100644
+--- a/includes/site.h
++++ b/includes/site.h
+@@ -149,7 +149,8 @@
+ /* Define this if you want the dhcpd.conf file to go somewhere other than
+    the default location.   By default, it goes in /etc/dhcpd.conf. */
+ 
+-/* #define _PATH_DHCPD_CONF	"/etc/dhcpd.conf" */
++#define _PATH_DHCPD_CONF	"/etc/dhcp/dhcpd.conf"
++#define _PATH_DHCLIENT_CONF	"/etc/dhcp/dhclient.conf"
+ 
+ /* Network API definitions.   You do not need to choose one of these - if
+    you don't choose, one will be chosen for you in your system's config
+-- 
+1.8.3.1
+

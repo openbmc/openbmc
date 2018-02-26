@@ -38,8 +38,13 @@ SRC_URI = "git://github.com/rpm-software-management/rpm \
            file://0011-Do-not-require-that-ELF-binaries-are-executable-to-b.patch \
            file://0012-Use-conditional-to-access-_docdir-in-macros.in.patch \
            file://0013-Add-a-new-option-alldeps-to-rpmdeps.patch \
+           file://0001-Split-binary-package-building-into-a-separate-functi.patch \
+           file://0002-Run-binary-package-creation-via-thread-pools.patch \
+           file://0003-rpmstrpool.c-make-operations-over-string-pools-threa.patch \
+           file://0004-build-pack.c-remove-static-local-variables-from-buil.patch \
            file://0001-perl-disable-auto-reqs.patch \
            "
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 PV = "4.13.90+git${SRCPV}"
 PE = "1"
@@ -47,8 +52,8 @@ SRCREV = "a8e51b3bb05c6acb1d9b2e3d34f859ddda1677be"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "nss libarchive db file popt xz dbus elfutils python3"
-DEPENDS_append_class-native = " file-replacement-native"
+DEPENDS = "nss libarchive db file popt xz bzip2 dbus elfutils python3"
+DEPENDS_append_class-native = " file-replacement-native bzip2-replacement-native"
 
 inherit autotools gettext pkgconfig python3native
 export PYTHON_ABI
@@ -67,6 +72,9 @@ EXTRA_OECONF_append_libc-musl = " --disable-nls"
 EXTRA_OECONF_append_class-native = " --sysconfdir=/etc --localstatedir=/var --disable-plugins"
 
 BBCLASSEXTEND = "native nativesdk"
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[imaevm] = "--with-imaevm,,ima-evm-utils"
 
 # Direct rpm-native to read configuration from our sysroot, not the one it was compiled in
 # libmagic also has sysroot path contamination, so override it
@@ -99,7 +107,8 @@ do_install_append_class-target() {
 }
 
 do_install_append () {
-	sed -i -e 's:${HOSTTOOLS_DIR}/::g' ${D}/${libdir}/rpm/macros
+	sed -i -e 's:${HOSTTOOLS_DIR}/::g' \
+	    ${D}/${libdir}/rpm/macros
 
 	sed -i -e 's|/usr/bin/python|${USRBINPATH}/env ${PYTHON_PN}|' \
 	    ${D}${libdir}/rpm/pythondistdeps.py
@@ -119,3 +128,11 @@ FILES_python3-rpm = "${PYTHON_SITEPACKAGES_DIR}/rpm/*"
 RPROVIDES_${PN} += "rpm-build"
 
 RDEPENDS_${PN} = "bash perl python3-core"
+
+PACKAGE_PREPROCESS_FUNCS += "rpm_package_preprocess"
+
+# Do not specify a sysroot when compiling on a target.
+rpm_package_preprocess () {
+	sed -i -e 's:--sysroot[^ ]*::g' \
+	    ${PKGD}/${libdir}/rpm/macros
+}

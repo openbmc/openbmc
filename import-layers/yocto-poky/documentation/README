@@ -36,8 +36,8 @@ Folders exist for individual manuals as follows:
 
 * sdk-manual       - The Yocto Project Software Development Kit (SDK) Developer's Guide.
 * bsp-guide        - The Yocto Project Board Support Package (BSP) Developer's Guide
-* dev-manual       - The Yocto Project Development Manual
-* kernel-dev       - The Yocto Project Linux Kernel Development Manual
+* dev-manual       - The Yocto Project Development Tasks Manual
+* kernel-dev       - The Yocto Project Linux Kernel Development Tasks Manual
 * ref-manual       - The Yocto Project Reference Manual
 * yocto-project-qs - The Yocto Project Quick Start
 * mega-manual      - The Yocto Project Mega-Manual, which is an aggregated manual comprised

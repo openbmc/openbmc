@@ -8,6 +8,8 @@ When _GNU_SOURCE is used then both typedefs are same and using
 sighandler_t makes it work on musl too
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
 ---
  include/lapi/rt_sigaction.h                      | 2 +-
  testcases/kernel/syscalls/rt_sigsuspend/Makefile | 3 +++

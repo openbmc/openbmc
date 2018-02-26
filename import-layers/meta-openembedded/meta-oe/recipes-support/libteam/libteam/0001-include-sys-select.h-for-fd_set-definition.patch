@@ -1,0 +1,28 @@
+From 0ab69dc18a2057ff5bf41abcdf2b983b72d5a903 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Jul 2017 15:34:49 -0700
+Subject: [PATCH 1/2] include sys/select.h for fd_set definition
+
+Fixes
+teamnl.c:160:2: error: unknown type name 'fd_set'; did you mean 'fpos_t'?
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/teamnl.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/utils/teamnl.c b/utils/teamnl.c
+index e8de7e2..25129e8 100644
+--- a/utils/teamnl.c
++++ b/utils/teamnl.c
+@@ -24,6 +24,7 @@
+ #include <getopt.h>
+ #include <errno.h>
+ #include <sys/signalfd.h>
++#include <sys/select.h>
+ #include <signal.h>
+ #include <unistd.h>
+ #include <team.h>
+-- 
+2.13.2
+

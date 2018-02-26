@@ -7,6 +7,8 @@ Fixes musl build failure e.g.
 error: 'SA_NOMASK' undeclared here (not in a function)
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
 ---
  testcases/kernel/syscalls/rt_sigaction/rt_sigaction01.c     | 1 +
  testcases/kernel/syscalls/rt_sigaction/rt_sigaction02.c     | 2 +-

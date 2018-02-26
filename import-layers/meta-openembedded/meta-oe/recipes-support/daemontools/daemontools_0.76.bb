@@ -1,4 +1,5 @@
 SUMMARY = "DJB daemontools"
+HOMEPAGE = "http://cr.yp.to/daemontools.html"
 DESCRIPTION = "supervise monitors a service. It starts the service and restarts the \
 service if it dies. The companion svc program stops, pauses, or restarts \
 the service on sysadmin request. The svstat program prints a one-line \

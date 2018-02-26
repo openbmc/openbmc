@@ -7,7 +7,7 @@
 
     <para>
         Toaster is a web interface to the Yocto Project's
-        <ulink url='&YOCTO_DOCS_DEV_URL;#build-system-term'>OpenEmbedded build system</ulink>.
+        <ulink url='&YOCTO_DOCS_REF_URL;#build-system-term'>OpenEmbedded build system</ulink>.
         The interface enables you to configure and run your builds.
         Information about builds is collected and stored in a database.
         You can use Toaster to configure and start builds on multiple

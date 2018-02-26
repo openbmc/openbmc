@@ -6,6 +6,7 @@
 # Date: 28-May-06
 
 SUMMARY = "The fbset console tool"
+HOMEPAGE = "http://users.telenet.be/geertu/Linux/fbdev/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://fbset.c;endline=19;md5=bf326f82cdfcac391af208f019c5603f"
 RRECOMMENDS_${PN} = "fbset-modes"

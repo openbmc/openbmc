@@ -1,0 +1,29 @@
+From a0d815ad9918aba977aed9275b3bf3d750a1709b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Aug 2017 19:24:40 -0700
+Subject: [PATCH] serial_forward: Disable default static linking
+
+This does not work with ssp turned on with hardening flags on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/serial_forward/src/Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/tools/serial_forward/src/Makefile.am b/tools/serial_forward/src/Makefile.am
+index 3f598286..bcac9bc9 100644
+--- a/tools/serial_forward/src/Makefile.am
++++ b/tools/serial_forward/src/Makefile.am
+@@ -20,9 +20,6 @@ serial_forward_SOURCES = \
+ 	cy8mrln.h \
+ 	$(NULL)
+ 
+-serial_forward_LDFLAGS = \
+-	-all-static
+-
+ pty_forward_SOURCES = \
+ 	pty_forward.c \
+ 	$(NULL)
+-- 
+2.14.1
+

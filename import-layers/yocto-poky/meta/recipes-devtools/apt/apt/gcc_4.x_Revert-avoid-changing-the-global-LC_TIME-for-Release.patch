@@ -1,0 +1,80 @@
+From 7ef2b2dba0e0bee450da3c8450ea782a3e7d6429 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Tue, 22 Aug 2017 11:49:01 -0500
+Subject: [PATCH 3/3] Revert "avoid changing the global LC_TIME for Release
+ writing"
+
+This reverts commit 78e7b683c645e907db12658405a4b201a6243ea8.
+
+After we drop debian8 and centos7 that has gcc < 5 (std::put_time not available) 
+versions this patch can be remove.
+
+Signed-off-by: Anibal Limon <limon.anibal@gmail.com>
+
+Upstream-Status: Inappropriate [embedded specific]
+---
+ ftparchive/writer.cc | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/ftparchive/writer.cc b/ftparchive/writer.cc
+index 2596382..e43a643 100644
+--- a/ftparchive/writer.cc
++++ b/ftparchive/writer.cc
+@@ -37,7 +37,6 @@
+ #include <unistd.h>
+ #include <ctime>
+ #include <iostream>
+-#include <iomanip>
+ #include <sstream>
+ #include <memory>
+ #include <utility>
+@@ -984,29 +983,35 @@ ReleaseWriter::ReleaseWriter(FileFd * const GivenOutput, string const &/*DB*/) :
+    AddPatterns(_config->FindVector("APT::FTPArchive::Release::Patterns"));
+ 
+    time_t const now = time(NULL);
+-   auto const posix = std::locale("C.UTF-8");
+ 
+-   // FIXME: use TimeRFC1123 here? But that uses GMT to satisfy HTTP/1.1
+-   std::ostringstream datestr;
+-   datestr.imbue(posix);
+-   datestr << std::put_time(gmtime(&now), "%a, %d %b %Y %H:%M:%S UTC");
++   setlocale(LC_TIME, "C");
++
++   char datestr[128];
++   if (strftime(datestr, sizeof(datestr), "%a, %d %b %Y %H:%M:%S UTC",
++                gmtime(&now)) == 0)
++   {
++      datestr[0] = '\0';
++   }
+ 
+    time_t const validuntil = now + _config->FindI("APT::FTPArchive::Release::ValidTime", 0);
+-   std::ostringstream validstr;
+-   if (validuntil != now)
++   char validstr[128];
++   if (now == validuntil ||
++       strftime(validstr, sizeof(validstr), "%a, %d %b %Y %H:%M:%S UTC",
++                gmtime(&validuntil)) == 0)
+    {
+-      datestr.imbue(posix);
+-      validstr << std::put_time(gmtime(&validuntil), "%a, %d %b %Y %H:%M:%S UTC");
++      validstr[0] = '\0';
+    }
+ 
++   setlocale(LC_TIME, "");
++
+    map<string,string> Fields;
+    Fields["Origin"] = "";
+    Fields["Label"] = "";
+    Fields["Suite"] = "";
+    Fields["Version"] = "";
+    Fields["Codename"] = "";
+-   Fields["Date"] = datestr.str();
+-   Fields["Valid-Until"] = validstr.str();
++   Fields["Date"] = datestr;
++   Fields["Valid-Until"] = validstr;
+    Fields["Architectures"] = "";
+    Fields["Components"] = "";
+    Fields["Description"] = "";
+-- 
+2.1.4
+

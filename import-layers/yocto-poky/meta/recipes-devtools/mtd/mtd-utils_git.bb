@@ -5,7 +5,7 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
                     file://include/common.h;beginline=1;endline=17;md5=ba05b07912a44ea2bf81ce409380049c"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig update-alternatives
 
 DEPENDS = "zlib lzo e2fsprogs util-linux"
 
@@ -29,6 +29,11 @@ PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'xattr', d)}"
 PACKAGECONFIG[xattr] = ",,acl,"
 
 EXTRA_OEMAKE = "'CC=${CC}' 'RANLIB=${RANLIB}' 'AR=${AR}' 'CFLAGS=${CFLAGS} ${@bb.utils.contains('PACKAGECONFIG', 'xattr', '', '-DWITHOUT_XATTR', d)} -I${S}/include' 'BUILDDIR=${S}'"
+
+ALTERNATIVE_${PN} = "flash_eraseall"
+ALTERNATIVE_LINK_NAME[flash_eraseall] = "${sbindir}/flash_eraseall"
+# Use higher priority than busybox's flash_eraseall (created when built with CONFIG_FLASH_ERASEALL)
+ALTERNATIVE_PRIORITY[flash_eraseall] = "100"
 
 do_install () {
 	oe_runmake install DESTDIR=${D} SBINDIR=${sbindir} MANDIR=${mandir} INCLUDEDIR=${includedir}

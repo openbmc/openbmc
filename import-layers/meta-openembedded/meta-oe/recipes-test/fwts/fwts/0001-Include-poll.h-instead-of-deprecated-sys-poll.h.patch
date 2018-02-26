@@ -1,0 +1,48 @@
+From 100a107a53d5dc9b0554252ac5dbf2c9330615e9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 6 Jun 2017 07:25:09 -0700
+Subject: [PATCH 1/3] Include poll.h instead of deprecated sys/poll.h
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/src/fwts_ipmi.c   | 3 ++-
+ src/lib/src/fwts_pipeio.c | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/lib/src/fwts_ipmi.c b/src/lib/src/fwts_ipmi.c
+index cbb27611..70d11cfa 100644
+--- a/src/lib/src/fwts_ipmi.c
++++ b/src/lib/src/fwts_ipmi.c
+@@ -18,10 +18,11 @@
+  *
+  */
+ 
++#include <poll.h>
++
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+-#include <sys/poll.h>
+ #include <sys/ioctl.h>
+ #include <linux/ipmi.h>
+ 
+diff --git a/src/lib/src/fwts_pipeio.c b/src/lib/src/fwts_pipeio.c
+index fd719640..bdc5b2ea 100644
+--- a/src/lib/src/fwts_pipeio.c
++++ b/src/lib/src/fwts_pipeio.c
+@@ -30,9 +30,9 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <paths.h>
++#include <poll.h>
+ 
+ #include <sys/param.h>
+-#include <sys/poll.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ #include <errno.h>
+-- 
+2.13.0
+

@@ -1,0 +1,33 @@
+From 0e10e976025b21d12df099e82951f759024ad649 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 24 Aug 2017 22:04:56 -0700
+Subject: [PATCH] imapx: Fix signature for imapx_tokenise_struct()
+
+clang complains about different signature for this patch
+
+Fixes
+camel/providers/imapx/camel-imapx-tokens.txt:56:1: error: conflicting types for 'imapx_tokenise_struct'
+| imapx_tokenise_struct (register const char *str, register size_t len)
+| ^
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ camel/providers/imapx/camel-imapx-tokens.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/camel/providers/imapx/camel-imapx-tokens.txt b/camel/providers/imapx/camel-imapx-tokens.txt
+index d48501865..994c368c0 100644
+--- a/camel/providers/imapx/camel-imapx-tokens.txt
++++ b/camel/providers/imapx/camel-imapx-tokens.txt
+@@ -1,7 +1,7 @@
+ /* This contains all of the keywords we care about.  These
+    can be converted to an id very efficiently */
+ struct _imapx_keyword {const gchar *name; camel_imapx_id_t id; };
+-struct _imapx_keyword *imapx_tokenise_struct (register const char *str, register unsigned int len);
++struct _imapx_keyword *imapx_tokenise_struct (register const char *str, register size_t len);
+ %%
+ ALERT,          IMAPX_ALERT
+ APPENDUID,	IMAPX_APPENDUID
+-- 
+2.14.1
+

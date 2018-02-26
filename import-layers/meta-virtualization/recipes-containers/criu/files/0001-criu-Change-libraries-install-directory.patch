@@ -1,26 +1,26 @@
-From 7ebde06e00b591a88397dad74a1aa47fd562eb50 Mon Sep 17 00:00:00 2001
-From: Jianchuan Wang <jianchuan.wang@windriver.com>
-Date: Tue, 16 Aug 2016 09:48:08 +0800
-Subject: [PATCH 1/2] criu: Change libraries install directory
+From 78390305829316633acee2ca5607331b0e37a104 Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Fri, 8 Sep 2017 15:11:31 -0400
+Subject: [PATCH] criu: Change libraries install directory
 
 Install the libraries into /usr/lib(or /usr/lib64)
 
 Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
 ---
  Makefile.install | 13 -------------
  1 file changed, 13 deletions(-)
 
 diff --git a/Makefile.install b/Makefile.install
-index dbc22e1..a30dc96 100644
+index 3987bcc..73d98a4 100644
 --- a/Makefile.install
 +++ b/Makefile.install
-@@ -11,19 +11,6 @@ LIBDIR		?= $(PREFIX)/lib
- INCLUDEDIR	?= $(PREFIX)/include/criu
- LIBEXECDIR	?= $(PREFIX)/libexec
+@@ -9,19 +9,6 @@ LIBEXECDIR	?= $(PREFIX)/libexec
+ RUNDIR		?= /run
  
--#
+ #
 -# For recent Debian/Ubuntu with multiarch support.
--DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH 2>/dev/null)
+-DEB_HOST_MULTIARCH := $(shell dpkg-architecture -qDEB_HOST_MULTIARCH 2>/dev/null)
 -ifneq "$(DEB_HOST_MULTIARCH)" ""
 -        LIBDIR			?= $(PREFIX)/lib/$(DEB_HOST_MULTIARCH)
 -else
@@ -31,8 +31,9 @@ index dbc22e1..a30dc96 100644
 -        endif
 -endif
 -
- export BINDIR SBINDIR MANDIR SYSTEMDUNITDIR LOGROTATEDIR
- export INCLUDEDIR LIBDIR DESTDIR PREFIX LIBEXECDIR
+-#
+ # LIBDIR falls back to the standard path.
+ LIBDIR ?= $(PREFIX)/lib
  
 -- 
 2.7.4

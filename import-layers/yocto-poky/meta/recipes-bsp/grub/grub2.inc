@@ -11,45 +11,39 @@ SECTION = "bootloaders"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-SRC_URI = "ftp://ftp.gnu.org/gnu/grub/grub-${PV}.tar.gz \
-           file://grub-module-explicitly-keeps-symbole-.module_license.patch \
-           file://grub-2.00-fpmath-sse-387-fix.patch \
-           file://check-if-liblzma-is-disabled.patch \
-           file://fix-issue-with-flex-2.5.37.patch \
-           file://grub-2.00-add-oe-kernel.patch \
-           file://grub-install.in.patch \
-           file://remove-gets.patch \
-           file://fix-endianness-problem.patch \
-           file://grub2-remove-sparc64-setup-from-x86-builds.patch \
-           file://grub-2.00-fix-enable_execute_stack-check.patch \
-           file://grub-no-unused-result.patch \
-           file://grub-efi-allow-a-compilation-without-mcmodel-large.patch \
-           file://grub-efi-fix-with-glibc-2.20.patch \
+SRC_URI = "https://ftp.gnu.org/gnu/grub/grub-${PV}.tar.gz \
+           file://0001-Disable-mfpmath-sse-as-well-when-SSE-is-disabled.patch \
            file://0001-Unset-need_charset_alias-when-building-for-musl.patch \
-           file://0001-parse_dhcp_vendor-Add-missing-const-qualifiers.patch \
-           file://grub2-fix-initrd-size-bug.patch \
-           file://0001-Fix-CVE-2015-8370-Grub2-user-pass-vulnerability.patch \
-           file://0001-Remove-direct-_llseek-code-and-require-long-filesyst.patch \
-           file://fix-texinfo.patch \
-           file://0001-grub-core-gettext-gettext.c-main_context-secondary_c.patch \
-           file://0001-Enforce-no-pie-if-the-compiler-supports-it.patch \
-           file://0001-grub-core-kern-efi-mm.c-grub_efi_finish_boot_service.patch \
-           file://0002-grub-core-kern-efi-mm.c-grub_efi_get_memory_map-Neve.patch \
-           file://0001-build-Use-AC_HEADER_MAJOR-to-find-device-macros.patch \
-           file://0001-btrfs-avoid-used-uninitialized-error-with-GCC7.patch \
-           file://0002-i386-x86_64-ppc-fix-switch-fallthrough-cases-with-GC.patch \
-           file://0003-Add-gnulib-fix-gcc7-fallthrough.diff.patch \
-           file://0004-Fix-remaining-cases-of-gcc-7-fallthrough-warning.patch \
-            "
+           file://autogen.sh-exclude-pc.patch \
+           file://grub-module-explicitly-keeps-symbole-.module_license.patch \
+           file://0001-grub.d-10_linux.in-add-oe-s-kernel-name.patch \
+	   file://fix.build.with.gcc-7.patch \
+"
+SRC_URI[md5sum] = "1116d1f60c840e6dbd67abbc99acb45d"
+SRC_URI[sha256sum] = "660ee136fbcee08858516ed4de2ad87068bfe1b6b8b37896ce3529ff054a726d"
 
-DEPENDS = "flex-native bison-native autogen-native"
+DEPENDS = "flex-native bison-native"
 
-SRC_URI[md5sum] = "e927540b6eda8b024fb0391eeaa4091c"
-SRC_URI[sha256sum] = "65b39a0558f8c802209c574f4d02ca263a804e8a564bc6caf1cd0fd3b3cc11e3"
+COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*)-(linux.*|freebsd.*)'
+COMPATIBLE_HOST_armv7a = 'null'
+COMPATIBLE_HOST_armv7ve = 'null'
 
-COMPATIBLE_HOST = '(x86_64.*|i.86.*)-(linux|freebsd.*)'
+# configure.ac has code to set this automagically from the target tuple
+# but the OE freeform one (core2-foo-bar-linux) don't work with that.
+
+GRUBPLATFORM_arm = "uboot"
+GRUBPLATFORM_aarch64 = "efi"
+GRUBPLATFORM ??= "pc"
 
 inherit autotools gettext texinfo
+
+EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
+                --disable-grub-mkfont \
+                --program-prefix="" \
+                --enable-liblzma=no \
+                --enable-libzfs=no \
+                --enable-largefile \
+"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[grub-mount] = "--enable-grub-mount,--disable-grub-mount,fuse"
@@ -76,3 +70,9 @@ do_configure_prepend() {
 # grub and grub-efi's sysroot/${datadir}/grub/grub-mkconfig_lib are
 # conflicted, remove it since no one uses it.
 SYSROOT_DIRS_BLACKLIST += "${datadir}/grub/grub-mkconfig_lib"
+
+PACKAGES =+ "${PN}-editenv"
+
+FILES_${PN}-editenv = "${bindir}/grub-editenv"
+RDEPENDS_${PN} += "${PN}-editenv"
+RDEPENDS_${PN}_class-native = ""

@@ -11,7 +11,7 @@ header so define it manually.
 apt-pkg/contrib/srvrec.h: Add explicity include of sys/types.h
 to avoid errors in types u_int_SIZE.
 
-Upstream-status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
 ---

@@ -41,11 +41,6 @@ EXTRA_OECMAKE = " \
     -DWITH_QT5=OFF \
 "
 
-EXTRA_OECMAKE_append_class-native = "\
-             -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DWITH_CPP=OFF"
-EXTRA_OECMAKE_append_class-nativesdk = "\
-             -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DWITH_PYTHON=OFF"
-
 PACKAGECONFIG ??= "libevent glib python"
 PACKAGECONFIG[libevent] = "-DWITH_LIBEVENT=ON,-DWITH_LIBEVENT=OFF,libevent,"
 PACKAGECONFIG[python] = "-DWITH_PYTHON=ON,-DWITH_PYTHON=OFF,python,"

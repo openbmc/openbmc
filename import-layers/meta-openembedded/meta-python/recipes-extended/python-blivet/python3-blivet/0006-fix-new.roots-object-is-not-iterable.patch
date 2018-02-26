@@ -1,0 +1,28 @@
+From cd92eea8fab37ba6b0c7f03daa5255343dc75716 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 8 May 2017 16:30:20 +0800
+Subject: [PATCH 06/13] fix new.roots object is not iterable
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/blivet.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blivet/blivet.py b/blivet/blivet.py
+index 6a33e9c..79ae91a 100644
+--- a/blivet/blivet.py
++++ b/blivet/blivet.py
+@@ -1761,7 +1761,7 @@ class Blivet(object):
+             p = partition.disk.format.parted_disk.getPartitionByPath(partition.path)
+             partition.parted_partition = p
+ 
+-        for root in new.roots:
++        for root in new.roots or []:
+             root.swaps = [new.devicetree.get_device_by_id(d.id, hidden=True) for d in root.swaps]
+             root.swaps = [s for s in root.swaps if s]
+ 
+-- 
+2.7.4
+

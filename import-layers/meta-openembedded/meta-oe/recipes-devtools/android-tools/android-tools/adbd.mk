@@ -16,6 +16,7 @@ adbd_SRC_FILES += jdwp_service.c
 adbd_SRC_FILES += framebuffer_service.c
 adbd_SRC_FILES += remount_service.c
 adbd_SRC_FILES += disable_verity_service.c
+adbd_SRC_FILES += base64.c
 adbd_SRC_FILES += usb_linux_client.c
 adbd_OBJS := $(adbd_SRC_FILES:.c=.o)
 

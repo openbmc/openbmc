@@ -1,0 +1,49 @@
+commit 7c58a1e244ea83a9e7bbd51a6d354cee25cdbd33
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Wed Sep 12 23:35:40 2012 -0400
+
+    Fix openl2tpd initscript
+    
+    - Correct the location of the retval statement.
+    - use start-stop-daemon instead of daemon.
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+    Upstream-Status: Inappropriate [OE specific]
+
+    Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+diff --git a/etc/rc.d/init.d/openl2tpd b/etc/rc.d/init.d/openl2tpd
+index ce21b50..7f27bb7 100755
+--- a/etc/rc.d/init.d/openl2tpd
++++ b/etc/rc.d/init.d/openl2tpd
+@@ -24,7 +24,7 @@ start() {
+         if [ -e /var/lock/subsys/openl2tpd ]; then
+ 	    if [ -e /var/run/openl2tpd.pid ] && [ -e /proc/`cat /var/run/openl2tpd.pid` ]; then
+ 		echo -n $"cannot start openl2tpd: openl2tpd is already running.";
+-		failure $"cannot start openl2tpd: openl2tpd already running.";
++		#failure $"cannot start openl2tpd: openl2tpd already running.";
+ 		echo
+ 		return 1
+ 	    fi
+@@ -32,9 +32,9 @@ start() {
+ 	modprobe -s pppol2tp || modprobe -s l2tp_ppp
+ 	RETVAL=$?
+ 	if [ $RETVAL -eq 0 ]; then
+-	    daemon openl2tpd $OPENL2TPDARGS
++	    start-stop-daemon --start --exec openl2tpd $OPENL2TPDARGS
++        RETVAL=$?
+ 	fi
+-	RETVAL=$?
+ 	echo
+ 	if [ $RETVAL -eq 0 ]; then
+ 	    touch /var/lock/subsys/openl2tpd
+@@ -52,7 +52,7 @@ stop() {
+ 	echo -n $"Stopping $prog: "
+         if [ ! -e /var/lock/subsys/openl2tpd ]; then
+ 	    echo -n $"cannot stop openl2tpd: openl2tpd is not running."
+-	    failure $"cannot stop openl2tpd: openl2tpd is not running."
++	    #failure $"cannot stop openl2tpd: openl2tpd is not running."
+ 	    echo
+ 	    return 1;
+ 	fi

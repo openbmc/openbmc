@@ -1,0 +1,57 @@
+The patch in this Bugzilla entry was requested by a customer:
+  https://sourceware.org/bugzilla/show_bug.cgi?id=4578
+
+If a thread happens to hold dl_load_lock and have r_state set to RT_ADD or
+RT_DELETE at the time another thread calls fork(), then the child exit code
+from fork (in nptl/sysdeps/unix/sysv/linux/fork.c in our case) re-initializes
+dl_load_lock but does not restore r_state to RT_CONSISTENT. If the child
+subsequently requires ld.so functionality before calling exec(), then the
+assertion will fire.
+
+The patch acquires dl_load_lock on entry to fork() and releases it on exit
+from the parent path.  The child path is initialized as currently done.
+This is essentially pthreads_atfork, but forced to be first because the
+acquisition of dl_load_lock must happen before malloc_atfork is active
+to avoid a deadlock.
+The patch has not yet been integrated upstream.
+
+Upstream-Status: Pending [ Not Author See bugzilla]
+
+Signed-off-by: Raghunath Lolur <Raghunath.Lolur@kpit.com>
+Signed-off-by: Yuanjie Huang <yuanjie.huang@windriver.com>
+Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
+
+Index: git/sysdeps/nptl/fork.c
+===================================================================
+--- git.orig/sysdeps/nptl/fork.c       2017-08-03 16:02:15.674704080 +0800
++++ git/sysdeps/nptl/fork.c    2017-08-04 18:15:02.463362015 +0800
+@@ -25,6 +25,7 @@
+ #include <tls.h>
+ #include <hp-timing.h>
+ #include <ldsodefs.h>
++#include <libc-lock.h>
+ #include <stdio-lock.h>
+ #include <atomic.h>
+ #include <nptl/pthreadP.h>
+@@ -60,6 +61,10 @@
+      but our current fork implementation is not.  */
+   bool multiple_threads = THREAD_GETMEM (THREAD_SELF, header.multiple_threads);
+ 
++  /* grab ld.so lock BEFORE switching to malloc_atfork */
++  __rtld_lock_lock_recursive (GL(dl_load_lock));
++  __rtld_lock_lock_recursive (GL(dl_load_write_lock));
++
+   /* Run all the registered preparation handlers.  In reverse order.
+      While doing this we build up a list of all the entries.  */
+   struct fork_handler *runp;
+@@ -247,6 +252,10 @@
+ 
+ 	  allp = allp->next;
+ 	}
++
++      /* unlock ld.so last, because we locked it first */
++      __rtld_lock_unlock_recursive (GL(dl_load_write_lock));
++      __rtld_lock_unlock_recursive (GL(dl_load_lock));
+     }
+ 
+   return pid;

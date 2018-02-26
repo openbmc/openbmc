@@ -1,0 +1,36 @@
+From 2e8ff0e4f6d39e346ea86b8c514ab4ccc78fa359 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 15 Aug 2017 15:24:14 +0800
+Subject: [PATCH 05/11] dhcp-client: fix invoke dhclient-script failed on
+ Read-only file system
+
+In read-only file system, '/etc' is on the readonly partition,
+and '/etc/resolv.conf' is symlinked to a separate writable
+partition.
+
+In this situation, we create temp files 'resolv.conf.dhclient-new'
+in /tmp dir.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ client/scripts/linux | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/scripts/linux b/client/scripts/linux
+index 3d447b6..3122a75 100755
+--- a/client/scripts/linux
++++ b/client/scripts/linux
+@@ -40,7 +40,7 @@ make_resolv_conf() {
+     # DHCPv4
+     if [ -n "$new_domain_search" ] || [ -n "$new_domain_name" ] ||
+        [ -n "$new_domain_name_servers" ]; then
+-        new_resolv_conf=/etc/resolv.conf.dhclient-new
++        new_resolv_conf=/tmp/resolv.conf.dhclient-new
+         rm -f $new_resolv_conf
+ 
+         if [ -n "$new_domain_name" ]; then
+-- 
+1.8.3.1
+

@@ -1,4 +1,5 @@
 import oe.path
+import oe.types
 
 class NotFoundError(bb.BBHandledException):
     def __init__(self, path):

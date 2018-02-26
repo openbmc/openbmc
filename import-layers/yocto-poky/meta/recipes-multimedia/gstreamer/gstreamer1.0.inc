@@ -25,10 +25,10 @@ PACKAGECONFIG[tests] = "--enable-tests,--disable-tests"
 PACKAGECONFIG[valgrind] = "--enable-valgrind,--disable-valgrind,valgrind,"
 PACKAGECONFIG[gst-tracer-hooks] = "--enable-gst-tracer-hooks,--disable-gst-tracer-hooks,"
 PACKAGECONFIG[unwind] = "--with-unwind,--without-unwind,libunwind"
+PACKAGECONFIG[dw] = "--with-dw,--without-dw,elfutils"
 
 EXTRA_OECONF = " \
     --disable-dependency-tracking \
-    --disable-docbook \
     --disable-examples \
 "
 

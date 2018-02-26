@@ -1,0 +1,15 @@
+[Unit]
+Description=Webmin Admin Tool
+Requires=local-fs.target
+After=basic.target
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=@SYSCONFDIR@/webmin/start
+ExecStop=@SYSCONFDIR@/webmin/stop
+ExecReload=@SYSCONFDIR@/webmin/reload
+
+[Install]
+WantedBy=multi-user.target

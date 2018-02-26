@@ -1,0 +1,62 @@
+From 3e13a006fe3dff9489269274093bf868532036e2 Mon Sep 17 00:00:00 2001
+From: Saul Wold <sgw@linux.intel.com>
+Date: Tue, 5 Sep 2017 16:02:55 -0700
+Subject: [PATCH] staprun/stapbpf: don't support installing a non-root
+
+Since we are in a known environment and installing as root and
+expect to be running as root, don't create the group or chmod
+the binaries.
+
+Upstream-Status: Inappropriate [Embedded]
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+---
+ stapbpf/Makefile.am | 14 +++++++-------
+ staprun/Makefile.am | 12 ++++++------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/stapbpf/Makefile.am b/stapbpf/Makefile.am
+index 421b044ef..f7daeb2b2 100644
+--- a/stapbpf/Makefile.am
++++ b/stapbpf/Makefile.am
+@@ -39,11 +39,11 @@ git_version.stamp ../git_version.h:
+ 
+ # Why the "id -u" condition?  This way, an unprivileged user can run
+ # make install, and have "sudo stap ...." or "sudo stapbpf ...." work later.
+-install-exec-hook:
+-	if [ `id -u` -eq 0 ]; then \
+-		getent group stapusr >/dev/null || groupadd -g 156 -r stapusr 2>/dev/null || groupadd -r stapusr; \
+-		getent group stapusr >/dev/null \
+-		&& chgrp stapusr "$(DESTDIR)$(bindir)/stapbpf" \
+-		&& chmod 04110 "$(DESTDIR)$(bindir)/stapbpf"; \
+-	fi
++#install-exec-hook:
++#	if [ `id -u` -eq 0 ]; then \
++#		getent group stapusr >/dev/null || groupadd -g 156 -r stapusr 2>/dev/null || groupadd -r stapusr; \
++#		getent group stapusr >/dev/null \
++#		&& chgrp stapusr "$(DESTDIR)$(bindir)/stapbpf" \
++#		&& chmod 04110 "$(DESTDIR)$(bindir)/stapbpf"; \
++#	fi
+ endif
+diff --git a/staprun/Makefile.am b/staprun/Makefile.am
+index 4073aa01c..2925e34c3 100644
+--- a/staprun/Makefile.am
++++ b/staprun/Makefile.am
+@@ -72,9 +72,9 @@ git_version.stamp ../git_version.h:
+ 
+ # Why the "id -u" condition?  This way, an unprivileged user can run
+ # make install, and have "sudo stap ...." or "sudo staprun ...." work later.
+-install-exec-hook:
+-	if [ `id -u` -eq 0 ]; then \
+-		getent group stapusr >/dev/null || groupadd -g 156 -r stapusr 2>/dev/null || groupadd -r stapusr; \
+-		getent group stapusr >/dev/null && chgrp stapusr "$(DESTDIR)$(bindir)/staprun"; \
+-		chmod 04110 "$(DESTDIR)$(bindir)/staprun"; \
+-	fi
++#install-exec-hook:
++#	if [ `id -u` -eq 0 ]; then \
++#		getent group stapusr >/dev/null || groupadd -g 156 -r stapusr 2>/dev/null || groupadd -r stapusr; \
++#		getent group stapusr >/dev/null && chgrp stapusr "$(DESTDIR)$(bindir)/staprun"; \
++#		chmod 04110 "$(DESTDIR)$(bindir)/staprun"; \
++#	fi
+-- 
+2.11.0
+

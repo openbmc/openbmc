@@ -1,0 +1,21 @@
+Add LDFLAGS variable to Makefile so that extra linker flags can be sent via this variable.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 4f7af1d..a05a000 100644
+--- a/Makefile
++++ b/Makefile
+@@ -83,8 +83,8 @@ endif
+ 
+ CPPFLAGS=		$(CPPFLAGS.ippooltest)
+ CFLAGS=			-I. -Iusl -Icli -MMD -Wall -g $(CPPFLAGS) $(CPPFLAGS.dmalloc)
+-LDFLAGS.ippoold=	-Wl,-E -L. -Lusl -lusl -lnsl -ldl $(LIBS.dmalloc) -lc
+-LDFLAGS.ippoolconfig=	-Lcli -lcli -lreadline -lcurses -lnsl $(LIBS.dmalloc) -lc
++LDFLAGS.ippoold=	$(LDFLAGS) -Wl,-E -L. -Lusl -lusl -lnsl -ldl $(LIBS.dmalloc) -lc
++LDFLAGS.ippoolconfig=	$(LDFLAGS) -Lcli -lcli -lreadline -lcurses -lnsl $(LIBS.dmalloc) -lc
+ 
+ OPT_CFLAGS?=		-O
+ 

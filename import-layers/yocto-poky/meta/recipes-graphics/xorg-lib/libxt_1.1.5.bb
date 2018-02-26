@@ -23,7 +23,9 @@ PE = "1"
 
 XORG_PN = "libXt"
 
-SRC_URI +=  "file://libxt_fix_for_x32.patch"
+SRC_URI +=  "file://libxt_fix_for_x32.patch \
+             file://0001-libXt-util-don-t-link-makestrs-with-target-cflags.patch \
+            "
 
 BBCLASSEXTEND = "native"
 

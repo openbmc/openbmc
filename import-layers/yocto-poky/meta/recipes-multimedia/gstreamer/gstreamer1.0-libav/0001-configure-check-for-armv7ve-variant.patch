@@ -1,0 +1,35 @@
+From aac5902d3c9cb35c771e760d0e487622aa2e116a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Apr 2017 10:38:18 -0700
+Subject: [PATCH] configure: check for armv7ve variant
+
+OE passes -mcpu and -march via cmdline and if
+package tries to detect one of it own then it
+should be compatible otherwise, newer gcc7+ will
+error out
+
+Check for relevant preprocessor macro to determine
+armv7ve architecture
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gst-libs/ext/libav/configure | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gst-libs/ext/libav/configure b/gst-libs/ext/libav/configure
+index 4a5e477..727818e 100755
+--- a/gst-libs/ext/libav/configure
++++ b/gst-libs/ext/libav/configure
+@@ -4295,6 +4295,7 @@ elif enabled arm; then
+         elif check_arm_arch 6Z;       then echo armv6z
+         elif check_arm_arch 6ZK;      then echo armv6zk
+         elif check_arm_arch 6T2;      then echo armv6t2
++        elif check_arm_arch EXT_IDIV; then echo armv7ve
+         elif check_arm_arch 7;        then echo armv7
+         elif check_arm_arch 7A  7_A;  then echo armv7-a
+         elif check_arm_arch 7S;       then echo armv7-a
+-- 
+2.12.2
+

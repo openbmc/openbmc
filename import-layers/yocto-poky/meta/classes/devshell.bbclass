@@ -8,14 +8,14 @@ python do_devshell () {
        fakeenv = d.getVar("FAKEROOTENV").split()
        for f in fakeenv:
             k = f.split("=")
-            d.setVar(k[0], k[1])           
+            d.setVar(k[0], k[1])
             d.appendVar("OE_TERMINAL_EXPORTS", " " + k[0])
        d.delVarFlag("do_devshell", "fakeroot")
 
     oe_terminal(d.getVar('DEVSHELL'), 'OpenEmbedded Developer Shell', d)
 }
 
-addtask devshell after do_patch
+addtask devshell after do_patch do_prepare_recipe_sysroot
 
 # The directory that the terminal starts in
 DEVSHELL_STARTDIR ?= "${S}"
@@ -49,7 +49,7 @@ def devpyshell(d):
         old[3] = old[3] &~ termios.ECHO &~ termios.ICANON
         # &~ termios.ISIG
         termios.tcsetattr(fd, termios.TCSADRAIN, old)
-    
+
     # No echo or buffering over the pty
     noechoicanon(s)
 
@@ -145,7 +145,7 @@ python do_devpyshell() {
     try:
         devpyshell(d)
     except SystemExit:
-        # Stop the SIGTERM above causing an error exit code    
+        # Stop the SIGTERM above causing an error exit code
         return
     finally:
         return

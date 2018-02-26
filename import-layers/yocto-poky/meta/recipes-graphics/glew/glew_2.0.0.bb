@@ -24,6 +24,7 @@ PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'opengl', 'egl-
 PACKAGECONFIG[opengl] = "SYSTEM='linux',,virtual/libx11 virtual/libgl libglu libxext libxi libxmu"
 PACKAGECONFIG[egl-gles2] = "SYSTEM='linux-egl' GLEW_NO_GLU='-DGLEW_NO_GLU' LDFLAGS.GL='-lEGL -lGLESv2',,virtual/egl virtual/libgles2"
 
+CFLAGS += "-D_GNU_SOURCE"
 # Override SYSTEM (via PACKAGECONFIG_CONFARGS) to avoid calling config.guess,
 # we're cross-compiling. Pass our CFLAGS via POPT as that's the optimisation
 # variable and safely overwritten.

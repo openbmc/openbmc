@@ -3,14 +3,10 @@ HOMEPAGE = "http://cryptodev-linux.org/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "http://nwl.cc/pub/cryptodev-linux/cryptodev-linux-${PV}.tar.gz \
-           file://06d6b560c6e45dc317dae47c74706fa43f4a31d8.patch \
-           file://cb186f682679383e8b5806240927903730ce85d9.patch \
-           file://0001-Adjust-to-another-change-in-the-user-page-API.patch \
-           file://kernel-4-10-changes.patch"
+SRC_URI = "http://nwl.cc/pub/cryptodev-linux/cryptodev-linux-${PV}.tar.gz"
 
-SRC_URI[md5sum] = "02644cc4cd02301e0b503a332eb2f0b5"
-SRC_URI[sha256sum] = "67fabde9fb67b286a96c4f45b594b0eccd0f761b495705c18f2ae9461b831376"
+SRC_URI[md5sum] = "cb4e0ed9e5937716c7c8a7be84895b6d"
+SRC_URI[sha256sum] = "9f4c0b49b30e267d776f79455d09c70cc9c12c86eee400a0d0a0cd1d8e467950"
 
 S = "${WORKDIR}/cryptodev-linux-${PV}"
 

@@ -16,7 +16,7 @@ UPSTREAM_CHECK_URI = "https://launchpad.net/intltool/trunk/"
 
 DEPENDS = "libxml-parser-perl-native"
 RDEPENDS_${PN} = "gettext-dev libxml-parser-perl"
-DEPENDS_class-native = "libxml-parser-perl-native"
+DEPENDS_class-native = "libxml-parser-perl-native gettext-native"
 
 inherit autotools pkgconfig perlnative
 

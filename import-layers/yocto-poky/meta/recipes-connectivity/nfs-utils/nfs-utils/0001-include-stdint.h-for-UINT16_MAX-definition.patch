@@ -1,0 +1,27 @@
+From 36b48057bce76dced335d67a2894a420967811c9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 20 May 2017 14:07:53 -0700
+Subject: [PATCH] include stdint.h for UINT16_MAX definition
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ support/nsm/rpc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/support/nsm/rpc.c b/support/nsm/rpc.c
+index 4e5f40e..d91c6ea 100644
+--- a/support/nsm/rpc.c
++++ b/support/nsm/rpc.c
+@@ -40,6 +40,7 @@
+ 
+ #include <time.h>
+ #include <stdbool.h>
++#include <stdint.h>
+ #include <string.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+-- 
+2.13.0
+

@@ -8,8 +8,8 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2ee41112a44fe7014dce33e26468ba93"
 SRCNAME = "cassandra-driver"
 
-SRC_URI[md5sum] = "7561a89cd8a432a22cf33abef76b64ee"
-SRC_URI[sha256sum] = "10b0c88854f3bddcfd994cb208d780507de62524ef8dcb4f068c084d335b7054"
+SRC_URI[md5sum] = "1659b074e10c613e5ba1cdf92974a57a"
+SRC_URI[sha256sum] = "643bed0fac08ee91630f0f35556bb62c3b4b007c20d4e6e8d349f769ea648150"
 
 DISTUTILS_BUILD_ARGS += " \
     --no-libev \

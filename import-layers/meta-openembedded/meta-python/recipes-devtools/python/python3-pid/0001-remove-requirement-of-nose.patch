@@ -1,0 +1,29 @@
+From 04d04a8fa1ef3d8dbdaebbaac9ae936e1c8234c1 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 28 Jun 2017 21:17:43 -0400
+Subject: [PATCH] remove requirement of nose
+
+The nose extends unittest to make testing easier.
+Do not need the test suite, so remove requirement of nose.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ setup.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 3f7c7cb..c42a546 100644
+--- a/setup.py
++++ b/setup.py
+@@ -53,6 +53,4 @@ setup(
+     keywords='pid pidfile context manager decorator',
+     packages=["pid"],
+     install_requires=[],
+-    test_suite='nose.collector',
+-    setup_requires=['nose>=1.0'],
+ )
+-- 
+2.8.1
+

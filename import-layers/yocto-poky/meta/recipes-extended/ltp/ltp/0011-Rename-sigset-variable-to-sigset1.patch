@@ -7,6 +7,8 @@ sigset API from signal.h is shadowed by this name conflict
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Dengke Du <dengke.du@windriver.com>
+
+Upstream-Status: Pending
 ---
  testcases/kernel/mem/shmt/shmt04.c                    | 10 +++++-----
  testcases/kernel/mem/shmt/shmt06.c                    | 10 +++++-----

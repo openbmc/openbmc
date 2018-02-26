@@ -1,0 +1,32 @@
+From aa2176be32eed2578da82f34d31148f934c11c34 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 28 Jun 2017 17:03:45 -0700
+Subject: [PATCH] bookmarks: Check for return value of fread()
+
+Fixes below compiler error
+ignoring return value of 'fread', declared with attribute warn_unused_result
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/bookmarks/ephy-bookmark.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/bookmarks/ephy-bookmark.c b/src/bookmarks/ephy-bookmark.c
+index ff0239b..8633ce4 100644
+--- a/src/bookmarks/ephy-bookmark.c
++++ b/src/bookmarks/ephy-bookmark.c
+@@ -217,7 +217,8 @@ ephy_bookmark_init (EphyBookmark *self)
+   bytes = g_malloc (num_bytes);
+ 
+   fp = fopen ("/dev/urandom", "r");
+-  fread (bytes, sizeof (guint8), num_bytes, fp);
++  if (fread (bytes, sizeof (guint8), num_bytes, fp) != num_bytes)
++    g_warning("Unable to read data from /dev/urandom\n");
+ 
+   self->id = g_malloc0 (ID_LEN + 1);
+   for (gsize i = 0; i < num_bytes; i++) {
+-- 
+2.13.2
+

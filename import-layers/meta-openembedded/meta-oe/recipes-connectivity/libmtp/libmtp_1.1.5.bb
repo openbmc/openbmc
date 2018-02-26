@@ -45,10 +45,10 @@ PACKAGECONFIG[doxygen] = "--enable-doxygen,--disable-doxygen"
 PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile"
 PACKAGECONFIG[mtpz] = "--enable-mtpz,--disable-mtpz,libgcrypt"
 
-PACKAGES =+ "libmtp-common libmtp-runtime mtp-tools"
+PACKAGES =+ "libmtp-common libmtp-runtime"
 
 RDEPENDS_${PN} += "libmtp-common"
-RRECOMMENDS_${PN} += "libmtp-runtime mtp-tools"
+RRECOMMENDS_${PN} += "libmtp-runtime ${PN}-bin"
 FILES_${PN}-dbg += "${nonarch_base_libdir}/udev/.debug/*"
 FILES_libmtp-common = "${nonarch_base_libdir}/udev/rules.d/*"
 SUMMARY_libmtp-common = "The udev rules file for MTP devices"

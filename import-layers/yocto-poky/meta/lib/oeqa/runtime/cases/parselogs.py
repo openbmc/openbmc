@@ -86,9 +86,11 @@ ignore_errors = {
     'qemumips' : [
         'Failed to load module "glx"',
         'pci 0000:00:00.0: [Firmware Bug]: reg 0x..: invalid BAR (can\'t size)',
+        'cacheinfo: Failed to find cpu0 device node',
         ] + common_errors,
     'qemumips64' : [
         'pci 0000:00:00.0: [Firmware Bug]: reg 0x..: invalid BAR (can\'t size)',
+        'cacheinfo: Failed to find cpu0 device node',
          ] + common_errors,
     'qemuppc' : [
         'PCI 0000:00 Cannot reserve Legacy IO [io  0x0000-0x0fff]',
@@ -151,6 +153,8 @@ ignore_errors = {
         'failed to read out thermal zone',
         'Bluetooth: hci0: Setting Intel event mask failed',
         'ttyS2 - failed to request DMA',
+        'Bluetooth: hci0: Failed to send firmware data (-38)',
+        'atkbd serio0: Failed to enable keyboard on isa0060/serio0',
         ] + x86_common,
     'crownbay' : x86_common,
     'genericx86' : x86_common,

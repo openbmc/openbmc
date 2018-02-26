@@ -31,6 +31,7 @@ EXTRA_OECMAKE += " \
     -DLIB_INSTALL_DIR=${libdir} \
     -DLIBEXEC_INSTALL_DIR=${libexecdir} \
 "
+SECURITY_PIE_CFLAGS_remove = "-fPIE -pie"
 
 FILES_${PN} += "${libdir}/${BPN}/${PV}/modules"
 FILES_${PN}-dev += "${datadir}/cmake"

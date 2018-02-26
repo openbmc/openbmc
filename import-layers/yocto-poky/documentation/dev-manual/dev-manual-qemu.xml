@@ -6,427 +6,303 @@
 
 <title>Using the Quick EMUlator (QEMU)</title>
 
-<para>
-    Quick EMUlator (QEMU) is an Open Source project the Yocto Project uses
-    as part of its development "tool set".
-    As such, the information in this chapter is limited to the
-    Yocto Project integration of QEMU and not QEMU in general.
-    For official information and documentation on QEMU, see the
-    following references:
-    <itemizedlist>
-        <listitem><para><emphasis><ulink url='http://wiki.qemu.org/Main_Page'>QEMU Website</ulink>:</emphasis>
-            The official website for the QEMU Open Source project.
-            </para></listitem>
-        <listitem><para><emphasis><ulink url='http://wiki.qemu.org/Manual'>Documentation</ulink>:</emphasis>
-            The QEMU user manual.
-            </para></listitem>
-    </itemizedlist>
-</para>
-
-<para>
-    This chapter provides an overview of the Yocto Project's integration of
-    QEMU, a description of how you use QEMU and its various options, running
-    under a Network File System (NFS) server, and a few tips and tricks you
-    might find helpful when using QEMU.
-</para>
-
-<section id='qemu-overview'>
-    <title>Overview</title>
-
     <para>
-        Within the context of the Yocto Project, QEMU is an
-        emulator and virtualization machine that allows you to run a complete
-        image you have built using the Yocto Project as just another task
-        on your build system.
-        QEMU is useful for running and testing images and applications on
-        supported Yocto Project architectures without having actual hardware.
-        Among other things, the Yocto Project uses QEMU to run automated
-        Quality Assurance (QA) tests on final images shipped with each
-        release.
+        This chapter provides procedures that show you how to use the
+        Quick EMUlator (QEMU), which is an Open Source project the Yocto
+        Project uses as part of its development "tool set".
+        For reference information on the Yocto Project implementation of QEMU,
+        see the
+        "<ulink url='&YOCTO_DOCS_REF_URL;#ref-quick-emulator-qemu'>Quick EMUlator (QEMU)</ulink>"
+        section in the Yocto Project Reference Manual.
     </para>
 
-    <para>
-        QEMU is made available with the Yocto Project a number of ways.
-        One method is to install a Software Development Kit (SDK).
-        For more information on how to make sure you have
-        QEMU available, see the
-        <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-intro'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
-    </para>
-</section>
-
-<section id='qemu-running-qemu'>
-    <title>Running QEMU</title>
-
-    <para>
-        Running QEMU involves having your build environment set up, having the
-        right artifacts available, and understanding how to use the many
-        options that are available to you when you start QEMU using the
-        <filename>runqemu</filename> command.
-    </para>
-
-    <section id='qemu-setting-up-the-environment'>
-        <title>Setting Up the Environment</title>
+    <section id='qemu-running-qemu'>
+        <title>Running QEMU</title>
 
         <para>
-            You run QEMU in the same environment from which you run BitBake.
-            This means you need to source a build environment script (i.e.
-            <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
-            or
-            <ulink url='&YOCTO_DOCS_REF_URL;#structure-memres-core-script'><filename>oe-init-build-env-memres</filename></ulink>).
-        </para>
-    </section>
+            To use QEMU, you need to have QEMU installed and initialized as
+            well as have the proper artifacts (i.e. image files and root
+            filesystems) available.
+            Follow these general steps to run QEMU:
+            <orderedlist>
+                <listitem><para>
+                    <emphasis>Install QEMU:</emphasis>
+                    See
+                    "<ulink url='&YOCTO_DOCS_SDK_URL;#the-qemu-emulator'>The QEMU Emulator</ulink>"
+                    section in the Yocto Project Application Development and
+                    the Extensible Software Development Kit (eSDK) manual
+                    for information on how to install QEMU.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Setting Up the Environment:</emphasis>
+                    How you set up the QEMU environment depends on how you
+                    installed QEMU:
+                    <itemizedlist>
+                        <listitem><para>
+                            If you cloned the <filename>poky</filename>
+                            repository or you downloaded and unpacked a
+                            Yocto Project release tarball, you can source
+                            the build environment script (i.e.
+                            <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>):
+                            <literallayout class='monospaced'>
+     $ cd ~/poky
+     $ source oe-init-build-env
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            If you installed a cross-toolchain, you can
+                            run the script that initializes the toolchain.
+                            For example, the following commands run the
+                            initialization script from the default
+                            <filename>poky_sdk</filename> directory:
+                            <literallayout class='monospaced'>
+     . ~/poky_sdk/environment-setup-core2-64-poky-linux
+                            </literallayout>
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Ensure the Artifacts are in Place:</emphasis>
+                    You need to be sure you have a pre-built kernel that
+                    will boot in QEMU.
+                    You also need the target root filesystem for your target
+                    machine’s architecture:
+                    <itemizedlist>
+                        <listitem><para>
+                            If you have previously built an image for QEMU
+                            (e.g. <filename>qemux86</filename>,
+                            <filename>qemuarm</filename>, and so forth),
+                            then the artifacts are in place in your
+                            <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>.
+                            </para></listitem>
+                        <listitem><para>
+                            If you have not built an image, you can go to the
+                            <ulink url='&YOCTO_MACHINES_DL_URL;'>machines/qemu</ulink>
+                            area and download a pre-built image that matches
+                            your architecture and can be run on QEMU.
+                            </para></listitem>
+                    </itemizedlist></para>
 
-    <section id='qemu-using-the-runqemu-command'>
-        <title>Using the <filename>runqemu</filename> Command</title>
-
-        <para>
-            The basic <filename>runqemu</filename> command syntax is as
-            follows:
-            <literallayout class='monospaced'>
+                    <para>See the
+                    "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-extracting-the-root-filesystem'>Extracting the Root Filesystem</ulink>"
+                    section in the Yocto Project Application Development and
+                    the Extensible Software Development Kit (eSDK) manual
+                    for information on how to extract a root filesystem.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Run QEMU:</emphasis>
+                    The basic <filename>runqemu</filename> command syntax is as
+                    follows:
+                    <literallayout class='monospaced'>
      $ runqemu [<replaceable>option</replaceable> ]  [...]
-            </literallayout>
-            Based on what you provide on the command line,
-            <filename>runqemu</filename> does a good job of figuring out what
-            you are trying to do.
-            For example, by default, QEMU looks for the most recently built
-            image according to the timestamp when it needs to look for an
-            image.
-            Minimally, through the use of options, you must provide either
-            a machine name, a virtual machine image
-            (<filename>*.vmdk</filename>), or a kernel image
-            (<filename>*.bin</filename>).
-        </para>
+                    </literallayout>
+                    Based on what you provide on the command line,
+                    <filename>runqemu</filename> does a good job of figuring
+                    out what you are trying to do.
+                    For example, by default, QEMU looks for the most recently
+                    built image according to the timestamp when it needs to
+                    look for an image.
+                    Minimally, through the use of options, you must provide
+                    either a machine name, a virtual machine image
+                    (<filename>*wic.vmdk</filename>), or a kernel image
+                    (<filename>*.bin</filename>).</para>
 
-        <para>
-            Following is a description of <filename>runqemu</filename>
-            options you can provide on the command line:
-            <note><title>Tip</title>
-                If you do provide some "illegal" option combination or perhaps
-                you do not provide enough in the way of options,
-                <filename>runqemu</filename> provides appropriate error
-                messaging to help you correct the problem.
-            </note>
-            <itemizedlist>
-                <listitem><para><replaceable>QEMUARCH</replaceable>:
-                    The QEMU machine architecture, which must be "qemux86",
-                    "qemux86_64", "qemuarm", "qemumips", "qemumipsel",
-                    “qemumips64", "qemush4", "qemuppc", "qemumicroblaze",
-                    or "qemuzynq".
-                    </para></listitem>
-                <listitem><para><filename><replaceable>VM</replaceable></filename>:
-                    The virtual machine image, which must be a
-                    <filename>.vmdk</filename> file.
-                    Use this option when you want to boot a
-                    <filename>.vmdk</filename> image.
-                    The image filename you provide must contain one of the
-                    following strings: "qemux86-64", "qemux86", "qemuarm",
-                    "qemumips64", "qemumips", "qemuppc", or "qemush4".
-                    </para></listitem>
-                <listitem><para><replaceable>ROOTFS</replaceable>:
-                    A root filesystem that has one of the following
-                    filetype extensions: "ext2", "ext3", "ext4", "jffs2",
-                    "nfs", or "btrfs".
-                    If the filename you provide for this option uses “nfs”, it
-                    must provide an explicit root filesystem path.
-                    </para></listitem>
-                <listitem><para><replaceable>KERNEL</replaceable>:
-                    A kernel image, which is a <filename>.bin</filename> file.
-                    When you provide a <filename>.bin</filename> file,
-                    <filename>runqemu</filename> detects it and assumes the
-                    file is a kernel image.
-                    </para></listitem>
-                <listitem><para><replaceable>MACHINE</replaceable>:
-                    The architecture of the QEMU machine, which must be one
-                    of the following: "qemux86",
-                    "qemux86-64", "qemuarm", "qemumips", "qemumipsel",
-                    “qemumips64", "qemush4", "qemuppc", "qemumicroblaze",
-                    or "qemuzynq".
-                    The <replaceable>MACHINE</replaceable> and
-                    <replaceable>QEMUARCH</replaceable> options are basically
-                    identical.
-                    If you do not provide a <replaceable>MACHINE</replaceable>
-                    option, <filename>runqemu</filename> tries to determine
-                    it based on other options.
-                    </para></listitem>
-                <listitem><para><filename>ramfs</filename>:
-                    Indicates you are booting an initial RAM disk (initramfs)
-                    image, which means the <filename>FSTYPE</filename> is
-                    <filename>cpio.gz</filename>.
-                    </para></listitem>
-                <listitem><para><filename>iso</filename>:
-                    Indicates you are booting an ISO image, which means the
-                    <filename>FSTYPE</filename> is
-                    <filename>.iso</filename>.
-                    </para></listitem>
-                <listitem><para><filename>nographic</filename>:
-                    Disables the video console, which sets the console to
-                    "ttys0".
-                    </para></listitem>
-                <listitem><para><filename>serial</filename>:
-                    Enables a serial console on
-                    <filename>/dev/ttyS0</filename>.
-                    </para></listitem>
-                <listitem><para><filename>biosdir</filename>:
-                    Establishes a custom directory for BIOS, VGA BIOS and
-                    keymaps.
-                    </para></listitem>
-                <listitem><para><filename>biosfilename</filename>:
-                    Establishes a custom BIOS name.
-                    </para></listitem>
-                <listitem><para><filename>qemuparams=\"<replaceable>xyz</replaceable>\"</filename>:
-                    Specifies custom QEMU parameters.
-                    Use this option to pass options other than the simple
-                    "kvm" and "serial" options.
-                    </para></listitem>
-                <listitem><para><filename>bootparams=\"<replaceable>xyz</replaceable>\"</filename>:
-                    Specifies custom boot parameters for the kernel.
-                    </para></listitem>
-                <listitem><para><filename>audio</filename>:
-                    Enables audio in QEMU.
-                    The <replaceable>MACHINE</replaceable> option must be
-                    either "qemux86" or "qemux86-64" in order for audio to be
-                    enabled.
-                    Additionally, the <filename>snd_intel8x0</filename>
-                    or <filename>snd_ens1370</filename> driver must be
-                    installed in linux guest.
-                    </para></listitem>
-                <listitem><para><filename>slirp</filename>:
-                    Enables "slirp" networking, which is a different way
-                    of networking that does not need root access
-                    but also is not as easy to use or comprehensive
-                    as the default.
-                    </para></listitem>
-                <listitem><para id='kvm-cond'><filename>kvm</filename>:
-                    Enables KVM when running "qemux86" or "qemux86-64"
-                    QEMU architectures.
-                    For KVM to work, all the following conditions must be met:
+                    <para>Here are some additional examples to help illustrate
+                    further QEMU:
                     <itemizedlist>
                         <listitem><para>
-                            Your <replaceable>MACHINE</replaceable> must be either
-qemux86" or "qemux86-64".
+                            This example starts QEMU with
+                            <replaceable>MACHINE</replaceable> set to "qemux86".
+                            Assuming a standard
+                            <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>,
+                            <filename>runqemu</filename> automatically finds the
+                            <filename>bzImage-qemux86.bin</filename> image file and
+                            the
+                            <filename>core-image-minimal-qemux86-20140707074611.rootfs.ext3</filename>
+                            (assuming the current build created a
+                            <filename>core-image-minimal</filename> image).
+                            <note>
+                            When more than one image with the same name exists, QEMU finds
+                            and uses the most recently built image according to the
+                            timestamp.
+                            </note>
+                            <literallayout class='monospaced'>
+     $ runqemu qemux86
+                            </literallayout>
                             </para></listitem>
                         <listitem><para>
-                            Your build host has to have the KVM modules
-                            installed, which are
-                            <filename>/dev/kvm</filename>.
-                            </para></listitem>
-                        <listitem><para>
-                            The  build host <filename>/dev/kvm</filename>
-                            directory has to be both writable and readable.
-                            </para></listitem>
-                    </itemizedlist>
-                    </para></listitem>
-                <listitem><para><filename>kvm-vhost</filename>:
-                    Enables KVM with VHOST support when running "qemux86" or "qemux86-64"
-                    QEMU architectures.
-                    For KVM with VHOST to work, the following conditions must
-                    be met:
-                    <itemizedlist>
-                        <listitem><para>
-                            <link linkend='kvm-cond'>kvm</link> option
-                            conditions must be met.
-                            </para></listitem>
-                        <listitem><para>
-                            Your build host has to have virtio net device, which
-                            are <filename>/dev/vhost-net</filename>.
-                            </para></listitem>
-                        <listitem><para>
-                            The build host <filename>/dev/vhost-net</filename>
-                            directory has to be either readable or writable
-                            and “slirp-enabled”.
-                            </para></listitem>
-                    </itemizedlist>
-                    </para></listitem>
-                <listitem><para><filename>publicvnc</filename>:
-                    Enables a VNC server open to all hosts.
-                    </para></listitem>
-            </itemizedlist>
-        </para>
-
-        <para>
-            For further understanding regarding option use with
-            <filename>runqemu</filename>, consider some examples.
-        </para>
-
-        <para>
-            This example starts QEMU with
-            <replaceable>MACHINE</replaceable> set to "qemux86".
-            Assuming a standard
-            <link linkend='build-directory'>Build Directory</link>,
-            <filename>runqemu</filename> automatically finds the
-            <filename>bzImage-qemux86.bin</filename> image file and
-            the
-            <filename>core-image-minimal-qemux86-20140707074611.rootfs.ext3</filename>
-            (assuming the current build created a
-            <filename>core-image-minimal</filename> image).
-            <note>
-                When more than one image with the same name exists, QEMU finds
-                and uses the most recently built image according to the
-                timestamp.
-            </note>
-            <literallayout class='monospaced'>
-    $ runqemu qemux86
-            </literallayout>
-            This example produces the exact same results as the
-            previous example.
-            This command, however, specifically provides the image
-            and root filesystem type.
-            <literallayout class='monospaced'>
+                            This example produces the exact same results as the
+                            previous example.
+                            This command, however, specifically provides the image
+                            and root filesystem type.
+                            <literallayout class='monospaced'>
      $ runqemu qemux86 core-image-minimal ext3
-            </literallayout>
-            This example specifies to boot an initial RAM disk image
-            and to enable audio in QEMU.
-            For this case, <filename>runqemu</filename> set the
-            internal variable <filename>FSTYPE</filename> to
-            "cpio.gz".
-            Also, for audio to be enabled, an appropriate driver must
-            be installed (see the previous description for the
-            <filename>audio</filename> option for more information).
-            <literallayout class='monospaced'>
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            This example specifies to boot an initial RAM disk image
+                            and to enable audio in QEMU.
+                            For this case, <filename>runqemu</filename> set the
+                            internal variable <filename>FSTYPE</filename> to
+                            "cpio.gz".
+                            Also, for audio to be enabled, an appropriate driver must
+                            be installed (see the previous description for the
+                            <filename>audio</filename> option for more information).
+                            <literallayout class='monospaced'>
      $ runqemu qemux86 ramfs audio
-            </literallayout>
-            This example does not provide enough information for
-            QEMU to launch.
-            While the command does provide a root filesystem type, it
-            must also minimally provide a
-            <replaceable>MACHINE</replaceable>,
-            <replaceable>KERNEL</replaceable>, or
-            <replaceable>VM</replaceable> option.
-            <literallayout class='monospaced'>
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            This example does not provide enough information for
+                            QEMU to launch.
+                            While the command does provide a root filesystem type, it
+                            must also minimally provide a
+                            <replaceable>MACHINE</replaceable>,
+                            <replaceable>KERNEL</replaceable>, or
+                            <replaceable>VM</replaceable> option.
+                            <literallayout class='monospaced'>
      $ runqemu ext3
-            </literallayout>
-            This example specifies to boot a virtual machine image
-            (<filename>.vmdk</filename> file).
-            From the <filename>.vmdk</filename>,
-            <filename>runqemu</filename> determines the QEMU
-            architecture (<replaceable>MACHINE</replaceable>) to be
-            "qemux86" and the root filesystem type to be "vmdk".
-            <literallayout class='monospaced'>
-     $ runqemu /home/scott-lenovo/vm/core-image-minimal-qemux86.vmdk
-            </literallayout>
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            This example specifies to boot a virtual machine
+                            image (<filename>.wic.vmdk</filename> file).
+                            From the <filename>.wic.vmdk</filename>,
+                            <filename>runqemu</filename> determines the QEMU
+                            architecture (<replaceable>MACHINE</replaceable>) to be
+                            "qemux86" and the root filesystem type to be "vmdk".
+                            <literallayout class='monospaced'>
+     $ runqemu /home/scott-lenovo/vm/core-image-minimal-qemux86.wic.vmdk
+                            </literallayout>
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+            </orderedlist>
         </para>
     </section>
-</section>
 
-<section id='qemu-running-under-a-network-file-system-nfs-server'>
-    <title>Running Under a Network File System (NFS) Server</title>
-
-    <para>
-        One method for running QEMU is to run it on an NFS server.
-        This is useful when you need to access the same file system from both
-        the build and the emulated system at the same time.
-        It is also worth noting that the system does not need root privileges
-        to run.
-        It uses a user space NFS server to avoid that.
-        This section describes how to set up for running QEMU using an NFS
-        server and then how you can start and stop the server.
-    </para>
-
-    <section id='qemu-setting-up-to-use-nfs'>
-        <title>Setting Up to Use NFS</title>
+    <section id='switching-between-consoles'>
+        <title>Switching Between Consoles</title>
 
         <para>
-            Once you are able to run QEMU in your environment, you can use the
-            <filename>runqemu-extract-sdk</filename> script, which is located
-            in the <filename>scripts</filename> directory along with
-            <filename>runqemu</filename> script.
-            The <filename>runqemu-extract-sdk</filename> takes a root
-            file system tarball and extracts it into a location that you
-            specify.
-            Then, when you run <filename>runqemu</filename>, you can specify
-            the location that has the file system to pass it to QEMU.
-            Here is an example that takes a file system and extracts it to
-            a directory named <filename>test-nfs</filename>:
-            <literallayout class='monospaced'>
+            When booting or running QEMU, you can switch between
+            supported consoles by using
+            Ctrl+Alt+<replaceable>number</replaceable>.
+            For example, Ctrl+Alt+3 switches you to the serial console
+            as long as that console is enabled.
+            Being able to switch consoles is helpful, for example, if
+            the main QEMU console breaks for some reason.
+            <note>
+                Usually, "2" gets you to the main console and "3"
+                gets you to the serial console.
+            </note>
+        </para>
+    </section>
+
+    <section id='removing-the-splash-screen'>
+        <title>Removing the Splash Screen</title>
+
+        <para>
+            You can remove the splash screen when QEMU is booting by
+            using Alt+left.
+            Removing the splash screen allows you to see what is
+            happening in the background.
+        </para>
+    </section>
+
+    <section id='disabling-the-cursor-grab'>
+        <title>Disabling the Cursor Grab</title>
+
+        <para>
+            The default QEMU integration captures the cursor within the
+            main window.
+            It does this since standard mouse devices only provide
+            relative input and not absolute coordinates.
+            You then have to break out of the grab using the "Ctrl+Alt"
+            key combination.
+            However, the Yocto Project's integration of QEMU enables
+            the wacom USB touch pad driver by default to allow input
+            of absolute coordinates.
+            This default means that the mouse can enter and leave the
+            main window without the grab taking effect leading to a
+            better user experience.
+        </para>
+    </section>
+
+    <section id='qemu-running-under-a-network-file-system-nfs-server'>
+        <title>Running Under a Network File System (NFS) Server</title>
+
+        <para>
+            One method for running QEMU is to run it on an NFS server.
+            This is useful when you need to access the same file system
+            from both the build and the emulated system at the same time.
+            It is also worth noting that the system does not need root
+            privileges to run.
+            It uses a user space NFS server to avoid that.
+            Follow these steps to set up for running QEMU using an NFS
+            server.
+            <orderedlist>
+                <listitem><para>
+                    <emphasis>Extract a Root Filesystem:</emphasis>
+                    Once you are able to run QEMU in your environment, you can
+                    use the <filename>runqemu-extract-sdk</filename> script,
+                    which is located in the <filename>scripts</filename>
+                    directory along with the <filename>runqemu</filename>
+                    script.</para>
+
+                    <para>The <filename>runqemu-extract-sdk</filename> takes a
+                    root filesystem tarball and extracts it into a location
+                    that you specify.
+                    Here is an example that takes a file system and
+                    extracts it to a directory named
+                    <filename>test-nfs</filename>:
+                    <literallayout class='monospaced'>
      runqemu-extract-sdk ./tmp/deploy/images/qemux86/core-image-sato-qemux86.tar.bz2 test-nfs
-            </literallayout>
-            Once you have extracted the file system, you can run
-            <filename>runqemu</filename> normally with the additional
-            location of the file system.
-            You can then also make changes to the files within
-            <filename>./test-nfs</filename> and see those changes appear in the
-            image in real time.
-            Here is an example using the <filename>qemux86</filename> image:
-            <literallayout class='monospaced'>
+                    </literallayout>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis>Start QEMU:</emphasis>
+                    Once you have extracted the file system, you can run
+                    <filename>runqemu</filename> normally with the additional
+                    location of the file system.
+                    You can then also make changes to the files within
+                    <filename>./test-nfs</filename> and see those changes
+                    appear in the image in real time.
+                    Here is an example using the <filename>qemux86</filename>
+                    image:
+                    <literallayout class='monospaced'>
      runqemu qemux86 ./test-nfs
-            </literallayout>
-        </para>
-    </section>
-
-    <section id='qemu-starting-and-stopping-nfs'>
-        <title>Starting and Stopping NFS</title>
-
-        <para>
-            You can manually start and stop the NFS share using these
-            commands:
-            <itemizedlist>
-                <listitem><para><emphasis><filename>start</filename>:</emphasis>
-                    Starts the NFS share:
-                    <literallayout class='monospaced'>
+                    </literallayout>
+                    </para></listitem>
+            </orderedlist>
+            <note>
+                <para>
+                    Should you need to start, stop, or restart the NFS share,
+                    you can use the following commands:
+                    <itemizedlist>
+                        <listitem><para>
+                            The following command starts the NFS share:
+                            <literallayout class='monospaced'>
      runqemu-export-rootfs start <replaceable>file-system-location</replaceable>
-                    </literallayout>
-                    </para></listitem>
-                <listitem><para><emphasis><filename>stop</filename>:</emphasis>
-                    Stops the NFS share:
-                    <literallayout class='monospaced'>
-     runqemu-export-rootfs stop <replaceable>file-system-location</replaceable>
-                    </literallayout>
-                    </para></listitem>
-                <listitem><para><emphasis><filename>restart</filename>:</emphasis>
-                    Restarts the NFS share:
-                    <literallayout class='monospaced'>
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            The following command stops the NFS share:
+                            <literallayout class='monospaced'>
+         runqemu-export-rootfs stop <replaceable>file-system-location</replaceable>
+                            </literallayout>
+                            </para></listitem>
+                        <listitem><para>
+                            The following command restarts the NFS share:
+                            <literallayout class='monospaced'>
      runqemu-export-rootfs restart <replaceable>file-system-location</replaceable>
-                    </literallayout>
-                    </para></listitem>
-            </itemizedlist>
+                            </literallayout>
+                            </para></listitem>
+                    </itemizedlist>
+                </para>
+            </note>
         </para>
     </section>
-</section>
-
-<section id='qemu-tips-and-tricks'>
-    <title>Tips and Tricks</title>
-
-    <para>
-        The following list describes things you can do to make running QEMU
-        in the context of the Yocto Project a better experience:
-        <itemizedlist>
-            <listitem><para><emphasis>Switching Between Consoles:</emphasis>
-                When booting or running QEMU, you can switch between
-                supported consoles by using
-                Ctrl+Alt+<replaceable>number</replaceable>.
-                For example, Ctrl+Alt+3 switches you to the serial console as
-                long as that console is enabled.
-                Being able to switch consoles is helpful, for example, if the
-                main QEMU console breaks for some reason.
-                <note>
-                    Usually, "2" gets you to the main console and "3" gets you
-                    to the serial console.
-                </note>
-                </para></listitem>
-            <listitem><para><emphasis>Removing the Splash Screen:</emphasis>
-                You can remove the splash screen when QEMU is booting by
-                using Alt+left.
-                Removing the splash screen allows you to see what is happening
-                in the background.
-                </para></listitem>
-            <listitem><para><emphasis>Disabling the Cursor Grab:</emphasis>
-                The default QEMU integration captures the cursor within the
-                main window.
-                It does this since standard mouse devices only provide relative
-                input and not absolute coordinates.
-                You then have to break out of the grab using the "Ctrl+Alt" key
-                combination.
-                However, the Yocto Project's integration of QEMU enables the
-                wacom USB touch pad driver by default to allow input of absolute
-                coordinates.
-                This default means that the mouse can enter and leave the
-                main window without the grab taking effect leading to a better
-                user experience.
-                </para></listitem>
-        </itemizedlist>
-    </para>
-</section>
-
 </chapter>
 <!--
 vim: expandtab tw=80 ts=4

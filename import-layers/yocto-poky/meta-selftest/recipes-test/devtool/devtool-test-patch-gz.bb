@@ -6,6 +6,7 @@ DEPENDS = "libxres libxext virtual/libx11 ncurses"
 SRC_URI = "http://downloads.yoctoproject.org/releases/xrestop/xrestop-0.4.tar.gz \
            file://readme.patch.gz \
            "
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 S = "${WORKDIR}/xrestop-0.4"
 

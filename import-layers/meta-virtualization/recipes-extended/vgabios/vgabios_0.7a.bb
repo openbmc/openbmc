@@ -3,7 +3,7 @@ HOMEPAGE = "http://www.nongnu.org/vgabios/"
 LICENSE = "LGPLv2.1"
 SECTION = "firmware"
 
-DEPENDS = "dev86-native"
+DEPENDS = "dev86-native biossums-native"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=dcf3c825659e82539645da41a7908589"
 
@@ -20,7 +20,9 @@ FILES_${PN}-dbg = "/usr/share/firmware/${PN}-${PV}*.debug.bin"
 S = "${WORKDIR}/${PN}-${PV}"
 
 do_configure() {
-    echo "Skip do_configure"
+    # Override to use the native-built biossums tool:
+    sed 's,./biossums,biossums,' -i Makefile
+    sed 's,$(CC) -o biossums biossums.c,touch biossums,' -i Makefile
 }
 
 do_install() {

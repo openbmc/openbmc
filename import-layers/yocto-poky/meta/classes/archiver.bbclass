@@ -223,6 +223,8 @@ python do_ar_configured() {
     import shutil
 
     # Forcibly expand the sysroot paths as we're about to change WORKDIR
+    d.setVar('STAGING_DIR_HOST', d.getVar('STAGING_DIR_HOST'))
+    d.setVar('STAGING_DIR_TARGET', d.getVar('STAGING_DIR_TARGET'))
     d.setVar('RECIPE_SYSROOT', d.getVar('RECIPE_SYSROOT'))
     d.setVar('RECIPE_SYSROOT_NATIVE', d.getVar('RECIPE_SYSROOT_NATIVE'))
 

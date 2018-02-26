@@ -719,7 +719,11 @@ class ORMWrapper(object):
 
     def save_build_package_information(self, build_obj, package_info, recipes,
                                        built_package):
-       # assert isinstance(build_obj, Build)
+        # assert isinstance(build_obj, Build)
+
+        if not 'PN' in package_info.keys():
+            # no package data to save (e.g. 'OPKGN'="lib64-*"|"lib32-*")
+            return None
 
         # create and save the object
         pname = package_info['PKG']

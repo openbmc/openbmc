@@ -1,0 +1,27 @@
+Index: lss/linux_syscall_support.h
+===================================================================
+--- lss.orig/linux_syscall_support.h
++++ lss/linux_syscall_support.h
+@@ -118,21 +118,13 @@ extern "C" {
+ #include <endian.h>
+ 
+ #ifdef __mips__
+-/* Include definitions of the ABI currently in use.                          */
+-#ifdef __ANDROID__
+-/* Android doesn't have sgidefs.h, but does have asm/sgidefs.h,
+- * which has the definitions we need.
+- */
+ #include <asm/sgidefs.h>
+-#else
+-#include <sgidefs.h>
+-#endif
+ #endif
+ #endif
+ 
+ /* The Android NDK's <sys/stat.h> #defines these macros as aliases
+  * to their non-64 counterparts. To avoid naming conflict, remove them. */
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || (defined(__linux__) && !defined(__glibc__))
+   /* These are restored by the corresponding #pragma pop_macro near
+    * the end of this file. */
+ # pragma push_macro("stat64")

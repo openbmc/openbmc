@@ -3,7 +3,7 @@ SECTION = "utils"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
-DEPENDS += "libtirpc flex-native bison-native e2fsprogs openssl libxml2 util-linux cyrus-sasl"
+DEPENDS += "libtirpc flex-native bison-native e2fsprogs openssl libxml2 util-linux cyrus-sasl libnsl2"
 
 CFLAGS += "-I${STAGING_INCDIR}/tirpc"
 
@@ -26,6 +26,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/daemons/autofs/v5/autofs-${PV}.tar.gz \
            file://0002-Replace-__S_IEXEC-with-S_IEXEC.patch \
            file://autofs-5.1.2-libtirpc-as-need.patch \
            file://pkgconfig-libnsl.patch \
+           file://0001-modules-lookup_multi.c-Replace-__S_IEXEC-with-S_IEXE.patch \
            "
 SRC_URI[md5sum] = "28cf88f99eff553a8500659ba5d45a76"
 SRC_URI[sha256sum] = "0d57e4138c2ec8058ca92164d035546f68ce4af93acb893369993d67c7056a10"

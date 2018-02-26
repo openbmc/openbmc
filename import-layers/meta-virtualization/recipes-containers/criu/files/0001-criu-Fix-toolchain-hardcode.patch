@@ -1,6 +1,6 @@
-From 057d30f15e81dcc4162d6fbee06f126564596397 Mon Sep 17 00:00:00 2001
-From: Jianchuan Wang <jianchuan.wang@windriver.com>
-Date: Wed, 7 Sep 2016 23:55:15 -0400
+From af679853a45fe63f680c99e70416c8ac620d23b8 Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Fri, 8 Sep 2017 15:02:14 -0400
 Subject: [PATCH] criu: Fix toolchain hardcode
 
 Replace ":=" to "?=" so that the toolchain used by bitbake build system will
@@ -8,45 +8,32 @@ be taken.
 
 Signed-off-by: Yang Shi <yang.shi@windriver.com>
 Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
 ---
  Makefile                       |  2 +-
- criu/pie/Makefile              |  2 +-
  scripts/nmk/scripts/include.mk |  2 +-
  scripts/nmk/scripts/tools.mk   | 40 ++++++++++++++++++++--------------------
- 4 files changed, 23 insertions(+), 23 deletions(-)
+ 3 files changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 52cbd6a..f66279b 100644
+index f2583a2..d7f51e5 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -60,7 +60,7 @@ LDARCH			?= $(SRCARCH)
- 
- export SRCARCH LDARCH VDSO
+@@ -17,7 +17,7 @@ ifeq ($(origin HOSTCFLAGS), undefined)
+         HOSTCFLAGS := $(CFLAGS) $(USERCFLAGS)
+ endif
  
 -UNAME-M := $(shell uname -m)
 +UNAME-M ?= $(shell uname -m)
- export UNAME-M
  
- ifeq ($(ARCH),arm)
-diff --git a/criu/pie/Makefile b/criu/pie/Makefile
-index 125b02f..9975871 100644
---- a/criu/pie/Makefile
-+++ b/criu/pie/Makefile
-@@ -17,7 +17,7 @@ restorer-obj-e		+= ./$(ARCH_DIR)/syscalls.built-in.o
  #
- CFLAGS			:= $(filter-out -pg $(CFLAGS-GCOV),$(CFLAGS))
- CFLAGS			+= -iquote $(SRC_DIR)/criu/pie/piegen
--CFLAGS			+= -iquote $(SRC_DIR)/criu/arch/$(ARCH)/include
-+CFLAGS			+= -iquote $(SRC_DIR)/criu/arch/$(SRCARCH)/include
- CFLAGS			+= -iquote $(SRC_DIR)/criu/include
- CFLAGS			+= -iquote $(SRC_DIR)
- 
+ # Supported Architectures
 diff --git a/scripts/nmk/scripts/include.mk b/scripts/nmk/scripts/include.mk
-index 4c496f7..a7250cd 100644
+index 04ccb3a..0d63bc7 100644
 --- a/scripts/nmk/scripts/include.mk
 +++ b/scripts/nmk/scripts/include.mk
 @@ -20,7 +20,7 @@ SUBARCH := $(shell uname -m | sed       \
-                 -e s/aarch64.*/arm64/)
+                 -e s/aarch64.*/aarch64/)
  
  ARCH		?= $(SUBARCH)
 -SRCARCH 	:= $(ARCH)
@@ -55,16 +42,20 @@ index 4c496f7..a7250cd 100644
  export SUBARCH ARCH SRCARCH
  
 diff --git a/scripts/nmk/scripts/tools.mk b/scripts/nmk/scripts/tools.mk
-index 0538dde..e4af068 100644
+index 56dba84..1698821 100644
 --- a/scripts/nmk/scripts/tools.mk
 +++ b/scripts/nmk/scripts/tools.mk
-@@ -2,28 +2,28 @@ ifndef ____nmk_defined__tools
+@@ -2,30 +2,30 @@ ifndef ____nmk_defined__tools
  
  #
  # System tools shorthands
 -RM		:= rm -f
--LD		:= $(CROSS_COMPILE)ld
--CC		:= $(CROSS_COMPILE)gcc
++RM		?= rm -f
+ HOSTLD		?= ld
+-LD		:= $(CROSS_COMPILE)$(HOSTLD)
++LD		?= $(CROSS_COMPILE)$(HOSTLD)
+ HOSTCC		?= gcc
+-CC		:= $(CROSS_COMPILE)$(HOSTCC)
 -CPP		:= $(CC) -E
 -AS		:= $(CROSS_COMPILE)as
 -AR		:= $(CROSS_COMPILE)ar
@@ -79,9 +70,7 @@ index 0538dde..e4af068 100644
 -PYTHON		:= python
 -FIND		:= find
 -SH		:= $(shell if [ -x "$$BASH" ]; then echo $$BASH;        \
-+RM		?= rm -f
-+LD		?= $(CROSS_COMPILE)ld
-+CC		?= $(CROSS_COMPILE)gcc
++CC		?= $(CROSS_COMPILE)$(HOSTCC)
 +CPP		?= $(CC) -E
 +AS		?= $(CROSS_COMPILE)as
 +AR		?= $(CROSS_COMPILE)ar
@@ -105,8 +94,8 @@ index 0538dde..e4af068 100644
 +ETAGS		?= etags
 +CTAGS		?= ctags
  
- export RM LD CC CPP AS AR STRIP OBJCOPY OBJDUMP
+ export RM HOSTLD LD HOSTCC CC CPP AS AR STRIP OBJCOPY OBJDUMP
  export NM SH MAKE MKDIR AWK PERL PYTHON SH CSCOPE
 -- 
-2.8.1
+2.7.4
 

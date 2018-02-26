@@ -143,22 +143,25 @@ class ChangeRecord:
             out += '\n  '.join(list(diff)[2:])
             out += '\n  --'
         elif self.fieldname in img_monitor_files or '/image-files/' in self.path:
-            fieldname = self.fieldname
-            if '/image-files/' in self.path:
-                fieldname = os.path.join('/' + self.path.split('/image-files/')[1], self.fieldname)
-                out = 'Changes to %s:\n  ' % fieldname
+            if self.filechanges or (self.oldvalue and self.newvalue):
+                fieldname = self.fieldname
+                if '/image-files/' in self.path:
+                    fieldname = os.path.join('/' + self.path.split('/image-files/')[1], self.fieldname)
+                    out = 'Changes to %s:\n  ' % fieldname
+                else:
+                    if outer:
+                        prefix = 'Changes to %s ' % self.path
+                    out = '(%s):\n  ' % self.fieldname
+                if self.filechanges:
+                    out += '\n  '.join(['%s' % i for i in self.filechanges])
+                else:
+                    alines = self.oldvalue.splitlines()
+                    blines = self.newvalue.splitlines()
+                    diff = difflib.unified_diff(alines, blines, fieldname, fieldname, lineterm='')
+                    out += '\n  '.join(list(diff))
+                    out += '\n  --'
             else:
-                if outer:
-                    prefix = 'Changes to %s ' % self.path
-                out = '(%s):\n  ' % self.fieldname
-            if self.filechanges:
-                out += '\n  '.join(['%s' % i for i in self.filechanges])
-            else:
-                alines = self.oldvalue.splitlines()
-                blines = self.newvalue.splitlines()
-                diff = difflib.unified_diff(alines, blines, fieldname, fieldname, lineterm='')
-                out += '\n  '.join(list(diff))
-                out += '\n  --'
+                out = ''
         else:
             out = '%s changed from "%s" to "%s"' % (self.fieldname, self.oldvalue, self.newvalue)
 
@@ -169,7 +172,7 @@ class ChangeRecord:
                 for line in chg._str_internal(False).splitlines():
                     out += '\n  * %s' % line
 
-        return '%s%s' % (prefix, out)
+        return '%s%s' % (prefix, out) if out else ''
 
 class FileChange:
     changetype_add = 'A'
@@ -508,7 +511,8 @@ def compare_siglists(a_blob, b_blob, taskdiff=False):
     return '\n'.join(out)
 
 
-def process_changes(repopath, revision1, revision2='HEAD', report_all=False, report_ver=False, sigs=False, sigsdiff=False):
+def process_changes(repopath, revision1, revision2='HEAD', report_all=False, report_ver=False,
+                    sigs=False, sigsdiff=False, exclude_path=None):
     repo = git.Repo(repopath)
     assert repo.bare == False
     commit = repo.commit(revision1)
@@ -600,6 +604,19 @@ def process_changes(repopath, revision1, revision2='HEAD', report_all=False, rep
                         chg.related.append(chg2)
                     elif chg.path == chg2.path and chg.path.startswith('packages/') and chg2.fieldname in ['PE', 'PV', 'PR']:
                         chg.related.append(chg2)
+
+    # filter out unwanted paths
+    if exclude_path:
+        for chg in changes:
+            if chg.filechanges:
+                fchgs = []
+                for fchg in chg.filechanges:
+                    for epath in exclude_path:
+                        if fchg.path.startswith(epath):
+                           break
+                    else:
+                        fchgs.append(fchg)
+                chg.filechanges = fchgs
 
     if report_all:
         return changes

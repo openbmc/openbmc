@@ -320,29 +320,13 @@ def main(server, eventHandler, params):
             if isinstance(event, bb.event.CacheLoadCompleted):
                 continue
             if isinstance(event, bb.event.MultipleProviders):
-                logger.info("multiple providers are available for %s%s (%s)", event._is_runtime and "runtime " or "",
-                            event._item,
-                            ", ".join(event._candidates))
-                logger.info("consider defining a PREFERRED_PROVIDER entry to match %s", event._item)
+                logger.info(str(event))
                 continue
 
             if isinstance(event, bb.event.NoProvider):
                 errors = errors + 1
-                if event._runtime:
-                    r = "R"
-                else:
-                    r = ""
-
-                if event._dependees:
-                    text = "Nothing %sPROVIDES '%s' (but %s %sDEPENDS on or otherwise requires it)" % (r, event._item, ", ".join(event._dependees), r)
-                else:
-                    text = "Nothing %sPROVIDES '%s'" % (r, event._item)
-
+                text = str(event)
                 logger.error(text)
-                if event._reasons:
-                    for reason in event._reasons:
-                        logger.error("%s", reason)
-                        text += reason
                 buildinfohelper.store_log_error(text)
                 continue
 
@@ -364,8 +348,7 @@ def main(server, eventHandler, params):
             if isinstance(event, bb.runqueue.runQueueTaskFailed):
                 buildinfohelper.update_and_store_task(event)
                 taskfailures.append(event.taskstring)
-                logger.error("Task (%s) failed with exit code '%s'",
-                             event.taskstring, event.exitcode)
+                logger.error(str(event))
                 continue
 
             if isinstance(event, (bb.runqueue.sceneQueueTaskCompleted, bb.runqueue.sceneQueueTaskFailed)):
@@ -382,7 +365,7 @@ def main(server, eventHandler, params):
                 if isinstance(event, bb.command.CommandFailed):
                     errors += 1
                     errorcode = 1
-                    logger.error("Command execution failed: %s", event.error)
+                    logger.error(str(event))
                 elif isinstance(event, bb.event.BuildCompleted):
                     buildinfohelper.scan_image_artifacts()
                     buildinfohelper.clone_required_sdk_artifacts()

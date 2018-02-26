@@ -63,10 +63,6 @@ EXTRA_OECONF = "--with-avahi-priv-access-group=adm \
 EXTRA_OECONF_SYSVINIT = "${@bb.utils.contains('DISTRO_FEATURES','sysvinit','--with-distro=debian','--with-distro=none',d)}"
 EXTRA_OECONF_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES','systemd','--with-systemdsystemunitdir=${systemd_unitdir}/system/','--without-systemdsystemunitdir',d)}"
 
-
-LDFLAGS_append_libc-uclibc = " -lintl"
-LDFLAGS_append_uclinux-uclibc = " -lintl"
-
 do_configure_prepend() {
     sed 's:AM_CHECK_PYMOD:echo "no pymod" #AM_CHECK_PYMOD:g' -i ${S}/configure.ac
 
@@ -111,7 +107,6 @@ FILES_avahi-utils = "${bindir}/avahi-*"
 
 RDEPENDS_${PN}-dev = "avahi-daemon (= ${EXTENDPKGV}) libavahi-core (= ${EXTENDPKGV}) libavahi-client (= ${EXTENDPKGV})"
 
-# uclibc has no nss
 RRECOMMENDS_avahi-daemon_append_libc-glibc = " libnss-mdns"
 RRECOMMENDS_${PN}_append_libc-glibc = " libnss-mdns"
 

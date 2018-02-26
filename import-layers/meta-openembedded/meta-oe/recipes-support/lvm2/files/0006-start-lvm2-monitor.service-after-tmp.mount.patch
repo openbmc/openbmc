@@ -1,0 +1,32 @@
+From 24a2c47fd01dde1710f1fa66f5c30ce7010c5956 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 21 Sep 2017 15:28:10 +0800
+Subject: [PATCH] start lvm2-monitor.service after tmp.mount
+
+The lvm2-monitor.service reqires the existence of locking_dir
+("/tmp/lock/lvm"), and unit tmp.mount is to mount /tmp.
+So start lvm2-monitor.service after tmp.mount
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ scripts/lvm2_monitoring_systemd_red_hat.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/lvm2_monitoring_systemd_red_hat.service.in b/scripts/lvm2_monitoring_systemd_red_hat.service.in
+index 22238b7..93b2bee 100644
+--- a/scripts/lvm2_monitoring_systemd_red_hat.service.in
++++ b/scripts/lvm2_monitoring_systemd_red_hat.service.in
+@@ -2,7 +2,7 @@
+ Description=Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling
+ Documentation=man:dmeventd(8) man:lvcreate(8) man:lvchange(8) man:vgchange(8)
+ Requires=dm-event.socket lvm2-lvmetad.socket
+-After=dm-event.socket dm-event.service lvm2-lvmetad.socket lvm2-activation.service lvm2-lvmetad.service
++After=dm-event.socket dm-event.service lvm2-lvmetad.socket lvm2-activation.service lvm2-lvmetad.service tmp.mount
+ Before=local-fs-pre.target
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+-- 
+1.8.3.1
+

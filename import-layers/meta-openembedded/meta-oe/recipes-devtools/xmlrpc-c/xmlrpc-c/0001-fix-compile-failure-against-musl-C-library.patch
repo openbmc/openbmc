@@ -1,0 +1,52 @@
+From 950b27f8320b841490cafcb3e6e3b818c7174c0d Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 20 Jul 2017 22:32:50 -0400
+Subject: [PATCH] fix compile failure against musl C library
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ test/cpp/server_abyss.cpp               |  2 +-
+ tools/xmlrpc_pstream/xmlrpc_pstream.cpp | 10 +++++++---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/test/cpp/server_abyss.cpp b/test/cpp/server_abyss.cpp
+index 2458a8f..82f91da 100644
+--- a/test/cpp/server_abyss.cpp
++++ b/test/cpp/server_abyss.cpp
+@@ -18,7 +18,7 @@
+ #ifdef WIN32
+   #include <winsock2.h>
+ #else
+-  #include <sys/unistd.h>
++  #include <unistd.h>
+   #include <sys/socket.h>
+   #include <arpa/inet.h>
+   #include <netinet/in.h>
+diff --git a/tools/xmlrpc_pstream/xmlrpc_pstream.cpp b/tools/xmlrpc_pstream/xmlrpc_pstream.cpp
+index d39e105..1fd8900 100644
+--- a/tools/xmlrpc_pstream/xmlrpc_pstream.cpp
++++ b/tools/xmlrpc_pstream/xmlrpc_pstream.cpp
+@@ -15,11 +15,15 @@
+ #include "xmlrpc-c/girerr.hpp"
+ using girerr::throwf;
+ 
+-#include <features.h>  // for __BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+-__BEGIN_DECLS
+ #include "dumpvalue.h"  /* An internal Xmlrpc-c header file ! */
+-__END_DECLS
++
++#ifdef __cplusplus
++}
++#endif
+ 
+ 
+ #include <xmlrpc-c/base.hpp>
+-- 
+2.8.1
+

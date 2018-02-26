@@ -1,4 +1,4 @@
-From 2fd8d2aedad0c50cdf1e43edd2387874b720ad4c Mon Sep 17 00:00:00 2001
+From f37fa9a41f248fa41dd74a41c66cb41a291c03d2 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Fri, 16 Sep 2016 12:18:23 -0700
 Subject: [PATCH] fix libtomcrypt/libtommath ordering
@@ -11,18 +11,19 @@ prepended to LIBTOM_LIBS as they are found, not appended.
 Note that LIBTOM_LIBS is not used when linking with the bundled
 libtom libs.
 
-Upstream-Status: Pending
+Upstream-Status: Backport [ https://github.com/mkj/dropbear/commit/f9e6bc2aecab0f4b5b529e07a92cc63c8a66cd4b ]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
 ---
  configure.ac | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index b6abe4c..85bb8bc 100644
+index 245408d..d624853 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -390,16 +390,16 @@ AC_ARG_ENABLE(bundled-libtom,
+@@ -393,16 +393,16 @@ AC_ARG_ENABLE(bundled-libtom,
  			AC_MSG_NOTICE(Forcing bundled libtom*)
  		else
  			BUNDLED_LIBTOM=0
@@ -44,5 +45,5 @@ index b6abe4c..85bb8bc 100644
  )
  
 -- 
-1.9.1
+2.8.1
 

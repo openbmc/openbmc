@@ -12,9 +12,7 @@ SRC_URI = "git://${PKG_NAME}.git"
 SRCREV = "b4a58d95188dd092ae20072bac14cece0e67c388"
 PV = "4+git${SRCREV}"
 
-DEPENDS += " \
-    bash \
-"
+RDEPENDS_${PN} += "bash"
 
 S = "${WORKDIR}/git"
 

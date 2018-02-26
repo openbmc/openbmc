@@ -1,0 +1,30 @@
+From 38688ee2754415cf2a1935dafb8278861b7315e7 Mon Sep 17 00:00:00 2001
+From: Stefan Strogin <sstrogin@cisco.com>
+Date: Thu, 2 Mar 2017 00:26:31 +0200
+Subject: [PATCH] test: add output in the format "result: testname"
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Stefan Strogin <sstrogin@cisco.com>
+---
+ src/test/runtests.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/test/runtests.sh b/src/test/runtests.sh
+index a3eaad0..64f0705 100755
+--- a/src/test/runtests.sh
++++ b/src/test/runtests.sh
+@@ -34,8 +34,10 @@ do
+     then
+ 	n_failed=`expr ${n_failed} + 1`
+ 	tests_failed="$tests_failed $testfile"
++	echo "FAIL: $testfile"
+     else
+         touch lastrun/$testfile
++	echo "PASS: $testfile"
+     fi
+ done
+ 
+-- 
+2.11.0
+

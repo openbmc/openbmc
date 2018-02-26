@@ -1,4 +1,5 @@
 SUMMARY = "Replacement syslog API"
+HOMEPAGE = "http://www.balabit.com/network-security/syslog-ng/opensource-logging-system"
 DESCRIPTION = "The EventLog library aims to be a replacement of the \
               simple syslog() API provided on UNIX systems. The \
               major difference between EventLog and syslog is that \

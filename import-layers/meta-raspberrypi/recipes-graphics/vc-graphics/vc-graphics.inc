@@ -4,7 +4,7 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=86e53f5f5909ee66900418028de11780"
 
 PROVIDES = "virtual/libgles2 virtual/egl"
-COMPATIBLE_MACHINE = "raspberrypi"
+COMPATIBLE_MACHINE = "^rpi$"
 
 include recipes-bsp/common/firmware.inc
 

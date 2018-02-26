@@ -7,6 +7,8 @@ Fix underquoted m4 entry. This causes a failure if gcrypt isn't present:
 RP
 2016/2/16
 
+Upstream-Status: Pending
+
 Index: rng-tools-5/configure.ac
 ===================================================================
 --- rng-tools-5.orig/configure.ac

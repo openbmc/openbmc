@@ -1,0 +1,27 @@
+When checking if the compiler supports compressed debug sections we need to
+actually link instead of just compile.  Otherwise the compiler thinks that
+they are supported, but gold does not support -gz=zlib.
+
+Upstream-Status: Backport (r16459)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+--- a/configure.ac~	2017-07-11 11:53:16.000000000 +0100
++++ b/configure.ac	2017-07-11 18:16:13.674130483 +0100
+@@ -2119,7 +2119,7 @@
+ safe_CFLAGS=$CFLAGS
+ CFLAGS="-g -gz=zlib"
+ 
+-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ ]], [[
++AC_LINK_IFELSE([AC_LANG_PROGRAM([[ ]], [[
+   return 0;
+ ]])], [
+ ac_have_gz_zlib=yes
+@@ -2139,7 +2139,7 @@
+ safe_CFLAGS=$CFLAGS
+ CFLAGS="-g -gz=zlib-gnu"
+ 
+-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ ]], [[
++AC_LINK_IFELSE([AC_LANG_PROGRAM([[ ]], [[
+   return 0;
+ ]])], [
+ ac_have_gz_zlib_gnu=yes

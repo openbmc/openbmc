@@ -1,0 +1,14 @@
+messagebus:x:500:
+systemd-bus-proxy:x:501:
+systemd-network:x:502:
+systemd-resolve:x:503:
+systemd-timesync:x:504:
+polkitd:x:505:
+lock:x:506:
+systemd-journal:x:507:
+netdev:x:508:
+avahi:x:509:
+avahi-autoipd:x:510:
+rpc:x:511:
+rpcuser:x:513:
+

@@ -1,7 +1,7 @@
 SUMMARY = "Install a Debian system into a subdirectory"
 HOMEPAGE = "https://wiki.debian.org/Debootstrap"
 SECTION = "devel"
-LICENSE = "debootstrap-custom-license"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=1e68ced6e1689d4cd9dac75ff5225608"
 
 inherit pkgconfig

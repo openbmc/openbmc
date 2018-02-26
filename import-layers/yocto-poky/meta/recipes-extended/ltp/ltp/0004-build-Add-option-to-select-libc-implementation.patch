@@ -10,6 +10,7 @@ different and does not implement all GNU extentions
 Disable tests specifically not building _yet_ on musl based systems
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
 ---
  Makefile                                    | 5 +++++
  testcases/kernel/Makefile                   | 5 ++++-

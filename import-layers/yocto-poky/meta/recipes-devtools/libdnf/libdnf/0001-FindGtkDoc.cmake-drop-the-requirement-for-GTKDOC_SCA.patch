@@ -7,7 +7,7 @@ Subject: [PATCH 1/4] FindGtkDoc.cmake: drop the requirement for
 For some reason cmake is not able to find it when building in openembedded,
 and it's bundled with the source code anyway.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/312]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  cmake/modules/FindGtkDoc.cmake | 2 +-

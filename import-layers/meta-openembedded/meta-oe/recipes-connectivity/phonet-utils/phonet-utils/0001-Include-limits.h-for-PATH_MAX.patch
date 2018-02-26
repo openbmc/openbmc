@@ -1,0 +1,25 @@
+From f7ad9a4471cee2324f216a0d82ba8097ec746c56 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2017 11:48:12 -0700
+Subject: [PATCH] Include limits.h for PATH_MAX
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/pnstat.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/pnstat.c b/src/pnstat.c
+index 661a5bc..76068e6 100644
+--- a/src/pnstat.c
++++ b/src/pnstat.c
+@@ -35,6 +35,7 @@
+ #include <dirent.h>
+ #include <unistd.h>
+ #include <netinet/tcp.h>
++#include <limits.h>
+ 
+ struct fd
+ {
+-- 
+2.13.3
+

@@ -1,0 +1,67 @@
+From a7170d32a13aead608abd18996f6dab2e2a631b5 Mon Sep 17 00:00:00 2001
+From: Matt Madison <matt@madison.systems>
+Date: Wed, 13 Sep 2017 08:06:37 -0700
+Subject: [PATCH 2/7] cmd/go: fix CC and CXX environment variable construction
+
+For OE cross-builds, CC and CXX have multiple words, and
+we need their complete definitions when setting up the
+environment during Go builds.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Matt Madison <matt@madison.systems>
+---
+ src/cmd/go/internal/envcmd/env.go |  4 ++--
+ src/cmd/go/internal/work/build.go | 12 ++++++++++++
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/src/cmd/go/internal/envcmd/env.go b/src/cmd/go/internal/envcmd/env.go
+index 43d4334..529d21d 100644
+--- a/src/cmd/go/internal/envcmd/env.go
++++ b/src/cmd/go/internal/envcmd/env.go
+@@ -74,10 +74,10 @@ func MkEnv() []cfg.EnvVar {
+ 	}
+ 
+ 	cmd := b.GccCmd(".")
+-	env = append(env, cfg.EnvVar{Name: "CC", Value: cmd[0]})
++	env = append(env, cfg.EnvVar{Name: "CC", Value: strings.Join(b.GccCmdForReal(), " ")})
+ 	env = append(env, cfg.EnvVar{Name: "GOGCCFLAGS", Value: strings.Join(cmd[3:], " ")})
+ 	cmd = b.GxxCmd(".")
+-	env = append(env, cfg.EnvVar{Name: "CXX", Value: cmd[0]})
++	env = append(env, cfg.EnvVar{Name: "CXX", Value: strings.Join(b.GxxCmdForReal(), " ")})
+ 
+ 	if cfg.BuildContext.CgoEnabled {
+ 		env = append(env, cfg.EnvVar{Name: "CGO_ENABLED", Value: "1"})
+diff --git a/src/cmd/go/internal/work/build.go b/src/cmd/go/internal/work/build.go
+index 7d667ff..85df0b3 100644
+--- a/src/cmd/go/internal/work/build.go
++++ b/src/cmd/go/internal/work/build.go
+@@ -3127,12 +3127,24 @@ func (b *Builder) GccCmd(objdir string) []string {
+ 	return b.ccompilerCmd("CC", cfg.DefaultCC, objdir)
+ }
+ 
++// gccCmd returns a gcc command line prefix
++// defaultCC is defined in zdefaultcc.go, written by cmd/dist.
++func (b *Builder) GccCmdForReal() []string {
++	return envList("CC", cfg.DefaultCC)
++}
++
+ // gxxCmd returns a g++ command line prefix
+ // defaultCXX is defined in zdefaultcc.go, written by cmd/dist.
+ func (b *Builder) GxxCmd(objdir string) []string {
+ 	return b.ccompilerCmd("CXX", cfg.DefaultCXX, objdir)
+ }
+ 
++// gxxCmd returns a g++ command line prefix
++// defaultCXX is defined in zdefaultcc.go, written by cmd/dist.
++func (b *Builder) GxxCmdForReal() []string {
++	return envList("CXX", cfg.DefaultCXX)
++}
++
+ // gfortranCmd returns a gfortran command line prefix.
+ func (b *Builder) gfortranCmd(objdir string) []string {
+ 	return b.ccompilerCmd("FC", "gfortran", objdir)
+-- 
+2.7.4
+

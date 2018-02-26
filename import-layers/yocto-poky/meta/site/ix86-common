@@ -19,7 +19,6 @@ ac_cv_sizeof_long_p=${ac_cv_sizeof_long_p=4}
 ac_cv_sizeof_float=${ac_cv_sizeof_float=4}
 ac_cv_sizeof_uid_t=${ac_cv_sizeof_uid_t=4}
 ac_cv_sizeof_gid_t=${ac_cv_sizeof_gid_t=4}
-ac_cv_sizeof_ino_t=${ac_cv_sizeof_ino_t=4}
 ac_cv_sizeof_dev_t=${ac_cv_sizeof_dev_t=8}
 ac_cv_func_lstat_dereferences_slashed_symlink=${ac_cv_func_lstat_dereferences_slashed_symlink=yes}
 ac_cv_func_lstat_empty_string_bug=${ac_cv_func_lstat_empty_string_bug=no}

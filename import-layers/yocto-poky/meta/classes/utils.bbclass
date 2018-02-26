@@ -320,7 +320,7 @@ hardlinkdir () {
 
 
 def check_app_exists(app, d):
-    app = d.expand(app).strip()
+    app = d.expand(app).split()[0].strip()
     path = d.getVar('PATH')
     return bool(bb.utils.which(path, app))
 
@@ -369,6 +369,7 @@ def get_multilib_datastore(variant, d):
     localdata.setVar("OVERRIDES", overrides)
     localdata.setVar("MLPREFIX", variant + "-")
     return localdata
+get_multilib_datastore[vardepsexclude] = "OVERRIDES"
 
 def all_multilib_tune_values(d, var, unique = True, need_split = True, delim = ' '):
     """Return a string of all ${var} in all multilib tune configuration"""
@@ -431,6 +432,7 @@ def all_multilib_tune_list(vars, d):
         values[v].append(localdata.getVar(v))
         values['ml'].append(item)
     return values
+all_multilib_tune_list[vardepsexclude] = "OVERRIDES"
 
 # If the user hasn't set up their name/email, set some defaults
 check_git_config() {

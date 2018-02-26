@@ -12,10 +12,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  configure.ac | 2 --
  2 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 29ed1dd..02f4017 100644
---- a/Makefile.am
-+++ b/Makefile.am
+Index: git/Makefile.am
+===================================================================
+--- git.orig/Makefile.am
++++ git/Makefile.am
 @@ -320,7 +320,7 @@ define install-relative-aliases
  	while [ -n "$$1" ]; do \
  		$(MKDIR_P) `dirname $(DESTDIR)$$dir/$$2` && \
@@ -25,19 +25,16 @@ index 29ed1dd..02f4017 100644
  		shift 2 || exit $$?; \
  	done
  endef
-diff --git a/configure.ac b/configure.ac
-index 7c4b5a2..b10c952 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -108,8 +108,6 @@ AC_PATH_PROG([SULOGIN], [sulogin], [/usr/sbin/sulogin], [$PATH:/usr/sbin:/sbin])
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -110,8 +110,6 @@ AC_PATH_PROG([SULOGIN], [sulogin], [/usr
  AC_PATH_PROG([MOUNT_PATH], [mount], [/usr/bin/mount], [$PATH:/usr/sbin:/sbin])
  AC_PATH_PROG([UMOUNT_PATH], [umount], [/usr/bin/umount], [$PATH:/usr/sbin:/sbin])
  
 -AS_IF([! ln --relative --help > /dev/null 2>&1], [AC_MSG_ERROR([*** ln doesn't support --relative ***])])
 -
- # check for few functions not implemented in uClibc
+ M4_DEFINES=
  
- AC_CHECK_FUNCS_ONCE(mkostemp execvpe posix_fallocate)
--- 
-2.10.2
-
+ AC_CHECK_TOOL(OBJCOPY, objcopy)

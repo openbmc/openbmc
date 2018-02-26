@@ -1,0 +1,31 @@
+From 8f299df4dd1ca857e34859c377a29b183c630961 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Sep 2017 13:05:03 -0700
+Subject: [PATCH] l2tp_api.c: include rpc/clnt.h for 'resultproc_t'
+
+Fixes
+
+| /mnt/a/oe/build/tmp/work/mips32r2-bec-linux-musl/openl2tp/1.8-r0/recipe-sysroot/usr/include/tirpc/rpc/pmap_clnt.h:81:12: error: unknown type name 'resultproc_t'; did you mean 'rpcproc_t'?                                                 |             resultproc_t);                                                                                                                                                                                                                  |             ^~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ l2tp_api.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/l2tp_api.c b/l2tp_api.c
+index f0946fd..f77881c 100644
+--- a/l2tp_api.c
++++ b/l2tp_api.c
+@@ -26,6 +26,7 @@
+ #include <sys/types.h>
+ #include <rpc/types.h>
+ #include <rpc/xdr.h>
++#include <rpc/clnt.h>
+ #include <rpc/pmap_clnt.h>
+ //#include <netinet/in.h>
+ 
+-- 
+2.14.1
+

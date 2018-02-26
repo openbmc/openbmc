@@ -1,0 +1,19 @@
+Enabled dhcp client functionality for Yocto reference
+hardware MPC8315E-RDB.
+
+Upstream-Status: Pending
+
+Signed-off-by: Ed Bartosh <ed.bartosh@linux.intel.com>
+
+diff --git a/configs/MPC8315ERDB_defconfig b/configs/MPC8315ERDB_defconfig
+index 4e2b705..b02ab1f 100644
+--- a/configs/MPC8315ERDB_defconfig
++++ b/configs/MPC8315ERDB_defconfig
+@@ -9,6 +9,7 @@ CONFIG_HUSH_PARSER=y
+ CONFIG_CMD_I2C=y
+ CONFIG_CMD_USB=y
+ # CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_DHCP=y
+ CONFIG_CMD_MII=y
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_EXT2=y

@@ -485,6 +485,7 @@ class BuildPerfTestCase(unittest.TestCase):
     @staticmethod
     def sync():
         """Sync and drop kernel caches"""
+        runCmd2('bitbake -m', ignore_status=True)
         log.debug("Syncing and dropping kernel caches""")
         KernelDropCaches.drop()
         os.sync()

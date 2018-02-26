@@ -1,0 +1,27 @@
+Fix missing test directory creation.
+
+GCC used in OE-core has "dependency tracking" disabled and
+libevent has problem with this.
+Due to removed makefile.am/in files in test/sample/include
+directories, output directories are not created in
+configuration step. Compilation step will fails, when
+trying to write to non-existing directory.
+
+Upstream-Status: Inappropriate [Other]
+Workaround specific to our build system.
+
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
+
+diff --git a/libevent-2.1.8-stable/test/include.am b/libevent-2.1.8-stable/test/include.am
+index eea249f..d323dff 100644
+--- a/test/include.am
++++ b/test/include.am
+@@ -161,6 +161,7 @@ test_bench_httpclient_LDADD = $(LIBEVENT_GC_SECTIONS) libevent_core.la
+ test/regress.gen.c test/regress.gen.h: test/rpcgen-attempted
+ 
+ test/rpcgen-attempted: test/regress.rpc event_rpcgen.py test/rpcgen_wrapper.sh
++	@$(MKDIR_P) test
+ 	$(AM_V_GEN)date -u > $@
+ 	$(AM_V_at)if $(srcdir)/test/rpcgen_wrapper.sh $(srcdir)/test; then \
+ 	   true; \

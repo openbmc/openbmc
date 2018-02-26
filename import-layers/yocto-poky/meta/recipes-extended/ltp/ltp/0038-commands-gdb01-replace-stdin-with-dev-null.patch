@@ -1,0 +1,34 @@
+From 2f6ab8f694b26b7f2566624f6d1f23788d6ab8a0 Mon Sep 17 00:00:00 2001
+From: Jan Stancek <jstancek@redhat.com>
+Date: Mon, 11 Sep 2017 12:57:58 +0200
+Subject: [PATCH] commands/gdb01: replace stdin with /dev/null
+
+If this testcase runs as background process, gdb can receive
+SIGTTOU and then testcase gets stuck.
+
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+
+Upstream-Status: Backport
+[https://github.com/linux-test-project/ltp/commit/2f6ab8f694b26b7f2566624f6d1f23788d6ab8a0]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ testcases/commands/gdb/gdb01.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/commands/gdb/gdb01.sh b/testcases/commands/gdb/gdb01.sh
+index 07ae36f..e3a5b51 100755
+--- a/testcases/commands/gdb/gdb01.sh
++++ b/testcases/commands/gdb/gdb01.sh
+@@ -29,7 +29,7 @@ TST_NEEDS_CMDS="gdb /bin/cat"
+ 
+ simple_test()
+ {
+-	gdb /bin/cat -ex "run /etc/passwd" -ex quit
++	gdb /bin/cat -ex "run /etc/passwd" -ex quit < /dev/null
+ 	RC=$?
+ 	if [ $RC -eq 0 ] ; then
+ 		tst_res TPASS "gdb attached to process and completed run"
+-- 
+2.7.4
+

@@ -1,0 +1,31 @@
+From a6ac2157ee6793302e23ddbc5e3b249fa7da5b7e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 31 Aug 2016 21:30:32 -0400
+Subject: [PATCH 09/13] invoking mount with infinite timeout
+
+This large timeout is needed when running on machines with
+lots of disks, or with slow disks.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/util.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blivet/util.py b/blivet/util.py
+index b3c45ac..9f02b18 100644
+--- a/blivet/util.py
++++ b/blivet/util.py
+@@ -257,7 +257,7 @@ def mount(device, mountpoint, fstype, options=None):
+ 
+     argv = ["mount", "-t", fstype, "-o", options, device, mountpoint]
+     try:
+-        rc = run_program(argv)
++        rc = run_program(argv, timeout=-1)
+     except OSError:
+         raise
+ 
+-- 
+2.7.4
+

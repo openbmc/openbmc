@@ -942,8 +942,8 @@ index f86c166..ba1acad 100644
 +	gdkgears
 +endif
 +
- if USE_X11
- noinst_PROGRAMS += testerrors
+ if USE_WAYLAND
+ noinst_PROGRAMS += testforeign
  endif
 diff --git a/testsuite/gtk/objects-finalize.c b/testsuite/gtk/objects-finalize.c
 index 0b3a519..07b096f 100644

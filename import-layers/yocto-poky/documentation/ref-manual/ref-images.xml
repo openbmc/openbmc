@@ -30,8 +30,8 @@
     <para>
         From within the <filename>poky</filename> Git repository, you can use
         the following command to display the list of directories within the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
-        that containe image recipe files:
+        <link linkend='source-directory'>Source Directory</link>
+        that contain image recipe files:
         <literallayout class='monospaced'>
      $ ls meta*/recipes*/images/*.bb
         </literallayout>
@@ -140,7 +140,7 @@
                 second image to be tested.
                 You can find more information about runtime testing in the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
-                section in the Yocto Project Development Manual.
+                section in the Yocto Project Development Tasks Manual.
                 </para></listitem>
             <listitem><para><filename>core-image-testmaster-initramfs</filename>:
                 A RAM-based Initial Root Filesystem (initramfs) image tailored for

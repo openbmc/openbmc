@@ -1,0 +1,52 @@
+From 0a69a26c9f7487daca900db87cd1195857a4603f Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 15 Aug 2017 17:10:57 +0800
+Subject: [PATCH 1/7] dso link change
+
+Upstream-Status: Pending
+
+This patch makes the link to the dependencies of libdw explicit, as
+recent ld no longer implicitly links them. See
+http://lists.fedoraproject.org/pipermail/devel/2010-March/133601.html
+as a similar example of the error message you can encounter without this
+patch, and https://fedoraproject.org/wiki/UnderstandingDSOLinkChange and
+https://fedoraproject.org/wiki/Features/ChangeInImplicitDSOLinking for
+more details.
+
+Rebase to 0.170
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/Makefile.am   | 2 +-
+ tests/Makefile.am | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 2b1c0dc..9305b84 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -44,7 +44,7 @@ libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl
+ libelf = ../libelf/libelf.a -lz
+ else
+ libasm = ../libasm/libasm.so
+-libdw = ../libdw/libdw.so
++libdw = ../libdw/libdw.so $(zip_LIBS) $(libelf) $(libebl) -ldl
+ libelf = ../libelf/libelf.so
+ endif
+ libebl = ../libebl/libebl.a
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 3735084..528615d 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -400,7 +400,7 @@ libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl
+ libelf = ../libelf/libelf.a -lz
+ libasm = ../libasm/libasm.a
+ else
+-libdw = ../libdw/libdw.so
++libdw = ../libdw/libdw.so $(zip_LIBS) $(libelf) $(libebl) -ldl
+ libelf = ../libelf/libelf.so
+ libasm = ../libasm/libasm.so
+ endif
+-- 
+1.8.3.1
+

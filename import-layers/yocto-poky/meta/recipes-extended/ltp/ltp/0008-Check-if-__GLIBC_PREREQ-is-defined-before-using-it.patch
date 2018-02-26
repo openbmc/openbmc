@@ -8,6 +8,7 @@ defined or not.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
+Upstream-Status: Pending
 ---
  testcases/kernel/syscalls/accept4/accept4_01.c     |  9 ++++-
  testcases/kernel/syscalls/getcpu/getcpu01.c        | 40 +++++++++++++++++++++-

@@ -1,0 +1,23 @@
+The native version of expat may be used on older systems which dont have glibc 2.25
+and hence don't have getrandom() thanks to uninative. Disable the libc call and
+use the syscall instead to avoid a compatibility issue until we have 2.25 everywhere
+we support with uninative.
+
+RP
+2017/8/14
+
+Upstream-Status: Inappropriate
+
+Index: expat-2.2.3/configure.ac
+===================================================================
+--- expat-2.2.3.orig/configure.ac
++++ expat-2.2.3/configure.ac
+@@ -151,7 +151,7 @@ AC_LINK_IFELSE([AC_LANG_SOURCE([
+   #include <stdlib.h>  /* for NULL */
+   #include <sys/random.h>
+   int main() {
+-    return getrandom(NULL, 0U, 0U);
++    return getrandomBREAKME(NULL, 0U, 0U);
+   }
+ ])], [
+     AC_DEFINE([HAVE_GETRANDOM], [1],

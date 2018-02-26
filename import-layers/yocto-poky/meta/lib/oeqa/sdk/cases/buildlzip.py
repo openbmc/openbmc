@@ -17,7 +17,8 @@ class BuildLzipTest(OESDKTestCase):
 
         machine = self.td.get("MACHINE")
 
-        if not self.tc.hasHostPackage("packagegroup-cross-canadian-%s" % machine):
+        if not (self.tc.hasTargetPackage("packagegroup-cross-canadian-%s" % machine) or
+                self.tc.hasTargetPackage("gcc")):
             raise unittest.SkipTest("SDK doesn't contain a cross-canadian toolchain")
 
     def test_lzip(self):

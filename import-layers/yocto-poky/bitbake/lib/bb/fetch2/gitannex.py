@@ -33,6 +33,11 @@ class GitANNEX(Git):
         """
         return ud.type in ['gitannex']
 
+    def urldata_init(self, ud, d):
+        super(GitANNEX, self).urldata_init(ud, d)
+        if ud.shallow:
+            ud.shallow_extra_refs += ['refs/heads/git-annex', 'refs/heads/synced/*']
+
     def uses_annex(self, ud, d, wd):
         for name in ud.names:
             try:
@@ -55,9 +60,21 @@ class GitANNEX(Git):
     def download(self, ud, d):
         Git.download(self, ud, d)
 
-        annex = self.uses_annex(ud, d, ud.clonedir)
-        if annex:
-            self.update_annex(ud, d, ud.clonedir)
+        if not ud.shallow or ud.localpath != ud.fullshallow:
+            if self.uses_annex(ud, d, ud.clonedir):
+                self.update_annex(ud, d, ud.clonedir)
+
+    def clone_shallow_local(self, ud, dest, d):
+        super(GitANNEX, self).clone_shallow_local(ud, dest, d)
+
+        try:
+            runfetchcmd("%s annex init" % ud.basecmd, d, workdir=dest)
+        except bb.fetch.FetchError:
+            pass
+
+        if self.uses_annex(ud, d, dest):
+            runfetchcmd("%s annex get" % ud.basecmd, d, workdir=dest)
+            runfetchcmd("chmod u+w -R %s/.git/annex" % (dest), d, quiet=True, workdir=dest)
 
     def unpack(self, ud, destdir, d):
         Git.unpack(self, ud, destdir, d)

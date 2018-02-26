@@ -1,0 +1,56 @@
+From 1049fbd887e52f94afeb03fc7942c01c143ebdfc Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Fri, 9 Jun 2017 12:01:25 +0300
+Subject: [PATCH] queryloaders: Make output more reproducible
+
+Reproducible builds are good: Sort the output by module name so that
+same input always leads to same output.
+
+This should also make gdk-pixbuf-print-mime-types output and
+gdk-pixbuf-thumbnailer.thumbnailer reproducible.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=783592
+
+Upstream-Status: Submitted
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ gdk-pixbuf/queryloaders.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/gdk-pixbuf/queryloaders.c b/gdk-pixbuf/queryloaders.c
+index 395674a..4ac9b28 100644
+--- a/gdk-pixbuf/queryloaders.c
++++ b/gdk-pixbuf/queryloaders.c
+@@ -346,6 +346,7 @@ int main (int argc, char **argv)
+ #ifdef USE_GMODULE
+                 const char *path;
+                 GDir *dir;
++                GList *l, *modules = NULL;
+ 
+                 path = g_getenv ("GDK_PIXBUF_MODULEDIR");
+ #ifdef G_OS_WIN32
+@@ -365,12 +366,19 @@ int main (int argc, char **argv)
+                                 gint len = strlen (dent);
+                                 if (len > SOEXT_LEN &&
+                                     strcmp (dent + len - SOEXT_LEN, SOEXT) == 0) {
++                                        modules = g_list_prepend (modules,
++                                                                  g_strdup (dent));
+-                                        if (!query_module (contents, path, dent))
+-                                                success = FALSE;
+                                 }
+                         }
+                         g_dir_close (dir);
+                 }
++
++                modules = g_list_sort (modules, (GCompareFunc)strcmp);
++                for (l = modules; l != NULL; l = l->next)
++                        if (!query_module (contents, path, l->data))
++                                success = FALSE;
++
++                g_list_free_full (modules, g_free);
+ #else
+                 g_string_append_printf (contents, "# dynamic loading of modules not supported\n");
+ #endif
+-- 
+2.1.4
+

@@ -1,0 +1,41 @@
+From ab8dcad25d0ac1f3a88814e78794e5d450de15ac Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Sep 2017 23:12:51 -0700
+Subject: [PATCH 1/5] Turn off sign-compare for musl-libc
+
+Fix
+
+../../../../../../../workspace/sources/breakpad/src/client/linux/crash_generation/crash_generation_server.cc:234:14: error:                 comparison of integers of different signs: 'unsigned long' and 'int' [-Werror,-Wsign-compare]                                          hdr = CMSG_NXTHDR(&msg, hdr)) {                                                                                                             ^~~~~~~~~~~~~~~~~~~~~~
+/mnt/a/oe/build/tmp/work/cortexa7hf-neon-vfpv4-bec-linux-musleabi/breakpad/1_1.0+git999-r0/recipe-sysroot/usr/include/sys/socket.h:288:44: note:                                                                                                                                  expanded from macro 'CMSG_NXTHDR'                                                                                                       __CMSG_LEN(cmsg) + sizeof(struct cmsghdr) >= __MHDR_END(mhdr) - (unsigned char *)(cmsg) \                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                       1 error generated.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/client/linux/crash_generation/crash_generation_server.cc | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/client/linux/crash_generation/crash_generation_server.cc b/src/client/linux/crash_generation/crash_generation_server.cc
+index 2596afde..2faeb9e5 100644
+--- a/src/client/linux/crash_generation/crash_generation_server.cc
++++ b/src/client/linux/crash_generation/crash_generation_server.cc
+@@ -230,8 +230,18 @@ CrashGenerationServer::ClientEvent(short revents)
+   // Walk the control payload and extract the file descriptor and validated pid.
+   pid_t crashing_pid = -1;
+   int signal_fd = -1;
++#ifndef __GLIBC__
++  // In musl-libc, CMSG_NXTHDR typecasts char* to cmsghdr* which causes
++  // clang to throw sign-compare warning. This is to suppress the warning
++  // inline.
++  #pragma clang diagnostic push
++  #pragma clang diagnostic ignored "-Wsign-compare"
++#endif
+   for (struct cmsghdr *hdr = CMSG_FIRSTHDR(&msg); hdr;
+        hdr = CMSG_NXTHDR(&msg, hdr)) {
++#ifndef __GLIBC__
++  #pragma clang diagnostic pop
++#endif
+     if (hdr->cmsg_level != SOL_SOCKET)
+       continue;
+     if (hdr->cmsg_type == SCM_RIGHTS) {
+-- 
+2.14.1
+

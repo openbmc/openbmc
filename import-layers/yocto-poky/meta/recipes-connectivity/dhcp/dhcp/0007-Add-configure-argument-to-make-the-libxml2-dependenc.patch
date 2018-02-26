@@ -1,0 +1,42 @@
+From 7107511fd209f08f9a96f8938041ae48f3295895 Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Tue, 15 Aug 2017 16:17:49 +0800
+Subject: [PATCH 07/11] Add configure argument to make the libxml2 dependency
+ explicit and determinisitic.
+
+Upstream-Status: Pending
+
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+
+Rebase to 4.3.6
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 44fb57e..8e9f509 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -611,6 +611,17 @@ AC_CHECK_FUNCS(strlcat)
+ # For HP/UX we need -lipv6 for if_nametoindex, perhaps others.
+ AC_SEARCH_LIBS(if_nametoindex, [ipv6])
+ 
++AC_ARG_WITH(libxml2,
++	AS_HELP_STRING([--with-libxml2], [link against libxml2. this is needed if bind was built with xml2 support enabled]),
++	with_libxml2="$withval", with_libxml2="no")
++
++if test x$with_libxml2 != xno; then
++	AC_SEARCH_LIBS(xmlTextWriterStartElement, [xml2],
++		[if test x$with_libxml2 != xauto; then
++			AC_MSG_FAILURE([*** Cannot find xmlTextWriterStartElement with -lxml2 and libxml2 was requested])
++		fi])
++fi
++
+ # check for /dev/random (declares HAVE_DEV_RANDOM)
+ AC_MSG_CHECKING(for random device)
+ AC_ARG_WITH(randomdev,
+-- 
+1.8.3.1
+

@@ -1,0 +1,40 @@
+From fcc0cf15a309947103a0695b8a1f4865b820eb5c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jul 2017 23:26:03 -0700
+Subject: [PATCH 3/5] replace use of SIGCLD with SIGCHLD
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ common/main.c    | 2 +-
+ doc/xfsdump.html | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/common/main.c b/common/main.c
+index 3848499..faa66ee 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -2225,7 +2225,7 @@ static sig_printmap_t sig_printmap[ ] = {
+ 	{SIGTERM,	"SIGTERM"},
+ 	{SIGUSR1,	"SIGUSR1"},
+ 	{SIGUSR2,	"SIGUSR2"},
+-	{SIGCLD,	"SIGCLD"},
++	{SIGCHLD,	"SIGCHLD"},
+ 	{SIGPWR,	"SIGPWR"},
+ 	{SIGURG,	"SIGURG"},
+ 	{SIGPOLL,	"SIGPOLL"},
+diff --git a/doc/xfsdump.html b/doc/xfsdump.html
+index f85128f..d96f037 100644
+--- a/doc/xfsdump.html
++++ b/doc/xfsdump.html
+@@ -334,7 +334,7 @@ the ring buffer. It ignores signals and does not terminate until it
+ receives a RING_OP_DIE message. It then exits 0.
+ <p>
+ The main process sleeps waiting for any of its children to die
+-(ie. waiting for a SIGCLD). All children that it cares about (stream
++(ie. waiting for a SIGCHLD). All children that it cares about (stream
+ managers and ring buffer slaves) are registered through the child
+ manager abstraction. When a child dies wait status and other info is
+ stored with its entry in the child manager. main() ignores the deaths
+-- 
+2.13.2
+

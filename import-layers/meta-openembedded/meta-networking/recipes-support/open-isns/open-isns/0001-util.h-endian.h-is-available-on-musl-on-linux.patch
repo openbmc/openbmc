@@ -1,0 +1,38 @@
+From e0d86318227a23f00cf0f6639a6685bb9f5771a1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Dec 2017 09:42:19 -0800
+Subject: [PATCH] util.h: endian.h is available on musl on linux
+
+just checking for glibc alone is not enough since
+it excludes musl, therefore check for platform
+being linux as well
+
+Fixes build issues
+
+include/libisns/util.h:114:12: fatal error: sys/endian.h: No such file or directory
+ #  include <sys/endian.h>
+            ^~~~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ include/libisns/util.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/libisns/util.h b/include/libisns/util.h
+index 9a2bd13..6cc1a1b 100644
+--- a/include/libisns/util.h
++++ b/include/libisns/util.h
+@@ -100,7 +100,7 @@ enum {
+  * There's no htonll yet
+  */
+ #ifndef htonll
+-# ifdef __GLIBC__
++# if defined(__GLIBC__) || defined(__linux__)
+ #  include <endian.h>
+ #  include <byteswap.h>
+ #  if __BYTE_ORDER == __BIG_ENDIAN
+-- 
+2.15.1
+

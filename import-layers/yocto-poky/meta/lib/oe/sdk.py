@@ -152,6 +152,8 @@ class RpmSdk(Sdk):
         pm.install(pkgs_attempt, True)
 
     def _populate(self):
+        execute_pre_post_process(self.d, self.d.getVar("POPULATE_SDK_PRE_TARGET_COMMAND"))
+
         bb.note("Installing TARGET packages")
         self._populate_sysroot(self.target_pm, self.target_manifest)
 
@@ -233,6 +235,8 @@ class OpkgSdk(Sdk):
                            [False, True][pkg_type == Manifest.PKG_TYPE_ATTEMPT_ONLY])
 
     def _populate(self):
+        execute_pre_post_process(self.d, self.d.getVar("POPULATE_SDK_PRE_TARGET_COMMAND"))
+
         bb.note("Installing TARGET packages")
         self._populate_sysroot(self.target_pm, self.target_manifest)
 
@@ -315,6 +319,8 @@ class DpkgSdk(Sdk):
                            [False, True][pkg_type == Manifest.PKG_TYPE_ATTEMPT_ONLY])
 
     def _populate(self):
+        execute_pre_post_process(self.d, self.d.getVar("POPULATE_SDK_PRE_TARGET_COMMAND"))
+
         bb.note("Installing TARGET packages")
         self._populate_sysroot(self.target_pm, self.target_manifest)
 
@@ -378,6 +384,25 @@ def populate_sdk(d, manifest_dir=None):
 
     os.environ.clear()
     os.environ.update(env_bkp)
+
+def get_extra_sdkinfo(sstate_dir):
+    """
+    This function is going to be used for generating the target and host manifest files packages of eSDK.
+    """
+    import math
+    
+    extra_info = {}
+    extra_info['tasksizes'] = {}
+    extra_info['filesizes'] = {}
+    for root, _, files in os.walk(sstate_dir):
+        for fn in files:
+            if fn.endswith('.tgz'):
+                fsize = int(math.ceil(float(os.path.getsize(os.path.join(root, fn))) / 1024))
+                task = fn.rsplit(':',1)[1].split('_',1)[1].split(',')[0]
+                origtotal = extra_info['tasksizes'].get(task, 0)
+                extra_info['tasksizes'][task] = origtotal + fsize
+                extra_info['filesizes'][fn] = fsize
+    return extra_info
 
 if __name__ == "__main__":
     pass

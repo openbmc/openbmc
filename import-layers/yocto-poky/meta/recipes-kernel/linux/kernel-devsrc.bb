@@ -46,7 +46,7 @@ do_install() {
         cd ${B}
         find . -type d -name '.git*' -prune -o -path '.debug' -prune -o -type f -print0 | cpio --null -pdlu $kerneldir
         cd ${S}
-        find . -type d -name '.git*' -prune -o -type f -print0 | cpio --null -pdlu $kerneldir
+	find . -type d -name '.git*' -prune -o -type d -name '.kernel-meta' -prune -o -type f -print0 | cpio --null -pdlu $kerneldir
 
         # Explicitly set KBUILD_OUTPUT to ensure that the image directory is cleaned and not
         # The main build artifacts. We clean the directory to avoid QA errors on mismatched

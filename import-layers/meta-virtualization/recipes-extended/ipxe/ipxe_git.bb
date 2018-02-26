@@ -8,7 +8,7 @@ SRCREV = "8c43891db4eb131d019360ccfb619f235b17eb58"
 PV = "gitr${SRCPV}"
 PR = "r0"
 
-SRC_URI = "git://git.ipxe.org/ipxe.git;protocol=git"
+SRC_URI = "git://git.ipxe.org/ipxe.git;protocol=https"
 
 FILES_${PN} = "/usr/share/firmware/*.rom"
 

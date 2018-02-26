@@ -1,6 +1,6 @@
-From 2e0c5c66786016f6443da2c1ff15ad77f018ec9b Mon Sep 17 00:00:00 2001
+From 89f9b87904bd312b817ffaa7d83abfd5e84d723d Mon Sep 17 00:00:00 2001
 From: Mark Asselstine <mark.asselstine@windriver.com>
-Date: Mon, 24 Apr 2017 16:12:05 -0400
+Date: Fri, 8 Sep 2017 15:40:49 -0400
 Subject: [PATCH] lib/Makefile: overwrite install-lib, to allow multiarch
 
 I am not sure why Yocto installs python modules in arch specific
@@ -13,15 +13,15 @@ Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/Makefile b/lib/Makefile
-index f1c0821..c714d12 100644
+index b1bb057..06f5c5d 100644
 --- a/lib/Makefile
 +++ b/lib/Makefile
-@@ -56,7 +56,7 @@ install: lib-c lib-py ../crit/crit c/criu.pc.in
- 	$(Q) sed -e 's,@version@,$(CRIU_VERSION),' -e 's,@libdir@,$(LIBDIR),' -e 's,@includedir@,$(dir $(INCLUDEDIR)),' c/criu.pc.in > c/criu.pc
- 	$(Q) install -m 644 c/criu.pc $(DESTDIR)$(LIBDIR)/pkgconfig
+@@ -56,7 +56,7 @@ install: lib-c lib-py crit/crit lib/c/criu.pc.in
+ 	$(Q) sed -e 's,@version@,$(CRIU_VERSION),' -e 's,@libdir@,$(LIBDIR),' -e 's,@includedir@,$(dir $(INCLUDEDIR)/criu/),' lib/c/criu.pc.in > lib/c/criu.pc
+ 	$(Q) install -m 644 lib/c/criu.pc $(DESTDIR)$(LIBDIR)/pkgconfig
  	$(E) "  INSTALL " crit
--	$(Q) python ../scripts/crit-setup.py install --root=$(DESTDIR) --prefix=$(PREFIX) --record $(CRIT_SETUP_FILES)
-+	$(Q) python ../scripts/crit-setup.py install --root=$(DESTDIR) --prefix=$(PREFIX) --record $(CRIT_SETUP_FILES) --install-lib=$(INSTALL_LIB)
+-	$(Q) $(PYTHON_BIN) scripts/crit-setup.py install --prefix=$(DESTDIR)$(PREFIX) --record $(CRIT_SETUP_FILES)
++	$(Q) $(PYTHON_BIN) scripts/crit-setup.py install --prefix=$(DESTDIR)$(PREFIX) --record $(CRIT_SETUP_FILES) --install-lib=$(DESTDIR)$(INSTALL_LIB)
  .PHONY: install
  
  uninstall:

@@ -1,0 +1,29 @@
+From 6181d9c3c407ee030b4c3a94045318b9e3a3cc89 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 25 Jul 2017 14:08:54 -0700
+Subject: [PATCH] minicoredumper: Initialize pointer to config struct to null
+
+Fixes
+corestripper.c:3632:13: error: variable 'cfg' is used uninitialized whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/minicoredumper/corestripper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/minicoredumper/corestripper.c b/src/minicoredumper/corestripper.c
+index a764073..ddb0d25 100644
+--- a/src/minicoredumper/corestripper.c
++++ b/src/minicoredumper/corestripper.c
+@@ -3605,7 +3605,7 @@ out:
+ 
+ static int do_all_dumps(struct dump_info *di, int argc, char *argv[])
+ {
+-	struct config *cfg;
++	struct config *cfg = 0;
+ 	const char *recept;
+ 	bool live_dumper;
+ 	char *comm_base;
+-- 
+2.13.3
+

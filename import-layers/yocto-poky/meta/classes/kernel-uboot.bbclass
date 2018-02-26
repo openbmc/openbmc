@@ -3,6 +3,10 @@ uboot_prep_kimage() {
 		vmlinux_path="arch/${ARCH}/boot/compressed/vmlinux"
 		linux_suffix=""
 		linux_comp="none"
+	elif [ -e arch/${ARCH}/boot/Image ] ; then
+		vmlinux_path="vmlinux"
+		linux_suffix=""
+		linux_comp="none"
 	elif [ -e arch/${ARCH}/boot/vmlinuz.bin ]; then
 		rm -f linux.bin
 		cp -l arch/${ARCH}/boot/vmlinuz.bin linux.bin

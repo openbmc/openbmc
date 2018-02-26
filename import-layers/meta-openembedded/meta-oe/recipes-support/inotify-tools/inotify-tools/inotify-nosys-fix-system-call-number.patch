@@ -1,0 +1,31 @@
+inotify-tools: fix __NR_inotify_add_watch system call number on _MIPS_SIM_ABI64
+
+The correct value should be the same as defined in
+linux/arch/mips/include/uapi/asm/unistd.h
+
+Upstream-Status: Summitted [https://github.com/rvoicilas/inotify-tools/pull/71]
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ libinotifytools/src/inotifytools/inotify-nosys.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libinotifytools/src/inotifytools/inotify-nosys.h b/libinotifytools/src/inotifytools/inotify-nosys.h
+index db76b2c..5f7b11b 100644
+--- a/libinotifytools/src/inotifytools/inotify-nosys.h
++++ b/libinotifytools/src/inotifytools/inotify-nosys.h
+@@ -100,8 +100,8 @@ struct inotify_event {
+ # endif
+ # if _MIPS_SIM == _MIPS_SIM_ABI64
+ #  define __NR_inotify_init (__NR_Linux + 243)
+-#  define __NR_inotify_add_watch (__NR_Linux + 243)
+-#  define __NR_inotify_rm_watch (__NR_Linux + 243)
++#  define __NR_inotify_add_watch (__NR_Linux + 244)
++#  define __NR_inotify_rm_watch (__NR_Linux + 245)
+ # endif
+ # if _MIPS_SIM == _MIPS_SIM_NABI32
+ #  define __NR_inotify_init (__NR_Linux + 247)
+-- 
+1.7.10.4
+

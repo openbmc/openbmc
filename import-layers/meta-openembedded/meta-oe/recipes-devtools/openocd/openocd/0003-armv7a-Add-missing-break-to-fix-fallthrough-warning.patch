@@ -1,0 +1,27 @@
+From 8e5051e83fedb078170565a24d1f5de6c2ce4428 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 17 Jun 2017 00:01:51 -0700
+Subject: [PATCH 3/5] armv7a: Add missing break to fix fallthrough warning
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/target/armv7a.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/target/armv7a.c b/src/target/armv7a.c
+index 6021def4e..bad806b3d 100644
+--- a/src/target/armv7a.c
++++ b/src/target/armv7a.c
+@@ -355,6 +355,7 @@ int armv7a_mmu_translate_va_pa(struct target *target, uint32_t va,
+ 				break;
+ 			case 7:
+ 				LOG_INFO("inner: Write-Back, no Write-Allocate");
++				break;
+ 
+ 			default:
+ 				LOG_INFO("inner: %" PRIx32 " ???", INNER);
+-- 
+2.13.1
+

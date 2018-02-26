@@ -124,30 +124,8 @@ do_configure() {
             cat $i >> config.sh-${TARGET_ARCH}-${TARGET_OS}
         done
 
-        # Fixups for uclibc
-        if [ "${TARGET_OS}" = "linux-uclibc" -o "${TARGET_OS}" = "linux-uclibceabi" ]; then
-                sed -i -e "s,\(d_crypt_r=\)'define',\1'undef',g" \
-                       -e "s,\(d_futimes=\)'define',\1'undef',g" \
-                       -e "s,\(d_finitel=\)'define',\1'undef',g" \
-                       -e "s,\(crypt_r_proto=\)'\w+',\1'0',g" \
-                       -e "s,\(d_getnetbyname_r=\)'define',\1'undef',g" \
-                       -e "s,\(getnetbyname_r_proto=\)'\w+',\1'0',g" \
-                       -e "s,\(d_getnetbyaddr_r=\)'define',\1'undef',g" \
-                       -e "s,\(getnetbyaddr_r_proto=\)'\w+',\1'0',g" \
-                       -e "s,\(d_getnetent_r=\)'define',\1'undef',g" \
-                       -e "s,\(getnetent_r_proto=\)'\w+',\1'0',g" \
-                       -e "s,\(d_sockatmark=\)'define',\1'undef',g" \
-                       -e "s,\(d_sockatmarkproto=\)'\w+',\1'0',g" \
-                       -e "s,\(d_eaccess=\)'define',\1'undef',g" \
-                       -e "s,\(d_stdio_ptr_lval=\)'define',\1'undef',g" \
-                       -e "s,\(d_stdio_ptr_lval_sets_cnt=\)'define',\1'undef',g" \
-                       -e "s,\(d_stdiobase=\)'define',\1'undef',g" \
-                       -e "s,\(d_stdstdio=\)'define',\1'undef',g" \
-                       -e "s,-fstack-protector,-fno-stack-protector,g" \
-                    config.sh-${TARGET_ARCH}-${TARGET_OS}
-        fi
         # Fixups for musl
-        if [ "${TARGET_OS}" = "linux-musl" -o "${TARGET_OS}" = "linux-musleabi" ]; then
+        if [ "${TARGET_OS}" = "linux-musl" -o "${TARGET_OS}" = "linux-musleabi" -o "${TARGET_OS}" = "linux-muslx32" ]; then
                 sed -i -e "s,\(d_libm_lib_version=\)'define',\1'undef',g" \
                        -e "s,\(d_stdio_ptr_lval=\)'define',\1'undef',g" \
                        -e "s,\(d_stdio_ptr_lval_sets_cnt=\)'define',\1'undef',g" \
@@ -193,7 +171,7 @@ do_configure() {
 			;;
 	esac
         # These are strewn all over the source tree
-        for foo in `grep -I --exclude="*.patch" --exclude="*.diff" --exclude="*.pod" --exclude="README*" -m1 "/usr/include/.*\.h" ${S}/* -r -l` ${S}/utils/h2xs.PL ; do
+        for foo in `grep -I --exclude="*.patch" --exclude="*.diff" --exclude="*.pod" --exclude="README*" --exclude="Glossary" -m1 "/usr/include/.*\.h" ${S}/* -r -l` ${S}/utils/h2xs.PL ; do
             echo Fixing: $foo
             sed -e 's|\([ "^'\''I]\+\)/usr/include/|\1${STAGING_INCDIR}/|g' -i $foo
         done
@@ -245,6 +223,7 @@ PACKAGE_PREPROCESS_FUNCS += "perl_package_preprocess"
 perl_package_preprocess () {
         # Fix up installed configuration
         sed -i -e "s,${D},,g" \
+               -e "s,${DEBUG_PREFIX_MAP},,g" \
                -e "s,--sysroot=${STAGING_DIR_HOST},,g" \
                -e "s,-isystem${STAGING_INCDIR} ,,g" \
                -e "s,${STAGING_LIBDIR},${libdir},g" \

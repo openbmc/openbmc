@@ -1,14 +1,24 @@
-Upstream-Status: Pending
+From 285b5fbf1d6b25ff55d305c17edf4d327bf19dd3 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 5 Jul 2011 23:42:29 +0100
+Subject: [PATCH] chrpath: Ensure the package respects the docdir variable
 
-autoconf/automake set docdir automatically, use their value ensuring 
+autoconf/automake set docdir automatically, use their value ensuring
 doc files are placed into $datadir/doc, not $prefix/doc.
 
 RP 5/7/2011
 
-Index: chrpath-0.13/Makefile.am
-===================================================================
---- chrpath-0.13.orig/Makefile.am	2011-07-05 23:40:14.769920254 +0100
-+++ chrpath-0.13/Makefile.am	2011-07-05 23:40:19.819920635 +0100
+Upstream-Status: Submitted [ http://lists.alioth.debian.org/pipermail/chrpath-devel/Week-of-Mon-20170710/000013.html ]
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ Makefile.am | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index b50ad21..5f7e861 100644
+--- a/Makefile.am
++++ b/Makefile.am
 @@ -1,7 +1,5 @@
  SUBDIRS = testsuite deb
  
@@ -17,3 +27,6 @@ Index: chrpath-0.13/Makefile.am
  doc_DATA = AUTHORS COPYING ChangeLog INSTALL NEWS README
  
  bin_PROGRAMS = chrpath
+-- 
+2.8.1
+

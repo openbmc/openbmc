@@ -1,0 +1,27 @@
+From 25a8ac30486798d23f516722d73eb622e6264f28 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 26 Jul 2017 11:19:56 -0700
+Subject: [PATCH] automake: Add default libtool_tag to cppasm.
+
+    * bin/automake.in (register_language): Define default libtool tag to be CC
+    since CPPASCOMPILE is using CC to call assembler
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ bin/automake.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: automake-1.15.1/bin/automake.in
+===================================================================
+--- automake-1.15.1.orig/bin/automake.in
++++ automake-1.15.1/bin/automake.in
+@@ -831,6 +831,7 @@ register_language ('name' => 'cppasm',
+ 		   'compiler' => 'CPPASCOMPILE',
+ 		   'compile_flag' => '-c',
+ 		   'output_flag' => '-o',
++		   'libtool_tag' => 'CC',
+ 		   'extensions' => ['.S', '.sx']);
+ 
+ # Fortran 77

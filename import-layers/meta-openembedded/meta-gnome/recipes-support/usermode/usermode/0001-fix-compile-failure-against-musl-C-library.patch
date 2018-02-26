@@ -1,0 +1,27 @@
+From c77e3f0d4560797f7dc56549ae5ebcc035714a4d Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 20 Jul 2017 23:20:53 -0400
+Subject: [PATCH] fix compile failure against musl C library
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ usermount.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/usermount.c b/usermount.c
+index 3aafadd..4107027 100644
+--- a/usermount.c
++++ b/usermount.c
+@@ -46,6 +46,7 @@
+ #include <limits.h>
+ #include <locale.h>
+ #include <mntent.h>
++#include <paths.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-- 
+2.8.1
+

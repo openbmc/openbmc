@@ -1,11 +1,12 @@
 SUMMARY = "A commercial quality OCR engine "
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://COPYING;md5=c0c94b3c86ad0c386bb6dec70ca8a36a"
+LIC_FILES_CHKSUM = "file://COPYING;md5=7ea4f9a43aba9d3c849fe5c203a0ed40"
 
-PV = "3.04.00+git${SRCPV}"
-SRCREV = "228317caa1ced217e6d264aafc901f361ecd7e90"
-SRC_URI = "git://github.com/${BPN}-ocr/${BPN}.git"
+BRANCH = "3.05"
+PV = "${BRANCH}.01+git${SRCPV}"
+SRCREV = "215866151e774972c9502282111b998d7a053562"
+SRC_URI = "git://github.com/${BPN}-ocr/${BPN}.git;branch=${BRANCH}"
 S = "${WORKDIR}/git"
 
 DEPENDS = "leptonica"

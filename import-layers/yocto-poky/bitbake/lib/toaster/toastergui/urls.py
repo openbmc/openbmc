@@ -1,7 +1,7 @@
 #
 # BitBake Toaster Implementation
 #
-# Copyright (C) 2013        Intel Corporation
+# Copyright (C) 2013-2017    Intel Corporation
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.views.generic import RedirectView, TemplateView
 
 from django.http import HttpResponseBadRequest
@@ -25,49 +25,50 @@ from toastergui import buildtables
 from toastergui import typeaheads
 from toastergui import api
 from toastergui import widgets
+from toastergui import views
 
-urlpatterns = patterns('toastergui.views',
+urlpatterns = [
         # landing page
-        url(r'^landing/$', 'landing', name='landing'),
+        url(r'^landing/$', views.landing, name='landing'),
 
         url(r'^builds/$',
             tables.AllBuildsTable.as_view(template_name="builds-toastertable.html"),
             name='all-builds'),
 
         # build info navigation
-        url(r'^build/(?P<build_id>\d+)$', 'builddashboard', name="builddashboard"),
+        url(r'^build/(?P<build_id>\d+)$', views.builddashboard, name="builddashboard"),
         url(r'^build/(?P<build_id>\d+)/tasks/$',
             buildtables.BuildTasksTable.as_view(
                 template_name="buildinfo-toastertable.html"),
             name='tasks'),
 
-        url(r'^build/(?P<build_id>\d+)/task/(?P<task_id>\d+)$', 'task', name='task'),
+        url(r'^build/(?P<build_id>\d+)/task/(?P<task_id>\d+)$', views.task, name='task'),
 
         url(r'^build/(?P<build_id>\d+)/recipes/$',
             buildtables.BuiltRecipesTable.as_view(
                 template_name="buildinfo-toastertable.html"),
             name='recipes'),
 
-        url(r'^build/(?P<build_id>\d+)/recipe/(?P<recipe_id>\d+)/active_tab/(?P<active_tab>\d{1})$', 'recipe', name='recipe'),
+        url(r'^build/(?P<build_id>\d+)/recipe/(?P<recipe_id>\d+)/active_tab/(?P<active_tab>\d{1})$', views.recipe, name='recipe'),
 
-        url(r'^build/(?P<build_id>\d+)/recipe/(?P<recipe_id>\d+)$', 'recipe', name='recipe'),
-        url(r'^build/(?P<build_id>\d+)/recipe_packages/(?P<recipe_id>\d+)$', 'recipe_packages', name='recipe_packages'),
+        url(r'^build/(?P<build_id>\d+)/recipe/(?P<recipe_id>\d+)$', views.recipe, name='recipe'),
+        url(r'^build/(?P<build_id>\d+)/recipe_packages/(?P<recipe_id>\d+)$', views.recipe_packages, name='recipe_packages'),
 
         url(r'^build/(?P<build_id>\d+)/packages/$',
             buildtables.BuiltPackagesTable.as_view(
                 template_name="buildinfo-toastertable.html"),
             name='packages'),
 
-        url(r'^build/(?P<build_id>\d+)/package/(?P<package_id>\d+)$', 'package_built_detail',
+        url(r'^build/(?P<build_id>\d+)/package/(?P<package_id>\d+)$', views.package_built_detail,
                 name='package_built_detail'),
         url(r'^build/(?P<build_id>\d+)/package_built_dependencies/(?P<package_id>\d+)$',
-            'package_built_dependencies', name='package_built_dependencies'),
+            views.package_built_dependencies, name='package_built_dependencies'),
         url(r'^build/(?P<build_id>\d+)/package_included_detail/(?P<target_id>\d+)/(?P<package_id>\d+)$',
-            'package_included_detail', name='package_included_detail'),
+            views.package_included_detail, name='package_included_detail'),
         url(r'^build/(?P<build_id>\d+)/package_included_dependencies/(?P<target_id>\d+)/(?P<package_id>\d+)$',
-            'package_included_dependencies', name='package_included_dependencies'),
+            views.package_included_dependencies, name='package_included_dependencies'),
         url(r'^build/(?P<build_id>\d+)/package_included_reverse_dependencies/(?P<target_id>\d+)/(?P<package_id>\d+)$',
-            'package_included_reverse_dependencies', name='package_included_reverse_dependencies'),
+            views.package_included_reverse_dependencies, name='package_included_reverse_dependencies'),
 
         url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)$',
             buildtables.InstalledPackagesTable.as_view(
@@ -75,11 +76,11 @@ urlpatterns = patterns('toastergui.views',
             name='target'),
 
 
-        url(r'^dentries/build/(?P<build_id>\d+)/target/(?P<target_id>\d+)$', 'xhr_dirinfo', name='dirinfo_ajax'),
-        url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)/dirinfo$', 'dirinfo', name='dirinfo'),
-        url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)/dirinfo_filepath/_(?P<file_path>(?:/[^/\n]+)*)$', 'dirinfo', name='dirinfo_filepath'),
-        url(r'^build/(?P<build_id>\d+)/configuration$', 'configuration', name='configuration'),
-        url(r'^build/(?P<build_id>\d+)/configvars$', 'configvars', name='configvars'),
+        url(r'^dentries/build/(?P<build_id>\d+)/target/(?P<target_id>\d+)$', views.xhr_dirinfo, name='dirinfo_ajax'),
+        url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)/dirinfo$', views.dirinfo, name='dirinfo'),
+        url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)/dirinfo_filepath/_(?P<file_path>(?:/[^/\n]+)*)$', views.dirinfo, name='dirinfo_filepath'),
+        url(r'^build/(?P<build_id>\d+)/configuration$', views.configuration, name='configuration'),
+        url(r'^build/(?P<build_id>\d+)/configvars$', views.configvars, name='configvars'),
         url(r'^build/(?P<build_id>\d+)/buildtime$',
             buildtables.BuildTimeTable.as_view(
                 template_name="buildinfo-toastertable.html"),
@@ -97,26 +98,26 @@ urlpatterns = patterns('toastergui.views',
 
         # image information dir
         url(r'^build/(?P<build_id>\d+)/target/(?P<target_id>\d+)/packagefile/(?P<packagefile_id>\d+)$',
-             'image_information_dir', name='image_information_dir'),
+             views.image_information_dir, name='image_information_dir'),
 
         # build download artifact
-        url(r'^build/(?P<build_id>\d+)/artifact/(?P<artifact_type>\w+)/id/(?P<artifact_id>\w+)', 'build_artifact', name="build_artifact"),
+        url(r'^build/(?P<build_id>\d+)/artifact/(?P<artifact_type>\w+)/id/(?P<artifact_id>\w+)', views.build_artifact, name="build_artifact"),
 
         # project URLs
-        url(r'^newproject/$', 'newproject', name='newproject'),
+        url(r'^newproject/$', views.newproject, name='newproject'),
 
         url(r'^projects/$',
             tables.ProjectsTable.as_view(template_name="projects-toastertable.html"),
             name='all-projects'),
 
-        url(r'^project/(?P<pid>\d+)/$', 'project', name='project'),
-        url(r'^project/(?P<pid>\d+)/configuration$', 'projectconf', name='projectconf'),
+        url(r'^project/(?P<pid>\d+)/$', views.project, name='project'),
+        url(r'^project/(?P<pid>\d+)/configuration$', views.projectconf, name='projectconf'),
         url(r'^project/(?P<pid>\d+)/builds/$',
             tables.ProjectBuildsTable.as_view(template_name="projectbuilds-toastertable.html"),
             name='projectbuilds'),
 
         # the import layer is a project-specific functionality;
-        url(r'^project/(?P<pid>\d+)/importlayer$', 'importlayer', name='importlayer'),
+        url(r'^project/(?P<pid>\d+)/importlayer$', views.importlayer, name='importlayer'),
 
         # the table pages that have been converted to ToasterTable widget
         url(r'^project/(?P<pid>\d+)/machines/$',
@@ -142,7 +143,7 @@ urlpatterns = patterns('toastergui.views',
             name="projectlayers"),
 
         url(r'^project/(?P<pid>\d+)/layer/(?P<layerid>\d+)$',
-            'layerdetails', name='layerdetails'),
+            views.layerdetails, name='layerdetails'),
 
         url(r'^project/(?P<pid>\d+)/layer/(?P<layerid>\d+)/recipes/$',
             tables.LayerRecipesTable.as_view(template_name="generic-toastertable-page.html"),
@@ -157,6 +158,11 @@ urlpatterns = patterns('toastergui.views',
             name=tables.LayerMachinesTable.__name__.lower()),
 
 
+        url(r'^project/(?P<pid>\d+)/distros/$',
+            tables.DistrosTable.as_view(template_name="generic-toastertable-page.html"),
+            name="projectdistros"),
+
+
         url(r'^project/(?P<pid>\d+)/customrecipe/(?P<custrecipeid>\d+)/selectpackages/$',
             tables.SelectPackagesTable.as_view(), name="recipeselectpackages"),
 
@@ -166,7 +172,7 @@ urlpatterns = patterns('toastergui.views',
             name="customrecipe"),
 
         url(r'^project/(?P<pid>\d+)/customrecipe/(?P<recipe_id>\d+)/download$',
-            'customrecipe_download',
+            views.customrecipe_download,
             name="customrecipedownload"),
 
         url(r'^project/(?P<pid>\d+)/recipe/(?P<recipe_id>\d+)$',
@@ -186,9 +192,12 @@ urlpatterns = patterns('toastergui.views',
             typeaheads.GitRevisionTypeAhead.as_view(),
             name='xhr_gitrevtypeahead'),
 
-        url(r'^xhr_testreleasechange/(?P<pid>\d+)$', 'xhr_testreleasechange',
+        url(r'^xhr_typeahead/(?P<pid>\d+)/distros$',
+            typeaheads.DistrosTypeAhead.as_view(), name='xhr_distrostypeahead'),
+
+        url(r'^xhr_testreleasechange/(?P<pid>\d+)$', views.xhr_testreleasechange,
             name='xhr_testreleasechange'),
-        url(r'^xhr_configvaredit/(?P<pid>\d+)$', 'xhr_configvaredit',
+        url(r'^xhr_configvaredit/(?P<pid>\d+)$', views.xhr_configvaredit,
             name='xhr_configvaredit'),
 
         url(r'^xhr_layer/(?P<pid>\d+)/(?P<layerversion_id>\d+)$',
@@ -200,7 +209,7 @@ urlpatterns = patterns('toastergui.views',
             name='xhr_layer'),
 
         # JS Unit tests
-        url(r'^js-unit-tests/$', 'jsunittests', name='js-unit-tests'),
+        url(r'^js-unit-tests/$', views.jsunittests, name='js-unit-tests'),
 
         # image customisation functionality
         url(r'^xhr_customrecipe/(?P<recipe_id>\d+)'
@@ -235,6 +244,11 @@ urlpatterns = patterns('toastergui.views',
         url(r'^mostrecentbuilds$', widgets.MostRecentBuildsView.as_view(),
             name='most_recent_builds'),
 
-          # default redirection
+        # JSON data for aggregators
+        url(r'^api/builds$', views.json_builds, name='json_builds'),
+        url(r'^api/building$', views.json_building, name='json_building'),
+        url(r'^api/build/(?P<build_id>\d+)$', views.json_build, name='json_build'),
+
+        # default redirection
         url(r'^$', RedirectView.as_view(url='landing', permanent=True)),
-)
+]

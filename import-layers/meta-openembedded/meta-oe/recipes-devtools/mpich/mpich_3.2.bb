@@ -12,8 +12,6 @@ SRC_URI = " \
 SRC_URI[md5sum] = "f414cfa77099cd1fa1a5ae4e22db508a"
 SRC_URI[sha256sum] = "0778679a6b693d7b7caff37ff9d2856dc2bfc51318bf8373859bfa74253da3dc"
 
-CACHED_CONFIGUREVARS += "BASH_SHELL=${base_bindir}/bash"
-
 RDEPENDS_${PN} += "bash perl libxml2"
 S = "${WORKDIR}/${BP}"
 
@@ -26,6 +24,8 @@ EXTRA_OECONF = "--enable-debuginfo \
     --disable-fc \
     --disable-fortran \
     --disable-cxx \
+    BASH_SHELL='${USRBINPATH}/env bash' \
+    PERL='${USRBINPATH}/env perl' \
 "
 
 inherit autotools-brokensep gettext

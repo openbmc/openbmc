@@ -1,4 +1,5 @@
 SUMMARY = "Linux control group abstraction library"
+HOMEPAGE = "http://libcg.sourceforge.net/"
 DESCRIPTION = "libcgroup is a library that abstracts the control group file system \
 in Linux. Control groups allow you to limit, account and isolate resource usage \
 (CPU, memory, disk I/O, etc.) of groups of processes."

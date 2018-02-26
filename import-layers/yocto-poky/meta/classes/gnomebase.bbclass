@@ -14,6 +14,8 @@ FILES_${PN} += "${datadir}/application-registry  \
                 ${datadir}/polkit* \
                 ${datadir}/GConf \
                 ${datadir}/glib-2.0/schemas \
+                ${datadir}/appdata \
+                ${datadir}/icons \
 "
 
 FILES_${PN}-doc += "${datadir}/devhelp"

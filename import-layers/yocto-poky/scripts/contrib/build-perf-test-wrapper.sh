@@ -35,6 +35,7 @@ Optional arguments:
   -C GIT_REPO       commit results into Git
   -E EMAIL_ADDR     send email report
   -P GIT_REMOTE     push results to a remote Git repository
+  -R DEST           rsync reports to a remote destination
   -w WORK_DIR       work dir for this script
                     (default: GIT_TOP_DIR/build-perf-test)
   -x                create xml report (instead of json)
@@ -50,7 +51,7 @@ get_os_release_var () {
 commitish=""
 oe_build_perf_test_extra_opts=()
 oe_git_archive_extra_opts=()
-while getopts "ha:c:C:E:P:w:x" opt; do
+while getopts "ha:c:C:E:P:R:w:x" opt; do
     case $opt in
         h)  usage
             exit 0
@@ -64,6 +65,8 @@ while getopts "ha:c:C:E:P:w:x" opt; do
         E)  email_to="$OPTARG"
             ;;
         P)  oe_git_archive_extra_opts+=("--push" "$OPTARG")
+            ;;
+        R)  rsync_dst="$OPTARG"
             ;;
         w)  base_dir=`realpath -s "$OPTARG"`
             ;;
@@ -132,6 +135,11 @@ if [ -n "$commitish" ]; then
     git reset --hard $commit > /dev/null
 fi
 
+# Determine name of the current branch
+branch=`git symbolic-ref HEAD 2> /dev/null`
+# Strip refs/heads/
+branch=${branch:11}
+
 # Setup build environment
 if [ -z "$base_dir" ]; then
     base_dir="$git_topdir/build-perf-test"
@@ -187,13 +195,25 @@ if [ -n "$results_repo" ]; then
         "${oe_git_archive_extra_opts[@]}" \
         "$results_dir"
 
+    # Generate test reports
+    sanitized_branch=`echo $branch | tr / _`
+    report_txt=`hostname`_${sanitized_branch}_${machine}.txt
+    report_html=`hostname`_${sanitized_branch}_${machine}.html
+    echo -e "\nGenerating test report"
+    oe-build-perf-report -r "$results_repo" > $report_txt
+    oe-build-perf-report -r "$results_repo" --html > $report_html
+
     # Send email report
     if [ -n "$email_to" ]; then
-        echo -e "\nEmailing test report"
+        echo "Emailing test report"
         os_name=`get_os_release_var PRETTY_NAME`
-        oe-build-perf-report -r "$results_repo" > report.txt
-        oe-build-perf-report -r "$results_repo" --html > report.html
-        "$script_dir"/oe-build-perf-report-email.py --to "$email_to" --subject "Build Perf Test Report for $os_name" --text report.txt --html report.html "${OE_BUILD_PERF_REPORT_EMAIL_EXTRA_ARGS[@]}"
+        "$script_dir"/oe-build-perf-report-email.py --to "$email_to" --subject "Build Perf Test Report for $os_name" --text $report_txt --html $report_html "${OE_BUILD_PERF_REPORT_EMAIL_EXTRA_ARGS[@]}"
+    fi
+
+    # Upload report files, unless we're on detached head
+    if [ -n "$rsync_dst" -a -n "$branch" ]; then
+        echo "Uploading test report"
+        rsync $report_txt $report_html $rsync_dst
     fi
 fi
 

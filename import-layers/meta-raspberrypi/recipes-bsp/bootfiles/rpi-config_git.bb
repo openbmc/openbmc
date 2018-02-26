@@ -5,7 +5,7 @@ DESCRIPTION = "Commented config.txt file for the Raspberry Pi. \
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-COMPATIBLE_MACHINE = "raspberrypi"
+COMPATIBLE_MACHINE = "^rpi$"
 
 SRCREV = "648ffc470824c43eb0d16c485f4c24816b32cd6f"
 SRC_URI = "git://github.com/Evilpaul/RPi-config.git;protocol=git;branch=master \
@@ -21,7 +21,8 @@ PITFT28r="${@bb.utils.contains("MACHINE_FEATURES", "pitft28r", "1", "0", d)}"
 PITFT35r="${@bb.utils.contains("MACHINE_FEATURES", "pitft35r", "1", "0", d)}"
 
 VC4GRAPHICS="${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}"
-
+VC4DTBO_raspberrypi3-64 = "vc4-fkms-v3d"
+VC4DTBO ?= "vc4-kms-v3d"
 inherit deploy
 
 do_deploy() {
@@ -114,7 +115,7 @@ do_deploy() {
     # VC4 Graphics support
     if [ "${VC4GRAPHICS}" = "1" ]; then
         echo "# Enable VC4 Graphics" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
-        echo "dtoverlay=vc4-kms-v3d,${VC4_CMA_SIZE}" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+        echo "dtoverlay=${VC4DTBO},${VC4_CMA_SIZE}" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
     fi
 
     # Waveshare "C" 1024x600 7" Rev2.1 IPS capacitive touch (http://www.waveshare.com/7inch-HDMI-LCD-C.htm)
@@ -129,6 +130,12 @@ do_deploy() {
 }
 
 do_deploy_append_raspberrypi3-64() {
+    echo "# have a properly sized image" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+    echo "disable_overscan=1" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+
+    echo "# Enable audio (loads snd_bcm2835)" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+    echo "dtparam=audio=on" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+
     # Device Tree support
     echo "# Load correct Device Tree for Aarch64" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt
     echo "device_tree=bcm2710-rpi-3-b.dtb" >>${DEPLOYDIR}/bcm2835-bootfiles/config.txt

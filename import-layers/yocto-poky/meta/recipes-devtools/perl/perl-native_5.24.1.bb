@@ -32,6 +32,7 @@ do_configure () {
 		-Dcc="${CC}" \
 		-Dcflags="${CFLAGS}" \
 		-Dldflags="${LDFLAGS}" \
+		-Dlddlflags="${LDFLAGS} -shared" \
 		-Dcf_by="Open Embedded" \
 		-Dprefix=${prefix} \
 		-Dvendorprefix=${prefix} \

@@ -1,0 +1,186 @@
+Upstream-Status: Backport [https://github.com/opencv/opencv/pull/9376/commits/78a310630fb0a1f6d089576202343e672f27609d]
+
+Fix CVEs for opencv 3.3.
+
+* CVE-2017-12597
+* CVE-2017-12598
+* CVE-2017-12599
+* CVE-2017-12600
+* CVE-2017-12601
+* CVE-2017-12602
+* CVE-2017-12603
+* CVE-2017-12604
+* CVE-2017-12605
+* CVE-2017-12606
+* CVE-2017-12862
+* CVE-2017-12863
+* CVE-2017-12864
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+From 78a310630fb0a1f6d089576202343e672f27609d Mon Sep 17 00:00:00 2001
+From: Alexander Alekhin <alexander.alekhin@intel.com>
+Date: Wed, 16 Aug 2017 13:53:12 +0300
+Subject: [PATCH 3/3] imgproc(test): add checks for remove() call
+
+---
+ modules/imgcodecs/test/test_grfmt.cpp      |  2 +-
+ modules/imgcodecs/test/test_jpeg.cpp       | 12 ++++++------
+ modules/imgcodecs/test/test_png.cpp        |  2 +-
+ modules/imgcodecs/test/test_read_write.cpp |  4 ++--
+ modules/imgcodecs/test/test_tiff.cpp       |  8 ++++----
+ modules/imgcodecs/test/test_webp.cpp       |  6 +++---
+ 6 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/modules/imgcodecs/test/test_grfmt.cpp b/modules/imgcodecs/test/test_grfmt.cpp
+index 64a0c1e3a..74b72c3b3 100644
+--- a/modules/imgcodecs/test/test_grfmt.cpp
++++ b/modules/imgcodecs/test/test_grfmt.cpp
+@@ -175,7 +175,7 @@ TEST_P(Imgcodecs_ExtSize, write_imageseq)
+             EXPECT_LT(n, 1.);
+             EXPECT_PRED_FORMAT2(cvtest::MatComparator(0, 0), img, img_gt);
+         }
+-        remove(filename.c_str());
++        EXPECT_EQ(0, remove(filename.c_str()));
+     }
+ }
+ 
+diff --git a/modules/imgcodecs/test/test_jpeg.cpp b/modules/imgcodecs/test/test_jpeg.cpp
+index 5546f2d91..6ddb02840 100644
+--- a/modules/imgcodecs/test/test_jpeg.cpp
++++ b/modules/imgcodecs/test/test_jpeg.cpp
+@@ -123,8 +123,8 @@ TEST(Imgcodecs_Jpeg, encode_decode_progressive_jpeg)
+ 
+     EXPECT_EQ(0, cvtest::norm(img_jpg_progressive, img_jpg_normal, NORM_INF));
+ 
+-    remove(output_progressive.c_str());
+-    remove(output_normal.c_str());
++    EXPECT_EQ(0, remove(output_progressive.c_str()));
++    EXPECT_EQ(0, remove(output_normal.c_str()));
+ }
+ 
+ TEST(Imgcodecs_Jpeg, encode_decode_optimize_jpeg)
+@@ -148,8 +148,8 @@ TEST(Imgcodecs_Jpeg, encode_decode_optimize_jpeg)
+ 
+     EXPECT_EQ(0, cvtest::norm(img_jpg_optimized, img_jpg_normal, NORM_INF));
+ 
+-    remove(output_optimized.c_str());
+-    remove(output_normal.c_str());
++    EXPECT_EQ(0, remove(output_optimized.c_str()));
++    EXPECT_EQ(0, remove(output_normal.c_str()));
+ }
+ 
+ TEST(Imgcodecs_Jpeg, encode_decode_rst_jpeg)
+@@ -173,8 +173,8 @@ TEST(Imgcodecs_Jpeg, encode_decode_rst_jpeg)
+ 
+     EXPECT_EQ(0, cvtest::norm(img_jpg_rst, img_jpg_normal, NORM_INF));
+ 
+-    remove(output_rst.c_str());
+-    remove(output_normal.c_str());
++    EXPECT_EQ(0, remove(output_rst.c_str()));
++    EXPECT_EQ(0, remove(output_normal.c_str()));
+ }
+ 
+ #endif // HAVE_JPEG
+diff --git a/modules/imgcodecs/test/test_png.cpp b/modules/imgcodecs/test/test_png.cpp
+index c46f90119..4e97043e1 100644
+--- a/modules/imgcodecs/test/test_png.cpp
++++ b/modules/imgcodecs/test/test_png.cpp
+@@ -17,7 +17,7 @@ TEST(Imgcodecs_Png, write_big)
+     EXPECT_EQ(13043, img.cols);
+     EXPECT_EQ(13917, img.rows);
+     ASSERT_NO_THROW(imwrite(dst_file, img));
+-    remove(dst_file.c_str());
++    EXPECT_EQ(0, remove(dst_file.c_str()));
+ }
+ 
+ TEST(Imgcodecs_Png, encode)
+diff --git a/modules/imgcodecs/test/test_read_write.cpp b/modules/imgcodecs/test/test_read_write.cpp
+index 38f10225f..5119813bf 100644
+--- a/modules/imgcodecs/test/test_read_write.cpp
++++ b/modules/imgcodecs/test/test_read_write.cpp
+@@ -50,7 +50,7 @@ TEST(Imgcodecs_Image, read_write_bmp)
+         psnr = cvtest::PSNR(buf_loaded, image);
+         EXPECT_GT(psnr, thresDbell);
+ 
+-        remove(dst_name.c_str());
++        EXPECT_EQ(0, remove(dst_name.c_str()));
+     }
+ }
+ 
+@@ -95,7 +95,7 @@ TEST_P(Imgcodecs_Image, read_write)
+     psnr = cvtest::PSNR(buf_loaded, image);
+     EXPECT_GT(psnr, thresDbell);
+ 
+-    remove(full_name.c_str());
++    EXPECT_EQ(0, remove(full_name.c_str()));
+ }
+ 
+ const string exts[] = {
+diff --git a/modules/imgcodecs/test/test_tiff.cpp b/modules/imgcodecs/test/test_tiff.cpp
+index 0264da4cd..6ef0c1748 100644
+--- a/modules/imgcodecs/test/test_tiff.cpp
++++ b/modules/imgcodecs/test/test_tiff.cpp
+@@ -41,8 +41,8 @@ TEST(Imgcodecs_Tiff, decode_tile16384x16384)
+         // not enough memory
+     }
+ 
+-    remove(file3.c_str());
+-    remove(file4.c_str());
++    EXPECT_EQ(0, remove(file3.c_str()));
++    EXPECT_EQ(0, remove(file4.c_str()));
+ }
+ 
+ TEST(Imgcodecs_Tiff, write_read_16bit_big_little_endian)
+@@ -88,7 +88,7 @@ TEST(Imgcodecs_Tiff, write_read_16bit_big_little_endian)
+         EXPECT_EQ(0xDEAD, img.at<ushort>(0,0));
+         EXPECT_EQ(0xBEEF, img.at<ushort>(0,1));
+ 
+-        remove(filename.c_str());
++        EXPECT_EQ(0, remove(filename.c_str()));
+     }
+ }
+ 
+@@ -143,7 +143,7 @@ TEST(Imgcodecs_Tiff, decode_infinite_rowsperstrip)
+ 
+     EXPECT_NO_THROW(cv::imread(filename, IMREAD_UNCHANGED));
+ 
+-    remove(filename.c_str());
++    EXPECT_EQ(0, remove(filename.c_str()));
+ }
+ 
+ //==================================================================================================
+diff --git a/modules/imgcodecs/test/test_webp.cpp b/modules/imgcodecs/test/test_webp.cpp
+index 6d40ce21e..d82fdd289 100644
+--- a/modules/imgcodecs/test/test_webp.cpp
++++ b/modules/imgcodecs/test/test_webp.cpp
+@@ -44,7 +44,7 @@ TEST(Imgcodecs_WebP, encode_decode_lossless_webp)
+         }
+     }
+ 
+-    remove(output.c_str());
++    EXPECT_EQ(0, remove(output.c_str()));
+ 
+     cv::Mat decode = cv::imdecode(buf, IMREAD_COLOR);
+     ASSERT_FALSE(decode.empty());
+@@ -71,7 +71,7 @@ TEST(Imgcodecs_WebP, encode_decode_lossy_webp)
+ 
+         EXPECT_NO_THROW(cv::imwrite(output, img, params));
+         cv::Mat img_webp = cv::imread(output);
+-        remove(output.c_str());
++        EXPECT_EQ(0, remove(output.c_str()));
+         EXPECT_FALSE(img_webp.empty());
+         EXPECT_EQ(3,   img_webp.channels());
+         EXPECT_EQ(512, img_webp.cols);
+@@ -96,7 +96,7 @@ TEST(Imgcodecs_WebP, encode_decode_with_alpha_webp)
+ 
+     EXPECT_NO_THROW(cv::imwrite(output, img));
+     cv::Mat img_webp = cv::imread(output);
+-    remove(output.c_str());
++    EXPECT_EQ(0, remove(output.c_str()));
+     EXPECT_FALSE(img_webp.empty());
+     EXPECT_EQ(4,   img_webp.channels());
+     EXPECT_EQ(512, img_webp.cols);
+-- 
+2.14.1
+

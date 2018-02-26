@@ -8,7 +8,8 @@ from oeqa.sdk.case import OESDKTestCase
 class PythonTest(OESDKTestCase):
     @classmethod
     def setUpClass(self):
-        if not self.tc.hasHostPackage("nativesdk-python"):
+        if not (self.tc.hasHostPackage("nativesdk-python") or
+                self.tc.hasHostPackage("python-native")):
             raise unittest.SkipTest("No python package in the SDK")
 
         for f in ['test.py']:

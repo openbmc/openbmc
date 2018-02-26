@@ -16,13 +16,8 @@
 #   into exec_prefix
 #  -Check that scripts in base_[bindir|sbindir|libdir] do not reference
 #   files under exec_prefix
+#  -Check if the package name is upper case
 
-
-# unsafe-references-in-binaries requires prelink-rtld from
-# prelink-native, but we don't want this DEPENDS for -native builds
-QADEPENDS = "prelink-native"
-QADEPENDS_class-native = ""
-QADEPENDS_class-nativesdk = ""
 QA_SANE = "True"
 
 # Elect whether a given type of error is a warning or error, they may
@@ -32,7 +27,7 @@ WARN_QA ?= "ldflags useless-rpaths rpaths staticdev libdir xorg-driver-abi \
             installed-vs-shipped compile-host-path install-host-path \
             pn-overrides infodir build-deps \
             unknown-configure-option symlink-to-sysroot multilib \
-            invalid-packageconfig host-user-contaminated \
+            invalid-packageconfig host-user-contaminated uppercase-pn \
             "
 ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             perms dep-cmp pkgvarcheck perm-config perm-line perm-link \
@@ -40,6 +35,9 @@ ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             version-going-backwards expanded-d invalid-chars \
             license-checksum dev-elf file-rdeps \
             "
+# Add usrmerge QA check based on distro feature
+ERROR_QA_append = "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', ' usrmerge', '', d)}"
+
 FAKEROOT_QA = "host-user-contaminated"
 FAKEROOT_QA[doc] = "QA tests which need to run under fakeroot. If any \
 enabled tests are listed here, the do_package_qa task will run under fakeroot."
@@ -103,23 +101,6 @@ def package_qa_get_machine_dict(d):
                         "microblazeeb":(189,   0,    0,          False,         32),
                         "microblazeel":(189,   0,    0,          True,          32),
                       },
-            "linux-uclibc" : { 
-                        "arm" :       (  40,    97,    0,          True,          32),
-                        "armeb":      (  40,    97,    0,          False,         32),
-                        "powerpc":    (  20,     0,    0,          False,         32),
-                        "i386":       (   3,     0,    0,          True,          32),
-                        "i486":       (   3,     0,    0,          True,          32),
-                        "i586":       (   3,     0,    0,          True,          32),
-                        "i686":       (   3,     0,    0,          True,          32),
-                        "x86_64":     (  62,     0,    0,          True,          64),
-                        "mips":       (   8,     0,    0,          False,         32),
-                        "mipsel":     (   8,     0,    0,          True,          32),
-                        "mips64":     (   8,     0,    0,          False,         64),
-                        "mips64el":   (   8,     0,    0,          True,          64),
-                        "avr32":      (6317,     0,    0,          False,         32),
-                        "sh4":        (42,       0,    0,          True,          32),
-
-                      },
             "linux-musl" : { 
                         "aarch64" :   (183,    0,    0,            True,          64),
                         "aarch64_be" :(183,    0,    0,            False,         64),
@@ -151,17 +132,10 @@ def package_qa_get_machine_dict(d):
                         "arm" :       (40,     0,    0,          True,          32),
                         "armeb" :     (40,     0,    0,          False,         32),
                       },
-            "linux-uclibceabi" : {
-                        "arm" :       (40,     0,    0,          True,          32),
-                        "armeb" :     (40,     0,    0,          False,         32),
-                      },
             "linux-gnuspe" : {
                         "powerpc":    (20,     0,    0,          False,         32),
                       },
             "linux-muslspe" : {
-                        "powerpc":    (20,     0,    0,          False,         32),
-                      },
-            "linux-uclibcspe" : {
                         "powerpc":    (20,     0,    0,          False,         32),
                       },
             "linux-gnu" :       {
@@ -169,6 +143,9 @@ def package_qa_get_machine_dict(d):
                         "sh4":        (42,     0,    0,          True,          32),
                       },
             "linux-gnux32" :       {
+                        "x86_64":     (62,     0,    0,          True,          32),
+                      },
+            "linux-muslx32" :       {
                         "x86_64":     (62,     0,    0,          True,          32),
                       },
             "linux-gnun32" :       {
@@ -207,12 +184,13 @@ def package_qa_write_error(type, error, d):
             f.write("%s: %s [%s]\n" % (p, error, type))
 
 def package_qa_handle_error(error_class, error_msg, d):
-    package_qa_write_error(error_class, error_msg, d)
     if error_class in (d.getVar("ERROR_QA") or "").split():
+        package_qa_write_error(error_class, error_msg, d)
         bb.error("QA Issue: %s [%s]" % (error_msg, error_class))
         d.setVar("QA_SANE", False)
         return False
     elif error_class in (d.getVar("WARN_QA") or "").split():
+        package_qa_write_error(error_class, error_msg, d)
         bb.warn("QA Issue: %s [%s]" % (error_msg, error_class))
     else:
         bb.note("QA Issue: %s [%s]" % (error_msg, error_class))
@@ -408,71 +386,6 @@ def package_qa_check_perm(path,name,d, elf, messages):
     """
     return
 
-QAPATHTEST[unsafe-references-in-scripts] = "package_qa_check_unsafe_references_in_scripts"
-def package_qa_check_unsafe_references_in_scripts(path, name, d, elf, messages):
-    """
-    Warn if scripts in base_[bindir|sbindir|libdir] reference files under exec_prefix
-    """
-    if unsafe_references_skippable(path, name, d):
-        return
-
-    if not elf:
-        import stat
-        import subprocess
-        pn = d.getVar('PN')
-
-        # Ensure we're checking an executable script
-        statinfo = os.stat(path)
-        if bool(statinfo.st_mode & stat.S_IXUSR):
-            # grep shell scripts for possible references to /exec_prefix/
-            exec_prefix = d.getVar('exec_prefix')
-            statement = "grep -e '%s/[^ :]\{1,\}/[^ :]\{1,\}' %s > /dev/null" % (exec_prefix, path)
-            if subprocess.call(statement, shell=True) == 0:
-                error_msg = pn + ": Found a reference to %s/ in %s" % (exec_prefix, path)
-                package_qa_handle_error("unsafe-references-in-scripts", error_msg, d)
-                error_msg = "Shell scripts in base_bindir and base_sbindir should not reference anything in exec_prefix"
-                package_qa_handle_error("unsafe-references-in-scripts", error_msg, d)
-
-def unsafe_references_skippable(path, name, d):
-    if bb.data.inherits_class('native', d) or bb.data.inherits_class('nativesdk', d):
-        return True
-
-    if "-dbg" in name or "-dev" in name:
-        return True
-
-    # Other package names to skip:
-    if name.startswith("kernel-module-"):
-        return True
-
-    # Skip symlinks
-    if os.path.islink(path):
-        return True
-
-    # Skip unusual rootfs layouts which make these tests irrelevant
-    exec_prefix = d.getVar('exec_prefix')
-    if exec_prefix == "":
-        return True
-
-    pkgdest = d.getVar('PKGDEST')
-    pkgdest = pkgdest + "/" + name
-    pkgdest = os.path.abspath(pkgdest)
-    base_bindir = pkgdest + d.getVar('base_bindir')
-    base_sbindir = pkgdest + d.getVar('base_sbindir')
-    base_libdir = pkgdest + d.getVar('base_libdir')
-    bindir = pkgdest + d.getVar('bindir')
-    sbindir = pkgdest + d.getVar('sbindir')
-    libdir = pkgdest + d.getVar('libdir')
-
-    if base_bindir == bindir and base_sbindir == sbindir and base_libdir == libdir:
-        return True
-
-    # Skip files not in base_[bindir|sbindir|libdir]
-    path = os.path.abspath(path)
-    if not (base_bindir in path or base_sbindir in path or base_libdir in path):
-        return True
-
-    return False
-
 QAPATHTEST[arch] = "package_qa_check_arch"
 def package_qa_check_arch(path,name,d, elf, messages):
     """
@@ -509,7 +422,7 @@ def package_qa_check_arch(path,name,d, elf, messages):
 
     # Check the architecture and endiannes of the binary
     is_32 = (("virtual/kernel" in provides) or bb.data.inherits_class("module", d)) and \
-            (target_os == "linux-gnux32" or re.match('mips64.*32', d.getVar('DEFAULTTUNE')))
+            (target_os == "linux-gnux32" or target_os == "linux-muslx32"  or re.match('mips64.*32', d.getVar('DEFAULTTUNE')))
     if not ((machine == elf.machine()) or is_32):
         package_qa_add_message(messages, "arch", "Architecture did not match (%s, expected %s) on %s" % \
                  (oe.qa.elf_machine_to_string(elf.machine()), oe.qa.elf_machine_to_string(machine), package_qa_clean_path(path,d)))
@@ -677,7 +590,7 @@ python populate_lic_qa_checksum() {
         sane = package_qa_handle_error("license-checksum", pn + ": Recipe file fetches files and does not have license file information (LIC_FILES_CHKSUM)", d)
 
     srcdir = d.getVar('S')
-
+    corebase_licensefile = d.getVar('COREBASE') + "/LICENSE"
     for url in lic_files.split():
         try:
             (type, host, path, user, pswd, parm) = bb.fetch.decodeurl(url)
@@ -688,6 +601,9 @@ python populate_lic_qa_checksum() {
         if not os.path.isfile(srclicfile):
             package_qa_handle_error("license-checksum", pn + ": LIC_FILES_CHKSUM points to an invalid file: " + srclicfile, d)
             continue
+
+        if (srclicfile == corebase_licensefile):
+            bb.warn("${COREBASE}/LICENSE is not a valid license file, please use '${COMMON_LICENSE_DIR}/MIT' for a MIT License file in LIC_FILES_CHKSUM. This will become an error in the future")
 
         recipemd5 = parm.get('md5', '')
         beginline, endline = 0, 0
@@ -816,7 +732,7 @@ def package_qa_check_staged(path,d):
     return sane
 
 # Run all package-wide warnfuncs and errorfuncs
-def package_qa_package(warnfuncs, errorfuncs, skip, package, d):
+def package_qa_package(warnfuncs, errorfuncs, package, d):
     warnings = {}
     errors = {}
 
@@ -832,8 +748,25 @@ def package_qa_package(warnfuncs, errorfuncs, skip, package, d):
 
     return len(errors) == 0
 
+# Run all recipe-wide warnfuncs and errorfuncs
+def package_qa_recipe(warnfuncs, errorfuncs, pn, d):
+    warnings = {}
+    errors = {}
+
+    for func in warnfuncs:
+        func(pn, d, warnings)
+    for func in errorfuncs:
+        func(pn, d, errors)
+
+    for w in warnings:
+        package_qa_handle_error(w, warnings[w], d)
+    for e in errors:
+        package_qa_handle_error(e, errors[e], d)
+
+    return len(errors) == 0
+
 # Walk over all files in a directory and call func
-def package_qa_walk(warnfuncs, errorfuncs, skip, package, d):
+def package_qa_walk(warnfuncs, errorfuncs, package, d):
     import oe.qa
 
     #if this will throw an exception, then fix the dict above
@@ -973,8 +906,9 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
                     error_msg = "%s contained in package %s requires %s, but no providers found in RDEPENDS_%s?" % \
                             (filerdepends[key].replace("_%s" % pkg, "").replace("@underscore@", "_"), pkg, key, pkg)
                     package_qa_handle_error("file-rdeps", error_msg, d)
+package_qa_check_rdepends[vardepsexclude] = "OVERRIDES"
 
-def package_qa_check_deps(pkg, pkgdest, skip, d):
+def package_qa_check_deps(pkg, pkgdest, d):
 
     localdata = bb.data.createCopy(d)
     localdata.setVar('OVERRIDES', pkg)
@@ -996,6 +930,18 @@ def package_qa_check_deps(pkg, pkgdest, skip, d):
     check_valid_deps('RPROVIDES')
     check_valid_deps('RREPLACES')
     check_valid_deps('RCONFLICTS')
+
+QAPKGTEST[usrmerge] = "package_qa_check_usrmerge"
+def package_qa_check_usrmerge(pkg, d, messages):
+    pkgdest = d.getVar('PKGDEST')
+    pkg_dir = pkgdest + os.sep + pkg + os.sep
+    merged_dirs = ['bin', 'sbin', 'lib'] + d.getVar('MULTILIB_VARIANTS').split()
+    for f in merged_dirs:
+        if os.path.exists(pkg_dir + f) and not os.path.islink(pkg_dir + f):
+            msg = "%s package is not obeying usrmerge distro feature. /%s should be relocated to /usr." % (pkg, f)
+            package_qa_add_message(messages, "usrmerge", msg)
+            return False
+    return True
 
 QAPKGTEST[expanded-d] = "package_qa_check_expanded_d"
 def package_qa_check_expanded_d(package, d, messages):
@@ -1070,6 +1016,7 @@ def package_qa_check_host_user(path, name, d, elf, messages):
             return False
     return True
 
+
 # The PACKAGE FUNC to scan each package
 python do_package_qa () {
     import subprocess
@@ -1083,7 +1030,7 @@ python do_package_qa () {
     package_qa_check_encoding(['DESCRIPTION', 'SUMMARY', 'LICENSE', 'SECTION'], 'utf-8', d)
 
     logdir = d.getVar('T')
-    pkg = d.getVar('PN')
+    pn = d.getVar('PN')
 
     # Check the compile log for host contamination
     compilelog = os.path.join(logdir,"log.do_compile")
@@ -1092,7 +1039,7 @@ python do_package_qa () {
         statement = "grep -e 'CROSS COMPILE Badness:' -e 'is unsafe for cross-compilation' %s > /dev/null" % compilelog
         if subprocess.call(statement, shell=True) == 0:
             msg = "%s: The compile log indicates that host include and/or library paths were used.\n \
-        Please check the log '%s' for more information." % (pkg, compilelog)
+        Please check the log '%s' for more information." % (pn, compilelog)
             package_qa_handle_error("compile-host-path", msg, d)
 
     # Check the install log for host contamination
@@ -1102,7 +1049,7 @@ python do_package_qa () {
         statement = "grep -e 'CROSS COMPILE Badness:' -e 'is unsafe for cross-compilation' %s > /dev/null" % installlog
         if subprocess.call(statement, shell=True) == 0:
             msg = "%s: The install log indicates that host include and/or library paths were used.\n \
-        Please check the log '%s' for more information." % (pkg, installlog)
+        Please check the log '%s' for more information." % (pn, installlog)
             package_qa_handle_error("install-host-path", msg, d)
 
     # Scan the packages...
@@ -1131,34 +1078,29 @@ python do_package_qa () {
     for dep in taskdepdata:
         taskdeps.add(taskdepdata[dep][0])
 
+    def parse_test_matrix(matrix_name):
+        testmatrix = d.getVarFlags(matrix_name) or {}
+        g = globals()
+        warnchecks = []
+        for w in (d.getVar("WARN_QA") or "").split():
+            if w in skip:
+               continue
+            if w in testmatrix and testmatrix[w] in g:
+                warnchecks.append(g[testmatrix[w]])
+
+        errorchecks = []
+        for e in (d.getVar("ERROR_QA") or "").split():
+            if e in skip:
+               continue
+            if e in testmatrix and testmatrix[e] in g:
+                errorchecks.append(g[testmatrix[e]])
+        return warnchecks, errorchecks
+
     for package in packages:
-        def parse_test_matrix(matrix_name):
-            testmatrix = d.getVarFlags(matrix_name) or {}
-            g = globals()
-            warnchecks = []
-            for w in (d.getVar("WARN_QA") or "").split():
-                if w in skip:
-                   continue
-                if w in testmatrix and testmatrix[w] in g:
-                    warnchecks.append(g[testmatrix[w]])
-                if w == 'unsafe-references-in-binaries':
-                    oe.utils.write_ld_so_conf(d)
-
-            errorchecks = []
-            for e in (d.getVar("ERROR_QA") or "").split():
-                if e in skip:
-                   continue
-                if e in testmatrix and testmatrix[e] in g:
-                    errorchecks.append(g[testmatrix[e]])
-                if e == 'unsafe-references-in-binaries':
-                    oe.utils.write_ld_so_conf(d)
-            return warnchecks, errorchecks
-
         skip = set((d.getVar('INSANE_SKIP') or "").split() +
                    (d.getVar('INSANE_SKIP_' + package) or "").split())
         if skip:
             bb.note("Package %s skipping QA tests: %s" % (package, str(skip)))
-
 
         bb.note("Checking Package: %s" % package)
         # Check package name
@@ -1167,13 +1109,16 @@ python do_package_qa () {
                     "%s doesn't match the [a-z0-9.+-]+ regex" % package, d)
 
         warn_checks, error_checks = parse_test_matrix("QAPATHTEST")
-        package_qa_walk(warn_checks, error_checks, skip, package, d)
+        package_qa_walk(warn_checks, error_checks, package, d)
 
         warn_checks, error_checks = parse_test_matrix("QAPKGTEST")
-        package_qa_package(warn_checks, error_checks, skip, package, d)
+        package_qa_package(warn_checks, error_checks, package, d)
 
         package_qa_check_rdepends(package, pkgdest, skip, taskdeps, packages, d)
-        package_qa_check_deps(package, pkgdest, skip, d)
+        package_qa_check_deps(package, pkgdest, d)
+
+    warn_checks, error_checks = parse_test_matrix("QARECIPETEST")
+    package_qa_recipe(warn_checks, error_checks, pn, d)
 
     if 'libdir' in d.getVar("ALL_QA").split():
         package_qa_check_libdir(d)
@@ -1238,12 +1183,10 @@ Rerun configure task after fixing this.""")
     cnf = d.getVar('EXTRA_OECONF') or ""
     if "gettext" not in d.getVar('P') and "gcc-runtime" not in d.getVar('P') and "--disable-nls" not in cnf:
         ml = d.getVar("MLPREFIX") or ""
-        if bb.data.inherits_class('native', d) or bb.data.inherits_class('cross', d) or bb.data.inherits_class('crosssdk', d) or bb.data.inherits_class('nativesdk', d):
-            gt = "gettext-native"
-        elif bb.data.inherits_class('cross-canadian', d):
+        if bb.data.inherits_class('cross-canadian', d):
             gt = "nativesdk-gettext"
         else:
-            gt = "virtual/" + ml + "gettext"
+            gt = "gettext-native"
         deps = bb.utils.explode_deps(d.getVar('DEPENDS') or "")
         if gt not in deps:
             for config in configs:
@@ -1308,6 +1251,8 @@ do_configure[postfuncs] += "do_qa_configure "
 do_unpack[postfuncs] += "do_qa_unpack"
 
 python () {
+    import re
+    
     tests = d.getVar('ALL_QA').split()
     if "desktop" in tests:
         d.appendVar("PACKAGE_DEPENDS", " desktop-file-utils-native")
@@ -1334,6 +1279,9 @@ python () {
     if pn in overrides:
         msg = 'Recipe %s has PN of "%s" which is in OVERRIDES, this can result in unexpected behaviour.' % (d.getVar("FILE"), pn)
         package_qa_handle_error("pn-overrides", msg, d)
+    prog = re.compile('[A-Z]')
+    if prog.search(pn):
+        package_qa_handle_error("uppercase-pn", 'PN: %s is upper case, this can result in unexpected behavior.' % pn, d)
 
     issues = []
     if (d.getVar('PACKAGES') or "").split():

@@ -1,4 +1,5 @@
 SUMMARY = "QEMU wrapper script"
+HOMEPAGE = "http://qemu.org"
 LICENSE = "MIT"
 
 S = "${WORKDIR}"

@@ -30,6 +30,7 @@ import tempfile
 import subprocess
 import os
 import logging
+import errno
 import bb
 import bb.progress
 import urllib.request, urllib.parse, urllib.error
@@ -89,13 +90,13 @@ class Wget(FetchMethod):
 
         self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate"
 
-    def _runwget(self, ud, d, command, quiet):
+    def _runwget(self, ud, d, command, quiet, workdir=None):
 
         progresshandler = WgetProgressHandler(d)
 
         logger.debug(2, "Fetching %s using command '%s'" % (ud.url, command))
         bb.fetch2.check_network_access(d, command, ud.url)
-        runfetchcmd(command + ' --progress=dot -v', d, quiet, log=progresshandler)
+        runfetchcmd(command + ' --progress=dot -v', d, quiet, log=progresshandler, workdir=workdir)
 
     def download(self, ud, d):
         """Fetch urls"""
@@ -206,8 +207,21 @@ class Wget(FetchMethod):
                     h.request(req.get_method(), req.selector, req.data, headers)
                 except socket.error as err: # XXX what error?
                     # Don't close connection when cache is enabled.
+                    # Instead, try to detect connections that are no longer
+                    # usable (for example, closed unexpectedly) and remove
+                    # them from the cache.
                     if fetch.connection_cache is None:
                         h.close()
+                    elif isinstance(err, OSError) and err.errno == errno.EBADF:
+                        # This happens when the server closes the connection despite the Keep-Alive.
+                        # Apparently urllib then uses the file descriptor, expecting it to be
+                        # connected, when in reality the connection is already gone.
+                        # We let the request fail and expect it to be
+                        # tried once more ("try_again" in check_status()),
+                        # with the dead connection removed from the cache.
+                        # If it still fails, we give up, which can happend for bad
+                        # HTTP proxy settings.
+                        fetch.connection_cache.remove_connection(h.host, h.port)
                     raise urllib.error.URLError(err)
                 else:
                     try:
@@ -269,11 +283,6 @@ class Wget(FetchMethod):
             """
             http_error_403 = http_error_405
 
-            """
-            Some servers (e.g. FusionForge) returns 406 Not Acceptable when they
-            actually mean 405 Method Not Allowed.
-            """
-            http_error_406 = http_error_405
 
         class FixedHTTPRedirectHandler(urllib.request.HTTPRedirectHandler):
             """
@@ -302,7 +311,9 @@ class Wget(FetchMethod):
             uri = ud.url.split(";")[0]
             r = urllib.request.Request(uri)
             r.get_method = lambda: "HEAD"
-
+            # Some servers (FusionForge, as used on Alioth) require that the
+            # optional Accept header is set.
+            r.add_header("Accept", "*/*")
             def add_basic_auth(login_str, request):
                 '''Adds Basic auth to http request, pass in login:password as string'''
                 import base64
@@ -408,17 +419,16 @@ class Wget(FetchMethod):
         Run fetch checkstatus to get directory information
         """
         f = tempfile.NamedTemporaryFile()
+        with tempfile.TemporaryDirectory(prefix="wget-index-") as workdir, tempfile.NamedTemporaryFile(dir=workdir, prefix="wget-listing-") as f:
+            agent = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.12) Gecko/20101027 Ubuntu/9.10 (karmic) Firefox/3.6.12"
+            fetchcmd = self.basecmd
+            fetchcmd += " -O " + f.name + " --user-agent='" + agent + "' '" + uri + "'"
+            try:
+                self._runwget(ud, d, fetchcmd, True, workdir=workdir)
+                fetchresult = f.read()
+            except bb.fetch2.BBFetchException:
+                fetchresult = ""
 
-        agent = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.12) Gecko/20101027 Ubuntu/9.10 (karmic) Firefox/3.6.12"
-        fetchcmd = self.basecmd
-        fetchcmd += " -O " + f.name + " --user-agent='" + agent + "' '" + uri + "'"
-        try:
-            self._runwget(ud, d, fetchcmd, True)
-            fetchresult = f.read()
-        except bb.fetch2.BBFetchException:
-            fetchresult = ""
-
-        f.close()
         return fetchresult
 
     def _check_latest_version(self, url, package, package_regex, current_version, ud, d):

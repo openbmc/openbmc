@@ -1,0 +1,54 @@
+From c64d04d084f47b4cb3e1cdee6e96348fcc6a756e Mon Sep 17 00:00:00 2001
+From: Mihai Tudor Panu <mihai.tudor.panu@intel.com>
+Date: Tue, 30 May 2017 15:14:09 -0700
+Subject: [PATCH 1/1] ads1x15: fixed case logic in getThresh() function
+
+Signed-off-by: Mihai Tudor Panu <mihai.tudor.panu@intel.com>
+
+Upstream-Status: Backported [c64d04d084f47b4cb3e1cdee6e96348fcc6a756e]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+
+---
+ src/ads1x15/ads1x15.cxx | 4 ++--
+ src/ads1x15/ads1x15.hpp | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/ads1x15/ads1x15.cxx b/src/ads1x15/ads1x15.cxx
+index 35782709..47701b2a 100644
+--- a/src/ads1x15/ads1x15.cxx
++++ b/src/ads1x15/ads1x15.cxx
+@@ -116,7 +116,7 @@ ADS1X15::setContinuous(bool mode){
+ 
+ float
+ ADS1X15::getThresh(ADSTHRESH reg){
+-     if( THRESH_HIGH && THRESH_LOW) return getLastSample(reg);
++     if(reg == THRESH_HIGH || reg == THRESH_LOW) return getLastSample(reg);
+      else return 0.0;
+ }
+ 
+@@ -137,7 +137,7 @@ ADS1X15::setThresh(ADSTHRESH reg, float value){
+      case 2:
+      case 3:
+           set_value = value / getMultiplier();
+-         set_value = set_value << m_bitShift;
++          set_value = set_value << m_bitShift;
+           if(i2c->writeWordReg(reg, swapWord(set_value)) != mraa::SUCCESS){
+             throw std::runtime_error(std::string(__FUNCTION__) + ": I2c.write() failed");
+             return;
+diff --git a/src/ads1x15/ads1x15.hpp b/src/ads1x15/ads1x15.hpp
+index 7524572d..efd8c8ec 100644
+--- a/src/ads1x15/ads1x15.hpp
++++ b/src/ads1x15/ads1x15.hpp
+@@ -390,7 +390,7 @@ namespace upm {
+              * @param reg ADSTHRES enum value.
+              * Returns 0.0 unless THRESH_HIGH or THRESH_LOW requested.
+              */
+-            float getThresh(ADSTHRESH reg = THRESH_LOW);
++            float getThresh(ADSTHRESH reg = THRESH_DEFAULT);
+ 
+             /**
+              * Sets threshold levels or configures for conversion ready
+-- 
+2.11.0
+

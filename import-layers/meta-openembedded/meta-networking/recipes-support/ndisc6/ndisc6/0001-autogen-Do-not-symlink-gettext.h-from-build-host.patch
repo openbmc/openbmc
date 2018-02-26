@@ -1,0 +1,34 @@
+From 1ee2c998933c4a3d7e7b386352cbdb12f270774c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 6 Sep 2017 20:50:48 -0700
+Subject: [PATCH] autogen: Do not symlink gettext.h from build host
+
+This will create a dependency on build host having gettext
+installed which may not always be the case.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Inappropriate [Cross-compile specific]
+ autogen.sh | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/autogen.sh b/autogen.sh
+index 3371011..bbc7add 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -25,12 +25,6 @@ echo "Running autoreconf ..."
+ autoreconf -sfi
+ unlink po/Makevars.template
+ 
+-for d in /usr /usr/local /opt/gettext /usr/pkg $HOME ; do
+-	if test -f $d/share/gettext/gettext.h ; then
+-		ln -sf $d/share/gettext/gettext.h include/gettext.h
+-	fi
+-done
+-
+ test -f "include/gettext.h" || {
+ echo "Error: can't find <gettext.h> convenience C header."
+ echo "Please put a link to it by hand as include/gettext.h"
+-- 
+2.14.1
+

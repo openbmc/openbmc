@@ -1,0 +1,68 @@
+From 1369178b497b12088ec4c2794606cc9f14cc327c Mon Sep 17 00:00:00 2001
+From: Matt Madison <matt@madison.systems>
+Date: Wed, 13 Sep 2017 08:15:03 -0700
+Subject: [PATCH 4/7] cmd/go: allow GOTOOLDIR to be overridden in the
+ environment
+
+For OE cross-builds, host-side tools reside in the native
+GOROOT, not the target GOROOT.  Allow GOTOOLDIR to be set
+in the environment to allow that split, rather than always
+computing GOTOOLDIR relative to the GOROOT setting.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Matt Madison <matt@madison.systems>
+---
+ src/cmd/go/internal/cfg/cfg.go    | 7 ++++++-
+ src/cmd/go/internal/work/build.go | 2 +-
+ src/go/build/build.go             | 2 +-
+ 3 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/src/cmd/go/internal/cfg/cfg.go b/src/cmd/go/internal/cfg/cfg.go
+index b3ad1ce..c1dc974 100644
+--- a/src/cmd/go/internal/cfg/cfg.go
++++ b/src/cmd/go/internal/cfg/cfg.go
+@@ -91,7 +91,12 @@ func init() {
+ 	// as the tool directory does not move based on environment variables.
+ 	// This matches the initialization of ToolDir in go/build,
+ 	// except for using GOROOT rather than runtime.GOROOT().
+-	build.ToolDir = filepath.Join(GOROOT, "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
++	s := os.Getenv("GOTOOLDIR")
++	if s == "" {
++		build.ToolDir = filepath.Join(GOROOT, "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
++	} else {
++		build.ToolDir = s
++	}
+ }
+ 
+ func findGOROOT() string {
+diff --git a/src/cmd/go/internal/work/build.go b/src/cmd/go/internal/work/build.go
+index 85df0b3..7b9a69e 100644
+--- a/src/cmd/go/internal/work/build.go
++++ b/src/cmd/go/internal/work/build.go
+@@ -1337,7 +1337,7 @@ func (b *Builder) build(a *Action) (err error) {
+ 		}
+ 
+ 		var cgoExe string
+-		if a.cgo != nil && a.cgo.Target != "" {
++		if a.cgo != nil && a.cgo.Target != "" && os.Getenv("GOTOOLDIR") == "" {
+ 			cgoExe = a.cgo.Target
+ 		} else {
+ 			cgoExe = base.Tool("cgo")
+diff --git a/src/go/build/build.go b/src/go/build/build.go
+index fd89871..e16145b 100644
+--- a/src/go/build/build.go
++++ b/src/go/build/build.go
+@@ -1588,7 +1588,7 @@ func init() {
+ }
+ 
+ // ToolDir is the directory containing build tools.
+-var ToolDir = filepath.Join(runtime.GOROOT(), "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH)
++var ToolDir = envOr("GOTOOLDIR", filepath.Join(runtime.GOROOT(), "pkg/tool/"+runtime.GOOS+"_"+runtime.GOARCH))
+ 
+ // IsLocalImport reports whether the import path is
+ // a local import path, like ".", "..", "./foo", or "../foo".
+-- 
+2.7.4
+

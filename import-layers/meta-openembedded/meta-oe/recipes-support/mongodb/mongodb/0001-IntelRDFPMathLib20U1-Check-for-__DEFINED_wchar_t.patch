@@ -1,0 +1,36 @@
+From fbfceebce2121831904f2f7115252dd03b413a6d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 19 Sep 2017 18:52:53 -0700
+Subject: [PATCH] IntelRDFPMathLib20U1: Check for __DEFINED_wchar_t
+
+This is defined by musl if wchar_t is already defined
+
+avoids errors like
+
+src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h:46:15: error: typedef redefinition with different types
+      ('int' vs 'unsigned int')
+typedef int   wchar_t;
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h b/src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h
+index 2b3f76db86..cc80305775 100755
+--- a/src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h
++++ b/src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h
+@@ -42,7 +42,7 @@
+ #include <ctype.h>
+ 
+ // Fix system header issue on Sun solaris and define required type by ourselves
+-#if !defined(_WCHAR_T) && !defined(_WCHAR_T_DEFINED) && !defined(__QNX__)
++#if !defined(_WCHAR_T) && !defined(_WCHAR_T_DEFINED) && !defined(__QNX__) && !defined(__DEFINED_wchar_t)
+ typedef int   wchar_t;
+ #endif
+ 
+-- 
+2.14.1
+

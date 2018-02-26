@@ -14,3 +14,8 @@ EXTRA_OECMAKE += " \
     -DOPTION_USE_XFIXES=OFF \
     -DOPTION_USE_XCURSOR=OFF \
 "
+
+do_install_append() {
+    # make sure native fltk-config is not used accidentaly
+    rm -f ${D}${bindir}/fltk-config
+}

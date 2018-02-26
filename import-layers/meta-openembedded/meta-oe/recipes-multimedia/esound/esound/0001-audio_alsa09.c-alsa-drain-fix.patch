@@ -1,0 +1,26 @@
+From a860fe0796c43e35eac9783140fcb563cab9f55a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 8 Jun 2017 23:09:51 -0700
+Subject: [PATCH 1/3] audio_alsa09.c: alsa drain fix
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ audio_alsa09.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/audio_alsa09.c b/audio_alsa09.c
+index 534e3db..d9450e6 100644
+--- a/audio_alsa09.c
++++ b/audio_alsa09.c
+@@ -506,7 +506,7 @@ void esd_audio_flush(void)
+ 	}
+ 
+ 	if (alsa_playback_handle != NULL)
+-		snd_pcm_drain( alsa_playback_handle );
++		snd_pcm_drop( alsa_playback_handle );
+   
+ 	if (alsadbg) 
+ 		print_state();
+-- 
+2.13.1
+

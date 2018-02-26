@@ -1,5 +1,5 @@
 SUMMARY = "Multi-purpose linux bootloader"
-HOMEPAGE = "http://syslinux.zytor.com/"
+HOMEPAGE = "http://www.syslinux.org/"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
                     file://README;beginline=35;endline=41;md5=558f2c71cb1fb9ba511ccd4858e48e8a"

@@ -818,6 +818,10 @@ yocto_layer_help_usage = """
 
 yocto_layer_create_usage = """
 
+ WARNING: this plugin will be removed starting 2.5 development in favour
+ of using 'bitbake-layers create-layer' script/plugin, offering a single
+ script to manage layers.
+
  Create a new generic Yocto layer
 
  usage: yocto-layer create <layer-name> [layer_priority]
@@ -844,6 +848,10 @@ yocto_layer_create_usage = """
 """
 
 yocto_layer_create_help = """
+
+WARNING: this plugin will be removed starting 2.5 development in favour
+of using 'bitbake-layers create-layer' script/plugin, offering a single
+script to manage layers.
 
 NAME
     yocto-layer create - Create a new generic Yocto layer

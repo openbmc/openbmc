@@ -189,7 +189,7 @@ def package_compare_impl(pkgtype, d):
 
     # Remove all the old files and copy again if docopy
     if docopy:
-        bb.plain('Copying packages for recipe %s' % pn)
+        bb.note('Copying packages for recipe %s' % pn)
         pcmanifest = os.path.join(prepath, d.expand('pkg-compare-manifest-${MULTIMACH_TARGET_SYS}-${PN}'))
         try:
             with open(pcmanifest, 'r') as f:
@@ -224,7 +224,7 @@ def package_compare_impl(pkgtype, d):
                     shutil.copyfile(srcpath, destpath)
                 f.write('%s\n' % destpath)
     else:
-        bb.plain('Not copying packages for recipe %s' % pn)
+        bb.note('Not copying packages for recipe %s' % pn)
 
 do_cleansstate[postfuncs] += "pfs_cleanpkgs"
 python pfs_cleanpkgs () {

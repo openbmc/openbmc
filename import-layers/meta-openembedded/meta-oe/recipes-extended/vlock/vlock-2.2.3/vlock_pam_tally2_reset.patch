@@ -1,0 +1,19 @@
+Upstream-Status: Pending
+
+written by: Jeff Polk <jeff.polk@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+Index: vlock-2.2.2/src/auth-pam.c
+===================================================================
+--- vlock-2.2.2.orig/src/auth-pam.c	2010-06-14 14:38:51.000000000 -0400
++++ vlock-2.2.2/src/auth-pam.c	2010-06-14 14:39:12.000000000 -0400
+@@ -148,6 +148,9 @@
+ 
+   if (pam_status != PAM_SUCCESS) {
+     fprintf(stderr, "vlock: %s\n", pam_strerror(pamh, pam_status));
++  } else {
++    pam_status = pam_acct_mgmt(pamh, 0);
++    if (pam_status == PAM_SUCCESS) pam_setcred(pamh, PAM_REINITIALIZE_CRED);
+   }
+ 
+ end:

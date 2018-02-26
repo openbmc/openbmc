@@ -4,7 +4,7 @@ SECTION = "net"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=78fa8ef966b48fbf9095e13cc92377c5"
 
-DEPENDS = "xz libpcap libpcre daq libdnet util-linux"
+DEPENDS = "xz libpcap libpcre daq libdnet util-linux daq-native"
 DEPENDS_append_libc-musl = " libtirpc"
 
 SRC_URI = " ${GENTOO_MIRROR}/${BP}.tar.gz;name=tarball \
@@ -15,6 +15,7 @@ SRC_URI = " ${GENTOO_MIRROR}/${BP}.tar.gz;name=tarball \
     file://disable-daq-verdict-retry.patch \
     file://0001-libpcap-search-sysroot-for-headers.patch \
     file://0001-fix-do_package-failed-since-snort-2.9.7.0.patch \
+    file://fix-host-contamination-when-enable-static-daq.patch \
 "
 
 SRC_URI[tarball.md5sum] = "fd271788c0f8876be87a858a9142f202"
@@ -31,7 +32,7 @@ EXTRA_OECONF = " \
     --enable-reload \
     --enable-reload-error-restart \
     --enable-targetbased \
-    --disable-static-daq \
+    --enable-static-daq \
     --with-dnet-includes=${STAGING_INCDIR} \
     --with-dnet-libraries=${STAGING_LIBDIR} \
     --with-libpcre-includes=${STAGING_INCDIR} \

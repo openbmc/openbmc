@@ -302,7 +302,7 @@
                             See the <filename>bin_package.bbclass</filename>
                             file in the <filename>meta/classes</filename>
                             directory of the
-                            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                            <link linkend='source-directory'>Source Directory</link>
                             for an example.
                             </para></listitem>
                     </itemizedlist>
@@ -495,10 +495,11 @@
 
         <para>
             Installs the files into the individual recipe specific sysroots
-            (i.e.
+            (i.e. <filename>recipe-sysroot</filename> and
+            <filename>recipe-sysroot-native</filename> under
             <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}</filename>
             based upon the dependencies specified by
-            <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>.
+            <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>).
             See the
             "<link linkend='ref-classes-staging'><filename>staging</filename></link>"
             class for more information.
@@ -717,7 +718,7 @@
             the BitBake environment.
             See the
             "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-devpyshell'>Using a Development Python Shell</ulink>"
-            section in the Yocto Project Development Manual for more
+            section in the Yocto Project Development Tasks Manual for more
             information about using <filename>devpyshell</filename>.
         </para>
     </section>
@@ -730,7 +731,7 @@
             development, debugging, or both.
             See the
             "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-devshell'>Using a Development Shell</ulink>"
-            section in the Yocto Project Development Manual for more
+            section in the Yocto Project Development Tasks Manual for more
             information about using <filename>devshell</filename>.
         </para>
     </section>
@@ -820,7 +821,7 @@
             Boots an image and performs runtime tests within the image.
             For information on automatically testing images, see the
             "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
-            section in the Yocto Project Development Manual.
+            section in the Yocto Project Development Tasks Manual.
         </para>
     </section>
 
@@ -838,17 +839,7 @@
         <para>
             For information on automatically testing images, see the
             "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
-            section in the Yocto Project Development Manual.
-        </para>
-    </section>
-
-    <section id='ref-tasks-vmdkimg'>
-        <title><filename>do_vmdkimg</filename></title>
-
-        <para>
-            Creates a <filename>.vmdk</filename> image for use with
-            <ulink url='http://www.vmware.com/'>VMware</ulink>
-            and compatible virtual machine hosts.
+            section in the Yocto Project Development Tasks Manual.
         </para>
     </section>
 </section>
@@ -892,7 +883,7 @@
      $ bitbake linux-yocto -c diffconfig
             </literallayout>
             For more information, see the
-            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#generating-configuration-files'>Generating Configuration Files</ulink>"
+            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#creating-config-fragments'>Creating Configuration Fragments</ulink>"
             section in the Yocto Project Linux Kernel Development Manual.
         </para>
     </section>
@@ -927,7 +918,7 @@
      $ bitbake linux-yocto -c kernel_configcheck -f
             </literallayout>
             For more information, see the
-            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#generating-configuration-files'>Generating Configuration Files</ulink>"
+            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#validating-configuration'>Validating Configuration</ulink>"
             section in the Yocto Project Linux Kernel Development Manual.
         </para>
     </section>
@@ -965,12 +956,9 @@
                 </literallayout>
             </note>
             See the
-            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#generating-configuration-files'>Generating Configuration Files</ulink>"
+            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#using-menuconfig'>Using <filename>menuconfig</filename></ulink>"
             section in the Yocto Project Linux Kernel Development Manual
             for more information on this configuration tool.
-            You can also reference the
-            "<ulink url='&YOCTO_DOCS_DEV_URL;#using-menuconfig'>Using <filename>menuconfig</filename></ulink>"
-            section in the Yocto Project Development Manual.
         </para>
     </section>
 
@@ -997,8 +985,8 @@
         <para>
             Runs <filename>make menuconfig</filename> for the kernel.
             For information on <filename>menuconfig</filename>, see the
-            "<ulink url='&YOCTO_DOCS_DEV_URL;#using-menuconfig'>Using&nbsp;&nbsp;<filename>menuconfig</filename></ulink>"
-            section in the Yocto Project Development Manual.
+            "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#using-menuconfig'>Using&nbsp;&nbsp;<filename>menuconfig</filename></ulink>"
+            section in the Yocto Project Linux Kernel Development Manual.
         </para>
     </section>
 

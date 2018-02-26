@@ -620,7 +620,9 @@
                         The Git Submodules fetcher is not a complete fetcher
                         implementation.
                         The fetcher has known issues where it does not use the
-                        normal source mirroring infrastructure properly.
+                        normal source mirroring infrastructure properly. Further,
+                        the submodule sources it fetches are not visible to the
+                        licensing and source archiving infrastructures.
                     </para>
                 </note>
             </para>

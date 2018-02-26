@@ -1,4 +1,4 @@
-From cff6fbf555a072408c21da1e818209c9d3814dd3 Mon Sep 17 00:00:00 2001
+From 7592e793b3906355d76ca9a59f8fea2749ea2a4e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 27 Oct 2015 14:36:58 +0200
 Subject: [PATCH] Makefile.am: don't hardcode libtool name when running
@@ -7,17 +7,34 @@ Subject: [PATCH] Makefile.am: don't hardcode libtool name when running
 Upstream-Status: Pending [review on oe-core list]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
----
- gst-libs/gst/gl/Makefile.am        | 2 +-
- gst-libs/gst/insertbin/Makefile.am | 2 +-
- gst-libs/gst/mpegts/Makefile.am    | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+%% original patch: 0001-Makefile.am-don-t-hardcode-libtool-name-when-running.patch
 
-Index: gst-plugins-bad-1.10.1/gst-libs/gst/gl/Makefile.am
-===================================================================
---- gst-plugins-bad-1.10.1.orig/gst-libs/gst/gl/Makefile.am
-+++ gst-plugins-bad-1.10.1/gst-libs/gst/gl/Makefile.am
-@@ -171,7 +171,7 @@ GstGL-@GST_API_VERSION@.gir: $(INTROSPEC
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ gst-libs/gst/allocators/Makefile.am | 2 +-
+ gst-libs/gst/gl/Makefile.am         | 2 +-
+ gst-libs/gst/insertbin/Makefile.am  | 2 +-
+ gst-libs/gst/mpegts/Makefile.am     | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gst-libs/gst/allocators/Makefile.am b/gst-libs/gst/allocators/Makefile.am
+index e50d077..623f092 100644
+--- a/gst-libs/gst/allocators/Makefile.am
++++ b/gst-libs/gst/allocators/Makefile.am
+@@ -37,7 +37,7 @@ GstBadAllocators-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstbadalloca
+ 		--add-include-path=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-@GST_API_VERSION@` \
+ 		--library=libgstbadallocators-@GST_API_VERSION@.la \
+ 		--include=Gst-@GST_API_VERSION@ \
+-		--libtool="$(top_builddir)/libtool" \
++		--libtool="$(LIBTOOL)" \
+ 		--pkg gstreamer-@GST_API_VERSION@ \
+ 		--pkg-export gstreamer-badallocators-@GST_API_VERSION@ \
+ 		--output $@ \
+diff --git a/gst-libs/gst/gl/Makefile.am b/gst-libs/gst/gl/Makefile.am
+index 2ae4773..dfa7a7d 100644
+--- a/gst-libs/gst/gl/Makefile.am
++++ b/gst-libs/gst/gl/Makefile.am
+@@ -178,7 +178,7 @@ GstGL-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstgl-@GST_API_VERSION@
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
  		--include=GstVideo-@GST_API_VERSION@ \
@@ -26,11 +43,11 @@ Index: gst-plugins-bad-1.10.1/gst-libs/gst/gl/Makefile.am
  		--pkg gstreamer-@GST_API_VERSION@ \
  		--pkg gstreamer-base-@GST_API_VERSION@ \
  		--pkg gstreamer-video-@GST_API_VERSION@ \
-Index: gst-plugins-bad-1.10.1/gst-libs/gst/insertbin/Makefile.am
-===================================================================
---- gst-plugins-bad-1.10.1.orig/gst-libs/gst/insertbin/Makefile.am
-+++ gst-plugins-bad-1.10.1/gst-libs/gst/insertbin/Makefile.am
-@@ -45,7 +45,7 @@ GstInsertBin-@GST_API_VERSION@.gir: $(IN
+diff --git a/gst-libs/gst/insertbin/Makefile.am b/gst-libs/gst/insertbin/Makefile.am
+index 1f8ea30..4b98ef6 100644
+--- a/gst-libs/gst/insertbin/Makefile.am
++++ b/gst-libs/gst/insertbin/Makefile.am
+@@ -45,7 +45,7 @@ GstInsertBin-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstinsertbin-@GS
  		--library=libgstinsertbin-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
  		--include=GstBase-@GST_API_VERSION@ \
@@ -39,11 +56,11 @@ Index: gst-plugins-bad-1.10.1/gst-libs/gst/insertbin/Makefile.am
  		--pkg gstreamer-@GST_API_VERSION@ \
  		--pkg gstreamer-base-@GST_API_VERSION@ \
  		--pkg-export gstreamer-insertbin-@GST_API_VERSION@ \
-Index: gst-plugins-bad-1.10.1/gst-libs/gst/mpegts/Makefile.am
-===================================================================
---- gst-plugins-bad-1.10.1.orig/gst-libs/gst/mpegts/Makefile.am
-+++ gst-plugins-bad-1.10.1/gst-libs/gst/mpegts/Makefile.am
-@@ -79,7 +79,7 @@ GstMpegts-@GST_API_VERSION@.gir: $(INTRO
+diff --git a/gst-libs/gst/mpegts/Makefile.am b/gst-libs/gst/mpegts/Makefile.am
+index aeea32e..929d9cc 100644
+--- a/gst-libs/gst/mpegts/Makefile.am
++++ b/gst-libs/gst/mpegts/Makefile.am
+@@ -79,7 +79,7 @@ GstMpegts-@GST_API_VERSION@.gir: $(INTROSPECTION_SCANNER) libgstmpegts-@GST_API_
  		--add-include-path=`PKG_CONFIG_PATH="$(GST_PKG_CONFIG_PATH)" $(PKG_CONFIG) --variable=girdir gstreamer-video-@GST_API_VERSION@` \
  		--library=libgstmpegts-@GST_API_VERSION@.la \
  		--include=Gst-@GST_API_VERSION@ \
@@ -52,3 +69,6 @@ Index: gst-plugins-bad-1.10.1/gst-libs/gst/mpegts/Makefile.am
  		--pkg gstreamer-@GST_API_VERSION@ \
  		--pkg gstreamer-video-@GST_API_VERSION@ \
  		--pkg-export gstreamer-mpegts-@GST_API_VERSION@ \
+-- 
+2.4.0
+

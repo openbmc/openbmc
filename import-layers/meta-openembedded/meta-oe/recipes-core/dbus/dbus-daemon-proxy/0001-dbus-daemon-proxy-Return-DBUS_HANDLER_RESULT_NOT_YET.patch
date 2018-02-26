@@ -1,0 +1,30 @@
+From 8e6d1f590b1cb437dc67c51298ef1722a7266d35 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 25 Jul 2017 18:37:58 -0700
+Subject: [PATCH] dbus-daemon-proxy: Return DBUS_HANDLER_RESULT_NOT_YET_HANDLED
+ from master_filter_cb() if DBusConnection is null
+
+So it can be passed on to other handlers since this could
+not be handled here
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dbus-daemon-proxy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dbus-daemon-proxy.c b/dbus-daemon-proxy.c
+index 009e4fd..f3f0d80 100644
+--- a/dbus-daemon-proxy.c
++++ b/dbus-daemon-proxy.c
+@@ -115,7 +115,7 @@ master_filter_cb (DBusConnection *conn,
+   guint32 serial;
+ 
+   if (!dbus_conn)
+-    return;
++    DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+ 
+   if (verbose)
+     g_print ("New message from server: type='%d' path='%s' iface='%s'"
+-- 
+2.13.3
+

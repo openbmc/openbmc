@@ -1,0 +1,37 @@
+From aa09af0fe2ec0737fa04ffd00957532684e257b9 Mon Sep 17 00:00:00 2001
+From: Xiao Ni <xni@redhat.com>
+Date: Fri, 17 Mar 2017 19:55:42 +0800
+Subject: [PATCH 1/5] mdadm: Add Wimplicit-fallthrough=0 in Makefile
+
+There are many errors like 'error: this statement may fall through'.
+But the logic is right. So add the flag Wimplicit-fallthrough=0
+to disable the error messages. The method I use is from
+https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+#index-Wimplicit-fallthrough-375
+
+Signed-off-by: Xiao Ni <xni@redhat.com>
+Signed-off-by: Jes Sorensen <Jes.Sorensen@gmail.com>
+---
+Upstream-Status: Backport
+ Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 0f307ec..e1a7058 100644
+--- a/Makefile
++++ b/Makefile
+@@ -48,6 +48,11 @@ ifdef WARN_UNUSED
+ CWFLAGS += -Wp,-D_FORTIFY_SOURCE=2 -O3
+ endif
+ 
++FALLTHROUGH := $(shell gcc -v --help 2>&1 | grep "implicit-fallthrough" | wc -l)
++ifneq "$(FALLTHROUGH)"  "0"
++CWFLAGS += -Wimplicit-fallthrough=0
++endif
++
+ ifdef DEBIAN
+ CPPFLAGS += -DDEBIAN
+ endif
+-- 
+2.12.2
+

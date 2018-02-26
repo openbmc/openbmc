@@ -29,10 +29,17 @@ python __anonymous () {
         d.setVar("PACKAGE_ARCH", d.getVar("MACHINE_ARCH"))
 }
 
+delete_pkg_m4_file() {
+    # Delete m4 files which we provide patched versions of but will be ignored
+    # if these exist
+	rm -f "${S}/common/m4/pkg.m4"
+	rm -f "${S}/common/m4/gtk-doc.m4"
+}
+do_configure[prefuncs] += "delete_pkg_m4_file"
+
 set_omx_core_name() {
 	sed -i -e "s;^core-name=.*;core-name=${GSTREAMER_1_0_OMX_CORE_NAME};" "${D}${sysconfdir}/xdg/gstomx.conf"
 }
-
 do_install[postfuncs] += " set_omx_core_name "
 
 FILES_${PN} += "${libdir}/gstreamer-1.0/*.so"

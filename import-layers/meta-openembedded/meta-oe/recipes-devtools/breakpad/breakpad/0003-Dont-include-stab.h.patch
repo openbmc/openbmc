@@ -1,0 +1,88 @@
+From 569af712da94637091080943f6a0d69ccb35864e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Sep 2017 23:24:08 -0700
+Subject: [PATCH 3/5] Dont include stab.h
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/common/stabs_reader.cc          |  1 -
+ src/common/stabs_reader.h           | 12 +++++++++++-
+ src/common/stabs_reader_unittest.cc |  1 -
+ 3 files changed, 11 insertions(+), 3 deletions(-)
+
+Index: git/src/common/stabs_reader.cc
+===================================================================
+--- git.orig/src/common/stabs_reader.cc
++++ git/src/common/stabs_reader.cc
+@@ -34,7 +34,9 @@
+ #include "common/stabs_reader.h"
+ 
+ #include <assert.h>
++#ifdef HAVE_STAB_H
+ #include <stab.h>
++#endif
+ #include <string.h>
+ 
+ #include <string>
+Index: git/src/common/stabs_reader.h
+===================================================================
+--- git.orig/src/common/stabs_reader.h
++++ git/src/common/stabs_reader.h
+@@ -58,6 +58,30 @@
+ #elif defined(HAVE_A_OUT_H)
+ #include <a.out.h>
+ #endif
++// Definitions from <stab.h> and <a.out.h> for systems which
++// do not have them
++#ifndef HAVE_A_OUT_H
++#undef N_UNDF
++#define N_UNDF 0x0
++#ifndef N_FUN
++#define N_FUN 0x24
++#endif
++#ifndef N_SLINE
++#define N_SLINE 0x44
++#endif
++#ifndef N_SO
++#define N_SO 0x64
++#endif
++#ifndef N_LSYM
++#define N_LSYM 0x80
++#endif
++#ifndef N_BINCL
++#define N_BINCL 0x82
++#endif
++#ifndef N_SOL
++#define N_SOL 0x84
++#endif
++#endif
+ 
+ #include <string>
+ #include <vector>
+Index: git/src/common/stabs_reader_unittest.cc
+===================================================================
+--- git.orig/src/common/stabs_reader_unittest.cc
++++ git/src/common/stabs_reader_unittest.cc
+@@ -33,7 +33,9 @@
+ 
+ #include <assert.h>
+ #include <errno.h>
++#ifdef HAVE_STAB_H
+ #include <stab.h>
++#endif
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <string.h>
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -72,7 +72,7 @@ AC_ARG_ENABLE(m32,
+ AC_HEADER_STDC
+ AC_SYS_LARGEFILE
+ AX_PTHREAD
+-AC_CHECK_HEADERS([a.out.h sys/random.h])
++AC_CHECK_HEADERS([a.out.h stab.h sys/random.h])
+ AC_CHECK_FUNCS([arc4random getrandom])
+ 
+ AX_CXX_COMPILE_STDCXX(11, noext, mandatory)

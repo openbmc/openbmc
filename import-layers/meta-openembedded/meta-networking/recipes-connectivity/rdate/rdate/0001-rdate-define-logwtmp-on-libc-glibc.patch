@@ -1,0 +1,40 @@
+From e0c690acfcddd3c3421f6eb0182c54815fd70f8f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Jul 2017 23:21:08 -0700
+Subject: [PATCH] rdate: define logwtmp on libc != glibc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/rdate.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/src/rdate.c b/src/rdate.c
+index 943d481..685b1b8 100644
+--- a/src/rdate.c
++++ b/src/rdate.c
+@@ -41,7 +41,22 @@ static int print_mode = 0;		// display the time
+ static int timeout = 10;		// timeout for each connection attempt
+ static char *service = DEFAULT_SERVICE;
+ 
++#ifndef __GLIBC__
++static void logwtmp(const char * line, const char * name, const char * host)
++{
++    struct utmp u;
++    memset(&u, 0, sizeof(u));
++
++    u.ut_pid = getpid();
++    u.ut_type = name[0] ? USER_PROCESS : DEAD_PROCESS;
++    strncpy(u.ut_line, line, sizeof(u.ut_line));
++    strncpy(u.ut_name, name, sizeof(u.ut_name));
++    strncpy(u.ut_host, host, sizeof(u.ut_host));
++    gettimeofday(&(u.ut_tv), NULL);
+ 
++    updwtmp(_PATH_WTMP, &u);
++}
++#endif /* __GLIBC__ */
+ 
+ // Returns string from address info pointer
+ static char*
+-- 
+2.13.3
+

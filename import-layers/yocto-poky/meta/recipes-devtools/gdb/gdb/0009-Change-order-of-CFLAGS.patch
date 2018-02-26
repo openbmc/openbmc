@@ -1,4 +1,4 @@
-From 8c35d5d1825ed017cc58ea91011412e54c002eeb Mon Sep 17 00:00:00 2001
+From 3f54036b891054072b3e43ea8daaa57aa367b2e0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 15:35:39 -0700
 Subject: [PATCH 09/10] Change order of CFLAGS
@@ -9,26 +9,22 @@ Upstream-Status: Inappropriate
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- gdb/gdbserver/Makefile.in | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ gdb/gdbserver/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gdb/gdbserver/Makefile.in b/gdb/gdbserver/Makefile.in
-index f844ab8853..3f88db52e3 100644
+index 01dfdc0b89..f6aebef464 100644
 --- a/gdb/gdbserver/Makefile.in
 +++ b/gdb/gdbserver/Makefile.in
-@@ -138,10 +138,10 @@ CXXFLAGS = @CXXFLAGS@
- CPPFLAGS = @CPPFLAGS@
- 
- # INTERNAL_CFLAGS is the aggregate of all other *CFLAGS macros.
--INTERNAL_CFLAGS_BASE =  ${COMPILER_CFLAGS} ${GLOBAL_CFLAGS} \
-+INTERNAL_CFLAGS_BASE =  ${GLOBAL_CFLAGS} \
+@@ -140,7 +140,7 @@ CPPFLAGS = @CPPFLAGS@
+ INTERNAL_CFLAGS_BASE = ${CXXFLAGS} ${GLOBAL_CFLAGS} \
  	${PROFILE_CFLAGS} ${INCLUDE_CFLAGS} ${CPPFLAGS}
- INTERNAL_WARN_CFLAGS =  ${INTERNAL_CFLAGS_BASE} $(WARN_CFLAGS)
--INTERNAL_CFLAGS =  ${INTERNAL_WARN_CFLAGS} $(WERROR_CFLAGS) -DGDBSERVER
-+INTERNAL_CFLAGS =  ${INTERNAL_WARN_CFLAGS} $(WERROR_CFLAGS) ${COMPILER_CFLAGS} -DGDBSERVER
+ INTERNAL_WARN_CFLAGS = ${INTERNAL_CFLAGS_BASE} $(WARN_CFLAGS)
+-INTERNAL_CFLAGS = ${INTERNAL_WARN_CFLAGS} $(WERROR_CFLAGS) -DGDBSERVER
++INTERNAL_CFLAGS = ${INTERNAL_WARN_CFLAGS} $(WERROR_CFLAGS) ${COMPILER_CFLAGS} -DGDBSERVER
  
  # LDFLAGS is specifically reserved for setting from the command line
  # when running make.
 -- 
-2.11.0
+2.13.1
 

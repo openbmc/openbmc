@@ -1,0 +1,31 @@
+From d22241efc0708c9799f17a20eabb52a48d6d6ea1 Mon Sep 17 00:00:00 2001
+From: Anuj Mittal <anuj.mittal@intel.com>
+Date: Tue, 2 Jan 2018 12:35:32 +0800
+Subject: [PATCH] Linux: add support for X32 ABI compilation
+
+X32 follows ILP32 model. Check for ILP32 as well when checking for
+x86_64 to ensure the defines are correct for X32 ABI.
+
+Upstream-Status: Submitted [https://github.com/acpica/acpica/pull/348]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ source/include/platform/aclinux.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/include/platform/aclinux.h b/source/include/platform/aclinux.h
+index 75b1d82..6b8ff73 100644
+--- a/source/include/platform/aclinux.h
++++ b/source/include/platform/aclinux.h
+@@ -315,7 +315,7 @@
+ #define ACPI_FLUSH_CPU_CACHE()
+ #define ACPI_CAST_PTHREAD_T(Pthread) ((ACPI_THREAD_ID) (Pthread))
+ 
+-#if defined(__ia64__)    || defined(__x86_64__) ||\
++#if defined(__ia64__)    || (defined(__x86_64__) && !defined(__ILP32__)) ||\
+     defined(__aarch64__) || defined(__PPC64__) ||\
+     defined(__s390x__)
+ #define ACPI_MACHINE_WIDTH          64
+-- 
+2.7.4
+

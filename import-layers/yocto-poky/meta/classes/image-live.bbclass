@@ -34,20 +34,21 @@ do_bootimg[depends] += "dosfstools-native:do_populate_sysroot \
                         ${MLPREFIX}syslinux:do_populate_sysroot \
                         syslinux-native:do_populate_sysroot \
                         ${@oe.utils.ifelse(d.getVar('COMPRESSISO', False),'zisofs-tools-native:do_populate_sysroot','')} \
-                        ${PN}:do_image_ext4 \
+                        ${PN}:do_image_${@d.getVar('LIVE_ROOTFS_TYPE').replace('-', '_')} \
                         "
 
 
 LABELS_LIVE ?= "boot install"
 ROOT_LIVE ?= "root=/dev/ram0"
-INITRD_IMAGE_LIVE ?= "core-image-minimal-initramfs"
+INITRD_IMAGE_LIVE ?= "${MLPREFIX}core-image-minimal-initramfs"
 INITRD_LIVE ?= "${DEPLOY_DIR_IMAGE}/${INITRD_IMAGE_LIVE}-${MACHINE}.cpio.gz"
 
-ROOTFS ?= "${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ext4"
+LIVE_ROOTFS_TYPE ?= "ext4"
+ROOTFS ?= "${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${LIVE_ROOTFS_TYPE}"
 
-IMAGE_TYPEDEP_live = "ext4"
-IMAGE_TYPEDEP_iso = "ext4"
-IMAGE_TYPEDEP_hddimg = "ext4"
+IMAGE_TYPEDEP_live = "${LIVE_ROOTFS_TYPE}"
+IMAGE_TYPEDEP_iso = "${LIVE_ROOTFS_TYPE}"
+IMAGE_TYPEDEP_hddimg = "${LIVE_ROOTFS_TYPE}"
 IMAGE_TYPES_MASKED += "live hddimg iso"
 
 python() {
@@ -91,7 +92,7 @@ build_iso() {
 	for fs in ${INITRD}
 	do
 		if [ ! -s "$fs" ]; then
-			bbnote "ISO image will not be created. $fs is invalid."
+			bbwarn "ISO image will not be created. $fs is invalid."
 			return
 		fi
 	done
@@ -216,10 +217,10 @@ build_fat_img() {
 	fi
 
 	if [ -z "${HDDIMG_ID}" ]; then
-		mkdosfs ${FATSIZE} -n ${BOOTIMG_VOLUME_ID} -S 512 -C ${FATIMG} \
+		mkdosfs ${FATSIZE} -n ${BOOTIMG_VOLUME_ID} ${MKDOSFS_EXTRAOPTS} -C ${FATIMG} \
 			${BLOCKS}
 	else
-		mkdosfs ${FATSIZE} -n ${BOOTIMG_VOLUME_ID} -S 512 -C ${FATIMG} \
+		mkdosfs ${FATSIZE} -n ${BOOTIMG_VOLUME_ID} ${MKDOSFS_EXTRAOPTS} -C ${FATIMG} \
 		${BLOCKS} -i ${HDDIMG_ID}
 	fi
 

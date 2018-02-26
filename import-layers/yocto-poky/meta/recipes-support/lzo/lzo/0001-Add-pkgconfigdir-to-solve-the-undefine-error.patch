@@ -1,0 +1,27 @@
+From e730bfd7c2d3a4b5f3605878599cb9b20d31b1fd Mon Sep 17 00:00:00 2001
+From: Fan Xin <fan.xin@jp.fujitsu.com>
+Date: Fri, 2 Jun 2017 11:52:25 +0900
+Subject: [PATCH] Add pkgconfigdir to solve the undefine error.
+
+Upstream-Status: Pending
+
+Signed-off-by: Fan Xin <fan.xin@jp.fujitsu.com>
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index e4d383b..c75023d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -14,6 +14,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)
+ LDADD = src/liblzo2.la
+ lib_LTLIBRARIES =
+ noinst_PROGRAMS =
++pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = lzo2.pc
+ 
+ 
+-- 
+1.9.1
+

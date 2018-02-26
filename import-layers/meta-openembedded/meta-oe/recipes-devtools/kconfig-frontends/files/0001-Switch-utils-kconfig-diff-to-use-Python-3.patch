@@ -1,0 +1,26 @@
+From 3b9b0f82c33f793a14d44bf06b6c8136bc3fc4bf Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 27 Apr 2017 16:48:42 +0300
+Subject: [PATCH] Switch utils/kconfig-diff to use Python 3
+
+The script supports it, but continues to refer to 2.x in shebang.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ utils/kconfig-diff | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/utils/kconfig-diff b/utils/kconfig-diff
+index 0db267d..19189f3 100755
+--- a/utils/kconfig-diff
++++ b/utils/kconfig-diff
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ #
+ # diffconfig - a tool to compare .config files.
+ #
+-- 
+2.11.0
+

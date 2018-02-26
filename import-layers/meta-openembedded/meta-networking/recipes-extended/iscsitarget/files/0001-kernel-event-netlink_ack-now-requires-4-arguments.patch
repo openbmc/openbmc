@@ -1,0 +1,40 @@
+From cbc5f8151017f45231b75a826f18354a81c287c4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Aug 2017 07:52:59 -0700
+Subject: [PATCH] kernel/event: netlink_ack() now requires 4 arguments
+
+see https://patchwork.kernel.org/patch/9670181/
+
+event.c:32:4: error: too few arguments to function 'netlink_ack'
+|     netlink_ack(skb, nlh, 0);
+|     ^~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ kernel/event.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: iscsitarget-1.4.20.3+svn502/kernel/event.c
+===================================================================
+--- iscsitarget-1.4.20.3+svn502.orig/kernel/event.c
++++ iscsitarget-1.4.20.3+svn502/kernel/event.c
+@@ -6,6 +6,7 @@
+  * Some functions are based on audit code.
+  */
+ 
++#include <linux/version.h>
+ #include <linux/module.h>
+ #include <net/tcp.h>
+ #include "iet_u.h"
+@@ -29,7 +30,11 @@ static void event_recv_skb(struct sk_buf
+ 		ietd_pid = NETLINK_CB(skb).portid;
+ 		WARN_ON(ietd_pid == 0);
+ 		if (nlh->nlmsg_flags & NLM_F_ACK)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
++			netlink_ack(skb, nlh, 0, NULL);
++#else
+ 			netlink_ack(skb, nlh, 0);
++#endif
+ 		skb_pull(skb, rlen);
+ 	}
+ }

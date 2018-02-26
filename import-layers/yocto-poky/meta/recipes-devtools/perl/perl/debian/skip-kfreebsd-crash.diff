@@ -12,6 +12,7 @@ a new unrelated test case.
 Skip the test until the culprit is found.
 
 Patch-Name: debian/skip-kfreebsd-crash.diff
+Upstream-Status: Pending
 ---
  t/op/threads.t | 4 ++++
  1 file changed, 4 insertions(+)

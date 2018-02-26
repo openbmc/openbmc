@@ -1,0 +1,64 @@
+#/bin/sh
+# Copyright (C) 2011 O.S. Systems Software LTDA.
+# Licensed on MIT
+
+setup_enabled() {
+	return 0
+}
+
+setup_run() {
+ROOT_IMAGE="rootfs.img"
+ISOLINUX=""
+ROOT_DISK=""
+shelltimeout=30
+
+	if [ -z "$bootparam_root" -o "$bootparam_root" = "/dev/ram0" ]; then
+		echo "Waiting for removable media..."
+		C=0
+		while true
+		do
+		  for i in `ls /run/media 2>/dev/null`; do
+		      if [ -f /run/media/$i/$ROOT_IMAGE ] ; then
+				found="yes"
+				ROOT_DISK="$i"
+				break
+			  elif [ -f /run/media/$i/isolinux/$ROOT_IMAGE ]; then
+				found="yes"
+				ISOLINUX="isolinux"
+				ROOT_DISK="$i"
+				break
+		      fi
+		  done
+		  if [ "$found" = "yes" ]; then
+		      break;
+		  fi
+		  # don't wait for more than $shelltimeout seconds, if it's set
+		  if [ -n "$shelltimeout" ]; then
+		      echo -n " " $(( $shelltimeout - $C ))
+		      if [ $C -ge $shelltimeout ]; then
+		           echo "..."
+			   echo "Mounted filesystems"
+		           mount | grep media
+		           echo "Available block devices"
+		           cat /proc/partitions
+		           fatal "Cannot find $ROOT_IMAGE file in /run/media/* , dropping to a shell "
+		      fi
+		      C=$(( C + 1 ))
+		  fi
+		  sleep 1
+		done
+		# The existing rootfs module has no support for rootfs images. Assign the rootfs image.
+		bootparam_root="/run/media/$ROOT_DISK/$ISOLINUX/$ROOT_IMAGE"
+	fi
+
+	if [ "$bootparam_LABEL" != "boot" -a -f /init.d/$bootparam_LABEL.sh ] ; then
+		if [ -f /run/media/$i/$ISOLINUX/$ROOT_IMAGE ] ; then
+		    ./init.d/$bootparam_LABEL.sh $i/$ISOLINUX $ROOT_IMAGE $video_mode $vga_mode $console_params
+		else
+		    fatal "Could not find $bootparam_LABEL script"
+		fi
+
+		# If we're getting here, we failed...
+		fatal "Target $bootparam_LABEL failed"
+	fi
+}

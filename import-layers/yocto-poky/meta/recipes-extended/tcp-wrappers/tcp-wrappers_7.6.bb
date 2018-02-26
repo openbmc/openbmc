@@ -1,4 +1,5 @@
 SUMMARY = "Security tool that is a wrapper for TCP daemons"
+HOMEPAGE = "http://www.softpanorama.org/Net/Network_security/TCP_wrappers/"
 DESCRIPTION = "Tools for monitoring and filtering incoming requests for tcp \
                services."
 SECTION = "console/network"
@@ -73,7 +74,6 @@ EXTRA_OEMAKE = "'CC=${CC}' \
                 'EXTRA_CFLAGS=${CFLAGS} -DSYS_ERRLIST_DEFINED -DHAVE_STRERROR -DHAVE_WEAKSYMS -D_REENTRANT -DINET6=1 -Dss_family=__ss_family -Dss_len=__ss_len'"
 
 EXTRA_OEMAKE_NETGROUP = "-DNETGROUP -DUSE_GETDOMAIN"
-EXTRA_OEMAKE_NETGROUP_libc-uclibc = "-DUSE_GETDOMAIN"
 EXTRA_OEMAKE_NETGROUP_libc-musl = "-DUSE_GETDOMAIN"
 
 EXTRA_OEMAKE_append_libc-musl = " 'LIBS='"

@@ -1,5 +1,7 @@
-DESCRIPTION = "OVMF - UEFI firmware for Qemu and KVM"
-HOMEPAGE = "http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=OVMF"
+SUMMARY = "OVMF - UEFI firmware for Qemu and KVM"
+DESCRIPTION = "OVMF is an EDK II based project to enable UEFI support for \
+Virtual Machines. OVMF contains sample UEFI firmware for QEMU and KVM"
+HOMEPAGE = "https://github.com/tianocore/tianocore.github.io/wiki/OVMF"
 LICENSE = "BSD"
 LICENSE_class-target = "${@bb.utils.contains('PACKAGECONFIG', 'secureboot', 'BSD & OpenSSL', 'BSD', d)}"
 LIC_FILES_CHKSUM = "file://OvmfPkg/License.txt;md5=343dc88e82ff33d042074f62050c3496"
@@ -11,20 +13,25 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[secureboot] = ",,,"
 
 SRC_URI = "git://github.com/tianocore/edk2.git;branch=master \
+	file://0001-ia32-Dont-use-pie.patch \
 	file://0002-ovmf-update-path-to-native-BaseTools.patch \
 	file://0003-BaseTools-makefile-adjust-to-build-in-under-bitbake.patch \
+	file://0004-ovmf-enable-long-path-file.patch \
 	file://VfrCompile-increase-path-length-limit.patch \
-        file://0001-MdeModulePkg-UefiHiiLib-Fix-incorrect-comparison-exp.patch \
+	file://no-stack-protector-all-archs.patch \
         "
+UPSTREAM_VERSION_UNKNOWN = "1"
+
+OPENSSL_RELEASE = "openssl-1.1.0e"
 
 SRC_URI_append_class-target = " \
-	${@bb.utils.contains('PACKAGECONFIG', 'secureboot', 'http://www.openssl.org/source/openssl-1.0.2j.tar.gz;name=openssl;subdir=${S}/CryptoPkg/Library/OpensslLib', '', d)} \
+	${@bb.utils.contains('PACKAGECONFIG', 'secureboot', 'http://www.openssl.org/source/${OPENSSL_RELEASE}.tar.gz;name=openssl;subdir=${S}/CryptoPkg/Library/OpensslLib', '', d)} \
 	file://0007-OvmfPkg-EnrollDefaultKeys-application-for-enrolling-.patch \
 "
 
-SRCREV="4575a602ca6072ee9d04150b38bfb143cbff8588"
-SRC_URI[openssl.md5sum] = "96322138f0b69e61b7212bc53d5e912b"
-SRC_URI[openssl.sha256sum] = "e7aff292be21c259c6af26469c7a9b3ba26e9abaaffd325e3dccc9785256c431"
+SRCREV="ec4910cd3336565fdb61dafdd9ec4ae7a6160ba3"
+SRC_URI[openssl.md5sum] = "51c42d152122e474754aea96f66928c6"
+SRC_URI[openssl.sha256sum] = "57be8618979d80c910728cfc99369bf97b2a1abd8f366ab6ebdee8975ad3874c"
 
 inherit deploy
 
@@ -144,7 +151,7 @@ do_compile_class-native() {
 
 do_compile_class-target() {
     export LFLAGS="${LDFLAGS}"
-    PARALLEL_JOBS="${@ '${PARALLEL_MAKE}'.replace('-j', '-n')}"
+    PARALLEL_JOBS="${@ '${PARALLEL_MAKE}'.replace('-j', '-n ')}"
     OVMF_ARCH="X64"
     if [ "${TARGET_ARCH}" != "x86_64" ] ; then
         OVMF_ARCH="IA32"
@@ -186,10 +193,7 @@ do_compile_class-target() {
         # building with Secure Boot enabled.
         bbnote "Building with Secure Boot."
         rm -rf ${S}/Build/Ovmf$OVMF_DIR_SUFFIX
-        if ! [ -f ${S}/CryptoPkg/Library/OpensslLib/openssl-*/edk2-patch-applied ]; then
-            ( cd ${S}/CryptoPkg/Library/OpensslLib/openssl-* && patch -p1 <$(echo ../EDKII_openssl-*.patch) && touch edk2-patch-applied )
-        fi
-        ( cd ${S}/CryptoPkg/Library/OpensslLib/ && ./Install.sh )
+        ln -sf ${OPENSSL_RELEASE} ${S}/CryptoPkg/Library/OpensslLib/openssl
         ${S}/OvmfPkg/build.sh $PARALLEL_JOBS -a $OVMF_ARCH -b RELEASE -t ${FIXED_GCCVER} ${OVMF_SECURE_BOOT_FLAGS}
         ln ${build_dir}/FV/OVMF.fd ${WORKDIR}/ovmf/ovmf.secboot.fd
         ln ${build_dir}/FV/OVMF_CODE.fd ${WORKDIR}/ovmf/ovmf.secboot.code.fd
@@ -241,3 +245,4 @@ do_deploy_class-target() {
 addtask do_deploy after do_compile before do_build
 
 BBCLASSEXTEND = "native"
+TOOLCHAIN = "gcc"

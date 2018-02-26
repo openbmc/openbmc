@@ -1,0 +1,30 @@
+Subject: explicitly disable replacing getopt
+
+Explicitly disable replacing getopt to avoid compilation error like below.
+
+  xstrtol-error.c:84:26: error: invalid use of undefined type 'struct rpl_option'
+
+Upstream-Status: Inappropriate [workaround]
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ m4/getopt.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/m4/getopt.m4 b/m4/getopt.m4
+index 3ebc7b7..8934426 100644
+--- a/m4/getopt.m4
++++ b/m4/getopt.m4
+@@ -22,8 +22,8 @@ AC_DEFUN([gl_FUNC_GETOPT_POSIX],
+     fi
+   ])
+   if test $REPLACE_GETOPT = 1; then
+-    dnl Arrange for getopt.h to be created.
+-    gl_GETOPT_SUBSTITUTE_HEADER
++    dnl Explicitly disable replacing getopt
++    :
+   fi
+ ])
+ 
+-- 
+2.11.0
+

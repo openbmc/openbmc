@@ -1,0 +1,61 @@
+From 157914941bd38f1a38bb6bd7294ca6c2bc1b8dcb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Jul 2017 15:51:28 -0700
+Subject: [PATCH] fix build with musl libc
+
+Patch from https://github.com/gperftools/gperftools/pull/765/
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac                 | 1 +
+ src/malloc_hook_mmap_linux.h | 8 ++++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b42fea3..70b49a3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -188,6 +188,7 @@ AC_HEADER_STDC
+ AC_CHECK_TYPES([__int64])       # defined in some windows platforms
+ AC_CHECK_TYPES([struct mallinfo],,, [#include <malloc.h>])
+ AC_CHECK_TYPES([Elf32_Versym],,, [#include <elf.h>])   # for vdso_support.h
++AC_CHECK_FUNCS(__sbrk)          # for intercepting glibc memory allocator
+ AC_CHECK_FUNCS(sbrk)            # for tcmalloc to get memory
+ AC_CHECK_FUNCS(geteuid)         # for turning off services when run as root
+ AC_CHECK_FUNCS(fork)            # for the pthread_atfork setup
+diff --git a/src/malloc_hook_mmap_linux.h b/src/malloc_hook_mmap_linux.h
+index 79ac4e3..d444635 100755
+--- a/src/malloc_hook_mmap_linux.h
++++ b/src/malloc_hook_mmap_linux.h
+@@ -46,6 +46,10 @@
+ #include <errno.h>
+ #include "base/linux_syscall_support.h"
+ 
++#ifndef __GLIBC__
++typedef off64_t   __off64_t;
++#endif
++
+ // The x86-32 case and the x86-64 case differ:
+ // 32b has a mmap2() syscall, 64b does not.
+ // 64b and 32b have different calling conventions for mmap().
+@@ -168,7 +172,7 @@ extern "C" void* mmap64(void *start, size_t length, int prot, int flags,
+   return result;
+ }
+ 
+-# if !defined(__USE_FILE_OFFSET64) || !defined(__REDIRECT_NTH)
++# if defined(__GLIBC__) && (!defined(__USE_FILE_OFFSET64) || !defined(__REDIRECT_NTH))
+ 
+ extern "C" void* mmap(void *start, size_t length, int prot, int flags,
+                       int fd, off_t offset) __THROW {
+@@ -206,7 +210,7 @@ extern "C" void* mremap(void* old_addr, size_t old_size, size_t new_size,
+   return result;
+ }
+ 
+-#ifndef __UCLIBC__
++#if HAVE___SBRK
+ // libc's version:
+ extern "C" void* __sbrk(ptrdiff_t increment);
+ 
+-- 
+2.13.3
+

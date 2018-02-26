@@ -1,0 +1,108 @@
+From b2b504fc1959c7a3f0a843c3c204e8e193b675b7 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Wed, 15 Oct 2014 10:39:30 -0500
+Subject: [PATCH 04/14] RH: don't start without a config file
+
+If /etc/multipath.conf doesn't exist, don't start multipathd and blacklist
+all devices when running multipath.  A completely blank configuration file
+is almost never what users want.  Also, people may have the multipath
+packages installed but don't want to use them.  This patch provides a
+simple way to disable multipath.  Simply removing or renaming
+/etc/multipath.conf will keep multipath from doing anything.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ libmultipath/config.c         | 17 +++++++++++++++++
+ libmultipath/config.h         |  1 +
+ multipath/multipath.rules     |  1 +
+ multipathd/multipathd.8       |  2 ++
+ multipathd/multipathd.service |  1 +
+ 5 files changed, 22 insertions(+)
+
+diff --git a/libmultipath/config.c b/libmultipath/config.c
+index bb6619b..aae69b8 100644
+--- a/libmultipath/config.c
++++ b/libmultipath/config.c
+@@ -25,6 +25,7 @@
+ #include "prio.h"
+ #include "devmapper.h"
+ #include "mpath_cmd.h"
++#include "version.h"
+ 
+ static int
+ hwe_strmatch (struct hwentry *hwe1, struct hwentry *hwe2)
+@@ -667,6 +668,22 @@ load_config (char * file)
+ 			factorize_hwtable(conf->hwtable, builtin_hwtable_size);
+ 		}
+ 
++	} else {
++		condlog(0, "/etc/multipath.conf does not exist, blacklisting all devices.");
++		condlog(0, "A default multipath.conf file is located at");
++		condlog(0, "/usr/share/doc/device-mapper-multipath-%d.%d.%d/multipath.conf", MULTIPATH_VERSION(VERSION_CODE));
++		if (conf->blist_devnode == NULL) {
++			conf->blist_devnode = vector_alloc();
++			if (!conf->blist_devnode) {
++				condlog(0, "cannot allocate blacklist\n");
++				goto out;
++			}
++		}
++		if (store_ble(conf->blist_devnode, strdup(".*"),
++		              ORIGIN_NO_CONFIG)) {
++			condlog(0, "cannot store default no-config blacklist\n");
++			goto out;
++		}
+ 	}
+ 
+ 	conf->processed_main_config = 1;
+diff --git a/libmultipath/config.h b/libmultipath/config.h
+index ffc69b5..614331c 100644
+--- a/libmultipath/config.h
++++ b/libmultipath/config.h
+@@ -7,6 +7,7 @@
+ 
+ #define ORIGIN_DEFAULT 0
+ #define ORIGIN_CONFIG  1
++#define ORIGIN_NO_CONFIG 2
+ 
+ /*
+  * In kernel, fast_io_fail == 0 means immediate failure on rport delete.
+diff --git a/multipath/multipath.rules b/multipath/multipath.rules
+index 4d78b98..5753766 100644
+--- a/multipath/multipath.rules
++++ b/multipath/multipath.rules
+@@ -6,6 +6,7 @@ IMPORT{cmdline}="nompath"
+ ENV{nompath}=="?*", GOTO="end_mpath"
+ IMPORT{cmdline}="multipath"
+ ENV{multipath}=="off", GOTO="end_mpath"
++TEST!="/etc/multipath.conf", GOTO="end_mpath"
+ 
+ KERNEL=="dm-*", GOTO="check_kpartx"
+ ENV{DEVTYPE}!="partition", GOTO="test_dev"
+diff --git a/multipathd/multipathd.8 b/multipathd/multipathd.8
+index 4c765af..c1499a5 100644
+--- a/multipathd/multipathd.8
++++ b/multipathd/multipathd.8
+@@ -39,6 +39,8 @@ map regains its maximum performance and redundancy.
+ This daemon executes the external \fBmultipath\fR tool when events occur.
+ In turn, the multipath tool signals the multipathd daemon when it is done with
+ devmap reconfiguration, so that it can refresh its failed path list.
++
++In this Linux distribution, multipathd does not run unless a /etc/multipath.conffile exists
+ .
+ .
+ .\" ----------------------------------------------------------------------------
+diff --git a/multipathd/multipathd.service b/multipathd/multipathd.service
+index fd66cf6..fafd088 100644
+--- a/multipathd/multipathd.service
++++ b/multipathd/multipathd.service
+@@ -4,6 +4,7 @@ Wants=systemd-udev-trigger.service systemd-udev-settle.service
+ Before=iscsi.service iscsid.service lvm2-lvmetad.service lvm2-activation-early.service
+ Before=local-fs-pre.target blk-availability.service
+ After=multipathd.socket systemd-udev-trigger.service systemd-udev-settle.service
++ConditionPathExists=/etc/multipath.conf
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+ ConditionKernelCommandLine=!nompath
+-- 
+2.8.1
+

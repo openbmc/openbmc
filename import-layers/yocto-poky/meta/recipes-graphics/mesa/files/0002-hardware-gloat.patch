@@ -1,0 +1,51 @@
+From 00bcd599310dc7fce4fe336ffd85902429051a0c Mon Sep 17 00:00:00 2001
+From: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+Date: Sun, 20 Mar 2016 13:27:04 +0100
+Subject: [PATCH 2/4] hardware gloat
+
+Upstream-Status: Inappropriate [not author]
+Signed-off-by: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+---
+ src/gallium/drivers/llvmpipe/lp_screen.c | 7 +++++++
+ src/gallium/drivers/softpipe/sp_screen.c | 7 +++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/src/gallium/drivers/llvmpipe/lp_screen.c b/src/gallium/drivers/llvmpipe/lp_screen.c
+index 4f61de8..3b0ec77 100644
+--- a/src/gallium/drivers/llvmpipe/lp_screen.c
++++ b/src/gallium/drivers/llvmpipe/lp_screen.c
+@@ -411,6 +411,13 @@ llvmpipe_is_format_supported( struct pipe_screen *_screen,
+    if (!format_desc)
+       return FALSE;
+ 
++   if ((bind & PIPE_BIND_RENDER_TARGET) &&
++       format != PIPE_FORMAT_R9G9B9E5_FLOAT &&
++       format != PIPE_FORMAT_R11G11B10_FLOAT &&
++       util_format_is_float(format)) {
++      return FALSE;
++   }
++
+    assert(target == PIPE_BUFFER ||
+           target == PIPE_TEXTURE_1D ||
+           target == PIPE_TEXTURE_1D_ARRAY ||
+diff --git a/src/gallium/drivers/softpipe/sp_screen.c b/src/gallium/drivers/softpipe/sp_screen.c
+index 031602b..c279120 100644
+--- a/src/gallium/drivers/softpipe/sp_screen.c
++++ b/src/gallium/drivers/softpipe/sp_screen.c
+@@ -358,6 +358,13 @@ softpipe_is_format_supported( struct pipe_screen *screen,
+    if (!format_desc)
+       return FALSE;
+ 
++   if ((bind & PIPE_BIND_RENDER_TARGET) &&
++       format != PIPE_FORMAT_R9G9B9E5_FLOAT &&
++       format != PIPE_FORMAT_R11G11B10_FLOAT &&
++       util_format_is_float(format)) {
++      return FALSE;
++   }
++
+    if (sample_count > 1)
+       return FALSE;
+ 
+-- 
+2.7.4
+

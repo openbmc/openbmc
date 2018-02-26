@@ -1,0 +1,37 @@
+From d195f8cfe41991573128ccdcd3a0ed0267aa5e33 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 28 Jun 2017 19:44:46 -0700
+Subject: [PATCH] backtrace: Replace struct ucontext with ucontext_t
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/backtrace.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/backtrace.c b/src/backtrace.c
+index 69bee99..dc35f8f 100644
+--- a/src/backtrace.c
++++ b/src/backtrace.c
+@@ -42,7 +42,7 @@
+ #define MAX_BTSIZE 64
+ 
+ void backtrace_handler(int n, siginfo_t *ist, void *extra) {
+-  static struct ucontext *puc;
++  static ucontext_t *puc;
+   static void *btinfo[MAX_BTSIZE];
+   static char **messages = NULL;
+   static size_t btsize = 0;
+@@ -58,7 +58,7 @@ void backtrace_handler(int n, siginfo_t *ist, void *extra) {
+ 
+ #define SIC_CASE(c) case c: strerr = #c
+ 
+-  puc = (struct ucontext *)extra;
++  puc = (ucontext_t *)extra;
+   switch(n) {
+   case SIGSEGV:
+     switch(ist->si_code) {
+-- 
+2.13.2
+

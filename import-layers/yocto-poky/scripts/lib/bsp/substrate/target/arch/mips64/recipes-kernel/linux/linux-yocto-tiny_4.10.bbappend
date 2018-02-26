@@ -20,7 +20,9 @@ KBRANCH_{{=machine}}  = "{{=existing_kbranch}}"
 {{ if smp == "y": }}
 KERNEL_FEATURES_append_{{=machine}} += " cfg/smp.scc"
 
-SRC_URI += "file://{{=machine}}-tiny.scc \
+SRC_URI += "file://{{=machine}}.scc \
+            file://{{=machine}}.cfg \
+            file://{{=machine}}-tiny.scc \
             file://{{=machine}}-user-config.cfg \
             file://{{=machine}}-user-patches.scc \
             file://{{=machine}}-user-features.scc \

@@ -43,6 +43,11 @@ do_install_ptest() {
 	tar -c --exclude=nfs test/ | ( cd ${D}${PTEST_PATH} && tar -xf - )
 	mkdir ${D}${PTEST_PATH}/include
 	cp ${S}/include/builddefs ${S}/include/buildmacros ${S}/include/buildrules ${D}${PTEST_PATH}/include/
+	# Remove any build host references
+	sed -e "s:--sysroot=${STAGING_DIR_TARGET}::g" \
+	    -e 's:${HOSTTOOLS_DIR}/::g' \
+	    -e 's:${RECIPE_SYSROOT_NATIVE}::g' \
+	    -i ${D}${PTEST_PATH}/include/builddefs
 }
 
 RDEPENDS_${PN}-ptest = "acl bash coreutils perl perl-module-filehandle perl-module-getopt-std perl-module-posix shadow"

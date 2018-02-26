@@ -1,0 +1,29 @@
+From 6f799f1f0e68cc7bf89c0a56aec5ecf46937619d Mon Sep 17 00:00:00 2001
+From: Ricardo Salveti <rsalveti@rsalveti.net>
+Date: Thu, 15 Jun 2017 10:02:38 -0300
+Subject: [PATCH] dns/resolved: also check for /etc/resolv-conf.systemd
+
+OE specific resolv.conf path, so it can be enabled by default if available.
+
+Upstream-Status: Inappropriate [OE config specific]
+
+Signed-off-by: Ricardo Salveti <rsalveti@rsalveti.net>
+---
+ src/dns-manager/nm-dns-manager.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/dns-manager/nm-dns-manager.c b/src/dns-manager/nm-dns-manager.c
+index c1d2bf7..d70d4b4 100644
+--- a/src/dns-manager/nm-dns-manager.c
++++ b/src/dns-manager/nm-dns-manager.c
+@@ -1596,6 +1596,7 @@ _resolvconf_resolved_managed (void)
+ 		"/run/systemd/resolve/resolv.conf",
+ 		"/lib/systemd/resolv.conf",
+ 		"/usr/lib/systemd/resolv.conf",
++		"/etc/resolv-conf.systemd",
+ 	};
+ 	GFile *f;
+ 	GFileInfo *info;
+-- 
+2.7.4
+

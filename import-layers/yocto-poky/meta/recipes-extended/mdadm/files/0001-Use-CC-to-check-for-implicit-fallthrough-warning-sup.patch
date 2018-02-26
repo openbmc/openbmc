@@ -1,0 +1,31 @@
+From a129ee6d80f3b2cda0d827c35fa81a517cf6d505 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 13 Oct 2017 10:27:34 -0700
+Subject: [PATCH] Use CC to check for implicit-fallthrough warning support
+
+This warning it new in gcc7 and in cross compile case
+its possible that build host gcc is version 7+ but the
+cross compile used for compiling mdadm is < version 7
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index d207ee4..971f255 100644
+--- a/Makefile
++++ b/Makefile
+@@ -48,7 +48,7 @@ ifdef WARN_UNUSED
+ CWFLAGS += -Wp,-D_FORTIFY_SOURCE=2 -O3
+ endif
+ 
+-FALLTHROUGH := $(shell gcc -v --help 2>&1 | grep "implicit-fallthrough" | wc -l)
++FALLTHROUGH := $(shell ${CC} -v --help 2>&1 | grep "implicit-fallthrough" | wc -l)
+ ifneq "$(FALLTHROUGH)"  "0"
+ CWFLAGS += -Wimplicit-fallthrough=0
+ endif
+-- 
+2.14.2
+

@@ -350,6 +350,14 @@ def check_not_nfs(path, name):
         return "The %s: %s can't be located on nfs.\n" % (name, path)
     return ""
 
+# Check that the path is on a case-sensitive file system
+def check_case_sensitive(path, name):
+    import tempfile
+    with tempfile.NamedTemporaryFile(prefix='TmP', dir=path) as tmp_file:
+        if os.path.exists(tmp_file.name.lower()):
+            return "The %s (%s) can't be on a case-insensitive file system.\n" % (name, path)
+        return ""
+
 # Check that path isn't a broken symlink
 def check_symlink(lnk, data):
     if os.path.islink(lnk) and not os.path.exists(lnk):
@@ -447,45 +455,6 @@ def check_sanity_validmachine(sanity_data):
         messages = messages + "Error, the PACKAGE_ARCHS variable (%s) for DEFAULTTUNE (%s) does not contain TUNE_PKGARCH (%s)." % (pkgarchs, defaulttune, tunepkg)
 
     return messages
-
-# Checks if necessary to add option march to host gcc
-def check_gcc_march(sanity_data):
-    result = True
-    message = ""
-
-    # Check if -march not in BUILD_CFLAGS
-    if sanity_data.getVar("BUILD_CFLAGS").find("-march") < 0:
-        result = False
-
-        # Construct a test file
-        f = open("gcc_test.c", "w")
-        f.write("int main (){ volatile int atomic = 2; __sync_bool_compare_and_swap (&atomic, 2, 3); return 0; }\n")
-        f.close()
-
-        # Check if GCC could work without march
-        if not result:
-            status,res = oe.utils.getstatusoutput(sanity_data.expand("${BUILD_CC} gcc_test.c -o gcc_test"))
-            if status == 0:
-                result = True;
-
-        if not result:
-            status,res = oe.utils.getstatusoutput(sanity_data.expand("${BUILD_CC} -march=native gcc_test.c -o gcc_test"))
-            if status == 0:
-                message = "BUILD_CFLAGS_append = \" -march=native\""
-                result = True;
-
-        if not result:
-            build_arch = sanity_data.getVar('BUILD_ARCH')
-            status,res = oe.utils.getstatusoutput(sanity_data.expand("${BUILD_CC} -march=%s gcc_test.c -o gcc_test" % build_arch))
-            if status == 0:
-                message = "BUILD_CFLAGS_append = \" -march=%s\"" % build_arch
-                result = True;
-
-        os.remove("gcc_test.c")
-        if os.path.exists("gcc_test"):
-            os.remove("gcc_test")
-
-    return (result, message)
 
 # Unpatched versions of make 3.82 are known to be broken.  See GNU Savannah Bug 30612.
 # Use a modified reproducer from http://savannah.gnu.org/bugs/?30612 to validate.
@@ -612,7 +581,7 @@ def check_sanity_sstate_dir_change(sstate_dir, data):
         except IndexError:
             pass
     return testmsg
-       
+
 def check_sanity_version_change(status, d):
     # Sanity checks to be done when SANITY_VERSION or NATIVELSBSTRING changes
     # In other words, these tests run once in a given build directory and then 
@@ -656,23 +625,6 @@ def check_sanity_version_change(status, d):
     # Check user doesn't have ASSUME_PROVIDED = instead of += in local.conf
     if "diffstat-native" not in assume_provided:
         status.addresult('Please use ASSUME_PROVIDED +=, not ASSUME_PROVIDED = in your local.conf\n')
-
-    if "qemu-native" in assume_provided:
-        if not check_app_exists("qemu-arm", d):
-            status.addresult("qemu-native was in ASSUME_PROVIDED but the QEMU binaries (qemu-arm) can't be found in PATH")
-
-    if "libsdl-native" in assume_provided:
-        if not check_app_exists("sdl-config", d):
-            status.addresult("libsdl-native is set to be ASSUME_PROVIDED but sdl-config can't be found in PATH. Please either install it, or configure qemu not to require sdl.")
-
-    (result, message) = check_gcc_march(d)
-    if result and message:
-        status.addresult("Your gcc version is older than 4.5, please add the following param to local.conf\n \
-        %s\n" % message)
-    if not result:
-        status.addresult("Your gcc version is older than 4.5 or is not working properly.  Please verify you can build")
-        status.addresult(" and link something that uses atomic operations, such as: \n")
-        status.addresult("        __sync_bool_compare_and_swap (&atomic, 2, 3);\n")
 
     # Check that TMPDIR isn't on a filesystem with limited filename length (eg. eCryptFS)
     tmpdir = d.getVar('TMPDIR')
@@ -728,6 +680,10 @@ def check_sanity_version_change(status, d):
     # Check that TMPDIR isn't located on nfs
     status.addresult(check_not_nfs(tmpdir, "TMPDIR"))
 
+    # Check for case-insensitive file systems (such as Linux in Docker on
+    # macOS with default HFS+ file system)
+    status.addresult(check_case_sensitive(tmpdir, "TMPDIR"))
+
 def sanity_check_locale(d):
     """
     Currently bitbake switches locale to en_US.UTF-8 so check that this locale actually exists.
@@ -746,10 +702,10 @@ def check_sanity_everybuild(status, d):
     if 0 == os.getuid():
         raise_sanity_error("Do not use Bitbake as root.", d)
 
-    # Check the Python version, we now have a minimum of Python 2.7.3
+    # Check the Python version, we now have a minimum of Python 3.4
     import sys
-    if sys.hexversion < 0x020703F0:
-        status.addresult('The system requires at least Python 2.7.3 to run. Please update your Python interpreter.\n')
+    if sys.hexversion < 0x03040000:
+        status.addresult('The system requires at least Python 3.4 to run. Please update your Python interpreter.\n')
 
     # Check the bitbake version meets minimum requirements
     from distutils.version import LooseVersion
@@ -769,6 +725,11 @@ def check_sanity_everybuild(status, d):
     if distro and distro != "nodistro":
         if not ( check_conf_exists("conf/distro/${DISTRO}.conf", d) or check_conf_exists("conf/distro/include/${DISTRO}.inc", d) ):
             status.addresult("DISTRO '%s' not found. Please set a valid DISTRO in your local.conf\n" % d.getVar("DISTRO"))
+
+    # Check that these variables don't use tilde-expansion as we don't do that
+    for v in ("TMPDIR", "DL_DIR", "SSTATE_DIR"):
+        if d.getVar(v).startswith("~"):
+            status.addresult("%s uses ~ but Bitbake will not expand this, use an absolute path or variables." % v)
 
     # Check that DL_DIR is set, exists and is writable. In theory, we should never even hit the check if DL_DIR isn't 
     # set, since so much relies on it being set.
@@ -839,7 +800,7 @@ def check_sanity_everybuild(status, d):
 
         # Split into pairs
         if len(mirrors) % 2 != 0:
-            bb.warn('Invalid mirror variable value for %s: %s, should contain paired members.' % (mirror_var, mirrors.strip()))
+            bb.warn('Invalid mirror variable value for %s: %s, should contain paired members.' % (mirror_var, str(mirrors)))
             continue
         mirrors = list(zip(*[iter(mirrors)]*2))
 

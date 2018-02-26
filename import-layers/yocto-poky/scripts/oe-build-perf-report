@@ -29,12 +29,14 @@ sys.path.append(os.path.join(scripts_path, 'lib'))
 import scriptpath
 from build_perf import print_table
 from build_perf.report import (metadata_xml_to_json, results_xml_to_json,
-                               aggregate_data, aggregate_metadata, measurement_stats)
+                               aggregate_data, aggregate_metadata, measurement_stats,
+                               AggregateTestData)
 from build_perf import html
+from buildstats import BuildStats, diff_buildstats, BSVerDiff
 
 scriptpath.add_oe_lib_path()
 
-from oeqa.utils.git import GitRepo
+from oeqa.utils.git import GitRepo, GitError
 
 
 # Setup logging
@@ -82,29 +84,52 @@ def get_test_runs(repo, tag_name, **kwargs):
     # Return field names and a sorted list of revs
     return undef_fields, sorted(revs)
 
-def list_test_revs(repo, tag_name, **kwargs):
+def list_test_revs(repo, tag_name, verbosity, **kwargs):
     """Get list of all tested revisions"""
-    fields, revs = get_test_runs(repo, tag_name, **kwargs)
+    valid_kwargs = dict([(k, v) for k, v in kwargs.items() if v is not None])
+
+    fields, revs = get_test_runs(repo, tag_name, **valid_kwargs)
     ignore_fields = ['tag_number']
+    if verbosity < 2:
+        extra_fields = ['COMMITS', 'TEST RUNS']
+        ignore_fields.extend(['commit_number', 'commit'])
+    else:
+        extra_fields = ['TEST RUNS']
+
     print_fields = [i for i, f in enumerate(fields) if f not in ignore_fields]
 
     # Sort revs
-    rows = [[fields[i].upper() for i in print_fields] + ['TEST RUNS']]
-    prev = [''] * len(revs)
+    rows = [[fields[i].upper() for i in print_fields] + extra_fields]
+
+    prev = [''] * len(print_fields)
+    prev_commit = None
+    commit_cnt = 0
+    commit_field = fields.index('commit')
     for rev in revs:
         # Only use fields that we want to print
-        rev = [rev[i] for i in print_fields]
+        cols = [rev[i] for i in print_fields]
 
-        if rev != prev:
-            new_row = [''] * len(print_fields) + [1]
+
+        if cols != prev:
+            commit_cnt = 1
+            test_run_cnt = 1
+            new_row = [''] * (len(print_fields) + len(extra_fields))
+
             for i in print_fields:
-                if rev[i] != prev[i]:
+                if cols[i] != prev[i]:
                     break
-            new_row[i:-1] = rev[i:]
+            new_row[i:-len(extra_fields)] = cols[i:]
             rows.append(new_row)
         else:
-            rows[-1][-1] += 1
-        prev = rev
+            if rev[commit_field] != prev_commit:
+                commit_cnt += 1
+            test_run_cnt += 1
+
+        if verbosity < 2:
+            new_row[-2] = commit_cnt
+        new_row[-1] = test_run_cnt
+        prev = cols
+        prev_commit = rev[commit_field]
 
     print_table(rows)
 
@@ -309,20 +334,50 @@ def print_diff_report(metadata_l, data_l, metadata_r, data_r):
     print()
 
 
-def print_html_report(data, id_comp):
+class BSSummary(object):
+    def __init__(self, bs1, bs2):
+        self.tasks = {'count': bs2.num_tasks,
+                      'change': '{:+d}'.format(bs2.num_tasks - bs1.num_tasks)}
+        self.top_consumer = None
+        self.top_decrease = None
+        self.top_increase = None
+        self.ver_diff = OrderedDict()
+
+        tasks_diff = diff_buildstats(bs1, bs2, 'cputime')
+
+        # Get top consumers of resources
+        tasks_diff = sorted(tasks_diff, key=attrgetter('value2'))
+        self.top_consumer = tasks_diff[-5:]
+
+        # Get biggest increase and decrease in resource usage
+        tasks_diff = sorted(tasks_diff, key=attrgetter('absdiff'))
+        self.top_decrease = tasks_diff[0:5]
+        self.top_increase = tasks_diff[-5:]
+
+        # Compare recipe versions and prepare data for display
+        ver_diff = BSVerDiff(bs1, bs2)
+        if ver_diff:
+            if ver_diff.new:
+                self.ver_diff['New recipes'] = [(n, r.evr) for n, r in ver_diff.new.items()]
+            if ver_diff.dropped:
+                self.ver_diff['Dropped recipes'] = [(n, r.evr) for n, r in ver_diff.dropped.items()]
+            if ver_diff.echanged:
+                self.ver_diff['Epoch changed'] = [(n, "{} &rarr; {}".format(r.left.evr, r.right.evr)) for n, r in ver_diff.echanged.items()]
+            if ver_diff.vchanged:
+                self.ver_diff['Version changed'] = [(n, "{} &rarr; {}".format(r.left.version, r.right.version)) for n, r in ver_diff.vchanged.items()]
+            if ver_diff.rchanged:
+                self.ver_diff['Revision changed'] = [(n, "{} &rarr; {}".format(r.left.evr, r.right.evr)) for n, r in ver_diff.rchanged.items()]
+
+
+def print_html_report(data, id_comp, buildstats):
     """Print report in html format"""
     # Handle metadata
-    metadata = {'branch': {'title': 'Branch', 'value': 'master'},
-                'hostname': {'title': 'Hostname', 'value': 'foobar'},
-                'commit': {'title': 'Commit', 'value': '1234'}
-               }
-    metadata = metadata_diff(data[id_comp][0], data[-1][0])
-
+    metadata = metadata_diff(data[id_comp].metadata, data[-1].metadata)
 
     # Generate list of tests
     tests = []
-    for test in data[-1][1]['tests'].keys():
-        test_r = data[-1][1]['tests'][test]
+    for test in data[-1].results['tests'].keys():
+        test_r = data[-1].results['tests'][test]
         new_test = {'name': test_r['name'],
                     'description': test_r['description'],
                     'status': test_r['status'],
@@ -368,6 +423,16 @@ def print_html_report(data, id_comp):
             new_meas['value'] = samples[-1]
             new_meas['value_type'] = samples[-1]['val_cls']
 
+            # Compare buildstats
+            bs_key = test + '.' + meas
+            rev = metadata['commit_num']['value']
+            comp_rev = metadata['commit_num']['value_old']
+            if (rev in buildstats and bs_key in buildstats[rev] and
+                    comp_rev in buildstats and bs_key in buildstats[comp_rev]):
+                new_meas['buildstats'] = BSSummary(buildstats[comp_rev][bs_key],
+                                                   buildstats[rev][bs_key])
+
+
             new_test['measurements'].append(new_meas)
         tests.append(new_test)
 
@@ -376,7 +441,61 @@ def print_html_report(data, id_comp):
                             'max': get_data_item(data[-1][0], 'layers.meta.commit_count')}
                  }
 
-    print(html.template.render(metadata=metadata, test_data=tests, chart_opts=chart_opts))
+    print(html.template.render(title="Build Perf Test Report",
+                               metadata=metadata, test_data=tests,
+                               chart_opts=chart_opts))
+
+
+def get_buildstats(repo, notes_ref, revs, outdir=None):
+    """Get the buildstats from git notes"""
+    full_ref = 'refs/notes/' + notes_ref
+    if not repo.rev_parse(full_ref):
+        log.error("No buildstats found, please try running "
+                  "'git fetch origin %s:%s' to fetch them from the remote",
+                  full_ref, full_ref)
+        return
+
+    missing = False
+    buildstats = {}
+    log.info("Parsing buildstats from 'refs/notes/%s'", notes_ref)
+    for rev in revs:
+        buildstats[rev.commit_number] = {}
+        log.debug('Dumping buildstats for %s (%s)', rev.commit_number,
+                  rev.commit)
+        for tag in rev.tags:
+            log.debug('    %s', tag)
+            try:
+                bs_all = json.loads(repo.run_cmd(['notes', '--ref', notes_ref,
+                                                  'show', tag + '^0']))
+            except GitError:
+                log.warning("Buildstats not found for %s", tag)
+                bs_all = {}
+                missing = True
+
+            for measurement, bs in bs_all.items():
+                # Write out onto disk
+                if outdir:
+                    tag_base, run_id = tag.rsplit('/', 1)
+                    tag_base = tag_base.replace('/', '_')
+                    bs_dir = os.path.join(outdir, measurement, tag_base)
+                    if not os.path.exists(bs_dir):
+                        os.makedirs(bs_dir)
+                    with open(os.path.join(bs_dir, run_id + '.json'), 'w') as f:
+                        json.dump(bs, f, indent=2)
+
+                # Read buildstats into a dict
+                _bs = BuildStats.from_json(bs)
+                if measurement not in buildstats[rev.commit_number]:
+                    buildstats[rev.commit_number][measurement] = _bs
+                else:
+                    buildstats[rev.commit_number][measurement].aggregate(_bs)
+
+    if missing:
+        log.info("Buildstats were missing for some test runs, please "
+                 "run 'git fetch origin %s:%s' and try again",
+                 full_ref, full_ref)
+
+    return buildstats
 
 
 def auto_args(repo, args):
@@ -411,7 +530,7 @@ Examine build performance test results from a Git repository"""
                         help="Verbose logging")
     parser.add_argument('--repo', '-r', required=True,
                         help="Results repository (local git clone)")
-    parser.add_argument('--list', '-l', action='store_true',
+    parser.add_argument('--list', '-l', action='count',
                         help="List available test runs")
     parser.add_argument('--html', action='store_true',
                         help="Generate report in html format")
@@ -434,6 +553,8 @@ Examine build performance test results from a Git repository"""
     group.add_argument('--commit-number2',
                        help="Revision number to compare with, redundant if "
                             "--commit2 is specified")
+    parser.add_argument('--dump-buildstats', nargs='?', const='.',
+                        help="Dump buildstats of the tests")
 
     return parser.parse_args(argv)
 
@@ -447,7 +568,7 @@ def main(argv=None):
     repo = GitRepo(args.repo)
 
     if args.list:
-        list_test_revs(repo, args.tag_name)
+        list_test_revs(repo, args.tag_name, args.list, hostname=args.hostname)
         return 0
 
     # Determine hostname which to use
@@ -501,7 +622,7 @@ def main(argv=None):
     xml = is_xml_format(repo, revs[index_r].tags[-1])
 
     if args.html:
-        index_0 = max(0, index_r - args.history_length)
+        index_0 = max(0, min(index_l, index_r - args.history_length))
         rev_range = range(index_0, index_r + 1)
     else:
         # We do not need range of commits for text report (no graphs)
@@ -515,18 +636,27 @@ def main(argv=None):
 
     data = []
     for raw_m, raw_d in raw_data:
-        data.append((aggregate_metadata(raw_m), aggregate_data(raw_d)))
+        data.append(AggregateTestData(aggregate_metadata(raw_m),
+                                      aggregate_data(raw_d)))
 
     # Re-map list indexes to the new table starting from index 0
     index_r = index_r - index_0
     index_l = index_l - index_0
 
+    # Read buildstats only when needed
+    buildstats = None
+    if args.dump_buildstats or args.html:
+        outdir = 'oe-build-perf-buildstats' if args.dump_buildstats else None
+        notes_ref = 'buildstats/{}/{}/{}'.format(args.hostname, args.branch,
+                                                 args.machine)
+        buildstats = get_buildstats(repo, notes_ref, [rev_l, rev_r], outdir)
+
     # Print report
     if not args.html:
-        print_diff_report(data[index_l][0], data[index_l][1],
-                          data[index_r][0], data[index_r][1])
+        print_diff_report(data[index_l].metadata, data[index_l].results,
+                          data[index_r].metadata, data[index_r].results)
     else:
-        print_html_report(data, index_l)
+        print_html_report(data, index_l, buildstats)
 
     return 0
 

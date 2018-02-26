@@ -1,0 +1,32 @@
+From d13b918a3ff8b0ebfd1e7b18b198b4b45841d720 Mon Sep 17 00:00:00 2001
+From: Andrea Galbusera <gizero@gmail.com>
+Date: Fri, 31 Jul 2015 16:42:08 +0200
+Subject: [PATCH] Makefile: remove hardcoding of CC
+
+* upgrade previous patch to avoid wiping CFLAGS. This fixes build on arm
+platforms which previously caused and issue due to -fPIC being lost
+
+Signed-off-by: Andrea Galbusera <gizero@gmail.com>
+---
+ Makefile | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 8b0f0c2..66a4317 100644
+--- a/Makefile
++++ b/Makefile
+@@ -34,11 +34,6 @@ define REDIS_TEST_CONFIG
+ endef
+ export REDIS_TEST_CONFIG
+ 
+-# Fallback to gcc when $CC is not in $PATH.
+-CC:=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
+-OPTIMIZATION?=-O3
+-WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
+-DEBUG?= -g -ggdb
+ REAL_CFLAGS=$(OPTIMIZATION) -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG) $(ARCH)
+ REAL_LDFLAGS=$(LDFLAGS) $(ARCH)
+ 
+-- 
+1.9.1
+

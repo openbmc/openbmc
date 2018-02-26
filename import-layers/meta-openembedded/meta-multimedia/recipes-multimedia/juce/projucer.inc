@@ -3,19 +3,19 @@ DESCRIPTION = "Projucer is used to build and generate support files and build in
 JUCE supported platforms, including Linux and Embedded Linux."
 SECTION = "utils"
 HOMEPAGE = "http://juce.com/"
-LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://README.txt;md5=9ab765ccda8890efc753f287911a1958"
+LICENSE = "GPLv3"
+LIC_FILES_CHKSUM = "file://README.md;md5=65c50b4ff3522b99436da100536ccd1c"
 
 inherit pkgconfig
 
 DEPENDS = "libx11 libxext libxinerama libxrandr libxcursor freetype alsa-lib curl"
 
-SRCREV = "a8a7fa28e2e9cb19db6a27fcccb567a8ccfe6109"
-BRANCH = "develop"
-SRC_URI = "git://github.com/julianstorer/JUCE.git;protocol=https;branch=${BRANCH}"
+SRCREV = "4f41f28b47d01b939559123d145b4e5860528bb7"
+BRANCH = "master"
+SRC_URI = "git://github.com/WeAreROLI/JUCE.git;protocol=https;branch=${BRANCH}"
 
 S = "${WORKDIR}/git"
-PV = "4.2.3+git${SRCPV}"
+PV = "5.0.1"
 
 JUCE_PROJUCER_BUILD_PATH = "${B}/extras/Projucer/Builds"
 JUCE_PROJUCER_MAKEFILE_PATH = "${JUCE_PROJUCER_BUILD_PATH}/LinuxMakefile"

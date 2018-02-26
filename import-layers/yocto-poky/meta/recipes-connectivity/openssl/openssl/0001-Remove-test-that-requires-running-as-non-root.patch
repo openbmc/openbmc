@@ -1,0 +1,49 @@
+From 3fdb1e2a16ea405c6731447a8994f222808ef7e6 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 7 Apr 2017 18:01:52 +0300
+Subject: [PATCH] Remove test that requires running as non-root
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ test/recipes/40-test_rehash.t | 17 +----------------
+ 1 file changed, 1 insertion(+), 16 deletions(-)
+
+diff --git a/test/recipes/40-test_rehash.t b/test/recipes/40-test_rehash.t
+index f902c23..c7567c1 100644
+--- a/test/recipes/40-test_rehash.t
++++ b/test/recipes/40-test_rehash.t
+@@ -23,7 +23,7 @@ setup("test_rehash");
+ plan skip_all => "test_rehash is not available on this platform"
+     unless run(app(["openssl", "rehash", "-help"]));
+ 
+-plan tests => 5;
++plan tests => 3;
+ 
+ indir "rehash.$$" => sub {
+     prepare();
+@@ -42,21 +42,6 @@ indir "rehash.$$" => sub {
+        'Testing rehash operations on empty directory');
+ }, create => 1, cleanup => 1;
+ 
+-indir "rehash.$$" => sub {
+-    prepare();
+-    chmod 0500, curdir();
+-  SKIP: {
+-      if (!ok(!open(FOO, ">unwritable.txt"),
+-              "Testing that we aren't running as a privileged user, such as root")) {
+-          close FOO;
+-          skip "It's pointless to run the next test as root", 1;
+-      }
+-      isnt(run(app(["openssl", "rehash", curdir()])), 1,
+-           'Testing rehash operations on readonly directory');
+-    }
+-    chmod 0700, curdir();       # make it writable again, so cleanup works
+-}, create => 1, cleanup => 1;
+-
+ sub prepare {
+     my @pemsourcefiles = sort glob(srctop_file('test', "*.pem"));
+     my @destfiles = ();
+-- 
+2.11.0
+

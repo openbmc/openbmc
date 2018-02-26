@@ -1,0 +1,81 @@
+From 37725f3e22edb50e0ca2d1fff971321a5a4d5112 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 12 Jul 2017 03:05:13 -0400
+Subject: [PATCH 11/11] Moved the call to isc_app_ctxstart() to not get signal
+ block by all threads
+
+Signed-off-by: Francis Dupont <fdupont@isc.org>
+
+In https://source.isc.org/git/bind9.git, since the following
+commit applied:
+...
+commit b99bfa184bc9375421b5df915eea7dfac6a68a99
+Author: Evan Hunt <each@isc.org>
+Date:   Wed Apr 10 13:49:57 2013 -0700
+
+    [master] unify internal and export libraries
+
+    3550.       [func]          Unified the internal and export versions of the
+                        BIND libraries, allowing external clients to use
+                        the same libraries as BIND. [RT #33131]
+...
+(git show b99bfa184bc9375421b5df915eea7dfac6a68a99 -- ./lib/isc/unix/app.c)
+
+In this commit, if bind9 enable threads(ISC_PLATFORM_USETHREADS),
+it blocks signal SIGHUP, SIGINT and SIGTERM in isc__app_ctxstart.
+Which caused dhclient/dhcpd could not be stopped by SIGTERM.
+
+It caused systemd's reboot hung which send SIGTERM by default.
+
+Upstream-Status: Backport [https://source.isc.org/git/dhcp.git]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ omapip/isclib.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
+
+diff --git a/omapip/isclib.c b/omapip/isclib.c
+index ce86490..6a04345 100644
+--- a/omapip/isclib.c
++++ b/omapip/isclib.c
+@@ -185,16 +185,6 @@ dhcp_context_create(int flags,
+ 		if (result != ISC_R_SUCCESS)
+ 			goto cleanup;
+ 
+-		result = isc_app_ctxstart(dhcp_gbl_ctx.actx);
+-		if (result != ISC_R_SUCCESS)
+-			return (result);
+-		dhcp_gbl_ctx.actx_started = ISC_TRUE;
+-
+-		/* Not all OSs support suppressing SIGPIPE through socket
+-		 * options, so set the sigal action to be ignore.  This allows
+-		 * broken connections to fail gracefully with EPIPE on writes */
+-		handle_signal(SIGPIPE, SIG_IGN);
+-
+ 		result = isc_taskmgr_createinctx(dhcp_gbl_ctx.mctx,
+ 						 dhcp_gbl_ctx.actx,
+ 						 1, 0,
+@@ -217,6 +207,21 @@ dhcp_context_create(int flags,
+ 		result = isc_task_create(dhcp_gbl_ctx.taskmgr, 0, &dhcp_gbl_ctx.task);
+ 		if (result != ISC_R_SUCCESS)
+ 			goto cleanup;
++
++		result = isc_app_ctxstart(dhcp_gbl_ctx.actx);
++		if (result != ISC_R_SUCCESS)
++			return (result);
++		dhcp_gbl_ctx.actx_started = ISC_TRUE;
++
++		/* Not all OSs support suppressing SIGPIPE through socket
++		 * options, so set the sigal action to be ignore.  This allows
++		 * broken connections to fail gracefully with EPIPE on writes */
++		handle_signal(SIGPIPE, SIG_IGN);
++
++		/* Reset handlers installed by isc_app_ctxstart()
++		 * to default for control-c and kill */
++		handle_signal(SIGINT, SIG_DFL);
++		handle_signal(SIGTERM, SIG_DFL);
+ 	}
+ 
+ #if defined (NSUPDATE)
+-- 
+1.8.3.1
+

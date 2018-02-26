@@ -1,0 +1,31 @@
+Add LDFLAGS variable to Makefile so that extra linker flags can be sent via this variable.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 49d622d..cd17334 100644
+--- a/Makefile
++++ b/Makefile
+@@ -48,18 +48,17 @@ CFLAGS = -Wall -W -O2
+ CFLAGS_lib = $(CFLAGS) -fPIC
+ CFLAGS_bin = $(CFLAGS) -fomit-frame-pointer
+ 
+-LDFLAGS =
+ LDFLAGS_shared = --shared
+ LDFLAGS_shared_LINUX = --shared
+ LDFLAGS_shared_SUN = -G
+ LDFLAGS_shared_HP = -b
+ LDFLAGS_lib = $(LDFLAGS_shared)
+-LDFLAGS_lib_LINUX = $(LDFLAGS_shared_LINUX) \
++LDFLAGS_lib_LINUX = $(LDFLAGS) $(LDFLAGS_shared_LINUX) \
+ 	-Wl,--soname,$(SHARED_LIB),--version-script,$(MAP_LIB)
+ LDFLAGS_lib_SUN = $(LDFLAGS_shared_SUN)
+ LDFLAGS_lib_HP = $(LDFLAGS_shared_HP)
+ LDFLAGS_pam = $(LDFLAGS_shared)
+-LDFLAGS_pam_LINUX = $(LDFLAGS_shared_LINUX) \
++LDFLAGS_pam_LINUX = $(LDFLAGS) $(LDFLAGS_shared_LINUX) \
+ 	-Wl,--version-script,$(MAP_PAM)
+ LDFLAGS_pam_SUN = $(LDFLAGS_shared_SUN)
+ LDFLAGS_pam_HP = $(LDFLAGS_shared_HP)

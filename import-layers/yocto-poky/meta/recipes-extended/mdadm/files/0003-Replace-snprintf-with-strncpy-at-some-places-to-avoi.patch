@@ -1,0 +1,59 @@
+From bc87af1314325b00c6ac002a60a2b0f0caa81e34 Mon Sep 17 00:00:00 2001
+From: Xiao Ni <xni@redhat.com>
+Date: Sat, 18 Mar 2017 10:33:44 +0800
+Subject: [PATCH 3/5] Replace snprintf with strncpy at some places to avoid
+ truncation
+
+In gcc7 there are some building errors like:
+directive output may be truncated writing up to 31 bytes into a region of size 24
+snprintf(str, MPB_SIG_LEN, %s, mpb->sig);
+
+It just need to copy one string to target. So use strncpy to replace it.
+
+For this line code: snprintf(str, MPB_SIG_LEN, %s, mpb->sig);
+Because mpb->sig has the content of version after magic, so
+it's better to use strncpy to replace snprintf too.
+
+Signed-off-by: Xiao Ni <xni@redhat.com>
+Signed-off-by: Jes Sorensen <Jes.Sorensen@gmail.com>
+---
+Upstream-Status: Backport
+ super-intel.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/super-intel.c b/super-intel.c
+index 57c7e75..5499098 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -1811,7 +1811,8 @@ static void examine_super_imsm(struct supertype *st, char *homehost)
+ 	__u32 reserved = imsm_reserved_sectors(super, super->disks);
+ 	struct dl *dl;
+ 
+-	snprintf(str, MPB_SIG_LEN, "%s", mpb->sig);
++	strncpy(str, (char *)mpb->sig, MPB_SIG_LEN);
++	str[MPB_SIG_LEN-1] = '\0';
+ 	printf("          Magic : %s\n", str);
+ 	snprintf(str, strlen(MPB_VERSION_RAID0), "%s", get_imsm_version(mpb));
+ 	printf("        Version : %s\n", get_imsm_version(mpb));
+@@ -7142,14 +7143,16 @@ static int update_subarray_imsm(struct supertype *st, char *subarray,
+ 
+ 			u->type = update_rename_array;
+ 			u->dev_idx = vol;
+-			snprintf((char *) u->name, MAX_RAID_SERIAL_LEN, "%s", name);
++			strncpy((char *) u->name, name, MAX_RAID_SERIAL_LEN);
++			u->name[MAX_RAID_SERIAL_LEN-1] = '\0';
+ 			append_metadata_update(st, u, sizeof(*u));
+ 		} else {
+ 			struct imsm_dev *dev;
+ 			int i;
+ 
+ 			dev = get_imsm_dev(super, vol);
+-			snprintf((char *) dev->volume, MAX_RAID_SERIAL_LEN, "%s", name);
++			strncpy((char *) dev->volume, name, MAX_RAID_SERIAL_LEN);
++			dev->volume[MAX_RAID_SERIAL_LEN-1] = '\0';
+ 			for (i = 0; i < mpb->num_raid_devs; i++) {
+ 				dev = get_imsm_dev(super, i);
+ 				handle_missing(super, dev);
+-- 
+2.12.2
+

@@ -85,10 +85,11 @@ python do_write_qemuboot_conf() {
 
     qemuboot = "%s/%s.qemuboot.conf" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_NAME'))
     qemuboot_link = "%s/%s.qemuboot.conf" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME'))
-    topdir="%s/"%(d.getVar('TOPDIR')).replace("//","/")
+    finalpath = d.getVar("DEPLOY_DIR_IMAGE")
+    topdir = d.getVar('TOPDIR')
     cf = configparser.ConfigParser()
     cf.add_section('config_bsp')
-    for k in qemuboot_vars(d):
+    for k in sorted(qemuboot_vars(d)):
         # qemu-helper-native sysroot is not removed by rm_work and
         # contains all tools required by runqemu
         if k == 'STAGING_BINDIR_NATIVE':
@@ -98,7 +99,8 @@ python do_write_qemuboot_conf() {
             val = d.getVar(k)
         # we only want to write out relative paths so that we can relocate images
         # and still run them
-        val=val.replace(topdir,"")
+        if val.startswith(topdir):
+            val = os.path.relpath(val, finalpath)
         cf.set('config_bsp', k, '%s' % val)
 
     # QB_DEFAULT_KERNEL's value of KERNEL_IMAGETYPE is the name of a symlink
@@ -108,14 +110,15 @@ python do_write_qemuboot_conf() {
     kernel = os.path.realpath(kernel_link)
     # we only want to write out relative paths so that we can relocate images
     # and still run them
-    kernel=kernel.replace(topdir,"")
+    kernel = os.path.relpath(kernel, finalpath)
     cf.set('config_bsp', 'QB_DEFAULT_KERNEL', kernel)
 
     bb.utils.mkdirhier(os.path.dirname(qemuboot))
     with open(qemuboot, 'w') as f:
         cf.write(f)
 
-    if os.path.lexists(qemuboot_link):
-       os.remove(qemuboot_link)
-    os.symlink(os.path.basename(qemuboot), qemuboot_link)
+    if qemuboot_link != qemuboot:
+        if os.path.lexists(qemuboot_link):
+           os.remove(qemuboot_link)
+        os.symlink(os.path.basename(qemuboot), qemuboot_link)
 }

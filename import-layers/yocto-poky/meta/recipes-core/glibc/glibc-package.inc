@@ -1,19 +1,3 @@
-#
-# For now, we will skip building of a gcc package if it is a uclibc one
-# and our build is not a uclibc one, and we skip a glibc one if our build
-# is a uclibc build.
-#
-# See the note in gcc/gcc_3.4.0.oe
-#
-
-python __anonymous () {
-    import bb, re
-    uc_os = (re.match('.*uclibc*', d.getVar('TARGET_OS')) != None)
-    if uc_os:
-        raise bb.parse.SkipPackage("incompatible with target %s" %
-                                   d.getVar('TARGET_OS'))
-}
-
 INHIBIT_SYSROOT_STRIP = "1"
 
 PACKAGES = "${PN}-dbg catchsegv sln nscd ldd tzcode glibc-thread-db ${PN}-pic libcidn libmemusage libsegfault ${PN}-pcprofile libsotruss ${PN} ${PN}-utils glibc-extra-nss ${PN}-dev ${PN}-staticdev ${PN}-doc"
@@ -147,11 +131,15 @@ do_install_append_arm () {
 	do_install_armmultilib
 }
 
+do_install_append_armeb () {
+	do_install_armmultilib
+}
+
 do_install_armmultilib () {
 
 	oe_multilib_header bits/endian.h bits/fcntl.h bits/fenv.h bits/fp-fast.h bits/hwcap.h bits/ipc.h bits/link.h bits/wordsize.h
-	oe_multilib_header bits/local_lim.h bits/mman.h bits/msq.h bits/pthreadtypes.h  bits/sem.h  bits/semaphore.h bits/setjmp.h
-	oe_multilib_header bits/shm.h bits/sigstack.h bits/stat.h bits/statfs.h bits/string.h bits/typesizes.h
+	oe_multilib_header bits/local_lim.h bits/mman.h bits/msq.h bits/pthreadtypes.h bits/pthreadtypes-arch.h  bits/sem.h  bits/semaphore.h bits/setjmp.h
+	oe_multilib_header bits/shm.h bits/sigstack.h bits/stat.h bits/statfs.h bits/typesizes.h
 
 	oe_multilib_header fpu_control.h gnu/lib-names.h gnu/stubs.h ieee754.h
 

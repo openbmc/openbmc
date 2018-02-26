@@ -28,6 +28,7 @@ exec="/usr/bin/$prog"
 pidfile="/var/run/$prog.pid"
 lockfile="/var/lock/subsys/$prog"
 logfile="/var/log/$prog"
+other_args="--registry-mirror=http://localhost:5000 --insecure-registry=http://localhost:5000 --raw-logs"
 
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
 
@@ -38,8 +39,8 @@ start() {
 
     if ! [ -f $pidfile ]; then
         printf "Starting $prog:\t"
-        echo "\n$(date)\n" >> $logfile
-        "$unshare" -m -- $exec -d $other_args &>> $logfile &
+        echo -e "\n$(date)\n" >> $logfile
+        "$unshare" -m -- $exec daemon $other_args &>> $logfile &
         pid=$!
         touch $lockfile
         # wait up to 10 seconds for the pidfile to exist.  see

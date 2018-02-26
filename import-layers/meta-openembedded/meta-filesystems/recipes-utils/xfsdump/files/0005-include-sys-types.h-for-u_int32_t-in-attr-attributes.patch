@@ -1,0 +1,27 @@
+From d95f494de1aa8123c74170ffebaed8ea89649da2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jul 2017 23:33:44 -0700
+Subject: [PATCH 5/5] include sys/types.h for u_int32_t in attr/attributes.h
+
+error: unknown type name 'u_int32_t'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ restore/content.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/restore/content.c b/restore/content.c
+index 7c4a81f..1d5de1b 100644
+--- a/restore/content.c
++++ b/restore/content.c
+@@ -24,6 +24,7 @@
+ #include <sys/param.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
++#include <sys/types.h>
+ #include <attr/attributes.h>
+ #include <xfs/handle.h>
+ #include <time.h>
+-- 
+2.13.2
+

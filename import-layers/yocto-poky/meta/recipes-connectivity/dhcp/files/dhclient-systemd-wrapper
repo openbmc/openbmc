@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# In case the interface is used for nfs, skip it.
+nfsroot=0
+interfaces=""
+exec 9<&0 < /proc/mounts
+while read dev mtpt fstype rest; do
+    if test $mtpt = "/" ; then
+        case $fstype in
+            nfs | nfs4)
+                nfsroot=1
+                nfs_addr=`echo $rest | sed -e 's/^.*addr=\([0-9.]*\).*$/\1/'`
+                break
+                ;;
+            *)
+                ;;
+        esac
+    fi
+done
+exec 0<&9 9<&-
+
+if [ $nfsroot -eq 0 ]; then
+    interfaces="$INTERFACES"
+else
+    if [ -x /bin/ip -o -x /sbin/ip ] ; then
+	nfs_iface=`ip route get $nfs_addr | grep dev | sed -e 's/^.*dev \([-a-z0-9.]*\).*$/\1/'`
+    fi
+    for i in $INTERFACES; do
+	if test "x$i" = "x$nfs_iface"; then
+            echo "dhclient skipping nfsroot interface $i"
+	else
+	    interfaces="$interfaces $i"
+	fi
+    done
+fi
+
+if test "x$interfaces" != "x"; then
+    /sbin/dhclient -d -cf /etc/dhcp/dhclient.conf -q -lf /var/lib/dhcp/dhclient.leases $interfaces
+fi

@@ -47,7 +47,7 @@ python split_kernel_module_packages () {
         tf = tempfile.mkstemp()
         tmpfile = tf[1]
         cmd = "%sobjcopy -j .modinfo -O binary %s %s" % (d.getVar("HOST_PREFIX") or "", file, tmpfile)
-        subprocess.call(cmd, shell=True)
+        subprocess.check_call(cmd, shell=True)
         f = open(tmpfile)
         l = f.read().split("\000")
         f.close()

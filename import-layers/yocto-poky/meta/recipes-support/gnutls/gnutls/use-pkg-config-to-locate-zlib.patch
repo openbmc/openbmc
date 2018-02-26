@@ -1,7 +1,9 @@
-From cee80af1fe93f5b76765afeebfcc3b902768f5d6 Mon Sep 17 00:00:00 2001
-From: Andre McCurdy <armccurdy@gmail.com>
-Date: Tue, 26 May 2015 21:41:24 -0700
-Subject: [PATCH] use pkg-config to locate zlib
+From 18081068a97c00015aabc5fa321664951458ea0d Mon Sep 17 00:00:00 2001
+From: Fan Xin <fan.xin@jp.fujitsu.com>
+Date: Fri, 9 Jun 2017 15:20:31 +0900
+Subject: [PATCH] From cee80af1fe93f5b76765afeebfcc3b902768f5d6 Mon Sep 17
+ 00:00:00 2001 From: Andre McCurdy <armccurdy@gmail.com> Date: Tue, 26 May
+ 2015 21:41:24 -0700 Subject: [PATCH] use pkg-config to locate zlib
 
 AC_LIB_HAVE_LINKFLAGS can sometimes find host libs and is therefore not
 robust when cross-compiling. Remove it for zlib and use PKG_CHECK_MODULES
@@ -18,15 +20,19 @@ Change based on ChromeOS gnutls 2.12.23 cross-compile fixes patch:
 Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
+Rebase on gnutls 3.5.13
+
+Signed-off-by: Fan Xin <fan.xin@jp.fujitsu.com>
 ---
- configure.ac | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+ configure.ac | 25 +++++++++----------------
+ 1 file changed, 9 insertions(+), 16 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 1b561d5..0c787dc 100644
+index c65268e..f6a18aa 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -508,25 +508,21 @@ AC_ARG_WITH(zlib, AS_HELP_STRING([--without-zlib],
+@@ -735,28 +735,21 @@ AC_ARG_WITH(zlib, AS_HELP_STRING([--without-zlib],
  AC_MSG_CHECKING([whether to include zlib compression support])
  if test x$ac_zlib != xno; then
   AC_MSG_RESULT(yes)
@@ -49,6 +55,7 @@ index 1b561d5..0c787dc 100644
 -    else
 -      GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, zlib"
 -    fi
+-    LIBZ_PC=""
 +  PKG_CHECK_MODULES(ZLIB, zlib)
 +  HAVE_LIBZ=yes
 +  AC_DEFINE([HAVE_LIBZ], [1], [zlib is enabled])
@@ -57,11 +64,12 @@ index 1b561d5..0c787dc 100644
 +  AC_SUBST(LTLIBZ)
 +  if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
 +    GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
-+  else
+   else
+-    LIBZ_PC=$LIBZ
 +    GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, zlib"
    fi
  fi
- AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
+ AC_SUBST(LIBZ_PC)
 -- 
 1.9.1
 

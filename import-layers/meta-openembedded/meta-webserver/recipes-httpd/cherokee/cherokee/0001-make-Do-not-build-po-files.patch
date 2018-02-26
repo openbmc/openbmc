@@ -1,0 +1,27 @@
+From e9ae3231ec188df801fe51aa95d6afec2e52db58 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 25 Jul 2017 16:14:19 -0700
+Subject: [PATCH] make: Do not build po files
+
+Target fails to build
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index f01278c3..eb864c36 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,6 +1,6 @@
+ ## Cherokee: Makefile.am  -*- makefile -*-
+ 
+-SUBDIRS = po m4 www icons themes qa doc . admin contrib cherokee cget packages dbslayer
++SUBDIRS = m4 www icons themes qa doc . admin contrib cherokee cget packages dbslayer
+ SUFFIXES = .sample.pre .sample .h.pre .h .xml.pre .xml
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-- 
+2.13.3
+

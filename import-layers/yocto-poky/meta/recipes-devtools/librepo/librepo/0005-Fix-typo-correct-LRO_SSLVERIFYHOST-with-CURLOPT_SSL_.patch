@@ -1,0 +1,40 @@
+From a4bbbccce6edc1a2d1bd475506e2975fd7696c88 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 8 Jun 2017 16:31:30 +0800
+Subject: [PATCH] Fix typo: correct LRO_SSLVERIFYHOST with
+ CURLOPT_SSL_VERIFYHOST
+
+In commit 51d32c6cd88ba0139c32793183fd6a236c1ef456
+---
+Author: Tomas Mlcoch <tmlcoch@redhat.com>
+Date:   Mon May 5 14:31:35 2014 +0200
+
+    Add LRO_SSLVERIFYPEER and LRO_SSLVERIFYHOST options (RhBug: 1093014)
+---
+
+It incorrectly setopt CURLOPT_SSL_VERIFYPEER for LRO_SSLVERIFYHOST.
+Use CURLOPT_SSL_VERIFYHOST to correct.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ librepo/handle.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/librepo/handle.c b/librepo/handle.c
+index ccea79b..ff39db4 100644
+--- a/librepo/handle.c
++++ b/librepo/handle.c
+@@ -629,7 +629,7 @@ lr_handle_setopt(LrHandle *handle,
+ 
+     case LRO_SSLVERIFYHOST:
+         handle->sslverifyhost = va_arg(arg, long) ? 2 : 0;
+-        c_rc = curl_easy_setopt(c_h, CURLOPT_SSL_VERIFYPEER, handle->sslverifyhost);
++        c_rc = curl_easy_setopt(c_h, CURLOPT_SSL_VERIFYHOST, handle->sslverifyhost);
+         break;
+ 
+     case LRO_SSLCLIENTCERT:
+-- 
+2.7.4
+

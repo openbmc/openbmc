@@ -1,0 +1,23 @@
+Disabled reading host configs.
+
+Upstream-Status: Inappropriate [native]
+
+Signed-off-by: Ed Bartosh <ed.bartosh@linux.intel.com>
+
+--- mtools-4.0.18/config.c.orig	2017-06-13 12:27:38.644000000 +0300
++++ mtools-4.0.18/config.c	2017-06-13 12:28:47.576000000 +0300
+@@ -701,14 +701,6 @@
+ 	memcpy(devices, const_devices,
+ 	       nr_const_devices*sizeof(struct device));
+ 
+-    (void) ((parse(CONF_FILE,1) |
+-	     parse(LOCAL_CONF_FILE,1) |
+-	     parse(SYS_CONF_FILE,1)) ||
+-	    (parse(OLD_CONF_FILE,1) |
+-	     parse(OLD_LOCAL_CONF_FILE,1)));
+-    /* the old-name configuration files only get executed if none of the
+-     * new-name config files were used */
+-
+     homedir = get_homedir();
+     if ( homedir ){
+ 	strncpy(conf_file, homedir, MAXPATHLEN );

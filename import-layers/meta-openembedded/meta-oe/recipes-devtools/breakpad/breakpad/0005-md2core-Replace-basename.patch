@@ -1,0 +1,38 @@
+From bbf2b5ed5d93b227df8aea5726727b48e29f6790 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Sep 2017 23:35:40 -0700
+Subject: [PATCH 5/5] md2core: Replace basename()
+
+musl does not provide it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/tools/linux/md2core/minidump-2-core.cc | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/tools/linux/md2core/minidump-2-core.cc b/src/tools/linux/md2core/minidump-2-core.cc
+index 6a9e28eb..52b81c22 100644
+--- a/src/tools/linux/md2core/minidump-2-core.cc
++++ b/src/tools/linux/md2core/minidump-2-core.cc
+@@ -107,6 +107,9 @@ struct Options {
+ 
+ static void
+ Usage(int argc, const char* argv[]) {
++  const char *c_filename = argv[0];;
++  const char *p = strrchr(c_filename, '/');
++  const char *base = p ? p+1 : c_filename;
+   fprintf(stderr,
+           "Usage: %s [options] <minidump file>\n"
+           "\n"
+@@ -133,7 +136,7 @@ Usage(int argc, const char* argv[]) {
+           "             lookups to be done in this directory rather than the filesystem\n"
+           "             layout as it exists in the crashing image.  This path should end\n"
+           "             with a slash if it's a directory.  e.g. /var/lib/breakpad/\n"
+-          "", basename(argv[0]));
++          "", base);
+ }
+ 
+ static void
+-- 
+2.14.1
+

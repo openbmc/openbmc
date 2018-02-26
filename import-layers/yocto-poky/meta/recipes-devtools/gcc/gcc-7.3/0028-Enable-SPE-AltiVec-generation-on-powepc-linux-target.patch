@@ -1,0 +1,56 @@
+From 2c05b4072f982df8002d61327837e18a724e934f Mon Sep 17 00:00:00 2001
+From: Alexandru-Cezar Sardan <alexandru.sardan@freescale.com>
+Date: Wed, 5 Feb 2014 16:52:31 +0200
+Subject: [PATCH 28/47] Enable SPE & AltiVec generation on powepc*linux target
+
+When is configured with --target=powerpc-linux, the resulting GCC will
+not be able to generate code for SPE targets (e500v1/v2).
+GCC configured with --target=powerpc-linuxspe will not be able to
+generate AltiVec instructions (for e6500).
+This patch modifies the configured file such that SPE or AltiVec code
+can be generated when gcc is configured with --target=powerpc-linux.
+The ABI and speciffic instructions can be selected through the
+"-mabi=spe or -mabi=altivec" and the "-mspe or -maltivec" parameters.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Alexandru-Cezar Sardan <alexandru.sardan@freescale.com>
+---
+ gcc/config.gcc               | 9 ++++++++-
+ gcc/config/rs6000/linuxspe.h | 3 ---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/gcc/config.gcc b/gcc/config.gcc
+index 5e45f4b5199..9b381dfd9af 100644
+--- a/gcc/config.gcc
++++ b/gcc/config.gcc
+@@ -2415,7 +2415,14 @@ powerpc-*-rtems*)
+ 	tmake_file="${tmake_file} rs6000/t-fprules rs6000/t-rtems rs6000/t-ppccomm"
+ 	;;
+ powerpc*-*-linux*)
+-	tm_file="${tm_file} dbxelf.h elfos.h gnu-user.h freebsd-spec.h rs6000/sysv4.h"
++	case ${target} in
++	    powerpc*-*-linux*spe* | powerpc*-*-linux*altivec*)
++		tm_file="${tm_file} dbxelf.h elfos.h gnu-user.h freebsd-spec.h rs6000/sysv4.h"
++		;;
++	    *)
++		tm_file="${tm_file} dbxelf.h elfos.h gnu-user.h freebsd-spec.h rs6000/sysv4.h rs6000/linuxaltivec.h rs6000/linuxspe.h rs6000/e500.h"
++		;;
++	esac
+ 	extra_options="${extra_options} rs6000/sysv4.opt"
+ 	tmake_file="${tmake_file} rs6000/t-fprules rs6000/t-ppccomm"
+ 	extra_objs="$extra_objs rs6000-linux.o"
+diff --git a/gcc/config/rs6000/linuxspe.h b/gcc/config/rs6000/linuxspe.h
+index 92efabfe664..6d486451a7e 100644
+--- a/gcc/config/rs6000/linuxspe.h
++++ b/gcc/config/rs6000/linuxspe.h
+@@ -27,6 +27,3 @@
+ #undef	TARGET_DEFAULT
+ #define TARGET_DEFAULT MASK_STRICT_ALIGN
+ #endif
+-
+-#undef  ASM_DEFAULT_SPEC
+-#define	ASM_DEFAULT_SPEC "-mppc -mspe -me500"
+-- 
+2.12.2
+

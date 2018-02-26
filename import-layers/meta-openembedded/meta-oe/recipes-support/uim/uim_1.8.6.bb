@@ -14,14 +14,15 @@ SRC_URI[md5sum] = "ecea4c597bab1fd4ba98ea84edcece59"
 SRC_URI[sha256sum] = "7b1ea803c73f3478917166f04f67cce6e45ad7ea5ab6df99b948c17eb1cb235f"
 
 DEPENDS = "anthy fontconfig libxft libxt glib-2.0 ncurses intltool"
-DEPENDS_class-target += "intltool-native gtk+ gtk+3 uim-native takao-fonts"
+DEPENDS_append_class-target = " intltool-native gtk+ gtk+3 uim-native takao-fonts"
 
 RDEPENDS_uim = "libuim0 libedit"
-RDEPENDS_uim-anthy = "takao-fonts anthy libanthy0"
+RDEPENDS_uim-anthy = "takao-fonts anthy libanthy0 glibc-utils glibc-gconv-euc-jp"
 
 LEAD_SONAME = "libuim.so.1"
 
-inherit autotools pkgconfig gettext
+inherit autotools pkgconfig gettext qemu gtk-immodules-cache
+GTKIMMODULES_PACKAGES = "uim-gtk2.0 uim-gtk3"
 
 EXTRA_OECONF += "--disable-emacs \
     --without-scim \
@@ -103,52 +104,36 @@ FILES_uim-skk = "${libdir}/uim/plugin/libuim-skk.* \
     ${datadir}/uim/skk*.scm \
 "
 
+PACKAGE_WRITE_DEPS += "qemu-native"
 pkg_postinst_uim-anthy() {
-    if [ -f /usr/bin/uim-module-manager ]; then
-        /usr/bin/uim-module-manager --register anthy --path /etc/uim
-    fi
-}
-
-pkg_postrm_uim-anthy() {
-    if [ -f /usr/bin/uim-module-manager ]; then
-        /usr/bin/uim-module-manager --path /etc/uim --unregister anthy
+    if test -n "$D"; then
+        ${@qemu_run_binary(d, '$D', '${bindir}/uim-module-manager')} --register anthy --path $D${datadir}/uim
+    else
+		uim-module-manager --register anthy --path ${datadir}/uim
     fi
 }
 
 pkg_prerm_uim-anthy() {
-    if [ -f /usr/bin/uim-module-manager ]; then
-        /usr/bin/uim-module-manager --register anthy --path /etc/uim
+    if test -n "$D"; then
+        ${@qemu_run_binary(d, '$D', '${bindir}/uim-module-manager')} --path $D${datadir}/uim --unregister anthy
+    else
+		uim-module-manager --path ${datadir}/uim --unregister anthy
     fi
 }
 
-pkg_postinst_uim-gtk2.0() {
-    gtk-query-immodules-2.0 > /etc/gtk-2.0/gtk.immodules
-}
-
 pkg_postinst_uim-skk() {
-    if [ -f /usr/bin/uim-module-manager ]; then
-        /usr/bin/uim-module-manager --register skk --path /etc/uim
+    if test -n "$D"; then
+        ${@qemu_run_binary(d, '$D', '${bindir}/uim-module-manager')} --register skk --path $D${datadir}/uim
+    else
+		uim-module-manager --register skk --path ${datadir}/uim
     fi
 }
 
 pkg_postrm_uim-skk() {
-    if [ -f /usr/bin/uim-module-manager ]; then
-        /usr/bin/uim-module-manager --path /etc/uim --unregister skk
-    fi
-}
-
-pkg_postinst_uim-common() {
-    if [ -f /usr/bin/uim-module-manager ]; then
-        /usr/bin/uim-module-manager --path /etc/uim --register \
-            tutcode tcode hangul viqr \
-            ipa-x-sampa latin byeoru
-    fi
-}
-
-pkg_prerm_uim-common() {
-    if [ -f /usr/bin/uim-module-manager ]; then
-        /usr/bin/uim-module-manager --path /etc/uim --register \
-        tutcode tcode hangul viqr ipa-x-sampa latin byeoru
+    if test -n "$D"; then
+        ${@qemu_run_binary(d, '$D', '${bindir}/uim-module-manager')} --path $D${datadir}/uim --unregister skk
+    else
+		uim-module-manager --path ${datadir}/uim --unregister skk
     fi
 }
 

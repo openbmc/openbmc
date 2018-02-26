@@ -1,5 +1,5 @@
 SUMMARY = "Basic desktop integration functions"
-
+HOMEPAGE = "https://www.freedesktop.org/wiki/Software/xdg-utils/"
 DESCRIPTION = "The xdg-utils package is a set of simple scripts that provide basic \
 desktop integration functions for any Free Desktop, such as Linux. \
 They are intended to provide a set of defacto standards. \

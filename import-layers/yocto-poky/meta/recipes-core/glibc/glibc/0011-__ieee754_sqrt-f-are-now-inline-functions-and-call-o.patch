@@ -1,7 +1,7 @@
-From d6e2076571263e45c48889896d3d94ff576df2be Mon Sep 17 00:00:00 2001
+From 9b2af6cbf68d3353d72519e7f6c46becb7bd1d0f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:24:46 +0000
-Subject: [PATCH 11/26] __ieee754_sqrt{,f} are now inline functions and call
+Subject: [PATCH 11/25] __ieee754_sqrt{,f} are now inline functions and call
  out __slow versions
 
 Upstream-Status: Pending
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c
-index 1c34244..7038a70 100644
+index 1c34244bd8..7038a70b47 100644
 --- a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c
 +++ b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c
 @@ -41,10 +41,10 @@ static const float half = 0.5;
@@ -40,7 +40,7 @@ index 1c34244..7038a70 100644
  #define FMADD(a_, c_, b_)                                               \
            ({ double __r;                                                \
 diff --git a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c
-index 8126535..10de1f0 100644
+index 812653558f..10de1f0cc3 100644
 --- a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c
 +++ b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c
 @@ -39,10 +39,10 @@ static const float threehalf = 1.5;
@@ -57,5 +57,5 @@ index 8126535..10de1f0 100644
  #endif
  {
 -- 
-2.10.2
+2.13.2
 

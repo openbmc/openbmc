@@ -26,7 +26,6 @@ EXTRA_OECONF = " \
     --disable-strip \
     --disable-werror \
     --target-list=${@get_qemu_target_list(d)} \
-    --with-system-pixman \
     --extra-cflags='${CFLAGS}' \
     "
 EXTRA_OECONF_append_class-native = " --python=${USRBINPATH}/python2.7"

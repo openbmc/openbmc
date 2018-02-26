@@ -1,2 +1,4 @@
 #!/bin/sh
-make -k runtest
+cd test
+OPENSSL_ENGINES=../engines BLDTOP=.. SRCTOP=.. perl run_tests.pl
+cd ..

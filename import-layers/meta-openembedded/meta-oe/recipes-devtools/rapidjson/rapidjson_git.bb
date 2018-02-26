@@ -21,5 +21,6 @@ EXTRA_OECMAKE += "-DRAPIDJSON_BUILD_DOC=OFF -DRAPIDJSON_BUILD_TESTS=OFF -DRAPIDJ
 # RapidJSON is a header-only C++ library, so the main package will be empty.
 
 FILES_${PN}-dev += "${libdir}/cmake"
+RDEPENDS_${PN}-dev = ""
 
 BBCLASSEXTEND = "native nativesdk"

@@ -10,8 +10,8 @@ LIC_FILES_CHKSUM = "file://src/libfakekey.c;endline=30;md5=602b5ccd48f6440751086
 DEPENDS = "libxtst"
 SECTION = "x11/wm"
 
-SRCREV = "e327ff049b8503af2dadffa84370a0860b9fb682"
-PV = "0.0+git${SRCPV}"
+SRCREV = "7ad885912efb2131e80914e964d5e635b0d07b40"
+PV = "0.3+git${SRCPV}"
 
 SRC_URI = "git://git.yoctoproject.org/${BPN}"
 

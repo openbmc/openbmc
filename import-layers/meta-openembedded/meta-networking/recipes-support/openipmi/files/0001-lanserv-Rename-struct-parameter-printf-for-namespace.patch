@@ -1,0 +1,618 @@
+From 8b51a6bf5a4829d8add535a098c0c06a049a9958 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 26 Aug 2017 22:50:57 -0700
+Subject: [PATCH] lanserv: Rename struct parameter printf for namespace
+ collision
+
+This comes to fore when we use hardening flags where printf
+is treated as macro and gets replaced with printf_chk
+
+Fixes errors like
+
+error: no member named '__printf_chk' in 'struct emu_out_s'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lanserv/OpenIPMI/serv.h |   2 +-
+ lanserv/emu_cmd.c       | 132 ++++++++++++++++++++++++------------------------
+ lanserv/ipmi_sim.c      |  10 ++--
+ 3 files changed, 72 insertions(+), 72 deletions(-)
+
+diff --git a/lanserv/OpenIPMI/serv.h b/lanserv/OpenIPMI/serv.h
+index d12d63a..8555c85 100644
+--- a/lanserv/OpenIPMI/serv.h
++++ b/lanserv/OpenIPMI/serv.h
+@@ -522,7 +522,7 @@ uint8_t ipmb_checksum(uint8_t *data, int size, uint8_t start);
+ typedef struct emu_data_s emu_data_t;
+ typedef struct emu_out_s
+ {
+-    void (*printf)(struct emu_out_s *out, char *format, ...);
++    void (*eprintf)(struct emu_out_s *out, char *format, ...);
+     void *data;
+ } emu_out_t;
+ 
+diff --git a/lanserv/emu_cmd.c b/lanserv/emu_cmd.c
+index ca44032..54b6f7b 100644
+--- a/lanserv/emu_cmd.c
++++ b/lanserv/emu_cmd.c
+@@ -76,7 +76,7 @@ emu_get_uchar(emu_out_t *out, char **toks, unsigned char *val, char *errstr,
+ 	if (empty_ok)
+ 	    return ENOSPC;
+ 	if (errstr)
+-	    out->printf(out, "**No %s given\n", errstr);
++	    out->eprintf(out, "**No %s given\n", errstr);
+ 	return EINVAL;
+     }
+     if (str[0] == '\'') {
+@@ -86,7 +86,7 @@ emu_get_uchar(emu_out_t *out, char **toks, unsigned char *val, char *errstr,
+     *val = strtoul(str, &tmpstr, 0);
+     if (*tmpstr != '\0') {
+ 	if (errstr)
+-	    out->printf(out, "**Invalid %s given\n", errstr);
++	    out->eprintf(out, "**Invalid %s given\n", errstr);
+ 	return EINVAL;
+     }
+ 
+@@ -108,7 +108,7 @@ emu_get_uchar_with_vals(emu_out_t *out, char **toks,
+ 	if (empty_ok)
+ 	    return ENOSPC;
+ 	if (errstr)
+-	    out->printf(out, "**No %s given\n", errstr);
++	    out->eprintf(out, "**No %s given\n", errstr);
+ 	return EINVAL;
+     }
+     if (str[0] == '\'') {
+@@ -131,7 +131,7 @@ emu_get_uchar_with_vals(emu_out_t *out, char **toks,
+     *val = strtoul(str, &tmpstr, 0);
+     if (*tmpstr != '\0') {
+ 	if (errstr)
+-	    out->printf(out, "**Invalid %s given\n", errstr);
++	    out->eprintf(out, "**Invalid %s given\n", errstr);
+ 	return EINVAL;
+     }
+  out:
+@@ -150,12 +150,12 @@ emu_get_bitmask(emu_out_t *out, char **toks, uint16_t *val, char *errstr,
+ 	if (empty_ok)
+ 	    return ENOSPC;
+ 	if (errstr)
+-	    out->printf(out, "**No %s given\n", errstr);
++	    out->eprintf(out, "**No %s given\n", errstr);
+ 	return EINVAL;
+     }
+     if (strlen(str) != size) {
+ 	if (errstr)
+-	    out->printf(out, "**invalid number of bits in %s\n", errstr);
++	    out->eprintf(out, "**invalid number of bits in %s\n", errstr);
+ 	return EINVAL;
+     }
+     *val = 0;
+@@ -166,7 +166,7 @@ emu_get_bitmask(emu_out_t *out, char **toks, uint16_t *val, char *errstr,
+ 	    *val |= 1 << i;
+ 	} else {
+ 	    if (errstr)
+-		out->printf(out, "**Invalid bit value '%c' in %s\n", str[j],
++		out->eprintf(out, "**Invalid bit value '%c' in %s\n", str[j],
+ 			    errstr);
+ 	    return EINVAL;
+ 	}
+@@ -184,13 +184,13 @@ emu_get_uint(emu_out_t *out, char **toks, unsigned int *val, char *errstr)
+     str = mystrtok(NULL, " \t\n", toks);
+     if (!str) {
+ 	if (errstr)
+-	    out->printf(out, "**No %s given\n", errstr);
++	    out->eprintf(out, "**No %s given\n", errstr);
+ 	return EINVAL;
+     }
+     *val = strtoul(str, &tmpstr, 0);
+     if (*tmpstr != '\0') {
+ 	if (errstr)
+-	    out->printf(out, "**Invalid %s given\n", errstr);
++	    out->eprintf(out, "**Invalid %s given\n", errstr);
+ 	return EINVAL;
+     }
+ 
+@@ -206,7 +206,7 @@ emu_get_bytes(emu_out_t *out, char **tokptr, unsigned char *data, char *errstr,
+ 
+     if (!tok) {
+ 	if (errstr)
+-	    out->printf(out, "**No %s given\n", errstr);
++	    out->eprintf(out, "**No %s given\n", errstr);
+ 	return EINVAL;
+     }
+     if (*tok == '"') {
+@@ -215,7 +215,7 @@ emu_get_bytes(emu_out_t *out, char **tokptr, unsigned char *data, char *errstr,
+ 	tok++;
+ 	end = strlen(tok) - 1;
+ 	if (tok[end] != '"') {
+-	  out->printf(out, "**ASCII %s doesn't end in '\"'", errstr);
++	  out->eprintf(out, "**ASCII %s doesn't end in '\"'", errstr);
+ 	    return EINVAL;
+ 	}
+ 	if (end > (len - 1))
+@@ -228,7 +228,7 @@ emu_get_bytes(emu_out_t *out, char **tokptr, unsigned char *data, char *errstr,
+ 	char         c[3];
+ 	/* HEX pw */
+ 	if (strlen(tok) != 32) {
+-	    out->printf(out, "**HEX %s not 32 HEX characters long", errstr);
++	    out->eprintf(out, "**HEX %s not 32 HEX characters long", errstr);
+ 	    return EINVAL;
+ 	}
+ 	c[2] = '\0';
+@@ -239,7 +239,7 @@ emu_get_bytes(emu_out_t *out, char **tokptr, unsigned char *data, char *errstr,
+ 	    tok++;
+ 	    data[i] = strtoul(c, &end, 16);
+ 	    if (*end != '\0') {
+-		out->printf(out, "**Invalid HEX character in %s", errstr);
++		out->eprintf(out, "**Invalid HEX character in %s", errstr);
+ 		return -1;
+ 	    }
+ 	}
+@@ -263,12 +263,12 @@ read_command_file(emu_out_t *out, emu_data_t *emu, const char *command_file)
+ 
+ 	buffer = malloc(INPUT_BUFFER_SIZE);
+ 	if (!buffer) {
+-	    out->printf(out, "Could not allocate buffer memory\n");
++	    out->eprintf(out, "Could not allocate buffer memory\n");
+ 	    rv = ENOMEM;
+ 	    goto out;
+ 	}
+ 	while (fgets(buffer+pos, INPUT_BUFFER_SIZE-pos, f)) {
+-	    out->printf(out, "%s", buffer+pos);
++	    out->eprintf(out, "%s", buffer+pos);
+ 	    if (buffer[pos] == '#')
+ 		continue;
+ 	    pos = strlen(buffer);
+@@ -318,7 +318,7 @@ sel_enable(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     rv = ipmi_mc_enable_sel(mc, max_records, flags);
+     if (rv)
+-	out->printf(out, "**Unable to enable sel, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to enable sel, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -343,9 +343,9 @@ sel_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     rv = ipmi_mc_add_to_sel(mc, record_type, data, &r);
+     if (rv)
+-	out->printf(out, "**Unable to add to sel, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to add to sel, error 0x%x\n", rv);
+     else
+-	out->printf(out, "Added record %d\n", r);
++	out->eprintf(out, "Added record %d\n", r);
+     return rv;
+ }
+ 
+@@ -361,14 +361,14 @@ main_sdr_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	if (rv == ENOSPC)
+ 	    break;
+ 	if (rv) {
+-	    out->printf(out, "**Error 0x%x in data byte %d\n", rv, i);
++	    out->eprintf(out, "**Error 0x%x in data byte %d\n", rv, i);
+ 	    return rv;
+ 	}
+     }
+ 
+     rv = ipmi_mc_add_main_sdr(mc, data, i);
+     if (rv)
+-	out->printf(out, "**Unable to add to sdr, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to add to sdr, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -389,14 +389,14 @@ device_sdr_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	if (rv == ENOSPC)
+ 	    break;
+ 	if (rv) {
+-	    out->printf(out, "**Error 0x%x in data byte %d\n", rv, i);
++	    out->eprintf(out, "**Error 0x%x in data byte %d\n", rv, i);
+ 	    return rv;
+ 	}
+     }
+ 
+     rv = ipmi_mc_add_device_sdr(mc, lun, data, i);
+     if (rv)
+-	out->printf(out, "**Unable to add to sdr, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to add to sdr, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -439,7 +439,7 @@ sensor_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+     while (tok) {
+ 	if (strcmp(tok, "poll") == 0) {
+ 	    if (handler) {
+-		out->printf(out, "**poll given twice in sensor\n", tok);
++		out->eprintf(out, "**poll given twice in sensor\n", tok);
+ 		return -1;
+ 	    }
+ 
+@@ -449,27 +449,27 @@ sensor_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+ 	    tok = mystrtok(NULL, " \t\n", toks);
+ 	    if (!tok) {
+-		out->printf(out, "**No polled sensor handler given\n", tok);
++		out->eprintf(out, "**No polled sensor handler given\n", tok);
+ 		return -1;
+ 	    }
+ 
+ 	    handler = ipmi_sensor_find_handler(tok);
+ 	    if (!handler) {
+-		out->printf(out, "**Invalid sensor handler: %s\n", tok);
++		out->eprintf(out, "**Invalid sensor handler: %s\n", tok);
+ 		return -1;
+ 	    }
+ 
+ 	    rv = handler->init(mc, lun, num, toks, handler->cb_data, &rcb_data,
+ 			       &errstr);
+ 	    if (rv) {
+-		out->printf(out, "**Error initializing sensor handler: %s\n", 
++		out->eprintf(out, "**Error initializing sensor handler: %s\n", 
+ 			    errstr);
+ 		return rv;
+ 	    }
+ 	} else if (strcmp(tok, "event-only") == 0) {
+ 	    event_only = 1;
+ 	} else {
+-	    out->printf(out, "**Unknown sensor option: %s\n", tok);
++	    out->eprintf(out, "**Unknown sensor option: %s\n", tok);
+ 	    return -1;
+ 	}
+ 
+@@ -477,7 +477,7 @@ sensor_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+     }
+ 
+     if (handler && event_only) {
+-	out->printf(out, "**An event-only sensor cannot be polled\n");
++	out->eprintf(out, "**An event-only sensor cannot be polled\n");
+ 	return -1;
+     }
+ 
+@@ -488,7 +488,7 @@ sensor_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	if (!rv && handler->postinit) {
+ 	    rv = handler->postinit(rcb_data, &errstr);
+ 	    if (rv) {
+-		out->printf(out, "**Error in sensor handler postinit: %s\n", 
++		out->eprintf(out, "**Error in sensor handler postinit: %s\n", 
+ 			    errstr);
+ 	    }
+ 	}
+@@ -496,7 +496,7 @@ sensor_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	rv = ipmi_mc_add_sensor(mc, lun, num, type, code, event_only);
+     }
+     if (rv)
+-	out->printf(out, "**Unable to add to sensor, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to add to sensor, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -532,7 +532,7 @@ sensor_set_bit(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     rv = ipmi_mc_sensor_set_bit(mc, lun, num, bit, value, gen_event);
+     if (rv)
+-	out->printf(out, "**Unable to set sensor bit, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to set sensor bit, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -563,7 +563,7 @@ sensor_set_bit_clr_rest(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **
+ 
+     rv = ipmi_mc_sensor_set_bit_clr_rest(mc, lun, num, bit, gen_event);
+     if (rv)
+-	out->printf(out, "**Unable to set sensor bit, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to set sensor bit, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -594,7 +594,7 @@ sensor_set_value(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     rv = ipmi_mc_sensor_set_value(mc, lun, num, value, gen_event);
+     if (rv)
+-	out->printf(out, "**Unable to set sensor value, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to set sensor value, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -637,7 +637,7 @@ sensor_set_hysteresis(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **to
+     rv = ipmi_mc_sensor_set_hysteresis(mc, lun, num, support, positive,
+ 				       negative);
+     if (rv)
+-	out->printf(out, "**Unable to set sensor hysteresis, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to set sensor hysteresis, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -682,7 +682,7 @@ sensor_set_threshold(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **tok
+     rv = ipmi_mc_sensor_set_threshold(mc, lun, num, support,
+ 				      enabled, 1, thresholds);
+     if (rv)
+-	out->printf(out, "**Unable to set sensor thresholds, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to set sensor thresholds, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -759,7 +759,7 @@ sensor_set_event_support(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char *
+ 					  assert_support, deassert_support,
+ 					  assert_enabled, deassert_enabled);
+     if (rv)
+-	out->printf(out, "**Unable to set sensor thresholds, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to set sensor thresholds, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -819,7 +819,7 @@ mc_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	else if (strcmp("persist_sdr", tok) == 0)
+ 	    flags |= IPMI_MC_PERSIST_SDR;
+ 	else {
+-	    out->printf(out, "**Invalid MC flag: %s\n", tok);
++	    out->eprintf(out, "**Invalid MC flag: %s\n", tok);
+ 	    return -1;
+ 	}
+     }
+@@ -833,7 +833,7 @@ mc_add(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 			 device_revision, major_fw_rev, minor_fw_rev,
+ 			 device_support, mfg_id, product_id, flags);
+     if (rv)
+-	out->printf(out, "**Unable to add the MC, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to add the MC, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -890,7 +890,7 @@ mc_set_power(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     rv = ipmi_mc_set_power(mc, power, gen_int);
+     if (rv)
+-	out->printf(out, "**Unable to set power, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to set power, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -916,7 +916,7 @@ mc_add_fru_data(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     tok = mystrtok(NULL, " \t\n", toks);
+     if (!tok) {
+-	out->printf(out, "**No FRU data type given");
++	out->eprintf(out, "**No FRU data type given");
+ 	return -1;
+     }
+     if (strcmp(tok, "file") == 0) {
+@@ -929,13 +929,13 @@ mc_add_fru_data(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+ 	rv = get_delim_str(toks, &frufn, &errstr);
+ 	if (rv) {
+-	    out->printf(out, "**Error with FRU filename: %d", strerror(rv));
++	    out->eprintf(out, "**Error with FRU filename: %d", strerror(rv));
+ 	    return rv;
+ 	}
+ 	rv = ipmi_mc_add_fru_file(mc, devid, length, file_offset,
+ 				  (void *) frufn);
+ 	if (rv)
+-	    out->printf(out, "**Unable to add FRU file, error 0x%x\n", rv);
++	    out->eprintf(out, "**Unable to add FRU file, error 0x%x\n", rv);
+ 	
+     } else if (strcmp(tok, "data") == 0) {
+ 	for (i=0; i<length; i++) {
+@@ -943,14 +943,14 @@ mc_add_fru_data(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	    if (rv == ENOSPC)
+ 		break;
+ 	    if (rv) {
+-		out->printf(out, "**Error 0x%x in data byte %d\n", rv, i);
++		out->eprintf(out, "**Error 0x%x in data byte %d\n", rv, i);
+ 		return rv;
+ 	    }
+ 	}
+ 
+ 	rv = emu_get_uchar(out, toks, &data[i], "data byte", 1);
+ 	if (rv != ENOSPC) {
+-	    out->printf(out, "**Error: input data too long for FRU\n", rv, i);
++	    out->eprintf(out, "**Error: input data too long for FRU\n", rv, i);
+ 	    return EINVAL;
+ 	}
+ 
+@@ -958,9 +958,9 @@ mc_add_fru_data(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+ 	rv = ipmi_mc_add_fru_data(mc, devid, length, NULL, data);
+ 	if (rv)
+-	    out->printf(out, "**Unable to add FRU data, error 0x%x\n", rv);
++	    out->eprintf(out, "**Unable to add FRU data, error 0x%x\n", rv);
+     } else {
+-	out->printf(out, "**FRU type not given, need file or data\n");
++	out->eprintf(out, "**FRU type not given, need file or data\n");
+ 	rv = EINVAL;
+     }
+     return rv;
+@@ -981,28 +981,28 @@ mc_dump_fru_data(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     rv = ipmi_mc_get_fru_data_len(mc, devid, &length);
+     if (rv) {
+-	out->printf(out, "**Unable to dump FRU data, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to dump FRU data, error 0x%x\n", rv);
+ 	goto out;
+     }
+ 
+     data = malloc(length);
+     if (!data) {
+-	out->printf(out, "**Unable to dump FRU data, out of memory\n", rv);
++	out->eprintf(out, "**Unable to dump FRU data, out of memory\n", rv);
+ 	goto out;
+     }
+ 
+     rv = ipmi_mc_get_fru_data(mc, devid, length, data);
+     if (rv) {
+-	out->printf(out, "**Unable to dump FRU data, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to dump FRU data, error 0x%x\n", rv);
+ 	goto out;
+     }
+ 
+     for (i=0; i<length; i++) {
+ 	if ((i > 0) && ((i % 8) == 0))
+-	    out->printf(out, "\n");
+-	out->printf(out, " 0x%2.2x", data[i]);
++	    out->eprintf(out, "\n");
++	out->eprintf(out, " 0x%2.2x", data[i]);
+     }
+-    out->printf(out, "\n");
++    out->eprintf(out, "\n");
+ 
+  out:
+     if (data)
+@@ -1021,7 +1021,7 @@ mc_setbmc(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	return rv;
+     rv = ipmi_emu_set_bmc_mc(emu, ipmb);
+     if (rv)
+-	out->printf(out, "**Invalid IPMB address\n");
++	out->eprintf(out, "**Invalid IPMB address\n");
+     return rv;
+ }
+ 
+@@ -1032,7 +1032,7 @@ atca_enable(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     rv = ipmi_emu_atca_enable(emu);
+     if (rv)
+-	out->printf(out, "**Unable to enable ATCA mode, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to enable ATCA mode, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -1056,7 +1056,7 @@ atca_set_site(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     rv = ipmi_emu_atca_set_site(emu, hw_address, site_type, site_number);
+     if (rv)
+-	out->printf(out, "**Unable to set site type, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to set site type, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -1072,7 +1072,7 @@ mc_set_num_leds(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     rv = ipmi_mc_set_num_leds(mc, count);
+     if (rv)
+-	out->printf(out, "**Unable to set number of LEDs, error 0x%x\n", rv);
++	out->eprintf(out, "**Unable to set number of LEDs, error 0x%x\n", rv);
+     return rv;
+ }
+ 
+@@ -1085,7 +1085,7 @@ read_cmds(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     err = get_delim_str(toks, &filename, &errstr);
+     if (err) {
+-	out->printf(out, "Could not get include filename: %s\n", errstr);
++	out->eprintf(out, "Could not get include filename: %s\n", errstr);
+ 	return err;
+     }
+ 
+@@ -1097,7 +1097,7 @@ read_cmds(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+     {
+ 	char *nf = malloc(strlen(BASE_CONF_STR) + strlen(filename) + 2);
+ 	if (!nf) {
+-	    out->printf(out, "Out of memory in include\n", errstr);
++	    out->eprintf(out, "Out of memory in include\n", errstr);
+ 	    goto out_err;
+ 	}
+ 	strcpy(nf, BASE_CONF_STR);
+@@ -1107,7 +1107,7 @@ read_cmds(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	filename = nf;
+ 	err = read_command_file(out, emu, filename);
+ 	if (err) {
+-	    out->printf(out, "Could not read include file %s\n", filename);
++	    out->eprintf(out, "Could not read include file %s\n", filename);
+ 	}
+     }
+ 
+@@ -1147,7 +1147,7 @@ debug_cmd(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	} else if (strcmp(tok, "sol") == 0) {
+ 	    level |= DEBUG_SOL;
+ 	} else {
+-	    out->printf(out, "Invalid debug level '%s', options are 'raw' and 'msg'\n",
++	    out->eprintf(out, "Invalid debug level '%s', options are 'raw' and 'msg'\n",
+ 		   tok);
+ 	    return EINVAL;
+ 	}
+@@ -1168,7 +1168,7 @@ persist_cmd(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 	} else if (strcmp(tok, "off") == 0) {
+ 	    persist_enable = 0;
+ 	} else {
+-	    out->printf(out, "Invalid persist vale '%s', options are 'on' and 'off'\n",
++	    out->eprintf(out, "Invalid persist vale '%s', options are 'on' and 'off'\n",
+ 		   tok);
+ 	    return EINVAL;
+ 	}
+@@ -1194,18 +1194,18 @@ do_define(emu_out_t *out, emu_data_t *emu, lmc_data_t *mc, char **toks)
+ 
+     name = mystrtok(NULL, " \t\n", toks);
+     if (!name) {
+-	out->printf(out, "No variable name given for define\n");
++	out->eprintf(out, "No variable name given for define\n");
+ 	return EINVAL;
+     }
+     err = get_delim_str(toks, &value, &errstr);
+     if (err) {
+-	out->printf(out, "Could not get variable %s value: %s\n", name, errstr);
++	out->eprintf(out, "Could not get variable %s value: %s\n", name, errstr);
+ 	return err;
+     }
+     err = add_variable(name, value);
+     if (err) {
+ 	free(value);
+-	out->printf(out, "Out of memory setting variable %s\n", name);
++	out->eprintf(out, "Out of memory setting variable %s\n", name);
+ 	return err;
+     }
+     return 0;
+@@ -1301,7 +1301,7 @@ ipmi_emu_cmd(emu_out_t *out, emu_data_t *emu, char *cmd_str)
+ 		    return rv;
+ 		rv = ipmi_emu_get_mc_by_addr(emu, ipmb, &mc);
+ 		if (rv) {
+-		    out->printf(out, "**Invalid MC address\n");
++		    out->eprintf(out, "**Invalid MC address\n");
+ 		    return rv;
+ 		}
+ 	    }
+@@ -1312,7 +1312,7 @@ ipmi_emu_cmd(emu_out_t *out, emu_data_t *emu, char *cmd_str)
+ 	}
+     }
+ 
+-    out->printf(out, "**Unknown command: %s\n", cmd);
++    out->eprintf(out, "**Unknown command: %s\n", cmd);
+ 
+  out:
+     return rv;
+diff --git a/lanserv/ipmi_sim.c b/lanserv/ipmi_sim.c
+index 9472cce..30c4f27 100644
+--- a/lanserv/ipmi_sim.c
++++ b/lanserv/ipmi_sim.c
+@@ -607,8 +607,8 @@ isim_log(sys_data_t *sys, int logtype, msg_t *msg, const char *format,
+ 
+     con = data->consoles;
+     while (con) {
+-	con->out.printf(&con->out, "%s", str);
+-	con->out.printf(&con->out, "\n");
++	con->out.eprintf(&con->out, "%s", str);
++	con->out.eprintf(&con->out, "\n");
+ 	con = con->next;
+     }
+ #if HAVE_SYSLOG
+@@ -956,7 +956,7 @@ console_bind_ready(int fd, void *cb_data, os_hnd_fd_id_t *id)
+     newcon->shutdown_on_close = 0;
+     newcon->telnet = 1;
+     newcon->tn_pos = 0;
+-    newcon->out.printf = emu_printf;
++    newcon->out.eprintf = emu_printf;
+     newcon->out.data = newcon;
+ 
+     setsockopt(rv, IPPROTO_TCP, TCP_NODELAY, (char *)&val, sizeof(val));
+@@ -1463,10 +1463,10 @@ main(int argc, const char *argv[])
+     stdio_console.telnet = 0;
+     stdio_console.tn_pos = 0;
+     if (nostdio) {
+-	stdio_console.out.printf = dummy_printf;
++	stdio_console.out.eprintf = dummy_printf;
+ 	stdio_console.out.data = &stdio_console;
+     } else {
+-	stdio_console.out.printf = emu_printf;
++	stdio_console.out.eprintf = emu_printf;
+ 	stdio_console.out.data = &stdio_console;
+     }
+     stdio_console.next = NULL;
+-- 
+2.14.1
+

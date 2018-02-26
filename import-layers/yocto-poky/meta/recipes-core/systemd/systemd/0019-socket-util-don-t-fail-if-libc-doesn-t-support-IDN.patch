@@ -1,18 +1,19 @@
-From 289554d87e4fd96cae08c0fb449bf41d5641cd24 Mon Sep 17 00:00:00 2001
+From b7c6bfe2ec5ae426e586e1d6ecadb52a97128a3f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 9 Nov 2016 20:49:53 -0800
-Subject: [PATCH 19/19] socket-util: don't fail if libc doesn't support IDN
+Subject: [PATCH 13/14] socket-util: don't fail if libc doesn't support IDN
 
 Upstream-Status: Pending
 
 Signed-off-by: Emil Renner Berthing <systemd@esmil.dk>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/basic/socket-util.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
 diff --git a/src/basic/socket-util.c b/src/basic/socket-util.c
-index 4ebf106..53b9a12 100644
+index 016e64aa0..d4658826e 100644
 --- a/src/basic/socket-util.c
 +++ b/src/basic/socket-util.c
 @@ -47,6 +47,15 @@
@@ -29,8 +30,8 @@ index 4ebf106..53b9a12 100644
 +#define NI_IDN_USE_STD3_ASCII_RULES 0
 +#endif
  
- int socket_address_parse(SocketAddress *a, const char *s) {
-         char *e, *n;
+ #ifdef ENABLE_IDN
+ #  define IDN_FLAGS (NI_IDN|NI_IDN_USE_STD3_ASCII_RULES)
 -- 
-2.10.2
+2.13.2
 

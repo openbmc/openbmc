@@ -45,11 +45,15 @@ COMPATIBLE_MACHINE_{{=machine}} = "{{=machine}}"
 {{ if need_new_kbranch == "n": }}
 KBRANCH_{{=machine}}  = "{{=existing_kbranch}}"
 
+{{ if qemuarch != "arm": }}
 {{ input type:"boolean" name:"smp" prio:"30" msg:"Would you like SMP support? (y/n)" default:"y"}}
 {{ if smp == "y": }}
 KERNEL_FEATURES_append_{{=machine}} += " cfg/smp.scc"
 
-SRC_URI += "file://{{=machine}}-standard.scc \
+SRC_URI += "file://{{=machine}}.scc \
+            file://{{=machine}}.cfg \
+            file://{{=machine}}-standard.scc \
             file://{{=machine}}-user-config.cfg \
             file://{{=machine}}-user-features.scc \
+            file://{{=machine}}-user-patches.scc \
            "

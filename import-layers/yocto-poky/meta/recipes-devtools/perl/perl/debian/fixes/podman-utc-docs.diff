@@ -12,6 +12,7 @@ entry.
 Origin: upstream, http://git.eyrie.org/?p=perl/podlators.git;a=commitdiff;h=52db93bf80e4a06f8497e4ebade0506b6ee0e70d
 Bug-Debian: https://bugs.debian.org/780259
 Patch-Name: fixes/podman-utc-docs.diff
+Upstream-Status: Pending
 ---
  cpan/podlators/lib/Pod/Man.pm     |  6 +++++-
  cpan/podlators/scripts/pod2man.PL | 11 ++++++-----

@@ -1,0 +1,124 @@
+From 3a7d5396e633e6c02a4583be7faf3d79d0d33748 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Aug 2017 11:14:41 -0700
+Subject: [PATCH 1/2] replace VLAIS with malloc/free pair
+
+Makes it compatible with non-gnu compilers
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/trace-icmp.c |  7 +++++--
+ src/trace-tcp.c  | 14 ++++++++++----
+ src/trace-udp.c  |  7 +++++--
+ 3 files changed, 20 insertions(+), 8 deletions(-)
+
+diff --git a/src/trace-icmp.c b/src/trace-icmp.c
+index 842938e..c76cb54 100644
+--- a/src/trace-icmp.c
++++ b/src/trace-icmp.c
+@@ -43,16 +43,19 @@ send_echo_probe (int fd, unsigned ttl, unsigned n, size_t plen, uint16_t port)
+ 	struct
+ 	{
+ 		struct icmp6_hdr ih;
+-		uint8_t payload[plen - sizeof (struct icmp6_hdr)];
++		uint8_t *payload;
+ 	} packet;
+ 	memset (&packet, 0, plen);
++	packet.payload = malloc(plen - sizeof (struct icmp6_hdr));
+ 
+ 	packet.ih.icmp6_type = ICMP6_ECHO_REQUEST;
+ 	packet.ih.icmp6_id = htons (getpid ());
+ 	packet.ih.icmp6_seq = htons ((ttl << 8) | (n & 0xff));
+ 	(void)port;
+ 
+-	return send_payload (fd, &packet.ih, plen, ttl);
++	ssize_t ret = send_payload (fd, &packet.ih, plen, ttl);
++	free(packet.payload);
++	return ret;
+ }
+ 
+ 
+diff --git a/src/trace-tcp.c b/src/trace-tcp.c
+index 940f918..62d22ff 100644
+--- a/src/trace-tcp.c
++++ b/src/trace-tcp.c
+@@ -54,10 +54,11 @@ send_syn_probe (int fd, unsigned ttl, unsigned n, size_t plen, uint16_t port)
+ 	struct
+ 	{
+ 		struct tcphdr th;
+-		uint8_t payload[plen - sizeof (struct tcphdr)];
++		uint8_t *payload;
+ 	} packet;
+ 
+ 	memset (&packet, 0, sizeof (packet));
++	packet.payload = malloc(plen - sizeof (struct tcphdr));
+ 	packet.th.th_sport = sport;
+ 	packet.th.th_dport = port;
+ 	packet.th.th_seq = htonl ((ttl << 24) | (n << 16) | (uint16_t)getpid ());
+@@ -65,7 +66,9 @@ send_syn_probe (int fd, unsigned ttl, unsigned n, size_t plen, uint16_t port)
+ 	packet.th.th_flags = TH_SYN | (ecn ? (TH_ECE | TH_CWR) : 0);
+ 	packet.th.th_win = htons (TCP_WINDOW);
+ 
+-	return send_payload (fd, &packet, plen, ttl);
++	ssize_t ret = send_payload (fd, &packet, plen, ttl);
++	free(packet.payload);
++	return ret;
+ }
+ 
+ 
+@@ -131,10 +134,11 @@ send_ack_probe (int fd, unsigned ttl, unsigned n, size_t plen, uint16_t port)
+ 	struct
+ 	{
+ 		struct tcphdr th;
+-		uint8_t payload[plen - sizeof (struct tcphdr)];
++		uint8_t *payload;
+ 	} packet;
+ 
+ 	memset (&packet, 0, sizeof (packet));
++	packet.payload = malloc(plen - sizeof (struct tcphdr));
+ 	packet.th.th_sport = sport;
+ 	packet.th.th_dport = port;
+ 	packet.th.th_ack = htonl ((ttl << 24) | (n << 16) | (uint16_t)getpid ());
+@@ -142,7 +146,9 @@ send_ack_probe (int fd, unsigned ttl, unsigned n, size_t plen, uint16_t port)
+ 	packet.th.th_flags = TH_ACK;
+ 	packet.th.th_win = htons (TCP_WINDOW);
+ 
+-	return send_payload (fd, &packet, plen, ttl);
++	ssize_t ret = send_payload (fd, &packet, plen, ttl);
++	free(packet.payload);
++	return ret;
+ }
+ 
+ 
+diff --git a/src/trace-udp.c b/src/trace-udp.c
+index 4adde6b..a6cbb07 100644
+--- a/src/trace-udp.c
++++ b/src/trace-udp.c
+@@ -46,9 +46,10 @@ send_udp_probe (int fd, unsigned ttl, unsigned n, size_t plen, uint16_t port)
+ 	struct
+ 	{
+ 		struct udphdr uh;
+-		uint8_t payload[plen - sizeof (struct udphdr)];
++		uint8_t *payload;
+ 	} packet;
+ 	memset (&packet, 0, plen);
++	packet.payload = malloc(plen - sizeof (struct udphdr));
+ 
+ 	(void)n;
+ 	packet.uh.uh_sport = sport;
+@@ -61,7 +62,9 @@ send_udp_probe (int fd, unsigned ttl, unsigned n, size_t plen, uint16_t port)
+ 	/*if (plen > sizeof (struct udphdr))
+ 		packet.payload[0] = (uint8_t)ttl;*/
+ 
+-	return send_payload (fd, &packet, plen, ttl);
++	ssize_t ret = send_payload (fd, &packet, plen, ttl);
++	free(packet.payload);
++	return ret;
+ }
+ 
+ 
+-- 
+2.14.1
+

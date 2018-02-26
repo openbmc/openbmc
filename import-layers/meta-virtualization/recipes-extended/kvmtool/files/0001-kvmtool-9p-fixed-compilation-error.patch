@@ -1,0 +1,27 @@
+From bcd954ffdb9383030e02d356b51e09e4e2a7105a Mon Sep 17 00:00:00 2001
+From: Dariusz Pelowski <dariusz.pelowski@gmail.com>
+Date: Sun, 5 Nov 2017 12:39:52 +0100
+Subject: [PATCH 1/2] kvmtool: 9p: fixed compilation error
+
+makedev is defined in sys/sysmacros.h
+
+Signed-off-by: Dariusz Pelowski <dariusz.pelowski@gmail.com>
+---
+ virtio/9p.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/virtio/9p.c b/virtio/9p.c
+index 6acbfdd..1dee2c2 100644
+--- a/virtio/9p.c
++++ b/virtio/9p.c
+@@ -15,6 +15,7 @@
+ #include <string.h>
+ #include <errno.h>
+ #include <sys/vfs.h>
++#include <sys/sysmacros.h>
+ 
+ #include <linux/virtio_ring.h>
+ #include <linux/virtio_9p.h>
+-- 
+2.15.0
+

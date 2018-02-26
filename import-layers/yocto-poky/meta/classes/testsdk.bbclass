@@ -21,9 +21,10 @@ def testsdk_main(d):
     import logging
 
     from bb.utils import export_proxies
-    from oeqa.core.runner import OEStreamLogger
     from oeqa.sdk.context import OESDKTestContext, OESDKTestContextExecutor
     from oeqa.utils import make_logger_bitbake_compatible
+
+    bb.event.enable_threadlock()
 
     pn = d.getVar("PN")
     logger = make_logger_bitbake_compatible(logging.getLogger("BitBake"))
@@ -71,8 +72,8 @@ def testsdk_main(d):
         component = "%s %s" % (pn, OESDKTestContextExecutor.name)
         context_msg = "%s:%s" % (os.path.basename(tcname), os.path.basename(sdk_env))
 
-        tc.logSummary(result, component, context_msg)
-        tc.logDetails()
+        result.logDetails()
+        result.logSummary(component, context_msg)
 
         if not result.wasSuccessful():
             fail = True
@@ -97,6 +98,8 @@ def testsdkext_main(d):
     from bb.utils import export_proxies
     from oeqa.utils import avoid_paths_in_environ, make_logger_bitbake_compatible, subprocesstweak
     from oeqa.sdkext.context import OESDKExtTestContext, OESDKExtTestContextExecutor
+
+    bb.event.enable_threadlock()
 
     pn = d.getVar("PN")
     logger = make_logger_bitbake_compatible(logging.getLogger("BitBake"))
@@ -173,8 +176,8 @@ def testsdkext_main(d):
         component = "%s %s" % (pn, OESDKExtTestContextExecutor.name)
         context_msg = "%s:%s" % (os.path.basename(tcname), os.path.basename(sdk_env))
 
-        tc.logSummary(result, component, context_msg)
-        tc.logDetails()
+        result.logDetails()
+        result.logSummary(component, context_msg)
 
         if not result.wasSuccessful():
             fail = True

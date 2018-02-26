@@ -1,4 +1,5 @@
 SUMMARY = "Perl modules useful for manipulating date and time information"
+HOMEPAGE = "https://metacpan.org/release/TimeDate"
 SECTION = "libs"
 # You can redistribute it and/or modify it under the same terms as Perl itself.
 LICENSE = "Artistic-1.0 | GPL-1.0+"

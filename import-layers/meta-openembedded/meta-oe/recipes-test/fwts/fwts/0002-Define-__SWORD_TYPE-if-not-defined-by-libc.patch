@@ -1,0 +1,33 @@
+From 0e89127cd02ecd5ea4506b935cb2b59eb94107d2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 6 Jun 2017 07:37:20 -0700
+Subject: [PATCH 2/3] Define __SWORD_TYPE if not defined by libc
+
+__SWORD_TYPE is internal to glibc, therefore
+check and define it if needed e.g. on musl
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/src/fwts_uefi.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/lib/src/fwts_uefi.c b/src/lib/src/fwts_uefi.c
+index 1f9d31fa..2d925f8d 100644
+--- a/src/lib/src/fwts_uefi.c
++++ b/src/lib/src/fwts_uefi.c
+@@ -59,6 +59,10 @@ typedef struct {
+ #define UEFI_IFACE_SYSFS		(2)	/* sysfs */
+ #define UEFI_IFACE_EFIVARS		(3)	/* efivar fs */
+ 
++#ifndef __SWORD_TYPE
++typedef __typeof__( ((struct statfs *)0)->f_type )	__SWORD_TYPE;
++#endif
++
+ /* File system magic numbers */
+ #define PSTOREFS_MAGIC          ((__SWORD_TYPE)0x6165676C)
+ #define EFIVARFS_MAGIC          ((__SWORD_TYPE)0xde5e81e4)
+-- 
+2.13.0
+

@@ -8,7 +8,7 @@
 # system.  These manuals also include an "eclipse" sub-directory as part of
 # the make process.
 #
-# Note that the figures for the Yocto Project Development Manual
+# Note that the figures for the Yocto Project Development Tasks Manual
 # differ depending on the BRANCH being built.
 #
 # The Makefile has these targets:
@@ -42,7 +42,7 @@
 # To build a manual, you must invoke Makefile with the DOC argument.  If you
 # are going to publish the manual, then you must invoke Makefile with both the
 # DOC and the VER argument.  Furthermore, if you are building or publishing
-# the edison or denzil versions of the Yocto Project Development Manual or
+# the edison or denzil versions of the Yocto Project Development Tasks Manual or
 # the mega-manual, you must also use the BRANCH argument.
 #
 # Examples:
@@ -59,7 +59,7 @@
 # 'make DOC=yocto-project-qs' command would be equivalent. The third example
 # generates just the PDF version of the Yocto Project Reference Manual.
 # The fourth example generates the HTML 'edison' version and (if available)
-# the Eclipse help version of the YP Development Manual.  The last example
+# the Eclipse help version of the YP Development Tasks Manual.  The last example
 # generates the HTML version of the mega-manual and uses the 'denzil'
 # branch when choosing figures for the tarball of figures.  Any example that does
 # not use the BRANCH argument builds the current version of the manual set.
@@ -79,15 +79,16 @@
 # The first example publishes the 1.7 version of both the PDF and HTML versions of
 # the BSP Guide.  The second example publishes the 1.6 version of both the PDF and
 # HTML versions of the ADT Manual. The third example publishes the 1.1.1 version of
-# the PDF and HTML YP Development Manual for the 'edison' branch.  The fourth example
-# publishes the 1.2 version of the PDF and HTML YP Development Manual for the
-# 'denzil' branch.
+# the PDF and HTML YP Development Tasks Manual for the 'edison' branch.  The fourth
+# example publishes the 1.2 version of the PDF and HTML YP Development Tasks Manual
+# for the 'denzil' branch.
 #
 
 ifeq ($(DOC),bsp-guide)
 XSLTOPTS = --xinclude
 ALLPREQ = html eclipse tarball
 TARFILES = bsp-style.css bsp-guide.html figures/bsp-title.png \
+           figures/bsp-dev-flow.png \
            eclipse
 MANUALS = $(DOC)/$(DOC).html $(DOC)/eclipse
 FIGURES = figures
@@ -128,14 +129,8 @@ TARFILES = dev-style.css dev-manual.html \
            figures/wip.png
         else
 TARFILES = dev-style.css dev-manual.html \
-           figures/bsp-dev-flow.png \
-           figures/dev-title.png figures/git-workflow.png \
-           figures/index-downloads.png figures/kernel-dev-flow.png \
-           figures/kernel-overview-1.png figures/kernel-overview-2-generic.png \
-           figures/source-repos.png figures/yp-download.png \
-           figures/recipe-workflow.png \
-           figures/devtool-add-flow.png figures/devtool-modify-flow.png \
-           figures/devtool-upgrade-flow.png \
+           figures/dev-title.png \
+           figures/recipe-workflow.png figures/bitbake-build-flow.png \
            eclipse
 	endif
 
@@ -148,7 +143,7 @@ endif
 ifeq ($(DOC),yocto-project-qs)
 XSLTOPTS = --xinclude
 ALLPREQ = html eclipse tarball
-TARFILES = yocto-project-qs.html qs-style.css figures/yocto-environment.png \
+TARFILES = yocto-project-qs.html qs-style.css \
            figures/yocto-project-transp.png \
            eclipse
 MANUALS = $(DOC)/$(DOC).html $(DOC)/eclipse
@@ -195,8 +190,8 @@ TARFILES = mega-manual.html mega-style.css figures/yocto-environment.png \
 	figures/source-repos.png figures/yp-download.png \
 	figures/wip.png
         else
-TARFILES = mega-manual.html mega-style.css figures/yocto-environment.png \
-        figures/building-an-image.png  \
+TARFILES = mega-manual.html mega-style.css \
+        figures/building-an-image.png figures/YP-flow-diagram.png \
 	figures/using-a-pre-built-image.png \
 	figures/poky-title.png figures/buildhistory.png \
         figures/buildhistory-web.png \
@@ -206,7 +201,7 @@ TARFILES = mega-manual.html mega-style.css figures/yocto-environment.png \
         figures/dev-title.png \
 	figures/git-workflow.png figures/index-downloads.png \
         figures/kernel-dev-flow.png \
-	figures/kernel-overview-1.png figures/kernel-overview-2-generic.png \
+	figures/kernel-overview-2-generic.png \
 	figures/source-repos.png figures/yp-download.png \
         figures/profile-title.png figures/kernelshark-all.png \
         figures/kernelshark-choose-events.png \
@@ -244,13 +239,12 @@ TARFILES = mega-manual.html mega-style.css figures/yocto-environment.png \
 	figures/sdk-generation.png figures/recipe-workflow.png \
 	figures/build-workspace-directory.png figures/mega-title.png \
 	figures/toaster-title.png figures/hosted-service.png \
-	figures/simple-configuration.png figures/devtool-add-flow.png \
-	figures/devtool-modify-flow.png figures/devtool-upgrade-flow.png \
+	figures/simple-configuration.png \
 	figures/compatible-layers.png figures/import-layer.png figures/new-project.png \
 	figures/sdk-environment.png figures/sdk-installed-standard-sdk-directory.png \
 	figures/sdk-devtool-add-flow.png figures/sdk-installed-extensible-sdk-directory.png \
 	figures/sdk-devtool-modify-flow.png figures/sdk-eclipse-dev-flow.png \
-	figures/sdk-devtool-upgrade-flow.png
+	figures/sdk-devtool-upgrade-flow.png figures/bitbake-build-flow.png
 	endif
 
 MANUALS = $(DOC)/$(DOC).html
@@ -262,7 +256,7 @@ endif
 ifeq ($(DOC),ref-manual)
 XSLTOPTS = --xinclude
 ALLPREQ = html eclipse tarball
-TARFILES = ref-manual.html ref-style.css figures/poky-title.png \
+TARFILES = ref-manual.html ref-style.css figures/poky-title.png figures/YP-flow-diagram.png \
 	figures/buildhistory.png figures/buildhistory-web.png eclipse \
         figures/cross-development-toolchains.png figures/layer-input.png \
 	figures/package-feeds.png figures/source-input.png \
@@ -271,7 +265,8 @@ TARFILES = ref-manual.html ref-style.css figures/poky-title.png \
 	figures/patching.png figures/configuration-compile-autoreconf.png \
 	figures/analysis-for-package-splitting.png figures/image-generation.png \
 	figures/sdk-generation.png figures/building-an-image.png \
-	figures/build-workspace-directory.png
+	figures/build-workspace-directory.png figures/source-repos.png \
+	figures/index-downloads.png figures/yp-download.png figures/git-workflow.png
 MANUALS = $(DOC)/$(DOC).html $(DOC)/eclipse
 FIGURES = figures
 STYLESHEET = $(DOC)/*.css
@@ -330,8 +325,8 @@ ifeq ($(DOC),kernel-dev)
 XSLTOPTS = --xinclude
 ALLPREQ = html eclipse tarball
 TARFILES = kernel-dev.html kernel-dev-style.css \
-           figures/kernel-dev-title.png \
-           figures/kernel-architecture-overview.png \
+           figures/kernel-dev-title.png figures/kernel-overview-2-generic.png \
+           figures/kernel-architecture-overview.png figures/kernel-dev-flow.png \
            eclipse
 MANUALS = $(DOC)/$(DOC).html $(DOC)/eclipse
 FIGURES = figures

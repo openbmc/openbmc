@@ -356,6 +356,8 @@ class PythonRecipeHandler(RecipeHandler):
         # Naive mapping of setup() arguments to PKG-INFO field names
         for d in [info, non_literals]:
             for key, value in list(d.items()):
+                if key is None:
+                    continue
                 new_key = _map(key)
                 if new_key != key:
                     del d[key]

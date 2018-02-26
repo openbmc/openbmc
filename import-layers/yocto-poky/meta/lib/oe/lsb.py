@@ -1,19 +1,26 @@
+def get_os_release():
+    """Get all key-value pairs from /etc/os-release as a dict"""
+    from collections import OrderedDict
+
+    data = OrderedDict()
+    if os.path.exists('/etc/os-release'):
+        with open('/etc/os-release') as f:
+            for line in f:
+                try:
+                    key, val = line.rstrip().split('=', 1)
+                except ValueError:
+                    continue
+                data[key.strip()] = val.strip('"')
+    return data
+
 def release_dict_osr():
     """ Populate a dict with pertinent values from /etc/os-release """
-    if not os.path.exists('/etc/os-release'):
-        return None
-
     data = {}
-    with open('/etc/os-release') as f:
-        for line in f:
-            try:
-                key, val = line.rstrip().split('=', 1)
-            except ValueError:
-                continue
-            if key == 'ID':
-                data['DISTRIB_ID'] = val.strip('"')
-            if key == 'VERSION_ID':
-                data['DISTRIB_RELEASE'] = val.strip('"')
+    os_release = get_os_release()
+    if 'ID' in os_release:
+        data['DISTRIB_ID'] = os_release['ID']
+    if 'VERSION_ID' in os_release:
+        data['DISTRIB_RELEASE'] = os_release['VERSION_ID']
 
     return data
 

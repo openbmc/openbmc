@@ -1,0 +1,39 @@
+From 4a13419e3805b541fc58e57f1f27c4a388609ef5 Mon Sep 17 00:00:00 2001
+From: Paul Barker <pbarker@toganlabs.com>
+Date: Thu, 7 Sep 2017 20:02:15 +0000
+Subject: [PATCH] Prevent ffmpeg configure/compile race condition
+
+Additional dependency information is needed in Makefile.ffmpeg to ensure that
+the configure stage is finished before the compile stage starts.
+
+Signed-off-by: Paul Barker <pbarker@toganlabs.com>
+Upstream-status: Pending
+---
+ Makefile.ffmpeg | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.ffmpeg b/Makefile.ffmpeg
+index 8651724..619c49a 100644
+--- a/Makefile.ffmpeg
++++ b/Makefile.ffmpeg
+@@ -6,7 +6,7 @@ FFMPEG_EXTRA_CFLAGS?=-mfpu=vfp -mfloat-abi=$(FLOAT) -mno-apcs-stack-check -mstru
+ WORK=$(PWD)
+ 
+ .PHONY : all
+-all: configure compile
++all: compile
+ 
+ .PHONY : copy
+ copy:
+@@ -14,7 +14,7 @@ copy:
+ 	$(HOST)-strip *.so*
+ 
+ .PHONY : compile
+-compile: 
++compile: configure
+ 	+$(MAKE) -C ffmpeg
+ 
+ .PHONY : configure
+-- 
+2.7.4
+

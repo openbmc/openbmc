@@ -19,7 +19,6 @@ RDEPENDS_${PN} = "\
     "
 
 NETWORK_MANAGER ?= "connman-gnome"
-NETWORK_MANAGER_libc-uclibc = ""
 
 SUMMARY_${PN}-base = "Sato desktop - base packages"
 RDEPENDS_${PN}-base = "\

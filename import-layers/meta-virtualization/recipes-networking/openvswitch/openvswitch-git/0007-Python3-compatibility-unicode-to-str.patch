@@ -1,0 +1,51 @@
+From 2fe58f87b00d0ec24d6997930d0bcdb130c84396 Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Thu, 29 Jun 2017 20:33:23 -0700
+Subject: [PATCH 7/8] Python3 compatibility: unicode to str
+
+Commit 7430959d4ad17db89b8387c3aef58c8b230cad10 from
+https://github.com/openvswitch/ovs.git
+
+When transitioning from python2 to python3 the following type class
+changes occured:
+
+python2 -> python3
+unicode -> str
+str -> bytes
+
+That means we have to check the python version and do the right type
+check python3 will throw an error when it tries to use the unicode
+type because it doesn't exist.
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+Signed-off-by: Ben Pfaff <blp@ovn.org>
+---
+ ovsdb/ovsdb-doc | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/ovsdb/ovsdb-doc b/ovsdb/ovsdb-doc
+index 918e88a..406c293 100755
+--- a/ovsdb/ovsdb-doc
++++ b/ovsdb/ovsdb-doc
+@@ -65,9 +65,15 @@ def columnGroupToNroff(table, groupXml, documented_columns):
+                 if node.hasAttribute('type'):
+                     type_string = node.attributes['type'].nodeValue
+                     type_json = ovs.json.from_string(str(type_string))
+-                    if type(type_json) in (str, unicode):
+-                        raise error.Error("%s %s:%s has invalid 'type': %s" 
+-                                          % (table.name, name, key, type_json))
++                    # py2 -> py3 means str -> bytes and unicode -> str
++                    try:
++                        if type(type_json) in (str, unicode):
++                            raise error.Error("%s %s:%s has invalid 'type': %s" 
++                                              % (table.name, name, key, type_json))
++                    except:
++                        if type(type_json) in (bytes, str):
++                            raise error.Error("%s %s:%s has invalid 'type': %s" 
++                                              % (table.name, name, key, type_json))
+                     type_ = ovs.db.types.BaseType.from_json(type_json)
+                 else:
+                     type_ = column.type.value
+-- 
+2.5.0
+

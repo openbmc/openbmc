@@ -1,0 +1,23 @@
+Add LDFLAGS variable to Makefile so that extra linker flags can be sent via this variable.
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/src/Makefile.real b/src/Makefile.real
+index 02179e4..9070974 100644
+--- a/src/Makefile.real
++++ b/src/Makefile.real
+@@ -36,10 +36,10 @@ all: src
+ src: $(CLIENT_BIN) $(SERVER_BIN)
+ 
+ $(SERVER_BIN): $(SERVEROBJS) $(COMMONOBJS) $(MISSINGOBJS)
+-	$(CC) -o $@ $(SERVEROBJS) $(COMMONOBJS) $(MISSINGOBJS) $(LIBS)
++	$(CC) -o $@ $(SERVEROBJS) $(COMMONOBJS) $(MISSINGOBJS) $(LIBS) $(LDFLAGS)
+ 
+ $(CLIENT_BIN): $(CLIENTOBJS) $(COMMONOBJS) $(MISSINGOBJS)
+-	$(CC) -o $@ $(CLIENTOBJS) $(COMMONOBJS) $(MISSINGOBJS) $(LIBS)
++	$(CC) -o $@ $(CLIENTOBJS) $(COMMONOBJS) $(MISSINGOBJS) $(LIBS) $(LDFLAGS)
+ 
+ $(CLIENTOBJS) $(SERVEROBJS): $(HFILES) y.tab.h
+ 

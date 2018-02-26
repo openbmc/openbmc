@@ -8,6 +8,7 @@ PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight localed \
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
 SRC_URI += "file://service-restart-policy.conf"
+SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 SRC_URI += "file://0001-Export-message_append_cmdline.patch"
 SRC_URI += "file://0002-systemd-Make-pam-compile-shared-library.patch"
 SRC_URI += "file://0003-basic-Factor-out-string-checking-from-name_to_prefix.patch"
@@ -23,9 +24,6 @@ FILES_${PN} += "${datadir}/dbus-1/system.d/org.freedesktop.journal1.conf"
 
 SRC_URI += "file://0007-journal-Add-Synchronize-dbus-method.patch"
 SRC_URI_append_df-obmc-ubi-fs = " file://software.conf"
-SRC_URI += "file://0008-man-update-machine-id-5-with-a-note-about-privacy-46.patch"
-SRC_URI += "file://0009-sd-id128-add-new-sd_id128_get_machine_app_specific-A.patch"
-SRC_URI += "file://0010-core-add-khash-API-to-src-basic-as-wrapper-around-ke.patch"
 
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${libdir}/systemd/network/default.network"

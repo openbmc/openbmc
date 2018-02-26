@@ -1,0 +1,59 @@
+From c3959bd00665e24a955bbdbea1ef555e76372f12 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 8 May 2017 16:25:16 +0800
+Subject: [PATCH 04/13] Mount /var/volatile during install
+
+The installed system needs /var/volatile clean, otherwise it
+caused systemd's journalctl failed to record boot log.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/osinstall.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/blivet/osinstall.py b/blivet/osinstall.py
+index a4f9535..61819c2 100644
+--- a/blivet/osinstall.py
++++ b/blivet/osinstall.py
+@@ -294,6 +294,7 @@ class FSSet(object):
+         self._sysfs = None
+         self._proc = None
+         self._devshm = None
++        self._volatile = None
+         self._usb = None
+         self._selinux = None
+         self._run = None
+@@ -335,6 +336,12 @@ class FSSet(object):
+         return self._devshm
+ 
+     @property
++    def volatile(self):
++        if not self._volatile:
++            self._volatile = NoDevice(fmt=get_format("tmpfs", device="tmpfs", mountpoint="/var/volatile"))
++        return self._volatile
++
++    @property
+     def usb(self):
+         if not self._usb:
+             self._usb = NoDevice(fmt=get_format("usbfs", device="usbfs", mountpoint="/proc/bus/usb"))
+@@ -591,6 +598,7 @@ class FSSet(object):
+ 
+         devices = list(self.mountpoints.values()) + self.swap_devices
+         devices.extend([self.dev, self.devshm, self.devpts, self.sysfs,
++                        self.volatile,
+                         self.proc, self.selinux, self.usb, self.run])
+         if isinstance(_platform, EFI):
+             devices.append(self.efivars)
+@@ -650,6 +658,7 @@ class FSSet(object):
+         """ unmount filesystems, except swap if swapoff == False """
+         devices = list(self.mountpoints.values()) + self.swap_devices
+         devices.extend([self.dev, self.devshm, self.devpts, self.sysfs,
++                        self.volatile,
+                         self.proc, self.usb, self.selinux, self.run])
+         if isinstance(_platform, EFI):
+             devices.append(self.efivars)
+-- 
+2.7.4
+

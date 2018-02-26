@@ -1,0 +1,37 @@
+Upstream-Status: Submitted
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From c78979fd95a1c4f732f7e6edf0f32c524e5955b8 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 12 Jul 2017 17:10:07 +0100
+Subject: [PATCH] src/intel/Makefile.vulkan.am: create target directories when
+ required
+
+In out-of-tree builds src/intel/vulkan won't exist, so always create it before
+writing into it.
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ src/intel/Makefile.vulkan.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/intel/Makefile.vulkan.am b/src/intel/Makefile.vulkan.am
+index 3857a5dc62..26e9cd410c 100644
+--- a/src/intel/Makefile.vulkan.am
++++ b/src/intel/Makefile.vulkan.am
+@@ -44,11 +44,13 @@ EXTRA_DIST += \
+ 	vulkan/TODO
+ 
+ vulkan/dev_icd.json : vulkan/dev_icd.json.in
++	$(MKDIR_GEN)
+ 	$(AM_V_GEN) $(SED) \
+ 		-e "s#@build_libdir@#${abs_top_builddir}/${LIB_DIR}#" \
+ 		< $(srcdir)/vulkan/dev_icd.json.in > $@
+ 
+ vulkan/intel_icd.@host_cpu@.json : vulkan/intel_icd.json.in
++	$(MKDIR_GEN)
+ 	$(AM_V_GEN) $(SED) \
+ 		-e "s#@install_libdir@#${libdir}#" \
+ 		< $(srcdir)/vulkan/intel_icd.json.in > $@
+-- 
+2.11.0

@@ -1,0 +1,26 @@
+From fda0ff49968aebc7b27f9711cf6eb7f6c560adc1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 25 Jul 2017 18:28:15 -0700
+Subject: [PATCH] Makefile.am: Link with libm for powl() API
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 4219f28..2a5ceac 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -69,7 +69,7 @@ dist_pkgdata_DATA = usermode.ui
+ userhelper_SOURCES = userhelper.c userhelper.h shvar.c shvar.h
+ userhelper_CPPFLAGS = $(AM_CPPFLAGS) -DSYSCONFDIR='"$(sysconfdir)"'
+ userhelper_LDADD = liblib.a $(LIBUSER_LIBS) $(GLIB_LIBS) $(PAM_LIBS) \
+-	$(SELINUX_LIBS) $(EFENCE_LIBS)
++	$(SELINUX_LIBS) $(EFENCE_LIBS) -lm
+ 
+ userinfo_SOURCES = userinfo.c
+ userinfo_CPPFLAGS = $(AM_CPPFLAGS) $(PIXMAPDIR_CPPFLAGS) $(SBINDIR_CPPFLAGS) \
+-- 
+2.13.3
+

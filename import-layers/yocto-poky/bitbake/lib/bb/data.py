@@ -290,7 +290,7 @@ def build_dependencies(key, keys, shelldeps, varflagsexcl, d):
             return deps, value
         varflags = d.getVarFlags(key, ["vardeps", "vardepvalue", "vardepsexclude", "exports", "postfuncs", "prefuncs", "lineno", "filename"]) or {}
         vardeps = varflags.get("vardeps")
-        value = d.getVar(key, False)
+        value = d.getVarFlag(key, "_content", False)
 
         def handle_contains(value, contains, d):
             newvalue = ""

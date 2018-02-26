@@ -1,0 +1,51 @@
+From a582b0a53d1dc8604a201348b99ca8de48784e7e Mon Sep 17 00:00:00 2001
+From: jiwang <jiwang@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Thu, 12 May 2016 17:00:52 +0000
+Subject: [PATCH] [LRA] PR70904, relax the restriction on subreg reload for
+ wide mode
+
+2016-05-12  Jiong Wang  <jiong.wang@arm.com>
+
+gcc/
+  PR rtl-optimization/70904
+  * lra-constraint.c (process_addr_reg): Relax the restriction on
+  subreg reload for wide mode.
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@236181 138bc75d-0d04-0410-961f-82ee72b054a4
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ gcc/lra-constraints.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/gcc/lra-constraints.c b/gcc/lra-constraints.c
+index f96fd458e23..73fb72a2ea5 100644
+--- a/gcc/lra-constraints.c
++++ b/gcc/lra-constraints.c
+@@ -1326,7 +1326,21 @@ process_addr_reg (rtx *loc, bool check_only_p, rtx_insn **before, rtx_insn **aft
+ 
+   subreg_p = GET_CODE (*loc) == SUBREG;
+   if (subreg_p)
+-    loc = &SUBREG_REG (*loc);
++    {
++      reg = SUBREG_REG (*loc);
++      mode = GET_MODE (reg);
++
++      /* For mode with size bigger than ptr_mode, there unlikely to be "mov"
++	 between two registers with different classes, but there normally will
++	 be "mov" which transfers element of vector register into the general
++	 register, and this normally will be a subreg which should be reloaded
++	 as a whole.  This is particularly likely to be triggered when
++	 -fno-split-wide-types specified.  */
++      if (in_class_p (reg, cl, &new_class)
++	  || GET_MODE_SIZE (mode) <= GET_MODE_SIZE (ptr_mode))
++       loc = &SUBREG_REG (*loc);
++    }
++
+   reg = *loc;
+   mode = GET_MODE (reg);
+   if (! REG_P (reg))
+-- 
+2.14.2
+

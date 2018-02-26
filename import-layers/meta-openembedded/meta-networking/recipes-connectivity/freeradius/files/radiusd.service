@@ -1,0 +1,16 @@
+[Unit]
+Description=FreeRADIUS high performance RADIUS server.
+After=syslog.target network.target
+
+[Service]
+Type=forking
+PIDFile=@STATEDIR@/run/radiusd/radiusd.pid
+ExecStartPre=-@BASE_BINDIR@/chown -R radiusd.radiusd @STATEDIR@/run/radiusd
+ExecStartPre=-@BASE_BINDIR@/sh -c "if [ ! -f @SYSCONFDIR@/raddb/certs/server.pem ]; then sudo -u radiusd @SYSCONFDIR@/raddb/certs/bootstrap; fi"
+ExecStartPre=@SBINDIR@/radiusd -C
+ExecStart=@SBINDIR@/radiusd -d @SYSCONFDIR@/raddb
+ExecReload=@SBINDIR@/radiusd -C
+ExecReload=@BASE_BINDIR@/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

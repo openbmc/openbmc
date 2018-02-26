@@ -11,10 +11,13 @@
 # more details.
 #
 """Handling of build perf test reports"""
-from collections import OrderedDict, Mapping
+from collections import OrderedDict, Mapping, namedtuple
 from datetime import datetime, timezone
 from numbers import Number
 from statistics import mean, stdev, variance
+
+
+AggregateTestData = namedtuple('AggregateTestData', ['metadata', 'results'])
 
 
 def isofmt_to_timestamp(string):

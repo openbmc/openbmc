@@ -33,12 +33,11 @@ SRC_URI = "${GNU_MIRROR}/mtools/mtools-${PV}.tar.bz2 \
            file://0001-Continue-even-if-fs-size-is-not-divisible-by-sectors.patch \
            "
 
+SRC_URI_append_class-native = " file://disable-hardcoded-configs.patch"
 
 inherit autotools texinfo
 
 EXTRA_OECONF = "--without-x"
-
-LDFLAGS_append_libc-uclibc = " -liconv "
 
 BBCLASSEXTEND = "native nativesdk"
 

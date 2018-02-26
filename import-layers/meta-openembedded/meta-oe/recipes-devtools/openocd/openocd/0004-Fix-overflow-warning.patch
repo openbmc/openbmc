@@ -1,0 +1,30 @@
+From d3ca56370a2be7e737d48bd14d474d790a0ab8ac Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 17 Jun 2017 00:04:00 -0700
+Subject: [PATCH 4/5] Fix overflow warning
+
+Remove an empty space which makes it fit into 11 byte string
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/target/nds32_cmd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/target/nds32_cmd.c b/src/target/nds32_cmd.c
+index edb4872e4..73355073c 100644
+--- a/src/target/nds32_cmd.c
++++ b/src/target/nds32_cmd.c
+@@ -821,7 +821,7 @@ static int jim_nds32_bulk_read(Jim_Interp *interp, int argc, Jim_Obj * const *ar
+ 	jim_wide i;
+ 	Jim_SetResult(interp, Jim_NewEmptyStringObj(interp));
+ 	for (i = 0; i < count; i++) {
+-		sprintf(data_str, "0x%08" PRIx32 " ", data[i]);
++		sprintf(data_str, "0x%08" PRIx32 "", data[i]);
+ 		Jim_AppendStrings(interp, Jim_GetResult(interp), data_str, NULL);
+ 	}
+ 
+-- 
+2.13.1
+

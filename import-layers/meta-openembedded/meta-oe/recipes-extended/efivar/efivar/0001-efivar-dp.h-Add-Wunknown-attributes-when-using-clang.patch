@@ -1,0 +1,32 @@
+From 3d43c5efdb632da5d7387dcadce4e87b83929c64 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 24 Aug 2017 15:54:47 -0700
+Subject: [PATCH] efivar-dp.h: Add -Wunknown-attributes when using clang
+
+change !dp check to a comparision against NULL to silent clang warning
+nonnull parameter 'dp' will evaluate to 'true' on first encounter
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/include/efivar/efivar-dp.h | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+Index: git/src/include/efivar/efivar-dp.h
+===================================================================
+--- git.orig/src/include/efivar/efivar-dp.h
++++ git/src/include/efivar/efivar-dp.h
+@@ -783,9 +783,14 @@ extern int efidp_append_instance(const_e
+  * though older or other compilers might just ignore that attribute if they
+  * don't support it.  Ugh.
+  */
++#pragma GCC diagnostic push
+ #if defined(__GNUC__) && __GNUC__ >= 6
+ #pragma GCC diagnostic ignored "-Wnonnull-compare"
+ #endif
++#if defined(__clang__)
++#pragma GCC diagnostic ignored "-Wunknown-attributes"
++#pragma GCC diagnostic ignored "-Wpointer-bool-conversion"
++#endif
+ 
+ static inline int16_t
+ __attribute__((__artificial__))

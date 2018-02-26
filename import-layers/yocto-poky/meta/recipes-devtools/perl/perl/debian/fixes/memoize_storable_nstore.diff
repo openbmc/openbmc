@@ -47,6 +47,7 @@ Bug-Debian: http://bugs.debian.org/587650
 Bug: https://rt.cpan.org/Public/Bug/Display.html?id=77790
 Forwarded: https://rt.cpan.org/Public/Bug/Display.html?id=77790
 Patch-Name: fixes/memoize_storable_nstore.diff
+Upstream-Status: Pending
 ---
  cpan/Memoize/Memoize/Storable.pm |  2 +-
  cpan/Memoize/t/tie_storable.t    | 24 ++++++++++++++++++++----

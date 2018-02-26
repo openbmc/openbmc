@@ -15,10 +15,14 @@ PR = "r12"
 
 inherit autotools gnome gtk-doc pkgconfig gsettings
 
-SRC_URI += "file://egg-asn1x.patch"
+SRC_URI += "file://egg-asn1x.patch \
+            file://musl.patch \
+"
 
 DEPENDS = "gtk+ libgcrypt libtasn1 libtasn1-native gconf ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)} intltool-native"
 RDEPENDS_${PN} = "libgnome-keyring glib-2.0-utils"
+
+LDFLAGS += "-lgmodule-2.0"
 
 EXTRA_OECONF = "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '--enable-pam --with-pam-dir=${base_libdir}/security', '--disable-pam', d)}"
 
@@ -42,4 +46,11 @@ FILES_${PN}-dbg += "${libdir}/${BPN}/standalone/.debug/ \
                     ${libdir}/${BPN}/devel/.debug/ \
                     ${base_libdir}/security/.debug/"
 
-PNBLACKLIST[gnome-keyring] ?= "This version conflicts with gcr from oe-core - the recipe will be removed on 2017-09-01 unless the issue is fixed"
+# Make compatible with gcr version 3 or newer by removing
+# org.gnome.crypto.pgp.*, which is the provider for this optional
+# functionality.
+
+do_install_append() {
+	rm ${D}${datadir}/GConf/gsettings/org.gnome.crypto.pgp.convert
+	rm ${D}${datadir}/glib-2.0/schemas/org.gnome.crypto.pgp.gschema.xml
+}

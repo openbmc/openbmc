@@ -1,0 +1,75 @@
+#!/bin/sh
+#
+# chkconfig: 35 20 80
+# description: Distributed Input Output Daemon 
+#
+
+# Get function from functions library
+. /etc/init.d/functions
+
+BASE=diod
+PIDFILE=/var/run/$BASE.pid
+PID=`test -f $PIDFILE && cat $PIDFILE`
+DIOD_BIN=/usr/sbin/$BASE
+DIOD_CONF=/etc/$BASE.conf
+DIOD_OPTS="-c $DIOD_CONF"
+DIOD="$DIOD_BIN $DIOD_OPTS"
+RETVAL=0
+
+# Start the service $BASE
+start()
+{
+       # Force creation of the log directory even on a tmpfs /var/log.
+       mkdir -p /var/log/diod
+
+       start-stop-daemon --stop --test --quiet --pidfile $PIDFILE
+       status=$?
+       if [ $status -eq 0 ]; then
+           echo "diod service is already running with pid $PID"
+           exit 1
+       else
+           echo -n "Starting $BASE:"
+           start-stop-daemon --start --pidfile $PIDFILE \
+	     --exec $DIOD_BIN -- $DIOD_OPTS
+           RETVAL=$?
+           echo
+           [ $RETVAL -ne 0 ] && exit $RETVAL
+       fi
+}
+
+# Stop the service $BASE
+stop()
+{
+    echo -n "Stopping $BASE:"
+    start-stop-daemon --stop --test --quiet --pidfile $PIDFILE
+    status=$?
+    if [ $status -eq 0 ]; then
+        start-stop-daemon --stop --quiet --pidfile $PIDFILE
+        [ -w $PIDFILE ] && rm -f $PIDFILE
+    else
+	start-stop-daemon --stop --quiet --name $BASE
+    fi
+}
+
+
+### service arguments ###
+case $1 in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $BASE
+        ;;
+    restart | force-reload)
+        $0 stop
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart}."
+        exit 1
+esac
+
+exit 0

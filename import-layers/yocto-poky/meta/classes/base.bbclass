@@ -61,22 +61,15 @@ oe_runmake() {
 
 
 def base_dep_prepend(d):
-    #
-    # Ideally this will check a flag so we will operate properly in
-    # the case where host == build == target, for now we don't work in
-    # that case though.
-    #
+    if d.getVar('INHIBIT_DEFAULT_DEPS', False):
+        return ""
+    return "${BASE_DEFAULT_DEPS}"
 
-    deps = ""
-    # INHIBIT_DEFAULT_DEPS doesn't apply to the patch command.  Whether or  not
-    # we need that built is the responsibility of the patch function / class, not
-    # the application.
-    if not d.getVar('INHIBIT_DEFAULT_DEPS', False):
-        if (d.getVar('HOST_SYS') != d.getVar('BUILD_SYS')):
-            deps += " virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}compilerlibs virtual/libc "
-    return deps
+BASE_DEFAULT_DEPS = "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}compilerlibs virtual/libc"
 
-BASEDEPENDS = "${@base_dep_prepend(d)}"
+BASEDEPENDS = ""
+BASEDEPENDS_class-target = "${@base_dep_prepend(d)}"
+BASEDEPENDS_class-nativesdk = "${@base_dep_prepend(d)}"
 
 DEPENDS_prepend="${BASEDEPENDS} "
 
@@ -185,7 +178,7 @@ def pkgarch_mapping(d):
 
 def get_layers_branch_rev(d):
     layers = (d.getVar("BBLAYERS") or "").split()
-    layers_branch_rev = ["%-17s = \"%s:%s\"" % (os.path.basename(i), \
+    layers_branch_rev = ["%-20s = \"%s:%s\"" % (os.path.basename(i), \
         base_get_metadata_git_branch(i, None).strip(), \
         base_get_metadata_git_revision(i, None)) \
             for i in layers]
@@ -213,7 +206,7 @@ def buildcfg_vars(d):
     for var in statusvars:
         value = d.getVar(var)
         if value is not None:
-            yield '%-17s = "%s"' % (var, value)
+            yield '%-20s = "%s"' % (var, value)
 
 def buildcfg_neededvars(d):
     needed_vars = oe.data.typed_value("BUILDCFG_NEEDEDVARS", d)
@@ -227,7 +220,7 @@ def buildcfg_neededvars(d):
         bb.fatal('The following variable(s) were not set: %s\nPlease set them directly, or choose a MACHINE or DISTRO that sets them.' % ', '.join(pesteruser))
 
 addhandler base_eventhandler
-base_eventhandler[eventmask] = "bb.event.ConfigParsed bb.event.BuildStarted bb.event.RecipePreFinalise bb.runqueue.sceneQueueComplete bb.event.RecipeParsed"
+base_eventhandler[eventmask] = "bb.event.ConfigParsed bb.event.MultiConfigParsed bb.event.BuildStarted bb.event.RecipePreFinalise bb.runqueue.sceneQueueComplete bb.event.RecipeParsed"
 python base_eventhandler() {
     import bb.runqueue
 
@@ -241,6 +234,16 @@ python base_eventhandler() {
         # Works with the line in layer.conf which changes PATH to point here
         setup_hosttools_dir(d.getVar('HOSTTOOLS_DIR'), 'HOSTTOOLS', d)
         setup_hosttools_dir(d.getVar('HOSTTOOLS_DIR'), 'HOSTTOOLS_NONFATAL', d, fatal=False)
+
+    if isinstance(e, bb.event.MultiConfigParsed):
+        # We need to expand SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS in each of the multiconfig data stores
+        # own contexts so the variables get expanded correctly for that arch, then inject back into
+        # the main data store.
+        deps = []
+        for config in e.mcdata:
+            deps.append(e.mcdata[config].getVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS"))
+        deps = " ".join(deps)
+        e.mcdata[''].setVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS", deps)
 
     if isinstance(e, bb.event.BuildStarted):
         localdata = bb.data.createCopy(e.data)
@@ -391,7 +394,7 @@ python () {
     # These take the form:
     #
     # PACKAGECONFIG ??= "<default options>"
-    # PACKAGECONFIG[foo] = "--enable-foo,--disable-foo,foo_depends,foo_runtime_depends"
+    # PACKAGECONFIG[foo] = "--enable-foo,--disable-foo,foo_depends,foo_runtime_depends,foo_runtime_recommends"
     pkgconfigflags = d.getVarFlags("PACKAGECONFIG") or {}
     if pkgconfigflags:
         pkgconfig = (d.getVar('PACKAGECONFIG') or "").split()
@@ -433,12 +436,13 @@ python () {
 
         extradeps = []
         extrardeps = []
+        extrarrecs = []
         extraconf = []
         for flag, flagval in sorted(pkgconfigflags.items()):
             items = flagval.split(",")
             num = len(items)
-            if num > 4:
-                bb.error("%s: PACKAGECONFIG[%s] Only enable,disable,depend,rdepend can be specified!"
+            if num > 5:
+                bb.error("%s: PACKAGECONFIG[%s] Only enable,disable,depend,rdepend,rrecommend can be specified!"
                     % (d.getVar('PN'), flag))
 
             if flag in pkgconfig:
@@ -446,12 +450,15 @@ python () {
                     extradeps.append(items[2])
                 if num >= 4 and items[3]:
                     extrardeps.append(items[3])
+                if num >= 5 and items[4]:
+                    extrarrecs.append(items[4])
                 if num >= 1 and items[0]:
                     extraconf.append(items[0])
             elif num >= 2 and items[1]:
                     extraconf.append(items[1])
         appendVar('DEPENDS', extradeps)
         appendVar('RDEPENDS_${PN}', extrardeps)
+        appendVar('RRECOMMENDS_${PN}', extrarrecs)
         appendVar('PACKAGECONFIG_CONFARGS', extraconf)
 
     pn = d.getVar('PN')
@@ -617,16 +624,16 @@ python () {
             d.appendVarFlag('do_unpack', 'depends', ' lzip-native:do_populate_sysroot')
 
         # *.xz should DEPEND on xz-native for unpacking
-        elif path.endswith('.xz'):
+        elif path.endswith('.xz') or path.endswith('.txz'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 
         # .zip should DEPEND on unzip-native for unpacking
-        elif path.endswith('.zip'):
+        elif path.endswith('.zip') or path.endswith('.jar'):
             d.appendVarFlag('do_unpack', 'depends', ' unzip-native:do_populate_sysroot')
 
         # file is needed by rpm2cpio.sh
-        elif path.endswith('.src.rpm'):
-            d.appendVarFlag('do_unpack', 'depends', ' file-native:do_populate_sysroot')
+        elif path.endswith('.rpm'):
+            d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 
     if needsrcrev:
         d.setVar("SRCPV", "${@bb.fetch2.get_srcrev(d)}")

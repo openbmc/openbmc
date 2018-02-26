@@ -1,0 +1,56 @@
+From 18415c0b4c6e50ed9b99dfdae8d210590d0ab72e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 28 Apr 2017 04:50:30 -0400
+Subject: [PATCH] explicitly support python3 by pkg-config
+
+The PYTHON_CPPFLAGS and -lpython$(PYTHON_VERSION) is hardcoded,
+use pkg-config to replace
+
+Upstream-Status: Inappropriate [wr-installer specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.am  | 5 ++---
+ configure.ac | 2 ++
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 4569bbf..7a8daf4 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -20,7 +20,6 @@ ACLOCAL_AMFLAGS = -I m4
+ AM_CPPFLAGS = $(blkid_CFLAGS) $(glib_CFLAGS) $(GPGME_CFLAGS) \
+ 	$(libcryptsetup_CFLAGS) $(nss_CFLAGS)
+ LOCALEDIR_CPPFLAGS = -DLOCALEDIR='"$(localedir)"'
+-PYTHON_CPPFLAGS = -I/usr/include/python$(PYTHON_VERSION)
+ 
+ ## Targets
+ SUBDIRS = po
+@@ -63,9 +62,9 @@ lib_libvolume_key_la_LIBADD = $(blkid_LIBS) $(glib_LIBS) $(GPGME_LIBS) \
+ 	$(LTLIBINTL) $(libcryptsetup_LIBS) $(nss_LIBS)
+ 
+ python__volume_key_la_SOURCES = python/volume_key_wrap.c
+-python__volume_key_la_CPPFLAGS = $(AM_CPPFLAGS) $(PYTHON_CPPFLAGS)
++python__volume_key_la_CPPFLAGS = $(AM_CPPFLAGS) $(python3_CFLAGS)
+ python__volume_key_la_LDFLAGS = -module -avoid-version $(glib_LIBS)
+-python__volume_key_la_LIBADD = lib/libvolume_key.la -lpython$(PYTHON_VERSION) \
++python__volume_key_la_LIBADD = lib/libvolume_key.la $(python3_LIBS) \
+ 	$(glib_LIBS) $(nss_LIBS)
+ 
+ src_volume_key_SOURCES = src/volume_key.c
+diff --git a/configure.ac b/configure.ac
+index ff35dd0..0928a6c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -27,6 +27,8 @@ AM_INIT_AUTOMAKE([no-dist-gzip dist-xz no-define subdir-objects -Wall])
+ AC_PROG_CC
+ AM_PROG_CC_C_O
+ LT_INIT([disable-static])
++
++PKG_CHECK_MODULES(python3, [python3])
+ AM_PATH_PYTHON
+ 
+ dnl Not gpg2, it cannot receive passphrases from gpgme
+-- 
+2.8.1
+

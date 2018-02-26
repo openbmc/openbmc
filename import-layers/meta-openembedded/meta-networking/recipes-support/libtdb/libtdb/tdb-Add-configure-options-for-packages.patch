@@ -1,7 +1,10 @@
-From 10ac5e5fdda44adcc2a159b6f9a2d51a51361057 Mon Sep 17 00:00:00 2001
-From: Jackie Huang <jackie.huang@windriver.com>
-Date: Wed, 21 Sep 2016 10:46:19 +0800
-Subject: [PATCH] tdb: Add configure options for packages
+From 24911f36bcb00412e5dc4cd11fda139e09d58798 Mon Sep 17 00:00:00 2001
+From: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
+Date: Tue, 1 Aug 2017 03:12:09 +0900
+Subject: [PATCH] From 10ac5e5fdda44adcc2a159b6f9a2d51a51361057 Mon Sep 17
+ 00:00:00 2001 From: Jackie Huang <jackie.huang@windriver.com> Date: Wed, 21
+ Sep 2016 10:46:19 +0800 Subject: [PATCH] tdb: Add configure options for
+ packages
 
 Add configure options for the following packages:
  - acl
@@ -14,6 +17,10 @@ Add configure options for the following packages:
 Upstream-Status: Inappropriate [oe deterministic build specific]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+Update for libtdb_1.3.14.
+
+Signed-off-by: Huang Qiyu <huangqy.fnst@cn.fujitsu.com>
 ---
  lib/replace/system/wscript_configure |  6 ++-
  lib/replace/wscript                  | 85 ++++++++++++++++++++++++++++--------
@@ -37,7 +44,7 @@ index 2035474..10f9ae7 100644
  
  # solaris varients of getXXent_r
 diff --git a/lib/replace/wscript b/lib/replace/wscript
-index 145300d..310048c 100644
+index 7c50e1d..15df5c3 100644
 --- a/lib/replace/wscript
 +++ b/lib/replace/wscript
 @@ -23,6 +23,41 @@ def set_options(opt):
@@ -124,7 +131,7 @@ index 145300d..310048c 100644
      conf.CHECK_HEADERS('nss_common.h nsswitch.h ns_api.h')
      conf.CHECK_HEADERS('sys/extattr.h sys/ea.h sys/proplist.h sys/cdefs.h')
      conf.CHECK_HEADERS('utmp.h utmpx.h lastlog.h')
-@@ -248,17 +298,18 @@ def configure(conf):
+@@ -251,17 +301,18 @@ def configure(conf):
  
      conf.CHECK_FUNCS('prctl dirname basename')
  
@@ -155,23 +162,23 @@ index 145300d..310048c 100644
      conf.CHECK_CODE('''
                  struct ucred cred;
 diff --git a/wscript b/wscript
-index 50b2286..748eef1 100644
+index 1c9655a..8c20d3b 100644
 --- a/wscript
 +++ b/wscript
-@@ -64,7 +64,12 @@ def set_options(opt):
-         opt.add_option('--disable-python',
-                        help=("disable the pytdb module"),
-                        action="store_true", dest='disable_python', default=False)
+@@ -62,7 +62,12 @@ def set_options(opt):
+                    help=("Disable the use of pthread robust mutexes"),
+                    action="store_true", dest='disable_tdb_mutex_locking',
+                    default=False)
 -
-+        opt.add_option('--with-valgrind',
-+                       help=("enable use of valgrind"),
-+                       action="store_true", dest='enable_valgrind')
-+        opt.add_option('--without-valgrind',
-+                       help=("disable use of valgrind"),
-+                       action="store_false", dest='enable_valgrind', default=False)
++    opt.add_option('--with-valgrind',
++                   help=("enable use of valgrind"),
++                   action="store_true", dest='enable_valgrind')
++    opt.add_option('--without-valgrind',
++                   help=("disable use of valgrind"),
++                   action="store_false", dest='enable_valgrind', default=False)
  
  def configure(conf):
      conf.env.disable_tdb_mutex_locking = getattr(Options.options,
 -- 
-2.8.3
+2.7.4
 

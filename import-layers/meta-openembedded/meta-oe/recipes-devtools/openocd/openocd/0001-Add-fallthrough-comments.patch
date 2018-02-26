@@ -1,0 +1,155 @@
+From 8f85163b030e7b957648f90cd8fa599fb04d5d65 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Jun 2017 23:32:49 -0700
+Subject: [PATCH 1/5] Add fallthrough comments
+
+Fixes
+
+src/svf/svf.c:663:7: error: this statement may fall through [-Werror=implicit-fallthrough=]
+     i = -1;
+     ~~^~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/flash/mflash.c            | 3 ++-
+ src/flash/nand/mx3.c          | 1 +
+ src/jtag/drivers/ftdi.c       | 1 +
+ src/svf/svf.c                 | 2 ++
+ src/target/arm_adi_v5.c       | 9 +++++++++
+ src/target/arm_disassembler.c | 1 +
+ src/target/target.c           | 1 +
+ 7 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/src/flash/mflash.c b/src/flash/mflash.c
+index b69995542..3254a3d56 100644
+--- a/src/flash/mflash.c
++++ b/src/flash/mflash.c
+@@ -259,10 +259,11 @@ static int mg_dsk_wait(mg_io_type_wait wait_local, uint32_t time_var)
+ 				case mg_io_wait_rdy:
+ 					if (status & mg_io_rbit_status_ready)
+ 						return ERROR_OK;
+-
++					/* fallthru */
+ 				case mg_io_wait_drq:
+ 					if (status & mg_io_rbit_status_data_req)
+ 						return ERROR_OK;
++					/* fallthru */
+ 
+ 				default:
+ 					break;
+diff --git a/src/flash/nand/mx3.c b/src/flash/nand/mx3.c
+index b61e47535..0a55929ed 100644
+--- a/src/flash/nand/mx3.c
++++ b/src/flash/nand/mx3.c
+@@ -281,6 +281,7 @@ static int imx31_command(struct nand_device *nand, uint8_t command)
+ 			 * offset == one half of page size
+ 			 */
+ 			in_sram_address = MX3_NF_MAIN_BUFFER0 + (nand->page_size >> 1);
++			/* fallthru */
+ 		default:
+ 			in_sram_address = MX3_NF_MAIN_BUFFER0;
+ 	}
+diff --git a/src/jtag/drivers/ftdi.c b/src/jtag/drivers/ftdi.c
+index 00fe37faf..20f17d810 100644
+--- a/src/jtag/drivers/ftdi.c
++++ b/src/jtag/drivers/ftdi.c
+@@ -855,6 +855,7 @@ COMMAND_HANDLER(ftdi_handle_set_signal_command)
+ 			ftdi_set_signal(sig, *CMD_ARGV[1]);
+ 			break;
+ 		}
++		/* fallthru */
+ 	default:
+ 		LOG_ERROR("unknown signal level '%s', use 0, 1 or z", CMD_ARGV[1]);
+ 		return ERROR_COMMAND_SYNTAX_ERROR;
+diff --git a/src/svf/svf.c b/src/svf/svf.c
+index e7e815c10..7b261cc72 100644
+--- a/src/svf/svf.c
++++ b/src/svf/svf.c
+@@ -661,11 +661,13 @@ static int svf_read_command_from_file(FILE *fd)
+ 				if (svf_getline(&svf_read_line, &svf_read_line_size, svf_fd) <= 0)
+ 					return ERROR_FAIL;
+ 				i = -1;
++				/* fallthru */
+ 			case '\r':
+ 				slash = 0;
+ 				/* Don't save '\r' and '\n' if no data is parsed */
+ 				if (!cmd_pos)
+ 					break;
++				/* fallthru */
+ 			default:
+ 				/* The parsing code currently expects a space
+ 				 * before parentheses -- "TDI (123)".  Also a
+diff --git a/src/target/arm_adi_v5.c b/src/target/arm_adi_v5.c
+index eafc2ddc0..d444db2b1 100644
+--- a/src/target/arm_adi_v5.c
++++ b/src/target/arm_adi_v5.c
+@@ -346,10 +346,13 @@ static int mem_ap_write(struct adiv5_ap *ap, const uint8_t *buffer, uint32_t siz
+ 			case 4:
+ 				outvalue |= (uint32_t)*buffer++ << 8 * (address++ & 3);
+ 				outvalue |= (uint32_t)*buffer++ << 8 * (address++ & 3);
++				/* fallthru */
+ 			case 2:
+ 				outvalue |= (uint32_t)*buffer++ << 8 * (address++ & 3);
++				/* fallthru */
+ 			case 1:
+ 				outvalue |= (uint32_t)*buffer++ << 8 * (address++ & 3);
++				/* fallthru */
+ 			}
+ 		}
+ 
+@@ -509,20 +512,26 @@ static int mem_ap_read(struct adiv5_ap *ap, uint8_t *buffer, uint32_t size, uint
+ 			case 4:
+ 				*buffer++ = *read_ptr >> 8 * (3 - (address++ & 3));
+ 				*buffer++ = *read_ptr >> 8 * (3 - (address++ & 3));
++				/* fallthru */
+ 			case 2:
+ 				*buffer++ = *read_ptr >> 8 * (3 - (address++ & 3));
++				/* fallthru */
+ 			case 1:
+ 				*buffer++ = *read_ptr >> 8 * (3 - (address++ & 3));
++				/* fallthru */
+ 			}
+ 		} else {
+ 			switch (this_size) {
+ 			case 4:
+ 				*buffer++ = *read_ptr >> 8 * (address++ & 3);
+ 				*buffer++ = *read_ptr >> 8 * (address++ & 3);
++				/* fallthru */
+ 			case 2:
+ 				*buffer++ = *read_ptr >> 8 * (address++ & 3);
++				/* fallthru */
+ 			case 1:
+ 				*buffer++ = *read_ptr >> 8 * (address++ & 3);
++				/* fallthru */
+ 			}
+ 		}
+ 
+diff --git a/src/target/arm_disassembler.c b/src/target/arm_disassembler.c
+index 5277b94d8..2eb21ea33 100644
+--- a/src/target/arm_disassembler.c
++++ b/src/target/arm_disassembler.c
+@@ -3299,6 +3299,7 @@ static int t2ev_data_immed(uint32_t opcode, uint32_t address,
+ 		case 0x10:
+ 		case 0x12:
+ 			is_signed = true;
++			/* fallthru */
+ 		case 0x18:
+ 		case 0x1a:
+ 			/* signed/unsigned saturated add */
+diff --git a/src/target/target.c b/src/target/target.c
+index e04ecc470..597b4b13d 100644
+--- a/src/target/target.c
++++ b/src/target/target.c
+@@ -3684,6 +3684,7 @@ COMMAND_HANDLER(handle_bp_command)
+ 				addr = 0;
+ 				return handle_bp_command_set(CMD_CTX, addr, asid, length, hw);
+ 			}
++			/* fallthru */
+ 
+ 		case 4:
+ 			hw = BKPT_HARD;
+-- 
+2.13.1
+

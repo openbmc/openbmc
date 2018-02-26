@@ -1,0 +1,28 @@
+From 23f827ea94284656972652f61f2c6aad96092cc8 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 20 Jul 2017 23:00:29 -0400
+Subject: [PATCH] fix compile failure against musl C library
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ lib/rpm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/rpm.c b/lib/rpm.c
+index 920e145..58140bf 100644
+--- a/lib/rpm.c
++++ b/lib/rpm.c
+@@ -188,7 +188,7 @@ sr_rpm_package_sort(struct sr_rpm_package *packages)
+     }
+ 
+     /* Sort the array. */
+-    qsort(array, count, sizeof(struct sr_rpm_package*), (comparison_fn_t)cmp_nevra_qsort_wrapper);
++    qsort(array, count, sizeof(struct sr_rpm_package*), cmp_nevra_qsort_wrapper);
+ 
+     /* Create a linked list from the sorted array. */
+     for (size_t loop = 0; loop < count; ++loop)
+-- 
+2.8.1
+

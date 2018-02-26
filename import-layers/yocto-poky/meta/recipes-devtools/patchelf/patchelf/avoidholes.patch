@@ -31,7 +31,7 @@ was good, the implementation wasn't correct and they've been rewritten here.
 RP
 2017/3/7
 
-Upstream-Status: Pending
+Upstream-Status: Accepted
 
 Index: patchelf-0.9/src/patchelf.cc
 ===================================================================

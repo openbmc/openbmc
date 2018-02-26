@@ -1,4 +1,5 @@
 SUMMARY = "Command line file status display utility"
+HOMEPAGE = "http://www.ibiblio.org/pub/Linux/utils/file/"
 DESCRIPTION = "Displays all information about a file that the stat() call provides and all information about a filesystem that statfs() provides."
 SECTION = "console/utils"
 LICENSE = "GPLv2"

@@ -15,16 +15,16 @@ SRCREV = "a9e4e74ec4473a4fd09e56b690bd4fa72f686687"
 # 3.4 series needs libgdata-0.10*, 3.8 series needs also libsecret instead of gnome-keyring
 PV = "3.2.3+git${SRCPV}"
 
-SRC_URI = " \
-    git://git.gnome.org/evolution-data-server;branch=gnome-3-2 \
-    file://0001-contact-Replace-the-Novell-sample-contact-with-somet.patch \
-    file://0002-Fix-for-automake-1.12.x.patch \
-    file://0003-Disable-Werror-for-automake.patch \
-    file://0004-configure-Fix-libical-pkg-config-trying-to-use-host-.patch \
-    file://0005-soup-adapt-to-new-libxml2-API-from-2.9.0.patch \
-    file://0006-configure.ac-do-not-overwrite-localedir.patch \
-    file://iconv-detect.h \
-"
+SRC_URI = "git://git.gnome.org/evolution-data-server;branch=gnome-3-2 \
+           file://0001-contact-Replace-the-Novell-sample-contact-with-somet.patch \
+           file://0002-Fix-for-automake-1.12.x.patch \
+           file://0003-Disable-Werror-for-automake.patch \
+           file://0004-configure-Fix-libical-pkg-config-trying-to-use-host-.patch \
+           file://0005-soup-adapt-to-new-libxml2-API-from-2.9.0.patch \
+           file://0006-configure.ac-do-not-overwrite-localedir.patch \
+           file://iconv-detect.h \
+           file://0001-imapx-Fix-signature-for-imapx_tokenise_struct.patch \
+           "
 
 S = "${WORKDIR}/git"
 

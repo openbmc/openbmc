@@ -1,0 +1,43 @@
+From 21d83dd9499e5be30eea28dd7034d1ea2a01c838 Mon Sep 17 00:00:00 2001
+From: Matt Madison <matt@madison.systems>
+Date: Tue, 14 Nov 2017 07:38:42 -0800
+Subject: [PATCH 10/10] make.bash: override CC when building dist and
+ go_bootstrap
+
+For cross-canadian builds, dist and go_bootstrap
+run on the build host, so CC needs to point to the
+build host's C compiler.  Add a BUILD_CC environment
+for this, falling back to $CC if not present.
+
+Upstream-Status: Pending
+
+Signed-off-by: Matt Madison <matt@madison.systems>
+---
+ src/make.bash | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/make.bash b/src/make.bash
+index 0bdadc6..f199349 100755
+--- a/src/make.bash
++++ b/src/make.bash
+@@ -131,7 +131,7 @@ if [ "$GOROOT_BOOTSTRAP" = "$GOROOT" ]; then
+ 	exit 1
+ fi
+ rm -f cmd/dist/dist
+-GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
++CC=${BUILD_CC:-${CC}} GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
+ 
+ # -e doesn't propagate out of eval, so check success by hand.
+ eval $(./cmd/dist/dist env -p || echo FAIL=true)
+@@ -167,7 +167,7 @@ elif [ "$1" = "--host-only" ]; then
+ fi
+ 
+ if [ "$do_host_build" = "yes" ]; then
+-	./cmd/dist/dist bootstrap $buildall $GO_DISTFLAGS -v # builds go_bootstrap
++	CC=${BUILD_CC:-${CC}} ./cmd/dist/dist bootstrap $buildall $GO_DISTFLAGS -v # builds go_bootstrap
+ 	# Delay move of dist tool to now, because bootstrap may clear tool directory.
+ 	mv cmd/dist/dist "$GOTOOLDIR"/dist
+ 	echo
+-- 
+2.7.4
+

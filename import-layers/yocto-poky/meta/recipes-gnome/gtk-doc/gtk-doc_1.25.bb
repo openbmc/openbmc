@@ -16,6 +16,7 @@ PACKAGECONFIG ??= "${@bb.utils.contains("DISTRO_FEATURES", "api-documentation", 
 # hopefully no one minds because its scripts are not used for anything during build
 # and shouldn't be used on targets.
 PACKAGECONFIG[working-scripts] = "--with-highlight=source-highlight,--with-highlight=no,libxslt-native xmlto-native source-highlight-native perl-native"
+PACKAGECONFIG[tests] = "--enable-tests,--disable-tests,glib-2.0"
 
 # We cannot use host perl, because it may be too old for gtk-doc
 EXTRANATIVEPATH += "perl-native"
@@ -23,6 +24,7 @@ EXTRANATIVEPATH += "perl-native"
 SRC_URI += "file://0001-Do-not-hardocode-paths-to-perl-python-in-scripts.patch \
             file://0001-Do-not-error-out-if-xsltproc-is-not-found.patch \
             file://0001-Do-not-error-out-if-perl-is-not-found-or-its-version.patch \
+            file://conditionaltests.patch \
            "
 SRC_URI_append_class-native = " file://pkg-config-native.patch"
 

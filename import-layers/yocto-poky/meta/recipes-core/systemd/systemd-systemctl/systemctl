@@ -108,7 +108,7 @@ for service in $services; do
 
 	# If any new unit types are added to systemd they should be added
 	# to this regular expression.
-	unit_types_re='\.\(service\|socket\|device\|mount\|automount\|swap\|target\|path\|timer\|snapshot\)\s*$'
+	unit_types_re='\.\(service\|socket\|device\|mount\|automount\|swap\|target\|target\.wants\|path\|timer\|snapshot\)\s*$'
 	if [ "$action" = "preset" ]; then
 		action=`egrep -sh  $service $ROOT/etc/systemd/user-preset/*.preset | cut -f1 -d' '`
 		if [ -z "$action" ]; then

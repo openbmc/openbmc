@@ -12,6 +12,7 @@ arch specific methods, and the end result will be strangeness
 like the loopback device not being configured/enabled.
 
 Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+Upstream-Status: Pending
 ---
  defn2c.pl   | 6 +++---
  defn2man.pl | 6 +++---

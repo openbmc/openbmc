@@ -5,7 +5,8 @@ BUGTRACKER = "https://bugzilla.gnome.org/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=55ca817ccb7d5b5b66355690e9abc605"
 
-DEPENDS = "intltool-native gtk+3 p11-kit glib-2.0 libgcrypt"
+DEPENDS = "intltool-native gtk+3 p11-kit glib-2.0 libgcrypt \
+           ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'libxslt-native', '', d)}"
 
 inherit autotools gnomebase gtk-icon-cache gtk-doc distro_features_check upstream-version-is-even vala gobject-introspection
 # depends on gtk+3, but also x11 through gtk+-x11
@@ -23,16 +24,3 @@ FILES_${PN} += " \
 
 # http://errors.yoctoproject.org/Errors/Details/20229/
 ARM_INSTRUCTION_SET = "arm"
-
-# on x86-64 the introspection binary goes into 
-# an infinite loop under qemu during compilation, 
-# printing the following:
-# 
-# gcrypt-Message: select() error: Bad address
-#
-# gcrypt-Message: select() error: Bad address
-#
-# gcrypt-Message: select() error: Bad address
-#
-# This will be investigated later.
-EXTRA_OECONF_append_x86-64 = " --disable-introspection --disable-gtk-doc"

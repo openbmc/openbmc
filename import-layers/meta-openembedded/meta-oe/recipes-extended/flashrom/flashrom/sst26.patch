@@ -1,0 +1,198 @@
+--- flashrom-0.9.9.orig/chipdrivers.h
++++ flashrom-0.9.9/chipdrivers.h
+@@ -103,6 +103,7 @@
+ int spi_prettyprint_status_register_sst25(struct flashctx *flash);
+ int spi_prettyprint_status_register_sst25vf016(struct flashctx *flash);
+ int spi_prettyprint_status_register_sst25vf040b(struct flashctx *flash);
++int spi_disable_blockprotect_sst26_global_unprotect(struct flashctx *flash);
+ 
+ /* sfdp.c */
+ int probe_spi_sfdp(struct flashctx *flash);
+--- flashrom-0.9.9.orig/flashchips.c
++++ flashrom-0.9.9/flashchips.c
+@@ -12564,6 +12564,120 @@
+ 
+ 	{
+ 		.vendor		= "SST",
++		.name		= "SST26VF016B(A)",
++		.bustype	= BUS_SPI,
++		.manufacture_id	= SST_ID,
++		.model_id	= SST_SST26VF016B,
++		.total_size	= 2048,
++		.page_size	= 256,
++		.feature_bits	= FEATURE_WRSR_WREN | FEATURE_OTP,
++		.tested		= TEST_OK_PREW,
++		.probe		= probe_spi_rdid,
++		.probe_timing	= TIMING_ZERO,
++		.block_erasers	=
++		{
++			{
++				.eraseblocks = { {4 * 1024, 512} },
++				.block_erase = spi_block_erase_20,
++			}, {
++				.eraseblocks = {
++					{8 * 1024, 4},
++					{32 * 1024, 1},
++					{64 * 1024, 30},
++					{32 * 1024, 1},
++					{8 * 1024, 4},
++				},
++				.block_erase = spi_block_erase_d8,
++			}, {
++				.eraseblocks = { {2 * 1024 * 1024, 1} },
++				.block_erase = spi_block_erase_c7,
++			},
++		},
++		.printlock	= spi_prettyprint_status_register_plain, /* TODO: improve */
++		.unlock		= spi_disable_blockprotect_sst26_global_unprotect,
++		.write		= spi_chip_write_256, /* Multi I/O supported */
++		.read		= spi_chip_read, /* Fast read (0x0B) and multi I/O supported */
++		.voltage	= {2700, 3600},
++	},
++	{
++		.vendor		= "SST",
++		.name		= "SST26VF032B(A)",
++		.bustype	= BUS_SPI,
++		.manufacture_id	= SST_ID,
++		.model_id	= SST_SST26VF032B,
++		.total_size	= 4096,
++		.page_size	= 256,
++		.feature_bits	= FEATURE_WRSR_WREN | FEATURE_OTP,
++		.tested		= TEST_UNTESTED,
++		.probe		= probe_spi_rdid,
++		.probe_timing	= TIMING_ZERO,
++		.block_erasers	=
++		{
++			{
++				.eraseblocks = { {4 * 1024, 1024} },
++				.block_erase = spi_block_erase_20,
++			}, {
++				.eraseblocks = {
++					{8 * 1024, 4},
++					{32 * 1024, 1},
++					{64 * 1024, 62},
++					{32 * 1024, 1},
++					{8 * 1024, 4},
++				},
++				.block_erase = spi_block_erase_d8,
++			}, {
++				.eraseblocks = { {4 * 1024 * 1024, 1} },
++				.block_erase = spi_block_erase_c7,
++			},
++		},
++		.printlock	= spi_prettyprint_status_register_plain, /* TODO: improve */
++		.unlock		= spi_disable_blockprotect_sst26_global_unprotect,
++		.write		= spi_chip_write_256, /* Multi I/O supported */
++		.read		= spi_chip_read, /* Fast read (0x0B) and multi I/O supported */
++		.voltage	= {2700, 3600},
++	},
++
++
++	{
++		.vendor		= "SST",
++		.name		= "SST26VF064B(A)",
++		.bustype	= BUS_SPI,
++		.manufacture_id	= SST_ID,
++		.model_id	= SST_SST26VF064B,
++		.total_size	= 8192,
++		.page_size	= 256,
++		.feature_bits	= FEATURE_WRSR_WREN | FEATURE_OTP,
++		.tested		= TEST_OK_PREW,
++		.probe		= probe_spi_rdid,
++		.probe_timing	= TIMING_ZERO,
++		.block_erasers	=
++		{
++			{
++				.eraseblocks = { {4 * 1024, 2048} },
++				.block_erase = spi_block_erase_20,
++			}, {
++				.eraseblocks = {
++					{8 * 1024, 4},
++					{32 * 1024, 1},
++					{64 * 1024, 126},
++					{32 * 1024, 1},
++					{8 * 1024, 4},
++				},
++				.block_erase = spi_block_erase_d8,
++			}, {
++				.eraseblocks = { {8 * 1024 * 1024, 1} },
++				.block_erase = spi_block_erase_c7,
++			},
++		},
++		.printlock	= spi_prettyprint_status_register_plain, /* TODO: improve */
++		.unlock		= spi_disable_blockprotect_sst26_global_unprotect,
++		.write		= spi_chip_write_256, /* Multi I/O supported */
++		.read		= spi_chip_read, /* Fast read (0x0B) and multi I/O supported */
++		.voltage	= {2700, 3600},
++	},
++
++	{
++		.vendor		= "SST",
+ 		.name		= "SST25WF512",
+ 		.bustype	= BUS_SPI,
+ 		.manufacture_id	= SST_ID,
+--- flashrom-0.9.9.orig/flashchips.h
++++ flashrom-0.9.9/flashchips.h
+@@ -697,6 +697,8 @@
+ #define SST_SST25VF064C		0x254B
+ #define SST_SST26VF016		0x2601
+ #define SST_SST26VF032		0x2602
++#define SST_SST26VF016B		0x2641
++#define SST_SST26VF032B		0x2642
+ #define SST_SST26VF064B		0x2643
+ #define SST_SST27SF512		0xA4
+ #define SST_SST27SF010		0xA5
+--- flashrom-0.9.9.orig/linux_spi.c
++++ flashrom-0.9.9/linux_spi.c
+@@ -141,6 +141,16 @@
+ 	return 0;
+ }
+ 
++static void print_hex(const char *msg, const void *buf, size_t len)
++{
++        size_t i;
++	msg_pspew("%s:\n", msg);
++        for (i = 0; i < len; i++) {
++                msg_pspew(" %02x", ((uint8_t *)buf)[i]);
++        }
++        msg_pspew("\n");
++}
++
+ static int linux_spi_send_command(struct flashctx *flash, unsigned int writecnt,
+ 				  unsigned int readcnt,
+ 				  const unsigned char *txbuf,
+@@ -172,10 +182,12 @@
+ 	else
+ 		iocontrol_code = SPI_IOC_MESSAGE(2);
+ 
++	print_hex("Write", txbuf, writecnt);
+ 	if (ioctl(fd, iocontrol_code, msg) == -1) {
+ 		msg_cerr("%s: ioctl: %s\n", __func__, strerror(errno));
+ 		return -1;
+ 	}
++	if (readcnt) print_hex("Got", rxbuf, readcnt);
+ 	return 0;
+ }
+ 
+--- flashrom-0.9.9.orig/spi25_statusreg.c
++++ flashrom-0.9.9/spi25_statusreg.c
+@@ -196,6 +196,19 @@
+ 	return spi_disable_blockprotect_generic(flash, 0x3C, 0, 0, 0xFF);
+ }
+ 
++int spi_disable_blockprotect_sst26_global_unprotect(struct flashctx *flash)
++{
++	int result = spi_write_enable(flash);
++	if (result)
++		return result;
++
++	static const unsigned char cmd[] = { 0x98 }; /* ULBPR */
++	result = spi_send_command(flash, sizeof(cmd), 0, cmd, NULL);
++	if (result)
++		msg_cerr("ULBPR failed\n");
++	return result;
++}
++
+ /* A common block protection disable that tries to unset the status register bits masked by 0x0C (BP0-1) and
+  * protected/locked by bit #7. Useful when bits 4-5 may be non-0). */
+ int spi_disable_blockprotect_bp1_srwd(struct flashctx *flash)

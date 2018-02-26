@@ -1,7 +1,7 @@
-From 77a7495376c7d0c5507c0ec99bf1568150339ef4 Mon Sep 17 00:00:00 2001
+From b9edcc845641956b7286c60c833f05a9f70cfab9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:01:50 +0000
-Subject: [PATCH 05/26] fsl e500/e5500/e6500/603e fsqrt implementation
+Subject: [PATCH 05/25] fsl e500/e5500/e6500/603e fsqrt implementation
 
 Upstream-Status: Pending
 Signed-off-by: Edmar Wienskoski <edmar@freescale.com>
@@ -49,7 +49,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 diff --git a/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrt.c
 new file mode 100644
-index 0000000..71e516d
+index 0000000000..71e516d1c8
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrt.c
 @@ -0,0 +1,134 @@
@@ -189,7 +189,7 @@ index 0000000..71e516d
 +}
 diff --git a/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrtf.c
 new file mode 100644
-index 0000000..26fa067
+index 0000000000..26fa067abf
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrtf.c
 @@ -0,0 +1,101 @@
@@ -296,7 +296,7 @@ index 0000000..26fa067
 +}
 diff --git a/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrt.c
 new file mode 100644
-index 0000000..71e516d
+index 0000000000..71e516d1c8
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrt.c
 @@ -0,0 +1,134 @@
@@ -436,7 +436,7 @@ index 0000000..71e516d
 +}
 diff --git a/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrtf.c
 new file mode 100644
-index 0000000..26fa067
+index 0000000000..26fa067abf
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrtf.c
 @@ -0,0 +1,101 @@
@@ -543,7 +543,7 @@ index 0000000..26fa067
 +}
 diff --git a/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrt.c
 new file mode 100644
-index 0000000..71e516d
+index 0000000000..71e516d1c8
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrt.c
 @@ -0,0 +1,134 @@
@@ -683,7 +683,7 @@ index 0000000..71e516d
 +}
 diff --git a/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrtf.c
 new file mode 100644
-index 0000000..26fa067
+index 0000000000..26fa067abf
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrtf.c
 @@ -0,0 +1,101 @@
@@ -790,7 +790,7 @@ index 0000000..26fa067
 +}
 diff --git a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c
 new file mode 100644
-index 0000000..71e516d
+index 0000000000..71e516d1c8
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c
 @@ -0,0 +1,134 @@
@@ -930,7 +930,7 @@ index 0000000..71e516d
 +}
 diff --git a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c
 new file mode 100644
-index 0000000..26fa067
+index 0000000000..26fa067abf
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c
 @@ -0,0 +1,101 @@
@@ -1037,7 +1037,7 @@ index 0000000..26fa067
 +}
 diff --git a/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrt.c
 new file mode 100644
-index 0000000..71e516d
+index 0000000000..71e516d1c8
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrt.c
 @@ -0,0 +1,134 @@
@@ -1177,7 +1177,7 @@ index 0000000..71e516d
 +}
 diff --git a/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrtf.c
 new file mode 100644
-index 0000000..26fa067
+index 0000000000..26fa067abf
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrtf.c
 @@ -0,0 +1,101 @@
@@ -1284,7 +1284,7 @@ index 0000000..26fa067
 +}
 diff --git a/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrt.c
 new file mode 100644
-index 0000000..71e516d
+index 0000000000..71e516d1c8
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrt.c
 @@ -0,0 +1,134 @@
@@ -1424,7 +1424,7 @@ index 0000000..71e516d
 +}
 diff --git a/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrtf.c
 new file mode 100644
-index 0000000..26fa067
+index 0000000000..26fa067abf
 --- /dev/null
 +++ b/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrtf.c
 @@ -0,0 +1,101 @@
@@ -1531,14 +1531,14 @@ index 0000000..26fa067
 +}
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/603e/fpu/Implies b/sysdeps/unix/sysv/linux/powerpc/powerpc32/603e/fpu/Implies
 new file mode 100644
-index 0000000..b103b4d
+index 0000000000..b103b4dea5
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/603e/fpu/Implies
 @@ -0,0 +1 @@
 +powerpc/powerpc32/603e/fpu
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/e300c3/fpu/Implies b/sysdeps/unix/sysv/linux/powerpc/powerpc32/e300c3/fpu/Implies
 new file mode 100644
-index 0000000..64db17f
+index 0000000000..64db17fada
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/e300c3/fpu/Implies
 @@ -0,0 +1,2 @@
@@ -1546,39 +1546,39 @@ index 0000000..64db17f
 +powerpc/powerpc32/603e/fpu
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/e500mc/fpu/Implies b/sysdeps/unix/sysv/linux/powerpc/powerpc32/e500mc/fpu/Implies
 new file mode 100644
-index 0000000..7eac5fc
+index 0000000000..7eac5fcf02
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/e500mc/fpu/Implies
 @@ -0,0 +1 @@
 +powerpc/powerpc32/e500mc/fpu
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/e5500/fpu/Implies b/sysdeps/unix/sysv/linux/powerpc/powerpc32/e5500/fpu/Implies
 new file mode 100644
-index 0000000..264b2a7
+index 0000000000..264b2a7700
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/e5500/fpu/Implies
 @@ -0,0 +1 @@
 +powerpc/powerpc32/e5500/fpu
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc32/e6500/fpu/Implies b/sysdeps/unix/sysv/linux/powerpc/powerpc32/e6500/fpu/Implies
 new file mode 100644
-index 0000000..a259344
+index 0000000000..a25934467b
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc32/e6500/fpu/Implies
 @@ -0,0 +1 @@
 +powerpc/powerpc32/e6500/fpu
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/e5500/fpu/Implies b/sysdeps/unix/sysv/linux/powerpc/powerpc64/e5500/fpu/Implies
 new file mode 100644
-index 0000000..a7bc854
+index 0000000000..a7bc854be8
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/e5500/fpu/Implies
 @@ -0,0 +1 @@
 +powerpc/powerpc64/e5500/fpu
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/e6500/fpu/Implies b/sysdeps/unix/sysv/linux/powerpc/powerpc64/e6500/fpu/Implies
 new file mode 100644
-index 0000000..04ff8cc
+index 0000000000..04ff8cc181
 --- /dev/null
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/e6500/fpu/Implies
 @@ -0,0 +1 @@
 +powerpc/powerpc64/e6500/fpu
 -- 
-2.10.2
+2.13.2
 

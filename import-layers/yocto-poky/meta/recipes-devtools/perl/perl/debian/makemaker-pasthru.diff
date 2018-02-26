@@ -11,6 +11,7 @@ the PASTHRU list fixes this.
 
 Bug-Debian: https://bugs.debian.org/758471
 Patch-Name: debian/makemaker-pasthru.diff
+Upstream-Status: Pending
 ---
  cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -1,10 +1,12 @@
 DESCRIPTION = "Python HTTP for Humans."
 HOMEPAGE = "http://python-requests.org"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=d9bb3515869c0f426cb8441c899ae7f5"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=979d6a23b143e13ea0e5e3aa81248820"
 
-SRC_URI[md5sum] = "921ec6b48f2ddafc8bb6160957baf444"
-SRC_URI[sha256sum] = "5722cd09762faa01276230270ff16af7acf7c5c45d623868d9ba116f15791ce8"
+SRC_URI[md5sum] = "081412b2ef79bdc48229891af13f4d82"
+SRC_URI[sha256sum] = "9c443e7324ba5b85070c4a818ade28bfabedf16ea10206da1132edaa6dda237e"
+
+inherit pypi
 
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-email \
@@ -15,6 +17,8 @@ RDEPENDS_${PN} += " \
     ${PYTHON_PN}-pyopenssl \
     ${PYTHON_PN}-pysocks \
     ${PYTHON_PN}-urllib3 \
+    ${PYTHON_PN}-chardet \
+    ${PYTHON_PN}-idna \
 "
 
 BBCLASSEXTEND = "native nativesdk"

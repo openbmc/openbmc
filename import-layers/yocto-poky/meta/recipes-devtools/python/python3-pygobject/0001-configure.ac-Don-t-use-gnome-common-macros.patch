@@ -1,0 +1,33 @@
+From 206360744cedff20eae3c8fcfde9938fdae99592 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 6 Jul 2017 11:47:21 +0300
+Subject: [PATCH] configure.ac: Don't use gnome-common macros
+
+remove GNOME_COMPILE_WARNINGS() call: it's from gnome-common which
+is deprecated.
+
+This patch can be removed when upgrading to 3.25.1: at that point
+pygobject needs autoconf-archive instead.
+
+Upstream-Status: Inappropriate [Already handled upstream]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ configure.ac | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1f15b3c..5cb170f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -221,8 +221,6 @@ AC_ARG_WITH(common,
+     with_common=yes)
+ AM_CONDITIONAL(WITH_COMMON, test "$with_common" = "yes")
+ 
+-# compiler warnings, errors, required cflags, and code coverage support
+-GNOME_COMPILE_WARNINGS([maximum], [-Wno-error=missing-prototypes])
+ AC_MSG_CHECKING(for Gnome code coverage support)
+ m4_ifdef([GNOME_CODE_COVERAGE],
+          [AC_MSG_RESULT(yes)
+-- 
+2.1.4
+

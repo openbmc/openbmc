@@ -45,6 +45,11 @@ do_install_ptest() {
 	install ${B}/minigzip   ${D}${PTEST_PATH}
 	install ${B}/examplesh  ${D}${PTEST_PATH}
 	install ${B}/minigzipsh ${D}${PTEST_PATH}
+
+	# Remove buildhost references...
+	sed -i -e "s,--sysroot=${STAGING_DIR_TARGET},,g" \
+		-e 's|${DEBUG_PREFIX_MAP}||g' \
+	 ${D}${PTEST_PATH}/Makefile
 }
 
 # Move zlib shared libraries for target builds to $base_libdir so the library

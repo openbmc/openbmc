@@ -7,6 +7,7 @@ The Debian packaging moves libperl.a a couple of levels up from the
 CORE directory to match other static libraries.
 
 Patch-Name: debian/extutils_set_libperl_path.diff
+Upstream-Status: Pending
 ---
  cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm | 2 +-
  pp.c                                            | 2 +-

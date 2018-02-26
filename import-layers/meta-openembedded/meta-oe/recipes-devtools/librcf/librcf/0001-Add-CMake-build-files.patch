@@ -53,7 +53,7 @@ index 0000000..f6e24be
 +####################################################################
 +INCLUDE (${CMAKE_SOURCE_DIR}/VERSION.cmake)
 +
-+SET (LIBRCF_LIBRARIES "-lpthread -ldl")
++SET (LIBRCF_LIBRARIES "-lpthread -ldl -latomic")
 +INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR}/include)
 +
 +IF (LIBRCF_USE_OPENSSL)

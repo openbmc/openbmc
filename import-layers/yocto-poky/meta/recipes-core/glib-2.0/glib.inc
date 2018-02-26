@@ -45,7 +45,6 @@ PRINTF_darwin = "--enable-included-printf=yes"
 PRINTF_mingw32 = "--enable-included-printf=yes"
 EXTRA_OECONF = "${PRINTF} ${CORECONF}"
 EXTRA_OECONF_class-native = "${CORECONF} --disable-selinux"
-EXTRA_OECONF_append_libc-uclibc = " --with-libiconv=gnu"
 
 # Tell configure that we'll have dbus-daemon on the target for the tests
 EXTRA_OECONF_class-target_append = " ${@bb.utils.contains('PTEST_ENABLED', '1', ' ac_cv_prog_DBUS_DAEMON=dbus-daemon', '', d)}"
@@ -67,11 +66,16 @@ FILES_${PN}-dev += "${libdir}/glib-2.0/include \
                     ${bindir}/glib-compile-resources \
                     ${datadir}/glib-2.0/gettext/po/Makefile.in.in \
                     ${datadir}/glib-2.0/schemas/gschema.dtd \
+                    ${datadir}/glib-2.0/valgrind/glib.supp \
                     ${datadir}/gettext/its"
 FILES_${PN}-dbg += "${datadir}/glib-2.0/gdb ${datadir}/gdb"
 FILES_${PN}-codegen = "${datadir}/glib-2.0/codegen/*.py \
                        ${bindir}/gdbus-codegen"
 FILES_${PN}-utils = "${bindir}/*"
+
+RRECOMMENDS_${PN} += "shared-mime-info"
+# When cross compiling for Windows we don't want to include this
+RRECOMMENDS_${PN}_remove_mingw32 = "shared-mime-info"
 
 ARM_INSTRUCTION_SET_armv4 = "arm"
 ARM_INSTRUCTION_SET_armv5 = "arm"
@@ -116,6 +120,12 @@ do_install_append_class-target () {
 		mv ${D}${libexecdir}/gio-querymodules ${D}${libexecdir}/${MLPREFIX}gio-querymodules
 	fi
 }
+
+RDEPENDS_${PN}-codegen += "\
+            python3 \
+            python3-distutils \
+            python3-xml \
+           "
 
 RDEPENDS_${PN}-ptest += "\
             dbus \

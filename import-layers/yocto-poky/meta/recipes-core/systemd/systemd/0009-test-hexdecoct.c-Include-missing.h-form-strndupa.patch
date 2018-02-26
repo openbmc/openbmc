@@ -1,0 +1,27 @@
+From 75f4e7f167de533a160ee1af2a03fba4c5a5ffc6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Oct 2017 12:33:22 -0700
+Subject: [PATCH 09/12] test-hexdecoct.c: Include missing.h form strndupa
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/test/test-hexdecoct.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/test/test-hexdecoct.c b/src/test/test-hexdecoct.c
+index fcae427e7..5eb5e2ed7 100644
+--- a/src/test/test-hexdecoct.c
++++ b/src/test/test-hexdecoct.c
+@@ -21,6 +21,7 @@
+ #include "hexdecoct.h"
+ #include "macro.h"
+ #include "string-util.h"
++#include "missing.h"
+ 
+ static void test_hexchar(void) {
+         assert_se(hexchar(0xa) == 'a');
+-- 
+2.14.2
+

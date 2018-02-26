@@ -1,0 +1,46 @@
+From e957c3458d53e37bf416f51d2f8bf54c195e50f5 Mon Sep 17 00:00:00 2001
+From: Matt Madison <matt@madison.systems>
+Date: Wed, 13 Sep 2017 08:27:02 -0700
+Subject: [PATCH 7/7] ld: add soname to shareable objects
+
+Shared library handling in OE depends on the inclusion
+of an soname header, so update the go linker to add that
+header for both internal and external linking.
+
+Upstream-Status: Pending
+
+Signed-off-by: Matt Madison <matt@madison.systems>
+---
+ src/cmd/link/internal/ld/lib.go | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/cmd/link/internal/ld/lib.go b/src/cmd/link/internal/ld/lib.go
+index 0234105..0b9e2d0 100644
+--- a/src/cmd/link/internal/ld/lib.go
++++ b/src/cmd/link/internal/ld/lib.go
+@@ -1124,12 +1124,14 @@ func (l *Link) hostlink() {
+ 			// Pass -z nodelete to mark the shared library as
+ 			// non-closeable: a dlclose will do nothing.
+ 			argv = append(argv, "-shared", "-Wl,-z,nodelete")
++			argv = append(argv, fmt.Sprintf("-Wl,-soname,%s", filepath.Base(*flagOutfile)))
+ 		}
+ 	case BuildmodeShared:
+ 		if UseRelro() {
+ 			argv = append(argv, "-Wl,-z,relro")
+ 		}
+ 		argv = append(argv, "-shared")
++		argv = append(argv, fmt.Sprintf("-Wl,-soname,%s", filepath.Base(*flagOutfile)))
+ 	case BuildmodePlugin:
+ 		if Headtype == objabi.Hdarwin {
+ 			argv = append(argv, "-dynamiclib")
+@@ -1138,6 +1140,7 @@ func (l *Link) hostlink() {
+ 				argv = append(argv, "-Wl,-z,relro")
+ 			}
+ 			argv = append(argv, "-shared")
++			argv = append(argv, fmt.Sprintf("-Wl,-soname,%s", filepath.Base(*flagOutfile)))
+ 		}
+ 	}
+ 
+-- 
+2.7.4
+

@@ -3,9 +3,9 @@
 
 require musl.inc
 
-SRCREV = "54807d47acecab778498ced88ce8f62bfa16e379"
+SRCREV = "eb03bde2f24582874cb72b56c7811bf51da0c817"
 
-PV = "1.1.16+git${SRCPV}"
+PV = "1.1.18+git${SRCPV}"
 
 # mirror is at git://github.com/kraj/musl.git
 
@@ -28,6 +28,14 @@ export CROSS_COMPILE="${TARGET_PREFIX}"
 
 LDFLAGS += "-Wl,-soname,libc.so"
 
+# When compiling for Thumb or Thumb2, frame pointers _must_ be disabled since the
+# Thumb frame pointer in r7 clashes with musl's use of inline asm to make syscalls
+# (where r7 is used for the syscall NR). In most cases, frame pointers will be
+# disabled automatically due to the optimisation level, but append an explicit
+# -fomit-frame-pointer to handle cases where optimisation is set to -O0 or frame
+# pointers have been enabled by -fno-omit-frame-pointer earlier in CFLAGS, etc.
+CFLAGS_append_arm = " ${@bb.utils.contains('TUNE_CCARGS', '-mthumb', '-fomit-frame-pointer', '', d)}"
+
 CONFIGUREOPTS = " \
     --prefix=${prefix} \
     --exec-prefix=${exec_prefix} \
@@ -49,10 +57,11 @@ do_install() {
 	oe_runmake install DESTDIR='${D}'
 
 	install -d ${D}${bindir}
+	rm -f ${D}${bindir}/ldd
 	lnr ${D}${libdir}/libc.so ${D}${bindir}/ldd
 	for l in crypt dl m pthread resolv rt util xnet
 	do
-		ln -s libc.so ${D}${libdir}/lib$l.so
+		ln -sf libc.so ${D}${libdir}/lib$l.so
 	done
 }
 

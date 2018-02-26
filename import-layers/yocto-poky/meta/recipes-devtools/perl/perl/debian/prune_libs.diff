@@ -10,7 +10,7 @@ We want to keep the dependencies on perl-base as small as possible,
 and some of the original list may be present on buildds (see Bug#128355).
 
 Patch-Name: debian/prune_libs.diff
-
+Upstream-Status: Pending
 ---
  Configure | 5 ++---
  1 file changed, 2 insertions(+), 3 deletions(-)

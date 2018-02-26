@@ -36,8 +36,8 @@ def tinfoil_init(parserecipes):
     import bb.tinfoil
     import logging
     tinfoil = bb.tinfoil.Tinfoil(tracking=True)
-    tinfoil.prepare(not parserecipes)
     tinfoil.logger.setLevel(logger.getEffectiveLevel())
+    tinfoil.prepare(not parserecipes)
     return tinfoil
 
 def main():

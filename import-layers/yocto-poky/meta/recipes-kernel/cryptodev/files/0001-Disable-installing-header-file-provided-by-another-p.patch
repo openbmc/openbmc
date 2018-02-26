@@ -7,22 +7,18 @@ Signed-off-by: Denys Dmytriyenko <denys@ti.com>
 
 Upstream-Status: Inappropriate [ OE specific ]
 ---
- Makefile | 2 --
- 1 file changed, 2 deletions(-)
+ Makefile | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index d66ef26..8e97c6a 100644
+index 5a080e0..bf02396 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -23,8 +23,6 @@ install: modules_install
+@@ -33,7 +33,6 @@ install: modules_install
  
  modules_install:
- 	make -C $(KERNEL_DIR) SUBDIRS=`pwd` modules_install
--	@echo "Installing cryptodev.h in $(PREFIX)/usr/include/crypto ..."
--	@install -D crypto/cryptodev.h $(PREFIX)/usr/include/crypto/cryptodev.h
+ 	$(MAKE) $(KERNEL_MAKE_OPTS) modules_install
+-	install -m 644 -D crypto/cryptodev.h $(DESTDIR)/$(includedir)/crypto/cryptodev.h
  
  clean:
- 	make -C $(KERNEL_DIR) SUBDIRS=`pwd` clean
--- 
-1.9.1
-
+ 	$(MAKE) $(KERNEL_MAKE_OPTS) clean

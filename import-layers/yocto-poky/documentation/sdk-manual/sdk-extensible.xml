@@ -15,7 +15,7 @@
         to an image, modify the source for an existing component, test
         changes on the target hardware, and ease integration into the rest of
         the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#build-system-term'>OpenEmbedded build system</ulink>.
+        <ulink url='&YOCTO_DOCS_REF_URL;#build-system-term'>OpenEmbedded build system</ulink>.
         <note>
             For a side-by-side comparison of main features supported for an
             extensible SDK as compared to a standard SDK, see the
@@ -235,15 +235,28 @@
             you build, test and package software within the extensible SDK, and
             optionally integrate it into an image built by the OpenEmbedded
             build system.
+            <note><title>Tip</title>
+                The use of <filename>devtool</filename> is not limited to
+                the extensible SDK.
+                You can use <filename>devtool</filename> to help you easily
+                develop any project whose build output must be part of an
+                image built using the OpenEmbedded build system.
+            </note>
         </para>
 
         <para>
             The <filename>devtool</filename> command line is organized
             similarly to
-            <ulink url='&YOCTO_DOCS_DEV_URL;#git'>Git</ulink> in that it has a
+            <ulink url='&YOCTO_DOCS_REF_URL;#git'>Git</ulink> in that it has a
             number of sub-commands for each function.
             You can run <filename>devtool --help</filename> to see all the
             commands.
+            <note>
+                See the
+                "<ulink url='&YOCTO_DOCS_REF_URL;#ref-devtool-reference'><filename>devtool</filename>&nbsp;Quick Reference</ulink>"
+                in the Yocto Project Reference Manual for a
+                <filename>devtool</filename> quick reference.
+            </note>
         </para>
 
         <para>
@@ -293,7 +306,7 @@
                 The <filename>devtool add</filename> command generates
                 a new recipe based on existing source code.
                 This command takes advantage of the
-                <ulink url='&YOCTO_DOCS_DEV_URL;#devtool-the-workspace-layer-structure'>workspace</ulink>
+                <ulink url='&YOCTO_DOCS_REF_URL;#devtool-the-workspace-layer-structure'>workspace</ulink>
                 layer that many <filename>devtool</filename> commands
                 use.
                 The command is flexible enough to allow you to extract source
@@ -612,7 +625,7 @@
                                 extracts them.
                                 Providing the <replaceable>srctree</replaceable>
                                 argument instructs <filename>devtool</filename> where
-                                place the extracted source.</para>
+                                to place the extracted source.</para>
 
                                 <para>Within workspace, <filename>devtool</filename>
                                 creates an append file for the recipe.
@@ -1262,7 +1275,7 @@
         <title>Working With Recipes</title>
 
         <para>
-            When building a recipe with <filename>devtool build</filename> the
+            When building a recipe with <filename>devtool build</filename>, the
             typical build progression is as follows:
             <orderedlist>
                 <listitem><para>

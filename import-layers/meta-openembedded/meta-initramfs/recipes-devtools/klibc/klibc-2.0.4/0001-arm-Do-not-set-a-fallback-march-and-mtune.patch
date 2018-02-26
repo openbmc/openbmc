@@ -1,0 +1,33 @@
+From a46a144ac883898d9cedf7a0b13aec6d10116125 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Sep 2017 23:11:53 -0700
+Subject: [PATCH] arm: Do not set a fallback march and mtune
+
+In OE we pass the options explicitly, there is
+no need to set it inside the makefiles, we will
+need to compute values for CPU_ARCH and CPU_TUNE
+which is a bit harder in OE
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ usr/klibc/arch/arm/MCONFIG | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/klibc/arch/arm/MCONFIG b/usr/klibc/arch/arm/MCONFIG
+index 53bc1dc3..857e2f2d 100644
+--- a/usr/klibc/arch/arm/MCONFIG
++++ b/usr/klibc/arch/arm/MCONFIG
+@@ -10,7 +10,7 @@
+ CPU_ARCH ?= armv4
+ CPU_TUNE ?= strongarm
+ 
+-KLIBCOPTFLAGS += -Os -march=$(CPU_ARCH) -mtune=$(CPU_TUNE)
++KLIBCOPTFLAGS += -Os
+ KLIBCBITSIZE  = 32
+ KLIBCREQFLAGS += -fno-exceptions
+ KLIBCSTRIPFLAGS += -R .ARM.exidx
+-- 
+2.14.2
+

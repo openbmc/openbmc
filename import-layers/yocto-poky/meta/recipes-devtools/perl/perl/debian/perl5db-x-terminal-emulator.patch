@@ -10,6 +10,7 @@ Bug-Debian: http://bugs.debian.org/668490
 Forwarded: not-needed
 
 Patch-Name: debian/perl5db-x-terminal-emulator.patch
+Upstream-Status: Pending
 ---
  lib/perl5db.pl | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

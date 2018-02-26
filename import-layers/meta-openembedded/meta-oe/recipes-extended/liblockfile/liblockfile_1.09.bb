@@ -1,4 +1,5 @@
 SUMMARY = "File locking library"
+HOMEPAGE = "http://packages.qa.debian.org/libl/liblockfile.html"
 SECTION = "libs"
 LICENSE = "LGPLv2+ & GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=ac284a60d48eaa4bc811cddc377fa341"

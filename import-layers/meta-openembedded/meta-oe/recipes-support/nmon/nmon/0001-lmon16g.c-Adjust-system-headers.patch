@@ -1,0 +1,46 @@
+From d977b5170027926eb97ab9742ddc51d2a5555a34 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Jul 2017 10:06:49 -0700
+Subject: [PATCH] lmon16g.c: Adjust system headers
+
+fstab.h is unused
+errno.h is in /usr/include
+defines from sys/cdefs.h is used
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lmon16g.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lmon16g.c b/lmon16g.c
+index cb27e09..d2a11c5 100644
+--- a/lmon16g.c
++++ b/lmon16g.c
+@@ -63,7 +63,7 @@ static char *SccsId = "nmon " VERSION;
+ #include <fcntl.h>
+ #include <math.h>
+ #include <time.h>
+-#include <sys/errno.h>
++#include <errno.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+@@ -71,6 +71,7 @@ static char *SccsId = "nmon " VERSION;
+ #include <sys/time.h>
+ #include <sys/socket.h>
+ #include <sys/wait.h>
++#include <sys/cdefs.h>
+ 
+ /* Windows moved here so they can be cleared when the screen mode changes */
+ WINDOW *padwelcome = NULL;
+@@ -576,7 +577,6 @@ struct procsinfo {
+ int isroot = 0;
+ 
+ #include <mntent.h>
+-#include <fstab.h>
+ #include <sys/stat.h>
+ #include <sys/statfs.h>
+ #include <net/if.h>
+-- 
+2.13.3
+

@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://include/linux/can.h;endline=43;md5=390a2c9a3c5e3595a0
 DEPENDS = "libsocketcan"
 
 SRC_URI = "git://github.com/linux-can/${BPN}.git;protocol=git;branch=master"
-SRCREV = "67a2bdcd336e6becfa5784742e18c88dbeddc973"
+SRCREV = "4c8fb05cb4d6ddcd67299008db54af423f86fd05"
 
 PV = "0.0+gitr${SRCPV}"
 

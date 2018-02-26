@@ -144,7 +144,7 @@ def handle(fn, d, include):
     try:
         statements.eval(d)
     except bb.parse.SkipRecipe:
-        bb.data.setVar("__SKIPPED", True, d)
+        d.setVar("__SKIPPED", True)
         if include == 0:
             return { "" : d }
 

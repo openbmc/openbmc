@@ -14,6 +14,10 @@ PV = "0.9.6+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
+
+PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+
 inherit autotools pkgconfig
 
 do_configure_prepend() {

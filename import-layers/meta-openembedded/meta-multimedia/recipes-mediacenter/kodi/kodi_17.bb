@@ -18,6 +18,7 @@ DEPENDS = " \
             avahi \
             boost \
             bzip2 \
+            crossguid \
             curl \
             dcadec \
             enca \
@@ -62,11 +63,11 @@ DEPENDS = " \
 
 PROVIDES = "xbmc"
 
-SRCREV = "661dd08d221f5b2bf509a696a6aca5ee7d45bb27"
-BASEPV = "17.1"
-PV = "${BASEPV}+gitr${SRCPV}"
+SRCREV = "6abeebd5ba371547c8f04272296433f5e4e28e86"
+PV = "17.3+gitr${SRCPV}"
+ADDONSPV = "17.1"
 SRC_URI = "git://github.com/xbmc/xbmc.git;branch=Krypton \
-           https://repo.voidlinux.eu/distfiles/${BPN}-${BASEPV}-generated-addons.tar.xz;name=addons;unpack=0 \
+           https://repo.voidlinux.eu/distfiles/${BPN}-${ADDONSPV}-generated-addons.tar.xz;name=addons;unpack=0 \
            file://0003-configure-don-t-try-to-run-stuff-to-find-tinyxml.patch \
            file://0004-handle-SIGTERM.patch \
            file://0005-add-support-to-read-frequency-output-if-using-intel-.patch \
@@ -131,6 +132,11 @@ FULL_OPTIMIZATION_armv7a = "-fexpensive-optimizations -fomit-frame-pointer -O3 -
 FULL_OPTIMIZATION_armv7ve = "-fexpensive-optimizations -fomit-frame-pointer -O3 -ffast-math"
 BUILD_OPTIMIZATION = "${FULL_OPTIMIZATION}"
 
+LDFLAGS_append_mips = " -latomic"
+LDFLAGS_append_mipsel = " -latomic"
+LDFLAGS_append_powerpc = " -latomic"
+LDFLAGS_append_arm = " -latomic"
+
 EXTRA_OECONF_append = " LIBTOOL=${STAGING_BINDIR_CROSS}/${HOST_SYS}-libtool"
 
 # for python modules
@@ -146,15 +152,14 @@ def enable_glew(bb, d):
     return ""
 
 do_configure() {
-    tar xf ${WORKDIR}/${BPN}-${BASEPV}-generated-addons.tar.xz -C ${S}/
+    tar xf ${WORKDIR}/${BPN}-${ADDONSPV}-generated-addons.tar.xz -C ${S}/
 
-    ( for i in $(find ${S} -name "configure.*" ) ; do
+    ( for i in $(find ${S} -name configure.ac -or -name configure.in|grep -v ".pc") ; do
        cd $(dirname $i) && gnu-configize --force || true
     done )
     ( for f in ${S}/xbmc/interfaces/python/generated/*.cpp; do
        touch `echo $f|sed -e 's/.cpp$/.xml/g'`
     done )
-    make -C tools/depends/target/crossguid PREFIX=${STAGING_DIR_HOST}${prefix}
 
     BOOTSTRAP_STANDALONE=1 make -f bootstrap.mk JSON_BUILDER="${STAGING_BINDIR_NATIVE}/JsonSchemaBuilder"
     BOOTSTRAP_STANDALONE=1 make JAVA=/bin/true -f codegenerator.mk JSON_BUILDER="${STAGING_BINDIR_NATIVE}/JsonSchemaBuilder"

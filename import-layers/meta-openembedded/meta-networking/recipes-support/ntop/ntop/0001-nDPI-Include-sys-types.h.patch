@@ -1,0 +1,26 @@
+From 6543f3e2d5fe214e2fc6c050289bf1ae73b18724 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Aug 2017 13:56:24 -0700
+Subject: [PATCH] nDPI: Include sys/types.h
+
+Needed for uint_t types
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ nDPI/src/include/ipq_api.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: ntop-5.0.1/nDPI/src/include/ipq_api.h
+===================================================================
+--- ntop-5.0.1.orig/nDPI/src/include/ipq_api.h
++++ ntop-5.0.1/nDPI/src/include/ipq_api.h
+@@ -24,6 +24,7 @@
+ #ifndef __IPOQUE_API_INCLUDE_FILE__
+ #define __IPOQUE_API_INCLUDE_FILE__
+ 
++#include <sys/types.h>
+ 
+ #if defined(HAVE_NTOP) && defined(WIN32)
+ #include <winsock2.h>

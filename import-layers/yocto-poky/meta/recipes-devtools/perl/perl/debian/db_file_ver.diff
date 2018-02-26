@@ -8,6 +8,7 @@ Bug-Debian: http://bugs.debian.org/340047
 Package dependencies ensure the correct library is linked at run-time.
 
 Patch-Name: debian/db_file_ver.diff
+Upstream-Status: Pending
 ---
  cpan/DB_File/version.c | 2 ++
  1 file changed, 2 insertions(+)

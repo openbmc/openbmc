@@ -55,7 +55,7 @@
                 To help understand the BSP layer concept, consider the BSPs that the
                 Yocto Project supports and provides with each release.
                 You can see the layers in the
-                <ulink url='&YOCTO_DOCS_DEV_URL;#yocto-project-repositories'>Yocto Project Source Repositories</ulink>
+                <ulink url='&YOCTO_DOCS_REF_URL;#yocto-project-repositories'>Yocto Project Source Repositories</ulink>
                 through a web interface at
                 <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi'></ulink>.
                 If you go to that interface, you will find near the bottom of the list
@@ -83,12 +83,12 @@
 
             <para>
                 For information on the BSP development workflow, see the
-                "<ulink url='&YOCTO_DOCS_DEV_URL;#developing-a-board-support-package-bsp'>Developing a Board Support Package (BSP)</ulink>"
-                section in the Yocto Project Development Manual.
+                "<link linkend='developing-a-board-support-package-bsp'>Developing a Board Support Package (BSP)</link>"
+                section.
                 For more information on how to set up a local copy of source files
                 from a Git repository, see the
-                "<ulink url='&YOCTO_DOCS_DEV_URL;#getting-setup'>Getting Set Up</ulink>"
-                section also in the Yocto Project Development Manual.
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#working-with-yocto-project-source-files'>Working With Yocto Project Source Files</ulink>"
+                section also in the Yocto Project Development Tasks Manual.
             </para>
 
             <para>
@@ -98,12 +98,10 @@
                 This root is what you add to the
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-BBLAYERS'><filename>BBLAYERS</filename></ulink>
                 variable in the <filename>conf/bblayers.conf</filename> file found in the
-                <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>,
-                which is established after you run one of the OpenEmbedded build environment
-                setup scripts (i.e.
-                <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
-                and
-                <ulink url='&YOCTO_DOCS_REF_URL;#structure-memres-core-script'><filename>oe-init-build-env-memres</filename></ulink>).
+                <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>,
+                which is established after you run the OpenEmbedded build environment
+                setup script (i.e.
+                <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>).
                 Adding the root allows the OpenEmbedded build system to recognize the BSP
                 definition and from it build an image.
                 Here is an example:
@@ -141,7 +139,149 @@
             <para>
                 For more detailed information on layers, see the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and Creating Layers</ulink>"
-                section of the Yocto Project Development Manual.
+                section of the Yocto Project Development Tasks Manual.
+            </para>
+        </section>
+
+        <section id='preparing-your-build-host-to-work-with-bsp-layers'>
+            <title>Preparing Your Build Host to Work With BSP Layers</title>
+
+            <para>
+                This section describes how to get your build host ready
+                to work with BSP layers.
+                Once you have the host set up, you can create the layer
+                as described in the
+                "<link linkend='creating-a-new-bsp-layer-using-the-yocto-bsp-script'>Creating a new BSP Layer Using the yocto-bsp Script</link>"
+                section.
+                <note>
+                    For structural information on BSPs, see the
+                    <link linkend='bsp-filelayout'>Example Filesystem Layout</link>
+                    section.
+                </note>
+                <orderedlist>
+                    <listitem><para>
+                        <emphasis>Set Up the Build Environment:</emphasis>
+                        Be sure you are set up to use BitBake in a shell.
+                        See the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Setting Up the Development Host to Use the Yocto Project</ulink>"
+                        section in the Yocto Project Development Tasks Manual for information
+                        on how to get a build host ready that is either a native
+                        Linux machine or a machine that uses CROPS.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Clone the <filename>poky</filename> Repository:</emphasis>
+                        You need to have a local copy of the Yocto Project
+                        <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>
+                        (i.e. a local <filename>poky</filename> repository).
+                        See the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#cloning-the-poky-repository'>Cloning the <filename>poky</filename> Repository</ulink>"
+                        and possibly the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#checking-out-by-branch-in-poky'>Checking Out by Branch in Poky</ulink>"
+                        and
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#checkout-out-by-tag-in-poky'>Checking Out by Tag in Poky</ulink>"
+                        sections all in the Yocto Project Development Tasks Manual for
+                        information on how to clone the <filename>poky</filename>
+                        repository and check out the appropriate branch for your work.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Determine the BSP Layer You Want:</emphasis>
+                        The Yocto Project supports many BSPs, which are maintained in
+                        their own layers or in layers designed to contain several
+                        BSPs.
+                        To get an idea of machine support through BSP layers, you can
+                        look at the
+                        <ulink url='&YOCTO_RELEASE_DL_URL;/machines'>index of machines</ulink>
+                        for the release.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Optionally Clone the
+                        <filename>meta-intel</filename> BSP Layer:</emphasis>
+                        If your hardware is based on current Intel CPUs and devices,
+                        you can leverage this BSP layer.
+                        For details on the <filename>meta-intel</filename> BSP layer,
+                        see the layer's
+                        <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi/meta-intel/tree/README'><filename>README</filename></ulink>
+                        file.
+                        <orderedlist>
+                            <listitem><para>
+                                <emphasis>Navigate to Your Source Directory:</emphasis>
+                                Typically, you set up the
+                                <filename>meta-intel</filename> Git repository
+                                inside the
+                                <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>
+                                (e.g. <filename>poky</filename>).
+                                </para></listitem>
+                            <listitem><para>
+                                <emphasis>Clone the Layer:</emphasis>
+                                <literallayout class='monospaced'>
+     $ git clone git://git.yoctoproject.org/meta-intel.git
+     Cloning into 'meta-intel'...
+     remote: Counting objects: 14224, done.
+     remote: Compressing objects: 100% (4591/4591), done.
+     remote: Total 14224 (delta 8245), reused 13985 (delta 8006)
+     Receiving objects: 100% (14224/14224), 4.29 MiB | 2.90 MiB/s, done.
+     Resolving deltas: 100% (8245/8245), done.
+     Checking connectivity... done.
+                                </literallayout>
+                                </para></listitem>
+                            <listitem><para>
+                                <emphasis>Check Out the Proper Branch:</emphasis>
+                                The branch you check out for
+                                <filename>meta-intel</filename> must match the same
+                                branch you are using for the Yocto Project release
+                                (e.g. &DISTRO_NAME_NO_CAP;):
+                                <literallayout class='monospaced'>
+     $ git checkout <replaceable>branch_name</replaceable>
+                                </literallayout>
+                                For an example on how to discover branch names and
+                                checkout on a branch, see the
+                                "<ulink url='&YOCTO_DOCS_DEV_URL;#checking-out-by-branch-in-poky'>Checking Out By Branch in Poky</ulink>"
+                                section in the Yocto Project Development Tasks Manual.
+                                </para></listitem>
+                        </orderedlist>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Optionally Set Up an Alternative BSP Layer:</emphasis>
+                        If your hardware can be more closely leveraged to an
+                        existing BSP not within the <filename>meta-intel</filename>
+                        BSP layer, you can clone that BSP layer.</para>
+
+                        <para>The process is identical to the process used for the
+                        <filename>meta-intel</filename> layer except for the layer's
+                        name.
+                        For example, if you determine that your hardware most
+                        closely matches the <filename>meta-minnow</filename>,
+                        clone that layer:
+                        <literallayout class='monospaced'>
+     $ git clone git://git.yoctoproject.org/meta-minnow
+     Cloning into 'meta-minnow'...
+     remote: Counting objects: 456, done.
+     remote: Compressing objects: 100% (283/283), done.
+     remote: Total 456 (delta 163), reused 384 (delta 91)
+     Receiving objects: 100% (456/456), 96.74 KiB | 0 bytes/s, done.
+     Resolving deltas: 100% (163/163), done.
+     Checking connectivity... done.
+                        </literallayout>
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Initialize the Build Environment:</emphasis>
+                        While in the root directory of the Source Directory (i.e.
+                        <filename>poky</filename>), run the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#structure-core-script'><filename>&OE_INIT_FILE;</filename></ulink>
+                        environment setup script to define the OpenEmbedded
+                        build environment on your build host.
+                        <literallayout class='monospaced'>
+     $ source &OE_INIT_FILE;
+                        </literallayout>
+                        Among other things, the script creates the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>,
+                        which is <filename>build</filename> in this case
+                        and is located in the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>.
+                        After the script runs, your current working directory
+                        is set to the <filename>build</filename> directory.
+                        </para></listitem>
+                </orderedlist>
             </para>
         </section>
 
@@ -417,7 +557,7 @@
                     released with the BSP.
                     The information in the <filename>README.sources</filename>
                     file also helps you find the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+                    <ulink url='&YOCTO_DOCS_REF_URL;#metadata'>Metadata</ulink>
                     used to generate the images that ship with the BSP.
                     <note>
                         If the BSP's <filename>binary</filename> directory is
@@ -522,7 +662,7 @@
 
                 <para>
                     This file simply makes
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink>
+                    <ulink url='&YOCTO_DOCS_REF_URL;#bitbake-term'>BitBake</ulink>
                     aware of the recipes and configuration directories.
                     The file must exist so that the OpenEmbedded build system can recognize the BSP.
                 </para>
@@ -571,7 +711,7 @@
                 <para>
                     Tuning files are found in the <filename>meta/conf/machine/include</filename>
                     directory within the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>.
                     For example, the <filename>ia32-base.inc</filename> file resides in the
                     <filename>meta/conf/machine/include</filename> directory.
                 </para>
@@ -627,7 +767,7 @@
                     formfactor recipe
                     <filename>meta/recipes-bsp/formfactor/formfactor_0.0.bb</filename>,
                     which is found in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>.
                 </para></note>
             </section>
 
@@ -667,7 +807,7 @@
                 <para>
                     For your BSP, you typically want to use an existing Yocto
                     Project kernel recipe found in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>
                     at <filename>meta/recipes-kernel/linux</filename>.
                     You can append machine-specific changes to the kernel recipe
                     by using a similarly named append file, which is located in
@@ -710,6 +850,204 @@
             </section>
         </section>
 
+        <section id='developing-a-board-support-package-bsp'>
+            <title>Developing a Board Support Package (BSP)</title>
+
+            <para>
+                This section contains the high-level procedure you can follow
+                to create a BSP using the Yocto Project's
+                <link linkend='using-the-yocto-projects-bsp-tools'>BSP Tools</link>.
+                Although not required for BSP creation, the
+                <filename>meta-intel</filename> repository, which contains
+                many BSPs supported by the Yocto Project, is part of the
+                example.
+            </para>
+
+            <para>
+                For an example that shows how to create a new layer using
+                the tools, see the
+                "<link linkend='creating-a-new-bsp-layer-using-the-yocto-bsp-script'>Creating a New BSP Layer Using the yocto-bsp Script</link>"
+                 section.
+            </para>
+
+            <para>
+                The following illustration and list summarize the BSP
+                creation general workflow.
+            </para>
+
+            <para>
+                <imagedata fileref="figures/bsp-dev-flow.png" width="7in" depth="5in" align="center" scalefit="1" />
+            </para>
+
+            <para>
+                <orderedlist>
+                    <listitem><para>
+                        <emphasis>Set up Your Host Development System to Support
+                        Development Using the Yocto Project</emphasis>:
+                        See the
+                        "<ulink url='&YOCTO_DOCS_QS_URL;#yp-resources'>Setting Up to Use the Yocto Project</ulink>"
+                        section in the Yocto Project Quick Start for options on how
+                        to get a build host ready to use the Yocto Project.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Establish the <filename>meta-intel</filename>
+                        Repository on Your System:</emphasis>
+                        Having local copies of these supported BSP layers on
+                        your system gives you access to layers you might be able
+                        to build on or modify to create your BSP.
+                        For information on how to get these files, see the
+                        "<link linkend='preparing-your-build-host-to-work-with-bsp-layers'>Preparing Your Build Host to Work with BSP Layers</link>"
+                        section.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Create Your Own BSP Layer Using the
+                        <link linkend='creating-a-new-bsp-layer-using-the-yocto-bsp-script'><filename>yocto-bsp</filename></link>
+                        script:</emphasis>
+                        Layers are ideal for isolating and storing work for a
+                        given piece of hardware.
+                        A layer is really just a location or area in which you
+                        place the recipes and configurations for your BSP.
+                        In fact, a BSP is, in itself, a special type of layer.
+                        The simplest way to create a new BSP layer that is
+                        compliant with the Yocto Project is to use the
+                        <filename>yocto-bsp</filename> script.
+                        For information about that script, see the
+                        "<link linkend='creating-a-new-bsp-layer-using-the-yocto-bsp-script'>Creating a New BSP Layer Using the yocto-bsp Script</link>"
+                        section.</para>
+
+                        <para>Another example that illustrates a layer
+                        is an application.
+                        Suppose you are creating an application that has
+                        library or other dependencies in order for it to
+                        compile and run.
+                        The layer, in this case, would be where all the
+                        recipes that define those dependencies are kept.
+                        The key point for a layer is that it is an isolated
+                        area that contains all the relevant information for
+                        the project that the OpenEmbedded build system knows
+                        about.
+                        For more information on layers, see the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and Creating Layers</ulink>"
+                        section in the Yocto Project Development Tasks Manual.
+                        For more information on BSP layers, see the
+                        "<link linkend='bsp-layers'>BSP Layers</link>"
+                        section.
+                        <note><title>Notes</title>
+                            <para>Five BSPs exist that are part of the Yocto
+                            Project release:
+                            <filename>beaglebone</filename> (ARM),
+                            <filename>mpc8315e</filename> (PowerPC),
+                            and <filename>edgerouter</filename> (MIPS).
+                            The recipes and configurations for these five BSPs
+                            are located and dispersed within the
+                            <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>.
+                            </para>
+
+                            <para>Three core Intel BSPs exist as part of the Yocto
+                            Project release in the
+                            <filename>meta-intel</filename> layer:
+                            <itemizedlist>
+                                <listitem><para>
+                                    <filename>intel-core2-32</filename>,
+                                    which is a BSP optimized for the Core2 family of CPUs
+                                    as well as all CPUs prior to the Silvermont core.
+                                    </para></listitem>
+                                <listitem><para>
+                                    <filename>intel-corei7-64</filename>,
+                                    which is a BSP optimized for Nehalem and later
+                                    Core and Xeon CPUs as well as Silvermont and later
+                                    Atom CPUs, such as the Baytrail SoCs.
+                                    </para></listitem>
+                                <listitem><para>
+                                    <filename>intel-quark</filename>,
+                                    which is a BSP optimized for the Intel Galileo
+                                    gen1 &amp; gen2 development boards.
+                                    </para></listitem>
+                            </itemizedlist></para>
+                        </note></para>
+
+                        <para>When you set up a layer for a new BSP, you should
+                        follow a standard layout.
+                        This layout is described in the
+                        "<link linkend='bsp-filelayout'>Example Filesystem Layout</link>"
+                        section.
+                        In the standard layout, you will notice a suggested
+                        structure for recipes and configuration information.
+                        You can see the standard layout for a BSP by examining
+                        any supported BSP found in the
+                        <filename>meta-intel</filename> layer inside the Source
+                        Directory.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Make Configuration Changes to Your New BSP
+                        Layer:</emphasis>
+                        The standard BSP layer structure organizes the files
+                        you need to edit in <filename>conf</filename> and
+                        several <filename>recipes-*</filename>
+                        directories within the BSP layer.
+                        Configuration changes identify where your new layer
+                        is on the local system and identify which kernel you
+                        are going to use.
+                        When you run the <filename>yocto-bsp</filename> script,
+                        you are able to interactively configure many things for
+                        the BSP (e.g. keyboard, touchscreen, and so forth).
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Make Recipe Changes to Your New BSP
+                        Layer:</emphasis>
+                        Recipe changes include altering recipes
+                        (<filename>.bb</filename> files), removing recipes you
+                        do not use, and adding new recipes or append files
+                        (<filename>.bbappend</filename>) that you need to
+                        support your hardware.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Prepare for the Build:</emphasis>
+                        Once you have made all the changes to your BSP layer,
+                        there remains a few things you need to do for the
+                        OpenEmbedded build system in order for it to create
+                        your image.
+                        You need to get the build environment ready by
+                        sourcing an environment setup script
+                        (i.e. <filename>oe-init-build-env</filename>)
+                        and you need to be sure two key configuration
+                        files are configured appropriately: the
+                        <filename>conf/local.conf</filename> and the
+                        <filename>conf/bblayers.conf</filename> file.
+                        You must make the OpenEmbedded build system aware
+                        of your new layer.
+                        See the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#enabling-your-layer'>Enabling Your Layer</ulink>"
+                        section in the Yocto Project Development Tasks Manual
+                        for information on how to let the build system
+                        know about your new layer.</para>
+
+                        <para>The entire process for building an image is
+                        overviewed in the section
+                        "<ulink url='&YOCTO_DOCS_QS_URL;#qs-building-images'>Building Images</ulink>" section
+                        of the Yocto Project Quick Start.
+                        You might want to reference this information.
+                        </para></listitem>
+                    <listitem><para>
+                        <emphasis>Build the Image:</emphasis>
+                        The OpenEmbedded build system uses the BitBake tool
+                        to build images based on the type of image you want to
+                        create.
+                        You can find more information about BitBake in the
+                        <ulink url='&YOCTO_DOCS_BB_URL;'>BitBake User Manual</ulink>.
+                        </para>
+
+                        <para>The build process supports several types of
+                        images to satisfy different needs.
+                        See the
+                        "<ulink url='&YOCTO_DOCS_REF_URL;#ref-images'>Images</ulink>"
+                        chapter in the Yocto Project Reference Manual for
+                        information on supported images.
+                        </para></listitem>
+                </orderedlist>
+            </para>
+        </section>
+
         <section id='requirements-and-recommendations-for-released-bsps'>
             <title>Requirements and Recommendations for Released BSPs</title>
 
@@ -732,24 +1070,28 @@
                             For guidelines on creating a layer that meets these base requirements, see the
                             "<link linkend='bsp-layers'>BSP Layers</link>" and the
                             "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding
-                            and Creating Layers"</ulink> in the Yocto Project Development Manual.</para></listitem>
+                            and Creating Layers"</ulink> in the Yocto Project Development Tasks Manual.
+                            </para></listitem>
                         <listitem><para>The requirements in this section apply regardless of how you
                             package a BSP.
                             You should consult the packaging and distribution guidelines for your
                             specific release process.
                             For an example of packaging and distribution requirements, see the
                             "<ulink url='https://wiki.yoctoproject.org/wiki/Third_Party_BSP_Release_Process'>Third Party BSP Release Process</ulink>"
-                            wiki page.</para></listitem>
+                            wiki page.
+                            </para></listitem>
                         <listitem><para>The requirements for the BSP as it is made available to a developer
                             are completely independent of the released form of the BSP.
                             For example, the BSP Metadata can be contained within a Git repository
                             and could have a directory structure completely different from what appears
-                            in the officially released BSP layer.</para></listitem>
+                            in the officially released BSP layer.
+                            </para></listitem>
                         <listitem><para>It is not required that specific packages or package
                             modifications exist in the BSP layer, beyond the requirements for general
                             compliance with the Yocto Project.
                             For example, no requirement exists dictating that a specific kernel or
-                            kernel version be used in a given BSP.</para></listitem>
+                            kernel version be used in a given BSP.
+                            </para></listitem>
                     </itemizedlist>
                 </para>
 
@@ -776,7 +1118,7 @@
                             <filename>recipes-*</filename> subdirectory.
                             You can find <filename>recipes.txt</filename> in the
                             <filename>meta</filename> directory of the
-                            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>,
+                            <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>,
                             or in the OpenEmbedded Core Layer
                             (<filename>openembedded-core</filename>) found at
                             <ulink url='http://git.openembedded.org/openembedded-core/tree/meta'></ulink>.
@@ -832,8 +1174,8 @@
                                     This is the person to whom patches and questions should
                                     be sent.
                                     For information on how to find the right person, see the
-                                    "<ulink url='&YOCTO_DOCS_DEV_URL;#how-to-submit-a-change'>How to Submit a Change</ulink>"
-                                    section in the Yocto Project Development Manual.
+                                    "<ulink url='&YOCTO_DOCS_DEV_URL;#how-to-submit-a-change'>Submitting a Change to the Yocto Project</ulink>"
+                                    section in the Yocto Project Development Tasks Manual.
                                     </para></listitem>
                                 <listitem><para>Instructions on how to build the BSP using the BSP
                                     layer.</para></listitem>
@@ -937,7 +1279,7 @@
                        file for the modified recipe.
                        For information on using append files, see the
                        "<ulink url='&YOCTO_DOCS_DEV_URL;#using-bbappend-files'>Using .bbappend Files in Your Layer</ulink>"
-                       section in the Yocto Project Development Manual.
+                       section in the Yocto Project Development Tasks Manual.
                        </para></listitem>
                    <listitem><para>
                        Ensure your directory structure in the BSP layer
@@ -1144,7 +1486,7 @@
 
                 <para>
                     Designed to have a  command interface somewhat like
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#git'>Git</ulink>, each
+                    <ulink url='&YOCTO_DOCS_REF_URL;#git'>Git</ulink>, each
                     tool is structured as a set of sub-commands under a
                     top-level command.
                     The top-level command (<filename>yocto-bsp</filename>
@@ -1155,7 +1497,7 @@
 
                 <para>
                     Both tools reside in the <filename>scripts/</filename> subdirectory
-                    of the <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    of the <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>.
                     Consequently, to use the scripts, you must <filename>source</filename> the
                     environment just as you would when invoking a build:
                     <literallayout class='monospaced'>
@@ -1251,11 +1593,11 @@
                     necessary to create a BSP and perform basic kernel maintenance on that BSP using
                     the tools.
                     <note>
-                        You can also use the <filename>yocto-layer</filename> tool to create
+                        You can also use the <filename>bitbake-layers</filename> script to create
                         a "generic" layer.
-                        For information on this tool, see the
-                        "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-general-layer-using-the-yocto-layer-script'>Creating a General Layer Using the yocto-layer Script</ulink>"
-                        section in the Yocto Project Development Guide.
+                        For information on using this script to create a layer, see the
+                        "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-general-layer-using-the-bitbake-layers-script'>Creating a General Layer Using the <filename>bitbake-layers</filename> Script</ulink>"
+                        section in the Yocto Project Development Tasks Manual.
                     </note>
                 </para>
 
@@ -1384,8 +1726,7 @@
                             you do want to use.</para></listitem>
                         <listitem><para>Next, the script asks whether you would like to have a new
                             branch created especially for your BSP in the local
-                            <ulink url='&YOCTO_DOCS_DEV_URL;#local-kernel-files'>Linux Yocto Kernel</ulink>
-                            Git repository .
+                            Linux Yocto Kernel Git repository .
                             If not, then the script re-uses an existing branch.</para>
                             <para>In this example, the default (or "yes") is accepted.
                             Thus, a new branch is created for the BSP rather than using a common, shared
@@ -1406,7 +1747,7 @@
                             Defaults are accepted for each.</para></listitem>
                         <listitem><para>By default, the script creates the new BSP Layer in the
                             current working directory of the
-                            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>,
+                            <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>,
                             (i.e. <filename>poky/build</filename>).
                             </para></listitem>
                     </orderedlist>

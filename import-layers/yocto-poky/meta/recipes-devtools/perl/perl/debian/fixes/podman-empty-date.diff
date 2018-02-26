@@ -10,6 +10,7 @@ One may want to set this to an empty string.  Handle that correctly.
 Origin: upstream, http://git.eyrie.org/?p=perl/podlators.git;a=commitdiff;h=e0e9fcb53e8fc954b2b1955385eea18c27f869af
 Bug-Debian: https://bugs.debian.org/780259
 Patch-Name: fixes/podman-empty-date.diff
+Upstream-Status: Pending
 ---
  cpan/podlators/lib/Pod/Man.pm  | 2 +-
  cpan/podlators/t/devise-date.t | 6 +++++-

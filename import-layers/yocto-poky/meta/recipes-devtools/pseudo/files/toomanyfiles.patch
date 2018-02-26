@@ -1,0 +1,59 @@
+Currently if we max out the maximum number of files, pseudo can deadlock, unable to
+accept new connections yet unable to move forward and unblock the other processes
+waiting either.
+
+Rather than hang, when this happens, close out inactive connections, allowing us
+to accept the new ones. The disconnected clients will simply reconnect. There is
+a small risk of data loss here sadly but its better than hanging.
+
+RP
+2017/4/25
+
+Upstream-Status: Submitted [Peter is aware of the issue]
+
+Index: pseudo-1.8.2/pseudo_server.c
+===================================================================
+--- pseudo-1.8.2.orig/pseudo_server.c
++++ pseudo-1.8.2/pseudo_server.c
+@@ -581,6 +581,7 @@ pseudo_server_loop(void) {
+ 	int rc;
+ 	int fd;
+ 	int loop_timeout = pseudo_server_timeout;
++	int hitmaxfiles;
+ 
+ 	clients = malloc(16 * sizeof(*clients));
+ 
+@@ -597,6 +598,7 @@ pseudo_server_loop(void) {
+ 	active_clients = 1;
+ 	max_clients = 16;
+ 	highest_client = 0;
++	hitmaxfiles = 0;
+ 
+ 	pseudo_debug(PDBGF_SERVER, "server loop started.\n");
+ 	if (listen_fd < 0) {
+@@ -663,10 +665,15 @@ pseudo_server_loop(void) {
+ 						message_time.tv_usec -= 1000000;
+ 						++message_time.tv_sec;
+ 					}
++				} else if (hitmaxfiles) {
++					/* Only close one per loop iteration in the interests of caution */
++					close_client(i);
++					hitmaxfiles = 0;
+ 				}
+ 				if (die_forcefully)
+ 					break;
+ 			}
++			hitmaxfiles = 0;
+ 			if (!die_forcefully && 
+ 			    (FD_ISSET(clients[0].fd, &events) ||
+ 			     FD_ISSET(clients[0].fd, &reads))) {
+@@ -688,6 +698,9 @@ pseudo_server_loop(void) {
+                                          */
+                                         pseudo_server_timeout = DEFAULT_PSEUDO_SERVER_TIMEOUT;
+                                         die_peacefully = 0;
++				} else if (errno == EMFILE) {
++					hitmaxfiles = 1;
++					pseudo_debug(PDBGF_SERVER, "Hit max open files, dropping a client.\n");
+ 				}
+ 			}
+ 			pseudo_debug(PDBGF_SERVER, "server loop complete [%d clients left]\n", active_clients);

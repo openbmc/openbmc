@@ -1,0 +1,24 @@
+#! /bin/sh
+
+# Orignal pkg-config-native action when called as pkg-config-native
+# NO Change here
+if [ "pkg-config-native" = "`basename $0`" ] ; then
+	PKG_CONFIG_PATH="@PATH_NATIVE@"
+	PKG_CONFIG_LIBDIR="@LIBDIR_NATIVE@"
+	unset PKG_CONFIG_SYSROOT_DIR
+else
+	# in this case check if we are in the esdk
+	if [ "$OE_SKIP_SDK_CHECK" = "1" ] ; then
+		parentpid=`ps -o ppid= -p $$`
+		parentpid_info=`ps -wo comm= -o args= -p $parentpid`
+
+		# check if we are being called from  the kernel's make menuconfig
+		if ( echo $parentpid_info | grep -q check-lxdialog ) ; then
+			PKG_CONFIG_PATH="@PATH_NATIVE@"
+			PKG_CONFIG_LIBDIR="@LIBDIR_NATIVE@"
+			unset PKG_CONFIG_SYSROOT_DIR
+		fi
+	fi
+fi
+
+pkg-config.real "$@"

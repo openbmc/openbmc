@@ -1,0 +1,48 @@
+From be6012a5dd49ae5e8ac035654ab1c6f37f0dc8f4 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 1 Jun 2017 15:15:15 +0800
+Subject: [PATCH 3/4] comment out sections shutdown and environment in
+ generated kickstart file
+
+Both of them is disabled by default.
+
+Upstream-Status: Inappropriate[oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+fixup! add comments of shutdown for user
+---
+ pykickstart/commands/reboot.py | 3 +++
+ pykickstart/parser.py          | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/pykickstart/commands/reboot.py b/pykickstart/commands/reboot.py
+index 88799ba..2d0cea9 100644
+--- a/pykickstart/commands/reboot.py
++++ b/pykickstart/commands/reboot.py
+@@ -41,6 +41,9 @@ class FC3_Reboot(KickstartCommand):
+         elif self.action == KS_SHUTDOWN:
+             retval += "# Shutdown after installation\nshutdown"
+             retval += self._getArgsAsStr() + "\n"
++        else:
++            retval += "# Shutdown after installation\n#shutdown"
++            retval += self._getArgsAsStr() + "\n"
+ 
+         return retval
+ 
+diff --git a/pykickstart/parser.py b/pykickstart/parser.py
+index 264ba05..b3f33d7 100644
+--- a/pykickstart/parser.py
++++ b/pykickstart/parser.py
+@@ -383,7 +383,7 @@ class Packages(KickstartObject):
+ 
+         if not self.default:
+             if self.environment:
+-                pkgs += "@^%s\n" % self.environment
++                pkgs += "#@^%s\n" % self.environment
+ 
+             grps = self.groupList
+             grps.sort()
+-- 
+2.7.4
+

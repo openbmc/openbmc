@@ -1,0 +1,228 @@
+Modify ntop.init to WRLinux 5.0 style.
+
+Fix a small problem that when ntop not running,
+/etc/init.d/ntop stop will return 1
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+---
+ packages/RedHat/ntop.init |  102 +++++++++-----------------------------------
+ 1 files changed, 21 insertions(+), 81 deletions(-)
+
+diff --git a/packages/RedHat/ntop.init b/packages/RedHat/ntop.init
+index 40d49f1..a189c59 100755
+--- a/packages/RedHat/ntop.init
++++ b/packages/RedHat/ntop.init
+@@ -10,19 +10,9 @@
+ #           You have set the admin password - read docs/1STRUN.txt
+ #           You have created /etc/ntop.conf with appropriate parameters.
+ 
+-#  To identify an interface to ntop, use the following flags 
+-#  in /etc/sysconfig/network-scripts/ifcfg-ethx
+-
+-#   NTOP="yes"      <--- means for ntop to use this interface
+-#   NTOPCONFIG="yes"  <--- means for ntop to configure this interface
+-
+ # Note that if you give a -i parameter in either /etc/ntop.conf or
+ # the command line, the scan is NOT performed.  
+ 
+-# However, when it comes to the configuration step, with NTOPCONFIG="yes"
+-# the interface is configured regardless of how the interface list was
+-# specified.
+-
+ #
+ #  -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+ # 
+@@ -107,11 +97,7 @@ ntopusesyslog="local3"
+ invoked=$0
+ 
+ # Source function library.
+-. /etc/rc.d/init.d/functions
+-
+-# Source networking configuration.
+-. /etc/sysconfig/network
+-
++. /etc/init.d/functions
+ 
+ # Basic sanity checks...
+ if ! [ -x $prog ]; then
+@@ -124,16 +110,6 @@ if ! [ -x $prog ]; then
+   exit 1
+ fi
+ 
+-if [ ${NETWORKING} = "no" ]; then
+-  echo ""
+-  echo "ERROR -"
+-  echo "        Networking is not up!"
+-  echo ""
+-  echo "Aborting..."
+-  echo ""
+-  exit 1
+-fi
+-
+ if ! [ -f ${conf} ]; then
+   echo ""
+   echo "ERROR -"
+@@ -180,8 +156,8 @@ fi
+ if [ "${debug}" = "y" ]; then echo "DEBUG: parm file temp is ${parmfile}"; fi
+  
+ cmd=`echo \
+-    @${conf} \
+     -i tbd \
++    @${conf} \
+     $extra $@`
+ 
+ echo ${cmd} | awk ' \
+@@ -305,42 +281,6 @@ logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD -      Configuration
+ 
+ # Build list of interfaces, e.g  eth0 eth1 eth1:1
+ # (Yeah, we'll have to convert that to eth0,eth1,eth1:1 later
+-if [ ".${ntopinterface}" = ".tbd" ]; then
+-
+-    ntopinterface=""
+-    iflist=`ip link show | \
+-        awk '/^[0-9]*:\ eth/ { printf("%s ", substr($2, 1, length($2)-1)) }'`
+-    logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - Scanning all interfaces $iflist"
+-    if [ "${debug}" = "y" ]; then echo "DEBUG: Interface candidates are ${iflist}"; fi
+-
+-    for eth in $iflist; do
+-
+-       if ! LANG=C egrep -L "^[Nn][Tt][Oo][Pp]=['\"]?[Yy][Ee][Ss]['\"]?" \
+-                /etc/sysconfig/network-scripts/ifcfg-$eth > /dev/null ; then
+-            logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - $eth is not ntop=yes, skipping"
+-            if [ "${debug}" = "y" ]; then echo "DEBUG: $eth not ntop=yes"; fi
+-            continue
+-       fi
+-
+-       ntopinterface="${ntopinterface} $eth"
+-  
+-       ip=`ip addr show $eth | \
+-           awk '/inet/ { printf("%s", substr($2, 1, index($2, "/")-1)) }'`
+-
+-       if [ ".$ip" = "." ]; then
+-           is="is unnumbered interface"
+-       else
+-           is="has IP address $ip"
+-       fi
+-       logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - $eth is ntop=yes, ${is}"
+-       if [ "${debug}" = "y" ]; then echo "DEBUG: $eth ntop=yes, ${is}"; fi
+-
+-    done
+-
+-else
+-    logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - Skipping interface scan - list in parms"
+-fi
+-
+ if [ "x${ntopinterface}" = "x" ]; then
+   ntopinterface="none"
+ fi
+@@ -462,12 +402,6 @@ config_interfaces () {
+           if="${if},${eth}"
+       fi
+ 
+-       if ! LANG=C egrep -L "^[Nn][Tt][Oo][Pp][Cc].*=['\"]?[Yy][Ee][Ss]['\"]?" \
+-                /etc/sysconfig/network-scripts/ifcfg-$eth > /dev/null ; then
+-            logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - $eth is not ntopconfigure=yes, skipping"
+-            continue
+-       fi
+-
+       logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - Configuring $eth"
+       if [ "${debug}" = "y" ]; then echo "DEBUG: Configuring $eth"; fi
+ 
+@@ -527,7 +461,7 @@ start () {
+   show_extra
+   config_interfaces
+ 
+-  cmd=`echo $prog \
++  cmd=`echo \
+                @${conf} \
+                -i $if \
+                $extra $@`
+@@ -541,7 +475,7 @@ start () {
+   if [ ".${ldlibpath}" != "." ]; then
+     export LD_LIBRARY_PATH="${ldlibpath}"
+   fi
+-  daemon ${cmd}
++  start-stop-daemon --start --quiet --exec $prog -- ${cmd}
+   RETVAL=$?
+ 
+   [ $RETVAL = 0 ] && touch /var/lock/subsys/${name}${instance}
+@@ -551,6 +485,7 @@ start () {
+ stop () {
+   # stop daemon
+ 
++  NOT_RUNNING=1
+   RETVAL=1
+   echo -n $"Stopping ${name}${instance}: "
+   logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - Stopping: ${name}${instance}"
+@@ -563,13 +498,14 @@ stop () {
+     if [ $rc = 0 ]; then
+       logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - Sending SIGTERM to ${pid}"
+       if [ "${debug}" = "y" ]; then echo "Sending SIGTERM to ${pid}"; fi
+-      kill -s SIGTERM ${pid}
++      kill -TERM ${pid} 2>&1 > /dev/null
+       RETVAL=$?
+       rm -f ${ntopdbfilepath}/ntop.pid
+     else 
+       logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - Unable to find process ${pid} ... will kill by name"
+       if [ "${debug}" = "y" ]; then echo "Unable to find process ${pid} ... will kill by name"; fi
+     fi
++    NOT_RUNNING=0
+   else
+ 
+     logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - Unable to find ${ntopdbfilepath}/ntop.pid file ... will kill by name"
+@@ -577,15 +513,16 @@ stop () {
+ 
+   fi
+ 
+-  echo 
+-
+   if [ $RETVAL != 0 ]; then
+     pids=`ps axf | grep '\/usr\/bin\/ntop' | awk '{ printf(" %s", $1) }; END { print "" }'`
+-    if [ "${pids}" != " " ]; then
++    if [ "${pids}" != "" ]; then
+       logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - Sending SIGTERM to ${prog}...${pids}"
+       if [ "${debug}" = "y" ]; then echo "Sending SIGTERM to ${prog}...${pids}"; fi
+-      kill -INT ${pids}
++      kill -TERM ${pids} > /dev/null 2>&1
+       RETVAL=$?
++      NOT_RUNNING=0
++    else
++      NOT_RUNNING=1
+     fi
+   fi
+ 
+@@ -597,13 +534,9 @@ stop () {
+       if [ "${debug}" = "y" ]; then echo "DEBUG: Unconfiguring interfaces"; fi
+ 
+       for eth in ${ntopinterface}; do
+-          if ! LANG=C egrep -L "^[Nn][Tt][Oo][Pp][Cc].*=['\"]?[Yy][Ee][Ss]['\"]?" \
+-                   /etc/sysconfig/network-scripts/ifcfg-$eth > /dev/null ; then
+-              logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - $eth is not ntopconfigure=yes, skipping"
+-              if [ "${debug}" = "y" ]; then echo "DEBUG: $eth is not ntopconfigure=yes"; fi
+-              continue
++          if [ "$eth" = "none" ]; then
++               continue
+           fi
+-
+           logger -p ${ntopusesyslog} -t ${name}${instance} -- "INITD - Unconfiguring $eth"
+           if [ "${debug}" = "y" ]; then echo "DEBUG: Unconfiguring $eth"; fi
+     
+@@ -623,6 +556,13 @@ stop () {
+       if [ "${debug}" = "y" ]; then echo "DEBUG: Interfaces are unconfigured"; fi
+   fi
+ 
++  if [ $NOT_RUNNING -eq 1 -o $RETVAL -eq 0 ]; then
++    echo " [ OK ]"
++    RETVAL=0
++  else
++    echo " [ FAILED ]"
++  fi
++
+   return $RETVAL
+ }
+ 
+-- 
+1.7.5.4
+

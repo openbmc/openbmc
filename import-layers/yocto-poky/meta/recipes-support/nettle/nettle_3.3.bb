@@ -11,5 +11,9 @@ SRC_URI += "\
             file://check-header-files-of-openssl-only-if-enable_.patch \
             "
 
+SRC_URI_append_class-target = "\
+            file://dlopen-test.patch \
+            "
+
 SRC_URI[md5sum] = "10f969f78a463704ae73529978148dbe"
 SRC_URI[sha256sum] = "46942627d5d0ca11720fec18d81fc38f7ef837ea4197c1f630e71ce0d470b11e"

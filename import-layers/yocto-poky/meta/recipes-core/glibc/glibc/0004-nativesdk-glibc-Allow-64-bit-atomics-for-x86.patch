@@ -1,11 +1,13 @@
-From 0b95f34207ffed3aa53fa949662bfbccc7c864a4 Mon Sep 17 00:00:00 2001
+From 8fe1b56180c30d237cc2ab9a5a9c97a0311f41da Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 14:35:35 -0800
-Subject: [PATCH 04/26] nativesdk-glibc: Allow 64 bit atomics for x86
+Subject: [PATCH 04/25] nativesdk-glibc: Allow 64 bit atomics for x86
 
 The fix consist of allowing 64bit atomic ops for x86.
 This should be safe for i586 and newer CPUs.
 It also makes the synchronization more efficient.
+
+Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
@@ -15,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/sysdeps/i386/atomic-machine.h b/sysdeps/i386/atomic-machine.h
-index ce62b33..4fe44ea 100644
+index 0e24200617..1532f52dec 100644
 --- a/sysdeps/i386/atomic-machine.h
 +++ b/sysdeps/i386/atomic-machine.h
 @@ -54,7 +54,7 @@ typedef uintmax_t uatomic_max_t;
@@ -25,8 +27,8 @@ index ce62b33..4fe44ea 100644
 -#define __HAVE_64B_ATOMICS 0
 +#define __HAVE_64B_ATOMICS 1
  #define USE_ATOMIC_COMPILER_BUILTINS 0
- 
+ #define ATOMIC_EXCHANGE_USES_CAS 0
  
 -- 
-2.10.2
+2.13.2
 

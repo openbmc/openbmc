@@ -1,0 +1,33 @@
+From 781288d6307002cce70ddafb6efb200b7f60294d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Jun 2017 22:12:43 -0700
+Subject: [PATCH 3/6] Replace canonicalize_file_name with realpath() API
+
+Fixed build on musl where canonicalize_file_name is not implemented
+
+filesystem.cpp:46:15: error: 'canonicalize_file_name' was not declared in this scope
+     char *p = canonicalize_file_name(path);
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/engine/filesystem.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/engine/filesystem.cpp b/lib/engine/filesystem.cpp
+index b99257e..6064837 100644
+--- a/lib/engine/filesystem.cpp
++++ b/lib/engine/filesystem.cpp
+@@ -43,7 +43,7 @@ void CanonicalPath::__canonicalize_path_name(const char *path)
+     if (path == 0) {
+         throw E_NULL_POINTER;
+     }
+-    char *p = canonicalize_file_name(path);
++    char *p = realpath(path, NULL);
+     assign(p);
+     if (p) {
+         free(p);
+-- 
+2.13.1
+

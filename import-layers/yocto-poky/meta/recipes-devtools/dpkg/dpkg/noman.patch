@@ -1,14 +1,22 @@
 Upstream-Status: Inappropriate [disable feature]
 
-diff -ruN dpkg-1.15.8.5-orig/Makefile.am dpkg-1.15.8.5/Makefile.am
---- dpkg-1.15.8.5-orig/Makefile.am	2010-10-08 12:27:15.042083703 +0800
-+++ dpkg-1.15.8.5/Makefile.am	2010-10-08 12:27:27.755148228 +0800
-@@ -12,8 +12,7 @@
- 	utils \
+---
+ Makefile.am | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 0da52cb16..a1f79e0a2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -13,8 +13,7 @@ SUBDIRS = \
  	$(MAYBE_DSELECT) \
  	scripts \
+ 	t-func \
 -	po \
 -	man
 +	po
  
  ACLOCAL_AMFLAGS = -I m4
+ 
+-- 
+2.11.0

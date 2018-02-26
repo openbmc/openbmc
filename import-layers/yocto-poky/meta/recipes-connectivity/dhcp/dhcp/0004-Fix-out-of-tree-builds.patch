@@ -1,0 +1,100 @@
+From cccec0344d68dac4100b6f260ee24e7c2da9dfda Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 15 Aug 2017 15:08:22 +0800
+Subject: [PATCH 04/11] Fix out of tree builds
+
+Upstream-Status: Pending
+
+RP 2013/03/21
+
+Rebase to 4.3.6
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ client/Makefile.am  | 4 ++--
+ common/Makefile.am  | 3 ++-
+ dhcpctl/Makefile.am | 2 ++
+ omapip/Makefile.am  | 1 +
+ relay/Makefile.am   | 2 +-
+ server/Makefile.am  | 2 +-
+ 6 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/client/Makefile.am b/client/Makefile.am
+index 2cb83d8..4730bb3 100644
+--- a/client/Makefile.am
++++ b/client/Makefile.am
+@@ -7,11 +7,11 @@ SUBDIRS = . tests
+ BINDLIBDIR = @BINDDIR@/lib
+ 
+ AM_CPPFLAGS = -DCLIENT_PATH='"PATH=$(sbindir):/sbin:/bin:/usr/sbin:/usr/bin"' \
+-	      -DLOCALSTATEDIR='"$(localstatedir)"'
++	      -DLOCALSTATEDIR='"$(localstatedir)"' -I$(top_srcdir)/includes
+ 
+ dist_sysconf_DATA = dhclient.conf.example
+ sbin_PROGRAMS = dhclient
+-dhclient_SOURCES = clparse.c dhclient.c dhc6.c \
++dhclient_SOURCES = $(srcdir)/clparse.c $(srcdir)/dhclient.c $(srcdir)/dhc6.c \
+ 		   scripts/bsdos scripts/freebsd scripts/linux scripts/macos \
+ 		   scripts/netbsd scripts/nextstep scripts/openbsd \
+ 		   scripts/solaris scripts/openwrt
+diff --git a/common/Makefile.am b/common/Makefile.am
+index 113aee8..0f24fbb 100644
+--- a/common/Makefile.am
++++ b/common/Makefile.am
+@@ -1,4 +1,5 @@
+-AM_CPPFLAGS = -I$(top_srcdir) -DLOCALSTATEDIR='"@localstatedir@"'
++AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_srcdir) -DLOCALSTATEDIR='"@localstatedir@"'
++
+ AM_CFLAGS = $(LDAP_CFLAGS)
+ 
+ noinst_LIBRARIES = libdhcp.a
+diff --git a/dhcpctl/Makefile.am b/dhcpctl/Makefile.am
+index ceb0de1..ba8dd8b 100644
+--- a/dhcpctl/Makefile.am
++++ b/dhcpctl/Makefile.am
+@@ -1,5 +1,7 @@
+ BINDLIBDIR = @BINDDIR@/lib
+ 
++AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_srcdir)
++
+ bin_PROGRAMS = omshell
+ lib_LIBRARIES = libdhcpctl.a
+ noinst_PROGRAMS = cltest
+diff --git a/omapip/Makefile.am b/omapip/Makefile.am
+index 446a594..dd1afa0 100644
+--- a/omapip/Makefile.am
++++ b/omapip/Makefile.am
+@@ -1,4 +1,5 @@
+ BINDLIBDIR = @BINDDIR@/lib
++AM_CPPFLAGS = -I$(top_srcdir)/includes
+ 
+ lib_LIBRARIES = libomapi.a
+ noinst_PROGRAMS = svtest
+diff --git a/relay/Makefile.am b/relay/Makefile.am
+index 3060eca..6d652f6 100644
+--- a/relay/Makefile.am
++++ b/relay/Makefile.am
+@@ -1,6 +1,6 @@
+ BINDLIBDIR = @BINDDIR@/lib
+ 
+-AM_CPPFLAGS = -DLOCALSTATEDIR='"@localstatedir@"'
++AM_CPPFLAGS = -DLOCALSTATEDIR='"@localstatedir@"' -I$(top_srcdir)/includes
+ 
+ sbin_PROGRAMS = dhcrelay
+ dhcrelay_SOURCES = dhcrelay.c
+diff --git a/server/Makefile.am b/server/Makefile.am
+index 54feedf..3990b9c 100644
+--- a/server/Makefile.am
++++ b/server/Makefile.am
+@@ -6,7 +6,7 @@ SUBDIRS = . tests
+ 
+ BINDLIBDIR = @BINDDIR@/lib
+ 
+-AM_CPPFLAGS = -I.. -DLOCALSTATEDIR='"@localstatedir@"'
++AM_CPPFLAGS = -I$(top_srcdir) -DLOCALSTATEDIR='"@localstatedir@"' -I$(top_srcdir)/includes
+ 
+ dist_sysconf_DATA = dhcpd.conf.example
+ sbin_PROGRAMS = dhcpd
+-- 
+1.8.3.1
+

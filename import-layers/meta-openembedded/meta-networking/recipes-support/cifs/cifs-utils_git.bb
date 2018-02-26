@@ -4,12 +4,13 @@ SECTION = "otherosfs"
 LICENSE = "GPLv3 & LGPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-PV = "6.6"
+PV = "6.7"
 
-SRCREV = "7926aaea98cdc96b6544b8e21fb5b0b4422c340d"
+SRCREV = "8101a07871f185c7044fa2ca221b282ab4607c8b"
 SRC_URI = "git://git.samba.org/cifs-utils.git"
 
 S = "${WORKDIR}/git"
+DEPENDS += "libtalloc"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[cap] = "--with-libcap,--without-libcap,libcap"

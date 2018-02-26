@@ -3,6 +3,8 @@
 !*.indirectionsymlink
 !*.[ch]
 !*.mk
+!*.patch
+!*.service
 !NOTICE
 !MODULE_LICENSE_*
 !/system/

@@ -1,4 +1,4 @@
-From 42292f5533bca904f230a8e03ceee1f84ef0c4ec Mon Sep 17 00:00:00 2001
+From 9d37c8f68c07da63186cb993f1221f6c11eca422 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:27:17 +0000
 Subject: [PATCH 05/15] Only generate an RPATH entry if LD_RUN_PATH is not
@@ -15,19 +15,19 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/ld/emultempl/elf32.em b/ld/emultempl/elf32.em
-index 84adaef6df..ab8c74257e 100644
+index 9ac1840316..9dc4c149bc 100644
 --- a/ld/emultempl/elf32.em
 +++ b/ld/emultempl/elf32.em
-@@ -1411,6 +1411,8 @@ fragment <<EOF
+@@ -1463,6 +1463,8 @@ fragment <<EOF
  	      && command_line.rpath == NULL)
  	    {
- 	      lib_path = (const char *) getenv ("LD_RUN_PATH");
-+	      if ((lib_path) && (strlen (lib_path) == 0))
-+		  lib_path = NULL;
- 	      if (gld${EMULATION_NAME}_search_needed (lib_path, &n,
- 						      force))
+ 	      path = (const char *) getenv ("LD_RUN_PATH");
++	      if ((path) && (strlen (path) == 0))
++		  path = NULL;
+ 	      if (path
+ 		  && gld${EMULATION_NAME}_search_needed (path, &n, force))
  		break;
-@@ -1692,6 +1694,8 @@ gld${EMULATION_NAME}_before_allocation (void)
+@@ -1740,6 +1742,8 @@ gld${EMULATION_NAME}_before_allocation (void)
    rpath = command_line.rpath;
    if (rpath == NULL)
      rpath = (const char *) getenv ("LD_RUN_PATH");
@@ -37,5 +37,5 @@ index 84adaef6df..ab8c74257e 100644
    for (abfd = link_info.input_bfds; abfd; abfd = abfd->link.next)
      if (bfd_get_flavour (abfd) == bfd_target_elf_flavour)
 -- 
-2.12.0
+2.14.0
 

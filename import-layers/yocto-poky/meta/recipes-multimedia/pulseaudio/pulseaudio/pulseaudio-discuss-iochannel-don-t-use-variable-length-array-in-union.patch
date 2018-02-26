@@ -1,0 +1,59 @@
+From patchwork Sat Feb  4 12:19:01 2017
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [pulseaudio-discuss] iochannel: don't use variable length array in
+ union
+From: Tanu Kaskinen <tanuk@iki.fi>
+X-Patchwork-Id: 136885
+Message-Id: <20170204121901.17428-1-tanuk@iki.fi>
+To: pulseaudio-discuss@lists.freedesktop.org
+Date: Sat,  4 Feb 2017 14:19:01 +0200
+
+Clang didn't like the variable length array:
+
+pulsecore/iochannel.c:358:17: error: fields must have a constant size:
+'variable length array in structure' extension will never be supported
+        uint8_t data[CMSG_SPACE(sizeof(int) * nfd)];
+                ^
+
+Commit 451d1d6762 introduced the variable length array in order to have
+the correct value in msg_controllen. This patch reverts that commit and
+uses a different way to achieve the same goal.
+
+BugLink: https://bugs.freedesktop.org/show_bug.cgi?id=99458
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ src/pulsecore/iochannel.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/pulsecore/iochannel.c b/src/pulsecore/iochannel.c
+index 8ace297ff..897337522 100644
+--- a/src/pulsecore/iochannel.c
++++ b/src/pulsecore/iochannel.c
+@@ -355,7 +355,7 @@ ssize_t pa_iochannel_write_with_fds(pa_iochannel*io, const void*data, size_t l,
+     struct iovec iov;
+     union {
+         struct cmsghdr hdr;
+-        uint8_t data[CMSG_SPACE(sizeof(int) * nfd)];
++        uint8_t data[CMSG_SPACE(sizeof(int) * MAX_ANCIL_DATA_FDS)];
+     } cmsg;
+ 
+     pa_assert(io);
+@@ -382,7 +382,13 @@ ssize_t pa_iochannel_write_with_fds(pa_iochannel*io, const void*data, size_t l,
+     mh.msg_iov = &iov;
+     mh.msg_iovlen = 1;
+     mh.msg_control = &cmsg;
+-    mh.msg_controllen = sizeof(cmsg);
++
++    /* If we followed the example on the cmsg man page, we'd use
++     * sizeof(cmsg.data) here, but if nfd < MAX_ANCIL_DATA_FDS, then the data
++     * buffer is larger than needed, and the kernel doesn't like it if we set
++     * msg_controllen to a larger than necessary value. The commit message for
++     * commit 451d1d6762 contains a longer explanation. */
++    mh.msg_controllen = CMSG_SPACE(sizeof(int) * nfd);
+ 
+     if ((r = sendmsg(io->ofd, &mh, MSG_NOSIGNAL)) >= 0) {
+         io->writable = io->hungup = false;

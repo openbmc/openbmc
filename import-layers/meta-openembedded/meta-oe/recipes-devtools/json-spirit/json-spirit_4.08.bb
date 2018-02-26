@@ -11,13 +11,12 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=278ef6183dec4aae1524fccc4b0113c9"
 
 SRC_URI = "file://json_spirit_v${PV}.zip \
            file://0001-Adjust-the-cmake-files.patch \
+           file://0001-Link-to-libatomic.patch \
 "
 
 S = "${WORKDIR}/json_spirit_v${PV}"
 
 DEPENDS = "boost"
-
-LDFLAGS += "-Wl,--as-needed -latomic -Wl,--no-as-needed"
 
 inherit cmake
 

@@ -1,7 +1,9 @@
 import fnmatch
 import logging
 import os
+import shutil
 import sys
+import tempfile
 
 import bb.utils
 
@@ -32,10 +34,26 @@ class ActionPlugin(LayerPlugin):
             sys.stderr.write("Unable to find bblayers.conf\n")
             return 1
 
-        notadded, _ = bb.utils.edit_bblayers_conf(bblayers_conf, layerdir, None)
-        if notadded:
-            for item in notadded:
-                sys.stderr.write("Specified layer %s is already in BBLAYERS\n" % item)
+        # Back up bblayers.conf to tempdir before we add layers
+        tempdir = tempfile.mkdtemp()
+        backup = tempdir + "/bblayers.conf.bak"
+        shutil.copy2(bblayers_conf, backup)
+
+        try:
+            notadded, _ = bb.utils.edit_bblayers_conf(bblayers_conf, layerdir, None)
+            if not (args.force or notadded):
+                try:
+                    self.tinfoil.parseRecipes()
+                except bb.tinfoil.TinfoilUIException:
+                    # Restore the back up copy of bblayers.conf
+                    shutil.copy2(backup, bblayers_conf)
+                    bb.fatal("Parse failure with the specified layer added")
+                else:
+                    for item in notadded:
+                        sys.stderr.write("Specified layer %s is already in BBLAYERS\n" % item)
+        finally:
+            # Remove the back up copy of bblayers.conf
+            shutil.rmtree(tempdir)
 
     def do_remove_layer(self, args):
         """Remove a layer from bblayers.conf."""

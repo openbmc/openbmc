@@ -23,7 +23,8 @@ inherit systemd
 
 EXTRA_OEMAKE = "'BINDIR=${sbindir}' 'MANDIR=${mandir}'"
 
-do_install_append() {
+do_install() {
+    oe_runmake install DESTDIR=${D}
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${systemd_unitdir}/system
         install -m 644 ${WORKDIR}/arptables.service ${D}${systemd_unitdir}/system

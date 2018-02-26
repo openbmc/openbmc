@@ -1,0 +1,32 @@
+openl2tp: eliminate warning from modprobe
+
+modprobe will emit alarming warnings if it cannot
+find a module, but we only care that it find one
+of two possible modules when we start openl2tpd.
+
+Suppress messages from modprobe.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+--- a/etc/rc.d/init.d/openl2tpd
++++ b/etc/rc.d/init.d/openl2tpd
+@@ -29,7 +29,7 @@ start() {
+ 		return 1
+ 	    fi
+ 	fi
+-	modprobe -s pppol2tp || modprobe -s l2tp_ppp
++	modprobe -sq pppol2tp || modprobe -sq l2tp_ppp
+ 	RETVAL=$?
+ 	if [ $RETVAL -eq 0 ]; then
+ 	    start-stop-daemon --start --exec openl2tpd $OPENL2TPDARGS
+@@ -57,7 +57,7 @@ stop() {
+ 	    return 1;
+ 	fi
+ 	killproc openl2tpd
+-	modprobe -s -r pppol2tp || modprobe -s -r l2tp_ppp
++	modprobe -srq pppol2tp || modprobe -srq l2tp_ppp
+ 	echo
+ 	rm -f /var/run/openl2tpd.pid
+         rm -f /var/lock/subsys/openl2tpd

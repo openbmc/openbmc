@@ -2,7 +2,7 @@ inherit linux-kernel-base kernel-module-split
 
 PROVIDES += "virtual/kernel"
 DEPENDS += "virtual/${TARGET_PREFIX}binutils virtual/${TARGET_PREFIX}gcc kmod-native bc-native lzop-native"
-PACKAGE_WRITE_DEPS += "depmodwrapper-cross virtual/update-alternatives-native"
+PACKAGE_WRITE_DEPS += "depmodwrapper-cross"
 
 do_deploy[depends] += "depmodwrapper-cross:do_populate_sysroot"
 
@@ -57,20 +57,13 @@ python __anonymous () {
 
         d.appendVar('PACKAGES', ' ' + 'kernel-image-' + typelower)
 
-        d.setVar('FILES_kernel-image-' + typelower, '/' + imagedest + '/' + type + '-${KERNEL_VERSION_NAME}')
+        d.setVar('FILES_kernel-image-' + typelower, '/' + imagedest + '/' + type + '-${KERNEL_VERSION_NAME}' + ' /' + imagedest + '/' + type)
 
         d.appendVar('RDEPENDS_kernel-image', ' ' + 'kernel-image-' + typelower)
 
         d.setVar('PKG_kernel-image-' + typelower, 'kernel-image-' + typelower + '-${KERNEL_VERSION_PKG_NAME}')
 
         d.setVar('ALLOW_EMPTY_kernel-image-' + typelower, '1')
-
-        priority = d.getVar('KERNEL_PRIORITY')
-        postinst = '#!/bin/sh\n' + 'update-alternatives --install /' + imagedest + '/' + type + ' ' + type + ' ' + type + '-${KERNEL_VERSION_NAME} ' + priority + ' || true' + '\n'
-        d.setVar('pkg_postinst_kernel-image-' + typelower, postinst)
-
-        postrm = '#!/bin/sh\n' + 'update-alternatives --remove' + ' ' + type + ' ' + type + '-${KERNEL_VERSION_NAME} || true' + '\n'
-        d.setVar('pkg_postrm_kernel-image-' + typelower, postrm)
 
     image = d.getVar('INITRAMFS_IMAGE')
     if image:
@@ -137,10 +130,6 @@ export CROSS_COMPILE = "${TARGET_PREFIX}"
 export KBUILD_BUILD_USER = "oe-user"
 export KBUILD_BUILD_HOST = "oe-host"
 
-KERNEL_PRIORITY ?= "${@int(d.getVar('PV').split('-')[0].split('+')[0].split('.')[0]) * 10000 + \
-                       int(d.getVar('PV').split('-')[0].split('+')[0].split('.')[1]) * 100 + \
-                       int(d.getVar('PV').split('-')[0].split('+')[0].split('.')[-1])}"
-
 KERNEL_RELEASE ?= "${KERNEL_VERSION}"
 
 # The directory where built kernel lies in the kernel tree
@@ -166,7 +155,7 @@ UBOOT_LOADADDRESS ?= "${UBOOT_ENTRYPOINT}"
 # Some Linux kernel configurations need additional parameters on the command line
 KERNEL_EXTRA_ARGS ?= ""
 
-EXTRA_OEMAKE = " HOSTCC="${BUILD_CC}" HOSTCPP="${BUILD_CPP}""
+EXTRA_OEMAKE = " HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}""
 KERNEL_ALT_IMAGETYPE ??= ""
 
 copy_initramfs() {
@@ -255,8 +244,36 @@ python do_devshell_prepend () {
 
 addtask bundle_initramfs after do_install before do_deploy
 
+get_cc_option () {
+		# Check if KERNEL_CC supports the option "file-prefix-map".
+		# This option allows us to build images with __FILE__ values that do not
+		# contain the host build path.
+		if ${KERNEL_CC} -Q --help=joined | grep -q "\-ffile-prefix-map=<old=new>"; then
+			echo "-ffile-prefix-map=${S}=/kernel-source/"
+		fi
+}
+
 kernel_do_compile() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS MACHINE
+	if [ "$BUILD_REPRODUCIBLE_BINARIES" = "1" ]; then
+		# kernel sources do not use do_unpack, so SOURCE_DATE_EPOCH may not
+		# be set....
+		if [ "$SOURCE_DATE_EPOCH" = "0" ]; then
+			olddir=`pwd`
+			cd ${S}
+			SOURCE_DATE_EPOCH=`git log  -1 --pretty=%ct`
+			# git repo not guaranteed, so fall back to REPRODUCIBLE_TIMESTAMP_ROOTFS
+			if [ $? -ne 0 ]; then
+				SOURCE_DATE_EPOCH=${REPRODUCIBLE_TIMESTAMP_ROOTFS}
+			fi
+			cd $olddir
+		fi
+
+		ts=`LC_ALL=C date -d @$SOURCE_DATE_EPOCH`
+		export KBUILD_BUILD_TIMESTAMP="$ts"
+		export KCONFIG_NOTIMESTAMP=1
+		bbnote "KBUILD_BUILD_TIMESTAMP: $ts"
+	fi
 	# The $use_alternate_initrd is only set from
 	# do_bundle_initramfs() This variable is specifically for the
 	# case where we are making a second pass at the kernel
@@ -270,20 +287,22 @@ kernel_do_compile() {
 		copy_initramfs
 		use_alternate_initrd=CONFIG_INITRAMFS_SOURCE=${B}/usr/${INITRAMFS_IMAGE_NAME}.cpio
 	fi
+	cc_extra=$(get_cc_option)
 	for typeformake in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
-		oe_runmake ${typeformake} CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
+		oe_runmake ${typeformake} CC="${KERNEL_CC} $cc_extra " LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 	done
 	# vmlinux.gz is not built by kernel
 	if (echo "${KERNEL_IMAGETYPES}" | grep -wq "vmlinux\.gz"); then
 		mkdir -p "${KERNEL_OUTPUT_DIR}"
-		gzip -9c < ${B}/vmlinux > "${KERNEL_OUTPUT_DIR}/vmlinux.gz"
+		gzip -9cn < ${B}/vmlinux > "${KERNEL_OUTPUT_DIR}/vmlinux.gz"
 	fi
 }
 
 do_compile_kernelmodules() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS MACHINE
 	if (grep -q -i -e '^CONFIG_MODULES=y$' ${B}/.config); then
-		oe_runmake -C ${B} ${PARALLEL_MAKE} modules CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS}
+		cc_extra=$(get_cc_option)
+		oe_runmake -C ${B} ${PARALLEL_MAKE} modules CC="${KERNEL_CC} $cc_extra " LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS}
 
 		# Module.symvers gets updated during the 
 		# building of the kernel modules. We need to
@@ -320,6 +339,7 @@ kernel_do_install() {
 	install -d ${D}/boot
 	for type in ${KERNEL_IMAGETYPES} ; do
 		install -m 0644 ${KERNEL_OUTPUT_DIR}/${type} ${D}/${KERNEL_IMAGEDEST}/${type}-${KERNEL_VERSION}
+		ln -sf ${type}-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${type}
 	done
 	install -m 0644 System.map ${D}/boot/System.map-${KERNEL_VERSION}
 	install -m 0644 .config ${D}/boot/config-${KERNEL_VERSION}
@@ -575,19 +595,27 @@ do_strip[dirs] = "${B}"
 addtask strip before do_sizecheck after do_kernel_link_images
 
 # Support checking the kernel size since some kernels need to reside in partitions
-# with a fixed length or there is a limit in transferring the kernel to memory
+# with a fixed length or there is a limit in transferring the kernel to memory.
+# If more than one image type is enabled, warn on any that don't fit but only fail
+# if none fit.
 do_sizecheck() {
 	if [ ! -z "${KERNEL_IMAGE_MAXSIZE}" ]; then
 		invalid=`echo ${KERNEL_IMAGE_MAXSIZE} | sed 's/[0-9]//g'`
 		if [ -n "$invalid" ]; then
-			die "Invalid KERNEL_IMAGE_MAXSIZE: ${KERNEL_IMAGE_MAXSIZE}, should be an integerx (The unit is Kbytes)"
+			die "Invalid KERNEL_IMAGE_MAXSIZE: ${KERNEL_IMAGE_MAXSIZE}, should be an integer (The unit is Kbytes)"
 		fi
+		at_least_one_fits=
 		for type in ${KERNEL_IMAGETYPES} ; do
 			size=`du -ks ${B}/${KERNEL_OUTPUT_DIR}/$type | awk '{print $1}'`
 			if [ $size -ge ${KERNEL_IMAGE_MAXSIZE} ]; then
-				warn "This kernel $type (size=$size(K) > ${KERNEL_IMAGE_MAXSIZE}(K)) is too big for your device. Please reduce the size of the kernel by making more of it modular."
+				bbwarn "This kernel $type (size=$size(K) > ${KERNEL_IMAGE_MAXSIZE}(K)) is too big for your device."
+			else
+				at_least_one_fits=y
 			fi
 		done
+		if [ -z "$at_least_one_fits" ]; then
+			die "All kernel images are too big for your device. Please reduce the size of the kernel by making more of it modular."
+		fi
 	fi
 }
 do_sizecheck[dirs] = "${B}"
@@ -642,3 +670,6 @@ do_deploy[prefuncs] += "package_get_auto_pr"
 addtask deploy after do_populate_sysroot do_packagedata
 
 EXPORT_FUNCTIONS do_deploy
+
+# Add using Device Tree support
+inherit kernel-devicetree

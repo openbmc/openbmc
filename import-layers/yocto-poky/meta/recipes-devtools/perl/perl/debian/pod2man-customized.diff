@@ -4,6 +4,7 @@ Date: Sat, 18 Apr 2015 17:39:32 +0300
 Subject: Update porting/customized.dat for pod2man modifications
 
 Patch-Name: debian/pod2man-customized.diff
+Upstream-Status: Pending
 ---
  t/porting/customized.dat | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

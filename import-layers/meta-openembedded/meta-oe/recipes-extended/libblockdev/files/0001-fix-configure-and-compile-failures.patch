@@ -1,0 +1,79 @@
+From 86686ccbf43c5d9e8c8dc97c66ba09e522050e5e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 27 Jul 2017 10:06:24 +0800
+Subject: [PATCH 1/3] fix configure and compile failures
+
+1. Fix do_configure failure
+---------------------------
+|Checking header volume_key/libvolume_key.h existence and usability.
+../tmp/6tvtK.c:1:38: fatal error: volume_key/libvolume_key.h:
+No such file or directory
+| #include <volume_key/libvolume_key.h>
+|Checking header dmraid/dmraid.h existence and usability.../tmp/
+ktVJ6.c:1:27: fatal error: dmraid/dmraid.h: No such file or directory
+| #include <dmraid/dmraid.h>
+---------------------------
+We explictly add volume_key and dmraid to DEPENDS, do not need
+configure to test.
+
+2. Fix config.h not found
+Add it to configure.ac
+
+3. Correct AC_DEFINE
+...
+autoheader: warning: missing template: LIBMOUNT_NEW_ERR_API
+autoheader: Use AC_DEFINE([LIBMOUNT_NEW_ERR_API], [], [Description])
+...
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 0270c99..b7c7368 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -9,6 +9,8 @@ AC_DISABLE_STATIC
+ AM_INIT_AUTOMAKE([foreign -Wall -Werror -Wno-syntax -Wno-portability])
+ AC_CONFIG_MACRO_DIR([m4])
+ 
++AC_CONFIG_HEADERS([config.h])
++
+ AM_PATH_PYTHON
+ 
+ AM_PROG_AR
+@@ -129,7 +131,6 @@ LIBBLOCKDEV_PKG_CHECK_MODULES([UDEV], [libudev >= 216])
+ AS_IF([test "x$with_crypto" != "xno"],
+       [LIBBLOCKDEV_PKG_CHECK_MODULES([CRYPTSETUP], [libcryptsetup >= 1.6.7])
+        LIBBLOCKDEV_PKG_CHECK_MODULES([NSS], [nss >= 3.18.0])
+-       LIBBLOCKDEV_CHECK_HEADER([volume_key/libvolume_key.h], [$GLIB_CFLAGS $NSS_CFLAGS], [libvolume_key.h not available])
+       ],
+       [])
+ 
+@@ -137,10 +138,6 @@ AS_IF([test "x$with_dm" != "xno" -o "x$with_lvm" != "xno" -o "x$with_lvm_dbus" !
+       [LIBBLOCKDEV_PKG_CHECK_MODULES([DEVMAPPER], [devmapper >= 1.02.93])],
+       [])
+ 
+-AS_IF([test "x$with_dm" != "xno"],
+-      [LIBBLOCKDEV_CHECK_HEADER([dmraid/dmraid.h], [], [dmraid.h not available])],
+-      [])
+-
+ AS_IF([test "x$with_kbd" != "xno"],
+       [LIBBLOCKDEV_PKG_CHECK_MODULES([KMOD], [libkmod >= 19])],
+       [])
+@@ -154,7 +151,8 @@ AS_IF([test "x$with_fs" != "xno"],
+       [LIBBLOCKDEV_PKG_CHECK_MODULES([MOUNT], [mount >= 2.23.0])
+        # new versions of libmount has some new functions we can use
+        AS_IF([$PKG_CONFIG --atleast-version=2.30.0 mount],
+-             [AC_DEFINE([LIBMOUNT_NEW_ERR_API])], [])
++             [AC_DEFINE([LIBMOUNT_NEW_ERR_API], [1], [new versions of libmount has some new functions we can use])],
++             [])
+ 
+        LIBBLOCKDEV_PKG_CHECK_MODULES([BLKID], [blkid >= 2.23.0])
+        # older versions of libblkid don't support BLKID_SUBLKS_BADCSUM so let's just
+-- 
+1.8.3.1
+

@@ -18,7 +18,7 @@
 
         <para>
             Navigate to the root of your
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+            <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>
             (e.g. <filename>poky</filename>):
             <literallayout class='monospaced'>
      $ cd poky
@@ -61,18 +61,31 @@
         </para>
     </section>
 
-    <section id='setting-a-different-address'>
-        <title>Setting a Different Address</title>
+    <section id='setting-up-external-access'>
+        <title>Setting up External Access</title>
 
         <para>
             By default, Toaster binds to the loop back address
-            (i.e. localhost).
-            You can use the <filename>WEBPORT</filename> parameter to
-            set a different host.
-            For example, the following command sets the host and port
-            to "0.0.0.0:8400":
+            (i.e. localhost), which does not allow access from
+            external hosts. To allow external access, use the
+            <filename>WEBPORT</filename> parameter to open an
+            address that connects to the network, specifically the
+            IP address that your NIC uses to connect to the network.
+            You can also bind to all IP addresses the computer
+            supports by using the shortcut
+            "0.0.0.0:<replaceable>port</replaceable>".
+        </para>
+
+        <para>
+            The following example binds to all IP addresses on the
+            host:
             <literallayout class='monospaced'>
      $ source toaster start webport=0.0.0.0:8400
+            </literallayout>
+            This example binds to a specific IP address on the host's
+            NIC:
+            <literallayout class='monospaced'>
+     $ source toaster start webport=192.168.1.1:8400
             </literallayout>
         </para>
     </section>
@@ -145,7 +158,7 @@
               <listitem><para>
                   From the directory containing the Toaster database,
                   which by default is the
-                  <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>,
+                  <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>,
                   invoke the <filename>createsuperuser</filename> command
                   from <filename>manage.py</filename>:
                   <literallayout class='monospaced'>
@@ -369,16 +382,16 @@
                           <filename>TOASTER_CONF</filename>, which is
                           relative to the Toaster root directory
                           <filename>TOASTER_DIR</filename>.
-                          For more information on the Toaster configuration file
-                          <filename>TOASTER_CONF</filename>, see the
-                          <link linkend='toaster-json-files'>JSON Files</link>
-                          section of this manual.
+                          For more information on the Toaster configuration file,
+                          see the
+                          <link linkend='configuring-toaster'>Configuring Toaster</link>
+                          chapter.
                       </para>
 
                       <para>
                           This line also runs the <filename>checksettings</filename>
                           command, which configures the location of the Toaster
-                          <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build directory</ulink>.
+                          <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build directory</ulink>.
                           The Toaster root directory <filename>TOASTER_DIR</filename>
                           determines where the Toaster build directory
                           is created on the file system.

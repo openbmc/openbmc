@@ -1,0 +1,68 @@
+From d103475875858ab8a2e6b53ce178bb2f63883d4c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Jul 2017 17:37:56 -0700
+Subject: [PATCH 3/3] tests/seg_override: Replace __modify_ldt() with syscall()
+
+__modify_ldt() is specific to glibc, replacing it with syscall()
+makes it more portable.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ none/tests/x86-linux/seg_override.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/none/tests/x86-linux/seg_override.c b/none/tests/x86-linux/seg_override.c
+index b7619c9..c89874b 100644
+--- a/none/tests/x86-linux/seg_override.c
++++ b/none/tests/x86-linux/seg_override.c
+@@ -2,6 +2,8 @@
+ #include <stdio.h>
+ #include <errno.h>
+ #include <string.h>
++#include <unistd.h>
++#include <syscall.h>
+ 
+ /* Stuff from Wine. */
+ 
+@@ -52,14 +54,11 @@ inline static unsigned int wine_ldt_get_limit( const LDT_ENTRY *ent )
+ /* our copy of the ldt */
+ LDT_ENTRY ldt_copy[8192];
+ 
+-/* System call to set LDT entry.  */
+-//extern int __modify_ldt (int, struct modify_ldt_ldt_s *, size_t);
+-extern int __modify_ldt (int, void *, size_t);
+-
+ void print_ldt ( void )
+ {
+    int res;
+-   res = __modify_ldt( 0, ldt_copy, 8192*sizeof(LDT_ENTRY) );
++   /* System call to set LDT entry.  */
++   res = syscall(SYS_modify_ldt, 0, ldt_copy, 8192*sizeof(LDT_ENTRY) );
+    printf("got %d bytes\n", res );   
+    perror("error is");
+ }
+@@ -83,9 +82,6 @@ struct modify_ldt_ldt_s
+   unsigned int empty:25;
+ };
+ 
+-/* System call to set LDT entry.  */
+-//extern int __modify_ldt (int, struct modify_ldt_ldt_s *, size_t);
+-
+ void set_ldt1 ( void* base )
+ {
+   int stat;
+@@ -102,7 +98,8 @@ void set_ldt1 ( void* base )
+   ldt_entry.read_exec_only = 0;
+   ldt_entry.limit_in_pages = 0;
+   ldt_entry.seg_not_present = 0;
+-  stat = __modify_ldt (1, &ldt_entry, sizeof (ldt_entry));
++  /* System call to set LDT entry.  */
++  stat = syscall(SYS_modify_ldt, 1, &ldt_entry, sizeof (ldt_entry));
+   printf("stat = %d\n", stat);
+ }
+ 
+-- 
+2.13.2
+

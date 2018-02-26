@@ -5,25 +5,34 @@ Subject: [PATCH] selinux: drop selinux support
 
 Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
 ---
- src/systemdhook.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ src/systemdhook.c |   12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/src/systemdhook.c b/src/systemdhook.c
-index 274e5b910699..b9e8f1be376a 100644
 --- a/src/systemdhook.c
 +++ b/src/systemdhook.c
-@@ -14,7 +14,6 @@
+@@ -16,7 +16,6 @@
  #include <errno.h>
  #include <inttypes.h>
  #include <linux/limits.h>
 -#include <selinux/selinux.h>
  #include <yajl/yajl_tree.h>
+ #include <stdbool.h>
  
- #include "config.h"
-@@ -538,14 +537,6 @@ static int prestart(const char *rootfs,
+@@ -129,9 +128,6 @@ static int chperm(const char *path, cons
+ 				closedir(dir);
+ 				return -1;
+ 			}
+-			if (setfilecon (full_path, label) < 0) {
+-				pr_perror("Failed to set context %s on %s", label, full_path);
+-			}
+ 
+ 			if (doChown) {
+ 				/* Change uid and gid to something the container can handle */
+@@ -496,14 +492,6 @@ static int prestart(const char *rootfs,
+ 				return -1;
  			}
  		}
- 
+-
 -		if (strcmp("", mount_label)) {
 -			rc = setfilecon(journal_dir, (security_context_t)mount_label);
 -			if (rc < 0) {
@@ -31,10 +40,6 @@ index 274e5b910699..b9e8f1be376a 100644
 -				return -1;
 -			}
 -		}
--
- 		if (makepath(cont_journal_dir, 0755) == -1) {
- 			if (errno != EEXIST) {
- 				pr_perror("Failed to mkdir container journal dir: %s", cont_journal_dir);
--- 
-2.4.0.53.g8440f74
-
+ 
+ 		/* Attempt to creare /var/log/journal inside of rootfs,
+ 		   if successful, or directory exists, mount tmpfs on top of

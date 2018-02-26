@@ -17,6 +17,9 @@ SRC_URI = "git://git.kernel.org/pub/scm/libs/klibc/klibc.git \
            file://0001-include-linux-sysinfo.h-directly.patch \
            file://0001-mkfifo-Implement-mkfifo.patch \
            file://0001-always-use-bfd-linker.patch \
+           file://0001-Kbuild.klibc-Use-print-libgcc-file-name-instead-of-p.patch \
+           file://0001-Kbuild.klibc-Add-path-to-compiler-headers-via-isyste.patch \
+           file://0001-arm-Do-not-set-a-fallback-march-and-mtune.patch \
 "
 
 ARMPATCHES ?= ""
@@ -38,7 +41,8 @@ EXTRA_OEMAKE = "'KLIBCARCH=${KLIBC_ARCH}' \
                 'INSTALLDIR=${libdir}/klibc' \
                 'SHLIBDIR=${libdir}' \
                 '${KLIBCTHUMB}' \
-                'KLIBCOPTFLAGS=${TUNE_CCARGS}' \
+                'KLIBCOPTFLAGS=${TUNE_CCARGS} -Os' \
+                 V=1 \
                 "
 
 export FIX_ARMV4_EABI_BX = "${FIX_V4BX}"
@@ -46,6 +50,10 @@ KLIBCTHUMB = "${@['CONFIG_KLIBC_THUMB=n', 'CONFIG_KLIBC_THUMB=y'][(d.getVar('ARM
 
 do_configure () {
     ln -sf "${STAGING_DIR_TARGET}${exec_prefix}" linux
+}
+
+do_compile_prepend_toolchain-clang() {
+    sed -i -e 's#$(KLIBCROSS)gcc#$(KLIBCROSS)clang#g' ${S}/Makefile
 }
 
 INHIBIT_PACKAGE_STRIP = "1"

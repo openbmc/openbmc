@@ -1,0 +1,44 @@
+From f34c567045bea5a7ded9bcfa8e785cfd24cc7dde Mon Sep 17 00:00:00 2001
+From: Shivraj Patil <shivraj.patil@imgtec.com>
+Date: Tue, 4 Apr 2017 18:56:01 +0530
+Subject: [PATCH] build fix for mips
+
+Signed-off-by: Shivraj Patil <shivraj.patil@imgtec.com>
+Signed-off-by: Ronald S. Bultje <rsbultje@gmail.com>
+---
+Upstream-Status: Backport
+
+ libavcodec/mips/hevcpred_init_mips.c | 3 ++-
+ libavcodec/mips/hevcpred_msa.c       | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/libavcodec/mips/hevcpred_init_mips.c b/libavcodec/mips/hevcpred_init_mips.c
+index 331cfac115..e987698d66 100644
+--- a/libavcodec/mips/hevcpred_init_mips.c
++++ b/libavcodec/mips/hevcpred_init_mips.c
+@@ -18,7 +18,8 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
+-#include "libavcodec/hevc.h"
++#include "config.h"
++#include "libavutil/attributes.h"
+ #include "libavcodec/mips/hevcpred_mips.h"
+ 
+ #if HAVE_MSA
+diff --git a/libavcodec/mips/hevcpred_msa.c b/libavcodec/mips/hevcpred_msa.c
+index 6a3b2815fd..963c64c861 100644
+--- a/libavcodec/mips/hevcpred_msa.c
++++ b/libavcodec/mips/hevcpred_msa.c
+@@ -18,7 +18,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
+-#include "libavcodec/hevc.h"
++#include "libavcodec/hevcdec.h"
+ #include "libavutil/mips/generic_macros_msa.h"
+ #include "hevcpred_mips.h"
+ 
+-- 
+2.13.1
+

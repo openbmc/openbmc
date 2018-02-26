@@ -1,0 +1,76 @@
+From d0d76820efe51dd404d381fc4c46544008e757dd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 8 Jun 2017 16:50:59 -0700
+Subject: [PATCH 3/3] use intptr_t to fix pointer-to-int-cast issues
+
+uintptr_t is guaranteed to be wide enough that
+converting a void* to uintptr_t and back again
+will yield the original pointer value
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/src/fwts_acpi_tables.c | 4 ++--
+ src/lib/src/fwts_mmap.c        | 2 +-
+ src/lib/src/fwts_smbios.c      | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/lib/src/fwts_acpi_tables.c b/src/lib/src/fwts_acpi_tables.c
+index 832f8d66..d0006529 100644
+--- a/src/lib/src/fwts_acpi_tables.c
++++ b/src/lib/src/fwts_acpi_tables.c
+@@ -150,7 +150,7 @@ static fwts_acpi_table_rsdp *fwts_acpi_get_rsdp(fwts_framework *fw, void *addr,
+ 	fwts_acpi_table_rsdp *rsdp = NULL;
+ 	*rsdp_len = 0;
+ 
+-	if ((mem = fwts_mmap((off_t)addr, sizeof(fwts_acpi_table_rsdp))) == FWTS_MAP_FAILED)
++	if ((mem = fwts_mmap((uintptr_t)addr, sizeof(fwts_acpi_table_rsdp))) == FWTS_MAP_FAILED)
+ 		return NULL;
+ 
+ 	if (fwts_safe_memread(mem, sizeof(fwts_acpi_table_rsdp)) != FWTS_OK) {
+@@ -456,7 +456,7 @@ static int fwts_acpi_load_tables_from_firmware(fwts_framework *fw)
+ 	if ((rsdp = fwts_acpi_get_rsdp(fw, rsdp_addr, &rsdp_len)) == NULL)
+ 		return FWTS_ERROR;
+ 
+-	fwts_acpi_add_table("RSDP", rsdp, (uint64_t)(off_t)rsdp_addr, rsdp_len, FWTS_ACPI_TABLE_FROM_FIRMWARE);
++	fwts_acpi_add_table("RSDP", rsdp, (uint64_t)(uintptr_t)rsdp_addr, rsdp_len, FWTS_ACPI_TABLE_FROM_FIRMWARE);
+ 
+ 	/* Load any tables from XSDT if it's valid */
+ 	if (rsdp->xsdt_address) {
+diff --git a/src/lib/src/fwts_mmap.c b/src/lib/src/fwts_mmap.c
+index a09f688e..9fe6329a 100644
+--- a/src/lib/src/fwts_mmap.c
++++ b/src/lib/src/fwts_mmap.c
+@@ -81,7 +81,7 @@ int fwts_munmap(void *mem, const size_t size)
+ 	off_t offset;
+ 
+ 	page_size = fwts_page_size();
+-	offset = ((off_t)(mem)) & (page_size - 1);
++	offset = ((uintptr_t)(mem)) & (page_size - 1);
+ 
+ 	if (munmap((void *)((uint8_t *)mem - offset), size + offset) < 0)
+ 		return FWTS_ERROR;
+diff --git a/src/lib/src/fwts_smbios.c b/src/lib/src/fwts_smbios.c
+index 8d0ea39b..63b4bf25 100644
+--- a/src/lib/src/fwts_smbios.c
++++ b/src/lib/src/fwts_smbios.c
+@@ -54,7 +54,7 @@ static void *fwts_smbios_find_entry_uefi(fwts_framework *fw, fwts_smbios_entry *
+ 	if ((addr = fwts_scan_efi_systab("SMBIOS")) != NULL) {
+ 		fwts_smbios_entry *mapped_entry;
+ 
+-		if ((mapped_entry = fwts_mmap((off_t)addr, sizeof(fwts_smbios_entry))) != FWTS_MAP_FAILED) {
++		if ((mapped_entry = fwts_mmap((uintptr_t)addr, sizeof(fwts_smbios_entry))) != FWTS_MAP_FAILED) {
+ 			*entry = *mapped_entry;
+ 			(void)fwts_munmap(mapped_entry, sizeof(fwts_smbios_entry));
+ 			*type  = FWTS_SMBIOS;
+@@ -84,7 +84,7 @@ static void *fwts_smbios30_find_entry_uefi(fwts_framework *fw, fwts_smbios30_ent
+ 	if ((addr = fwts_scan_efi_systab("SMBIOS3")) != NULL) {
+ 		fwts_smbios30_entry *mapped_entry;
+ 
+-		if ((mapped_entry = fwts_mmap((off_t)addr, sizeof(fwts_smbios30_entry))) != FWTS_MAP_FAILED) {
++		if ((mapped_entry = fwts_mmap((uintptr_t)addr, sizeof(fwts_smbios30_entry))) != FWTS_MAP_FAILED) {
+ 			*entry = *mapped_entry;
+ 			(void)fwts_munmap(mapped_entry, sizeof(fwts_smbios30_entry));
+ 			return addr;
+-- 
+2.13.1
+

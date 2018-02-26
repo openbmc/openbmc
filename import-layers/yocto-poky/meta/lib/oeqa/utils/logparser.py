@@ -9,7 +9,7 @@ from . import ftools
 # A parser that can be used to identify weather a line is a test result or a section statement.
 class Lparser(object):
 
-    def __init__(self, test_0_pass_regex, test_0_fail_regex, section_0_begin_regex=None, section_0_end_regex=None, **kwargs):
+    def __init__(self, test_0_pass_regex, test_0_fail_regex, test_0_skip_regex, section_0_begin_regex=None, section_0_end_regex=None, **kwargs):
         # Initialize the arguments dictionary
         if kwargs:
             self.args = kwargs
@@ -19,12 +19,13 @@ class Lparser(object):
         # Add the default args to the dictionary
         self.args['test_0_pass_regex'] = test_0_pass_regex
         self.args['test_0_fail_regex'] = test_0_fail_regex
+        self.args['test_0_skip_regex'] = test_0_skip_regex
         if section_0_begin_regex:
             self.args['section_0_begin_regex'] = section_0_begin_regex
         if section_0_end_regex:
             self.args['section_0_end_regex'] = section_0_end_regex
 
-        self.test_possible_status = ['pass', 'fail', 'error']
+        self.test_possible_status = ['pass', 'fail', 'error', 'skip']
         self.section_possible_status = ['begin', 'end']
 
         self.initialized = False
@@ -108,7 +109,7 @@ class Result(object):
             prefix = ''
             for x in test_status:
                 prefix +=x+'.'
-            if (section != ''):
+            if section:
                 prefix += section
             section_file = os.path.join(target_dir, prefix)
             # purge the file contents if it exists

@@ -3,6 +3,7 @@ require pulseaudio.inc
 SRC_URI = "http://freedesktop.org/software/pulseaudio/releases/${BP}.tar.xz \
            file://0001-padsp-Make-it-compile-on-musl.patch \
            file://0001-client-conf-Add-allow-autospawn-for-root.patch \
+           file://pulseaudio-discuss-iochannel-don-t-use-variable-length-array-in-union.patch \
            file://volatiles.04_pulse \
 "
 SRC_URI[md5sum] = "4950d2799bf55ab91f6b7f990b7f0971"

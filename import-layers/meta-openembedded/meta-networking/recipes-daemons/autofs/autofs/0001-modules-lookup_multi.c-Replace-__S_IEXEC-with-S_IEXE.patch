@@ -1,0 +1,29 @@
+From e4ee00e08acd7c0912a3264ad32e4de861c7416f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 Sep 2017 22:22:31 -0700
+Subject: [PATCH] modules/lookup_multi.c: Replace __S_IEXEC with S_IEXEC
+
+__S_IEXEC is internal to libc and may not be available on
+all libc e.g. musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ modules/lookup_multi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/lookup_multi.c b/modules/lookup_multi.c
+index 3ecda6d..cf109de 100644
+--- a/modules/lookup_multi.c
++++ b/modules/lookup_multi.c
+@@ -452,7 +452,7 @@ int lookup_reinit(const char *my_mapfmt,
+ 					continue;
+ 				}
+ 
+-				if (st.st_mode & __S_IEXEC)
++				if (st.st_mode & S_IEXEC)
+ 					type = src_prog;
+ 				else
+ 					type = src_file;
+-- 
+2.14.1
+

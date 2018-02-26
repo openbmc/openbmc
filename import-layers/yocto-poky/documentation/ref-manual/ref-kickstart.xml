@@ -1,0 +1,284 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='ref-kickstart'>
+<title>OpenEmbedded Kickstart (<filename>.wks</filename>) Reference</title>
+
+    <section id='openembedded-kickstart-wks-reference'>
+        <title>Introduction</title>
+
+        <para>
+            The current Wic implementation supports only the basic kickstart
+            partitioning commands:
+            <filename>partition</filename> (or <filename>part</filename>
+            for short) and <filename>bootloader</filename>.
+            <note>
+                Future updates will implement more commands and options.
+                If you use anything that is not specifically supported, results
+                can be unpredictable.
+            </note>
+        </para>
+
+        <para>
+            This chapter provides a reference on the available kickstart
+            commands.
+            The information lists the commands, their syntax, and meanings.
+            Kickstart commands are based on the Fedora kickstart versions but
+            with modifications to reflect Wic capabilities.
+            You can see the original documentation for those commands at the
+            following links:
+            <itemizedlist>
+                <listitem><para>
+                    <ulink url='http://fedoraproject.org/wiki/Anaconda/Kickstart#part_or_partition'>http://fedoraproject.org/wiki/Anaconda/Kickstart#part_or_partition</ulink>
+                    </para></listitem>
+                <listitem><para>
+                    <ulink url='http://fedoraproject.org/wiki/Anaconda/Kickstart#bootloader'>http://fedoraproject.org/wiki/Anaconda/Kickstart#bootloader</ulink>
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='command-part-or-partition'>
+        <title>Command: part or partition</title>
+
+        <para>
+            Either of these commands create a partition on the system and use
+            the following syntax:
+            <literallayout class='monospaced'>
+     part [<replaceable>mntpoint</replaceable>]
+     partition [<replaceable>mntpoint</replaceable>]
+            </literallayout>
+            If you do not provide <replaceable>mntpoint</replaceable>, Wic
+            creates a partition but does not mount it.
+        </para>
+
+        <para>
+            The <filename><replaceable>mntpoint</replaceable></filename> is
+            where the partition will be mounted and must be of one of the
+            following forms:
+            <itemizedlist>
+                <listitem><para>
+                    <filename>/<replaceable>path</replaceable></filename>:
+                    For example, "/", "/usr", or "/home"
+                    </para></listitem>
+                <listitem><para>
+                    <filename>swap</filename>:
+                    The created partition is used as swap space.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            Specifying a <replaceable>mntpoint</replaceable> causes the
+            partition to automatically be mounted.
+            Wic achieves this by adding entries to the filesystem table (fstab)
+            during image generation.
+            In order for wic to generate a valid fstab, you must also provide
+            one of the <filename>--ondrive</filename>,
+            <filename>--ondisk</filename>, or
+            <filename>--use-uuid</filename> partition options as part of the
+            command.
+            Here is an example using "/" as the mountpoint.
+            The command uses "--ondisk" to force the partition onto the
+            <filename>sdb</filename> disk:
+            <literallayout class='monospaced'>
+     part / --source rootfs --ondisk sdb --fstype=ext3 --label platform --align 1024
+            </literallayout>
+        </para>
+
+        <para>
+            Here is a list that describes other supported options you can use
+            with the <filename>part</filename> and
+            <filename>partition</filename> commands:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis><filename>--size</filename>:</emphasis>
+                    The minimum partition size in MBytes.
+                    Specify an integer value such as 500.
+                    Do not append the number with "MB".
+                    You do not need this option if you use
+                    <filename>--source</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--source</filename>:</emphasis>
+                    This option is a Wic-specific option that names the source
+                    of the data that populates the partition.
+                    The most common value for this option is "rootfs", but you
+                    can use any value that maps to a valid source plug-in.
+                    For information on the source plug-ins, see the
+                    "<link linkend='wic-plug-ins-interface'>Wic Plug-Ins Interface</link>"
+                    section.</para>
+
+                    <para>If you use <filename>--source rootfs</filename>, Wic
+                    creates a partition as large as needed and to fill it with
+                    the contents of the root filesystem pointed to by the
+                    <filename>-r</filename> command-line option or the
+                    equivalent rootfs derived from the <filename>-e</filename>
+                    command-line option.
+                    The filesystem type used to create the partition is driven
+                    by the value of the <filename>--fstype</filename> option
+                    specified for the partition.
+                    See the entry on <filename>--fstype</filename> that follows
+                    for more information.</para>
+
+                    <para>If you use
+                    <filename>--source <replaceable>plugin-name</replaceable></filename>,
+                    Wic creates a partition as large as needed and fills it
+                    with the contents of the partition that is generated by the
+                    specified plug-in name using the data pointed to by the
+                    <filename>-r</filename> command-line option or the
+                    equivalent rootfs derived from the <filename>-e</filename>
+                    command-line option.
+                    Exactly what those contents and filesystem type end up
+                    being are dependent on the given plug-in implementation.
+                    </para>
+
+                    <para>If you do not use the <filename>--source</filename>
+                    option, the <filename>wic</filename> command creates an
+                    empty partition.
+                    Consequently, you must use the <filename>--size</filename>
+                    option to specify the size of the empty partition.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--ondisk</filename> or <filename>--ondrive</filename>:</emphasis>
+                    Forces the partition to be created on a particular disk.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--fstype</filename>:</emphasis>
+                    Sets the file system type for the partition.
+                    Valid values are:
+                    <itemizedlist>
+                        <listitem><para>
+                            <filename>ext4</filename>
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>ext3</filename>
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>ext2</filename>
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>btrfs</filename>
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>squashfs</filename>
+                            </para></listitem>
+                        <listitem><para>
+                            <filename>swap</filename>
+                            </para></listitem>
+                    </itemizedlist>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--fsoptions</filename>:</emphasis>
+                    Specifies a free-form string of options to be used when
+                    mounting the filesystem.
+                    This string will be copied into the
+                    <filename>/etc/fstab</filename> file of the installed
+                    system and should be enclosed in quotes.
+                    If not specified, the default string is "defaults".
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--label label</filename>:</emphasis>
+                    Specifies the label to give to the filesystem to be made on
+                    the partition.
+                    If the given label is already in use by another filesystem,
+                    a new label is created for the partition.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--active</filename>:</emphasis>
+                    Marks the partition as active.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--align (in KBytes)</filename>:</emphasis>
+                    This option is a Wic-specific option that says to start a
+                    partition on an <replaceable>x</replaceable> KBytes
+                    boundary.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--no-table</filename>:</emphasis>
+                    This option is a Wic-specific option.
+                    Using the option reserves space for the partition and
+                    causes it to become populated.
+                    However, the partition is not added to the partition table.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--extra-space</filename>:</emphasis>
+                    This option is a Wic-specific option that adds extra space
+                    after the space filled by the content of the partition.
+                    The final size can go beyond the size specified by the
+                    <filename>--size</filename> option.
+                    The default value is 10 Mbytes.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--overhead-factor</filename>:</emphasis>
+                    This option is a Wic-specific option that multiplies the
+                    size of the partition by the option's value.
+                    You must supply a value greater than or equal to "1".
+                    The default value is "1.3".
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--part-type</filename>:</emphasis>
+                    This option is a Wic-specific option that specifies the
+                    partition type globally unique identifier (GUID) for GPT
+                    partitions.
+                    You can find the list of partition type GUIDs at
+                    <ulink url='http://en.wikipedia.org/wiki/GUID_Partition_Table#Partition_type_GUIDs'></ulink>.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--use-uuid</filename>:</emphasis>
+                    This option is a Wic-specific option that causes Wic to
+                    generate a random GUID for the partition.
+                    The generated identifier is used in the bootloader
+                    configuration to specify the root partition.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--uuid</filename>:</emphasis>
+                    This option is a Wic-specific option that specifies the
+                    partition UUID.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='command-bootloader'>
+    <title>Command: bootloader</title>
+
+        <para>
+            This command specifies how the bootloader should be configured and
+            supports the following options:
+            <note>
+                Bootloader functionality and boot partitions are implemented by
+                the various <filename>--source</filename> plug-ins that
+                implement bootloader functionality.
+                The bootloader command essentially provides a means of
+                modifying bootloader configuration.
+            </note>
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis><filename>--timeout</filename>:</emphasis>
+                    Specifies the number of seconds before the bootloader times
+                    out and boots the default option.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--append</filename>:</emphasis>
+                    Specifies kernel parameters.
+                    These parameters will be added to the syslinux
+                    <filename>APPEND</filename> or <filename>grub</filename>
+                    kernel command line.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--configfile</filename>:</emphasis>
+                    Specifies a user-defined configuration file for the
+                    bootloader.
+                    You can provide a full pathname for the file or a file that
+                    exists in the <filename>canned-wks</filename> folder.
+                    This option overrides all other bootloader options.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

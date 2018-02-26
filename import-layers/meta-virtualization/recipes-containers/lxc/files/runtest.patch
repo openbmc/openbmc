@@ -19,7 +19,7 @@ diff -uNr a/src/tests/Makefile.am b/src/tests/Makefile.am
 +
 +install-ptest:
 +	install -d $(TEST_DIR)
-+	install -D ../lxc/liblxc.so $(TEST_DIR)/../lxc/liblxc.so
++	install -D ../lxc/.libs/liblxc.so $(TEST_DIR)/../lxc/liblxc.so
 +	install -D ../../config/test-driver $(TEST_DIR)/../../config/test-driver
 +	cp Makefile $(TEST_DIR)
 +	@(for file in $(TESTS); do install $$file $(TEST_DIR);  done;)

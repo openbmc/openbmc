@@ -23,6 +23,7 @@ from toastergui.widgets import ToasterTable
 from orm.models import Recipe, ProjectLayer, Layer_Version, Machine, Project
 from orm.models import CustomImageRecipe, Package, Target, Build, LogMessage, Task
 from orm.models import CustomImagePackage, Package_DependencyManager
+from orm.models import Distro
 from django.db.models import Q, Max, Sum, Count, When, Case, Value, IntegerField
 from django.conf.urls import url
 from django.core.urlresolvers import reverse, resolve
@@ -1536,3 +1537,93 @@ class ProjectBuildsTable(BuildsTable):
             context['build_in_progress_none_completed'] = False
 
         return context
+
+
+class DistrosTable(ToasterTable):
+    """Table of Distros in Toaster"""
+
+    def __init__(self, *args, **kwargs):
+        super(DistrosTable, self).__init__(*args, **kwargs)
+        self.empty_state = "Toaster has no distro information for this project. Sadly, 			   distro information cannot be obtained from builds, so this 				  page will remain empty."
+        self.title = "Compatible Distros"
+        self.default_orderby = "name"
+
+    def get_context_data(self, **kwargs):
+        context = super(DistrosTable, self).get_context_data(**kwargs)
+        context['project'] = Project.objects.get(pk=kwargs['pid'])
+        return context
+
+    def setup_filters(self, *args, **kwargs):
+        project = Project.objects.get(pk=kwargs['pid'])
+
+        in_current_project_filter = TableFilter(
+            "in_current_project",
+            "Filter by project Distros"
+        )
+
+        in_project_action = TableFilterActionToggle(
+            "in_project",
+            "Distro provided by layers added to this project",
+            ProjectFilters.in_project(self.project_layers)
+        )
+
+        not_in_project_action = TableFilterActionToggle(
+            "not_in_project",
+            "Distros provided by layers not added to this project",
+            ProjectFilters.not_in_project(self.project_layers)
+        )
+
+        in_current_project_filter.add_action(in_project_action)
+        in_current_project_filter.add_action(not_in_project_action)
+        self.add_filter(in_current_project_filter)
+
+    def setup_queryset(self, *args, **kwargs):
+        prj = Project.objects.get(pk = kwargs['pid'])
+        self.queryset = prj.get_all_compatible_distros()
+        self.queryset = self.queryset.order_by(self.default_orderby)
+
+        self.static_context_extra['current_layers'] = \
+                self.project_layers = \
+                prj.get_project_layer_versions(pk=True)
+
+    def setup_columns(self, *args, **kwargs):
+
+        self.add_column(title="Distro",
+                        hideable=False,
+                        orderable=True,
+                        field_name="name")
+
+        self.add_column(title="Description",
+                        field_name="description")
+
+        layer_link_template = '''
+        <a href="{% url 'layerdetails' extra.pid data.layer_version.id %}">
+        {{data.layer_version.layer.name}}</a>
+        '''
+
+        self.add_column(title="Layer",
+                        static_data_name="layer_version__layer__name",
+                        static_data_template=layer_link_template,
+                        orderable=True)
+
+        self.add_column(title="Git revision",
+                        help_text="The Git branch, tag or commit. For the layers from the OpenEmbedded layer source, the revision is always the branch compatible with the Yocto Project version you selected for this project",
+                        hidden=True,
+                        field_name="layer_version__get_vcs_reference")
+
+        wrtemplate_file_template = '''<code>conf/machine/{{data.name}}.conf</code>
+        <a href="{{data.get_vcs_machine_file_link_url}}" target="_blank"><span class="glyphicon glyphicon-new-window"></i></a>'''
+
+        self.add_column(title="Distro file",
+                        hidden=True,
+                        static_data_name="templatefile",
+                        static_data_template=wrtemplate_file_template)
+
+
+        self.add_column(title="Select",
+                        help_text="Sets the selected distro to the project",
+                        hideable=False,
+                        filter_name="in_current_project",
+                        static_data_name="add-del-layers",
+                        static_data_template='{% include "distro_btn.html" %}')
+

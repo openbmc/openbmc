@@ -1,0 +1,96 @@
+From 4a7aa30ae9f3ce798dd886c2f2d4164c43027748 Mon Sep 17 00:00:00 2001
+From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Date: Sat, 29 Jul 2017 14:34:23 +0300
+Subject: [PATCH] Fix building AArch32 CE implementations when target is ARMv6
+ arch
+
+* cipher/cipher-gcm-armv8-aarch32-ce.S: Select ARMv8 architecure.
+* cipher/rijndael-armv8-aarch32-ce.S: Ditto.
+* cipher/sha1-armv8-aarch32-ce.S: Ditto.
+* cipher/sha256-armv8-aarch32-ce.S: Ditto.
+* configure.ac (gcry_cv_gcc_inline_asm_aarch32_crypto): Ditto.
+--
+
+Raspbian distribution defaults to ARMv6 architecture thus 'rbit'
+instruction is not available with default compiler flags. Patch
+adds explicit architecture selection for ARMv8 to enable 'rbit'
+usage with ARMv8/AArch32-CE assembly implementations of SHA,
+GHASH and AES.
+
+Reported-by: Chris Horry <zerbey@gmail.com>
+Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+
+Signed-off-by: Paul Barker <pbarker@toganlabs.com>
+Upstream-Status: Backport
+
+---
+ cipher/cipher-gcm-armv8-aarch32-ce.S | 1 +
+ cipher/rijndael-armv8-aarch32-ce.S   | 1 +
+ cipher/sha1-armv8-aarch32-ce.S       | 1 +
+ cipher/sha256-armv8-aarch32-ce.S     | 1 +
+ configure.ac                         | 1 +
+ 5 files changed, 5 insertions(+)
+
+diff --git a/cipher/cipher-gcm-armv8-aarch32-ce.S b/cipher/cipher-gcm-armv8-aarch32-ce.S
+index b61a7871..1de66a16 100644
+--- a/cipher/cipher-gcm-armv8-aarch32-ce.S
++++ b/cipher/cipher-gcm-armv8-aarch32-ce.S
+@@ -24,6 +24,7 @@
+     defined(HAVE_GCC_INLINE_ASM_AARCH32_CRYPTO)
+ 
+ .syntax unified
++.arch armv8-a
+ .fpu crypto-neon-fp-armv8
+ .arm
+ 
+diff --git a/cipher/rijndael-armv8-aarch32-ce.S b/cipher/rijndael-armv8-aarch32-ce.S
+index f375f673..5c8fa3c0 100644
+--- a/cipher/rijndael-armv8-aarch32-ce.S
++++ b/cipher/rijndael-armv8-aarch32-ce.S
+@@ -24,6 +24,7 @@
+     defined(HAVE_GCC_INLINE_ASM_AARCH32_CRYPTO)
+ 
+ .syntax unified
++.arch armv8-a
+ .fpu crypto-neon-fp-armv8
+ .arm
+ 
+diff --git a/cipher/sha1-armv8-aarch32-ce.S b/cipher/sha1-armv8-aarch32-ce.S
+index b0bc5ffe..bf2b233b 100644
+--- a/cipher/sha1-armv8-aarch32-ce.S
++++ b/cipher/sha1-armv8-aarch32-ce.S
+@@ -24,6 +24,7 @@
+     defined(HAVE_GCC_INLINE_ASM_AARCH32_CRYPTO) && defined(USE_SHA1)
+ 
+ .syntax unified
++.arch armv8-a
+ .fpu crypto-neon-fp-armv8
+ .arm
+ 
+diff --git a/cipher/sha256-armv8-aarch32-ce.S b/cipher/sha256-armv8-aarch32-ce.S
+index 2041a237..2b17ab1b 100644
+--- a/cipher/sha256-armv8-aarch32-ce.S
++++ b/cipher/sha256-armv8-aarch32-ce.S
+@@ -24,6 +24,7 @@
+     defined(HAVE_GCC_INLINE_ASM_AARCH32_CRYPTO) && defined(USE_SHA256)
+ 
+ .syntax unified
++.arch armv8-a
+ .fpu crypto-neon-fp-armv8
+ .arm
+ 
+diff --git a/configure.ac b/configure.ac
+index 27faa7f4..66e7cd67 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1619,6 +1619,7 @@ AC_CACHE_CHECK([whether GCC inline assembler supports AArch32 Crypto Extension i
+           AC_COMPILE_IFELSE([AC_LANG_SOURCE(
+           [[__asm__(
+                 ".syntax unified\n\t"
++                ".arch armv8-a\n\t"
+                 ".arm\n\t"
+                 ".fpu crypto-neon-fp-armv8\n\t"
+ 
+-- 
+2.11.0
+

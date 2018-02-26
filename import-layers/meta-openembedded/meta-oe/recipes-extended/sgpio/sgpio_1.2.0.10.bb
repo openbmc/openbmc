@@ -1,4 +1,5 @@
 SUMMARY = "SGPIO captive backplane tool"
+HOMEPAGE = "http://sources.redhat.com/lvm2/wiki/DMRAID_Eventing"
 DESCRIPTION = "Intel SGPIO enclosure management utility"
 
 SRC_URI = "http://pkgs.fedoraproject.org/repo/pkgs/${BPN}/${BPN}-1.2-0.10-src.tar.gz/a417bf68da4e9bd79a4664c11d7debd1/${BPN}-1.2-0.10-src.tar.gz \

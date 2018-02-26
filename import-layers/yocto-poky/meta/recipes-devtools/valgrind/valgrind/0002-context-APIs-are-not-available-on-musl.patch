@@ -1,0 +1,49 @@
+From 862b807076d57f2f58ed9d572ddac8bb402774a2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 10 Jun 2017 01:01:10 -0700
+Subject: [PATCH 2/6] context APIs are not available on musl
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ memcheck/tests/linux/stack_changes.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/memcheck/tests/linux/stack_changes.c b/memcheck/tests/linux/stack_changes.c
+index a978fc2..ffb49c6 100644
+--- a/memcheck/tests/linux/stack_changes.c
++++ b/memcheck/tests/linux/stack_changes.c
+@@ -10,6 +10,7 @@
+ // This test is checking the libc context calls (setcontext, etc.) and
+ // checks that Valgrind notices their stack changes properly.
+ 
++#ifdef __GLIBC__
+ typedef  struct ucontext  mycontext;
+ 
+ mycontext ctx1, ctx2, oldc;
+@@ -51,9 +52,11 @@ int init_context(mycontext *uc)
+ 
+     return ret;
+ }
++#endif
+ 
+ int main(int argc, char **argv)
+ {
++#ifdef __GLIBC__
+     int c1 = init_context(&ctx1);
+     int c2 = init_context(&ctx2);
+ 
+@@ -66,6 +69,8 @@ int main(int argc, char **argv)
+     //free(ctx1.uc_stack.ss_sp);
+     VALGRIND_STACK_DEREGISTER(c2);
+     //free(ctx2.uc_stack.ss_sp);
+-
++#else
++    printf("libc context call APIs e.g. getcontext() are deprecated by posix\n");
++#endif
+     return 0;
+ }
+-- 
+2.13.1
+

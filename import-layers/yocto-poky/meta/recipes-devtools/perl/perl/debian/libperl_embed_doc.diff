@@ -6,6 +6,7 @@ Subject: Note that libperl-dev package is required for embedded linking
 Bug-Debian: http://bugs.debian.org/186778
 
 Patch-Name: debian/libperl_embed_doc.diff
+Upstream-Status: Pending
 ---
  lib/ExtUtils/Embed.pm | 3 +++
  1 file changed, 3 insertions(+)

@@ -22,20 +22,11 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  include/common.h | 10 ++++++----
  1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/include/common.h b/include/common.h
-index 77f3f7d..2cbee0f 100644
---- a/include/common.h
-+++ b/include/common.h
-@@ -126,7 +126,7 @@ static char __PRIxoff_t_static_assert[sizeof(off_t) == 8 ? 1 : -1];
- 	fprintf(stderr, "%s: warning!: " fmt "\n", PROGRAM_NAME, ##__VA_ARGS__); \
- } while(0)
- 
--#if defined(__UCLIBC__)
-+#if defined(__UCLIBC__) || defined(__KLIBC__)
- /* uClibc versions before 0.9.34 don't have rpmatch() */
- #if __UCLIBC_MAJOR__ == 0 && \
- 		(__UCLIBC_MINOR__ < 9 || \
-@@ -146,15 +146,17 @@ static inline int __rpmatch(const char *resp)
+Index: git/include/common.h
+===================================================================
+--- git.orig/include/common.h
++++ git/include/common.h
+@@ -161,15 +161,17 @@ static inline int __rpmatch(const char *
   */
  static inline bool prompt(const char *msg, bool def)
  {
@@ -56,6 +47,3 @@ index 77f3f7d..2cbee0f 100644
  			printf("failed to read prompt; assuming '%s'\n",
  				def ? "yes" : "no");
  			break;
--- 
-1.9.1
-

@@ -1,0 +1,25 @@
+From a557651a08e21e3c7c7f5eca9f5405f86624903f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 14 Jul 2017 22:42:51 -0700
+Subject: [PATCH] src/igmpproxy.h: Include sys/types.h for u_short/u_init
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/igmpproxy.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/igmpproxy.h b/src/igmpproxy.h
+index 4dabd1c..4454729 100644
+--- a/src/igmpproxy.h
++++ b/src/igmpproxy.h
+@@ -46,6 +46,7 @@
+ #include <stdbool.h>
+ 
+ #include <sys/socket.h>
++#include <sys/types.h>
+ #include <sys/un.h>
+ #include <sys/time.h>
+ #include <sys/ioctl.h>
+-- 
+2.13.3
+

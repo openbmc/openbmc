@@ -7,6 +7,9 @@ SRC_URI = "http://downloads.yoctoproject.org/releases/pseudo/${BPN}-${PV}.tar.bz
            file://moreretries.patch \
            file://efe0be279901006f939cd357ccee47b651c786da.patch \
            file://b6b68db896f9963558334aff7fca61adde4ec10f.patch \
+           file://fastopreply.patch \
+           file://toomanyfiles.patch \
+           file://0001-Use-epoll-API-on-Linux.patch \
            "
 
 SRC_URI[md5sum] = "7d41e72188fbea1f696c399c1a435675"

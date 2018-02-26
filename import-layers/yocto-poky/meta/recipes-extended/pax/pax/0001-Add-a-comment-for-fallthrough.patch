@@ -1,0 +1,38 @@
+From e67bb3debe582f0e77770b714bd012bb1082fc41 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Apr 2017 11:32:00 -0700
+Subject: [PATCH] Add a comment for fallthrough
+
+Fixes warnings with gcc7 e.g.
+
+../../../../../../../workspace/sources/pax/src/options.c: In function 'tar_options':
+../../../../../../../workspace/sources/pax/src/options.c:725:7: error: this statement may fall through [-Werror=implicit-fallthrough=]
+    if (opt_add ("write_opt=nodir") < 0)
+       ^
+../../../../../../../workspace/sources/pax/src/options.c:730:2: note: here
+  case 'O':
+  ^~~~
+cc1: all warnings being treated as errors
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/options.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/options.c b/src/options.c
+index c663b4e..b80819a 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -724,6 +724,7 @@ tar_options (int argc, char **argv)
+ 	case 'o':
+ 	  if (opt_add ("write_opt=nodir") < 0)
+ 	    tar_usage ();
++	  /* fallthru */
+ 	case 'O':
+ 	  Oflag = 1;
+ 	  break;
+-- 
+2.12.2
+

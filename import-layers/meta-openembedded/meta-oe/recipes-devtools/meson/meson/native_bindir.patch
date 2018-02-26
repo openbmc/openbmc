@@ -1,8 +1,13 @@
+There are some discussions upstream to merge this patch, but I presonaly believe
+that is is OE only. https://github.com/mesonbuild/meson/issues/1849#issuecomment-303730323
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 diff --git a/mesonbuild/dependencies.py b/mesonbuild/dependencies.py
-index da73a57b7ecd..22100f69c580 100644
+index 04a22f985941..3e33bc4a79e7 100644
 --- a/mesonbuild/dependencies.py
 +++ b/mesonbuild/dependencies.py
-@@ -65,7 +65,7 @@ class Dependency():
+@@ -95,7 +95,7 @@ class Dependency:
      def need_threads(self):
          return False
  
@@ -11,7 +16,7 @@ index da73a57b7ecd..22100f69c580 100644
          raise MesonException('Tried to get a pkg-config variable from a non-pkgconfig dependency.')
  
  class InternalDependency(Dependency):
-@@ -177,8 +177,12 @@ class PkgConfigDependency(Dependency):
+@@ -224,8 +224,12 @@ class PkgConfigDependency(Dependency):
          return s.format(self.__class__.__name__, self.name, self.is_found,
                          self.version_reqs)
  
@@ -23,10 +28,10 @@ index da73a57b7ecd..22100f69c580 100644
 +        else:
 +            pkgbin = [self.pkgbin]
 +        p, out = Popen_safe(pkgbin + args, env=os.environ)[0:2]
-         return (p.returncode, out.strip())
+         return p.returncode, out.strip()
  
      def _set_cargs(self):
-@@ -212,8 +216,8 @@ class PkgConfigDependency(Dependency):
+@@ -259,8 +263,8 @@ class PkgConfigDependency(Dependency):
                  self.is_libtool = True
              self.libs.append(lib)
  
@@ -37,16 +42,30 @@ index da73a57b7ecd..22100f69c580 100644
          variable = ''
          if ret != 0:
              if self.required:
-@@ -933,10 +937,10 @@ class QtBaseDependency(Dependency):
-             corekwargs = {'required': 'false', 'silent': 'true'}
-             core = PkgConfigDependency(self.qtpkgname + 'Core', env, corekwargs)
-         # Used by self.compilers_detect()
--        self.bindir = core.get_pkgconfig_variable('host_bins')
-+        self.bindir = core.get_pkgconfig_variable('host_bins', use_native=True)
+@@ -1091,7 +1095,7 @@ class QtBaseDependency(Dependency):
+         self.bindir = self.get_pkgconfig_host_bins(core)
          if not self.bindir:
              # If exec_prefix is not defined, the pkg-config file is broken
 -            prefix = core.get_pkgconfig_variable('exec_prefix')
 +            prefix = core.get_pkgconfig_variable('exec_prefix', use_native=True)
              if prefix:
                  self.bindir = os.path.join(prefix, 'bin')
+ 
+@@ -1202,7 +1206,7 @@ class Qt5Dependency(QtBaseDependency):
+         QtBaseDependency.__init__(self, 'qt5', env, kwargs)
+ 
+     def get_pkgconfig_host_bins(self, core):
+-        return core.get_pkgconfig_variable('host_bins')
++        return core.get_pkgconfig_variable('host_bins', use_native=True)
+ 
+ class Qt4Dependency(QtBaseDependency):
+     def __init__(self, env, kwargs):
+@@ -1216,7 +1220,7 @@ class Qt4Dependency(QtBaseDependency):
+         applications = ['moc', 'uic', 'rcc', 'lupdate', 'lrelease']
+         for application in applications:
+             try:
+-                return os.path.dirname(core.get_pkgconfig_variable('%s_location' % application))
++                return os.path.dirname(core.get_pkgconfig_variable('%s_location' % application, use_native=True))
+             except MesonException:
+                 pass
  

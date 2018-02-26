@@ -1,0 +1,25 @@
+From b5961f17e9d7f2bc44da611b3e4b27c8a641fc72 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 2 Sep 2017 08:07:17 -0700
+Subject: [PATCH] disbale heap checkers and debug allocator on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -51,6 +51,8 @@ case "$host" in
+    *-cygwin*) default_enable_heap_checker=no; default_enable_cpu_profiler=no;;
+    *-freebsd*) default_enable_heap_checker=no;;
+    *-darwin*) default_enable_heap_checker=no;;
++   *-musl*) default_enable_heap_checker=no; default_enable_heap_profiler=no;
++            default_enable_debugalloc=no; default_enable_libunwind=no;
+ esac
+ 
+ # Currently only backtrace works on s390.

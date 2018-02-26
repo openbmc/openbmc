@@ -1,0 +1,30 @@
+From 62332eec752dd790f4dd071dfb0dbe86be377203 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 16 Aug 2017 02:05:34 -0400
+Subject: [PATCH 3/5] Correctly install python modules
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+Rebase to 1.9.0
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ lang/python/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
+index d91ead9..67f7cdc 100644
+--- a/lang/python/Makefile.am
++++ b/lang/python/Makefile.am
+@@ -106,6 +106,7 @@ install-exec-local:
+ 	  cd python$${VERSION}-gpg ; \
+ 	  $$PYTHON setup.py install \
+ 	  --prefix $(DESTDIR)$(prefix) \
++	  --install-lib=$(DESTDIR)${pythondir} \
+ 	  --record files.txt \
+ 	  --verbose ; \
+ 	  cat files.txt >> ../install_files.txt ; \
+-- 
+2.8.1
+

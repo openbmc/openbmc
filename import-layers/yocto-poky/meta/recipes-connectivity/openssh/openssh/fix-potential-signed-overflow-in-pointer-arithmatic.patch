@@ -8,7 +8,7 @@ type, so that 's - src' in strlcpy and others may trigger signed overflow.
 In case of compilation by gcc or clang with -ftrapv option, the overflow
 would lead to program abort.
 
-Upstream-status: Submitted [http://bugzilla.mindrot.org/show_bug.cgi?id=2608]
+Upstream-Status: Submitted [http://bugzilla.mindrot.org/show_bug.cgi?id=2608]
 
 Signed-off-by: Yuanjie Huang <yuanjie.huang@windriver.com>
 ---

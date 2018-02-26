@@ -35,7 +35,7 @@ from orm.models import BitbakeVersion, CustomImageRecipe
 from django.core.urlresolvers import reverse, resolve
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, JsonResponse
 from django.utils import timezone
 from datetime import timedelta, datetime
 from toastergui.templatetags.projecttags import json as jsonfilter
@@ -49,6 +49,8 @@ import logging
 
 logger = logging.getLogger("toaster")
 
+# Project creation and managed build enable
+project_enable = ('1' == os.environ.get('TOASTER_BUILDSERVER'))
 
 class MimeTypeFinder(object):
     # setting this to False enables additional non-standard mimetypes
@@ -64,6 +66,12 @@ class MimeTypeFinder(object):
         if guessed_type == None:
             guessed_type = 'application/octet-stream'
         return guessed_type
+
+# single point to add global values into the context before rendering
+def toaster_render(request, page, context):
+    context['project_enable'] = project_enable
+    return render(request, page, context)
+
 
 # all new sessions should come through the landing page;
 # determine in which mode we are running in, and redirect appropriately
@@ -86,7 +94,7 @@ def landing(request):
 
     context = {'lvs_nos' : Layer_Version.objects.all().count()}
 
-    return render(request, 'landing.html', context)
+    return toaster_render(request, 'landing.html', context)
 
 def objtojson(obj):
     from django.db.models.query import QuerySet
@@ -277,7 +285,7 @@ def _validate_input(field_input, model):
             return None, invalid + str(field_input_list)
 
         # Check we are looking for a valid field
-        valid_fields = model._meta.get_all_field_names()
+        valid_fields = [f.name for f in model._meta.get_fields()]
         for field in field_input_list[0].split(AND_VALUE_SEPARATOR):
             if True in [field.startswith(x) for x in valid_fields]:
                 break
@@ -457,10 +465,15 @@ def builddashboard( request, build_id ):
         npkg = 0
         pkgsz = 0
         package = None
-        for package in Package.objects.filter(id__in = [x.package_id for x in t.target_installed_package_set.all()]):
-            pkgsz = pkgsz + package.size
-            if package.installed_name:
-                npkg = npkg + 1
+        # Chunk the query to avoid "too many SQL variables" error
+        package_set = t.target_installed_package_set.all()
+        package_set_len = len(package_set)
+        for ps_start in range(0,package_set_len,500):
+            ps_stop = min(ps_start+500,package_set_len)
+            for package in Package.objects.filter(id__in = [x.package_id for x in package_set[ps_start:ps_stop]]):
+                pkgsz = pkgsz + package.size
+                if package.installed_name:
+                    npkg = npkg + 1
         elem['npkg'] = npkg
         elem['pkgsz'] = pkgsz
         ti = Target_Image_File.objects.filter(target_id = t.id)
@@ -514,7 +527,7 @@ def builddashboard( request, build_id ):
             'packagecount'    : packageCount,
             'logmessages'     : logmessages,
     }
-    return render( request, template, context )
+    return toaster_render( request, template, context )
 
 
 
@@ -586,7 +599,7 @@ def task( request, build_id, task_id ):
             build__completed_on__lt=task_object.build.completed_on).exclude(
             order__isnull=True).exclude(outcome=Task.OUTCOME_NA).order_by('-build__completed_on')
 
-    return render( request, template, context )
+    return toaster_render( request, template, context )
 
 def recipe(request, build_id, recipe_id, active_tab="1"):
     template = "recipe.html"
@@ -613,7 +626,7 @@ def recipe(request, build_id, recipe_id, active_tab="1"):
             'package_count' : package_count,
             'tab_states' : tab_states,
     }
-    return render(request, template, context)
+    return toaster_render(request, template, context)
 
 def recipe_packages(request, build_id, recipe_id):
     template = "recipe_packages.html"
@@ -658,7 +671,7 @@ def recipe_packages(request, build_id, recipe_id):
                 },
            ]
        }
-    response = render(request, template, context)
+    response = toaster_render(request, template, context)
     _set_parameters_values(pagesize, orderby, request)
     return response
 
@@ -780,7 +793,7 @@ def dirinfo(request, build_id, target_id, file_path=None):
                 'dir_list': dir_list,
                 'file_path': file_path,
               }
-    return render(request, template, context)
+    return toaster_render(request, template, context)
 
 def _find_task_dep(task_object):
     tdeps = Task_Dependency.objects.filter(task=task_object).filter(depends_on__order__gt=0)
@@ -832,7 +845,7 @@ def configuration(request, build_id):
                     'build': build,
                     'project': build.project,
                     'targets': Target.objects.filter(build=build_id)})
-    return render(request, template, context)
+    return toaster_render(request, template, context)
 
 
 def configvars(request, build_id):
@@ -921,7 +934,7 @@ def configvars(request, build_id):
                 ],
             }
 
-    response = render(request, template, context)
+    response = toaster_render(request, template, context)
     _set_parameters_values(pagesize, orderby, request)
     return response
 
@@ -934,7 +947,7 @@ def bfile(request, build_id, package_id):
         'project': build.project,
         'objects' : files
     }
-    return render(request, template, context)
+    return toaster_render(request, template, context)
 
 
 # A set of dependency types valid for both included and built package views
@@ -1087,7 +1100,7 @@ def package_built_detail(request, build_id, package_id):
     if paths.all().count() < 2:
         context['disable_sort'] = True;
 
-    response = render(request, template, context)
+    response = toaster_render(request, template, context)
     _set_parameters_values(pagesize, orderby, request)
     return response
 
@@ -1106,7 +1119,7 @@ def package_built_dependencies(request, build_id, package_id):
             'other_deps' :   dependencies['other_deps'],
             'dependency_count' : _get_package_dependency_count(package, -1,  False)
     }
-    return render(request, template, context)
+    return toaster_render(request, template, context)
 
 
 def package_included_detail(request, build_id, target_id, package_id):
@@ -1152,7 +1165,7 @@ def package_included_detail(request, build_id, target_id, package_id):
     }
     if paths.all().count() < 2:
         context['disable_sort'] = True
-    response = render(request, template, context)
+    response = toaster_render(request, template, context)
     _set_parameters_values(pagesize, orderby, request)
     return response
 
@@ -1176,7 +1189,7 @@ def package_included_dependencies(request, build_id, target_id, package_id):
             'reverse_count' : _get_package_reverse_dep_count(package, target_id),
             'dependency_count' : _get_package_dependency_count(package, target_id, True)
     }
-    return render(request, template, context)
+    return toaster_render(request, template, context)
 
 def package_included_reverse_dependencies(request, build_id, target_id, package_id):
     template = "package_included_reverse_dependencies.html"
@@ -1227,7 +1240,7 @@ def package_included_reverse_dependencies(request, build_id, target_id, package_
     }
     if objects.all().count() < 2:
         context['disable_sort'] = True
-    response = render(request, template, context)
+    response = toaster_render(request, template, context)
     _set_parameters_values(pagesize, orderby, request)
     return response
 
@@ -1251,6 +1264,89 @@ def managedcontextprocessor(request):
     }
     return ret
 
+# REST-based API calls to return build/building status to external Toaster
+# managers and aggregators via JSON
+
+def _json_build_status(build_id,extend):
+    build_stat = None
+    try:
+        build = Build.objects.get( pk = build_id )
+        build_stat = {}
+        build_stat['id'] = build.id
+        build_stat['name'] = build.build_name
+        build_stat['machine'] = build.machine
+        build_stat['distro'] = build.distro
+        build_stat['start'] = build.started_on
+        # look up target name
+        target= Target.objects.get( build = build )
+        if target:
+            if target.task:
+                build_stat['target'] = '%s:%s' % (target.target,target.task)
+            else:
+                build_stat['target'] = '%s' % (target.target)
+        else:
+            build_stat['target'] = ''
+        # look up project name
+        project = Project.objects.get( build = build )
+        if project:
+            build_stat['project'] = project.name
+        else:
+            build_stat['project'] = ''
+        if Build.IN_PROGRESS == build.outcome:
+            now = timezone.now()
+            timediff = now - build.started_on
+            build_stat['seconds']='%.3f' % timediff.total_seconds()
+            build_stat['clone']='%d:%d' % (build.repos_cloned,build.repos_to_clone)
+            build_stat['parse']='%d:%d' % (build.recipes_parsed,build.recipes_to_parse)
+            tf = Task.objects.filter(build = build)
+            tfc = tf.count()
+            if tfc > 0:
+                tfd = tf.exclude(order__isnull=True).count()
+            else:
+                tfd = 0
+            build_stat['task']='%d:%d' % (tfd,tfc)
+        else:
+            build_stat['outcome'] = build.get_outcome_text()
+            timediff = build.completed_on - build.started_on
+            build_stat['seconds']='%.3f' % timediff.total_seconds()
+            build_stat['stop'] = build.completed_on
+            messages = LogMessage.objects.all().filter(build = build)
+            errors = len(messages.filter(level=LogMessage.ERROR) |
+                 messages.filter(level=LogMessage.EXCEPTION) |
+                 messages.filter(level=LogMessage.CRITICAL))
+            build_stat['errors'] = errors
+            warnings = len(messages.filter(level=LogMessage.WARNING))
+            build_stat['warnings'] = warnings
+        if extend:
+            build_stat['cooker_log'] = build.cooker_log_path
+    except Exception as e:
+        build_state = str(e)
+    return build_stat
+
+def json_builds(request):
+    build_table = []
+    builds = []
+    try:
+        builds = Build.objects.exclude(outcome=Build.IN_PROGRESS).order_by("-started_on")
+        for build in builds:
+            build_table.append(_json_build_status(build.id,False))
+    except Exception as e:
+        build_table = str(e)
+    return JsonResponse({'builds' : build_table, 'count' : len(builds)})
+
+def json_building(request):
+    build_table = []
+    builds = []
+    try:
+        builds = Build.objects.filter(outcome=Build.IN_PROGRESS).order_by("-started_on")
+        for build in builds:
+            build_table.append(_json_build_status(build.id,False))
+    except Exception as e:
+        build_table = str(e)
+    return JsonResponse({'building' : build_table, 'count' : len(builds)})
+
+def json_build(request,build_id):
+    return JsonResponse({'build' : _json_build_status(build_id,True)})
 
 
 import toastermain.settings
@@ -1277,6 +1373,9 @@ if True:
 
     # new project
     def newproject(request):
+        if not project_enable:
+            return redirect( landing )
+
         template = "newproject.html"
         context = {
             'email': request.user.email if request.user.is_authenticated() else '',
@@ -1291,7 +1390,7 @@ if True:
 
         if request.method == "GET":
             # render new project page
-            return render(request, template, context)
+            return toaster_render(request, template, context)
         elif request.method == "POST":
             mandatory_fields = ['projectname', 'ptype']
             try:
@@ -1331,7 +1430,7 @@ if True:
                     context['alert'] = "Your chosen username is already used"
                 else:
                     context['alert'] = str(e)
-                return render(request, template, context)
+                return toaster_render(request, template, context)
 
         raise Exception("Invalid HTTP method for this page")
 
@@ -1339,7 +1438,7 @@ if True:
     def project(request, pid):
         project = Project.objects.get(pk=pid)
         context = {"project": project}
-        return render(request, "project.html", context)
+        return toaster_render(request, "project.html", context)
 
     def jsunittests(request):
         """ Provides a page for the js unit tests """
@@ -1365,7 +1464,7 @@ if True:
                                               name="MACHINE",
                                               value="qemux86")
         context = {'project': new_project}
-        return render(request, "js-unit-tests.html", context)
+        return toaster_render(request, "js-unit-tests.html", context)
 
     from django.views.decorators.csrf import csrf_exempt
     @csrf_exempt
@@ -1500,7 +1599,7 @@ if True:
         context = {
             'project': Project.objects.get(id=pid),
         }
-        return render(request, template, context)
+        return toaster_render(request, template, context)
 
     def layerdetails(request, pid, layerid):
         project = Project.objects.get(pk=pid)
@@ -1529,7 +1628,7 @@ if True:
             'projectlayers': list(project_layers)
         }
 
-        return render(request, 'layerdetails.html', context)
+        return toaster_render(request, 'layerdetails.html', context)
 
 
     def get_project_configvars_context():
@@ -1619,7 +1718,7 @@ if True:
         except (ProjectVariable.DoesNotExist, BuildEnvironment.DoesNotExist):
             pass
 
-        return render(request, "projectconf.html", context)
+        return toaster_render(request, "projectconf.html", context)
 
     def _file_names_for_artifact(build, artifact_type, artifact_id):
         """
@@ -1686,6 +1785,7 @@ if True:
 
                 return response
             else:
-                return render(request, "unavailable_artifact.html")
+                return toaster_render(request, "unavailable_artifact.html")
         except (ObjectDoesNotExist, IOError):
-            return render(request, "unavailable_artifact.html")
+            return toaster_render(request, "unavailable_artifact.html")
+

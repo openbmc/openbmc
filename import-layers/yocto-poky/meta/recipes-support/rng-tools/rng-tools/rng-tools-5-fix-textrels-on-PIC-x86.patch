@@ -1,0 +1,103 @@
+From: Francisco Blas Izquierdo Riera (klondike) <klondike@gentoo.org>
+Subject: [PATCH] Fix assemby textrels on rdrand_asm.S on PIC x86
+
+This patch updates the fixes in the assembly in rdrand_asm.S in
+sys-apps/rng-tools-5 so it won't generate textrels on PIC systems.
+The main fixes are in the use of leal in SETPTR for such systems, the rest is
+the usual PIC support stuff.
+
+This should fix Gentoo bug #469962 and help fix #518210
+
+This patch is released under the GPLv2 or a higher version license as is the
+original file as long as the author and the tester are credited.
+
+Gentoo-bug-url: https://bugs.gentoo.org/show_bug.cgi?id=469962
+Gentoo-bug-url: https://bugs.gentoo.org/show_bug.cgi?id=518210
+Signed-off-by: Francisco Blas Izquierdo Riera (klondike) <klondike@gentoo.org>
+Reported-by: cilly <cilly@cilly.mine.nu>
+Reported-by: Manuel Rüger <mrueg@gentoo.org>
+Tested-by: Anthony Basile <blueness@gentoo.org>
+
+Upstream-Status: Pending
+
+Index: rng-tools-5/rdrand_asm.S
+===================================================================
+--- rng-tools-5.orig/rdrand_asm.S
++++ rng-tools-5/rdrand_asm.S
+@@ -2,6 +2,7 @@
+  * Copyright (c) 2011-2014, Intel Corporation
+  * Authors: Fenghua Yu <fenghua.yu@intel.com>,
+  *          H. Peter Anvin <hpa@linux.intel.com>
++ * PIC code by: Francisco Blas Izquierdo Riera (klondike) <klondike@gentoo.org>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -174,7 +175,19 @@ ENTRY(x86_rdseed_or_rdrand_bytes)
+ 	jmp	4b
+ ENDPROC(x86_rdseed_or_rdrand_bytes)
+ 
++#if defined(__PIC__)
++#define INIT_PIC() \
++	pushl	%ebx ; \
++	call    __x86.get_pc_thunk.bx ; \
++	addl    $_GLOBAL_OFFSET_TABLE_, %ebx
++#define END_PIC() \
++	popl	%ebx
++#define SETPTR(var,ptr) leal (var)@GOTOFF(%ebx),ptr
++#else
++#define INIT_PIC()
++#define END_PIC()
+ #define SETPTR(var,ptr)	movl $(var),ptr
++#endif
+ #define PTR0	%eax
+ #define PTR1	%edx
+ #define PTR2	%ecx
+@@ -190,6 +203,7 @@ ENTRY(x86_aes_mangle)
+ 	movl	8(%ebp), %eax
+ 	movl	12(%ebp), %edx
+ 	push	%esi
++	INIT_PIC()
+ #endif
+ 	movl	$512, CTR3	/* Number of rounds */
+ 	
+@@ -280,6 +294,7 @@ offset = offset + 16
+ 	movdqa	%xmm7, (7*16)(PTR1)
+ 
+ #ifdef __i386__
++	END_PIC()
+ 	pop	%esi
+ 	pop	%ebp
+ #endif
+@@ -294,6 +309,7 @@ ENTRY(x86_aes_expand_key)
+ 	push	%ebp
+ 	mov	%esp, %ebp
+ 	movl	8(%ebp), %eax
++	INIT_PIC()
+ #endif
+ 
+ 	SETPTR(aes_round_keys, PTR1)
+@@ -323,6 +339,7 @@ ENTRY(x86_aes_expand_key)
+ 	call	1f
+ 
+ #ifdef __i386__
++	END_PIC()
+ 	pop	%ebp
+ #endif
+ 	ret
+@@ -343,6 +360,16 @@ ENTRY(x86_aes_expand_key)
+ 
+ ENDPROC(x86_aes_expand_key)
+ 
++#if defined(__i386__) && defined(__PIC__)
++	.section	.text.__x86.get_pc_thunk.bx,"axG",@progbits,__x86.get_pc_thunk.bx,comdat
++	.globl	__x86.get_pc_thunk.bx
++	.hidden	__x86.get_pc_thunk.bx
++	.type	__x86.get_pc_thunk.bx, @function
++__x86.get_pc_thunk.bx:
++	movl	(%esp), %ebx
++	ret
++#endif
++
+ 	.bss
+ 	.balign 64
+ aes_round_keys:

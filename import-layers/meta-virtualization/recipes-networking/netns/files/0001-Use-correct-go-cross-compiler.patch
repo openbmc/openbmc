@@ -1,0 +1,77 @@
+From d5c319bb61155d94bef2571a095d82983d786b94 Mon Sep 17 00:00:00 2001
+From: Paul Barker <pbarker@toganlabs.com>
+Date: Fri, 13 Oct 2017 17:58:11 +0000
+Subject: [PATCH] Use correct go cross-compiler
+
+Signed-off-by: Paul Barker <pbarker@toganlabs.com>
+Upstream-status: Pending
+---
+ Makefile | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index cb9a46d..633f884 100644
+--- a/src/import/Makefile
++++ b/src/import/Makefile
+@@ -33,12 +33,12 @@ build: $(NAME) ## Builds a dynamic executable or package
+ 
+ $(NAME): *.go VERSION
+ 	@echo "+ $@"
+-	go build -tags "$(BUILDTAGS)" ${GO_LDFLAGS} -o $(NAME) .
++	$(GO) build -tags "$(BUILDTAGS)" ${GO_LDFLAGS} -o $(NAME) .
+ 
+ .PHONY: static
+ static: ## Builds a static executable
+ 	@echo "+ $@"
+-	CGO_ENABLED=0 go build \
++	CGO_ENABLED=0 $(GO) build \
+ 				-tags "$(BUILDTAGS) static_build" \
+ 				${GO_LDFLAGS_STATIC} -o $(NAME) .
+ 
+@@ -55,21 +55,21 @@ lint: ## Verifies `golint` passes
+ .PHONY: test
+ test: ## Runs the go tests
+ 	@echo "+ $@"
+-	@go test -v -tags "$(BUILDTAGS) cgo" $(shell go list ./... | grep -v vendor)
++	@$(GO) test -v -tags "$(BUILDTAGS) cgo" $(shell $(GO) list ./... | grep -v vendor)
+ 
+ .PHONY: vet
+ vet: ## Verifies `go vet` passes
+ 	@echo "+ $@"
+-	@go vet $(shell go list ./... | grep -v vendor) | grep -v '.pb.go:' | tee /dev/stderr
++	@$(GO) vet $(shell $(GO) list ./... | grep -v vendor) | grep -v '.pb.go:' | tee /dev/stderr
+ 
+ .PHONY: install
+ install: ## Installs the executable or package
+ 	@echo "+ $@"
+-	@go install .
++	@$(GO) install .
+ 
+ define buildpretty
+ mkdir -p $(BUILDDIR)/$(1)/$(2);
+-GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build \
++GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 $(GO) build \
+ 	 -o $(BUILDDIR)/$(1)/$(2)/$(NAME) \
+ 	 -a -tags "$(BUILDTAGS) static_build netgo" \
+ 	 -installsuffix netgo ${GO_LDFLAGS_STATIC} .;
+@@ -83,7 +83,7 @@ cross: *.go VERSION ## Builds the cross-compiled binaries, creating a clean dire
+ 	$(foreach GOOSARCH,$(GOOSARCHES), $(call buildpretty,$(subst /,,$(dir $(GOOSARCH))),$(notdir $(GOOSARCH))))
+ 
+ define buildrelease
+-GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build \
++GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 $(GO) build \
+ 	 -o $(BUILDDIR)/$(NAME)-$(1)-$(2) \
+ 	 -a -tags "$(BUILDTAGS) static_build netgo" \
+ 	 -installsuffix netgo ${GO_LDFLAGS_STATIC} .;
+@@ -99,7 +99,7 @@ release: *.go VERSION ## Builds the cross-compiled binaries, naming them in such
+ .PHONY: bump-version
+ BUMP := patch
+ bump-version: ## Bump the version in the version file. Set KIND to [ patch | major | minor ]
+-	@go get -u github.com/jessfraz/junk/sembump # update sembump tool
++	@$(GO) get -u github.com/jessfraz/junk/sembump # update sembump tool
+ 	$(eval NEW_VERSION = $(shell sembump --kind $(BUMP) $(VERSION)))
+ 	@echo "Bumping VERSION from $(VERSION) to $(NEW_VERSION)"
+ 	echo $(NEW_VERSION) > VERSION
+-- 
+2.7.4
+

@@ -1,0 +1,50 @@
+From 59fbd57acd1df25b1972a131dc6a77a4fe147729 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 27 Jul 2017 10:45:02 +0800
+Subject: [PATCH] fix compile failure against musl C library
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/plugins/crypto.c | 2 +-
+ src/plugins/part.c   | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/crypto.c b/src/plugins/crypto.c
+index 8fbce4f..66e11e5 100644
+--- a/src/plugins/crypto.c
++++ b/src/plugins/crypto.c
+@@ -22,7 +22,7 @@
+ #include <libcryptsetup.h>
+ #include <nss.h>
+ #include <volume_key/libvolume_key.h>
+-#include <sys/fcntl.h>
++#include <fcntl.h>
+ #include <sys/ioctl.h>
+ #include <linux/random.h>
+ #include <locale.h>
+diff --git a/src/plugins/part.c b/src/plugins/part.c
+index 12d2ef7..3afe297 100644
+--- a/src/plugins/part.c
++++ b/src/plugins/part.c
+@@ -25,6 +25,7 @@
+ #include <inttypes.h>
+ #include <unistd.h>
+ #include <sys/file.h>
++#include <fcntl.h>
+ #include <blockdev/utils.h>
+ #include <part_err.h>
+ 
+@@ -1224,7 +1225,7 @@ static gboolean set_gpt_flags (const gchar *device, int part_num, guint64 flags,
+         real_flags |= 0x4000000000000000; /* 1 << 62 */
+     if (flags & BD_PART_FLAG_GPT_NO_AUTOMOUNT)
+         real_flags |= 0x8000000000000000; /* 1 << 63 */
+-    mask_str = g_strdup_printf ("%.16"__PRI64_PREFIX"x", real_flags);
++    mask_str = g_strdup_printf ("%.16"__PRI64"x", real_flags);
+ 
+     args[2] = g_strdup_printf ("%d:=:%s", part_num, mask_str);
+     g_free (mask_str);
+-- 
+1.8.3.1
+

@@ -26,7 +26,7 @@ DEPENDS = " \
     virtual/${MLPREFIX}libc \
     ${MLPREFIX}elfutils \
     ${MLPREFIX}binutils \
-    bison-native flex-native xz \
+    bison flex xz \
     xmlto-native \
     asciidoc-native \
 "
@@ -35,10 +35,9 @@ do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 PROVIDES = "virtual/perf"
 
-inherit linux-kernel-base kernel-arch
+inherit linux-kernel-base kernel-arch pythonnative
 
 # needed for building the tools/perf Python bindings
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'scripting', 'pythonnative', '', d)}
 inherit python-dir
 export PYTHON_SITEPACKAGES_DIR
 
@@ -48,8 +47,7 @@ export WERROR = "0"
 do_populate_lic[depends] += "virtual/kernel:do_patch"
 
 # needed for building the tools/perf Perl binding
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'scripting', 'perlnative', '', d)}
-inherit cpan-base
+inherit perlnative cpan-base
 # Env var which tells perl if it should use host (no) or target (yes) settings
 export PERLCONFIGTARGET = "${@is_target(d)}"
 export PERL_INC = "${STAGING_LIBDIR}${PERL_OWN_DIR}/perl/${@get_perl_version(d)}/CORE"

@@ -1,0 +1,37 @@
+From 6b2b136caa68912d77ffe26143cd3da768b9ef80 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 3 Jun 2017 08:39:37 -0700
+Subject: [PATCH] mallinfo() is glibc specific API mark it so
+
+Helps compiling with musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/tbbmalloc/proxy.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/tbbmalloc/proxy.cpp b/src/tbbmalloc/proxy.cpp
+index 5ef279d..06c4872 100644
+--- a/src/tbbmalloc/proxy.cpp
++++ b/src/tbbmalloc/proxy.cpp
+@@ -185,6 +185,7 @@ int mallopt(int /*param*/, int /*value*/) __THROW
+     return 1;
+ }
+ 
++#ifdef __GLIBC__
+ struct mallinfo mallinfo() __THROW
+ {
+     struct mallinfo m;
+@@ -192,6 +193,7 @@ struct mallinfo mallinfo() __THROW
+ 
+     return m;
+ }
++#endif
+ 
+ #if __ANDROID__
+ // Android doesn't have malloc_usable_size, provide it to be compatible
+-- 
+2.13.0
+

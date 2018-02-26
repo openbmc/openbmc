@@ -1,0 +1,35 @@
+commit 6ea3125e2bec15004f312814022335d94cdf7e94
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Wed Sep 19 11:34:48 2012 -0400
+
+    Fix openl2tp config script location
+    
+    Correct the location of the sysconfig
+    script. Use /etc/default/ instead of
+    /etc/sysconfig/
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+    Upstream-Status: Inappropriate [configuration]
+
+    Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+diff --git a/etc/rc.d/init.d/openl2tpd b/etc/rc.d/init.d/openl2tpd
+index 7f27bb7..4194f63 100755
+--- a/etc/rc.d/init.d/openl2tpd
++++ b/etc/rc.d/init.d/openl2tpd
+@@ -8,12 +8,12 @@
+ #              can be used to implement L2TP VPNs. As a server, it can handle
+ #              hundreds of tunnels and sessions.
+ # processname: openl2tpd
+-# config: /etc/sysconfig/openl2tpd
++# config: /etc/default/openl2tpd
+ # pidfile: /var/run/openl2tpd.pid
+ 
+ # Source function library.
+ . /etc/init.d/functions
+-. /etc/sysconfig/openl2tpd
++. /etc/default/openl2tpd
+  
+ # See how we were called.
+   

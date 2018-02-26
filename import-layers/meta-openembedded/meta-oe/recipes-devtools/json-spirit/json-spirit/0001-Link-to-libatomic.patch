@@ -1,0 +1,64 @@
+From bbac9ac3e391253bc1f90cf0f70a2ce1aac9511f Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Wed, 30 Aug 2017 16:50:56 +0200
+Subject: [PATCH] Link to libatomic
+
+This is needed for clang compiler.
+
+Upstream-Status: Pending
+
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ json_demo/CMakeLists.txt              | 2 +-
+ json_headers_only_demo/CMakeLists.txt | 2 +-
+ json_map_demo/CMakeLists.txt          | 2 +-
+ json_test/CMakeLists.txt              | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/json_demo/CMakeLists.txt b/json_demo/CMakeLists.txt
+index b1d3c6a..0dfd308 100644
+--- a/json_demo/CMakeLists.txt
++++ b/json_demo/CMakeLists.txt
+@@ -5,5 +5,5 @@ FIND_PACKAGE(Boost 1.34 REQUIRED)
+ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+ 
+ ADD_EXECUTABLE(json_demo ${JSON_DEMO_SRCS})
+-TARGET_LINK_LIBRARIES(json_demo json_spirit)
++TARGET_LINK_LIBRARIES(json_demo json_spirit -latomic)
+ 
+diff --git a/json_headers_only_demo/CMakeLists.txt b/json_headers_only_demo/CMakeLists.txt
+index a3c787a..6eae11e 100644
+--- a/json_headers_only_demo/CMakeLists.txt
++++ b/json_headers_only_demo/CMakeLists.txt
+@@ -5,5 +5,5 @@ FIND_PACKAGE(Boost 1.34 REQUIRED)
+ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+ 
+ ADD_EXECUTABLE(json_headers_only_demo ${JSON_HEADERS_ONLY_DEMO_SRCS})
+-TARGET_LINK_LIBRARIES(json_headers_only_demo json_spirit)
++TARGET_LINK_LIBRARIES(json_headers_only_demo json_spirit -latomic)
+ 
+diff --git a/json_map_demo/CMakeLists.txt b/json_map_demo/CMakeLists.txt
+index 599006a..e3e45e8 100644
+--- a/json_map_demo/CMakeLists.txt
++++ b/json_map_demo/CMakeLists.txt
+@@ -5,5 +5,5 @@ FIND_PACKAGE(Boost 1.34 REQUIRED)
+ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+ 
+ ADD_EXECUTABLE(json_map_demo ${JSON_MAP_DEMO_SRCS})
+-TARGET_LINK_LIBRARIES(json_map_demo json_spirit)
++TARGET_LINK_LIBRARIES(json_map_demo json_spirit -latomic)
+ 
+diff --git a/json_test/CMakeLists.txt b/json_test/CMakeLists.txt
+index 38ffa7f..1ec1365 100644
+--- a/json_test/CMakeLists.txt
++++ b/json_test/CMakeLists.txt
+@@ -11,5 +11,5 @@ FIND_PACKAGE(Boost 1.34 REQUIRED)
+ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+ 
+ ADD_EXECUTABLE(json_test ${JSON_TEST_SRCS})
+-TARGET_LINK_LIBRARIES(json_test json_spirit)
++TARGET_LINK_LIBRARIES(json_test json_spirit -latomic)
+ 
+-- 
+2.7.4
+

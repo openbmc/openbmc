@@ -1,19 +1,20 @@
-From c5f5c5054c1b15539dccf866e2c3faba7ed68456 Mon Sep 17 00:00:00 2001
+From 58dd24a80ca0f400d0761afd9ce2b7f684fc9125 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Eric=20B=C3=A9nard?= <eric@eukrea.com>
 Date: Thu, 25 Apr 2013 00:27:25 +0200
-Subject: [PATCH 3/6] configure: add a variable to allow openpty check to be cached
+Subject: [PATCH] configure: add a variable to allow openpty check to be cached
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [ https://github.com/mkj/dropbear/pull/48 ]
 
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
 ---
  configure.ac | 11 ++++++++---
  1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 05461f3..9c16d90 100644
+index 893b904..245408d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -166,15 +166,20 @@ AC_ARG_ENABLE(openpty,
+@@ -177,15 +177,20 @@ AC_ARG_ENABLE(openpty,
  			AC_MSG_NOTICE(Not using openpty)
  		else
  			AC_MSG_NOTICE(Using openpty if available)
@@ -38,5 +39,5 @@ index 05461f3..9c16d90 100644
  AC_ARG_ENABLE(syslog,
  	[  --disable-syslog        Don't include syslog support],
 -- 
-1.7.11.7
+2.8.1
 

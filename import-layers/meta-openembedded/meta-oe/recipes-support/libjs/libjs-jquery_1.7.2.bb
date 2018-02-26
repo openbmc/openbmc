@@ -1,4 +1,5 @@
 SUMMARY = "JavaScript library for dynamic web applications"
+HOMEPAGE = "https://jquery.com/"
 LICENSE = "MIT | BSD | GPL-2"
 LIC_FILES_CHKSUM = "file://usr/share/doc/libjs-jquery/copyright;md5=5d1ec6f95e0a91d38e2f71de93ddb00e"
 

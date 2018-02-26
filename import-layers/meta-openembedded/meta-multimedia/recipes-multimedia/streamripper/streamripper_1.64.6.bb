@@ -6,6 +6,9 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 DEPENDS = "glib-2.0 libmad libogg libvorbis"
 
+# While this item does not require it, it depends on libmad which does
+LICENSE_FLAGS = "commercial"
+
 SRC_URI = "\
     ${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \
     file://0001-build-these-are-foreign-automake-projects.patch \

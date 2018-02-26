@@ -1,0 +1,37 @@
+From 5fd0918df2bb30e8f3edb2ee895d178edbf26f40 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 4 Sep 2017 22:38:03 -0700
+Subject: [PATCH 1/2] build_detect_platform: Check for __SSE4_2__
+
+just using -msse4.2 is not enough, especially with clang
+where it may accept -msse4.2 even during cross compiling
+for say arm, however the difference is that builtin defines
+wont be defined.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ build_detect_platform | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: git/build_detect_platform
+===================================================================
+--- git.orig/build_detect_platform
++++ git/build_detect_platform
+@@ -224,13 +224,13 @@ EOF
+     rm -f $CXXOUTPUT 2>/dev/null
+ 
+     # Test if gcc SSE 4.2 is supported
+-    $CXX $CXXFLAGS -x c++ - -o $CXXOUTPUT -msse4.2 2>/dev/null  <<EOF
++    $CXX $CXXFLAGS -Werror -x c++ - -o $CXXOUTPUT -msse4.2 -dD -E 2>/dev/null  <<EOF
+       int main() {}
+ EOF
++    eval fgrep __SSE4_2__ $CXXOUTPUT >/dev/null 2>&1
+     if [ "$?" = 0 ]; then
+         PLATFORM_SSEFLAGS="-msse4.2"
+     fi
+-
+     rm -f $CXXOUTPUT 2>/dev/null
+ fi
+ 

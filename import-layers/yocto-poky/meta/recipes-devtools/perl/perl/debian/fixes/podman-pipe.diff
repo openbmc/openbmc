@@ -14,6 +14,7 @@ standard input.  (Debian Bug#777405)
 Origin: upstream, http://git.eyrie.org/?p=perl/podlators.git;a=commitdiff;h=d98872e46c93861b7aba14949e1258712087dc55
 Bug-Debian: https://bugs.debian.org/777405
 Patch-Name: fixes/podman-pipe.diff
+Upstream-Status: Pending
 ---
  cpan/podlators/lib/Pod/Man.pm     | 15 +++++++++++++++
  cpan/podlators/scripts/pod2man.PL |  4 ++++

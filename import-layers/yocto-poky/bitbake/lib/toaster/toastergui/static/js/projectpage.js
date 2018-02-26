@@ -15,6 +15,13 @@ function projectPageInit(ctx) {
   var machineInputForm = $("#machine-input-form");
   var invalidMachineNameHelp = $("#invalid-machine-name-help");
 
+  var distroChangeInput = $("#distro-change-input");
+  var distroChangeBtn = $("#distro-change-btn");
+  var distroForm = $("#select-distro-form");
+  var distroChangeFormToggle = $("#change-distro-toggle");
+  var distroNameTitle = $("#project-distro-name");
+  var distroChangeCancel = $("#cancel-distro-change");
+
   var freqBuildBtn =  $("#freq-build-btn");
   var freqBuildList = $("#freq-build-list");
 
@@ -26,6 +33,7 @@ function projectPageInit(ctx) {
 
   var currentLayerAddSelection;
   var currentMachineAddSelection = "";
+  var currentDistroAddSelection = "";
 
   var urlParams = libtoaster.parseUrlParams();
 
@@ -43,6 +51,17 @@ function projectPageInit(ctx) {
         machineChangeBtn.click();
     } else {
       updateMachineName(prjInfo.machine.name);
+    }
+
+    /* If we're receiving a distro set from the url and it's different from
+     * our current distro then activate set machine sequence.
+     */
+    if (urlParams.hasOwnProperty('setDistro') &&
+        urlParams.setDistro !== prjInfo.distro.name){
+        distroChangeInput.val(urlParams.setDistro);
+        distroChangeBtn.click();
+    } else {
+      updateDistroName(prjInfo.distro.name);
     }
 
    /* Now we're really ready show the page */
@@ -274,6 +293,60 @@ function projectPageInit(ctx) {
       function(){
         /* Failed machine changed */
         console.warn("Failed to change machine");
+    });
+  });
+
+
+  /* Change distro functionality */
+
+  distroChangeFormToggle.click(function(){
+    distroForm.slideDown();
+    distroNameTitle.hide();
+    $(this).hide();
+  });
+
+  distroChangeCancel.click(function(){
+    distroForm.slideUp(function(){
+      distroNameTitle.show();
+      distroChangeFormToggle.show();
+    });
+  });
+
+  function updateDistroName(distroName){
+    distroChangeInput.val(distroName);
+    distroNameTitle.text(distroName);
+  }
+
+  libtoaster.makeTypeahead(distroChangeInput,
+                           libtoaster.ctx.distrosTypeAheadUrl,
+                           { }, function(item){
+    currentDistroAddSelection = item.name;
+    distroChangeBtn.removeAttr("disabled");
+  });
+
+  distroChangeBtn.click(function(e){
+    e.preventDefault();
+    /* We accept any value regardless of typeahead selection or not */
+    if (distroChangeInput.val().length === 0)
+      return;
+
+    currentDistroAddSelection = distroChangeInput.val();
+
+    libtoaster.editCurrentProject(
+      { distroName : currentDistroAddSelection },
+      function(){
+        /* Success machine changed */
+        updateDistroName(currentDistroAddSelection);
+        distroChangeCancel.click();
+
+        /* Show the alert message */
+        var message = $('<span>You have changed the distro to: <strong><span id="notify-machine-name"></span></strong></span>');
+        message.find("#notify-machine-name").text(currentDistroAddSelection);
+        libtoaster.showChangeNotification(message);
+    },
+      function(){
+        /* Failed machine changed */
+        console.warn("Failed to change distro");
     });
   });
 

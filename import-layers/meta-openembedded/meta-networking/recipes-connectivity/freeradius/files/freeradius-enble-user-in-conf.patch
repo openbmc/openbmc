@@ -1,0 +1,28 @@
+Enable and change user and group of freeradius server to radiusd
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ raddb/radiusd.conf.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/raddb/radiusd.conf.in b/raddb/radiusd.conf.in
+index c62f4ff..0b4a84e 100644
+--- a/raddb/radiusd.conf.in
++++ b/raddb/radiusd.conf.in
+@@ -436,8 +436,8 @@ security {
+ 	#  member.  This can allow for some finer-grained access
+ 	#  controls.
+ 	#
+-#	user = radius
+-#	group = radius
++	user = radiusd
++	group = radiusd
+ 
+ 	#  Core dumps are a bad thing.  This should only be set to
+ 	#  'yes' if you're debugging a problem with the server.
+-- 
+1.9.1
+

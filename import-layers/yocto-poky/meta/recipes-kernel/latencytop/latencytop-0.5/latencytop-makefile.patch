@@ -1,3 +1,7 @@
+
+Signed-off-by: Jack Mitchell <jack.mitchell@dbbroadcast.co.uk>
+Upstream-Status: Pending
+
 diff --git a/Makefile.orig b/Makefile
 index 16a2369..fa797a2 100644
 --- a/Makefile.orig
@@ -5,8 +9,8 @@ index 16a2369..fa797a2 100644
 @@ -1,10 +1,11 @@
 -# FIXME: Use autoconf ?
 -HAS_GTK_GUI = 1
-+# Upstream-Status: Inappropriate [configuration]
-+# Signed-off-by: Jack Mitchell <jack.mitchell@dbbroadcast.co.uk>
++#
++#
  
  DESTDIR =
  SBINDIR = /usr/sbin

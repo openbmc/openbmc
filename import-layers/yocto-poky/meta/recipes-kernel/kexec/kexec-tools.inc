@@ -11,6 +11,7 @@ DEPENDS = "zlib xz"
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/kernel/kexec/kexec-tools-${PV}.tar.gz \
            file://kdump \
            file://kdump.conf \
+           file://kdump.service \
 "
 
 PR = "r1"

@@ -32,6 +32,12 @@ do_install_ptest() {
 	  do cp ${S}/include/$i ${D}${PTEST_PATH}/include/; \
 	done
 	sed -e 's|; @echo|; echo|' -i ${D}${PTEST_PATH}/test/Makefile
+    
+	# Remove any build host references
+	sed -e "s:--sysroot=${STAGING_DIR_TARGET}::g" \
+	    -e 's:${HOSTTOOLS_DIR}/::g' \
+	    -e 's:${RECIPE_SYSROOT_NATIVE}::g' \
+	    -i ${D}${PTEST_PATH}/include/builddefs
 }
 
 RDEPENDS_${PN}-ptest = "attr coreutils perl-module-filehandle perl-module-getopt-std perl-module-posix"

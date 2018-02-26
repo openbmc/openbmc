@@ -1,0 +1,36 @@
+From 0a8e466fcf99622896e070c5133165e4278e8cfb Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 25 May 2017 05:27:11 -0400
+Subject: [PATCH] explicitly do not install libdm
+
+Already have package libdevmapper which split from lvm2,
+explicitly do not do the installation here.
+
+Upstream-Status: Inappropriate [meta-oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ libdm/Makefile.in | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/libdm/Makefile.in b/libdm/Makefile.in
+index 3c9a4ce..45c91c6 100644
+--- a/libdm/Makefile.in
++++ b/libdm/Makefile.in
+@@ -77,9 +77,11 @@ ifeq ("@PKGCONFIG@", "yes")
+   INSTALL_TYPE += install_pkgconfig
+ endif
+ 
+-install: $(INSTALL_TYPE) install_include
++install:
++	echo "Do not install device mappler in lvm2"
+ 
+-install_device-mapper: install
++install_device-mapper:
++	echo "Do not install device mappler in lvm2"
+ 
+ install_include: $(srcdir)/libdevmapper.h
+ 	$(INSTALL_DATA) -D $< $(includedir)/$(<F)
+-- 
+2.8.1
+

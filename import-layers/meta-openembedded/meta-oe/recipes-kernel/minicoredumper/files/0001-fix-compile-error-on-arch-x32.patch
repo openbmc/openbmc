@@ -1,0 +1,32 @@
+From 883f53ee33eaef8aca1288a110857402ad362966 Mon Sep 17 00:00:00 2001
+From: John Ogness <john.ogness@linutronix.de>
+Date: Fri, 8 Sep 2017 15:03:03 -0700
+Subject: [PATCH] fix compile error on arch=x32
+
+On the x32 architecture time_t is a "long long int". By
+ typecasting time_t to "long long", this should work correctly
+ for all architectures.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/minicoredumper/corestripper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/minicoredumper/corestripper.c b/src/minicoredumper/corestripper.c
+index fd39bfb..07dc318 100644
+--- a/src/minicoredumper/corestripper.c
++++ b/src/minicoredumper/corestripper.c
+@@ -1241,7 +1241,7 @@ static int dump_compressed_tar(struct dump_info *di)
+ 	snprintf(hdr.mode, sizeof(hdr.mode), "%07o", 0644);
+ 	snprintf(hdr.uid, sizeof(hdr.uid), "%07o", 0);
+ 	snprintf(hdr.gid, sizeof(hdr.gid), "%07o", 0);
+-	snprintf(hdr.mtime, sizeof(hdr.mtime), "%011lo",
++	snprintf(hdr.mtime, sizeof(hdr.mtime), "%011llo",
+ 		 (long long)time(NULL));
+ 	memset(hdr.checksum, ' ', sizeof(hdr.checksum));
+ 	hdr.type = 'S';
+-- 
+2.14.1
+

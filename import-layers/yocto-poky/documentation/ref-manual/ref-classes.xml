@@ -16,12 +16,12 @@
 </para>
 
 <para>
-    Any <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink> usually
+    Any <link linkend='metadata'>Metadata</link> usually
     found in a recipe can also be placed in a class file.
     Class files are identified by the extension <filename>.bbclass</filename>
     and are usually placed in a <filename>classes/</filename> directory beneath
     the <filename>meta*/</filename> directory found in the
-    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+    <link linkend='source-directory'>Source Directory</link>.
     Class files can also be pointed to by
     <link linkend='var-BUILDDIR'><filename>BUILDDIR</filename></link>
     (e.g. <filename>build/</filename>) in the same way as
@@ -36,7 +36,7 @@
     This chapter discusses only the most useful and important classes.
     Other classes do exist within the <filename>meta/classes</filename>
     directory in the
-    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+    <link linkend='source-directory'>Source Directory</link>.
     You can reference the <filename>.bbclass</filename> files directly
     for more information.
 </para>
@@ -94,7 +94,7 @@
     <para>
         For more details on the source archiver, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#maintaining-open-source-license-compliance-during-your-products-lifecycle'>Maintaining Open Source License Compliance During Your Product's Lifecycle</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
         You can also see the
         <link linkend='var-ARCHIVER_MODE'><filename>ARCHIVER_MODE</filename></link>
         variable for information about the variable flags (varflags)
@@ -122,7 +122,7 @@
         These classes can also work with software that emulates Autotools.
         For more information, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#new-recipe-autotooled-package'>Autotooled Package</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 
     <para>
@@ -333,7 +333,7 @@
         For details on how the class works, see the
         <filename>meta/classes/bluetooth.bbclass</filename> file in the Yocto
         Project
-        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+        <link linkend='source-directory'>Source Directory</link>.
     </para>
 </section>
 
@@ -641,7 +641,7 @@
         Distribution policy dictates whether to include this class.
         See the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-devshell'>Using a Development Shell</ulink>" section
-        in the Yocto Project Development Manual for more information about
+        in the Yocto Project Development Tasks Manual for more information about
         using <filename>devshell</filename>.
     </para>
 </section>
@@ -816,11 +816,11 @@
         For more information on the
         <filename>externalsrc</filename> class, see the comments in
         <filename>meta/classes/externalsrc.bbclass</filename> in the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+        <link linkend='source-directory'>Source Directory</link>.
         For information on how to use the <filename>externalsrc</filename>
         class, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#building-software-from-an-external-source'>Building Software from an External Source</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 </section>
 
@@ -1247,7 +1247,7 @@
         </itemizedlist>
         For information on customizing images, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#usingpoky-extend-customimage'>Customizing Images</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
         For information on how images are created, see the
         "<link linkend='images-dev-environment'>Images</link>" section elsewhere
         in this manual.
@@ -1286,14 +1286,15 @@
         <filename>image_types</filename> must also appear in
         <filename>IMAGE_CLASSES</filename>.
     </para>
-</section>
-
-<section id='ref-classes-image_types_uboot'>
-    <title><filename>image_types_uboot.bbclass</filename></title>
 
     <para>
-        The <filename>image_types_uboot</filename> class
-        defines additional image types specifically for the U-Boot bootloader.
+        This class also handles conversion and compression of images.
+        <note>
+            To build a VMware VMDK image, you need to add "wic.vmdk" to
+            <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>.
+            This would also be similar for Virtual Box Virtual Disk Image
+            ("vdi") and QEMU Copy On Write Version 2 ("qcow2") images.
+        </note>
     </para>
 </section>
 
@@ -1367,27 +1368,6 @@
         <literallayout class='monospaced'>
      USER_CLASSES ?= "buildstats image-mklibs image-prelink"
         </literallayout>
-    </para>
-</section>
-
-<section id='ref-classes-image-vm'>
-    <title><filename>image-vm.bbclass</filename></title>
-
-    <para>
-        The <filename>image-vm</filename> class supports building VM
-        images.
-    </para>
-</section>
-
-<section id='ref-classes-image-vmdk'>
-    <title><filename>image-vmdk.bbclass</filename></title>
-
-    <para>
-        The <filename>image-vmdk</filename> class supports building VMware
-        VMDK images.
-        Normally, you do not use this class directly.
-        Instead, you add "vmdk" to
-        <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>.
     </para>
 </section>
 
@@ -1788,27 +1768,6 @@ This check was removed for YP 2.3 release
                 </note>
                 </para></listitem>
 -->
-            <listitem><para><emphasis><filename>unsafe-references-in-scripts:</filename></emphasis>
-                Reports when a script file installed in
-                <filename>${base_libdir}</filename>,
-                <filename>${base_bindir}</filename>, or
-                <filename>${base_sbindir}</filename>, depends on files
-                installed under <filename>${exec_prefix}</filename>.
-                This dependency is a concern if you want the system to remain
-                basically operable if <filename>/usr</filename> is mounted
-                separately and is not mounted.
-                <note>
-                    Defaults for binaries installed in
-                    <filename>${base_libdir}</filename>,
-                    <filename>${base_bindir}</filename>, and
-                    <filename>${base_sbindir}</filename> are
-                    <filename>/lib</filename>, <filename>/bin</filename>, and
-                    <filename>/sbin</filename>, respectively.
-                    The default for a binary installed
-                    under <filename>${exec_prefix}</filename> is
-                    <filename>/usr</filename>.
-                </note>
-                </para></listitem>
             <listitem><para><emphasis><filename>useless-rpaths:</filename></emphasis>
                 Checks for dynamic library load paths (rpaths) in the binaries that
                 by default on a standard system are searched by the linker (e.g.
@@ -1900,7 +1859,7 @@ This check was removed for YP 2.3 release
         you build the kernel image.
         For information on how to build an initramfs, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 
     <para>
@@ -2194,7 +2153,7 @@ This check was removed for YP 2.3 release
     <para>
         For more information on using the Multilib feature, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#combining-multiple-versions-library-files-into-one-image'>Combining Multiple Versions of Library Files into One Image</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 </section>
 
@@ -2328,7 +2287,7 @@ This check was removed for YP 2.3 release
         The <filename>oelint</filename> class is an
         obsolete lint checking tool that exists in
         <filename>meta/classes</filename> in the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+        <link linkend='source-directory'>Source Directory</link>.
     </para>
 
     <para>
@@ -2393,7 +2352,7 @@ This check was removed for YP 2.3 release
         <filename><link linkend='var-PACKAGE_CLASSES'>PACKAGE_CLASSES</link></filename>
         variable defined in your <filename>conf/local.conf</filename>
         configuration file, which is located in the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+        <link linkend='build-directory'>Build Directory</link>.
         When defining the variable, you can specify one or more package types.
         Since images are generated from packages, a packaging class is
         needed to enable image generation.
@@ -2407,7 +2366,7 @@ This check was removed for YP 2.3 release
         on the target (i.e. runtime installation of packages).
         For more information, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#using-runtime-package-management'>Using Runtime Package Management</ulink>"
-         section in the Yocto Project Development Manual.
+         section in the Yocto Project Development Tasks Manual.
     </para>
 
     <para>
@@ -2419,7 +2378,7 @@ This check was removed for YP 2.3 release
         all dependencies previously built.
         The reason for this discrepancy is because the RPM package manager
         creates and processes more
-        <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink> than the
+        <link linkend='metadata'>Metadata</link> than the
         IPK package manager.
         Consequently, you might consider setting
         <filename>PACKAGE_CLASSES</filename> to "package_ipk" if you are
@@ -2587,7 +2546,7 @@ This check was removed for YP 2.3 release
     <para>
         For information on how to use this class, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#usingpoky-extend-customimage-customtasks'>Customizing Images Using Custom Package Groups</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 
     <para>
@@ -2676,7 +2635,8 @@ This check was removed for YP 2.3 release
         <link linkend='ref-tasks-populate_sdk'><filename>do_populate_sdk</filename></link>
         task, see the
         "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-building-an-sdk-installer'>Building an SDK Installer</ulink>"
-        section in the Yocto Project Software Development Kit (SDK) Developer's Guide.
+        section in the Yocto Project Application Development and the
+        Extensible Software Development Kit (eSDK) manual.
     </para>
 </section>
 
@@ -2756,8 +2716,8 @@ This check was removed for YP 2.3 release
         <link linkend='ref-tasks-populate_sdk'><filename>do_populate_sdk</filename></link>
         task, see the
         "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-building-an-sdk-installer'>Building an SDK Installer</ulink>"
-        section in the Yocto Project Software Development Kit (SDK) Developer's
-        Guide.
+        section in the Yocto Project Application Development and the
+        Extensible Software Development Kit (eSDK) manual.
     </para>
 </section>
 
@@ -2830,8 +2790,8 @@ This check was removed for YP 2.3 release
         <link linkend='var-DISTRO_FEATURES'><filename>DISTRO_FEATURES</filename></link>.
         See the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#testing-packages-with-ptest'>Testing Packages With ptest</ulink>"
-        section in the Yocto Project Development Manual for more information
-        on ptest.
+        section in the Yocto Project Development Tasks Manual for more
+        information on ptest.
     </para>
 </section>
 
@@ -2847,7 +2807,7 @@ This check was removed for YP 2.3 release
     <para>
         For information on setting up and running ptests, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#testing-packages-with-ptest'>Testing Packages With ptest</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 </section>
 
@@ -2988,7 +2948,7 @@ This check was removed for YP 2.3 release
         as the build progresses, you can enable <filename>rm_work</filename>
         by adding the following to your <filename>local.conf</filename> file,
         which is found in the
-        <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+        <link linkend='build-directory'>Build Directory</link>.
         <literallayout class='monospaced'>
     INHERIT += "rm_work"
         </literallayout>
@@ -3455,7 +3415,7 @@ This check was removed for YP 2.3 release
     <para>
         For more information on <filename>systemd</filename>, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#selecting-an-initialization-manager'>Selecting an Initialization Manager</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 </section>
 
@@ -3555,7 +3515,7 @@ This check was removed for YP 2.3 release
     <para>
         For information on how to enable, run, and create new tests, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
-        section in the Yocto Project Development Manual.
+        section in the Yocto Project Development Tasks Manual.
     </para>
 </section>
 
@@ -3737,7 +3697,8 @@ This check was removed for YP 2.3 release
         provide pathnames for links, default links for targets, and
         so forth.
         For details on how to use this class, see the comments in the
-        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta/classes/update-alternatives.bbclass'><filename>update-alternatives.bbclass</filename></ulink>.
+        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta/classes/update-alternatives.bbclass'><filename>update-alternatives.bbclass</filename></ulink>
+        file.
     </para>
 
     <note>
@@ -3777,8 +3738,9 @@ This check was removed for YP 2.3 release
         For example, if you have packages that contain system services that
         should be run under their own user or group, you can use these classes
         to enable creation of the user or group.
-        The <filename>meta-skeleton/recipes-skeleton/useradd/useradd-example.bb</filename>
-        recipe in the <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+        The
+        <filename>meta-skeleton/recipes-skeleton/useradd/useradd-example.bb</filename>
+        recipe in the <link linkend='source-directory'>Source Directory</link>
         provides a simple example that shows how to add three
         users and groups to two packages.
         See the <filename>useradd-example.bb</filename> recipe for more

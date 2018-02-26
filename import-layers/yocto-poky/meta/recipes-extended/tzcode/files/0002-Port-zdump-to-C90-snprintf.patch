@@ -1,0 +1,115 @@
+From e231da4fb2beb17c60b4b1a5c276366d6a6e433f Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Mon, 23 Oct 2017 17:58:36 -0700
+Subject: [PATCH] Port zdump to C90 + snprintf
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Problem reported by Jon Skeet in:
+https://mm.icann.org/pipermail/tz/2017-October/025362.html
+* NEWS: Mention this.
+* zdump.c (my_snprintf): New macro or function.  If a macro, it is
+just snprintf.  If a function, it is the same as the old snprintf
+static function, with an ATTRIBUTE_FORMAT to pacify modern GCC.
+All uses of snprintf changed to use my_snprintf.  This way,
+installers don’t need to specify -DHAVE_SNPRINTF if they are using
+a pre-C99 compiler with a library that has snprintf.
+
+Upstream-Status: Backport
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+---
+ NEWS    |  4 ++++
+ zdump.c | 29 ++++++++++++++++-------------
+ 2 files changed, 20 insertions(+), 13 deletions(-)
+
+diff --git a/NEWS b/NEWS
+index 75ab095..dea08b8 100644
+--- a/NEWS
++++ b/NEWS
+@@ -7,6 +7,10 @@ Unreleased, experimental changes
+     The Makefile now quotes values like BACKWARD more carefully when
+     passing them to the shell.  (Problem reported by Zefram.)
+ 
++    Builders no longer need to specify -DHAVE_SNPRINTF on platforms
++    that have snprintf and use pre-C99 compilers.  (Problem reported
++    by Jon Skeet.)
++
+ 
+ Release 2017c - 2017-10-20 14:49:34 -0700
+ 
+diff --git a/zdump.c b/zdump.c
+index 8e3bf3e..d4e6084 100644
+--- a/zdump.c
++++ b/zdump.c
+@@ -795,12 +795,14 @@ show(timezone_t tz, char *zone, time_t t, bool v)
+ 		abbrok(abbr(tmp), zone);
+ }
+ 
+-#if !HAVE_SNPRINTF
++#if HAVE_SNPRINTF
++# define my_snprintf snprintf
++#else
+ # include <stdarg.h>
+ 
+ /* A substitute for snprintf that is good enough for zdump.  */
+-static int
+-snprintf(char *s, size_t size, char const *format, ...)
++static int ATTRIBUTE_FORMAT((printf, 3, 4))
++my_snprintf(char *s, size_t size, char const *format, ...)
+ {
+   int n;
+   va_list args;
+@@ -839,10 +841,10 @@ format_local_time(char *buf, size_t size, struct tm const *tm)
+ {
+   int ss = tm->tm_sec, mm = tm->tm_min, hh = tm->tm_hour;
+   return (ss
+-	  ? snprintf(buf, size, "%02d:%02d:%02d", hh, mm, ss)
++	  ? my_snprintf(buf, size, "%02d:%02d:%02d", hh, mm, ss)
+ 	  : mm
+-	  ? snprintf(buf, size, "%02d:%02d", hh, mm)
+-	  : snprintf(buf, size, "%02d", hh));
++	  ? my_snprintf(buf, size, "%02d:%02d", hh, mm)
++	  : my_snprintf(buf, size, "%02d", hh));
+ }
+ 
+ /* Store into BUF, of size SIZE, a formatted UTC offset for the
+@@ -877,10 +879,10 @@ format_utc_offset(char *buf, size_t size, struct tm const *tm, time_t t)
+   mm = off / 60 % 60;
+   hh = off / 60 / 60;
+   return (ss || 100 <= hh
+-	  ? snprintf(buf, size, "%c%02ld%02d%02d", sign, hh, mm, ss)
++	  ? my_snprintf(buf, size, "%c%02ld%02d%02d", sign, hh, mm, ss)
+ 	  : mm
+-	  ? snprintf(buf, size, "%c%02ld%02d", sign, hh, mm)
+-	  : snprintf(buf, size, "%c%02ld", sign, hh));
++	  ? my_snprintf(buf, size, "%c%02ld%02d", sign, hh, mm)
++	  : my_snprintf(buf, size, "%c%02ld", sign, hh));
+ }
+ 
+ /* Store into BUF (of size SIZE) a quoted string representation of P.
+@@ -983,15 +985,16 @@ istrftime(char *buf, size_t size, char const *time_fmt,
+ 	    for (abp = ab; is_alpha(*abp); abp++)
+ 	      continue;
+ 	    len = (!*abp && *ab
+-		   ? snprintf(b, s, "%s", ab)
++		   ? my_snprintf(b, s, "%s", ab)
+ 		   : format_quoted_string(b, s, ab));
+ 	    if (s <= len)
+ 	      return false;
+ 	    b += len, s -= len;
+ 	  }
+-	  formatted_len = (tm->tm_isdst
+-			   ? snprintf(b, s, &"\t\t%d"[show_abbr], tm->tm_isdst)
+-			   : 0);
++	  formatted_len
++	    = (tm->tm_isdst
++	       ? my_snprintf(b, s, &"\t\t%d"[show_abbr], tm->tm_isdst)
++	       : 0);
+ 	}
+ 	break;
+       }
+-- 
+2.7.4
+

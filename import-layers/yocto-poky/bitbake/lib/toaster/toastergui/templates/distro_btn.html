@@ -1,0 +1,20 @@
+<a href="{% url 'project' extra.pid %}?setDistro={{data.name}}" class="btn btn-default btn-block layer-exists-{{data.layer_version.id}}"
+    {% if data.layer_version.pk not in extra.current_layers %}
+    style="display:none;"
+    {% endif %}>
+  Set distro</a>
+<a class="btn btn-default btn-block layerbtn layer-add-{{data.layer_version.id}}" data-layer='{
+    "id": {{data.layer_version.id}},
+    "name":  "{{data.layer_version.layer.name}}",
+    "xhrLayerUrl": "{% url "xhr_layer" extra.pid data.pk %}",
+    "layerdetailurl": "{%url 'layerdetails' extra.pid data.layer_version.id %}"
+    }' data-directive="add"
+    {% if data.layer_version.pk in extra.current_layers %}
+    style="display:none;"
+    {% endif %}
+>
+  <span class="glyphicon glyphicon-plus"></span>
+  Add layer
+  <span class="glyphicon glyphicon-question-sign get-help" title="To select this distro, you must first add the {{data.layer_version.layer.name}} layer to your project"></i>
+</a>
+

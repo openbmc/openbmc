@@ -32,6 +32,10 @@ class BuildSystem(object):
 
         corebase = os.path.abspath(self.d.getVar('COREBASE'))
         layers.append(corebase)
+        # The bitbake build system uses the meta-skeleton layer as a layout
+        # for common recipies, e.g: the recipetool script to create kernel recipies
+        # Add the meta-skeleton layer to be included as part of the eSDK installation
+        layers.append(os.path.join(corebase, 'meta-skeleton'))
 
         # Exclude layers
         for layer_exclude in self.layers_exclude:
@@ -71,6 +75,11 @@ class BuildSystem(object):
             layerdestpath = destdir
             if corebase == os.path.dirname(layer):
                 layerdestpath += '/' + os.path.basename(corebase)
+            else:
+                layer_relative = os.path.basename(corebase) + '/' + os.path.relpath(layer, corebase)
+                if os.path.dirname(layer_relative) != layernewname:
+                    layerdestpath += '/' + os.path.dirname(layer_relative)
+
             layerdestpath += '/' + layernewname
 
             layer_relative = os.path.relpath(layerdestpath,
@@ -122,6 +131,14 @@ class BuildSystem(object):
                             continue
                         line = line.replace('workspacelayer', workspace_newname)
                         f.write(line)
+
+        # meta-skeleton layer is added as part of the build system
+        # but not as a layer included in the build, therefore it is
+        # not reported to the function caller.
+        for layer in layers_copied:
+            if layer.endswith('/meta-skeleton'):
+                layers_copied.remove(layer)
+                break
 
         return layers_copied
 
@@ -239,6 +256,7 @@ def check_sstate_task_list(d, targets, filteroutfile, cmdprefix='', cwd=None, lo
     cmd = "%sBB_SETSCENE_ENFORCE=1 PSEUDO_DISABLED=1 oe-check-sstate %s -s -o %s %s" % (cmdprefix, targets, filteroutfile, logparam)
     env = dict(d.getVar('BB_ORIGENV', False))
     env.pop('BUILDDIR', '')
+    env.pop('BBPATH', '')
     pathitems = env['PATH'].split(':')
     env['PATH'] = ':'.join([item for item in pathitems if not item.endswith('/bitbake/bin')])
     bb.process.run(cmd, stderr=subprocess.STDOUT, env=env, cwd=cwd, executable='/bin/bash')

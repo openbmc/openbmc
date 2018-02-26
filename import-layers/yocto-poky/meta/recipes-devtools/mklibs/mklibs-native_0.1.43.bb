@@ -4,7 +4,6 @@ HOMEPAGE = "https://launchpad.net/mklibs"
 SECTION = "devel"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=98d31037b13d896e33890738ef01af64"
-DEPENDS = "python-native"
 
 SRC_URI = "http://snapshot.debian.org/archive/debian/20161123T152011Z/pool/main/m/mklibs/mklibs_${PV}.tar.xz \
 	file://ac_init_fix.patch\
@@ -20,6 +19,6 @@ SRC_URI[sha256sum] = "6f0cf24ade13fff76e943c003413d85c3e497c984c95c1ecea1c9731ca
 
 UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/m/mklibs/"
 
-inherit autotools gettext native pythonnative
+inherit autotools gettext native
 
 S = "${WORKDIR}/mklibs"

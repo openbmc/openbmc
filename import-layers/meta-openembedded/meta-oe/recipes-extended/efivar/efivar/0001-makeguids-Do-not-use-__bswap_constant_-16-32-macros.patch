@@ -1,0 +1,37 @@
+From 98b33d4193998687aa3a78c097f7bd4c393e0c85 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2017 00:29:42 -0700
+Subject: [PATCH] makeguids: Do not use __bswap_constant_{16|32} macros
+
+not available on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/makeguids.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/makeguids.c b/src/makeguids.c
+index da2f5f7..daf821a 100644
+--- a/src/makeguids.c
++++ b/src/makeguids.c
+@@ -155,13 +155,13 @@ main(int argc, char *argv[])
+ #if BYTE_ORDER == BIG_ENDIAN\n\
+ #define cpu_to_be32(n) (n)\n\
+ #define cpu_to_be16(n) (n)\n\
+-#define cpu_to_le32(n) (__bswap_constant_32(n))\n\
+-#define cpu_to_le16(n) (__bswap_constant_16(n))\n\
++#define cpu_to_le32(n) ((uint32_t) ((n)>>24 | (n)>>8&0xff00 | (n)<<8&0xff0000 | (n)<<24))\n\
++#define cpu_to_le16(n) ((uint16_t) ((n)<<8 | (n)>>8))\n\
+ #else\n\
+ #define cpu_to_le32(n) (n)\n\
+ #define cpu_to_le16(n) (n)\n\
+-#define cpu_to_be32(n) (__bswap_constant_32(n))\n\
+-#define cpu_to_be16(n) (__bswap_constant_16(n))\n\
++#define cpu_to_be32(n) ((uint32_t) ((n)>>24 | (n)>>8&0xff00 | (n)<<8&0xff0000 | (n)<<24))\n\
++#define cpu_to_be16(n) ((uint16_t) ((n)<<8 | (n)>>8))\n\
+ #endif\n\
+ """);
+ 
+-- 
+2.13.3
+

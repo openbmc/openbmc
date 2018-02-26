@@ -115,8 +115,8 @@ def setup_tinfoil(config_only=False, basepath=None, tracking=False):
         import bb.tinfoil
         tinfoil = bb.tinfoil.Tinfoil(tracking=tracking)
         try:
-            tinfoil.prepare(config_only)
             tinfoil.logger.setLevel(logger.getEffectiveLevel())
+            tinfoil.prepare(config_only)
         except bb.tinfoil.TinfoilUIException:
             tinfoil.shutdown()
             raise DevtoolError('Failed to start bitbake environment')
@@ -191,7 +191,7 @@ def use_external_build(same_dir, no_same_dir, d):
         logger.info('Using source tree as build directory since --same-dir specified')
     elif bb.data.inherits_class('autotools-brokensep', d):
         logger.info('Using source tree as build directory since recipe inherits autotools-brokensep')
-    elif d.getVar('B') == os.path.abspath(d.getVar('S')):
+    elif os.path.abspath(d.getVar('B')) == os.path.abspath(d.getVar('S')):
         logger.info('Using source tree as build directory since that would be the default for this recipe')
     else:
         b_is_s = False
@@ -261,34 +261,79 @@ def get_bbclassextend_targets(recipefile, pn):
                 targets.append('%s-%s' % (pn, variant))
     return targets
 
-def ensure_npm(config, basepath, fixed_setup=False, check_exists=True):
-    """
-    Ensure that npm is available and either build it or show a
-    reasonable error message
-    """
-    if check_exists:
-        tinfoil = setup_tinfoil(config_only=False, basepath=basepath)
-        try:
-            rd = tinfoil.parse_recipe('nodejs-native')
-            nativepath = rd.getVar('STAGING_BINDIR_NATIVE')
-        finally:
-            tinfoil.shutdown()
-        npmpath = os.path.join(nativepath, 'npm')
-        build_npm = not os.path.exists(npmpath)
-    else:
-        build_npm = True
+def replace_from_file(path, old, new):
+    """Replace strings on a file"""
 
-    if build_npm:
-        logger.info('Building nodejs-native')
+    def read_file(path):
+        data = None
+        with open(path) as f:
+            data = f.read()
+        return data
+
+    def write_file(path, data):
+        if data is None:
+            return
+        wdata = data.rstrip() + "\n"
+        with open(path, "w") as f:
+            f.write(wdata)
+
+    # In case old is None, return immediately
+    if old is None:
+        return
+    try:
+        rdata = read_file(path)
+    except IOError as e:
+        # if file does not exit, just quit, otherwise raise an exception
+        if e.errno == errno.ENOENT:
+            return
+        else:
+            raise
+
+    old_contents = rdata.splitlines()
+    new_contents = []
+    for old_content in old_contents:
         try:
-            exec_build_env_command(config.init_path, basepath,
-                                'bitbake -q nodejs-native -c addto_recipe_sysroot', watch=True)
-        except bb.process.ExecutionError as e:
-            if "Nothing PROVIDES 'nodejs-native'" in e.stdout:
-                if fixed_setup:
-                    msg = 'nodejs-native is required for npm but is not available within this SDK'
-                else:
-                    msg = 'nodejs-native is required for npm but is not available - you will likely need to add a layer that provides nodejs'
-                raise DevtoolError(msg)
-            else:
-                raise
+            new_contents.append(old_content.replace(old, new))
+        except ValueError:
+            pass
+    write_file(path, "\n".join(new_contents))
+
+
+def update_unlockedsigs(basepath, workspace, fixed_setup, extra=None):
+    """ This function will make unlocked-sigs.inc match the recipes in the
+    workspace plus any extras we want unlocked. """
+
+    if not fixed_setup:
+        # Only need to write this out within the eSDK
+        return
+
+    if not extra:
+        extra = []
+
+    confdir = os.path.join(basepath, 'conf')
+    unlockedsigs = os.path.join(confdir, 'unlocked-sigs.inc')
+
+    # Get current unlocked list if any
+    values = {}
+    def get_unlockedsigs_varfunc(varname, origvalue, op, newlines):
+        values[varname] = origvalue
+        return origvalue, None, 0, True
+    if os.path.exists(unlockedsigs):
+        with open(unlockedsigs, 'r') as f:
+            bb.utils.edit_metadata(f, ['SIGGEN_UNLOCKED_RECIPES'], get_unlockedsigs_varfunc)
+    unlocked = sorted(values.get('SIGGEN_UNLOCKED_RECIPES', []))
+
+    # If the new list is different to the current list, write it out
+    newunlocked = sorted(list(workspace.keys()) + extra)
+    if unlocked != newunlocked:
+        bb.utils.mkdirhier(confdir)
+        with open(unlockedsigs, 'w') as f:
+            f.write("# DO NOT MODIFY! YOUR CHANGES WILL BE LOST.\n" +
+                    "# This layer was created by the OpenEmbedded devtool" +
+                    " utility in order to\n" +
+                    "# contain recipes that are unlocked.\n")
+
+            f.write('SIGGEN_UNLOCKED_RECIPES += "\\\n')
+            for pn in newunlocked:
+                f.write('    ' + pn)
+            f.write('"')

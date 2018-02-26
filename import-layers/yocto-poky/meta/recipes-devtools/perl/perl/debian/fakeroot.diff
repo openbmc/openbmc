@@ -11,6 +11,7 @@ since fakeroot (which now sets LD_LIBRARY_PATH) is not used for the "build"
 rule where the Makefile is created, but is for the clean/binary* targets.
 
 Patch-Name: debian/fakeroot.diff
+Upstream-Status: Pending
 ---
  Makefile.SH | 7 ++-----
  1 file changed, 2 insertions(+), 5 deletions(-)

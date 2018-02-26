@@ -1,7 +1,7 @@
-From 64130262787d54e2e6695ae4ed8783bfec14ffef Mon Sep 17 00:00:00 2001
+From cf00bf9de8128171e79a019de809e35f3aeed281 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:15:07 +0000
-Subject: [PATCH 07/26] ppc/sqrt: Fix undefined reference to `__sqrt_finite'
+Subject: [PATCH 07/25] ppc/sqrt: Fix undefined reference to `__sqrt_finite'
 
 on ppc fixes the errors like below
 | ./.libs/libpulsecore-1.1.so: undefined reference to `__sqrt_finite'
@@ -36,7 +36,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  12 files changed, 12 insertions(+), 24 deletions(-)
 
 diff --git a/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrt.c
-index 71e516d..1795fd6 100644
+index 71e516d1c8..1795fd6c3e 100644
 --- a/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrt.c
 +++ b/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrt.c
 @@ -39,14 +39,8 @@ static const float half = 0.5;
@@ -60,7 +60,7 @@ index 71e516d..1795fd6 100644
  }
 +strong_alias (__ieee754_sqrt, __sqrt_finite)
 diff --git a/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrtf.c
-index 26fa067..a917f31 100644
+index 26fa067abf..a917f313ab 100644
 --- a/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrtf.c
 +++ b/sysdeps/powerpc/powerpc32/603e/fpu/e_sqrtf.c
 @@ -37,14 +37,8 @@ static const float threehalf = 1.5;
@@ -84,7 +84,7 @@ index 26fa067..a917f31 100644
  }
 +strong_alias (__ieee754_sqrtf, __sqrtf_finite)
 diff --git a/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrt.c
-index 71e516d..fc4a749 100644
+index 71e516d1c8..fc4a74990e 100644
 --- a/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrt.c
 +++ b/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrt.c
 @@ -132,3 +132,4 @@ __ieee754_sqrt (b)
@@ -93,7 +93,7 @@ index 71e516d..fc4a749 100644
  }
 +strong_alias (__ieee754_sqrt, __sqrt_finite)
 diff --git a/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrtf.c
-index 26fa067..9d17512 100644
+index 26fa067abf..9d175122a8 100644
 --- a/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrtf.c
 +++ b/sysdeps/powerpc/powerpc32/e500mc/fpu/e_sqrtf.c
 @@ -99,3 +99,4 @@ __ieee754_sqrtf (b)
@@ -102,7 +102,7 @@ index 26fa067..9d17512 100644
  }
 +strong_alias (__ieee754_sqrtf, __sqrtf_finite)
 diff --git a/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrt.c
-index 71e516d..fc4a749 100644
+index 71e516d1c8..fc4a74990e 100644
 --- a/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrt.c
 +++ b/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrt.c
 @@ -132,3 +132,4 @@ __ieee754_sqrt (b)
@@ -111,7 +111,7 @@ index 71e516d..fc4a749 100644
  }
 +strong_alias (__ieee754_sqrt, __sqrt_finite)
 diff --git a/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrtf.c
-index 26fa067..9d17512 100644
+index 26fa067abf..9d175122a8 100644
 --- a/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrtf.c
 +++ b/sysdeps/powerpc/powerpc32/e5500/fpu/e_sqrtf.c
 @@ -99,3 +99,4 @@ __ieee754_sqrtf (b)
@@ -120,7 +120,7 @@ index 26fa067..9d17512 100644
  }
 +strong_alias (__ieee754_sqrtf, __sqrtf_finite)
 diff --git a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c
-index 71e516d..fc4a749 100644
+index 71e516d1c8..fc4a74990e 100644
 --- a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c
 +++ b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrt.c
 @@ -132,3 +132,4 @@ __ieee754_sqrt (b)
@@ -129,7 +129,7 @@ index 71e516d..fc4a749 100644
  }
 +strong_alias (__ieee754_sqrt, __sqrt_finite)
 diff --git a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c
-index 26fa067..9d17512 100644
+index 26fa067abf..9d175122a8 100644
 --- a/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c
 +++ b/sysdeps/powerpc/powerpc32/e6500/fpu/e_sqrtf.c
 @@ -99,3 +99,4 @@ __ieee754_sqrtf (b)
@@ -138,7 +138,7 @@ index 26fa067..9d17512 100644
  }
 +strong_alias (__ieee754_sqrtf, __sqrtf_finite)
 diff --git a/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrt.c
-index 71e516d..1795fd6 100644
+index 71e516d1c8..1795fd6c3e 100644
 --- a/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrt.c
 +++ b/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrt.c
 @@ -39,14 +39,8 @@ static const float half = 0.5;
@@ -162,7 +162,7 @@ index 71e516d..1795fd6 100644
  }
 +strong_alias (__ieee754_sqrt, __sqrt_finite)
 diff --git a/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrtf.c
-index 26fa067..a917f31 100644
+index 26fa067abf..a917f313ab 100644
 --- a/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrtf.c
 +++ b/sysdeps/powerpc/powerpc64/e5500/fpu/e_sqrtf.c
 @@ -37,14 +37,8 @@ static const float threehalf = 1.5;
@@ -186,7 +186,7 @@ index 26fa067..a917f31 100644
  }
 +strong_alias (__ieee754_sqrtf, __sqrtf_finite)
 diff --git a/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrt.c b/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrt.c
-index 71e516d..fc4a749 100644
+index 71e516d1c8..fc4a74990e 100644
 --- a/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrt.c
 +++ b/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrt.c
 @@ -132,3 +132,4 @@ __ieee754_sqrt (b)
@@ -195,7 +195,7 @@ index 71e516d..fc4a749 100644
  }
 +strong_alias (__ieee754_sqrt, __sqrt_finite)
 diff --git a/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrtf.c b/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrtf.c
-index 26fa067..9d17512 100644
+index 26fa067abf..9d175122a8 100644
 --- a/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrtf.c
 +++ b/sysdeps/powerpc/powerpc64/e6500/fpu/e_sqrtf.c
 @@ -99,3 +99,4 @@ __ieee754_sqrtf (b)
@@ -204,5 +204,5 @@ index 26fa067..9d17512 100644
  }
 +strong_alias (__ieee754_sqrtf, __sqrtf_finite)
 -- 
-2.10.2
+2.13.2
 

@@ -3,6 +3,7 @@ SECTION = "devel"
 # Would need transfig-native for documentation if it wasn't disabled
 DEPENDS = "elfutils binutils"
 SUMMARY = "An ELF prelinking utility"
+HOMEPAGE = "http://git.yoctoproject.org/cgit.cgi/prelink-cross/about/"
 DESCRIPTION = "The prelink package contains a utility which modifies ELF shared libraries \
 and executables, so that far fewer relocations need to be resolved at \
 runtime and thus programs come up faster."
@@ -31,6 +32,8 @@ SRC_URI = "git://git.yoctoproject.org/prelink-cross.git;branch=cross_prelink \
            file://prelink.cron.daily \
            file://prelink.default \
 	   file://macros.prelink"
+UPSTREAM_CHECK_GITTAGREGEX = "upstream has no usable tags"
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 TARGET_OS_ORIG := "${TARGET_OS}"
 OVERRIDES_append = ":${TARGET_OS_ORIG}"
@@ -150,13 +153,15 @@ do_install_append () {
 	install -m 0644 ${WORKDIR}/macros.prelink ${D}${sysconfdir}/rpm/macros.prelink
 }
 
-# If we're using image-prelink, we want to skip this on the host side
-# but still do it if the package is installed on the target...
+# If we ae doing a cross install, we want to avoid prelinking.
+# Prelinking during a cross install should be handled by the image-prelink
+# bbclass.  If the user desires this to run on the target at first boot
+# they will need to create a custom boot script.
 pkg_postinst_prelink() {
 #!/bin/sh
 
 if [ "x$D" != "x" ]; then
-  ${@bb.utils.contains('USER_CLASSES', 'image-prelink', 'exit 0', 'exit 1', d)}
+  exit 0
 fi
 
 prelink -a

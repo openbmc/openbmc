@@ -1,0 +1,15 @@
+[Unit]
+Description=Mosquitto - lightweight server implementation of the MQTT and MQTT-SN protocols
+ConditionPathExists=/etc/mosquitto/mosquitto.conf
+After=network.target
+
+[Service]
+Type=simple
+ExecStartPre=/bin/rm -f /var/run/mosquitto.pid
+ExecStart=/usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
+ExecReload=/bin/kill -HUP $MAINPID
+PIDFile=/var/run/mosquitto.pid
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

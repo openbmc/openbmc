@@ -1,0 +1,94 @@
+From ebd7c8e548e9b8e096ee4c390173db9a701f2604 Mon Sep 17 00:00:00 2001
+From: Bruno Bottazzini <bruno.bottazzini@intel.com>
+Date: Wed, 23 Mar 2016 11:18:26 -0300
+Subject: [PATCH] build
+
+Disable stripping and allow easily overriding prefix
+
+Upstream-Status: Pending
+
+Signed-off-by: Bruno Bottazzini <bruno.bottazzini@intel.com>
+---
+ client/Makefile  | 4 ++--
+ config.mk        | 2 +-
+ lib/Makefile     | 2 +-
+ lib/cpp/Makefile | 2 +-
+ src/Makefile     | 4 ++--
+ 5 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/client/Makefile b/client/Makefile
+index bd65355..4e5a640 100644
+--- a/client/Makefile
++++ b/client/Makefile
+@@ -24,8 +24,8 @@ client_shared.o : client_shared.c client
+ 
+ install : all
+ 	$(INSTALL) -d ${DESTDIR}$(prefix)/bin
+-	$(INSTALL) -s --strip-program=${CROSS_COMPILE}${STRIP} mosquitto_pub ${DESTDIR}${prefix}/bin/mosquitto_pub
+-	$(INSTALL) -s --strip-program=${CROSS_COMPILE}${STRIP} mosquitto_sub ${DESTDIR}${prefix}/bin/mosquitto_sub
++	$(INSTALL) mosquitto_pub ${DESTDIR}${prefix}/bin/mosquitto_pub
++	$(INSTALL) mosquitto_sub ${DESTDIR}${prefix}/bin/mosquitto_sub
+ 
+ uninstall :
+ 	-rm -f ${DESTDIR}${prefix}/bin/mosquitto_pub
+diff --git a/config.mk b/config.mk
+index c0f175f..3427b83 100644
+--- a/config.mk
++++ b/config.mk
+@@ -241,7 +241,7 @@ ifeq ($(WITH_DOCS),yes)
+ endif
+ 
+ INSTALL?=install
+-prefix=/usr/local
++prefix?=/usr
+ mandir=${prefix}/share/man
+ localedir=${prefix}/share/locale
+ STRIP?=strip
+diff --git a/lib/Makefile b/lib/Makefile
+index 825fcea..9b7c05c 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -25,7 +25,7 @@ all : libmosquitto.so.${SOVERSION} libmo
+ 
+ install : all
+ 	$(INSTALL) -d ${DESTDIR}$(prefix)/lib${LIB_SUFFIX}/
+-	$(INSTALL) -s --strip-program=${CROSS_COMPILE}${STRIP} libmosquitto.so.${SOVERSION} ${DESTDIR}${prefix}/lib${LIB_SUFFIX}/libmosquitto.so.${SOVERSION}
++	$(INSTALL) libmosquitto.so.${SOVERSION} ${DESTDIR}${prefix}/lib${LIB_SUFFIX}/libmosquitto.so.${SOVERSION}
+ 	ln -sf libmosquitto.so.${SOVERSION} ${DESTDIR}${prefix}/lib${LIB_SUFFIX}/libmosquitto.so
+ 	$(INSTALL) -d ${DESTDIR}${prefix}/include/
+ 	$(INSTALL) mosquitto.h ${DESTDIR}${prefix}/include/mosquitto.h
+diff --git a/lib/cpp/Makefile b/lib/cpp/Makefile
+index 8b627d3..cdb2923 100644
+--- a/lib/cpp/Makefile
++++ b/lib/cpp/Makefile
+@@ -10,7 +10,7 @@ all : libmosquittopp.so.${SOVERSION}
+ 
+ install : all
+ 	$(INSTALL) -d ${DESTDIR}$(prefix)/lib${LIB_SUFFIX}/
+-	$(INSTALL) -s --strip-program=${CROSS_COMPILE}${STRIP} libmosquittopp.so.${SOVERSION} ${DESTDIR}${prefix}/lib${LIB_SUFFIX}/libmosquittopp.so.${SOVERSION}
++	$(INSTALL) libmosquittopp.so.${SOVERSION} ${DESTDIR}${prefix}/lib${LIB_SUFFIX}/libmosquittopp.so.${SOVERSION}
+ 	ln -sf libmosquittopp.so.${SOVERSION} ${DESTDIR}${prefix}/lib${LIB_SUFFIX}/libmosquittopp.so
+ 	$(INSTALL) -d ${DESTDIR}${prefix}/include/
+ 	$(INSTALL) mosquittopp.h ${DESTDIR}${prefix}/include/mosquittopp.h
+diff --git a/src/Makefile b/src/Makefile
+index 2cfb7d4..9a97644 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -103,12 +103,12 @@ mosquitto_passwd.o : mosquitto_passwd.c
+ 
+ install : all
+ 	$(INSTALL) -d ${DESTDIR}$(prefix)/sbin
+-	$(INSTALL) -s --strip-program=${CROSS_COMPILE}${STRIP} mosquitto ${DESTDIR}${prefix}/sbin/mosquitto
++	$(INSTALL) mosquitto ${DESTDIR}${prefix}/sbin/mosquitto
+	$(INSTALL) -d ${DESTDIR}$(prefix)/include
+ 	$(INSTALL) mosquitto_plugin.h ${DESTDIR}${prefix}/include/mosquitto_plugin.h
+ ifeq ($(WITH_TLS),yes)
+	$(INSTALL) -d ${DESTDIR}$(prefix)/bin
+-	$(INSTALL) -s --strip-program=${CROSS_COMPILE}${STRIP} mosquitto_passwd ${DESTDIR}${prefix}/bin/mosquitto_passwd
++	$(INSTALL) mosquitto_passwd ${DESTDIR}${prefix}/bin/mosquitto_passwd
+ endif
+ 
+ uninstall :
+-- 
+2.7.1
+

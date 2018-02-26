@@ -346,8 +346,6 @@ def sstate_installpkgdir(ss, d):
         oe.path.remove(dir)
 
     for state in ss['dirs']:
-        if d.getVar('SSTATE_SKIP_CREATION') == '1':
-            continue
         prepdir(state[1])
         os.rename(sstateinst + state[0], state[1])
     sstate_install(ss, d)
@@ -404,7 +402,7 @@ python sstate_hardcode_path_unpack () {
             return
 
         bb.note("Replacing fixme paths in sstate package: %s" % (sstate_hardcode_cmd))
-        subprocess.call(sstate_hardcode_cmd, shell=True)
+        subprocess.check_call(sstate_hardcode_cmd, shell=True)
 
         # Need to remove this or we'd copy it into the target directory and may 
         # conflict with another writer
@@ -453,7 +451,7 @@ def sstate_clean_manifest(manifest, d, prefix=None):
     if os.path.exists(manifest + ".postrm"):
         import subprocess
         os.chmod(postrm, 0o755)
-        subprocess.call(postrm, shell=True)
+        subprocess.check_call(postrm, shell=True)
         oe.path.remove(postrm)
 
     oe.path.remove(manifest)
@@ -596,8 +594,6 @@ def sstate_package(ss, d):
     for state in ss['dirs']:
         if not os.path.exists(state[1]):
             continue
-        if d.getVar('SSTATE_SKIP_CREATION') == '1':
-            continue
         srcbase = state[0].rstrip("/").rsplit('/', 1)[0]
         # Find and error for absolute symlinks. We could attempt to relocate but its not
         # clear where the symlink is relative to in this context. We could add that markup
@@ -625,6 +621,10 @@ def sstate_package(ss, d):
 
     d.setVar('SSTATE_BUILDDIR', sstatebuild)
     d.setVar('SSTATE_PKG', sstatepkg)
+    d.setVar('SSTATE_INSTDIR', sstatebuild)
+
+    if d.getVar('SSTATE_SKIP_CREATION') == '1':
+        return
 
     for f in (d.getVar('SSTATECREATEFUNCS') or '').split() + \
              ['sstate_create_package', 'sstate_sign_package'] + \
@@ -633,8 +633,6 @@ def sstate_package(ss, d):
         bb.build.exec_func(f, d, (sstatebuild,))
 
     bb.siggen.dump_this_task(sstatepkg + ".siginfo", d)
-
-    d.setVar('SSTATE_INSTDIR', sstatebuild)
 
     return
 
@@ -969,7 +967,8 @@ def setscene_depvalid(task, taskdependees, notneeded, d, log=None):
             if isNativeCross(taskdependees[dep][0]):
                 return False
             # Native/cross tools depended upon by target sysroot are not needed
-            if isNativeCross(taskdependees[task][0]):
+            # Add an exception for shadow-native as required by useradd.bbclass
+            if isNativeCross(taskdependees[task][0]) and taskdependees[task][0] != 'shadow-native':
                 continue
             # Target populate_sysroot need their dependencies
             return False
@@ -1017,6 +1016,11 @@ python sstate_eventhandler2() {
     d = e.data
     stamps = e.stamps.values()
     removeworkdir = (d.getVar("SSTATE_PRUNE_OBSOLETEWORKDIR", False) == "1")
+    preservestampfile = d.expand('${SSTATE_MANIFESTS}/preserve-stamps')
+    preservestamps = []
+    if os.path.exists(preservestampfile):
+        with open(preservestampfile, 'r') as f:
+            preservestamps = f.readlines()
     seen = []
     for a in d.getVar("SSTATE_ARCHS").split():
         toremove = []
@@ -1027,7 +1031,7 @@ python sstate_eventhandler2() {
             lines = f.readlines()
             for l in lines:
                 (stamp, manifest, workdir) = l.split()
-                if stamp not in stamps:
+                if stamp not in stamps and stamp not in preservestamps:
                     toremove.append(l)
                     if stamp not in seen:
                         bb.debug(2, "Stamp %s is not reachable, removing related manifests" % stamp)
@@ -1049,4 +1053,6 @@ python sstate_eventhandler2() {
         with open(i, "w") as f:
             for l in lines:
                 f.write(l)
+    if preservestamps:
+        os.remove(preservestampfile)
 }

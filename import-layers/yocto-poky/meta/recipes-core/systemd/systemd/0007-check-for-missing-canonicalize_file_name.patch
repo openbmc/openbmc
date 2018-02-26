@@ -1,0 +1,63 @@
+From 05dffe67919ffc72be5c017bc6cf82f164b2e8f9 Mon Sep 17 00:00:00 2001
+From: Emil Renner Berthing <systemd@esmil.dk>
+Date: Mon, 23 Oct 2017 11:42:03 -0700
+Subject: [PATCH 07/12] check for missing canonicalize_file_name
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ configure.ac                | 2 ++
+ src/basic/missing.h         | 1 +
+ src/basic/missing_syscall.h | 6 ++++++
+ 3 files changed, 9 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index cd035a971..3674190fb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -333,6 +333,7 @@ AC_CHECK_DECLS([
+         renameat2,
+         kcmp,
+         keyctl,
++        canonicalize_file_name,
+         LO_FLAGS_PARTSCAN,
+         copy_file_range,
+         explicit_bzero],
+@@ -343,6 +344,7 @@ AC_CHECK_DECLS([
+ #include <fcntl.h>
+ #include <sched.h>
+ #include <string.h>
++#include <stdlib.h>
+ #include <linux/loop.h>
+ ]])
+ 
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index 671f341c6..8ae4964e1 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -1246,3 +1246,4 @@ struct ethtool_link_settings {
+ #endif
+ 
+ #include "missing_syscall.h"
++
+diff --git a/src/basic/missing_syscall.h b/src/basic/missing_syscall.h
+index 898116c7b..4d44ee4fa 100644
+--- a/src/basic/missing_syscall.h
++++ b/src/basic/missing_syscall.h
+@@ -28,6 +28,12 @@ static inline int pivot_root(const char *new_root, const char *put_old) {
+ }
+ #endif
+ 
++#if !HAVE_DECL_CANONICALIZE_FILE_NAME
++static inline char *canonicalize_file_name(const char *path) {
++        return realpath(path, NULL);
++}
++#endif
++
+ /* ======================================================================= */
+ 
+ #if !HAVE_DECL_MEMFD_CREATE
+-- 
+2.14.2
+

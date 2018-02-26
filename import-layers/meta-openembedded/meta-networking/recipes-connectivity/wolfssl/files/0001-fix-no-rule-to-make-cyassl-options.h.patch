@@ -1,0 +1,27 @@
+From fb490136cf8f2456cfe13b0b4f796e6c155e75dc Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Wed, 30 Aug 2017 03:02:32 -0400
+Subject: [PATCH] fix no rule to make cyassl/options.h
+
+Upstream-Status: Pending
+
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 395d75d..d4a3880 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3684,6 +3684,7 @@ AC_CONFIG_FILES([wolfssl/options.h])
+ #fi
+ AC_CONFIG_FILES([support/wolfssl.pc])
+ AC_CONFIG_FILES([rpm/spec])
++AC_CONFIG_FILES([cyassl/options.h])
+ 
+ AX_CREATE_GENERIC_CONFIG
+ AX_AM_JOBSERVER([yes])
+-- 
+2.8.1
+

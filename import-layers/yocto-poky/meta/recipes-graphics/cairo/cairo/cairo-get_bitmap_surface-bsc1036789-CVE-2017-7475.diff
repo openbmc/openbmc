@@ -1,0 +1,22 @@
+Cairo: Fix Denial-of-Service Attack due to Logical Problem in Program
+
+https://bugs.freedesktop.org/show_bug.cgi?id=100763
+
+CVE: CVE-2017-7475
+Upstream-Status: Submitted
+
+Signed-off-by: Fan Xin <fan.xin@jp.fujitsu.com>
+
+Index: cairo-1.15.4/src/cairo-ft-font.c
+===================================================================
+--- cairo-1.15.4.orig/src/cairo-ft-font.c
++++ cairo-1.15.4/src/cairo-ft-font.c
+@@ -1149,7 +1149,7 @@ _get_bitmap_surface (FT_Bitmap		     *bi
+     width = bitmap->width;
+     height = bitmap->rows;
+ 
+-    if (width == 0 || height == 0) {
++    if (width == 0 || height == 0 || bitmap->buffer == NULL) {
+ 	*surface = (cairo_image_surface_t *)
+ 	    cairo_image_surface_create_for_data (NULL, format, 0, 0, 0);
+ 	return (*surface)->base.status;

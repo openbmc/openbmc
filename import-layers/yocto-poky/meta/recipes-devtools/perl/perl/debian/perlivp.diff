@@ -21,6 +21,7 @@ On Sat, Jan 10, 2009 at 12:37:18AM +1100, Brendan O'Dea wrote:
 Signed-off-by: Niko Tyni <ntyni@debian.org>
 
 Patch-Name: debian/perlivp.diff
+Upstream-Status: Pending
 ---
  utils/perlivp.PL | 1 +
  1 file changed, 1 insertion(+)

@@ -9,6 +9,7 @@ PREFIX= to the "make install" command (used when packaging
 modules).
 
 Patch-Name: debian/prefix_changes.diff
+Upstream-Status: Pending
 ---
  cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Any.pm  | 12 ++++++------
  cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm |  3 +--

@@ -3,7 +3,6 @@ EXTRA_IMAGE_FEATURES = "tools-debug debug-tweaks"
 
 IMAGE_INSTALL = "\
     ${CORE_IMAGE_BASE_INSTALL} \
-    ${ROOTFS_PKGMANAGE_BOOTSTRAP} \
     packagegroup-core-basic \
     openflow \
     qemu \   
@@ -13,6 +12,5 @@ IMAGE_INSTALL = "\
     "
 
 inherit core-image
-inherit image-vm
 
-IMAGE_FSTYPES += "vmdk"
+IMAGE_FSTYPES += "wic.vmdk"

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# Yocto Project layer check tool wrapper
+#
+# Creates a temporary build directory to run the yocto-check-layer
+# script to avoid a contaminated environment.
+#
+# Copyright (C) 2017 Intel Corporation
+# Released under the MIT license (see COPYING.MIT)
+
+if [ -z "$BUILDDIR" ]; then
+	echo "Please source oe-init-build-env before run this script."
+	exit 2
+fi
+
+# since we are using a temp directory, use the realpath for output
+# log option
+output_log=''
+while getopts o: name
+do
+	case $name in
+	o) output_log=$(realpath "$OPTARG")
+	esac
+done
+shift $(($OPTIND - 1))
+
+# generate a temp directory to run check layer script
+base_dir=$(realpath $BUILDDIR/../)
+cd $base_dir
+
+build_dir=$(mktemp -p $base_dir -d -t build-XXXX)
+
+source oe-init-build-env $build_dir
+if [[ $output_log != '' ]]; then
+	yocto-check-layer -o "$output_log" "$*"
+else
+	yocto-check-layer "$@"
+fi
+retcode=$?
+
+rm -rf $build_dir
+
+exit $retcode

@@ -1,0 +1,27 @@
+From d71cbeb3b76e54778a4d5eec6d387cce653537ca Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 9 Jun 2017 09:49:35 -0700
+Subject: [PATCH] nis_call.c: Include stdint.h for uintptr_t definition
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/nisplus/nis_call.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/nisplus/nis_call.c b/src/nisplus/nis_call.c
+index 1a2b90c..1dc982d 100644
+--- a/src/nisplus/nis_call.c
++++ b/src/nisplus/nis_call.c
+@@ -23,6 +23,7 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <string.h>
++#include <stdint.h>
+ #include <libintl.h>
+ #include <rpc/rpc.h>
+ #include <rpc/auth.h>
+-- 
+2.13.1
+

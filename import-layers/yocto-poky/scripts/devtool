@@ -130,25 +130,6 @@ def read_workspace():
                                      'recipefile': recipefile}
                     logger.debug('Found recipe %s' % workspace[pn])
 
-def create_unlockedsigs():
-    """ This function will make unlocked-sigs.inc match the recipes in the
-    workspace. This runs on every run of devtool, but it lets us ensure
-    the unlocked items are in sync with the workspace. """
-
-    confdir = os.path.join(basepath, 'conf')
-    unlockedsigs = os.path.join(confdir, 'unlocked-sigs.inc')
-    bb.utils.mkdirhier(confdir)
-    with open(os.path.join(confdir, 'unlocked-sigs.inc'), 'w') as f:
-        f.write("# DO NOT MODIFY! YOUR CHANGES WILL BE LOST.\n" +
-                "# This layer was created by the OpenEmbedded devtool" +
-                " utility in order to\n" +
-                "# contain recipes that are unlocked.\n")
-
-        f.write('SIGGEN_UNLOCKED_RECIPES += "\\\n')
-        for pn in workspace:
-            f.write('    ' + pn)
-        f.write('"')
-
 def create_workspace(args, config, basepath, workspace):
     if args.layerpath:
         workspacedir = os.path.abspath(args.layerpath)
@@ -332,7 +313,6 @@ def main():
 
     if not getattr(args, 'no_workspace', False):
         read_workspace()
-        create_unlockedsigs()
 
     try:
         ret = args.func(args, config, basepath, workspace)

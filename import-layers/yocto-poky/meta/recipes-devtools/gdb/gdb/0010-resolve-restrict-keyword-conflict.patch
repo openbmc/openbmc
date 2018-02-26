@@ -1,4 +1,4 @@
-From 7816d3497266e55c1c921d7cc1c8bf81c8ed0b4a Mon Sep 17 00:00:00 2001
+From 3ead0dd143521b0ba69c9e753bc4a236f9445ad9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 10 May 2016 08:47:05 -0700
 Subject: [PATCH 10/10] resolve restrict keyword conflict
@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/gdb/gnulib/import/sys_time.in.h b/gdb/gnulib/import/sys_time.in.h
-index c556c5db23..2a6107fcf8 100644
+index d535a6a48b..7c34d5a1aa 100644
 --- a/gdb/gnulib/import/sys_time.in.h
 +++ b/gdb/gnulib/import/sys_time.in.h
 @@ -93,20 +93,20 @@ struct timeval
@@ -42,7 +42,7 @@ index c556c5db23..2a6107fcf8 100644
 +                       (struct timeval *__restrict, void *__restrict));
  # endif
  _GL_CXXALIASWARN (gettimeofday);
- #elif defined GNULIB_POSIXCHECK
+ # if defined __cplusplus && defined GNULIB_NAMESPACE
 -- 
-2.11.0
+2.13.1
 

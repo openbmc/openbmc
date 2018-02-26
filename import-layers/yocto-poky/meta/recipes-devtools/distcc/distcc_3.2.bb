@@ -23,6 +23,7 @@ SRC_URI = "git://github.com/distcc/distcc.git;branch=${PV} \
            file://distcc.service"
 SRCREV = "d8b18df3e9dcbe4f092bed565835d3975e99432c"
 S = "${WORKDIR}/git"
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 inherit autotools pkgconfig update-rc.d useradd systemd
 

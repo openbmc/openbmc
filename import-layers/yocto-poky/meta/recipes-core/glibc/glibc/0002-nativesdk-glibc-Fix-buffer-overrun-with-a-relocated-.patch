@@ -1,7 +1,7 @@
-From 1578f52647ec8804186d1944d4cd2095132efc39 Mon Sep 17 00:00:00 2001
+From 82f2e910ec0e2de6a9e2b007825bddfc5850575d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:50:00 +0000
-Subject: [PATCH 02/26] nativesdk-glibc: Fix buffer overrun with a relocated
+Subject: [PATCH 02/25] nativesdk-glibc: Fix buffer overrun with a relocated
  SDK
 
 When ld-linux-*.so.2 is relocated to a path that is longer than the
@@ -22,7 +22,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 12 insertions(+)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index f503dbc..3a3d112 100644
+index d7af9ebcbc..19c1db9948 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
 @@ -1753,7 +1753,19 @@ open_path (const char *name, size_t namelen, int mode,
@@ -46,5 +46,5 @@ index f503dbc..3a3d112 100644
      {
        struct r_search_path_elem *this_dir = *dirs;
 -- 
-2.10.2
+2.13.2
 

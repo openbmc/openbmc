@@ -1,0 +1,32 @@
+From 386ff899763f8473eb93a7a1578fb7cc4f86f66d Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 8 May 2017 16:28:12 +0800
+Subject: [PATCH 05/13] update fstab by appending
+
+The 'storage.write()' has updated fstab by overwriting
+the original one, we should update fstab by appending
+to keep original tmpfs partitions.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ blivet/osinstall.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blivet/osinstall.py b/blivet/osinstall.py
+index 61819c2..afa82db 100644
+--- a/blivet/osinstall.py
++++ b/blivet/osinstall.py
+@@ -728,7 +728,7 @@ class FSSet(object):
+         # /etc/fstab
+         fstab_path = os.path.normpath("%s/etc/fstab" % get_sysroot())
+         fstab = self.fstab()
+-        open(fstab_path, "w").write(fstab)
++        open(fstab_path, "a").write(fstab)
+ 
+         # /etc/crypttab
+         crypttab_path = os.path.normpath("%s/etc/crypttab" % get_sysroot())
+-- 
+2.7.4
+

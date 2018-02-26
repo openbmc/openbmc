@@ -36,8 +36,11 @@ DEPENDS += " \
     dbus \
     expat \
     zlib \
-    libupnp \
+    libupnp1.6 \
 "
+
+# While this item does not require it, it depends on mpg123 which does
+LICENSE_FLAGS = "commercial"
 
 SRC_URI = " \
     http://www.musicpd.org/download/${BPN}/0.19/${BP}.tar.xz \

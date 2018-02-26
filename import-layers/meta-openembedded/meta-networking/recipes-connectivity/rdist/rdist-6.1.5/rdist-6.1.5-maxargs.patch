@@ -1,0 +1,16 @@
+Upstream-Status: Inappropriate [1]
+
+[1] Not the author, the patch is from:rdist
+http://vault.centos.org/5.8/os/SRPMS/rdist-6.1.5-44.src.rpm
+
+--- rdist-6.1.5/src/setargs.c.maxargs	1998-11-10 05:15:56.000000000 +0100
++++ rdist-6.1.5/src/setargs.c	2003-09-04 14:39:03.000000000 +0200
+@@ -58,7 +58,7 @@
+  * Set process argument functions
+  */
+ 
+-#define MAXUSERENVIRON 		40
++#define MAXUSERENVIRON 		1024
+ char 			      **Argv = NULL;
+ char 			       *LastArgv = NULL;
+ char 			       *UserEnviron[MAXUSERENVIRON+1];

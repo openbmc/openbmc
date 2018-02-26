@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://Copyright;md5=0cd9a07afbeb24026c9b03aecfeba458"
 SECTION = "libs"
 DEPENDS = "libxml2"
 
-SRC_URI = "ftp://xmlsoft.org/libxslt/libxslt-${PV}.tar.gz \
+SRC_URI = "http://xmlsoft.org/sources/libxslt-${PV}.tar.gz \
            file://pkgconfig_fix.patch \
            file://0001-Use-pkg-config-to-find-gcrypt-and-libxml2.patch \
            file://0001-Link-libraries-with-libm.patch \

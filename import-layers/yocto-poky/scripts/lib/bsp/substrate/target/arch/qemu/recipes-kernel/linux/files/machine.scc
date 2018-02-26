@@ -1,5 +1,3 @@
 # yocto-bsp-filename {{=machine}}.scc
 kconf hardware {{=machine}}.cfg
 
-kconf hardware {{=machine}}-user-config.cfg
-include {{=machine}}-user-patches.scc

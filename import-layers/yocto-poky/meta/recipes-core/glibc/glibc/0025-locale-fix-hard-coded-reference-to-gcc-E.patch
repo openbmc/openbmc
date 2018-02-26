@@ -1,0 +1,38 @@
+From f3a670496c8fe6d4acf045f5b167a19cf41b044e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Rosen?= <jeremy.rosen@smile.fr>
+Date: Mon, 22 Aug 2016 16:09:25 +0200
+Subject: [PATCH 25/25] locale: fix hard-coded reference to gcc -E
+
+When new version of compilers are published, they may not be compatible with
+older versions of software. This is particularly common when software is built
+with -Werror.
+
+Autotools provides a way for a user to specify the name of his compiler using a
+set of variables ($CC $CXX $CPP etc.). Those variables are used correctly when
+compiling glibc but the script used to generate transliterations in the locale/
+subdirectory directly calls the gcc binary to get the output of the
+preprocessor instead of using the $CPP variable provided by the build
+environment.
+
+This patch replaces the hard-coded reference to the gcc binary with the proper
+environment variable, thus allowing a user to override it.
+
+Upstream-Status: Submitted [https://sourceware.org/ml/libc-alpha/2016-08/msg00746.html]
+---
+ locale/gen-translit.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/locale/gen-translit.pl b/locale/gen-translit.pl
+index 30d3f2f195..e97653017c 100644
+--- a/locale/gen-translit.pl
++++ b/locale/gen-translit.pl
+@@ -1,5 +1,5 @@
+ #!/usr/bin/perl -w
+-open F, "cat C-translit.h.in | gcc -E - |" || die "Cannot preprocess input file";
++open F, 'cat C-translit.h.in | ${CPP:-gcc -E} - |' || die "Cannot preprocess input file";
+ 
+ 
+ sub cstrlen {
+-- 
+2.13.2
+

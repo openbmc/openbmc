@@ -33,6 +33,7 @@ SDK_LOCAL_CONF_BLACKLIST ?= "CONF_VERSION \
                              DL_DIR \
                              SSTATE_DIR \
                              TMPDIR \
+                             BB_SERVER_TIMEOUT \
                             "
 SDK_INHERIT_BLACKLIST ?= "buildhistory icecc"
 SDK_UPDATE_URL ?= ""
@@ -69,7 +70,6 @@ OE_INIT_ENV_SCRIPT ?= "oe-init-build-env"
 # COREBASE be preserved as well as untracked files.
 COREBASE_FILES ?= " \
     oe-init-build-env \
-    oe-init-build-env-memres \
     scripts \
     LICENSE \
     .templateconf \
@@ -82,6 +82,39 @@ TOOLCHAIN_OUTPUTNAME_task-populate-sdk-ext = "${TOOLCHAINEXT_OUTPUTNAME}"
 
 SDK_EXT_TARGET_MANIFEST = "${SDK_DEPLOY}/${TOOLCHAINEXT_OUTPUTNAME}.target.manifest"
 SDK_EXT_HOST_MANIFEST = "${SDK_DEPLOY}/${TOOLCHAINEXT_OUTPUTNAME}.host.manifest"
+
+python write_target_sdk_ext_manifest () {
+    from oe.sdk import get_extra_sdkinfo
+    sstate_dir = d.expand('${SDK_OUTPUT}/${SDKPATH}/sstate-cache')
+    extra_info = get_extra_sdkinfo(sstate_dir)
+
+    target = d.getVar('TARGET_SYS')
+    target_multimach = d.getVar('MULTIMACH_TARGET_SYS')
+    real_target_multimach = d.getVar('REAL_MULTIMACH_TARGET_SYS')
+
+    pkgs = {}
+    with open(d.getVar('SDK_EXT_TARGET_MANIFEST'), 'w') as f:
+        for fn in extra_info['filesizes']:
+            info = fn.split(':')
+            if info[2] in (target, target_multimach, real_target_multimach) \
+                    or info[5] == 'allarch':
+                if not info[1] in pkgs:
+                    f.write("%s %s %s\n" % (info[1], info[2], info[3]))
+                    pkgs[info[1]] = {}
+}
+python write_host_sdk_ext_manifest () {
+    from oe.sdk import get_extra_sdkinfo
+    sstate_dir = d.expand('${SDK_OUTPUT}/${SDKPATH}/sstate-cache')
+    extra_info = get_extra_sdkinfo(sstate_dir)
+    host = d.getVar('BUILD_SYS')
+    with open(d.getVar('SDK_EXT_HOST_MANIFEST'), 'w') as f:
+        for fn in extra_info['filesizes']:
+            info = fn.split(':')
+            if info[2] == host:
+                f.write("%s %s %s\n" % (info[1], info[2], info[3]))
+}
+
+SDK_POSTPROCESS_COMMAND_append_task-populate-sdk-ext = "write_target_sdk_ext_manifest; write_host_sdk_ext_manifest; "    
 
 SDK_TITLE_task-populate-sdk-ext = "${@d.getVar('DISTRO_NAME') or d.getVar('DISTRO')} Extensible SDK"
 
@@ -111,7 +144,7 @@ def create_filtered_tasklist(d, sdkbasepath, tasklistfile, conf_initpath):
         with open(sdkbasepath + '/conf/local.conf', 'a') as f:
             # Force the use of sstate from the build system
             f.write('\nSSTATE_DIR_forcevariable = "%s"\n' % d.getVar('SSTATE_DIR'))
-            f.write('SSTATE_MIRRORS_forcevariable = ""\n')
+            f.write('SSTATE_MIRRORS_forcevariable = "file://universal/(.*) file://universal-4.9/\\1 file://universal-4.9/(.*) file://universal-4.8/\\1"\n')
             # Ensure TMPDIR is the default so that clean_esdk_builddir() can delete it
             f.write('TMPDIR_forcevariable = "${TOPDIR}/tmp"\n')
             f.write('TCLIBCAPPEND_forcevariable = ""\n')
@@ -314,11 +347,17 @@ python copy_buildsystem () {
             # the sig computed from the metadata.
             f.write('SIGGEN_LOCKEDSIGS_TASKSIG_CHECK = "warn"\n\n')
 
+            # We want to be able to set this without a full reparse
+            f.write('BB_HASHCONFIG_WHITELIST_append = " SIGGEN_UNLOCKED_RECIPES"\n\n')
+
             # Set up whitelist for run on install
             f.write('BB_SETSCENE_ENFORCE_WHITELIST = "%:* *:do_shared_workdir *:do_rm_work wic-tools:* *:do_addto_recipe_sysroot"\n\n')
 
             # Hide the config information from bitbake output (since it's fixed within the SDK)
             f.write('BUILDCFG_HEADER = ""\n\n')
+
+            f.write('# Provide a flag to indicate we are in the EXT_SDK Context\n')
+            f.write('WITHIN_EXT_SDK = "1"\n\n')
 
             # Map gcc-dependent uninative sstate cache for installer usage
             f.write('SSTATE_MIRRORS += " file://universal/(.*) file://universal-4.9/\\1 file://universal-4.9/(.*) file://universal-4.8/\\1"\n\n')

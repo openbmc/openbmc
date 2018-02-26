@@ -1,0 +1,34 @@
+From e1c8f4b8323e3965271a93529eab5774c1a7083c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Jun 2017 10:32:14 -0700
+Subject: [PATCH 3/3] Fix use of gegl API
+
+newer version of gegl does not define GEGL_IS_PARAM_SPEC_MULTILINE
+
+| core/libappcore.a(gimpparamspecs-duplicate.o): In function `gimp_param_spec_duplicate':
+| /usr/src/debug/gimp/2.8.22-r0/gimp-2.8.22/app/core/../../../../../../../../../workspace/sources/gimp/app/core/gimpparamspecs-duplicate.c:70: undefined reference to `GEGL_IS_PARAM_SPEC_MULTILINE'
+| collect2: error: ld returned 1 exit status
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ app/core/gimpparamspecs-duplicate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/app/core/gimpparamspecs-duplicate.c b/app/core/gimpparamspecs-duplicate.c
+index c0b7426..2efaf23 100644
+--- a/app/core/gimpparamspecs-duplicate.c
++++ b/app/core/gimpparamspecs-duplicate.c
+@@ -67,7 +67,7 @@ gimp_param_spec_duplicate (GParamSpec *pspec)
+                                      spec->default_value,
+                                      pspec->flags);
+ 
+-          if (GEGL_IS_PARAM_SPEC_MULTILINE (pspec))
++          if (gegl_param_spec_get_property_key(pspec, "multiline"))
+             {
+               g_param_spec_set_qdata (new, multiline_quark,
+                                       GINT_TO_POINTER (TRUE));
+-- 
+2.13.2
+

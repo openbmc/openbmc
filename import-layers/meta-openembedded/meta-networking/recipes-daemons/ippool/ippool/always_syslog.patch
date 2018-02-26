@@ -1,0 +1,22 @@
+ippool: always log to syslog
+
+Even when running in the foreground, send log messages to syslog.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+
+--- a/ippool_main.c
++++ b/ippool_main.c
+@@ -251,9 +251,8 @@ void ippool_vlog(int level, const char *
+ 	if (ippool_opt_nodaemon) {
+ 		vprintf(fmt, ap);
+ 		printf("\n");
+-	} else {
+-		vsyslog(level, fmt, ap);
+ 	}
++	vsyslog(level, fmt, ap);
+ 	DMALLOC_VMESSAGE(fmt, ap);
+ }
+ 

@@ -1,0 +1,33 @@
+From 2acce7bc8ab7711e76c7765c84a198fe38f247f3 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 18 Jul 2017 23:06:41 -0400
+Subject: [PATCH] fix parallel error
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index fbdfcb4..2ad3238 100644
+--- a/Makefile
++++ b/Makefile
+@@ -29,9 +29,11 @@ implantisomd5: implantisomd5.o libimplantisomd5.a
+ checkisomd5: checkisomd5.o libcheckisomd5.a
+ 	$(CC) $(CPPFLAGS) $(CFLAGS) checkisomd5.o libcheckisomd5.a -lpopt $(LDFLAGS) -o checkisomd5
+ 
+-libimplantisomd5.a: libimplantisomd5.a(libimplantisomd5.o md5.o utilities.o)
++libimplantisomd5.a: libimplantisomd5.o md5.o utilities.o
++	$(AR) rv $@ $^
+ 
+-libcheckisomd5.a: libcheckisomd5.a(libcheckisomd5.o md5.o utilities.o)
++libcheckisomd5.a: libcheckisomd5.o md5.o utilities.o
++	$(AR) rv $@ $^
+ 
+ pyisomd5sum.so: $(PYOBJS)
+ 	$(CC) $(CPPFLAGS) $(CFLAGS) -shared -g -fpic $(PYOBJS) $(LDFLAGS) -o pyisomd5sum.so
+-- 
+2.8.1
+

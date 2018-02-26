@@ -1,0 +1,28 @@
+From f1e822d546e08cc195eaeb38ca172bd0c3800aa9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 9 Sep 2017 07:48:48 -0700
+Subject: [PATCH] xfsdump: Use c99 defined int64_t instead of __int64_t
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ common/hsmapi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/hsmapi.c b/common/hsmapi.c
+index 6054773..0709dbe 100644
+--- a/common/hsmapi.c
++++ b/common/hsmapi.c
+@@ -585,7 +585,7 @@ HsmModifyExtentMap(
+ 	struct getbmapx	*bmap)
+ {
+ 	dmf_f_ctxt_t	*dmf_f_ctxtp = (dmf_f_ctxt_t *)contextp;
+-	__int64_t	length;
++	int64_t		length;
+ 
+ 	if (bmap[0].bmv_entries <= 0) {
+ 		return 1;	/* caller must already be at EOF */
+-- 
+2.14.1
+

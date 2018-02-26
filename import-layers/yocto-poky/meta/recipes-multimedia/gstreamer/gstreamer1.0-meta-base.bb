@@ -37,7 +37,7 @@ RDEPENDS_gstreamer1.0-meta-base = "\
     gstreamer1.0-plugins-base-videoscale \
     gstreamer1.0-plugins-base-videoconvert \
     gstreamer1.0-plugins-good-autodetect \
-    gstreamer1.0-plugins-good-souphttpsrc"
+    gstreamer1.0-plugins-good-soup"
 
 RRECOMMENDS_gstreamer1.0-meta-x11-base = "\
     gstreamer1.0-plugins-base-ximagesink \

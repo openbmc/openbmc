@@ -1,0 +1,81 @@
+dhrystone: fix compilation problems
+
+This patch fixes two compilation errors with original
+dhrystone sources:
+* Redefinition of times() with wrong return type
+  - Fixed by commenting out the unnecessary redefinition
+* Undefined identifier HZ
+  - Originally HZ was supposed to be the clock frequency
+    value for times()
+  - For Linux, the frequency should come from sysconf
+  - This patch defines global varible HZ and initializes
+    it from sysconf
+
+Additionally, this patch adds a simple Makefile.
+
+Upstream-status: Pending
+
+Sign-off-by: Kimmo Surakka <kimmo.surakka@ge.com>
+Signed-off-by: Jose Alarcon <jose.alarcon@ge.com>
+---
+
+diff -Naur dhry.orig/dhry_1.c dhry/dhry_1.c
+--- dhry.orig/dhry_1.c	2015-07-20 14:25:58.059945353 +0300
++++ dhry/dhry_1.c	2015-07-20 12:43:25.318945353 +0300
+@@ -45,11 +45,15 @@
+ 
+ #ifdef TIMES
+ struct tms      time_info;
+-extern  int     times ();
++/* extern  int     times (); */
+                 /* see library function "times" */
+ #define Too_Small_Time 120
+                 /* Measurements should last at least about 2 seconds */
+ #endif
++#ifndef HZ
++#include <unistd.h>  /* sysconf */
++   long HZ;
++#endif
+ #ifdef TIME
+ extern long     time();
+                 /* see library function "time"  */
+@@ -84,6 +88,9 @@
+ 
+   /* Initializations */
+ 
++#ifndef HZ
++  HZ = sysconf(_SC_CLK_TCK);
++#endif
+   Next_Ptr_Glob = (Rec_Pointer) malloc (sizeof (Rec_Type));
+   Ptr_Glob = (Rec_Pointer) malloc (sizeof (Rec_Type));
+ 
+diff -Naur dhry.orig/dhry.h dhry/dhry.h
+--- dhry.orig/dhry.h	2015-07-20 14:25:58.054945353 +0300
++++ dhry/dhry.h	2015-07-20 12:42:59.903945353 +0300
+@@ -420,4 +420,6 @@
+           } variant;
+       } Rec_Type, *Rec_Pointer;
+ 
+-
++#ifndef HZ
++   extern long HZ;
++#endif
+diff -Naur dhry.orig/Makefile dhry/Makefile
+--- dhry.orig/Makefile	1970-01-01 02:00:00.000000000 +0200
++++ dhry/Makefile	2015-07-20 14:10:45.832945353 +0300
+@@ -0,0 +1,15 @@
++CC=gcc
++
++all: dhry
++
++dhry: dhry_1.o dhry_2.o
++	$(CC) $(LDFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS)
++
++dhry_1.o: dhry_1.c dhry.h
++
++dhry_2.o: dhry_2.c dhry.h
++
++clean:
++	rm -f *.o *~
++
++.PHONY: all clean

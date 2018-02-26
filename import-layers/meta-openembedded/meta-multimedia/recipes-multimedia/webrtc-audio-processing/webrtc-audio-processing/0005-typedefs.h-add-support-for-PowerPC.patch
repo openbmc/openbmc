@@ -1,0 +1,28 @@
+From db5f570e928c8ca5b0b8dc702e1af0a57277f092 Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Mon, 3 Jul 2017 16:20:08 +0300
+Subject: [PATCH 5/6] typedefs.h: add support for PowerPC
+
+Upstream-Status: Pending
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ webrtc/typedefs.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/webrtc/typedefs.h b/webrtc/typedefs.h
+index d1b2f54..6e34d9e 100644
+--- a/webrtc/typedefs.h
++++ b/webrtc/typedefs.h
+@@ -53,6 +53,9 @@
+ #else
+ #define WEBRTC_ARCH_BIG_ENDIAN
+ #endif
++#elif defined(__powerpc__)
++#define WEBRTC_ARCH_32_BITS
++#define WEBRTC_ARCH_BIG_ENDIAN
+ #elif defined(__pnacl__)
+ #define WEBRTC_ARCH_32_BITS
+ #define WEBRTC_ARCH_LITTLE_ENDIAN
+-- 
+2.11.0
+

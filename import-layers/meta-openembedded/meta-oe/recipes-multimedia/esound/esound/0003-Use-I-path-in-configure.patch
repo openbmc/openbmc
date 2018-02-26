@@ -1,0 +1,38 @@
+From 979a02d9ec9c28686021cd2b49ca55d2195c9dce Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 8 Jun 2017 23:12:36 -0700
+Subject: [PATCH 3/3] Use -I=<path> in configure
+
+This helps to use proper sysroot in
+cross build environment
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 5645dce..d374cda 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -208,7 +208,7 @@ if test "x$enable_local_sound" = "xyes"; then
+    AC_CHECK_HEADERS(CoreAudio/CoreAudio.h)
+    # mme_api.h directly includes other files from the mme subdir
+    xCPPFLAGS="$CPPFLAGS"
+-   CPPFLAGS="$CPPFLAGS -I/usr/include/mme"
++   CPPFLAGS="$CPPFLAGS -I=/usr/include/mme"
+    AC_CHECK_HEADERS(mme/mme_api.h)
+    CPPFLAGS="$xCPPFLAGS"
+    AM_PATH_ARTS(, HAVE_ARTS=yes, HAVE_ARTS=no)
+@@ -269,7 +269,7 @@ if test "x$enable_local_sound" = "xyes"; then
+       osf*)
+ 	found_sound=yes
+ 	AC_DEFINE(DRIVER_OSF, 1, [Defined if OSF backend is enabled])
+-	CPPFLAGS="$CPPFLAGS -I/usr/include/mme"
++	CPPFLAGS="$CPPFLAGS -I=/usr/include/mme"
+ 	SOUND_LIBS=-lmme
+       esac
+    fi
+-- 
+2.13.1
+

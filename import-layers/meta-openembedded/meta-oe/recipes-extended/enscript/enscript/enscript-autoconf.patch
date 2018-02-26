@@ -1,0 +1,118 @@
+autoconf no longer supports AM_C_PROTOTYPES
+
+| configure.ac:14: error: automatic de-ANSI-fication support has been removed
+| /bitbake_build/tmp/sysroots/x86_64-linux/usr/share/aclocal-1.12/protos.m4:10: AM_C_PROTOTYPES is expanded from...
+
+Upstream-Status: Pending
+
+Author: Mark Hatle <mark.hatle@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+Index: enscript-1.6.6/configure.ac
+===================================================================
+--- enscript-1.6.6.orig/configure.ac
++++ enscript-1.6.6/configure.ac
+@@ -11,7 +11,6 @@ AC_PROG_INSTALL
+ AC_PROG_CC
+ 
+ AC_USE_SYSTEM_EXTENSIONS
+-AM_C_PROTOTYPES
+ 
+ AC_C_CONST
+ AC_FUNC_ALLOCA
+Index: enscript-1.6.6/afmlib/afm.h
+===================================================================
+--- enscript-1.6.6.orig/afmlib/afm.h
++++ enscript-1.6.6/afmlib/afm.h
+@@ -24,11 +24,7 @@
+ #define AFM_H
+ 
+ #ifndef ___P
+-#if PROTOTYPES
+ #define ___P(protos) protos
+-#else /* no PROTOTYPES */
+-#define ___P(protos) ()
+-#endif /* no PROTOTYPES */
+ #endif
+ 
+ /**********************************************************************
+Index: enscript-1.6.6/afmlib/afmint.h
+===================================================================
+--- enscript-1.6.6.orig/afmlib/afmint.h
++++ enscript-1.6.6/afmlib/afmint.h
+@@ -34,11 +34,7 @@
+ #include <stdio.h>
+ 
+ #ifndef ___P
+-#if PROTOTYPES
+ #define ___P(protos) protos
+-#else /* no PROTOTYPES */
+-#define ___P(protos) ()
+-#endif /* no PROTOTYPES */
+ #endif
+ 
+ #if STDC_HEADERS
+Index: enscript-1.6.6/afmlib/strhash.h
+===================================================================
+--- enscript-1.6.6.orig/afmlib/strhash.h
++++ enscript-1.6.6/afmlib/strhash.h
+@@ -24,11 +24,7 @@
+ #define STRHASH_H
+ 
+ #ifndef ___P
+-#if PROTOTYPES
+ #define ___P(protos) protos
+-#else /* no PROTOTYPES */
+-#define ___P(protos) ()
+-#endif /* no PROTOTYPES */
+ #endif
+ 
+ typedef struct stringhash_st *StringHashPtr;
+Index: enscript-1.6.6/compat/xalloc.h
+===================================================================
+--- enscript-1.6.6.orig/compat/xalloc.h
++++ enscript-1.6.6/compat/xalloc.h
+@@ -28,11 +28,7 @@
+ #define XALLOC_H
+ 
+ #ifndef ___P
+-#if PROTOTYPES
+ #define ___P(protos) protos
+-#else /* no PROTOTYPES */
+-#define ___P(protos) ()
+-#endif /* no PROTOTYPES */
+ #endif
+ 
+ void *xmalloc ___P ((size_t size));
+Index: enscript-1.6.6/src/gsint.h
+===================================================================
+--- enscript-1.6.6.orig/src/gsint.h
++++ enscript-1.6.6/src/gsint.h
+@@ -39,11 +39,7 @@
+ #include <sys/stat.h>
+ 
+ #ifndef ___P
+-#if PROTOTYPES
+ #define ___P(protos) protos
+-#else /* no PROTOTYPES */
+-#define ___P(protos) ()
+-#endif /* no PROTOTYPES */
+ #endif
+ 
+ #if STDC_HEADERS
+Index: enscript-1.6.6/states/defs.h
+===================================================================
+--- enscript-1.6.6.orig/states/defs.h
++++ enscript-1.6.6/states/defs.h
+@@ -37,11 +37,7 @@
+ #include <ctype.h>
+ 
+ #ifndef ___P
+-#if PROTOTYPES
+ #define ___P(protos) protos
+-#else /* no PROTOTYPES */
+-#define ___P(protos) ()
+-#endif /* no PROTOTYPES */
+ #endif
+ 
+ #if STDC_HEADERS

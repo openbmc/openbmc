@@ -1,0 +1,44 @@
+oprofile: Determine the root home directory dynamically
+
+This commit detects the root home directory dynamically with changes to
+the oprofile gui app source.
+
+The commit replaces an earlier fix that detected and adjusted a
+'non-standard' root home directory at build time.  The advantage of this
+patch is that the oprofile tools are adjusted to the current run-time
+path to ~root, not the build time path.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
+
+Index: oprofile-1.0.0/doc/oprofile.html
+===================================================================
+--- oprofile-1.0.0.orig/doc/oprofile.html	2014-11-03 17:55:31.511034857 +0000
++++ oprofile-1.0.0/doc/oprofile.html	2014-11-03 17:57:26.415037988 +0000
+@@ -1563,8 +1563,8 @@
+ 		<span class="emphasis"><em>must</em></span> stop it in a controlled manner in order to process
+ 		the profile data it has collected.  Use <code class="code">kill -SIGINT &lt;operf-PID&gt;</code>
+ 		for this purpose. It is recommended that when running <span class="command"><strong>operf</strong></span>
+-		with this option, your current working directory should be <code class="filename">/root</code> or a subdirectory
+-		of <code class="filename">/root</code> to avoid storing sample data files in locations accessible by regular users.
++		with this option, your current working directory should be <code class="filename">~root</code> or a subdirectory
++		of <code class="filename">~root</code> to avoid storing sample data files in locations accessible by regular users.
+ 		</p>
+               </dd>
+               <dt>
+Index: oprofile-1.0.0/doc/oprofile.xml
+===================================================================
+--- oprofile-1.0.0.orig/doc/oprofile.xml	2014-11-03 17:55:31.515034857 +0000
++++ oprofile-1.0.0/doc/oprofile.xml	2014-11-03 17:58:03.719039005 +0000
+@@ -654,8 +654,8 @@
+ 		<emphasis>must</emphasis> stop it in a controlled manner in order to process
+ 		the profile data it has collected.  Use <code>kill -SIGINT &lt;operf-PID&gt;</code>
+ 		for this purpose. It is recommended that when running <command>operf</command>
+-		with this option, your current working directory should be <filename>/root</filename> or a subdirectory
+-		of <filename>/root</filename> to avoid storing sample data files in locations accessible by regular users.
++		with this option, your current working directory should be <filename>~root</filename> or a subdirectory
++		of <filename>~root</filename> to avoid storing sample data files in locations accessible by regular users.
+ 		</para></listitem>
+ 	</varlistentry>
+ 	<varlistentry>

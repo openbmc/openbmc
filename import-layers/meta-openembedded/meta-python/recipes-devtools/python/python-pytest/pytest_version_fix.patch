@@ -1,0 +1,51 @@
+Upstream-Status: Inappropriate (OE specific) 
+
+python-pytest: remove fetch during do_compile phase
+commit: c974fbf9ebf185552ab65301e07af44f36517abf 
+
+introduced an issue by making the version 0.0.0
+this fixes that
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+Index: pytest-3.2.2/setup.py
+===================================================================
+--- pytest-3.2.2.orig/setup.py
++++ pytest-3.2.2/setup.py
+@@ -1,5 +1,6 @@
+ import os
+ import sys
++import re
+ import setuptools
+ import pkg_resources
+ from setuptools import setup, Command
+@@ -22,6 +23,18 @@ classifiers = [
+ with open('README.rst') as fd:
+     long_description = fd.read()
+ 
++def read(*names, **kwargs):
++    with open(os.path.join( *names), 'r') as fp:
++        return fp.read()
++
++def find_version(*file_paths):
++    version_file = read(*file_paths)
++    version_match = re.search(r"^version = ['\']([^'\"]*)['\']",
++                              version_file, re.M)
++
++    if version_match:
++        return version_match.group(1)
++    raise RuntimeError("Unable to find version string.")
+ 
+ def has_environment_marker_support():
+     """
+@@ -59,9 +72,7 @@ def main():
+         name='pytest',
+         description='pytest: simple powerful testing with Python',
+         long_description=long_description,
+-        use_scm_version={
+-            'write_to': '_pytest/_version.py',
+-        },
++	version=find_version("_pytest", "_version.py"),
+         url='http://pytest.org',
+         license='MIT license',
+         platforms=['unix', 'linux', 'osx', 'cygwin', 'win32'],

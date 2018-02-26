@@ -19,6 +19,8 @@ SRC_URI = "${GNU_MIRROR}/libidn/${BPN}-${PV}.tar.gz \
            file://avoid_AM_PROG_MKDIR_P_warning_error_with_automake_1.12.patch \
            file://dont-depend-on-help2man.patch \
            file://0001-idn-fix-printf-format-security-warnings.patch \
+           file://gcc7-compatibility.patch \
+           file://0001-idn-format-security-warnings.patch \
 "
 
 SRC_URI[md5sum] = "a9aa7e003665de9c82bd3f9fc6ccf308"

@@ -24,8 +24,7 @@ if ! $(return >/dev/null 2>&1) ; then
     echo 'Usage: . $OEROOT/scripts/oe-buildenv-internal &&'
     echo ''
     echo 'OpenEmbedded oe-buildenv-internal - an internal script that is'
-    echo 'used in oe-init-build-env and oe-init-build-env-memres to'
-    echo 'initialize oe build environment'
+    echo 'used in oe-init-build-env to initialize oe build environment'
     echo ''
     exit 2
 fi
@@ -106,6 +105,9 @@ fi
 
 BITBAKEDIR=$(readlink -f "$BITBAKEDIR")
 BUILDDIR=$(readlink -f "$BUILDDIR")
+BBPATH=$BUILDDIR
+
+export BBPATH
 
 if [ ! -d "$BITBAKEDIR" ]; then
     echo >&2 "Error: The bitbake directory ($BITBAKEDIR) does not exist!  Please ensure a copy of bitbake exists at this location or specify an alternative path on the command line"

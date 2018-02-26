@@ -1,4 +1,4 @@
-SUMMARY = "A GNU tool that procude shell scripts to automatically configure software"
+SUMMARY = "A GNU tool that produce shell scripts to automatically configure software"
 DESCRIPTION = "Autoconf is an extensible package of M4 macros that produce shell scripts to automatically \ 
 configure software source code packages. Autoconf creates a configuration script for a package from a template \
 file that lists the operating system features that the package can use, in the form of M4 macro calls."

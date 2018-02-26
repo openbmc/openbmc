@@ -1,0 +1,43 @@
+From 1beb0dad6f8b99eb3bf1b9982e0b49e81ff77bbc Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Wed, 23 Nov 2016 19:17:31 +0800
+Subject: [PATCH] Makefile: Add LDFLAGS variable
+
+Add LDFLAGS variable to make sure the extra linkder
+flags can be passed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e20918f..25d92d3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -51,7 +51,7 @@ $(CROSS_COMPILE)agent-proxy: $(OBJS)
+ 	$(CC) -DAGENT_VER=$(AGENTVER) $(LINKFLAGS) $(CFLAGS) -o $(extpath)$@ $(OBJS) wsock32.lib
+ else
+ $(CROSS_COMPILE)agent-proxy: $(OBJS)
+-	$(CC) -DAGENT_VER=$(AGENTVER) $(CFLAGS) -o $(extpath)$@ $(OBJS) $(LDLIBS)
++	$(CC) -DAGENT_VER=$(AGENTVER) $(CFLAGS) $(LDFLAGS) -o $(extpath)$@ $(OBJS) $(LDLIBS)
+ endif
+ 
+ 
+@@ -61,9 +61,9 @@ clean:
+ 	rm -f $(extpath)$(CROSS_COMPILE)agent-proxy $(extpath)agent-proxy $(extpath)*.o $(extpath)*.obj $(extpath)*.exp $(extpath)*.exe $(extpath)*.ilk $(extpath)*.pdb *~
+ 
+ $(extpath)$(CROSS_COMPILE)%.o::%.c
+-	$(CC) -DAGENT_VER=$(AGENTVER) $(CFLAGS) -c $< -o $@
++	$(CC) -DAGENT_VER=$(AGENTVER) $(CFLAGS) $(LDFLAGS) -c $< -o $@
+ 
+ $(extpath)%.obj:%.c
+-	$(CC) -DAGENT_VER=$(AGENTVER) $(CFLAGS) -c -Fo$@ $(TLSPATH_INC) $<
++	$(CC) -DAGENT_VER=$(AGENTVER) $(CFLAGS) $(LDFLAGS) -c -Fo$@ $(TLSPATH_INC) $<
+ 
+ 
+-- 
+2.8.3
+

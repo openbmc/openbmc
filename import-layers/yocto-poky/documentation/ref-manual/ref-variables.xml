@@ -29,7 +29,7 @@
        <link linkend='var-KARCH'>K</link>
        <link linkend='var-LABELS'>L</link>
        <link linkend='var-MACHINE'>M</link>
-<!--               <link linkend='var-glossary-n'>N</link> -->
+       <link linkend='var-NATIVELSBSTRING'>N</link>
        <link linkend='var-OBJCOPY'>O</link>
        <link linkend='var-P'>P</link>
 <!--               <link linkend='var-glossary-q'>Q</link> -->
@@ -321,7 +321,7 @@
                     For information on how the variable works, see the
                     <filename>meta/classes/archiver.bbclass</filename> file
                     in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                 </para>
             </glossdef>
         </glossentry>
@@ -488,7 +488,7 @@
                 <para>
                     For more information see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#automatically-incrementing-a-binary-package-revision-number'>Automatically Incrementing a Binary Package Revision Number</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                     </para>
             </glossdef>
         </glossentry>
@@ -536,7 +536,7 @@
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     The directory within the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                    <link linkend='build-directory'>Build Directory</link>
                     in which the OpenEmbedded build system places generated
                     objects during a recipe's build process.
                     By default, this directory is the same as the <link linkend='var-S'><filename>S</filename></link>
@@ -626,14 +626,14 @@
                     Multilib context.
                     See the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#combining-multiple-versions-library-files-into-one-image'>Combining Multiple Versions of Library Files into One Image</ulink>"
-                    section in the Yocto Project Development Manual for
+                    section in the Yocto Project Development Tasks Manual for
                     information on Multilib.
                 </para>
 
                 <para>
                     The <filename>BASE_LIB</filename> variable is defined in
                     the machine include files in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                     If Multilib is not being used, the value defaults to "lib".
                 </para>
             </glossdef>
@@ -734,7 +734,7 @@
                     variable to "1", "yes", or "true"
                     in your <filename>local.conf</filename> file, which is
                     located in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>:
+                    <link linkend='build-directory'>Build Directory</link>:
                     Here is an example:
                     <literallayout class='monospaced'>
      BB_DANGLINGAPPENDS_WARNONLY = "1"
@@ -759,7 +759,7 @@
                     Disk space monitoring is disabled by default.
                     To enable monitoring, add the <filename>BB_DISKMON_DIRS</filename>
                     variable to your <filename>conf/local.conf</filename> file found in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                     Use the following form:
                     <literallayout class='monospaced'>
      BB_DISKMON_DIRS = "<replaceable>action</replaceable>,<replaceable>dir</replaceable>,<replaceable>threshold</replaceable> [...]"
@@ -852,7 +852,7 @@
                     Defines the disk space and free inode warning intervals.
                     To set these intervals, define the variable in your
                     <filename>conf/local.conf</filename> file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                 </para>
 
                 <para>
@@ -936,7 +936,7 @@
                     </literallayout>
                     Set this variable in your <filename>local.conf</filename>
                     file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                 </para>
             </glossdef>
         </glossentry>
@@ -1154,7 +1154,8 @@
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Lists the layers to enable during the build.
                     This variable is defined in the <filename>bblayers.conf</filename> configuration
-                    file in the <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    file in the
+                    <link linkend='build-directory'>Build Directory</link>.
                     Here is an example:
                     <literallayout class='monospaced'>
      BBLAYERS = " \
@@ -1250,7 +1251,7 @@
      BBMULTIFONFIG = "configA configB configC"
                     </literallayout>
                     Each configuration file you use must reside in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory's</ulink>
+                    <link linkend='build-directory'>Build Directory</link>
                     <filename>conf/multiconfig</filename> directory
                     (e.g.
                     <replaceable>build_directory</replaceable><filename>/conf/multiconfig/configA.conf</filename>).
@@ -1262,7 +1263,7 @@
                     supports building targets with multiple configurations,
                     see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-building-targets-with-multiple-configurations'>Building Targets with Multiple Configurations</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -1280,7 +1281,7 @@
                     <filename>PATH</filename> variable.
                     <note>
                         If you run BitBake from a directory outside of the
-                        <ulink url='&YOCTO_DOCS_DEV_URL;build-directory'>Build Directory</ulink>,
+                        <link linkend='build-directory'>Build Directory</link>,
                         you must be sure to set
                         <filename>BBPATH</filename> to point to the
                         Build Directory.
@@ -1298,29 +1299,29 @@
 
         <glossentry id='var-BBSERVER'><glossterm>BBSERVER</glossterm>
             <info>
-                BBSERVER[doc] = "Points to the server that runs memory-resident BitBake."
+                BBSERVER[doc] = "Points to the BitBake remote server."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Points to the server that runs memory-resident BitBake.
-                    This variable is set by the
-                    <link linkend='structure-memres-core-script'><filename>oe-init-build-env-memres</filename></link>
-                    setup script and should not be hand-edited.
-                    The variable is only used when you employ memory-resident
-                    BitBake.
-                    The setup script exports the value as follows:
+                    If defined in the BitBake environment,
+                    <filename>BBSERVER</filename> points to the BitBake
+                    remote server.
+                </para>
+
+                <para>
+                    Use the following format to export the variable to the
+                    BitBake environment:
                     <literallayout class='monospaced'>
-     export BBSERVER=localhost:$port
+     export BBSERVER=localhost:$port"
                     </literallayout>
                 </para>
 
                 <para>
-                    For more information on how the
-                    <filename>BBSERVER</filename> is used, see the
-                    <filename>oe-init-build-env-memres</filename> script, which
-                    is located in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    By default, <filename>BBSERVER</filename> also appears in
+                    <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_HASHBASE_WHITELIST'><filename>BB_HASHBASE_WHITELIST</filename></ulink>.
+                    Consequently, <filename>BBSERVER</filename> is excluded
+                    from checksum and dependency data.
                 </para>
             </glossdef>
         </glossentry>
@@ -1373,7 +1374,7 @@
                 <para>
                     For more information on how this variable works, see
                     <filename>meta/classes/binconfig.bbclass</filename> in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                     You can also find general information on the class in the
                     "<link linkend='ref-classes-binconfig'><filename>binconfig.bbclass</filename></link>"
                     section.
@@ -1456,6 +1457,51 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-BUILD_AS_ARCH'><glossterm>BUILD_AS_ARCH</glossterm>
+            <info>
+                BUILD_AS_ARCH[doc] = "Specifies the architecture-specific assembler flags for the build host."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the architecture-specific assembler flags for
+                    the build host. By default, the value of
+                    <filename>BUILD_AS_ARCH</filename> is empty.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-BUILD_CC_ARCH'><glossterm>BUILD_CC_ARCH</glossterm>
+            <info>
+                BUILD_CC_ARCH[doc] = "Specifies the architecture-specific C compiler flags for the build host."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the architecture-specific C compiler flags for
+                    the build host. By default, the value of
+                    <filename>BUILD_CC_ARCH</filename> is empty.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-BUILD_CCLD'><glossterm>BUILD_CCLD</glossterm>
+            <info>
+                BUILD_CCLD[doc] = "Specifies the linker command to be used for the build host when the C compiler is being used as the linker."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the linker command to be used for the build host
+                    when the C compiler is being used as the linker. By default,
+                    <filename>BUILD_CCLD</filename> points to GCC and passes as
+                    arguments the value of
+                    <link linkend='var-BUILD_CC_ARCH'><filename>BUILD_CC_ARCH</filename></link>,
+                    assuming <filename>BUILD_CC_ARCH</filename> is set.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-BUILD_CFLAGS'><glossterm>BUILD_CFLAGS</glossterm>
             <info>
                 BUILD_CFLAGS[doc] = "Specifies the flags to pass to the C compiler when building for the build host."
@@ -1502,6 +1548,52 @@
                     <link linkend='var-CXXFLAGS'><filename>CXXFLAGS</filename></link>
                     is set to the value of this variable by default.
                 </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-BUILD_FC'><glossterm>BUILD_FC</glossterm>
+            <info>
+                BUILD_FC[doc] = "Specifies the Fortran compiler command for the build host."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the Fortran compiler command for the build host.
+                    By default, <filename>BUILD_FC</filename> points to
+                    Gfortran and passes as arguments the value of
+                    <link linkend='var-BUILD_CC_ARCH'><filename>BUILD_CC_ARCH</filename></link>,
+                    assuming <filename>BUILD_CC_ARCH</filename> is set.
+               </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-BUILD_LD'><glossterm>BUILD_LD</glossterm>
+            <info>
+                BUILD_LD[doc] = "Specifies the linker command for the build host."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the linker command for the build host. By default,
+                    <filename>BUILD_LD</filename> points to the GNU linker (ld)
+                    and passes as arguments the value of
+                    <link linkend='var-BUILD_LD_ARCH'><filename>BUILD_LD_ARCH</filename></link>,
+                    assuming <filename>BUILD_LD_ARCH</filename> is set.
+               </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-BUILD_LD_ARCH'><glossterm>BUILD_LD_ARCH</glossterm>
+            <info>
+                BUILD_LD_ARCH[doc] = "Specifies architecture-specific linker flags for the build."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies architecture-specific linker flags for the build
+                    host. By default, the value of
+                    <filename>BUILD_LD_ARCH</filename> is empty.
+               </para>
             </glossdef>
         </glossentry>
 
@@ -1578,6 +1670,21 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-BUILD_STRIP'><glossterm>BUILD_STRIP</glossterm>
+            <info>
+                BUILD_STRIP[doc] = "Specifies the command to be used to strip debugging symbols from binaries produced for the build host."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Specifies the command to be used to strip debugging symbols
+                    from binaries produced for the build host. By default,
+                    <filename>BUILD_STRIP</filename> points to
+                    <filename>${</filename><link linkend='var-BUILD_PREFIX'><filename>BUILD_PREFIX</filename></link><filename>}strip</filename>.
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-BUILD_SYS'><glossterm>BUILD_SYS</glossterm>
             <info>
                 BUILD_SYS[doc] = "The toolchain binary prefix used for native recipes."
@@ -1626,14 +1733,12 @@
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Points to the location of the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                     You can define this directory indirectly through the
                     <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>
-                    and
-                    <link linkend='structure-memres-core-script'><filename>oe-init-build-env-memres</filename></link>
-                    scripts by passing in a Build Directory path when you run
-                    the scripts.
-                    If you run the scripts and do not provide a Build Directory
+                    script by passing in a Build Directory path when you run
+                    the script.
+                    If you run the script and do not provide a Build Directory
                     path, the <filename>BUILDDIR</filename> defaults to
                     <filename>build</filename> in the current directory.
                 </para>
@@ -1968,7 +2073,7 @@
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Specifies the directory BitBake uses to store a cache
                     of the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+                    <link linkend='metadata'>Metadata</link>
                     so it does not need to be parsed every time BitBake is
                     started.
                 </para>
@@ -2126,7 +2231,7 @@
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Points to <filename>meta/files/common-licenses</filename>
                     in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>,
+                    <link linkend='source-directory'>Source Directory</link>,
                     which is where generic license files reside.
                 </para>
             </glossdef>
@@ -2207,6 +2312,27 @@
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-COMPONENTS_DIR'><glossterm>COMPONENTS_DIR</glossterm>
+            <info>
+                COMPONENTS_DIR[doc] = "Stores sysroot components for each recipe."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Stores sysroot components for each recipe.
+                    The OpenEmbedded build system uses
+                    <filename>COMPONENTS_DIR</filename> when constructing
+                    recipe-specific sysroots for other recipes.
+                </para>
+
+                <para>
+                    The default is
+                    "<filename>${</filename><link linkend='var-STAGING_DIR'><filename>STAGING_DIR</filename></link><filename>}-components</filename>."
+                    (i.e. "<filename>${</filename><link linkend='var-TMPDIR'><filename>TMPDIR</filename></link><filename>}/sysroots-components</filename>").
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-CONF_VERSION'><glossterm>CONF_VERSION</glossterm>
             <info>
                 CONF_VERSION[doc] = "Tracks the version of local.conf.  Increased each time build/conf/ changes incompatibly."
@@ -2272,7 +2398,7 @@
                     than <filename>/usr/bin</filename>.
                     You can find a list of these variables at the top of the
                     <filename>meta/conf/bitbake.conf</filename> file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                 </note>
             </glossdef>
         </glossentry>
@@ -2315,7 +2441,7 @@
                 <para>
                     For information on creating an initramfs, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -2549,8 +2675,8 @@
                         variable for additional information.
                         You can also reference the
                         "<ulink url='&YOCTO_DOCS_DEV_URL;#providing-license-text'>Providing License Text</ulink>"
-                        section in the Yocto Project Development Manual for
-                        information on providing license text.
+                        section in the Yocto Project Development Tasks Manual
+                        for information on providing license text.
                     </note>
                 </para>
             </glossdef>
@@ -2577,8 +2703,8 @@
                         variable for additional information.
                         You can also reference the
                         "<ulink url='&YOCTO_DOCS_DEV_URL;#providing-license-text'>Providing License Text</ulink>"
-                        section in the Yocto Project Development Manual for
-                        information on providing license text.
+                        section in the Yocto Project Development Tasks Manual
+                        for information on providing license text.
                     </note>
                 </para>
             </glossdef>
@@ -2595,7 +2721,7 @@
                     You should only set this variable in the
                     <filename>local.conf</filename> configuration file found
                     in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                 </para>
 
                 <para>
@@ -2805,7 +2931,8 @@
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     The destination directory.
-                    The location in the <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                    The location in the
+                    <link linkend='build-directory'>Build Directory</link>
                     where components are installed by the
                     <link linkend='ref-tasks-install'><filename>do_install</filename></link>
                     task.
@@ -3116,7 +3243,7 @@
                     system uses to place images, packages, SDKs and other output
                     files that are ready to be used outside of the build system.
                     By default, this directory resides within the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                    <link linkend='build-directory'>Build Directory</link>
                     as <filename>${TMPDIR}/deploy</filename>.
                 </para>
 
@@ -3189,7 +3316,7 @@
                     The directory is machine-specific as it contains the
                     <filename>${MACHINE}</filename> name.
                     By default, this directory resides within the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                    <link linkend='build-directory'>Build Directory</link>
                     as <filename>${DEPLOY_DIR}/images/${MACHINE}/</filename>.
                 </para>
 
@@ -3439,7 +3566,7 @@
                     and resides in the
                     <filename>meta-poky/conf/distro</filename> directory of
                     the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                 </para>
 
                 <para>
@@ -3453,7 +3580,7 @@
                 <para>
                     Distribution configuration files are located in a
                     <filename>conf/distro</filename> directory within the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+                    <link linkend='metadata'>Metadata</link>
                     that contains the distribution configuration.
                     The value for <filename>DISTRO</filename> must not contain
                     spaces, and is typically all lower-case.
@@ -3794,7 +3921,7 @@
                     to touch it.
                     By default, the directory is <filename>downloads</filename>
                     in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                     <literallayout class='monospaced'>
      #DL_DIR ?= "${TOPDIR}/downloads"
                     </literallayout>
@@ -3862,14 +3989,14 @@
 
         <glossentry id='var-EFI_PROVIDER'><glossterm>EFI_PROVIDER</glossterm>
             <info>
-                EFI_PROVIDER[doc] = "When building bootable images (i.e. where hddimg or vmdk is in IMAGE_FSTYPES), the EFI_PROVIDER variable specifies the EFI bootloader to use."
+                EFI_PROVIDER[doc] = "When building bootable images (i.e. where hddimg, iso, or wic.vmdk is in IMAGE_FSTYPES), the EFI_PROVIDER variable specifies the EFI bootloader to use."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     When building bootable images (i.e. where
-                    <filename>hddimg</filename> or <filename>vmdk</filename>
-                    is in
+                    <filename>hddimg</filename>, <filename>iso</filename>,
+                    or <filename>wic.vmdk</filename> is in
                     <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>),
                     the <filename>EFI_PROVIDER</filename> variable specifies
                     the EFI bootloader to use.
@@ -4117,7 +4244,7 @@
                     You can also find information on how to use this variable
                     in the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#building-software-from-an-external-source'>Building Software from an External Source</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -4148,7 +4275,7 @@
                     You can also find information on how to use this variable
                     in the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#building-software-from-an-external-source'>Building Software from an External Source</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -4191,7 +4318,7 @@
                 <para>
                     Typically, you configure this variable in your
                     <filename>local.conf</filename> file, which is found in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                     Although you can use this variable from within a recipe,
                     best practices dictate that you do not.
                     <note>
@@ -4225,8 +4352,8 @@
                      filesystem is read-only. See the
                      "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-read-only-root-filesystem'>Creating a Read-Only Root Filesystem</ulink>"
                      section in the Yocto Project
-                     Development Manual for more
-                     information
+                     Development Tasks Manual for
+                     more information
 
 "tools-debug" - Adds debugging tools such as gdb and
                 strace.
@@ -4252,7 +4379,7 @@
                     For an example that shows how to customize your image by
                     using this variable, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#usingpoky-extend-customimage-imagefeatures'>Customizing Images Using Custom <filename>IMAGE_FEATURES</filename> and <filename>EXTRA_IMAGE_FEATURES</filename></ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -4541,7 +4668,7 @@
                     <filename>/usr/bin</filename>.
                     You can find a list of these variables at the top of the
                     <filename>meta/conf/bitbake.conf</filename> file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                     You will also find the default values of the various
                     <filename>FILES_*</filename> variables in this file.
                 </note>
@@ -4615,7 +4742,8 @@
                     in a directory that has the same name as the corresponding
                     append file.
                     <note>
-                        <para>When extending <filename>FILESEXTRAPATHS</filename>,
+                        <para>When extending
+                        <filename>FILESEXTRAPATHS</filename>,
                         be sure to use the immediate expansion
                         (<filename>:=</filename>) operator.
                         Immediate expansion makes sure that BitBake evaluates
@@ -4624,6 +4752,7 @@
                         some later time when expansion might result in a
                         directory that does not contain the files you need.
                         </para>
+
                         <para>Also, include the trailing separating colon
                         character if you are prepending.
                         The trailing colon character is necessary because you
@@ -4641,10 +4770,34 @@
                 </para>
 
                 <para>
-                    Here is a final example that specifically adds three paths:
+                    This next example specifically adds three paths:
                     <literallayout class='monospaced'>
      FILESEXTRAPATHS_prepend := "path_1:path_2:path_3:"
                     </literallayout>
+                </para>
+
+                <para>
+                    A final example shows how you can extend the search path
+                    and include a
+                    <link linkend='var-MACHINE'><filename>MACHINE</filename></link>-specific
+                    override, which is useful in a BSP layer:
+                    <literallayout class='monospaced'>
+     FILESEXTRAPATHS_prepend_intel-x86-common := "${THISDIR}/${PN}:"
+                    </literallayout>
+                    The previous statement appears in the
+                    <filename>linux-yocto-dev.bbappend</filename> file, which
+                    is found in the Yocto Project
+                    <link linkend='source-repositories'>Source Repositories</link>
+                    in
+                    <filename>meta-intel/common/recipes-kernel/linux</filename>.
+                    Here, the machine override is a special
+                    <link linkend='var-PACKAGE_ARCH'><filename>PACKAGE_ARCH</filename></link>
+                    definition for multiple <filename>meta-intel</filename>
+                    machines.
+                    <note>
+                        For a layer that supports a single BSP, the override
+                        could just be the value of <filename>MACHINE</filename>.
+                    </note>
                 </para>
 
                 <para>
@@ -4707,7 +4860,7 @@
                     The default value for the <filename>FILESPATH</filename>
                     variable is defined in the <filename>base.bbclass</filename>
                     class found in <filename>meta/classes</filename> in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>:
+                    <link linkend='source-directory'>Source Directory</link>:
                     <literallayout class='monospaced'>
      FILESPATH = "${@base_set_filespath(["${FILE_DIRNAME}/${BP}", \
         "${FILE_DIRNAME}/${BPN}", "${FILE_DIRNAME}/files"], d)}"
@@ -4753,7 +4906,7 @@
                 <para>
                     By default, the OpenEmbedded build system uses the <filename>fs-perms.txt</filename>, which
                     is located in the <filename>meta/files</filename> folder in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                     If you create your own file permissions setting table, you should place it in your
                     layer or the distro's layer.
                 </para>
@@ -4761,7 +4914,7 @@
                 <para>
                     You define the <filename>FILESYSTEM_PERMS_TABLES</filename> variable in the
                     <filename>conf/local.conf</filename> file, which is found in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>, to
+                    <link linkend='build-directory'>Build Directory</link>, to
                     point to your custom <filename>fs-perms.txt</filename>.
                     You can specify more than a single file permissions setting table.
                     The paths you specify to these files must be defined within the
@@ -5539,7 +5692,7 @@
                 <para>
                     For more information, see
                     <filename>meta/classes/image_types.bbclass</filename> in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                 </para>
             </glossdef>
         </glossentry>
@@ -5613,7 +5766,7 @@
                     Typically, you configure this variable in an image recipe.
                     Although you can use this variable from your
                     <filename>local.conf</filename> file, which is found in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>,
+                    <link linkend='build-directory'>Build Directory</link>,
                     best practices dictate that you do not.
                     <note>
                         To enable extra features from outside the image recipe,
@@ -5633,7 +5786,7 @@
                     For an example that shows how to customize your image by
                     using this variable, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#usingpoky-extend-customimage-imagefeatures'>Customizing Images Using Custom <filename>IMAGE_FEATURES</filename> and <filename>EXTRA_IMAGE_FEATURES</filename></ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -5662,20 +5815,25 @@
                     <link linkend='var-IMAGE_TYPES'><filename>IMAGE_TYPES</filename></link>.
                 </para>
 
-                <note>
-                    If you add "live" to <filename>IMAGE_FSTYPES</filename>
-                    inside an image recipe, be sure that you do so prior to the
-                    "inherit image" line of the recipe or the live image will
-                    not build.
-                </note>
-
-                <note>
-                    Due to the way this variable is processed, it is not
-                    possible to update its contents using
-                    <filename>_append</filename> or
-                    <filename>_prepend</filename>. To add one or more
-                    additional options to this variable the
-                    <filename>+=</filename> operator must be used.
+                <note><title>Notes</title>
+                    <itemizedlist>
+                        <listitem><para>
+                            If you add "live" to
+                            <filename>IMAGE_FSTYPES</filename> inside an image
+                            recipe, be sure that you do so prior to the
+                            "inherit image" line of the recipe or the live
+                            image will not build.
+                            </para></listitem>
+                        <listitem><para>
+                            Due to the way the OpenEmbedded build system
+                            processes this variable, you cannot update its
+                            contents by using <filename>_append</filename> or
+                            <filename>_prepend</filename>.
+                            You must use the <filename>+=</filename>
+                            operator to add one or more options to the
+                            <filename>IMAGE_FSTYPES</filename> variable.
+                            </para></listitem>
+                    </itemizedlist>
                 </note>
             </glossdef>
         </glossentry>
@@ -5703,7 +5861,7 @@
                         not be affected by <filename>IMAGE_INSTALL</filename>.
                         For information on creating an initramfs, see the
                         "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
-                        section in the Yocto Project Development Manual.
+                        section in the Yocto Project Development Tasks Manual.
                     </note>
                 </para>
 
@@ -6188,7 +6346,6 @@
      jffs2
      jffs2.sum
      multiubi
-     qcow2
      squashfs
      squashfs-lzo
      squashfs-xz
@@ -6199,8 +6356,6 @@
      tar.xz
      ubi
      ubifs
-     vdi
-     vmdk
      wic
      wic.bz2
      wic.gz
@@ -6212,7 +6367,7 @@
                     For more information about these types of images, see
                     <filename>meta/classes/image_types*.bbclass</filename>
                     in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                 </para>
             </glossdef>
         </glossentry>
@@ -6455,7 +6610,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     The default value of this variable, which is set in the
                     <filename>meta/conf/bitbake.conf</filename> configuration
                     file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>,
+                    <link linkend='source-directory'>Source Directory</link>,
                     is "cpio.gz".
                     The Linux kernel's initramfs mechanism, as opposed to the
                     initial RAM filesystem
@@ -6477,32 +6632,38 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <link linkend='var-PROVIDES'><filename>PROVIDES</filename></link>
                     name of an image recipe that is used to build an initial
                     RAM filesystem (initramfs) image.
-                    An initramfs provides a temporary root filesystem used for
-                    early system initialization (e.g. loading of modules
-                    needed to locate and mount the "real" root filesystem).
-                    The specified recipe is added as a dependency of the root
-                    filesystem recipe (e.g.
-                    <filename>core-image-sato</filename>).
-                    See the <filename>meta/recipes-core/images/core-image-minimal-initramfs.bb</filename>
-                    recipe in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
-                    for an example initramfs recipe.
-                    To select this recipe to provide the initramfs,
-                    set <filename>INITRAMFS_IMAGE</filename> to
-                    "core-image-minimal-initramfs".
+                    In other words, the <filename>INITRAMFS_IMAGE</filename>
+                    variable causes an additional recipe to be built as
+                    a dependency to whatever root filesystem recipe you
+                    might be using (e.g. <filename>core-image-sato</filename>).
+                    The initramfs image recipe you provide should set
+                    <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
+                    to
+                    <link linkend='var-INITRAMFS_FSTYPES'><filename>INITRAMFS_FSTYPES</filename></link>.
+                </para>
+
+                <para>
+                    An initramfs image provides a temporary root filesystem
+                    used for early system initialization (e.g. loading of
+                    modules needed to locate and mount the "real" root
+                    filesystem).
                     <note>
-                        The initramfs image recipe should set
-                        <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
-                        to
-                        <link linkend='var-INITRAMFS_FSTYPES'><filename>INITRAMFS_FSTYPES</filename></link>.
+                        See the <filename>meta/recipes-core/images/core-image-minimal-initramfs.bb</filename>
+                        recipe in the
+                        <link linkend='source-directory'>Source Directory</link>
+                        for an example initramfs recipe.
+                        To select this sample recipe as the one built
+                        to provide the initramfs image,
+                        set <filename>INITRAMFS_IMAGE</filename> to
+                        "core-image-minimal-initramfs".
                     </note>
                 </para>
 
                 <para>
                     You can also find more information by referencing the
-                    <filename>meta/poky/conf/local.conf.sample.extended</filename>
+                    <filename>meta-poky/conf/local.conf.sample.extended</filename>
                     configuration file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>,
+                    <link linkend='source-directory'>Source Directory</link>,
                     the
                     <link linkend='ref-classes-image'><filename>image</filename></link>
                     class, and the
@@ -6513,7 +6674,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
                 <para>
                     If <filename>INITRAMFS_IMAGE</filename> is empty, which is
-                    the default, then no initramfs is built.
+                    the default, then no initramfs image is built.
                 </para>
 
                 <para>
@@ -6521,10 +6682,10 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <link linkend='var-INITRAMFS_IMAGE_BUNDLE'><filename>INITRAMFS_IMAGE_BUNDLE</filename></link>
                     variable, which allows the generated image to be bundled
                     inside the kernel image.
-                    Additionally, for information on creating an initramfs, see
-                    the
+                    Additionally, for information on creating an initramfs
+                    image, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -6562,7 +6723,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     The combined binary is deposited into the
                     <filename>tmp/deploy</filename> directory, which is part
                     of the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                 </para>
 
                 <para>
@@ -6591,7 +6752,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     file for additional information.
                     Also, for information on creating an initramfs, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -6862,12 +7023,13 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     Values for this variable are set in the kernel's recipe
                     file and the kernel's append file.
-                    For example, if you are using the Yocto Project kernel that
-                    is based on the Linux 3.14 kernel, the kernel recipe file
-                    is the
-                    <filename>meta/recipes-kernel/linux/linux-yocto_3.14.bb</filename>
+                    For example, if you are using the
+                    <filename>linux-yocto_4.12</filename> kernel, the kernel
+                    recipe file is the
+                    <filename>meta/recipes-kernel/linux/linux-yocto_4.12.bb</filename>
                     file.
-                    Following is an example for a kernel recipe file:
+                    <filename>KBRANCH</filename> is set as follows in that
+                    kernel recipe file:
                     <literallayout class='monospaced'>
      KBRANCH ?= "standard/base"
                     </literallayout>
@@ -6877,21 +7039,25 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     This variable is also used from the kernel's append file
                     to identify the kernel branch specific to a particular
                     machine or target hardware.
-                    The kernel's append file is located in the BSP layer for
-                    a given machine.
-                    For example, the kernel append file for the Emenlow BSP is in the
-                    <filename>meta-intel</filename> Git repository and is named
-                    <filename>meta-emenlow/recipes-kernel/linux/linux-yocto_3.14.bbappend</filename>.
-                    Here are the related statements from the append file:
+                    Continuing with the previous kernel example, the kernel's
+                    append file (i.e.
+                    <filename>linux-yocto_4.12.bbappend</filename>) is located
+                    in the BSP layer for a given machine.
+                    For example, the append file for the Beaglebone,
+                    EdgeRouter, and generic versions of both 32 and 64-bit IA
+                    machines (<filename>meta-yocto-bsp</filename>) is named
+                    <filename>meta-yocto-bsp/recipes-kernel/linux/linux-yocto_4.12.bbappend</filename>.
+                    Here are the related statements from that append file:
                     <literallayout class='monospaced'>
-     COMPATIBLE_MACHINE_emenlow-noemgd = "emenlow-noemgd"
-     KMACHINE_emenlow-noemgd = "emenlow"
-     KBRANCH_emenlow-noemgd = "standard/base"
-     KERNEL_FEATURES_append_emenlow-noemgd = " features/drm-gma500/drm-gma500.scc"
+     KBRANCH_genericx86  = "standard/base"
+     KBRANCH_genericx86-64  = "standard/base"
+     KBRANCH_edgerouter = "standard/edgerouter"
+     KBRANCH_beaglebone = "standard/beaglebone"
+     KBRANCH_mpc8315e-rdb = "standard/fsl-mpc8315e-rdb"
                     </literallayout>
-                        The <filename>KBRANCH</filename> statement identifies
-                        the kernel branch to use when building for the Emenlow
-                        BSP.
+                        The <filename>KBRANCH</filename> statements identify
+                        the kernel branch to use when building for each
+                        supported BSP.
                 </para>
             </glossdef>
         </glossentry>
@@ -6913,20 +7079,23 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Typically, when using a <filename>defconfig</filename> to
                     configure a kernel during a build, you place the
                     file in your layer in the same manner as you would
-                    patch files and configuration fragment files (i.e.
+                    place patch files and configuration fragment files (i.e.
                     "out-of-tree").
                     However, if you want to use a <filename>defconfig</filename>
                     file that is part of the kernel tree (i.e. "in-tree"),
                     you can use the
-                    <filename>KBUILD_DEFCONFIG</filename> variable to point
-                    to the <filename>defconfig</filename> file.
+                    <filename>KBUILD_DEFCONFIG</filename> variable and append
+                    the
+                    <link linkend='var-KMACHINE'><filename>KMACHINE</filename></link>
+                    variable to point to the <filename>defconfig</filename>
+                    file.
                 </para>
 
                 <para>
                     To use the variable, set it in the append file for your
                     kernel recipe using the following form:
                     <literallayout class='monospaced'>
-     KBUILD_DEFCONFIG_<link linkend='var-KMACHINE'>KMACHINE</link> ?= <replaceable>defconfig_file</replaceable>
+     KBUILD_DEFCONFIG_<replaceable>KMACHINE</replaceable> ?= <replaceable>defconfig_file</replaceable>
                     </literallayout>
                     Here is an example from a "raspberrypi2"
                     <filename>KMACHINE</filename> build that uses a
@@ -7028,41 +7197,50 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
         <glossentry id='var-KERNEL_FEATURES'><glossterm>KERNEL_FEATURES</glossterm>
             <info>
-                KERNEL_FEATURES[doc] = "Includes additional metadata from the Yocto Project kernel Git repository. The metadata you add through this variable includes config fragments and features descriptions."
+                KERNEL_FEATURES[doc] = "Includes additional kernel metadata. The metadata you add through this variable includes config fragments and features descriptions."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    Includes additional metadata from the Yocto Project kernel Git repository.
-                    In the OpenEmbedded build system, the default Board Support Packages (BSPs)
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+                    Includes additional kernel metadata.
+                    In the OpenEmbedded build system, the default Board Support
+                    Packages (BSPs)
+                    <link linkend='metadata'>Metadata</link>
                     is provided through
                     the <link linkend='var-KMACHINE'><filename>KMACHINE</filename></link>
-                    and <link linkend='var-KBRANCH'><filename>KBRANCH</filename></link> variables.
-                    You can use the <filename>KERNEL_FEATURES</filename> variable to further
-                    add metadata for all BSPs.
+                    and
+                    <link linkend='var-KBRANCH'><filename>KBRANCH</filename></link>
+                    variables.
+                    You can use the <filename>KERNEL_FEATURES</filename>
+                    variable from within the kernel recipe or kernel append
+                    file to further add metadata for all BSPs or specific
+                    BSPs.
                 </para>
 
                 <para>
-                    The metadata you add through this variable includes config fragments and
-                    features descriptions,
+                    The metadata you add through this variable includes config
+                    fragments and features descriptions,
                     which usually includes patches as well as config fragments.
-                    You typically override the <filename>KERNEL_FEATURES</filename> variable
-                    for a specific machine.
-                    In this way, you can provide validated, but optional, sets of kernel
-                    configurations and features.
+                    You typically override the
+                    <filename>KERNEL_FEATURES</filename> variable for a
+                    specific machine.
+                    In this way, you can provide validated, but optional,
+                    sets of kernel configurations and features.
                 </para>
 
                 <para>
-                    For example, the following adds <filename>netfilter</filename> to all
-                    the Yocto Project kernels and adds sound support to the <filename>qemux86</filename>
-                    machine:
+                    For example, the following example from the
+                    <filename>linux-yocto-rt_4.12</filename> kernel recipe
+                    adds "netfilter" and "taskstats" features to all BSPs
+                    as well as "virtio" configurations to all QEMU machines.
+                    The last two statements add specific configurations to
+                    targeted machine types:
                     <literallayout class='monospaced'>
-     # Add netfilter to all linux-yocto kernels
-     KERNEL_FEATURES="features/netfilter/netfilter.scc"
-
-     # Add sound support to the qemux86 machine
-     KERNEL_FEATURES_append_qemux86=" cfg/sound.scc"
+     KERNEL_EXTRA_FEATURES ?= "features/netfilter/netfilter.scc features/taskstats/taskstats.scc"
+     KERNEL_FEATURES_append = " ${KERNEL_EXTRA_FEATURES}"
+     KERNEL_FEATURES_append_qemuall=" cfg/virtio.scc"
+     KERNEL_FEATURES_append_qemux86=" cfg/sound.scc cfg/paravirt_kvm.scc"
+     KERNEL_FEATURES_append_qemux86-64=" cfg/sound.scc"
                     </literallayout></para>
             </glossdef>
         </glossentry>
@@ -7739,7 +7917,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <link linkend='var-COPY_LIC_MANIFEST'><filename>COPY_LIC_MANIFEST</filename></link>
                     variable, and the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#providing-license-text'>Providing License Text</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -7838,7 +8016,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     defines the search
                     arguments used by the kernel tools to find the appropriate
                     description within the kernel
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+                    <link linkend='metadata'>Metadata</link>
                     with which to build out the sources and configuration.
                     </para>
             </glossdef>
@@ -7942,7 +8120,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Specifies the target device for which the image is built.
                     You define <filename>MACHINE</filename> in the
                     <filename>local.conf</filename> file found in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                     By default, <filename>MACHINE</filename> is set to
                     "qemux86", which is an x86-based architecture machine to
                     be emulated using QEMU:
@@ -7957,7 +8135,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Thus, when <filename>MACHINE</filename> is set to "qemux86" there
                     exists the corresponding <filename>qemux86.conf</filename> machine
                     configuration file, which can be found in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <link linkend='source-directory'>Source Directory</link>
                     in <filename>meta/conf/machine</filename>.
                 </para>
 
@@ -8708,6 +8886,29 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             </glossdef>
         </glossentry>
 
+        <glossentry id='var-NOAUTOPACKAGEDEBUG'><glossterm>NOAUTOPACKAGEDEBUG</glossterm>
+            <info>
+                NOAUTOPACKAGEDEBUG[doc] = "Disables auto package from splitting .debug files."
+            </info>
+            <glossdef>
+                <para role="glossdeffirst">
+<!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
+                    Disables auto package from splitting
+                    <filename>.debug</filename> files. If a recipe requires
+                    <filename>FILES_${PN}-dbg</filename> to be set manually,
+                    the <filename>NOAUTOPACKAGEDEBUG</filename> can be defined
+                    allowing you to define the content of the debug package.
+                    For example:
+                    <literallayout class='monospaced'>
+     NOAUTOPACKAGEDEBUG = "1"
+     FILES_${PN}-dev = "${includedir}/${QT_DIR_NAME}/Qt/*"
+     FILES_${PN}-dbg = "/usr/src/debug/"
+     FILES_${QT_BASE_NAME}-demos-doc = "${docdir}/${QT_DIR_NAME}/qch/qt.qch"
+                    </literallayout>
+                </para>
+            </glossdef>
+        </glossentry>
+
         <glossentry id='var-NOHDD'><glossterm>NOHDD</glossterm>
             <info>
                 NOHDD[doc] = "Causes the OpenEmbedded build system to skip building the .hddimg image."
@@ -8798,7 +8999,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     See the <filename>meta/classes/binconfig.bbclass</filename>
                     in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <link linkend='source-directory'>Source Directory</link>
                     for details on how this class applies these additional
                     sed command arguments.
                     For general information on the
@@ -8863,7 +9064,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <filename>-c devshell</filename> command-line option).
                     For more information, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-appdev-devshell'>Using a Development Shell</ulink>" section
-                    in the Yocto Project Development Manual.
+                    in the Yocto Project Development Tasks Manual.
                  </para>
 
                  <para>
@@ -8891,19 +9092,17 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     The directory from which the top-level build environment
                     setup script is sourced.
-                    The Yocto Project makes two top-level build environment
-                    setup scripts available:
-                    <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>
-                    and
-                    <link linkend='structure-memres-core-script'><filename>oe-init-build-env-memres</filename></link>.
-                    When you run one of these scripts, the
+                    The Yocto Project provides a top-level build environment
+                    setup script:
+                    <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>.
+                    When you run this script, the
                     <filename>OEROOT</filename> variable resolves to the
                     directory that contains the script.
                 </para>
 
                 <para>
                     For additional information on how this variable is used,
-                    see the initialization scripts.
+                    see the initialization script.
                 </para>
             </glossdef>
         </glossentry>
@@ -9086,7 +9285,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     This variable, which is set in the
                     <filename>local.conf</filename> configuration file found in
                     the <filename>conf</filename> folder of the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>,
+                    <link linkend='build-directory'>Build Directory</link>,
                     specifies the package manager the OpenEmbedded build system
                     uses when packaging data.
                 </para>
@@ -9179,7 +9378,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     You can find out more about debugging using GDB by reading
                     the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#platdev-gdb-remotedebug'>Debugging With the GNU Project Debugger (GDB) Remotely</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -9466,7 +9665,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     variable.
                     For information on creating an initramfs, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#building-an-initramfs-image'>Building an Initial RAM Filesystem (initramfs) Image</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -9522,7 +9721,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     For information on running post-installation scripts, see
                     the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#new-recipe-post-installation-scripts'>Post-Installation Scripts</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -9654,7 +9853,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
         <glossentry id='var-PACKAGECONFIG_CONFARGS'><glossterm>PACKAGECONFIG_CONFARGS</glossterm>
             <info>
-                PACKAGECONFIG_CONFARGS[doc] = "A space-separated list of configuration options generated from PACKAGECONFIG."
+                PACKAGECONFIG_CONFARGS[doc] = "A space-separated list of configuration options generated from the PACKAGECONFIG setting."
             </info>
             <glossdef>
                 <para role="glossdeffirst">
@@ -9789,7 +9988,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     For an example of how to use the <filename>PACKAGES_DYNAMIC</filename>
                     variable when you are splitting packages, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#handling-optional-module-packaging'>Handling Optional Module Packaging</ulink>" section
-                    in the Yocto Project Development Manual.
+                    in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -9854,7 +10053,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                         the recipe as a workaround.
                         For information on addressing race conditions, see the
                         "<ulink url='&YOCTO_DOCS_DEV_URL;#debugging-parallel-make-races'>Debugging Parallel Make Races</ulink>"
-                        section in the Yocto Project Development Manual.
+                        section in the Yocto Project Development Tasks Manual.
                     </note>
                     For single socket systems (i.e. one CPU), you should not
                     have to override this variable to gain optimal parallelism
@@ -9903,7 +10102,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                         the recipe as a workaround.
                         For information on addressing race conditions, see the
                         "<ulink url='&YOCTO_DOCS_DEV_URL;#debugging-parallel-make-races'>Debugging Parallel Make Races</ulink>"
-                        section in the Yocto Project Development Manual.</para>
+                        section in the Yocto Project Development Tasks Manual.
+                        </para>
                     </note>
                 </para>
             </glossdef>
@@ -10385,7 +10585,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     cumbersome and error-prone, an automated solution exists.
                     See the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#working-with-a-pr-service'>Working With a PR Service</ulink>"
-                    section for more information.
+                    section in the Yocto Project Development Tasks Manual
+                    for more information.
                 </para>
             </glossdef>
         </glossentry>
@@ -10409,6 +10610,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
      PREFERRED_PROVIDER_virtual/xserver = "xserver-xf86"
      PREFERRED_PROVIDER_virtual/libgl ?= "mesa"
                     </literallayout>
+                    For more information see:
+                    <link linkend='metadata-virtual-providers'>Metadata (Virtual Providers)</link>
                     <note>
                         If you set <filename>PREFERRED_PROVIDER</filename>
                         for a <filename>virtual/*</filename> item, then any
@@ -10445,7 +10648,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     Here are two examples:
                     <literallayout class='monospaced'>
      PREFERRED_VERSION_python = "3.4.0"
-     PREFERRED_VERSION_linux-yocto = "3.19%"
+     PREFERRED_VERSION_linux-yocto = "4.12%"
                     </literallayout>
                     <note>
                         The specified version is matched against
@@ -10480,14 +10683,14 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     to set a machine-specific override.
                     Here is an example:
                     <literallayout class='monospaced'>
-     PREFERRED_VERSION_linux-yocto_qemux86 = "3.4%"
+     PREFERRED_VERSION_linux-yocto_qemux86 = "4.12%"
                     </literallayout>
                     Although not recommended, worst case, you can also use the
                     "forcevariable" override, which is the strongest override
                     possible.
                     Here is an example:
                     <literallayout class='monospaced'>
-     PREFERRED_VERSION_linux-yocto_forcevariable = "3.4%"
+     PREFERRED_VERSION_linux-yocto_forcevariable = "4.12%"
                     </literallayout>
                     <note>
                         The <filename>_forcevariable</filename> override is
@@ -10532,7 +10735,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     build system to attempt before any others by adding
                     something like the following to the
                     <filename>local.conf</filename> configuration file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>:
+                    <link linkend='build-directory'>Build Directory</link>:
                     <literallayout class='monospaced'>
      PREMIRRORS_prepend = "\
      git://.*/.* http://www.yoctoproject.org/sources/ \n \
@@ -10710,7 +10913,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     The <filename>conf/local.conf.sample.extended</filename>
                     configuration file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <link linkend='source-directory'>Source Directory</link>
                     shows how the <filename>PRSERV_HOST</filename> variable is
                     set:
                     <literallayout class='monospaced'>
@@ -11494,7 +11697,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     The location in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                    <link linkend='build-directory'>Build Directory</link>
                     where unpacked recipe source code resides.
                     By default, this directory is
                     <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}/${</filename><link linkend='var-BPN'><filename>BPN</filename></link><filename>}-${</filename><link linkend='var-PV'><filename>PV</filename></link><filename>}</filename>,
@@ -11502,7 +11705,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     and <filename>${PV}</filename> is the recipe version.
                     If the source tarball extracts the code to a directory
                     named anything other than <filename>${BPN}-${PV}</filename>,
-                    or if the source code if fetched from an SCM such as
+                    or if the source code is fetched from an SCM such as
                     Git or Subversion, then you must set <filename>S</filename>
                     in the recipe so that the OpenEmbedded build system
                     knows where to find the unpacked source.
@@ -11510,7 +11713,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
                 <para>
                     As an example, assume a
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <link linkend='source-directory'>Source Directory</link>
                     top-level folder named <filename>poky</filename> and a
                     default Build Directory at <filename>poky/build</filename>.
                     In this case, the work directory the build system uses
@@ -12412,7 +12615,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     To enable file removal, set the variable to "1" in your
                     <filename>conf/local.conf</filename> configuration file
                     in your:
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                     <literallayout class='monospaced'>
      SKIP_FILEDEPS = "1"
                     </literallayout>
@@ -12619,7 +12822,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                         <listitem><para><emphasis><filename>file://</filename> -</emphasis>
                             Fetches files, which are usually files shipped with
                             the
-                            <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>,
+                            <link linkend='metadata'>Metadata</link>,
                             from the local machine.
                             The path is relative to the
                             <link linkend='var-FILESPATH'><filename>FILESPATH</filename></link>
@@ -12819,7 +13022,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     The <filename>SRCPV</filename> variable is defined in the
                     <filename>meta/conf/bitbake.conf</filename> configuration
                     file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <link linkend='source-directory'>Source Directory</link>
                     as follows:
                     <literallayout class='monospaced'>
      SRCPV = "${@bb.fetch2.get_srcrev(d)}"
@@ -12863,7 +13066,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                         <link linkend='var-AUTOREV'><filename>AUTOREV</filename></link>
                         variable description and the
                         "<ulink url='&YOCTO_DOCS_DEV_URL;#automatically-incrementing-a-binary-package-revision-number'>Automatically Incrementing a Binary Package Revision Number</ulink>"
-                        section, which is in the Yocto Project Development Manual.
+                        section, which is in the Yocto Project Development
+                        Tasks Manual.
                     </note>
                 </para>
 
@@ -13116,7 +13320,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <link linkend='var-SYSROOT_DIRS'><filename>SYSROOT_DIRS</filename></link>
                     variable and the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#new-sharing-files-between-recipes'>Sharing Files Between Recipes</ulink>"
-                    section for more information.
+                    section in the Yocto Project Development Tasks Manual
+                    for more information.
                     <note>
                         Recipes should never write files directly under
                         the <filename>STAGING_DIR</filename> directory because
@@ -13583,15 +13788,12 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     Points to the temporary directory under the work directory
                     (default
-                    <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}/sysroot-destidir</filename>)
+                    "<filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}/sysroot-destdir</filename>")
                     where the files
                     that will be populated into the sysroot are assembled
                     during the
                     <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>
                     task.
-                    <literallayout class='monospaced'>
-     SYSROOT_DESTDIR ?= "console=ttyS0,115200"
-                    </literallayout>
                 </para>
             </glossdef>
         </glossentry>
@@ -14026,7 +14228,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     See the
                     <filename>meta/conf/machine/include/arm/feature-arm-thumb.inc</filename>
                     file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <link linkend='source-directory'>Source Directory</link>
                     for an example.
                 </para>
             </glossdef>
@@ -14292,7 +14494,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     The suffix identifies the <filename>libc</filename> variant
                     for building.
                     When you are building for multiple variants with the same
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>,
+                    <link linkend='build-directory'>Build Directory</link>,
                     this mechanism ensures that output for different
                     <filename>libc</filename> variants is kept separate to
                     avoid potential conflicts.
@@ -14450,7 +14652,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     <filename>ssh</filename>.
                     You can set this variable to "1" in your
                     <filename>local.conf</filename> file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>
+                    <link linkend='build-directory'>Build Directory</link>
                     to have the OpenEmbedded build system automatically run
                     these tests after an image successfully builds:
                     <literallayout class='monospaced'>
@@ -14459,7 +14661,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     For more information on enabling, running, and writing
                     these tests, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
-                    section in the Yocto Project Development Manual and the
+                    section in the Yocto Project Development Tasks Manual and
+                    the
                     "<link linkend='ref-classes-testimage*'><filename>testimage*.bbclass</filename></link>"
                     section.
                 </para>
@@ -14543,7 +14746,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     For more information on testing images, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -14650,8 +14853,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                             Boots a QEMU image and runs the tests.
                             See the
                             "<ulink url='&YOCTO_DOCS_DEV_URL;#qemu-image-enabling-tests'>Enabling Runtime Tests on QEMU</ulink>"
-                            section in the Yocto Project Development Manual for
-                            more information.
+                            section in the Yocto Project Development Tasks
+                            Manual for more information.
                             </para></listitem>
                         <listitem><para><emphasis>"simpleremote" and "SimpleRemoteTarget":</emphasis>
                             Runs the tests on target hardware that is already
@@ -14683,7 +14886,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     For information on running tests on hardware, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#hardware-image-enabling-tests'>Enabling Runtime Tests on Hardware</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -14772,7 +14975,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     For more information on testing images, see the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#performing-automated-runtime-testing'>Performing Automated Runtime Testing</ulink>"
-                    section in the Yocto Project Development Manual.
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -14818,7 +15021,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     files (other than the shared state cache).
                     By default, the <filename>TMPDIR</filename> variable points
                     to <filename>tmp</filename> within the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                 </para>
 
                 <para>
@@ -14826,7 +15029,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     than the default, you can uncomment and edit the following
                     statement in the
                     <filename>conf/local.conf</filename> file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>:
+                    <link linkend='source-directory'>Source Directory</link>:
                     <literallayout class='monospaced'>
      #TMPDIR = "${TOPDIR}/tmp"
                     </literallayout>
@@ -14872,8 +15075,9 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     variable, but you can add additional packages to the list.
                     See the
                     "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-adding-individual-packages'>Adding Individual Packages to the Standard SDK</ulink>"
-                    section in the Yocto Project Software Development Kit (SDK)
-                    Developer's Guide for more information.
+                    section in the Yocto Project Application Development and
+                    the Extensible Software Development Kit (eSDK) manual
+                    for more information.
                 </para>
 
                 <para>
@@ -14883,7 +15087,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     section.
                     For information on setting up a cross-development
                     environment, see the
-                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
+                    <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Application Development and the Extensible Software Development Kit (eSDK)</ulink>
+                    manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -14929,8 +15134,9 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     part of the SDK that runs on the target.
                     See the
                     "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-adding-individual-packages'>Adding Individual Packages to the Standard SDK</ulink>"
-                    section in the Yocto Project Software Development Kit (SDK)
-                    Developer's Guide for more information.
+                    section in the Yocto Project Application Development and
+                    the Extensible Software Development Kit (eSDK) manual for
+                    more information.
                 </para>
 
                 <para>
@@ -14940,7 +15146,8 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     section.
                     For information on setting up a cross-development
                     environment, see the
-                    <ulink url='&YOCTO_DOCS_SDK_URL;#sdk-manual'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
+                    <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Application Development and the Extensible Software Development Kit (eSDK)</ulink>
+                    manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -14953,12 +15160,10 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     The top-level
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+                    <link linkend='build-directory'>Build Directory</link>.
                     BitBake automatically sets this variable when you
-                    initialize your build environment using either
-                    <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>
-                    or
-                    <link linkend='structure-memres-core-script'><filename>oe-init-build-env-memres</filename></link>.
+                    initialize your build environment using
+                    <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>.
                 </para>
             </glossdef>
         </glossentry>
@@ -15010,7 +15215,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     For example, the
                     <filename>meta/conf/machine/include/mips/README</filename>
                     file in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <link linkend='source-directory'>Source Directory</link>
                     provides information for <filename>TUNE_ARCH</filename>
                     specific to the <filename>mips</filename> architecture.
                 </para>
@@ -15293,7 +15498,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     Known tuning conflicts are specified in the machine include
                     files in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                     Here is an example from the
                     <filename>meta/conf/machine/include/mips/arch-mips.inc</filename>
                     include file that lists the "o32" and "n64" features as
@@ -15325,7 +15530,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
 
                 <para>
                     See the machine include files in the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>
+                    <link linkend='source-directory'>Source Directory</link>
                     for these features.
                 </para>
             </glossdef>
@@ -15662,7 +15867,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                 <para>
                     See the
                     "<ulink url='&YOCTO_DOCS_DEV_URL;#selecting-dev-manager'>Selecting a Device Manager</ulink>"
-                    section in the Yocto Project Development Manual for
+                    section in the Yocto Project Development Tasks Manual for
                     information on how to use this variable.
                 </para>
             </glossdef>
@@ -15717,7 +15922,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     For more information, see
                     <filename>meta-poky/conf/local.conf.sample</filename> in
                     the
-                    <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+                    <link linkend='source-directory'>Source Directory</link>.
                 </para>
             </glossdef>
         </glossentry>
@@ -16056,12 +16261,13 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     kickstart file that is used by the OpenEmbedded build
                     system to create a partitioned image
                     (<replaceable>image</replaceable><filename>.wic</filename>).
-                    For information on how to create a
-                    partitioned image, see the
-                    "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-wic-images-oe'>Creating Partitioned Images</ulink>"
-                    section.
+                    For information on how to create a partitioned image, see
+                    the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-partitioned-images-using-wic'>Creating Partitioned Images Using Wic</ulink>"
+                    section in the Yocto Project Development Tasks Manual.
                     For details on the kickstart file format, see the
-                    "<ulink url='&YOCTO_DOCS_DEV_URL;#openembedded-kickstart-wks-reference'>OpenEmbedded Kickstart (<filename>.wks</filename>) Reference</ulink>.
+                    "<link linkend='openembedded-kickstart-wks-reference'>OpenEmbedded Kickstart (<filename>.wks</filename>) Reference</link>
+                    Chapter.
                 </para>
             </glossdef>
         </glossentry>

@@ -5,6 +5,7 @@
 # Filename: alsa-state.bb
 
 SUMMARY = "Alsa scenario files to enable alsa state restoration"
+HOMEPAGE = "http://www.alsa-project.org/"
 DESCRIPTION = "Alsa Scenario Files - an init script and state files to restore \
 sound state at system boot and save it at system shut down."
 LICENSE = "MIT"

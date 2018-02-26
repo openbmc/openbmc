@@ -1,0 +1,30 @@
+From 2a50154fbce38fd36be7e14f5cd4a8b03c65c72f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Aug 2017 11:15:37 -0700
+Subject: [PATCH 2/2] Do not undef _GNU_SOURCE
+
+There are functions from tcp.h which are under _GNU_SOURCE
+in musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/trace-tcp.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/trace-tcp.c b/src/trace-tcp.c
+index 62d22ff..380008e 100644
+--- a/src/trace-tcp.c
++++ b/src/trace-tcp.c
+@@ -21,7 +21,6 @@
+ # include <config.h>
+ #endif
+ 
+-#undef _GNU_SOURCE
+ #define _DEFAULT_SOURCE 1
+ 
+ #include <string.h>
+-- 
+2.14.1
+

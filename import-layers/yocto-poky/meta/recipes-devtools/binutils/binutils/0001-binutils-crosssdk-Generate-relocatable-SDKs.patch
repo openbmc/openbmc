@@ -1,4 +1,4 @@
-From 689d011688b5ff9481d4367bef3dea7a7b2867fb Mon Sep 17 00:00:00 2001
+From 58ac9f95a3d83c29efaf7a8906fb6aefea8c8e79 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:58:54 +0000
 Subject: [PATCH 01/15] binutils-crosssdk: Generate relocatable SDKs
@@ -43,7 +43,7 @@ index b6940d376d..a42c4d7a4b 100755
  LD_FLAG=
  DATA_ALIGNMENT=${DATA_ALIGNMENT_}
 diff --git a/ld/scripttempl/elf.sc b/ld/scripttempl/elf.sc
-index e65f9a3ccf..d99d2c1d2a 100644
+index d9138bc059..e48faeca43 100644
 --- a/ld/scripttempl/elf.sc
 +++ b/ld/scripttempl/elf.sc
 @@ -138,8 +138,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then
@@ -58,5 +58,5 @@ index e65f9a3ccf..d99d2c1d2a 100644
  if test -z "$PLT"; then
    IPLT=".iplt         ${RELOCATING-0} : { *(.iplt) }"
 -- 
-2.12.0
+2.14.0
 

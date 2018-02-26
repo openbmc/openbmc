@@ -1,0 +1,21 @@
+getrandom() is only available in glibc 2.25+ and uninative may relocate 
+binaries onto systems that don't have this function. For now, force the 
+code to the older codepath until we can come up with a better solution 
+for this kind of issue.
+
+Upstream-Status: Inappropriate
+RP
+2016/8/15
+
+Index: util-linux-2.30/configure.ac
+===================================================================
+--- util-linux-2.30.orig/configure.ac
++++ util-linux-2.30/configure.ac
+@@ -399,7 +399,6 @@ AC_CHECK_FUNCS([ \
+ 	getdtablesize \
+ 	getexecname \
+ 	getmntinfo \
+-	getrandom \
+ 	getrlimit \
+ 	getsgnam \
+ 	inotify_init \

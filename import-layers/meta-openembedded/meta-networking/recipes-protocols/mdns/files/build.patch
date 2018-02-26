@@ -1,0 +1,167 @@
+From 43b6e98c9c37afd0d914949dcff4eab81f5a995f Mon Sep 17 00:00:00 2001
+From: Brendan Le Foll <brendan.le.foll@intel.com>
+Date: Tue, 3 Mar 2015 11:42:57 +0000
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+---
+ mDNSPosix/Makefile | 54 +++++++++++++++++++++++++-----------------------------
+ 1 file changed, 25 insertions(+), 29 deletions(-)
+
+diff --git a/mDNSPosix/Makefile b/mDNSPosix/Makefile
+index 4f98e90..8ac97ad 100755
+--- a/mDNSPosix/Makefile
++++ b/mDNSPosix/Makefile
+@@ -50,6 +50,7 @@
+ 
+ LIBVERS = 1
+ 
++POSIXDIR = ../mDNSPosix
+ COREDIR = ../mDNSCore
+ SHAREDDIR ?= ../mDNSShared
+ JDK = /usr/jdk
+@@ -58,11 +59,11 @@ CC = @cc
+ BISON = @bison
+ FLEX = @flex
+ ST = @strip
+-LD = ld -shared
++LD =@LD
+ CP = cp
+ RM = rm
+ LN = ln -s -f
+-CFLAGS_COMMON = -I$(COREDIR) -I$(SHAREDDIR) -I$(OBJDIR) -fwrapv -W -Wall -DPID_FILE=\"/var/run/mdnsd.pid\" -DMDNS_UDS_SERVERPATH=\"/var/run/mdnsd\"
++CFLAGS_COMMON = -I$(POSIXDIR) -I$(COREDIR) -I$(SHAREDDIR) -I$(OBJDIR) -fwrapv -W -Wall -DPID_FILE=\"/var/run/mdnsd.pid\" -DMDNS_UDS_SERVERPATH=\"/var/run/mdnsd\"
+ CFLAGS_PTHREAD =
+ LINKOPTS =
+ LINKOPTS_PTHREAD = -lpthread
+@@ -70,7 +71,7 @@ LDSUFFIX = so
+ JAVACFLAGS_OS = -fPIC -shared -ldns_sd
+ 
+ # Set up diverging paths for debug vs. prod builds
+-DEBUG=0
++DEBUG?=1
+ ifeq ($(DEBUG),1)
+ CFLAGS_DEBUG = -g -DMDNS_DEBUGMSGS=2
+ OBJDIR = objects/debug
+@@ -213,7 +214,7 @@ endif
+ endif
+ endif
+ 
+-CFLAGS = $(CFLAGS_COMMON) $(CFLAGS_OS) $(CFLAGS_DEBUG)
++CFLAGS_BUILD = $(CFLAGS) $(CFLAGS_COMMON) $(CFLAGS_OS) $(CFLAGS_DEBUG)
+ 
+ #############################################################################
+ 
+@@ -249,8 +250,7 @@ Daemon: setup $(BUILDDIR)/mdnsd
+ 	@echo "Responder daemon done"
+ 
+ $(BUILDDIR)/mdnsd: $(DAEMONOBJS)
+-	$(CC) -o $@ $+ $(LINKOPTS)
+-	@$(STRIP) $@
++	$(CC) -o $@ $+
+ 
+ # libdns_sd target builds the client library
+ libdns_sd: setup $(BUILDDIR)/libdns_sd.$(LDSUFFIX)
+@@ -259,22 +259,18 @@ libdns_sd: setup $(BUILDDIR)/libdns_sd.$(LDSUFFIX)
+ CLIENTLIBOBJS = $(OBJDIR)/dnssd_clientlib.c.so.o $(OBJDIR)/dnssd_clientstub.c.so.o $(OBJDIR)/dnssd_ipc.c.so.o
+ 
+ $(BUILDDIR)/libdns_sd.$(LDSUFFIX): $(CLIENTLIBOBJS)
+-	@$(LD) $(LINKOPTS) -o $@ $+
+-	@$(STRIP) $@
++	$(LD) -shared $(LINKOPTS) -Wl,-soname,libdns_sd.$(LDSUFFIX).1 -o $@ $+
+ 
+-Clients: setup libdns_sd ../Clients/build/dns-sd
++Clients: setup libdns_sd
++	@$(MAKE) -C ../Clients DEBUG=${DEBUG}
+ 	@echo "Clients done"
+ 
+-../Clients/build/dns-sd:
+-	@$(MAKE) -C ../Clients
+-
+ # nss_mdns target builds the Name Service Switch module
+ nss_mdns: setup $(BUILDDIR)/$(NSSLIBFILE)
+ 	@echo "Name Service Switch module done"
+ 
+ $(BUILDDIR)/$(NSSLIBFILE): $(CLIENTLIBOBJS) $(OBJDIR)/nss_mdns.c.so.o
+-	@$(LD) $(LINKOPTS) -o $@ $+
+-	@$(STRIP) $@
++	$(LD) -shared $(LINKOPTS) -o $@ $+
+ 
+ #############################################################################
+ 
+@@ -470,55 +466,55 @@ dnsextd: setup $(BUILDDIR)/dnsextd
+ 	@echo "dnsextd done"
+ 
+ $(BUILDDIR)/mDNSClientPosix:         $(APPOBJ)     $(OBJDIR)/Client.c.o
+-	$(CC) $+ -o $@ $(LINKOPTS)
++	$(CC) $+ -o $@
+ 
+ $(BUILDDIR)/mDNSResponderPosix:      $(COMMONOBJ)  $(OBJDIR)/Responder.c.o
+-	$(CC) $+ -o $@ $(LINKOPTS)
++	$(CC) $+ -o $@
+ 
+ $(BUILDDIR)/mDNSProxyResponderPosix: $(COMMONOBJ)  $(OBJDIR)/ProxyResponder.c.o
+-	$(CC) $+ -o $@ $(LINKOPTS)
++	$(CC) $+ -o $@
+ 
+ $(BUILDDIR)/mDNSIdentify:            $(SPECIALOBJ) $(OBJDIR)/Identify.c.o
+-	$(CC) $+ -o $@ $(LINKOPTS)
++	$(CC) $+ -o $@
+ 
+ $(OBJDIR)/Identify.c.o:              $(COREDIR)/mDNS.c # Note: Identify.c textually imports mDNS.c
+ 
+ $(BUILDDIR)/mDNSNetMonitor:          $(SPECIALOBJ) $(OBJDIR)/NetMonitor.c.o
+-	$(CC) $+ -o $@ $(LINKOPTS)
++	$(CC) $+ -o $@
+ 
+ $(OBJDIR)/NetMonitor.c.o:            $(COREDIR)/mDNS.c # Note: NetMonitor.c textually imports mDNS.c
+ 
+ $(BUILDDIR)/dnsextd:                 $(DNSEXTDOBJ) $(OBJDIR)/dnsextd.c.threadsafe.o
+-	$(CC) $+ -o $@ $(LINKOPTS) $(LINKOPTS_PTHREAD)
++	$(CC) $+ -o $@ $(LINKOPTS_PTHREAD)
+ 
+ #############################################################################
+ 
+ # Implicit rules
+ $(OBJDIR)/%.c.o:	%.c
+-	$(CC) $(CFLAGS) -c -o $@ $<
++	$(CC) $(CFLAGS_BUILD) -c -o $@ $<
+ 
+ $(OBJDIR)/%.c.o:	$(COREDIR)/%.c
+-	$(CC) $(CFLAGS) -c -o $@ $<
++	$(CC) $(CFLAGS_BUILD) -c -o $@ $<
+ 
+ $(OBJDIR)/%.c.o:	$(SHAREDDIR)/%.c
+-	$(CC) $(CFLAGS) -c -o $@ $<
++	$(CC) $(CFLAGS_BUILD) -c -o $@ $<
+ 
+ $(OBJDIR)/%.c.threadsafe.o:	%.c
+-	$(CC) $(CFLAGS) $(CFLAGS_PTHREAD) -D_REENTRANT -c -o $@ $<
++	$(CC) $(CFLAGS_BUILD) $(CFLAGS_PTHREAD) -D_REENTRANT -c -o $@ $<
+ 
+ $(OBJDIR)/%.c.threadsafe.o:	$(SHAREDDIR)/%.c
+-	$(CC) $(CFLAGS) $(CFLAGS_PTHREAD) -D_REENTRANT -c -o $@ $<
++	$(CC) $(CFLAGS_BUILD) $(CFLAGS_PTHREAD) -D_REENTRANT -c -o $@ $<
+ 
+ $(OBJDIR)/%.c.so.o:	%.c
+-	$(CC) $(CFLAGS) -c -fPIC -o $@ $<
++	$(CC) $(CFLAGS_BUILD) -c -fPIC -o $@ $<
+ 
+ $(OBJDIR)/%.c.so.o:	$(SHAREDDIR)/%.c
+-	$(CC) $(CFLAGS) -c -fPIC -o $@ $<
++	$(CC) $(CFLAGS_BUILD) -c -fPIC -o $@ $<
+ 
+ $(OBJDIR)/%.y.o: $(SHAREDDIR)/%.y
+ 	$(BISON)              -o $(OBJDIR)/$*.c -d $<
+-	$(CC) $(CFLAGS) -c -o $@ $(OBJDIR)/$*.c
++	$(CC) $(CFLAGS_BUILD) -c -o $@ $(OBJDIR)/$*.c
+ 
+ $(OBJDIR)/%.l.o: $(SHAREDDIR)/%.l
+ 	$(FLEX) $(FLEXFLAGS_OS) -i             -o$(OBJDIR)/$*.l.c $<
+-	$(CC) $(CFLAGS) -Wno-error -c -o $@ $(OBJDIR)/$*.l.c
++	$(CC) $(CFLAGS_BUILD) -Wno-error -c -o $@ $(OBJDIR)/$*.l.c
+-- 
+2.9.5
+

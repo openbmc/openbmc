@@ -1,0 +1,3800 @@
+From 14f8b6810bd240cc58131483790a099fcf56c073 Mon Sep 17 00:00:00 2001
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+Date: Fri, 4 Aug 2017 16:33:51 -0500
+Subject: [PATCH] xfsprogs: remove double-underscore integer types
+
+This is a purely mechanical patch that removes the private
+__{u,}int{8,16,32,64}_t typedefs in favor of using the system
+{u,}int{8,16,32,64}_t typedefs.  This is the sed script used to perform
+the transformation and fix the resulting whitespace and indentation
+errors:
+
+s/typedef\t__uint8_t/typedef __uint8_t\t/g
+s/typedef\t__uint/typedef __uint/g
+s/typedef\t__int\([0-9]*\)_t/typedef int\1_t\t/g
+s/__uint8_t\t/__uint8_t\t\t/g
+s/__uint/uint/g
+s/__int\([0-9]*\)_t\t/__int\1_t\t\t/g
+s/__int/int/g
+/^typedef.*int[0-9]*_t;$/d
+
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
+[sandeen: fix whitespace incidentals]
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+Signed-off-by: Eric Sandeen <sandeen@sandeen.net>
+---
+ copy/xfs_copy.c           | 14 ++++-----
+ copy/xfs_copy.h           |  2 +-
+ db/attr.c                 |  8 ++---
+ db/attrshort.c            |  4 +--
+ db/bit.c                  |  4 +--
+ db/bit.h                  |  2 +-
+ db/block.c                |  8 ++---
+ db/check.c                | 18 +++++------
+ db/convert.c              | 28 ++++++++---------
+ db/faddr.c                | 14 ++++-----
+ db/field.c                | 44 +++++++++++++--------------
+ db/fprint.c               |  8 ++---
+ db/frag.c                 |  8 ++---
+ db/inode.c                | 34 ++++++++++-----------
+ db/io.c                   |  2 +-
+ db/io.h                   |  6 ++--
+ db/metadump.c             | 12 ++++----
+ db/sb.c                   |  6 ++--
+ fsr/xfs_fsr.c             |  2 +-
+ include/darwin.h          | 18 +++++------
+ include/freebsd.h         |  6 ++--
+ include/gnukfreebsd.h     |  6 ++--
+ include/libxcmd.h         |  6 ++--
+ include/linux.h           |  8 ++---
+ include/xfs_arch.h        | 22 +++++++-------
+ include/xfs_inode.h       |  4 +--
+ include/xfs_log_recover.h |  2 +-
+ include/xfs_metadump.h    |  4 +--
+ include/xfs_mount.h       | 22 +++++++-------
+ libhandle/handle.c        |  2 +-
+ libhandle/jdm.c           |  2 +-
+ libxcmd/topology.c        | 14 ++++-----
+ libxfs/darwin.c           |  2 +-
+ libxfs/freebsd.c          |  2 +-
+ libxfs/init.c             |  2 +-
+ libxfs/irix.c             |  2 +-
+ libxfs/libxfs_priv.h      |  4 +--
+ libxfs/linux.c            |  2 +-
+ libxfs/logitem.c          |  2 +-
+ libxfs/radix-tree.c       |  8 ++---
+ libxfs/rdwr.c             |  6 ++--
+ libxfs/util.c             |  8 ++---
+ logprint/log_misc.c       |  6 ++--
+ mdrestore/xfs_mdrestore.c |  2 +-
+ mkfs/proto.c              |  2 +-
+ mkfs/xfs_mkfs.c           | 76 +++++++++++++++++++++++------------------------
+ quota/edit.c              | 64 +++++++++++++++++++--------------------
+ quota/free.c              | 44 +++++++++++++--------------
+ quota/quot.c              | 24 +++++++--------
+ quota/quota.c             |  4 +--
+ quota/quota.h             | 12 ++++----
+ quota/report.c            |  4 +--
+ quota/state.c             |  2 +-
+ quota/util.c              | 66 ++++++++++++++++++++--------------------
+ repair/README             |  2 +-
+ repair/agheader.h         | 14 ++++-----
+ repair/attr_repair.h      | 26 ++++++++--------
+ repair/avl64.c            | 38 ++++++++++++------------
+ repair/avl64.h            | 18 +++++------
+ repair/dinode.c           | 38 ++++++++++++------------
+ repair/dinode.h           |  4 +--
+ repair/dir2.c             |  2 +-
+ repair/globals.h          | 18 +++++------
+ repair/incore.c           | 10 +++----
+ repair/incore.h           | 46 ++++++++++++++--------------
+ repair/incore_ext.c       |  6 ++--
+ repair/incore_ino.c       | 72 ++++++++++++++++++++++----------------------
+ repair/phase2.c           |  2 +-
+ repair/phase3.c           |  6 ++--
+ repair/phase4.c           |  4 +--
+ repair/phase5.c           | 28 ++++++++---------
+ repair/phase6.c           | 16 +++++-----
+ repair/phase7.c           |  6 ++--
+ repair/progress.c         | 30 +++++++++----------
+ repair/progress.h         |  4 +--
+ repair/rmap.c             | 18 +++++------
+ repair/rmap.h             |  2 +-
+ repair/sb.c               | 24 +++++++--------
+ repair/scan.c             | 50 +++++++++++++++----------------
+ repair/scan.h             | 12 ++++----
+ 80 files changed, 590 insertions(+), 590 deletions(-)
+
+diff --git a/copy/xfs_copy.c b/copy/xfs_copy.c
+index a7da824f..33e05dfd 100644
+--- a/copy/xfs_copy.c
++++ b/copy/xfs_copy.c
+@@ -43,7 +43,7 @@ unsigned int	source_sectorsize;	/* source disk sectorsize */
+ 
+ xfs_agblock_t	first_agbno;
+ 
+-__uint64_t	barcount[11];
++uint64_t	barcount[11];
+ 
+ unsigned int	num_targets;
+ target_control	*target;
+@@ -313,7 +313,7 @@ usage(void)
+ }
+ 
+ void
+-init_bar(__uint64_t source_blocks)
++init_bar(uint64_t source_blocks)
+ {
+ 	int	i;
+ 
+@@ -322,7 +322,7 @@ init_bar(__uint64_t source_blocks)
+ }
+ 
+ int
+-bump_bar(int tenths, __uint64_t numblocks)
++bump_bar(int tenths, uint64_t numblocks)
+ {
+ 	static char *bar[11] = {
+ 		" 0% ",
+@@ -534,8 +534,8 @@ main(int argc, char **argv)
+ 	xfs_off_t	pos;
+ 	size_t		length;
+ 	int		c;
+-	__uint64_t	size, sizeb;
+-	__uint64_t	numblocks = 0;
++	uint64_t	size, sizeb;
++	uint64_t	numblocks = 0;
+ 	int		wblocks = 0;
+ 	int		num_threads = 0;
+ 	struct dioattr	d;
+@@ -951,8 +951,8 @@ main(int argc, char **argv)
+ 	num_ags = mp->m_sb.sb_agcount;
+ 
+ 	init_bar(mp->m_sb.sb_blocksize / BBSIZE
+-			* ((__uint64_t)mp->m_sb.sb_dblocks
+-			    - (__uint64_t)mp->m_sb.sb_fdblocks + 10 * num_ags));
++			* ((uint64_t)mp->m_sb.sb_dblocks
++			    - (uint64_t)mp->m_sb.sb_fdblocks + 10 * num_ags));
+ 
+ 	kids = num_targets;
+ 
+diff --git a/copy/xfs_copy.h b/copy/xfs_copy.h
+index 27370688..53c6e42c 100644
+--- a/copy/xfs_copy.h
++++ b/copy/xfs_copy.h
+@@ -76,7 +76,7 @@ typedef struct {
+ 
+ typedef int thread_id;
+ typedef int tm_index;			/* index into thread mask array */
+-typedef __uint32_t thread_mask;		/* a thread mask */
++typedef uint32_t thread_mask;		/* a thread mask */
+ 
+ typedef struct {
+ 	char		*name;
+diff --git a/db/attr.c b/db/attr.c
+index 31536a8b..23ffcd5f 100644
+--- a/db/attr.c
++++ b/db/attr.c
+@@ -77,16 +77,16 @@ const field_t	attr_leaf_entry_flds[] = {
+ 	{ "nameidx", FLDT_UINT16D, OI(LEOFF(nameidx)), C1, 0, TYP_NONE },
+ 	{ "flags", FLDT_UINT8X, OI(LEOFF(flags)), C1, FLD_SKIPALL, TYP_NONE },
+ 	{ "incomplete", FLDT_UINT1,
+-	  OI(LEOFF(flags) + bitsz(__uint8_t) - XFS_ATTR_INCOMPLETE_BIT - 1), C1,
++	  OI(LEOFF(flags) + bitsz(uint8_t) - XFS_ATTR_INCOMPLETE_BIT - 1), C1,
+ 	  0, TYP_NONE },
+ 	{ "root", FLDT_UINT1,
+-	  OI(LEOFF(flags) + bitsz(__uint8_t) - XFS_ATTR_ROOT_BIT - 1), C1, 0,
++	  OI(LEOFF(flags) + bitsz(uint8_t) - XFS_ATTR_ROOT_BIT - 1), C1, 0,
+ 	  TYP_NONE },
+ 	{ "secure", FLDT_UINT1,
+-	  OI(LEOFF(flags) + bitsz(__uint8_t) - XFS_ATTR_SECURE_BIT - 1), C1, 0,
++	  OI(LEOFF(flags) + bitsz(uint8_t) - XFS_ATTR_SECURE_BIT - 1), C1, 0,
+ 	  TYP_NONE },
+ 	{ "local", FLDT_UINT1,
+-	  OI(LEOFF(flags) + bitsz(__uint8_t) - XFS_ATTR_LOCAL_BIT - 1), C1, 0,
++	  OI(LEOFF(flags) + bitsz(uint8_t) - XFS_ATTR_LOCAL_BIT - 1), C1, 0,
+ 	  TYP_NONE },
+ 	{ "pad2", FLDT_UINT8X, OI(LEOFF(pad2)), C1, FLD_SKIPALL, TYP_NONE },
+ 	{ NULL }
+diff --git a/db/attrshort.c b/db/attrshort.c
+index d82559cc..2ef358f5 100644
+--- a/db/attrshort.c
++++ b/db/attrshort.c
+@@ -51,10 +51,10 @@ const field_t	attr_sf_entry_flds[] = {
+ 	{ "valuelen", FLDT_UINT8D, OI(EOFF(valuelen)), C1, 0, TYP_NONE },
+ 	{ "flags", FLDT_UINT8X, OI(EOFF(flags)), C1, FLD_SKIPALL, TYP_NONE },
+ 	{ "root", FLDT_UINT1,
+-	  OI(EOFF(flags) + bitsz(__uint8_t) - XFS_ATTR_ROOT_BIT - 1), C1, 0,
++	  OI(EOFF(flags) + bitsz(uint8_t) - XFS_ATTR_ROOT_BIT - 1), C1, 0,
+ 	  TYP_NONE },
+ 	{ "secure", FLDT_UINT1,
+-	  OI(EOFF(flags) + bitsz(__uint8_t) - XFS_ATTR_SECURE_BIT - 1), C1, 0,
++	  OI(EOFF(flags) + bitsz(uint8_t) - XFS_ATTR_SECURE_BIT - 1), C1, 0,
+ 	  TYP_NONE },
+ 	{ "name", FLDT_CHARNS, OI(EOFF(nameval)), attr_sf_entry_name_count,
+ 	  FLD_COUNT, TYP_NONE },
+diff --git a/db/bit.c b/db/bit.c
+index 24872bf7..f5ebf681 100644
+--- a/db/bit.c
++++ b/db/bit.c
+@@ -60,7 +60,7 @@ setbit(
+ 	}
+ }
+ 
+-__int64_t
++int64_t
+ getbitval(
+ 	void		*obj,
+ 	int		bitoff,
+@@ -70,7 +70,7 @@ getbitval(
+ 	int		bit;
+ 	int		i;
+ 	char		*p;
+-	__int64_t	rval;
++	int64_t		rval;
+ 	int		signext;
+ 	int		z1, z2, z3, z4;
+ 
+diff --git a/db/bit.h b/db/bit.h
+index 80ba24c4..9fd71f4b 100644
+--- a/db/bit.h
++++ b/db/bit.h
+@@ -25,5 +25,5 @@
+ #define	BVUNSIGNED	0
+ #define	BVSIGNED	1
+ 
+-extern __int64_t	getbitval(void *obj, int bitoff, int nbits, int flags);
++extern int64_t		getbitval(void *obj, int bitoff, int nbits, int flags);
+ extern void             setbitval(void *obuf, int bitoff, int nbits, void *ibuf);
+diff --git a/db/block.c b/db/block.c
+index 4a357ced..5ecd687a 100644
+--- a/db/block.c
++++ b/db/block.c
+@@ -98,7 +98,7 @@ ablock_f(
+ 	}
+ 	dfsbno = bm.startblock + (bno - bm.startoff);
+ 	ASSERT(typtab[TYP_ATTR].typnm == TYP_ATTR);
+-	set_cur(&typtab[TYP_ATTR], (__int64_t)XFS_FSB_TO_DADDR(mp, dfsbno),
++	set_cur(&typtab[TYP_ATTR], (int64_t)XFS_FSB_TO_DADDR(mp, dfsbno),
+ 		blkbb, DB_RING_ADD, NULL);
+ 	return 0;
+ }
+@@ -128,14 +128,14 @@ daddr_f(
+ 	int		argc,
+ 	char		**argv)
+ {
+-	__int64_t	d;
++	int64_t		d;
+ 	char		*p;
+ 
+ 	if (argc == 1) {
+ 		dbprintf(_("current daddr is %lld\n"), iocur_top->off >> BBSHIFT);
+ 		return 0;
+ 	}
+-	d = (__int64_t)strtoull(argv[1], &p, 0);
++	d = (int64_t)strtoull(argv[1], &p, 0);
+ 	if (*p != '\0' ||
+ 	    d >= mp->m_sb.sb_dblocks << (mp->m_sb.sb_blocklog - BBSHIFT)) {
+ 		dbprintf(_("bad daddr %s\n"), argv[1]);
+@@ -197,7 +197,7 @@ dblock_f(
+ 	ASSERT(typtab[type].typnm == type);
+ 	if (nex > 1)
+ 		make_bbmap(&bbmap, nex, bmp);
+-	set_cur(&typtab[type], (__int64_t)XFS_FSB_TO_DADDR(mp, dfsbno),
++	set_cur(&typtab[type], (int64_t)XFS_FSB_TO_DADDR(mp, dfsbno),
+ 		nb * blkbb, DB_RING_ADD, nex > 1 ? &bbmap : NULL);
+ 	free(bmp);
+ 	return 0;
+diff --git a/db/check.c b/db/check.c
+index 8e618a23..81ba63a6 100644
+--- a/db/check.c
++++ b/db/check.c
+@@ -114,8 +114,8 @@ typedef struct dirhash {
+ 
+ static xfs_extlen_t	agffreeblks;
+ static xfs_extlen_t	agflongest;
+-static __uint64_t	agf_aggr_freeblks;	/* aggregate count over all */
+-static __uint32_t	agfbtreeblks;
++static uint64_t	agf_aggr_freeblks;	/* aggregate count over all */
++static uint32_t	agfbtreeblks;
+ static int		lazycount;
+ static xfs_agino_t	agicount;
+ static xfs_agino_t	agifreecount;
+@@ -124,10 +124,10 @@ static int		blist_size;
+ static char		**dbmap;	/* really dbm_t:8 */
+ static dirhash_t	**dirhash;
+ static int		error;
+-static __uint64_t	fdblocks;
+-static __uint64_t	frextents;
+-static __uint64_t	icount;
+-static __uint64_t	ifree;
++static uint64_t	fdblocks;
++static uint64_t	frextents;
++static uint64_t	icount;
++static uint64_t	ifree;
+ static inodata_t	***inodata;
+ static int		inodata_hash_size;
+ static inodata_t	***inomap;
+@@ -1187,7 +1187,7 @@ blocktrash_f(
+ 		goto out;
+ 	}
+ 	for (i = 0; i < count; i++) {
+-		randb = (xfs_rfsblock_t)((((__int64_t)random() << 32) |
++		randb = (xfs_rfsblock_t)((((int64_t)random() << 32) |
+ 					 random()) % blocks);
+ 		for (bi = 0, agno = 0, done = 0;
+ 		     !done && agno < mp->m_sb.sb_agcount;
+@@ -3032,7 +3032,7 @@ process_leaf_node_dir_v2(
+ 		}
+ 		if (v)
+ 			dbprintf(_("dir inode %lld block %u=%llu\n"), id->ino,
+-				(__uint32_t)dbno,
++				(uint32_t)dbno,
+ 				(xfs_fsblock_t)bmp->startblock);
+ 		push_cur();
+ 		if (nex > 1)
+@@ -3045,7 +3045,7 @@ process_leaf_node_dir_v2(
+ 			if (!sflag || v)
+ 				dbprintf(_("can't read block %u for directory "
+ 					 "inode %lld\n"),
+-					(__uint32_t)dbno, id->ino);
++					(uint32_t)dbno, id->ino);
+ 			error++;
+ 			pop_cur();
+ 			dbno += mp->m_dir_geo->fsbcount - 1;
+diff --git a/db/convert.c b/db/convert.c
+index a337abea..fa4f9623 100644
+--- a/db/convert.c
++++ b/db/convert.c
+@@ -24,13 +24,13 @@
+ 
+ #define	M(A)	(1 << CT_ ## A)
+ #define	agblock_to_bytes(x)	\
+-	((__uint64_t)(x) << mp->m_sb.sb_blocklog)
++	((uint64_t)(x) << mp->m_sb.sb_blocklog)
+ #define	agino_to_bytes(x)	\
+-	((__uint64_t)(x) << mp->m_sb.sb_inodelog)
++	((uint64_t)(x) << mp->m_sb.sb_inodelog)
+ #define	agnumber_to_bytes(x)	\
+-	agblock_to_bytes((__uint64_t)(x) * mp->m_sb.sb_agblocks)
++	agblock_to_bytes((uint64_t)(x) * mp->m_sb.sb_agblocks)
+ #define	daddr_to_bytes(x)	\
+-	((__uint64_t)(x) << BBSHIFT)
++	((uint64_t)(x) << BBSHIFT)
+ #define	fsblock_to_bytes(x)	\
+ 	(agnumber_to_bytes(XFS_FSB_TO_AGNO(mp, (x))) + \
+ 	 agblock_to_bytes(XFS_FSB_TO_AGBNO(mp, (x))))
+@@ -38,7 +38,7 @@
+ 	(agnumber_to_bytes(XFS_INO_TO_AGNO(mp, (x))) + \
+ 	 agino_to_bytes(XFS_INO_TO_AGINO(mp, (x))))
+ #define	inoidx_to_bytes(x)	\
+-	((__uint64_t)(x) << mp->m_sb.sb_inodelog)
++	((uint64_t)(x) << mp->m_sb.sb_inodelog)
+ 
+ typedef enum {
+ 	CT_NONE = -1,
+@@ -68,7 +68,7 @@ typedef union {
+ 	xfs_agnumber_t	agnumber;
+ 	int		bboff;
+ 	int		blkoff;
+-	__uint64_t	byte;
++	uint64_t	byte;
+ 	xfs_daddr_t	daddr;
+ 	xfs_fsblock_t	fsblock;
+ 	xfs_ino_t	ino;
+@@ -76,7 +76,7 @@ typedef union {
+ 	int		inooff;
+ } cval_t;
+ 
+-static __uint64_t		bytevalue(ctype_t ctype, cval_t *val);
++static uint64_t		bytevalue(ctype_t ctype, cval_t *val);
+ static int		convert_f(int argc, char **argv);
+ static int		getvalue(char *s, ctype_t ctype, cval_t *val);
+ static ctype_t		lookupcty(char *ctyname);
+@@ -118,7 +118,7 @@ static const cmdinfo_t	convert_cmd =
+ 	{ "convert", NULL, convert_f, 3, 9, 0, "type num [type num]... type",
+ 	  "convert from one address form to another", NULL };
+ 
+-static __uint64_t
++static uint64_t
+ bytevalue(ctype_t ctype, cval_t *val)
+ {
+ 	switch (ctype) {
+@@ -129,9 +129,9 @@ bytevalue(ctype_t ctype, cval_t *val)
+ 	case CT_AGNUMBER:
+ 		return agnumber_to_bytes(val->agnumber);
+ 	case CT_BBOFF:
+-		return (__uint64_t)val->bboff;
++		return (uint64_t)val->bboff;
+ 	case CT_BLKOFF:
+-		return (__uint64_t)val->blkoff;
++		return (uint64_t)val->blkoff;
+ 	case CT_BYTE:
+ 		return val->byte;
+ 	case CT_DADDR:
+@@ -143,7 +143,7 @@ bytevalue(ctype_t ctype, cval_t *val)
+ 	case CT_INOIDX:
+ 		return inoidx_to_bytes(val->inoidx);
+ 	case CT_INOOFF:
+-		return (__uint64_t)val->inooff;
++		return (uint64_t)val->inooff;
+ 	case CT_NONE:
+ 	case NCTS:
+ 		break;
+@@ -160,7 +160,7 @@ convert_f(int argc, char **argv)
+ 	cval_t		cvals[NCTS] = {};
+ 	int		i;
+ 	int		mask;
+-	__uint64_t	v;
++	uint64_t	v;
+ 	ctype_t		wtype;
+ 
+ 	/* move past the "convert" command */
+@@ -262,7 +262,7 @@ static int
+ getvalue(char *s, ctype_t ctype, cval_t *val)
+ {
+ 	char		*p;
+-	__uint64_t	v;
++	uint64_t	v;
+ 
+ 	v = strtoull(s, &p, 0);
+ 	if (*p != '\0') {
+@@ -286,7 +286,7 @@ getvalue(char *s, ctype_t ctype, cval_t *val)
+ 		val->blkoff = (int)v;
+ 		break;
+ 	case CT_BYTE:
+-		val->byte = (__uint64_t)v;
++		val->byte = (uint64_t)v;
+ 		break;
+ 	case CT_DADDR:
+ 		val->daddr = (xfs_daddr_t)v;
+diff --git a/db/faddr.c b/db/faddr.c
+index 877200bf..56207648 100644
+--- a/db/faddr.c
++++ b/db/faddr.c
+@@ -79,11 +79,11 @@ fa_attrblock(
+ 	typnm_t		next)
+ {
+ 	bmap_ext_t	bm;
+-	__uint32_t	bno;
++	uint32_t	bno;
+ 	xfs_fsblock_t	dfsbno;
+ 	int		nex;
+ 
+-	bno = (__uint32_t)getbitval(obj, bit, bitsz(bno), BVUNSIGNED);
++	bno = (uint32_t)getbitval(obj, bit, bitsz(bno), BVUNSIGNED);
+ 	if (bno == 0) {
+ 		dbprintf(_("null attribute block number, cannot set new addr\n"));
+ 		return;
+@@ -96,7 +96,7 @@ fa_attrblock(
+ 	}
+ 	dfsbno = bm.startblock + (bno - bm.startoff);
+ 	ASSERT(typtab[next].typnm == next);
+-	set_cur(&typtab[next], (__int64_t)XFS_FSB_TO_DADDR(mp, dfsbno), blkbb,
++	set_cur(&typtab[next], (int64_t)XFS_FSB_TO_DADDR(mp, dfsbno), blkbb,
+ 		DB_RING_ADD, NULL);
+ }
+ 
+@@ -276,11 +276,11 @@ fa_dirblock(
+ {
+ 	bbmap_t		bbmap;
+ 	bmap_ext_t	*bmp;
+-	__uint32_t	bno;
++	uint32_t	bno;
+ 	xfs_fsblock_t	dfsbno;
+ 	int		nex;
+ 
+-	bno = (__uint32_t)getbitval(obj, bit, bitsz(bno), BVUNSIGNED);
++	bno = (uint32_t)getbitval(obj, bit, bitsz(bno), BVUNSIGNED);
+ 	if (bno == 0) {
+ 		dbprintf(_("null directory block number, cannot set new addr\n"));
+ 		return;
+@@ -297,7 +297,7 @@ fa_dirblock(
+ 	ASSERT(typtab[next].typnm == next);
+ 	if (nex > 1)
+ 		make_bbmap(&bbmap, nex, bmp);
+-	set_cur(&typtab[next], (__int64_t)XFS_FSB_TO_DADDR(mp, dfsbno),
++	set_cur(&typtab[next], (int64_t)XFS_FSB_TO_DADDR(mp, dfsbno),
+ 		XFS_FSB_TO_BB(mp, mp->m_dir_geo->fsbcount), DB_RING_ADD,
+ 		nex > 1 ? &bbmap : NULL);
+ 	free(bmp);
+@@ -317,7 +317,7 @@ fa_drfsbno(
+ 		return;
+ 	}
+ 	ASSERT(typtab[next].typnm == next);
+-	set_cur(&typtab[next], (__int64_t)XFS_FSB_TO_BB(mp, bno), blkbb,
++	set_cur(&typtab[next], (int64_t)XFS_FSB_TO_BB(mp, bno), blkbb,
+ 		DB_RING_ADD, NULL);
+ }
+ 
+diff --git a/db/field.c b/db/field.c
+index 865b0b71..f1e5f35e 100644
+--- a/db/field.c
++++ b/db/field.c
+@@ -83,7 +83,7 @@ const ftattr_t	ftattrtab[] = {
+ 	  attr_sf_entry_size, FTARG_SIZE, NULL, attr_sf_entry_flds },
+ 	{ FLDT_ATTR_SF_HDR, "attr_sf_hdr", NULL, (char *)attr_sf_hdr_flds,
+ 	  SI(bitsz(struct xfs_attr_sf_hdr)), 0, NULL, attr_sf_hdr_flds },
+-	{ FLDT_ATTRBLOCK, "attrblock", fp_num, "%u", SI(bitsz(__uint32_t)), 0,
++	{ FLDT_ATTRBLOCK, "attrblock", fp_num, "%u", SI(bitsz(uint32_t)), 0,
+ 	  fa_attrblock, NULL },
+ 	{ FLDT_ATTRSHORT, "attrshort", NULL, (char *)attr_shortform_flds,
+ 	  attrshort_size, FTARG_SIZE, NULL, attr_shortform_flds },
+@@ -199,7 +199,7 @@ const ftattr_t	ftattrtab[] = {
+ 	  SI(bitsz(struct xfs_refcount_rec)), 0, NULL, refcbt_rec_flds },
+ 
+ /* CRC field */
+-	{ FLDT_CRC, "crc", fp_crc, "%#x (%s)", SI(bitsz(__uint32_t)),
++	{ FLDT_CRC, "crc", fp_crc, "%#x (%s)", SI(bitsz(uint32_t)),
+ 	  0, NULL, NULL },
+ 
+ 	{ FLDT_DEV, "dev", fp_num, "%#x", SI(bitsz(xfs_dev_t)), 0, NULL, NULL },
+@@ -214,7 +214,7 @@ const ftattr_t	ftattrtab[] = {
+ 	{ FLDT_DINODE_CORE, "dinode_core", NULL, (char *)inode_core_flds,
+ 	  SI(bitsz(xfs_dinode_t)), 0, NULL, inode_core_flds },
+ 	{ FLDT_DINODE_FMT, "dinode_fmt", fp_dinode_fmt, NULL,
+-	  SI(bitsz(__int8_t)), 0, NULL, NULL },
++	  SI(bitsz(int8_t)), 0, NULL, NULL },
+ 	{ FLDT_DINODE_U, "dinode_u", NULL, (char *)inode_u_flds, inode_u_size,
+ 	  FTARG_SIZE|FTARG_OKEMPTY, NULL, inode_u_flds },
+ 	{ FLDT_DINODE_V3, "dinode_v3", NULL, (char *)inode_v3_flds,
+@@ -295,7 +295,7 @@ const ftattr_t	ftattrtab[] = {
+ 	{ FLDT_DA3_NODE_HDR, "dir_node_hdr", NULL, (char *)da3_node_hdr_flds,
+ 	  SI(bitsz(struct xfs_da3_node_hdr)), 0, NULL, da3_node_hdr_flds },
+ 
+-	{ FLDT_DIRBLOCK, "dirblock", fp_num, "%u", SI(bitsz(__uint32_t)), 0,
++	{ FLDT_DIRBLOCK, "dirblock", fp_num, "%u", SI(bitsz(uint32_t)), 0,
+ 	  fa_dirblock, NULL },
+ 	{ FLDT_DISK_DQUOT, "disk_dquot", NULL, (char *)disk_dquot_flds,
+ 	  SI(bitsz(xfs_disk_dquot_t)), 0, NULL, disk_dquot_flds },
+@@ -335,15 +335,15 @@ const ftattr_t	ftattrtab[] = {
+ 	  FTARG_SIZE, NULL, inode_crc_flds },
+ 	{ FLDT_INOFREE, "inofree", fp_num, "%#llx", SI(bitsz(xfs_inofree_t)), 0,
+ 	  NULL, NULL },
+-	{ FLDT_INT16D, "int16d", fp_num, "%d", SI(bitsz(__int16_t)),
++	{ FLDT_INT16D, "int16d", fp_num, "%d", SI(bitsz(int16_t)),
+ 	  FTARG_SIGNED, NULL, NULL },
+-	{ FLDT_INT32D, "int32d", fp_num, "%d", SI(bitsz(__int32_t)),
++	{ FLDT_INT32D, "int32d", fp_num, "%d", SI(bitsz(int32_t)),
+ 	  FTARG_SIGNED, NULL, NULL },
+-	{ FLDT_INT64D, "int64d", fp_num, "%lld", SI(bitsz(__int64_t)),
++	{ FLDT_INT64D, "int64d", fp_num, "%lld", SI(bitsz(int64_t)),
+ 	  FTARG_SIGNED, NULL, NULL },
+-	{ FLDT_INT8D, "int8d", fp_num, "%d", SI(bitsz(__int8_t)), FTARG_SIGNED,
++	{ FLDT_INT8D, "int8d", fp_num, "%d", SI(bitsz(int8_t)), FTARG_SIGNED,
+ 	  NULL, NULL },
+-	{ FLDT_NSEC, "nsec", fp_num, "%09d", SI(bitsz(__int32_t)), FTARG_SIGNED,
++	{ FLDT_NSEC, "nsec", fp_num, "%09d", SI(bitsz(int32_t)), FTARG_SIGNED,
+ 	  NULL, NULL },
+ 	{ FLDT_QCNT, "qcnt", fp_num, "%llu", SI(bitsz(xfs_qcnt_t)), 0, NULL,
+ 	  NULL },
+@@ -356,34 +356,34 @@ const ftattr_t	ftattrtab[] = {
+ 	{ FLDT_SYMLINK_CRC, "symlink", NULL, (char *)symlink_crc_flds,
+ 	  symlink_size, FTARG_SIZE, NULL, symlink_crc_flds },
+ 
+-	{ FLDT_TIME, "time", fp_time, NULL, SI(bitsz(__int32_t)), FTARG_SIGNED,
++	{ FLDT_TIME, "time", fp_time, NULL, SI(bitsz(int32_t)), FTARG_SIGNED,
+ 	  NULL, NULL },
+ 	{ FLDT_TIMESTAMP, "timestamp", NULL, (char *)timestamp_flds,
+ 	  SI(bitsz(xfs_timestamp_t)), 0, NULL, timestamp_flds },
+ 	{ FLDT_UINT1, "uint1", fp_num, "%u", SI(1), 0, NULL, NULL },
+-	{ FLDT_UINT16D, "uint16d", fp_num, "%u", SI(bitsz(__uint16_t)), 0, NULL,
++	{ FLDT_UINT16D, "uint16d", fp_num, "%u", SI(bitsz(uint16_t)), 0, NULL,
+ 	  NULL },
+-	{ FLDT_UINT16O, "uint16o", fp_num, "%#o", SI(bitsz(__uint16_t)), 0,
++	{ FLDT_UINT16O, "uint16o", fp_num, "%#o", SI(bitsz(uint16_t)), 0,
+ 	  NULL, NULL },
+-	{ FLDT_UINT16X, "uint16x", fp_num, "%#x", SI(bitsz(__uint16_t)), 0,
++	{ FLDT_UINT16X, "uint16x", fp_num, "%#x", SI(bitsz(uint16_t)), 0,
+ 	  NULL, NULL },
+-	{ FLDT_UINT32D, "uint32d", fp_num, "%u", SI(bitsz(__uint32_t)), 0, NULL,
++	{ FLDT_UINT32D, "uint32d", fp_num, "%u", SI(bitsz(uint32_t)), 0, NULL,
+ 	  NULL },
+-	{ FLDT_UINT32O, "uint32o", fp_num, "%#o", SI(bitsz(__uint32_t)), 0,
++	{ FLDT_UINT32O, "uint32o", fp_num, "%#o", SI(bitsz(uint32_t)), 0,
+ 	  NULL, NULL },
+-	{ FLDT_UINT32X, "uint32x", fp_num, "%#x", SI(bitsz(__uint32_t)), 0,
++	{ FLDT_UINT32X, "uint32x", fp_num, "%#x", SI(bitsz(uint32_t)), 0,
+ 	  NULL, NULL },
+-	{ FLDT_UINT64D, "uint64d", fp_num, "%llu", SI(bitsz(__uint64_t)), 0,
++	{ FLDT_UINT64D, "uint64d", fp_num, "%llu", SI(bitsz(uint64_t)), 0,
+ 	  NULL, NULL },
+-	{ FLDT_UINT64O, "uint64o", fp_num, "%#llo", SI(bitsz(__uint64_t)), 0,
++	{ FLDT_UINT64O, "uint64o", fp_num, "%#llo", SI(bitsz(uint64_t)), 0,
+ 	  NULL, NULL },
+-	{ FLDT_UINT64X, "uint64x", fp_num, "%#llx", SI(bitsz(__uint64_t)), 0,
++	{ FLDT_UINT64X, "uint64x", fp_num, "%#llx", SI(bitsz(uint64_t)), 0,
+ 	  NULL, NULL },
+-	{ FLDT_UINT8D, "uint8d", fp_num, "%u", SI(bitsz(__uint8_t)), 0, NULL,
++	{ FLDT_UINT8D, "uint8d", fp_num, "%u", SI(bitsz(uint8_t)), 0, NULL,
+ 	  NULL },
+-	{ FLDT_UINT8O, "uint8o", fp_num, "%#o", SI(bitsz(__uint8_t)), 0, NULL,
++	{ FLDT_UINT8O, "uint8o", fp_num, "%#o", SI(bitsz(uint8_t)), 0, NULL,
+ 	  NULL },
+-	{ FLDT_UINT8X, "uint8x", fp_num, "%#x", SI(bitsz(__uint8_t)), 0, NULL,
++	{ FLDT_UINT8X, "uint8x", fp_num, "%#x", SI(bitsz(uint8_t)), 0, NULL,
+ 	  NULL },
+ 	{ FLDT_UUID, "uuid", fp_uuid, NULL, SI(bitsz(uuid_t)), 0, NULL, NULL },
+ 	{ FLDT_ZZZ, NULL }
+diff --git a/db/fprint.c b/db/fprint.c
+index fd7e7f45..261a31ef 100644
+--- a/db/fprint.c
++++ b/db/fprint.c
+@@ -80,7 +80,7 @@ fp_num(
+ 	int		bitpos;
+ 	int		i;
+ 	int		isnull;
+-	__int64_t	val;
++	int64_t		val;
+ 
+ 	for (i = 0, bitpos = bit;
+ 	     i < count && !seenint();
+@@ -100,7 +100,7 @@ fp_num(
+ 		else if (size > 32)
+ 			dbprintf(fmtstr, val);
+ 		else
+-			dbprintf(fmtstr, (__int32_t)val);
++			dbprintf(fmtstr, (int32_t)val);
+ 		if (i < count - 1)
+ 			dbprintf(" ");
+ 	}
+@@ -203,7 +203,7 @@ fp_crc(
+ {
+ 	int		bitpos;
+ 	int		i;
+-	__int64_t	val;
++	int64_t		val;
+ 	char		*ok;
+ 
+ 	switch (iocur_crc_valid()) {
+@@ -230,7 +230,7 @@ fp_crc(
+ 		if (size > 32)
+ 			dbprintf(fmtstr, val, ok);
+ 		else
+-			dbprintf(fmtstr, (__int32_t)val, ok);
++			dbprintf(fmtstr, (int32_t)val, ok);
+ 		if (i < count - 1)
+ 			dbprintf(" ");
+ 	}
+diff --git a/db/frag.c b/db/frag.c
+index 8005e45d..d224f0c2 100644
+--- a/db/frag.c
++++ b/db/frag.c
+@@ -42,8 +42,8 @@ typedef	struct extmap {
+ 
+ static int		aflag;
+ static int		dflag;
+-static __uint64_t	extcount_actual;
+-static __uint64_t	extcount_ideal;
++static uint64_t	extcount_actual;
++static uint64_t	extcount_ideal;
+ static int		fflag;
+ static int		lflag;
+ static int		qflag;
+@@ -310,8 +310,8 @@ process_inode(
+ 	xfs_agino_t		agino,
+ 	xfs_dinode_t		*dip)
+ {
+-	__uint64_t		actual;
+-	__uint64_t		ideal;
++	uint64_t		actual;
++	uint64_t		ideal;
+ 	xfs_ino_t		ino;
+ 	int			skipa;
+ 	int			skipd;
+diff --git a/db/inode.c b/db/inode.c
+index 8b7a41e4..6cc47d6a 100644
+--- a/db/inode.c
++++ b/db/inode.c
+@@ -119,49 +119,49 @@ const field_t	inode_core_flds[] = {
+ 	{ "dmstate", FLDT_UINT16D, OI(COFF(dmstate)), C1, 0, TYP_NONE },
+ 	{ "flags", FLDT_UINT16X, OI(COFF(flags)), C1, FLD_SKIPALL, TYP_NONE },
+ 	{ "newrtbm", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_NEWRTBM_BIT - 1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_NEWRTBM_BIT - 1), C1,
+ 	  0, TYP_NONE },
+ 	{ "prealloc", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_PREALLOC_BIT - 1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_PREALLOC_BIT - 1), C1,
+ 	  0, TYP_NONE },
+ 	{ "realtime", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_REALTIME_BIT - 1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_REALTIME_BIT - 1), C1,
+ 	  0, TYP_NONE },
+ 	{ "immutable", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_IMMUTABLE_BIT-1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_IMMUTABLE_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ "append", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_APPEND_BIT - 1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_APPEND_BIT - 1), C1,
+ 	  0, TYP_NONE },
+ 	{ "sync", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_SYNC_BIT - 1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_SYNC_BIT - 1), C1,
+ 	  0, TYP_NONE },
+ 	{ "noatime", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_NOATIME_BIT - 1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_NOATIME_BIT - 1), C1,
+ 	  0, TYP_NONE },
+ 	{ "nodump", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_NODUMP_BIT - 1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_NODUMP_BIT - 1), C1,
+ 	  0, TYP_NONE },
+ 	{ "rtinherit", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_RTINHERIT_BIT-1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_RTINHERIT_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ "projinherit", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_PROJINHERIT_BIT-1),C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_PROJINHERIT_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ "nosymlinks", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_NOSYMLINKS_BIT-1), C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_NOSYMLINKS_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ "extsz", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_EXTSIZE_BIT-1),C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_EXTSIZE_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ "extszinherit", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_EXTSZINHERIT_BIT-1),C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_EXTSZINHERIT_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ "nodefrag", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_NODEFRAG_BIT-1),C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_NODEFRAG_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ "filestream", FLDT_UINT1,
+-	  OI(COFF(flags) + bitsz(__uint16_t) - XFS_DIFLAG_FILESTREAM_BIT-1),C1,
++	  OI(COFF(flags) + bitsz(uint16_t) - XFS_DIFLAG_FILESTREAM_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ "gen", FLDT_UINT32D, OI(COFF(gen)), C1, 0, TYP_NONE },
+ 	{ NULL }
+@@ -177,10 +177,10 @@ const field_t	inode_v3_flds[] = {
+ 	{ "inumber", FLDT_INO, OI(COFF(ino)), C1, 0, TYP_NONE },
+ 	{ "uuid", FLDT_UUID, OI(COFF(uuid)), C1, 0, TYP_NONE },
+ 	{ "reflink", FLDT_UINT1,
+-	  OI(COFF(flags2) + bitsz(__uint64_t) - XFS_DIFLAG2_REFLINK_BIT-1), C1,
++	  OI(COFF(flags2) + bitsz(uint64_t) - XFS_DIFLAG2_REFLINK_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ "cowextsz", FLDT_UINT1,
+-	  OI(COFF(flags2) + bitsz(__uint64_t) - XFS_DIFLAG2_COWEXTSIZE_BIT-1), C1,
++	  OI(COFF(flags2) + bitsz(uint64_t) - XFS_DIFLAG2_COWEXTSIZE_BIT-1), C1,
+ 	  0, TYP_NONE },
+ 	{ NULL }
+ };
+diff --git a/db/io.c b/db/io.c
+index 1f27f6b3..fd9b9f4b 100644
+--- a/db/io.c
++++ b/db/io.c
+@@ -545,7 +545,7 @@ set_cur(
+ 	struct xfs_buf	*bp;
+ 	xfs_ino_t	dirino;
+ 	xfs_ino_t	ino;
+-	__uint16_t	mode;
++	uint16_t	mode;
+ 	const struct xfs_buf_ops *ops = type ? type->bops : NULL;
+ 
+ 	if (iocur_sp < 0) {
+diff --git a/db/io.h b/db/io.h
+index 99730048..df0fdd75 100644
+--- a/db/io.h
++++ b/db/io.h
+@@ -25,7 +25,7 @@ typedef struct bbmap {
+ } bbmap_t;
+ 
+ typedef struct iocur {
+-	__int64_t		bb;	/* BB number in filesystem of buf */
++	int64_t			bb;	/* BB number in filesystem of buf */
+ 	int			blen;	/* length of "buf", bb's */
+ 	int			boff;	/* data - buf */
+ 	void			*buf;	/* base address of buffer */
+@@ -33,7 +33,7 @@ typedef struct iocur {
+ 	xfs_ino_t		dirino;	/* current directory inode number */
+ 	xfs_ino_t		ino;	/* current inode number */
+ 	int			len;	/* length of "data", bytes */
+-	__uint16_t		mode;	/* current inode's mode */
++	uint16_t		mode;	/* current inode's mode */
+ 	xfs_off_t		off;	/* fs offset of "data" in bytes */
+ 	const struct typ	*typ;	/* type of "data" */
+ 	bbmap_t			*bbmap;	/* map daddr if fragmented */
+@@ -57,7 +57,7 @@ extern void	off_cur(int off, int len);
+ extern void	pop_cur(void);
+ extern void	print_iocur(char *tag, iocur_t *ioc);
+ extern void	push_cur(void);
+-extern int	read_buf(__int64_t daddr, int count, void *bufp);
++extern int	read_buf(int64_t daddr, int count, void *bufp);
+ extern void     write_cur(void);
+ extern void	set_cur(const struct typ *type, xfs_daddr_t blknum,
+ 			int len, int ring_add, bbmap_t *bbmap);
+diff --git a/db/metadump.c b/db/metadump.c
+index 31bb5959..67bdf14e 100644
+--- a/db/metadump.c
++++ b/db/metadump.c
+@@ -175,7 +175,7 @@ write_index(void)
+ static int
+ write_buf_segment(
+ 	char		*data,
+-	__int64_t	off,
++	int64_t		off,
+ 	int		len)
+ {
+ 	int		i;
+@@ -1256,7 +1256,7 @@ process_sf_dir(
+ {
+ 	struct xfs_dir2_sf_hdr	*sfp;
+ 	xfs_dir2_sf_entry_t	*sfep;
+-	__uint64_t		ino_dir_size;
++	uint64_t		ino_dir_size;
+ 	int			i;
+ 
+ 	sfp = (struct xfs_dir2_sf_hdr *)XFS_DFORK_DPTR(dip);
+@@ -1322,7 +1322,7 @@ process_sf_dir(
+ static void
+ obfuscate_path_components(
+ 	char			*buf,
+-	__uint64_t		len)
++	uint64_t		len)
+ {
+ 	unsigned char		*comp = (unsigned char *)buf;
+ 	unsigned char		*end = comp + len;
+@@ -1359,7 +1359,7 @@ static void
+ process_sf_symlink(
+ 	xfs_dinode_t		*dip)
+ {
+-	__uint64_t		len;
++	uint64_t		len;
+ 	char			*buf;
+ 
+ 	len = be64_to_cpu(dip->di_size);
+@@ -1631,7 +1631,7 @@ process_attr_block(
+ 	xfs_attr_leaf_entry_t 		*entry;
+ 	xfs_attr_leaf_name_local_t 	*local;
+ 	xfs_attr_leaf_name_remote_t 	*remote;
+-	__uint32_t			bs = mp->m_sb.sb_blocksize;
++	uint32_t			bs = mp->m_sb.sb_blocksize;
+ 	char				*first_name;
+ 
+ 
+@@ -2270,7 +2270,7 @@ done:
+ 	return success;
+ }
+ 
+-static __uint32_t	inodes_copied = 0;
++static uint32_t	inodes_copied;
+ 
+ static int
+ copy_inode_chunk(
+diff --git a/db/sb.c b/db/sb.c
+index 8e7722cd..f19248d7 100644
+--- a/db/sb.c
++++ b/db/sb.c
+@@ -606,7 +606,7 @@ version_help(void)
+ }
+ 
+ static int
+-do_version(xfs_agnumber_t agno, __uint16_t version, __uint32_t features)
++do_version(xfs_agnumber_t agno, uint16_t version, uint32_t features)
+ {
+ 	xfs_sb_t	tsb;
+ 
+@@ -710,8 +710,8 @@ version_f(
+ 	int		argc,
+ 	char		**argv)
+ {
+-	__uint16_t	version = 0;
+-	__uint32_t	features = 0;
++	uint16_t	version = 0;
++	uint32_t	features = 0;
+ 	xfs_agnumber_t	ag;
+ 
+ 	if (argc == 2) {	/* WRITE VERSION */
+diff --git a/fsr/xfs_fsr.c b/fsr/xfs_fsr.c
+index 517b75f0..d4846a32 100644
+--- a/fsr/xfs_fsr.c
++++ b/fsr/xfs_fsr.c
+@@ -54,7 +54,7 @@ struct getbmap  *outmap = NULL;
+ int             outmap_size = 0;
+ int		RealUid;
+ int		tmp_agi;
+-static __int64_t	minimumfree = 2048;
++static int64_t		minimumfree = 2048;
+ 
+ #define MNTTYPE_XFS             "xfs"
+ 
+diff --git a/include/darwin.h b/include/darwin.h
+index 7bbd5764..51031c42 100644
+--- a/include/darwin.h
++++ b/include/darwin.h
+@@ -125,15 +125,15 @@ typedef signed int		__s32;
+ typedef unsigned long long int	__u64;
+ typedef signed long long int	__s64;
+ 
+-#define __int8_t	int8_t
+-#define __int16_t	int16_t
+-#define __int32_t	int32_t
+-#define __int32_t	int32_t
+-#define __int64_t	int64_t
+-#define __uint8_t	u_int8_t
+-#define __uint16_t	u_int16_t
+-#define __uint32_t	u_int32_t
+-#define __uint64_t	u_int64_t
++#define int8_t		int8_t
++#define int16_t		int16_t
++#define int32_t		int32_t
++#define int32_t		int32_t
++#define int64_t		int64_t
++#define uint8_t		u_int8_t
++#define uint16_t	u_int16_t
++#define uint32_t	u_int32_t
++#define uint64_t	u_int64_t
+ 
+ typedef off_t		xfs_off_t;
+ typedef u_int64_t	xfs_ino_t;
+diff --git a/include/freebsd.h b/include/freebsd.h
+index fb318b89..f52ed0a9 100644
+--- a/include/freebsd.h
++++ b/include/freebsd.h
+@@ -50,9 +50,9 @@ typedef unsigned long long int	__u64;
+ typedef signed long long int	__s64;
+ 
+ typedef off_t		xfs_off_t;
+-typedef __uint64_t	xfs_ino_t;
+-typedef __uint32_t	xfs_dev_t;
+-typedef __int64_t	xfs_daddr_t;
++typedef uint64_t	xfs_ino_t;
++typedef uint32_t	xfs_dev_t;
++typedef int64_t		xfs_daddr_t;
+ typedef __u32		xfs_nlink_t;
+ 
+ #define	O_LARGEFILE	0
+diff --git a/include/gnukfreebsd.h b/include/gnukfreebsd.h
+index 6916e65a..1db3f4f0 100644
+--- a/include/gnukfreebsd.h
++++ b/include/gnukfreebsd.h
+@@ -46,9 +46,9 @@ typedef unsigned long long int	__u64;
+ typedef signed long long int	__s64;
+ 
+ typedef off_t		xfs_off_t;
+-typedef __uint64_t	xfs_ino_t;
+-typedef __uint32_t	xfs_dev_t;
+-typedef __int64_t	xfs_daddr_t;
++typedef uint64_t	xfs_ino_t;
++typedef uint32_t	xfs_dev_t;
++typedef int64_t		xfs_daddr_t;
+ typedef __u32		xfs_nlink_t;
+ 
+ #define HAVE_FID	1
+diff --git a/include/libxcmd.h b/include/libxcmd.h
+index e8d2ffc8..6806380c 100644
+--- a/include/libxcmd.h
++++ b/include/libxcmd.h
+@@ -42,10 +42,10 @@ get_topology(
+ extern void
+ calc_default_ag_geometry(
+ 	int		blocklog,
+-	__uint64_t	dblocks,
++	uint64_t	dblocks,
+ 	int		multidisk,
+-	__uint64_t	*agsize,
+-	__uint64_t	*agcount);
++	uint64_t	*agsize,
++	uint64_t	*agcount);
+ 
+ extern int
+ check_overwrite(
+diff --git a/include/linux.h b/include/linux.h
+index 9611a37f..6ce344c5 100644
+--- a/include/linux.h
++++ b/include/linux.h
+@@ -132,7 +132,7 @@ static __inline__ void platform_uuid_copy(uuid_t *dst, uuid_t *src)
+ static __inline__ int
+ platform_discard_blocks(int fd, uint64_t start, uint64_t len)
+ {
+-	__uint64_t range[2] = { start, len };
++	uint64_t range[2] = { start, len };
+ 
+ 	if (ioctl(fd, BLKDISCARD, &range) < 0)
+ 		return errno;
+@@ -144,9 +144,9 @@ platform_discard_blocks(int fd, uint64_t start, uint64_t len)
+ #define EFSBADCRC	EBADMSG	/* Bad CRC detected */
+ 
+ typedef off_t		xfs_off_t;
+-typedef __uint64_t	xfs_ino_t;
+-typedef __uint32_t	xfs_dev_t;
+-typedef __int64_t	xfs_daddr_t;
++typedef uint64_t	xfs_ino_t;
++typedef uint32_t	xfs_dev_t;
++typedef int64_t		xfs_daddr_t;
+ typedef __u32		xfs_nlink_t;
+ 
+ /**
+diff --git a/include/xfs_arch.h b/include/xfs_arch.h
+index 12cd43e6..186cadba 100644
+--- a/include/xfs_arch.h
++++ b/include/xfs_arch.h
+@@ -244,39 +244,39 @@ static inline void be64_add_cpu(__be64 *a, __s64 b)
+ 	*a = cpu_to_be64(be64_to_cpu(*a) + b);
+ }
+ 
+-static inline __uint16_t get_unaligned_be16(void *p)
++static inline uint16_t get_unaligned_be16(void *p)
+ {
+-	__uint8_t *__p = p;
++	uint8_t *__p = p;
+ 	return __p[0] << 8 | __p[1];
+ }
+ 
+-static inline __uint32_t get_unaligned_be32(void *p)
++static inline uint32_t get_unaligned_be32(void *p)
+ {
+-	__uint8_t *__p = p;
++	uint8_t *__p = p;
+         return __p[0] << 24 | __p[1] << 16 | __p[2] << 8 | __p[3];
+ }
+ 
+-static inline __uint64_t get_unaligned_be64(void *p)
++static inline uint64_t get_unaligned_be64(void *p)
+ {
+-	return (__uint64_t)get_unaligned_be32(p) << 32 |
++	return (uint64_t)get_unaligned_be32(p) << 32 |
+ 			   get_unaligned_be32(p + 4);
+ }
+ 
+-static inline void put_unaligned_be16(__uint16_t val, void *p)
++static inline void put_unaligned_be16(uint16_t val, void *p)
+ {
+-	__uint8_t *__p = p;
++	uint8_t *__p = p;
+ 	*__p++ = val >> 8;
+ 	*__p++ = val;
+ }
+ 
+-static inline void put_unaligned_be32(__uint32_t val, void *p)
++static inline void put_unaligned_be32(uint32_t val, void *p)
+ {
+-	__uint8_t *__p = p;
++	uint8_t *__p = p;
+ 	put_unaligned_be16(val >> 16, __p);
+ 	put_unaligned_be16(val, __p + 2);
+ }
+ 
+-static inline void put_unaligned_be64(__uint64_t val, void *p)
++static inline void put_unaligned_be64(uint64_t val, void *p)
+ {
+ 	put_unaligned_be32(val >> 32, p);
+ 	put_unaligned_be32(val, p + 4);
+diff --git a/include/xfs_inode.h b/include/xfs_inode.h
+index fb6b5429..8766024e 100644
+--- a/include/xfs_inode.h
++++ b/include/xfs_inode.h
+@@ -123,8 +123,8 @@ xfs_get_projid(struct xfs_icdinode *id)
+ static inline void
+ xfs_set_projid(struct xfs_icdinode *id, prid_t projid)
+ {
+-	id->di_projid_hi = (__uint16_t) (projid >> 16);
+-	id->di_projid_lo = (__uint16_t) (projid & 0xffff);
++	id->di_projid_hi = (uint16_t) (projid >> 16);
++	id->di_projid_lo = (uint16_t) (projid & 0xffff);
+ }
+ 
+ static inline bool xfs_is_reflink_inode(struct xfs_inode *ip)
+diff --git a/include/xfs_log_recover.h b/include/xfs_log_recover.h
+index 7582676b..0d098628 100644
+--- a/include/xfs_log_recover.h
++++ b/include/xfs_log_recover.h
+@@ -26,7 +26,7 @@
+ #define XLOG_RHASH_SIZE	16
+ #define XLOG_RHASH_SHIFT 2
+ #define XLOG_RHASH(tid)	\
+-	((((__uint32_t)tid)>>XLOG_RHASH_SHIFT) & (XLOG_RHASH_SIZE-1))
++	((((uint32_t)tid)>>XLOG_RHASH_SHIFT) & (XLOG_RHASH_SIZE-1))
+ 
+ #define XLOG_MAX_REGIONS_IN_ITEM   (XFS_MAX_BLOCKSIZE / XFS_BLF_CHUNK / 2 + 1)
+ 
+diff --git a/include/xfs_metadump.h b/include/xfs_metadump.h
+index 7f3039eb..13afb8dd 100644
+--- a/include/xfs_metadump.h
++++ b/include/xfs_metadump.h
+@@ -24,8 +24,8 @@
+ typedef struct xfs_metablock {
+ 	__be32		mb_magic;
+ 	__be16		mb_count;
+-	__uint8_t	mb_blocklog;
+-	__uint8_t	mb_info;
++	uint8_t		mb_blocklog;
++	uint8_t		mb_info;
+ 	/* followed by an array of xfs_daddr_t */
+ } xfs_metablock_t;
+ 
+diff --git a/include/xfs_mount.h b/include/xfs_mount.h
+index 5ff24ebf..5b323bb1 100644
+--- a/include/xfs_mount.h
++++ b/include/xfs_mount.h
+@@ -48,12 +48,12 @@ typedef struct xfs_mount {
+ #define m_dev		m_ddev_targp
+ #define m_logdev	m_logdev_targp
+ #define m_rtdev		m_rtdev_targp
+-	__uint8_t		m_dircook_elog;	/* log d-cookie entry bits */
+-	__uint8_t		m_blkbit_log;	/* blocklog + NBBY */
+-	__uint8_t		m_blkbb_log;	/* blocklog - BBSHIFT */
+-	__uint8_t		m_sectbb_log;	/* sectorlog - BBSHIFT */
+-	__uint8_t		m_agno_log;	/* log #ag's */
+-	__uint8_t		m_agino_log;	/* #bits for agino in inum */
++	uint8_t			m_dircook_elog;	/* log d-cookie entry bits */
++	uint8_t			m_blkbit_log;	/* blocklog + NBBY */
++	uint8_t			m_blkbb_log;	/* blocklog - BBSHIFT */
++	uint8_t			m_sectbb_log;	/* sectorlog - BBSHIFT */
++	uint8_t			m_agno_log;	/* log #ag's */
++	uint8_t			m_agino_log;	/* #bits for agino in inum */
+ 	uint			m_inode_cluster_size;/* min inode buf size */
+ 	uint			m_blockmask;	/* sb_blocksize-1 */
+ 	uint			m_blockwsize;	/* sb_blocksize in words */
+@@ -88,7 +88,7 @@ typedef struct xfs_mount {
+ 	int			m_litino;	/* size of inode union area */
+ 	int			m_inoalign_mask;/* mask sb_inoalignmt if used */
+ 	struct xfs_trans_resv	m_resv;		/* precomputed res values */
+-	__uint64_t		m_maxicount;	/* maximum inode count */
++	uint64_t		m_maxicount;	/* maximum inode count */
+ 	int			m_dalign;	/* stripe unit */
+ 	int			m_swidth;	/* stripe width */
+ 	int			m_sinoalign;	/* stripe unit inode alignmnt */
+@@ -144,12 +144,12 @@ typedef struct xfs_perag {
+ 	char		pagi_init;	/* this agi's entry is initialized */
+ 	char		pagf_metadata;	/* the agf is preferred to be metadata */
+ 	char		pagi_inodeok;	/* The agi is ok for inodes */
+-	__uint8_t	pagf_levels[XFS_BTNUM_AGF];
++	uint8_t		pagf_levels[XFS_BTNUM_AGF];
+ 					/* # of levels in bno & cnt btree */
+-	__uint32_t	pagf_flcount;	/* count of blocks in freelist */
++	uint32_t	pagf_flcount;	/* count of blocks in freelist */
+ 	xfs_extlen_t	pagf_freeblks;	/* total free blocks */
+ 	xfs_extlen_t	pagf_longest;	/* longest free space */
+-	__uint32_t	pagf_btreeblks;	/* # of blocks held in AGF btrees */
++	uint32_t	pagf_btreeblks;	/* # of blocks held in AGF btrees */
+ 	xfs_agino_t	pagi_freecount;	/* number of free inodes */
+ 	xfs_agino_t	pagi_count;	/* number of allocated inodes */
+ 
+@@ -169,7 +169,7 @@ typedef struct xfs_perag {
+ 	struct xfs_ag_resv	pag_agfl_resv;
+ 
+ 	/* reference count */
+-	__uint8_t	pagf_refcount_level;
++	uint8_t		pagf_refcount_level;
+ } xfs_perag_t;
+ 
+ static inline struct xfs_ag_resv *
+diff --git a/libhandle/handle.c b/libhandle/handle.c
+index 236ed22a..00127b3c 100644
+--- a/libhandle/handle.c
++++ b/libhandle/handle.c
+@@ -232,7 +232,7 @@ obj_to_handle(
+ {
+ 	char		hbuf [MAXHANSIZ];
+ 	int		ret;
+-	__uint32_t	handlen;
++	uint32_t	handlen;
+ 	xfs_fsop_handlereq_t hreq;
+ 
+ 	if (opcode == XFS_IOC_FD_TO_HANDLE) {
+diff --git a/libhandle/jdm.c b/libhandle/jdm.c
+index e52f5d83..821061b4 100644
+--- a/libhandle/jdm.c
++++ b/libhandle/jdm.c
+@@ -36,7 +36,7 @@ typedef struct filehandle {
+ 	fshandle_t fh_fshandle;		/* handle of fs containing this inode */
+ 	int16_t fh_sz_following;	/* bytes in handle after this member */
+ 	char fh_pad[FILEHANDLE_SZ_PAD];	/* padding, must be zeroed */
+-	__uint32_t fh_gen;		/* generation count */
++	uint32_t fh_gen;		/* generation count */
+ 	xfs_ino_t fh_ino;		/* 64 bit ino */
+ } filehandle_t;
+ 
+diff --git a/libxcmd/topology.c b/libxcmd/topology.c
+index 8b0276a7..f66dd1bc 100644
+--- a/libxcmd/topology.c
++++ b/libxcmd/topology.c
+@@ -23,19 +23,19 @@
+ #endif /* ENABLE_BLKID */
+ #include "xfs_multidisk.h"
+ 
+-#define TERABYTES(count, blog)	((__uint64_t)(count) << (40 - (blog)))
+-#define GIGABYTES(count, blog)	((__uint64_t)(count) << (30 - (blog)))
+-#define MEGABYTES(count, blog)	((__uint64_t)(count) << (20 - (blog)))
++#define TERABYTES(count, blog)	((uint64_t)(count) << (40 - (blog)))
++#define GIGABYTES(count, blog)	((uint64_t)(count) << (30 - (blog)))
++#define MEGABYTES(count, blog)	((uint64_t)(count) << (20 - (blog)))
+ 
+ void
+ calc_default_ag_geometry(
+ 	int		blocklog,
+-	__uint64_t	dblocks,
++	uint64_t	dblocks,
+ 	int		multidisk,
+-	__uint64_t	*agsize,
+-	__uint64_t	*agcount)
++	uint64_t	*agsize,
++	uint64_t	*agcount)
+ {
+-	__uint64_t	blocks = 0;
++	uint64_t	blocks = 0;
+ 	int		shift = 0;
+ 
+ 	/*
+diff --git a/libxfs/darwin.c b/libxfs/darwin.c
+index 74507e81..16d2c35c 100644
+--- a/libxfs/darwin.c
++++ b/libxfs/darwin.c
+@@ -68,7 +68,7 @@ platform_flush_device(int fd, dev_t device)
+ void
+ platform_findsizes(char *path, int fd, long long *sz, int *bsz)
+ {
+-	__uint64_t	size;
++	uint64_t	size;
+ 	struct stat	st;
+ 
+ 	if (fstat(fd, &st) < 0) {
+diff --git a/libxfs/freebsd.c b/libxfs/freebsd.c
+index 4667d1f5..d7bca142 100644
+--- a/libxfs/freebsd.c
++++ b/libxfs/freebsd.c
+@@ -109,7 +109,7 @@ void
+ platform_findsizes(char *path, int fd, long long *sz, int *bsz)
+ {
+ 	struct stat	st;
+-	__int64_t	size;
++	int64_t		size;
+ 	u_int		ssize;
+ 
+ 	if (fstat(fd, &st) < 0) {
+diff --git a/libxfs/init.c b/libxfs/init.c
+index fc14c5e4..0f41a853 100644
+--- a/libxfs/init.c
++++ b/libxfs/init.c
+@@ -546,7 +546,7 @@ libxfs_initialize_perag(
+ 		 * the max inode percentage.
+ 		 */
+ 		if (mp->m_maxicount) {
+-			__uint64_t	icount;
++			uint64_t	icount;
+ 
+ 			icount = sbp->sb_dblocks * sbp->sb_imax_pct;
+ 			do_div(icount, 100);
+diff --git a/libxfs/irix.c b/libxfs/irix.c
+index 32fcb3e5..0f14aec7 100644
+--- a/libxfs/irix.c
++++ b/libxfs/irix.c
+@@ -22,7 +22,7 @@
+ 
+ int platform_has_uuid = 0;
+ extern char *progname;
+-extern __int64_t findsize(char *);
++extern int64_t findsize(char *);
+ 
+ int
+ platform_check_ismounted(char *name, char *block, struct stat *s, int verbose)
+diff --git a/libxfs/libxfs_priv.h b/libxfs/libxfs_priv.h
+index b4f766db..d525b667 100644
+--- a/libxfs/libxfs_priv.h
++++ b/libxfs/libxfs_priv.h
+@@ -296,8 +296,8 @@ roundup_pow_of_two(uint v)
+ 	return 0;
+ }
+ 
+-static inline __uint64_t
+-roundup_64(__uint64_t x, __uint32_t y)
++static inline uint64_t
++roundup_64(uint64_t x, uint32_t y)
+ {
+ 	x += y - 1;
+ 	do_div(x, y);
+diff --git a/libxfs/linux.c b/libxfs/linux.c
+index 69f04ad9..0bace3eb 100644
+--- a/libxfs/linux.c
++++ b/libxfs/linux.c
+@@ -163,7 +163,7 @@ void
+ platform_findsizes(char *path, int fd, long long *sz, int *bsz)
+ {
+ 	struct stat	st;
+-	__uint64_t	size;
++	uint64_t	size;
+ 	int		error;
+ 
+ 	if (fstat(fd, &st) < 0) {
+diff --git a/libxfs/logitem.c b/libxfs/logitem.c
+index 7e93f609..466b4421 100644
+--- a/libxfs/logitem.c
++++ b/libxfs/logitem.c
+@@ -121,7 +121,7 @@ xfs_buf_item_init(
+ 	bip->bli_item.li_mountp = mp;
+ 	bip->bli_buf = bp;
+ 	bip->bli_format.blf_type = XFS_LI_BUF;
+-	bip->bli_format.blf_blkno = (__int64_t)XFS_BUF_ADDR(bp);
++	bip->bli_format.blf_blkno = (int64_t)XFS_BUF_ADDR(bp);
+ 	bip->bli_format.blf_len = (unsigned short)BTOBB(XFS_BUF_COUNT(bp));
+ 	XFS_BUF_SET_FSPRIVATE(bp, bip);
+ }
+diff --git a/libxfs/radix-tree.c b/libxfs/radix-tree.c
+index eef9c36d..3f0257fe 100644
+--- a/libxfs/radix-tree.c
++++ b/libxfs/radix-tree.c
+@@ -66,21 +66,21 @@ static unsigned long height_to_maxindex[RADIX_TREE_MAX_PATH];
+ static inline void tag_set(struct radix_tree_node *node, unsigned int tag,
+ 		int offset)
+ {
+-	*((__uint32_t *)node->tags[tag] + (offset >> 5)) |= (1 << (offset & 31));
++	*((uint32_t *)node->tags[tag] + (offset >> 5)) |= (1 << (offset & 31));
+ }
+ 
+ static inline void tag_clear(struct radix_tree_node *node, unsigned int tag,
+ 		int offset)
+ {
+-	__uint32_t 	*p = (__uint32_t*)node->tags[tag] + (offset >> 5);
+-	__uint32_t 	m = 1 << (offset & 31);
++	uint32_t 	*p = (uint32_t*)node->tags[tag] + (offset >> 5);
++	uint32_t 	m = 1 << (offset & 31);
+ 	*p &= ~m;
+ }
+ 
+ static inline int tag_get(struct radix_tree_node *node, unsigned int tag,
+ 		int offset)
+ {
+-	return 1 & (((const __uint32_t *)node->tags[tag])[offset >> 5] >> (offset & 31));
++	return 1 & (((const uint32_t *)node->tags[tag])[offset >> 5] >> (offset & 31));
+ }
+ 
+ /*
+diff --git a/libxfs/rdwr.c b/libxfs/rdwr.c
+index 21c42f14..474e5ebc 100644
+--- a/libxfs/rdwr.c
++++ b/libxfs/rdwr.c
+@@ -118,9 +118,9 @@ static void unmount_record(void *p)
+ 	xlog_op_header_t	*op = (xlog_op_header_t *)p;
+ 	/* the data section must be 32 bit size aligned */
+ 	struct {
+-	    __uint16_t magic;
+-	    __uint16_t pad1;
+-	    __uint32_t pad2; /* may as well make it 64 bits */
++	    uint16_t magic;
++	    uint16_t pad1;
++	    uint32_t pad2; /* may as well make it 64 bits */
+ 	} magic = { XLOG_UNMOUNT_TYPE, 0, 0 };
+ 
+ 	memset(p, 0, BBSIZE);
+diff --git a/libxfs/util.c b/libxfs/util.c
+index dcfca397..7938e317 100644
+--- a/libxfs/util.c
++++ b/libxfs/util.c
+@@ -170,8 +170,8 @@ libxfs_trans_ichgtime(
+ 	if (flags & XFS_ICHGTIME_CHG)
+ 		VFS_I(ip)->i_ctime = tv;
+ 	if (flags & XFS_ICHGTIME_CREATE) {
+-		ip->i_d.di_crtime.t_sec = (__int32_t)tv.tv_sec;
+-		ip->i_d.di_crtime.t_nsec = (__int32_t)tv.tv_nsec;
++		ip->i_d.di_crtime.t_sec = (int32_t)tv.tv_sec;
++		ip->i_d.di_crtime.t_nsec = (int32_t)tv.tv_nsec;
+ 	}
+ }
+ 
+@@ -261,8 +261,8 @@ libxfs_ialloc(
+ 		ASSERT(uuid_equal(&ip->i_d.di_uuid, &mp->m_sb.sb_meta_uuid));
+ 		VFS_I(ip)->i_version = 1;
+ 		ip->i_d.di_flags2 = 0;
+-		ip->i_d.di_crtime.t_sec = (__int32_t)VFS_I(ip)->i_mtime.tv_sec;
+-		ip->i_d.di_crtime.t_nsec = (__int32_t)VFS_I(ip)->i_mtime.tv_nsec;
++		ip->i_d.di_crtime.t_sec = (int32_t)VFS_I(ip)->i_mtime.tv_sec;
++		ip->i_d.di_crtime.t_nsec = (int32_t)VFS_I(ip)->i_mtime.tv_nsec;
+ 	}
+ 
+ 	flags = XFS_ILOG_CORE;
+diff --git a/logprint/log_misc.c b/logprint/log_misc.c
+index 0dfcfd19..2fd01ceb 100644
+--- a/logprint/log_misc.c
++++ b/logprint/log_misc.c
+@@ -166,12 +166,12 @@ xlog_print_trans_header(char **ptr, int len)
+ {
+     xfs_trans_header_t  *h;
+     char		*cptr = *ptr;
+-    __uint32_t          magic;
++    uint32_t          magic;
+     char                *magic_c = (char *)&magic;
+ 
+     *ptr += len;
+ 
+-    magic=*(__uint32_t*)cptr; /* XXX be32_to_cpu soon */
++    magic = *(uint32_t *)cptr; /* XXX be32_to_cpu soon */
+ 
+     if (len >= 4) {
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+@@ -201,7 +201,7 @@ xlog_print_trans_buffer(char **ptr, int len, int *i, int num_ops)
+     int			 num, skip;
+     int			 super_block = 0;
+     int			 bucket, col, buckets;
+-    __int64_t		 blkno;
++    int64_t			 blkno;
+     xfs_buf_log_format_t lbuf;
+     int			 size, blen, map_size, struct_size;
+     __be64		 x, y;
+diff --git a/mdrestore/xfs_mdrestore.c b/mdrestore/xfs_mdrestore.c
+index 9d1b4e80..c49c13aa 100644
+--- a/mdrestore/xfs_mdrestore.c
++++ b/mdrestore/xfs_mdrestore.c
+@@ -66,7 +66,7 @@ perform_restore(
+ 	int			mb_count;
+ 	xfs_metablock_t		tmb;
+ 	xfs_sb_t		sb;
+-	__int64_t		bytes_read;
++	int64_t			bytes_read;
+ 
+ 	/*
+ 	 * read in first blocks (superblock 0), set "inprogress" flag for it,
+diff --git a/mkfs/proto.c b/mkfs/proto.c
+index 89cd2379..cf8cc391 100644
+--- a/mkfs/proto.c
++++ b/mkfs/proto.c
+@@ -667,7 +667,7 @@ rtinit(
+ 	mp->m_sb.sb_rbmino = rbmip->i_ino;
+ 	rbmip->i_d.di_size = mp->m_sb.sb_rbmblocks * mp->m_sb.sb_blocksize;
+ 	rbmip->i_d.di_flags = XFS_DIFLAG_NEWRTBM;
+-	*(__uint64_t *)&VFS_I(rbmip)->i_atime = 0;
++	*(uint64_t *)&VFS_I(rbmip)->i_atime = 0;
+ 	libxfs_trans_log_inode(tp, rbmip, XFS_ILOG_CORE);
+ 	libxfs_log_sb(tp);
+ 	mp->m_rbmip = rbmip;
+diff --git a/mkfs/xfs_mkfs.c b/mkfs/xfs_mkfs.c
+index b5c3a57e..7bb6408f 100644
+--- a/mkfs/xfs_mkfs.c
++++ b/mkfs/xfs_mkfs.c
+@@ -705,9 +705,9 @@ struct opt_params mopts = {
+ 	},
+ };
+ 
+-#define TERABYTES(count, blog)	((__uint64_t)(count) << (40 - (blog)))
+-#define GIGABYTES(count, blog)	((__uint64_t)(count) << (30 - (blog)))
+-#define MEGABYTES(count, blog)	((__uint64_t)(count) << (20 - (blog)))
++#define TERABYTES(count, blog)	((uint64_t)(count) << (40 - (blog)))
++#define GIGABYTES(count, blog)	((uint64_t)(count) << (30 - (blog)))
++#define MEGABYTES(count, blog)	((uint64_t)(count) << (20 - (blog)))
+ 
+ /*
+  * Use this macro before we have superblock and mount structure
+@@ -878,7 +878,7 @@ fixup_log_stripe_unit(
+ 	xfs_rfsblock_t	*logblocks,
+ 	int		blocklog)
+ {
+-	__uint64_t	tmp_logblocks;
++	uint64_t	tmp_logblocks;
+ 
+ 	/*
+ 	 * Make sure that the log size is a multiple of the stripe unit
+@@ -910,7 +910,7 @@ fixup_internal_log_stripe(
+ 	xfs_mount_t	*mp,
+ 	int		lsflag,
+ 	xfs_fsblock_t	logstart,
+-	__uint64_t	agsize,
++	uint64_t	agsize,
+ 	int		sunit,
+ 	xfs_rfsblock_t	*logblocks,
+ 	int		blocklog,
+@@ -934,7 +934,7 @@ fixup_internal_log_stripe(
+ }
+ 
+ void
+-validate_log_size(__uint64_t logblocks, int blocklog, int min_logblocks)
++validate_log_size(uint64_t logblocks, int blocklog, int min_logblocks)
+ {
+ 	if (logblocks < min_logblocks) {
+ 		fprintf(stderr,
+@@ -959,7 +959,7 @@ validate_log_size(__uint64_t logblocks, int blocklog, int min_logblocks)
+ static int
+ calc_default_imaxpct(
+ 	int		blocklog,
+-	__uint64_t	dblocks)
++	uint64_t	dblocks)
+ {
+ 	/*
+ 	 * This returns the % of the disk space that is used for
+@@ -981,9 +981,9 @@ calc_default_imaxpct(
+ static void
+ validate_ag_geometry(
+ 	int		blocklog,
+-	__uint64_t	dblocks,
+-	__uint64_t	agsize,
+-	__uint64_t	agcount)
++	uint64_t	dblocks,
++	uint64_t	agsize,
++	uint64_t	agcount)
+ {
+ 	if (agsize < XFS_AG_MIN_BLOCKS(blocklog)) {
+ 		fprintf(stderr,
+@@ -1059,7 +1059,7 @@ zero_old_xfs_structures(
+ {
+ 	void 			*buf;
+ 	xfs_sb_t 		sb;
+-	__uint32_t		bsize;
++	uint32_t		bsize;
+ 	int			i;
+ 	xfs_off_t		off;
+ 
+@@ -1112,8 +1112,8 @@ zero_old_xfs_structures(
+ 			i != sb.sb_blocklog)
+ 		goto done;
+ 
+-	if (sb.sb_dblocks > ((__uint64_t)sb.sb_agcount * sb.sb_agblocks) ||
+-			sb.sb_dblocks < ((__uint64_t)(sb.sb_agcount - 1) *
++	if (sb.sb_dblocks > ((uint64_t)sb.sb_agcount * sb.sb_agblocks) ||
++			sb.sb_dblocks < ((uint64_t)(sb.sb_agcount - 1) *
+ 					 sb.sb_agblocks + XFS_MIN_AG_BLOCKS))
+ 		goto done;
+ 
+@@ -1133,7 +1133,7 @@ done:
+ }
+ 
+ static void
+-discard_blocks(dev_t dev, __uint64_t nsectors)
++discard_blocks(dev_t dev, uint64_t nsectors)
+ {
+ 	int fd;
+ 
+@@ -1395,11 +1395,11 @@ main(
+ 	int			argc,
+ 	char			**argv)
+ {
+-	__uint64_t		agcount;
++	uint64_t		agcount;
+ 	xfs_agf_t		*agf;
+ 	xfs_agi_t		*agi;
+ 	xfs_agnumber_t		agno;
+-	__uint64_t		agsize;
++	uint64_t		agsize;
+ 	xfs_alloc_rec_t		*arec;
+ 	struct xfs_btree_block	*block;
+ 	int			blflag;
+@@ -1475,10 +1475,10 @@ main(
+ 	char			*rtsize;
+ 	xfs_sb_t		*sbp;
+ 	int			sectorlog;
+-	__uint64_t		sector_mask;
++	uint64_t		sector_mask;
+ 	int			slflag;
+ 	int			ssflag;
+-	__uint64_t		tmp_agsize;
++	uint64_t		tmp_agsize;
+ 	uuid_t			uuid;
+ 	int			worst_freelist;
+ 	libxfs_init_t		xi;
+@@ -2167,7 +2167,7 @@ _("rmapbt not supported with realtime devices\n"));
+ 
+ 
+ 	if (dsize) {
+-		__uint64_t dbytes;
++		uint64_t dbytes;
+ 
+ 		dbytes = getnum(dsize, &dopts, D_SIZE);
+ 		if (dbytes % XFS_MIN_BLOCKSIZE) {
+@@ -2199,7 +2199,7 @@ _("rmapbt not supported with realtime devices\n"));
+ 	}
+ 
+ 	if (logsize) {
+-		__uint64_t logbytes;
++		uint64_t logbytes;
+ 
+ 		logbytes = getnum(logsize, &lopts, L_SIZE);
+ 		if (logbytes % XFS_MIN_BLOCKSIZE) {
+@@ -2216,7 +2216,7 @@ _("rmapbt not supported with realtime devices\n"));
+ 				(long long)(logblocks << blocklog));
+ 	}
+ 	if (rtsize) {
+-		__uint64_t rtbytes;
++		uint64_t rtbytes;
+ 
+ 		rtbytes = getnum(rtsize, &ropts, R_SIZE);
+ 		if (rtbytes % XFS_MIN_BLOCKSIZE) {
+@@ -2236,7 +2236,7 @@ _("rmapbt not supported with realtime devices\n"));
+ 	 * If specified, check rt extent size against its constraints.
+ 	 */
+ 	if (rtextsize) {
+-		__uint64_t rtextbytes;
++		uint64_t rtextbytes;
+ 
+ 		rtextbytes = getnum(rtextsize, &ropts, R_EXTSIZE);
+ 		if (rtextbytes % blocksize) {
+@@ -2252,8 +2252,8 @@ _("rmapbt not supported with realtime devices\n"));
+ 		 * and the underlying volume is striped, then set rtextblocks
+ 		 * to the stripe width.
+ 		 */
+-		__uint64_t	rswidth;
+-		__uint64_t	rtextbytes;
++		uint64_t	rswidth;
++		uint64_t	rtextbytes;
+ 
+ 		if (!norsflag && !xi.risfile && !(!rtsize && xi.disfile))
+ 			rswidth = ft.rtswidth;
+@@ -2335,10 +2335,10 @@ _("rmapbt not supported with realtime devices\n"));
+ 	 * multiple of the sector size, or 1024, whichever is larger.
+ 	 */
+ 
+-	sector_mask = (__uint64_t)-1 << (MAX(sectorlog, 10) - BBSHIFT);
++	sector_mask = (uint64_t)-1 << (MAX(sectorlog, 10) - BBSHIFT);
+ 	xi.dsize &= sector_mask;
+ 	xi.rtsize &= sector_mask;
+-	xi.logBBsize &= (__uint64_t)-1 << (MAX(lsectorlog, 10) - BBSHIFT);
++	xi.logBBsize &= (uint64_t)-1 << (MAX(lsectorlog, 10) - BBSHIFT);
+ 
+ 
+ 	/* don't do discards on print-only runs or on files */
+@@ -2696,9 +2696,9 @@ _("size %s specified for log subvolume is too large, maximum is %lld blocks\n"),
+ 	mp = &mbuf;
+ 	sbp = &mp->m_sb;
+ 	memset(mp, 0, sizeof(xfs_mount_t));
+-	sbp->sb_blocklog = (__uint8_t)blocklog;
+-	sbp->sb_sectlog = (__uint8_t)sectorlog;
+-	sbp->sb_agblklog = (__uint8_t)libxfs_log2_roundup((unsigned int)agsize);
++	sbp->sb_blocklog = (uint8_t)blocklog;
++	sbp->sb_sectlog = (uint8_t)sectorlog;
++	sbp->sb_agblklog = (uint8_t)libxfs_log2_roundup((unsigned int)agsize);
+ 	sbp->sb_agblocks = (xfs_agblock_t)agsize;
+ 	mp->m_blkbb_log = sbp->sb_blocklog - BBSHIFT;
+ 	mp->m_sectbb_log = sbp->sb_sectlog - BBSHIFT;
+@@ -2805,14 +2805,14 @@ _("size %s specified for log subvolume is too large, maximum is %lld blocks\n"),
+ 	sbp->sb_agcount = (xfs_agnumber_t)agcount;
+ 	sbp->sb_rbmblocks = nbmblocks;
+ 	sbp->sb_logblocks = (xfs_extlen_t)logblocks;
+-	sbp->sb_sectsize = (__uint16_t)sectorsize;
+-	sbp->sb_inodesize = (__uint16_t)isize;
+-	sbp->sb_inopblock = (__uint16_t)(blocksize / isize);
+-	sbp->sb_sectlog = (__uint8_t)sectorlog;
+-	sbp->sb_inodelog = (__uint8_t)inodelog;
+-	sbp->sb_inopblog = (__uint8_t)(blocklog - inodelog);
++	sbp->sb_sectsize = (uint16_t)sectorsize;
++	sbp->sb_inodesize = (uint16_t)isize;
++	sbp->sb_inopblock = (uint16_t)(blocksize / isize);
++	sbp->sb_sectlog = (uint8_t)sectorlog;
++	sbp->sb_inodelog = (uint8_t)inodelog;
++	sbp->sb_inopblog = (uint8_t)(blocklog - inodelog);
+ 	sbp->sb_rextslog =
+-		(__uint8_t)(rtextents ?
++		(uint8_t)(rtextents ?
+ 			libxfs_highbit32((unsigned int)rtextents) : 0);
+ 	sbp->sb_inprogress = 1;	/* mkfs is in progress */
+ 	sbp->sb_imax_pct = imaxpct;
+@@ -2840,8 +2840,8 @@ _("size %s specified for log subvolume is too large, maximum is %lld blocks\n"),
+ 	} else
+ 		sbp->sb_inoalignmt = 0;
+ 	if (lsectorsize != BBSIZE || sectorsize != BBSIZE) {
+-		sbp->sb_logsectlog = (__uint8_t)lsectorlog;
+-		sbp->sb_logsectsize = (__uint16_t)lsectorsize;
++		sbp->sb_logsectlog = (uint8_t)lsectorlog;
++		sbp->sb_logsectsize = (uint16_t)lsectorsize;
+ 	} else {
+ 		sbp->sb_logsectlog = 0;
+ 		sbp->sb_logsectsize = 0;
+diff --git a/quota/edit.c b/quota/edit.c
+index 36b327a5..8418e858 100644
+--- a/quota/edit.c
++++ b/quota/edit.c
+@@ -115,16 +115,16 @@ warn_help(void)
+ 
+ static void
+ set_limits(
+-	__uint32_t	id,
++	uint32_t	id,
+ 	uint		type,
+ 	uint		mask,
+ 	char		*dev,
+-	__uint64_t	*bsoft,
+-	__uint64_t	*bhard,
+-	__uint64_t	*isoft,
+-	__uint64_t	*ihard,
+-	__uint64_t	*rtbsoft,
+-	__uint64_t	*rtbhard)
++	uint64_t	*bsoft,
++	uint64_t	*bhard,
++	uint64_t	*isoft,
++	uint64_t	*ihard,
++	uint64_t	*rtbsoft,
++	uint64_t	*rtbhard)
+ {
+ 	fs_disk_quota_t	d;
+ 
+@@ -152,12 +152,12 @@ set_user_limits(
+ 	char		*name,
+ 	uint		type,
+ 	uint		mask,
+-	__uint64_t	*bsoft,
+-	__uint64_t	*bhard,
+-	__uint64_t	*isoft,
+-	__uint64_t	*ihard,
+-	__uint64_t	*rtbsoft,
+-	__uint64_t	*rtbhard)
++	uint64_t	*bsoft,
++	uint64_t	*bhard,
++	uint64_t	*isoft,
++	uint64_t	*ihard,
++	uint64_t	*rtbsoft,
++	uint64_t	*rtbhard)
+ {
+ 	uid_t		uid = uid_from_string(name);
+ 
+@@ -175,12 +175,12 @@ set_group_limits(
+ 	char		*name,
+ 	uint		type,
+ 	uint		mask,
+-	__uint64_t	*bsoft,
+-	__uint64_t	*bhard,
+-	__uint64_t	*isoft,
+-	__uint64_t	*ihard,
+-	__uint64_t	*rtbsoft,
+-	__uint64_t	*rtbhard)
++	uint64_t	*bsoft,
++	uint64_t	*bhard,
++	uint64_t	*isoft,
++	uint64_t	*ihard,
++	uint64_t	*rtbsoft,
++	uint64_t	*rtbhard)
+ {
+ 	gid_t		gid = gid_from_string(name);
+ 
+@@ -198,12 +198,12 @@ set_project_limits(
+ 	char		*name,
+ 	uint		type,
+ 	uint		mask,
+-	__uint64_t	*bsoft,
+-	__uint64_t	*bhard,
+-	__uint64_t	*isoft,
+-	__uint64_t	*ihard,
+-	__uint64_t	*rtbsoft,
+-	__uint64_t	*rtbhard)
++	uint64_t	*bsoft,
++	uint64_t	*bhard,
++	uint64_t	*isoft,
++	uint64_t	*ihard,
++	uint64_t	*rtbsoft,
++	uint64_t	*rtbhard)
+ {
+ 	prid_t		prid = prid_from_string(name);
+ 
+@@ -224,7 +224,7 @@ extractb(
+ 	int		length,
+ 	uint		blocksize,
+ 	uint		sectorsize,
+-	__uint64_t	*value)
++	uint64_t	*value)
+ {
+ 	long long	v;
+ 	char		*s = string;
+@@ -238,7 +238,7 @@ extractb(
+ 				progname, s);
+ 			return 0;
+ 		}
+-		*value = (__uint64_t)v >> 9;	/* syscalls use basic blocks */
++		*value = (uint64_t)v >> 9;	/* syscalls use basic blocks */
+ 		if (v > 0 && *value == 0)
+ 			fprintf(stderr, _("%s: Warning: `%s' in quota blocks is 0 (unlimited).\n"), progname, s);
+ 		return 1;
+@@ -252,7 +252,7 @@ extracti(
+ 	char		*string,
+ 	const char	*prefix,
+ 	int		length,
+-	__uint64_t	*value)
++	uint64_t	*value)
+ {
+ 	char		*sp, *s = string;
+ 
+@@ -270,7 +270,7 @@ limit_f(
+ 	char		**argv)
+ {
+ 	char		*name;
+-	__uint64_t	bsoft, bhard, isoft, ihard, rtbsoft, rtbhard;
++	uint64_t	bsoft, bhard, isoft, ihard, rtbsoft, rtbhard;
+ 	int		c, type = 0, mask = 0, flags = 0;
+ 	uint		bsize, ssize, endoptions;
+ 
+@@ -384,8 +384,8 @@ restore_file(
+ 	char		*dev = NULL;
+ 	uint		mask;
+ 	int		cnt;
+-	__uint32_t	id;
+-	__uint64_t	bsoft, bhard, isoft, ihard, rtbsoft, rtbhard;
++	uint32_t	id;
++	uint64_t	bsoft, bhard, isoft, ihard, rtbsoft, rtbhard;
+ 
+ 	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+ 		if (strncmp("fs = ", buffer, 5) == 0) {
+@@ -546,7 +546,7 @@ timer_f(
+ 
+ static void
+ set_warnings(
+-	__uint32_t	id,
++	uint32_t	id,
+ 	uint		type,
+ 	uint		mask,
+ 	char		*dev,
+diff --git a/quota/free.c b/quota/free.c
+index cee15ee9..1f8378d2 100644
+--- a/quota/free.c
++++ b/quota/free.c
+@@ -49,20 +49,20 @@ free_help(void)
+ static int
+ mount_free_space_data(
+ 	struct fs_path		*mount,
+-	__uint64_t		*bcount,
+-	__uint64_t		*bused,
+-	__uint64_t		*bfree,
+-	__uint64_t		*icount,
+-	__uint64_t		*iused,
+-	__uint64_t		*ifree,
+-	__uint64_t		*rcount,
+-	__uint64_t		*rused,
+-	__uint64_t		*rfree)
++	uint64_t		*bcount,
++	uint64_t		*bused,
++	uint64_t		*bfree,
++	uint64_t		*icount,
++	uint64_t		*iused,
++	uint64_t		*ifree,
++	uint64_t		*rcount,
++	uint64_t		*rused,
++	uint64_t		*rfree)
+ {
+ 	struct xfs_fsop_counts	fscounts;
+ 	struct xfs_fsop_geom	fsgeo;
+ 	struct statfs		st;
+-	__uint64_t		logsize, count, free;
++	uint64_t		logsize, count, free;
+ 	int			fd;
+ 
+ 	if ((fd = open(mount->fs_dir, O_RDONLY)) < 0) {
+@@ -132,15 +132,15 @@ mount_free_space_data(
+ static int
+ projects_free_space_data(
+ 	struct fs_path		*path,
+-	__uint64_t		*bcount,
+-	__uint64_t		*bused,
+-	__uint64_t		*bfree,
+-	__uint64_t		*icount,
+-	__uint64_t		*iused,
+-	__uint64_t		*ifree,
+-	__uint64_t		*rcount,
+-	__uint64_t		*rused,
+-	__uint64_t		*rfree)
++	uint64_t		*bcount,
++	uint64_t		*bused,
++	uint64_t		*bfree,
++	uint64_t		*icount,
++	uint64_t		*iused,
++	uint64_t		*ifree,
++	uint64_t		*rcount,
++	uint64_t		*rused,
++	uint64_t		*rfree)
+ {
+ 	fs_quota_stat_t		qfs;
+ 	fs_disk_quota_t		d;
+@@ -226,9 +226,9 @@ free_space(
+ 	fs_path_t	*path,
+ 	uint		flags)
+ {
+-	__uint64_t	bcount, bused, bfree;
+-	__uint64_t	icount, iused, ifree;
+-	__uint64_t	rcount, rused, rfree;
++	uint64_t	bcount, bused, bfree;
++	uint64_t	icount, iused, ifree;
++	uint64_t	rcount, rused, rfree;
+ 	char		a[8], s[8], u[8], p[8];
+ 	int		count;
+ 
+diff --git a/quota/quot.c b/quota/quot.c
+index ccc154f5..6378fbb7 100644
+--- a/quota/quot.c
++++ b/quota/quot.c
+@@ -26,17 +26,17 @@
+ 
+ typedef struct du {
+ 	struct du	*next;
+-	__uint64_t	blocks;
+-	__uint64_t	blocks30;
+-	__uint64_t	blocks60;
+-	__uint64_t	blocks90;
+-	__uint64_t	nfiles;
+-	__uint32_t	id;
++	uint64_t	blocks;
++	uint64_t	blocks30;
++	uint64_t	blocks60;
++	uint64_t	blocks90;
++	uint64_t	nfiles;
++	uint32_t	id;
+ } du_t;
+ 
+ #define	TSIZE		500
+-static __uint64_t	sizes[TSIZE];
+-static __uint64_t	overflow;
++static uint64_t	sizes[TSIZE];
++static uint64_t	overflow;
+ 
+ #define	NDU		60000
+ #define	DUHASH		8209
+@@ -84,8 +84,8 @@ quot_bulkstat_add(
+ {
+ 	du_t		*dp;
+ 	du_t		**hp;
+-	__uint64_t	size;
+-	__uint32_t	i, id;
++	uint64_t	size;
++	uint32_t	i, id;
+ 
+ 	if ((p->bs_mode & S_IFMT) == 0)
+ 		return;
+@@ -203,7 +203,7 @@ qcompare(
+ 	return 0;
+ }
+ 
+-typedef char *(*idtoname_t)(__uint32_t);
++typedef char *(*idtoname_t)(uint32_t);
+ 
+ static void
+ quot_report_mount_any_type(
+@@ -291,7 +291,7 @@ quot_histogram_mount(
+ 	fs_path_t	*mount,
+ 	uint		flags)
+ {
+-	__uint64_t	t = 0;
++	uint64_t	t = 0;
+ 	int		i;
+ 
+ 	fprintf(fp, _("%s (%s):\n"), mount->fs_name, mount->fs_dir);
+diff --git a/quota/quota.c b/quota/quota.c
+index d09e239b..479b970e 100644
+--- a/quota/quota.c
++++ b/quota/quota.c
+@@ -52,7 +52,7 @@ quota_help(void)
+ static int
+ quota_mount(
+ 	FILE		*fp,
+-	__uint32_t	id,
++	uint32_t	id,
+ 	char		*name,
+ 	uint		form,
+ 	uint		type,
+@@ -181,7 +181,7 @@ quota_mount(
+ static void
+ quota(
+ 	FILE		*fp,
+-	__uint32_t	id,
++	uint32_t	id,
+ 	char		*name,
+ 	uint		form,
+ 	uint		type,
+diff --git a/quota/quota.h b/quota/quota.h
+index 4bde3513..9ed28bee 100644
+--- a/quota/quota.h
++++ b/quota/quota.h
+@@ -53,9 +53,9 @@ enum {
+ extern char *type_to_string(uint __type);
+ extern char *form_to_string(uint __form);
+ extern char *time_to_string(time_t __time, uint __flags);
+-extern char *bbs_to_string(__uint64_t __v, char *__c, uint __size);
+-extern char *num_to_string(__uint64_t __v, char *__c, uint __size);
+-extern char *pct_to_string(__uint64_t __v, __uint64_t __t, char *__c, uint __s);
++extern char *bbs_to_string(uint64_t __v, char *__c, uint __size);
++extern char *num_to_string(uint64_t __v, char *__c, uint __size);
++extern char *pct_to_string(uint64_t __v, uint64_t __t, char *__c, uint __s);
+ 
+ extern FILE *fopen_write_secure(char *__filename);
+ 
+@@ -81,7 +81,7 @@ enum {
+  * Identifier (uid/gid/prid) cache routines
+  */
+ #define NMAX 32
+-extern char *uid_to_name(__uint32_t __uid);
+-extern char *gid_to_name(__uint32_t __gid);
+-extern char *prid_to_name(__uint32_t __prid);
++extern char *uid_to_name(uint32_t __uid);
++extern char *gid_to_name(uint32_t __gid);
++extern char *prid_to_name(uint32_t __prid);
+ extern bool isdigits_only(const char *);
+diff --git a/quota/report.c b/quota/report.c
+index d0509c25..b2ea3bbe 100644
+--- a/quota/report.c
++++ b/quota/report.c
+@@ -333,9 +333,9 @@ report_header(
+ static int
+ report_mount(
+ 	FILE		*fp,
+-	__uint32_t	id,
++	uint32_t	id,
+ 	char		*name,
+-	__uint32_t	*oid,
++	uint32_t	*oid,
+ 	uint		form,
+ 	uint		type,
+ 	fs_path_t	*mount,
+diff --git a/quota/state.c b/quota/state.c
+index 09dfa705..b08bf50b 100644
+--- a/quota/state.c
++++ b/quota/state.c
+@@ -135,7 +135,7 @@ static void
+ state_timelimit(
+ 	FILE		*fp,
+ 	uint		form,
+-	__uint32_t	timelimit)
++	uint32_t	timelimit)
+ {
+ 	fprintf(fp, _("%s grace time: %s\n"),
+ 		form_to_string(form),
+diff --git a/quota/util.c b/quota/util.c
+index cafd45f5..37840a86 100644
+--- a/quota/util.c
++++ b/quota/util.c
+@@ -94,8 +94,8 @@ round_snprintf(
+ 	size_t		size,
+ 	const char	*fmt_round,
+ 	const char	*fmt_not_round,
+-	__uint64_t	value,
+-	__uint64_t	divisor)
++	uint64_t	value,
++	uint64_t	divisor)
+ {
+ 	double		v = (double)value / divisor;
+ 
+@@ -107,23 +107,23 @@ round_snprintf(
+ }
+ 
+ /* Basic blocks (512) bytes are returned from quotactl */
+-#define BBS_TO_EXABYTES(bbs)	((__uint64_t)(bbs)>>51)
+-#define BBS_TO_PETABYTES(bbs)	((__uint64_t)(bbs)>>41)
+-#define BBS_TO_TERABYTES(bbs)	((__uint64_t)(bbs)>>31)
+-#define BBS_TO_GIGABYTES(bbs)	((__uint64_t)(bbs)>>21)
+-#define BBS_TO_MEGABYTES(bbs)	((__uint64_t)(bbs)>>11)
+-#define BBS_TO_KILOBYTES(bbs)	((__uint64_t)(bbs)>>1)
+-
+-#define BBEXABYTE		((__uint64_t)1<<51)
+-#define BBPETABYTE		((__uint64_t)1<<41)
+-#define BBTERABYTE		((__uint64_t)1<<31)
+-#define BBGIGABYTE		((__uint64_t)1<<21)
+-#define BBMEGABYTE		((__uint64_t)1<<11)
+-#define BBKILOBYTE		((__uint64_t)1<< 1)
++#define BBS_TO_EXABYTES(bbs)	((uint64_t)(bbs)>>51)
++#define BBS_TO_PETABYTES(bbs)	((uint64_t)(bbs)>>41)
++#define BBS_TO_TERABYTES(bbs)	((uint64_t)(bbs)>>31)
++#define BBS_TO_GIGABYTES(bbs)	((uint64_t)(bbs)>>21)
++#define BBS_TO_MEGABYTES(bbs)	((uint64_t)(bbs)>>11)
++#define BBS_TO_KILOBYTES(bbs)	((uint64_t)(bbs)>>1)
++
++#define BBEXABYTE		((uint64_t)1<<51)
++#define BBPETABYTE		((uint64_t)1<<41)
++#define BBTERABYTE		((uint64_t)1<<31)
++#define BBGIGABYTE		((uint64_t)1<<21)
++#define BBMEGABYTE		((uint64_t)1<<11)
++#define BBKILOBYTE		((uint64_t)1<< 1)
+ 
+ char *
+ bbs_to_string(
+-	__uint64_t	v,
++	uint64_t	v,
+ 	char		*sp,
+ 	uint		size)
+ {
+@@ -146,17 +146,17 @@ bbs_to_string(
+ 	return sp;
+ }
+ 
+-#define THOUSAND		((__uint64_t)1000)
+-#define MILLION			((__uint64_t)1000*1000)
+-#define BILLION			((__uint64_t)1000*1000*1000)
+-#define TRILLION		((__uint64_t)1000*1000*1000*1000)
+-#define GAZILLION		((__uint64_t)1000*1000*1000*1000*1000)
+-#define RIDICULOUS		((__uint64_t)1000*1000*1000*1000*1000*1000)
+-#define STOPALREADY		((__uint64_t)1000*1000*1000*1000*1000*1000*1000)
++#define THOUSAND		((uint64_t)1000)
++#define MILLION			((uint64_t)1000*1000)
++#define BILLION			((uint64_t)1000*1000*1000)
++#define TRILLION		((uint64_t)1000*1000*1000*1000)
++#define GAZILLION		((uint64_t)1000*1000*1000*1000*1000)
++#define RIDICULOUS		((uint64_t)1000*1000*1000*1000*1000*1000)
++#define STOPALREADY		((uint64_t)1000*1000*1000*1000*1000*1000*1000)
+ 
+ char *
+ num_to_string(
+-	__uint64_t	v,
++	uint64_t	v,
+ 	char		*sp,
+ 	uint		size)
+ {
+@@ -183,8 +183,8 @@ num_to_string(
+ 
+ char *
+ pct_to_string(
+-	__uint64_t	portion,
+-	__uint64_t	whole,
++	uint64_t	portion,
++	uint64_t	whole,
+ 	char		*buf,
+ 	uint		size)
+ {
+@@ -237,7 +237,7 @@ type_to_string(
+ #define IDMASK		(NID-1)
+ 
+ typedef struct {
+-	__uint32_t	id;
++	uint32_t	id;
+ 	char		name[NMAX+1];
+ } idcache_t;
+ 
+@@ -250,7 +250,7 @@ static int		pentriesleft = NID;
+ 
+ static idcache_t *
+ getnextpwent(
+-	__uint32_t	id,
++	uint32_t	id,
+ 	int		byid)
+ {
+ 	struct passwd	*pw;
+@@ -266,7 +266,7 @@ getnextpwent(
+ 
+ static idcache_t *
+ getnextgrent(
+-	__uint32_t	id,
++	uint32_t	id,
+ 	int		byid)
+ {
+ 	struct group	*gr;
+@@ -281,7 +281,7 @@ getnextgrent(
+ 
+ static idcache_t *
+ getnextprent(
+-	__uint32_t	id,
++	uint32_t	id,
+ 	int		byid)
+ {
+ 	fs_project_t	*pr;
+@@ -296,7 +296,7 @@ getnextprent(
+ 
+ char *
+ uid_to_name(
+-	__uint32_t	id)
++	uint32_t	id)
+ {
+ 	idcache_t	*ncp, *idp;
+ 
+@@ -333,7 +333,7 @@ uid_to_name(
+ 
+ char *
+ gid_to_name(
+-	__uint32_t	id)
++	uint32_t	id)
+ {
+ 	idcache_t	*ncp, *idp;
+ 
+@@ -370,7 +370,7 @@ gid_to_name(
+ 
+ char *
+ prid_to_name(
+-	__uint32_t	id)
++	uint32_t	id)
+ {
+ 	idcache_t	*ncp, *idp;
+ 
+diff --git a/repair/README b/repair/README
+index 7f168e69..4692463d 100644
+--- a/repair/README
++++ b/repair/README
+@@ -189,7 +189,7 @@ D - 0) look at usage of XFS_MAKE_IPTR().  It does the right
+ 
+ 
+ D - 0) look at references to XFS_INODES_PER_CHUNK.  change the
+-	ones that really mean sizeof(__uint64_t)*NBBY to
++	ones that really mean sizeof(uint64_t)*NBBY to
+ 	something else (like that only defined as a constant
+ 	INOS_PER_IREC. this isn't as important since
+ 	XFS_INODES_PER_CHUNK will never chang
+diff --git a/repair/agheader.h b/repair/agheader.h
+index 6b2974ca..2f7246d2 100644
+--- a/repair/agheader.h
++++ b/repair/agheader.h
+@@ -20,7 +20,7 @@ typedef struct fs_geometry  {
+ 	/*
+ 	 * these types should match the superblock types
+ 	 */
+-	__uint32_t	sb_blocksize;	/* blocksize (bytes) */
++	uint32_t	sb_blocksize;	/* blocksize (bytes) */
+ 	xfs_rfsblock_t	sb_dblocks;	/* # data blocks */
+ 	xfs_rfsblock_t	sb_rblocks;	/* # realtime blocks */
+ 	xfs_rtblock_t	sb_rextents;	/* # realtime extents */
+@@ -30,9 +30,9 @@ typedef struct fs_geometry  {
+ 	xfs_agnumber_t	sb_agcount;	/* # of ags */
+ 	xfs_extlen_t	sb_rbmblocks;	/* # of rt bitmap blocks */
+ 	xfs_extlen_t	sb_logblocks;	/* # of log blocks */
+-	__uint16_t	sb_sectsize;	/* volume sector size (bytes) */
+-	__uint16_t	sb_inodesize;	/* inode size (bytes) */
+-	__uint8_t	sb_imax_pct;	/* max % of fs for inode space */
++	uint16_t	sb_sectsize;	/* volume sector size (bytes) */
++	uint16_t	sb_inodesize;	/* inode size (bytes) */
++	uint8_t		sb_imax_pct;	/* max % of fs for inode space */
+ 
+ 	/*
+ 	 * these don't have to match the superblock types but are placed
+@@ -49,10 +49,10 @@ typedef struct fs_geometry  {
+ 	/*
+ 	 * fields after this point have to be checked manually in compare_sb()
+ 	 */
+-	__uint8_t	sb_shared_vn;	/* shared version number */
++	uint8_t		sb_shared_vn;	/* shared version number */
+ 	xfs_extlen_t	sb_inoalignmt;	/* inode chunk alignment, fsblocks */
+-	__uint32_t	sb_unit;	/* stripe or raid unit */
+-	__uint32_t	sb_width;	/* stripe or width unit */
++	uint32_t	sb_unit;	/* stripe or raid unit */
++	uint32_t	sb_width;	/* stripe or width unit */
+ 
+ 	/*
+ 	 * these don't have to match, they track superblock properties
+diff --git a/repair/attr_repair.h b/repair/attr_repair.h
+index 7010e4ff..294fad44 100644
+--- a/repair/attr_repair.h
++++ b/repair/attr_repair.h
+@@ -32,10 +32,10 @@
+ #define ACL_WRITE	02
+ #define ACL_EXECUTE	01
+ 
+-typedef __uint16_t	xfs_acl_perm_t;
+-typedef __int32_t	xfs_acl_type_t;
+-typedef __int32_t	xfs_acl_tag_t;
+-typedef __int32_t	xfs_acl_id_t;
++typedef uint16_t	xfs_acl_perm_t;
++typedef int32_t		xfs_acl_type_t;
++typedef int32_t		xfs_acl_tag_t;
++typedef int32_t		xfs_acl_id_t;
+ 
+ /*
+  * "icacl" = in-core ACL. There is no equivalent in the XFS kernel code,
+@@ -50,7 +50,7 @@ struct xfs_icacl_entry {
+ };
+ 
+ struct xfs_icacl {
+-	__int32_t		acl_cnt;
++	int32_t			acl_cnt;
+ 	struct xfs_icacl_entry	acl_entry[0];
+ };
+ 
+@@ -59,14 +59,14 @@ struct xfs_icacl {
+  */
+ #define XFS_MAC_MAX_SETS	250
+ typedef struct xfs_mac_label {
+-	__uint8_t       ml_msen_type;	/* MSEN label type */
+-	__uint8_t       ml_mint_type;	/* MINT label type */
+-	__uint8_t       ml_level;	/* Hierarchical level */
+-	__uint8_t       ml_grade;	/* Hierarchical grade */
+-	__uint16_t      ml_catcount;	/* Category count */
+-	__uint16_t      ml_divcount;	/* Division count */
++	uint8_t       ml_msen_type;	/* MSEN label type */
++	uint8_t       ml_mint_type;	/* MINT label type */
++	uint8_t       ml_level;	/* Hierarchical level */
++	uint8_t       ml_grade;	/* Hierarchical grade */
++	uint16_t      ml_catcount;	/* Category count */
++	uint16_t      ml_divcount;	/* Division count */
+ 					/* Category set, then Division set */
+-	__uint16_t      ml_list[XFS_MAC_MAX_SETS];
++	uint16_t      ml_list[XFS_MAC_MAX_SETS];
+ } xfs_mac_label_t;
+ 
+ /* MSEN label type names. Choose an upper case ASCII character.  */
+@@ -93,7 +93,7 @@ typedef struct xfs_mac_label {
+ /*
+  * Capabilities (IRIX)
+  */
+-typedef __uint64_t xfs_cap_value_t;
++typedef uint64_t xfs_cap_value_t;
+ 
+ typedef struct xfs_cap_set {
+ 	xfs_cap_value_t	cap_effective;  /* use in capability checks */
+diff --git a/repair/avl64.c b/repair/avl64.c
+index 51cd624c..8f4a1211 100644
+--- a/repair/avl64.c
++++ b/repair/avl64.c
+@@ -70,8 +70,8 @@ avl64_checktree(
+ 	avl64node_t *root)
+ {
+ 	avl64node_t *nlast, *nnext, *np;
+-	__uint64_t offset = 0;
+-	__uint64_t end;
++	uint64_t offset = 0;
++	uint64_t end;
+ 
+ 	nlast = nnext = root;
+ 
+@@ -583,8 +583,8 @@ attach:
+ avl64node_t *
+ avl64_findanyrange(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t start,
+-	__uint64_t end,
++	uint64_t start,
++	uint64_t end,
+ 	int	checklen)
+ {
+ 	avl64node_t *np = tree->avl_root;
+@@ -655,7 +655,7 @@ avl64_findanyrange(
+ avl64node_t *
+ avl64_findrange(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t value)
++	uint64_t value)
+ {
+ 	avl64node_t *np = tree->avl_root;
+ 
+@@ -682,10 +682,10 @@ avl64_findrange(
+ avl64node_t *
+ avl64_find(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t value)
++	uint64_t value)
+ {
+ 	avl64node_t *np = tree->avl_root;
+-	__uint64_t nvalue;
++	uint64_t nvalue;
+ 
+ 	while (np) {
+ 		nvalue = AVL_START(tree, np);
+@@ -909,8 +909,8 @@ static
+ avl64node_t *
+ avl64_insert_find_growth(
+ 		avl64tree_desc_t *tree,
+-		__uint64_t start,	/* range start at start, */
+-		__uint64_t end,	/* exclusive */
++		uint64_t start,	/* range start at start, */
++		uint64_t end,	/* exclusive */
+ 		int   *growthp)	/* OUT */
+ {
+ 	avl64node_t *root = tree->avl_root;
+@@ -963,7 +963,7 @@ avl64_insert_grow(
+ 	int growth)
+ {
+ 	avl64node_t *nnext;
+-	__uint64_t start = AVL_START(tree, newnode);
++	uint64_t start = AVL_START(tree, newnode);
+ 
+ 	if (growth == AVL_BACK) {
+ 
+@@ -1005,8 +1005,8 @@ avl64_insert(
+ 	avl64node_t *newnode)
+ {
+ 	avl64node_t *np;
+-	__uint64_t start = AVL_START(tree, newnode);
+-	__uint64_t end = AVL_END(tree, newnode);
++	uint64_t start = AVL_START(tree, newnode);
++	uint64_t end = AVL_END(tree, newnode);
+ 	int growth;
+ 
+ 	ASSERT(newnode);
+@@ -1159,16 +1159,16 @@ avl64ops_t avl_debug_ops = {
+ 	avl_debug_end,
+ }
+ 
+-static __uint64_t
++static uint64_t
+ avl64_debug_start(avl64node_t *node)
+ {
+-	return (__uint64_t)(struct avl_debug_node *)node->avl_start;
++	return (uint64_t)(struct avl_debug_node *)node->avl_start;
+ }
+ 
+-static __uint64_t
++static uint64_t
+ avl64_debug_end(avl64node_t *node)
+ {
+-	return (__uint64_t)
++	return (uint64_t)
+ 		((struct avl_debug_node *)node->avl_start +
+ 		 (struct avl_debug_node *)node->avl_size);
+ }
+@@ -1304,7 +1304,7 @@ main()
+ avl64node_t *
+ avl64_findadjacent(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t value,
++	uint64_t value,
+ 	int		dir)
+ {
+ 	avl64node_t *np = tree->avl_root;
+@@ -1378,8 +1378,8 @@ avl64_findadjacent(
+ void
+ avl64_findranges(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t start,
+-	__uint64_t end,
++	uint64_t start,
++	uint64_t end,
+ 	avl64node_t	        **startp,
+ 	avl64node_t		**endp)
+ {
+diff --git a/repair/avl64.h b/repair/avl64.h
+index fd193218..cd079a00 100644
+--- a/repair/avl64.h
++++ b/repair/avl64.h
+@@ -32,8 +32,8 @@ typedef struct	avl64node {
+  * avl-tree operations
+  */
+ typedef struct avl64ops {
+-	__uint64_t	(*avl_start)(avl64node_t *);
+-	__uint64_t	(*avl_end)(avl64node_t *);
++	uint64_t	(*avl_start)(avl64node_t *);
++	uint64_t	(*avl_end)(avl64node_t *);
+ } avl64ops_t;
+ 
+ /*
+@@ -89,32 +89,32 @@ avl64_init_tree(
+ avl64node_t *
+ avl64_findrange(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t value);
++	uint64_t value);
+ 
+ avl64node_t *
+ avl64_find(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t value);
++	uint64_t value);
+ 
+ avl64node_t *
+ avl64_findanyrange(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t	start,
+-	__uint64_t	end,
++	uint64_t	start,
++	uint64_t	end,
+ 	int     checklen);
+ 
+ 
+ avl64node_t *
+ avl64_findadjacent(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t	value,
++	uint64_t	value,
+ 	int		dir);
+ 
+ void
+ avl64_findranges(
+ 	avl64tree_desc_t *tree,
+-	__uint64_t	start,
+-	__uint64_t	end,
++	uint64_t	start,
++	uint64_t	end,
+ 	avl64node_t	        **startp,
+ 	avl64node_t		**endp);
+ 
+diff --git a/repair/dinode.c b/repair/dinode.c
+index d664f87a..da872178 100644
+--- a/repair/dinode.c
++++ b/repair/dinode.c
+@@ -746,7 +746,7 @@ _("%s fork in ino %" PRIu64 " claims dup extent, "
+ 			case XR_E_FREE1:
+ 				do_warn(
+ _("%s fork in ino %" PRIu64 " claims free block %" PRIu64 "\n"),
+-					forkname, ino, (__uint64_t) b);
++					forkname, ino, (uint64_t) b);
+ 				/* fall through ... */
+ 			case XR_E_INUSE1:	/* seen by rmap */
+ 			case XR_E_UNKNOWN:
+@@ -923,7 +923,7 @@ process_btinode(
+ 	int			type,
+ 	int			*dirty,
+ 	xfs_rfsblock_t		*tot,
+-	__uint64_t		*nex,
++	uint64_t		*nex,
+ 	blkmap_t		**blkmapp,
+ 	int			whichfork,
+ 	int			check_dups)
+@@ -939,7 +939,7 @@ process_btinode(
+ 	int			level;
+ 	int			numrecs;
+ 	bmap_cursor_t		cursor;
+-	__uint64_t		magic;
++	uint64_t		magic;
+ 
+ 	dib = (xfs_bmdr_block_t *)XFS_DFORK_PTR(dip, whichfork);
+ 	lino = XFS_AGINO_TO_INO(mp, agno, ino);
+@@ -1098,7 +1098,7 @@ process_exinode(
+ 	int			type,
+ 	int			*dirty,
+ 	xfs_rfsblock_t		*tot,
+-	__uint64_t		*nex,
++	uint64_t		*nex,
+ 	blkmap_t		**blkmapp,
+ 	int			whichfork,
+ 	int			check_dups)
+@@ -1200,14 +1200,14 @@ process_symlink_extlist(xfs_mount_t *mp, xfs_ino_t lino, xfs_dinode_t *dino)
+ 		do_warn(
+ _("mismatch between format (%d) and size (%" PRId64 ") in symlink ino %" PRIu64 "\n"),
+ 			dino->di_format,
+-			(__int64_t)be64_to_cpu(dino->di_size), lino);
++			(int64_t)be64_to_cpu(dino->di_size), lino);
+ 		return 1;
+ 	}
+ 	if (dino->di_format == XFS_DINODE_FMT_LOCAL) {
+ 		do_warn(
+ _("mismatch between format (%d) and size (%" PRId64 ") in symlink inode %" PRIu64 "\n"),
+ 			dino->di_format,
+-			(__int64_t)be64_to_cpu(dino->di_size), lino);
++			(int64_t)be64_to_cpu(dino->di_size), lino);
+ 		return 1;
+ 	}
+ 
+@@ -1454,22 +1454,22 @@ _("inode %" PRIu64 " has bad inode type (IFMNT)\n"), lino);
+ 		case XR_INO_CHRDEV:
+ 			do_warn(
+ _("size of character device inode %" PRIu64 " != 0 (%" PRId64 " bytes)\n"), lino,
+-				(__int64_t)be64_to_cpu(dino->di_size));
++				(int64_t)be64_to_cpu(dino->di_size));
+ 			break;
+ 		case XR_INO_BLKDEV:
+ 			do_warn(
+ _("size of block device inode %" PRIu64 " != 0 (%" PRId64 " bytes)\n"), lino,
+-				(__int64_t)be64_to_cpu(dino->di_size));
++				(int64_t)be64_to_cpu(dino->di_size));
+ 			break;
+ 		case XR_INO_SOCK:
+ 			do_warn(
+ _("size of socket inode %" PRIu64 " != 0 (%" PRId64 " bytes)\n"), lino,
+-				(__int64_t)be64_to_cpu(dino->di_size));
++				(int64_t)be64_to_cpu(dino->di_size));
+ 			break;
+ 		case XR_INO_FIFO:
+ 			do_warn(
+ _("size of fifo inode %" PRIu64 " != 0 (%" PRId64 " bytes)\n"), lino,
+-				(__int64_t)be64_to_cpu(dino->di_size));
++				(int64_t)be64_to_cpu(dino->di_size));
+ 			break;
+ 		default:
+ 			do_warn(_("Internal error - process_misc_ino_types, "
+@@ -1743,12 +1743,12 @@ _("found inode %" PRIu64 " claiming to be a real-time file\n"), lino);
+ 		break;
+ 
+ 	case XR_INO_RTBITMAP:
+-		if (size != (__int64_t)mp->m_sb.sb_rbmblocks *
++		if (size != (int64_t)mp->m_sb.sb_rbmblocks *
+ 					mp->m_sb.sb_blocksize) {
+ 			do_warn(
+ _("realtime bitmap inode %" PRIu64 " has bad size %" PRId64 " (should be %" PRIu64 ")\n"),
+ 				lino, size,
+-				(__int64_t) mp->m_sb.sb_rbmblocks *
++				(int64_t) mp->m_sb.sb_rbmblocks *
+ 					mp->m_sb.sb_blocksize);
+ 			return 1;
+ 		}
+@@ -1817,8 +1817,8 @@ static int
+ process_inode_blocks_and_extents(
+ 	xfs_dinode_t	*dino,
+ 	xfs_rfsblock_t	nblocks,
+-	__uint64_t	nextents,
+-	__uint64_t	anextents,
++	uint64_t	nextents,
++	uint64_t	anextents,
+ 	xfs_ino_t	lino,
+ 	int		*dirty)
+ {
+@@ -1908,7 +1908,7 @@ process_inode_data_fork(
+ 	int		type,
+ 	int		*dirty,
+ 	xfs_rfsblock_t	*totblocks,
+-	__uint64_t	*nextents,
++	uint64_t	*nextents,
+ 	blkmap_t	**dblkmap,
+ 	int		check_dups)
+ {
+@@ -2017,7 +2017,7 @@ process_inode_attr_fork(
+ 	int		type,
+ 	int		*dirty,
+ 	xfs_rfsblock_t	*atotblocks,
+-	__uint64_t	*anextents,
++	uint64_t	*anextents,
+ 	int		check_dups,
+ 	int		extra_attr_check,
+ 	int		*retval)
+@@ -2228,8 +2228,8 @@ process_dinode_int(xfs_mount_t *mp,
+ 	int			di_mode;
+ 	int			type;
+ 	int			retval = 0;
+-	__uint64_t		nextents;
+-	__uint64_t		anextents;
++	uint64_t		nextents;
++	uint64_t		anextents;
+ 	xfs_ino_t		lino;
+ 	const int		is_free = 0;
+ 	const int		is_used = 1;
+@@ -2346,7 +2346,7 @@ _("inode identifier %llu mismatch on inode %" PRIu64 "\n"),
+ 		if (!uncertain)
+ 			do_warn(
+ _("bad (negative) size %" PRId64 " on inode %" PRIu64 "\n"),
+-				(__int64_t)be64_to_cpu(dino->di_size),
++				(int64_t)be64_to_cpu(dino->di_size),
+ 				lino);
+ 		if (verify_mode)
+ 			return 1;
+diff --git a/repair/dinode.h b/repair/dinode.h
+index 61d07363..39d6a72f 100644
+--- a/repair/dinode.h
++++ b/repair/dinode.h
+@@ -46,8 +46,8 @@ process_bmbt_reclist(xfs_mount_t	*mp,
+ 		xfs_ino_t		ino,
+ 		xfs_rfsblock_t		*tot,
+ 		struct blkmap		**blkmapp,
+-		__uint64_t		*first_key,
+-		__uint64_t		*last_key,
++		uint64_t		*first_key,
++		uint64_t		*last_key,
+ 		int			whichfork);
+ 
+ int
+diff --git a/repair/dir2.c b/repair/dir2.c
+index e6415e49..73dff902 100644
+--- a/repair/dir2.c
++++ b/repair/dir2.c
+@@ -160,7 +160,7 @@ process_sf_dir2(
+ 	int			bad_sfnamelen;
+ 	int			i;
+ 	int			i8;
+-	__int64_t		ino_dir_size;
++	int64_t			ino_dir_size;
+ 	int			ino_off;
+ 	ino_tree_node_t		*irec_p;
+ 	int			junkit;
+diff --git a/repair/globals.h b/repair/globals.h
+index 4085ccc4..c7bbe6f1 100644
+--- a/repair/globals.h
++++ b/repair/globals.h
+@@ -141,7 +141,7 @@ EXTERN int		inodes_per_cluster;
+ EXTERN unsigned int	glob_agcount;
+ EXTERN int		chunks_pblock;	/* # of 64-ino chunks per allocation */
+ EXTERN int		max_symlink_blocks;
+-EXTERN __int64_t	fs_max_file_offset;
++EXTERN int64_t		fs_max_file_offset;
+ 
+ /* realtime info */
+ 
+@@ -161,24 +161,24 @@ EXTERN int		full_ino_ex_data;/*
+ 
+ /* superblock counters */
+ 
+-EXTERN __uint64_t	sb_icount;	/* allocated (made) inodes */
+-EXTERN __uint64_t	sb_ifree;	/* free inodes */
+-EXTERN __uint64_t	sb_fdblocks;	/* free data blocks */
+-EXTERN __uint64_t	sb_frextents;	/* free realtime extents */
++EXTERN uint64_t	sb_icount;	/* allocated (made) inodes */
++EXTERN uint64_t	sb_ifree;	/* free inodes */
++EXTERN uint64_t	sb_fdblocks;	/* free data blocks */
++EXTERN uint64_t	sb_frextents;	/* free realtime extents */
+ 
+ /* superblock geometry info */
+ 
+ EXTERN xfs_extlen_t	sb_inoalignmt;
+-EXTERN __uint32_t	sb_unit;
+-EXTERN __uint32_t	sb_width;
++EXTERN uint32_t	sb_unit;
++EXTERN uint32_t	sb_width;
+ 
+ struct aglock {
+ 	pthread_mutex_t	lock __attribute__((__aligned__(64)));
+ };
+ EXTERN struct aglock	*ag_locks;
+ 
+-EXTERN int 		report_interval;
+-EXTERN __uint64_t 	*prog_rpt_done;
++EXTERN int		report_interval;
++EXTERN uint64_t		*prog_rpt_done;
+ 
+ EXTERN int		ag_stride;
+ EXTERN int		thread_count;
+diff --git a/repair/incore.c b/repair/incore.c
+index cb573165..a9191ae2 100644
+--- a/repair/incore.c
++++ b/repair/incore.c
+@@ -179,7 +179,7 @@ get_bmap_ext(
+ static uint64_t		*rt_bmap;
+ static size_t		rt_bmap_size;
+ 
+-/* block records fit into __uint64_t's units */
++/* block records fit into uint64_t's units */
+ #define XR_BB_UNIT	64			/* number of bits/unit */
+ #define XR_BB		4			/* bits per block record */
+ #define XR_BB_NUM	(XR_BB_UNIT/XR_BB)	/* number of records per unit */
+@@ -203,8 +203,8 @@ set_rtbmap(
+ {
+ 	*(rt_bmap + bno / XR_BB_NUM) =
+ 	 ((*(rt_bmap + bno / XR_BB_NUM) &
+-	  (~((__uint64_t) XR_BB_MASK << ((bno % XR_BB_NUM) * XR_BB)))) |
+-	 (((__uint64_t) state) << ((bno % XR_BB_NUM) * XR_BB)));
++	  (~((uint64_t) XR_BB_MASK << ((bno % XR_BB_NUM) * XR_BB)))) |
++	 (((uint64_t) state) << ((bno % XR_BB_NUM) * XR_BB)));
+ }
+ 
+ static void
+@@ -222,9 +222,9 @@ init_rt_bmap(
+ 		return;
+ 
+ 	rt_bmap_size = roundup(mp->m_sb.sb_rextents / (NBBY / XR_BB),
+-			       sizeof(__uint64_t));
++			       sizeof(uint64_t));
+ 
+-	rt_bmap = memalign(sizeof(__uint64_t), rt_bmap_size);
++	rt_bmap = memalign(sizeof(uint64_t), rt_bmap_size);
+ 	if (!rt_bmap) {
+ 		do_error(
+ 	_("couldn't allocate realtime block map, size = %" PRIu64 "\n"),
+diff --git a/repair/incore.h b/repair/incore.h
+index c23a3a3c..fd66084f 100644
+--- a/repair/incore.h
++++ b/repair/incore.h
+@@ -257,7 +257,7 @@ typedef xfs_ino_t parent_entry_t;
+ struct nlink_ops;
+ 
+ typedef struct parent_list  {
+-	__uint64_t		pmask;
++	uint64_t		pmask;
+ 	parent_entry_t		*pentries;
+ #ifdef DEBUG
+ 	short			cnt;
+@@ -265,14 +265,14 @@ typedef struct parent_list  {
+ } parent_list_t;
+ 
+ union ino_nlink {
+-	__uint8_t	*un8;
+-	__uint16_t	*un16;
+-	__uint32_t	*un32;
++	uint8_t		*un8;
++	uint16_t	*un16;
++	uint32_t	*un32;
+ };
+ 
+ typedef struct ino_ex_data  {
+-	__uint64_t		ino_reached;	/* bit == 1 if reached */
+-	__uint64_t		ino_processed;	/* reference checked bit mask */
++	uint64_t		ino_reached;	/* bit == 1 if reached */
++	uint64_t		ino_processed;	/* reference checked bit mask */
+ 	parent_list_t		*parents;
+ 	union ino_nlink		counted_nlinks;/* counted nlinks in P6 */
+ } ino_ex_data_t;
+@@ -281,22 +281,22 @@ typedef struct ino_tree_node  {
+ 	avlnode_t		avl_node;
+ 	xfs_agino_t		ino_startnum;	/* starting inode # */
+ 	xfs_inofree_t		ir_free;	/* inode free bit mask */
+-	__uint64_t		ir_sparse;	/* sparse inode bitmask */
+-	__uint64_t		ino_confirmed;	/* confirmed bitmask */
+-	__uint64_t		ino_isa_dir;	/* bit == 1 if a directory */
+-	__uint64_t		ino_was_rl;	/* bit == 1 if reflink flag set */
+-	__uint64_t		ino_is_rl;	/* bit == 1 if reflink flag should be set */
+-	__uint8_t		nlink_size;
++	uint64_t		ir_sparse;	/* sparse inode bitmask */
++	uint64_t		ino_confirmed;	/* confirmed bitmask */
++	uint64_t		ino_isa_dir;	/* bit == 1 if a directory */
++	uint64_t		ino_was_rl;	/* bit == 1 if reflink flag set */
++	uint64_t		ino_is_rl;	/* bit == 1 if reflink flag should be set */
++	uint8_t			nlink_size;
+ 	union ino_nlink		disk_nlinks;	/* on-disk nlinks, set in P3 */
+ 	union  {
+ 		ino_ex_data_t	*ex_data;	/* phases 6,7 */
+ 		parent_list_t	*plist;		/* phases 2-5 */
+ 	} ino_un;
+-	__uint8_t		*ftypes;	/* phases 3,6 */
++	uint8_t			*ftypes;	/* phases 3,6 */
+ } ino_tree_node_t;
+ 
+-#define INOS_PER_IREC	(sizeof(__uint64_t) * NBBY)
+-#define	IREC_MASK(i)	((__uint64_t)1 << (i))
++#define INOS_PER_IREC	(sizeof(uint64_t) * NBBY)
++#define	IREC_MASK(i)	((uint64_t)1 << (i))
+ 
+ void		add_ino_ex_data(xfs_mount_t *mp);
+ 
+@@ -543,10 +543,10 @@ static inline int inode_is_rl(struct ino_tree_node *irec, int offset)
+  */
+ void add_inode_ref(struct ino_tree_node *irec, int offset);
+ void drop_inode_ref(struct ino_tree_node *irec, int offset);
+-__uint32_t num_inode_references(struct ino_tree_node *irec, int offset);
++uint32_t num_inode_references(struct ino_tree_node *irec, int offset);
+ 
+-void set_inode_disk_nlinks(struct ino_tree_node *irec, int offset, __uint32_t nlinks);
+-__uint32_t get_inode_disk_nlinks(struct ino_tree_node *irec, int offset);
++void set_inode_disk_nlinks(struct ino_tree_node *irec, int offset, uint32_t nlinks);
++uint32_t get_inode_disk_nlinks(struct ino_tree_node *irec, int offset);
+ 
+ static inline int is_inode_reached(struct ino_tree_node *irec, int offset)
+ {
+@@ -567,13 +567,13 @@ static inline void add_inode_reached(struct ino_tree_node *irec, int offset)
+ static inline void
+ set_inode_ftype(struct ino_tree_node *irec,
+ 	int		ino_offset,
+-	__uint8_t	ftype)
++	uint8_t		ftype)
+ {
+ 	if (irec->ftypes)
+ 		irec->ftypes[ino_offset] = ftype;
+ }
+ 
+-static inline __uint8_t
++static inline uint8_t
+ get_inode_ftype(
+ 	struct ino_tree_node *irec,
+ 	int		ino_offset)
+@@ -606,11 +606,11 @@ typedef struct bm_level_state  {
+ 	xfs_fsblock_t		fsbno;
+ 	xfs_fsblock_t		left_fsbno;
+ 	xfs_fsblock_t		right_fsbno;
+-	__uint64_t		first_key;
+-	__uint64_t		last_key;
++	uint64_t		first_key;
++	uint64_t		last_key;
+ /*
+ 	int			level;
+-	__uint64_t		prev_last_key;
++	uint64_t		prev_last_key;
+ 	xfs_buf_t		*bp;
+ 	xfs_bmbt_block_t	*block;
+ */
+diff --git a/repair/incore_ext.c b/repair/incore_ext.c
+index 7e6786c5..0a8138a9 100644
+--- a/repair/incore_ext.c
++++ b/repair/incore_ext.c
+@@ -721,13 +721,13 @@ search_rt_dup_extent(xfs_mount_t *mp, xfs_rtblock_t bno)
+ 	return(ret);
+ }
+ 
+-static __uint64_t
++static uint64_t
+ avl64_rt_ext_start(avl64node_t *node)
+ {
+ 	return(((rt_extent_tree_node_t *) node)->rt_startblock);
+ }
+ 
+-static __uint64_t
++static uint64_t
+ avl64_ext_end(avl64node_t *node)
+ {
+ 	return(((rt_extent_tree_node_t *) node)->rt_startblock +
+@@ -834,7 +834,7 @@ count_extents(xfs_agnumber_t agno, avltree_desc_t *tree, int whichtree)
+ int
+ count_bno_extents_blocks(xfs_agnumber_t agno, uint *numblocks)
+ {
+-	__uint64_t nblocks;
++	uint64_t nblocks;
+ 	extent_tree_node_t *node;
+ 	int i = 0;
+ 
+diff --git a/repair/incore_ino.c b/repair/incore_ino.c
+index 2ec17657..3b6b44d4 100644
+--- a/repair/incore_ino.c
++++ b/repair/incore_ino.c
+@@ -38,7 +38,7 @@ static avltree_desc_t	**inode_uncertain_tree_ptrs;
+ /* memory optimised nlink counting for all inodes */
+ 
+ static void *
+-alloc_nlink_array(__uint8_t nlink_size)
++alloc_nlink_array(uint8_t nlink_size)
+ {
+ 	void *ptr;
+ 
+@@ -51,10 +51,10 @@ alloc_nlink_array(__uint8_t nlink_size)
+ static void
+ nlink_grow_8_to_16(ino_tree_node_t *irec)
+ {
+-	__uint16_t	*new_nlinks;
++	uint16_t	*new_nlinks;
+ 	int		i;
+ 
+-	irec->nlink_size = sizeof(__uint16_t);
++	irec->nlink_size = sizeof(uint16_t);
+ 
+ 	new_nlinks = alloc_nlink_array(irec->nlink_size);
+ 	for (i = 0; i < XFS_INODES_PER_CHUNK; i++)
+@@ -76,10 +76,10 @@ nlink_grow_8_to_16(ino_tree_node_t *irec)
+ static void
+ nlink_grow_16_to_32(ino_tree_node_t *irec)
+ {
+-	__uint32_t	*new_nlinks;
++	uint32_t	*new_nlinks;
+ 	int		i;
+ 
+-	irec->nlink_size = sizeof(__uint32_t);
++	irec->nlink_size = sizeof(uint32_t);
+ 
+ 	new_nlinks = alloc_nlink_array(irec->nlink_size);
+ 	for (i = 0; i < XFS_INODES_PER_CHUNK; i++)
+@@ -104,21 +104,21 @@ void add_inode_ref(struct ino_tree_node *irec, int ino_offset)
+ 	ASSERT(irec->ino_un.ex_data != NULL);
+ 
+ 	switch (irec->nlink_size) {
+-	case sizeof(__uint8_t):
++	case sizeof(uint8_t):
+ 		if (irec->ino_un.ex_data->counted_nlinks.un8[ino_offset] < 0xff) {
+ 			irec->ino_un.ex_data->counted_nlinks.un8[ino_offset]++;
+ 			break;
+ 		}
+ 		nlink_grow_8_to_16(irec);
+ 		/*FALLTHRU*/
+-	case sizeof(__uint16_t):
++	case sizeof(uint16_t):
+ 		if (irec->ino_un.ex_data->counted_nlinks.un16[ino_offset] < 0xffff) {
+ 			irec->ino_un.ex_data->counted_nlinks.un16[ino_offset]++;
+ 			break;
+ 		}
+ 		nlink_grow_16_to_32(irec);
+ 		/*FALLTHRU*/
+-	case sizeof(__uint32_t):
++	case sizeof(uint32_t):
+ 		irec->ino_un.ex_data->counted_nlinks.un32[ino_offset]++;
+ 		break;
+ 	default:
+@@ -128,20 +128,20 @@ void add_inode_ref(struct ino_tree_node *irec, int ino_offset)
+ 
+ void drop_inode_ref(struct ino_tree_node *irec, int ino_offset)
+ {
+-	__uint32_t	refs = 0;
++	uint32_t	refs = 0;
+ 
+ 	ASSERT(irec->ino_un.ex_data != NULL);
+ 
+ 	switch (irec->nlink_size) {
+-	case sizeof(__uint8_t):
++	case sizeof(uint8_t):
+ 		ASSERT(irec->ino_un.ex_data->counted_nlinks.un8[ino_offset] > 0);
+ 		refs = --irec->ino_un.ex_data->counted_nlinks.un8[ino_offset];
+ 		break;
+-	case sizeof(__uint16_t):
++	case sizeof(uint16_t):
+ 		ASSERT(irec->ino_un.ex_data->counted_nlinks.un16[ino_offset] > 0);
+ 		refs = --irec->ino_un.ex_data->counted_nlinks.un16[ino_offset];
+ 		break;
+-	case sizeof(__uint32_t):
++	case sizeof(uint32_t):
+ 		ASSERT(irec->ino_un.ex_data->counted_nlinks.un32[ino_offset] > 0);
+ 		refs = --irec->ino_un.ex_data->counted_nlinks.un32[ino_offset];
+ 		break;
+@@ -153,16 +153,16 @@ void drop_inode_ref(struct ino_tree_node *irec, int ino_offset)
+ 		irec->ino_un.ex_data->ino_reached &= ~IREC_MASK(ino_offset);
+ }
+ 
+-__uint32_t num_inode_references(struct ino_tree_node *irec, int ino_offset)
++uint32_t num_inode_references(struct ino_tree_node *irec, int ino_offset)
+ {
+ 	ASSERT(irec->ino_un.ex_data != NULL);
+ 
+ 	switch (irec->nlink_size) {
+-	case sizeof(__uint8_t):
++	case sizeof(uint8_t):
+ 		return irec->ino_un.ex_data->counted_nlinks.un8[ino_offset];
+-	case sizeof(__uint16_t):
++	case sizeof(uint16_t):
+ 		return irec->ino_un.ex_data->counted_nlinks.un16[ino_offset];
+-	case sizeof(__uint32_t):
++	case sizeof(uint32_t):
+ 		return irec->ino_un.ex_data->counted_nlinks.un32[ino_offset];
+ 	default:
+ 		ASSERT(0);
+@@ -171,24 +171,24 @@ __uint32_t num_inode_references(struct ino_tree_node *irec, int ino_offset)
+ }
+ 
+ void set_inode_disk_nlinks(struct ino_tree_node *irec, int ino_offset,
+-		__uint32_t nlinks)
++		uint32_t nlinks)
+ {
+ 	switch (irec->nlink_size) {
+-	case sizeof(__uint8_t):
++	case sizeof(uint8_t):
+ 		if (nlinks < 0xff) {
+ 			irec->disk_nlinks.un8[ino_offset] = nlinks;
+ 			break;
+ 		}
+ 		nlink_grow_8_to_16(irec);
+ 		/*FALLTHRU*/
+-	case sizeof(__uint16_t):
++	case sizeof(uint16_t):
+ 		if (nlinks < 0xffff) {
+ 			irec->disk_nlinks.un16[ino_offset] = nlinks;
+ 			break;
+ 		}
+ 		nlink_grow_16_to_32(irec);
+ 		/*FALLTHRU*/
+-	case sizeof(__uint32_t):
++	case sizeof(uint32_t):
+ 		irec->disk_nlinks.un32[ino_offset] = nlinks;
+ 		break;
+ 	default:
+@@ -196,14 +196,14 @@ void set_inode_disk_nlinks(struct ino_tree_node *irec, int ino_offset,
+ 	}
+ }
+ 
+-__uint32_t get_inode_disk_nlinks(struct ino_tree_node *irec, int ino_offset)
++uint32_t get_inode_disk_nlinks(struct ino_tree_node *irec, int ino_offset)
+ {
+ 	switch (irec->nlink_size) {
+-	case sizeof(__uint8_t):
++	case sizeof(uint8_t):
+ 		return irec->disk_nlinks.un8[ino_offset];
+-	case sizeof(__uint16_t):
++	case sizeof(uint16_t):
+ 		return irec->disk_nlinks.un16[ino_offset];
+-	case sizeof(__uint32_t):
++	case sizeof(uint32_t):
+ 		return irec->disk_nlinks.un32[ino_offset];
+ 	default:
+ 		ASSERT(0);
+@@ -211,11 +211,11 @@ __uint32_t get_inode_disk_nlinks(struct ino_tree_node *irec, int ino_offset)
+ 	return 0;
+ }
+ 
+-static __uint8_t *
++static uint8_t *
+ alloc_ftypes_array(
+ 	struct xfs_mount *mp)
+ {
+-	__uint8_t	*ptr;
++	uint8_t		*ptr;
+ 
+ 	if (!xfs_sb_version_hasftype(&mp->m_sb))
+ 		return NULL;
+@@ -262,23 +262,23 @@ alloc_ino_node(
+ 	irec->ir_free = (xfs_inofree_t) - 1;
+ 	irec->ir_sparse = 0;
+ 	irec->ino_un.ex_data = NULL;
+-	irec->nlink_size = sizeof(__uint8_t);
++	irec->nlink_size = sizeof(uint8_t);
+ 	irec->disk_nlinks.un8 = alloc_nlink_array(irec->nlink_size);
+ 	irec->ftypes = alloc_ftypes_array(mp);
+ 	return irec;
+ }
+ 
+ static void
+-free_nlink_array(union ino_nlink nlinks, __uint8_t nlink_size)
++free_nlink_array(union ino_nlink nlinks, uint8_t nlink_size)
+ {
+ 	switch (nlink_size) {
+-	case sizeof(__uint8_t):
++	case sizeof(uint8_t):
+ 		free(nlinks.un8);
+ 		break;
+-	case sizeof(__uint16_t):
++	case sizeof(uint16_t):
+ 		free(nlinks.un16);
+ 		break;
+-	case sizeof(__uint32_t):
++	case sizeof(uint32_t):
+ 		free(nlinks.un32);
+ 		break;
+ 	default:
+@@ -609,7 +609,7 @@ set_inode_parent(
+ 	int			i;
+ 	int			cnt;
+ 	int			target;
+-	__uint64_t		bitmask;
++	uint64_t		bitmask;
+ 	parent_entry_t		*tmp;
+ 
+ 	if (full_ino_ex_data)
+@@ -699,7 +699,7 @@ set_inode_parent(
+ xfs_ino_t
+ get_inode_parent(ino_tree_node_t *irec, int offset)
+ {
+-	__uint64_t	bitmask;
++	uint64_t	bitmask;
+ 	parent_list_t	*ptbl;
+ 	int		i;
+ 	int		target;
+@@ -740,15 +740,15 @@ alloc_ex_data(ino_tree_node_t *irec)
+ 	irec->ino_un.ex_data->parents = ptbl;
+ 
+ 	switch (irec->nlink_size) {
+-	case sizeof(__uint8_t):
++	case sizeof(uint8_t):
+ 		irec->ino_un.ex_data->counted_nlinks.un8 =
+ 			alloc_nlink_array(irec->nlink_size);
+ 		break;
+-	case sizeof(__uint16_t):
++	case sizeof(uint16_t):
+ 		irec->ino_un.ex_data->counted_nlinks.un16 =
+ 			alloc_nlink_array(irec->nlink_size);
+ 		break;
+-	case sizeof(__uint32_t):
++	case sizeof(uint32_t):
+ 		irec->ino_un.ex_data->counted_nlinks.un32 =
+ 			alloc_nlink_array(irec->nlink_size);
+ 		break;
+diff --git a/repair/phase2.c b/repair/phase2.c
+index c21778b8..0085732b 100644
+--- a/repair/phase2.c
++++ b/repair/phase2.c
+@@ -179,7 +179,7 @@ phase2(
+ 
+ 	bad_ino_btree = 0;
+ 
+-	set_progress_msg(PROG_FMT_SCAN_AG, (__uint64_t) glob_agcount);
++	set_progress_msg(PROG_FMT_SCAN_AG, (uint64_t) glob_agcount);
+ 
+ 	scan_ags(mp, scan_threads);
+ 
+diff --git a/repair/phase3.c b/repair/phase3.c
+index 0890a27d..17b1c28d 100644
+--- a/repair/phase3.c
++++ b/repair/phase3.c
+@@ -122,7 +122,7 @@ phase3(
+ 	else
+ 		do_log(_("        - scan (but don't clear) agi unlinked lists...\n"));
+ 
+-	set_progress_msg(PROG_FMT_AGI_UNLINKED, (__uint64_t) glob_agcount);
++	set_progress_msg(PROG_FMT_AGI_UNLINKED, (uint64_t) glob_agcount);
+ 
+ 	/* first clear the agi unlinked AGI list */
+ 	if (!no_modify) {
+@@ -142,7 +142,7 @@ phase3(
+ 	do_log(_(
+ 	    "        - process known inodes and perform inode discovery...\n"));
+ 
+-	set_progress_msg(PROG_FMT_PROCESS_INO, (__uint64_t) mp->m_sb.sb_icount);
++	set_progress_msg(PROG_FMT_PROCESS_INO, (uint64_t) mp->m_sb.sb_icount);
+ 
+ 	process_ags(mp);
+ 
+@@ -152,7 +152,7 @@ phase3(
+ 	 * process newly discovered inode chunks
+ 	 */
+ 	do_log(_("        - process newly discovered inodes...\n"));
+-	set_progress_msg(PROG_FMT_NEW_INODES, (__uint64_t) glob_agcount);
++	set_progress_msg(PROG_FMT_NEW_INODES, (uint64_t) glob_agcount);
+ 
+ 	counts = calloc(sizeof(*counts), mp->m_sb.sb_agcount);
+ 	if (!counts) {
+diff --git a/repair/phase4.c b/repair/phase4.c
+index e59464b1..cc17ec03 100644
+--- a/repair/phase4.c
++++ b/repair/phase4.c
+@@ -290,7 +290,7 @@ phase4(xfs_mount_t *mp)
+ 	do_log(_("Phase 4 - check for duplicate blocks...\n"));
+ 	do_log(_("        - setting up duplicate extent list...\n"));
+ 
+-	set_progress_msg(PROG_FMT_DUP_EXTENT, (__uint64_t) glob_agcount);
++	set_progress_msg(PROG_FMT_DUP_EXTENT, (uint64_t) glob_agcount);
+ 
+ 	irec = find_inode_rec(mp, XFS_INO_TO_AGNO(mp, mp->m_sb.sb_rootino),
+ 				XFS_INO_TO_AGINO(mp, mp->m_sb.sb_rootino));
+@@ -404,7 +404,7 @@ phase4(xfs_mount_t *mp)
+ 	reset_bmaps(mp);
+ 
+ 	do_log(_("        - check for inodes claiming duplicate blocks...\n"));
+-	set_progress_msg(PROG_FMT_DUP_BLOCKS, (__uint64_t) mp->m_sb.sb_icount);
++	set_progress_msg(PROG_FMT_DUP_BLOCKS, (uint64_t) mp->m_sb.sb_icount);
+ 
+ 	/*
+ 	 * ok, now process the inodes -- signal 2-pass check per inode.
+diff --git a/repair/phase5.c b/repair/phase5.c
+index 0b833f13..21dce67a 100644
+--- a/repair/phase5.c
++++ b/repair/phase5.c
+@@ -86,9 +86,9 @@ struct agi_stat {
+ 	xfs_agino_t		freecount;
+ };
+ 
+-static __uint64_t	*sb_icount_ag;		/* allocated inodes per ag */
+-static __uint64_t	*sb_ifree_ag;		/* free inodes per ag */
+-static __uint64_t	*sb_fdblocks_ag;	/* free data blocks per ag */
++static uint64_t	*sb_icount_ag;		/* allocated inodes per ag */
++static uint64_t	*sb_ifree_ag;		/* free inodes per ag */
++static uint64_t	*sb_fdblocks_ag;	/* free data blocks per ag */
+ 
+ static int
+ mk_incore_fstree(xfs_mount_t *mp, xfs_agnumber_t agno)
+@@ -886,10 +886,10 @@ build_freespace_tree(xfs_mount_t *mp, xfs_agnumber_t agno,
+  */
+ static void
+ init_ino_cursor(xfs_mount_t *mp, xfs_agnumber_t agno, bt_status_t *btree_curs,
+-		__uint64_t *num_inos, __uint64_t *num_free_inos, int finobt)
++		uint64_t *num_inos, uint64_t *num_free_inos, int finobt)
+ {
+-	__uint64_t		ninos;
+-	__uint64_t		nfinos;
++	uint64_t		ninos;
++	uint64_t		nfinos;
+ 	int			rec_nfinos;
+ 	int			rec_ninos;
+ 	ino_tree_node_t		*ino_rec;
+@@ -2193,10 +2193,10 @@ phase5_func(
+ 	xfs_agnumber_t	agno,
+ 	struct xfs_slab	*lost_fsb)
+ {
+-	__uint64_t	num_inos;
+-	__uint64_t	num_free_inos;
+-	__uint64_t	finobt_num_inos;
+-	__uint64_t	finobt_num_free_inos;
++	uint64_t	num_inos;
++	uint64_t	num_free_inos;
++	uint64_t	finobt_num_inos;
++	uint64_t	finobt_num_free_inos;
+ 	bt_status_t	bno_btree_curs;
+ 	bt_status_t	bcnt_btree_curs;
+ 	bt_status_t	ino_btree_curs;
+@@ -2471,7 +2471,7 @@ phase5(xfs_mount_t *mp)
+ 	int			error;
+ 
+ 	do_log(_("Phase 5 - rebuild AG headers and trees...\n"));
+-	set_progress_msg(PROG_FMT_REBUILD_AG, (__uint64_t )glob_agcount);
++	set_progress_msg(PROG_FMT_REBUILD_AG, (uint64_t)glob_agcount);
+ 
+ #ifdef XR_BLD_FREE_TRACE
+ 	fprintf(stderr, "inobt level 1, maxrec = %d, minrec = %d\n",
+@@ -2497,15 +2497,15 @@ phase5(xfs_mount_t *mp)
+ 	keep_fsinos(mp);
+ 
+ 	/* allocate per ag counters */
+-	sb_icount_ag = calloc(mp->m_sb.sb_agcount, sizeof(__uint64_t));
++	sb_icount_ag = calloc(mp->m_sb.sb_agcount, sizeof(uint64_t));
+ 	if (sb_icount_ag == NULL)
+ 		do_error(_("cannot alloc sb_icount_ag buffers\n"));
+ 
+-	sb_ifree_ag = calloc(mp->m_sb.sb_agcount, sizeof(__uint64_t));
++	sb_ifree_ag = calloc(mp->m_sb.sb_agcount, sizeof(uint64_t));
+ 	if (sb_ifree_ag == NULL)
+ 		do_error(_("cannot alloc sb_ifree_ag buffers\n"));
+ 
+-	sb_fdblocks_ag = calloc(mp->m_sb.sb_agcount, sizeof(__uint64_t));
++	sb_fdblocks_ag = calloc(mp->m_sb.sb_agcount, sizeof(uint64_t));
+ 	if (sb_fdblocks_ag == NULL)
+ 		do_error(_("cannot alloc sb_fdblocks_ag buffers\n"));
+ 
+diff --git a/repair/phase6.c b/repair/phase6.c
+index 08636dcf..373b1a5b 100644
+--- a/repair/phase6.c
++++ b/repair/phase6.c
+@@ -82,7 +82,7 @@ typedef struct dir_hash_ent {
+ 	struct dir_hash_ent	*nextbyhash;	/* next in name bucket */
+ 	struct dir_hash_ent	*nextbyorder;	/* next in order added */
+ 	xfs_dahash_t		hashval;	/* hash value of name */
+-	__uint32_t		address;	/* offset of data entry */
++	uint32_t		address;	/* offset of data entry */
+ 	xfs_ino_t 		inum;		/* inode num of entry */
+ 	short			junkit;		/* name starts with / */
+ 	short			seen;		/* have seen leaf entry */
+@@ -170,11 +170,11 @@ static int
+ dir_hash_add(
+ 	xfs_mount_t		*mp,
+ 	dir_hash_tab_t		*hashtab,
+-	__uint32_t		addr,
++	uint32_t		addr,
+ 	xfs_ino_t		inum,
+ 	int			namelen,
+ 	unsigned char		*name,
+-	__uint8_t		ftype)
++	uint8_t			ftype)
+ {
+ 	xfs_dahash_t		hash = 0;
+ 	int			byaddr;
+@@ -357,7 +357,7 @@ static void
+ dir_hash_update_ftype(
+ 	dir_hash_tab_t		*hashtab,
+ 	xfs_dir2_dataptr_t	addr,
+-	__uint8_t		ftype)
++	uint8_t			ftype)
+ {
+ 	int			i;
+ 	dir_hash_ent_t		*p;
+@@ -1791,8 +1791,8 @@ longform_dir2_entry_check_data(
+ 
+ 		/* validate ftype field if supported */
+ 		if (xfs_sb_version_hasftype(&mp->m_sb)) {
+-			__uint8_t dir_ftype;
+-			__uint8_t ino_ftype;
++			uint8_t dir_ftype;
++			uint8_t ino_ftype;
+ 
+ 			dir_ftype = M_DIROPS(mp)->data_get_ftype(dep);
+ 			ino_ftype = get_inode_ftype(irec, ino_offset);
+@@ -2703,8 +2703,8 @@ _("entry \"%s\" (ino %" PRIu64 ") in dir %" PRIu64 " is a duplicate name"),
+ 
+ 		/* validate ftype field if supported */
+ 		if (xfs_sb_version_hasftype(&mp->m_sb)) {
+-			__uint8_t dir_ftype;
+-			__uint8_t ino_ftype;
++			uint8_t dir_ftype;
++			uint8_t ino_ftype;
+ 
+ 			dir_ftype = M_DIROPS(mp)->sf_get_ftype(sfep);
+ 			ino_ftype = get_inode_ftype(irec, ino_offset);
+diff --git a/repair/phase7.c b/repair/phase7.c
+index 8bce117d..4ffb81a8 100644
+--- a/repair/phase7.c
++++ b/repair/phase7.c
+@@ -32,7 +32,7 @@ static void
+ update_inode_nlinks(
+ 	xfs_mount_t 		*mp,
+ 	xfs_ino_t		ino,
+-	__uint32_t		nlinks)
++	uint32_t		nlinks)
+ {
+ 	xfs_trans_t		*tp;
+ 	xfs_inode_t		*ip;
+@@ -104,7 +104,7 @@ do_link_updates(
+ {
+ 	ino_tree_node_t		*irec;
+ 	int			j;
+-	__uint32_t		nrefs;
++	uint32_t		nrefs;
+ 
+ 	for (irec = findfirst_inode_rec(agno); irec;
+ 	     irec = next_ino_rec(irec)) {
+@@ -143,7 +143,7 @@ phase7(
+ 	else
+ 		do_log(_("Phase 7 - verify link counts...\n"));
+ 
+-	set_progress_msg(PROGRESS_FMT_CORR_LINK, (__uint64_t) glob_agcount);
++	set_progress_msg(PROGRESS_FMT_CORR_LINK, (uint64_t) glob_agcount);
+ 
+ 	create_work_queue(&wq, mp, scan_threads);
+ 
+diff --git a/repair/progress.c b/repair/progress.c
+index 2a09b239..99d2658c 100644
+--- a/repair/progress.c
++++ b/repair/progress.c
+@@ -85,8 +85,8 @@ pthread_t	report_thread;
+ typedef struct msg_block_s {
+ 	pthread_mutex_t	mutex;
+ 	progress_rpt_t	*format;
+-	__uint64_t	*done;
+-	__uint64_t	*total;
++	uint64_t	*done;
++	uint64_t	*total;
+ 	int		count;
+ 	int		interval;
+ } msg_block_t;
+@@ -96,14 +96,14 @@ typedef struct phase_times_s {
+ 	time_t		start;
+ 	time_t		end;
+ 	time_t		duration;
+-	__uint64_t	item_counts[4];
++	uint64_t	item_counts[4];
+ } phase_times_t;
+ static phase_times_t phase_times[8];
+ 
+ static void *progress_rpt_thread(void *);
+ static int current_phase;
+ static int running;
+-static __uint64_t prog_rpt_total;
++static uint64_t prog_rpt_total;
+ 
+ void
+ init_progress_rpt (void)
+@@ -113,11 +113,11 @@ init_progress_rpt (void)
+ 	 *  allocate the done vector
+ 	 */
+ 
+-	if ((prog_rpt_done = (__uint64_t *)
+-		malloc(sizeof(__uint64_t)*glob_agcount)) == NULL ) {
++	if ((prog_rpt_done = (uint64_t *)
++		malloc(sizeof(uint64_t)*glob_agcount)) == NULL) {
+ 		do_error(_("cannot malloc pointer to done vector\n"));
+ 	}
+-	bzero(prog_rpt_done, sizeof(__uint64_t)*glob_agcount);
++	bzero(prog_rpt_done, sizeof(uint64_t)*glob_agcount);
+ 
+ 	/*
+ 	 *  Setup comm block, start the thread
+@@ -165,10 +165,10 @@ progress_rpt_thread (void *p)
+ 	timer_t timerid;
+ 	struct itimerspec timespec;
+ 	char *msgbuf;
+-	__uint64_t *donep;
+-	__uint64_t sum;
++	uint64_t *donep;
++	uint64_t sum;
+ 	msg_block_t *msgp = (msg_block_t *)p;
+-	__uint64_t percent;
++	uint64_t percent;
+ 
+ 	/* It's possible to get here very early w/ no progress msg set */
+ 	if (!msgp->format)
+@@ -286,7 +286,7 @@ progress_rpt_thread (void *p)
+ }
+ 
+ int
+-set_progress_msg (int report, __uint64_t total)
++set_progress_msg(int report, uint64_t total)
+ {
+ 
+ 	if (!ag_stride)
+@@ -300,7 +300,7 @@ set_progress_msg (int report, __uint64_t total)
+ 
+ 	/* reset all the accumulative totals */
+ 	if (prog_rpt_done)
+-		bzero(prog_rpt_done, sizeof(__uint64_t)*glob_agcount);
++		bzero(prog_rpt_done, sizeof(uint64_t)*glob_agcount);
+ 
+ 	if (pthread_mutex_unlock(&global_msgs.mutex))
+ 		do_error(_("set_progress_msg: cannot unlock progress mutex\n"));
+@@ -308,14 +308,14 @@ set_progress_msg (int report, __uint64_t total)
+ 	return (0);
+ }
+ 
+-__uint64_t
++uint64_t
+ print_final_rpt(void)
+ {
+ 	int i;
+ 	struct tm *tmp;
+ 	time_t now;
+-	__uint64_t *donep;
+-	__uint64_t sum;
++	uint64_t *donep;
++	uint64_t sum;
+ 	msg_block_t 	*msgp = &global_msgs;
+ 	char		msgbuf[DURATION_BUF_SIZE];
+ 
+diff --git a/repair/progress.h b/repair/progress.h
+index 33db8344..51526483 100644
+--- a/repair/progress.h
++++ b/repair/progress.h
+@@ -32,8 +32,8 @@
+ extern void init_progress_rpt(void);
+ extern void stop_progress_rpt(void);
+ extern void summary_report(void);
+-extern int  set_progress_msg(int report, __uint64_t total);
+-extern __uint64_t print_final_rpt(void);
++extern int  set_progress_msg(int report, uint64_t total);
++extern uint64_t print_final_rpt(void);
+ extern char *timestamp(int end, int phase, char *buf);
+ extern char *duration(int val, char *buf);
+ extern int do_parallel;
+diff --git a/repair/rmap.c b/repair/rmap.c
+index ab6e5839..01d6f0fc 100644
+--- a/repair/rmap.c
++++ b/repair/rmap.c
+@@ -343,7 +343,7 @@ err:
+ 
+ static int
+ find_first_zero_bit(
+-	__uint64_t	mask)
++	uint64_t	mask)
+ {
+ 	int		n;
+ 	int		b = 0;
+@@ -356,7 +356,7 @@ find_first_zero_bit(
+ 
+ static int
+ popcnt(
+-	__uint64_t	mask)
++	uint64_t	mask)
+ {
+ 	int		n;
+ 	int		b = 0;
+@@ -1064,14 +1064,14 @@ err:
+  * Compare the key fields of two rmap records -- positive if key1 > key2,
+  * negative if key1 < key2, and zero if equal.
+  */
+-__int64_t
++int64_t
+ rmap_diffkeys(
+ 	struct xfs_rmap_irec	*kp1,
+ 	struct xfs_rmap_irec	*kp2)
+ {
+ 	__u64			oa;
+ 	__u64			ob;
+-	__int64_t		d;
++	int64_t			d;
+ 	struct xfs_rmap_irec	tmp;
+ 
+ 	tmp = *kp1;
+@@ -1081,7 +1081,7 @@ rmap_diffkeys(
+ 	tmp.rm_flags &= ~XFS_RMAP_REC_FLAGS;
+ 	ob = libxfs_rmap_irec_offset_pack(&tmp);
+ 
+-	d = (__int64_t)kp1->rm_startblock - kp2->rm_startblock;
++	d = (int64_t)kp1->rm_startblock - kp2->rm_startblock;
+ 	if (d)
+ 		return d;
+ 
+@@ -1192,10 +1192,10 @@ fix_inode_reflink_flags(
+ {
+ 	struct ino_tree_node	*irec;
+ 	int			bit;
+-	__uint64_t		was;
+-	__uint64_t		is;
+-	__uint64_t		diff;
+-	__uint64_t		mask;
++	uint64_t		was;
++	uint64_t		is;
++	uint64_t		diff;
++	uint64_t		mask;
+ 	int			error = 0;
+ 	xfs_agino_t		agino;
+ 
+diff --git a/repair/rmap.h b/repair/rmap.h
+index 752ece82..1616ab7d 100644
+--- a/repair/rmap.h
++++ b/repair/rmap.h
+@@ -44,7 +44,7 @@ extern int rmap_init_cursor(xfs_agnumber_t, struct xfs_slab_cursor **);
+ extern void rmap_avoid_check(void);
+ extern int rmaps_verify_btree(struct xfs_mount *, xfs_agnumber_t);
+ 
+-extern __int64_t rmap_diffkeys(struct xfs_rmap_irec *kp1,
++extern int64_t rmap_diffkeys(struct xfs_rmap_irec *kp1,
+ 		struct xfs_rmap_irec *kp2);
+ extern void rmap_high_key_from_rec(struct xfs_rmap_irec *rec,
+ 		struct xfs_rmap_irec *key);
+diff --git a/repair/sb.c b/repair/sb.c
+index 77e51546..acc92839 100644
+--- a/repair/sb.c
++++ b/repair/sb.c
+@@ -40,7 +40,7 @@ copy_sb(xfs_sb_t *source, xfs_sb_t *dest)
+ 	xfs_ino_t	uquotino;
+ 	xfs_ino_t	gquotino;
+ 	xfs_ino_t	pquotino;
+-	__uint16_t	versionnum;
++	uint16_t	versionnum;
+ 
+ 	rootino = dest->sb_rootino;
+ 	rbmino = dest->sb_rbmino;
+@@ -106,8 +106,8 @@ verify_sb_blocksize(xfs_sb_t *sb)
+ static int
+ __find_secondary_sb(
+ 	xfs_sb_t	*rsb,
+-	__uint64_t	start,
+-	__uint64_t	skip)
++	uint64_t	start,
++	uint64_t	skip)
+ {
+ 	xfs_off_t	off;
+ 	xfs_sb_t	*sb;
+@@ -187,13 +187,13 @@ __find_secondary_sb(
+ 
+ static int
+ guess_default_geometry(
+-	__uint64_t		*agsize,
+-	__uint64_t		*agcount,
++	uint64_t		*agsize,
++	uint64_t		*agcount,
+ 	libxfs_init_t		*x)
+ {
+ 	struct fs_topology	ft;
+ 	int			blocklog;
+-	__uint64_t		dblocks;
++	uint64_t		dblocks;
+ 	int			multidisk;
+ 
+ 	memset(&ft, 0, sizeof(ft));
+@@ -216,9 +216,9 @@ int
+ find_secondary_sb(xfs_sb_t *rsb)
+ {
+ 	int		retval = 0;
+-	__uint64_t	agcount;
+-	__uint64_t	agsize;
+-	__uint64_t	skip;
++	uint64_t	agcount;
++	uint64_t	agsize;
++	uint64_t	skip;
+ 	int		blocklog;
+ 
+ 	/*
+@@ -229,7 +229,7 @@ find_secondary_sb(xfs_sb_t *rsb)
+ 	do_warn(_("\nattempting to find secondary superblock...\n"));
+ 
+ 	if (verify_sb_blocksize(rsb) == 0) {
+-		skip = (__uint64_t)rsb->sb_agblocks * rsb->sb_blocksize;
++		skip = (uint64_t)rsb->sb_agblocks * rsb->sb_blocksize;
+ 		if (skip >= XFS_AG_MIN_BYTES && skip <= XFS_AG_MAX_BYTES)
+ 			retval = __find_secondary_sb(rsb, skip, skip);
+ 	}
+@@ -343,7 +343,7 @@ sb_validate_ino_align(struct xfs_sb *sb)
+ int
+ verify_sb(char *sb_buf, xfs_sb_t *sb, int is_primary_sb)
+ {
+-	__uint32_t	bsize;
++	uint32_t	bsize;
+ 	int		i;
+ 	int		ret;
+ 
+@@ -399,7 +399,7 @@ verify_sb(char *sb_buf, xfs_sb_t *sb, int is_primary_sb)
+ 		sb->sb_dblocks < XFS_MIN_DBLOCKS(sb))
+ 		return(XR_BAD_FS_SIZE_DATA);
+ 
+-	if (sb->sb_agblklog != (__uint8_t)libxfs_log2_roundup(sb->sb_agblocks))
++	if (sb->sb_agblklog != (uint8_t)libxfs_log2_roundup(sb->sb_agblocks))
+ 		return(XR_BAD_FS_SIZE_DATA);
+ 
+ 	if (sb->sb_inodesize < XFS_DINODE_MIN_SIZE                     ||
+diff --git a/repair/scan.c b/repair/scan.c
+index b9ef4dc3..447611ac 100644
+--- a/repair/scan.c
++++ b/repair/scan.c
+@@ -42,13 +42,13 @@ struct aghdr_cnts {
+ 	xfs_agnumber_t	agno;
+ 	xfs_extlen_t	agffreeblks;
+ 	xfs_extlen_t	agflongest;
+-	__uint64_t	agfbtreeblks;
+-	__uint32_t	agicount;
+-	__uint32_t	agifreecount;
+-	__uint64_t	fdblocks;
+-	__uint64_t	usedblocks;
+-	__uint64_t	ifreecount;
+-	__uint32_t	fibtfreecount;
++	uint64_t	agfbtreeblks;
++	uint32_t	agicount;
++	uint32_t	agifreecount;
++	uint64_t	fdblocks;
++	uint64_t	usedblocks;
++	uint64_t	ifreecount;
++	uint32_t	fibtfreecount;
+ };
+ 
+ void
+@@ -70,10 +70,10 @@ scan_sbtree(
+ 				xfs_agnumber_t		agno,
+ 				int			suspect,
+ 				int			isroot,
+-				__uint32_t		magic,
++				uint32_t		magic,
+ 				void			*priv),
+ 	int		isroot,
+-	__uint32_t	magic,
++	uint32_t	magic,
+ 	void		*priv,
+ 	const struct xfs_buf_ops *ops)
+ {
+@@ -110,23 +110,23 @@ scan_lbtree(
+ 				xfs_fsblock_t		bno,
+ 				xfs_ino_t		ino,
+ 				xfs_rfsblock_t		*tot,
+-				__uint64_t		*nex,
++				uint64_t		*nex,
+ 				blkmap_t		**blkmapp,
+ 				bmap_cursor_t		*bm_cursor,
+ 				int			isroot,
+ 				int			check_dups,
+ 				int			*dirty,
+-				__uint64_t		magic),
++				uint64_t		magic),
+ 	int		type,
+ 	int		whichfork,
+ 	xfs_ino_t	ino,
+ 	xfs_rfsblock_t	*tot,
+-	__uint64_t	*nex,
++	uint64_t	*nex,
+ 	blkmap_t	**blkmapp,
+ 	bmap_cursor_t	*bm_cursor,
+ 	int		isroot,
+ 	int		check_dups,
+-	__uint64_t	magic,
++	uint64_t	magic,
+ 	const struct xfs_buf_ops *ops)
+ {
+ 	xfs_buf_t	*bp;
+@@ -179,13 +179,13 @@ scan_bmapbt(
+ 	xfs_fsblock_t		bno,
+ 	xfs_ino_t		ino,
+ 	xfs_rfsblock_t		*tot,
+-	__uint64_t		*nex,
++	uint64_t		*nex,
+ 	blkmap_t		**blkmapp,
+ 	bmap_cursor_t		*bm_cursor,
+ 	int			isroot,
+ 	int			check_dups,
+ 	int			*dirty,
+-	__uint64_t		magic)
++	uint64_t		magic)
+ {
+ 	int			i;
+ 	int			err;
+@@ -548,7 +548,7 @@ scan_allocbt(
+ 	xfs_agnumber_t		agno,
+ 	int			suspect,
+ 	int			isroot,
+-	__uint32_t		magic,
++	uint32_t		magic,
+ 	void			*priv)
+ {
+ 	struct aghdr_cnts	*agcnts = priv;
+@@ -930,7 +930,7 @@ scan_rmapbt(
+ 	xfs_agnumber_t		agno,
+ 	int			suspect,
+ 	int			isroot,
+-	__uint32_t		magic,
++	uint32_t		magic,
+ 	void			*priv)
+ {
+ 	const char		*name = "rmap";
+@@ -1233,7 +1233,7 @@ scan_refcbt(
+ 	xfs_agnumber_t		agno,
+ 	int			suspect,
+ 	int			isroot,
+-	__uint32_t		magic,
++	uint32_t		magic,
+ 	void			*priv)
+ {
+ 	const char		*name = "refcount";
+@@ -1939,7 +1939,7 @@ scan_inobt(
+ 	xfs_agnumber_t		agno,
+ 	int			suspect,
+ 	int			isroot,
+-	__uint32_t		magic,
++	uint32_t		magic,
+ 	void			*priv)
+ {
+ 	struct aghdr_cnts	*agcnts = priv;
+@@ -2176,7 +2176,7 @@ validate_agf(
+ 	struct aghdr_cnts	*agcnts)
+ {
+ 	xfs_agblock_t		bno;
+-	__uint32_t		magic;
++	uint32_t		magic;
+ 
+ 	bno = be32_to_cpu(agf->agf_roots[XFS_BTNUM_BNO]);
+ 	if (bno != 0 && verify_agbno(mp, agno, bno)) {
+@@ -2274,7 +2274,7 @@ validate_agi(
+ {
+ 	xfs_agblock_t		bno;
+ 	int			i;
+-	__uint32_t		magic;
++	uint32_t		magic;
+ 
+ 	bno = be32_to_cpu(agi->agi_root);
+ 	if (bno != 0 && verify_agbno(mp, agno, bno)) {
+@@ -2499,10 +2499,10 @@ scan_ags(
+ 	int			scan_threads)
+ {
+ 	struct aghdr_cnts *agcnts;
+-	__uint64_t	fdblocks = 0;
+-	__uint64_t	icount = 0;
+-	__uint64_t	ifreecount = 0;
+-	__uint64_t	usedblocks = 0;
++	uint64_t	fdblocks = 0;
++	uint64_t	icount = 0;
++	uint64_t	ifreecount = 0;
++	uint64_t	usedblocks = 0;
+ 	xfs_agnumber_t	i;
+ 	work_queue_t	wq;
+ 
+diff --git a/repair/scan.h b/repair/scan.h
+index ea8c0bf2..9bbe1e69 100644
+--- a/repair/scan.h
++++ b/repair/scan.h
+@@ -30,23 +30,23 @@ int scan_lbtree(
+ 				xfs_fsblock_t		bno,
+ 				xfs_ino_t		ino,
+ 				xfs_rfsblock_t		*tot,
+-				__uint64_t		*nex,
++				uint64_t		*nex,
+ 				struct blkmap		**blkmapp,
+ 				bmap_cursor_t		*bm_cursor,
+ 				int			isroot,
+ 				int			check_dups,
+ 				int			*dirty,
+-				__uint64_t		magic),
++				uint64_t		magic),
+ 	int		type,
+ 	int		whichfork,
+ 	xfs_ino_t	ino,
+ 	xfs_rfsblock_t	*tot,
+-	__uint64_t	*nex,
++	uint64_t	*nex,
+ 	struct blkmap	**blkmapp,
+ 	bmap_cursor_t	*bm_cursor,
+ 	int		isroot,
+ 	int		check_dups,
+-	__uint64_t	magic,
++	uint64_t	magic,
+ 	const struct xfs_buf_ops *ops);
+ 
+ int scan_bmapbt(
+@@ -57,13 +57,13 @@ int scan_bmapbt(
+ 	xfs_fsblock_t		bno,
+ 	xfs_ino_t		ino,
+ 	xfs_rfsblock_t		*tot,
+-	__uint64_t		*nex,
++	uint64_t		*nex,
+ 	struct blkmap		**blkmapp,
+ 	bmap_cursor_t		*bm_cursor,
+ 	int			isroot,
+ 	int			check_dups,
+ 	int			*dirty,
+-	__uint64_t		magic);
++	uint64_t		magic);
+ 
+ void
+ scan_ags(
+-- 
+2.14.1
+

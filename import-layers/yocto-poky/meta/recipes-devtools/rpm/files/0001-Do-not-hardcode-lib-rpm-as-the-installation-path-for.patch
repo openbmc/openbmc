@@ -4,7 +4,7 @@ Date: Mon, 27 Feb 2017 09:43:30 +0200
 Subject: [PATCH] Do not hardcode "lib/rpm" as the installation path for
  default configuration and macros.
 
-Upstream-Status: Inappropriate [oe-core specific]
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/pull/263]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---

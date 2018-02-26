@@ -1,0 +1,29 @@
+From 977a4d41012d1814f5a5330cacc2e4944de387cc Mon Sep 17 00:00:00 2001
+From: Dariusz Pelowski <dariusz.pelowski@gmail.com>
+Date: Sun, 5 Nov 2017 12:39:21 +0100
+Subject: [PATCH 2/2] kvmtool: add EXTRA_CFLAGS variable
+
+to avoid CFLAGS overriding introduce new EXTRA_CFLAGS variable
+for setting via command argument
+
+Signed-off-by: Dariusz Pelowski <dariusz.pelowski@gmail.com>
+---
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 64a0a16..bca1b26 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,6 +2,8 @@
+ # Define WERROR=0 to disable -Werror.
+ #
+ 
++CFLAGS += $(EXTRA_CFLAGS)
++
+ ifeq ($(strip $(V)),)
+ 	E = @echo
+ 	Q = @
+-- 
+2.15.0
+

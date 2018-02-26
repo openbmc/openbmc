@@ -9,6 +9,7 @@ explicitly in Makefile.PL or Build.PL.  This makes sense for the normal @INC
 ordering, but not ours.
 
 Patch-Name: debian/cpan_definstalldirs.diff
+Upstream-Status: Pending
 ---
  cpan/CPAN/lib/CPAN/FirstTime.pm | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

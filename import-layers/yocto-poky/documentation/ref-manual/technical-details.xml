@@ -18,7 +18,7 @@
 
     <para>
         The
-        <ulink url='&YOCTO_DOCS_DEV_URL;#bitbake-term'>BitBake</ulink>
+        <link linkend='bitbake-term'>BitBake</link>
         task executor together with various types of configuration files form
         the OpenEmbedded Core.
         This section overviews these components by describing their use and
@@ -48,15 +48,16 @@
         to each data source as a layer.
         For information on layers, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and
-        Creating Layers</ulink>" section of the Yocto Project Development Manual.
+        Creating Layers</ulink>" section of the Yocto Project Development
+        Tasks Manual.
     </para>
 
     <para>
         Following are some brief details on these core components.
         For additional information on how these components interact during
         a build, see the
-        "<link linkend='closer-look'>A Closer Look at the Yocto Project Development Environment</link>"
-        Chapter.
+        "<link linkend='development-concepts'>Development Concepts</link>"
+        section.
     </para>
 
     <section id='usingpoky-components-bitbake'>
@@ -65,7 +66,7 @@
         <para>
             BitBake is the tool at the heart of the OpenEmbedded build system
             and is responsible for parsing the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>,
+            <link linkend='metadata'>Metadata</link>,
             generating a list of tasks from it, and then executing those tasks.
         </para>
 
@@ -146,13 +147,70 @@
         </para>
     </section>
 
+    <section id='metadata-virtual-providers'>
+        <title>Metadata (Virtual Providers)</title>
+
+        <para>
+            Prior to the build, if you know that several different recipes
+            provide the same functionality, you can use a virtual provider
+            (i.e. <filename>virtual/*</filename>) as a placeholder for the
+            actual provider.
+            The actual provider would be determined at build
+            time.
+            In this case, you should add <filename>virtual/*</filename>
+            to <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>,
+            rather than listing the specified provider.
+            You would select the actual provider by setting the
+            <link linkend='var-PREFERRED_PROVIDER'><filename>PREFERRED_PROVIDER</filename></link>
+            variable (i.e. <filename>PREFERRED_PROVIDER_virtual/*</filename>)
+            in the build's configuration file (e.g.
+            <filename>poky/build/conf/local.conf</filename>).
+            <note>
+                Any recipe that PROVIDES a <filename>virtual/*</filename> item
+                that is ultimately not selected through
+                <filename>PREFERRED_PROVIDER</filename> does not get built.
+                Preventing these recipes from building is usually the desired
+                behavior since this mechanism's purpose is to select between
+                mutually exclusive alternative providers.
+            </note>
+        </para>
+
+        <para>
+            The following lists specific examples of virtual providers:
+            <itemizedlist>
+                <listitem><para>
+                    <filename>virtual/mesa</filename>:
+                    Provides <filename>gbm.pc</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>virtual/egl</filename>:
+                    Provides <filename>egl.pc</filename> and possibly
+                    <filename>wayland-egl.pc</filename>.
+                    </para></listitem>
+                <listitem><para>
+                    <filename>virtual/libgl</filename>:
+                    Provides <filename>gl.pc</filename> (i.e. libGL).
+                    </para></listitem>
+                <listitem><para>
+                    <filename>virtual/libgles1</filename>:
+                    Provides <filename>glesv1_cm.pc</filename>
+                    (i.e. libGLESv1_CM).
+                    </para></listitem>
+                <listitem><para>
+                    <filename>virtual/libgles2</filename>:
+                    Provides <filename>glesv2.pc</filename> (i.e. libGLESv2).
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
     <section id='usingpoky-components-classes'>
         <title>Classes</title>
 
         <para>
             Class files (<filename>.bbclass</filename>) contain information that
             is useful to share between
-            <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink> files.
+            <link linkend='metadata'>Metadata</link> files.
             An example is the
             <link linkend='ref-classes-autotools'><filename>autotools</filename></link>
             class, which contains common settings for any application that
@@ -172,7 +230,7 @@
             distribution configuration options, compiler tuning options, general common configuration
             options, and user configuration options in <filename>local.conf</filename>, which is found
             in the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+            <link linkend='build-directory'>Build Directory</link>.
         </para>
     </section>
 </section>
@@ -183,11 +241,12 @@
     <para>
         The Yocto Project does most of the work for you when it comes to
         creating
-        <ulink url='&YOCTO_DOCS_DEV_URL;#cross-development-toolchain'>cross-development toolchains</ulink>.
+        <link linkend='cross-development-toolchain'>cross-development toolchains</link>.
         This section provides some technical background on how
         cross-development toolchains are created and used.
         For more information on toolchains, you can also see the
-        <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
+        <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Application Development and the Extensible Software Development Kit (eSDK)</ulink>
+        manual.
     </para>
 
     <para>
@@ -372,8 +431,8 @@
         For information on advantages gained when building a
         cross-development toolchain installer, see the
         "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-building-an-sdk-installer'>Building an SDK Installer</ulink>"
-        section in the Yocto Project Software Development Kit (SDK) Developer's
-        Guide.
+        section in the Yocto Project Application Development and the
+        Extensible Software Development Kit (eSDK) manual.
     </note>
 </section>
 
@@ -433,7 +492,7 @@
         works with packages and can
         track incrementing <filename>PR</filename> information, see the
         "<ulink url='&YOCTO_DOCS_DEV_URL;#automatically-incrementing-a-binary-package-revision-number'>Automatically Incrementing a Binary Package Revision Number</ulink>"
-        section.
+        section in the Yocto Project Development Tasks Manual.
     </note>
 
     <para>
@@ -562,7 +621,7 @@
             code.
             However, there is still the question of a task's indirect inputs - the
             things that were already built and present in the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#build-directory'>Build Directory</ulink>.
+            <link linkend='build-directory'>Build Directory</link>.
             The checksum (or signature) for a particular task needs to add the hashes
             of all the tasks on which the particular task depends.
             Choosing which dependencies to add is a policy decision.
@@ -598,11 +657,12 @@
             The code in <filename>meta/lib/oe/sstatesig.py</filename> shows two examples
             of this and also illustrates how you can insert your own policy into the system
             if so desired.
-            This file defines the two basic signature generators <filename>OE-Core</filename>
-            uses:  "OEBasic" and "OEBasicHash".
+            This file defines the two basic signature generators
+            <link linkend='oe-core'>OE-Core</link> uses:  "OEBasic" and
+            "OEBasicHash".
             By default, there is a dummy "noop" signature handler enabled in BitBake.
             This means that behavior is unchanged from previous versions.
-            <filename>OE-Core</filename> uses the "OEBasicHash" signature handler by default
+            OE-Core uses the "OEBasicHash" signature handler by default
             through this setting in the <filename>bitbake.conf</filename> file:
             <literallayout class='monospaced'>
      BB_SIGNATURE_HANDLER ?= "OEBasicHash"
@@ -610,7 +670,7 @@
             The "OEBasicHash" <filename>BB_SIGNATURE_HANDLER</filename> is the same as the
             "OEBasic" version but adds the task hash to the stamp files.
             This results in any
-            <ulink url='&YOCTO_DOCS_DEV_URL;#metadata'>Metadata</ulink>
+            <link linkend='metadata'>Metadata</link>
             change that changes the task hash, automatically
             causing the task to be run again.
             This removes the need to bump <link linkend='var-PR'><filename>PR</filename></link>
@@ -1195,6 +1255,213 @@
     </para>
 </section>
 
+<section id='wic-plug-ins-interface'>
+    <title>Wic Plug-Ins Interface</title>
+
+    <para>
+        You can extend and specialize Wic functionality by using
+        Wic plug-ins.
+        This section explains the Wic plug-in interface.
+        For information on using Wic in general, see the
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-partitioned-images-using-wic'>Creating Partitioned Images Using Wic</ulink>"
+        section in the Yocto Project Development Tasks Manual.
+        <note>
+            Wic plug-ins consist of "source" and "imager" plug-ins.
+            Imager plug-ins are beyond the scope of this section.
+        </note>
+    </para>
+
+    <para>
+        Source plug-ins provide a mechanism to customize partition
+        content during the Wic image generation process.
+        You can use source plug-ins to map values that you specify
+        using <filename>--source</filename> commands in kickstart
+        files (i.e. <filename>*.wks</filename>) to a plug-in
+        implementation used to populate a given partition.
+        <note>
+            If you use plug-ins that have build-time dependencies
+            (e.g. native tools, bootloaders, and so forth)
+            when building a Wic image, you need to specify those
+            dependencies using the
+            <link linkend='var-WKS_FILE_DEPENDS'><filename>WKS_FILE_DEPENDS</filename></link>
+            variable.
+        </note>
+    </para>
+
+    <para>
+        Source plug-ins are subclasses defined in plug-in files.
+        As shipped, the Yocto Project provides several plug-in
+        files.
+        You can see the source plug-in files that ship with the
+        Yocto Project
+        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/scripts/lib/wic/plugins/source'>here</ulink>.
+        Each of these plug-in files contain source plug-ins that
+        are designed to populate a specific Wic image partition.
+    </para>
+
+    <para>
+        Source plug-ins are subclasses of the
+        <filename>SourcePlugin</filename> class, which is
+        defined in the
+        <filename>poky/scripts/lib/wic/pluginbase.py</filename>
+        file.
+        For example, the <filename>BootimgEFIPlugin</filename>
+        source plug-in found in the
+        <filename>bootimg-efi.py</filename> file is a subclass of
+        the <filename>SourcePlugin</filename> class, which is found
+        in the <filename>pluginbase.py</filename> file.
+    </para>
+
+    <para>
+        You can also implement source plug-ins in a layer outside
+        of the Source Repositories (external layer).
+        To do so, be sure that your plug-in files are located in
+        a directory whose path is
+        <filename>scripts/lib/wic/plugins/source/</filename>
+        within your external layer.
+        When the plug-in files are located there, the source
+        plug-ins they contain are made available to Wic.
+    </para>
+
+    <para>
+        When the Wic implementation needs to invoke a
+        partition-specific implementation, it looks for the plug-in
+        with the same name as the <filename>--source</filename>
+        parameter used in the kickstart file given to that
+        partition.
+        For example, if the partition is set up using the following
+        command in a kickstart file:
+        <literallayout class='monospaced'>
+     part /boot --source bootimg-pcbios --ondisk sda --label boot --active --align 1024
+        </literallayout>
+        The methods defined as class members of the matching
+        source plug-in (i.e. <filename>bootimg-pcbios</filename>)
+        in the <filename>bootimg-pcbios.py</filename> plug-in file
+        are used.
+    </para>
+
+    <para>
+        To be more concrete, here is the corresponding plug-in
+        definition from the <filename>bootimg-pcbios.py</filename>
+        file for the previous command along with an example
+        method called by the Wic implementation when it needs to
+        prepare a partition using an implementation-specific
+        function:
+        <literallayout class='monospaced'>
+     bootimg-pcbios.py
+                  .
+                  .
+                  .
+        class BootimgPcbiosPlugin(SourcePlugin):
+        """
+        Create MBR boot partition and install syslinux on it.
+        """
+
+        name = 'bootimg-pcbios'
+                  .
+                  .
+                  .
+        @classmethod
+        def do_prepare_partition(cls, part, source_params, creator, cr_workdir,
+                                 oe_builddir, bootimg_dir, kernel_dir,
+                                 rootfs_dir, native_sysroot):
+            """
+            Called to do the actual content population for a partition i.e. it
+            'prepares' the partition to be incorporated into the image.
+            In this case, prepare content for legacy bios boot partition.
+            """
+                  .
+                  .
+                  .
+        </literallayout>
+        If a subclass (plug-in) itself does not implement a
+        particular function, Wic locates and uses the default
+        version in the superclass.
+        It is for this reason that all source plug-ins are derived
+        from the <filename>SourcePlugin</filename> class.
+    </para>
+
+    <para>
+        The <filename>SourcePlugin</filename> class defined in
+        the <filename>pluginbase.py</filename> file defines
+        a set of methods that source plug-ins can implement or
+        override.
+        Any plug-ins (subclass of
+        <filename>SourcePlugin</filename>) that do not implement
+        a particular method inherit the implementation of the
+        method from the <filename>SourcePlugin</filename> class.
+        For more information, see the
+        <filename>SourcePlugin</filename> class in the
+        <filename>pluginbase.py</filename> file for details:
+    </para>
+
+    <para>
+        The following list describes the methods implemented in the
+        <filename>SourcePlugin</filename> class:
+        <itemizedlist>
+            <listitem><para>
+                <emphasis><filename>do_prepare_partition()</filename>:</emphasis>
+                Called to populate a partition with actual content.
+                In other words, the method prepares the final
+                partition image that is incorporated into the
+                disk image.
+                </para></listitem>
+            <listitem><para>
+                <emphasis><filename>do_configure_partition()</filename>:</emphasis>
+                Called before
+                <filename>do_prepare_partition()</filename> to
+                create custom configuration files for a partition
+                (e.g. syslinux or grub configuration files).
+                </para></listitem>
+            <listitem><para>
+                <emphasis><filename>do_install_disk()</filename>:</emphasis>
+                Called after all partitions have been prepared and
+                assembled into a disk image.
+                This method provides a hook to allow finalization
+                of a disk image (e.g. writing an MBR).
+                </para></listitem>
+            <listitem><para>
+                <emphasis><filename>do_stage_partition()</filename>:</emphasis>
+                Special content-staging hook called before
+                <filename>do_prepare_partition()</filename>.
+                This method is normally empty.</para>
+
+                <para>Typically, a partition just uses the passed-in
+                parameters (e.g. the unmodified value of
+                <filename>bootimg_dir</filename>).
+                However, in some cases, things might need to be
+                more tailored.
+                As an example, certain files might additionally
+                need to be taken from
+                <filename>bootimg_dir + /boot</filename>.
+                This hook allows those files to be staged in a
+                customized fashion.
+                <note>
+                    <filename>get_bitbake_var()</filename>
+                    allows you to access non-standard variables
+                    that you might want to use for this
+                    behavior.
+                </note>
+                </para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        You can extend the source plug-in mechanism.
+        To add more hooks, create more source plug-in methods
+        within <filename>SourcePlugin</filename> and the
+        corresponding derived subclasses.
+        The code that calls the plug-in methods uses the
+        <filename>plugin.get_source_plugin_methods()</filename>
+        function to find the method or methods needed by the call.
+        Retrieval of those methods is accomplished by filling up
+        a dict with keys that contain the method names of interest.
+        On success, these will be filled in with the actual
+        methods.
+        See the Wic implementation for examples and details.
+    </para>
+</section>
+
 <section id='x32'>
     <title>x32</title>
 
@@ -1310,7 +1577,7 @@
             The Wayland protocol libraries and the reference Weston compositor
             ship as integrated packages in the <filename>meta</filename> layer
             of the
-            <ulink url='&YOCTO_DOCS_DEV_URL;#source-directory'>Source Directory</ulink>.
+            <link linkend='source-directory'>Source Directory</link>.
             Specifically, you can find the recipes that build both Wayland
             and Weston at <filename>meta/recipes-graphics/wayland</filename>.
         </para>
@@ -1425,8 +1692,8 @@
     <para>
         For information that can help you maintain compliance with various open
         source licensing during the lifecycle of the product, see the
-        "<ulink url='&YOCTO_DOCS_DEV_URL;#maintaining-open-source-license-compliance-during-your-products-lifecycle'>Maintaining Open Source License Compliance During Your Project's Lifecycle</ulink>" section
-        in the Yocto Project Development Manual.
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#maintaining-open-source-license-compliance-during-your-products-lifecycle'>Maintaining Open Source License Compliance During Your Project's Lifecycle</ulink>"
+        section in the Yocto Project Development Tasks Manual.
     </para>
 
     <section id="usingpoky-configuring-LIC_FILES_CHKSUM">

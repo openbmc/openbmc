@@ -33,7 +33,8 @@ KERNEL_FEATURES_append_qemuall=" features/debug/printk.scc"
 # and it can be specific to the machine or shared
 # KMACHINE = "UNDEFINED"
 
-LINUX_KERNEL_TYPE ?= "standard"
+# The distro or local.conf should set this, but if nobody cares...
+LINUX_KERNEL_TYPE ??= "standard"
 
 # KMETA ?= ""
 KBRANCH ?= "master"
@@ -48,12 +49,11 @@ KCONF_AUDIT_LEVEL ?= "1"
 KCONF_BSP_AUDIT_LEVEL ?= "0"
 KMETA_AUDIT ?= "yes"
 
-LINUX_VERSION_EXTENSION ?= "-yocto-${LINUX_KERNEL_TYPE}"
+LINUX_VERSION_EXTENSION ??= "-yocto-${LINUX_KERNEL_TYPE}"
 
 # Pick up shared functions
 inherit kernel
 inherit kernel-yocto
-require linux-dtb.inc
 
 B = "${WORKDIR}/linux-${PACKAGE_ARCH}-${LINUX_KERNEL_TYPE}-build"
 

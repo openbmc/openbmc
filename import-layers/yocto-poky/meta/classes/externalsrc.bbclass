@@ -29,6 +29,12 @@ EXTERNALSRC_SYMLINKS ?= "oe-workdir:${WORKDIR} oe-logs:${T}"
 
 python () {
     externalsrc = d.getVar('EXTERNALSRC')
+    externalsrcbuild = d.getVar('EXTERNALSRC_BUILD')
+
+    if externalsrc and not externalsrc.startswith("/"):
+        bb.error("EXTERNALSRC must be an absolute path")
+    if externalsrcbuild and not externalsrcbuild.startswith("/"):
+        bb.error("EXTERNALSRC_BUILD must be an absolute path")
 
     # If this is the base recipe and EXTERNALSRC is set for it or any of its
     # derivatives, then enable BB_DONT_CACHE to force the recipe to always be
@@ -48,7 +54,6 @@ python () {
 
     if externalsrc:
         d.setVar('S', externalsrc)
-        externalsrcbuild = d.getVar('EXTERNALSRC_BUILD')
         if externalsrcbuild:
             d.setVar('B', externalsrcbuild)
         else:
@@ -167,6 +172,7 @@ do_buildclean[nostamp] = "1"
 do_buildclean[doc] = "Call 'make clean' or equivalent in ${B}"
 externalsrc_do_buildclean() {
 	if [ -e Makefile -o -e makefile -o -e GNUmakefile ]; then
+		rm -f ${@' '.join([x.split(':')[0] for x in (d.getVar('EXTERNALSRC_SYMLINKS') or '').split()])}
 		oe_runmake clean || die "make failed"
 	else
 		bbnote "nothing to do - no makefile found"
@@ -179,14 +185,20 @@ def srctree_hash_files(d, srcdir=None):
     import tempfile
 
     s_dir = srcdir or d.getVar('EXTERNALSRC')
-    git_dir = os.path.join(s_dir, '.git')
-    oe_hash_file = os.path.join(git_dir, 'oe-devtool-tree-sha1')
+    git_dir = None
+
+    try:
+        git_dir = os.path.join(s_dir,
+            subprocess.check_output(['git', '-C', s_dir, 'rev-parse', '--git-dir']).decode("utf-8").rstrip())
+    except subprocess.CalledProcessError:
+        pass
 
     ret = " "
-    if os.path.exists(git_dir):
-        with tempfile.NamedTemporaryFile(dir=git_dir, prefix='oe-devtool-index') as tmp_index:
+    if git_dir is not None:
+        oe_hash_file = os.path.join(git_dir, 'oe-devtool-tree-sha1')
+        with tempfile.NamedTemporaryFile(prefix='oe-devtool-index') as tmp_index:
             # Clone index
-            shutil.copy2(os.path.join(git_dir, 'index'), tmp_index.name)
+            shutil.copyfile(os.path.join(git_dir, 'index'), tmp_index.name)
             # Update our custom index
             env = os.environ.copy()
             env['GIT_INDEX_FILE'] = tmp_index.name

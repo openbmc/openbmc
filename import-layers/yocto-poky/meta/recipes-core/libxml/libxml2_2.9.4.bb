@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://Copyright;md5=2044417e2e5006b65a8b9067b683fcf1 \
 
 DEPENDS = "zlib virtual/libiconv"
 
-SRC_URI = "ftp://xmlsoft.org/libxml2/libxml2-${PV}.tar.gz;name=libtar \
+SRC_URI = "http://www.xmlsoft.org/sources/libxml2-${PV}.tar.gz;name=libtar \
            http://www.w3.org/XML/Test/xmlts20080827.tar.gz;name=testtar \
            file://libxml-64bit.patch \
            file://ansidecl.patch \
@@ -53,11 +53,11 @@ RDEPENDS_${PN}-ptest += "make ${@bb.utils.contains('PACKAGECONFIG', 'python', 'l
 
 RDEPENDS_${PN}-python += "${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3-core', '', d)}"
 
-RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-gconv-ebcdic-us glibc-gconv-ibm1141"
+RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-gconv-ebcdic-us glibc-gconv-ibm1141 glibc-gconv-iso8859-5"
 
 export PYTHON_SITE_PACKAGES="${PYTHON_SITEPACKAGES_DIR}"
 
-# WARNING: zlib is require for RPM use
+# WARNING: zlib is required for RPM use
 EXTRA_OECONF = "--without-debug --without-legacy --with-catalog --without-docbook --with-c14n --without-lzma --with-fexceptions"
 EXTRA_OECONF_class-native = "--without-legacy --without-docbook --with-c14n --without-lzma --with-zlib"
 EXTRA_OECONF_class-nativesdk = "--without-legacy --without-docbook --with-c14n --without-lzma --with-zlib"
@@ -89,6 +89,17 @@ do_install_ptest () {
 		grep -lrZ '#!/usr/bin/python' ${D}${PTEST_PATH}/python |
 			xargs -0 sed -i -e 's|/usr/bin/python|${USRBINPATH}/${PYTHON_PN}|'
 	fi
+	#Remove build host references from various Makefiles
+	find "${D}${PTEST_PATH}" -name Makefile -type f -exec \
+	    sed -i \
+	    -e 's,--sysroot=${STAGING_DIR_TARGET},,g' \
+	    -e 's|${DEBUG_PREFIX_MAP}||g' \
+	    -e 's:${HOSTTOOLS_DIR}/::g' \
+	    -e 's:${RECIPE_SYSROOT_NATIVE}::g' \
+	    -e 's:${RECIPE_SYSROOT}::g' \
+	    -e 's:${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}::g' \
+	    -e '/^RELDATE/d' \
+	    {} +
 }
 
 do_install_append_class-native () {

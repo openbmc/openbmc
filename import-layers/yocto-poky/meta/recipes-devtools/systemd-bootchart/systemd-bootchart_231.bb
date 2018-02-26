@@ -2,7 +2,9 @@ LICENSE = "LGPLv2.1 & GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE.LGPL2.1;md5=4fbd65380cdd255951079008b364516c \
                     file://LICENSE.GPL2;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = "git://github.com/systemd/systemd-bootchart.git;protocol=https"
+SRC_URI = "git://github.com/systemd/systemd-bootchart.git;protocol=https \
+           file://0001-parse-util-Don-t-use-xlocale.h.patch \
+"
 
 # Modify these as desired
 PV = "231+git${SRCPV}"

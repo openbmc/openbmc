@@ -77,10 +77,6 @@ if [ ! -d "$PSEUDO_LOCALSTATEDIR" ]; then
 	exit 1	
 fi
 
-# rpc.mountd RPC port
-MOUNTD_RPCPORT=${MOUNTD_RPCPORT:=$[ 21111 + $NFS_INSTANCE ]}
-# rpc.nfsd RPC port
-NFSD_RPCPORT=${NFSD_RPCPORT:=$[ 11111 + $NFS_INSTANCE ]}
 # NFS server port number
 NFSD_PORT=${NFSD_PORT:=$[ 3049 + 2 * $NFS_INSTANCE ]}
 # mountd port number
@@ -88,7 +84,7 @@ MOUNTD_PORT=${MOUNTD_PORT:=$[ 3048 + 2 * $NFS_INSTANCE ]}
 
 ## For debugging you would additionally add
 ## --debug all
-UNFSD_OPTS="-p -N -i $NFSPID -e $EXPORTS -x $NFSD_RPCPORT -n $NFSD_PORT -y $MOUNTD_RPCPORT -m $MOUNTD_PORT"
+UNFSD_OPTS="-p -N -i $NFSPID -e $EXPORTS -n $NFSD_PORT -m $MOUNTD_PORT"
 
 # See how we were called.
 case "$1" in
@@ -130,7 +126,7 @@ case "$1" in
 	fi
 	echo " "
 	echo "On your target please remember to add the following options for NFS"
-	echo "nfsroot=IP_ADDRESS:$NFS_EXPORT_DIR,nfsvers=3,port=$NFSD_PORT,mountprog=$MOUNTD_RPCPORT,nfsprog=$NFSD_RPCPORT,udp,mountport=$MOUNTD_PORT"
+	echo "nfsroot=IP_ADDRESS:$NFS_EXPORT_DIR,nfsvers=3,port=$NFSD_PORT,udp,mountport=$MOUNTD_PORT"
 	;;
   stop)
 	if [ -f "$NFSPID" ]; then

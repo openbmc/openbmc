@@ -9,7 +9,7 @@ TOOLCHAIN_TARGET_TASK += "${PACKAGE_INSTALL}"
 TOOLCHAIN_TARGET_TASK_ATTEMPTONLY += "${PACKAGE_INSTALL_ATTEMPTONLY}"
 POPULATE_SDK_POST_TARGET_COMMAND += "rootfs_sysroot_relativelinks; "
 
-LICENSE = "MIT"
+LICENSE ?= "MIT"
 PACKAGES = ""
 DEPENDS += "${MLPREFIX}qemuwrapper-cross depmodwrapper-cross"
 RDEPENDS += "${PACKAGE_INSTALL} ${LINGUAS_INSTALL}"
@@ -33,7 +33,7 @@ ROOTFS_BOOTSTRAP_INSTALL = "run-postinsts"
 
 # These packages will be removed from a read-only rootfs after all other
 # packages have been installed
-ROOTFS_RO_UNNEEDED = "update-rc.d base-passwd shadow ${VIRTUAL-RUNTIME_update-alternatives} ${ROOTFS_BOOTSTRAP_INSTALL}"
+ROOTFS_RO_UNNEEDED ??= "update-rc.d base-passwd shadow ${VIRTUAL-RUNTIME_update-alternatives} ${ROOTFS_BOOTSTRAP_INSTALL}"
 
 # packages to install from features
 FEATURE_INSTALL = "${@' '.join(oe.packagegroup.required_packages(oe.data.typed_value('IMAGE_FEATURES', d), d))}"
@@ -85,7 +85,6 @@ PID = "${@os.getpid()}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 LDCONFIGDEPEND ?= "ldconfig-native:do_populate_sysroot"
-LDCONFIGDEPEND_libc-uclibc = ""
 LDCONFIGDEPEND_libc-musl = ""
 
 # This is needed to have depmod data in PKGDATA_DIR,
@@ -118,7 +117,7 @@ def rootfs_variables(d):
                  'IMAGE_ROOTFS_MAXSIZE','IMAGE_NAME','IMAGE_LINK_NAME','IMAGE_MANIFEST','DEPLOY_DIR_IMAGE','IMAGE_FSTYPES','IMAGE_INSTALL_COMPLEMENTARY','IMAGE_LINGUAS',
                  'MULTILIBRE_ALLOW_REP','MULTILIB_TEMP_ROOTFS','MULTILIB_VARIANTS','MULTILIBS','ALL_MULTILIB_PACKAGE_ARCHS','MULTILIB_GLOBAL_VARIANTS','BAD_RECOMMENDATIONS','NO_RECOMMENDATIONS',
                  'PACKAGE_ARCHS','PACKAGE_CLASSES','TARGET_VENDOR','TARGET_ARCH','TARGET_OS','OVERRIDES','BBEXTENDVARIANT','FEED_DEPLOYDIR_BASE_URI','INTERCEPT_DIR','USE_DEVFS',
-                 'CONVERSIONTYPES', 'IMAGE_GEN_DEBUGFS', 'ROOTFS_RO_UNNEEDED', 'IMGDEPLOYDIR', 'PACKAGE_EXCLUDE_COMPLEMENTARY']
+                 'CONVERSIONTYPES', 'IMAGE_GEN_DEBUGFS', 'ROOTFS_RO_UNNEEDED', 'IMGDEPLOYDIR', 'PACKAGE_EXCLUDE_COMPLEMENTARY', 'REPRODUCIBLE_TIMESTAMP_ROOTFS']
     variables.extend(rootfs_command_variables(d))
     variables.extend(variable_depends(d))
     return " ".join(variables)
@@ -139,9 +138,6 @@ def build_live(d):
 IMAGE_TYPE_live = "${@build_live(d)}"
 inherit ${IMAGE_TYPE_live}
 
-IMAGE_TYPE_vm = '${@bb.utils.contains_any("IMAGE_FSTYPES", ["vmdk", "vdi", "qcow2", "hdddirect"], "image-vm", "", d)}'
-inherit ${IMAGE_TYPE_vm}
-
 IMAGE_TYPE_container = '${@bb.utils.contains("IMAGE_FSTYPES", "container", "image-container", "", d)}'
 inherit ${IMAGE_TYPE_container}
 
@@ -149,13 +145,17 @@ IMAGE_TYPE_wic = "image_types_wic"
 inherit ${IMAGE_TYPE_wic}
 
 python () {
+    def extraimage_getdepends(task):
+        deps = ""
+        for dep in (d.getVar('EXTRA_IMAGEDEPENDS') or "").split():
+            deps += " %s:%s" % (dep, task)
+        return deps
+
+    d.appendVarFlag('do_image', 'depends', extraimage_getdepends('do_populate_lic'))
+    d.appendVarFlag('do_image_complete', 'depends', extraimage_getdepends('do_populate_sysroot'))
+
     deps = " " + imagetypes_getdepends(d)
     d.appendVarFlag('do_rootfs', 'depends', deps)
-
-    deps = ""
-    for dep in (d.getVar('EXTRA_IMAGEDEPENDS') or "").split():
-        deps += " %s:do_populate_sysroot" % dep
-    d.appendVarFlag('do_image_complete', 'depends', deps)
 
     #process IMAGE_FEATURES, we must do this before runtime_mapping_rename
     #Check for replaces image features
@@ -254,6 +254,7 @@ fakeroot python do_rootfs () {
     progress_reporter.next_stage()
 
     # generate rootfs
+    d.setVarFlag('REPRODUCIBLE_TIMESTAMP_ROOTFS', 'export', '1')
     create_rootfs(d, progress_reporter=progress_reporter, logcatcher=logcatcher)
 
     progress_reporter.finish()
@@ -261,18 +262,19 @@ fakeroot python do_rootfs () {
 do_rootfs[dirs] = "${TOPDIR}"
 do_rootfs[cleandirs] += "${S} ${IMGDEPLOYDIR}"
 do_rootfs[umask] = "022"
-addtask rootfs before do_build after do_prepare_recipe_sysroot
+addtask rootfs after do_prepare_recipe_sysroot
 
 fakeroot python do_image () {
     from oe.utils import execute_pre_post_process
 
+    d.setVarFlag('REPRODUCIBLE_TIMESTAMP_ROOTFS', 'export', '1')
     pre_process_cmds = d.getVar("IMAGE_PREPROCESS_COMMAND")
 
     execute_pre_post_process(d, pre_process_cmds)
 }
 do_image[dirs] = "${TOPDIR}"
 do_image[umask] = "022"
-addtask do_image after do_rootfs before do_build
+addtask do_image after do_rootfs
 
 fakeroot python do_image_complete () {
     from oe.utils import execute_pre_post_process
@@ -289,14 +291,21 @@ do_image_complete[sstate-inputdirs] = "${IMGDEPLOYDIR}"
 do_image_complete[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
 do_image_complete[stamp-extra-info] = "${MACHINE}"
 addtask do_image_complete after do_image before do_build
+python do_image_complete_setscene () {
+    sstate_setscene(d)
+}
+addtask do_image_complete_setscene
 
 # Add image-level QA/sanity checks to IMAGE_QA_COMMANDS
 #
 # IMAGE_QA_COMMANDS += " \
 #     image_check_everything_ok \
 # "
-# This task runs all functions in IMAGE_QA_COMMANDS after the image
+# This task runs all functions in IMAGE_QA_COMMANDS after the rootfs
 # construction has completed in order to validate the resulting image.
+#
+# The functions should use ${IMAGE_ROOTFS} to find the unpacked rootfs
+# directory, which if QA passes will be the basis for the images.
 fakeroot python do_image_qa () {
     from oe.utils import ImageQAFailed
 
@@ -318,7 +327,16 @@ fakeroot python do_image_qa () {
         imgname = d.getVar('IMAGE_NAME')
         bb.fatal("QA errors found whilst validating image: %s\n%s" % (imgname, qamsg))
 }
-addtask do_image_qa after do_image_complete before do_build
+addtask do_image_qa after do_rootfs before do_image
+
+SSTATETASKS += "do_image_qa"
+SSTATE_SKIP_CREATION_task-image-qa = '1'
+do_image_qa[sstate-inputdirs] = ""
+do_image_qa[sstate-outputdirs] = ""
+python do_image_qa_setscene () {
+    sstate_setscene(d)
+}
+addtask do_image_qa_setscene
 
 def setup_debugfs_variables(d):
     d.appendVar('IMAGE_ROOTFS', '-dbg')
@@ -426,7 +444,11 @@ python () {
         # Expand PV else it can trigger get_srcrev which can fail due to these variables being unset
         localdata.setVar('PV', d.getVar('PV'))
         localdata.delVar('DATETIME')
+        localdata.delVar('DATE')
         localdata.delVar('TMPDIR')
+        vardepsexclude = (d.getVarFlag('IMAGE_CMD_' + realt, 'vardepsexclude', True) or '').split()
+        for dep in vardepsexclude:
+            localdata.delVar(dep)
 
         image_cmd = localdata.getVar("IMAGE_CMD")
         vardeps.add('IMAGE_CMD_' + realt)
@@ -480,19 +502,20 @@ python () {
         for dep in typedeps[t]:
             after += ' do_image_%s' % dep.replace("-", "_").replace(".", "_")
 
-        t = t.replace("-", "_").replace(".", "_")
+        task = "do_image_%s" % t.replace("-", "_").replace(".", "_")
 
-        d.setVar('do_image_%s' % t, '\n'.join(cmds))
-        d.setVarFlag('do_image_%s' % t, 'func', '1')
-        d.setVarFlag('do_image_%s' % t, 'fakeroot', '1')
-        d.setVarFlag('do_image_%s' % t, 'prefuncs', debug + 'set_image_size')
-        d.setVarFlag('do_image_%s' % t, 'postfuncs', 'create_symlinks')
-        d.setVarFlag('do_image_%s' % t, 'subimages', ' '.join(subimages))
-        d.appendVarFlag('do_image_%s' % t, 'vardeps', ' '.join(vardeps))
-        d.appendVarFlag('do_image_%s' % t, 'vardepsexclude', 'DATETIME')
+        d.setVar(task, '\n'.join(cmds))
+        d.setVarFlag(task, 'func', '1')
+        d.setVarFlag(task, 'fakeroot', '1')
 
-        bb.debug(2, "Adding type %s before %s, after %s" % (t, 'do_image_complete', after))
-        bb.build.addtask('do_image_%s' % t, 'do_image_complete', after, d)
+        d.appendVarFlag(task, 'prefuncs', ' ' + debug + ' set_image_size')
+        d.prependVarFlag(task, 'postfuncs', ' create_symlinks')
+        d.appendVarFlag(task, 'subimages', ' ' + ' '.join(subimages))
+        d.appendVarFlag(task, 'vardeps', ' ' + ' '.join(vardeps))
+        d.appendVarFlag(task, 'vardepsexclude', 'DATETIME DATE ' + ' '.join(vardepsexclude))
+
+        bb.debug(2, "Adding task %s before %s, after %s" % (task, 'do_image_complete', after))
+        bb.build.addtask(task, 'do_image_complete', after, d)
 }
 
 #
@@ -598,3 +621,46 @@ do_package_write_ipk[noexec] = "1"
 do_package_write_deb[noexec] = "1"
 do_package_write_rpm[noexec] = "1"
 
+# Prepare the root links to point to the /usr counterparts.
+create_merged_usr_symlinks() {
+    root="$1"
+    install -d $root${base_bindir} $root${base_sbindir} $root${base_libdir}
+    lnr $root${base_bindir} $root/bin
+    lnr $root${base_sbindir} $root/sbin
+    lnr $root${base_libdir} $root/${baselib}
+
+    if [ "${nonarch_base_libdir}" != "${base_libdir}" ]; then
+       install -d $root${nonarch_base_libdir}
+       lnr $root${nonarch_base_libdir} $root/lib
+    fi
+
+    # create base links for multilibs
+    multi_libdirs="${@d.getVar('MULTILIB_VARIANTS')}"
+    for d in $multi_libdirs; do
+        install -d $root${exec_prefix}/$d
+        lnr $root${exec_prefix}/$d $root/$d
+    done
+}
+
+create_merged_usr_symlinks_rootfs() {
+    create_merged_usr_symlinks ${IMAGE_ROOTFS}
+}
+
+create_merged_usr_symlinks_sdk() {
+    create_merged_usr_symlinks ${SDK_OUTPUT}${SDKTARGETSYSROOT}
+}
+
+ROOTFS_PREPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', 'create_merged_usr_symlinks_rootfs; ', '',d)}"
+POPULATE_SDK_PRE_TARGET_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', 'create_merged_usr_symlinks_sdk; ', '',d)}"
+
+reproducible_final_image_task () {
+    if [ "$BUILD_REPRODUCIBLE_BINARIES" = "1" ]; then
+        if [ "$REPRODUCIBLE_TIMESTAMP_ROOTFS" = "" ]; then
+            REPRODUCIBLE_TIMESTAMP_ROOTFS=`git log -1 --pretty=%ct`
+        fi
+        # Set mtime of all files to a reproducible value
+        bbnote "reproducible_final_image_task: mtime set to $REPRODUCIBLE_TIMESTAMP_ROOTFS"
+        find  ${IMAGE_ROOTFS} -exec touch -h  --date=@$REPRODUCIBLE_TIMESTAMP_ROOTFS {} \;
+    fi
+}
+IMAGE_PREPROCESS_COMMAND_append = " reproducible_final_image_task; "

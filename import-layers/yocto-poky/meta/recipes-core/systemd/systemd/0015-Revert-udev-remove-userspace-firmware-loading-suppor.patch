@@ -1,7 +1,7 @@
-From 4d28d9a7d8d69fb429955d770e53e7a81640da24 Mon Sep 17 00:00:00 2001
+From 7883985a3a78677e9a1d5d61fe7fa8badf39f565 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 9 Nov 2016 20:45:23 -0800
-Subject: [PATCH 15/19] Revert "udev: remove userspace firmware loading
+Subject: [PATCH 10/14] Revert "udev: remove userspace firmware loading
  support"
 
 This reverts commit be2ea723b1d023b3d385d3b791ee4607cbfb20ca.
@@ -11,23 +11,24 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Jonathan Liu <net147@gmail.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  Makefile.am                      |  12 +++
- README                           |   6 +-
+ README                           |   4 +-
  TODO                             |   1 +
  configure.ac                     |  18 +++++
  src/udev/udev-builtin-firmware.c | 154 +++++++++++++++++++++++++++++++++++++++
  src/udev/udev-builtin.c          |   3 +
  src/udev/udev.h                  |   6 ++
  src/udev/udevd.c                 |  13 ++++
- 8 files changed, 210 insertions(+), 3 deletions(-)
+ 8 files changed, 209 insertions(+), 2 deletions(-)
  create mode 100644 src/udev/udev-builtin-firmware.c
 
 diff --git a/Makefile.am b/Makefile.am
-index 3010b01..229492a 100644
+index c2b4a99d2..692d7bb95 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -3791,6 +3791,18 @@ libudev_core_la_LIBADD = \
+@@ -3985,6 +3985,18 @@ libudev_core_la_LIBADD = \
  	$(BLKID_LIBS) \
  	$(KMOD_LIBS)
  
@@ -47,17 +48,10 @@ index 3010b01..229492a 100644
  libudev_core_la_SOURCES += \
  	src/udev/udev-builtin-kmod.c
 diff --git a/README b/README
-index 9f5bc93..f60ae11 100644
+index 60388eebe..e21976393 100644
 --- a/README
 +++ b/README
-@@ -50,14 +50,14 @@ REQUIREMENTS:
-           CONFIG_PROC_FS
-           CONFIG_FHANDLE (libudev, mount and bind mount handling)
- 
--        udev will fail to work with the legacy sysfs layout:
-+        Udev will fail to work with the legacy sysfs layout:
-           CONFIG_SYSFS_DEPRECATED=n
- 
+@@ -61,8 +61,8 @@ REQUIREMENTS:
          Legacy hotplug slows down the system and confuses udev:
            CONFIG_UEVENT_HELPER_PATH=""
  
@@ -69,10 +63,10 @@ index 9f5bc93..f60ae11 100644
  
          Some udev rules and virtualization detection relies on it:
 diff --git a/TODO b/TODO
-index baaac94..1ab1691 100644
+index 61efa5e9f..67ccac224 100644
 --- a/TODO
 +++ b/TODO
-@@ -658,6 +658,7 @@ Features:
+@@ -740,6 +740,7 @@ Features:
  * initialize the hostname from the fs label of /, if /etc/hostname does not exist?
  
  * udev:
@@ -81,11 +75,11 @@ index baaac94..1ab1691 100644
    - kill scsi_id
    - add trigger --subsystem-match=usb/usb_device device
 diff --git a/configure.ac b/configure.ac
-index dfc0bd3..1de0066 100644
+index b53ca1f1a..1150ca50e 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1394,6 +1394,23 @@ AM_CONDITIONAL(HAVE_MYHOSTNAME, [test "$have_myhostname" = "yes"])
- AC_ARG_ENABLE(hwdb, [AC_HELP_STRING([--disable-hwdb], [disable hardware database support])],
+@@ -1522,6 +1522,23 @@ AM_CONDITIONAL(HAVE_MYHOSTNAME, [test "$have_myhostname" = "yes"])
+ AC_ARG_ENABLE(hwdb, [AS_HELP_STRING([--disable-hwdb], [disable hardware database support])],
         enable_hwdb=$enableval, enable_hwdb=yes)
  AM_CONDITIONAL(ENABLE_HWDB, [test x$enable_hwdb = xyes])
 +AC_ARG_WITH(firmware-path,
@@ -108,17 +102,17 @@ index dfc0bd3..1de0066 100644
  
  # ------------------------------------------------------------------------------
  have_manpages=no
-@@ -1698,6 +1715,7 @@ AC_MSG_RESULT([
+@@ -1839,6 +1856,7 @@ AC_MSG_RESULT([
          SysV init scripts:                 ${SYSTEM_SYSVINIT_PATH}
          SysV rc?.d directories:            ${SYSTEM_SYSVRCND_PATH}
-         Build Python:                      ${PYTHON}
+         build Python:                      ${PYTHON}
 +        firmware path:                     ${FIRMWARE_PATH}
          PAM modules dir:                   ${with_pamlibdir}
          PAM configuration dir:             ${with_pamconfdir}
-         D-Bus policy dir:                  ${with_dbuspolicydir}
+         RPM macros dir:                    ${with_rpmmacrosdir}
 diff --git a/src/udev/udev-builtin-firmware.c b/src/udev/udev-builtin-firmware.c
 new file mode 100644
-index 0000000..bd8c2fb
+index 000000000..bd8c2fb96
 --- /dev/null
 +++ b/src/udev/udev-builtin-firmware.c
 @@ -0,0 +1,154 @@
@@ -277,7 +271,7 @@ index 0000000..bd8c2fb
 +        .run_once = true,
 +};
 diff --git a/src/udev/udev-builtin.c b/src/udev/udev-builtin.c
-index e6b36f1..cd9947e 100644
+index e6b36f124..cd9947e2a 100644
 --- a/src/udev/udev-builtin.c
 +++ b/src/udev/udev-builtin.c
 @@ -31,6 +31,9 @@ static const struct udev_builtin *builtins[] = {
@@ -291,10 +285,10 @@ index e6b36f1..cd9947e 100644
          [UDEV_BUILTIN_INPUT_ID] = &udev_builtin_input_id,
          [UDEV_BUILTIN_KEYBOARD] = &udev_builtin_keyboard,
 diff --git a/src/udev/udev.h b/src/udev/udev.h
-index 8433e8d..d32366d 100644
+index c0cb7eae8..9f0f1cf13 100644
 --- a/src/udev/udev.h
 +++ b/src/udev/udev.h
-@@ -148,6 +148,9 @@ enum udev_builtin_cmd {
+@@ -150,6 +150,9 @@ enum udev_builtin_cmd {
          UDEV_BUILTIN_BLKID,
  #endif
          UDEV_BUILTIN_BTRFS,
@@ -304,7 +298,7 @@ index 8433e8d..d32366d 100644
          UDEV_BUILTIN_HWDB,
          UDEV_BUILTIN_INPUT_ID,
          UDEV_BUILTIN_KEYBOARD,
-@@ -176,6 +179,9 @@ struct udev_builtin {
+@@ -178,6 +181,9 @@ struct udev_builtin {
  extern const struct udev_builtin udev_builtin_blkid;
  #endif
  extern const struct udev_builtin udev_builtin_btrfs;
@@ -315,7 +309,7 @@ index 8433e8d..d32366d 100644
  extern const struct udev_builtin udev_builtin_input_id;
  extern const struct udev_builtin udev_builtin_keyboard;
 diff --git a/src/udev/udevd.c b/src/udev/udevd.c
-index d336ee0..81e5dc5 100644
+index acbddd418..20347b402 100644
 --- a/src/udev/udevd.c
 +++ b/src/udev/udevd.c
 @@ -125,6 +125,9 @@ struct event {
@@ -353,5 +347,5 @@ index d336ee0..81e5dc5 100644
                  if (event->devpath[common] == '/') {
                          event->delaying_seqnum = loop_event->seqnum;
 -- 
-2.10.2
+2.13.2
 

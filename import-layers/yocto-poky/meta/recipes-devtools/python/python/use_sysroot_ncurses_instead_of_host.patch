@@ -2,6 +2,7 @@ Python tries to use ncursesw from the host,
 if it is not found causes an error on configure,
 we should use ncursesw from sysroot instead
 
+Upstream-Status: Pending
 
 Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
 

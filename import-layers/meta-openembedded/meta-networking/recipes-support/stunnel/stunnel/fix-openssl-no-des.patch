@@ -1,0 +1,54 @@
+Upstream-Status: Pending
+
+When openssl disable des support with configure option 'no-des', it doesn't
+provide des related header file and functions. That causes stunnel compile
+failed. Fix it by checking macro OPENSSL_NO_DES to use openssl des related
+library conditionaly.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/src/common.h b/src/common.h
+index f7d38b0..bf485af 100644
+--- a/src/common.h
++++ b/src/common.h
+@@ -471,7 +471,9 @@ extern char *sys_errlist[];
+ #ifndef OPENSSL_NO_MD4
+ #include <openssl/md4.h>
+ #endif /* !defined(OPENSSL_NO_MD4) */
++#ifndef OPENSSL_NO_DES
+ #include <openssl/des.h>
++#endif
+ #ifndef OPENSSL_NO_DH
+ #include <openssl/dh.h>
+ #if OPENSSL_VERSION_NUMBER<0x10100000L
+diff --git a/src/protocol.c b/src/protocol.c
+index 587df09..8198eb6 100644
+--- a/src/protocol.c
++++ b/src/protocol.c
+@@ -66,7 +66,7 @@ NOEXPORT char *imap_server(CLI *, SERVICE_OPTIONS *, const PHASE);
+ NOEXPORT char *nntp_client(CLI *, SERVICE_OPTIONS *, const PHASE);
+ NOEXPORT char *connect_server(CLI *, SERVICE_OPTIONS *, const PHASE);
+ NOEXPORT char *connect_client(CLI *, SERVICE_OPTIONS *, const PHASE);
+-#ifndef OPENSSL_NO_MD4
++#if !defined(OPENSSL_NO_MD4) && !defined(OPENSSL_NO_DES)
+ NOEXPORT void ntlm(CLI *, SERVICE_OPTIONS *);
+ NOEXPORT char *ntlm1();
+ NOEXPORT char *ntlm3(char *, char *, char *, char *);
+@@ -1175,7 +1175,7 @@ NOEXPORT char *connect_client(CLI *c, SERVICE_OPTIONS *opt, const PHASE phase) {
+     fd_printf(c, c->remote_fd.fd, "Host: %s", opt->protocol_host);
+     if(opt->protocol_username && opt->protocol_password) {
+         if(!strcasecmp(opt->protocol_authentication, "ntlm")) {
+-#ifndef OPENSSL_NO_MD4
++#if !defined(OPENSSL_NO_MD4) && !defined(OPENSSL_NO_DES)
+             ntlm(c, opt);
+ #else
+             s_log(LOG_ERR, "NTLM authentication is not available");
+@@ -1216,7 +1216,7 @@ NOEXPORT char *connect_client(CLI *c, SERVICE_OPTIONS *opt, const PHASE phase) {
+     return NULL;
+ }
+ 
+-#ifndef OPENSSL_NO_MD4
++#if !defined(OPENSSL_NO_MD4) && !defined(OPENSSL_NO_DES)
+ 
+ /*
+  * NTLM code is based on the following documentation:

@@ -1,0 +1,45 @@
+From ecbdea7bd8b08205f1bc3f6b72d4b4a80f313fcb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 10 Jun 2017 01:03:17 -0700
+Subject: [PATCH 3/6] correct include directive path for config.h
+
+when building out of source tree, it can not find
+the generated config.h otherwise
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ memcheck/tests/linux/syscalls-2007.c  | 2 +-
+ memcheck/tests/linux/syslog-syscall.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/memcheck/tests/linux/syscalls-2007.c b/memcheck/tests/linux/syscalls-2007.c
+index b61c6d5..cc3fd62 100644
+--- a/memcheck/tests/linux/syscalls-2007.c
++++ b/memcheck/tests/linux/syscalls-2007.c
+@@ -10,7 +10,7 @@
+ 
+ #define _GNU_SOURCE
+ 
+-#include "../../config.h"
++#include "config.h"
+ #include <fcntl.h>
+ #include <signal.h>
+ #include <stdint.h>
+diff --git a/memcheck/tests/linux/syslog-syscall.c b/memcheck/tests/linux/syslog-syscall.c
+index 1143722..21e758b 100644
+--- a/memcheck/tests/linux/syslog-syscall.c
++++ b/memcheck/tests/linux/syslog-syscall.c
+@@ -6,7 +6,7 @@
+  *    klogctl().
+  */
+ 
+-#include "../../config.h"
++#include "config.h"
+ #include <stdio.h>
+ #if defined(HAVE_SYS_KLOG_H)
+ #include <sys/klog.h>
+-- 
+2.13.1
+

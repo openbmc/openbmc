@@ -1,0 +1,30 @@
+From d4d1e7146ca2698089f6bd532f2fb8b9c1134ca7 Mon Sep 17 00:00:00 2001
+From: Natanael Copa <ncopa@alpinelinux.org>
+Date: Mon, 2 Jan 2017 14:39:27 +0000
+Subject: [PATCH 08/11] use posix strerror_r unless gnu
+
+---
+ open-vm-tools/lib/err/errPosix.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+Index: open-vm-tools/lib/err/errPosix.c
+===================================================================
+--- open-vm-tools.orig/lib/err/errPosix.c
++++ open-vm-tools/lib/err/errPosix.c
+@@ -63,11 +63,13 @@ ErrErrno2String(Err_Number errorNumber,
+ {
+    char *p;
+ 
+-#if defined(linux) && !defined(N_PLAT_NLM) && !defined(__ANDROID__)
++#if defined(__GLIBC__)
+    p = strerror_r(errorNumber, buf, bufSize);
+ #else
+-   p = strerror(errorNumber);
+-#endif
++   if (strerror_r(errorNumber, buf, bufSize) != 0)
++      snprintf(buf, bufSize, "unknown error %i", errorNumber);
++   p = buf;
++#endif /* defined __GLIBC__ */
+    ASSERT(p != NULL);
+    return p;
+ }

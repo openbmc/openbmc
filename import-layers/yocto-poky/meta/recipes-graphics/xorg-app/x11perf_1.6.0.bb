@@ -13,6 +13,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=428ca4d67a41fcd4fc3283dce9bbda7e \
 
 PE = "1"
 
+do_install_append_class-target () {
+    sed -i -e 's:${HOSTTOOLS_DIR}/::g' ${D}${bindir}/x11perfcomp
+}
+
 FILES_${PN} += "${libdir}/X11/x11perfcomp/*"
 
 SRC_URI[md5sum] = "f0b24e4d8beb622a419e8431e1c03cd7"

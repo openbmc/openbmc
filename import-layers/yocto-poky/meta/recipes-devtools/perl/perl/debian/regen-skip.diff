@@ -8,6 +8,7 @@ for instance because the repository only imported the Perl tarball,
 the regeneration check is broken because lib/.gitignore is missing.
 
 Patch-Name: debian/regen-skip.diff
+Upstream-Status: Pending
 ---
  regen/lib_cleanup.pl | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

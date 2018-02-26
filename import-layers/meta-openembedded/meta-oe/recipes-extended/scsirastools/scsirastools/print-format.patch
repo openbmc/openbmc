@@ -1,0 +1,218 @@
+Index: scsirastools-1.6.6/src/sgcommon.c
+===================================================================
+--- scsirastools-1.6.6.orig/src/sgcommon.c
++++ scsirastools-1.6.6/src/sgcommon.c
+@@ -304,8 +304,8 @@ void showit(char *buf)
+ 	    fdlog = stderr;
+ 	}
+     }
+-    if (flogopen) fprintf(fdlog, buf);	/*write to log */
+-    fprintf(fdmsg, buf);	/*defaults to stdout */
++    if (flogopen) fprintf(fdlog, "%s", buf);	/*write to log */
++    fprintf(fdmsg, "%s", buf);	/*defaults to stdout */
+ }
+ 
+ void showlog(const char * format, ...) 
+Index: scsirastools-1.6.6/src/sgdefects.c
+===================================================================
+--- scsirastools-1.6.6.orig/src/sgdefects.c
++++ scsirastools-1.6.6/src/sgdefects.c
+@@ -226,7 +226,7 @@ int main(int argc, char **argv)
+ 	    ("              ******************************************\n");
+ 	if (flogopen)
+ 	    printf("Log file %s is open\n", logfile);
+-	printf(HeaderStr);
++	printf("%s", HeaderStr);
+ 	/* get SCSI Device Info */
+ 	idev = 0;
+ 	flags = O_RDWR;		/* could use OPEN_FLAG if read-only. */
+Index: scsirastools-1.6.6/src/sgdiag.c
+===================================================================
+--- scsirastools-1.6.6.orig/src/sgdiag.c
++++ scsirastools-1.6.6/src/sgdiag.c
+@@ -250,7 +250,7 @@ int main(int argc, char **argv)
+ 	   printf("              ******************************************\n");
+ 	   if (flogopen)
+ 	       printf("Log file %s is open, debug=%d\n", logfile,fdebug);
+-	   printf(HeaderStr);
++	   printf("%s", HeaderStr);
+ 	}
+ 	/* get SCSI Device Info */
+ 	idev = 0;
+@@ -356,12 +356,12 @@ int main(int argc, char **argv)
+ 	case 'F':
+ 	case 'f':
+ 	    func = 'f';
+-	    printf(erase_msg);
++	    printf("%s", erase_msg);
+ 	    break;
+ 	case 'W':
+ 	case 'w':
+ 	    func = 'w';
+-	    printf(erase_msg);
++	    printf("%s", erase_msg);
+ 	    break;
+ 	case 'S':
+ 	case 's':
+Index: scsirastools-1.6.6/src/sgdiskmon.c
+===================================================================
+--- scsirastools-1.6.6.orig/src/sgdiskmon.c
++++ scsirastools-1.6.6/src/sgdiskmon.c
+@@ -197,9 +197,9 @@ void showit(char *buf)
+         }
+     }
+     if (flogopen)
+-        fprintf(fdlog, buf);    /*write to log */
++        fprintf(fdlog, "%s", buf);    /*write to log */
+     if (!background)
+-        fprintf(fdmsg, buf);    /*message display defaults to stdout */
++        fprintf(fdmsg, "%s",  buf);    /*message display defaults to stdout */
+ }
+ 
+ /*
+@@ -235,7 +235,7 @@ rem_scsi_dev(int bus, int ch, int id, in
+ 	fp = fopen("/proc/scsi/scsi","r+");
+ 	if (fp == NULL) return(errno); 
+ 	sprintf(cmd,"remove-single-device %d %d %d %d",bus,ch,id,lun);
+-	n = fprintf(fp,cmd);
++	n = fprintf(fp,"%s", cmd);
+ 	fclose(fp);
+ 	strcat(cmd,"\n");
+ 	showit(cmd);
+@@ -256,7 +256,7 @@ add_scsi_dev(int bus, int ch, int id, in
+ 	fp = fopen("/proc/scsi/scsi","r+");
+ 	if (fp == NULL) return(errno); 
+ 	sprintf(cmd,"add-single-device %d %d %d %d",bus,ch,id,lun);
+-	n = fprintf(fp,cmd);
++	n = fprintf(fp, "%s", cmd);
+ 	fclose(fp);
+ 	strcat(cmd,"\n");
+ 	showit(cmd);
+@@ -1233,7 +1233,7 @@ main(int argc, char **argv)
+             interval = atoi(optarg);
+             break;
+ 	default:
+-            printf(output2);    /*prog header*/
++            printf("%s", output2);    /*prog header*/
+             printf("Usage: %s [-bemnrx -t time]\n",progname);
+ 	    printf(" -b  Run in Background as a daemon\n");
+ 	    printf(" -e  Do not write to any files.\n");
+@@ -1246,7 +1246,7 @@ main(int argc, char **argv)
+             exit(1); 
+ 	}
+    }
+-   if (!background) printf(output2);  /*prog header*/
++   if (!background) printf("%s", output2);  /*prog header*/
+ 
+    /* only run this as superuser */
+    i = geteuid();
+Index: scsirastools-1.6.6/src/sgmode.c
+===================================================================
+--- scsirastools-1.6.6.orig/src/sgmode.c
++++ scsirastools-1.6.6/src/sgmode.c
+@@ -303,7 +303,7 @@ int main(int argc, char **argv)
+ 	    ("              ******************************************\n");
+ 	if (flogopen)
+ 	    printf("Log file %s is open\n", logfile);
+-	printf(HeaderStr);
++	printf("%s", HeaderStr);
+ 	/* get SCSI Device Info */
+ 	idev = 0;
+ 	flags = O_RDWR;		/* could use OPEN_FLAG if read-only. */
+@@ -585,8 +585,8 @@ int do_modeselect(int idx)
+ 	    if (!foverwrite) {
+ 		/* use existing capacity from mode sense */
+ 		memcpy(sel_buffer + 4, out_buffer + 4, 8);
+-		sprintf(scratch, "Using existing capacity instead\n");
+-		printf(scratch);
++		sprintf(scratch, "%s", "Using existing capacity instead\n");
++		printf("%s",scratch);
+ 		showlog( scratch);
+ 	    } else {  /* foverwrite==1, changing something */
+ 		/* usually only change num blks, if change blk size, flag it. */
+Index: scsirastools-1.6.6/src/sgraidmon.c
+===================================================================
+--- scsirastools-1.6.6.orig/src/sgraidmon.c
++++ scsirastools-1.6.6/src/sgraidmon.c
+@@ -269,9 +269,9 @@ void showit(char *buf)
+         }
+     }
+     if (flogopen)
+-        fprintf(fdlog, buf);    /*write to log */
++        fprintf(fdlog, "%s", buf);    /*write to log */
+     if (!background)
+-        fprintf(fdmsg, buf);    /*message display defaults to stdout */
++        fprintf(fdmsg, "%s", buf);    /*message display defaults to stdout */
+ }
+ 
+ /*
+@@ -563,7 +563,7 @@ add_scsi_dev(int bus, int ch, int id, in
+ 	fp = fopen("/proc/scsi/scsi","r+");
+ 	if (fp == NULL) return(errno); 
+ 	sprintf(cmd,"add-single-device %d %d %d %d",bus,ch,id,lun);
+-	fprintf(fp,cmd);
++	fprintf(fp, "%s", cmd);
+ 	fclose(fp);
+ 	strcat(cmd,"\n");
+ 	showit(cmd);
+@@ -1585,7 +1585,7 @@ main(int argc, char **argv)
+             interval = atoi(optarg);
+             break;
+ 	default:
+-            printf(output2);    /*prog header*/
++            printf("%s", output2);    /*prog header*/
+             printf("Usage: %s [-bemnrx -t time]\n",progname);
+ 	    printf(" -b  Run in Background as a daemon\n");
+ 	    printf(" -e  Do not write to any files.\n");
+@@ -1598,7 +1598,7 @@ main(int argc, char **argv)
+             exit(1); 
+ 	}
+    }
+-   if (!background) printf(output2);  /*prog header*/
++   if (!background) printf("%s", output2);  /*prog header*/
+ 
+    /* only run this as superuser */
+    i = geteuid();
+Index: scsirastools-1.6.6/src/sgsafte.c
+===================================================================
+--- scsirastools-1.6.6.orig/src/sgsafte.c
++++ scsirastools-1.6.6/src/sgsafte.c
+@@ -174,9 +174,9 @@ void showit(char *buf)
+         }
+     }
+     if (flogopen)
+-        fprintf(fdlog, buf);    /*write to log */
++        fprintf(fdlog, "%s", buf);    /*write to log */
+     if (!background)
+-        fprintf(fdmsg, buf);    /*message display defaults to stdout */
++        fprintf(fdmsg, "%s", buf);    /*message display defaults to stdout */
+ }
+  
+ /*
+@@ -384,7 +384,7 @@ add_scsi_dev(int bus, int ch, int id, in
+ 	fp = fopen("/proc/scsi/scsi","r+");
+ 	if (fp == NULL) return(errno); 
+ 	sprintf(cmd,"add-single-device %d %d %d %d",bus,ch,id,lun);
+-	fprintf(fp,cmd);
++	fprintf(fp, "%s", cmd);
+ 	fclose(fp);
+ 	strcat(cmd,"\n");
+ 	showit(cmd);
+@@ -1261,7 +1261,7 @@ main(int argc, char **argv)
+             do_numeric = 0;
+             break; 
+ 	default:
+-            printf(output2);    /*prog header*/
++            printf("%s", output2);    /*prog header*/
+             printf("Usage: %s [-d num -rf -emnx]\n",progname);
+ 	    printf(" -d  drive number to set (0, 1, ...)\n");
+ 	    printf(" -r  set SAF-TE status to ready\n");
+@@ -1273,7 +1273,7 @@ main(int argc, char **argv)
+             exit(1); 
+ 	}
+    }
+-   if (!background) printf(output2);  /*prog header*/
++   if (!background) printf("%s", output2);  /*prog header*/
+ 
+    if (setval != 0 && drivenum == -1) drivenum = 0;  /*default to first drive*/
+ 

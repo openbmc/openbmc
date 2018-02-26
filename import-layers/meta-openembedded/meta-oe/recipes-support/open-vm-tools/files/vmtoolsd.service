@@ -1,0 +1,11 @@
+[Unit]
+Description=Open Virtual Machine Tools (VMware Tools)
+ConditionVirtualization=vmware
+
+[Service]
+ExecStart=/usr/bin/vmtoolsd
+Restart=on-failure
+KillSignal=SIGKILL
+
+[Install]
+WantedBy=multi-user.target

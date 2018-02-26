@@ -25,8 +25,13 @@ RDEPENDS_${PN} += "base-files"
 RDEPENDS_${PN}_class-nativesdk = ""
 RDEPENDS_${PN}-ptest += "make"
 
+DEPENDS_append_libc-glibc = " glibc-locale"
+RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-fr-fr locale-base-de-de"
+
 USERADD_PACKAGES = "${PN}-ptest"
 USERADD_PARAM_${PN}-ptest = "--create-home --user-group test"
+
+CACHED_CONFIGUREVARS += "headersdir=${includedir}/${PN}"
 
 do_configure_prepend () {
 	if [ ! -e ${S}/acinclude.m4 ]; then
@@ -46,16 +51,32 @@ do_install_append () {
 	fi
 }
 do_install_append_class-target () {
-	# Clean host path in bashbug
+	# Clean buildhost references in bashbug
 	sed -i -e "s,--sysroot=${STAGING_DIR_TARGET},,g" \
-		-e "s,-I${WORKDIR}/\S* ,,g" ${D}${bindir}/bashbug
+		-e "s,-I${WORKDIR}/\S* ,,g" \
+		-e 's|${DEBUG_PREFIX_MAP}||g' \
+		${D}${bindir}/bashbug
+
+	# Clean buildhost references in bash.pc
+	sed -i -e "s,--sysroot=${STAGING_DIR_TARGET},,g" \
+	     ${D}${libdir}/pkgconfig/bash.pc
+
+	# Clean buildhost references in Makefile.inc
+	sed -i -e "s,--sysroot=${STAGING_DIR_TARGET},,g" \
+		-e 's|${DEBUG_PREFIX_MAP}||g' \
+		-e 's:${HOSTTOOLS_DIR}/::g' \
+		-e 's:${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}::g' \
+		${D}${libdir}/bash/Makefile.inc
 }
 
 do_install_ptest () {
 	make INSTALL_TEST_DIR=${D}${PTEST_PATH}/tests install-test
 	cp ${B}/Makefile ${D}${PTEST_PATH}
         sed -i -e 's/^Makefile/_Makefile/' -e "s,--sysroot=${STAGING_DIR_TARGET},,g" \
-	    -e "s,${S},,g" -e "s,${B},,g" -e "s,${STAGING_DIR_NATIVE},,g" ${D}${PTEST_PATH}/Makefile
+	    -e 's|${DEBUG_PREFIX_MAP}||g' \
+	    -e "s,${S},,g" -e "s,${B},,g" -e "s,${STAGING_DIR_NATIVE},,g" \
+	    -e 's:${HOSTTOOLS_DIR}/::g' \
+	     ${D}${PTEST_PATH}/Makefile
 }
 
 pkg_postinst_${PN} () {
@@ -69,3 +90,9 @@ pkg_postrm_${PN} () {
 PACKAGES += "${PN}-bashbug"
 FILES_${PN} = "${bindir}/bash ${base_bindir}/bash.bash"
 FILES_${PN}-bashbug = "${bindir}/bashbug"
+
+PACKAGE_BEFORE_PN += "${PN}-loadable"
+RDEPENDS_${PN}-loadable += "${PN}"
+FILES_${PN}-loadable += "${libdir}/bash/*"
+
+RPROVIDES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sh /bin/bash', '', d)}"

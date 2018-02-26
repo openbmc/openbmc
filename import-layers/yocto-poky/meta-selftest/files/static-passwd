@@ -1,0 +1,11 @@
+messagebus:x:500:500::/var/lib/dbus:/bin/false
+systemd-bus-proxy:x:501:501::/:/bin/nologin
+systemd-network:x:502:502::/:/bin/nologin
+systemd-resolve:x:503:503::/:/bin/nologin
+systemd-timesync:x:504:504::/:/bin/nologin
+polkitd:x:505:505::/:/bin/nologin
+avahi:x:509:509::/:/bin/nologin
+avahi-autoipd:x:510:510::/:/bin/nologin
+rpc:x:511:511::/:/bin/nologin
+distcc:x:512:nogroup::/:/bin/nologin
+rpcuser:x:513:513::/var/lib/nfs:/bin/nologin

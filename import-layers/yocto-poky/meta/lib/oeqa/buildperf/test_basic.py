@@ -121,5 +121,7 @@ class Test4(BuildPerfTestCase):
         self.sync()
         self.measure_cmd_resources([installer, '-y', '-d', deploy_dir],
                                    'deploy', 'eSDK deploy')
+        #make sure bitbake is unloaded
+        self.sync()
         self.measure_disk_usage(deploy_dir, 'deploy_dir', 'deploy dir',
                                 apparent_size=True)

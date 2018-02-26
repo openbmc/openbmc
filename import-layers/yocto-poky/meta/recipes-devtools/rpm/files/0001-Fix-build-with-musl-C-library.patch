@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 27 Feb 2017 14:43:21 +0200
 Subject: [PATCH] Fix build with musl C library.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [problem already solved in master branch]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 

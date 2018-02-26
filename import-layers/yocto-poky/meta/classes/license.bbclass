@@ -255,14 +255,9 @@ def get_boot_dependencies(d):
     """
 
     depends = []
-    boot_depends_string = ""
     taskdepdata = d.getVar("BB_TASKDEPDATA", False)
-    # Only bootimg and bootdirectdisk include the depends flag
-    boot_tasks = ["do_bootimg", "do_bootdirectdisk",]
-
-    for task in boot_tasks:
-        boot_depends_string = "%s %s" % (boot_depends_string,
-                d.getVarFlag(task, "depends") or "")
+    # Only bootimg includes the depends flag
+    boot_depends_string = d.getVarFlag("do_bootimg", "depends") or ""
     boot_depends = [dep.split(":")[0] for dep
                 in boot_depends_string.split()
                 if not dep.split(":")[0].endswith("-native")]

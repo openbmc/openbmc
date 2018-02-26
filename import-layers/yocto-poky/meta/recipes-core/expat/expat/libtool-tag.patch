@@ -1,0 +1,18 @@
+Add CC tag to build
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: expat-2.2.2/Makefile.in
+===================================================================
+--- expat-2.2.2.orig/Makefile.in
++++ expat-2.2.2/Makefile.in
+@@ -109,7 +109,7 @@ mkdir-init:
+ 
+ CC = @CC@
+ CXX = @CXX@
+-LIBTOOL = @LIBTOOL@
++LIBTOOL = @LIBTOOL@ --tag CC
+ 
+ INCLUDES = -I$(srcdir)/lib -I.
+ LDFLAGS = @LDFLAGS@

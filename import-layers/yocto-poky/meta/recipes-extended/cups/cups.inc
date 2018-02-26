@@ -1,4 +1,5 @@
 SUMMARY = "An Internet printing system for Unix"
+HOMEPAGE = "https://www.cups.org/"
 SECTION = "console/utils"
 LICENSE = "GPLv2 & LGPLv2"
 DEPENDS = "gnutls libpng jpeg dbus dbus-glib zlib libusb"
@@ -77,13 +78,6 @@ do_install () {
 	    rm -rf ${D}${sysconfdir}/init.d/
 	    rm -rf ${D}${sysconfdir}/rc*
 	fi
-}
-
-python do_package_append() {
-    import subprocess
-    # Change permissions back the way they were, they probably had a reason...
-    workdir = d.getVar('WORKDIR')
-    subprocess.call('chmod 0511 %s/install/cups/var/run/cups/certs' % workdir, shell=True)
 }
 
 PACKAGES =+ "${PN}-lib ${PN}-libimage"

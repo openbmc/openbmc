@@ -1,0 +1,35 @@
+From 331443a87a31ec504e5652fc099d9129a9a4deb8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 2 Mar 2015 01:39:01 +0000
+Subject: [PATCH 08/15] don't let the distro compiler point to the wrong
+ installation location
+
+Thanks to RP for helping find the source code causing the issue.
+
+2010/08/13
+Nitin A Kamble <nitin.a.kamble@intel.com>
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libiberty/Makefile.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
+index 25cfa29ad5..ce67a710e3 100644
+--- a/libiberty/Makefile.in
++++ b/libiberty/Makefile.in
+@@ -364,7 +364,8 @@ install-strip: install
+ # multilib-specific flags, it's overridden by FLAGS_TO_PASS from the
+ # default multilib, so we have to take CFLAGS into account as well,
+ # since it will be passed the multilib flags.
+-MULTIOSDIR = `$(CC) $(CFLAGS) -print-multi-os-directory`
++#MULTIOSDIR = `$(CC) $(CFLAGS) -print-multi-os-directory`
++MULTIOSDIR = ""
+ install_to_libdir: all
+ 	if test -n "${target_header_dir}"; then \
+ 		${mkinstalldirs} $(DESTDIR)$(libdir)/$(MULTIOSDIR); \
+-- 
+2.14.0
+

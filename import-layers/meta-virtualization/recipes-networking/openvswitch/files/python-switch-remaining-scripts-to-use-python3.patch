@@ -1,0 +1,113 @@
+From 176528ca3a8b76c9d0bb71b1e56eeebccc655c71 Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Wed, 3 May 2017 10:39:12 -0400
+Subject: [PATCH] python: switch remaining scripts to use python3
+
+Work to remove the main openvswitch package's dependency on python 2.
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ ofproto/ipfix-gen-entities                            | 2 +-
+ tests/test-l7.py                                      | 2 +-
+ utilities/checkpatch.py                               | 2 +-
+ utilities/ovs-dev.py                                  | 2 +-
+ utilities/ovs-pipegen.py                              | 2 +-
+ vtep/ovs-vtep                                         | 2 +-
+ xenserver/etc_xapi.d_plugins_openvswitch-cfg-update   | 2 +-
+ xenserver/opt_xensource_libexec_interface-reconfigure | 2 +-
+ xenserver/usr_share_openvswitch_scripts_ovs-xapi-sync | 2 +-
+ 9 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/ofproto/ipfix-gen-entities b/ofproto/ipfix-gen-entities
+index 0be7199..d2cce42 100755
+--- a/ofproto/ipfix-gen-entities
++++ b/ofproto/ipfix-gen-entities
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/env python3
+ #
+ # Copyright (C) 2012 Nicira, Inc.
+ #
+diff --git a/tests/test-l7.py b/tests/test-l7.py
+index d7854a1..f09defb 100755
+--- a/tests/test-l7.py
++++ b/tests/test-l7.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # Copyright (c) 2015, 2016 Nicira, Inc.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/utilities/checkpatch.py b/utilities/checkpatch.py
+index 26eb5c3..2e1932b 100755
+--- a/utilities/checkpatch.py
++++ b/utilities/checkpatch.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # Copyright (c) 2016 Red Hat, Inc.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/utilities/ovs-dev.py b/utilities/ovs-dev.py
+index 9ce0f04..839e13e 100755
+--- a/utilities/ovs-dev.py
++++ b/utilities/ovs-dev.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # Copyright (c) 2013, 2014, 2015, 2016 Nicira, Inc.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/utilities/ovs-pipegen.py b/utilities/ovs-pipegen.py
+index 4bf240f..2a8f13e 100755
+--- a/utilities/ovs-pipegen.py
++++ b/utilities/ovs-pipegen.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/env python3
+ # Copyright (c) 2013, 2014, 2015 Nicira, Inc.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/vtep/ovs-vtep b/vtep/ovs-vtep
+index fd652d4..19d63f9 100755
+--- a/vtep/ovs-vtep
++++ b/vtep/ovs-vtep
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/env python3
+ # Copyright (C) 2013 Nicira, Inc. All Rights Reserved.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+diff --git a/xenserver/etc_xapi.d_plugins_openvswitch-cfg-update b/xenserver/etc_xapi.d_plugins_openvswitch-cfg-update
+index e7404e3..5edad76 100755
+--- a/xenserver/etc_xapi.d_plugins_openvswitch-cfg-update
++++ b/xenserver/etc_xapi.d_plugins_openvswitch-cfg-update
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # xapi plugin script to update the cache of configuration items in the
+ # ovs-vswitchd configuration that are managed in the xapi database when
+diff --git a/xenserver/opt_xensource_libexec_interface-reconfigure b/xenserver/opt_xensource_libexec_interface-reconfigure
+index ea4a742..c6745ee 100755
+--- a/xenserver/opt_xensource_libexec_interface-reconfigure
++++ b/xenserver/opt_xensource_libexec_interface-reconfigure
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Copyright (c) 2008,2009 Citrix Systems, Inc.
+ #
+diff --git a/xenserver/usr_share_openvswitch_scripts_ovs-xapi-sync b/xenserver/usr_share_openvswitch_scripts_ovs-xapi-sync
+index a776c00..d5ff8af 100755
+--- a/xenserver/usr_share_openvswitch_scripts_ovs-xapi-sync
++++ b/xenserver/usr_share_openvswitch_scripts_ovs-xapi-sync
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/env python3
+ # Copyright (c) 2009, 2010, 2011, 2012, 2013 Nicira, Inc.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+-- 
+2.7.4
+

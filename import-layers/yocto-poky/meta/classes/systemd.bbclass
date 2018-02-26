@@ -154,8 +154,10 @@ python systemd_populate_packages() {
                 # Deal with adding, for example, 'ifplugd@eth0.service' from
                 # 'ifplugd@.service'
                 base = None
-                if service.find('@') != -1:
-                    base = re.sub('@[^.]+.', '@.', service)
+                at = service.find('@')
+                if at != -1:
+                    ext = service.rfind('.')
+                    base = service[:at] + '@' + service[ext:]
 
                 for path in searchpaths:
                     if os.path.exists(oe.path.join(d.getVar("D"), path, service)):

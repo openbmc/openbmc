@@ -74,7 +74,7 @@ def newappend(args):
             return 1
 
     if args.edit:
-        return scriptutils.run_editor([append_path, recipe_path])
+        return scriptutils.run_editor([append_path, recipe_path], logger)
     else:
         print(append_path)
 

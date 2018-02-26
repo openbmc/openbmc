@@ -7,8 +7,8 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e23fadd6ceef8c618fc1c65191d846fa"
 PYPI_PACKAGE = "Cython"
 BBCLASSEXTEND = "native"
 
-SRC_URI[md5sum] = "642c81285e1bb833b14ab3f439964086"
-SRC_URI[sha256sum] = "f141d1f9c27a07b5a93f7dc5339472067e2d7140d1c5a9e20112a5665ca60306"
+SRC_URI[md5sum] = "b93750b34382b025d678bea819b7491b"
+SRC_URI[sha256sum] = "e6840a2ba2704f4ffb40e454c36f73aeb440a4005453ee8d7ff6a00d812ba176"
 
 inherit pypi
 
@@ -17,3 +17,10 @@ RDEPENDS_${PN}_class-target += "\
     ${PYTHON_PN}-subprocess \
     ${PYTHON_PN}-shell \
 "
+
+do_install_append() {
+	# Make sure we use /usr/bin/env python
+	for PYTHSCRIPT in `grep -rIl '^#!.*python' ${D}`; do
+		sed -i -e '1s|^#!.*|#!/usr/bin/env ${PYTHON_PN}|' $PYTHSCRIPT
+	done
+}

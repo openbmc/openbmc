@@ -32,7 +32,7 @@ from bb.parse import ParseError, resolve_file, ast, logger, handle
 
 __config_regexp__  = re.compile( r"""
     ^
-    (?P<exp>export\s*)?
+    (?P<exp>export\s+)?
     (?P<var>[a-zA-Z0-9\-_+.${}/~]+?)
     (\[(?P<flag>[a-zA-Z0-9\-_+.]+)\])?
 
@@ -69,17 +69,25 @@ def init(data):
 def supports(fn, d):
     return fn[-5:] == ".conf"
 
-def include(parentfn, fn, lineno, data, error_out):
+def include(parentfn, fns, lineno, data, error_out):
     """
     error_out: A string indicating the verb (e.g. "include", "inherit") to be
     used in a ParseError that will be raised if the file to be included could
     not be included. Specify False to avoid raising an error in this case.
     """
+    fns = data.expand(fns)
+    parentfn = data.expand(parentfn)
+
+    # "include" or "require" accept zero to n space-separated file names to include.
+    for fn in fns.split():
+        include_single_file(parentfn, fn, lineno, data, error_out)
+
+def include_single_file(parentfn, fn, lineno, data, error_out):
+    """
+    Helper function for include() which does not expand or split its parameters.
+    """
     if parentfn == fn: # prevent infinite recursion
         return None
-
-    fn = data.expand(fn)
-    parentfn = data.expand(parentfn)
 
     if not os.path.isabs(fn):
         dname = os.path.dirname(parentfn)

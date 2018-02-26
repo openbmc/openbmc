@@ -1,0 +1,32 @@
+From d379126d56d0b6e935b2d97ca71579e6cc54d1bb Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 18 Jul 2017 13:37:27 +0300
+Subject: [PATCH] parse-util: Don't use xlocale.h
+
+glibc 2.26 no longer contains the non-standard xlocale.h
+(http://sourceware.org/glibc/wiki/Release/2.26#Removal_of_.27xlocale.h.27)
+
+This change shouldn't break anything as xlocale.h was a subset of
+locale.h.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Submitted [https://github.com/systemd/systemd-bootchart/pull/35]
+---
+ src/parse-util.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/parse-util.c b/src/parse-util.c
+index 5635a68..1b2169c 100644
+--- a/src/parse-util.c
++++ b/src/parse-util.c
+@@ -21,7 +21,6 @@
+ #include <locale.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <xlocale.h>
+ 
+ #include "macro.h"
+ #include "parse-util.h"
+-- 
+2.13.2
+

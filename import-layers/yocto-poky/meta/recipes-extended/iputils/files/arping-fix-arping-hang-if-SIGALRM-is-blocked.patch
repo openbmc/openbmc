@@ -1,0 +1,44 @@
+arping: fix arping hang if SIGALRM is blocked
+
+Unblock SIGALRM so that the previously called alarm() can prevent
+recvfrom() from blocking forever in case the inherited procmask is
+blocking SIGALRM and no packet is received.
+
+Upstream-Status: Backport
+
+Reported-by: Rui Prior <rprior@dcc.fc.up.pt>
+RH-Bugzilla: #1085971
+Signed-off-by: Jan Synacek <jsynacek@redhat.com>
+Signed-off-by: Zhenbo Gao <zhenbo.gao@windriver.com>
+
+diff --git a/arping.c.orig b/arping.c
+index 35408c1..2098159 100644
+--- a/arping.c.orig
++++ b/arping.c
+@@ -1215,16 +1215,22 @@ main(int argc, char **argv)
+ 		socklen_t alen = sizeof(from);
+ 		int cc;
+ 
++		sigemptyset(&sset);
++		sigaddset(&sset, SIGALRM);
++		sigaddset(&sset, SIGINT);
++		/* Unblock SIGALRM so that the previously called alarm()
++		 * can prevent recvfrom from blocking forever in case the
++		 * inherited procmask is blocking SIGALRM and no packet
++		 * is received. */
++		sigprocmask(SIG_UNBLOCK, &sset, &osset);
++
+ 		if ((cc = recvfrom(s, packet, sizeof(packet), 0,
+ 				   (struct sockaddr *)&from, &alen)) < 0) {
+ 			perror("arping: recvfrom");
+ 			continue;
+ 		}
+ 
+-		sigemptyset(&sset);
+-		sigaddset(&sset, SIGALRM);
+-		sigaddset(&sset, SIGINT);
+-		sigprocmask(SIG_BLOCK, &sset, &osset);
++		sigprocmask(SIG_BLOCK, &sset, NULL);
+ 		recv_pack(packet, cc, (struct sockaddr_ll *)&from);
+ 		sigprocmask(SIG_SETMASK, &osset, NULL);
+ 	}

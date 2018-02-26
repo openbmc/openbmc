@@ -1,0 +1,37 @@
+From 1523ab462c1bf19055960ced255f4872b6cf9f5c Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Wed, 5 Jul 2017 11:00:42 +0300
+Subject: [PATCH 1/2] vkdisplay: Use ifdef for platform specific defines
+
+VK_KHR_*_SURFACE_EXTENSION_NAME are only available when corresponding
+WSI is enabled.
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=784539]
+---
+ ext/vulkan/vkdisplay.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ext/vulkan/vkdisplay.c b/ext/vulkan/vkdisplay.c
+index 550134cd8..ade5d4583 100644
+--- a/ext/vulkan/vkdisplay.c
++++ b/ext/vulkan/vkdisplay.c
+@@ -448,11 +448,15 @@ gst_vulkan_display_type_to_extension_string (GstVulkanDisplayType type)
+   if (type == GST_VULKAN_DISPLAY_TYPE_NONE)
+     return NULL;
+ 
++#if GST_VULKAN_HAVE_WINDOW_XCB
+   if (type & GST_VULKAN_DISPLAY_TYPE_XCB)
+     return VK_KHR_XCB_SURFACE_EXTENSION_NAME;
++#endif
+ 
++#if GST_VULKAN_HAVE_WINDOW_WAYLAND
+   if (type & GST_VULKAN_DISPLAY_TYPE_WAYLAND)
+     return VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME;
++#endif
+ 
+   return NULL;
+ }
+-- 
+2.13.2
+

@@ -10,7 +10,7 @@ however, not every kernel has the CONFIG_TRACEPOINTS feature enabled.
 This change makes the build do not fail when CONFIG_TRACEPOINTS is not
 available, allowing it to be kept being pulled by default.
 
-Upstream-Status: Inapropriate [embedded specific]
+Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
 ---

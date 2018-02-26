@@ -1,0 +1,68 @@
+From 508a0ff690dfebc17c4f55a5f81824ed549bed66 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 18 Apr 2017 09:13:33 -0700
+Subject: [PATCH 1/2] include sys/cdefs.h explicitly
+
+glibc includes this header indirectly but not musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/rpcsvc/nis.h    | 1 +
+ src/rpcsvc/nislib.h | 1 +
+ src/rpcsvc/ypclnt.h | 1 +
+ src/rpcsvc/ypupd.h  | 1 +
+ 4 files changed, 4 insertions(+)
+
+diff --git a/src/rpcsvc/nis.h b/src/rpcsvc/nis.h
+index 933c4d9..88cbca0 100644
+--- a/src/rpcsvc/nis.h
++++ b/src/rpcsvc/nis.h
+@@ -32,6 +32,7 @@
+ #ifndef _RPCSVC_NIS_H
+ #define _RPCSVC_NIS_H 1
+ 
++#include <sys/cdefs.h>
+ #include <features.h>
+ #include <rpc/rpc.h>
+ #include <rpcsvc/nis_tags.h>
+diff --git a/src/rpcsvc/nislib.h b/src/rpcsvc/nislib.h
+index a59c19b..a53fab3 100644
+--- a/src/rpcsvc/nislib.h
++++ b/src/rpcsvc/nislib.h
+@@ -19,6 +19,7 @@
+ #ifndef	__RPCSVC_NISLIB_H__
+ #define	__RPCSVC_NISLIB_H__
+ 
++#include <sys/cdefs.h>
+ #include <features.h>
+ 
+ __BEGIN_DECLS
+diff --git a/src/rpcsvc/ypclnt.h b/src/rpcsvc/ypclnt.h
+index fe43fd4..a686b61 100644
+--- a/src/rpcsvc/ypclnt.h
++++ b/src/rpcsvc/ypclnt.h
+@@ -20,6 +20,7 @@
+ #ifndef	__RPCSVC_YPCLNT_H__
+ #define	__RPCSVC_YPCLNT_H__
+ 
++#include <sys/cdefs.h>
+ #include <features.h>
+ 
+ /* Some defines */
+diff --git a/src/rpcsvc/ypupd.h b/src/rpcsvc/ypupd.h
+index d07fd4d..2c57301 100644
+--- a/src/rpcsvc/ypupd.h
++++ b/src/rpcsvc/ypupd.h
+@@ -33,6 +33,7 @@
+ #ifndef __RPCSVC_YPUPD_H__
+ #define __RPCSVC_YPUPD_H__
+ 
++#include <sys/cdefs.h>
+ #include <features.h>
+ 
+ #include <rpc/rpc.h>
+-- 
+2.12.2
+

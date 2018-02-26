@@ -53,4 +53,4 @@ RDEPENDS_${PN} = "\
   python3-xmlrpc \
 "
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

@@ -1,0 +1,26 @@
+From 63619acf25151d4dade6d65732722ec4a710a5ac Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2017 09:54:25 -0700
+Subject: [PATCH] Check for glibc before setting CANT_USE_SEND_RECV_MSG
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/util/sys_defs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/util/sys_defs.h b/src/util/sys_defs.h
+index f720e2a..7314c63 100644
+--- a/src/util/sys_defs.h
++++ b/src/util/sys_defs.h
+@@ -813,7 +813,7 @@ extern int initgroups(const char *, int);
+ #define KERNEL_VERSION(a,b,c) (LINUX_VERSION_CODE + 1)
+ #endif
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(2,2,0)) \
+-	|| (__GLIBC__ < 2)
++	|| (defined(__GLIBC__) && (__GLIBC__ < 2))
+ #define CANT_USE_SEND_RECV_MSG
+ #define DEF_SMTP_CACHE_DEMAND	0
+ #else
+-- 
+2.13.3
+

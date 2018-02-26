@@ -1,0 +1,29 @@
+From e2d81009c790b4ebeced8408b6bae78060cabcaf Mon Sep 17 00:00:00 2001
+From: Derek Straka <derek@asterius.io>
+Date: Wed, 5 Jul 2017 09:35:51 -0400
+Subject: [PATCH 1/1] setup.py: remove the setup_requires for setuptools-scm
+
+The setup_requires argument forces the download of the egg file for setuptools-scm
+during the do_compile phase.  This download is incompatible with the typical fetch
+and mirror structure.  The only usage of scm is the generation of the _version.py
+file and in the release tarball it is already correctly created
+
+Signed-off-by: Derek Straka <derek@asterius.io>
+---
+ setup.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 751868c..ef6ebf1 100644
+--- a/setup.py
++++ b/setup.py
+@@ -71,7 +71,6 @@ def main():
+         keywords="test unittest",
+         cmdclass={'test': PyTest},
+         # the following should be enabled for release
+-        setup_requires=['setuptools-scm'],
+         install_requires=install_requires,
+         extras_require=extras_require,
+         packages=['_pytest', '_pytest.assertion', '_pytest._code', '_pytest.vendored_packages'],
+-- 
+2.7.4

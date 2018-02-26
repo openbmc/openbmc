@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Copyright (C) 2017 Intel Corp.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+# This is sample software. Rename it to 'custom_toaster_append.sh' and
+# enable the respective custom sections.
+
+verbose=0
+if [ $verbose -ne 0 ] ; then
+    echo "custom_toaster_append.sh:$*"
+fi
+
+if [ "toaster_prepend" = "$1" ] ; then
+    echo "Add custom actions here when Toaster script is started"
+fi
+
+if [ "web_start_postpend" = "$1" ] ; then
+    echo "Add custom actions here after Toaster web service is started"
+fi
+
+if [ "web_stop_postpend" = "$1" ] ; then
+    echo "Add custom actions here after Toaster web service is stopped"
+fi
+
+if [ "noweb_start_postpend" = "$1" ] ; then
+    echo "Add custom actions here after Toaster (no web) service is started"
+fi
+
+if [ "noweb_stop_postpend" = "$1" ] ; then
+    echo "Add custom actions here after Toaster (no web) service is stopped"
+fi
+
+if [ "toaster_postpend" = "$1" ] ; then
+    echo "Add custom actions here after Toaster script is done"
+fi
+

@@ -10,7 +10,6 @@ INHIBIT_DEFAULT_DEPS = "1"
 
 
 SRC_URI = "http://downloads.yoctoproject.org/releases/gnu-config/gnu-config-${PV}.tar.bz2 \
-	   file://config-guess-uclibc.patch \
 	   file://musl-support.patch \
            file://gnu-configize.in"
 

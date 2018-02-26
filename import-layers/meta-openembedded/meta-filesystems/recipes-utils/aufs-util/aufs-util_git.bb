@@ -4,22 +4,24 @@ HOMEPAGE = "http://aufs.sourceforge.net/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
 
-DEPENDS = "aufs-util-native"
+DEPENDS = "coreutils-native aufs-util-native"
 DEPENDS_class-native = ""
 
-SRCREV = "b59a2167a135ceea37581ee33997de278cf8a30a"
-SRC_URI = "git://git.code.sf.net/p/aufs/aufs-util;protocol=git;branch=aufs3.14 \
+SRCREV = "89afb1806c3d2eed8db2666ae254b77518ae3ceb"
+SRC_URI = "git://git.code.sf.net/p/aufs/aufs-util;protocol=git;branch=aufs4.4 \
+           https://raw.githubusercontent.com/sfjro/aufs4-linux/aufs4.4/include/uapi/linux/aufs_type.h;name=aufs_type \
            file://aufs-util-don-t-strip-executables.patch \
            file://aufs-util-add-tool-concept-to-Makefile-for-cross-com.patch \
-           file://aufs_type.h \
+           file://0001-libau-Define-STRIP-weakly.patch \
 "
+SRC_URI[aufs_type.md5sum] = "f7b4a255dcb55fe7b0967f5f59b44f19"
+SRC_URI[aufs_type.sha256sum] = "85bc8e4c1a94a7d526c382e4b047b4256cab8c4a65fc0396291707ad9a327a18"
 
-PV = "3.14+git${SRCPV}"
+PV = "4.4+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
 export HOSTCC = "${BUILD_CC}"
-
 do_configure_prepend() {
    # Replace sbin,bin paths with bitbake environment
    sed -i -e 's;install_sbin: Tgt = ${DESTDIR}/sbin;install_sbin: Tgt = ${DESTDIR}/${base_sbindir};' \
@@ -30,11 +32,12 @@ do_configure_prepend() {
 do_configure_append () {
     install -d ${S}/include/linux/
     cp ${WORKDIR}/aufs_type.h ${S}/include/linux/
+    sed -i -e 's;__user;;' ${S}/include/linux/aufs_type.h
 }
 
 do_configure_append_class-target () {
     for i in ver c2sh c2tmac; do
-        cp ${STAGING_BINDIR_NATIVE}/aufs-util-${PV}/$i ./
+        cp ${STAGING_BINDIR_NATIVE}/aufs-util-${PV}/$i ${B}
     done
 }
 

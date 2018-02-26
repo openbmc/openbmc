@@ -1,0 +1,28 @@
+From 02fa5cee1b8d0321787113e2dc10b162c657f333 Mon Sep 17 00:00:00 2001
+From: Robert Ramey <ramey@rrsd.com>
+Date: Wed, 1 Feb 2017 16:43:59 -0800
+Subject: [PATCH] correct error which appeared when compiling non c++ compliant
+ code for arrays
+
+Upstream-Status: Backport [expected to be released in v1.65]
+
+---
+ boost/serialization/array.hpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/boost/serialization/array.hpp b/boost/serialization/array.hpp
+index 61708b3..612d1a6 100644
+--- a/boost/serialization/array.hpp
++++ b/boost/serialization/array.hpp
+@@ -23,6 +23,8 @@ namespace std{
+ } // namespace std
+ #endif
+ 
++#include <boost/serialization/array_wrapper.hpp>
++
+ #ifndef BOOST_NO_CXX11_HDR_ARRAY
+ 
+ #include <array>
+-- 
+2.9.3
+

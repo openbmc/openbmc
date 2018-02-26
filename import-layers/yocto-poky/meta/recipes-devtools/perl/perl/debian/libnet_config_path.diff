@@ -5,6 +5,7 @@ Subject: Set location of libnet.cfg to /etc/perl/Net as /usr may not be
  writable.
 
 Patch-Name: debian/libnet_config_path.diff
+Upstream-Status: Pending
 ---
  cpan/libnet/lib/Net/Config.pm | 7 +++----
  1 file changed, 3 insertions(+), 4 deletions(-)

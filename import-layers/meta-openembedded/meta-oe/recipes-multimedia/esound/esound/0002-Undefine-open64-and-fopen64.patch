@@ -1,0 +1,35 @@
+From 1fbee6e96384f340b816e221fe1c2f3ff0b487bf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 8 Jun 2017 23:11:31 -0700
+Subject: [PATCH 2/3] Undefine open64 and fopen64
+
+Since the signatures do not match with libc
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ esddsp.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/esddsp.c b/esddsp.c
+index d3c6ea9..17b5949 100644
+--- a/esddsp.c
++++ b/esddsp.c
+@@ -290,6 +290,7 @@ open (const char *pathname, int flags, ...)
+   return open_wrapper(func, pathname, flags, mode);
+ }
+ 
++#undef open64
+ int
+ open64 (const char *pathname, int flags, ...)
+ {
+@@ -374,6 +375,7 @@ fopen (const char *path, const char *mode)
+   return fopen_wrapper(func, path, mode);
+ }
+ 
++#undef fopen64
+ FILE *
+ fopen64 (const char *path, const char *mode)
+ {
+-- 
+2.13.1
+

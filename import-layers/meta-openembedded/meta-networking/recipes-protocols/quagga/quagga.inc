@@ -7,21 +7,20 @@ Ishiguro. The Quagga tree aims to build a more involved community \
 around Quagga than the current centralised model of GNU Zebra."
 HOMEPAGE = "http://www.nongnu.org/quagga/"
 SECTION = "net"
-LICENSE = "GPL-2.0 & LGPL-2.0"
-DEPENDS = "readline ncurses perl-native"
-DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'snmp', 'net-snmp', '', d)}"
-SNMP_CONF="${@bb.utils.contains('DISTRO_FEATURES', 'snmp', '--enable-snmp', '', d)}"
 
+
+LICENSE = "GPL-2.0 & LGPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=81bcece21748c91ba9992349a91ec11d \
                     file://COPYING.LIB;md5=01ef24401ded36cd8e5d18bfe947240c"
+
+DEPENDS = "readline ncurses perl-native c-ares"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'snmp', 'net-snmp', '', d)}"
+SNMP_CONF="${@bb.utils.contains('DISTRO_FEATURES', 'snmp', '--enable-snmp', '', d)}"
 
 # the "ip" command from busybox is not sufficient (flush by protocol flushes all routes)
 RDEPENDS_${PN} += "iproute2"
 
-QUAGGASUBDIR = ""
-# ${QUAGGASUBDIR} is deal with old versions. Set to "/attic" for old
-# versions and leave it empty for recent versions.
-SRC_URI = "${SAVANNAH_GNU_MIRROR}/quagga${QUAGGASUBDIR}/quagga-${PV}.tar.gz; \
+SRC_URI = "${SAVANNAH_GNU_MIRROR}/quagga/quagga-${PV}.tar.gz; \
            file://quagga.init \
            file://quagga.default \
            file://watchquagga.init \
@@ -35,7 +34,7 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/quagga${QUAGGASUBDIR}/quagga-${PV}.tar.gz; \
            file://ripd.service \
            file://ripngd.service \
            file://zebra.service \
-"
+          "
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[cap] = "--enable-capabilities,--disable-capabilities,libcap"
@@ -107,10 +106,6 @@ do_install () {
     sed -i 's!/etc/!${sysconfdir}/!g' ${D}${sysconfdir}/init.d/* ${D}${sysconfdir}/default/watchquagga
     sed -i 's!/var/!${localstatedir}/!g' ${D}${sysconfdir}/init.d/* ${D}${sysconfdir}/default/volatiles/volatiles.03_quagga
     sed -i 's!^PATH=.*!PATH=${base_sbindir}:${sbindir}:${base_bindir}:${bindir}!' ${D}${sysconfdir}/init.d/*
-
-    # Remove generated info dir file, it doesn't belong in the generated
-    # package.
-    rm -f ${D}${infodir}/dir
 
     # For PAM
     for feature in ${DISTRO_FEATURES}; do
@@ -187,9 +182,6 @@ CONFFILES_${PN}-watchquagga = "${sysconfdir}/default/watchquagga"
 # Stop the names being rewritten due to the internal shared libraries
 DEBIAN_NOAUTONAME_${PN}-ospfd = "1"
 DEBIAN_NOAUTONAME_${PN}-ospfclient = "1"
-
-# the "ip" command from busybox is not sufficient (flush by protocol flushes all routes)
-RDEPENDS_${PN}          += "iproute2"
 
 # Main init script starts all deamons
 # Seperate init script for watchquagga

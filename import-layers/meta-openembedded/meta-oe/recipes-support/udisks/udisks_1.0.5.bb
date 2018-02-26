@@ -2,7 +2,7 @@ DESCRIPTION = "A storage daemon that implements well-defined D-Bus interfaces th
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=73d83aebe7e4b62346afde80e0e94273"
 
-DEPENDS = "libatasmart sg3-utils polkit libgudev dbus-glib glib-2.0 intltool-native lvm2 \
+DEPENDS = "libatasmart sg3-utils polkit libgudev dbus-glib glib-2.0 intltool-native \
     dbus-glib-native \
 "
 # optional dependencies: device-mapper parted
@@ -24,7 +24,8 @@ SRC_URI[udisks.sha256sum] = "f2ec82eb0ea7e01dc299b5b29b3c18cdf861236ec43dcff66b3
 
 inherit autotools-brokensep systemd gtk-doc
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "libdevmapper"
+PACKAGECONFIG[libdevmapper] = "--enable-devmapper,--disable-devmapper,libdevmapper"
 PACKAGECONFIG[parted] = "--enable-parted,--disable-parted,parted"
 
 EXTRA_OECONF = "--disable-man-pages --libdir=${base_libdir} --sbindir=${base_sbindir}"

@@ -13,6 +13,9 @@ DEPENDS = "libfribidi libtool libgcrypt libgcrypt-native \
    libmtp libopus orc libsamplerate0 libusb1 schroedinger taglib \
    tiff"
 
+# While this item does not require it, it depends on ffmpeg which does
+LICENSE_FLAGS = "commercial"
+
 SRC_URI = "http://download.videolan.org/pub/videolan/${BPN}/${PV}/${BP}.tar.xz"
 
 inherit autotools gettext pkgconfig distro_features_check

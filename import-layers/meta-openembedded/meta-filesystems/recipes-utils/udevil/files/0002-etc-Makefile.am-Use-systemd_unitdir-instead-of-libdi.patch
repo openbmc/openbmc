@@ -1,0 +1,32 @@
+From 80b087193698632e525b90d45b4a49e61e343e1c Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Date: Thu, 13 Jul 2017 21:30:35 +0200
+Subject: [PATCH] etc: Makefile.am: Use systemd_unitdir instead of libdir
+
+Proper directory for installing systemd services is systemd_unitdir, not
+libdir.
+
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ etc/Makefile.am | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/etc/Makefile.am b/etc/Makefile.am
+index 9b6e7522c20f..6d663241a72f 100644
+--- a/etc/Makefile.am
++++ b/etc/Makefile.am
+@@ -16,8 +16,8 @@ if ADD_SYSTEMD
+ 	test -f $(DESTDIR)/$(sysconfdir)/conf.d/devmon || $(INSTALL_DATA) \
+ 				$(srcdir)/systemd/devmon \
+ 				$(DESTDIR)/$(sysconfdir)/conf.d/devmon
+-	test -d $(DESTDIR)/$(libdir)/systemd/system || \
+-				mkdir -p -- $(DESTDIR)/$(libdir)/systemd/system
++	test -d $(DESTDIR)/$(systemd_unitdir)/system || \
++				mkdir -p -- $(DESTDIR)/$(systemd_unitdir)/system
+ 	$(INSTALL_DATA) $(srcdir)/systemd/devmon@.service \
+-				$(DESTDIR)/$(libdir)/systemd/system/devmon@.service
++				$(DESTDIR)/$(systemd_unitdir)/system/devmon@.service
+ endif
+-- 
+2.11.0
+

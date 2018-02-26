@@ -97,6 +97,7 @@ FILES_libtsan += "${libdir}/libtsan.so.*"
 FILES_libtsan-dev += "\
     ${libdir}/libtsan.so \
     ${libdir}/libtsan.la \
+    ${libdir}/libtsan_*.o \
 "
 FILES_libtsan-staticdev += "${libdir}/libtsan.a"
 

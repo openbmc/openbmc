@@ -1,6 +1,6 @@
 inherit module-base kernel-module-split pkgconfig
 
-addtask make_scripts after do_prepare_recipe_sysroot before do_compile
+addtask make_scripts after do_prepare_recipe_sysroot before do_configure
 do_make_scripts[lockfiles] = "${TMPDIR}/kernel-scripts.lock"
 do_make_scripts[depends] += "virtual/kernel:do_shared_workdir"
 
@@ -16,6 +16,26 @@ python __anonymous () {
         if dep.startswith("kernel-module-"):
             extra_symbols.append("${STAGING_INCDIR}/" + dep + "/Module.symvers")
     d.setVar('KBUILD_EXTRA_SYMBOLS', " ".join(extra_symbols))
+}
+
+python do_devshell_prepend () {
+    os.environ['CFLAGS'] = ''
+    os.environ['CPPFLAGS'] = ''
+    os.environ['CXXFLAGS'] = ''
+    os.environ['LDFLAGS'] = ''
+
+    os.environ['KERNEL_PATH'] = d.getVar('STAGING_KERNEL_DIR')
+    os.environ['KERNEL_SRC'] = d.getVar('STAGING_KERNEL_DIR')
+    os.environ['KERNEL_VERSION'] = d.getVar('KERNEL_VERSION')
+    os.environ['CC'] = d.getVar('KERNEL_CC')
+    os.environ['LD'] = d.getVar('KERNEL_LD')
+    os.environ['AR'] = d.getVar('KERNEL_AR')
+    os.environ['O'] = d.getVar('STAGING_KERNEL_BUILDDIR')
+    kbuild_extra_symbols = d.getVar('KBUILD_EXTRA_SYMBOLS')
+    if kbuild_extra_symbols:
+        os.environ['KBUILD_EXTRA_SYMBOLS'] = kbuild_extra_symbols
+    else:
+        os.environ['KBUILD_EXTRA_SYMBOLS'] = ''
 }
 
 module_do_compile() {

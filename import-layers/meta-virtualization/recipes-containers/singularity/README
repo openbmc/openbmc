@@ -1,0 +1,46 @@
+Singularity is a container platform based on the principle of mobility of 
+compute, and it is designed for use within HPC clusters. For more info see
+singularity.lbl.gov.  
+
+To test whether the software functions correctly, you can use `singularity
+selftest`. This is what you would expect to see:
+
+~# singularity selftest
+ + sh -c test -f /etc/singularity/singularity.conf                                     (retval=0) OK
+ + test -u /usr/libexec/singularity/bin/action-suid                                    (retval=0) OK
+ + test -u /usr/libexec/singularity/bin/create-suid                                    (retval=0) OK
+ + test -u /usr/libexec/singularity/bin/expand-suid                                    (retval=0) OK
+ + test -u /usr/libexec/singularity/bin/export-suid                                    (retval=0) OK
+ + test -u /usr/libexec/singularity/bin/import-suid                                    (retval=0) OK
+ + test -u /usr/libexec/singularity/bin/mount-suid                                     (retval=0) OK
+
+You can also pull a container from Docker Hub to prove full functionality
+(Test was performed on a Raspberry Pi 3, hence the arm32v7 part of the Docker
+link. Make sure you pull an image which is compatible with your hardware.) 
+For instance:
+
+~# singularity pull docker://arm32v7/debian:latest
+Initializing Singularity image subsystem
+Opening image file: debian-latest.img
+Creating 200MiB image
+Binding image to loop
+Creating file system within image
+Image is done: debian-latest.img
+Docker image path: index.docker.io/arm32v7/debian:latest
+Cache folder set to /home/root/.singularity/docker
+[1/1] |===================================| 100.0% 
+Importing: base Singularity environment
+Importing: /home/root/.singularity/docker/sha256:ed4f1f0d0a0457e7f76ffb25a8d6a193007709dd312b7647cb44fc6979ec4a53.tar.gz
+Importing: /home/root/.singularity/metadata/sha256:89997b2c16b29c5a3a316e314172ef21b36f67cc3200b1c4d95927f716dbee83.tar.gz
+Done. Container is at: debian-latest.img
+~# singularity shell debian-latest.img 
+Singularity: Invoking an interactive shell within container...
+
+Singularity debian-latest.img:~> echo "Hello from within the container!"
+Hello from within the container!
+Singularity debian-latest.img:~> ls /
+bin   dev  home  lost+found  mnt  proc	run   singularity  sys	usr
+boot  etc  lib	 media	     opt  root	sbin  srv	   tmp	var
+Singularity debian-latest.img:~> exit
+exit
+~# 

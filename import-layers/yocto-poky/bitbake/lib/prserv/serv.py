@@ -6,10 +6,11 @@ import queue
 import socket
 import io
 import sqlite3
-import bb.server.xmlrpc
+import bb.server.xmlrpcclient
 import prserv
 import prserv.db
 import errno
+import select
 
 logger = logging.getLogger("BitBake.PRserv")
 
@@ -59,6 +60,8 @@ class PRServer(SimpleXMLRPCServer):
         self.register_function(self.importone, "importone")
         self.register_introspection_functions()
 
+        self.quitpipein, self.quitpipeout = os.pipe()
+
         self.requestqueue = queue.Queue()
         self.handlerthread = threading.Thread(target = self.process_request_thread)
         self.handlerthread.daemon = False
@@ -75,11 +78,13 @@ class PRServer(SimpleXMLRPCServer):
 
         bb.utils.set_process_name("PRServ Handler")
 
-        while not self.quit:
+        while not self.quitflag:
             try:
                 (request, client_address) = self.requestqueue.get(True, 30)
             except queue.Empty:
                 self.table.sync_if_dirty()
+                continue
+            if request is None:
                 continue
             try:
                 self.finish_request(request, client_address)
@@ -100,7 +105,8 @@ class PRServer(SimpleXMLRPCServer):
     def sigterm_handler(self, signum, stack):
         if self.table:
             self.table.sync()
-        self.quit=True
+        self.quit()
+        self.requestqueue.put((None, None))
 
     def process_request(self, request, client_address):
         self.requestqueue.put((request, client_address))
@@ -136,7 +142,7 @@ class PRServer(SimpleXMLRPCServer):
         return self.table.importone(version, pkgarch, checksum, value)
 
     def ping(self):
-        return not self.quit
+        return not self.quitflag
 
     def getinfo(self):
         return (self.host, self.port)
@@ -152,12 +158,17 @@ class PRServer(SimpleXMLRPCServer):
             return None
 
     def quit(self):
-        self.quit=True
+        self.quitflag=True
+        os.write(self.quitpipeout, b"q")
+        os.close(self.quitpipeout)
         return
 
     def work_forever(self,):
-        self.quit = False
-        self.timeout = 0.5
+        self.quitflag = False
+        # This timeout applies to the poll in TCPServer, we need the select 
+        # below to wake on our quit pipe closing. We only ever call into handle_request
+        # if there is data there.
+        self.timeout = 0.01
 
         bb.utils.set_process_name("PRServ")
 
@@ -169,12 +180,17 @@ class PRServer(SimpleXMLRPCServer):
                      (self.dbfile, self.host, self.port, str(os.getpid())))
 
         self.handlerthread.start()
-        while not self.quit:
-            self.handle_request()
+        while not self.quitflag:
+            ready = select.select([self.fileno(), self.quitpipein], [], [], 30)
+            if self.quitflag:
+                break
+            if self.fileno() in ready[0]:
+                self.handle_request()
         self.handlerthread.join()
         self.db.disconnect()
         logger.info("PRServer: stopping...")
         self.server_close()
+        os.close(self.quitpipein)
         return
 
     def start(self):
@@ -182,6 +198,7 @@ class PRServer(SimpleXMLRPCServer):
             pid = self.daemonize()
         else:
             pid = self.fork()
+            self.pid = pid
 
         # Ensure both the parent sees this and the child from the work_forever log entry above
         logger.info("Started PRServer with DBfile: %s, IP: %s, PORT: %s, PID: %s" %
@@ -300,7 +317,7 @@ class PRServerConnection(object):
             host, port = singleton.getinfo()
         self.host = host
         self.port = port
-        self.connection, self.transport = bb.server.xmlrpc._create_server(self.host, self.port)
+        self.connection, self.transport = bb.server.xmlrpcclient._create_server(self.host, self.port)
 
     def terminate(self):
         try:
@@ -428,6 +445,9 @@ class PRServiceConfigError(Exception):
 def auto_start(d):
     global singleton
 
+    # Shutdown any existing PR Server
+    auto_shutdown()
+
     host_params = list(filter(None, (d.getVar('PRSERV_HOST') or '').split(':')))
     if not host_params:
         return None
@@ -464,7 +484,7 @@ def auto_start(d):
         logger.critical("PRservice %s:%d not available" % (host, port))
         raise PRServiceConfigError
 
-def auto_shutdown(d=None):
+def auto_shutdown():
     global singleton
     if singleton:
         host, port = singleton.getinfo()
@@ -472,6 +492,11 @@ def auto_shutdown(d=None):
             PRServerConnection(host, port).terminate()
         except:
             logger.critical("Stop PRService %s:%d failed" % (host,port))
+
+        try:
+            os.waitpid(singleton.prserv.pid, 0)
+        except ChildProcessError:
+            pass
         singleton = None
 
 def ping(host, port):

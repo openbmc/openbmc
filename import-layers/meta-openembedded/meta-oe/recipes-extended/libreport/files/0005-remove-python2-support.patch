@@ -1,0 +1,142 @@
+From 06710ab89fc7d7a82a378289aa3fcd92d33074f2 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 27 Apr 2017 03:31:00 -0400
+Subject: [PATCH] remove python2 support
+
+We do not require python2, so remove it.
+
+Upstream-Status:  Inappropriate workaround
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac                               | 15 ---------------
+ src/client-python/reportclient/Makefile.am |  9 ---------
+ src/report-python/Makefile.am              | 19 -------------------
+ 3 files changed, 43 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index eb50382..826d0fe 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -166,15 +166,6 @@ do
+ done
+ fi dnl end NO_MANTISBT
+ 
+-AC_PATH_PROG([PYTHON_CONFIG], [python-config], [no])
+-[if test "$PYTHON_CONFIG" = "no"]
+-[then]
+-    [echo "The python-config program was not found in the search path. Please ensure"]
+-    [echo "that it is installed and its directory is included in the search path."]
+-    [echo "Then run configure again before attempting to build libreport."]
+-    [exit 1]
+-[fi]
+-
+ AC_PATH_PROG([PYTHON3_CONFIG], [python3-config], [no])
+ [if test "$PYTHON3_CONFIG" = "no"]
+ [then]
+@@ -184,9 +175,6 @@ AC_PATH_PROG([PYTHON3_CONFIG], [python3-config], [no])
+     [exit 1]
+ [fi]
+ 
+-PYTHON_CFLAGS=`python-config --cflags 2> /dev/null`
+-PYTHON_LIBS=`python-config --libs 2> /dev/null`
+-
+ PYTHON3_CFLAGS=`python3-config --cflags 2> /dev/null`
+ PYTHON3_LIBS=`python3-config --libs 2> /dev/null`
+ 
+@@ -198,9 +186,6 @@ PYTHON3_DIR=`$PYTHON3 -c "import distutils.sysconfig; \
+ PYTHON3_EXECDIR=`$PYTHON3 -c "import distutils.sysconfig; \
+     print(distutils.sysconfig.get_python_lib(1,0,prefix='$PYTHON3_EXEC_PREFIX'))"`
+ 
+-AC_SUBST(PYTHON_CFLAGS)
+-AC_SUBST(PYTHON_LIBS)
+-
+ AC_SUBST(PYTHON3_CFLAGS)
+ AC_SUBST(PYTHON3_LIBS)
+ AC_SUBST(python3dir, $PYTHON3_DIR)
+diff --git a/src/client-python/reportclient/Makefile.am b/src/client-python/reportclient/Makefile.am
+index 46ac42f..fb5216a 100644
+--- a/src/client-python/reportclient/Makefile.am
++++ b/src/client-python/reportclient/Makefile.am
+@@ -4,13 +4,10 @@ PYFILES = \
+     dnfdebuginfo.py \
+     yumdebuginfo.py
+ 
+-py2clientdir = $(pyexecdir)/reportclient
+ py3clientdir = $(py3execdir)/reportclient
+ 
+-py2client_PYTHON = $(PYFILES)
+ py3client_PYTHON = $(PYFILES)
+ 
+-py2client_LTLIBRARIES = _reportclient.la
+ py3client_LTLIBRARIES = _reportclient3.la
+ 
+ PYEXTFILES = \
+@@ -33,12 +30,6 @@ PYEXTLDFLAGS = \
+     -avoid-version \
+     -Wl,-z,relro -Wl,-z,now
+ 
+-_reportclient_la_SOURCES = $(PYEXTFILES)
+-_reportclient_la_CPPFLAGS = $(PYEXTCPPFLAGS) $(PYTHON_CFLAGS)
+-_reportclient_la_LDFLAGS = $(PYEXTLDFLAGS) \
+-    -export-symbols-regex init_reportclient
+-_reportclient_la_LIBADD = ../../lib/libreport.la
+-
+ _reportclient3_la_SOURCES = $(PYEXTFILES)
+ _reportclient3_la_CPPFLAGS = $(PYEXTCPPFLAGS) $(PYTHON3_CFLAGS)
+ _reportclient3_la_LDFLAGS = $(PYEXTLDFLAGS) \
+diff --git a/src/report-python/Makefile.am b/src/report-python/Makefile.am
+index 793cebd..241dcb7 100644
+--- a/src/report-python/Makefile.am
++++ b/src/report-python/Makefile.am
+@@ -1,12 +1,9 @@
+ PYFILES = __init__.py accountmanager.py
+ 
+-pyreportexecdir = $(pyexecdir)/report
+ py3reportexecdir = $(py3execdir)/report
+ 
+-pyreportexec_PYTHON = $(PYFILES)
+ py3reportexec_PYTHON = $(PYFILES)
+ 
+-pyreportexec_LTLIBRARIES = _pyreport.la
+ py3reportexec_LTLIBRARIES = _py3report.la
+ 
+ PYEXTFILES = \
+@@ -34,20 +31,6 @@ PYEXTLDFLAGS = \
+     -avoid-version \
+     -Wl,-z,relro -Wl,-z,now
+ 
+-_pyreport_la_SOURCES = $(PYEXTFILES)
+-
+-_pyreport_la_CPPFLAGS = \
+-    $(PYEXTCPPFLAGS) \
+-    $(PYTHON_CFLAGS)
+-
+-_pyreport_la_LDFLAGS = \
+-   $(PYEXTLDFLAGS) \
+-   -export-symbols-regex init_pyreport
+-
+-_pyreport_la_LIBADD = \
+-    ../lib/libreport.la \
+-    $(PYTHON2_LIBS)
+-
+ _py3report_la_SOURCES = $(PYEXTFILES)
+ 
+ _py3report_la_CPPFLAGS = \
+@@ -64,7 +47,6 @@ _py3report_la_LIBADD = \
+ 
+ # report compat:
+ 
+-pyreportioexecdir = $(pyexecdir)/report/io
+ py3reportioexecdir = $(py3execdir)/report/io
+ 
+ PYIOFILES = \
+@@ -73,5 +55,4 @@ PYIOFILES = \
+     io/NewtIO.py \
+     io/TextIO.py
+ 
+-pyreportioexec_PYTHON = $(PYIOFILES)
+ py3reportioexec_PYTHON = $(PYIOFILES)
+-- 
+2.8.1
+

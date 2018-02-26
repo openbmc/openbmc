@@ -1,0 +1,30 @@
+From b5bda3431159b6505dcd069641c863018c4d4309 Mon Sep 17 00:00:00 2001
+From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
+Date: Wed, 6 Jul 2016 15:18:15 -0400
+Subject: [PATCH 2/6] build: Add ARM 64bit support
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+Upstream-Status: Accepted [expected in 0.4]
+---
+ configure.ac | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index f5304b8..be20514 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -71,6 +71,11 @@ AS_CASE(["${host_cpu}"],
+          HAVE_ARM=1
+          ARCH_CFLAGS="-DWEBRTC_ARCH_ARM"
+         ],
++    [aarch64*],
++        [
++         HAVE_NEON=1
++         ARCH_CFLAGS="-DWEBRTC_HAS_NEON -DWEBRTC_ARCH_ARM64"
++        ],
+     # FIXME: Add MIPS support, see webrtc/BUILD.gn for defines
+     [AC_MSG_ERROR([Unsupported CPU type $host_cpu])]
+ )
+-- 
+2.11.0
+

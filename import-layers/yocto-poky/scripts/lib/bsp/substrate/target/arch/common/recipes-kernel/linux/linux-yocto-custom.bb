@@ -42,6 +42,7 @@ SRC_URI += "file://{{=machine}}.scc \
             file://{{=machine}}.cfg \
             file://{{=machine}}-user-config.cfg \
             file://{{=machine}}-user-patches.scc \
+            file://{{=machine}}-user-features.scc \
            "
 
 {{ if kernel_choice == "custom" and custom_kernel_need_kbranch == "y" and custom_kernel_kbranch and custom_kernel_kbranch != "master": }}

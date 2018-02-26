@@ -1,0 +1,30 @@
+From 40dae7ea6450cb30f066da8443eabf063b5b0ad7 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 8 May 2017 02:05:40 -0400
+Subject: [PATCH 2/3] remove python2 support
+
+Only python3 is required.
+
+Upstream-Status: Inappropriate [wr-installer specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/python/gi/overrides/Makefile.am | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/src/python/gi/overrides/Makefile.am b/src/python/gi/overrides/Makefile.am
+index a2927ac..6385502 100644
+--- a/src/python/gi/overrides/Makefile.am
++++ b/src/python/gi/overrides/Makefile.am
+@@ -1,8 +1,3 @@
+-pylibdir = $(shell python -c "import distutils.sysconfig; print(distutils.sysconfig.get_python_lib(1,0,prefix='${exec_prefix}'))")
+-
+-overridesdir = $(pylibdir)/gi/overrides
+-dist_overrides_DATA = BlockDev.py
+-
+ if WITH_PYTHON3
+ py3libdir = $(shell python3 -c "import distutils.sysconfig; print(distutils.sysconfig.get_python_lib(1,0,prefix='${exec_prefix}'))")
+ py3overridesdir = $(py3libdir)/gi/overrides
+-- 
+1.8.3.1
+

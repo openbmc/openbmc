@@ -1,8 +1,8 @@
 inherit pkgconfig
 
+# List of JUCE modules that requires external dependencies
 JUCE_MODULES ??= " \
   juce_core \
-  juce_events \
   ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'juce_audio_devices', '', d)} \
   ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'juce_graphics juce_gui_basics', '', d)} \
   ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'juce_opengl', '', d)} \
@@ -11,7 +11,6 @@ JUCE_X11_DEPS = "libx11 libxext libxinerama libxrandr libxcursor"
 
 PACKAGECONFIG_prepend= "${JUCE_MODULES} "
 PACKAGECONFIG[juce_core] = ",,curl,"
-PACKAGECONFIG[juce_events] = ",,libx11,"
 PACKAGECONFIG[juce_audio_devices] = ",,alsa-lib,"
 PACKAGECONFIG[juce_graphics] = ",,${JUCE_X11_DEPS} freetype,"
 PACKAGECONFIG[juce_gui_basics] = ",,${JUCE_X11_DEPS},"

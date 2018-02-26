@@ -1,0 +1,6 @@
+#! /bin/sh
+
+PKG_CONFIG_PATH="@PATH_NATIVE@"
+unset PKG_CONFIG_SYSROOT_DIR
+
+pkg-config "$@"

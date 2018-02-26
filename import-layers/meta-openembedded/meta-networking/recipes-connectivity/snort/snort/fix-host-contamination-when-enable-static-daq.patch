@@ -1,0 +1,21 @@
+Upstream-Status: Inappropriate [embedded specific]
+
+When enable static daq for snort, it calls to daq-modules-config to get link
+library and library path. Library path is useless for oe and cause host
+contamination issue. So filter it.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/configure.in b/configure.in
+index fded45b..a247bb9 100644
+--- a/configure.in
++++ b/configure.in
+@@ -658,7 +658,7 @@ fi
+ 
+ if test "x$enable_static_daq" = "xyes"; then
+     LDAQ=""
+-    LIBS="${LIBS} `daq-modules-config --static --libs`"
++    LIBS="${LIBS} `daq-modules-config --static --libs | sed 's#-L[^ ]*##g'`"
+     AC_CHECK_LIB([daq_static], [daq_load_modules],
+         [LIBS="-ldaq_static ${LIBS}"], [LDAQ="no"], [ ])
+ 

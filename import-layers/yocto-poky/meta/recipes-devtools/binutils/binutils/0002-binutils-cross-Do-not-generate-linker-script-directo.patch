@@ -1,4 +1,4 @@
-From 7c7de107b4b0a507d2aeca3e3a86d01cb4b51360 Mon Sep 17 00:00:00 2001
+From 8f929c616208351d0971d7dfd7574d48d3144603 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 6 Mar 2017 23:37:05 -0800
 Subject: [PATCH 02/15] binutils-cross: Do not generate linker script
@@ -57,5 +57,5 @@ index a42c4d7a4b..d727b4d07e 100755
    libs=${NATIVE_LIB_DIRS}
    if [ "x${NATIVE}" = "xyes" ] ; then
 -- 
-2.12.0
+2.14.0
 

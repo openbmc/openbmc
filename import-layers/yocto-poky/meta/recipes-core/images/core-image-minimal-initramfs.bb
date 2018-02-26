@@ -8,7 +8,7 @@ PACKAGE_INSTALL = "initramfs-live-boot initramfs-live-install initramfs-live-ins
 # Do not pollute the initrd image with rootfs features
 IMAGE_FEATURES = ""
 
-export IMAGE_BASENAME = "core-image-minimal-initramfs"
+export IMAGE_BASENAME = "${MLPREFIX}core-image-minimal-initramfs"
 IMAGE_LINGUAS = ""
 
 LICENSE = "MIT"

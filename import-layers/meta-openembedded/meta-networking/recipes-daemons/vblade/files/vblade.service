@@ -1,0 +1,11 @@
+[Unit]
+Description=Virtual EtherDrive blade AoE target
+After=syslog.target network.target
+
+[Service]
+Type=forking
+ExecStart=@BINDIR@/vblade.init start
+ExecStop=@BINDIR@/vblade.init stop
+
+[Install]
+WantedBy=multi-user.target

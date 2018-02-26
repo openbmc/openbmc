@@ -1,0 +1,20 @@
+Fix
+
+sensor_factors_000.cpp:66:5: error: non-constant-expression cannot be narrowed from type 'int' to 'unsigned char' in initializer list [-Wc++11-narrowing]
+((dRExp << 4) & 0xf0) | (dBExp & 0x0f ),                                                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: openhpi-3.6.1/plugins/ipmidirect/t/sensor_factors_000.cpp
+===================================================================
+--- openhpi-3.6.1.orig/plugins/ipmidirect/t/sensor_factors_000.cpp
++++ openhpi-3.6.1/plugins/ipmidirect/t/sensor_factors_000.cpp
+@@ -63,7 +63,7 @@ static cIpmiSdr sdr =
+     dB & 0xff,
+     ((dB >> 2) & 0xc0) | (dAccuracy & 0x3f),
+     ((dAccuracy >> 2) & 0xf0) | ((dAccuracyExp << 2) & 0x0c),
+-    ((dRExp << 4) & 0xf0) | (dBExp & 0x0f ),
++    (unsigned char)(((dRExp << 4) & 0xf0) | (dBExp & 0x0f )),
+     0,
+     0,
+   }

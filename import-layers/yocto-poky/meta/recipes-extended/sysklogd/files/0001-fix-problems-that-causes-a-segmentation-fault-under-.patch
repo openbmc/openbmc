@@ -1,0 +1,28 @@
+From cb72b3e172c238b4b5ae5935dc6be54f5034fcf1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Jun 2017 18:20:06 -0700
+Subject: [PATCH 1/2] fix problems that causes a segmentation fault under some
+ conditions
+
+Upstream-Status: Inappropriate [ no upstream ]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ksym_mod.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/ksym_mod.c b/ksym_mod.c
+index 6e26da1..a3daa7d 100644
+--- a/ksym_mod.c
++++ b/ksym_mod.c
+@@ -186,7 +186,6 @@ extern int InitMsyms()
+ 		else
+ 			Syslog(LOG_ERR, "Error loading kernel symbols " \
+ 			       "- %s\n", strerror(errno));
+-		fclose(ksyms);
+ 		return(0);
+ 	}
+ 
+-- 
+2.13.2
+

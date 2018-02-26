@@ -16,6 +16,7 @@ Please see the attached patch for a quick fix of this issue.
 [Maintainer's note: html2text in Debian is not the same implementation
 as the html2text.pl which is expected, but should provide similar
 functionality].
+Upstream-Status: Pending
 ---
  cpan/CPAN/lib/CPAN/Distribution.pm | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -1,0 +1,19 @@
+Use HAVE_WORKING_SNPRINTF to check for snprintf()
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: libesmtp-1.0.6/missing.h
+===================================================================
+--- libesmtp-1.0.6.orig/missing.h
++++ libesmtp-1.0.6/missing.h
+@@ -43,7 +43,7 @@ int strncasecmp (const char *a, const ch
+ void *memrchr (const void *a, int c, size_t len);
+ #endif
+ 
+-#ifndef HAVE_SNPRINTF
++#ifndef HAVE_WORKING_SNPRINTF
+ #include <sys/types.h>
+ int snprintf(char *s, size_t n, const char *format, ...);
+ #endif

@@ -20,9 +20,12 @@ SECTION = "net"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e3c772a32386888ccb5ae1c0ba95f1a4"
 
-DEPENDS = "net-snmp libxml2 ncurses openssl glib-2.0 popt e2fsprogs"
+DEPENDS = "net-snmp libxml2 ncurses openssl glib-2.0 popt e2fsprogs autoconf-archive-native"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \
+           file://openhpi.init \
+           file://openhpid.service \
+           file://run-ptest \
            file://openhpi-netsnmp-cross-compile.patch \
            file://openhpi-sysfs-cross-compile.patch \
            file://openhpi-libxml2-cross-compile.patch \
@@ -35,11 +38,13 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \
            file://openhpi-invalide-session.patch \
            file://openhpi-use-serial-tests-config-needed-by-ptest.patch \
            file://openhpi-fix-alignment-issue.patch \
-           \
-           file://openhpi.init \
-           file://openhpid.service \
-           file://run-ptest \
-"
+           file://0001-Fix-build-failures-with-gcc7.patch \
+           file://c++11.patch \
+           file://clang-c++11.patch \
+           file://fix-narrowing-warning.patch \
+           file://0001-plugins-Check-for-PTHREAD_RECURSIVE_MUTEX_INITIALIZE.patch \
+           file://0001-ipmidirect-Replace-__STRING.patch \
+           "
 
 SRC_URI[md5sum] = "4718b16e0f749b5ad214a9b04f45dd23"
 SRC_URI[sha256sum] = "e0a810cb401c4bdcfc9551f2e6afd5a8ca4b411f5ee3bc60c19f82fd6e84a3dc"
@@ -53,9 +58,10 @@ FILES_${PN}-libs = "${libdir}/${BPN}/*.so /usr/lib/${BPN}/*.so"
 INSANE_SKIP_${PN}-libs = "dev-so"
 RDEPENDS_${PN} += "${PN}-libs"
 
-PACKAGECONFIG ??= "libgcrypt"
+PACKAGECONFIG ??= "libgcrypt non32bit"
 PACKAGECONFIG[sysfs] = "--enable-sysfs,--disable-sysfs,sysfsutils,"
 PACKAGECONFIG[libgcrypt] = "--enable-encryption,--disable-encryption,libgcrypt,"
+PACKAGECONFIG[non32bit] = "--enable-non32bit-int,--disable-non32bit-int,,"
 
 do_install_append () {
     install -m 0755 -d ${D}${sysconfdir}/${BPN}

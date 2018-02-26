@@ -14,6 +14,7 @@ Any real locale problem will show up after the system upgrade too, and
 the warning will be triggered normally again at that point.
 
 Patch-Name: debian/squelch-locale-warnings.diff
+Upstream-Status: Pending
 ---
  locale.c           | 5 ++++-
  pod/perllocale.pod | 8 ++++++++

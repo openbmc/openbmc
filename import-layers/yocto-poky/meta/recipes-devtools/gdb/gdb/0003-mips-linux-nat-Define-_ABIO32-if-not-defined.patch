@@ -1,4 +1,4 @@
-From f2912b1d2e5c854a112176682903b696da33e003 Mon Sep 17 00:00:00 2001
+From ca0ef06b7320912df350e730e63f9bafdaa6ea70 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 23 Mar 2016 06:30:09 +0000
 Subject: [PATCH 03/10] mips-linux-nat: Define _ABIO32 if not defined
@@ -17,10 +17,10 @@ Upstream-Status: Pending
  1 file changed, 5 insertions(+)
 
 diff --git a/gdb/mips-linux-nat.c b/gdb/mips-linux-nat.c
-index 0f20f16814..722532bb6c 100644
+index 8041d84be7..f2df1b9907 100644
 --- a/gdb/mips-linux-nat.c
 +++ b/gdb/mips-linux-nat.c
-@@ -46,6 +46,11 @@
+@@ -47,6 +47,11 @@
  #define PTRACE_GET_THREAD_AREA 25
  #endif
  
@@ -33,5 +33,5 @@ index 0f20f16814..722532bb6c 100644
     we'll clear this and use PTRACE_PEEKUSER instead.  */
  static int have_ptrace_regsets = 1;
 -- 
-2.11.0
+2.13.1
 

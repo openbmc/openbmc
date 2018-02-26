@@ -1,0 +1,56 @@
+From 0be174dbedd861d7694b0c7799fe26be31eb32b0 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Fri, 26 May 2017 17:52:57 -0500
+Subject: [PATCH 08/14] libmultipath: change how RADOS checker is enabled
+
+Instead of making the user call "make", "make install" and "make clean"
+with ENABLE_RADOS set correctly, have the makefile check if
+/usr/include/rados/librados.h exists, just like it checks if specific
+functions exist in a file.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ Makefile.inc                   | 13 +++++++++++++
+ libmultipath/checkers/Makefile |  3 ++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index 2591fa9..e084fd1 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -109,5 +109,18 @@ check_func =								       \
+ 	echo "$$found"							       \
+     )
+ 
++# Checker whether a file with name $1 exists
++check_file = $(shell	\
++	if [ -f "$1" ]; then \
++		found=1; \
++		status="yes"; \
++	else \
++		found=0; \
++		status="no"; \
++	fi; \
++	echo 1>&2 "Checking if $1 exists ... $$status"; \
++	echo "$$found" \
++	)
++
+ %.o:	%.c
+ 	$(CC) $(CFLAGS) -c -o $@ $<
+diff --git a/libmultipath/checkers/Makefile b/libmultipath/checkers/Makefile
+index 732ca9d..bce6b8b 100644
+--- a/libmultipath/checkers/Makefile
++++ b/libmultipath/checkers/Makefile
+@@ -14,7 +14,8 @@ LIBS= \
+ 	libcheckemc_clariion.so \
+ 	libcheckhp_sw.so \
+ 	libcheckrdac.so
+-ifneq ($(ENABLE_RADOS),0)
++
++ifneq ($(call check_file,/usr/include/rados/librados.h),0)
+ LIBS += libcheckrbd.so
+ endif
+ 
+-- 
+2.8.1
+

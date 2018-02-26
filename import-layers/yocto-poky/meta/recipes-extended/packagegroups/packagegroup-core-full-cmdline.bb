@@ -86,7 +86,6 @@ RDEPENDS_packagegroup-core-full-cmdline-utils = "\
     mc-fish \
     mc-helpers \
     mc-helpers-perl \
-    mc-helpers-python \
     mktemp \
     ncurses \
     net-tools \
@@ -110,7 +109,6 @@ RDEPENDS_packagegroup-core-full-cmdline-extended = "\
     "
 
 RDEPENDS_packagegroup-core-full-cmdline-dev-utils = "\
-    byacc \
     diffutils \
     m4 \
     make \

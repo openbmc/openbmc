@@ -1,0 +1,38 @@
+From bc3ceda747104afdc24386df5dc45ca86f6c2936 Mon Sep 17 00:00:00 2001
+From: Benjamin Marzinski <bmarzins@redhat.com>
+Date: Thu, 1 Jun 2017 17:52:28 -0500
+Subject: [PATCH 11/14] multipathd: fix "show maps json" crash
+
+If there are no multipath devices, show_maps_json sets the maximum size
+of the reply buffer to 0. Having a size of 0 causes the calls to calloc
+and realloc to behave in ways that the code isn't designed to handle,
+leading to a double-free crash. Instead, show_maps_json should just
+use the INITIAL_REPLY_LEN if there are no multipath devices.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+---
+ multipathd/cli_handlers.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/multipathd/cli_handlers.c b/multipathd/cli_handlers.c
+index 04c7386..7b0d00c 100644
+--- a/multipathd/cli_handlers.c
++++ b/multipathd/cli_handlers.c
+@@ -162,10 +162,12 @@ show_maps_json (char ** r, int * len, struct vectors * vecs)
+ 	struct multipath * mpp;
+ 	char * c;
+ 	char * reply;
+-	unsigned int maxlen = INITIAL_REPLY_LEN *
+-			PRINT_JSON_MULTIPLIER * VECTOR_SIZE(vecs->mpvec);
++	unsigned int maxlen = INITIAL_REPLY_LEN;
+ 	int again = 1;
+ 
++	if (VECTOR_SIZE(vecs->mpvec) > 0)
++		maxlen *= PRINT_JSON_MULTIPLIER * VECTOR_SIZE(vecs->mpvec);
++
+ 	vector_foreach_slot(vecs->mpvec, mpp, i) {
+ 		if (update_multipath(vecs, mpp->alias, 0)) {
+ 			return 1;
+-- 
+2.8.1
+

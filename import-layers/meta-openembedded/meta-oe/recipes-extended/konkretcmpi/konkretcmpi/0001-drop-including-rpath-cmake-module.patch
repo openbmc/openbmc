@@ -1,0 +1,38 @@
+From 45e1c4c04a126d2386446775f99084bd603016af Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Jun 2017 23:10:59 -0700
+Subject: [PATCH] drop including rpath cmake module
+
+Fixes cross compilation QA errors e.g.
+/usr/lib/libkonkret.so.0.0.1 contains probably-redundant RPATH /usr/lib [useless-rpaths]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/konkret/CMakeLists.txt | 1 -
+ src/program/CMakeLists.txt | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/src/konkret/CMakeLists.txt b/src/konkret/CMakeLists.txt
+index c2faa40..df49e11 100644
+--- a/src/konkret/CMakeLists.txt
++++ b/src/konkret/CMakeLists.txt
+@@ -8,7 +8,6 @@ set(konkret_SRCS
+     kstr.c
+     print.c
+ )
+-include(rpath)
+ include_directories(${CMPI_INCLUDE_DIR})
+ 
+ add_library(libkonkret SHARED ${konkret_SRCS})
+diff --git a/src/program/CMakeLists.txt b/src/program/CMakeLists.txt
+index afcefe5..8a4646c 100644
+--- a/src/program/CMakeLists.txt
++++ b/src/program/CMakeLists.txt
+@@ -1,4 +1,3 @@
+-include (rpath)
+ include_directories(${CMPI_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src)
+ 
+ add_executable(konkret main.cpp)
+-- 
+2.13.0
+

@@ -1,0 +1,2761 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
+[<!ENTITY % poky SYSTEM "../poky.ent"> %poky; ] >
+
+<chapter id='ref-development-environment'>
+<title>The Yocto Project Development Environment</title>
+
+<para>
+    This chapter takes a look at the Yocto Project development
+    environment and also provides a detailed look at what goes on during
+    development in that environment.
+    The chapter provides Yocto Project Development environment concepts that
+    help you understand how work is accomplished in an open source environment,
+    which is very different as compared to work accomplished in a closed,
+    proprietary environment.
+</para>
+
+<para>
+    Specifically, this chapter addresses open source philosophy, workflows,
+    Git, source repositories, licensing, recipe syntax, and development
+    syntax.
+</para>
+
+<section id='open-source-philosophy'>
+    <title>Open Source Philosophy</title>
+
+    <para>
+        Open source philosophy is characterized by software development
+        directed by peer production and collaboration through an active
+        community of developers.
+        Contrast this to the more standard centralized development models
+        used by commercial software companies where a finite set of developers
+        produces a product for sale using a defined set of procedures that
+        ultimately result in an end product whose architecture and source
+        material are closed to the public.
+    </para>
+
+    <para>
+        Open source projects conceptually have differing concurrent agendas,
+        approaches, and production.
+        These facets of the development process can come from anyone in the
+        public (community) that has a stake in the software project.
+        The open source environment contains new copyright, licensing, domain,
+        and consumer issues that differ from the more traditional development
+        environment.
+        In an open source environment, the end product, source material,
+        and documentation are all available to the public at no cost.
+    </para>
+
+    <para>
+        A benchmark example of an open source project is the Linux kernel,
+        which was initially conceived and created by Finnish computer science
+        student Linus Torvalds in 1991.
+        Conversely, a good example of a non-open source project is the
+        <trademark class='registered'>Windows</trademark> family of operating
+        systems developed by
+        <trademark class='registered'>Microsoft</trademark> Corporation.
+    </para>
+
+    <para>
+        Wikipedia has a good historical description of the Open Source
+        Philosophy
+        <ulink url='http://en.wikipedia.org/wiki/Open_source'>here</ulink>.
+        You can also find helpful information on how to participate in the
+        Linux Community
+        <ulink url='http://ldn.linuxfoundation.org/book/how-participate-linux-community'>here</ulink>.
+    </para>
+</section>
+
+<section id='workflows'>
+    <title>Workflows</title>
+
+    <para>
+        This section provides workflow concepts using the Yocto Project and
+        Git.
+        In particular, the information covers basic practices that describe
+        roles and actions in a collaborative development environment.
+        <note>
+            If you are familiar with this type of development environment, you
+            might not want to read this section.
+        </note>
+    </para>
+
+    <para>
+        The Yocto Project files are maintained using Git in "master"
+        branches whose Git histories track every change and whose structures
+        provides branches for all diverging functionality.
+        Although there is no need to use Git, many open source projects do so.
+    <para>
+
+    </para>
+        For the Yocto Project, a key individual called the "maintainer" is
+        responsible for the "master" branch of a given Git repository.
+        The "master" branch is the “upstream” repository from which final or
+        most recent builds of the project occur.
+        The maintainer is responsible for accepting changes from other
+        developers and for organizing the underlying branch structure to
+        reflect release strategies and so forth.
+        <note>For information on finding out who is responsible for (maintains)
+            a particular area of code, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#how-to-submit-a-change'>Submitting a Change to the Yocto Project</ulink>"
+            section of the Yocto Project Development Tasks Manual.
+        </note>
+    </para>
+
+    <para>
+        The Yocto Project <filename>poky</filename> Git repository also has an
+        upstream contribution Git repository named
+        <filename>poky-contrib</filename>.
+        You can see all the branches in this repository using the web interface
+        of the
+        <ulink url='&YOCTO_GIT_URL;'>Source Repositories</ulink> organized
+        within the "Poky Support" area.
+        These branches temporarily hold changes to the project that have been
+        submitted or committed by the Yocto Project development team and by
+        community members who contribute to the project.
+        The maintainer determines if the changes are qualified to be moved
+        from the "contrib" branches into the "master" branch of the Git
+        repository.
+    </para>
+
+    <para>
+        Developers (including contributing community members) create and
+        maintain cloned repositories of the upstream "master" branch.
+        The cloned repositories are local to their development platforms and
+        are used to develop changes.
+        When a developer is satisfied with a particular feature or change,
+        they "push" the changes to the appropriate "contrib" repository.
+    </para>
+
+    <para>
+        Developers are responsible for keeping their local repository
+        up-to-date with "master".
+        They are also responsible for straightening out any conflicts that
+        might arise within files that are being worked on simultaneously by
+        more than one person.
+        All this work is done locally on the developer’s machine before
+        anything is pushed to a "contrib" area and examined at the maintainer’s
+        level.
+    </para>
+
+    <para>
+        A somewhat formal method exists by which developers commit changes
+        and push them into the "contrib" area and subsequently request that
+        the maintainer include them into "master".
+        This process is called “submitting a patch” or "submitting a change."
+        For information on submitting patches and changes, see the
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#how-to-submit-a-change'>Submitting a Change to the Yocto Project</ulink>"
+        section in the Yocto Project Development Tasks Manual.
+    </para>
+
+    <para>
+        To summarize the development workflow:  a single point of entry
+        exists for changes into the project’s "master" branch of the
+        Git repository, which is controlled by the project’s maintainer.
+        And, a set of developers exist who independently develop, test, and
+        submit changes to "contrib" areas for the maintainer to examine.
+        The maintainer then chooses which changes are going to become a
+        permanent part of the project.
+    </para>
+
+    <para>
+        <imagedata fileref="figures/git-workflow.png" width="6in" depth="3in" align="left" scalefit="1" />
+    </para>
+
+    <para>
+        While each development environment is unique, there are some best
+        practices or methods that help development run smoothly.
+        The following list describes some of these practices.
+        For more information about Git workflows, see the workflow topics in
+        the
+        <ulink url='http://book.git-scm.com'>Git Community Book</ulink>.
+        <itemizedlist>
+            <listitem><para>
+                <emphasis>Make Small Changes:</emphasis>
+                It is best to keep the changes you commit small as compared to
+                bundling many disparate changes into a single commit.
+                This practice not only keeps things manageable but also allows
+                the maintainer to more easily include or refuse changes.</para>
+
+                <para>It is also good practice to leave the repository in a
+                state that allows you to still successfully build your project.
+                In other words, do not commit half of a feature,
+                then add the other half as a separate, later commit.
+                Each commit should take you from one buildable project state
+                to another buildable state.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Use Branches Liberally:</emphasis>
+                It is very easy to create, use, and delete local branches in
+                your working Git repository.
+                You can name these branches anything you like.
+                It is helpful to give them names associated with the particular
+                feature or change on which you are working.
+                Once you are done with a feature or change and have merged it
+                into your local master branch, simply discard the temporary
+                branch.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Merge Changes:</emphasis>
+                The <filename>git merge</filename> command allows you to take
+                the changes from one branch and fold them into another branch.
+                This process is especially helpful when more than a single
+                developer might be working on different parts of the same
+                feature.
+                Merging changes also automatically identifies any collisions
+                or "conflicts" that might happen as a result of the same lines
+                of code being altered by two different developers.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Manage Branches:</emphasis>
+                Because branches are easy to use, you should use a system
+                where branches indicate varying levels of code readiness.
+                For example, you can have a "work" branch to develop in, a
+                "test" branch where the code or change is tested, a "stage"
+                branch where changes are ready to be committed, and so forth.
+                As your project develops, you can merge code across the
+                branches to reflect ever-increasing stable states of the
+                development.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Use Push and Pull:</emphasis>
+                The push-pull workflow is based on the concept of developers
+                "pushing" local commits to a remote repository, which is
+                usually a contribution repository.
+                This workflow is also based on developers "pulling" known
+                states of the project down into their local development
+                repositories.
+                The workflow easily allows you to pull changes submitted by
+                other developers from the upstream repository into your
+                work area ensuring that you have the most recent software
+                on which to develop.
+                The Yocto Project has two scripts named
+                <filename>create-pull-request</filename> and
+                <filename>send-pull-request</filename> that ship with the
+                release to facilitate this workflow.
+                You can find these scripts in the <filename>scripts</filename>
+                folder of the
+                <link linkend='source-directory'>Source Directory</link>.
+                For information on how to use these scripts, see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#pushing-a-change-upstream'>Using Scripts to Push a Change Upstream and Request a Pull</ulink>"
+                section in the Yocto Project Development Tasks Manual.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Patch Workflow:</emphasis>
+                This workflow allows you to notify the maintainer through an
+                email that you have a change (or patch) you would like
+                considered for the "master" branch of the Git repository.
+                To send this type of change, you format the patch and then
+                send the email using the Git commands
+                <filename>git format-patch</filename> and
+                <filename>git send-email</filename>.
+                For information on how to use these scripts, see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#how-to-submit-a-change'>Submitting a Change to the Yocto Project</ulink>"
+                section in the Yocto Project Development Tasks Manual.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id='git'>
+    <title>Git</title>
+
+    <para>
+        The Yocto Project makes extensive use of Git, which is a
+        free, open source distributed version control system.
+        Git supports distributed development, non-linear development,
+        and can handle large projects.
+        It is best that you have some fundamental understanding
+        of how Git tracks projects and how to work with Git if
+        you are going to use the Yocto Project for development.
+        This section provides a quick overview of how Git works and
+        provides you with a summary of some essential Git commands.
+        <note><title>Notes</title>
+            <itemizedlist>
+                <listitem><para>
+                    For more information on Git, see
+                    <ulink url='http://git-scm.com/documentation'></ulink>.
+                    </para></listitem>
+                <listitem><para>
+                    If you need to download Git, it is recommended that you add
+                    Git to your system through your distribution's "software
+                    store" (e.g. for Ubuntu, use the Ubuntu Software feature).
+                    For the Git download page, see
+                    <ulink url='http://git-scm.com/download'></ulink>.
+                    </para></listitem>
+                <listitem><para>
+                    For examples beyond the limited few in this section on how
+                    to use Git with the Yocto Project, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#working-with-yocto-project-source-files'>Working With Yocto Project Source Files</ulink>"
+                    section in the Yocto Project Development Tasks Manual.
+                    </para></listitem>
+            </itemizedlist>
+        </note>
+    </para>
+
+    <section id='repositories-tags-and-branches'>
+        <title>Repositories, Tags, and Branches</title>
+
+        <para>
+            As mentioned briefly in the previous section and also in the
+            "<link linkend='workflows'>Workflows</link>" section,
+            the Yocto Project maintains source repositories at
+            <ulink url='&YOCTO_GIT_URL;/cgit.cgi'></ulink>.
+            If you look at this web-interface of the repositories, each item
+            is a separate Git repository.
+        </para>
+
+        <para>
+            Git repositories use branching techniques that track content
+            change (not files) within a project (e.g. a new feature or updated
+            documentation).
+            Creating a tree-like structure based on project divergence allows
+            for excellent historical information over the life of a project.
+            This methodology also allows for an environment from which you can
+            do lots of local experimentation on projects as you develop
+            changes or new features.
+        </para>
+
+        <para>
+            A Git repository represents all development efforts for a given
+            project.
+            For example, the Git repository <filename>poky</filename> contains
+            all changes and developments for Poky over the course of its
+            entire life.
+            That means that all changes that make up all releases are captured.
+            The repository maintains a complete history of changes.
+        </para>
+
+        <para>
+            You can create a local copy of any repository by "cloning" it
+            with the <filename>git clone</filename> command.
+            When you clone a Git repository, you end up with an identical
+            copy of the repository on your development system.
+            Once you have a local copy of a repository, you can take steps to
+            develop locally.
+            For examples on how to clone Git repositories, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#working-with-yocto-project-source-files'>Working With Yocto Project Source Files</ulink>"
+            section in the Yocto Project Development Tasks Manual.
+        </para>
+
+        <para>
+            It is important to understand that Git tracks content change and
+            not files.
+            Git uses "branches" to organize different development efforts.
+            For example, the <filename>poky</filename> repository has
+            several branches that include the current "&DISTRO_NAME_NO_CAP;"
+            branch, the "master" branch, and many branches for past
+            Yocto Project releases.
+            You can see all the branches by going to
+            <ulink url='&YOCTO_GIT_URL;/cgit.cgi/poky/'></ulink> and
+            clicking on the
+            <filename><ulink url='&YOCTO_GIT_URL;/cgit.cgi/poky/refs/heads'>[...]</ulink></filename>
+            link beneath the "Branch" heading.
+        </para>
+
+        <para>
+            Each of these branches represents a specific area of development.
+            The "master" branch represents the current or most recent
+            development.
+            All other branches represent offshoots of the "master" branch.
+        </para>
+
+        <para>
+            When you create a local copy of a Git repository, the copy has
+            the same set of branches as the original.
+            This means you can use Git to create a local working area
+            (also called a branch) that tracks a specific development branch
+            from the upstream source Git repository.
+            in other words, you can define your local Git environment to
+            work on any development branch in the repository.
+            To help illustrate, consider the following example Git commands:
+            <literallayout class='monospaced'>
+     $ cd ~
+     $ git clone git://git.yoctoproject.org/poky
+     $ cd poky
+     $ git checkout -b &DISTRO_NAME_NO_CAP; origin/&DISTRO_NAME_NO_CAP;
+            </literallayout>
+            In the previous example after moving to the home directory, the
+            <filename>git clone</filename> command creates a
+            local copy of the upstream <filename>poky</filename> Git repository.
+            By default, Git checks out the "master" branch for your work.
+            After changing the working directory to the new local repository
+            (i.e. <filename>poky</filename>), the
+            <filename>git checkout</filename> command creates
+            and checks out a local branch named "&DISTRO_NAME_NO_CAP;", which
+            tracks the upstream "origin/&DISTRO_NAME_NO_CAP;" branch.
+            Changes you make while in this branch would ultimately affect
+            the upstream "&DISTRO_NAME_NO_CAP;" branch of the
+            <filename>poky</filename> repository.
+        </para>
+
+        <para>
+            It is important to understand that when you create and checkout a
+            local working branch based on a branch name,
+            your local environment matches the "tip" of that particular
+            development branch at the time you created your local branch,
+            which could be different from the files in the "master" branch
+            of the upstream repository.
+            In other words, creating and checking out a local branch based on
+            the "&DISTRO_NAME_NO_CAP;" branch name is not the same as
+            cloning and checking out the "master" branch if the repository.
+            Keep reading to see how you create a local snapshot of a Yocto
+            Project Release.
+        </para>
+
+        <para>
+            Git uses "tags" to mark specific changes in a repository.
+            Typically, a tag is used to mark a special point such as the final
+            change before a project is released.
+            You can see the tags used with the <filename>poky</filename> Git
+            repository by going to
+            <ulink url='&YOCTO_GIT_URL;/cgit.cgi/poky/'></ulink> and
+            clicking on the
+            <filename><ulink url='&YOCTO_GIT_URL;/cgit.cgi/poky/refs/tags'>[...]</ulink></filename>
+            link beneath the "Tag" heading.
+        </para>
+
+        <para>
+            Some key tags for the <filename>poky</filename> are
+            <filename>jethro-14.0.3</filename>,
+            <filename>morty-16.0.1</filename>,
+            <filename>pyro-17.0.0</filename>, and
+            <filename>&DISTRO_NAME_NO_CAP;-&POKYVERSION;</filename>.
+            These tags represent Yocto Project releases.
+        </para>
+
+        <para>
+            When you create a local copy of the Git repository, you also
+            have access to all the tags in the upstream repository.
+            Similar to branches, you can create and checkout a local working
+            Git branch based on a tag name.
+            When you do this, you get a snapshot of the Git repository that
+            reflects the state of the files when the change was made associated
+            with that tag.
+            The most common use is to checkout a working branch that matches
+            a specific Yocto Project release.
+            Here is an example:
+            <literallayout class='monospaced'>
+     $ cd ~
+     $ git clone git://git.yoctoproject.org/poky
+     $ cd poky
+     $ git fetch --all --tags --prune
+     $ git checkout tags/pyro-17.0.0 -b my-pyro-17.0.0
+            </literallayout>
+            In this example, the name of the top-level directory of your
+            local Yocto Project repository is <filename>poky</filename>.
+            After moving to the <filename>poky</filename> directory, the
+            <filename>git fetch</filename> command makes all the upstream
+            tags available locally in your repository.
+            Finally, the <filename>git checkout</filename> command
+            creates and checks out a branch named "my-pyro-17.0.0" that is
+            based on the specific change upstream in the repository
+            associated with the "pyro-17.0.0" tag.
+            The files in your repository now exactly match that particular
+            Yocto Project release as it is tagged in the upstream Git
+            repository.
+            It is important to understand that when you create and
+            checkout a local working branch based on a tag, your environment
+            matches a specific point in time and not the entire development
+            branch (i.e. the "tip" of the branch).
+        </para>
+    </section>
+
+    <section id='basic-commands'>
+        <title>Basic Commands</title>
+
+        <para>
+            Git has an extensive set of commands that lets you manage changes
+            and perform collaboration over the life of a project.
+            Conveniently though, you can manage with a small set of basic
+            operations and workflows once you understand the basic
+            philosophy behind Git.
+            You do not have to be an expert in Git to be functional.
+            A good place to look for instruction on a minimal set of Git
+            commands is
+            <ulink url='http://git-scm.com/documentation'>here</ulink>.
+        </para>
+
+        <para>
+            If you do not know much about Git, you should educate
+            yourself by visiting the links previously mentioned.
+        </para>
+
+        <para>
+            The following list of Git commands briefly describes some basic
+            Git operations as a way to get started.
+            As with any set of commands, this list (in most cases) simply shows
+            the base command and omits the many arguments they support.
+            See the Git documentation for complete descriptions and strategies
+            on how to use these commands:
+            <itemizedlist>
+                <listitem><para>
+                    <emphasis><filename>git init</filename>:</emphasis>
+                    Initializes an empty Git repository.
+                    You cannot use Git commands unless you have a
+                    <filename>.git</filename> repository.
+                    </para></listitem>
+                <listitem><para id='git-commands-clone'>
+                    <emphasis><filename>git clone</filename>:</emphasis>
+                    Creates a local clone of a Git repository that is on
+                    equal footing with a fellow developer’s Git repository
+                    or an upstream repository.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git add</filename>:</emphasis>
+                    Locally stages updated file contents to the index that
+                    Git uses to track changes.
+                    You must stage all files that have changed before you
+                    can commit them.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git commit</filename>:</emphasis>
+                    Creates a local "commit" that documents the changes you
+                    made.
+                    Only changes that have been staged can be committed.
+                    Commits are used for historical purposes, for determining
+                    if a maintainer of a project will allow the change,
+                    and for ultimately pushing the change from your local
+                    Git repository into the project’s upstream repository.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git status</filename>:</emphasis>
+                    Reports any modified files that possibly need to be
+                    staged and gives you a status of where you stand regarding
+                    local commits as compared to the upstream repository.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git checkout</filename> <replaceable>branch-name</replaceable>:</emphasis>
+                    Changes your working branch.
+                    This command is analogous to "cd".
+                    </para></listitem>
+                <listitem><para><emphasis><filename>git checkout –b</filename> <replaceable>working-branch</replaceable>:</emphasis>
+                    Creates and checks out a working branch on your local
+                    machine that you can use to isolate your work.
+                    It is a good idea to use local branches when adding
+                    specific features or changes.
+                    Using isolated branches facilitates easy removal of
+                    changes if they do not work out.
+                    </para></listitem>
+                <listitem><para><emphasis><filename>git branch</filename>:</emphasis>
+                    Displays the existing local branches associated with your
+                    local repository.
+                    The branch that you have currently checked out is noted
+                    with an asterisk character.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git branch -D</filename> <replaceable>branch-name</replaceable>:</emphasis>
+                    Deletes an existing local branch.
+                    You need to be in a local branch other than the one you
+                    are deleting in order to delete
+                    <replaceable>branch-name</replaceable>.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git pull</filename>:</emphasis>
+                    Retrieves information from an upstream Git repository
+                    and places it in your local Git repository.
+                    You use this command to make sure you are synchronized with
+                    the repository from which you are basing changes
+                    (.e.g. the "master" branch).
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git push</filename>:</emphasis>
+                    Sends all your committed local changes to the upstream Git
+                    repository that your local repository is tracking
+                    (e.g. a contribution repository).
+                    The maintainer of the project draws from these repositories
+                    to merge changes (commits) into the appropriate branch
+                    of project's upstream repository.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git merge</filename>:</emphasis>
+                    Combines or adds changes from one
+                    local branch of your repository with another branch.
+                    When you create a local Git repository, the default branch
+                    is named "master".
+                    A typical workflow is to create a temporary branch that is
+                    based off "master" that you would use for isolated work.
+                    You would make your changes in that isolated branch,
+                    stage and commit them locally, switch to the "master"
+                    branch, and then use the <filename>git merge</filename>
+                    command to apply the changes from your isolated branch
+                    into the currently checked out branch (e.g. "master").
+                    After the merge is complete and if you are done with
+                    working in that isolated branch, you can safely delete
+                    the isolated branch.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git cherry-pick</filename>:</emphasis>
+                    Choose and apply specific commits from one branch
+                    into another branch.
+                    There are times when you might not be able to merge
+                    all the changes in one branch with
+                    another but need to pick out certain ones.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>gitk</filename>:</emphasis>
+                    Provides a GUI view of the branches and changes in your
+                    local Git repository.
+                    This command is a good way to graphically see where things
+                    have diverged in your local repository.
+                    <note>
+                        You need to install the <filename>gitk</filename>
+                        package on your development system to use this
+                        command.
+                    </note>
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git log</filename>:</emphasis>
+                    Reports a history of your commits to the repository.
+                    This report lists all commits regardless of whether you
+                    have pushed them upstream or not.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>git diff</filename>:</emphasis>
+                    Displays line-by-line differences between a local
+                    working file and the same file as understood by Git.
+                    This command is useful to see what you have changed
+                    in any given file.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
+
+<section id='yocto-project-repositories'>
+    <title>Yocto Project Source Repositories</title>
+
+    <para>
+        The Yocto Project team maintains complete source repositories for all
+        Yocto Project files at
+        <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi'></ulink>.
+        This web-based source code browser is organized into categories by
+        function such as IDE Plugins, Matchbox, Poky, Yocto Linux Kernel, and
+        so forth.
+        From the interface, you can click on any particular item in the "Name"
+        column and see the URL at the bottom of the page that you need to clone
+        a Git repository for that particular item.
+        Having a local Git repository of the
+        <link linkend='source-directory'>Source Directory</link>, which is
+        usually named "poky", allows
+        you to make changes, contribute to the history, and ultimately enhance
+        the Yocto Project's tools, Board Support Packages, and so forth.
+    </para>
+
+    <para>
+        For any supported release of Yocto Project, you can also go to the
+        <ulink url='&YOCTO_HOME_URL;'>Yocto Project Website</ulink> and
+        select the "Downloads" tab and get a released tarball of the
+        <filename>poky</filename> repository or any supported BSP tarballs.
+        Unpacking these tarballs gives you a snapshot of the released
+        files.
+        <note><title>Notes</title>
+            <itemizedlist>
+                <listitem><para>
+                    The recommended method for setting up the Yocto Project
+                    <link linkend='source-directory'>Source Directory</link>
+                    and the files for supported BSPs
+                    (e.g., <filename>meta-intel</filename>) is to use
+                    <link linkend='git'>Git</link> to create a local copy of
+                    the upstream repositories.
+                    </para></listitem>
+                <listitem><para>
+                    Be sure to always work in matching branches for both
+                    the selected BSP repository and the
+                    <link linkend='source-directory'>Source Directory</link>
+                    (i.e. <filename>poky</filename>) repository.
+                    For example, if you have checked out the "master" branch
+                    of <filename>poky</filename> and you are going to use
+                    <filename>meta-intel</filename>, be sure to checkout the
+                    "master" branch of <filename>meta-intel</filename>.
+                    </para></listitem>
+            </itemizedlist>
+        </note>
+    </para>
+
+    <para>
+        In summary, here is where you can get the project files needed for
+        development:
+        <itemizedlist>
+            <listitem><para id='source-repositories'>
+                <emphasis>
+                <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi'>Source Repositories:</ulink>
+                </emphasis>
+                This area contains IDE Plugins, Matchbox, Poky, Poky Support,
+                Tools, Yocto Linux Kernel, and Yocto Metadata Layers.
+                You can create local copies of Git repositories for each of
+                these areas.</para>
+
+                <para>
+                <imagedata fileref="figures/source-repos.png" align="center" width="6in" depth="4in" />
+                For steps on how to view and access these upstream Git
+                repositories, see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#accessing-source-repositories'>Accessing Source Repositories</ulink>"
+                Section in the Yocto Project Development Tasks Manual.
+                </para></listitem>
+            <listitem><para><anchor id='index-downloads' />
+                <emphasis>
+                <ulink url='&YOCTO_DL_URL;/releases/'>Index of /releases:</ulink>
+                </emphasis>
+                This is an index of releases such as
+                the <trademark class='trade'>Eclipse</trademark>
+                Yocto Plug-in, miscellaneous support, Poky, Pseudo, installers
+                for cross-development toolchains, and all released versions of
+                Yocto Project in the form of images or tarballs.
+                Downloading and extracting these files does not produce a local
+                copy of the Git repository but rather a snapshot of a
+                particular release or image.</para>
+
+                <para>
+                <imagedata fileref="figures/index-downloads.png" align="center" width="6in" depth="3.5in" />
+                For steps on how to view and access these files, see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#accessing-index-of-releases'>Accessing Index of Releases</ulink>"
+                section in the Yocto Project Development Tasks Manual.
+                </para></listitem>
+            <listitem><para id='downloads-page'>
+                <emphasis>"Downloads" page for the
+                <ulink url='&YOCTO_HOME_URL;'>Yocto Project Website</ulink>:
+                </emphasis></para>
+
+                <para role="writernotes">This section will change due to
+                reworking of the YP Website.</para>
+
+                <para>The Yocto Project website includes a "Downloads" tab
+                that allows you to download any Yocto Project
+                release and Board Support Package (BSP) in tarball form.
+                The tarballs are similar to those found in the
+                <ulink url='&YOCTO_DL_URL;/releases/'>Index of /releases:</ulink> area.</para>
+
+                <para>
+                <imagedata fileref="figures/yp-download.png" align="center" width="6in" depth="4in" />
+                For steps on how to use the "Downloads" page, see the
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#using-the-downloads-page'>Using the Downloads Page</ulink>"
+                section in the Yocto Project Development Tasks Manual.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id='licensing'>
+    <title>Licensing</title>
+
+    <para>
+        Because open source projects are open to the public, they have
+        different licensing structures in place.
+        License evolution for both Open Source and Free Software has an
+        interesting history.
+        If you are interested in this history, you can find basic information
+        here:
+        <itemizedlist>
+            <listitem><para>
+                <ulink url='http://en.wikipedia.org/wiki/Open-source_license'>Open source license history</ulink>
+                </para></listitem>
+            <listitem><para>
+                <ulink url='http://en.wikipedia.org/wiki/Free_software_license'>Free software license history</ulink>
+                </para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        In general, the Yocto Project is broadly licensed under the
+        Massachusetts Institute of Technology (MIT) License.
+        MIT licensing permits the reuse of software within proprietary
+        software as long as the license is distributed with that software.
+        MIT is also compatible with the GNU General Public License (GPL).
+        Patches to the Yocto Project follow the upstream licensing scheme.
+        You can find information on the MIT license
+        <ulink url='http://www.opensource.org/licenses/mit-license.php'>here</ulink>.
+        You can find information on the GNU GPL
+        <ulink url='http://www.opensource.org/licenses/LGPL-3.0'>here</ulink>.
+    </para>
+
+    <para>
+        When you build an image using the Yocto Project, the build process
+        uses a known list of licenses to ensure compliance.
+        You can find this list in the
+        <link linkend='source-directory'>Source Directory</link> at
+        <filename>meta/files/common-licenses</filename>.
+        Once the build completes, the list of all licenses found and used
+        during that build are kept in the
+        <link linkend='build-directory'>Build Directory</link>
+        at <filename>tmp/deploy/licenses</filename>.
+    </para>
+
+    <para>
+        If a module requires a license that is not in the base list, the
+        build process generates a warning during the build.
+        These tools make it easier for a developer to be certain of the
+        licenses with which their shipped products must comply.
+        However, even with these tools it is still up to the developer to
+        resolve potential licensing issues.
+    </para>
+
+    <para>
+        The base list of licenses used by the build process is a combination
+        of the Software Package Data Exchange (SPDX) list and the Open
+        Source Initiative (OSI) projects.
+        <ulink url='http://spdx.org'>SPDX Group</ulink> is a working group of
+        the Linux Foundation that maintains a specification for a standard
+        format for communicating the components, licenses, and copyrights
+        associated with a software package.
+        <ulink url='http://opensource.org'>OSI</ulink> is a corporation
+        dedicated to the Open Source Definition and the effort for reviewing
+        and approving licenses that conform to the Open Source Definition
+        (OSD).
+    </para>
+
+    <para>
+        You can find a list of the combined SPDX and OSI licenses that the
+        Yocto Project uses in the
+        <filename>meta/files/common-licenses</filename> directory in your
+        <link linkend='source-directory'>Source Directory</link>.
+    </para>
+
+    <para>
+        For information that can help you maintain compliance with various
+        open source licensing during the lifecycle of a product created using
+        the Yocto Project, see the
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#maintaining-open-source-license-compliance-during-your-products-lifecycle'>Maintaining Open Source License Compliance During Your Product's Lifecycle</ulink>"
+        section in the Yocto Project Development Tasks Manual.
+    </para>
+</section>
+
+<section id='recipe-syntax'>
+    <title>Recipe Syntax</title>
+
+    <para>
+        Understanding recipe file syntax is important for
+        writing recipes.
+        The following list overviews the basic items that make up a
+        BitBake recipe file.
+        For more complete BitBake syntax descriptions, see the
+        "<ulink url='&YOCTO_DOCS_BB_URL;#bitbake-user-manual-metadata'>Syntax and Operators</ulink>"
+        chapter of the BitBake User Manual.
+        <itemizedlist>
+            <listitem><para><emphasis>Variable Assignments and Manipulations:</emphasis>
+                Variable assignments allow a value to be assigned to a
+                variable.
+                The assignment can be static text or might include
+                the contents of other variables.
+                In addition to the assignment, appending and prepending
+                operations are also supported.</para>
+                <para>The following example shows some of the ways
+                you can use variables in recipes:
+                <literallayout class='monospaced'>
+     S = "${WORKDIR}/postfix-${PV}"
+     CFLAGS += "-DNO_ASM"
+     SRC_URI_append = " file://fixup.patch"
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Functions:</emphasis>
+                Functions provide a series of actions to be performed.
+                You usually use functions to override the default
+                implementation of a task function or to complement
+                a default function (i.e. append or prepend to an
+                existing function).
+                Standard functions use <filename>sh</filename> shell
+                syntax, although access to OpenEmbedded variables and
+                internal methods are also available.</para>
+                <para>The following is an example function from the
+                <filename>sed</filename> recipe:
+                <literallayout class='monospaced'>
+     do_install () {
+         autotools_do_install
+         install -d ${D}${base_bindir}
+         mv ${D}${bindir}/sed ${D}${base_bindir}/sed
+         rmdir ${D}${bindir}/
+     }
+                </literallayout>
+                It is also possible to implement new functions that
+                are called between existing tasks as long as the
+                new functions are not replacing or complementing the
+                default functions.
+                You can implement functions in Python
+                instead of shell.
+                Both of these options are not seen in the majority of
+                recipes.</para></listitem>
+            <listitem><para><emphasis>Keywords:</emphasis>
+                BitBake recipes use only a few keywords.
+                You use keywords to include common
+                functions (<filename>inherit</filename>), load parts
+                of a recipe from other files
+                (<filename>include</filename> and
+                <filename>require</filename>) and export variables
+                to the environment (<filename>export</filename>).</para>
+                <para>The following example shows the use of some of
+                these keywords:
+                <literallayout class='monospaced'>
+     export POSTCONF = "${STAGING_BINDIR}/postconf"
+     inherit autoconf
+     require otherfile.inc
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Comments:</emphasis>
+                Any lines that begin with the hash character
+                (<filename>#</filename>) are treated as comment lines
+                and are ignored:
+                <literallayout class='monospaced'>
+     # This is a comment
+                </literallayout>
+                </para></listitem>
+        </itemizedlist>
+    </para>
+
+    <para>
+        This next list summarizes the most important and most commonly
+        used parts of the recipe syntax.
+        For more information on these parts of the syntax, you can
+        reference the
+        <ulink url='&YOCTO_DOCS_BB_URL;#bitbake-user-manual-metadata'>Syntax and Operators</ulink>
+        chapter in the BitBake User Manual.
+        <itemizedlist>
+            <listitem><para><emphasis>Line Continuation: <filename>\</filename></emphasis> -
+                Use the backward slash (<filename>\</filename>)
+                character to split a statement over multiple lines.
+                Place the slash character at the end of the line that
+                is to be continued on the next line:
+                <literallayout class='monospaced'>
+     VAR = "A really long \
+            line"
+                </literallayout>
+                <note>
+                    You cannot have any characters including spaces
+                    or tabs after the slash character.
+                </note>
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Using Variables: <filename>${...}</filename></emphasis> -
+                Use the <filename>${<replaceable>VARNAME</replaceable>}</filename> syntax to
+                access the contents of a variable:
+                <literallayout class='monospaced'>
+     SRC_URI = "${SOURCEFORGE_MIRROR}/libpng/zlib-${PV}.tar.gz"
+                </literallayout>
+                <note>
+                    It is important to understand that the value of a
+                    variable expressed in this form does not get
+                    substituted automatically.
+                    The expansion of these expressions happens
+                    on-demand later (e.g. usually when a function that
+                    makes reference to the variable executes).
+                    This behavior ensures that the values are most
+                    appropriate for the context in which they are
+                    finally used.
+                    On the rare occasion that you do need the variable
+                    expression to be expanded immediately, you can use
+                    the <filename>:=</filename> operator instead of
+                    <filename>=</filename> when you make the
+                    assignment, but this is not generally needed.
+                </note>
+                </para></listitem>
+            <listitem><para><emphasis>Quote All Assignments: <filename>"<replaceable>value</replaceable>"</filename></emphasis> -
+                Use double quotes around the value in all variable
+                assignments.
+                <literallayout class='monospaced'>
+     VAR1 = "${OTHERVAR}"
+     VAR2 = "The version is ${PV}"
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Conditional Assignment: <filename>?=</filename></emphasis> -
+                Conditional assignment is used to assign a value to
+                a variable, but only when the variable is currently
+                unset.
+                Use the question mark followed by the equal sign
+                (<filename>?=</filename>) to make a "soft" assignment
+                used for conditional assignment.
+                Typically, "soft" assignments are used in the
+                <filename>local.conf</filename> file for variables
+                that are allowed to come through from the external
+                environment.
+                </para>
+                <para>Here is an example where
+                <filename>VAR1</filename> is set to "New value" if
+                it is currently empty.
+                However, if <filename>VAR1</filename> has already been
+                set, it remains unchanged:
+                <literallayout class='monospaced'>
+     VAR1 ?= "New value"
+                </literallayout>
+                In this next example, <filename>VAR1</filename>
+                is left with the value "Original value":
+                <literallayout class='monospaced'>
+     VAR1 = "Original value"
+     VAR1 ?= "New value"
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Appending: <filename>+=</filename></emphasis> -
+                Use the plus character followed by the equals sign
+                (<filename>+=</filename>) to append values to existing
+                variables.
+                <note>
+                    This operator adds a space between the existing
+                    content of the variable and the new content.
+                </note></para>
+                <para>Here is an example:
+                <literallayout class='monospaced'>
+     SRC_URI += "file://fix-makefile.patch"
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Prepending: <filename>=+</filename></emphasis> -
+                Use the equals sign followed by the plus character
+                (<filename>=+</filename>) to prepend values to existing
+                variables.
+                <note>
+                    This operator adds a space between the new content
+                    and the existing content of the variable.
+                </note></para>
+                <para>Here is an example:
+                <literallayout class='monospaced'>
+     VAR =+ "Starts"
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Appending: <filename>_append</filename></emphasis> -
+                Use the <filename>_append</filename> operator to
+                append values to existing variables.
+                This operator does not add any additional space.
+                Also, the operator is applied after all the
+                <filename>+=</filename>, and
+                <filename>=+</filename> operators have been applied and
+                after all <filename>=</filename> assignments have
+                occurred.
+                </para>
+                <para>The following example shows the space being
+                explicitly added to the start to ensure the appended
+                value is not merged with the existing value:
+                <literallayout class='monospaced'>
+     SRC_URI_append = " file://fix-makefile.patch"
+                </literallayout>
+                You can also use the <filename>_append</filename>
+                operator with overrides, which results in the actions
+                only being performed for the specified target or
+                machine:
+                <literallayout class='monospaced'>
+     SRC_URI_append_sh4 = " file://fix-makefile.patch"
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Prepending: <filename>_prepend</filename></emphasis> -
+                Use the <filename>_prepend</filename> operator to
+                prepend values to existing variables.
+                This operator does not add any additional space.
+                Also, the operator is applied after all the
+                <filename>+=</filename>, and
+                <filename>=+</filename> operators have been applied and
+                after all <filename>=</filename> assignments have
+                occurred.
+                </para>
+                <para>The following example shows the space being
+                explicitly added to the end to ensure the prepended
+                value is not merged with the existing value:
+                <literallayout class='monospaced'>
+     CFLAGS_prepend = "-I${S}/myincludes "
+                </literallayout>
+                You can also use the <filename>_prepend</filename>
+                operator with overrides, which results in the actions
+                only being performed for the specified target or
+                machine:
+                <literallayout class='monospaced'>
+     CFLAGS_prepend_sh4 = "-I${S}/myincludes "
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Overrides:</emphasis> -
+                You can use overrides to set a value conditionally,
+                typically based on how the recipe is being built.
+                For example, to set the
+                <link linkend='var-KBRANCH'><filename>KBRANCH</filename></link>
+                variable's value to "standard/base" for any target
+                <link linkend='var-MACHINE'><filename>MACHINE</filename></link>,
+                except for qemuarm where it should be set to
+                "standard/arm-versatile-926ejs", you would do the
+                following:
+                <literallayout class='monospaced'>
+     KBRANCH = "standard/base"
+     KBRANCH_qemuarm  = "standard/arm-versatile-926ejs"
+                </literallayout>
+                Overrides are also used to separate alternate values
+                of a variable in other situations.
+                For example, when setting variables such as
+                <link linkend='var-FILES'><filename>FILES</filename></link>
+                and
+                <link linkend='var-RDEPENDS'><filename>RDEPENDS</filename></link>
+                that are specific to individual packages produced by
+                a recipe, you should always use an override that
+                specifies the name of the package.
+                </para></listitem>
+            <listitem><para><emphasis>Indentation:</emphasis>
+                Use spaces for indentation rather than than tabs.
+                For shell functions, both currently work.
+                However, it is a policy decision of the Yocto Project
+                to use tabs in shell functions.
+                Realize that some layers have a policy to use spaces
+                for all indentation.
+                </para></listitem>
+            <listitem><para><emphasis>Using Python for Complex Operations: <filename>${@<replaceable>python_code</replaceable>}</filename></emphasis> -
+                For more advanced processing, it is possible to use
+                Python code during variable assignments (e.g.
+                search and replacement on a variable).</para>
+                <para>You indicate Python code using the
+                <filename>${@<replaceable>python_code</replaceable>}</filename>
+                syntax for the variable assignment:
+                <literallayout class='monospaced'>
+     SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/zip${@d.getVar('PV',1).replace('.', '')}.tgz
+                </literallayout>
+                </para></listitem>
+            <listitem><para><emphasis>Shell Function Syntax:</emphasis>
+                Write shell functions as if you were writing a shell
+                script when you describe a list of actions to take.
+                You should ensure that your script works with a generic
+                <filename>sh</filename> and that it does not require
+                any <filename>bash</filename> or other shell-specific
+                functionality.
+                The same considerations apply to various system
+                utilities (e.g. <filename>sed</filename>,
+                <filename>grep</filename>, <filename>awk</filename>,
+                and so forth) that you might wish to use.
+                If in doubt, you should check with multiple
+                implementations - including those from BusyBox.
+                </para></listitem>
+        </itemizedlist>
+    </para>
+</section>
+
+<section id="development-concepts">
+    <title>Development Concepts</title>
+
+    <para>
+        This section takes a more detailed look inside the development
+        process.
+        The following diagram represents development at a high level.
+        The remainder of this chapter expands on the fundamental input, output,
+        process, and
+        <link linkend='metadata'>Metadata</link>) blocks
+        that make up development in the Yocto Project environment.
+    </para>
+
+    <para id='general-yocto-environment-figure'>
+        <imagedata fileref="figures/yocto-environment-ref.png" align="center" width="8in" depth="4.25in" />
+    </para>
+
+    <para>
+        In general, development consists of several functional areas:
+        <itemizedlist>
+            <listitem><para><emphasis>User Configuration:</emphasis>
+                Metadata you can use to control the build process.
+                </para></listitem>
+            <listitem><para><emphasis>Metadata Layers:</emphasis>
+                Various layers that provide software, machine, and
+                distro Metadata.</para></listitem>
+            <listitem><para><emphasis>Source Files:</emphasis>
+                Upstream releases, local projects, and SCMs.</para></listitem>
+            <listitem><para><emphasis>Build System:</emphasis>
+                Processes under the control of
+                <link linkend='bitbake-term'>BitBake</link>.
+                This block expands on how BitBake fetches source, applies
+                patches, completes compilation, analyzes output for package
+                generation, creates and tests packages, generates images, and
+                generates cross-development tools.</para></listitem>
+            <listitem><para><emphasis>Package Feeds:</emphasis>
+                Directories containing output packages (RPM, DEB or IPK),
+                which are subsequently used in the construction of an image or
+                SDK, produced by the build system.
+                These feeds can also be copied and shared using a web server or
+                other means to facilitate extending or updating existing
+                images on devices at runtime if runtime package management is
+                enabled.</para></listitem>
+            <listitem><para><emphasis>Images:</emphasis>
+                Images produced by the development process.
+                </para></listitem>
+            <listitem><para><emphasis>Application Development SDK:</emphasis>
+                Cross-development tools that are produced along with an image
+                or separately with BitBake.</para></listitem>
+        </itemizedlist>
+    </para>
+
+    <section id="user-configuration">
+        <title>User Configuration</title>
+
+        <para>
+            User configuration helps define the build.
+            Through user configuration, you can tell BitBake the
+            target architecture for which you are building the image,
+            where to store downloaded source, and other build properties.
+        </para>
+
+        <para>
+            The following figure shows an expanded representation of the
+            "User Configuration" box of the
+            <link linkend='general-yocto-environment-figure'>general Yocto Project Development Environment figure</link>:
+        </para>
+
+        <para>
+            <imagedata fileref="figures/user-configuration.png" align="center" />
+        </para>
+
+        <para>
+            BitBake needs some basic configuration files in order to complete
+            a build.
+            These files are <filename>*.conf</filename> files.
+            The minimally necessary ones reside as example files in the
+            <link linkend='source-directory'>Source Directory</link>.
+            For simplicity, this section refers to the Source Directory as
+            the "Poky Directory."
+        </para>
+
+        <para>
+            When you clone the <filename>poky</filename> Git repository or you
+            download and unpack a Yocto Project release, you can set up the
+            Source Directory to be named anything you want.
+            For this discussion, the cloned repository uses the default
+            name <filename>poky</filename>.
+            <note>
+                The Poky repository is primarily an aggregation of existing
+                repositories.
+                It is not a canonical upstream source.
+            </note>
+        </para>
+
+        <para>
+            The <filename>meta-poky</filename> layer inside Poky contains
+            a <filename>conf</filename> directory that has example
+            configuration files.
+            These example files are used as a basis for creating actual
+            configuration files when you source the build environment
+            script
+            (i.e.
+            <link linkend='structure-core-script'><filename>&OE_INIT_FILE;</filename></link>).
+        </para>
+
+        <para>
+            Sourcing the build environment script creates a
+            <link linkend='build-directory'>Build Directory</link>
+            if one does not already exist.
+            BitBake uses the Build Directory for all its work during builds.
+            The Build Directory has a <filename>conf</filename> directory that
+            contains default versions of your <filename>local.conf</filename>
+            and <filename>bblayers.conf</filename> configuration files.
+            These default configuration files are created only if versions
+            do not already exist in the Build Directory at the time you
+            source the build environment setup script.
+        </para>
+
+        <para>
+            Because the Poky repository is fundamentally an aggregation of
+            existing repositories, some users might be familiar with running
+            the <filename>&OE_INIT_FILE;</filename> script in the context
+            of separate OpenEmbedded-Core and BitBake repositories rather than a
+            single Poky repository.
+            This discussion assumes the script is executed from within a cloned
+            or unpacked version of Poky.
+        </para>
+
+        <para>
+            Depending on where the script is sourced, different sub-scripts
+            are called to set up the Build Directory (Yocto or OpenEmbedded).
+            Specifically, the script
+            <filename>scripts/oe-setup-builddir</filename> inside the
+            poky directory sets up the Build Directory and seeds the directory
+            (if necessary) with configuration files appropriate for the
+            Yocto Project development environment.
+            <note>
+                The <filename>scripts/oe-setup-builddir</filename> script
+                uses the <filename>$TEMPLATECONF</filename> variable to
+                determine which sample configuration files to locate.
+            </note>
+        </para>
+
+        <para>
+            The <filename>local.conf</filename> file provides many
+            basic variables that define a build environment.
+            Here is a list of a few.
+            To see the default configurations in a <filename>local.conf</filename>
+            file created by the build environment script, see the
+            <filename>local.conf.sample</filename> in the
+            <filename>meta-poky</filename> layer:
+            <itemizedlist>
+                <listitem><para><emphasis>Parallelism Options:</emphasis>
+                    Controlled by the
+                    <link linkend='var-BB_NUMBER_THREADS'><filename>BB_NUMBER_THREADS</filename></link>,
+                    <link linkend='var-PARALLEL_MAKE'><filename>PARALLEL_MAKE</filename></link>,
+                    and
+                    <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_NUMBER_PARSE_THREADS'><filename>BB_NUMBER_PARSE_THREADS</filename></ulink>
+                    variables.</para></listitem>
+                <listitem><para><emphasis>Target Machine Selection:</emphasis>
+                    Controlled by the
+                    <link linkend='var-MACHINE'><filename>MACHINE</filename></link>
+                    variable.</para></listitem>
+                <listitem><para><emphasis>Download Directory:</emphasis>
+                    Controlled by the
+                    <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+                    variable.</para></listitem>
+                <listitem><para><emphasis>Shared State Directory:</emphasis>
+                    Controlled by the
+                    <link linkend='var-SSTATE_DIR'><filename>SSTATE_DIR</filename></link>
+                    variable.</para></listitem>
+                <listitem><para><emphasis>Build Output:</emphasis>
+                    Controlled by the
+                    <link linkend='var-TMPDIR'><filename>TMPDIR</filename></link>
+                    variable.</para></listitem>
+            </itemizedlist>
+            <note>
+                Configurations set in the <filename>conf/local.conf</filename>
+                file can also be set in the
+                <filename>conf/site.conf</filename> and
+                <filename>conf/auto.conf</filename> configuration files.
+            </note>
+        </para>
+
+        <para>
+            The <filename>bblayers.conf</filename> file tells BitBake what
+            layers you want considered during the build.
+            By default, the layers listed in this file include layers
+            minimally needed by the build system.
+            However, you must manually add any custom layers you have created.
+            You can find more information on working with the
+            <filename>bblayers.conf</filename> file in the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#enabling-your-layer'>Enabling Your Layer</ulink>"
+            section in the Yocto Project Development Tasks Manual.
+        </para>
+
+        <para>
+            The files <filename>site.conf</filename> and
+            <filename>auto.conf</filename> are not created by the environment
+            initialization script.
+            If you want the <filename>site.conf</filename> file, you need to
+            create that yourself.
+            The <filename>auto.conf</filename> file is typically created by
+            an autobuilder:
+            <itemizedlist>
+                <listitem><para><emphasis><filename>site.conf</filename>:</emphasis>
+                    You can use the <filename>conf/site.conf</filename>
+                    configuration file to configure multiple build directories.
+                    For example, suppose you had several build environments and
+                    they shared some common features.
+                    You can set these default build properties here.
+                    A good example is perhaps the packaging format to use
+                    through the
+                    <link linkend='var-PACKAGE_CLASSES'><filename>PACKAGE_CLASSES</filename></link>
+                    variable.</para>
+                    <para>One useful scenario for using the
+                    <filename>conf/site.conf</filename> file is to extend your
+                    <link linkend='var-BBPATH'><filename>BBPATH</filename></link>
+                    variable to include the path to a
+                    <filename>conf/site.conf</filename>.
+                    Then, when BitBake looks for Metadata using
+                    <filename>BBPATH</filename>, it finds the
+                    <filename>conf/site.conf</filename> file and applies your
+                    common configurations found in the file.
+                    To override configurations in a particular build directory,
+                    alter the similar configurations within that build
+                    directory's <filename>conf/local.conf</filename> file.
+                    </para></listitem>
+                <listitem><para><emphasis><filename>auto.conf</filename>:</emphasis>
+                    The file is usually created and written to by
+                    an autobuilder.
+                    The settings put into the file are typically the same as
+                    you would find in the <filename>conf/local.conf</filename>
+                    or the <filename>conf/site.conf</filename> files.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            You can edit all configuration files to further define
+            any particular build environment.
+            This process is represented by the "User Configuration Edits"
+            box in the figure.
+        </para>
+
+        <para>
+            When you launch your build with the
+            <filename>bitbake <replaceable>target</replaceable></filename>
+            command, BitBake sorts out the configurations to ultimately
+            define your build environment.
+            It is important to understand that the OpenEmbedded build system
+            reads the configuration files in a specific order:
+            <filename>site.conf</filename>, <filename>auto.conf</filename>,
+            and <filename>local.conf</filename>.
+            And, the build system applies the normal assignment statement
+            rules.
+            Because the files are parsed in a specific order, variable
+            assignments for the same variable could be affected.
+            For example, if the <filename>auto.conf</filename> file and
+            the <filename>local.conf</filename> set
+            <replaceable>variable1</replaceable> to different values, because
+            the build system parses <filename>local.conf</filename> after
+            <filename>auto.conf</filename>,
+            <replaceable>variable1</replaceable> is assigned the value from
+            the <filename>local.conf</filename> file.
+        </para>
+    </section>
+
+    <section id="metadata-machine-configuration-and-policy-configuration">
+        <title>Metadata, Machine Configuration, and Policy Configuration</title>
+
+        <para>
+            The previous section described the user configurations that
+            define BitBake's global behavior.
+            This section takes a closer look at the layers the build system
+            uses to further control the build.
+            These layers provide Metadata for the software, machine, and
+            policy.
+        </para>
+
+        <para>
+            In general, three types of layer input exist:
+            <itemizedlist>
+                <listitem><para><emphasis>Policy Configuration:</emphasis>
+                    Distribution Layers provide top-level or general
+                    policies for the image or SDK being built.
+                    For example, this layer would dictate whether BitBake
+                    produces RPM or IPK packages.</para></listitem>
+                <listitem><para><emphasis>Machine Configuration:</emphasis>
+                    Board Support Package (BSP) layers provide machine
+                    configurations.
+                    This type of information is specific to a particular
+                    target architecture.</para></listitem>
+                <listitem><para><emphasis>Metadata:</emphasis>
+                    Software layers contain user-supplied recipe files,
+                    patches, and append files.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            The following figure shows an expanded representation of the
+            Metadata, Machine Configuration, and Policy Configuration input
+            (layers) boxes of the
+            <link linkend='general-yocto-environment-figure'>general Yocto Project Development Environment figure</link>:
+        </para>
+
+        <para>
+            <imagedata fileref="figures/layer-input.png" align="center" width="8in" depth="7.5in" />
+        </para>
+
+        <para>
+            In general, all layers have a similar structure.
+            They all contain a licensing file
+            (e.g. <filename>COPYING</filename>) if the layer is to be
+            distributed, a <filename>README</filename> file as good practice
+            and especially if the layer is to be distributed, a
+            configuration directory, and recipe directories.
+        </para>
+
+        <para>
+            The Yocto Project has many layers that can be used.
+            You can see a web-interface listing of them on the
+            <ulink url="http://git.yoctoproject.org/">Source Repositories</ulink>
+            page.
+            The layers are shown at the bottom categorized under
+            "Yocto Metadata Layers."
+            These layers are fundamentally a subset of the
+            <ulink url="http://layers.openembedded.org/layerindex/layers/">OpenEmbedded Metadata Index</ulink>,
+            which lists all layers provided by the OpenEmbedded community.
+            <note>
+                Layers exist in the Yocto Project Source Repositories that
+                cannot be found in the OpenEmbedded Metadata Index.
+                These layers are either deprecated or experimental in nature.
+            </note>
+        </para>
+
+        <para>
+            BitBake uses the <filename>conf/bblayers.conf</filename> file,
+            which is part of the user configuration, to find what layers it
+            should be using as part of the build.
+        </para>
+
+        <para>
+            For more information on layers, see the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and Creating Layers</ulink>"
+            section in the Yocto Project Development Tasks Manual.
+        </para>
+
+        <section id="distro-layer">
+            <title>Distro Layer</title>
+
+            <para>
+                The distribution layer provides policy configurations for your
+                distribution.
+                Best practices dictate that you isolate these types of
+                configurations into their own layer.
+                Settings you provide in
+                <filename>conf/distro/<replaceable>distro</replaceable>.conf</filename> override
+                similar
+                settings that BitBake finds in your
+                <filename>conf/local.conf</filename> file in the Build
+                Directory.
+            </para>
+
+            <para>
+                The following list provides some explanation and references
+                for what you typically find in the distribution layer:
+                <itemizedlist>
+                    <listitem><para><emphasis>classes:</emphasis>
+                        Class files (<filename>.bbclass</filename>) hold
+                        common functionality that can be shared among
+                        recipes in the distribution.
+                        When your recipes inherit a class, they take on the
+                        settings and functions for that class.
+                        You can read more about class files in the
+                        "<link linkend='ref-classes'>Classes</link>" section.
+                        </para></listitem>
+                    <listitem><para><emphasis>conf:</emphasis>
+                        This area holds configuration files for the
+                        layer (<filename>conf/layer.conf</filename>),
+                        the distribution
+                        (<filename>conf/distro/<replaceable>distro</replaceable>.conf</filename>),
+                        and any distribution-wide include files.
+                        </para></listitem>
+                    <listitem><para><emphasis>recipes-*:</emphasis>
+                        Recipes and append files that affect common
+                        functionality across the distribution.
+                        This area could include recipes and append files
+                        to add distribution-specific configuration,
+                        initialization scripts, custom image recipes,
+                        and so forth.</para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id="bsp-layer">
+            <title>BSP Layer</title>
+
+            <para>
+                The BSP Layer provides machine configurations.
+                Everything in this layer is specific to the machine for which
+                you are building the image or the SDK.
+                A common structure or form is defined for BSP layers.
+                You can learn more about this structure in the
+                <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>.
+                <note>
+                    In order for a BSP layer to be considered compliant with the
+                    Yocto Project, it must meet some structural requirements.
+                </note>
+            </para>
+
+            <para>
+                The BSP Layer's configuration directory contains
+                configuration files for the machine
+                (<filename>conf/machine/<replaceable>machine</replaceable>.conf</filename>) and,
+                of course, the layer (<filename>conf/layer.conf</filename>).
+            </para>
+
+            <para>
+                The remainder of the layer is dedicated to specific recipes
+                by function: <filename>recipes-bsp</filename>,
+                <filename>recipes-core</filename>,
+                <filename>recipes-graphics</filename>, and
+                <filename>recipes-kernel</filename>.
+                Metadata can exist for multiple formfactors, graphics
+                support systems, and so forth.
+                <note>
+                    While the figure shows several <filename>recipes-*</filename>
+                    directories, not all these directories appear in all
+                    BSP layers.
+                </note>
+            </para>
+        </section>
+
+        <section id="software-layer">
+            <title>Software Layer</title>
+
+            <para>
+                The software layer provides the Metadata for additional
+                software packages used during the build.
+                This layer does not include Metadata that is specific to the
+                distribution or the machine, which are found in their
+                respective layers.
+            </para>
+
+            <para>
+                This layer contains any new recipes that your project needs
+                in the form of recipe files.
+            </para>
+        </section>
+    </section>
+
+    <section id="sources-dev-environment">
+        <title>Sources</title>
+
+        <para>
+            In order for the OpenEmbedded build system to create an image or
+            any target, it must be able to access source files.
+            The
+            <link linkend='general-yocto-environment-figure'>general Yocto Project Development Environment figure</link>
+            represents source files using the "Upstream Project Releases",
+            "Local Projects", and "SCMs (optional)" boxes.
+            The figure represents mirrors, which also play a role in locating
+            source files, with the "Source Mirror(s)" box.
+        </para>
+
+        <para>
+            The method by which source files are ultimately organized is
+            a function of the project.
+            For example, for released software, projects tend to use tarballs
+            or other archived files that can capture the state of a release
+            guaranteeing that it is statically represented.
+            On the other hand, for a project that is more dynamic or
+            experimental in nature, a project might keep source files in a
+            repository controlled by a Source Control Manager (SCM) such as
+            Git.
+            Pulling source from a repository allows you to control
+            the point in the repository (the revision) from which you want to
+            build software.
+            Finally, a combination of the two might exist, which would give the
+            consumer a choice when deciding where to get source files.
+        </para>
+
+        <para>
+            BitBake uses the
+            <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+            variable to point to source files regardless of their location.
+            Each recipe must have a <filename>SRC_URI</filename> variable
+            that points to the source.
+        </para>
+
+        <para>
+            Another area that plays a significant role in where source files
+            come from is pointed to by the
+            <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+            variable.
+            This area is a cache that can hold previously downloaded source.
+            You can also instruct the OpenEmbedded build system to create
+            tarballs from Git repositories, which is not the default behavior,
+            and store them in the <filename>DL_DIR</filename> by using the
+            <link linkend='var-BB_GENERATE_MIRROR_TARBALLS'><filename>BB_GENERATE_MIRROR_TARBALLS</filename></link>
+            variable.
+        </para>
+
+        <para>
+            Judicious use of a <filename>DL_DIR</filename> directory can
+            save the build system a trip across the Internet when looking
+            for files.
+            A good method for using a download directory is to have
+            <filename>DL_DIR</filename> point to an area outside of your
+            Build Directory.
+            Doing so allows you to safely delete the Build Directory
+            if needed without fear of removing any downloaded source file.
+        </para>
+
+        <para>
+            The remainder of this section provides a deeper look into the
+            source files and the mirrors.
+            Here is a more detailed look at the source file area of the
+            base figure:
+            <imagedata fileref="figures/source-input.png" align="center" width="7in" depth="7.5in" />
+        </para>
+
+        <section id='upstream-project-releases'>
+            <title>Upstream Project Releases</title>
+
+            <para>
+                Upstream project releases exist anywhere in the form of an
+                archived file (e.g. tarball or zip file).
+                These files correspond to individual recipes.
+                For example, the figure uses specific releases each for
+                BusyBox, Qt, and Dbus.
+                An archive file can be for any released product that can be
+                built using a recipe.
+            </para>
+        </section>
+
+        <section id='local-projects'>
+            <title>Local Projects</title>
+
+            <para>
+                Local projects are custom bits of software the user provides.
+                These bits reside somewhere local to a project - perhaps
+                a directory into which the user checks in items (e.g.
+                a local directory containing a development source tree
+                used by the group).
+            </para>
+
+            <para>
+                The canonical method through which to include a local project
+                is to use the
+                <link linkend='ref-classes-externalsrc'><filename>externalsrc</filename></link>
+                class to include that local project.
+                You use either the <filename>local.conf</filename> or a
+                recipe's append file to override or set the
+                recipe to point to the local directory on your disk to pull
+                in the whole source tree.
+            </para>
+
+            <para>
+                For information on how to use the
+                <filename>externalsrc</filename> class, see the
+                "<link linkend='ref-classes-externalsrc'><filename>externalsrc.bbclass</filename></link>"
+                section.
+            </para>
+        </section>
+
+        <section id='scms'>
+            <title>Source Control Managers (Optional)</title>
+
+            <para>
+                Another place the build system can get source files from is
+                through an SCM such as Git or Subversion.
+                In this case, a repository is cloned or checked out.
+                The
+                <link linkend='ref-tasks-fetch'><filename>do_fetch</filename></link>
+                task inside BitBake uses
+                the <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+                variable and the argument's prefix to determine the correct
+                fetcher module.
+            </para>
+
+            <note>
+                For information on how to have the OpenEmbedded build system
+                generate tarballs for Git repositories and place them in the
+                <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+                directory, see the
+                <link linkend='var-BB_GENERATE_MIRROR_TARBALLS'><filename>BB_GENERATE_MIRROR_TARBALLS</filename></link>
+                variable.
+            </note>
+
+            <para>
+                When fetching a repository, BitBake uses the
+                <link linkend='var-SRCREV'><filename>SRCREV</filename></link>
+                variable to determine the specific revision from which to
+                build.
+            </para>
+        </section>
+
+        <section id='source-mirrors'>
+            <title>Source Mirror(s)</title>
+
+            <para>
+                Two kinds of mirrors exist: pre-mirrors and regular mirrors.
+                The <link linkend='var-PREMIRRORS'><filename>PREMIRRORS</filename></link>
+                and
+                <link linkend='var-MIRRORS'><filename>MIRRORS</filename></link>
+                variables point to these, respectively.
+                BitBake checks pre-mirrors before looking upstream for any
+                source files.
+                Pre-mirrors are appropriate when you have a shared directory
+                that is not a directory defined by the
+                <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>
+                variable.
+                A Pre-mirror typically points to a shared directory that is
+                local to your organization.
+            </para>
+
+            <para>
+                Regular mirrors can be any site across the Internet that is
+                used as an alternative location for source code should the
+                primary site not be functioning for some reason or another.
+            </para>
+        </section>
+    </section>
+
+    <section id="package-feeds-dev-environment">
+        <title>Package Feeds</title>
+
+        <para>
+            When the OpenEmbedded build system generates an image or an SDK,
+            it gets the packages from a package feed area located in the
+            <link linkend='build-directory'>Build Directory</link>.
+            The
+            <link linkend='general-yocto-environment-figure'>general Yocto Project Development Environment figure</link>
+            shows this package feeds area in the upper-right corner.
+        </para>
+
+        <para>
+            This section looks a little closer into the package feeds area used
+            by the build system.
+            Here is a more detailed look at the area:
+            <imagedata fileref="figures/package-feeds.png" align="center" width="7in" depth="6in" />
+        </para>
+
+        <para>
+            Package feeds are an intermediary step in the build process.
+            The OpenEmbedded build system provides classes to generate
+            different package types, and you specify which classes to enable
+            through the
+            <link linkend='var-PACKAGE_CLASSES'><filename>PACKAGE_CLASSES</filename></link>
+            variable.
+            Before placing the packages into package feeds,
+            the build process validates them with generated output quality
+            assurance checks through the
+            <link linkend='ref-classes-insane'><filename>insane</filename></link>
+            class.
+        </para>
+
+        <para>
+            The package feed area resides in the Build Directory.
+            The directory the build system uses to temporarily store packages
+            is determined by a combination of variables and the particular
+            package manager in use.
+            See the "Package Feeds" box in the illustration and note the
+            information to the right of that area.
+            In particular, the following defines where package files are
+            kept:
+            <itemizedlist>
+                <listitem><para><link linkend='var-DEPLOY_DIR'><filename>DEPLOY_DIR</filename></link>:
+                    Defined as <filename>tmp/deploy</filename> in the Build
+                    Directory.
+                    </para></listitem>
+                <listitem><para><filename>DEPLOY_DIR_*</filename>:
+                    Depending on the package manager used, the package type
+                    sub-folder.
+                    Given RPM, IPK, or DEB packaging and tarball creation, the
+                    <link linkend='var-DEPLOY_DIR_RPM'><filename>DEPLOY_DIR_RPM</filename></link>,
+                    <link linkend='var-DEPLOY_DIR_IPK'><filename>DEPLOY_DIR_IPK</filename></link>,
+                    <link linkend='var-DEPLOY_DIR_DEB'><filename>DEPLOY_DIR_DEB</filename></link>,
+                    or
+                    <link linkend='var-DEPLOY_DIR_TAR'><filename>DEPLOY_DIR_TAR</filename></link>,
+                    variables are used, respectively.
+                    </para></listitem>
+                <listitem><para><link linkend='var-PACKAGE_ARCH'><filename>PACKAGE_ARCH</filename></link>:
+                    Defines architecture-specific sub-folders.
+                    For example, packages could exist for the i586 or qemux86
+                    architectures.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+
+        <para>
+            BitBake uses the <filename>do_package_write_*</filename> tasks to
+            generate packages and place them into the package holding area (e.g.
+            <filename>do_package_write_ipk</filename> for IPK packages).
+            See the
+            "<link linkend='ref-tasks-package_write_deb'><filename>do_package_write_deb</filename></link>",
+            "<link linkend='ref-tasks-package_write_ipk'><filename>do_package_write_ipk</filename></link>",
+            "<link linkend='ref-tasks-package_write_rpm'><filename>do_package_write_rpm</filename></link>",
+            and
+            "<link linkend='ref-tasks-package_write_tar'><filename>do_package_write_tar</filename></link>"
+            sections for additional information.
+            As an example, consider a scenario where an IPK packaging manager
+            is being used and package architecture support for both i586
+            and qemux86 exist.
+            Packages for the i586 architecture are placed in
+            <filename>build/tmp/deploy/ipk/i586</filename>, while packages for
+            the qemux86 architecture are placed in
+            <filename>build/tmp/deploy/ipk/qemux86</filename>.
+        </para>
+    </section>
+
+    <section id='bitbake-dev-environment'>
+        <title>BitBake</title>
+
+        <para>
+            The OpenEmbedded build system uses
+            <link linkend='bitbake-term'>BitBake</link>
+            to produce images.
+            You can see from the
+            <link linkend='general-yocto-environment-figure'>general Yocto Project Development Environment figure</link>,
+            the BitBake area consists of several functional areas.
+            This section takes a closer look at each of those areas.
+        </para>
+
+        <para>
+            Separate documentation exists for the BitBake tool.
+            See the
+            <ulink url='&YOCTO_DOCS_BB_URL;#bitbake-user-manual'>BitBake User Manual</ulink>
+            for reference material on BitBake.
+        </para>
+
+        <section id='source-fetching-dev-environment'>
+            <title>Source Fetching</title>
+
+            <para>
+                The first stages of building a recipe are to fetch and unpack
+                the source code:
+                <imagedata fileref="figures/source-fetching.png" align="center" width="6.5in" depth="5in" />
+            </para>
+
+            <para>
+                The
+                <link linkend='ref-tasks-fetch'><filename>do_fetch</filename></link>
+                and
+                <link linkend='ref-tasks-unpack'><filename>do_unpack</filename></link>
+                tasks fetch the source files and unpack them into the work
+                directory.
+                <note>
+                    For every local file (e.g. <filename>file://</filename>)
+                    that is part of a recipe's
+                    <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+                    statement, the OpenEmbedded build system takes a checksum
+                    of the file for the recipe and inserts the checksum into
+                    the signature for the <filename>do_fetch</filename>.
+                    If any local file has been modified, the
+                    <filename>do_fetch</filename> task and all tasks that
+                    depend on it are re-executed.
+                </note>
+                By default, everything is accomplished in the
+                <link linkend='build-directory'>Build Directory</link>,
+                which has a defined structure.
+                For additional general information on the Build Directory,
+                see the
+                "<link linkend='structure-core-build'><filename>build/</filename></link>"
+                section.
+            </para>
+
+            <para>
+                Unpacked source files are pointed to by the
+                <link linkend='var-S'><filename>S</filename></link> variable.
+                Each recipe has an area in the Build Directory where the
+                unpacked source code resides.
+                The name of that directory for any given recipe is defined from
+                several different variables.
+                You can see the variables that define these directories
+                by looking at the figure:
+                <itemizedlist>
+                    <listitem><para><link linkend='var-TMPDIR'><filename>TMPDIR</filename></link> -
+                        The base directory where the OpenEmbedded build system
+                        performs all its work during the build.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-PACKAGE_ARCH'><filename>PACKAGE_ARCH</filename></link> -
+                        The architecture of the built package or packages.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-TARGET_OS'><filename>TARGET_OS</filename></link> -
+                        The operating system of the target device.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-PN'><filename>PN</filename></link> -
+                        The name of the built package.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-PV'><filename>PV</filename></link> -
+                        The version of the recipe used to build the package.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-PR'><filename>PR</filename></link> -
+                        The revision of the recipe used to build the package.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link> -
+                        The location within <filename>TMPDIR</filename> where
+                        a specific package is built.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-S'><filename>S</filename></link> -
+                        Contains the unpacked source files for a given recipe.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='patching-dev-environment'>
+            <title>Patching</title>
+
+            <para>
+                Once source code is fetched and unpacked, BitBake locates
+                patch files and applies them to the source files:
+                <imagedata fileref="figures/patching.png" align="center" width="6in" depth="5in" />
+            </para>
+
+            <para>
+                The
+                <link linkend='ref-tasks-patch'><filename>do_patch</filename></link>
+                task processes recipes by
+                using the
+                <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
+                variable to locate applicable patch files, which by default
+                are <filename>*.patch</filename> or
+                <filename>*.diff</filename> files, or any file if
+                "apply=yes" is specified for the file in
+                <filename>SRC_URI</filename>.
+            </para>
+
+            <para>
+                BitBake finds and applies multiple patches for a single recipe
+                in the order in which it finds the patches.
+                Patches are applied to the recipe's source files located in the
+                <link linkend='var-S'><filename>S</filename></link> directory.
+            </para>
+
+            <para>
+                For more information on how the source directories are
+                created, see the
+                "<link linkend='source-fetching-dev-environment'>Source Fetching</link>"
+                section.
+            </para>
+        </section>
+
+        <section id='configuration-and-compilation-dev-environment'>
+            <title>Configuration and Compilation</title>
+
+            <para>
+                After source code is patched, BitBake executes tasks that
+                configure and compile the source code:
+                <imagedata fileref="figures/configuration-compile-autoreconf.png" align="center" width="7in" depth="5in" />
+            </para>
+
+            <para>
+                This step in the build process consists of three tasks:
+                <itemizedlist>
+                    <listitem><para>
+                        <emphasis><link linkend='ref-tasks-prepare_recipe_sysroot'><filename>do_prepare_recipe_sysroot</filename></link>:</emphasis>
+                        This task sets up the two sysroots in
+                        <filename>${</filename><link linkend='var-WORKDIR'><filename>WORKDIR</filename></link><filename>}</filename>
+                        (i.e. <filename>recipe-sysroot</filename> and
+                        <filename>recipe-sysroot-native</filename>) so that
+                        the sysroots contain the contents of the
+                        <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>
+                        tasks of the recipes on which the recipe
+                        containing the tasks depends.
+                        A sysroot exists for both the target and for the native
+                        binaries, which run on the host system.
+                        </para></listitem>
+                    <listitem><para><emphasis><filename>do_configure</filename>:</emphasis>
+                        This task configures the source by enabling and
+                        disabling any build-time and configuration options for
+                        the software being built.
+                        Configurations can come from the recipe itself as well
+                        as from an inherited class.
+                        Additionally, the software itself might configure itself
+                        depending on the target for which it is being built.
+                        </para>
+
+                        <para>The configurations handled by the
+                        <link linkend='ref-tasks-configure'><filename>do_configure</filename></link>
+                        task are specific
+                        to source code configuration for the source code
+                        being built by the recipe.</para>
+
+                        <para>If you are using the
+                        <link linkend='ref-classes-autotools'><filename>autotools</filename></link>
+                        class,
+                        you can add additional configuration options by using
+                        the <link linkend='var-EXTRA_OECONF'><filename>EXTRA_OECONF</filename></link>
+                        or
+                        <link linkend='var-PACKAGECONFIG_CONFARGS'><filename>PACKAGECONFIG_CONFARGS</filename></link>
+                        variables.
+                        For information on how this variable works within
+                        that class, see the
+                        <filename>meta/classes/autotools.bbclass</filename> file.
+                        </para></listitem>
+                    <listitem><para><emphasis><filename>do_compile</filename>:</emphasis>
+                        Once a configuration task has been satisfied, BitBake
+                        compiles the source using the
+                        <link linkend='ref-tasks-compile'><filename>do_compile</filename></link>
+                        task.
+                        Compilation occurs in the directory pointed to by the
+                        <link linkend='var-B'><filename>B</filename></link>
+                        variable.
+                        Realize that the <filename>B</filename> directory is, by
+                        default, the same as the
+                        <link linkend='var-S'><filename>S</filename></link>
+                        directory.</para></listitem>
+                    <listitem><para><emphasis><filename>do_install</filename>:</emphasis>
+                        Once compilation is done, BitBake executes the
+                        <link linkend='ref-tasks-install'><filename>do_install</filename></link>
+                        task.
+                        This task copies files from the <filename>B</filename>
+                        directory and places them in a holding area pointed to
+                        by the
+                        <link linkend='var-D'><filename>D</filename></link>
+                        variable.</para></listitem>
+                </itemizedlist>
+            </para>
+        </section>
+
+        <section id='package-splitting-dev-environment'>
+            <title>Package Splitting</title>
+
+            <para>
+                After source code is configured and compiled, the
+                OpenEmbedded build system analyzes
+                the results and splits the output into packages:
+                <imagedata fileref="figures/analysis-for-package-splitting.png" align="center" width="7in" depth="7in" />
+            </para>
+
+            <para>
+                The
+                <link linkend='ref-tasks-package'><filename>do_package</filename></link>
+                and
+                <link linkend='ref-tasks-packagedata'><filename>do_packagedata</filename></link>
+                tasks combine to analyze
+                the files found in the
+                <link linkend='var-D'><filename>D</filename></link> directory
+                and split them into subsets based on available packages and
+                files.
+                The analyzing process involves the following as well as other
+                items: splitting out debugging symbols,
+                looking at shared library dependencies between packages,
+                and looking at package relationships.
+                The <filename>do_packagedata</filename> task creates package
+                metadata based on the analysis such that the
+                OpenEmbedded build system can generate the final packages.
+                Working, staged, and intermediate results of the analysis
+                and package splitting process use these areas:
+                <itemizedlist>
+                    <listitem><para><link linkend='var-PKGD'><filename>PKGD</filename></link> -
+                        The destination directory for packages before they are
+                        split.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-PKGDATA_DIR'><filename>PKGDATA_DIR</filename></link> -
+                        A shared, global-state directory that holds data
+                        generated during the packaging process.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-PKGDESTWORK'><filename>PKGDESTWORK</filename></link> -
+                        A temporary work area used by the
+                        <filename>do_package</filename> task.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-PKGDEST'><filename>PKGDEST</filename></link> -
+                        The parent directory for packages after they have
+                        been split.
+                        </para></listitem>
+                </itemizedlist>
+                The <link linkend='var-FILES'><filename>FILES</filename></link>
+                variable defines the files that go into each package in
+                <link linkend='var-PACKAGES'><filename>PACKAGES</filename></link>.
+                If you want details on how this is accomplished, you can
+                look at the
+                <link linkend='ref-classes-package'><filename>package</filename></link>
+                class.
+            </para>
+
+            <para>
+                Depending on the type of packages being created (RPM, DEB, or
+                IPK), the <filename>do_package_write_*</filename> task
+                creates the actual packages and places them in the
+                Package Feed area, which is
+                <filename>${TMPDIR}/deploy</filename>.
+                You can see the
+                "<link linkend='package-feeds-dev-environment'>Package Feeds</link>"
+                section for more detail on that part of the build process.
+                <note>
+                    Support for creating feeds directly from the
+                    <filename>deploy/*</filename> directories does not exist.
+                    Creating such feeds usually requires some kind of feed
+                    maintenance mechanism that would upload the new packages
+                    into an official package feed (e.g. the
+                    Ångström distribution).
+                    This functionality is highly distribution-specific
+                    and thus is not provided out of the box.
+                </note>
+            </para>
+        </section>
+
+        <section id='image-generation-dev-environment'>
+            <title>Image Generation</title>
+
+            <para>
+                Once packages are split and stored in the Package Feeds area,
+                the OpenEmbedded build system uses BitBake to generate the
+                root filesystem image:
+                <imagedata fileref="figures/image-generation.png" align="center" width="6in" depth="7in" />
+            </para>
+
+            <para>
+                The image generation process consists of several stages and
+                depends on several tasks and variables.
+                The
+                <link linkend='ref-tasks-rootfs'><filename>do_rootfs</filename></link>
+                task creates the root filesystem (file and directory structure)
+                for an image.
+                This task uses several key variables to help create the list
+                of packages to actually install:
+                <itemizedlist>
+                    <listitem><para><link linkend='var-IMAGE_INSTALL'><filename>IMAGE_INSTALL</filename></link>:
+                        Lists out the base set of packages to install from
+                        the Package Feeds area.</para></listitem>
+                    <listitem><para><link linkend='var-PACKAGE_EXCLUDE'><filename>PACKAGE_EXCLUDE</filename></link>:
+                        Specifies packages that should not be installed.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-IMAGE_FEATURES'><filename>IMAGE_FEATURES</filename></link>:
+                        Specifies features to include in the image.
+                        Most of these features map to additional packages for
+                        installation.</para></listitem>
+                    <listitem><para><link linkend='var-PACKAGE_CLASSES'><filename>PACKAGE_CLASSES</filename></link>:
+                        Specifies the package backend to use and consequently
+                        helps determine where to locate packages within the
+                        Package Feeds area.</para></listitem>
+                    <listitem><para><link linkend='var-IMAGE_LINGUAS'><filename>IMAGE_LINGUAS</filename></link>:
+                        Determines the language(s) for which additional
+                        language support packages are installed.
+                        </para></listitem>
+                    <listitem><para><link linkend='var-PACKAGE_INSTALL'><filename>PACKAGE_INSTALL</filename></link>:
+                        The final list of packages passed to the package manager
+                        for installation into the image.
+                        </para></listitem>
+                </itemizedlist>
+            </para>
+
+            <para>
+                With
+                <link linkend='var-IMAGE_ROOTFS'><filename>IMAGE_ROOTFS</filename></link>
+                pointing to the location of the filesystem under construction and
+                the <filename>PACKAGE_INSTALL</filename> variable providing the
+                final list of packages to install, the root file system is
+                created.
+            </para>
+
+            <para>
+                Package installation is under control of the package manager
+                (e.g. dnf/rpm, opkg, or apt/dpkg) regardless of whether or
+                not package management is enabled for the target.
+                At the end of the process, if package management is not
+                enabled for the target, the package manager's data files
+                are deleted from the root filesystem.
+                As part of the final stage of package installation, postinstall
+                scripts that are part of the packages are run.
+                Any scripts that fail to run
+                on the build host are run on the target when the target system
+                is first booted.
+                If you are using a
+                <ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-read-only-root-filesystem'>read-only root filesystem</ulink>,
+                all the post installation scripts must succeed during the
+                package installation phase since the root filesystem is
+                read-only.
+            </para>
+
+            <para>
+                The final stages of the <filename>do_rootfs</filename> task
+                handle post processing.
+                Post processing includes creation of a manifest file and
+                optimizations.
+            </para>
+
+            <para>
+                The manifest file (<filename>.manifest</filename>) resides
+                in the same directory as the root filesystem image.
+                This file lists out, line-by-line, the installed packages.
+                The manifest file is useful for the
+                <link linkend='ref-classes-testimage*'><filename>testimage</filename></link>
+                class, for example, to determine whether or not to run
+                specific tests.
+                See the
+                <link linkend='var-IMAGE_MANIFEST'><filename>IMAGE_MANIFEST</filename></link>
+                variable for additional information.
+            </para>
+
+            <para>
+                Optimizing processes run across the image include
+                <filename>mklibs</filename>, <filename>prelink</filename>,
+                and any other post-processing commands as defined by the
+                <link linkend='var-ROOTFS_POSTPROCESS_COMMAND'><filename>ROOTFS_POSTPROCESS_COMMAND</filename></link>
+                variable.
+                The <filename>mklibs</filename> process optimizes the size
+                of the libraries, while the
+                <filename>prelink</filename> process optimizes the dynamic
+                linking of shared libraries to reduce start up time of
+                executables.
+            </para>
+
+            <para>
+                After the root filesystem is built, processing begins on
+                the image through the
+                <link linkend='ref-tasks-image'><filename>do_image</filename></link>
+                task.
+                The build system runs any pre-processing commands as defined
+                by the
+                <link linkend='var-IMAGE_PREPROCESS_COMMAND'><filename>IMAGE_PREPROCESS_COMMAND</filename></link>
+                variable.
+                This variable specifies a list of functions to call before
+                the OpenEmbedded build system creates the final image output
+                files.
+            </para>
+
+            <para>
+                The OpenEmbedded build system dynamically creates
+                <filename>do_image_*</filename> tasks as needed, based
+                on the image types specified in the
+                <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
+                variable.
+                The process turns everything into an image file or a set of
+                image files and compresses the root filesystem image to reduce
+                the overall size of the image.
+                The formats used for the root filesystem depend on the
+                <filename>IMAGE_FSTYPES</filename> variable.
+            </para>
+
+            <para>
+                As an example, a dynamically created task when creating a
+                particular image <replaceable>type</replaceable> would take the
+                following form:
+                <literallayout class='monospaced'>
+     do_image_<replaceable>type</replaceable>[depends]
+                </literallayout>
+                So, if the <replaceable>type</replaceable> as specified by the
+                <filename>IMAGE_FSTYPES</filename> were
+                <filename>ext4</filename>, the dynamically generated task
+                would be as follows:
+                <literallayout class='monospaced'>
+     do_image_ext4[depends]
+                </literallayout>
+            </para>
+
+            <para>
+                The final task involved in image creation is the
+                <link linkend='ref-tasks-image-complete'><filename>do_image_complete</filename></link>
+                task.
+                This task completes the image by applying any image
+                post processing as defined through the
+                <link linkend='var-IMAGE_POSTPROCESS_COMMAND'><filename>IMAGE_POSTPROCESS_COMMAND</filename></link>
+                variable.
+                The variable specifies a list of functions to call once the
+                OpenEmbedded build system has created the final image output
+                files.
+            </para>
+
+            <note>
+                The entire image generation process is run under Pseudo.
+                Running under Pseudo ensures that the files in the root
+                filesystem have correct ownership.
+            </note>
+        </section>
+
+        <section id='sdk-generation-dev-environment'>
+            <title>SDK Generation</title>
+
+            <para>
+                The OpenEmbedded build system uses BitBake to generate the
+                Software Development Kit (SDK) installer script for both the
+                standard and extensible SDKs:
+                <imagedata fileref="figures/sdk-generation.png" align="center" />
+            </para>
+
+            <note>
+                For more information on the cross-development toolchain
+                generation, see the
+                "<link linkend='cross-development-toolchain-generation'>Cross-Development Toolchain Generation</link>"
+                section.
+                For information on advantages gained when building a
+                cross-development toolchain using the
+                <link linkend='ref-tasks-populate_sdk'><filename>do_populate_sdk</filename></link>
+                task, see the
+                "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-building-an-sdk-installer'>Building an SDK Installer</ulink>"
+                section in the Yocto Project Application Development and the
+                Extensible Software Development Kit (SDK) manual.
+            </note>
+
+            <para>
+                Like image generation, the SDK script process consists of
+                several stages and depends on many variables.
+                The <filename>do_populate_sdk</filename> and
+                <filename>do_populate_sdk_ext</filename> tasks use these
+                key variables to help create the list of packages to actually
+                install.
+                For information on the variables listed in the figure, see the
+                "<link linkend='sdk-dev-environment'>Application Development SDK</link>"
+                section.
+            </para>
+
+            <para>
+                The <filename>do_populate_sdk</filename> task helps create
+                the standard SDK and handles two parts: a target part and a
+                host part.
+                The target part is the part built for the target hardware and
+                includes libraries and headers.
+                The host part is the part of the SDK that runs on the
+                <link linkend='var-SDKMACHINE'><filename>SDKMACHINE</filename></link>.
+            </para>
+
+            <para>
+                The <filename>do_populate_sdk_ext</filename> task helps create
+                the extensible SDK and handles host and target parts
+                differently than its counter part does for the standard SDK.
+                For the extensible SDK, the task encapsulates the build system,
+                which includes everything needed (host and target) for the SDK.
+            </para>
+
+            <para>
+                Regardless of the type of SDK being constructed, the
+                tasks perform some cleanup after which a cross-development
+                environment setup script and any needed configuration files
+                are created.
+                The final output is the Cross-development
+                toolchain installation script (<filename>.sh</filename> file),
+                which includes the environment setup script.
+            </para>
+        </section>
+
+        <section id='stamp-files-and-the-rerunning-of-tasks'>
+            <title>Stamp Files and the Rerunning of Tasks</title>
+
+            <para>
+                For each task that completes successfully, BitBake writes a
+                stamp file into the
+                <link linkend='var-STAMPS_DIR'><filename>STAMPS_DIR</filename></link>
+                directory.
+                The beginning of the stamp file's filename is determined by the
+                <link linkend='var-STAMP'><filename>STAMP</filename></link>
+                variable, and the end of the name consists of the task's name
+                and current
+                <ulink url='&YOCTO_DOCS_BB_URL;#checksums'>input checksum</ulink>.
+                <note>
+                    This naming scheme assumes that
+                    <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_SIGNATURE_HANDLER'><filename>BB_SIGNATURE_HANDLER</filename></ulink>
+                    is "OEBasicHash", which is almost always the case in
+                    current OpenEmbedded.
+                </note>
+                To determine if a task needs to be rerun, BitBake checks if a
+                stamp file with a matching input checksum exists for the task.
+                If such a stamp file exists, the task's output is assumed to
+                exist and still be valid.
+                If the file does not exist, the task is rerun.
+                <note>
+                    <para>The stamp mechanism is more general than the shared
+                    state (sstate) cache mechanism described in the
+                    "<link linkend='setscene-tasks-and-shared-state'>Setscene Tasks and Shared State</link>"
+                    section.
+                    BitBake avoids rerunning any task that has a valid
+                    stamp file, not just tasks that can be accelerated through
+                    the sstate cache.</para>
+                    <para>However, you should realize that stamp files only
+                    serve as a marker that some work has been done and that
+                    these files do not record task output.
+                    The actual task output would usually be somewhere in
+                    <link linkend='var-TMPDIR'><filename>TMPDIR</filename></link>
+                    (e.g. in some recipe's
+                    <link linkend='var-WORKDIR'><filename>WORKDIR</filename></link>.)
+                    What the sstate cache mechanism adds is a way to cache task
+                    output that can then be shared between build machines.
+                    </para>
+                </note>
+                Since <filename>STAMPS_DIR</filename> is usually a subdirectory
+                of <filename>TMPDIR</filename>, removing
+                <filename>TMPDIR</filename> will also remove
+                <filename>STAMPS_DIR</filename>, which means tasks will
+                properly be rerun to repopulate <filename>TMPDIR</filename>.
+            </para>
+
+            <para>
+                If you want some task to always be considered "out of date",
+                you can mark it with the
+                <ulink url='&YOCTO_DOCS_BB_URL;#variable-flags'><filename>nostamp</filename></ulink>
+                varflag.
+                If some other task depends on such a task, then that task will
+                also always be considered out of date, which might not be what
+                you want.
+            </para>
+
+            <para>
+                For details on how to view information about a task's
+                signature, see the
+                "<link linkend='usingpoky-viewing-task-variable-dependencies'>Viewing Task Variable Dependencies</link>"
+                section.
+            </para>
+        </section>
+
+        <section id='setscene-tasks-and-shared-state'>
+            <title>Setscene Tasks and Shared State</title>
+
+            <para>
+                The description of tasks so far assumes that BitBake needs to
+                build everything and there are no prebuilt objects available.
+                BitBake does support skipping tasks if prebuilt objects are
+                available.
+                These objects are usually made available in the form of a
+                shared state (sstate) cache.
+                <note>
+                    For information on variables affecting sstate, see the
+                    <link linkend='var-SSTATE_DIR'><filename>SSTATE_DIR</filename></link>
+                    and
+                    <link linkend='var-SSTATE_MIRRORS'><filename>SSTATE_MIRRORS</filename></link>
+                    variables.
+                </note>
+            </para>
+
+            <para>
+                The idea of a setscene task (i.e
+                <filename>do_</filename><replaceable>taskname</replaceable><filename>_setscene</filename>)
+                is a version of the task where
+                instead of building something, BitBake can skip to the end
+                result and simply place a set of files into specific locations
+                as needed.
+                In some cases, it makes sense to have a setscene task variant
+                (e.g. generating package files in the
+                <filename>do_package_write_*</filename> task).
+                In other cases, it does not make sense, (e.g. a
+                <link linkend='ref-tasks-patch'><filename>do_patch</filename></link>
+                task or
+                <link linkend='ref-tasks-unpack'><filename>do_unpack</filename></link>
+                task) since the work involved would be equal to or greater than
+                the underlying task.
+            </para>
+
+            <para>
+                In the OpenEmbedded build system, the common tasks that have
+                setscene variants are <link linkend='ref-tasks-package'><filename>do_package</filename></link>,
+                <filename>do_package_write_*</filename>,
+                <link linkend='ref-tasks-deploy'><filename>do_deploy</filename></link>,
+                <link linkend='ref-tasks-packagedata'><filename>do_packagedata</filename></link>,
+                and
+                <link linkend='ref-tasks-populate_sysroot'><filename>do_populate_sysroot</filename></link>.
+                Notice that these are most of the tasks whose output is an
+                end result.
+            </para>
+
+            <para>
+                The OpenEmbedded build system has knowledge of the relationship
+                between these tasks and other tasks that precede them.
+                For example, if BitBake runs
+                <filename>do_populate_sysroot_setscene</filename> for
+                something, there is little point in running any of the
+                <filename>do_fetch</filename>, <filename>do_unpack</filename>,
+                <filename>do_patch</filename>,
+                <filename>do_configure</filename>,
+                <filename>do_compile</filename>, and
+                <filename>do_install</filename> tasks.
+                However, if <filename>do_package</filename> needs to be run,
+                BitBake would need to run those other tasks.
+            </para>
+
+            <para>
+                It becomes more complicated if everything can come from an
+                sstate cache because some objects are simply not required at
+                all.
+                For example, you do not need a compiler or native tools, such
+                as quilt, if there is nothing to compile or patch.
+                If the <filename>do_package_write_*</filename> packages are
+                available from sstate, BitBake does not need the
+                <filename>do_package</filename> task data.
+            </para>
+
+            <para>
+                To handle all these complexities, BitBake runs in two phases.
+                The first is the "setscene" stage.
+                During this stage, BitBake first checks the sstate cache for
+                any targets it is planning to build.
+                BitBake does a fast check to see if the object exists rather
+                than a complete download.
+                If nothing exists, the second phase, which is the setscene
+                stage, completes and the main build proceeds.
+            </para>
+
+            <para>
+                If objects are found in the sstate cache, the OpenEmbedded
+                build system works backwards from the end targets specified
+                by the user.
+                For example, if an image is being built, the OpenEmbedded build
+                system first looks for the packages needed for that image and
+                the tools needed to construct an image.
+                If those are available, the compiler is not needed.
+                Thus, the compiler is not even downloaded.
+                If something was found to be unavailable, or the download or
+                setscene task fails, the OpenEmbedded build system then tries
+                to install dependencies, such as the compiler, from the cache.
+            </para>
+
+            <para>
+                The availability of objects in the sstate cache is handled by
+                the function specified by the
+                <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_HASHCHECK_FUNCTION'><filename>BB_HASHCHECK_FUNCTION</filename></ulink>
+                variable and returns a list of the objects that are available.
+                The function specified by the
+                <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_SETSCENE_DEPVALID'><filename>BB_SETSCENE_DEPVALID</filename></ulink>
+                variable is the function that determines whether a given
+                dependency needs to be followed, and whether for any given
+                relationship the function needs to be passed.
+                The function returns a True or False value.
+            </para>
+        </section>
+    </section>
+
+    <section id='images-dev-environment'>
+        <title>Images</title>
+
+        <para>
+            The images produced by the OpenEmbedded build system
+            are compressed forms of the
+            root filesystem that are ready to boot on a target device.
+            You can see from the
+            <link linkend='general-yocto-environment-figure'>general Yocto Project Development Environment figure</link>
+            that BitBake output, in part, consists of images.
+            This section is going to look more closely at this output:
+            <imagedata fileref="figures/images.png" align="center" width="5.5in" depth="5.5in" />
+        </para>
+
+        <para>
+            For a list of example images that the Yocto Project provides,
+            see the
+            "<link linkend='ref-images'>Images</link>" chapter.
+        </para>
+
+        <para>
+            Images are written out to the
+            <link linkend='build-directory'>Build Directory</link>
+            inside the <filename>tmp/deploy/images/<replaceable>machine</replaceable>/</filename>
+            folder as shown in the figure.
+            This folder contains any files expected to be loaded on the
+            target device.
+            The
+            <link linkend='var-DEPLOY_DIR'><filename>DEPLOY_DIR</filename></link>
+            variable points to the <filename>deploy</filename> directory,
+            while the
+            <link linkend='var-DEPLOY_DIR_IMAGE'><filename>DEPLOY_DIR_IMAGE</filename></link>
+            variable points to the appropriate directory containing images for
+            the current configuration.
+            <itemizedlist>
+                <listitem><para><filename><replaceable>kernel-image</replaceable></filename>:
+                    A kernel binary file.
+                    The <link linkend='var-KERNEL_IMAGETYPE'><filename>KERNEL_IMAGETYPE</filename></link>
+                    variable setting determines the naming scheme for the
+                    kernel image file.
+                    Depending on that variable, the file could begin with
+                    a variety of naming strings.
+                    The <filename>deploy/images/<replaceable>machine</replaceable></filename>
+                    directory can contain multiple image files for the
+                    machine.</para></listitem>
+                <listitem><para><filename><replaceable>root-filesystem-image</replaceable></filename>:
+                    Root filesystems for the target device (e.g.
+                    <filename>*.ext3</filename> or <filename>*.bz2</filename>
+                    files).
+                    The <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>
+                    variable setting determines the root filesystem image
+                    type.
+                    The <filename>deploy/images/<replaceable>machine</replaceable></filename>
+                    directory can contain multiple root filesystems for the
+                    machine.</para></listitem>
+                <listitem><para><filename><replaceable>kernel-modules</replaceable></filename>:
+                    Tarballs that contain all the modules built for the kernel.
+                    Kernel module tarballs exist for legacy purposes and
+                    can be suppressed by setting the
+                    <link linkend='var-MODULE_TARBALL_DEPLOY'><filename>MODULE_TARBALL_DEPLOY</filename></link>
+                    variable to "0".
+                    The <filename>deploy/images/<replaceable>machine</replaceable></filename>
+                    directory can contain multiple kernel module tarballs
+                    for the machine.</para></listitem>
+                <listitem><para><filename><replaceable>bootloaders</replaceable></filename>:
+                    Bootloaders supporting the image, if applicable to the
+                    target machine.
+                    The <filename>deploy/images/<replaceable>machine</replaceable></filename>
+                    directory can contain multiple bootloaders for the
+                    machine.</para></listitem>
+                <listitem><para><filename><replaceable>symlinks</replaceable></filename>:
+                    The <filename>deploy/images/<replaceable>machine</replaceable></filename>
+                    folder contains
+                    a symbolic link that points to the most recently built file
+                    for each machine.
+                    These links might be useful for external scripts that
+                    need to obtain the latest version of each file.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+
+    <section id='sdk-dev-environment'>
+        <title>Application Development SDK</title>
+
+        <para>
+            In the
+            <link linkend='general-yocto-environment-figure'>general Yocto Project Development Environment figure</link>,
+            the output labeled "Application Development SDK" represents an
+            SDK.
+            The SDK generation process differs depending on whether you build
+            a standard SDK
+            (e.g. <filename>bitbake -c populate_sdk</filename> <replaceable>imagename</replaceable>)
+            or an extensible SDK
+            (e.g. <filename>bitbake -c populate_sdk_ext</filename> <replaceable>imagename</replaceable>).
+            This section is going to take a closer look at this output:
+            <imagedata fileref="figures/sdk.png" align="center" width="9in" depth="7.25in" />
+        </para>
+
+        <para>
+            The specific form of this output is a self-extracting
+            SDK installer (<filename>*.sh</filename>) that, when run,
+            installs the SDK, which consists of a cross-development
+            toolchain, a set of libraries and headers, and an SDK
+            environment setup script.
+            Running this installer essentially sets up your
+            cross-development environment.
+            You can think of the cross-toolchain as the "host"
+            part because it runs on the SDK machine.
+            You can think of the libraries and headers as the "target"
+            part because they are built for the target hardware.
+            The environment setup script is added so that you can initialize
+            the environment before using the tools.
+        </para>
+
+        <note><title>Notes</title>
+            <itemizedlist>
+                <listitem><para>
+                    The Yocto Project supports several methods by which you can
+                    set up this cross-development environment.
+                    These methods include downloading pre-built SDK installers
+                    or building and installing your own SDK installer.
+                    </para></listitem>
+                <listitem><para>
+                    For background information on cross-development toolchains
+                    in the Yocto Project development environment, see the
+                    "<link linkend='cross-development-toolchain-generation'>Cross-Development Toolchain Generation</link>"
+                    section.
+                    </para></listitem>
+                <listitem><para>
+                    For information on setting up a cross-development
+                    environment, see the
+                    <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Software Development Kit (SDK) Developer's Guide</ulink>.
+                    </para></listitem>
+            </itemizedlist>
+        </note>
+        <para>
+            Once built, the SDK installers are written out to the
+            <filename>deploy/sdk</filename> folder inside the
+            <link linkend='build-directory'>Build Directory</link>
+            as shown in the figure at the beginning of this section.
+            Depending on the type of SDK, several variables exist that help
+            configure these files.
+            The following list shows the variables associated with a standard
+            SDK:
+            <itemizedlist>
+                <listitem><para><link linkend='var-DEPLOY_DIR'><filename>DEPLOY_DIR</filename></link>:
+                    Points to the <filename>deploy</filename>
+                    directory.</para></listitem>
+                <listitem><para><link linkend='var-SDKMACHINE'><filename>SDKMACHINE</filename></link>:
+                    Specifies the architecture of the machine
+                    on which the cross-development tools are run to
+                    create packages for the target hardware.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDKIMAGE_FEATURES'><filename>SDKIMAGE_FEATURES</filename></link>:
+                    Lists the features to include in the "target" part
+                    of the SDK.
+                    </para></listitem>
+                <listitem><para><link linkend='var-TOOLCHAIN_HOST_TASK'><filename>TOOLCHAIN_HOST_TASK</filename></link>:
+                    Lists packages that make up the host
+                    part of the SDK (i.e. the part that runs on
+                    the <filename>SDKMACHINE</filename>).
+                    When you use
+                    <filename>bitbake -c populate_sdk <replaceable>imagename</replaceable></filename>
+                    to create the SDK, a set of default packages
+                    apply.
+                    This variable allows you to add more packages.
+                    </para></listitem>
+                <listitem><para><link linkend='var-TOOLCHAIN_TARGET_TASK'><filename>TOOLCHAIN_TARGET_TASK</filename></link>:
+                    Lists packages that make up the target part
+                    of the SDK (i.e. the part built for the
+                    target hardware).
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDKPATH'><filename>SDKPATH</filename></link>:
+                    Defines the default SDK installation path offered by the
+                    installation script.
+                    </para></listitem>
+            </itemizedlist>
+            This next list, shows the variables associated with an extensible
+            SDK:
+            <itemizedlist>
+                <listitem><para><link linkend='var-DEPLOY_DIR'><filename>DEPLOY_DIR</filename></link>:
+                    Points to the <filename>deploy</filename> directory.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_EXT_TYPE'><filename>SDK_EXT_TYPE</filename></link>:
+                    Controls whether or not shared state artifacts are copied
+                    into the extensible SDK.
+                    By default, all required shared state artifacts are copied
+                    into the SDK.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_INCLUDE_PKGDATA'><filename>SDK_INCLUDE_PKGDATA</filename></link>:
+                    Specifies whether or not packagedata will be included in
+                    the extensible SDK for all recipes in the "world" target.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_INCLUDE_TOOLCHAIN'><filename>SDK_INCLUDE_TOOLCHAIN</filename></link>:
+                    Specifies whether or not the toolchain will be included
+                    when building the extensible SDK.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_LOCAL_CONF_WHITELIST'><filename>SDK_LOCAL_CONF_WHITELIST</filename></link>:
+                    A list of variables allowed through from the build system
+                    configuration into the extensible SDK configuration.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_LOCAL_CONF_BLACKLIST'><filename>SDK_LOCAL_CONF_BLACKLIST</filename></link>:
+                    A list of variables not allowed through from the build
+                    system configuration into the extensible SDK configuration.
+                    </para></listitem>
+                <listitem><para><link linkend='var-SDK_INHERIT_BLACKLIST'><filename>SDK_INHERIT_BLACKLIST</filename></link>:
+                    A list of classes to remove from the
+                    <link linkend='var-INHERIT'><filename>INHERIT</filename></link>
+                    value globally within the extensible SDK configuration.
+                    </para></listitem>
+            </itemizedlist>
+        </para>
+    </section>
+</section>
+
+</chapter>
+<!--
+vim: expandtab tw=80 ts=4
+-->

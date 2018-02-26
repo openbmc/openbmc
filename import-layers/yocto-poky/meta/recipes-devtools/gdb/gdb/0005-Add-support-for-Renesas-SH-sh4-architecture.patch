@@ -1,4 +1,4 @@
-From 6649e2cccfb11dec076abb02eae0afab95614829 Mon Sep 17 00:00:00 2001
+From 60ac68f601885ea6480229a5c8a89a0257da376c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 02:31:12 +0000
 Subject: [PATCH 05/10] Add support for Renesas SH (sh4) architecture.
@@ -13,7 +13,7 @@ Bug-Debian: http://bugs.debian.org/576242
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- gdb/Makefile.in                      |   1 +
+ gdb/Makefile.in                      |   2 +
  gdb/configure.host                   |   1 +
  gdb/sh-linux-tdep.c                  | 519 +++++++++++++++++++++++++++++++++++
  gdb/sh-tdep.c                        |  54 ++--
@@ -24,25 +24,26 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  gdb/testsuite/gdb.base/annota3.c     |   4 +
  gdb/testsuite/gdb.base/sigall.c      |   3 +
  gdb/testsuite/gdb.base/signals.c     |   4 +
- 11 files changed, 617 insertions(+), 29 deletions(-)
+ 11 files changed, 618 insertions(+), 29 deletions(-)
 
 diff --git a/gdb/Makefile.in b/gdb/Makefile.in
-index 7b2df86878..10f1266fe3 100644
+index 8be73ba423..e287ff6a2e 100644
 --- a/gdb/Makefile.in
 +++ b/gdb/Makefile.in
-@@ -1750,6 +1750,7 @@ ALLDEPFILES = \
- 	score-tdep.c \
- 	ser-go32.c ser-pipe.c ser-tcp.c ser-mingw.c \
- 	sh-tdep.c sh64-tdep.c shnbsd-tdep.c shnbsd-nat.c \
-+	sh-linux-tdep.c sh-linux-nat.c \
+@@ -2638,6 +2638,8 @@ ALLDEPFILES = \
+ 	sh-nbsd-tdep.c \
+ 	sh-tdep.c \
+ 	sh64-tdep.c \
++	sh-linux-tdep.c \
++	sh-linux-nat.c \
  	sol2-tdep.c \
- 	solib-svr4.c \
- 	sparc-linux-nat.c sparc-linux-tdep.c \
+ 	solib-aix.c \
+ 	solib-spu.c \
 diff --git a/gdb/configure.host b/gdb/configure.host
-index ef265ebe29..322a1e2c67 100644
+index d74fd04934..be12de1446 100644
 --- a/gdb/configure.host
 +++ b/gdb/configure.host
-@@ -149,6 +149,7 @@ powerpc*-*-linux*)	gdb_host=linux ;;
+@@ -150,6 +150,7 @@ powerpc*-*-linux*)	gdb_host=linux ;;
  
  s390*-*-linux*)		gdb_host=linux ;;
  
@@ -51,7 +52,7 @@ index ef265ebe29..322a1e2c67 100644
  			gdb_host=nbsd ;;
  sh*-*-openbsd*)		gdb_host=nbsd ;;
 diff --git a/gdb/sh-linux-tdep.c b/gdb/sh-linux-tdep.c
-index 2418d25010..ac8ea9e2a4 100644
+index c5c745d218..84e539aad3 100644
 --- a/gdb/sh-linux-tdep.c
 +++ b/gdb/sh-linux-tdep.c
 @@ -18,14 +18,37 @@
@@ -599,7 +600,7 @@ index 2418d25010..ac8ea9e2a4 100644
  
    /* GNU/Linux uses SVR4-style shared libraries.  */
 diff --git a/gdb/sh-tdep.c b/gdb/sh-tdep.c
-index 694f5f742d..8d54df7a1a 100644
+index 2c2b26847d..14f5281ed4 100644
 --- a/gdb/sh-tdep.c
 +++ b/gdb/sh-tdep.c
 @@ -21,6 +21,9 @@
@@ -620,7 +621,7 @@ index 694f5f742d..8d54df7a1a 100644
  #include "doublest.h"
  #include "osabi.h"
  #include "reggroups.h"
-@@ -67,23 +71,6 @@ static const char *const sh_cc_enum[] = {
+@@ -68,23 +72,6 @@ static const char *const sh_cc_enum[] = {
  
  static const char *sh_active_calling_convention = sh_cc_gcc;
  
@@ -644,7 +645,7 @@ index 694f5f742d..8d54df7a1a 100644
  static int
  sh_is_renesas_calling_convention (struct type *func_type)
  {
-@@ -1043,7 +1030,7 @@ sh_treat_as_flt_p (struct type *type)
+@@ -1052,7 +1039,7 @@ sh_treat_as_flt_p (struct type *type)
      return 0;
    /* Otherwise if the type of that member is float, the whole type is
       treated as float.  */
@@ -653,7 +654,7 @@ index 694f5f742d..8d54df7a1a 100644
      return 1;
    /* Otherwise it's not treated as float.  */
    return 0;
-@@ -1093,7 +1080,7 @@ sh_push_dummy_call_fpu (struct gdbarch *gdbarch,
+@@ -1102,7 +1089,7 @@ sh_push_dummy_call_fpu (struct gdbarch *gdbarch,
       in four registers available.  Loop thru args from first to last.  */
    for (argnum = 0; argnum < nargs; argnum++)
      {
@@ -662,7 +663,7 @@ index 694f5f742d..8d54df7a1a 100644
        len = TYPE_LENGTH (type);
        val = sh_justify_value_in_reg (gdbarch, args[argnum], len);
  
-@@ -1819,7 +1806,7 @@ sh_dwarf2_frame_init_reg (struct gdbarch *gdbarch, int regnum,
+@@ -1828,7 +1815,7 @@ sh_dwarf2_frame_init_reg (struct gdbarch *gdbarch, int regnum,
      reg->how = DWARF2_FRAME_REG_UNDEFINED;
  }
  
@@ -671,7 +672,7 @@ index 694f5f742d..8d54df7a1a 100644
  sh_alloc_frame_cache (void)
  {
    struct sh_frame_cache *cache;
-@@ -1846,7 +1833,7 @@ sh_alloc_frame_cache (void)
+@@ -1855,7 +1842,7 @@ sh_alloc_frame_cache (void)
    return cache;
  }
  
@@ -680,7 +681,7 @@ index 694f5f742d..8d54df7a1a 100644
  sh_frame_cache (struct frame_info *this_frame, void **this_cache)
  {
    struct gdbarch *gdbarch = get_frame_arch (this_frame);
-@@ -1913,9 +1900,9 @@ sh_frame_cache (struct frame_info *this_frame, void **this_cache)
+@@ -1922,9 +1909,9 @@ sh_frame_cache (struct frame_info *this_frame, void **this_cache)
    return cache;
  }
  
@@ -693,7 +694,7 @@ index 694f5f742d..8d54df7a1a 100644
  {
    struct gdbarch *gdbarch = get_frame_arch (this_frame);
    struct sh_frame_cache *cache = sh_frame_cache (this_frame, this_cache);
-@@ -1929,7 +1916,7 @@ sh_frame_prev_register (struct frame_info *this_frame,
+@@ -1938,7 +1925,7 @@ sh_frame_prev_register (struct frame_info *this_frame,
       the current frame.  Frob regnum so that we pull the value from
       the correct place.  */
    if (regnum == gdbarch_pc_regnum (gdbarch))
@@ -702,7 +703,7 @@ index 694f5f742d..8d54df7a1a 100644
  
    if (regnum < SH_NUM_REGS && cache->saved_regs[regnum] != -1)
      return frame_unwind_got_memory (this_frame, regnum,
-@@ -2238,8 +2225,8 @@ sh_return_in_first_hidden_param_p (struct gdbarch *gdbarch,
+@@ -2247,8 +2234,8 @@ sh_return_in_first_hidden_param_p (struct gdbarch *gdbarch,
  static struct gdbarch *
  sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  {
@@ -712,7 +713,7 @@ index 694f5f742d..8d54df7a1a 100644
  
    /* SH5 is handled entirely in sh64-tdep.c.  */
    if (info.bfd_arch_info->mach == bfd_mach_sh5)
-@@ -2255,6 +2242,18 @@ sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -2264,6 +2251,18 @@ sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
    tdep = XCNEW (struct gdbarch_tdep);
    gdbarch = gdbarch_alloc (&info, tdep);
  
@@ -731,7 +732,7 @@ index 694f5f742d..8d54df7a1a 100644
    set_gdbarch_short_bit (gdbarch, 2 * TARGET_CHAR_BIT);
    set_gdbarch_int_bit (gdbarch, 4 * TARGET_CHAR_BIT);
    set_gdbarch_long_bit (gdbarch, 4 * TARGET_CHAR_BIT);
-@@ -2405,10 +2404,11 @@ sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -2418,10 +2417,11 @@ sh_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
        break;
      }
  
@@ -745,7 +746,7 @@ index 694f5f742d..8d54df7a1a 100644
    frame_unwind_append_unwinder (gdbarch, &sh_frame_unwind);
  
 diff --git a/gdb/sh-tdep.h b/gdb/sh-tdep.h
-index 666968f787..62c65b55ea 100644
+index d15ef050e0..c4642cefa4 100644
 --- a/gdb/sh-tdep.h
 +++ b/gdb/sh-tdep.h
 @@ -21,6 +21,12 @@
@@ -828,7 +829,7 @@ index 666968f787..62c65b55ea 100644
       where each general-purpose register is stored inside the associated
       core file section.  */
 diff --git a/gdb/testsuite/gdb.asm/asm-source.exp b/gdb/testsuite/gdb.asm/asm-source.exp
-index 6d9aef81bb..5b66b429d1 100644
+index e07e5543f2..f5e60e1002 100644
 --- a/gdb/testsuite/gdb.asm/asm-source.exp
 +++ b/gdb/testsuite/gdb.asm/asm-source.exp
 @@ -116,6 +116,11 @@ switch -glob -- [istarget] {
@@ -917,5 +918,5 @@ index 756606880f..1205a9bc9c 100644
  static int count = 0;
  
 -- 
-2.11.0
+2.13.1
 

@@ -737,9 +737,7 @@ python fixup_perms () {
     def get_fs_perms_list(d):
         str = ""
         bbpath = d.getVar('BBPATH')
-        fs_perms_tables = d.getVar('FILESYSTEM_PERMS_TABLES')
-        if not fs_perms_tables:
-            fs_perms_tables = 'files/fs-perms.txt'
+        fs_perms_tables = d.getVar('FILESYSTEM_PERMS_TABLES') or ""
         for conf_file in fs_perms_tables.split():
             str += " %s" % bb.utils.which(bbpath, conf_file)
         return str
@@ -879,6 +877,11 @@ python split_and_strip_files () {
         debugdir = "/.debug"
         debuglibdir = ""
         debugsrcdir = ""
+    elif d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-with-srcpkg':
+        debugappend = ""
+        debugdir = "/.debug"
+        debuglibdir = ""
+        debugsrcdir = "/usr/src/debug"
     else:
         # Original OE-core, a.k.a. ".debug", style debug info
         debugappend = ""
@@ -1092,6 +1095,15 @@ python populate_packages () {
     
     autodebug = not (d.getVar("NOAUTOPACKAGEDEBUG") or False)
 
+    split_source_package = (d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-with-srcpkg')
+
+    # If debug-with-srcpkg mode is enabled then the src package is added
+    # into the package list and the source directory as its main content
+    if split_source_package:
+        src_package_name = ('%s-src' % d.getVar('PN'))
+        packages += (' ' + src_package_name)
+        d.setVar('FILES_%s' % src_package_name, '/usr/src/debug')
+
     # Sanity check PACKAGES for duplicates
     # Sanity should be moved to sanity.bbclass once we have the infrastucture
     package_list = []
@@ -1100,7 +1112,12 @@ python populate_packages () {
         if pkg in package_list:
             msg = "%s is listed in PACKAGES multiple times, this leads to packaging errors." % pkg
             package_qa_handle_error("packages-list", msg, d)
-        elif autodebug and pkg.endswith("-dbg"):
+        # If debug-with-srcpkg mode is enabled then the src package will have
+        # priority over dbg package when assigning the files.
+        # This allows src package to include source files and remove them from dbg.
+        elif split_source_package and pkg.endswith("-src"):
+            package_list.insert(0, pkg)
+        elif autodebug and pkg.endswith("-dbg") and not split_source_package:
             package_list.insert(0, pkg)
         else:
             package_list.append(pkg)
@@ -1434,13 +1451,7 @@ if [ x"$D" = "x" ]; then
 fi
 }
 
-# In Morty and earlier releases, and on master (Rocko), the RPM file
-# dependencies are always enabled. However, since they were broken with the
-# release of Pyro and enabling them may cause build problems for some packages,
-# they are not enabled by default in Pyro. Setting ENABLE_RPM_FILEDEPS_FOR_PYRO
-# to "1" will enable them again.
-ENABLE_RPM_FILEDEPS_FOR_PYRO ??= "0"
-RPMDEPS = "${STAGING_LIBDIR_NATIVE}/rpm/rpmdeps${@' --alldeps' if d.getVar('ENABLE_RPM_FILEDEPS_FOR_PYRO') == '1' else ''}"
+RPMDEPS = "${STAGING_LIBDIR_NATIVE}/rpm/rpmdeps --alldeps"
 
 # Collect perfile run-time dependency metadata
 # Output:
@@ -1465,7 +1476,7 @@ python package_do_filedeps() {
     for pkg in packages.split():
         if d.getVar('SKIP_FILEDEPS_' + pkg) == '1':
             continue
-        if pkg.endswith('-dbg') or pkg.endswith('-doc') or pkg.find('-locale-') != -1 or pkg.find('-localedata-') != -1 or pkg.find('-gconv-') != -1 or pkg.find('-charmap-') != -1 or pkg.startswith('kernel-module-'):
+        if pkg.endswith('-dbg') or pkg.endswith('-doc') or pkg.find('-locale-') != -1 or pkg.find('-localedata-') != -1 or pkg.find('-gconv-') != -1 or pkg.find('-charmap-') != -1 or pkg.startswith('kernel-module-') or pkg.endswith('-src'):
             continue
         for files in chunks(pkgfiles[pkg], 100):
             pkglist.append((pkg, files, rpmdeps, pkgdest))
@@ -1583,7 +1594,7 @@ python package_do_shlibs() {
                 combos.append("-".join(options[0:i]))
             return combos
 
-        if (file.endswith('.dylib') or file.endswith('.so')) and not pkg.endswith('-dev') and not pkg.endswith('-dbg'):
+        if (file.endswith('.dylib') or file.endswith('.so')) and not pkg.endswith('-dev') and not pkg.endswith('-dbg') and not pkg.endswith('-src'):
             # Drop suffix
             name = os.path.basename(file).rsplit(".",1)[0]
             # Find all combinations
@@ -2060,7 +2071,7 @@ python do_package () {
     # cache.  This is useful if an item this class depends on changes in a
     # way that the output of this class changes.  rpmdeps is a good example
     # as any change to rpmdeps requires this to be rerun.
-    # PACKAGE_BBCLASS_VERSION = "1"
+    # PACKAGE_BBCLASS_VERSION = "2"
 
     # Init cachedpath
     global cpath

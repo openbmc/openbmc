@@ -1,0 +1,37 @@
+From 52590fbf735cef3fec85a042458aa89a02c52b57 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2017 11:33:12 -0700
+Subject: [PATCH] nicstat.c: Do not define uint64_t and uint32_t
+
+Use the defines from platform
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ nicstat.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/nicstat.c b/nicstat.c
+index 83ad557..2a6e0c1 100644
+--- a/nicstat.c
++++ b/nicstat.c
+@@ -32,6 +32,7 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <unistd.h>
+ #include <string.h>
+ #include <ctype.h>
+@@ -88,8 +89,6 @@
+ #define	PROC_NET_BUFSIZ		(128 * 1024)
+ #define	PROC_UPTIME		"/proc/uptime"
+ /* Needs to be fixed if not built under ILP32 */
+-typedef unsigned long long	uint64_t;
+-typedef unsigned int		uint32_t;
+ extern char *optarg;
+ extern int optind, opterr, optopt;
+ #endif /* OS_LINUX */
+-- 
+2.13.3
+

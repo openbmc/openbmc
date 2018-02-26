@@ -1,0 +1,34 @@
+From e198f0a87660a048164ca0e16d18517d0aee846e Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 9 Jun 2015 12:20:45 -0700
+Subject: [PATCH] Fix builds when using separate source and build directories.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ configure.ac           | 10 +++++-----
+ 1 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a8731b5..54a3c3d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -744,9 +744,9 @@ AC_OUTPUT
+ #
+ # Files copied for windows compilation.
+ #
+-echo "configure: copying \"autoconfig.h\"          to \"build/inc/autoconfig.h\""
+-test -d build/inc || mkdir -p build/inc
+-cp autoconfig.h build/inc/autoconfig.h
+-echo "configure: copying \"upnp/inc/upnpconfig.h\" to \"build/inc/upnpconfig.h\""
+-cp upnp/inc/upnpconfig.h build/inc/upnpconfig.h
++echo "configure: copying \"autoconfig.h\"          to \"\$srcdir/build/inc/autoconfig.h\""
++test -d $srcdir/build/inc || mkdir -p $srcdir/build/inc
++cp autoconfig.h $srcdir/build/inc/autoconfig.h
++echo "configure: copying \"upnp/inc/upnpconfig.h\" to \"\$srcdir/build/inc/upnpconfig.h\""
++cp upnp/inc/upnpconfig.h $srcdir/build/inc/upnpconfig.h
+ 
+-- 
+1.9.1
+

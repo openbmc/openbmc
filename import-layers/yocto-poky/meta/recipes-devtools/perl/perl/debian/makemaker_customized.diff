@@ -4,6 +4,7 @@ Date: Sat, 23 May 2015 21:15:06 +0200
 Subject: Update t/porting/customized.dat for files patched in Debian
 
 Patch-Name: debian/makemaker_customized.diff
+Upstream-Status: Pending
 ---
  t/porting/customized.dat | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)

@@ -1,5 +1,5 @@
 SUMMARY = "Enhances systemd compatilibity with existing SysVinit scripts"
-
+HOMEPAGE = "http://www.freedesktop.org/wiki/Software/systemd"
 LICENSE = "MIT"
 
 PR = "r29"

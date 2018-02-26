@@ -15,6 +15,11 @@ COMPATIBLE_HOST = "(i.86|x86_64).*-linux"
 
 S = "${WORKDIR}/git"
 
+inherit update-alternatives
+
+ALTERNATIVE_PRIORITY = "90"
+ALTERNATIVE_${PN} = "acpixtract"
+
 do_configure[noexec] = "1"
 do_compile() {
     oe_runmake

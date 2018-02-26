@@ -2,15 +2,15 @@ This file contains a list of maintainers for the meta-networking layer.
 
 Please submit any patches against meta-networking to the OpenEmbedded
 development mailing list (openembedded-devel@lists.openembedded.org) with
-'[meta-networking][pyro]' in the subject.
+'[meta-networking][rocko]' in the subject.
 
 When sending single patches, please use something like:
 
    git send-email -1 -M \
         --to openembedded-devel@lists.openembedded.org \
-        --subject-prefix=meta-networking][pyro][PATCH
+        --subject-prefix=meta-networking][rocko][PATCH
 
-pyro Branch Maintainer:
+rocko Branch Maintainer:
 Armin Kuster <akuster808@gmail.com>
 
 You may also contact the maintainers directly.

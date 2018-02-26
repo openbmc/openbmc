@@ -1,0 +1,28 @@
+Nios II for MAX10 10m50 board requires update to 
+its device tree to enable CPU driver during
+u-boot pre-relocation. This patch tag the CPU 
+with dm-pre-reloc flag.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Gan, Yau Wai <yau.wai.gan@intel.com>
+
+---
+ arch/nios2/dts/10m50_devboard.dts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/nios2/dts/10m50_devboard.dts b/arch/nios2/dts/10m50_devboard.dts
+index 05eac30..461ae68 100644
+--- a/arch/nios2/dts/10m50_devboard.dts
++++ b/arch/nios2/dts/10m50_devboard.dts
+@@ -19,6 +19,7 @@
+ 		#size-cells = <0>;
+ 
+ 		cpu: cpu@0 {
++			u-boot,dm-pre-reloc;
+ 			device_type = "cpu";
+ 			compatible = "altr,nios2-1.1";
+ 			reg = <0x00000000>;
+-- 
+2.7.4
+
