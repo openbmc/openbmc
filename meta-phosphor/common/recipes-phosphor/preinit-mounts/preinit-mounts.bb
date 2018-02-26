@@ -1,5 +1,8 @@
 inherit obmc-phosphor-license
+inherit allarch
 inherit update-alternatives
+
+RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_base-utils}"
 
 SRC_URI += "file://init"
 
