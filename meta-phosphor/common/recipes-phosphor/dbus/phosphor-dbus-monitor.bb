@@ -7,7 +7,7 @@ HOMEPAGE = "http://github.com/openbmc/phosphor-dbus-monitor"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 SRC_URI = "git://github.com/openbmc/phosphor-dbus-monitor"
-SRCREV = "8bbf9d2cc5a502fa0df0e70bd4232208a1ab6c01"
+SRCREV = "c458deea83b4356f07194691e301037d8e831d46"
 
 inherit autotools \
         pkgconfig \
