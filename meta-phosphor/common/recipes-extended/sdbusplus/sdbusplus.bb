@@ -45,7 +45,7 @@ PACKAGECONFIG[transaction] = "--enable-transaction,--disable-transaction"
 S = "${WORKDIR}/git"
 
 PROVIDES_prepend = "sdbus++ "
-PACKAGES_prepend = "sdbus++ "
+PACKAGE_BEFORE_PN = "sdbus++"
 FILES_sdbus++_append = " ${bindir}/sdbus++"
 PYTHON_AUTOTOOLS_PACKAGE = "sdbus++"
 
