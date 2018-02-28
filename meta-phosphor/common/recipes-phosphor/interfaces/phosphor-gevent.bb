@@ -1,5 +1,5 @@
-SUMMARY = "Phosphor Rocket startup script"
-DESCRIPTION = "Phosphor Rocket startup script."
+SUMMARY = "python-gevent startup script"
+DESCRIPTION = "python-gevent startup script."
 PR = "r1"
 
 inherit allarch
