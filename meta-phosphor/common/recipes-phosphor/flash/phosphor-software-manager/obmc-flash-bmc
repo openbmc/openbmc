@@ -218,10 +218,10 @@ ubi_cleanup() {
             grep /xyz/openbmc_project/software/ | tail -c 9)
 
     if [[ -z "$activeVersion" ]]; then
-        vols=$(ubinfo -a | grep -e "kernel-" -e "rofs-" | cut -c 14-)
+        vols=$(ubinfo -a | grep "rofs-" | cut -c 14-)
         vols=(${vols})
     else
-        vols=$(ubinfo -a | grep -e "kernel-" -e "rofs-" | \
+        vols=$(ubinfo -a | grep "rofs-" | \
                 grep -v "$activeVersion" | cut -c 14-)
         vols=(${vols})
     fi
