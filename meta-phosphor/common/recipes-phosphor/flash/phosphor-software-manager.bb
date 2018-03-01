@@ -50,6 +50,7 @@ RDEPENDS_${PN}-updater += " \
     phosphor-dbus-interfaces \
     sdbusplus \
     virtual-obmc-image-manager \
+    bash \
 "
 
 RPROVIDES_${PN}-version += " \
