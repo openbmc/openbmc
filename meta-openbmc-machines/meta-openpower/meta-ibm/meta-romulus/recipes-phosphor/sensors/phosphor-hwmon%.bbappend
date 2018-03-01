@@ -3,7 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 # Pin the revision so the patch is guaranteed to be appliable
 # TODO: Remove this when the error handling in hwmon is done:
 # https://gerrit.openbmc-project.xyz/#/c/8073/
-SRCREV = "26d21731c292a02ec71480fade9a06658160eafb"
+SRCREV = "a7e2c1e5c1e94246ae55313fc361d30b0e1a6165"
 
 SRC_URI += " file://0001-sysfs-Return-ETIMEDOUT-instead-of-throw-exception.patch"
 
