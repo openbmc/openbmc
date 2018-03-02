@@ -306,7 +306,7 @@ ubi_setenv() {
         varName="${variable%=*}"
         value="${variable##*=}"
         # Write only if var is not set already to the requested value
-        currentValue="$(fw_printenv -n "${varName}")"
+        currentValue="$(fw_printenv -n "${varName}" 2>/dev/null)" || true
         if [[ "${currenValue}" != "${value}" ]]; then
           fw_setenv "$varName" "$value"
           fw_setenv "$varName" "$value"
