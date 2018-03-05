@@ -1,4 +1,20 @@
 #!/bin/sh
+#
+# Copyright (c) 2018, YADRO
+# Author: Alexander Amelkin <a.amelkin@yadro.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
 if [ "$(basename -- "$0")" = "setup" ]; then
 	echo The script must be sourced, not executed
@@ -35,9 +51,10 @@ machine() {
 if [ -z "$1" ]; then
 	echo Target machine must be specified. Use one of:
 	echo
-	echo qemuarm
+	(echo qemuarm; machine) | sort
 elif [ "$1" = "qemuarm" ]; then
 	source openbmc-env
+else
+	machine $1
 fi
 
-machine $1 | sort
