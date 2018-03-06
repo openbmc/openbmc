@@ -108,9 +108,12 @@ ubi_rw() {
   rw="${rwmtd#mtd}"
   ubidev="/dev/ubi${rw}"
 
-  rwsize="$(fw_printenv -n rwfs_size)"
-  if [[ "${imgsize}" != "${rwsize}" ]]; then
-    fw_setenv rwfs_size "${imgsize}"
+  # Update rwfs_size, check imgsize was specified, otherwise it'd clear the var
+  if [ ! -z "$imgsize" ]; then
+    rwsize="$(fw_printenv -n rwfs_size 2>/dev/null)" || true
+    if [[ "${imgsize}" != "${rwsize}" ]]; then
+      fw_setenv rwfs_size "${imgsize}"
+    fi
   fi
 
   vol="$(findubi "${name}")"
