@@ -42,7 +42,10 @@ RDEPENDS_${PN} += " \
                phosphor-dbus-interfaces \
                "
 
-EXTRA_OECONF = "YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN}"
+EXTRA_OECONF = " \
+             YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN} \
+             PS_DERATING_FACTOR=${POWER_SUPPLY_DERATING_FACTOR} \
+             "
 EXTRA_OECONF_append = "${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'i2c-occ', ' --enable-i2c-occ', '', d)}"
 
 OCC_ENABLE = "enable"

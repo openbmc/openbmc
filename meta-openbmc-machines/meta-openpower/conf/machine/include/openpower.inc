@@ -29,3 +29,6 @@ PREFERRED_PROVIDER_virtual/openpower-fru-properties ?= "openpower-fru-properties
 # configuration files in the format and native sysroot location expected by
 # the openpower-occ-control build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/openpower-occ-control-config-native ?= "openpower-occ-control-config-example-native"
+
+#Default value for power supply output power efficiency.
+POWER_SUPPLY_DERATING_FACTOR = "90"
