@@ -12,6 +12,7 @@ DEPENDS += " \
            mrw-perl-tools-native \
            phosphor-ipmi-sensor-config-native \
            phosphor-ipmi-sensor-inventory-mrw-config-native \
+           python-pyyaml-native \
            "
 
 PROVIDES += "virtual/phosphor-ipmi-sensor-inventory"
