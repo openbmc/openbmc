@@ -3,6 +3,7 @@ PR = "r1"
 
 inherit packagegroup
 inherit obmc-phosphor-license
+inherit obmc-phosphor-utils
 
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \

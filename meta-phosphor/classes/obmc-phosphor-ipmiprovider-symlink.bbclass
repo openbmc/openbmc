@@ -1,5 +1,7 @@
 # Common code for recipes that create IPMI provider libraries
 
+inherit obmc-phosphor-utils
+
 LIBDIR = "${D}/${libdir}/ipmid-providers/"
 HOSTIPMI_LIBDIR = "${D}/${libdir}/host-ipmid/"
 NETIPMI_LIBDIR = "${D}/${libdir}/net-ipmid/"

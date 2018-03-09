@@ -2,7 +2,6 @@ SUMMARY = "OpenPower OCC Control with MRW generated sensor IDs"
 PR = "r1"
 
 inherit native
-inherit obmc-phosphor-utils
 inherit obmc-phosphor-license
 inherit openpower-occ-control
 inherit mrw-xml

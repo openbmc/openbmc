@@ -1,3 +1,5 @@
+inherit obmc-phosphor-utils
+
 SRC_URI += "${@df_enabled(d, 'openpower-ubi-fs', 'file://software.conf')}"
 
 install_tmpfile() {

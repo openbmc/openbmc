@@ -1,5 +1,3 @@
-inherit obmc-phosphor-utils
-
 FILESEXTRAPATHS_prepend_df-obmc-ubi-fs := "${THISDIR}/${PN}:"
 
 RDEPENDS_${PN}_append_df-obmc-ubi-fs = " preinit-mounts"

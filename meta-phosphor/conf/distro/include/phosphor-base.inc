@@ -57,8 +57,6 @@ DISTRO_EXTRA_RDEPENDS_remove_qemuarm = "packagegroup-core-device-devel"
 # TODO: openbmc/openbmc#12345 - Upgrade to pygobject-3.
 PREFERRED_VERSION_python-pygobject = "2.%"
 
-INHERIT_append = " obmc-phosphor-utils"
-
 include conf/distro/include/openbmc-phosphor/${MACHINE}.inc
 
 # TODO: openbmc/openbmc#1407 - Remove with RHEL6 support deprecation.

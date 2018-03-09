@@ -25,6 +25,7 @@
 # PHOSPHOR_MAPPER_INTERFACE_BLACKLIST_append = " foo.bar.baz"
 
 inherit phosphor-mapperdir
+inherit obmc-phosphor-utils
 
 python phosphor_mapper_do_postinst() {
     def process_var(d, var, dir):

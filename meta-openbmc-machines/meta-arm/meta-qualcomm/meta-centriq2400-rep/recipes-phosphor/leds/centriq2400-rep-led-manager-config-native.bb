@@ -2,7 +2,6 @@ SUMMARY = "Phosphor LED Group Management for Centriq2400 REP"
 PR = "r1"
 
 inherit native
-inherit obmc-phosphor-utils
 inherit obmc-phosphor-license
 
 PROVIDES += "virtual/phosphor-led-manager-config-native"

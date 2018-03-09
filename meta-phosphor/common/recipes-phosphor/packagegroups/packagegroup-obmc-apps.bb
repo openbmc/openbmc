@@ -2,7 +2,6 @@ SUMMARY = "OpenBMC - Applications"
 PR = "r1"
 
 inherit packagegroup
-inherit obmc-phosphor-utils
 inherit obmc-phosphor-license
 
 PROVIDES = "${PACKAGES}"

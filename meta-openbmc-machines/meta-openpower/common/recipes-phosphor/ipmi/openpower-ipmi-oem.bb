@@ -5,7 +5,6 @@ PR = "r1"
 inherit autotools pkgconfig
 inherit obmc-phosphor-license
 inherit obmc-phosphor-ipmiprovider-symlink
-inherit obmc-phosphor-utils
 inherit pythonnative
 
 require ${PN}.inc
