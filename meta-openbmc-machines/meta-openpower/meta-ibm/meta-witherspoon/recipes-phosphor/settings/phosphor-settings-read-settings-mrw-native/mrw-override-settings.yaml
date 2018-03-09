@@ -5,7 +5,7 @@
               Default: 0
               Validation:
                   Type: "range"
-                  Validator: "MRW_OPEN_POWER_SOFT_MIN_PCAP_WATTS..MRW_OPEN_POWER_N_PLUS_ONE_BULK_POWER_LIMIT_WATTS"
+                  Validator: "[[MRW_OPEN_POWER_SOFT_MIN_PCAP_WATTS/(PS_DERATING/100)]]..[[MRW_OPEN_POWER_N_PLUS_ONE_BULK_POWER_LIMIT_WATTS/(PS_DERATING/100)]]"
                   Unit: "Watts"
           PowerCapEnable:
                Default: 'false'

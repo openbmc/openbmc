@@ -17,6 +17,8 @@ SRC_URI += "file://mrw-override-settings.yaml"
 
 S = "${WORKDIR}"
 
+MRW_EXPRESSION_VARS ?= ""
+
 do_install() {
     DEST=${D}${config_datadir}
     install -D mrw-override-settings.yaml ${DEST}/mrw-override-settings.yaml
@@ -30,5 +32,6 @@ do_install() {
         -i ${mrw_datadir}/${MRW_XML} \
         -s ${DEST}/mrw-override-settings.yaml \
         -o ${SETTINGS}/mrw-settings.override.yaml \
+        ${MRW_EXPRESSION_VARS} \
         -f
 }
