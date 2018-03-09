@@ -1,11 +1,11 @@
-SRC_URI += "${@mf_enabled(d, 'openpower-ubi-fs', 'file://software.conf')}"
+SRC_URI += "${@df_enabled(d, 'openpower-ubi-fs', 'file://software.conf')}"
 
 install_tmpfile() {
         # /tmp/images is the software image upload directory.
         # It should not be deleted since it is watched by the Image Manager for
         # new images.
 
-        if ${@bb.utils.contains('MACHINE_FEATURES', 'openpower-ubi-fs', 'true', 'false', d)}; then
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'openpower-ubi-fs', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/software.conf ${D}${exec_prefix}/lib/tmpfiles.d/
         fi
 }
