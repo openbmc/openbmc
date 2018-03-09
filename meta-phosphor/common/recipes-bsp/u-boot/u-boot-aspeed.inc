@@ -2,17 +2,17 @@ inherit image_version
 
 SRC_URI_append_aspeed = " file://0001-configs-ast-Add-redundnant-env.patch"
 
-SRC_URI_append_aspeed = " ${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', \
-    'file://0002-config-ast-common-hack-bootopts.patch \
-     file://0003-config-ast-common-Add-bootopts-to-support-ubi-and-mt.patch \
-     file://0004-config-ast-common-Add-conditional-factory-reset-comm.patch', '', d)}"
+SRC_URI_append_aspeed_df-obmc-ubi-fs = " \
+    file://0002-config-ast-common-hack-bootopts.patch \
+    file://0003-config-ast-common-Add-bootopts-to-support-ubi-and-mt.patch \
+    file://0004-config-ast-common-Add-conditional-factory-reset-comm.patch \
+    "
 
 
-python do_configure_aspeed () {
-    if "obmc-ubi-fs" in d.getVar("MACHINE_FEATURES", True):
-        version_id=do_get_versionID(d)
-        d.setVar('VERSION_ID', version_id)
-        bb.build.exec_func("patch_uboot", d)
+python do_configure_aspeed_df-obmc-ubi-fs () {
+    version_id=do_get_versionID(d)
+    d.setVar('VERSION_ID', version_id)
+    bb.build.exec_func("patch_uboot", d)
 }
 
 patch_uboot () {

@@ -161,8 +161,8 @@ python install_dreport_user_scripts() {
                 os.symlink(srclink, destlink)
 }
 
-#Enable ubifs-workaround by MACHINE_FEATURE obmc-ubi-fs.
-PACKAGECONFIG_append = "${@mf_enabled(d, 'obmc-ubi-fs', 'ubifs-workaround')}"
+#Enable ubifs-workaround by DISTRO_FEATURE obmc-ubi-fs.
+PACKAGECONFIG_append_df-obmc-ubi-fs = " ubifs-workaround"
 PACKAGECONFIG[ubifs-workaround] = " \
        --enable-ubifs-workaround, \
        --disable-ubifs-workaround \

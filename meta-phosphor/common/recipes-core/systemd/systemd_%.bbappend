@@ -22,7 +22,7 @@ PACKAGECONFIG[journald-dbus] = "--enable-journald-dbus,--disable-journald-dbus"
 FILES_${PN} += "${datadir}/dbus-1/system.d/org.freedesktop.journal1.conf"
 
 SRC_URI += "file://0007-journal-Add-Synchronize-dbus-method.patch"
-SRC_URI += "${@mf_enabled(d, 'obmc-ubi-fs', 'file://software.conf')}"
+SRC_URI_append_df-obmc-ubi-fs = " file://software.conf"
 SRC_URI += "file://0008-man-update-machine-id-5-with-a-note-about-privacy-46.patch"
 SRC_URI += "file://0009-sd-id128-add-new-sd_id128_get_machine_app_specific-A.patch"
 SRC_URI += "file://0010-core-add-khash-API-to-src-basic-as-wrapper-around-ke.patch"
@@ -40,11 +40,11 @@ do_install_append() {
         #TODO Remove after this issue is resolved
         #https://github.com/openbmc/openbmc/issues/152
         ln -s /dev/null ${D}/etc/systemd/system/systemd-hwdb-update.service
+}
 
+do_install_append_df-obmc-ubi-fs() {
         # /tmp/images is the software image upload directory.
         # It should not be deleted since it is watched by the Image Manager
         # for new images.
-        if ${@bb.utils.contains('MACHINE_FEATURES', 'obmc-ubi-fs', 'true', 'false', d)}; then
-                install -m 0644 ${WORKDIR}/software.conf ${D}${exec_prefix}/lib/tmpfiles.d/
-        fi
+        install -m 0644 ${WORKDIR}/software.conf ${D}${exec_prefix}/lib/tmpfiles.d/
 }
