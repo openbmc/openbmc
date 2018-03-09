@@ -119,8 +119,7 @@ PREFERRED_PROVIDER_virtual/obmc-wsgihost ?= "phosphor-gevent"
 #
 # The phosphor-hwmon package can have its configuration generated
 # automatically if the MRW feature is enabled.
-VIRTUAL-RUNTIME_phosphor-hwmon-config ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-hwmon-config-mrw')}"
+VIRTUAL-RUNTIME_phosphor-hwmon-config ?= ""
 
 # obmc-settings-mgmt
 #
@@ -151,13 +150,13 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-hostfw-config ?= "phosphor-ipmi-fru
 # configuration files in the format and native sysroot location expected by
 # the phosphor-ipmi-fru build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-inventory ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-inventory-mrw-native', 'phosphor-ipmi-fru-inventory-example-native')}"
+    "phosphor-ipmi-fru-inventory-example-native"
 
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-properties ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-properties-mrw-native', 'phosphor-ipmi-fru-properties-native')}"
+    "phosphor-ipmi-fru-properties-native"
 
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-read-inventory ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-ipmi-fru-read-inventory-mrw-native', 'phosphor-ipmi-fru-read-inventory-example-native')}"
+    "phosphor-ipmi-fru-read-inventory-example-native"
 
 # Configuration overrides for phosphor-host-ipmid.
 #
@@ -169,7 +168,7 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-read-inventory ?= \
 # configuration files in the format and native sysroot location expected by
 # the phosphor-host-ipmid build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-sensor-inventory ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-ipmi-sensor-inventory-mrw-native', 'phosphor-ipmi-sensor-inventory-native')}"
+    "phosphor-ipmi-sensor-inventory-native"
 
 # The phosphor-host-ipmid application is data-driven and requires an input
 # mapping of IPMI channel to DBus objects interfaces and properties.
@@ -184,7 +183,7 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-channel-config ?= "phosphor-ipmi-channe
 # configuration files in the format and native sysroot location expected by
 # the phosphor-host-ipmid build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-inventory-sel ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-ipmi-inventory-sel-mrw-native', 'phosphor-ipmi-inventory-sel-native')}"
+    "phosphor-ipmi-inventory-sel-native"
 
 # Various other overrides.
 
@@ -194,7 +193,7 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-inventory-sel ?= \
 # configuration files in the format and native sysroot location expected by
 # the phosphor-led-manager build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-led-manager-config-mrw-native', 'phosphor-led-manager-config-example-native')}"
+    "phosphor-led-manager-config-example-native"
 
 # The phosphor-logging application has a data driven plugin that adds FRU
 # callout information to error logs, when applications generating error logs
@@ -204,7 +203,7 @@ PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native ?= \
 # configuration files in the format and native sysroot location expected by
 # the phosphor-logging build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-logging-callouts ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-logging-callouts-mrw-native', 'phosphor-logging-callouts-example-native')}"
+    "phosphor-logging-callouts-example-native"
 
 # The phosphor-fan-presence application is data driven and requires an
 # input YAML that maps fans to their tach sensors.
@@ -212,7 +211,7 @@ PREFERRED_PROVIDER_virtual/phosphor-logging-callouts ?= \
 # configuration files in the format and native sysroot location expected by
 # the phosphor-fan-presence build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-fan-presence-mrw-native', 'phosphor-fan-presence-config-native')}"
+    "phosphor-fan-presence-config-native"
 
 # The phosphor-fan-control application is data driven and requires a YAML
 # file to define the fans in the system.
@@ -220,7 +219,7 @@ PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config ?= \
 # the YAML file in the format and native sysroot location expected by
 # the phosphor-fan-control build process in the native sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'phosphor-fan-control-fan-config-mrw-native', 'phosphor-fan-control-fan-config-native')}"
+    "phosphor-fan-control-fan-config-native"
 
 # The phosphor-gpio-monitor application is data-driven and requires an input.
 # The application then watches the passed in input event entry for the

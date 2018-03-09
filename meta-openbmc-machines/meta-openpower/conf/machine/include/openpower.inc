@@ -23,15 +23,12 @@ PREFERRED_PROVIDER_virtual/obmc-host-ctl ?= "obmc-op-control-host"
 PREFERRED_PROVIDER_virtual/obmc-inventory-data ?= "${VIRTUAL-RUNTIME_skeleton_workbook}"
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-hostfw-config ?= "hostboot-inventory-config-native"
 PREFERRED_PROVIDER_virtual/openpower-fru-vpd-layout ?= "openpower-fru-vpd-layout-native"
-PREFERRED_PROVIDER_virtual/openpower-fru-inventory ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'openpower-fru-inventory-mrw-native', 'openpower-fru-inventory-example-native')}"
-PREFERRED_PROVIDER_virtual/openpower-fru-properties ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'openpower-fru-properties-mrw-native', 'openpower-fru-properties-example-native')}"
+PREFERRED_PROVIDER_virtual/openpower-fru-inventory ?= "openpower-fru-inventory-example-native"
+PREFERRED_PROVIDER_virtual/openpower-fru-properties ?= "openpower-fru-properties-example-native"
 
 # The openpower-occ-control application is data-driven and requires an input
 # yaml of OCC instance numbers to sensor IDs.
 # This virtual is a native recipe that provides that mapping by installing
 # configuration files in the format and native sysroot location expected by
 # the openpower-occ-control build process in the native sysroot.
-PREFERRED_PROVIDER_virtual/openpower-occ-control-config-native ?= \
-    "${@df_enabled(d, 'obmc-mrw', 'openpower-occ-control-config-mrw-native', 'openpower-occ-control-config-example-native')}"
+PREFERRED_PROVIDER_virtual/openpower-occ-control-config-native ?= "openpower-occ-control-config-example-native"
