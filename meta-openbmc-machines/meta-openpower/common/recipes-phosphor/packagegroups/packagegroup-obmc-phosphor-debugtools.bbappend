@@ -1,5 +1,5 @@
-RDEPENDS_${PN}_append = " ${@cf_enabled(d, 'obmc-openpower-extra', '\
+RDEPENDS_${PN}_append_df-openpower = " \
     pflash \
     gard \
     fsidbg \
-    ')}"
+    "

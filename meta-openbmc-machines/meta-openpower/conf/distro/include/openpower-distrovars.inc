@@ -1,0 +1,4 @@
+DISTRO_FEATURES += "openpower"
+DISTRO_FEATURES_FILTER_NATIVE += "openpower"
+DISTRO_FEATURES_FILTER_NATIVESDK += "openpower"
+DISTROOVERRIDES .= ":df-openpower"

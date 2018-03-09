@@ -1,5 +1,5 @@
-DEPENDS_append = " ${@cf_enabled(d, 'obmc-openpower', '\
+DEPENDS_append_df-openpower = " \
         openpower-debug-collector-native \
         openpower-dbus-interfaces-native \
         openpower-occ-control-native \
-        ')}"
+        "

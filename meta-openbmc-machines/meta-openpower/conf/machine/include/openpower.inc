@@ -7,9 +7,6 @@ OBMC_MACHINE_FEATURES += "\
         obmc-host-state-mgmt \
         obmc-chassis-state-mgmt \
         obmc-bmc-state-mgmt \
-        obmc-openpower \
-        obmc-openpower-extra \
-        obmc-openpower-legacy \
         "
 
 VIRTUAL-RUNTIME_skeleton_workbook = "${MACHINE}-config"
