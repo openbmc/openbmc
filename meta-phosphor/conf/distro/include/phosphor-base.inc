@@ -25,7 +25,6 @@ DISTRO_FEATURES = "\
         obmc-settings-mgmt \
         obmc-phosphor-system-mgmt \
         obmc-host-ipmi \
-        obmc-mrw \
         obmc-logging-mgmt \
         obmc-host-ctl \
         avahi \
