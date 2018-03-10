@@ -11,26 +11,41 @@ IMAGE_LINGUAS = "en-us"
 VIRTUAL-RUNTIME_keymaps = ""
 
 # Phosphor OpenBMC uses systemd and udev
-DISTRO_FEATURES_append = " systemd pam"
 VIRTUAL-RUNTIME_init_manager = "systemd"
-DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"
 VIRTUAL-RUNTIME_initscripts = ""
 
-DISTRO_FEATURES = "\
-        ipv6 \
-        obmc-phosphor-fan-mgmt \
-        obmc-phosphor-chassis-mgmt \
-        obmc-phosphor-flash-mgmt \
-        obmc-phosphor-user-mgmt \
-        obmc-settings-mgmt \
-        obmc-phosphor-system-mgmt \
+DISTRO_FEATURES_BACKFILL_CONSIDERED = " \
+        bluez5 \
+        ldconfig \
+        gobject-introspection-data \
+        pulseaudio \
+        sysvinit \
+        "
+
+DISTRO_FEATURES_OBMC = " \
+        obmc-host-ctl \
         obmc-host-ipmi \
         obmc-logging-mgmt \
-        obmc-host-ctl \
-        avahi \
-        slp \
         obmc-net-ipmi \
+        obmc-phosphor-chassis-mgmt \
+        obmc-phosphor-fan-mgmt \
+        obmc-phosphor-flash-mgmt \
+        obmc-phosphor-system-mgmt \
+        obmc-phosphor-user-mgmt \
+        obmc-settings-mgmt \
+        "
+
+DISTRO_FEATURES_DEFAULT = " \
+        avahi \
+        pam \
+        slp \
+        systemd \
+        "
+
+DISTRO_FEATURES = " \
+        ${DISTRO_FEATURES_DEFAULT} \
         ${DISTRO_FEATURES_LIBC} \
+        ${DISTRO_FEATURES_OBMC} \
         "
 
 MACHINE_FEATURES += " \
