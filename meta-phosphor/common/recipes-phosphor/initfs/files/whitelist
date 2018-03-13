@@ -1,10 +1,10 @@
 /etc/dropbear/dropbear_rsa_host_key
-/etc/systemd/network
-/etc/resolv.conf
+/etc/group
+/etc/gshadow
 /etc/machine-id
 /etc/passwd
-/etc/group
+/etc/resolv.conf
 /etc/shadow
-/etc/gshadow
+/etc/systemd/network
 /var/cache/obmc
 /var/lib/obmc
