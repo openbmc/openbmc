@@ -38,13 +38,6 @@ VIRTUAL-RUNTIME_obmc-host-state-manager ?= "phosphor-state-manager-host"
 # power the host back on.
 VIRTUAL-RUNTIME_obmc-discover-system-state ?= "phosphor-state-manager-discover"
 
-# obmc-host-check
-#
-# Provides an implementation of phosphor-host-check, which will determine
-# if the host is running after a BMC reboot and create the necessary file
-# to indicate to host services that the host is running
-VIRTUAL-RUNTIME_obmc-host-check ?= "phosphor-state-manager-host-check"
-
 # obmc-fan-presence
 #
 # Provides implementations of fan presence detection

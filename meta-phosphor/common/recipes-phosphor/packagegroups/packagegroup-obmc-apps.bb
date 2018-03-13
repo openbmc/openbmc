@@ -35,11 +35,6 @@ RDEPENDS_${PN}-chassis-state-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-chassis-state-manager} \
         "
 
-SUMMARY_${PN}-host-check-mgmt = "Host state check on bmc reset"
-RDEPENDS_${PN}-host-check-mgmt = " \
-        ${VIRTUAL-RUNTIME_obmc-host-check} \
-        "
-
 SUMMARY_${PN}-extras = "Extra features"
 RDEPENDS_${PN}-extras = " \
         phosphor-rest \

@@ -25,10 +25,14 @@ DBUS_PACKAGES = "${STATE_MGR_PACKAGES}"
 SYSTEMD_PACKAGES = "${PN}-discover \
                     ${PN}-reset-sensor-states \
 "
+
+# The host-check function will check if the host is running
+# after a BMC reset.
 # The reset-sensor-states function will reset the host
-# sensors on a BMC reset or system power loss so it is
-# recommended when bringing in the host state function
-RRECOMMENDS_${PN}-host = "${PN}-reset-sensor-states"
+# sensors on a BMC reset or system power loss.
+# Neither is required for host state function but are
+# recommended to deal properly with these reset scenarios.
+RRECOMMENDS_${PN}-host = "${PN}-host-check ${PN}-reset-sensor-states"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service

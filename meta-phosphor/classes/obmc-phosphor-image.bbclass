@@ -11,7 +11,6 @@
 # - obmc-host-ctl                     - OpenBMC host control
 # - obmc-host-ipmi                    - OpenBMC host IPMI
 # - obmc-host-state-mgmt              - OpenBMC host state management
-# - obmc-host-check-mgmt              - OpenBMC host state checking
 # - obmc-inventory                    - OpenBMC inventory support
 # - obmc-leds                         - OpenBMC LED support
 # - obmc-logging-mgmt                 - OpenBMC logging management
@@ -39,7 +38,6 @@ FEATURE_PACKAGES_obmc-flash-mgmt ?= "${@cf_enabled(d, 'obmc-phosphor-flash-mgmt'
 FEATURE_PACKAGES_obmc-host-ctl ?= "${@cf_enabled(d, 'obmc-host-ctl', 'virtual-obmc-host-ctl')}"
 FEATURE_PACKAGES_obmc-host-ipmi ?= "${@cf_enabled(d, 'obmc-host-ipmi', 'virtual-obmc-host-ipmi-hw')}"
 FEATURE_PACKAGES_obmc-host-state-mgmt ?= "packagegroup-obmc-apps-host-state-mgmt"
-FEATURE_PACKAGES_obmc-host-check-mgmt ?= "packagegroup-obmc-apps-host-check-mgmt"
 FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 FEATURE_PACKAGES_obmc-leds ?= "packagegroup-obmc-apps-leds"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled(d, 'obmc-logging-mgmt', 'virtual-obmc-logging-mgmt')}"
@@ -63,7 +61,6 @@ IMAGE_FEATURES += " \
         obmc-host-ctl \
         obmc-host-ipmi \
         obmc-host-state-mgmt \
-        obmc-host-check-mgmt \
         obmc-inventory \
         obmc-leds \
         obmc-logging-mgmt \
