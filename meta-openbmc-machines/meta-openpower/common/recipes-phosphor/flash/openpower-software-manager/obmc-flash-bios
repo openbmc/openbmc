@@ -293,6 +293,40 @@ ubi_cleanup() {
     done
 }
 
+clear_volatile() {
+  service=$(mapper get-service /org/open_power/control/volatile)
+  clearVolatileEnabled=$(busctl get-property $service /org/open_power/control/volatile xyz.openbmc_project.Object.Enable Enabled)
+  if [[ "$clearVolatileEnabled" != "b true" ]]; then
+    return 0
+  fi
+
+  PNOR_TOC_FILE="pnor.toc"
+  PNOR_RO_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/ro/"
+  PNOR_RW_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/rw/"
+  PNOR_PRSV_ACTIVE_PATH="/var/lib/phosphor-software-manager/pnor/prsv/"
+
+  # toc partition string format:
+  # partition27=HB_VOLATILE,0x02ba9000,0x02bae000,00,ECC,VOLATILE,READWRITE
+  tocFilePath="${PNOR_RO_ACTIVE_PATH}${PNOR_TOC_FILE}"
+  volatiles=($(grep VOLATILE "${tocFilePath}" | grep -Eo '^partition([0-9]+)=([A-Za-z0-9_]+)'))
+  for (( index=0; index<${#volatiles[@]}; index++ )); do
+    volatileName="$(echo ${volatiles[${index}]} | awk -F '=' '{print $2}')"
+
+    rwVolatile="${PNOR_RW_ACTIVE_PATH}${volatileName}"
+    if [ -f "${rwVolatile}" ]; then
+      echo "Clear $rwVolatile"
+      rm "${rwVolatile}"
+    fi
+    prsvVolatile="${PNOR_PRSV_ACTIVE_PATH}${volatileName}"
+    if [ -f "${prsvVolatile}" ]; then
+      echo "Clear $prsvVolatile"
+      rm "${prsvVolatile}"
+    fi
+  done
+  # Always reset the sensor after clearing
+  busctl set-property $service /org/open_power/control/volatile xyz.openbmc_project.Object.Enable Enabled b false
+}
+
 case "$1" in
   ubiattach)
     attach_ubi
@@ -322,6 +356,9 @@ case "$1" in
     ;;
   ubicleanup)
     ubi_cleanup
+    ;;
+  clearvolatile)
+    clear_volatile
     ;;
   *)
     echo "Invalid argument"
