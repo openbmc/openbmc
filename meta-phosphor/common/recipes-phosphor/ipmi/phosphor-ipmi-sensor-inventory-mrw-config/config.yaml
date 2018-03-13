@@ -226,3 +226,88 @@ turbo_allowed_sensor:
             assert: true
             deassert: false
             type: bool
+
+cpucore_temp_sensor:
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: -3
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+
+dimm_temp_sensor:
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: -3
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+
+vrm_vdd_temp_sensor:
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: -3
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+
+gpu_temp_sensor:
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: -3
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+
+memory_temp_sensor:
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  multiplierM: 1
+  offsetB: -127
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: -3
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
