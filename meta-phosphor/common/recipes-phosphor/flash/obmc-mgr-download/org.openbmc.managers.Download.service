@@ -8,8 +8,6 @@ SyslogIdentifier=download_manager.py
 Environment="PYTHONUNBUFFERED=1"
 Type=dbus
 BusName={BUSNAME}
-Nice=19
-TimeoutStartSec=180s
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
