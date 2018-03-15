@@ -59,12 +59,7 @@ PREFERRED_VERSION_python-pygobject = "2.%"
 
 include conf/distro/include/openbmc-phosphor/${MACHINE}.inc
 
-# TODO: openbmc/openbmc#1407 - Remove with RHEL6 support deprecation.
-#  RHEL6.4's kernel is too old to use the uninative-shim due to missing
-#  syscall support.  Disable uninative and set OLDEST_KERNEL back to
-#  the version in RHEL6.4.
 INHERIT_remove = " uninative"
-OLDEST_KERNEL = "2.6.32"
 
 KERNEL_FEATURES_append = " phosphor-gpio-keys"
 KERNEL_FEATURES_remove_qemuall = " phosphor-gpio-keys"
