@@ -9,8 +9,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=de7833d9c2ce0052a4073928c76a13d7"
 
 inherit allarch
 inherit setuptools
+inherit pypi
 
-S = "${WORKDIR}/${SRCNAME}-${PV}"
 RDEPENDS_${PN} += " \
         ${PYTHON_PN}-re \
         ${PYTHON_PN}-codecs \

@@ -11,8 +11,8 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE;md5=94b9b2cc7e46ccea87e00af8970826
 
 inherit allarch
 inherit setuptools
+inherit pypi
 
-S = "${WORKDIR}/${SRCNAME}-${PV}"
 RDEPENDS_${PN} += " \
         python-email-utils \
         python-json \
