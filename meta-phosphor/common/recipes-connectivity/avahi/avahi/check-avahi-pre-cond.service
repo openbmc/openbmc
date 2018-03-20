@@ -1,0 +1,13 @@
+[Unit]
+Description=Check the precondition before starting avahi
+Before=avahi-daemon.service
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/usr/sbin/check-local-domain
+ExecStart=/usr/sbin/create-user
+ExecStart=/bin/touch /tmp/avahi
+
+[Install]
+WantedBy=obmc-standby.target
