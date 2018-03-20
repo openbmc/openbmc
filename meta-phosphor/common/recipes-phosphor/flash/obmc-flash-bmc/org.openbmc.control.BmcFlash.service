@@ -2,8 +2,6 @@
 Description=Phosphor BMC Code Update
 Wants=mapper-wait@-org-openbmc-managers-Download.service
 After=mapper-wait@-org-openbmc-managers-Download.service
-Wants=mapper-wait@-org-openbmc-control-bmc0.service
-After=mapper-wait@-org-openbmc-control-bmc0.service
 
 [Service]
 Restart=always
