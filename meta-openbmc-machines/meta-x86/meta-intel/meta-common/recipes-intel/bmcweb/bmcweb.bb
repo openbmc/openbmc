@@ -9,10 +9,10 @@ USERADD_PARAM_${PN} = "-r -s /usr/sbin/nologin bmcweb"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=a6a4edad4aed50f39a66d098d74b265b"
 
-SRC_URI = "gitsm://github.com/openbmc/bmcweb.git"
+SRC_URI = "git://github.com/openbmc/bmcweb.git"
 
 PV = "1.0+git${SRCPV}"
-SRCREV = "8db6e57bbad48443eb75ba3b13a5dad0abe06aec"
+SRCREV = "b8f09e1140cfa9d34fc086ea1aa9197f3bcb0801"
 
 S = "${WORKDIR}/git"
 
@@ -22,7 +22,7 @@ FILES_${PN} += "${datadir}/** "
 
 inherit cmake
 
-EXTRA_OECMAKE = "-DBUILD_UT=OFF -DYOCTO_DEPENDENCIES=ON"
+EXTRA_OECMAKE = "-DBMCWEB_BUILD_UT=OFF -DYOCTO_DEPENDENCIES=ON"
 
 SYSTEMD_SERVICE_${PN} += "bmcweb.service"
 
