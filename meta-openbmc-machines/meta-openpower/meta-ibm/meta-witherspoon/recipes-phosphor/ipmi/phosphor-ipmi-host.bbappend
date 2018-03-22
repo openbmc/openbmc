@@ -4,6 +4,7 @@ SRC_URI_append_witherspoon = " file://occ_sensors.hardcoded.yaml \
                                file://dcmi_sensors.json \
                                file://power_reading.json \
                                file://hwmon_sensors.hardcoded.yaml \
+                               file://cipher_list.json \
                              "
 inherit image_version
 
