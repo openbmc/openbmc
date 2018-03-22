@@ -152,7 +152,12 @@ matches:
           An interfaces removed match
       parameters:
           - object
-      signal: objectSignal
+      signal:
+          name: objectSignal
+          parameters:
+              - object
+              - interface
+          handler: removeInterface
     - name: nameOwnerChanged
       description: >
           A name owner changed match
@@ -202,6 +207,13 @@ handlers:
           Sets the service name(s) for the given group
       parameters:
           - group
+    - name: removeInterface
+      description: >
+          Removes an interface(and all associated properties) on the
+          given object from use within actions
+      parameters:
+          - object
+          - interface
 
 preconditions:
     - name: property_states_match
@@ -569,6 +581,7 @@ events:
                 matches:
                     - name: interfacesAdded
                     - name: propertiesChanged
+                    - name: interfacesRemoved
                 actions:
                     - name: set_net_increase_speed
                       property:
@@ -603,6 +616,7 @@ events:
                 matches:
                     - name: interfacesAdded
                     - name: propertiesChanged
+                    - name: interfacesRemoved
                 actions:
                     - name: set_net_increase_speed
                       property:
@@ -640,6 +654,7 @@ events:
                 matches:
                     - name: interfacesAdded
                     - name: propertiesChanged
+                    - name: interfacesRemoved
                 actions:
                     - name: set_net_increase_speed
                       property:
@@ -677,6 +692,7 @@ events:
                 matches:
                     - name: interfacesAdded
                     - name: propertiesChanged
+                    - name: interfacesRemoved
                 actions:
                     - name: set_net_increase_speed
                       property:
