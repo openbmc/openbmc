@@ -24,8 +24,6 @@ DEPENDS += "phosphor-logging-error-logs-native"
 DEPENDS += "phosphor-logging-native"
 DEPENDS += "cereal"
 RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
-PROVIDES += "virtual/obmc-logging-mgmt"
-RPROVIDES_${PN} += "virtual-obmc-logging-mgmt"
 
 PACKAGE_BEFORE_PN = "${PN}-test"
 FILES_${PN}-test = "${bindir}/*-test"

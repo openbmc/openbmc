@@ -15,6 +15,7 @@ PACKAGES = " \
         ${PN}-host-state-mgmt \
         ${PN}-inventory \
         ${PN}-leds \
+        ${PN}-logging \
         ${PN}-sensors \
         ${PN}-software \
         ${PN}-host-check-mgmt \
@@ -76,6 +77,11 @@ RDEPENDS_${PN}-leds = " \
         ${VIRTUAL-RUNTIME_obmc-leds-manager} \
         ${VIRTUAL-RUNTIME_obmc-leds-sysfs} \
         ${VIRTUAL-RUNTIME_obmc-led-monitor} \
+        "
+
+SUMMARY_${PN}-logging = "Logging applications"
+RDEPENDS_${PN}-logging = " \
+        phosphor-logging \
         "
 
 SUMMARY_${PN}-sensors = "Sensor applications"
