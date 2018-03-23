@@ -88,8 +88,6 @@ VIRTUAL-RUNTIME_obmc-bmc-version ?= "phosphor-software-manager-version"
 # interface.
 VIRTUAL-RUNTIME_obmc-bmc-updater ?= "phosphor-software-manager-updater"
 
-PREFERRED_PROVIDER_virtual/obmc-net-ipmi ?= "phosphor-ipmi-net"
-
 # obmc-sensors-hwmon
 #
 # Provides an implementation of xyz.openbmc_project.Sensor.Value

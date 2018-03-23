@@ -37,7 +37,7 @@ FEATURE_PACKAGES_obmc-host-state-mgmt ?= "packagegroup-obmc-apps-host-state-mgmt
 FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 FEATURE_PACKAGES_obmc-leds ?= "packagegroup-obmc-apps-leds"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "${@df_enabled(d, 'obmc-logging-mgmt', 'packagegroup-obmc-apps-logging')}"
-FEATURE_PACKAGES_obmc-net-ipmi ?= "${@df_enabled(d, 'obmc-net-ipmi', 'virtual-obmc-net-ipmi')}"
+FEATURE_PACKAGES_obmc-net-ipmi ?= "phosphor-ipmi-net"
 FEATURE_PACKAGES_obmc-sensors ?= "packagegroup-obmc-apps-sensors"
 FEATURE_PACKAGES_obmc-software ?= "packagegroup-obmc-apps-software"
 FEATURE_PACKAGES_obmc-system-mgmt ?= "${@df_enabled(d, 'obmc-phosphor-system-mgmt', 'virtual-obmc-system-mgmt')}"
@@ -45,6 +45,11 @@ FEATURE_PACKAGES_obmc-debug-collector ?= "packagegroup-obmc-apps-debug-collector
 FEATURE_PACKAGES_obmc-settings-mgmt ?= "packagegroup-obmc-apps-settings"
 FEATURE_PACKAGES_obmc-network-mgmt ?= "packagegroup-obmc-apps-network"
 FEATURE_PACKAGES_obmc-user-mgmt ?= "packagegroup-obmc-apps-user-mgmt"
+
+# FIXME: phosphor-net-ipmi depends on phosphor-ipmi-host !?!? and
+# cannot be built on core-qemu machines because of the dependency
+# tree under phosphor-ipmi-host
+FEATURE_PACKAGES_obmc-net-ipmi_qemuall = ""
 
 # Install entire Phosphor application stack by default
 IMAGE_FEATURES += " \
