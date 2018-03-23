@@ -34,3 +34,5 @@ SYSROOT_DIRS_append_class-cross = " ${bindir_cross}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 BBCLASSEXTEND = "cross"
+
+RDEPENDS_${PN} = "udev-aspeed-mtd-partitions"
