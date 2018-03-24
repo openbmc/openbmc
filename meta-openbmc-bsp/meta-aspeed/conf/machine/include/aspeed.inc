@@ -1,9 +1,6 @@
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-obmc"
-
-ASPEED_UBOOT_VERSION ?= "v2016.07+git%"
-
-PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot"
-PREFERRED_VERSION_u-boot ?= "${ASPEED_UBOOT_VERSION}"
-PREFERRED_VERSION_u-boot-fw-utils ?= "${ASPEED_UBOOT_VERSION}"
+PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-aspeed"
+PREFERRED_PROVIDER_u-boot ?= "u-boot-aspeed"
+PREFERRED_PROVIDER_u-boot-fw-utils ?= "u-boot-fw-utils-aspeed"
 
 MACHINEOVERRIDES .= ":aspeed"
