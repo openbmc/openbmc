@@ -23,7 +23,7 @@ SYSTEMD_SERVICE_${PN} ?=""
 # Install the override to set up a Conflicts relation
 SYSTEMD_OVERRIDE_${PN} +="checkstop.conf:phosphor-gpio-monitor@checkstop.service.d/checkstop.conf"
 
-STATES = "start"
+STATES = "startmin"
 GPIO_MONITOR_TMPL = "phosphor-gpio-monitor@.service"
 GPIO_MONITOR_TGTFMT = "phosphor-gpio-monitor@{1}.service"
 CHECKSTOP_MONITOR_FMT = "../${GPIO_MONITOR_TMPL}:obmc-host-{0}@{2}.target.wants/${GPIO_MONITOR_TGTFMT}"

@@ -43,8 +43,8 @@ SYSTEMD_SERVICE_${PN} += "${ENABLE_WATCHDOG_TMPL}"
 WATCHDOG_TGTFMT = "phosphor-watchdog@{0}.service"
 ENABLE_WATCHDOG_TGTFMT = "obmc-enable-host-watchdog@{0}.service"
 
-WATCHDOG_FMT = "../${WATCHDOG_TMPL}:obmc-host-start@{1}.target.wants/${WATCHDOG_TGTFMT}"
-ENABLE_WATCHDOG_FMT = "../${ENABLE_WATCHDOG_TMPL}:obmc-host-start@{0}.target.wants/${ENABLE_WATCHDOG_TGTFMT}"
+WATCHDOG_FMT = "../${WATCHDOG_TMPL}:obmc-host-startmin@{1}.target.wants/${WATCHDOG_TGTFMT}"
+ENABLE_WATCHDOG_FMT = "../${ENABLE_WATCHDOG_TMPL}:obmc-host-startmin@{0}.target.wants/${ENABLE_WATCHDOG_TGTFMT}"
 
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'WATCHDOG_FMT', 'OBMC_HOST_WATCHDOG_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'ENABLE_WATCHDOG_FMT', 'OBMC_HOST_INSTANCES')}"

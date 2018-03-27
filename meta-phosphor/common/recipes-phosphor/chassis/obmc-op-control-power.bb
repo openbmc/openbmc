@@ -68,7 +68,7 @@ SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'RESET_ON_CHASSIS_FMT', 'OBMC_POWE
 
 # Now show that the main control target requires these power targets
 START_TMPL_CTRL = "obmc-chassis-poweron@.target"
-START_TGTFMT_CTRL = "obmc-host-start@{1}.target"
+START_TGTFMT_CTRL = "obmc-host-startmin@{1}.target"
 START_INSTFMT_CTRL = "obmc-chassis-poweron@{0}.target"
 START_FMT_CTRL = "../${START_TMPL_CTRL}:${START_TGTFMT_CTRL}.requires/${START_INSTFMT_CTRL}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT_CTRL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"

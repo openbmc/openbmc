@@ -32,7 +32,12 @@ CHASSIS_ACTION_TARGETS = "poweron poweroff powered-off powerreset hard-poweroff"
 HOST_SYNCH_TARGETS = "start-pre starting started stop-pre stopping stopped reset-running"
 
 # Track all host action targets
-# - start:    Service to run to start the host
+# - start:    Will run startmin target, this target used for any additional
+#             services that user needs for an initial power on of host.
+#             For example, resetting the host reboot count could be put in
+#             this target so on any fresh power on, this count is reset.
+# - startmin: Minimum services required to start the host. This target will
+#             be called by reboot and start target.
 # - stop:     Services to run to shutdown the host
 # - quiesce:  Target to enter on host boot failure
 # - shutdown: Tell host to shutdown, then stop system
@@ -42,7 +47,7 @@ HOST_SYNCH_TARGETS = "start-pre starting started stop-pre stopping stopped reset
 #            multiple services and one of them is the quiesce target.
 # - timeout: Target to run when host watchdog times out
 # - reboot:  Reboot the host
-HOST_ACTION_TARGETS = "start stop quiesce reset shutdown crash timeout reboot"
+HOST_ACTION_TARGETS = "start startmin stop quiesce reset shutdown crash timeout reboot"
 
 CHASSIS_SYNCH_FMT = "obmc-power-{0}@.target"
 CHASSIS_ACTION_FMT = "obmc-chassis-{0}@.target"

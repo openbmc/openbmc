@@ -9,7 +9,7 @@ inherit pkgconfig
 SKELETON_DIR = "pciedetect"
 
 TMPL = "pcie-slot-detect@.service"
-TGTFMT = "obmc-host-start@{0}.target"
+TGTFMT = "obmc-host-startmin@{0}.target"
 INSTFMT = "pcie-slot-detect@{0}.service"
 FMT = "../${TMPL}:${TGTFMT}.wants/${INSTFMT}"
 

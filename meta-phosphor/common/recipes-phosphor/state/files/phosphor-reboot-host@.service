@@ -9,7 +9,9 @@ After=obmc-host-stop@%i.target
 # target this service is running in. OpenBMC needs a refactor of
 # how it does its host reset path. Until then, this short term
 # solution does the job.
-ExecStart=/bin/sh -c "sleep 5 && systemctl start obmc-host-start@%i.target"
+# Since this is a part of the reboot target, call the startmin
+# target which does the minimum required to start the host.
+ExecStart=/bin/sh -c "sleep 5 && systemctl start obmc-host-startmin@%i.target"
 
 
 [Install]

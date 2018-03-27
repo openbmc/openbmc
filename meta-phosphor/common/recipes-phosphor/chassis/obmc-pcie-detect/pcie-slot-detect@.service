@@ -11,4 +11,4 @@ ExecStart=/usr/bin/env pcie_slot_present.exe
 SyslogIdentifier=pcie_slot_present.exe
 
 [Install]
-WantedBy=obmc-host-start@%i.target
+WantedBy=obmc-host-startmin@%i.target

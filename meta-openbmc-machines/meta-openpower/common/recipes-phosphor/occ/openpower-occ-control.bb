@@ -50,10 +50,10 @@ EXTRA_OECONF_append = "${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'i2c-occ', 
 
 OCC_ENABLE = "enable"
 OCC_DISABLE = "disable"
-HOST_START = "start"
+HOST_START = "startmin"
 HOST_STOP = "stop"
 
-# Ensure host-stop and host-start targets require needed occ states
+# Ensure host-stop and host-startmin targets require needed occ states
 OCC_TMPL = "op-occ-{0}@.service"
 HOST_TGTFMT = "obmc-host-{1}@{2}.target"
 OCC_INSTFMT = "op-occ-{0}@{2}.service"

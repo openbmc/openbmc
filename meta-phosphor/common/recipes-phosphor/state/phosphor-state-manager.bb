@@ -116,13 +116,20 @@ HOST_SHUTDOWN_INSTFMT = "obmc-host-shutdown@{0}.target"
 HOST_REBOOT_FMT = "../${HOST_SHUTDOWN_TMPL}:${HOST_REBOOT_TGTFMT}.requires/${HOST_SHUTDOWN_INSTFMT}"
 SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_REBOOT_FMT', 'OBMC_HOST_INSTANCES')}"
 
-# And also force the reboot target to call the host start service
+# And also force the reboot target to call the host startmin service
 HOST_REBOOT_SVC = "phosphor-reboot-host@.service"
 HOST_REBOOT_SVC_INST = "phosphor-reboot-host@{0}.service"
 HOST_REBOOT_SVC_FMT = "../${HOST_REBOOT_SVC}:${HOST_REBOOT_TGTFMT}.requires/${HOST_REBOOT_SVC_INST}"
 SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_REBOOT_SVC_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
+# Force the host-start target to call the host-startmin target
+HOST_STARTMIN_TMPL = "obmc-host-startmin@.target"
+HOST_START_TGTFMT = "obmc-host-start@{0}.target"
+HOST_STARTMIN_INSTFMT = "obmc-host-startmin@{0}.target"
+HOST_START_FMT = "../${HOST_STARTMIN_TMPL}:${HOST_START_TGTFMT}.requires/${HOST_STARTMIN_INSTFMT}"
+SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_START_FMT', 'OBMC_HOST_INSTANCES')}"
+
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "90e5ae705afa8b63e41815a57cf5858b4ca7e710"
+SRCREV = "969b2613fed44f5b504411b21a9c65d89ed28bf5"
 
 S = "${WORKDIR}/git"
