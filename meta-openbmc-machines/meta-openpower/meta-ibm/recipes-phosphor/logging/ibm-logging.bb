@@ -9,8 +9,10 @@ SRCREV = "259e7277e6af53d2c4862cd48c14131c0b22bb81"
 
 inherit autotools
 inherit pkgconfig
+inherit pythonnative
 inherit obmc-phosphor-dbus-service
 inherit obmc-phosphor-systemd
+inherit phosphor-dbus-yaml
 
 DEPENDS += " \
          ibm-dbus-interfaces \
@@ -50,3 +52,28 @@ do_install_append(){
         -p ${WORKDIR}/policyTable.json \
         -c ${D}/${datadir}/ibm-logging/policy.json
 }
+
+#An optional task to generate a report on all of the errors
+#created by OpenBMC, and compare these errors to what is
+#in the error policy table
+do_report(){
+
+    ${S}/create_error_reports.py \
+        -p ${D}/${datadir}/ibm-logging/policy.json \
+        -y ${STAGING_DIR_NATIVE}${yaml_dir} \
+        -e ${WORKDIR}/build/all_errors.json \
+        -x ${WORKDIR}/build/policy_crosscheck.txt
+
+}
+
+addtask report
+
+#Collect all of the error YAML files into our recipe-sysroot-native dir.
+do_report[depends] = " \
+                     ibm-logging:do_install \
+                     phosphor-logging-error-logs-native:do_populate_sysroot \
+                     phosphor-dbus-interfaces-native:do_populate_sysroot \
+                     openpower-dbus-interfaces-native:do_populate_sysroot \
+                     openpower-occ-control-native:do_populate_sysroot  \
+                     openpower-debug-collector-native:do_populate_sysroot \
+                     "
