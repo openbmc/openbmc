@@ -1,0 +1,13 @@
+[Unit]
+Description=Reset host reboot counter
+Wants=mapper-wait@-xyz-openbmc_project-state-host%i.service
+After=mapper-wait@-xyz-openbmc_project-state-host%i.service
+ConditionPathExists=!/run/openbmc/host@%i-on
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStart=/bin/sh -c "busctl set-property `mapper get-service /xyz/openbmc_project/state/host%i` /xyz/openbmc_project/state/host%i xyz.openbmc_project.Control.Boot.RebootAttempts AttemptsLeft u 3"
+
+[Install]
+WantedBy=obmc-host-start@%i.target

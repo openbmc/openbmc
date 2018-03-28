@@ -54,6 +54,7 @@ RDEPENDS_${PN}-reset-sensor-states += "libsystemd phosphor-dbus-interfaces"
 FILES_${PN}-host = "${sbindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
 DBUS_SERVICE_${PN}-host += "phosphor-reboot-host@.service"
+SYSTEMD_SERVICE_${PN}-host += "phosphor-reset-host-reboot-attempts@.service"
 
 FILES_${PN}-chassis = "${sbindir}/phosphor-chassis-state-manager"
 DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
@@ -128,6 +129,12 @@ HOST_START_TGTFMT = "obmc-host-start@{0}.target"
 HOST_STARTMIN_INSTFMT = "obmc-host-startmin@{0}.target"
 HOST_START_FMT = "../${HOST_STARTMIN_TMPL}:${HOST_START_TGTFMT}.requires/${HOST_STARTMIN_INSTFMT}"
 SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_START_FMT', 'OBMC_HOST_INSTANCES')}"
+
+# Force the host-start target to call the reboot count reset service
+HOST_RST_RBT_ATTEMPTS_SVC = "phosphor-reset-host-reboot-attempts@.service"
+HOST_RST_RBT_ATTEMPTS_SVC_INST = "phosphor-reset-host-reboot-attempts@{0}.service"
+HOST_RST_RBT_ATTEMPTS_SVC_FMT = "../${HOST_RST_RBT_ATTEMPTS_SVC}:${HOST_START_TGTFMT}.requires/${HOST_RST_RBT_ATTEMPTS_SVC_INST}"
+SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_RST_RBT_ATTEMPTS_SVC_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
 SRCREV = "969b2613fed44f5b504411b21a9c65d89ed28bf5"
