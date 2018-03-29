@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# config: 2 20
+# @brief: Get the IBM specific elog objects
+#
+
+. $DREPORT_INCLUDE/functions
+
+desc="IBM elog"
+
+entries=$(busctl --list --no-pager tree \
+                 com.ibm.Logging | grep \
+                 '/xyz/openbmc_project/logging/entry/')
+
+#check for elog entries.
+if [ -z "$entries" ]; then
+    log_info "No $desc entries"
+    exit 0
+fi
+
+command="busctl call --verbose --no-pager \
+                com.ibm.Logging \
+                /xyz/openbmc_project/logging \
+                org.freedesktop.DBus.ObjectManager \
+                GetManagedObjects"
+
+file_name="ibm_elogall.log"
+
+add_cmd_output "$command" "$file_name" "$desc"
