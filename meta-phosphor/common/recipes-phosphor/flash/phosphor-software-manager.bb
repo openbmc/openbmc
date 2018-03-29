@@ -23,6 +23,8 @@ DBUS_PACKAGES = "${SOFTWARE_MGR_PACKAGES}"
 # handles the rest.
 SYSTEMD_PACKAGES = ""
 
+PACKAGECONFIG[verify_signature] = "--enable-verify_signature,--disable-verify_signature"
+
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
 inherit pythonnative
