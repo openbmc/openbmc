@@ -17,15 +17,14 @@ OVERLAY_BASETYPE ?= "jffs2"
 FLASH_UBI_BASETYPE ?= "${IMAGE_BASETYPE}"
 FLASH_UBI_OVERLAY_BASETYPE ?= "ubifs"
 
-IMAGE_TYPES += "overlay mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar"
+IMAGE_TYPES += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar"
 
-IMAGE_TYPEDEP_overlay = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP_mtd-static = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP_mtd-static-tar = "${IMAGE_BASETYPE}"
 IMAGE_TYPEDEP_mtd-static-alltar = "mtd-static"
 IMAGE_TYPEDEP_mtd-ubi = "${FLASH_UBI_BASETYPE}"
 IMAGE_TYPEDEP_mtd-ubi-tar = "${FLASH_UBI_BASETYPE}"
-IMAGE_TYPES_MASKED += "overlay mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar"
+IMAGE_TYPES_MASKED += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar"
 
 # Flash characteristics in KB unless otherwise noted
 FLASH_SIZE ?= "32768"
