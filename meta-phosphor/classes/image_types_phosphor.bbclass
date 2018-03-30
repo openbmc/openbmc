@@ -233,20 +233,24 @@ do_generate_static_alltar() {
 do_generate_static_alltar[vardepsexclude] = "DATETIME"
 do_generate_static_alltar[dirs] = "${S}/static"
 
-make_tar_of_images() {
+make_image_links() {
 	rwfs=$1
 	rofs=$2
-	type=$3
 	shift
 	shift
-	shift
-	extra_files="$@"
 
-	# Create some links to help make the tar archive
+	# Create some links to help make the tar archive in the format
+	# expected by phosphor-bmc-code-mgmt.
 	ln -sf ${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} image-u-boot
 	ln -sf ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} image-kernel
 	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.$rofs image-rofs
 	ln -sf rwfs.$rwfs image-rwfs
+}
+
+make_tar_of_images() {
+	type=$1
+	shift
+	extra_files="$@"
 
 	# Create the tar archive
 	tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.$type.mtd.tar \
@@ -257,7 +261,8 @@ make_tar_of_images() {
 }
 
 do_generate_static_tar() {
-	make_tar_of_images ${OVERLAY_BASETYPE} ${IMAGE_BASETYPE} static
+	make_image_links ${OVERLAY_BASETYPE} ${IMAGE_BASETYPE}
+	make_tar_of_images static
 
 	# Maintain non-standard legacy link.
 	cd ${IMGDEPLOYDIR}
@@ -273,7 +278,8 @@ do_generate_static_tar[vardepsexclude] = "DATETIME"
 
 do_generate_ubi_tar() {
 	ln -sf ${S}/MANIFEST MANIFEST
-	make_tar_of_images ${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_BASETYPE} ubi MANIFEST
+	make_image_links ${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_BASETYPE}
+	make_tar_of_images ubi MANIFEST
 }
 do_generate_ubi_tar[dirs] = " ${S}/ubi"
 do_generate_ubi_tar[depends] += " \
