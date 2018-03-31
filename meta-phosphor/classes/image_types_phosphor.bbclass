@@ -48,6 +48,8 @@ SIGNING_KEY ?= "${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv"
 INSECURE_KEY = "${@'${SIGNING_KEY}' == '${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv'}"
 SIGNING_KEY_DEPENDS = "${@oe.utils.conditional('INSECURE_KEY', 'True', 'phosphor-insecure-signing-key-native:do_populate_sysroot', '', d)}"
 
+UBOOT_SUFFIX ?= "bin"
+
 python() {
     # Compute rwfs LEB count and LEB size.
     page_size = d.getVar('FLASH_PAGE_SIZE', True)
