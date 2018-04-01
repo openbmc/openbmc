@@ -1,0 +1,21 @@
+# A YAML similar to this sample would have to be generated, for eg with MRW
+# inputs and system configuration, to depict IPMI FRU information.
+#
+# This file maps phosphor dbus inventory properties to IPMI properties
+#
+# This YAML could help generate C++ code.
+# Format of the YAML:
+# Fruid:
+#   Associated Fru paths
+#     d-bus Interfaces
+#       d-bus Properties
+#         IPMI Fru mapping
+#20:
+#  /system/chassis/motherboard/gv100card0:
+#    entityID: 3
+#    entityInstance: 1
+#    interfaces:
+#      xyz.openbmc_project.Inventory.Item:
+#        PrettyName:
+#          IPMIFruProperty: Board Name
+#          IPMIFruSection: Board
