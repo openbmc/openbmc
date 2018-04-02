@@ -1,11 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-# Pin the revision so the patch is guaranteed to be appliable
-# TODO: Remove this when the error handling in hwmon is done:
-# https://gerrit.openbmc-project.xyz/#/c/8073/
-SRCREV = "a23babd6952cb21397d6aa408a827047d1de81de"
-
-SRC_URI += " file://0001-sysfs-Return-ETIMEDOUT-instead-of-throw-exception.patch"
+EXTRA_OECONF_append_romulus = " --enable-negative-errno-on-fail"
 
 CHIPS = " \
         i2c@1e78a000/i2c-bus@440/w83773g@4c \
