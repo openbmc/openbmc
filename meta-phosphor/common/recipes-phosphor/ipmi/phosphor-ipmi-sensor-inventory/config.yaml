@@ -6,6 +6,7 @@
   sensorReadingType: 0x6F
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: eventdata2
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameProperty
   interfaces:
     xyz.openbmc_project.State.Boot.Progress:
@@ -37,6 +38,7 @@
   sensorReadingType: 0x6F
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameProperty
   interfaces:
     xyz.openbmc_project.State.OperatingSystem.Status:
@@ -68,6 +70,7 @@
   sensorReadingType: 0x6F
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameProperty
   interfaces:
     xyz.openbmc_project.Control.Boot.RebootAttempts:
@@ -83,6 +86,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -113,6 +117,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -143,6 +148,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -173,6 +179,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -203,6 +210,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -233,6 +241,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -263,6 +272,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -293,6 +303,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -323,6 +334,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -353,6 +365,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -383,6 +396,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -413,6 +427,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -443,6 +458,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -473,6 +489,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -503,6 +520,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -533,6 +551,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -563,6 +582,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -593,6 +613,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -623,6 +644,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -653,6 +675,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -683,6 +706,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -713,6 +737,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -743,6 +768,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -773,6 +799,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -803,6 +830,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -832,6 +860,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -862,6 +891,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -892,6 +922,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -922,6 +953,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -952,6 +984,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -982,6 +1015,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1012,6 +1046,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1042,6 +1077,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1072,6 +1108,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1102,6 +1139,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1132,6 +1170,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1162,6 +1201,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1192,6 +1232,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1222,6 +1263,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1252,6 +1294,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1282,6 +1325,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1312,6 +1356,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1342,6 +1387,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1372,6 +1418,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1402,6 +1449,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1432,6 +1480,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1462,6 +1511,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1492,6 +1542,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1522,6 +1573,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameParentLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1552,6 +1604,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1581,6 +1634,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1610,6 +1664,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1639,6 +1694,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1668,6 +1724,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1697,6 +1754,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1726,6 +1784,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1755,6 +1814,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1784,6 +1844,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1813,6 +1874,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1842,6 +1904,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1871,6 +1934,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1900,6 +1964,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1929,6 +1994,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1958,6 +2024,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -1987,6 +2054,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
@@ -2016,6 +2084,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
