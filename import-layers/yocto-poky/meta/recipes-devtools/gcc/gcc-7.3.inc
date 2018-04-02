@@ -74,9 +74,11 @@ SRC_URI = "\
            file://0048-gcc-Enable-static-PIE.patch \
            file://fix-segmentation-fault-precompiled-hdr.patch \
            file://0050-RISC-V-Handle-non-legitimate-address-in-riscv_legiti.patch \
+           file://no-sse-fix-test-case-failures.patch \
            ${BACKPORTS} \
 "
 BACKPORTS = "\
+           file://0001-Fix-internal-compiler-error-in-testcase.patch \
 "
 
 SRC_URI[md5sum] = "be2da21680f27624f3a87055c4ba5af2"

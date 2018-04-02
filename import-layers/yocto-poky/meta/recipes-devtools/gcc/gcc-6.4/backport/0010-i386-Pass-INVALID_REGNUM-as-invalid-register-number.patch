@@ -1,0 +1,46 @@
+From c4300d9ad683e693c90d02d4f1b13183bf2d4acc Mon Sep 17 00:00:00 2001
+From: hjl <hjl@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Fri, 2 Feb 2018 16:47:02 +0000
+Subject: [PATCH 10/12] i386: Pass INVALID_REGNUM as invalid register number
+
+	Backport from mainline
+	* config/i386/i386.c (ix86_output_function_return): Pass
+	INVALID_REGNUM, instead of -1, as invalid register number to
+	indirect_thunk_name and output_indirect_thunk.
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-7-branch@257341 138bc75d-0d04-0410-961f-82ee72b054a4
+
+Upstream-Status: Pending
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+---
+ gcc/config/i386/i386.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/config/i386/i386.c b/gcc/config/i386/i386.c
+index 4012657..66502ee 100644
+--- a/gcc/config/i386/i386.c
++++ b/gcc/config/i386/i386.c
+@@ -28056,7 +28056,8 @@ ix86_output_function_return (bool long_p)
+ 	{
+ 	  bool need_thunk = (cfun->machine->function_return_type
+ 			     == indirect_branch_thunk);
+-	  indirect_thunk_name (thunk_name, -1, need_bnd_p, true);
++	  indirect_thunk_name (thunk_name, INVALID_REGNUM, need_bnd_p,
++			       true);
+ 	  if (need_bnd_p)
+ 	    {
+ 	      indirect_thunk_bnd_needed |= need_thunk;
+@@ -28069,7 +28070,7 @@ ix86_output_function_return (bool long_p)
+ 	    }
+ 	}
+       else
+-	output_indirect_thunk (need_bnd_p, -1);
++	output_indirect_thunk (need_bnd_p, INVALID_REGNUM);
+ 
+       return "";
+     }
+-- 
+2.7.4
+

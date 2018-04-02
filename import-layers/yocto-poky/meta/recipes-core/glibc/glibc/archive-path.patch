@@ -1,0 +1,39 @@
+localedef --add-to-archive uses a hard-coded locale path which doesn't exist in
+normal use, and there's no way to pass an alternative filename.
+
+Add a fallback of $LOCALEARCHIVE from the environment, and allow creation of new locale archives that are not the system archive.
+
+Upstream-Status: Inappropriate (OE-specific)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/locale/programs/locarchive.c b/locale/programs/locarchive.c
+index ca332a34..6b7ba9b2 100644
+--- a/locale/programs/locarchive.c
++++ b/locale/programs/locarchive.c
+@@ -569,10 +569,13 @@ open_archive (struct locarhandle *ah, bool readonly)
+   /* If ah has a non-NULL fname open that otherwise open the default.  */
+   if (archivefname == NULL)
+     {
+-      archivefname = default_fname;
+-      if (output_prefix)
+-        memcpy (default_fname, output_prefix, prefix_len);
+-      strcpy (default_fname + prefix_len, ARCHIVE_NAME);
++      archivefname = getenv("LOCALEARCHIVE");
++      if (archivefname == NULL) {
++              archivefname = default_fname;
++              if (output_prefix)
++                memcpy (default_fname, output_prefix, prefix_len);
++              strcpy (default_fname + prefix_len, ARCHIVE_NAME);
++      }
+     }
+ 
+   while (1)
+@@ -585,7 +588,7 @@ open_archive (struct locarhandle *ah, bool readonly)
+ 	     the default locale archive we ignore the failure and
+ 	     list an empty archive, otherwise we print an error
+ 	     and exit.  */
+-	  if (errno == ENOENT && archivefname == default_fname)
++	  if (errno == ENOENT)
+ 	    {
+ 	      if (readonly)
+ 		{

@@ -43,6 +43,11 @@ SRC_URI += "file://find.pl;subdir=openssl-${PV}/util/ \
            file://0001-Fix-build-with-clang-using-external-assembler.patch \
            file://0001-openssl-force-soft-link-to-avoid-rare-race.patch \
            "
+
+SRC_URI_append_class-target = "\
+           file://reproducible-cflags.patch \
+           file://reproducible-mkbuildinf.patch \
+           "
 SRC_URI[md5sum] = "13bdc1b1d1ff39b6fd42a255e74676a4"
 SRC_URI[sha256sum] = "370babb75f278c39e0c50e8c4e7493bc0f18db6867478341a832a982fd15a8fe"
 

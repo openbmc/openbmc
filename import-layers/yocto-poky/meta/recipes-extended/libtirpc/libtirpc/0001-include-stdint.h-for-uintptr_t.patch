@@ -1,17 +1,15 @@
-From b80d3b573c1dade2b29b22f8acc3b9e2c7ddefd7 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Sat, 20 May 2017 13:36:43 -0700
-Subject: [PATCH] include stdint.h for uintptr_t
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@intel.com>
 
-Fixes
-| ../../libtirpc-1.0.1/src/xdr_sizeof.c:93:13: error: 'uintptr_t' undeclared (first use in this function); did you mean '__intptr_t'?
-|   if (len < (uintptr_t)xdrs->x_base) {
-|              ^~~~~~~~~
+From acb9a37977cf0a9630eac74af9adebf35e38e719 Mon Sep 17 00:00:00 2001
+From: Thorsten Kukuk <kukuk@thkukuk.de>
+Date: Tue, 14 Nov 2017 10:39:08 -0500
+Subject: [PATCH] Include stdint.h from xdr_sizeof.c to avoid missing
+ declaration errors.
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Thorsten Kukuk <kukuk@suse.de>
+Signed-off-by: Steve Dickson <steved@redhat.com>
 ---
-Upstream-Status: Pending
-
  src/xdr_sizeof.c | 1 +
  1 file changed, 1 insertion(+)
 
@@ -28,5 +26,4 @@ index d23fbd1..79d6707 100644
  
  /* ARGSUSED */
 -- 
-2.13.0
-
+1.8.3.1

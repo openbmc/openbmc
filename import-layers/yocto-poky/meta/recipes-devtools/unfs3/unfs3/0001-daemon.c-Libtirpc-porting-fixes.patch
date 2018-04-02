@@ -1,0 +1,37 @@
+From c7a2a65d6c2a433312540c207860740d6e4e7629 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 11 Mar 2018 17:32:54 -0700
+Subject: [PATCH] daemon.c: Libtirpc porting fixes
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ daemon.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/daemon.c b/daemon.c
+index 22f30f6..028a181 100644
+--- a/daemon.c
++++ b/daemon.c
+@@ -117,7 +117,7 @@ void logmsg(int prio, const char *fmt, ...)
+  */
+ struct in_addr get_remote(struct svc_req *rqstp)
+ {
+-    return (svc_getcaller(rqstp->rq_xprt))->sin_addr;
++    return ((struct sockaddr_in*)svc_getcaller(rqstp->rq_xprt))->sin_addr;
+ }
+ 
+ /*
+@@ -125,7 +125,7 @@ struct in_addr get_remote(struct svc_req *rqstp)
+  */
+ short get_port(struct svc_req *rqstp)
+ {
+-    return (svc_getcaller(rqstp->rq_xprt))->sin_port;
++    return ((struct sockaddr_in*)svc_getcaller(rqstp->rq_xprt))->sin_port;
+ }
+ 
+ /*
+-- 
+2.16.2
+

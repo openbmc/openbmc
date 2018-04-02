@@ -10,6 +10,7 @@ SRC_URI += "file://acinclude.m4 \
             file://mkdir_p.patch \
             file://reproducible-doc.patch \
             file://0001-misc-create_inode.c-set-dir-s-mode-correctly.patch \
+            file://0001-misc-rename-copy_file_range-to-copy_file_chunk.patch \
 "
 
 SRC_URI_append_class-native = " file://e2fsprogs-fix-missing-check-for-permission-denied.patch"

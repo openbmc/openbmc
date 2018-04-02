@@ -29,6 +29,7 @@ SRC_URI = "http://wiki.qemu-project.org/download/${BP}.tar.bz2 \
            file://CVE-2017-13672.patch \
            file://CVE-2017-14167.patch \
            file://ppc_locking.patch \
+           file://memfd.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+\..*)\.tar"
 
@@ -60,4 +61,3 @@ do_install_ptest() {
 
 	cp ${S}/tests/Makefile.include ${D}${PTEST_PATH}/tests
 }
-

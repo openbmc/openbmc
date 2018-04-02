@@ -64,13 +64,14 @@ do_install_append_class-target () {
         ${D}${mandir}/man8/update-ca-certificates.8
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst_${PN}_class-target () {
     SYSROOT="$D" $D${sbindir}/update-ca-certificates
 }
 
 CONFFILES_${PN} += "${sysconfdir}/ca-certificates.conf"
 
-# Postinsts don't seem to be run for nativesdk packages when populating SDKs.
+# Rather than make a postinst script that works for both target and nativesdk,
+# we just run update-ca-certificate from do_install() for nativesdk.
 CONFFILES_${PN}_append_class-nativesdk = " ${sysconfdir}/ssl/certs/ca-certificates.crt"
 do_install_append_class-nativesdk () {
     SYSROOT="${D}${SDKPATHNATIVE}" ${D}${sbindir}/update-ca-certificates

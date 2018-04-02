@@ -371,6 +371,29 @@ class PackageManager(object, metaclass=ABCMeta):
         pass
 
     """
+    Install all packages that match a glob.
+    """
+    def install_glob(self, globs, sdk=False):
+        # TODO don't have sdk here but have a property on the superclass
+        # (and respect in install_complementary)
+        if sdk:
+            pkgdatadir = self.d.expand("${TMPDIR}/pkgdata/${SDK_SYS}")
+        else:
+            pkgdatadir = self.d.getVar("PKGDATA_DIR")
+
+        try:
+            bb.note("Installing globbed packages...")
+            cmd = ["oe-pkgdata-util", "-p", pkgdatadir, "list-pkgs", globs]
+            pkgs = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode("utf-8")
+            self.install(pkgs.split(), attempt_only=True)
+        except subprocess.CalledProcessError as e:
+            # Return code 1 means no packages matched
+            if e.returncode != 1:
+                bb.fatal("Could not compute globbed packages list. Command "
+                         "'%s' returned %d:\n%s" %
+                         (' '.join(cmd), e.returncode, e.output.decode("utf-8")))
+
+    """
     Install complementary packages based upon the list of currently installed
     packages e.g. locales, *-dev, *-dbg, etc. This will only attempt to install
     these packages, if they don't exist then no error will occur.  Note: every
@@ -402,7 +425,7 @@ class PackageManager(object, metaclass=ABCMeta):
             installed_pkgs.write(output)
             installed_pkgs.flush()
 
-            cmd = [bb.utils.which(os.getenv('PATH'), "oe-pkgdata-util"),
+            cmd = ["oe-pkgdata-util",
                    "-p", self.d.getVar('PKGDATA_DIR'), "glob", installed_pkgs.name,
                    globs]
             exclude = self.d.getVar('PACKAGE_EXCLUDE_COMPLEMENTARY')
@@ -412,11 +435,11 @@ class PackageManager(object, metaclass=ABCMeta):
                 bb.note("Installing complementary packages ...")
                 bb.note('Running %s' % cmd)
                 complementary_pkgs = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode("utf-8")
+                self.install(complementary_pkgs.split(), attempt_only=True)
             except subprocess.CalledProcessError as e:
                 bb.fatal("Could not compute complementary packages list. Command "
                          "'%s' returned %d:\n%s" %
                          (' '.join(cmd), e.returncode, e.output.decode("utf-8")))
-            self.install(complementary_pkgs.split(), attempt_only=True)
 
     def deploy_dir_lock(self):
         if self.deploy_dir is None:
@@ -1066,7 +1089,7 @@ class OpkgPM(OpkgDpkgPM):
             output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT).decode("utf-8")
             bb.note(output)
         except subprocess.CalledProcessError as e:
-            (bb.fatal, bb.note)[attempt_only]("Unable to install packages. "
+            (bb.fatal, bb.warn)[attempt_only]("Unable to install packages. "
                                               "Command '%s' returned %d:\n%s" %
                                               (cmd, e.returncode, e.output.decode("utf-8")))
 
@@ -1365,7 +1388,7 @@ class DpkgPM(OpkgDpkgPM):
             bb.note("Installing the following packages: %s" % ' '.join(pkgs))
             subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
-            (bb.fatal, bb.note)[attempt_only]("Unable to install packages. "
+            (bb.fatal, bb.warn)[attempt_only]("Unable to install packages. "
                                               "Command '%s' returned %d:\n%s" %
                                               (cmd, e.returncode, e.output.decode("utf-8")))
 

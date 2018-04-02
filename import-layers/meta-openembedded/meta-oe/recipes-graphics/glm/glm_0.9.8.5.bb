@@ -10,13 +10,13 @@ SECTION = "libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://copying.txt;md5=4431606d144252143c9c3df384a74cad"
 
-SRC_URI = "git://github.com/g-truc/glm;protocol=https"
-
-SRCREV = "5dcc56489e1b66dfd5bca751fa9b8dc68059e008"
-
+SRC_URI = "git://github.com/g-truc/glm;branch=0.9.8"
+SRCREV = "6fa203eeb7fbcbb6f620501fad40359c8a456049"
 S = "${WORKDIR}/git"
 
 inherit cmake
 
 FILES_${PN}-dev += "${libdir}/cmake"
 RDEPENDS_${PN}-dev = ""
+
+BBCLASSEXTEND = "native"

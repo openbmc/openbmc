@@ -657,7 +657,8 @@ fakeroot python do_populate_sdk_ext() {
     d.setVar('SDK_REQUIRED_UTILITIES', get_sdk_required_utilities(buildtools_fn, d))
     d.setVar('SDK_BUILDTOOLS_INSTALLER', buildtools_fn)
     d.setVar('SDKDEPLOYDIR', '${SDKEXTDEPLOYDIR}')
-
+    # ESDKs have a libc from the buildtools so ensure we don't ship linguas twice
+    d.delVar('SDKIMAGE_LINGUAS')
     populate_sdk_common(d)
 }
 

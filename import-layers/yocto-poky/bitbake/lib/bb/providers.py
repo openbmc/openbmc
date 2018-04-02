@@ -244,17 +244,17 @@ def _filterProviders(providers, item, cfgData, dataCache):
             pkg_pn[pn] = []
         pkg_pn[pn].append(p)
 
-    logger.debug(1, "providers for %s are: %s", item, list(pkg_pn.keys()))
+    logger.debug(1, "providers for %s are: %s", item, list(sorted(pkg_pn.keys())))
 
     # First add PREFERRED_VERSIONS
-    for pn in pkg_pn:
+    for pn in sorted(pkg_pn):
         sortpkg_pn[pn] = sortPriorities(pn, dataCache, pkg_pn)
         preferred_versions[pn] = findPreferredProvider(pn, cfgData, dataCache, sortpkg_pn[pn], item)
         if preferred_versions[pn][1]:
             eligible.append(preferred_versions[pn][1])
 
     # Now add latest versions
-    for pn in sortpkg_pn:
+    for pn in sorted(sortpkg_pn):
         if pn in preferred_versions and preferred_versions[pn][1]:
             continue
         preferred_versions[pn] = findLatestProvider(pn, cfgData, dataCache, sortpkg_pn[pn][0])

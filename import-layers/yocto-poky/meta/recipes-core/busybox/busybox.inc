@@ -48,6 +48,8 @@ CONFFILES_${PN}-mdev = "${sysconfdir}/mdev.conf"
 
 RRECOMMENDS_${PN} = "${PN}-syslog ${PN}-udhcpc"
 
+RDEPENDS_${PN} = "${@["", "busybox-inittab"][(d.getVar('VIRTUAL-RUNTIME_init_manager') == 'busybox')]}"
+
 inherit cml1 systemd update-rc.d ptest
 
 # internal helper
@@ -292,16 +294,6 @@ do_install () {
                 install -D -m 0777 ${WORKDIR}/rcS ${D}${sysconfdir}/init.d/rcS
                 install -D -m 0777 ${WORKDIR}/rcK ${D}${sysconfdir}/init.d/rcK
                 install -D -m 0755 ${WORKDIR}/runlevel ${D}${base_sbindir}/runlevel
-                if grep "CONFIG_FEATURE_USE_INITTAB=y" ${B}/.config; then
-                        install -D -m 0777 ${WORKDIR}/inittab ${D}${sysconfdir}/inittab
-                        tmp="${SERIAL_CONSOLES}"
-                        for i in $tmp
-                        do
-                                j=`echo ${i} | sed s/\;/\ /g`
-                                id=`echo ${i} | sed -e 's/^.*;//' -e 's/;.*//'`
-                                echo "$id::respawn:${base_sbindir}/getty ${j}" >> ${D}${sysconfdir}/inittab
-                        done
-                fi
         fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then

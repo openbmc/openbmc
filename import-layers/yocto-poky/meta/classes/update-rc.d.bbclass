@@ -91,7 +91,8 @@ python populate_packages_updatercd () {
             return
         statement = "grep -q -w '/etc/init.d/functions' %s" % path
         if subprocess.call(statement, shell=True) == 0:
-            d.appendVar('RDEPENDS_' + pkg, ' initd-functions')
+            mlprefix = d.getVar('MLPREFIX') or ""
+            d.appendVar('RDEPENDS_' + pkg, ' %sinitd-functions' % (mlprefix))
 
     def update_rcd_package(pkg):
         bb.debug(1, 'adding update-rc.d calls to preinst/postinst/prerm/postrm for %s' % pkg)

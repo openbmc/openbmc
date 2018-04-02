@@ -57,7 +57,7 @@ COMPATIBLE_HOST_linux-muslx32 = 'null'
 COMPATIBLE_HOST_mipsarchn32 = 'null'
 COMPATIBLE_HOST_mipsarchr6 = 'null'
 
-inherit autotools ptest
+inherit autotools ptest multilib_header
 
 EXTRA_OECONF = "--enable-tls --without-mpicc"
 EXTRA_OECONF += "${@['--enable-only32bit','--enable-only64bit'][d.getVar('SITEINFO_BITS') != '32']}"
@@ -90,6 +90,7 @@ do_configure_prepend () {
 
 do_install_append () {
     install -m 644 ${B}/default.supp ${D}/${libdir}/valgrind/
+    oe_multilib_header valgrind/config.h
 }
 
 TUNE = "${@strip_mcpu(d)}"

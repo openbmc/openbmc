@@ -88,6 +88,7 @@ RECIPE_MAINTAINER_pn-build-sysroots = "Richard Purdie <richard.purdie@linuxfound
 RECIPE_MAINTAINER_pn-builder = "Cristian Iorga <cristian.iorga@intel.com>"
 RECIPE_MAINTAINER_pn-buildtools-tarball = "Cristian Iorga <cristian.iorga@intel.com>"
 RECIPE_MAINTAINER_pn-busybox = "Armin Kuster <akuster808@gmail.com>"
+RECIPE_MAINTAINER_pn-busybox-inittab = "Denys Dmytriyenko <denys@ti.com>"
 RECIPE_MAINTAINER_pn-byacc = "Chen Qi <Qi.Chen@windriver.com>"
 RECIPE_MAINTAINER_pn-bzip2 = "Denys Dmytriyenko <denys@ti.com>"
 RECIPE_MAINTAINER_pn-ca-certificates = "Alexander Kanavin <alexander.kanavin@intel.com>"

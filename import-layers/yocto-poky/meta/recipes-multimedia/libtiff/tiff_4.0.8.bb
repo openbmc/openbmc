@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "59d7a5a8ccd92059913f246877db95a2918e6c04fb9d43fd74e5c3390d
 # exclude betas
 UPSTREAM_CHECK_REGEX = "tiff-(?P<pver>\d+(\.\d+)+).tar"
 
-inherit autotools
+inherit autotools multilib_header
 
 CACHED_CONFIGUREVARS = "ax_cv_check_gl_libgl=no"
 
@@ -50,5 +50,9 @@ PACKAGECONFIG[chunky-strip-read] = "--enable-chunky-strip-read,--disable-chunky-
 PACKAGES =+ "tiffxx tiff-utils"
 FILES_tiffxx = "${libdir}/libtiffxx.so.*"
 FILES_tiff-utils = "${bindir}/*"
+
+do_install_append() {
+    oe_multilib_header tiffconf.h
+}
 
 BBCLASSEXTEND = "native"

@@ -7,6 +7,51 @@ import shutil
 import glob
 import traceback
 
+def generate_locale_archive(d, rootfs):
+    # Pretty sure we don't need this for SDK archive generation but
+    # keeping it to be safe...
+    target_arch = d.getVar('SDK_ARCH')
+    locale_arch_options = { \
+        "arm": ["--uint32-align=4", "--little-endian"],
+        "armeb": ["--uint32-align=4", "--big-endian"],
+        "aarch64": ["--uint32-align=4", "--little-endian"],
+        "aarch64_be": ["--uint32-align=4", "--big-endian"],
+        "sh4": ["--uint32-align=4", "--big-endian"],
+        "powerpc": ["--uint32-align=4", "--big-endian"],
+        "powerpc64": ["--uint32-align=4", "--big-endian"],
+        "mips": ["--uint32-align=4", "--big-endian"],
+        "mipsisa32r6": ["--uint32-align=4", "--big-endian"],
+        "mips64": ["--uint32-align=4", "--big-endian"],
+        "mipsisa64r6": ["--uint32-align=4", "--big-endian"],
+        "mipsel": ["--uint32-align=4", "--little-endian"],
+        "mipsisa32r6el": ["--uint32-align=4", "--little-endian"],
+        "mips64el": ["--uint32-align=4", "--little-endian"],
+        "mipsisa64r6el": ["--uint32-align=4", "--little-endian"],
+        "i586": ["--uint32-align=4", "--little-endian"],
+        "i686": ["--uint32-align=4", "--little-endian"],
+        "x86_64": ["--uint32-align=4", "--little-endian"]
+    }
+    if target_arch in locale_arch_options:
+        arch_options = locale_arch_options[target_arch]
+    else:
+        bb.error("locale_arch_options not found for target_arch=" + target_arch)
+        bb.fatal("unknown arch:" + target_arch + " for locale_arch_options")
+
+    localedir = oe.path.join(rootfs, d.getVar("libdir_nativesdk"), "locale")
+    # Need to set this so cross-localedef knows where the archive is
+    env = dict(os.environ)
+    env["LOCALEARCHIVE"] = oe.path.join(localedir, "locale-archive")
+
+    for name in os.listdir(localedir):
+        path = os.path.join(localedir, name)
+        if os.path.isdir(path):
+            try:
+                cmd = ["cross-localedef", "--verbose"]
+                cmd += arch_options
+                cmd += ["--add-to-archive", path]
+                subprocess.check_output(cmd, env=env, stderr=subprocess.STDOUT)
+            except Exception as e:
+                bb.fatal("Cannot create locale archive: %s" % e.output)
 
 class Sdk(object, metaclass=ABCMeta):
     def __init__(self, d, manifest_dir):
@@ -83,6 +128,30 @@ class Sdk(object, metaclass=ABCMeta):
         except Exception as e:
             bb.debug(1, "printing the stack trace\n %s" %traceback.format_exc())
             bb.warn("cannot remove SDK dir: %s" % path)
+
+    def install_locales(self, pm):
+        # This is only relevant for glibc
+        if self.d.getVar("TCLIBC") != "glibc":
+            return
+
+        linguas = self.d.getVar("SDKIMAGE_LINGUAS")
+        if linguas:
+            import fnmatch
+            # Install the binary locales
+            if linguas == "all":
+                pm.install_glob("nativesdk-glibc-binary-localedata-*.utf-8", sdk=True)
+            else:
+                for lang in linguas.split():
+                    pm.install("nativesdk-glibc-binary-localedata-%s.utf-8" % lang)
+            # Generate a locale archive of them
+            generate_locale_archive(self.d, oe.path.join(self.sdk_host_sysroot, self.sdk_native_path))
+            # And now delete the binary locales
+            pkgs = fnmatch.filter(pm.list_installed(), "nativesdk-glibc-binary-localedata-*.utf-8")
+            pm.remove(pkgs)
+        else:
+            # No linguas so do nothing
+            pass
+
 
 class RpmSdk(Sdk):
     def __init__(self, d, manifest_dir=None, rpm_workdir="oe-sdk-repo"):
@@ -166,6 +235,7 @@ class RpmSdk(Sdk):
 
         bb.note("Installing NATIVESDK packages")
         self._populate_sysroot(self.host_pm, self.host_manifest)
+        self.install_locales(self.host_pm)
 
         execute_pre_post_process(self.d, self.d.getVar("POPULATE_SDK_POST_HOST_COMMAND"))
 
@@ -249,6 +319,7 @@ class OpkgSdk(Sdk):
 
         bb.note("Installing NATIVESDK packages")
         self._populate_sysroot(self.host_pm, self.host_manifest)
+        self.install_locales(self.host_pm)
 
         execute_pre_post_process(self.d, self.d.getVar("POPULATE_SDK_POST_HOST_COMMAND"))
 
@@ -335,6 +406,7 @@ class DpkgSdk(Sdk):
 
         bb.note("Installing NATIVESDK packages")
         self._populate_sysroot(self.host_pm, self.host_manifest)
+        self.install_locales(self.host_pm)
 
         execute_pre_post_process(self.d, self.d.getVar("POPULATE_SDK_POST_HOST_COMMAND"))
 

@@ -1,0 +1,126 @@
+From 3eff2adada2b1667b0e76496fa559e0c248ecd84 Mon Sep 17 00:00:00 2001
+From: uros <uros@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Thu, 25 Jan 2018 19:39:01 +0000
+Subject: [PATCH 09/12] Use INVALID_REGNUM in indirect thunk processing
+
+	Backport from mainline
+	2018-01-17  Uros Bizjak  <ubizjak@gmail.com>
+
+	* config/i386/i386.c (indirect_thunk_name): Declare regno
+	as unsigned int.  Compare regno with INVALID_REGNUM.
+	(output_indirect_thunk): Ditto.
+	(output_indirect_thunk_function): Ditto.
+	(ix86_code_end): Declare regno as unsigned int.  Use INVALID_REGNUM
+	in the call to output_indirect_thunk_function.
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-7-branch@257067 138bc75d-0d04-0410-961f-82ee72b054a4
+
+Upstream-Status: Pending
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+---
+ gcc/config/i386/i386.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/gcc/config/i386/i386.c b/gcc/config/i386/i386.c
+index 9c038be..4012657 100644
+--- a/gcc/config/i386/i386.c
++++ b/gcc/config/i386/i386.c
+@@ -11087,16 +11087,16 @@ static int indirect_thunks_bnd_used;
+ /* Fills in the label name that should be used for the indirect thunk.  */
+ 
+ static void
+-indirect_thunk_name (char name[32], int regno, bool need_bnd_p,
+-		     bool ret_p)
++indirect_thunk_name (char name[32], unsigned int regno,
++		     bool need_bnd_p, bool ret_p)
+ {
+-  if (regno >= 0 && ret_p)
++  if (regno != INVALID_REGNUM && ret_p)
+     gcc_unreachable ();
+ 
+   if (USE_HIDDEN_LINKONCE)
+     {
+       const char *bnd = need_bnd_p ? "_bnd" : "";
+-      if (regno >= 0)
++      if (regno != INVALID_REGNUM)
+ 	{
+ 	  const char *reg_prefix;
+ 	  if (LEGACY_INT_REGNO_P (regno))
+@@ -11114,7 +11114,7 @@ indirect_thunk_name (char name[32], int regno, bool need_bnd_p,
+     }
+   else
+     {
+-      if (regno >= 0)
++      if (regno != INVALID_REGNUM)
+ 	{
+ 	  if (need_bnd_p)
+ 	    ASM_GENERATE_INTERNAL_LABEL (name, "LITBR", regno);
+@@ -11166,7 +11166,7 @@ indirect_thunk_name (char name[32], int regno, bool need_bnd_p,
+  */
+ 
+ static void
+-output_indirect_thunk (bool need_bnd_p, int regno)
++output_indirect_thunk (bool need_bnd_p, unsigned int regno)
+ {
+   char indirectlabel1[32];
+   char indirectlabel2[32];
+@@ -11196,7 +11196,7 @@ output_indirect_thunk (bool need_bnd_p, int regno)
+ 
+   ASM_OUTPUT_INTERNAL_LABEL (asm_out_file, indirectlabel2);
+ 
+-  if (regno >= 0)
++  if (regno != INVALID_REGNUM)
+     {
+       /* MOV.  */
+       rtx xops[2];
+@@ -11220,12 +11220,12 @@ output_indirect_thunk (bool need_bnd_p, int regno)
+ }
+ 
+ /* Output a funtion with a call and return thunk for indirect branch.
+-   If BND_P is true, the BND prefix is needed.   If REGNO != -1,  the
+-   function address is in REGNO.  Otherwise, the function address is
++   If BND_P is true, the BND prefix is needed.  If REGNO != INVALID_REGNUM,
++   the function address is in REGNO.  Otherwise, the function address is
+    on the top of stack.  */
+ 
+ static void
+-output_indirect_thunk_function (bool need_bnd_p, int regno)
++output_indirect_thunk_function (bool need_bnd_p, unsigned int regno)
+ {
+   char name[32];
+   tree decl;
+@@ -11274,7 +11274,7 @@ output_indirect_thunk_function (bool need_bnd_p, int regno)
+ 	ASM_OUTPUT_LABEL (asm_out_file, name);
+       }
+ 
+-  if (regno < 0)
++  if (regno == INVALID_REGNUM)
+     {
+       /* Create alias for __x86.return_thunk/__x86.return_thunk_bnd.  */
+       char alias[32];
+@@ -11348,16 +11348,16 @@ static void
+ ix86_code_end (void)
+ {
+   rtx xops[2];
+-  int regno;
++  unsigned int regno;
+ 
+   if (indirect_thunk_needed)
+-    output_indirect_thunk_function (false, -1);
++    output_indirect_thunk_function (false, INVALID_REGNUM);
+   if (indirect_thunk_bnd_needed)
+-    output_indirect_thunk_function (true, -1);
++    output_indirect_thunk_function (true, INVALID_REGNUM);
+ 
+   for (regno = FIRST_REX_INT_REG; regno <= LAST_REX_INT_REG; regno++)
+     {
+-      int i = regno - FIRST_REX_INT_REG + LAST_INT_REG + 1;
++      unsigned int i = regno - FIRST_REX_INT_REG + LAST_INT_REG + 1;
+       if ((indirect_thunks_used & (1 << i)))
+ 	output_indirect_thunk_function (false, regno);
+ 
+-- 
+2.7.4
+

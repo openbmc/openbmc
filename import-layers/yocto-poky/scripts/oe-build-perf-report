@@ -639,10 +639,6 @@ def main(argv=None):
         data.append(AggregateTestData(aggregate_metadata(raw_m),
                                       aggregate_data(raw_d)))
 
-    # Re-map list indexes to the new table starting from index 0
-    index_r = index_r - index_0
-    index_l = index_l - index_0
-
     # Read buildstats only when needed
     buildstats = None
     if args.dump_buildstats or args.html:
@@ -653,10 +649,11 @@ def main(argv=None):
 
     # Print report
     if not args.html:
-        print_diff_report(data[index_l].metadata, data[index_l].results,
-                          data[index_r].metadata, data[index_r].results)
+        print_diff_report(data[0].metadata, data[0].results,
+                          data[1].metadata, data[1].results)
     else:
-        print_html_report(data, index_l, buildstats)
+        # Re-map 'left' list index to the data table where index_0 maps to 0
+        print_html_report(data, index_l - index_0, buildstats)
 
     return 0
 

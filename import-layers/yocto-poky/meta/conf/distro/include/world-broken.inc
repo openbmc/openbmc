@@ -5,10 +5,6 @@
 # rt-tests needs PI mutex support in libc
 EXCLUDE_FROM_WORLD_pn-rt-tests_libc-musl = "1"
 
-# error: no member named 'sin_port' in 'struct sockaddr_in6'
-# this is due to libtirpc using ipv6 but portmap rpc expecting ipv4
-EXCLUDE_FROM_WORLD_pn-unfs3_libc-musl = "1"
-
 # error: use of undeclared identifier '_STAT_VER'
 EXCLUDE_FROM_WORLD_pn-pseudo_libc-musl = "1"
 

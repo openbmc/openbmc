@@ -9,8 +9,10 @@ RECIPE_UPSTREAM_DATE = "Oct 08, 2015"
 CHECK_DATE = "Dec 10, 2015"
 
 DEPENDS = "flex-native bison-native flex"
-DEPENDS_append_libc-musl = " libtirpc"
+DEPENDS += "libtirpc"
 DEPENDS_append_class-nativesdk = " flex-nativesdk"
+
+ASNEEDED = ""
 
 MOD_PV = "497"
 S = "${WORKDIR}/trunk"
@@ -26,7 +28,8 @@ SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/unfs3-0.9.22.r497.ta
            file://rename_fh_cache.patch \
            file://relative_max_socket_path_len.patch \
            file://tcp_no_delay.patch \
-          "
+           file://0001-daemon.c-Libtirpc-porting-fixes.patch \
+           "
 SRC_URI[md5sum] = "2e43e471c77ade0331901c40b8f8e9a3"
 SRC_URI[sha256sum] = "21009468a9ba07b72ea93780d025a63ab4e55bf8fc3127803c296f0900fe1bac"
 
@@ -34,7 +37,8 @@ BBCLASSEXTEND = "native nativesdk"
 
 inherit autotools
 EXTRA_OECONF_append_class-native = " --sbindir=${bindir}"
-CFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc"
+CFLAGS_append = " -I${STAGING_INCDIR}/tirpc"
+LDFLAGS_append = " -ltirpc"
 
 # Turn off these header detects else the inode search
 # will walk entire file systems and this is a real problem

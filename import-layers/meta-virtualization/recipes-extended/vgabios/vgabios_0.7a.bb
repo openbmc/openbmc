@@ -7,7 +7,7 @@ DEPENDS = "dev86-native biossums-native"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=dcf3c825659e82539645da41a7908589"
 
-SRC_URI =  "http://savannah.gnu.org/download/vgabios/${PN}-${PV}.tgz"
+SRC_URI =  "http://savannah.gnu.org/download/vgabios/${BPN}-${PV}.tgz"
 
 SRC_URI[md5sum] = "2c0fe5c0ca08082a9293e3a7b23dc900"
 SRC_URI[sha256sum] = "9d24c33d4bfb7831e2069cf3644936a53ef3de21d467872b54ce2ea30881b865"
