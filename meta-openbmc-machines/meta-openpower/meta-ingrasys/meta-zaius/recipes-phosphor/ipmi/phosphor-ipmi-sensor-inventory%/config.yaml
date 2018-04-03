@@ -4,6 +4,7 @@
   sensorReadingType: 0x6F
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: eventdata2
+  mutability: Mutability::Write|Mutability::Read
   interfaces:
     xyz.openbmc_project.State.Boot.Progress:
       BootProgress:
@@ -32,6 +33,7 @@
   sensorReadingType: 0x6F
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   interfaces:
     xyz.openbmc_project.State.OperatingSystem.Status:
       OperatingSystemState:
@@ -60,6 +62,7 @@
   sensorReadingType: 0x6F
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingAssertion
+  mutability: Mutability::Write|Mutability::Read
   interfaces:
     xyz.openbmc_project.Control.Boot.RebootAttempts:
       AttemptsLeft:
@@ -72,6 +75,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -98,6 +102,7 @@
   sensorReadingType: 0x09
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   interfaces:
     org.open_power.OCC.Status:
       OccActive:
@@ -116,6 +121,7 @@
   sensorReadingType: 0x6F
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   interfaces:
     xyz.openbmc_project.State.Decorator.OperationalStatus:
       Functional:
@@ -142,6 +148,7 @@
   sensorReadingType: 0x09
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   interfaces:
     org.open_power.OCC.Status:
       OccActive:
@@ -160,6 +167,7 @@
   sensorReadingType: 0x03
   serviceInterface: xyz.openbmc_project.Inventory.Manager
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
