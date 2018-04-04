@@ -1,6 +1,7 @@
 occ_active_sensor:
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     org.open_power.OCC.Status:
@@ -19,6 +20,7 @@ hb_volatile_sensor:
   path: /org/open_power/control/volatile
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     xyz.openbmc_project.Object.Enable:

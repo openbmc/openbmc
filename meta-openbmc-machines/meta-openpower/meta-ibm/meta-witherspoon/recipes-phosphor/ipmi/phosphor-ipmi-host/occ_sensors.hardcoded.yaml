@@ -6,6 +6,7 @@
   sensorReadingType: 0x09
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     org.open_power.OCC.Status:
@@ -27,6 +28,7 @@
   sensorReadingType: 0x09
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: assertion
+  mutability: Mutability::Write|Mutability::Read
   sensorNamePattern: nameLeaf
   interfaces:
     org.open_power.OCC.Status:
