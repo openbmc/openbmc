@@ -1,0 +1,45 @@
+[PATCH] umount: ignore -c option
+
+systemd uses -c.
+       -c, --no-canonicalize
+              Do  not canonicalize paths.  The paths canonicalization is based
+              on stat(2) and readlink(2) system calls. These system calls  may
+              hang  in  some cases (for example on NFS if server is not avail‐
+              able). The option has to be used  with  canonical  path  to  the
+              mount point.
+
+              For  more  details  about this option see the mount(8) man page.
+              Note  that  umount  does   not   pass   this   option   to   the
+              /sbin/umount.type helpers.
+As busybox doesn't canonicalize paths in the first place it is safe to ignore this
+option.
+
+See https://github.com/systemd/systemd/issues/7786
+
+Signed-off-by: Shawn Landden <slandden at gmail.com>
+---
+ util-linux/umount.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/util-linux/umount.c b/util-linux/umount.c
+index a6405dfcc..b45cd8a6b 100644
+--- a/util-linux/umount.c
++++ b/util-linux/umount.c
+@@ -44,7 +44,7 @@ static struct mntent *getmntent_r(FILE*
+ }
+ #endif
+ 
+-/* Ignored: -v -t -i
++/* Ignored: -c -v -t -i
+  * bbox always acts as if -d is present.
+  * -D can be used to suppress it (bbox extension).
+  * Rationale:
+@@ -52,7 +52,7 @@ static struct mntent *getmntent_r(FILE*
+  * thus, on many systems, bare umount _does_ drop loop devices.
+  * (2) many users request this feature.
+  */
+-#define OPTION_STRING           "fldDnra" "vt:i"
++#define OPTION_STRING           "fldDnra" "cvt:i"
+ #define OPT_FORCE               (1 << 0) // Same as MNT_FORCE
+ #define OPT_LAZY                (1 << 1) // Same as MNT_DETACH
+ //#define OPT_FREE_LOOP           (1 << 2) // -d is assumed always present
