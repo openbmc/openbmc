@@ -1,0 +1,27 @@
+From 5ebfe83e2d407e946d47cbe3b589b638fc62f1ab Mon Sep 17 00:00:00 2001
+From: Eddie James <eajames@us.ibm.com>
+Date: Thu, 5 Apr 2018 12:40:20 -0500
+Subject: [PATCH] Enable watchdog and set watchdog device to watchdog1
+
+---
+ src/core/system.conf | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/core/system.conf b/src/core/system.conf
+index 746572b..d012216 100644
+--- a/src/core/system.conf
++++ b/src/core/system.conf
+@@ -24,8 +24,9 @@
+ #CtrlAltDelBurstAction=reboot-force
+ #CPUAffinity=1 2
+ #JoinControllers=cpu,cpuacct net_cls,net_prio
+-#RuntimeWatchdogSec=0
++RuntimeWatchdogSec=20
+ #ShutdownWatchdogSec=10min
++WatchdogDevice=/dev/watchdog1
+ #CapabilityBoundingSet=
+ #SystemCallArchitectures=
+ #TimerSlackNSec=
+-- 
+1.8.3.1
+
