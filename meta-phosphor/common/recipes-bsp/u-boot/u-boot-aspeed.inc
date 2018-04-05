@@ -8,16 +8,15 @@ SRC_URI_append_aspeed_df-obmc-ubi-fs = " \
     file://0004-config-ast-common-Add-conditional-factory-reset-comm.patch \
     "
 
+do_patch[depends] = "os-release:do_populate_sysroot"
 
-python do_configure_aspeed_df-obmc-ubi-fs () {
+python do_patch_append_aspeed_df-obmc-ubi-fs () {
     version_id=do_get_versionID(d)
     d.setVar('VERSION_ID', version_id)
-    bb.build.exec_func("patch_uboot", d)
+    bb.build.exec_func("patch_kernelname", d)
 }
 
-patch_uboot () {
-	sed -i "s/kernel-0/kernel-${VERSION_ID}/g" \
-	${S}/patches/0003-config-ast-common-Add-bootopts-to-support-ubi-and-mt.patch &> /dev/null
-	sed -i "s/kernel-0/kernel-${VERSION_ID}/g" \
-	${S}/include/configs/ast-common.h &> /dev/null
+patch_kernelname () {
+    sed -ri "s/kernel-(0|[a-fA-F0-9]{8})/kernel-${VERSION_ID}/g" \
+    ${S}/include/configs/ast-common.h &> /dev/null
 }
