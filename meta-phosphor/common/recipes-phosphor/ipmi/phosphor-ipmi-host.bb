@@ -19,7 +19,6 @@ def ipmi_whitelists(d):
     whitelists = [ '{}-whitelist-native'.format(x) for x in whitelists ]
     return ' '.join(whitelists)
 
-
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "nlohmann-json"
 DEPENDS += "obmc-targets"
@@ -34,6 +33,8 @@ DEPENDS += "virtual/phosphor-ipmi-fru-merge-config"
 DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
 DEPENDS += "virtual/phosphor-ipmi-channel-config"
 
+VIRTUAL-RUNTIME_ipmi-config ?= "phosphor-ipmi-config"
+
 RDEPENDS_${PN}-dev += "phosphor-logging"
 RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
 RDEPENDS_${PN} += "clear-once"
@@ -43,6 +44,7 @@ RDEPENDS_${PN} += "phosphor-dbus-interfaces"
 RDEPENDS_${PN} += "phosphor-mapper"
 RDEPENDS_${PN} += "phosphor-time-manager"
 RDEPENDS_${PN} += "sdbusplus"
+RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_ipmi-config}"
 RDEPENDS_${PN} += "virtual/obmc-watchdog"
 
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
@@ -68,13 +70,7 @@ EXTRA_OECONF = " \
 
 S = "${WORKDIR}/git"
 
-SRC_URI += "file://merge_yamls.py \
-            file://dev_id.json \
-            file://dcmi_cap.json \
-            file://power_reading.json \
-            file://dcmi_sensors.json \
-            file://cipher_list.json \
-            "
+SRC_URI += "file://merge_yamls.py "
 
 HOSTIPMI_PROVIDER_LIBRARY += "libapphandler.so"
 HOSTIPMI_PROVIDER_LIBRARY += "libsysintfcmds.so"
@@ -84,11 +80,6 @@ NETIPMI_PROVIDER_LIBRARY += "libapphandler.so"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
-FILES_${PN}_append = " ${datadir}/ipmi-providers/dev_id.json"
-FILES_${PN}_append = " ${datadir}/ipmi-providers/dcmi_cap.json"
-FILES_${PN}_append = " ${datadir}/ipmi-providers/power_reading.json"
-FILES_${PN}_append = " ${datadir}/ipmi-providers/dcmi_sensors.json"
-FILES_${PN}_append = " ${datadir}/ipmi-providers/cipher_list.json"
 FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
 
 # Soft Power Off
@@ -126,18 +117,6 @@ python do_merge_sensors () {
     # Invoke the script and don't catch any resulting exception.
     subprocess.check_call(cmd)
 }
-do_install_append(){
-    install -d ${D}${datadir}/ipmi-providers
-    install -m 0644 -D ${WORKDIR}/dev_id.json \
-        ${D}${datadir}/ipmi-providers/dev_id.json
-    install -m 0644 -D ${WORKDIR}/dcmi_cap.json \
-        ${D}${datadir}/ipmi-providers/dcmi_cap.json
-    install -m 0644 -D ${WORKDIR}/power_reading.json \
-        ${D}${datadir}/ipmi-providers/power_reading.json
-    install -m 0644 -D ${WORKDIR}/dcmi_sensors.json \
-        ${D}${datadir}/ipmi-providers/dcmi_sensors.json
-    install -m 0644 -D ${WORKDIR}/cipher_list.json \
-        ${D}${datadir}/ipmi-providers/cipher_list.json
-}
+
 # python-pyyaml-native is installed by do_configure, so put this task after
 addtask merge_sensors after do_configure before do_compile
