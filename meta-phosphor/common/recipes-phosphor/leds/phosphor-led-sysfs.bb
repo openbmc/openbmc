@@ -17,7 +17,7 @@ DBUS_SERVICE_${PN} += "xyz.openbmc_project.led.controller@.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-led-sysfs"
 SRC_URI += "file://70-leds.rules"
-SRCREV = "f9de54be38be17456dae06408ed93f3416a6621f"
+SRCREV = "7caf4dcc47c665e214f9204da9ad161c41d3a183"
 S = "${WORKDIR}/git"
 
 do_install_append() {
