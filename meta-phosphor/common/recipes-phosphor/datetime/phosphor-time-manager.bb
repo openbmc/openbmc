@@ -23,7 +23,7 @@ RDEPENDS_${PN} += "sdbusplus"
 RDEPENDS_${PN} += "phosphor-dbus-interfaces"
 
 SRC_URI += "git://github.com/openbmc/phosphor-time-manager"
-SRCREV = "a111b9f380fdae78821abfe95fb171e82ee5db53"
+SRCREV = "75710b6a1a78cb81dd4fd2f3271f398a42179599"
 S = "${WORKDIR}/git"
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.Time.Manager.service"
