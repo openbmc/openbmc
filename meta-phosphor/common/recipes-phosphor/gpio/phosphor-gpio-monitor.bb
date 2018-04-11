@@ -13,10 +13,8 @@ GPIO_PACKAGES = " \
         ${PN}-presence \
 "
 
-PACKAGES += "${GPIO_PACKAGES}"
-PACKAGES_remove = "${PN}"
-RDEPENDS_${PN}-dev = "${GPIO_PACKAGES}"
-RDEPENDS_${PN}-staticdev = "${GPIO_PACKAGES}"
+PACKAGE_BEFORE_PN += "${GPIO_PACKAGES}"
+ALLOW_EMPTY_${PN} = "1"
 SYSTEMD_PACKAGES = "${GPIO_PACKAGES}"
 
 RPROVIDES_${PN}-monitor += "virtual/obmc-gpio-monitor"
