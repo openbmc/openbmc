@@ -12,15 +12,12 @@ LED_MGR_PACKAGES = " \
     ${PN}-faultmonitor \
 "
 
-PACKAGES += "${LED_MGR_PACKAGES}"
-PACKAGES_remove = "${PN}"
+PACKAGE_BEFORE_PN += "${LED_MGR_PACKAGES}"
+ALLOW_EMPTY_${PN} = "1"
 
 DBUS_PACKAGES = "${PN}-ledmanager"
 
 SYSTEMD_PACKAGES = "${LED_MGR_PACKAGES}"
-
-RDEPENDS_${PN}-dev = "${LED_MGR_PACKAGES}"
-RDEPENDS_${PN}-staticdev = "${LED_MGR_PACKAGES}"
 
 DEPENDS += "python-pyyaml-native"
 DEPENDS += "autoconf-archive-native"
