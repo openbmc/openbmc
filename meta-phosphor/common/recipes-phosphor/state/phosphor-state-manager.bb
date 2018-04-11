@@ -15,10 +15,8 @@ STATE_MGR_PACKAGES = " \
     ${PN}-host-check \
     ${PN}-reset-sensor-states \
 "
-PACKAGES =+ "${STATE_MGR_PACKAGES}"
-PACKAGES_remove = "${PN}"
-RDEPENDS_${PN}-dev = "${STATE_MGR_PACKAGES}"
-RDEPENDS_${PN}-staticdev = "${STATE_MGR_PACKAGES}"
+PACKAGE_BEFORE_PN += "${STATE_MGR_PACKAGES}"
+ALLOW_EMPTY_${PN} = "1"
 
 DBUS_PACKAGES = "${STATE_MGR_PACKAGES}"
 
