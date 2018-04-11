@@ -1,1 +1,1 @@
-RDEPENDS_${PN}-inventory += " openpower-occ-control phosphor-cooling-type"
+RDEPENDS_${PN}-inventory += " openpower-occ-control phosphor-cooling-type id-button"
