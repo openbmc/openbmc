@@ -27,12 +27,10 @@ FAN_PACKAGES = " \
         ${PN}-monitor \
 "
 
-PACKAGES_remove = "${PN}"
-PACKAGES += "${FAN_PACKAGES}"
+ALLOW_EMPTY_${PN} = "1"
+PACKAGE_BEFORE_PN += "${FAN_PACKAGES}"
 PACKAGECONFIG ?= "presence control monitor"
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
-RDEPENDS_${PN}-dev = "${FAN_PACKAGES}"
-RDEPENDS_${PN}-staticdev = "${FAN_PACKAGES}"
 
 # --------------------------------------
 # ${PN}-presence-tach specific configuration
