@@ -12,10 +12,8 @@ DEBUG_COLLECTOR_PKGS = " \
     ${PN}-dreport \
     ${PN}-scripts \
 "
-PACKAGES =+ "${DEBUG_COLLECTOR_PKGS}"
-PACKAGES_remove = "${PN}"
-RDEPENDS_${PN}-dev = "${DEBUG_COLLECTOR_PKGS}"
-RDEPENDS_${PN}-staticdev = "${DEBUG_COLLECTOR_PKGS}"
+PACKAGE_BEFORE_PN += "${DEBUG_COLLECTOR_PKGS}"
+ALLOW_EMPTY_${PN} = "1"
 
 DBUS_PACKAGES = "${PN}-manager"
 
