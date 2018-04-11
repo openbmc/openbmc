@@ -11,9 +11,7 @@ SRCREV = "51cbda5f30e56c801c07fe3d3aba5d7fb9e6cca4"
 
 S = "${WORKDIR}/git"
 
-PACKAGES_remove = "${PN}*"
-PACKAGES = "${PN}-dev"
-RDEPENDS_${PN}-dev = ""
+ALLOW_EMPTY_${PN} = "1"
 
 do_install () {
     install -d ${D}${includedir}/cereal
