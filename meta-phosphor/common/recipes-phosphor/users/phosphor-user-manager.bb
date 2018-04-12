@@ -15,6 +15,11 @@ DEPENDS += "phosphor-dbus-interfaces"
 RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "phosphor-logging"
 
+inherit useradd
+
+USERADD_PACKAGES = "${PN}"
+# add groups needed for privilege maintenance
+GROUPADD_PARAM_${PN} = "priv-admin; priv-operator; priv-user; priv-callback "
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.User.Manager.service"
 
