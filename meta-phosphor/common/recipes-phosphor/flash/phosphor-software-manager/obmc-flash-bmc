@@ -1,33 +1,6 @@
 #!/bin/bash
 set -eo pipefail
 
-# Check if BMC is currently booted from the alternate chip; returns "1" if true
-check_if_alt() {
-  res=0
-  wdiof_cardreset_bit=5
-  wdiof_cardreset=$((1 << $wdiof_cardreset_bit))
-
-  # Read the systemd watchdog config to see which device we should use
-  line=$(cat /etc/systemd/system.conf | grep "WatchdogDevice")
-  if [ ! -z ${line} ]; then
-    watchdog_device=${line##WatchdogDevice=/dev/}
-
-    # Check for legacy symlink to /dev/watchdog0
-    if [ ${watchdog_device} == "watchdog" ]; then
-      watchdog_device="watchdog0"
-    fi
-
-    # Check the bootstatus to see if we've been reset
-    path="/sys/class/watchdog/${watchdog_device}/bootstatus"
-    if [ -f ${path} ]; then
-      bootstatus=$(cat ${path})
-      res=$((($bootstatus & $wdiof_cardreset) >> $wdiof_cardreset_bit))
-    fi
-  fi
-
-  echo "${res}"
-}
-
 # Get the root mtd device number (mtdX) from "/dev/ubiblockX_Y on /"
 findrootmtd() {
   rootmatch=" on / "
@@ -449,17 +422,10 @@ mirroruboot() {
     bmcenvdev="/dev/${bmcenv}"
     altenv="$(findmtd "alt-u-boot-env")"
     altenvdev="/dev/${altenv}"
-    is_alt="$(check_if_alt)"
 
-    if [[ "${is_alt}" == "1" ]]; then
-      echo "Mirroring U-boot; alt to bmc"
-      mtd_copy "${altdev}" "${bmcdev}"
-      mtd_copy "${altenvdev}" "${bmcenvdev}"
-    else
-      echo "Mirroring U-boot; bmc to alt"
-      mtd_copy "${bmcdev}" "${altdev}"
-      mtd_copy "${bmcenvdev}" "${altenvdev}"
-    fi
+    echo "Mirroring U-boot to alt chip"
+    mtd_copy "${bmcdev}" "${altdev}"
+    mtd_copy "${bmcenvdev}" "${altenvdev}"
 
     copy_ubiblock_to_alt
     copy_root_to_alt
