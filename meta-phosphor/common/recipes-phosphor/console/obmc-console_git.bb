@@ -16,6 +16,7 @@ SRC_URI += "git://github.com/openbmc/obmc-console"
 SRC_URI += "file://${PN}.conf"
 
 SRCREV = "c7fbcd480fb03840a4c44e546af878e84400b6fe"
+PV = "1.0+git${SRCPV}"
 
 REGISTERED_SERVICES_${PN} += "obmc_console:tcp:2200"
 OBMC_CONSOLE_HOST_TTY ?= "ttyVUART0"
