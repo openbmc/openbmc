@@ -1,4 +1,4 @@
-SUMMARY = "Quanta Q71l IPMI to DBus Inventory mapping."
+SUMMARY = "Quanta-Q71l IPMI to DBus Inventory mapping."
 PR = "r1"
 
 inherit native
@@ -12,9 +12,6 @@ PROVIDES += "virtual/phosphor-ipmi-fru-inventory"
 S = "${WORKDIR}"
 
 do_install() {
-        # TODO: install this to inventory_datadir
-        # after ipmi-fru-parser untangles the host
-        # firmware config from the machine inventory.
         DEST=${D}${config_datadir}
 
         install -d ${DEST}
