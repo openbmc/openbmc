@@ -101,13 +101,13 @@ i2cset -y 5 0x12 0x3C 0x80 b    # Set to 64A
 #VDD A master OC fault to 445A
 i2cset -y 4 0x70 0x00 0x00 b    # PAGE
 i2cset -y 4 0x70 0x46 0x08DE w
-# VDD A master OC warn to 384A
-i2cset -y 4 0x70 0x4A 0x08C0 w
+# VDD A master OC warn to 326A
+i2cset -y 4 0x70 0x4A 0x08A3 w # A308
 #VDD B master OC fault to 445A
 i2cset -y 5 0x70 0x00 0x00 b    # PAGE
 i2cset -y 5 0x70 0x46 0x08DE w
-# VDD B master OC warn to 384A
-i2cset -y 5 0x70 0x4A 0x08C0 w
+# VDD B master OC warn to 326A
+i2cset -y 5 0x70 0x4A 0x08A3 w
 #VCS phase current to 30A C/C
 i2cset -y 4 0x12 0xFF 0x08 b    # set window register to 8
 i2cset -y 4 0x12 0x3C 0x3C b    # 30A
