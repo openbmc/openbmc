@@ -8,7 +8,7 @@ SRC_URI_append_aspeed_df-obmc-ubi-fs = " \
     file://0004-config-ast-common-Add-conditional-factory-reset-comm.patch \
     "
 
-do_patch[depends] = "os-release:do_populate_sysroot"
+do_patch[depends] += "os-release:do_populate_sysroot"
 
 python do_patch_append_aspeed_df-obmc-ubi-fs () {
     version_id=do_get_versionID(d)
