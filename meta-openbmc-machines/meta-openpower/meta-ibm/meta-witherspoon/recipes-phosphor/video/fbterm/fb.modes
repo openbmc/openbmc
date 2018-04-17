@@ -1,0 +1,7 @@
+mode "800x600-60"
+    # D: 40.00 MHz, H: 37.879 kHz, V: 60.32 Hz
+    geometry 800 600 800 600 32
+    timings 0 88 40 23 1 128 4
+    hsync high
+    vsync high
+endmode
