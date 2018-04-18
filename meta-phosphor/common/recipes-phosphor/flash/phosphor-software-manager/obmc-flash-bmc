@@ -231,6 +231,17 @@ ubi_cleanup() {
     done
 }
 
+mount_alt_rwfs() {
+  altNum="$(findmtdnum "alt-bmc")"
+  if [ ! -z "${altNum}" ]; then
+    altVarMount="/media/alt/var"
+    mkdir -p "${altVarMount}"
+    if mount ubi"${altNum}":rwfs "${altVarMount}" -t ubifs -o defaults; then
+      mkdir -p "${altVarMount}"/persist/etc
+    fi
+  fi
+}
+
 remount_ubi() {
   bmcmtd="$(findmtd "bmc")"
   altbmcmtd="$(findmtd "alt-bmc")"
@@ -477,6 +488,7 @@ case "$1" in
     ;;
   ubiremount)
     remount_ubi
+    mount_alt_rwfs
     ;;
   createenvbackup)
     backup_env_vars
