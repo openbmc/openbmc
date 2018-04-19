@@ -2,4 +2,4 @@ DEVPATH=/dev/input/by-path/platform-gpio-keys-event
 KEY=135
 POLARITY=1
 TARGET=id-button-pressed.service
-CONTINUE=true
+EXTRA_ARGS=--continue
