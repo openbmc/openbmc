@@ -1,9 +1,0 @@
-#!/bin/sh
-
-if !(host -t SOA local. > /dev/null 2> /dev/null); then
-    # Return 1 to tell that local domain is present
-    exit 1
-else
-    # Return 0 to tell local domain is not being used
-    exit 0
-fi

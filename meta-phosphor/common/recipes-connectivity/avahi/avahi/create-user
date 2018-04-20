@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Create avahi group and user
-deluser avahi ; addgroup --system avahi ; adduser --system --no-create-home --ingroup avahi avahi
-
-exit $?
