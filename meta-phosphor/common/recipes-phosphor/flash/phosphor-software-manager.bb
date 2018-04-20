@@ -11,6 +11,7 @@ SOFTWARE_MGR_PACKAGES = " \
     ${PN}-version \
     ${PN}-download-mgr \
     ${PN}-updater \
+    ${PN}-sync \
 "
 PACKAGES =+ "${SOFTWARE_MGR_PACKAGES}"
 PACKAGES_remove = "${PN}"
@@ -24,6 +25,7 @@ DBUS_PACKAGES = "${SOFTWARE_MGR_PACKAGES}"
 SYSTEMD_PACKAGES = ""
 
 PACKAGECONFIG[verify_signature] = "--enable-verify_signature,--disable-verify_signature"
+PACKAGECONFIG[sync_bmc_files] = "--enable-sync_bmc_files,--disable-sync_bmc_files"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
@@ -69,9 +71,11 @@ FILES_${PN}-updater += " \
     ${sbindir}/obmc-flash-bmc \
     /usr/local \
     "
+FILES_${PN}-sync += "${sbindir}/phosphor-sync-software-manager"
 DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.Version.service"
 DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
 DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
+DBUS_SERVICE_${PN}-sync += "xyz.openbmc_project.Software.Sync.service"
 
 SYSTEMD_SERVICE_${PN}-updater += " \
     obmc-flash-bmc-ubirw.service \

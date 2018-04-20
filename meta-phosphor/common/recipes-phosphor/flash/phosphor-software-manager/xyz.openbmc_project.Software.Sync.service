@@ -1,0 +1,10 @@
+[Unit]
+Description=Phosphor Sync Manager that syncs files to the alternate BMC chip
+
+[Service]
+ExecStart=/usr/bin/env phosphor-sync-software-manager
+SyslogIdentifier=phosphor-sync-software-manager
+Restart=always
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
