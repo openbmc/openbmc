@@ -1,0 +1,34 @@
+From 345b1ade63576f5a8a1c3a4a1b75aab41d84b714 Mon Sep 17 00:00:00 2001
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Fri, 20 Apr 2018 13:29:58 +0930
+Subject: [PATCH] config/ast-common: Fall-back to secondary flash on failed
+ bootm
+
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+---
+ include/configs/ast-common.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
+index ad08016ec110..10ef6a1955b7 100644
+--- a/include/configs/ast-common.h
++++ b/include/configs/ast-common.h
+@@ -127,12 +127,14 @@
+ #define CONFIG_ENV_OVERWRITE
+ 
+ #define ASPEED_ENV_SETTINGS \
++	"wdt2bite=mw.l 0x1e785024 0xa 1; mw.b 0x1e78502c 0xb3 1 \0" \
++	"bootalt=run wdt2bite \0" \
+ 	"ubiblock=0,1 \0" \
+ 	"root=/dev/ubiblock0_1 \0" \
+ 	"kernelname=kernel-0 \0" \
+ 	"loadaddr=" __stringify(CONFIG_LOADADDR) "\0" \
+ 	"set_bootargs=setenv bootargs " CONFIG_BOOTARGS " ubi.block=\${ubiblock} root=\${root} \0" \
+-	"obmc_bootcmd=ubi part obmc-ubi; run do_rwreset; ubi read ${loadaddr} ${kernelname}; bootm ${loadaddr} \0" \
++	"obmc_bootcmd=ubi part obmc-ubi; run do_rwreset; ubi read ${loadaddr} ${kernelname}; bootm ${loadaddr} || run bootalt \0" \
+ 	"verify=yes\0"	\
+ 	"spi_dma=yes\0" \
+ 	"mtdids=" MTDIDS_DEFAULT "\0" \
+-- 
+2.14.1
+
