@@ -1,0 +1,2 @@
+define KFEATURE_DESCRIPTION "Require watchdog to reset SoC on panic"
+kconf non-hardware phosphor-wdt-on-panic.cfg
