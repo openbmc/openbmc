@@ -1,0 +1,8 @@
+[Unit]
+Description=UART renderer
+Requires=obmc-console@ttyVUART0.service
+
+[Service]
+EnvironmentFile={envfiledir}/fbterm
+ExecStartPre=/usr/sbin/fbset $FB_MODE
+ExecStart=/usr/bin/fbterm --write-only obmc-console-client
