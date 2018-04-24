@@ -1,0 +1,13 @@
+[Unit]
+Description=Phosphor SNMP conf Manager
+After=obmc-mapper.target
+
+[Service]
+ExecStart=/usr/bin/env phosphor-network-snmpconf
+SyslogIdentifier=phosphor-network-snmpconf
+Restart=always
+Type=dbus
+BusName=xyz.openbmc_project.Network.SNMP
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
