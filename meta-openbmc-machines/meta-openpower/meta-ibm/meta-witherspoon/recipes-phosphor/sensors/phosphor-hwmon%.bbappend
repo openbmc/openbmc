@@ -1,5 +1,9 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+SRC_URI += " \
+           file://start_max31785_hwmon.sh \
+           "
+
 WSPOON_CHIPS = " \
                i2c@1e78a000/i2c-bus@100/bmp280@77 \
                i2c@1e78a000/i2c-bus@100/dps310@76 \
@@ -28,3 +32,8 @@ SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'WSPOON_OCCITEMS')
 
 SYSTEMD_ENVIRONMENT_FILE_max31785-msl += "obmc/hwmon-max31785/wspoon.conf"
 SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:${SYSTEMD_DEFAULT_TARGET}.wants/phosphor-max31785-msl@wspoon.service"
+
+do_install_append() {
+    install -d ${D}${bindir}
+    install -m 0755 ${WORKDIR}/start_max31785_hwmon.sh ${D}${bindir}
+}
