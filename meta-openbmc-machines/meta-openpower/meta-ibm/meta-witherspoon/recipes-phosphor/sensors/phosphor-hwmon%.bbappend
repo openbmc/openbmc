@@ -1,13 +1,16 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += " \
+           file://70-hwmon.rules \
+           file://70-max31785-hwmon.rules \
            file://start_max31785_hwmon.sh \
            "
 
 WSPOON_CHIPS = " \
                i2c@1e78a000/i2c-bus@100/bmp280@77 \
                i2c@1e78a000/i2c-bus@100/dps310@76 \
-               i2c@1e78a000/i2c-bus@100/max31785@52 \
+               i2c@1e78a000/i2c-bus@100/max31785@52_air \
+               i2c@1e78a000/i2c-bus@100/max31785@52_water \
                i2c@1e78a000/i2c-bus@100/power-supply@68 \
                i2c@1e78a000/i2c-bus@100/power-supply@69 \
                i2c@1e78a000/i2c-bus@140/ir35221@70 \
@@ -36,6 +39,9 @@ SYSTEMD_LINK_max31785-msl += "../phosphor-max31785-msl@.service:${SYSTEMD_DEFAUL
 SYSTEMD_SERVICE_${PN} += "max31785-hwmon-helper@.service"
 
 do_install_append() {
+    install -d ${D}/${base_libdir}/udev/rules.d/
+    install ${WORKDIR}/70-max31785-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
+
     install -d ${D}${bindir}
     install -m 0755 ${WORKDIR}/start_max31785_hwmon.sh ${D}${bindir}
 }
