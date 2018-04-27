@@ -94,6 +94,16 @@ findname() {
   echo "${n}"
 }
 
+# Set the u-boot envs that perform a side switch on failure to boot
+set_wdt2bite() {
+  if ! fw_printenv wdt2bite 2>/dev/null; then
+    fw_setenv wdt2bite "mw.l 0x1e785024 0xa 1; mw.b 0x1e78502c 0xb3 1"
+    fw_setenv bootalt "run wdt2bite"
+    fw_setenv obmc_bootcmd "ubi part obmc-ubi; run do_rwreset; ubi read \
+\${loadaddr} \${kernelname}; bootm \${loadaddr} || run bootalt"
+  fi
+}
+
 # Make space on flash before creating new volumes. This can be enhanced
 # determine current flash usage. For now only keep a "keepmax" number of them
 ubi_remove_volumes()
@@ -282,6 +292,8 @@ remount_ubi() {
       fi
     done
   done
+
+  set_wdt2bite
 }
 
 # Read the current env variable and set it on the alternate boot env
