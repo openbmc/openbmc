@@ -15,7 +15,7 @@ RDEPENDS_${PN} += "libmapper"
 RDEPENDS_${PN} += "libsystemd"
 
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
-SRCREV = "62ec622e0b71fb396ef681ad4cadc4a567ce5d85"
+SRCREV = "56527b9331eaf18deb40bc71e8da630535b5e5a4"
 
 S = "${WORKDIR}/git"
 
