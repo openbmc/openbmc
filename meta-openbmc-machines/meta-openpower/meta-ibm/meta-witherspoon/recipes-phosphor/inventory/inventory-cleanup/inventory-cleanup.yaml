@@ -13,3 +13,15 @@ events:
                 - /system/chassis/power_supply1
                 - /system/chassis/powersupply0
                 - /system/chassis/powersupply1
+
+    - name: Remove fan1
+      description: >
+          Remove all fan1 associated objects and have fan presence and
+          fan monitor create it based on cooling type.
+      type: startup
+      actions:
+          - name: destroyObjects
+            paths:
+                - /system/chassis/motherboard/fan1/fan1_0
+                - /system/chassis/motherboard/fan1/fan1_1
+                - /system/chassis/motherboard/fan1

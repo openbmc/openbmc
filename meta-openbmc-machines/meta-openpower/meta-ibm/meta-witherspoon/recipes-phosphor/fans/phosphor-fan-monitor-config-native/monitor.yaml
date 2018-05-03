@@ -20,6 +20,16 @@ fans:
         has_target: true
       - name: fan1_1
         has_target: false
+    # Create fan1 inventory & sensors on air cooled only
+    condition:
+      name: propertiesMatch
+      properties:
+        - object: /xyz/openbmc_project/inventory/system/chassis
+          interface: xyz.openbmc_project.Inventory.Decorator.CoolingType
+          property:
+              name: WaterCooled
+              type: bool
+              value: false
 
   - inventory: /system/chassis/motherboard/fan2
     functional_delay: 5
