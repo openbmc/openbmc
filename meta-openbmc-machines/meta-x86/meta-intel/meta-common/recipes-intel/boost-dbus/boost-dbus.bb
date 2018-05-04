@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://LICENSE_1_0.txt;md5=e4224ccaecb14d942c71d31bef20d78c"
 SRC_URI = "gitsm://github.com/openbmc/boost-dbus.git"
 
 PV = "1.0+git${SRCPV}"
-SRCREV = "165e3f02c7d5d418c1b5f8c180ae970d6a8afb3a"
+SRCREV = "70f79f4d666ffe7361bf17294abf4fec9cf2c806"
 
 S = "${WORKDIR}/git"
 
