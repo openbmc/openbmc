@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Link in the correct MAX31785 phosphor-hwmon config file to use based on the
+# Copy in the correct MAX31785 phosphor-hwmon config file to use based on the
 # WaterCooled property, and then start the hwmon service.
 
 # $1: The OF_FULLNAME udev attribute for the MAX31785
@@ -20,7 +20,7 @@ else
     source=$base'_air.conf'
 fi
 
-ln -sf $source $target
+cp $source $target
 
 instance=$(systemd-escape $1)
 systemctl start xyz.openbmc_project.Hwmon@$instance.service
