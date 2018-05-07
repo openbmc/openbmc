@@ -11,6 +11,8 @@ inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
 inherit pythonnative
 
+PACKAGECONFIG[verify_pnor_signature] = "--enable-verify_pnor_signature,--disable-verify_pnor_signature"
+
 DEPENDS += " \
         autoconf-archive-native \
         phosphor-dbus-interfaces \
