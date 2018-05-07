@@ -237,6 +237,14 @@ local.conf:
 
     ENABLE_DWC2_PERIPHERAL = "1"
 
+## Enable Openlabs 802.15.4 radio module
+
+When using device tree kernels, set this variable to enable the 802.15.4 hat:
+
+    ENABLE_AT86RF = "1"
+
+See: <https://openlabs.co/OSHW/Raspberry-Pi-802.15.4-radio>
+
 ## Manual additions to config.txt
 
 The `RPI_EXTRA_CONFIG` variable can be used to manually add additional lines to

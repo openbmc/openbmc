@@ -7,5 +7,5 @@ IMAGE_INSTALL += " \
 	"
 
 do_image_prepend() {
-    bb.warn("The image 'rpi-hwup-image' is deprecated, please use 'core-image-minimal' instead")
+    bb.warn("The image 'rpi-hwup-image' is deprecated, please use 'core-image-base' instead")
 }

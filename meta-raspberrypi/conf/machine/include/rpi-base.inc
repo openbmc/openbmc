@@ -14,16 +14,7 @@ XSERVER = " \
     ${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "xf86-video-modesetting", "xf86-video-fbdev", d)} \
     "
 
-KERNEL_DEVICETREE ?= " \
-    bcm2708-rpi-0-w.dtb \
-    bcm2708-rpi-b.dtb \
-    bcm2708-rpi-b-plus.dtb \
-    bcm2709-rpi-2-b.dtb \
-    bcm2710-rpi-3-b.dtb \
-    bcm2710-rpi-3-b-plus.dtb \
-    bcm2708-rpi-cm.dtb \
-    bcm2710-rpi-cm3.dtb \
-    \
+RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/dwc2.dtbo \
     overlays/hifiberry-amp.dtbo \
     overlays/hifiberry-dac.dtbo \
@@ -43,6 +34,23 @@ KERNEL_DEVICETREE ?= " \
     overlays/pi3-disable-bt.dtbo \
     overlays/pi3-miniuart-bt.dtbo \
     overlays/vc4-kms-v3d.dtbo \
+    overlays/at86rf233.dtbo \
+    "
+
+RPI_KERNEL_DEVICETREE ?= " \
+    bcm2708-rpi-0-w.dtb \
+    bcm2708-rpi-b.dtb \
+    bcm2708-rpi-b-plus.dtb \
+    bcm2709-rpi-2-b.dtb \
+    bcm2710-rpi-3-b.dtb \
+    bcm2710-rpi-3-b-plus.dtb \
+    bcm2708-rpi-cm.dtb \
+    bcm2710-rpi-cm3.dtb \
+    "
+
+KERNEL_DEVICETREE ?= " \
+    ${RPI_KERNEL_DEVICETREE} \
+    ${RPI_KERNEL_DEVICETREE_OVERLAYS} \
     "
 
 # By default:
