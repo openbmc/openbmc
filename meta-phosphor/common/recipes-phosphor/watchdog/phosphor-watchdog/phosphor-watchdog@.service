@@ -4,5 +4,5 @@ Description=Phosphor %I watchdog
 [Service]
 Restart=no
 EnvironmentFile={envfiledir}/obmc/watchdog/%I
-ExecStart=/usr/bin/env phosphor-watchdog --service=${{SERVICE}} --path=${{DEVPATH}} --target=${{TARGET}}
+ExecStart=/usr/bin/env phosphor-watchdog --continue --service=${{SERVICE}} --path=${{DEVPATH}} --target=${{TARGET}}
 SyslogIdentifier=phosphor-watchdog
