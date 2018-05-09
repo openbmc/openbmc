@@ -200,7 +200,7 @@
   entityID: 0x0A
   entityInstance: 3
   sensorType: 0x08
-  path: /xyz/openbmc_project/sensors/power/p0_gpu0_power
+  path: /xyz/openbmc_project/sensors/power/gpu0_power
   sensorReadingType: 0x01
   multiplierM: 2
   offsetB: 0
@@ -222,7 +222,7 @@
   entityID: 0x0A
   entityInstance: 4
   sensorType: 0x08
-  path: /xyz/openbmc_project/sensors/power/p0_gpu1_power
+  path: /xyz/openbmc_project/sensors/power/gpu1_power
   sensorReadingType: 0x01
   multiplierM: 2
   offsetB: 0
@@ -244,7 +244,7 @@
   entityID: 0x0A
   entityInstance: 5
   sensorType: 0x08
-  path: /xyz/openbmc_project/sensors/power/p0_gpu2_power
+  path: /xyz/openbmc_project/sensors/power/gpu2_power
   sensorReadingType: 0x01
   multiplierM: 2
   offsetB: 0
@@ -265,7 +265,7 @@
   entityID: 0x0A
   entityInstance: 6
   sensorType: 0x08
-  path: /xyz/openbmc_project/sensors/power/p1_gpu0_power
+  path: /xyz/openbmc_project/sensors/power/gpu3_power
   sensorReadingType: 0x01
   multiplierM: 2
   offsetB: 0
@@ -287,7 +287,7 @@
   entityID: 0x0A
   entityInstance: 7
   sensorType: 0x08
-  path: /xyz/openbmc_project/sensors/power/p1_gpu1_power
+  path: /xyz/openbmc_project/sensors/power/gpu4_power
   sensorReadingType: 0x01
   multiplierM: 2
   offsetB: 0
@@ -309,7 +309,7 @@
   entityID: 0x0A
   entityInstance: 8
   sensorType: 0x08
-  path: /xyz/openbmc_project/sensors/power/p1_gpu2_power
+  path: /xyz/openbmc_project/sensors/power/gpu5_power
   sensorReadingType: 0x01
   multiplierM: 2
   offsetB: 0
