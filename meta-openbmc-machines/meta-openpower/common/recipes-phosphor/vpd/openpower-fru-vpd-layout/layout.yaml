@@ -1,7 +1,7 @@
 BMC:
     xyz.openbmc_project.Inventory.Decorator.Asset:
-        VINI,PN: PartNumber
-        VINI,SN: SerialNumber
+        OPFR,VP: PartNumber
+        OPFR,VS: SerialNumber
         OPFR,VN: Manufacturer
     xyz.openbmc_project.Inventory.Item:
         VINI,DR: PrettyName
