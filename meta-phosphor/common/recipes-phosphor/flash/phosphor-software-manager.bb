@@ -54,6 +54,9 @@ RDEPENDS_${PN}-updater += " \
     virtual-obmc-image-manager \
     bash \
 "
+RDEPENDS_${PN}-updater_append_df-obmc-ubi-fs = " \
+    mtd-utils-ubifs \
+"
 
 RPROVIDES_${PN}-version += " \
     virtual-obmc-image-manager \
