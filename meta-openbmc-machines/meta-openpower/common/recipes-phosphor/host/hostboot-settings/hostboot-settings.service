@@ -1,0 +1,9 @@
+[Unit]
+Description=Hostboot Boot Settings
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hb_settings --uart vuart
+
+[Install]
+WantedBy=obmc-standby.target
