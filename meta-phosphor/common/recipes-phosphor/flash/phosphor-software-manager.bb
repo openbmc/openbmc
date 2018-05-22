@@ -71,7 +71,10 @@ FILES_${PN}-updater += " \
     ${sbindir}/obmc-flash-bmc \
     /usr/local \
     "
-FILES_${PN}-sync += "${sbindir}/phosphor-sync-software-manager"
+FILES_${PN}-sync += " \
+    ${sbindir}/phosphor-sync-software-manager \
+    ${sysconfdir}/synclist \
+    "
 DBUS_SERVICE_${PN}-version += "xyz.openbmc_project.Software.Version.service"
 DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
 DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
@@ -103,10 +106,16 @@ SYSTEMD_SUBSTITUTIONS += "KERNEL_MTD:${BMC_KERNEL_MTD}:obmc-flash-bmc-ubiro@.ser
 SYSTEMD_SUBSTITUTIONS += "RW_SIZE:${BMC_RW_SIZE}:obmc-flash-bmc-ubirw.service"
 
 SRC_URI += "file://obmc-flash-bmc"
+SRC_URI += "file://synclist"
 do_install_append() {
     install -d ${D}${sbindir}
     install -m 0755 ${WORKDIR}/obmc-flash-bmc ${D}${sbindir}/obmc-flash-bmc
     install -d ${D}/usr/local
+
+    if [ -f ${WORKDIR}/build/phosphor-sync-software-manager ]; then
+        install -d ${D}${sysconfdir}
+        install -m 0644 ${WORKDIR}/synclist ${D}${sysconfdir}/synclist
+    fi
 }
 
 SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
