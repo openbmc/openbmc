@@ -211,7 +211,7 @@
 - name: check group functional enclosures
   description: >
     'If this condition passes more than one fan enclosure in the group has been
-    marked as nonfunctional for ten seconds.  Shut the system down.
+    marked as nonfunctional for five seconds.  Shut the system down.
 
     For a more detailed definition of nonfunctional, consult the documentation
     of xyz.openbmc_project.State.Decorator.OperationalStatus and/or the
@@ -220,7 +220,7 @@
   condition: count
   paths: fan enclosures
   properties: fan functional
-  defer: 10000000us
+  defer: 5000000us
   callback: log and shutdown
   countop: '>'
   countbound: 1
