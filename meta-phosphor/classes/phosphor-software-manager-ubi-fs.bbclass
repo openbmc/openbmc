@@ -1,5 +1,7 @@
 # UBI-specific configuration for the phosphor-manager-software package
 
+PACKAGECONFIG_append = " ubifs_layout"
+
 RDEPENDS_phosphor-software-manager-updater-ubi += " \
     bash \
     mtd-utils-ubifs \

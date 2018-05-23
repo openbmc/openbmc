@@ -25,6 +25,7 @@ SYSTEMD_PACKAGES = ""
 
 PACKAGECONFIG[verify_signature] = "--enable-verify_signature,--disable-verify_signature"
 PACKAGECONFIG[sync_bmc_files] = "--enable-sync_bmc_files,--disable-sync_bmc_files"
+PACKAGECONFIG[ubifs_layout] = "--enable-ubifs_layout"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
