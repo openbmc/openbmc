@@ -223,8 +223,17 @@ do_generate_static[depends] += " \
         "
 
 do_generate_static_alltar() {
+	ln -sf ${S}/MANIFEST MANIFEST
+	ln -sf ${S}/publickey publickey
 	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd image-bmc
-	tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd.all.tar image-bmc
+
+	for file in image-bmc MANIFEST publickey; do
+		openssl dgst -sha256 -sign ${SIGNING_KEY} -out "${file}.sig" $file
+		signature_files="${signature_files} ${file}.sig"
+	done
+
+	tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd.all.tar \
+	    image-bmc MANIFEST publickey ${signature_files}
 
 	cd ${IMGDEPLOYDIR}
 
@@ -234,9 +243,15 @@ do_generate_static_alltar() {
 	# Maintain non-standard legacy link.
 	ln -sf ${IMAGE_NAME}.static.mtd.all.tar \
 		${IMGDEPLOYDIR}/${MACHINE}-${DATETIME}.all.tar
+
 }
 do_generate_static_alltar[vardepsexclude] = "DATETIME"
 do_generate_static_alltar[dirs] = "${S}/static"
+do_generate_static_alltar[depends] += " \
+        openssl-native:do_populate_sysroot \
+        ${SIGNING_KEY_DEPENDS} \
+        ${PN}:do_copy_signing_pubkey \
+        "
 
 make_image_links() {
 	rwfs=$1
@@ -266,8 +281,14 @@ make_tar_of_images() {
 }
 
 do_generate_static_tar() {
+	ln -sf ${S}/MANIFEST MANIFEST
+	ln -sf ${S}/publickey publickey
 	make_image_links ${OVERLAY_BASETYPE} ${IMAGE_BASETYPE}
-	make_tar_of_images static
+	for file in image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey; do
+		openssl dgst -sha256 -sign ${SIGNING_KEY} -out "${file}.sig" $file
+		signature_files="${signature_files} ${file}.sig"
+	done
+	make_tar_of_images static MANIFEST publickey ${signature_files}
 
 	# Maintain non-standard legacy link.
 	cd ${IMGDEPLOYDIR}
@@ -278,6 +299,9 @@ do_generate_static_tar[depends] += " \
         ${PN}:do_image_${@d.getVar('IMAGE_BASETYPE', True).replace('-', '_')} \
         virtual/kernel:do_deploy \
         u-boot:do_populate_sysroot \
+        openssl-native:do_populate_sysroot \
+        ${SIGNING_KEY_DEPENDS} \
+        ${PN}:do_copy_signing_pubkey \
         "
 do_generate_static_tar[vardepsexclude] = "DATETIME"
 
@@ -357,12 +381,12 @@ python() {
         bb.build.addtask(
                 'do_generate_static_alltar',
                 'do_image_complete',
-                'do_generate_static', d)
+                'do_generate_static do_generate_phosphor_manifest', d)
     if 'mtd-static-tar' in types:
         bb.build.addtask(
                 'do_generate_static_tar',
                 'do_image_complete',
-                'do_generate_rwfs_static', d)
+                'do_generate_rwfs_static do_generate_phosphor_manifest', d)
 
     if 'mtd-ubi' in types:
         bb.build.addtask(
