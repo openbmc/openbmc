@@ -19,8 +19,8 @@ SYSTEMD_SERVICE_${PN} = " \
         "
 
 START_TMPL = "op-start-host@.service"
-START_TGTFMT = "obmc-host-start@{1}.target"
-START_INSTFMT = "obmc-start-host@{0}.service"
+START_TGTFMT = "obmc-host-startmin@{1}.target"
+START_INSTFMT = "op-start-host@{0}.service"
 START_FMT = "../${START_TMPL}:${START_TGTFMT}.requires/${START_INSTFMT}"
 
 INIT_PNOR_TMPL = "op-init-pnor@.service"
