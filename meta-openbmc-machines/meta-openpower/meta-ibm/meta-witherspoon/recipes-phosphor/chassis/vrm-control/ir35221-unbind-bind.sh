@@ -3,46 +3,79 @@
 # Script to run on witherspoon BMC to unbind/bind the ir35221
 # driver's devices
 
+status=0
+max_retries=3
+driver_path="/sys/bus/i2c/drivers/ir35221/"
+platform_path="/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/"
+
+unbind_driver () {
+    echo $1 > $driver_path/unbind
+}
+
+bind_driver () {
+    device=$1
+    tries=0
+
+    until [ $tries -ge $max_retries ]; do
+        tries=$((tries+1))
+        ret=0
+        echo $device > $driver_path/bind || ret=$?
+        if [ $ret -ne 0 ]; then
+            echo "VRM $1 bind failed. Try $tries"
+            sleep 1
+        else
+            tries=$((max_retries+1))
+        fi
+    done
+
+    #Script will return a nonzero value if any binds fail.
+    if [ $ret -ne 0 ]; then
+        status=$ret
+    fi
+}
+
 if [ "$1" = "unbind" ]
 then
-    if [ -e /sys/bus/i2c/drivers/ir35221/4-0070 ]
+    if [ -e $driver_path/4-0070 ]
     then
-        echo 4-0070 > /sys/bus/i2c/drivers/ir35221/$1
+        unbind_driver "4-0070"
     fi
 
-    if [ -e /sys/bus/i2c/drivers/ir35221/4-0071 ]
+    if [ -e $driver_path/4-0071 ]
     then
-        echo 4-0071 > /sys/bus/i2c/drivers/ir35221/$1
+        unbind_driver "4-0071"
     fi
 
-    if [ -e /sys/bus/i2c/drivers/ir35221/5-0070 ]
+    if [ -e $driver_path/5-0070 ]
     then
-        echo 5-0070 > /sys/bus/i2c/drivers/ir35221/$1
+        unbind_driver "5-0070"
     fi
 
-    if [ -e /sys/bus/i2c/drivers/ir35221/5-0071 ]
+    if [ -e $driver_path/5-0071 ]
     then
-        echo 5-0071 > /sys/bus/i2c/drivers/ir35221/$1
+        unbind_driver "5-0071"
     fi
 elif [ "$1" = "bind" ]
 then
-    if [ -e /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a140.i2c-bus/i2c-4/4-0070 ]
+    if [ -e $platform_path/1e78a140.i2c-bus/i2c-4/4-0070 ]
     then
-        echo 4-0070 > /sys/bus/i2c/drivers/ir35221/$1
+        bind_driver "4-0070"
     fi
 
-    if [ -e /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a140.i2c-bus/i2c-4/4-0071 ]
+    if [ -e $platform_path/1e78a140.i2c-bus/i2c-4/4-0071 ]
     then
-        echo 4-0071 > /sys/bus/i2c/drivers/ir35221/$1
+        bind_driver "4-0071"
     fi
 
-    if [ -e /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a180.i2c-bus/i2c-5/5-0070 ]
+    if [ -e $platform_path/1e78a180.i2c-bus/i2c-5/5-0070 ]
     then
-        echo 5-0070 > /sys/bus/i2c/drivers/ir35221/$1
+        bind_driver "5-0070"
     fi
 
-    if [ -e /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a180.i2c-bus/i2c-5/5-0071 ]
+    if [ -e $platform_path/1e78a180.i2c-bus/i2c-5/5-0071 ]
     then
-        echo 5-0071 > /sys/bus/i2c/drivers/ir35221/$1
+        bind_driver "5-0071"
     fi
 fi
+
+exit $status
