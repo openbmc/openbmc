@@ -24,7 +24,7 @@ FMT_ON = "../${TMPL}:${TGTFMT_ON}.requires/${INSTFMT}"
 
 TMPL_ON_IRBIND = "ir35221-on-bind@.service"
 INSTFMT_ON_IRBIND = "ir35221-on-bind@{0}.service"
-FMT_ON_IRBIND = "../${TMPL_ON_IRBIND}:${TGTFMT_ON}.requires/${INSTFMT_ON_IRBIND}"
+FMT_ON_IRBIND = "../${TMPL_ON_IRBIND}:${TGTFMT_ON}.wants/${INSTFMT_ON_IRBIND}"
 
 TMPL_ON_IRUNBIND = "ir35221-on-unbind@.service"
 INSTFMT_ON_IRUNBIND = "ir35221-on-unbind@{0}.service"
