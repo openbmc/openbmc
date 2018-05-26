@@ -61,7 +61,7 @@ MGR_SVC ?= "xyz.openbmc_project.Dump.Manager.service"
 
 SYSTEMD_SUBSTITUTIONS += "BMC_DUMP_PATH:${bmc_dump_path}:${MGR_SVC}"
 
-FILES_${PN}-manager += "${sbindir}/phosphor-dump-manager"
+FILES_${PN}-manager += "${sbindir}/phosphor-dump-manager ${exec_prefix}/lib/tmpfiles.d/coretemp.conf"
 FILES_${PN}-monitor += "${sbindir}/phosphor-dump-monitor"
 FILES_${PN}-dreport += "${bindir}/dreport"
 FILES_${PN}-scripts += "${dreport_dir}"
@@ -72,6 +72,12 @@ SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
 EXTRA_OECONF = "BMC_DUMP_PATH=${bmc_dump_path}"
 
 S = "${WORKDIR}/git"
+SRC_URI += "file://coretemp.conf"
+
+do_install_append() {
+    install -d ${D}${exec_prefix}/lib/tmpfiles.d
+    install -m 644 ${WORKDIR}/coretemp.conf ${D}${exec_prefix}/lib/tmpfiles.d/
+}
 
 # Install dreport script
 # From tools/dreport.d/dreport to /usr/bin/dreport
