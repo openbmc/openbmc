@@ -3,5 +3,5 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 
 SRC_URI += "git://github.com/openbmc/phosphor-rest-server"
-SRCREV = "57068618982edec6ad3a4be9117766aec525629f"
+SRCREV = "eace1bcbd2748411c98e2acd21eb3bca803ff283"
 
