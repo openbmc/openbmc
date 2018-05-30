@@ -1,5 +1,5 @@
 [Unit]
-Description=Phoshpor System Manager
+Description=Phosphor System Manager
 Wants=obmc-mapper.target
 After=obmc-mapper.target
 
