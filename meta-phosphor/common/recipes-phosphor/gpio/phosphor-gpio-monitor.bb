@@ -49,5 +49,5 @@ FILES_${PN}-monitor += "${sbindir}/phosphor-gpio-util"
 FILES_${PN}-presence += "${sbindir}/phosphor-gpio-presence"
 
 SRC_URI += "git://github.com/openbmc/phosphor-gpio-monitor"
-SRCREV = "065b767b6e658702dfac696cd752cca6190a4610"
+SRCREV = "f672a037276691dc631f4c65a1b4f32da65f2874"
 S = "${WORKDIR}/git"
