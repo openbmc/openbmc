@@ -1,0 +1,14 @@
+{
+ "urls": [
+ "/org/openbmc/*",
+ "/org/open_power/*",
+ "/xyz/openbmc_project/*",
+ "/enumerate",
+ "/list",
+ "/login",
+ "/logout",
+ "/subscribe",
+ "/upload/image",
+ "/download/dump/*"
+ ]
+}
