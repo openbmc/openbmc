@@ -9,7 +9,8 @@
 # If a water cooled system, don't create errors for fan 1.
 # Note: An error is created each time the chassis powers on.
 #
-# * Watch for fans to become functional, and then resolve their errors
+# * Watch for fans to become both present and functional, and then resolve
+#   their errors
 
 - name: fan0
   class: group
@@ -76,6 +77,20 @@
   group: property
   type: boolean
   members:
+    - interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+      meta: FUNCTIONAL
+      property: Functional
+
+- name: fan present and functional
+  description: >
+    'Monitor the present and functional state of each fan.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Inventory.Item
+      meta: PRESENT
+      property: Present
     - interface: xyz.openbmc_project.State.Decorator.OperationalStatus
       meta: FUNCTIONAL
       property: Functional
@@ -183,41 +198,41 @@
   properties: fan functional
   callback: check power fan3 functional
 
-- name: watch fan0 functional for resolving error logs
+- name: watch fan0 present and functional for resolving error logs
   description: >
-    'On fan functional state changes, check if errors need to be resolved.'
+    'On fan present or functional state changes, check if errors need to be resolved.'
   class: watch
   watch: property
   paths: fan0
-  properties: fan functional
-  callback: resolve fan0 errors if functional
+  properties: fan present and functional
+  callback: resolve fan0 errors if present and functional
 
-- name: watch fan1 functional for resolving error logs
+- name: watch fan1 present and functional for resolving error logs
   description: >
-    'On fan functional state changes, check if errors need to be resolved.'
+    'On fan present or functional state changes, check if errors need to be resolved.'
   class: watch
   watch: property
   paths: fan1
-  properties: fan functional
-  callback: resolve fan1 errors if functional
+  properties: fan present and functional
+  callback: resolve fan1 errors if present and functional
 
-- name: watch fan2 functional for resolving error logs
+- name: watch fan2 present and functional for resolving error logs
   description: >
-    'On fan functional state changes, check if errors need to be resolved.'
+    'On fan present or functional state changes, check if errors need to be resolved.'
   class: watch
   watch: property
   paths: fan2
-  properties: fan functional
-  callback: resolve fan2 errors if functional
+  properties: fan present and functional
+  callback: resolve fan2 errors if present and functional
 
-- name: watch fan3 functional for resolving error logs
+- name: watch fan3 present and functional for resolving error logs
   description: >
-    'On fan functional state changes, check if errors need to be resolved.'
+    'On fan present or functional state changes, check if errors need to be resolved.'
   class: watch
   watch: property
   paths: fan3
-  properties: fan functional
-  callback: resolve fan3 errors if functional
+  properties: fan present and functional
+  callback: resolve fan3 errors if present and functional
 
 - name: check power
   description: >
@@ -579,56 +594,56 @@
       value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
       type: string
 
-- name: resolve fan0 errors if functional
+- name: resolve fan0 errors if present and functional
   description: >
-    'If fan0 is functional, call the resolve fan0 errors callback.'
+    'If fan0 is present and functional, call the resolve fan0 errors callback.'
   class: condition
   condition: count
   paths: fan0
-  properties: fan functional
+  properties: fan present and functional
   callback: resolve fan0 errors
-  countop: '>'
-  countbound: 0
+  countop: '=='
+  countbound: 2
   op: '=='
   bound: true
 
 #Go ahead and do this on water cooled as well
-- name: resolve fan1 errors if functional
+- name: resolve fan1 errors if present and functional
   description: >
-    'If fan1 is functional, call the resolve fan1 errors callback.'
+    'If fan1 is present and functional, call the resolve fan1 errors callback.'
   class: condition
   condition: count
   paths: fan1
-  properties: fan functional
+  properties: fan present and functional
   callback: resolve fan1 errors
-  countop: '>'
-  countbound: 0
+  countop: '=='
+  countbound: 2
   op: '=='
   bound: true
 
-- name: resolve fan2 errors if functional
+- name: resolve fan2 errors if present and functional
   description: >
-    'If fan2 is functional, call the resolve fan2 errors callback.'
+    'If fan2 is present and functional, call the resolve fan2 errors callback.'
   class: condition
   condition: count
   paths: fan2
-  properties: fan functional
+  properties: fan present and functional
   callback: resolve fan2 errors
-  countop: '>'
-  countbound: 0
+  countop: '=='
+  countbound: 2
   op: '=='
   bound: true
 
-- name: resolve fan3 errors if functional
+- name: resolve fan3 errors if present and functional
   description: >
-    'If fan3 is functional, call the resolve fan3 errors callback.'
+    'If fan3 is present and functional, call the resolve fan3 errors callback.'
   class: condition
   condition: count
   paths: fan3
-  properties: fan functional
+  properties: fan present and functional
   callback: resolve fan3 errors
-  countop: '>'
-  countbound: 0
+  countop: '=='
+  countbound: 2
   op: '=='
   bound: true
 
@@ -636,26 +651,26 @@
   class: callback
   callback: resolve callout
   paths: fan0
-  properties: fan functional
+  properties: fan present and functional
   callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0
 
 - name: resolve fan1 errors
   class: callback
   callback: resolve callout
   paths: fan1
-  properties: fan functional
+  properties: fan present and functional
   callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan1
 
 - name: resolve fan2 errors
   class: callback
   callback: resolve callout
   paths: fan2
-  properties: fan functional
+  properties: fan present and functional
   callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
 
 - name: resolve fan3 errors
   class: callback
   callback: resolve callout
   paths: fan3
-  properties: fan functional
+  properties: fan present and functional
   callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
