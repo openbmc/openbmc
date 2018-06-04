@@ -97,6 +97,7 @@ ${PN}-software-extras = " \
 
 ${PN}-software-extras_df-obmc-ubi-fs = " \
         phosphor-image-signing \
+        phosphor-software-manager-updater-ubi \
         "
 
 SUMMARY_${PN}-software = "Software applications"
