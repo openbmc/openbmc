@@ -1,0 +1,128 @@
+From b002fd4b884b5f8cd3f429ea2002dd19e91d1d91 Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Thu, 7 Jun 2018 09:18:01 -0400
+Subject: [PATCH] json: Use int/long.__str__ to convert subclasses
+
+Based on changes that went into 3.x:
+
+e0805cf10ea84b44a13ad5649267edba7cb83ee9
+a4998a70416c27730e75c0a4225ee2c3552b1618
+---
+ Lib/json/encoder.py | 26 ++++++++++++++++++--------
+ Modules/_json.c     | 21 +++++++++++++++++----
+ 2 files changed, 35 insertions(+), 12 deletions(-)
+
+diff --git a/Lib/json/encoder.py b/Lib/json/encoder.py
+index 97ffe8e8a2..3156682fdd 100644
+--- a/Lib/json/encoder.py
++++ b/Lib/json/encoder.py
+@@ -283,6 +283,8 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
+         long=long,
+         str=str,
+         tuple=tuple,
++        _intstr=int.__str__,
++        _longstr=long.__str__,
+     ):
+ 
+     def _iterencode_list(lst, _current_indent_level):
+@@ -317,8 +319,10 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
+                 yield buf + 'true'
+             elif value is False:
+                 yield buf + 'false'
+-            elif isinstance(value, (int, long)):
+-                yield buf + str(value)
++            elif isinstance(value, int):
++                yield buf + _intstr(value)
++            elif isinstance(value, long):
++                yield buf + _longstr(value)
+             elif isinstance(value, float):
+                 yield buf + _floatstr(value)
+             else:
+@@ -374,8 +378,10 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
+                 key = 'false'
+             elif key is None:
+                 key = 'null'
+-            elif isinstance(key, (int, long)):
+-                key = str(key)
++            elif isinstance(key, int):
++                key = _intstr(key)
++            elif isinstance(key, long):
++                key = _longstr(key)
+             elif _skipkeys:
+                 continue
+             else:
+@@ -394,8 +400,10 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
+                 yield 'true'
+             elif value is False:
+                 yield 'false'
+-            elif isinstance(value, (int, long)):
+-                yield str(value)
++            elif isinstance(value, int):
++                yield _intstr(value)
++            elif isinstance(value, long):
++                yield _longstr(value)
+             elif isinstance(value, float):
+                 yield _floatstr(value)
+             else:
+@@ -423,8 +431,10 @@ def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
+             yield 'true'
+         elif o is False:
+             yield 'false'
+-        elif isinstance(o, (int, long)):
+-            yield str(o)
++        elif isinstance(o, long):
++            yield _longstr(o)
++        elif isinstance(o, int):
++            yield _intstr(o)
+         elif isinstance(o, float):
+             yield _floatstr(o)
+         elif isinstance(o, (list, tuple)):
+diff --git a/Modules/_json.c b/Modules/_json.c
+index 39ec467b09..f429738145 100644
+--- a/Modules/_json.c
++++ b/Modules/_json.c
+@@ -1981,12 +1981,19 @@ encoder_listencode_obj(PyEncoderObject *s, PyObject *rval, PyObject *obj, Py_ssi
+             return -1;
+         return _steal_list_append(rval, encoded);
+     }
+-    else if (PyInt_Check(obj) || PyLong_Check(obj)) {
+-        PyObject *encoded = PyObject_Str(obj);
++    else if (PyLong_Check(obj)) {
++        PyObject *encoded = PyLong_Type.tp_str(obj);
+         if (encoded == NULL)
+             return -1;
+         return _steal_list_append(rval, encoded);
+     }
++    else if (PyInt_Check(obj)) {
++        PyObject *encoded = PyInt_Type.tp_str(obj);
++        if (encoded == NULL)
++            return -1;
++        return _steal_list_append(rval, encoded);
++    }
++
+     else if (PyFloat_Check(obj)) {
+         PyObject *encoded = encoder_encode_float(s, obj);
+         if (encoded == NULL)
+@@ -2131,11 +2138,17 @@ encoder_listencode_dict(PyEncoderObject *s, PyObject *rval, PyObject *dct, Py_ss
+             if (kstr == NULL)
+                 goto bail;
+         }
+-        else if (PyInt_Check(key) || PyLong_Check(key)) {
+-            kstr = PyObject_Str(key);
++        else if (PyLong_Check(key)) {
++            kstr = PyLong_Type.tp_str(key);
+             if (kstr == NULL)
+                 goto bail;
+         }
++        else if (PyInt_Check(key)) {
++            kstr = PyInt_Type.tp_str(key);
++            if (kstr == NULL)
++                goto bail;
++        }
++
+         else if (key == Py_True || key == Py_False || key == Py_None) {
+             kstr = _encoded_const(key);
+             if (kstr == NULL)
+-- 
+2.14.3
+

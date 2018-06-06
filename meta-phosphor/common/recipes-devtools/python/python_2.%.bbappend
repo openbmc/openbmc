@@ -1,5 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://__init__.email_min.py"
+SRC_URI += "file://0001-json-Use-int-long.__str__-to-convert-subclasses.patch"
 
 do_install_append_class-target() {
 	dir=${libdir}/python${PYTHON_MAJMIN}/email
