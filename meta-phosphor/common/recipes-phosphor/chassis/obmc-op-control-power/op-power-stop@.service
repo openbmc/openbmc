@@ -10,8 +10,8 @@ Conflicts=obmc-chassis-poweron@%i.target
 
 [Service]
 RemainAfterExit=yes
-ExecStart=/usr/bin/env mapper call /org/openbmc/control/power%i org.openbmc.control.Power setPowerState i 0
-SyslogIdentifier=mapper
+ExecStart=/bin/sh -c "busctl call `mapper get-service /org/openbmc/control/power%i` /org/openbmc/control/power%i org.openbmc.control.Power setPowerState i 0"
+SyslogIdentifier=op-power-stop
 
 [Install]
 WantedBy=obmc-host-stop@%i.target

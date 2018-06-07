@@ -12,8 +12,8 @@ ConditionPathExists=!/run/openbmc/chassis@%i-on
 [Service]
 RemainAfterExit=yes
 Type=oneshot
-ExecStart=/usr/bin/env mapper call /org/openbmc/control/power%i org.openbmc.control.Power setPowerState i 1
-SyslogIdentifier=mapper
+ExecStart=/bin/sh -c "busctl call `mapper get-service /org/openbmc/control/power%i` /org/openbmc/control/power%i org.openbmc.control.Power setPowerState i 1"
+SyslogIdentifier=op-power-start
 
 [Install]
 WantedBy=obmc-host-start@%i.target

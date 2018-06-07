@@ -14,8 +14,8 @@ ConditionPathExists=!/run/openbmc/host@%i-on
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/env mapper call /org/openbmc/control/host%i org.openbmc.control.Host boot
-SyslogIdentifier=mapper
+ExecStart=/bin/sh -c "busctl call `mapper get-service /org/openbmc/control/host%i` /org/openbmc/control/host%i org.openbmc.control.Host boot"
+SyslogIdentifier=op-start-host
 
 [Install]
 WantedBy=obmc-host-start@%i.target
