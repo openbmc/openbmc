@@ -30,10 +30,6 @@ EXTRA_OECONF += " --disable-hwdb"
 do_install_append() {
         install -m 644 ${WORKDIR}/default.network ${D}${libdir}/systemd/network/
         install -m 644 -D ${WORKDIR}/service-restart-policy.conf ${D}${libdir}/systemd/system.conf.d/service-restart-policy.conf
-
-        #TODO Remove after this issue is resolved
-        #https://github.com/openbmc/openbmc/issues/152
-        ln -s /dev/null ${D}/etc/systemd/system/systemd-hwdb-update.service
 }
 
 do_install_append_df-obmc-ubi-fs() {
