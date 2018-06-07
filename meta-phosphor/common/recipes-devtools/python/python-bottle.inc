@@ -14,7 +14,7 @@ inherit setuptools
 inherit pypi
 
 RDEPENDS_${PN} += " \
-        python-email-utils \
+        python-email \
         python-json \
         python-netserver \
         "
