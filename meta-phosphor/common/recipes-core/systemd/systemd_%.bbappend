@@ -22,14 +22,14 @@ SRC_URI += "file://0001-watchdog-allow-a-device-path-to-be-specified.patch"
 SRC_URI += "file://0002-core-Add-WatchdogDevice-config-option-and-implement-.patch"
 
 RRECOMMENDS_${PN} += "obmc-targets"
-FILES_${PN} += "${libdir}/systemd/network/default.network"
-FILES_${PN} += "${libdir}/systemd/system.conf.d/service-restart-policy.conf"
+FILES_${PN} += "${systemd_unitdir}/network/default.network"
+FILES_${PN} += "${systemd_unitdir}/system.conf.d/service-restart-policy.conf"
 
 EXTRA_OECONF += " --disable-hwdb"
 
 do_install_append() {
-        install -m 644 ${WORKDIR}/default.network ${D}${libdir}/systemd/network/
-        install -m 644 -D ${WORKDIR}/service-restart-policy.conf ${D}${libdir}/systemd/system.conf.d/service-restart-policy.conf
+        install -m 644 ${WORKDIR}/default.network ${D}${systemd_unitdir}/network/
+        install -m 644 -D ${WORKDIR}/service-restart-policy.conf ${D}${systemd_unitdir}/system.conf.d/service-restart-policy.conf
 }
 
 do_install_append_df-obmc-ubi-fs() {
