@@ -62,7 +62,7 @@ RPROVIDES_${PN}-version += " \
     virtual-obmc-image-manager \
 "
 
-FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager"
+FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager ${exec_prefix}/lib/tmpfiles.d/software.conf"
 FILES_${PN}-download-mgr += "${sbindir}/phosphor-download-manager"
 FILES_${PN}-updater += " \
     ${sbindir}/phosphor-image-updater \
@@ -105,6 +105,8 @@ SYSTEMD_SUBSTITUTIONS += "RW_SIZE:${BMC_RW_SIZE}:obmc-flash-bmc-ubirw.service"
 
 SRC_URI += "file://obmc-flash-bmc"
 SRC_URI += "file://synclist"
+SRC_URI += "file://software.conf"
+
 do_install_append() {
     install -d ${D}${sbindir}
     install -m 0755 ${WORKDIR}/obmc-flash-bmc ${D}${sbindir}/obmc-flash-bmc
@@ -113,6 +115,15 @@ do_install_append() {
     if [ -f ${WORKDIR}/build/phosphor-sync-software-manager ]; then
         install -d ${D}${sysconfdir}
         install -m 0644 ${WORKDIR}/synclist ${D}${sysconfdir}/synclist
+    fi
+
+    # /tmp/images is the software image upload directory.
+    # It should not be deleted since it is watched by the Image Manager
+    # for new images.
+
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true', 'false', d)}; then
+        install -d ${D}${exec_prefix}/lib/tmpfiles.d
+        install -m 644 ${WORKDIR}/software.conf ${D}${exec_prefix}/lib/tmpfiles.d/
     fi
 }
 

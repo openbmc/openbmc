@@ -16,7 +16,6 @@ SRC_URI += "file://0004-basic-Use-path-escaping-when-mangling-path-instances.pat
 #TODO upstream the below patch via below issue
 #https://github.com/openbmc/openbmc/issues/2016
 SRC_URI += "file://0005-dont-return-error-if-unable-to-create-network-namespace.patch"
-SRC_URI_append_df-obmc-ubi-fs = " file://software.conf"
 
 SRC_URI += "file://0001-watchdog-allow-a-device-path-to-be-specified.patch"
 SRC_URI += "file://0002-core-Add-WatchdogDevice-config-option-and-implement-.patch"
@@ -30,11 +29,4 @@ EXTRA_OECONF += " --disable-hwdb"
 do_install_append() {
         install -m 644 ${WORKDIR}/default.network ${D}${systemd_unitdir}/network/
         install -m 644 -D ${WORKDIR}/service-restart-policy.conf ${D}${systemd_unitdir}/system.conf.d/service-restart-policy.conf
-}
-
-do_install_append_df-obmc-ubi-fs() {
-        # /tmp/images is the software image upload directory.
-        # It should not be deleted since it is watched by the Image Manager
-        # for new images.
-        install -m 0644 ${WORKDIR}/software.conf ${D}${exec_prefix}/lib/tmpfiles.d/
 }
