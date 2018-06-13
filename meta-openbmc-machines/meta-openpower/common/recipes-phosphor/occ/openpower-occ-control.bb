@@ -1,5 +1,5 @@
 SUMMARY = "OpenPOWER OCC controller"
-DESCRIPTION = "Application to contol the OpenPOWER On-Chip-Controller"
+DESCRIPTION = "Application to control the OpenPOWER On-Chip-Controller"
 HOMEPAGE = "https://github.com/openbmc/openpower-occ-control"
 PR = "r1"
 
