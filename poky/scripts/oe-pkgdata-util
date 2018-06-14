@@ -277,7 +277,7 @@ def lookup_recipe(args):
                     print("%s is in the RPROVIDES of %s:" % (pkg, f))
                 pkgdatafile = os.path.join(args.pkgdata_dir, "runtime", f)
                 parse_pkgdatafile(pkgdatafile)
-            break
+            continue
         pkgdatafile = os.path.join(args.pkgdata_dir, 'runtime-reverse', pkg)
         if not os.path.exists(pkgdatafile):
             logger.error("The following packages could not be found: %s" % pkg)
@@ -286,37 +286,35 @@ def lookup_recipe(args):
 
 def package_info(args):
     def parse_pkgdatafile(pkgdatafile):
+        vars = ['PKGV', 'PKGE', 'PKGR', 'PN', 'PV', 'PE', 'PR', 'PKGSIZE']
+        if args.extra:
+            vars += args.extra
         with open(pkgdatafile, 'r') as f:
-            pkge = ''
-            pkgr = ''
-            pe = ''
-            pr = ''
+            vals = dict()
+            extra = ''
             for line in f:
-                if line.startswith('PKGV:'):
-                    pkg_version = line.split(':', 1)[1].strip()
-                elif line.startswith('PKGE:'):
-                    pkge = line.split(':', 1)[1].strip()
-                elif line.startswith('PKGR:'):
-                    pkgr = line.split(':', 1)[1].strip()
-                elif line.startswith('PN:'):
-                    recipe = line.split(':', 1)[1].strip()
-                elif line.startswith('PV:'):
-                    recipe_version = line.split(':', 1)[1].strip()
-                elif line.startswith('PE:'):
-                    pe = line.split(':', 1)[1].strip()
-                elif line.startswith('PR:'):
-                    pr = line.split(':', 1)[1].strip()
-                elif line.startswith('PKGSIZE'):
-                    pkg_size = line.split(':', 1)[1].strip()
-            if pkge:
-                pkg_version = pkge + ":" + pkg_version
-            if pkgr:
-                pkg_version = pkg_version + "-" + pkgr
-            if pe:
-                recipe_version = pe + ":" + recipe_version
-            if pr:
-                recipe_version = recipe_version + "-" + pr
-            print("%s %s %s %s %s" % (pkg, pkg_version, recipe, recipe_version, pkg_size))
+                for var in vars:
+                    m = re.match(var + '(?:_\S+)?:\s*(.+?)\s*$', line)
+                    if m:
+                        vals[var] = m.group(1)
+            pkg_version = vals['PKGV'] or ''
+            recipe = vals['PN'] or ''
+            recipe_version = vals['PV'] or ''
+            pkg_size = vals['PKGSIZE'] or ''
+            if 'PKGE' in vals:
+                pkg_version = vals['PKGE'] + ":" + pkg_version
+            if 'PKGR' in vals:
+                pkg_version = pkg_version + "-" + vals['PKGR']
+            if 'PE' in vals:
+                recipe_version = vals['PE'] + ":" + recipe_version
+            if 'PR' in vals:
+                recipe_version = recipe_version + "-" + vals['PR']
+            if args.extra:
+                for var in args.extra:
+                    if var in vals:
+                        val = re.sub(r'\s+', ' ', vals[var])
+                        extra += ' "%s"' % val
+            print("%s %s %s %s %s%s" % (pkg, pkg_version, recipe, recipe_version, pkg_size, extra))
 
     # Handle both multiple arguments and multiple values within an arg (old syntax)
     packages = []
@@ -341,7 +339,7 @@ def package_info(args):
                     print("%s is in the RPROVIDES of %s:" % (pkg, f))
                 pkgdatafile = os.path.join(args.pkgdata_dir, "runtime", f)
                 parse_pkgdatafile(pkgdatafile)
-            break
+            continue
         pkgdatafile = os.path.join(args.pkgdata_dir, "runtime-reverse", pkg)
         if not os.path.exists(pkgdatafile):
             logger.error("Unable to find any built runtime package named %s" % pkg)

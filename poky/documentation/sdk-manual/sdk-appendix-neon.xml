@@ -14,8 +14,8 @@
         from start to finish.
         For general information on using the Eclipse IDE and the Yocto
         Project Eclipse Plug-In, see the
-        "<link linkend='sdk-eclipse-project'>Developing Applications Using <trademark class='trade'>Eclipse</trademark></link>"
-        Chapter.
+        "<link linkend='application-development-workflow-using-eclipse'>Application Development Workflow Using <trademark class='trade'>Eclipse</trademark></link>"
+        section.
     </para>
 
     <section id='neon-setting-up-the-eclipse-ide'>
@@ -53,13 +53,18 @@
                         <ulink url='http://www.eclipse.org/neon/'>http://www.eclipse.org/neon/</ulink>.
                         </para></listitem>
                     <listitem><para><emphasis>Download the Tarball:</emphasis>
-                        Click the "Download" button and then use the "Eclipse
-                        IDE for C/C++ Developers"
-                        appropriate for your development system.
+                        Click the "Download" button and look for the
+                        "Eclipse IDE for C/C++ Developers" Neon 3 Package.
+                        Select the correct platform download link listed at
+                        the right.
+                        For example, click on "64-bit" next to Linux if your
+                        build host is running a 64-bit Linux distribution.
+                        Click through the process to save the file.
                         </para></listitem>
                     <listitem><para><emphasis>Unpack the Tarball:</emphasis>
-                        Move to a clean directory and unpack the tarball.
-                        Here is an example:
+                        Move to a directory and unpack the tarball.
+                        The following commands unpack the tarball into the
+                        home directory:
                         <literallayout class='monospaced'>
      $ cd ~
      $ tar -xzvf ~/Downloads/eclipse-cpp-neon-3-linux-gtk-x86_64.tar.gz
@@ -84,11 +89,22 @@
 
             <para>
                 Follow these steps to configure the Neon Eclipse IDE.
-                <note>
-                    Depending on how you installed Eclipse and what you have
-                    already done, some of the options will not appear.
-                    If you cannot find an option as directed by the manual,
-                    it has already been installed.
+                <note><title>Notes</title>
+                    <itemizedlist>
+                        <listitem><para>
+                            Depending on how you installed Eclipse and what
+                            you have already done, some of the options do
+                            not appear.
+                            If you cannot find an option as directed by the
+                            manual, it has already been installed.
+                            </para></listitem>
+                        <listitem><para>
+                            If you want to see all options regardless of
+                            whether they are installed or not, deselect the
+                            "Hide items that are already installed"
+                            check box.
+                            </para></listitem>
+                    </itemizedlist>
                 </note>
                 <orderedlist>
                     <listitem><para>Be sure Eclipse is running and
@@ -164,11 +180,11 @@
                             in the URL field and provide a meaningful name
                             in the "Name" field.
                             </para></listitem>
-                        <listitem><para>Click "OK" to have the entry added
-                            to the "Work with:" drop-down list.
-                            </para></listitem>
-                        <listitem><para>Select the entry for the plug-in
-                            from the "Work with:" drop-down list.
+                        <listitem><para>
+                            Click "OK" to have the entry automatically
+                            populate the "Work with:" field and to have
+                            the items for installation appear in the window
+                            below.
                             </para></listitem>
                         <listitem><para>Check the boxes next to the following:
                             <literallayout class='monospaced'>
@@ -196,8 +212,14 @@
                     To install the Neon Eclipse Yocto Plug-in from the latest
                     source code, follow these steps:
                     <orderedlist>
-                        <listitem><para>Be sure your development system
-                            has JDK 1.8+
+                        <listitem><para>
+                            Be sure your build host has JDK version 1.8
+                            or greater.
+                            On a Linux build host you can determine the
+                            version using the following command:
+                            <literallayout class='monospaced'>
+     $ java -version
+                            </literallayout>
                             </para></listitem>
                         <listitem><para>install X11-related packages:
                             <literallayout class='monospaced'>
@@ -211,18 +233,19 @@
      $ git clone git://git.yoctoproject.org/eclipse-yocto
                             </literallayout>
                             </para></listitem>
-                        <listitem><para>Use Git to checkout the correct
-                            tag:
+                        <listitem><para>
+                            Use Git to create the correct tag:
                             <literallayout class='monospaced'>
      $ cd ~/eclipse-yocto
-     $ git checkout neon/yocto-&DISTRO;
+     $ git checkout -b neon/&DISTRO_NAME_NO_CAP; remotes/origin/neon/&DISTRO_NAME_NO_CAP;
                             </literallayout>
                             This creates a local tag named
-                            <filename>neon/yocto-&DISTRO;</filename> based on
-                            the branch <filename>origin/neon-master</filename>.
-                            This puts you in a detached HEAD state, which
-                            is fine since you are only going to be building
-                            and not developing.
+                            <filename>neon/&DISTRO_NAME_NO_CAP;</filename>
+                            based on the branch
+                            <filename>origin/neon/&DISTRO_NAME_NO_CAP;</filename>.
+                            You are put into a detached HEAD state,
+                            which is fine since you are only going to
+                            be building and not developing.
                             </para></listitem>
                         <listitem><para>Change to the
                             <filename>scripts</filename>
@@ -243,20 +266,22 @@
                             directory of the Git repository created
                             earlier.
                             </para></listitem>
-                        <listitem><para>Run the <filename>build.sh</filename>
+                        <listitem><para>
+                            Run the <filename>build.sh</filename>
                             script as directed.
-                            Be sure to provide the tag name, documentation
-                            branch, and a release name.</para>
-                            <para>
-                            Following is an example:
+                            Be sure to provide the tag name,
+                            documentation branch, and a release name.</para>
+
+                            <para>Following is an example:
                             <literallayout class='monospaced'>
-     $ ECLIPSE_HOME=/home/scottrif/eclipse-yocto/scripts/eclipse ./build.sh -l neon/yocto-&DISTRO; master yocto-&DISTRO; 2>&amp;1 | tee build.log
+     $ ECLIPSE_HOME=/home/scottrif/eclipse-yocto/scripts/eclipse ./build.sh -l neon/&DISTRO_NAME_NO_CAP; master yocto-&DISTRO; 2>&amp;1 | tee build.log
                             </literallayout>
-                            The previous example command adds the tag you
-                            need for <filename>neon/yocto-&DISTRO;</filename>
-                            to <filename>HEAD</filename>, then tells the
-                            build script to use the local (-l) Git checkout
-                            for the build.
+                            The previous example command adds the tag
+                            you need for
+                            <filename>neon/&DISTRO_NAME_NO_CAP;</filename>
+                            to <filename>HEAD</filename>, then tells
+                            the build script to use the local (-l) Git
+                            checkout for the build.
                             After running the script, the file
                             <filename>org.yocto.sdk-</filename><replaceable>release</replaceable><filename>-</filename><replaceable>date</replaceable><filename>-archive.zip</filename>
                             is in the current directory.
@@ -310,7 +335,7 @@
         </section>
 
         <section id='neon-configuring-the-eclipse-yocto-plug-in'>
-            <title>Configuring the Neon Eclipse Yocto Plug-in</title>
+            <title>Configuring the Neon Eclipse Yocto Plug-In</title>
 
             <para>
                 Configuring the Neon Eclipse Yocto Plug-in involves setting the
@@ -324,14 +349,16 @@
             <para>
                 To start, you need to do the following from within the
                 Eclipse IDE:
-                <itemizedlist>
-                    <listitem><para>Choose "Preferences" from the
+                <orderedlist>
+                    <listitem><para>
+                        Choose "Preferences" from the
                         "Window" menu to display the Preferences Dialog.
                         </para></listitem>
-                    <listitem><para>Click "Yocto Project SDK" to display
+                    <listitem><para>
+                        Click "Yocto Project SDK" to display
                         the configuration screen.
                         </para></listitem>
-                </itemizedlist>
+                </orderedlist>
                 The following sub-sections describe how to configure the
                 the plug-in.
                 <note>
@@ -354,15 +381,15 @@
                     the sysroot location, and select the target
                     architecture.
                     <itemizedlist>
-                        <listitem><para><emphasis>Selecting the Toolchain Type:</emphasis>
-                            Choose between
-                            <filename>Standalone pre-built toolchain</filename>
+                        <listitem><para>
+                            <emphasis>Selecting the Toolchain Type:</emphasis>
+                            Choose between "Standalone pre-built toolchain"
                             and
-                            <filename>Build system derived toolchain</filename>
-                            for Cross Compiler Options.
+                            "Build system derived toolchain" for Cross Compiler
+                            Options.
                                 <itemizedlist>
-                                    <listitem><para><emphasis>
-                                        <filename>Standalone Pre-built Toolchain:</filename></emphasis>
+                                    <listitem><para>
+                                        <emphasis>Standalone Pre-built Toolchain:</emphasis>
                                         Select this type when you are using
                                         a stand-alone cross-toolchain.
                                         For example, suppose you are an
@@ -376,24 +403,25 @@
                                         and installed a pre-built toolchain
                                         for an existing image.
                                         </para></listitem>
-                                   <listitem><para><emphasis>
-                                        <filename>Build System Derived Toolchain:</filename></emphasis>
+                                   <listitem><para>
+                                        <emphasis>Build System Derived Toolchain:</emphasis>
                                         Select this type if you built the
                                         toolchain as part of the
                                         <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>.
-                                        When you select
-                                        <filename>Build system derived toolchain</filename>,
-                                        you are using the toolchain built and
-                                        bundled inside the Build Directory.
+                                        When you select "Build system derived
+                                        toolchain", you are using the toolchain
+                                        built and bundled inside the Build
+                                        Directory.
                                         For example, suppose you created a
                                         suitable image using the steps in the
                                         <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
-                                        In this situation, you would select the
-                                        <filename>Build system derived toolchain</filename>.
+                                        In this situation, you would select
+                                        "Build system derived toolchain".
                                         </para></listitem>
                                 </itemizedlist>
                             </para></listitem>
-                        <listitem><para><emphasis>Specify the Toolchain Root Location:</emphasis>
+                        <listitem><para>
+                            <emphasis>Specify the Toolchain Root Location:</emphasis>
                             If you are using a stand-alone pre-built
                             toolchain, you should be pointing to where it is
                             installed (e.g.
@@ -402,10 +430,10 @@
                             "<link linkend='sdk-installing-the-sdk'>Installing the SDK</link>"
                             section for information about how the SDK is
                             installed.</para>
+
                             <para>If you are using a build system derived
                             toolchain, the path you provide for the
-                            <filename>Toolchain Root Location</filename>
-                            field is the
+                            "Toolchain Root Location" field is the
                             <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
                             from which you run the
                             <filename>bitbake</filename> command (e.g
@@ -414,10 +442,12 @@
                             "<link linkend='sdk-building-an-sdk-installer'>Building an SDK Installer</link>"
                             section.
                             </para></listitem>
-                        <listitem><para><emphasis>Specify Sysroot Location:</emphasis>
+                        <listitem><para>
+                            <emphasis>Specify Sysroot Location:</emphasis>
                             This location is where the root filesystem for
                             the target hardware resides.
                             </para>
+
                             <para>This location depends on where you
                             separately extracted and installed the
                             target filesystem when you either built
@@ -438,17 +468,18 @@
                             and you would browse to and select that directory
                             (e.g. <filename>/home/scottrif/build/MY_QEMU_ROOTFS</filename>).
                             </para>
+
                             <para>For more information on how to install the
                             toolchain and on how to extract and install the
                             sysroot filesystem, see the
                             "<link linkend='sdk-building-an-sdk-installer'>Building an SDK Installer</link>"
                             section.
                             </para></listitem>
-                        <listitem><para><emphasis>Select the Target Architecture:</emphasis>
+                        <listitem><para>
+                            <emphasis>Select the Target Architecture:</emphasis>
                             The target architecture is the type of hardware
                             you are going to use or emulate.
-                            Use the pull-down
-                            <filename>Target Architecture</filename> menu
+                            Use the pull-down "Target Architecture" menu
                             to make your selection.
                             The pull-down menu should have the supported
                             architectures.
@@ -473,16 +504,17 @@
                     emulator, or you can choose to run your image on actual
                     hardware.
                     <itemizedlist>
-                        <listitem><para><emphasis>QEMU:</emphasis>
+                        <listitem><para>
+                            <emphasis>QEMU:</emphasis>
                             Select this option if you will be using the
                             QEMU emulator.
                             If you are using the emulator, you also need to
                             locate the kernel and specify any custom
                             options.</para>
-                            <para>If you selected the
-                            <filename>Build system derived toolchain</filename>,
-                            the target kernel you built will be located in
-                            the
+
+                            <para>If you selected the Build system derived
+                            toolchain, the target kernel you built will be
+                            located in the
                             <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
                             in
                             <filename>tmp/deploy/images/<replaceable>machine</replaceable></filename>
@@ -494,10 +526,12 @@
                             followed by the image (e.g.
                             <filename>/home/scottrif/poky/build/tmp/deploy/images/qemux86/bzImage-qemux86.bin</filename>).
                             </para>
+
                             <para>If you selected the standalone pre-built
                             toolchain, the pre-built image you downloaded is
                             located in the directory you specified when you
                             downloaded the image.</para>
+
                             <para>Most custom options are for advanced QEMU
                             users to further customize their QEMU instance.
                             These options are specified between paired
@@ -514,16 +548,16 @@
                             The following is an example:
                            <literallayout class='monospaced'>
     serial ‘&lt;-m 256 -full-screen&gt;’
-                            </literallayout></para>
-                            <para>
+                            </literallayout>
                             Regardless of the mode, Sysroot is already
                             defined as part of the Cross-Compiler Options
-                            configuration in the
-                            <filename>Sysroot Location:</filename> field.
+                            configuration in the "Sysroot Location:" field.
                             </para></listitem>
-                        <listitem><para><emphasis>External HW:</emphasis>
+                        <listitem><para>
+                            <emphasis>External HW:</emphasis>
                             Select this option if you will be using actual
-                            hardware.</para></listitem>
+                            hardware.
+                            </para></listitem>
                     </itemizedlist>
                 </para>
 
@@ -558,31 +592,37 @@
             To create a project based on a Yocto template and then display
             the source code, follow these steps:
             <orderedlist>
-                <listitem><para>Select "C Project" from the "File -> New" menu.
+                <listitem><para>
+                    Select "C Project" from the "File -> New" menu.
                     </para></listitem>
-                <listitem><para>Expand <filename>Yocto Project SDK Autotools Project</filename>.
+                <listitem><para>
+                    Expand "Yocto Project SDK Autotools Project".
                     </para></listitem>
-                <listitem><para>Select <filename>Hello World ANSI C Autotools Projects</filename>.
+                <listitem><para>
+                    Select "Hello World ANSI C Autotools Projects".
                     This is an Autotools-based project based on a Yocto
                     template.
                     </para></listitem>
-                <listitem><para>Put a name in the <filename>Project name:</filename>
-                    field.
+                <listitem><para>
+                    Put a name in the "Project name:" field.
                     Do not use hyphens as part of the name
-                    (e.g. <filename>hello</filename>).
+                    (e.g. "hello").
                     </para></listitem>
-                <listitem><para>Click "Next".
+                <listitem><para>
+                    Click "Next".
                     </para></listitem>
-                <listitem><para>Add appropriate information in the various
-                    fields.
+                <listitem><para>
+                    Add appropriate information in the various fields.
                     </para></listitem>
-                <listitem><para>Click "Finish".
+                <listitem><para>
+                    Click "Finish".
                     </para></listitem>
-                <listitem><para>If the "open perspective" prompt appears,
+                <listitem><para>
+                    If the "open perspective" prompt appears,
                     click "Yes" so that you are in the C/C++ perspective.
                     </para></listitem>
-                <listitem><para>The left-hand navigation pane shows your
-                    project.
+                <listitem><para>
+                    The left-hand navigation pane shows your project.
                     You can display your source by double clicking the
                     project's source file.
                     </para></listitem>
@@ -600,7 +640,8 @@
             You can override these settings for a given project by following
             these steps:
             <orderedlist>
-                <listitem><para>Select "Yocto Project Settings" from
+                <listitem><para>
+                    Select "Yocto Project Settings" from
                     the "Project -> Properties" menu.
                     This selection brings up the Yocto Project Settings
                     Dialog and allows you to make changes specific to an
@@ -613,22 +654,19 @@
                     The Yocto Project Settings Dialog allows you to override
                     those default settings for a given project.
                     </para></listitem>
-                <listitem><para>Make or verify your configurations for the
-                    project and click "OK".
+                <listitem><para>
+                    Make or verify your configurations for the project and
+                    click "OK".
                     </para></listitem>
-                <listitem><para>Right-click in the navigation pane and
-                    select "Reconfigure Project" from the pop-up menu.
+                <listitem><para>
+                    Right-click in the navigation pane and select
+                    "Reconfigure Project" from the pop-up menu.
                     This selection reconfigures the project by running
-                    <filename>autogen.sh</filename> in the workspace for
-                    your project.
-                    The script also runs <filename>libtoolize</filename>,
-                    <filename>aclocal</filename>,
-                    <filename>autoconf</filename>,
-                    <filename>autoheader</filename>,
-                    <filename>automake --a</filename>, and
-                    <filename>./configure</filename>.
-                    Click on the "Console" tab beneath your source code to
-                    see the results of reconfiguring your project.
+                    <ulink url='https://en.wikipedia.org/wiki/GNU_Build_System'>Autotools GNU utility programs</ulink>
+                    such as Autoconf, Automake, and so forth in the
+                    workspace for your project.
+                    Click on the "Console" tab beneath your source code
+                    to see the results of reconfiguring your project.
                     </para></listitem>
             </orderedlist>
         </para>
@@ -656,8 +694,7 @@
                         Select the project.
                         </para></listitem>
                     <listitem><para>
-                        Select "Folder" from the
-                        <filename>File > New</filename> menu.
+                        Select "Folder" from the "File > New" menu.
                         </para></listitem>
                     <listitem><para>
                         In the "New Folder" Dialog, select "Link to alternate
@@ -782,54 +819,66 @@
                 exit out of or close that shell).
             </note>
             <orderedlist>
-                <listitem><para>Select "Debug Configurations..." from the
+                <listitem><para>
+                    Select "Debug Configurations..." from the
                     "Run" menu.</para></listitem>
-                <listitem><para>In the left area, expand
-                    <filename>C/C++Remote Application</filename>.
+                <listitem><para>
+                    In the left area, expand
+                    "C/C++Remote Application".
                     </para></listitem>
-                <listitem><para>Locate your project and select it to bring
+                <listitem><para>
+                    Locate your project and select it to bring
                     up a new tabbed view in the Debug Configurations Dialog.
                     </para></listitem>
-                <listitem><para>Click on the "Debugger" tab to see the
+                <listitem><para>
+                    Click on the "Debugger" tab to see the
                     cross-tool debugger you are using.
                     Be sure to change to the debugger perspective in Eclipse.
                     </para></listitem>
-                <listitem><para>Click on the "Main" tab.
+                <listitem><para>
+                    Click on the "Main" tab.
                     </para></listitem>
                 <listitem><para>Create a new connection to the QEMU instance
                     by clicking on "new".</para></listitem>
-                <listitem><para>Select <filename>SSH</filename>, which means
+                <listitem><para>
+                    Select "SSH", which means
                     Secure Socket Shell.
                     Optionally, you can select a TCF connection instead.
                     </para></listitem>
-                <listitem><para>Click "Next".
+                <listitem><para>
+                    Click "Next".
                     </para></listitem>
-                <listitem><para>Clear out the "Connection name" field and
+                <listitem><para>
+                    Clear out the "Connection name" field and
                     enter any name you want for the connection.
                     </para></listitem>
-                <listitem><para>Put the IP address for the connection in
+                <listitem><para>
+                    Put the IP address for the connection in
                     the "Host" field.
-                    For QEMU, the default is <filename>192.168.7.2</filename>.
+                    For QEMU, the default is "192.168.7.2".
                     However, if a previous QEMU session did not exit
                     cleanly, the IP address increments (e.g.
-                    <filename>192.168.7.3</filename>).
+                    "192.168.7.3").
                     <note>
                         You can find the IP address for the current QEMU
                         session by looking in the xterm that opens when
                         you launch QEMU.
                     </note>
                     </para></listitem>
-                <listitem><para>Enter <filename>root</filename>, which
+                <listitem><para>
+                    Enter "root", which
                     is the default for QEMU, for the "User" field.
                     Be sure to leave the password field empty.
                     </para></listitem>
                 <listitem><para>Click "Finish" to close the
                     New Connections Dialog.
                     </para></listitem>
-                <listitem><para>If necessary, use the drop-down menu now in the
+                <listitem><para>
+                    If necessary, use the drop-down menu now in the
                     "Connection" field and pick the IP Address you entered.
                      </para></listitem>
-                <listitem><para>Assuming you are connecting as the root user,
+                <listitem><para>
+                    Assuming you are connecting as the root user,
                     which is the default for QEMU x86-64 SDK images provided by
                     the Yocto Project, in the "Remote Absolute File Path for
                     C/C++ Application" field, browse to
@@ -874,9 +923,11 @@
                 <listitem><para>
                     Be sure you change to the "Debug" perspective in Eclipse.
                     </para></listitem>
-                <listitem><para>Click "Debug"
+                <listitem><para>
+                    Click "Debug"
                     </para></listitem>
-                <listitem><para>Accept the debug perspective.
+                <listitem><para>
+                    Accept the debug perspective.
                     </para></listitem>
             </orderedlist>
         </para>

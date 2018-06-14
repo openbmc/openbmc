@@ -19,6 +19,10 @@ SRC_URI = "git://github.com/tianocore/edk2.git;branch=master \
 	file://0004-ovmf-enable-long-path-file.patch \
 	file://VfrCompile-increase-path-length-limit.patch \
 	file://no-stack-protector-all-archs.patch \
+	file://0001-BaseTools-header.makefile-add-Wno-stringop-truncatio.patch \
+	file://0002-BaseTools-header.makefile-add-Wno-restrict.patch \
+	file://0003-BaseTools-header.makefile-revert-gcc-8-Wno-xxx-optio.patch \
+	file://0004-BaseTools-GenVtf-silence-false-stringop-overflow-war.patch \
         "
 UPSTREAM_VERSION_UNKNOWN = "1"
 
@@ -35,7 +39,7 @@ SRC_URI[openssl.sha256sum] = "57be8618979d80c910728cfc99369bf97b2a1abd8f366ab6eb
 
 inherit deploy
 
-PARALLEL_MAKE_class-native = ""
+PARALLEL_MAKE = ""
 
 S = "${WORKDIR}/git"
 

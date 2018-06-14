@@ -208,7 +208,7 @@ def SSHCall(command, logger, timeout=None, **opts):
                 try:
                     if select.select([process.stdout], [], [], 5)[0] != []:
                         reader = codecs.getreader('utf-8')(process.stdout)
-                        data = reader.read(1024, 1024)
+                        data = reader.read(1024, 4096)
                         if not data:
                             process.stdout.close()
                             eof = True

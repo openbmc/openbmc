@@ -79,8 +79,8 @@ SRC_URI = "\
 BACKPORTS = "\
            file://0001-Fix-internal-compiler-error-in-testcase.patch \
            file://0001-PR-rtl-optimization-83030.patch \
-           file://0001-PR-c-80290-memory-hog-with-std-pair.patch \
            file://0001-Fix-ppc64le-build-Partial-backport-r256656.patch \
+           file://0001-PR-c-80290-memory-hog-with-std-pair.patch \
 "
 
 SRC_URI[md5sum] = "be2da21680f27624f3a87055c4ba5af2"

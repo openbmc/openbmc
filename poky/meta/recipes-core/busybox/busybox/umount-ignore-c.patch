@@ -1,0 +1,40 @@
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+Upstream-Status: Backport [https://git.busybox.net/busybox/commit/?id=426134128112738c97a665170b21153ef0764b7d]
+
+From 95ea12791c8623bf825bc711ac7790306e7e1adb Mon Sep 17 00:00:00 2001
+From: Shawn Landden <slandden@gmail.com>
+Date: Mon, 8 Jan 2018 13:31:58 +0100
+Subject: [PATCH] umount: ignore -c
+Organization: O.S. Systems Software LTDA.
+
+"-c, --no-canonicalize: Do not canonicalize paths."
+
+As busybox doesn't canonicalize paths in the first place it is safe to ignore
+this option.
+
+See https://github.com/systemd/systemd/issues/7786
+
+Signed-off-by: Shawn Landden <slandden@gmail.com>
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ util-linux/umount.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/util-linux/umount.c b/util-linux/umount.c
+index 0c50dc9ee..0425c5b76 100644
+--- a/util-linux/umount.c
++++ b/util-linux/umount.c
+@@ -68,8 +68,8 @@ static struct mntent *getmntent_r(FILE* stream, struct mntent* result,
+ }
+ #endif
+ 
+-/* ignored: -v -t -i */
+-#define OPTION_STRING           "fldnra" "vt:i"
++/* ignored: -c -v -t -i */
++#define OPTION_STRING           "fldnra" "cvt:i"
+ #define OPT_FORCE               (1 << 0) // Same as MNT_FORCE
+ #define OPT_LAZY                (1 << 1) // Same as MNT_DETACH
+ #define OPT_FREELOOP            (1 << 2)
+-- 
+2.18.0
+

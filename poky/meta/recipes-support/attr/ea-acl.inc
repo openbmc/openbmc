@@ -7,6 +7,9 @@ SRC_URI_append = " file://0001-Added-configure-option-to-enable-disable-static-l
 
 inherit autotools-brokensep gettext
 
+# When upstream is using automake properly, this can be removed
+CLEANBROKEN = "1"
+
 # the package comes with a custom config.h.in, it cannot be
 # overwritten by autoheader
 EXTRA_AUTORECONF += "--exclude=autoheader"

@@ -1715,31 +1715,35 @@
         </para>
     </section>
 
-    <section id='sdk-updating-the-extensible-sdk'>
-        <title>Updating the Extensible SDK</title>
+    <section id='sdk-applying-updates-to-an-installed-extensible-sdk'>
+        <title>Applying Updates to an Installed Extensible SDK</title>
 
         <para>
-            If you are working with an extensible SDK that gets occasionally
-            updated (e.g. typically when that SDK has been provided to you by
-            another party), then you will need to manually pull down those
-            updates to your installed SDK.
+            If you are working with an installed extensible SDK that gets
+            occasionally updated (e.g. a third-party SDK), then you will need
+            to manually "pull down" the updates into the installed SDK.
         </para>
 
         <para>
-            To update your installed SDK, run the following:
+            To update your installed SDK, use <filename>devtool</filename> as
+            follows:
             <literallayout class='monospaced'>
      $ devtool sdk-update
             </literallayout>
             The previous command assumes your SDK provider has set the default
-            update URL for you.
-            If that URL has not been set, you need to specify it yourself as
-            follows:
+            update URL for you through the
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_UPDATE_URL'><filename>SDK_UPDATE_URL</filename></ulink>
+            variable as described in the
+            "<link linkend='sdk-providing-updates-to-the-extensible-sdk-after-installation'>Providing Updates to the Extensible SDK After Installation</link>"
+            section.
+            If the SDK provider has not set that default URL, you need to
+            specify it yourself in the command as follows:
             <literallayout class='monospaced'>
      $ devtool sdk-update <replaceable>path_to_update_directory</replaceable>
             </literallayout>
             <note>
-                The URL needs to point specifically to a published SDK and not an
-                SDK installer that you would download and install.
+                The URL needs to point specifically to a published SDK and
+                not to an SDK installer that you would download and install.
             </note>
         </para>
     </section>

@@ -37,10 +37,12 @@ CFLAGS_append = " -fPIC"
 
 # pread() is in POSIX.1-2001 so any reasonable system must surely support it
 BUILD_CFLAGS += "-DUSE_PREAD"
+BUILDSDK_CFLAGS += "-DUSE_PREAD"
 TARGET_CFLAGS += "-DUSE_PREAD"
 
 # Provide column meta-data API
 BUILD_CFLAGS += "-DSQLITE_ENABLE_COLUMN_METADATA"
+BUILDSDK_CFLAGS += "-DSQLITE_ENABLE_COLUMN_METADATA"
 TARGET_CFLAGS += "-DSQLITE_ENABLE_COLUMN_METADATA"
 
 PACKAGES = "lib${BPN} lib${BPN}-dev lib${BPN}-doc ${PN}-dbg lib${BPN}-staticdev ${PN}"

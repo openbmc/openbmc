@@ -25,7 +25,7 @@ SRC_URI[sha256sum] = "ae7a42df026550b85daca8389b6a60ba6313b0567f374392e54918588a
 
 UPSTREAM_CHECK_REGEX = "nettle-(?P<pver>\d+(\.\d+)+)\.tar"
 
-inherit autotools ptest
+inherit autotools ptest multilib_header
 
 EXTRA_AUTORECONF += "--exclude=aclocal"
 
@@ -33,6 +33,10 @@ EXTRA_OECONF = "--disable-openssl"
 
 do_compile_ptest() {
         oe_runmake buildtest
+}
+
+do_install_append() {
+    oe_multilib_header nettle/nettle-stdint.h nettle/version.h
 }
 
 do_install_ptest() {

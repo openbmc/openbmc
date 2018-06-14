@@ -336,11 +336,11 @@ def check_path_length(filepath, pathname, limit):
     return ""
 
 def get_filesystem_id(path):
-    status, result = oe.utils.getstatusoutput("stat -f -c '%s' '%s'" % ("%t", path))
-    if status == 0:
-        return result
-    else:
-        bb.warn("Can't get the filesystem id of: %s" % path)
+    import subprocess
+    try:
+        return subprocess.check_output(["stat", "-f", "-c", "%t", path]).decode('utf-8')
+    except subprocess.CalledProcessError:
+        bb.warn("Can't get filesystem id of: %s" % path)
         return None
 
 # Check that the path isn't located on nfs.
@@ -463,7 +463,7 @@ def check_patch_version(sanity_data):
     import re, subprocess
 
     try:
-        result = subprocess.check_output(["patch", "--version"], stderr=subprocess.STDOUT, universal_newlines=True)
+        result = subprocess.check_output(["patch", "--version"], stderr=subprocess.STDOUT).decode('utf-8')
         version = re.search(r"[0-9.]+", result.splitlines()[0]).group()
         if LooseVersion(version) < LooseVersion("2.7"):
             return "Your version of patch is older than 2.7 and has bugs which will break builds. Please install a newer version of patch.\n"
@@ -476,9 +476,12 @@ def check_patch_version(sanity_data):
 # Use a modified reproducer from http://savannah.gnu.org/bugs/?30612 to validate.
 def check_make_version(sanity_data):
     from distutils.version import LooseVersion
-    status, result = oe.utils.getstatusoutput("make --version")
-    if status != 0:
-        return "Unable to execute make --version, exit code %d\n" % status
+    import subprocess
+
+    try:
+        result = subprocess.check_output(['make', '--version'], stderr=subprocess.STDOUT).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute make --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[2]
     if LooseVersion(version) == LooseVersion("3.82"):
         # Construct a test file
@@ -493,18 +496,18 @@ def check_make_version(sanity_data):
         f.close()
 
         # Check if make 3.82 has been patched
-        status,result = oe.utils.getstatusoutput("make -f makefile_test")
-
-        os.remove("makefile_test")
-        if os.path.exists("makefile_test_a.c"):
-            os.remove("makefile_test_a.c")
-        if os.path.exists("makefile_test_b.c"):
-            os.remove("makefile_test_b.c")
-        if os.path.exists("makefile_test.a"):
-            os.remove("makefile_test.a")
-
-        if status != 0:
+        try:
+            subprocess.check_call(['make', '-f', 'makefile_test'])
+        except subprocess.CalledProcessError as e:
             return "Your version of make 3.82 is broken. Please revert to 3.81 or install a patched version.\n"
+        finally:
+            os.remove("makefile_test")
+            if os.path.exists("makefile_test_a.c"):
+                os.remove("makefile_test_a.c")
+            if os.path.exists("makefile_test_b.c"):
+                os.remove("makefile_test_b.c")
+            if os.path.exists("makefile_test.a"):
+                os.remove("makefile_test.a")
     return None
 
 
@@ -512,9 +515,11 @@ def check_make_version(sanity_data):
 # but earlier versions do not; this needs to work properly for sstate
 def check_tar_version(sanity_data):
     from distutils.version import LooseVersion
-    status, result = oe.utils.getstatusoutput("tar --version")
-    if status != 0:
-        return "Unable to execute tar --version, exit code %d\n" % status
+    import subprocess
+    try:
+        result = subprocess.check_output(["tar", "--version"], stderr=subprocess.STDOUT).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute tar --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[3]
     if LooseVersion(version) < LooseVersion("1.24"):
         return "Your version of tar is older than 1.24 and has bugs which will break builds. Please install a newer version of tar.\n"
@@ -525,9 +530,11 @@ def check_tar_version(sanity_data):
 # The git fetcher also had workarounds for git < 1.7.9.2 which we've dropped
 def check_git_version(sanity_data):
     from distutils.version import LooseVersion
-    status, result = oe.utils.getstatusoutput("git --version 2> /dev/null")
-    if status != 0:
-        return "Unable to execute git --version, exit code %d\n" % status
+    import subprocess
+    try:
+        result = subprocess.check_output(["git", "--version"], stderr=subprocess.DEVNULL).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute git --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[2]
     if LooseVersion(version) < LooseVersion("1.8.3.1"):
         return "Your version of git is older than 1.8.3.1 and has bugs which will break builds. Please install a newer version of git.\n"
@@ -535,13 +542,15 @@ def check_git_version(sanity_data):
 
 # Check the required perl modules which may not be installed by default
 def check_perl_modules(sanity_data):
+    import subprocess
     ret = ""
     modules = ( "Text::ParseWords", "Thread::Queue", "Data::Dumper" )
     errresult = ''
     for m in modules:
-        status, result = oe.utils.getstatusoutput("perl -e 'use %s'" % m)
-        if status != 0:
-            errresult += result
+        try:
+            subprocess.check_output(["perl", "-e", "use %s" % m])
+        except subprocess.CalledProcessError as e:
+            errresult += e.output
             ret += "%s " % m
     if ret:
         return "Required perl module(s) not found: %s\n\n%s\n" % (ret, errresult)

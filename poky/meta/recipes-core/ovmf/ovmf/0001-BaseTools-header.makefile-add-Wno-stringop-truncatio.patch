@@ -1,0 +1,71 @@
+From 9fce4bab014b9aa618060eba13d6dd04b0fa1b70 Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Fri, 2 Mar 2018 17:11:52 +0100
+Subject: [PATCH 1/4] BaseTools/header.makefile: add "-Wno-stringop-truncation"
+
+gcc-8 (which is part of Fedora 28) enables the new warning
+"-Wstringop-truncation" in "-Wall". This warning is documented in detail
+at <https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html>; the
+introduction says
+
+> Warn for calls to bounded string manipulation functions such as strncat,
+> strncpy, and stpncpy that may either truncate the copied string or leave
+> the destination unchanged.
+
+It breaks the BaseTools build with:
+
+> EfiUtilityMsgs.c: In function 'PrintMessage':
+> EfiUtilityMsgs.c:484:9: error: 'strncat' output may be truncated copying
+> between 0 and 511 bytes from a string of length 511
+> [-Werror=stringop-truncation]
+>          strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> EfiUtilityMsgs.c:469:9: error: 'strncat' output may be truncated copying
+> between 0 and 511 bytes from a string of length 511
+> [-Werror=stringop-truncation]
+>          strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> EfiUtilityMsgs.c:511:5: error: 'strncat' output may be truncated copying
+> between 0 and 511 bytes from a string of length 511
+> [-Werror=stringop-truncation]
+>      strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The right way to fix the warning would be to implement string concat with
+snprintf(). However, Microsoft does not appear to support snprintf()
+before VS2015
+<https://stackoverflow.com/questions/2915672/snprintf-and-visual-studio-2010>,
+so we just have to shut up the warning. The strncat() calls flagged above
+are valid BTW.
+
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Cole Robinson <crobinso@redhat.com>
+Cc: Liming Gao <liming.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yonghong Zhu <yonghong.zhu@intel.com>
+Contributed-under: TianoCore Contribution Agreement 1.1
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Liming Gao <liming.gao@intel.com>
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+
+ BaseTools/Source/C/Makefiles/header.makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: git/BaseTools/Source/C/Makefiles/header.makefile
+===================================================================
+--- git.orig/BaseTools/Source/C/Makefiles/header.makefile
++++ git/BaseTools/Source/C/Makefiles/header.makefile
+@@ -47,9 +47,9 @@ INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT)
+ BUILD_CPPFLAGS += $(INCLUDE) -O2
+ ifeq ($(DARWIN),Darwin)
+ # assume clang or clang compatible flags on OS X
+-BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -c -g
++BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-self-assign -Wno-unused-result -nostdlib -c -g
+ else
+-BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-unused-result -nostdlib -c -g
++BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-unused-result -nostdlib -c -g
+ endif
+ BUILD_LFLAGS = $(LDFLAGS)
+ BUILD_CXXFLAGS += -Wno-unused-result

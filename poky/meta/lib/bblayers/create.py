@@ -53,7 +53,7 @@ class CreatePlugin(LayerPlugin):
         example_template = read_template('example.bb')
         example = os.path.join(layerdir, 'recipes-' + args.examplerecipe, args.examplerecipe)
         bb.utils.mkdirhier(example)
-        with open(os.path.join(example, args.examplerecipe + '.bb'), 'w') as fd:
+        with open(os.path.join(example, args.examplerecipe + '_%s.bb') % args.version, 'w') as fd:
             fd.write(example_template)
 
         logger.plain('Add your new layer with \'bitbake-layers add-layer %s\'' % args.layerdir)
@@ -63,4 +63,5 @@ class CreatePlugin(LayerPlugin):
         parser_create_layer.add_argument('layerdir', help='Layer directory to create')
         parser_create_layer.add_argument('--priority', '-p', default=6, help='Layer directory to create')
         parser_create_layer.add_argument('--example-recipe-name', '-e', dest='examplerecipe', default='example', help='Filename of the example recipe')
+        parser_create_layer.add_argument('--example-recipe-version', '-v', dest='version', default='0.1', help='Version number for the example recipe')
 

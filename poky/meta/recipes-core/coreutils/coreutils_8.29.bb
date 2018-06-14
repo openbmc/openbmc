@@ -26,7 +26,7 @@ SRC_URI[sha256sum] = "92d0fa1c311cacefa89853bdb53c62f4110cdfda3820346b59cbd098f4
 
 EXTRA_OECONF_class-native = "--without-gmp"
 EXTRA_OECONF_class-target = "--enable-install-program=arch,hostname --libexecdir=${libdir}"
-EXTRA_OECONF_class-nativesdk = "--enable-install-program=arch"
+EXTRA_OECONF_class-nativesdk = "--enable-install-program=arch,hostname"
 
 # acl and xattr are not default features
 #

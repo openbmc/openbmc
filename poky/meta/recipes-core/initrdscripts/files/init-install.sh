@@ -302,6 +302,8 @@ if [ -f /etc/grub.d/00_header -a $grub_version -ne 0 ] ; then
     GRUBCFG="/boot/grub/grub.cfg"
     mkdir -p $(dirname $GRUBCFG)
     cat >$GRUBCFG <<_EOF
+timeout=5
+default=0
 menuentry "Linux" {
     search --no-floppy --fs-uuid $boot_uuid --set root
     linux /$kernel root=PARTUUID=$root_part_uuid $rootwait rw $5 $3 $4 quiet

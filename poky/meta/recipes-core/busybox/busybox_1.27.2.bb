@@ -45,6 +45,8 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://CVE-2011-5325.patch \
            file://CVE-2017-15873.patch \
            file://busybox-CVE-2017-16544.patch \
+           file://busybox-fix-lzma-segfaults.patch \
+           file://umount-ignore-c.patch \
 "
 SRC_URI_append_libc-musl = " file://musl.cfg "
 

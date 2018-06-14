@@ -35,6 +35,18 @@ SRC_URI = "\
      file://0013-fix-the-incorrect-assembling-for-ppc-wait-mnemonic.patch \
      file://0014-Detect-64-bit-MIPS-targets.patch \
      file://0015-sync-with-OE-libtool-changes.patch \
+     file://CVE-2018-8945.patch \
+     file://CVE-2018-7643.patch \
+     file://CVE-2018-6872.patch \ 
+     file://CVE-2018-6759.patch \
+     file://CVE-2018-7642.patch \
+     file://CVE-2018-7208.patch \
+     file://CVE-2018-7569.patch \
+     file://CVE-2018-7568.patch \
+     file://CVE-2018-10373.patch \
+     file://CVE-2018-10372.patch \
+     file://CVE-2018-10535.patch \
+     file://CVE-2018-10534.patch \
 "
 S  = "${WORKDIR}/git"
 

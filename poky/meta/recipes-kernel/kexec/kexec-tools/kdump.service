@@ -1,6 +1,7 @@
 [Unit]
 Description=Reboot and dump vmcore via kexec
 DefaultDependencies=no
+After=basic.target
 
 [Service]
 Type=oneshot

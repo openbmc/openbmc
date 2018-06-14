@@ -16,6 +16,7 @@ class RpmBasicTest(OERuntimeTestCase):
             cls.skipTest('Tests require image to be build from rpm')
 
     @OETestID(960)
+    @OEHasPackage(['rpm'])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_rpm_help(self):
         status, output = self.target.run('rpm --help')

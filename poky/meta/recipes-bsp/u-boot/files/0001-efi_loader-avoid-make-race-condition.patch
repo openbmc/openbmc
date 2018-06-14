@@ -1,0 +1,51 @@
+From 5c2e24a9ed54dfee77d1844a080e998b4affe916 Mon Sep 17 00:00:00 2001
+From: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Date: Sat, 2 Jun 2018 19:00:41 +0200
+Subject: [PATCH] efi_loader: avoid make race condition
+
+When U-Boot is built with 'make -j' there is not guarantee that targets in
+directory arch/ are built before targets in directory lib/. The current
+build instruction for EFI binaries in lib/ rely on dependencies in arch/.
+If $(EFI_CRT0) or $(EFI_RELOC) is not yet built before trying to build
+%.efi an error
+    *** No rule to make target '%.efi'
+occurs.
+
+With the patch separate copies of $(EFI_CRT0) and $(EFI_RELOC) named
+efi_crt0.o and efi_reloc.o are built in lib/efi_loader and
+lib/efi_selftest.
+
+Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Signed-off-by: Alexander Graf <agraf@suse.de>
+
+Upstream-Status: Backport from 2018.07
+
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ scripts/Makefile.lib | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 8f19b2db56..f2f398c935 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -404,8 +404,14 @@ cmd_efi_ld = $(LD) -nostdlib -znocombreloc -T $(EFI_LDS_PATH) -shared \
+ 
+ EFI_LDS_PATH = $(srctree)/arch/$(ARCH)/lib/$(EFI_LDS)
+ 
+-$(obj)/%_efi.so: $(obj)/%.o arch/$(ARCH)/lib/$(EFI_CRT0) \
+-		arch/$(ARCH)/lib/$(EFI_RELOC)
++$(obj)/efi_crt0.o: $(srctree)/arch/$(ARCH)/lib/$(EFI_CRT0:.o=.S)
++	$(call if_changed_dep,as_o_S)
++
++$(obj)/efi_reloc.o: $(srctree)/arch/$(ARCH)/lib/$(EFI_RELOC:.o=.c) $(recordmcount_source) FORCE
++	$(call cmd,force_checksrc)
++	$(call if_changed_rule,cc_o_c)
++
++$(obj)/%_efi.so: $(obj)/%.o $(obj)/efi_crt0.o $(obj)/efi_reloc.o
+ 	$(call cmd,efi_ld)
+ 
+ # ACPI
+-- 
+2.17.1
+

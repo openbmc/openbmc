@@ -1,0 +1,53 @@
+From 6866325dd9c17412e555974dde41f9631224db52 Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Wed, 7 Mar 2018 10:17:28 +0100
+Subject: [PATCH 3/4] BaseTools/header.makefile: revert gcc-8 "-Wno-xxx"
+ options on OSX
+
+I recently added the gcc-8 specific "-Wno-stringop-truncation" and
+"-Wno-restrict" options to BUILD_CFLAGS, both for "Darwin" (XCODE5 /
+clang, OSX) and otherwise (gcc, Linux / Cygwin).
+
+I also regression-tested the change with gcc-4.8 on Linux -- gcc-4.8 does
+not know either of the (gcc-8 specific) "-Wno-stringop-truncation" and
+"-Wno-restrict" options, yet the build completed fine (by GCC design).
+
+Regarding OSX, my expectation was that
+
+- XCODE5 / clang would either recognize these warnings options (because
+  clang does recognize most -W options of gcc),
+
+- or, similarly to gcc, clang would simply ignore the "-Wno-xxx" flags
+  that it didn't recognize.
+
+Neither is the case; the new flags have broken the BaseTools build on OSX.
+Revert them (for OSX only).
+
+Cc: Liming Gao <liming.gao@intel.com>
+Cc: Yonghong Zhu <yonghong.zhu@intel.com>
+Reported-by: Liming Gao <liming.gao@intel.com>
+Fixes: 1d212a83df0eaf32a6f5d4159beb2d77832e0231
+Fixes: 9222154ae7b3eef75ae88cdb56158256227cb929
+Contributed-under: TianoCore Contribution Agreement 1.1
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Liming Gao <liming.gao@intel.com>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+ BaseTools/Source/C/Makefiles/header.makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: git/BaseTools/Source/C/Makefiles/header.makefile
+===================================================================
+--- git.orig/BaseTools/Source/C/Makefiles/header.makefile
++++ git/BaseTools/Source/C/Makefiles/header.makefile
+@@ -47,7 +47,7 @@ INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT)
+ BUILD_CPPFLAGS += $(INCLUDE) -O2
+ ifeq ($(DARWIN),Darwin)
+ # assume clang or clang compatible flags on OS X
+-BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict -Wno-self-assign -Wno-unused-result -nostdlib -c -g
++BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -c -g
+ else
+ BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict -Wno-unused-result -nostdlib -c -g
+ endif

@@ -7,7 +7,7 @@ Subject: [PATCH] 	PR c++/80290 - memory-hog with std::pair.
 	check for a nested list argument.
 	(braced_init_depth): New.
 
-git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-7-branch@262204 138bc75d-0d04-0410-961f-82ee72b054a4
+Upstream-Status: Backport
 Signed-off-by: Joel Stanley <joel@jms.id.au>
 ---
  gcc/cp/pt.c      | 22 ++++++++++++++++++++++

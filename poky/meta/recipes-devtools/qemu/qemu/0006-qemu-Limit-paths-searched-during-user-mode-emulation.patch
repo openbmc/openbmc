@@ -1,0 +1,145 @@
+From c79c48a79710d0e2ef68062435596ac455cd9f71 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Wed, 9 Mar 2016 22:49:02 +0000
+Subject: [PATCH] qemu: Limit paths searched during user mode emulation
+
+By default qemu builds a complete list of directories within the user
+emulation sysroot (-L option). The OE sysroot directory is large and
+this is confusing, for example it indexes all pkgdata. In particular this
+confuses strace of qemu binaries with tons of irrelevant paths.
+
+This patch stops the code indexing up front and instead only indexes
+things if/as/when it needs to. This drastically reduces the files it
+reads and reduces memory usage and cleans up strace.
+
+It would also avoid the infinite directory traversal bug in [YOCTO #6996]
+although the code could still be vulnerable if it parsed those specific
+paths.
+
+RP
+2016/3/9
+Upstream-Status: Pending
+---
+ util/path.c | 44 ++++++++++++++++++++++----------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/util/path.c b/util/path.c
+index 7f9fc27..a416cd4 100644
+--- a/util/path.c
++++ b/util/path.c
+@@ -15,6 +15,7 @@ struct pathelem
+     char *name;
+     /* Full path name, eg. /usr/gnemul/x86-linux/lib. */
+     char *pathname;
++    int populated_entries;
+     struct pathelem *parent;
+     /* Children */
+     unsigned int num_entries;
+@@ -45,6 +46,7 @@ static struct pathelem *new_entry(const char *root,
+     new->name = g_strdup(name);
+     new->pathname = g_strdup_printf("%s/%s", root, name);
+     new->num_entries = 0;
++    new->populated_entries = 0;
+     return new;
+ }
+ 
+@@ -53,15 +55,16 @@ static struct pathelem *new_entry(const char *root,
+ /* Not all systems provide this feature */
+ #if defined(DT_DIR) && defined(DT_UNKNOWN) && defined(DT_LNK)
+ # define dirent_type(dirent) ((dirent)->d_type)
+-# define is_dir_maybe(type) \
+-    ((type) == DT_DIR || (type) == DT_UNKNOWN || (type) == DT_LNK)
++# define is_not_dir(type) \
++    ((type) != DT_DIR && (type) != DT_UNKNOWN && (type) != DT_LNK)
+ #else
+ # define dirent_type(dirent) (1)
+-# define is_dir_maybe(type)  (type)
++# define is_not_dir(type)  (0)
+ #endif
+ 
+ static struct pathelem *add_dir_maybe(struct pathelem *path)
+ {
++    unsigned int i;
+     DIR *dir;
+ 
+     if ((dir = opendir(path->pathname)) != NULL) {
+@@ -74,6 +77,11 @@ static struct pathelem *add_dir_maybe(struct pathelem *path)
+         }
+         closedir(dir);
+     }
++
++    for (i = 0; i < path->num_entries; i++)
++        (path->entries[i])->parent = path;
++
++    path->populated_entries = 1;
+     return path;
+ }
+ 
+@@ -89,26 +97,16 @@ static struct pathelem *add_entry(struct pathelem *root, const char *name,
+     e = &root->entries[root->num_entries-1];
+ 
+     *e = new_entry(root->pathname, root, name);
+-    if (is_dir_maybe(type)) {
+-        *e = add_dir_maybe(*e);
++    if (is_not_dir(type)) {
++        (*e)->populated_entries = 1;
+     }
+ 
+     return root;
+ }
+ 
+-/* This needs to be done after tree is stabilized (ie. no more reallocs!). */
+-static void set_parents(struct pathelem *child, struct pathelem *parent)
+-{
+-    unsigned int i;
+-
+-    child->parent = parent;
+-    for (i = 0; i < child->num_entries; i++)
+-        set_parents(child->entries[i], child);
+-}
+-
+ /* FIXME: Doesn't handle DIR/.. where DIR is not in emulated dir. */
+ static const char *
+-follow_path(const struct pathelem *cursor, const char *name)
++follow_path(struct pathelem *cursor, struct pathelem **source, const char *name)
+ {
+     unsigned int i, namelen;
+ 
+@@ -119,14 +117,18 @@ follow_path(const struct pathelem *cursor, const char *name)
+         return cursor->pathname;
+ 
+     if (strneq(name, namelen, ".."))
+-        return follow_path(cursor->parent, name + namelen);
++        return follow_path(cursor->parent, &cursor->parent, name + namelen);
+ 
+     if (strneq(name, namelen, "."))
+-        return follow_path(cursor, name + namelen);
++        return follow_path(cursor, source, name + namelen);
++
++    if (!cursor->populated_entries)
++        *source = add_dir_maybe(cursor);
++        cursor = *source;
+ 
+     for (i = 0; i < cursor->num_entries; i++)
+         if (strneq(name, namelen, cursor->entries[i]->name))
+-            return follow_path(cursor->entries[i], name + namelen);
++            return follow_path(cursor->entries[i], &cursor->entries[i], name + namelen);
+ 
+     /* Not found */
+     return NULL;
+@@ -160,8 +162,6 @@ void init_paths(const char *prefix)
+         g_free(base->name);
+         g_free(base);
+         base = NULL;
+-    } else {
+-        set_parents(base, base);
+     }
+ }
+ 
+@@ -173,5 +173,5 @@ const char *path(const char *name)
+     if (!base || !name || name[0] != '/')
+         return name;
+ 
+-    return follow_path(base, name) ?: name;
++    return follow_path(base, &base, name) ?: name;
+ }

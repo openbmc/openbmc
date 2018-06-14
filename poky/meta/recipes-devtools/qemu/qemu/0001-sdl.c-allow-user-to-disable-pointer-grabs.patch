@@ -1,0 +1,70 @@
+From 273e1af49d3e0a58bb9464369deb2652f243e649 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 18 Sep 2013 14:04:54 +0100
+Subject: [PATCH] sdl.c: allow user to disable pointer grabs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When the pointer enters the Qemu window it calls SDL_WM_GrabInput, which calls
+XGrabPointer in a busyloop until it returns GrabSuccess. However if there's already
+a pointer grab (screen is locked, a menu is open) then qemu will hang until the
+grab can be taken.  In the specific case of a headless X server on an autobuilder, once
+the screensaver has kicked in any qemu instance that appears underneath the
+pointer will hang.
+
+I'm not entirely sure why pointer grabs are required (the documentation
+explicitly says it doesn't do grabs when using a tablet, which we are) so wrap
+them in a conditional that can be set by the autobuilder environment, preserving
+the current grabbing behaviour for everyone else.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Eric Bénard <eric@eukrea.com>
+---
+ ui/sdl.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/ui/sdl.c b/ui/sdl.c
+index 7b71a9a..29ce1b9 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -63,6 +63,10 @@ static SDL_PixelFormat host_format;
+ static int scaling_active = 0;
+ static Notifier mouse_mode_notifier;
+ static int idle_counter;
++#ifndef True
++#define True 1
++#endif
++static doing_grabs = True;
+ 
+ #define SDL_REFRESH_INTERVAL_BUSY 10
+ #define SDL_MAX_IDLE_COUNT (2 * GUI_REFRESH_INTERVAL_DEFAULT \
+@@ -431,14 +435,16 @@ static void sdl_grab_start(void)
+         }
+     } else
+         sdl_hide_cursor();
+-    SDL_WM_GrabInput(SDL_GRAB_ON);
++    if (doing_grabs)
++      SDL_WM_GrabInput(SDL_GRAB_ON);
+     gui_grab = 1;
+     sdl_update_caption();
+ }
+ 
+ static void sdl_grab_end(void)
+ {
+-    SDL_WM_GrabInput(SDL_GRAB_OFF);
++    if (doing_grabs)
++      SDL_WM_GrabInput(SDL_GRAB_OFF);
+     gui_grab = 0;
+     sdl_show_cursor();
+     sdl_update_caption();
+@@ -986,6 +992,8 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+      * This requires SDL >= 1.2.14. */
+     setenv("SDL_DISABLE_LOCK_KEYS", "1", 1);
+ 
++    doing_grabs = (getenv("QEMU_DONT_GRAB") == NULL);
++
+     flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE;
+     if (SDL_Init (flags)) {
+         fprintf(stderr, "Could not initialize SDL(%s) - exiting\n",

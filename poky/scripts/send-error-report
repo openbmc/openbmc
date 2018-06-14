@@ -143,7 +143,7 @@ def send_data(data, args):
         logging.error(e.reason)
         sys.exit(1)
 
-    print(response.read())
+    print(response.read().decode('utf-8'))
 
 
 if __name__ == '__main__':

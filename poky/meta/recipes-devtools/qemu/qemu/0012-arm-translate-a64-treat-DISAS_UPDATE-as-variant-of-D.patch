@@ -1,0 +1,64 @@
+From 7354b9b24c36ee712bb6e881d39504bf1b6a4c8b Mon Sep 17 00:00:00 2001
+From: Victor Kamensky <kamensky@cisco.com>
+Date: Fri, 23 Mar 2018 18:26:45 +0000
+Subject: [PATCH] arm/translate-a64: treat DISAS_UPDATE as variant of
+ DISAS_EXIT
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In OE project 4.15 linux kernel boot hang was observed under
+single cpu aarch64 qemu. Kernel code was in a loop waiting for
+vtimer arrival, spinning in TC generated blocks, while interrupt
+was pending unprocessed. This happened because when qemu tried to
+handle vtimer interrupt target had interrupts disabled, as
+result flag indicating TCG exit, cpu->icount_decr.u16.high,
+was cleared but arm_cpu_exec_interrupt function did not call
+arm_cpu_do_interrupt to process interrupt. Later when target
+reenabled interrupts, it happened without exit into main loop, so
+following code that waited for result of interrupt execution
+run in infinite loop.
+
+To solve the problem instructions that operate on CPU sys state
+(i.e enable/disable interrupt), and marked as DISAS_UPDATE,
+should be considered as DISAS_EXIT variant, and should be
+forced to exit back to main loop so qemu will have a chance
+processing pending CPU state updates, including pending
+interrupts.
+
+This change brings consistency with how DISAS_UPDATE is treated
+in aarch32 case.
+
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Alex Bennée <alex.bennee@linaro.org>
+CC: qemu-stable@nongnu.org
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1521526368-1996-1-git-send-email-kamensky@cisco.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Upstream-Status: Backport
+---
+ target/arm/translate-a64.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 625ef2d..c381091 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11384,12 +11384,12 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_UPDATE:
+             gen_a64_set_pc_im(dc->pc);
+             /* fall through */
+-        case DISAS_JUMP:
+-            tcg_gen_lookup_and_goto_ptr();
+-            break;
+         case DISAS_EXIT:
+             tcg_gen_exit_tb(0);
+             break;
++        case DISAS_JUMP:
++            tcg_gen_lookup_and_goto_ptr();
++            break;
+         case DISAS_NORETURN:
+         case DISAS_SWI:
+             break;

@@ -2,6 +2,7 @@ PACKAGE_WRITE_DEPS += "qemu-native"
 inherit qemu
 
 GIO_MODULE_PACKAGES ??= "${PN}"
+GIO_MODULE_PACKAGES_class-nativesdk = ""
 
 gio_module_cache_common() {
 if [ "x$D" != "x" ]; then

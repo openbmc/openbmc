@@ -1,0 +1,60 @@
+From 065061dca34fa5b91be6dce9a87a8755d8826c78 Mon Sep 17 00:00:00 2001
+From: Prasad J Pandit <pjp@fedoraproject.org>
+Date: Thu, 16 Nov 2017 13:21:55 +0530
+Subject: [PATCH] ps2: check PS2Queue pointers in post_load routine
+
+During Qemu guest migration, a destination process invokes ps2
+post_load function. In that, if 'rptr' and 'count' values were
+invalid, it could lead to OOB access or infinite loop issue.
+Add check to avoid it.
+
+Reported-by: Cyrille Chatras <cyrille.chatras@orange.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+Message-id: 20171116075155.22378-1-ppandit@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+CVE: CVE-2017-16845
+Upstream-Status: Backport
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ hw/input/ps2.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
+
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index f388a23..de171a2 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -1225,24 +1225,21 @@ static void ps2_common_reset(PS2State *s)
+ static void ps2_common_post_load(PS2State *s)
+ {
+     PS2Queue *q = &s->queue;
+-    int size;
+-    int i;
+-    int tmp_data[PS2_QUEUE_SIZE];
++    uint8_t i, size;
++    uint8_t tmp_data[PS2_QUEUE_SIZE];
+ 
+     /* set the useful data buffer queue size, < PS2_QUEUE_SIZE */
+-    size = q->count > PS2_QUEUE_SIZE ? 0 : q->count;
++    size = (q->count < 0 || q->count > PS2_QUEUE_SIZE) ? 0 : q->count;
+ 
+     /* move the queue elements to the start of data array */
+-    if (size > 0) {
+-        for (i = 0; i < size; i++) {
+-            /* move the queue elements to the temporary buffer */
+-            tmp_data[i] = q->data[q->rptr];
+-            if (++q->rptr == 256) {
+-                q->rptr = 0;
+-            }
++    for (i = 0; i < size; i++) {
++        if (q->rptr < 0 || q->rptr >= sizeof(q->data)) {
++            q->rptr = 0;
+         }
+-        memcpy(q->data, tmp_data, size);
++        tmp_data[i] = q->data[q->rptr++];
+     }
++    memcpy(q->data, tmp_data, size);
++
+     /* reset rptr/wptr/count */
+     q->rptr = 0;
+     q->wptr = size;

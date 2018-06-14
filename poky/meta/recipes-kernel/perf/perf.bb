@@ -97,6 +97,13 @@ EXTRA_OEMAKE += "\
     'infodir=${@os.path.relpath(infodir, prefix)}' \
 "
 
+# During do_configure, we might run a 'make clean'. That often breaks
+# when done in parallel, so disable parallelism for do_configure. Note
+# that it has to be done this way rather than by passing -j1, since
+# perf's build system by default ignores any -j argument, but does
+# honour a JOBS variable.
+EXTRA_OEMAKE_append_task-configure = " JOBS=1"
+
 PERF_SRC ?= "Makefile \
              include \
              tools/arch \

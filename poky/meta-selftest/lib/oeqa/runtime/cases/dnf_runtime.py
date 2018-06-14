@@ -1,6 +1,7 @@
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.runtime.cases.dnf import DnfTest
 from oeqa.utils.httpserver import HTTPService
+from oeqa.core.decorator.data import skipIfDataVar
 
 class DnfSelftest(DnfTest):
 
@@ -18,6 +19,8 @@ class DnfSelftest(DnfTest):
         cls.temp_dir.cleanup()
 
     @OETestDepends(['dnf.DnfBasicTest.test_dnf_help'])
+    @skipIfDataVar('PACKAGE_FEED_URIS', None,
+                   'Not suitable as PACKAGE_FEED_URIS is not set')
     def test_verify_package_feeds(self):
         """
         Summary: Check correct setting of PACKAGE_FEED_URIS var

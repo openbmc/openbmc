@@ -13,10 +13,7 @@ Subject: [PATCH] Partial backport r256656
 	use of __builtin_vec_vsx_ld () built-in function, which operates
 	on unaligned pointer values.
 
-git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-6-branch@261621 138bc75d-0d04-0410-961f-82ee72b054a4
-
-
-git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-7-branch@262243 138bc75d-0d04-0410-961f-82ee72b054a4
+Upstream-Status: Backport
 Signed-off-by: Joel Stanley <joel@jms.id.au>
 ---
  libcpp/lex.c  |  2 +-

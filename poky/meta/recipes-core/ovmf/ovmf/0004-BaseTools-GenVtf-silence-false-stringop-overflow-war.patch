@@ -1,0 +1,66 @@
+From dfb42a5bff78d9239a80731e337855234badef3e Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Fri, 2 Mar 2018 17:11:52 +0100
+Subject: [PATCH 4/4] BaseTools/GenVtf: silence false "stringop-overflow"
+ warning with memcpy()
+
+gcc-8 (which is part of Fedora 28) enables the new warning
+"-Wstringop-overflow" in "-Wall". This warning is documented in detail at
+<https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html>; the
+introduction says
+
+> Warn for calls to string manipulation functions such as memcpy and
+> strcpy that are determined to overflow the destination buffer.
+
+It breaks the BaseTools build with:
+
+> GenVtf.c: In function 'ConvertVersionInfo':
+> GenVtf.c:132:7: error: 'strncpy' specified bound depends on the length
+> of the source argument [-Werror=stringop-overflow=]
+>        strncpy (TemStr + 4 - Length, Str, Length);
+>        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> GenVtf.c:130:14: note: length computed here
+>      Length = strlen(Str);
+>               ^~~~~~~~~~~
+
+It is a false positive because, while the bound equals the length of the
+source argument, the destination pointer is moved back towards the
+beginning of the destination buffer by the same amount (and this amount is
+range-checked first, so we can't precede the start of the dest buffer).
+
+Replace both strncpy() calls with memcpy().
+
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Cole Robinson <crobinso@redhat.com>
+Cc: Liming Gao <liming.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yonghong Zhu <yonghong.zhu@intel.com>
+Reported-by: Cole Robinson <crobinso@redhat.com>
+Contributed-under: TianoCore Contribution Agreement 1.1
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Liming Gao <liming.gao@intel.com>
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+ BaseTools/Source/C/GenVtf/GenVtf.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/BaseTools/Source/C/GenVtf/GenVtf.c b/BaseTools/Source/C/GenVtf/GenVtf.c
+index 2ae9a7be2c..0cd33e71e9 100644
+--- a/BaseTools/Source/C/GenVtf/GenVtf.c
++++ b/BaseTools/Source/C/GenVtf/GenVtf.c
+@@ -129,9 +129,9 @@ Returns:
+   } else {
+     Length = strlen(Str);
+     if (Length < 4) {
+-      strncpy (TemStr + 4 - Length, Str, Length);
++      memcpy (TemStr + 4 - Length, Str, Length);
+     } else {
+-      strncpy (TemStr, Str + Length - 4, 4);
++      memcpy (TemStr, Str + Length - 4, 4);
+     }
+   
+     sscanf (
+-- 
+2.17.0
+

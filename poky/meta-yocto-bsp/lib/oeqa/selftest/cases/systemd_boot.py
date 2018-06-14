@@ -44,7 +44,7 @@ class Systemdboot(OESelftestTestCase):
 
         # Ensure we're actually testing that this gets built and not that
         # it was around from an earlier build
-        bitbake('-c cleansstate systemd-boot')
+        bitbake('-c clean systemd-boot')
         runCmd('rm -f %s' % systemdbootfile)
 
         self._common_build()

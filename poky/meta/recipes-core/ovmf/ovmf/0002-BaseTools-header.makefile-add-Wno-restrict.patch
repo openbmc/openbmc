@@ -1,0 +1,102 @@
+From 86dbdac5a25bd23deb4a0e0a97b527407e02184d Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Fri, 2 Mar 2018 17:11:52 +0100
+Subject: [PATCH 2/4] BaseTools/header.makefile: add "-Wno-restrict"
+
+gcc-8 (which is part of Fedora 28) enables the new warning
+"-Wrestrict" in "-Wall". This warning is documented in detail
+at <https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html>; the
+introduction says
+
+> Warn when an object referenced by a restrict-qualified parameter (or, in
+> C++, a __restrict-qualified parameter) is aliased by another argument,
+> or when copies between such objects overlap.
+
+It breaks the BaseTools build (in the Brotli compression library) with:
+
+> In function 'ProcessCommandsInternal',
+>     inlined from 'ProcessCommands' at dec/decode.c:1828:10:
+> dec/decode.c:1781:9: error: 'memcpy' accessing between 17 and 2147483631
+> bytes at offsets 16 and 16 overlaps between 17 and 2147483631 bytes at
+> offset 16 [-Werror=restrict]
+>          memcpy(copy_dst + 16, copy_src + 16, (size_t)(i - 16));
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> In function 'ProcessCommandsInternal',
+>     inlined from 'SafeProcessCommands' at dec/decode.c:1833:10:
+> dec/decode.c:1781:9: error: 'memcpy' accessing between 17 and 2147483631
+> bytes at offsets 16 and 16 overlaps between 17 and 2147483631 bytes at
+> offset 16 [-Werror=restrict]
+>          memcpy(copy_dst + 16, copy_src + 16, (size_t)(i - 16));
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Paolo Bonzini <pbonzini@redhat.com> analyzed the Brotli source in detail,
+and concluded that the warning is a false positive:
+
+> This seems safe to me, because it's preceded by:
+>
+>     uint8_t* copy_dst = &s->ringbuffer[pos];
+>     uint8_t* copy_src = &s->ringbuffer[src_start];
+>     int dst_end = pos + i;
+>     int src_end = src_start + i;
+>     if (src_end > pos && dst_end > src_start) {
+>       /* Regions intersect. */
+>       goto CommandPostWrapCopy;
+>     }
+>
+> If [src_start, src_start + i) and [pos, pos + i) don't intersect, then
+> neither do [src_start + 16, src_start + i) and [pos + 16, pos + i).
+>
+> The if seems okay:
+>
+>        (src_start + i > pos && pos + i > src_start)
+>
+> which can be rewritten to:
+>
+>        (pos < src_start + i && src_start < pos + i)
+>
+> Then the numbers are in one of these two orders:
+>
+>      pos <= src_start < pos + i <= src_start + i
+>      src_start <= pos < src_start + i <= pos + i
+>
+> These two would be allowed by the "if", but they can only happen if pos
+> == src_start so they degenerate to the same two orders above:
+>
+>      pos <= src_start < src_start + i <= pos + i
+>      src_start <= pos < pos + i <= src_start + i
+>
+> So it is a false positive in GCC.
+
+Disable the warning for now.
+
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Cole Robinson <crobinso@redhat.com>
+Cc: Liming Gao <liming.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yonghong Zhu <yonghong.zhu@intel.com>
+Reported-by: Cole Robinson <crobinso@redhat.com>
+Contributed-under: TianoCore Contribution Agreement 1.1
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Liming Gao <liming.gao@intel.com>
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+ BaseTools/Source/C/Makefiles/header.makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: git/BaseTools/Source/C/Makefiles/header.makefile
+===================================================================
+--- git.orig/BaseTools/Source/C/Makefiles/header.makefile
++++ git/BaseTools/Source/C/Makefiles/header.makefile
+@@ -47,9 +47,9 @@ INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT)
+ BUILD_CPPFLAGS += $(INCLUDE) -O2
+ ifeq ($(DARWIN),Darwin)
+ # assume clang or clang compatible flags on OS X
+-BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-self-assign -Wno-unused-result -nostdlib -c -g
++BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict -Wno-self-assign -Wno-unused-result -nostdlib -c -g
+ else
+-BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-unused-result -nostdlib -c -g
++BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict -Wno-unused-result -nostdlib -c -g
+ endif
+ BUILD_LFLAGS = $(LDFLAGS)
+ BUILD_CXXFLAGS += -Wno-unused-result

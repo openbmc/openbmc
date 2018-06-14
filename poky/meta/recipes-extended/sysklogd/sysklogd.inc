@@ -33,7 +33,7 @@ SYSTEMD_AUTO_ENABLE = "enable"
 
 INITSCRIPT_NAME = "syslog"
 CONFFILES_${PN} = "${sysconfdir}/syslog.conf"
-RCONFLICTS_${PN}-syslog = "rsyslog busybox-syslog syslog-ng"
+RCONFLICTS_${PN} = "rsyslog busybox-syslog syslog-ng"
 
 CFLAGS += "-DSYSV -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
 

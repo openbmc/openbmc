@@ -76,7 +76,9 @@ fi
 pseudo_state_dir="$SDK_ROOTFS_DIR/../$(basename "$SDK_ROOTFS_DIR").pseudo_state"
 pseudo_state_dir="$(readlink -f $pseudo_state_dir)"
 
-if [ -e "$pseudo_state_dir" ]; then
+debug_image="`echo $ROOTFS_TARBALL | grep '\-dbg\.tar\.'`"
+
+if [ -e "$pseudo_state_dir" -a -z "$debug_image" ]; then
 	echo "Error: $pseudo_state_dir already exists!"
 	echo "Please delete the rootfs tree and pseudo directory manually"
         echo "if this is really what you want."

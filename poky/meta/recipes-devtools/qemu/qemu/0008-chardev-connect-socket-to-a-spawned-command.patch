@@ -1,0 +1,239 @@
+From 55c9510311b7481a0c8f3f71b3ce130cc25563f9 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 21 Dec 2017 11:35:16 -0800
+Subject: [PATCH] chardev: connect socket to a spawned command
+
+The command is started in a shell (sh -c) with stdin connect to QEMU
+via a Unix domain stream socket. QEMU then exchanges data via its own
+end of the socket, just like it normally does.
+
+"-chardev socket" supports some ways of connecting via protocols like
+telnet, but that is only a subset of the functionality supported by
+tools socat. To use socat instead, for example to connect via a socks
+proxy, use:
+
+  -chardev 'socket,id=socat,cmd=exec socat FD:0 SOCKS4A:socks-proxy.localdomain:example.com:9999,,socksuser=nobody' \
+  -device usb-serial,chardev=socat
+
+Beware that commas in the command must be escaped as double commas.
+
+Or interactively in the console:
+   (qemu) chardev-add socket,id=cat,cmd=cat
+   (qemu) device_add usb-serial,chardev=cat
+   ^ac
+   # cat >/dev/ttyUSB0
+   hello
+   hello
+
+Another usage is starting swtpm from inside QEMU. swtpm will
+automatically shut down once it looses the connection to the parent
+QEMU, so there is no risk of lingering processes:
+
+  -chardev 'socket,id=chrtpm0,cmd=exec swtpm socket --terminate --ctrl type=unixio,,clientfd=0 --tpmstate dir=... --log file=swtpm.log' \
+  -tpmdev emulator,id=tpm0,chardev=chrtpm0 \
+  -device tpm-tis,tpmdev=tpm0
+
+The patch was discussed upstream, but QEMU developers believe that the
+code calling QEMU should be responsible for managing additional
+processes. In OE-core, that would imply enhancing runqemu and
+oeqa. This patch is a simpler solution.
+
+Because it is not going upstream, the patch was written so that it is
+as simple as possible.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ chardev/char-socket.c | 99 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ chardev/char.c        |  3 ++
+ qapi/char.json        |  5 +++
+ 3 files changed, 107 insertions(+)
+
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 53eda8e..6c63555 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -852,6 +852,68 @@ static gboolean socket_reconnect_timeout(gpointer opaque)
+     return false;
+ }
+ 
++#ifndef _WIN32
++static void chardev_open_socket_cmd(Chardev *chr,
++                                    const char *cmd,
++                                    Error **errp)
++{
++    int fds[2] = { -1, -1 };
++    QIOChannelSocket *sioc = NULL;
++    pid_t pid = -1;
++    const char *argv[] = { "/bin/sh", "-c", cmd, NULL };
++
++    /*
++     * We need a Unix domain socket for commands like swtpm and a single
++     * connection, therefore we cannot use qio_channel_command_new_spawn()
++     * without patching it first. Duplicating the functionality is easier.
++     */
++    if (socketpair(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC, 0, fds)) {
++        error_setg_errno(errp, errno, "Error creating socketpair(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC)");
++        goto error;
++    }
++
++    pid = qemu_fork(errp);
++    if (pid < 0) {
++        goto error;
++    }
++
++    if (!pid) {
++        /* child */
++        dup2(fds[1], STDIN_FILENO);
++        execv(argv[0], (char * const *)argv);
++        _exit(1);
++    }
++
++    /*
++     * Hand over our end of the socket pair to the qio channel.
++     *
++     * We don't reap the child because it is expected to keep
++     * running. We also don't support the "reconnect" option for the
++     * same reason.
++     */
++    sioc = qio_channel_socket_new_fd(fds[0], errp);
++    if (!sioc) {
++        goto error;
++    }
++    fds[0] = -1;
++
++    g_free(chr->filename);
++    chr->filename = g_strdup_printf("cmd:%s", cmd);
++    tcp_chr_new_client(chr, sioc);
++
++ error:
++    if (fds[0] >= 0) {
++        close(fds[0]);
++    }
++    if (fds[1] >= 0) {
++        close(fds[1]);
++    }
++    if (sioc) {
++        object_unref(OBJECT(sioc));
++    }
++}
++#endif
++
+ static void qmp_chardev_open_socket(Chardev *chr,
+                                     ChardevBackend *backend,
+                                     bool *be_opened,
+@@ -859,6 +921,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
+ {
+     SocketChardev *s = SOCKET_CHARDEV(chr);
+     ChardevSocket *sock = backend->u.socket.data;
++#ifndef _WIN32
++    const char *cmd     = sock->cmd;
++#endif
+     bool do_nodelay     = sock->has_nodelay ? sock->nodelay : false;
+     bool is_listen      = sock->has_server  ? sock->server  : true;
+     bool is_telnet      = sock->has_telnet  ? sock->telnet  : false;
+@@ -925,7 +990,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
+     } else if (reconnect > 0) {
+         s->reconnect_time = reconnect;
+     }
++#ifndef _WIN32
++    if (cmd) {
++        chardev_open_socket_cmd(chr, cmd, errp);
+ 
++        /* everything ready (or failed permanently) before we return */
++        *be_opened = true;
++    } else
++#endif
+     if (s->reconnect_time) {
+         sioc = qio_channel_socket_new();
+         tcp_chr_set_client_ioc_name(chr, sioc);
+@@ -985,10 +1057,26 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+     const char *host = qemu_opt_get(opts, "host");
+     const char *port = qemu_opt_get(opts, "port");
+     const char *tls_creds = qemu_opt_get(opts, "tls-creds");
++#ifndef _WIN32
++    const char *cmd = qemu_opt_get(opts, "cmd");
++#endif
+     SocketAddressLegacy *addr;
+     ChardevSocket *sock;
+ 
+     backend->type = CHARDEV_BACKEND_KIND_SOCKET;
++#ifndef _WIN32
++    if (cmd) {
++        /*
++         * Here we have to ensure that no options are set which are incompatible with
++         * spawning a command, otherwise unmodified code that doesn't know about
++         * command spawning (like socket_reconnect_timeout()) might get called.
++         */
++        if (path || is_listen || is_telnet || is_tn3270 || reconnect || host || port || tls_creds) {
++            error_setg(errp, "chardev: socket: cmd does not support any additional options");
++            return;
++        }
++    } else
++#endif
+     if (!path) {
+         if (!host) {
+             error_setg(errp, "chardev: socket: no host given");
+@@ -1021,13 +1109,24 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+     sock->has_reconnect = true;
+     sock->reconnect = reconnect;
+     sock->tls_creds = g_strdup(tls_creds);
++#ifndef _WIN32
++    sock->cmd = g_strdup(cmd);
++#endif
+ 
+     addr = g_new0(SocketAddressLegacy, 1);
++#ifndef _WIN32
++    if (path || cmd) {
++#else
+     if (path) {
++#endif
+         UnixSocketAddress *q_unix;
+         addr->type = SOCKET_ADDRESS_LEGACY_KIND_UNIX;
+         q_unix = addr->u.q_unix.data = g_new0(UnixSocketAddress, 1);
++#ifndef _WIN32
++        q_unix->path = cmd ? g_strdup_printf("cmd:%s", cmd) : g_strdup(path);
++#else
+         q_unix->path = g_strdup(path);
++#endif
+     } else {
+         addr->type = SOCKET_ADDRESS_LEGACY_KIND_INET;
+         addr->u.inet.data = g_new(InetSocketAddress, 1);
+diff --git a/chardev/char.c b/chardev/char.c
+index 2ae4f46..5d52cd5 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -793,6 +793,9 @@ QemuOptsList qemu_chardev_opts = {
+             .name = "path",
+             .type = QEMU_OPT_STRING,
+         },{
++            .name = "cmd",
++            .type = QEMU_OPT_STRING,
++        },{
+             .name = "host",
+             .type = QEMU_OPT_STRING,
+         },{
+diff --git a/qapi/char.json b/qapi/char.json
+index ae19dcd..6de0f29 100644
+--- a/qapi/char.json
++++ b/qapi/char.json
+@@ -241,6 +241,10 @@
+ #
+ # @addr: socket address to listen on (server=true)
+ #        or connect to (server=false)
++# @cmd: command to run via "sh -c" with stdin as one end of
++#       a AF_UNIX SOCK_DSTREAM socket pair. The other end
++#       is used by the chardev. Either an addr or a cmd can
++#       be specified, but not both.
+ # @tls-creds: the ID of the TLS credentials object (since 2.6)
+ # @server: create server socket (default: true)
+ # @wait: wait for incoming connection on server
+@@ -258,6 +262,7 @@
+ # Since: 1.4
+ ##
+ { 'struct': 'ChardevSocket', 'data': { 'addr'       : 'SocketAddressLegacy',
++                                     '*cmd'       : 'str',
+                                      '*tls-creds'  : 'str',
+                                      '*server'    : 'bool',
+                                      '*wait'      : 'bool',

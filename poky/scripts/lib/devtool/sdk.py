@@ -145,6 +145,9 @@ def sdk_update(args, config, basepath, workspace):
         # Fetch manifest from server
         tmpmanifest = os.path.join(tmpsdk_dir, 'conf', 'sdk-conf-manifest')
         ret = subprocess.call("wget -q -O %s %s/conf/sdk-conf-manifest" % (tmpmanifest, updateserver), shell=True)
+        if ret != 0:
+            logger.error("Cannot dowload files from %s" % updateserver)
+            return ret
         changedfiles = check_manifest(tmpmanifest, basepath)
         if not changedfiles:
             logger.info("Already up-to-date")

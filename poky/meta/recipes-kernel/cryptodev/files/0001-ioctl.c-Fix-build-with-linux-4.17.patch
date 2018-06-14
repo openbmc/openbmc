@@ -1,0 +1,43 @@
+From f60aa08c63fc02780554a0a12180a478ca27d49f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Date: Wed, 23 May 2018 18:43:39 +0300
+Subject: [PATCH] ioctl.c: Fix build with linux 4.17
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Since kernel 4.17-rc1, sys_* syscalls can no longer be called directly:
+819671ff849b ("syscalls: define and explain goal to not call syscalls in the kernel")
+
+Since cryptodev uses sys_close() - and this has been removed in commit:
+2ca2a09d6215 ("fs: add ksys_close() wrapper; remove in-kernel calls to sys_close()")
+cryptodev has to be updated to use the ksys_close() wrapper.
+
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+
+Upstream-Status: Backport
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ ioctl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ioctl.c b/ioctl.c
+index d831b0c..2571034 100644
+--- a/ioctl.c
++++ b/ioctl.c
+@@ -828,7 +828,11 @@ cryptodev_ioctl(struct file *filp, unsigned int cmd, unsigned long arg_)
+ 		fd = clonefd(filp);
+ 		ret = put_user(fd, p);
+ 		if (unlikely(ret)) {
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 17, 0))
+ 			sys_close(fd);
++#else
++			ksys_close(fd);
++#endif
+ 			return ret;
+ 		}
+ 		return ret;
+-- 
+2.7.4
+

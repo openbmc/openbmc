@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "0064891270c180c190f41925b0f6fb9cecac3056f1168d2592dbe90e5f
 
 UPSTREAM_CHECK_URI = "https://github.com/intel/${BPN}/releases"
 
-RDEPENDS_${PN} = "python3-core python3-compression python3-mmap python3-setuptools"
+RDEPENDS_${PN} = "python3-core python3-compression python3-mmap python3-setuptools python3-fcntl"
 
 inherit python3native
 inherit setuptools3

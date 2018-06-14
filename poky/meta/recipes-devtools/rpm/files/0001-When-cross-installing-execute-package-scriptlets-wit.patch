@@ -1,4 +1,4 @@
-From a6f269f879221f2777169c5f7291322afe6b661b Mon Sep 17 00:00:00 2001
+From a89daa75ac970d8e247edc762d1181e9a5b0c5d0 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 17 Jan 2017 14:07:17 +0200
 Subject: [PATCH] When cross-installing, execute package scriptlets without
@@ -7,17 +7,42 @@ Subject: [PATCH] When cross-installing, execute package scriptlets without
 This is triggered only when RPM_NO_CHROOT_FOR_SCRIPTS environment variable is defined.
 Otherwise they will trigger an explosion of failures, obviously.
 
+Amended 2018-07-03 by Olof Johansson <olofjn@axis.com>:
+
+  Remove leaking temporary scriptlet files
+
+  Since we tell dnf to run rpm with debug output, this will result in rpm not
+  cleaning up written temporary scriptlet files (same flag controls both
+  behaviors). This wouldn't have been a problem since we normally would use the
+  target sysroot also for temporary files, but we need to chroot out to be able
+  to actually run the rpm scriptlets (purpose of this patch), so the temporary
+  files are written to the host's /var/tmp/ directory, causing a gradual
+  resource leakage on the host system for every RPM based do_rootfs task
+  executed.
+
+  Signed-off-by: Olof Johansson <olofjn@axis.com>
+
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
- lib/rpmscript.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ lib/rpmscript.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/lib/rpmscript.c b/lib/rpmscript.c
-index 98d3f420d..b95b5d606 100644
+index cc98c4885..f8bd3df04 100644
 --- a/lib/rpmscript.c
 +++ b/lib/rpmscript.c
-@@ -467,7 +467,13 @@ rpmRC rpmScriptRun(rpmScript script, int arg1, int arg2, FD_t scriptFd,
+@@ -394,8 +394,7 @@ exit:
+ 	Fclose(out);	/* XXX dup'd STDOUT_FILENO */
+ 
+     if (fn) {
+-	if (!rpmIsDebug())
+-	    unlink(fn);
++	unlink(fn);
+ 	free(fn);
+     }
+     free(mline);
+@@ -428,7 +427,13 @@ rpmRC rpmScriptRun(rpmScript script, int arg1, int arg2, FD_t scriptFd,
  
      if (rc != RPMRC_FAIL) {
  	if (script_type & RPMSCRIPTLET_EXEC) {

@@ -3636,10 +3636,17 @@
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     The short name of the distribution.
-                    This variable corresponds to a distribution
-                    configuration file whose root name is the same as the
-                    variable's argument and whose filename extension is
-                    <filename>.conf</filename>.
+                    For information on the long name of the distribution, see
+                    the
+                    <link linkend='var-DISTRO_NAME'><filename>DISTRO_NAME</filename></link>
+                    variable.
+                </para>
+
+                <para>
+                    The <filename>DISTRO</filename> variable corresponds to a
+                    distribution configuration file whose root name is the
+                    same as the variable's argument and whose filename
+                    extension is <filename>.conf</filename>.
                     For example, the distribution configuration file for the
                     Poky distribution is named <filename>poky.conf</filename>
                     and resides in the
@@ -3664,9 +3671,9 @@
                     The value for <filename>DISTRO</filename> must not contain
                     spaces, and is typically all lower-case.
                     <note>
-                        If the <filename>DISTRO</filename> variable is blank, a set
-                        of default configurations are used, which are specified
-                        within
+                        If the <filename>DISTRO</filename> variable is blank,
+                        a set of default configurations are used, which are
+                        specified within
                         <filename>meta/conf/distro/defaultsetup.conf</filename>
                         also in the Source Directory.
                     </note>
@@ -3931,6 +3938,46 @@
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
                     The long name of the distribution.
+                    For information on the short name of the distribution, see
+                    the
+                    <link linkend='var-DISTRO'><filename>DISTRO</filename></link>
+                    variable.
+                </para>
+
+                <para>
+                    The <filename>DISTRO_NAME</filename> variable corresponds
+                    to a distribution configuration file whose root name is the
+                    same as the variable's argument and whose filename
+                    extension is <filename>.conf</filename>.
+                    For example, the distribution configuration file for the
+                    Poky distribution is named <filename>poky.conf</filename>
+                    and resides in the
+                    <filename>meta-poky/conf/distro</filename> directory of
+                    the
+                    <link linkend='source-directory'>Source Directory</link>.
+                </para>
+
+                <para>
+                    Within that <filename>poky.conf</filename> file, the
+                    <filename>DISTRO_NAME</filename> variable is set as
+                    follows:
+                    <literallayout class='monospaced'>
+     DISTRO_NAME = "Poky (Yocto Project Reference Distro)"
+                    </literallayout>
+                </para>
+
+                <para>
+                    Distribution configuration files are located in a
+                    <filename>conf/distro</filename> directory within the
+                    <link linkend='metadata'>Metadata</link>
+                    that contains the distribution configuration.
+                    <note>
+                        If the <filename>DISTRO_NAME</filename> variable is
+                        blank, a set of default configurations are used, which
+                        are specified within
+                        <filename>meta/conf/distro/defaultsetup.conf</filename>
+                        also in the Source Directory.
+                    </note>
                 </para>
             </glossdef>
         </glossentry>
@@ -9917,7 +9964,7 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     execute at rootfs creation time rather than on the
                     target but depends on a native tool in order to execute,
                     you need to list the tools in
-                    <filename>PACKAGE_WRITE_DEPENDS</filename>.
+                    <filename>PACKAGE_WRITE_DEPS</filename>.
                 </para>
 
                 <para>
@@ -12175,13 +12222,26 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     A list of classes to remove from the
                     <link linkend='var-INHERIT'><filename>INHERIT</filename></link>
                     value globally within the extensible SDK configuration.
-                    The default value is "buildhistory icecc".
+                    The
+                    <link linkend='ref-classes-populate-sdk-*'><filename>populate-sdk-ext</filename></link>
+                    class sets the default value:
+                    <literallayout class='monospaced'>
+     SDK_INHERIT_BLACKLIST ?= "buildhistory icecc"
+                    </literallayout>
                 </para>
 
                 <para>
                     Some classes are not generally applicable within
-                    the extensible SDK context and you can use this variable
-                    to disable them.
+                    the extensible SDK context.
+                    You can use this variable to disable those classes.
+                </para>
+
+                <para>
+                    For additional information on how to customize the
+                    extensible SDK's configuration, see the
+                    "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-configuring-the-extensible-sdk'>Configuring the Extensible SDK</ulink>"
+                    section in the Yocto Project Application Development and
+                    the Extensible Software Development Kit (eSDK) manual.
                 </para>
             </glossdef>
         </glossentry>
@@ -12193,12 +12253,40 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    A list of variables not allowed through from the build
-                    system configuration into the extensible SDK configuration.
+                    A list of variables not allowed through from the
+                    OpenEmbedded build system configuration into the extensible
+                    SDK configuration.
                     Usually, these are variables that are specific to the
                     machine on which the build system is running and thus
                     would be potentially problematic within the extensible SDK.
+                    </para>
+
+                    <para>By default,
+                    <filename>SDK_LOCAL_CONF_BLACKLIST</filename> is set in the
+                    <link linkend='ref-classes-populate-sdk-*'><filename>populate-sdk-ext</filename></link>
+                    class and excludes the following variables:
+                    <literallayout class='monospaced'>
+     <link linkend='var-CONF_VERSION'>CONF_VERSION</link>
+     <link linkend='var-BB_NUMBER_THREADS'>BB_NUMBER_THREADS</link>
+     <ulink url='&YOCTO_DOCS_BB_URL;#var-BB_NUMBER_PARSE_THREADS'>BB_NUMBER_PARSE_THREADS</ulink>
+     <link linkend='var-PARALLEL_MAKE'>PARALLEL_MAKE</link>
+     <link linkend='var-PRSERV_HOST'>PRSERV_HOST</link>
+     <link linkend='var-SSTATE_MIRRORS'>SSTATE_MIRRORS</link>
+     <link linkend='var-DL_DIR'>DL_DIR</link>
+     <link linkend='var-SSTATE_DIR'>SSTATE_DIR</link>
+     <link linkend='var-TMPDIR'>TMPDIR</link>
+     <link linkend='var-BB_SERVER_TIMEOUT'>BB_SERVER_TIMEOUT</link>
+                    </literallayout>
                 </para>
+
+                <para>
+                    For additional information on how to customize the
+                    extensible SDK's configuration, see the
+                    "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-configuring-the-extensible-sdk'>Configuring the Extensible SDK</ulink>"
+                    section in the Yocto Project Application Development and
+                    the Extensible Software Development Kit (eSDK) manual.
+                </para>
+
             </glossdef>
         </glossentry>
 
@@ -12209,8 +12297,16 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
             <glossdef>
                 <para role="glossdeffirst">
 <!--                <para role="glossdeffirst"><imagedata fileref="figures/define-generic.png" /> -->
-                    A list of variables allowed through from the build system
-                    configuration into the extensible SDK configuration.
+                    A list of variables allowed through from the OpenEmbedded
+                    build system configuration into the extensible SDK
+                    configuration.
+                    By default, the list of variables is empty and is set in
+                    the
+                    <link linkend='ref-classes-populate-sdk-*'><filename>populate-sdk-ext</filename></link>
+                    class.
+                </para>
+
+                <para>
                     This list overrides the variables specified using the
                     <link linkend='var-SDK_LOCAL_CONF_BLACKLIST'><filename>SDK_LOCAL_CONF_BLACKLIST</filename></link>
                     variable as well as any variables identified by automatic
@@ -12218,6 +12314,14 @@ recipes-graphics/xorg-font/font-alias_1.0.3.bb:PR = "${INC_PR}.3"
                     start of the value, which is usually indicative of being a
                     path and thus might not be valid on the system where the
                     SDK is installed.
+                </para>
+
+                <para>
+                    For additional information on how to customize the
+                    extensible SDK's configuration, see the
+                    "<ulink url='&YOCTO_DOCS_SDK_URL;#sdk-configuring-the-extensible-sdk'>Configuring the Extensible SDK</ulink>"
+                    section in the Yocto Project Application Development and
+                    the Extensible Software Development Kit (eSDK) manual.
                 </para>
             </glossdef>
         </glossentry>

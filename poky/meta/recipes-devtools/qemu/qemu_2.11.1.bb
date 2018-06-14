@@ -9,27 +9,27 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
 
 SRC_URI = "http://wiki.qemu-project.org/download/${BP}.tar.bz2 \
            file://powerpc_rom.bin \
-           file://disable-grabs.patch \
-           file://wacom.patch \
-           file://add-ptest-in-makefile-v10.patch \
+           file://0001-sdl.c-allow-user-to-disable-pointer-grabs.patch \
+           file://0002-qemu-Add-missing-wacom-HID-descriptor.patch \
+           file://0003-Add-subpackage-ptest-which-runs-all-unit-test-cases-.patch \
            file://run-ptest \
-           file://qemu-enlarge-env-entry-size.patch \
-           file://no-valgrind.patch \
-           file://pathlimit.patch \
-           file://qemu-2.5.0-cflags.patch \
-           file://chardev-connect-socket-to-a-spawned-command.patch \
-           file://apic-fixup-fallthrough-to-PIC.patch \
-           file://linux-user-Fix-webkitgtk-hangs-on-32-bit-x86-target.patch \
-           file://memfd.patch \
-           file://0001-arm-translate-a64-treat-DISAS_UPDATE-as-variant-of-D.patch \
-           file://check-PS2Queue-pointers-in-post_load-routine.patch \
+           file://0004-qemu-Add-addition-environment-space-to-boot-loader-q.patch \
+           file://0005-qemu-disable-Valgrind.patch \
+           file://0006-qemu-Limit-paths-searched-during-user-mode-emulation.patch \
+           file://0007-qemu-native-set-ld.bfd-fix-cflags-and-set-some-envir.patch \
+           file://0008-chardev-connect-socket-to-a-spawned-command.patch \
+           file://0009-apic-fixup-fallthrough-to-PIC.patch \
+           file://0010-linux-user-Fix-webkitgtk-hangs-on-32-bit-x86-target.patch \
+           file://0011-memfd-fix-configure-test.patch \
+           file://0012-arm-translate-a64-treat-DISAS_UPDATE-as-variant-of-D.patch \
+           file://0013-ps2-check-PS2Queue-pointers-in-post_load-routine.patch \
+           file://0001-CVE-2018-11806-QEMU-slirp-heap-buffer-overflow.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+\..*)\.tar"
 
-
 SRC_URI_append_class-native = " \
-            file://fix-libcap-header-issue-on-some-distro.patch \
-            file://cpus.c-qemu_cpu_kick_thread_debugging.patch \
+            file://0014-fix-libcap-header-issue-on-some-distro.patch \
+            file://0015-cpus.c-Add-error-messages-when-qemi_cpu_kick_thread-.patch \
             "
 
 SRC_URI[md5sum] = "61cf862b6007eba4ac98247776af2e27"

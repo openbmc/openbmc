@@ -121,6 +121,11 @@
                 <date>May 2018</date>
                 <revremark>Released with the Yocto Project 2.5 Release.</revremark>
             </revision>
+            <revision>
+                <revnumber>2.5.1</revnumber>
+                <date>September 2018</date>
+                <revremark>The initial document released with the Yocto Project 2.5.1 Release.</revremark>
+            </revision>
         </revhistory>
 
     <copyright>

@@ -45,6 +45,8 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0028-bits-siginfo-consts.h-enum-definition-for-TRAP_HWBKP.patch \
            file://0029-Replace-strncpy-with-memccpy-to-fix-Wstringop-trunca.patch \
            file://0030-plural_c_no_preprocessor_lines.patch \
+           file://CVE-2017-18269.patch \
+           file://CVE-2018-11236.patch \
 "
 
 NATIVESDKFIXES ?= ""

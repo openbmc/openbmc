@@ -37,3 +37,5 @@ ac_cv_linux_vers=${ac_cv_linux_vers=2}
 # apr
 apr_cv_tcp_nodelay_with_cork=${apr_cv_tcp_nodelay_with_cork=yes}
 
+# cvs
+cvs_cv_func_printf_ptr=${cvs_cv_func_printf_ptr=yes}

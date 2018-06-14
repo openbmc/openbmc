@@ -534,9 +534,9 @@ def package_qa_check_buildpaths(path, name, d, elf, messages):
     if path.find(name + "/CONTROL/") != -1 or path.find(name + "/DEBIAN/") != -1:
         return
 
-    tmpdir = d.getVar('TMPDIR')
+    tmpdir = bytes(d.getVar('TMPDIR'), encoding="utf-8")
     with open(path, 'rb') as f:
-        file_content = f.read().decode('utf-8', errors='ignore')
+        file_content = f.read()
         if tmpdir in file_content:
             package_qa_add_message(messages, "buildpaths", "File %s in package contained reference to tmpdir" % package_qa_clean_path(path,d))
 

@@ -14,6 +14,7 @@ LICENSE = "\
     & Firmware-cavium \
     & Firmware-chelsio_firmware \
     & Firmware-cw1200 \
+    & Firmware-cypress \
     & Firmware-dib0700 \
     & Firmware-e100 \
     & Firmware-ene_firmware \
@@ -66,7 +67,7 @@ LIC_FILES_CHKSUM = "\
     file://LICENCE.adsp_sst;md5=615c45b91a5a4a9fe046d6ab9a2df728 \
     file://LICENCE.agere;md5=af0133de6b4a9b2522defd5f188afd31 \
     file://LICENSE.amdgpu;md5=0aa3c2f3e736af320a08a3aeeccecf29 \
-    file://LICENSE.amd-ucode;md5=3a0de451253cc1edbf30a3c621effee3 \
+    file://LICENSE.amd-ucode;md5=3c5399dc9148d7f0e1f41e34b69cf14f \
     file://LICENCE.atheros_firmware;md5=30a14c7823beedac9fa39c64fdd01a13 \
     file://LICENSE.atmel;md5=aa74ac0c60595dee4d4e239107ea77a3 \
     file://LICENCE.broadcom_bcm43xx;md5=3160c14df7228891b868060e1951dfbc \
@@ -74,6 +75,7 @@ LIC_FILES_CHKSUM = "\
     file://LICENCE.cavium;md5=c37aaffb1ebe5939b2580d073a95daea \
     file://LICENCE.chelsio_firmware;md5=819aa8c3fa453f1b258ed8d168a9d903 \
     file://LICENCE.cw1200;md5=f0f770864e7a8444a5c5aa9d12a3a7ed \
+    file://LICENCE.cypress;md5=48cd9436c763bf873961f9ed7b5c147b \
     file://LICENSE.dib0700;md5=f7411825c8a555a1a3e5eab9ca773431 \
     file://LICENCE.e100;md5=ec0f84136766df159a3ae6d02acdf5a8 \
     file://LICENCE.ene_firmware;md5=ed67f0f62f8f798130c296720b7d3921 \
@@ -118,7 +120,7 @@ LIC_FILES_CHKSUM = "\
     file://LICENCE.xc4000;md5=0ff51d2dc49fce04814c9155081092f0 \
     file://LICENCE.xc5000;md5=1e170c13175323c32c7f4d0998d53f66 \
     file://LICENCE.xc5000c;md5=12b02efa3049db65d524aeb418dd87ca \
-    file://WHENCE;md5=6f46986f4e913ef16b765c2319cc5141 \
+    file://WHENCE;md5=eaaf310bac02fee05ea1b334f58c5caf \
 "
 
 # These are not common licenses, set NO_GENERIC_LICENSE for them
@@ -135,6 +137,7 @@ NO_GENERIC_LICENSE[Firmware-ca0132] = "LICENCE.ca0132"
 NO_GENERIC_LICENSE[Firmware-cavium] = "LICENCE.cavium"
 NO_GENERIC_LICENSE[Firmware-chelsio_firmware] = "LICENCE.chelsio_firmware"
 NO_GENERIC_LICENSE[Firmware-cw1200] = "LICENCE.cw1200"
+NO_GENERIC_LICENSE[Firmware-cypress] = "LICENCE.cypress"
 NO_GENERIC_LICENSE[Firmware-dib0700] = "LICENSE.dib0700"
 NO_GENERIC_LICENSE[Firmware-e100] = "LICENCE.e100"
 NO_GENERIC_LICENSE[Firmware-ene_firmware] = "LICENCE.ene_firmware"
@@ -181,7 +184,7 @@ NO_GENERIC_LICENSE[Firmware-xc5000] = "LICENCE.xc5000"
 NO_GENERIC_LICENSE[Firmware-xc5000c] = "LICENCE.xc5000c"
 NO_GENERIC_LICENSE[WHENCE] = "WHENCE"
 
-SRCREV = "8fc2d4e55685bf73b6f7752383da9067404a74bb"
+SRCREV = "d1147327232ec4616a66ab898df84f9700c816c1"
 PE = "1"
 PV = "0.0+git${SRCPV}"
 
@@ -232,9 +235,41 @@ PACKAGES =+ "${PN}-ralink-license ${PN}-ralink \
              ${PN}-ti-connectivity-license ${PN}-wl12xx ${PN}-wl18xx \
              ${PN}-vt6656-license ${PN}-vt6656 \
              ${PN}-rtl-license ${PN}-rtl8188 ${PN}-rtl8192cu ${PN}-rtl8192ce ${PN}-rtl8192su ${PN}-rtl8723 ${PN}-rtl8821 \
+             ${PN}-rtl8168 \
+             ${PN}-cypress-license \
              ${PN}-broadcom-license \
-             ${PN}-bcm4329 ${PN}-bcm4330 ${PN}-bcm4334 ${PN}-bcm43340 \
-             ${PN}-bcm43362 ${PN}-bcm4339 ${PN}-bcm43430 ${PN}-bcm4354 \
+             ${PN}-bcm-0bb4-0306 \
+             ${PN}-bcm43143 \
+             ${PN}-bcm43236b \
+             ${PN}-bcm43241b0 \
+             ${PN}-bcm43241b4 \
+             ${PN}-bcm43241b5 \
+             ${PN}-bcm43242a \
+             ${PN}-bcm4329 \
+             ${PN}-bcm4329-fullmac \
+             ${PN}-bcm4330 \
+             ${PN}-bcm4334 \
+             ${PN}-bcm43340 \
+             ${PN}-bcm4335 \
+             ${PN}-bcm43362 \
+             ${PN}-bcm4339 \
+             ${PN}-bcm43430 \
+             ${PN}-bcm43430a0 \
+             ${PN}-bcm43455 \
+             ${PN}-bcm4350 \
+             ${PN}-bcm4350c2 \
+             ${PN}-bcm4354 \
+             ${PN}-bcm4356 \
+             ${PN}-bcm4356-pcie \
+             ${PN}-bcm43569 \
+             ${PN}-bcm43570 \
+             ${PN}-bcm4358 \
+             ${PN}-bcm43602 \
+             ${PN}-bcm4366b \
+             ${PN}-bcm4371 \
+             ${PN}-bcm4373 \
+             ${PN}-bcm43xx \
+             ${PN}-bcm43xx-hdr \
              ${PN}-atheros-license ${PN}-ar9170 ${PN}-ath6k ${PN}-ath9k \
              ${PN}-gplv2-license ${PN}-carl9170 \
              ${PN}-ar3k-license ${PN}-ar3k ${PN}-ath10k-license ${PN}-ath10k ${PN}-qca \
@@ -440,6 +475,7 @@ LICENSE_${PN}-rtl8192su = "Firmware-rtlwifi_firmware"
 LICENSE_${PN}-rtl8723 = "Firmware-rtlwifi_firmware"
 LICENSE_${PN}-rtl8821 = "Firmware-rtlwifi_firmware"
 LICENSE_${PN}-rtl-license = "Firmware-rtlwifi_firmware"
+LICENSE_${PN}-rtl8168 = "WHENCE"
 
 FILES_${PN}-rtl-license = " \
   ${nonarch_base_libdir}/firmware/LICENCE.rtlwifi_firmware.txt \
@@ -462,6 +498,9 @@ FILES_${PN}-rtl8723 = " \
 FILES_${PN}-rtl8821 = " \
   ${nonarch_base_libdir}/firmware/rtlwifi/rtl8821*.bin \
 "
+FILES_${PN}-rtl8168 = " \
+  ${nonarch_base_libdir}/firmware/rtl_nic/rtl8168*.fw \
+"
 
 RDEPENDS_${PN}-rtl8188 += "${PN}-rtl-license"
 RDEPENDS_${PN}-rtl8192ce += "${PN}-rtl-license"
@@ -469,6 +508,7 @@ RDEPENDS_${PN}-rtl8192cu += "${PN}-rtl-license"
 RDEPENDS_${PN}-rtl8192su = "${PN}-rtl-license"
 RDEPENDS_${PN}-rtl8723 += "${PN}-rtl-license"
 RDEPENDS_${PN}-rtl8821 += "${PN}-rtl-license"
+RDEPENDS_${PN}-rtl8168 += "${PN}-whence-license"
 
 # For ti-connectivity
 LICENSE_${PN}-wl12xx = "Firmware-ti-connectivity"
@@ -503,52 +543,126 @@ RDEPENDS_${PN}-vt6656 = "${PN}-vt6656-license"
 
 # For broadcom
 
-LICENSE_${PN}-bcm4329 = "Firmware-broadcom_bcm43xx"
-LICENSE_${PN}-bcm4330 = "Firmware-broadcom_bcm43xx"
-LICENSE_${PN}-bcm4334 = "Firmware-broadcom_bcm43xx"
-LICENSE_${PN}-bcm43340 = "Firmware-broadcom_bcm43xx"
-LICENSE_${PN}-bcm43362 = "Firmware-broadcom_bcm43xx"
-LICENSE_${PN}-bcm4339 = "Firmware-broadcom_bcm43xx"
-LICENSE_${PN}-bcm43430 = "Firmware-broadcom_bcm43xx"
-LICENSE_${PN}-bcm4354 = "Firmware-broadcom_bcm43xx"
+# for i in `grep brcm WHENCE  | grep ^File | sed 's/File: brcm.//g'`; do pkg=`echo $i | sed 's/-[sp40].*//g; s/\.bin//g; s/brcmfmac/bcm/g; s/_hdr/-hdr/g; s/BCM/bcm-0bb4-0306/g'`; echo -e "             \${PN}-$pkg \\"; done  | sort -u
+
 LICENSE_${PN}-broadcom-license = "Firmware-broadcom_bcm43xx"
+FILES_${PN}-broadcom-license = "${nonarch_base_libdir}/firmware/LICENCE.broadcom_bcm43xx"
 
-FILES_${PN}-broadcom-license = " \
-  ${nonarch_base_libdir}/firmware/LICENCE.broadcom_bcm43xx \
-"
-FILES_${PN}-bcm4329 = " \
-  ${nonarch_base_libdir}/firmware/brcm/brcmfmac4329-sdio.bin \
-"
-FILES_${PN}-bcm4330 = " \
-  ${nonarch_base_libdir}/firmware/brcm/brcmfmac4330-sdio.bin \
-"
-FILES_${PN}-bcm4334 = " \
-  ${nonarch_base_libdir}/firmware/brcm/brcmfmac4334-sdio.bin \
-"
-FILES_${PN}-bcm43340 = " \
-  ${nonarch_base_libdir}/firmware/brcm/brcmfmac43340-sdio.bin \
-"
-FILES_${PN}-bcm43362 = " \
-  ${nonarch_base_libdir}/firmware/brcm/brcmfmac43362-sdio.bin \
-"
-FILES_${PN}-bcm4339 = " \
-  ${nonarch_base_libdir}/firmware/brcm/brcmfmac4339-sdio.bin \
-"
-FILES_${PN}-bcm43430 = " \
-  ${nonarch_base_libdir}/firmware/brcm/brcmfmac43430-sdio.bin \
-"
-FILES_${PN}-bcm4354 = " \
-  ${nonarch_base_libdir}/firmware/brcm/brcmfmac4354-sdio.bin \
-"
+# for i in `grep brcm WHENCE  | grep ^File | sed 's/File: brcm.//g'`; do pkg=`echo $i | sed 's/-[sp40].*//g; s/\.bin//g; s/brcmfmac/bcm/g; s/_hdr/-hdr/g; s/BCM/bcm-0bb4-0306/g'`; echo "$i - $pkg"; echo -e "FILES_\${PN}-$pkg = \"\${nonarch_base_libdir}/firmware/brcm/$i\""; done | grep ^FILES
 
+FILES_${PN}-bcm43xx = "${nonarch_base_libdir}/firmware/brcm/bcm43xx-0.fw"
+FILES_${PN}-bcm43xx-hdr = "${nonarch_base_libdir}/firmware/brcm/bcm43xx_hdr-0.fw"
+FILES_${PN}-bcm4329-fullmac = "${nonarch_base_libdir}/firmware/brcm/bcm4329-fullmac-4.bin"
+FILES_${PN}-bcm43236b = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43236b.bin"
+FILES_${PN}-bcm4329 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4329-sdio.bin"
+FILES_${PN}-bcm4330 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4330-sdio.bin"
+FILES_${PN}-bcm4334 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4334-sdio.bin"
+FILES_${PN}-bcm4335 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4335-sdio.bin"
+FILES_${PN}-bcm4339 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4339-sdio.bin"
+FILES_${PN}-bcm43241b0 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43241b0-sdio.bin"
+FILES_${PN}-bcm43241b4 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43241b4-sdio.bin"
+FILES_${PN}-bcm43241b5 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43241b5-sdio.bin"
+FILES_${PN}-bcm43242a = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43242a.bin"
+FILES_${PN}-bcm43143 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43143.bin \
+  ${nonarch_base_libdir}/firmware/brcm/brcmfmac43143-sdio.bin \
+"
+FILES_${PN}-bcm43430a0 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43430a0-sdio.bin"
+FILES_${PN}-bcm43455 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.bin"
+FILES_${PN}-bcm4350c2 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4350c2-pcie.bin"
+FILES_${PN}-bcm4350 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4350-pcie.bin"
+FILES_${PN}-bcm4356 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4356-sdio.bin"
+FILES_${PN}-bcm43569 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43569.bin"
+FILES_${PN}-bcm43570 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43570-pcie.bin"
+FILES_${PN}-bcm4358 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4358-pcie.bin"
+FILES_${PN}-bcm43602 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43602-pcie.bin \
+  ${nonarch_base_libdir}/firmware/brcm/brcmfmac43602-pcie.ap.bin \
+"
+FILES_${PN}-bcm4366b = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4366b-pcie.bin"
+FILES_${PN}-bcm4371 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4371-pcie.bin"
+
+# for i in `grep brcm WHENCE  | grep ^File | sed 's/File: brcm.//g'`; do pkg=`echo $i | sed 's/-[sp40].*//g; s/\.bin//g; s/brcmfmac/bcm/g; s/_hdr/-hdr/g; s/BCM/bcm-0bb4-0306/g'`; echo -e "LICENSE_\${PN}-$pkg = \"Firmware-broadcom_bcm43xx\"\nRDEPENDS_\${PN}-$pkg += \"\${PN}-broadcom-license\""; done
+# Currently 1st one and last 6 have cypress LICENSE
+
+LICENSE_${PN}-bcm43xx = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43xx += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43xx-hdr = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43xx-hdr += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4329-fullmac = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm4329-fullmac += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43236b = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43236b += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4329 = "Firmware-broadcom_bcm43xx"
 RDEPENDS_${PN}-bcm4329 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4330 = "Firmware-broadcom_bcm43xx"
 RDEPENDS_${PN}-bcm4330 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4334 = "Firmware-broadcom_bcm43xx"
 RDEPENDS_${PN}-bcm4334 += "${PN}-broadcom-license"
-RDEPENDS_${PN}-bcm43340 += "${PN}-broadcom-license"
-RDEPENDS_${PN}-bcm43362 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4335 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm4335 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4339 = "Firmware-broadcom_bcm43xx"
 RDEPENDS_${PN}-bcm4339 += "${PN}-broadcom-license"
-RDEPENDS_${PN}-bcm43430 += "${PN}-broadcom-license"
-RDEPENDS_${PN}-bcm4354 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43241b0 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43241b0 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43241b4 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43241b4 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43241b5 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43241b5 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43242a = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43242a += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43143 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43143 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43430a0 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43430a0 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43455 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43455 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4350c2 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm4350c2 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4350 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm4350 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4356 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm4356 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43569 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43569 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43570 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43570 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4358 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm4358 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm43602 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43602 += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4366b = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm4366b += "${PN}-broadcom-license"
+LICENSE_${PN}-bcm4371 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm4371 += "${PN}-broadcom-license"
+
+# For broadcom cypress
+
+LICENSE_${PN}-cypress-license = "Firmware-cypress"
+FILES_${PN}-cypress-license = "${nonarch_base_libdir}/firmware/LICENCE.cypress"
+
+FILES_${PN}-bcm-0bb4-0306 = "${nonarch_base_libdir}/firmware/brcm/BCM-0bb4-0306.hcd"
+FILES_${PN}-bcm43340 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43340-sdio.bin"
+FILES_${PN}-bcm43362 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43362-sdio.bin"
+FILES_${PN}-bcm43430 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43430-sdio.bin"
+FILES_${PN}-bcm4354 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4354-sdio.bin"
+FILES_${PN}-bcm4356-pcie = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4356-pcie.bin"
+FILES_${PN}-bcm4373 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4373-sdio.bin \
+  ${nonarch_base_libdir}/firmware/brcm/brcmfmac4373.bin \
+"
+
+LICENSE_${PN}-bcm-0bb4-0306 = "Firmware-cypress"
+RDEPENDS_${PN}-bcm-0bb4-0306 += "${PN}-cypress-license"
+LICENSE_${PN}-bcm43340 = "Firmware-cypress"
+RDEPENDS_${PN}-bcm43340 += "${PN}-cypress-license"
+LICENSE_${PN}-bcm43362 = "Firmware-cypress"
+RDEPENDS_${PN}-bcm43362 += "${PN}-cypress-license"
+LICENSE_${PN}-bcm43430 = "Firmware-cypress"
+RDEPENDS_${PN}-bcm43430 += "${PN}-cypress-license"
+LICENSE_${PN}-bcm4354 = "Firmware-cypress"
+RDEPENDS_${PN}-bcm4354 += "${PN}-cypress-license"
+LICENSE_${PN}-bcm4356-pcie = "Firmware-cypress"
+RDEPENDS_${PN}-bcm4356-pcie += "${PN}-cypress-license"
+LICENSE_${PN}-bcm4373 = "Firmware-cypress"
+RDEPENDS_${PN}-bcm4373 += "${PN}-cypress-license"
 
 # For Broadcom bnx2-mips
 #
