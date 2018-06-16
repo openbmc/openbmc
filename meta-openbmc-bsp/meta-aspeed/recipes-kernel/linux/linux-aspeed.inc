@@ -15,15 +15,8 @@ LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-do_patch_append() {
-        for DTB in "${KERNEL_DEVICETREE}"; do
-               DT=`basename ${DTB} .dtb`
-                if [ -r "${WORKDIR}/${DT}.dts" ]; then
-                        cp ${WORKDIR}/${DT}.dts \
-                                ${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts
-               fi
-       done
-}
-
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
+
+# From 4.16+ the COPYING file changed
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
