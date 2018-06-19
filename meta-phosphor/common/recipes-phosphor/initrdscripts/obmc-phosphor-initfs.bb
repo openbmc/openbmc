@@ -7,6 +7,8 @@ PR = "r1"
 
 inherit allarch
 
+RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_base-utils}"
+
 S = "${WORKDIR}"
 SRC_URI += "file://obmc-init.sh"
 SRC_URI += "file://obmc-shutdown.sh"
