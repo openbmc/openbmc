@@ -16,7 +16,7 @@ SRCREV = "7885954af734ae61a2e1358740f84ad39248f18d"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "dbus openssl zlib boost libpam boost-dbus gtest nlohmann-json libtinyxml2 "
+DEPENDS = "openssl zlib boost libpam sdbusplus gtest nlohmann-json libtinyxml2 "
 
 FILES_${PN} += "${datadir}/** "
 
