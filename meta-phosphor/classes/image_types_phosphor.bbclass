@@ -222,15 +222,20 @@ do_generate_static[depends] += " \
         u-boot:do_populate_sysroot \
         "
 
+make_signatures() {
+	signature_files=""
+	for file in "$@"; do
+		openssl dgst -sha256 -sign ${SIGNING_KEY} -out "${file}.sig" $file
+		signature_files="${signature_files} ${file}.sig"
+	done
+}
+
 do_generate_static_alltar() {
 	ln -sf ${S}/MANIFEST MANIFEST
 	ln -sf ${S}/publickey publickey
 	ln -sf ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.static.mtd image-bmc
 
-	for file in image-bmc MANIFEST publickey; do
-		openssl dgst -sha256 -sign ${SIGNING_KEY} -out "${file}.sig" $file
-		signature_files="${signature_files} ${file}.sig"
-	done
+	make_signatures image-bmc MANIFEST publickey
 
 	tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd.all.tar \
 	    image-bmc MANIFEST publickey ${signature_files}
@@ -284,10 +289,7 @@ do_generate_static_tar() {
 	ln -sf ${S}/MANIFEST MANIFEST
 	ln -sf ${S}/publickey publickey
 	make_image_links ${OVERLAY_BASETYPE} ${IMAGE_BASETYPE}
-	for file in image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey; do
-		openssl dgst -sha256 -sign ${SIGNING_KEY} -out "${file}.sig" $file
-		signature_files="${signature_files} ${file}.sig"
-	done
+	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
 	make_tar_of_images static MANIFEST publickey ${signature_files}
 
 	# Maintain non-standard legacy link.
@@ -309,10 +311,8 @@ do_generate_ubi_tar() {
 	ln -sf ${S}/MANIFEST MANIFEST
 	ln -sf ${S}/publickey publickey
 	make_image_links ${FLASH_UBI_OVERLAY_BASETYPE} ${FLASH_UBI_BASETYPE}
-	for file in image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey; do
-		openssl dgst -sha256 -sign ${SIGNING_KEY} -out "${file}.sig" $file
-	done
-	make_tar_of_images ubi MANIFEST publickey *.sig
+	make_signatures image-u-boot image-kernel image-rofs image-rwfs MANIFEST publickey
+	make_tar_of_images ubi MANIFEST publickey ${signature_files}
 }
 do_generate_ubi_tar[dirs] = " ${S}/ubi"
 do_generate_ubi_tar[depends] += " \
