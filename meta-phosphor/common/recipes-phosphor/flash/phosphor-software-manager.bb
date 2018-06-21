@@ -2,10 +2,9 @@ SUMMARY = "Phosphor Software Management"
 DESCRIPTION = "Phosphor Software Manager provides a set of system software \
 management daemons. It is suitable for use on a wide variety of OpenBMC \
 platforms."
-HOMEPAGE = "https://github.com/openbmc/phosphor-bmc-code-mgmt"
 PR = "r1"
-LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
+
+require ${PN}.inc
 
 SOFTWARE_MGR_PACKAGES = " \
     ${PN}-version \
@@ -85,8 +84,5 @@ do_install_append() {
         install -m 644 ${WORKDIR}/software.conf ${D}${exec_prefix}/lib/tmpfiles.d/
     fi
 }
-
-SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
-SRCREV = "56aaf454adef04bd4c1d45870cd86dc2de0a880a"
 
 S = "${WORKDIR}/git"
