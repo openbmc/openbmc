@@ -28,5 +28,5 @@ EXTRA_OEMAKE = '-e MAKEFLAGS= STRIP="echo"'
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_install() {
-	oe_runmake install DESTDIR=${D} PREFIX=${exec_prefix}
+	oe_runmake install DESTDIR=${D} PREFIX=${exec_prefix} LIBDIR=${libdir}
 }

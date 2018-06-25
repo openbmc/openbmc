@@ -32,6 +32,12 @@ logger = logging.getLogger('devtool')
 
 def _find_recipe_path(args, config, basepath, workspace):
     if args.any_recipe:
+        logger.warning('-a/--any-recipe option is now always active, and thus the option will be removed in a future release')
+    if args.recipename in workspace:
+        recipefile = workspace[args.recipename]['recipefile']
+    else:
+        recipefile = None
+    if not recipefile:
         tinfoil = setup_tinfoil(config_only=False, basepath=basepath)
         try:
             rd = parse_recipe(config, tinfoil, args.recipename, True)
@@ -40,12 +46,6 @@ def _find_recipe_path(args, config, basepath, workspace):
             recipefile = rd.getVar('FILE')
         finally:
             tinfoil.shutdown()
-    else:
-        check_workspace_recipe(workspace, args.recipename)
-        recipefile = workspace[args.recipename]['recipefile']
-        if not recipefile:
-            raise DevtoolError("Recipe file for %s is not under the workspace" %
-                               args.recipename)
     return recipefile
 
 
@@ -222,19 +222,21 @@ The ./configure %s output for %s follows.
 
 def register_commands(subparsers, context):
     """Register devtool subcommands from this plugin"""
-    parser_edit_recipe = subparsers.add_parser('edit-recipe', help='Edit a recipe file in your workspace',
-                                         description='Runs the default editor (as specified by the EDITOR variable) on the specified recipe. Note that the recipe file itself must be in the workspace (i.e. as a result of "devtool add" or "devtool upgrade"); you can override this with the -a/--any-recipe option.',
+    parser_edit_recipe = subparsers.add_parser('edit-recipe', help='Edit a recipe file',
+                                         description='Runs the default editor (as specified by the EDITOR variable) on the specified recipe. Note that this will be quicker for recipes in the workspace as the cache does not need to be loaded in that case.',
                                          group='working')
     parser_edit_recipe.add_argument('recipename', help='Recipe to edit')
-    parser_edit_recipe.add_argument('--any-recipe', '-a', action="store_true", help='Edit any recipe, not just where the recipe file itself is in the workspace')
+    # FIXME drop -a at some point in future
+    parser_edit_recipe.add_argument('--any-recipe', '-a', action="store_true", help='Does nothing (exists for backwards-compatibility)')
     parser_edit_recipe.set_defaults(func=edit_recipe)
 
     # Find-recipe
-    parser_find_recipe = subparsers.add_parser('find-recipe', help='Find a recipe file in your workspace',
-                                         description='By default, this will find a recipe file in your workspace; you can override this with the -a/--any-recipe option.',
+    parser_find_recipe = subparsers.add_parser('find-recipe', help='Find a recipe file',
+                                         description='Finds a recipe file. Note that this will be quicker for recipes in the workspace as the cache does not need to be loaded in that case.',
                                          group='working')
     parser_find_recipe.add_argument('recipename', help='Recipe to find')
-    parser_find_recipe.add_argument('--any-recipe', '-a', action="store_true", help='Find any recipe, not just where the recipe file itself is in the workspace')
+    # FIXME drop -a at some point in future
+    parser_find_recipe.add_argument('--any-recipe', '-a', action="store_true", help='Does nothing (exists for backwards-compatibility)')
     parser_find_recipe.set_defaults(func=find_recipe)
 
     # NOTE: Needed to override the usage string here since the default

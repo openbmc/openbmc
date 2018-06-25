@@ -1,23 +1,24 @@
-From cc2ce6d8b6a3e6e2c8874896c10897034a80cd4f Mon Sep 17 00:00:00 2001
+From c8c6649b29a08f82e1d6761a6d62ce5f632313c5 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 10 Dec 2015 13:20:30 +0200
-Subject: [PATCH] Don't search /usr and so on for libraries by default to avoid
- host contamination.
+Subject: [PATCH 1/3] Don't search /usr and so on for libraries by default to
+ avoid host contamination.
 
 Upstream-Status: Inappropriate (As the code stands, this is a hack)
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  numpy/distutils/system_info.py | 50 +++++-------------------------------------
  1 file changed, 6 insertions(+), 44 deletions(-)
 
-Index: numpy-1.13.1/numpy/distutils/system_info.py
-===================================================================
---- numpy-1.13.1.orig/numpy/distutils/system_info.py
-+++ numpy-1.13.1/numpy/distutils/system_info.py
-@@ -211,51 +211,13 @@ if sys.platform == 'win32':
-     default_x11_lib_dirs = []
-     default_x11_include_dirs = []
+diff --git a/numpy/distutils/system_info.py b/numpy/distutils/system_info.py
+index bea120c..544e056 100644
+--- a/numpy/distutils/system_info.py
++++ b/numpy/distutils/system_info.py
+@@ -262,51 +262,13 @@ if sys.platform == 'win32':
+             add_system_root(os.path.join(conda_dir, 'Library'))
+                         
  else:
 -    default_lib_dirs = libpaths(['/usr/local/lib', '/opt/lib', '/usr/lib',
 -                                 '/opt/local/lib', '/sw/lib'], platform_bits)
@@ -29,10 +30,7 @@ Index: numpy-1.13.1/numpy/distutils/system_info.py
 -                            '/opt/local/include', '/sw/include',
 -                            '/usr/include/suitesparse']
 -    default_src_dirs = ['.', '/usr/local/src', '/opt/src', '/sw/src']
-+    default_lib_dirs = libpaths(['/deadir/lib'], platform_bits)
-+    default_include_dirs = ['/deaddir/include']
-+    default_src_dirs = ['.', '/deaddir/src']
- 
+-
 -    default_x11_lib_dirs = libpaths(['/usr/X11R6/lib', '/usr/X11/lib',
 -                                     '/usr/lib'], platform_bits)
 -    default_x11_include_dirs = ['/usr/X11R6/include', '/usr/X11/include',
@@ -67,8 +65,15 @@ Index: numpy-1.13.1/numpy/distutils/system_info.py
 -    finally:
 -        if tmp is not None:
 -            tmp.close()
++    default_lib_dirs = libpaths(['/deadir/lib'], platform_bits)
++    default_include_dirs = ['/deaddir/include']
++    default_src_dirs = ['.', '/deaddir/src']
++
 +    default_x11_lib_dirs = libpaths(['/deaddir/lib'], platform_bits)
 +    default_x11_include_dirs = ['/deaddir/include']
  
  if os.path.join(sys.prefix, 'lib') not in default_lib_dirs:
      default_lib_dirs.insert(0, os.path.join(sys.prefix, 'lib'))
+-- 
+2.16.1
+

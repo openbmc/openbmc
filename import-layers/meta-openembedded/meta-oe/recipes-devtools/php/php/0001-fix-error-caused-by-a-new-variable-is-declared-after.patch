@@ -1,0 +1,45 @@
+From 0d88d735887c6f2fa00a743c27124c7a52006a41 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sun, 15 Apr 2018 19:17:27 -0700
+Subject: [PATCH] fix error caused by a new variable is declared after the
+ label
+
+There is a build failure on mips:
+...
+|sljitNativeMIPS_common.c: In function 'sljit_has_cpu_feature':
+|sljitNativeMIPS_common.c:506:3: error: a label can only be part
+of a statement and a declaration is not a statement
+|   sljit_sw fir;
+|   ^~~~~~~~
+...
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ ext/pcre/pcrelib/sljit/sljitNativeMIPS_common.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/ext/pcre/pcrelib/sljit/sljitNativeMIPS_common.c b/ext/pcre/pcrelib/sljit/sljitNativeMIPS_common.c
+index ee207fe..adfd342 100644
+--- a/ext/pcre/pcrelib/sljit/sljitNativeMIPS_common.c
++++ b/ext/pcre/pcrelib/sljit/sljitNativeMIPS_common.c
+@@ -498,12 +498,14 @@ SLJIT_API_FUNC_ATTRIBUTE void* sljit_generate_code(struct sljit_compiler *compil
+ 
+ SLJIT_API_FUNC_ATTRIBUTE sljit_s32 sljit_has_cpu_feature(sljit_s32 feature_type)
+ {
++#if defined(__GNUC__)
++	sljit_sw fir;
++#endif
+ 	switch (feature_type) {
+ 	case SLJIT_HAS_FPU:
+ #ifdef SLJIT_IS_FPU_AVAILABLE
+ 		return SLJIT_IS_FPU_AVAILABLE;
+ #elif defined(__GNUC__)
+-		sljit_sw fir;
+ 		asm ("cfc1 %0, $0" : "=r"(fir));
+ 		return (fir >> 22) & 0x1;
+ #else
+-- 
+2.10.2
+

@@ -7,12 +7,11 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=66493d54e65bfc12c7983ff2e884f37f"
 
 DEPENDS = "libjpeg-turbo mraa"
 
-SRCREV = "106b6c706268522ab0168a4ddb19e89ce832e084"
-PV = "1.3.0-git${SRCPV}"
+SRCREV = "cc7fec9ae0228add9011bf1c2cd5e0ca2ba0d4f0"
+PV = "1.6.0-git${SRCPV}"
 
 SRC_URI = " \
     git://github.com/intel-iot-devkit/${BPN}.git;protocol=http \
-    file://ads1x15-fixed-case-logic-in-getThresh-function.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -26,7 +25,13 @@ inherit distutils3-base cmake
 # override this in local.conf to get needed bindings.
 # BINDINGS_pn-upm="python"
 # will result in only the python bindings being built/packaged.
-BINDINGS ??= "python ${@ 'nodejs' if oe.types.boolean(d.getVar('HAVE_NODEJS') or '0') else '' }"
+# Note: 'nodejs' is disabled by default because the bindings
+# generation currently fails with nodejs (>v7.x).
+BINDINGS ??= "python"
+
+# nodejs isn't available for armv4/armv5 architectures
+BINDINGS_armv4 ??= "python"
+BINDINGS_armv5 ??= "python"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('PACKAGES', 'node-${PN}', 'nodejs', '', d)} \
  ${@bb.utils.contains('PACKAGES', '${PYTHON_PN}-${PN}', 'python', '', d)}"

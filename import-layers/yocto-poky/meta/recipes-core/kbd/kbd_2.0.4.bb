@@ -3,7 +3,6 @@ HOMEPAGE = "http://www.kbd-project.org/"
 # everything minus console-fonts is GPLv2+
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a5fcc36121d93e1f69d96a313078c8b5"
-DEPENDS = "libcheck"
 
 inherit autotools gettext ptest pkgconfig
 
@@ -19,8 +18,12 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/${BPN}/${BP}.tar.xz \
 SRC_URI[md5sum] = "c1635a5a83b63aca7f97a3eab39ebaa6"
 SRC_URI[sha256sum] = "5fd90af6beb225a9bb9b9fb414c090fba53c9a55793e172f508cd43652e59a88"
 
-PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
+PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} \
+                  ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests','', d)} \
+                  "
+
 PACKAGECONFIG[pam] = "--enable-vlock, --disable-vlock, libpam,"
+PACKAGECONFIG[tests] = "--enable-tests, --disable-tests, libcheck"
 
 do_compile_ptest() {
     oe_runmake -C ${B}/tests dumpkeys-fulltable alt-is-meta
@@ -29,6 +32,13 @@ do_compile_ptest() {
 do_install_ptest() {
     install -D ${B}/tests/Makefile ${D}${PTEST_PATH}/tests/Makefile
     sed -i -e '/Makefile:/,/^$/d' -e '/%: %.in/,/^$/d' \
+	-e 's:--sysroot=${STAGING_DIR_TARGET}::g' \
+	-e 's:${DEBUG_PREFIX_MAP}::g' \
+	-e 's:${HOSTTOOLS_DIR}/::g' \
+	-e 's:${RECIPE_SYSROOT_NATIVE}::g' \
+	-e 's:${RECIPE_SYSROOT}::g' \
+	-e 's:${S}/config/missing::g' \
+	-e 's:${WORKDIR}::g' \
 	-e '/libkeymap_.*_SOURCES =/d' -e '/$(EXEEXT):/,/^$/d' ${D}${PTEST_PATH}/tests/Makefile
 
     find ${B}/tests -executable -exec install {} ${D}${PTEST_PATH}/tests \;
@@ -48,7 +58,7 @@ RDEPENDS_${PN}-ptest = "make"
 
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "chvt deallocvt fgconsole openvt"
+ALTERNATIVE_${PN} = "chvt deallocvt fgconsole openvt showkey"
 ALTERNATIVE_PRIORITY = "100"
 
 BBCLASSEXTEND = "native"

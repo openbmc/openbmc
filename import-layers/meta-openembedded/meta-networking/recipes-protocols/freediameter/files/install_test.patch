@@ -1,0 +1,22 @@
+CMakeLists: add an option to install tests
+
+Upstream-Status: Inappropriate [OE ptest specific]
+
+Original author: Yao Zhao <yao.zhao@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index da8da1b..de04059 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -113,4 +113,9 @@ ENDFOREACH( TEST )
+ ####
+ ## INSTALL section ##
+ 
+-# we do not install the tests
++# install the tests
++SET(INSTALL_TEST_SUFFIX       /opt/${FD_PROJECT_NAME}-tests   CACHE PATH "Directory where the test binary is installed.")
++
++INSTALL(TARGETS ${TEST_LIST}
++        RUNTIME DESTINATION ${INSTALL_TEST_SUFFIX}
++        COMPONENT freeDiameter-common)

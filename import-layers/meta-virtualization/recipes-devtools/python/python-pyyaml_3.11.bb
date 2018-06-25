@@ -25,6 +25,8 @@ SRC_URI[sha256sum] = "c36c938a872e5ff494938b33b14aaa156cb439ec67548fcab3535bb78b
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 
+DEFAULT_PREFERENCE = "-1"
+
 inherit setuptools
 
 DEPENDS += "libyaml python-cython-native"

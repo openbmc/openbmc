@@ -60,3 +60,5 @@ FILES_${PN} += "${sbindir} \
 
 RDEPENDS_${PN} = "kernel-module-iscsi-trgt"
 RRECOMMENDS_${PN} = "kernel-module-crc32c kernel-module-libcrc32c"
+
+PNBLACKLIST[iscsitarget] = "error: implicit declaration of function 'init_timer'; did you mean 'init_timers'?; 4.15 kernel issues"

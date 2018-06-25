@@ -1,0 +1,36 @@
+Fix runtime Valgrind failure
+
+This patch is derived from
+https://bugzilla.redhat.com/show_bug.cgi?id=1464211
+
+At runtime it will fails like this:
+
+ARM64 front end: branch_etc
+disInstr(arm64): unhandled instruction 0xD5380001
+disInstr(arm64): 1101'0101 0011'1000 0000'0000 0000'0001 ==2082==
+valgrind: Unrecognised instruction at address 0x4014e64.
+
+This patch is a workaround by masking all HWCAP
+
+Upstream-Status: Pending
+
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+
+Index: valgrind-3.13.0/coregrind/m_initimg/initimg-linux.c
+===================================================================
+
+--- valgrind-3.13.0.orig/coregrind/m_initimg/initimg-linux.c   2018-03-04 22:22:17.698572675 -0800
++++ valgrind-3.13.0/coregrind/m_initimg/initimg-linux.c        2018-03-04 22:23:25.727815624 -0800
+@@ -703,6 +703,12 @@
+                   (and anything above) are not supported by Valgrind. */
+                auxv->u.a_val &= VKI_HWCAP_S390_TE - 1;
+             }
++#           elif defined(VGP_arm64_linux)
++            {
++               /* Linux 4.11 started populating this for arm64, but we
++                  currently don't support any. */
++               auxv->u.a_val = 0;
++            }
+ #           endif
+             break;
+ #        if defined(VGP_ppc64be_linux) || defined(VGP_ppc64le_linux)

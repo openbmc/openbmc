@@ -43,6 +43,10 @@ do_install_append_class-nativesdk() {
 	create_wrapper ${D}/${bindir}/flex M4=${M4}
 }
 
+PACKAGES =+ "${PN}-libfl"
+
+FILES_${PN}-libfl = "${libdir}/libfl.so.* ${libdir}/libfl_pic.so.*"
+
 RDEPENDS_${PN} += "m4"
 RDEPENDS_${PN}-ptest += "bash gawk"
 

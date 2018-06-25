@@ -36,7 +36,7 @@ def get_git_pv(d, tagadjust=None):
                 return "0.0"
 
         except Exception as exc:
-            raise bb.parse.SkipPackage(str(exc))
+            raise bb.parse.SkipRecipe(str(exc))
 
     if ver and tagadjust:
         ver = tagadjust(ver)

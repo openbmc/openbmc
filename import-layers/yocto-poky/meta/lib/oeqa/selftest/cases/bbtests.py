@@ -64,15 +64,14 @@ class BitbakeTests(OESelftestTestCase):
 
     @OETestID(108)
     def test_invalid_patch(self):
-        # This patch already exists in SRC_URI so adding it again will cause the
-        # patch to fail.
-        self.write_recipeinc('man', 'SRC_URI += "file://man-1.5h1-make.patch"')
+        # This patch should fail to apply.
+        self.write_recipeinc('man-db', 'FILESEXTRAPATHS_prepend := "${THISDIR}/files:"\nSRC_URI += "file://0001-Test-patch-here.patch"')
         self.write_config("INHERIT_remove = \"report-error\"")
-        result = bitbake('man -c patch', ignore_status=True)
-        self.delete_recipeinc('man')
-        bitbake('-cclean man')
+        result = bitbake('man-db -c patch', ignore_status=True)
+        self.delete_recipeinc('man-db')
+        bitbake('-cclean man-db')
         line = self.getline(result, "Function failed: patch_do_patch")
-        self.assertTrue(line and line.startswith("ERROR:"), msg = "Repeated patch application didn't fail. bitbake output: %s" % result.output)
+        self.assertTrue(line and line.startswith("ERROR:"), msg = "Incorrectly formed patch application didn't fail. bitbake output: %s" % result.output)
 
     @OETestID(1354)
     def test_force_task_1(self):
@@ -132,17 +131,17 @@ class BitbakeTests(OESelftestTestCase):
     @OETestID(168)
     def test_invalid_recipe_src_uri(self):
         data = 'SRC_URI = "file://invalid"'
-        self.write_recipeinc('man', data)
+        self.write_recipeinc('man-db', data)
         self.write_config("""DL_DIR = \"${TOPDIR}/download-selftest\"
 SSTATE_DIR = \"${TOPDIR}/download-selftest\"
 INHERIT_remove = \"report-error\"
 """)
         self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
 
-        bitbake('-ccleanall man')
-        result = bitbake('-c fetch man', ignore_status=True)
-        bitbake('-ccleanall man')
-        self.delete_recipeinc('man')
+        bitbake('-ccleanall man-db')
+        result = bitbake('-c fetch man-db', ignore_status=True)
+        bitbake('-ccleanall man-db')
+        self.delete_recipeinc('man-db')
         self.assertEqual(result.status, 1, msg="Command succeded when it should have failed. bitbake output: %s" % result.output)
         self.assertTrue('Fetcher failure: Unable to find file file://invalid anywhere. The paths that were searched were:' in result.output, msg = "\"invalid\" file \
 doesn't exist, yet no error message encountered. bitbake output: %s" % result.output)
@@ -222,9 +221,9 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
 INHERIT_remove = \"report-error\"
 """)
         self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
-        self.write_recipeinc('man',"\ndo_fail_task () {\nexit 1 \n}\n\naddtask do_fail_task before do_fetch\n" )
-        runCmd('bitbake -c cleanall man xcursor-transparent-theme')
-        result = runCmd('bitbake -c unpack -k man xcursor-transparent-theme', ignore_status=True)
+        self.write_recipeinc('man-db',"\ndo_fail_task () {\nexit 1 \n}\n\naddtask do_fail_task before do_fetch\n" )
+        runCmd('bitbake -c cleanall man-db xcursor-transparent-theme')
+        result = runCmd('bitbake -c unpack -k man-db xcursor-transparent-theme', ignore_status=True)
         errorpos = result.output.find('ERROR: Function failed: do_fail_task')
         manver = re.search("NOTE: recipe xcursor-transparent-theme-(.*?): task do_unpack: Started", result.output)
         continuepos = result.output.find('NOTE: recipe xcursor-transparent-theme-%s: task do_unpack: Started' % manver.group(1))

@@ -7,7 +7,8 @@ HOMEPAGE = "http://www.gnu.org/software/libc/index.html"
 # This needs to match with glibc.inc, otherwise glibc-scripts and glibc-locale
 # will fail to find main glibc, for details see
 # http://lists.openembedded.org/pipermail/openembedded-core/2015-January/100679.html
-ARM_INSTRUCTION_SET = "arm"
+ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET_armv5 = "arm"
 
 deltask do_fetch
 deltask do_unpack

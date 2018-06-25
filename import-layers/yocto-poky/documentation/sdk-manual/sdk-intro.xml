@@ -31,15 +31,18 @@
     <para>
         All SDKs consist of the following:
         <itemizedlist>
-            <listitem><para><emphasis>Cross-Development Toolchain</emphasis>:
+            <listitem><para>
+                <emphasis>Cross-Development Toolchain</emphasis>:
                 This toolchain contains a compiler, debugger, and various
                 miscellaneous tools.
                 </para></listitem>
-            <listitem><para><emphasis>Libraries, Headers, and Symbols</emphasis>:
+            <listitem><para>
+                <emphasis>Libraries, Headers, and Symbols</emphasis>:
                 The libraries, headers, and symbols are specific to the image
                 (i.e. they match the image).
                 </para></listitem>
-            <listitem><para><emphasis>Environment Setup Script</emphasis>:
+            <listitem><para>
+                <emphasis>Environment Setup Script</emphasis>:
                 This <filename>*.sh</filename> file, once run, sets up the
                 cross-development environment by defining variables and
                 preparing for SDK use.
@@ -48,7 +51,7 @@
     </para>
 
     <para>
-        Additionally an extensible SDK has tools that allow you to easily add
+        Additionally, an extensible SDK has tools that allow you to easily add
         new applications and libraries to an image, modify the source of an
         existing component, test changes on the target hardware, and easily
         integrate an application into the
@@ -81,14 +84,15 @@
         and
         <ulink url='&YOCTO_DOCS_REF_URL;#var-LD'><filename>LD</filename></ulink>.
         This reduces the space needed for the tools.
-        Understand, however, that a sysroot is still needed for every target
-        since those binaries are target-specific.
+        Understand, however, that every target still needs a sysroot because
+        those binaries are target-specific.
     </para>
 
     <para>
         The SDK development environment consists of the following:
         <itemizedlist>
-            <listitem><para>The self-contained SDK, which is an
+            <listitem><para>
+                The self-contained SDK, which is an
                 architecture-specific cross-toolchain and
                 matching sysroots (target and native) all built by the
                 OpenEmbedded build system (e.g. the SDK).
@@ -100,21 +104,24 @@
                 Additionally, the extensible SDK contains the
                 <filename>devtool</filename> functionality.
                 </para></listitem>
-            <listitem><para>The Quick EMUlator (QEMU), which lets you simulate
+            <listitem><para>
+                The Quick EMUlator (QEMU), which lets you simulate
                 target hardware.
                 QEMU is not literally part of the SDK.
                 You must build and include this emulator separately.
                 However, QEMU plays an important role in the development
                 process that revolves around use of the SDK.
                 </para></listitem>
-            <listitem><para>The Eclipse IDE Yocto Plug-in.
+            <listitem><para>
+                The Eclipse IDE Yocto Plug-in.
                 This plug-in is available for you if you are an Eclipse
                 user.
                 In the same manner as QEMU, the plug-in is not literally part
                 of the SDK but is rather available for use as part of the
                 development process.
                 </para></listitem>
-            <listitem><para>Various performance-related
+            <listitem><para>
+                Various performance-related
                 <ulink url='http://www.eclipse.org/linuxtools/index.php'>tools</ulink>
                 that can enhance your development experience.
                 These tools are also separate from the actual SDK but can be
@@ -192,11 +199,11 @@
             </tgroup>
         </informaltable>
         <literallayout class='monospaced'>
-     * Extensible SDK will contain the toolchain and debugger if <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_EXT_TYPE'><filename>SDK_EXT_TYPE</filename></ulink> is "full" or <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_INCLUDE_TOOLCHAIN'><filename>SDK_INCLUDE_TOOLCHAIN</filename></ulink> is "1", which is the default.
+     * Extensible SDK contains the toolchain and debugger if <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_EXT_TYPE'><filename>SDK_EXT_TYPE</filename></ulink> is "full" or <ulink url='&YOCTO_DOCS_REF_URL;#var-SDK_INCLUDE_TOOLCHAIN'><filename>SDK_INCLUDE_TOOLCHAIN</filename></ulink> is "1", which is the default.
 
-     ** Sysroot is managed through use of <filename>devtool</filename>.  Thus, it is less likely that you will corrupt your SDK sysroot when you try to add additional libraries.
+     ** Sysroot is managed through the use of <filename>devtool</filename>.  Thus, it is less likely that you will corrupt your SDK sysroot when you try to add additional libraries.
 
-     *** Runtime package management can be added to the standard SDK but it is not supported by default.
+     *** You can add runtime package management to the standard SDK but it is not supported by default.
 
      **** You must build and make the shared state available to extensible SDK users for "packages" you want to enable users to install.
         </literallayout>
@@ -216,7 +223,7 @@
             This toolchain is created by running a SDK installer script
             or through a
             <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
-            that is based on your Metadata configuration or extension for
+            that is based on your metadata configuration or extension for
             your targeted device.
             The cross-toolchain works with a matching target sysroot.
         </para>
@@ -230,7 +237,7 @@
             for generating binaries that run on the target architecture.
             The target sysroot is based on the target root filesystem image
             that is built by the OpenEmbedded build system and uses the same
-            Metadata configuration used to build the cross-toolchain.
+            metadata configuration used to build the cross-toolchain.
         </para>
     </section>
 
@@ -240,7 +247,8 @@
         <para>
             The QEMU emulator allows you to simulate your hardware while
             running your application or image.
-            QEMU is not part of the SDK but is made available a number of ways:
+            QEMU is not part of the SDK but is made available a number of
+            different ways:
             <itemizedlist>
                 <listitem><para>
                     If you have cloned the <filename>poky</filename> Git
@@ -265,7 +273,7 @@
     </section>
 
     <section id='eclipse-overview'>
-        <title>Eclipse Yocto Plug-in</title>
+        <title><trademark class='trade'>Eclipse</trademark> Yocto Plug-in</title>
 
         <para>
             The Eclipse IDE is a popular development environment and it fully
@@ -285,8 +293,8 @@
                 Previous releases of the Eclipse Yocto Plug-in supported
                 "user-space tools" (i.e. LatencyTOP, PowerTOP, Perf, SystemTap,
                 and Lttng-ust) that also added to the development experience.
-                These tools have been deprecated beginning with this release
-                of the plug-in.
+                These tools have been deprecated with the release of the
+                Eclipse Yocto Plug-in.
             </note>
         </para>
 
@@ -335,14 +343,18 @@
     <para>
         You just need to follow these general steps:
         <orderedlist>
-            <listitem><para><emphasis>Install the SDK for your target hardware:</emphasis>
+            <listitem><para>
+                <emphasis>Install the SDK for your target hardware:</emphasis>
                 For information on how to install the SDK, see the
                 "<link linkend='sdk-installing-the-sdk'>Installing the SDK</link>"
-                section.</para></listitem>
-            <listitem><para><emphasis>Download or Build the Target Image:</emphasis>
+                section.
+                </para></listitem>
+            <listitem><para>
+                <emphasis>Download or Build the Target Image:</emphasis>
                 The Yocto Project supports several target architectures
                 and has many pre-built kernel images and root filesystem
                 images.</para>
+
                 <para>If you are going to develop your application on
                 hardware, go to the
                 <ulink url='&YOCTO_MACHINES_DL_URL;'><filename>machines</filename></ulink>
@@ -356,6 +368,7 @@
                 so forth.
                 Be sure to get the files you need for your particular
                 development process.</para>
+
                 <para>If you are going to develop your application and
                 then run and test it using the QEMU emulator, go to the
                 <ulink url='&YOCTO_QEMU_DL_URL;'><filename>machines/qemu</filename></ulink>
@@ -364,35 +377,35 @@
                 target architecture (e.g. <filename>qemux86_64</filename>
                 for an <trademark class='registered'>Intel</trademark>-based
                 64-bit architecture).
-                Download kernel, root filesystem, and any other files you
+                Download the kernel, root filesystem, and any other files you
                 need for your process.
                 <note>
-                    To use the root filesystem in QEMU, you
-                    need to extract it.
+                    To use the root filesystem in QEMU, you need to extract it.
                     See the
                     "<link linkend='sdk-extracting-the-root-filesystem'>Extracting the Root Filesystem</link>"
                     section for information on how to extract the root
                     filesystem.
                 </note>
                 </para></listitem>
-            <listitem><para><emphasis>Develop and Test your
-                Application:</emphasis>  At this point, you have the tools
-                to develop your application.
-                If you need to separately install and use the QEMU
-                emulator, you can go to
+            <listitem><para>
+                <emphasis>Develop and Test your Application:</emphasis>
+                At this point, you have the tools to develop your application.
+                If you need to separately install and use the QEMU emulator,
+                you can go to
                 <ulink url='http://wiki.qemu.org/Main_Page'>QEMU Home Page</ulink>
                 to download and learn about the emulator.
                 See the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-qemu'>Using the Quick EMUlator (QEMU)</ulink>"
                 chapter in the Yocto Project Development Tasks Manual
                 for information on using QEMU within the Yocto
-                Project.</para></listitem>
+                Project.
+                </para></listitem>
         </orderedlist>
     </para>
 
     <para>
-        The remainder of this manual describes how to use both the standard
-        SDK and the extensible SDK.
+        The remainder of this manual describes how to use the extensible
+        and standard SDKs.
         Information also exists in appendix form that describes how you can
         build, install, and modify an SDK.
     </para>

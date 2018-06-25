@@ -13,9 +13,10 @@ Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 
-diff -up nfs-utils-1.2.3/utils/statd/sm-notify.c.orig nfs-utils-1.2.3/utils/statd/sm-notify.c
---- nfs-utils-1.2.3/utils/statd/sm-notify.c.orig	2010-09-28 08:24:16.000000000 -0400
-+++ nfs-utils-1.2.3/utils/statd/sm-notify.c	2010-10-15 16:44:43.487119601 -0400
+Index: nfs-utils-2.1.1/utils/statd/sm-notify.c
+===================================================================
+--- nfs-utils-2.1.1.orig/utils/statd/sm-notify.c
++++ nfs-utils-2.1.1/utils/statd/sm-notify.c
 @@ -28,6 +28,9 @@
  #include <netdb.h>
  #include <errno.h>
@@ -24,9 +25,9 @@ diff -up nfs-utils-1.2.3/utils/statd/sm-notify.c.orig nfs-utils-1.2.3/utils/stat
 +#include <arpa/nameser.h>
 +#include <resolv.h>
  
+ #include "conffile.h"
  #include "sockaddr.h"
- #include "xlog.h"
-@@ -84,6 +87,7 @@ smn_lookup(const char *name)
+@@ -89,6 +92,7 @@ smn_lookup(const char *name)
  	};
  	int error;
  

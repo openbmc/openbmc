@@ -23,3 +23,4 @@ therefore provides compatibility with the following caveats:
 * libpng 1.2 isn't provided; oe-core includes the latest release of libpng
   instead.
 
+* pax (POSIX standard archive) tool is not provided.

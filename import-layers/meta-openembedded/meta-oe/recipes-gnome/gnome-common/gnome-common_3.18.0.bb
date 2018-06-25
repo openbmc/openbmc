@@ -14,6 +14,10 @@ SRC_URI[archive.sha256sum] = "22569e370ae755e04527b76328befc4c73b62bfd4a572499fd
 EXTRA_AUTORECONF = ""
 DEPENDS = ""
 
+# Default to enable autoconf-archive to avoid conflicts
+PACKAGECONFIG ??= "autoconf-archive"
+PACKAGECONFIG[autoconf-archive] = "--with-autoconf-archive, --without-autoconf-archive, autoconf-archive"
+
 FILES_${PN} += "${datadir}/aclocal"
 FILES_${PN}-dev = ""
 

@@ -1,0 +1,28 @@
+From 3e8c19bb1bbc4493c591f75c00c1fefe3b1c8a69 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 27 Feb 2018 20:42:41 -0800
+Subject: [PATCH] Also check i386, i586 and i686 for ia32
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 28cb8b60e..489531a43 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1217,7 +1217,7 @@ conf.set10('SYSTEMD_SLOW_TESTS_DEFAULT', slow_tests)
+ if get_option('efi')
+         efi_arch = host_machine.cpu_family()
+ 
+-        if efi_arch == 'x86'
++        if efi_arch == 'x86' or efi_arch == 'i386' or efi_arch == 'i586' or efi_arch == 'i686'
+                 EFI_MACHINE_TYPE_NAME = 'ia32'
+                 gnu_efi_arch = 'ia32'
+         elif efi_arch == 'x86_64'
+-- 
+2.13.0
+

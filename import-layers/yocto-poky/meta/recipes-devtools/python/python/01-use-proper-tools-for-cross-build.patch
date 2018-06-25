@@ -9,6 +9,9 @@ Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 Rebased for python-2.7.9
 Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
 
+Rebased for python-2.7.14
+Signed-off-by: Derek Straka <derek@asterius.io>
+
 Index: Python-2.7.13/Makefile.pre.in
 ===================================================================
 --- Python-2.7.13.orig/Makefile.pre.in
@@ -30,14 +33,14 @@ Index: Python-2.7.13/Makefile.pre.in
  
  # Create build directory and generate the sysconfig build-time data there.
  # pybuilddir.txt contains the name of the build dir and is used for
-@@ -681,7 +682,7 @@ Modules/pwdmodule.o: $(srcdir)/Modules/p
- 
- $(GRAMMAR_H): @GENERATED_COMMENT@ $(GRAMMAR_INPUT) $(PGEN)
+@@ -663,7 +663,7 @@
+ 	# Regenerate Include/graminit.h and Python/graminit.c
+ 	# from Grammar/Grammar using pgen
  	@$(MKDIR_P) Include
--	$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
-+	$(HOSTPGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
- $(GRAMMAR_C): @GENERATED_COMMENT@ $(GRAMMAR_H)
- 	touch $(GRAMMAR_C)
+-	$(PGEN) $(srcdir)/Grammar/Grammar \
++	$(HOSTPGEN) $(srcdir)/Grammar/Grammar \
+ 		$(srcdir)/Include/graminit.h \
+ 		$(srcdir)/Python/graminit.c
  
 @@ -1121,27 +1122,27 @@ libinstall:	build_all $(srcdir)/Lib/$(PL
  			$(DESTDIR)$(LIBDEST)/distutils/tests ; \

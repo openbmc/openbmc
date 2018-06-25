@@ -1,12 +1,17 @@
+From 9d260d408f9e17abd1d1dccd685bd7e80a3655a9 Mon Sep 17 00:00:00 2001
+From: Donn Seeley <donn.seeley@windriver.com>
+Date: Tue, 25 Feb 2014 17:44:04 +0800
+Subject: [PATCH] dpkg: fix a link problem for dpkg-native on CentOS 5.8
+
 CentOS 5.8 kernels and headers support the sync_file_range() system call,
 but glibc 2.5 doesn't provide the syscall stub.  It appears that this
 problem is known but will never be fixed:
 
   https://bugzilla.redhat.com/show_bug.cgi?id=518581
 
-  Bug 518581 - [RHEL5] glibc misses sync_file_range syscall interface 
+  Bug 518581 - [RHEL5] glibc misses sync_file_range syscall interface
 
-  Status:       CLOSED CANTFIX 
+  Status:       CLOSED CANTFIX
   Last Closed:  2009-11-22 22:19:55
 
   Kirby Zhou 2009-08-20 23:37:55 EDT
@@ -60,13 +65,16 @@ Upstream-Status: Inappropriate [everyone else builds on newer hosts :-)]
 
 Signed-off-by: Donn Seeley <donn.seeley@windriver.com>
 Signed-off-by: Lei Liu <lei.liu2@windriver.com>
+
 ---
- src/archives.c |    4 ++--
+ src/archives.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/src/archives.c b/src/archives.c
+index 4b2fc92..a92b795 100644
 --- a/src/archives.c
 +++ b/src/archives.c
-@@ -75,7 +75,7 @@
+@@ -69,7 +69,7 @@ fd_writeback_init(int fd)
    /* Ignore the return code as it should be considered equivalent to an
     * asynchronous hint for the kernel, we are doing an fsync() later on
     * anyway. */
@@ -75,7 +83,7 @@ Signed-off-by: Lei Liu <lei.liu2@windriver.com>
    sync_file_range(fd, 0, 0, SYNC_FILE_RANGE_WRITE);
  #elif defined(HAVE_POSIX_FADVISE)
    posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
-@@ -1179,7 +1179,7 @@
+@@ -1078,7 +1078,7 @@ tarobject(void *ctx, struct tar_entry *ti)
    return 0;
  }
  
@@ -84,3 +92,6 @@ Signed-off-by: Lei Liu <lei.liu2@windriver.com>
  static void
  tar_writeback_barrier(struct fileinlist *files, struct pkginfo *pkg)
  {
+-- 
+2.16.2
+

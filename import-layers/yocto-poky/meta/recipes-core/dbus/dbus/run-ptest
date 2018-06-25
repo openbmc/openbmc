@@ -1,10 +1,24 @@
 #!/bin/sh
 
 output() {
-  if [ $? -eq 0 ]
+  retcode=$?
+  if [ $retcode -eq 0 ]
     then echo "PASS: $i"
-    else echo "FAIL: $i"
+  elif [ $retcode -eq 77 ]
+    then echo "SKIP: $i"
+  else echo "FAIL: $i"
   fi
 }
 
-for i in `ls test/test-*`; do ./$i ./test/data DBUS_TEST_HOMEDIR=./test >/dev/null; output; done
+export DBUS_TEST_HOMEDIR=./test
+export XDG_RUNTIME_DIR=./test
+export LD_LIBRARY_PATH=/usr/lib/dbus-test/ptest/test/.libs
+
+files=`ls test/test-*`
+
+for i in $files
+	do
+		./$i ./test/data >/dev/null
+		output
+	done
+

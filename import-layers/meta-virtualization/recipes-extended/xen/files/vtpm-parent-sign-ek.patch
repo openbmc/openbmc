@@ -1,0 +1,196 @@
+diff --git a/tpm/tpm_cmd_handler.c b/tpm/tpm_cmd_handler.c
+index 9e1cfb4..0fabf98 100644
+--- a/tpm/tpm_cmd_handler.c
++++ b/tpm/tpm_cmd_handler.c
+@@ -3312,6 +3312,37 @@ static TPM_RESULT execute_TPM_OwnerReadPubek(TPM_REQUEST *req, TPM_RESPONSE *rsp
+   return res;
+ }
+ 
++static TPM_RESULT execute_TPM_ParentSignEK(TPM_REQUEST *req, TPM_RESPONSE *rsp)
++{
++	TPM_NONCE nonce;
++	TPM_RESULT res;
++	UINT32 sigSize;
++	BYTE *sig;
++	BYTE *ptr;
++	UINT32 len;
++	TPM_PCR_SELECTION targetPCR;
++
++	tpm_compute_in_param_digest(req);
++
++	ptr = req->param;
++	len = req->paramSize;
++	if (tpm_unmarshal_TPM_NONCE(&ptr, &len, &nonce)
++		|| tpm_unmarshal_TPM_PCR_SELECTION(&ptr, &len, &targetPCR)
++		|| len != 0) return TPM_BAD_PARAMETER;
++
++	res = TPM_ParentSignEK(&nonce, &targetPCR, &req->auth1, &sigSize, &sig);
++	if (res != TPM_SUCCESS) return res;
++	rsp->paramSize = len = sigSize;
++	rsp->param = ptr = tpm_malloc(len);
++	if (ptr == NULL || tpm_marshal_BLOB(&ptr, &len, sig, sigSize)) {
++		tpm_free(rsp->param);
++		res = TPM_FAIL;
++	}
++	tpm_free(sig);
++
++	return res;
++}
++
+ static void tpm_setup_rsp_auth(TPM_COMMAND_CODE ordinal, TPM_RESPONSE *rsp) 
+ {
+   tpm_hmac_ctx_t hmac;
+@@ -4062,6 +4093,11 @@ void tpm_execute_command(TPM_REQUEST *req, TPM_RESPONSE *rsp)
+       res = execute_TPM_OwnerReadPubek(req, rsp);
+     break;
+ 
++    case TPM_ORD_ParentSignEK:
++      debug("[TPM_ORD_ParentSignEK]");
++      res = execute_TPM_ParentSignEK(req, rsp);
++    break;
++
+     default:
+ #ifdef MTM_EMULATOR
+       res = mtm_execute_command(req, rsp);
+diff --git a/tpm/tpm_commands.h b/tpm/tpm_commands.h
+index a7666f6..7fef934 100644
+--- a/tpm/tpm_commands.h
++++ b/tpm/tpm_commands.h
+@@ -3054,6 +3054,23 @@ TPM_RESULT TPM_OwnerReadPubek(
+   TPM_PUBKEY *pubEndorsementKey 
+ );
+ 
++/**
++ * TPM_ParentSignEK - gets a hardware TPM quote of a vTPM's EK
++ * @externalData: [in] AntiReplay nonce to prevent replay of messages
++ * @sel: [in] PCR selection for the hardware TPM's quote
++ * @auth1: [in, out] Authorization protocol parameters
++ * @sigSize: [out] The length of the returned digital signature
++ * @sig: [out] The resulting digital signature and PCR values
++ * Returns: TPM_SUCCESS on success, a TPM error code otherwise.
++ */
++TPM_RESULT TPM_ParentSignEK(
++  TPM_NONCE *externalData,
++  TPM_PCR_SELECTION *sel,
++  TPM_AUTH *auth1,
++  UINT32 *sigSize,
++  BYTE **sig
++);
++
+ /*
+  * Error handling
+  * [tpm_error.c]
+diff --git a/tpm/tpm_credentials.c b/tpm/tpm_credentials.c
+index 9cd64af..01f29e6 100644
+--- a/tpm/tpm_credentials.c
++++ b/tpm/tpm_credentials.c
+@@ -180,3 +180,34 @@ TPM_RESULT TPM_OwnerReadInternalPub(TPM_KEY_HANDLE keyHandle, TPM_AUTH *auth1,
+     return TPM_BAD_PARAMETER;
+   }
+ }
++
++int endorsementKeyFresh = 0;
++
++TPM_RESULT VTPM_GetParentQuote(TPM_DIGEST* data, TPM_PCR_SELECTION *sel, UINT32 *sigSize, BYTE **sig);
++
++TPM_RESULT TPM_ParentSignEK(TPM_NONCE *externalData, TPM_PCR_SELECTION *sel,
++                            TPM_AUTH *auth1, UINT32 *sigSize, BYTE **sig)
++{
++	TPM_PUBKEY pubKey;
++	TPM_RESULT res;
++	TPM_DIGEST hres;
++
++	info("TPM_ParentSignEK()");
++
++	res = tpm_verify_auth(auth1, tpmData.permanent.data.ownerAuth, TPM_KH_OWNER);
++	if (res != TPM_SUCCESS) return res;
++
++	if (!endorsementKeyFresh) return TPM_DISABLED_CMD;
++
++	res = tpm_get_pubek(&pubKey);
++	if (res != TPM_SUCCESS) return res;
++
++	if (tpm_compute_pubkey_checksum(externalData, &pubKey, &hres))
++		res = TPM_FAIL;
++
++	if (res == TPM_SUCCESS)
++		res = VTPM_GetParentQuote(&hres, sel, sigSize, sig);
++
++	free_TPM_PUBKEY(pubKey);
++	return res;
++}
+diff --git a/tpm/tpm_data.c b/tpm/tpm_data.c
+index 50c9697..6a0c499 100644
+--- a/tpm/tpm_data.c
++++ b/tpm/tpm_data.c
+@@ -76,6 +76,8 @@ static void init_timeouts(void)
+   tpmData.permanent.data.cmd_durations[2] = 1000;
+ }
+ 
++extern int endorsementKeyFresh;
++
+ void tpm_init_data(void)
+ {
+   /* endorsement key */
+@@ -157,6 +159,7 @@ void tpm_init_data(void)
+   if (tpmConf & TPM_CONF_GENERATE_EK) {
+     /* generate a new endorsement key */
+     tpm_rsa_generate_key(&tpmData.permanent.data.endorsementKey, 2048);
++    endorsementKeyFresh = 1;
+   } else {
+     /* setup endorsement key */
+     tpm_rsa_import_key(&tpmData.permanent.data.endorsementKey, 
+diff --git a/tpm/tpm_structures.h b/tpm/tpm_structures.h
+index f746c05..b0f4625 100644
+--- a/tpm/tpm_structures.h
++++ b/tpm/tpm_structures.h
+@@ -658,6 +658,49 @@ typedef struct tdTPM_CMK_MA_APPROVAL {
+ #define TPM_ORD_TickStampBlob                   242
+ #define TPM_ORD_MAX                             256
+ 
++/* VTPM-only commands: */
++/*
++ * ParentSignEK - Proof of fresh provisioning and EK value
++ *
++ * Input:
++ *   TPM_TAG             tag           TPM_TAG_RQU_AUTH1_COMMAND
++ *   UINT32              paramSize     Total size of request
++ *   TPM_COMMAND_CODE    ordinal       TPM_ORD_ParentSignEK
++ *   TPM_NONCE           externData    20 bytes of external data
++ *   TPM_PCR_SELECTION   ptSel         PCR selection for physical TPM
++ *   ---
++ *   UINT32              authHandle    Owner authorization session (OIAP)
++ *   TPM_NONCE           nonceOdd      Nonce for authHandle
++ *   BOOL                continueAuth  Continue flag for authHandle
++ *   TPM_AUTHDATA        privAuth      Authorization digest for command
++ *
++ * Output:
++ *   TPM_TAG             tag           TPM_TAG_RSP_AUTH1_COMMAND
++ *   UINT32              paramSize     Total size of response
++ *   TPM_RESULT          returnCode    Return code of the operation
++ *   BYTE[]              sig           Signature provided by physical TPM
++ *   TPM_PCRVALUE[]      pcrValue      Values of hardware PCRs used in the quote
++ *   ---
++ *   TPM_NONCE           nonceEven     Nonce for authHandle
++ *   BOOL                continueAuth  Continue flag for authHandle
++ *   TPM_AUTHDATA        resAuth       Authorization digest for response
++ *
++ * This command is only valid on the first boot of a vTPM; on any subsequent
++ * boot, the command returns TPM_DISABLED_CMD. It is intended to be used to
++ * provide evidence of proper platform configuration to the verifier/CA which is
++ * responsible for the creation of the vTPM's endorsement credential, which will
++ * be used on subsequent boots to certify AIKs via the usual Privacy CA protocol.
++ *
++ * The values of the virtual TPM's PCRs are not included in the response.
++ * The signature is a standard TPM_Quote response from the physical TPM; its
++ * externalData is the SHA1 hash of the following structure:
++ *   TPM_PUBKEY          pubEK         The vTPM's public EK
++ *   TPM_NONCE           externData    From input to the deep quote
++ *
++ * This structure was chosen to match the return of TPM_ReadPubek
++ */
++#define TPM_ORD_ParentSignEK                    (TPM_VENDOR_COMMAND | TPM_ORD_ReadPubek)
++
+ /*
+  * TCS Ordinals ([TPM_Part2], Section 17.1)
+  *

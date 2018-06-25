@@ -307,5 +307,5 @@ python __anonymous() {
             update_useradd_static_config(d)
         except NotImplementedError as f:
             bb.debug(1, "Skipping recipe %s: %s" % (d.getVar('PN'), f))
-            raise bb.parse.SkipPackage(f)
+            raise bb.parse.SkipRecipe(f)
 }

@@ -14,7 +14,7 @@ S = "${WORKDIR}/XML-Parser-${PV}"
 
 EXTRA_CPANFLAGS = "EXPATLIBPATH=${STAGING_LIBDIR} EXPATINCPATH=${STAGING_INCDIR} CC='${CC}' LD='${CCLD}' FULL_AR='${AR}'"
 
-inherit cpan
+inherit cpan ptest-perl
 
 # fix up sub MakeMaker project as arguments don't get propagated though
 # see https://rt.cpan.org/Public/Bug/Display.html?id=28632
@@ -32,6 +32,15 @@ do_compile() {
 
 do_compile_class-native() {
 	cpan_do_compile
+}
+
+do_install_ptest() {
+	sed -i -e "s:/usr/local/bin/perl:/usr/bin/perl:g" ${B}/samples/xmlstats
+	sed -i -e "s:/usr/local/bin/perl:/usr/bin/perl:g" ${B}/samples/xmlfilter
+	sed -i -e "s:/usr/local/bin/perl:/usr/bin/perl:g" ${B}/samples/xmlcomments
+	sed -i -e "s:/usr/local/bin/perl:/usr/bin/perl:g" ${B}/samples/canonical
+	cp -r ${B}/samples ${D}${PTEST_PATH}
+	chown -R root:root ${D}${PTEST_PATH}/samples
 }
 
 BBCLASSEXTEND="native nativesdk"

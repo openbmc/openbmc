@@ -5,6 +5,8 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 DEPENDS = "u-boot-mkimage-native"
 
+INHIBIT_DEFAULT_DEPS = "1"
+
 SRC_URI = "file://boot.cmd.in"
 
 do_compile() {
@@ -14,7 +16,7 @@ do_compile() {
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
 }
 
-inherit deploy
+inherit deploy nopackages
 
 do_deploy() {
     install -d ${DEPLOYDIR}

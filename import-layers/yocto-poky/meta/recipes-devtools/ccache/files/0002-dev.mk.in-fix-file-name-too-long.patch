@@ -14,10 +14,10 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  dev.mk.in |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/dev.mk.in b/dev.mk.in
-index 1261ad3..ec55ac4 100644
---- a/dev.mk.in
-+++ b/dev.mk.in
+Index: ccache-3.3.4/dev.mk.in
+===================================================================
+--- ccache-3.3.4.orig/dev.mk.in
++++ ccache-3.3.4/dev.mk.in
 @@ -1,7 +1,7 @@
  # GNU make syntax reigns in this file.
  
@@ -26,7 +26,4 @@ index 1261ad3..ec55ac4 100644
 +all_cppflags += -MD -MP -MF .deps/$(subst .._,,$(subst /,_,$(subst $(srcdir)/,,$<))).d
  
  ASCIIDOC = asciidoc
- GPERF = gperf
--- 
-1.7.9.5
-
+ CPPCHECK = cppcheck

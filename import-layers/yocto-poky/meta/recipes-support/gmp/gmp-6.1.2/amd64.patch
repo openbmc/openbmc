@@ -1,10 +1,10 @@
 Upstream-Status: Pending
 
-Index: gmp-5.0.3/longlong.h
+Index: gmp-6.1.2/longlong.h
 ===================================================================
---- gmp-5.0.3.orig/longlong.h
-+++ gmp-5.0.3/longlong.h
-@@ -994,8 +994,10 @@ extern UWtype __MPN(udiv_qrnnd) _PROTO (
+--- gmp-6.1.2.orig/longlong.h
++++ gmp-6.1.2/longlong.h
+@@ -1036,8 +1036,10 @@ extern UWtype __MPN(udiv_qrnnd) (UWtype
     count is only an int. */
  #define count_trailing_zeros(count, x)					\
    do {									\
@@ -14,5 +14,5 @@ Index: gmp-5.0.3/longlong.h
 +    __asm__ ("bsfq %1,%0" : "=r" (__cbtmp) : "rm" ((UDItype)(x)));	\
 +    (count) = __cbtmp;							\
    } while (0)
- #endif /* x86_64 */
+ #endif /* __amd64__ */
  

@@ -9,7 +9,7 @@ and executables, so that far fewer relocations need to be resolved at \
 runtime and thus programs come up faster."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b"
-SRCREV = "ef20628dd78b92e1a3123afc67b64cf010bdd9e4"
+SRCREV = "05aeafd053e56356ec8c62f4bb8f7b95bae192f3"
 PV = "1.0+git${SRCPV}"
 
 #
@@ -32,8 +32,7 @@ SRC_URI = "git://git.yoctoproject.org/prelink-cross.git;branch=cross_prelink \
            file://prelink.cron.daily \
            file://prelink.default \
 	   file://macros.prelink"
-UPSTREAM_CHECK_GITTAGREGEX = "upstream has no usable tags"
-UPSTREAM_VERSION_UNKNOWN = "1"
+UPSTREAM_CHECK_COMMITS = "1"
 
 TARGET_OS_ORIG := "${TARGET_OS}"
 OVERRIDES_append = ":${TARGET_OS_ORIG}"

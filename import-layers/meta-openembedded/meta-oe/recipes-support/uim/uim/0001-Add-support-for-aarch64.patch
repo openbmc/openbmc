@@ -1,9 +1,10 @@
-From 24fd52cc45f7b5ff45afe072f5fbe66485df8c8e Mon Sep 17 00:00:00 2001
+From 82f44f53b9a9766c2ec816f237506beb953eb332 Mon Sep 17 00:00:00 2001
 From: Andreas Schwab <schwab@suse.de>
 Date: Wed, 29 Oct 2014 14:18:28 +0100
 Subject: [PATCH] Add support for aarch64
 
 * include/private/gcconfig.h: Add support for aarch64.
+
 ---
  sigscheme/libgcroots/include/private/gcconfig.h | 37 +++++++++++++++++++++++++
  1 file changed, 37 insertions(+)
@@ -77,6 +78,3 @@ index 4d42b03..0f13db6 100644
  # ifdef ARM32
  #   define CPP_WORDSZ 32
  #   define MACH_TYPE "ARM32"
--- 
-2.13.2
-

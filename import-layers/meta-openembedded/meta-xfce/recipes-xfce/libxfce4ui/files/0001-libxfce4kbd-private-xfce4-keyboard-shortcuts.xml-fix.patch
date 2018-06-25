@@ -9,6 +9,7 @@ Content-Transfer-Encoding: 8bit
 
 Upstream-Status: Pending
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+
 ---
  libxfce4kbd-private/xfce4-keyboard-shortcuts.xml |    4 ++++
  1 files changed, 4 insertions(+), 0 deletions(-)
@@ -17,8 +18,8 @@ diff --git a/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml b/libxfce4kbd-priv
 index 723a10d..e6502f3 100644
 --- a/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
 +++ b/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
-@@ -66,4 +66,8 @@
-       <property name="&lt;Control&gt;F12" type="string" value="workspace_12_key"/>
+@@ -75,4 +75,8 @@
+       <property name="&lt;Primary&gt;F12" type="string" value="workspace_12_key"/>
      </property>
    </property>
 +  <property name="providers" type="array">

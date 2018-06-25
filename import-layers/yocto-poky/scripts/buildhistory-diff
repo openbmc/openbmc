@@ -38,7 +38,7 @@ def get_args_parser():
     parser.add_argument('-a', '--report-all',
                         action='store_true',
                         dest='report_all',
-                        default='False',
+                        default=False,
                         help="Report all changes, not just the default significant ones")
     parser.add_argument('-s', '---signatures',
                         action='store_true',
@@ -53,6 +53,10 @@ def get_args_parser():
     parser.add_argument('-e', '--exclude-path',
                         action='append',
                         help="Exclude path from the output")
+    parser.add_argument('-c', '--colour',
+                        choices=('yes', 'no', 'auto'),
+                        default="auto",
+                        help="Whether to colourise (defaults to auto)")
     parser.add_argument('revisions',
                         default = ['build-minus-1', 'HEAD'],
                         nargs='*',
@@ -107,9 +111,10 @@ def main():
     elif len(args.revisions) == 2:
         fromrev, torev = args.revisions
 
-    from oe.buildhistory_analysis import process_changes
-
+    from oe.buildhistory_analysis import init_colours, process_changes
     import gitdb
+
+    init_colours({"yes": True, "no": False, "auto": sys.stdout.isatty()}[args.colour])
 
     try:
         changes = process_changes(args.buildhistory_dir, fromrev, torev,

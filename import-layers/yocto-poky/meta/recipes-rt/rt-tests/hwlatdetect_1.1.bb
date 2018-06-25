@@ -22,5 +22,5 @@ do_install() {
 }
 
 FILES_${PN} += "${libdir}/python${PYTHON_BASEVERSION}/dist-packages/hwlatdetect.py"
-RDEPENDS_${PN} = "python3 python3-subprocess python3-textutils"
+RDEPENDS_${PN} = "python3-core "
 RRECOMMENDS_${PN} = "kernel-module-hwlat-detector"

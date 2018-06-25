@@ -1,0 +1,103 @@
+From a9a80a1f4df65892a0269295ce8a64b06f2ff61d Mon Sep 17 00:00:00 2001
+From: Ruslan Bilovol <rbilovol@cisco.com>
+Date: Tue, 19 Dec 2017 15:59:04 +0200
+Subject: [PATCH] kpatch-build: add cross-compilation support
+
+This patch introduces new option for kpatch-build
+script "--cross-compile" which can be used for
+specifying cross-complier prefix.
+It allows to build live patches not only on
+target system, but also on hosts for a target other
+than the one on which the compiler is running
+
+Also removed quotes in exec lines, so it is
+possible to pass multy-component strings like
+"ccache x86_64-xelinux-linux-" as cross-compiler
+
+Upstream-Status: Pending
+
+Signed-off-by: Ruslan Bilovol <rbilovol@cisco.com>
+---
+ kpatch-build/kpatch-build | 13 +++++++++++--
+ kpatch-build/kpatch-gcc   |  4 ++--
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
+index 166ecbd..af24cc4 100755
+--- a/kpatch-build/kpatch-build
++++ b/kpatch-build/kpatch-build
+@@ -195,7 +195,7 @@ gcc_version_check() {
+ 	# gcc --version varies between distributions therefore extract version
+ 	# by compiling a test file and compare it to vmlinux's version.
+ 	echo 'void main(void) {}' > "$c"
+-	out="$(gcc -c -pg -ffunction-sections -o "$o" "$c" 2>&1)"
++	out="$(${KPATCH_CROSS_COMPILE}gcc -c -pg -ffunction-sections -o "$o" "$c" 2>&1)"
+ 	gccver="$(gcc_version_from_file "$o")"
+ 	kgccver="$(gcc_version_from_file "$VMLINUX")"
+ 	rm -f "$c" "$o"
+@@ -381,12 +381,14 @@ usage() {
+ 	echo "		-d, --debug        Enable 'xtrace' and keep scratch files" >&2
+ 	echo "		                   in <CACHEDIR>/tmp" >&2
+ 	echo "		                   (can be specified multiple times)" >&2
++	echo "		--cross-compile    Specify the prefix used for all executables" >&2
++	echo "		                   used during compilation" >&2
+ 	echo "		--skip-cleanup     Skip post-build cleanup" >&2
+ 	echo "		--skip-gcc-check   Skip gcc version matching check" >&2
+ 	echo "		                   (not recommended)" >&2
+ }
+ 
+-options="$(getopt -o ha:r:s:c:v:j:t:n:o:d -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,debug,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
++options="$(getopt -o ha:r:s:c:v:j:t:n:o:d -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,debug,cross-compile:,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
+ 
+ eval set -- "$options"
+ 
+@@ -444,6 +446,10 @@ while [[ $# -gt 0 ]]; do
+ 			echo "DEBUG mode enabled"
+ 		fi
+ 		;;
++	--cross-compile)
++		KPATCH_CROSS_COMPILE="$2"
++		shift
++		;;
+ 	--skip-cleanup)
+ 		echo "Skipping cleanup"
+ 		SKIPCLEANUP=1
+@@ -691,6 +697,8 @@ if [[ $DEBUG -ge 4 ]]; then
+ 	export KPATCH_GCC_DEBUG=1
+ fi
+ 
++export KPATCH_CROSS_COMPILE
++
+ echo "Building original kernel"
+ ./scripts/setlocalversion --save-scmversion || die
+ make mrproper 2>&1 | logger || die
+@@ -840,6 +848,7 @@ cd "$TEMPDIR/patch" || die
+ KPATCH_BUILD="$SRCDIR" KPATCH_NAME="$MODNAME" \
+ KBUILD_EXTRA_SYMBOLS="$KBUILD_EXTRA_SYMBOLS" \
+ KPATCH_LDFLAGS="$KPATCH_LDFLAGS" \
++CROSS_COMPILE="$KPATCH_CROSS_COMPILE" \
+ 	make 2>&1 | logger || die
+ 
+ if ! "$KPATCH_MODULE"; then
+diff --git a/kpatch-build/kpatch-gcc b/kpatch-build/kpatch-gcc
+index 6ba133c..3937948 100755
+--- a/kpatch-build/kpatch-gcc
++++ b/kpatch-build/kpatch-gcc
+@@ -8,7 +8,7 @@ TOOLCHAINCMD="$1"
+ shift
+ 
+ if [[ -z "$KPATCH_GCC_TEMPDIR" ]]; then
+-	exec "$TOOLCHAINCMD" "$@"
++	exec ${KPATCH_CROSS_COMPILE}${TOOLCHAINCMD} "$@"
+ fi
+ 
+ declare -a args=("$@")
+@@ -80,4 +80,4 @@ elif [[ "$TOOLCHAINCMD" = "ld" ]] ; then
+ 	done
+ fi
+ 
+-exec "$TOOLCHAINCMD" "${args[@]}"
++exec ${KPATCH_CROSS_COMPILE}${TOOLCHAINCMD} "${args[@]}"
+-- 
+1.9.1
+

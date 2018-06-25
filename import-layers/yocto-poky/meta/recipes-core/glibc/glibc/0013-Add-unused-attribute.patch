@@ -1,7 +1,7 @@
-From 049cce82f35e0d864d98075b83888dbba4d68afd Mon Sep 17 00:00:00 2001
+From bba7a647b636618d5fd083e904f995f7736b9168 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:28:41 +0000
-Subject: [PATCH 13/25] Add unused attribute
+Subject: [PATCH 13/27] Add unused attribute
 
 Helps in avoiding gcc warning when header is is included in
 a source file which does not use both functions
@@ -17,7 +17,7 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/iconv/gconv_charset.h b/iconv/gconv_charset.h
-index 18d8bd6ae7..eb729da5d3 100644
+index 123e2a62ce..63cc83ec84 100644
 --- a/iconv/gconv_charset.h
 +++ b/iconv/gconv_charset.h
 @@ -21,7 +21,7 @@
@@ -30,5 +30,5 @@ index 18d8bd6ae7..eb729da5d3 100644
  {
    int slash_count = 0;
 -- 
-2.13.2
+2.16.1
 

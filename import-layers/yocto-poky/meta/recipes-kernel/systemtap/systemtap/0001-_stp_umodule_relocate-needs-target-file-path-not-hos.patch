@@ -1,0 +1,39 @@
+From 183c7a7a8167333c873525f7908913837b8dc3cb Mon Sep 17 00:00:00 2001
+From: Victor Kamensky <kamensky@cisco.com>
+Date: Tue, 20 Mar 2018 12:41:05 -0500
+Subject: [PATCH] _stp_umodule_relocate needs target file path, not host file
+ path
+
+Strip of sysroot from module name is required when _stp_umodule_relocate
+call is generated. Otherwise path won't match path on target and could
+will fail to calculated address within the file.
+
+Upstream-Status: Backport
+Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+---
+ loc2stap.cxx | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/loc2stap.cxx b/loc2stap.cxx
+index 4818ee0..e09954f 100644
+--- a/loc2stap.cxx
++++ b/loc2stap.cxx
+@@ -17,6 +17,7 @@
+ 
+ #include "loc2stap.h"
+ #include "dwflpp.h"
++#include "tapsets.h"
+ 
+ #if ! _ELFUTILS_PREREQ(0, 153)
+ #define DW_OP_GNU_entry_value 0xf3
+@@ -106,7 +107,9 @@ location_context::translate_address(Dwarf_Addr addr)
+           c = "/* pragma:vma */ "
+               "({ unsigned long addr = 0; "
+               "addr = _stp_umodule_relocate (\""
+-              + resolve_path(dw->module_name.c_str()) + "\", "
++              + path_remove_sysroot(dw->sess,
++				    resolve_path(dw->module_name.c_str()))
++	      + "\", "
+               + lex_cast_hex (addr)
+ 	      + ", current); addr; })";
+ 	}

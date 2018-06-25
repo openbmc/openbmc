@@ -28,15 +28,44 @@
 #Error checking is kept to minimum so double check any parameters you pass to the class
 ###########################################################################################
 
-BB_HASHBASE_WHITELIST += "ICECC_PARALLEL_MAKE ICECC_DISABLED ICECC_USER_PACKAGE_BL ICECC_USER_CLASS_BL ICECC_USER_PACKAGE_WL ICECC_PATH ICECC_ENV_EXEC"
+BB_HASHBASE_WHITELIST += "ICECC_PARALLEL_MAKE ICECC_DISABLED ICECC_USER_PACKAGE_BL \
+    ICECC_USER_CLASS_BL ICECC_USER_PACKAGE_WL ICECC_PATH ICECC_ENV_EXEC \
+    ICECC_CARET_WORKAROUND ICECC_CFLAGS ICECC_ENV_VERSION \
+    ICECC_DEBUG ICECC_LOGFILE ICECC_REPEAT_RATE ICECC_PREFERRED_HOST \
+    ICECC_CLANG_REMOTE_CPP ICECC_IGNORE_UNVERIFIED ICECC_TEST_SOCKET \
+    ICECC_ENV_DEBUG \
+    "
 
 ICECC_ENV_EXEC ?= "${STAGING_BINDIR_NATIVE}/icecc-create-env"
+
+# This version can be incremented when changes are made to the environment that
+# invalidate the version on the compile nodes. Changing it will cause a new
+# environment to be created.
+#
+# A useful thing to do for testing Icecream changes locally is to add a
+# subversion in local.conf:
+#  ICECC_ENV_VERSION_append = "-my-ver-1"
+ICECC_ENV_VERSION = "2"
+
+# Default to disabling the caret workaround, If set to "1" in local.conf, icecc
+# will locally recompile any files that have warnings, which can adversely
+# affect performance.
+#
+# See: https://github.com/icecc/icecream/issues/190
+export ICECC_CARET_WORKAROUND ??= "0"
+
+ICECC_CFLAGS = ""
+CFLAGS += "${ICECC_CFLAGS}"
+CXXFLAGS += "${ICECC_CFLAGS}"
+
+# Debug flags when generating environments
+ICECC_ENV_DEBUG ??= ""
 
 def icecc_dep_prepend(d):
     # INHIBIT_DEFAULT_DEPS doesn't apply to the patch command.  Whether or  not
     # we need that built is the responsibility of the patch function / class, not
     # the application.
-    if not d.getVar('INHIBIT_DEFAULT_DEPS', False):
+    if not d.getVar('INHIBIT_DEFAULT_DEPS'):
         return "icecc-create-env-native"
     return ""
 
@@ -44,21 +73,20 @@ DEPENDS_prepend += "${@icecc_dep_prepend(d)} "
 
 get_cross_kernel_cc[vardepsexclude] += "KERNEL_CC"
 def get_cross_kernel_cc(bb,d):
-    kernel_cc = d.getVar('KERNEL_CC', False)
+    kernel_cc = d.getVar('KERNEL_CC')
 
     # evaluate the expression by the shell if necessary
     if '`' in kernel_cc or '$(' in kernel_cc:
         import subprocess
         kernel_cc = subprocess.check_output("echo %s" % kernel_cc, shell=True).decode("utf-8")[:-1]
 
-    kernel_cc = d.expand(kernel_cc)
     kernel_cc = kernel_cc.replace('ccache', '').strip()
     kernel_cc = kernel_cc.split(' ')[0]
     kernel_cc = kernel_cc.strip()
     return kernel_cc
 
 def get_icecc(d):
-    return d.getVar('ICECC_PATH', False) or bb.utils.which(os.getenv("PATH"), "icecc")
+    return d.getVar('ICECC_PATH') or bb.utils.which(os.getenv("PATH"), "icecc")
 
 def create_path(compilers, bb, d):
     """
@@ -93,7 +121,7 @@ def create_path(compilers, bb, d):
     return staging
 
 def use_icecc(bb,d):
-    if d.getVar('ICECC_DISABLED', False) == "1":
+    if d.getVar('ICECC_DISABLED') == "1":
         # don't even try it, when explicitly disabled
         return "no"
 
@@ -101,10 +129,13 @@ def use_icecc(bb,d):
     if icecc_is_allarch(bb, d):
         return "no"
 
+    if icecc_is_cross_canadian(bb, d):
+        return "no"
+
     pn = d.getVar('PN')
 
     system_class_blacklist = []
-    user_class_blacklist = (d.getVar('ICECC_USER_CLASS_BL', False) or "none").split()
+    user_class_blacklist = (d.getVar('ICECC_USER_CLASS_BL') or "none").split()
     package_class_blacklist = system_class_blacklist + user_class_blacklist
 
     for black in package_class_blacklist:
@@ -121,8 +152,8 @@ def use_icecc(bb,d):
     # e.g. when there is new version
     # building libgcc-initial with icecc fails with CPP sanity check error if host sysroot contains cross gcc built for another target tune/variant
     system_package_blacklist = ["libgcc-initial"]
-    user_package_blacklist = (d.getVar('ICECC_USER_PACKAGE_BL', False) or "").split()
-    user_package_whitelist = (d.getVar('ICECC_USER_PACKAGE_WL', False) or "").split()
+    user_package_blacklist = (d.getVar('ICECC_USER_PACKAGE_BL') or "").split()
+    user_package_whitelist = (d.getVar('ICECC_USER_PACKAGE_WL') or "").split()
     package_blacklist = system_package_blacklist + user_package_blacklist
 
     if pn in package_blacklist:
@@ -133,7 +164,7 @@ def use_icecc(bb,d):
         bb.debug(1, "%s: found in whitelist, enable icecc" % pn)
         return "yes"
 
-    if d.getVar('PARALLEL_MAKE', False) == "":
+    if d.getVar('PARALLEL_MAKE') == "":
         bb.debug(1, "%s: has empty PARALLEL_MAKE, disable icecc" % pn)
         return "no"
 
@@ -151,15 +182,26 @@ def icecc_is_native(bb, d):
         bb.data.inherits_class("cross", d) or \
         bb.data.inherits_class("native", d);
 
+def icecc_is_cross_canadian(bb, d):
+    return bb.data.inherits_class("cross-canadian", d)
+
+def icecc_dir(bb, d):
+    return d.expand('${TMPDIR}/work-shared/ice')
+
 # Don't pollute allarch signatures with TARGET_FPU
 icecc_version[vardepsexclude] += "TARGET_FPU"
 def icecc_version(bb, d):
     if use_icecc(bb, d) == "no":
         return ""
 
-    parallel = d.getVar('ICECC_PARALLEL_MAKE', False) or ""
-    if not d.getVar('PARALLEL_MAKE', False) == "" and parallel:
+    parallel = d.getVar('ICECC_PARALLEL_MAKE') or ""
+    if not d.getVar('PARALLEL_MAKE') == "" and parallel:
         d.setVar("PARALLEL_MAKE", parallel)
+
+    # Disable showing the caret in the GCC compiler output if the workaround is
+    # disabled
+    if d.getVar('ICECC_CARET_WORKAROUND') == '0':
+        d.setVar('ICECC_CFLAGS', '-fno-diagnostics-show-caret')
 
     if icecc_is_native(bb, d):
         archive_name = "local-host-env"
@@ -169,14 +211,18 @@ def icecc_version(bb, d):
         prefix = d.expand('${HOST_PREFIX}' )
         distro = d.expand('${DISTRO}')
         target_sys = d.expand('${TARGET_SYS}')
-        float = d.getVar('TARGET_FPU', False) or "hard"
+        float = d.getVar('TARGET_FPU') or "hard"
         archive_name = prefix + distro + "-"        + target_sys + "-" + float
         if icecc_is_kernel(bb, d):
             archive_name += "-kernel"
 
     import socket
-    ice_dir = d.expand('${STAGING_DIR_NATIVE}${prefix_native}')
-    tar_file = os.path.join(ice_dir, 'ice', archive_name + "-@VERSION@-" + socket.gethostname() + '.tar.gz')
+    ice_dir = icecc_dir(bb, d)
+    tar_file = os.path.join(ice_dir, "{archive}-{version}-@VERSION@-{hostname}.tar.gz".format(
+        archive=archive_name,
+        version=d.getVar('ICECC_ENV_VERSION'),
+        hostname=socket.gethostname()
+        ))
 
     return tar_file
 
@@ -197,25 +243,42 @@ def icecc_get_external_tool(bb, d, tool):
     target_prefix = d.expand('${TARGET_PREFIX}')
     return os.path.join(external_toolchain_bindir, '%s%s' % (target_prefix, tool))
 
+def icecc_get_tool_link(tool, d):
+    import subprocess
+    return subprocess.check_output("readlink -f %s" % tool, shell=True).decode("utf-8")[:-1]
+
+def icecc_get_path_tool(tool, d):
+    # This is a little ugly, but we want to make sure we add an actual
+    # compiler to the toolchain, not ccache. Some distros (e.g. Fedora)
+    # have ccache enabled by default using symlinks PATH, meaning ccache
+    # would be found first when looking for the compiler.
+    paths = os.getenv("PATH").split(':')
+    while True:
+        p, hist = bb.utils.which(':'.join(paths), tool, history=True)
+        if not p or os.path.basename(icecc_get_tool_link(p, d)) != 'ccache':
+            return p
+        paths = paths[len(hist):]
+
+    return ""
+
 # Don't pollute native signatures with target TUNE_PKGARCH through STAGING_BINDIR_TOOLCHAIN
 icecc_get_tool[vardepsexclude] += "STAGING_BINDIR_TOOLCHAIN"
 def icecc_get_tool(bb, d, tool):
     if icecc_is_native(bb, d):
-        return bb.utils.which(os.getenv("PATH"), tool)
+        return icecc_get_path_tool(tool, d)
     elif icecc_is_kernel(bb, d):
-        return bb.utils.which(os.getenv("PATH"), get_cross_kernel_cc(bb, d))
+        return icecc_get_path_tool(get_cross_kernel_cc(bb, d), d)
     else:
         ice_dir = d.expand('${STAGING_BINDIR_TOOLCHAIN}')
         target_sys = d.expand('${TARGET_SYS}')
-        tool_bin = os.path.join(ice_dir, "%s-%s" % (target_sys, tool))
-        if os.path.isfile(tool_bin):
-            return tool_bin
-        else:
-            external_tool_bin = icecc_get_external_tool(bb, d, tool)
-            if os.path.isfile(external_tool_bin):
-                return external_tool_bin
-            else:
-                return ""
+        for p in ice_dir.split(':'):
+            tool_bin = os.path.join(p, "%s-%s" % (target_sys, tool))
+            if os.path.isfile(tool_bin):
+                return tool_bin
+        external_tool_bin = icecc_get_external_tool(bb, d, tool)
+        if os.path.isfile(external_tool_bin):
+            return external_tool_bin
+        return ""
 
 def icecc_get_and_check_tool(bb, d, tool):
     # Check that g++ or gcc is not a symbolic link to icecc binary in
@@ -223,8 +286,7 @@ def icecc_get_and_check_tool(bb, d, tool):
     # compiler environment package.
     t = icecc_get_tool(bb, d, tool)
     if t:
-        import subprocess
-        link_path = subprocess.check_output("readlink -f %s" % t, shell=True).decode("utf-8")[:-1]
+        link_path = icecc_get_tool_link(tool, d)
         if link_path == get_icecc(d):
             bb.error("%s is a symlink to %s in PATH and this prevents icecc from working" % (t, get_icecc(d)))
             return ""
@@ -305,7 +367,7 @@ set_icecc_env() {
         # the ICECC_VERSION generation step must be locked by a mutex
         # in order to prevent race conditions
         if flock -n "${ICECC_VERSION}.lock" \
-            ${ICECC_ENV_EXEC} "${ICECC_CC}" "${ICECC_CXX}" "${ICECC_AS}" "${ICECC_VERSION}"
+            ${ICECC_ENV_EXEC} ${ICECC_ENV_DEBUG} "${ICECC_CC}" "${ICECC_CXX}" "${ICECC_AS}" "${ICECC_VERSION}"
         then
             touch "${ICECC_VERSION}.done"
         elif [ ! wait_for_file "${ICECC_VERSION}.done" 30 ]
@@ -316,9 +378,13 @@ set_icecc_env() {
         fi
     fi
 
+    # Don't let ccache find the icecream compiler links that have been created, otherwise
+    # it can end up invoking icecream recursively.
+    export CCACHE_PATH="$PATH"
+    export CCACHE_DISBALE="1"
+
     export ICECC_VERSION ICECC_CC ICECC_CXX
     export PATH="$ICE_PATH:$PATH"
-    export CCACHE_PATH="$PATH"
 
     bbnote "Using icecc"
 }
@@ -338,3 +404,13 @@ do_compile_kernelmodules_prepend() {
 do_install_prepend() {
     set_icecc_env
 }
+
+# IceCream is not (currently) supported in the extensible SDK
+ICECC_SDK_HOST_TASK = "nativesdk-icecc-toolchain"
+ICECC_SDK_HOST_TASK_task-populate-sdk-ext = ""
+
+# Don't include IceCream in uninative tarball
+ICECC_SDK_HOST_TASK_pn-uninative-tarball = ""
+
+# Add the toolchain scripts to the SDK
+TOOLCHAIN_HOST_TASK_append = " ${ICECC_SDK_HOST_TASK}"

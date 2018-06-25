@@ -13,6 +13,7 @@ TOOLCHAIN_HOST_TASK = "\
     nativesdk-glibc-gconv-utf-16 \
     nativesdk-glibc-gconv-cp1252 \
     nativesdk-patchelf \
+    nativesdk-libxcrypt \
     "
 
 INHIBIT_DEFAULT_DEPS = "1"

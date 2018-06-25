@@ -1,7 +1,7 @@
 SUMMARY = "System and process monitoring utilities"
 DESCRIPTION = "Procps contains a set of system utilities that provide system information about processes using \
 the /proc filesystem. The package includes the programs ps, top, vmstat, w, kill, and skill."
-HOMEPAGE = "https://gitorious.org/procps"
+HOMEPAGE = "https://gitlab.com/procps-ng/procps"
 SECTION = "base"
 LICENSE = "GPLv2+ & LGPLv2+"
 LIC_FILES_CHKSUM="file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
@@ -23,8 +23,6 @@ S = "${WORKDIR}/procps-ng-${PV}"
 
 EXTRA_OECONF = "--enable-skill --disable-modern-top"
 
-CPPFLAGS += "-I${S}"
-
 do_install_append () {
 	install -d ${D}${base_bindir}
 	[ "${bindir}" != "${base_bindir}" ] && for i in ${base_bindir_progs}; do mv ${D}${bindir}/$i ${D}${base_bindir}/$i; done
@@ -44,7 +42,7 @@ do_install_append () {
 
 CONFFILES_${PN} = "${sysconfdir}/sysctl.conf"
 
-bindir_progs = "free pkill pmap pgrep pwdx skill snice top uptime"
+bindir_progs = "free pkill pmap pgrep pwdx skill snice top uptime w"
 base_bindir_progs += "kill pidof ps watch"
 base_sbindir_progs += "sysctl"
 

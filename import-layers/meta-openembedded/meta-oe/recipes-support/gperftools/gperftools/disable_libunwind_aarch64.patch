@@ -1,15 +1,22 @@
-Disable libunwind on aarch64
+From 564f800e3e24647c095f7a321bf3ebdccfbf762d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 2 Sep 2017 12:02:04 -0700
+Subject: [PATCH] Disable libunwind on aarch64
 
 Fixes hangs when using libtcmalloc.so
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-Index: git/configure.ac
-===================================================================
---- git.orig/configure.ac
-+++ git/configure.ac
-@@ -69,6 +69,11 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(, [re
+---
+ configure.ac | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 8154c5c..063b260 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -69,6 +69,11 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(, [return __PPC64__])],
                    [default_enable_libunwind=yes
                     default_tcmalloc_pagesize=8])
  

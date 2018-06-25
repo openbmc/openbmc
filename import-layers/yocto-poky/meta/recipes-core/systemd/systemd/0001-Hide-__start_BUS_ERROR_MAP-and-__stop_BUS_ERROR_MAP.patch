@@ -1,0 +1,34 @@
+From 687a5af8dc5d38f918a6ce08fed5297234bf8346 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Mar 2018 18:00:17 -0800
+Subject: [PATCH] Hide __start_BUS_ERROR_MAP and __stop_BUS_ERROR_MAP
+
+for currently unknown reasons they get exported to the shared libries
+even without being listed in the sym file
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+
+Upstream-Status: Pending [ Conditional on master needing this, 234 does need it ]
+
+ src/libsystemd/sd-bus/bus-error.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libsystemd/sd-bus/bus-error.c b/src/libsystemd/sd-bus/bus-error.c
+index 378f7a377..49d797abd 100644
+--- a/src/libsystemd/sd-bus/bus-error.c
++++ b/src/libsystemd/sd-bus/bus-error.c
+@@ -71,8 +71,8 @@ BUS_ERROR_MAP_ELF_REGISTER const sd_bus_error_map bus_standard_errors[] = {
+ };
+ 
+ /* GCC maps this magically to the beginning and end of the BUS_ERROR_MAP section */
+-extern const sd_bus_error_map __start_BUS_ERROR_MAP[];
+-extern const sd_bus_error_map __stop_BUS_ERROR_MAP[];
++extern const sd_bus_error_map __start_BUS_ERROR_MAP[] _hidden_;
++extern const sd_bus_error_map __stop_BUS_ERROR_MAP[] _hidden_;
+ 
+ /* Additional maps registered with sd_bus_error_add_map() are in this
+  * NULL terminated array */
+-- 
+2.16.2
+

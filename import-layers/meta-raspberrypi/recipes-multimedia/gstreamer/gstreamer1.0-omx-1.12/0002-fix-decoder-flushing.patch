@@ -1,8 +1,16 @@
+From fc4773f36aa31b4ae0fc97d3aa3f94db0c88f194 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 11 Feb 2016 12:53:20 -0800
+
+---
+ omx/gstomx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/omx/gstomx.c b/omx/gstomx.c
-index 69696c4..c382019 100644
+index 0237f3c..45732c3 100644
 --- a/omx/gstomx.c
 +++ b/omx/gstomx.c
-@@ -1508,8 +1508,8 @@ gst_omx_port_set_flushing (GstOMXPort * port, GstClockTime timeout,
+@@ -1538,8 +1538,8 @@ gst_omx_port_set_flushing (GstOMXPort * port, GstClockTime timeout,
      last_error = OMX_ErrorNone;
      gst_omx_component_handle_messages (comp);
      while (signalled && last_error == OMX_ErrorNone && !port->flushed
@@ -13,4 +21,3 @@ index 69696c4..c382019 100644
        signalled = gst_omx_component_wait_message (comp, timeout);
        if (signalled)
          gst_omx_component_handle_messages (comp);
-

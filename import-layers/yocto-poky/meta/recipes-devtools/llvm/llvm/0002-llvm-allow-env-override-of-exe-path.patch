@@ -1,4 +1,4 @@
-From d776487bac17650704614248d19d1e6b35775001 Mon Sep 17 00:00:00 2001
+From 2f8ea767afdaa440c6368040630e1b3ea6a0977a Mon Sep 17 00:00:00 2001
 From: Martin Kelly <mkelly@xevo.com>
 Date: Fri, 19 May 2017 00:22:57 -0700
 Subject: [PATCH 2/2] llvm: allow env override of exe path
@@ -35,5 +35,5 @@ index 08b096afb05..d8d7742744e 100644
    // allow taking the address of ::main however.
    void *P = (void *)(intptr_t)GetExecutablePath;
 -- 
-2.13.1
+2.16.1
 

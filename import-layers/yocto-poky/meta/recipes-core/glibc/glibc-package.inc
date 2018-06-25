@@ -66,7 +66,7 @@ do_install_append () {
 		rmdir --ignore-fail-on-non-empty ${D}${libexecdir}
 	fi
 
-	oe_multilib_header bits/syscall.h bits/long-double.h
+	oe_multilib_header bits/syscall.h bits/long-double.h bits/floatn.h
 
 	if [ -f ${D}${bindir}/mtrace ]; then
 		sed -i -e '1s,#!.*perl,#! ${USRBINPATH}/env perl,' -e '2s,exec.*perl,exec ${USRBINPATH}/env perl,' ${D}${bindir}/mtrace
@@ -97,6 +97,7 @@ do_install_append () {
 	install -m 0755 ${S}/nscd/nscd.init ${D}${sysconfdir}/init.d/nscd
 	install -m 0755 ${S}/nscd/nscd.conf ${D}${sysconfdir}/nscd.conf
 	sed -i "s%daemon%start-stop-daemon --start --exec%g" ${D}${sysconfdir}/init.d/nscd
+	sed -i "s|\(enable-cache\t\+netgroup\t\+\)yes|\1no|" ${D}${sysconfdir}/nscd.conf
 
 	install -d ${D}${systemd_unitdir}/system
 	install -m 0644 ${S}/nscd/nscd.service ${D}${systemd_unitdir}/system/
@@ -117,10 +118,10 @@ do_install_append_aarch64 () {
 		# The aarch64 ABI says the dynamic linker -must- be /lib/ld-linux-aarch64[_be].so.1
 		install -d ${D}${nonarch_base_libdir}
 		if [ -e ${D}${base_libdir}/ld-linux-aarch64.so.1 ]; then
-			ln -s ${@base_path_relative('${nonarch_base_libdir}', '${base_libdir}')}/ld-linux-aarch64.so.1 \
+			ln -s ${@oe.path.relative('${nonarch_base_libdir}', '${base_libdir}')}/ld-linux-aarch64.so.1 \
 				${D}${nonarch_base_libdir}/ld-linux-aarch64.so.1
 		elif [ -e ${D}${base_libdir}/ld-linux-aarch64_be.so.1 ]; then
-			ln -s ${@base_path_relative('${nonarch_base_libdir}', '${base_libdir}')}/ld-linux-aarch64_be.so.1 \
+			ln -s ${@oe.path.relative('${nonarch_base_libdir}', '${base_libdir}')}/ld-linux-aarch64_be.so.1 \
 				${D}${nonarch_base_libdir}/ld-linux-aarch64_be.so.1
 		fi
 	fi
@@ -206,8 +207,11 @@ do_poststash_install_cleanup () {
 	rm -rf ${D}/${localedir}
 	rm -rf ${D}${datadir}/locale
 	if [ "${libdir}" != "${exec_prefix}/lib" ]; then
-		# This dir only exists to hold locales
-		rm -rf ${D}${exec_prefix}/lib
+		if [ -d ${D}${exec_prefix}/lib/locale ] ; then
+			rm -rf ${D}${exec_prefix}/lib/locale
+			# error out if directory isn't empty
+			rm -f ${D}${exec_prefix}/lib
+		fi
 	fi
 }
 addtask do_poststash_install_cleanup after do_stash_locale do_install before do_populate_sysroot do_package

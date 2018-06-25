@@ -1,0 +1,32 @@
+From 00debe6bd4cf5a3133a8fbaab75f7447a39fa655 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 12 Apr 2018 01:54:15 +0000
+Subject: [PATCH] team_basic_test.py: disable RedHat specific test
+
+The test _run_teamd_initscripts() is for RedHat ifcfg scripts which are
+incompatible with OE:
+  /etc/sysconfig/network-scripts/ifcfg-*
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ scripts/team_basic_test.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/team_basic_test.py b/scripts/team_basic_test.py
+index b05be9e..faabd18 100755
+--- a/scripts/team_basic_test.py
++++ b/scripts/team_basic_test.py
+@@ -171,7 +171,7 @@ TEAM_PORT_CONFIG='{"prio": 10}'
+         try:
+             for mode_name in self._team_modes:
+                 self._run_one_mode(mode_name)
+-            self._run_teamd_initscripts()
++            #self._run_teamd_initscripts()
+         finally:
+             cmd_exec("modprobe -r team_mode_loadbalance team_mode_roundrobin team_mode_activebackup team_mode_broadcast team");
+ 
+-- 
+2.13.3
+

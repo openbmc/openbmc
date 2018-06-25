@@ -1,0 +1,77 @@
+From b3b4fe35018c98ad176719b2d9ffb867974fc7c3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 16 Apr 2018 14:45:44 +0200
+Subject: [PATCH] musl: avoid further conflicts by including net/ethernet.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ src/systemd/src/systemd/sd-dhcp-client.h  | 2 ++
+ src/systemd/src/systemd/sd-dhcp-lease.h   | 2 ++
+ src/systemd/src/systemd/sd-dhcp6-client.h | 2 ++
+ src/systemd/src/systemd/sd-ipv4ll.h       | 2 ++
+ 4 files changed, 8 insertions(+)
+
+diff --git a/src/systemd/src/systemd/sd-dhcp-client.h b/src/systemd/src/systemd/sd-dhcp-client.h
+index 5e46d8d..18a613f 100644
+--- a/src/systemd/src/systemd/sd-dhcp-client.h
++++ b/src/systemd/src/systemd/sd-dhcp-client.h
+@@ -21,7 +21,9 @@
+ ***/
+ 
+ #include <inttypes.h>
++#if defined(__GLIBC__)
+ #include <net/ethernet.h>
++#endif
+ #include <netinet/in.h>
+ #include <sys/types.h>
+ 
+diff --git a/src/systemd/src/systemd/sd-dhcp-lease.h b/src/systemd/src/systemd/sd-dhcp-lease.h
+index 7ab99cc..85acdf2 100644
+--- a/src/systemd/src/systemd/sd-dhcp-lease.h
++++ b/src/systemd/src/systemd/sd-dhcp-lease.h
+@@ -22,7 +22,9 @@
+ ***/
+ 
+ #include <inttypes.h>
++#if defined(__GLIBC__)
+ #include <net/ethernet.h>
++#endif
+ #include <netinet/in.h>
+ #include <sys/types.h>
+ 
+diff --git a/src/systemd/src/systemd/sd-dhcp6-client.h b/src/systemd/src/systemd/sd-dhcp6-client.h
+index 7819f0d..35f30ee 100644
+--- a/src/systemd/src/systemd/sd-dhcp6-client.h
++++ b/src/systemd/src/systemd/sd-dhcp6-client.h
+@@ -21,7 +21,9 @@
+ ***/
+ 
+ #include <inttypes.h>
++#if defined(__GLIBC__)
+ #include <net/ethernet.h>
++#endif
+ #include <sys/types.h>
+ 
+ #include "sd-dhcp6-lease.h"
+diff --git a/src/systemd/src/systemd/sd-ipv4ll.h b/src/systemd/src/systemd/sd-ipv4ll.h
+index 5ba9208..c90eca6 100644
+--- a/src/systemd/src/systemd/sd-ipv4ll.h
++++ b/src/systemd/src/systemd/sd-ipv4ll.h
+@@ -20,7 +20,9 @@
+   along with systemd; If not, see <http://www.gnu.org/licenses/>.
+ ***/
+ 
++#if defined(__GLIBC__)
+ #include <net/ethernet.h>
++#endif
+ #include <netinet/in.h>
+ 
+ #include "sd-event.h"
+-- 
+2.14.3
+

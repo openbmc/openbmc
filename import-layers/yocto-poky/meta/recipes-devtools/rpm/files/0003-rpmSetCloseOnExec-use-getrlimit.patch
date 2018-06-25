@@ -1,0 +1,53 @@
+From 307e28b4cb08b05bc044482058eeebc9f59bb9a9 Mon Sep 17 00:00:00 2001
+From: Kir Kolyshkin <kolyshkin@gmail.com>
+Date: Tue, 29 May 2018 18:09:27 -0700
+Subject: [PATCH 3/3] rpmSetCloseOnExec: use getrlimit()
+
+In case /proc is not available to get the actual list of opened fds,
+we fall back to iterating through the list of all possible fds.
+
+It is possible that during the course of the program execution the limit
+on number of open file descriptors might be lowered, so using the
+current limit, as returned by sysconf(_SC_OPEN_MAX), might omit some
+fds. Therefore, it is better to use rlim_max from the structure
+filled in by gertlimit(RLIMIT_NOFILE) to make sure we're checking
+all fds.
+
+This slows down the function, but only in the case /proc is not
+available, which should be rare in practice.
+
+Signed-off-by: Kir Kolyshkin <kolyshkin@gmail.com>
+Upstream-Status: Accepted [https://github.com/rpm-software-management/rpm/pull/444]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ rpmio/rpmio.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/rpmio/rpmio.c b/rpmio/rpmio.c
+index 55351c221..e051c9863 100644
+--- a/rpmio/rpmio.c
++++ b/rpmio/rpmio.c
+@@ -10,6 +10,7 @@
+ #include <sys/personality.h>
+ #endif
+ #include <sys/utsname.h>
++#include <sys/resource.h>
+ 
+ #include <rpm/rpmlog.h>
+ #include <rpm/rpmmacro.h>
+@@ -1778,7 +1779,14 @@ void rpmSetCloseOnExec(void)
+ 	DIR *dir = opendir("/proc/self/fd");
+ 	if (dir == NULL) { /* /proc not available */
+ 		/* iterate over all possible fds, might be slow */
+-		int open_max = sysconf(_SC_OPEN_MAX);
++		struct rlimit rl;
++		int open_max;
++
++		if (getrlimit(RLIMIT_NOFILE, &rl) == 0 && rl.rlim_max != RLIM_INFINITY)
++			open_max = rl.rlim_max;
++		else
++			open_max = sysconf(_SC_OPEN_MAX);
++
+ 		if (open_max == -1)
+ 			open_max = 1024;
+ 

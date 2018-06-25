@@ -161,9 +161,9 @@
                     protocols support.
                     <note>
                         The default value for the
-                        <link linkend='var-DISTRO_FEATURES'><filename>DISTRO FEATURES</filename></link>
-                        variable includes "bluetooth", which causes bluez5
-                        to be backfilled in for bluetooth support.
+                        <filename>DISTRO FEATURES</filename> variable includes
+                        "bluetooth", which causes bluez5 to be backfilled in
+                        for bluetooth support.
                         If you do not want bluez5 backfilled and would rather
                         use bluez4, you need to use the
                         <link linkend='var-DISTRO_FEATURES_BACKFILL_CONSIDERED'><filename>DISTRO_FEATURES_BACKFILL_CONSIDERED</filename></link>

@@ -1,7 +1,7 @@
 SUMMARY = "Qemu helper scripts"
 LICENSE = "GPLv2"
-RDEPENDS_${PN} = "nativesdk-qemu nativesdk-python3-subprocess \
-                  nativesdk-python3-shell nativesdk-python3-fcntl \
+RDEPENDS_${PN} = "nativesdk-qemu \
+                  nativesdk-python3-shell nativesdk-python3-fcntl nativesdk-python3-logging \
                 "
 
 PR = "r9"

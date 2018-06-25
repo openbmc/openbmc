@@ -8,13 +8,16 @@ export GOOS = "${TARGET_GOOS}"
 export GOARCH = "${TARGET_GOARCH}"
 export GOARM = "${TARGET_GOARM}"
 export GO386 = "${TARGET_GO386}"
+export GOMIPS = "${TARGET_GOMIPS}"
 export GOROOT_BOOTSTRAP = "${STAGING_LIBDIR_NATIVE}/go"
 export GOROOT_FINAL = "${libdir}/go"
-export GO_TARGET_INSTALL = "std"
-export CGO_ENABLED = "1"
-export CC_FOR_TARGET="${CC}"
-export CXX_FOR_TARGET="${CXX}"
-export GOROOT_OVERRIDE = "1"
+export CGO_CFLAGS = "${CFLAGS}"
+export CGO_CPPFLAGS = "${CPPFLAGS}"
+export CGO_CXXFLAGS = "${CXXFLAGS}"
+export CGO_LDFLAGS = "${LDFLAGS}"
+
+GO_EXTLDFLAGS ?= "${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS} ${LDFLAGS}"
+GO_SHLIB_LDFLAGS ?= '-ldflags="--linkmode=external -extldflags '${GO_EXTLDFLAGS}'"'
 
 do_configure() {
 	:
@@ -25,21 +28,20 @@ do_configure_libc-musl() {
 }
 
 do_compile() {
-	export GOBIN="${B}/bin"
-	export CC="${@d.getVar('BUILD_CC').strip()}"
-	rm -rf ${GOBIN} ${B}/pkg
-	mkdir ${GOBIN}
+	export CC_FOR_${TARGET_GOOS}_${TARGET_GOARCH}="${CC}"
+	export CXX_FOR_${TARGET_GOOS}_${TARGET_GOARCH}="${CXX}"
+
 	cd src
-	./make.bash --host-only
-	cp ${B}/pkg/tool/${BUILD_GOTUPLE}/go_bootstrap ${B}
-	rm -rf ${B}/pkg/${TARGET_GOTUPLE}
-	./make.bash --target-only
+	./make.bash --target-only --no-banner std
 	if [ -n "${GO_DYNLINK}" ]; then
-		cp ${B}/go_bootstrap ${B}/pkg/tool/${BUILD_GOTUPLE}
-		GO_FLAGS="-buildmode=shared" GO_LDFLAGS="-extldflags \"${LDFLAGS}\"" ./make.bash --target-only
+		export GOTOOLDIR="${B}/pkg/tool/native_native"
+		CC="$CC_FOR_${TARGET_GOOS}_${TARGET_GOARCH}" GOARCH="${TARGET_GOARCH}" GOOS="${TARGET_GOOS}" GOROOT=${B} \
+			$GOTOOLDIR/go_bootstrap install -linkshared -buildmode=shared ${GO_SHLIB_LDFLAGS} std
 	fi
 	cd ${B}
 }
+do_compile[dirs] =+ "${GOTMPDIR} ${B}/bin ${B}/pkg"
+do_compile[cleandirs] += "${GOTMPDIR} ${B}/bin ${B}/pkg"
 
 do_install() {
 	install -d ${D}${libdir}/go/src
@@ -54,18 +56,8 @@ do_install() {
 	find src -mindepth 1 -maxdepth 1 -type d | while read srcdir; do
 		cp --preserve=mode,timestamps -R $srcdir ${D}${libdir}/go/src/
 	done
+	find ${D}${libdir}/go/src -depth -type d -name testdata -exec rm -rf {} \;
 	rm -f ${D}${libdir}/go/src/cmd/dist/dist
-}
-
-# Remove test binaries that cannot be relocated
-do_install_append_class-nativesdk() {
-	rm -rf ${D}${libdir}/go/src/runtime/pprof/testdata
-}
-
-# These testdata directories aren't needed for builds and contain binaries
-# that can cause errors in sysroot_strip(), so just remove them.
-sysroot_stage_all_append() {
-	find ${SYSROOT_DESTDIR}${libdir}/go/src -depth -type d -name 'testdata' -exec rm -rf {} \;
 }
 
 ALLOW_EMPTY_${PN} = "1"
@@ -78,8 +70,6 @@ FILES_${PN}-dev = "${libdir}/go/src ${libdir}/go/pkg/include \
                    ${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink/*/*/*/*/*.shlibname \
                    ${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink/*/*/*/*/*/*.shlibname \
                    ${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink/*/*/*/*/*/*/*.shlibname \
-"
-FILES_${PN}-staticdev = "${libdir}/go/pkg/${TARGET_GOTUPLE} \
                    ${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink/*.a \
                    ${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink/*/*.a \
                    ${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink/*/*/*.a \
@@ -88,11 +78,15 @@ FILES_${PN}-staticdev = "${libdir}/go/pkg/${TARGET_GOTUPLE} \
                    ${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink/*/*/*/*/*/*.a \
                    ${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink/*/*/*/*/*/*/*.a \
 "
-# The testdata directories in the source tree include some binaries for various
-# architectures, scripts, and .a files
-INSANE_SKIP_${PN}-dev = "staticdev ldflags file-rdeps arch"
+FILES_${PN}-staticdev = "${libdir}/go/pkg/${TARGET_GOTUPLE}"
+
+# Go sources include some scripts and pre-built binaries for
+# multiple architectures.  The static .a files for dynamically-linked
+# runtime are also required in -dev.
+INSANE_SKIP_${PN}-dev = "staticdev file-rdeps arch"
 
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+INHIBIT_SYSROOT_STRIP = "1"
 
 BBCLASSEXTEND = "nativesdk"

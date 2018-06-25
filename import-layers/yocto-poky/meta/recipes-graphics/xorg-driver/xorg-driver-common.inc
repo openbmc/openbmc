@@ -38,3 +38,5 @@ def _add_xorg_abi_depends(d, name):
 
     pn = d.getVar("PN")
     d.appendVar('RDEPENDS_' + pn, ' ' + abi)
+
+SECURITY_LDFLAGS = "${SECURITY_X_LDFLAGS}"

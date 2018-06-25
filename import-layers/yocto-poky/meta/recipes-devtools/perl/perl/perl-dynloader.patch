@@ -7,13 +7,13 @@ system.
 
 Update by Nitin A Kamble <nitin.a.kamble@intel.com> 2011/04/21
 
-Index: perl-5.14.2/dist/XSLoader/XSLoader_pm.PL
+Index: perl-5.24.1/dist/XSLoader/XSLoader_pm.PL
 ===================================================================
---- perl-5.14.2.orig/dist/XSLoader/XSLoader_pm.PL
-+++ perl-5.14.2/dist/XSLoader/XSLoader_pm.PL
-@@ -28,6 +28,20 @@ sub load {
- 
-     my ($module, $modlibname) = caller();
+--- perl-5.24.1.orig/dist/XSLoader/XSLoader_pm.PL
++++ perl-5.24.1/dist/XSLoader/XSLoader_pm.PL
+@@ -52,6 +52,20 @@ sub load {
+     my ($caller, $modlibname) = caller();
+     my $module = $caller;
  
 +    # OE: Allow env to form dynamic loader to look in a different place
 +    # This is so it finds the host .so files, not the targets
@@ -30,5 +30,5 @@ Index: perl-5.14.2/dist/XSLoader/XSLoader_pm.PL
 +    }
 +
      if (@_) {
- 	$module = $_[0];
+         $module = $_[0];
      } else {

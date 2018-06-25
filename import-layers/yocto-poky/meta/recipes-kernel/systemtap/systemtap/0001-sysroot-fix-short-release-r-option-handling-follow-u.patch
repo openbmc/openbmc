@@ -1,0 +1,40 @@
+From 7e11f129ff370ce5f39812ce2ae6ce40818a347f Mon Sep 17 00:00:00 2001
+From: Victor Kamensky <kamensky@cisco.com>
+Date: Thu, 22 Mar 2018 16:02:02 -0500
+Subject: [PATCH] sysroot: fix short release -r option handling follow up
+
+In case of sysroot set and short release -r option it does not make sense
+to pass short release name into dwfl_linux_kernel_report_offline
+function. This function is not aware about sysroot and it won't look for
+kernel modules under sysroot directory.
+
+Upstream-Status: Backport
+Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+---
+ setupdwfl.cxx | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/setupdwfl.cxx b/setupdwfl.cxx
+index c419afa..0cf5810 100644
+--- a/setupdwfl.cxx
++++ b/setupdwfl.cxx
+@@ -367,7 +367,15 @@ setup_dwfl_kernel (unsigned *modules_found, systemtap_session &s)
+   // hard-code this magic here.
+   string lib_path = s.sysroot + "/lib/modules/" + s.kernel_release + "/build";
+   if (s.kernel_build_tree == lib_path)
+-    elfutils_kernel_path = s.kernel_release;
++    {
++      if (s.sysroot != "")
++        // If we have sysroot set does not make sense to pass
++        // short release to dwfl, it won't take a sysroot into
++        // account. Let's construct full path in such case.
++	elfutils_kernel_path = string(s.sysroot + "/lib/modules/" + s.kernel_release);
++      else
++	elfutils_kernel_path = s.kernel_release;
++    }
+   else
+     elfutils_kernel_path = s.kernel_build_tree;
+   offline_modules_found = 0;
+-- 
+2.7.4
+

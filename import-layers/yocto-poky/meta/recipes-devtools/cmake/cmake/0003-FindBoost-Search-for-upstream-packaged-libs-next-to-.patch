@@ -1,0 +1,31 @@
+From d56deff7d127b030739bd0034609d0046121d8cd Mon Sep 17 00:00:00 2001
+From: "Paul \"TBBle\" Hampson" <Paul.Hampson@Pobox.com>
+Date: Fri, 29 Dec 2017 22:38:36 +1100
+Subject: [PATCH 3/6] FindBoost: Search for upstream-packaged libs next to
+ includes
+
+Upstream packages Boost binaries for Windows with the 'boost' directory
+(the INCLUDE_DIR) next to the lib-... directory (the LIBRARY_DIR).
+
+Affects cmake < 3.11.0
+
+Upsteam-Status: Backport
+[Yocto 12762]
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ Modules/FindBoost.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: cmake-3.10.3/Modules/FindBoost.cmake
+===================================================================
+--- cmake-3.10.3.orig/Modules/FindBoost.cmake
++++ cmake-3.10.3/Modules/FindBoost.cmake
+@@ -1502,6 +1502,7 @@ foreach(c DEBUG RELEASE)
+       ${Boost_INCLUDE_DIR}/stage/lib
+       )
+     _Boost_UPDATE_WINDOWS_LIBRARY_SEARCH_DIRS_WITH_PREBUILT_PATHS(_boost_LIBRARY_SEARCH_DIRS_${c} "${Boost_INCLUDE_DIR}/..")
++    _Boost_UPDATE_WINDOWS_LIBRARY_SEARCH_DIRS_WITH_PREBUILT_PATHS(_boost_LIBRARY_SEARCH_DIRS_${c} "${Boost_INCLUDE_DIR}")
+     if( Boost_NO_SYSTEM_PATHS )
+       list(APPEND _boost_LIBRARY_SEARCH_DIRS_${c} NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
+     else()

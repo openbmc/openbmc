@@ -1,0 +1,34 @@
+From 732913a8c35c7b25c0cbf6903cab1ad6b602b525 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 22 Mar 2018 22:44:03 -0700
+Subject: [PATCH] Ensure that packed structs follow the gcc memory layout
+
+Partial backport of
+https://sourceware.org/git/?p=elfutils.git;a=commit;h=17d7194d291bf91d130b78e06cbe27b290e0376d
+
+Helps fixing alignment errors e.g.
+linux-core-note.c:116:1: error: alignment 2 of 'struct m68k_prstatus
+' is less than 4 [-Werror=packed-not-aligned]
+ ;
+ ^
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=elfutils.git;a=commit;h=17d7194d291bf91d130b78e06cbe27b290e0376d]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ backends/linux-core-note.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/backends/linux-core-note.c b/backends/linux-core-note.c
+index 5f06c896..9faae4c3 100644
+--- a/backends/linux-core-note.c
++++ b/backends/linux-core-note.c
+@@ -111,7 +111,7 @@ struct EBLHOOK(prstatus)
+   FIELD (INT, pr_fpvalid);
+ }
+ #ifdef ALIGN_PRSTATUS
+-  __attribute__ ((packed, aligned (ALIGN_PRSTATUS)))
++  attribute_packed __attribute__ ((aligned (ALIGN_PRSTATUS)))
+ #endif
+ ;
+ 

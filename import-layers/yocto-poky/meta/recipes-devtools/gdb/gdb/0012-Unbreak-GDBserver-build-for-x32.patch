@@ -1,0 +1,101 @@
+From 3e1e401053ea5f02a9e9c65abddd31a03baa1bd1 Mon Sep 17 00:00:00 2001
+From: Yao Qi <yao.qi@linaro.org>
+Date: Fri, 29 Dec 2017 12:57:25 +0800
+Subject: [PATCH] Unbreak GDBserver build for x32
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When I verify my target description changes, I build GDB and GDBserver for
+x32, but it failed.
+
+/../../binutils-gdb/gdb/gdbserver/linux-amd64-ipa.c
+../../../binutils-gdb/gdb/gdbserver/linux-amd64-ipa.c: In function ‘const target_desc* get_ipa_tdesc(int)’:
+../../../binutils-gdb/gdb/gdbserver/linux-amd64-ipa.c:184:10: error: ‘X86_TDESC_AVX512’ was not declared in this scope
+     case X86_TDESC_AVX512:
+          ^
+../../../binutils-gdb/gdb/gdbserver/linux-amd64-ipa.c:185:14: error: ‘tdesc_x32_avx512_linux’ was not declared in this scope
+       return tdesc_x32_avx512_linux;
+              ^
+../../../binutils-gdb/gdb/gdbserver/linux-amd64-ipa.c: In function ‘void initialize_low_tracepoint()’:
+../../../binutils-gdb/gdb/gdbserver/linux-amd64-ipa.c:282:36: error: ‘init_registers_x32_avx512_linux’ was not declared in this scope
+   init_registers_x32_avx512_linux ();
+                                    ^
+
+ipa_x32_linux_regobj use to be there, but removed by
+22049425ce40324139be82d9a6ec518c46b65815 by mistake.
+
+gdb/gdbserver:
+
+2017-08-04  Yao Qi  <yao.qi@linaro.org>
+
+        * configure.srv (ipa_x32_linux_regobj): New.
+        * linux-amd64-ipa.c (get_ipa_tdesc): Use X86_TDESC_AVX_AVX512
+        instead of X86_TDESC_AVX512.
+        (initialize_low_tracepoint): Call
+        init_registers_x32_avx_avx512_linux.
+
+Upstream-Status: Backport [https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=commitdiff;h=f02fd7745d003d65fd3b981618e07b874b721d79]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ ChangeLog                       | 8 ++++++++
+ gdb/gdbserver/configure.srv     | 1 +
+ gdb/gdbserver/linux-amd64-ipa.c | 6 +++---
+ 3 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 4ac2d63..b5b8228 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,11 @@
++ 2017-08-04  Yao Qi  <yao.qi@linaro.org>
++
++	* configure.srv (ipa_x32_linux_regobj): New.
++	* linux-amd64-ipa.c (get_ipa_tdesc): Use X86_TDESC_AVX_AVX512
++	instead of X86_TDESC_AVX512.
++	(initialize_low_tracepoint): Call
++	init_registers_x32_avx_avx512_linux.
++
+ 2017-04-13  Andrew Jenner  <andrew@codesourcery.com>
+ 
+ 	* config.sub: Sync with master version in config project.
+diff --git a/gdb/gdbserver/configure.srv b/gdb/gdbserver/configure.srv
+index d00d9e2..56951c8 100644
+--- a/gdb/gdbserver/configure.srv
++++ b/gdb/gdbserver/configure.srv
+@@ -31,6 +31,7 @@ srv_amd64_linux_regobj="amd64-linux.o amd64-avx-linux.o amd64-avx-avx512-linux.o
+ 
+ ipa_i386_linux_regobj="i386-linux-ipa.o i386-avx-linux-ipa.o  i386-avx-mpx-linux-ipa.o i386-avx-avx512-linux-ipa.o i386-avx-mpx-avx512-pku-linux-ipa.o i386-mpx-linux-ipa.o i386-mmx-linux-ipa.o"
+ ipa_amd64_linux_regobj="amd64-linux-ipa.o amd64-avx-linux-ipa.o amd64-avx-mpx-linux-ipa.o amd64-avx-avx512-linux-ipa.o amd64-avx-mpx-avx512-pku-linux-ipa.o amd64-mpx-linux-ipa.o"
++ipa_x32_linux_regobj="x32-linux-ipa.o x32-avx-linux-ipa.o x32-avx-avx512-linux-ipa.o"
+ ipa_ppc_linux_regobj="powerpc-32l-ipa.o powerpc-altivec32l-ipa.o powerpc-cell32l-ipa.o powerpc-vsx32l-ipa.o powerpc-isa205-32l-ipa.o powerpc-isa205-altivec32l-ipa.o powerpc-isa205-vsx32l-ipa.o powerpc-e500l-ipa.o powerpc-64l-ipa.o powerpc-altivec64l-ipa.o powerpc-cell64l-ipa.o powerpc-vsx64l-ipa.o powerpc-isa205-64l-ipa.o powerpc-isa205-altivec64l-ipa.o powerpc-isa205-vsx64l-ipa.o"
+ 
+ srv_i386_32bit_xmlfiles="i386/32bit-core.xml i386/32bit-sse.xml i386/32bit-avx.xml i386/32bit-avx512.xml i386/32bit-mpx.xml i386/32bit-pkeys.xml"
+diff --git a/gdb/gdbserver/linux-amd64-ipa.c b/gdb/gdbserver/linux-amd64-ipa.c
+index 67f36c2..683339b 100644
+--- a/gdb/gdbserver/linux-amd64-ipa.c
++++ b/gdb/gdbserver/linux-amd64-ipa.c
+@@ -181,8 +181,8 @@ get_ipa_tdesc (int idx)
+       return tdesc_x32_linux;
+     case X86_TDESC_AVX:
+       return tdesc_x32_avx_linux;
+-    case X86_TDESC_AVX512:
+-      return tdesc_x32_avx512_linux;
++    case X86_TDESC_AVX_AVX512:
++      return tdesc_x32_avx_avx512_linux;
+     default:
+       break;
+     }
+@@ -279,7 +279,7 @@ initialize_low_tracepoint (void)
+ #if defined __ILP32__
+   init_registers_x32_linux ();
+   init_registers_x32_avx_linux ();
+-  init_registers_x32_avx512_linux ();
++  init_registers_x32_avx_avx512_linux ();
+ #else
+   init_registers_amd64_linux ();
+   init_registers_amd64_avx_linux ();
+-- 
+2.7.4
+

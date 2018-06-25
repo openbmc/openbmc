@@ -1,4 +1,7 @@
-include unistd.h to get ssize_t definitions
+From fb5056fea9559b3ec3bb61967a112b6c793b700d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Jan 2013 21:33:34 -0800
+Subject: [PATCH] include unistd.h to get ssize_t definitions
 
 Fixes errors like
 
@@ -18,15 +21,20 @@ Fixes errors like
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-Index: obexd-0.44/plugins/mas.c
-===================================================================
---- obexd-0.44.orig/plugins/mas.c	2012-01-11 14:53:53.000000000 -0800
-+++ obexd-0.44/plugins/mas.c	2013-01-08 12:51:12.681882174 -0800
-@@ -29,6 +29,7 @@
+
+---
+ plugins/mas.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plugins/mas.c b/plugins/mas.c
+index 1b18059..b519507 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -30,6 +30,7 @@
  #include <glib.h>
  #include <fcntl.h>
  #include <inttypes.h>
 +#include <unistd.h>
  
- #include "obexd.h"
- #include "plugin.h"
+ #include <gobex/gobex.h>
+ #include <gobex/gobex-apparam.h>

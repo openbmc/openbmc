@@ -1,0 +1,25 @@
+python3-native: run regen-importlib target correctly
+
+regen-importlib depends on other regen- targets, so we must be sure to
+run it after (most of) the others.  In reality, we do not need to run it
+at all since "make" will invoke it, if necessary.  We do not want to
+rely on that, though.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -709,7 +709,8 @@ regen-importlib: Programs/_freeze_import
+ ############################################################################
+ # Regenerate all generated files
+ 
+-regen-all: regen-opcode regen-opcode-targets regen-typeslots regen-grammar regen-ast regen-importlib
++regen-all: regen-opcode regen-opcode-targets regen-typeslots regen-grammar regen-ast
++	$(MAKE) regen-importlib
+ 
+ ############################################################################
+ # Special rules for object files

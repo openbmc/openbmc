@@ -1,4 +1,4 @@
-From cab02076afb808a43c6ff3d7b1c64e71f5a1b397 Mon Sep 17 00:00:00 2001
+From 172907f31d64da4c3f289a439fd605d2ab51b24a Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@cn.fujitsu.com>
 Date: Wed, 19 Aug 2015 12:17:03 +0900
 Subject: [PATCH] configure in cross
@@ -14,7 +14,7 @@ Upstream-Status: Inappropriate [build system specific changes]
  1 file changed, 16 insertions(+), 50 deletions(-)
 
 diff --git a/src/configure.in b/src/configure.in
-index e194295..82d64d6 100644
+index 90a07df..1d30243 100644
 --- a/src/configure.in
 +++ b/src/configure.in
 @@ -5,6 +5,13 @@ AC_INIT(pppoe.c)
@@ -40,7 +40,7 @@ index e194295..82d64d6 100644
  fi
  
  dnl Check for N_HDLC line discipline
-@@ -56,7 +63,7 @@ AC_TRY_COMPILE([#include <linux/termios.h>],
+@@ -58,7 +65,7 @@ AC_TRY_COMPILE([
  	ac_cv_n_hdlc=no)
  AC_MSG_RESULT($ac_cv_n_hdlc)
  if test "$ac_cv_n_hdlc" = yes ; then
@@ -49,7 +49,7 @@ index e194295..82d64d6 100644
  fi
  
  AC_ARG_ENABLE(plugin, [  --enable-plugin=pppd_src_path   build pppd plugin], ac_cv_pluginpath=$enableval, ac_cv_pluginpath=no)
-@@ -104,7 +111,7 @@ PPPD_INCDIR=""
+@@ -106,7 +113,7 @@ PPPD_INCDIR=""
  if test "$ac_cv_header_linux_if_pppox_h" = yes ; then
  	if test "$ac_cv_pluginpath" != no ; then
  		LINUX_KERNELMODE_PLUGIN=rp-pppoe.so
@@ -58,7 +58,7 @@ index e194295..82d64d6 100644
  		PPPD_INCDIR=$ac_cv_pluginpath
  	fi
  fi
-@@ -114,7 +121,7 @@ if test "$PPPD_INCDIR" = "" ; then
+@@ -116,7 +123,7 @@ if test "$PPPD_INCDIR" = "" ; then
  fi
  
  if test "$ac_cv_debugging" = "yes" ; then
@@ -67,7 +67,7 @@ index e194295..82d64d6 100644
  fi
  
  AC_SUBST(LINUX_KERNELMODE_PLUGIN)
-@@ -140,15 +147,8 @@ AC_CHECK_SIZEOF(unsigned short)
+@@ -142,15 +149,8 @@ AC_CHECK_SIZEOF(unsigned short)
  AC_CHECK_SIZEOF(unsigned int)
  AC_CHECK_SIZEOF(unsigned long)
  
@@ -84,7 +84,7 @@ index e194295..82d64d6 100644
  
  dnl Check for Linux-specific kernel support for PPPoE
  AC_MSG_CHECKING(for Linux 2.4.X kernel-mode PPPoE support)
-@@ -193,44 +193,8 @@ if test "$GCC" = yes; then
+@@ -195,44 +195,8 @@ if test "$GCC" = yes; then
  	CFLAGS="$CFLAGS -fno-strict-aliasing -Wall -Wstrict-prototypes"
  fi
  
@@ -130,7 +130,7 @@ index e194295..82d64d6 100644
  if test "${rpppoe_cv_pack_bitfields+set}" != set ; then
  AC_TRY_RUN([
  union foo {
-@@ -257,10 +221,11 @@ main(void)
+@@ -259,10 +223,11 @@ main(void)
  }], rpppoe_cv_pack_bitfields=normal, rpppoe_cv_pack_bitfields=rev,
  $ECHO "no defaults for cross-compiling"; exit 0)
  fi
@@ -143,7 +143,7 @@ index e194295..82d64d6 100644
  else
  	AC_MSG_RESULT(normal)
  fi
-@@ -324,6 +289,7 @@ AC_SUBST(PPPOE_SERVER_DEPS)
+@@ -326,6 +291,7 @@ AC_SUBST(PPPOE_SERVER_DEPS)
  AC_SUBST(RDYNAMIC)
  AC_SUBST(LIBEVENT)
  AC_SUBST(ECHO)
@@ -151,6 +151,3 @@ index e194295..82d64d6 100644
  AC_SUBST(LDFLAGS)
  
  datadir_evaluated=`eval echo $datadir`
--- 
-1.8.4.2
-

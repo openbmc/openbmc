@@ -12,11 +12,11 @@ Signed-off-by: Li Zhou <li.zhou@windriver.com>
  snmplib/snmpv3.c | 4 ++--
  2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/agent/snmpd.c b/agent/snmpd.c
-index 056048a..12a7ea1 100644
---- a/agent/snmpd.c
-+++ b/agent/snmpd.c
-@@ -1246,6 +1246,7 @@ receive(void)
+Index: net-snmp-5.7.3/agent/snmpd.c
+===================================================================
+--- net-snmp-5.7.3.orig/agent/snmpd.c
++++ net-snmp-5.7.3/agent/snmpd.c
+@@ -1253,6 +1253,7 @@ receive(void)
  	    snmp_log(LOG_INFO, "NET-SNMP version %s restarted\n",
  		     netsnmp_get_version());
              update_config();
@@ -24,11 +24,11 @@ index 056048a..12a7ea1 100644
              send_easy_trap(SNMP_TRAP_ENTERPRISESPECIFIC, 3);
  #if HAVE_SIGHOLD
              sigrelse(SIGHUP);
-diff --git a/snmplib/snmpv3.c b/snmplib/snmpv3.c
-index 435cafd..6ad8208 100644
---- a/snmplib/snmpv3.c
-+++ b/snmplib/snmpv3.c
-@@ -984,9 +984,9 @@ init_snmpv3_post_config(int majorid, int minorid, void *serverarg,
+Index: net-snmp-5.7.3/snmplib/snmpv3.c
+===================================================================
+--- net-snmp-5.7.3.orig/snmplib/snmpv3.c
++++ net-snmp-5.7.3/snmplib/snmpv3.c
+@@ -984,9 +984,9 @@ init_snmpv3_post_config(int majorid, int
      /*
       * if our engineID has changed at all, the boots record must be set to 1 
       */
@@ -40,6 +40,3 @@ index 435cafd..6ad8208 100644
          engineBoots = 1;
      }
  
--- 
-1.9.1
-

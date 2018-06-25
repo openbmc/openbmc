@@ -24,3 +24,5 @@ do_configure_prepend () {
 	# Else these could be used in preference to those in aclocal-copy
 	rm -f ${S}/m4/gpg-error.m4
 }
+
+BBCLASSEXTEND = "native"

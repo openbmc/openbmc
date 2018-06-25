@@ -1,0 +1,25 @@
+samba: defeat iconv test
+
+A test was added when configuring samba which requires target code
+to be executed.  In general, this will not work, so we eliminate it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+--- a/lib/util/charset/wscript_configure
++++ b/lib/util/charset/wscript_configure
+@@ -17,6 +17,8 @@ if (conf.CHECK_FUNCS_IN('iconv_open', 'i
+     
+     conf.DEFINE('HAVE_NATIVE_ICONV', 1)
+ 
++"""
++[added for 4.7.0, but breaks cross-compilation]
+ conf.CHECK_CODE('''
+                 uint8_t inbuf[2] = { 0x30, 0xdf };
+                 uint8_t outbuf[4] = { 0 };
+@@ -36,3 +38,4 @@ conf.CHECK_CODE('''
+                 msg='Checking errno of iconv for illegal multibyte sequence',
+                 lib='iconv',
+                 headers='errno.h iconv.h')
++"""

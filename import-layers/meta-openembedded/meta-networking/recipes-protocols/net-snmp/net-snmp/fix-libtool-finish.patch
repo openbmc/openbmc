@@ -10,11 +10,11 @@ Upstream-Status: Inappropriate [cross compile specific]
 
 Signed-off-by: Roy.Li <rongqing.li@windriver.com>
 ---
-diff --git a/Makefile.top b/Makefile.top
-index 862fb94..ed7dcfc 100644
---- a/Makefile.top
-+++ b/Makefile.top
-@@ -86,7 +86,7 @@ LIBREVISION = 2
+Index: net-snmp-5.7.3/Makefile.top
+===================================================================
+--- net-snmp-5.7.3.orig/Makefile.top
++++ net-snmp-5.7.3/Makefile.top
+@@ -87,7 +87,7 @@ LIBREVISION = 3
  LIB_LD_CMD      = $(LIBTOOL) --mode=link $(LINKCC) $(CFLAGS) -rpath $(libdir) -version-info $(LIBCURRENT):$(LIBREVISION):$(LIBAGE) -o
  LIB_EXTENSION   = la
  LIB_VERSION     =

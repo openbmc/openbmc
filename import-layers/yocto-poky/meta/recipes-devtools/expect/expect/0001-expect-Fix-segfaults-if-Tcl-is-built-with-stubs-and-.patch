@@ -1,0 +1,91 @@
+From f0049b4b2ea55b3b3c53bf6f0275654801c755d2 Mon Sep 17 00:00:00 2001
+From: Li Zhou <li.zhou@windriver.com>
+Date: Thu, 28 Sep 2017 15:54:55 +0800
+Subject: [PATCH] expect: Fix segfaults if Tcl is built with stubs and Expect
+ is used directly from C program
+
+Description: This dirty hack fixes segfaults if Tcl is built with stubs
+ and Expect is used directly from C program.
+Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=588817
+Example:
+ #include <stdio.h>
+ #include <tcl8.5/expect.h>
+ int main()
+ {
+     FILE *pipe;
+     char *some_command = "uname";
+     char datum;
+     pipe = exp_popen(some_command);
+     if (pipe == NULL) return 1;
+     while ((datum = getc (pipe)) != EOF)
+ 	printf("%c",datum);
+ }
+Example:
+ #include <stdio.h>
+ #include "expect.h"
+ main()
+ {
+     int fd = 0;
+     fd = exp_spawnl("echo", "echo", "Hello User: Whats up?", (char*) 0);
+     switch (exp_expectl(fd, exp_regexp, "ser:", 1, exp_end)) {
+ 	case 1: {
+ 	    printf("GOT ser:\n");
+ 	    break;
+ 	}
+ 	default: {
+ 	    printf("DEFAULT\n");
+ 	    return 1;
+ 	}
+     }
+     printf("Normal Exit\n");
+     return 0;
+ }
+Author: Sergei Golovan <sgolovan@debian.org>
+
+Upstream-Status: Pending
+This patch is backported from fedora changes for expect:
+http://pkgs.fedoraproject.org/cgit/rpms/expect.git/commit/
+?h=master&id=b6737eed550be93182f2ed194e836a6cbbcf4fa3
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ exp_clib.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/exp_clib.c b/exp_clib.c
+index 172c05e..19341d5 100644
+--- a/exp_clib.c
++++ b/exp_clib.c
+@@ -114,7 +114,11 @@ extern unsigned long	strtoul _ANSI_ARGS_((CONST char *string,
+ #include <stdlib.h>		/* for malloc */
+ #endif
+ 
+-#include <tcl.h>
++#define ckalloc(x) Tcl_Alloc(x)
++#define ckfree(x) Tcl_Free(x)
++extern char *Tcl_ErrnoMsg(int err);
++extern char *Tcl_Alloc(unsigned int size);
++extern void Tcl_Free(char *ptr);
+ #include "expect.h"
+ #define TclRegError exp_TclRegError
+ 
+@@ -389,7 +393,7 @@ char *exp;
+ 		FAIL("regexp too big");
+ 
+ 	/* Allocate space. */
+-	r = (regexp *)ckalloc(sizeof(regexp) + (unsigned)rcstate->regsize);
++	r = (regexp *)malloc(sizeof(regexp) + (unsigned)rcstate->regsize);
+ 	if (r == NULL)
+ 		FAIL("out of space");
+ 
+@@ -399,7 +403,7 @@ char *exp;
+ 	rcstate->regcode = r->program;
+ 	regc(MAGIC, rcstate);
+ 	if (reg(0, &flags, rcstate) == NULL) {
+-	  ckfree ((char*) r);
++	  free((char*) r);
+ 	  return(NULL);
+ 	}
+ 
+-- 
+1.9.1
+

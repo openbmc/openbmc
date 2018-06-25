@@ -24,6 +24,10 @@ inherit cmake python3native
 EXTRA_OECMAKE = "-DLIB='${baselib}' \
                  -DPYTHON_INCLUDE_PATH=${STAGING_INCDIR}/python${PYTHON_BASEVERSION}"
 
+# With Ninja it fails with:
+# ninja: error: build.ninja:282: bad $-escape (literal $ must be written as $$)
+OECMAKE_GENERATOR = "Unix Makefiles"
+
 do_configure_prepend() {
     export STAGING_LIBDIR=${STAGING_LIBDIR}
     export STAGING_INCDIR=${STAGING_INCDIR}

@@ -3,7 +3,15 @@ SECTION = "devel/python"
 LICENSE = "LGPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=38138baa100d7259934590850bc0406e"
 
-SRC_URI[md5sum] = "b2a164887c1c6a2a2490b5afb36e36db"
-SRC_URI[sha256sum] = "b961b6ce75a7f08b586f4d2cae8cdc409881731b851fc405fa21cb16bad00d87"
+SRC_URI[md5sum] = "3310f0aa2a8492d0ff614ecf636ec8a8"
+SRC_URI[sha256sum] = "4a5c01dd67feeda35f88e6c12ea14ac8cabd426b9be0cc5f9fd083fe90a9dbfc"
 
 PYPI_PACKAGE="python-can"
+
+RDEPENDS_${PN}_class-target += "\
+    ${PYTHON_PN}-ctypes \
+    ${PYTHON_PN}-logging \
+    ${PYTHON_PN}-misc \
+    ${PYTHON_PN}-netserver \
+    ${PYTHON_PN}-sqlite3 \
+"

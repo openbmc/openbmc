@@ -1,0 +1,62 @@
+From dcfc263db9e69e5381cb511c51836271dec577a3 Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Thu, 10 May 2018 13:27:47 -0400
+Subject: [PATCH] Makefiles: Add more $XDR_CFLAGS as needed
+
+When building with libtirpc instead of libc-xdr the include search
+path needs to be used. In several places this was missing and it was
+only looking in /usr/include and failing.
+
+Upstream-Status: Inappropriate [old release]
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ src/Makefile.am   | 5 +++--
+ tests/Makefile.am | 1 +
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index e9ce941..38114b7 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1157,7 +1157,7 @@ libvirt_la_BUILT_LIBADD += libvirt_driver.la
+ libvirt_driver_la_SOURCES = $(DRIVER_SOURCES)
+ 
+ libvirt_driver_la_CFLAGS = \
+-		$(GNUTLS_CFLAGS) $(CURL_CFLAGS) \
++		$(GNUTLS_CFLAGS) $(CURL_CFLAGS) $(XDR_CFLAGS) \
+ 		-I$(srcdir)/conf $(AM_CFLAGS)
+ libvirt_driver_la_LIBADD = \
+ 		$(GNUTLS_LIBS) $(CURL_LIBS) $(DLOPEN_LIBS)
+@@ -1348,6 +1348,7 @@ endif ! WITH_DRIVER_MODULES
+ 
+ libvirt_driver_qemu_impl_la_CFLAGS = \
+ 		$(GNUTLS_CFLAGS) \
++		$(XDR_CFLAGS) \
+ 		$(LIBNL_CFLAGS) \
+ 		-I$(srcdir)/access \
+ 		-I$(srcdir)/conf \
+@@ -2306,7 +2307,7 @@ libvirt_lxc_la_LDFLAGS = \
+ 		$(CYGWIN_EXTRA_LDFLAGS) \
+ 		$(MINGW_EXTRA_LDFLAGS) \
+ 		$(NULL)
+-libvirt_lxc_la_CFLAGS = $(AM_CFLAGS)
++libvirt_lxc_la_CFLAGS = $(AM_CFLAGS) $(XDR_CFLAGS)
+ libvirt_lxc_la_LIBADD = libvirt.la $(CYGWIN_EXTRA_LIBADD)
+ 
+ # Since virt-login-shell will be setuid, we must do everything
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 2f8b9eb..aec9a3e 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -48,6 +48,7 @@ AM_CFLAGS = \
+ 	$(APPARMOR_CFLAGS) \
+ 	$(YAJL_CFLAGS) \
+ 	$(COVERAGE_CFLAGS) \
++	$(XDR_CFLAGS) \
+ 	$(WARN_CFLAGS)
+ 
+ AM_LDFLAGS = \
+-- 
+2.7.4
+

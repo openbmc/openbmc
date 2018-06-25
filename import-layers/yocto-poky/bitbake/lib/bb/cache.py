@@ -395,7 +395,7 @@ class Cache(NoCache):
         self.has_cache = True
         self.cachefile = getCacheFile(self.cachedir, "bb_cache.dat", self.data_hash)
 
-        logger.debug(1, "Using cache in '%s'", self.cachedir)
+        logger.debug(1, "Cache dir: %s", self.cachedir)
         bb.utils.mkdirhier(self.cachedir)
 
         cache_ok = True
@@ -408,6 +408,8 @@ class Cache(NoCache):
             self.load_cachefile()
         elif os.path.isfile(self.cachefile):
             logger.info("Out of date cache found, rebuilding...")
+        else:
+            logger.debug(1, "Cache file %s not found, building..." % self.cachefile)
 
     def load_cachefile(self):
         cachesize = 0
@@ -424,6 +426,7 @@ class Cache(NoCache):
 
         for cache_class in self.caches_array:
             cachefile = getCacheFile(self.cachedir, cache_class.cachefile, self.data_hash)
+            logger.debug(1, 'Loading cache file: %s' % cachefile)
             with open(cachefile, "rb") as cachefile:
                 pickled = pickle.Unpickler(cachefile)
                 # Check cache version information

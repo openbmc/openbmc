@@ -1,16 +1,17 @@
-From 3ddaa930cda57a62a2174faebcc87aebc59591d1 Mon Sep 17 00:00:00 2001
+From 7205033e44d8fba1d3b18b490e7eaab82da1ffa3 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:29:07 +0200
-Subject: [PATCH 29/30] Do not set PYTHON_INSTALL_DIR by running python
+Subject: [PATCH 1/5] Do not set PYTHON_INSTALL_DIR by running python
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 6a319935..466ca1e6 100644
+index 23e5f889..650b624a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -18,7 +18,7 @@ else()
@@ -23,5 +24,5 @@ index 6a319935..466ca1e6 100644
  MESSAGE(STATUS "Python install dir is ${PYTHON_INSTALL_DIR}")
  
 -- 
-2.11.0
+2.14.2
 

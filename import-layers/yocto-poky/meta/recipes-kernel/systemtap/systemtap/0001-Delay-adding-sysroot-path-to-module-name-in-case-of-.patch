@@ -1,0 +1,61 @@
+From 4ffecddf5433d65a6f01241990c9d516586b1c79 Mon Sep 17 00:00:00 2001
+From: Victor Kamensky <kamensky@cisco.com>
+Date: Mon, 19 Mar 2018 08:53:51 -0500
+Subject: [PATCH] Delay adding sysroot path to module name in case of non
+ absolute executable
+
+Current stap code adds sysroot prematurely for probes that specify non
+absolute path name, i.e like "foo", so when find_executable called it
+receives full path as <sysroot>/foo and find_executable does not search
+PATH while applying sysroot.
+
+Fix delays adding sysroot till path inside of sysroot is searched first.
+
+Also fix missing sysroot addition in glob expansion case.
+
+Upstream-Status: Backport
+Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+---
+ tapsets.cxx | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+Index: git/tapsets.cxx
+===================================================================
+--- git.orig/tapsets.cxx
++++ git/tapsets.cxx
+@@ -746,7 +746,7 @@ base_query::base_query(dwflpp & dw, lite
+               pid_val = 0;
+               get_string_param(params, TOK_PROCESS, module_val);
+             }
+-          module_val = find_executable (module_val, "", sess.sysenv);
++          module_val = find_executable (module_val, sess.sysroot, sess.sysenv);
+           if (!is_fully_resolved(module_val, "", sess.sysenv))
+             throw SEMANTIC_ERROR(_F("cannot find executable '%s'",
+                                     module_val.to_string().c_str()));
+@@ -8287,7 +8287,6 @@ dwarf_builder::build(systemtap_session &
+             }
+           else
+             {
+-              module_name = (string)sess.sysroot + (string)module_name;
+               filled_parameters[TOK_PROCESS] = new literal_string(module_name);
+             }
+         }
+@@ -8321,7 +8320,8 @@ dwarf_builder::build(systemtap_session &
+           assert (lit);
+ 
+           // Evaluate glob here, and call derive_probes recursively with each match.
+-          const auto& globs = glob_executable (module_name);
++          const auto& globs = glob_executable (sess.sysroot
++					       + string(module_name));
+           unsigned results_pre = finished_results.size();
+           for (auto it = globs.begin(); it != globs.end(); ++it)
+             {
+@@ -8413,7 +8413,7 @@ dwarf_builder::build(systemtap_session &
+       // PR13338: unquote glob results
+       module_name = unescape_glob_chars (module_name);
+       user_path = find_executable (module_name, "", sess.sysenv); // canonicalize it
+-      if (!is_fully_resolved(user_path, "", sess.sysenv))
++      if (!is_fully_resolved(user_path, sess.sysroot, sess.sysenv))
+         throw SEMANTIC_ERROR(_F("cannot find executable '%s'",
+                                 user_path.to_string().c_str()));
+ 

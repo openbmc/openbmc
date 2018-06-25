@@ -1,4 +1,4 @@
-From 14d469bc82c758116aef7d549abd49c131b4170f Mon Sep 17 00:00:00 2001
+From c21adbb0b230ffba97cf5d059e2bd024e13a37df Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 22 Apr 2017 11:54:57 -0700
 Subject: [PATCH] configure: Check for -Wno-error=format-truncation compiler
@@ -9,36 +9,18 @@ Fixes
 client.c:834:23: error: '%s' directive output may be truncated writing up to 1023 bytes into a region of size 1010 [-Werror=format-truncation=]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
- configure.ac                |  3 +-
- m4/ax_check_compile_flag.m4 | 74 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 76 insertions(+), 1 deletion(-)
- create mode 100644 m4/ax_check_compile_flag.m4
 
-Index: squid-3.5.26/configure.ac
-===================================================================
---- squid-3.5.26.orig/configure.ac
-+++ squid-3.5.26/configure.ac
-@@ -26,6 +26,7 @@ m4_include([acinclude/pkg.m4])
- m4_include([acinclude/lib-checks.m4])
- m4_include([acinclude/ax_cxx_compile_stdcxx_11.m4])
- m4_include([acinclude/ax_cxx_0x_types.m4])
-+m4_include([acinclude/ax_check_compile_flag.m4])
- 
- HOSTCXX="$BUILD_CXX"
- PRESET_CFLAGS="$CFLAGS"
-@@ -44,6 +45,7 @@ AC_PROG_CXX
- AC_LANG([C++])
- AC_CANONICAL_HOST
- 
-+AX_CHECK_COMPILE_FLAG([-Werror=format-truncation],[CFLAGS="$CFLAGS -Wno-error=format-truncation" CXXFLAGS="$CXXFLAGS -Wno-error=format-truncation"])
- # Clang 3.2 on some CPUs requires -march-native to detect correctly.
- # GCC 4.3+ can also produce faster executables when its used.
- # But building inside a virtual machine environment has been found to
-Index: squid-3.5.26/acinclude/ax_check_compile_flag.m4
-===================================================================
+---
+ acinclude/ax_check_compile_flag.m4 | 74 ++++++++++++++++++++++++++++++++++++++
+ configure.ac                       |  2 ++
+ 2 files changed, 76 insertions(+)
+ create mode 100644 acinclude/ax_check_compile_flag.m4
+
+diff --git a/acinclude/ax_check_compile_flag.m4 b/acinclude/ax_check_compile_flag.m4
+new file mode 100644
+index 0000000..dcabb92
 --- /dev/null
-+++ squid-3.5.26/acinclude/ax_check_compile_flag.m4
++++ b/acinclude/ax_check_compile_flag.m4
 @@ -0,0 +1,74 @@
 +# ===========================================================================
 +#  https://www.gnu.org/software/autoconf-archive/ax_check_compile_flag.html
@@ -114,3 +96,23 @@ Index: squid-3.5.26/acinclude/ax_check_compile_flag.m4
 +  [m4_default([$3], :)])
 +AS_VAR_POPDEF([CACHEVAR])dnl
 +])dnl AX_CHECK_COMPILE_FLAGS
+diff --git a/configure.ac b/configure.ac
+index ff4688c..9382fdf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -26,6 +26,7 @@ m4_include([acinclude/pkg.m4])
+ m4_include([acinclude/lib-checks.m4])
+ m4_include([acinclude/ax_cxx_compile_stdcxx_11.m4])
+ m4_include([acinclude/ax_cxx_0x_types.m4])
++m4_include([acinclude/ax_check_compile_flag.m4])
+ 
+ HOSTCXX="$BUILD_CXX"
+ PRESET_CFLAGS="$CFLAGS"
+@@ -44,6 +45,7 @@ AC_PROG_CXX
+ AC_LANG([C++])
+ AC_CANONICAL_HOST
+ 
++AX_CHECK_COMPILE_FLAG([-Werror=format-truncation],[CFLAGS="$CFLAGS -Wno-error=format-truncation" CXXFLAGS="$CXXFLAGS -Wno-error=format-truncation"])
+ # Clang 3.2 on some CPUs requires -march-native to detect correctly.
+ # GCC 4.3+ can also produce faster executables when its used.
+ # But building inside a virtual machine environment has been found to

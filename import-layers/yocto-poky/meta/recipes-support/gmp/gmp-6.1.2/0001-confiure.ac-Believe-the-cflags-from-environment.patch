@@ -18,13 +18,13 @@ Upstream-Status: Inappropriate[OE-Specific]
  configure.ac | 11 -----------
  1 file changed, 11 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index 857ea3b..359e919 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -607,15 +607,6 @@ case $host in
-     GMP_INCLUDE_MPN(arm/arm-defs.m4)
-     CALLING_CONVENTIONS_OBJS='arm32call.lo arm32check.lo'
+Index: gmp-6.1.2/configure.ac
+===================================================================
+--- gmp-6.1.2.orig/configure.ac
++++ gmp-6.1.2/configure.ac
+@@ -604,15 +604,6 @@ case $host in
+     any_32_testlist="sizeof-long-4"
+     any_64_testlist="sizeof-long-8"
  
 -    # This is needed for clang, which is not content with flags like -mfpu=neon
 -    # alone.
@@ -38,7 +38,7 @@ index 857ea3b..359e919 100644
      # FIXME: We make mandatory compiler options optional here.  We should
      # either enforce them, or organise to strip paths as the corresponding
      # options fail.
-@@ -686,8 +677,6 @@ case $host in
+@@ -746,8 +737,6 @@ case $host in
  	;;
        *)
  	path="arm"
@@ -47,6 +47,3 @@ index 857ea3b..359e919 100644
  	;;
      esac
      ;;
--- 
-1.9.1
-

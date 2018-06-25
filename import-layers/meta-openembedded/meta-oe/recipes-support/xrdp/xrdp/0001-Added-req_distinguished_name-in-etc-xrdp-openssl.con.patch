@@ -1,0 +1,33 @@
+From d705b1d666cb8713d86ea6fb2fc45c424128285a Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Fri, 1 Dec 2017 10:24:50 +0900
+Subject: [PATCH] Added  req_distinguished_name in /etc/xrdp/openssl.conf,
+ otherwise, cert.pem can't be created.
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ keygen/openssl.conf | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/keygen/openssl.conf b/keygen/openssl.conf
+index 09db6c2..f077d72 100644
+--- a/keygen/openssl.conf
++++ b/keygen/openssl.conf
+@@ -4,6 +4,14 @@ distinguished_name = req_distinguished_name
+ x509_extensions = v3_ca
+ 
+ [req_distinguished_name]
++# Certificate subject
++#countryName = US
++#stateOrProvinceName = CA
++#localityName = Sunnyvale
++#organizationName = xrdp
++#organizationalUnitName =
++commonName = XRDP
++#emailAddress =
+ 
+ [v3_ca]
+ # Extensions for a typical CA - PKIX recommendation.
+-- 
+1.8.4.2
+

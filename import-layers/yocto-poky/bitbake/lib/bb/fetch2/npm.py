@@ -195,9 +195,11 @@ class Npm(FetchMethod):
         outputurl = pdata['dist']['tarball']
         data[pkg] = {}
         data[pkg]['tgz'] = os.path.basename(outputurl)
-        if not outputurl in fetchedlist:
-            self._runwget(ud, d, "%s --directory-prefix=%s %s" % (self.basecmd, ud.prefixdir, outputurl), False)
-            fetchedlist.append(outputurl)
+        if outputurl in fetchedlist:
+            return
+
+        self._runwget(ud, d, "%s --directory-prefix=%s %s" % (self.basecmd, ud.prefixdir, outputurl), False)
+        fetchedlist.append(outputurl)
 
         dependencies = pdata.get('dependencies', {})
         optionalDependencies = pdata.get('optionalDependencies', {})

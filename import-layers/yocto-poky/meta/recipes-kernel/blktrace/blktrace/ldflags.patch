@@ -10,6 +10,8 @@ aed463414e2e2bf8ca44ba54ee5973e7ed599e57
 
 Signed-off-by: Fahad Usman <fahad_usman@mentor.com>
 
+Index: git/Makefile
+===================================================================
 --- git.orig/Makefile
 +++ git/Makefile
 @@ -1,5 +1,6 @@
@@ -19,7 +21,7 @@ Signed-off-by: Fahad Usman <fahad_usman@mentor.com>
  ALL_CFLAGS = $(CFLAGS) -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
  PROGS	= blkparse blktrace verify_blkparse blkrawverify blkiomon
  LIBS	= -lpthread
-@@ -23,19 +24,19 @@ btreplay/btreplay:
+@@ -26,19 +27,19 @@ btreplay/btreplay:
  	$(CC) -o $*.o -c $(ALL_CFLAGS) $<
  
  blkparse: blkparse.o blkparse_fmt.o rbtree.o act_mask.o
@@ -44,6 +46,8 @@ Signed-off-by: Fahad Usman <fahad_usman@mentor.com>
  
  $(PROGS): | depend
  
+Index: git/btreplay/Makefile
+===================================================================
 --- git.orig/btreplay/Makefile
 +++ git/btreplay/Makefile
 @@ -7,6 +7,7 @@
@@ -55,8 +59,8 @@ Signed-off-by: Fahad Usman <fahad_usman@mentor.com>
  OCFLAGS	= -UCOUNT_IOS -UDEBUG -DNDEBUG
  XCFLAGS	= -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 @@ -32,10 +33,10 @@ clean: docsclean
-	$(CC) $(CFLAGS) -c -o $*.o $<
-
+ 	$(CC) $(CFLAGS) -c -o $*.o $<
+ 
  btrecord: btrecord.o
 -	$(CC) $(CFLAGS) -o $@ $(filter %.o,$^)
 +	$(CC) $(CFLAGS) -o $@ $(filter %.o,$^) $(LDFLAGS)
@@ -67,6 +71,8 @@ Signed-off-by: Fahad Usman <fahad_usman@mentor.com>
  
  depend:
  	@$(CC) -MM $(CFLAGS) *.c 1> .depend
+Index: git/btt/Makefile
+===================================================================
 --- git.orig/btt/Makefile
 +++ git/btt/Makefile
 @@ -7,6 +7,7 @@
@@ -86,11 +92,13 @@ Signed-off-by: Fahad Usman <fahad_usman@mentor.com>
  
  ifneq ($(wildcard .depend),)
  include .depend
+Index: git/iowatcher/Makefile
+===================================================================
 --- git.orig/iowatcher/Makefile
 +++ git/iowatcher/Makefile
 @@ -1,5 +1,6 @@
- C      = gcc
- CFLAGS  = -Wall -O0 -g -W
+ CC      = gcc
+ CFLAGS  = -Wall -O2 -g -W -Wunused-result
 +LDFLAGS =
  ALL_CFLAGS = $(CFLAGS) -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
  
@@ -99,8 +107,8 @@ Signed-off-by: Fahad Usman <fahad_usman@mentor.com>
  	$(CC) -o $*.o -c $(ALL_CFLAGS) $<
  
  iowatcher: blkparse.o plot.o main.o tracers.o mpstat.o fio.o
--	$(CC) $(ALL_CFLAGS) -o $@ $(filter %.o,$^) -lm
-+	$(CC) $(ALL_CFLAGS) -o $@ $(filter %.o,$^) -lm $(LDFLAGS)
+-	$(CC) $(ALL_CFLAGS) -o $@ $(filter %.o,$^) -lm -lrt
++	$(CC) $(ALL_CFLAGS) -o $@ $(filter %.o,$^) -lm $(LDFLAGS) -lrt
  
  depend:
  	@$(CC) -MM $(ALL_CFLAGS) *.c 1> .depend

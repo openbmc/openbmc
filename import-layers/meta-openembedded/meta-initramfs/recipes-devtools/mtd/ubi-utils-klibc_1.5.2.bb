@@ -11,12 +11,15 @@ inherit klibc
 
 SRCREV = "aea36417067dade75192bafa03af70b6eb2677b1"
 SRC_URI = "git://git.infradead.org/mtd-utils.git \
-             file://0001-Makefile-only-build-ubi-utils.patch \
+             file://0001-Makefile-build-ubi-utils-only.patch \
              file://0002-common.mk-for-klibc-CC-is-klcc.patch \
-             file://0003-libubi.c-add-klibc-specific-fixes.patch \
-             file://0004-common.h-klibc-fixes-1.patch \
-             file://0005-common.h-klibc-fixes-2.patch \
+             file://0003-libubi.c-add-klibc-specific-fixes-for-ioctl.patch \
+             file://0004-Restore-compatibility-to-dietlibc-klibc-musl-libc-af.patch \
+             file://0005-common.h-more-workarounds-for-klibc-compatibility.patch \
              file://0006-libiniparser-remove-unused-function-needing-float.patch \
+             file://0007-mtd-utils-common.c-convert-to-integer-arithmetic.patch \
+             file://0008-ubi-utils-ubiformat.c-convert-to-integer-arithmetic.patch \
+             file://0009-Eliminate-warnings-about-implicit-non-const-casting-.patch \
              "
 
 S = "${WORKDIR}/git/"

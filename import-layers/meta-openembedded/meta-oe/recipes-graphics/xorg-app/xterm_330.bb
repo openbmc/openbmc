@@ -27,3 +27,8 @@ do_configure() {
 }
 
 FILES_${PN} += "/usr/lib/X11"
+
+# busybox can supply resize too
+inherit update-alternatives
+
+ALTERNATIVE_${PN} = "resize"

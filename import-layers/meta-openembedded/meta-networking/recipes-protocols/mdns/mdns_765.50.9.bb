@@ -9,6 +9,7 @@ RPROVIDES_${PN} += "libdns_sd.so"
 SRC_URI = "http://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-${PV}.tar.gz \
            file://build.patch;patchdir=.. \
            file://mdns.service \
+           file://0001-nss_mdns-Do-not-include-nss.h-when-libc-glibc.patch;patchdir=.. \
            "
 
 SRC_URI[md5sum] = "4a6bc1628851002634ea3833a4dca317"

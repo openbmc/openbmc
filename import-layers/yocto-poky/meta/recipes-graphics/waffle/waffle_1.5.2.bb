@@ -35,6 +35,3 @@ PACKAGECONFIG[gbm] = "-Dwaffle_has_gbm=1,-Dwaffle_has_gbm=0,virtual/${MLPREFIX}l
 
 # I say virtual/libgl, actually wants egl.pc
 PACKAGECONFIG[x11-egl] = "-Dwaffle_has_x11_egl=1,-Dwaffle_has_x11_egl=0,virtual/${MLPREFIX}libgl libxcb"
-
-FILES_${PN}-dev += "${datadir}/cmake/Modules/FindWaffle.cmake \
-                    ${libdir}/cmake/Waffle/"

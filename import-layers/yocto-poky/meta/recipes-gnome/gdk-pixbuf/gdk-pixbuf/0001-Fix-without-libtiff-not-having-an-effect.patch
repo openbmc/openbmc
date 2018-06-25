@@ -1,0 +1,27 @@
+From 460befc992adb32434b0408b453be39a6866ccf8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 10 Oct 2017 14:33:18 +0300
+Subject: [PATCH] Fix --without-libtiff not having an effect.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=788770]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 315e0cc..98e780c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -676,7 +676,7 @@ if test x$gio_can_sniff = x; then
+   AC_DEFINE(GDK_PIXBUF_USE_GIO_MIME, 1, [Define if gio can sniff image data])
+ fi
+ 
+-AM_CONDITIONAL(HAVE_TIFF, test "x$libtiff_found" != x)
++AM_CONDITIONAL(HAVE_TIFF, test "x$libtiff_found" != xno)
+ AM_CONDITIONAL(HAVE_PNG, test "x$LIBPNG" != x)
+ AM_CONDITIONAL(HAVE_JPEG, test "x$LIBJPEG" != x)
+ AM_CONDITIONAL(HAVE_JASPER, test "x$LIBJASPER" != x)
+-- 
+2.14.1
+

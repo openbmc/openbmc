@@ -1,0 +1,43 @@
+From a0b1496322f4d7ce83f4fbfd2a90b91d0721f643 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Oct 2017 23:08:24 -0700
+Subject: [PATCH 25/31] Define _PATH_WTMPX and _PATH_UTMPX if not defined
+
+Musl needs these defines
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/shared/utmp-wtmp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/shared/utmp-wtmp.c b/src/shared/utmp-wtmp.c
+index cab1cd6a2..f5eedac18 100644
+--- a/src/shared/utmp-wtmp.c
++++ b/src/shared/utmp-wtmp.c
+@@ -28,6 +28,7 @@
+ #include <sys/time.h>
+ #include <sys/utsname.h>
+ #include <unistd.h>
++#include <utmp.h>
+ #include <utmpx.h>
+ 
+ #include "alloc-util.h"
+@@ -42,6 +43,13 @@
+ #include "util.h"
+ #include "utmp-wtmp.h"
+ 
++#if defined _PATH_UTMP && !defined _PATH_UTMPX
++# define _PATH_UTMPX _PATH_UTMP
++#endif
++#if defined _PATH_WTMP && !defined _PATH_WTMPX
++# define _PATH_WTMPX _PATH_WTMP
++#endif
++
+ int utmp_get_runlevel(int *runlevel, int *previous) {
+         struct utmpx *found, lookup = { .ut_type = RUN_LVL };
+         int r;
+-- 
+2.13.0
+

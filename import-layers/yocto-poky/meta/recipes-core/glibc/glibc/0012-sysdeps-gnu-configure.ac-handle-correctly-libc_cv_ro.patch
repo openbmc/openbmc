@@ -1,7 +1,7 @@
-From ffd3c5a04d8f2f26fea71fed4ce41e88b6f51086 Mon Sep 17 00:00:00 2001
+From 4f9f39761909e67bd6d29b970b7165863e33e565 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:27:10 +0000
-Subject: [PATCH 12/25] sysdeps/gnu/configure.ac: handle correctly
+Subject: [PATCH 12/27] sysdeps/gnu/configure.ac: handle correctly
  $libc_cv_rootsbindir
 
 Upstream-Status:Pending
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/sysdeps/gnu/configure b/sysdeps/gnu/configure
-index 71243ad0c6..f578187576 100644
+index c15d1087e8..37cc983f2a 100644
 --- a/sysdeps/gnu/configure
 +++ b/sysdeps/gnu/configure
 @@ -32,6 +32,6 @@ case "$prefix" in
@@ -38,5 +38,5 @@ index 634fe4de2a..3db1697f4f 100644
    ;;
  esac
 -- 
-2.13.2
+2.16.1
 

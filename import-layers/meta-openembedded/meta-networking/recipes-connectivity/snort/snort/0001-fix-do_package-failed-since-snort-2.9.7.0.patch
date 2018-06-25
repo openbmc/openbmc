@@ -1,4 +1,4 @@
-From 815e861721a9c43efddb78521147145ebc7569ca Mon Sep 17 00:00:00 2001
+From 4335c4c61877c0b65ff4ec767e8ad3ad8c73c32d Mon Sep 17 00:00:00 2001
 From: Zhiquan Li <zhiquan.li@windriver.com>
 Date: Fri, 13 Nov 2015 17:40:24 +0800
 Subject: [PATCH] fix do_package failed since snort 2.9.7.0
@@ -13,6 +13,7 @@ It's a rpm debugedit bug:
 Upstream-Status:Inappropriate [embedded specific]
 
 Signed-off-by: Zhiquan Li <zhiquan.li@windriver.com>
+
 ---
  src/snort.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -30,6 +31,3 @@ index 8308e57..499d157 100644
  #include "profiler.h"
  #include "rules.h"
  #include "treenodes.h"
---
-1.9.1
-

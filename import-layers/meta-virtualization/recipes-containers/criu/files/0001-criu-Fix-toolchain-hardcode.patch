@@ -1,4 +1,4 @@
-From af679853a45fe63f680c99e70416c8ac620d23b8 Mon Sep 17 00:00:00 2001
+From c005b7a4874f55df687ff22bc425551775581421 Mon Sep 17 00:00:00 2001
 From: Mark Asselstine <mark.asselstine@windriver.com>
 Date: Fri, 8 Sep 2017 15:02:14 -0400
 Subject: [PATCH] criu: Fix toolchain hardcode
@@ -9,6 +9,7 @@ be taken.
 Signed-off-by: Yang Shi <yang.shi@windriver.com>
 Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
 Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+
 ---
  Makefile                       |  2 +-
  scripts/nmk/scripts/include.mk |  2 +-
@@ -96,6 +97,3 @@ index 56dba84..1698821 100644
  
  export RM HOSTLD LD HOSTCC CC CPP AS AR STRIP OBJCOPY OBJDUMP
  export NM SH MAKE MKDIR AWK PERL PYTHON SH CSCOPE
--- 
-2.7.4
-

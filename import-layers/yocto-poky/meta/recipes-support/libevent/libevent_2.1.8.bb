@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=17f20574c0b154d12236d5fbe964f549"
 SRC_URI = " \
     https://github.com/libevent/libevent/releases/download/release-${PV}-stable/${BP}-stable.tar.gz \
     file://Makefile-missing-test-dir.patch \
+    file://0001-test-fix-32bit-linux-regress.patch \
     file://run-ptest \
 "
 

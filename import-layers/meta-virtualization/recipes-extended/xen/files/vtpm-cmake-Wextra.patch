@@ -1,0 +1,21 @@
+---
+ CMakeLists.txt |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+Index: tpm_emulator-x86_64/CMakeLists.txt
+===================================================================
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,10 +40,11 @@ set(TPM_STORAGE_NAME "/var/lib/tpm/tpm_e
+ set(TPM_DEVICE_NAME "/dev/tpm")
+ endif()
+ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+-add_definitions(-Wall -Werror -Wno-unused-parameter -Wpointer-arith -Wcast-align -Wwrite-strings)
++add_definitions(-Wall -Werror)
+ if("${CMAKE_SYSTEM}" MATCHES "Linux")
+     add_definitions(-Wextra)
+ endif()
++add_definitions(-Wno-unused-parameter -Wpointer-arith -Wcast-align -Wwrite-strings)
+ if(USE_OPENSSL)
+     add_definitions(-DUSE_OPENSSL)
+ endif()

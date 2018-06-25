@@ -1,0 +1,32 @@
+From b04eeea777df32364df74bd63fc5b7fb05d21c8d Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 27 Mar 2018 10:21:09 +0800
+Subject: [PATCH] init.d/Makefile.am: add missing dependency
+
+install-data-hook should epend on install-exec-hook, or the
+haveged.service might be installed incorrectly when build
+with -j option.
+
+Upstream-Status: Inappropriate [no upstream mailing list]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ init.d/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/init.d/Makefile.am b/init.d/Makefile.am
+index 5940f78..07bcdf7 100644
+--- a/init.d/Makefile.am
++++ b/init.d/Makefile.am
+@@ -33,7 +33,7 @@ if ENABLE_SYSTEMD
+ install-exec-hook:
+ 	$(do_subst) < $(srcdir)/$(src_tmpl) > haveged.service;
+ 
+-install-data-hook:
++install-data-hook: install-exec-hook
+ if ENABLE_SYSTEMD_LOOKUP
+ 	install -p -D -m644 haveged.service $(DESTDIR)`pkg-config --variable=systemdsystemunitdir systemd`/haveged.service;
+ else
+-- 
+2.11.0
+

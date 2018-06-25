@@ -1,0 +1,215 @@
+From 875c11dbf87d1258ad7d3697a40d605d503e5673 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Wed, 17 Jan 2018 10:02:14 -0200
+Subject: [PATCH] cmake: Prevent the detection of Qt5
+Organization: O.S. Systems Software LTDA.
+
+CMake doesn't have dependency on qt4/qt5, so these tests usually fail
+but still can cause undeterministic results or build failures (when
+OE_QMAKE_PATH_EXTERNAL_HOST_BINS is undefined or native qmake removed
+while running the test in cmake)
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ Source/QtDialog/CMakeLists.txt                     | 2 +-
+ Tests/CMakeLists.txt                               | 2 +-
+ Tests/Qt4And5Automoc/CMakeLists.txt                | 4 ++--
+ Tests/QtAutoUicInterface/CMakeLists.txt            | 2 +-
+ Tests/QtAutogen/CMakeLists.txt                     | 2 +-
+ Tests/QtAutogen/macosFW/CMakeLists.txt             | 2 +-
+ Tests/QtAutogen/mocDepends/CMakeLists.txt          | 2 +-
+ Tests/QtAutogenRerun/CMakeLists.txt                | 4 ++--
+ Tests/QtAutogenRerun/mocPlugin/CMakeLists.txt      | 2 +-
+ Tests/QtAutogenRerun/mocRerun/CMakeLists.txt       | 2 +-
+ Tests/QtAutogenRerun/rccDepends/CMakeLists.txt     | 2 +-
+ Tests/RunCMake/CMakeLists.txt                      | 2 +-
+ Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake | 2 +-
+ 13 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/Source/QtDialog/CMakeLists.txt b/Source/QtDialog/CMakeLists.txt
+index b38797bca..b5fbfc5fa 100644
+--- a/Source/QtDialog/CMakeLists.txt
++++ b/Source/QtDialog/CMakeLists.txt
+@@ -6,7 +6,7 @@ if(POLICY CMP0020)
+   cmake_policy(SET CMP0020 NEW) # Drop when CMake >= 2.8.11 required
+ endif()
+ CMake_OPTIONAL_COMPONENT(cmake-gui)
+-find_package(Qt5Widgets QUIET)
++#find_package(Qt5Widgets QUIET)
+ if (Qt5Widgets_FOUND)
+   include_directories(${Qt5Widgets_INCLUDE_DIRS})
+   add_definitions(${Qt5Widgets_DEFINITONS})
+diff --git a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
+index 533788a44..32ef03c55 100644
+--- a/Tests/CMakeLists.txt
++++ b/Tests/CMakeLists.txt
+@@ -1260,7 +1260,7 @@ ${CMake_BINARY_DIR}/bin/cmake -DDIR=dev -P ${CMake_SOURCE_DIR}/Utilities/Release
+     set(CMake_TEST_Qt5 1)
+   endif()
+   if(CMake_TEST_Qt5)
+-    find_package(Qt5Widgets QUIET NO_MODULE)
++    #find_package(Qt5Widgets QUIET NO_MODULE)
+   endif()
+   if(CMake_TEST_Qt5 AND Qt5Widgets_FOUND)
+     add_test(NAME Qt5Autogen COMMAND ${CMAKE_CTEST_COMMAND}
+diff --git a/Tests/Qt4And5Automoc/CMakeLists.txt b/Tests/Qt4And5Automoc/CMakeLists.txt
+index ad74961d9..a9dd74b15 100644
+--- a/Tests/Qt4And5Automoc/CMakeLists.txt
++++ b/Tests/Qt4And5Automoc/CMakeLists.txt
+@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 2.8.12)
+ project(Qt4And5Automoc)
+ 
+ if (QT_REVERSE_FIND_ORDER)
+-  find_package(Qt5Core REQUIRED)
++  #find_package(Qt5Core REQUIRED)
+   find_package(Qt4 REQUIRED)
+ else()
+   find_package(Qt4 REQUIRED)
+-  find_package(Qt5Core REQUIRED)
++  #find_package(Qt5Core REQUIRED)
+ endif()
+ 
+ set(CMAKE_AUTOMOC ON)
+diff --git a/Tests/QtAutoUicInterface/CMakeLists.txt b/Tests/QtAutoUicInterface/CMakeLists.txt
+index a5c2d99b2..2d640e4a3 100644
+--- a/Tests/QtAutoUicInterface/CMakeLists.txt
++++ b/Tests/QtAutoUicInterface/CMakeLists.txt
+@@ -14,7 +14,7 @@ else()
+   if (NOT QT_TEST_VERSION STREQUAL 5)
+     message(SEND_ERROR "Invalid Qt version specified.")
+   endif()
+-  find_package(Qt5Widgets REQUIRED)
++  #find_package(Qt5Widgets REQUIRED)
+ 
+   set(QT_CORE_TARGET Qt5::Core)
+   set(QT_GUI_TARGET Qt5::Widgets)
+diff --git a/Tests/QtAutogen/CMakeLists.txt b/Tests/QtAutogen/CMakeLists.txt
+index dff9d0c66..c6e8fc3f5 100644
+--- a/Tests/QtAutogen/CMakeLists.txt
++++ b/Tests/QtAutogen/CMakeLists.txt
+@@ -23,7 +23,7 @@ else()
+   if (NOT QT_TEST_VERSION STREQUAL 5)
+     message(SEND_ERROR "Invalid Qt version specified.")
+   endif()
+-  find_package(Qt5Widgets REQUIRED)
++  #find_package(Qt5Widgets REQUIRED)
+ 
+   set(QT_QTCORE_TARGET Qt5::Core)
+ 
+diff --git a/Tests/QtAutogen/macosFW/CMakeLists.txt b/Tests/QtAutogen/macosFW/CMakeLists.txt
+index 114d9bac0..157fe0aaa 100644
+--- a/Tests/QtAutogen/macosFW/CMakeLists.txt
++++ b/Tests/QtAutogen/macosFW/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.8)
+ project(macos-fw-test)
+ 
+-find_package(Qt5Test REQUIRED)
++#find_package(Qt5Test REQUIRED)
+ 
+ set(CMAKE_CXX_STANDARD 11)
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/bin)
+diff --git a/Tests/QtAutogen/mocDepends/CMakeLists.txt b/Tests/QtAutogen/mocDepends/CMakeLists.txt
+index 8217b8dbf..86bb7bc7f 100644
+--- a/Tests/QtAutogen/mocDepends/CMakeLists.txt
++++ b/Tests/QtAutogen/mocDepends/CMakeLists.txt
+@@ -10,7 +10,7 @@ else()
+     message(SEND_ERROR "Invalid Qt version specified.")
+   endif()
+ 
+-  find_package(Qt5Core REQUIRED)
++  #find_package(Qt5Core REQUIRED)
+   set(QT_CORE_TARGET Qt5::Core)
+ endif()
+ 
+diff --git a/Tests/QtAutogenRerun/CMakeLists.txt b/Tests/QtAutogenRerun/CMakeLists.txt
+index e72c1912e..d7e6884ce 100644
+--- a/Tests/QtAutogenRerun/CMakeLists.txt
++++ b/Tests/QtAutogenRerun/CMakeLists.txt
+@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
+ cmake_policy(SET CMP0071 NEW)
+ project(QtAutogenRerun)
+ 
+-# Tell find_package(Qt5) where to find Qt.
++# Tell #find_package(Qt5) where to find Qt.
+ if(QT_QMAKE_EXECUTABLE)
+   get_filename_component(Qt_BIN_DIR "${QT_QMAKE_EXECUTABLE}" PATH)
+   get_filename_component(Qt_PREFIX_DIR "${Qt_BIN_DIR}" PATH)
+@@ -23,7 +23,7 @@ else()
+   if (NOT QT_TEST_VERSION STREQUAL 5)
+     message(SEND_ERROR "Invalid Qt version specified.")
+   endif()
+-  find_package(Qt5Widgets REQUIRED)
++  #find_package(Qt5Widgets REQUIRED)
+ 
+   set(QT_QTCORE_TARGET Qt5::Core)
+ 
+diff --git a/Tests/QtAutogenRerun/mocPlugin/CMakeLists.txt b/Tests/QtAutogenRerun/mocPlugin/CMakeLists.txt
+index b7cc5e9ff..e1d109953 100644
+--- a/Tests/QtAutogenRerun/mocPlugin/CMakeLists.txt
++++ b/Tests/QtAutogenRerun/mocPlugin/CMakeLists.txt
+@@ -9,7 +9,7 @@ set(CMAKE_AUTOMOC_DEPEND_FILTERS
+ if (NOT QT_TEST_VERSION STREQUAL 5)
+   message(SEND_ERROR "Invalid Qt version specified.")
+ endif()
+-find_package(Qt5Widgets REQUIRED)
++#find_package(Qt5Widgets REQUIRED)
+ 
+ if(Qt5_POSITION_INDEPENDENT_CODE AND CMAKE_CXX_COMPILE_OPTIONS_PIC)
+   add_definitions(${CMAKE_CXX_COMPILE_OPTIONS_PIC})
+diff --git a/Tests/QtAutogenRerun/mocRerun/CMakeLists.txt b/Tests/QtAutogenRerun/mocRerun/CMakeLists.txt
+index bafd9cf48..43ec933d2 100644
+--- a/Tests/QtAutogenRerun/mocRerun/CMakeLists.txt
++++ b/Tests/QtAutogenRerun/mocRerun/CMakeLists.txt
+@@ -10,7 +10,7 @@ else()
+     message(SEND_ERROR "Invalid Qt version specified.")
+   endif()
+ 
+-  find_package(Qt5Core REQUIRED)
++  #find_package(Qt5Core REQUIRED)
+   set(QT_CORE_TARGET Qt5::Core)
+ endif()
+ 
+diff --git a/Tests/QtAutogenRerun/rccDepends/CMakeLists.txt b/Tests/QtAutogenRerun/rccDepends/CMakeLists.txt
+index 291592e7d..40cd52868 100644
+--- a/Tests/QtAutogenRerun/rccDepends/CMakeLists.txt
++++ b/Tests/QtAutogenRerun/rccDepends/CMakeLists.txt
+@@ -9,7 +9,7 @@ else()
+     message(SEND_ERROR "Invalid Qt version specified.")
+   endif()
+ 
+-  find_package(Qt5Core REQUIRED)
++  #find_package(Qt5Core REQUIRED)
+   set(QT_CORE_TARGET Qt5::Core)
+ endif()
+ 
+diff --git a/Tests/RunCMake/CMakeLists.txt b/Tests/RunCMake/CMakeLists.txt
+index 29325ff0a..d30d01e78 100644
+--- a/Tests/RunCMake/CMakeLists.txt
++++ b/Tests/RunCMake/CMakeLists.txt
+@@ -274,7 +274,7 @@ add_RunCMake_test(configure_file)
+ add_RunCMake_test(CTestTimeoutAfterMatch)
+ 
+ find_package(Qt4 QUIET)
+-find_package(Qt5Core QUIET)
++#find_package(Qt5Core QUIET)
+ if (QT4_FOUND AND Qt5Core_FOUND AND NOT Qt5Core_VERSION VERSION_LESS 5.1.0)
+   add_RunCMake_test(IncompatibleQt)
+ endif()
+diff --git a/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake b/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake
+index 4fccdc418..b76e1e531 100644
+--- a/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake
++++ b/Tests/RunCMake/IncompatibleQt/IncompatibleQt.cmake
+@@ -1,6 +1,6 @@
+ 
+ find_package(Qt4 REQUIRED)
+-find_package(Qt5Core REQUIRED)
++#find_package(Qt5Core REQUIRED)
+ 
+ add_executable(mainexe main.cpp)
+ target_link_libraries(mainexe Qt4::QtCore Qt5::Core)
+-- 
+2.15.1
+

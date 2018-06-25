@@ -1,0 +1,95 @@
+From c6c5966d9fae27bc2f0a34ab59b999555111bd2d Mon Sep 17 00:00:00 2001
+From: Aric Belsito <lluixhi@gmail.com>
+Date: Sun, 29 Oct 2017 23:17:03 +0100
+Subject: [PATCH] Fix build on MUSL
+
+Add missing AI_IDN and NI_IDN declarations.
+
+Bug: https://bugs.gentoo.org/503914
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ arping.c      |  7 +++++++
+ ping.h        | 11 +++++++++++
+ tracepath.c   |  8 ++++++++
+ traceroute6.c |  4 ++++
+ 4 files changed, 30 insertions(+)
+
+diff --git a/arping.c b/arping.c
+index 1a3f40b..531d29d 100644
+--- a/arping.c
++++ b/arping.c
+@@ -45,6 +45,13 @@ struct sysfs_devattr_values;
+ #ifdef USE_IDN
+ #include <idna.h>
+ #include <locale.h>
++
++#ifndef AI_IDN
++#define AI_IDN 0x0040
++#endif
++#ifndef AI_CANONIDN
++#define AI_CANONIDN 0x0080
++#endif
+ #endif
+ 
+ #include "SNAPSHOT.h"
+diff --git a/ping.h b/ping.h
+index 749f3ff..227315f 100644
+--- a/ping.h
++++ b/ping.h
+@@ -38,6 +38,17 @@
+ #include <locale.h>
+ #include <idna.h>
+ #include <stringprep.h>
++
++#ifndef AI_IDN
++#define AI_IDN 0x0040
++#endif
++#ifndef AI_CANONIDN
++#define AI_CANONIDN 0x0080
++#endif
++#ifndef NI_IDN
++#define NI_IDN 32
++#endif
++
+ #define getaddrinfo_flags (AI_CANONNAME | AI_IDN | AI_CANONIDN)
+ #define getnameinfo_flags NI_IDN
+ #else
+diff --git a/tracepath.c b/tracepath.c
+index 74a829d..dcec5b9 100644
+--- a/tracepath.c
++++ b/tracepath.c
+@@ -30,6 +30,14 @@
+ #ifdef USE_IDN
+ #include <idna.h>
+ #include <locale.h>
++
++#ifndef AI_IDN
++#define AI_IDN 0x0040
++#endif
++#ifndef NI_IDN
++#define NI_IDN 32
++#endif
++
+ #define getnameinfo_flags	NI_IDN
+ #else
+ #define getnameinfo_flags	0
+diff --git a/traceroute6.c b/traceroute6.c
+index 48fc5c5..8d1eebf 100644
+--- a/traceroute6.c
++++ b/traceroute6.c
+@@ -251,6 +251,10 @@
+ #include <idna.h>
+ #include <locale.h>
+ 
++#ifndef NI_IDN
++#define NI_IDN 32
++#endif
++
+ #define getnameinfo_flags	NI_IDN
+ #else
+ #define getnameinfo_flags	0
+-- 
+2.15.1
+

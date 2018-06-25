@@ -8,22 +8,19 @@ LIC_FILES_CHKSUM = " \
     file://COPYING;md5=0c56db0143f4f80c369ee3af7425af6e \
 "
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/lksctp/${BP}.tar.gz \
+SRCREV = "736b91d340e3f2519714f2930ed63b164d363511"
+
+PV .= "+git${SRCPV}"
+LK_REL = "1.0.17"
+
+SRC_URI = " \
+    git://github.com/sctp/lksctp-tools.git \
     file://run-ptest \
     file://v4test.sh \
     file://v6test.sh \
 "
 
-SRC_URI[md5sum] = "68e9b8fa4d4e331029b247b72d46d7a5"
-SRC_URI[sha256sum] = "1aeb204cdb2befc94d9eb3037d1609c9d1d2cd5379d6dd2c0a8ca9b10533aa15"
-
-#| arm-oe-linux-gnueabi-libtool: link: arm-oe-linux-gnueabi-gcc  -march=armv5te -marm -mthumb-interwork --sysroot=/home/jenkins/oe/world/shr-core/tmp-eglibc/sysroots/qemuarm -shared  -fPIC -DPIC  .libs/bindx.o .libs/connectx.o .libs/peeloff.o .libs/opt_info.o .libs/addrs.o .libs/sendmsg.o .libs/recvmsg.o    -march=armv5te -marm -mthumb-interwork --sysroot=/home/jenkins/oe/world/shr-core/tmp-eglibc/sysroots/qemuarm -O2 -Wl,--version-script=/home/jenkins/oe/world/shr-core/tmp-eglibc/work/armv5te-oe-linux-gnueabi/lksctp-tools/1.0.16-r0/lksctp-tools-1.0.16/src/lib/Versions.map -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed   -Wl,-soname -Wl,libsctp.so.1 -o .libs/libsctp.so.1.0.16
-#| /home/jenkins/oe/world/shr-core/tmp-eglibc/sysroots/x86_64-linux/usr/libexec/arm-oe-linux-gnueabi/gcc/arm-oe-linux-gnueabi/4.9.0/ld: error: symbol sctp_connectx has undefined version
-#| collect2: error: ld returned 1 exit status
-#| make[4]: *** [libsctp.la] Error 1
-PNBLACKLIST[lksctp-tools] ?= "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', "BROKEN: fails to link against sctp_connectx symbol", '', d)}"
-
-S = "${WORKDIR}/${BP}"
+S = "${WORKDIR}/git"
 
 BBCLASSEXTEND = "native"
 
@@ -37,7 +34,7 @@ do_install_ptest () {
     done
 }
 
-SOLIBVERSION="${PV}"
+SOLIBVERSION="${LK_REL}"
 SOLIBMAJORVERSION="1"
 
 PACKAGES =+ "${PN}-withsctp ${PN}-utils"

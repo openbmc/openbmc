@@ -1,0 +1,116 @@
+From 761bf993ca55095f46380c0238583791c1797295 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20D=C3=ADaz?= <daniel.diaz@linaro.org>
+Date: Tue, 11 Jul 2017 14:50:37 -0500
+Subject: [PATCH kmscube] Detect gst_bo_map/_unmap and use it (or avoid it)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Those functions are not available on libMali, thus breaking
+builds and creating havoc.
+
+Removing the specific parts of the code that deal with
+gbm_bo_map() and gbm_bo_unmap() renders the kmscube utility
+a little less useful, but still valuable.
+
+Signed-off-by: Daniel Díaz <daniel.diaz@linaro.org>
+Cc: Rob Clark <robdclark@gmail.com>
+Reviewed-by: Eric Engestrom <eric.engestrom@imgtec.com>
+
+Upstream-Status: Submitted [https://lists.freedesktop.org/archives/mesa-dev/2017-July/163020.html]
+---
+ Makefile.am   | 5 ++++-
+ configure.ac  | 3 +++
+ gst-decoder.c | 7 ++++++-
+ kmscube.c     | 4 ++++
+ 4 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index a36087d..ab4adbf 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -43,7 +43,6 @@ kmscube_SOURCES = \
+ 	common.c \
+ 	common.h \
+ 	cube-smooth.c \
+-	cube-tex.c \
+ 	drm-atomic.c \
+ 	drm-common.c \
+ 	drm-common.h \
+@@ -59,3 +58,7 @@ kmscube_LDADD += $(GST_LIBS)
+ kmscube_CFLAGS += $(GST_CFLAGS)
+ kmscube_SOURCES += cube-video.c gst-decoder.c
+ endif
++
++if ENABLE_GBM_MAP
++kmscube_SOURCES += cube-tex.c
++endif
+diff --git a/configure.ac b/configure.ac
+index 8397f7b..c7f1f4d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -65,5 +65,8 @@ if test "x$enable_gbm_modifiers" = xyes; then
+ 	AC_DEFINE(HAVE_GBM_MODIFIERS, 1, [Define if you can use GBM properties.])
+ fi
+ 
++AC_CHECK_LIB([gbm], [gbm_bo_map], [HAVE_GBM_BO_MAP=yes], [])
++AM_CONDITIONAL(ENABLE_GBM_MAP, [test "x$HAVE_GBM_BO_MAP" = "xyes"])
++
+ AC_CONFIG_FILES([Makefile])
+ AC_OUTPUT
+diff --git a/gst-decoder.c b/gst-decoder.c
+index 2d6d581..b84980e 100644
+--- a/gst-decoder.c
++++ b/gst-decoder.c
+@@ -332,6 +332,7 @@ set_last_frame(struct decoder *dec, EGLImage frame, GstSample *samp)
+ 	dec->last_samp = samp;
+ }
+ 
++#if HAVE_GBM_BO_MAP
+ // TODO this could probably be a helper re-used by cube-tex:
+ static int
+ buf_to_fd(const struct gbm *gbm, int size, void *ptr)
+@@ -357,6 +358,7 @@ buf_to_fd(const struct gbm *gbm, int size, void *ptr)
+ 
+ 	return fd;
+ }
++#endif
+ 
+ static EGLImage
+ buffer_to_image(struct decoder *dec, GstBuffer *buf)
+@@ -410,12 +412,15 @@ buffer_to_image(struct decoder *dec, GstBuffer *buf)
+ 
+ 	if (is_dmabuf_mem) {
+ 		dmabuf_fd = dup(gst_dmabuf_memory_get_fd(mem));
+-	} else {
++	}
++#if HAVE_GBM_BO_MAP
++	else {
+ 		GstMapInfo map_info;
+ 		gst_buffer_map(buf, &map_info, GST_MAP_READ);
+ 		dmabuf_fd = buf_to_fd(dec->gbm, map_info.size, map_info.data);
+ 		gst_buffer_unmap(buf, &map_info);
+ 	}
++#endif
+ 
+ 	if (dmabuf_fd < 0) {
+ 		GST_ERROR("could not obtain DMABUF FD");
+diff --git a/kmscube.c b/kmscube.c
+index 3a2c4dd..276dc55 100644
+--- a/kmscube.c
++++ b/kmscube.c
+@@ -142,7 +142,11 @@ int main(int argc, char *argv[])
+ 	else if (mode == VIDEO)
+ 		egl = init_cube_video(gbm, video);
+ 	else
++#if HAVE_GBM_BO_MAP
+ 		egl = init_cube_tex(gbm, mode);
++#else
++		printf("gbm_bo_map() support missing\n");
++#endif
+ 
+ 	if (!egl) {
+ 		printf("failed to initialize EGL\n");
+-- 
+2.7.4
+

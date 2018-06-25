@@ -3,6 +3,8 @@ LICENSE = "MIT"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 addtask do_allpackagedata before do_build
 do_allpackagedata() {
 	:

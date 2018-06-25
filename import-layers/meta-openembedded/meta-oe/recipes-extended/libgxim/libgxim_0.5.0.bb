@@ -26,4 +26,6 @@ file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 EXTRA_OECONF = " --disable-static --disable-rebuilds --enable-compile-warnings=minimum"
 DEPENDS += "gtk+ glib-2.0 glib-2.0-native ruby-native intltool-native gnome-common-native"
 
-inherit autotools pkgconfig gettext
+inherit distro_features_check autotools pkgconfig gettext
+
+REQUIRED_DISTRO_FEATURES = "x11"

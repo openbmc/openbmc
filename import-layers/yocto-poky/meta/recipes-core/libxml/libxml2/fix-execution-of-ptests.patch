@@ -1,0 +1,21 @@
+Make sure that Makefile doesn't try to compile these tests again
+on the target where the source dependencies won't be available.
+
+Upstream-Status: Inappropriate [cross-compile specific]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+
+Index: libxml2-2.9.7/Makefile.am
+===================================================================
+--- libxml2-2.9.7.orig/Makefile.am
++++ libxml2-2.9.7/Makefile.am
+@@ -211,8 +211,7 @@ install-ptest:
+ 	sed -i -e 's|^Makefile:|_Makefile:|' $(DESTDIR)/Makefile
+ 	$(MAKE) -C python install-ptest
+ 
+-runtests: runtest$(EXEEXT) testrecurse$(EXEEXT) testapi$(EXEEXT) \
+-          testchar$(EXEEXT) testdict$(EXEEXT) runxmlconf$(EXEEXT)
++runtests:
+ 	[ -d test   ] || $(LN_S) $(srcdir)/test   .
+ 	[ -d result ] || $(LN_S) $(srcdir)/result .
+ 	$(CHECKER) ./runtest$(EXEEXT) && \

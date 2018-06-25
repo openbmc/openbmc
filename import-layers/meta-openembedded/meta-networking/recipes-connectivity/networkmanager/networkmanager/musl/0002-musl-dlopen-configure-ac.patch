@@ -1,0 +1,35 @@
+From 57239fda56b68a8f3e413f7b6af5290ba0d86636 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Thu, 22 Mar 2018 18:18:06 +0100
+Subject: [PATCH 2/4] musl: dlopen is included so LD_LIBS="" instead of
+ LD_LIBS="none required"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Stolen from [1] and prettyfied slightly
+
+[1] https://github.com/voidlinux/void-packages/tree/master/srcpkgs/NetworkManager/patches
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 487a266..96ae4f7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -305,6 +305,7 @@ dnl
+ dnl Checks for libdl - on certain platforms its part of libc
+ dnl
+ AC_SEARCH_LIBS([dlopen], [dl dld], [], [ac_cv_search_dlopen=])
++AS_IF([test "$ac_cv_search_dlopen" = "none required"],[ac_cv_search_dlopen=""])
+ AC_SUBST([DL_LIBS], "$ac_cv_search_dlopen")
+ 
+ PKG_CHECK_MODULES(GLIB, [gio-unix-2.0 >= 2.37.6 gmodule-2.0],
+-- 
+2.14.3
+

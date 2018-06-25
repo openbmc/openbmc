@@ -1,0 +1,112 @@
+From b5fd5945886fa1845db5c969424b63d894fe0376 Mon Sep 17 00:00:00 2001
+From: Jian Liang <jianliang@tycoint.com>
+Date: Fri, 25 Aug 2017 10:02:16 -0400
+Subject: [PATCH 1/2] session: Keep track of addr in fw_snat & session
+To: connman@lists.01.org
+Cc: wagi@monom.org
+
+When there is more than one session in fw_snat's list of sessions,
+fw_snat failed to be re-created when update-session-state is triggered
+with new IP address. This is because index alone is not sufficient to
+decide if fw_snat needs to be re-created. The solution here is to keep
+a track of IP addr and use it to avoid false lookup of fw_snat.
+
+Signed-off-by: Jian Liang <jianliang@tycoint.com>
+
+---
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/network/connman/connman.git/commit/?id=f9e27d4abfcab5c80a38e0850b5ddb26277f97c1]
+Signed-off-by: André Draszik <andre.draszik@jci.com>
+ src/session.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/src/session.c b/src/session.c
+index 9e3c559..965ac06 100644
+--- a/src/session.c
++++ b/src/session.c
+@@ -65,6 +65,7 @@ struct connman_session {
+ 	struct firewall_context *fw;
+ 	uint32_t mark;
+ 	int index;
++	char *addr;
+ 	char *gateway;
+ 	bool policy_routing;
+ 	bool snat_enabled;
+@@ -79,6 +80,7 @@ struct fw_snat {
+ 	GSList *sessions;
+ 	int id;
+ 	int index;
++	char *addr;
+ 	struct firewall_context *fw;
+ };
+ 
+@@ -200,7 +202,7 @@ static char *service2bearer(enum connman_service_type type)
+ 	return "";
+ }
+ 
+-static struct fw_snat *fw_snat_lookup(int index)
++static struct fw_snat *fw_snat_lookup(int index, const char *addr)
+ {
+ 	struct fw_snat *fw_snat;
+ 	GSList *list;
+@@ -208,8 +210,11 @@ static struct fw_snat *fw_snat_lookup(int index)
+ 	for (list = fw_snat_list; list; list = list->next) {
+ 		fw_snat = list->data;
+ 
+-		if (fw_snat->index == index)
++		if (fw_snat->index == index) {
++			if (g_strcmp0(addr, fw_snat->addr) != 0)
++				continue;
+ 			return fw_snat;
++		}
+ 	}
+ 	return NULL;
+ }
+@@ -224,6 +229,7 @@ static int fw_snat_create(struct connman_session *session,
+ 
+ 	fw_snat->fw = __connman_firewall_create();
+ 	fw_snat->index = index;
++	fw_snat->addr = g_strdup(addr);
+ 
+ 	fw_snat->id = __connman_firewall_enable_snat(fw_snat->fw,
+ 						index, ifname, addr);
+@@ -238,6 +244,7 @@ static int fw_snat_create(struct connman_session *session,
+ 	return 0;
+ err:
+ 	__connman_firewall_destroy(fw_snat->fw);
++	g_free(fw_snat->addr);
+ 	g_free(fw_snat);
+ 	return err;
+ }
+@@ -393,7 +400,7 @@ static void del_nat_rules(struct connman_session *session)
+ 		return;
+ 
+ 	session->snat_enabled = false;
+-	fw_snat = fw_snat_lookup(session->index);
++	fw_snat = fw_snat_lookup(session->index, session->addr);
+ 
+ 	if (!fw_snat)
+ 		return;
+@@ -420,8 +427,11 @@ static void add_nat_rules(struct connman_session *session)
+ 	if (!addr)
+ 		return;
+ 
++	g_free(session->addr);
++	session->addr = g_strdup(addr);
++
+ 	session->snat_enabled = true;
+-	fw_snat = fw_snat_lookup(index);
++	fw_snat = fw_snat_lookup(index, session->addr);
+ 	if (fw_snat) {
+ 		fw_snat_ref(session, fw_snat);
+ 		return;
+@@ -502,6 +512,7 @@ static void free_session(struct connman_session *session)
+ 	g_free(session->info);
+ 	g_free(session->info_last);
+ 	g_free(session->gateway);
++	g_free(session->addr);
+ 
+ 	g_free(session);
+ }
+-- 
+2.7.4
+

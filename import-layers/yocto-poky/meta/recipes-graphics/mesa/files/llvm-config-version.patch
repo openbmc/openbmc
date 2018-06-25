@@ -1,18 +1,24 @@
-When building llvm from git or svn it embeds the svn/git revision into internal version string
+From: Otavio Salvador <otavio@ossystems.com.br>
+Subject: [PATCH] Properly get LLVM version when using LLVM Git releases
 
-$ /mnt/a/oe/build/tmp/work/corei7-64-bec-linux/mesa/2_17.1.5-r0/recipe-sysroot/usr/lib/llvm5.0/llvm-config-host --version
+$ llvm-config-host --version
 5.0.0git-9a5c333388c
 
-We need to ignore everything after 5.0.0 which is what the cut cmd is doing
+We need to ignore everything after 5.0.0 which is what the cut cmd is
+doing
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Index: mesa-17.1.5/configure.ac
-===================================================================
---- mesa-17.1.5.orig/configure.ac
-+++ mesa-17.1.5/configure.ac
-@@ -967,7 +967,7 @@ strip_unwanted_llvm_flags() {
+diff --git a/configure.ac b/configure.ac
+index a02173f244..b107f04c2e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -995,7 +995,7 @@ strip_unwanted_llvm_flags() {
  
  llvm_set_environment_variables() {
      if test "x$LLVM_CONFIG" != xno; then
@@ -21,12 +27,15 @@ Index: mesa-17.1.5/configure.ac
          LLVM_CPPFLAGS=`strip_unwanted_llvm_flags "$LLVM_CONFIG --cppflags"`
          LLVM_INCLUDEDIR=`$LLVM_CONFIG --includedir`
          LLVM_LIBDIR=`$LLVM_CONFIG --libdir`
-@@ -2560,7 +2560,7 @@ if test "x$enable_llvm" = xyes; then
+@@ -2644,7 +2644,7 @@ detect_old_buggy_llvm() {
+     dnl ourselves.
      dnl (See https://llvm.org/bugs/show_bug.cgi?id=6823)
-     if test "x$enable_llvm_shared_libs" = xyes; then
-         dnl We can't use $LLVM_VERSION because it has 'svn' stripped out,
--        LLVM_SO_NAME=LLVM-`$LLVM_CONFIG --version`
-+        LLVM_SO_NAME=LLVM-`$LLVM_CONFIG --version|cut -c1-5`
-         AS_IF([test -f "$LLVM_LIBDIR/lib$LLVM_SO_NAME.$IMP_LIB_EXT"], [llvm_have_one_so=yes])
+     dnl We can't use $LLVM_VERSION because it has 'svn' stripped out,
+-    LLVM_SO_NAME=LLVM-`$LLVM_CONFIG --version`
++    LLVM_SO_NAME=LLVM-`$LLVM_CONFIG --version | cut -c1-5`
+     AS_IF([test -f "$LLVM_LIBDIR/lib$LLVM_SO_NAME.$IMP_LIB_EXT"], [llvm_have_one_so=yes])
  
-         if test "x$llvm_have_one_so" = xyes; then
+     if test "x$llvm_have_one_so" = xyes; then
+-- 
+2.15.1
+

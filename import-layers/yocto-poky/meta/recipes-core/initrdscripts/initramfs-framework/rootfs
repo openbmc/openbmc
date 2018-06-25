@@ -31,6 +31,11 @@ rootfs_run() {
 				bootparam_root="/dev/disk/by-partuuid/$root_uuid"
 			fi
 
+			if [ "`echo ${bootparam_root} | cut -c1-6`" = "LABEL=" ]; then
+				root_label=`echo $bootparam_root | cut -c7-`
+				bootparam_root="/dev/disk/by-label/$root_label"
+			fi
+
 			if [ -e "$bootparam_root" ]; then
 				flags=""
 				if [ -n "$bootparam_ro" ] && ! echo "$bootparam_rootflags" | grep -w -q "ro"; then

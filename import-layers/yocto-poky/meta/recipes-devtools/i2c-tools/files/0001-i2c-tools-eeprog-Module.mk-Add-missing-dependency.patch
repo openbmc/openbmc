@@ -1,0 +1,32 @@
+From 01674fefe3bd24fd93412fbb3eb4e85fe70c80aa Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Mon, 18 Dec 2017 16:01:39 +0200
+Subject: [PATCH] i2c-tools: eeprog/Module.mk: Add missing dependency
+
+Absence of this dependency caused parallel build to run into a race
+and break.
+
+Upstream-Status: Accepted
+https://git.kernel.org/pub/scm/utils/i2c-tools/i2c-tools.git/commit/?id=f87c97317012a3b96b67237925893b8ffd5f4f50
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ eeprog/Module.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/eeprog/Module.mk b/eeprog/Module.mk
+index 9d36869..d215855 100644
+--- a/eeprog/Module.mk
++++ b/eeprog/Module.mk
+@@ -20,7 +20,7 @@ EEPROG_TARGETS	:= eeprog
+ # Programs
+ #
+ 
+-$(EEPROG_DIR)/eeprog: $(EEPROG_DIR)/eeprog.o $(EEPROG_DIR)/24cXX.o
++$(EEPROG_DIR)/eeprog: $(EEPROG_DIR)/eeprog.o $(EEPROG_DIR)/24cXX.o $(LIB_DEPS)
+ 	$(CC) $(LDFLAGS) -o $@ $^ $(EEPROG_LDFLAGS)
+ 
+ #
+-- 
+2.4.0
+

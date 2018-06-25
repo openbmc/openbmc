@@ -1,7 +1,7 @@
-From 3b904bee81a1cfe81e3f437b5f3296efd54a51ac Mon Sep 17 00:00:00 2001
+From 62f44ce3dd01a257cf67116e355492cb1659a917 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:31:06 +0000
-Subject: [PATCH 14/25] 'yes' within the path sets wrong config variables
+Subject: [PATCH 14/27] 'yes' within the path sets wrong config variables
 
 It seems that the 'AC_EGREP_CPP(yes...' example is quite popular
 but being such a short word to grep it is likely to produce
@@ -165,7 +165,7 @@ index f05f43802b..dc8639902d 100644
    ], libc_cv_nios2_be=yes, libc_cv_nios2_be=no)])
  if test $libc_cv_nios2_be = yes; then
 diff --git a/sysdeps/unix/sysv/linux/mips/configure b/sysdeps/unix/sysv/linux/mips/configure
-index a5513fad48..283b293ff3 100644
+index 1ee7f41a36..77e38bebde 100644
 --- a/sysdeps/unix/sysv/linux/mips/configure
 +++ b/sysdeps/unix/sysv/linux/mips/configure
 @@ -414,11 +414,11 @@ else
@@ -199,7 +199,7 @@ index 9147aa4582..7898e24738 100644
  
  libc_mips_nan=
 diff --git a/sysdeps/unix/sysv/linux/powerpc/powerpc64/configure b/sysdeps/unix/sysv/linux/powerpc/powerpc64/configure
-index 4e7fcf1d97..44a9cb3791 100644
+index ae7f254da4..874519000b 100644
 --- a/sysdeps/unix/sysv/linux/powerpc/powerpc64/configure
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/configure
 @@ -155,12 +155,12 @@ else
@@ -259,5 +259,5 @@ index f9cba6e15d..b21f72f1e4 100644
      ], libc_cv_ppc64_def_call_elf=yes, libc_cv_ppc64_def_call_elf=no)])
    if test $libc_cv_ppc64_def_call_elf = no; then
 -- 
-2.13.2
+2.16.1
 

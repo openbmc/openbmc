@@ -1,0 +1,47 @@
+From 7018ca1c4bf26c8317e7fcd2e7e4e648195f42ca Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 20 Dec 2017 13:03:03 +0000
+Subject: [PATCH] gstreamer: use a patch instead of sed to fix gtk-doc
+
+Patch the gtk-doc makefiles so that the qemu wrapper is used to run transient
+binaries instead of libtool wrapper or running them directly.
+
+Also substitute a bogus plugin scanner, as trying to run the real one is causing
+issues during build on x86_64.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+---
+ common/gtk-doc.mak | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/common/gtk-doc.mak b/common/gtk-doc.mak
+index 3f83491..e5cb0d1 100644
+--- a/common/gtk-doc.mak
++++ b/common/gtk-doc.mak
+@@ -6,11 +6,11 @@
+ if GTK_DOC_USE_LIBTOOL
+ GTKDOC_CC = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(INCLUDES) $(GTKDOC_DEPS_CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+ GTKDOC_LD = $(LIBTOOL) --tag=CC --mode=link $(CC) $(GTKDOC_DEPS_LIBS) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS)
+-GTKDOC_RUN = $(LIBTOOL) --mode=execute
++GTKDOC_RUN = $(top_builddir)/gtkdoc-qemuwrapper
+ else
+ GTKDOC_CC = $(CC) $(INCLUDES) $(GTKDOC_DEPS_CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+ GTKDOC_LD = $(CC) $(GTKDOC_DEPS_LIBS) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS)
+-GTKDOC_RUN =
++GTKDOC_RUN = $(top_builddir)/gtkdoc-qemuwrapper
+ endif
+ 
+ # We set GPATH here; this gives us semantics for GNU make
+@@ -101,6 +101,7 @@ scan-build.stamp: $(HFILE_GLOB) $(CFILE_GLOB)
+ 	    GST_PLUGIN_PATH_1_0=					\
+ 	    GST_REGISTRY_1_0=doc-registry.xml				\
+ 	    $(GTKDOC_EXTRA_ENVIRONMENT)					\
++	    GST_PLUGIN_SCANNER_1_0="$(top_builddir)/libs/gst/helpers/gst-plugin-scanner-dummy" \
+ 	    CC="$(GTKDOC_CC)" LD="$(GTKDOC_LD)" RUN="$(GTKDOC_RUN)"	\
+ 	    CFLAGS="$(GTKDOC_CFLAGS) $(CFLAGS)"				\
+ 	    LDFLAGS="$(GTKDOC_LIBS) $(LDFLAGS)"				\
+-- 
+2.15.1
+

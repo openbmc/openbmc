@@ -2,7 +2,6 @@ DESCRIPTION = "A minimal kvm image"
 
 IMAGE_INSTALL = " \
     packagegroup-core-boot \
-    ${ROOTFS_PKGMANAGE_BOOTSTRAP} \
     qemu \
     libvirt \
     libvirt-libvirtd \

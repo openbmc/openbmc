@@ -13,9 +13,9 @@ GDBPROPREFIX = "--program-prefix='${TARGET_PREFIX}'"
 # Overrides PACKAGECONFIG variables in gdb-common.inc
 PACKAGECONFIG ??= "python readline"
 PACKAGECONFIG[python] = "--with-python=${WORKDIR}/python,--without-python,nativesdk-python3, \
-                         nativesdk-python3-core nativesdk-python3-lang nativesdk-python3-re \
+                         nativesdk-python3-core \
                          nativesdk-python3-codecs nativesdk-python3-netclient \
-                         nativesdk-python3-importlib"
+                         "
 PACKAGECONFIG[readline] = "--with-system-readline,--without-system-readline,nativesdk-readline"
 
 SSTATE_DUPWHITELIST += "${STAGING_DATADIR}/gdb"

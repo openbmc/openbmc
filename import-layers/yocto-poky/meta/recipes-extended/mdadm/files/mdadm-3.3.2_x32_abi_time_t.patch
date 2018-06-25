@@ -5,13 +5,13 @@ Upstream-Status: Pending
 
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
 
-Index: mdadm-3.3.4/monitor.c
+Index: mdadm-4.0/monitor.c
 ===================================================================
---- mdadm-3.3.4.orig/monitor.c
-+++ mdadm-3.3.4/monitor.c
-@@ -257,9 +257,12 @@ static int read_and_act(struct active_ar
- 			mdi->curr_state = read_dev_state(mdi->state_fd);
- 		}
+--- mdadm-4.0.orig/monitor.c
++++ mdadm-4.0/monitor.c
+@@ -445,9 +445,12 @@ static int read_and_act(struct active_ar
+ 		if (FD_ISSET(mdi->bb_fd, fds))
+ 			check_for_cleared_bb(a, mdi);
  	}
 -
  	gettimeofday(&tv, NULL);

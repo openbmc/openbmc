@@ -17,11 +17,11 @@ Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
  configure.d/config_os_headers | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/configure.d/config_os_headers b/configure.d/config_os_headers
-index 708aa09..0df32ca 100644
---- a/configure.d/config_os_headers
-+++ b/configure.d/config_os_headers
-@@ -482,8 +482,8 @@ then
+Index: net-snmp-5.7.3/configure.d/config_os_headers
+===================================================================
+--- net-snmp-5.7.3.orig/configure.d/config_os_headers
++++ net-snmp-5.7.3/configure.d/config_os_headers
+@@ -484,8 +484,8 @@ then
      unset ac_cv_header_pkg_h
      netsnmp_save_CPPFLAGS="$CPPFLAGS"
      netsnmp_save_LDFLAGS="$LDFLAGS"
@@ -32,6 +32,3 @@ index 708aa09..0df32ca 100644
      AC_CHECK_HEADERS(pkg.h,
          NETSNMP_SEARCH_LIBS(pkg_init, pkg,
  	    AC_DEFINE(HAVE_LIBPKG, 1, [define if you have BSD pkg-ng])))
--- 
-1.8.4.2
-

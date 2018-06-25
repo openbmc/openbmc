@@ -1,0 +1,58 @@
+From 41b90ed7af10a071ccfeede6a429e0d80518436d Mon Sep 17 00:00:00 2001
+From: Cherry Zhang <cherryyz@google.com>
+Date: Sat, 17 Feb 2018 10:31:39 -0500
+Subject: [PATCH 8/9] cmd/internal/obj/arm64: fix branch-too-far with TBZ like
+ instructions
+
+The compiler now emits TBZ like instructions, but the assembler's
+too-far-branch patch code didn't include that case. Add it.
+
+Fixes #23889.
+
+Change-Id: Ib75f9250c660b9fb652835fbc83263a5d5073dc5
+---
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport
+
+ src/cmd/internal/obj/arm64/asm7.go     | 11 +++++++++--
+ src/cmd/internal/obj/arm64/asm_test.go |  1 +
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/src/cmd/internal/obj/arm64/asm7.go b/src/cmd/internal/obj/arm64/asm7.go
+index ca81238c93..b1ee552489 100644
+--- a/src/cmd/internal/obj/arm64/asm7.go
++++ b/src/cmd/internal/obj/arm64/asm7.go
+@@ -696,9 +696,16 @@ func span7(ctxt *obj.Link, cursym *obj.LSym, newprog obj.ProgAlloc) {
+ 			o = c.oplook(p)
+ 
+ 			/* very large branches */
+-			if (o.type_ == 7 || o.type_ == 39) && p.Pcond != nil { // 7: BEQ and like, 39: CBZ and like
++			if (o.type_ == 7 || o.type_ == 39 || o.type_ == 40) && p.Pcond != nil { // 7: BEQ and like, 39: CBZ and like, 40: TBZ and like
+ 				otxt := p.Pcond.Pc - pc
+-				if otxt <= -(1<<18)+10 || otxt >= (1<<18)-10 {
++				var toofar bool
++				switch o.type_ {
++				case 7, 39: // branch instruction encodes 19 bits
++					toofar = otxt <= -(1<<20)+10 || otxt >= (1<<20)-10
++				case 40: // branch instruction encodes 14 bits
++					toofar = otxt <= -(1<<15)+10 || otxt >= (1<<15)-10
++				}
++				if toofar {
+ 					q := c.newprog()
+ 					q.Link = p.Link
+ 					p.Link = q
+diff --git a/src/cmd/internal/obj/arm64/asm_test.go b/src/cmd/internal/obj/arm64/asm_test.go
+index 369c48f510..3e0c9c13a6 100644
+--- a/src/cmd/internal/obj/arm64/asm_test.go
++++ b/src/cmd/internal/obj/arm64/asm_test.go
+@@ -52,6 +52,7 @@ func TestLarge(t *testing.T) {
+ // gen generates a very large program, with a very far conditional branch.
+ func gen(buf *bytes.Buffer) {
+ 	fmt.Fprintln(buf, "TEXT f(SB),0,$0-0")
++	fmt.Fprintln(buf, "TBZ $5, R0, label")
+ 	fmt.Fprintln(buf, "CBZ R0, label")
+ 	fmt.Fprintln(buf, "BEQ label")
+ 	for i := 0; i < 1<<19; i++ {
+-- 
+2.14.1
+

@@ -3,20 +3,20 @@ require openvswitch.inc
 DEPENDS += "virtual/kernel"
 
 RDEPENDS_${PN}-ptest += "\
-	python3-logging python3-syslog python3-argparse python3-io \
-	python3-fcntl python3-shell python3-lang python3-xml python3-math \
+	python3-logging python3-syslog python3-io \
+	python3-fcntl python3-shell python3-xml python3-math \
 	python3-datetime python3-netclient python3 sed \
 	ldd perl-module-socket perl-module-carp perl-module-exporter \
 	perl-module-xsloader python3-netserver python3-threading \
-	python3-resource python3-subprocess findutils which \
+	python3-resource findutils which \
 	"
 
 S = "${WORKDIR}/git"
-PV = "2.7.1+${SRCREV}"
+PV = "2.7.3+${SRCREV}"
 
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}-git:"
 
-SRCREV = "b29cb89e9e9fe3119b2e5dd5d4fb79141635b7cc"
+SRCREV = "b8dcfbebee9e7dbc74ec5eecc9b45d335d6150c1"
 SRC_URI = "file://openvswitch-switch \
            file://openvswitch-switch-setup \
            file://openvswitch-testcontroller \
@@ -29,7 +29,6 @@ SRC_URI = "file://openvswitch-switch \
            file://python-make-remaining-scripts-use-usr-bin-env.patch \
            file://0001-use-the-linux-if_packet.h-Interface-directly.patch \
            file://0002-Define-WAIT_ANY-if-not-provided-by-system.patch \
-           file://CVE-2017-9263.patch \
            file://python-switch-remaining-scripts-to-use-python3.patch \
            "
 

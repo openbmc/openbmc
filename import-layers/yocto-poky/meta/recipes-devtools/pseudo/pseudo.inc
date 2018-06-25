@@ -26,7 +26,7 @@ do_configure () {
 NO32LIBS ??= "1"
 NO32LIBS_class-nativesdk = "1"
 
-PSEUDO_EXTRA_OPTS ?= "--enable-force-async --without-passwd-fallback"
+PSEUDO_EXTRA_OPTS ?= "--enable-force-async --without-passwd-fallback --enable-epoll --enable-xattr"
 
 # Compile for the local machine arch...
 do_compile () {

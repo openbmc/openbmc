@@ -14,11 +14,11 @@ Signed-off-by: Kevin Strasser <kevin.strasser@linux.intel.com>
  exports/exports-lib.pl |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/exports/exports-lib.pl b/exports/exports-lib.pl
-index 22891c0..1c67494 100755
---- a/exports/exports-lib.pl
-+++ b/exports/exports-lib.pl
-@@ -273,7 +273,7 @@ return !&has_command("rpc.nfsd") && !&has_command("nfsd") &&
+Index: webmin-1.850/exports/exports-lib.pl
+===================================================================
+--- webmin-1.850.orig/exports/exports-lib.pl
++++ webmin-1.850/exports/exports-lib.pl
+@@ -301,7 +301,7 @@ return !&has_command("rpc.nfsd") && !&ha
  sub restart_mountd
  {
  # Try exportfs -r first
@@ -27,6 +27,3 @@ index 22891c0..1c67494 100755
  	my $out = &backquote_logged("$config{'apply_cmd'} 2>&1 </dev/null");
  	if (!$? && $out !~ /invalid|error|failed/i) {
  		# Looks like it worked!
--- 
-1.7.9.5
-

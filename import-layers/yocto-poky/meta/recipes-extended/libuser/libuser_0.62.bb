@@ -22,6 +22,9 @@ SRC_URI[sha256sum] = "a58ff4fabb01a25043b142185a33eeea961109dd60d4b40b6a9df4fa3c
 
 DEPENDS = "popt libpam glib-2.0 python3"
 
+inherit distro_features_check
+REQUIRED_DISTRO_FEATURES = "pam"
+
 inherit autotools gettext python3native python3-dir pkgconfig gtk-doc
 
 EXTRA_OEMAKE = "PYTHON_CPPFLAGS=-I${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}"

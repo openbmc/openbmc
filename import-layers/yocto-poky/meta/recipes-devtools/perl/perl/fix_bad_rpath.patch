@@ -10,15 +10,15 @@ This fixes this warning for perl recipe as well as libxml-parser-perl recipe.
 It is a fix to MakeMaker within perl, so all such perl recipes will get 
 fixed with this perl fix.
 
-Index: perl-5.14.2/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm
+Index: perl-5.24.1/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm
 ===================================================================
---- perl-5.14.2.orig/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm
-+++ perl-5.14.2/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm
-@@ -55,6 +55,7 @@ sub _unix_os2_ext {
-     my($found) = 0;
+--- perl-5.24.1.orig/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm
++++ perl-5.24.1/cpan/ExtUtils-MakeMaker/lib/ExtUtils/Liblist/Kid.pm
+@@ -57,6 +57,7 @@ sub _unix_os2_ext {
+     my ( $found ) = 0;
  
      # Debian-specific: don't use LD_RUN_PATH for standard dirs
 +    push(@libpath, "SYSROOTLIB");
      $ld_run_path_seen{$_}++ for @libpath;
  
-     foreach my $thislib (split ' ', $potential_libs) {
+     foreach my $thislib ( split ' ', $potential_libs ) {

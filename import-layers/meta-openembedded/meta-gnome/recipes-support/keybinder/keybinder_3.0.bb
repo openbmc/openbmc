@@ -18,7 +18,9 @@ SRC_URI = "git://github.com/engla/keybinder.git;branch=keybinder-3.0 \
 
 RDEPENDS_${PN} = "gtk+"
 
-inherit autotools gtk-doc gobject-introspection
+inherit distro_features_check autotools gtk-doc gobject-introspection
+
+REQUIRED_DISTRO_FEATURES = "x11"
 do_configure_prepend() {
 	touch ${S}/ChangeLog
 }

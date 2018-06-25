@@ -53,6 +53,9 @@ python () {
             d.setVar('BB_DONT_CACHE', '1')
 
     if externalsrc:
+        import oe.recipeutils
+        import oe.path
+
         d.setVar('S', externalsrc)
         if externalsrcbuild:
             d.setVar('B', externalsrcbuild)
@@ -85,10 +88,10 @@ python () {
                 d.appendVarFlag(task, "lockfiles", " ${S}/singletask.lock")
 
             # We do not want our source to be wiped out, ever (kernel.bbclass does this for do_clean)
-            cleandirs = (d.getVarFlag(task, 'cleandirs', False) or '').split()
+            cleandirs = oe.recipeutils.split_var_value(d.getVarFlag(task, 'cleandirs', False) or '')
             setvalue = False
             for cleandir in cleandirs[:]:
-                if d.expand(cleandir) == externalsrc:
+                if oe.path.is_path_parent(externalsrc, d.expand(cleandir)):
                     cleandirs.remove(cleandir)
                     setvalue = True
             if setvalue:
@@ -173,7 +176,9 @@ do_buildclean[doc] = "Call 'make clean' or equivalent in ${B}"
 externalsrc_do_buildclean() {
 	if [ -e Makefile -o -e makefile -o -e GNUmakefile ]; then
 		rm -f ${@' '.join([x.split(':')[0] for x in (d.getVar('EXTERNALSRC_SYMLINKS') or '').split()])}
-		oe_runmake clean || die "make failed"
+		if [ "${CLEANBROKEN}" != "1" ]; then
+			oe_runmake clean || die "make failed"
+		fi
 	else
 		bbnote "nothing to do - no makefile found"
 	fi
@@ -189,7 +194,7 @@ def srctree_hash_files(d, srcdir=None):
 
     try:
         git_dir = os.path.join(s_dir,
-            subprocess.check_output(['git', '-C', s_dir, 'rev-parse', '--git-dir']).decode("utf-8").rstrip())
+            subprocess.check_output(['git', '-C', s_dir, 'rev-parse', '--git-dir'], stderr=subprocess.DEVNULL).decode("utf-8").rstrip())
     except subprocess.CalledProcessError:
         pass
 

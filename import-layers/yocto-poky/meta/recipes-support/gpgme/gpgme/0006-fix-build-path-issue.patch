@@ -1,0 +1,37 @@
+From 180a5669e4a13a550b1b0dcef1689b6c0470fe54 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 31 Jan 2018 11:01:09 +0800
+Subject: [PATCH] fix build path issue
+
+Get the "--root" directory supplied to the "install" command,
+and use it as a prefix to strip off the purported filename
+encoded in bytecode files.
+
+Since --root added, we need to tweak --prefix and --install-lib
+to use relative path.
+
+Upstream-Status: Submitted [gnupg-devel@gnupg.org]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ lang/python/Makefile.am | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
+index ce4f0a5..5a468f1 100644
+--- a/lang/python/Makefile.am
++++ b/lang/python/Makefile.am
+@@ -90,8 +90,9 @@ install-exec-local:
+ 	  build \
+ 	  --build-base="$$(basename "$${PYTHON}")-gpg" \
+ 	  install \
+-	  --prefix "$(DESTDIR)$(prefix)" \
+-	  --install-lib=$(DESTDIR)${pythondir} \
++	  --root=${DESTDIR} \
++	  --prefix "$(prefix)" \
++	  --install-lib=${pythondir} \
+ 	  --verbose ; \
+ 	done
+ 
+-- 
+1.8.3.1
+

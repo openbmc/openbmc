@@ -1,12 +1,13 @@
-From 3d1a1a8273112668927a6c6bb3e361e896f5b229 Mon Sep 17 00:00:00 2001
+From 3b5f431a370054bfc090796e8d55de8c8cea46f4 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Wed, 11 Apr 2012 14:28:45 +0200
-Subject: [PATCH 02/12] add setdpi Xinit.d script
+Subject: [PATCH] add setdpi Xinit.d script
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
- X11/Xinit.d/50setdpi |   92 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 92 insertions(+), 0 deletions(-)
+ X11/Xinit.d/50setdpi | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
  create mode 100644 X11/Xinit.d/50setdpi
 
 diff --git a/X11/Xinit.d/50setdpi b/X11/Xinit.d/50setdpi
@@ -107,6 +108,3 @@ index 0000000..04a2edd
 +
 +set_dpi "$SET_SCREEN_DPI"
 +set_rxvt_font "$SCREEN_DPI"
--- 
-1.7.8.5
-

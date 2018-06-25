@@ -17,12 +17,12 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  Lib/sysconfig.py           |    5 ++++-
  2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index a545ab9..74317d1 100644
---- a/Lib/distutils/sysconfig.py
-+++ b/Lib/distutils/sysconfig.py
-@@ -554,7 +554,10 @@ def get_config_vars(*args):
-         _config_vars['exec_prefix'] = EXEC_PREFIX
+Index: Python-3.5.3/Lib/distutils/sysconfig.py
+===================================================================
+--- Python-3.5.3.orig/Lib/distutils/sysconfig.py
++++ Python-3.5.3/Lib/distutils/sysconfig.py
+@@ -498,7 +498,10 @@ def get_config_vars(*args):
+             _config_vars['SO'] = SO
  
          # Always convert srcdir to an absolute path
 -        srcdir = _config_vars.get('srcdir', project_base)
@@ -33,11 +33,11 @@ index a545ab9..74317d1 100644
          if os.name == 'posix':
              if python_build:
                  # If srcdir is a relative path (typically '.' or '..')
-diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 7287f11..cc92998 100644
---- a/Lib/sysconfig.py
-+++ b/Lib/sysconfig.py
-@@ -562,7 +562,10 @@ def get_config_vars(*args):
+Index: Python-3.5.3/Lib/sysconfig.py
+===================================================================
+--- Python-3.5.3.orig/Lib/sysconfig.py
++++ Python-3.5.3/Lib/sysconfig.py
+@@ -544,7 +544,10 @@ def get_config_vars(*args):
          _CONFIG_VARS['userbase'] = _getuserbase()
  
          # Always convert srcdir to an absolute path
@@ -49,6 +49,3 @@ index 7287f11..cc92998 100644
          if os.name == 'posix':
              if _PYTHON_BUILD:
                  # If srcdir is a relative path (typically '.' or '..')
--- 
-1.7.9.5
-

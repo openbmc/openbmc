@@ -10,7 +10,27 @@ SRC_URI[sha256sum] = "b2d701b25ad3f9a1542057f3eb492c5c1d7dbe2b8d1e8f763043dcc14e
 
 inherit pypi setuptools
 
+PACKAGES =+ "${PN}-tests ${PN}-samples"
+
+FILES_${PN}-samples += " \
+    ${PYTHON_SITEPACKAGES_DIR}/rtm/samples \
+"
+
+FILES_${PN}-tests += " \
+    ${PYTHON_SITEPACKAGES_DIR}/rtm/tests \
+"
+
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-json \
+    ${PYTHON_PN}-logging \
     ${PYTHON_PN}-netclient \
-    "
+"
+
+RDEPENDS_${PN}-samples += " \
+    ${PN} \
+"
+
+RDEPENDS_${PN}-tests += " \
+    ${PN} \
+    ${PYTHON_PN}-unittest \
+"

@@ -1,0 +1,155 @@
+--- a/newlib/libc/stdio/fprintf_chk.c	1969-12-31 19:00:00.000000000 -0500
++++ b/newlib/libc/stdio/fprintf_chk.c	2009-02-26 19:02:53.000000000 -0500
+@@ -0,0 +1,21 @@
++#include <stdarg.h>
++#include <stdio.h>
++
++/*
++ * Stub implementation of __fprintf_chk adapted from glibc 2.7.  This 
++ * doesn't actually implement any buffer overflow protection.  It just makes
++ * the linker happy :)
++*/
++int
++__fprintf_chk (FILE *fp, int flag, const char *format, ...)
++{
++  va_list ap;
++  int done;
++
++  va_start (ap, format);
++  done = vfprintf (fp, format, ap);
++  va_end (ap);
++
++  return done;
++}
++
+--- a/newlib/libc/stdio/Makefile.am	2007-08-02 16:23:06.000000000 -0400
++++ b/newlib/libc/stdio/Makefile.am	2009-02-26 18:14:53.000000000 -0500
+@@ -20,6 +20,7 @@
+ 	flags.c			\
+ 	fopen.c			\
+ 	fprintf.c			\
++	fprintf_chk.c		\
+ 	fputc.c			\
+ 	fputs.c			\
+ 	fread.c			\
+@@ -65,6 +66,7 @@
+ 	sniprintf.c			\
+ 	snprintf.c			\
+ 	sprintf.c			\
++	sprintf_chk.c			\
+ 	sscanf.c			\
+ 	stdio.c			\
+ 	tmpfile.c			\
+--- a/newlib/libc/stdio/Makefile.in	2007-12-19 17:36:38.000000000 -0500
++++ b/newlib/libc/stdio/Makefile.in	2009-02-26 18:43:52.000000000 -0500
+@@ -63,7 +63,8 @@
+ 	lib_a-fgets.$(OBJEXT) lib_a-fileno.$(OBJEXT) \
+ 	lib_a-findfp.$(OBJEXT) lib_a-fiprintf.$(OBJEXT) \
+ 	lib_a-flags.$(OBJEXT) lib_a-fopen.$(OBJEXT) \
+-	lib_a-fprintf.$(OBJEXT) lib_a-fputc.$(OBJEXT) \
++	lib_a-fprintf.$(OBJEXT) lib_a-fprintf_chk.$(OBJEXT) \
++	lib_a-fputc.$(OBJEXT) \
+ 	lib_a-fputs.$(OBJEXT) lib_a-fread.$(OBJEXT) \
+ 	lib_a-freopen.$(OBJEXT) lib_a-fscanf.$(OBJEXT) \
+ 	lib_a-fiscanf.$(OBJEXT) lib_a-fseek.$(OBJEXT) \
+@@ -86,6 +87,7 @@
+ 	lib_a-setvbuf.$(OBJEXT) lib_a-siprintf.$(OBJEXT) \
+ 	lib_a-siscanf.$(OBJEXT) lib_a-sniprintf.$(OBJEXT) \
+ 	lib_a-snprintf.$(OBJEXT) lib_a-sprintf.$(OBJEXT) \
++	lib_a-sprintf_chk.$(OBJEXT) \
+ 	lib_a-sscanf.$(OBJEXT) lib_a-stdio.$(OBJEXT) \
+ 	lib_a-tmpfile.$(OBJEXT) lib_a-tmpnam.$(OBJEXT) \
+ 	lib_a-ungetc.$(OBJEXT) lib_a-vdiprintf.$(OBJEXT) \
+@@ -122,15 +124,15 @@
+ LTLIBRARIES = $(noinst_LTLIBRARIES)
+ am__objects_4 = clearerr.lo fclose.lo fdopen.lo feof.lo ferror.lo \
+ 	fflush.lo fgetc.lo fgetpos.lo fgets.lo fileno.lo findfp.lo \
+-	fiprintf.lo flags.lo fopen.lo fprintf.lo fputc.lo fputs.lo \
+-	fread.lo freopen.lo fscanf.lo fiscanf.lo fseek.lo fsetpos.lo \
++	fiprintf.lo flags.lo fopen.lo fprintf.lo fprintf_chk.lo fputc.lo \
++	fputs.lo fread.lo freopen.lo fscanf.lo fiscanf.lo fseek.lo fsetpos.lo \
+ 	ftell.lo fvwrite.lo fwalk.lo fwrite.lo getc.lo getchar.lo \
+ 	getc_u.lo getchar_u.lo getdelim.lo getline.lo gets.lo \
+ 	iprintf.lo iscanf.lo makebuf.lo perror.lo printf.lo putc.lo \
+ 	putchar.lo putc_u.lo putchar_u.lo puts.lo refill.lo remove.lo \
+ 	rename.lo rewind.lo rget.lo scanf.lo sccl.lo setbuf.lo \
+ 	setbuffer.lo setlinebuf.lo setvbuf.lo siprintf.lo siscanf.lo \
+-	sniprintf.lo snprintf.lo sprintf.lo sscanf.lo stdio.lo \
++	sniprintf.lo snprintf.lo sprintf.lo sprintf_chk.lo sscanf.lo stdio.lo \
+ 	tmpfile.lo tmpnam.lo ungetc.lo vdiprintf.lo vdprintf.lo \
+ 	viprintf.lo viscanf.lo vprintf.lo vscanf.lo vsiprintf.lo \
+ 	vsiscanf.lo vsnprintf.lo vsniprintf.lo vsprintf.lo vsscanf.lo \
+@@ -344,6 +346,7 @@
+ 	flags.c			\
+ 	fopen.c			\
+ 	fprintf.c			\
++	fprintf_chk.c			\
+ 	fputc.c			\
+ 	fputs.c			\
+ 	fread.c			\
+@@ -389,6 +392,7 @@
+ 	sniprintf.c			\
+ 	snprintf.c			\
+ 	sprintf.c			\
++	sprintf_chk.c			\
+ 	sscanf.c			\
+ 	stdio.c			\
+ 	tmpfile.c			\
+@@ -508,6 +512,7 @@
+ 	siprintf.def		\
+ 	siscanf.def		\
+ 	sprintf.def		\
++	sprintf_chk.def		\
+ 	sscanf.def		\
+ 	tmpfile.def		\
+ 	tmpnam.def		\
+@@ -678,6 +683,12 @@
+ lib_a-fprintf.obj: fprintf.c
+ 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fprintf.obj `if test -f 'fprintf.c'; then $(CYGPATH_W) 'fprintf.c'; else $(CYGPATH_W) '$(srcdir)/fprintf.c'; fi`
+ 
++lib_a-fprintf_chk.o: fprintf_chk.c
++	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fprintf_chk.o `test -f 'fprintf_chk.c' || echo '$(srcdir)/'`fprintf_chk.c
++
++lib_a-fprintf_chk.obj: fprintf_chk.c
++	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fprintf_chk.obj `if test -f 'fprintf_chk.c'; then $(CYGPATH_W) 'fprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/fprintf_chk.c'; fi`
++
+ lib_a-fputc.o: fputc.c
+ 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fputc.o `test -f 'fputc.c' || echo '$(srcdir)/'`fputc.c
+ 
+@@ -948,6 +959,12 @@
+ lib_a-sprintf.obj: sprintf.c
+ 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf.obj `if test -f 'sprintf.c'; then $(CYGPATH_W) 'sprintf.c'; else $(CYGPATH_W) '$(srcdir)/sprintf.c'; fi`
+ 
++lib_a-sprintf_chk.o: sprintf_chk.c
++	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf_chk.o `test -f 'sprintf_chk.c' || echo '$(srcdir)/'`sprintf_chk.c
++
++lib_a-sprintf_chk.obj: sprintf_chk.c
++	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf_chk.obj `if test -f 'sprintf_chk.c'; then $(CYGPATH_W) 'sprintf_chk.c'; else $(CYGPATH_W) '$(srcdir)/sprintf_chk.c'; fi`
++
+ lib_a-sscanf.o: sscanf.c
+ 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sscanf.o `test -f 'sscanf.c' || echo '$(srcdir)/'`sscanf.c
+ 
+--- a/newlib/libc/stdio/sprintf_chk.c	1969-12-31 19:00:00.000000000 -0500
++++ b/newlib/libc/stdio/sprintf_chk.c	2009-02-26 19:02:26.000000000 -0500
+@@ -0,0 +1,21 @@
++#include <stdarg.h>
++#include <stdio.h>
++
++/*
++ * Stub implementation of __sprintf_chk adapted from glibc 2.7.  This 
++ * doesn't actually implement any buffer overflow protection.  It just makes
++ * the linker happy :)
++*/
++int
++__sprintf_chk (char *s, int flags, size_t slen, const char *format, ...)
++{
++  va_list arg;
++  int done;
++
++  va_start (arg, format);
++  done = vsprintf (s, format, arg);
++  va_end (arg);
++
++  return done;
++}
++

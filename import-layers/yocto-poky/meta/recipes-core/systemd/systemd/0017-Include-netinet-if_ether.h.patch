@@ -1,0 +1,85 @@
+From f2b0173cd9807864db1ef3b102abaa76ef37e506 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 28 Feb 2018 21:19:12 -0800
+Subject: [PATCH 17/31] Include netinet/if_ether.h
+
+Fixes
+/path/to/systemd/recipe-sysroot/usr/include/netinet/if_ether.h:101:8: error: redefinition of 'struct ethhdr'
+ struct ethhdr {
+        ^~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/libsystemd/sd-netlink/netlink-types.c | 1 +
+ src/network/netdev/tuntap.c               | 1 +
+ src/network/networkd-brvlan.c             | 1 +
+ src/udev/net/ethtool-util.c               | 1 +
+ src/udev/udev-builtin-net_setup_link.c    | 1 +
+ 5 files changed, 5 insertions(+)
+
+diff --git a/src/libsystemd/sd-netlink/netlink-types.c b/src/libsystemd/sd-netlink/netlink-types.c
+index 0ee7d6f0d..ef75893a6 100644
+--- a/src/libsystemd/sd-netlink/netlink-types.c
++++ b/src/libsystemd/sd-netlink/netlink-types.c
+@@ -21,6 +21,7 @@
+ #include <netinet/in.h>
+ #include <stdint.h>
+ #include <sys/socket.h>
++#include <netinet/if_ether.h>
+ #include <linux/netlink.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/genetlink.h>
+diff --git a/src/network/netdev/tuntap.c b/src/network/netdev/tuntap.c
+index 4fc9b610a..628c61c57 100644
+--- a/src/network/netdev/tuntap.c
++++ b/src/network/netdev/tuntap.c
+@@ -20,6 +20,7 @@
+ 
+ #include <errno.h>
+ #include <fcntl.h>
++#include <netinet/if_ether.h>
+ #include <linux/if_tun.h>
+ #include <net/if.h>
+ #include <netinet/if_ether.h>
+diff --git a/src/network/networkd-brvlan.c b/src/network/networkd-brvlan.c
+index 99dd41629..90407c9d8 100644
+--- a/src/network/networkd-brvlan.c
++++ b/src/network/networkd-brvlan.c
+@@ -19,6 +19,7 @@
+ ***/
+ 
+ #include <netinet/in.h>
++#include <netinet/if_ether.h>
+ #include <linux/if_bridge.h>
+ #include <stdbool.h>
+ 
+diff --git a/src/udev/net/ethtool-util.c b/src/udev/net/ethtool-util.c
+index 9bdaef8d9..948f89cf8 100644
+--- a/src/udev/net/ethtool-util.c
++++ b/src/udev/net/ethtool-util.c
+@@ -18,6 +18,7 @@
+   along with systemd; If not, see <http://www.gnu.org/licenses/>.
+ ***/
+ 
++#include <netinet/if_ether.h>
+ #include <net/if.h>
+ #include <sys/ioctl.h>
+ #include <linux/ethtool.h>
+diff --git a/src/udev/udev-builtin-net_setup_link.c b/src/udev/udev-builtin-net_setup_link.c
+index 40158e0af..b24b3fce8 100644
+--- a/src/udev/udev-builtin-net_setup_link.c
++++ b/src/udev/udev-builtin-net_setup_link.c
+@@ -18,6 +18,7 @@
+   along with systemd; If not, see <http://www.gnu.org/licenses/>.
+ ***/
+ 
++#include <netinet/if_ether.h>
+ #include "alloc-util.h"
+ #include "link-config.h"
+ #include "log.h"
+-- 
+2.13.0
+

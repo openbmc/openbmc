@@ -1,4 +1,4 @@
-From 12ac0dc6742e1bcdfaf1842186c9002f0820a5e8 Mon Sep 17 00:00:00 2001
+From 230cd84486145c5bb1d69d4c9a544e00adbcc9b5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 1 Jul 2017 13:21:21 -0700
 Subject: [PATCH] Use ucontext_t instead of struct ucontext
@@ -6,12 +6,13 @@ Subject: [PATCH] Use ucontext_t instead of struct ucontext
 Newer glibc has dropped the ucontext tag from exposing
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/stacktrace_powerpc-linux-inl.h | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/src/stacktrace_powerpc-linux-inl.h b/src/stacktrace_powerpc-linux-inl.h
-index a9bf775..47ff2d7 100644
+index 3b3843b..a301a46 100644
 --- a/src/stacktrace_powerpc-linux-inl.h
 +++ b/src/stacktrace_powerpc-linux-inl.h
 @@ -53,7 +53,6 @@
@@ -31,6 +32,3 @@ index a9bf775..47ff2d7 100644
            // We don't care about the rest, since IP value is at 'uc' field.A
          } *sigframe = reinterpret_cast<rt_signal_frame_32*>(current);
          result[n] = (void*) sigframe->uc.uc_mcontext.uc_regs->gregs[PT_NIP];
--- 
-2.13.2
-

@@ -1,31 +1,34 @@
-From c4254fd8ff1888ca285e3242b812010357ce2b3e Mon Sep 17 00:00:00 2001
+From d6b57c1b4eb9a24d9d95342a961c93946539c93b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 24 Jun 2017 22:52:40 -0700
-Subject: [PATCH] i18n: Drop include <xlocale.h>
+Subject: [PATCH 3/4] i18n: Drop include <xlocale.h>
 
 glibc 2.26 drops this header
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
- i18n/digitlst.cpp | 6 +-----
+---
+ source/i18n/digitlst.cpp | 6 +-----
  1 file changed, 1 insertion(+), 5 deletions(-)
 
-Index: source/i18n/digitlst.cpp
-===================================================================
---- source.orig/i18n/digitlst.cpp
-+++ source/i18n/digitlst.cpp
-@@ -61,11 +61,7 @@
+diff --git a/source/i18n/digitlst.cpp b/source/i18n/digitlst.cpp
+index 8e86fa7..0bdbb2c 100644
+--- a/i18n/digitlst.cpp
++++ b/i18n/digitlst.cpp
+@@ -62,11 +62,7 @@
  #endif
  
  #if U_USE_STRTOD_L
--# if U_PLATFORM_USES_ONLY_WIN32_API || U_PLATFORM == U_PF_CYGWIN
--#   include <locale.h>
--# else
+-# if U_HAVE_XLOCALE_H
 -#   include <xlocale.h>
+-# else
+-#   include <locale.h>
 -# endif
 +# include <locale.h>
  #endif
  
  // ***************************************************************************
+-- 
+2.14.2
+

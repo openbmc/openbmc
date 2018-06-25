@@ -78,7 +78,7 @@
                 </para>
 
                 <para>
-                    In OpenEmbedded Core, <filename>ASSUME_PROVIDED</filename>
+                    In OpenEmbedded-Core, <filename>ASSUME_PROVIDED</filename>
                     mostly specifies native tools that should not be built.
                     An example is <filename>git-native</filename>, which
                     when specified allows for the Git binary from the host to
@@ -964,7 +964,7 @@
                     Allows you to extend a recipe so that it builds variants
                     of the software.
                     Some examples of these variants for recipes from the
-                    OpenEmbedded Core metadata are "natives" such as
+                    OpenEmbedded-Core metadata are "natives" such as
                     <filename>quilt-native</filename>, which is a copy of
                     Quilt built to run on the build system; "crosses" such
                     as <filename>gcc-cross</filename>, which is a compiler
@@ -980,7 +980,7 @@
                     amount of code, it usually is as simple as adding the
                     variable to your recipe.
                     Here are two examples.
-                    The "native" variants are from the OpenEmbedded Core
+                    The "native" variants are from the OpenEmbedded-Core
                     metadata:
                     <literallayout class='monospaced'>
      BBCLASSEXTEND =+ "native nativesdk"
@@ -2085,6 +2085,16 @@
                     For information on build-time dependencies, see the
                     <link linkend='var-DEPENDS'><filename>DEPENDS</filename></link>
                     variable.
+                </para>
+            </glossdef>
+        </glossentry>
+
+        <glossentry id='var-REPODIR'><glossterm>REPODIR</glossterm>
+            <glossdef>
+                <para>
+                    The directory in which a local copy of a
+                    <filename>google-repo</filename> directory is stored
+                    when it is synced.
                 </para>
             </glossdef>
         </glossentry>

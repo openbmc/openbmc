@@ -1,0 +1,44 @@
+This fixes a compile issue introduced with linux kernel 4.15
+
+include/linux/in.h:222:8: error: redefinition of 'struct in_pktinfo'
+|  struct in_pktinfo {
+
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: openl2tp-1.8/plugins/ppp_unix.c
+===================================================================
+--- openl2tp-1.8.orig/plugins/ppp_unix.c
++++ openl2tp-1.8/plugins/ppp_unix.c
+@@ -25,9 +25,14 @@
+ #include <fcntl.h>
+ #include <sys/types.h>
+ #include <signal.h>
++#include <linux/version.h>
++
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ #include <net/ethernet.h>
+ #include <net/if.h>
+ #include <netinet/in.h>
++#endif
++
+ #include <arpa/inet.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
+@@ -41,12 +46,12 @@
+ #define __user
+ #endif
+ #include <sys/ioctl.h>
+-#include <linux/if_ether.h>
+-#include <linux/if_pppox.h>
+ #include <linux/ppp_defs.h>
+ #include <linux/if_ppp.h>
++#include <linux/if_pppox.h>
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+ #include <linux/if_pppol2tp.h>
+-
++#endif
+ #include "usl.h"
+ #include "l2tp_private.h"
+ 

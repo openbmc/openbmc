@@ -4,9 +4,9 @@ HOMEPAGE = "http://fukuchi.org/works/qrencode/"
 SECTION = "libs"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
-PV = "3.4.4+git${SRCPV}"
+PV = "4.0.0+git${SRCPV}"
 
-SRCREV = "1b565c7b599029818fc596e7da4371a3083da36c"
+SRCREV = "07f3c5d4bf9136711422cc7dbf28aff469da220a"
 SRC_URI = "git://github.com/fukuchi/libqrencode.git"
 
 S = "${WORKDIR}/git"

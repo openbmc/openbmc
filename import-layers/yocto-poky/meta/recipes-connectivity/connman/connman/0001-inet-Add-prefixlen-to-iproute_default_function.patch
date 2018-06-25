@@ -1,0 +1,63 @@
+From 508dc60a1f0758ebc586b6b086478a176d493086 Mon Sep 17 00:00:00 2001
+From: Jian Liang <jianliang@tycoint.com>
+Date: Thu, 5 Oct 2017 09:34:41 +0100
+Subject: [PATCH 1/4] inet: Add prefixlen to iproute_default_function
+To: connman@lists.01.org
+Cc: wagi@monom.org
+
+Add prefixlen parameter to this function in preparation for using
+it also in creating subnet route later, e.g.
+
+default via 192.168.100.1 dev eth0
+192.168.100.0/24 dev eth0
+
+Signed-off-by: Jian Liang <jianliang@tycoint.com>
+
+---
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/network/connman/connman.git/commit/?id=edda5b695de2ee79f02314abc9b46fdd46b388e1]
+Signed-off-by: André Draszik <andre.draszik@jci.com>
+ src/inet.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/inet.c b/src/inet.c
+index b887aa0..ab8aec8 100644
+--- a/src/inet.c
++++ b/src/inet.c
+@@ -2796,7 +2796,7 @@ int __connman_inet_del_fwmark_rule(uint32_t table_id, int family, uint32_t fwmar
+ }
+ 
+ static int iproute_default_modify(int cmd, uint32_t table_id, int ifindex,
+-			const char *gateway)
++			const char *gateway, unsigned char prefixlen)
+ {
+ 	struct __connman_inet_rtnl_handle rth;
+ 	unsigned char buf[sizeof(struct in6_addr)];
+@@ -2829,6 +2829,7 @@ static int iproute_default_modify(int cmd, uint32_t table_id, int ifindex,
+ 	rth.req.u.r.rt.rtm_protocol = RTPROT_BOOT;
+ 	rth.req.u.r.rt.rtm_scope = RT_SCOPE_UNIVERSE;
+ 	rth.req.u.r.rt.rtm_type = RTN_UNICAST;
++	rth.req.u.r.rt.rtm_dst_len = prefixlen;
+ 
+ 	__connman_inet_rtnl_addattr_l(&rth.req.n, sizeof(rth.req), RTA_GATEWAY,
+ 								buf, len);
+@@ -2860,7 +2861,7 @@ int __connman_inet_add_default_to_table(uint32_t table_id, int ifindex,
+ {
+ 	/* ip route add default via 1.2.3.4 dev wlan0 table 1234 */
+ 
+-	return iproute_default_modify(RTM_NEWROUTE, table_id, ifindex, gateway);
++	return iproute_default_modify(RTM_NEWROUTE, table_id, ifindex, gateway, 0);
+ }
+ 
+ int __connman_inet_del_default_from_table(uint32_t table_id, int ifindex,
+@@ -2868,7 +2869,7 @@ int __connman_inet_del_default_from_table(uint32_t table_id, int ifindex,
+ {
+ 	/* ip route del default via 1.2.3.4 dev wlan0 table 1234 */
+ 
+-	return iproute_default_modify(RTM_DELROUTE, table_id, ifindex, gateway);
++	return iproute_default_modify(RTM_DELROUTE, table_id, ifindex, gateway, 0);
+ }
+ 
+ int __connman_inet_get_interface_ll_address(int index, int family,
+-- 
+2.7.4
+

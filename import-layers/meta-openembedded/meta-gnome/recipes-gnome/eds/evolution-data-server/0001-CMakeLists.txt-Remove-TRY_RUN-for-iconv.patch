@@ -1,0 +1,39 @@
+From 131b88a81aba3d72d566bc8a9d968941a98e0007 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Tue, 19 Dec 2017 16:37:20 +0100
+Subject: [PATCH] CMakeLists.txt: Remove TRY_RUN for iconv
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+| CMake Error: TRY_RUN() invoked in cross-compiling mode, please set the following cache variables appropriately:
+|    _correct_iconv_EXITCODE (advanced)
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ CMakeLists.txt | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8d07772..a2396f2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -521,13 +521,8 @@ if(NOT HAVE_ICONV)
+ endif(NOT HAVE_ICONV)
+ 
+ set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBS})
+-CHECK_C_SOURCE_RUNS("#include \"${CMAKE_SOURCE_DIR}/iconv-detect.c\"" _correct_iconv)
+ unset(CMAKE_REQUIRED_LIBRARIES)
+ 
+-if(NOT _correct_iconv)
+-	message(FATAL_ERROR "You need to install a working iconv implementation, such as ftp://ftp.gnu.org/pub/gnu/libiconv")
+-endif(NOT _correct_iconv)
+-
+ # ******************************
+ # Backtraces for debugging
+ # ******************************
+-- 
+2.14.3
+

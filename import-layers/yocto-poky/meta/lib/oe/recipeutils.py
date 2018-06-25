@@ -22,7 +22,7 @@ from collections import OrderedDict, defaultdict
 # Help us to find places to insert values
 recipe_progression = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION', 'LICENSE', 'LICENSE_FLAGS', 'LIC_FILES_CHKSUM', 'PROVIDES', 'DEPENDS', 'PR', 'PV', 'SRCREV', 'SRCPV', 'SRC_URI', 'S', 'do_fetch()', 'do_unpack()', 'do_patch()', 'EXTRA_OECONF', 'EXTRA_OECMAKE', 'EXTRA_OESCONS', 'do_configure()', 'EXTRA_OEMAKE', 'do_compile()', 'do_install()', 'do_populate_sysroot()', 'INITSCRIPT', 'USERADD', 'GROUPADD', 'PACKAGES', 'FILES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RPROVIDES', 'RREPLACES', 'RCONFLICTS', 'ALLOW_EMPTY', 'populate_packages()', 'do_package()', 'do_deploy()']
 # Variables that sometimes are a bit long but shouldn't be wrapped
-nowrap_vars = ['SUMMARY', 'HOMEPAGE', 'BUGTRACKER', 'SRC_URI[md5sum]', 'SRC_URI[sha256sum]']
+nowrap_vars = ['SUMMARY', 'HOMEPAGE', 'BUGTRACKER', 'SRC_URI\[(.+\.)?md5sum\]', 'SRC_URI\[(.+\.)?sha256sum\]']
 list_vars = ['SRC_URI', 'LIC_FILES_CHKSUM']
 meta_vars = ['SUMMARY', 'DESCRIPTION', 'HOMEPAGE', 'BUGTRACKER', 'SECTION']
 
@@ -142,6 +142,10 @@ def patch_recipe_lines(fromlines, values, trailing_newline=True):
     else:
         newline = ''
 
+    nowrap_vars_res = []
+    for item in nowrap_vars:
+        nowrap_vars_res.append(re.compile('^%s$' % item))
+
     recipe_progression_res = []
     recipe_progression_restrs = []
     for item in recipe_progression:
@@ -174,7 +178,12 @@ def patch_recipe_lines(fromlines, values, trailing_newline=True):
             return
         rawtext = '%s = "%s"%s' % (name, values[name], newline)
         addlines = []
-        if name in nowrap_vars:
+        nowrap = False
+        for nowrap_re in nowrap_vars_res:
+            if nowrap_re.match(name):
+                nowrap = True
+                break
+        if nowrap:
             addlines.append(rawtext)
         elif name in list_vars:
             splitvalue = split_var_value(values[name], assignment=False)
@@ -242,7 +251,7 @@ def patch_recipe_lines(fromlines, values, trailing_newline=True):
     return changed, tolines
 
 
-def patch_recipe_file(fn, values, patch=False, relpath=''):
+def patch_recipe_file(fn, values, patch=False, relpath='', redirect_output=None):
     """Update or insert variable values into a recipe file (assuming you
        have already identified the exact file you want to update.)
        Note that some manual inspection/intervention may be required
@@ -254,7 +263,11 @@ def patch_recipe_file(fn, values, patch=False, relpath=''):
 
     _, tolines = patch_recipe_lines(fromlines, values)
 
-    if patch:
+    if redirect_output:
+        with open(os.path.join(redirect_output, os.path.basename(fn)), 'w') as f:
+            f.writelines(tolines)
+        return None
+    elif patch:
         relfn = os.path.relpath(fn, relpath)
         diff = difflib.unified_diff(fromlines, tolines, 'a/%s' % relfn, 'b/%s' % relfn)
         return diff
@@ -304,7 +317,7 @@ def localise_file_vars(fn, varfiles, varlist):
 
     return filevars
 
-def patch_recipe(d, fn, varvalues, patch=False, relpath=''):
+def patch_recipe(d, fn, varvalues, patch=False, relpath='', redirect_output=None):
     """Modify a list of variable values in the specified recipe. Handles inc files if
     used by the recipe.
     """
@@ -314,7 +327,7 @@ def patch_recipe(d, fn, varvalues, patch=False, relpath=''):
     patches = []
     for f,v in locs.items():
         vals = {k: varvalues[k] for k in v}
-        patchdata = patch_recipe_file(f, vals, patch, relpath)
+        patchdata = patch_recipe_file(f, vals, patch, relpath, redirect_output)
         if patch:
             patches.append(patchdata)
 
@@ -395,7 +408,7 @@ def get_recipe_local_files(d, patches=False, archives=False):
     # fetcher) though note that this only encompasses actual container formats
     # i.e. that can contain multiple files as opposed to those that only
     # contain a compressed stream (i.e. .tar.gz as opposed to just .gz)
-    archive_exts = ['.tar', '.tgz', '.tar.gz', '.tar.Z', '.tbz', '.tbz2', '.tar.bz2', '.tar.xz', '.tar.lz', '.zip', '.jar', '.rpm', '.srpm', '.deb', '.ipk', '.tar.7z', '.7z']
+    archive_exts = ['.tar', '.tgz', '.tar.gz', '.tar.Z', '.tbz', '.tbz2', '.tar.bz2', '.txz', '.tar.xz', '.tar.lz', '.zip', '.jar', '.rpm', '.srpm', '.deb', '.ipk', '.tar.7z', '.7z']
     ret = {}
     for uri in uris:
         if fetch.ud[uri].type == 'file':
@@ -575,7 +588,7 @@ def get_bbappend_path(d, destlayerdir, wildcardver=False):
     return (appendpath, pathok)
 
 
-def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False, machine=None, extralines=None, removevalues=None):
+def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False, machine=None, extralines=None, removevalues=None, redirect_output=None):
     """
     Writes a bbappend file for a recipe
     Parameters:
@@ -602,6 +615,9 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
             value pairs, or simply a list of the lines.
         removevalues:
             Variable values to remove - a dict of names/values.
+        redirect_output:
+            If specified, redirects writing the output file to the
+            specified directory (for dry-run purposes)
     """
 
     if not removevalues:
@@ -616,7 +632,8 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
         bb.warn('Unable to determine correct subdirectory path for bbappend file - check that what %s adds to BBFILES also matches .bbappend files. Using %s for now, but until you fix this the bbappend will not be applied.' % (os.path.join(destlayerdir, 'conf', 'layer.conf'), os.path.dirname(appendpath)))
 
     appenddir = os.path.dirname(appendpath)
-    bb.utils.mkdirhier(appenddir)
+    if not redirect_output:
+        bb.utils.mkdirhier(appenddir)
 
     # FIXME check if the bbappend doesn't get overridden by a higher priority layer?
 
@@ -693,9 +710,18 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
         if instfunclines:
             bbappendlines.append(('do_install_append%s()' % appendoverride, '', instfunclines))
 
-    bb.note('Writing append file %s' % appendpath)
+    if redirect_output:
+        bb.note('Writing append file %s (dry-run)' % appendpath)
+        outfile = os.path.join(redirect_output, os.path.basename(appendpath))
+        # Only take a copy if the file isn't already there (this function may be called
+        # multiple times per operation when we're handling overrides)
+        if os.path.exists(appendpath) and not os.path.exists(outfile):
+            shutil.copy2(appendpath, outfile)
+    else:
+        bb.note('Writing append file %s' % appendpath)
+        outfile = appendpath
 
-    if os.path.exists(appendpath):
+    if os.path.exists(outfile):
         # Work around lack of nonlocal in python 2
         extvars = {'destsubdir': destsubdir}
 
@@ -767,7 +793,7 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
         if removevalues:
             varnames.extend(list(removevalues.keys()))
 
-        with open(appendpath, 'r') as f:
+        with open(outfile, 'r') as f:
             (updated, newlines) = bb.utils.edit_metadata(f, varnames, appendfile_varfunc)
 
         destsubdir = extvars['destsubdir']
@@ -784,20 +810,27 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
         updated = True
 
     if updated:
-        with open(appendpath, 'w') as f:
+        with open(outfile, 'w') as f:
             f.writelines(newlines)
 
     if copyfiles:
         if machine:
             destsubdir = os.path.join(destsubdir, machine)
+        if redirect_output:
+            outdir = redirect_output
+        else:
+            outdir = appenddir
         for newfile, srcfile in copyfiles.items():
-            filedest = os.path.join(appenddir, destsubdir, os.path.basename(srcfile))
+            filedest = os.path.join(outdir, destsubdir, os.path.basename(srcfile))
             if os.path.abspath(newfile) != os.path.abspath(filedest):
                 if newfile.startswith(tempfile.gettempdir()):
                     newfiledisp = os.path.basename(newfile)
                 else:
                     newfiledisp = newfile
-                bb.note('Copying %s to %s' % (newfiledisp, filedest))
+                if redirect_output:
+                    bb.note('Copying %s to %s (dry-run)' % (newfiledisp, os.path.join(appenddir, destsubdir, os.path.basename(srcfile))))
+                else:
+                    bb.note('Copying %s to %s' % (newfiledisp, filedest))
                 bb.utils.mkdirhier(os.path.dirname(filedest))
                 shutil.copyfile(newfile, filedest)
 
@@ -867,25 +900,25 @@ def get_recipe_upstream_version(rd):
             FetchError when don't have network access or upstream site don't response.
             NoMethodError when uri latest_versionstring method isn't implemented.
 
-        Returns a dictonary with version, type and datetime.
+        Returns a dictonary with version, repository revision, current_version, type and datetime.
         Type can be A for Automatic, M for Manual and U for Unknown.
     """
     from bb.fetch2 import decodeurl
     from datetime import datetime
 
     ru = {}
+    ru['current_version'] = rd.getVar('PV')
     ru['version'] = ''
     ru['type'] = 'U'
     ru['datetime'] = ''
-
-    pv = rd.getVar('PV')
+    ru['revision'] = ''
 
     # XXX: If don't have SRC_URI means that don't have upstream sources so
     # returns the current recipe version, so that upstream version check
     # declares a match.
     src_uris = rd.getVar('SRC_URI')
     if not src_uris:
-        ru['version'] = pv
+        ru['version'] = ru['current_version']
         ru['type'] = 'M'
         ru['datetime'] = datetime.now()
         return ru
@@ -893,6 +926,9 @@ def get_recipe_upstream_version(rd):
     # XXX: we suppose that the first entry points to the upstream sources
     src_uri = src_uris.split()[0]
     uri_type, _, _, _, _, _ =  decodeurl(src_uri)
+
+    (pv, pfx, sfx) = get_recipe_pv_without_srcpv(rd.getVar('PV'), uri_type)
+    ru['current_version'] = pv
 
     manual_upstream_version = rd.getVar("RECIPE_UPSTREAM_VERSION")
     if manual_upstream_version:
@@ -914,32 +950,21 @@ def get_recipe_upstream_version(rd):
         ru['datetime'] = datetime.now()
     else:
         ud = bb.fetch2.FetchData(src_uri, rd)
-        pupver = ud.method.latest_versionstring(ud, rd)
-        (upversion, revision) = pupver
-
-        # format git version version+gitAUTOINC+HASH
-        if uri_type == 'git':
-            (pv, pfx, sfx) = get_recipe_pv_without_srcpv(pv, uri_type)
-
-            # if contains revision but not upversion use current pv
-            if upversion == '' and revision:
-                upversion = pv
-
-            if upversion:
-                tmp = upversion
-                upversion = ''
-
-                if pfx:
-                    upversion = pfx + tmp
-                else:
-                    upversion = tmp
-
-                if sfx:
-                    upversion = upversion + sfx + revision[:10]
+        if rd.getVar("UPSTREAM_CHECK_COMMITS") == "1":
+            revision = ud.method.latest_revision(ud, rd, 'default')
+            upversion = pv
+            if revision != rd.getVar("SRCREV"):
+                upversion = upversion + "-new-commits-available" 
+        else:
+            pupver = ud.method.latest_versionstring(ud, rd)
+            (upversion, revision) = pupver
 
         if upversion:
             ru['version'] = upversion
             ru['type'] = 'A'
+
+        if revision:
+            ru['revision'] = revision
 
         ru['datetime'] = datetime.now()
 

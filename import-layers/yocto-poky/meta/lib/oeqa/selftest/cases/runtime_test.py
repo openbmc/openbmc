@@ -167,55 +167,6 @@ class TestImage(OESelftestTestCase):
 
 class Postinst(OESelftestTestCase):
     @OETestID(1540)
-    def test_verify_postinst(self):
-        """
-        Summary: The purpose of this test is to verify the execution order of postinst Bugzilla ID: [5319]
-        Expected :
-        1. Compile a minimal image.
-        2. The compiled image will add the created layer with the recipes postinst[ abdpt]
-        3. Run qemux86
-        4. Validate the task execution order
-        Author: Francisco Pedraza <francisco.j.pedraza.gonzalez@intel.com>
-        """
-        features = 'INHERIT += "testimage"\n'
-        features += 'CORE_IMAGE_EXTRA_INSTALL += "postinst-at-rootfs \
-postinst-delayed-a \
-postinst-delayed-b \
-postinst-delayed-d \
-postinst-delayed-p \
-postinst-delayed-t \
-"\n'
-        self.write_config(features)
-
-        bitbake('core-image-minimal -f ')
-
-        postinst_list = ['100-postinst-at-rootfs',
-                         '101-postinst-delayed-a',
-                         '102-postinst-delayed-b',
-                         '103-postinst-delayed-d',
-                         '104-postinst-delayed-p',
-                         '105-postinst-delayed-t']
-        path_workdir = get_bb_var('WORKDIR','core-image-minimal')
-        workspacedir = 'testimage/qemu_boot_log'
-        workspacedir = os.path.join(path_workdir, workspacedir)
-        rexp = re.compile("^Running postinst .*/(?P<postinst>.*)\.\.\.$")
-        with runqemu('core-image-minimal') as qemu:
-            with open(workspacedir) as f:
-                found = False
-                idx = 0
-                for line in f.readlines():
-                    line = line.strip().replace("^M","")
-                    if not line: # To avoid empty lines
-                        continue
-                    m = rexp.search(line)
-                    if m:
-                        self.assertEqual(postinst_list[idx], m.group('postinst'), "Fail")
-                        idx = idx+1
-                        found = True
-                    elif found:
-                        self.assertEqual(idx, len(postinst_list), "Not found all postinsts")
-                        break
-
     @OETestID(1545)
     def test_postinst_rootfs_and_boot(self):
         """
@@ -234,16 +185,22 @@ postinst-delayed-t \
                         for initialization managers: sysvinit and systemd.
 
         """
-        file_rootfs_name = "this-was-created-at-rootfstime"
-        fileboot_name = "this-was-created-at-first-boot"
-        rootfs_pkg = 'postinst-at-rootfs'
-        boot_pkg = 'postinst-delayed-a'
+
+        import oe.path
+
+        vars = get_bb_vars(("IMAGE_ROOTFS", "sysconfdir"), "core-image-minimal")
+        rootfs = vars["IMAGE_ROOTFS"]
+        self.assertIsNotNone(rootfs)
+        sysconfdir = vars["sysconfdir"]
+        self.assertIsNotNone(sysconfdir)
+        # Need to use oe.path here as sysconfdir starts with /
+        hosttestdir = oe.path.join(rootfs, sysconfdir, "postinst-test")
+        targettestdir = os.path.join(sysconfdir, "postinst-test")
 
         for init_manager in ("sysvinit", "systemd"):
             for classes in ("package_rpm", "package_deb", "package_ipk"):
                 with self.subTest(init_manager=init_manager, package_class=classes):
-                    features = 'MACHINE = "qemux86"\n'
-                    features += 'CORE_IMAGE_EXTRA_INSTALL += "%s %s "\n'% (rootfs_pkg, boot_pkg)
+                    features = 'CORE_IMAGE_EXTRA_INSTALL = "postinst-delayed-b"\n'
                     features += 'IMAGE_FEATURES += "package-management empty-root-password"\n'
                     features += 'PACKAGE_CLASSES = "%s"\n' % classes
                     if init_manager == "systemd":
@@ -255,13 +212,49 @@ postinst-delayed-t \
 
                     bitbake('core-image-minimal')
 
-                    file_rootfs_created = os.path.join(get_bb_var('IMAGE_ROOTFS', "core-image-minimal"),
-                                                       file_rootfs_name)
-                    found = os.path.isfile(file_rootfs_created)
-                    self.assertTrue(found, "File %s was not created at rootfs time by %s" % \
-                                    (file_rootfs_name, rootfs_pkg))
+                    self.assertTrue(os.path.isfile(os.path.join(hosttestdir, "rootfs")),
+                                    "rootfs state file was not created")
 
-                    testcommand = 'ls /etc/' + fileboot_name
                     with runqemu('core-image-minimal') as qemu:
-                        status, output = qemu.run_serial("-f /etc/" + fileboot_name)
-                        self.assertEqual(status, 0, 'File %s was not created at first boot (%s)' % (fileboot_name, output))
+                        # Make the test echo a string and search for that as
+                        # run_serial()'s status code is useless.'
+                        for filename in ("rootfs", "delayed-a", "delayed-b"):
+                            status, output = qemu.run_serial("test -f %s && echo found" % os.path.join(targettestdir, filename))
+                            self.assertEqual(output, "found", "%s was not present on boot" % filename)
+
+
+
+    def test_failing_postinst(self):
+        """
+        Summary:        The purpose of this test case is to verify that post-installation
+                        scripts that contain errors are properly reported.
+        Expected:       The scriptlet failure is properly reported.
+                        The file that is created after the error in the scriptlet is not present.
+        Product: oe-core
+        Author: Alexander Kanavin <alexander.kanavin@intel.com>
+        """
+
+        import oe.path
+
+        vars = get_bb_vars(("IMAGE_ROOTFS", "sysconfdir"), "core-image-minimal")
+        rootfs = vars["IMAGE_ROOTFS"]
+        self.assertIsNotNone(rootfs)
+        sysconfdir = vars["sysconfdir"]
+        self.assertIsNotNone(sysconfdir)
+        # Need to use oe.path here as sysconfdir starts with /
+        hosttestdir = oe.path.join(rootfs, sysconfdir, "postinst-test")
+
+        for classes in ("package_rpm", "package_deb", "package_ipk"):
+            with self.subTest(package_class=classes):
+                features = 'CORE_IMAGE_EXTRA_INSTALL = "postinst-rootfs-failing"\n'
+                features += 'PACKAGE_CLASSES = "%s"\n' % classes
+                self.write_config(features)
+                bb_result = bitbake('core-image-minimal')
+                self.assertGreaterEqual(bb_result.output.find("Intentionally failing postinstall scriptlets of ['postinst-rootfs-failing'] to defer them to first boot is deprecated."), 0,
+                    "Warning about a failed scriptlet not found in bitbake output: %s" %(bb_result.output))
+
+                self.assertTrue(os.path.isfile(os.path.join(hosttestdir, "rootfs-before-failure")),
+                                    "rootfs-before-failure file was not created")
+                self.assertFalse(os.path.isfile(os.path.join(hosttestdir, "rootfs-after-failure")),
+                                    "rootfs-after-failure file was created")
+

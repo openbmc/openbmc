@@ -1,7 +1,7 @@
-From 8ae149035c97d27cd2c624704d1651806c53577e Mon Sep 17 00:00:00 2001
+From 265faf8fe0acaca2043a248a4df02b0868ffa6de Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 16 Aug 2017 02:00:08 -0400
-Subject: [PATCH 1/5] pkgconfig
+Subject: [PATCH 1/4] pkgconfig
 
 Update gpgme to use pkgconfig instead of -config files since its
 simpler and less error prone when cross compiling.
@@ -25,10 +25,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  create mode 100644 src/gpgme.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index 0dac6ce..6a9e507 100644
+index 6ea4bcd..2a0d528 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -866,6 +866,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -887,6 +887,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
                  src/versioninfo.rc
                  src/gpgme.h)
  AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
@@ -299,5 +299,5 @@ index 0000000..b69539f
 +Requires: libassuan gpg-error
 \ No newline at end of file
 -- 
-2.8.1
+1.8.3.1
 

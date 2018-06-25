@@ -27,7 +27,6 @@ SRC_URI = "http://www.rsyslog.com/download/files/download/rsyslog/${BPN}-${PV}.t
 "
 
 SRC_URI_append_libc-musl = " \
-    file://0001-Undefine-GLOB_BRACE.patch \
     file://0001-Include-sys-time-h.patch \
 "
 

@@ -11,7 +11,6 @@ DEPENDS += "${PYTHON_PN}-greenlet"
 RDEPENDS_${PN} = "${PYTHON_PN}-greenlet \
 		  ${PYTHON_PN}-mime \
 		  ${PYTHON_PN}-pprint \
-		  ${PYTHON_PN}-re \
 		 "
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/python-gevent:"

@@ -6,7 +6,9 @@ SECTION = "x11/gnome/libs"
 
 DEPENDS = "gconf glib-2.0 libxklavier gtk+3 intltool-native"
 
-inherit gnome gobject-introspection gettext
+inherit distro_features_check gnome gobject-introspection gettext
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 GNOME_COMPRESS_TYPE = "xz"
 

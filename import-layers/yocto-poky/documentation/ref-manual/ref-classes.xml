@@ -35,8 +35,7 @@
 <para>
     This chapter discusses only the most useful and important classes.
     Other classes do exist within the <filename>meta/classes</filename>
-    directory in the
-    <link linkend='source-directory'>Source Directory</link>.
+    directory in the Source Directory.
     You can reference the <filename>.bbclass</filename> files directly
     for more information.
 </para>
@@ -128,9 +127,8 @@
     <para>
         By default, the <filename>autotools*</filename> classes
         use out-of-tree builds (i.e.
-        <filename>autotools.bbclass</filename>).
-        (<link linkend='var-B'><filename>B</filename></link> <filename>!=</filename>
-        <link linkend='var-S'><filename>S</filename></link>).
+        <filename>autotools.bbclass</filename> building with
+        <filename>B != S</filename>).
     </para>
 
     <para>
@@ -357,8 +355,8 @@
         history of build output metadata, which can be used to detect possible
         regressions as well as used for analysis of the build output.
         For more information on using Build History, see the
-        "<link linkend='maintaining-build-output-quality'>Maintaining Build Output Quality</link>"
-        section.
+        "<ulink url='&YOCTO_DOCS_DEV_URL;#maintaining-build-output-quality'>Maintaining Build Output Quality</ulink>"
+        section in the Yocto Project Development Tasks Manual.
     </para>
 </section>
 
@@ -407,8 +405,7 @@
     <title><filename>ccache.bbclass</filename></title>
 
     <para>
-        The <filename>ccache</filename> class enables the
-        <ulink url='http://ccache.samba.org/'>C/C++ Compiler Cache</ulink>
+        The <filename>ccache</filename> class enables the C/C++ Compiler Cache
         for the build.
         This class is used to give a minor performance boost during the build.
         However, using the class can lead to unexpected side-effects.
@@ -568,8 +565,9 @@
         provides support for the recipes that build the Canadian
         Cross-compilation tools for SDKs.
         See the
-        "<link linkend='cross-development-toolchain-generation'>Cross-Development Toolchain Generation</link>"
-        section for more discussion on these cross-compilation tools.
+        "<ulink url='&YOCTO_DOCS_OM_URL;#cross-development-toolchain-generation'>Cross-Development Toolchain Generation</ulink>"
+        section in the Yocto Project Overview and Concepts Manual for more
+        discussion on these cross-compilation tools.
     </para>
 </section>
 
@@ -581,8 +579,9 @@
         provides support for the recipes that build the cross-compilation
         tools used for building SDKs.
         See the
-        "<link linkend='cross-development-toolchain-generation'>Cross-Development Toolchain Generation</link>"
-        section for more discussion on these cross-compilation tools.
+        "<ulink url='&YOCTO_DOCS_OM_URL;#cross-development-toolchain-generation'>Cross-Development Toolchain Generation</ulink>"
+        section in the Yocto Project Overview and Concepts Manual for more
+        discussion on these cross-compilation tools.
     </para>
 </section>
 
@@ -1249,8 +1248,8 @@
         "<ulink url='&YOCTO_DOCS_DEV_URL;#usingpoky-extend-customimage'>Customizing Images</ulink>"
         section in the Yocto Project Development Tasks Manual.
         For information on how images are created, see the
-        "<link linkend='images-dev-environment'>Images</link>" section elsewhere
-        in this manual.
+        "<ulink url='&YOCTO_DOCS_OM_URL;#images-dev-environment'>Images</ulink>"
+        section in the Yocto Project Overview and Concpets Manual.
     </para>
 </section>
 
@@ -1291,7 +1290,7 @@
         This class also handles conversion and compression of images.
         <note>
             To build a VMware VMDK image, you need to add "wic.vmdk" to
-            <link linkend='var-IMAGE_FSTYPES'><filename>IMAGE_FSTYPES</filename></link>.
+            <filename>IMAGE_FSTYPES</filename>.
             This would also be similar for Virtual Box Virtual Disk Image
             ("vdi") and QEMU Copy On Write Version 2 ("qcow2") images.
         </note>
@@ -1552,7 +1551,8 @@
                 <link linkend='var-FILES'><filename>FILES</filename></link>
                 variable values that contain "//", which is invalid.
                 </para></listitem>
-            <listitem><para><emphasis><filename>host-user-contaminated:</filename></emphasis>
+            <listitem><para id='insane-host-user-contaminated'>
+                <emphasis><filename>host-user-contaminated:</filename></emphasis>
                 Checks that no package produced by the recipe contains any
                 files outside of <filename>/home</filename> with a user or
                 group ID that matches the user running BitBake.
@@ -1883,6 +1883,17 @@ This check was removed for YP 2.3 release
     </para>
 </section>
 
+<section id='ref-classes-kernel-devicetree'>
+    <title><filename>kernel-devicetree.bbclass</filename></title>
+
+    <para>
+        The <filename>kernel-devicetree</filename> class, which is inherited by
+        the
+        <link linkend='ref-classes-kernel'><filename>kernel</filename></link>
+        class, supports device tree generation.
+    </para>
+</section>
+
 <section id='ref-classes-kernel-fitimage'>
     <title><filename>kernel-fitimage.bbclass</filename></title>
 
@@ -2122,7 +2133,7 @@ This check was removed for YP 2.3 release
 
     <para>
         For general information on out-of-tree Linux kernel modules, see the
-        "<ulink url='&YOCTO_DOCS_KERNEL_URL;#incorporating-out-of-tree-modules'>Incorporating Out-of-Tree Modules</ulink>"
+        "<ulink url='&YOCTO_DOCS_KERNEL_DEV_URL;#incorporating-out-of-tree-modules'>Incorporating Out-of-Tree Modules</ulink>"
         section in the Yocto Project Linux Kernel Development Manual.
     </para>
 </section>
@@ -2709,8 +2720,8 @@ This check was removed for YP 2.3 release
     <para>
         For more information on the cross-development toolchain
         generation, see the
-        "<link linkend='cross-development-toolchain-generation'>Cross-Development Toolchain Generation</link>"
-        section.
+        "<ulink url='&YOCTO_DOCS_OM_URL;#cross-development-toolchain-generation'>Cross-Development Toolchain Generation</ulink>"
+        section in the Yocto Project Overview and Concepts Manual.
         For information on advantages gained when building a
         cross-development toolchain using the
         <link linkend='ref-tasks-populate_sdk'><filename>do_populate_sdk</filename></link>
@@ -3007,8 +3018,8 @@ This check was removed for YP 2.3 release
 
     <para>
         For information on how root filesystem images are created, see the
-        "<link linkend='image-generation-dev-environment'>Image Generation</link>"
-        section.
+        "<ulink url='&YOCTO_DOCS_OM_URL;#image-generation-dev-environment'>Image Generation</ulink>"
+        section in the Yocto Project Overview and Concepts Manual.
     </para>
 </section>
 
@@ -3169,8 +3180,8 @@ This check was removed for YP 2.3 release
 
     <para>
         For more information on sstate, see the
-        "<link linkend='shared-state-cache'>Shared State Cache</link>"
-        section.
+        "<ulink url='&YOCTO_DOCS_OM_URL;#shared-state-cache'>Shared State Cache</ulink>"
+        section in the Yocto Project Overview and Concepts Manual.
     </para>
 </section>
 

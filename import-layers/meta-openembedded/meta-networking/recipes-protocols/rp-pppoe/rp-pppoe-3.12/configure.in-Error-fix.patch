@@ -1,4 +1,4 @@
-From 71956de46feef962dc0645af4c81ae074ca3b818 Mon Sep 17 00:00:00 2001
+From bdd20b7a584a20504dfabb409a41ee2b9ae41657 Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@cn.fujitsu.com>
 Date: Wed, 19 Aug 2015 13:52:57 +0900
 Subject: [PATCH] configure.in: Error fix.
@@ -9,15 +9,16 @@ No such file or directory #include <ac_nonexistent.h>
 Upstream-Status: pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+
 ---
  src/configure.in | 30 ------------------------------
  1 file changed, 30 deletions(-)
 
 diff --git a/src/configure.in b/src/configure.in
-index 0b23df5..31c7fbc 100644
+index 1714e69..cae0976 100644
 --- a/src/configure.in
 +++ b/src/configure.in
-@@ -193,36 +193,6 @@ if test "$GCC" = yes; then
+@@ -195,36 +195,6 @@ if test "$GCC" = yes; then
  	CFLAGS="$CFLAGS -fno-strict-aliasing -Wall -Wstrict-prototypes"
  fi
  
@@ -54,6 +55,3 @@ index 0b23df5..31c7fbc 100644
  if test "$rpppoe_cv_pack_bitfields" = "rev" ; then
  	AC_MSG_RESULT(reversed)
  	AC_DEFINE([PACK_BITFIELDS_REVERSED], [], [Reversed bitfields])
--- 
-1.8.4.2
-

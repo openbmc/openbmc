@@ -1,7 +1,7 @@
-From e8740833336c59d6f616a1781b256e648e338c26 Mon Sep 17 00:00:00 2001
+From 1dd1e6ddca5deada049bac2e1ee1fe4ecc5342c5 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Sat, 28 Apr 2012 18:24:50 +0200
-Subject: [PATCH] configure: use $host_alias-libtool instead of libtool
+Subject: [PATCH 01/10] configure: use $host_alias-libtool instead of libtool
  directly
 
 Poky renames libtool to $host_alias-libtool.
@@ -18,24 +18,16 @@ Rebased to glib-2.31.20+ by Andre McCurdy <armccurdy@gmail.com>
 Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
- configure.ac | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 1af90c5..f6b7a73 100644
+index 6fa6eb0..b6f78a6 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1378,7 +1378,7 @@ if test x"$glib_native_win32" = xyes; then
-   G_MODULE_LDFLAGS=
- else
-   export SED
--  G_MODULE_LDFLAGS=`(./libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
-+  G_MODULE_LDFLAGS=`(./$host_alias-libtool --config; echo eval echo \\$export_dynamic_flag_spec) | sh`
- fi
- dnl G_MODULE_IMPL= don't reset, so cmd-line can override
- G_MODULE_NEED_USCORE=0
-@@ -1427,13 +1427,13 @@ AS_IF([ test "$G_MODULE_IMPL" = "G_MODULE_IMPL_DL" ], [
+@@ -1428,9 +1428,9 @@ AS_IF([ test "$G_MODULE_IMPL" = "G_MODULE_IMPL_DL" ], [
  	LDFLAGS="$LDFLAGS $G_MODULE_LDFLAGS"
  dnl *** check for OSF1/5.0 RTLD_GLOBAL brokenness
  	echo "void glib_plugin_test(void) { }" > plugin.c
@@ -47,20 +39,6 @@ index 1af90c5..f6b7a73 100644
  		${LDFLAGS} -module -o plugin.la -export-dynamic \
  		-shrext ".o" -avoid-version plugin.lo \
  		-rpath /dont/care >/dev/null 2>&1
--	eval `./libtool --config | grep ^objdir`
-+	eval `./$host_alias-libtool --config | grep ^objdir`
- 	AC_CACHE_CHECK([for RTLD_GLOBAL brokenness],
- 		glib_cv_rtldglobal_broken,[
- 		AC_TRY_RUN([
-@@ -1506,7 +1506,7 @@ fi
- 
- AC_MSG_CHECKING(for the suffix of module shared libraries)
- export SED
--shrext_cmds=`./libtool --config | grep '^shrext_cmds='`
-+shrext_cmds=`./$host_alias-libtool --config | grep '^shrext_cmds='`
- eval $shrext_cmds
- module=yes eval std_shrext=$shrext_cmds
- # chop the initial dot
 -- 
-1.9.1
+2.14.1
 

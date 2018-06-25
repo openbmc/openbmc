@@ -5,13 +5,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 DEPENDS = "libaio"
 
-SRCREV = "43fc870ce04e963def45dfc0d1ed4ea21ef10d4b"
+SRCREV = "cca113f2fe0759b91fd6a0e10fdcda2c28f18a7e"
 
-PV = "1.1.0+git${SRCPV}"
+PV = "1.2.0+git${SRCPV}"
 
 SRC_URI = "git://git.kernel.dk/blktrace.git \
            file://ldflags.patch \
-           file://0001-include-sys-types.h-for-dev_t-definition.patch \
 "
 
 S = "${WORKDIR}/git"

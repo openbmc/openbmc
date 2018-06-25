@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides:          freediameter
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Short-Description: Start freeDiameter daemon at boot time
+# Description:       Start the freeDiameter daemon at boot time.
+#       freeDiameter is an extensible implementation of the Diameter protocol,
+#       designed for Authentication, Authorization and Accounting. Diameter is
+#       an evolution of the RADIUS protocol.
+### END INIT INFO#
+DAEMON=/usr/bin/freeDiameterd
+CONF=/etc/freeDiameter/freeDiameter.conf
+NAME=freediameter
+DESC="freeDiameter daemon"
+
+. /etc/init.d/functions
+start() {
+	[ -x $DAEMON ] || exit 5
+	echo -n $"Starting $DAEMON: "
+	start-stop-daemon -S -b -x ${DAEMON} && success || failure
+	retval=$?
+	echo ""
+	return $retval
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+	start-stop-daemon -K -x $DAEMON
+	retval=$?
+	echo ""
+	return $retval
+}
+
+restart() {
+	stop
+	sleep 3
+	start
+}
+
+rh_status() {
+	status $DAEMON
+}
+
+rh_status_q() {
+	rh_status > /dev/null 2>&1
+}
+
+case "$1" in
+  start)
+	rh_status_q && exit 0
+	start
+	;;
+  stop)
+	rh_status_q || exit 0
+	stop
+	;;
+  restart)
+	restart
+	;;
+  status)
+	rh_status
+	;;
+  *)
+	echo $"Usage: $prog {start|stop|status|restart}"
+	exit 2
+esac
+
+exit $?

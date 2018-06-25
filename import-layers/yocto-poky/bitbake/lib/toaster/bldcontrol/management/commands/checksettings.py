@@ -107,7 +107,10 @@ class Command(BaseCommand):
                                 action="ignore",
                                 message="^.*No fixture named.*$")
                             print("Importing custom settings if present")
-                            call_command("loaddata", "custom")
+                            try:
+                                call_command("loaddata", "custom")
+                            except:
+                                print("NOTE: optional fixture 'custom' not found")
 
                         # we run lsupdates after config update
                         print("\nFetching information from the layer index, "

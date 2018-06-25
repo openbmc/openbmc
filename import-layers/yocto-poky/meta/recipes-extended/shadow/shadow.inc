@@ -6,8 +6,7 @@ LICENSE = "BSD | Artistic-1.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ed80ff1c2b40843cf5768e5229cf16e5 \
                     file://src/passwd.c;beginline=8;endline=30;md5=d83888ea14ae61951982d77125947661"
 
-DEPENDS_class-native = ""
-DEPENDS_class-nativesdk = ""
+DEPENDS = "virtual/crypt"
 
 SRC_URI = "http://pkg-shadow.alioth.debian.org/releases/${BPN}-${PV}.tar.xz \
            file://shadow-4.1.3-dots-in-usernames.patch \
@@ -190,7 +189,7 @@ ALTERNATIVE_LINK_NAME[su.1] = "${mandir}/man1/su.1"
 ALTERNATIVE_LINK_NAME[nologin.8] = "${mandir}/man8/nologin.8"
 
 PACKAGE_WRITE_DEPS += "shadow-native"
-pkg_postinst_${PN} () {
+pkg_postinst_${PN}_class-target () {
 	if [ "x$D" != "x" ]; then
 	  rootarg="--root $D"
 	else

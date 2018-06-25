@@ -1,0 +1,47 @@
+import os
+from oeqa.utils.httpserver import HTTPService
+from oeqa.runtime.case import OERuntimeTestCase
+from oeqa.core.decorator.data import skipIfNotDataVar, skipIfNotFeature
+from oeqa.runtime.decorator.package import OEHasPackage
+
+class OpkgTest(OERuntimeTestCase):
+
+    def pkg(self, command, expected = 0):
+        command = 'opkg %s' % command
+        status, output = self.target.run(command, 1500)
+        message = os.linesep.join([command, output])
+        self.assertEqual(status, expected, message)
+        return output
+
+class OpkgRepoTest(OpkgTest):
+
+    @classmethod
+    def setUpClass(cls):
+        service_repo = os.path.join(cls.tc.td['DEPLOY_DIR_IPK'], 'all')
+        cls.repo_server = HTTPService(service_repo, cls.tc.target.server_ip)
+        cls.repo_server.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.repo_server.stop()
+
+    def setup_source_config_for_package_install(self):
+        apt_get_source_server = 'http://%s:%s/' % (self.tc.target.server_ip, self.repo_server.port)
+        apt_get_sourceslist_dir = '/etc/opkg/'
+        self.target.run('cd %s; echo src/gz all %s >> opkg.conf' % (apt_get_sourceslist_dir, apt_get_source_server))
+        
+    def cleanup_source_config_for_package_install(self):
+        apt_get_sourceslist_dir = '/etc/opkg/'
+        self.target.run('cd %s; sed -i "/^src/d" opkg.conf' % (apt_get_sourceslist_dir))
+        
+    @skipIfNotFeature('package-management',
+                      'Test requires package-management to be in IMAGE_FEATURES')
+    @skipIfNotDataVar('IMAGE_PKGTYPE', 'ipk',
+                      'IPK is not the primary package manager')
+    @OEHasPackage(['opkg'])
+    def test_opkg_install_from_repo(self):
+        self.setup_source_config_for_package_install()
+        self.pkg('update')
+        self.pkg('remove run-postinsts-dev')
+        self.pkg('install run-postinsts-dev')
+        self.cleanup_source_config_for_package_install()

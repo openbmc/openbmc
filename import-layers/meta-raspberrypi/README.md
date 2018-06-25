@@ -10,10 +10,11 @@ Yocto BSP layer for the Raspberry Pi boards - <http://www.raspberrypi.org/>.
 ## Quick links
 
 * Git repository web frontend:
-  <http://git.yoctoproject.org/cgit/cgit.cgi/meta-raspberrypi/>
+  <https://github.com/agherzan/meta-raspberrypi>
 * Mailing list (yocto mailing list): <yocto@yoctoproject.org>
 * Issues management (Github Issues):
   <https://github.com/agherzan/meta-raspberrypi/issues>
+* Documentation: <http://meta-raspberrypi.readthedocs.io/en/latest/>
 
 ## Description
 
@@ -33,12 +34,12 @@ OpenEmbedded/Yocto distributions and layer stacks, such as:
 This layer depends on:
 
 * URI: git://git.yoctoproject.org/poky
-  * branch: rocko
+  * branch: master
   * revision: HEAD
 
 * URI: git://git.openembedded.org/meta-openembedded
   * layers: meta-oe, meta-multimedia, meta-networking, meta-python
-  * branch: rocko
+  * branch: master
   * revision: HEAD
 
 ## Quick Start
@@ -46,7 +47,7 @@ This layer depends on:
 1. source poky/oe-init-build-env rpi-build
 2. Add this layer to bblayers.conf and the dependencies above
 3. Set MACHINE in local.conf to one of the supported boards
-4. bitbake rpi-hwup-image
+4. bitbake core-image-base
 5. dd to a SD card the generated sdimg file (use xzcat if rpi-sdimg.xz is used)
 6. Boot your RPI.
 

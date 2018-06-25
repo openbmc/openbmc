@@ -28,7 +28,7 @@ EXTRA_OECONF = " \
     --target-list=${@get_qemu_target_list(d)} \
     --extra-cflags='${CFLAGS}' \
     "
-EXTRA_OECONF_append_class-native = " --python=${USRBINPATH}/python2.7"
+EXTRA_OECONF_append_class-native = " --python=python2.7"
 
 EXTRA_OEMAKE_append_class-native = " LD='${LD}' AR='${AR}' OBJCOPY='${OBJCOPY}' LDFLAGS='${LDFLAGS}'"
 

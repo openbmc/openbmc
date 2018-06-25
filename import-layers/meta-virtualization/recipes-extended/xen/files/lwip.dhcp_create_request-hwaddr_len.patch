@@ -1,0 +1,13 @@
+Index: src/core/dhcp.c
+===================================================================
+--- a/src/core/dhcp.c
++++ b/src/core/dhcp.c
+@@ -1356,7 +1358,7 @@ dhcp_create_request(struct netif *netif)
+   dhcp->msg_out->giaddr.addr = 0;
+   for (i = 0; i < DHCP_CHADDR_LEN; i++) {
+     /* copy netif hardware address, pad with zeroes */
+-    dhcp->msg_out->chaddr[i] = (i < netif->hwaddr_len) ? netif->hwaddr[i] : 0/* pad byte*/;
++    dhcp->msg_out->chaddr[i] = (i < (netif->hwaddr_len > NETIF_MAX_HWADDR_LEN ? NETIF_MAX_HWADDR_LEN : netif->hwaddr_len)) ? netif->hwaddr[i] : 0/* pad byte*/;
+   }
+   for (i = 0; i < DHCP_SNAME_LEN; i++) {
+     dhcp->msg_out->sname[i] = 0;

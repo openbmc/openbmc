@@ -22,7 +22,7 @@ PACKAGECONFIG ??= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
     ${@bb.utils.filter('DISTRO_FEATURES', 'directfb vulkan', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
-    bz2 curl dash dtls hls neon rsvg sbc smoothstreaming sndfile uvch264 webp \
+    bz2 curl dash dtls hls rsvg sbc smoothstreaming sndfile uvch264 webp \
 "
 
 PACKAGECONFIG[assrender]       = "--enable-assrender,--disable-assrender,libass"

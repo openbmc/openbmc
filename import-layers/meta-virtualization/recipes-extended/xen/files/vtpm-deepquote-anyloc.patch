@@ -1,0 +1,127 @@
+diff --git a/tpm/tpm_cmd_handler.c b/tpm/tpm_cmd_handler.c
+index 69511d1..7545d51 100644
+--- a/tpm/tpm_cmd_handler.c
++++ b/tpm/tpm_cmd_handler.c
+@@ -3347,12 +3347,13 @@ static TPM_RESULT execute_TPM_DeepQuote(TPM_REQUEST *req, TPM_RESPONSE *rsp)
+ {
+ 	TPM_NONCE nonce;
+ 	TPM_RESULT res;
+-	UINT32 sigSize;
+-	BYTE *sig;
++	UINT32 quote_blob_size;
++	BYTE *quote_blob;
+ 	BYTE *ptr;
+ 	UINT32 len;
+ 	TPM_PCR_SELECTION myPCR;
+ 	TPM_PCR_SELECTION ptPCR;
++	UINT32 extraInfoFlags = 0;
+ 
+ 	tpm_compute_in_param_digest(req);
+ 
+@@ -3361,17 +3362,19 @@ static TPM_RESULT execute_TPM_DeepQuote(TPM_REQUEST *req, TPM_RESPONSE *rsp)
+ 	if (tpm_unmarshal_TPM_NONCE(&ptr, &len, &nonce)
+ 		|| tpm_unmarshal_TPM_PCR_SELECTION(&ptr, &len, &myPCR)
+ 		|| tpm_unmarshal_TPM_PCR_SELECTION(&ptr, &len, &ptPCR)
++		|| tpm_unmarshal_TPM_DEEP_QUOTE_INFO(&ptr, &len, &extraInfoFlags)
+ 		|| len != 0) return TPM_BAD_PARAMETER;
+ 
+-	res = TPM_DeepQuote(&nonce, &myPCR, &ptPCR, &req->auth1, &sigSize, &sig);
++	res = TPM_DeepQuote(&nonce, &myPCR, &ptPCR, &req->auth1, extraInfoFlags,
++		&quote_blob_size, &quote_blob);
+ 	if (res != TPM_SUCCESS) return res;
+-	rsp->paramSize = len = sigSize;
++	rsp->paramSize = len = quote_blob_size;
+ 	rsp->param = ptr = tpm_malloc(len);
+-	if (ptr == NULL || tpm_marshal_BLOB(&ptr, &len, sig, sigSize)) {
++	if (ptr == NULL || tpm_marshal_BLOB(&ptr, &len, quote_blob, quote_blob_size)) {
+ 		tpm_free(rsp->param);
+ 		res = TPM_FAIL;
+ 	}
+-	tpm_free(sig);
++	tpm_free(quote_blob);
+ 
+ 	return res;
+ }
+diff --git a/tpm/tpm_commands.h b/tpm/tpm_commands.h
+index 328d1be..a56dd5f 100644
+--- a/tpm/tpm_commands.h
++++ b/tpm/tpm_commands.h
+@@ -3077,6 +3077,7 @@ TPM_RESULT TPM_ParentSignEK(
+  * @myPCR: [in] PCR selection for the virtual TPM
+  * @ptPCR: [in] PCR selection for the hardware TPM
+  * @auth1: [in, out] Authorization protocol parameters
++ * @extraInfoFlags [in] Flags for including, kernel hash, group info, etc
+  * @sigSize: [out] The length of the returned digital signature
+  * @sig: [out] The resulting digital signature and PCR values
+  * Returns: TPM_SUCCESS on success, a TPM error code otherwise.
+@@ -3086,6 +3087,7 @@ TPM_RESULT TPM_DeepQuote(
+   TPM_PCR_SELECTION *myPCR,
+   TPM_PCR_SELECTION *ptPCR,
+   TPM_AUTH *auth1,
++  UINT32 extraInfoFlags,
+   UINT32 *sigSize,
+   BYTE **sig
+ );
+diff --git a/tpm/tpm_credentials.c b/tpm/tpm_credentials.c
+index c0d62e7..6586c22 100644
+--- a/tpm/tpm_credentials.c
++++ b/tpm/tpm_credentials.c
+@@ -183,7 +183,8 @@ TPM_RESULT TPM_OwnerReadInternalPub(TPM_KEY_HANDLE keyHandle, TPM_AUTH *auth1,
+ 
+ int endorsementKeyFresh = 0;
+ 
+-TPM_RESULT VTPM_GetParentQuote(TPM_DIGEST* data, TPM_PCR_SELECTION *sel, UINT32 *sigSize, BYTE **sig);
++TPM_RESULT VTPM_GetParentQuote(TPM_NONCE *data, TPM_PCR_SELECTION *sel,
++                               UINT32 extraInfoFlags, UINT32 *sigSize, BYTE **sig);
+ 
+ TPM_RESULT TPM_ParentSignEK(TPM_NONCE *externalData, TPM_PCR_SELECTION *sel,
+                             TPM_AUTH *auth1, UINT32 *sigSize, BYTE **sig)
+@@ -191,7 +192,7 @@ TPM_RESULT TPM_ParentSignEK(TPM_NONCE *externalData, TPM_PCR_SELECTION *sel,
+ 	TPM_PUBKEY pubKey;
+ 	TPM_RESULT res;
+ 	TPM_DIGEST hres;
+-
++	UINT32 extraInfoFlags = 0;
+ 	info("TPM_ParentSignEK()");
+ 
+ 	res = tpm_verify_auth(auth1, tpmData.permanent.data.ownerAuth, TPM_KH_OWNER);
+@@ -206,7 +207,7 @@ TPM_RESULT TPM_ParentSignEK(TPM_NONCE *externalData, TPM_PCR_SELECTION *sel,
+ 		res = TPM_FAIL;
+ 
+ 	if (res == TPM_SUCCESS)
+-		res = VTPM_GetParentQuote(&hres, sel, sigSize, sig);
++		res = VTPM_GetParentQuote((TPM_NONCE*)&hres, sel, extraInfoFlags, sigSize, sig);
+ 
+ 	free_TPM_PUBKEY(pubKey);
+ 	return res;
+@@ -218,7 +219,7 @@ static const BYTE dquot_hdr[] = {
+ 
+ TPM_RESULT TPM_DeepQuote(TPM_NONCE *externalData, TPM_PCR_SELECTION *myPCR,
+                          TPM_PCR_SELECTION *ptPCR, TPM_AUTH *auth1,
+-                         UINT32 *sigSize, BYTE **sig)
++                         UINT32 extraInfoFlags, UINT32 *quote_blob_size, BYTE **quote_blob)
+ {
+   TPM_RESULT res;
+   TPM_DIGEST hres;
+@@ -253,7 +254,7 @@ TPM_RESULT TPM_DeepQuote(TPM_NONCE *externalData, TPM_PCR_SELECTION *myPCR,
+ 
+   tpm_free(buf);
+ 
+-	res = VTPM_GetParentQuote(&hres, ptPCR, sigSize, sig);
++  res = VTPM_GetParentQuote((TPM_NONCE*)&hres, ptPCR, extraInfoFlags, quote_blob_size, quote_blob);
+ 
+   return res;
+ }
+diff --git a/tpm/tpm_marshalling.h b/tpm/tpm_marshalling.h
+index d510ebe..2e0c008 100644
+--- a/tpm/tpm_marshalling.h
++++ b/tpm/tpm_marshalling.h
+@@ -268,6 +268,8 @@ static inline int tpm_unmarshal_BOOL(BYTE **ptr, UINT32 *length, BOOL *v)
+ #define tpm_unmarshal_TPM_REDIR_COMMAND        tpm_unmarshal_UINT32
+ #define tpm_marshal_DAAHANDLE                  tpm_marshal_UINT32
+ #define tpm_unmarshal_DAAHANDLE                tpm_unmarshal_UINT32
++#define tpm_marshal_TPM_DEEP_QUOTE_INFO        tpm_marshal_UINT32
++#define tpm_unmarshal_TPM_DEEP_QUOTE_INFO      tpm_unmarshal_UINT32
+ 
+ int tpm_marshal_UINT32_ARRAY(BYTE **ptr, UINT32 *length, UINT32 *v, UINT32 n);
+ int tpm_unmarshal_UINT32_ARRAY(BYTE **ptr, UINT32 *length, UINT32 *v, UINT32 n);

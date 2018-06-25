@@ -1,21 +1,17 @@
-Index: autofs-5.0.7/aclocal.m4
-===================================================================
---- autofs-5.0.7.orig/aclocal.m4	2012-10-28 13:17:45.504237027 -0700
-+++ autofs-5.0.7/aclocal.m4	2012-10-28 13:20:50.108242739 -0700
-@@ -403,7 +403,7 @@
- # save current flags
- af_check_libtirpc_save_cflags="$CFLAGS"
- af_check_libtirpc_save_ldflags="$LDFLAGS"
--CFLAGS="$CFLAGS -I/usr/include/tirpc"
-+CFLAGS="$CFLAGS -I=/usr/include/tirpc"
- LDFLAGS="$LDFLAGS -ltirpc"
- 
- AC_TRY_LINK(
-Index: autofs-5.0.7/Makefile.rules
-===================================================================
---- autofs-5.0.7.orig/Makefile.rules	2012-10-28 13:17:45.308237022 -0700
-+++ autofs-5.0.7/Makefile.rules	2012-10-28 13:21:25.720242803 -0700
-@@ -48,7 +48,7 @@
+From cb6a4f61adb027f2366318f2c08c8264ebf39218 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 5 Jan 2013 19:53:10 -0800
+
+---
+ Makefile.rules | 2 +-
+ aclocal.m4     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.rules b/Makefile.rules
+index 6fa3e02..709dd04 100644
+--- a/Makefile.rules
++++ b/Makefile.rules
+@@ -46,7 +46,7 @@ CFLAGS += -D_REENTRANT -D_FILE_OFFSET_BITS=64
  LIBS += -lpthread
  
  ifdef TIRPCLIB
@@ -24,3 +20,16 @@ Index: autofs-5.0.7/Makefile.rules
  LIBS += $(TIRPCLIB)
  endif
  
+diff --git a/aclocal.m4 b/aclocal.m4
+index 2a9a802..0e4a624 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -416,7 +416,7 @@ AC_DEFUN([AF_CHECK_LIBTIRPC],
+ # save current flags
+ af_check_libtirpc_save_cflags="$CFLAGS"
+ af_check_libtirpc_save_ldflags="$LDFLAGS"
+-CFLAGS="$CFLAGS -I/usr/include/tirpc"
++CFLAGS="$CFLAGS -I=/usr/include/tirpc"
+ LDFLAGS="$LDFLAGS -ltirpc"
+ 
+ AC_TRY_LINK(

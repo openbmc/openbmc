@@ -1,18 +1,19 @@
-From ecb62f3467f493cc0d679323f05367eebbf0fb67 Mon Sep 17 00:00:00 2001
+From a9e4057bfda190ad365b503af058b460ab8c7616 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Tue, 1 Oct 2013 22:22:57 +0200
 Subject: [PATCH] aclocal: Add parameter to disable keyutils detection
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
  aclocal.m4 | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/aclocal.m4 b/aclocal.m4
-index 210c473..83b1f02 100644
+index d6d1279..80ce604 100644
 --- a/aclocal.m4
 +++ b/aclocal.m4
-@@ -1650,11 +1650,15 @@ fi
+@@ -1679,12 +1679,16 @@ fi
  dnl
  dnl If libkeyutils exists (on Linux) include it and use keyring ccache
  AC_DEFUN(KRB5_AC_KEYRING_CCACHE,[
@@ -28,6 +29,4 @@ index 210c473..83b1f02 100644
 +fi
  ])dnl
  dnl
--- 
-1.8.3.2
-
+ dnl If libkeyutils supports persistent keyrings, use them

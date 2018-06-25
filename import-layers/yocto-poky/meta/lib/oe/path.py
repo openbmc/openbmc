@@ -237,3 +237,25 @@ def realpath(file, root, use_physdir = True, loop_cnt = 100, assume_dir = False)
         raise
 
     return file
+
+def is_path_parent(possible_parent, *paths):
+    """
+    Return True if a path is the parent of another, False otherwise.
+    Multiple paths to test can be specified in which case all
+    specified test paths must be under the parent in order to
+    return True.
+    """
+    def abs_path_trailing(pth):
+        pth_abs = os.path.abspath(pth)
+        if not pth_abs.endswith(os.sep):
+            pth_abs += os.sep
+        return pth_abs
+
+    possible_parent_abs = abs_path_trailing(possible_parent)
+    if not paths:
+        return False
+    for path in paths:
+        path_abs = abs_path_trailing(path)
+        if not path_abs.startswith(possible_parent_abs):
+            return False
+    return True

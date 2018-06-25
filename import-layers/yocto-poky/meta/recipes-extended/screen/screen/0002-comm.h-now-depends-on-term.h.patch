@@ -15,19 +15,16 @@ Subject: [PATCH] comm.h now depends on term.h
  src/Makefile.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/Makefile.in b/src/Makefile.in
-index e791e79..d4f7c0b 100644
---- a/Makefile.in
-+++ b/Makefile.in
-@@ -113,7 +113,7 @@ term.h: term.c term.sh
- 
- kmapdef.c: term.h
+Index: screen-4.6.1/Makefile.in
+===================================================================
+--- screen-4.6.1.orig/Makefile.in
++++ screen-4.6.1/Makefile.in
+@@ -133,7 +133,7 @@ kmapdef.c: term.h
+ tty.c:	tty.sh 
+ 	sh $(srcdir)/tty.sh tty.c
  
 -comm.h: comm.c comm.sh config.h
 +comm.h: comm.c comm.sh config.h term.h
  	AWK=$(AWK) CC="$(CC) $(CFLAGS)" srcdir=${srcdir} sh $(srcdir)/comm.sh
  
- docs:
--- 
-2.4.1
-
+ osdef.h: osdef.sh config.h osdef.h.in

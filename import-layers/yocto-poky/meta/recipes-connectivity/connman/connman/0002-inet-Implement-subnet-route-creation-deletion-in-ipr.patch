@@ -1,0 +1,69 @@
+From 08cda4004491d3971a8b9df937426c43800d15b1 Mon Sep 17 00:00:00 2001
+From: Jian Liang <jianliang@tycoint.com>
+Date: Thu, 5 Oct 2017 09:37:06 +0100
+Subject: [PATCH 2/4] inet: Implement subnet route creation/deletion in
+ iproute_default_modify
+To: connman@lists.01.org
+Cc: wagi@monom.org
+
+- Calculate subnet address base on gateway address and prefixlen
+- Differentiate creation of routes to gateway and subnet
+
+Signed-off-by: Jian Liang <jianliang@tycoint.com>
+
+---
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/network/connman/connman.git/commit/?id=ff7dcf91f12a2a237feebc6e606d0a8e92975528]
+Signed-off-by: André Draszik <andre.draszik@jci.com>
+ src/inet.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/src/inet.c b/src/inet.c
+index ab8aec8..0ddb030 100644
+--- a/src/inet.c
++++ b/src/inet.c
+@@ -2802,6 +2802,9 @@ static int iproute_default_modify(int cmd, uint32_t table_id, int ifindex,
+ 	unsigned char buf[sizeof(struct in6_addr)];
+ 	int ret, len;
+ 	int family = connman_inet_check_ipaddress(gateway);
++	char *dst = NULL;
++
++	DBG("gateway %s/%u table %u", gateway, prefixlen, table_id);
+ 
+ 	switch (family) {
+ 	case AF_INET:
+@@ -2814,7 +2817,19 @@ static int iproute_default_modify(int cmd, uint32_t table_id, int ifindex,
+ 		return -EINVAL;
+ 	}
+ 
+-	ret = inet_pton(family, gateway, buf);
++	if (prefixlen) {
++		struct in_addr ipv4_subnet_addr, ipv4_mask;
++
++		memset(&ipv4_subnet_addr, 0, sizeof(ipv4_subnet_addr));
++		ipv4_mask.s_addr = htonl((0xffffffff << (32 - prefixlen)) & 0xffffffff);
++		ipv4_subnet_addr.s_addr = inet_addr(gateway);
++		ipv4_subnet_addr.s_addr &= ipv4_mask.s_addr;
++
++		dst = g_strdup(inet_ntoa(ipv4_subnet_addr));
++	}
++
++	ret = inet_pton(family, dst ? dst : gateway, buf);
++	g_free(dst);
+ 	if (ret <= 0)
+ 		return -EINVAL;
+ 
+@@ -2831,8 +2846,9 @@ static int iproute_default_modify(int cmd, uint32_t table_id, int ifindex,
+ 	rth.req.u.r.rt.rtm_type = RTN_UNICAST;
+ 	rth.req.u.r.rt.rtm_dst_len = prefixlen;
+ 
+-	__connman_inet_rtnl_addattr_l(&rth.req.n, sizeof(rth.req), RTA_GATEWAY,
+-								buf, len);
++	__connman_inet_rtnl_addattr_l(&rth.req.n, sizeof(rth.req),
++		prefixlen > 0 ? RTA_DST : RTA_GATEWAY, buf, len);
++
+ 	if (table_id < 256) {
+ 		rth.req.u.r.rt.rtm_table = table_id;
+ 	} else {
+-- 
+2.7.4
+

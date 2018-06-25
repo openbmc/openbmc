@@ -16,5 +16,5 @@ python () {
     blacklist = d.getVarFlag('PNBLACKLIST', d.getVar('PN'))
 
     if blacklist:
-        raise bb.parse.SkipPackage("Recipe is blacklisted: %s" % (blacklist))
+        raise bb.parse.SkipRecipe("Recipe is blacklisted: %s" % (blacklist))
 }

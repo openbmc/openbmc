@@ -13,11 +13,11 @@ Ionut Radu <ionutx.radu@intel.com>
 
 Upstream-Status: Inappropriate [embedded specific]
 
-Index: pciutils-3.5.4/Makefile
+Index: pciutils-3.5.6/Makefile
 ===================================================================
---- pciutils-3.5.4.orig/Makefile
-+++ pciutils-3.5.4/Makefile
-@@ -96,7 +95,7 @@ example: example.o lib/$(PCILIB)
+--- pciutils-3.5.6.orig/Makefile
++++ pciutils-3.5.6/Makefile
+@@ -96,7 +96,7 @@ example: example.o lib/$(PCILIB)
  example.o: example.c $(PCIINC)
  
  %: %.o
@@ -26,12 +26,12 @@ Index: pciutils-3.5.4/Makefile
  
  %.8 %.7: %.man
  	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)/;s#@IDSDIR@#$(IDSDIR)#"
-Index: pciutils-3.5.4/lib/configure
+Index: pciutils-3.5.6/lib/configure
 ===================================================================
---- pciutils-3.5.4.orig/lib/configure
-+++ pciutils-3.5.4/lib/configure
-@@ -14,6 +14,10 @@ echo_n() {
- 	fi
+--- pciutils-3.5.6.orig/lib/configure
++++ pciutils-3.5.6/lib/configure
+@@ -9,6 +9,10 @@ echo_n() {
+ 	printf '%s' "$*"
  }
  
 +VERSION=$1
@@ -41,7 +41,7 @@ Index: pciutils-3.5.4/lib/configure
  if [ -z "$VERSION" -o -z "$IDSDIR" ] ; then
  	echo >&2 "Please run the configure script from the top-level Makefile"
  	exit 1
-@@ -21,8 +25,8 @@ fi
+@@ -16,8 +20,8 @@ fi
  
  echo_n "Configuring libpci for your system..."
  if [ -z "$HOST" ] ; then
@@ -52,7 +52,7 @@ Index: pciutils-3.5.4/lib/configure
  	realsys="$sys"
  	if [ "$sys" = "AIX" -a -x /usr/bin/oslevel -a -x /usr/sbin/lsattr ]
  	then
-@@ -30,7 +34,7 @@ if [ -z "$HOST" ] ; then
+@@ -25,7 +29,7 @@ if [ -z "$HOST" ] ; then
  		proc=`/usr/sbin/lsdev -C -c processor -S available -F name | head -1`
  		cpu=`/usr/sbin/lsattr -F value -l $proc -a type | sed 's/_.*//'`
  	else
@@ -61,7 +61,7 @@ Index: pciutils-3.5.4/lib/configure
  	fi
  	if [ "$sys" = "GNU/kFreeBSD" -o "$sys" = "DragonFly" ]
  	then
-@@ -40,7 +44,7 @@ if [ -z "$HOST" ] ; then
+@@ -35,7 +39,7 @@ if [ -z "$HOST" ] ; then
  	then
  		sys=cygwin
  	fi
@@ -70,7 +70,7 @@ Index: pciutils-3.5.4/lib/configure
  fi
  [ -n "$RELEASE" ] && rel="${RELEASE}"
  # CAVEAT: tr on Solaris is a bit weird and the extra [] is otherwise harmless.
-@@ -49,6 +53,8 @@ cpu=`echo $host | sed 's/^\([^-]*\)-\([^
+@@ -44,6 +48,8 @@ cpu=`echo $host | sed 's/^\([^-]*\)-\([^
  sys=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
  echo " $host $rel $cpu $sys"
  

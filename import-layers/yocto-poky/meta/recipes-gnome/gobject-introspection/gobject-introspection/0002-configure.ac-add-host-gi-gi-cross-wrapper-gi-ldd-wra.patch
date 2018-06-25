@@ -32,10 +32,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  tests/Makefile.am |  5 ++++-
  4 files changed, 87 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index b080a89..ce8d29b 100644
---- a/Makefile.am
-+++ b/Makefile.am
+Index: gobject-introspection-1.52.1/Makefile.am
+===================================================================
+--- gobject-introspection-1.52.1.orig/Makefile.am
++++ gobject-introspection-1.52.1/Makefile.am
 @@ -21,7 +21,9 @@ include Makefile-cmph.am
  include Makefile-girepository.am
  include Makefile-giscanner.am
@@ -46,10 +46,10 @@ index b080a89..ce8d29b 100644
  include Makefile-tools.am
  include Makefile-msvcproj.am
  
-diff --git a/common.mk b/common.mk
-index e26c637..9f3a65f 100644
---- a/common.mk
-+++ b/common.mk
+Index: gobject-introspection-1.52.1/common.mk
+===================================================================
+--- gobject-introspection-1.52.1.orig/common.mk
++++ gobject-introspection-1.52.1/common.mk
 @@ -6,6 +6,15 @@
  # module itself.
  #
@@ -130,13 +130,13 @@ index e26c637..9f3a65f 100644
  
  INTROSPECTION_DOCTOOL_ARGS = \
      --add-include-path=$(srcdir) \
-diff --git a/configure.ac b/configure.ac
-index 6c91fa5..21340a5 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -360,6 +360,48 @@ fi
- 
- AC_SUBST(EXTRA_LINK_FLAGS)
+Index: gobject-introspection-1.52.1/configure.ac
+===================================================================
+--- gobject-introspection-1.52.1.orig/configure.ac
++++ gobject-introspection-1.52.1/configure.ac
+@@ -366,6 +366,48 @@ dnl
+ AM_CONDITIONAL(MSVC_BASE_NO_TOOLSET_SET, [test x$MSVC_BASE_TOOLSET = x])
+ AM_CONDITIONAL(MSVC_NO_TOOLSET_SET, [test x$MSVC_TOOLSET = x])
  
 +AC_ARG_ENABLE([host-gi],
 +[AS_HELP_STRING([--enable-host-gi],[Use gobject introspection tools installed in the host system (useful when cross-compiling)])],
@@ -183,10 +183,10 @@ index 6c91fa5..21340a5 100644
  AC_CONFIG_FILES([
  Makefile
  tests/Makefile
-diff --git a/tests/Makefile.am b/tests/Makefile.am
-index bdd0fa7..75dd3c9 100644
---- a/tests/Makefile.am
-+++ b/tests/Makefile.am
+Index: gobject-introspection-1.52.1/tests/Makefile.am
+===================================================================
+--- gobject-introspection-1.52.1.orig/tests/Makefile.am
++++ gobject-introspection-1.52.1/tests/Makefile.am
 @@ -1,6 +1,9 @@
  include $(top_srcdir)/common.mk
  
@@ -198,6 +198,3 @@ index bdd0fa7..75dd3c9 100644
  
  EXTRA_DIST=
  BUILT_SOURCES=
--- 
-2.7.0
-

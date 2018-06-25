@@ -13,16 +13,17 @@ If no network connection appears within DefaultTimeoutStartSec
 therefore get killed.
 
 Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+
 ---
  packaging/systemd/nmb.service | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/packaging/systemd/nmb.service b/packaging/systemd/nmb.service
-index 992c0cd..555c9ab 100644
+index 71c93d6..f3d2fc2 100644
 --- a/packaging/systemd/nmb.service
 +++ b/packaging/systemd/nmb.service
 @@ -10,6 +10,7 @@ EnvironmentFile=-/etc/sysconfig/samba
- ExecStart=/usr/sbin/nmbd $NMBDOPTIONS
+ ExecStart=/usr/sbin/nmbd --foreground --no-process-group $NMBDOPTIONS
  ExecReload=/usr/bin/kill -HUP $MAINPID
  LimitCORE=infinity
 +TimeoutStartSec=0

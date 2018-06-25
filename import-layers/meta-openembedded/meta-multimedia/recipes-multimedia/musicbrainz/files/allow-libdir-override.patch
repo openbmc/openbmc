@@ -6,11 +6,11 @@ Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Kumar Gala <galak@kernel.crashing.org>
 
-Index: libmusicbrainz-3.0.3/CMakeLists.txt
+Index: git/CMakeLists.txt
 ===================================================================
---- libmusicbrainz-3.0.3.orig/CMakeLists.txt
-+++ libmusicbrainz-3.0.3/CMakeLists.txt
-@@ -26,7 +26,7 @@ FIND_PACKAGE(DiscId)
+--- git.orig/CMakeLists.txt
++++ git/CMakeLists.txt
+@@ -36,7 +36,7 @@ FIND_PACKAGE(LibXml2 REQUIRED)
  SET(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
  SET(EXEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "Installation prefix for executables and object code libraries" FORCE)
  SET(BIN_INSTALL_DIR ${EXEC_INSTALL_PREFIX}/bin CACHE PATH "Installation prefix for user executables" FORCE)
@@ -18,4 +18,4 @@ Index: libmusicbrainz-3.0.3/CMakeLists.txt
 +SET(LIB_INSTALL_DIR ${EXEC_INSTALL_PREFIX}/lib${LIB_SUFFIX} CACHE PATH  "Installation prefix for object code libraries")
  SET(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include CACHE PATH "Installation prefix for C header files" FORCE)
  
- CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libmusicbrainz3.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libmusicbrainz3.pc)
+ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libmusicbrainz5.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/libmusicbrainz5.pc)

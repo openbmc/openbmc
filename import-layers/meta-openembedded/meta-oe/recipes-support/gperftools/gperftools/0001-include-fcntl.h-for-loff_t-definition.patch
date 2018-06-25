@@ -1,4 +1,4 @@
-From 04ea8e001501931f4dbf20288aca78469617b08a Mon Sep 17 00:00:00 2001
+From a16a73f0819d26219ee83cd98eea82786d7c1755 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 16 Jul 2017 19:28:17 -0700
 Subject: [PATCH] include fcntl.h for loff_t definition
@@ -7,6 +7,7 @@ Fixes
 linux_syscall_support.h:2641:26: error: 'loff_t' has not been declared
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/base/linux_syscall_support.h | 1 +
  1 file changed, 1 insertion(+)
@@ -23,6 +24,3 @@ index 85347a2..70431ca 100644
  
  #ifdef __mips__
  /* Include definitions of the ABI currently in use.                          */
--- 
-2.13.3
-

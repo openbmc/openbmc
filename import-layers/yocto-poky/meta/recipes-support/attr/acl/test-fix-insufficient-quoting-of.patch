@@ -35,61 +35,56 @@ http://git.savannah.gnu.org/cgit/acl.git/commit/?id=e98ce8acf84d12ea67a3ac76bf63
 
 Signed-off-by: Kamil Dudka <kdudka@redhat.com>
 Signed-off-by: He Zhe <zhe.he@windriver.com>
----
- test/cp.test            | 2 +-
- test/misc.test          | 6 +++---
- test/sbits-restore.test | 6 +++---
- 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/test/cp.test b/test/cp.test
-index 0867f63..a927195 100644
---- a/test/cp.test
-+++ b/test/cp.test
-@@ -9,7 +9,7 @@ The cp utility should only copy ACLs if `-p' is given.
+Index: acl-2.2.52/test/cp.test
+===================================================================
+--- acl-2.2.52.orig/test/cp.test
++++ acl-2.2.52/test/cp.test
+@@ -9,7 +9,7 @@ The cp utility should only copy ACLs if
  	> -rw-rw-r--+
-
+ 	
  	$ cp f g
 -	$ ls -l g | awk -- '{ print $1 }' | sed 's/\.$//g'
 +	$ ls -l g | awk -- '{ print $1 }' | sed 's/\\.$//g'
  	> -rw-r--r--
-
+ 	
  	$ rm g
-diff --git a/test/misc.test b/test/misc.test
-index 6e98053..29372b7 100644
---- a/test/misc.test
-+++ b/test/misc.test
+Index: acl-2.2.52/test/misc.test
+===================================================================
+--- acl-2.2.52.orig/test/misc.test
++++ acl-2.2.52/test/misc.test
 @@ -254,7 +254,7 @@ Add some users and groups
  Symlink in directory with default ACL?
-
+ 	 
  	$ ln -s d d/l
 -	$ ls -dl d/l | awk '{print $1}' | sed 's/\.$//g'
 +	$ ls -dl d/l | awk '{print $1}' | sed 's/\\.$//g'
  	> lrwxrwxrwx
-
+ 
  	$ ls -dl -L d/l | awk '{print $1}'
 @@ -343,7 +343,7 @@ Remove the default ACL
  Reset to base entries
-
+ 	 
  	$ setfacl -b d
 -	$ ls -dl d | awk '{print $1}' | sed 's/\.$//g'
 +	$ ls -dl d | awk '{print $1}' | sed 's/\\.$//g'
  	> drwxr-x---
-
+ 
  	$ getfacl --omit-header d
 @@ -355,7 +355,7 @@ Reset to base entries
  Now, chmod should change the group_obj entry
-
+ 	 
  	$ chmod 775 d
 -	$ ls -dl d | awk '{print $1}' | sed 's/\.$//g'
 +	$ ls -dl d | awk '{print $1}' | sed 's/\\.$//g'
  	> drwxrwxr-x
-
+ 	
  	$ getfacl --omit-header d
-diff --git a/test/sbits-restore.test b/test/sbits-restore.test
-index de21340..5899b0a 100644
---- a/test/sbits-restore.test
-+++ b/test/sbits-restore.test
-@@ -13,10 +13,10 @@ Ensure setting of SUID/SGID/sticky via --restore works
+Index: acl-2.2.52/test/sbits-restore.test
+===================================================================
+--- acl-2.2.52.orig/test/sbits-restore.test
++++ acl-2.2.52/test/sbits-restore.test
+@@ -13,10 +13,10 @@ Ensure setting of SUID/SGID/sticky via -
  	$ touch d/g
  	$ touch d/u
  	$ setfacl --restore d.acl
@@ -103,6 +98,3 @@ index de21340..5899b0a 100644
 +	$ ls -dl d/g | awk '{print $1}' | sed 's/\\.$//g'
  	> -rw-r-Sr--
  	$ rm -Rf d
---
-1.9.1
-

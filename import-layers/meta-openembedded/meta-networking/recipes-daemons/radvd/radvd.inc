@@ -8,7 +8,7 @@ addresses and some other parameters. They also can \
 choose a default router based on these advertisements."
 HOMEPAGE = "http://www.litech.org/radvd/"
 SECTION = "net"
-DEPENDS = "flex-native libdaemon"
+DEPENDS = "flex-native bison-native libdaemon "
 
 # License is BSD-Style (with advertising clause) but also has an additional 0th clause
 LICENSE = "radvd"

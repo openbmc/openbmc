@@ -1,4 +1,4 @@
-From ab060a57b41f989665ade20e813bbcb67f91f1f2 Mon Sep 17 00:00:00 2001
+From d966d52d1e569cbc2293d841285e2b8941f28c61 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 9 Jul 2017 15:56:28 -0700
 Subject: [PATCH] include linux/sysinfo.h directly
@@ -10,12 +10,13 @@ but until its done in right place, change the local header
 override to avoid this assumption
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  usr/include/sys/sysinfo.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/usr/include/sys/sysinfo.h b/usr/include/sys/sysinfo.h
-index dba68dc6..d145c0b1 100644
+index dba68dc..d145c0b 100644
 --- a/usr/include/sys/sysinfo.h
 +++ b/usr/include/sys/sysinfo.h
 @@ -5,7 +5,7 @@
@@ -27,6 +28,3 @@ index dba68dc6..d145c0b1 100644
  
  extern int sysinfo(struct sysinfo *info);
  
--- 
-2.13.2
-

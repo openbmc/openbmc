@@ -1,0 +1,74 @@
+From 5925b20da8bbc34d9bf5a5dca123ef38864d43c6 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 30 Jan 2018 09:39:06 +0800
+Subject: [PATCH 2/7] apr: Remove workdir path references from installed apr
+ files
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+The generated `apr-1-config' is used by other recipes at build time or
+packages at target run time, the workdir path caused confusion.
+
+Rebase to 1.6.3
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ apr-config.in | 26 ++------------------------
+ 1 file changed, 2 insertions(+), 24 deletions(-)
+
+diff --git a/apr-config.in b/apr-config.in
+index 84b4073..bbbf651 100644
+--- a/apr-config.in
++++ b/apr-config.in
+@@ -152,14 +152,7 @@ while test $# -gt 0; do
+     flags="$flags $LDFLAGS"
+     ;;
+     --includes)
+-    if test "$location" = "installed"; then
+         flags="$flags -I$includedir $EXTRA_INCLUDES"
+-    elif test "$location" = "source"; then
+-        flags="$flags -I$APR_SOURCE_DIR/include $EXTRA_INCLUDES"
+-    else
+-        # this is for VPATH builds
+-        flags="$flags -I$APR_BUILD_DIR/include -I$APR_SOURCE_DIR/include $EXTRA_INCLUDES"
+-    fi
+     ;;
+     --srcdir)
+     echo $APR_SOURCE_DIR
+@@ -181,29 +174,14 @@ while test $# -gt 0; do
+     exit 0
+     ;;
+     --link-ld)
+-    if test "$location" = "installed"; then
+-        ### avoid using -L if libdir is a "standard" location like /usr/lib
+-        flags="$flags -L$libdir -l${APR_LIBNAME}"
+-    else
+-        ### this surely can't work since the library is in .libs?
+-        flags="$flags -L$APR_BUILD_DIR -l${APR_LIBNAME}"
+-    fi
++        flags="$flags -l${APR_LIBNAME}"
+     ;;
+     --link-libtool)
+     # If the LA_FILE exists where we think it should be, use it.  If we're
+     # installed and the LA_FILE does not exist, assume to use -L/-l
+     # (the LA_FILE may not have been installed).  If we're building ourselves,
+     # we'll assume that at some point the .la file be created.
+-    if test -f "$LA_FILE"; then
+-        flags="$flags $LA_FILE"
+-    elif test "$location" = "installed"; then
+-        ### avoid using -L if libdir is a "standard" location like /usr/lib
+-        # Since the user is specifying they are linking with libtool, we
+-        # *know* that -R will be recognized by libtool.
+-        flags="$flags -L$libdir -R$libdir -l${APR_LIBNAME}"
+-    else
+-        flags="$flags $LA_FILE"
+-    fi
++        flags="$flags -l${APR_LIBNAME}"
+     ;;
+     --shlib-path-var)
+     echo "$SHLIBPATH_VAR"
+-- 
+1.8.3.1
+

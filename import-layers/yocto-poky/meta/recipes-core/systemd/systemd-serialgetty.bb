@@ -11,6 +11,10 @@ SRC_URI = "file://serial-getty@.service"
 
 S = "${WORKDIR}"
 
+# As this package is tied to systemd, only build it when we're also building systemd.
+inherit distro_features_check
+REQUIRED_DISTRO_FEATURES = "systemd"
+
 do_install() {
 	if [ ! -z "${SERIAL_CONSOLES}" ] ; then
 		default_baudrate=`echo "${SERIAL_CONSOLES}" | sed 's/\;.*//'`
@@ -42,11 +46,5 @@ do_install() {
 # This is a machine specific file
 FILES_${PN} = "${systemd_unitdir}/system/*.service ${sysconfdir}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-
-# As this package is tied to systemd, only build it when we're also building systemd.
-python () {
-    if not bb.utils.contains ('DISTRO_FEATURES', 'systemd', True, False, d):
-        raise bb.parse.SkipPackage("'systemd' not in DISTRO_FEATURES")
-}
 
 ALLOW_EMPTY_${PN} = "1"

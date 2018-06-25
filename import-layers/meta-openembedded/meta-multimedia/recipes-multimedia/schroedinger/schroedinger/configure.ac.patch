@@ -5,10 +5,10 @@ Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 
 Upstream-Status: Inappropriate [configuration]
 
-Index: schroedinger-1.0.9/configure.ac
+Index: schroedinger-1.0.11/configure.ac
 ===================================================================
---- schroedinger-1.0.9.orig/configure.ac
-+++ schroedinger-1.0.9/configure.ac
+--- schroedinger-1.0.11.orig/configure.ac
++++ schroedinger-1.0.11/configure.ac
 @@ -54,7 +54,7 @@ if test "x${HAVE_ORC}" != xyes ; then
    AC_ERROR([orc-0.4 >= $ORC_VER is required])
  fi
@@ -16,5 +16,5 @@ Index: schroedinger-1.0.9/configure.ac
 -ORCC=`$PKG_CONFIG --variable=orcc orc-0.4`
 +ORCC=$STAGING_DIR`$PKG_CONFIG --variable=orcc orc-0.4`
  AC_SUBST(ORCC)
+ AM_CONDITIONAL(HAVE_ORCC, test "x$cross_compiling" != xyes)
  
- AC_ARG_WITH([thread],

@@ -2,47 +2,29 @@ Add 'install-ptest' rule.
 Print a standard result line for each test.
 
 Signed-off-by: Mihaela Sendrea <mihaela.sendrea@enea.com>
-Signed-off-by: Andrej Valek <andrej.valek@enea.com>
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
 Upstream-Status: Backport
 
 diff -uNr a/Makefile.am b/Makefile.am
---- a/Makefile.am	2016-05-22 03:49:02.000000000 +0200
-+++ b/Makefile.am	2017-06-14 10:38:43.381305385 +0200
-@@ -202,10 +202,24 @@
+--- a/Makefile.am	2017-08-28 15:01:14.000000000 +0200
++++ b/Makefile.am	2017-09-05 08:06:05.752287323 +0200
+@@ -202,6 +202,15 @@
  #testOOM_DEPENDENCIES = $(DEPS)
  #testOOM_LDADD= $(LDADDS)
  
 +install-ptest:
 +	@(if [ -d .libs ] ; then cd .libs; fi; \
-+	install $(noinst_PROGRAMS) $(DESTDIR))
++	install $(check_PROGRAMS) $(DESTDIR))
 +	cp -r $(srcdir)/test $(DESTDIR)
 +	cp -r $(srcdir)/result $(DESTDIR)
 +	cp -r $(srcdir)/python $(DESTDIR)
 +	cp Makefile $(DESTDIR)
 +	sed -i -e 's|^Makefile:|_Makefile:|' $(DESTDIR)/Makefile
 +
- runtests:
+ runtests: runtest$(EXEEXT) testrecurse$(EXEEXT) testapi$(EXEEXT) \
+           testchar$(EXEEXT) testdict$(EXEEXT) runxmlconf$(EXEEXT)
  	[ -d test   ] || $(LN_S) $(srcdir)/test   .
- 	[ -d result ] || $(LN_S) $(srcdir)/result .
--	$(CHECKER) ./runtest$(EXEEXT) && $(CHECKER) ./testrecurse$(EXEEXT) &&$(CHECKER) ./testapi$(EXEEXT) && $(CHECKER) ./testchar$(EXEEXT)&& $(CHECKER) ./testdict$(EXEEXT) && $(CHECKER) ./runxmlconf$(EXEEXT)
-+	$(CHECKER) ./runtest$(EXEEXT) && \
-+	    $(CHECKER) ./testrecurse$(EXEEXT) && \
-+	    ASAN_OPTIONS="$$ASAN_OPTIONS:detect_leaks=0" $(CHECKER) ./testapi$(EXEEXT) && \
-+	    $(CHECKER) ./testchar$(EXEEXT) && \
-+	    $(CHECKER) ./testdict$(EXEEXT) && \
-+	    $(CHECKER) ./runxmlconf$(EXEEXT)
- 	@(if [ "$(PYTHON_SUBDIR)" != "" ] ; then cd python ; \
- 	    $(MAKE) tests ; fi)
- 
-@@ -229,7 +243,7 @@
- 
- APItests: testapi$(EXEEXT)
- 	@echo "## Running the API regression tests this may take a little while"
--	-@($(CHECKER) $(top_builddir)/testapi -q)
-+	-@(ASAN_OPTIONS="$$ASAN_OPTIONS:detect_leaks=0" $(CHECKER) $(top_builddir)/testapi -q)
- 
- HTMLtests : testHTML$(EXEEXT)
- 	@(echo > .memdump)
+
 diff -uNr a/runsuite.c b/runsuite.c
 --- a/runsuite.c	2013-04-12 16:17:11.462823238 +0200
 +++ b/runsuite.c	2013-04-17 14:07:24.352693211 +0200

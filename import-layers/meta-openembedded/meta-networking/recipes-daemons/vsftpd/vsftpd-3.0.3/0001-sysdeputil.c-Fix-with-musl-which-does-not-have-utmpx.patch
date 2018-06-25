@@ -1,9 +1,10 @@
-From e55135c2a4ea7eae3cb1f4dccf69ca477ea095bf Mon Sep 17 00:00:00 2001
+From c5caf52b9ed79da8916ef5722efe6df61a856e2f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 28 Mar 2017 20:09:12 -0700
 Subject: [PATCH] sysdeputil.c: Fix with musl which does not have utmpx
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  sysdeputil.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
@@ -23,6 +24,3 @@ index 06f01f4..a8cff3b 100644
  
  #define __USE_GNU
  #include <utmpx.h>
--- 
-2.12.1
-

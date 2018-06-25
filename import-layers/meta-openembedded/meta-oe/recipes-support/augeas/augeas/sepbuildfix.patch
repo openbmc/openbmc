@@ -1,15 +1,24 @@
-Ensure that builds in separate builddirs (${B} != ${S}) correctly install the 
+From 8a277957a2579e7149c1850675441b288192077c Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Fri, 15 Jul 2016 10:04:48 +0300
+Subject: [PATCH] augeas: fix separate builddirs
+
+Ensure that builds in separate builddirs (${B} != ${S}) correctly install the
 lenses files.
 
 Upstream-Status: Pending
 
 RP 2013/4/17
 
-Index: augeas-1.0.0/Makefile.am
-===================================================================
---- augeas-1.0.0.orig/Makefile.am	2012-11-02 15:20:11.000000000 +0000
-+++ augeas-1.0.0/Makefile.am	2013-04-17 10:36:24.033400125 +0000
-@@ -5,8 +5,8 @@
+---
+ Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 87d511a..7710b3b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -5,8 +5,8 @@ ACLOCAL_AMFLAGS = -I gnulib/m4
  lensdir=$(datadir)/augeas/lenses/dist
  lenstestdir=$(datadir)/augeas/lenses/dist/tests
  
@@ -18,5 +27,5 @@ Index: augeas-1.0.0/Makefile.am
 +dist_lens_DATA=$(wildcard $(top_srcdir)/lenses/*.aug)
 +dist_lenstest_DATA=$(wildcard $(top_srcdir)lenses/tests/*.aug)
  
- EXTRA_DIST=augeas.spec build/aux/move-if-change Makefile.am HACKING
+ EXTRA_DIST=augeas.spec build/ac-aux/move-if-change Makefile.am HACKING.md
  

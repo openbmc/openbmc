@@ -33,7 +33,7 @@ cc: linux-kbuild@vger.kernel.org
  scripts/kconfig/lxdialog/Makefile          |    2 +-
  scripts/kconfig/lxdialog/check-lxdialog.sh |    8 ++++++++
  2 files changed, 9 insertions(+), 1 deletion(-)
-
+ 
 --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
 +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
 @@ -4,6 +4,10 @@
@@ -44,10 +44,10 @@ cc: linux-kbuild@vger.kernel.org
 +		echo "$CROSS_CURSES_LIB"
 +		exit
 +	fi
- 	for ext in so a dylib ; do
- 		for lib in ncursesw ncurses curses ; do
- 			$cc -print-file-name=lib${lib}.${ext} | grep -q /
-@@ -19,6 +23,10 @@ ldflags()
+ 	pkg-config --libs ncursesw 2>/dev/null && exit
+ 	pkg-config --libs ncurses 2>/dev/null && exit
+ 	for ext in so a dll.a dylib ; do
+@@ -21,6 +25,10 @@
  # Where is ncurses.h?
  ccflags()
  {
@@ -55,12 +55,12 @@ cc: linux-kbuild@vger.kernel.org
 +		echo "$CROSS_CURSES_INC"
 +		exit
 +	fi
- 	if [ -f /usr/include/ncursesw/ncurses.h ]; then
- 		echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncurses.h>"'
- 	elif [ -f /usr/include/ncursesw/curses.h ]; then
+ 	if pkg-config --cflags ncursesw 2>/dev/null; then
+ 		echo '-DCURSES_LOC="<ncurses.h>" -DNCURSES_WIDECHAR=1'
+ 	elif pkg-config --cflags ncurses 2>/dev/null; then
 --- a/scripts/kconfig/lxdialog/Makefile
 +++ b/scripts/kconfig/lxdialog/Makefile
-@@ -5,7 +5,7 @@ check-lxdialog  := $(srctree)/$(src)/che
+@@ -5,7 +5,7 @@
  
  # Use reursively expanded variables so we do not call gcc unless
  # we really need to do so. (Do not call gcc as part of make mrproper)

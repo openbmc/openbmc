@@ -9,12 +9,12 @@ This patch fixes following issue with automake 1.12
 Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 2012/05/03
 
-Index: libidn-1.24/configure.ac
+Index: libidn-1.33/configure.ac
 ===================================================================
---- libidn-1.24.orig/configure.ac
-+++ libidn-1.24/configure.ac
-@@ -34,6 +34,10 @@ AC_SUBST(LT_CURRENT, 17)
- AC_SUBST(LT_REVISION, 7)
+--- libidn-1.33.orig/configure.ac
++++ libidn-1.33/configure.ac
+@@ -33,6 +33,10 @@ AC_SUBST(LT_CURRENT, 17)
+ AC_SUBST(LT_REVISION, 16)
  AC_SUBST(LT_AGE, 6)
  
 +# automake 1.12 seems to require this, but automake 1.11 doesn't recognize it

@@ -1,4 +1,7 @@
-fix the function parameter
+From 9f97479373f3fceedc471074b81486d77a49618d Mon Sep 17 00:00:00 2001
+From: "Roy.Li" <rongqing.li@windriver.com>
+Date: Tue, 4 Mar 2014 14:38:42 +0800
+Subject: [PATCH] fix the function parameter
 
 Upstream-Status: pending
 
@@ -31,9 +34,10 @@ on PPC, Now we simply correct the number of parameters.
     #11 0x4836c378 in process_message (this=0x514005f0, message=0x51500778)
          at sa/ike_sa.c:1317
     #12 0x48362270 in execute (this=0x515008d0)
-         at processing/jobs/process_message_job.c:74 
+         at processing/jobs/process_message_job.c:74
 
 Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+
 ---
  src/libstrongswan/plugins/openssl/openssl_diffie_hellman.c | 8 +++++++-
  src/libstrongswan/plugins/openssl/openssl_diffie_hellman.h | 4 +++-
@@ -41,20 +45,20 @@ Signed-off-by: Roy.Li <rongqing.li@windriver.com>
  3 files changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/src/libstrongswan/plugins/openssl/openssl_diffie_hellman.c b/src/libstrongswan/plugins/openssl/openssl_diffie_hellman.c
-index ff33824..bd21446 100644
+index 8e9c118..a73b038 100644
 --- a/src/libstrongswan/plugins/openssl/openssl_diffie_hellman.c
 +++ b/src/libstrongswan/plugins/openssl/openssl_diffie_hellman.c
-@@ -142,7 +142,7 @@ METHOD(diffie_hellman_t, destroy, void,
+@@ -192,7 +192,7 @@ METHOD(diffie_hellman_t, destroy, void,
  /*
   * Described in header.
   */
 -openssl_diffie_hellman_t *openssl_diffie_hellman_create(
 +openssl_diffie_hellman_t *openssl_diffie_hellman_create_custom(
- 							diffie_hellman_group_t group, chunk_t g, chunk_t p)
+ 											diffie_hellman_group_t group, ...)
  {
  	private_openssl_diffie_hellman_t *this;
-@@ -197,5 +197,11 @@ openssl_diffie_hellman_t *openssl_diffie_hellman_create(
- 
+@@ -255,5 +255,11 @@ openssl_diffie_hellman_t *openssl_diffie_hellman_create(
+ 	DBG2(DBG_LIB, "size of DH secret exponent: %d bits", BN_num_bits(privkey));
  	return &this->public;
  }
 +openssl_diffie_hellman_t *openssl_diffie_hellman_create( diffie_hellman_group_t group)
@@ -66,26 +70,26 @@ index ff33824..bd21446 100644
  
  #endif /* OPENSSL_NO_DH */
 diff --git a/src/libstrongswan/plugins/openssl/openssl_diffie_hellman.h b/src/libstrongswan/plugins/openssl/openssl_diffie_hellman.h
-index 53dc59c..eb69eaa 100644
+index 5de5520..22586e0 100644
 --- a/src/libstrongswan/plugins/openssl/openssl_diffie_hellman.h
 +++ b/src/libstrongswan/plugins/openssl/openssl_diffie_hellman.h
-@@ -44,8 +44,10 @@ struct openssl_diffie_hellman_t {
-  * @param p				custom prime, if MODP_CUSTOM
+@@ -43,8 +43,10 @@ struct openssl_diffie_hellman_t {
+  * @param ...			expects generator and prime as chunk_t if MODP_CUSTOM
   * @return				openssl_diffie_hellman_t object, NULL if not supported
   */
 -openssl_diffie_hellman_t *openssl_diffie_hellman_create(
 +openssl_diffie_hellman_t *openssl_diffie_hellman_create_custom(
- 							diffie_hellman_group_t group, chunk_t g, chunk_t p);
+ 											diffie_hellman_group_t group, ...);
 +openssl_diffie_hellman_t *openssl_diffie_hellman_create(
 +							diffie_hellman_group_t group);
  
  #endif /** OPENSSL_DIFFIE_HELLMAN_H_ @}*/
  
 diff --git a/src/libstrongswan/plugins/openssl/openssl_plugin.c b/src/libstrongswan/plugins/openssl/openssl_plugin.c
-index ff25086..c76873d 100644
+index 8b0a7c5..114d575 100644
 --- a/src/libstrongswan/plugins/openssl/openssl_plugin.c
 +++ b/src/libstrongswan/plugins/openssl/openssl_plugin.c
-@@ -388,6 +388,7 @@ METHOD(plugin_t, get_features, int,
+@@ -609,6 +609,7 @@ METHOD(plugin_t, get_features, int,
  			PLUGIN_PROVIDE(DH, MODP_1024_BIT),
  			PLUGIN_PROVIDE(DH, MODP_1024_160),
  			PLUGIN_PROVIDE(DH, MODP_768_BIT),
@@ -93,6 +97,3 @@ index ff25086..c76873d 100644
  			PLUGIN_PROVIDE(DH, MODP_CUSTOM),
  #endif
  #ifndef OPENSSL_NO_RSA
--- 
-1.8.3
-

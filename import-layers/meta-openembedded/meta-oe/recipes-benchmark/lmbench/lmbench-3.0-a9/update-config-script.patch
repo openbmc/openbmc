@@ -1,8 +1,18 @@
+From aca1a59d888421c1fc553229b8049be47e8b3ddf Mon Sep 17 00:00:00 2001
+From: Chunrong Guo <b40290@freescale.com>
+Date: Fri, 1 Mar 2013 09:50:42 +0000
+Subject: [PATCH] lmbench: update config script
+
 Upstream-Status: Pending
-Index: lmbench-3.0-a9/scripts/config
-===================================================================
---- lmbench-3.0-a9/scripts/config	2000-01-31 18:29:31.000000000 -0600
-+++ lmbench-3.0-a9/scripts/config	2013-03-01 00:19:41.032984315 -0600
+
+---
+ scripts/config | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/config b/scripts/config
+index b58cb60..25d9d77 100755
+--- a/scripts/config
++++ b/scripts/config
 @@ -3,5 +3,5 @@
  UNAME=`uname -n 2>/dev/null`
  if [ X$UNAME = X ]

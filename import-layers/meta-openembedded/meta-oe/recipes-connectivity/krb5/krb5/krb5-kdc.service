@@ -6,6 +6,7 @@ ConditionPathExists=/etc/krb5.conf
 [Service]
 Type=forking
 ExecStart=/usr/sbin/krb5kdc
+EnvironmentFile=-/etc/default/krb5-kdc
 SuccessExitStatus=1 2 SIGKILL
 TimeoutStopSec=30
 

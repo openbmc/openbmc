@@ -1,0 +1,26 @@
+From bc35c4caebb57cc8b96c30c25432b12ca8dc18d5 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 6 Oct 2017 15:03:49 +0300
+Subject: [PATCH] Fix build with musl (missing header include for dev_t).
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ convert/source-fs.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/convert/source-fs.h b/convert/source-fs.h
+index 23f3356..6fd770f 100644
+--- a/convert/source-fs.h
++++ b/convert/source-fs.h
+@@ -20,6 +20,7 @@
+ #include "kerncompat.h"
+ #include <linux/kdev_t.h>
+ #include <pthread.h>
++#include <sys/types.h>
+ 
+ #define CONV_IMAGE_SUBVOL_OBJECTID BTRFS_FIRST_FREE_OBJECTID
+ 
+-- 
+2.14.1
+

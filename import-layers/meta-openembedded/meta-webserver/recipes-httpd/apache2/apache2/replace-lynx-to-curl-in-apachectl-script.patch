@@ -10,11 +10,11 @@ Signed-off-by: Yulong Pei <Yulong.pei@windriver.com>
  support/apachectl.in |   14 ++++++++++----
  1 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/support/apachectl.in b/support/apachectl.in
-index d4dff38..109ea13 100644
---- a/support/apachectl.in
-+++ b/support/apachectl.in
-@@ -51,11 +51,11 @@ fi
+Index: httpd-2.4.29/support/apachectl.in
+===================================================================
+--- httpd-2.4.29.orig/support/apachectl.in
++++ httpd-2.4.29/support/apachectl.in
+@@ -52,11 +52,11 @@ fi
  # a command that outputs a formatted text version of the HTML at the
  # url given on the command line.  Designed for lynx, however other
  # programs may work.  
@@ -28,7 +28,7 @@ index d4dff38..109ea13 100644
  #
  # Set this variable to a command that increases the maximum
  # number of file descriptors allowed per child process. This is
-@@ -91,10 +91,16 @@ configtest)
+@@ -92,10 +92,16 @@ configtest)
      ERROR=$?
      ;;
  status)
@@ -46,7 +46,4 @@ index d4dff38..109ea13 100644
 +    fi
      ;;
  *)
-     $HTTPD $ARGV
--- 
-1.6.4
-
+     $HTTPD "$@"

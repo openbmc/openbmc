@@ -1,16 +1,26 @@
+From b916443d43f2e1eeacfbed0033274a0270ef634d Mon Sep 17 00:00:00 2001
+From: Zhiquan Li <zhiquan.li@windriver.com>
+Date: Mon, 16 Nov 2015 10:23:00 +0800
+Subject: [PATCH] snort: 2.9.6.0 -> 2.9.7.5
+
 Upstream-Status:Inappropriate [embedded specific]
 
 fix the below error:
 checking for DAQ_VERDICT_RETRY... configure:
 configure: error: cannot run test program while cross compiling
 
+---
+ configure.in | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
---- a/configure.in    2015-10-28 10:45:18.174487395 +0800
-+++ b/configure.in    2015-10-28 10:45:47.586485951 +0800
-@@ -734,23 +734,23 @@
+diff --git a/configure.in b/configure.in
+index 2fbd298..62573a8 100644
+--- a/configure.in
++++ b/configure.in
+@@ -734,23 +734,23 @@ have_daq_flow_id="yes"
  #        [DAQ version supports flow ID in header.])
  #fi
-
+ 
 -AC_MSG_CHECKING([for DAQ_VERDICT_RETRY])
 -AC_RUN_IFELSE(
 -[AC_LANG_PROGRAM(
@@ -45,7 +55,6 @@ configure: error: cannot run test program while cross compiling
 +#    AC_DEFINE([HAVE_DAQ_VERDICT_RETRY],[1],
 +#        [DAQ version supports DAQ_VERDICT_RETRY in DAQ_Verdict.])
 +#fi
-
+ 
  # any sparc platform has to have this one defined.
  AC_MSG_CHECKING(for sparc)
-

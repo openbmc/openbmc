@@ -1,8 +1,21 @@
+From 17e5c8d32abc214aea408f0837be41e88bce7eb2 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Wed, 16 Aug 2017 13:37:40 +0800
+Subject: [PATCH] vlock: add new recipe
+
 Upstream-Status: Pending
 
 written by: Jeff Polk <jeff.polk@windriver.com>
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 
+---
+ Makefile         | 4 ++++
+ configure        | 9 +++++++++
+ src/vlock-main.c | 8 ++++++++
+ 3 files changed, 21 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 4eeb42a..834cd2c 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -126,6 +126,10 @@ ifeq ($(AUTH_METHOD),shadow)
@@ -16,6 +29,8 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  ifeq ($(ENABLE_PLUGINS),yes)
  vlock-main: plugins.o plugin.o module.o process.o script.o tsort.o list.o
  # -rdynamic is needed so that the all plugin can access the symbols from console_switch.o
+diff --git a/configure b/configure
+index d5d84d6..1303598 100755
 --- a/configure
 +++ b/configure
 @@ -44,6 +44,7 @@ Optional Features:
@@ -36,7 +51,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
      pam|shadow)
        if [ "$2" = "yes" ] ; then
          if [ -n "$auth_method" ] && [ "$auth_method" != "$1" ] ; then
-@@ -232,6 +232,7 @@ set_defaults() {
+@@ -228,6 +232,7 @@ set_defaults() {
    AUTH_METHOD="pam"
    ENABLE_ROOT_PASSWORD="yes"
    ENABLE_PLUGINS="yes"
@@ -44,9 +59,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
    SCRIPTS=""
  
    VLOCK_GROUP="vlock"
-@@ -356,10 +356,14 @@ ENABLE_PLUGINS = ${ENABLE_PLUGINS}
- # which plugins should be build
- MODULES = ${MODULES}
+@@ -353,6 +358,10 @@ MODULES = ${MODULES}
  # which scripts should be installed
  SCRIPTS = ${SCRIPTS}
  
@@ -57,12 +70,12 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  # root's group
  ROOT_GROUP = ${ROOT_GROUP}
  
- # group for privileged plugins
- VLOCK_GROUP = ${VLOCK_GROUP}
+diff --git a/src/vlock-main.c b/src/vlock-main.c
+index 008f6f0..108ce8b 100644
 --- a/src/vlock-main.c
 +++ b/src/vlock-main.c
-@@ -111,7 +111,9 @@ static void restore_terminal(void)
-   (void) tcsetattr(STDIN_FILENO, TCSANOW, &term);
+@@ -112,7 +112,9 @@ static void restore_terminal(void)
+   (void) tcsetattr(STDIN_FILENO, TCSANOW, &old_term);
  }
  
 +#ifdef ENABLE_FAIL_COUNT
@@ -71,7 +84,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  
  static void auth_loop(const char *username)
  {
-@@ -181,7 +183,9 @@ static void auth_loop(const char *userna
+@@ -182,7 +184,9 @@ static void auth_loop(const char *username)
      }
  #endif
  
@@ -81,7 +94,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
    }
  
    /* Free timeouts memory. */
-@@ -189,11 +193,13 @@ static void auth_loop(const char *userna
+@@ -190,11 +194,13 @@ static void auth_loop(const char *username)
    free(prompt_timeout);
  }
  
@@ -95,7 +108,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  
  #ifdef USE_PLUGINS
  static void call_end_hook(void)
-@@ -216,7 +222,9 @@ int main(int argc, char *const argv[])
+@@ -217,7 +223,9 @@ int main(int argc, char *const argv[])
    if (username == NULL)
      fatal_perror("vlock: could not get username");
  

@@ -1,0 +1,53 @@
+From e92de7409a3e107f90d108a9c5d49bd0418296dd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Thu, 22 Mar 2018 17:54:10 +0100
+Subject: [PATCH 1/4] Usual fix for musl libc
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Stolen from [1] and prettyfied slightly
+
+[1] https://github.com/voidlinux/void-packages/tree/master/srcpkgs/NetworkManager/patches
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ src/systemd/src/basic/stdio-util.h | 2 ++
+ src/systemd/src/basic/util.h       | 5 +++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/src/systemd/src/basic/stdio-util.h b/src/systemd/src/basic/stdio-util.h
+index bd1144b..9eafacb 100644
+--- a/src/systemd/src/basic/stdio-util.h
++++ b/src/systemd/src/basic/stdio-util.h
+@@ -19,7 +19,9 @@
+   along with systemd; If not, see <http://www.gnu.org/licenses/>.
+ ***/
+ 
++#if defined(__GLIBC__)
+ #include <printf.h>
++#endif
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <sys/types.h>
+diff --git a/src/systemd/src/basic/util.h b/src/systemd/src/basic/util.h
+index b31dfd1..9b7032c 100644
+--- a/src/systemd/src/basic/util.h
++++ b/src/systemd/src/basic/util.h
+@@ -46,6 +46,11 @@
+ #include "missing.h"
+ #include "time-util.h"
+ 
++#if !defined(__GLIBC__)
++typedef int (*__compar_fn_t) (const void*, const void*);
++typedef __compar_fn_t comparison_fn_t;
++#endif
++
+ size_t page_size(void) _pure_;
+ #define PAGE_ALIGN(l) ALIGN_TO((l), page_size())
+ 
+-- 
+2.14.3
+

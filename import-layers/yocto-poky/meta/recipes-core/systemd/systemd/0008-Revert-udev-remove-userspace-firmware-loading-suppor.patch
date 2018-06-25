@@ -1,0 +1,377 @@
+From 5cce7626f33e92f624ac06b613125813fb47d445 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 28 Feb 2018 21:05:39 -0800
+Subject: [PATCH 08/31] Revert "udev: remove userspace firmware loading
+ support"
+
+This reverts commit be2ea723b1d023b3d385d3b791ee4607cbfb20ca.
+Userspace firmware loading support is needed for Linux < 3.7.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Jonathan Liu <net147@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ README                           |   4 +-
+ TODO                             |   1 +
+ meson.build                      |   9 +++
+ meson_options.txt                |   2 +
+ rules/meson.build                |   4 +
+ src/udev/meson.build             |   4 +
+ src/udev/udev-builtin-firmware.c | 154 +++++++++++++++++++++++++++++++++++++++
+ src/udev/udev-builtin.c          |   3 +
+ src/udev/udev.h                  |   6 ++
+ src/udev/udevd.c                 |  12 +++
+ 10 files changed, 197 insertions(+), 2 deletions(-)
+ create mode 100644 src/udev/udev-builtin-firmware.c
+
+diff --git a/README b/README
+index 8807e5cfe..bfd7a35de 100644
+--- a/README
++++ b/README
+@@ -58,8 +58,8 @@ REQUIREMENTS:
+         Legacy hotplug slows down the system and confuses udev:
+           CONFIG_UEVENT_HELPER_PATH=""
+ 
+-        Userspace firmware loading is not supported and should
+-        be disabled in the kernel:
++        Userspace firmware loading is deprecated, will go away, and
++        sometimes causes problems:
+           CONFIG_FW_LOADER_USER_HELPER=n
+ 
+         Some udev rules and virtualization detection relies on it:
+diff --git a/TODO b/TODO
+index a77028c7b..39e72d7ec 100644
+--- a/TODO
++++ b/TODO
+@@ -783,6 +783,7 @@ Features:
+ * initialize the hostname from the fs label of /, if /etc/hostname does not exist?
+ 
+ * udev:
++  - remove src/udev/udev-builtin-firmware.c (CONFIG_FW_LOADER_USER_HELPER=n)
+   - move to LGPL
+   - kill scsi_id
+   - add trigger --subsystem-match=usb/usb_device device
+diff --git a/meson.build b/meson.build
+index 918101d6b..9c25022a4 100644
+--- a/meson.build
++++ b/meson.build
+@@ -72,6 +72,12 @@ conf.set10('HAVE_SYSV_COMPAT', have,
+            description : 'SysV init scripts and rcN.d links are supported')
+ m4_defines += have ? ['-DHAVE_SYSV_COMPAT'] : []
+ 
++firmware_path = get_option('firmware-path')
++have = firmware_path != ''
++conf.set10('HAVE_FIRMWARE', have,
++           description : 'Userspace firmware loading is supported')
++m4_defines += have ? ['-DHAVE_FIRMWARE'] : []
++
+ # join_paths ignore the preceding arguments if an absolute component is
+ # encountered, so this should canonicalize various paths when they are
+ # absolute or relative.
+@@ -178,6 +184,7 @@ conf.set_quoted('SYSTEM_CONFIG_UNIT_PATH',                    join_paths(pkgsysc
+ conf.set_quoted('SYSTEM_DATA_UNIT_PATH',                      systemunitdir)
+ conf.set_quoted('SYSTEM_SYSVINIT_PATH',                       sysvinit_path)
+ conf.set_quoted('SYSTEM_SYSVRCND_PATH',                       sysvrcnd_path)
++conf.set_quoted('FIRMWARE_PATH',                              firmware_path)
+ conf.set_quoted('RC_LOCAL_SCRIPT_PATH_START',                 get_option('rc-local'))
+ conf.set_quoted('RC_LOCAL_SCRIPT_PATH_STOP',                  get_option('halt-local'))
+ conf.set_quoted('USER_CONFIG_UNIT_PATH',                      join_paths(pkgsysconfdir, 'user'))
+@@ -258,6 +265,7 @@ substs.set('SYSTEMCTL',                                       join_paths(rootbin
+ substs.set('RANDOM_SEED',                                     join_paths(randomseeddir, 'random-seed'))
+ substs.set('SYSTEM_SYSVINIT_PATH',                            sysvinit_path)
+ substs.set('SYSTEM_SYSVRCND_PATH',                            sysvrcnd_path)
++substs.set('FIRMWARE_PATH',                                   firmware_path)
+ substs.set('RC_LOCAL_SCRIPT_PATH_START',                      get_option('rc-local'))
+ substs.set('RC_LOCAL_SCRIPT_PATH_STOP',                       get_option('halt-local'))
+ 
+@@ -2715,6 +2723,7 @@ status = [
+         'roothome directory:                @0@'.format(roothomedir),
+         'SysV init scripts:                 @0@'.format(sysvinit_path),
+         'SysV rc?.d directories:            @0@'.format(sysvrcnd_path),
++        'firmware path:                     @0@'.format(firmware_path),
+         'PAM modules directory:             @0@'.format(pamlibdir),
+         'PAM configuration directory:       @0@'.format(pamconfdir),
+         'RPM macros directory:              @0@'.format(rpmmacrosdir),
+diff --git a/meson_options.txt b/meson_options.txt
+index 0b24f0e0f..92d25fa35 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -108,6 +108,8 @@ option('tmpfiles', type : 'boolean',
+        description : 'support for tmpfiles.d')
+ option('importd', type : 'combo', choices : ['auto', 'true', 'false'],
+        description : 'install the systemd-importd daemon')
++option('firmware-path', type : 'string', value : '',
++       description : 'Firmware search path')
+ option('hwdb', type : 'boolean',
+        description : 'support for the hardware database')
+ option('rfkill', type : 'boolean',
+diff --git a/rules/meson.build b/rules/meson.build
+index e253b9f59..5eee5fbca 100644
+--- a/rules/meson.build
++++ b/rules/meson.build
+@@ -41,6 +41,10 @@ rules = files('''
+ install_data(rules,
+              install_dir : udevrulesdir)
+ 
++if conf.get('HAVE_FIRMWARE') == 1
++        install_data('50-firmware.rules', install_dir : udevrulesdir)
++endif
++
+ all_rules = rules
+ 
+ rules_in = '''
+diff --git a/src/udev/meson.build b/src/udev/meson.build
+index de2fd2d9c..b6b0ca006 100644
+--- a/src/udev/meson.build
++++ b/src/udev/meson.build
+@@ -67,6 +67,10 @@ if conf.get('HAVE_ACL') == 1
+                                  sd_login_c]
+ endif
+ 
++if conf.get('HAVE_FIRMWARE') == 1
++        libudev_core_sources += ['udev-builtin-firmware.c']
++endif
++
+ ############################################################
+ 
+ generate_keyboard_keys_list = find_program('generate-keyboard-keys-list.sh')
+diff --git a/src/udev/udev-builtin-firmware.c b/src/udev/udev-builtin-firmware.c
+new file mode 100644
+index 000000000..bd8c2fb96
+--- /dev/null
++++ b/src/udev/udev-builtin-firmware.c
+@@ -0,0 +1,154 @@
++/*
++ * firmware - Kernel firmware loader
++ *
++ * Copyright (C) 2009 Piter Punk <piterpunk@slackware.com>
++ * Copyright (C) 2009-2011 Kay Sievers <kay@vrfy.org>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details:*
++ */
++
++#include <unistd.h>
++#include <stdlib.h>
++#include <string.h>
++#include <stdio.h>
++#include <getopt.h>
++#include <errno.h>
++#include <stdbool.h>
++#include <sys/utsname.h>
++#include <sys/stat.h>
++
++#include "udev.h"
++
++static bool set_loading(struct udev *udev, char *loadpath, const char *state) {
++        FILE *ldfile;
++
++        ldfile = fopen(loadpath, "we");
++        if (ldfile == NULL) {
++                log_error("error: can not open '%s'", loadpath);
++                return false;
++        };
++        fprintf(ldfile, "%s\n", state);
++        fclose(ldfile);
++        return true;
++}
++
++static bool copy_firmware(struct udev *udev, const char *source, const char *target, size_t size) {
++        char *buf;
++        FILE *fsource = NULL, *ftarget = NULL;
++        bool ret = false;
++
++        buf = malloc(size);
++        if (buf == NULL) {
++                log_error("No memory available to load firmware file");
++                return false;
++        }
++
++        log_debug("writing '%s' (%zi) to '%s'", source, size, target);
++
++        fsource = fopen(source, "re");
++        if (fsource == NULL)
++                goto exit;
++        ftarget = fopen(target, "we");
++        if (ftarget == NULL)
++                goto exit;
++        if (fread(buf, size, 1, fsource) != 1)
++                goto exit;
++        if (fwrite(buf, size, 1, ftarget) == 1)
++                ret = true;
++exit:
++        if (ftarget != NULL)
++                fclose(ftarget);
++        if (fsource != NULL)
++                fclose(fsource);
++        free(buf);
++        return ret;
++}
++
++static int builtin_firmware(struct udev_device *dev, int argc, char *argv[], bool test) {
++        struct udev *udev = udev_device_get_udev(dev);
++        static const char *searchpath[] = { FIRMWARE_PATH };
++        char loadpath[UTIL_PATH_SIZE];
++        char datapath[UTIL_PATH_SIZE];
++        char fwpath[UTIL_PATH_SIZE];
++        const char *firmware;
++        FILE *fwfile = NULL;
++        struct utsname kernel;
++        struct stat statbuf;
++        unsigned int i;
++        int rc = EXIT_SUCCESS;
++
++        firmware = udev_device_get_property_value(dev, "FIRMWARE");
++        if (firmware == NULL) {
++                log_error("firmware parameter missing");
++                rc = EXIT_FAILURE;
++                goto exit;
++        }
++
++        /* lookup firmware file */
++        uname(&kernel);
++        for (i = 0; i < ELEMENTSOF(searchpath); i++) {
++                strscpyl(fwpath, sizeof(fwpath), searchpath[i], kernel.release, "/", firmware, NULL);
++                fwfile = fopen(fwpath, "re");
++                if (fwfile != NULL)
++                        break;
++
++                strscpyl(fwpath, sizeof(fwpath), searchpath[i], firmware, NULL);
++                fwfile = fopen(fwpath, "re");
++                if (fwfile != NULL)
++                        break;
++        }
++
++        strscpyl(loadpath, sizeof(loadpath), udev_device_get_syspath(dev), "/loading", NULL);
++
++        if (fwfile == NULL) {
++                log_debug("did not find firmware file '%s'", firmware);
++                rc = EXIT_FAILURE;
++                /*
++                 * Do not cancel the request in the initrd, the real root might have
++                 * the firmware file and the 'coldplug' run in the real root will find
++                 * this pending request and fulfill or cancel it.
++                 * */
++                if (!in_initrd())
++                        set_loading(udev, loadpath, "-1");
++                goto exit;
++        }
++
++        if (stat(fwpath, &statbuf) < 0 || statbuf.st_size == 0) {
++                if (!in_initrd())
++                        set_loading(udev, loadpath, "-1");
++                rc = EXIT_FAILURE;
++                goto exit;
++        }
++
++        if (!set_loading(udev, loadpath, "1"))
++                goto exit;
++
++        strscpyl(datapath, sizeof(datapath), udev_device_get_syspath(dev), "/data", NULL);
++        if (!copy_firmware(udev, fwpath, datapath, statbuf.st_size)) {
++                log_error("error sending firmware '%s' to device", firmware);
++                set_loading(udev, loadpath, "-1");
++                rc = EXIT_FAILURE;
++                goto exit;
++        };
++
++        set_loading(udev, loadpath, "0");
++exit:
++        if (fwfile)
++                fclose(fwfile);
++        return rc;
++}
++
++const struct udev_builtin udev_builtin_firmware = {
++        .name = "firmware",
++        .cmd = builtin_firmware,
++        .help = "kernel firmware loader",
++        .run_once = true,
++};
+diff --git a/src/udev/udev-builtin.c b/src/udev/udev-builtin.c
+index db2b6874f..ccd88638c 100644
+--- a/src/udev/udev-builtin.c
++++ b/src/udev/udev-builtin.c
+@@ -32,6 +32,9 @@ static const struct udev_builtin *builtins[] = {
+         [UDEV_BUILTIN_BLKID] = &udev_builtin_blkid,
+ #endif
+         [UDEV_BUILTIN_BTRFS] = &udev_builtin_btrfs,
++#if HAVE_FIRMWARE
++        [UDEV_BUILTIN_FIRMWARE] = &udev_builtin_firmware,
++#endif
+         [UDEV_BUILTIN_HWDB] = &udev_builtin_hwdb,
+         [UDEV_BUILTIN_INPUT_ID] = &udev_builtin_input_id,
+         [UDEV_BUILTIN_KEYBOARD] = &udev_builtin_keyboard,
+diff --git a/src/udev/udev.h b/src/udev/udev.h
+index ea11c2d29..c47dd3d88 100644
+--- a/src/udev/udev.h
++++ b/src/udev/udev.h
+@@ -151,6 +151,9 @@ enum udev_builtin_cmd {
+         UDEV_BUILTIN_BLKID,
+ #endif
+         UDEV_BUILTIN_BTRFS,
++#if HAVE_FIRMWARE
++        UDEV_BUILTIN_FIRMWARE,
++#endif
+         UDEV_BUILTIN_HWDB,
+         UDEV_BUILTIN_INPUT_ID,
+         UDEV_BUILTIN_KEYBOARD,
+@@ -179,6 +182,9 @@ struct udev_builtin {
+ extern const struct udev_builtin udev_builtin_blkid;
+ #endif
+ extern const struct udev_builtin udev_builtin_btrfs;
++#if HAVE_FIRMWARE
++extern const struct udev_builtin udev_builtin_firmware;
++#endif
+ extern const struct udev_builtin udev_builtin_hwdb;
+ extern const struct udev_builtin udev_builtin_input_id;
+ extern const struct udev_builtin udev_builtin_keyboard;
+diff --git a/src/udev/udevd.c b/src/udev/udevd.c
+index 5c757d513..2f3313007 100644
+--- a/src/udev/udevd.c
++++ b/src/udev/udevd.c
+@@ -127,6 +127,9 @@ struct event {
+         bool is_block;
+         sd_event_source *timeout_warning;
+         sd_event_source *timeout;
++#if HAVE_FIRMWARE
++        bool nodelay;
++#endif
+ };
+ 
+ static void event_queue_cleanup(Manager *manager, enum event_state type);
+@@ -609,6 +612,10 @@ static int event_queue_insert(Manager *manager, struct udev_device *dev) {
+         event->devnum = udev_device_get_devnum(dev);
+         event->is_block = streq("block", udev_device_get_subsystem(dev));
+         event->ifindex = udev_device_get_ifindex(dev);
++#if HAVE_FIRMWARE
++        if (streq(udev_device_get_subsystem(dev), "firmware"))
++                event->nodelay = true;
++#endif
+ 
+         log_debug("seq %llu queued, '%s' '%s'", udev_device_get_seqnum(dev),
+              udev_device_get_action(dev), udev_device_get_subsystem(dev));
+@@ -692,6 +699,11 @@ static bool is_devpath_busy(Manager *manager, struct event *event) {
+                         return true;
+                 }
+ 
++#if HAVE_FIRMWARE
++                /* allow to bypass the dependency tracking */
++                if (event->nodelay)
++                        continue;
++#endif
+                 /* parent device event found */
+                 if (event->devpath[common] == '/') {
+                         event->delaying_seqnum = loop_event->seqnum;
+-- 
+2.13.0
+

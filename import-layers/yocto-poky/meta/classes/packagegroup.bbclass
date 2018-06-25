@@ -56,3 +56,4 @@ python () {
         bb.fatal("Please ensure that your setting of VIRTUAL-RUNTIME_init_manager (%s) matches the entries enabled in DISTRO_FEATURES" % initman)
 }
 
+CVE_PRODUCT = ""

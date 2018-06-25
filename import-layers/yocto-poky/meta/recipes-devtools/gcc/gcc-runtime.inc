@@ -34,6 +34,18 @@ RUNTIMETARGET_remove_libc-musl = "libmpx"
 # libmudflap
 # libgfortran needs separate recipe due to libquadmath dependency
 
+SLIB = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/gcc-${PV}"
+SLIB_NEW = "/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}"
+
+DEBUG_PREFIX_MAP_class-target = " \
+   -fdebug-prefix-map=${WORKDIR}/recipe-sysroot= \
+   -fdebug-prefix-map=${WORKDIR}/recipe-sysroot-native= \
+   -fdebug-prefix-map=${SLIB}=${SLIB_NEW} \
+   -fdebug-prefix-map=${SLIB}/include=${SLIB_NEW}/libstdc++-v3/../include \
+   -fdebug-prefix-map=${SLIB}/libiberty=${SLIB_NEW}/libstdc++-v3/../libiberty \
+   -fdebug-prefix-map=${B}=${SLIB_NEW} \
+   "
+
 do_configure () {
 	export CXX="${CXX} -nostdinc++ -nostdlib++"
 	for d in libgcc ${RUNTIMETARGET}; do

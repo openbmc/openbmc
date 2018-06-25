@@ -36,7 +36,7 @@ prelink_image () {
 	dynamic_loader=$(linuxloader)
 
 	# prelink!
-	if [ "$BUILD_REPRODUCIBLE_BINARIES" = "1" ]; then
+	if [ "${BUILD_REPRODUCIBLE_BINARIES}" = "1" ]; then
 		bbnote " prelink: BUILD_REPRODUCIBLE_BINARIES..."
 		if [ "$REPRODUCIBLE_TIMESTAMP_ROOTFS" = "" ]; then
 			export PRELINK_TIMESTAMP=`git log -1 --pretty=%ct `

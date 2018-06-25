@@ -1,0 +1,32 @@
+Fix wayland-client and wayland-scanner pc files
+
+Upstream-Status: Pending
+
+Signed-off-by: Fabien Lahoudere <fabien.lahoudere@collabora.co.uk>
+
+Index: wayland-1.14.0/src/wayland-client.pc.in
+===================================================================
+--- wayland-1.14.0.orig/src/wayland-client.pc.in
++++ wayland-1.14.0/src/wayland-client.pc.in
+@@ -1,7 +1,7 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ datarootdir=@datarootdir@
+-pkgdatadir=@datadir@/@PACKAGE@
++pkgdatadir=${pc_sysrootdir}@datadir@/@PACKAGE@
+ libdir=@libdir@
+ includedir=@includedir@
+ 
+Index: wayland-1.14.0/src/wayland-scanner.pc.in
+===================================================================
+--- wayland-1.14.0.orig/src/wayland-scanner.pc.in
++++ wayland-1.14.0/src/wayland-scanner.pc.in
+@@ -2,7 +2,7 @@ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ datarootdir=@datarootdir@
+ pkgdatadir=@datadir@/@PACKAGE@
+-wayland_scanner=@bindir@/wayland-scanner
++wayland_scanner=wayland-scanner
+ 
+ Name: Wayland Scanner
+ Description: Wayland scanner

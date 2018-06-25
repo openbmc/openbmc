@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cd tests
+for i in test*[0-9] ; do
+    if ./${i} | cmp -s "${i}.ans" - ; then
+        echo "PASS: ${i}"
+    else
+        echo "FAIL: ${i}"
+    fi
+done

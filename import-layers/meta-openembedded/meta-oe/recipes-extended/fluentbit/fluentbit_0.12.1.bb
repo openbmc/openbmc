@@ -21,6 +21,10 @@ inherit cmake systemd
 
 EXTRA_OECMAKE = "-DGNU_HOST=${HOST_SYS} -DFLB_ALL=ON -DFLB_TD=1"
 
+# With Ninja it fails with:
+# ninja: error: build.ninja:134: bad $-escape (literal $ must be written as $$)
+OECMAKE_GENERATOR = "Unix Makefiles"
+
 SYSTEMD_SERVICE_${PN} = "td-agent-bit.service"
 
 TARGET_CC_ARCH_append = " ${SELECTED_OPTIMIZATION}"

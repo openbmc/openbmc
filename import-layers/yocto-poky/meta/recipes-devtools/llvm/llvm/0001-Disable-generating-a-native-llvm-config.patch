@@ -1,0 +1,41 @@
+From 7f7743ce233fcd735ec580c75270413493658aa6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 19 Apr 2018 18:08:31 -0700
+Subject: [PATCH] Disable generating a native llvm-config
+
+OpenEmbedded already builds this as part of llvm-native
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/llvm-config/CMakeLists.txt | 16 ----------------
+ 1 file changed, 16 deletions(-)
+
+diff --git a/tools/llvm-config/CMakeLists.txt b/tools/llvm-config/CMakeLists.txt
+index 25f99cec978..c45e9b642a8 100644
+--- a/tools/llvm-config/CMakeLists.txt
++++ b/tools/llvm-config/CMakeLists.txt
+@@ -63,19 +63,3 @@ endif()
+ 
+ # Add the dependency on the generation step.
+ add_file_dependencies(${CMAKE_CURRENT_SOURCE_DIR}/llvm-config.cpp ${BUILDVARIABLES_OBJPATH})
+-
+-if(CMAKE_CROSSCOMPILING)
+-  set(${project}_LLVM_CONFIG_EXE "${LLVM_NATIVE_BUILD}/bin/llvm-config")
+-  set(${project}_LLVM_CONFIG_EXE ${${project}_LLVM_CONFIG_EXE} PARENT_SCOPE)
+-
+-  add_custom_command(OUTPUT "${${project}_LLVM_CONFIG_EXE}"
+-    COMMAND ${CMAKE_COMMAND} --build . --target llvm-config --config $<CONFIGURATION>
+-    DEPENDS ${LLVM_NATIVE_BUILD}/CMakeCache.txt
+-    WORKING_DIRECTORY ${LLVM_NATIVE_BUILD}
+-    COMMENT "Building native llvm-config..."
+-    USES_TERMINAL)
+-  add_custom_target(${project}NativeLLVMConfig DEPENDS ${${project}_LLVM_CONFIG_EXE})
+-  add_dependencies(${project}NativeLLVMConfig CONFIGURE_LLVM_NATIVE)
+-
+-  add_dependencies(llvm-config ${project}NativeLLVMConfig)
+-endif(CMAKE_CROSSCOMPILING)
+-- 
+2.17.0
+

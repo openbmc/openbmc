@@ -31,6 +31,9 @@ SRC_URI = "ftp://ftp.openl2tp.org/releases/${BP}/${BP}.tar.gz \
            file://openl2tpd-initscript-fix-sysconfig.patch \
            file://openl2tpd-initscript-fix-warning.patch \
            file://openl2tpd.service \
+           file://openl2tpd-enable-tests.patch \
+           file://run-ptest \
+           file://fix_linux_4.15_compile.patch \
            "
 
 SRC_URI_append_libc-musl = "\
@@ -41,7 +44,7 @@ SRC_URI_append_libc-musl = "\
 SRC_URI[md5sum] = "e3d08dedfb9e6a9a1e24f6766f6dadd0"
 SRC_URI[sha256sum] = "1c97704d4b963a87fbc0e741668d4530933991515ae9ab0dffd11b5444f4860f"
 
-inherit autotools-brokensep pkgconfig systemd
+inherit autotools-brokensep pkgconfig systemd ptest
 
 SYSTEMD_SERVICE_${PN} = "openl2tpd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
@@ -83,6 +86,14 @@ do_install_append () {
                -e 's,@BASE_BINDIR@,${base_bindir},g' \
                ${D}${systemd_system_unitdir}/openl2tpd.service
     fi
+}
+
+do_install_ptest () {
+    for i in all.tcl configfile.test peer_profile.test ppp_profile.test \
+    session_profile.test session.test system.test test_procs.tcl \
+    thirdparty_lns.test tunnel_profile.test tunnel.test; do
+        install -m 0755 ${S}/test/$i ${D}${PTEST_PATH}
+    done
 }
 
 RDEPENDS_${PN} = "ppp ppp-l2tp bash"

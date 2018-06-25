@@ -1,0 +1,43 @@
+From 4cbecb61682a0ee426faaa03d824fc8fd7aef826 Mon Sep 17 00:00:00 2001
+From: Daniel Stone <daniels@collabora.com>
+Date: Mon, 2 Apr 2018 13:20:34 +0100
+Subject: [PATCH] st/dri: Initialise modifier to INVALID for DRI2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When allocating a buffer for DRI2, set the modifier to INVALID to inform
+the backend that we have no supplied modifiers and it should do its own
+thing. The missed initialisation forced linear, even if the
+implementation had made other decisions.
+
+This resulted in VC4 DRI2 clients failing with:
+  Modifier 0x0 vs. tiling (0x700000000000001) mismatch
+
+Signed-off-by: Daniel Stone <daniels@collabora.com>
+Reported-by: Andreas Müller <schnitzeltony@gmail.com>
+Reviewed-by: Eric Anholt <eric@anholt.net>
+Fixes: 3f8513172ff6 ("gallium/winsys/drm: introduce modifier field to winsys_handle")
+
+Upstream-Status: Backport [1]
+
+[1] https://cgit.freedesktop.org/mesa/mesa/commit/?id=4cbecb61682a0ee426faaa03d824fc8fd7aef826
+---
+ src/gallium/state_trackers/dri/dri2.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/gallium/state_trackers/dri/dri2.c b/src/gallium/state_trackers/dri/dri2.c
+index 31d17d46c2..58a6757f03 100644
+--- a/src/gallium/state_trackers/dri/dri2.c
++++ b/src/gallium/state_trackers/dri/dri2.c
+@@ -806,6 +806,7 @@ dri2_allocate_textures(struct dri_context *ctx,
+          whandle.handle = buf->name;
+          whandle.stride = buf->pitch;
+          whandle.offset = 0;
++         whandle.modifier = DRM_FORMAT_MOD_INVALID;
+          if (screen->can_share_buffer)
+             whandle.type = DRM_API_HANDLE_TYPE_SHARED;
+          else
+-- 
+2.14.3
+

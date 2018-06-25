@@ -13,7 +13,7 @@ DESCRIPTION = "The EventLog library aims to be a replacement of the \
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b8ba8e77bcda9a53fac0fe39fe957767"
 
-SRC_URI = "http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/3.4.2/source/${BPN}_${PV}.tar.gz"
+SRC_URI = "https://www.balabit.com/downloads/syslog-ng/open-source-edition/3.4.2/source/${BPN}_${PV}.tar.gz"
 
 inherit autotools pkgconfig
 

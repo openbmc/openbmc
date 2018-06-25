@@ -11,6 +11,8 @@ S = "${WORKDIR}/git"
 PV = "${RUNC_VERSION}+git${SRCPV}"
 
 inherit go
+inherit goarch
+
 RRECOMMENDS_${PN} = "lxc docker"
 PROVIDES += "virtual/runc"
 RPROVIDES_${PN} = "virtual/runc"
@@ -20,7 +22,7 @@ GO_IMPORT = "import"
 LIBCONTAINER_PACKAGE="github.com/opencontainers/runc/libcontainer"
 
 do_configure[noexec] = "1"
-EXTRA_OEMAKE="BUILDTAGS=''"
+EXTRA_OEMAKE="BUILDTAGS='' GO=${GO}"
 
 do_compile() {
 	# Set GOPATH. See 'PACKAGERS.md'. Don't rely on
@@ -44,10 +46,12 @@ do_compile() {
 	export CGO_ENABLED="1"
 	export CGO_CFLAGS="${CFLAGS} --sysroot=${STAGING_DIR_TARGET}"
 	export CGO_LDFLAGS="${LDFLAGS} --sysroot=${STAGING_DIR_TARGET}"
+	export GO=${GO}
+
 	export CFLAGS=""
 	export LDFLAGS=""
 
-        oe_runmake static
+	oe_runmake static
 }
 
 do_install() {

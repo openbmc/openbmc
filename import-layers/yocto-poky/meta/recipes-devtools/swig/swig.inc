@@ -11,7 +11,7 @@ DEPENDS = "libpcre python3"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz"
 
-inherit autotools python3native
+inherit autotools python3native pkgconfig
 
 EXTRA_OECONF = " \
     --with-python3=${PYTHON} \

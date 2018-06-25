@@ -1,0 +1,55 @@
+Multi-plane sub-sampled textures have partial width/height, e.g.
+YUV420/I420 has a full-size Y plane, followed by a half-width/height U
+plane, and a half-width/height V plane.
+
+zwp_linux_dmabuf_v1 allows clients to pass an explicit pitch for each
+plane, but for wl_shm this must be inferred. gl-renderer was correctly
+accounting for the width and height when subsampling, but the pitch was
+being taken as the pitch for the first plane.
+
+This does not match the requirements for GStreamer's waylandsink, in
+particular, as well as other clients. Fix the SHM upload path to
+correctly set the pitch for each plane, according to subsampling.
+
+Tested with:
+  $ gst-launch-1.0 videotestsrc ! waylandsink
+
+Upstream-Status: Backport [https://patchwork.freedesktop.org/patch/180767/]
+
+Signed-off-by: Daniel Stone <daniels@collabora.com>
+Fixes: fdeefe42418 ("gl-renderer: add support of WL_SHM_FORMAT_YUV420")
+Reported-by: Fabien Lahoudere <fabien.lahoudere@collabora.co.uk>
+Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=103063
+
+---
+ libweston/gl-renderer.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
+index 244ce309..40bf0bb6 100644
+--- a/libweston/gl-renderer.c
++++ b/libweston/gl-renderer.c
+@@ -1445,14 +1445,13 @@ gl_renderer_flush_damage(struct weston_surface *surface)
+ 		goto done;
+ 	}
+ 
+-	glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT, gs->pitch);
+-
+ 	if (gs->needs_full_upload) {
+ 		glPixelStorei(GL_UNPACK_SKIP_PIXELS_EXT, 0);
+ 		glPixelStorei(GL_UNPACK_SKIP_ROWS_EXT, 0);
+ 		wl_shm_buffer_begin_access(buffer->shm_buffer);
+ 		for (j = 0; j < gs->num_textures; j++) {
+ 			glBindTexture(GL_TEXTURE_2D, gs->textures[j]);
++			glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT, gs->pitch / gs->hsub[j]);
+ 			glTexImage2D(GL_TEXTURE_2D, 0,
+ 				     gs->gl_format[j],
+ 				     gs->pitch / gs->hsub[j],
+@@ -1477,6 +1476,7 @@ gl_renderer_flush_damage(struct weston_surface *surface)
+ 		glPixelStorei(GL_UNPACK_SKIP_ROWS_EXT, r.y1);
+ 		for (j = 0; j < gs->num_textures; j++) {
+ 			glBindTexture(GL_TEXTURE_2D, gs->textures[j]);
++			glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT, gs->pitch / gs->hsub[j]);
+ 			glTexSubImage2D(GL_TEXTURE_2D, 0,
+ 					r.x1 / gs->hsub[j],
+ 					r.y1 / gs->vsub[j],

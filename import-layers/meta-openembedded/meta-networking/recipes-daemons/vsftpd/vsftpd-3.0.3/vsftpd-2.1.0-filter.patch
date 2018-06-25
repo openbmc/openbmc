@@ -1,4 +1,7 @@
-Fix the CVE-2015-1419
+From b756444854c5ab3b1284fd7113043fe8860e99ec Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Fri, 24 Apr 2015 09:36:48 +0800
+Subject: [PATCH] Fix the CVE-2015-1419
 
 Upstream-Status: Pending
 
@@ -9,10 +12,17 @@ ftp://195.220.108.108/linux/fedora/linux/development/rawhide/source/SRPMS/v/vsft
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 
-diff -up vsftpd-2.1.0/ls.c.filter vsftpd-2.1.0/ls.c
---- vsftpd-2.1.0/ls.c.filter	2008-02-02 02:30:41.000000000 +0100
-+++ vsftpd-2.1.0/ls.c	2009-01-08 19:31:15.000000000 +0100
-@@ -239,9 +239,31 @@ vsf_filename_passes_filter(const struct 
+---
+ ls.c  | 26 ++++++++++++++++++++++++--
+ str.c | 11 +++++++++++
+ str.h |  1 +
+ 3 files changed, 36 insertions(+), 2 deletions(-)
+
+diff --git a/ls.c b/ls.c
+index 7e1376d..e9302dd 100644
+--- a/ls.c
++++ b/ls.c
+@@ -246,9 +246,31 @@ vsf_filename_passes_filter(const struct mystr* p_filename_str,
    int ret = 0;
    char last_token = 0;
    int must_match_at_current_pos = 1;
@@ -46,10 +56,11 @@ diff -up vsftpd-2.1.0/ls.c.filter vsftpd-2.1.0/ls.c
    while (!str_isempty(&filter_remain_str) && *iters < VSFTP_MATCHITERS_MAX)
    {
      static struct mystr s_match_needed_str;
-diff -up vsftpd-2.1.0/str.c.filter vsftpd-2.1.0/str.c
---- vsftpd-2.1.0/str.c.filter	2008-12-17 06:54:16.000000000 +0100
-+++ vsftpd-2.1.0/str.c	2009-01-08 19:31:15.000000000 +0100
-@@ -680,3 +680,14 @@ str_replace_unprintable(struct mystr* p_
+diff --git a/str.c b/str.c
+index 6596204..ba4b92a 100644
+--- a/str.c
++++ b/str.c
+@@ -711,3 +711,14 @@ str_replace_unprintable(struct mystr* p_str, char new_char)
    }
  }
  
@@ -64,10 +75,11 @@ diff -up vsftpd-2.1.0/str.c.filter vsftpd-2.1.0/str.c
 +  if (str_isempty(d_str))
 +   str_copy (d_str, path);
 +}
-diff -up vsftpd-2.1.0/str.h.filter vsftpd-2.1.0/str.h
---- vsftpd-2.1.0/str.h.filter	2008-12-17 06:53:23.000000000 +0100
-+++ vsftpd-2.1.0/str.h	2009-01-08 19:32:14.000000000 +0100
-@@ -100,6 +100,7 @@ void str_replace_unprintable(struct myst
+diff --git a/str.h b/str.h
+index ab0a9a4..3a21b50 100644
+--- a/str.h
++++ b/str.h
+@@ -100,6 +100,7 @@ void str_replace_unprintable(struct mystr* p_str, char new_char);
  int str_atoi(const struct mystr* p_str);
  filesize_t str_a_to_filesize_t(const struct mystr* p_str);
  unsigned int str_octal_to_uint(const struct mystr* p_str);

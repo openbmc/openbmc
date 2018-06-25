@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SRC_URI = "git://${GO_IMPORT}"
 SRCREV = "46695d81d1fae905a270fb7db8a4d11a334562fe"
+UPSTREAM_CHECK_COMMITS = "1"
 
 GO_IMPORT = "github.com/golang/example"
 GO_INSTALL = "${GO_IMPORT}/hello"

@@ -6,10 +6,10 @@ SRC_URI = "git://anongit.freedesktop.org/piglit \
            file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0001-tests-Use-FE_UPWARD-only-if-its-defined-in-fenv.h.patch \
            "
-UPSTREAM_VERSION_UNKNOWN = "1"
+UPSTREAM_CHECK_COMMITS = "1"
 
-# From 2017-07-03
-SRCREV = "c8f4fd9eeb298a2ef0855927f22634f794ef3eff"
+# From 2018-02-26
+SRCREV = "4ce0887e2f7f848d2be2e435a2d0f3c80e44ea3b"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 
@@ -40,14 +40,12 @@ do_configure_prepend() {
    fi
 }
 
-do_install() {
-	oe_runmake -C ${B} 'DESTDIR=${D}' install/strip
-}
+OECMAKE_TARGET_INSTALL = "install/strip"
 
 RDEPENDS_${PN} = "waffle python3 python3-mako python3-json \
-	python3-subprocess python3-misc python3-importlib \
+	python3-misc \
 	python3-unixadmin python3-xml python3-multiprocessing \
-	python3-six python3-shell python3-io python3-argparse \
+	python3-six python3-shell python3-io \
 	python3-netserver mesa-demos bash \
 	"
 

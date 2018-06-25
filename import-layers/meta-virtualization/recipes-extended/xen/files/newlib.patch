@@ -1,0 +1,727 @@
+There is a mix between longs and long longs.
+
+Index: newlib/libc/include/inttypes.h
+===================================================================
+RCS file: /cvs/src/src/newlib/libc/include/inttypes.h,v
+retrieving revision 1.3
+diff -u -p -r1.3 inttypes.h
+--- a/newlib/libc/include/inttypes.h	16 Dec 2005 19:03:12 -0000	1.3
++++ b/newlib/libc/include/inttypes.h	8 Nov 2007 16:32:44 -0000
+@@ -163,12 +163,12 @@
+ 
+ 
+ /* 64-bit types */
+-#if __have_longlong64
+-#define __PRI64(x) __STRINGIFY(ll##x)
+-#define __SCN64(x) __STRINGIFY(ll##x)
+-#elif __have_long64
++#if __have_long64
+ #define __PRI64(x) __STRINGIFY(l##x)
+ #define __SCN64(x) __STRINGIFY(l##x)
++#elif __have_longlong64
++#define __PRI64(x) __STRINGIFY(ll##x)
++#define __SCN64(x) __STRINGIFY(ll##x)
+ #else
+ #define __PRI64(x) __STRINGIFY(x)
+ #define __SCN64(x) __STRINGIFY(x)
+@@ -217,12 +217,12 @@
+ #endif
+ 
+ /* max-bit types */
+-#if __have_longlong64
+-#define __PRIMAX(x) __STRINGIFY(ll##x)
+-#define __SCNMAX(x) __STRINGIFY(ll##x)
+-#elif __have_long64
++#if __have_long64
+ #define __PRIMAX(x) __STRINGIFY(l##x)
+ #define __SCNMAX(x) __STRINGIFY(l##x)
++#elif __have_longlong64
++#define __PRIMAX(x) __STRINGIFY(ll##x)
++#define __SCNMAX(x) __STRINGIFY(ll##x)
+ #else
+ #define __PRIMAX(x) __STRINGIFY(x)
+ #define __SCNMAX(x) __STRINGIFY(x)
+@@ -242,12 +242,12 @@
+ #define SCNxMAX		__SCNMAX(x)
+ 
+ /* ptr types */
+-#if __have_longlong64
+-#define __PRIPTR(x) __STRINGIFY(ll##x)
+-#define __SCNPTR(x) __STRINGIFY(ll##x)
+-#elif __have_long64
++#if __have_long64
+ #define __PRIPTR(x) __STRINGIFY(l##x)
+ #define __SCNPTR(x) __STRINGIFY(l##x)
++#elif __have_longlong64
++#define __PRIPTR(x) __STRINGIFY(ll##x)
++#define __SCNPTR(x) __STRINGIFY(ll##x)
+ #else
+ #define __PRIPTR(x) __STRINGIFY(x)
+ #define __SCNPTR(x) __STRINGIFY(x)
+
+We don't want u?int32_t to be long as our code assume in a lot of places to be
+int.
+
+Index: newlib/libc/include/stdint.h
+===================================================================
+RCS file: /cvs/src/src/newlib/libc/include/stdint.h,v
+retrieving revision 1.10
+diff -u -p -r1.10 stdint.h
+--- a/newlib/libc/include/stdint.h	16 Aug 2006 21:39:43 -0000	1.10
++++ b/newlib/libc/include/stdint.h	12 Feb 2008 13:07:52 -0000
+@@ -38,7 +38,7 @@ extern "C" {
+ #if __STDINT_EXP(LONG_MAX) > 0x7fffffff
+ #define __have_long64 1
+ #elif __STDINT_EXP(LONG_MAX) == 0x7fffffff && !defined(__SPU__)
+-#define __have_long32 1
++/* #define __have_long32 1 */
+ #endif
+ 
+ #if __STDINT_EXP(SCHAR_MAX) == 0x7f
+
+Define the basic ia64 jump buffer
+
+Index: newlib/libc/include/sys/config.h
+===================================================================
+RCS file: /cvs/src/src/newlib/libc/include/sys/config.h,v
+retrieving revision 1.47
+diff -u -p -r1.47 config.h
+--- a/newlib/libc/include/sys/config.h	15 Mar 2007 21:32:12 -0000	1.47
++++ b/newlib/libc/include/sys/config.h	8 Nov 2007 16:32:44 -0000
+@@ -71,6 +71,10 @@
+ #endif
+ #endif
+ 
++#ifndef __DYNAMIC_REENT__
++#define __DYNAMIC_REENT__
++#endif
++
+ #ifdef __mn10200__
+ #define __SMALL_BITFIELDS
+ #endif
+
+Dynamic pointer to our reentrancy zone
+
+Index: newlib/libc/reent/getreent.c
+===================================================================
+RCS file: /cvs/src/src/newlib/libc/reent/getreent.c,v
+retrieving revision 1.2
+diff -u -p -r1.2 getreent.c
+--- a/newlib/libc/reent/getreent.c	7 Sep 2007 00:45:55 -0000	1.2
++++ b/newlib/libc/reent/getreent.c	8 Nov 2007 16:32:44 -0000
+@@ -3,12 +3,20 @@
+ #include <_ansi.h>
+ #include <reent.h>
+ 
++#define weak_alias(name, aliasname) \
++  extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)));
++
+ #ifdef __getreent
+ #undef __getreent
+ #endif
++#ifdef __libc_getreent
++#undef __libc_getreent
++#endif
+ 
+ struct _reent *
+-_DEFUN_VOID(__getreent)
++__libc_getreent (void)
+ {
+   return _impure_ptr;
+ }
++weak_alias(__libc_getreent,__getreent)
++
+
+We can't provide a red zone in mini-os.
+
+Index: newlib/libc/machine/x86_64/memcpy.S
+===================================================================
+RCS file: /cvs/src/src/newlib/libc/machine/x86_64/memcpy.S,v
+retrieving revision 1.1
+diff -u -p -r1.1 memcpy.S
+--- a/newlib/libc/machine/x86_64/memcpy.S	28 Aug 2007 21:56:49 -0000	1.1
++++ b/newlib/libc/machine/x86_64/memcpy.S	8 Nov 2007 16:32:44 -0000
+@@ -30,10 +30,18 @@ quadword_aligned:
+   cmpq    $256, rdx
+   jb      quadword_copy
+ 
++#if 1
++  subq    $32, rsp
++  movq    rax, 24 (rsp)
++  movq    r12, 16 (rsp)
++  movq    r13, 8  (rsp)
++  movq    r14, 0  (rsp)
++#else
+   movq    rax, -8  (rsp)
+   movq    r12, -16 (rsp)
+   movq    r13, -24 (rsp)
+   movq    r14, -32 (rsp)
++#endif
+ 
+   movq    rdx, rcx                /* Copy 128 bytes at a time with minimum cache polution */
+   shrq    $7, rcx
+@@ -89,10 +97,18 @@ loop:
+   movq    rdx, rcx
+   andq    $127, rcx
+   rep     movsb
++#if 1
++  movq    24 (rsp), rax
++  movq    16 (rsp), r12
++  movq    8  (rsp), r13
++  movq    0  (rsp), r14
++  addq    $32, rsp
++#else
+   movq    -8  (rsp), rax
+   movq    -16 (rsp), r12
+   movq    -24 (rsp), r13
+   movq    -32 (rsp), r14
++#endif
+   ret
+ 
+ 
+--- a/newlib/libc/machine/x86_64/x86_64mach.h.orig	2008-07-11 14:57:23.062269000 +0100
++++ b/newlib/libc/machine/x86_64/x86_64mach.h	2008-07-11 14:58:01.262503000 +0100
+@@ -22,81 +22,81 @@
+ 
+ #define REG(x) CONCAT1(__REG_PREFIX__, x)
+ 
+-#define rax REG(rax)
+-#define rbx REG(rbx)
+-#define rcx REG(rcx)
+-#define rdx REG(rdx)
+-#define rsi REG(rsi)
+-#define rdi REG(rdi)
+-#define rbp REG(rbp)
+-#define rsp REG(rsp)
+-
+-#define r8  REG(r8)
+-#define r9  REG(r9)
+-#define r10 REG(r10)
+-#define r11 REG(r11)
+-#define r12 REG(r12)
+-#define r13 REG(r13)
+-#define r14 REG(r14)
+-#define r15 REG(r15)
+-
+-#define eax REG(eax)
+-#define ebx REG(ebx)
+-#define ecx REG(ecx)
+-#define edx REG(edx)
+-#define esi REG(esi)
+-#define edi REG(edi)
+-#define ebp REG(ebp)
+-#define esp REG(esp)
+-
+-#define st0 REG(st)
+-#define st1 REG(st(1))
+-#define st2 REG(st(2))
+-#define st3 REG(st(3))
+-#define st4 REG(st(4))
+-#define st5 REG(st(5))
+-#define st6 REG(st(6))
+-#define st7 REG(st(7))
+-
+-#define ax REG(ax)
+-#define bx REG(bx)
+-#define cx REG(cx)
+-#define dx REG(dx)
+-
+-#define ah REG(ah)
+-#define bh REG(bh)
+-#define ch REG(ch)
+-#define dh REG(dh)
+-
+-#define al REG(al)
+-#define bl REG(bl)
+-#define cl REG(cl)
+-#define dl REG(dl)
+-
+-#define sil REG(sil)
+-
+-#define mm1 REG(mm1)
+-#define mm2 REG(mm2)
+-#define mm3 REG(mm3)
+-#define mm4 REG(mm4)
+-#define mm5 REG(mm5)
+-#define mm6 REG(mm6)
+-#define mm7 REG(mm7)
+-
+-#define xmm0 REG(xmm0)
+-#define xmm1 REG(xmm1)
+-#define xmm2 REG(xmm2)
+-#define xmm3 REG(xmm3)
+-#define xmm4 REG(xmm4)
+-#define xmm5 REG(xmm5)
+-#define xmm6 REG(xmm6)
+-#define xmm7 REG(xmm7)
+-
+-#define cr0 REG(cr0)
+-#define cr1 REG(cr1)
+-#define cr2 REG(cr2)
+-#define cr3 REG(cr3)
+-#define cr4 REG(cr4)
++#define rax %rax
++#define rbx %rbx
++#define rcx %rcx
++#define rdx %rdx
++#define rsi %rsi
++#define rdi %rdi
++#define rbp %rbp
++#define rsp %rsp
++
++#define r8  %r8
++#define r9  %r9
++#define r10 %r10
++#define r11 %r11
++#define r12 %r12
++#define r13 %r13
++#define r14 %r14
++#define r15 %r15
++
++#define eax %eax
++#define ebx %ebx
++#define ecx %ecx
++#define edx %edx
++#define esi %esi
++#define edi %edi
++#define ebp %ebp
++#define esp %esp
++
++#define st0 %st
++#define st1 %st(1)
++#define st2 %st(2)
++#define st3 %st(3)
++#define st4 %st(4)
++#define st5 %st(5)
++#define st6 %st(6)
++#define st7 %st(7)
++
++#define ax %ax
++#define bx %bx
++#define cx %cx
++#define dx %dx
++
++#define ah %ah
++#define bh %bh
++#define ch %ch
++#define dh %dh
++
++#define al %al
++#define bl %bl
++#define cl %cl
++#define dl %dl
++
++#define sil %sil
++
++#define mm1 %mm1
++#define mm2 %mm2
++#define mm3 %mm3
++#define mm4 %mm4
++#define mm5 %mm5
++#define mm6 %mm6
++#define mm7 %mm7
++
++#define xmm0 %xmm0
++#define xmm1 %xmm1
++#define xmm2 %xmm2
++#define xmm3 %xmm3
++#define xmm4 %xmm4
++#define xmm5 %xmm5
++#define xmm6 %xmm6
++#define xmm7 %xmm7
++
++#define cr0 %cr0
++#define cr1 %cr1
++#define cr2 %cr2
++#define cr3 %cr3
++#define cr4 %cr4
+ 
+ #ifdef _I386MACH_NEED_SOTYPE_FUNCTION
+ #define SOTYPE_FUNCTION(sym) .type SYM(sym),@function
+--- a/newlib/libc/machine/x86_64/memcpy.S.orig	2008-07-11 15:12:27.494693000 +0100
++++ b/newlib/libc/machine/x86_64/memcpy.S	2008-07-11 15:12:29.448706000 +0100
+@@ -60,14 +60,14 @@
+   movq    48 (rsi), r13
+   movq    56 (rsi), r14
+ 
+-  movntiq rax,    (rdi)
+-  movntiq r8 ,  8 (rdi)
+-  movntiq r9 , 16 (rdi)
+-  movntiq r10, 24 (rdi)
+-  movntiq r11, 32 (rdi)
+-  movntiq r12, 40 (rdi)
+-  movntiq r13, 48 (rdi)
+-  movntiq r14, 56 (rdi)
++  movnti rax,    (rdi)
++  movnti r8 ,  8 (rdi)
++  movnti r9 , 16 (rdi)
++  movnti r10, 24 (rdi)
++  movnti r11, 32 (rdi)
++  movnti r12, 40 (rdi)
++  movnti r13, 48 (rdi)
++  movnti r14, 56 (rdi)
+ 
+   movq     64 (rsi), rax
+   movq     72 (rsi), r8
+@@ -78,14 +78,14 @@
+   movq    112 (rsi), r13
+   movq    120 (rsi), r14
+ 
+-  movntiq rax,  64 (rdi)
+-  movntiq r8 ,  72 (rdi)
+-  movntiq r9 ,  80 (rdi)
+-  movntiq r10,  88 (rdi)
+-  movntiq r11,  96 (rdi)
+-  movntiq r12, 104 (rdi)
+-  movntiq r13, 112 (rdi)
+-  movntiq r14, 120 (rdi)
++  movnti rax,  64 (rdi)
++  movnti r8 ,  72 (rdi)
++  movnti r9 ,  80 (rdi)
++  movnti r10,  88 (rdi)
++  movnti r11,  96 (rdi)
++  movnti r12, 104 (rdi)
++  movnti r13, 112 (rdi)
++  movnti r14, 120 (rdi)
+ 
+   leaq    128 (rsi), rsi
+   leaq    128 (rdi), rdi
+--- a/newlib/libc/machine/i386/i386mach.h	2000-08-28 18:50:06.000000000 +0100
++++ b/newlib/libc/machine/i386/i386mach.h	2008-07-11 15:17:13.874409000 +0100
+@@ -27,46 +27,46 @@
+  
+ #define REG(x) CONCAT1(__REG_PREFIX__, x)
+  
+-#define eax REG(eax)
+-#define ebx REG(ebx)
+-#define ecx REG(ecx)
+-#define edx REG(edx)
+-#define esi REG(esi)
+-#define edi REG(edi)
+-#define ebp REG(ebp)
+-#define esp REG(esp)
+-
+-#define st0 REG(st)
+-#define st1 REG(st(1))
+-#define st2 REG(st(2))
+-#define st3 REG(st(3))
+-#define st4 REG(st(4))
+-#define st5 REG(st(5))
+-#define st6 REG(st(6))
+-#define st7 REG(st(7))
+-
+-#define ax REG(ax)
+-#define bx REG(bx)
+-#define cx REG(cx)
+-#define dx REG(dx)
+-
+-#define ah REG(ah)
+-#define bh REG(bh)
+-#define ch REG(ch)
+-#define dh REG(dh)
+-
+-#define al REG(al)
+-#define bl REG(bl)
+-#define cl REG(cl)
+-#define dl REG(dl)
+-
+-#define mm1 REG(mm1)
+-#define mm2 REG(mm2)
+-#define mm3 REG(mm3)
+-#define mm4 REG(mm4)
+-#define mm5 REG(mm5)
+-#define mm6 REG(mm6)
+-#define mm7 REG(mm7)
++#define eax %eax
++#define ebx %ebx
++#define ecx %ecx
++#define edx %edx
++#define esi %esi
++#define edi %edi
++#define ebp %ebp
++#define esp %esp
++
++#define st0 %st
++#define st1 %st(1)
++#define st2 %st(2)
++#define st3 %st(3)
++#define st4 %st(4)
++#define st5 %st(5)
++#define st6 %st(6)
++#define st7 %st(7)
++
++#define ax %ax
++#define bx %bx
++#define cx %cx
++#define dx %dx
++
++#define ah %ah
++#define bh %bh
++#define ch %ch
++#define dh %dh
++
++#define al %al
++#define bl %bl
++#define cl %cl
++#define dl %dl
++
++#define mm1 %mm1
++#define mm2 %mm2
++#define mm3 %mm3
++#define mm4 %mm4
++#define mm5 %mm5
++#define mm6 %mm6
++#define mm7 %mm7
+ 
+ #ifdef _I386MACH_NEED_SOTYPE_FUNCTION
+ #define SOTYPE_FUNCTION(sym) .type SYM(sym),@function
+--- a/newlib/libc/machine/x86_64/memset.S	2007-08-28 22:56:49.000000000 +0100
++++ b/newlib/libc/machine/x86_64/memset.S	2008-07-11 15:16:59.098320000 +0100
+@@ -40,22 +40,22 @@
+ 
+   .p2align 4
+ loop:
+-  movntiq rax,     (rdi)
+-  movntiq rax,   8 (rdi)
+-  movntiq rax,  16 (rdi)
+-  movntiq rax,  24 (rdi)
+-  movntiq rax,  32 (rdi)
+-  movntiq rax,  40 (rdi)
+-  movntiq rax,  48 (rdi)
+-  movntiq rax,  56 (rdi)
+-  movntiq rax,  64 (rdi)
+-  movntiq rax,  72 (rdi)
+-  movntiq rax,  80 (rdi)
+-  movntiq rax,  88 (rdi)
+-  movntiq rax,  96 (rdi)
+-  movntiq rax, 104 (rdi)
+-  movntiq rax, 112 (rdi)
+-  movntiq rax, 120 (rdi)
++  movnti rax,     (rdi)
++  movnti rax,   8 (rdi)
++  movnti rax,  16 (rdi)
++  movnti rax,  24 (rdi)
++  movnti rax,  32 (rdi)
++  movnti rax,  40 (rdi)
++  movnti rax,  48 (rdi)
++  movnti rax,  56 (rdi)
++  movnti rax,  64 (rdi)
++  movnti rax,  72 (rdi)
++  movnti rax,  80 (rdi)
++  movnti rax,  88 (rdi)
++  movnti rax,  96 (rdi)
++  movnti rax, 104 (rdi)
++  movnti rax, 112 (rdi)
++  movnti rax, 120 (rdi)
+ 
+   leaq    128 (rdi), rdi
+ 
+--- a/newlib/libm/machine/i386/i386mach.h.orig	2008-07-11 15:30:37.367227000 +0100
++++ b/newlib/libm/machine/i386/i386mach.h	2008-07-11 15:30:55.232337000 +0100
+@@ -27,46 +27,46 @@
+  
+ #define REG(x) CONCAT1(__REG_PREFIX__, x)
+  
+-#define eax REG(eax)
+-#define ebx REG(ebx)
+-#define ecx REG(ecx)
+-#define edx REG(edx)
+-#define esi REG(esi)
+-#define edi REG(edi)
+-#define ebp REG(ebp)
+-#define esp REG(esp)
+-
+-#define st0 REG(st)
+-#define st1 REG(st(1))
+-#define st2 REG(st(2))
+-#define st3 REG(st(3))
+-#define st4 REG(st(4))
+-#define st5 REG(st(5))
+-#define st6 REG(st(6))
+-#define st7 REG(st(7))
+-
+-#define ax REG(ax)
+-#define bx REG(bx)
+-#define cx REG(cx)
+-#define dx REG(dx)
+-
+-#define ah REG(ah)
+-#define bh REG(bh)
+-#define ch REG(ch)
+-#define dh REG(dh)
+-
+-#define al REG(al)
+-#define bl REG(bl)
+-#define cl REG(cl)
+-#define dl REG(dl)
+-
+-#define mm1 REG(mm1)
+-#define mm2 REG(mm2)
+-#define mm3 REG(mm3)
+-#define mm4 REG(mm4)
+-#define mm5 REG(mm5)
+-#define mm6 REG(mm6)
+-#define mm7 REG(mm7)
++#define eax %eax
++#define ebx %ebx
++#define ecx %ecx
++#define edx %edx
++#define esi %esi
++#define edi %edi
++#define ebp %ebp
++#define esp %esp
++
++#define st0 %st
++#define st1 %st(1)
++#define st2 %st(2)
++#define st3 %st(3)
++#define st4 %st(4)
++#define st5 %st(5)
++#define st6 %st(6)
++#define st7 %st(7)
++
++#define ax %ax
++#define bx %bx
++#define cx %cx
++#define dx %dx
++
++#define ah %ah
++#define bh %bh
++#define ch %ch
++#define dh %dh
++
++#define al %al
++#define bl %bl
++#define cl %cl
++#define dl %dl
++
++#define mm1 %mm1
++#define mm2 %mm2
++#define mm3 %mm3
++#define mm4 %mm4
++#define mm5 %mm5
++#define mm6 %mm6
++#define mm7 %mm7
+ 
+ #ifdef _I386MACH_NEED_SOTYPE_FUNCTION
+ #define SOTYPE_FUNCTION(sym) .type SYM(sym),@function
+
+
+We want to have a 64bit offsets libc even on 32bit platforms.
+
+--- ./newlib/configure.host.orig	2008-08-07 16:01:17.801946000 +0100
++++ ./newlib/configure.host	2008-08-07 16:01:34.181064000 +0100
+@@ -317,6 +317,8 @@
+     oext=lo
+     lpfx=
+     aext=la ;;
++  i[34567]86-xen-elf)
++    stdio64_dir=stdio64 ;;
+   *) ;; #shared library not supported for ${host}
+ esac
+ 
+--- a/newlib/libc/include/sys/_types.h.orig	2008-08-07 15:22:44.925008000 +0100
++++ b/newlib/libc/include/sys/_types.h	2008-08-07 15:22:50.824044000 +0100
+@@ -13,8 +13,12 @@
+ #include <sys/lock.h>
+ 
+ #ifndef __off_t_defined
++#ifdef __MINIOS__
++typedef long long _off_t;
++#else
+ typedef long _off_t;
+ #endif
++#endif
+ 
+ #if defined(__rtems__)
+ /* device numbers are 32-bit major and and 32-bit minor */
+--- ./newlib/libc/include/sys/config.h.orig	2008-08-07 14:43:25.915866000 +0100
++++ ./newlib/libc/include/sys/config.h	2008-08-07 14:44:13.508154000 +0100
+@@ -69,6 +69,10 @@
+ /* we use some glibc header files so turn on glibc large file feature */
+ #define _LARGEFILE64_SOURCE 1
+ #endif
++#ifdef __MINIOS__
++#define __LARGE64_FILES 1
++#define _LARGEFILE64_SOURCE 1
++#endif
+ #endif
+ 
+ #ifndef __DYNAMIC_REENT__
+--- ./newlib/libc/include/sys/_default_fcntl.h.orig	2008-08-07 15:08:22.377836000 +0100
++++ ./newlib/libc/include/sys/_default_fcntl.h	2008-08-07 15:08:31.651890000 +0100
+@@ -170,7 +170,11 @@
+ /* Provide _<systemcall> prototypes for functions provided by some versions
+    of newlib.  */
+ #ifdef _COMPILING_NEWLIB
+-extern int _open _PARAMS ((const char *, int, ...));
++extern int _open _PARAMS ((const char *, int, ...))
++#ifdef __MINIOS__
++    asm("open64")
++#endif
++    ;
+ extern int _fcntl _PARAMS ((int, int, ...));
+ #ifdef __LARGE64_FILES
+ extern int _open64 _PARAMS ((const char *, int, ...));
+--- ./newlib/libc/include/sys/unistd.h.orig	2008-08-07 15:09:36.449280000 +0100
++++ ./newlib/libc/include/sys/unistd.h	2008-08-07 15:09:51.210370000 +0100
+@@ -101,7 +101,11 @@
+ int     _EXFUN(link, (const char *__path1, const char *__path2 ));
+ int	_EXFUN(nice, (int __nice_value ));
+ #if !defined(__INSIDE_CYGWIN__)
+-off_t   _EXFUN(lseek, (int __fildes, off_t __offset, int __whence ));
++off_t   _EXFUN(lseek, (int __fildes, off_t __offset, int __whence ))
++#ifdef __MINIOS__
++    asm("lseek64")
++#endif
++    ;
+ #endif
+ #if defined(__SPU__)
+ #define F_ULOCK	0
+--- ./newlib/libc/include/sys/stat.h.orig	2008-08-07 16:08:50.495116000 +0100
++++ ./newlib/libc/include/sys/stat.h	2008-08-07 16:10:21.799753000 +0100
+@@ -49,6 +49,9 @@
+   long	st_spare4[2];
+ #endif
+ };
++#ifdef __MINIOS__
++#define stat64 stat
++#endif
+ #endif
+ 
+ #define	_IFMT		0170000	/* type of file */
+@@ -132,7 +135,11 @@
+ /* Provide prototypes for most of the _<systemcall> names that are
+    provided in newlib for some compilers.  */
+ #ifdef _COMPILING_NEWLIB
+-int	_EXFUN(_fstat,( int __fd, struct stat *__sbuf ));
++int	_EXFUN(_fstat,( int __fd, struct stat *__sbuf ))
++#ifdef __MINIOS__
++    asm("fstat64")
++#endif
++    ;
+ int	_EXFUN(_stat,( const char *__path, struct stat *__sbuf ));
+ #ifdef __LARGE64_FILES
+ struct stat64;
+--- ./newlib/libc/include/_syslist.h.orig	2008-08-07 16:24:19.122605000 +0100
++++ ./newlib/libc/include/_syslist.h	2008-08-07 16:24:21.548628000 +0100
+@@ -14,6 +14,7 @@
+ #define _kill kill
+ #define _link link
+ #define _lseek lseek
++#define _lseek64 lseek64
+ #define _open open
+ #define _read read
+ #define _sbrk sbrk
+--- a/newlib/libc/include/reent.h.orig	2008-08-07 16:28:49.846502000 +0100
++++ b/newlib/libc/include/reent.h	2008-08-07 16:29:02.096586000 +0100
+@@ -87,6 +87,9 @@
+ #if defined(__CYGWIN__) && defined(_COMPILING_NEWLIB)
+ #define stat64 __stat64
+ #endif
++#if defined(__MINIOS__)
++#define stat64 stat
++#endif
+ 
+ struct stat64;
+ 

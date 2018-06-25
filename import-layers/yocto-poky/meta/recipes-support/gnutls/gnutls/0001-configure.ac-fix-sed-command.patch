@@ -14,19 +14,16 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.ac b/configure.ac
-index 6907b21..7c70d9e 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -948,7 +948,7 @@ YEAR=`date +%Y`
+Index: gnutls-3.5.16/configure.ac
+===================================================================
+--- gnutls-3.5.16.orig/configure.ac
++++ gnutls-3.5.16/configure.ac
+@@ -955,7 +955,7 @@ YEAR=`date +%Y`
  AC_SUBST([YEAR], $YEAR)
  
  for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
 -	nam=$(basename $i|sed 's/.bak//g')
 +	nam=$(basename $i|sed 's/\.bak$//')
  	if test "$create_libopts_links" = "yes";then
+ 		rm -f "src/$nam.stamp"
  		rm -f "src/$nam"
- 		AC_CONFIG_LINKS([src/$nam:$i])
--- 
-2.11.0
-

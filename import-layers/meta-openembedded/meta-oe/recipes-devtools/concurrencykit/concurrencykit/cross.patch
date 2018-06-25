@@ -1,8 +1,16 @@
-Index: git/configure
-===================================================================
---- git.orig/configure	2012-11-19 21:07:51.917429465 -0800
-+++ git/configure	2012-11-19 21:13:19.337437278 -0800
-@@ -439,14 +442,18 @@
+From ab0eec78382bd00ce533aec2c84fd50c1733033d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 5 Jan 2013 19:42:51 -0800
+
+---
+ configure | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
+
+diff --git a/configure b/configure
+index 76c2812..78ce2ff 100755
+--- a/configure
++++ b/configure
+@@ -535,14 +535,18 @@ else
  	GZIP_SUFFIX=".gz"
  fi
  
@@ -25,12 +33,16 @@ Index: git/configure
 +	cat << EOF > .1.c
  #include <stdio.h>
  int main(void) {
- #if defined(__GNUC__) && (__GNUC__ >= 4)
-@@ -569,16 +576,16 @@
+ #if defined(_WIN32)
+@@ -569,16 +573,16 @@ int main(void) {
  #endif
  }
  EOF
--
++	$CC -o .1 .1.c
++	COMPILER=`./.1`
++	r=$?
++	rm -f .1.c .1
+ 
 -$CC -o .1 .1.c
 -COMPILER=`./.1`
 -r=$?
@@ -40,11 +52,6 @@ Index: git/configure
 -	assert "" "update compiler"
 -else
 -	echo "success [$CC]"
-+	$CC -o .1 .1.c
-+	COMPILER=`./.1`
-+	r=$?
-+	rm -f .1.c .1
-+
 +	if test "$r" -ne 0; then
 +		assert "" "update compiler"
 +	else

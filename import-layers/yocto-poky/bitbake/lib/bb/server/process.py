@@ -223,6 +223,8 @@ class ProcessServer(multiprocessing.Process):
 
         try: 
             self.cooker.shutdown(True)
+            self.cooker.notifier.stop()
+            self.cooker.confignotifier.stop()
         except:
             pass
 

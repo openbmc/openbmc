@@ -1,0 +1,11 @@
+[Unit]
+Description=freediameter daemon
+After=network.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/freediameter.pid
+ExecStart=@BINDIR@/freeDiameterd
+
+[Install]
+WantedBy=multi-user.target

@@ -15,7 +15,9 @@ DEPENDS = "gtk+3 gdk-pixbuf libsoup-2.4 json-glib gnome-common-native \
 
 B = "${S}"
 
-inherit autotools pkgconfig gobject-introspection
+inherit distro_features_check autotools pkgconfig gobject-introspection
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 do_configure_prepend() {
 	(cd ${S}; NOCONFIGURE="yes" . ${S}/autogen.sh)

@@ -7,4 +7,6 @@ XORG_PN = "${BPN}"
 SRC_URI = "${XORG_MIRROR}/individual/data/${BP}.tar.bz2"
 S = "${WORKDIR}/${XORG_PN}-${PV}"
 
-inherit autotools pkgconfig
+inherit distro_features_check autotools pkgconfig
+
+REQUIRED_DISTRO_FEATURES = "x11"

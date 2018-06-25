@@ -14,6 +14,9 @@ SRC_URI = "https://github.com/blueness/${BPN}/archive/v${PV}.tar.gz;downloadfile
 SRC_URI[md5sum] = "3cda1b6c8c8542b1510eadb8e540d8b6"
 SRC_URI[sha256sum] = "a1ee2806432eaf5b5dd267a0523701f9f1fa00fefd499d5bec42165a41e05846"
 
+UPSTREAM_CHECK_URI = "https://github.com/blueness/sthttpd/releases/"
+UPSTREAM_CHECK_REGEX = "v(?P<pver>\d+(\.\d+)+).tar.gz"
+
 S = "${WORKDIR}/sthttpd-${PV}"
 
 inherit autotools update-rc.d systemd

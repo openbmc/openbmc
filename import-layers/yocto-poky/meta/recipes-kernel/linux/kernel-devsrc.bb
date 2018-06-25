@@ -69,6 +69,13 @@ do_install() {
                 cp ${B}/arch/powerpc/lib/crtsavres.o $kerneldir/arch/powerpc/lib/crtsavres.o
         fi
 
+        # Remove fixdep/objtool as they won't be target binaries
+        for i in fixdep objtool; do
+                if [ -e $kerneldir/tools/objtool/$i ]; then
+                        rm -rf $kerneldir/tools/objtool/$i
+                fi
+        done
+
         chown -R root:root ${D}
 }
 # Ensure we don't race against "make scripts" during cpio

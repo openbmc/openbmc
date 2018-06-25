@@ -18,18 +18,19 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  configure.ac | 4 ++++
  2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.in b/Makefile.in
---- a/Makefile.in
-+++ b/Makefile.in
+Index: newt-0.52.20/Makefile.in
+===================================================================
+--- newt-0.52.20.orig/Makefile.in
++++ newt-0.52.20/Makefile.in
 @@ -7,6 +7,7 @@ CFLAGS = @CFLAGS@
  LDFLAGS = @LDFLAGS@
- CPPFLAGS = -D_GNU_SOURCE @CPPFLAGS@ 
+ CPPFLAGS = -D_GNU_SOURCE @CPPFLAGS@
  GNU_LD = @GNU_LD@
 +AR = @AR@
  
  VERSION = @VERSION@
  TAG = r$(subst .,-,$(VERSION))
-@@ -109,7 +110,7 @@ whiptcl.$(SOEXT): $(WHIPTCLOBJS) $(LIBNEWTSH)
+@@ -109,7 +110,7 @@ whiptcl.$(SOEXT): $(WHIPTCLOBJS) $(LIBNE
  	$(CC) -shared $(SHCFLAGS) $(LDFLAGS) -o whiptcl.$(SOEXT) $(WHIPTCLOBJS) -L. -lnewt  $(LIBTCL) -lpopt $(LIBS)
  
  $(LIBNEWT): $(LIBOBJS)
@@ -38,10 +39,10 @@ diff --git a/Makefile.in b/Makefile.in
  
  newt.o $(SHAREDDIR)/newt.o: newt.c Makefile
  
-diff --git a/configure.ac b/configure.ac
-index 92e6da8..cd83d57 100644
---- a/configure.ac
-+++ b/configure.ac
+Index: newt-0.52.20/configure.ac
+===================================================================
+--- newt-0.52.20.orig/configure.ac
++++ newt-0.52.20/configure.ac
 @@ -15,6 +15,10 @@ AC_PROG_INSTALL
  AC_PROG_LN_S
  AC_PROG_GREP
@@ -51,8 +52,5 @@ index 92e6da8..cd83d57 100644
 +AC_DEFUN([AC_PROG_AR], [AC_CHECK_TOOL(AR, ar, :)])
 +AC_PROG_AR
  
- # Are we using GNU ld?
- AC_MSG_CHECKING([for GNU ld])
--- 
-1.8.1.2
-
+ AC_CHECK_SIZEOF([long])
+ AC_CHECK_SIZEOF([long long])

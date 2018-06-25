@@ -18,4 +18,4 @@ RDEPENDS_${PN} += " \
     ${PYTHON_PN}-threading \
 "
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

@@ -3,7 +3,7 @@ From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 14:56:56 +0800
 Subject: [PATCH 02/11] dhclient dbus
 
-upstream-Status: Inappropriate [distribution]
+Upstream-Status: Inappropriate [distribution]
 
 Rebase to 4.3.6
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>

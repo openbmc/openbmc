@@ -116,6 +116,7 @@ PERLTOOLS = " \
     ${datadir}/gitweb/gitweb.cgi \
     ${datadir}/git-core/templates/hooks/prepare-commit-msg.sample \
     ${datadir}/git-core/templates/hooks/pre-rebase.sample \
+    ${datadir}/git-core/templates/hooks/fsmonitor-watchman.sample \
 "
 
 # Git tools requiring perl
@@ -125,6 +126,7 @@ FILES_${PN}-perltools += " \
     ${libdir}/perl \
     ${datadir}/perl \
 "
+
 RDEPENDS_${PN}-perltools = "${PN} perl perl-module-file-path findutils"
 
 # git-tk package with gitk and git-gui

@@ -1,0 +1,33 @@
+Add option to disable tests.
+
+Upstream-Status: Submitted (https://github.com/anholt/libepoxy/pull/158)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/meson.build b/meson.build
+index b2ebaef..9632c7a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -242,7 +242,10 @@ libepoxy_inc = [
+ 
+ subdir('include/epoxy')
+ subdir('src')
+-subdir('test')
++
++if get_option('tests')
++  subdir('test')
++endif
+ 
+ if get_option('docs')
+   doxygen = find_program('doxygen', required: false)
+diff --git a/meson_options.txt b/meson_options.txt
+index b5d7c98..dc30e68 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -15,3 +15,7 @@ option('x11',
+        type: 'boolean',
+        value: true,
+        description: 'Enable X11 support (GLX or EGL-X11)')
++option('tests',
++       type: 'boolean',
++       value: true,
++       description: 'Build the test suite')

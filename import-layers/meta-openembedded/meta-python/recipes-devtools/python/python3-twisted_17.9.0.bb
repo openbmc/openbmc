@@ -1,7 +1,7 @@
 inherit pypi setuptools3
 require python-twisted.inc
 
-RDEPENDS_${PN}-core += "python3-lang"
+PACKAGES_remove = "${PN}-src"
 
 FILES_${PN}-core_append += " \
   ${libdir}/${PYTHON_DIR}/site-packages/twisted/__pycache__ \

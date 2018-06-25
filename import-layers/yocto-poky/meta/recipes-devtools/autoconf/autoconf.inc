@@ -41,6 +41,10 @@ PERL_class-nativesdk = "/usr/bin/env perl"
 CACHED_CONFIGUREVARS += "ac_cv_path_PERL='${PERL}'"
 
 do_configure() {
+	# manually install a newer config.guess/.sub
+	install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}/build-aux
+	install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}/build-aux
+
 	oe_runconf
 }
 

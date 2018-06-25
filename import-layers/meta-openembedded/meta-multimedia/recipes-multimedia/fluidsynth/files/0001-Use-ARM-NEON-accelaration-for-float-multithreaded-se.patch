@@ -1,0 +1,76 @@
+From 2de7e128fbdf528716b500cf27ed9a4358c931c9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Fri, 24 Nov 2017 00:05:35 +0100
+Subject: [PATCH 2/2] Use ARM-NEON accelaration for float-multithreaded setups
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ src/rvoice/fluid_rvoice_mixer.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/src/rvoice/fluid_rvoice_mixer.c b/src/rvoice/fluid_rvoice_mixer.c
+index 9616518..dbf8057 100644
+--- a/src/rvoice/fluid_rvoice_mixer.c
++++ b/src/rvoice/fluid_rvoice_mixer.c
+@@ -27,6 +27,10 @@
+ #include "fluid_ladspa.h"
+ #include "fluid_synth.h"
+ 
++#if defined(__ARM_NEON__)
++#include "arm_neon.h"
++#endif
++
+ 
+ #define ENABLE_MIXER_THREADS 1
+ 
+@@ -794,20 +798,42 @@ fluid_mixer_buffers_mix(fluid_mixer_buffers_t* dest, fluid_mixer_buffers_t* src)
+   if (minbuf > src->buf_count)
+     minbuf = src->buf_count;
+   for (i=0; i < minbuf; i++) {
++#if defined(__ARM_NEON__) && defined(WITH_FLOAT)
++    for (j=0; j < scount; j+=4) {
++        float32x4_t vleft = vld1q_f32(&dest->left_buf[i][j]);
++        float32x4_t vright = vld1q_f32(&dest->right_buf[i][j]);
++        vleft = vaddq_f32(vleft, vld1q_f32(&src->left_buf[i][j]));
++        vright = vaddq_f32(vright, vld1q_f32(&src->right_buf[i][j]));
++        vst1q_f32(&dest->left_buf[i][j], vleft);
++        vst1q_f32(&dest->right_buf[i][j], vright);
++    }
++#else
+     for (j=0; j < scount; j++) {
+       dest->left_buf[i][j] += src->left_buf[i][j];
+       dest->right_buf[i][j] += src->right_buf[i][j];
+     }
++#endif
+   }
+ 
+   minbuf = dest->fx_buf_count;
+   if (minbuf > src->fx_buf_count)
+     minbuf = src->fx_buf_count;
+   for (i=0; i < minbuf; i++) {
++#if defined(__ARM_NEON__) && defined(WITH_FLOAT)
++    for (j=0; j < scount; j+=4) {
++        float32x4_t vleft = vld1q_f32(&dest->fx_left_buf[i][j]);
++        float32x4_t vright = vld1q_f32(&dest->fx_right_buf[i][j]);
++        vleft = vaddq_f32(vleft, vld1q_f32(&src->fx_left_buf[i][j]));
++        vright = vaddq_f32(vright, vld1q_f32(&src->fx_right_buf[i][j]));
++        vst1q_f32(&dest->fx_left_buf[i][j], vleft);
++        vst1q_f32(&dest->fx_right_buf[i][j], vright);
++    }
++#else
+     for (j=0; j < scount; j++) {
+       dest->fx_left_buf[i][j] += src->fx_left_buf[i][j];
+       dest->fx_right_buf[i][j] += src->fx_right_buf[i][j];
+     }
++#endif
+   }
+ }
+ 
+-- 
+2.9.5
+

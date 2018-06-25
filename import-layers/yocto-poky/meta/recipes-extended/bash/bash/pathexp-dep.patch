@@ -1,0 +1,13 @@
+pathexp includes libintl.h but doesn't depend on it, thus a build race can occur.
+
+Upstream-Status: Submitted (https://savannah.gnu.org/patch/index.php?9503)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/Makefile.in b/Makefile.in
+index c7b62bc0..241cbf12 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1281,2 +1281,3 @@ nojobs.o: bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
+ y.tab.o: bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
++pathexp.o: bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
+ pcomplete.o: bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h

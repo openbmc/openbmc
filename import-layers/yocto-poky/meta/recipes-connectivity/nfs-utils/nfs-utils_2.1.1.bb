@@ -56,7 +56,6 @@ SYSTEMD_SERVICE_${PN}-client = "nfs-statd.service"
 EXTRA_OECONF = "--with-statduser=rpcuser \
                 --enable-mountconfig \
                 --enable-libmount-mount \
-                --disable-nfsv41 \
                 --enable-uuid \
                 --disable-gss \
                 --disable-nfsdcltrack \
@@ -70,6 +69,8 @@ PACKAGECONFIG_remove_libc-musl = "tcp-wrappers"
 PACKAGECONFIG[tcp-wrappers] = "--with-tcp-wrappers,--without-tcp-wrappers,tcp-wrappers"
 PACKAGECONFIG[nfsidmap] = "--enable-nfsidmap,--disable-nfsidmap,keyutils"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+# libdevmapper is available in meta-oe
+PACKAGECONFIG[nfsv41] = "--enable-nfsv41,--disable-nfsv41,libdevmapper"
 
 PACKAGES =+ "${PN}-client ${PN}-mount ${PN}-stats"
 

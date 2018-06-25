@@ -1,0 +1,30 @@
+From fbd62eff9ff2f447c2eb4634398110609fbf9d59 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Thu, 16 Nov 2017 23:40:17 -0500
+Subject: [PATCH] config: make Config.User mapping errors a warning
+
+Rather than throwing an error if we can't map a user to a uid,
+output a warning. We aren't actually running the code, but are
+just extracting it .. so the user not existing isn't an issue.
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+---
+ image/config.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/import/image/config.go b/src/import/image/config.go
+index d28b1bc4fe5f..37dfd1f14ef7 100644
+--- a/src/import/image/config.go
++++ b/src/import/image/config.go
+@@ -106,7 +106,7 @@ func (c *config) runtimeSpec(rootfs string) (*specs.Spec, error) {
+ 		s.Process.User.UID = uint32(uid)
+ 		s.Process.User.GID = uint32(gid)
+ 	} else if c.Config.User != "" {
+-		return nil, errors.New("config.User: unsupported format")
++		fmt.Println("Warning: could not map UID for user:", c.Config.User)
+ 	}
+ 
+ 	s.Linux = &specs.Linux{}
+-- 
+2.4.0.53.g8440f74
+

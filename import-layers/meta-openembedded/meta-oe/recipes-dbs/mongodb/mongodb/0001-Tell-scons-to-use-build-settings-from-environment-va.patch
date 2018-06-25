@@ -1,0 +1,64 @@
+From 53368d3f4adc09dd84234a9af31771bcd8ca2757 Mon Sep 17 00:00:00 2001
+From: Sven Ebenfeld <sven.ebenfeld@gmail.com>
+Date: Fri, 15 Jan 2016 22:41:28 +0100
+Subject: [PATCH] Tell scons to use build settings from environment variables
+
+Signed-off-by: Sven Ebenfeld <sven.ebenfeld@gmail.com>
+---
+ SConstruct                | 8 ++++++--
+ src/mongo/util/SConscript | 2 ++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+Index: git/SConstruct
+===================================================================
+--- git.orig/SConstruct
++++ git/SConstruct
+@@ -548,6 +548,7 @@ def variable_arch_converter(val):
+         'amd64':  'x86_64',
+         'emt64':   'x86_64',
+         'x86':    'i386',
++        'aarch64': 'arm64',
+     }
+     val = val.lower()
+ 
+@@ -627,7 +628,8 @@ env_vars.Add(
+ )
+ 
+ env_vars.Add('CC',
+-    help='Select the C compiler to use')
++    help='Select the C compiler to use',
++    default=os.getenv('CC'))
+ 
+ env_vars.Add('CCFLAGS',
+     help='Sets flags for the C and C++ compiler',
+@@ -647,7 +649,8 @@ env_vars.Add('CPPPATH',
+     converter=variable_shlex_converter)
+ 
+ env_vars.Add('CXX',
+-    help='Select the C++ compiler to use')
++    help='Select the C++ compiler to use',
++    default=os.getenv('CXX'))
+ 
+ env_vars.Add('CXXFLAGS',
+     help='Sets flags for the C++ compiler',
+@@ -895,6 +898,7 @@ envDict = dict(BUILD_ROOT=buildDir,
+                )
+ 
+ env = Environment(variables=env_vars, **envDict)
++env.PrependENVPath('PATH', os.getenv('PATH'))
+ del envDict
+ 
+ env.AddMethod(env_os_is_wrapper, 'TargetOSIs')
+Index: git/src/mongo/util/SConscript
+===================================================================
+--- git.orig/src/mongo/util/SConscript
++++ git/src/mongo/util/SConscript
+@@ -274,6 +274,8 @@ if env['MONGO_ALLOCATOR'] == 'tcmalloc':
+                 'MONGO_HAVE_GPERFTOOLS_SIZE_CLASS_STATS'
+             ]
+         )
++    if not use_system_version_of_library('valgrind'):
++        tcmspEnv.InjectThirdPartyIncludePaths('valgrind')
+ 
+     if not use_system_version_of_library('valgrind'):
+         # Include valgrind since tcmalloc disables itself while running under valgrind

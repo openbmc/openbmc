@@ -1,4 +1,4 @@
-From 37cc924363515c8c309944c455bcbba7ddcc8eda Mon Sep 17 00:00:00 2001
+From 9c4826c19f04da533886209361a2caddf582d65c Mon Sep 17 00:00:00 2001
 From: Mingli Yu <Mingli.Yu@windriver.com>
 Date: Tue, 6 Sep 2016 17:17:44 +0800
 Subject: [PATCH] vsftpd: allow sysinfo() in the seccomp sandbox
@@ -24,6 +24,7 @@ ftp> mget small*
 OOPS: priv_sock_get_cmd
 
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+
 ---
  seccompsandbox.c | 1 +
  1 file changed, 1 insertion(+)
@@ -40,6 +41,3 @@ index 2c350a9..67d9ca5 100644
    /* Misc */
    allow_nr(__NR_umask);
  
--- 
-2.8.1
-

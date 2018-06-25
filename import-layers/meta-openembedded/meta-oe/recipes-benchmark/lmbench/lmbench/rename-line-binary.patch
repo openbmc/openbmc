@@ -1,3 +1,8 @@
+From 16823f5c3d3d5adad0b70e9055c08cb4e18d255b Mon Sep 17 00:00:00 2001
+From: Noor Ahsan <noor_ahsan@mentor.com>
+Date: Mon, 29 Aug 2011 16:17:51 +0000
+Subject: [PATCH] lmbench: Add version 3.0-a9 (initial recipe)
+
 Both lmbench and util-linux-ng packages provide own /usr/bin/line binaries.
 Even though the binaries name is the same, their functionality is different.
 This patch renames lmbench's line binary as lm_line to avoid conflicts with
@@ -6,8 +11,14 @@ instead of line.
 
 Upstream-Status: Inappropriate [build system specific change]
 
---- patches/scripts/config-run	2006-11-26 15:11:04.000000000 -0500
-+++ patches/scripts/config-run	2011-04-01 09:35:50.000000000 -0400
+---
+ scripts/config-run | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/config-run b/scripts/config-run
+index f620c15..a2d5ba4 100755
+--- a/scripts/config-run
++++ b/scripts/config-run
 @@ -224,7 +224,7 @@ fi
  
  echo "Hang on, we are calculating your cache line size."

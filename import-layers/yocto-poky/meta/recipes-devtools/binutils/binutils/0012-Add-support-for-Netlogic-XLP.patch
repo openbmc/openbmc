@@ -1,4 +1,4 @@
-From 8c60a55d3678589d93739bd27fec216911d80968 Mon Sep 17 00:00:00 2001
+From 3b40bf584615f794b85fd50d4d0a5c0a1d2ee7bf Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 14 Feb 2016 17:06:19 +0000
 Subject: [PATCH 12/15] Add support for Netlogic XLP
@@ -34,7 +34,7 @@ Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
  14 files changed, 61 insertions(+), 21 deletions(-)
 
 diff --git a/bfd/aoutx.h b/bfd/aoutx.h
-index 3d38fda14b..0aec49bbb3 100644
+index eec9c4ad2a..3bf0a71e63 100644
 --- a/bfd/aoutx.h
 +++ b/bfd/aoutx.h
 @@ -814,6 +814,7 @@ NAME (aout, machine_type) (enum bfd_architecture arch,
@@ -46,34 +46,34 @@ index 3d38fda14b..0aec49bbb3 100644
  	  arch_flags = M_MIPS2;
  	  break;
 diff --git a/bfd/archures.c b/bfd/archures.c
-index 433b95fa08..063b7943a1 100644
+index e83c57a2f3..3016ea1bae 100644
 --- a/bfd/archures.c
 +++ b/bfd/archures.c
 @@ -201,6 +201,7 @@ DESCRIPTION
- .#define bfd_mach_mips_octeon3          6503
- .#define bfd_mach_mips_xlr              887682   {* decimal 'XLR'  *}
- .#define bfd_mach_mips_interaptiv_mr2   736550   {* decimal 'IA2'  *}
-+.#define bfd_mach_mips_xlp              887680   {* decimal 'XLP'  *}
- .#define bfd_mach_mipsisa32             32
- .#define bfd_mach_mipsisa32r2           33
- .#define bfd_mach_mipsisa32r3           34
+ .#define bfd_mach_mips_octeon3		6503
+ .#define bfd_mach_mips_xlr		887682	 {* decimal 'XLR'.  *}
+ .#define bfd_mach_mips_interaptiv_mr2	736550	 {* decimal 'IA2'.  *}
++.#define bfd_mach_mips_xlp              887680   {* decimal 'XLP'.  *}
+ .#define bfd_mach_mipsisa32		32
+ .#define bfd_mach_mipsisa32r2		33
+ .#define bfd_mach_mipsisa32r3		34
 diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
-index d126aed086..2b753b3a93 100644
+index 42991e7848..27abc5d5a8 100644
 --- a/bfd/bfd-in2.h
 +++ b/bfd/bfd-in2.h
-@@ -2060,6 +2060,7 @@ enum bfd_architecture
+@@ -2062,6 +2062,7 @@ enum bfd_architecture
  #define bfd_mach_mips_octeon3          6503
- #define bfd_mach_mips_xlr              887682   /* decimal 'XLR'  */
- #define bfd_mach_mips_interaptiv_mr2   736550   /* decimal 'IA2'  */
-+#define bfd_mach_mips_xlp              887680   /* decimal 'XLP'  */
+ #define bfd_mach_mips_xlr              887682   /* decimal 'XLR'.  */
+ #define bfd_mach_mips_interaptiv_mr2   736550   /* decimal 'IA2'.  */
++#define bfd_mach_mips_xlp              887680   /* decimal 'XLP'.  */
  #define bfd_mach_mipsisa32             32
  #define bfd_mach_mipsisa32r2           33
  #define bfd_mach_mipsisa32r3           34
 diff --git a/bfd/config.bfd b/bfd/config.bfd
-index 4511024f22..f0f9072f10 100644
+index 8777f96bd2..7b80bda8c9 100644
 --- a/bfd/config.bfd
 +++ b/bfd/config.bfd
-@@ -1169,6 +1169,11 @@ case "${targ}" in
+@@ -1172,6 +1172,11 @@ case "${targ}" in
      targ_defvec=mips_elf32_le_vec
      targ_selvecs="mips_elf32_be_vec mips_elf64_be_vec mips_elf64_le_vec"
      ;;
@@ -86,7 +86,7 @@ index 4511024f22..f0f9072f10 100644
      targ_defvec=mips_elf32_be_vec
      targ_selvecs="mips_elf32_le_vec mips_elf64_be_vec mips_elf64_le_vec"
 diff --git a/bfd/cpu-mips.c b/bfd/cpu-mips.c
-index 2493094bef..8375d1ae96 100644
+index cb50c64371..2b9d1d6ecf 100644
 --- a/bfd/cpu-mips.c
 +++ b/bfd/cpu-mips.c
 @@ -105,7 +105,8 @@ enum
@@ -100,7 +100,7 @@ index 2493094bef..8375d1ae96 100644
  
  #define NN(index) (&arch_info_struct[(index) + 1])
 @@ -158,7 +159,8 @@ static const bfd_arch_info_type arch_info_struct[] =
-   N (64, 64, bfd_mach_mips_xlr, "mips:xlr",       FALSE, NN(I_xlr)),
+   N (64, 64, bfd_mach_mips_xlr, "mips:xlr",	  FALSE, NN(I_xlr)),
    N (32, 32, bfd_mach_mips_interaptiv_mr2, "mips:interaptiv-mr2", FALSE,
       NN(I_interaptiv_mr2)),
 -  N (64, 64, bfd_mach_mips_micromips,"mips:micromips",FALSE,0)
@@ -110,10 +110,10 @@ index 2493094bef..8375d1ae96 100644
  
  /* The default architecture is mips:3000, but with a machine number of
 diff --git a/bfd/elfxx-mips.c b/bfd/elfxx-mips.c
-index fddf68c816..354c85d00b 100644
+index 285401367d..14ebb5f175 100644
 --- a/bfd/elfxx-mips.c
 +++ b/bfd/elfxx-mips.c
-@@ -6796,6 +6796,9 @@ _bfd_elf_mips_mach (flagword flags)
+@@ -6806,6 +6806,9 @@ _bfd_elf_mips_mach (flagword flags)
      case E_MIPS_MACH_IAMR2:
        return bfd_mach_mips_interaptiv_mr2;
  
@@ -123,7 +123,7 @@ index fddf68c816..354c85d00b 100644
      default:
        switch (flags & EF_MIPS_ARCH)
  	{
-@@ -11956,6 +11959,10 @@ mips_set_isa_flags (bfd *abfd)
+@@ -11963,6 +11966,10 @@ mips_set_isa_flags (bfd *abfd)
        val = E_MIPS_ARCH_64R2 | E_MIPS_MACH_OCTEON2;
        break;
  
@@ -134,7 +134,7 @@ index fddf68c816..354c85d00b 100644
      case bfd_mach_mipsisa32:
        val = E_MIPS_ARCH_32;
        break;
-@@ -13989,6 +13996,7 @@ static const struct mips_mach_extension mips_mach_extensions[] =
+@@ -13936,6 +13943,7 @@ static const struct mips_mach_extension mips_mach_extensions[] =
    { bfd_mach_mips_octeonp, bfd_mach_mips_octeon },
    { bfd_mach_mips_octeon, bfd_mach_mipsisa64r2 },
    { bfd_mach_mips_loongson_3a, bfd_mach_mipsisa64r2 },
@@ -143,10 +143,10 @@ index fddf68c816..354c85d00b 100644
    /* MIPS64 extensions.  */
    { bfd_mach_mipsisa64r2, bfd_mach_mipsisa64 },
 diff --git a/binutils/readelf.c b/binutils/readelf.c
-index 2b15f0f2cb..092744708e 100644
+index ae1cda9a7b..fed0387a94 100644
 --- a/binutils/readelf.c
 +++ b/binutils/readelf.c
-@@ -3335,6 +3335,7 @@ get_machine_flags (unsigned e_flags, unsigned e_machine)
+@@ -3370,6 +3370,7 @@ get_machine_flags (Filedata * filedata, unsigned e_flags, unsigned e_machine)
  	    case E_MIPS_MACH_OCTEON3: strcat (buf, ", octeon3"); break;
  	    case E_MIPS_MACH_XLR:  strcat (buf, ", xlr"); break;
  	    case E_MIPS_MACH_IAMR2:  strcat (buf, ", interaptiv-mr2"); break;
@@ -155,7 +155,7 @@ index 2b15f0f2cb..092744708e 100644
  	    /* We simply ignore the field in this case to avoid confusion:
  	       MIPS ELF does not specify EF_MIPS_MACH, it is a GNU
 diff --git a/gas/config/tc-mips.c b/gas/config/tc-mips.c
-index 3804df2958..9576c986db 100644
+index c135131b59..d8fbda8e31 100644
 --- a/gas/config/tc-mips.c
 +++ b/gas/config/tc-mips.c
 @@ -552,6 +552,7 @@ static int mips_32bitmode = 0;
@@ -174,7 +174,7 @@ index 3804df2958..9576c986db 100644
     )
  
  /* Whether the processor uses hardware interlocks to protect reads
-@@ -19738,7 +19740,7 @@ static const struct mips_cpu_info mips_cpu_info_table[] =
+@@ -19737,7 +19739,7 @@ static const struct mips_cpu_info mips_cpu_info_table[] =
    /* Broadcom XLP.
       XLP is mostly like XLR, with the prominent exception that it is
       MIPS64R2 rather than MIPS64.  */
@@ -184,7 +184,7 @@ index 3804df2958..9576c986db 100644
    /* MIPS 64 Release 6 */
    { "i6400",	      0, ASE_MSA,		ISA_MIPS64R6, CPU_MIPS64R6},
 diff --git a/gas/configure b/gas/configure
-index 81dd4cbd97..95bdf3b19b 100755
+index a40ac2144f..65a6995243 100755
 --- a/gas/configure
 +++ b/gas/configure
 @@ -12989,6 +12989,9 @@ _ACEOF
@@ -198,7 +198,7 @@ index 81dd4cbd97..95bdf3b19b 100755
  	    mips_cpu=r3900
  	    ;;
 diff --git a/include/elf/mips.h b/include/elf/mips.h
-index a4bea43ff8..73d904e25f 100644
+index 9de0b4e175..74fc4f7e55 100644
 --- a/include/elf/mips.h
 +++ b/include/elf/mips.h
 @@ -290,6 +290,7 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
@@ -210,7 +210,7 @@ index a4bea43ff8..73d904e25f 100644
  #define E_MIPS_MACH_OCTEON3	0x008e0000
  #define E_MIPS_MACH_5400	0x00910000
 diff --git a/include/opcode/mips.h b/include/opcode/mips.h
-index ceae9ec50a..276ee3c6c1 100644
+index 5eea72f139..90f6d57e15 100644
 --- a/include/opcode/mips.h
 +++ b/include/opcode/mips.h
 @@ -1259,6 +1259,8 @@ static const unsigned int mips_isa_table[] = {
@@ -241,10 +241,10 @@ index ceae9ec50a..276ee3c6c1 100644
        return FALSE;
      }
 diff --git a/ld/configure.tgt b/ld/configure.tgt
-index fe7b9238b2..2adf108b17 100644
+index 1d78465590..307e787b64 100644
 --- a/ld/configure.tgt
 +++ b/ld/configure.tgt
-@@ -516,6 +516,8 @@ mips*el-sde-elf* | mips*el-mti-elf* | mips*el-img-elf*)
+@@ -521,6 +521,8 @@ mips*el-sde-elf* | mips*el-mti-elf* | mips*el-img-elf*)
  mips*-sde-elf* | mips*-mti-elf* | mips*-img-elf*)
  			targ_emul=elf32btsmip
  			targ_extra_emuls="elf32ltsmip elf32btsmipn32 elf64btsmip elf32ltsmipn32 elf64ltsmip" ;;
@@ -254,7 +254,7 @@ index fe7b9238b2..2adf108b17 100644
  			targ_extra_emuls="elf32lr5900"
  			targ_extra_libpath=$targ_extra_emuls ;;
 diff --git a/opcodes/mips-dis.c b/opcodes/mips-dis.c
-index 45195007c1..4a80a05d19 100644
+index 984fcbb802..95b107d216 100644
 --- a/opcodes/mips-dis.c
 +++ b/opcodes/mips-dis.c
 @@ -655,13 +655,11 @@ const struct mips_arch_choice mips_arch_choices[] =
@@ -277,7 +277,7 @@ index 45195007c1..4a80a05d19 100644
    /* This entry, mips16, is here only for ISA/processor selection; do
       not print its name.  */
 diff --git a/opcodes/mips-opc.c b/opcodes/mips-opc.c
-index 19fca408c9..d02069c528 100644
+index 180d613c93..65b7b8cc23 100644
 --- a/opcodes/mips-opc.c
 +++ b/opcodes/mips-opc.c
 @@ -328,6 +328,7 @@ decode_mips_operand (const char *p)
@@ -389,5 +389,5 @@ index 19fca408c9..d02069c528 100644
  {"swc0",		"E,A(b)",	0,    (int) M_SWC0_AB,	INSN_MACRO,		0,		I1,		0,	IOCT|IOCTP|IOCT2|I37 },
  {"swc1",		"T,o(b)",	0xe4000000, 0xfc000000,	RD_1|RD_3|SM|FP_S,	0,		I1,		0,	0 },
 -- 
-2.14.0
+2.16.1
 

@@ -1,15 +1,15 @@
 HOMEPAGE = "https://github.com/firehol/netdata/"
 SUMMARY = "Real-time performance monitoring"
 LICENSE = "GPLv3"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=a4a3b650ea3f74269cdfd45a3550e219 \
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=95b49e9ea979a337578f13c2a3ab9535 \
                     file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                    "
 
 SRC_URI = "git://github.com/firehol/netdata.git;protocol=https \
            file://0001-makefile-Do-not-build-contrib-dir.patch \
 "
-SRCREV = "f5fa346a188e906a8f2cce3c2cf32a88ce81c666"
-PV = "1.6.0+git${SRCPV}"
+SRCREV = "89ed309252981ddd50f697fde4fe93019cb3e652"
+PV = "1.8.0+git${SRCPV}"
 
 # patch to disable timeout because timeout are not available with actual version
 # of core-utils

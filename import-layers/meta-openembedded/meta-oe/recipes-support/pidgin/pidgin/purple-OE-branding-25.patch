@@ -1,8 +1,16 @@
-Index: pidgin-2.5.0/libpurple/protocols/irc/irc.h
-===================================================================
---- pidgin-2.5.0.orig/libpurple/protocols/irc/irc.h	2008-08-19 01:53:38.000000000 +0000
-+++ pidgin-2.5.0/libpurple/protocols/irc/irc.h	2008-08-27 11:15:58.000000000 +0000
-@@ -36,9 +36,9 @@
+From 43e9db656431ffb22b429d5fca4ce3b4af21bc9e Mon Sep 17 00:00:00 2001
+From: Herrie <github.com@herrie.org>
+Date: Mon, 24 Jul 2017 21:30:16 +0200
+
+---
+ libpurple/protocols/irc/irc.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libpurple/protocols/irc/irc.h b/libpurple/protocols/irc/irc.h
+index fde35c4..66e52dd 100644
+--- a/libpurple/protocols/irc/irc.h
++++ b/libpurple/protocols/irc/irc.h
+@@ -40,9 +40,9 @@
  
  #define IRC_DEFAULT_CHARSET "UTF-8"
  #define IRC_DEFAULT_AUTODETECT FALSE

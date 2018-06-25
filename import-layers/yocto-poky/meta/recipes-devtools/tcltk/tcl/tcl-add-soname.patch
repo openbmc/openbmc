@@ -11,7 +11,7 @@ Index: unix/configure
 +	    # following line added by CW for Debian GNU/Linux
 +	    TCL_SHLIB_LD_EXTRAS="-Wl,-soname,\${TCL_LIB_FILE}.0"
 +
- 	    SHLIB_LD='${CC} -shared ${CFLAGS} ${LDFLAGS}'
+ 	    SHLIB_LD='${CC} ${CFLAGS} ${LDFLAGS} -shared'
  	    DL_OBJS="tclLoadDl.o"
  	    DL_LIBS="-ldl"
 Index: unix/tcl.m4
@@ -25,7 +25,7 @@ Index: unix/tcl.m4
 +	    # following line added by CW for Debian GNU/Linux
 +	    TCL_SHLIB_LD_EXTRAS="-Wl,-soname,\${TCL_LIB_FILE}.0"
 +
- 	    SHLIB_LD='${CC} -shared ${CFLAGS} ${LDFLAGS}'
+ 	    SHLIB_LD='${CC} ${CFLAGS} ${LDFLAGS} -shared'
  	    DL_OBJS="tclLoadDl.o"
  	    DL_LIBS="-ldl"
 Index: unix/Makefile.in

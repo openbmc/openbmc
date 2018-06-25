@@ -1,0 +1,50 @@
+diff --git a/tpm/tpm_capability.c b/tpm/tpm_capability.c
+index 60bbb90..f8f7f0f 100644
+--- a/tpm/tpm_capability.c
++++ b/tpm/tpm_capability.c
+@@ -949,6 +949,8 @@ static TPM_RESULT set_vendor(UINT32 subCap, BYTE *setValue,
+                              UINT32 setValueSize, BOOL ownerAuth,
+                              BOOL deactivated, BOOL disabled)
+ {
++  if (tpmData.stany.flags.localityModifier != 8)
++    return TPM_BAD_PARAMETER;
+   /* set the capability area with the specified data, on failure
+      deactivate the TPM */
+   switch (subCap) {
+diff --git a/tpm/tpm_cmd_handler.c b/tpm/tpm_cmd_handler.c
+index 288d1ce..9e1cfb4 100644
+--- a/tpm/tpm_cmd_handler.c
++++ b/tpm/tpm_cmd_handler.c
+@@ -4132,7 +4132,7 @@ void tpm_emulator_shutdown()
+   tpm_extern_release();
+ }
+ 
+-int tpm_handle_command(const uint8_t *in, uint32_t in_size, uint8_t **out, uint32_t *out_size)
++int tpm_handle_command(const uint8_t *in, uint32_t in_size, uint8_t **out, uint32_t *out_size, int locality)
+ {
+   TPM_REQUEST req;
+   TPM_RESPONSE rsp;
+@@ -4140,7 +4140,9 @@ int tpm_handle_command(const uint8_t *in, uint32_t in_size, uint8_t **out, uint3
+   UINT32 len;
+   BOOL free_out;
+ 
+-  debug("tpm_handle_command()");
++  debug("tpm_handle_command(%d)", locality);
++  if (locality != -1)
++    tpmData.stany.flags.localityModifier = locality;
+ 
+   /* we need the whole packet at once, otherwise unmarshalling will fail */
+   if (tpm_unmarshal_TPM_REQUEST((uint8_t**)&in, &in_size, &req) != 0) {
+diff --git a/tpm/tpm_emulator.h b/tpm/tpm_emulator.h
+index eed749e..4c228bd 100644
+--- a/tpm/tpm_emulator.h
++++ b/tpm/tpm_emulator.h
+@@ -59,7 +59,7 @@ void tpm_emulator_shutdown(void);
+  * its usage. In case of an error, all internally allocated memory
+  * is released and the the state of out and out_size is unspecified.
+  */ 
+-int tpm_handle_command(const uint8_t *in, uint32_t in_size, uint8_t **out, uint32_t *out_size);
++int tpm_handle_command(const uint8_t *in, uint32_t in_size, uint8_t **out, uint32_t *out_size, int locality);
+ 
+ #endif /* _TPM_EMULATOR_H_ */
+ 

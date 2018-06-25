@@ -1,17 +1,18 @@
-From 1cec65e45f011c3f52eed5e27d3d816502e36610 Mon Sep 17 00:00:00 2001
+From 28b2d17de9414161d5edd67766bd4b452cd809ef Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 20 Mar 2017 12:12:51 -0700
-Subject: [PATCH 1/2] use the linux if_packet.h Interface directly
+Subject: [PATCH] use the linux if_packet.h Interface directly
 
 Helps compiling with musl
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  lib/netdev-linux.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/lib/netdev-linux.c b/lib/netdev-linux.c
-index a5a9ec1ab..9dd40acdd 100644
+index fccf88f..b703156 100644
 --- a/lib/netdev-linux.c
 +++ b/lib/netdev-linux.c
 @@ -33,14 +33,13 @@
@@ -30,6 +31,3 @@ index a5a9ec1ab..9dd40acdd 100644
  #include <net/route.h>
  #include <netinet/in.h>
  #include <poll.h>
--- 
-2.12.0
-

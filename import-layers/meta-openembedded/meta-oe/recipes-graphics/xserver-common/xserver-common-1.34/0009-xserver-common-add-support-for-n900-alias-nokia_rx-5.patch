@@ -1,16 +1,16 @@
-From 6d6caecb7172b9b33e7364564b0e6eabf67b6e8b Mon Sep 17 00:00:00 2001
+From f2d808cea5b9f69158f82e16c06f882a6db10d63 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Wed, 11 Apr 2012 14:40:14 +0200
-Subject: [PATCH 09/12] xserver-common: add support for n900 alias
- nokia_rx-51_board
+Subject: [PATCH] xserver-common: add support for n900 alias nokia_rx-51_board
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
- X11/xserver-common |    7 +++++++
- 1 files changed, 7 insertions(+), 0 deletions(-)
+ X11/xserver-common | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/X11/xserver-common b/X11/xserver-common
-index f76fa5f..86ed17f 100644
+index a2c0591..b8c37e6 100644
 --- a/X11/xserver-common
 +++ b/X11/xserver-common
 @@ -132,6 +132,13 @@ else
@@ -27,6 +27,3 @@ index f76fa5f..86ed17f 100644
          "gta01" )
              DPI="280"
              if [ "$XSERVER" != "Xorg" ] ; then
--- 
-1.7.8.5
-

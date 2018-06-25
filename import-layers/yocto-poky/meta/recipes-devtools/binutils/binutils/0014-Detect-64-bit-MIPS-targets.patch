@@ -1,4 +1,4 @@
-From bf20d5823662d1f2eb47de2cdfd173627a205b17 Mon Sep 17 00:00:00 2001
+From 7dfbd6889d868a09d695dd2736104848c1a9c9c3 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 31 Mar 2017 11:42:03 -0700
 Subject: [PATCH 14/15] Detect 64-bit MIPS targets
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 14 insertions(+)
 
 diff --git a/gold/configure.tgt b/gold/configure.tgt
-index 3d63027297..c1f92a1360 100644
+index 8aef22a318..7030026ffa 100644
 --- a/gold/configure.tgt
 +++ b/gold/configure.tgt
 @@ -153,6 +153,13 @@ aarch64*-*)
@@ -46,5 +46,5 @@ index 3d63027297..c1f92a1360 100644
   targ_obj=mips
   targ_machine=EM_MIPS
 -- 
-2.14.0
+2.16.1
 

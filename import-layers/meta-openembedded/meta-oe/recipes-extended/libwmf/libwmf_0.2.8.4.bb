@@ -12,7 +12,9 @@ DEPENDS = "freetype libpng jpeg expat gtk+"
 
 BBCLASSEXTEND = "native"
 
-inherit autotools pkgconfig
+inherit distro_features_check autotools pkgconfig
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/wvware/${BPN}/${PV}/${BPN}-${PV}.tar.gz;name=tarball \
            file://libwmf-0.2.8.4-intoverflow.patch \

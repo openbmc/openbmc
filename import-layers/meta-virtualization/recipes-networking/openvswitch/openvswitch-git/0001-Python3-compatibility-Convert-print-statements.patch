@@ -1,7 +1,7 @@
-From c5c18f9c5f1b7217d43af43be9736c1762c7ebba Mon Sep 17 00:00:00 2001
+From 3658d861c3c83caab9040bec04b195be3f86d4ce Mon Sep 17 00:00:00 2001
 From: Jason Wessel <jason.wessel@windriver.com>
 Date: Thu, 29 Jun 2017 20:33:23 -0700
-Subject: [PATCH 1/8] Python3 compatibility: Convert print statements
+Subject: [PATCH] Python3 compatibility: Convert print statements
 
 Commit d34a1cc02536f9a812517a71accec3fbd3c6c98b from
 https://github.com/openvswitch/ovs.git
@@ -11,6 +11,7 @@ python2.
 
 Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
 Signed-off-by: Ben Pfaff <blp@ovn.org>
+
 ---
  build-aux/check-structs       |   4 +-
  build-aux/extract-ofp-actions |  68 +++---
@@ -22,7 +23,7 @@ Signed-off-by: Ben Pfaff <blp@ovn.org>
  7 files changed, 306 insertions(+), 305 deletions(-)
 
 diff --git a/build-aux/check-structs b/build-aux/check-structs
-index f79f235..bae511f 100755
+index 5129b72..cbb19b6 100755
 --- a/build-aux/check-structs
 +++ b/build-aux/check-structs
 @@ -211,7 +211,7 @@ def checkStructs():
@@ -44,7 +45,7 @@ index f79f235..bae511f 100755
  
      global fileName
 diff --git a/build-aux/extract-ofp-actions b/build-aux/extract-ofp-actions
-index 0062ab8..874e6b4 100755
+index ee8c4ff..67e3848 100755
 --- a/build-aux/extract-ofp-actions
 +++ b/build-aux/extract-ofp-actions
 @@ -67,7 +67,7 @@ def fatal(msg):
@@ -187,7 +188,7 @@ index 0062ab8..874e6b4 100755
  if __name__ == '__main__':
      if '--help' in sys.argv:
 diff --git a/build-aux/extract-ofp-errors b/build-aux/extract-ofp-errors
-index 2312b76..336a240 100755
+index e36444e..97d62d2 100755
 --- a/build-aux/extract-ofp-errors
 +++ b/build-aux/extract-ofp-errors
 @@ -426,7 +426,7 @@ static const struct ofperr_domain %s = {
@@ -200,7 +201,7 @@ index 2312b76..336a240 100755
                  print ("        {       -1, -1,  -1 }, /* %s */" % enum)
          print ("""\
 diff --git a/build-aux/extract-ofp-fields b/build-aux/extract-ofp-fields
-index 498b887..425a85f 100755
+index c248e76..80c7d35 100755
 --- a/build-aux/extract-ofp-fields
 +++ b/build-aux/extract-ofp-fields
 @@ -728,7 +728,7 @@ def make_ovs_fields(meta_flow_h, meta_flow_xml):
@@ -213,7 +214,7 @@ index 498b887..425a85f 100755
      recursively_replace(doc, 'oxm_classes', make_oxm_classes_xml(document))
  
 diff --git a/build-aux/extract-ofp-msgs b/build-aux/extract-ofp-msgs
-index 1813638..a67e870 100755
+index c2a91f9..92c4bda 100755
 --- a/build-aux/extract-ofp-msgs
 +++ b/build-aux/extract-ofp-msgs
 @@ -56,14 +56,14 @@ def fatal(msg):
@@ -241,7 +242,7 @@ index 1813638..a67e870 100755
 +            print(line)
          
 diff --git a/ovsdb/ovsdb-doc b/ovsdb/ovsdb-doc
-index 5cf26ee..b34fb11 100755
+index bdf2dcc..e82ad59 100755
 --- a/ovsdb/ovsdb-doc
 +++ b/ovsdb/ovsdb-doc
 @@ -258,7 +258,7 @@ represent strong references; thin lines represent weak references.
@@ -272,11 +273,11 @@ index 5cf26ee..b34fb11 100755
      except error.Error, e:
          sys.stderr.write("%s: %s\n" % (argv0, e.msg))
 diff --git a/ovsdb/ovsdb-idlc.in b/ovsdb/ovsdb-idlc.in
-index 721ab50..1064448 100755
+index bfbcf23..62442ee 100755
 --- a/ovsdb/ovsdb-idlc.in
 +++ b/ovsdb/ovsdb-idlc.in
 @@ -1,5 +1,6 @@
- #! @PYTHON@
+ #! /usr/bin/env @PYTHON@
  
 +from __future__ import print_function
  import getopt
@@ -1259,6 +1260,3 @@ index 721ab50..1064448 100755
              elif key in ['-C', '--directory']:
                  os.chdir(value)
              else:
--- 
-2.5.0
-

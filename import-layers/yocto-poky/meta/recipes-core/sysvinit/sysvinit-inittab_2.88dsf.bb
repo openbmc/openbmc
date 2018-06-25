@@ -53,8 +53,15 @@ EOF
 }
 
 pkg_postinst_${PN} () {
+# run this on host and on target
+if [ "${SERIAL_CONSOLES_CHECK}" = "" ]; then
+       exit 0
+fi
+}
+
+pkg_postinst_ontarget_${PN} () {
 # run this on the target
-if [ "x$D" = "x" ] && [ -e /proc/consoles ]; then
+if [ -e /proc/consoles ]; then
 	tmp="${SERIAL_CONSOLES_CHECK}"
 	for i in $tmp
 	do
@@ -68,11 +75,7 @@ if [ "x$D" = "x" ] && [ -e /proc/consoles ]; then
 	done
 	kill -HUP 1
 else
-	if [ "${SERIAL_CONSOLES_CHECK}" = "" ]; then
-		exit 0
-	else
-		exit 1
-	fi
+	exit 1
 fi
 }
 

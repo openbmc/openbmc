@@ -23,7 +23,8 @@ SRC_URI[sha256sum] = "3dd0b9639b5bd396b7ea5fada6aaa694dbfdaa3ad06eb95a6eabcdfd02
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
-inherit autotools gettext pkgconfig
+inherit distro_features_check autotools gettext pkgconfig
 
 EXTRA_OEMAKE += "INSTALL='install -p'"
 
+REQUIRED_DISTRO_FEATURES = "x11 pam"

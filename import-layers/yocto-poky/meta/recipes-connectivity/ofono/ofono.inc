@@ -5,7 +5,7 @@ LICENSE  = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a \
                     file://src/ofono.h;beginline=1;endline=20;md5=3ce17d5978ef3445def265b98899c2ee"
 
-inherit autotools pkgconfig update-rc.d systemd bluetooth
+inherit autotools pkgconfig update-rc.d systemd bluetooth gobject-introspection-data
 
 DEPENDS  = "dbus glib-2.0 udev mobile-broadband-provider-info"
 
@@ -26,10 +26,6 @@ SYSTEMD_SERVICE_${PN} = "ofono.service"
 do_install_append() {
   install -d ${D}${sysconfdir}/init.d/
   install -m 0755 ${WORKDIR}/ofono ${D}${sysconfdir}/init.d/ofono
-
-  # Ofono still has one test tool that refers to Python 2 in the shebang
-  sed -i -e '1s,#!.*python.*,#!${bindir}/python3,' ${D}${libdir}/ofono/test/set-ddr
-
 }
 
 PACKAGES =+ "${PN}-tests"
@@ -39,4 +35,5 @@ RRECOMMENDS_${PN} += "kernel-module-tun mobile-broadband-provider-info"
 
 FILES_${PN} += "${systemd_unitdir}"
 FILES_${PN}-tests = "${libdir}/${BPN}/test"
-RDEPENDS_${PN}-tests = "python3 python3-pygobject python3-dbus"
+RDEPENDS_${PN}-tests = "python3 python3-dbus"
+RDEPENDS_${PN}-tests += "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'python3-pygobject', '', d)}"

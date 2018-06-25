@@ -1,7 +1,7 @@
 SUMMARY = "Generic client/server library for SASL authentication"
 SECTION = "libs"
 HOMEPAGE = "http://asg.web.cmu.edu/sasl/"
-DEPENDS = "openssl virtual/db"
+DEPENDS = "openssl db"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3f55e0974e3d6db00ca6f57f2d206396"
 
@@ -75,8 +75,8 @@ do_install_append() {
 USERADD_PACKAGES = "${PN}-bin"
 USERADD_PARAM_${PN}-bin = "--system --home=/var/spool/mail -g mail cyrus"
 
-SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "saslauthd.service"
+SYSTEMD_PACKAGES = "${PN}-bin"
+SYSTEMD_SERVICE_${PN}-bin = "saslauthd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 SRC_URI[md5sum] = "a7f4e5e559a0e37b3ffc438c9456e425"

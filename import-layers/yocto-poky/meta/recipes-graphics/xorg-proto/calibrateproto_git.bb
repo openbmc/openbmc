@@ -17,5 +17,5 @@ PR = "r2"
 SRC_URI = "git://anongit.freedesktop.org/git/xorg/proto/calibrateproto \
            file://fix.patch;apply=yes"
 S = "${WORKDIR}/git"
-UPSTREAM_VERSION_UNKNOWN = "1"
+UPSTREAM_CHECK_COMMITS = "1"
 

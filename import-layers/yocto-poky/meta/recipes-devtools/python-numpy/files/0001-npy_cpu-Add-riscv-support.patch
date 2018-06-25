@@ -1,0 +1,28 @@
+From 30fb1bf9244bb0789c02ec7c98a923acc7200206 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Mar 2018 19:55:21 -0700
+Subject: [PATCH] npy_cpu: Add riscv support
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/numpy/numpy/pull/10761]
+
+ numpy/core/include/numpy/npy_cpu.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/numpy/core/include/numpy/npy_cpu.h b/numpy/core/include/numpy/npy_cpu.h
+index 84653ea18..9e88db873 100644
+--- a/numpy/core/include/numpy/npy_cpu.h
++++ b/numpy/core/include/numpy/npy_cpu.h
+@@ -78,6 +78,8 @@
+     #define NPY_CPU_AARCH64
+ #elif defined(__mc68000__)
+     #define NPY_CPU_M68K
++#elif defined(__riscv)
++    #define NPY_CPU_RISCV
+ #elif defined(__arc__) && defined(__LITTLE_ENDIAN__)
+     #define NPY_CPU_ARCEL
+ #elif defined(__arc__) && defined(__BIG_ENDIAN__)
+-- 
+2.16.2
+

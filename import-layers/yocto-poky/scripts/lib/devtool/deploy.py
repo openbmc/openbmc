@@ -213,9 +213,7 @@ def deploy(args, config, basepath, workspace):
 
         scp_port = ''
         ssh_port = ''
-        if not args.port:
-            raise DevtoolError("If you specify -P/--port then you must provide the port to be used to connect to the target")
-        else:
+        if args.port:
             scp_port = "-P %s" % args.port
             ssh_port = "-p %s" % args.port
 
@@ -280,9 +278,7 @@ def undeploy(args, config, basepath, workspace):
 
     scp_port = ''
     ssh_port = ''
-    if not args.port:
-        raise DevtoolError("If you specify -P/--port then you must provide the port to be used to connect to the target")
-    else:
+    if args.port:
         scp_port = "-P %s" % args.port
         ssh_port = "-p %s" % args.port
 
@@ -328,7 +324,7 @@ def register_commands(subparsers, context):
     parser_deploy.add_argument('-n', '--dry-run', help='List files to be deployed only', action='store_true')
     parser_deploy.add_argument('-p', '--no-preserve', help='Do not preserve existing files', action='store_true')
     parser_deploy.add_argument('--no-check-space', help='Do not check for available space before deploying', action='store_true')
-    parser_deploy.add_argument('-P', '--port', default='22', help='Port to use for connection to the target')
+    parser_deploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
 
     strip_opts = parser_deploy.add_mutually_exclusive_group(required=False)
     strip_opts.add_argument('-S', '--strip',
@@ -350,5 +346,5 @@ def register_commands(subparsers, context):
     parser_undeploy.add_argument('-s', '--show-status', help='Show progress/status output', action='store_true')
     parser_undeploy.add_argument('-a', '--all', help='Undeploy all recipes deployed on the target', action='store_true')
     parser_undeploy.add_argument('-n', '--dry-run', help='List files to be undeployed only', action='store_true')
-    parser_undeploy.add_argument('-P', '--port', default='22', help='Port to use for connection to the target')
+    parser_undeploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
     parser_undeploy.set_defaults(func=undeploy)

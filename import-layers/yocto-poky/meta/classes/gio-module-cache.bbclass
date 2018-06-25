@@ -9,6 +9,7 @@ if [ "x$D" != "x" ]; then
             mlprefix=${MLPREFIX} \
             binprefix=${MLPREFIX} \
             libdir=${libdir} \
+            libexecdir=${libexecdir} \
             base_libdir=${base_libdir} \
             bindir=${bindir}
 else

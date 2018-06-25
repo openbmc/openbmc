@@ -32,6 +32,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/net-snmp/net-snmp-${PV}.zip \
            file://0004-configure-fix-incorrect-variable.patch \
            file://net-snmp-5.7.2-fix-engineBoots-value-on-SIGHUP.patch \
            file://net-snmp-fix-for-disable-des.patch \
+           file://0001-Remove-U64-typedef.patch \
            "
 SRC_URI[md5sum] = "9f682bd70c717efdd9f15b686d07baee"
 SRC_URI[sha256sum] = "e8dfc79b6539b71a6ff335746ce63d2da2239062ad41872fff4354cafed07a3e"
@@ -60,7 +61,7 @@ EXTRA_OECONF = "--enable-shared \
                 --with-defaults \
                 --with-install-prefix=${D} \
                 --with-persistent-directory=${localstatedir}/lib/net-snmp \
-                ${@base_conditional('SITEINFO_ENDIANNESS', 'le', '--with-endianness=little', '--with-endianness=big', d)} \
+                ${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '--with-endianness=little', '--with-endianness=big', d)} \
 "
 
 # net-snmp needs to have mib-modules=smux enabled to enable quagga to support snmp
@@ -118,6 +119,10 @@ do_install_append() {
     sed    -e "s@^NSC_SRCDIR=.*@NSC_SRCDIR=.@g" \
         -i ${D}${bindir}/net-snmp-create-v3-user
     sed    -e "s@^NSC_SRCDIR=.*@NSC_SRCDIR=.@g" \
+           -e "s@\([^ ]*-fdebug-prefix-map=[^ ]*\)\1*@@g" \
+           -e "s@\([^ ]*--sysroot=[^ ]*\)\1*@@g" \
+           -e "s@\([^ ]*--with-libtool-sysroot=[^ ]*\)\1*@@g" \
+           -e "s@\([^ ]*--with-install-prefix=[^ ]*\)\1*@@g" \
         -i ${D}${bindir}/net-snmp-config
 
     if [ "${HAS_PERL}" = "1" ]; then
@@ -146,6 +151,7 @@ do_install_ptest() {
 }
 
 SYSROOT_PREPROCESS_FUNCS += "net_snmp_sysroot_preprocess"
+SNMP_DBGDIR = "/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}"
 
 net_snmp_sysroot_preprocess () {
     if [ -e ${D}${bindir}/net-snmp-config ]; then
@@ -157,6 +163,12 @@ net_snmp_sysroot_preprocess () {
             -e "s@^includedir=.*@includedir=${STAGING_INCDIR}@g" \
             -e "s@^libdir=.*@libdir=${STAGING_LIBDIR}@g" \
             -e "s@^NSC_SRCDIR=.*@NSC_SRCDIR=${S}@g" \
+            -e "s@-fdebug-prefix-map=${SNMP_DBGDIR}@-fdebug-prefix-map=${WORKDIR}=${SNMP_DBGDIR}@g" \
+            -e "s@-fdebug-prefix-map= -fdebug-prefix-map=@-fdebug-prefix-map=${STAGING_DIR_NATIVE}= \
+                  -fdebug-prefix-map=${STAGING_DIR_HOST}=@g" \
+            -e "s@--sysroot=@--sysroot=${STAGING_DIR_HOST}@g" \
+            -e "s@--with-libtool-sysroot=@--with-libtool-sysroot=${STAGING_DIR_HOST}@g" \
+            -e "s@--with-install-prefix=@--with-install-prefix=${D}@g" \
           -i  ${SYSROOT_DESTDIR}${bindir_crossscripts}/net-snmp-config
     fi
 }

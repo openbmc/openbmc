@@ -54,7 +54,6 @@ RDEPENDS_packagegroup-base = "\
     packagegroup-distro-base \
     packagegroup-machine-base \
     \
-    sysfsutils \
     module-init-tools \
     ${@bb.utils.contains('MACHINE_FEATURES', 'apm', 'packagegroup-base-apm', '',d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'acpi', 'packagegroup-base-acpi', '',d)} \
@@ -152,8 +151,7 @@ RDEPENDS_packagegroup-base-pci = "\
 
 SUMMARY_packagegroup-base-acpi = "ACPI support"
 RDEPENDS_packagegroup-base-acpi = "\
-    acpid \
-    libacpi "
+    acpid"
 
 SUMMARY_packagegroup-base-apm = "APM support"
 RDEPENDS_packagegroup-base-apm = "\
@@ -292,8 +290,6 @@ RRECOMMENDS_packagegroup-base-ipsec = "\
 SUMMARY_packagegroup-base-wifi = "WiFi support"
 RDEPENDS_packagegroup-base-wifi = "\
     ${VIRTUAL-RUNTIME_wireless-tools} \
-    ${@bb.utils.contains('COMBINED_FEATURES', 'pcmcia', 'hostap-utils', '',d)} \
-    ${@bb.utils.contains('COMBINED_FEATURES', 'pci', 'hostap-utils', '',d)} \
     wpa-supplicant"
 
 RRECOMMENDS_packagegroup-base-wifi = "\

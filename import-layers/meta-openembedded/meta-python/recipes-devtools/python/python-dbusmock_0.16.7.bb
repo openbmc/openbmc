@@ -20,7 +20,6 @@ inherit pypi setuptools
 
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-dbus \
-    ${PYTHON_PN}-importlib \
     ${PYTHON_PN}-pygobject \
     ${PYTHON_PN}-xml \
     "

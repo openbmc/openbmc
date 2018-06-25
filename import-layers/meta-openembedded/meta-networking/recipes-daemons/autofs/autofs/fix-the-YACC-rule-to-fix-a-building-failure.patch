@@ -1,4 +1,7 @@
-[PATCH] fix the YACC rule to fix a building failure
+From 971d48a00ef82880c34e89778bf430a01360ebd5 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Mon, 18 May 2015 16:28:36 +0800
+Subject: [PATCH] [PATCH] fix the YACC rule to fix a building failure
 
 Upstream-Statu: Pending
 
@@ -14,6 +17,7 @@ This lead to a race when compile amd_tok.o, the header file maybe rewritten.
   |../Makefile.rules:64: recipe for target 'amd_tok.o' failed
   |----------------------
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
 ---
  lib/Makefile     | 6 ++++--
  modules/Makefile | 3 ++-
@@ -44,7 +48,7 @@ index 4798a4b..c40cf86 100644
  
  nss_tok.o: nss_tok.c nss_parse.tab.h
 diff --git a/modules/Makefile b/modules/Makefile
-index 237b70b..71415d0 100644
+index d9ab06c..abc7698 100644
 --- a/modules/Makefile
 +++ b/modules/Makefile
 @@ -103,7 +103,8 @@ amd_tok.c: amd_tok.l
@@ -57,6 +61,3 @@ index 237b70b..71415d0 100644
  	$(YACC) -v -d -p amd_ -b amd_parse $?
  
  amd_parse.tab.o: amd_parse.tab.c amd_parse.tab.h
--- 
-1.9.1
-

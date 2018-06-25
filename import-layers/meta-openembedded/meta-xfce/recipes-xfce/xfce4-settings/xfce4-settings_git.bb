@@ -13,12 +13,12 @@ REQUIRED_DISTRO_FEATURES = "x11"
 # + minor bugfixes - sent mainline but no response
 # + option to hide mousepointer for a specific (touch) input device - sent mainline but no response
 SRC_URI = " \
-    git://github.com/schnitzeltony/xfce4-settings.git;protocol=git;branch=for-oe-4.12.0-1 \
+    git://github.com/schnitzeltony/xfce4-settings.git;protocol=git;branch=for-oe-4.12.3 \
     file://0001-xsettings.xml-Set-default-themes.patch \
 "
-SRCREV = "c6683cb2cff489c16c2c7b5eab4017bb461f07f1"
+SRCREV = "b701ac8b66b83c17469dd5009da51eeb59eba442"
 S = "${WORKDIR}/git"
-PV = "4.12.0+git${SRCPV}"
+PV = "4.12.3+git${SRCPV}"
 
 EXTRA_OECONF += "--enable-maintainer-mode --disable-debug"
 

@@ -137,3 +137,13 @@ class SourcePlugin(metaclass=PluginMeta):
         'prepares' the partition to be incorporated into the image.
         """
         logger.debug("SourcePlugin: do_prepare_partition: part: %s", part)
+
+    @classmethod
+    def do_post_partition(cls, part, source_params, creator, cr_workdir,
+                             oe_builddir, bootimg_dir, kernel_dir, rootfs_dir,
+                             native_sysroot):
+        """
+        Called after the partition is created. It is useful to add post
+        operations e.g. security signing the partition.
+        """
+        logger.debug("SourcePlugin: do_post_partition: part: %s", part)

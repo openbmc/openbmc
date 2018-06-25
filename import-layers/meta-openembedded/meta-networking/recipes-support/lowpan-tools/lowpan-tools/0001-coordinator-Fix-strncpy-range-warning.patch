@@ -1,0 +1,30 @@
+From f017353b8f3170ce79e7addc127056c0142f087b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 1 Apr 2018 14:31:05 -0700
+Subject: [PATCH] coordinator: Fix strncpy range warning
+
+Fixes
+error: 'strncpy' specified bound 4096 equals destination size [-Werror=stringop-truncation]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/coordinator.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/coordinator.c b/src/coordinator.c
+index c139aae..ca49418 100644
+--- a/src/coordinator.c
++++ b/src/coordinator.c
+@@ -296,7 +296,8 @@ int main(int argc, char **argv)
+ 	if(!lease_file)
+ 		lease_file = LEASE_FILE;
+ 
+-	strncpy(pname, argv[0], PATH_MAX);
++	strncpy(pname, argv[0], PATH_MAX - 1);
++	pname[PATH_MAX - 1] = '\0';
+ 
+ 	pid_file = getenv("PID_FILE");
+ 	if (!pid_file)
+-- 
+2.16.3
+

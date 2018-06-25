@@ -8,9 +8,9 @@
 
   <!-- Bitbake versions which correspond to the metadata release -->
   <object model="orm.bitbakeversion" pk="1">
-    <field type="CharField" name="name">rocko</field>
+    <field type="CharField" name="name">sumo</field>
     <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
-    <field type="CharField" name="branch">1.36</field>
+    <field type="CharField" name="branch">1.38</field>
   </object>
   <object model="orm.bitbakeversion" pk="2">
     <field type="CharField" name="name">HEAD</field>
@@ -22,14 +22,19 @@
     <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
     <field type="CharField" name="branch">master</field>
   </object>
+  <object model="orm.bitbakeversion" pk="4">
+    <field type="CharField" name="name">rocko</field>
+    <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
+    <field type="CharField" name="branch">1.36</field>
+  </object>
 
   <!-- Releases available -->
   <object model="orm.release" pk="1">
     <field type="CharField" name="name">rocko</field>
-    <field type="CharField" name="description">Openembedded Rocko</field>
+    <field type="CharField" name="description">Openembedded Sumo</field>
     <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
-    <field type="CharField" name="branch_name">rocko</field>
-    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=rocko\"&gt;OpenEmbedded Rocko&lt;/a&gt; branch.</field>
+    <field type="CharField" name="branch_name">sumo</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=sumo\"&gt;OpenEmbedded Sumo&lt;/a&gt; branch.</field>
   </object>
   <object model="orm.release" pk="2">
     <field type="CharField" name="name">local</field>
@@ -45,6 +50,13 @@
     <field type="CharField" name="branch_name">master</field>
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"http://cgit.openembedded.org/openembedded-core/log/\"&gt;OpenEmbedded master&lt;/a&gt; branch.</field>
   </object>
+  <object model="orm.release" pk="4">
+    <field type="CharField" name="name">rocko</field>
+    <field type="CharField" name="description">Openembedded Rocko</field>
+    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
+    <field type="CharField" name="branch_name">rocko</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"http://cgit.openembedded.org/openembedded-core/log/?h=rocko\"&gt;OpenEmbedded Rocko&lt;/a&gt; branch.</field>
+  </object>
 
   <!-- Default layers for each release -->
   <object model="orm.releasedefaultlayer" pk="1">
@@ -57,6 +69,10 @@
   </object>
   <object model="orm.releasedefaultlayer" pk="3">
     <field rel="ManyToOneRel" to="orm.release" name="release">3</field>
+    <field type="CharField" name="layer_name">openembedded-core</field>
+  </object>
+  <object model="orm.releasedefaultlayer" pk="4">
+    <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
     <field type="CharField" name="layer_name">openembedded-core</field>
   </object>
 

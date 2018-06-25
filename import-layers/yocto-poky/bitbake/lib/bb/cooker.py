@@ -516,6 +516,8 @@ class BBCooker:
             fn = runlist[0][3]
         else:
             envdata = self.data
+            data.expandKeys(envdata)
+            parse.ast.runAnonFuncs(envdata)
 
         if fn:
             try:
@@ -536,7 +538,6 @@ class BBCooker:
             logger.plain(env.getvalue())
 
         # emit the metadata which isnt valid shell
-        data.expandKeys(envdata)
         for e in sorted(envdata.keys()):
             if envdata.getVarFlag(e, 'func', False) and envdata.getVarFlag(e, 'python', False):
                 logger.plain("\npython %s () {\n%s}\n", e, envdata.getVar(e, False))
@@ -856,12 +857,12 @@ class BBCooker:
 
         with open('task-depends.dot', 'w') as f:
             f.write("digraph depends {\n")
-            for task in depgraph["tdepends"]:
+            for task in sorted(depgraph["tdepends"]):
                 (pn, taskname) = task.rsplit(".", 1)
                 fn = depgraph["pn"][pn]["filename"]
                 version = depgraph["pn"][pn]["version"]
                 f.write('"%s.%s" [label="%s %s\\n%s\\n%s"]\n' % (pn, taskname, pn, taskname, version, fn))
-                for dep in depgraph["tdepends"][task]:
+                for dep in sorted(depgraph["tdepends"][task]):
                     f.write('"%s" -> "%s"\n' % (task, dep))
             f.write("}\n")
         logger.info("Task dependencies saved to 'task-depends.dot'")
@@ -869,23 +870,23 @@ class BBCooker:
         with open('recipe-depends.dot', 'w') as f:
             f.write("digraph depends {\n")
             pndeps = {}
-            for task in depgraph["tdepends"]:
+            for task in sorted(depgraph["tdepends"]):
                 (pn, taskname) = task.rsplit(".", 1)
                 if pn not in pndeps:
                     pndeps[pn] = set()
-                for dep in depgraph["tdepends"][task]:
+                for dep in sorted(depgraph["tdepends"][task]):
                     (deppn, deptaskname) = dep.rsplit(".", 1)
                     pndeps[pn].add(deppn)
-            for pn in pndeps:
+            for pn in sorted(pndeps):
                 fn = depgraph["pn"][pn]["filename"]
                 version = depgraph["pn"][pn]["version"]
                 f.write('"%s" [label="%s\\n%s\\n%s"]\n' % (pn, pn, version, fn))
-                for dep in pndeps[pn]:
+                for dep in sorted(pndeps[pn]):
                     if dep == pn:
                         continue
                     f.write('"%s" -> "%s"\n' % (pn, dep))
             f.write("}\n")
-        logger.info("Flatened recipe dependencies saved to 'recipe-depends.dot'")
+        logger.info("Flattened recipe dependencies saved to 'recipe-depends.dot'")
 
     def show_appends_with_no_recipes(self):
         # Determine which bbappends haven't been applied
@@ -1170,6 +1171,7 @@ class BBCooker:
                 elif regex == "":
                     parselog.debug(1, "BBFILE_PATTERN_%s is empty" % c)
                     errors = False
+                    continue
                 else:
                     try:
                         cre = re.compile(regex)
@@ -1603,8 +1605,6 @@ class BBCooker:
 
         if self.parser:
             self.parser.shutdown(clean=not force, force=force)
-        self.notifier.stop()
-        self.confignotifier.stop()
 
     def finishcommand(self):
         self.state = state.initial
@@ -1807,21 +1807,25 @@ class CookerCollectFiles(object):
             realfn, cls, mc = bb.cache.virtualfn2realfn(p)
             priorities[p] = self.calc_bbfile_priority(realfn, matched)
 
-        # Don't show the warning if the BBFILE_PATTERN did match .bbappend files
         unmatched = set()
         for _, _, regex, pri in self.bbfile_config_priorities:
             if not regex in matched:
                 unmatched.add(regex)
 
-        def findmatch(regex):
+        # Don't show the warning if the BBFILE_PATTERN did match .bbappend files
+        def find_bbappend_match(regex):
             for b in self.bbappends:
                 (bbfile, append) = b
                 if regex.match(append):
+                    # If the bbappend is matched by already "matched set", return False
+                    for matched_regex in matched:
+                        if matched_regex.match(append):
+                            return False
                     return True
             return False
 
         for unmatch in unmatched.copy():
-            if findmatch(unmatch):
+            if find_bbappend_match(unmatch):
                 unmatched.remove(unmatch)
 
         for collection, pattern, regex, _ in self.bbfile_config_priorities:

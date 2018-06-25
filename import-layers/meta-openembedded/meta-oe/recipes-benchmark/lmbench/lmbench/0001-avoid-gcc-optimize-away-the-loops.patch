@@ -1,4 +1,7 @@
-[PATCH] avoid gcc optimize-away the loops
+From 25738bb9c75f94b451201acfd6bcab13bdeee512 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Thu, 5 May 2016 09:52:01 +0800
+Subject: [PATCH] [PATCH] avoid gcc optimize-away the loops
 
 Upstream-Status: pending
 
@@ -15,6 +18,7 @@ and TEN is macro:
 	#define TEN(a) a a a a a a a a a a
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
 ---
  src/lat_ops.c | 30 +++++++++++++++++++++++++-----
  1 file changed, 25 insertions(+), 5 deletions(-)
@@ -74,6 +78,3 @@ index d343ff3..457072b 100644
  	}
  	use_int((int)r);
  }
--- 
-2.8.1
-

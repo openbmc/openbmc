@@ -171,7 +171,7 @@ def staging_processfixme(fixme, target, recipesysroot, recipesysrootnative, d):
         fixme_path = d.getVar(fixmevar)
         cmd += " -e 's:FIXME_%s:%s:g'" % (fixmevar, fixme_path)
     bb.debug(2, cmd)
-    subprocess.check_output(cmd, shell=True)
+    subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
 
 def staging_populate_sysroot_dir(targetsysroot, nativesysroot, native, d):
@@ -228,7 +228,7 @@ def staging_populate_sysroot_dir(targetsysroot, nativesysroot, native, d):
 
     staging_processfixme(fixme, targetdir, targetsysroot, nativesysroot, d)
     for p in postinsts:
-        subprocess.check_output(p, shell=True)
+        subprocess.check_output(p, shell=True, stderr=subprocess.STDOUT)
 
 #
 # Manifests here are complicated. The main sysroot area has the unpacked sstate
@@ -470,40 +470,14 @@ python extend_recipe_sysroot() {
 
         os.symlink(c + "." + taskhash, depdir + "/" + c)
 
-        d2 = d
-        destsysroot = recipesysroot
-        variant = ''
-        if setscenedeps[dep][2].startswith("virtual:multilib"):
-            variant = setscenedeps[dep][2].split(":")[2]
-            if variant != current_variant:
-                if variant not in multilibs:
-                    multilibs[variant] = get_multilib_datastore(variant, d)
-                d2 = multilibs[variant]
-                destsysroot = d2.getVar("RECIPE_SYSROOT")
+        manifest, d2 = oe.sstatesig.find_sstate_manifest(c, setscenedeps[dep][2], "populate_sysroot", d, multilibs)
+        destsysroot = d2.getVar("RECIPE_SYSROOT")
 
         native = False
-        if c.endswith("-native"):
-            manifest = d2.expand("${SSTATE_MANIFESTS}/manifest-${BUILD_ARCH}-%s.populate_sysroot" % c)
+        if c.endswith("-native") or "-cross-" in c or "-crosssdk" in c:
             native = True
-        elif c.startswith("nativesdk-"):
-            manifest = d2.expand("${SSTATE_MANIFESTS}/manifest-${SDK_ARCH}_${SDK_OS}-%s.populate_sysroot" % c)
-        elif "-cross-" in c:
-            manifest = d2.expand("${SSTATE_MANIFESTS}/manifest-${BUILD_ARCH}_${TARGET_ARCH}-%s.populate_sysroot" % c)
-            native = True
-        elif "-crosssdk" in c:
-            manifest = d2.expand("${SSTATE_MANIFESTS}/manifest-${BUILD_ARCH}_${SDK_ARCH}_${SDK_OS}-%s.populate_sysroot" % c)
-            native = True
-        else:
-            pkgarchs = ['${MACHINE_ARCH}']
-            pkgarchs = pkgarchs + list(reversed(d2.getVar("PACKAGE_EXTRA_ARCHS").split()))
-            pkgarchs.append('allarch')
-            for pkgarch in pkgarchs:
-                manifest = d2.expand("${SSTATE_MANIFESTS}/manifest-%s-%s.populate_sysroot" % (pkgarch, c))
-                if os.path.exists(manifest):
-                    break
-        if not os.path.exists(manifest):
-            bb.warn("Manifest %s not found?" % manifest)
-        else:
+
+        if manifest:
             newmanifest = collections.OrderedDict()
             if native:
                 fm = fixme['native']
@@ -576,7 +550,7 @@ python extend_recipe_sysroot() {
             staging_processfixme(fixme[f], multilibs[f].getVar("RECIPE_SYSROOT"), recipesysroot, recipesysrootnative, d)
 
     for p in postinsts:
-        subprocess.check_output(p, shell=True)
+        subprocess.check_output(p, shell=True, stderr=subprocess.STDOUT)
 
     for dep in manifests:
         c = setscenedeps[dep][0]

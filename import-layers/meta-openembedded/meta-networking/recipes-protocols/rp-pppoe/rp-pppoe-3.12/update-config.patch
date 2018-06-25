@@ -1,3 +1,8 @@
+From 4d34e0d7d790ec41b0afb731c7dc1b1ee90dd377 Mon Sep 17 00:00:00 2001
+From: Tom Rini <tom_rini@mentor.com>
+Date: Wed, 27 Jul 2011 03:46:52 +0000
+Subject: [PATCH] rp-pppoe: Port from oe.dev
+
 Set the timeout to 0 since we don't want pppoe to try reconnecting,
 we want whatever is calling it to reconnect. Lots of odd things
 happen when you have pppoe retrying itself.
@@ -8,11 +13,15 @@ ppp looks, so that's what we do here.
 
 Upstream-Status: Inappropriate [configuration]
 
-Index: rp-pppoe-3.8/configs/pppoe.conf
-===================================================================
---- rp-pppoe-3.8.orig/configs/pppoe.conf	2006-04-03 00:29:41.000000000 +1000
-+++ rp-pppoe-3.8/configs/pppoe.conf	2007-06-08 16:02:47.000000000 +1000
-@@ -66,7 +66,7 @@
+---
+ configs/pppoe.conf | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configs/pppoe.conf b/configs/pppoe.conf
+index c222b2f..65618a5 100644
+--- a/configs/pppoe.conf
++++ b/configs/pppoe.conf
+@@ -66,7 +66,7 @@ DEFAULTROUTE=yes
  # to connect forever after pppoe-start is called.  Otherwise, it will
  # give out after CONNECT_TIMEOUT seconds and will not attempt to
  # connect again, making it impossible to reach.
@@ -21,7 +30,7 @@ Index: rp-pppoe-3.8/configs/pppoe.conf
  
  # How often in seconds pppoe-start polls to check if link is up
  CONNECT_POLL=2
-@@ -115,7 +115,7 @@
+@@ -115,7 +115,7 @@ PPPOE_TIMEOUT=80
  FIREWALL=NONE
  
  # Linux kernel-mode plugin for pppd.  If you want to try the kernel-mode

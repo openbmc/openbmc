@@ -10,6 +10,8 @@ DEPENDS = "libnl libdaemon jansson"
 SRC_URI = "git://github.com/jpirko/libteam \
            file://0001-include-sys-select.h-for-fd_set-definition.patch \
            file://0002-teamd-Re-adjust-include-header-order.patch \
+           file://0001-team_basic_test.py-disable-RedHat-specific-test.patch \
+           file://run-ptest \
            "
 SRCREV = "91a928a56a501daac5ce8b3c16bd9943661f1d16"
 
@@ -18,7 +20,7 @@ SRC_URI[sha256sum] = "d65286379141db141bea33424ec0507bb0f827a0bf03d9c65004bb593e
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig ptest
 
 FILES_${PN} = "${libdir}/libteam${SOLIBS} \
 "
@@ -33,4 +35,8 @@ FILES_${PN}-utils = "${bindir}/bond2team \
 "
 
 RDEPENDS_${PN}-utils = "bash"
+RDEPENDS_${PN}-ptest = "python"
 
+do_install_ptest() {
+	install ${S}/scripts/team_basic_test.py ${D}${PTEST_PATH}/
+}

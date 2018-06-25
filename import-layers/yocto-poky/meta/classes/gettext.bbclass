@@ -3,7 +3,7 @@ def gettext_dependencies(d):
         return ""
     if d.getVar('USE_NLS') == 'no':
         return "gettext-minimal-native"
-    return d.getVar('DEPENDS_GETTEXT', False)
+    return "gettext-native"
 
 def gettext_oeconf(d):
     if d.getVar('USE_NLS') == 'no':
@@ -12,8 +12,6 @@ def gettext_oeconf(d):
     if d.getVar('INHIBIT_DEFAULT_DEPS') and not oe.utils.inherits(d, 'cross-canadian'):
         return '--disable-nls'
     return "--enable-nls"
-
-DEPENDS_GETTEXT ??= "gettext-native"
 
 BASEDEPENDS_append = " ${@gettext_dependencies(d)}"
 EXTRA_OECONF_append = " ${@gettext_oeconf(d)}"

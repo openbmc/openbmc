@@ -14,11 +14,11 @@ Date:   Mon Dec 17 16:23:45 2012 -0500
     
     Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
 
-diff --git a/hpi_shell/session.c b/hpi_shell/session.c
-index 85c31bf..187da4c 100644
---- a/hpi_shell/session.c
-+++ b/hpi_shell/session.c
-@@ -66,7 +66,7 @@ static void* progress_bar(void *unused)
+Index: openhpi-3.6.1/hpi_shell/session.c
+===================================================================
+--- openhpi-3.6.1.orig/hpi_shell/session.c
++++ openhpi-3.6.1/hpi_shell/session.c
+@@ -73,7 +73,7 @@ static void* progress_bar(void *unused)
  		if (i < (PROGRESS_BUF_SIZE - mes_len - 1)) i++;
  		t++;
  	};

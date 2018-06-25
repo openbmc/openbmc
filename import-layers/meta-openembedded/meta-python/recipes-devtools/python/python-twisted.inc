@@ -39,6 +39,10 @@ PACKAGES =+ "\
     ${PN}-bin \
 "
 
+DEPENDS += " \
+    ${PYTHON_PN}-incremental-native \
+"
+
 RDEPENDS_${PN} = "\
     ${PN}-bin \
     ${PN}-core \

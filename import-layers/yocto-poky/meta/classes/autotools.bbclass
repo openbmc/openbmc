@@ -200,7 +200,7 @@ autotools_do_configure() {
 				bbnote Executing glib-gettextize --force --copy
 				echo "no" | glib-gettextize --force --copy
 			fi
-		elif grep -q "^[[:space:]]*AM_GNU_GETTEXT" $CONFIGURE_AC; then
+		elif [ "${BPN}" != "gettext" ] && grep -q "^[[:space:]]*AM_GNU_GETTEXT" $CONFIGURE_AC; then
 			# We'd call gettextize here if it wasn't so broken...
 			cp ${STAGING_DATADIR_NATIVE}/gettext/config.rpath ${AUTOTOOLS_AUXDIR}/
 			if [ -d ${S}/po/ ]; then

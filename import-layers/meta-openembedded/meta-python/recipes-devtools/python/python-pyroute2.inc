@@ -1,26 +1,25 @@
 SUMMARY = "A pure Python netlink and Linux network configuration library"
 LICENSE = "GPLv2 & Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.GPL.v2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
-                    file://LICENSE.Apache.v2;md5=3b83ef96387f14655fc854ddc3c6bd57"
+                    file://LICENSE.Apache.v2;md5=34281e312165f843a2b7d1f114fe65ce"
 
-SRC_URI[md5sum] = "733adb362b6603c7269c0b3df3045a55"
-SRC_URI[sha256sum] = "5cdf44656cf623369f0cbf183d9d14a1a50ebdffbd50d4e30ffda62c0a05d7b3"
-
-SRC_URI += "file://import-simplejson-as-json.patch"
+SRC_URI[md5sum] = "9c251543c4282a2f8b1a8d6aa8afc688"
+SRC_URI[sha256sum] = "7afad28ee0a0f3e7c34adaa9f953d00560ed9910203e93f107833b6e8d151171"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/python-pyroute2:"
 
 inherit pypi
 
-RDEPENDS_${PN} += "\
-  ${PYTHON_PN}-distutils \
-  ${PYTHON_PN}-simplejson \
-  ${PYTHON_PN}-multiprocessing \
-  ${PYTHON_PN}-io ${PYTHON_PN}-pprint \
-  ${PYTHON_PN}-pickle \
-  ${PYTHON_PN}-logging \
-  ${PYTHON_PN}-threading \
-  ${PYTHON_PN}-textutils \
-  ${PYTHON_PN}-subprocess \
-  ${PYTHON_PN}-netclient \
+RDEPENDS_${PN} += " \
+    ${PYTHON_PN}-ctypes \
+    ${PYTHON_PN}-distutils \
+    ${PYTHON_PN}-io \
+    ${PYTHON_PN}-json \
+    ${PYTHON_PN}-logging \
+    ${PYTHON_PN}-multiprocessing \
+    ${PYTHON_PN}-pickle \
+    ${PYTHON_PN}-pkgutil \
+    ${PYTHON_PN}-pprint \
+    ${PYTHON_PN}-shell \
+    ${PYTHON_PN}-unixadmin \
 "

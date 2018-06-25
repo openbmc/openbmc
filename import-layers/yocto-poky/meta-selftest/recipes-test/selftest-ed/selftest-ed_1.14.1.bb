@@ -12,6 +12,7 @@ SECTION = "base"
 bindir = "${base_bindir}"
 
 SRC_URI = "${GNU_MIRROR}/ed/ed-${PV}.tar.lz"
+RECIPE_NO_UPDATE_REASON = "This recipe is used in selftest and shouldn't be updated otherwise"
 
 SRC_URI[md5sum] = "7f4a54fa7f366479f03654b8af645fd0"
 SRC_URI[sha256sum] = "ffb97eb8f2a2b5a71a9b97e3872adce953aa1b8958e04c5b7bf11d556f32552a"

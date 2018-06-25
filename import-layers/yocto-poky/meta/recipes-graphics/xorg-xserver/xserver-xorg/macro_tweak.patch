@@ -5,13 +5,13 @@ Upstream-Status: Pending
 
 Signed-off-by: Yu Ke <ke.yu@intel.com>
 
-diff --git a/xorg-server.m4 b/xorg-server.m4
-index bdecf62..040fdb8 100644
---- a/xorg-server.m4
-+++ b/xorg-server.m4
+Index: xorg-server-1.19.6/xorg-server.m4
+===================================================================
+--- xorg-server-1.19.6.orig/xorg-server.m4
++++ xorg-server-1.19.6/xorg-server.m4
 @@ -28,10 +28,12 @@ dnl
- # Checks for the $1 define in xorg-server.h (from the sdk).  If it
- # is defined, then add $1 to $REQUIRED_MODULES.
+ # Checks for the MACRO define in xorg-server.h (from the sdk).  If it
+ # is defined, then add the given PROTO to $REQUIRED_MODULES.
  
 +m4_pattern_allow(PKG_CONFIG_SYSROOT_DIR)
 +

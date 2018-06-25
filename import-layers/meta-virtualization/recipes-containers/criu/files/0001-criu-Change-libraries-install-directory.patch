@@ -1,4 +1,4 @@
-From 78390305829316633acee2ca5607331b0e37a104 Mon Sep 17 00:00:00 2001
+From f64fbca70e6049dad3c404d871f2383d97725d2d Mon Sep 17 00:00:00 2001
 From: Mark Asselstine <mark.asselstine@windriver.com>
 Date: Fri, 8 Sep 2017 15:11:31 -0400
 Subject: [PATCH] criu: Change libraries install directory
@@ -7,12 +7,13 @@ Install the libraries into /usr/lib(or /usr/lib64)
 
 Signed-off-by: Jianchuan Wang <jianchuan.wang@windriver.com>
 Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+
 ---
  Makefile.install | 13 -------------
  1 file changed, 13 deletions(-)
 
 diff --git a/Makefile.install b/Makefile.install
-index 3987bcc..73d98a4 100644
+index 1def3cf..d020eef 100644
 --- a/Makefile.install
 +++ b/Makefile.install
 @@ -9,19 +9,6 @@ LIBEXECDIR	?= $(PREFIX)/libexec
@@ -35,6 +36,3 @@ index 3987bcc..73d98a4 100644
  # LIBDIR falls back to the standard path.
  LIBDIR ?= $(PREFIX)/lib
  
--- 
-2.7.4
-

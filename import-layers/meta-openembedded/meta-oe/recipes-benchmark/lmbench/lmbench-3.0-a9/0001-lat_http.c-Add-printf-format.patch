@@ -1,9 +1,10 @@
-From 6faa6acdf20aa6f738eed1483b7dceed94286adb Mon Sep 17 00:00:00 2001
+From 7c05fa5353ad91acae6e5e8a01f65d54935ef778 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 27 Jun 2017 14:39:10 -0700
 Subject: [PATCH] lat_http.c: Add printf format
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/lat_http.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -21,6 +22,3 @@ index c630d59..28d04f7 100644
  	}
  	write(sock, buf, strlen(buf));
  	while ((n = read(sock, buf, XFERSIZE)) > 0) {
--- 
-2.13.2
-

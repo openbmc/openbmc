@@ -1,0 +1,31 @@
+From 1dd07113f2a7489444a8990a95be42e035f8e9df Mon Sep 17 00:00:00 2001
+From: Kurt Roeckx <kroeckx@debian.org>
+Date: Tue, 1 Nov 2016 12:57:35 +0100
+Subject: [PATCH] Fix issue #599
+Forwarded: https://github.com/zaphoyd/websocketpp/pull/600
+
+---
+ websocketpp/transport/asio/security/tls.hpp | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/websocketpp/transport/asio/security/tls.hpp b/websocketpp/transport/asio/security/tls.hpp
+index 7b32db8..a8aafec 100644
+--- a/websocketpp/transport/asio/security/tls.hpp
++++ b/websocketpp/transport/asio/security/tls.hpp
+@@ -355,13 +355,9 @@ protected:
+     template <typename ErrorCodeType>
+     lib::error_code translate_ec(ErrorCodeType ec) {
+         if (ec.category() == lib::asio::error::get_ssl_category()) {
+-            if (ERR_GET_REASON(ec.value()) == SSL_R_SHORT_READ) {
+-                return make_error_code(transport::error::tls_short_read);
+-            } else {
+                 // We know it is a TLS related error, but otherwise don't know
+                 // more. Pass through as TLS generic.
+                 return make_error_code(transport::error::tls_error);
+-            }
+         } else {
+             // We don't know any more information about this error so pass
+             // through
+-- 
+2.7.4
+

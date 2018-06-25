@@ -10,3 +10,6 @@ PYPI_PACKAGE = "python-pam"
 inherit pypi setuptools
 
 RDEPENDS_${PN} = "libpam"
+
+inherit distro_features_check
+REQUIRED_DISTRO_FEATURES = "pam"

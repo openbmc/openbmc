@@ -1,0 +1,31 @@
+From 897736166fd709906a5fdf16eb23f8fddff770b5 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Thu, 1 Mar 2018 18:31:01 -0500
+Subject: [PATCH] if_ether: move muslc ethhdr protection to uapi file
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+Upstream-Status: Pending
+---
+ include/uapi/linux/if_ether.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/include/uapi/linux/if_ether.h b/include/uapi/linux/if_ether.h
+index 153c9c2..7b69b73 100644
+--- a/include/uapi/linux/if_ether.h
++++ b/include/uapi/linux/if_ether.h
+@@ -149,6 +149,12 @@
+  *	This is an Ethernet frame header.
+  */
+ 
++#ifdef _NETINET_IF_ETHER_H /* musl */
++#define __UAPI_DEF_ETHHDR 0
++#else /* glibc uses __NETINET_IF_ETHER_H, and includes the kernel header. */
++#define __UAPI_DEF_ETHHDR 1
++#endif
++
+ /* allow libcs like musl to deactivate this, glibc does not implement this. */
+ #ifndef __UAPI_DEF_ETHHDR
+ #define __UAPI_DEF_ETHHDR		1
+-- 
+2.7.4
+

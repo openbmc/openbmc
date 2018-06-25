@@ -89,7 +89,13 @@ def get_tinfoil():
     return tinfoil
 
 if __name__=='__main__':
-    import shutil
+    import argparse, shutil
+
+    parser = argparse.ArgumentParser(description='Bashim detector for shell fragments in recipes.')
+    parser.add_argument("recipes", metavar="RECIPE", nargs="*", help="recipes to check (if not specified, all will be checked)")
+    parser.add_argument("--verbose", default=False, action="store_true")
+    args = parser.parse_args()
+
     if shutil.which("checkbashisms.pl") is None:
         print("Cannot find checkbashisms.pl on $PATH, get it from https://anonscm.debian.org/cgit/collab-maint/devscripts.git/plain/scripts/checkbashisms.pl")
         sys.exit(1)
@@ -99,6 +105,8 @@ if __name__=='__main__':
     # bitbake server is crucial, don't change it.
     def func(item):
         (filename, key, lineno), script = item
+        if args.verbose:
+            print("Scanning %s:%s" % (filename, key))
         return process(filename, key, lineno, script)
 
     import multiprocessing
@@ -110,9 +118,8 @@ if __name__=='__main__':
     # recipecaches to handle multiconfig environments
     pkg_pn = tinfoil.cooker.recipecaches[""].pkg_pn
 
-    # TODO: use argparse and have --help
-    if len(sys.argv) > 1:
-        initial_pns = sys.argv[1:]
+    if args.recipes:
+        initial_pns = args.recipes
     else:
         initial_pns = sorted(pkg_pn)
 

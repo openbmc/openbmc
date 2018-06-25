@@ -36,7 +36,7 @@ Index: pytest-3.2.2/setup.py
 +        return version_match.group(1)
 +    raise RuntimeError("Unable to find version string.")
  
- def has_environment_marker_support():
+ def get_environment_marker_support_level():
      """
 @@ -59,9 +72,7 @@ def main():
          name='pytest',

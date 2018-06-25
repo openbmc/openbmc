@@ -1,7 +1,7 @@
-From dc75482af095d667a4a92655c4e7eb312e80c42d Mon Sep 17 00:00:00 2001
+From ba0dc8273e4f83bcd2d43baa5910aae34b93048c Mon Sep 17 00:00:00 2001
 From: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
 Date: Mon, 1 Feb 2016 19:25:12 -0500
-Subject: [PATCH 2/5] passphrase_cb is deprecated
+Subject: [PATCH] passphrase_cb is deprecated
 
 https://bugs.gnupg.org/gnupg/issue767 indicates that
 gpgme_set_passphrase_cb is a deprecated corner of the API and that
@@ -19,6 +19,7 @@ test suite to be able to make those tests.
 Upstream-Status: Backport
 
 Signed-off-by: Catalin Enache <catalin.enache@windriver.com>
+
 ---
  tests/util.py | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)
@@ -48,3 +49,4 @@ index cd803c2..86892ca 100644
 +
          # import requested keys into the keyring
          ctx = gpgme.Context()
+         for key in self.import_keys:

@@ -68,8 +68,4 @@ python sign_rpm () {
 do_package_index[depends] += "signing-keys:do_deploy"
 do_rootfs[depends] += "signing-keys:do_populate_sysroot"
 
-# Newer versions of gpg (at least 2.1.5 and 2.2.1) have issues when signing occurs in parallel
-# so unfortunately the signing must be done serially. Once the upstream problem is fixed,
-# the following line must be removed otherwise we loose all the intrinsic parallelism from
-# bitbake.  For more information, check https://bugzilla.yoctoproject.org/show_bug.cgi?id=12022.
-do_package_write_rpm[lockfiles] += "${TMPDIR}/gpg.lock"
+PACKAGE_WRITE_DEPS += "gnupg-native"

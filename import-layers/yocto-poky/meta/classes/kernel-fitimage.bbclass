@@ -14,6 +14,8 @@ python __anonymous () {
             replacementtype = "vmlinuz.bin"
         elif uarch == "x86":
             replacementtype = "bzImage"
+        elif uarch == "microblaze":
+            replacementtype = "linux.bin"
         else:
             replacementtype = "zImage"
 
@@ -100,7 +102,7 @@ fitimage_emit_section_kernel() {
 
 	kernel_csum="sha1"
 
-	ENTRYPOINT=${UBOOT_ENTRYPOINT}
+	ENTRYPOINT="${UBOOT_ENTRYPOINT}"
 	if [ -n "${UBOOT_ENTRYSYMBOL}" ]; then
 		ENTRYPOINT=`${HOST_PREFIX}nm vmlinux | \
 			awk '$3=="${UBOOT_ENTRYSYMBOL}" {print "0x"$1;exit}'`

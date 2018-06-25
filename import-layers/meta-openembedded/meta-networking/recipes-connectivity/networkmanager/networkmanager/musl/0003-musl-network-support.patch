@@ -1,0 +1,72 @@
+From 714b4731a238653e9c7d885c0dee10677b0a4df3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Thu, 22 Mar 2018 18:24:07 +0100
+Subject: [PATCH 3/4] musl: network support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Pending
+
+Stolen from [1] and prettyfied slightly
+
+[1] https://github.com/voidlinux/void-packages/tree/master/srcpkgs/NetworkManager/patches
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ libnm-core/nm-utils.h               | 4 ++++
+ src/platform/wifi/wifi-utils.h      | 4 ++++
+ src/systemd/src/basic/socket-util.h | 5 +++++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/libnm-core/nm-utils.h b/libnm-core/nm-utils.h
+index df9284b..2bcf4b8 100644
+--- a/libnm-core/nm-utils.h
++++ b/libnm-core/nm-utils.h
+@@ -30,7 +30,11 @@
+ #include <netinet/in.h>
+ 
+ /* For ETH_ALEN and INFINIBAND_ALEN */
++#if defined(__GLIBC__)
+ #include <linux/if_ether.h>
++#else
++#define ETH_ALEN	6		/* Octets in one ethernet addr	 */
++#endif
+ #include <linux/if_infiniband.h>
+ 
+ #include "nm-core-enum-types.h"
+diff --git a/src/platform/wifi/wifi-utils.h b/src/platform/wifi/wifi-utils.h
+index 705717b..da3edc4 100644
+--- a/src/platform/wifi/wifi-utils.h
++++ b/src/platform/wifi/wifi-utils.h
+@@ -22,7 +22,11 @@
+ #ifndef __WIFI_UTILS_H__
+ #define __WIFI_UTILS_H__
+ 
++#if defined(__GLIBC__)
+ #include <net/ethernet.h>
++#else /* musl libc */
++#define ETH_ALEN	6		/* Octets in one ethernet addr	 */
++#endif
+ 
+ #include "nm-dbus-interface.h"
+ 
+diff --git a/src/systemd/src/basic/socket-util.h b/src/systemd/src/basic/socket-util.h
+index d7e2d85..d109c84 100644
+--- a/src/systemd/src/basic/socket-util.h
++++ b/src/systemd/src/basic/socket-util.h
+@@ -29,6 +29,11 @@
+ #include <linux/netlink.h>
+ #include <linux/if_infiniband.h>
+ #include <linux/if_packet.h>
++#if !defined(__GLIBC__)
++/* SIOCGSTAMPNS from linux/asm-generic.h
++ * for src/systemd/src/libsystemd-network/sd-lldp.c */
++#include <linux/sockios.h>
++#endif
+ 
+ #include "macro.h"
+ #include "missing.h"
+-- 
+2.14.3
+

@@ -49,7 +49,7 @@
 
         <para>
             You can find a web interface to the Yocto Linux kernels in the
-            <ulink url='&YOCTO_DOCS_REF_URL;#source-repositories'>Source Repositories</ulink>
+            <ulink url='&YOCTO_DOCS_OM_URL;#source-repositories'>Source Repositories</ulink>
             at
             <ulink url='&YOCTO_GIT_URL;'></ulink>.
             If you look at the interface, you will see to the left a
@@ -239,8 +239,9 @@
                         <ulink url='http://git-scm.com/documentation'></ulink>.
                         You can also get an introduction to Git as it
                         applies to the Yocto Project in the
-                        "<ulink url='&YOCTO_DOCS_REF_URL;#git'>Git</ulink>"
-                        section in the Yocto Project Reference Manual.
+                        "<ulink url='&YOCTO_DOCS_OM_URL;#git'>Git</ulink>"
+                        section in the Yocto Project Overview and Concepts
+                        Manual.
                         The latter reference provides an overview of
                         Git and presents a minimal set of Git commands
                         that allows you to be functional using Git.
@@ -381,7 +382,7 @@
                 generic kernel just for conceptual purposes.
                 Also keep in mind that this structure represents the Yocto
                 Project
-                <ulink url='&YOCTO_DOCS_REF_URL;#source-repositories'>Source Repositories</ulink>
+                <ulink url='&YOCTO_DOCS_OM_URL;#source-repositories'>Source Repositories</ulink>
                 that are either pulled from during the build or established
                 on the host development system prior to the build by either
                 cloning a particular kernel's Git repository or by

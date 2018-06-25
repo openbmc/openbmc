@@ -1,0 +1,31 @@
+From fd80c0599083013a1b583feba5d7473f52b35938 Mon Sep 17 00:00:00 2001
+From: Mariia Movchan <mmovchan@cisco.com>
+Date: Tue, 6 Mar 2018 16:03:39 +0200
+Subject: [PATCH] Makefile: pass extra linker flags
+
+Fixes
+ERROR: QA Issue: No GNU_HASH in the elf binary
+
+Upstream-Status: Pending
+
+Signed-off-by: Mariia Movchan <mmovchan@cisco.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 8beff8f..047f02a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -8,7 +8,7 @@ LIBS?=
+ VERSION=0.2.2
+ CC?=gcc
+ CFLAGS?=-O2 -g -Wall
+-LDFLAGS=$(LIBS)
++LDFLAGS+=$(LIBS)
+ 
+ ifeq ($(USE_GEOIP),yes)
+ ifeq ($(USE_DYN_GEOIP),yes)
+-- 
+2.15.1
+

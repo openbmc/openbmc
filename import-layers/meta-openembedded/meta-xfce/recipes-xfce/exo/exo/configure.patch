@@ -1,6 +1,20 @@
---- a/configure.ac	2007-12-02 10:37:06.000000000 -0200
-+++ b/configure.ac	2008-06-05 17:21:42.000000000 -0300
-@@ -127,22 +127,24 @@
+From 13a74582ffd7f81dbd66a7296fc76007718e9d4d Mon Sep 17 00:00:00 2001
+From: Andreas Mueller <schnitzeltony@gmx.de>
+Date: Mon, 1 Aug 2011 17:16:29 +0200
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+
+---
+ configure.ac | 34 ++++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 0de5ceb..3f92d1b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -143,22 +143,24 @@ AC_FUNC_MMAP()
  dnl ***************************************
  dnl *** Check for strftime() extensions ***
  dnl ***************************************

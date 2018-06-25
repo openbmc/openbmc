@@ -32,6 +32,8 @@ Accommodate the values above to your own needs (ex: ext3 / ext4).
 * `GPU_MEM_1024`: GPU memory in megabyte for the 1024MB Raspberry Pi. Ignored by
   the 256MB/512MB RP. Overrides gpu_mem. Max 944. Default not set.
 
+See: <https://www.raspberrypi.org/documentation/configuration/config-txt/memory.md>
+
 ## Add purchased license codecs
 
 To add you own licenses use variables `KEY_DECODE_MPG2` and `KEY_DECODE_WVC1` in
@@ -44,6 +46,7 @@ You can supply more licenses separated by comma. Example:
 
     KEY_DECODE_WVC1 = "0x12345678,0xabcdabcd,0x87654321"
 
+See: <https://www.raspberrypi.org/documentation/configuration/config-txt/codeclicence.md>
 
 ## Disable overscan
 
@@ -53,17 +56,56 @@ local.conf:
 
     DISABLE_OVERSCAN = "1"
 
+## Disable splash screen
+
+By default a rainbow splash screen is shown after the GPU firmware is loaded.
+To disable this set this variable in local.conf:
+
+    DISABLE_SPLASH = "1"
+
+## Boot delay
+
+The Raspberry Pi waits a number of seconds after loading the GPU firmware and
+before loading the kernel. By default it is one second. This is useful if your
+SD card needs a while to get ready before Linux is able to boot from it.
+To remove (or adjust) this delay set these variables in local.conf:
+
+    BOOT_DELAY = "0"
+    BOOT_DELAY_MS = "0"
+
 ## Set overclocking options
 
-The Raspberry PI can be overclocked. As of now overclocking up to the "Turbo
+The Raspberry Pi can be overclocked. As of now overclocking up to the "Turbo
 Mode" is officially supported by the raspbery and does not void warranty. Check
-the config.txt for a detailed description of options and modes. Example turbo
-mode:
+the config.txt for a detailed description of options and modes. The following
+variables are supported in local.conf: `ARM_FREQ`, `GPU_FREQ`, `CORE_FREQ`,
+`SDRAM_FREQ` and `OVER_VOLTAGE`.
+
+Example official settings for Turbo Mode in Raspberry Pi 2:
 
     ARM_FREQ = "1000"
     CORE_FREQ = "500"
     SDRAM_FREQ = "500"
     OVER_VOLTAGE = "6"
+
+See: <https://www.raspberrypi.org/documentation/configuration/config-txt/overclocking.md>
+
+## HDMI and composite video options
+
+The Raspberry Pi can output video over HDMI or SDTV composite (the RCA connector).
+By default the video mode for these is autodetected on boot: the HDMI mode is
+selected according to the connected monitor's EDID information and the composite
+mode is defaulted to NTSC using a 4:3 aspect ratio. Check the config.txt for a
+detailed description of options and modes. The following variables are supported in
+local.conf: `HDMI_FORCE_HOTPLUG`, `HDMI_DRIVE`, `HDMI_GROUP`, `HDMI_MODE`,
+`CONFIG_HDMI_BOOST`, `SDTV_MODE`, `SDTV_ASPECT` and `DISPLAY_ROTATE`.
+
+Example to force HDMI output to 720p in CEA mode:
+
+    HDMI_GROUP = "1"
+    HDMI_MODE = "4"
+
+See: <https://www.raspberrypi.org/documentation/configuration/config-txt/video.md>
 
 ## Video camera support with V4L2 drivers
 
@@ -179,10 +221,34 @@ needs a fixed core frequency and enable_uart wil set it to the minimum. Certain
 operations - 60fps h264 decode, high quality deinterlace - which aren't
 performed on the ARM may be affected, and we wouldn't want to do that to users
 who don't want to use the serial port. Users who want serial console support on
-RaspberryPi3 will have to explicitely set in local.conf:
+RaspberryPi3 will have to explicitly set in local.conf:
 
     ENABLE_UART = "1"
 
 Ref.:
 * <https://github.com/raspberrypi/firmware/issues/553>
 * <https://github.com/RPi-Distro/repo/issues/22>
+
+## Enable USB Peripheral (Gadget) support
+
+The standard USB driver only supports host mode operations.  Users who
+want to use gadget modules like g_ether should set the following in
+local.conf:
+
+    ENABLE_DWC2_PERIPHERAL = "1"
+
+## Manual additions to config.txt
+
+The `RPI_EXTRA_CONFIG` variable can be used to manually add additional lines to
+the `config.txt` file if there is not a specific option above for the
+configuration you need. To add multiple lines you must include `\n` separators.
+If double-quotes are needed in the lines you are adding you can use single
+quotes around the whole string.
+
+For example, to add a comment containing a double-quote and a configuration
+option:
+
+    RPI_EXTRA_CONFIG = ' \n \
+        # Raspberry Pi 7\" display/touch screen \n \
+        lcd_rotate=2 \n \
+        '

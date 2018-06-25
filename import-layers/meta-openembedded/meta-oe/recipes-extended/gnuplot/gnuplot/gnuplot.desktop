@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Gnuplot
 Comment=Plot data and function graphs
-Exec=x-terminal-emulator -e gnuplot
-Terminal=false
+Exec=gnuplot
+Terminal=true
 Type=Application
 Icon=gnuplot
 Categories=Science;

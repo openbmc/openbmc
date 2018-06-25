@@ -7,13 +7,16 @@ Upstream-Status: Inappropriate [distribution]
 Also simply disable the tk module since its not in DEPENDS.
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 
-Index: Python-2.7.2/setup.py
+Index: Python-2.7.13/setup.py
 ===================================================================
---- Python-2.7.2.orig/setup.py	2012-04-05 23:18:38.500136647 +0300
-+++ Python-2.7.2/setup.py	2012-04-05 23:19:35.888134969 +0300
-@@ -1634,8 +1634,10 @@
+--- Python-2.7.13.orig/setup.py
++++ Python-2.7.13/setup.py
+@@ -1783,10 +1783,12 @@ class PyBuildExt(build_ext):
+         self.extensions.extend(exts)
+ 
          # Call the method for detecting whether _tkinter can be compiled
-         self.detect_tkinter(inc_dirs, lib_dirs)
+-        self.detect_tkinter(inc_dirs, lib_dirs)
++        # self.detect_tkinter(inc_dirs, lib_dirs)
  
 -        if '_tkinter' not in [e.name for e in self.extensions]:
 -            missing.append('_tkinter')
@@ -22,18 +25,5 @@ Index: Python-2.7.2/setup.py
 +        #if '_tkinter' not in [e.name for e in self.extensions]:
 +        #    missing.append('_tkinter')
  
-         return missing
- 
-diff --git Python-3.5.1.orig/setup.py Python-3.5.1/setup.py
-index b4633b9..d7588c0 100644
---- Python-3.5.1.orig/setup.py
-+++ Python-3.5.1/setup.py
-@@ -1536,7 +1536,7 @@ class PyBuildExt(build_ext):
-         self.extensions.extend(exts)
- 
-         # Call the method for detecting whether _tkinter can be compiled
--        self.detect_tkinter(inc_dirs, lib_dirs)
-+        # self.detect_tkinter(inc_dirs, lib_dirs)
- 
-         # tkinter module will not be avalaible as yocto
-         # doesn't have tk integrated (yet)
+ ##         # Uncomment these lines if you want to play with xxmodule.c
+ ##         ext = Extension('xx', ['xxmodule.c'])

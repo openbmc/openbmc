@@ -1,0 +1,101 @@
+From eb0086dc4ea8fe9cda069456287b3a29a2631d30 Mon Sep 17 00:00:00 2001
+From: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+Date: Wed, 13 Dec 2017 16:18:45 +0900
+Subject: [PATCH] Fix the error of can't find header file
+
+Upstream-Status: Inappropriate [embedded specific]
+This fix is just for yocto.
+
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+---
+ src/NCApplication.cc | 2 +-
+ src/NCstyle.h        | 2 +-
+ src/NCurses.h        | 2 +-
+ src/ncursesp.h       | 2 +-
+ src/ncursesw.cc      | 2 +-
+ src/ncursesw.h       | 4 ++--
+ 6 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/src/NCApplication.cc b/src/NCApplication.cc
+index 5bcf969..510f034 100644
+--- a/src/NCApplication.cc
++++ b/src/NCApplication.cc
+@@ -23,7 +23,7 @@
+ 
+ /-*/
+ 
+-#include <ncursesw/curses.h>
++#include <curses.h>
+ 
+ #define  YUILogComponent "ncurses"
+ #include <yui/YUILog.h>
+diff --git a/src/NCstyle.h b/src/NCstyle.h
+index a40d5a8..3657917 100644
+--- a/src/NCstyle.h
++++ b/src/NCstyle.h
+@@ -25,7 +25,7 @@
+ #ifndef NCstyle_h
+ #define NCstyle_h
+ 
+-#include <ncursesw/ncurses.h>
++#include <ncurses.h>
+ 
+ #include <iosfwd>
+ #include <string>
+diff --git a/src/NCurses.h b/src/NCurses.h
+index a07c6bf..d17d3c3 100644
+--- a/src/NCurses.h
++++ b/src/NCurses.h
+@@ -34,7 +34,7 @@
+ #include <yui/YWidget.h>
+ #include <yui/YMenuItem.h>
+ 
+-#include <ncursesw/curses.h>	/* curses.h: #define  NCURSES_CH_T cchar_t */
++#include <curses.h>	/* curses.h: #define  NCURSES_CH_T cchar_t */
+ #include <wchar.h>
+ 
+ #include "ncursesw.h"
+diff --git a/src/ncursesp.h b/src/ncursesp.h
+index d478347..2fcfea5 100644
+--- a/src/ncursesp.h
++++ b/src/ncursesp.h
+@@ -28,7 +28,7 @@
+ #include <iosfwd>
+ 
+ #include "ncursesw.h"
+-#include <ncursesw/panel.h>
++#include <panel.h>
+ 
+ class NCursesPanel : public NCursesWindow
+ {
+diff --git a/src/ncursesw.cc b/src/ncursesw.cc
+index 3c771af..bb83210 100644
+--- a/src/ncursesw.cc
++++ b/src/ncursesw.cc
+@@ -47,7 +47,7 @@
+ #include <iostream>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <ncursesw/term.h>
++#include <term.h>
+ #undef line
+ #undef columns
+ 
+diff --git a/src/ncursesw.h b/src/ncursesw.h
+index d25923a..c140d37 100644
+--- a/src/ncursesw.h
++++ b/src/ncursesw.h
+@@ -27,8 +27,8 @@
+ 
+ #include <iosfwd>
+ 
+-#include <ncursesw/curses.h>
+-#include <ncursesw/etip.h>
++#include <curses.h>
++#include <etip.h>
+ #include <cstdio>
+ #include <cstdarg>
+ #include <climits>
+-- 
+2.7.4
+

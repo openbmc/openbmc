@@ -1,0 +1,10 @@
+--- a/tpm/tpm_cmd_handler.c.orig	2017-04-27 13:37:14.408000000 +0200
++++ b/tpm/tpm_cmd_handler.c	2017-04-27 13:39:53.585000000 +0200
+@@ -3397,6 +3397,7 @@
+                   sizeof(rsp->auth2->nonceOdd.nonce));
+       tpm_hmac_update(&hmac, (BYTE*)&rsp->auth2->continueAuthSession, 1);
+       tpm_hmac_final(&hmac, rsp->auth2->auth);
++      /* fall-thru */
+     case TPM_TAG_RSP_AUTH1_COMMAND:
+       tpm_hmac_init(&hmac, rsp->auth1->secret, sizeof(rsp->auth1->secret));
+       tpm_hmac_update(&hmac, rsp->auth1->digest, sizeof(rsp->auth1->digest));

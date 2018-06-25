@@ -1,7 +1,7 @@
-From e60aea50e41ae8a17672beb5859beecb66e7a305 Mon Sep 17 00:00:00 2001
+From b2efcc20617d6317f74c4acb2a6af5b765f20b34 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 14 Jul 2017 13:11:25 -0700
-Subject: [PATCH 1/3] ir-ctl: Define TEMP_FAILURE_RETRY if undefined
+Subject: [PATCH] ir-ctl: Define TEMP_FAILURE_RETRY if undefined
 
 use strndup() instead of strndupa() which is not
 universally available in C libraries
@@ -9,6 +9,7 @@ universally available in C libraries
 Taken from AlpineLinux
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  utils/ir-ctl/ir-ctl.c | 14 +++++++++++++-
  1 file changed, 13 insertions(+), 1 deletion(-)
@@ -50,6 +51,3 @@ index bc58cee..1a44011 100644
  
  	if (!strtoscancode(p + 1, &scancode)) {
  		fprintf(stderr, _("error: invalid scancode '%s'\n"), p + 1);
--- 
-2.13.3
-

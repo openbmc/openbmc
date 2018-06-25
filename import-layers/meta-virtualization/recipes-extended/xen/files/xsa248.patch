@@ -1,0 +1,164 @@
+From: Jan Beulich <jbeulich@suse.com>
+Subject: x86/mm: don't wrongly set page ownership
+
+PV domains can obtain mappings of any pages owned by the correct domain,
+including ones that aren't actually assigned as "normal" RAM, but used
+by Xen internally.  At the moment such "internal" pages marked as owned
+by a guest include pages used to track logdirty bits, as well as p2m
+pages and the "unpaged pagetable" for HVM guests. Since the PV memory
+management and shadow code conflict in their use of struct page_info
+fields, and since shadow code is being used for log-dirty handling for
+PV domains, pages coming from the shadow pool must, for PV domains, not
+have the domain set as their owner.
+
+While the change could be done conditionally for just the PV case in
+shadow code, do it unconditionally (and for consistency also for HAP),
+just to be on the safe side.
+
+There's one special case though for shadow code: The page table used for
+running a HVM guest in unpaged mode is subject to get_page() (in
+set_shadow_status()) and hence must have its owner set.
+
+This is XSA-248.
+
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
+Reviewed-by: Tim Deegan <tim@xen.org>
+Reviewed-by: George Dunlap <george.dunlap@citrix.com>
+---
+v2: Drop PGC_page_table related pieces.
+
+--- a/xen/arch/x86/mm/hap/hap.c
++++ b/xen/arch/x86/mm/hap/hap.c
+@@ -286,8 +286,7 @@ static struct page_info *hap_alloc_p2m_p
+     {
+         d->arch.paging.hap.total_pages--;
+         d->arch.paging.hap.p2m_pages++;
+-        page_set_owner(pg, d);
+-        pg->count_info |= 1;
++        ASSERT(!page_get_owner(pg) && !(pg->count_info & PGC_count_mask));
+     }
+     else if ( !d->arch.paging.p2m_alloc_failed )
+     {
+@@ -302,21 +301,23 @@ static struct page_info *hap_alloc_p2m_p
+ 
+ static void hap_free_p2m_page(struct domain *d, struct page_info *pg)
+ {
++    struct domain *owner = page_get_owner(pg);
++
+     /* This is called both from the p2m code (which never holds the 
+      * paging lock) and the log-dirty code (which always does). */
+     paging_lock_recursive(d);
+ 
+-    ASSERT(page_get_owner(pg) == d);
+-    /* Should have just the one ref we gave it in alloc_p2m_page() */
+-    if ( (pg->count_info & PGC_count_mask) != 1 ) {
+-        HAP_ERROR("Odd p2m page %p count c=%#lx t=%"PRtype_info"\n",
+-                     pg, pg->count_info, pg->u.inuse.type_info);
++    /* Should still have no owner and count zero. */
++    if ( owner || (pg->count_info & PGC_count_mask) )
++    {
++        HAP_ERROR("d%d: Odd p2m page %"PRI_mfn" d=%d c=%lx t=%"PRtype_info"\n",
++                  d->domain_id, mfn_x(page_to_mfn(pg)),
++                  owner ? owner->domain_id : DOMID_INVALID,
++                  pg->count_info, pg->u.inuse.type_info);
+         WARN();
++        pg->count_info &= ~PGC_count_mask;
++        page_set_owner(pg, NULL);
+     }
+-    pg->count_info &= ~PGC_count_mask;
+-    /* Free should not decrement domain's total allocation, since
+-     * these pages were allocated without an owner. */
+-    page_set_owner(pg, NULL);
+     d->arch.paging.hap.p2m_pages--;
+     d->arch.paging.hap.total_pages++;
+     hap_free(d, page_to_mfn(pg));
+--- a/xen/arch/x86/mm/shadow/common.c
++++ b/xen/arch/x86/mm/shadow/common.c
+@@ -1503,32 +1503,29 @@ shadow_alloc_p2m_page(struct domain *d)
+     pg = mfn_to_page(shadow_alloc(d, SH_type_p2m_table, 0));
+     d->arch.paging.shadow.p2m_pages++;
+     d->arch.paging.shadow.total_pages--;
++    ASSERT(!page_get_owner(pg) && !(pg->count_info & PGC_count_mask));
+ 
+     paging_unlock(d);
+ 
+-    /* Unlike shadow pages, mark p2m pages as owned by the domain.
+-     * Marking the domain as the owner would normally allow the guest to
+-     * create mappings of these pages, but these p2m pages will never be
+-     * in the domain's guest-physical address space, and so that is not
+-     * believed to be a concern. */
+-    page_set_owner(pg, d);
+-    pg->count_info |= 1;
+     return pg;
+ }
+ 
+ static void
+ shadow_free_p2m_page(struct domain *d, struct page_info *pg)
+ {
+-    ASSERT(page_get_owner(pg) == d);
+-    /* Should have just the one ref we gave it in alloc_p2m_page() */
+-    if ( (pg->count_info & PGC_count_mask) != 1 )
++    struct domain *owner = page_get_owner(pg);
++
++    /* Should still have no owner and count zero. */
++    if ( owner || (pg->count_info & PGC_count_mask) )
+     {
+-        SHADOW_ERROR("Odd p2m page count c=%#lx t=%"PRtype_info"\n",
++        SHADOW_ERROR("d%d: Odd p2m page %"PRI_mfn" d=%d c=%lx t=%"PRtype_info"\n",
++                     d->domain_id, mfn_x(page_to_mfn(pg)),
++                     owner ? owner->domain_id : DOMID_INVALID,
+                      pg->count_info, pg->u.inuse.type_info);
++        pg->count_info &= ~PGC_count_mask;
++        page_set_owner(pg, NULL);
+     }
+-    pg->count_info &= ~PGC_count_mask;
+     pg->u.sh.type = SH_type_p2m_table; /* p2m code reuses type-info */
+-    page_set_owner(pg, NULL);
+ 
+     /* This is called both from the p2m code (which never holds the
+      * paging lock) and the log-dirty code (which always does). */
+@@ -3132,7 +3129,9 @@ int shadow_enable(struct domain *d, u32
+         e = __map_domain_page(pg);
+         write_32bit_pse_identmap(e);
+         unmap_domain_page(e);
++        pg->count_info = 1;
+         pg->u.inuse.type_info = PGT_l2_page_table | 1 | PGT_validated;
++        page_set_owner(pg, d);
+     }
+ 
+     paging_lock(d);
+@@ -3170,7 +3169,11 @@ int shadow_enable(struct domain *d, u32
+     if ( rv != 0 && !pagetable_is_null(p2m_get_pagetable(p2m)) )
+         p2m_teardown(p2m);
+     if ( rv != 0 && pg != NULL )
++    {
++        pg->count_info &= ~PGC_count_mask;
++        page_set_owner(pg, NULL);
+         shadow_free_p2m_page(d, pg);
++    }
+     domain_unpause(d);
+     return rv;
+ }
+@@ -3279,7 +3282,22 @@ out:
+ 
+     /* Must be called outside the lock */
+     if ( unpaged_pagetable )
++    {
++        if ( page_get_owner(unpaged_pagetable) == d &&
++             (unpaged_pagetable->count_info & PGC_count_mask) == 1 )
++        {
++            unpaged_pagetable->count_info &= ~PGC_count_mask;
++            page_set_owner(unpaged_pagetable, NULL);
++        }
++        /* Complain here in cases where shadow_free_p2m_page() won't. */
++        else if ( !page_get_owner(unpaged_pagetable) &&
++                  !(unpaged_pagetable->count_info & PGC_count_mask) )
++            SHADOW_ERROR("d%d: Odd unpaged pt %"PRI_mfn" c=%lx t=%"PRtype_info"\n",
++                         d->domain_id, mfn_x(page_to_mfn(unpaged_pagetable)),
++                         unpaged_pagetable->count_info,
++                         unpaged_pagetable->u.inuse.type_info);
+         shadow_free_p2m_page(d, unpaged_pagetable);
++    }
+ }
+ 
+ void shadow_final_teardown(struct domain *d)

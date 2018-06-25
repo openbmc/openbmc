@@ -28,10 +28,10 @@ https://raw.githubusercontent.com/rdnetto/teapot-buildroot/master/package/libunw
  include/libunwind_i.h | 1 +
  2 files changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index 497f7c2..9c15af1 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
+Index: libunwind-1.2.1/acinclude.m4
+===================================================================
+--- libunwind-1.2.1.orig/acinclude.m4
++++ libunwind-1.2.1/acinclude.m4
 @@ -22,11 +22,5 @@ fi])
  AC_DEFUN([CHECK_ATOMIC_OPS],
  [dnl Check whether the system has the atomic_ops package installed.
@@ -45,18 +45,15 @@ index 497f7c2..9c15af1 100644
 -#  AC_CHECK_LIB(atomic_ops, main)
 +  AC_CHECK_LIB(atomic_ops, main)
  ])
-diff --git a/include/libunwind_i.h b/include/libunwind_i.h
-index 23f615e..deabdfd 100644
---- a/include/libunwind_i.h
-+++ b/include/libunwind_i.h
-@@ -95,6 +95,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
- 	(pthread_mutex_unlock != NULL ? pthread_mutex_unlock (l) : 0)
+Index: libunwind-1.2.1/include/libunwind_i.h
+===================================================================
+--- libunwind-1.2.1.orig/include/libunwind_i.h
++++ libunwind-1.2.1/include/libunwind_i.h
+@@ -116,6 +116,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DE
+         (pthread_mutex_unlock != NULL ? pthread_mutex_unlock (l) : 0)
  
  #ifdef HAVE_ATOMIC_OPS_H
 +# define AO_REQUIRE_CAS
  # include <atomic_ops.h>
  static inline int
  cmpxchg_ptr (void *addr, void *old, void *new)
--- 
-1.9.2
-

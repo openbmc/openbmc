@@ -1,0 +1,42 @@
+From a714658727206d2a98a7194b7e6d29dbd3e27b8d Mon Sep 17 00:00:00 2001
+From: David Smith <dsmith@redhat.com>
+Date: Mon, 19 Mar 2018 16:50:05 -0500
+Subject: [PATCH] Added a couple of small sysroot fixes.
+
+* tapsets.cxx (dwarf_builder::build): Fix commit 4ffecddf5.
+  (path_remove_sysroot): Fix extra '/' present at start of paths.
+
+Upstream-Status: Backport
+Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+---
+ tapsets.cxx | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+Index: git/tapsets.cxx
+===================================================================
+--- git.orig/tapsets.cxx
++++ git/tapsets.cxx
+@@ -1395,7 +1395,8 @@ string path_remove_sysroot(const systemt
+   string retval = path;
+   if (!sess.sysroot.empty() &&
+       (pos = retval.find(sess.sysroot)) != string::npos)
+-    retval.replace(pos, sess.sysroot.length(), "/");
++    retval.replace(pos, sess.sysroot.length(),
++		   (sess.sysroot.back() == '/' ? "/": ""));
+   return retval;
+ }
+ 
+@@ -8412,8 +8413,11 @@ dwarf_builder::build(systemtap_session &
+ 
+       // PR13338: unquote glob results
+       module_name = unescape_glob_chars (module_name);
+-      user_path = find_executable (module_name, "", sess.sysenv); // canonicalize it
+-      if (!is_fully_resolved(user_path, sess.sysroot, sess.sysenv))
++      user_path = find_executable (module_name, sess.sysroot, sess.sysenv); // canonicalize it
++      // Note we don't need to pass the sysroot to
++      // is_fully_resolved(), since we just passed it to
++      // find_executable().
++      if (!is_fully_resolved(user_path, "", sess.sysenv))
+         throw SEMANTIC_ERROR(_F("cannot find executable '%s'",
+                                 user_path.to_string().c_str()));
+ 

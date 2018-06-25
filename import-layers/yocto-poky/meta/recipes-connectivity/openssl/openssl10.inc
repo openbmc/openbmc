@@ -25,7 +25,7 @@ TERMIO_libc-musl = "-DTERMIOS"
 TERMIO ?= "-DTERMIO"
 # Avoid binaries being marked as requiring an executable stack since it 
 # doesn't(which causes and this causes issues with SELinux
-CFLAG = "${@base_conditional('SITEINFO_ENDIANNESS', 'le', '-DL_ENDIAN', '-DB_ENDIAN', d)} \
+CFLAG = "${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '-DL_ENDIAN', '-DB_ENDIAN', d)} \
 	 ${TERMIO} ${CFLAGS} -Wall -Wa,--noexecstack"
 
 export DIRS = "crypto ssl apps"
@@ -135,6 +135,12 @@ do_configure () {
 	linux-powerpc64)
 		target=linux-ppc64
 		;;
+	linux-riscv64)
+		target=linux-generic64
+		;;
+	linux-riscv32)
+		target=linux-generic32
+		;;
 	linux-supersparc)
 		target=linux-sparcv8
 		;;
@@ -151,7 +157,8 @@ do_configure () {
         if [ "x$useprefix" = "x" ]; then
                 useprefix=/
         fi        
-	perl ./Configure ${EXTRA_OECONF} shared --prefix=$useprefix --openssldir=${libdir}/ssl --libdir=`basename ${libdir}` $target
+	libdirleaf="$(echo ${libdir} | sed s:$useprefix::)"
+	perl ./Configure ${EXTRA_OECONF} shared --prefix=$useprefix --openssldir=${libdir}/ssl --libdir=${libdirleaf} $target
 }
 
 do_compile_prepend_class-target () {

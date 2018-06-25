@@ -10,14 +10,13 @@ SRC_URI = "file://LSB_Test.sh \
 		   file://packages_list \
 		   file://session \
 		   "
-RDEPENDS_${PN} = "rpm"
+RDEPENDS_${PN} = "lsb rpm"
 
 S = "${WORKDIR}"
 
 do_install() {
-	install -d ${D}${bindir}
-	install -m 0755 ${S}/LSB_Test.sh ${D}${bindir}
 	install -d  ${D}/opt/lsb-test
+	install -m 0755 ${S}/LSB_Test.sh ${D}/opt/lsb-test/LSB_Test.sh
 	install -m 0644 ${S}/packages_list ${D}/opt/lsb-test/packages_list
 	install -m 0644 ${S}/session ${D}/opt/lsb-test/session
 	if [ "${TARGET_ARCH}" = "i586" ] || [ "${TARGET_ARCH}" = "i686" ];then

@@ -25,12 +25,10 @@ python () {
 }
 
 python debian_package_name_hook () {
-    import glob, copy, stat, errno, re
+    import glob, copy, stat, errno, re, pathlib, subprocess
 
-    pkgdest = d.getVar('PKGDEST')
+    pkgdest = d.getVar("PKGDEST")
     packages = d.getVar('PACKAGES')
-    bin_re = re.compile(".*/s?" + os.path.basename(d.getVar("bindir")) + "$")
-    lib_re = re.compile(".*/" + os.path.basename(d.getVar("libdir")) + "$")
     so_re = re.compile("lib.*\.so")
 
     def socrunch(s):
@@ -60,25 +58,32 @@ python debian_package_name_hook () {
                 d.appendVar('RPROVIDES_' + pkg, " " + pkg + " (=" + d.getVar("PKGV") + ")")
 
     def auto_libname(packages, orig_pkg):
+        p = lambda var: pathlib.PurePath(d.getVar(var))
+        libdirs = (p("base_libdir"), p("libdir"))
+        bindirs = (p("base_bindir"), p("base_sbindir"), p("bindir"), p("sbindir"))
+
         sonames = []
         has_bins = 0
         has_libs = 0
-        for file in pkgfiles[orig_pkg]:
-            root = os.path.dirname(file)
-            if bin_re.match(root):
+        for f in pkgfiles[orig_pkg]:
+            # This is .../packages-split/orig_pkg/
+            pkgpath = pathlib.PurePath(pkgdest, orig_pkg)
+            # Strip pkgpath off the full path to a file in the package, re-root
+            # so it is absolute, and then get the parent directory of the file.
+            path = pathlib.PurePath("/") / (pathlib.PurePath(f).relative_to(pkgpath).parent)
+            if path in bindirs:
                 has_bins = 1
-            if lib_re.match(root):
+            if path in libdirs:
                 has_libs = 1
-                if so_re.match(os.path.basename(file)):
-                    cmd = (d.getVar('TARGET_PREFIX') or "") + "objdump -p " + file + " 2>/dev/null"
-                    fd = os.popen(cmd)
-                    lines = fd.readlines()
-                    fd.close()
-                    for l in lines:
-                        m = re.match("\s+SONAME\s+([^\s]*)", l)
-                        if m and not m.group(1) in sonames:
-                            sonames.append(m.group(1))
-
+                if so_re.match(os.path.basename(f)):
+                    try:
+                        cmd = [d.expand("${TARGET_PREFIX}objdump"), "-p", f]
+                        output = subprocess.check_output(cmd).decode("utf-8")
+                        for m in re.finditer("\s+SONAME\s+([^\s]+)", output):
+                            if m.group(1) not in sonames:
+                                sonames.append(m.group(1))
+                    except subprocess.CalledProcessError:
+                        pass
         bb.debug(1, 'LIBNAMES: pkg %s libs %d bins %d sonames %s' % (orig_pkg, has_libs, has_bins, sonames))
         soname = None
         if len(sonames) == 1:
@@ -120,6 +125,7 @@ python debian_package_name_hook () {
                         if not newpkg.find(mlpre) == 0:
                             newpkg = mlpre + newpkg
                     if newpkg != pkg:
+                        bb.note("debian: renaming %s to %s" % (pkg, newpkg))
                         d.setVar('PKG_' + pkg, newpkg)
                         add_rprovides(pkg, d)
         else:
@@ -138,4 +144,3 @@ python debian_package_name_hook () {
 EXPORT_FUNCTIONS package_name_hook
 
 DEBIAN_NAMES = "1"
-

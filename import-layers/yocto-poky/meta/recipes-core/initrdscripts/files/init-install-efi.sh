@@ -8,8 +8,19 @@
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
-# We need 20 Mb for the boot partition
-boot_size=20
+# figure out how big of a boot partition we need
+boot_size=$(du -ms /run/media/$1/ | awk '{print $1}')
+# remove rootfs.img ($2) from the size if it exists, as its not installed to /boot
+if [ -e /run/media/$1/$2 ]; then
+    boot_size=$(( boot_size - $( du -ms /run/media/$1/$2 | awk '{print $1}') ))
+fi
+# remove initrd from size since its not currently installed
+if [ -e /run/media/$1/initrd ]; then
+    boot_size=$(( boot_size - $( du -ms /run/media/$1/initrd | awk '{print $1}') ))
+fi
+# add 10M to provide some extra space for users and account
+# for rounding in the above subtractions
+boot_size=$(( boot_size + 10 ))
 
 # 5% for swap
 swap_ratio=5
@@ -179,7 +190,7 @@ parted ${device} mkpart boot fat32 0% $boot_size
 parted ${device} set 1 boot on
 
 echo "Creating rootfs partition on $rootfs"
-parted ${device} mkpart root ext3 $rootfs_start $rootfs_end
+parted ${device} mkpart root ext4 $rootfs_start $rootfs_end
 
 echo "Creating swap partition on $swap"
 parted ${device} mkpart swap linux-swap $swap_start 100%
@@ -196,8 +207,8 @@ done
 echo "Formatting $bootfs to vfat..."
 mkfs.vfat $bootfs
 
-echo "Formatting $rootfs to ext3..."
-mkfs.ext3 $rootfs
+echo "Formatting $rootfs to ext4..."
+mkfs.ext4 $rootfs
 
 echo "Formatting swap partition...($swap)"
 mkswap $swap
@@ -244,10 +255,9 @@ if [ -f /run/media/$1/EFI/BOOT/grub.cfg ]; then
     sed -i "/initrd /d" $GRUBCFG
     # Delete any LABEL= strings
     sed -i "s/ LABEL=[^ ]*/ /" $GRUBCFG
-    # Delete any root= strings
-    sed -i "s/ root=[^ ]*/ /g" $GRUBCFG
-    # Add the root= and other standard boot options
-    sed -i "s@linux /vmlinuz *@linux /vmlinuz root=PARTUUID=$root_part_uuid rw $rootwait quiet @" $GRUBCFG
+    # Replace root= and add additional standard boot options
+    # We use root as a sentinel value, as vmlinuz is no longer guaranteed
+    sed -i "s/ root=[^ ]*/ root=PARTUUID=$root_part_uuid rw $rootwait quiet /g" $GRUBCFG
 fi
 
 if [ -d /run/media/$1/loader ]; then
@@ -269,7 +279,13 @@ fi
 
 umount /tgt_root
 
-cp /run/media/$1/vmlinuz /boot
+# Copy kernel artifacts. To add more artifacts just add to types
+# For now just support kernel types already being used by something in OE-core
+for types in bzImage zImage vmlinux vmlinuz fitImage; do
+    for kernel in `find /run/media/$1/ -name $types*`; do
+        cp $kernel /boot
+    done
+done
 
 umount /boot
 

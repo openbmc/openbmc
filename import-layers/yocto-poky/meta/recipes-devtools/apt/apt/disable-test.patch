@@ -17,10 +17,10 @@ Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
  configure.ac | 7 -------
  2 files changed, 3 insertions(+), 13 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 7680f08..69527a5 100644
---- a/Makefile
-+++ b/Makefile
+Index: apt-1.2.24/Makefile
+===================================================================
+--- apt-1.2.24.orig/Makefile
++++ apt-1.2.24/Makefile
 @@ -9,8 +9,8 @@ endif
  .PHONY: default
  default: startup all
@@ -32,9 +32,9 @@ index 7680f08..69527a5 100644
  	$(MAKE) -C vendor $@
  	$(MAKE) -C apt-pkg $@
  	$(MAKE) -C apt-inst $@
-@@ -21,8 +21,6 @@ all headers library clean veryclean binary program doc manpages docbook test upd
+@@ -21,8 +21,6 @@ all headers library clean veryclean bina
  	$(MAKE) -C dselect $@
- 	$(MAKE) -C doc $@
+ #	$(MAKE) -C doc $@
  	$(MAKE) -C po $@
 -	# FIXME: -C test has issue swith parallel builds, investigate!
 -	-$(MAKE) -C test $@
@@ -52,10 +52,10 @@ index 7680f08..69527a5 100644
  
  dirs: startup
  
-diff --git a/configure.ac b/configure.ac
-index 1f05da5..e47f459 100644
---- a/configure.ac
-+++ b/configure.ac
+Index: apt-1.2.24/configure.ac
+===================================================================
+--- apt-1.2.24.orig/configure.ac
++++ apt-1.2.24/configure.ac
 @@ -90,13 +90,6 @@ AC_CHECK_LIB(curl, curl_easy_init,
       AC_MSG_ERROR([failed: I need CURL due https support]),
  )
@@ -70,6 +70,3 @@ index 1f05da5..e47f459 100644
  AC_SUBST(BDBLIB)
  
  HAVE_ZLIB=no
--- 
-2.1.4
-

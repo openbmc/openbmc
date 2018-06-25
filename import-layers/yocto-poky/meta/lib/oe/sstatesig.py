@@ -1,4 +1,5 @@
 import bb.siggen
+import oe
 
 def sstate_rundepfilter(siggen, fn, recipename, task, dep, depname, dataCache):
     # Return True if we should keep the dependency, False to drop it
@@ -28,13 +29,12 @@ def sstate_rundepfilter(siggen, fn, recipename, task, dep, depname, dataCache):
             return False
         return True
 
-    # Quilt (patch application) changing isn't likely to affect anything
-    excludelist = ['quilt-native', 'subversion-native', 'git-native', 'ccache-native']
-    if depname in excludelist and recipename != depname:
-        return False
-
     # Exclude well defined recipe->dependency
     if "%s->%s" % (recipename, depname) in siggen.saferecipedeps:
+        return False
+
+    # Check for special wildcard
+    if "*->%s" % depname in siggen.saferecipedeps and recipename != depname:
         return False
 
     # Don't change native/cross/nativesdk recipe dependencies any further
@@ -368,3 +368,37 @@ def sstate_get_manifest_filename(task, d):
     if extrainf:
         d2.setVar("SSTATE_MANMACH", extrainf)
     return (d2.expand("${SSTATE_MANFILEPREFIX}.%s" % task), d2)
+
+def find_sstate_manifest(taskdata, taskdata2, taskname, d, multilibcache):
+    d2 = d
+    variant = ''
+    if taskdata2.startswith("virtual:multilib"):
+        variant = taskdata2.split(":")[2]
+        if variant not in multilibcache:
+            multilibcache[variant] = oe.utils.get_multilib_datastore(variant, d)
+        d2 = multilibcache[variant]
+
+    if taskdata.endswith("-native"):
+        pkgarchs = ["${BUILD_ARCH}"]
+    elif taskdata.startswith("nativesdk-"):
+        pkgarchs = ["${SDK_ARCH}_${SDK_OS}", "allarch"]
+    elif "-cross-canadian" in taskdata:
+        pkgarchs = ["${SDK_ARCH}_${SDK_ARCH}-${SDKPKGSUFFIX}"]
+    elif "-cross-" in taskdata:
+        pkgarchs = ["${BUILD_ARCH}_${TARGET_ARCH}"]
+    elif "-crosssdk" in taskdata:
+        pkgarchs = ["${BUILD_ARCH}_${SDK_ARCH}_${SDK_OS}"]
+    else:
+        pkgarchs = ['${MACHINE_ARCH}']
+        pkgarchs = pkgarchs + list(reversed(d2.getVar("PACKAGE_EXTRA_ARCHS").split()))
+        pkgarchs.append('allarch')
+        pkgarchs.append('${SDK_ARCH}_${SDK_ARCH}-${SDKPKGSUFFIX}')
+
+    for pkgarch in pkgarchs:
+        manifest = d2.expand("${SSTATE_MANIFESTS}/manifest-%s-%s.%s" % (pkgarch, taskdata, taskname))
+        if os.path.exists(manifest):
+            return manifest, d2
+    bb.warn("Manifest %s not found in %s (variant '%s')?" % (manifest, d2.expand(" ".join(pkgarchs)), variant))
+    return None, d2
+
+

@@ -17,6 +17,9 @@ SRC_URI = "http://monkey-project.com/releases/1.5/monkey-${PV}.tar.gz \
 SRC_URI[md5sum] = "9699e4c9ea6ce6b989907c252ae80254"
 SRC_URI[sha256sum] = "7c3d845306aa74ee6effd7ab6169d16ac4e6450e564954d0d0baa2d1e9be1a22"
 
+UPSTREAM_CHECK_URI = "https://github.com/monkey/monkey/releases"
+UPSTREAM_CHECK_REGEX = "v(?P<pver>\d+(\.\d+)+).tar.gz"
+
 EXTRA_OECONF = "--plugdir=${libdir}/monkey/ \
                 --logdir=${localstatedir}/log/monkey/ \
                 --pidfile=${localstatedir}/run/monkey.pid \

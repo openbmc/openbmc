@@ -11,3 +11,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=73eed1a5470b969951dac411086c7036"
 
 SRC_URI[md5sum] = "254869dae3fd9f09f0746a3cb29a0b15"
 SRC_URI[sha256sum] = "3d948f64138c25633613f303bcc471126eae67c04d5e3f6b7b8ce6242f8653e0"
+
+RDEPENDS_${PN} += "\
+    ${PYTHON_PN}-crypt \
+    ${PYTHON_PN}-logging \
+    ${PYTHON_PN}-netclient \
+"

@@ -187,7 +187,7 @@ def explode_deps(s):
             #r[-1] += ' ' + ' '.join(j)
     return r
 
-def explode_dep_versions2(s):
+def explode_dep_versions2(s, *, sort=True):
     """
     Take an RDEPENDS style string of format:
     "DEPEND1 (optional version) DEPEND2 (optional version) ..."
@@ -250,7 +250,8 @@ def explode_dep_versions2(s):
         if not (i in r and r[i]):
             r[lastdep] = []
 
-    r = collections.OrderedDict(sorted(r.items(), key=lambda x: x[0]))
+    if sort:
+        r = collections.OrderedDict(sorted(r.items(), key=lambda x: x[0]))
     return r
 
 def explode_dep_versions(s):
@@ -806,8 +807,8 @@ def movefile(src, dest, newmtime = None, sstat = None):
                 return None # failure
         try:
             if didcopy:
-                os.lchown(dest, sstat[stat.ST_UID], sstat[stat.ST_GID])
-                os.chmod(dest, stat.S_IMODE(sstat[stat.ST_MODE])) # Sticky is reset on chown
+                os.lchown(destpath, sstat[stat.ST_UID], sstat[stat.ST_GID])
+                os.chmod(destpath, stat.S_IMODE(sstat[stat.ST_MODE])) # Sticky is reset on chown
                 os.unlink(src)
         except Exception as e:
             print("movefile: Failed to chown/chmod/unlink", dest, e)

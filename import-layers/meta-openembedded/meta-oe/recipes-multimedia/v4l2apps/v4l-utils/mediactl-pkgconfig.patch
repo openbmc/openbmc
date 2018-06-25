@@ -1,8 +1,16 @@
-Index: v4l-utils-1.6.2/utils/media-ctl/Makefile.am
-===================================================================
---- v4l-utils-1.6.2.orig/utils/media-ctl/Makefile.am
-+++ v4l-utils-1.6.2/utils/media-ctl/Makefile.am
-@@ -7,6 +7,7 @@ libv4l2subdev_la_LIBADD = libmediactl.la
+From 480c04ac6a9d11bfef9d4aca073052fdcee4fdea Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 1 Mar 2015 22:25:07 +0000
+
+---
+ utils/media-ctl/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/utils/media-ctl/Makefile.am b/utils/media-ctl/Makefile.am
+index d11fa2e..7c520a2 100644
+--- a/utils/media-ctl/Makefile.am
++++ b/utils/media-ctl/Makefile.am
+@@ -20,6 +20,7 @@ libv4l2subdev_la_LIBADD = libmediactl.la
  mediactl_includedir=$(includedir)/mediactl
  noinst_HEADERS = mediactl.h v4l2subdev.h
  

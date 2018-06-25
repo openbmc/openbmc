@@ -4,6 +4,7 @@ about the configuration files for the grub, lilo, elilo (ia64), yaboot (powerpc)
 zipl (s390) boot loaders. It is primarily designed to be used from scripts which install \
 new kernels and need to find information about the current boot environment. \
 "
+HOMEPAGE = "https://github.com/rhboot/grubby"
 LICENSE = "GPLv2+"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
@@ -11,17 +12,14 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
 DEPENDS = "popt util-linux"
 DEPENDS_append_libc-musl = " libexecinfo"
 
-SRC_URI = "https://github.com/rhinstaller/${BPN}/archive/${PV}-1.tar.gz;downloadfilename=${BPN}-${PV}-1.tar.gz \
+S = "${WORKDIR}/git"
+SRCREV = "79c5cfa02c567efdc5bb18cdd584789e2e35aa23"
+SRC_URI = "git://github.com/rhboot/grubby.git;protocol=https; \
            file://grubby-rename-grub2-editenv-to-grub-editenv.patch \
            file://run-ptest \
            file://0001-Add-another-variable-LIBS-to-provides-libraries-from.patch \
            file://0002-include-paths.h-for-_PATH_MOUNTED.patch \
            "
-
-SRC_URI[md5sum] = "1005907b275d6d93368d045274537d86"
-SRC_URI[sha256sum] = "85f1c678484f74c8978e8643451594967defce463a86c35cb1ee56d12767a9df"
-
-S = "${WORKDIR}/${BPN}-${PV}-1"
 
 RDEPENDS_${PN} += "dracut"
 

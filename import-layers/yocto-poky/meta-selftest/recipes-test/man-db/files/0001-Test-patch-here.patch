@@ -1,0 +1,22 @@
+From efc8831f33106e6b48de8e612c2d816fe7d1ae68 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 9 Feb 2018 17:37:48 +0200
+Subject: [PATCH] Test patch here!
+
+This is an invalid patch used by oe-selftest
+---
+ README | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/README b/README
+index 48fff57..26d1234 100644
+--- a/README
++++ b/README
+@@ -1,3 +1,4 @@
++This is a test patch for purposes of oe-selftest
+ THIS LINE MAKES THIS PATCH INVALID README for the man-db manual pager suite
+ ========================================
+ 
+-- 
+2.15.1
+

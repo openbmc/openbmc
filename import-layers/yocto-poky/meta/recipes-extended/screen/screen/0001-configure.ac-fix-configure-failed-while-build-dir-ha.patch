@@ -9,7 +9,8 @@ test always return true.
 We rarely use "yes;" to name build dir, so s/yes/yes;/g
 could fix the issue
 
-Upstream-Status: Pending
+Upstream-Status: Accepted
+https://git.savannah.gnu.org/cgit/screen.git/commit/?h=screen-v4&id=8c2b4061d16756ee2ed37f08db063b8215656943
 
 Signed-off-by: Jian Kang <jian.kang@windriver.com>
 ---

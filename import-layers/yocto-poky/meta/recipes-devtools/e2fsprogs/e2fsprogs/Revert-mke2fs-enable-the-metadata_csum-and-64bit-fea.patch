@@ -19,10 +19,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  misc/mke2fs.conf.in | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/misc/mke2fs.conf.in b/misc/mke2fs.conf.in
-index 812f7c7..0280398 100644
---- a/misc/mke2fs.conf.in
-+++ b/misc/mke2fs.conf.in
+Index: git/misc/mke2fs.conf.in
+===================================================================
+--- git.orig/misc/mke2fs.conf.in
++++ git/misc/mke2fs.conf.in
 @@ -11,8 +11,9 @@
  		features = has_journal
  	}
@@ -32,5 +32,5 @@ index 812f7c7..0280398 100644
  		inode_size = 256
 +		auto_64-bit_support = 1
  	}
- 	ext4dev = {
- 		features = has_journal,extent,huge_file,flex_bg,uninit_bg,inline_data,64bit,dir_nlink,extra_isize
+ 	small = {
+ 		blocksize = 1024

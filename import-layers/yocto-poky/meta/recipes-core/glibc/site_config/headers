@@ -9,7 +9,6 @@ asm/page.h
 asm/types.h
 assert.h
 byteswap.h
-crypt.h
 ctype.h
 dirent.h
 dlfcn.h

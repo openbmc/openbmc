@@ -1,0 +1,51 @@
+From 697e2e9ff97487266d817cdd41bacc83f681e3d7 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 29 Apr 2012 00:05:59 +0200
+Subject: [PATCH 4/4] SConstruct: disable html and man docs building because
+ xmlto-native from OE is broken
+
+It will try to load dtd and fail:
+| xmlto man gpsctl.xml; mv `basename gpsctl.1` gpsctl.1
+| xmlto: /var/lib/jenkins/jobs/shr-core-branches/workspace/shr-core/tmp-eglibc/work/armv4t-oe-linux-gnueabi/gpsd-3.4-r2/gpsd-3.4/gpsctl.xml does not validate (status 3)
+| xmlto: Fix document syntax or use --skip-validation option
+| I/O error : Attempt to load network entity http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd
+| /var/lib/jenkins/jobs/shr-core-branches/workspace/shr-core/tmp-eglibc/work/armv4t-oe-linux-gnueabi/gpsd-3.4-r2/gpsd-3.4/gpsctl.xml:8: warning: failed to load external entity "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+|    "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+|                                                               ^
+| I/O error : Attempt to load network entity http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd
+| warning: failed to load external entity "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+| validity error : Could not load the external subset "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+| Document /var/lib/jenkins/jobs/shr-core-branches/workspace/shr-core/tmp-eglibc/work/armv4t-oe-linux-gnueabi/gpsd-3.4-r2/gpsd-3.4/gpsctl.xml does not validate
+| mv: cannot stat `gpsctl.1': No such file or directory
+| scons: *** [gpsctl.1] Error 1
+| scons: building terminated because of errors.
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Signed-off-by: Peter A. Bigot <pab@pabigot.com>
+---
+ SConstruct | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/SConstruct b/SConstruct
+index 3318bb48..a5bb756d 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -889,11 +889,11 @@ else:
+ 
+     manbuilder = htmlbuilder = None
+     if env['manbuild']:
+-        if config.CheckXsltproc():
++        if False and config.CheckXsltproc():
+             build = "xsltproc --nonet %s $SOURCE >$TARGET"
+             htmlbuilder = build % docbook_html_uri
+             manbuilder = build % docbook_man_uri
+-        elif WhereIs("xmlto"):
++        elif False and WhereIs("xmlto"):
+             xmlto = "xmlto %s $SOURCE || mv `basename $TARGET` " \
+                     "`dirname $TARGET`"
+             htmlbuilder = xmlto % "html-nochunks"
+-- 
+1.8.5.5
+

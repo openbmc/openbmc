@@ -1,0 +1,30 @@
+# HG changeset patch
+# User Daiki Ueno <dueno@redhat.com>
+# Date 1516710574 -3600
+#      Tue Jan 23 13:29:34 2018 +0100
+# Node ID 27f27ce21c2c6ff5a47fa9e17c438b000366c9c9
+# Parent  be1dca5ac80541d3b81a8da9d42854d8b1cceefb
+Build Hacl_Poly1305_64.o on aarch64 even with make
+
+Upstream-Status: Backport
+https://bug1432455.bmoattachments.org/attachment.cgi?id=8944691
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+Index: nss-3.35/nss/lib/freebl/Makefile
+===================================================================
+--- nss-3.35.orig/nss/lib/freebl/Makefile
++++ nss-3.35/nss/lib/freebl/Makefile
+@@ -533,7 +533,12 @@ ifndef NSS_DISABLE_CHACHAPOLY
+             EXTRA_SRCS += chacha20_vec.c
+         endif
+     else
+-        EXTRA_SRCS += poly1305.c
++        ifeq ($(CPU_ARCH),aarch64)
++            EXTRA_SRCS += Hacl_Poly1305_64.c
++        else
++            EXTRA_SRCS += poly1305.c
++        endif
++
+         EXTRA_SRCS += chacha20.c
+         VERIFIED_SRCS += Hacl_Chacha20.c
+     endif # x86_64

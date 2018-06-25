@@ -1,17 +1,27 @@
+From 5a53260a819e2873f58165e96852529719101c53 Mon Sep 17 00:00:00 2001
+From: Chunrong Guo <B40290@freescale.com>
+Date: Mon, 4 Nov 2013 10:39:56 +0800
+Subject: [PATCH] snort: add recipe
+
 Upstream-Status:Inappropriate [embedded specific]
 
 fix the below error:
-checking for dap address space id... configure: 
+checking for dap address space id... configure:
 configure: error: cannot run test program while cross compiling
-
 
 Signed-off-by: Chunrong Guo <B40290@freescale.com>
 
---- a/configure.in	2013-08-23 00:06:37.239361932 -0500
-+++ b/configure.in	2013-08-23 00:07:32.860266534 -0500
-@@ -679,23 +679,23 @@
+---
+ configure.in | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 6fe5d68..e7636ce 100644
+--- a/configure.in
++++ b/configure.in
+@@ -698,23 +698,23 @@ if test "x$ac_cv_func_daq_dp_add_dc" = "xyes"; then
  
- AC_CHECK_FUNCS([daq_hup_apply] [daq_acquire_with_meta])
+ fi
  
 -AC_MSG_CHECKING([for daq address space ID])
 -AC_RUN_IFELSE(
@@ -48,5 +58,5 @@ Signed-off-by: Chunrong Guo <B40290@freescale.com>
 +#        [DAQ version supports address space ID in header.])
 +#fi
  
- # any sparc platform has to have this one defined.
- AC_MSG_CHECKING(for sparc)
+ AC_MSG_CHECKING([for daq flow ID])
+ AC_RUN_IFELSE(

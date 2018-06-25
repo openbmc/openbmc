@@ -5,6 +5,8 @@ SECTION = "multimedia"
 
 DEPENDS = "gstreamer1.0 glib-2.0-native"
 
+SRC_URI_append = " file://gtk-doc-tweaks.patch"
+
 inherit autotools pkgconfig upstream-version-is-even gobject-introspection gtk-doc
 
 acpaths = "-I ${S}/common/m4 -I ${S}/m4"
@@ -34,21 +36,6 @@ delete_pkg_m4_file() {
 	rm -f "${S}/common/m4/gtk-doc.m4"
 }
 
-# gstreamer is not using system-wide makefiles (which we patch in gtkdoc recipe,
-# but its own custom ones, which we have to patch here
-patch_gtk_doc_makefiles() {
-        # Patch the gtk-doc makefiles so that the qemu wrapper is used to run transient binaries
-        # instead of libtool wrapper or running them directly
-        # Also substitute a bogus plugin scanner, as trying to run the real one is causing issues during build on x86_64.
-        sed -i \
-           -e "s|GTKDOC_RUN =.*|GTKDOC_RUN = \$(top_builddir)/gtkdoc-qemuwrapper|" \
-           -e "s|\$(GTKDOC_EXTRA_ENVIRONMENT)|\$(GTKDOC_EXTRA_ENVIRONMENT) GST_PLUGIN_SCANNER_1_0=\$(top_builddir)/libs/gst/helpers/gst-plugin-scanner-dummy|" \
-           ${S}/common/gtk-doc*mak
-}
-
-do_configure[prefuncs] += " delete_pkg_m4_file patch_gtk_doc_makefiles"
+do_configure[prefuncs] += " delete_pkg_m4_file"
 
 PACKAGES_DYNAMIC = "^${PN}-.*"
-
-# qemu-mips64: error while loading shared libraries: .../recipe-sysroot/usr/lib/libgthread-2.0.so.0: ELF file data encoding not little-endian
-EXTRA_OECONF_append_mips64 = " --disable-introspection "

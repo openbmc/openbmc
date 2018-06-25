@@ -43,7 +43,7 @@ remove_rcsd_link () {
 	fi
 }
 
-if [ -z "$pi_dir" ]; then
+if ! [ -d $pi_dir ]; then
 	remove_rcsd_link
 	exit 0
 fi

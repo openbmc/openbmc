@@ -31,6 +31,11 @@ EXTRA_OECONF = "--enable-debuginfo \
 inherit autotools-brokensep gettext
 
 do_configure_prepend() {
+    for d in confdb test/mpi/confdb src/openpa/confdb src/pm/hydra/confdb src/pm/hydra/tools/topo/hwloc/hwloc/config src/pm/hydra/mpl/confdb src/mpl/confdb src/mpi/romio/confdb;  do
+        install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}/$d
+        install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}/$d
+    done
+
     autoreconf --verbose --install --force -I . -I confdb/ -I maint/
     oe_runconf
     exit

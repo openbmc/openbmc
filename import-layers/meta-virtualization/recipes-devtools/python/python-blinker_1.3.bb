@@ -18,5 +18,7 @@ SRC_URI[sha256sum] = "6811010809262261e41ab7b92f3f6d23f35cf816fbec2bc05077992eeb
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 
+DEFAULT_PREFERENCE = "-1"
+
 inherit setuptools
 

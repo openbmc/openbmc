@@ -3,9 +3,10 @@ Auto-detect disks if none specified
 Refer to:
 https://bugzilla.redhat.com/show_bug.cgi?id=717479
 
-diff -up hddtemp-0.3-beta15/doc/hddtemp.8~ hddtemp-0.3-beta15/doc/hddtemp.8
---- hddtemp-0.3-beta15/doc/hddtemp.8~	2011-08-18 00:36:05.689001470 +0300
-+++ hddtemp-0.3-beta15/doc/hddtemp.8	2011-08-18 00:44:46.753006253 +0300
+Index: hddtemp-0.3-beta15/doc/hddtemp.8
+===================================================================
+--- hddtemp-0.3-beta15.orig/doc/hddtemp.8
++++ hddtemp-0.3-beta15/doc/hddtemp.8
 @@ -19,7 +19,7 @@
  hddtemp \- Utility to monitor hard drive temperature
  .SH SYNOPSIS
@@ -25,9 +26,10 @@ diff -up hddtemp-0.3-beta15/doc/hddtemp.8~ hddtemp-0.3-beta15/doc/hddtemp.8
  
  
  .SH "OPTIONS"
-diff -up hddtemp-0.3-beta15/src/hddtemp.c~ hddtemp-0.3-beta15/src/hddtemp.c
---- hddtemp-0.3-beta15/src/hddtemp.c~	2011-08-18 00:36:05.638996861 +0300
-+++ hddtemp-0.3-beta15/src/hddtemp.c	2011-08-18 00:35:55.485060798 +0300
+Index: hddtemp-0.3-beta15/src/hddtemp.c
+===================================================================
+--- hddtemp-0.3-beta15.orig/src/hddtemp.c
++++ hddtemp-0.3-beta15/src/hddtemp.c
 @@ -54,6 +54,7 @@
  #include <linux/hdreg.h>
  #include <ctype.h>
@@ -44,7 +46,7 @@ diff -up hddtemp-0.3-beta15/src/hddtemp.c~ hddtemp-0.3-beta15/src/hddtemp.c
  
    backtrace_sigsegv();
    backtrace_sigill();
-@@ -419,11 +421,6 @@ int main(int argc, char* argv[]) {
+@@ -423,11 +425,6 @@ int main(int argc, char* argv[]) {
       exit(0);
    }
    
@@ -56,7 +58,7 @@ diff -up hddtemp-0.3-beta15/src/hddtemp.c~ hddtemp-0.3-beta15/src/hddtemp.c
    if(debug) {
      /*    argc = optind + 1;*/
      quiet = 1;
-@@ -434,6 +431,23 @@ int main(int argc, char* argv[]) {
+@@ -438,6 +435,23 @@ int main(int argc, char* argv[]) {
      exit(1);
    }
  
@@ -80,7 +82,7 @@ diff -up hddtemp-0.3-beta15/src/hddtemp.c~ hddtemp-0.3-beta15/src/hddtemp.c
    init_bus_types();
  
    /* collect disks informations */
-@@ -527,6 +541,7 @@ int main(int argc, char* argv[]) {
+@@ -531,6 +545,7 @@ int main(int argc, char* argv[]) {
    else {
      do_direct_mode(ldisks);
    }

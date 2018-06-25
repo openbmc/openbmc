@@ -40,15 +40,19 @@
     <para>
         Following is a list of supported recipes:
         <itemizedlist>
-            <listitem><para><filename>build-appliance-image</filename>:
-                An example virtual machine that contains all the pieces required to
-                run builds using the build system as well as the build system itself.
+            <listitem><para>
+                <filename>build-appliance-image</filename>:
+                An example virtual machine that contains all the pieces
+                required to run builds using the build system as well as the
+                build system itself.
                 You can boot and run the image using either the
                 <ulink url='http://www.vmware.com/products/player/overview.html'>VMware Player</ulink>
-                or <ulink url='http://www.vmware.com/products/workstation/overview.html'>VMware Workstation</ulink>.
+                or
+                <ulink url='http://www.vmware.com/products/workstation/overview.html'>VMware Workstation</ulink>.
                 For more information on this image, see the
-                <ulink url='&YOCTO_HOME_URL;/documentation/build-appliance'>Build Appliance</ulink> page on
-                the Yocto Project website.</para></listitem>
+                <ulink url='&YOCTO_HOME_URL;/software-item/build-appliance/'>Build Appliance</ulink>
+                page on the Yocto Project website.
+                </para></listitem>
             <listitem><para><filename>core-image-base</filename>:
                 A console-only image that fully supports the target device hardware.</para></listitem>
             <listitem><para><filename>core-image-clutter</filename>:
@@ -151,7 +155,8 @@
                 This image provides the Wayland protocol libraries and the
                 reference Weston compositor.
                 For more information, see the
-                "<link linkend='wayland'>Wayland</link>" section.
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-using-wayland-and-weston'>Using Wayland and Weston</ulink>"
+                section in the Yocto Project Development Tasks Manual.
                 </para></listitem>
             <listitem><para><filename>core-image-x11</filename>:
                 A very basic X11 image with a terminal.

@@ -29,8 +29,8 @@ do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 do_package[noexec] = "1"
 do_packagedata[noexec] = "1"
-do_package_write_ipk[noexec] = "1"
-do_package_write_deb[noexec] = "1"
-do_package_write_rpm[noexec] = "1"
+deltask package_write_ipk
+deltask package_write_deb
+deltask package_write_rpm
 
 BBCLASSEXTEND = "native"

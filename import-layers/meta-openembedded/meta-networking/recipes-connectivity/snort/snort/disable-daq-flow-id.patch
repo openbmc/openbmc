@@ -1,16 +1,26 @@
+From 5aa42a3137c657b5eddd4608343aa1854bd7cd27 Mon Sep 17 00:00:00 2001
+From: Zhiquan Li <zhiquan.li@windriver.com>
+Date: Mon, 16 Nov 2015 10:23:00 +0800
+Subject: [PATCH] snort: 2.9.6.0 -> 2.9.7.5
+
 Upstream-Status:Inappropriate [embedded specific]
 
 fix the below error:
 checking for daq flow ID... configure:
 configure: error: cannot run test program while cross compiling
 
+---
+ configure.in | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
---- a/configure.in    2015-10-28 10:36:42.918512690 +0800
-+++ b/configure.in    2015-10-28 10:37:36.738510048 +0800
-@@ -716,23 +716,23 @@
+diff --git a/configure.in b/configure.in
+index e7636ce..2fbd298 100644
+--- a/configure.in
++++ b/configure.in
+@@ -716,23 +716,23 @@ have_daq_address_space_id="yes"
  #        [DAQ version supports address space ID in header.])
  #fi
-
+ 
 -AC_MSG_CHECKING([for daq flow ID])
 -AC_RUN_IFELSE(
 -[AC_LANG_PROGRAM(
@@ -45,6 +55,6 @@ configure: error: cannot run test program while cross compiling
 +#    AC_DEFINE([HAVE_DAQ_FLOW_ID],[1],
 +#        [DAQ version supports flow ID in header.])
 +#fi
-
+ 
  AC_MSG_CHECKING([for DAQ_VERDICT_RETRY])
  AC_RUN_IFELSE(

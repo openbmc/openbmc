@@ -1,0 +1,61 @@
+From 7f1357529d23b356b45fbb0dd7388588162e4cb8 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 10 Jan 2018 14:43:20 +0800
+Subject: [PATCH] src/Makefile.am: improve reproducibility
+
+Remove build host references from the internally
+generated file version.c. The references get compiled into
+executables, which leads to non-reproducible builds.
+The removed references (--sysroot, -fdebug-prefix-map) were
+only used as part of the `wget --version' which do not have
+side effect.
+
+...
+$ wget --version
+GNU Wget 1.14 built on linux-gnu.
+
++digest +https +ipv6 +iri +large-file +nls +ntlm +opie +ssl/openssl
+
+Wgetrc:
+    /etc/wgetrc (system)
+Locale: /usr/share/locale
+Compile: gcc -DHAVE_CONFIG_H -DSYSTEM_WGETRC="/etc/wgetrc"
+    -DLOCALEDIR="/usr/share/locale" -I. -I../lib -I../lib -O2 -g -pipe
+    -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong
+    --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic
+Link: gcc -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions
+    -fstack-protector-strong --param=ssp-buffer-size=4
+    -grecord-gcc-switches -m64 -mtune=generic -lssl -lcrypto
+    /usr/lib64/libssl.so /usr/lib64/libcrypto.so /usr/lib64/libz.so
+    -ldl -lz -lz -lidn -luuid -lpcre ftp-opie.o openssl.o http-ntlm.o
+    ../lib/libgnu.a
+...
+
+Upstream-Status: Inappropriate [oe-core specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/Makefile.am | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 28c0be2..44084a3 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -87,9 +87,13 @@ version.c:  $(wget_SOURCES) ../lib/libgnu.a
+ 	echo '#include "version.h"' >> $@
+ 	echo 'const char *version_string = "@VERSION@";' >> $@
+ 	echo 'const char *compilation_string = "'$(COMPILE)'";' \
++	    | sed -e "s,$(TOOLCHAIN_OPTIONS),,g" \
++	          -e "s,$(DEBUG_PREFIX_MAP),,g" \
+ 	    | $(ESCAPEQUOTE) >> $@
+ 	echo 'const char *link_string = "'$(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+ 	$(AM_LDFLAGS) $(LDFLAGS) $(LIBS) $(wget_LDADD)'";' \
++	    | sed -e "s,$(TOOLCHAIN_OPTIONS),,g" \
++	          -e "s,$(DEBUG_PREFIX_MAP),,g" \
+ 	    | $(ESCAPEQUOTE) >> $@
+ 
+ css.c: $(srcdir)/css.l
+-- 
+1.8.3.1
+

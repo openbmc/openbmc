@@ -1,4 +1,4 @@
-From 176528ca3a8b76c9d0bb71b1e56eeebccc655c71 Mon Sep 17 00:00:00 2001
+From 39d1af836d844c89e625cfc908545e93977af8be Mon Sep 17 00:00:00 2001
 From: Mark Asselstine <mark.asselstine@windriver.com>
 Date: Wed, 3 May 2017 10:39:12 -0400
 Subject: [PATCH] python: switch remaining scripts to use python3
@@ -6,6 +6,7 @@ Subject: [PATCH] python: switch remaining scripts to use python3
 Work to remove the main openvswitch package's dependency on python 2.
 
 Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+
 ---
  ofproto/ipfix-gen-entities                            | 2 +-
  tests/test-l7.py                                      | 2 +-
@@ -108,6 +109,3 @@ index a776c00..d5ff8af 100755
  # Copyright (c) 2009, 2010, 2011, 2012, 2013 Nicira, Inc.
  #
  # Licensed under the Apache License, Version 2.0 (the "License");
--- 
-2.7.4
-

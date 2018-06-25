@@ -643,26 +643,25 @@ def verify_donestamp(ud, d, origud=None):
     if not ud.needdonestamp or (origud and not origud.needdonestamp):
         return True
 
-    if not os.path.exists(ud.donestamp):
+    if not os.path.exists(ud.localpath):
+        # local path does not exist
+        if os.path.exists(ud.donestamp):
+            # done stamp exists, but the downloaded file does not; the done stamp
+            # must be incorrect, re-trigger the download
+            bb.utils.remove(ud.donestamp)
         return False
 
     if (not ud.method.supports_checksum(ud) or
         (origud and not origud.method.supports_checksum(origud))):
-        # done stamp exists, checksums not supported; assume the local file is
-        # current
-        return True
-
-    if not os.path.exists(ud.localpath):
-        # done stamp exists, but the downloaded file does not; the done stamp
-        # must be incorrect, re-trigger the download
-        bb.utils.remove(ud.donestamp)
-        return False
+        # if done stamp exists and checksums not supported; assume the local
+        # file is current
+        return os.path.exists(ud.donestamp)
 
     precomputed_checksums = {}
     # Only re-use the precomputed checksums if the donestamp is newer than the
     # file. Do not rely on the mtime of directories, though. If ud.localpath is
     # a directory, there will probably not be any checksums anyway.
-    if (os.path.isdir(ud.localpath) or
+    if os.path.exists(ud.donestamp) and (os.path.isdir(ud.localpath) or
             os.path.getmtime(ud.localpath) < os.path.getmtime(ud.donestamp)):
         try:
             with open(ud.donestamp, "rb") as cachefile:
@@ -852,6 +851,9 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
         val = d.getVar(var) or (origenv and origenv.getVar(var))
         if val:
             cmd = 'export ' + var + '=\"%s\"; %s' % (val, cmd)
+
+    # Disable pseudo as it may affect ssh, potentially causing it to hang.
+    cmd = 'export PSEUDO_DISABLED=1; ' + cmd
 
     logger.debug(1, "Running %s", cmd)
 
@@ -1424,7 +1426,7 @@ class FetchMethod(object):
                 cmd = 'gzip -dc %s > %s' % (file, efile)
             elif file.endswith('.bz2'):
                 cmd = 'bzip2 -dc %s > %s' % (file, efile)
-            elif file.endswith('.tar.xz'):
+            elif file.endswith('.txz') or file.endswith('.tar.xz'):
                 cmd = 'xz -dc %s | tar x --no-same-owner -f -' % file
             elif file.endswith('.xz'):
                 cmd = 'xz -dc %s > %s' % (file, efile)

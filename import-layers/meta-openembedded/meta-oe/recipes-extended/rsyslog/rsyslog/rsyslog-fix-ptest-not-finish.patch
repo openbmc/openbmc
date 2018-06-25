@@ -1,3 +1,8 @@
+From 07ad2a1905089b9124623324a9969e4522317110 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Fri, 12 Sep 2014 03:41:11 -0400
+Subject: [PATCH] rsyslog: update configure to fix ptest
+
 $MaxMessageSize doesn't work if before $IncludeConfig diag-common.conf, then
 test cases fall into infinite loop with error message:
 
@@ -6,13 +11,24 @@ test cases fall into infinite loop with error message:
 
 Update configure to fix it.
 
-Upstream-Status: pending
+Upstream-Status: Pending
 
-Kai Kang <kai.kang@windriver.com>
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
-diff -Nru rsyslog-7.4.4/tests/testsuites/complex1.conf rsyslog-7.4.4.new/tests/testsuites/complex1.conf
---- rsyslog-7.4.4/tests/testsuites/complex1.conf	2013-08-31 00:30:41.000000000 +0800
-+++ rsyslog-7.4.4.new/tests/testsuites/complex1.conf	2013-12-18 14:28:10.644004184 +0800
+ tests/testsuites/complex1.conf             | 2 +-
+ tests/testsuites/gzipwr_large.conf         | 2 +-
+ tests/testsuites/gzipwr_large_dynfile.conf | 2 +-
+ tests/testsuites/imptcp_conndrop.conf      | 2 +-
+ tests/testsuites/imptcp_large.conf         | 2 +-
+ tests/testsuites/imtcp_conndrop.conf       | 2 +-
+ tests/testsuites/wr_large.conf             | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/tests/testsuites/complex1.conf b/tests/testsuites/complex1.conf
+index 9b6a9f3..e00caa4 100644
+--- a/tests/testsuites/complex1.conf
++++ b/tests/testsuites/complex1.conf
 @@ -1,7 +1,7 @@
  # complex test case with multiple actions in gzip mode
  # rgerhards, 2009-05-22
@@ -22,9 +38,10 @@ diff -Nru rsyslog-7.4.4/tests/testsuites/complex1.conf rsyslog-7.4.4.new/tests/t
  
  $MainMsgQueueTimeoutEnqueue 5000
  
-diff -Nru rsyslog-7.4.4/tests/testsuites/gzipwr_large.conf rsyslog-7.4.4.new/tests/testsuites/gzipwr_large.conf
---- rsyslog-7.4.4/tests/testsuites/gzipwr_large.conf	2012-04-04 14:29:55.000000000 +0800
-+++ rsyslog-7.4.4.new/tests/testsuites/gzipwr_large.conf	2013-12-18 14:28:10.645004186 +0800
+diff --git a/tests/testsuites/gzipwr_large.conf b/tests/testsuites/gzipwr_large.conf
+index 54ad3bb..e8247a9 100644
+--- a/tests/testsuites/gzipwr_large.conf
++++ b/tests/testsuites/gzipwr_large.conf
 @@ -1,7 +1,7 @@
  # simple async writing test
  # rgerhards, 2010-03-09
@@ -34,9 +51,10 @@ diff -Nru rsyslog-7.4.4/tests/testsuites/gzipwr_large.conf rsyslog-7.4.4.new/tes
  
  $ModLoad ../plugins/imtcp/.libs/imtcp
  $MainMsgQueueTimeoutShutdown 10000
-diff -Nru rsyslog-7.4.4/tests/testsuites/gzipwr_large_dynfile.conf rsyslog-7.4.4.new/tests/testsuites/gzipwr_large_dynfile.conf
---- rsyslog-7.4.4/tests/testsuites/gzipwr_large_dynfile.conf	2012-04-04 14:29:55.000000000 +0800
-+++ rsyslog-7.4.4.new/tests/testsuites/gzipwr_large_dynfile.conf	2013-12-18 14:28:10.645004186 +0800
+diff --git a/tests/testsuites/gzipwr_large_dynfile.conf b/tests/testsuites/gzipwr_large_dynfile.conf
+index 3a1b255..297cb70 100644
+--- a/tests/testsuites/gzipwr_large_dynfile.conf
++++ b/tests/testsuites/gzipwr_large_dynfile.conf
 @@ -1,7 +1,7 @@
  # simple async writing test
  # rgerhards, 2010-03-09
@@ -46,9 +64,10 @@ diff -Nru rsyslog-7.4.4/tests/testsuites/gzipwr_large_dynfile.conf rsyslog-7.4.4
  
  $ModLoad ../plugins/imtcp/.libs/imtcp
  $MainMsgQueueTimeoutShutdown 10000
-diff -Nru rsyslog-7.4.4/tests/testsuites/imptcp_conndrop.conf rsyslog-7.4.4.new/tests/testsuites/imptcp_conndrop.conf
---- rsyslog-7.4.4/tests/testsuites/imptcp_conndrop.conf	2013-08-31 00:30:41.000000000 +0800
-+++ rsyslog-7.4.4.new/tests/testsuites/imptcp_conndrop.conf	2013-12-18 14:28:10.646004189 +0800
+diff --git a/tests/testsuites/imptcp_conndrop.conf b/tests/testsuites/imptcp_conndrop.conf
+index 77a5d79..d9a14a8 100644
+--- a/tests/testsuites/imptcp_conndrop.conf
++++ b/tests/testsuites/imptcp_conndrop.conf
 @@ -1,7 +1,7 @@
  # simple async writing test
  # rgerhards, 2010-03-09
@@ -58,9 +77,10 @@ diff -Nru rsyslog-7.4.4/tests/testsuites/imptcp_conndrop.conf rsyslog-7.4.4.new/
  
  $ModLoad ../plugins/imptcp/.libs/imptcp
  $MainMsgQueueTimeoutShutdown 10000
-diff -Nru rsyslog-7.4.4/tests/testsuites/imptcp_large.conf rsyslog-7.4.4.new/tests/testsuites/imptcp_large.conf
---- rsyslog-7.4.4/tests/testsuites/imptcp_large.conf	2013-08-31 00:30:41.000000000 +0800
-+++ rsyslog-7.4.4.new/tests/testsuites/imptcp_large.conf	2013-12-18 14:28:10.646004189 +0800
+diff --git a/tests/testsuites/imptcp_large.conf b/tests/testsuites/imptcp_large.conf
+index 77a5d79..d9a14a8 100644
+--- a/tests/testsuites/imptcp_large.conf
++++ b/tests/testsuites/imptcp_large.conf
 @@ -1,7 +1,7 @@
  # simple async writing test
  # rgerhards, 2010-03-09
@@ -70,9 +90,10 @@ diff -Nru rsyslog-7.4.4/tests/testsuites/imptcp_large.conf rsyslog-7.4.4.new/tes
  
  $ModLoad ../plugins/imptcp/.libs/imptcp
  $MainMsgQueueTimeoutShutdown 10000
-diff -Nru rsyslog-7.4.4/tests/testsuites/imtcp_conndrop.conf rsyslog-7.4.4.new/tests/testsuites/imtcp_conndrop.conf
---- rsyslog-7.4.4/tests/testsuites/imtcp_conndrop.conf	2013-07-19 20:59:03.000000000 +0800
-+++ rsyslog-7.4.4.new/tests/testsuites/imtcp_conndrop.conf	2013-12-18 14:28:10.646004189 +0800
+diff --git a/tests/testsuites/imtcp_conndrop.conf b/tests/testsuites/imtcp_conndrop.conf
+index de41bc4..7844dc7 100644
+--- a/tests/testsuites/imtcp_conndrop.conf
++++ b/tests/testsuites/imtcp_conndrop.conf
 @@ -1,7 +1,7 @@
  # simple async writing test
  # rgerhards, 2010-03-09
@@ -82,9 +103,10 @@ diff -Nru rsyslog-7.4.4/tests/testsuites/imtcp_conndrop.conf rsyslog-7.4.4.new/t
  
  $ModLoad ../plugins/imtcp/.libs/imtcp
  $MainMsgQueueTimeoutShutdown 10000
-diff -Nru rsyslog-7.4.4/tests/testsuites/wr_large.conf rsyslog-7.4.4.new/tests/testsuites/wr_large.conf
---- rsyslog-7.4.4/tests/testsuites/wr_large.conf	2012-04-04 14:29:55.000000000 +0800
-+++ rsyslog-7.4.4.new/tests/testsuites/wr_large.conf	2013-12-18 14:28:10.647004190 +0800
+diff --git a/tests/testsuites/wr_large.conf b/tests/testsuites/wr_large.conf
+index b64f132..b0ae264 100644
+--- a/tests/testsuites/wr_large.conf
++++ b/tests/testsuites/wr_large.conf
 @@ -1,7 +1,7 @@
  # simple async writing test
  # rgerhards, 2010-03-09

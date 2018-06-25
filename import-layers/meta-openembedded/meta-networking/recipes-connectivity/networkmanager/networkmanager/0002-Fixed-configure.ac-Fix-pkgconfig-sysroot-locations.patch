@@ -1,0 +1,25 @@
+From 583f0448fb7e9aba2b410c06eec6f420b41a6a0c Mon Sep 17 00:00:00 2001
+From: Pablo Saavedra <psaavedra@igalia.com>
+Date: Tue, 13 Mar 2018 17:36:20 +0100
+Subject: [PATCH 7/7] Fixed configure.ac: Fix pkgconfig sysroot locations
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 51e5eb6..c9d3e56 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -669,7 +669,7 @@ else
+ 	AC_DEFINE(WITH_JANSSON, 1, [Define if JANSSON is enabled])
+ 
+ 	AC_CHECK_TOOLS(READELF, [eu-readelf readelf])
+-	JANSSON_LIBDIR=`$PKG_CONFIG --variable=libdir jansson`
++	JANSSON_LIBDIR=${PKG_CONFIG_SYSROOT_DIR}`$PKG_CONFIG --variable=libdir jansson`
+ 	JANSSON_SONAME=`$READELF -d $JANSSON_LIBDIR/libjansson.so |sed -n 's/.*SONAME.*\[[\([^]]*\)]]/\1/p'`
+ 
+ 	if test "$JANSSON_SONAME" = ""; then
+-- 
+2.14.1
+

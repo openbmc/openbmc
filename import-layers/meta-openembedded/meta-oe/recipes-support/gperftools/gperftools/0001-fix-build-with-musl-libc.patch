@@ -1,4 +1,4 @@
-From 157914941bd38f1a38bb6bd7294ca6c2bc1b8dcb Mon Sep 17 00:00:00 2001
+From 034e7da08c3fbffcba8cf8d4e24a71a16558db5a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 16 Jul 2017 15:51:28 -0700
 Subject: [PATCH] fix build with musl libc
@@ -6,6 +6,7 @@ Subject: [PATCH] fix build with musl libc
 Patch from https://github.com/gperftools/gperftools/pull/765/
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  configure.ac                 | 1 +
  src/malloc_hook_mmap_linux.h | 8 ++++++--
@@ -56,6 +57,3 @@ index 79ac4e3..d444635 100755
  // libc's version:
  extern "C" void* __sbrk(ptrdiff_t increment);
  
--- 
-2.13.3
-

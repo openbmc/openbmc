@@ -449,12 +449,6 @@ class BuildBase(Event):
     def setName(self, name):
         self._name = name
 
-    def getCfg(self):
-        return self.data
-
-    def setCfg(self, cfg):
-        self.data = cfg
-
     def getFailures(self):
         """
         Return the number of failed packages
@@ -463,9 +457,6 @@ class BuildBase(Event):
 
     pkgs = property(getPkgs, setPkgs, None, "pkgs property")
     name = property(getName, setName, None, "name property")
-    cfg = property(getCfg, setCfg, None, "cfg property")
-
-
 
 class BuildInit(BuildBase):
     """buildFile or buildTargets was invoked"""

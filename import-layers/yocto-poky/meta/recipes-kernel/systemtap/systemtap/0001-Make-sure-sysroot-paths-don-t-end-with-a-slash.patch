@@ -1,0 +1,128 @@
+From 41efad04730be89889d1483719f9a6c9396dc250 Mon Sep 17 00:00:00 2001
+From: David Smith <dsmith@redhat.com>
+Date: Wed, 14 Mar 2018 17:05:25 -0500
+Subject: [PATCH] Make sure sysroot paths don't end with a slash.
+
+* session.cxx (parse_cmdline): Make sure a sysroot path does not end with
+  a '/', since we build paths like: sysroot + "/lib/modules". If the
+  sysroot path ends with a '/', we end up with paths like
+  '/SYSROOT//lib/modules'.
+  (setup_kernel_release): Take a string parameter, not a character pointer.
+* session.h: Update setup_kernel_release() prototype.
+
+Upstream-Status: Backport
+Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+---
+ session.cxx | 34 ++++++++++++++++++++++++++--------
+ session.h   |  2 +-
+ 2 files changed, 27 insertions(+), 9 deletions(-)
+
+Index: git/session.cxx
+===================================================================
+--- git.orig/session.cxx
++++ git/session.cxx
+@@ -722,6 +722,9 @@ systemtap_session::parse_cmdline (int ar
+   client_options_disallowed_for_unprivileged = "";
+   std::set<std::string> additional_unwindsym_modules;
+   struct rlimit our_rlimit;
++  bool sysroot_option_seen = false;
++  string kernel_release_value;
++
+   while (true)
+     {
+       char * num_endptr;
+@@ -887,7 +890,7 @@ systemtap_session::parse_cmdline (int ar
+ 	    // Note that '-' must come last in a regex bracket expression.
+             assert_regexp_match("-r parameter from client", optarg, "^[a-z0-9_.+-]+$");
+ 	  server_args.push_back (string ("-") + (char)grc + optarg);
+-          setup_kernel_release(optarg);
++	  kernel_release_value = optarg;
+           break;
+ 
+         case 'a':
+@@ -1473,7 +1476,7 @@ systemtap_session::parse_cmdline (int ar
+ 	  if (client_options) {
+ 	      cerr << _F("ERROR: %s invalid with %s", "--sysroot", "--client-options") << endl;
+ 	      return 1;
+-	  } else if (!sysroot.empty()) {
++	  } else if (sysroot_option_seen) {
+ 	      cerr << "ERROR: multiple --sysroot options not supported" << endl;
+ 	      return 1;
+ 	  } else {
+@@ -1487,11 +1490,17 @@ systemtap_session::parse_cmdline (int ar
+ 
+ 	      sysroot = string(spath);
+ 	      free (spath);
+-	      if (sysroot[sysroot.size() - 1] != '/')
+-		  sysroot.append("/");
+ 
+-	      break;
++	      // We do path creation like this:
++	      //   sysroot + "/lib/modules"
++	      // So, we don't want the sysroot path to end with a '/',
++	      // otherwise we'll end up with '/foo//lib/modules'.
++	      if (sysroot.back() == '/') {
++		  sysroot.pop_back();
++	      }
+ 	  }
++	  sysroot_option_seen = true;
++	  break;
+ 
+ 	case LONG_OPT_SYSENV:
+ 	  if (client_options) {
+@@ -1501,7 +1510,7 @@ systemtap_session::parse_cmdline (int ar
+ 	      string sysenv_str = optarg;
+ 	      string value;
+ 	      size_t pos;
+-	      if (sysroot.empty()) {
++	      if (! sysroot_option_seen) {
+ 		  cerr << "ERROR: --sysenv must follow --sysroot" << endl;
+ 		  return 1;
+ 	      }
+@@ -1646,6 +1655,15 @@ systemtap_session::parse_cmdline (int ar
+ 	}
+     }
+ 
++  if (! kernel_release_value.empty())
++  {
++      setup_kernel_release(kernel_release_value);
++  }
++  else if (! sysroot.empty())
++  {
++      kernel_build_tree = sysroot + "/lib/modules/" + kernel_release  + "/build";
++  }
++
+   return 0;
+ }
+ 
+@@ -2152,7 +2170,7 @@ void systemtap_session::insert_loaded_mo
+ }
+ 
+ void
+-systemtap_session::setup_kernel_release (const char* kstr) 
++systemtap_session::setup_kernel_release (const string& kstr) 
+ {
+   // Sometimes we may get dupes here... e.g. a server may have a full
+   // -r /path/to/kernel followed by a client's -r kernel.
+@@ -2183,7 +2201,7 @@ systemtap_session::setup_kernel_release
+   else
+     {
+       update_release_sysroot = true;
+-      kernel_release = string (kstr);
++      kernel_release = kstr;
+       if (!kernel_release.empty())
+         kernel_build_tree = "/lib/modules/" + kernel_release + "/build";
+ 
+Index: git/session.h
+===================================================================
+--- git.orig/session.h
++++ git/session.h
+@@ -144,7 +144,7 @@ public:
+ 
+   // NB: It is very important for all of the above (and below) fields
+   // to be cleared in the systemtap_session ctor (session.cxx).
+-  void setup_kernel_release (const char* kstr);
++  void setup_kernel_release (const std::string& kstr);
+   void insert_loaded_modules ();
+ 
+   // command line parsing

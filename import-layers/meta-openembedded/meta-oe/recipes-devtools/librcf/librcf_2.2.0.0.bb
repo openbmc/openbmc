@@ -50,3 +50,5 @@ FILES_${PN}-demos = "${bindir}/*"
 FILES_${PN}-dev += "${datadir}/cmake/Modules/FindLibRcf.cmake"
 
 BBCLASSEXTEND = "nativesdk"
+
+PNBLACKLIST[librcf] = " error: invalid use of incomplete type 'RCF::AsioIoService {aka class boost::asio::io_service}; among others?" 

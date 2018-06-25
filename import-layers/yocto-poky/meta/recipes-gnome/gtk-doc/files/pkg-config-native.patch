@@ -1,24 +1,32 @@
-Use native pkg-config when looking for gtk-doc.
+From 5f145621b4780cfd6a5632fcc97c45f572938efc Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Mon, 5 Sep 2016 22:25:44 +0100
+Subject: [PATCH 5/5] Use native pkg-config when looking for gtk-doc.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
-diff --git a/gtk-doc.m4 b/gtk-doc.m4
-index 3675543..94881ae 100644
---- a/gtk-doc.m4
-+++ b/gtk-doc.m4
-@@ -1,6 +1,6 @@
- dnl -*- mode: autoconf -*-
+---
+ gtk-doc.m4 | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
+Index: gtk-doc-1.27/gtk-doc.m4
+===================================================================
+--- gtk-doc-1.27.orig/gtk-doc.m4
++++ gtk-doc-1.27/gtk-doc.m4
+@@ -25,7 +25,7 @@
+ # Macro appear in them. The GNU General Public License (GPL) does govern
+ # all other use of the material that constitutes the Autoconf Macro.
+ 
 -# serial 2
 +# serial 2.1
-
+ 
  dnl Usage:
  dnl   GTK_DOC_CHECK([minimum-gtk-doc-version])
-@@ -10,11 +10,16 @@ AC_DEFUN([GTK_DOC_CHECK],
+@@ -35,11 +35,16 @@ AC_DEFUN([GTK_DOC_CHECK],
    AC_BEFORE([AC_PROG_LIBTOOL],[$0])dnl setup libtool first
    AC_BEFORE([AM_PROG_LIBTOOL],[$0])dnl setup libtool first
-
+ 
 +  gtkdoc_pkgconfig_save=$PKG_CONFIG
 +  PKG_CONFIG=pkg-config-native
 +
@@ -26,7 +34,7 @@ index 3675543..94881ae 100644
    AC_MSG_CHECKING([for gtk-doc])
    PKG_CHECK_EXISTS([$gtk_doc_requires],[have_gtk_doc=yes],[have_gtk_doc=no])
    AC_MSG_RESULT($have_gtk_doc)
-
+ 
 +  PKG_CONFIG=$gtkdoc_pkgconfig_save
 +
    if test "$have_gtk_doc" = "no"; then

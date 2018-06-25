@@ -1,4 +1,4 @@
-From 89f9b87904bd312b817ffaa7d83abfd5e84d723d Mon Sep 17 00:00:00 2001
+From 6caf90592d61c8c45b32cb7ff76709f9326030e2 Mon Sep 17 00:00:00 2001
 From: Mark Asselstine <mark.asselstine@windriver.com>
 Date: Fri, 8 Sep 2017 15:40:49 -0400
 Subject: [PATCH] lib/Makefile: overwrite install-lib, to allow multiarch
@@ -8,6 +8,7 @@ I am not sure why Yocto installs python modules in arch specific
 INSTALL_LIB.
 
 Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+
 ---
  lib/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -25,6 +26,3 @@ index b1bb057..06f5c5d 100644
  .PHONY: install
  
  uninstall:
--- 
-2.7.4
-

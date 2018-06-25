@@ -1,4 +1,4 @@
-From 3634ec3547bc0f8a5d1b8ad15365e2f836cda642 Mon Sep 17 00:00:00 2001
+From a0e893ea094c48fa803046ffa89e31907aee0597 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:09:58 +0000
 Subject: [PATCH 04/15] Point scripts location to libdir
@@ -12,7 +12,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index 625347ff62..d5334d2681 100644
+index 6243c12528..3c5d6c8202 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
 @@ -57,7 +57,7 @@ endif
@@ -25,7 +25,7 @@ index 625347ff62..d5334d2681 100644
  EMUL = @EMUL@
  EMULATION_OFILES = @EMULATION_OFILES@
 diff --git a/ld/Makefile.in b/ld/Makefile.in
-index ba251777b0..a2cf2282b5 100644
+index 760c037f9d..6dea692869 100644
 --- a/ld/Makefile.in
 +++ b/ld/Makefile.in
 @@ -446,7 +446,7 @@ AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS)
@@ -38,5 +38,5 @@ index ba251777b0..a2cf2282b5 100644
  BFDDIR = $(BASEDIR)/bfd
  INCDIR = $(BASEDIR)/include
 -- 
-2.14.0
+2.16.1
 

@@ -1,0 +1,27 @@
+In out-of-tree builds gtk-doc's setup-build target copies all the content from $srcdir to $builddir.
+
+However, if some of this content is regenerated at configure time this can happen:
+
+1) configure writes new build/version.xml
+2) make compile copies content, including the tarball's src/version.xml
+   to build/version.xml, and generates gtk-doc.
+3) make install notices build/version.xml is older than configure.status,
+   so regenerates gtk-doc.
+
+gtk-doc generation is a slow process at the best of times, so doing it twice isn't good.
+
+Solve this by changing cp --force to cp --no-clobber, so setup-build only copies
+files which don't already exist.
+
+Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=794571]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/gtk-doc.make b/gtk-doc.make
+index f87eaab..246f3c0 100644
+--- a/gtk-doc.make
++++ b/gtk-doc.make
+@@ -113,3 +113,3 @@ setup-build.stamp:
+ 	      test -f $(abs_srcdir)/$$file && \
+-	        cp -pf $(abs_srcdir)/$$file $(abs_builddir)/$$file || true; \
++	        cp -pn $(abs_srcdir)/$$file $(abs_builddir)/$$file || true; \
+ 	    done; \

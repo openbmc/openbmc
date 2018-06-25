@@ -41,6 +41,7 @@ SRC_URI = "git://github.com/google/breakpad;name=breakpad \
            file://0005-md2core-Replace-basename.patch \
            file://0002-Use-_fpstate-instead-of-_libc_fpstate-on-linux.patch \
            file://mcontext.patch \
+           file://0001-disable-calls-to-getcontext-with-musl.patch \
            file://0001-lss-Match-syscalls-to-match-musl.patch;patchdir=src/third_party/lss \
            file://mips_asm_sgidefs.patch;patchdir=src/third_party/lss \
 "

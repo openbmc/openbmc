@@ -1,4 +1,4 @@
-From 12103842d5f347cf245e71071d0c44297bcdb1f9 Mon Sep 17 00:00:00 2001
+From 0d2ad639e6158c8023c157e206ef3ff7abdc089c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Enrique=20Oca=C3=B1a=20Gonz=C3=A1lez?= <eocanha@igalia.com>
 Date: Fri, 4 Dec 2015 18:39:59 +0100
 Subject: [PATCH] Don't abort gst_omx_video_dec_set_format() if there's a
@@ -9,10 +9,10 @@ Subject: [PATCH] Don't abort gst_omx_video_dec_set_format() if there's a
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
-index 2368f34..da35e0d 100644
+index bad6335..c63b972 100644
 --- a/omx/gstomxvideodec.c
 +++ b/omx/gstomxvideodec.c
-@@ -1905,8 +1905,11 @@ gst_omx_video_dec_set_format (GstVideoDecoder * decoder,
+@@ -1911,8 +1911,11 @@ gst_omx_video_dec_set_format (GstVideoDecoder * decoder,
                5 * GST_SECOND) != OMX_ErrorNone)
          return FALSE;
        if (gst_omx_port_wait_buffers_released (out_port,
@@ -25,6 +25,3 @@ index 2368f34..da35e0d 100644
        if (gst_omx_port_deallocate_buffers (self->dec_in_port) != OMX_ErrorNone)
          return FALSE;
        if (gst_omx_video_dec_deallocate_output_buffers (self) != OMX_ErrorNone)
--- 
-2.1.4
-

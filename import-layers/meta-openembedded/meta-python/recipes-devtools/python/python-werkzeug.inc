@@ -8,14 +8,22 @@ cookie handling, file uploads, a powerful URL routing system and a bunch \
 of community contributed addon modules."
 HOMEPAGE = "http://werkzeug.pocoo.org/"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=a68f5361a2b2ca9fdf26b38aaecb6faa"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=ed9a0b7c0254616d72dadb98b293ef1b"
 
-SRC_URI[md5sum] = "e385b2c5a7193cff24c689b31e1124dc"
-SRC_URI[sha256sum] = "903a7b87b74635244548b30d30db4c8947fe64c5198f58899ddcd3a13c23bb26"
+SRC_URI[md5sum] = "6d20b5be2d245be4ac7706cc390d130c"
+SRC_URI[sha256sum] = "c3fd7a7d41976d9f44db327260e263132466836cef6f91512889ed60ad26557c"
 
 PYPI_PACKAGE = "Werkzeug"
 
 CLEANBROKEN = "1"
+
+PACKAGES =+ "${PN}-tests"
+FILES_${PN}-tests+= " \
+    ${PYTHON_SITEPACKAGES_DIR}/werkzeug/test* \
+    ${PYTHON_SITEPACKAGES_DIR}/werkzeug/__pycache__/test* \
+    ${PYTHON_SITEPACKAGES_DIR}/werkzeug/contrib/test* \
+    ${PYTHON_SITEPACKAGES_DIR}/werkzeug/contrib/__pycache__/test* \
+"
 
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-datetime \
@@ -24,11 +32,16 @@ RDEPENDS_${PN} += " \
     ${PYTHON_PN}-html \
     ${PYTHON_PN}-io \
     ${PYTHON_PN}-json \
+    ${PYTHON_PN}-netclient \
     ${PYTHON_PN}-netserver \
     ${PYTHON_PN}-numbers \
     ${PYTHON_PN}-pkgutil \
     ${PYTHON_PN}-pprint \
-    ${PYTHON_PN}-subprocess \
     ${PYTHON_PN}-threading \
     ${PYTHON_PN}-unixadmin \
+"
+
+RDEPENDS_${PN}-tests = " \
+    ${PN} \
+    ${PYTHON_PN}-unittest \
 "

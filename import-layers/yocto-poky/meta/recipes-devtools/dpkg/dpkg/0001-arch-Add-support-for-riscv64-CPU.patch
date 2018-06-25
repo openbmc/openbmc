@@ -1,0 +1,54 @@
+From 319f32d743f5b5e725012654d124e49226d5de91 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Mar 2018 20:28:24 -0700
+Subject: [PATCH] arch: Add support for riscv64 CPU
+
+  * Architecture support:
+    - Add support for riscv64 CPU. Closes: #822914
+      Thanks to Manuel A. Fernandez Montecelo <mafm@debian.org>
+
+Upstream-Status: Backport [https://alioth.debian.org/plugins/scmgit/cgi-bin/gitweb.cgi?p=dpkg%2Fdpkg.git;a=commitdiff_plain;h=ee0855cc66076691de4796be48f8a0d889fde001;hp=2f5816d8be40b449d2473b22f9e0c33b32f3bd78]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ data/cputable         | 1 +
+ scripts/t/Dpkg_Arch.t | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/data/cputable b/data/cputable
+index a2bd7d6..9f2a8e0 100644
+--- a/data/cputable
++++ b/data/cputable
+@@ -41,6 +41,7 @@ powerpc		powerpc		(powerpc|ppc)		32	big
+ powerpcel	powerpcle	powerpcle		32	little
+ ppc64		powerpc64	(powerpc|ppc)64		64	big
+ ppc64el		powerpc64le	powerpc64le		64	little
++riscv64		riscv64		riscv64			64	little
+ s390		s390		s390			32	big
+ s390x		s390x		s390x			64	big
+ sh3		sh3		sh3			32	little
+diff --git a/scripts/t/Dpkg_Arch.t b/scripts/t/Dpkg_Arch.t
+index d478b49..ecd5d66 100644
+--- a/scripts/t/Dpkg_Arch.t
++++ b/scripts/t/Dpkg_Arch.t
+@@ -16,7 +16,7 @@
+ use strict;
+ use warnings;
+ 
+-use Test::More tests => 16367;
++use Test::More tests => 16832;
+ 
+ use_ok('Dpkg::Arch', qw(debarch_to_debtuple debarch_to_multiarch
+                         debarch_eq debarch_is debarch_is_wildcard
+@@ -162,7 +162,7 @@ is(gnutriplet_to_debarch(undef), undef, 'undef gnutriplet');
+ is(gnutriplet_to_debarch('unknown-unknown-unknown'), undef, 'unknown gnutriplet');
+ is(gnutriplet_to_debarch('x86_64-linux-gnu'), 'amd64', 'known gnutriplet');
+ 
+-is(scalar get_valid_arches(), 524, 'expected amount of known architectures');
++is(scalar get_valid_arches(), 539, 'expected amount of known architectures');
+ 
+ {
+     local $ENV{CC} = 'false';
+-- 
+2.16.2
+

@@ -87,7 +87,7 @@ class Signing(OESelftestTestCase):
         ret = runCmd('%s/rpmkeys --define "_dbpath %s" --checksig %s' %
                      (staging_bindir_native, rpmdb, pkg_deploy))
         # tmp/deploy/rpm/i586/ed-1.9-r0.i586.rpm: rsa sha1 md5 OK
-        self.assertIn('rsa sha1 (md5) pgp md5 OK', ret.output, 'Package signed incorrectly.')
+        self.assertIn('digests signatures OK', ret.output, 'Package signed incorrectly.')
         shutil.rmtree(rpmdb)
 
         #Check that an image can be built from signed packages

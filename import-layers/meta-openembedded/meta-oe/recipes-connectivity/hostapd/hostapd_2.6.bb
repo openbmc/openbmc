@@ -1,34 +1,48 @@
+SUMMARY = "User space daemon for extended IEEE 802.11 management"
 HOMEPAGE = "http://w1.fi/hostapd/"
 SECTION = "kernel/userland"
-LICENSE = "GPLv2 | BSD"
-LIC_FILES_CHKSUM = "file://${B}/README;md5=8aa4e8c78b59b12016c4cb2d0a8db350"
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://hostapd/README;md5=8aa4e8c78b59b12016c4cb2d0a8db350"
+
 DEPENDS = "libnl openssl"
-SUMMARY = "User space daemon for extended IEEE 802.11 management"
-
-inherit update-rc.d systemd
-INITSCRIPT_NAME = "hostapd"
-
-SYSTEMD_SERVICE_${PN} = "hostapd.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "disable"
 
 SRC_URI = " \
     http://w1.fi/releases/hostapd-${PV}.tar.gz \
     file://defconfig \
     file://init \
     file://hostapd.service \
-    file://key-replay-cve-multiple.patch \
+    file://0001-hostapd-Avoid-key-reinstallation-in-FT-handshake.patch \
+    file://0002-Prevent-reinstallation-of-an-already-in-use-group-ke.patch \
+    file://0003-Extend-protection-of-GTK-IGTK-reinstallation-of-WNM-.patch \
+    file://0004-Prevent-installation-of-an-all-zero-TK.patch \
+    file://0005-Fix-PTK-rekeying-to-generate-a-new-ANonce.patch \
+    file://0006-TDLS-Reject-TPK-TK-reconfiguration.patch \
+    file://0007-FT-Do-not-allow-multiple-Reassociation-Response-fram.patch \
 "
+
+SRC_URI[md5sum] = "eaa56dce9bd8f1d195eb62596eab34c7"
+SRC_URI[sha256sum] = "01526b90c1d23bec4b0f052039cc4456c2fd19347b4d830d1d58a0a6aea7117d"
 
 S = "${WORKDIR}/hostapd-${PV}"
 B = "${WORKDIR}/hostapd-${PV}/hostapd"
 
-do_configure() {
+inherit update-rc.d systemd pkgconfig distro_features_check
+
+CONFLICT_DISTRO_FEATURES = "openssl-no-weak-ciphers"
+
+INITSCRIPT_NAME = "hostapd"
+
+SYSTEMD_SERVICE_${PN} = "hostapd.service"
+SYSTEMD_AUTO_ENABLE_${PN} = "disable"
+
+do_configure_append() {
     install -m 0644 ${WORKDIR}/defconfig ${B}/.config
 }
 
 do_compile() {
-    export CFLAGS="-MMD -O2 -Wall -g -I${STAGING_INCDIR}/libnl3"
-    make
+    export CFLAGS="-MMD -O2 -Wall -g"
+    export EXTRA_CFLAGS="${CFLAGS}"
+    make V=1
 }
 
 do_install() {
@@ -42,7 +56,3 @@ do_install() {
 }
 
 CONFFILES_${PN} += "${sysconfdir}/hostapd.conf"
-
-SRC_URI[md5sum] = "eaa56dce9bd8f1d195eb62596eab34c7"
-SRC_URI[sha256sum] = "01526b90c1d23bec4b0f052039cc4456c2fd19347b4d830d1d58a0a6aea7117d"
-

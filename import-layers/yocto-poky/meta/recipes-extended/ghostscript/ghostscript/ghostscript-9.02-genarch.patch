@@ -12,11 +12,12 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 # Summary: Generate arch.h for ppc32
 #
 
-diff -Nru ghostscript-8.64.orig/base/lib.mak ghostscript-8.64/base/lib.mak
---- ghostscript-8.64.orig/base/lib.mak	2010-02-10 10:30:02.000000000 +0800
-+++ ghostscript-8.64/base/lib.mak	2010-02-10 10:56:21.000000000 +0800
-@@ -67,8 +67,8 @@
- stdpre_h=$(GLSRC)stdpre.h $(stdpn_h)
+Index: ghostscript-9.21/base/lib.mak
+===================================================================
+--- ghostscript-9.21.orig/base/lib.mak
++++ ghostscript-9.21/base/lib.mak
+@@ -73,8 +73,8 @@ arch_h=$(GLGEN)arch.h
+ stdpre_h=$(GLSRC)stdpre.h
  stdint__h=$(GLSRC)stdint_.h $(std_h)
  
 -$(GLGEN)arch.h : $(GENARCH_XE)

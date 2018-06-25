@@ -9,7 +9,6 @@ LIC_FILES_CHKSUM = " \
 "
 DEPENDS = "libbsd libpcre openssl zlib libcap"
 
-ANDROID_TAG = "android-5.1.1_r37"
 ANDROID_MIRROR = "android.googlesource.com"
 CORE_REPO = "${ANDROID_MIRROR}/platform/system/core"
 EXTRAS_REPO = "${ANDROID_MIRROR}/platform/system/extras"
@@ -17,16 +16,23 @@ LIBHARDWARE_REPO = "${ANDROID_MIRROR}/platform/hardware/libhardware"
 LIBSELINUX_REPO = "${ANDROID_MIRROR}/platform/external/libselinux"
 BUILD_REPO = "${ANDROID_MIRROR}/platform/build"
 
+# matches with android-5.1.1_r37
+SRCREV_core = "2314b110bdebdbfd2d94c502282f9e57c849897e"
+SRCREV_extras = "3ecbe8d841df96127d7855661293e5ab6ba6c205"
+SRCREV_libhardware = "be55eb1f4d840c82ffaf7c47460df17ff5bc4d9b"
+SRCREV_libselinux = "07e9e1339ad1ba608acfba9dce2d0f474b252feb"
+SRCREV_build = "16e987def3d7d8f7d30805eb95cef69e52a87dbc"
+
 SRC_URI = " \
-    git://${CORE_REPO};name=core;protocol=https;nobranch=1;destsuffix=git/system/core;tag=${ANDROID_TAG} \
-    git://${EXTRAS_REPO};name=extras;protocol=https;nobranch=1;destsuffix=git/system/extras;tag=${ANDROID_TAG} \
-    git://${LIBHARDWARE_REPO};name=libhardware;protocol=https;nobranch=1;destsuffix=git/hardware/libhardware;tag=${ANDROID_TAG} \
-    git://${LIBSELINUX_REPO};name=libselinux;protocol=https;nobranch=1;destsuffix=git/external/libselinux;tag=${ANDROID_TAG} \
-    git://${BUILD_REPO};name=build;protocol=https;nobranch=1;destsuffix=git/build;tag=${ANDROID_TAG} \
+    git://${CORE_REPO};name=core;protocol=https;nobranch=1;destsuffix=git/system/core \
+    git://${EXTRAS_REPO};name=extras;protocol=https;nobranch=1;destsuffix=git/system/extras \
+    git://${LIBHARDWARE_REPO};name=libhardware;protocol=https;nobranch=1;destsuffix=git/hardware/libhardware \
+    git://${LIBSELINUX_REPO};name=libselinux;protocol=https;nobranch=1;destsuffix=git/external/libselinux \
+    git://${BUILD_REPO};name=build;protocol=https;nobranch=1;destsuffix=git/build \
     file://remove-selinux-android.patch \
     file://use-capability.patch \
     file://use-local-socket.patch \
-    file://preserve-ownership.patch \
+    file://preserve-ownership.patch;patchdir=system/extras \
     file://mkbootimg-Add-dt-parameter-to-specify-DT-image.patch \
     file://remove-bionic-android.patch \
     file://define-shell-command.patch \

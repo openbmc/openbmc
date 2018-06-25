@@ -9,4 +9,4 @@ SRC_URI[sha256sum] = "a6be69091dac236ea9c6bc7d012beab42010fa914c459791d627dad491
 PYPI_PACKAGE = "MarkupSafe"
 inherit pypi
 
-RDEPENDS_${PN} += "${PYTHON_PN}-re ${PYTHON_PN}-stringold"
+RDEPENDS_${PN} += "${PYTHON_PN}-stringold"

@@ -111,8 +111,7 @@
             <link linkend='ref-classes-deploy'><filename>deploy</filename></link>
             class and should write the output to
             <filename>${</filename><link linkend='var-DEPLOYDIR'><filename>DEPLOYDIR</filename></link><filename>}</filename>,
-            which is not to be confused with
-            <filename>${</filename><link linkend='var-DEPLOY_DIR'><filename>DEPLOY_DIR</filename></link><filename>}</filename>.
+            which is not to be confused with <filename>${DEPLOY_DIR}</filename>.
             The <filename>deploy</filename> class sets up
             <filename>do_deploy</filename> as a shared state (sstate) task that
             can be accelerated through sstate use.
@@ -220,8 +219,8 @@
 
         <para>
             For more information on image creation, see the
-            "<link linkend='image-generation-dev-environment'>Image Generation</link>"
-            section.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#image-generation-dev-environment'>Image Generation</ulink>"
+            section in the Yocto Project Overview and Concepts Manual.
         </para>
     </section>
 
@@ -232,7 +231,7 @@
             Completes the image generation process.
             The <filename>do_image_complete</filename> task runs after the
             OpenEmbedded build system has run the
-            <link linkend='ref-tasks-rootfs'><filename>do_image</filename></link>
+            <link linkend='ref-tasks-image'><filename>do_image</filename></link>
             task during which image pre-processing occurs and through
             dynamically generated <filename>do_image_*</filename> tasks the
             image is constructed.
@@ -246,8 +245,8 @@
 
         <para>
             For more information on image creation, see the
-            "<link linkend='image-generation-dev-environment'>Image Generation</link>"
-            section.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#image-generation-dev-environment'>Image Generation</ulink>"
+            section in the Yocto Project Overview and Concepts Manual.
         </para>
     </section>
 
@@ -268,7 +267,7 @@
             and
             <link linkend='ref-tasks-rootfs'><filename>do_rootfs</filename></link>),
             run under
-            <link linkend='fakeroot-and-pseudo'>fakeroot</link>.
+            <ulink url='&YOCTO_DOCS_OM_URL;#fakeroot-and-pseudo'>fakeroot</ulink>.
             <note>
                 <title>Caution</title>
 
@@ -280,7 +279,7 @@
                     UID and/or GID of the original file, which is usually not
                     what you want.
                     The
-                    <link linkend='ref-classes-insane'><filename>host-user-contaminated</filename></link>
+                    <link linkend='insane-host-user-contaminated'><filename>host-user-contaminated</filename></link>
                     QA check checks for files that probably have the wrong
                     ownership.
                 </para>
@@ -342,8 +341,8 @@
             For additional information, see the
             <link linkend='var-PKGDESTWORK'><filename>PKGDESTWORK</filename></link>
             variable and the
-            "<link linkend='automatically-added-runtime-dependencies'>Automatically Added Runtime Dependencies</link>"
-            section.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#automatically-added-runtime-dependencies'>Automatically Added Runtime Dependencies</ulink>"
+            section in the Yocto Project Overview and Concepts Manual.
         </para>
     </section>
 
@@ -367,8 +366,8 @@
             <filename>${</filename><link linkend='var-DEPLOY_DIR_DEB'><filename>DEPLOY_DIR_DEB</filename></link><filename>}</filename>
             directory in the package feeds area.
             For more information, see the
-            "<link linkend='package-feeds-dev-environment'>Package Feeds</link>"
-            section.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#package-feeds-dev-environment'>Package Feeds</ulink>"
+            section in the Yocto Project Overview and Concepts Manual.
         </para>
     </section>
 
@@ -381,8 +380,8 @@
             <filename>${</filename><link linkend='var-DEPLOY_DIR_IPK'><filename>DEPLOY_DIR_IPK</filename></link><filename>}</filename>
             directory in the package feeds area.
             For more information, see the
-            "<link linkend='package-feeds-dev-environment'>Package Feeds</link>"
-            section.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#package-feeds-dev-environment'>Package Feeds</ulink>"
+            section in the Yocto Project Overview and Concepts Manual.
         </para>
     </section>
 
@@ -395,8 +394,8 @@
             <filename>${</filename><link linkend='var-DEPLOY_DIR_RPM'><filename>DEPLOY_DIR_RPM</filename></link><filename>}</filename>
             directory in the package feeds area.
             For more information, see the
-            "<link linkend='package-feeds-dev-environment'>Package Feeds</link>"
-            section.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#package-feeds-dev-environment'>Package Feeds</ulink>"
+            section in the Yocto Project Overview and Concepts Manual.
         </para>
     </section>
 
@@ -408,8 +407,8 @@
             <filename>${</filename><link linkend='var-DEPLOY_DIR_TAR'><filename>DEPLOY_DIR_TAR</filename></link><filename>}</filename>
             directory in the package feeds area.
             For more information, see the
-            "<link linkend='package-feeds-dev-environment'>Package Feeds</link>"
-            section.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#package-feeds-dev-environment'>Package Feeds</ulink>"
+            section in the Yocto Project Overview and Concepts Manual.
         </para>
     </section>
 
@@ -430,9 +429,87 @@
 
         <para>
             Locates patch files and applies them to the source code.
-            See the
-            "<link linkend='patching-dev-environment'>Patching</link>"
-            section for more information.
+        </para>
+
+        <para>
+            After fetching and unpacking source files, the build system
+            uses the recipe's
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
+            statements to locate and apply patch files to the source code.
+            <note>
+                The build system uses the
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESPATH'><filename>FILESPATH</filename></ulink>
+                variable to determine the default set of directories when
+                searching for patches.
+            </note>
+            Patch files, by default, are <filename>*.patch</filename> and
+            <filename>*.diff</filename> files created and kept in a
+            subdirectory of the directory holding the recipe file.
+            For example, consider the
+            <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/poky/tree/meta/recipes-connectivity/bluez5'><filename>bluez5</filename></ulink>
+            recipe from the OE-Core layer (i.e.
+            <filename>poky/meta</filename>):
+            <literallayout class='monospaced'>
+     poky/meta/recipes-connectivity/bluez5
+            </literallayout>
+            This recipe has two patch files located here:
+            <literallayout class='monospaced'>
+     poky/meta/recipes-connectivity/bluez5/bluez5
+            </literallayout>
+        </para>
+
+        <para>
+            In the <filename>bluez5</filename> recipe, the
+            <filename>SRC_URI</filename> statements point to the source and
+            patch files needed to build the package.
+            <note>
+                In the case for the <filename>bluez5_5.48.bb</filename>
+                recipe, the <filename>SRC_URI</filename> statements are from an
+                include file <filename>bluez5.inc</filename>.
+            </note>
+        </para>
+
+        <para>
+            As mentioned earlier, the build system treats files whose file
+            types are <filename>.patch</filename> and
+            <filename>.diff</filename> as patch files.
+            However, you can use the "apply=yes" parameter with the
+            <filename>SRC_URI</filename> statement to indicate any file as a
+            patch file:
+            <literallayout class='monospaced'>
+     SRC_URI = " \
+          git://<replaceable>path_to_repo</replaceable>/<replaceable>some_package</replaceable> \
+          file://<replaceable>file</replaceable>;apply=yes \
+     "
+            </literallayout>
+        </para>
+
+        <para>
+            Conversely, if you have a directory full of patch files and you
+            want to exclude some so that the <filename>do_patch</filename>
+            task does not apply them during the patch phase, you can use
+            the "apply=no" parameter with the <filename>SRC_URI</filename>
+            statement:
+            <literallayout class='monospaced'>
+     SRC_URI = " \
+          git://<replaceable>path_to_repo</replaceable>/<replaceable>some_package</replaceable> \
+          file://<replaceable>path_to_lots_of_patch_files</replaceable> \
+          file://<replaceable>path_to_lots_of_patch_files</replaceable>/<replaceable>patch_file5</replaceable>;apply=no \
+     "
+            </literallayout>
+            In the previous example, assuming all the files in the directory
+            holding the patch files end with either <filename>.patch</filename>
+            or <filename>.diff</filename>, every file would be applied as a
+            patch by default except for the
+            <replaceable>patch_file5</replaceable> patch.
+        </para>
+
+        <para>
+            You can find out more about the patching process in the
+            "<ulink url='&YOCTO_DOCS_OM_URL;#patching-dev-environment'>Patching</ulink>"
+            section in the Yocto Project Overview and Concepts Manual and the
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#new-recipe-patching-code'>Patching Code</ulink>"
+            section in the Yocto Project Development Tasks Manual.
         </para>
     </section>
 
@@ -451,8 +528,9 @@
         <para>
             Creates the file and directory structure for an installable SDK.
             See the
-            "<link linkend='sdk-generation-dev-environment'>SDK Generation</link>"
-            section for more information.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#sdk-generation-dev-environment'>SDK Generation</ulink>"
+            section in the Yocto Project Overview and Concepts Manual for more
+            information.
         </para>
     </section>
 
@@ -538,8 +616,9 @@
             <link linkend='var-S'><filename>S</filename></link> variable also
             plays a role in where unpacked source files ultimately reside.
             For more information on how source files are unpacked, see the
-            "<link linkend='source-fetching-dev-environment'>Source Fetching</link>"
-            section and the <filename>WORKDIR</filename> and
+            "<ulink url='&YOCTO_DOCS_OM_URL;#source-fetching-dev-environment'>Source Fetching</ulink>"
+            section in the Yocto Project Overview and Concepts Manual and also
+            see the <filename>WORKDIR</filename> and
             <filename>S</filename> variable descriptions.
         </para>
     </section>
@@ -593,24 +672,13 @@
         </para>
     </section>
 
-    <section id='ref-tasks-checkuriall'>
-        <title><filename>do_checkuriall</filename></title>
-
-        <para>
-            Validates the
-            <link linkend='var-SRC_URI'><filename>SRC_URI</filename></link>
-            value for all recipes required to build a target.
-        </para>
-    </section>
-
     <section id='ref-tasks-clean'>
         <title><filename>do_clean</filename></title>
 
         <para>
             Removes all output files for a target from the
             <link linkend='ref-tasks-unpack'><filename>do_unpack</filename></link>
-            task forward (i.e.
-            <link linkend='ref-tasks-patch'><filename>do_unpack</filename></link>,
+            task forward (i.e. <filename>do_unpack</filename>,
             <link linkend='ref-tasks-configure'><filename>do_configure</filename></link>,
             <link linkend='ref-tasks-compile'><filename>do_compile</filename></link>,
             <link linkend='ref-tasks-install'><filename>do_install</filename></link>,
@@ -627,8 +695,8 @@
 
         <para>
             Running this task does not remove the
-            <link linkend='shared-state-cache'>sstate</link>) cache
-            files.
+            <ulink url='&YOCTO_DOCS_OM_URL;#shared-state-cache'>sstate</ulink>
+            cache files.
             Consequently, if no changes have been made and the recipe is
             rebuilt after cleaning, output files are simply restored from the
             sstate cache.
@@ -644,8 +712,9 @@
 
         <para>
             Removes all output files, shared state
-            (<link linkend='shared-state-cache'>sstate</link>) cache, and
-            downloaded source files for a target (i.e. the contents of
+            (<ulink url='&YOCTO_DOCS_OM_URL;#shared-state-cache'>sstate</ulink>)
+            cache, and downloaded source files for a target (i.e. the contents
+            of
             <link linkend='var-DL_DIR'><filename>DL_DIR</filename></link>).
             Essentially, the <filename>do_cleanall</filename> task is
             identical to the
@@ -674,13 +743,14 @@
 
         <para>
             Removes all output files and shared state
-            (<link linkend='shared-state-cache'>sstate</link>)
+            (<ulink url='&YOCTO_DOCS_OM_URL;#shared-state-cache'>sstate</ulink>)
             cache for a target.
             Essentially, the <filename>do_cleansstate</filename> task is
             identical to the
             <link linkend='ref-tasks-clean'><filename>do_clean</filename></link>
             task with the added removal of shared state
-            (<link linkend='shared-state-cache'>sstate</link>) cache.
+            (<ulink url='&YOCTO_DOCS_OM_URL;#shared-state-cache'>sstate</ulink>)
+            cache.
         </para>
 
         <para>
@@ -736,14 +806,6 @@
         </para>
     </section>
 
-    <section id='ref-tasks-fetchall'>
-        <title><filename>do_fetchall</filename></title>
-
-        <para>
-            Fetches all remote sources required to build a target.
-        </para>
-    </section>
-
     <section id='ref-tasks-listtasks'>
         <title><filename>do_listtasks</filename></title>
 
@@ -757,7 +819,7 @@
 
         <para>
             Creates or updates the index in the
-            <link linkend='package-feeds-dev-environment'>Package Feeds</link>
+            <ulink url='&YOCTO_DOCS_OM_URL;#package-feeds-dev-environment'>Package Feeds</ulink>
             area.
             <note>
                 This task is not triggered with the
@@ -809,8 +871,9 @@
             Creates the root filesystem (file and directory structure) for an
             image.
             See the
-            "<link linkend='image-generation-dev-environment'>Image Generation</link>"
-            section for more information on how the root filesystem is created.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#image-generation-dev-environment'>Image Generation</ulink>"
+            section in the Yocto Project Overview and Concepts Manual for more
+            information on how the root filesystem is created.
         </para>
     </section>
 

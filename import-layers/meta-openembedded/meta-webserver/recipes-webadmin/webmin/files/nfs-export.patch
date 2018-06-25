@@ -12,11 +12,11 @@ Upstream-Status: Pending
 
 Signed-off-by: Yu Ke <ke.yu@intel.com>
 
-diff --git a/exports/save_export.cgi b/exports/save_export.cgi
-index 3bc2f97..3e60298 100755
---- a/exports/save_export.cgi
-+++ b/exports/save_export.cgi
-@@ -40,7 +40,7 @@ else {
+Index: webmin-1.850/exports/save_export.cgi
+===================================================================
+--- webmin-1.850.orig/exports/save_export.cgi
++++ webmin-1.850/exports/save_export.cgi
+@@ -50,7 +50,7 @@ else {
  			&error(&text('save_enetmask', $in{'netmask'}));
  		$exp{'host'} = $in{'network'}."/".$in{'netmask'};
  		}
@@ -25,9 +25,9 @@ index 3bc2f97..3e60298 100755
  	else {
  		$in{'host'} =~ /\*/ || &to_ipaddress($in{'host'}) ||
  			&error(&text('save_ehost', $in{'host'}));
-@@ -70,6 +70,11 @@ else {
- 
- 	delete($opts{'no_subtree_check'}); delete($opts{'subtree_check'});
+@@ -87,6 +87,11 @@ else {
+ 	delete($opts{'no_subtree_check'});
+ 	delete($opts{'subtree_check'});
  	$opts{'no_subtree_check'} = "" if ($in{'no_subtree_check'});
 +	if ($in{'no_subtree_check'}) {
 +		$opts{'no_subtree_check'} = "";
@@ -35,5 +35,5 @@ index 3bc2f97..3e60298 100755
 +		$opts{'subtree_check'} = "";
 +	}
  
- 	delete($opts{'nohide'}); delete($opts{'hide'});
- 	$opts{'nohide'} = "" if ($in{'nohide'});
+ 	delete($opts{'nohide'});
+ 	delete($opts{'hide'});

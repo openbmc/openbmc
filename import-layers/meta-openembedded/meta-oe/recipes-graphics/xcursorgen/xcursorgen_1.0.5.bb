@@ -7,6 +7,8 @@ SRC_URI = "http://xorg.freedesktop.org/archive/individual/app/${BPN}-${PV}.tar.b
 SRC_URI[md5sum] = "09f56978a62854534deacc8aa8ff3031"
 SRC_URI[sha256sum] = "bc7171a0fa212da866fca2301241630e2009aea8c4ddb75f21b51a31c2e4c581"
 
-inherit autotools pkgconfig
+inherit distro_features_check autotools pkgconfig
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 BBCLASSEXTEND = "native"

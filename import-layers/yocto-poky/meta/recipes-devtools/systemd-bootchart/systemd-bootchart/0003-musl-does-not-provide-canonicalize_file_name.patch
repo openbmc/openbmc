@@ -1,0 +1,33 @@
+From 79396449d264bde58b4daa3ef6dd99f0f0652429 Mon Sep 17 00:00:00 2001
+From: Tim Orling <timothy.t.orling@linux.intel.com>
+Date: Thu, 28 Dec 2017 22:10:58 -0800
+Subject: [PATCH 3/3] musl does not provide canonicalize_file_name
+
+Reuse the approach from systemd:
+systemd/0007-check-for-missing-canonicalize_file_name.patch
+
+Based on work by: Khem Raj <raj.khem@gmail.com>
+
+Signed-off-by: Tim Orling <timothy.t.orling@linux.intel.com>
+---
+Upstream-Status: Pending
+
+ src/path-util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/path-util.c b/src/path-util.c
+index 2fb6366..12e2e17 100644
+--- a/src/path-util.c
++++ b/src/path-util.c
+@@ -63,7 +63,7 @@ char **path_strv_resolve(char **l, const char *prefix) {
+                         t = *s;
+ 
+                 errno = 0;
+-                u = canonicalize_file_name(t);
++                u = realpath(t, NULL);
+                 if (!u) {
+                         if (errno == ENOENT) {
+                                 if (prefix) {
+-- 
+2.13.6
+

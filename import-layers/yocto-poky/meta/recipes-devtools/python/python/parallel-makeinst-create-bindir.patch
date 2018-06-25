@@ -8,12 +8,12 @@ Upstream-Status: Pending
 
 --- Python-2.7.3.orig/Makefile.pre.in
 +++ Python-2.7.3/Makefile.pre.in
-@@ -1008,7 +1008,7 @@ LIBPL=		$(LIBP)/config
+@@ -1187,7 +1187,7 @@
  LIBPC=		$(LIBDIR)/pkgconfig
-
- libainstall:	all python-config
+ 
+ libainstall:	@DEF_MAKE_RULE@ python-config
 -	@for i in $(LIBDIR) $(LIBP) $(LIBPL) $(LIBPC); \
 +	@for i in $(LIBDIR) $(LIBP) $(LIBPL) $(LIBPC) $(BINDIR); \
-	do \
-		if test ! -d $(DESTDIR)$$i; then \
-			echo "Creating directory $$i"; \
+ 	do \
+ 		if test ! -d $(DESTDIR)$$i; then \
+ 			echo "Creating directory $$i"; \

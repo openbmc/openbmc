@@ -4,7 +4,7 @@ meta-virtualization
 This layer provides support for building Xen, KVM, Libvirt, and associated
 packages necessary for constructing OE-based virtualized solutions.
 
-The bbappend files for some recipe (e.g. linux-yocto) in this layer needs to
+The bbappend files for some recipes (e.g. linux-yocto) in this layer need to
 have 'virtualization' in DISTRO_FEATURES to have effect. To enable them, add
 in configuration file the following line.
 
@@ -23,8 +23,16 @@ variable in your configuration:
 
   SKIP_META_VIRT_SANITY_CHECK = 1
 
-Also note that there are kvm and xen specific distro flags/features that depending
-on your use case.
+Depending on your use case, there are other distro features in meta-virtualization
+that may also be enabled:
+
+ - xen: enables xen functionality in various packages (kernel, libvirt, etc)
+ - kvm: enables KVM configurations in the kernel and autoloads modules
+ - aufs: enables aufs support in docker and linux-yocto
+ - x11: enable xen and libvirt functionality related to x11
+ - selinux: enables functionality in libvirt and lxc
+ - systemd: enable systemd services and unit files (for recipes for support)
+ - sysvinit: enable sysvinit scripts (for recipes with support)
 
 Dependencies
 ------------
@@ -39,13 +47,9 @@ URI: git://github.com/openembedded/meta-openembedded.git
 branch: master
 revision: HEAD
 layers: meta-oe
-	meta-networking
+        meta-networking
         meta-filesystems
         meta-python
-
-URI: git://github.com/errordeveloper/oe-meta-go.git
-branch: master
-revision: HEAD
 
 BBFILE_PRIORITY_openembedded-layer = "4"
 
@@ -64,7 +68,7 @@ Maintainers: Raymond Danks <ray.danks@se-eng.com>
              Bruce Ashfield <bruce.ashfield@gmail.com>
 
 When sending single patches, please using something like:
-$ git send-email -1 --to meta-virtualization@yoctoproject.org --subject-prefix='meta-virtualization][PATCH'
+$ git send-email -1 -M --to meta-virtualization@yoctoproject.org --subject-prefix='meta-virtualization][PATCH'
 
 License
 -------

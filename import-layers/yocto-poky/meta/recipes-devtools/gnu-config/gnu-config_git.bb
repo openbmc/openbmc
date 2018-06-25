@@ -14,7 +14,7 @@ PV = "20150728+git${SRCPV}"
 SRC_URI = "git://git.savannah.gnu.org/config.git \
            file://gnu-configize.in"
 S = "${WORKDIR}/git"
-UPSTREAM_VERSION_UNKNOWN = "1"
+UPSTREAM_CHECK_COMMITS = "1"
 
 CLEANBROKEN = "1"
 

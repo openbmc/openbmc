@@ -1,15 +1,16 @@
-From 0c42e1fb84cc2bfe768bed17f3b979aca868cf64 Mon Sep 17 00:00:00 2001
+From b60e364c35d56a2a3164254d98c9931bfa3feed4 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Wed, 11 Apr 2012 14:34:43 +0200
-Subject: [PATCH 06/12] add support for /etc/X11/xserver-system
+Subject: [PATCH] add support for /etc/X11/xserver-system
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
- X11/xserver-common |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ X11/xserver-common | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/X11/xserver-common b/X11/xserver-common
-index 4c7ed6e..6d8c9df 100644
+index 52655cb..bb7c2ff 100644
 --- a/X11/xserver-common
 +++ b/X11/xserver-common
 @@ -204,3 +204,8 @@ fi
@@ -21,6 +22,3 @@ index 4c7ed6e..6d8c9df 100644
 +if [ -e /etc/X11/xserver-system ] ; then                    
 +       . /etc/X11/xserver-system                    
 +fi                    
--- 
-1.7.8.5
-

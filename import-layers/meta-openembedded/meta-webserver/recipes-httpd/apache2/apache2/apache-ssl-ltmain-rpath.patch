@@ -1,11 +1,11 @@
  build/ltmain.sh | 32 +++++++++++++++++++++++++++-----
  1 file changed, 27 insertions(+), 5 deletions(-)
 
-diff --git a/build/ltmain.sh b/build/ltmain.sh
-index 5eca4ae..805b461 100644
---- a/build/ltmain.sh
-+++ b/build/ltmain.sh
-@@ -6944,7 +6944,7 @@ func_mode_link ()
+Index: httpd-2.4.29/build/ltmain.sh
+===================================================================
+--- httpd-2.4.29.orig/build/ltmain.sh
++++ httpd-2.4.29/build/ltmain.sh
+@@ -6969,7 +6969,7 @@ func_mode_link ()
  	dir=$func_resolve_sysroot_result
  	# We need an absolute path.
  	case $dir in
@@ -14,7 +14,7 @@ index 5eca4ae..805b461 100644
  	*)
  	  absdir=`cd "$dir" && pwd`
  	  test -z "$absdir" && \
-@@ -8137,7 +8137,7 @@ func_mode_link ()
+@@ -8167,7 +8167,7 @@ func_mode_link ()
  	    $ECHO "*** $linklib is not portable!"
  	  fi
  	  if test lib = "$linkmode" &&
@@ -23,7 +23,7 @@ index 5eca4ae..805b461 100644
  	    # Hardcode the library path.
  	    # Skip directories that are in the system default run-time
  	    # search path.
-@@ -8404,7 +8404,7 @@ func_mode_link ()
+@@ -8434,7 +8434,7 @@ func_mode_link ()
  
  	if test lib = "$linkmode"; then
  	  if test -n "$dependency_libs" &&
@@ -32,7 +32,7 @@ index 5eca4ae..805b461 100644
  	       test yes = "$build_old_libs" ||
  	       test yes = "$link_static"; }; then
  	    # Extract -R from dependency_libs
-@@ -9025,7 +9025,8 @@ func_mode_link ()
+@@ -9086,7 +9086,8 @@ func_mode_link ()
  	  *) func_append finalize_rpath " $libdir" ;;
  	  esac
  	done
@@ -42,7 +42,7 @@ index 5eca4ae..805b461 100644
  	  dependency_libs="$temp_xrpath $dependency_libs"
  	fi
        fi
-@@ -9473,7 +9474,7 @@ EOF
+@@ -9534,7 +9535,7 @@ EOF
  	case $archive_cmds in
  	  *\$LD\ *) wl= ;;
          esac
@@ -51,7 +51,7 @@ index 5eca4ae..805b461 100644
  	  # Hardcode the library paths
  	  hardcode_libdirs=
  	  dep_rpath=
-@@ -10211,6 +10212,27 @@ EOF
+@@ -10272,6 +10273,27 @@ EOF
        # Now hardcode the library paths
        rpath=
        hardcode_libdirs=
@@ -79,6 +79,3 @@ index 5eca4ae..805b461 100644
        for libdir in $compile_rpath $finalize_rpath; do
  	if test -n "$hardcode_libdir_flag_spec"; then
  	  if test -n "$hardcode_libdir_separator"; then
--- 
-1.9.1
-

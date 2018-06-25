@@ -11,3 +11,5 @@ SRC_URI[tar.md5sum] = "be9b4b5328c6da1bda565ac5dffadb2d"
 SRC_URI[tar.sha256sum] = "171f89699f286a5854b72b91d06e8f8e3683064c5901fb09d954a9ab6f551f81"
 
 inherit autotools pkgconfig
+
+BBCLASSEXTEND = "native"

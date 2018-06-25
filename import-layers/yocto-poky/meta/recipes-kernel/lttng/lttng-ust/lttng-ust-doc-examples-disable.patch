@@ -6,13 +6,12 @@ recipe anyway.
 
 Signed-off-by: Tom Zanussi <tom.zanussi@intel.com>
 
-Index: doc/Makefile.am
+Index: lttng-ust-2.9.1/doc/Makefile.am
 ===================================================================
---- a/doc/Makefile.am
-+++ b/doc/Makefile.am
-@@ -1,4 +1,4 @@
+--- lttng-ust-2.9.1.orig/doc/Makefile.am
++++ lttng-ust-2.9.1/doc/Makefile.am
+@@ -1,3 +1,3 @@
 -SUBDIRS = . man examples
 +SUBDIRS = . man
  
- dist_man_MANS = man/lttng-gen-tp.1 \
- 	man/lttng-ust.3 \
+ dist_doc_DATA = java-agent.txt

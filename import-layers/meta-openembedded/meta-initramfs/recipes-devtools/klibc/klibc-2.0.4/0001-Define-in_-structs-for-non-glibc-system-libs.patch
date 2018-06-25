@@ -1,4 +1,4 @@
-From f414dea1316a48aba3e8e293201ebd51652d3ef4 Mon Sep 17 00:00:00 2001
+From 57e3a60b23891905733bfea7a1cb78c2377cc524 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 9 Jul 2017 15:17:29 -0700
 Subject: [PATCH] Define in_* structs for non-glibc system libs
@@ -10,14 +10,38 @@ glibc in mind, and does not provide adequate guards for musl
 to infer that these structs should be defined in linux/in.h
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
- usr/include/netinet/in.h | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
 
-Index: git/usr/include/netinet/in.h
-===================================================================
---- git.orig/usr/include/netinet/in.h
-+++ git/usr/include/netinet/in.h
+---
+ usr/include/net/if.h     | 11 +++++++++++
+ usr/include/netinet/in.h | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
+
+diff --git a/usr/include/net/if.h b/usr/include/net/if.h
+index 116a176..6246b12 100644
+--- a/usr/include/net/if.h
++++ b/usr/include/net/if.h
+@@ -1,6 +1,17 @@
+ #ifndef _NET_IF_H
+ #define _NET_IF_H
+ 
++#ifndef __GLIBC__
++#include <linux/libc-compat.h>
++#undef __UAPI_DEF_IF_IFREQ
++#define __UAPI_DEF_IF_IFREQ            1
++#undef __UAPI_DEF_IF_IFNAMSIZ
++#define __UAPI_DEF_IF_IFNAMSIZ         1
++#undef __UAPI_DEF_IF_IFMAP
++#define __UAPI_DEF_IF_IFMAP            1
++#undef __UAPI_DEF_IF_NET_DEVICE_FLAGS
++#define __UAPI_DEF_IF_NET_DEVICE_FLAGS 1
++#endif
+ #include <sys/socket.h>
+ #include <sys/types.h>
+ #include <linux/if.h>
+diff --git a/usr/include/netinet/in.h b/usr/include/netinet/in.h
+index 2952bb2..0c95bc9 100644
+--- a/usr/include/netinet/in.h
++++ b/usr/include/netinet/in.h
 @@ -5,6 +5,42 @@
  #ifndef _NETINET_IN_H
  #define _NETINET_IN_H
@@ -61,25 +85,3 @@ Index: git/usr/include/netinet/in.h
  #include <klibc/extern.h>
  #include <stdint.h>
  #include <endian.h>		/* Must be included *before* <linux/in.h> */
-Index: git/usr/include/net/if.h
-===================================================================
---- git.orig/usr/include/net/if.h
-+++ git/usr/include/net/if.h
-@@ -1,6 +1,17 @@
- #ifndef _NET_IF_H
- #define _NET_IF_H
- 
-+#ifndef __GLIBC__
-+#include <linux/libc-compat.h>
-+#undef __UAPI_DEF_IF_IFREQ
-+#define __UAPI_DEF_IF_IFREQ            1
-+#undef __UAPI_DEF_IF_IFNAMSIZ
-+#define __UAPI_DEF_IF_IFNAMSIZ         1
-+#undef __UAPI_DEF_IF_IFMAP
-+#define __UAPI_DEF_IF_IFMAP            1
-+#undef __UAPI_DEF_IF_NET_DEVICE_FLAGS
-+#define __UAPI_DEF_IF_NET_DEVICE_FLAGS 1
-+#endif
- #include <sys/socket.h>
- #include <sys/types.h>
- #include <linux/if.h>

@@ -14,6 +14,8 @@ SRC_URI[sha256sum] = "9d2771e4c89be127bc4bac056ab7ceaf0e0064c723d6b6e195739c3af4
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 
+DEFAULT_PREFERENCE = "-1"
+
 inherit setuptools
 
 RDEPENDS_${PN} += "python-io \

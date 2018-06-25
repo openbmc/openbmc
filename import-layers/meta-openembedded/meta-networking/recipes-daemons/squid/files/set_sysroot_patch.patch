@@ -1,15 +1,23 @@
-Set the SYSROOT for libxml2 header file to avoid host contamination.
+From 702bd881b66dc034e711c0ff47805f2da40b6e0d Mon Sep 17 00:00:00 2001
+From: Yue Tao <yue.tao@windriver.com>
+Date: Mon, 8 Aug 2016 16:04:33 +0800
+Subject: [PATCH] Set the SYSROOT for libxml2 header file to avoid host
+ contamination.
 
 Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Yue Tao <yue.tao@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 
-diff --git a/configure.ac.old b/configure.ac
-index 54eda73..874f48e 100644
---- a/configure.ac.old
+---
+ configure.ac | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 504a844..ff4688c 100644
+--- a/configure.ac
 +++ b/configure.ac
-@@ -964,15 +964,15 @@ if test "x$squid_opt_use_esi" = "xyes" -a "x$with_libxml2" != "xno" ; then
+@@ -974,15 +974,15 @@ if test "x$squid_opt_use_esi" = "xyes" -a "x$with_libxml2" != "xno" ; then
    dnl Find the main header and include path...
    AC_CACHE_CHECK([location of libxml2 include files], [ac_cv_libxml2_include], [
      AC_CHECK_HEADERS([libxml/parser.h], [], [

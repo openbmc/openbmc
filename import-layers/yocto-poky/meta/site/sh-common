@@ -227,7 +227,6 @@ with_broken_putenv=${with_broken_putenv=no}
 clamav_av_func_working_snprintf_long=${clamav_av_func_working_snprintf_long=yes}
 clamav_av_have_in_port_t=${clamav_av_have_in_port_t=yes}
 clamav_av_have_in_addr_t=${clamav_av_have_in_addr_t=yes}
-ac_cv_func_mmap_fixed_mapped=${ac_cv_func_mmap_fixed_mapped=yes}
 
 # libnet 
 ac_cv_lbl_unaligned_fail=${ac_cv_lbl_unaligned_fail=no}

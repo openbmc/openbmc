@@ -18,3 +18,7 @@ inherit cmake
 
 DEPENDS = "libcap file bzip2"
 RDEPENDS_${PN} = "perl"
+
+do_install_append() {
+    ln -sf ${bindir}/genisoimage ${D}${bindir}/mkisofs
+}

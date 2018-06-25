@@ -3,10 +3,11 @@ We do not have capability to run binaries when cross compiling
 Upstream-Status: Pending
 
 
-diff -uraN nginx-1.0.11.orig/auto/feature nginx-1.0.11/auto/feature
---- nginx-1.0.11.orig/auto/feature	2011-05-11 06:50:19.000000000 -0500
-+++ nginx-1.0.11/auto/feature	2011-12-27 13:56:42.323370040 -0600
-@@ -49,12 +49,20 @@
+Index: nginx-1.12.2/auto/feature
+===================================================================
+--- nginx-1.12.2.orig/auto/feature
++++ nginx-1.12.2/auto/feature
+@@ -49,12 +49,20 @@ eval "/bin/sh -c \"$ngx_test\" >> $NGX_A
  
  if [ -x $NGX_AUTOTEST ]; then
  
@@ -29,7 +30,7 @@ diff -uraN nginx-1.0.11.orig/auto/feature nginx-1.0.11/auto/feature
                  ngx_found=yes
  
                  if test -n "$ngx_feature_name"; then
-@@ -68,17 +75,27 @@
+@@ -68,17 +76,27 @@ if [ -x $NGX_AUTOTEST ]; then
  
          value)
              # /bin/sh is used to intercept "Killed" or "Abort trap" messages
@@ -61,7 +62,7 @@ diff -uraN nginx-1.0.11.orig/auto/feature nginx-1.0.11/auto/feature
              else
                  echo " found but is not working"
              fi
-@@ -86,7 +105,7 @@
+@@ -86,7 +104,7 @@ END
  
          bug)
              # /bin/sh is used to intercept "Killed" or "Abort trap" messages
@@ -70,10 +71,11 @@ diff -uraN nginx-1.0.11.orig/auto/feature nginx-1.0.11/auto/feature
                  echo " not found"
  
              else
-diff -uraN nginx-1.0.11.orig/auto/options nginx-1.0.11/auto/options
---- nginx-1.0.11.orig/auto/options	2011-12-14 07:34:16.000000000 -0600
-+++ nginx-1.0.11/auto/options	2011-12-27 13:56:42.323370040 -0600
-@@ -353,6 +353,18 @@
+Index: nginx-1.12.2/auto/options
+===================================================================
+--- nginx-1.12.2.orig/auto/options
++++ nginx-1.12.2/auto/options
+@@ -386,6 +386,18 @@ $0: warning: the \"--with-sha1-asm\" opt
          --test-build-epoll)              NGX_TEST_BUILD_EPOLL=YES   ;;
          --test-build-solaris-sendfilev)  NGX_TEST_BUILD_SOLARIS_SENDFILEV=YES ;;
  
@@ -92,7 +94,7 @@ diff -uraN nginx-1.0.11.orig/auto/options nginx-1.0.11/auto/options
          *)
              echo "$0: error: invalid option \"$option\""
              exit 1
-@@ -533,6 +445,17 @@
+@@ -568,6 +580,17 @@ cat << END
  
    --with-debug                       enable debug logging
  
@@ -110,7 +112,7 @@ diff -uraN nginx-1.0.11.orig/auto/options nginx-1.0.11/auto/options
  END
  
      exit 1
-@@ -554,6 +577,8 @@
+@@ -576,6 +599,8 @@ fi
  
  if [ ".$NGX_PLATFORM" = ".win32" ]; then
      NGX_WINE=$WINE
@@ -119,10 +121,11 @@ diff -uraN nginx-1.0.11.orig/auto/options nginx-1.0.11/auto/options
  fi
  
  
-diff -uraN nginx-1.0.11.orig/auto/types/sizeof nginx-1.0.11/auto/types/sizeof
---- nginx-1.0.11.orig/auto/types/sizeof	2006-06-28 11:00:26.000000000 -0500
-+++ nginx-1.0.11/auto/types/sizeof	2011-12-27 13:56:42.323370040 -0600
-@@ -12,9 +12,12 @@
+Index: nginx-1.12.2/auto/types/sizeof
+===================================================================
+--- nginx-1.12.2.orig/auto/types/sizeof
++++ nginx-1.12.2/auto/types/sizeof
+@@ -12,9 +12,12 @@ checking for $ngx_type size
  
  END
  
@@ -137,7 +140,7 @@ diff -uraN nginx-1.0.11.orig/auto/types/sizeof nginx-1.0.11/auto/types/sizeof
  
  #include <sys/types.h>
  #include <sys/time.h>
-@@ -33,15 +36,16 @@
+@@ -33,15 +36,16 @@ int main(void) {
  END
  
  
@@ -160,10 +163,11 @@ diff -uraN nginx-1.0.11.orig/auto/types/sizeof nginx-1.0.11/auto/types/sizeof
  fi
  
  
-diff -uraN nginx-1.0.11.orig/auto/unix nginx-1.0.11/auto/unix
---- nginx-1.0.11.orig/auto/unix	2011-12-14 07:34:16.000000000 -0600
-+++ nginx-1.0.11/auto/unix	2011-12-27 13:56:42.327370060 -0600
-@@ -393,13 +393,13 @@
+Index: nginx-1.12.2/auto/unix
+===================================================================
+--- nginx-1.12.2.orig/auto/unix
++++ nginx-1.12.2/auto/unix
+@@ -587,13 +587,13 @@ ngx_feature_libs=
  
  # C types
  
@@ -181,8 +185,8 @@ diff -uraN nginx-1.0.11.orig/auto/unix nginx-1.0.11/auto/unix
  ngx_param=NGX_PTR_SIZE; ngx_value=$ngx_size; . auto/types/value
  
  
-@@ -416,7 +416,7 @@
- 
+@@ -604,7 +604,7 @@ NGX_INCLUDE_AUTO_CONFIG_H="#include \"ng
+ ngx_type="uint32_t"; ngx_types="u_int32_t"; . auto/types/typedef
  ngx_type="uint64_t"; ngx_types="u_int64_t"; . auto/types/typedef
  
 -ngx_type="sig_atomic_t"; ngx_types="int"; . auto/types/typedef
@@ -190,9 +194,9 @@ diff -uraN nginx-1.0.11.orig/auto/unix nginx-1.0.11/auto/unix
  . auto/types/sizeof
  ngx_param=NGX_SIG_ATOMIC_T_SIZE; ngx_value=$ngx_size; . auto/types/value
  
-@@ -432,15 +432,15 @@
+@@ -620,15 +620,15 @@ ngx_type="rlim_t"; ngx_types="int"; . au
  
- . auto/endianess
+ . auto/endianness
  
 -ngx_type="size_t"; . auto/types/sizeof
 +ngx_type="size_t"; ngx_param="SIZE_T"; . auto/types/sizeof
@@ -208,4 +212,4 @@ diff -uraN nginx-1.0.11.orig/auto/unix nginx-1.0.11/auto/unix
 +ngx_type="time_t"; ngx_param="TIME_T"; . auto/types/sizeof
  ngx_param=NGX_TIME_T_SIZE; ngx_value=$ngx_size; . auto/types/value
  ngx_param=NGX_TIME_T_LEN; ngx_value=$ngx_max_len; . auto/types/value
- 
+ ngx_param=NGX_MAX_TIME_T_VALUE; ngx_value=$ngx_max_value; . auto/types/value

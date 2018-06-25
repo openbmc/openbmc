@@ -8,11 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d8045f3b8f929c1cb29a1e3fd737b499 \
 
 DEPENDS = "atkmm pangomm glibmm gtk+ cairomm"
 
-inherit gnome autotools pkgconfig distro_features_check
+inherit gnomebase distro_features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
-
-GNOME_COMPRESS_TYPE = "xz"
 
 SRC_URI[archive.md5sum] = "6c59ae8bbff48fad9132f23af347acf1"
 SRC_URI[archive.sha256sum] = "0680a53b7bf90b4e4bf444d1d89e6df41c777e0bacc96e9c09fc4dd2f5fe6b72"

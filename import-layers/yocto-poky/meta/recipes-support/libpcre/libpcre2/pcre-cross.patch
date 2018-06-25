@@ -9,11 +9,11 @@ Upstream-Status: Pending
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 
-diff --git a/Makefile.am b/Makefile.am
-index 38f1d41..2bde083 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -298,9 +298,21 @@ bin_SCRIPTS = pcre2-config
+Index: pcre2-10.30/Makefile.am
+===================================================================
+--- pcre2-10.30.orig/Makefile.am
++++ pcre2-10.30/Makefile.am
+@@ -325,9 +325,21 @@ bin_SCRIPTS = pcre2-config
  ## to copy a distributed set of tables that are defined for ASCII code. In this
  ## case, dftables is not needed.
  
@@ -35,13 +35,13 @@ index 38f1d41..2bde083 100644
  src/pcre2_chartables.c: dftables$(EXEEXT)
  	rm -f $@
  	./dftables$(EXEEXT) $@
-diff --git a/configure.ac b/configure.ac
-index d7c57aa..d6eb0aa 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -59,6 +59,23 @@ then
-   fi
- fi
+Index: pcre2-10.30/configure.ac
+===================================================================
+--- pcre2-10.30.orig/configure.ac
++++ pcre2-10.30/configure.ac
+@@ -60,6 +60,23 @@ fi
+ # This is a new thing required to stop a warning from automake 1.12
+ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
  
 +if test x"$cross_compiling" = xyes; then
 +    CC_FOR_BUILD="${CC_FOR_BUILD-gcc}"

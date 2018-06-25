@@ -781,7 +781,7 @@
             The code in <filename>meta/lib/oe/sstatesig.py</filename> shows two examples
             of this and also illustrates how you can insert your own policy into the system
             if so desired.
-            This file defines the two basic signature generators OpenEmbedded Core
+            This file defines the two basic signature generators OpenEmbedded-Core
             uses:  "OEBasic" and "OEBasicHash".
             By default, there is a dummy "noop" signature handler enabled in BitBake.
             This means that behavior is unchanged from previous versions.

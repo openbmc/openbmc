@@ -1,0 +1,31 @@
+From 76c71aa889155f29be1d5d2b74a2c4faa5909c8c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 12 Sep 2015 18:53:31 +0000
+Subject: [PATCH 24/31] comparison_fn_t is glibc specific, use raw signature in
+ function pointer
+
+make it work with musl where comparison_fn_t is not provided
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/basic/util.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/basic/util.h b/src/basic/util.h
+index 9d1b10756..12db53a93 100644
+--- a/src/basic/util.h
++++ b/src/basic/util.h
+@@ -95,7 +95,7 @@ void *xbsearch_r(const void *key, const void *base, size_t nmemb, size_t size,
+  * Normal qsort requires base to be nonnull. Here were require
+  * that only if nmemb > 0.
+  */
+-static inline void qsort_safe(void *base, size_t nmemb, size_t size, comparison_fn_t compar) {
++static inline void qsort_safe(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *)) {
+         if (nmemb <= 1)
+                 return;
+ 
+-- 
+2.13.0
+

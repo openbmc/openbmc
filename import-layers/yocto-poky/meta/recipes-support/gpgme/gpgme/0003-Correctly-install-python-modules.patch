@@ -1,7 +1,7 @@
-From 62332eec752dd790f4dd071dfb0dbe86be377203 Mon Sep 17 00:00:00 2001
-From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Wed, 16 Aug 2017 02:05:34 -0400
-Subject: [PATCH 3/5] Correctly install python modules
+From 93aae34ee70b8d50b31a19a65d6ac8290cb148ae Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 30 Jan 2018 15:28:49 +0800
+Subject: [PATCH 2/4] Correctly install python modules
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
@@ -9,22 +9,25 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 Rebase to 1.9.0
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase to 1.10.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  lang/python/Makefile.am | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
-index d91ead9..67f7cdc 100644
+index 8d74cbd..ce4f0a5 100644
 --- a/lang/python/Makefile.am
 +++ b/lang/python/Makefile.am
-@@ -106,6 +106,7 @@ install-exec-local:
- 	  cd python$${VERSION}-gpg ; \
- 	  $$PYTHON setup.py install \
- 	  --prefix $(DESTDIR)$(prefix) \
+@@ -91,6 +91,7 @@ install-exec-local:
+ 	  --build-base="$$(basename "$${PYTHON}")-gpg" \
+ 	  install \
+ 	  --prefix "$(DESTDIR)$(prefix)" \
 +	  --install-lib=$(DESTDIR)${pythondir} \
- 	  --record files.txt \
  	  --verbose ; \
- 	  cat files.txt >> ../install_files.txt ; \
+ 	done
+ 
 -- 
-2.8.1
+1.8.3.1
 

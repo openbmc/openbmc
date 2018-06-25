@@ -6,60 +6,59 @@ LIC_FILES_CHKSUM = "file://LICENSE.GPL;md5=930e2a5f63425d8dd72dbd7391c43c46"
 FILESPATH =. "${FILE_DIRNAME}/kodi-17:"
 
 DEPENDS = " \
-            cmake-native \
-            curl-native \
-            gperf-native \
-            jsonschemabuilder-native \
-            nasm-native \
-            swig-native \
-            unzip-native \
-            yasm-native \
-            zip-native \
-            avahi \
-            boost \
-            bzip2 \
-            crossguid \
-            curl \
-            dcadec \
-            enca \
-            expat \
-            faad2 \
-            ffmpeg \
-            fontconfig \
-            fribidi \
-            giflib \
-            jasper \
-            libass \
-            libcdio \
-            libcec \
-            libmad \
-            libmicrohttpd \
-            libmms \
-            libmms \
-            libmodplug \
-            libpcre \
-            libplist \
-            libsamplerate0 \
-            libsdl-image \
-            libsdl-mixer \
-            libsquish \
-            libssh \
-            libtinyxml \
-            libusb1 \
-            libxslt \
-            lzo \
-            mpeg2dec \
-            python \
-            samba \
-            sqlite3 \
-            taglib \
-            virtual/egl \
-            virtual/libsdl \
-            wavpack \
-            yajl \
-            zlib \
-            ${@enable_glew(bb, d)} \
-          "
+    cmake-native \
+    curl-native \
+    gperf-native \
+    jsonschemabuilder-native \
+    nasm-native \
+    swig-native \
+    unzip-native \
+    yasm-native \
+    zip-native \
+    avahi \
+    boost \
+    bzip2 \
+    crossguid \
+    curl \
+    dcadec \
+    enca \
+    expat \
+    faad2 \
+    ffmpeg \
+    fontconfig \
+    fribidi \
+    giflib \
+    jasper \
+    libass \
+    libcdio \
+    libcec \
+    libmad \
+    libmicrohttpd \
+    libmms \
+    libmms \
+    libmodplug \
+    libpcre \
+    libplist \
+    libsamplerate0 \
+    libsdl-image \
+    libsdl-mixer \
+    libsquish \
+    libssh \
+    libtinyxml \
+    libusb1 \
+    libxslt \
+    lzo \
+    mpeg2dec \
+    python \
+    sqlite3 \
+    taglib \
+    virtual/egl \
+    virtual/libsdl \
+    wavpack \
+    yajl \
+    zlib \
+    ${@enable_glew(bb, d)} \
+"
 
 PROVIDES = "xbmc"
 
@@ -67,24 +66,24 @@ SRCREV = "6abeebd5ba371547c8f04272296433f5e4e28e86"
 PV = "17.3+gitr${SRCPV}"
 ADDONSPV = "17.1"
 SRC_URI = "git://github.com/xbmc/xbmc.git;branch=Krypton \
-           https://repo.voidlinux.eu/distfiles/${BPN}-${ADDONSPV}-generated-addons.tar.xz;name=addons;unpack=0 \
-           file://0003-configure-don-t-try-to-run-stuff-to-find-tinyxml.patch \
-           file://0004-handle-SIGTERM.patch \
-           file://0005-add-support-to-read-frequency-output-if-using-intel-.patch \
-           file://0006-Disable-DVD-support.patch \
-           file://0007-Always-compile-libcpluff-as-PIC.patch \
-           file://0008-kodi-config.cmake-use-CMAKE_FIND_ROOT_PATH-to-fix-cr.patch \
-           file://0009-build-Add-support-for-musl-triplets.patch \
-           file://0010-RssReader-Fix-compiler-warning-comparing-pointer-to-.patch \
-           file://0011-Let-configure-pass-on-unknown-architectures-setting-.patch \
-           file://0012-Revert-droid-fix-builds-with-AML-disabled.patch \
-           file://0001-change-order-of-detecting-libegl-and-libgles2.patch \
-           file://0013-FTPParse.cpp-use-std-string.patch \
+    https://repo.voidlinux.eu/distfiles/${BPN}-${ADDONSPV}-generated-addons.tar.xz;name=addons;unpack=0 \
+    file://0003-configure-don-t-try-to-run-stuff-to-find-tinyxml.patch \
+    file://0004-handle-SIGTERM.patch \
+    file://0005-add-support-to-read-frequency-output-if-using-intel-.patch \
+    file://0006-Disable-DVD-support.patch \
+    file://0007-Always-compile-libcpluff-as-PIC.patch \
+    file://0008-kodi-config.cmake-use-CMAKE_FIND_ROOT_PATH-to-fix-cr.patch \
+    file://0009-build-Add-support-for-musl-triplets.patch \
+    file://0010-RssReader-Fix-compiler-warning-comparing-pointer-to-.patch \
+    file://0011-Let-configure-pass-on-unknown-architectures-setting-.patch \
+    file://0012-Revert-droid-fix-builds-with-AML-disabled.patch \
+    file://0001-change-order-of-detecting-libegl-and-libgles2.patch \
+    file://0013-FTPParse.cpp-use-std-string.patch \
 "
 
 SRC_URI_append_libc-musl = " \
-           file://0001-Fix-file_Emu-on-musl.patch \
-           file://0002-Remove-FILEWRAP.patch \
+    file://0001-Fix-file_Emu-on-musl.patch \
+    file://0002-Remove-FILEWRAP.patch \
 "
 SRC_URI[addons.md5sum] = "719614fa764011a18665d08af5c8c92f"
 SRC_URI[addons.sha256sum] = "350da57408c27473eaf40e7f544bc94841bf101dc4346085260c5c4af0adac97"
@@ -102,8 +101,10 @@ ACCEL ?= ""
 ACCEL_x86 = "vaapi vdpau"
 ACCEL_x86-64 = "vaapi vdpau"
 
-PACKAGECONFIG ??= "${ACCEL} opengl"
-PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', ' x11', ' openglesv2', d)}"
+PACKAGECONFIG ??= "${ACCEL} opengl \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', 'openglesv2', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'samba', '', d)} \
+"
 
 PACKAGECONFIG[opengl] = "--enable-gl,--enable-gles,"
 PACKAGECONFIG[openglesv2] = "--enable-gles,--enable-gl,virtual/egl"
@@ -113,6 +114,7 @@ PACKAGECONFIG[mysql] = "--enable-mysql,--disable-mysql,mysql5"
 PACKAGECONFIG[x11] = "--enable-x11,--disable-x11,libxinerama libxmu libxrandr libxtst"
 PACKAGECONFIG[pulseaudio] = "--enable-pulse,--disable-pulse,pulseaudio"
 PACKAGECONFIG[lcms] = "--enable-lcms2,--disable-lcms2,lcms"
+PACKAGECONFIG[samba] = "--enable-samba,--disable-samba,samba"
 
 EXTRA_OECONF = " \
     --disable-debug \
@@ -183,29 +185,31 @@ FILES_${PN}-dbg += "${libdir}/kodi/.debug ${libdir}/kodi/*/.debug ${libdir}/kodi
 
 # kodi uses some kind of dlopen() method for libcec so we need to add it manually
 # OpenGL builds need glxinfo, that's in mesa-demos
-RRECOMMENDS_${PN}_append = " libcec \
-                             python \
-                             python-ctypes \
-                             python-lang \
-                             python-re \
-                             python-netclient \
-                             python-html \
-                             python-difflib \
-                             python-json \
-                             python-zlib \
-                             python-shell \
-                             python-sqlite3 \
-                             python-compression \
-                             libcurl \
-                             ${@bb.utils.contains('PACKAGECONFIG', 'x11', 'xrandr xdpyinfo', '', d)} \
+RRECOMMENDS_${PN}_append = " \
+    libcec \
+    python \
+    python-ctypes \
+    python-lang \
+    python-re \
+    python-netclient \
+    python-html \
+    python-difflib \
+    python-json \
+    python-zlib \
+    python-shell \
+    python-sqlite3 \
+    python-compression \
+    libcurl \
+    ${@bb.utils.contains('PACKAGECONFIG', 'x11', 'xrandr xdpyinfo', '', d)} \
 "
-RRECOMMENDS_${PN}_append_libc-glibc = " glibc-charmap-ibm850 \
-                                        glibc-gconv-ibm850 \
-					glibc-gconv-unicode \
-                                        glibc-gconv-utf-32 \
-					glibc-charmap-utf-8 \
-					glibc-localedata-en-us \
-                                      "
+RRECOMMENDS_${PN}_append_libc-glibc = " \
+    glibc-charmap-ibm850 \
+    glibc-gconv-ibm850 \
+    glibc-gconv-unicode \
+    glibc-gconv-utf-32 \
+    glibc-charmap-utf-8 \
+    glibc-localedata-en-us \
+"
 
 RPROVIDES_${PN} += "xbmc"
 

@@ -8,9 +8,11 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=62ddc846179e908dc0c8efec4a42ef20 \
                     file://epl-v10;md5=8d383c379e91d20ba18a52c3e7d3a979 \
                     file://notice.html;md5=a00d6f9ab542be7babc2d8b80d5d2a4c \
 "
+DEPENDS = "uthash"
 
 SRC_URI = "http://mosquitto.org/files/source/mosquitto-${PV}.tar.gz \
-           file://build.patch \
+           file://0001-config.mk-allow-prefix-mandir-localedir-from-environ.patch \
+           file://0002-uthash-remove-in-tree-version.patch \
            file://mosquitto.service \
            file://mosquitto.init \
 "
@@ -26,6 +28,7 @@ PACKAGECONFIG[dns-srv] = ",,c-ares"
 PACKAGECONFIG[ssl] = ",,openssl"
 PACKAGECONFIG[uuid] = ",,util-linux"
 EXTRA_OEMAKE = "${@bb.utils.contains('PACKAGECONFIG', 'dns-srv', 'WITH_SRV=yes', 'WITH_SRV=no', d)} \
+                STRIP=/bin/true \
                 WITH_DOCS=no \
                 ${@bb.utils.contains('PACKAGECONFIG', 'ssl', 'WITH_TLS=yes WITH_TLS_PSK=yes', 'WITH_TLS=no WITH_TLS_PSK=no', d)} \
                 ${@bb.utils.contains('PACKAGECONFIG', 'uuid', 'WITH_UUID=yes', 'WITH_UUID=no', d)}"

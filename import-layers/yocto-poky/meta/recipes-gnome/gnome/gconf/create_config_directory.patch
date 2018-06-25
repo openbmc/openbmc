@@ -1,0 +1,28 @@
+Upstream-Status: Pending
+
+In some circumstances, gconf isn't able to save configurations
+because ~/.config folder aka root_dir doesn't exist.
+This issue was not seen before because ~/.config directory is shared
+between several packages and one of those packages usually creates it
+by the time gconf wants to use it.
+
+This patch makes sure that gconf creates the .config directory if it
+doesn't exist, along with the gconf directory inside it.
+
+Signed-off-by: Jaewon Lee <jaewon.lee@xilinx.com>
+Signed-off-by: Alejandro Hernandez <alejandr@xilinx.com>
+
+
+Index: GConf-3.2.6/backends/markup-backend.c
+===================================================================
+--- GConf-3.2.6.orig/backends/markup-backend.c
++++ GConf-3.2.6/backends/markup-backend.c
+@@ -276,7 +276,7 @@ resolve_address (const char *address,
+       /* dir_mode without search bits */
+       file_mode = dir_mode & (~0111);
+     }
+-  else if (g_mkdir (root_dir, dir_mode) < 0)
++  else if (g_mkdir_with_parents (root_dir, dir_mode) < 0)
+     {
+       /* Error out even on EEXIST - shouldn't happen anyway */
+       gconf_set_error (err, GCONF_ERROR_FAILED,

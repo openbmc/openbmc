@@ -10,10 +10,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  make_ext.pl | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/make_ext.pl b/make_ext.pl
-index b433762..9fc1a36 100644
---- a/make_ext.pl
-+++ b/make_ext.pl
+Index: perl-5.24.1/make_ext.pl
+===================================================================
+--- perl-5.24.1.orig/make_ext.pl
++++ perl-5.24.1/make_ext.pl
 @@ -335,6 +335,10 @@ sub build_extension {
                  print "Deleting non-Cross makefile\n";
                  close $mfh or die "close $makefile: $!";
@@ -24,7 +24,4 @@ index b433762..9fc1a36 100644
 +                }
              }
          }
-     }
--- 
-1.8.1.2
-
+     } else {

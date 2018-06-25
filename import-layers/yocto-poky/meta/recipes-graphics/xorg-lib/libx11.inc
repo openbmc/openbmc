@@ -35,7 +35,3 @@ PACKAGES =+ "${PN}-xcb"
 FILES_${PN} += "${datadir}/X11/XKeysymDB ${datadir}/X11/XErrorDB ${datadir}/X11/Xcms.txt"
 FILES_${PN}-xcb += "${libdir}/libX11-xcb.so.*"
 FILES_${PN}-locale += "${datadir}/X11/locale ${libdir}/X11/locale"
-
-# Multiple libx11 derivatives from from this file and are selected by virtual/libx11
-# A world build should only build the correct version, not all of them.
-EXCLUDE_FROM_WORLD = "1"

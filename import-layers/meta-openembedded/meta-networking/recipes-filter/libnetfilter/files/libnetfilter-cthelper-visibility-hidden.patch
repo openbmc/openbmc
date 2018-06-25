@@ -20,10 +20,10 @@ Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
  src/libnetfilter_cthelper.c | 83 ++++++++++++++++++---------------------------
  3 files changed, 36 insertions(+), 54 deletions(-)
 
-diff --git a/doxygen.cfg.in b/doxygen.cfg.in
-index cac9b05..190b7cd 100644
---- a/doxygen.cfg.in
-+++ b/doxygen.cfg.in
+Index: libnetfilter_cthelper-1.0.0/doxygen.cfg.in
+===================================================================
+--- libnetfilter_cthelper-1.0.0.orig/doxygen.cfg.in
++++ libnetfilter_cthelper-1.0.0/doxygen.cfg.in
 @@ -72,7 +72,7 @@ RECURSIVE              = YES
  EXCLUDE                = 
  EXCLUDE_SYMLINKS       = NO
@@ -33,10 +33,10 @@ index cac9b05..190b7cd 100644
  EXAMPLE_PATH           = 
  EXAMPLE_PATTERNS       = 
  EXAMPLE_RECURSIVE      = NO
-diff --git a/src/internal.h b/src/internal.h
-index 3a88d1a..5d78171 100644
---- a/src/internal.h
-+++ b/src/internal.h
+Index: libnetfilter_cthelper-1.0.0/src/internal.h
+===================================================================
+--- libnetfilter_cthelper-1.0.0.orig/src/internal.h
++++ libnetfilter_cthelper-1.0.0/src/internal.h
 @@ -3,10 +3,9 @@
  
  #include "config.h"
@@ -50,10 +50,10 @@ index 3a88d1a..5d78171 100644
  #endif
  
  #endif
-diff --git a/src/libnetfilter_cthelper.c b/src/libnetfilter_cthelper.c
-index f8f58e6..af543a1 100644
---- a/src/libnetfilter_cthelper.c
-+++ b/src/libnetfilter_cthelper.c
+Index: libnetfilter_cthelper-1.0.0/src/libnetfilter_cthelper.c
+===================================================================
+--- libnetfilter_cthelper-1.0.0.orig/src/libnetfilter_cthelper.c
++++ libnetfilter_cthelper-1.0.0/src/libnetfilter_cthelper.c
 @@ -99,17 +99,16 @@ struct nfct_helper {
   * In case of success, this function returns a valid pointer, otherwise NULL
   * s returned and errno is appropriately set.
@@ -74,9 +74,9 @@ index f8f58e6..af543a1 100644
  {
  	int i;
  
-@@ -119,7 +118,6 @@ void nfct_helper_free(struct nfct_helper *h)
+@@ -119,7 +118,6 @@ void nfct_helper_free(struct nfct_helper
+ 			free(h->expect_policy[i]);
  	}
- 	free(h);
  }
 -EXPORT_SYMBOL(nfct_helper_free);
  
@@ -115,7 +115,7 @@ index f8f58e6..af543a1 100644
  nfct_helper_policy_attr_set(struct nfct_helper_policy *p,
  			    enum nfct_helper_policy_attr_type type,
  			    const void *data)
-@@ -170,7 +166,6 @@ nfct_helper_policy_attr_set(struct nfct_helper_policy *p,
+@@ -170,7 +166,6 @@ nfct_helper_policy_attr_set(struct nfct_
  		break;
  	}
  }
@@ -123,7 +123,7 @@ index f8f58e6..af543a1 100644
  
  /**
   * nfct_helper_attr_set_str - set one attribute the helper object
-@@ -178,23 +173,21 @@ EXPORT_SYMBOL(nfct_helper_policy_attr_set);
+@@ -178,23 +173,21 @@ EXPORT_SYMBOL(nfct_helper_policy_attr_se
   * \param type attribute type you want to set
   * \param name string that will be used to set this attribute
   */
@@ -149,7 +149,7 @@ index f8f58e6..af543a1 100644
  
  /**
   * nfct_helper_attr_set - set one attribute of the helper object
-@@ -202,7 +195,7 @@ EXPORT_SYMBOL(nfct_helper_policy_attr_set_u32);
+@@ -202,7 +195,7 @@ EXPORT_SYMBOL(nfct_helper_policy_attr_se
   * \param type attribute type you want to set
   * \param data pointer to data that will be used to set this attribute
   */
@@ -158,7 +158,7 @@ index f8f58e6..af543a1 100644
  nfct_helper_attr_set(struct nfct_helper *h,
  		     enum nfct_helper_attr_type type, const void *data)
  {
-@@ -250,7 +243,6 @@ nfct_helper_attr_set(struct nfct_helper *h,
+@@ -250,7 +243,6 @@ nfct_helper_attr_set(struct nfct_helper
  		break;
  	}
  }
@@ -216,7 +216,7 @@ index f8f58e6..af543a1 100644
  nfct_helper_attr_unset(struct nfct_helper *nfct_helper, enum nfct_helper_attr_type type)
  {
  	switch(type) {
-@@ -307,7 +295,6 @@ nfct_helper_attr_unset(struct nfct_helper *nfct_helper, enum nfct_helper_attr_ty
+@@ -307,7 +295,6 @@ nfct_helper_attr_unset(struct nfct_helpe
  		break;
  	}
  }
@@ -236,7 +236,7 @@ index f8f58e6..af543a1 100644
  {
  	const void *ret = NULL;
  
-@@ -358,7 +346,6 @@ const void *nfct_helper_attr_get(struct nfct_helper *helper,
+@@ -358,7 +346,6 @@ const void *nfct_helper_attr_get(struct
  	}
  	return ret;
  }
@@ -321,7 +321,7 @@ index f8f58e6..af543a1 100644
  {
  	int ret;
  
-@@ -454,7 +441,6 @@ int nfct_helper_snprintf(char *buf, size_t size,
+@@ -454,7 +441,6 @@ int nfct_helper_snprintf(char *buf, size
  
  	return ret;
  }
@@ -338,7 +338,7 @@ index f8f58e6..af543a1 100644
  nfct_helper_nlmsg_build_hdr(char *buf, uint8_t cmd,
  			    uint16_t flags, uint32_t seq)
  {
-@@ -509,7 +495,6 @@ nfct_helper_nlmsg_build_hdr(char *buf, uint8_t cmd,
+@@ -509,7 +495,6 @@ nfct_helper_nlmsg_build_hdr(char *buf, u
  
  	return nlh;
  }
@@ -346,7 +346,7 @@ index f8f58e6..af543a1 100644
  
  static void
  nfct_helper_nlmsg_build_policy(struct nlmsghdr *nlh,
-@@ -530,7 +515,7 @@ nfct_helper_nlmsg_build_policy(struct nlmsghdr *nlh,
+@@ -530,7 +515,7 @@ nfct_helper_nlmsg_build_policy(struct nl
   * \param nlh: netlink message that you want to use to add the payload.
   * \param nfct_helper: pointer to a helper object
   */
@@ -355,7 +355,7 @@ index f8f58e6..af543a1 100644
  nfct_helper_nlmsg_build_payload(struct nlmsghdr *nlh, struct nfct_helper *h)
  {
  	struct nlattr *nest;
-@@ -593,7 +578,6 @@ nfct_helper_nlmsg_build_payload(struct nlmsghdr *nlh, struct nfct_helper *h)
+@@ -593,7 +578,6 @@ nfct_helper_nlmsg_build_payload(struct n
  	if (h->bitset & (1 << NFCTH_ATTR_STATUS))
  		mnl_attr_put_u32(nlh, NFCTH_STATUS, ntohl(h->status));
  }
@@ -363,7 +363,7 @@ index f8f58e6..af543a1 100644
  
  static int
  nfct_helper_nlmsg_parse_tuple_cb(const struct nlattr *attr, void *data)
-@@ -795,7 +779,7 @@ nfct_helper_nlmsg_parse_attr_cb(const struct nlattr *attr, void *data)
+@@ -795,7 +779,7 @@ nfct_helper_nlmsg_parse_attr_cb(const st
   * This function returns -1 in case that some mandatory attributes are
   * missing. On sucess, it returns 0.
   */
@@ -372,7 +372,7 @@ index f8f58e6..af543a1 100644
  nfct_helper_nlmsg_parse_payload(const struct nlmsghdr *nlh,
  				struct nfct_helper *h)
  {
-@@ -832,7 +816,6 @@ nfct_helper_nlmsg_parse_payload(const struct nlmsghdr *nlh,
+@@ -832,7 +816,6 @@ nfct_helper_nlmsg_parse_payload(const st
  	}
  	return 0;
  }
@@ -380,6 +380,3 @@ index f8f58e6..af543a1 100644
  
  /**
   * @}
--- 
-cgit v1.1
-

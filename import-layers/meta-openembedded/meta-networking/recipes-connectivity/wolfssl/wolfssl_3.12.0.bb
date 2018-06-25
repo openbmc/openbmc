@@ -12,14 +12,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 PROVIDES += "cyassl"
 RPROVIDES_${PN} = "cyassl"
 
-SRC_URI = "https://github.com/wolfSSL/wolfssl/archive/v${PV}-stable.zip \
+S = "${WORKDIR}/git"
+SRCREV = "d195009dcb62d8712195661bd1d50f8dd6831044"
+SRC_URI = "git://github.com/wolfSSL/wolfssl.git;protocol=https; \
            file://0001-fix-no-rule-to-make-cyassl-options.h.patch \
           "
-
-SRC_URI[md5sum] = "f9caf558169ab650dc8200708799ebeb"
-SRC_URI[sha256sum] = "b6d87d3e2c8757177d69aff373c91cf162f4a3944fae90fa10d086fd5f9542e7"
-
-S = "${WORKDIR}/wolfssl-${PV}-stable"
 
 inherit autotools
 

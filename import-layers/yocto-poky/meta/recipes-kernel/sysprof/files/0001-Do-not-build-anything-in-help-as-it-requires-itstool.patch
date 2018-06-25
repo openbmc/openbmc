@@ -1,0 +1,26 @@
+From c2495a4c042e6a675da69bab20cc3669391e8e2a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 23 Aug 2017 18:38:26 +0300
+Subject: [PATCH 1/2] Do not build anything in help/ as it requires itstool.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ meson.build | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 4ac3934..8c4369a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -116,7 +116,6 @@ subdir('tools')
+ subdir('tests')
+ 
+ subdir('data')
+-subdir('help')
+ subdir('po')
+ 
+ meson.add_install_script('build-aux/meson_post_install.sh')
+-- 
+2.14.1
+

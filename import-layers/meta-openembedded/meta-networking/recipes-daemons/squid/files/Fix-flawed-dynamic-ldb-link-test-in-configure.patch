@@ -1,8 +1,7 @@
-From 0d5b337ff5ef7dd48f970f08bd95d6327917cfd1 Mon Sep 17 00:00:00 2001
-Message-Id: <0d5b337ff5ef7dd48f970f08bd95d6327917cfd1.1382375807.git.Jim.Somerville@windriver.com>
+From b4943594654cd340b95aabdc2f3750a4705cc0de Mon Sep 17 00:00:00 2001
 From: Jim Somerville <Jim.Somerville@windriver.com>
 Date: Mon, 21 Oct 2013 12:50:44 -0400
-Subject: [PATCH 1/1] Fix flawed dynamic -ldb link test in configure
+Subject: [PATCH] Fix flawed dynamic -ldb link test in configure
 
 The test uses dbopen, but just ignores the fact
 that this function may not exist in the db version
@@ -11,15 +10,16 @@ and the configure script just making assumptions
 about why and setting the need for -ldb incorrectly.
 
 Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+
 ---
- configure.ac |   12 ++++++++++--
- 1 files changed, 10 insertions(+), 2 deletions(-)
+ configure.ac | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 962a748..42e6a93 100644
+index 57cd1ac..3827222 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3051,8 +3051,16 @@ AC_CHECK_DECL(dbopen,,,[
+@@ -3229,8 +3229,16 @@ AC_CHECK_DECL(dbopen,,,[
  #include <db.h>
  #endif])
  
@@ -38,6 +38,3 @@ index 962a748..42e6a93 100644
  if test "x$ac_cv_dbopen_libdb" = "xyes"; then
      LIB_DB="-ldb"
  fi
--- 
-1.7.4.1
-

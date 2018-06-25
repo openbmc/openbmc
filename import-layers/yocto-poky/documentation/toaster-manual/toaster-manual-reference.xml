@@ -34,7 +34,7 @@
             A layer index is a web application that contains information
             about a set of custom layers.
             A good example of an existing layer index is the
-            OpenEmbedded Metadata Index.
+            OpenEmbedded Layer Index.
             A public instance of this layer index exists at
             <ulink url='http://layers.openembedded.org'></ulink>.
             You can find the code for this layer index's web application at
@@ -92,11 +92,11 @@
 
                 <para>
                     For general information on layers, see the
-                    "<ulink url='&YOCTO_DOCS_BSP_URL;#bsp-layers'>BSP Layers</ulink>"
-                    and
-                    "<ulink url='&YOCTO_DOCS_BSP_URL;#using-the-yocto-projects-bsp-tools'>Using the Yocto Project's BSP Tools</ulink>"
-                    sections in the Yocto Project Board Support Package (BSP)
-                    Developer's Guide.
+                    "<ulink url='&YOCTO_DOCS_OM_URL;#the-yocto-project-layer-model'>The Yocto Project Layer Model</ulink>"
+                    section in the Yocto Project Overview and Concepts Manual.
+                    For information on how to create layers, see the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#understanding-and-creating-layers'>Understanding and Creating Layers</ulink>"
+                    section in the Yocto Project Development Tasks Manual.
                 </para>
             </section>
 
@@ -681,26 +681,27 @@
             (e.g. <filename>poky</filename>) at
             <filename>bitbake/lib/manage.py</filename>.
             This section documents those commands.
-            <note>
-                <para>
-                    When using <filename>manage.py</filename> commands given
-                    a default configuration, you must be sure that your
-                    working directory is set to the
-                    <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>.
-                    Using <filename>manage.py</filename> commands from the
-                    Build Directory allows Toaster to find the
-                    <filename>toaster.sqlite</filename> file, which is located
-                    in the Build Directory.
-                </para>
-
-                <para>
-                    For non-default database configurations, it is possible
-                    that you can use <filename>manage.py</filename> commands
-                    from a directory other than the Build directory.
-                    To do so, the
-                    <filename>toastermain/settings.py</filename> file must be
-                    configured to point to the correct database backend.
-                </para>
+            <note><title>Notes</title>
+                <itemizedlist>
+                    <listitem><para>
+                        When using <filename>manage.py</filename> commands given
+                        a default configuration, you must be sure that your
+                        working directory is set to the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>.
+                        Using <filename>manage.py</filename> commands from the
+                        Build Directory allows Toaster to find the
+                        <filename>toaster.sqlite</filename> file, which is located
+                        in the Build Directory.
+                        </para></listitem>
+                    <listitem><para>
+                        For non-default database configurations, it is possible
+                        that you can use <filename>manage.py</filename> commands
+                        from a directory other than the Build Directory.
+                        To do so, the
+                        <filename>toastermain/settings.py</filename> file must be
+                        configured to point to the correct database backend.
+                        </para></listitem>
+                </itemizedlist>
             </note>
         </para>
 

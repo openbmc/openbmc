@@ -1,0 +1,21 @@
+From: Jan Beulich <jbeulich@suse.com>
+Subject: x86/paging: don't unconditionally BUG() on finding SHARED_M2P_ENTRY
+
+PV guests can fully control the values written into the P2M.
+
+This is XSA-251.
+
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
+Reviewed-by: Andrew Cooper <andrew.cooper3@citrix.com>
+
+--- a/xen/arch/x86/mm/paging.c
++++ b/xen/arch/x86/mm/paging.c
+@@ -274,7 +274,7 @@ void paging_mark_pfn_dirty(struct domain
+         return;
+ 
+     /* Shared MFNs should NEVER be marked dirty */
+-    BUG_ON(SHARED_M2P(pfn_x(pfn)));
++    BUG_ON(paging_mode_translate(d) && SHARED_M2P(pfn_x(pfn)));
+ 
+     /*
+      * Values with the MSB set denote MFNs that aren't really part of the

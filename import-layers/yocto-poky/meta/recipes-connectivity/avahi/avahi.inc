@@ -23,21 +23,20 @@ SRC_URI = "https://github.com/lathiat/avahi/releases/download/v${PV}/avahi-${PV}
           "
 UPSTREAM_CHECK_URI = "https://github.com/lathiat/avahi/releases/"
 
-# For gtk related PACKAGECONFIGs: gtk, gtk3 and pygtk
+# For gtk related PACKAGECONFIGs: gtk, gtk3
 AVAHI_GTK ?= ""
 
 PACKAGECONFIG ??= "dbus ${AVAHI_GTK}"
 PACKAGECONFIG[dbus] = "--enable-dbus,--disable-dbus,dbus"
 PACKAGECONFIG[gtk] = "--enable-gtk,--disable-gtk,gtk+"
 PACKAGECONFIG[gtk3] = "--enable-gtk3,--disable-gtk3,gtk+3"
-PACKAGECONFIG[pygtk] = "--enable-pygtk,--disable-pygtk,"
 
 USERADD_PACKAGES = "avahi-daemon avahi-autoipd"
-USERADD_PARAM_avahi-daemon = "--system --home /var/run/avahi-daemon \
+USERADD_PARAM_avahi-daemon = "--system --home /run/avahi-daemon \
                               --no-create-home --shell /bin/false \
                               --user-group avahi"
 
-USERADD_PARAM_avahi-autoipd = "--system --home /var/run/avahi-autoipd \
+USERADD_PARAM_avahi-autoipd = "--system --home /run/avahi-autoipd \
                               --no-create-home --shell /bin/false \
                               --user-group \
                               -c \"Avahi autoip daemon\" \
@@ -110,11 +109,6 @@ RDEPENDS_${PN}-dev = "avahi-daemon (= ${EXTENDPKGV}) libavahi-core (= ${EXTENDPK
 RRECOMMENDS_avahi-daemon_append_libc-glibc = " libnss-mdns"
 RRECOMMENDS_${PN}_append_libc-glibc = " libnss-mdns"
 
-RRECOMMENDS_avahi-dev = "expat-dev libcap-dev libdaemon-dev dbus-dev glib-2.0-dev update-rc.d-dev"
-RRECOMMENDS_avahi-dev_append_libc-glibc = " gettext-dev"
-
-RRECOMMENDS_avahi-dev[nodeprrecs] = "1"
-
 CONFFILES_avahi-daemon = "${sysconfdir}/avahi/avahi-daemon.conf"
 
 INITSCRIPT_PACKAGES = "avahi-daemon avahi-dnsconfd"
@@ -125,12 +119,7 @@ INITSCRIPT_PARAMS_avahi-dnsconfd = "defaults 22 19"
 
 do_install() {
 	autotools_do_install
-
-	# don't install /var/run when populating rootfs. Do it through volatile
-	# /var/run of current version is empty, so just remove it.
-	# if /var/run become non-empty in the future, need to install it via volatile
-	rm -rf ${D}${localstatedir}/run
-	rmdir --ignore-fail-on-non-empty ${D}${localstatedir}
+	rm -rf ${D}/run
 	rm -rf ${D}${datadir}/dbus-1/interfaces
 	test -d ${D}${datadir}/dbus-1 && rmdir --ignore-fail-on-non-empty ${D}${datadir}/dbus-1
 	rm -rf ${D}${libdir}/avahi

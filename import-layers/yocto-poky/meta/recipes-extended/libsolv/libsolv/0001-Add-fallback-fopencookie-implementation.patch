@@ -1,4 +1,4 @@
-From 4d9b6ec30b78d00ead0a22eb5d047dcdba37e99c Mon Sep 17 00:00:00 2001
+From 47c6f1b4332a9e4935c48cca826786a6b8fe6f59 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Neal=20Gompa=20=28=E3=83=8B=E3=83=BC=E3=83=AB=E3=83=BB?=
  =?UTF-8?q?=E3=82=B3=E3=82=99=E3=83=B3=E3=83=8F=E3=82=9A=29?=
  <ngompa13@gmail.com>
@@ -13,6 +13,7 @@ Alex Kanavin: rebased CMakeLists.txt change to apply to latest upstream code.
 
 Upstream-Status: Denied [https://github.com/openSUSE/libsolv/pull/112]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  ext/CMakeLists.txt                     |   7 ++
  ext/solv_xfopen.c                      |  10 +--
@@ -23,7 +24,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  create mode 100644 ext/solv_xfopen_fallback_fopencookie.h
 
 diff --git a/ext/CMakeLists.txt b/ext/CMakeLists.txt
-index 586eda8..477a2ef 100644
+index b8917a2..fac6c32 100644
 --- a/ext/CMakeLists.txt
 +++ b/ext/CMakeLists.txt
 @@ -4,6 +4,13 @@ SET (libsolvext_SRCS
@@ -41,11 +42,11 @@ index 586eda8..477a2ef 100644
      SET (libsolvext_SRCS ${libsolvext_SRCS}
          pool_fileconflicts.c repo_rpmdb.c)
 diff --git a/ext/solv_xfopen.c b/ext/solv_xfopen.c
-index b0421bf..31345dd 100644
+index 2c64bb6..eb3a3ad 100644
 --- a/ext/solv_xfopen.c
 +++ b/ext/solv_xfopen.c
-@@ -13,6 +13,10 @@
- #include <zlib.h>
+@@ -12,6 +12,10 @@
+ #include <string.h>
  #include <fcntl.h>
  
 +#if !defined(HAVE_FUNOPEN) && !defined(HAVE_FOPENCOOKIE)
@@ -55,7 +56,7 @@ index b0421bf..31345dd 100644
  #include "solv_xfopen.h"
  #include "util.h"
  
-@@ -39,7 +43,7 @@ static FILE *cookieopen(void *cookie, const char *mode,
+@@ -21,7 +25,7 @@ static FILE *cookieopen(void *cookie, const char *mode,
  	ssize_t (*cwrite)(void *, const char *, size_t),
  	int (*cclose)(void *))
  {
@@ -64,7 +65,7 @@ index b0421bf..31345dd 100644
    if (!cookie)
      return 0;
    return funopen(cookie,
-@@ -48,7 +52,7 @@ static FILE *cookieopen(void *cookie, const char *mode,
+@@ -30,7 +34,7 @@ static FILE *cookieopen(void *cookie, const char *mode,
        (fpos_t (*)(void *, fpos_t, int))NULL,					/* seekfn */
        cclose
        );
@@ -73,7 +74,7 @@ index b0421bf..31345dd 100644
    cookie_io_functions_t cio;
  
    if (!cookie)
-@@ -60,8 +64,6 @@ static FILE *cookieopen(void *cookie, const char *mode,
+@@ -42,8 +46,6 @@ static FILE *cookieopen(void *cookie, const char *mode,
      cio.write = cwrite;
    cio.close = cclose;
    return  fopencookie(cookie, *mode == 'w' ? "w" : "r", cio);
@@ -246,5 +247,5 @@ index 0000000..6a7bfee
 +
 +#endif
 -- 
-2.11.0
+2.4.0
 

@@ -1,0 +1,111 @@
+From 1128a98fd1676981e536d8773f363cb832cfa6bb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Tue, 6 Mar 2018 22:28:56 +0100
+Subject: [PATCH] Use native tools to build docs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ docs/Makefile.am | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/docs/Makefile.am b/docs/Makefile.am
+index 3baf0c4..e82f87d 100644
+--- a/docs/Makefile.am
++++ b/docs/Makefile.am
+@@ -152,7 +152,7 @@ gnuplot-groff.ps: gnuplot.ms $(srcdir)/titlepag.ms
+ 
+ ### doc2xxx dependencies
+ gnuplot.ms: doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN) ./doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms "$(srcdir)/titlepag.ms"
++	$(AM_V_GEN) doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms "$(srcdir)/titlepag.ms"
+ 
+ doc2ms_SOURCES = doc2ms.c termdoc.c
+ doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
+@@ -173,10 +173,10 @@ pdf_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
+ 	$(AM_V_GEN)touch $@
+ 
+ figures.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN)./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc $@
++	$(AM_V_GEN) doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc $@
+ 
+ nofigures.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN)./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc $@
++	$(AM_V_GEN) doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc $@
+ 
+ pdf: gnuplot.pdf
+ pdf_nofig: nofigures.pdf
+@@ -256,7 +256,7 @@ gnuplot.ps: gnuplot.dvi
+ hlp: gnuplot.hlp
+ 
+ gnuplot.hlp: doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN)./doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.hlp
++	$(AM_V_GEN)doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.hlp
+ 
+ doc2hlp_SOURCES = doc2hlp.c termdoc.c
+ 
+@@ -264,14 +264,14 @@ doc2hlp_SOURCES = doc2hlp.c termdoc.c
+ gih: gnuplot.gih
+ 
+ gnuplot.gih: doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN)./doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
++	$(AM_V_GEN)doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
+ 
+ doc2gih_SOURCES = doc2gih.c termdoc.c
+ 
+ # To include all terminals in the .gih file
+ allgih: alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
+ 	@echo "generate gnuplot.gih with all terminals"
+-	$(AM_V_at)./alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
++	$(AM_V_at)alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
+ 
+ alldoc2gih_SOURCES = doc2gih.c termdoc.c
+ alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
+@@ -286,7 +286,7 @@ $(srcdir)/windows/wgnuplot.hhk
+ wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk wxhelp/*.html windows/*.png
+ 
+ wxhelp/wgnuplot.html: doc2wxhtml$(EXEEXT) $(srcdir)/gnuplot.doc 
+-	$(AM_V_GEN) ./doc2wxhtml$(EXEEXT) $(srcdir)/gnuplot.doc wxhelp/
++	$(AM_V_GEN) doc2wxhtml$(EXEEXT) $(srcdir)/gnuplot.doc wxhelp/
+ 
+ #doc2wxhtml_SOURCES = windows/doc2html.c termdoc.c xref.c allterm.h
+ #doc2wxhtml_CPPFLAGS = -DALL_TERM_DOC -DWXHELP -I../src $(AM_CPPFLAGS)
+@@ -336,7 +336,7 @@ install-info: gnuplot.info
+ ipf: gnuplot.ipf
+ 
+ gnuplot.ipf: doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN) ./doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ipf
++	$(AM_V_GEN) doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ipf
+ 
+ doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
+ 
+@@ -344,7 +344,7 @@ doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
+ rtf: gnuplot.rtf
+ 
+ gnuplot.rtf: doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN) ./doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rtf
++	$(AM_V_GEN) doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rtf
+ 
+ doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
+ 
+@@ -352,13 +352,13 @@ doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
+ rnh: gnuplot.rnh
+ 
+ gnuplot.rnh: doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN) ./doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rnh
++	$(AM_V_GEN) doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rnh
+ 
+ doc2rnh_SOURCES = doc2rnh.c termdoc.c
+ 
+ # this is how to check the gnuplot.doc file
+ check-local: checkdoc$(EXEEXT)
+-	$(AM_V_at)./checkdoc$(EXEEXT) < $(srcdir)/gnuplot.doc; \
++	$(AM_V_at)checkdoc$(EXEEXT) < $(srcdir)/gnuplot.doc; \
+ 	if test $$? -eq 0; then \
+ 	  echo "PASS: gnuplot.doc"; \
+ 	else \
+-- 
+2.14.3
+

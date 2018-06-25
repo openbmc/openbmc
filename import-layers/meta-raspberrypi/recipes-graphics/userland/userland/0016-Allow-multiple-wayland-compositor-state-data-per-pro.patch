@@ -1,0 +1,145 @@
+From 6b4c4d469d435bfcfb464356b6ccc9421c6b8fd5 Mon Sep 17 00:00:00 2001
+From: Jeff Wannamaker <jeff_wannamaker@cable.comcast.com>
+Date: Sat, 27 Jan 2018 12:28:31 -0500
+Subject: [PATCH 16/16] Allow multiple wayland compositor state data per
+ process
+
+When eglBindWaylandDisplayWL is called store the wl_global
+created in a list associated with the wayland display.
+This allows multiple wayland compositor instances to be
+created and used per process. This scenario is common for
+applications integrating externl process UI elements
+via embedded composition e.g. westeros
+
+Signed-off-by: Jeff Wannamaker <jeff_wannamaker@cable.comcast.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ interface/khronos/common/khrn_client.c |  2 +-
+ interface/khronos/common/khrn_client.h | 11 +++++++-
+ interface/khronos/ext/egl_wayland.c    | 50 ++++++++++++++++++++++++++++++----
+ 3 files changed, 55 insertions(+), 8 deletions(-)
+
+diff --git a/interface/khronos/common/khrn_client.c b/interface/khronos/common/khrn_client.c
+index d7e798e..60bdb63 100644
+--- a/interface/khronos/common/khrn_client.c
++++ b/interface/khronos/common/khrn_client.c
+@@ -147,7 +147,7 @@ bool client_process_state_init(CLIENT_PROCESS_STATE_T *process)
+ {
+    if (!process->inited) {
+ #ifdef BUILD_WAYLAND
+-      process->wl_global = NULL;
++      process->wlStateMap = NULL;
+ #endif
+ 
+       if (!khrn_pointer_map_init(&process->contexts, 64))
+diff --git a/interface/khronos/common/khrn_client.h b/interface/khronos/common/khrn_client.h
+index 615f7b4..4fa86f7 100644
+--- a/interface/khronos/common/khrn_client.h
++++ b/interface/khronos/common/khrn_client.h
+@@ -170,6 +170,15 @@ static INLINE CLIENT_THREAD_STATE_T *CLIENT_GET_CHECK_THREAD_STATE(void)
+    return (CLIENT_THREAD_STATE_T *)platform_tls_get_check(client_tls);
+ }
+ 
++#ifdef BUILD_WAYLAND
++typedef struct WAYLAND_STATE
++{
++   struct WAYLAND_STATE *next;
++   struct wl_display *display;
++   struct wl_global *wl_global;
++} WAYLAND_STATE_T;
++#endif
++
+ /*
+    per-process state
+ 
+@@ -318,7 +327,7 @@ struct CLIENT_PROCESS_STATE {
+    struct wl_event_queue *wl_queue;
+ 
+    /* Compositor-side Wayland state */
+-   struct wl_global *wl_global;
++   WAYLAND_STATE_T *wlStateMap;
+ #endif
+ };
+ 
+diff --git a/interface/khronos/ext/egl_wayland.c b/interface/khronos/ext/egl_wayland.c
+index 9ef89cd..abd5ab3 100644
+--- a/interface/khronos/ext/egl_wayland.c
++++ b/interface/khronos/ext/egl_wayland.c
+@@ -208,17 +208,38 @@ eglBindWaylandDisplayWL(EGLDisplay dpy, struct wl_display *display)
+ {
+    CLIENT_THREAD_STATE_T *thread;
+    CLIENT_PROCESS_STATE_T *process;
++   WAYLAND_STATE_T *stateIter;
++   WAYLAND_STATE_T *stateNew;
++   struct wl_global *wl_global;
+ 
+    if (!CLIENT_LOCK_AND_GET_STATES(dpy, &thread, &process))
+       return EGL_FALSE;
+ 
+-   if (process->wl_global != NULL)
++   stateIter= process->wlStateMap;
++   while( stateIter )
++   {
++      if ( stateIter->display == display )
++         goto error;
++      stateIter= stateIter->next;
++   }
++
++   wl_global = wl_global_create(display, &wl_dispmanx_interface, 1,
++                                NULL, bind_dispmanx);
++   if (wl_global == NULL)
+       goto error;
+ 
+-   process->wl_global = wl_global_create(display, &wl_dispmanx_interface, 1,
+-                                         NULL, bind_dispmanx);
+-   if (process->wl_global == NULL)
++   stateNew= (WAYLAND_STATE_T*)calloc( 1, sizeof(WAYLAND_STATE_T));
++   if (stateNew == NULL )
++   {
++      wl_global_destroy(wl_global);
+       goto error;
++   }
++
++   stateNew->next= process->wlStateMap;
++   stateNew->display= display;
++   stateNew->wl_global= wl_global;
++   process->wlStateMap= stateNew;
++   CLIENT_UNLOCK();
+ 
+    return EGL_TRUE;
+ 
+@@ -232,12 +253,29 @@ eglUnbindWaylandDisplayWL(EGLDisplay dpy, struct wl_display *display)
+ {
+    CLIENT_THREAD_STATE_T *thread;
+    CLIENT_PROCESS_STATE_T *process;
++   WAYLAND_STATE_T *stateIter;
++   WAYLAND_STATE_T *statePrev;
+ 
+    if (!CLIENT_LOCK_AND_GET_STATES(dpy, &thread, &process))
+       return EGL_FALSE;
+ 
+-   wl_global_destroy(process->wl_global);
+-   process->wl_global = NULL;
++   statePrev= NULL;
++   stateIter= process->wlStateMap;
++   while( stateIter )
++   {
++      if ( stateIter->display == display )
++      {
++         wl_global_destroy(stateIter->wl_global);
++         if ( statePrev )
++            statePrev->next= stateIter->next;
++         else
++            process->wlStateMap= stateIter->next;
++         free( stateIter );
++         break;
++      }
++      statePrev= stateIter;
++      stateIter= stateIter->next;
++   }
+ 
+    CLIENT_UNLOCK();
+ 
+-- 
+2.16.1
+

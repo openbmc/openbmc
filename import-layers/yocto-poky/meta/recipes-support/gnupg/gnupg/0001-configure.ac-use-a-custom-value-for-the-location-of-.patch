@@ -1,0 +1,30 @@
+From 0b97148c3aad0993a9aeb088596fa63a2fec5328 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 22 Jan 2018 18:00:21 +0200
+Subject: [PATCH] configure.ac: use a custom value for the location of
+ gpg-agent socket in the filesystem
+
+This should avoid clashes with the host gpg-agent observed on autobuilders.
+
+Upstream-Status: Inappropriate [oe-core specific, and only for -native]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 382ef1d..0570d7c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1818,7 +1818,7 @@ AC_DEFINE_UNQUOTED(GPGCONF_DISP_NAME, "GPGConf",
+ 
+ AC_DEFINE_UNQUOTED(GPGTAR_NAME, "gpgtar", [The name of the gpgtar tool])
+ 
+-AC_DEFINE_UNQUOTED(GPG_AGENT_SOCK_NAME, "S.gpg-agent",
++AC_DEFINE_UNQUOTED(GPG_AGENT_SOCK_NAME, "S.gpg-agent.yocto-native",
+                    [The name of the agent socket])
+ AC_DEFINE_UNQUOTED(GPG_AGENT_EXTRA_SOCK_NAME, "S.gpg-agent.extra",
+                    [The name of the agent socket for remote access])
+-- 
+2.15.1
+

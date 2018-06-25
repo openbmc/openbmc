@@ -14,37 +14,37 @@ Upstream-Status: Pending
  tests/Makefile |    8 ++++++++
  2 files changed, 14 insertions(+), 0 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 31c4b3f..2ecf2a9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -34,6 +34,9 @@ modules_install:
- 	@echo "Installing cryptodev.h in $(PREFIX)/usr/include/crypto ..."
- 	@install -D crypto/cryptodev.h $(PREFIX)/usr/include/crypto/cryptodev.h
+Index: git/Makefile
+===================================================================
+--- git.orig/Makefile
++++ git/Makefile
+@@ -35,6 +35,9 @@ modules_install:
+ 	$(MAKE) $(KERNEL_MAKE_OPTS) modules_install
+ 	install -m 644 -D crypto/cryptodev.h $(DESTDIR)/$(includedir)/crypto/cryptodev.h
  
 +install_tests:
 +	make -C tests install DESTDIR=$(PREFIX)
 +
  clean:
- 	make -C $(KERNEL_DIR) SUBDIRS=`pwd` clean
+ 	$(MAKE) $(KERNEL_MAKE_OPTS) clean
  	rm -f $(hostprogs) *~
-@@ -42,6 +45,9 @@ clean:
+@@ -43,6 +46,9 @@ clean:
  check:
- 	CFLAGS=$(CRYPTODEV_CFLAGS) KERNEL_DIR=$(KERNEL_DIR) make -C tests check
+ 	CFLAGS=$(CRYPTODEV_CFLAGS) KERNEL_DIR=$(KERNEL_DIR) $(MAKE) -C tests check
  
 +testprogs:
 +	KERNEL_DIR=$(KERNEL_DIR) make -C tests testprogs
 +
  CPOPTS =
- ifneq (${SHOW_TYPES},)
+ ifneq ($(SHOW_TYPES),)
  CPOPTS += --show-types
-diff --git a/tests/Makefile b/tests/Makefile
-index c9f04e8..cd202af 100644
---- a/tests/Makefile
-+++ b/tests/Makefile
-@@ -19,6 +19,12 @@ example-async-hmac-objs := async_hmac.o
- example-async-speed-objs := async_speed.o
- example-hashcrypt-speed-objs := hashcrypt_speed.c
+Index: git/tests/Makefile
+===================================================================
+--- git.orig/tests/Makefile
++++ git/tests/Makefile
+@@ -23,6 +23,12 @@ bindir = $(execprefix)/bin
+ 
+ all: $(hostprogs)
  
 +install:
 +	install -d  $(DESTDIR)/usr/bin/tests_cryptodev
@@ -55,9 +55,9 @@ index c9f04e8..cd202af 100644
  check: $(hostprogs)
  	./cipher
  	./hmac
-@@ -28,6 +34,8 @@ check: $(hostprogs)
- 	./cipher-gcm
- 	./cipher-aead
+@@ -38,6 +44,8 @@ install:
+ 		install -m 755 $$prog $(DESTDIR)/$(bindir); \
+ 	done
  
 +testprogs: $(hostprogs)
 +

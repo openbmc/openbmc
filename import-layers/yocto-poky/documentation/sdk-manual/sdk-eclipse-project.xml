@@ -19,8 +19,8 @@
 
         <para>
             The following figure and supporting list summarize the
-            application development general workflow that employs both the
-            SDK Eclipse.
+            general workflow for application development that uses the
+            SDK within the Eclipse IDE.
         </para>
 
         <para>
@@ -31,9 +31,8 @@
         <para>
             <orderedlist>
                 <listitem><para>
-                    <emphasis>Prepare the host system for the Yocto
-                    Project</emphasis>:
-                    See
+                    <emphasis>Prepare the Host System for the Yocto Project</emphasis>:
+                    See the
                     "<ulink url='&YOCTO_DOCS_REF_URL;#detailed-supported-distros'>Supported Linux Distributions</ulink>"
                     and
                     "<ulink url='&YOCTO_DOCS_REF_URL;#required-packages-for-the-host-development-system'>Required Packages for the Host Development System</ulink>"
@@ -43,8 +42,8 @@
                     <filename>xterm</filename> package installed.
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Secure the Yocto Project kernel target
-                    image</emphasis>:
+                    <emphasis>Secure the Yocto Project Kernel Target
+                    Image</emphasis>:
                     You must have a target kernel image that has been built
                     using the OpenEmbedded build system.</para>
                     <para>Depending on whether the Yocto Project has a
@@ -66,7 +65,8 @@
                             <filename>machines/qemu</filename></ulink> if
                             your target architecture is supported and you
                             are going to develop and test your application
-                            using the QEMU emulator.
+                            using the
+                            <ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-qemu'>QEMU Emulator</ulink>.
                             </para></listitem>
                         <listitem><para>
                             Build your image if you cannot find a pre-built
@@ -91,8 +91,8 @@
                     section.
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Secure the target root filesystem
-                    and the Cross-development toolchain</emphasis>:
+                    <emphasis>Secure the Target Root Filesystem
+                    and the Cross-Development Toolchain</emphasis>:
                     You need to find and download the appropriate root
                     filesystem and the cross-development toolchain.</para>
                     <para>You can find the tarballs for the root filesystem
@@ -118,22 +118,19 @@
                         section.
                         Another helpful resource for building an installer
                         is the
-                        <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
+                        "<ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an Eclipse Debug Capable Image</ulink>"
                         wiki page.
                     </note>
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Create and build your application</emphasis>:
+                    <emphasis>Create and Build Your Application</emphasis>:
                     At this point, you need to have source files for your
                     application.
                     Once you have the files, you can use the Eclipse IDE
                     to import them and build the project.
-                    If you are not using Eclipse, you need to use the
-                    cross-development tools you have installed to create
-                    the image.</para></listitem>
+                    </para></listitem>
                 <listitem><para>
-                    <emphasis>Deploy the image with the
-                    application</emphasis>:
+                    <emphasis>Deploy the Image With the Application</emphasis>:
                     Using the Eclipse IDE, you can deploy your image to the
                     hardware or to QEMU through the project's preferences.
                     You can also use Eclipse to load and test your image
@@ -144,7 +141,7 @@
                     for information on using QEMU.
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Test and debug the application</emphasis>:
+                    <emphasis>Test and Debug the Application</emphasis>:
                     Once your application is deployed, you need to test it.
                     Within the Eclipse IDE, you can use the debugging
                     environment along with supported performance enhancing
@@ -179,25 +176,25 @@
             collection of power data, collection of latency data, and
             collection of performance data.
             <note>
-                This release of the Yocto Project supports both the Neon
-                and Mars versions of the Eclipse IDE.
-                This section provides information on how to use the Neon
+                This release of the Yocto Project supports both the Oxygen
+                and Neon versions of the Eclipse IDE.
+                This section provides information on how to use the Oxygen
                 release with the Yocto Project.
-                For information on how to use the Mars version of Eclipse
+                For information on how to use the Neon version of Eclipse
                 with the Yocto Project, see
-                "<link linkend='sdk-appendix-latest-yp-eclipse-plug-in'>Appendix C</link>.
+                "<link linkend='sdk-appendix-neon-yp-eclipse-plug-in'>Appendix D</link>".
              </note>
         </para>
 
-        <section id='neon-setting-up-the-eclipse-ide'>
-            <title>Setting Up the Neon Version of the Eclipse IDE</title>
+        <section id='oxygen-setting-up-the-eclipse-ide'>
+            <title>Setting Up the Oxygen Version of the Eclipse IDE</title>
 
             <para>
                 To develop within the Eclipse IDE, you need to do the
                 following:
                 <orderedlist>
                     <listitem><para>
-                        Install the Neon version of the Eclipse IDE.
+                        Install the Oxygen version of the Eclipse IDE.
                         </para></listitem>
                     <listitem><para>
                         Configure the Eclipse IDE.
@@ -217,17 +214,17 @@
                 </note>
             </para>
 
-            <section id='neon-installing-eclipse-ide'>
-                <title>Installing the Neon Eclipse IDE</title>
+            <section id='oxygen-installing-eclipse-ide'>
+                <title>Installing the Oxygen Eclipse IDE</title>
 
                 <para>
                     Follow these steps to locate, install, and configure
-                    Neon Eclipse:
+                    Oxygen Eclipse:
                     <orderedlist>
                         <listitem><para>
-                            <emphasis>Locate the Neon Download:</emphasis>
+                            <emphasis>Locate the Oxygen Download:</emphasis>
                             Open a browser and go to
-                            <ulink url='http://www.eclipse.org/neon/'>http://www.eclipse.org/neon/</ulink>.
+                            <ulink url='http://www.eclipse.org/oxygen/'>http://www.eclipse.org/oxygen/</ulink>.
                             </para></listitem>
                         <listitem><para>
                             <emphasis>Download the Tarball:</emphasis>
@@ -262,36 +259,50 @@
                             </para></listitem>
                         <listitem><para>
                             <emphasis>Install the Software:</emphasis>
-                            Accept the default "cpp-neon" directory and
-                            click "Install".
-                            Accept any license agreements and approve any
-                            certificates.
+                            Click "Install" to begin the installation.
+                            Accept all the certificates and any license
+                            agreements.
+                            Click "Install" again to finish the installation.
                             </para></listitem>
                         <listitem><para>
-                            <emphasis>Launch Neon:</emphasis>
-                            Click the "Launch" button and accept the
-                            default "workspace".
+                            <emphasis>Launch Oxygen:</emphasis>
+                            Accept the default "workspace" and click the
+                            "Launch" button.
+                            You should see the Eclipse welcome page from which
+                            can click "workbench" to enter your workspace.
                             </para></listitem>
                     </orderedlist>
                 </para>
             </section>
 
-            <section id='neon-configuring-the-mars-eclipse-ide'>
-                <title>Configuring the Neon Eclipse IDE</title>
+            <section id='oxygen-configuring-the-eclipse-ide'>
+                <title>Configuring the Oxygen Eclipse IDE</title>
 
                 <para>
-                    Follow these steps to configure the Neon Eclipse IDE.
-                    <note>
-                        Depending on how you installed Eclipse and what
-                        you have already done, some of the options will
-                        not appear.
-                        If you cannot find an option as directed by the
-                        manual, it has already been installed.
+                    Follow these steps to configure the Oxygen Eclipse IDE.
+                    <note><title>Notes</title>
+                        <itemizedlist>
+                            <listitem><para>
+                                Depending on how you installed Eclipse and what
+                                you have already done, some of the options will
+                                not appear.
+                                If you cannot find an option as directed by the
+                                manual, it has already been installed.
+                                </para></listitem>
+                            <listitem><para>
+                                If you want to see all items regardless of
+                                whether they are installed or not, deselect the
+                                "Hide items that are already installed"
+                                check box.
+                                </para></listitem>
+                        </itemizedlist>
                     </note>
                     <orderedlist>
                         <listitem><para>
                             Be sure Eclipse is running and you are in your
                             workbench.
+                            Just click "workbench" if you are not in your
+                            default workspace.
                             </para></listitem>
                         <listitem><para>
                             Select "Install New Software" from the "Help"
@@ -299,7 +310,7 @@
                             </para></listitem>
                         <listitem><para>
                             Select
-                            "Neon - http://download.eclipse.org/releases/neon"
+                            "Oxygen - http://download.eclipse.org/releases/oxygen"
                             from the "Work with:" pull-down menu.
                             </para></listitem>
                         <listitem><para>
@@ -331,28 +342,29 @@
                             </para></listitem>
                         <listitem><para>
                             Complete the installation by clicking through
-                            appropriate "Next" and "Finish" buttons.
+                            appropriate "Next" and "Finish" buttons and then
+                            restart the Eclipse IDE.
                             </para></listitem>
                     </orderedlist>
                 </para>
             </section>
 
-            <section id='neon-installing-the-eclipse-yocto-plug-in'>
-                <title>Installing or Accessing the Neon Eclipse Yocto Plug-in</title>
+            <section id='oxygen-installing-the-eclipse-yocto-plug-in'>
+                <title>Installing or Accessing the Oxygen Eclipse Yocto Plug-in</title>
 
                 <para>
                     You can install the Eclipse Yocto Plug-in into the
                     Eclipse IDE one of two ways:  use the Yocto Project's
-                    Eclipse Update site to install the pre-built plug-in
+                    Eclipse Update site to install the pre-built plug-in,
                     or build and install the plug-in from the latest
                     source code.
                 </para>
 
-                <section id='neon-new-software'>
+                <section id='oxygen-new-software'>
                     <title>Installing the Pre-built Plug-in from the Yocto Project Eclipse Update Site</title>
 
                     <para>
-                        To install the Neon Eclipse Yocto Plug-in from the
+                        To install the Oxygen Eclipse Yocto Plug-in from the
                         update site, follow these steps:
                         <orderedlist>
                             <listitem><para>
@@ -367,17 +379,15 @@
                                 </para></listitem>
                             <listitem><para>
                                 Enter
-                                <filename>&ECLIPSE_DL_PLUGIN_URL;/neon</filename>
+                                <filename>&ECLIPSE_DL_PLUGIN_URL;/oxygen</filename>
                                 in the URL field and provide a meaningful
                                 name in the "Name" field.
                                 </para></listitem>
                             <listitem><para>
-                                Click "OK" to have the entry added
-                                to the "Work with:" drop-down list.
-                                </para></listitem>
-                            <listitem><para>
-                                Select the entry for the plug-in
-                                from the "Work with:" drop-down list.
+                                Click "OK" to have the entry automatically
+                                populate the "Work with:" field and to have
+                                the items for installation appear in the window
+                                below.
                                 </para></listitem>
                             <listitem><para>
                                 Check the boxes next to the following:
@@ -401,16 +411,21 @@
                     </para>
                 </section>
 
-                <section id='neon-zip-file-method'>
+                <section id='oxygen-zip-file-method'>
                     <title>Installing the Plug-in Using the Latest Source Code</title>
 
                     <para>
-                        To install the Neon Eclipse Yocto Plug-in from the
+                        To install the Oxygen Eclipse Yocto Plug-in from the
                         latest source code, follow these steps:
                         <orderedlist>
                             <listitem><para>
-                                Be sure your development system
-                                has JDK 1.8+
+                                Be sure your build host has JDK version 1.8
+                                or greater.
+                                On a Linux build host you can determine the
+                                version using the following command:
+                                <literallayout class='monospaced'>
+     $ java -version
+                                </literallayout>
                                 </para></listitem>
                             <listitem><para>
                                 Install X11-related packages:
@@ -423,19 +438,19 @@
                                 Git repository with:
                                 <literallayout class='monospaced'>
      $ cd ~
-     $ git clone git://git.yoctoproject.org/eclipse-poky
+     $ git clone git://git.yoctoproject.org/eclipse-yocto
                                 </literallayout>
                                 </para></listitem>
                             <listitem><para>
                                 Use Git to create the correct tag:
                                 <literallayout class='monospaced'>
-     $ cd ~/eclipse-poky
-     $ git checkout neon/yocto-&DISTRO;
+     $ cd ~/eclipse-yocto
+     $ git checkout -b oxygen/&DISTRO_NAME_NO_CAP; remotes/origin/oxygen/&DISTRO_NAME_NO_CAP;
                                 </literallayout>
                                 This creates a local tag named
-                                <filename>neon/yocto-&DISTRO;</filename>
+                                <filename>oxygen/&DISTRO_NAME_NO_CAP;</filename>
                                 based on the branch
-                                <filename>origin/neon-master</filename>.
+                                <filename>origin/oxygen/&DISTRO_NAME_NO_CAP;</filename>.
                                 You are put into a detached HEAD state,
                                 which is fine since you are only going to
                                 be building and not developing.
@@ -469,11 +484,11 @@
                                 <para>
                                 Following is an example:
                                 <literallayout class='monospaced'>
-     $ ECLIPSE_HOME=/home/scottrif/eclipse-poky/scripts/eclipse ./build.sh -l neon/yocto-&DISTRO; master yocto-&DISTRO; 2>&amp;1 | tee build.log
+     $ ECLIPSE_HOME=/home/scottrif/eclipse-yocto/scripts/eclipse ./build.sh -l oxygen/&DISTRO_NAME_NO_CAP; master yocto-&DISTRO; 2>&amp;1 | tee build.log
                                 </literallayout>
                                 The previous example command adds the tag
                                 you need for
-                                <filename>mars/yocto-&DISTRO;</filename>
+                                <filename>oxygen/&DISTRO_NAME_NO_CAP;</filename>
                                 to <filename>HEAD</filename>, then tells
                                 the build script to use the local (-l) Git
                                 checkout for the build.
@@ -533,17 +548,17 @@
                     <para>
                         At this point you should be able to configure the
                         Eclipse Yocto Plug-in as described in the
-                        "<link linkend='mars-configuring-the-eclipse-yocto-plug-in'>Configuring the Neon Eclipse Yocto Plug-in</link>"
+                        "<link linkend='oxygen-configuring-the-eclipse-yocto-plug-in'>Configuring the Oxygen Eclipse Yocto Plug-in</link>"
                         section.
                     </para>
                 </section>
             </section>
 
-            <section id='neon-configuring-the-eclipse-yocto-plug-in'>
-                <title>Configuring the Neon Eclipse Yocto Plug-in</title>
+            <section id='oxygen-configuring-the-eclipse-yocto-plug-in'>
+                <title>Configuring the Oxygen Eclipse Yocto Plug-in</title>
 
                 <para>
-                    Configuring the Neon Eclipse Yocto Plug-in involves
+                    Configuring the Oxygen Eclipse Yocto Plug-in involves
                     setting the Cross Compiler options and the Target
                     options.
                     The configurations you choose become the default
@@ -555,7 +570,7 @@
                 <para>
                     To start, you need to do the following from within the
                     Eclipse IDE:
-                    <itemizedlist>
+                    <orderedlist>
                         <listitem><para>
                             Choose "Preferences" from the "Window" menu to
                             display the Preferences Dialog.
@@ -564,7 +579,7 @@
                             Click "Yocto Project SDK" to display
                             the configuration screen.
                             </para></listitem>
-                    </itemizedlist>
+                    </orderedlist>
                     The following sub-sections describe how to configure
                     the plug-in.
                     <note>
@@ -572,12 +587,12 @@
                         example for preparing a QEMU image for use with
                         Eclipse is referenced as the "wiki" and is linked
                         to the example on the
-                        <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'> Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
+                        "<ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'> Cookbook guide to Making an Eclipse Debug Capable Image</ulink>"
                         wiki page.
                     </note>
                 </para>
 
-                <section id='neon-configuring-the-cross-compiler-options'>
+                <section id='oxygen-configuring-the-cross-compiler-options'>
                     <title>Configuring the Cross-Compiler Options</title>
 
                     <para>
@@ -682,8 +697,7 @@
                                 <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
                                 If so, the
                                 <filename>MY_QEMU_ROOTFS</filename>
-                                directory is found in the
-                                <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>
+                                directory is found in the Build Directory
                                 and you would browse to and select that
                                 directory (e.g.
                                 <filename>/home/scottrif/poky/build/MY_QEMU_ROOTFS</filename>).
@@ -708,9 +722,9 @@
                                 in the menu, you will need to build the
                                 image.
                                 See the
-                                "<ulink url='&YOCTO_DOCS_QS_URL;#qs-building-images'>Building Images</ulink>"
-                                section of the Yocto Project Quick Start
-                                for more information.
+                                "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-building-a-simple-image'>Building a Simple Image</ulink>"
+                                section of the Yocto Project Development Tasks
+                                Manual for more information.
                                 You can also see the
                                 <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>wiki</ulink>.
                                 </para></listitem>
@@ -718,7 +732,7 @@
                     </para>
                 </section>
 
-                <section id='neon-configuring-the-target-options'>
+                <section id='oxygen-configuring-the-target-options'>
                     <title>Configuring the Target Options</title>
 
                     <para>
@@ -787,14 +801,14 @@
                     </para>
 
                     <para>
-                        Click the "Apply" and "OK" to save your plug-in
+                        Click "Apply and Close" to save your plug-in
                         configurations.
                     </para>
                 </section>
             </section>
         </section>
 
-        <section id='neon-creating-the-project'>
+        <section id='oxygen-creating-the-project'>
             <title>Creating the Project</title>
 
             <para>
@@ -818,20 +832,22 @@
                 display the source code, follow these steps:
                 <orderedlist>
                     <listitem><para>
-                        Select "C Project" from the "File -> New" menu.
+                        Select "C/C++ Project" from the "File -> New" menu.
                         </para></listitem>
                     <listitem><para>
-                        Expand
-                        <filename>Yocto Project SDK Autotools Project</filename>.
+                        Select "C Managed Build" from the available options and
+                        click "Next".
                         </para></listitem>
                     <listitem><para>
-                        Select <filename>Hello World ANSI C Autotools Projects</filename>.
+                        Expand "Yocto Project SDK Autotools Project".
+                        </para></listitem>
+                    <listitem><para>
+                        Select "Hello World ANSI C Autotools Projects".
                         This is an Autotools-based project based on a Yocto
                         template.
                         </para></listitem>
                     <listitem><para>
-                        Put a name in the
-                        <filename>Project name:</filename> field.
+                        Put a name in the "Project name:" field.
                         Do not use hyphens as part of the name
                         (e.g. <filename>hello</filename>).
                         </para></listitem>
@@ -857,12 +873,12 @@
             </para>
         </section>
 
-        <section id='neon-configuring-the-cross-toolchains'>
+        <section id='oxygen-configuring-the-cross-toolchains'>
             <title>Configuring the Cross-Toolchains</title>
 
             <para>
                 The earlier section,
-                "<link linkend='neon-configuring-the-eclipse-yocto-plug-in'>Configuring the Neon Eclipse Yocto Plug-in</link>",
+                "<link linkend='oxygen-configuring-the-eclipse-yocto-plug-in'>Configuring the Oxygen Eclipse Yocto Plug-in</link>",
                 sets up the default project configurations.
                 You can override these settings for a given project by
                 following these steps:
@@ -877,7 +893,7 @@
                         Target Options for a project are inherited from
                         settings you provided using the Preferences Dialog
                         as described earlier in the
-                        "<link linkend='neon-configuring-the-eclipse-yocto-plug-in'>Configuring the Neon Eclipse Yocto Plug-in</link>"
+                        "<link linkend='oxygen-configuring-the-eclipse-yocto-plug-in'>Configuring the Oxygen Eclipse Yocto Plug-in</link>"
                         section.
                         The Yocto Project Settings Dialog allows you to
                         override those default settings for a given
@@ -885,21 +901,15 @@
                         </para></listitem>
                     <listitem><para>
                         Make or verify your configurations for the
-                        project and click "OK".
+                        project and click "Apply and Close".
                         </para></listitem>
                     <listitem><para>
-                        Right-click in the navigation pane and
-                        select "Reconfigure Project" from the pop-up menu.
+                        Right-click in the navigation pane and select
+                        "Reconfigure Project" from the pop-up menu.
                         This selection reconfigures the project by running
-                        <filename>autogen.sh</filename> in the workspace
-                        for your project.
-                        The script also runs
-                        <filename>libtoolize</filename>,
-                        <filename>aclocal</filename>,
-                        <filename>autoconf</filename>,
-                        <filename>autoheader</filename>,
-                        <filename>automake --a</filename>, and
-                        <filename>./configure</filename>.
+                        <ulink url='https://en.wikipedia.org/wiki/GNU_Build_System'>Autotools GNU utility programs</ulink>
+                        such as Autoconf, Automake, and so forth in the
+                        workspace for your project.
                         Click on the "Console" tab beneath your source code
                         to see the results of reconfiguring your project.
                         </para></listitem>
@@ -907,13 +917,14 @@
             </para>
          </section>
 
-         <section id='neon-building-the-project'>
+         <section id='oxygen-building-the-project'>
             <title>Building the Project</title>
              <para>
                 To build the project select "Build All" from the
                 "Project" menu.
                 The console should update and you can note the
-                cross-compiler you are using.
+                cross-compiler you are using (i.e.
+                <filename>i586-poky-linux-gcc</filename> in this example).
                 <note>
                     When building "Yocto Project SDK Autotools" projects,
                     the Eclipse IDE might display error messages for
@@ -929,21 +940,18 @@
                             Select the project.
                             </para></listitem>
                         <listitem><para>
-                            Select "Folder" from the
-                            <filename>File > New</filename> menu.
+                            Select "Folder" from the "File -> New" menu.
                             </para></listitem>
                         <listitem><para>
-                            In the "New Folder" Dialog, select "Link to
-                            alternate location (linked folder)".
+                            In the "New Folder" Dialog, click the "Advanced"
+                            button and then activate "Link to
+                            alternate location (linked folder)" button.
                             </para></listitem>
                         <listitem><para>
                             Click "Browse" to navigate to the include
                             folder inside the same sysroot location
                             selected in the Yocto Project
                             configuration preferences.
-                            </para></listitem>
-                        <listitem><para>
-                            Click "OK".
                             </para></listitem>
                         <listitem><para>
                             Click "Finish" to save the linked folder.
@@ -953,7 +961,7 @@
             </para>
         </section>
 
-        <section id='neon-starting-qemu-in-user-space-nfs-mode'>
+        <section id='oxygen-starting-qemu-in-user-space-nfs-mode'>
             <title>Starting QEMU in User-Space NFS Mode</title>
 
             <para>
@@ -987,8 +995,8 @@
                             <filename>rpcbind</filename>, follow the
                             suggestions to get the service running.
                             As an example, on a new Ubuntu 16.04 LTS
-                            installation, you must do the following in
-                            order to get QEMU to launch:
+                            installation, you must do the following in a new
+                            shell in order to get QEMU to launch:
                             <literallayout class='monospaced'>
      $ sudo apt-get install rpcbind
                             </literallayout>
@@ -1032,7 +1040,7 @@
             </para>
         </section>
 
-        <section id='neon-deploying-and-debugging-the-application'>
+        <section id='oxygen-deploying-and-debugging-the-application'>
             <title>Deploying and Debugging the Application</title>
 
             <para>
@@ -1186,7 +1194,7 @@
             </para>
         </section>
 
-        <section id='neon-using-Linuxtools'>
+        <section id='oxygen-using-Linuxtools'>
             <title>Using Linuxtools</title>
 
             <para>

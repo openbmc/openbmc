@@ -19,17 +19,17 @@ Upstream-Status: Submitted [https://github.com/storaged-project/libblockdev/pull
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- src/plugins/crypto.c | 6 +++---
- src/plugins/fs.c     | 4 ++--
- src/plugins/part.c   | 4 ++--
- src/utils/exec.c     | 2 +-
+ src/plugins/crypto.c  | 6 +++---
+ src/plugins/fs/vfat.c | 4 ++--
+ src/plugins/part.c    | 4 ++--
+ src/utils/exec.c      | 2 +-
  4 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/src/plugins/crypto.c b/src/plugins/crypto.c
-index 8fbce4f..7ee7cdc 100644
+index 563093e..b961471 100644
 --- a/src/plugins/crypto.c
 +++ b/src/plugins/crypto.c
-@@ -881,7 +881,7 @@ gboolean bd_crypto_tc_open (const gchar *device, const gchar *name, const guint8
+@@ -970,7 +970,7 @@ gboolean bd_crypto_tc_open (const gchar *device, const gchar *name, const guint8
      gint ret = 0;
      guint64 progress_id = 0;
      gchar *msg = NULL;
@@ -38,7 +38,7 @@ index 8fbce4f..7ee7cdc 100644
  
      msg = g_strdup_printf ("Started opening '%s' TrueCrypt/VeraCrypt device", device);
      progress_id = bd_utils_report_started (msg);
-@@ -999,7 +999,7 @@ static gchar *replace_char (gchar *str, gchar orig, gchar new) {
+@@ -1090,7 +1090,7 @@ static gchar *replace_char (gchar *str, gchar orig, gchar new) {
      return str;
  }
  
@@ -47,7 +47,7 @@ index 8fbce4f..7ee7cdc 100644
                                          CERTCertificate *cert, GError **error) {
      gpointer packet_data = NULL;
      gsize packet_data_size = 0;
-@@ -1008,7 +1008,7 @@ static gboolean write_escrow_data_file (struct libvk_volume *volume, struct libv
+@@ -1099,7 +1099,7 @@ static gboolean write_escrow_data_file (struct libvk_volume *volume, struct libv
      gsize bytes_written = 0;
      GError *tmp_error = NULL;
  
@@ -56,11 +56,11 @@ index 8fbce4f..7ee7cdc 100644
                                                                       ui, LIBVK_PACKET_FORMAT_ASYMMETRIC_WRAP_SECRET_ONLY, error);
  
      if (!packet_data) {
-diff --git a/src/plugins/fs.c b/src/plugins/fs.c
-index c4b6ac8..647096d 100644
---- a/src/plugins/fs.c
-+++ b/src/plugins/fs.c
-@@ -2614,8 +2614,8 @@ BDFSVfatInfo* bd_fs_vfat_get_info (const gchar *device, GError **error) {
+diff --git a/src/plugins/fs/vfat.c b/src/plugins/fs/vfat.c
+index 3ed7d4a..5ff7795 100644
+--- a/src/plugins/fs/vfat.c
++++ b/src/plugins/fs/vfat.c
+@@ -376,8 +376,8 @@ BDFSVfatInfo* bd_fs_vfat_get_info (const gchar *device, GError **error) {
   */
  gboolean bd_fs_vfat_resize (const gchar *device, guint64 new_size, GError **error) {
      PedDevice *ped_dev = NULL;
@@ -72,10 +72,10 @@ index c4b6ac8..647096d 100644
      PedSector start = 0;
      PedSector length = 0;
 diff --git a/src/plugins/part.c b/src/plugins/part.c
-index 12d2ef7..d277688 100644
+index fed8300..6b2a690 100644
 --- a/src/plugins/part.c
 +++ b/src/plugins/part.c
-@@ -849,7 +849,7 @@ static PedPartition* add_part_to_disk (PedDevice *dev, PedDisk *disk, BDPartType
+@@ -926,7 +926,7 @@ static PedPartition* add_part_to_disk (PedDevice *dev, PedDisk *disk, BDPartType
          return NULL;
      }
  
@@ -84,7 +84,7 @@ index 12d2ef7..d277688 100644
      if (!part) {
          set_parted_error (error, BD_PART_ERROR_FAIL);
          g_prefix_error (error, "Failed to create new partition on device '%s'", dev->path);
-@@ -1427,7 +1427,7 @@ gboolean bd_part_set_part_flags (const gchar *disk, const gchar *part, guint64 f
+@@ -1564,7 +1564,7 @@ gboolean bd_part_set_part_flags (const gchar *disk, const gchar *part, guint64 f
      PedPartition *ped_part = NULL;
      const gchar *part_num_str = NULL;
      gint part_num = 0;
@@ -94,7 +94,7 @@ index 12d2ef7..d277688 100644
      gboolean ret = FALSE;
      guint64 progress_id = 0;
 diff --git a/src/utils/exec.c b/src/utils/exec.c
-index 7ac44fd..0a3094c 100644
+index 11c1489..dcf87e5 100644
 --- a/src/utils/exec.c
 +++ b/src/utils/exec.c
 @@ -354,7 +354,7 @@ gboolean bd_utils_exec_and_report_progress (const gchar **argv, const BDExtraArg
@@ -107,5 +107,5 @@ index 7ac44fd..0a3094c 100644
      gboolean err_done = FALSE;
      GString *stdout_data = g_string_new (NULL);
 -- 
-1.8.3.1
+2.14.3
 

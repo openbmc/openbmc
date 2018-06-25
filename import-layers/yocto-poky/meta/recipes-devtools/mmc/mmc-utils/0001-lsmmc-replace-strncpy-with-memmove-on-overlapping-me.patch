@@ -1,0 +1,36 @@
+From 175ac0f362bf6121c3537e2f1760ad41c8f81367 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Mar 2018 01:04:57 -0700
+Subject: [PATCH] lsmmc: replace strncpy with memmove on overlapping memory
+ copy
+
+here source and destination addresses are overlapping so using memmove is
+going to be more efficient.
+
+Additionally, the bounded size for copy is overflowing for first copy
+
+In function 'strncpy',
+    inlined from 'read_file' at lsmmc.c:356:3:
+/mnt/a/oe/build/tmp/work/cortexa7t2hf-neon-vfpv4-bec-linux-gnueabi/mmc-utils/0.1-r0/recipe-sysroot/usr/include/bits/string_fortified.h:106:10: error: '__builtin_strncpy' accessing 4096 bytes at offsets 0 and 1 overlaps 4095 bytes at offset 1 [-Werror=restrict]
+   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted [https://patchwork.kernel.org/patch/10314723/]
+ lsmmc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lsmmc.c b/lsmmc.c
+index c4faa00..bcb854d 100644
+--- a/lsmmc.c
++++ b/lsmmc.c
+@@ -353,7 +353,7 @@ char *read_file(char *name)
+ 		line[strlen(line) - 1] = '\0';
+ 
+ 	while (isspace(line[0]))
+-		strncpy(&line[0], &line[1], sizeof(line));
++		memmove(&line[0], &line[1], sizeof(line)-1);
+ 
+ 	return strdup(line);
+ }

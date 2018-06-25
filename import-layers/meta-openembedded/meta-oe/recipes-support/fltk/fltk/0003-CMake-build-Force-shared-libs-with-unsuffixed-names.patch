@@ -1,0 +1,41 @@
+From bc38fb41044503c9debf5710910c51dd29674b6a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Fri, 15 Dec 2017 22:14:01 +0100
+Subject: [PATCH] CMake build: Force shared libs with unsuffixed names
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For windows build sake CMake complains when a project wants to build shared and
+static libraries with same name. This caused the authors of fltk to generate
+libraries with names suffixed by '_SHARED' when building fltk with cmake -
+autotools builds do not suffix.
+
+Reasons to build shared libs with correct names:
+
+* Shared libraries are the preferred choice for embedded devices
+* There are projects (e.g yoshimi) expecting shared libraries with unsuffixed
+  names - as created by autotools build. These projects link against static
+  libraries by accident causing unusable binaries.
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ CMake/macros.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMake/macros.cmake b/CMake/macros.cmake
+index 4def62d..ab675f0 100644
+--- a/CMake/macros.cmake
++++ b/CMake/macros.cmake
+@@ -49,7 +49,7 @@ macro(FL_ADD_LIBRARY LIBNAME LIBTYPE LIBFILES)
+ 	    PROPERTIES
+ 	    VERSION ${FLTK_VERSION_FULL}
+ 	    SOVERSION ${FLTK_VERSION_MAJOR}.${FLTK_VERSION_MINOR}
+-	    PREFIX "lib"    # for MSVC static/shared coexistence
++	    OUTPUT_NAME ${LIBNAME} CLEAN_DIRECT_OUTPUT 1
+ 	    )
+     endif (${LIBTYPE} STREQUAL "SHARED")
+ 
+-- 
+2.9.5
+

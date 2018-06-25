@@ -383,8 +383,10 @@ def reformat_git_uri(uri):
         # which causes decodeurl to fail getting the right host and path
         if len(host.split(':')) > 1:
             splitslash = host.split(':')
-            host = splitslash[0]
-            path = '/' + splitslash[1] + path
+            # Port number should not be split from host
+            if not re.match('^[0-9]+$', splitslash[1]):
+                host = splitslash[0]
+                path = '/' + splitslash[1] + path
         #Algorithm:
         # if user is defined, append protocol=ssh or if a protocol is defined, then honor the user-defined protocol
         # if no user & password is defined, check for scheme type and append the protocol with the scheme type
@@ -433,6 +435,9 @@ def create_recipe(args):
         source = 'file://%s' % os.path.abspath(source)
 
     if scriptutils.is_src_url(source):
+        # Warn about github archive URLs
+        if re.match('https?://github.com/[^/]+/[^/]+/archive/.+(\.tar\..*|\.zip)$', source):
+            logger.warn('github archive files are not guaranteed to be stable and may be re-generated over time. If the latter occurs, the checksums will likely change and the recipe will fail at do_fetch. It is recommended that you point to an actual commit or tag in the repository instead (using the repository URL in conjunction with the -S/--srcrev option).')
         # Fetch a URL
         fetchuri = reformat_git_uri(urldefrag(source)[0])
         if args.binary:

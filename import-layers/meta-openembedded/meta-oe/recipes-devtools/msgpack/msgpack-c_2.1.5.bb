@@ -9,9 +9,10 @@ LIC_FILES_CHKSUM = "file://NOTICE;md5=7a858c074723608e08614061dc044352 \
 
 PV .= "+git${SRCPV}"
 
-SRCREV = "7a98138f27f27290e680bf8fbf1f8d1b089bf138"
+SRCREV = "208595b2620cf6260ce3d6d4cf8543f13b206449"
 
 SRC_URI = "git://github.com/msgpack/msgpack-c \
+           file://0001-Fix-Werror-class-memaccess.patch \
            "
 
 inherit cmake pkgconfig

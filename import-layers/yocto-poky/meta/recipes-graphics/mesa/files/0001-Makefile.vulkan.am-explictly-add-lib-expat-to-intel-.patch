@@ -20,17 +20,18 @@ undefined reference to `XML_GetCurrentLineNumber'
 
 explictly add EXPAT_LIBS to intel's VULKAN_LIB_DEPS
 
-Upstream-Status: Submitted [mesa-dev@lists.freedesktop.org]
+Upstream-Status: Accepted
+https://cgit.freedesktop.org/mesa/mesa/commit/?id=05fc62d89f59ce19a18bfd4e63a09624910d6caf
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  src/intel/Makefile.vulkan.am | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/src/intel/Makefile.vulkan.am b/src/intel/Makefile.vulkan.am
-index 271b0a5..8fbe2c8 100644
---- a/src/intel/Makefile.vulkan.am
-+++ b/src/intel/Makefile.vulkan.am
+Index: mesa-17.3.6/src/intel/Makefile.vulkan.am
+===================================================================
+--- mesa-17.3.6.orig/src/intel/Makefile.vulkan.am
++++ mesa-17.3.6/src/intel/Makefile.vulkan.am
 @@ -144,6 +144,7 @@ VULKAN_LIB_DEPS = \
  	$(LIBDRM_LIBS) \
  	$(PTHREAD_LIBS) \
@@ -38,7 +39,4 @@ index 271b0a5..8fbe2c8 100644
 +	$(EXPAT_LIBS) \
  	-lm
  
- if HAVE_PLATFORM_X11
--- 
-2.7.4
-
+ if HAVE_PLATFORM_ANDROID

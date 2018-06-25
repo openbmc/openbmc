@@ -22,21 +22,22 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- src/lib/plugin_apis/dm.api          |  41 -----
+ src/lib/plugin_apis/dm.api          |  50 ------
  src/plugins/Makefile.am             |   2 +-
- src/plugins/dm.c                    | 318 ------------------------------------
+ src/plugins/dm.c                    | 330 ------------------------------------
  src/plugins/dm.h                    |   5 -
  src/python/gi/overrides/BlockDev.py |   6 -
- 5 files changed, 1 insertion(+), 371 deletions(-)
+ 5 files changed, 1 insertion(+), 392 deletions(-)
 
 diff --git a/src/lib/plugin_apis/dm.api b/src/lib/plugin_apis/dm.api
-index a885bba..ec86b80 100644
+index 04fd8d8..5d30b6a 100644
 --- a/src/lib/plugin_apis/dm.api
 +++ b/src/lib/plugin_apis/dm.api
-@@ -68,44 +68,3 @@ gchar* bd_dm_node_from_name (const gchar *map_name, GError **error);
+@@ -111,53 +111,3 @@ gchar* bd_dm_get_subsystem_from_name (const gchar *device_name, GError **error);
+  * Tech category: %BD_DM_TECH_MAP-%BD_DM_TECH_MODE_QUERY
   */
  gboolean bd_dm_map_exists (const gchar *map_name, gboolean live_only, gboolean active_only, GError **error);
- 
+-
 -/**
 - * bd_dm_get_member_raid_sets:
 - * @name: (allow-none): name of the member
@@ -49,6 +50,8 @@ index a885bba..ec86b80 100644
 - * the member or %NULL in case of error
 - *
 - * One of @name, @uuid or @major:@minor has to be given.
+- *
+- * Tech category: %BD_DM_TECH_RAID-%BD_DM_TECH_MODE_QUERY
 - */
 -gchar** bd_dm_get_member_raid_sets (const gchar *name, const gchar *uuid, gint major, gint minor, GError **error);
 -
@@ -58,6 +61,8 @@ index a885bba..ec86b80 100644
 - * @error: (out): variable to store error (if any)
 - *
 - * Returns: whether the RAID set @name was successfully activate or not
+- *
+- * Tech category: %BD_DM_TECH_RAID-%BD_DM_TECH_CREATE_ACTIVATE
 - */
 -gboolean bd_dm_activate_raid_set (const gchar *name, GError **error);
 -
@@ -67,6 +72,8 @@ index a885bba..ec86b80 100644
 - * @error: (out): variable to store error (if any)
 - *
 - * Returns: whether the RAID set @name was successfully deactivate or not
+- *
+- * Tech category: %BD_DM_TECH_RAID-%BD_DM_TECH_REMOVE_DEACTIVATE
 - */
 -gboolean bd_dm_deactivate_raid_set (const gchar *name, GError **error);
 -
@@ -76,13 +83,15 @@ index a885bba..ec86b80 100644
 - * @error: (out): variable to store error (if any)
 - *
 - * Returns: string representation of the @name RAID set's type
+- *
+- * Tech category: %BD_DM_TECH_RAID-%BD_DM_TECH_QUERY
 - */
 -gchar* bd_dm_get_raid_set_type (const gchar *name, GError **error);
 diff --git a/src/plugins/Makefile.am b/src/plugins/Makefile.am
-index 6c4038f..59dc5e3 100644
+index b69c8f7..7575f4a 100644
 --- a/src/plugins/Makefile.am
 +++ b/src/plugins/Makefile.am
-@@ -76,7 +76,7 @@ endif
+@@ -75,7 +75,7 @@ endif
  
  if WITH_DM
  libbd_dm_la_CFLAGS = $(GLIB_CFLAGS) $(DEVMAPPER_CFLAGS) $(UDEV_CFLAGS) -Wall -Wextra -Werror
@@ -92,10 +101,10 @@ index 6c4038f..59dc5e3 100644
  # Dear author of libdmdraid, VERSION really is not a good name for an enum member!
  libbd_dm_la_CPPFLAGS = -I${builddir}/../../include/ -UVERSION
 diff --git a/src/plugins/dm.c b/src/plugins/dm.c
-index 9cee742..fd7c7ba 100644
+index 0e5466c..31ebe96 100644
 --- a/src/plugins/dm.c
 +++ b/src/plugins/dm.c
-@@ -21,16 +21,10 @@
+@@ -21,17 +21,11 @@
  #include <unistd.h>
  #include <blockdev/utils.h>
  #include <libdevmapper.h>
@@ -103,6 +112,7 @@ index 9cee742..fd7c7ba 100644
  #include <libudev.h>
  
  #include "dm.h"
+ #include "check_deps.h"
  
 -/* macros taken from the pyblock/dmraid.h file plus one more*/
 -#define for_each_raidset(_c, _n) list_for_each_entry(_n, LC_RS(_c), list)
@@ -112,10 +122,11 @@ index 9cee742..fd7c7ba 100644
  /**
   * SECTION: dm
   * @short_description: plugin for basic operations with device mapper
-@@ -286,315 +280,3 @@ gboolean bd_dm_map_exists (const gchar *map_name, gboolean live_only, gboolean a
+@@ -380,327 +374,3 @@ gboolean bd_dm_map_exists (const gchar *map_name, gboolean live_only, gboolean a
+ 
      return ret;
  }
- 
+-
 -/**
 - * init_dmraid_stack: (skip)
 - *
@@ -191,6 +202,9 @@ index 9cee742..fd7c7ba 100644
 -    /* if we don't have the name, we cannot check any match */
 -    g_return_val_if_fail (dev_name, FALSE);
 -
+-    /* g_return_val_if_fail above checks value of dev_name and returns FALSE if
+-     * it is NULL so we don't need to check it here */
+-    /* coverity[var_deref_model] */
 -    if (name && strcmp (dev_name, name) != 0) {
 -        return FALSE;
 -    }
@@ -220,8 +234,8 @@ index 9cee742..fd7c7ba 100644
 - * find_raid_sets_for_dev: (skip)
 - */
 -static void find_raid_sets_for_dev (const gchar *name, const gchar *uuid, gint major, gint minor, struct lib_context *lc, struct raid_set *rs, GPtrArray *ret_sets) {
--    struct raid_set *subset;
--    struct raid_dev *dev;
+-    struct raid_set *subset = NULL;
+-    struct raid_dev *dev = NULL;
 -
 -    if (T_GROUP(rs) || !list_empty(&(rs->sets))) {
 -        for_each_subset (rs, subset)
@@ -246,6 +260,8 @@ index 9cee742..fd7c7ba 100644
 - * the member or %NULL in case of error
 - *
 - * One of @name, @uuid or @major:@minor has to be given.
+- *
+- * Tech category: %BD_DM_TECH_RAID-%BD_DM_TECH_MODE_QUERY
 - */
 -gchar** bd_dm_get_member_raid_sets (const gchar *name, const gchar *uuid, gint major, gint minor, GError **error) {
 -    guint64 i = 0;
@@ -312,8 +328,8 @@ index 9cee742..fd7c7ba 100644
 -
 -static gboolean change_set_by_name (const gchar *name, enum activate_type action, GError **error) {
 -    gint rc = 0;
--    struct lib_context *lc;
--    struct raid_set *iter_rs;
+-    struct lib_context *lc = NULL;
+-    struct raid_set *iter_rs = NULL;
 -    struct raid_set *match_rs = NULL;
 -
 -    lc = init_dmraid_stack (error);
@@ -352,6 +368,8 @@ index 9cee742..fd7c7ba 100644
 - * @error: (out): variable to store error (if any)
 - *
 - * Returns: whether the RAID set @name was successfully activate or not
+- *
+- * Tech category: %BD_DM_TECH_RAID-%BD_DM_TECH_CREATE_ACTIVATE
 - */
 -gboolean bd_dm_activate_raid_set (const gchar *name, GError **error) {
 -    guint64 progress_id = 0;
@@ -372,6 +390,8 @@ index 9cee742..fd7c7ba 100644
 - * @error: (out): variable to store error (if any)
 - *
 - * Returns: whether the RAID set @name was successfully deactivate or not
+- *
+- * Tech category: %BD_DM_TECH_RAID-%BD_DM_TECH_REMOVE_DEACTIVATE
 - */
 -gboolean bd_dm_deactivate_raid_set (const gchar *name, GError **error) {
 -    guint64 progress_id = 0;
@@ -392,10 +412,12 @@ index 9cee742..fd7c7ba 100644
 - * @error: (out): variable to store error (if any)
 - *
 - * Returns: string representation of the @name RAID set's type
+- *
+- * Tech category: %BD_DM_TECH_RAID-%BD_DM_TECH_QUERY
 - */
 -gchar* bd_dm_get_raid_set_type (const gchar *name, GError **error) {
--    struct lib_context *lc;
--    struct raid_set *iter_rs;
+-    struct lib_context *lc = NULL;
+-    struct raid_set *iter_rs = NULL;
 -    struct raid_set *match_rs = NULL;
 -    const gchar *type = NULL;
 -
@@ -429,7 +451,7 @@ index 9cee742..fd7c7ba 100644
 -    return g_strdup (type);
 -}
 diff --git a/src/plugins/dm.h b/src/plugins/dm.h
-index 859fb80..80acd49 100644
+index 0dce6ac..1ee3788 100644
 --- a/src/plugins/dm.h
 +++ b/src/plugins/dm.h
 @@ -1,5 +1,4 @@
@@ -438,10 +460,10 @@ index 859fb80..80acd49 100644
  
  #ifndef BD_DM
  #define BD_DM
-@@ -35,9 +34,5 @@ gboolean bd_dm_remove (const gchar *map_name, GError **error);
+@@ -48,9 +47,5 @@ gboolean bd_dm_map_exists (const gchar *map_name, gboolean live_only, gboolean a
  gchar* bd_dm_name_from_node (const gchar *dm_node, GError **error);
  gchar* bd_dm_node_from_name (const gchar *map_name, GError **error);
- gboolean bd_dm_map_exists (const gchar *map_name, gboolean live_only, gboolean active_only, GError **error);
+ gchar* bd_dm_get_subsystem_from_name (const gchar *device_name, GError **error);
 -gchar** bd_dm_get_member_raid_sets (const gchar *name, const gchar *uuid, gint major, gint minor, GError **error);
 -gboolean bd_dm_activate_raid_set (const gchar *name, GError **error);
 -gboolean bd_dm_deactivate_raid_set (const gchar *name, GError **error);
@@ -466,5 +488,5 @@ index fb3ffb4..eed0a38 100644
  _loop_setup = BlockDev.loop_setup
  @override(BlockDev.loop_setup)
 -- 
-1.8.3.1
+2.14.3
 

@@ -5,18 +5,15 @@ Upstream-Status: Inappropriate [configuration]
  kex.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kex.h b/kex.h
-index 72430e9..375c677 100644
---- a/kex.h
-+++ b/kex.h
-@@ -67,6 +67,6 @@ struct KEXState {
- };
+Index: dropbear-2017.75/kex.h
+===================================================================
+--- dropbear-2017.75.orig/kex.h
++++ dropbear-2017.75/kex.h
+@@ -106,6 +106,6 @@ int curve25519_donna(unsigned char *out,
+ #endif
  
  
 -#define MAX_KEXHASHBUF 2000
 +#define MAX_KEXHASHBUF 3000
  
- #endif /* _KEX_H_ */
--- 
-1.7.11.7
-
+ #endif /* DROPBEAR_KEX_H_ */

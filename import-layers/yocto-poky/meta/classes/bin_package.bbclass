@@ -26,7 +26,10 @@ do_compile[noexec] = "1"
 bin_package_do_install () {
     # Do it carefully
     [ -d "${S}" ] || exit 1
-    cd ${S} || exit 1
+    if [ -z "$(ls -A ${S})" ]; then
+        bbfatal bin_package has nothing to install. Be sure the SRC_URI unpacks into S.
+    fi
+    cd ${S}
     tar --no-same-owner --exclude='./patches' --exclude='./.pc' -cpf - . \
         | tar --no-same-owner -xpf - -C ${D}
 }

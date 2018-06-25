@@ -1,0 +1,43 @@
+From 3edce6a0019bcb90febc1f654b5b2e2bad5c59bd Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 26 May 2016 21:50:01 -0400
+Subject: [PATCH] fix compile failure with older host gcc (<=4.6)
+
+While host gcc version is 4.6.3 in ubuntu 1204, it
+did not recognize -std=gnu11 and -Wmaybe-uninitialized.
+
+While host gcc version is 4.4.7 in centos6, it
+did not recognize -std=gnu11, -Wmaybe-uninitialized,
+and -flto.
+
+For native build, use -std=gnu99 to replace -std=gnu11,
+and directly remove -Wmaybe-uninitialized and -flto.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+---
+ gcc.specs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gcc.specs b/gcc.specs
+index 45d43d1..f1c6944 100644
+--- a/gcc.specs
++++ b/gcc.specs
+@@ -2,13 +2,13 @@
+ + -D_GNU_SOURCE
+ 
+ *efivar_cpp_options:
+- -Werror -Wall -std=gnu11 -Wextra
++ -Werror -Wall -std=gnu99 -Wextra
+ 
+ *cpp_options:
+ + %(efivar_cpp_options)
+ 
+ *cc1_options:
+-+ %(efivar_cpp_options) -Wmaybe-uninitialized -fno-merge-constants -fvisibility=hidden %{!r:%{!fpie:%{!fPIE:%{!fpic:%{!fPIC:%{!fno-pic:-fPIE}}}}}}
+++ %(efivar_cpp_options) -fno-merge-constants -fvisibility=hidden %{!r:%{!fpie:%{!fPIE:%{!fpic:%{!fPIC:%{!fno-pic:-fPIE}}}}}}
+ 
+ *self_spec:
+ + %{!shared:%{!static:%{!r:-pie}}} %{static:-Wl,-no-fatal-warnings -Wl,-static -static -Wl,-z,relro,-z,now}

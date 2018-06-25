@@ -20,7 +20,8 @@ FILES_${PN} += "${datadir}/application-registry  \
 
 FILES_${PN}-doc += "${datadir}/devhelp"
 
-inherit autotools pkgconfig
+GNOMEBASEBUILDCLASS ??= "autotools"
+inherit ${GNOMEBASEBUILDCLASS} pkgconfig
 
 do_install_append() {
 	rm -rf ${D}${localstatedir}/lib/scrollkeeper/*

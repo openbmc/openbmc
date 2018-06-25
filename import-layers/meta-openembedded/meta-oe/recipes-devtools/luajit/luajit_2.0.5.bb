@@ -53,6 +53,7 @@ EXTRA_OEMAKE = "\
     \
     'PREFIX=${prefix}' \
     'MULTILIB=${baselib}' \
+    'LDCONFIG=:' \
 "
 
 do_compile () {
@@ -90,3 +91,5 @@ FILES_${PN}-dev += "${libdir}/libluajit-5.1.a \
 "
 FILES_luajit-common = "${datadir}/${BPN}-${PV}"
 
+# Aarch64 is not supported in this release 
+COMPATIBLE_HOST = "^(?!aarch64).*"

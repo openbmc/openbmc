@@ -1,6 +1,16 @@
---- /tmp/configure.ac	2007-05-08 17:29:02.000000000 +0200
-+++ pidgin-2.0.0/configure.ac	2007-05-08 17:30:30.325251000 +0200
-@@ -472,7 +472,7 @@
+From c3058f9eadaf5ff28ba776cfed54b609a93a1249 Mon Sep 17 00:00:00 2001
+From: Herrie <github.com@herrie.org>
+Date: Mon, 24 Jul 2017 21:30:16 +0200
+
+---
+ configure.ac | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b8acd2a..d20a18e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -642,7 +642,7 @@ if test "x$enable_consoleui" = "xyes"; then
  	if test "x$enable_consoleui" = "xyes"; then
  		dnl # Some distros put the headers in ncursesw/, some don't
  		found_ncurses_h=no
@@ -8,8 +18,8 @@
 +		for location in $ac_ncurses_includes $NCURSES_HEADERS 
  		do
  			f="$location/ncurses.h"
- 			AC_CHECK_HEADER($f,[
-@@ -1860,10 +1860,6 @@
+ 			orig_CFLAGS="$CFLAGS"
+@@ -2397,10 +2397,6 @@ if test "$kerberos" != "no" ; then
  			KRB4_CFLAGS="$KRB4_CFLAGS -I${kerberos}/include/kerberosIV"
  		fi
  		KRB4_LDFLAGS="-L${kerberos}/lib"
@@ -20,7 +30,7 @@
  	fi
  	AC_DEFINE(ZEPHYR_USES_KERBEROS, 1, [Define if kerberos should be used in Zephyr.])
  
-@@ -1896,10 +1892,6 @@
+@@ -2433,10 +2429,6 @@ if test "$zephyr" != "no" ; then
  		ZEPHYR_LDFLAGS="-L${zephyr}/lib"
  	elif test -d /usr/athena/include/zephyr ; then
  		ZEPHYR_CFLAGS="-I/usr/athena/include"

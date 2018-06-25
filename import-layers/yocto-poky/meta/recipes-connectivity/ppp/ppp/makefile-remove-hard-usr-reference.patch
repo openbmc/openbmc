@@ -6,10 +6,11 @@ Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
 
 Upstream-Status: Inappropriate [configuration]
 
-diff -urN ppp-2.4.5-orig/pppd/Makefile.linux ppp-2.4.5/pppd/Makefile.linux
---- ppp-2.4.5-orig/pppd/Makefile.linux	2010-06-30 15:51:12.043682063 +0800
-+++ ppp-2.4.5/pppd/Makefile.linux	2010-06-30 17:08:21.806363042 +0800
-@@ -117,10 +117,10 @@
+Index: ppp-2.4.7/pppd/Makefile.linux
+===================================================================
+--- ppp-2.4.7.orig/pppd/Makefile.linux
++++ ppp-2.4.7/pppd/Makefile.linux
+@@ -120,10 +120,10 @@ CFLAGS   += -DHAS_SHADOW
  #LIBS     += -lshadow $(LIBS)
  endif
  
@@ -20,9 +21,9 @@ diff -urN ppp-2.4.5-orig/pppd/Makefile.linux ppp-2.4.5/pppd/Makefile.linux
 -endif
 +#endif
  
- ifdef NEEDDES
- ifndef USE_CRYPT
-@@ -169,10 +169,10 @@
+ ifdef USE_LIBUTIL
+ CFLAGS	+= -DHAVE_LOGWTMP=1
+@@ -177,10 +177,10 @@ LIBS	+= -ldl
  endif
  
  ifdef FILTER

@@ -12,11 +12,11 @@ Upstream-Status: Submitted [mailing list]
  configure.ac | 14 ++++++++++++--
  1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index e3048c7..918d21d 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -137,6 +137,12 @@ AC_ARG_ENABLE(install-test-programs,
+Index: libdrm-2.4.91/configure.ac
+===================================================================
+--- libdrm-2.4.91.orig/configure.ac
++++ libdrm-2.4.91/configure.ac
+@@ -163,6 +163,12 @@ AC_ARG_ENABLE(install-test-programs,
  		  [Install test programs (default: no)]),
  		  [INSTALL_TESTS=$enableval], [INSTALL_TESTS=no])
  
@@ -29,8 +29,8 @@ index e3048c7..918d21d 100644
  dnl ===========================================================================
  dnl check compiler flags
  AC_DEFUN([LIBDRM_CC_TRY_FLAG], [
-@@ -372,7 +378,7 @@ if test "x$RADEON" = xyes; then
- 	AC_DEFINE(HAVE_RADEON, 1, [Have radeon support])
+@@ -411,7 +417,7 @@ else
+ 	AC_DEFINE(HAVE_RADEON, 0)
  fi
  
 -if test "x$AMDGPU" != xno; then
@@ -38,8 +38,8 @@ index e3048c7..918d21d 100644
  	# Detect cunit library
  	PKG_CHECK_MODULES([CUNIT], [cunit >= 2.1], [have_cunit=yes], [have_cunit=no])
  	# If pkg-config does not find cunit, check it using AC_CHECK_LIB.  We
-@@ -399,7 +406,11 @@ if test "x$AMDGPU" = xyes; then
- 	AC_DEFINE(HAVE_CUNIT, [test "x$have_cunit" != "xno"], [Enable CUNIT Have amdgpu support])
+@@ -436,7 +442,11 @@ if test "x$AMDGPU" = xyes; then
+ 	AC_DEFINE(HAVE_AMDGPU, 1, [Have amdgpu support])
  
  	if test "x$have_cunit" = "xno"; then
 -		AC_MSG_WARN([Could not find cunit library. Disabling amdgpu tests])
@@ -49,8 +49,5 @@ index e3048c7..918d21d 100644
 +			AC_MSG_WARN([Could not find cunit library. Disabling amdgpu tests])
 +		fi
  	fi
- fi
- 
--- 
-2.1.4
-
+ else
+ 	AC_DEFINE(HAVE_AMDGPU, 0)

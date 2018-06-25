@@ -7,18 +7,17 @@ DEPENDS = "libxt"
 REQUIRED_DISTRO_FEATURES = "x11"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENCE;md5=33bcd4bce8f3c197f2aefbdbd2d299bc"
+LIC_FILES_CHKSUM = "file://LICENCE;md5=da6110d4ed1225a287eab2bf0ac0193b"
 
 SRC_URI = "git://git.tartarus.org/simon/puzzles.git \
            file://fix-compiling-failure-with-option-g-O.patch \
            file://0001-Use-labs-instead-of-abs.patch \
            file://0001-palisade-Fix-warnings-with-clang-on-arm.patch \
-           file://0001-Clarify-conditions-to-avoid-compiler-errors.patch \
            file://0001-Use-Wno-error-format-overflow-if-the-compiler-suppor.patch \
            "
-UPSTREAM_VERSION_UNKNOWN = "1"
-SRCREV = "8dfe5cec31e784e4ece2955ecc8cc35ee7e8fbb3"
-PE = "1"
+UPSTREAM_CHECK_COMMITS = "1"
+SRCREV = "2adf0052d66eae88c7a5e55e67fe16e13f7018b5"
+PE = "2"
 PV = "0.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"

@@ -1,0 +1,24 @@
+commit 3e96a6c41bdd26417265a45ed685138d8eed564e
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Fri Sep 14 02:32:53 2012 -0400
+
+    openl2tp: Enable tests
+    
+    Build the test direcctory as part
+    of the overall build
+    
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/Makefile b/Makefile
+index 412cf4d..adf4f44 100644
+--- a/Makefile
++++ b/Makefile
+@@ -16,7 +16,7 @@ L2TP_FEATURE_LOCAL_CONF_FILE=	y
+ 
+ # Define to include test code. This must be defined to run the
+ # regression tests
+-# L2TP_TEST=		y
++L2TP_TEST=y
+ 
+ # Define to compile in debug code. Also makes default trace flags
+ # enable all messages

@@ -7,13 +7,14 @@ python __anonymous() {
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-raspberrypi:"
 
-LINUX_VERSION ?= "4.13"
-LINUX_RPI_DEV_BRANCH ?= "rpi-4.13.y"
+LINUX_VERSION ?= "4.16"
+LINUX_RPI_DEV_BRANCH ?= "rpi-4.16.y"
 
 SRCREV = "${AUTOREV}"
-SRC_URI = "git://github.com/raspberrypi/linux.git;protocol=git;branch=${LINUX_RPI_DEV_BRANCH} \
-           file://0001-build-arm64-Add-rules-for-.dtbo-files-for-dts-overla.patch \
-"
+SRC_URI = " \
+    git://github.com/raspberrypi/linux.git;protocol=git;branch=${LINUX_RPI_DEV_BRANCH} \
+    file://0001-menuconfig-check-lxdiaglog.sh-Allow-specification-of.patch \
+    "
 require linux-raspberrypi.inc
 
 # Disable version check so that we don't have to edit this recipe every time

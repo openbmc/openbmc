@@ -7,7 +7,10 @@ DEPENDS = "gvfs enchant gconf gnome-doc-utils glib-2.0 gtk+ gtksourceview2 iso-c
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
-inherit gnome gettext pythonnative
+inherit distro_features_check gnome gettext pythonnative
+
+REQUIRED_DISTRO_FEATURES = "x11"
+
 SRC_URI = "${GNOME_MIRROR}/${GNOMEBN}/${@gnome_verdir("${PV}")}/${GNOMEBN}-${PV}.tar.${GNOME_COMPRESS_TYPE};name=archive \
            file://0001-workaround-void-pointer-arithmetic.patch \
            file://0001-Remove-help-directory-from-build.patch \

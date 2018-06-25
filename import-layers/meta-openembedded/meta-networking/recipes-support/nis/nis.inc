@@ -27,5 +27,5 @@ do_install() {
 python () {
     os = d.getVar("TARGET_OS", True)
     if os == "linux-uclibc":
-        raise bb.parse.SkipPackage("NIS functionality requires rpcsvc/yp.h, uClibC does not provide this")
+        raise bb.parse.SkipRecipe("NIS functionality requires rpcsvc/yp.h, uClibC does not provide this")
 }

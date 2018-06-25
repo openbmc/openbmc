@@ -1,0 +1,42 @@
+From dfea4b98844795a0cd14fdaf40c67df389dbd27e Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 28 Feb 2018 21:25:22 -0800
+Subject: [PATCH 21/31] test-sizeof.c: Disable tests for missing typedefs in
+ musl
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/test/test-sizeof.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/test/test-sizeof.c b/src/test/test-sizeof.c
+index aed6db842..0de6fa63c 100644
+--- a/src/test/test-sizeof.c
++++ b/src/test/test-sizeof.c
+@@ -50,8 +50,10 @@ int main(void) {
+         info(unsigned);
+         info(long unsigned);
+         info(long long unsigned);
++#ifdef __GLIBC__
+         info(__syscall_ulong_t);
+         info(__syscall_slong_t);
++#endif
+ 
+         info(float);
+         info(double);
+@@ -61,7 +63,9 @@ int main(void) {
+         info(ssize_t);
+         info(time_t);
+         info(usec_t);
++#ifdef __GLIBC__
+         info(__time_t);
++#endif
+         info(pid_t);
+         info(uid_t);
+         info(gid_t);
+-- 
+2.13.0
+

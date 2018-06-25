@@ -1,0 +1,40 @@
+From 67af7dbe8bdf29f9ed980d8d29feeae32a0a7a1d Mon Sep 17 00:00:00 2001
+From: Li Wang <liwang@redhat.com>
+Date: Tue, 23 Jan 2018 17:46:35 +0800
+Subject: [PATCH] safe_macros: make is_fuse() return zero if fs_type is NULL
+
+This commmit 28507e514c(safe_mount: Do not try mount() syscall for FUSE fs)
+involves FUSE fs check in safe_mount(), but we'd better guarantee the "fs_type"
+is legal to check in is_fuse() function otherwise system will kill the program.
+
+  cmdline="fanotify06"
+  contacts=""
+  analysis=exit
+  <<<test_output>>>
+  tst_test.c:980: INFO: Timeout per run is 0h 10m 00s
+  tst_test.c:1025: BROK: Test killed by SIGSEGV!
+
+Signed-off-by: Li Wang <liwang@redhat.com>
+Acked-by: Jan Stancek <jstancek@redhat.com>
+Upstream-Status: Accepted [https://github.com/linux-test-project/ltp/commit/67af7dbe8bdf29f9ed980d8d29feeae32a0a7a1d]
+---
+ lib/safe_macros.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/safe_macros.c b/lib/safe_macros.c
+index c48e436dc..abdeca013 100644
+--- a/lib/safe_macros.c
++++ b/lib/safe_macros.c
+@@ -708,6 +708,9 @@ static int is_fuse(const char *fs_type)
+ {
+ 	unsigned int i;
+ 
++	if (!fs_type)
++		return 0;
++
+ 	for (i = 0; i < ARRAY_SIZE(fuse_fs_types); i++) {
+ 		if (!strcmp(fuse_fs_types[i], fs_type))
+ 			return 1;
+-- 
+2.11.0
+

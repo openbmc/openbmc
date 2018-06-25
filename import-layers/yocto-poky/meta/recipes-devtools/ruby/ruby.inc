@@ -8,13 +8,13 @@ HOMEPAGE = "http://www.ruby-lang.org/"
 SECTION = "devel/ruby"
 LICENSE = "Ruby | BSD | GPLv2"
 LIC_FILES_CHKSUM = "\
-    file://COPYING;md5=8a960b08d972f43f91ae84a6f00dcbfb \
+    file://COPYING;md5=340948e1882e579731841bf49cdc22c1 \
     file://BSDL;md5=19aaf65c88a40b508d17ae4be539c4b5\
     file://GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263\
-    file://LEGAL;md5=daf349ad59dd19bd8c919171bff3c5d6 \
+    file://LEGAL;md5=8f871f3f03732c018a5fa9b185958231 \
 "
 
-DEPENDS = "ruby-native zlib openssl tcl libyaml db gdbm readline"
+DEPENDS = "ruby-native zlib openssl tcl libyaml gdbm readline"
 DEPENDS_class-native = "openssl-native libyaml-native"
 
 SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"

@@ -1,0 +1,23 @@
+Description: Fix FTBFS with glib 2.54
+ glib-mkenums now expects input files to be UTF-8,
+ fix the encoding of libgnomeui/gnome-scores.h
+Author: Adrian Bunk <bunk@debian.org>
+
+ported from: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=870738
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: gtk-xfce-engine-3.2.0/gtk-3.0/xfce_style_types.h
+===================================================================
+--- gtk-xfce-engine-3.2.0.orig/gtk-3.0/xfce_style_types.h
++++ gtk-xfce-engine-3.2.0/gtk-3.0/xfce_style_types.h
+@@ -19,7 +19,7 @@
+  *
+  *  Portions based Thinice port by 
+  *                       Tim Gerla <timg@rrv.net>,
+- *                       Tomas Ögren <stric@ing.umu.se,
++ *                       Tomas Ã–gren <stric@ing.umu.se>,
+  *                       Richard Hult <rhult@codefactory.se>
+  *  Portions based on Smooth theme by
+  *                       Andrew Johnson <ajgenius@ajgenius.us>

@@ -1,4 +1,7 @@
-lmbench: Can't proceed on some targets
+From 65180976c9963432d166b47a0b692260a69c0d47 Mon Sep 17 00:00:00 2001
+From: Qingming Su <qingming.su@windriver.com>
+Date: Tue, 19 Aug 2014 05:16:17 -0400
+Subject: [PATCH] lmbench: Can't proceed on some targets
 
 lmbench can't proceed on some targets.  The memory check fails because the
 memory latency of each page is longer then 10us, which is a time limit set
@@ -25,13 +28,19 @@ Upstream-status: inappropriate [ configuration ]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
+---
+ scripts/config-run | 12 +++++++---
+ src/Makefile       |  4 ++--
+ src/memsize.c      | 66 +++++++++++++++++++++++++++++++++++-------------------
+ 3 files changed, 54 insertions(+), 28 deletions(-)
+
 diff --git a/scripts/config-run b/scripts/config-run
-index e1f7b6d..31b9256 100755
+index 918cbdf..096ed12 100755
 --- a/scripts/config-run
 +++ b/scripts/config-run
-@@ -214,6 +214,12 @@ The bigger the range, the more accurate the results, but larger sizes
+@@ -197,6 +197,12 @@ The bigger the range, the more accurate the results, but larger sizes
  take somewhat longer to run the benchmark.
-
+ 
  EOF
 +
 +# By default, use 512M memory as the upper limit for lmbench test
@@ -40,12 +49,12 @@ index e1f7b6d..31b9256 100755
 +fi
 +
  echo $ECHON "MB [default $MB]: $ECHOC"
- #read TMP
- TMP=""
-@@ -718,10 +724,10 @@ case $MAIL in
-		;;
+ read TMP
+ if [ X$TMP != X ]
+@@ -687,10 +693,10 @@ case $MAIL in
+ 		;;
  esac
-
+ 
 -INFO=`../scripts/info`
 +INFO=`../scripts/hostinfo`
  if [ $MAIL = yes ]
@@ -54,8 +63,8 @@ index e1f7b6d..31b9256 100755
 +	then	cp ../scripts/hostinfo-template $INFO
  		chmod +w $INFO
  		REUSE=no
- 	else
-@@ -765,7 +771,7 @@ EOF
+ 	else	
+@@ -733,7 +739,7 @@ EOF
  		then	EDITOR=$TMP
  		fi
  		if [ X$EDITOR != "none" ]
@@ -65,10 +74,10 @@ index e1f7b6d..31b9256 100755
  	fi
  fi
 diff --git a/src/Makefile b/src/Makefile
-index d1f0dc6..5098998 100644
+index c7e4e3c..d9efd54 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -49,7 +49,7 @@ TARGET=`../scripts/target`
+@@ -50,7 +50,7 @@ TARGET=`../scripts/target`
  BINDIR=../bin/$(OS)
  CONFIG=../bin/$(OS)/`../scripts/config`
  UTILS=../scripts/target ../scripts/os ../scripts/gnu-os ../scripts/compiler \
@@ -79,21 +88,21 @@ index d1f0dc6..5098998 100644
  INSTALL=cp
 @@ -240,7 +240,7 @@ $O/getopt.o : getopt.c $(INCS)
  	$(COMPILE) -c getopt.c -o $O/getopt.o
-
+ 
  $(UTILS) :
 -	-cd ../scripts; make get
 +	-cd ../scripts; cp info hostinfo; cp info-template hostinfo-template
-
+ 
  # Do not remove the next line, $(MAKE) depend needs it
  # MAKEDEPEND follows
 diff --git a/src/memsize.c b/src/memsize.c
-index eb25a09..cf9fe0c 100644
+index eb25a09..82d7faf 100644
 --- a/src/memsize.c
 +++ b/src/memsize.c
 @@ -14,9 +14,12 @@ char	*id = "$Id$\n";
-
+ 
  #define	CHK(x)	if ((x) == -1) { perror("x"); exit(1); }
-
+ 
 -#ifndef	TOO_LONG
 -#define	TOO_LONG	10	/* usecs */
 -#endif
@@ -103,12 +112,12 @@ index eb25a09..cf9fe0c 100644
 +
 +#define	MEMORY_SIZE_1MB (1024 * 1024)
 +#define	MEMORY_SIZE_8MB (8 * 1024 * 1024)
-
+ 
  int	alarm_triggered = 0;
-
+ 
 @@ -35,10 +38,10 @@ main(int ac, char **av)
  	size_t	delta;
-
+ 
  	if (ac == 2) {
 -		max = size = bytes(av[1]) * 1024 * 1024;
 +		max = size = bytes(av[1]) * MEMORY_SIZE_1MB;
@@ -170,7 +179,7 @@ index eb25a09..cf9fe0c 100644
 +		time_each_page = 1;
 +	//Set the uper limit of time spending on one page
 +        too_long = 10 * time_each_page;
-
+ 
 -	range = 1024 * 1024;
 -	incr = 1024 * 1024;
 -	touchRange(where, range, pagesize);

@@ -14,11 +14,9 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS = "libsamplerate0 libsndfile1 readline"
 
-SRC_URI = "git://github.com/jackaudio/jack2.git \
-           file://0001-typecast-input-parameter-to-int-for-abs.patch \
-          "
-SRCREV = "2d1d323505585d406a7e64fb932953baefc5945e"
-PV = "1.9.10+git${SRCPV}"
+SRC_URI = "git://github.com/jackaudio/jack2.git"
+SRCREV = "c1647819eed6d11f94b21981d9c869629299f357"
+PV = "1.9.12"
 S = "${WORKDIR}/git"
 
 inherit waf pkgconfig

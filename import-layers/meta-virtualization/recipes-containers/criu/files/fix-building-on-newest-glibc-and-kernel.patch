@@ -1,0 +1,45 @@
+From b59947007362b53e9f41f1e5a33071dedf1c59ac Mon Sep 17 00:00:00 2001
+From: Adrian Reber <areber@redhat.com>
+Date: Thu, 28 Sep 2017 09:13:33 +0000
+Subject: [PATCH] fix building on newest glibc and kernel
+
+On Fedora rawhide with kernel-headers-4.14.0-0.rc2.git0.1.fc28.x86_64
+glibc-devel-2.26.90-15.fc28.x86_64 criu does not build any more:
+
+In file included from /usr/include/linux/aio_abi.h:31:0,
+                 from criu/cr-check.c:24:
+/usr/include/sys/mount.h:35:3: error: expected identifier before numeric constant
+   MS_RDONLY = 1,  /* Mount read-only.  */
+   ^
+make[2]: *** [/builddir/build/BUILD/criu-3.5/scripts/nmk/scripts/build.mk:111: criu/cr-check.o] Error 1
+make[1]: *** [criu/Makefile:73: criu/built-in.o] Error 2
+make: *** [Makefile:233: criu] Error 2
+
+This simple re-ordering of includes fixes it for me.
+
+Signed-off-by: Adrian Reber <areber@redhat.com>
+Signed-off-by: Andrei Vagin <avagin@virtuozzo.com>
+
+Upstream-Status: Backport
+[https://github.com/checkpoint-restore/criu/commit/f41e386d4d40e3e26b0cfdc85a812b7edb337f1d#diff-cc847b1cc975358c6582595be92d48db]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+---
+ criu/cr-check.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/criu/cr-check.c b/criu/cr-check.c
+index 1dd887a..93df2ab 100644
+--- a/criu/cr-check.c
++++ b/criu/cr-check.c
+@@ -21,8 +21,8 @@
+ #include <netinet/in.h>
+ #include <sys/prctl.h>
+ #include <sched.h>
+-#include <linux/aio_abi.h>
+ #include <sys/mount.h>
++#include <linux/aio_abi.h>
+ 
+ #include "../soccr/soccr.h"
+ 

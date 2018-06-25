@@ -151,11 +151,8 @@ do_install() {
 	fi
 }
 
-python do_pam_sanity () {
-    if not bb.utils.contains('DISTRO_FEATURES', 'pam', True, False, d):
-        bb.warn("Building libpam but 'pam' isn't in DISTRO_FEATURES, PAM won't work correctly")
-}
-addtask pam_sanity before do_configure
+inherit distro_features_check
+REQUIRED_DISTRO_FEATURES = "pam"
 
 BBCLASSEXTEND = "nativesdk native"
 

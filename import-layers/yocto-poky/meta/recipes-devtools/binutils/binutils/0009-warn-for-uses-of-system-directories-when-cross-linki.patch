@@ -1,4 +1,4 @@
-From 0a4afdcf0700efd45963568e2d0049127cdf4434 Mon Sep 17 00:00:00 2001
+From 27e38ee92c24fca86b1c3f6ef156a1892dd06bfd Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Jan 2016 06:31:09 +0000
 Subject: [PATCH 09/15] warn for uses of system directories when cross linking
@@ -77,7 +77,7 @@ index a846743da6..df3cd5fb60 100644
  #undef EXTRA_SHLIB_EXTENSION
  
 diff --git a/ld/configure b/ld/configure
-index 4e71511bd1..71c6ad1fd1 100755
+index db8b998722..489ead5c13 100755
 --- a/ld/configure
 +++ b/ld/configure
 @@ -789,6 +789,7 @@ with_lib_path
@@ -118,7 +118,7 @@ index 4e71511bd1..71c6ad1fd1 100755
  if test "${enable_gold+set}" = set; then :
    enableval=$enable_gold; case "${enableval}" in
 diff --git a/ld/configure.ac b/ld/configure.ac
-index 00080f85fd..3aa98e37fb 100644
+index bada1b50b0..d074a3820b 100644
 --- a/ld/configure.ac
 +++ b/ld/configure.ac
 @@ -95,6 +95,16 @@ AC_SUBST(use_sysroot)
@@ -139,10 +139,10 @@ index 00080f85fd..3aa98e37fb 100644
  dnl "install_as_default" is set to false if gold is the default linker.
  dnl "installed_linker" is the installed BFD linker name.
 diff --git a/ld/ld.h b/ld/ld.h
-index c6fa1247f0..01c373498f 100644
+index ba914b921e..9df17dab6c 100644
 --- a/ld/ld.h
 +++ b/ld/ld.h
-@@ -174,6 +174,14 @@ typedef struct
+@@ -180,6 +180,14 @@ typedef struct
       in the linker script.  */
    bfd_boolean force_group_allocation;
  
@@ -158,10 +158,10 @@ index c6fa1247f0..01c373498f 100644
    enum endian_enum endian;
  
 diff --git a/ld/ld.texinfo b/ld/ld.texinfo
-index ebe7e7b7bd..33aa2c62fa 100644
+index c89915f1aa..df430837e2 100644
 --- a/ld/ld.texinfo
 +++ b/ld/ld.texinfo
-@@ -2480,6 +2480,18 @@ string identifying the original linked file does not change.
+@@ -2498,6 +2498,18 @@ string identifying the original linked file does not change.
  
  Passing @code{none} for @var{style} disables the setting from any
  @code{--build-id} options earlier on the command line.
@@ -181,7 +181,7 @@ index ebe7e7b7bd..33aa2c62fa 100644
  
  @c man end
 diff --git a/ld/ldfile.c b/ld/ldfile.c
-index 3b37a0a3e2..5c85b01849 100644
+index 6532a57d96..f943f0b2e5 100644
 --- a/ld/ldfile.c
 +++ b/ld/ldfile.c
 @@ -116,6 +116,23 @@ ldfile_add_library_path (const char *name, bfd_boolean cmdline)
@@ -209,7 +209,7 @@ index 3b37a0a3e2..5c85b01849 100644
  
  /* Try to open a BFD for a lang_input_statement.  */
 diff --git a/ld/ldlex.h b/ld/ldlex.h
-index 5aa7f6bc3e..cb655e0399 100644
+index 140ed1d9da..9965cbc04f 100644
 --- a/ld/ldlex.h
 +++ b/ld/ldlex.h
 @@ -147,6 +147,8 @@ enum option_values
@@ -222,7 +222,7 @@ index 5aa7f6bc3e..cb655e0399 100644
  
  /* The initial parser states.  */
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index 2b09f20413..89e2a3a805 100644
+index c473ed24c3..adae0b4610 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
 @@ -261,6 +261,8 @@ main (int argc, char **argv)
@@ -235,7 +235,7 @@ index 2b09f20413..89e2a3a805 100644
    /* We initialize DEMANGLING based on the environment variable
       COLLECT_NO_DEMANGLE.  The gcc collect2 program will demangle the
 diff --git a/ld/lexsup.c b/ld/lexsup.c
-index effa277b16..e4929607e9 100644
+index f2191602d4..bccb3bdeef 100644
 --- a/ld/lexsup.c
 +++ b/ld/lexsup.c
 @@ -538,6 +538,14 @@ static const struct ld_option ld_options[] =
@@ -269,5 +269,5 @@ index effa277b16..e4929607e9 100644
      }
  
 -- 
-2.14.0
+2.16.1
 

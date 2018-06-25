@@ -10,9 +10,10 @@ exo-csource creates c-header files from glade resource output files. When
 building xfce-packages from git instead of tarball this exo-csource-native is
 required.
 
-Upstream-Status: Inappropriate [configuration]
+Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+
 ---
  Makefile.am  | 10 +---------
  configure.ac | 22 ----------------------
@@ -40,7 +41,7 @@ index 62ad18d..bdc5fae 100644
  distclean-local:
  	rm -rf *.cache *~
 diff --git a/configure.ac b/configure.ac
-index ba5395d..2605067 100644
+index 3f92d1b..0d4cc38 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -116,15 +116,6 @@ AC_PROG_CC()
@@ -65,9 +66,9 @@ index ba5395d..2605067 100644
  XDT_CHECK_PACKAGE([GLIB], [glib-2.0], [2.42.0])
 -XDT_CHECK_PACKAGE([GIO], [gio-2.0], [2.42.0])
 -XDT_CHECK_PACKAGE([GTK], [gtk+-2.0], [2.24.0])
--XDT_CHECK_PACKAGE([GTK3], [gtk+-3.0], [3.20.0])
+-XDT_CHECK_PACKAGE([GTK3], [gtk+-3.0], [3.22.0])
 -XDT_CHECK_PACKAGE([GTHREAD], [gthread-2.0], [2.42.0])
--XDT_CHECK_PACKAGE([LIBXFCE4UTIL], [libxfce4util-1.0], [4.10.0])
+-XDT_CHECK_PACKAGE([LIBXFCE4UTIL], [libxfce4util-1.0], [4.12.0])
 -XDT_CHECK_PACKAGE([LIBXFCE4UI], [libxfce4ui-1], [4.12.0])
 -XDT_CHECK_PACKAGE([LIBXFCE4UI2], [libxfce4ui-2], [4.12.0])
 -XDT_CHECK_OPTIONAL_PACKAGE([GIO_UNIX], [gio-unix-2.0], [2.42.0], [gio-unix], [GIO-Unix features])
@@ -80,5 +81,5 @@ index ba5395d..2605067 100644
  dnl *************************
  dnl *** Check for gtk-doc ***
 -- 
-2.9.4
+2.14.3
 

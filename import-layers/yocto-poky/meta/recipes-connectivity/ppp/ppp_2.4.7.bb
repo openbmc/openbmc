@@ -30,7 +30,7 @@ SRC_URI = "https://download.samba.org/pub/${BPN}/${BP}.tar.gz \
            file://0001-ppp-Fix-compilation-errors-in-Makefile.patch \
            file://ppp@.service \
            file://fix-CVE-2015-3310.patch \
-           file://ppp-fix-building-with-linux-4.8.patch \
+           file://0001-pppoe-include-netinet-in.h-before-linux-in.h.patch \
            file://0001-ppp-Remove-unneeded-include.patch \
 "
 

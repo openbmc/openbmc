@@ -1,0 +1,187 @@
+diff --git a/tpm/tpm_cmd_handler.c b/tpm/tpm_cmd_handler.c
+index 0fabf98..69511d1 100644
+--- a/tpm/tpm_cmd_handler.c
++++ b/tpm/tpm_cmd_handler.c
+@@ -3343,6 +3343,39 @@ static TPM_RESULT execute_TPM_ParentSignEK(TPM_REQUEST *req, TPM_RESPONSE *rsp)
+ 	return res;
+ }
+ 
++static TPM_RESULT execute_TPM_DeepQuote(TPM_REQUEST *req, TPM_RESPONSE *rsp)
++{
++	TPM_NONCE nonce;
++	TPM_RESULT res;
++	UINT32 sigSize;
++	BYTE *sig;
++	BYTE *ptr;
++	UINT32 len;
++	TPM_PCR_SELECTION myPCR;
++	TPM_PCR_SELECTION ptPCR;
++
++	tpm_compute_in_param_digest(req);
++
++	ptr = req->param;
++	len = req->paramSize;
++	if (tpm_unmarshal_TPM_NONCE(&ptr, &len, &nonce)
++		|| tpm_unmarshal_TPM_PCR_SELECTION(&ptr, &len, &myPCR)
++		|| tpm_unmarshal_TPM_PCR_SELECTION(&ptr, &len, &ptPCR)
++		|| len != 0) return TPM_BAD_PARAMETER;
++
++	res = TPM_DeepQuote(&nonce, &myPCR, &ptPCR, &req->auth1, &sigSize, &sig);
++	if (res != TPM_SUCCESS) return res;
++	rsp->paramSize = len = sigSize;
++	rsp->param = ptr = tpm_malloc(len);
++	if (ptr == NULL || tpm_marshal_BLOB(&ptr, &len, sig, sigSize)) {
++		tpm_free(rsp->param);
++		res = TPM_FAIL;
++	}
++	tpm_free(sig);
++
++	return res;
++}
++
+ static void tpm_setup_rsp_auth(TPM_COMMAND_CODE ordinal, TPM_RESPONSE *rsp) 
+ {
+   tpm_hmac_ctx_t hmac;
+@@ -4098,6 +4131,11 @@ void tpm_execute_command(TPM_REQUEST *req, TPM_RESPONSE *rsp)
+       res = execute_TPM_ParentSignEK(req, rsp);
+     break;
+ 
++    case TPM_ORD_DeepQuote:
++      debug("[TPM_ORD_DeepQuote]");
++      res = execute_TPM_DeepQuote(req, rsp);
++    break;
++
+     default:
+ #ifdef MTM_EMULATOR
+       res = mtm_execute_command(req, rsp);
+diff --git a/tpm/tpm_commands.h b/tpm/tpm_commands.h
+index 7fef934..328d1be 100644
+--- a/tpm/tpm_commands.h
++++ b/tpm/tpm_commands.h
+@@ -3071,6 +3071,25 @@ TPM_RESULT TPM_ParentSignEK(
+   BYTE **sig
+ );
+ 
++/**
++ * TPM_DeepQuote - gets a hardware TPM quote of a vTPM's PCRs
++ * @externalData: [in] AntiReplay nonce to prevent replay of messages
++ * @myPCR: [in] PCR selection for the virtual TPM
++ * @ptPCR: [in] PCR selection for the hardware TPM
++ * @auth1: [in, out] Authorization protocol parameters
++ * @sigSize: [out] The length of the returned digital signature
++ * @sig: [out] The resulting digital signature and PCR values
++ * Returns: TPM_SUCCESS on success, a TPM error code otherwise.
++ */
++TPM_RESULT TPM_DeepQuote(
++  TPM_NONCE *externalData,
++  TPM_PCR_SELECTION *myPCR,
++  TPM_PCR_SELECTION *ptPCR,
++  TPM_AUTH *auth1,
++  UINT32 *sigSize,
++  BYTE **sig
++);
++
+ /*
+  * Error handling
+  * [tpm_error.c]
+diff --git a/tpm/tpm_credentials.c b/tpm/tpm_credentials.c
+index 01f29e6..c0d62e7 100644
+--- a/tpm/tpm_credentials.c
++++ b/tpm/tpm_credentials.c
+@@ -211,3 +211,49 @@ TPM_RESULT TPM_ParentSignEK(TPM_NONCE *externalData, TPM_PCR_SELECTION *sel,
+ 	free_TPM_PUBKEY(pubKey);
+ 	return res;
+ }
++
++static const BYTE dquot_hdr[] = {
++	0, 0, 0, 0, 'D', 'Q', 'U', 'T'
++};
++
++TPM_RESULT TPM_DeepQuote(TPM_NONCE *externalData, TPM_PCR_SELECTION *myPCR,
++                         TPM_PCR_SELECTION *ptPCR, TPM_AUTH *auth1,
++                         UINT32 *sigSize, BYTE **sig)
++{
++	TPM_RESULT res;
++	TPM_DIGEST hres;
++	TPM_PCR_INFO_SHORT pcrData;
++	tpm_sha1_ctx_t ctx;
++	BYTE *buf, *ptr;
++	UINT32 size, len;
++
++	info("TPM_DeepQuote()");
++
++	res = tpm_verify_auth(auth1, tpmData.permanent.data.ownerAuth, TPM_KH_OWNER);
++	if (res != TPM_SUCCESS) return res;
++
++	res = tpm_compute_pcr_digest(myPCR, &pcrData.digestAtRelease, NULL);
++	if (res != TPM_SUCCESS) return res;
++
++	pcrData.pcrSelection.sizeOfSelect = myPCR->sizeOfSelect;
++	memcpy(pcrData.pcrSelection.pcrSelect, myPCR->pcrSelect, myPCR->sizeOfSelect);
++	pcrData.localityAtRelease = 1 << tpmData.stany.flags.localityModifier;
++
++	size = len = sizeof_TPM_PCR_INFO_SHORT(pcrData);
++	buf = ptr = tpm_malloc(size);
++	if (buf == NULL) return TPM_NOSPACE;
++	if (tpm_marshal_TPM_PCR_INFO_SHORT(&ptr, &len, &pcrData))
++		return TPM_FAIL;
++
++	tpm_sha1_init(&ctx);
++	tpm_sha1_update(&ctx, dquot_hdr, 8);
++	tpm_sha1_update(&ctx, externalData->nonce, 20);
++	tpm_sha1_update(&ctx, buf, size);
++	tpm_sha1_final(&ctx, hres.digest);
++
++	tpm_free(buf);
++
++	res = VTPM_GetParentQuote(&hres, ptPCR, sigSize, sig);
++
++	return res;
++}
+diff --git a/tpm/tpm_structures.h b/tpm/tpm_structures.h
+index b0f4625..dfb1894 100644
+--- a/tpm/tpm_structures.h
++++ b/tpm/tpm_structures.h
+@@ -660,6 +660,42 @@ typedef struct tdTPM_CMK_MA_APPROVAL {
+ 
+ /* VTPM-only commands: */
+ /*
++ * Deep Quote - Create quote of PCRs
++ * Input:
++ *   TPM_TAG             tag           TPM_TAG_RQU_AUTH1_COMMAND
++ *   UINT32              paramSize     Total size of request
++ *   TPM_COMMAND_CODE    ordinal       TPM_ORD_DeepQuote
++ *   TPM_NONCE           externData    20 bytes of external data
++ *   TPM_PCR_SELECTION   vtSel         PCR selection for virtual TPM
++ *   TPM_PCR_SELECTION   ptSel         PCR selection for physical TPM
++ *   ---
++ *   UINT32              authHandle    Owner authorization session (OIAP)
++ *   TPM_NONCE           nonceOdd      Nonce for authHandle
++ *   BOOL                continueAuth  Continue flag for authHandle
++ *   TPM_AUTHDATA        privAuth      Authorization digest for command
++ *
++ * Output:
++ *   TPM_TAG             tag           TPM_TAG_RSP_AUTH1_COMMAND
++ *   UINT32              paramSize     Total size of response
++ *   TPM_RESULT          returnCode    Return code of the operation
++ *   BYTE[]              sig           Signature provided by physical TPM
++ *   TPM_PCRVALUE[]      pcrValue      Values of hardware PCRs used in the quote
++ *   ---
++ *   TPM_NONCE           nonceEven     Nonce for authHandle
++ *   BOOL                continueAuth  Continue flag for authHandle
++ *   TPM_AUTHDATA        resAuth       Authorization digest for response
++ *
++ * The values of the virutal TPM's PCRs are not included in the response.
++ * The signature is a standard TPM_Quote response from the physical TPM; its
++ * externalData is the SHA1 hash of the following structure:
++ *   TPM_STRUCT_VER      version       MUST be 0.0.0.0
++ *   BYTE[4]             fixed         MUST be the string "DQUT"
++ *   TPM_NONCE           externData    From input to the deep quote
++ *   TPM_PCR_INFO_SHORT  pcrData       Virtual TPM's PCRs
++ */
++#define TPM_ORD_DeepQuote                       (TPM_VENDOR_COMMAND | TPM_ORD_Quote)
++
++/*
+  * ParentSignEK - Proof of fresh provisioning and EK value
+  *
+  * Input:

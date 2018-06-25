@@ -69,7 +69,6 @@ RDEPENDS_${PN} = "mime-support \
                   python-pkgutil \
                   python-pyopenssl \
                   python-re \
-                  python-readline \
                   python-setuptools \
                   python-shell \
                   python-simplejson \

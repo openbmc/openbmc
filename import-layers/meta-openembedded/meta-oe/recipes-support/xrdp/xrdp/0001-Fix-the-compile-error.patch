@@ -1,0 +1,35 @@
+Subject: [PATCH] Fix the make error
+
+Fix the compile error:
+ *** No rule to make target '../librfxcodec/src/.libs/librfxencode.a', needed by 'xrdp'.  Stop..
+
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+---
+ xrdp/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xrdp/Makefile.am b/xrdp/Makefile.am
+index a259ef3..d5505b2 100644
+--- a/xrdp/Makefile.am
++++ b/xrdp/Makefile.am
+@@ -23,7 +23,7 @@ endif
+ if XRDP_RFXCODEC
+ AM_CPPFLAGS += -DXRDP_RFXCODEC
+ AM_CPPFLAGS += -I$(top_srcdir)/librfxcodec/include
+-XRDP_EXTRA_LIBS += $(top_builddir)/librfxcodec/src/.libs/librfxencode.a
++XRDP_EXTRA_LIBS += $(top_builddir)/librfxcodec/src/.libs/librfxencode.la
+ endif
+ 
+ if XRDP_PIXMAN
+@@ -35,7 +35,7 @@ endif
+ if XRDP_PAINTER
+ AM_CPPFLAGS += -DXRDP_PAINTER
+ AM_CPPFLAGS += -I$(top_srcdir)/libpainter/include
+-XRDP_EXTRA_LIBS += $(top_builddir)/libpainter/src/.libs/libpainter.a
++XRDP_EXTRA_LIBS += $(top_builddir)/libpainter/src/.libs/libpainter.la
+ endif
+ 
+ sbin_PROGRAMS = \
+-- 
+2.7.4
+

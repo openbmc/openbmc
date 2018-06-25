@@ -1,0 +1,29 @@
+From b1e9f67137733bc109d355450fcd06edda4784c5 Mon Sep 17 00:00:00 2001
+From: "Paul \"TBBle\" Hampson" <Paul.Hampson@Pobox.com>
+Date: Fri, 29 Dec 2017 20:07:31 +1100
+Subject: [PATCH 1/6] FindBoost: Fix incorrect alphabetisation of headers list
+
+Affects cmake < 3.11.0
+
+Upsteam-Status: Backport
+[Yocto 12762]
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ Modules/FindBoost.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: cmake-3.10.3/Modules/FindBoost.cmake
+===================================================================
+--- cmake-3.10.3.orig/Modules/FindBoost.cmake
++++ cmake-3.10.3/Modules/FindBoost.cmake
+@@ -831,8 +831,8 @@ function(_Boost_COMPONENT_HEADERS compon
+   set(_Boost_CONTAINER_HEADERS           "boost/container/container_fwd.hpp")
+   set(_Boost_CONTEXT_HEADERS             "boost/context/all.hpp")
+   set(_Boost_COROUTINE_HEADERS           "boost/coroutine/all.hpp")
+-  set(_Boost_EXCEPTION_HEADERS           "boost/exception/exception.hpp")
+   set(_Boost_DATE_TIME_HEADERS           "boost/date_time/date.hpp")
++  set(_Boost_EXCEPTION_HEADERS           "boost/exception/exception.hpp")
+   set(_Boost_FIBER_HEADERS               "boost/fiber/all.hpp")
+   set(_Boost_FILESYSTEM_HEADERS          "boost/filesystem/path.hpp")
+   set(_Boost_GRAPH_HEADERS               "boost/graph/adjacency_list.hpp")

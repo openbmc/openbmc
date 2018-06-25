@@ -6,7 +6,7 @@ DESCRIPTION = "containerd is a daemon to control runC, built for performance and
 
 # Apache-2.0 for containerd
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE.code;md5=aadc30f9c14d876ded7bedc0afd2d3d7"
+LIC_FILES_CHKSUM = "file://src/import/LICENSE.code;md5=aadc30f9c14d876ded7bedc0afd2d3d7"
 
 SRC_URI += "file://containerd.service"
 
@@ -17,6 +17,8 @@ PV = "${CONTAINERD_VERSION}+git${SRCREV}"
 inherit go
 inherit goarch
 
+GO_IMPORT = "import"
+
 RRECOMMENDS_${PN} = "lxc docker"
 CONTAINERD_PKG="github.com/containerd/containerd"
 
@@ -25,30 +27,37 @@ INSANE_SKIP_${PN} += "ldflags"
 do_configure[noexec] = "1"
 
 do_compile() {
-	# Set GOPATH. See 'PACKAGERS.md'. Don't rely on
-	# docker to download its dependencies but rather
-	# use dependencies packaged independently.
-	cd ${S}
-	rm -rf .gopath
-	mkdir -p .gopath/src/"$(dirname "${CONTAINERD_PKG}")"
-	ln -sf ../../../.. .gopath/src/"${CONTAINERD_PKG}"
+    export GOARCH="${TARGET_GOARCH}"
 
-        export GOPATH="${WORKDIR}/git/"
-        export GOROOT="${STAGING_LIBDIR_NATIVE}/${TARGET_SYS}/go"
+    # link fixups for compilation
+    rm -f ${S}/src/import/vendor/src
+    ln -sf ./ ${S}/src/import/vendor/src
 
-	# Pass the needed cflags/ldflags so that cgo
-	# can find the needed headers files and libraries
-	export GOARCH="${TARGET_GOARCH}"
-	export CGO_ENABLED="1"
-	export CFLAGS=""
-	export LDFLAGS=""
-	export CGO_CFLAGS="${BUILDSDK_CFLAGS} --sysroot=${STAGING_DIR_TARGET}"
-	export CGO_LDFLAGS="${BUILDSDK_LDFLAGS} --sysroot=${STAGING_DIR_TARGET}"
-        export GO_GCFLAGS=""
-	export CC_FOR_TARGET="${TARGET_PREFIX}gcc ${TARGET_CC_ARCH} --sysroot=${STAGING_DIR_TARGET}"
-	export CXX_FOR_TARGET="${TARGET_PREFIX}g++ ${TARGET_CC_ARCH} --sysroot=${STAGING_DIR_TARGET}"
+    mkdir -p ${S}/src/import/vendor/src/github.com/containerd/containerd/
+    # without this, the stress test parts of the build fail
+    cp ${S}/src/import/*.go ${S}/src/import/vendor/src/github.com/containerd/containerd
 
-        oe_runmake static
+    for c in content errdefs fs images mount snapshots linux api runtimes defaults progress \
+		     protobuf reference diff platforms runtime remotes version archive dialer gc metadata \
+		     metrics filters identifiers labels leases plugin server services \
+		     cmd cio containers namespaces oci events log reaper sys rootfs; do
+	ln -sfn ${S}/src/import/${c} ${S}/src/import/vendor/github.com/containerd/containerd/${c}
+    done
+
+    export GOPATH="${S}/src/import/.gopath:${S}/src/import/vendor:${STAGING_DIR_TARGET}/${prefix}/local/go"
+    export GOROOT="${STAGING_DIR_NATIVE}/${nonarch_libdir}/${HOST_SYS}/go"
+
+    # Pass the needed cflags/ldflags so that cgo
+    # can find the needed headers files and libraries
+    export CGO_ENABLED="1"
+    export CGO_CFLAGS="${CFLAGS} --sysroot=${STAGING_DIR_TARGET}"
+    export CGO_LDFLAGS="${LDFLAGS} --sysroot=${STAGING_DIR_TARGET}"
+    export BUILDTAGS="no_btrfs static_build netgo"
+    export CFLAGS="${CFLAGS}"
+    export LDFLAGS="${LDFLAGS}"
+
+    cd ${S}/src/import
+    oe_runmake binaries
 }
 
 # Note: disabled for now, since docker is launching containerd
@@ -59,9 +68,9 @@ do_compile() {
 do_install() {
 	mkdir -p ${D}/${bindir}
 
-	cp ${S}/bin/containerd ${D}/${bindir}/containerd
-	cp ${S}/bin/containerd-shim ${D}/${bindir}/containerd-shim
-        cp ${S}/bin/ctr ${D}/${bindir}/containerd-ctr
+	cp ${S}/src/import/bin/containerd ${D}/${bindir}/containerd
+	cp ${S}/src/import/bin/containerd-shim ${D}/${bindir}/containerd-shim
+	cp ${S}/src/import/bin/ctr ${D}/${bindir}/containerd-ctr
 	
 	ln -sf containerd ${D}/${bindir}/docker-containerd
 	ln -sf containerd-shim ${D}/${bindir}/docker-containerd-shim
@@ -78,3 +87,4 @@ do_install() {
 FILES_${PN} += "${systemd_system_unitdir}/*"
 
 INHIBIT_PACKAGE_STRIP = "1"
+INSANE_SKIP_${PN} += "ldflags already-stripped"

@@ -1,0 +1,118 @@
+From 33be9052315cc4ec8e929fa238e1f0cc0161ad07 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 28 Feb 2018 21:15:28 -0800
+Subject: [PATCH] src/basic/missing.h: check for missing strndupa
+
+include missing.h  for definition of strndupa
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ meson.build             |  1 +
+ src/basic/missing.h     | 11 +++++++++++
+ src/basic/mkdir.c       |  1 +
+ src/basic/parse-util.c  |  1 +
+ src/basic/procfs-util.c |  1 +
+ src/shared/pager.c      |  1 +
+ src/shared/uid-range.c  |  1 +
+ 7 files changed, 17 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index 4eabaafe8..12811b3f3 100644
+--- a/meson.build
++++ b/meson.build
+@@ -525,6 +525,7 @@ foreach ident : [
+         ['bpf',               '''#include <sys/syscall.h>
+                                  #include <unistd.h>'''],
+         ['explicit_bzero' ,   '''#include <string.h>'''],
++        ['strndupa' ,         '''#include <string.h>'''],
+ ]
+ 
+         have = cc.has_function(ident[0], prefix : ident[1], args : '-D_GNU_SOURCE')
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index 84d6d9167..07a8c8364 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -1187,6 +1187,17 @@ struct input_mask {
+ typedef int32_t key_serial_t;
+ #endif
+ 
++#if ! HAVE_STRNDUPA
++#define strndupa(s, n) \
++  ({ \
++    const char *__old = (s); \
++    size_t __len = strnlen(__old, (n)); \
++    char *__new = (char *)alloca(__len + 1); \
++    __new[__len] = '\0'; \
++    (char *)memcpy(__new, __old, __len); \
++  })
++#endif
++
+ #ifndef KEYCTL_JOIN_SESSION_KEYRING
+ #define KEYCTL_JOIN_SESSION_KEYRING 1
+ #endif
+diff --git a/src/basic/mkdir.c b/src/basic/mkdir.c
+index de4746c86..d51518a5a 100644
+--- a/src/basic/mkdir.c
++++ b/src/basic/mkdir.c
+@@ -30,6 +30,7 @@
+ #include "path-util.h"
+ #include "stat-util.h"
+ #include "user-util.h"
++#include "missing.h"
+ 
+ int mkdir_safe_internal(const char *path, mode_t mode, uid_t uid, gid_t gid, bool follow_symlink, mkdir_func_t _mkdir) {
+         struct stat st;
+diff --git a/src/basic/parse-util.c b/src/basic/parse-util.c
+index 2c22753de..97533721d 100644
+--- a/src/basic/parse-util.c
++++ b/src/basic/parse-util.c
+@@ -33,6 +33,7 @@
+ #include "parse-util.h"
+ #include "process-util.h"
+ #include "string-util.h"
++#include "missing.h"
+ 
+ int parse_boolean(const char *v) {
+         assert(v);
+diff --git a/src/basic/procfs-util.c b/src/basic/procfs-util.c
+index 9bb42cc7b..23bbd9e67 100644
+--- a/src/basic/procfs-util.c
++++ b/src/basic/procfs-util.c
+@@ -9,6 +9,7 @@
+ #include "procfs-util.h"
+ #include "stdio-util.h"
+ #include "string-util.h"
++#include "missing.h"
+ 
+ int procfs_tasks_get_limit(uint64_t *ret) {
+         _cleanup_free_ char *value = NULL;
+diff --git a/src/shared/pager.c b/src/shared/pager.c
+index 75db3c985..84f06bf7d 100644
+--- a/src/shared/pager.c
++++ b/src/shared/pager.c
+@@ -39,6 +39,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "terminal-util.h"
++#include "missing.h"
+ 
+ static pid_t pager_pid = 0;
+ 
+diff --git a/src/shared/uid-range.c b/src/shared/uid-range.c
+index c38b7cc98..8ec6bf08d 100644
+--- a/src/shared/uid-range.c
++++ b/src/shared/uid-range.c
+@@ -25,6 +25,7 @@
+ #include "macro.h"
+ #include "uid-range.h"
+ #include "user-util.h"
++#include "missing.h"
+ 
+ static bool uid_range_intersect(UidRange *range, uid_t start, uid_t nr) {
+         assert(range);
+-- 
+2.13.0
+

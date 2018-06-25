@@ -8,11 +8,11 @@ Date:   Thu Jun 7 16:00:13 2012 -0400
     
     Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
 
-diff --git a/cmdlang/Makefile.am b/cmdlang/Makefile.am
-index 92d6e83..f6039f9 100644
---- a/cmdlang/Makefile.am
-+++ b/cmdlang/Makefile.am
-@@ -36,6 +36,7 @@ CLEANFILES = libOpenIPMIcmdlang.map
+Index: OpenIPMI-2.0.24/cmdlang/Makefile.am
+===================================================================
+--- OpenIPMI-2.0.24.orig/cmdlang/Makefile.am
++++ OpenIPMI-2.0.24/cmdlang/Makefile.am
+@@ -35,6 +35,7 @@ openipmish_LDADD =  libOpenIPMIcmdlang.l
  # compatability.
  install-data-local:
  	rm -f $(DESTDIR)$(bindir)/ipmish

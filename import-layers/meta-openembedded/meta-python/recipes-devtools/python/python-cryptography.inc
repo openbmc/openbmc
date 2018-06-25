@@ -10,8 +10,8 @@ DEPENDS += " \
     ${PYTHON_PN}-six \
 "
 
-SRC_URI[md5sum] = "24cbdab3fda22be31dd3aef2808f5d2f"
-SRC_URI[sha256sum] = "d04bb2425086c3fe86f7bc48915290b13e798497839fbb18ab7f6dffcf98cc3a"
+SRC_URI[md5sum] = "9f39d4d8f2b05f295fa0ff52475ec4f2"
+SRC_URI[sha256sum] = "e4d967371c5b6b2e67855066471d844c5d52d210c36c28d49a8507b96e2c5291"
 
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-cffi \
@@ -28,7 +28,6 @@ RDEPENDS_${PN}_class-target += " \
     ${PYTHON_PN}-numbers \
     ${PYTHON_PN}-asn1crypto \
     ${PYTHON_PN}-pycparser \
-    ${PYTHON_PN}-subprocess \
     ${PYTHON_PN}-setuptools \
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-threading \
@@ -54,7 +53,5 @@ do_install_ptest() {
 FILES_${PN}-dbg += " \
     ${libdir}/${PYTHON_PN}2.7/site-packages/${SRCNAME}/hazmat/bindings/.debug \
 "
-
-LDFLAGS_append = " -pthread"
 
 BBCLASSEXTEND = "native nativesdk"

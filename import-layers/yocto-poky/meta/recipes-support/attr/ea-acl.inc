@@ -17,7 +17,7 @@ EXTRA_OECONF_append_class-target = "${@['', ' --disable-gettext '][(d.getVar('US
 EXTRA_OEMAKE = "PKG_LIB_DIR=${base_libdir} PKG_DEVLIB_DIR=${libdir}"
 
 do_install () {
-	oe_runmake install install-lib install-dev DIST_ROOT="${D}"
+	oe_runmake install install-lib install-dev DIST_ROOT="${D}" ZIP="gzip -n"
 }
 
 do_install_append_class-native () {

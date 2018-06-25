@@ -1,0 +1,78 @@
+From 9d63227420f0c4f093c1c2066eafe2b6152070cf Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Fri, 23 Feb 2018 13:47:37 +0800
+Subject: [PATCH 06/31] Make root's home directory configurable
+
+OpenEmbedded has a configurable home directory for root. Allow
+systemd to be built using its idea of what root's home directory
+should be.
+
+Upstream-Status: Denied
+Upstream wants to have a unified hierarchy where everyone is
+using the same root folder.
+https://github.com/systemd/systemd/issues/541
+
+Signed-off-by: Dan McGregor <dan.mcgregor@usask.ca>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ meson.build       | 8 ++++++++
+ meson_options.txt | 2 ++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index 7347ea880..918101d6b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -94,6 +94,11 @@ if rootlibdir == ''
+         rootlibdir = join_paths(rootprefixdir, libdir.split('/')[-1])
+ endif
+ 
++roothomedir = get_option('roothomedir')
++if roothomedir == ''
++        roothomedir = '/root'
++endif
++
+ # Dirs of external packages
+ pkgconfigdatadir = join_paths(datadir, 'pkgconfig')
+ pkgconfiglibdir = join_paths(libdir, 'pkgconfig')
+@@ -205,6 +210,7 @@ conf.set_quoted('UDEVLIBEXECDIR',                             udevlibexecdir)
+ conf.set_quoted('POLKIT_AGENT_BINARY_PATH',                   join_paths(bindir, 'pkttyagent'))
+ conf.set_quoted('LIBDIR',                                     libdir)
+ conf.set_quoted('ROOTLIBDIR',                                 rootlibdir)
++conf.set_quoted('ROOTHOMEDIR',                                roothomedir)
+ conf.set_quoted('ROOTLIBEXECDIR',                             rootlibexecdir)
+ conf.set_quoted('BOOTLIBDIR',                                 bootlibdir)
+ conf.set_quoted('SYSTEMD_PULL_PATH',                          join_paths(rootlibexecdir, 'systemd-pull'))
+@@ -221,6 +227,7 @@ substs.set('prefix',                                          prefixdir)
+ substs.set('exec_prefix',                                     prefixdir)
+ substs.set('libdir',                                          libdir)
+ substs.set('rootlibdir',                                      rootlibdir)
++substs.set('roothomedir',                                     roothomedir)
+ substs.set('includedir',                                      includedir)
+ substs.set('pkgsysconfdir',                                   pkgsysconfdir)
+ substs.set('bindir',                                          bindir)
+@@ -2705,6 +2712,7 @@ status = [
+         'include directory:                 @0@'.format(includedir),
+         'lib directory:                     @0@'.format(libdir),
+         'rootlib directory:                 @0@'.format(rootlibdir),
++        'roothome directory:                @0@'.format(roothomedir),
+         'SysV init scripts:                 @0@'.format(sysvinit_path),
+         'SysV rc?.d directories:            @0@'.format(sysvrcnd_path),
+         'PAM modules directory:             @0@'.format(pamlibdir),
+diff --git a/meson_options.txt b/meson_options.txt
+index 39822d6cd..0b24f0e0f 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -22,6 +22,8 @@ option('rootlibdir', type : 'string',
+        description : '''[/usr]/lib/x86_64-linux-gnu or such''')
+ option('rootprefix', type : 'string',
+        description : '''override the root prefix''')
++option('roothomedir', type : 'string',
++       description : '''override the root home directory''')
+ option('link-udev-shared', type : 'boolean',
+        description : 'link systemd-udev and its helpers to libsystemd-shared.so')
+ 
+-- 
+2.13.0
+

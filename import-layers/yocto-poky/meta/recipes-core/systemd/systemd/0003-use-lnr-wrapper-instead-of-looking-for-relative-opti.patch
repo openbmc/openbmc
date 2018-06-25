@@ -1,0 +1,64 @@
+From 8b9d194e956848e0d1fb35ef2fba714b2691ebe6 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 28 Feb 2018 20:47:49 -0800
+Subject: [PATCH 03/31] use lnr wrapper instead of looking for --relative
+ option for ln
+
+Remove file manually to avoid the 'File Exists' error when creating
+symlink. This is because the original 'ln' command uses '-f' option.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ meson.build                 | 4 ----
+ tools/meson-make-symlink.sh | 3 ++-
+ units/meson-add-wants.sh    | 7 ++++++-
+ 3 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 36a62d280..7347ea880 100644
+--- a/meson.build
++++ b/meson.build
+@@ -570,10 +570,6 @@ endforeach
+ 
+ conf.set_quoted('TELINIT', get_option('telinit-path'))
+ 
+-if run_command('ln', '--relative', '--help').returncode() != 0
+-        error('ln does not support --relative')
+-endif
+-
+ ############################################################
+ 
+ gperf = find_program('gperf')
+diff --git a/tools/meson-make-symlink.sh b/tools/meson-make-symlink.sh
+index 501cd43d4..f4e4ac9ac 100755
+--- a/tools/meson-make-symlink.sh
++++ b/tools/meson-make-symlink.sh
+@@ -8,5 +8,6 @@ mkdir -vp "$(dirname "${DESTDIR:-}$2")"
+ if [ "$(dirname $1)" = . ]; then
+         ln -vfs -T "$1" "${DESTDIR:-}$2"
+ else
+-        ln -vfs -T --relative "${DESTDIR:-}$1" "${DESTDIR:-}$2"
++        rm -f "${DESTDIR:-}$2"
++        lnr "${DESTDIR:-}$1" "${DESTDIR:-}$2"
+ fi
+diff --git a/units/meson-add-wants.sh b/units/meson-add-wants.sh
+index 70f7172ae..a42666aac 100755
+--- a/units/meson-add-wants.sh
++++ b/units/meson-add-wants.sh
+@@ -25,4 +25,9 @@ case "$target" in
+                 ;;
+ esac
+ 
+-ln -vfs --relative "$unitpath" "$dir"
++if [ -d "$dir" ]; then
++        rm -f "$dir/$unit"
++        lnr "$unitpath" "$dir/$unit"
++else
++        lnr "$unitpath" "$dir"
++fi
+-- 
+2.13.0
+

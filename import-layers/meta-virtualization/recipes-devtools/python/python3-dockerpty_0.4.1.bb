@@ -1,7 +1,7 @@
 SUMMARY = "Python library to use the pseudo-tty of a docker container"
 HOMEPAGE = "https://github.com/d11wtq/dockerpty"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=afaf767baa20ac524dc12f1071ca493a"
+LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 inherit pypi setuptools3
 

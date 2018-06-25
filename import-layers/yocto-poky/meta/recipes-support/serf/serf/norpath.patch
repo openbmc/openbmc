@@ -5,11 +5,11 @@ Upstream-Status: Inappropriate
 
 RP 2014/7/17
 
-Index: serf-1.3.6/SConstruct
+Index: serf-1.3.9/SConstruct
 ===================================================================
---- serf-1.3.6.orig/SConstruct	2014-07-17 19:57:57.724389150 +0000
-+++ serf-1.3.6/SConstruct	2014-07-17 20:04:21.784399616 +0000
-@@ -218,8 +218,7 @@
+--- serf-1.3.9.orig/SConstruct
++++ serf-1.3.9/SConstruct
+@@ -224,8 +224,7 @@ if sys.platform != 'win32':
  else:
    LIBNAMESTATIC = 'serf-${MAJOR}'
  
@@ -17,9 +17,9 @@ Index: serf-1.3.6/SConstruct
 -           PDB='${TARGET.filebase}.pdb')
 +env.Append(PDB='${TARGET.filebase}.pdb')
  
- #for i in env:
- #    print(str(env[i]))
-@@ -371,12 +370,6 @@
+ if sys.platform == 'darwin':
+ #  linkflags.append('-Wl,-install_name,@executable_path/%s.dylib' % (LIBNAME,))
+@@ -385,12 +384,6 @@ if gssapi and CALLOUT_OKAY:
  if sys.platform == 'win32':
    env.Append(CPPDEFINES=['SERF_HAVE_SSPI'])
  
@@ -32,8 +32,8 @@ Index: serf-1.3.6/SConstruct
  # Set up the construction of serf-*.pc
  pkgconfig = env.Textfile('serf-%d.pc' % (MAJOR,),
                           env.File('build/serf.pc.in'),
-@@ -446,7 +439,6 @@
-                           ENV={'PATH' : os.environ['PATH']}))
+@@ -461,7 +454,6 @@ else:
+   TEST_EXES = [ os.path.join('test', '%s' % (prog)) for prog in TEST_PROGRAMS ]
  
  # Find the (dynamic) library in this directory
 -tenv.Replace(RPATH=thisdir)

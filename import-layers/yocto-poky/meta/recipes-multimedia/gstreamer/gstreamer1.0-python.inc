@@ -8,8 +8,6 @@ RDEPENDS_${PN} += "gstreamer1.0 python3-pygobject"
 
 PNREAL = "gst-python"
 
-SRC_URI = "http://gstreamer.freedesktop.org/src/${PNREAL}/${PNREAL}-${PV}.tar.xz"
-
 S = "${WORKDIR}/${PNREAL}-${PV}"
 
 inherit autotools pkgconfig distutils3-base upstream-version-is-even gobject-introspection

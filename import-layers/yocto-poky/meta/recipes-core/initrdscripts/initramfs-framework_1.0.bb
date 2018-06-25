@@ -8,6 +8,7 @@ PR = "r4"
 inherit allarch
 
 SRC_URI = "file://init \
+           file://exec \
            file://rootfs \
            file://finish \
            file://mdev \
@@ -25,6 +26,9 @@ do_install() {
     install -m 0755 ${WORKDIR}/init ${D}/init
     install -m 0755 ${WORKDIR}/rootfs ${D}/init.d/90-rootfs
     install -m 0755 ${WORKDIR}/finish ${D}/init.d/99-finish
+
+	# exec
+    install -m 0755 ${WORKDIR}/exec ${D}/init.d/89-exec
 
     # mdev
     install -m 0755 ${WORKDIR}/mdev ${D}/init.d/01-mdev
@@ -45,6 +49,7 @@ do_install() {
 }
 
 PACKAGES = "${PN}-base \
+            initramfs-module-exec \
             initramfs-module-mdev \
             initramfs-module-udev \
             initramfs-module-e2fs \
@@ -61,6 +66,10 @@ FILES_${PN}-base = "/init /init.d/99-finish /dev"
 # something that runs earlier (for example, a 89-my-rootfs)
 # and mounts the rootfs. Then 90-rootfs will proceed immediately.
 RRECOMMENDS_${PN}-base += "initramfs-module-rootfs"
+
+SUMMARY_initramfs-module-exec = "initramfs support for easy execution of applications"
+RDEPENDS_initramfs-module-exec = "${PN}-base"
+FILES_initramfs-module-exec = "/init.d/89-exec"
 
 SUMMARY_initramfs-module-mdev = "initramfs support for mdev"
 RDEPENDS_initramfs-module-mdev = "${PN}-base busybox-mdev"

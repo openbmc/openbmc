@@ -6,8 +6,18 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=52010cd3c7d7bd965b55721ef4d93ec2"
 
 PYPI_PACKAGE = "asn1crypto"
 
-SRC_URI[md5sum] = "97d54665c397b72b165768398dfdd876"
-SRC_URI[sha256sum] = "0874981329cfebb366d6584c3d16e913f2a0eb026c9463efcc4aaf42a9d94d70"
+SRC_URI[md5sum] = "de3520426e81a6581352d4366f310eb1"
+SRC_URI[sha256sum] = "9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49"
 
 inherit pypi
+
+RDEPENDS_${PN}_class-target += " \
+    ${PYTHON_PN}-codecs \
+    ${PYTHON_PN}-crypt \
+    ${PYTHON_PN}-ctypes \
+    ${PYTHON_PN}-datetime \
+    ${PYTHON_PN}-io \
+    ${PYTHON_PN}-netclient \
+"
+
 BBCLASSEXTEND = "native"

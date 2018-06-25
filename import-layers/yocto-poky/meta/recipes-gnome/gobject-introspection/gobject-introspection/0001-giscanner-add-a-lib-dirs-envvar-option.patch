@@ -1,0 +1,73 @@
+From e48f1e18f5ea41656f0ba10fe61d69d2604b0064 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 3 Jan 2018 17:02:01 +0200
+Subject: [PATCH] giscanner: add a --lib-dirs-envvar option
+
+By default LD_LIBRARY_PATH is set to the list of target library paths;
+this breaks down in cross-compilation environment, as we need to run a
+native emulation wrapper rather than the target binary itself. This patch
+allows exporting those paths to a different environment variable
+which can be picked up and used by the wrapper.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ giscanner/ccompiler.py   | 4 ++--
+ giscanner/dumper.py      | 3 ++-
+ giscanner/scannermain.py | 3 +++
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/giscanner/ccompiler.py b/giscanner/ccompiler.py
+index 29de0ee..928eae8 100644
+--- a/giscanner/ccompiler.py
++++ b/giscanner/ccompiler.py
+@@ -109,7 +109,7 @@ class CCompiler(object):
+ 
+             self._cflags_no_deprecation_warnings = "-Wno-deprecated-declarations"
+ 
+-    def get_internal_link_flags(self, args, libtool, libraries, extra_libraries, libpaths):
++    def get_internal_link_flags(self, args, libtool, libraries, extra_libraries, libpaths, lib_dirs_envvar):
+         # An "internal" link is where the library to be introspected
+         # is being built in the current directory.
+ 
+@@ -119,7 +119,7 @@ class CCompiler(object):
+         if self.check_is_msvc():
+             runtime_path_envvar = ['LIB', 'PATH']
+         else:
+-            runtime_path_envvar = ['LD_LIBRARY_PATH']
++            runtime_path_envvar = ['LD_LIBRARY_PATH'] if not lib_dirs_envvar else [lib_dirs_envvar]
+             # Search the current directory first
+             # (This flag is not supported nor needed for Visual C++)
+             args.append('-L.')
+diff --git a/giscanner/dumper.py b/giscanner/dumper.py
+index 7f77bd2..db96df6 100644
+--- a/giscanner/dumper.py
++++ b/giscanner/dumper.py
+@@ -259,7 +259,8 @@ class DumpCompiler(object):
+                                                    libtool,
+                                                    self._options.libraries,
+                                                    self._options.extra_libraries,
+-                                                   self._options.library_paths)
++                                                   self._options.library_paths,
++                                                   self._options.lib_dirs_envvar)
+             args.extend(pkg_config_libs)
+ 
+         else:
+diff --git a/giscanner/scannermain.py b/giscanner/scannermain.py
+index 38a45c1..b603850 100755
+--- a/giscanner/scannermain.py
++++ b/giscanner/scannermain.py
+@@ -130,6 +130,9 @@ def _get_option_parser():
+     parser.add_option("", "--use-ldd-wrapper",
+                       action="store", dest="ldd_wrapper", default=None,
+                       help="wrapper to use instead of ldd (useful when cross-compiling)")
++    parser.add_option("", "--lib-dirs-envvar",
++                      action="store", dest="lib_dirs_envvar", default=None,
++                      help="environment variable to write a list of library directories to (for running the transient binary), instead of standard LD_LIBRARY_PATH")
+     parser.add_option("", "--program-arg",
+                       action="append", dest="program_args", default=[],
+                       help="extra arguments to program")
+-- 
+2.15.1
+

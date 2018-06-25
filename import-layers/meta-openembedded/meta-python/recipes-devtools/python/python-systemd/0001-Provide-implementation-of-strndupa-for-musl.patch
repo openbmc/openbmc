@@ -1,0 +1,42 @@
+From 8b639f9faf6199e47b9eae0698d01a22917b6abe Mon Sep 17 00:00:00 2001
+From: Tim Orling <timothy.t.orling@linux.intel.com>
+Date: Fri, 29 Dec 2017 09:17:17 -0800
+Subject: [PATCH] Provide implementation of strndupa for musl
+
+Reuse the approach from oe-core:
+/meta/recipes-core/systemd/systemd/0002-src-basic-missing.h-check-for-missing-strndupa.patch
+
+Original patch author: Emil Renner Berthing <systemd@esmil.dk>
+
+Signed-off-by: Tim Orling <timothy.t.orling@linux.intel.com
+---
+Upstream-Status: Pending
+
+ systemd/util.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/systemd/util.c b/systemd/util.c
+index e02c825..277e611 100644
+--- a/systemd/util.c
++++ b/systemd/util.c
+@@ -34,6 +34,17 @@
+ 
+ #include "util.h"
+ 
++#if !HAVE_DECL_STRNDUPA
++#define strndupa(s, n) \
++  ({ \
++    const char *__old = (s); \
++    size_t __len = strnlen(__old, (n)); \
++    char *__new = (char *)alloca(__len + 1); \
++    __new[__len] = '\0'; \
++    (char *)memcpy(__new, __old, __len); \
++  })
++#endif
++
+ int safe_atou(const char *s, unsigned *ret_u) {
+         char *x = NULL;
+         unsigned long l;
+-- 
+2.13.6
+

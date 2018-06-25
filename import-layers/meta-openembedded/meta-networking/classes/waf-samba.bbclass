@@ -1,7 +1,7 @@
 # waf is a build system which is used by samba related project.
 # Obtain details from https://wiki.samba.org/index.php/Waf
-# 
-inherit qemu pythonnative waf
+#
+inherit qemu pythonnative
 
 DEPENDS += "qemu-native libxslt-native docbook-xsl-stylesheets-native python"
 
@@ -20,6 +20,29 @@ CONFIGUREOPTS = " --prefix=${prefix} \
                   --mandir=${mandir} \
                   ${PACKAGECONFIG_CONFARGS} \
                 "
+
+# avoids build breaks when using no-static-libs.inc
+DISABLE_STATIC = ""
+
+def get_waf_parallel_make(d):
+    pm = d.getVar('PARALLEL_MAKE')
+    if pm:
+        # look for '-j' and throw other options (e.g. '-l') away
+        # because they might have different meaning in bjam
+        pm = pm.split()
+        while pm:
+            opt = pm.pop(0)
+            if opt == '-j':
+                v = pm.pop(0)
+            elif opt.startswith('-j'):
+                v = opt[2:].strip()
+            else:
+                continue
+
+            v = min(64, int(v))
+            return '-j' + str(v)
+
+    return ""
 
 # Three methods for waf cross compile:
 # 1. answers:
@@ -86,8 +109,9 @@ do_configure() {
     fi
 }
 
+do_compile[progress] = "outof:^\[\s*(\d+)/\s*(\d+)\]\s+"
 do_compile () {
-    python ./buildtools/bin/waf ${@get_waf_parallel_make(d)}
+    python ./buildtools/bin/waf ${@oe.utils.parallel_make_argument(d, '-j%d', limit=64)}
 }
 
 do_install() {

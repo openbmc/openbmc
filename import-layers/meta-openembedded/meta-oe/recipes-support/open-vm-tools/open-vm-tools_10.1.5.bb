@@ -24,6 +24,7 @@ LICENSE_modules/solaris = "CDDL-1.0"
 SRC_URI = "git://github.com/vmware/open-vm-tools.git;protocol=https \
            file://tools.conf \
            file://vmtoolsd.service \
+           file://vmtoolsd.init \
            file://0001-configure.ac-don-t-use-dnet-config.patch \
            file://0002-add-include-sys-sysmacros.h.patch \
            file://0001-Remove-assumptions-about-glibc-being-only-libc-imple.patch \
@@ -50,7 +51,7 @@ DEPENDS_append_libc-musl = " libtirpc"
 # open-vm-tools is supported only on x86.
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-linux'
 
-inherit autotools pkgconfig systemd
+inherit autotools pkgconfig systemd update-rc.d
 
 SYSTEMD_SERVICE_${PN} = "vmtoolsd.service"
 
@@ -85,8 +86,14 @@ RDEPENDS_${PN} = "util-linux libdnet fuse"
 
 do_install_append() {
     ln -sf ${sbindir}/mount.vmhgfs ${D}/sbin/mount.vmhgfs
-    install -d ${D}${systemd_unitdir}/system ${D}${sysconfdir}/vmware-tools
-    install -m 644 ${WORKDIR}/*.service ${D}${systemd_unitdir}/system
+    install -d ${D}${sysconfdir}/vmware-tools
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}${systemd_unitdir}/system
+        install -m 644 ${WORKDIR}/*.service ${D}${systemd_unitdir}/system
+    else
+        install -d ${D}${sysconfdir}/init.d
+        install -m 0755 ${WORKDIR}/vmtoolsd.init ${D}${sysconfdir}/init.d/vmtoolsd
+    fi
     install -m 0644 ${WORKDIR}/tools.conf ${D}${sysconfdir}/vmware-tools/tools.conf
 }
 
@@ -94,6 +101,10 @@ do_configure_prepend() {
     export CUSTOM_DNET_NAME=dnet
     export CUSTOM_DNET_LIBS=-L${STAGING_LIBDIR}/libdnet.so
 }
+
+INITSCRIPT_PACKAGES = "${PN}"
+INITSCRIPT_NAME_${PN} = "vmtoolsd"
+INITSCRIPT_PARAMS_${PN} = "start 90 2 3 4 5 . stop 60 0 1 6 ."
 
 python() {
     if 'networking-layer' not in d.getVar('BBFILE_COLLECTIONS').split() or \

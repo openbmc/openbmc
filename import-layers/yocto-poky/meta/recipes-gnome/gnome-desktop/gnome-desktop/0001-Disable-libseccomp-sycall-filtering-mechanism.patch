@@ -1,0 +1,38 @@
+From 9dfada06f8d2e02d7a04f793ba6e1d4a2aa5ffb7 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 5 Oct 2017 14:54:17 +0300
+Subject: [PATCH] Disable libseccomp (sycall filtering mechanism)
+
+Upstream forgot to make it optional, and it is not currently used in Yocto
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 86bcf1f..8911f19 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -157,17 +157,6 @@ else
+ fi
+ 
+ SECCOMP_PKG=""
+-dnl Check for bubblewrap compatible platform
+-case $host_os in
+-  linux*)
+-    PKG_CHECK_MODULES(LIBSECCOMP, [libseccomp])
+-    SECCOMP_PKG="libseccomp"
+-    AC_DEFINE_UNQUOTED(_GNU_SOURCE, 1, [Define to include GNU extensions])
+-    AC_DEFINE_UNQUOTED(HAVE_BWRAP, 1, [Define to 1 if Bubblewrap support is available])
+-    AC_DEFINE([ENABLE_SECCOMP], [1], [Define if using seccomp])
+-    AC_DEFINE_UNQUOTED(INSTALL_PREFIX, "$prefix", [Path to library install prefix])
+-    ;;
+-esac
+ 
+ dnl pkg-config dependency checks
+ 
+-- 
+2.14.1
+

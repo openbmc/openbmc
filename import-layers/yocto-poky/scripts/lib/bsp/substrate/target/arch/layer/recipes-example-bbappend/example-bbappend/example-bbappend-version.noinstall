@@ -1,1 +1,0 @@
-# yocto-bsp-dirname {{=example_bbappend_name}}-{{=example_bbappend_version}}

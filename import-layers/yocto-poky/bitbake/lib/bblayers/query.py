@@ -161,7 +161,12 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
         items_listed = False
         for p in sorted(pkg_pn):
             if pnspec:
-                if not fnmatch.fnmatch(p, pnspec):
+                found=False
+                for pnm in pnspec:
+                    if fnmatch.fnmatch(p, pnm):
+                        found=True
+                        break
+                if not found:
                     continue
 
             if len(allproviders[p]) > 1 or not show_multi_provider_only:
@@ -251,8 +256,14 @@ Lists recipes with the bbappends that apply to them as subitems.
         pnlist.sort()
         appends = False
         for pn in pnlist:
-            if args.pnspec and pn != args.pnspec:
-                continue
+            if args.pnspec:
+                found=False
+                for pnm in args.pnspec:
+                    if fnmatch.fnmatch(pn, pnm):
+                        found=True
+                        break
+                if not found:
+                    continue
 
             if self.show_appends_for_pn(pn):
                 appends = True
@@ -479,11 +490,11 @@ NOTE: .bbappend files can impact the dependencies.
         parser_show_recipes = self.add_command(sp, 'show-recipes', self.do_show_recipes)
         parser_show_recipes.add_argument('-f', '--filenames', help='instead of the default formatting, list filenames of higher priority recipes with the ones they overlay indented underneath', action='store_true')
         parser_show_recipes.add_argument('-m', '--multiple', help='only list where multiple recipes (in the same layer or different layers) exist for the same recipe name', action='store_true')
-        parser_show_recipes.add_argument('-i', '--inherits', help='only list recipes that inherit the named class', metavar='CLASS', default='')
-        parser_show_recipes.add_argument('pnspec', nargs='?', help='optional recipe name specification (wildcards allowed, enclose in quotes to avoid shell expansion)')
+        parser_show_recipes.add_argument('-i', '--inherits', help='only list recipes that inherit the named class(es) - separate multiple classes using , (without spaces)', metavar='CLASS', default='')
+        parser_show_recipes.add_argument('pnspec', nargs='*', help='optional recipe name specification (wildcards allowed, enclose in quotes to avoid shell expansion)')
 
         parser_show_appends = self.add_command(sp, 'show-appends', self.do_show_appends)
-        parser_show_appends.add_argument('pnspec', nargs='?', help='optional recipe name specification (wildcards allowed, enclose in quotes to avoid shell expansion)')
+        parser_show_appends.add_argument('pnspec', nargs='*', help='optional recipe name specification (wildcards allowed, enclose in quotes to avoid shell expansion)')
 
         parser_show_cross_depends = self.add_command(sp, 'show-cross-depends', self.do_show_cross_depends)
         parser_show_cross_depends.add_argument('-f', '--filenames', help='show full file path', action='store_true')

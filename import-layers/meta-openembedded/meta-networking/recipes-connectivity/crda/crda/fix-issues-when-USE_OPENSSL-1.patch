@@ -17,7 +17,7 @@ c. keys-ssl.c: error: 'keys' defined but not used [-Werror=unused-variable]
    static struct pubkey keys[] = {
 
 Signed-off-by: Mike Frysinger <vapier@gentoo.org>
-Upsteam-Status: Pending
+Upstream-Status: Pending
 Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
 ---
  utils/key2pub.py | 5 +++--

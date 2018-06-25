@@ -14,6 +14,8 @@ SRC_URI[sha256sum] = "3b8f0a1bf0d3642764e5f646e1f3bbc8b1eeec474a77392d9aeb486884
 
 S = "${WORKDIR}/${BPN}"
 
+inherit update-alternatives
+
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
 # comment out MakeInclude in Makefile which sets build environment
@@ -30,3 +32,7 @@ do_install () {
     install -d ${D}/${base_sbindir}
     install -m 0755 ${S}/vconfig ${D}/${base_sbindir}/
 }
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN} = "vconfig"
+ALTERNATIVE_LINK_NAME[vconfig] = "${base_sbindir}/vconfig"

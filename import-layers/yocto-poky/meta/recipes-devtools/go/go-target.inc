@@ -1,4 +1,3 @@
-inherit goarch
 DEPENDS = "virtual/${TARGET_PREFIX}go go-native"
 DEPENDS_class-nativesdk = "virtual/${TARGET_PREFIX}go-crosssdk go-native"
 
@@ -8,41 +7,34 @@ export GOOS = "${TARGET_GOOS}"
 export GOARCH = "${TARGET_GOARCH}"
 export GOARM = "${TARGET_GOARM}"
 export GO386 = "${TARGET_GO386}"
+export GOMIPS = "${TARGET_GOMIPS}"
 export GOROOT_BOOTSTRAP = "${STAGING_LIBDIR_NATIVE}/go"
 export GOROOT_FINAL = "${libdir}/go"
-export CGO_ENABLED = "1"
-export CC_FOR_TARGET = "${CC}"
-export CXX_FOR_TARGET = "${CXX}"
-export GO_TARGET_INSTALL = "cmd"
-export GO_FLAGS = "-a"
 GO_LDFLAGS = ""
 GO_LDFLAGS_class-nativesdk = "-linkmode external"
 export GO_LDFLAGS
 
-SECURITY_CFLAGS = "${SECURITY_NOPIE_CFLAGS}"
-SECURITY_LDFLAGS = ""
+CC_append_class-nativesdk = " ${SECURITY_NOPIE_CFLAGS}"
 
 do_configure[noexec] = "1"
 
 do_compile() {
-	export GOBIN="${B}/bin"
-	export CC="${@d.getVar('BUILD_CC').strip()}"
-	rm -rf ${GOBIN} ${B}/pkg
-	mkdir ${GOBIN}
-
-	export TMPDIR=${WORKDIR}/build-tmp
-	mkdir -p ${WORKDIR}/build-tmp
+	export CC_FOR_${TARGET_GOOS}_${TARGET_GOARCH}="${CC}"
+	export CXX_FOR_${TARGET_GOOS}_${TARGET_GOARCH}="${CXX}"
 
 	cd src
-	./make.bash
+	./make.bash --target-only --no-banner
 	cd ${B}
 }
+do_compile[dirs] =+ "${GOTMPDIR} ${B}/bin ${B}/pkg"
+do_compile[cleandirs] += "${GOTMPDIR} ${B}/bin ${B}/pkg"
 
 do_install() {
 	install -d ${D}${libdir}/go/pkg/tool
 	cp --preserve=mode,timestamps -R ${B}/pkg/tool/${TARGET_GOTUPLE} ${D}${libdir}/go/pkg/tool/
 	install -d ${D}${libdir}/go/src
 	cp --preserve=mode,timestamps -R ${S}/src/cmd ${D}${libdir}/go/src/
+	find ${D}${libdir}/go/src -depth -type d -name testdata -exec rm -rf {} \;
 	install -d ${D}${libdir}/go/bin
 	install -d ${D}${bindir}
 	for f in ${B}/${GO_BUILD_BINDIR}/*; do

@@ -7,18 +7,15 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  rc.d/init.d/functions | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/rc.d/init.d/functions b/rc.d/init.d/functions
-index 6850046..11223f7 100644
---- a/rc.d/init.d/functions
-+++ b/rc.d/init.d/functions
-@@ -597,6 +597,6 @@ if [ "$_use_systemctl" = "1" ]; then
- 	fi
+Index: initscripts-9.72/rc.d/init.d/functions
+===================================================================
+--- initscripts-9.72.orig/rc.d/init.d/functions
++++ initscripts-9.72/rc.d/init.d/functions
+@@ -686,6 +686,6 @@ if [ "$_use_systemctl" = "1" ]; then
+     fi
  fi
  
 -strstr "$(cat /proc/cmdline)" "rc.debug" && set -x
 +strstr "$(cat /proc/cmdline)" "rc.debug" && set -x || true
  return 0
-
--- 
-2.1.0
-
+ 

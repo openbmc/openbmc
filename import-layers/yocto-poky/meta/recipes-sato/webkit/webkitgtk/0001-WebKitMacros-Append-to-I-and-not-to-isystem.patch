@@ -16,6 +16,7 @@ and ends up with compile errors e.g.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
+Upstream-Status: Pending
 ---
  Source/JavaScriptCore/shell/CMakeLists.txt | 2 +-
  Source/WebCore/PlatformGTK.cmake           | 6 +++---

@@ -1,16 +1,16 @@
-From 0ecc978b7d8cb6867646fb2a29523ebef3afa016 Mon Sep 17 00:00:00 2001
+From dfd832b35b6cb4cf2b6f2b51df7b0999f10c8ca1 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Wed, 11 Apr 2012 14:41:06 +0200
-Subject: [PATCH 11/12] xserver-common: add support for nexus one alias
- mahimahi
+Subject: [PATCH] xserver-common: add support for nexus one alias mahimahi
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
- X11/xserver-common |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ X11/xserver-common | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/X11/xserver-common b/X11/xserver-common
-index 5c9a6eb..55594fd 100644
+index 9aa6b24..8da926e 100644
 --- a/X11/xserver-common
 +++ b/X11/xserver-common
 @@ -129,6 +129,9 @@ else
@@ -23,6 +23,3 @@ index 5c9a6eb..55594fd 100644
          "generic_omap1510/1610/1710")
              ARGS="$ARGS -screen ${SCREEN_SIZE}"
              DPI="225" ;;
--- 
-1.7.8.5
-

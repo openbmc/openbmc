@@ -1,0 +1,62 @@
+From 527413ec243564a89ffaad6368d446de44415970 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 27 Feb 2018 21:42:23 -0800
+Subject: [PATCH] Fix to run efi_cc and efi_ld correctly when cross-compiling
+
+When cross-compiling, efi_cc and efi_ld may take the form of
+'xxx-gcc --sysroot=xxx', and this would cause run_command and
+the alike fail.
+
+Fix to split them to make commands run correctly.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/boot/efi/meson.build | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/src/boot/efi/meson.build b/src/boot/efi/meson.build
+index 992a3ba4c..9f9ec4911 100644
+--- a/src/boot/efi/meson.build
++++ b/src/boot/efi/meson.build
+@@ -157,7 +157,7 @@ if have_gnu_efi
+                 o_file = custom_target(file + '.o',
+                                        input : file,
+                                        output : file + '.o',
+-                                       command : [efi_cc, '-c', '@INPUT@', '-o', '@OUTPUT@']
++                                       command : efi_cc.split() + ['-c', '@INPUT@', '-o', '@OUTPUT@']
+                                                  + compile_args,
+                                        depend_files : efi_headers)
+                 if (common_sources + systemd_boot_sources).contains(file)
+@@ -168,7 +168,17 @@ if have_gnu_efi
+                 endif
+         endforeach
+ 
+-        libgcc_file_name = run_command(efi_cc, '-print-libgcc-file-name').stdout().strip()
++        find_libgcc_cmd_all = efi_cc + ' -print-libgcc-file-name'
++        find_libgcc_cmd = find_libgcc_cmd_all.split()[0]
++        find_libgcc_args = []
++        cmd_args_all = find_libgcc_cmd_all.split()
++        foreach arg : cmd_args_all
++                if arg != find_libgcc_cmd
++                        find_libgcc_args += arg
++                endif
++        endforeach
++
++        libgcc_file_name = run_command(find_libgcc_cmd, find_libgcc_args).stdout().strip()
+         systemd_boot_efi_name = 'systemd-boot@0@.efi'.format(EFI_MACHINE_TYPE_NAME)
+         stub_efi_name = 'linux@0@.efi.stub'.format(EFI_MACHINE_TYPE_NAME)
+         no_undefined_symbols = find_program('no-undefined-symbols.sh')
+@@ -179,7 +189,7 @@ if have_gnu_efi
+                         tuple[0],
+                         input : tuple[2],
+                         output : tuple[0],
+-                        command : [efi_ld, '-o', '@OUTPUT@'] +
++                        command : efi_ld.split() + ['-o', '@OUTPUT@'] +
+                                   efi_ldflags + tuple[2] +
+                                   ['-lefi', '-lgnuefi', libgcc_file_name])
+ 
+-- 
+2.13.0
+

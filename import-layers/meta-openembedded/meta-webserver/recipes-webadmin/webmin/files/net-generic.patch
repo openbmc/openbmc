@@ -3,9 +3,11 @@
 # Upstream-status: Not appropriate [config]
 #
 # Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
---- webmin-1.570.orig/net/module.info
-+++ webmin-1.570/net/module.info
-@@ -11,7 +11,7 @@ desc_ko_KR.UTF-8=ë„¤íŠ¸ì›Œí¬ êµ¬ì„±
+Index: webmin-1.850/net/module.info
+===================================================================
+--- webmin-1.850.orig/net/module.info
++++ webmin-1.850/net/module.info
+@@ -14,7 +14,7 @@ desc_ko_KR.UTF-8=ë„¤íŠ¸ì›Œí¬ êµ¬ì„±
  name=Networking
  desc_tr=Ağ Yapılandırması
  desc_de=Netzwerkkonfiguration
@@ -14,8 +16,10 @@
  desc_sk=Konfigurácia siete
  desc_zh_CN=ÍøÂçÅäÖÃ
  risk=low medium high
+Index: webmin-1.850/net/generic-linux-lib.pl
+===================================================================
 --- /dev/null
-+++ webmin-1.570/net/generic-linux-lib.pl
++++ webmin-1.850/net/generic-linux-lib.pl
 @@ -0,0 +1,2 @@
 +do 'linux-lib.pl';
 +

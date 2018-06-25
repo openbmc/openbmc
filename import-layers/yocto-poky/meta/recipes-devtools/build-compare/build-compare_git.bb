@@ -22,7 +22,7 @@ SRC_URI = "git://github.com/openSUSE/build-compare.git \
 SRCREV = "c5352c054c6ef15735da31b76d6d88620f4aff0a"
 PE = "1"
 PV = "2015.02.10+git${SRCPV}"
-UPSTREAM_VERSION_UNKNOWN = "1"
+UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"
 

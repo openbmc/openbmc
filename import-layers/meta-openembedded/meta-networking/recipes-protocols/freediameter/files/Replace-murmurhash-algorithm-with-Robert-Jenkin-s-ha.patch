@@ -1,0 +1,223 @@
+Replace murmurhash algorithm with Robert Jenkin's hash algorithm
+
+Upstream-Status: Pending
+
+From test result, murmurhash algorithm does not work in big endian
+processor, so replace it with Robert Jenkin's hash which has worked
+in linux kernel for many years and has more adaptability.
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ libfdproto/ostr.c |  192 +++++++++++++++++++++--------------------------------
+ 1 file changed, 74 insertions(+), 118 deletions(-)
+
+diff --git a/libfdproto/ostr.c b/libfdproto/ostr.c
+index 8f29b48..ce1f4dd 100644
+--- a/libfdproto/ostr.c
++++ b/libfdproto/ostr.c
+@@ -430,128 +430,84 @@ after_proto:
+ 
+ 
+ /********************************************************************************************************/
+-/* Hash function -- credits to Austin Appleby, thank you ^^ */
+-/* See http://murmurhash.googlepages.com for more information on this function */
+-
+-/* the strings are NOT always aligned properly (ex: received in RADIUS message), so we use the aligned MurmurHash2 function as needed */
+-#define _HASH_MIX(h,k,m) { k *= m; k ^= k >> r; k *= m; h *= m; h ^= k; }
+-uint32_t fd_os_hash ( uint8_t * string, size_t len )
++/*
++ * Robert Jenkin's hash function.
++ * http://burtleburtle.net/bob/hash/evahash.html
++ * This is in the public domain.
++ */
++#define mix(a, b, c)						\
++	do {							\
++		a = a - b;  a = a - c;  a = a ^ (c >> 13);	\
++		b = b - c;  b = b - a;  b = b ^ (a << 8);	\
++		c = c - a;  c = c - b;  c = c ^ (b >> 13);	\
++		a = a - b;  a = a - c;  a = a ^ (c >> 12);	\
++		b = b - c;  b = b - a;  b = b ^ (a << 16);	\
++		c = c - a;  c = c - b;  c = c ^ (b >> 5);	\
++		a = a - b;  a = a - c;  a = a ^ (c >> 3);	\
++		b = b - c;  b = b - a;  b = b ^ (a << 10);	\
++		c = c - a;  c = c - b;  c = c ^ (b >> 15);	\
++	} while (0)
++
++unsigned hash_rjenkins(const char *str, unsigned length)
+ {
+-	uint32_t hash = len;
+-	uint8_t * data = string;
+-	
+-	const unsigned int m = 0x5bd1e995;
+-	const int r = 24;
+-	int align = (long)string & 3;
+-	
+-	if (!align || (len < 4)) {
+-		/* In case data is aligned, MurmurHash2 function */
+-		while(len >= 4)
+-		{
+-			/* Mix 4 bytes at a time into the hash */
+-			uint32_t k = *(uint32_t *)data;	/* We don't care about the byte order */
+-
+-			_HASH_MIX(hash, k, m);
+-
+-			data += 4;
+-			len -= 4;
+-		}
+-
+-		/* Handle the last few bytes of the input */
+-		switch(len) {
+-			case 3: hash ^= data[2] << 16;
+-			case 2: hash ^= data[1] << 8;
+-			case 1: hash ^= data[0];
+-	        		hash *= m;
+-		}
+-		
+-	} else {
+-		/* Unaligned data, use alignment-safe slower version */
+-		
+-		/* Pre-load the temp registers */
+-		uint32_t t = 0, d = 0;
+-		switch(align)
+-		{
+-			case 1: t |= data[2] << 16;
+-			case 2: t |= data[1] << 8;
+-			case 3: t |= data[0];
+-		}
+-		t <<= (8 * align);
+-
+-		data += 4-align;
+-		len -= 4-align;
+-		
+-		/* From this point, "data" can be read by chunks of 4 bytes */
+-		
+-		int sl = 8 * (4-align);
+-		int sr = 8 * align;
+-
+-		/* Mix */
+-		while(len >= 4)
+-		{
+-			uint32_t k;
+-			
+-			d = *(unsigned int *)data;
+-			k = (t >> sr) | (d << sl);
+-
+-			_HASH_MIX(hash, k, m);
+-
+-			t = d;
+-
+-			data += 4;
+-			len -= 4;
+-		}
+-
+-		/* Handle leftover data in temp registers */
+-		d = 0;
+-		if(len >= align)
+-		{
+-			uint32_t k;
+-			
+-			switch(align)
+-			{
+-			case 3: d |= data[2] << 16;
+-			case 2: d |= data[1] << 8;
+-			case 1: d |= data[0];
+-			}
+-
+-			k = (t >> sr) | (d << sl);
+-			_HASH_MIX(hash, k, m);
+-
+-			data += align;
+-			len -= align;
+-
+-			/* Handle tail bytes */
+-
+-			switch(len)
+-			{
+-			case 3: hash ^= data[2] << 16;
+-			case 2: hash ^= data[1] << 8;
+-			case 1: hash ^= data[0];
+-					hash *= m;
+-			};
+-		}
+-		else
+-		{
+-			switch(len)
+-			{
+-			case 3: d |= data[2] << 16;
+-			case 2: d |= data[1] << 8;
+-			case 1: d |= data[0];
+-			case 0: hash ^= (t >> sr) | (d << sl);
+-					hash *= m;
+-			}
+-		}
+-
++	const unsigned char *k = (const unsigned char *)str;
++	uint32_t a, b, c;  /* the internal state */
++	uint32_t len;      /* how many key bytes still need mixing */
++
++	/* Set up the internal state */
++	len = length;
++	a = 0x9e3779b9;      /* the golden ratio; an arbitrary value */
++	b = a;
++	c = 0;               /* variable initialization of internal state */
++
++	/* handle most of the key */
++	while (len >= 12) {
++		a = a + (k[0] + ((uint32_t)k[1] << 8) + ((uint32_t)k[2] << 16) +
++			 ((uint32_t)k[3] << 24));
++		b = b + (k[4] + ((uint32_t)k[5] << 8) + ((uint32_t)k[6] << 16) +
++			 ((uint32_t)k[7] << 24));
++		c = c + (k[8] + ((uint32_t)k[9] << 8) + ((uint32_t)k[10] << 16) +
++			 ((uint32_t)k[11] << 24));
++		mix(a, b, c);
++		k = k + 12;
++		len = len - 12;
++	}
+ 
++	/* handle the last 11 bytes */
++	c = c + length;
++	switch (len) {            /* all the case statements fall through */
++	case 11:
++		c = c + ((uint32_t)k[10] << 24);
++	case 10:
++		c = c + ((uint32_t)k[9] << 16);
++	case 9:
++		c = c + ((uint32_t)k[8] << 8);
++		/* the first byte of c is reserved for the length */
++	case 8:
++		b = b + ((uint32_t)k[7] << 24);
++	case 7:
++		b = b + ((uint32_t)k[6] << 16);
++	case 6:
++		b = b + ((uint32_t)k[5] << 8);
++	case 5:
++		b = b + k[4];
++	case 4:
++		a = a + ((uint32_t)k[3] << 24);
++	case 3:
++		a = a + ((uint32_t)k[2] << 16);
++	case 2:
++		a = a + ((uint32_t)k[1] << 8);
++	case 1:
++		a = a + k[0];
++		/* case 0: nothing left to add */
+ 	}
++	mix(a, b, c);
+ 
+-	/* Do a few final mixes of the hash to ensure the last few
+-	   bytes are well-incorporated. */
+-	hash ^= hash >> 13;
+-	hash *= m;
+-	hash ^= hash >> 15;
++	return c;
++}
+ 
+-	return hash;
++uint32_t fd_os_hash ( uint8_t * string, size_t len )
++{
++	return hash_rjenkins(string, len); 
+ } 
+ 
+-- 
+1.7.10.4
+

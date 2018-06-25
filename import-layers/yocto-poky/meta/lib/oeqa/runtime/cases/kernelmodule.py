@@ -28,7 +28,7 @@ class KernelModuleTest(OERuntimeTestCase):
     @OETestDepends(['gcc.GccCompileTest.test_gcc_compile'])
     def test_kernel_module(self):
         cmds = [
-            'cd /usr/src/kernel && make scripts',
+            'cd /usr/src/kernel && make scripts prepare',
             'cd /tmp && make',
             'cd /tmp && insmod hellomod.ko',
             'lsmod | grep hellomod',

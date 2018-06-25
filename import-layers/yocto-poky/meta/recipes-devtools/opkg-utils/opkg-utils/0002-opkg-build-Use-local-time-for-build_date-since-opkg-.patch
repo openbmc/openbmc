@@ -1,0 +1,44 @@
+From 5727826b51cf99feaff3483a9df8af2043e7efc1 Mon Sep 17 00:00:00 2001
+From: Michael Hansen <michael.j.hansen@hp.com>
+Date: Mon, 26 Feb 2018 10:17:01 -0800
+Subject: [PATCH 2/2] opkg-build: Use local time for build_date, since opkg
+ extracts files assuming local time rather than UTC. Also increase resolution
+ of build date down to the second, rather than clamping to midnight of the
+ current date.
+
+Signed-off-by: Michael Hansen <michael.j.hansen@hp.com>
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+Upstream-Status: Backport
+
+---
+ opkg-build | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+Index: opkg-utils-0.3.6/opkg-build
+===================================================================
+--- opkg-utils-0.3.6.orig/opkg-build
++++ opkg-utils-0.3.6/opkg-build
+@@ -282,11 +282,11 @@ fi
+ tmp_dir=$dest_dir/IPKG_BUILD.$$
+ mkdir $tmp_dir
+ 
+-build_date="$(date --utc --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y-%m-%d)"
++build_date="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" "+%Y-%m-%d %H:%M:%S")"
+ 
+ echo $CONTROL > $tmp_dir/tarX
+-( cd $pkg_dir && tar $ogargs $tsortargs --mtime=$build_date -X $tmp_dir/tarX -c $tarformat . | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
+-( cd $pkg_dir/$CONTROL && tar $ogargs $tsortargs --mtime=$build_date -c $tarformat . | gzip $zipargs > $tmp_dir/control.tar.gz )
++( cd $pkg_dir && tar $ogargs $tsortargs --mtime="$build_date" -X $tmp_dir/tarX -c $tarformat . | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
++( cd $pkg_dir/$CONTROL && tar $ogargs $tsortargs --mtime="$build_date" -c $tarformat . | gzip $zipargs > $tmp_dir/control.tar.gz )
+ rm $tmp_dir/tarX
+ 
+ echo "2.0" > $tmp_dir/debian-binary
+@@ -301,7 +301,7 @@ rm -f $pkg_file
+ if [ "$outer" = "ar" ] ; then
+   ( cd $tmp_dir && ar -crf $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+ else
+-  ( cd $tmp_dir && tar -c $tsortargs --mtime=$build_date $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
++  ( cd $tmp_dir && tar -c $tsortargs --mtime="$build_date" $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
+ fi
+ 
+ rm $tmp_dir/debian-binary $tmp_dir/data.tar.$cext $tmp_dir/control.tar.gz

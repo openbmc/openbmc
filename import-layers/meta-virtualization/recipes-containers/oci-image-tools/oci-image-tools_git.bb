@@ -14,7 +14,8 @@ DEPENDS = "\
 
 SRC_URI = "git://github.com/opencontainers/image-tools.git \
            file://0001-image-manifest-Recursively-remove-pre-existing-entri.patch \
-           file://0002-image-manifest-Split-unpackLayerEntry-into-its-own-f.patch"
+           file://0002-image-manifest-Split-unpackLayerEntry-into-its-own-f.patch \
+           file://0001-config-make-Config.User-mapping-errors-a-warning.patch"
 
 SRCREV = "4abe1a166f9be97e8e71b1bb4d7599cc29323011"
 PV = "0.2.0-dev+git${SRCPV}"

@@ -1,0 +1,36 @@
+From f10477f0fe5e4b7487a4a41faa216d10cd2bc7c3 Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Thu, 10 May 2018 12:05:04 -0400
+Subject: [PATCH] configure.ac: search for rpc/rpc.h in the sysroot
+
+We want to avoid host contamination and use the sysroot as the base
+directory for our search so add the '=' the the '-I' when searching
+for libtirpc's rpc.h header.
+
+Upstream-Status: Inappropriate [old release]
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 5a6408c..6c19f6d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -705,10 +705,10 @@ if test x"$with_remote" = x"yes" || test x"$with_libvirtd" = x"yes"; then
+     dnl check for cygwin's variation in xdr function names
+     AC_CHECK_FUNCS([xdr_u_int64_t],[],[],[#include <rpc/xdr.h>])
+ 
+-    dnl Cygwin/recent glibc requires -I/usr/include/tirpc for <rpc/rpc.h>
++    dnl Cygwin/recent glibc requires -I=/usr/include/tirpc for <rpc/rpc.h>
+     old_CFLAGS=$CFLAGS
+     AC_CACHE_CHECK([where to find <rpc/rpc.h>], [lv_cv_xdr_cflags], [
+-      for add_CFLAGS in '' '-I/usr/include/tirpc' 'missing'; do
++      for add_CFLAGS in '' '-I=/usr/include/tirpc' 'missing'; do
+         if test x"$add_CFLAGS" = xmissing; then
+           lv_cv_xdr_cflags=missing; break
+         fi
+-- 
+2.7.4
+

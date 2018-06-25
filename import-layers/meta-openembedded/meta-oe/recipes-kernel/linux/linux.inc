@@ -16,7 +16,7 @@ CMDLINE_DEBUG ?= "loglevel=3"
 
 # Kernel bootlogo is distro-specific (default is OE logo).
 # Logo resolution (qvga, vga, ...) is machine-specific.
-LOGO_SIZE ?= '${@base_conditional("MACHINE_GUI_CLASS", "bigscreen", "vga", "qvga", d)}'
+LOGO_SIZE ?= '${@oe.utils.conditional("MACHINE_GUI_CLASS", "bigscreen", "vga", "qvga", d)}'
 # To use this, add file://${LOGO_SIZE}/logo_linux_clut224.ppm.bz2 or similar
 # to your kernel recipe, and then structure your logos for each resolution
 # accordingly.

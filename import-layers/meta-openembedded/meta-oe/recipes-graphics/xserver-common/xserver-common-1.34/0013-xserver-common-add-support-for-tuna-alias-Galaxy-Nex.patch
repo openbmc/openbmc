@@ -1,13 +1,13 @@
-From 176c3bd3d86c223fd44b0f15b62d38526bb3b0d2 Mon Sep 17 00:00:00 2001
+From 57ab521ffc1024f21105ca14be2d041a477942b1 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Fri, 17 Aug 2012 13:00:56 +0200
-Subject: [PATCH 13/13] xserver-common: add support for tuna alias Galaxy
- Nexus
+Subject: [PATCH] xserver-common: add support for tuna alias Galaxy Nexus
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
- X11/xserver-common |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+ X11/xserver-common | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/X11/xserver-common b/X11/xserver-common
 index d9325dd..017e5ae 100644
@@ -28,6 +28,3 @@ index d9325dd..017e5ae 100644
          "motorola_ezx_platform")
              ARGS="$ARGS -screen 240x320"
              DPI="170" ;;
--- 
-1.7.8.6
-

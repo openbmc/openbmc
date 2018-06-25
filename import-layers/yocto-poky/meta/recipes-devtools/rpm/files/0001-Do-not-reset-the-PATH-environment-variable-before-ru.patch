@@ -6,6 +6,9 @@ Subject: [PATCH 1/2] Do not reset the PATH environment variable before running
 
 We add lots of native stuff into it and scriptlets rely on that.
 
+Also need to remove the xx test later in the function since the
+value could now be used un-initialised.
+
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
@@ -25,6 +28,13 @@ index 92f949fa2..7c1aa75a8 100644
  	free(ipath);
      }
  
--- 
-2.11.0
-
+@@ -206,9 +206,7 @@ static void doScriptExec(ARGV_const_t ar
+ 	/* XXX Don't mtrace into children. */
+ 	unsetenv("MALLOC_CHECK_");
+ 
+-	if (xx == 0) {
+ 	    xx = execv(argv[0], argv);
+-	}
+     }
+     _exit(127); /* exit 127 for compatibility with bash(1) */
+ }

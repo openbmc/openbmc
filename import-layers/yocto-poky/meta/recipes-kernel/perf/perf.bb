@@ -22,11 +22,14 @@ PACKAGECONFIG[libnuma] = ",NO_LIBNUMA=1"
 PACKAGECONFIG[systemtap] = ",NO_SDT=1,systemtap"
 PACKAGECONFIG[jvmti] = ",NO_JVMTI=1"
 
+# libaudit support would need scripting to be enabled
+PACKAGECONFIG[audit] = ",NO_LIBAUDIT=1,audit"
+
 DEPENDS = " \
     virtual/${MLPREFIX}libc \
     ${MLPREFIX}elfutils \
     ${MLPREFIX}binutils \
-    bison flex xz \
+    bison-native flex-native xz \
     xmlto-native \
     asciidoc-native \
 "
@@ -35,9 +38,10 @@ do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 PROVIDES = "virtual/perf"
 
-inherit linux-kernel-base kernel-arch pythonnative
+inherit linux-kernel-base kernel-arch
 
 # needed for building the tools/perf Python bindings
+inherit ${@bb.utils.contains('PACKAGECONFIG', 'scripting', 'pythonnative', '', d)}
 inherit python-dir
 export PYTHON_SITEPACKAGES_DIR
 
@@ -47,7 +51,8 @@ export WERROR = "0"
 do_populate_lic[depends] += "virtual/kernel:do_patch"
 
 # needed for building the tools/perf Perl binding
-inherit perlnative cpan-base
+inherit ${@bb.utils.contains('PACKAGECONFIG', 'scripting', 'perlnative', '', d)}
+inherit cpan-base
 # Env var which tells perl if it should use host (no) or target (yes) settings
 export PERLCONFIGTARGET = "${@is_target(d)}"
 export PERL_INC = "${STAGING_LIBDIR}${PERL_OWN_DIR}/perl/${@get_perl_version(d)}/CORE"
@@ -56,7 +61,7 @@ export PERL_ARCHLIB = "${STAGING_LIBDIR}${PERL_OWN_DIR}/perl/${@get_perl_version
 
 inherit kernelsrc
 
-B = "${WORKDIR}/${BPN}-${PV}"
+S = "${WORKDIR}/${BP}"
 SPDX_S = "${S}/tools/perf"
 
 # The LDFLAGS is required or some old kernels fails due missing
@@ -92,6 +97,17 @@ EXTRA_OEMAKE += "\
     'infodir=${@os.path.relpath(infodir, prefix)}' \
 "
 
+PERF_SRC ?= "Makefile \
+             include \
+             tools/arch \
+             tools/build \
+             tools/include \
+             tools/lib \
+             tools/Makefile \
+             tools/perf \
+             tools/scripts \
+"
+
 PERF_EXTRA_LDFLAGS = ""
 
 # MIPS N32
@@ -114,11 +130,22 @@ do_install() {
 	fi
 }
 
-do_configure_prepend () {
-    # Fix for rebuilding
-    rm -rf ${B}/
-    mkdir -p ${B}/
+do_configure[prefuncs] += "copy_perf_source_from_kernel"
+python copy_perf_source_from_kernel() {
+    sources = (d.getVar("PERF_SRC") or "").split()
+    src_dir = d.getVar("STAGING_KERNEL_DIR")
+    dest_dir = d.getVar("S")
+    bb.utils.mkdirhier(dest_dir)
+    for s in sources:
+        src = oe.path.join(src_dir, s)
+        dest = oe.path.join(dest_dir, s)
+        if os.path.isdir(src):
+            oe.path.copyhardlinktree(src, dest)
+        else:
+            bb.utils.copyfile(src, dest)
+}
 
+do_configure_prepend () {
     # If building a multlib based perf, the incorrect library path will be
     # detected by perf, since it triggers via: ifeq ($(ARCH),x86_64). In a 32 bit
     # build, with a 64 bit multilib, the arch won't match and the detection of a 
@@ -214,20 +241,21 @@ PACKAGES =+ "${PN}-archive ${PN}-tests ${PN}-perl ${PN}-python"
 RDEPENDS_${PN} += "elfutils bash"
 RDEPENDS_${PN}-doc += "man"
 RDEPENDS_${PN}-archive =+ "bash"
-RDEPENDS_${PN}-python =+ "bash python python-modules"
+RDEPENDS_${PN}-python =+ "bash python python-modules ${@bb.utils.contains('PACKAGECONFIG', 'audit', 'audit-python', '', d)}"
 RDEPENDS_${PN}-perl =+ "bash perl perl-modules"
 RDEPENDS_${PN}-tests =+ "python"
 
 RSUGGESTS_SCRIPTING = "${@bb.utils.contains('PACKAGECONFIG', 'scripting', '${PN}-perl ${PN}-python', '',d)}"
 RSUGGESTS_${PN} += "${PN}-archive ${PN}-tests ${RSUGGESTS_SCRIPTING}"
 
-#FILES_${PN} += "${libexecdir}/perf-core ${exec_prefix}/libexec/perf-core /usr/lib64/traceevent ${libdir}/traceevent"
 FILES_${PN} += "${libexecdir}/perf-core ${exec_prefix}/libexec/perf-core ${libdir}/traceevent"
 FILES_${PN}-archive = "${libdir}/perf/perf-core/perf-archive"
 FILES_${PN}-tests = "${libdir}/perf/perf-core/tests ${libexecdir}/perf-core/tests"
-FILES_${PN}-python = "${libdir}/perf/perf-core/scripts/python ${PYTHON_SITEPACKAGES_DIR}"
-FILES_${PN}-python += "${libexecdir}/perf-core/scripts/python/*"
-FILES_${PN}-perl = "${libdir}/perf/perf-core/scripts/perl"
+FILES_${PN}-python = " \
+                       ${PYTHON_SITEPACKAGES_DIR} \
+                       ${libexecdir}/perf-core/scripts/python \
+                       "
+FILES_${PN}-perl = "${libexecdir}/perf-core/scripts/perl"
 
 
 INHIBIT_PACKAGE_DEBUG_SPLIT="1"

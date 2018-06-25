@@ -1,14 +1,18 @@
-[PATCH] force STRIP to emtpy
+From 3cbee00fe5725b87abdae80cfa2ee735e4513ca6 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Tue, 19 Aug 2014 11:31:35 +0800
+Subject: [PATCH] [PATCH] force STRIP to emtpy
 
 otherwise the generate file will be stripped
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
 ---
- Makefile.rules |    2 +-
+ Makefile.rules | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile.rules b/Makefile.rules
-index 710a2c9..e4334db 100644
+index 709dd04..b1f7e50 100644
 --- a/Makefile.rules
 +++ b/Makefile.rules
 @@ -31,7 +31,7 @@ LDFLAGS   ?= -s
@@ -20,6 +24,3 @@ index 710a2c9..e4334db 100644
  else
  STRIP     ?= strip --strip-debug
  endif
--- 
-1.7.10.4
-

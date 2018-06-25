@@ -1,0 +1,25 @@
+From 15d0afcfa4868b7b072b3434bac0064617d61f99 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Tue, 19 Dec 2017 14:53:14 +0900
+Subject: [PATCH] Run python scripts using env
+
+Otherwise the build tools hardcode the python path into them.
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ bin/dnfdragora | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bin/dnfdragora b/bin/dnfdragora
+index b8e0550..cd80f7f 100755
+--- a/bin/dnfdragora
++++ b/bin/dnfdragora
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/env python3
+ # vim: set et ts=4 sw=4:
+ #    Copyright 2016-2017 Angelo Naselli <anaselli@linux.it>
+ #
+-- 
+2.7.4
+

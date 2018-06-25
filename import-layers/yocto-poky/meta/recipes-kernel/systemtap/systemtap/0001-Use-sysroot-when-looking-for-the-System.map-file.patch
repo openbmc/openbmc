@@ -1,0 +1,29 @@
+From 436063d5e4738a9b03535d330a2242be5118e745 Mon Sep 17 00:00:00 2001
+From: David Smith <dsmith@redhat.com>
+Date: Thu, 8 Mar 2018 16:01:58 -0600
+Subject: [PATCH] Use sysroot when looking for the System.map file.
+
+Add sysroot to system_map_path + "/boot/System.map" case. Otherwise
+stap tries to look symbols on host system and it produce error like this:
+
+> Kernel symbol table /boot/System.map-4.9.78-yocto-standard unavailable, (No such file or directory)
+
+Upstream-Status: Backport
+Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+---
+ session.cxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: git/session.cxx
+===================================================================
+--- git.orig/session.cxx
++++ git/session.cxx
+@@ -2013,7 +2013,7 @@ systemtap_session::parse_kernel_function
+ 	clog << _F("Kernel symbol table %s unavailable, (%s)",
+ 		   system_map_path.c_str(), strerror(errno)) << endl;
+ 
+-      system_map_path = "/boot/System.map-" + kernel_release;
++      system_map_path = sysroot + "/boot/System.map-" + kernel_release;
+       system_map.clear();
+       system_map.open(system_map_path.c_str(), ifstream::in);
+       if (! system_map.is_open())

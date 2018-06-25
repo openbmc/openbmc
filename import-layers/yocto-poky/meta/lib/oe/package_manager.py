@@ -12,6 +12,7 @@ import oe.utils
 import oe.path
 import string
 from oe.gpg_sign import get_signer
+import hashlib
 
 # this can be used by all PM backends to create the index files in parallel
 def create_index(arg):
@@ -22,12 +23,12 @@ def create_index(arg):
     if result:
         bb.note(result)
 
-"""
-This method parse the output from the package managerand return
-a dictionary with the information of the packages. This is used
-when the packages are in deb or ipk format.
-"""
 def opkg_query(cmd_output):
+    """
+    This method parse the output from the package managerand return
+    a dictionary with the information of the packages. This is used
+    when the packages are in deb or ipk format.
+    """
     verregex = re.compile(' \([=<>]* [^ )]*\)')
     output = dict()
     pkg = ""
@@ -83,6 +84,11 @@ def opkg_query(cmd_output):
 
     return output
 
+# Note: this should be bb.fatal in the future.
+def failed_postinsts_warn(pkgs, log_path):
+    bb.warn("""Intentionally failing postinstall scriptlets of %s to defer them to first boot is deprecated. Please place them into pkg_postinst_ontarget_${PN} ().
+If deferring to first boot wasn't the intent, then scriptlet failure may mean an issue in the recipe, or a regression elsewhere.
+Details of the failure are in %s.""" %(pkgs, log_path))
 
 class Indexer(object, metaclass=ABCMeta):
     def __init__(self, d, deploy_dir):
@@ -96,13 +102,16 @@ class Indexer(object, metaclass=ABCMeta):
 
 class RpmIndexer(Indexer):
     def write_index(self):
+        self.do_write_index(self.deploy_dir)
+
+    def do_write_index(self, deploy_dir):
         if self.d.getVar('PACKAGE_FEED_SIGN') == '1':
             signer = get_signer(self.d, self.d.getVar('PACKAGE_FEED_GPG_BACKEND'))
         else:
             signer = None
 
         createrepo_c = bb.utils.which(os.environ['PATH'], "createrepo_c")
-        result = create_index("%s --update -q %s" % (createrepo_c, self.deploy_dir))
+        result = create_index("%s --update -q %s" % (createrepo_c, deploy_dir))
         if result:
             bb.fatal(result)
 
@@ -110,17 +119,28 @@ class RpmIndexer(Indexer):
         if signer:
             sig_type = self.d.getVar('PACKAGE_FEED_GPG_SIGNATURE_TYPE')
             is_ascii_sig = (sig_type.upper() != "BIN")
-            signer.detach_sign(os.path.join(self.deploy_dir, 'repodata', 'repomd.xml'),
+            signer.detach_sign(os.path.join(deploy_dir, 'repodata', 'repomd.xml'),
                                self.d.getVar('PACKAGE_FEED_GPG_NAME'),
                                self.d.getVar('PACKAGE_FEED_GPG_PASSPHRASE_FILE'),
                                armor=is_ascii_sig)
 
+class RpmSubdirIndexer(RpmIndexer):
+    def write_index(self):
+        bb.note("Generating package index for %s" %(self.deploy_dir))
+        self.do_write_index(self.deploy_dir)
+        for entry in os.walk(self.deploy_dir):
+            if os.path.samefile(self.deploy_dir, entry[0]):
+                for dir in entry[1]:
+                    if dir != 'repodata':
+                        dir_path = oe.path.join(self.deploy_dir, dir)
+                        bb.note("Generating package index for %s" %(dir_path))
+                        self.do_write_index(dir_path)
 
 class OpkgIndexer(Indexer):
     def write_index(self):
         arch_vars = ["ALL_MULTILIB_PACKAGE_ARCHS",
                      "SDK_PACKAGE_ARCHS",
-                     "MULTILIB_ARCHS"]
+                     ]
 
         opkg_index_cmd = bb.utils.which(os.getenv('PATH'), "opkg-make-index")
         if self.d.getVar('PACKAGE_FEED_SIGN') == '1':
@@ -307,39 +327,103 @@ class PackageManager(object, metaclass=ABCMeta):
     This is an abstract class. Do not instantiate this directly.
     """
 
-    def __init__(self, d):
+    def __init__(self, d, target_rootfs):
         self.d = d
+        self.target_rootfs = target_rootfs
         self.deploy_dir = None
         self.deploy_lock = None
+        self._initialize_intercepts()
 
-    """
-    Update the package manager package database.
-    """
+    def _initialize_intercepts(self):
+        bb.note("Initializing intercept dir for %s" % self.target_rootfs)
+        postinst_intercepts_dir = self.d.getVar("POSTINST_INTERCEPTS_DIR")
+        if not postinst_intercepts_dir:
+            postinst_intercepts_dir = self.d.expand("${COREBASE}/scripts/postinst-intercepts")
+        # As there might be more than one instance of PackageManager operating at the same time
+        # we need to isolate the intercept_scripts directories from each other,
+        # hence the ugly hash digest in dir name.
+        self.intercepts_dir = os.path.join(self.d.getVar('WORKDIR'),
+                                      "intercept_scripts-%s" %(hashlib.sha256(self.target_rootfs.encode()).hexdigest()) )
+
+        bb.utils.remove(self.intercepts_dir, True)
+        shutil.copytree(postinst_intercepts_dir, self.intercepts_dir)
+
+    @abstractmethod
+    def _handle_intercept_failure(self, failed_script):
+        pass
+
+    def _postpone_to_first_boot(self, postinst_intercept_hook):
+        with open(postinst_intercept_hook) as intercept:
+            registered_pkgs = None
+            for line in intercept.read().split("\n"):
+                m = re.match("^##PKGS:(.*)", line)
+                if m is not None:
+                    registered_pkgs = m.group(1).strip()
+                    break
+
+            if registered_pkgs is not None:
+                bb.note("If an image is being built, the postinstalls for the following packages "
+                        "will be postponed for first boot: %s" %
+                        registered_pkgs)
+
+                # call the backend dependent handler
+                self._handle_intercept_failure(registered_pkgs)
+
+
+    def run_intercepts(self):
+        intercepts_dir = self.intercepts_dir
+
+        bb.note("Running intercept scripts:")
+        os.environ['D'] = self.target_rootfs
+        os.environ['STAGING_DIR_NATIVE'] = self.d.getVar('STAGING_DIR_NATIVE')
+        for script in os.listdir(intercepts_dir):
+            script_full = os.path.join(intercepts_dir, script)
+
+            if script == "postinst_intercept" or not os.access(script_full, os.X_OK):
+                continue
+
+            if script == "delay_to_first_boot":
+                self._postpone_to_first_boot(script_full)
+                continue
+
+            bb.note("> Executing %s intercept ..." % script)
+
+            try:
+                output = subprocess.check_output(script_full, stderr=subprocess.STDOUT)
+                if output: bb.note(output.decode("utf-8"))
+            except subprocess.CalledProcessError as e:
+                bb.warn("The postinstall intercept hook '%s' failed, details in %s/log.do_%s" % (script, self.d.getVar('T'), self.d.getVar('BB_CURRENTTASK')))
+                bb.note("Exit code %d. Output:\n%s" % (e.returncode, e.output.decode("utf-8")))
+                self._postpone_to_first_boot(script_full)
+
     @abstractmethod
     def update(self):
+        """
+        Update the package manager package database.
+        """
         pass
 
-    """
-    Install a list of packages. 'pkgs' is a list object. If 'attempt_only' is
-    True, installation failures are ignored.
-    """
     @abstractmethod
     def install(self, pkgs, attempt_only=False):
+        """
+        Install a list of packages. 'pkgs' is a list object. If 'attempt_only' is
+        True, installation failures are ignored.
+        """
         pass
 
-    """
-    Remove a list of packages. 'pkgs' is a list object. If 'with_dependencies'
-    is False, the any dependencies are left in place.
-    """
     @abstractmethod
     def remove(self, pkgs, with_dependencies=True):
+        """
+        Remove a list of packages. 'pkgs' is a list object. If 'with_dependencies'
+        is False, then any dependencies are left in place.
+        """
         pass
 
-    """
-    This function creates the index files
-    """
     @abstractmethod
     def write_index(self):
+        """
+        This function creates the index files
+        """
         pass
 
     @abstractmethod
@@ -350,30 +434,28 @@ class PackageManager(object, metaclass=ABCMeta):
     def list_installed(self):
         pass
 
-    """
-    Returns the path to a tmpdir where resides the contents of a package.
-
-    Deleting the tmpdir is responsability of the caller.
-
-    """
     @abstractmethod
     def extract(self, pkg):
+        """
+        Returns the path to a tmpdir where resides the contents of a package.
+        Deleting the tmpdir is responsability of the caller.
+        """
         pass
 
-    """
-    Add remote package feeds into repository manager configuration. The parameters
-    for the feeds are set by feed_uris, feed_base_paths and feed_archs.
-    See http://www.yoctoproject.org/docs/current/ref-manual/ref-manual.html#var-PACKAGE_FEED_URIS
-    for their description.
-    """
     @abstractmethod
     def insert_feeds_uris(self, feed_uris, feed_base_paths, feed_archs):
+        """
+        Add remote package feeds into repository manager configuration. The parameters
+        for the feeds are set by feed_uris, feed_base_paths and feed_archs.
+        See http://www.yoctoproject.org/docs/current/ref-manual/ref-manual.html#var-PACKAGE_FEED_URIS
+        for their description.
+        """
         pass
 
-    """
-    Install all packages that match a glob.
-    """
     def install_glob(self, globs, sdk=False):
+        """
+        Install all packages that match a glob.
+        """
         # TODO don't have sdk here but have a property on the superclass
         # (and respect in install_complementary)
         if sdk:
@@ -393,14 +475,14 @@ class PackageManager(object, metaclass=ABCMeta):
                          "'%s' returned %d:\n%s" %
                          (' '.join(cmd), e.returncode, e.output.decode("utf-8")))
 
-    """
-    Install complementary packages based upon the list of currently installed
-    packages e.g. locales, *-dev, *-dbg, etc. This will only attempt to install
-    these packages, if they don't exist then no error will occur.  Note: every
-    backend needs to call this function explicitly after the normal package
-    installation
-    """
     def install_complementary(self, globs=None):
+        """
+        Install complementary packages based upon the list of currently installed
+        packages e.g. locales, *-dev, *-dbg, etc. This will only attempt to install
+        these packages, if they don't exist then no error will occur.  Note: every
+        backend needs to call this function explicitly after the normal package
+        installation
+        """
         if globs is None:
             globs = self.d.getVar('IMAGE_INSTALL_COMPLEMENTARY')
             split_linguas = set()
@@ -457,13 +539,13 @@ class PackageManager(object, metaclass=ABCMeta):
 
         self.deploy_lock = None
 
-    """
-    Construct URIs based on the following pattern: uri/base_path where 'uri'
-    and 'base_path' correspond to each element of the corresponding array
-    argument leading to len(uris) x len(base_paths) elements on the returned
-    array
-    """
     def construct_uris(self, uris, base_paths):
+        """
+        Construct URIs based on the following pattern: uri/base_path where 'uri'
+        and 'base_path' correspond to each element of the corresponding array
+        argument leading to len(uris) x len(base_paths) elements on the returned
+        array
+        """
         def _append(arr1, arr2, sep='/'):
             res = []
             narr1 = [a.rstrip(sep) for a in arr1]
@@ -477,18 +559,98 @@ class PackageManager(object, metaclass=ABCMeta):
             return res
         return _append(uris, base_paths)
 
+def create_packages_dir(d, rpm_repo_dir, deploydir, taskname, filterbydependencies):
+    """
+    Go through our do_package_write_X dependencies and hardlink the packages we depend
+    upon into the repo directory. This prevents us seeing other packages that may
+    have been built that we don't depend upon and also packages for architectures we don't
+    support.
+    """
+    import errno
+
+    taskdepdata = d.getVar("BB_TASKDEPDATA", False)
+    mytaskname = d.getVar("BB_RUNTASK")
+    pn = d.getVar("PN")
+    seendirs = set()
+    multilibs = {}
+   
+    rpm_subrepo_dir = oe.path.join(rpm_repo_dir, "rpm")
+
+    bb.utils.remove(rpm_subrepo_dir, recurse=True)
+    bb.utils.mkdirhier(rpm_subrepo_dir)
+
+    # Detect bitbake -b usage
+    nodeps = d.getVar("BB_LIMITEDDEPS") or False
+    if nodeps or not filterbydependencies:
+        oe.path.symlink(deploydir, rpm_subrepo_dir, True)
+        return
+
+    start = None
+    for dep in taskdepdata:
+        data = taskdepdata[dep]
+        if data[1] == mytaskname and data[0] == pn:
+            start = dep
+            break
+    if start is None:
+        bb.fatal("Couldn't find ourself in BB_TASKDEPDATA?")
+    rpmdeps = set()
+    start = [start]
+    seen = set(start)
+    # Support direct dependencies (do_rootfs -> rpms)
+    # or indirect dependencies within PN (do_populate_sdk_ext -> do_rootfs -> rpms)
+    while start:
+        next = []
+        for dep2 in start:
+            for dep in taskdepdata[dep2][3]:
+                if taskdepdata[dep][0] != pn:
+                    if "do_" + taskname in dep:
+                        rpmdeps.add(dep)
+                elif dep not in seen:
+                    next.append(dep)
+                    seen.add(dep)
+        start = next
+
+    for dep in rpmdeps:
+        c = taskdepdata[dep][0]
+        manifest, d2 = oe.sstatesig.find_sstate_manifest(c, taskdepdata[dep][2], taskname, d, multilibs)
+        if not manifest:
+            bb.fatal("No manifest generated from: %s in %s" % (c, taskdepdata[dep][2]))
+        if not os.path.exists(manifest):
+            continue
+        with open(manifest, "r") as f:
+            for l in f:
+                l = l.strip()
+                dest = l.replace(deploydir, "")
+                dest = rpm_subrepo_dir + dest
+                if l.endswith("/"):
+                    if dest not in seendirs:
+                        bb.utils.mkdirhier(dest)
+                        seendirs.add(dest)
+                    continue
+                # Try to hardlink the file, copy if that fails
+                destdir = os.path.dirname(dest)
+                if destdir not in seendirs:
+                    bb.utils.mkdirhier(destdir)
+                    seendirs.add(destdir)
+                try:
+                    os.link(l, dest)
+                except OSError as err:
+                    if err.errno == errno.EXDEV:
+                        bb.utils.copyfile(l, dest)
+                    else:
+                        raise
+
 class RpmPM(PackageManager):
     def __init__(self,
                  d,
                  target_rootfs,
                  target_vendor,
                  task_name='target',
-                 providename=None,
                  arch_var=None,
                  os_var=None,
-                 rpm_repo_workdir="oe-rootfs-repo"):
-        super(RpmPM, self).__init__(d)
-        self.target_rootfs = target_rootfs
+                 rpm_repo_workdir="oe-rootfs-repo",
+                 filterbydependencies=True):
+        super(RpmPM, self).__init__(d, target_rootfs)
         self.target_vendor = target_vendor
         self.task_name = task_name
         if arch_var == None:
@@ -501,8 +663,7 @@ class RpmPM(PackageManager):
             self.primary_arch = self.d.getVar('MACHINE_ARCH')
 
         self.rpm_repo_dir = oe.path.join(self.d.getVar('WORKDIR'), rpm_repo_workdir)
-        bb.utils.mkdirhier(self.rpm_repo_dir)
-        oe.path.symlink(self.d.getVar('DEPLOY_DIR_RPM'), oe.path.join(self.rpm_repo_dir, "rpm"), True)
+        create_packages_dir(self.d, self.rpm_repo_dir, d.getVar("DEPLOY_DIR_RPM"), "package_write_rpm", filterbydependencies)
 
         self.saved_packaging_data = self.d.expand('${T}/saved_packaging_data/%s' % self.task_name)
         if not os.path.exists(self.d.expand('${T}/saved_packaging_data')):
@@ -577,7 +738,7 @@ class RpmPM(PackageManager):
             gpg_opts += 'repo_gpgcheck=1\n'
             gpg_opts += 'gpgkey=file://%s/pki/packagefeed-gpg/PACKAGEFEED-GPG-KEY-%s-%s\n' % (self.d.getVar('sysconfdir'), self.d.getVar('DISTRO'), self.d.getVar('DISTRO_CODENAME'))
 
-        if self.d.getVar('RPM_SIGN_PACKAGES') == '0':
+        if self.d.getVar('RPM_SIGN_PACKAGES') != '1':
             gpg_opts += 'gpgcheck=0\n'
 
         bb.utils.mkdirhier(oe.path.join(self.target_rootfs, "etc", "yum.repos.d"))
@@ -602,8 +763,7 @@ class RpmPM(PackageManager):
         os.environ['OFFLINE_ROOT'] = self.target_rootfs
         os.environ['IPKG_OFFLINE_ROOT'] = self.target_rootfs
         os.environ['OPKG_OFFLINE_ROOT'] = self.target_rootfs
-        os.environ['INTERCEPT_DIR'] = oe.path.join(self.d.getVar('WORKDIR'),
-                                                   "intercept_scripts")
+        os.environ['INTERCEPT_DIR'] = self.intercepts_dir
         os.environ['NATIVE_ROOT'] = self.d.getVar('STAGING_DIR_NATIVE')
 
 
@@ -628,6 +788,8 @@ class RpmPM(PackageManager):
             if line.startswith("Non-fatal POSTIN scriptlet failure in rpm package"):
                 failed_scriptlets_pkgnames[line.split()[-1]] = True
 
+        if len(failed_scriptlets_pkgnames) > 0:
+            failed_postinsts_warn(list(failed_scriptlets_pkgnames.keys()), self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
         for pkg in failed_scriptlets_pkgnames.keys():
             self.save_rpmpostinst(pkg)
 
@@ -730,6 +892,7 @@ class RpmPM(PackageManager):
                              "--setopt=logdir=%s" % (self.d.getVar('T'))
                             ]
         cmd = [dnf_cmd] + standard_dnf_args + dnf_args
+        bb.note('Running %s' % ' '.join(cmd))
         try:
             output = subprocess.check_output(cmd,stderr=subprocess.STDOUT).decode("utf-8")
             if print_output:
@@ -782,6 +945,14 @@ class RpmPM(PackageManager):
         open(saved_script_name, 'w').write(output)
         os.chmod(saved_script_name, 0o755)
 
+    def _handle_intercept_failure(self, registered_pkgs):
+        rpm_postinsts_dir = self.target_rootfs + self.d.expand('${sysconfdir}/rpm-postinsts/')
+        bb.utils.mkdirhier(rpm_postinsts_dir)
+
+        # Save the package postinstalls in /etc/rpm-postinsts
+        for pkg in registered_pkgs.split():
+            self.save_rpmpostinst(pkg)
+
     def extract(self, pkg):
         output = self._invoke_dnf(["repoquery", "--queryformat", "%{location}", pkg])
         pkg_name = output.splitlines()[-1]
@@ -819,18 +990,18 @@ class RpmPM(PackageManager):
 
 
 class OpkgDpkgPM(PackageManager):
-    """
-    This is an abstract class. Do not instantiate this directly.
-    """
-    def __init__(self, d):
-        super(OpkgDpkgPM, self).__init__(d)
+    def __init__(self, d, target_rootfs):
+        """
+        This is an abstract class. Do not instantiate this directly.
+        """
+        super(OpkgDpkgPM, self).__init__(d, target_rootfs)
 
-    """
-    Returns a dictionary with the package info.
-
-    This method extracts the common parts for Opkg and Dpkg
-    """
     def package_info(self, pkg, cmd):
+        """
+        Returns a dictionary with the package info.
+
+        This method extracts the common parts for Opkg and Dpkg
+        """
 
         try:
             output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True).decode("utf-8")
@@ -839,14 +1010,14 @@ class OpkgDpkgPM(PackageManager):
                      "returned %d:\n%s" % (cmd, e.returncode, e.output.decode("utf-8")))
         return opkg_query(output)
 
-    """
-    Returns the path to a tmpdir where resides the contents of a package.
-
-    Deleting the tmpdir is responsability of the caller.
-
-    This method extracts the common parts for Opkg and Dpkg
-    """
     def extract(self, pkg, pkg_info):
+        """
+        Returns the path to a tmpdir where resides the contents of a package.
+
+        Deleting the tmpdir is responsability of the caller.
+
+        This method extracts the common parts for Opkg and Dpkg
+        """
 
         ar_cmd = bb.utils.which(os.getenv("PATH"), "ar")
         tar_cmd = bb.utils.which(os.getenv("PATH"), "tar")
@@ -885,12 +1056,13 @@ class OpkgDpkgPM(PackageManager):
 
         return tmp_dir
 
+    def _handle_intercept_failure(self, registered_pkgs):
+        self.mark_packages("unpacked", registered_pkgs.split())
 
 class OpkgPM(OpkgDpkgPM):
     def __init__(self, d, target_rootfs, config_file, archs, task_name='target'):
-        super(OpkgPM, self).__init__(d)
+        super(OpkgPM, self).__init__(d, target_rootfs)
 
-        self.target_rootfs = target_rootfs
         self.config_file = config_file
         self.pkg_archs = archs
         self.task_name = task_name
@@ -921,12 +1093,12 @@ class OpkgPM(OpkgDpkgPM):
 
         self.indexer = OpkgIndexer(self.d, self.deploy_dir)
 
-    """
-    This function will change a package's status in /var/lib/opkg/status file.
-    If 'packages' is None then the new_status will be applied to all
-    packages
-    """
     def mark_packages(self, status_tag, packages=None):
+        """
+        This function will change a package's status in /var/lib/opkg/status file.
+        If 'packages' is None then the new_status will be applied to all
+        packages
+        """
         status_file = os.path.join(self.opkg_dir, "status")
 
         with open(status_file, "r") as sf:
@@ -1079,8 +1251,7 @@ class OpkgPM(OpkgDpkgPM):
         os.environ['OFFLINE_ROOT'] = self.target_rootfs
         os.environ['IPKG_OFFLINE_ROOT'] = self.target_rootfs
         os.environ['OPKG_OFFLINE_ROOT'] = self.target_rootfs
-        os.environ['INTERCEPT_DIR'] = os.path.join(self.d.getVar('WORKDIR'),
-                                                   "intercept_scripts")
+        os.environ['INTERCEPT_DIR'] = self.intercepts_dir
         os.environ['NATIVE_ROOT'] = self.d.getVar('STAGING_DIR_NATIVE')
 
         try:
@@ -1088,6 +1259,13 @@ class OpkgPM(OpkgDpkgPM):
             bb.note(cmd)
             output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT).decode("utf-8")
             bb.note(output)
+            failed_pkgs = []
+            for line in output.split('\n'):
+                if line.endswith("configuration required on target."):
+                    bb.warn(line)
+                    failed_pkgs.append(line.split(".")[0])
+            if failed_pkgs:
+                failed_postinsts_warn(failed_pkgs, self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
         except subprocess.CalledProcessError as e:
             (bb.fatal, bb.warn)[attempt_only]("Unable to install packages. "
                                               "Command '%s' returned %d:\n%s" %
@@ -1170,10 +1348,10 @@ class OpkgPM(OpkgDpkgPM):
                 # is separated from the following entry
                 status.write("\n")
 
-    '''
-    The following function dummy installs pkgs and returns the log of output.
-    '''
     def dummy_install(self, pkgs):
+        """
+        The following function dummy installs pkgs and returns the log of output.
+        """
         if len(pkgs) == 0:
             return
 
@@ -1228,10 +1406,10 @@ class OpkgPM(OpkgDpkgPM):
                             self.opkg_dir,
                             symlinks=True)
 
-    """
-    Returns a dictionary with the package info.
-    """
     def package_info(self, pkg):
+        """
+        Returns a dictionary with the package info.
+        """
         cmd = "%s %s info %s" % (self.opkg_cmd, self.opkg_args, pkg)
         pkg_info = super(OpkgPM, self).package_info(pkg, cmd)
 
@@ -1242,12 +1420,12 @@ class OpkgPM(OpkgDpkgPM):
 
         return pkg_info
 
-    """
-    Returns the path to a tmpdir where resides the contents of a package.
-
-    Deleting the tmpdir is responsability of the caller.
-    """
     def extract(self, pkg):
+        """
+        Returns the path to a tmpdir where resides the contents of a package.
+
+        Deleting the tmpdir is responsability of the caller.
+        """
         pkg_info = self.package_info(pkg)
         if not pkg_info:
             bb.fatal("Unable to get information for package '%s' while "
@@ -1260,8 +1438,7 @@ class OpkgPM(OpkgDpkgPM):
 
 class DpkgPM(OpkgDpkgPM):
     def __init__(self, d, target_rootfs, archs, base_archs, apt_conf_dir=None):
-        super(DpkgPM, self).__init__(d)
-        self.target_rootfs = target_rootfs
+        super(DpkgPM, self).__init__(d, target_rootfs)
         self.deploy_dir = self.d.getVar('DEPLOY_DIR_DEB')
         if apt_conf_dir is None:
             self.apt_conf_dir = self.d.expand("${APTCONF_TARGET}/apt")
@@ -1281,12 +1458,12 @@ class DpkgPM(OpkgDpkgPM):
 
         self.indexer = DpkgIndexer(self.d, self.deploy_dir)
 
-    """
-    This function will change a package's status in /var/lib/dpkg/status file.
-    If 'packages' is None then the new_status will be applied to all
-    packages
-    """
     def mark_packages(self, status_tag, packages=None):
+        """
+        This function will change a package's status in /var/lib/dpkg/status file.
+        If 'packages' is None then the new_status will be applied to all
+        packages
+        """
         status_file = self.target_rootfs + "/var/lib/dpkg/status"
 
         with open(status_file, "r") as sf:
@@ -1309,11 +1486,11 @@ class DpkgPM(OpkgDpkgPM):
 
         os.rename(status_file + ".tmp", status_file)
 
-    """
-    Run the pre/post installs for package "package_name". If package_name is
-    None, then run all pre/post install scriptlets.
-    """
     def run_pre_post_installs(self, package_name=None):
+        """
+        Run the pre/post installs for package "package_name". If package_name is
+        None, then run all pre/post install scriptlets.
+        """
         info_dir = self.target_rootfs + "/var/lib/dpkg/info"
         ControlScript = collections.namedtuple("ControlScript", ["suffix", "name", "argument"])
         control_scripts = [
@@ -1335,8 +1512,7 @@ class DpkgPM(OpkgDpkgPM):
         os.environ['OFFLINE_ROOT'] = self.target_rootfs
         os.environ['IPKG_OFFLINE_ROOT'] = self.target_rootfs
         os.environ['OPKG_OFFLINE_ROOT'] = self.target_rootfs
-        os.environ['INTERCEPT_DIR'] = os.path.join(self.d.getVar('WORKDIR'),
-                                                   "intercept_scripts")
+        os.environ['INTERCEPT_DIR'] = self.intercepts_dir
         os.environ['NATIVE_ROOT'] = self.d.getVar('STAGING_DIR_NATIVE')
 
         failed_pkgs = []
@@ -1351,9 +1527,10 @@ class DpkgPM(OpkgDpkgPM):
                                 stderr=subprocess.STDOUT).decode("utf-8")
                         bb.note(output)
                     except subprocess.CalledProcessError as e:
-                        bb.note("%s for package %s failed with %d:\n%s" %
+                        bb.warn("%s for package %s failed with %d:\n%s" %
                                 (control_script.name, pkg_name, e.returncode,
                                     e.output.decode("utf-8")))
+                        failed_postinsts_warn([pkg_name], self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
                         failed_pkgs.append(pkg_name)
                         break
 
@@ -1558,10 +1735,10 @@ class DpkgPM(OpkgDpkgPM):
     def list_installed(self):
         return DpkgPkgsList(self.d, self.target_rootfs).list_pkgs()
 
-    """
-    Returns a dictionary with the package info.
-    """
     def package_info(self, pkg):
+        """
+        Returns a dictionary with the package info.
+        """
         cmd = "%s show %s" % (self.apt_cache_cmd, pkg)
         pkg_info = super(DpkgPM, self).package_info(pkg, cmd)
 
@@ -1572,12 +1749,12 @@ class DpkgPM(OpkgDpkgPM):
 
         return pkg_info
 
-    """
-    Returns the path to a tmpdir where resides the contents of a package.
-
-    Deleting the tmpdir is responsability of the caller.
-    """
     def extract(self, pkg):
+        """
+        Returns the path to a tmpdir where resides the contents of a package.
+
+        Deleting the tmpdir is responsability of the caller.
+        """
         pkg_info = self.package_info(pkg)
         if not pkg_info:
             bb.fatal("Unable to get information for package '%s' while "
@@ -1592,7 +1769,7 @@ def generate_index_files(d):
     classes = d.getVar('PACKAGE_CLASSES').replace("package_", "").split()
 
     indexer_map = {
-        "rpm": (RpmIndexer, d.getVar('DEPLOY_DIR_RPM')),
+        "rpm": (RpmSubdirIndexer, d.getVar('DEPLOY_DIR_RPM')),
         "ipk": (OpkgIndexer, d.getVar('DEPLOY_DIR_IPK')),
         "deb": (DpkgIndexer, d.getVar('DEPLOY_DIR_DEB'))
     }
@@ -1608,12 +1785,3 @@ def generate_index_files(d):
 
             if result is not None:
                 bb.fatal(result)
-
-if __name__ == "__main__":
-    """
-    We should be able to run this as a standalone script, from outside bitbake
-    environment.
-    """
-    """
-    TBD
-    """

@@ -18,7 +18,7 @@
 <para>
     For information on how to establish a local Source Directory on your
     development system, see the
-    "<ulink url='&YOCTO_DOCS_DEV_URL;#working-with-yocto-project-source-files'>Working With Yocto Project Source Files</ulink>"
+    "<ulink url='&YOCTO_DOCS_DEV_URL;#locating-yocto-project-source-files'>Locating Yocto Project Source Files</ulink>"
     section in the Yocto Project Development Tasks Manual.
 </para>
 
@@ -114,7 +114,7 @@
         <title><filename>meta/</filename></title>
 
         <para>
-            This directory contains the OpenEmbedded Core metadata.
+            This directory contains the OpenEmbedded-Core metadata.
             The directory holds recipes, common classes, and machine
             configuration for emulated targets (<filename>qemux86</filename>,
             <filename>qemuarm</filename>, and so forth.)
@@ -137,8 +137,7 @@
             This directory contains the Yocto Project reference
             hardware Board Support Packages (BSPs).
             For more information on BSPs, see the
-            <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support
-            Package (BSP) Developer's Guide</ulink>.
+            <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>.
         </para>
     </section>
 
@@ -234,8 +233,7 @@
         </para>
 
         <para>
-            By default, running this script without a
-            <link linkend='build-directory'>Build Directory</link>
+            By default, running this script without a Build Directory
             argument creates the <filename>build</filename> directory
             in your current working directory.
             If you provide a Build Directory argument when you
@@ -306,8 +304,8 @@
             The directory tracks build information into image, packages, and
             SDK subdirectories.
             For information on the build history feature, see the
-            "<link linkend='maintaining-build-output-quality'>Maintaining Build Output Quality</link>"
-            section.
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#maintaining-build-output-quality'>Maintaining Build Output Quality</ulink>"
+            section in the Yocto Project Development Tasks Manual.
         </para>
     </section>
 
@@ -350,7 +348,7 @@
             which defaults to <filename>meta-poky/conf</filename>
             when you are building from the Yocto Project development
             environment and defaults to <filename>meta/conf</filename> when
-            you are building from the OpenEmbedded Core environment.
+            you are building from the OpenEmbedded-Core environment.
             Because the script variable points to the source of the
             <filename>local.conf.sample</filename> file, this implies that
             you can configure your build environment from any layer by setting
@@ -402,7 +400,7 @@
             which defaults to <filename>meta-poky/conf</filename>
             when you are building from the Yocto Project development
             environment and defaults to <filename>meta/conf</filename> when
-            you are building from the OpenEmbedded Core environment.
+            you are building from the OpenEmbedded-Core environment.
             Because the script variable points to the source of the
             <filename>bblayers.conf.sample</filename> file, this implies that
             you can base your build from any layer by setting the variable in
@@ -520,9 +518,10 @@
             variable points to this directory.
             For more detail on the contents of the <filename>deploy</filename>
             directory, see the
-            "<link linkend='images-dev-environment'>Images</link>" and
-            "<link linkend='sdk-dev-environment'>Application Development SDK</link>"
-            sections.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#images-dev-environment'>Images</ulink>"
+            and
+            "<ulink url='&YOCTO_DOCS_OM_URL;#sdk-dev-environment'>Application Development SDK</ulink>"
+            sections in the Yocto Project Overview and Concepts Manual.
         </para>
     </section>
 
@@ -695,8 +694,8 @@
         <para>
             For information on how BitBake uses stamp files to determine if
             a task should be rerun, see the
-            "<link linkend='stamp-files-and-the-rerunning-of-tasks'>Stamp Files and the Rerunning of Tasks</link>"
-            section.
+            "<ulink url='&YOCTO_DOCS_OM_URL;#stamp-files-and-the-rerunning-of-tasks'>Stamp Files and the Rerunning of Tasks</ulink>"
+            section in the Yocto Project Overview and Concepts Manual.
         </para>
     </section>
 
@@ -735,8 +734,7 @@
             built within the Yocto Project.
             For this package, a work directory of
             <filename>tmp/work/qemux86-poky-linux/linux-yocto/3.0+git1+&lt;.....&gt;</filename>,
-            referred to as the
-            <filename><link linkend='var-WORKDIR'>WORKDIR</link></filename>, is created.
+            referred to as the <filename>WORKDIR</filename>, is created.
             Within this directory, the source is unpacked to
             <filename>linux-qemux86-standard-build</filename> and then patched by Quilt.
             (See the

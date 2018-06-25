@@ -22,7 +22,7 @@
 
 case "$1" in
     start)
-        echo "|/usr/bin/minicoredumper %p %u %g %s %t %h %e" > /proc/sys/kernel/core_pattern
+        echo "|/usr/sbin/minicoredumper %p %u %g %s %t %h %e" > /proc/sys/kernel/core_pattern
         ;;
     stop)
         echo "core" > /proc/sys/kernel/core_pattern

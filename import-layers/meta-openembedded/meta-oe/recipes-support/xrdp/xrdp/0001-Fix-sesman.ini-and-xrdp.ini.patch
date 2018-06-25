@@ -1,0 +1,75 @@
+From a9c460f158d68c1b3de6a31ce853de5379977695 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Thu, 30 Nov 2017 11:10:04 +0900
+Subject: [PATCH] Fix sesman.ini and xrdp.ini
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ sesman/sesman.ini | 20 ++++++--------------
+ xrdp/xrdp.ini     | 10 ----------
+ 2 files changed, 6 insertions(+), 24 deletions(-)
+
+diff --git a/sesman/sesman.ini b/sesman/sesman.ini
+index 8225ee4..c09189e 100644
+--- a/sesman/sesman.ini
++++ b/sesman/sesman.ini
+@@ -54,12 +54,14 @@ LogLevel=DEBUG
+ EnableSyslog=1
+ SyslogLevel=DEBUG
+ 
+-[X11rdp]
+-param=X11rdp
+-param=-bs
++[Xorg]
++param=Xorg
++param=-config
++param=xrdp/xorg.conf
++param=-noreset
+ param=-nolisten
+ param=tcp
+-param=-uds
++
+ 
+ [Xvnc]
+ param=Xvnc
+@@ -70,16 +72,6 @@ param=-localhost
+ param=-dpi
+ param=96
+ 
+-[Xorg]
+-param=Xorg
+-param=-config
+-param=xrdp/xorg.conf
+-param=-noreset
+-param=-nolisten
+-param=tcp
+-param=-logfile
+-param=.xorgxrdp.%s.log
+-
+ [Chansrv]
+ ; drive redirection, defaults to xrdp_client if not set
+ FuseMountName=thinclient_drives
+diff --git a/xrdp/xrdp.ini b/xrdp/xrdp.ini
+index cb6d7c3..9f63a69 100644
+--- a/xrdp/xrdp.ini
++++ b/xrdp/xrdp.ini
+@@ -157,16 +157,6 @@ ip=127.0.0.1
+ port=-1
+ code=20
+ 
+-[X11rdp]
+-name=X11rdp
+-lib=libxup.so
+-username=ask
+-password=ask
+-ip=127.0.0.1
+-port=-1
+-xserverbpp=24
+-code=10
+-
+ [Xvnc]
+ name=Xvnc
+ lib=libvnc.so
+-- 
+1.8.4.2
+

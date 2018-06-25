@@ -1,3 +1,11 @@
+From 0cb26cf2d25d36c1fdcc4f1635e4329436ed866a Mon Sep 17 00:00:00 2001
+From: Andrea Adami <andrea.adami@gmail.com>
+Date: Fri, 19 Sep 2014 23:09:29 +0200
+
+---
+ klcc/klcc.in | 3 +++
+ 1 file changed, 3 insertions(+)
+
 diff --git a/klcc/klcc.in b/klcc/klcc.in
 index 43d0984..61e9385 100644
 --- a/klcc/klcc.in

@@ -164,3 +164,17 @@ class ArchiverTest(OESelftestTestCase):
         src_file_glob = str(pkgs_path[0]) + "/xcursor*.src.rpm"
         tar_file_glob = str(pkgs_path[0]) + "/xcursor*.tar.gz"
         self.assertTrue((g.glob(src_file_glob) and g.glob(tar_file_glob)), "Couldn't find .src.rpm and .tar.gz files under %s/allarch*/xcursor*" % deploy_dir_src)
+
+class ToolchainOptions(OESelftestTestCase):
+
+    def test_toolchain_fortran(self):
+        """
+        Test whether we can enable and build fortran and its supporting libraries
+        """
+
+        features = 'FORTRAN_forcevariable = ",fortran"\n'
+        features += 'RUNTIMETARGET_append_pn-gcc-runtime = " libquadmath"\n'
+        self.write_config(features)
+
+        bitbake('gcc-runtime libgfortran')
+

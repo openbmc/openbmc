@@ -27,15 +27,10 @@
             Kickstart commands are based on the Fedora kickstart versions but
             with modifications to reflect Wic capabilities.
             You can see the original documentation for those commands at the
-            following links:
-            <itemizedlist>
-                <listitem><para>
-                    <ulink url='http://fedoraproject.org/wiki/Anaconda/Kickstart#part_or_partition'>http://fedoraproject.org/wiki/Anaconda/Kickstart#part_or_partition</ulink>
-                    </para></listitem>
-                <listitem><para>
-                    <ulink url='http://fedoraproject.org/wiki/Anaconda/Kickstart#bootloader'>http://fedoraproject.org/wiki/Anaconda/Kickstart#bootloader</ulink>
-                    </para></listitem>
-            </itemizedlist>
+            following link:
+            <literallayout class='monospaced'>
+     <ulink url='http://pykickstart.readthedocs.io/en/latest/kickstart-docs.html'>http://pykickstart.readthedocs.io/en/latest/kickstart-docs.html</ulink>
+            </literallayout>
         </para>
     </section>
 
@@ -43,7 +38,7 @@
         <title>Command: part or partition</title>
 
         <para>
-            Either of these commands create a partition on the system and use
+            Either of these commands creates a partition on the system and uses
             the following syntax:
             <literallayout class='monospaced'>
      part [<replaceable>mntpoint</replaceable>]
@@ -55,7 +50,7 @@
 
         <para>
             The <filename><replaceable>mntpoint</replaceable></filename> is
-            where the partition will be mounted and must be of one of the
+            where the partition is mounted and must be in one of the
             following forms:
             <itemizedlist>
                 <listitem><para>
@@ -64,7 +59,7 @@
                     </para></listitem>
                 <listitem><para>
                     <filename>swap</filename>:
-                    The created partition is used as swap space.
+                    The created partition is used as swap space
                     </para></listitem>
             </itemizedlist>
         </para>
@@ -74,13 +69,22 @@
             partition to automatically be mounted.
             Wic achieves this by adding entries to the filesystem table (fstab)
             during image generation.
-            In order for wic to generate a valid fstab, you must also provide
+            In order for Wic to generate a valid fstab, you must also provide
             one of the <filename>--ondrive</filename>,
             <filename>--ondisk</filename>, or
             <filename>--use-uuid</filename> partition options as part of the
             command.
-            Here is an example using "/" as the mountpoint.
-            The command uses "--ondisk" to force the partition onto the
+            <note>
+                The mount program must understand the PARTUUID syntax you use
+                with <filename>--use-uuid</filename> and non-root
+                <replaceable>mountpoint</replaceable>, including swap.
+                The busybox versions of these application are currently
+                excluded.
+            </note>
+            Here is an example that uses "/" as the
+            <replaceable>mountpoint</replaceable>.
+            The command uses <filename>--ondisk</filename> to force the
+            partition onto the
             <filename>sdb</filename> disk:
             <literallayout class='monospaced'>
      part / --source rootfs --ondisk sdb --fstype=ext3 --label platform --align 1024
@@ -101,17 +105,26 @@
                     <filename>--source</filename>.
                     </para></listitem>
                 <listitem><para>
+                    <emphasis><filename>--fixed-size</filename>:</emphasis>
+                    The exact partition size in MBytes.
+                    You cannot specify with <filename>--size</filename>.
+                    An error occurs when assembling the disk image if the
+                    partition data is larger than
+                    <filename>--fixed-size</filename>.
+                    </para></listitem>
+                <listitem><para>
                     <emphasis><filename>--source</filename>:</emphasis>
                     This option is a Wic-specific option that names the source
                     of the data that populates the partition.
                     The most common value for this option is "rootfs", but you
                     can use any value that maps to a valid source plug-in.
                     For information on the source plug-ins, see the
-                    "<link linkend='wic-plug-ins-interface'>Wic Plug-Ins Interface</link>"
-                    section.</para>
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#wic-using-the-wic-plug-ins-interface'>Using the Wic Plug-Ins Interface</ulink>"
+                    section in the Yocto Project Development Tasks Manual.
+                    </para>
 
                     <para>If you use <filename>--source rootfs</filename>, Wic
-                    creates a partition as large as needed and to fill it with
+                    creates a partition as large as needed and fills it with
                     the contents of the root filesystem pointed to by the
                     <filename>-r</filename> command-line option or the
                     equivalent rootfs derived from the <filename>-e</filename>
@@ -130,8 +143,8 @@
                     <filename>-r</filename> command-line option or the
                     equivalent rootfs derived from the <filename>-e</filename>
                     command-line option.
-                    Exactly what those contents and filesystem type end up
-                    being are dependent on the given plug-in implementation.
+                    Exactly what those contents are and filesystem type used are
+                    dependent on the given plug-in implementation.
                     </para>
 
                     <para>If you do not use the <filename>--source</filename>
@@ -173,7 +186,7 @@
                     <emphasis><filename>--fsoptions</filename>:</emphasis>
                     Specifies a free-form string of options to be used when
                     mounting the filesystem.
-                    This string will be copied into the
+                    This string is copied into the
                     <filename>/etc/fstab</filename> file of the installed
                     system and should be enclosed in quotes.
                     If not specified, the default string is "defaults".
@@ -191,9 +204,9 @@
                     </para></listitem>
                 <listitem><para>
                     <emphasis><filename>--align (in KBytes)</filename>:</emphasis>
-                    This option is a Wic-specific option that says to start a
-                    partition on an <replaceable>x</replaceable> KBytes
-                    boundary.
+                    This option is a Wic-specific option that says to start
+                    partitions on boundaries given
+                    <replaceable>x</replaceable> KBytes.
                     </para></listitem>
                 <listitem><para>
                     <emphasis><filename>--no-table</filename>:</emphasis>
@@ -203,10 +216,17 @@
                     However, the partition is not added to the partition table.
                     </para></listitem>
                 <listitem><para>
+                    <emphasis><filename>--exclude-path</filename>:</emphasis>
+                    This option is a Wic-specific option that excludes the given
+                    relative path from the resulting image.
+                    This option is only effective with the rootfs source
+                    plug-in.
+                    </para></listitem>
+                <listitem><para>
                     <emphasis><filename>--extra-space</filename>:</emphasis>
                     This option is a Wic-specific option that adds extra space
                     after the space filled by the content of the partition.
-                    The final size can go beyond the size specified by the
+                    The final size can exceed the size specified by the
                     <filename>--size</filename> option.
                     The default value is 10 Mbytes.
                     </para></listitem>
@@ -216,6 +236,11 @@
                     size of the partition by the option's value.
                     You must supply a value greater than or equal to "1".
                     The default value is "1.3".
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--part-name</filename>:</emphasis>
+                    This option is a Wic-specific option that specifies a name
+                    for GPT partitions.
                     </para></listitem>
                 <listitem><para>
                     <emphasis><filename>--part-type</filename>:</emphasis>
@@ -236,6 +261,31 @@
                     <emphasis><filename>--uuid</filename>:</emphasis>
                     This option is a Wic-specific option that specifies the
                     partition UUID.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--fsuuid</filename>:</emphasis>
+                    This option is a Wic-specific option that specifies the
+                    filesystem UUID.
+                    You can generate or modify
+                    <link linkend='var-WKS_FILE'><filename>WKS_FILE</filename></link>
+                    with this option if a preconfigured filesystem UUID is
+                    added to the kernel command line in the bootloader
+                    configuration before you run Wic.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--system-id</filename>:</emphasis>
+                    This option is a Wic-specific option that specifies the
+                    partition system ID, which is a one byte long, hexadecimal
+                    parameter with or without the 0x prefix.
+                    </para></listitem>
+                <listitem><para>
+                    <emphasis><filename>--mkfs-extraopts</filename>:</emphasis>
+                    This option specifies additional options to pass to the
+                    <filename>mkfs</filename> utility.
+                    Some default options for certain filesystems do not take
+                    effect.
+                    See Wic's help on kickstart
+                    (i.e. <filename>wic help kickstart</filename>).
                     </para></listitem>
             </itemizedlist>
         </para>

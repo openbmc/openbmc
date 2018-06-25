@@ -25,6 +25,8 @@ SRC_URI = "http://search.cpan.org/CPAN/authors/id/I/IS/ISHIGAKI/DBD-SQLite-${PV}
 SRC_URI[md5sum] = "8f835ddacb9a4a92a52bbe2d24d18a8e"
 SRC_URI[sha256sum] = "3929a6dbd8d71630f0cb57f85dcef9588cd7ac4c9fa12db79df77b9d3a4d7269"
 
+UPSTREAM_CHECK_REGEX = "DBD\-SQLite\-(?P<pver>(\d+\.\d+))(?!_\d+).tar"
+
 S = "${WORKDIR}/DBD-SQLite-${PV}"
 
 inherit cpan

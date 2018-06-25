@@ -9,17 +9,17 @@ Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 
-diff --git a/configure.ac b/configure.ac
-index 6d7c9a5..22cceb9 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -21,7 +21,8 @@ AC_USE_SYSTEM_EXTENSIONS
- 
- AM_PATH_PYTHON([2.6])
+Index: libxcb-1.12/configure.ac
+===================================================================
+--- libxcb-1.12.orig/configure.ac
++++ libxcb-1.12/configure.ac
+@@ -36,7 +36,8 @@ if test x"$HAVE_DOT" = xno; then
+     AC_MSG_WARN([dot not found - doxygen targets will be skipped])
+ fi
  
 -PKG_CHECK_MODULES(CHECK, [check >= 0.9.4], [HAVE_CHECK=yes], [HAVE_CHECK=no])
 +dnl PKG_CHECK_MODULES(CHECK, [check >= 0.9.4], [HAVE_CHECK=yes], [HAVE_CHECK=no])
 +HAVE_CHECK=no
  AM_CONDITIONAL(HAVE_CHECK, test x$HAVE_CHECK = xyes)
  
- AC_CONFIG_HEADERS([src/config.h])
+ XSLTPROC=no

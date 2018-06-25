@@ -15,8 +15,7 @@ import shutil
 
 import oe.path
 from oeqa.buildperf import BuildPerfTestCase
-from oeqa.utils.commands import get_bb_vars
-
+from oeqa.utils.commands import get_bb_var, get_bb_vars
 
 class Test1P1(BuildPerfTestCase):
     build_target = 'core-image-sato'
@@ -30,6 +29,7 @@ class Test1P1(BuildPerfTestCase):
         self.measure_cmd_resources(['bitbake', self.build_target], 'build',
                                    'bitbake ' + self.build_target, save_bs=True)
         self.measure_disk_usage(self.bb_vars['TMPDIR'], 'tmpdir', 'tmpdir')
+        self.measure_disk_usage(get_bb_var("IMAGE_ROOTFS", self.build_target), 'rootfs', 'rootfs', True)
 
 
 class Test1P2(BuildPerfTestCase):

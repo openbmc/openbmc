@@ -1,7 +1,7 @@
-From 15fb270f438f4ef1413192b5ce1e0dc784b45d9e Mon Sep 17 00:00:00 2001
+From 5608ec8002be8370e78c9dbb1e07cee4cfb18b58 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH 02/15] wayland: Add support for the Wayland winsys
+Subject: [PATCH 02/16] wayland: Add support for the Wayland winsys
 
 * Adds EGL_WL_bind_wayland_display extension
 * Adds wayland-egl library
@@ -57,20 +57,20 @@ vc_vchi_dispmanx.h
  create mode 100644 interface/wayland/dispmanx.xml
  create mode 100644 makefiles/cmake/Wayland.cmake
 
-diff --git a/.gitignore b/.gitignore
-index 63570f1..1459436 100644
---- a/.gitignore
-+++ b/.gitignore
+Index: git/.gitignore
+===================================================================
+--- git.orig/.gitignore
++++ git/.gitignore
 @@ -30,3 +30,4 @@ build/
  *.pts
  *.ppm
  *.mkv
 +*~
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index cfc8ae5..673a5ad 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -24,6 +24,17 @@ include(makefiles/cmake/global_settings.cmake)
+Index: git/CMakeLists.txt
+===================================================================
+--- git.orig/CMakeLists.txt
++++ git/CMakeLists.txt
+@@ -24,6 +24,17 @@ include(makefiles/cmake/global_settings.
  include(makefiles/cmake/arm-linux.cmake)
  include(makefiles/cmake/vmcs.cmake)
  
@@ -88,22 +88,22 @@ index cfc8ae5..673a5ad 100644
  enable_language(ASM)
  
  # Global include paths
-diff --git a/README.md b/README.md
-index 358d2b4..4da4448 100644
---- a/README.md
-+++ b/README.md
-@@ -4,3 +4,7 @@ EGL, mmal, GLESv2, vcos, openmaxil, vchiq_arm, bcm_host, WFC, OpenVG.
- 
- Use buildme to build. It requires cmake to be installed and an arm cross compiler. It is set up to use this one:
+Index: git/README.md
+===================================================================
+--- git.orig/README.md
++++ git/README.md
+@@ -6,3 +6,7 @@ Use buildme to build. It requires cmake
  https://github.com/raspberrypi/tools/tree/master/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian
+ 
+ Note that this repository does not contain the source for the edid_parser and vcdbg binaries due to licensing restrictions.
 +
 +To build support for the Wayland winsys in EGL, execute the buildme script like this:
 +
 +$ BUILD_WAYLAND=1 ./buildme.
-diff --git a/buildme b/buildme
-index b8fd440..a780bb6 100755
---- a/buildme
-+++ b/buildme
+Index: git/buildme
+===================================================================
+--- git.orig/buildme
++++ git/buildme
 @@ -8,6 +8,10 @@ fi
  
  BUILDSUBDIR=`echo $BUILDTYPE | tr '[A-Z]' '[a-z]'`;
@@ -130,11 +130,11 @@ index b8fd440..a780bb6 100755
  	make -j `nproc`
  
  	if [ "$1" != "" ]; then
-diff --git a/host_applications/linux/apps/raspicam/CMakeLists.txt b/host_applications/linux/apps/raspicam/CMakeLists.txt
-index e6aa6b8..69059cb 100644
---- a/host_applications/linux/apps/raspicam/CMakeLists.txt
-+++ b/host_applications/linux/apps/raspicam/CMakeLists.txt
-@@ -28,7 +28,7 @@ add_executable(raspividyuv  ${COMMON_SOURCES} RaspiVidYUV.c)
+Index: git/host_applications/linux/apps/raspicam/CMakeLists.txt
+===================================================================
+--- git.orig/host_applications/linux/apps/raspicam/CMakeLists.txt
++++ git/host_applications/linux/apps/raspicam/CMakeLists.txt
+@@ -28,7 +28,7 @@ add_executable(raspividyuv  ${COMMON_SOU
  
  set (MMAL_LIBS mmal_core mmal_util mmal_vc_client)
  
@@ -143,10 +143,10 @@ index e6aa6b8..69059cb 100644
  target_link_libraries(raspiyuv   ${MMAL_LIBS} vcos bcm_host)
  target_link_libraries(raspivid   ${MMAL_LIBS} vcos bcm_host)
  target_link_libraries(raspividyuv   ${MMAL_LIBS} vcos bcm_host)
-diff --git a/interface/khronos/CMakeLists.txt b/interface/khronos/CMakeLists.txt
-index 9ad615b..3d3571a 100644
---- a/interface/khronos/CMakeLists.txt
-+++ b/interface/khronos/CMakeLists.txt
+Index: git/interface/khronos/CMakeLists.txt
+===================================================================
+--- git.orig/interface/khronos/CMakeLists.txt
++++ git/interface/khronos/CMakeLists.txt
 @@ -6,6 +6,12 @@
  # have quite a few circular dependencies, and so the only way
  # to make it work seems to be to have everything static.
@@ -160,7 +160,7 @@ index 9ad615b..3d3571a 100644
  set(EGL_SOURCE
     egl/egl_client_config.c
     egl/egl_client_context.c
-@@ -55,12 +61,56 @@ set(CLIENT_SOURCE
+@@ -55,12 +61,55 @@ set(CLIENT_SOURCE
     common/khrn_int_hash_asm.s
     common/khrn_client_cache.c)
  
@@ -168,8 +168,7 @@ index 9ad615b..3d3571a 100644
 +   khrn_client
 +   vchiq_arm
 +   vcos
-+   bcm_host
-+   -lm)
++   bcm_host)
 +
 +if (BUILD_WAYLAND)
 +   set(EGL_SOURCE
@@ -217,21 +216,30 @@ index 9ad615b..3d3571a 100644
  # TODO do we need EGL_static and GLESv2_static now that khrn_static exists?
  add_library(EGL_static STATIC ${EGL_SOURCE})
  add_library(GLESv2_static STATIC ${GLES_SOURCE})
-@@ -72,8 +122,7 @@ include_directories (../../host_applications/linux/libs/sm )
+@@ -72,8 +121,7 @@ include_directories (../../host_applicat
  set(VCSM_LIBS vcsm)
  add_definitions(-DKHRONOS_HAVE_VCSM)
  endif()
 -
 -target_link_libraries(EGL khrn_client vchiq_arm vcos bcm_host ${VCSM_LIBS} -lm)
-+target_link_libraries(EGL ${EGL_LIBS} ${VCSM_LIBS})
++target_link_libraries(EGL ${EGL_LIBS} ${VCSM_LIBS} -lm)
  target_link_libraries(GLESv2 EGL khrn_client vcos)
  target_link_libraries(WFC EGL)
  target_link_libraries(OpenVG EGL)
-diff --git a/interface/khronos/common/khrn_client.c b/interface/khronos/common/khrn_client.c
-index ef4babd..d7e798e 100644
---- a/interface/khronos/common/khrn_client.c
-+++ b/interface/khronos/common/khrn_client.c
-@@ -54,6 +54,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@@ -87,7 +135,7 @@ add_library(brcmGLESv2 ${SHARED} ${GLES_
+ add_library(brcmOpenVG ${SHARED} ${VG_SOURCE})
+ add_library(brcmWFC ${SHARED} ${WFC_SOURCE})
+ 
+-target_link_libraries(brcmEGL khrn_client vchiq_arm vcos bcm_host ${VCSM_LIBS} -lm)
++target_link_libraries(brcmEGL ${EGL_LIBS} ${VCSM_LIBS} -lm)
+ target_link_libraries(brcmGLESv2 brcmEGL khrn_client vcos)
+ target_link_libraries(brcmWFC brcmEGL)
+ target_link_libraries(brcmOpenVG brcmEGL)
+Index: git/interface/khronos/common/khrn_client.c
+===================================================================
+--- git.orig/interface/khronos/common/khrn_client.c
++++ git/interface/khronos/common/khrn_client.c
+@@ -54,6 +54,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBI
  #include "applications/vmcs/khronos/khronos_server.h"
  #endif
  
@@ -242,7 +250,7 @@ index ef4babd..d7e798e 100644
  VCOS_LOG_CAT_T khrn_client_log = VCOS_LOG_INIT("khrn_client", VCOS_LOG_WARN);
  
  /*
-@@ -142,6 +146,10 @@ void client_try_unload_server(CLIENT_PROCESS_STATE_T *process)
+@@ -142,6 +146,10 @@ void client_try_unload_server(CLIENT_PRO
  bool client_process_state_init(CLIENT_PROCESS_STATE_T *process)
  {
     if (!process->inited) {
@@ -253,7 +261,7 @@ index ef4babd..d7e798e 100644
        if (!khrn_pointer_map_init(&process->contexts, 64))
           return false;
  
-@@ -194,6 +202,13 @@ bool client_process_state_init(CLIENT_PROCESS_STATE_T *process)
+@@ -194,6 +202,13 @@ bool client_process_state_init(CLIENT_PR
        }
  #endif
  
@@ -267,10 +275,10 @@ index ef4babd..d7e798e 100644
        process->inited = true;
     }
  
-diff --git a/interface/khronos/common/khrn_client.h b/interface/khronos/common/khrn_client.h
-index 804039b..615f7b4 100644
---- a/interface/khronos/common/khrn_client.h
-+++ b/interface/khronos/common/khrn_client.h
+Index: git/interface/khronos/common/khrn_client.h
+===================================================================
+--- git.orig/interface/khronos/common/khrn_client.h
++++ git/interface/khronos/common/khrn_client.h
 @@ -310,6 +310,16 @@ struct CLIENT_PROCESS_STATE {
  #ifdef RPC_LIBRARY
     KHRONOS_SERVER_CONNECTION_T khrn_connection;
@@ -288,11 +296,11 @@ index 804039b..615f7b4 100644
  };
  
  extern bool client_process_state_init(CLIENT_PROCESS_STATE_T *process);
-diff --git a/interface/khronos/common/khrn_client_mangle.h b/interface/khronos/common/khrn_client_mangle.h
-index b3c04f4..b7b21c5 100644
---- a/interface/khronos/common/khrn_client_mangle.h
-+++ b/interface/khronos/common/khrn_client_mangle.h
-@@ -83,6 +83,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Index: git/interface/khronos/common/khrn_client_mangle.h
+===================================================================
+--- git.orig/interface/khronos/common/khrn_client_mangle.h
++++ git/interface/khronos/common/khrn_client_mangle.h
+@@ -83,6 +83,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBI
  #define eglReleaseGlobalImageBRCM mangled_eglReleaseGlobalImageBRCM
  #define eglInitGlobalImageBRCM mangled_eglInitGlobalImageBRCM
  #define eglTermGlobalImageBRCM mangled_eglTermGlobalImageBRCM
@@ -302,11 +310,11 @@ index b3c04f4..b7b21c5 100644
  
  /* OpenGL ES 1.1 and 2.0 functions */
  
-diff --git a/interface/khronos/common/khrn_client_platform.h b/interface/khronos/common/khrn_client_platform.h
-index 1c9da3a..715c67e 100644
---- a/interface/khronos/common/khrn_client_platform.h
-+++ b/interface/khronos/common/khrn_client_platform.h
-@@ -48,6 +48,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Index: git/interface/khronos/common/khrn_client_platform.h
+===================================================================
+--- git.orig/interface/khronos/common/khrn_client_platform.h
++++ git/interface/khronos/common/khrn_client_platform.h
+@@ -48,6 +48,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBI
  #include "interface/khronos/common/vcos/khrn_client_platform_filler_vcos.h"
  #endif
  
@@ -326,11 +334,11 @@ index 1c9da3a..715c67e 100644
 +#endif
 +
  #endif // KHRN_CLIENT_PLATFORM_H
-diff --git a/interface/khronos/common/khrn_client_unmangle.h b/interface/khronos/common/khrn_client_unmangle.h
-index 4f3ce49..84f6ec0 100644
---- a/interface/khronos/common/khrn_client_unmangle.h
-+++ b/interface/khronos/common/khrn_client_unmangle.h
-@@ -83,6 +83,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Index: git/interface/khronos/common/khrn_client_unmangle.h
+===================================================================
+--- git.orig/interface/khronos/common/khrn_client_unmangle.h
++++ git/interface/khronos/common/khrn_client_unmangle.h
+@@ -83,6 +83,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBI
  #undef eglReleaseGlobalImageBRCM
  #undef eglInitGlobalImageBRCM
  #undef eglTermGlobalImageBRCM
@@ -340,11 +348,11 @@ index 4f3ce49..84f6ec0 100644
  
  /* OpenGL ES 1.1 and 2.0 functions */
  
-diff --git a/interface/khronos/common/linux/khrn_client_platform_linux.c b/interface/khronos/common/linux/khrn_client_platform_linux.c
-index 710d20f..50d60a6 100644
---- a/interface/khronos/common/linux/khrn_client_platform_linux.c
-+++ b/interface/khronos/common/linux/khrn_client_platform_linux.c
-@@ -37,6 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Index: git/interface/khronos/common/linux/khrn_client_platform_linux.c
+===================================================================
+--- git.orig/interface/khronos/common/linux/khrn_client_platform_linux.c
++++ git/interface/khronos/common/linux/khrn_client_platform_linux.c
+@@ -37,6 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBI
  #include "X11/Xlib.h"
  #endif
  
@@ -356,7 +364,7 @@ index 710d20f..50d60a6 100644
  extern VCOS_LOG_CAT_T khrn_client_log;
  
  extern void vc_vchi_khronos_init();
-@@ -464,13 +469,36 @@ EGLDisplay khrn_platform_set_display_id(EGLNativeDisplayType display_id)
+@@ -464,14 +469,37 @@ EGLDisplay khrn_platform_set_display_id(
  	   return EGL_NO_DISPLAY;
  }
  #else
@@ -384,18 +392,19 @@ index 710d20f..50d60a6 100644
 +#endif
 +         return EGL_NO_DISPLAY;
 +   }
- }
++}
 +
 +#ifdef BUILD_WAYLAND
 +struct wl_display *khrn_platform_get_wl_display()
 +{
 +   return hacky_display;
-+}
-+#endif
+ }
  #endif
++#endif
  
  #ifdef WANT_X
-@@ -805,22 +833,81 @@ static EGL_DISPMANX_WINDOW_T *check_default(EGLNativeWindowType win)
+ static void dump_hierarchy(Window w, Window thisw, Window look, int level)
+@@ -805,22 +833,81 @@ static EGL_DISPMANX_WINDOW_T *check_defa
  void platform_get_dimensions(EGLDisplay dpy, EGLNativeWindowType win,
        uint32_t *width, uint32_t *height, uint32_t *swapchain_count)
  {
@@ -426,8 +435,8 @@ index 710d20f..50d60a6 100644
 +#ifdef BUILD_WAYLAND
 +   }
 +#endif
- }
- 
++}
++
 +#ifdef BUILD_WAYLAND
 +static DISPMANX_ELEMENT_HANDLE_T create_dummy_element()
 +{
@@ -458,9 +467,9 @@ index 710d20f..50d60a6 100644
 +   vc_dispmanx_display_close(display);
 +
 +   return element;
-+}
+ }
 +#endif
-+
+ 
  uint32_t platform_get_handle(EGLDisplay dpy, EGLNativeWindowType win)
  {
 -   EGL_DISPMANX_WINDOW_T *dwin = check_default(win);
@@ -489,11 +498,10 @@ index 710d20f..50d60a6 100644
  }
  
  #endif
-diff --git a/interface/khronos/common/linux/khrn_wayland.c b/interface/khronos/common/linux/khrn_wayland.c
-new file mode 100644
-index 0000000..0e1b9e7
+Index: git/interface/khronos/common/linux/khrn_wayland.c
+===================================================================
 --- /dev/null
-+++ b/interface/khronos/common/linux/khrn_wayland.c
++++ git/interface/khronos/common/linux/khrn_wayland.c
 @@ -0,0 +1,215 @@
 +/*
 +Copyright (c) 2013, Raspberry Pi Foundation
@@ -710,74 +718,72 @@ index 0000000..0e1b9e7
 +
 +   return wl_dispmanx_client_buffer;
 +}
-diff --git a/interface/vmcs_host/vc_vchi_dispmanx.h b/interface/khronos/common/linux/khrn_wayland.h
-similarity index 56%
-copy from interface/vmcs_host/vc_vchi_dispmanx.h
-copy to interface/khronos/common/linux/khrn_wayland.h
-index b723b76..b9bf08c 100644
---- a/interface/vmcs_host/vc_vchi_dispmanx.h
-+++ b/interface/khronos/common/linux/khrn_wayland.h
-@@ -1,5 +1,5 @@
- /*
--Copyright (c) 2012, Broadcom Europe Ltd
+Index: git/interface/vmcs_host/vc_vchi_dispmanx.h
+===================================================================
+--- git.orig/interface/vmcs_host/vc_vchi_dispmanx.h
++++ git/interface/vmcs_host/vc_vchi_dispmanx.h
+@@ -66,4 +66,19 @@ typedef struct {
+ #define ELEMENT_CHANGE_MASK_RESOURCE  (1<<4)
+ #define ELEMENT_CHANGE_TRANSFORM      (1<<5)
+ 
++#ifdef BUILD_WAYLAND
++/* XXX: This should be in a private header that can be included from EGL and vc_* */
++#include <wayland-server.h>
++#include "interface/vmcs_host/wayland-dispmanx-server-protocol.h"
++struct wl_dispmanx_server_buffer {
++	struct wl_resource *resource;
++	struct wl_dispmanx *dispmanx;
++	enum wl_dispmanx_format format;
++	DISPMANX_RESOURCE_HANDLE_T handle;
++	int32_t width;
++	int32_t height;
++	int in_use;
++};
++#endif
++
+ #endif
+Index: git/interface/khronos/common/linux/khrn_wayland.h
+===================================================================
+--- /dev/null
++++ git/interface/khronos/common/linux/khrn_wayland.h
+@@ -0,0 +1,33 @@
++/*
 +Copyright (c) 2013, Raspberry Pi Foundation
- All rights reserved.
- 
- Redistribution and use in source and binary forms, with or without
-@@ -25,45 +25,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
- 
--#ifndef VC_VCHI_DISPMANX_H
--#define VC_VCHI_DISPMANX_H
++All rights reserved.
++
++Redistribution and use in source and binary forms, with or without
++modification, are permitted provided that the following conditions are met:
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above copyright
++      notice, this list of conditions and the following disclaimer in the
++      documentation and/or other materials provided with the distribution.
++    * Neither the name of the copyright holder nor the
++      names of its contributors may be used to endorse or promote products
++      derived from this software without specific prior written permission.
++
++THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
++DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++
 +#include "interface/khronos/common/khrn_client.h"
- 
--#include "interface/peer/vc_vchi_dispmanx_common.h"
++
 +int init_process_wayland(CLIENT_PROCESS_STATE_T *process);
 +int do_wl_roundtrip();
- 
--#define VC_NUM_HOST_RESOURCES 64
--#define DISPMANX_MSGFIFO_SIZE 1024
--#define DISPMANX_CLIENT_NAME MAKE_FOURCC("DISP")
--#define DISPMANX_NOTIFY_NAME MAKE_FOURCC("UPDH")
--
--//Or with command to indicate we don't need a response
--#define DISPMANX_NO_REPLY_MASK (1<<31)
--
--typedef struct {
--   char     description[32];
--   uint32_t width;
--   uint32_t height;
--   uint32_t aspect_pixwidth;
--   uint32_t aspect_pixheight;
--   uint32_t fieldrate_num;
--   uint32_t fieldrate_denom;
--   uint32_t fields_per_frame;
--   uint32_t transform;        
--} GET_MODES_DATA_T;
--
--typedef struct {
--   int32_t  response;
--   uint32_t width;
--   uint32_t height;
--   uint32_t transform;
--   uint32_t input_format;
--} GET_INFO_DATA_T;
--
--//Attributes changes flag mask
--#define ELEMENT_CHANGE_LAYER          (1<<0)
--#define ELEMENT_CHANGE_OPACITY        (1<<1)
--#define ELEMENT_CHANGE_DEST_RECT      (1<<2)
--#define ELEMENT_CHANGE_SRC_RECT       (1<<3)
--#define ELEMENT_CHANGE_MASK_RESOURCE  (1<<4)
--#define ELEMENT_CHANGE_TRANSFORM      (1<<5)
--
--#endif
++
 +struct wl_dispmanx_client_buffer *allocate_wl_buffer(struct wl_egl_window *window, KHRN_IMAGE_FORMAT_T color);
-diff --git a/interface/khronos/egl/egl_client.c b/interface/khronos/egl/egl_client.c
-index b8bb374..03fe67b 100644
---- a/interface/khronos/egl/egl_client.c
-+++ b/interface/khronos/egl/egl_client.c
+Index: git/interface/khronos/egl/egl_client.c
+===================================================================
+--- git.orig/interface/khronos/egl/egl_client.c
++++ git/interface/khronos/egl/egl_client.c
 @@ -153,6 +153,10 @@ by an attribute value"
  #include <stdlib.h>
  #include <string.h>
@@ -789,7 +795,7 @@ index b8bb374..03fe67b 100644
  
  #include "interface/khronos/egl/egl_client_cr.c"
  
-@@ -162,17 +166,6 @@ static void egl_current_release(CLIENT_PROCESS_STATE_T *process, EGL_CURRENT_T *
+@@ -162,17 +166,6 @@ static void egl_current_release(CLIENT_P
  void egl_gl_flush_callback(bool wait);
  void egl_vg_flush_callback(bool wait);
  
@@ -807,17 +813,17 @@ index b8bb374..03fe67b 100644
  /*
  TODO: do an RPC call to make sure the Khronos vll is loaded (and that it stays loaded until eglTerminate)
  Also affects global image (and possibly others?)
-@@ -450,6 +443,9 @@ EGLAPI const char EGLAPIENTRY * eglQueryString(EGLDisplay dpy, EGLint name)
- #ifdef EGL_KHR_fence_sync
+@@ -451,6 +444,9 @@ EGLAPI const char EGLAPIENTRY * eglQuery
              "EGL_KHR_fence_sync "
  #endif
-+#endif
+ #endif
 +#if EGL_WL_bind_wayland_display
 +            "EGL_WL_bind_wayland_display "
- #endif
++#endif
              ;
           break;
-@@ -655,8 +651,7 @@ EGLAPI EGLSurface EGLAPIENTRY eglCreateWindowSurface(EGLDisplay dpy, EGLConfig c
+       case EGL_VENDOR:
+@@ -655,8 +651,7 @@ EGLAPI EGLSurface EGLAPIENTRY eglCreateW
                                  false,
                                  EGL_NO_TEXTURE,
                                  EGL_NO_TEXTURE,
@@ -827,7 +833,7 @@ index b8bb374..03fe67b 100644
  
                 if (surface) {
                    if (khrn_pointer_map_insert(&process->surfaces, process->next_surface, surface)) {
-@@ -901,7 +896,7 @@ EGLAPI EGLSurface EGLAPIENTRY eglCreatePbufferSurface(EGLDisplay dpy, EGLConfig
+@@ -901,7 +896,7 @@ EGLAPI EGLSurface EGLAPIENTRY eglCreateP
                               mipmap_texture,
                               texture_format,
                               texture_target,
@@ -836,7 +842,7 @@ index b8bb374..03fe67b 100644
  
              if (surface) {
                 if (khrn_pointer_map_insert(&process->surfaces, process->next_surface, surface)) {
-@@ -1043,7 +1038,7 @@ EGLAPI EGLSurface EGLAPIENTRY eglCreatePixmapSurface(EGLDisplay dpy, EGLConfig c
+@@ -1043,7 +1038,7 @@ EGLAPI EGLSurface EGLAPIENTRY eglCreateP
                                     false,
                                     EGL_NO_TEXTURE,
                                     EGL_NO_TEXTURE,
@@ -845,7 +851,7 @@ index b8bb374..03fe67b 100644
  
                       if (surface) {
                          if (khrn_pointer_map_insert(&process->surfaces, process->next_surface, surface)) {
-@@ -2245,6 +2240,9 @@ EGLAPI EGLBoolean EGLAPIENTRY eglSwapBuffers(EGLDisplay dpy, EGLSurface surf)
+@@ -2245,6 +2240,9 @@ EGLAPI EGLBoolean EGLAPIENTRY eglSwapBuf
     CLIENT_THREAD_STATE_T *thread;
     CLIENT_PROCESS_STATE_T *process;
     EGLBoolean result;
@@ -855,7 +861,7 @@ index b8bb374..03fe67b 100644
  
     vcos_log_trace("eglSwapBuffers start. dpy=%d. surf=%d.", (int)dpy, (int)surf);
  
-@@ -2315,18 +2313,58 @@ EGLAPI EGLBoolean EGLAPIENTRY eglSwapBuffers(EGLDisplay dpy, EGLSurface surf)
+@@ -2315,18 +2313,58 @@ EGLAPI EGLBoolean EGLAPIENTRY eglSwapBuf
  
                 vcos_log_trace("eglSwapBuffers server call");
  
@@ -926,11 +932,11 @@ index b8bb374..03fe67b 100644
                 RPC_CALL6(eglIntSwapBuffers_impl,
                       thread,
                       EGLINTSWAPBUFFERS_ID,
-diff --git a/interface/khronos/egl/egl_client_get_proc.c b/interface/khronos/egl/egl_client_get_proc.c
-index 4cfa9ff..6a715af 100644
---- a/interface/khronos/egl/egl_client_get_proc.c
-+++ b/interface/khronos/egl/egl_client_get_proc.c
-@@ -254,6 +254,17 @@ EGLAPI void EGLAPIENTRY (* eglGetProcAddress(const char *procname))(void)
+Index: git/interface/khronos/egl/egl_client_get_proc.c
+===================================================================
+--- git.orig/interface/khronos/egl/egl_client_get_proc.c
++++ git/interface/khronos/egl/egl_client_get_proc.c
+@@ -254,6 +254,17 @@ EGLAPI void EGLAPIENTRY (* eglGetProcAdd
        return (void(*)(void))eglQueryGlobalImageBRCM;
  #endif
  
@@ -948,11 +954,11 @@ index 4cfa9ff..6a715af 100644
     return (void(*)(void)) NULL;
  }
  
-diff --git a/interface/khronos/egl/egl_client_surface.c b/interface/khronos/egl/egl_client_surface.c
-index 128325e..42350bf 100644
---- a/interface/khronos/egl/egl_client_surface.c
-+++ b/interface/khronos/egl/egl_client_surface.c
-@@ -46,6 +46,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Index: git/interface/khronos/egl/egl_client_surface.c
+===================================================================
+--- git.orig/interface/khronos/egl/egl_client_surface.c
++++ git/interface/khronos/egl/egl_client_surface.c
+@@ -46,6 +46,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBI
  #include "interface/khronos/egl/egl_int_impl.h"
  #endif
  
@@ -1026,7 +1032,7 @@ index 128325e..42350bf 100644
           RPC_CALL15_OUT_CTRL(eglIntCreateSurface_impl,
                               thread,
                               EGLINTCREATESURFACE_ID,
-@@ -663,6 +685,18 @@ void egl_surface_free(EGL_SURFACE_T *surface)
+@@ -663,6 +685,18 @@ void egl_surface_free(EGL_SURFACE_T *sur
     if( surface->type == WINDOW ) {
        vcos_log_trace("egl_surface_free: calling platform_destroy_winhandle...");
        platform_destroy_winhandle( surface->win, surface->internal_handle );
@@ -1045,10 +1051,10 @@ index 128325e..42350bf 100644
     }
     /* return value ignored -- read performed to ensure blocking. we want this to
      * block so clients can safely destroy the surface's window as soon as the
-diff --git a/interface/khronos/egl/egl_client_surface.h b/interface/khronos/egl/egl_client_surface.h
-index b5bf70a..e328b77 100644
---- a/interface/khronos/egl/egl_client_surface.h
-+++ b/interface/khronos/egl/egl_client_surface.h
+Index: git/interface/khronos/egl/egl_client_surface.h
+===================================================================
+--- git.orig/interface/khronos/egl/egl_client_surface.h
++++ git/interface/khronos/egl/egl_client_surface.h
 @@ -288,6 +288,41 @@ typedef struct {
        type == PIXMAP
     */
@@ -1091,7 +1097,7 @@ index b5bf70a..e328b77 100644
  } EGL_SURFACE_T;
  
  extern bool egl_surface_check_attribs(
-@@ -322,8 +357,7 @@ extern EGL_SURFACE_T *egl_surface_create(
+@@ -322,8 +357,7 @@ extern EGL_SURFACE_T *egl_surface_create
     EGLenum texture_format,
     EGLenum texture_target,
     EGLNativePixmapType pixmap,
@@ -1101,10 +1107,10 @@ index b5bf70a..e328b77 100644
  extern EGL_SURFACE_T *egl_surface_from_vg_image(
     VGImage vg_handle,
     EGLSurface name,
-diff --git a/interface/khronos/egl/egl_int_impl.h b/interface/khronos/egl/egl_int_impl.h
-index 51b3580..6863a3b 100644
---- a/interface/khronos/egl/egl_int_impl.h
-+++ b/interface/khronos/egl/egl_int_impl.h
+Index: git/interface/khronos/egl/egl_int_impl.h
+===================================================================
+--- git.orig/interface/khronos/egl/egl_int_impl.h
++++ git/interface/khronos/egl/egl_int_impl.h
 @@ -57,7 +57,7 @@ FN(int, eglIntCreateSurface_impl, (
     uint32_t sem,
     uint32_t type,
@@ -1114,11 +1120,10 @@ index 51b3580..6863a3b 100644
  
  FN(int, eglIntCreatePbufferFromVGImage_impl, (
     VGImage vg_handle,
-diff --git a/interface/khronos/ext/egl_wayland.c b/interface/khronos/ext/egl_wayland.c
-new file mode 100644
-index 0000000..5730743
+Index: git/interface/khronos/ext/egl_wayland.c
+===================================================================
 --- /dev/null
-+++ b/interface/khronos/ext/egl_wayland.c
++++ git/interface/khronos/ext/egl_wayland.c
 @@ -0,0 +1,246 @@
 +/*
 +Copyright (c) 2013, Raspberry Pi Foundation
@@ -1366,11 +1371,11 @@ index 0000000..5730743
 +
 +   return EGL_FALSE;
 +}
-diff --git a/interface/khronos/include/EGL/eglext.h b/interface/khronos/include/EGL/eglext.h
-index 89a3369..d7e5ba7 100755
---- a/interface/khronos/include/EGL/eglext.h
-+++ b/interface/khronos/include/EGL/eglext.h
-@@ -191,6 +191,29 @@ typedef EGLBoolean (EGLAPIENTRYP PFNEGLGETSYNCATTRIBKHRPROC) (EGLDisplay dpy, EG
+Index: git/interface/khronos/include/EGL/eglext.h
+===================================================================
+--- git.orig/interface/khronos/include/EGL/eglext.h
++++ git/interface/khronos/include/EGL/eglext.h
+@@ -191,6 +191,29 @@ typedef EGLBoolean (EGLAPIENTRYP PFNEGLG
  #endif
  
  
@@ -1400,11 +1405,10 @@ index 89a3369..d7e5ba7 100755
  #ifdef __cplusplus
  }
  #endif
-diff --git a/interface/khronos/wayland-egl/wayland-egl-priv.h b/interface/khronos/wayland-egl/wayland-egl-priv.h
-new file mode 100644
-index 0000000..8e38d36
+Index: git/interface/khronos/wayland-egl/wayland-egl-priv.h
+===================================================================
 --- /dev/null
-+++ b/interface/khronos/wayland-egl/wayland-egl-priv.h
++++ git/interface/khronos/wayland-egl/wayland-egl-priv.h
 @@ -0,0 +1,53 @@
 +/* Copied from Mesa */
 +
@@ -1459,11 +1463,10 @@ index 0000000..8e38d36
 +#endif
 +
 +#endif
-diff --git a/interface/khronos/wayland-egl/wayland-egl.c b/interface/khronos/wayland-egl/wayland-egl.c
-new file mode 100644
-index 0000000..b8f050b
+Index: git/interface/khronos/wayland-egl/wayland-egl.c
+===================================================================
 --- /dev/null
-+++ b/interface/khronos/wayland-egl/wayland-egl.c
++++ git/interface/khronos/wayland-egl/wayland-egl.c
 @@ -0,0 +1,59 @@
 +/* Copied from Mesa */
 +
@@ -1524,11 +1527,10 @@ index 0000000..b8f050b
 +	if (height)
 +		*height = egl_window->attached_height;
 +}
-diff --git a/interface/khronos/wayland-egl/wayland-egl.pc.in b/interface/khronos/wayland-egl/wayland-egl.pc.in
-new file mode 100644
-index 0000000..8bafc15
+Index: git/interface/khronos/wayland-egl/wayland-egl.pc.in
+===================================================================
 --- /dev/null
-+++ b/interface/khronos/wayland-egl/wayland-egl.pc.in
++++ git/interface/khronos/wayland-egl/wayland-egl.pc.in
 @@ -0,0 +1,10 @@
 +prefix=@CMAKE_INSTALL_PREFIX@
 +exec_prefix=${prefix}
@@ -1540,10 +1542,10 @@ index 0000000..8bafc15
 +Version: @PROJECT_APIVER@
 +Libs: -L${libdir} -lwayland-egl
 +Cflags: -I${includedir}
-diff --git a/interface/vmcs_host/CMakeLists.txt b/interface/vmcs_host/CMakeLists.txt
-index fde18da..6718215 100755
---- a/interface/vmcs_host/CMakeLists.txt
-+++ b/interface/vmcs_host/CMakeLists.txt
+Index: git/interface/vmcs_host/CMakeLists.txt
+===================================================================
+--- git.orig/interface/vmcs_host/CMakeLists.txt
++++ git/interface/vmcs_host/CMakeLists.txt
 @@ -9,13 +9,24 @@ add_definitions(-fno-strict-aliasing)
  
  include_directories(${VMCS_TARGET}/vcfiled)
@@ -1574,11 +1576,11 @@ index fde18da..6718215 100755
  #add_library(bufman            vc_vchi_bufman.c            )
  
  # OpenMAX/IL component service
-diff --git a/interface/vmcs_host/vc_dispmanx.h b/interface/vmcs_host/vc_dispmanx.h
-index 37fdae1..fe3619a 100755
---- a/interface/vmcs_host/vc_dispmanx.h
-+++ b/interface/vmcs_host/vc_dispmanx.h
-@@ -39,6 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Index: git/interface/vmcs_host/vc_dispmanx.h
+===================================================================
+--- git.orig/interface/vmcs_host/vc_dispmanx.h
++++ git/interface/vmcs_host/vc_dispmanx.h
+@@ -39,6 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBI
  #ifdef __cplusplus
  extern "C" {
  #endif
@@ -1590,7 +1592,7 @@ index 37fdae1..fe3619a 100755
  // Same function as above, to aid migration of code.
  VCHPRE_ int VCHPOST_ vc_dispman_init( void );
  // Stop the service from being used
-@@ -135,6 +140,11 @@ VCHPRE_ int VCHPOST_ vc_dispmanx_resource_set_palette( DISPMANX_RESOURCE_HANDLE_
+@@ -135,6 +140,11 @@ VCHPRE_ int VCHPOST_ vc_dispmanx_resourc
  // Start triggering callbacks synced to vsync
  VCHPRE_ int VCHPOST_ vc_dispmanx_vsync_callback( DISPMANX_DISPLAY_HANDLE_T display, DISPMANX_CALLBACK_FUNC_T cb_func, void *cb_arg );
  
@@ -1602,11 +1604,11 @@ index 37fdae1..fe3619a 100755
  #ifdef __cplusplus
  }
  #endif
-diff --git a/interface/vmcs_host/vc_vchi_dispmanx.c b/interface/vmcs_host/vc_vchi_dispmanx.c
-index 7a6cdcd..eab146e 100755
---- a/interface/vmcs_host/vc_vchi_dispmanx.c
-+++ b/interface/vmcs_host/vc_vchi_dispmanx.c
-@@ -1319,3 +1319,45 @@ static void *dispmanx_notify_func( void *arg ) {
+Index: git/interface/vmcs_host/vc_vchi_dispmanx.c
+===================================================================
+--- git.orig/interface/vmcs_host/vc_vchi_dispmanx.c
++++ git/interface/vmcs_host/vc_vchi_dispmanx.c
+@@ -1319,3 +1319,45 @@ static void *dispmanx_notify_func( void
     }
     return 0;
  }
@@ -1652,35 +1654,10 @@ index 7a6cdcd..eab146e 100755
 +	buffer->in_use = in_use;
 +}
 +#endif
-diff --git a/interface/vmcs_host/vc_vchi_dispmanx.h b/interface/vmcs_host/vc_vchi_dispmanx.h
-index b723b76..f0bae30 100644
---- a/interface/vmcs_host/vc_vchi_dispmanx.h
-+++ b/interface/vmcs_host/vc_vchi_dispmanx.h
-@@ -66,4 +66,19 @@ typedef struct {
- #define ELEMENT_CHANGE_MASK_RESOURCE  (1<<4)
- #define ELEMENT_CHANGE_TRANSFORM      (1<<5)
- 
-+#ifdef BUILD_WAYLAND
-+/* XXX: This should be in a private header that can be included from EGL and vc_* */
-+#include <wayland-server.h>
-+#include "interface/vmcs_host/wayland-dispmanx-server-protocol.h"
-+struct wl_dispmanx_server_buffer {
-+	struct wl_resource *resource;
-+	struct wl_dispmanx *dispmanx;
-+	enum wl_dispmanx_format format;
-+	DISPMANX_RESOURCE_HANDLE_T handle;
-+	int32_t width;
-+	int32_t height;
-+	int in_use;
-+};
-+#endif
-+
- #endif
-diff --git a/interface/wayland/dispmanx.xml b/interface/wayland/dispmanx.xml
-new file mode 100644
-index 0000000..c18626d
+Index: git/interface/wayland/dispmanx.xml
+===================================================================
 --- /dev/null
-+++ b/interface/wayland/dispmanx.xml
++++ git/interface/wayland/dispmanx.xml
 @@ -0,0 +1,123 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<protocol name="dispmanx">
@@ -1805,11 +1782,10 @@ index 0000000..c18626d
 +  </interface>
 +
 +</protocol>
-diff --git a/makefiles/cmake/Wayland.cmake b/makefiles/cmake/Wayland.cmake
-new file mode 100644
-index 0000000..ad90d30
+Index: git/makefiles/cmake/Wayland.cmake
+===================================================================
 --- /dev/null
-+++ b/makefiles/cmake/Wayland.cmake
++++ git/makefiles/cmake/Wayland.cmake
 @@ -0,0 +1,72 @@
 +#=============================================================================
 +# Copyright (C) 2012-2013 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
@@ -1883,6 +1859,3 @@ index 0000000..ad90d30
 +    list(APPEND ${_sources} "${_server_header}")
 +    set(${_sources} ${${_sources}} PARENT_SCOPE)
 +endfunction()
--- 
-2.15.0
-

@@ -11,6 +11,8 @@ SRC_URI[sha256sum] = "0c1cab8dc9f2588bd3076a28f77a7f8de9560cbf2d80e53f9a8696ada8
 
 inherit autotools lib_package pkgconfig gettext
 
+CFLAGS += "-pthread -D_REENTRANT"
+
 EXTRA_OECONF += "--disable-static --with-gnutls=${STAGING_LIBDIR}/../"
 
 PACKAGECONFIG ?= "curl"

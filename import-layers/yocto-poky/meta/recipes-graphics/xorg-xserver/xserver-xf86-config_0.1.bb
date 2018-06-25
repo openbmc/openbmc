@@ -10,7 +10,6 @@ SRC_URI = "file://xorg.conf"
 S = "${WORKDIR}"
 
 CONFFILES_${PN} = "${sysconfdir}/X11/xorg.conf"
-CONFFILES_${PN}_append_libc-musl = " ${sysconfdir}/X11/xorg.conf.d/10-preload-modules.conf"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 ALLOW_EMPTY_${PN} = "1"

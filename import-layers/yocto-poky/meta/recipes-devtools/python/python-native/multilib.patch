@@ -12,10 +12,10 @@ Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 
-Index: Python-2.7.13/Include/pythonrun.h
+Index: Python-2.7.14/Include/pythonrun.h
 ===================================================================
---- Python-2.7.13.orig/Include/pythonrun.h
-+++ Python-2.7.13/Include/pythonrun.h
+--- Python-2.7.14.orig/Include/pythonrun.h
++++ Python-2.7.14/Include/pythonrun.h
 @@ -108,6 +108,7 @@ PyAPI_FUNC(char *) Py_GetPath(void);
  /* In their own files */
  PyAPI_FUNC(const char *) Py_GetVersion(void);
@@ -24,10 +24,10 @@ Index: Python-2.7.13/Include/pythonrun.h
  PyAPI_FUNC(const char *) Py_GetCopyright(void);
  PyAPI_FUNC(const char *) Py_GetCompiler(void);
  PyAPI_FUNC(const char *) Py_GetBuildInfo(void);
-Index: Python-2.7.13/Lib/distutils/command/install.py
+Index: Python-2.7.14/Lib/distutils/command/install.py
 ===================================================================
---- Python-2.7.13.orig/Lib/distutils/command/install.py
-+++ Python-2.7.13/Lib/distutils/command/install.py
+--- Python-2.7.14.orig/Lib/distutils/command/install.py
++++ Python-2.7.14/Lib/distutils/command/install.py
 @@ -22,6 +22,8 @@ from site import USER_BASE
  from site import USER_SITE
  
@@ -46,10 +46,10 @@ Index: Python-2.7.13/Lib/distutils/command/install.py
          'headers': '$base/include/python$py_version_short/$dist_name',
          'scripts': '$base/bin',
          'data'   : '$base',
-Index: Python-2.7.13/Lib/pydoc.py
+Index: Python-2.7.14/Lib/pydoc.py
 ===================================================================
---- Python-2.7.13.orig/Lib/pydoc.py
-+++ Python-2.7.13/Lib/pydoc.py
+--- Python-2.7.14.orig/Lib/pydoc.py
++++ Python-2.7.14/Lib/pydoc.py
 @@ -375,7 +375,7 @@ class Doc:
      docmodule = docclass = docroutine = docother = docproperty = docdata = fail
  
@@ -59,10 +59,10 @@ Index: Python-2.7.13/Lib/pydoc.py
                                         "python"+sys.version[0:3])):
          """Return the location of module docs or None"""
  
-Index: Python-2.7.13/Lib/site.py
+Index: Python-2.7.14/Lib/site.py
 ===================================================================
---- Python-2.7.13.orig/Lib/site.py
-+++ Python-2.7.13/Lib/site.py
+--- Python-2.7.14.orig/Lib/site.py
++++ Python-2.7.14/Lib/site.py
 @@ -288,13 +288,19 @@ def getsitepackages():
          if sys.platform in ('os2emx', 'riscos'):
              sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
@@ -86,10 +86,10 @@ Index: Python-2.7.13/Lib/site.py
      return sitepackages
  
  def addsitepackages(known_paths):
-Index: Python-2.7.13/Lib/test/test_dl.py
+Index: Python-2.7.14/Lib/test/test_dl.py
 ===================================================================
---- Python-2.7.13.orig/Lib/test/test_dl.py
-+++ Python-2.7.13/Lib/test/test_dl.py
+--- Python-2.7.14.orig/Lib/test/test_dl.py
++++ Python-2.7.14/Lib/test/test_dl.py
 @@ -4,10 +4,11 @@
  import unittest
  from test.test_support import verbose, import_module
@@ -104,10 +104,10 @@ Index: Python-2.7.13/Lib/test/test_dl.py
      ('/usr/bin/cygwin1.dll', 'getpid'),
      ('/usr/lib/libc.dylib', 'getpid'),
      ]
-Index: Python-2.7.13/Lib/trace.py
+Index: Python-2.7.14/Lib/trace.py
 ===================================================================
---- Python-2.7.13.orig/Lib/trace.py
-+++ Python-2.7.13/Lib/trace.py
+--- Python-2.7.14.orig/Lib/trace.py
++++ Python-2.7.14/Lib/trace.py
 @@ -754,10 +754,10 @@ def main(argv=None):
                  # should I also call expanduser? (after all, could use $HOME)
  
@@ -121,11 +121,11 @@ Index: Python-2.7.13/Lib/trace.py
                                             "python" + sys.version[:3]))
                  s = os.path.normpath(s)
                  ignore_dirs.append(s)
-Index: Python-2.7.13/Makefile.pre.in
+Index: Python-2.7.14/Makefile.pre.in
 ===================================================================
---- Python-2.7.13.orig/Makefile.pre.in
-+++ Python-2.7.13/Makefile.pre.in
-@@ -92,6 +92,7 @@ PY_CFLAGS=	$(CFLAGS) $(CPPFLAGS) $(CFLAG
+--- Python-2.7.14.orig/Makefile.pre.in
++++ Python-2.7.14/Makefile.pre.in
+@@ -91,6 +91,7 @@ PY_CFLAGS=	$(CFLAGS) $(CPPFLAGS) $(CFLAG
  
  # Machine-dependent subdirectories
  MACHDEP=	@MACHDEP@
@@ -133,7 +133,7 @@ Index: Python-2.7.13/Makefile.pre.in
  
  # Multiarch directory (may be empty)
  MULTIARCH=	@MULTIARCH@
-@@ -111,7 +112,7 @@ LIBDIR=		@libdir@
+@@ -110,7 +111,7 @@ LIBDIR=		@libdir@
  MANDIR=		@mandir@
  INCLUDEDIR=	@includedir@
  CONFINCLUDEDIR=	$(exec_prefix)/include
@@ -142,7 +142,7 @@ Index: Python-2.7.13/Makefile.pre.in
  
  # Detailed destination directories
  BINLIBDEST=	$(LIBDIR)/python$(VERSION)
-@@ -668,6 +669,7 @@ Modules/getpath.o: $(srcdir)/Modules/get
+@@ -644,6 +645,7 @@ Modules/getpath.o: $(srcdir)/Modules/get
  		-DEXEC_PREFIX='"$(exec_prefix)"' \
  		-DVERSION='"$(VERSION)"' \
  		-DVPATH='"$(VPATH)"' \
@@ -150,8 +150,8 @@ Index: Python-2.7.13/Makefile.pre.in
  		-o $@ $(srcdir)/Modules/getpath.c
  
  Modules/python.o: $(srcdir)/Modules/python.c
-@@ -708,7 +710,7 @@ $(AST_C): $(AST_ASDL) $(ASDLGEN_FILES)
- Python/compile.o Python/symtable.o Python/ast.o: $(GRAMMAR_H) $(AST_H)
+@@ -692,7 +694,7 @@ regen-ast:
+ Python/compile.o Python/symtable.o Python/ast.o: $(srcdir)/Include/graminit.h $(srcdir)/Include/Python-ast.h
  
  Python/getplatform.o: $(srcdir)/Python/getplatform.c
 -		$(CC) -c $(PY_CFLAGS) -DPLATFORM='"$(MACHDEP)"' -o $@ $(srcdir)/Python/getplatform.c
@@ -159,10 +159,10 @@ Index: Python-2.7.13/Makefile.pre.in
  
  Python/importdl.o: $(srcdir)/Python/importdl.c
  		$(CC) -c $(PY_CFLAGS) -I$(DLINCLDIR) -o $@ $(srcdir)/Python/importdl.c
-Index: Python-2.7.13/Modules/getpath.c
+Index: Python-2.7.14/Modules/getpath.c
 ===================================================================
---- Python-2.7.13.orig/Modules/getpath.c
-+++ Python-2.7.13/Modules/getpath.c
+--- Python-2.7.14.orig/Modules/getpath.c
++++ Python-2.7.14/Modules/getpath.c
 @@ -100,6 +100,13 @@
  #error "PREFIX, EXEC_PREFIX, VERSION, and VPATH must be constant defined"
  #endif
@@ -186,10 +186,10 @@ Index: Python-2.7.13/Modules/getpath.c
  
  static void
  reduce(char *dir)
-Index: Python-2.7.13/Python/getplatform.c
+Index: Python-2.7.14/Python/getplatform.c
 ===================================================================
---- Python-2.7.13.orig/Python/getplatform.c
-+++ Python-2.7.13/Python/getplatform.c
+--- Python-2.7.14.orig/Python/getplatform.c
++++ Python-2.7.14/Python/getplatform.c
 @@ -10,3 +10,13 @@ Py_GetPlatform(void)
  {
  	return PLATFORM;
@@ -204,10 +204,10 @@ Index: Python-2.7.13/Python/getplatform.c
 +{
 +	return LIB;
 +}
-Index: Python-2.7.13/Python/sysmodule.c
+Index: Python-2.7.14/Python/sysmodule.c
 ===================================================================
---- Python-2.7.13.orig/Python/sysmodule.c
-+++ Python-2.7.13/Python/sysmodule.c
+--- Python-2.7.14.orig/Python/sysmodule.c
++++ Python-2.7.14/Python/sysmodule.c
 @@ -1437,6 +1437,8 @@ _PySys_Init(void)
                          PyString_FromString(Py_GetCopyright()));
      SET_SYS_FROM_STRING("platform",
@@ -217,11 +217,11 @@ Index: Python-2.7.13/Python/sysmodule.c
      SET_SYS_FROM_STRING("executable",
                          PyString_FromString(Py_GetProgramFullPath()));
      SET_SYS_FROM_STRING("prefix",
-Index: Python-2.7.13/configure.ac
+Index: Python-2.7.14/configure.ac
 ===================================================================
---- Python-2.7.13.orig/configure.ac
-+++ Python-2.7.13/configure.ac
-@@ -759,6 +759,11 @@ SunOS*)
+--- Python-2.7.14.orig/configure.ac
++++ Python-2.7.14/configure.ac
+@@ -758,6 +758,11 @@ SunOS*)
      ;;
  esac
  

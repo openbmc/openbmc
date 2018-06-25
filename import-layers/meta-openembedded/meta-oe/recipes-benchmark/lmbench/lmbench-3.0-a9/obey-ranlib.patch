@@ -1,16 +1,22 @@
+From 182a5d3dba3f440bbf35551da6d21ab1c990eb58 Mon Sep 17 00:00:00 2001
+From: Noor Ahsan <noor_ahsan@mentor.com>
+Date: Mon, 29 Aug 2011 16:17:51 +0000
+Subject: [PATCH] lmbench: Add version 3.0-a9 (initial recipe)
+
 In some cases the host may have too old of a ranlib to work.  Since it's
 not exactly a great idea to not be using the cross ranlib anyhow, fix the
 Makefile so we can override ranlib and then override it
 
 Upstream-Status: Inappropriate [build system specific change]
+
 ---
- src/Makefile |    3 ++-
+ src/Makefile | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Index: lmbench-3.0-a9/src/Makefile
-===================================================================
---- lmbench-3.0-a9.orig/src/Makefile
-+++ lmbench-3.0-a9/src/Makefile
+diff --git a/src/Makefile b/src/Makefile
+index 4962815..c7a8c79 100644
+--- a/src/Makefile
++++ b/src/Makefile
 @@ -38,6 +38,7 @@ CC=`../scripts/compiler`
  MAKE=`../scripts/make`
  AR=ar
@@ -19,7 +25,7 @@ Index: lmbench-3.0-a9/src/Makefile
  
  # base of installation location
  BASE=/usr/local
-@@ -217,7 +218,7 @@ $O/lmbench : ../scripts/lmbench version.
+@@ -217,7 +218,7 @@ $O/lmbench : ../scripts/lmbench version.h
  $O/lmbench.a: $(LIBOBJS)
  	/bin/rm -f $O/lmbench.a
  	$(AR) $(ARCREATE) $O/lmbench.a $(LIBOBJS)

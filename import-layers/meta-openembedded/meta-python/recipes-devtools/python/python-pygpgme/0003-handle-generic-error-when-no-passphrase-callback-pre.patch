@@ -1,7 +1,7 @@
-From 024fe219582143017b2f02bc924c0ed107b63619 Mon Sep 17 00:00:00 2001
+From 579b5930e15de8855bf63b3c20b6c3aaf894c3eb Mon Sep 17 00:00:00 2001
 From: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
 Date: Mon, 1 Feb 2016 19:27:59 -0500
-Subject: [PATCH 3/5] handle generic error when no passphrase callback present
+Subject: [PATCH] handle generic error when no passphrase callback present
 
 apparently gpg 2.1 returns ERR_GENERAL right now if the pinentry was
 in loopback mode and no passphrase callback was supplied.  Earlier
@@ -10,6 +10,7 @@ versions supplied ERR_BAD_PASSPHRASE.
 Upstream-Status: Backport
 
 Signed-off-by: Catalin Enache <catalin.enache@windriver.com>
+
 ---
  tests/test_passphrase.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -26,3 +27,4 @@ index 0a235e9..35b3c59 100644
 +            self.assertEqual(exc.args[1], gpgme.ERR_GENERAL)
          else:
              self.fail('gpgme.GpgmeError not raised')
+ 

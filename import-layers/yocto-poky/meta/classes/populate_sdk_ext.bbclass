@@ -162,18 +162,16 @@ def create_filtered_tasklist(d, sdkbasepath, tasklistfile, conf_initpath):
         except FileNotFoundError:
             pass
         os.rename(sdkbasepath, temp_sdkbasepath)
+        cmdprefix = '. %s .; ' % conf_initpath
+        logfile = d.getVar('WORKDIR') + '/tasklist_bb_log.txt'
         try:
-            cmdprefix = '. %s .; ' % conf_initpath
-            logfile = d.getVar('WORKDIR') + '/tasklist_bb_log.txt'
-            try:
-                oe.copy_buildsystem.check_sstate_task_list(d, get_sdk_install_targets(d), tasklistfile, cmdprefix=cmdprefix, cwd=temp_sdkbasepath, logfile=logfile)
-            except bb.process.ExecutionError as e:
-                msg = 'Failed to generate filtered task list for extensible SDK:\n%s' %  e.stdout.rstrip()
-                if 'attempted to execute unexpectedly and should have been setscened' in e.stdout:
-                    msg += '\n----------\n\nNOTE: "attempted to execute unexpectedly and should have been setscened" errors indicate this may be caused by missing sstate artifacts that were likely produced in earlier builds, but have been subsequently deleted for some reason.\n'
-                bb.fatal(msg)
-        finally:
-            os.rename(temp_sdkbasepath, sdkbasepath)
+            oe.copy_buildsystem.check_sstate_task_list(d, get_sdk_install_targets(d), tasklistfile, cmdprefix=cmdprefix, cwd=temp_sdkbasepath, logfile=logfile)
+        except bb.process.ExecutionError as e:
+            msg = 'Failed to generate filtered task list for extensible SDK:\n%s' %  e.stdout.rstrip()
+            if 'attempted to execute unexpectedly and should have been setscened' in e.stdout:
+                msg += '\n----------\n\nNOTE: "attempted to execute unexpectedly and should have been setscened" errors indicate this may be caused by missing sstate artifacts that were likely produced in earlier builds, but have been subsequently deleted for some reason.\n'
+            bb.fatal(msg)
+        os.rename(temp_sdkbasepath, sdkbasepath)
         # Clean out residue of running bitbake, which check_sstate_task_list()
         # will effectively do
         clean_esdk_builddir(d, sdkbasepath)
@@ -535,7 +533,7 @@ def get_sdk_required_utilities(buildtools_fn, d):
 
 install_tools() {
 	install -d ${SDK_OUTPUT}/${SDKPATHNATIVE}${bindir_nativesdk}
-	scripts="devtool recipetool oe-find-native-sysroot runqemu*"
+	scripts="devtool recipetool oe-find-native-sysroot runqemu* wic"
 	for script in $scripts; do
 		for scriptfn in `find ${SDK_OUTPUT}/${SDKPATH}/${scriptrelpath} -maxdepth 1 -executable -name "$script"`; do
 			lnr ${scriptfn} ${SDK_OUTPUT}/${SDKPATHNATIVE}${bindir_nativesdk}/`basename $scriptfn`
@@ -724,6 +722,6 @@ SSTATE_SKIP_CREATION_task-populate-sdk-ext = '1'
 do_populate_sdk_ext[cleandirs] = "${SDKEXTDEPLOYDIR}"
 do_populate_sdk_ext[sstate-inputdirs] = "${SDKEXTDEPLOYDIR}"
 do_populate_sdk_ext[sstate-outputdirs] = "${SDK_DEPLOY}"
-do_populate_sdk_ext[stamp-extra-info] = "${MACHINE}"
+do_populate_sdk_ext[stamp-extra-info] = "${MACHINE_ARCH}"
 
 addtask populate_sdk_ext after do_sdk_depends

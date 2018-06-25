@@ -1,0 +1,148 @@
+From 9c3e5de3240554c8ea1b29d52eeadee4840fefac Mon Sep 17 00:00:00 2001
+From: Kir Kolyshkin <kolyshkin@gmail.com>
+Date: Tue, 29 May 2018 17:37:05 -0700
+Subject: [PATCH 1/3] Factor out and unify setting CLOEXEC
+
+Commit 7a7c31f5 ("Set FD_CLOEXEC on opened files before exec from
+lua script is called") copied the code that sets CLOEXEC flag on all
+possible file descriptors from lib/rpmscript.c to luaext/lposix.c,
+essentially creating two copies of the same code (modulo comments
+and the unused assignment).
+
+This commit moves the functionality into its own function, without
+any code modifications, using the version from luaext/lposix.c.
+
+Signed-off-by: Kir Kolyshkin <kolyshkin@gmail.com>
+Upstream-Status: Accepted [https://github.com/rpm-software-management/rpm/pull/444]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ lib/rpmscript.c        | 18 ++----------------
+ luaext/lposix.c        | 13 ++-----------
+ rpmio/rpmio.c          | 16 ++++++++++++++++
+ rpmio/rpmio_internal.h |  6 ++++++
+ 4 files changed, 26 insertions(+), 27 deletions(-)
+
+diff --git a/lib/rpmscript.c b/lib/rpmscript.c
+index 747385a5b..b4ccd3246 100644
+--- a/lib/rpmscript.c
++++ b/lib/rpmscript.c
+@@ -3,7 +3,6 @@
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ #include <errno.h>
+-#include <unistd.h>
+ 
+ #include <rpm/rpmfileutil.h>
+ #include <rpm/rpmmacro.h>
+@@ -14,6 +13,7 @@
+ 
+ #include "rpmio/rpmlua.h"
+ #include "lib/rpmscript.h"
++#include "rpmio/rpmio_internal.h"
+ 
+ #include "lib/rpmplugins.h"     /* rpm plugins hooks */
+ 
+@@ -170,26 +170,12 @@ static const char * const SCRIPT_PATH = "PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr
+ static void doScriptExec(ARGV_const_t argv, ARGV_const_t prefixes,
+ 			FD_t scriptFd, FD_t out)
+ {
+-    int flag;
+-    int fdno;
+     int xx;
+-    int open_max;
+ 
+     /* SIGPIPE is ignored in rpm, reset to default for the scriptlet */
+     (void) signal(SIGPIPE, SIG_DFL);
+ 
+-    /* XXX Force FD_CLOEXEC on all inherited fdno's. */
+-    open_max = sysconf(_SC_OPEN_MAX);
+-    if (open_max == -1) {
+-	open_max = 1024;
+-    }
+-    for (fdno = 3; fdno < open_max; fdno++) {
+-	flag = fcntl(fdno, F_GETFD);
+-	if (flag == -1 || (flag & FD_CLOEXEC))
+-	    continue;
+-	xx = fcntl(fdno, F_SETFD, FD_CLOEXEC);
+-	/* XXX W2DO? debug msg for inheirited fdno w/o FD_CLOEXEC */
+-    }
++    rpmSetCloseOnExec();
+ 
+     if (scriptFd != NULL) {
+ 	int sfdno = Fileno(scriptFd);
+diff --git a/luaext/lposix.c b/luaext/lposix.c
+index 0a7c26c71..5d7ad3c87 100644
+--- a/luaext/lposix.c
++++ b/luaext/lposix.c
+@@ -27,6 +27,7 @@
+ #include <unistd.h>
+ #include <utime.h>
+ #include <rpm/rpmutil.h>
++#include "rpmio/rpmio_internal.h"
+ 
+ #define MYNAME		"posix"
+ #define MYVERSION	MYNAME " library for " LUA_VERSION " / Nov 2003"
+@@ -335,21 +336,11 @@ static int Pexec(lua_State *L)			/** exec(path,[args]) */
+ 	const char *path = luaL_checkstring(L, 1);
+ 	int i,n=lua_gettop(L);
+ 	char **argv;
+-	int flag, fdno, open_max;
+ 
+ 	if (!have_forked)
+ 	    return luaL_error(L, "exec not permitted in this context");
+ 
+-	open_max = sysconf(_SC_OPEN_MAX);
+-	if (open_max == -1) {
+-	    open_max = 1024;
+-	}
+-	for (fdno = 3; fdno < open_max; fdno++) {
+-	    flag = fcntl(fdno, F_GETFD);
+-	    if (flag == -1 || (flag & FD_CLOEXEC))
+-		continue;
+-	    fcntl(fdno, F_SETFD, FD_CLOEXEC);
+-	}
++	rpmSetCloseOnExec();
+ 
+ 	argv = malloc((n+1)*sizeof(char*));
+ 	if (argv==NULL) return luaL_error(L,"not enough memory");
+diff --git a/rpmio/rpmio.c b/rpmio/rpmio.c
+index c7cbc32aa..ea111d2ec 100644
+--- a/rpmio/rpmio.c
++++ b/rpmio/rpmio.c
+@@ -1759,3 +1759,19 @@ DIGEST_CTX fdDupDigest(FD_t fd, int id)
+ 
+     return ctx;
+ }
++
++void rpmSetCloseOnExec(void)
++{
++	int flag, fdno, open_max;
++
++	open_max = sysconf(_SC_OPEN_MAX);
++	if (open_max == -1) {
++		open_max = 1024;
++	}
++	for (fdno = 3; fdno < open_max; fdno++) {
++		flag = fcntl(fdno, F_GETFD);
++		if (flag == -1 || (flag & FD_CLOEXEC))
++			continue;
++		fcntl(fdno, F_SETFD, FD_CLOEXEC);
++	}
++}
+diff --git a/rpmio/rpmio_internal.h b/rpmio/rpmio_internal.h
+index fbed183b0..370cbdc75 100644
+--- a/rpmio/rpmio_internal.h
++++ b/rpmio/rpmio_internal.h
+@@ -41,6 +41,12 @@ DIGEST_CTX fdDupDigest(FD_t fd, int id);
+ int rpmioSlurp(const char * fn,
+                 uint8_t ** bp, ssize_t * blenp);
+ 
++/**
++ * Set close-on-exec flag for all opened file descriptors, except
++ * stdin/stdout/stderr.
++ */
++void rpmSetCloseOnExec(void);
++
+ #ifdef __cplusplus
+ }
+ #endif

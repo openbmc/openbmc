@@ -14,13 +14,14 @@ DEPENDS = "libpcre zlib openssl"
 SRC_URI = " \
     http://nginx.org/download/nginx-${PV}.tar.gz \
     file://nginx-cross.patch \
+    file://0001-Allow-the-overriding-of-the-endianness-via-the-confi.patch \
     file://nginx.conf \
     file://nginx.init \
     file://nginx-volatile.conf \
     file://nginx.service \
 "
 
-inherit update-rc.d useradd systemd
+inherit siteinfo update-rc.d useradd systemd
 
 SYSTEMD_SERVICE_${PN} = "nginx.service"
 
@@ -50,7 +51,7 @@ do_configure () {
 
     ./configure \
     --crossbuild=Linux:${TUNE_ARCH} \
-    --with-endian=${@base_conditional('SITEINFO_ENDIANNESS', 'le', 'little', 'big', d)} \
+    --with-endian=${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', 'little', 'big', d)} \
     --with-int=4 \
     --with-long=${PTRSIZE} \
     --with-long-long=8 \

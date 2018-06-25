@@ -14,11 +14,11 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  CMakeLists.txt | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d5aad80..5cc9863 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -91,8 +91,7 @@ if(SHARED_ONLY)
+Index: libical-2.0.0/CMakeLists.txt
+===================================================================
+--- libical-2.0.0.orig/CMakeLists.txt
++++ libical-2.0.0/CMakeLists.txt
+@@ -116,8 +116,7 @@ if(SHARED_ONLY)
    set(LIBRARY_TYPE SHARED)
  endif()
  
@@ -26,8 +26,5 @@ index d5aad80..5cc9863 100644
 -find_package(Perl REQUIRED)
 +set(PERL_EXECUTABLE perl)
  
- # MSVC specific definitions
- if(WIN32)
--- 
-2.1.4
-
+ # Ensure finding 64bit libs when using 64-bit compilers
+ if(CMAKE_CL_64)

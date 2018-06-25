@@ -1,0 +1,17 @@
+With glibc 2.27 memfd_create is behind a _GNU_SOURCE guard, so call
+AC_USE_SYSTEM_EXTENSIONS to get that defined.
+
+Upstream-Status: Submitted
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/configure.ac b/configure.ac
+index 0c98875..ebf4dee 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -29,4 +29,6 @@ AC_CONFIG_SRCDIR([Makefile.am])
+ AC_CONFIG_HEADERS([config.h])
+ 
++AC_USE_SYSTEM_EXTENSIONS
++
+ # Initialize Automake
+ AM_INIT_AUTOMAKE([foreign dist-bzip2])

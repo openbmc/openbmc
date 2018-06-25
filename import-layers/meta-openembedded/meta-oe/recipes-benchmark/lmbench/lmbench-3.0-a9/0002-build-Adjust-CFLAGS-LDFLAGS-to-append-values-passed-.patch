@@ -1,13 +1,13 @@
-From 76f3a9abc2ff96155425ef97d8c5520cfbc8fe6a Mon Sep 17 00:00:00 2001
+From b27c253bfb78fa3c5f416e6caee101098a4b58cc Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 12 Jul 2017 18:09:46 -0700
-Subject: [PATCH 2/2] build: Adjust CFLAGS/LDFLAGS to append values passed from
- env
+Subject: [PATCH] build: Adjust CFLAGS/LDFLAGS to append values passed from env
 
 For musl we have to pass additional arguments via cflags and ldflags
 to link in librirpc, make room for those changes to take effect
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  scripts/build |  2 +-
  src/Makefile  | 14 +++++++-------
@@ -71,6 +71,3 @@ index d9efd54..96467d7 100644
  
  
  tag:
--- 
-2.13.2
-

@@ -1,0 +1,39 @@
+From 60dd411e9756fc2b14c0e061ad803782b4aee874 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 26 Feb 2018 15:46:05 +0800
+Subject: [PATCH 11/31] socket-util: don't fail if libc doesn't support IDN
+
+Upstream-Status: Pending
+
+Signed-off-by: Emil Renner Berthing <systemd@esmil.dk>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/socket-util.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/basic/socket-util.c b/src/basic/socket-util.c
+index 2c70cade1..67aedadd4 100644
+--- a/src/basic/socket-util.c
++++ b/src/basic/socket-util.c
+@@ -50,6 +50,16 @@
+ #include "utf8.h"
+ #include "util.h"
+ 
++/* Don't fail if the standard library
++ * doesn't support IDN */
++#ifndef NI_IDN
++#define NI_IDN 0
++#endif
++
++#ifndef NI_IDN_USE_STD3_ASCII_RULES
++#define NI_IDN_USE_STD3_ASCII_RULES 0
++#endif
++
+ #if ENABLE_IDN
+ #  define IDN_FLAGS (NI_IDN|NI_IDN_USE_STD3_ASCII_RULES)
+ #else
+-- 
+2.13.0
+

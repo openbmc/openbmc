@@ -19,7 +19,6 @@
 
 # External variables (also used by syslinux.bbclass)
 # ${INITRD} - indicates a list of filesystem images to concatenate and use as an initrd (optional)
-# ${COMPRESSISO} - Transparent compress ISO, reduce size ~40% if set to 1
 # ${NOISO}  - skip building the ISO image if set to 1
 # ${NOHDD}  - skip building the HDD image if set to 1
 # ${HDDIMG_ID} - FAT image volume-id
@@ -33,7 +32,6 @@ do_bootimg[depends] += "dosfstools-native:do_populate_sysroot \
                         virtual/kernel:do_deploy \
                         ${MLPREFIX}syslinux:do_populate_sysroot \
                         syslinux-native:do_populate_sysroot \
-                        ${@oe.utils.ifelse(d.getVar('COMPRESSISO', False),'zisofs-tools-native:do_populate_sysroot','')} \
                         ${PN}:do_image_${@d.getVar('LIVE_ROOTFS_TYPE').replace('-', '_')} \
                         "
 
@@ -65,7 +63,6 @@ HDDDIR = "${S}/hddimg"
 ISODIR = "${S}/iso"
 EFIIMGDIR = "${S}/efi_img"
 COMPACT_ISODIR = "${S}/iso.z"
-COMPRESSISO ?= "0"
 
 ISOLINUXDIR ?= "/isolinux"
 ISO_BOOTIMG = "isolinux/isolinux.bin"
@@ -115,18 +112,8 @@ build_iso() {
 		install -m 0644 ${STAGING_DATADIR}/syslinux/isolinux.bin ${ISODIR}${ISOLINUXDIR}
 	fi
 
-	if [ "${COMPRESSISO}" = "1" ] ; then
-		# create compact directory, compress iso
-		mkdir -p ${COMPACT_ISODIR}
-		mkzftree -z 9 -p 4 -F ${ISODIR}/rootfs.img ${COMPACT_ISODIR}/rootfs.img
-
-		# move compact iso to iso, then remove compact directory
-		mv ${COMPACT_ISODIR}/rootfs.img ${ISODIR}/rootfs.img
-		rm -Rf ${COMPACT_ISODIR}
-		mkisofs_compress_opts="-R -z -D -l"
-	else
-		mkisofs_compress_opts="-r"
-	fi
+	# We used to have support for zisofs; this is a relic of that
+	mkisofs_compress_opts="-r"
 
 	# Check the size of ${ISODIR}/rootfs.img, use mkisofs -iso-level 3
 	# when it exceeds 3.8GB, the specification is 4G - 1 bytes, we need

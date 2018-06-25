@@ -11,7 +11,7 @@ LICENSE = "GPLv2+ & LGPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=321bf41f280cf805086dd5a720b37785"
 SECTION = "net"
 
-DEPENDS = "openssl systemd"
+DEPENDS = "openssl"
 
 SRC_URI = "git://github.com/open-iscsi/open-isns \
            file://0001-util.h-endian.h-is-available-on-musl-on-linux.patch \
@@ -21,9 +21,7 @@ SRCREV ?= "09954404e948e41eb0fce8e28836018b4ce3d20d"
 
 S = "${WORKDIR}/git"
 
-inherit systemd autotools-brokensep distro_features_check
-# depends on systemd
-REQUIRED_DISTRO_FEATURES = "systemd"
+inherit systemd autotools-brokensep update-rc.d
 
 EXTRA_OECONF = " --prefix=${prefix} --enable-shared"
 EXTRA_OEMAKE += "SYSTEMDDIR=${D}${systemd_unitdir}/system"
@@ -31,6 +29,12 @@ EXTRA_OEMAKE += "SYSTEMDDIR=${D}${systemd_unitdir}/system"
 do_install_append () {
     oe_runmake INCDIR=${D}${includedir}/libisns/ install_hdrs
     oe_runmake LIBDIR=${D}${libdir} install_lib
+
+    install -D -m 755 ${S}/etc/openisns.init ${D}${sysconfdir}/init.d/openisns
+    sed -i 's|daemon isnsd|start-stop-daemon --start --quiet --oknodo --exec ${sbindir}/isnsd --|' \
+        ${D}${sysconfdir}/init.d/openisns
 }
 
 FILES_${PN} += "${libdir} ${systemd_unitdir}"
+
+INITSCRIPT_NAME = "openisns"

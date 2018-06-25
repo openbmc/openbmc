@@ -18,12 +18,12 @@ Upstream-Status: Pending
  libkmod/libkmod-internal.h |    4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/libkmod/libkmod-internal.h b/libkmod/libkmod-internal.h
-index 0180124..100b40f 100644
---- a/libkmod/libkmod-internal.h
-+++ b/libkmod/libkmod-internal.h
-@@ -9,6 +9,10 @@
- #include "macro.h"
+Index: git/libkmod/libkmod-internal.h
+===================================================================
+--- git.orig/libkmod/libkmod-internal.h
++++ git/libkmod/libkmod-internal.h
+@@ -10,6 +10,10 @@
+ 
  #include "libkmod.h"
  
 +#ifndef O_CLOEXEC
@@ -33,6 +33,3 @@ index 0180124..100b40f 100644
  static _always_inline_ _printf_format_(2, 3) void
  	kmod_log_null(struct kmod_ctx *ctx, const char *format, ...) {}
  
--- 
-1.7.10.4
-

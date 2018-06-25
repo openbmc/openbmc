@@ -1,13 +1,19 @@
-Disable m4 file test where sources are built from git.
+From f675d7209f999ce80cb4249c4ebb216697387b71 Mon Sep 17 00:00:00 2001
+From: Amy Fong <amy.fong@windriver.com>
+Date: Thu, 29 Jan 2015 09:56:03 -0500
+Subject: [PATCH] Disable m4 file test where sources are built from git.
 
 Signed-off-by: Amy Fong <amy.fong@windriver.com>
+
 ---
- Makefile.am |    2 +-
+ Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/Makefile.am b/Makefile.am
+index ff7d70a..2fc1f13 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -185,7 +185,7 @@
+@@ -189,7 +189,7 @@ CLEAN_LOCAL += clean-pycov
  # Makefile in datapath/linux, needed to get the list of files to
  # distribute, requires GNU make extensions.
  if GNU_MAKE
@@ -15,4 +21,4 @@ Signed-off-by: Amy Fong <amy.fong@windriver.com>
 +# ALL_LOCAL += dist-hook-git
  dist-hook-git: distfiles
  	@if test -e $(srcdir)/.git && (git --version) >/dev/null 2>&1; then \
- 	  (cd datapath && $(MAKE) distfiles);				    \
+ 	  (cd datapath && $(MAKE) distfiles); \

@@ -1,0 +1,76 @@
+From f59cddcedd6535e0b809ec9b4e95672d34b41a16 Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Tue, 14 Nov 2017 07:41:41 -0800
+Subject: [PATCH] Add additional cgroup mounts from root NS automatically
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+---
+ src/systemdhook.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/src/systemdhook.c b/src/systemdhook.c
+index 78575ef..f735484 100644
+--- a/src/systemdhook.c
++++ b/src/systemdhook.c
+@@ -238,6 +238,11 @@ static char *get_process_cgroup_subsystem_path(int pid, const char *subsystem) {
+ static int mount_cgroup(const char *rootfs, const char *options, char *systemd_path)
+ {
+ 	_cleanup_free_ char *cgroup_path = NULL;
++	char *spath, *dpath;
++	DIR *dir;
++	struct dirent *d;
++	char link[80];
++	int got;
+ 
+ 	if (asprintf(&cgroup_path, "%s/%s", rootfs, CGROUP_ROOT) < 0) {
+ 		pr_perror("Failed to create path for %s", CGROUP_ROOT);
+@@ -256,6 +261,46 @@ static int mount_cgroup(const char *rootfs, const char *options, char *systemd_p
+ 		pr_perror("Failed to mkdir new dest: %s", systemd_path);
+ 		return -1;
+ 	}
++	/* Create all additional cgroup mounts which are in the root namespace */
++	dir = opendir(CGROUP_ROOT);
++	if (!dir) {
++		pr_perror("Failed to open %s", CGROUP_ROOT);
++		return -1;
++	}
++	/* Skip "." and ".." */
++	readdir(dir);
++	readdir(dir);
++	while ((d = readdir(dir))) {
++		/* Systemd is already handled above */
++		if (strcmp(d->d_name, "systemd") == 0) {
++			continue;
++		}
++		if (asprintf(&spath, "%s/%s", CGROUP_ROOT, d->d_name) < 0) {
++			pr_perror("Failed to create path for %s", d->d_name);
++			return -1;
++		}
++		if (asprintf(&dpath, "%s%s/%s", rootfs, CGROUP_ROOT, d->d_name) < 0) {
++			pr_perror("Failed to create path for %s", d->d_name);
++			return -1;
++		}
++		got = readlink(spath, link, sizeof(link) - 1);
++		if (got > 0) {
++			link[got] = '\0';
++			symlink(link, dpath);
++		} else {
++			if ((makepath(dpath, 0755) == -1) && (errno != EEXIST)) {
++				pr_perror("Failed to mkdir new dest: %s", dpath);
++				return -1;
++			}
++			if (bind_mount(spath, dpath, false)) {
++				pr_perror("Failed to bind mount %s on %s", spath, dpath);
++				return -1;
++			}
++		}
++		free(spath);
++		free(dpath);
++	}
++	closedir(dir);
+ 	if (mount(cgroup_path, cgroup_path, "bind", MS_REMOUNT|MS_BIND|MS_RDONLY, "") == -1) {
+ 		pr_perror("Failed to remount %s readonly", cgroup_path);
+ 		return -1;
+-- 
+2.11.0
+

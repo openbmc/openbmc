@@ -27,7 +27,7 @@ Hardware Reference Boards
 
 The following boards are supported by the meta-yocto-bsp layer:
 
-  * Texas Instruments Beaglebone (beaglebone)
+  * Texas Instruments Beaglebone (beaglebone-yocto)
   * Freescale MPC8315E-RDB (mpc8315e-rdb)
   * Ubiquiti Networks EdgeRouter Lite (edgerouter)
   * General IA platforms (genericx86 and genericx86-64)
@@ -120,7 +120,7 @@ USB Device:
        dd command to write the image to a USB stick.
 
 
-Texas Instruments Beaglebone (beaglebone)
+Texas Instruments Beaglebone (beaglebone-yocto)
 =========================================
 
 The Beaglebone is an ARM Cortex-A8 development board with USB, Ethernet, 2D/3D
@@ -151,7 +151,7 @@ From a Linux system with access to the image files perform the following steps:
 
   2. Use the "dd" utility to write the image to the SD card. For example:
 
-     # dd core-image-minimal-beaglebone.wic of=/dev/sdb
+     # dd core-image-minimal-beaglebone-yocto.wic of=/dev/sdb
 
   3. Insert the SD card into the Beaglebone and boot the board.
 

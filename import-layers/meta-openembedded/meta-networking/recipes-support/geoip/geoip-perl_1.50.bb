@@ -9,16 +9,11 @@ SECTION = "libdevel"
 LICENSE = "Artistic-1.0 | GPL-1.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b7a36f55e8ba62aadd74e4f0886a405e"
 
-# Note that we do not want to use the upstream file name locally.
-#
-SRC_URI = "http://github.com/maxmind/geoip-api-perl/archive/v${PV}.tar.gz;downloadfilename=${BPN}-${PV}.tar.gz \
+S = "${WORKDIR}/git"
+SRCREV = "47f7d49bd15cfc2e5f8c0f5c4068dc8bb0e10e96"
+SRC_URI = "git://github.com/maxmind/geoip-api-perl.git;protocol=https; \
     file://run-ptest \
 "
-
-SRC_URI[md5sum] = "2d7f8b1b54e6ba6d9e3fefce52675815"
-SRC_URI[sha256sum] = "86da0dd67f417a43dc70f15a49bd3619f668970c117b9e7f737b4ab246c240a6"
-
-S = "${WORKDIR}/geoip-api-perl-${PV}"
 
 DEPENDS += "geoip"
 

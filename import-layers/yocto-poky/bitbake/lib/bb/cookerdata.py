@@ -143,7 +143,8 @@ class CookerConfiguration(object):
         self.writeeventlog = False
         self.server_only = False
         self.limited_deps = False
-        self.runall = None
+        self.runall = []
+        self.runonly = []
 
         self.env = {}
 
@@ -395,6 +396,8 @@ class CookerDataBuilder(object):
                 if compat and not (compat & layerseries):
                     bb.fatal("Layer %s is not compatible with the core layer which only supports these series: %s (layer is compatible with %s)"
                               % (c, " ".join(layerseries), " ".join(compat)))
+                elif not compat and not data.getVar("BB_WORKERCONTEXT"):
+                    bb.warn("Layer %s should set LAYERSERIES_COMPAT_%s in its conf/layer.conf file to list the core layer names it is compatible with." % (c, c))
 
         if not data.getVar("BBPATH"):
             msg = "The BBPATH variable is not set"

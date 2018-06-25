@@ -1,0 +1,51 @@
+From c924f66743c054d7ebafef90ca1bbebc96732357 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Mon, 30 Oct 2017 13:48:33 -0400
+Subject: [PATCH] libbridge: Modifying the AR to cross toolchain
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The Makefile uses the host “ar” tool when it should be using the ar from
+the target toolchain.
+
+Upstream-Status: Pending
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ configure.ac          | 1 +
+ libbridge/Makefile.in | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 8b2e2ea..8426b7c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -12,6 +12,10 @@ dnl Checks for programs.
+ AC_PROG_CC
+ AC_PROG_INSTALL
+ AC_PROG_RANLIB
++AN_MAKEVAR([AR], [AC_PROG_AR])
++AN_PROGRAM([ar], [AC_PROG_AR])
++AC_DEFUN([AC_PROG_AR], [AC_CHECK_TOOL(AR, ar, :)])
++AC_PROG_AR
+ 
+ dnl Checks for header files.
+ AC_HEADER_STDC
+diff --git a/libbridge/Makefile.in b/libbridge/Makefile.in
+index 7932bfe..bd55e9b 100644
+--- a/libbridge/Makefile.in
++++ b/libbridge/Makefile.in
+@@ -1,7 +1,7 @@
+ 
+ KERNEL_HEADERS=-I@KERNEL_HEADERS@
+ 
+-AR=ar
++AR=@AR@
+ RANLIB=@RANLIB@
+ 
+ CC=@CC@
+-- 
+2.7.4
+

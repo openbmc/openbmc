@@ -10,7 +10,6 @@ PYPI_PACKAGE = "prompt_toolkit"
 RDEPENDS_${PN} += " \
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-six \
-    ${PYTHON_PN}-subprocess \
     ${PYTHON_PN}-terminal \
     ${PYTHON_PN}-threading \
     ${PYTHON_PN}-wcwidth \

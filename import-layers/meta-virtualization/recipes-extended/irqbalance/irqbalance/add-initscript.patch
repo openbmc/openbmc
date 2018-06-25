@@ -1,14 +1,23 @@
-irqbalance: add basic init script
+From 80c45eecc193c6c13430ddeb40b9b0fd1841ceee Mon Sep 17 00:00:00 2001
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Date: Thu, 14 Mar 2013 23:31:38 -0700
+Subject: [PATCH] irqbalance: add basic init script
 
 The upstream irqbalance release package does not contain an
 init script so we create a basic one here.
 
 Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+
 ---
-Index: irqbalance-0.56/irqbalance.init
-===================================================================
+ irqbalance.init | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+ create mode 100644 irqbalance.init
+
+diff --git a/irqbalance.init b/irqbalance.init
+new file mode 100644
+index 0000000..d12d62c
 --- /dev/null
-+++ irqbalance-0.56/irqbalance.init
++++ b/irqbalance.init
 @@ -0,0 +1,35 @@
 +#!/bin/sh
 +#

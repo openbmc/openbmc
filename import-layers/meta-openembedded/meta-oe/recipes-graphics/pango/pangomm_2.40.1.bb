@@ -12,7 +12,9 @@ SRC_URI = "http://ftp.gnome.org/pub/GNOME/sources/pangomm/${SHRT_VER}/pangomm-${
 SRC_URI[md5sum] = "874eadd9434613dbacf0272c82c3ac23"
 SRC_URI[sha256sum] = "9762ee2a2d5781be6797448d4dd2383ce14907159b30bc12bf6b08e7227be3af"
 
-inherit autotools pkgconfig
+inherit distro_features_check autotools pkgconfig
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 EXTRA_OECONF = " --disable-documentation "
 

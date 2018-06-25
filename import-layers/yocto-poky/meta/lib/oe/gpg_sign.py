@@ -12,6 +12,7 @@ class LocalSigner(object):
         self.gpg_path = d.getVar('GPG_PATH')
         self.gpg_version = self.get_gpg_version()
         self.rpm_bin = bb.utils.which(os.getenv('PATH'), "rpmsign")
+        self.gpg_agent_bin = bb.utils.which(os.getenv('PATH'), "gpg-agent")
 
     def export_pubkey(self, output_file, keyid, armor=True):
         """Export GPG public key to a file"""
@@ -31,7 +32,7 @@ class LocalSigner(object):
         """Sign RPM files"""
 
         cmd = self.rpm_bin + " --addsign --define '_gpg_name %s'  " % keyid
-        gpg_args = '--no-permission-warning --batch --passphrase=%s' % passphrase
+        gpg_args = '--no-permission-warning --batch --passphrase=%s --agent-program=%s|--auto-expand-secmem' % (passphrase, self.gpg_agent_bin)
         if self.gpg_version > (2,1,):
             gpg_args += ' --pinentry-mode=loopback'
         cmd += "--define '_gpg_sign_cmd_extra_args %s' " % gpg_args
@@ -71,6 +72,9 @@ class LocalSigner(object):
         if self.gpg_version > (2,1,):
             cmd += ['--pinentry-mode', 'loopback']
 
+        if self.gpg_agent_bin:
+            cmd += ["--agent-program=%s|--auto-expand-secmem" % (self.gpg_agent_bin)]
+
         cmd += [input_file]
 
         try:
@@ -99,7 +103,7 @@ class LocalSigner(object):
         import subprocess
         try:
             ver_str = subprocess.check_output((self.gpg_bin, "--version", "--no-permission-warning")).split()[2].decode("utf-8")
-            return tuple([int(i) for i in ver_str.split('.')])
+            return tuple([int(i) for i in ver_str.split("-")[0].split('.')])
         except subprocess.CalledProcessError as e:
             raise bb.build.FuncFailed("Could not get gpg version: %s" % e)
 

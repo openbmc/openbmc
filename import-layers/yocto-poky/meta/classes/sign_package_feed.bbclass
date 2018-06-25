@@ -43,4 +43,4 @@ python () {
 }
 
 do_package_index[depends] += "signing-keys:do_deploy"
-do_rootfs[depends] += "signing-keys:do_populate_sysroot"
+do_rootfs[depends] += "signing-keys:do_populate_sysroot gnupg-native:do_populate_sysroot"

@@ -18,9 +18,13 @@ hob-image-*.bb
 !meta-yocto
 !meta-yocto-bsp
 !meta-yocto-imported
-documentation/user-manual/user-manual.html
-documentation/user-manual/user-manual.pdf
-documentation/user-manual/user-manual.tgz
+/documentation/*/eclipse/
+/documentation/*/*.html
+/documentation/*/*.pdf
+/documentation/*/*.tgz
+/bitbake/doc/bitbake-user-manual/bitbake-user-manual.html
+/bitbake/doc/bitbake-user-manual/bitbake-user-manual.pdf
+/bitbake/doc/bitbake-user-manual/bitbake-user-manual.tgz
 pull-*/
 bitbake/lib/toaster/contrib/tts/backlog.txt
 bitbake/lib/toaster/contrib/tts/log/*

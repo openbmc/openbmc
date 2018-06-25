@@ -1,14 +1,16 @@
 Signed-off-by: Diego Rondini <diego.ml@zoho.com>
 Upstream-Status: Inappropriate
 
---- watchdog-5.13.orig/watchdog.conf	2013-02-01 12:15:44.000000000 +0100
-+++ watchdog-5.13/watchdog.conf	2014-11-13 10:59:43.233943000 +0100
-@@ -20,7 +20,7 @@
- #test-binary		= 
- #test-timeout		= 
+Index: watchdog-5.15/watchdog.conf
+===================================================================
+--- watchdog-5.15.orig/watchdog.conf
++++ watchdog-5.15/watchdog.conf
+@@ -28,7 +28,7 @@
+ #retry-timeout		= 60
+ #repair-maximum		= 1
  
 -#watchdog-device	= /dev/watchdog
 +watchdog-device	= /dev/watchdog
  
  # Defaults compiled into the binary
- #temperature-device	=
+ #temperature-sensor	=

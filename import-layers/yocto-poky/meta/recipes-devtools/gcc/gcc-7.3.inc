@@ -10,8 +10,8 @@ BINV = "7.3.0"
 
 FILESEXTRAPATHS =. "${FILE_DIRNAME}/gcc-7.3:${FILE_DIRNAME}/gcc-7.3/backport:"
 
-DEPENDS =+ "mpfr gmp libmpc zlib"
-NATIVEDEPS = "mpfr-native gmp-native libmpc-native zlib-native"
+DEPENDS =+ "mpfr gmp libmpc zlib flex-native"
+NATIVEDEPS = "mpfr-native gmp-native libmpc-native zlib-native flex-native"
 
 LICENSE = "GPL-3.0-with-GCC-exception & GPLv3"
 
@@ -73,12 +73,12 @@ SRC_URI = "\
            file://0047-sync-gcc-stddef.h-with-musl.patch \
            file://0048-gcc-Enable-static-PIE.patch \
            file://fix-segmentation-fault-precompiled-hdr.patch \
-           file://0050-RISC-V-Handle-non-legitimate-address-in-riscv_legiti.patch \
            file://no-sse-fix-test-case-failures.patch \
            ${BACKPORTS} \
 "
 BACKPORTS = "\
            file://0001-Fix-internal-compiler-error-in-testcase.patch \
+           file://0001-PR-rtl-optimization-83030.patch \
 "
 
 SRC_URI[md5sum] = "be2da21680f27624f3a87055c4ba5af2"
@@ -101,7 +101,7 @@ EXTRA_OECONF_BASE = "\
     --disable-bootstrap \
     --disable-libmudflap \
     --with-system-zlib \
-    --with-linker-hash-style=${LINKER_HASH_STYLE} \
+    ${@'--with-linker-hash-style=${LINKER_HASH_STYLE}' if '${LINKER_HASH_STYLE}' else ''} \
     --enable-linker-build-id \
     --with-ppl=no \
     --with-cloog=no \

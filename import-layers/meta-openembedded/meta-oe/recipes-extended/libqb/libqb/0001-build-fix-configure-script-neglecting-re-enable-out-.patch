@@ -1,0 +1,56 @@
+From 73d2aea33e32272bac693550e8a3b0e3ad89707f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Pokorn=C3=BD?= <jpokorny@redhat.com>
+Date: Tue, 26 Dec 2017 00:02:26 +0100
+Subject: [PATCH] build: fix configure script neglecting, re-enable out-of-tree
+ builds
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+For the former, a prototype and the final code got (hm, mysteriously)
+intertwisted.  For the latter, I am clearly guilty of (rare, anyway)
+testing of the out-of-tree builds only with libqb-already-system-wide
+scenario, which is rather shortsighted.
+
+Thanks Fabio and his ci.kronosnet.org project for spotting that.
+
+X-mas-present-for: Fabio M. Di Nitto <fdinitto@redhat.com>
+Signed-off-by: Jan Pokorný <jpokorny@redhat.com>
+---
+Upstream-Status: Backport
+
+ configure.ac    | 2 +-
+ lib/Makefile.am | 4 +++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9900310..f9761cc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -710,7 +710,7 @@ if test "x${GCC}" = xyes; then
+ 			                      | grep __stop___verbose | cut -d" " -f 3)
+ 			 test "${verbose_start_addr}" = "${verbose_stop_addr}" \
+ 			   && gcc_has_attribute_section_visible=no \
+-			   || { verbose_start_type=$(${READELF} -s backup \
++			   || { verbose_start_type=$(${READELF} -s "conftest${shrext_cmds}" \
+ 			                             | sed -n '/__start___verbose/{s/^\s*//p;q}' \
+ 			                             | tr -s ' ' \
+ 			                             | cut -d" " -f6)
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 6ca6b15..b035f0b 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -101,7 +101,9 @@ endif
+ endif
+ 
+ qblog_script.ld: %.ld: %.ld.in
+-	$(AM_V_GEN)$(CPP) -xc -I$(top_srcdir)/include -D_GNU_SOURCE -C -P $< \
++	$(AM_V_GEN)$(CPP) -C -D_GNU_SOURCE -P \
++	  -I$(top_srcdir)/include -I$(top_builddir)/include \
++	  -xc $< \
+ 	  | sed -n "/$$(sed -n '/^[^#]/{s/[*\/]/\\&/g;p;q;}' $<)/,$$ p" \
+ 	  > $@
+ 
+-- 
+2.16.2
+

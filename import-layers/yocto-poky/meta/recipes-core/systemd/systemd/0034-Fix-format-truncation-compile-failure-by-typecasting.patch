@@ -1,0 +1,173 @@
+From c2b3ebe112ebfd9f9e82fb1531ee225c3152ca83 Mon Sep 17 00:00:00 2001
+From: Patrick Uiterwijk <patrick@puiterwijk.org>
+Date: Thu, 22 Feb 2018 19:41:30 +0100
+Subject: [PATCH] Fix format-truncation compile failure by typecasting USB IDs
+ (#8250)
+
+This patch adds safe_atoux16 for parsing an unsigned hexadecimal 16bit int, and
+uses that for parsing USB device and vendor IDs.
+
+This fixes a compile error with gcc-8 because while we know that USB IDs are 2 bytes,
+the compiler does not know that.
+
+../src/udev/udev-builtin-hwdb.c:80:38: error: '%04X' directive output may be
+truncated writing between 4 and 8 bytes into a region of size between 2 and 6
+[-Werror=format-truncation=]
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/5547c12503a683290eaed47954ffcfb2d1bc03cd]
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+Signed-off-by: Patrick Uiterwijk <puiterwijk@redhat.com>
+---
+ src/basic/parse-util.c       | 24 ++++++++++++++++++++++
+ src/basic/parse-util.h       |  2 ++
+ src/test/test-parse-util.c   | 39 ++++++++++++++++++++++++++++++++++++
+ src/udev/udev-builtin-hwdb.c | 13 ++++++------
+ 4 files changed, 71 insertions(+), 7 deletions(-)
+
+diff --git a/src/basic/parse-util.c b/src/basic/parse-util.c
+index 97533721d..ff3fc298a 100644
+--- a/src/basic/parse-util.c
++++ b/src/basic/parse-util.c
+@@ -532,6 +532,30 @@ int safe_atoi16(const char *s, int16_t *ret) {
+         return 0;
+ }
+ 
++int safe_atoux16(const char *s, uint16_t *ret) {
++        char *x = NULL;
++        unsigned long l;
++
++        assert(s);
++        assert(ret);
++
++        s += strspn(s, WHITESPACE);
++
++        errno = 0;
++        l = strtoul(s, &x, 16);
++        if (errno > 0)
++                return -errno;
++        if (!x || x == s || *x != 0)
++                return -EINVAL;
++        if (s[0] == '-')
++                return -ERANGE;
++        if ((unsigned long) (uint16_t) l != l)
++                return -ERANGE;
++
++        *ret = (uint16_t) l;
++        return 0;
++}
++
+ int safe_atod(const char *s, double *ret_d) {
+         _cleanup_(freelocalep) locale_t loc = (locale_t) 0;
+         char *x = NULL;
+diff --git a/src/basic/parse-util.h b/src/basic/parse-util.h
+index 1eda1d7f9..727422056 100644
+--- a/src/basic/parse-util.h
++++ b/src/basic/parse-util.h
+@@ -54,6 +54,8 @@ int safe_atou8(const char *s, uint8_t *ret);
+ int safe_atou16(const char *s, uint16_t *ret);
+ int safe_atoi16(const char *s, int16_t *ret);
+ 
++int safe_atoux16(const char *s, uint16_t *ret);
++
+ static inline int safe_atou32(const char *s, uint32_t *ret_u) {
+         assert_cc(sizeof(uint32_t) == sizeof(unsigned));
+         return safe_atou(s, (unsigned*) ret_u);
+diff --git a/src/test/test-parse-util.c b/src/test/test-parse-util.c
+index 937500213..a99cea5a1 100644
+--- a/src/test/test-parse-util.c
++++ b/src/test/test-parse-util.c
+@@ -468,6 +468,44 @@ static void test_safe_atoi16(void) {
+         assert_se(r == -EINVAL);
+ }
+ 
++static void test_safe_atoux16(void) {
++        int r;
++        uint16_t l;
++
++        r = safe_atoux16("1234", &l);
++        assert_se(r == 0);
++        assert_se(l == 0x1234);
++
++        r = safe_atoux16("abcd", &l);
++        assert_se(r == 0);
++        assert_se(l == 0xabcd);
++
++        r = safe_atoux16("  1234", &l);
++        assert_se(r == 0);
++        assert_se(l == 0x1234);
++
++        r = safe_atoux16("12345", &l);
++        assert_se(r == -ERANGE);
++
++        r = safe_atoux16("-1", &l);
++        assert_se(r == -ERANGE);
++
++        r = safe_atoux16("  -1", &l);
++        assert_se(r == -ERANGE);
++
++        r = safe_atoux16("junk", &l);
++        assert_se(r == -EINVAL);
++
++        r = safe_atoux16("123x", &l);
++        assert_se(r == -EINVAL);
++
++        r = safe_atoux16("12.3", &l);
++        assert_se(r == -EINVAL);
++
++        r = safe_atoux16("", &l);
++        assert_se(r == -EINVAL);
++}
++
+ static void test_safe_atou64(void) {
+         int r;
+         uint64_t l;
+@@ -745,6 +783,7 @@ int main(int argc, char *argv[]) {
+         test_safe_atolli();
+         test_safe_atou16();
+         test_safe_atoi16();
++        test_safe_atoux16();
+         test_safe_atou64();
+         test_safe_atoi64();
+         test_safe_atod();
+diff --git a/src/udev/udev-builtin-hwdb.c b/src/udev/udev-builtin-hwdb.c
+index ca7f7c230..dbfe02429 100644
+--- a/src/udev/udev-builtin-hwdb.c
++++ b/src/udev/udev-builtin-hwdb.c
+@@ -27,6 +27,7 @@
+ 
+ #include "alloc-util.h"
+ #include "hwdb-util.h"
++#include "parse-util.h"
+ #include "string-util.h"
+ #include "udev-util.h"
+ #include "udev.h"
+@@ -63,7 +64,7 @@ int udev_builtin_hwdb_lookup(struct udev_device *dev,
+ 
+ static const char *modalias_usb(struct udev_device *dev, char *s, size_t size) {
+         const char *v, *p;
+-        int vn, pn;
++        uint16_t vn, pn;
+ 
+         v = udev_device_get_sysattr_value(dev, "idVendor");
+         if (!v)
+@@ -71,12 +72,10 @@ static const char *modalias_usb(struct udev_device *dev, char *s, size_t size) {
+         p = udev_device_get_sysattr_value(dev, "idProduct");
+         if (!p)
+                 return NULL;
+-        vn = strtol(v, NULL, 16);
+-        if (vn <= 0)
+-                return NULL;
+-        pn = strtol(p, NULL, 16);
+-        if (pn <= 0)
+-                return NULL;
++        if (safe_atoux16(v, &vn) < 0)
++		return NULL;
++        if (safe_atoux16(p, &pn) < 0)
++		return NULL;
+         snprintf(s, size, "usb:v%04Xp%04X*", vn, pn);
+         return s;
+ }
+-- 
+2.17.0
+

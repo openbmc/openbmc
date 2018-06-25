@@ -1,0 +1,53 @@
+From d77cdc5e1eee26821ab98c947abea53fb7b18fe5 Mon Sep 17 00:00:00 2001
+From: California Sullivan <california.l.sullivan@intel.com>
+Date: Fri, 16 Mar 2018 17:23:11 -0700
+Subject: [PATCH] xf86pciBus.c: use Intel ddx only for pre-gen4 hardware
+
+Use intel ddx only on pre-gen4 hw, newer ones will fall back to modesetting
+Author: Timo Aaltonen <tjaalton@debian.org>
+
+Instead of defaulting to the Intel driver for all Intel hardware, only
+default it for older hardware for which it has shown to be better for.
+
+Others fall through to the -modesetting default.
+
+Upstream-Status: Pending [Debian/Fedora patch
+https://src.fedoraproject.org/rpms/xorg-x11-server/c/ee515e44b07e37689abf48cf2fffb41578f3bc1d]
+
+Signed-off-by: California Sullivan <california.l.sullivan@intel.com>
+---
+ hw/xfree86/common/xf86pciBus.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/hw/xfree86/common/xf86pciBus.c b/hw/xfree86/common/xf86pciBus.c
+index e61ae0cd4..d70c99197 100644
+--- a/hw/xfree86/common/xf86pciBus.c
++++ b/hw/xfree86/common/xf86pciBus.c
+@@ -1173,7 +1173,23 @@ xf86VideoPtrToDriverList(struct pci_device *dev,
+ 		case 0x0bef:
+ 			/* Use fbdev/vesa driver on Oaktrail, Medfield, CDV */
+ 			break;
+-		default:
++		/* Default to intel only on pre-gen4 chips */
++		case 0x3577:
++		case 0x2562:
++		case 0x3582:
++		case 0x358e:
++		case 0x2572:
++		case 0x2582:
++		case 0x258a:
++		case 0x2592:
++		case 0x2772:
++		case 0x27a2:
++		case 0x27ae:
++		case 0x29b2:
++		case 0x29c2:
++		case 0x29d2:
++		case 0xa001:
++		case 0xa011:
+ 			driverList[0] = "intel";
+ 			break;
+         }
+-- 
+2.14.3
+

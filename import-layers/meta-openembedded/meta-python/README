@@ -17,12 +17,12 @@ The meta-python layer depends on:
 
 	URI: git://git.openembedded.org/openembedded-core
 	layers: meta
-	branch: rocko 
+	branch: master
 	revision: HEAD
 
 	URI: git://git.openembedded.org/meta-openembedded
 	layers: meta-oe
-	branch:  rocko
+	branch: master
 	revision: HEAD
 
 Please follow the recommended setup procedures of your OE distribution.
@@ -47,8 +47,7 @@ When sending single patches, please use something like:
 Maintenance
 -------------------------
 
-Maintainers:
+Layer Maintainers:
         Tim "moto-timo" Orling <TicoTimo@gmail.com>
-        Paul "bluelightning" Eggleton <paul.eggleton@linux.intel.com>
         Derek Straka <derek@asterius.io>
 

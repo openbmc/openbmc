@@ -2,15 +2,51 @@ import os
 import shutil
 import glob
 import subprocess
+import tempfile
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_test_layer
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_test_layer, create_temp_layer
 from oeqa.selftest.cases.sstate import SStateBase
 from oeqa.core.decorator.oeid import OETestID
 
 import bb.siggen
 
 class SStateTests(SStateBase):
+    def test_autorev_sstate_works(self):
+        # Test that a git repository which changes is correctly handled by SRCREV = ${AUTOREV}
+        # when PV does not contain SRCPV
+
+        tempdir = tempfile.mkdtemp(prefix='oeqa')
+        self.track_for_cleanup(tempdir)
+        create_temp_layer(tempdir, 'selftestrecipetool')
+        self.add_command_to_tearDown('bitbake-layers remove-layer %s' % tempdir)
+        runCmd('bitbake-layers add-layer %s' % tempdir)
+
+        # Use dbus-wait as a local git repo we can add a commit between two builds in
+        pn = 'dbus-wait'
+        srcrev = '6cc6077a36fe2648a5f993fe7c16c9632f946517'
+        url = 'git://git.yoctoproject.org/dbus-wait'
+        result = runCmd('git clone %s noname' % url, cwd=tempdir)
+        srcdir = os.path.join(tempdir, 'noname')
+        result = runCmd('git reset --hard %s' % srcrev, cwd=srcdir)
+        self.assertTrue(os.path.isfile(os.path.join(srcdir, 'configure.ac')), 'Unable to find configure script in source directory')
+
+        recipefile = os.path.join(tempdir, "recipes-test", "dbus-wait-test", 'dbus-wait-test_git.bb')
+        os.makedirs(os.path.dirname(recipefile))
+        srcuri = 'git://' + srcdir + ';protocol=file'
+        result = runCmd(['recipetool', 'create', '-o', recipefile, srcuri])
+        self.assertTrue(os.path.isfile(recipefile), 'recipetool did not create recipe file; output:\n%s' % result.output)
+
+        with open(recipefile, 'a') as f:
+            f.write('SRCREV = "${AUTOREV}"\n')
+            f.write('PV = "1.0"\n')
+
+        bitbake("dbus-wait-test -c fetch")
+        with open(os.path.join(srcdir, "bar.txt"), "w") as f:
+            f.write("foo")
+        result = runCmd('git add bar.txt; git commit -asm "add bar"', cwd=srcdir)
+        bitbake("dbus-wait-test -c unpack")
+
 
     # Test sstate files creation and their location
     def run_test_sstate_creation(self, targets, distro_specific=True, distro_nonspecific=True, temp_sstate_location=True, should_pass=True):
@@ -490,7 +526,7 @@ http_proxy = "http://example.com/"
         # this is an expensive computation, thus just compare the first 'max_sigfiles_to_compare' k files
         max_sigfiles_to_compare = 20
         first, rest = files[:max_sigfiles_to_compare], files[max_sigfiles_to_compare:]
-        compare_sigfiles(first, files1.keys(), files2.keys(), compare=True)
-        compare_sigfiles(rest, files1.keys(), files2.keys(), compare=False)
+        compare_sigfiles(first, files1, files2, compare=True)
+        compare_sigfiles(rest, files1, files2, compare=False)
 
         self.fail("sstate hashes not identical.")

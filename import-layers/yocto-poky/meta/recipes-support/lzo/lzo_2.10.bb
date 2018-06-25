@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 SRC_URI = "http://www.oberhumer.com/opensource/lzo/download/lzo-${PV}.tar.gz \
            file://0001-Use-memcpy-instead-of-reinventing-it.patch \
 	   file://0001-Add-pkgconfigdir-to-solve-the-undefine-error.patch \
-           file://acinclude.m4 \
            file://run-ptest \
            "
 
@@ -18,10 +17,6 @@ SRC_URI[sha256sum] = "c0f892943208266f9b6543b3ae308fab6284c5c90e627931446fb49b42
 inherit autotools ptest
 
 EXTRA_OECONF = "--enable-shared"
-
-do_configure_prepend () {
-	cp ${WORKDIR}/acinclude.m4 ${S}/
-}
 
 do_install_ptest() {
 	t=${D}${PTEST_PATH}

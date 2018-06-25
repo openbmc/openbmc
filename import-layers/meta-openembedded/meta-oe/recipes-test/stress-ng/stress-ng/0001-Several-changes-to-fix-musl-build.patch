@@ -1,0 +1,141 @@
+From 784dcd09d3f266e271d007f4fd257e85036872ca Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linaro.org>
+Date: Tue, 17 Oct 2017 10:13:20 -0500
+Subject: [PATCH] Several changes to fix musl build
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+stress-{context, stackmmap}.c: Set tests to non-implemented because uses
+swapcontext, musl provide the definition but not the implementation due
+  to that functions are pre-POSIX and set to be deprecated.
+  stress-{resources, pty}.c: Doesn't include termio.h and remove stress
+  operations that uses struct termio, musl doesn't provide that struct.
+stress-malloc.c: Check for definition of M_MMAP_THRESHOLD musl doesn't
+  ptovide that constant.
+stress-madvise.c: Add static poision_count integer, definition of
+  MADV_SOFT_OFFLINE doesn't grauntee MADV_HWPOISON to be defined.
+cache.c: Define GLOB_ONLYDIR not available on MUSL.
+
+Signed-off-by: Aníbal Limón <anibal.limon@linaro.org>
+Signed-off-by: Tim Orling <timothy.t.orling@linux.intel.com>
+
+Upstream-status: Pending
+
+---
+ cache.c            |  4 ++++
+ stress-madvise.c   |  1 +
+ stress-malloc.c    |  2 +-
+ stress-pty.c       | 18 ------------------
+ stress-resources.c |  1 -
+ stress-stackmmap.c |  2 +-
+ 6 files changed, 7 insertions(+), 21 deletions(-)
+
+diff --git a/cache.c b/cache.c
+index fbf7674..936c1ff 100644
+--- a/cache.c
++++ b/cache.c
+@@ -28,6 +28,10 @@ typedef struct {
+ 
+ #include <glob.h>
+ 
++#ifndef GLOB_ONLYDIR
++#define GLOB_ONLYDIR    0x100
++#endif
++
+ #if defined(__linux__)
+ #define SYS_CPU_PREFIX               "/sys/devices/system/cpu"
+ #define GLOB_PATTERN SYS_CPU_PREFIX  "/cpu[0-9]*"
+diff --git a/stress-madvise.c b/stress-madvise.c
+index 9e71e11..ddf8d2d 100644
+--- a/stress-madvise.c
++++ b/stress-madvise.c
+@@ -147,6 +147,7 @@ static int stress_random_advise(const args_t *args)
+ #if defined(MADV_SOFT_OFFLINE)
+ 	if (advise == MADV_SOFT_OFFLINE) {
+ 		static int soft_offline_count;
++		static int poison_count;
+ 
+ 		/* ..and minimize number of soft offline pages */
+ 		if ((soft_offline_count >= NUM_SOFT_OFFLINE_MAX) ||
+diff --git a/stress-malloc.c b/stress-malloc.c
+index a46b8c6..427827a 100644
+--- a/stress-malloc.c
++++ b/stress-malloc.c
+@@ -99,7 +99,7 @@ int stress_malloc(const args_t *args)
+ 			malloc_max = MIN_MALLOC_MAX;
+ 	}
+ 
+-#if defined(__GNUC__) && defined(__linux__)
++#if defined(__GNUC__) && defined(__linux__) && defined(M_MMAP_THRESHOLD)
+ 	if (get_setting("malloc-threshold", &malloc_threshold))
+ 		(void)mallopt(M_MMAP_THRESHOLD, (int)malloc_threshold);
+ #endif
+diff --git a/stress-pty.c b/stress-pty.c
+index 1bd1fbd..b1fe573 100644
+--- a/stress-pty.c
++++ b/stress-pty.c
+@@ -26,7 +26,6 @@
+ 
+ #if defined(__linux__)
+ 
+-#include <termio.h>
+ #include <termios.h>
+ 
+ typedef struct {
+@@ -108,7 +107,6 @@ int stress_pty(const args_t *args)
+ 		 */
+ 		for (i = 0; i < n; i++) {
+ 			struct termios ios;
+-			struct termio io;
+ 			struct winsize ws;
+ 			int arg;
+ 
+@@ -130,22 +128,6 @@ int stress_pty(const args_t *args)
+ 			if (ioctl(ptys[i].slave, TCSETSF, &ios) < 0)
+ 				pr_fail_err("ioctl TCSETSF on slave pty");
+ #endif
+-#if defined(TCGETA)
+-			if (ioctl(ptys[i].slave, TCGETA, &io) < 0)
+-				pr_fail_err("ioctl TCGETA on slave pty");
+-#endif
+-#if defined(TCSETA)
+-			if (ioctl(ptys[i].slave, TCSETA, &io) < 0)
+-				pr_fail_err("ioctl TCSETA on slave pty");
+-#endif
+-#if defined(TCSETAW)
+-			if (ioctl(ptys[i].slave, TCSETAW, &io) < 0)
+-				pr_fail_err("ioctl TCSETAW on slave pty");
+-#endif
+-#if defined(TCSETAF)
+-			if (ioctl(ptys[i].slave, TCSETAF, &io) < 0)
+-				pr_fail_err("ioctl TCSETAF on slave pty");
+-#endif
+ #if defined(TIOCGLCKTRMIOS)
+ 			if (ioctl(ptys[i].slave, TIOCGLCKTRMIOS, &ios) < 0)
+ 				pr_fail_err("ioctl TIOCGLCKTRMIOS on slave pty");
+diff --git a/stress-resources.c b/stress-resources.c
+index 958c99a..af79abd 100644
+--- a/stress-resources.c
++++ b/stress-resources.c
+@@ -31,7 +31,6 @@
+ #include <sys/inotify.h>
+ #endif
+ #if defined(__linux__)
+-#include <termio.h>
+ #include <termios.h>
+ #endif
+ #if defined(HAVE_LIB_PTHREAD) && defined(__linux__)
+diff --git a/stress-stackmmap.c b/stress-stackmmap.c
+index 9c83a69..2984f09 100644
+--- a/stress-stackmmap.c
++++ b/stress-stackmmap.c
+@@ -24,7 +24,7 @@
+  */
+ #include "stress-ng.h"
+ 
+-#if defined(__linux__)
++#if defined(__linux__) && False
+ 
+ #include <ucontext.h>
+ 

@@ -1,0 +1,38 @@
+Add target to only build tests (not run them)
+
+Not sending upstream as this is only a start of a solution to
+installable tests: It's useful for us already as is.
+
+Upstream-Status: Inappropriate [not a complete solution]
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Refactored for 3.4
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+Index: nettle-3.4/Makefile.in
+===================================================================
+--- nettle-3.4.orig/Makefile.in
++++ nettle-3.4/Makefile.in
+@@ -55,6 +55,9 @@ clean distclean mostlyclean maintainer-c
+ 	  echo "Making $@ in $$d" ; (cd $$d && $(MAKE) $@); done
+ 	$(MAKE) $@-here
+ 
++buildtest:
++	echo "Making $@ in testsuite" ; (cd testsuite && $(MAKE) $@)
++
+ check-here:
+ 	true
+ 
+Index: nettle-3.4/testsuite/Makefile.in
+===================================================================
+--- nettle-3.4.orig/testsuite/Makefile.in
++++ nettle-3.4/testsuite/Makefile.in
+@@ -131,6 +131,8 @@ $(TARGETS) $(EXTRA_TARGETS): testutils.$
+ # data.
+ VALGRIND = valgrind --error-exitcode=1 --leak-check=full --show-reachable=yes @IF_ASM@ --partial-loads-ok=yes
+ 
++buildtest: $(TS_ALL)
++
+ # The PATH update is for windows dlls, DYLD_LIBRARY_PATH is for OSX.
+ check: $(TS_ALL)
+ 	LD_LIBRARY_PATH=../.lib PATH="../.lib:$$PATH" DYLD_LIBRARY_PATH=../.lib \

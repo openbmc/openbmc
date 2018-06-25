@@ -1,0 +1,31 @@
+From 4ace68a6ba501907a0741dba5f5f155e06a74c35 Mon Sep 17 00:00:00 2001
+From: Petr Vorel <pvorel@suse.cz>
+Date: Wed, 7 Feb 2018 11:09:49 +0100
+Subject: [PATCH] configure: Fix default value of --without-numa switch in help
+
+The default value is no.
+
+Fixes: 39a85a1f1 ("configure: add knob to control numa support")
+
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
+Upstream-Status: Accepted
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index b39a31d..d66ea00 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -86,7 +86,7 @@ fi
+ # Numa
+ AC_ARG_WITH([numa],
+   AC_HELP_STRING([--without-numa],
+-    [without numa support (default=yes)]),
++    [without numa support (default=no)]),
+   [with_numa=no],
+   [with_numa=yes]
+ )
+-- 
+2.7.4
+

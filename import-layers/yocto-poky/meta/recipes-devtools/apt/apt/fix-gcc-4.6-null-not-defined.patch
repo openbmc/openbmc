@@ -1,12 +1,14 @@
 Upstream-Status: Pending
 
---- a/apt-pkg/contrib/weakptr.h
-+++ b/apt-pkg/contrib/weakptr.h
+Index: apt-1.2.24/apt-pkg/contrib/weakptr.h
+===================================================================
+--- apt-1.2.24.orig/apt-pkg/contrib/weakptr.h
++++ apt-1.2.24/apt-pkg/contrib/weakptr.h
 @@ -21,6 +21,7 @@
  #ifndef WEAK_POINTER_H
  #define WEAK_POINTER_H
  
 +#include <cstdlib>
  #include <set>
- /**
-  * Class for objects providing support for weak pointers.
+ #include <stddef.h>
+ 

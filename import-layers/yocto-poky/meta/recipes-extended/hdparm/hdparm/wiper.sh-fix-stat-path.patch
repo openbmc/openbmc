@@ -1,0 +1,38 @@
+From e233006ee212109d2a1401dac37a9a851cc493d8 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 14 Dec 2017 15:23:47 +0800
+Subject: [PATCH] wiper.sh: fix stat path
+
+Fix the stat path for OE.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ wiper/wiper.sh | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/wiper/wiper.sh b/wiper/wiper.sh
+index 79eddc8..9ef2840 100755
+--- a/wiper/wiper.sh
++++ b/wiper/wiper.sh
+@@ -97,7 +97,6 @@ function find_prog(){
+ hash -r  ## Refresh bash's cached PATH entries
+ HDPARM=`find_prog /sbin/hdparm`	|| exit 1
+ FIND=`find_prog /usr/bin/find`	|| exit 1
+-STAT=`find_prog /usr/bin/stat`	|| exit 1
+ GAWK=`find_prog /usr/bin/gawk`	|| exit 1
+ BLKID=`find_prog /sbin/blkid`	|| exit 1
+ GREP=`find_prog /bin/grep`	|| exit 1
+@@ -105,7 +104,7 @@ ID=`find_prog /usr/bin/id`	|| exit 1
+ LS=`find_prog /bin/ls`		|| exit 1
+ DF=`find_prog /bin/df`		|| exit 1
+ RM=`find_prog /bin/rm`		|| exit 1
+-STAT=`find_prog /usr/bin/stat`	|| exit 1
++STAT=`find_prog /bin/stat`	|| exit 1
+ 
+ [ $verbose -gt 1 ] && HDPARM="$HDPARM --verbose"
+ 
+-- 
+2.7.4
+

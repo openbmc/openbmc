@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/rhinstaller/blivet-gui;branch=master \
 "
 
 inherit distro_features_check
-REQUIRED_DISTRO_FEATURES = "systemd"
+REQUIRED_DISTRO_FEATURES = "x11 systemd"
 
 inherit setuptools3 python3native
 

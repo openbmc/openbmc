@@ -17,6 +17,9 @@ EXTRA_OECONF = " --with-iptables=/usr/sbin/iptables \
                "
 
 do_configure () {
+	install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}/config
+	install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}/config
+
 	aclocal
 	libtoolize --automake --copy --force
 	autoconf

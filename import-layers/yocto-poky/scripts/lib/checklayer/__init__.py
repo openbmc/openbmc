@@ -56,9 +56,11 @@ def _get_layer_collections(layer_path, lconf=None, data=None):
         priority = ldata.getVar('BBFILE_PRIORITY_%s' % name)
         pattern = ldata.getVar('BBFILE_PATTERN_%s' % name)
         depends = ldata.getVar('LAYERDEPENDS_%s' % name)
+        compat = ldata.getVar('LAYERSERIES_COMPAT_%s' % name)
         collections[name]['priority'] = priority
         collections[name]['pattern'] = pattern
         collections[name]['depends'] = depends
+        collections[name]['compat'] = compat
 
     return collections
 

@@ -1,7 +1,8 @@
-From 3012a93745223751cc979e3770207a09a075bec6 Mon Sep 17 00:00:00 2001
+From 2bf0666544293dcfac2f67b678e24353acdcd4e7 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 7 Feb 2017 12:16:03 +0200
-Subject: [PATCH 5/5] Get parameters for both libsolv and libsolvext (libdnf is
+Subject: [PATCH 2/2] Get parameters for both libsolv and libsolvext (libdnf is
+
  using both)
 
 Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/312]
@@ -12,12 +13,12 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8b2ab9a..e2d33d7 100644
+index ca280f3..6ab9827 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -29,7 +29,7 @@ find_package (PkgConfig REQUIRED)
  SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
- PKG_CHECK_MODULES(GLIB gio-unix-2.0>=2.44.0 REQUIRED)
+ PKG_CHECK_MODULES(GLIB gio-unix-2.0>=2.46.0 REQUIRED)
  FIND_LIBRARY (RPMDB_LIBRARY NAMES rpmdb)
 -PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
 +PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv libsolvext)
@@ -25,5 +26,5 @@ index 8b2ab9a..e2d33d7 100644
  if (ENABLE_RHSM_SUPPORT)
      pkg_check_modules (RHSM REQUIRED librhsm)
 -- 
-2.11.0
+2.14.2
 

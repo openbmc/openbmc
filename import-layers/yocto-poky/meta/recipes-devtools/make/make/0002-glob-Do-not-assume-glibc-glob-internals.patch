@@ -1,0 +1,38 @@
+From 9858702dbd1e137262c06765919937660879f63c Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Sun, 24 Sep 2017 09:12:58 -0400
+Subject: [PATCH 2/2] glob: Do not assume glibc glob internals.
+
+It has been proposed that glibc glob start using gl_lstat,
+which the API allows it to do.  GNU 'make' should not get in
+the way of this.  See:
+https://sourceware.org/ml/libc-alpha/2017-09/msg00409.html
+
+* dir.c (local_lstat): New function, like local_stat.
+(dir_setup_glob): Use it to initialize gl_lstat too, as the API
+requires.
+---
+Upstream-Status: Backport
+
+ configure.ac | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 64ec870..e87901c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -399,10 +399,9 @@ AC_CACHE_CHECK([if system libc has GNU glob], [make_cv_sys_gnu_glob],
+ #include <glob.h>
+ #include <fnmatch.h>
+ 
+-#define GLOB_INTERFACE_VERSION 1
+ #if !defined _LIBC && defined __GNU_LIBRARY__ && __GNU_LIBRARY__ > 1
+ # include <gnu-versions.h>
+-# if _GNU_GLOB_INTERFACE_VERSION == GLOB_INTERFACE_VERSION
++if _GNU_GLOB_INTERFACE_VERSION == 1 || _GNU_GLOB_INTERFACE_VERSION == 2
+    gnu glob
+ # endif
+ #endif],
+-- 
+2.16.1
+

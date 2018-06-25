@@ -4,11 +4,13 @@
 #
 # Upstream-Status: Inappropriate [configuration]
 
---- a/configure.in
-+++ b/configure.in
-@@ -638,10 +638,7 @@
- AC_DEFINE_UNQUOTED(APACHE_MPM_DIR, "$MPM_DIR",
- 	[Location of the source for the current MPM])
+Index: httpd-2.4.29/configure.in
+===================================================================
+--- httpd-2.4.29.orig/configure.in
++++ httpd-2.4.29/configure.in
+@@ -855,10 +855,7 @@ AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "
+ AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "${rel_sysconfdir}/mime.types",
+ 	[Location of the MIME types config file, relative to the Apache root directory])
  
 -perlbin=`$ac_aux_dir/PrintPath perl`
 -if test "x$perlbin" = "x"; then

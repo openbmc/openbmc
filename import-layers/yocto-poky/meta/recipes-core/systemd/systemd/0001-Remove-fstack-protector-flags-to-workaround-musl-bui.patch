@@ -1,0 +1,33 @@
+From e361f6b4aefae57efff7e457df8db4d1067bec23 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 28 Feb 2018 21:50:23 -0800
+Subject: [PATCH] Remove fstack-protector flags to workaround musl build
+
+Remove fstack-protector and fstack-protector-strong flags to fix
+the following build failure for qemux86 and qemuppc with musl.
+
+  undefined reference to `__stack_chk_fail_local'
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ meson.build | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 7610ab12b..591b9cbab 100644
+--- a/meson.build
++++ b/meson.build
+@@ -329,8 +329,6 @@ foreach arg : ['-Wextra',
+                '-fdiagnostics-show-option',
+                '-fno-strict-aliasing',
+                '-fvisibility=hidden',
+-               '-fstack-protector',
+-               '-fstack-protector-strong',
+                '--param=ssp-buffer-size=4',
+               ]
+         if cc.has_argument(arg)
+-- 
+2.13.0
+

@@ -1,9 +1,11 @@
+SRCREV = "cfd04396dc68220d1cecbe686a6cc3aa5ce3667c"
+SRC_URI = "git://github.com/containerd/containerd;nobranch=1 \
+           file://0001-build-use-oe-provided-GO-and-flags.patch \
+          "
+
 include containerd.inc
 
-SRCREV = "0ac3cd1be170d180b2baed755e8f0da547ceb267"
-SRC_URI = "git://github.com/docker/containerd.git;nobranch=1 \
-          "
-CONTAINERD_VERSION = "0.2.2"
+CONTAINERD_VERSION = "v1.0.2"
 
 PROVIDES += "virtual/containerd"
 RPROVIDES_${PN} = "virtual/containerd"

@@ -14,7 +14,8 @@ def get_package_manager(d, root_path):
     if pkg_class == "rpm":
         pm = RpmPM(d,
                    root_path,
-                   d.getVar('TARGET_VENDOR'))
+                   d.getVar('TARGET_VENDOR'),
+                   filterbydependencies=False)
         pm.create_configs()
 
     elif pkg_class == "ipk":

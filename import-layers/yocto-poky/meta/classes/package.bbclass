@@ -26,7 +26,7 @@
 #    a list of affected files in FILER{PROVIDES,DEPENDS}FLIST_pkg
 #
 # h) package_do_shlibs - Look at the shared libraries generated and autotmatically add any
-#    depenedencies found. Also stores the package name so anyone else using this library
+#    dependencies found. Also stores the package name so anyone else using this library
 #    knows which package to depend on.
 #
 # i) package_do_pkgconfig - Keep track of which packages need and provide which .pc files
@@ -52,7 +52,8 @@ LOCALE_SECTION ?= ''
 ALL_MULTILIB_PACKAGE_ARCHS = "${@all_multilib_tune_values(d, 'PACKAGE_ARCHS')}"
 
 # rpm is used for the per-file dependency identification
-PACKAGE_DEPENDS += "rpm-native"
+# dwarfsrcfiles is used to determine the list of debug source files
+PACKAGE_DEPENDS += "rpm-native dwarfsrcfiles-native"
 
 
 # If your postinstall can execute at rootfs creation time rather than on
@@ -334,6 +335,33 @@ def checkbuildpath(file, d):
 
     return False
 
+def parse_debugsources_from_dwarfsrcfiles_output(dwarfsrcfiles_output):
+    debugfiles = {}
+
+    for line in dwarfsrcfiles_output.splitlines():
+        if line.startswith("\t"):
+            debugfiles[os.path.normpath(line.split()[0])] = ""
+
+    return debugfiles.keys()
+
+def append_source_info(file, sourcefile, d, fatal=True):
+    cmd = "'dwarfsrcfiles' '%s'" % (file)
+    (retval, output) = oe.utils.getstatusoutput(cmd)
+    # 255 means a specific file wasn't fully parsed to get the debug file list, which is not a fatal failure
+    if retval != 0 and retval != 255:
+        msg = "dwarfsrcfiles failed with exit code %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else "")
+        if fatal:
+            bb.fatal(msg)
+        bb.note(msg)
+
+    debugsources = parse_debugsources_from_dwarfsrcfiles_output(output)
+    # filenames are null-separated - this is an artefact of the previous use
+    # of rpm's debugedit, which was writing them out that way, and the code elsewhere
+    # is still assuming that.
+    debuglistoutput = '\0'.join(debugsources) + '\0'
+    open(sourcefile, 'a').write(debuglistoutput)
+
+
 def splitdebuginfo(file, debugfile, debugsrcdir, sourcefile, d):
     # Function to split a single file into two components, one is the stripped
     # target system binary, the other contains any debugging information. The
@@ -345,7 +373,6 @@ def splitdebuginfo(file, debugfile, debugsrcdir, sourcefile, d):
 
     dvar = d.getVar('PKGD')
     objcopy = d.getVar("OBJCOPY")
-    debugedit = d.expand("${STAGING_LIBDIR_NATIVE}/rpm/debugedit")
 
     # We ignore kernel modules, we don't generate debug info files.
     if file.find("/lib/modules/") != -1 and file.endswith(".ko"):
@@ -359,10 +386,7 @@ def splitdebuginfo(file, debugfile, debugsrcdir, sourcefile, d):
 
     # We need to extract the debug src information here...
     if debugsrcdir:
-        cmd = "'%s' -i -l '%s' '%s'" % (debugedit, sourcefile, file)
-        (retval, output) = oe.utils.getstatusoutput(cmd)
-        if retval:
-            bb.fatal("debugedit failed with exit code %s (cmd was %s)%s" % (retval, cmd, ":\n%s" % output if output else ""))
+        append_source_info(file, sourcefile, d)
 
     bb.utils.mkdirhier(os.path.dirname(debugfile))
 
@@ -383,7 +407,7 @@ def splitdebuginfo(file, debugfile, debugsrcdir, sourcefile, d):
     return 0
 
 def copydebugsources(debugsrcdir, d):
-    # The debug src information written out to sourcefile is further procecessed
+    # The debug src information written out to sourcefile is further processed
     # and copied to the destination here.
 
     import stat
@@ -393,7 +417,6 @@ def copydebugsources(debugsrcdir, d):
         dvar = d.getVar('PKGD')
         strip = d.getVar("STRIP")
         objcopy = d.getVar("OBJCOPY")
-        debugedit = d.expand("${STAGING_LIBDIR_NATIVE}/rpm/bin/debugedit")
         workdir = d.getVar("WORKDIR")
         workparentdir = os.path.dirname(os.path.dirname(workdir))
         workbasedir = os.path.basename(os.path.dirname(workdir)) + "/" + os.path.basename(workdir)
@@ -633,7 +656,7 @@ python fixup_perms () {
     # __str__ can be used to print out an entry in the input format
     #
     # if fs_perms_entry.path is None:
-    #    an error occured
+    #    an error occurred
     # if fs_perms_entry.link, you can retrieve:
     #    fs_perms_entry.path = path
     #    fs_perms_entry.link = target of link
@@ -860,6 +883,7 @@ python split_and_strip_files () {
 
     dvar = d.getVar('PKGD')
     pn = d.getVar('PN')
+    targetos = d.getVar('TARGET_OS')
 
     oldcwd = os.getcwd()
     os.chdir(dvar)
@@ -901,7 +925,7 @@ python split_and_strip_files () {
     # 16 - kernel module
     def isELF(path):
         type = 0
-        ret, result = oe.utils.getstatusoutput("file \"%s\"" % path.replace("\"", "\\\""))
+        ret, result = oe.utils.getstatusoutput("file -b '%s'" % path)
 
         if ret:
             msg = "split_and_strip_files: 'file %s' failed" % path
@@ -919,6 +943,15 @@ python split_and_strip_files () {
                 type |= 8
         return type
 
+    def isStaticLib(path):
+        if path.endswith('.a') and not os.path.islink(path):
+            with open(path, 'rb') as fh:
+                # The magic must include the first slash to avoid
+                # matching golang static libraries
+                magic = b'!<arch>\x0a/'
+                start = fh.read(len(magic))
+                return start == magic
+        return False
 
     #
     # First lets figure out all of the files we may have to process ... do this only once!
@@ -926,9 +959,11 @@ python split_and_strip_files () {
     elffiles = {}
     symlinks = {}
     kernmods = []
+    staticlibs = []
     inodes = {}
     libdir = os.path.abspath(dvar + os.sep + d.getVar("libdir"))
     baselibdir = os.path.abspath(dvar + os.sep + d.getVar("base_libdir"))
+    skipfiles = (d.getVar("INHIBIT_PACKAGE_STRIP_FILES") or "").split()
     if (d.getVar('INHIBIT_PACKAGE_STRIP') != '1' or \
             d.getVar('INHIBIT_PACKAGE_DEBUG_SPLIT') != '1'):
         for root, dirs, files in cpath.walk(dvar):
@@ -937,11 +972,17 @@ python split_and_strip_files () {
                 if file.endswith(".ko") and file.find("/lib/modules/") != -1:
                     kernmods.append(file)
                     continue
+                if isStaticLib(file):
+                    staticlibs.append(file)
+                    continue
 
                 # Skip debug files
                 if debugappend and file.endswith(debugappend):
                     continue
                 if debugdir and debugdir in os.path.dirname(file[len(dvar):]):
+                    continue
+
+                if file in skipfiles:
                     continue
 
                 try:
@@ -955,7 +996,7 @@ python split_and_strip_files () {
                     continue
                 if not s:
                     continue
-                # Check its an excutable
+                # Check its an executable
                 if (s[stat.ST_MODE] & stat.S_IXUSR) or (s[stat.ST_MODE] & stat.S_IXGRP) or (s[stat.ST_MODE] & stat.S_IXOTH) \
                         or ((file.startswith(libdir) or file.startswith(baselibdir)) and (".so" in f or ".node" in f)):
                     # If it's a symlink, and points to an ELF file, we capture the readlink target
@@ -983,7 +1024,7 @@ python split_and_strip_files () {
                         #  b) Only strip any hardlinked file once (no races)
                         #  c) Track any hardlinks between files so that we can reconstruct matching debug file hardlinks
 
-                        # Use a reference of device ID and inode number to indentify files
+                        # Use a reference of device ID and inode number to identify files
                         file_reference = "%d_%d" % (s.st_dev, s.st_ino)
                         if file_reference in inodes:
                             os.unlink(file)
@@ -1011,6 +1052,10 @@ python split_and_strip_files () {
             #bb.note("Split %s -> %s" % (file, fpath))
             # Only store off the hard link reference if we successfully split!
             splitdebuginfo(file, fpath, debugsrcdir, sourcefile, d)
+
+        if debugsrcdir and not targetos.startswith("mingw"):
+            for file in staticlibs:
+                append_source_info(file, sourcefile, d, fatal=False)
 
         # Hardlink our debug symbols to the other hardlink copies
         for ref in inodes:
@@ -1105,7 +1150,7 @@ python populate_packages () {
         d.setVar('FILES_%s' % src_package_name, '/usr/src/debug')
 
     # Sanity check PACKAGES for duplicates
-    # Sanity should be moved to sanity.bbclass once we have the infrastucture
+    # Sanity should be moved to sanity.bbclass once we have the infrastructure
     package_list = []
 
     for pkg in packages.split():
@@ -1303,6 +1348,36 @@ python emit_pkgdata() {
     from glob import glob
     import json
 
+    def process_postinst_on_target(pkg, mlprefix):
+        defer_fragment = """
+if [ -n "$D" ]; then
+    $INTERCEPT_DIR/postinst_intercept delay_to_first_boot %s mlprefix=%s
+    exit 0
+fi
+""" % (pkg, mlprefix)
+
+        postinst = d.getVar('pkg_postinst_%s' % pkg)
+        postinst_ontarget = d.getVar('pkg_postinst_ontarget_%s' % pkg)
+
+        if postinst_ontarget:
+            bb.debug(1, 'adding deferred pkg_postinst_ontarget() to pkg_postinst() for %s' % pkg)
+            if not postinst:
+                postinst = '#!/bin/sh\n'
+            postinst += defer_fragment
+            postinst += postinst_ontarget
+            d.setVar('pkg_postinst_%s' % pkg, postinst)
+
+    def add_set_e_to_scriptlets(pkg):
+        for scriptlet_name in ('pkg_preinst', 'pkg_postinst', 'pkg_prerm', 'pkg_postrm'):
+            scriptlet = d.getVar('%s_%s' % (scriptlet_name, pkg))
+            if scriptlet:
+                scriptlet_split = scriptlet.split('\n')
+                if scriptlet_split[0].startswith("#!"):
+                    scriptlet = scriptlet_split[0] + "\nset -e\n" + "\n".join(scriptlet_split[1:])
+                else:
+                    scriptlet = "set -e\n" + "\n".join(scriptlet_split[0:])
+            d.setVar('%s_%s' % (scriptlet_name, pkg), scriptlet)
+
     def write_if_exists(f, pkg, var):
         def encode(str):
             import codecs
@@ -1398,6 +1473,8 @@ python emit_pkgdata() {
         write_if_exists(sf, pkg, 'ALLOW_EMPTY')
         write_if_exists(sf, pkg, 'FILES')
         write_if_exists(sf, pkg, 'CONFFILES')
+        process_postinst_on_target(pkg, d.getVar("MLPREFIX"))
+        add_set_e_to_scriptlets(pkg)
         write_if_exists(sf, pkg, 'pkg_postinst')
         write_if_exists(sf, pkg, 'pkg_postrm')
         write_if_exists(sf, pkg, 'pkg_preinst')
@@ -1541,7 +1618,7 @@ python package_do_shlibs() {
     shlibswork_dir = d.getVar('SHLIBSWORKDIR')
 
     # Take shared lock since we're only reading, not writing
-    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"))
+    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"), True)
 
     def linux_so(file, needed, sonames, renames, pkgver):
         needs_ldconfig = False
@@ -1732,6 +1809,9 @@ python package_do_shlibs() {
     for pkg in packages.split():
         bb.debug(2, "calculating shlib requirements for %s" % pkg)
 
+        private_libs = d.getVar('PRIVATE_LIBS_' + pkg) or d.getVar('PRIVATE_LIBS') or ""
+        private_libs = private_libs.split()
+
         deps = list()
         for n in needed[pkg]:
             # if n is in private libraries, don't try to search provider for it
@@ -1823,7 +1903,7 @@ python package_do_pkgconfig () {
                                 pkgconfig_needed[pkg] += exp.replace(',', ' ').split()
 
     # Take shared lock since we're only reading, not writing
-    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"))
+    lf = bb.utils.lockfile(d.expand("${PACKAGELOCK}"), True)
 
     for pkg in packages.split():
         pkgs_file = os.path.join(shlibswork_dir, pkg + ".pclist")
@@ -2156,11 +2236,9 @@ do_package[dirs] = "${SHLIBSWORKDIR} ${PKGDESTWORK} ${D}"
 do_package[vardeps] += "${PACKAGEBUILDPKGD} ${PACKAGESPLITFUNCS} ${PACKAGEFUNCS} ${@gen_packagevar(d)}"
 addtask package after do_install
 
-PACKAGELOCK = "${STAGING_DIR}/package-output.lock"
 SSTATETASKS += "do_package"
 do_package[cleandirs] = "${PKGDEST} ${PKGDESTWORK}"
 do_package[sstate-plaindirs] = "${PKGD} ${PKGDEST} ${PKGDESTWORK}"
-do_package[sstate-lockfile-shared] = "${PACKAGELOCK}"
 do_package_setscene[dirs] = "${STAGING_DIR}"
 
 python do_package_setscene () {
@@ -2175,10 +2253,13 @@ do_packagedata () {
 addtask packagedata before do_build after do_package
 
 SSTATETASKS += "do_packagedata"
+# PACKAGELOCK protects readers of PKGDATA_DIR against writes
+# whilst code is reading in do_package
+PACKAGELOCK = "${STAGING_DIR}/package-output.lock"
 do_packagedata[sstate-inputdirs] = "${PKGDESTWORK}"
 do_packagedata[sstate-outputdirs] = "${PKGDATA_DIR}"
-do_packagedata[sstate-lockfile-shared] = "${PACKAGELOCK}"
-do_packagedata[stamp-extra-info] = "${MACHINE}"
+do_packagedata[sstate-lockfile] = "${PACKAGELOCK}"
+do_packagedata[stamp-extra-info] = "${MACHINE_ARCH}"
 
 python do_packagedata_setscene () {
     sstate_setscene(d)

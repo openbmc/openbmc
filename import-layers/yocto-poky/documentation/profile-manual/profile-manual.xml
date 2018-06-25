@@ -87,14 +87,9 @@
                 <revremark>Released with the Yocto Project 2.4 Release.</revremark>
             </revision>
             <revision>
-                <revnumber>2.4.1</revnumber>
-                <date>January 2018</date>
-                <revremark>Released with the Yocto Project 2.4.1 Release.</revremark>
-            </revision>
-            <revision>
-                <revnumber>2.4.2</revnumber>
-                <date>March 2018</date>
-                <revremark>Released with the Yocto Project 2.4.2 Release.</revremark>
+                <revnumber>2.5</revnumber>
+                <date>May 2018</date>
+                <revremark>Released with the Yocto Project 2.5 Release.</revremark>
             </revision>
         </revhistory>
 
@@ -118,24 +113,36 @@
                        is for the &YOCTO_DOC_VERSION; release of the
                        Yocto Project.
                        To be sure you have the latest version of the manual
-                       for this release, use the manual from the
-                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>.
-                       </para></listitem>
-                   <listitem><para>
-                       For manuals associated with other releases of the Yocto
-                       Project, go to the
+                       for this release, go to the
                        <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
-                       and use the drop-down "Active Releases" button
-                       and choose the manual associated with the desired
-                       Yocto Project.
+                       and select the manual from that site.
+                       Manuals from the site are more up-to-date than manuals
+                       derived from the Yocto Project released TAR files.
                        </para></listitem>
                    <listitem><para>
-                        To report any inaccuracies or problems with this
-                        manual, send an email to the Yocto Project
-                        discussion group at
-                        <filename>yocto@yoctoproject.com</filename> or log into
-                        the freenode <filename>#yocto</filename> channel.
-                        </para></listitem>
+                       If you located this manual through a web search, the
+                       version of the manual might not be the one you want
+                       (e.g. the search might have returned a manual much
+                       older than the Yocto Project version with which you
+                       are working).
+                       You can see all Yocto Project major releases by
+                       visiting the
+                       <ulink url='&YOCTO_WIKI_URL;/wiki/Releases'>Releases</ulink>
+                       page.
+                       If you need a version of this manual for a different
+                       Yocto Project release, visit the
+                       <ulink url='&YOCTO_HOME_URL;/documentation'>Yocto Project documentation page</ulink>
+                       and select the manual set by using the
+                       "ACTIVE RELEASES DOCUMENTATION" or "DOCUMENTS ARCHIVE"
+                       pull-down menus.
+                       </para></listitem>
+                   <listitem><para>
+                       To report any inaccuracies or problems with this
+                       manual, send an email to the Yocto Project
+                       discussion group at
+                       <filename>yocto@yoctoproject.com</filename> or log into
+                       the freenode <filename>#yocto</filename> channel.
+                       </para></listitem>
                </itemizedlist>
            </note>
     </legalnotice>

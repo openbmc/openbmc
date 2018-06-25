@@ -1,4 +1,4 @@
-From 244863eca77fcaa1187884836c3e28d6b6d1504a Mon Sep 17 00:00:00 2001
+From 9d5e7eff4ae906f1ea6e6527080fded0b595fbd4 Mon Sep 17 00:00:00 2001
 From: Bruce Ashfield <bruce.ashfield@windriver.com>
 Date: Tue, 9 Apr 2013 18:50:34 -0700
 Subject: [PATCH] aufs-util: don't strip executables
@@ -14,16 +14,19 @@ as follows:
 
 To prevent this, we remove -s from LDFLAGS.
 
+Upstream-Status: Inappropriate [oe specific]
+
 Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+
 ---
- Makefile |    2 +-
+ Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 2f905ad..e0c6dcd 100644
+index 54f8d97..dbbe43d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -56,7 +56,7 @@ all: ver_test ${Man} ${Bin} ${Etc}
+@@ -118,7 +118,7 @@ clean:
  ver_test: ver
  	./ver
  
@@ -32,6 +35,3 @@ index 2f905ad..e0c6dcd 100644
  ${Bin}: LDLIBS = -L. -lautil
  ${BinObj}: %.o: %.c ${LibUtilHdr} ${LibUtil}
  
--- 
-1.7.10.4
-

@@ -10,11 +10,11 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  configure.ac |   27 +++++++++++++++++----------
  1 files changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index b1e18b4..8e13025 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -73,6 +73,9 @@ AC_CONFIG_HEADERS(config.h)
+Index: syslog-ng-3.8.1/configure.ac
+===================================================================
+--- syslog-ng-3.8.1.orig/configure.ac
++++ syslog-ng-3.8.1/configure.ac
+@@ -104,6 +104,9 @@ AC_CONFIG_HEADERS(config.h)
  dnl ***************************************************************************
  dnl Arguments
  
@@ -24,7 +24,7 @@ index b1e18b4..8e13025 100644
  AC_ARG_WITH(libnet,
     [  --with-libnet=path      use path to libnet-config script],
     ,
-@@ -768,22 +771,26 @@ dnl ***************************************************************************
+@@ -893,22 +896,26 @@ dnl ************************************
  dnl libnet headers/libraries
  dnl ***************************************************************************
  AC_MSG_CHECKING(for LIBNET)
@@ -61,6 +61,3 @@ index b1e18b4..8e13025 100644
  if test "x$enable_spoof_source" = "xauto"; then
  	AC_MSG_CHECKING(whether to enable spoof source support)
          if test "x$LIBNET_LIBS" != "x"; then
--- 
-1.7.1
-

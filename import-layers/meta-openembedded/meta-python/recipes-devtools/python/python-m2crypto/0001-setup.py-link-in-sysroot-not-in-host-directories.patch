@@ -1,4 +1,4 @@
-From f11b9c71080513f9b867ba8f40613ba2ebc6e960 Mon Sep 17 00:00:00 2001
+From dfb83a41aaeae326e9b6f02b233af375bc7b8815 Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Fri, 29 Mar 2013 15:17:17 +0100
 Subject: [PATCH] setup.py: link in sysroot, not in host directories
@@ -10,12 +10,12 @@ Upstream-status: Unknown
  setup.py | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-Index: M2Crypto-0.23.0/setup.py
-===================================================================
---- M2Crypto-0.23.0.orig/setup.py
-+++ M2Crypto-0.23.0/setup.py
-@@ -62,7 +62,7 @@ class _M2CryptoBuildExt(build_ext.build_
-             self.openssl = 'c:\\pkg'
+diff --git a/setup.py b/setup.py
+index 3407c82..15ed7cd 100644
+--- a/setup.py
++++ b/setup.py
+@@ -127,7 +127,7 @@ class _M2CryptoBuildExt(build_ext.build_ext):
+                 self.openssl = os.path.join(self.openssl, 'OpenSSL')
          else:
              self.libraries = ['ssl', 'crypto']
 -            self.openssl = '/usr'
@@ -23,7 +23,7 @@ Index: M2Crypto-0.23.0/setup.py
  
      def finalize_options(self):
          '''Overloaded build_ext implementation to append custom openssl
-@@ -75,8 +75,8 @@ class _M2CryptoBuildExt(build_ext.build_
+@@ -143,8 +143,8 @@ class _M2CryptoBuildExt(build_ext.build_ext):
          if _openssl and os.path.isdir(_openssl):
              self.openssl = _openssl
  
@@ -34,3 +34,6 @@ Index: M2Crypto-0.23.0/setup.py
  
          if platform.system() == "Linux":
              if _multiarch:  # on Fedora/RHEL it is an empty string
+-- 
+2.7.4
+

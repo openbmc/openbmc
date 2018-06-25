@@ -1,0 +1,68 @@
+From a9243f13d6e1aadd69bfcc27f75f69c38be51677 Mon Sep 17 00:00:00 2001
+From: Jian Liang <jianliang@tycoint.com>
+Date: Wed, 4 Oct 2017 17:30:17 +0100
+Subject: [PATCH 3/4] inet: Implement APIs for creating and deleting subnet
+ route
+To: connman@lists.01.org
+Cc: wagi@monom.org
+
+Signed-off-by: Jian Liang <jianliang@tycoint.com>
+
+---
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/network/connman/connman.git/commit/?id=3a15b0b7fccd053aff91da2cc68585509d0c509b]
+Signed-off-by: André Draszik <andre.draszik@jci.com>
+ src/connman.h |  4 ++++
+ src/inet.c    | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/src/connman.h b/src/connman.h
+index 21b7080..da4446a 100644
+--- a/src/connman.h
++++ b/src/connman.h
+@@ -240,7 +240,11 @@ int __connman_inet_rtnl_addattr32(struct nlmsghdr *n, size_t maxlen,
+ int __connman_inet_add_fwmark_rule(uint32_t table_id, int family, uint32_t fwmark);
+ int __connman_inet_del_fwmark_rule(uint32_t table_id, int family, uint32_t fwmark);
+ int __connman_inet_add_default_to_table(uint32_t table_id, int ifindex, const char *gateway);
++int __connman_inet_add_subnet_to_table(uint32_t table_id, int ifindex,
++			const char *gateway, unsigned char prefixlen);
+ int __connman_inet_del_default_from_table(uint32_t table_id, int ifindex, const char *gateway);
++int __connman_inet_del_subnet_from_table(uint32_t table_id, int ifindex,
++			const char *gateway, unsigned char prefixlen);
+ int __connman_inet_get_address_netmask(int ifindex,
+ 		struct sockaddr_in *address, struct sockaddr_in *netmask);
+ 
+diff --git a/src/inet.c b/src/inet.c
+index 0ddb030..dcd1ab2 100644
+--- a/src/inet.c
++++ b/src/inet.c
+@@ -2880,6 +2880,13 @@ int __connman_inet_add_default_to_table(uint32_t table_id, int ifindex,
+ 	return iproute_default_modify(RTM_NEWROUTE, table_id, ifindex, gateway, 0);
+ }
+ 
++int __connman_inet_add_subnet_to_table(uint32_t table_id, int ifindex,
++						const char *gateway, unsigned char prefixlen)
++{
++	/* ip route add 1.2.3.4/24 dev eth0 table 1234 */
++	return iproute_default_modify(RTM_NEWROUTE, table_id, ifindex, gateway, prefixlen);
++}
++
+ int __connman_inet_del_default_from_table(uint32_t table_id, int ifindex,
+ 						const char *gateway)
+ {
+@@ -2888,6 +2895,13 @@ int __connman_inet_del_default_from_table(uint32_t table_id, int ifindex,
+ 	return iproute_default_modify(RTM_DELROUTE, table_id, ifindex, gateway, 0);
+ }
+ 
++int __connman_inet_del_subnet_from_table(uint32_t table_id, int ifindex,
++						const char *gateway, unsigned char prefixlen)
++{
++	/* ip route del 1.2.3.4/24 dev eth0 table 1234 */
++	return iproute_default_modify(RTM_DELROUTE, table_id, ifindex, gateway, prefixlen);
++}
++
+ int __connman_inet_get_interface_ll_address(int index, int family,
+ 								void *address)
+ {
+-- 
+2.7.4
+

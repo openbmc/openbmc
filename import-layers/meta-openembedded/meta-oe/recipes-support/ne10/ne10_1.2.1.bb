@@ -29,7 +29,7 @@ python () {
         d.setVar('NE10_TARGET_ARCH', 'aarch64')
         bb.debug(2, 'Building Ne10 for aarch64')
     else:
-        raise bb.parse.SkipPackage("Incompatible with archs other than armv7 and aarch64")
+        raise bb.parse.SkipRecipe("Incompatible with archs other than armv7 and aarch64")
 }
 
 do_install() {

@@ -1,0 +1,32 @@
+From 4efdc06fb17b8a00a9eca923caa176be741d1e04 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 1 Feb 2018 14:56:13 +0800
+Subject: [PATCH 1/7] build/buildcheck.sh: improve libtool detection
+
+Support customize libtool by variable assigning, it is helpful
+for cross compileing (such as libtool=aarch64-linux-libtool)
+
+Upstream-Status: Submitted [https://github.com/apache/apr/pull/8]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ build/buildcheck.sh | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/build/buildcheck.sh b/build/buildcheck.sh
+index ab5df44..f191a41 100755
+--- a/build/buildcheck.sh
++++ b/build/buildcheck.sh
+@@ -40,7 +40,9 @@ fi
+ # output is multiline from 1.5 onwards
+ 
+ # Require libtool 1.4 or newer
+-libtool=`build/PrintPath glibtool1 glibtool libtool libtool15 libtool14`
++if test -z "$libtool"; then
++  libtool=`build/PrintPath glibtool1 glibtool libtool libtool15 libtool14`
++fi
+ lt_pversion=`$libtool --version 2>/dev/null|sed -e 's/([^)]*)//g;s/^[^0-9]*//;s/[- ].*//g;q'`
+ if test -z "$lt_pversion"; then
+   echo "buildconf: libtool not found."
+-- 
+1.8.3.1
+

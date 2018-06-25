@@ -38,4 +38,8 @@ do_install_append() {
     install -m 0644 ${WORKDIR}/minicoredumper.service ${D}${systemd_system_unitdir}
     install -d ${D}${sysconfdir}/init.d
     install -m 0644 ${WORKDIR}/minicoredumper.init ${D}${sysconfdir}/init.d/minicoredumper
+
+    # correct path of minicoredumper
+    sed -i -e s:/usr/bin/minicoredumper:${sbindir}/minicoredumper:g ${D}${sysconfdir}/init.d/minicoredumper
+    sed -i -e s:/usr/bin/minicoredumper:${sbindir}/minicoredumper:g ${D}${systemd_system_unitdir}/minicoredumper.service
 }

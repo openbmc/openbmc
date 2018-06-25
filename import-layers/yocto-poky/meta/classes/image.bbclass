@@ -17,7 +17,7 @@ RRECOMMENDS += "${PACKAGE_INSTALL_ATTEMPTONLY}"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-TESTIMAGECLASS = "${@base_conditional('TEST_IMAGE', '1', 'testimage-auto', '', d)}"
+TESTIMAGECLASS = "${@oe.utils.conditional('TEST_IMAGE', '1', 'testimage-auto', '', d)}"
 inherit ${TESTIMAGECLASS}
 
 # IMAGE_FEATURES may contain any available package group
@@ -289,7 +289,7 @@ SSTATETASKS += "do_image_complete"
 SSTATE_SKIP_CREATION_task-image-complete = '1'
 do_image_complete[sstate-inputdirs] = "${IMGDEPLOYDIR}"
 do_image_complete[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
-do_image_complete[stamp-extra-info] = "${MACHINE}"
+do_image_complete[stamp-extra-info] = "${MACHINE_ARCH}"
 addtask do_image_complete after do_image before do_build
 python do_image_complete_setscene () {
     sstate_setscene(d)
@@ -536,21 +536,29 @@ def get_rootfs_size(d):
     output = subprocess.check_output(['du', '-ks',
                                       d.getVar('IMAGE_ROOTFS')])
     size_kb = int(output.split()[0])
-    base_size = size_kb * overhead_factor
-    base_size = max(base_size, rootfs_req_size) + rootfs_extra_space
 
+    base_size = size_kb * overhead_factor
+    bb.debug(1, '%f = %d * %f' % (base_size, size_kb, overhead_factor))
+    base_size2 = max(base_size, rootfs_req_size) + rootfs_extra_space
+    bb.debug(1, '%f = max(%f, %d)[%f] + %d' % (base_size2, base_size, rootfs_req_size, max(base_size, rootfs_req_size), overhead_factor))
+
+    base_size = base_size2
     if base_size != int(base_size):
         base_size = int(base_size + 1)
     else:
         base_size = int(base_size)
+    bb.debug(1, '%f = int(%f)' % (base_size, base_size2))
 
+    base_size_saved = base_size
     base_size += rootfs_alignment - 1
     base_size -= base_size % rootfs_alignment
+    bb.debug(1, '%d = aligned(%d)' % (base_size, base_size_saved))
 
     # Do not check image size of the debugfs image. This is not supposed
     # to be deployed, etc. so it doesn't make sense to limit the size
     # of the debug.
     if (d.getVar('IMAGE_BUILDING_DEBUGFS') or "") == "true":
+        bb.debug(1, 'returning debugfs size %d' % (base_size))
         return base_size
 
     # Check the rootfs size against IMAGE_ROOTFS_MAXSIZE (if set)
@@ -568,6 +576,8 @@ def get_rootfs_size(d):
                 (base_size, initramfs_maxsize_int))
             bb.error("You can set INITRAMFS_MAXSIZE a larger value. Usually, it should")
             bb.fatal("be less than 1/2 of ram size, or you may fail to boot it.\n")
+
+    bb.debug(1, 'returning %d' % (base_size))
     return base_size
 
 python set_image_size () {
@@ -617,9 +627,9 @@ deltask do_populate_sysroot
 do_package[noexec] = "1"
 deltask do_package_qa
 do_packagedata[noexec] = "1"
-do_package_write_ipk[noexec] = "1"
-do_package_write_deb[noexec] = "1"
-do_package_write_rpm[noexec] = "1"
+deltask do_package_write_ipk
+deltask do_package_write_deb
+deltask do_package_write_rpm
 
 # Prepare the root links to point to the /usr counterparts.
 create_merged_usr_symlinks() {
@@ -654,7 +664,7 @@ ROOTFS_PREPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge'
 POPULATE_SDK_PRE_TARGET_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', 'create_merged_usr_symlinks_sdk; ', '',d)}"
 
 reproducible_final_image_task () {
-    if [ "$BUILD_REPRODUCIBLE_BINARIES" = "1" ]; then
+    if [ "${BUILD_REPRODUCIBLE_BINARIES}" = "1" ]; then
         if [ "$REPRODUCIBLE_TIMESTAMP_ROOTFS" = "" ]; then
             REPRODUCIBLE_TIMESTAMP_ROOTFS=`git log -1 --pretty=%ct`
         fi
@@ -664,3 +674,5 @@ reproducible_final_image_task () {
     fi
 }
 IMAGE_PREPROCESS_COMMAND_append = " reproducible_final_image_task; "
+
+CVE_PRODUCT = ""

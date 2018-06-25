@@ -1,7 +1,7 @@
-From 3e396f0b514f3acf90c02f5d55b3816028367a55 Mon Sep 17 00:00:00 2001
+From fb3002f77a175633af31019c513754d2ef5f3ac0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 2 Apr 2016 10:37:24 -0700
-Subject: [PATCH 11/15] build shared library for vchostif
+Subject: [PATCH 11/16] build shared library for vchostif
 
 Fixes #149
 
@@ -24,5 +24,5 @@ index c415176..d0cca1a 100755
  #add_library(bufman            vc_vchi_bufman.c            )
  
 -- 
-2.15.0
+2.16.1
 

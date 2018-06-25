@@ -16,7 +16,9 @@ DEPENDS = "gtk+"
 
 S = "${WORKDIR}/${BPN}"
 
-inherit autotools binconfig pkgconfig gettext
+inherit distro_features_check autotools binconfig pkgconfig gettext
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 do_configure_prepend () {
     rm -f ${S}/m4/init.m4

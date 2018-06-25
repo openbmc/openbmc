@@ -38,7 +38,7 @@
                             Browse layers listed in the various
                             <link linkend='layer-source'>layer sources</link>
                             that are available in your project (e.g. the
-                            OpenEmbedded Metadata Index at
+                            OpenEmbedded Layer Index at
                             <ulink url='http://layers.openembedded.org/layerindex/'></ulink>).
                             </para></listitem>
                         <listitem><para>

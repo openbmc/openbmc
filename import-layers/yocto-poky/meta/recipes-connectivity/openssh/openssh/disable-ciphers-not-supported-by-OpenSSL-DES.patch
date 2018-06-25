@@ -1,0 +1,39 @@
+From 265eaab8b39d8d8721224a48eefed5bf1696d353 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 18 Apr 2018 21:58:32 +0800
+Subject: [PATCH] disable ciphers not supported by OpenSSL DES
+
+While compiling openssl with option `no-des', it caused the openssh
+build failure
+...
+cipher.c:85:41: error: 'EVP_des_ede3_cbc' undeclared here (not in a function);
+...
+
+OpenSSL configured that way defines OPENSSL_NO_DES to disable des
+
+Suggested by dtucker@
+
+Upstream-Status: Submitted [openssh-unix-dev@mindrot.org]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ cipher.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cipher.c b/cipher.c
+index c3cd5dc..86558e1 100644
+--- a/cipher.c
++++ b/cipher.c
+@@ -82,7 +82,9 @@ struct sshcipher {
+ 
+ static const struct sshcipher ciphers[] = {
+ #ifdef WITH_OPENSSL
++#ifndef OPENSSL_NO_DES
+ 	{ "3des-cbc",		8, 24, 0, 0, CFLAG_CBC, EVP_des_ede3_cbc },
++#endif
+ 	{ "aes128-cbc",		16, 16, 0, 0, CFLAG_CBC, EVP_aes_128_cbc },
+ 	{ "aes192-cbc",		16, 24, 0, 0, CFLAG_CBC, EVP_aes_192_cbc },
+ 	{ "aes256-cbc",		16, 32, 0, 0, CFLAG_CBC, EVP_aes_256_cbc },
+-- 
+2.7.4
+

@@ -1,7 +1,7 @@
 LSB_RELEASE="released-5.0"
 LSB_ARCH="lsbarch"
 
-BASE_PACKAGES_LIST="lsb-setup-4.1.0-1.noarch.rpm"
+BASE_PACKAGES_LIST="lsb-setup-5.0.0-2.noarch.rpm"
 
 RUNTIME_BASE_PACKAGES_LIST="lsb-dist-checker-5.0.0.1-1.targetarch.rpm \
 	lsb-tet3-lite-3.7-27.lsb5.targetarch.rpm \

@@ -101,6 +101,7 @@ unset BDIR
 
 if [ -z "$BITBAKEDIR" ]; then
     BITBAKEDIR="$OEROOT/bitbake$BBEXTRA"
+    test -d "$BITBAKEDIR" || BITBAKEDIR="$OEROOT/../bitbake$BBEXTRA"
 fi
 
 BITBAKEDIR=$(readlink -f "$BITBAKEDIR")

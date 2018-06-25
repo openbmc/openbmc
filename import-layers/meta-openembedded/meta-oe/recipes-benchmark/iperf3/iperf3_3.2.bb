@@ -15,7 +15,6 @@ DEPENDS = "openssl"
 
 SRC_URI = "git://github.com/esnet/iperf.git \
            file://automake-foreign.patch \
-           file://0001-include-stdint.h-for-various-std-c99-int-types.patch \
            file://0002-Remove-pg-from-profile_CFLAGS.patch \
            "
 

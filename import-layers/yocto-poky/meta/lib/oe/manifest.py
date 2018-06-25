@@ -274,8 +274,8 @@ class OpkgManifest(Manifest):
                     if pkg_list is not None:
                         pkgs[self.var_maps[self.manifest_type][var]] = self.d.getVar(var)
 
-            for pkg_type in pkgs:
-                for pkg in pkgs[pkg_type].split():
+            for pkg_type in sorted(pkgs):
+                for pkg in sorted(pkgs[pkg_type].split()):
                     manifest.write("%s,%s\n" % (pkg_type, pkg))
 
     def create_final(self):

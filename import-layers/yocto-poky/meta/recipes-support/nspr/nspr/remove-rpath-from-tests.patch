@@ -11,12 +11,12 @@ in file {builddir}/tmp/work/armv5te-poky-linux-gnueabi/nspr-4.8.9-r1/packages-sp
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 Upstream-Status: Pending
 
-Index: nspr-4.8.9/mozilla/nsprpub/pr/tests/Makefile.in
+Index: nspr/pr/tests/Makefile.in
 ===================================================================
---- nsprpub.orig/pr/tests/Makefile.in	2012-02-11 00:01:10.476220505 +0200
-+++ nsprpub/pr/tests/Makefile.in	2012-02-10 23:57:40.000000000 +0200
-@@ -379,7 +379,7 @@
- endif
+--- nspr.orig/pr/tests/Makefile.in
++++ nspr/pr/tests/Makefile.in
+@@ -315,7 +315,7 @@ ifeq ($(OS_ARCH), SunOS)
+ endif # SunOS
  
  ifeq (,$(filter-out Linux GNU GNU_%,$(OS_ARCH)))
 -    LDOPTS += -Xlinker -rpath $(ABSOLUTE_LIB_DIR)

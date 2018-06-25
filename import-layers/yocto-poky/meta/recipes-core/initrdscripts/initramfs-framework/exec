@@ -1,0 +1,29 @@
+#!/bin/sh
+# Copyright (C) 2017 O.S. Systems Software LTDA.
+# Licensed on MIT
+
+EXEC_DIR=/exec.d  # place to look for modules
+
+exec_enabled() {
+	return 0
+}
+
+exec_run() {
+	if [ ! -d $EXEC_DIR ]; then
+		msg "No contents to exec in $EXEC_DIR. Starting shell ..."
+		sh
+	fi
+
+	# Load and run modules
+	for m in $EXEC_DIR/*; do
+		# Skip backup files
+		if [ "`echo $m | sed -e 's/\~$//'`" != "$m" ]; then
+			continue
+		fi
+
+		debug "Starting $m"
+
+		# process module
+		./$m
+	done
+}

@@ -1,0 +1,33 @@
+From 1ce892749e4f53bd0aeaa4c3ce45f80178799411 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 3 Mar 2018 17:52:51 -0800
+Subject: [PATCH] multicast_blast/tipcc: Fix struct type for TIPC_GROUP_JOIN
+
+Kernel defines it as tipc_group_req and not tipc_mreq
+this code was not excercised with older kernels so we
+never ran into the compiler failures since TIPC_GROUP_JOIN
+is only defined in kernel starting 4.15
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ multicast_blast/tipcc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/multicast_blast/tipcc.c b/multicast_blast/tipcc.c
+index 90644d3..911c759 100755
+--- a/multicast_blast/tipcc.c
++++ b/multicast_blast/tipcc.c
+@@ -213,7 +213,7 @@ int tipc_accept(int sd, struct tipc_addr *src)
+ int tipc_join(int sd, struct tipc_addr *member)
+ {
+ #ifdef TIPC_GROUP_JOIN
+-	struct tipc_mreq mreq = {
++	struct tipc_group_req mreq = {
+ 		.type = member->type,
+ 		.instance = member->instance,
+ 		.scope = domain2scope(member->domain)
+-- 
+2.16.2
+

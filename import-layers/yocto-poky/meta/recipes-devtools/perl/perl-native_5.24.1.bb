@@ -1,8 +1,7 @@
 require perl.inc
 
 # We need gnugrep (for -I)
-DEPENDS = "virtual/db-native grep-native"
-DEPENDS += "gdbm-native zlib-native"
+DEPENDS = "db-native grep-native gdbm-native zlib-native"
 
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
@@ -16,6 +15,7 @@ SRC_URI += "\
            file://dynaloaderhack.patch \
            file://perl-PathTools-don-t-filter-out-blib-from-INC.patch \
            file://0001-Configure-Remove-fstack-protector-strong-for-native-.patch \
+           file://perl-5.26.1-guard_old_libcrypt_fix.patch \
           "
 
 SRC_URI[md5sum] = "af6a84c7c3e2b8b269c105a5db2f6d53"
@@ -135,3 +135,5 @@ EOF
 
 # Fix the path in sstate
 SSTATE_SCAN_FILES += "*.pm *.pod *.h *.pl *.sh"
+PACKAGES_DYNAMIC_class-native += "^perl-module-.*native$"
+

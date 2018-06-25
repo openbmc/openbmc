@@ -1,0 +1,160 @@
+From 6db2a606196fb38a6d106dc409eee1cb9a40a440 Mon Sep 17 00:00:00 2001
+From: Tor Didriksen <tor.didriksen@oracle.com>
+Date: Mon, 24 Jun 2013 17:15:35 +0200
+Subject: [PATCH] Bug#16809055 MYSQL 5.6 AND 5.7 STILL USE LIBMYSQLCLIENT.SO.18
+
+With this patch, the libmysql/ directory contains:
+libmysqlclient.a
+libmysqlclient_r.a -> libmysqlclient.a
+libmysqlclient_r.so -> libmysqlclient.so*
+libmysqlclient_r.so.18 -> libmysqlclient.so.18*
+libmysqlclient_r.so.18.1.0 -> libmysqlclient.so.18.1.0*
+libmysqlclient.so -> libmysqlclient.so.18*
+libmysqlclient.so.18 -> libmysqlclient.so.18.1.0*
+libmysqlclient.so.18.1.0*
+
+This fixes libmysqlclient_r symlinks pointing to the unversioned
+libmysqlclient.so symlink (leading to package QA errors since the
+libmysqlclient-r package ends up depending on libmysqlclient-dev).
+
+Borrowed from MySQL 5.6 tree at https://github.com/percona/mysql/
+
+Upstream-Status: Pending
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+---
+ cmake/install_macros.cmake | 25 +++++++++++++++----------
+ libmysql/CMakeLists.txt    | 34 +++++++++++++++++++++++++++-------
+ 2 files changed, 42 insertions(+), 17 deletions(-)
+
+diff --git a/cmake/install_macros.cmake b/cmake/install_macros.cmake
+index b8efdf8..a0d0e68 100644
+--- a/cmake/install_macros.cmake
++++ b/cmake/install_macros.cmake
+@@ -1,4 +1,4 @@
+-# Copyright (c) 2009, 2011, Oracle and/or its affiliates. All rights reserved.
++# Copyright (c) 2009, 2013, Oracle and/or its affiliates. All rights reserved.
+ # 
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -167,28 +167,33 @@ ENDFUNCTION()
+ 
+ 
+ # Install symbolic link to CMake target. 
+-# the link is created in the same directory as target
+-# and extension will be the same as for target file.
+-MACRO(INSTALL_SYMLINK linkname target destination component)
++# We do 'cd path; ln -s target_name link_name'
++# We also add an INSTALL target for "${path}/${link_name}"
++MACRO(INSTALL_SYMLINK target target_name link_name destination component)
+ IF(UNIX)
+   GET_TARGET_PROPERTY(location ${target} LOCATION)
+   GET_FILENAME_COMPONENT(path ${location} PATH)
+-  GET_FILENAME_COMPONENT(name ${location} NAME)
+-  SET(output ${path}/${linkname})
++  MESSAGE(STATUS "target ${target}")
++  MESSAGE(STATUS "link_name ${link_name}")
++  MESSAGE(STATUS "target_name ${target_name}")
++  MESSAGE(STATUS "path ${path}")
++  MESSAGE(STATUS "")
++
++  SET(output ${path}/${link_name})
+   ADD_CUSTOM_COMMAND(
+     OUTPUT ${output}
+     COMMAND ${CMAKE_COMMAND} ARGS -E remove -f ${output}
+     COMMAND ${CMAKE_COMMAND} ARGS -E create_symlink 
+-      ${name} 
+-      ${linkname}
++      ${target_name} 
++      ${link_name}
+     WORKING_DIRECTORY ${path}
+     DEPENDS ${target}
+     )
+   
+-  ADD_CUSTOM_TARGET(symlink_${linkname}
++  ADD_CUSTOM_TARGET(symlink_${link_name}
+     ALL
+     DEPENDS ${output})
+-  SET_TARGET_PROPERTIES(symlink_${linkname} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
++  SET_TARGET_PROPERTIES(symlink_${link_name} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
+   IF(CMAKE_GENERATOR MATCHES "Xcode")
+     # For Xcode, replace project config with install config
+     STRING(REPLACE "${CMAKE_CFG_INTDIR}" 
+diff --git a/libmysql/CMakeLists.txt b/libmysql/CMakeLists.txt
+index be5760f..96286ff 100644
+--- a/libmysql/CMakeLists.txt
++++ b/libmysql/CMakeLists.txt
+@@ -433,6 +433,12 @@ IF(MSVC)
+  INSTALL_DEBUG_TARGET(clientlib DESTINATION ${INSTALL_LIBDIR}/debug)
+ ENDIF()
+ 
++MACRO(GET_TARGET_NAME target out_name)
++  GET_TARGET_PROPERTY(location ${target} LOCATION)
++  GET_FILENAME_COMPONENT(name ${location} NAME)
++  SET(${out_name} ${name})
++ENDMACRO()
++
+ IF(UNIX)
+   MACRO(GET_VERSIONED_LIBNAME LIBNAME EXTENSION VERSION OUTNAME)
+     SET(DOT_VERSION ".${VERSION}")
+@@ -445,7 +451,13 @@ IF(UNIX)
+       SET(${OUTNAME} ${LIBNAME}${EXTENSION}${DOT_VERSION})
+     ENDIF() 
+   ENDMACRO()
+-  INSTALL_SYMLINK(${CMAKE_STATIC_LIBRARY_PREFIX}mysqlclient_r.a mysqlclient ${INSTALL_LIBDIR} Development)
++ENDIF()
++
++IF(UNIX)
++  GET_TARGET_NAME(mysqlclient lib_name)
++  INSTALL_SYMLINK(mysqlclient
++    ${lib_name} ${CMAKE_STATIC_LIBRARY_PREFIX}mysqlclient_r.a
++    ${INSTALL_LIBDIR} Development)
+ ENDIF()
+ 
+ IF(NOT DISABLE_SHARED)
+@@ -456,10 +468,9 @@ IF(NOT DISABLE_SHARED)
+     # libtool compatability
+     IF(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
+       SET(OS_SHARED_LIB_VERSION "${SHARED_LIB_MAJOR_VERSION}")
+-    ELSEIF(CMAKE_SYSTEM_NAME MATCHES "HP-UX")
+-      SET(OS_SHARED_LIB_VERSION "${SHARED_LIB_MAJOR_VERSION}.0")
+     ELSE()
+-      SET(OS_SHARED_LIB_VERSION "${SHARED_LIB_MAJOR_VERSION}.0.0")
++      SET(OS_SHARED_LIB_VERSION
++        "${SHARED_LIB_MAJOR_VERSION}.${SHARED_LIB_MINOR_VERSION}.0")
+     ENDIF()
+     # Name of shared library is mysqlclient on Unix
+     SET_TARGET_PROPERTIES(libmysql PROPERTIES 
+@@ -482,8 +493,13 @@ IF(NOT DISABLE_SHARED)
+       "${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       ""
+       linkname)
+-    INSTALL_SYMLINK(${linkname} libmysql ${INSTALL_LIBDIR} SharedLibraries)
+-    SET(OS_SHARED_LIB_SYMLINKS "${SHARED_LIB_MAJOR_VERSION}" "${OS_SHARED_LIB_VERSION}")
++    GET_TARGET_NAME(libmysql lib_name)
++    GET_FILENAME_COMPONENT(lib_name_we ${lib_name} NAME_WE)
++    INSTALL_SYMLINK(libmysql
++      ${lib_name} ${linkname}
++      ${INSTALL_LIBDIR} SharedLibraries)
++    SET(OS_SHARED_LIB_SYMLINKS
++      "${SHARED_LIB_MAJOR_VERSION}" "${OS_SHARED_LIB_VERSION}")
+     LIST(REMOVE_DUPLICATES OS_SHARED_LIB_SYMLINKS)
+     FOREACH(ver ${OS_SHARED_LIB_SYMLINKS})
+       GET_VERSIONED_LIBNAME(
+@@ -491,7 +507,11 @@ IF(NOT DISABLE_SHARED)
+         "${CMAKE_SHARED_LIBRARY_SUFFIX}"
+         "${ver}"
+         linkname)
+-      INSTALL_SYMLINK(${linkname} libmysql ${INSTALL_LIBDIR} SharedLibraries)
++      GET_VERSIONED_LIBNAME(
++        ${lib_name_we} "${CMAKE_SHARED_LIBRARY_SUFFIX}" "${ver}" lib_name_ver)
++      INSTALL_SYMLINK(libmysql
++        ${lib_name_ver} ${linkname}
++        ${INSTALL_LIBDIR} SharedLibraries)
+     ENDFOREACH()
+   ENDIF()
+ ENDIF()
+-- 
+2.0.3
+

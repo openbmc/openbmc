@@ -1,13 +1,13 @@
 HOMEPAGE = "https://github.com/jfrazelle/netns"
 SUMMARY = "Runc hook for setting up default bridge networking."
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://src/import/LICENSE;md5=20ce4c6a4f32d6ee4a68e3a7506db3f1"
+LIC_FILES_CHKSUM = "file://src/import/LICENSE;md5=48ef0979a2bcc3fae14ff30b8a7f5dbf"
 
-SRC_URI = "git://github.com/jessfraz/netns;branch=master \
-           file://0001-Use-correct-go-cross-compiler.patch \
+SRC_URI = "git://github.com/genuinetools/netns;branch=master \
+           file://0001-Allow-selection-of-go-compiler.patch \
           "
-SRCREV = "74e23a0e5c4e7ac011aafcc4623586c196f1b3ef"
-PV = "0.2.1"
+SRCREV = "0da6ab0997707024debe68c91e940c9168041bf8"
+PV = "0.4.0"
 GO_IMPORT = "import"
 
 S = "${WORKDIR}/git"
@@ -26,9 +26,9 @@ do_compile() {
 	# We also need to link in the ipallocator and version directories as
 	# they are not under the src directory.
 	ln -sfn . "${S}/src/import/vendor/src"
-	mkdir -p "${S}/src/import/vendor/src/github.com/jessfraz/netns"
-	ln -sfn "${S}/src/import/ipallocator" "${S}/src/import/vendor/src/github.com/jessfraz/netns/ipallocator"
-	ln -sfn "${S}/src/import/version" "${S}/src/import/vendor/src/github.com/jessfraz/netns/version"
+	mkdir -p "${S}/src/import/vendor/src/github.com/genuinetools/netns"
+	ln -sfn "${S}/src/import/ipallocator" "${S}/src/import/vendor/src/github.com/genuinetools/netns/ipallocator"
+	ln -sfn "${S}/src/import/version" "${S}/src/import/vendor/src/github.com/genuinetools/netns/version"
 	export GOPATH="${S}/src/import/vendor"
 
 	# Pass the needed cflags/ldflags so that cgo

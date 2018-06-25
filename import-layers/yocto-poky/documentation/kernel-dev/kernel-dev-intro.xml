@@ -108,7 +108,11 @@
         review and understand the following documentation:
         <itemizedlist>
             <listitem><para>
-                <ulink url='&YOCTO_DOCS_QS_URL;'>Yocto Project Quick Start</ulink>
+                <ulink url='&YOCTO_DOCS_BRIEF_URL;'>Yocto Project Quick Build</ulink>
+                document.
+                </para></listitem>
+            <listitem><para>
+                <ulink url='&YOCTO_DOCS_OM_URL;'>Yocto Project Overview and Concepts Manual</ulink>.
                 </para></listitem>
             <listitem><para>
                 <ulink url='&YOCTO_DOCS_SDK_URL;#using-devtool-in-your-sdk-workflow'><filename>devtool</filename> workflow</ulink>
@@ -126,18 +130,6 @@
                 section.
                 </para></listitem>
         </itemizedlist>
-    </para>
-
-    <para>
-        Finally, while this document focuses on the manual creation of
-        recipes, patches, and configuration files, the Yocto Project
-        Board Support Package (BSP) tools are available to automate
-        this process with existing content and work well to create the
-        initial framework and boilerplate code.
-        For details on these tools, see the
-        "<ulink url='&YOCTO_DOCS_BSP_URL;#using-the-yocto-projects-bsp-tools'>Using the Yocto Project's BSP Tools</ulink>"
-        section in the Yocto Project Board Support Package (BSP) Developer's
-        Guide.
     </para>
 </section>
 
@@ -165,12 +157,15 @@
     <para>
         <orderedlist>
             <listitem><para>
-                <emphasis>Set Up Your Host Development System to Support
-                Development Using the Yocto Project:</emphasis>
+
+
+                <emphasis>Set up Your Host Development System to Support
+                Development Using the Yocto Project</emphasis>:
                 See the
-                "<ulink url='&YOCTO_DOCS_QS_URL;#yp-resources'>Setting Up to Use the Yocto Project</ulink>"
-                section in the Yocto Project Quick Start for options on how
-                to get a build host ready to use the Yocto Project.
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#dev-manual-start'>Setting Up the Development Host to Use the Yocto Project</ulink>"
+                section in the Yocto Project Development Tasks Manual for
+                options on how to get a build host ready to use the Yocto
+                Project.
                 </para></listitem>
             <listitem><para>
                 <emphasis>Set Up Your Host Development System for Kernel Development:</emphasis>
@@ -243,11 +238,7 @@
 
                 <para>Additionally, if you are working in a BSP layer
                 and need to modify the BSP's kernel's configuration,
-                you can use the
-                <ulink url='&YOCTO_DOCS_BSP_URL;#managing-kernel-patches-and-config-items-with-yocto-kernel'><filename>yocto-kernel</filename></ulink>
-                script as well as <filename>menuconfig</filename>.
-                The <filename>yocto-kernel</filename> script lets
-                you interactively set up kernel configurations.
+                you can use <filename>menuconfig</filename>.
                 </para></listitem>
             <listitem><para>
                 <emphasis>Rebuild the Kernel Image With Your Changes:</emphasis>

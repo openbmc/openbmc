@@ -22,6 +22,8 @@ SRC_URI += " \
 SRC_URI[md5sum] = "573f21aaac7d5c9549798e72ffcefedd"
 SRC_URI[sha256sum] = "6071bfc817d94723e9b458a010d565365104f84aa73f7fe11919871f7562ff72"
 
+DEFAULT_PREFERENCE = "-1"
+
 inherit setuptools pypi
 
 DEPENDS += "openssl swig-native"

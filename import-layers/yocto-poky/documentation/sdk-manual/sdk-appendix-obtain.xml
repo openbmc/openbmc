@@ -105,7 +105,7 @@
                 <emphasis>Set Up the Build Environment:</emphasis>
                 Be sure you are set up to use BitBake in a shell.
                 See the
-                "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Setting Up the Development Host to Use the Yocto Project</ulink>"
+                "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Preparing the Build Host</ulink>"
                 section in the Yocto Project Development Tasks Manual for
                 information on how to get a build host ready that is either a
                 native Linux machine or a machine that uses CROPS.
@@ -203,7 +203,7 @@
                         <listitem><para>
                             For additional information on building the
                             installer, see the
-                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an Eclipse Debug Capable Image</ulink>
+                            <ulink url='https://wiki.yoctoproject.org/wiki/TipsAndTricks/RunningEclipseAgainstBuiltImage'>Cookbook guide to Making an <trademark class='trade'>Eclipse</trademark> Debug Capable Image</ulink>
                             wiki page.
                             </para></listitem>
                     </itemizedlist>
@@ -327,7 +327,7 @@
                 <para>Following is an example command that extracts the root
                 filesystem from a previously built root filesystem image that
                 was downloaded from the
-                <ulink url='&YOCTO_DOCS_REF_URL;#index-downloads'>Index of Releases</ulink>.
+                <ulink url='&YOCTO_DOCS_OM_URL;#index-downloads'>Index of Releases</ulink>.
                 This command extracts the root filesystem into the
                 <filename>core2-64-sato</filename> directory:
                 <literallayout class='monospaced'>

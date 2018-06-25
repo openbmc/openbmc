@@ -1,0 +1,42 @@
+From dfb422c744fdc1838afc40b8e1f161bb46093d92 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Sun, 8 Apr 2018 12:06:42 +0800
+Subject: [PATCH] configure.ac: add option for dbus
+
+Add option for dbus so that users could choose to build with dbus
+or with no dbus.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ configure.ac | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4db15c7909..493f393d31 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -976,12 +976,15 @@ AS_IF([test "$enable_plugins" = yes],[
+ ])
+ AM_CONDITIONAL(ENABLE_PLUGINS,[test "$enable_plugins" = yes])
+ 
+-with_dbus=no
+-AS_IF([test "$enable_plugins" != no],[
++AC_ARG_WITH([dbus], [AS_HELP_STRING([--with-dbus], [build with dbus support])],
++            [],
++            [with_dbus=yes])
++
++AS_IF([test "$with_dbus" != no],[
+   PKG_CHECK_MODULES([DBUS],
+     [dbus-1 >= 1.3],
+-    [AC_DEFINE(DBUS, 1, [Build with dbus support?]) with_dbus=yes],
+-    [with_dbus=no])
++    [AC_DEFINE(DBUS, 1, [Build with dbus support?])],
++    [AC_MSG_ERROR([dbus not present (--without-dbus to disable)])])
+   AC_SUBST(DBUS_CFLAGS)
+   AC_SUBST(DBUS_LIBS)
+ ])
+-- 
+2.11.0
+

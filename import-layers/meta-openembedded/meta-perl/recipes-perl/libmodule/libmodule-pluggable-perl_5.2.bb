@@ -17,9 +17,14 @@ LICENSE = "Artistic-1.0 | GPL-1.0+"
 LIC_FILES_CHKSUM = "file://README;beginline=322;endline=325;md5=086450ce010f6fda25db0b38fcc41086"
 
 SRCNAME = "Module-Pluggable"
-SRC_URI = "https://github.com/moto-timo/${SRCNAME}/archive/${PV}.tar.gz"
-SRC_URI[md5sum] = "e32475d6ff5843f738cedacd3b7a2cdb"
-SRC_URI[sha256sum] = "58c62292eea6d06959eba1b97598650813211265403242d57efb2f605c96059f"
+SRC_URI = "${CPAN_MIRROR}/authors/id/S/SI/SIMONW/${SRCNAME}-${PV}.tar.gz"
+SRC_URI[md5sum] = "87ce2971662efd0b69a81bb4dc9ea76c"
+SRC_URI[sha256sum] = "b3f2ad45e4fd10b3fb90d912d78d8b795ab295480db56dc64e86b9fa75c5a6df"
+
+PR = "r1"
+
+UPSTREAM_CHECK_REGEX = "Module\-Pluggable\-(?P<pver>(\d+\.\d+))"
+UPSTREAM_CHECK_URI = "https://metacpan.org/release/${SRCNAME}"
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 

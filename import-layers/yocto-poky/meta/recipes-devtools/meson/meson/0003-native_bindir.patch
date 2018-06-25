@@ -1,0 +1,114 @@
+From ffa72eac56558aa4171dd70ac1e9c27a07338fa2 Mon Sep 17 00:00:00 2001
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Date: Wed, 15 Nov 2017 15:05:01 +0100
+Subject: [PATCH 4/4] native_bindir
+
+Some libraries, like QT, have pre-processors that convert their input
+files into something that the cross-compiler can process. We find the
+path of those pre-processors via pkg-config-native instead of
+pkg-config.
+
+This path forces the use of pkg-config-native for host_bins arguments.
+
+There are some discussions upstream to merge this patch, but I presonaly believe
+that is is OE only. https://github.com/mesonbuild/meson/issues/1849#issuecomment-303730323
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+
+---
+ mesonbuild/dependencies/base.py | 16 ++++++++++------
+ mesonbuild/dependencies/ui.py   |  6 +++---
+ 2 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/mesonbuild/dependencies/base.py b/mesonbuild/dependencies/base.py
+index bf79bc5..c9fd08c 100644
+--- a/mesonbuild/dependencies/base.py
++++ b/mesonbuild/dependencies/base.py
+@@ -131,7 +131,7 @@ class Dependency:
+     def need_threads(self):
+         return False
+ 
+-    def get_pkgconfig_variable(self, variable_name, kwargs):
++    def get_pkgconfig_variable(self, variable_name, kwargs, use_native=False):
+         raise DependencyException('{!r} is not a pkgconfig dependency'.format(self.name))
+ 
+     def get_configtool_variable(self, variable_name):
+@@ -150,7 +150,7 @@ class InternalDependency(Dependency):
+         self.sources = sources
+         self.ext_deps = ext_deps
+ 
+-    def get_pkgconfig_variable(self, variable_name, kwargs):
++    def get_pkgconfig_variable(self, variable_name, kwargs, use_native=False):
+         raise DependencyException('Method "get_pkgconfig_variable()" is '
+                                   'invalid for an internal dependency')
+ 
+@@ -425,10 +425,14 @@ class PkgConfigDependency(ExternalDependency):
+         return s.format(self.__class__.__name__, self.name, self.is_found,
+                         self.version_reqs)
+ 
+-    def _call_pkgbin(self, args, env=None):
++    def _call_pkgbin(self, args, env=None, use_native=False):
+         if not env:
+             env = os.environ
+-        p, out = Popen_safe([self.pkgbin] + args, env=env)[0:2]
++        if use_native:
++            pkgbin = [self.pkgbin + "-native"]
++        else:
++            pkgbin = [self.pkgbin]
++        p, out = Popen_safe(pkgbin + args, env=env)[0:2]
+         return p.returncode, out.strip()
+ 
+     def _convert_mingw_paths(self, args):
+@@ -522,7 +526,7 @@ class PkgConfigDependency(ExternalDependency):
+             # linkers such as MSVC, so prepend them.
+             self.link_args = ['-L' + lp for lp in libpaths] + self.link_args
+ 
+-    def get_pkgconfig_variable(self, variable_name, kwargs):
++    def get_pkgconfig_variable(self, variable_name, kwargs, use_native=False):
+         options = ['--variable=' + variable_name, self.name]
+ 
+         if 'define_variable' in kwargs:
+@@ -535,7 +539,7 @@ class PkgConfigDependency(ExternalDependency):
+ 
+             options = ['--define-variable=' + '='.join(definition)] + options
+ 
+-        ret, out = self._call_pkgbin(options)
++        ret, out = self._call_pkgbin(options, use_native=use_native)
+         variable = ''
+         if ret != 0:
+             if self.required:
+diff --git a/mesonbuild/dependencies/ui.py b/mesonbuild/dependencies/ui.py
+index 1db518c..4ed1d04 100644
+--- a/mesonbuild/dependencies/ui.py
++++ b/mesonbuild/dependencies/ui.py
+@@ -239,7 +239,7 @@ class QtBaseDependency(ExternalDependency):
+         self.bindir = self.get_pkgconfig_host_bins(core)
+         if not self.bindir:
+             # If exec_prefix is not defined, the pkg-config file is broken
+-            prefix = core.get_pkgconfig_variable('exec_prefix', {})
++            prefix = core.get_pkgconfig_variable('exec_prefix', {}, use_native=True)
+             if prefix:
+                 self.bindir = os.path.join(prefix, 'bin')
+ 
+@@ -359,7 +359,7 @@ class Qt4Dependency(QtBaseDependency):
+         applications = ['moc', 'uic', 'rcc', 'lupdate', 'lrelease']
+         for application in applications:
+             try:
+-                return os.path.dirname(core.get_pkgconfig_variable('%s_location' % application, {}))
++                return os.path.dirname(core.get_pkgconfig_variable('%s_location' % application, {}, use_native=True))
+             except MesonException:
+                 pass
+ 
+@@ -369,7 +369,7 @@ class Qt5Dependency(QtBaseDependency):
+         QtBaseDependency.__init__(self, 'qt5', env, kwargs)
+ 
+     def get_pkgconfig_host_bins(self, core):
+-        return core.get_pkgconfig_variable('host_bins', {})
++        return core.get_pkgconfig_variable('host_bins', {}, use_native=True)
+ 
+ 
+ # There are three different ways of depending on SDL2:
+-- 
+2.15.1
+

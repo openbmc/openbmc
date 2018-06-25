@@ -1,0 +1,100 @@
+From 5e6f05cd8dad6c1ee6bd1e6e43f176976c9c3416 Mon Sep 17 00:00:00 2001
+From: Kir Kolyshkin <kolyshkin@gmail.com>
+Date: Tue, 29 May 2018 17:52:56 -0700
+Subject: [PATCH 2/3] Optimize rpmSetCloseOnExec
+
+In case maximum number of open files limit is set too high, both
+luaext/Pexec() and lib/doScriptExec() spend way too much time
+trying to set FD_CLOEXEC flag for all those file descriptors,
+resulting in severe increase of time it takes to execute say
+rpm or dnf.
+
+This becomes increasingly noticeable when running with e.g. under
+Docker, the reason being:
+
+> $ docker run fedora ulimit -n
+> 1048576
+
+One obvious fix is to use procfs to get the actual list of opened fds
+and iterate over it. My quick-n-dirty benchmark shows the /proc approach
+is about 10x faster than iterating through a list of just 1024 fds,
+so it's an improvement even for default ulimit values.
+
+Note that the old method is still used in case /proc is not available.
+
+While at it,
+
+ 1. fix the function by making sure we modify (rather than set)
+    the existing flags. As the only known flag is FD_CLOEXEC,
+    this change is currently purely aesthetical, but in case
+    other flags will appear it will become a real bug fix.
+
+ 2. get rid of magic number 3; use STDERR_FILENO
+
+Signed-off-by: Kir Kolyshkin <kolyshkin@gmail.com>
+
+Fixes #444
+
+Upstream-Status: Accepted [https://github.com/rpm-software-management/rpm/pull/444]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ rpmio/rpmio.c | 43 ++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 34 insertions(+), 9 deletions(-)
+
+diff --git a/rpmio/rpmio.c b/rpmio/rpmio.c
+index ea111d2ec..55351c221 100644
+--- a/rpmio/rpmio.c
++++ b/rpmio/rpmio.c
+@@ -1760,18 +1760,43 @@ DIGEST_CTX fdDupDigest(FD_t fd, int id)
+     return ctx;
+ }
+ 
++static void set_cloexec(int fd)
++{
++	int flags = fcntl(fd, F_GETFD);
++
++	if (flags == -1 || (flags & FD_CLOEXEC))
++		return;
++
++	fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
++}
++
+ void rpmSetCloseOnExec(void)
+ {
+-	int flag, fdno, open_max;
++	const int min_fd = STDERR_FILENO; /* don't touch stdin/out/err */
++	int fd;
++
++	DIR *dir = opendir("/proc/self/fd");
++	if (dir == NULL) { /* /proc not available */
++		/* iterate over all possible fds, might be slow */
++		int open_max = sysconf(_SC_OPEN_MAX);
++		if (open_max == -1)
++			open_max = 1024;
+ 
+-	open_max = sysconf(_SC_OPEN_MAX);
+-	if (open_max == -1) {
+-		open_max = 1024;
++		for (fd = min_fd + 1; fd < open_max; fd++)
++			set_cloexec(fd);
++
++		return;
+ 	}
+-	for (fdno = 3; fdno < open_max; fdno++) {
+-		flag = fcntl(fdno, F_GETFD);
+-		if (flag == -1 || (flag & FD_CLOEXEC))
+-			continue;
+-		fcntl(fdno, F_SETFD, FD_CLOEXEC);
++
++	/* iterate over fds obtained from /proc */
++	struct dirent *entry;
++	while ((entry = readdir(dir)) != NULL) {
++		fd = atoi(entry->d_name);
++		if (fd > min_fd)
++			set_cloexec(fd);
+ 	}
++
++	closedir(dir);
++
++	return;
+ }

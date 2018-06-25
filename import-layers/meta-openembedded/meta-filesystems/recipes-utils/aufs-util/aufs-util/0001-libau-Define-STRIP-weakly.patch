@@ -1,4 +1,4 @@
-From bb8801fb21ac8d73e3b1a11a8555aaf822182a51 Mon Sep 17 00:00:00 2001
+From daf04dc9ca1f2e4c65ec338ab439e0a792e1a8ac Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 5 Sep 2017 10:36:52 -0700
 Subject: [PATCH] libau: Define STRIP weakly
@@ -6,10 +6,11 @@ Subject: [PATCH] libau: Define STRIP weakly
 STRIP can be set on environment to use cross version of strip utility
 hardcoding to strip is not working in cross environment
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Submitted
 
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
  libau/Makefile | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
@@ -34,6 +35,3 @@ index 81520ac..c25eef2 100644
  #	readelf --syms --use-dynamic libau.so
  
  install_ulib: File = ${LibSo}.${LibSoMajor}.${LibSoMinor}
--- 
-2.14.1
-

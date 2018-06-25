@@ -15,6 +15,8 @@ SRC_URI[sha256sum] = "a4fb37b02860f6b1617f6469487471fd086dd2d38bbce640c2055862b9
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 
+DEFAULT_PREFERENCE = "-1"
+
 inherit setuptools
 
 RDEPENDS_${PN} = "redis"

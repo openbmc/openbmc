@@ -169,7 +169,10 @@ FILES_${PN}-hostname = "${base_bindir}/hostname.${BPN}"
 FILES_${PN}-ifconfig = "${base_sbindir}/ifconfig.${BPN}"
 FILES_${PN}-traceroute = "${bindir}/traceroute.${BPN}"
 FILES_${PN}-logger = "${bindir}/logger.${BPN}"
+
 FILES_${PN}-syslogd = "${base_sbindir}/syslogd.${BPN}"
+RCONFLICTS_${PN}-syslogd = "rsyslog busybox-syslog sysklogd syslog-ng"
+
 FILES_${PN}-ftp = "${bindir}/ftp.${BPN}"
 
 FILES_${PN}-tftp = "${bindir}/tftp.${BPN}"

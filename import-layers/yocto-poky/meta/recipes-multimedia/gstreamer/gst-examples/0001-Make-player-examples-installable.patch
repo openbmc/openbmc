@@ -1,0 +1,39 @@
+From 755f6dab07565aca7b6aefacad8be65de364ff75 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Thu, 17 Aug 2017 11:07:02 +0300
+Subject: [PATCH] Make player examples installable
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Upstream-Status: Denied [Upstream considers these code examples, for now a least]
+
+https://bugzilla.gnome.org/show_bug.cgi?id=777827
+---
+ playback/player/gst-play/meson.build | 1 +
+ playback/player/gtk/meson.build      | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/playback/player/gst-play/meson.build b/playback/player/gst-play/meson.build
+index 719b55b..a56fe13 100644
+--- a/playback/player/gst-play/meson.build
++++ b/playback/player/gst-play/meson.build
+@@ -8,5 +8,6 @@ executable('gst-play',
+     ['gst-play.c',
+      'gst-play-kb.c',
+      'gst-play-kb.h'],
++    install: true,
+     dependencies : [gst_dep, gstplayer_dep, m_dep])
+ 
+diff --git a/playback/player/gtk/meson.build b/playback/player/gtk/meson.build
+index 08aae4f..671a65d 100644
+--- a/playback/player/gtk/meson.build
++++ b/playback/player/gtk/meson.build
+@@ -18,5 +18,6 @@ executable('gtk-play',
+       gtk_play_resources,
+      'gtk-video-renderer.h',
+      'gtk-video-renderer.c'],
++    install: true,
+     dependencies : [glib_dep, gobject_dep, gmodule_dep, gst_dep, gsttag_dep, gstplayer_dep, gtk_dep, x11_dep])
+ 
+-- 
+2.13.3
+

@@ -19,7 +19,6 @@ RDEPENDS_${PN} = "\
   ${PYTHON_PN}-docker-pycreds \
   ${PYTHON_PN}-dockerpty \
   ${PYTHON_PN}-docopt \
-  ${PYTHON_PN}-enum \
   ${PYTHON_PN}-idna \
   ${PYTHON_PN}-jsonschema \
   ${PYTHON_PN}-pyyaml \

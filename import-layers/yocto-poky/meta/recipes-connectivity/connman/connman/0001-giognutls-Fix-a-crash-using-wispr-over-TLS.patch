@@ -1,0 +1,41 @@
+From 929fc9b7068100444e0ffcccd25841f78791e619 Mon Sep 17 00:00:00 2001
+From: Jian Liang <jianliang@tycoint.com>
+Date: Fri, 15 Sep 2017 06:40:08 -0400
+Subject: [PATCH] gweb: Fix a crash using wispr over TLS
+To: connman@lists.01.org
+Cc: wagi@monom.org
+
+When gnutls_channel is instantiated, the gnutls_channel->established
+has to be initiated as FALSE. Otherwise, check_handshake function
+won't work. A random initial value 1 of gnutls_channel->established
+will make check_handshake return G_IO_STATUS_NORMAL, when the channel
+is actually not ready to be used. The observed behaviours are,
+
+- wispr is getting random errors in wispr_portal_web_result
+- ConnMan crashes on exit after those random errors
+- when wispr is luckly working, ConnMan doesn't crash on exit
+
+Signed-off-by: Jian Liang <jianliang@tycoint.com>
+
+---
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/network/connman/connman.git/commit/?id=73e53f3bd9e7debae86341f1eee7b97862a56a5e]
+Signed-off-by: André Draszik <andre.draszik@jci.com>
+ gweb/giognutls.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gweb/giognutls.c b/gweb/giognutls.c
+index 09dc9e7..c029a8b 100644
+--- a/gweb/giognutls.c
++++ b/gweb/giognutls.c
+@@ -421,7 +421,7 @@ GIOChannel *g_io_channel_gnutls_new(int fd)
+ 
+ 	DBG("");
+ 
+-	gnutls_channel = g_new(GIOGnuTLSChannel, 1);
++	gnutls_channel = g_new0(GIOGnuTLSChannel, 1);
+ 
+ 	channel = (GIOChannel *) gnutls_channel;
+ 
+-- 
+2.7.4
+

@@ -12,19 +12,16 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index b3e2b63..347aaf1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -323,7 +323,7 @@ version.h: version.sh version.h.in configure.ac
+Index: git/Makefile
+===================================================================
+--- git.orig/Makefile
++++ git/Makefile
+@@ -343,7 +343,7 @@ version.h: version.sh version.h.in confi
  
  mktables: kernel-lib/mktables.c
  	@echo "    [CC]     $@"
 -	$(Q)$(CC) $(CFLAGS) $< -o $@
 +	$(Q)$(BUILD_CC) $(BUILD_CFLAGS) $< -o $@
  
- kernel-lib/tables.c: mktables
- 	@echo "    [TABLE]  $@"
--- 
-2.13.2
-
+ # the target can be regenerated manually using mktables, but a local copy is
+ # kept so the build process is simpler

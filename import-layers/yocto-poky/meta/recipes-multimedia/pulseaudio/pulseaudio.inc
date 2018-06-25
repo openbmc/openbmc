@@ -160,7 +160,7 @@ do_install_append() {
 }
 
 USERADD_PACKAGES = "pulseaudio-server"
-GROUPADD_PARAM_pulseaudio-server = "pulse"
+GROUPADD_PARAM_pulseaudio-server = "--system pulse"
 USERADD_PARAM_pulseaudio-server = "--system --home /var/run/pulse \
                               --no-create-home --shell /bin/false \
                               --groups audio,pulse --gid pulse pulse"

@@ -1,0 +1,16 @@
+--- a/newlib/libc/include/stdint.h.orig	2006-08-17 00:39:43.000000000 +0300
++++ b/newlib/libc/include/stdint.h	2009-08-25 17:33:23.000000000 +0300
+@@ -348,8 +348,11 @@
+ #endif
+ 
+ /* This must match size_t in stddef.h, currently long unsigned int */
+-#define SIZE_MIN (-__STDINT_EXP(LONG_MAX) - 1L)
+-#define SIZE_MAX __STDINT_EXP(LONG_MAX)
++#ifdef __SIZE_MAX__
++#define SIZE_MAX __SIZE_MAX__
++#else
++#define SIZE_MAX (__STDINT_EXP(LONG_MAX) * 2UL + 1)
++#endif
+ 
+ /* This must match sig_atomic_t in <signal.h> (currently int) */
+ #define SIG_ATOMIC_MIN (-__STDINT_EXP(INT_MAX) - 1)

@@ -6,6 +6,8 @@ SRC_URI = " file://99-com.rules"
 
 S = "${WORKDIR}"
 
+INHIBIT_DEFAULT_DEPS = "1"
+
 do_install () {
     install -d ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${WORKDIR}/99-com.rules ${D}${sysconfdir}/udev/rules.d/

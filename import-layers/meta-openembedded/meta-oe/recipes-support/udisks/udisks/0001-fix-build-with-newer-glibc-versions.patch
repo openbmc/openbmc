@@ -1,4 +1,4 @@
-From 9829152b12a8924d2e091a00133ed1a3a7ba75c0 Mon Sep 17 00:00:00 2001
+From 054ad6a06cfac7c3d172d53cd901204079a53ec3 Mon Sep 17 00:00:00 2001
 From: Alexandre Rostovtsev <tetromino@gentoo.org>
 Date: Fri, 29 May 2015 21:09:39 -0400
 Subject: [PATCH] fix build with newer glibc versions
@@ -8,6 +8,7 @@ https://bugs.freedesktop.org/show_bug.cgi?id=90778
 Upstream-Status: Applied [1]
 
 [1] http://cgit.freedesktop.org/udisks/commit/?h=udisks1&id=9829152b12a8924d2e091a00133ed1a3a7ba75c0
+
 ---
  src/helpers/job-drive-detach.c | 1 +
  1 file changed, 1 insertion(+)
@@ -24,6 +25,3 @@ index eeafcab..d122a1f 100644
  #include <stdio.h>
  #include <string.h>
  #include <errno.h>
--- 
-2.1.0
-

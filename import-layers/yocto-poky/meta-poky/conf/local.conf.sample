@@ -28,7 +28,7 @@
 # There are also the following hardware board target machines included for 
 # demonstration purposes:
 #
-#MACHINE ?= "beaglebone"
+#MACHINE ?= "beaglebone-yocto"
 #MACHINE ?= "genericx86"
 #MACHINE ?= "genericx86-64"
 #MACHINE ?= "mpc8315e-rdb"
@@ -218,6 +218,17 @@ BB_DISKMON_DIRS ??= "\
 #file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
 #file://.* file:///some/local/dir/sstate/PATH"
 
+#
+# Yocto Project SState Mirror
+#
+# The Yocto Project has prebuilt artefacts available for its releases, you can enable
+# use of these by uncommenting the following line. This will mean the build uses
+# the network to check for artefacts at the start of builds, which does slow it down
+# equally, it will also speed up the builds by not having to build things if they are
+# present in the cache. It assumes you can download something faster than you can build it
+# which will depend on your network.
+#
+#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/2.5/PATH;downloadfilename=PATH"
 
 #
 # Qemu configuration

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python $(dirname $0)/team_basic_test.py

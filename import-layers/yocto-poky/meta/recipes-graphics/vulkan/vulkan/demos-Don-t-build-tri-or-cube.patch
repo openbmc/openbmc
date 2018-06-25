@@ -11,9 +11,11 @@ Date:   Tue Feb 16 10:05:25 2016 -0500
 Upstream-Status: Inappropriate [configuration]
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 
---- a/demos/CMakeLists.txt
-+++ b/demos/CMakeLists.txt
-@@ -61,46 +61,6 @@
+Index: git/demos/CMakeLists.txt
+===================================================================
+--- git.orig/demos/CMakeLists.txt
++++ git/demos/CMakeLists.txt
+@@ -63,46 +63,6 @@ elseif(UNIX)
  else()
  endif()
  
@@ -60,7 +62,7 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  
  if(WIN32)
      include_directories (
-@@ -114,43 +74,6 @@
+@@ -116,43 +76,6 @@ endif()
  add_executable(${API_LOWERCASE}info vulkaninfo.c)
  target_link_libraries(${API_LOWERCASE}info ${LIBRARIES})
  
@@ -103,4 +105,4 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 -endif()
  
  if(UNIX)
-     install(TARGETS ${API_LOWERCASE}info DESTINATION ${CMAKE_INSTALL_BINDIR})
+     if(INSTALL_LVL_FILES)

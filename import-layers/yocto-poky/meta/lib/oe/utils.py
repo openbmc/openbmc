@@ -86,17 +86,6 @@ def str_filter_out(f, str, d):
     from re import match
     return " ".join([x for x in str.split() if not match(f, x, 0)])
 
-def param_bool(cfg, field, dflt = None):
-    """Lookup <field> in <cfg> map and convert it to a boolean; take
-    <dflt> when this <field> does not exist"""
-    value = cfg.get(field, dflt)
-    strvalue = str(value).lower()
-    if strvalue in ('yes', 'y', 'true', 't', '1'):
-        return True
-    elif strvalue in ('no', 'n', 'false', 'f', '0'):
-        return False
-    raise ValueError("invalid value for boolean parameter '%s': '%s'" % (field, value))
-
 def build_depends_string(depends, task):
     """Append a taskname to a string of dependencies as used by the [depends] flag"""
     return " ".join(dep + ":" + task for dep in depends.split())
@@ -166,6 +155,49 @@ def any_distro_features(d, features, truevalue="1", falsevalue=""):
 
     """
     return bb.utils.contains_any("DISTRO_FEATURES", features, truevalue, falsevalue, d)
+
+def parallel_make(d):
+    """
+    Return the integer value for the number of parallel threads to use when
+    building, scraped out of PARALLEL_MAKE. If no parallelization option is
+    found, returns None
+
+    e.g. if PARALLEL_MAKE = "-j 10", this will return 10 as an integer.
+    """
+    pm = (d.getVar('PARALLEL_MAKE') or '').split()
+    # look for '-j' and throw other options (e.g. '-l') away
+    while pm:
+        opt = pm.pop(0)
+        if opt == '-j':
+            v = pm.pop(0)
+        elif opt.startswith('-j'):
+            v = opt[2:].strip()
+        else:
+            continue
+
+        return int(v)
+
+    return None
+
+def parallel_make_argument(d, fmt, limit=None):
+    """
+    Helper utility to construct a parallel make argument from the number of
+    parallel threads specified in PARALLEL_MAKE.
+
+    Returns the input format string `fmt` where a single '%d' will be expanded
+    with the number of parallel threads to use. If `limit` is specified, the
+    number of parallel threads will be no larger than it. If no parallelization
+    option is found in PARALLEL_MAKE, returns an empty string
+
+    e.g. if PARALLEL_MAKE = "-j 10", parallel_make_argument(d, "-n %d") will return
+    "-n 10"
+    """
+    v = parallel_make(d)
+    if v:
+        if limit:
+            v = min(limit, v)
+        return fmt % v
+    return ''
 
 def packages_filter_out_system(d):
     """
@@ -291,6 +323,14 @@ def host_gcc_version(d):
 
     version = match.group(1)
     return "-%s" % version if version in ("4.8", "4.9") else ""
+
+
+def get_multilib_datastore(variant, d):
+    localdata = bb.data.createCopy(d)
+    overrides = localdata.getVar("OVERRIDES", False) + ":virtclass-multilib-" + variant
+    localdata.setVar("OVERRIDES", overrides)
+    localdata.setVar("MLPREFIX", variant + "-")
+    return localdata
 
 #
 # Python 2.7 doesn't have threaded pools (just multiprocessing)

@@ -1,4 +1,4 @@
-From 54a9c2ba60adc7ec2724786662fd398e7c03999f Mon Sep 17 00:00:00 2001
+From 8786b91488dae3f6dfeadd686e80d2ffc5c29320 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Thu, 25 Aug 2016 15:22:57 +0800
 Subject: [PATCH] squid: don't do squid-conf-tests at build time
@@ -14,12 +14,13 @@ Subject: [PATCH] squid: don't do squid-conf-tests at build time
 Upstream-Status: Inappropriate [cross compile specific]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
 ---
  test-suite/Makefile.am | 15 +++++++--------
  1 file changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/test-suite/Makefile.am b/test-suite/Makefile.am
-index d5468be..77fc480 100644
+index 061a463..350dfb2 100644
 --- a/test-suite/Makefile.am
 +++ b/test-suite/Makefile.am
 @@ -41,8 +41,7 @@ TESTS += debug \
@@ -58,6 +59,3 @@ index d5468be..77fc480 100644
  		else break; fi; \
  	done; \
  	if test "$$failed" -eq 0; then cp $(TRUE) $@ ; fi
--- 
-2.8.3
-

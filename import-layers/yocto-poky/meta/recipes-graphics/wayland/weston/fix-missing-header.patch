@@ -1,0 +1,30 @@
+On the musl C library, tests/timespec-text.c does not build, with the
+following error:
+
+    In file included from tests/timespec-test.c:36:0:
+    ./shared/timespec-util.h:41:21: warning: ‘struct timespec’ declared
+    inside parameter list will not be visible outside of this definition
+    or declaration
+     timespec_sub(struct timespec *r,
+                         ^~~~~~~~
+   [...]
+
+Indeed, struct timespec is defined in time.h, so we must include it.
+
+Upstream-Status: Backport [fa41bdfbc0b962fd73b89f01aab1a5370c9c28eb]
+
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+Index: weston-3.0.0/shared/timespec-util.h
+===================================================================
+--- weston-3.0.0.orig/shared/timespec-util.h
++++ weston-3.0.0/shared/timespec-util.h
+@@ -28,6 +28,7 @@
+ 
+ #include <stdint.h>
+ #include <assert.h>
++#include <time.h>
+ 
+ #define NSEC_PER_SEC 1000000000
+ 

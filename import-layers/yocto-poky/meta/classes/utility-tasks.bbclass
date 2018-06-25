@@ -50,17 +50,4 @@ python do_checkuri() {
         bb.fatal(str(e))
 }
 
-addtask checkuriall after do_checkuri
-do_checkuriall[recrdeptask] = "do_checkuriall do_checkuri"
-do_checkuriall[recideptask] = "do_${BB_DEFAULT_TASK}"
-do_checkuriall[nostamp] = "1"
-do_checkuriall() {
-	:
-}
 
-addtask fetchall after do_fetch
-do_fetchall[recrdeptask] = "do_fetchall do_fetch"
-do_fetchall[recideptask] = "do_${BB_DEFAULT_TASK}"
-do_fetchall() {
-	:
-}

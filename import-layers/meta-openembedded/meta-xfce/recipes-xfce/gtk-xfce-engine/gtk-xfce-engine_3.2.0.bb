@@ -8,6 +8,8 @@ inherit xfce distro_features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
+SRC_URI += "file://glib-2.54-ftbfs.patch"
+
 SRC_URI[md5sum] = "363d6c16a48a00e26d45c45c2e1fd739"
 SRC_URI[sha256sum] = "875c9c3bda96faf050a2224649cc42129ffb662c4de33add8c0fd1fb860b47ed"
 

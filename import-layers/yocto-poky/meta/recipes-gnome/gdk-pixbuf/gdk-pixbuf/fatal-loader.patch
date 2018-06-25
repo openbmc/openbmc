@@ -1,11 +1,20 @@
+From b6a7b30522455cab39a0b9ea8463313380146e70 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 1 Apr 2014 17:23:36 +0100
+Subject: [PATCH 3/4] gdk-pixbuf: add an option so that loader errors are fatal
+
 If an environment variable is specified set the return value from main() to
 non-zero if the loader had errors (missing libraries, generally).
 
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
+---
+ gdk-pixbuf/queryloaders.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
 diff --git a/gdk-pixbuf/queryloaders.c b/gdk-pixbuf/queryloaders.c
-index a9ca015..395674a 100644
+index a81c804..350bec8 100644
 --- a/gdk-pixbuf/queryloaders.c
 +++ b/gdk-pixbuf/queryloaders.c
 @@ -146,7 +146,7 @@ write_loader_info (GString *contents, const char *path, GdkPixbufFormat *info)
@@ -47,17 +56,18 @@ index a9ca015..395674a 100644
  
  #ifdef G_OS_WIN32
          gchar *libdir;
-@@ -360,7 +365,8 @@ int main (int argc, char **argv)
-                                 gint len = strlen (dent);
-                                 if (len > SOEXT_LEN &&
-                                     strcmp (dent + len - SOEXT_LEN, SOEXT) == 0) {
--                                        query_module (contents, path, dent);
-+                                        if (!query_module (contents, path, dent))
-+                                                success = FALSE;
-                                 }
-                         }
-                         g_dir_close (dir);
-@@ -378,7 +384,8 @@ int main (int argc, char **argv)
+@@ -370,7 +375,9 @@ int main (int argc, char **argv)
+                 }
+                 modules = g_list_sort (modules, (GCompareFunc)strcmp);
+                 for (l = modules; l != NULL; l = l->next)
+-                        query_module (contents, path, l->data);
++                        if (!query_module (contents, path, l->data))
++                                success = FALSE;
++
+                 g_list_free_full (modules, g_free);
+ #else
+                 g_string_append_printf (contents, "# dynamic loading of modules not supported\n");
+@@ -385,7 +392,8 @@ int main (int argc, char **argv)
                          infilename = g_locale_to_utf8 (infilename,
                                                         -1, NULL, NULL, NULL);
  #endif
@@ -67,7 +77,7 @@ index a9ca015..395674a 100644
                  }
                  g_free (cwd);
          }
-@@ -394,5 +401,8 @@ int main (int argc, char **argv)
+@@ -401,5 +409,8 @@ int main (int argc, char **argv)
          else
                  g_print ("%s\n", contents->str);
  
@@ -77,3 +87,6 @@ index a9ca015..395674a 100644
 +        else
 +                return 0;
  }
+-- 
+2.14.1
+

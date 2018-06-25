@@ -2,11 +2,13 @@
 Description=Broadcom BCM43438 bluetooth HCI
 ConditionPathIsDirectory=/proc/device-tree/soc/gpio@7e200000/bt_pins
 Before=bluetooth.service
-After=dev-ttyAMA0.device
+BindsTo=dev-serial1.device
+After=dev-serial1.device
 
 [Service]
-Type=simple
-ExecStart=/usr/bin/hciattach -n /dev/ttyAMA0 bcm43xx 921600 noflow -
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/btuart
 
 [Install]
 WantedBy=multi-user.target

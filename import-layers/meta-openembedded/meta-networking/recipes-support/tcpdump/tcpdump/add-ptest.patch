@@ -1,4 +1,4 @@
-From 7b259580800e259d232229dc89f97058b56e2fe8 Mon Sep 17 00:00:00 2001
+From 8ee1ab1ac89557d48ac1ab7ddcc3c51be9b734ad Mon Sep 17 00:00:00 2001
 From: "Hongjun.Yang" <hongjun.yang@windriver.com>
 Date: Wed, 22 Oct 2014 10:02:48 +0800
 Subject: [PATCH] Add ptest for tcpdump
@@ -6,15 +6,16 @@ Subject: [PATCH] Add ptest for tcpdump
 Upstream-Status: Pending
 
 Signed-off-by: Hongjun.Yang <hongjun.yang@windriver.com>
+
 ---
  Makefile.in | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
-Index: tcpdump-4.9.0/Makefile.in
-===================================================================
---- tcpdump-4.9.0.orig/Makefile.in
-+++ tcpdump-4.9.0/Makefile.in
-@@ -436,9 +436,17 @@ distclean:
+diff --git a/Makefile.in b/Makefile.in
+index 0941f0e..3ce40c6 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -437,9 +437,17 @@ distclean:
  	    tests/failure-outputs.txt
  	rm -rf autom4te.cache tests/DIFF tests/NEW
  

@@ -95,7 +95,7 @@ class BuildSystem(object):
                     destname = os.path.join(layerdestpath, f_basename)
                     _smart_copy(f, destname)
             else:
-                if os.path.exists(layerdestpath):
+                if os.path.exists(os.path.join(layerdestpath, 'conf/layer.conf')):
                     bb.note("Skipping layer %s, already handled" % layer)
                 else:
                     _smart_copy(layer, layerdestpath)

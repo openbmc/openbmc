@@ -1,0 +1,34 @@
+From fb1f83c04dd5262897b09e60fa8b39090d0d4619 Mon Sep 17 00:00:00 2001
+From: Rex Dieter <rdieter@math.unl.edu>
+Date: Thu, 12 Nov 2015 13:53:03 -0600
+Subject: [PATCH] fix Name/Comment fields
+
+Validate as a valid .desktop file per
+http://standards.freedesktop.org/desktop-entry-spec/latest/
+
+See also issue #2
+
+Upstream-Status: Applied [1]
+
+[1] https://github.com/ncopa/xfce-polkit/commit/fb1f83c04dd5262897b09e60fa8b39090d0d4619
+---
+ xfce-polkit.desktop.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xfce-polkit.desktop.in b/xfce-polkit.desktop.in
+index 8575896..dd9f09c 100644
+--- a/xfce-polkit.desktop.in
++++ b/xfce-polkit.desktop.in
+@@ -1,7 +1,7 @@
+ [Desktop Entry]
+ Type=Application
+-_Name=XFCE PolKit
+-_Comment=Policykit Authentication Agent
++Name=XFCE PolKit
++Comment=Policykit Authentication Agent
+ Exec=@xfce_polkit_libexecdir@/xfce-polkit
+ Icon=gtk-dialog-authentication
+ NotShowIn=GNOME;KDE;
+-- 
+2.14.3
+

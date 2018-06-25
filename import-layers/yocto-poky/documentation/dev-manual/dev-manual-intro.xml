@@ -16,33 +16,29 @@
             The manual groups related procedures into higher-level sections.
             Procedures can consist of high-level steps or low-level steps
             depending on the topic.
-            You can find conceptual information related to a procedure by
-            following appropriate links to the Yocto Project Reference
-            Manual.
         </para>
 
         <para>
             The following list describes what you can get from this manual:
             <itemizedlist>
                 <listitem><para>
-                    <emphasis>Setup Procedures:</emphasis>
-                    Procedures that show you how to set
-                    up a Yocto Project Development environment and how
-                    to accomplish the change workflow through logging
-                    defects and submitting changes.
+                    Procedures that help you get going with the Yocto Project.
+                    For example, procedures that show you how to set up
+                    a build host and work with the Yocto Project
+                    source repositories.
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Emulation Procedures:</emphasis>
-                    Procedures that show you how to use the
-                    Yocto Project integrated QuickEMUlator (QEMU), which lets
-                    you simulate running on hardware an image you have built
-                    using the OpenEmbedded build system.
+                    Procedures that show you how to submit changes to the
+                    Yocto Project.
+                    Changes can be improvements, new features, or bug
+                    fixes.
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Common Procedures:</emphasis>
                     Procedures related to "everyday" tasks you perform while
                     developing images and applications using the Yocto
                     Project.
+                    For example, procedures to create a layer, customize an
+                    image, write a new recipe, and so forth.
                     </para></listitem>
             </itemizedlist>
         </para>
@@ -51,7 +47,7 @@
             This manual will not give you the following:
             <itemizedlist>
                 <listitem><para>
-                    <emphasis>Redundant Step-by-step Instructions:</emphasis>
+                    Redundant Step-by-step Instructions:
                     For example, the
                     <ulink url='&YOCTO_DOCS_SDK_URL;'>Yocto Project Application Development and the Extensible Software Development Kit (eSDK)</ulink>
                     manual contains detailed instructions on how to install an
@@ -59,14 +55,15 @@
                     hardware.
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Reference or Conceptual Material:</emphasis>
-                    This type of material resides in an appropriate reference manual.
+                    Reference or Conceptual Material:
+                    This type of material resides in an appropriate reference
+                    manual.
                     For example, system variables are documented in the
                     <ulink url='&YOCTO_DOCS_REF_URL;'>Yocto Project Reference Manual</ulink>.
                     </para></listitem>
                 <listitem><para>
-                    <emphasis>Detailed Public Information Not Specific to the
-                    Yocto Project:</emphasis>
+                    Detailed Public Information Not Specific to the
+                    Yocto Project:
                     For example, exhaustive information on how to use the
                     Source Control Manager Git is better covered with Internet
                     searches and official Git Documentation than through the
@@ -85,9 +82,10 @@
             comprehension.
             For introductory information on the Yocto Project, see the
             <ulink url='&YOCTO_HOME_URL;'>Yocto Project Website</ulink>.
-            You can find an introductory to using the Yocto Project by working
-            through the
-            <ulink url='&YOCTO_DOCS_QS_URL;'>Yocto Project Quick Start</ulink>.
+            If you want to build an image with no knowledge of Yocto Project
+            as a way of quickly testing it out, see the
+            <ulink url='&YOCTO_DOCS_BRIEF_URL;'>Yocto Project Quick Build</ulink>
+            document.
         </para>
 
         <para>

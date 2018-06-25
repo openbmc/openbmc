@@ -230,9 +230,11 @@ def deb_write_pkg(pkg, d):
             #   '>' = greater or equal
             # adjust these to the '<<' and '>>' equivalents
             #
-            for dep in var:
-                if '(' in dep:
-                    newdep = re.sub(r'[(:)]', '__', dep)
+            for dep in list(var.keys()):
+                if '(' in dep or '/' in dep:
+                    newdep = re.sub(r'[(:)/]', '__', dep)
+                    if newdep.startswith("__"):
+                        newdep = "A" + newdep
                     if newdep != dep:
                         var[newdep] = var[dep]
                         del var[dep]

@@ -247,6 +247,7 @@ do_kernel_checkout() {
 		fi
 		rm -f .gitignore
 		git init
+		check_git_config
 		git add .
 		git commit -q -m "baseline commit: creating repo for ${PN}-${PV}"
 		git clean -d -f

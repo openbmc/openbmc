@@ -7,7 +7,7 @@ SECTION = "console/utils"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
-DEPENDS = "libpcre libav virtual/egl boost freetype dbus openssl samba libssh libomxil coreutils-native curl-native"
+DEPENDS = "libpcre libav virtual/egl boost freetype dbus openssl libssh libomxil coreutils-native curl-native"
 PR = "r4"
 
 SRCREV_default = "b8ff59dccd9307f10dad71bec2525a95bd6c603b"
@@ -40,6 +40,11 @@ COMPATIBLE_MACHINE_rpi = "(.*)"
 
 inherit autotools-brokensep pkgconfig
 
+# This isn't used directly by omxplayer, but applied to Makefile.ffmpeg which
+# runs the ffmpeg configuration
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[samba] = "--enable-libsmbclient,--disable-libsmbclient,samba"
+
 # Needed in ffmpeg configure
 export TEMPDIR = "${S}/tmp"
 
@@ -65,6 +70,8 @@ export DIST = "${D}"
 do_compile() {
     # Needed for compiler test in ffmpeg's configure
     mkdir -p tmp
+
+    sed -i 's/--enable-libsmbclient/${@bb.utils.contains("PACKAGECONFIG", "samba", "--enable-libsmbclient", "--disable-libsmbclient", d)}/g' Makefile.ffmpeg
 
     oe_runmake -f Makefile.ffmpeg
     oe_runmake -f Makefile.ffmpeg install

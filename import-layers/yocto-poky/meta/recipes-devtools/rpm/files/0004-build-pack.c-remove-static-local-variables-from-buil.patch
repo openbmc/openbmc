@@ -1,7 +1,7 @@
-From ec305795a302d226343e69031ff2024dfcde69c0 Mon Sep 17 00:00:00 2001
+From 8ce9fbab2990609bdace457e146160334e931c89 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 8 Jun 2017 17:08:09 +0300
-Subject: [PATCH 3/3] build/pack.c: remove static local variables from
+Subject: [PATCH 14/15] build/pack.c: remove static local variables from
  buildHost() and getBuildTime()
 
 Their use is causing difficult to diagnoze data races when building multiple
@@ -11,8 +11,8 @@ difficult to reason about code.
 Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/pull/226]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
-
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  build/build.c             | 54 ++++++++++++++++++++++++++++--
  build/pack.c              | 84 +++++++++--------------------------------------
@@ -20,7 +20,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  3 files changed, 74 insertions(+), 72 deletions(-)
 
 diff --git a/build/build.c b/build/build.c
-index 5f99c8db7..09a1311c5 100644
+index 81152e53e..6001f9e52 100644
 --- a/build/build.c
 +++ b/build/build.c
 @@ -6,6 +6,8 @@
@@ -83,7 +83,7 @@ index 5f99c8db7..09a1311c5 100644
  /**
   */
  static rpmRC doRmSource(rpmSpec spec)
-@@ -203,6 +249,9 @@ static rpmRC buildSpec(BTA_t buildArgs, rpmSpec spec, int what)
+@@ -201,6 +247,9 @@ static rpmRC buildSpec(BTA_t buildArgs, rpmSpec spec, int what)
      rpmRC rc = RPMRC_OK;
      int test = (what & RPMBUILD_NOBUILD);
      char *cookie = buildArgs->cookie ? xstrdup(buildArgs->cookie) : NULL;
@@ -93,7 +93,7 @@ index 5f99c8db7..09a1311c5 100644
  
      if (rpmExpandNumeric("%{?source_date_epoch_from_changelog}") &&
  	getenv("SOURCE_DATE_EPOCH") == NULL) {
-@@ -271,11 +320,11 @@ static rpmRC buildSpec(BTA_t buildArgs, rpmSpec spec, int what)
+@@ -269,11 +318,11 @@ static rpmRC buildSpec(BTA_t buildArgs, rpmSpec spec, int what)
  		goto exit;
  
  	if (((what & RPMBUILD_PACKAGESOURCE) && !test) &&
@@ -107,7 +107,7 @@ index 5f99c8db7..09a1311c5 100644
  		goto exit;
  	
  	if ((what & RPMBUILD_CLEAN) &&
-@@ -295,6 +344,7 @@ static rpmRC buildSpec(BTA_t buildArgs, rpmSpec spec, int what)
+@@ -293,6 +342,7 @@ static rpmRC buildSpec(BTA_t buildArgs, rpmSpec spec, int what)
  	(void) unlink(spec->specFile);
  
  exit:
@@ -116,7 +116,7 @@ index 5f99c8db7..09a1311c5 100644
      spec->rootDir = NULL;
      if (rc != RPMRC_OK && rpmlogGetNrecs() > 0) {
 diff --git a/build/pack.c b/build/pack.c
-index ed5b9ab4e..62427065a 100644
+index df15876ff..17a4b0905 100644
 --- a/build/pack.c
 +++ b/build/pack.c
 @@ -6,8 +6,6 @@
@@ -128,7 +128,7 @@ index ed5b9ab4e..62427065a 100644
  #include <sys/wait.h>
  
  #include <rpm/rpmlib.h>			/* RPMSIGTAG*, rpmReadPackageFile */
-@@ -151,57 +149,6 @@ exit:
+@@ -152,57 +150,6 @@ exit:
      return rc;
  }
  
@@ -186,9 +186,9 @@ index ed5b9ab4e..62427065a 100644
  static rpmRC processScriptFiles(rpmSpec spec, Package pkg)
  {
      struct TriggerFileEntry *p;
-@@ -308,7 +255,8 @@ static int haveRichDep(Package pkg)
- }
- 
+@@ -476,7 +423,8 @@ exit:
+  * order to how the RPM format is laid on disk.
+  */
  static rpmRC writeRPM(Package pkg, unsigned char ** pkgidp,
 -		      const char *fileName, char **cookie)
 +		      const char *fileName, char **cookie,
@@ -196,7 +196,7 @@ index ed5b9ab4e..62427065a 100644
  {
      FD_t fd = NULL;
      char * rpmio_flags = NULL;
-@@ -397,7 +345,7 @@ static rpmRC writeRPM(Package pkg, unsigned char ** pkgidp,
+@@ -500,7 +448,7 @@ static rpmRC writeRPM(Package pkg, unsigned char ** pkgidp,
  
      /* Create and add the cookie */
      if (cookie) {
@@ -204,8 +204,8 @@ index ed5b9ab4e..62427065a 100644
 +	rasprintf(cookie, "%s %d", buildHost, buildTime);
  	headerPutString(pkg->header, RPMTAG_COOKIE, *cookie);
      }
-     
-@@ -546,7 +494,7 @@ static rpmRC checkPackages(char *pkgcheck)
+ 
+@@ -641,7 +589,7 @@ static rpmRC checkPackages(char *pkgcheck)
      return RPMRC_OK;
  }
  
@@ -214,7 +214,7 @@ index ed5b9ab4e..62427065a 100644
  {
  	const char *errorString;
  	rpmRC rc = RPMRC_OK;
-@@ -565,8 +513,8 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
+@@ -660,8 +608,8 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
  	headerCopyTags(spec->packages->header, pkg->header, copyTags);
  	
  	headerPutString(pkg->header, RPMTAG_RPMVERSION, VERSION);
@@ -225,7 +225,7 @@ index ed5b9ab4e..62427065a 100644
  
  	if (spec->sourcePkgId != NULL) {
  	    headerPutBin(pkg->header, RPMTAG_SOURCEPKGID, spec->sourcePkgId,16);
-@@ -604,7 +552,7 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
+@@ -699,7 +647,7 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
  	    free(binRpm);
  	}
  
@@ -234,7 +234,7 @@ index ed5b9ab4e..62427065a 100644
  	if (rc == RPMRC_OK) {
  	    /* Do check each written package if enabled */
  	    char *pkgcheck = rpmExpand("%{?_build_pkgcheck} ", *filename, NULL);
-@@ -624,7 +572,7 @@ struct binaryPackageTaskData
+@@ -719,7 +667,7 @@ struct binaryPackageTaskData
      struct binaryPackageTaskData *next;
  };
  
@@ -243,7 +243,7 @@ index ed5b9ab4e..62427065a 100644
  {
      struct binaryPackageTaskData *tasks = NULL;
      struct binaryPackageTaskData *task = NULL;
-@@ -636,7 +584,7 @@ static struct binaryPackageTaskData* runBinaryPackageTasks(rpmSpec spec, const c
+@@ -731,7 +679,7 @@ static struct binaryPackageTaskData* runBinaryPackageTasks(rpmSpec spec, const c
          if (pkg == spec->packages) {
              // the first package needs to be processed ahead of others, as they copy
              // changelog data from it, and so otherwise data races would happen
@@ -252,7 +252,7 @@ index ed5b9ab4e..62427065a 100644
              rpmlog(RPMLOG_NOTICE, _("Finished binary package job, result %d, filename %s\n"), task->result, task->filename);
              tasks = task;
          }
-@@ -653,7 +601,7 @@ static struct binaryPackageTaskData* runBinaryPackageTasks(rpmSpec spec, const c
+@@ -748,7 +696,7 @@ static struct binaryPackageTaskData* runBinaryPackageTasks(rpmSpec spec, const c
          if (task != tasks)
          #pragma omp task
          {
@@ -261,7 +261,7 @@ index ed5b9ab4e..62427065a 100644
              rpmlog(RPMLOG_NOTICE, _("Finished binary package job, result %d, filename %s\n"), task->result, task->filename);
          }
      }
-@@ -671,11 +619,11 @@ static void freeBinaryPackageTasks(struct binaryPackageTaskData* tasks)
+@@ -766,11 +714,11 @@ static void freeBinaryPackageTasks(struct binaryPackageTaskData* tasks)
      }
  }
  
@@ -275,7 +275,7 @@ index ed5b9ab4e..62427065a 100644
  
      for (struct binaryPackageTaskData *task = tasks; task != NULL; task = task->next) {
          if (task->result == RPMRC_OK) {
-@@ -702,22 +650,22 @@ rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating)
+@@ -797,7 +745,7 @@ rpmRC packageBinaries(rpmSpec spec, const char *cookie, int cheating)
      return RPMRC_OK;
  }
  
@@ -284,6 +284,7 @@ index ed5b9ab4e..62427065a 100644
  {
      Package sourcePkg = spec->sourcePackage;
      rpmRC rc;
+@@ -805,8 +753,8 @@ rpmRC packageSources(rpmSpec spec, char **cookie)
  
      /* Add some cruft */
      headerPutString(sourcePkg->header, RPMTAG_RPMVERSION, VERSION);
@@ -291,9 +292,10 @@ index ed5b9ab4e..62427065a 100644
 -    headerPutUint32(sourcePkg->header, RPMTAG_BUILDTIME, getBuildTime(), 1);
 +    headerPutString(sourcePkg->header, RPMTAG_BUILDHOST, buildHost);
 +    headerPutUint32(sourcePkg->header, RPMTAG_BUILDTIME, &buildTime, 1);
+     headerPutUint32(sourcePkg->header, RPMTAG_SOURCEPACKAGE, &one, 1);
  
      /* XXX this should be %_srpmdir */
-     {	char *fn = rpmGetPath("%{_srcrpmdir}/", spec->sourceRpmName,NULL);
+@@ -814,7 +762,7 @@ rpmRC packageSources(rpmSpec spec, char **cookie)
  	char *pkgcheck = rpmExpand("%{?_build_pkgcheck_srpm} ", fn, NULL);
  
  	spec->sourcePkgId = NULL;
@@ -303,10 +305,10 @@ index ed5b9ab4e..62427065a 100644
  	/* Do check SRPM package if enabled */
  	if (rc == RPMRC_OK && pkgcheck[0] != ' ') {
 diff --git a/build/rpmbuild_internal.h b/build/rpmbuild_internal.h
-index 8351a6a34..797337ca7 100644
+index 439b7d3b5..07e8338ad 100644
 --- a/build/rpmbuild_internal.h
 +++ b/build/rpmbuild_internal.h
-@@ -408,19 +408,23 @@ rpmRC processSourceFiles(rpmSpec spec, rpmBuildPkgFlags pkgFlags);
+@@ -427,19 +427,23 @@ rpmRC processSourceFiles(rpmSpec spec, rpmBuildPkgFlags pkgFlags);
   * @param spec		spec file control structure
   * @param cookie	build identifier "cookie" or NULL
   * @param cheating	was build shortcircuited?
@@ -333,5 +335,5 @@ index 8351a6a34..797337ca7 100644
  RPM_GNUC_INTERNAL
  int addLangTag(rpmSpec spec, Header h, rpmTagVal tag,
 -- 
-2.11.0
+2.14.2
 

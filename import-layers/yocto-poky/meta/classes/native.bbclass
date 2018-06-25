@@ -52,8 +52,6 @@ STAGING_BINDIR_CROSS = "${STAGING_BINDIR_NATIVE}"
 # native pkg doesn't need the TOOLCHAIN_OPTIONS.
 TOOLCHAIN_OPTIONS = ""
 
-DEPENDS_GETTEXT = "gettext-native"
-
 # Don't build ptest natively
 PTEST_ENABLED = "0"
 

@@ -11,9 +11,9 @@
 
         <para>
             Once you have set up the Yocto Project and installed the
-            Toaster system dependencies as described in
-            "<link linkend='toaster-manual-start'>Preparing to Use Toaster</link>",
-            you are ready to start Toaster.
+            Toaster system dependencies as described in the
+            "<link linkend='toaster-manual-start'>Preparing to Use Toaster</link>"
+            chapter, you are ready to start Toaster.
         </para>
 
         <para>
@@ -57,6 +57,71 @@
             For example, the following command sets the port to "8400":
             <literallayout class='monospaced'>
      $ source toaster start webport=8400
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='setting-up-toaster-without-a-web-server'>
+        <title>Setting Up Toaster Without a Web Server</title>
+
+        <para>
+            You can start a Toaster environment without starting its
+            web server. This is useful for the following:
+            <itemizedlist>
+                <listitem><para>
+                    Capturing a command-line build’s statistics into
+                    the Toaster database for examination later.
+                    </para></listitem>
+                <listitem><para>
+                    Capturing a command-line build’s statistics when
+                    the Toaster server is already running.
+                    </para></listitem>
+                <listitem><para>
+                    Having one instance of the Toaster web server
+                    track and capture multiple command-line builds,
+                    where each build is started in its own “noweb”
+                    Toaster environment.
+                    </para></listitem>
+            </itemizedlist>
+            The following commands show how to start a Toaster environment
+            without starting its web server, perform BitBake operations,
+            and then shut down the Toaster environment.
+            Once the build is complete, you can close the Toaster environment.
+            Before closing the environment, however, you should allow a few
+            minutes to ensure the complete transfer of its BitBake build
+            statistics to the Toaster database.
+            If you have a separate Toaster web server instance running, you
+            can watch this command-line build’s progress and examine the
+            results as soon as they are posted:
+            <literallayout class='monospaced'>
+     $ source toaster start noweb
+     $ bitbake <replaceable>target</replaceable>
+     $ source toaster stop
+            </literallayout>
+        </para>
+    </section>
+
+    <section id='setting-up-toaster-without-a-build-server'>
+        <title>Setting Up Toaster Without a Build Server</title>
+
+        <para>
+            You can start a Toaster environment with the
+            “New Projects” feature disabled.
+            Doing so is useful for the following:
+            <itemizedlist>
+                <listitem><para>
+                    Sharing your build results over the web server while
+                    blocking others from starting builds on your host.
+                    </para></listitem>
+                <listitem><para>
+                    Allowing only local command-line builds to be captured
+                    into the Toaster database.
+                    </para></listitem>
+            </itemizedlist>
+            Use the following command to set up Toaster without a
+            build server:
+            <literallayout class='monospaced'>
+     $ source toaster start nobuild webport=<replaceable>port</replaceable>
             </literallayout>
         </para>
     </section>
@@ -227,8 +292,8 @@
               </note>
               <itemizedlist>
                   <listitem><para>
-                      Have all the build requirements as described in
-                      "<link linkend='toaster-setting-up-the-basic-system-requirements'>Setting Up the Basic System Requirements</link>"
+                      Have all the build requirements as described in the
+                      "<link linkend='toaster-manual-start'>Preparing to Use Toaster</link>"
                       chapter.
                       </para></listitem>
                   <listitem><para>
@@ -312,7 +377,7 @@
                       <itemizedlist>
                           <listitem><para>
                               Edit the
-                              <ulink url='http://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-SECRET_KEY'>DATABASE</ulink>
+                              <ulink url='https://docs.djangoproject.com/en/1.11/ref/settings/#databases'>DATABASES</ulink>
                               settings:
                               <literallayout class='monospaced'>
    DATABASES = {
@@ -329,14 +394,14 @@
                               </para></listitem>
                           <listitem><para>
                               Edit the
-                              <ulink url='http://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-SECRET_KEY'>SECRET_KEY</ulink>:
+                              <ulink url='https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-SECRET_KEY'>SECRET_KEY</ulink>:
                               <literallayout class='monospaced'>
    SECRET_KEY = '<replaceable>your_secret_key</replaceable>'
                               </literallayout>
                               </para></listitem>
                           <listitem><para>
                               Edit the
-                              <ulink url='http://docs.djangoproject.com/en/1.8/ref/settings/#std:setting-SECRET_KEY'>STATIC_ROOT</ulink>:
+                              <ulink url='https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-STATIC_ROOT'>STATIC_ROOT</ulink>:
                               <literallayout class='monospaced'>
    STATIC_ROOT = '/var/www/toaster/static_files/'
                               </literallayout>
@@ -360,58 +425,68 @@
                       <literallayout class='monospaced'>
    $ cd  /var/www/toaster/poky/
    $ ./bitbake/lib/toaster/manage.py migrate
-   $ TOASTER_DIR=`pwd` TOASTER_CONF=./meta-poky/conf/toasterconf.json \
+   $ TOASTER_DIR=`pwd` TEMPLATECONF='poky' \
      ./bitbake/lib/toaster/manage.py checksettings
    $ ./bitbake/lib/toaster/manage.py collectstatic
                       </literallayout>
-                      </para>
+                      In the previous example, from the <filename>poky</filename>
+                      directory, the <filename>migrate</filename> command
+                      ensures the database schema changes have propagated
+                      correctly (i.e. migrations).
+                      The next line sets the Toaster root directory
+                      <filename>TOASTER_DIR</filename> and the location
+                      of the Toaster configuration file
+                      <filename>TOASTER_CONF</filename>, which is relative to
+                      <filename>TOASTER_DIR</filename>.
+                      The <filename>TEMPLATECONF</filename> value reflects the
+                      contents of <filename>poky/.templateconf</filename>, and
+                      by default, should include the string "poky".
+                      For more information on the Toaster configuration
+                      file, see the
+                      "<link linkend='configuring-toaster'>Configuring Toaster</link>"
+                      section.</para>
 
-                      <para>
-                          For the above set of commands, after moving to the
-                          <filename>poky</filename> directory,
-                          the <filename>migrate</filename>
-                          command ensures the database
-                          schema has had changes propagated correctly (i.e.
-                          migrations).
-                      </para>
-
-                      <para>
-                          The next line sets the Toaster root directory
-                          <filename>TOASTER_DIR</filename> and the location of
-                          the Toaster configuration file
-                          <filename>TOASTER_CONF</filename>, which is
-                          relative to the Toaster root directory
-                          <filename>TOASTER_DIR</filename>.
-                          For more information on the Toaster configuration file,
-                          see the
-                          <link linkend='configuring-toaster'>Configuring Toaster</link>
-                          chapter.
-                      </para>
-
-                      <para>
-                          This line also runs the <filename>checksettings</filename>
-                          command, which configures the location of the Toaster
-                          <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build directory</ulink>.
-                          The Toaster root directory <filename>TOASTER_DIR</filename>
-                          determines where the Toaster build directory
-                          is created on the file system.
-                          In the example above,
-                          <filename>TOASTER_DIR</filename> is set as follows:
-                          <literallayout class="monospaced">
+                      <para>This line also runs the <filename>checksettings</filename>
+                      command, which configures the location of the Toaster
+                      <ulink url='&YOCTO_DOCS_REF_URL;#build-directory'>Build Directory</ulink>.
+                      The Toaster root directory <filename>TOASTER_DIR</filename>
+                      determines where the Toaster build directory
+                      is created on the file system.
+                      In the example above,
+                      <filename>TOASTER_DIR</filename> is set as follows:
+                      <literallayout class="monospaced">
    /var/www/toaster/poky
-                          </literallayout>
-                          This setting causes the Toaster build directory to be:
-                          <literallayout class="monospaced">
+                      </literallayout>
+                      This setting causes the Toaster build directory to be:
+                      <literallayout class="monospaced">
    /var/www/toaster/poky/build
-                          </literallayout>
-                      </para>
+                      </literallayout></para>
 
-                      <para>
-                          Finally, the <filename>collectstatic</filename> command
-                          is a Django framework command that collects all the
-                          statically served files into a designated directory to
-                          be served up by the Apache web server as defined by
-                          <filename>STATIC_ROOT</filename>.
+                      <para>Finally, the <filename>collectstatic</filename> command
+                      is a Django framework command that collects all the
+                      statically served files into a designated directory to
+                      be served up by the Apache web server as defined by
+                      <filename>STATIC_ROOT</filename>.
+                      </para></listitem>
+                  <listitem><para>
+                      Test and/or use the Mysql integration with Toaster’s
+                      Django web server.
+                      At this point, you can start up the normal Toaster
+                      Django web server with the Toaster database in Mysql.
+                      You can use this web server to confirm that the database
+                      migration and data population from the Layer Index is
+                      complete.</para>
+
+                      <para>To start the default Toaster Django web server with
+                      the Toaster database now in Mysql, use the standard
+                      start commands:
+                      <literallayout class='monospaced'>
+   $ source oe-init-build-env
+   $ source toaster start
+                      </literallayout>
+                      Additionally, if Django is sufficient for your requirements,
+                      you can use it for your release system and migrate later
+                      to Apache as your requirements change.
                       </para></listitem>
                   <listitem><para>
                       Add an Apache configuration file for Toaster to your Apache web
@@ -535,7 +610,7 @@
           <itemizedlist>
               <listitem><para>
                   Browse published layers in the
-                  <ulink url='http://layers.openembedded.org'>OpenEmbedded Metadata Index</ulink>
+                  <ulink url='http://layers.openembedded.org'>OpenEmbedded Layer Index</ulink>
                   that are available for your selected version of the build
                   system.
                   </para></listitem>

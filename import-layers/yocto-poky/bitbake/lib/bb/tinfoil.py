@@ -604,13 +604,16 @@ class Tinfoil:
         recipecache = self.cooker.recipecaches[mc]
         prov = self.find_best_provider(pn)
         fn = prov[3]
-        actual_pn = recipecache.pkg_fn[fn]
-        recipe = TinfoilRecipeInfo(recipecache,
-                                    self.config_data,
-                                    pn=actual_pn,
-                                    fn=fn,
-                                    fns=recipecache.pkg_pn[actual_pn])
-        return recipe
+        if fn:
+            actual_pn = recipecache.pkg_fn[fn]
+            recipe = TinfoilRecipeInfo(recipecache,
+                                        self.config_data,
+                                        pn=actual_pn,
+                                        fn=fn,
+                                        fns=recipecache.pkg_pn[actual_pn])
+            return recipe
+        else:
+            return None
 
     def parse_recipe(self, pn):
         """

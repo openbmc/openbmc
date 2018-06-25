@@ -24,17 +24,15 @@ Signed-off-by: Thilo Cestonaro <thilo.cestonaro@ts.fujitsu.com>
  include/dbus-c++/eventloop-integration.h |    1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/include/dbus-c++/eventloop-integration.h b/include/dbus-c++/eventloop-integration.h
-index 5108340..1b56ab5 100644
---- a/include/dbus-c++/eventloop-integration.h
-+++ b/include/dbus-c++/eventloop-integration.h
-@@ -27,6 +27,7 @@
+Index: libdbus-c++-0.9.0/include/dbus-c++/eventloop-integration.h
+===================================================================
+--- libdbus-c++-0.9.0.orig/include/dbus-c++/eventloop-integration.h
++++ libdbus-c++-0.9.0/include/dbus-c++/eventloop-integration.h
+@@ -26,6 +26,7 @@
+ #define __DBUSXX_EVENTLOOP_INTEGRATION_H
  
- #include <cstring>
  #include <errno.h>
 +#include <unistd.h>
  #include "api.h"
  #include "dispatcher.h"
  #include "util.h"
--- 
-1.7.9.7

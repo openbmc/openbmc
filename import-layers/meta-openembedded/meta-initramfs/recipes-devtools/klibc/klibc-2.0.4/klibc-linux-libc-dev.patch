@@ -1,15 +1,22 @@
+From 1be2bc41f915922102a3ba671b54c2df6f0052e6 Mon Sep 17 00:00:00 2001
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sun, 14 Mar 2010 18:41:56 +0000
+Subject: [PATCH] klibc_1.5.26: now build against linux-libc-headers
+
 commit 43adf69062254fb4f8d4d11fb5fe36a60ae25d5a
-Author: Ben Hutchings <ben@decadent.org.uk>
-Date:   Sun Mar 14 18:41:56 2010 +0000
 
     Taken from debian "Fix klibc Debian specific build trouble"
     Adapted for klibc_2.0.2
 
-Index: klibc-2.0~rc2/scripts/Kbuild.install
-===================================================================
---- klibc-2.0~rc2.orig/scripts/Kbuild.install	2012-02-11 18:50:21.000000000 +0000
-+++ klibc-2.0~rc2/scripts/Kbuild.install	2012-02-11 19:04:52.000000000 +0000
-@@ -95,7 +95,9 @@
+---
+ scripts/Kbuild.install | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/Kbuild.install b/scripts/Kbuild.install
+index 8af5697..d32a8a5 100644
+--- a/scripts/Kbuild.install
++++ b/scripts/Kbuild.install
+@@ -95,7 +95,9 @@ header:
  	$(Q)mkdir -p $(INSTALLROOT)$(INSTALLDIR)/$(KCROSS)include
  	$(Q)mkdir -p $(INSTALLROOT)$(INSTALLDIR)/$(KCROSS)lib
  	$(Q)mkdir -p $(INSTALLROOT)$(INSTALLDIR)/$(KCROSS)bin
@@ -18,5 +25,5 @@ Index: klibc-2.0~rc2/scripts/Kbuild.install
 +		ln -sf $${x} $(INSTALLROOT)$(INSTALLDIR)/$(KCROSS)include/ || exit; \
 +	done
  	$(Q)cp -rf usr/include/. $(INSTALLROOT)$(INSTALLDIR)/$(KCROSS)include/.
- 	$(Q)chmod -R a+rX $(INSTALLROOT)$(INSTALLDIR)/$(KCROSS)include
+ 	$(Q)chmod -R a+rX,go-w $(INSTALLROOT)$(INSTALLDIR)/$(KCROSS)include
  	$(Q)$(install-data) $(srctree)/klcc/klcc.1 $(INSTALLROOT)$(mandir)/man1/$(KCROSS)klcc.1

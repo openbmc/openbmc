@@ -10,3 +10,4 @@ inherit autotools texinfo update-alternatives gettext
 ALTERNATIVE_${PN} = "diff cmp"
 ALTERNATIVE_PRIORITY = "100"
 
+BBCLASSEXTEND = "native nativesdk"

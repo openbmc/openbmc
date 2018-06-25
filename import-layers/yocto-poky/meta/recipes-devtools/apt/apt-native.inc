@@ -67,4 +67,10 @@ do_install_base () {
 	install -d ${D}${localstatedir}/cache/apt/archives/partial
 
 	install -d ${D}${localstatedir}/log/apt/
+
+	install -d ${D}${includedir}/apt-pkg
+	for h in `find ${S}/apt-pkg ${S}/apt-inst -name '*.h'`
+	do
+		install -m 0644 $h ${D}${includedir}/apt-pkg
+	done
 }

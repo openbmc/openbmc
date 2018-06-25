@@ -1,0 +1,37 @@
+From 5685527364198597f25fc1c6236cb64cbc3de44f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 4 Oct 2017 18:16:08 +0300
+Subject: [PATCH] Fix a strange assert typo; how was this released without
+ noticing?
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tools/build/src/engine/debugger.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/build/src/engine/debugger.c b/tools/build/src/engine/debugger.c
+index 802f262..152a7e6 100644
+--- a/tools/build/src/engine/debugger.c
++++ b/tools/build/src/engine/debugger.c
+@@ -1092,7 +1092,7 @@ static void debug_start_child( int argc, const char * * argv )
+     PROCESS_INFORMATION pi = { NULL, NULL, 0, 0 };
+     STARTUPINFO si = { sizeof( STARTUPINFO ), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0 };
+-    assert( DEBUG_STATE == DEBUG_NO_CHILD );
++    assert( debug_state == DEBUG_NO_CHILD );
+     if ( ! CreatePipe( &pipe1[ 0 ], &pipe1[ 1 ], &sa, 0 ) )
+     {
+         printf("internal error\n");
+@@ -1176,7 +1176,7 @@ static void debug_start_child( int argc, const char * * argv )
+     int read_fd;
+     int pid;
+     int i;
+-    assert( DEBUG_STATE == DEBUG_NO_CHILD );
++    assert( debug_state == DEBUG_NO_CHILD );
+     pipe(pipe1);
+     pipe(pipe2);
+     pid = fork();
+-- 
+2.14.1
+

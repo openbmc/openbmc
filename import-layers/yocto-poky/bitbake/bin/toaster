@@ -68,7 +68,7 @@ webserverKillAll()
         if [ -f ${pidfile} ]; then
             pid=`cat ${pidfile}`
             while kill -0 $pid 2>/dev/null; do
-                kill -SIGTERM -$pid 2>/dev/null
+                kill -SIGTERM $pid 2>/dev/null
                 sleep 1
             done
             rm  ${pidfile}
@@ -91,7 +91,7 @@ webserverStartAll()
 
     echo "Starting webserver..."
 
-    $MANAGE runserver "$ADDR_PORT" \
+    $MANAGE runserver --noreload "$ADDR_PORT" \
            </dev/null >>${BUILDDIR}/toaster_web.log 2>&1 \
            & echo $! >${BUILDDIR}/.toastermain.pid
 

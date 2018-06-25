@@ -26,4 +26,7 @@ LIBC_DEPENDENCIES = "\
     musl \
     musl-dbg \
     musl-dev \
+    musl-utils \
+    musl-utils-iconv \
+    bsd-headers-dev \
     "

@@ -1,0 +1,71 @@
+From a9fc13b2aee55655d58fcb77a3180fa99f96438a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <andre.draszik@jci.com>
+Date: Wed, 28 Mar 2018 16:45:05 +0100
+Subject: [PATCH] update-ca-certificates: use relative symlinks from
+ $ETCCERTSDIR
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+update-ca-certificates symlinks (trusted) certificates
+from $CERTSDIR or $LOCALCERTSDIR into $ETCCERTSDIR.
+update-ca-certificates can call hook scripts installed
+into /etc/ca-certificates/update.d. Those scripts are
+passed the pem file in /etc/ssl/certs/ that was added or
+removed in this run and those pem files are absolute
+symlinks into $CERTSDIR or $LOCALCERTSDIR at the moment.
+
+When running update-ca-certificates during image build
+time, they thusly all point into the host's file system,
+not into the $SYSROOT. This means:
+* the host's file system layout must match the one
+  produced by OE, and
+* it also means that the host must have installed the same
+  (or more) certificates as the target in $CERTSDIR and
+  $LOCALCERTSDIR
+
+This is a problem when wanting to execute hook scripts,
+because they all need to be taught about $SYSROOT, and
+behave differently depending on whether they're called
+at image build time, or on the target, as otherwise they
+will be trying to actually read the host's certificates
+from $CERTSDIR or $LOCALCERTSDIR.
+
+This also is a problem when running anything else during
+image build time that depends on the trusted CA
+certificates.
+
+Changing the symlink to be relative solves all of these
+problems. Do so.
+
+Upstream-Status: Inappropriate [OE-specific]
+Signed-off-by: André Draszik <andre.draszik@jci.com>
+---
+ sbin/update-ca-certificates | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/sbin/update-ca-certificates b/sbin/update-ca-certificates
+index 00f80c7..7e911a9 100755
+--- a/sbin/update-ca-certificates
++++ b/sbin/update-ca-certificates
+@@ -29,6 +29,7 @@ CERTSDIR=$SYSROOT/usr/share/ca-certificates
+ LOCALCERTSDIR=$SYSROOT/usr/local/share/ca-certificates
+ CERTBUNDLE=ca-certificates.crt
+ ETCCERTSDIR=$SYSROOT/etc/ssl/certs
++FSROOT=../../../ # to get from $ETCCERTSDIR to the root of the file system
+ HOOKSDIR=$SYSROOT/etc/ca-certificates/update.d
+ 
+ while [ $# -gt 0 ];
+@@ -125,9 +126,10 @@ add() {
+   PEM="$ETCCERTSDIR/$(basename "$CERT" .crt | sed -e 's/ /_/g' \
+                                                   -e 's/[()]/=/g' \
+                                                   -e 's/,/_/g').pem"
+-  if ! test -e "$PEM" || [ "$(readlink "$PEM")" != "${CERT##$SYSROOT}" ]
++  DST="$(echo ${CERT} | sed -e "s|^$SYSROOT||" -e "s|^/|$FSROOT|" )"
++  if ! test -e "$PEM" || [ "$(readlink "$PEM")" != "${DST}" ]
+   then
+-    ln -sf "${CERT##$SYSROOT}" "$PEM"
++    ln -sf "${DST}" "$PEM"
+     echo "+$PEM" >> "$ADDED"
+   fi
+   # Add trailing newline to certificate, if it is missing (#635570)

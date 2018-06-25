@@ -1,4 +1,4 @@
-From a78f2f0feda8f92cb59afe8236bd90726908768f Mon Sep 17 00:00:00 2001
+From faaa796a138cbd5033b1e53f33faac0cf4162bf5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 25 Jun 2017 00:59:24 -0700
 Subject: [PATCH] tools.cc: fixed unused-result warning
@@ -10,9 +10,8 @@ fix
 |      ~~~~~~^~~
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
-Upstream-Status: Submitted
 
+---
  src/tools.cc | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
@@ -31,6 +30,3 @@ index 8137a03..843e266 100644
  #endif
  #if HAVE_PRCTL && defined(PR_SET_DUMPABLE)
      /* Set Linux DUMPABLE flag */
--- 
-2.13.1
-

@@ -21,7 +21,7 @@ SRC_URI[sha256sum] = "4f93aac6fecb7da2b92871bb9ee33032be6a87b174f54abf8ddf0911a2
 
 BINCONFIG = "${bindir}/gpg-error-config"
 
-inherit autotools binconfig-disabled pkgconfig gettext
+inherit autotools binconfig-disabled pkgconfig gettext multilib_header
 CPPFLAGS += "-P"
 do_compile_prepend() {
 	TARGET_FILE=linux-gnu
@@ -53,6 +53,7 @@ do_compile_prepend() {
 do_install_append() {
 	# we don't have common lisp in OE
 	rm -rf "${D}${datadir}/common-lisp/"
+	oe_multilib_header gpg-error.h gpgrt.h
 }
 
 FILES_${PN}-dev += "${bindir}/gpg-error"

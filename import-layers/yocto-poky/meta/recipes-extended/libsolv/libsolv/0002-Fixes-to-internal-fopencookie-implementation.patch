@@ -1,4 +1,4 @@
-From 99b10cdf6a0f8a24e1670c1813b1d9563ae3f5b5 Mon Sep 17 00:00:00 2001
+From 84e12bf7ece49073c559dfd58005132a6099a964 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Neal=20Gompa=20=28=E3=83=8B=E3=83=BC=E3=83=AB=E3=83=BB?=
  =?UTF-8?q?=E3=82=B3=E3=82=99=E3=83=B3=E3=83=8F=E3=82=9A=29?=
  <ngompa13@gmail.com>
@@ -11,6 +11,7 @@ the tests all pass.
 
 Upstream-Status: Denied [https://github.com/openSUSE/libsolv/pull/112]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  ext/solv_xfopen_fallback_fopencookie.c | 19 ++++++++++---------
  ext/solv_xfopen_fallback_fopencookie.h | 10 +++++-----
@@ -100,5 +101,5 @@ index 6a7bfee..7223e3f 100644
  
  #ifndef SOLV_XFOPEN_FALLBACK_FOPENCOOKIE_H
 -- 
-2.11.0
+2.4.0
 

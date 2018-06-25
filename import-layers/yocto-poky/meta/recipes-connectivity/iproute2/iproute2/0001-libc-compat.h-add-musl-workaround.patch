@@ -15,13 +15,13 @@ https://git.buildroot.net/buildroot/tree/package/iproute2/0001-Add-the-musl-work
 Signed-off-by: Baruch Siach <baruch@tkos.co.il>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
 ---
- include/linux/libc-compat.h | 4 +++-
+ include/uapi/linux/libc-compat.h | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/libc-compat.h b/include/linux/libc-compat.h
+diff --git a/include/uapi/linux/libc-compat.h b/include/uapi/linux/libc-compat.h
 index f38571d..30f0b67 100644
---- a/include/linux/libc-compat.h
-+++ b/include/linux/libc-compat.h
+--- a/include/uapi/linux/libc-compat.h
++++ b/include/uapi/linux/libc-compat.h
 @@ -49,10 +49,12 @@
  #define _LIBC_COMPAT_H
  

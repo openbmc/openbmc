@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if ! lsmod | grep -q sctp && ! modprobe sctp 2>/dev/null; then
+        echo "Couldn't load kernel module sctp."
+        echo "Test cases testsctp and testcnx will fail."
+        echo
+fi
+
+export EXTENSIONS_DIR=$EXTENSIONS_DIR
+cmake  -E cmake_echo_color --cyan "Running tests..."
+ctest --force-new-ctest-process

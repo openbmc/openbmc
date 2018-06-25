@@ -1,13 +1,22 @@
+From e3ae56cf0bb4063c31295f45d04e3c504f4b6cc7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 24 Apr 2017 20:41:25 -0700
+Subject: [PATCH] autofs: Upgrade to 5.1.2 release
+
 Use pkg-config first to look for external libnsl which is now
 split out from glibc, if it does not exist then see if its provided
 by glibc itself.
 
 -Khem
 
-Index: autofs-5.1.2/configure.in
-===================================================================
---- autofs-5.1.2.orig/configure.in
-+++ autofs-5.1.2/configure.in
+---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 9cf73b8..1016c71 100644
+--- a/configure.in
++++ b/configure.in
 @@ -186,7 +186,7 @@ fi
  #
  # glibc/libc 6 new libraries

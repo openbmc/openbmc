@@ -14,8 +14,6 @@ SRC_URI[sha256sum] = "db625c7ab3bb3ee757b3926a5cfa8d9e1c3991ad24707a83dde8a5ef2b
 
 inherit autotools gettext texinfo pkgconfig
 
-EXTRA_OECONF = "--disable-perl-regexp"
-
 # Fix "Argument list too long" error when len(TMPDIR) = 410
 acpaths = "-I ./m4"
 
@@ -35,6 +33,9 @@ do_install () {
 }
 
 inherit update-alternatives
+
+PACKAGECONFIG ??= "pcre"
+PACKAGECONFIG[pcre] = "--enable-perl-regexp,--disable-perl-regexp,libpcre"
 
 ALTERNATIVE_PRIORITY = "100"
 

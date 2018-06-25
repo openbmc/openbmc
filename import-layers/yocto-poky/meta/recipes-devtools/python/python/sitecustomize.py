@@ -27,19 +27,11 @@ def __enableReadlineSupport():
     except IOError:
         pass
 
-def __enableDefaultEncoding():
-    import sys
-    try:
-        sys.setdefaultencoding( "utf8" )
-    except LookupError:
-        pass
-
 import sys
 try:
     import rlcompleter, readline
 except ImportError:
     pass
 else:
-    __enableDefaultEncoding()
     __registerExitHandler()
     __enableReadlineSupport()

@@ -1,0 +1,176 @@
+From ad208b8b7e45fb2b7c572b86c61c26412609e82d Mon Sep 17 00:00:00 2001
+From: George Dunlap <george.dunlap@citrix.com>
+Date: Fri, 10 Nov 2017 16:53:54 +0000
+Subject: [PATCH 1/2] p2m: Always check to see if removing a p2m entry actually
+ worked
+
+The PoD zero-check functions speculatively remove memory from the p2m,
+then check to see if it's completely zeroed, before putting it in the
+cache.
+
+Unfortunately, the p2m_set_entry() calls may fail if the underlying
+pagetable structure needs to change and the domain has exhausted its
+p2m memory pool: for instance, if we're removing a 2MiB region out of
+a 1GiB entry (in the p2m_pod_zero_check_superpage() case), or a 4k
+region out of a 2MiB or larger entry (in the p2m_pod_zero_check()
+case); and the return value is not checked.
+
+The underlying mfn will then be added into the PoD cache, and at some
+point mapped into another location in the p2m.  If the guest
+afterwards ballons out this memory, it will be freed to the hypervisor
+and potentially reused by another domain, in spite of the fact that
+the original domain still has writable mappings to it.
+
+There are several places where p2m_set_entry() shouldn't be able to
+fail, as it is guaranteed to write an entry of the same order that
+succeeded before.  Add a backstop of crashing the domain just in case,
+and an ASSERT_UNREACHABLE() to flag up the broken assumption on debug
+builds.
+
+While we're here, use PAGE_ORDER_2M rather than a magic constant.
+
+This is part of XSA-247.
+
+Reported-by: George Dunlap <george.dunlap.com>
+Signed-off-by: George Dunlap <george.dunlap@citrix.com>
+Reviewed-by: Jan Beulich <jbeulich@suse.com>
+---
+v4:
+- Removed some training whitespace
+v3:
+- Reformat reset clause to be more compact
+- Make sure to set map[i] = NULL when unmapping in case we need to bail
+v2:
+- Crash a domain if a p2m_set_entry we think cannot fail fails anyway.
+---
+ xen/arch/x86/mm/p2m-pod.c | 77 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 61 insertions(+), 16 deletions(-)
+
+diff --git a/xen/arch/x86/mm/p2m-pod.c b/xen/arch/x86/mm/p2m-pod.c
+index 730a48f928..f2ed751892 100644
+--- a/xen/arch/x86/mm/p2m-pod.c
++++ b/xen/arch/x86/mm/p2m-pod.c
+@@ -752,8 +752,10 @@ p2m_pod_zero_check_superpage(struct p2m_domain *p2m, unsigned long gfn)
+     }
+ 
+     /* Try to remove the page, restoring old mapping if it fails. */
+-    p2m_set_entry(p2m, gfn, INVALID_MFN, PAGE_ORDER_2M,
+-                  p2m_populate_on_demand, p2m->default_access);
++    if ( p2m_set_entry(p2m, gfn, INVALID_MFN, PAGE_ORDER_2M,
++                       p2m_populate_on_demand, p2m->default_access) )
++        goto out;
++
+     p2m_tlb_flush_sync(p2m);
+ 
+     /* Make none of the MFNs are used elsewhere... for example, mapped
+@@ -810,9 +812,18 @@ p2m_pod_zero_check_superpage(struct p2m_domain *p2m, unsigned long gfn)
+     ret = SUPERPAGE_PAGES;
+ 
+ out_reset:
+-    if ( reset )
+-        p2m_set_entry(p2m, gfn, mfn0, 9, type0, p2m->default_access);
+-    
++    /*
++     * This p2m_set_entry() call shouldn't be able to fail, since the same order
++     * on the same gfn succeeded above.  If that turns out to be false, crashing
++     * the domain should be the safest way of making sure we don't leak memory.
++     */
++    if ( reset && p2m_set_entry(p2m, gfn, mfn0, PAGE_ORDER_2M,
++                                type0, p2m->default_access) )
++    {
++        ASSERT_UNREACHABLE();
++        domain_crash(d);
++    }
++
+ out:
+     gfn_unlock(p2m, gfn, SUPERPAGE_ORDER);
+     return ret;
+@@ -869,19 +880,30 @@ p2m_pod_zero_check(struct p2m_domain *p2m, unsigned long *gfns, int count)
+         }
+ 
+         /* Try to remove the page, restoring old mapping if it fails. */
+-        p2m_set_entry(p2m, gfns[i], INVALID_MFN, PAGE_ORDER_4K,
+-                      p2m_populate_on_demand, p2m->default_access);
++        if ( p2m_set_entry(p2m, gfns[i], INVALID_MFN, PAGE_ORDER_4K,
++                           p2m_populate_on_demand, p2m->default_access) )
++            goto skip;
+ 
+         /* See if the page was successfully unmapped.  (Allow one refcount
+          * for being allocated to a domain.) */
+         if ( (mfn_to_page(mfns[i])->count_info & PGC_count_mask) > 1 )
+         {
++            /*
++             * If the previous p2m_set_entry call succeeded, this one shouldn't
++             * be able to fail.  If it does, crashing the domain should be safe.
++             */
++            if ( p2m_set_entry(p2m, gfns[i], mfns[i], PAGE_ORDER_4K,
++                               types[i], p2m->default_access) )
++            {
++                ASSERT_UNREACHABLE();
++                domain_crash(d);
++                goto out_unmap;
++            }
++
++        skip:
+             unmap_domain_page(map[i]);
+             map[i] = NULL;
+ 
+-            p2m_set_entry(p2m, gfns[i], mfns[i], PAGE_ORDER_4K,
+-                types[i], p2m->default_access);
+-
+             continue;
+         }
+     }
+@@ -900,12 +922,25 @@ p2m_pod_zero_check(struct p2m_domain *p2m, unsigned long *gfns, int count)
+ 
+         unmap_domain_page(map[i]);
+ 
+-        /* See comment in p2m_pod_zero_check_superpage() re gnttab
+-         * check timing.  */
+-        if ( j < PAGE_SIZE/sizeof(*map[i]) )
++        map[i] = NULL;
++
++        /*
++         * See comment in p2m_pod_zero_check_superpage() re gnttab
++         * check timing.
++         */
++        if ( j < (PAGE_SIZE / sizeof(*map[i])) )
+         {
+-            p2m_set_entry(p2m, gfns[i], mfns[i], PAGE_ORDER_4K,
+-                types[i], p2m->default_access);
++            /*
++             * If the previous p2m_set_entry call succeeded, this one shouldn't
++             * be able to fail.  If it does, crashing the domain should be safe.
++             */
++            if ( p2m_set_entry(p2m, gfns[i], mfns[i], PAGE_ORDER_4K,
++                               types[i], p2m->default_access) )
++            {
++                ASSERT_UNREACHABLE();
++                domain_crash(d);
++                goto out_unmap;
++            }
+         }
+         else
+         {
+@@ -929,7 +964,17 @@ p2m_pod_zero_check(struct p2m_domain *p2m, unsigned long *gfns, int count)
+             p2m->pod.entry_count++;
+         }
+     }
+-    
++
++    return;
++
++out_unmap:
++    /*
++     * Something went wrong, probably crashing the domain.  Unmap
++     * everything and return.
++     */
++    for ( i = 0; i < count; i++ )
++        if ( map[i] )
++            unmap_domain_page(map[i]);
+ }
+ 
+ #define POD_SWEEP_LIMIT 1024
+-- 
+2.15.0
+

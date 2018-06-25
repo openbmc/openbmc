@@ -91,6 +91,8 @@ class QemuTarget(BaseTarget):
 
     def __init__(self, d, logger, image_fstype=None):
 
+        import oe.types
+
         super(QemuTarget, self).__init__(d, logger)
 
         self.rootfs = ''
@@ -107,7 +109,7 @@ class QemuTarget(BaseTarget):
         dump_dir = d.getVar("TESTIMAGE_DUMP_DIR")
         qemu_use_kvm = d.getVar("QEMU_USE_KVM")
         if qemu_use_kvm and \
-           (qemu_use_kvm == "True" and "x86" in d.getVar("MACHINE") or \
+           (oe.types.boolean(qemu_use_kvm) and "x86" in d.getVar("MACHINE") or \
             d.getVar("MACHINE") in qemu_use_kvm.split()):
             use_kvm = True
         else:

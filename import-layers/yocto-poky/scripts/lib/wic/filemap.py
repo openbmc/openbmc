@@ -37,7 +37,15 @@ def get_block_size(file_obj):
     # Get the block size of the host file-system for the image file by calling
     # the FIGETBSZ ioctl (number 2).
     binary_data = fcntl.ioctl(file_obj, 2, struct.pack('I', 0))
-    return struct.unpack('I', binary_data)[0]
+    bsize = struct.unpack('I', binary_data)[0]
+    if not bsize:
+        import os
+        stat = os.fstat(file_obj.fileno())
+        if hasattr(stat, 'st_blksize'):
+            bsize = stat.st_blksize
+        else:
+            raise IOError("Unable to determine block size")
+    return bsize
 
 class ErrorNotSupp(Exception):
     """

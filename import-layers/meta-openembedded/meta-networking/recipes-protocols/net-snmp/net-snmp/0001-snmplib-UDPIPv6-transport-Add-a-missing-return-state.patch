@@ -12,11 +12,11 @@ Signed-off-by: Li Zhou <li.zhou@windriver.com>
  snmplib/transports/snmpUDPIPv6Domain.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/snmplib/transports/snmpUDPIPv6Domain.c b/snmplib/transports/snmpUDPIPv6Domain.c
-index 029b164..11c39bb 100644
---- a/snmplib/transports/snmpUDPIPv6Domain.c
-+++ b/snmplib/transports/snmpUDPIPv6Domain.c
-@@ -285,6 +285,7 @@ netsnmp_udp6_transport(struct sockaddr_in6 *addr, int local)
+Index: net-snmp-5.7.3/snmplib/transports/snmpUDPIPv6Domain.c
+===================================================================
+--- net-snmp-5.7.3.orig/snmplib/transports/snmpUDPIPv6Domain.c
++++ net-snmp-5.7.3/snmplib/transports/snmpUDPIPv6Domain.c
+@@ -305,6 +305,7 @@ netsnmp_udp6_transport(struct sockaddr_i
                                   errno, strerror(errno)));
                  netsnmp_socketbase_close(t);
                  netsnmp_transport_free(t);
@@ -24,6 +24,3 @@ index 029b164..11c39bb 100644
              }
          }
          /*
--- 
-2.9.3
-

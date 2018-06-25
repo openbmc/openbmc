@@ -2132,6 +2132,8 @@
                 <listitem><para>
                     <filename>bb.event.BuildStarted()</filename>:
                     Fired when a new build starts.
+                    BitBake fires multiple "BuildStarted" events (one per configuration)
+                    when multiple configuration (multiconfig) is enabled.
                     </para></listitem>
                 <listitem><para>
                     <filename>bb.build.TaskStarted()</filename>:
@@ -2650,46 +2652,69 @@
         </para>
 
         <para>
-            This list is a place holder of content existed from previous work
-            on the manual.
-            Some or all of it probably needs integrated into the subsections
-            that make up this section.
-            For now, I have just provided a short glossary-like description
-            for each variable.
-            Ultimately, this list goes away.
+            These checksums are stored in
+            <link linkend='var-STAMP'><filename>STAMP</filename></link>.
+            You can examine the checksums using the following BitBake command:
+            <literallayout class='monospaced'>
+     $ bitbake-dumpsigs
+            </literallayout>
+            This command returns the signature data in a readable format
+            that allows you to examine the inputs used when the
+            OpenEmbedded build system generates signatures.
+            For example, using <filename>bitbake-dumpsigs</filename>
+            allows you to examine the <filename>do_compile</filename>
+            task's “sigdata” for a C application (e.g.
+            <filename>bash</filename>).
+            Running the command also reveals that the “CC” variable is part of
+            the inputs that are hashed.
+            Any changes to this variable would invalidate the stamp and
+            cause the <filename>do_compile</filename> task to run.
+        </para>
+
+        <para>
+            The following list describes related variables:
             <itemizedlist>
-                <listitem><para><filename>STAMP</filename>:
-                    The base path to create stamp files.</para></listitem>
-                <listitem><para><filename>STAMPCLEAN</filename>
-                    Again, the base path to create stamp files but can use wildcards
-                    for matching a range of files for clean operations.
-                    </para></listitem>
-                <listitem><para><filename>BB_STAMP_WHITELIST</filename>
-                    Lists stamp files that are looked at when the stamp policy
-                    is "whitelist".
-                    </para></listitem>
-                <listitem><para><filename>BB_STAMP_POLICY</filename>
-                    Defines the mode for comparing timestamps of stamp files.
-                    </para></listitem>
-                <listitem><para><filename>BB_HASHCHECK_FUNCTION</filename>
+                <listitem><para>
+                    <link linkend='var-BB_HASHCHECK_FUNCTION'><filename>BB_HASHCHECK_FUNCTION</filename></link>:
                     Specifies the name of the function to call during
                     the "setscene" part of the task's execution in order
                     to validate the list of task hashes.
                     </para></listitem>
-                <listitem><para><filename>BB_SETSCENE_VERIFY_FUNCTION2</filename>
-                    Specifies a function to call that verifies the list of
-                    planned task execution before the main task execution
-                    happens.
-                    </para></listitem>
-                <listitem><para><filename>BB_SETSCENE_DEPVALID</filename>
+                <listitem><para>
+                    <link linkend='var-BB_SETSCENE_DEPVALID'><filename>BB_SETSCENE_DEPVALID</filename></link>:
                     Specifies a function BitBake calls that determines
                     whether BitBake requires a setscene dependency to
                     be met.
                     </para></listitem>
-                <listitem><para><filename>BB_TASKHASH</filename>
+                <listitem><para>
+                    <link linkend='var-BB_SETSCENE_VERIFY_FUNCTION2'><filename>BB_SETSCENE_VERIFY_FUNCTION2</filename></link>:
+                    Specifies a function to call that verifies the list of
+                    planned task execution before the main task execution
+                    happens.
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-BB_STAMP_POLICY'><filename>BB_STAMP_POLICY</filename></link>:
+                    Defines the mode for comparing timestamps of stamp files.
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-BB_STAMP_WHITELIST'><filename>BB_STAMP_WHITELIST</filename></link>:
+                    Lists stamp files that are looked at when the stamp policy
+                    is "whitelist".
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-BB_TASKHASH'><filename>BB_TASKHASH</filename></link>:
                     Within an executing task, this variable holds the hash
                     of the task as returned by the currently enabled
                     signature generator.
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-STAMP'><filename>STAMP</filename></link>:
+                    The base path to create stamp files.
+                    </para></listitem>
+                <listitem><para>
+                    <link linkend='var-STAMPCLEAN'><filename>STAMPCLEAN</filename></link>:
+                    Again, the base path to create stamp files but can use wildcards
+                    for matching a range of files for clean operations.
                     </para></listitem>
             </itemizedlist>
         </para>

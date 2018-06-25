@@ -5,39 +5,30 @@ LICENSE = "(GPLv3 & Elfutils-Exception)"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 DEPENDS = "libtool bzip2 zlib virtual/libintl"
 DEPENDS_append_libc-musl = " argp-standalone fts "
-SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2"
+# The Debian patches below are from:
+# http://ftp.de.debian.org/debian/pool/main/e/elfutils/elfutils_0.168-0.2.debian.tar.xz
+SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
+           file://0001-dso-link-change.patch \
+           file://0002-Fix-elf_cvt_gunhash-if-dest-and-src-are-same.patch \
+           file://0003-fixheadercheck.patch \
+           file://0004-Disable-the-test-to-convert-euc-jp.patch \
+           file://0005-fix-a-stack-usage-warning.patch \
+           file://0006-Fix-build-on-aarch64-musl.patch \
+           file://0007-Fix-control-path-where-we-have-str-as-uninitialized-.patch \
+           file://0001-libasm-may-link-with-libbz2-if-found.patch \
+           file://debian/hppa_backend.diff \
+           file://debian/arm_backend.diff \
+           file://debian/mips_backend.patch \
+           file://debian/mips_readelf_w.patch \
+           file://debian/0001-Ignore-differences-between-mips-machine-identifiers.patch \
+           file://debian/0002-Add-support-for-mips64-abis-in-mips_retval.c.patch \
+           file://debian/0003-Add-mips-n64-relocation-format-hack.patch \
+           file://0001-Use-fallthrough-attribute.patch \
+           file://0001-Ensure-that-packed-structs-follow-the-gcc-memory-lay.patch \
+           "
+SRC_URI_append_libc-musl = " file://0008-build-Provide-alternatives-for-glibc-assumptions-hel.patch"
 SRC_URI[md5sum] = "03599aee98c9b726c7a732a2dd0245d5"
 SRC_URI[sha256sum] = "1f844775576b79bdc9f9c717a50058d08620323c1e935458223a12f249c9e066"
-
-SRC_URI += "\
-        file://0001-dso-link-change.patch \
-        file://0002-Fix-elf_cvt_gunhash-if-dest-and-src-are-same.patch \
-        file://0003-fixheadercheck.patch \
-        file://0004-Disable-the-test-to-convert-euc-jp.patch \
-        file://0005-fix-a-stack-usage-warning.patch \
-        file://0006-Fix-build-on-aarch64-musl.patch \
-        file://0007-Fix-control-path-where-we-have-str-as-uninitialized-.patch \
-        file://0001-libasm-may-link-with-libbz2-if-found.patch \
-"
-SRC_URI_append_libc-musl = " file://0008-build-Provide-alternatives-for-glibc-assumptions-hel.patch"
-
-# Pick patches from debian
-# http://ftp.de.debian.org/debian/pool/main/e/elfutils/elfutils_0.168-0.2.debian.tar.xz
-SRC_URI += "\
-        file://debian/hppa_backend.diff \
-        file://debian/arm_backend.diff \
-        file://debian/mips_backend.patch \
-        file://debian/mips_readelf_w.patch \
-        file://debian/0001-Ignore-differences-between-mips-machine-identifiers.patch \
-        file://debian/0002-Add-support-for-mips64-abis-in-mips_retval.c.patch \
-        file://debian/0003-Add-mips-n64-relocation-format-hack.patch \
-"
-# Fix the patches from Debian with GCC7
-SRC_URI += "file://debian/fallthrough.patch"
-
-# The buildsystem wants to generate 2 .h files from source using a binary it just built,
-# which can not pass the cross compiling, so let's work around it by adding 2 .h files
-# along with the do_configure_prepend()
 
 inherit autotools gettext
 

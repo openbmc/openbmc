@@ -1,17 +1,21 @@
-[PATCH] replace krb5-config with pkg-config
+From ed70f0623708b8a6c1f58a5d243d87c5ff45b24d Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Tue, 26 Apr 2016 13:13:01 +0800
+Subject: [PATCH] replace krb5-config with pkg-config
 
 Upstream-Status:  Pending
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
 ---
  configure.ac | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index e99b303..dc93f39 100644
+index 5569a26..56b0380 100755
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1196,7 +1196,7 @@ AC_ARG_WITH(gssapi,
+@@ -1290,7 +1290,7 @@ AC_ARG_WITH(gssapi,
    fi
  ])
  
@@ -20,7 +24,7 @@ index e99b303..dc93f39 100644
  
  save_CPPFLAGS="$CPPFLAGS"
  AC_MSG_CHECKING([if GSS-API support is requested])
-@@ -1207,7 +1207,7 @@ if test x"$want_gss" = xyes; then
+@@ -1301,7 +1301,7 @@ if test x"$want_gss" = xyes; then
       if test -n "$host_alias" -a -f "$GSSAPI_ROOT/bin/$host_alias-krb5-config"; then
          GSSAPI_INCS=`$GSSAPI_ROOT/bin/$host_alias-krb5-config --cflags gssapi`
       elif test -f "$KRB5CONFIG"; then
@@ -29,7 +33,7 @@ index e99b303..dc93f39 100644
       elif test "$GSSAPI_ROOT" != "yes"; then
          GSSAPI_INCS="-I$GSSAPI_ROOT/include"
       fi
-@@ -1300,7 +1300,7 @@ if test x"$want_gss" = xyes; then
+@@ -1394,7 +1394,7 @@ if test x"$want_gss" = xyes; then
          elif test -f "$KRB5CONFIG"; then
             dnl krb5-config doesn't have --libs-only-L or similar, put everything
             dnl into LIBS
@@ -38,6 +42,3 @@ index e99b303..dc93f39 100644
             LIBS="$gss_libs $LIBS"
          else
             case $host in
--- 
-1.9.1
-

@@ -49,4 +49,4 @@ Index: nspr/configure.in
 -            PR_MD_ASFILES=os_Linux_ppc.s
          fi
          ;;
-     m68k)
+     esac    

@@ -1,4 +1,4 @@
-From 71c734bb3754319029dcfc898cedbade42274dcb Mon Sep 17 00:00:00 2001
+From fad053cc59baa6277182b0fc90415a214060ba99 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 14 Feb 2016 17:04:07 +0000
 Subject: [PATCH 06/15] Use libtool 2.4
@@ -12,7 +12,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  bfd/configure        | 1318 +++++++++++++++++------
  bfd/configure.ac     |    2 +-
  binutils/configure   | 1316 +++++++++++++++++------
- configure            |    2 +-
  gas/configure        | 1314 +++++++++++++++++------
  gprof/configure      | 1321 +++++++++++++++++------
  ld/configure         | 1691 +++++++++++++++++++++--------
@@ -24,10 +23,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  opcodes/configure    | 1318 +++++++++++++++++------
  opcodes/configure.ac |    2 +-
  zlib/configure       | 1316 +++++++++++++++++------
- 15 files changed, 9927 insertions(+), 3694 deletions(-)
+ 14 files changed, 9926 insertions(+), 3693 deletions(-)
 
 diff --git a/bfd/configure b/bfd/configure
-index 48276594ed..3ece8943f3 100755
+index 6c2b24ebe3..5fdd723b7f 100755
 --- a/bfd/configure
 +++ b/bfd/configure
 @@ -672,6 +672,9 @@ OTOOL
@@ -1931,7 +1930,7 @@ index 48276594ed..3ece8943f3 100755
    chmod +x "$ofile"
  
 diff --git a/bfd/configure.ac b/bfd/configure.ac
-index 8fd03a7ea8..8816c3286c 100644
+index 2342f3faea..a6451fccda 100644
 --- a/bfd/configure.ac
 +++ b/bfd/configure.ac
 @@ -254,7 +254,7 @@ changequote(,)dnl
@@ -1944,7 +1943,7 @@ index 8fd03a7ea8..8816c3286c 100644
  
  # More hacks to build DLLs on Windows.
 diff --git a/binutils/configure b/binutils/configure
-index 22e1b1736e..321b63535b 100755
+index 5d9c9105a7..a65b2b4518 100755
 --- a/binutils/configure
 +++ b/binutils/configure
 @@ -659,8 +659,11 @@ OTOOL
@@ -3841,21 +3840,8 @@ index 22e1b1736e..321b63535b 100755
      (rm -f "$ofile" && cp "$cfgfile" "$ofile" && rm -f "$cfgfile")
    chmod +x "$ofile"
  
-diff --git a/configure b/configure
-index d8af155ab5..005ed827ab 100755
---- a/configure
-+++ b/configure
-@@ -3844,7 +3844,7 @@ case "${target}" in
-   or1k*-*-*)
-     noconfigdirs="$noconfigdirs gdb"
-     ;;
--  sh*-*-* | sh64-*-*)
-+  sh-*-* | sh64-*-*)
-     case "${target}" in
-       sh*-*-elf)
-          ;;
 diff --git a/gas/configure b/gas/configure
-index 93afb20c8f..81dd4cbd97 100755
+index fbac8f44d5..a40ac2144f 100755
 --- a/gas/configure
 +++ b/gas/configure
 @@ -650,8 +650,11 @@ OTOOL
@@ -5156,7 +5142,7 @@ index 93afb20c8f..81dd4cbd97 100755
  int main ()
  {
    void *self = dlopen (0, LT_DLGLOBAL|LT_DLLAZY_OR_NOW);
-@@ -15436,13 +16089,20 @@ exeext='`$ECHO "$exeext" | $SED "$delay_single_quote_subst"`'
+@@ -15437,13 +16090,20 @@ exeext='`$ECHO "$exeext" | $SED "$delay_single_quote_subst"`'
  lt_unset='`$ECHO "$lt_unset" | $SED "$delay_single_quote_subst"`'
  lt_SP2NL='`$ECHO "$lt_SP2NL" | $SED "$delay_single_quote_subst"`'
  lt_NL2SP='`$ECHO "$lt_NL2SP" | $SED "$delay_single_quote_subst"`'
@@ -5177,7 +5163,7 @@ index 93afb20c8f..81dd4cbd97 100755
  STRIP='`$ECHO "$STRIP" | $SED "$delay_single_quote_subst"`'
  RANLIB='`$ECHO "$RANLIB" | $SED "$delay_single_quote_subst"`'
  old_postinstall_cmds='`$ECHO "$old_postinstall_cmds" | $SED "$delay_single_quote_subst"`'
-@@ -15457,14 +16117,17 @@ lt_cv_sys_global_symbol_pipe='`$ECHO "$lt_cv_sys_global_symbol_pipe" | $SED "$de
+@@ -15458,14 +16118,17 @@ lt_cv_sys_global_symbol_pipe='`$ECHO "$lt_cv_sys_global_symbol_pipe" | $SED "$de
  lt_cv_sys_global_symbol_to_cdecl='`$ECHO "$lt_cv_sys_global_symbol_to_cdecl" | $SED "$delay_single_quote_subst"`'
  lt_cv_sys_global_symbol_to_c_name_address='`$ECHO "$lt_cv_sys_global_symbol_to_c_name_address" | $SED "$delay_single_quote_subst"`'
  lt_cv_sys_global_symbol_to_c_name_address_lib_prefix='`$ECHO "$lt_cv_sys_global_symbol_to_c_name_address_lib_prefix" | $SED "$delay_single_quote_subst"`'
@@ -5196,7 +5182,7 @@ index 93afb20c8f..81dd4cbd97 100755
  DSYMUTIL='`$ECHO "$DSYMUTIL" | $SED "$delay_single_quote_subst"`'
  NMEDIT='`$ECHO "$NMEDIT" | $SED "$delay_single_quote_subst"`'
  LIPO='`$ECHO "$LIPO" | $SED "$delay_single_quote_subst"`'
-@@ -15497,12 +16160,12 @@ hardcode_shlibpath_var='`$ECHO "$hardcode_shlibpath_var" | $SED "$delay_single_q
+@@ -15498,12 +16161,12 @@ hardcode_shlibpath_var='`$ECHO "$hardcode_shlibpath_var" | $SED "$delay_single_q
  hardcode_automatic='`$ECHO "$hardcode_automatic" | $SED "$delay_single_quote_subst"`'
  inherit_rpath='`$ECHO "$inherit_rpath" | $SED "$delay_single_quote_subst"`'
  link_all_deplibs='`$ECHO "$link_all_deplibs" | $SED "$delay_single_quote_subst"`'
@@ -5210,7 +5196,7 @@ index 93afb20c8f..81dd4cbd97 100755
  file_list_spec='`$ECHO "$file_list_spec" | $SED "$delay_single_quote_subst"`'
  variables_saved_for_relink='`$ECHO "$variables_saved_for_relink" | $SED "$delay_single_quote_subst"`'
  need_lib_prefix='`$ECHO "$need_lib_prefix" | $SED "$delay_single_quote_subst"`'
-@@ -15557,8 +16220,13 @@ reload_flag \
+@@ -15558,8 +16221,13 @@ reload_flag \
  OBJDUMP \
  deplibs_check_method \
  file_magic_cmd \
@@ -5224,7 +5210,7 @@ index 93afb20c8f..81dd4cbd97 100755
  STRIP \
  RANLIB \
  CC \
-@@ -15568,12 +16236,14 @@ lt_cv_sys_global_symbol_pipe \
+@@ -15569,12 +16237,14 @@ lt_cv_sys_global_symbol_pipe \
  lt_cv_sys_global_symbol_to_cdecl \
  lt_cv_sys_global_symbol_to_c_name_address \
  lt_cv_sys_global_symbol_to_c_name_address_lib_prefix \
@@ -5240,7 +5226,7 @@ index 93afb20c8f..81dd4cbd97 100755
  DSYMUTIL \
  NMEDIT \
  LIPO \
-@@ -15589,7 +16259,6 @@ no_undefined_flag \
+@@ -15590,7 +16260,6 @@ no_undefined_flag \
  hardcode_libdir_flag_spec \
  hardcode_libdir_flag_spec_ld \
  hardcode_libdir_separator \
@@ -5248,7 +5234,7 @@ index 93afb20c8f..81dd4cbd97 100755
  exclude_expsyms \
  include_expsyms \
  file_list_spec \
-@@ -15625,6 +16294,7 @@ module_cmds \
+@@ -15626,6 +16295,7 @@ module_cmds \
  module_expsym_cmds \
  export_symbols_cmds \
  prelink_cmds \
@@ -5256,7 +5242,7 @@ index 93afb20c8f..81dd4cbd97 100755
  postinstall_cmds \
  postuninstall_cmds \
  finish_cmds \
-@@ -16389,7 +17059,8 @@ $as_echo X"$file" |
+@@ -16390,7 +17060,8 @@ $as_echo X"$file" |
  # NOTE: Changes made to this file will be lost: look at ltmain.sh.
  #
  #   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005,
@@ -5266,7 +5252,7 @@ index 93afb20c8f..81dd4cbd97 100755
  #   Written by Gordon Matzigkeit, 1996
  #
  #   This file is part of GNU Libtool.
-@@ -16492,19 +17163,42 @@ SP2NL=$lt_lt_SP2NL
+@@ -16493,19 +17164,42 @@ SP2NL=$lt_lt_SP2NL
  # turn newlines into spaces.
  NL2SP=$lt_lt_NL2SP
  
@@ -5310,7 +5296,7 @@ index 93afb20c8f..81dd4cbd97 100755
  # A symbol stripping program.
  STRIP=$lt_STRIP
  
-@@ -16534,6 +17228,12 @@ global_symbol_to_c_name_address=$lt_lt_cv_sys_global_symbol_to_c_name_address
+@@ -16535,6 +17229,12 @@ global_symbol_to_c_name_address=$lt_lt_cv_sys_global_symbol_to_c_name_address
  # Transform the output of nm in a C name address pair when lib prefix is needed.
  global_symbol_to_c_name_address_lib_prefix=$lt_lt_cv_sys_global_symbol_to_c_name_address_lib_prefix
  
@@ -5323,7 +5309,7 @@ index 93afb20c8f..81dd4cbd97 100755
  # The name of the directory that contains temporary libtool files.
  objdir=$objdir
  
-@@ -16543,6 +17243,9 @@ MAGIC_CMD=$MAGIC_CMD
+@@ -16544,6 +17244,9 @@ MAGIC_CMD=$MAGIC_CMD
  # Must we lock files when doing compilation?
  need_locks=$lt_need_locks
  
@@ -5333,7 +5319,7 @@ index 93afb20c8f..81dd4cbd97 100755
  # Tool to manipulate archived DWARF debug symbol files on Mac OS X.
  DSYMUTIL=$lt_DSYMUTIL
  
-@@ -16657,12 +17360,12 @@ with_gcc=$GCC
+@@ -16658,12 +17361,12 @@ with_gcc=$GCC
  # Compiler flag to turn off builtin functions.
  no_builtin_flag=$lt_lt_prog_compiler_no_builtin_flag
  
@@ -5349,7 +5335,7 @@ index 93afb20c8f..81dd4cbd97 100755
  # Compiler flag to prevent dynamic linking.
  link_static_flag=$lt_lt_prog_compiler_static
  
-@@ -16749,9 +17452,6 @@ inherit_rpath=$inherit_rpath
+@@ -16750,9 +17453,6 @@ inherit_rpath=$inherit_rpath
  # Whether libtool must link a program against all its dependency libraries.
  link_all_deplibs=$link_all_deplibs
  
@@ -5359,7 +5345,7 @@ index 93afb20c8f..81dd4cbd97 100755
  # Set to "yes" if exported symbols are required.
  always_export_symbols=$always_export_symbols
  
-@@ -16767,6 +17467,9 @@ include_expsyms=$lt_include_expsyms
+@@ -16768,6 +17468,9 @@ include_expsyms=$lt_include_expsyms
  # Commands necessary for linking programs (against libraries) with templates.
  prelink_cmds=$lt_prelink_cmds
  
@@ -5369,7 +5355,7 @@ index 93afb20c8f..81dd4cbd97 100755
  # Specify filename containing input files.
  file_list_spec=$lt_file_list_spec
  
-@@ -16799,210 +17502,169 @@ ltmain="$ac_aux_dir/ltmain.sh"
+@@ -16800,210 +17503,169 @@ ltmain="$ac_aux_dir/ltmain.sh"
    # if finds mixed CR/LF and LF-only lines.  Since sed operates in
    # text mode, it properly converts lines to CR/LF.  This bash problem
    # is reportedly fixed, but why not run on old versions too?
@@ -5744,7 +5730,7 @@ index 93afb20c8f..81dd4cbd97 100755
    chmod +x "$ofile"
  
 diff --git a/gprof/configure b/gprof/configure
-index 679e0dce77..ac4c016a63 100755
+index 6b43bf2b18..245ee48bc3 100755
 --- a/gprof/configure
 +++ b/gprof/configure
 @@ -631,8 +631,11 @@ OTOOL
@@ -7654,7 +7640,7 @@ index 679e0dce77..ac4c016a63 100755
    chmod +x "$ofile"
  
 diff --git a/ld/configure b/ld/configure
-index d7f66f8cdc..4e71511bd1 100755
+index 0cc6e8a50f..db8b998722 100755
 --- a/ld/configure
 +++ b/ld/configure
 @@ -655,8 +655,11 @@ OTOOL
@@ -17336,7 +17322,7 @@ index bf92b5e079..c573da90c5 100644
  # These exist entirely to fool aclocal when bootstrapping libtool.
  #
 diff --git a/opcodes/configure b/opcodes/configure
-index 17530f54b9..79b39611c2 100755
+index 4f29887098..2127d39288 100755
 --- a/opcodes/configure
 +++ b/opcodes/configure
 @@ -650,6 +650,9 @@ OTOOL
@@ -19240,7 +19226,7 @@ index 17530f54b9..79b39611c2 100755
    chmod +x "$ofile"
  
 diff --git a/opcodes/configure.ac b/opcodes/configure.ac
-index a9fbfd61f1..c43780f64d 100644
+index b07f3f3629..5a32d9b1fc 100644
 --- a/opcodes/configure.ac
 +++ b/opcodes/configure.ac
 @@ -167,7 +167,7 @@ changequote(,)dnl
@@ -21153,5 +21139,5 @@ index dc2d9ed383..ed9a492f5c 100755
    chmod +x "$ofile"
  
 -- 
-2.14.0
+2.16.1
 

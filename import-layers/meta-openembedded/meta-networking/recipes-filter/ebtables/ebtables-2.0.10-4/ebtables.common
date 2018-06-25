@@ -20,7 +20,7 @@ EBTABLES_BACKUP_SUFFIX="~"
 config=/etc/default/$prog
 [ -f "$config" ] && . "$config"
 
-function get_supported_tables() {
+get_supported_tables() {
 	EBTABLES_SUPPORTED_TABLES=
 	/sbin/ebtables -t filter -L 2>&1 1>/dev/null | grep -q permission
 	if [ $? -eq 0 ]; then
@@ -35,7 +35,7 @@ function get_supported_tables() {
 	done
 }
 
-function load() {
+load() {
 	RETVAL=0
 	get_supported_tables
 	echo -n "Restoring ebtables rulesets: "
@@ -64,7 +64,7 @@ function load() {
 	fi
 }
 
-function clear() {
+clear_rules() {
 	RETVAL=0
 	get_supported_tables
 	echo -n "Clearing ebtables rulesets: "
@@ -90,7 +90,7 @@ function clear() {
 	fi
 }
 
-function save() {
+save() {
 	RETVAL=0
 	get_supported_tables
 	echo -n "Saving ebtables rulesets: "
@@ -127,11 +127,11 @@ case "$1" in
 	;;
   stop)
 	[ "$EBTABLES_SAVE_ON_STOP" = "yes" ] && save
-	clear
+	clear_rules
 	;;
   restart|reload|force-reload)
 	[ "$EBTABLES_SAVE_ON_RESTART" = "yes" ] && save
-	clear
+	clear_rules
 	[ "$EBTABLES_LOAD_ON_START" = "yes" ] && load
 	;;
   load)

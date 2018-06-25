@@ -1,5 +1,5 @@
-# Base this image on rpi-basic-image
-include rpi-basic-image.bb
+# Base this image on core-image-base
+include recipes-core/images/core-image-base.bb
 
 COMPATIBLE_MACHINE = "^rpi$"
 

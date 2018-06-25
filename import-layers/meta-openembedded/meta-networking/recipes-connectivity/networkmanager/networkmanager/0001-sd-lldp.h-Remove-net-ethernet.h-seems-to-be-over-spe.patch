@@ -1,0 +1,40 @@
+From 18f71c1b48730b8602826517f2b5b088283ae948 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 31 Mar 2017 16:48:00 -0700
+Subject: [PATCH 5/7] sd-lldp.h: Remove net/ethernet.h seems to be over
+ specified
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/systemd/src/libsystemd-network/sd-lldp.c | 1 +
+ src/systemd/src/systemd/sd-lldp.h            | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/systemd/src/libsystemd-network/sd-lldp.c b/src/systemd/src/libsystemd-network/sd-lldp.c
+index 31e2448..7721cc2 100644
+--- a/src/systemd/src/libsystemd-network/sd-lldp.c
++++ b/src/systemd/src/libsystemd-network/sd-lldp.c
+@@ -21,6 +21,7 @@
+ #include "nm-sd-adapt.h"
+ 
+ #include <arpa/inet.h>
++#include <net/ethernet.h>
+ #include <linux/sockios.h>
+ 
+ #include "sd-lldp.h"
+diff --git a/src/systemd/src/systemd/sd-lldp.h b/src/systemd/src/systemd/sd-lldp.h
+index 3f35eeb..61b0e45 100644
+--- a/src/systemd/src/systemd/sd-lldp.h
++++ b/src/systemd/src/systemd/sd-lldp.h
+@@ -22,7 +22,7 @@
+ ***/
+ 
+ #include <inttypes.h>
+-#include <net/ethernet.h>
++//#include <net/ethernet.h>
+ #include <sys/types.h>
+ 
+ #include "sd-event.h"
+-- 
+2.14.1
+

@@ -13,6 +13,8 @@ DEPENDS = "flex-native bison-native iptables elfutils"
 
 inherit update-alternatives bash-completion pkgconfig
 
+CLEANBROKEN = "1"
+
 PACKAGECONFIG ??= "tipc"
 PACKAGECONFIG[tipc] = ",,libmnl,"
 
@@ -21,7 +23,7 @@ EXTRA_OEMAKE = "CC='${CC}' KERNEL_INCLUDE=${STAGING_INCDIR} DOCDIR=${docdir}/ipr
 do_configure_append () {
     sh configure ${STAGING_INCDIR}
     # Explicitly disable ATM support
-    sed -i -e '/TC_CONFIG_ATM/d' Config
+    sed -i -e '/TC_CONFIG_ATM/d' config.mk
 }
 
 do_install () {

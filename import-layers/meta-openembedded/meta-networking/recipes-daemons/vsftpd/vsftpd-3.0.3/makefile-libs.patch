@@ -1,4 +1,8 @@
-Hardcode LIBS instead of using a script to determine available libs
+From 328799d0cd5c523ad7a814fefec16d8a84aa8010 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Tue, 16 Apr 2013 10:53:55 +0000
+Subject: [PATCH] Hardcode LIBS instead of using a script to determine
+ available libs
 
 We want to avoid this dynamic detection so we have a deterministic
 build.
@@ -7,15 +11,20 @@ Upstream-Status: Inappropriate [config]
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/Makefile b/Makefile
+index 9e4f35f..3a5535d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -5,7 +5,7 @@
- #CFLAGS = -g
- CFLAGS	=	-O2 -Wall -W -Wshadow #-pedantic -Werror -Wconversion
+@@ -8,7 +8,7 @@ CFLAGS	=	-O2 -fPIE -fstack-protector --param=ssp-buffer-size=4 \
+ 	-D_FORTIFY_SOURCE=2 \
+ 	#-pedantic -Wconversion
  
 -LIBS	=	`./vsf_findlibs.sh`
 +LIBS	=	-lssl -lcrypto -lnsl -lresolv
  LINK	=	-Wl,-s
+ LDFLAGS	=	-fPIE -pie -Wl,-z,relro -Wl,-z,now
  
- OBJS	=	main.o utility.o prelogin.o ftpcmdio.o postlogin.o privsock.o \

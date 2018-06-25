@@ -6,7 +6,7 @@ DEPENDS = "ncurses bison-native virtual/libiconv"
 
 inherit autotools gettext texinfo update-alternatives ptest
 
-EXTRA_AUTORECONF += "--exclude=autoheader"
+EXTRA_AUTORECONF += "--exclude=autoheader --exclude=aclocal"
 EXTRA_OECONF = "--enable-job-control --without-bash-malloc"
 
 # If NON_INTERACTIVE_LOGIN_SHELLS is defined, all login shells read the
@@ -25,19 +25,13 @@ RDEPENDS_${PN} += "base-files"
 RDEPENDS_${PN}_class-nativesdk = ""
 RDEPENDS_${PN}-ptest += "make"
 
-DEPENDS_append_libc-glibc = " glibc-locale"
+DEPENDS_append_libc-glibc = " virtual/libc-locale"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-fr-fr locale-base-de-de"
 
 USERADD_PACKAGES = "${PN}-ptest"
 USERADD_PARAM_${PN}-ptest = "--create-home --user-group test"
 
 CACHED_CONFIGUREVARS += "headersdir=${includedir}/${PN}"
-
-do_configure_prepend () {
-	if [ ! -e ${S}/acinclude.m4 ]; then
-		cat ${S}/aclocal.m4 > ${S}/acinclude.m4
-	fi
-}
 
 do_compile_ptest () {
 	oe_runmake buildtest

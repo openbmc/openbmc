@@ -7,6 +7,7 @@ ConditionPathExists=/etc/krb5.conf
 Type=forking
 ExecStartPre=/bin/sh -c "test ! -f /var/log/kadmind.log || test ! -x /sbin/restorecon || /sbin/restorecon -F /var/log/kadmind.log"
 ExecStart=/usr/sbin/kadmind
+EnvironmentFile=-/etc/default/krb5-admin-server
 SuccessExitStatus=1 2 SIGKILL
 TimeoutStopSec=30
 

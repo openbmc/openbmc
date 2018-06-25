@@ -23,7 +23,7 @@ Index: squashfs-tools/mksquashfs.c
 ===================================================================
 --- squashfs-tools.orig/mksquashfs.c
 +++ squashfs-tools/mksquashfs.c
-@@ -1286,6 +1286,10 @@ void write_dir(squashfs_inode *inode, st
+@@ -1261,6 +1261,10 @@ void write_dir(squashfs_inode *inode, st
  		dir_size + 3, directory_block, directory_offset, NULL, NULL,
  		dir, 0);
  
@@ -50,9 +50,9 @@ Index: squashfs-tools/unsquashfs.c
 ===================================================================
 --- squashfs-tools.orig/unsquashfs.c
 +++ squashfs-tools/unsquashfs.c
-@@ -38,6 +38,10 @@
- #include <limits.h>
- #include <ctype.h>
+@@ -42,6 +42,10 @@
+ #include <sys/sysmacros.h>
+ #endif
  
 +#ifndef FNM_EXTMATCH
 +#define FNM_EXTMATCH 0

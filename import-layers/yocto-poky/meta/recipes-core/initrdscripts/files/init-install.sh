@@ -7,8 +7,19 @@
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
-# We need 20 Mb for the boot partition
-boot_size=20
+# figure out how big of a boot partition we need
+boot_size=$(du -ms /run/media/$1/ | awk '{print $1}')
+# remove rootfs.img ($2) from the size if it exists, as its not installed to /boot
+if [ -e /run/media/$1/$2 ]; then
+    boot_size=$(( boot_size - $( du -ms /run/media/$1/$2 | awk '{print $1}') ))
+fi
+# remove initrd from size since its not currently installed
+if [ -e /run/media/$1/initrd ]; then
+    boot_size=$(( boot_size - $( du -ms /run/media/$1/initrd | awk '{print $1}') ))
+fi
+# add 10M to provide some extra space for users and account
+# for rounding in the above subtractions
+boot_size=$(( boot_size + 10 ))
 
 # 5% for the swap
 swap_ratio=5
@@ -203,7 +214,7 @@ fi
 
 echo "Creating rootfs partition on $rootfs"
 [ $grub_version -eq 0 ] && pname='primary' || pname='root'
-parted ${device} mkpart $pname ext3 $rootfs_start $rootfs_end
+parted ${device} mkpart $pname ext4 $rootfs_start $rootfs_end
 
 echo "Creating swap partition on $swap"
 [ $grub_version -eq 0 ] && pname='primary' || pname='swap'
@@ -221,8 +232,8 @@ done
 echo "Formatting $bootfs to ext3..."
 mkfs.ext3 $bootfs
 
-echo "Formatting $rootfs to ext3..."
-mkfs.ext3 $rootfs
+echo "Formatting $rootfs to ext4..."
+mkfs.ext4 $rootfs
 
 echo "Formatting swap partition...($swap)"
 mkswap $swap
@@ -256,9 +267,34 @@ fi
 umount /tgt_root
 umount /src_root
 
+echo "Looking for kernels to use as boot target.."
+# Find kernel to boot to
+# Give user options if multiple are found
+kernels="$(find /run/media/$1/ -type f  \
+           -name bzImage* -o -name zImage* \
+           -o -name vmlinux* -o -name vmlinuz* \
+           -o -name fitImage* \
+           | sed s:.*/::)"
+if [ -n "$(echo $kernels)" ]; then
+    # only one kernel entry if no space
+    if [ -z "$(echo $kernels | grep " ")" ]; then
+        kernel=$kernels
+        echo "$kernel will be used as the boot target"
+    else
+        echo "Which kernel do we want to boot by default? The following kernels were found:"
+        echo $kernels
+        read answer
+        kernel=$answer
+    fi
+else
+    echo "No kernels found, exiting..."
+    exit 1
+fi
+
 # Handling of the target boot partition
 mount $bootfs /boot
 echo "Preparing boot partition..."
+
 if [ -f /etc/grub.d/00_header -a $grub_version -ne 0 ] ; then
     echo "Preparing custom grub2 menu..."
     root_part_uuid=$(blkid -o value -s PARTUUID ${rootfs})
@@ -268,7 +304,7 @@ if [ -f /etc/grub.d/00_header -a $grub_version -ne 0 ] ; then
     cat >$GRUBCFG <<_EOF
 menuentry "Linux" {
     search --no-floppy --fs-uuid $boot_uuid --set root
-    linux /vmlinuz root=PARTUUID=$root_part_uuid $rootwait rw $5 $3 $4 quiet
+    linux /$kernel root=PARTUUID=$root_part_uuid $rootwait rw $5 $3 $4 quiet
 }
 _EOF
     chmod 0444 $GRUBCFG
@@ -282,10 +318,16 @@ if [ $grub_version -eq 0 ] ; then
     echo "timeout 30" >> /boot/grub/menu.lst
     echo "title Live Boot/Install-Image" >> /boot/grub/menu.lst
     echo "root  (hd0,0)" >> /boot/grub/menu.lst
-    echo "kernel /vmlinuz root=$rootfs rw $3 $4 quiet" >> /boot/grub/menu.lst
+    echo "kernel /$kernel root=$rootfs rw $3 $4 quiet" >> /boot/grub/menu.lst
 fi
 
-cp /run/media/$1/vmlinuz /boot/
+# Copy kernel artifacts. To add more artifacts just add to types
+# For now just support kernel types already being used by something in OE-core
+for types in bzImage zImage vmlinux vmlinuz fitImage; do
+    for kernel in `find /run/media/$1/ -name $types*`; do
+        cp $kernel /boot
+    done
+done
 
 umount /boot
 

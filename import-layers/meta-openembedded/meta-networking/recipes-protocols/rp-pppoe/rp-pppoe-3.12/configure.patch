@@ -1,7 +1,15 @@
-Index: rp-pppoe-3.8/configure.in
-===================================================================
---- rp-pppoe-3.8.orig/configure.in	2014-07-16 19:31:33.549991388 +0000
-+++ rp-pppoe-3.8/configure.in	2014-07-17 22:01:18.116590827 +0000
+From c96dda04ec024bdef2a15d374e5f8242e041cad4 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Fri, 18 Jul 2014 08:25:16 +0000
+
+---
+ configure.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index ac1a7e4..11b9f31 100644
+--- a/configure.in
++++ b/configure.in
 @@ -1,4 +1,4 @@
 -AC_INIT(src/pppoe.c)
 -AM_INIT_AUTOMAKE([rp-pppoe], [3.8])

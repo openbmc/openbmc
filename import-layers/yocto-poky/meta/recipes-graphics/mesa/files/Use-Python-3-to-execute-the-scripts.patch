@@ -1,0 +1,32 @@
+From 18c3e684a8259a0644214f88c7ead7fa31573fd9 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Fri, 29 Dec 2017 10:27:59 -0200
+Subject: [PATCH] Use Python 3 to execute the scripts
+Organization: O.S. Systems Software LTDA.
+
+The MESA build system uses Python 2 but as OE-Core has moved away from
+it, we change it to use Python 3 instead.
+
+Upstream-Status: Inappropriate [ configuration ]
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index b107f04c2e..055546142d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -114,7 +114,7 @@ AC_PROG_CXX
+ AM_PROG_CC_C_O
+ AM_PROG_AS
+ AX_CHECK_GNU_MAKE
+-AC_CHECK_PROGS([PYTHON2], [python2.7 python2 python])
++AC_CHECK_PROGS([PYTHON2], [python3.5 python3 python])
+ AC_PROG_SED
+ AC_PROG_MKDIR_P
+ 
+-- 
+2.15.1
+

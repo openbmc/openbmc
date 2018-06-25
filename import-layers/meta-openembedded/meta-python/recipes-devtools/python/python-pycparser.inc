@@ -9,7 +9,8 @@ SRC_URI[sha256sum] = "99a8ca03e29851d96616ad0404b4aad7d9ee16f25c9f9708a11faf2810
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS_${PN}_class-target += "\
-    ${PYTHON_PN}-subprocess \
+    ${PYTHON_PN}-ply \
+    ${PYTHON_PN}-pprint \
     cpp \
     cpp-symlinks \
     "

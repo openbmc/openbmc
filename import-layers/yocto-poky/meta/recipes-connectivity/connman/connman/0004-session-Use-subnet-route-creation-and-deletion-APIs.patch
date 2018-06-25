@@ -1,0 +1,77 @@
+From deb9372db8396da4f7cd20555ce7c9a8b3ad96bd Mon Sep 17 00:00:00 2001
+From: Jian Liang <jianliang@tycoint.com>
+Date: Fri, 6 Oct 2017 11:40:16 +0100
+Subject: [PATCH 4/4] session: Use subnet route creation and deletion APIs
+To: connman@lists.01.org
+Cc: wagi@monom.org
+
+As subnet route is address and session specific in this case, so add
+prefixlen into struct connman_session, and update it along with ipconfig.
+Then use it in subnet route related APIs.
+
+Signed-off-by: Jian Liang <jianliang@tycoint.com>
+
+---
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/network/connman/connman.git/commit/?id=285f25ef6cc9e4a43dab83523f3e2eab4365ac26]
+Signed-off-by: André Draszik <andre.draszik@jci.com>
+ src/session.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/src/session.c b/src/session.c
+index 965ac06..7b7a14b 100644
+--- a/src/session.c
++++ b/src/session.c
+@@ -67,6 +67,7 @@ struct connman_session {
+ 	int index;
+ 	char *addr;
+ 	char *gateway;
++	unsigned char prefixlen;
+ 	bool policy_routing;
+ 	bool snat_enabled;
+ };
+@@ -357,13 +358,17 @@ static void del_default_route(struct connman_session *session)
+ 	if (!session->gateway)
+ 		return;
+ 
+-	DBG("index %d routing table %d default gateway %s",
+-		session->index, session->mark, session->gateway);
++	DBG("index %d routing table %d default gateway %s/%u",
++		session->index, session->mark, session->gateway, session->prefixlen);
++
++		__connman_inet_del_subnet_from_table(session->mark,
++			session->index, session->gateway, session->prefixlen);
+ 
+ 	__connman_inet_del_default_from_table(session->mark,
+ 					session->index, session->gateway);
+ 	g_free(session->gateway);
+ 	session->gateway = NULL;
++	session->prefixlen = 0;
+ 	session->index = -1;
+ }
+ 
+@@ -383,13 +388,20 @@ static void add_default_route(struct connman_session *session)
+ 	if (!session->gateway)
+ 		session->gateway = g_strdup(inet_ntoa(addr));
+ 
+-	DBG("index %d routing table %d default gateway %s",
+-		session->index, session->mark, session->gateway);
++	session->prefixlen = __connman_ipconfig_get_prefixlen(ipconfig);
++
++	DBG("index %d routing table %d default gateway %s/%u",
++		session->index, session->mark, session->gateway, session->prefixlen);
+ 
+ 	err = __connman_inet_add_default_to_table(session->mark,
+ 					session->index, session->gateway);
+ 	if (err < 0)
+ 		DBG("session %p %s", session, strerror(-err));
++
++	err = __connman_inet_add_subnet_to_table(session->mark,
++					session->index, session->gateway, session->prefixlen);
++	if (err < 0)
++		DBG("session add subnet route %p %s", session, strerror(-err));
+ }
+ 
+ static void del_nat_rules(struct connman_session *session)
+-- 
+2.7.4
+

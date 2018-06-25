@@ -1,10 +1,10 @@
 Upstream-Status: Pending
 
-diff --git a/initscript/debian/avahi-daemon.in b/initscript/debian/avahi-daemon.in
-index 30a2c2f..b5848a8 100755
---- a/initscript/debian/avahi-daemon.in
-+++ b/initscript/debian/avahi-daemon.in
-@@ -1,2 +1,14 @@
+Index: avahi-0.7/initscript/debian/avahi-daemon.in
+===================================================================
+--- avahi-0.7.orig/initscript/debian/avahi-daemon.in
++++ avahi-0.7/initscript/debian/avahi-daemon.in
+@@ -1,5 +1,17 @@
  #!/bin/sh
 -
 +### BEGIN INIT INFO
@@ -20,11 +20,14 @@ index 30a2c2f..b5848a8 100755
 +#                    automatically
 +### END INIT INFO
 +#
-diff --git a/initscript/debian/avahi-dnsconfd.in b/initscript/debian/avahi-dnsconfd.in
-index ac34804..f95c340 100755
---- a/initscript/debian/avahi-dnsconfd.in
-+++ b/initscript/debian/avahi-dnsconfd.in
-@@ -1,1 +1,14 @@
+ # This file is part of avahi.
+ #
+ # avahi is free software; you can redistribute it and/or modify it
+Index: avahi-0.7/initscript/debian/avahi-dnsconfd.in
+===================================================================
+--- avahi-0.7.orig/initscript/debian/avahi-dnsconfd.in
++++ avahi-0.7/initscript/debian/avahi-dnsconfd.in
+@@ -1,4 +1,17 @@
  #!/bin/sh
 +### BEGIN INIT INFO
 +# Provides:          avahi-dnsconfd
@@ -39,3 +42,6 @@ index ac34804..f95c340 100755
 +#                    automatically
 +### END INIT INFO
 +#
+ 
+ # This file is part of avahi.
+ #

@@ -1,0 +1,42 @@
+From 7a524d49b3d4459280f18942df2980603400ec52 Mon Sep 17 00:00:00 2001
+From: Bian Naimeng <biannm@cn.fujitsu.com>
+Date: Fri, 19 Jun 2015 11:54:44 +0900
+Subject: [PATCH] Using PKG_CHECK_MODULES to found headers and libraries of
+ smbclient
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+---
+ configure.in    | 5 +++++
+ src/Makefile.am | 3 +++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 4c03409..8d22e71 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -119,6 +119,11 @@ AC_CHECK_LIB(smbclient, smbc_setOptionUseCCache, [], [
+ LIBS="$LIBS $SMBCLIENT_LIBS"
+ CFLAGS="$CFLAGS $SMBCLIENT_CFLAGS"
+ 
++dnl *****************************************************************
++dnl *** Check libsmbclient by pkgconfig to get cflags and ldflags ***
++dnl *****************************************************************
++PKG_CHECK_MODULES(SMBCLIENT, smbclient)
++
+ dnl ******************
+ dnl *** Final step ***
+ dnl ******************
+diff --git a/src/Makefile.am b/src/Makefile.am
+index ccaa8c3..6598317 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -17,3 +17,6 @@ smbnetfs_SOURCES = \
+ 	event.c			event.h			\
+ 	reconfigure.c		reconfigure.h		\
+ 	main.c
++
++smbnetfs_CFLAGS=${SMBCLIENT_CFLAGS}
++smbnetfs_LDFLAGS=${SMBCLIENT_LDFLAGS}
+-- 
+1.8.4.2
+

@@ -1,8 +1,10 @@
 Upstream-Status: Inappropriate [embedded specific]
 
---- execute_cmd.c.orig	Fri Jun  3 13:34:42 2011
-+++ execute_cmd.c	Fri Jun  3 13:36:41 2011
-@@ -2202,7 +2202,11 @@
+Index: execute_cmd.c
+===================================================================
+--- execute_cmd.c.orig
++++ execute_cmd.c
+@@ -2459,7 +2459,11 @@ execute_pipeline (command, asynchronous,
    /* If the `lastpipe' option is set with shopt, and job control is not
       enabled, execute the last element of non-async pipelines in the
       current shell environment. */
@@ -13,5 +15,5 @@ Upstream-Status: Inappropriate [embedded specific]
 +#endif
 +		asynchronous == 0 && pipe_out == NO_PIPE && prev > 0)
      {
-       lstdin = move_to_high_fd (0, 0, 255);
+       lstdin = move_to_high_fd (0, 1, -1);
        if (lstdin > 0)

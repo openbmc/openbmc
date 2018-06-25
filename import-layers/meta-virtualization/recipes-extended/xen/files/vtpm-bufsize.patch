@@ -1,0 +1,13 @@
+diff --git a/config.h.in b/config.h.in
+index d16a997..8088a2a 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -27,7 +27,7 @@
+ #define TPM_STORAGE_NAME "${TPM_STORAGE_NAME}"
+ #define TPM_DEVICE_NAME  "${TPM_DEVICE_NAME}"
+ #define TPM_LOG_FILE     "${TPM_LOG_FILE}"
+-#define TPM_CMD_BUF_SIZE 4096
++#define TPM_CMD_BUF_SIZE 4088
+ 
+ #endif /* _CONFIG_H_ */
+ 

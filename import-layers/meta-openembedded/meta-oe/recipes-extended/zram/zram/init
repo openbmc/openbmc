@@ -34,7 +34,7 @@ start() {
     mem_by_cpu=$(($memtotal/$num_cpus*$factor/100*1024))
 
     # load dependency modules
-    modprobe zram zram_num_devices=$num_cpus
+    modprobe zram num_devices=$num_cpus
     echo "zram devices probed successfully"
 
     # initialize the devices

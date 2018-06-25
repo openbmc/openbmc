@@ -4,9 +4,11 @@ Upstream-Status: Pending
 
 Signed-off-by: Xufeng Zhang <xufeng.zhang@windriver.com>
 ---
---- a/lib/gprocess.c
-+++ b/lib/gprocess.c
-@@ -1421,6 +1421,18 @@
+Index: syslog-ng-3.8.1/lib/gprocess.c
+===================================================================
+--- syslog-ng-3.8.1.orig/lib/gprocess.c
++++ syslog-ng-3.8.1/lib/gprocess.c
+@@ -1432,6 +1432,18 @@ g_process_startup_ok(void)
  void
  g_process_finish(void)
  {

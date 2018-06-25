@@ -13,11 +13,14 @@ def preferred_ml_updates(d):
 
     versions = []
     providers = []
+    rproviders = []
     for v in d.keys():
         if v.startswith("PREFERRED_VERSION_"):
             versions.append(v)
         if v.startswith("PREFERRED_PROVIDER_"):
             providers.append(v)
+        if v.startswith("PREFERRED_RPROVIDER_"):
+            rproviders.append(v)
 
     for v in versions:
         val = d.getVar(v, False)
@@ -84,6 +87,29 @@ def preferred_ml_updates(d):
 
             # implement alternative multilib name
             newname = localdata.expand("PREFERRED_PROVIDER_" + virt + p + "-" + pkg)
+            if not d.getVar(newname, False) and newval != None:
+                d.setVar(newname, localdata.expand(newval))
+        # Avoid future variable key expansion
+        provexp = d.expand(prov)
+        if prov != provexp and d.getVar(prov, False):
+            d.renameVar(prov, provexp)
+
+    for prov in rproviders:
+        val = d.getVar(prov, False)
+        pkg = prov.replace("PREFERRED_RPROVIDER_", "")
+        for p in prefixes:
+            newval = p + "-" + val
+
+            # implement variable keys
+            localdata = bb.data.createCopy(d)
+            override = ":virtclass-multilib-" + p
+            localdata.setVar("OVERRIDES", localdata.getVar("OVERRIDES", False) + override)
+            newname = localdata.expand(prov)
+            if newname != prov and not d.getVar(newname, False):
+                d.setVar(newname, localdata.expand(newval))
+
+            # implement alternative multilib name
+            newname = localdata.expand("PREFERRED_RPROVIDER_" + p + "-" + pkg)
             if not d.getVar(newname, False) and newval != None:
                 d.setVar(newname, localdata.expand(newval))
         # Avoid future variable key expansion
@@ -162,7 +188,7 @@ python multilib_virtclass_handler_global () {
             if rprovs.strip():
                 e.data.setVar("RPROVIDES", rprovs)
 
-	    # Process RPROVIDES_${PN}...
+            # Process RPROVIDES_${PN}...
             for pkg in (e.data.getVar("PACKAGES") or "").split():
                 origrprovs = rprovs = e.data.getVar("RPROVIDES_%s" % pkg) or ""
                 for clsextend in clsextends:

@@ -1,13 +1,23 @@
+From f71cc920528c3496b0118964ebbcf5440cda4ed1 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Wed, 16 Aug 2017 13:37:40 +0800
+Subject: [PATCH] vlock: add new recipe
+
 Upstream-Status: Inappropriate [configuration]
 
 written by: Jeff Polk <jeff.polk@windriver.com>
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 
-Index: vlock-2.2.2/man/vlock.1
-===================================================================
---- vlock-2.2.2.orig/man/vlock.1	2010-07-26 14:12:42.000000000 -0400
-+++ vlock-2.2.2/man/vlock.1	2010-07-26 14:13:06.000000000 -0400
-@@ -111,11 +111,6 @@
+---
+ man/vlock.1  | 5 -----
+ src/vlock.sh | 5 -----
+ 2 files changed, 10 deletions(-)
+
+diff --git a/man/vlock.1 b/man/vlock.1
+index 0d29b49..01cb944 100644
+--- a/man/vlock.1
++++ b/man/vlock.1
+@@ -111,11 +111,6 @@ enter your password at the password prompt.  If this variable is unset or set
  to an invalid value or 0 no timeout is used.  \fBWarning\fR: If this value is
  too low, you may not be able to unlock your session.
  .PP
@@ -19,11 +29,11 @@ Index: vlock-2.2.2/man/vlock.1
  .SH SECURITY
  See the SECURITY file in the \fBvlock\fR distribution for more information.
  .PP
-Index: vlock-2.2.2/src/vlock.sh
-===================================================================
---- vlock-2.2.2.orig/src/vlock.sh	2010-07-26 14:12:32.000000000 -0400
-+++ vlock-2.2.2/src/vlock.sh	2010-07-26 14:13:33.000000000 -0400
-@@ -35,11 +35,6 @@
+diff --git a/src/vlock.sh b/src/vlock.sh
+index 75f1369..f572776 100644
+--- a/src/vlock.sh
++++ b/src/vlock.sh
+@@ -35,11 +35,6 @@ This TTY is now locked.
  
  ${VLOCK_ENTER_PROMPT}"
  

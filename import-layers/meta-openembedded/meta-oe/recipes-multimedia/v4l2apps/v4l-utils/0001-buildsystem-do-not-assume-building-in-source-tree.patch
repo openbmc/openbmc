@@ -1,7 +1,7 @@
-From 806822f5acb756d5acda0f9063c84b28b38b3ffb Mon Sep 17 00:00:00 2001
+From 75372b8088c20474497b79ec6cf1e99f2d17f56d Mon Sep 17 00:00:00 2001
 From: Ismo Puustinen <ismo.puustinen@intel.com>
 Date: Mon, 3 Apr 2017 13:23:38 +0300
-Subject: [PATCH v4l-utils] buildsystem: do not assume building in source tree.
+Subject: [PATCH] buildsystem: do not assume building in source tree.
 
 Use $(top_srcdir) as reference for include paths and buildtime scripts.
 Otherwise compilation outside of project root directory will fail
@@ -12,6 +12,7 @@ To reproduce: mkdir b; cd b; ../configure; make
 Upstream-status: Accepted [https://git.linuxtv.org//v4l-utils.git/commit/?id=bd98c9a99bffc8d44c54859345e4dfee0ada4275]
 
 Signed-off-by: Ismo Puustinen <ismo.puustinen@intel.com>
+
 ---
  utils/cec-compliance/Makefile.am  | 2 +-
  utils/cec-ctl/Makefile.am         | 2 +-
@@ -22,7 +23,7 @@ Signed-off-by: Ismo Puustinen <ismo.puustinen@intel.com>
  6 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/utils/cec-compliance/Makefile.am b/utils/cec-compliance/Makefile.am
-index ec5de51..8331aa0 100644
+index f05fe6c..f7d1535 100644
 --- a/utils/cec-compliance/Makefile.am
 +++ b/utils/cec-compliance/Makefile.am
 @@ -7,7 +7,7 @@ cec_compliance_LDFLAGS = -lrt
@@ -35,10 +36,10 @@ index ec5de51..8331aa0 100644
  cec-compliance.cpp: version.h
  
 diff --git a/utils/cec-ctl/Makefile.am b/utils/cec-ctl/Makefile.am
-index 0a7ef22..6afb6c9 100644
+index 4a6eae5..570a070 100644
 --- a/utils/cec-ctl/Makefile.am
 +++ b/utils/cec-ctl/Makefile.am
-@@ -7,7 +7,7 @@ cec_ctl_LDFLAGS = -lrt
+@@ -6,7 +6,7 @@ cec_ctl_SOURCES = cec-ctl.cpp
  cec-ctl.cpp: cec-ctl-gen.h
  
  cec-ctl-gen.h: msg2ctl.pl ../../include/linux/cec.h ../../include/linux/cec-funcs.h
@@ -48,7 +49,7 @@ index 0a7ef22..6afb6c9 100644
  clean-local:
  	-rm -vf cec-ctl-gen.h
 diff --git a/utils/cec-follower/Makefile.am b/utils/cec-follower/Makefile.am
-index 538edb2..fdbf3d9 100644
+index d8ad292..e3553eb 100644
 --- a/utils/cec-follower/Makefile.am
 +++ b/utils/cec-follower/Makefile.am
 @@ -7,12 +7,12 @@ cec_follower_LDFLAGS = -lrt
@@ -65,7 +66,7 @@ index 538edb2..fdbf3d9 100644
 +	$(top_srcdir)/utils/cec-ctl/msg2ctl.pl 2 $(top_srcdir)/include/linux/cec.h $(top_srcdir)/include/linux/cec-funcs.h >$@
  
  version.h:
- 	@if git rev-parse HEAD >/dev/null 2>&1; then \
+ 	@if git show-ref -s HEAD >/dev/null 2>&1; then \
 diff --git a/utils/qv4l2/Makefile.am b/utils/qv4l2/Makefile.am
 index fd58486..ccd1a2a 100644
 --- a/utils/qv4l2/Makefile.am
@@ -80,7 +81,7 @@ index fd58486..ccd1a2a 100644
  if WITH_QTGL
  qv4l2_CPPFLAGS += $(QTGL_CFLAGS)
 diff --git a/utils/v4l2-compliance/Makefile.am b/utils/v4l2-compliance/Makefile.am
-index 03db8df..18b9892 100644
+index c2b5919..fb8d12e 100644
 --- a/utils/v4l2-compliance/Makefile.am
 +++ b/utils/v4l2-compliance/Makefile.am
 @@ -5,7 +5,7 @@ DEFS :=
@@ -105,6 +106,3 @@ index 955647d..825e53f 100644
  
  if WITH_V4L2_CTL_LIBV4L
  v4l2_ctl_LDADD = ../../lib/libv4l2/libv4l2.la ../../lib/libv4lconvert/libv4lconvert.la -lrt -lpthread
--- 
-2.9.3
-

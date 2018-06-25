@@ -1,7 +1,8 @@
-From 55cbe6f40fe0836385e1a7241ec811cbe99e5840 Mon Sep 17 00:00:00 2001
+From bcea5c5063a2d5f07dbe6f40aee30370fc4ba656 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:24:50 +0200
-Subject: [PATCH 4/5] Set libsolv variables with pkg-config (cmake's own module
+Subject: [PATCH 1/2] Set libsolv variables with pkg-config (cmake's own module
+
  doesn't work properly).
 
 Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/312]
@@ -12,12 +13,12 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a75df04..8b2ab9a 100644
+index 8875bbf..ca280f3 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -29,7 +29,8 @@ find_package (PkgConfig REQUIRED)
  SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
- PKG_CHECK_MODULES(GLIB gio-unix-2.0>=2.44.0 REQUIRED)
+ PKG_CHECK_MODULES(GLIB gio-unix-2.0>=2.46.0 REQUIRED)
  FIND_LIBRARY (RPMDB_LIBRARY NAMES rpmdb)
 -find_package (LibSolv 0.6.21 REQUIRED COMPONENTS ext)
 +PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
@@ -26,5 +27,5 @@ index a75df04..8b2ab9a 100644
      pkg_check_modules (RHSM REQUIRED librhsm)
      include_directories (${RHSM_INCLUDE_DIRS})
 -- 
-2.11.0
+2.14.2
 

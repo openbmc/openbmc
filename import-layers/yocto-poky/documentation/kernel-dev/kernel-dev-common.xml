@@ -25,7 +25,7 @@
             Before you can do any kernel development, you need to be
             sure your build host is set up to use the Yocto Project.
             For information on how to get set up, see the
-            "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Setting Up to Use the Yocto Project</ulink>"
+            "<ulink url='&YOCTO_DOCS_DEV_URL;#setting-up-the-development-host-to-use-the-yocto-project'>Preparing the Build Host</ulink>"
             section in the Yocto Project Development Tasks Manual.
             Part of preparing the system is creating a local Git
             repository of the
@@ -79,7 +79,7 @@
                         </literallayout>
                         <note>
                             The previous commands assume the
-                            <ulink url='&YOCTO_DOCS_REF_URL;#source-repositories'>Source Repositories</ulink>
+                            <ulink url='&YOCTO_DOCS_OM_URL;#source-repositories'>Source Repositories</ulink>
                             (i.e. <filename>poky</filename>) have been cloned
                             using Git and the local repository is named
                             "poky".
@@ -136,7 +136,7 @@
                             Developer's Guide, respectively.
                             For information on how to use the
                             <filename>bitbake-layers create-layer</filename>
-                            command, see the
+                            command to quickly set up a layer, see the
                             "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-general-layer-using-the-bitbake-layers-script'>Creating a General Layer Using the <filename>bitbake-layers</filename> Script</ulink>"
                             section in the Yocto Project Development Tasks
                             Manual.
@@ -303,7 +303,7 @@
                         </literallayout>
                         <note>
                             The previous commands assume the
-                            <ulink url='&YOCTO_DOCS_REF_URL;#source-repositories'>Source Repositories</ulink>
+                            <ulink url='&YOCTO_DOCS_OM_URL;#source-repositories'>Source Repositories</ulink>
                             (i.e. <filename>poky</filename>) have been cloned
                             using Git and the local repository is named
                             "poky".
@@ -360,7 +360,7 @@
                             Developer's Guide, respectively.
                             For information on how to use the
                             <filename>bitbake-layers create-layer</filename>
-                            command, see the
+                            command to quickly set up a layer, see the
                             "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-general-layer-using-the-bitbake-layers-script'>Creating a General Layer Using the <filename>bitbake-layers</filename> Script</ulink>"
                             section in the Yocto Project Development Tasks
                             Manual.
@@ -387,7 +387,7 @@
                         You can find Git repositories of supported Yocto Project
                         kernels organized under "Yocto Linux Kernel" in the
                         Yocto Project Source Repositories at
-                        <ulink url='&YOCTO_GIT_URL;/cgit.cgi'></ulink>.
+                        <ulink url='&YOCTO_GIT_URL;'></ulink>.
                         </para>
 
                         <para>
@@ -489,7 +489,8 @@
                 See the
                 "<ulink url='&YOCTO_DOCS_DEV_URL;#creating-a-general-layer-using-the-bitbake-layers-script'>Creating a General Layer Using the <filename>bitbake-layers</filename> Script</ulink>"
                 section in the Yocto Project Development Tasks Manual for
-                information on how to use this script.
+                information on how to use this script to quick set up a
+                new layer.
             </note>
         </para>
 
@@ -1224,18 +1225,6 @@
             the
             "<link linkend='getting-ready-for-traditional-kernel-development'>Getting Ready for Traditional Kernel Development</link>"
             Section.
-        </para>
-
-        <para>
-            Although this example uses Git and shell commands to generate the
-            patch, you could use the <filename>yocto-kernel</filename> script
-            found in the <ulink url='&YOCTO_DOCS_REF_URL;#source-directory'>Source Directory</ulink>
-            under <filename>scripts</filename> to add and manage kernel
-            patches and configuration.
-            See the "<ulink url='&YOCTO_DOCS_BSP_URL;#managing-kernel-patches-and-config-items-with-yocto-kernel'>Managing kernel Patches and Config Items with yocto-kernel</ulink>"
-            section in the Yocto Project Board Support Packages (BSP)
-            Developer's Guide for more information on the
-            <filename>yocto-kernel</filename> script.
             <orderedlist>
                 <listitem><para>
                     <emphasis>Edit the Source Files</emphasis>
@@ -1413,9 +1402,9 @@
      SRC_URI_append = " file://0001-calibrate.c-Added-some-printk-statements.patch"
                     </literallayout>
                     The
-                    <ulink url='&YOCTO_DOCS_REF_URL;var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-FILESEXTRAPATHS'><filename>FILESEXTRAPATHS</filename></ulink>
                     and
-                    <ulink url='&YOCTO_DOCS_REF_URL;var-SRC_URI'><filename>SRC_URI</filename></ulink>
+                    <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
                     statements enable the OpenEmbedded build system to find
                     the patch file.</para>
 
@@ -1667,7 +1656,7 @@
                     after applying the existing defconfig file configurations.
                 </note>
                 For more information on configuring the kernel, see the
-                "<link link='changing-the-configuration'>Changing the Configuration</link>"
+                "<link linkend='changing-the-configuration'>Changing the Configuration</link>"
                 section.
             </para>
         </section>
@@ -2429,7 +2418,7 @@
                 modules.
                 If your module <filename>Makefile</filename> uses a different
                 variable, you might want to override the
-                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-compile'><filename>do_compile()</filename></ulink>
+                <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-compile'><filename>do_compile</filename></ulink>
                 step, or create a patch to
                 the <filename>Makefile</filename> to work with the more typical
                 <filename>KERNEL_SRC</filename> or
@@ -2505,7 +2494,7 @@
                     the Git commands.
                     You can see the branch names through the web interface
                     to the Yocto Project source repositories at
-                    <ulink url='http://git.yoctoproject.org/cgit.cgi'></ulink>.
+                    <ulink url='&YOCTO_GIT_URL;'></ulink>.
                 </note>
                 To see a full range of the changes, use the
                 <filename>git whatchanged</filename> command and specify a

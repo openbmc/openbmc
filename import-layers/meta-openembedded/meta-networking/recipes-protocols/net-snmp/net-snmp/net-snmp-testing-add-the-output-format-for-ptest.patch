@@ -10,11 +10,11 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  testing/RUNTESTS |    4 ++++
  1 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/testing/RUNTESTS b/testing/RUNTESTS
-index e11c969..fb90f76 100755
---- a/testing/RUNTESTS
-+++ b/testing/RUNTESTS
-@@ -25,13 +25,17 @@ failed_count=0
+Index: net-snmp-5.7.3/testing/RUNTESTS
+===================================================================
+--- net-snmp-5.7.3.orig/testing/RUNTESTS
++++ net-snmp-5.7.3/testing/RUNTESTS
+@@ -29,13 +29,17 @@ failed_count=0
  rm -f failed_tests
  for i in "${srcdir}"/testing/fulltests/default/T*$1*; do
      echo "RUNNING $i"
@@ -32,6 +32,3 @@ index e11c969..fb90f76 100755
  done
  
  if [ -f failed_tests ]; then
--- 
-1.7.1
-

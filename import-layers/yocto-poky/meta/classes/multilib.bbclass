@@ -11,8 +11,8 @@ python multilib_virtclass_handler () {
     # There should only be one kernel in multilib configs
     # We also skip multilib setup for module packages.
     provides = (e.data.getVar("PROVIDES") or "").split()
-    if "virtual/kernel" in provides or bb.data.inherits_class('module-base', e.data):
-        raise bb.parse.SkipPackage("We shouldn't have multilib variants for the kernel")
+    if "virtual/kernel" in provides or bb.data.inherits_class('module-base', e.data) or "make-mod-scripts" in e.data.getVar("PN"):
+        raise bb.parse.SkipRecipe("We shouldn't have multilib variants for the kernel")
 
     save_var_name=e.data.getVar("MULTILIB_SAVE_VARNAME") or ""
     for name in save_var_name.split():
@@ -41,13 +41,13 @@ python multilib_virtclass_handler () {
         return
 
     if bb.data.inherits_class('native', e.data):
-        raise bb.parse.SkipPackage("We can't extend native recipes")
+        raise bb.parse.SkipRecipe("We can't extend native recipes")
 
     if bb.data.inherits_class('nativesdk', e.data) or bb.data.inherits_class('crosssdk', e.data):
-        raise bb.parse.SkipPackage("We can't extend nativesdk recipes")
+        raise bb.parse.SkipRecipe("We can't extend nativesdk recipes")
 
     if bb.data.inherits_class('allarch', e.data) and not bb.data.inherits_class('packagegroup', e.data):
-        raise bb.parse.SkipPackage("Don't extend allarch recipes which are not packagegroups")
+        raise bb.parse.SkipRecipe("Don't extend allarch recipes which are not packagegroups")
 
 
     # Expand this since this won't work correctly once we set a multilib into place
@@ -76,7 +76,6 @@ python multilib_virtclass_handler () {
     newtune = e.data.getVar("DEFAULTTUNE_" + "virtclass-multilib-" + variant, False)
     if newtune:
         e.data.setVar("DEFAULTTUNE", newtune)
-        e.data.setVar('DEFAULTTUNE_ML_%s' % variant, newtune)
 }
 
 addhandler multilib_virtclass_handler
@@ -100,8 +99,8 @@ python __anonymous () {
         d.setVar("LINGUAS_INSTALL", "")
         # FIXME, we need to map this to something, not delete it!
         d.setVar("PACKAGE_INSTALL_ATTEMPTONLY", "")
-
-    if bb.data.inherits_class('image', d):
+        bb.build.deltask('do_populate_sdk', d)
+        bb.build.deltask('do_populate_sdk_ext', d)
         return
 
     clsextend.map_depends_variable("DEPENDS")
@@ -115,7 +114,6 @@ python __anonymous () {
 
     clsextend.map_packagevars()
     clsextend.map_regexp_variable("PACKAGES_DYNAMIC")
-    clsextend.map_variable("PACKAGE_INSTALL")
     clsextend.map_variable("INITSCRIPT_PACKAGES")
     clsextend.map_variable("USERADD_PACKAGES")
     clsextend.map_variable("SYSTEMD_PACKAGES")

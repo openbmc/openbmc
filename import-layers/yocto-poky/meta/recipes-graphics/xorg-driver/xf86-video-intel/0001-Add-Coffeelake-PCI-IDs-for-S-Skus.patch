@@ -1,0 +1,116 @@
+From 96d4e8e7b8a699f0ef77fa7b210d4de5f1c703d0 Mon Sep 17 00:00:00 2001
+From: Liwei Song <liwei.song@windriver.com>
+Date: Wed, 22 Nov 2017 08:59:03 +0000
+Subject: [PATCH] Add Coffeelake PCI IDs for S Skus
+
+Add the Coffeelake PCI IDs based on the following kernel patches:
+
+commit b056f8f3d6b900e8afd19f312719160346d263b4
+Author: Anusha Srivatsa <anusha.srivatsa@intel.com>
+Date:   Thu Jun 8 16:41:05 2017 -0700
+
+    drm/i915/cfl: Add Coffee Lake PCI IDs for S Skus.
+
+Upstream-Status: Submitted [https://patchwork.kernel.org/patch/10139905]
+
+Signed-off-by: Liwei Song <liwei.song@windriver.com>
+---
+ src/i915_pciids.h     |  7 +++++++
+ src/intel_module.c    | 13 +++++++++++++
+ src/sna/gen9_render.c | 12 ++++++++++++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/src/i915_pciids.h b/src/i915_pciids.h
+index 0370f830c541..11ccfa9c047a 100644
+--- a/src/i915_pciids.h
++++ b/src/i915_pciids.h
+@@ -340,4 +340,11 @@
+ 	INTEL_VGA_DEVICE(0x3184, info), \
+ 	INTEL_VGA_DEVICE(0x3185, info)
+ 
++#define INTEL_CFL_S_IDS(info) \
++	INTEL_VGA_DEVICE(0x3E90, info), /* SRV GT1 */ \
++	INTEL_VGA_DEVICE(0x3E93, info), /* SRV GT1 */ \
++	INTEL_VGA_DEVICE(0x3E91, info), /* SRV GT2 */ \
++	INTEL_VGA_DEVICE(0x3E92, info), /* SRV GT2 */ \
++	INTEL_VGA_DEVICE(0x3E96, info)  /* SRV GT2 */
++
+ #endif /* _I915_PCIIDS_H */
+diff --git a/src/intel_module.c b/src/intel_module.c
+index 6b04857e2853..4827a67255f0 100644
+--- a/src/intel_module.c
++++ b/src/intel_module.c
+@@ -138,6 +138,10 @@ static const struct intel_device_info intel_geminilake_info = {
+ 	.gen = 0113,
+ };
+ 
++static const struct intel_device_info intel_coffeelake_info = {
++	.gen = 0114,
++};
++
+ static const SymTabRec intel_chipsets[] = {
+ 	{PCI_CHIP_I810,				"i810"},
+ 	{PCI_CHIP_I810_DC100,			"i810-dc100"},
+@@ -303,6 +307,13 @@ static const SymTabRec intel_chipsets[] = {
+ 	{0x5916, "HD Graphics 620"},
+ 	{0x591E, "HD Graphics 615"},
+ 
++	/*Coffeelake*/
++	{0x3E90, "HD Graphics"},
++	{0x3E93, "HD Graphics"},
++	{0x3E91, "HD Graphics"},
++	{0x3E92, "HD Graphics"},
++	{0x3E96, "HD Graphics"},
++
+ 	/* When adding new identifiers, also update:
+ 	 * 1. intel_identify()
+ 	 * 2. man/intel.man
+@@ -368,6 +379,8 @@ static const struct pci_id_match intel_device_match[] = {
+ 
+ 	INTEL_GLK_IDS(&intel_geminilake_info),
+ 
++	INTEL_CFL_S_IDS(&intel_coffeelake_info),
++
+ 	INTEL_VGA_DEVICE(PCI_MATCH_ANY, &intel_generic_info),
+ #endif
+ 
+diff --git a/src/sna/gen9_render.c b/src/sna/gen9_render.c
+index e5f12c723956..7f49052c5ec1 100644
+--- a/src/sna/gen9_render.c
++++ b/src/sna/gen9_render.c
+@@ -245,6 +245,11 @@ static const struct gt_info glk_gt_info = {
+ 	.urb = { .max_vs_entries = 320 },
+ };
+ 
++static const struct gt_info cfl_gt_info = {
++	.name = "Coffeelake (gen9)",
++	.urb = { .max_vs_entries = 960 },
++};
++
+ static bool is_skl(struct sna *sna)
+ {
+ 	return sna->kgem.gen == 0110;
+@@ -265,6 +270,11 @@ static bool is_glk(struct sna *sna)
+ 	return sna->kgem.gen == 0113;
+ }
+ 
++static bool is_cfl(struct sna *sna)
++{
++	return sna->kgem.gen == 0114;
++}
++
+ 
+ static inline bool too_large(int width, int height)
+ {
+@@ -4040,6 +4050,8 @@ static bool gen9_render_setup(struct sna *sna)
+ 		state->info = &kbl_gt_info;
+ 	if (is_glk(sna))
+ 		state->info = &glk_gt_info;
++	if (is_cfl(sna))
++		state->info = &cfl_gt_info;
+ 
+ 	sna_static_stream_init(&general);
+ 
+-- 
+2.13.3
+

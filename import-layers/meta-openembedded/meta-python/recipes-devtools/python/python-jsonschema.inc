@@ -11,17 +11,13 @@ RDEPENDS_${PN} += " \
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-io \
     ${PYTHON_PN}-json \
-    ${PYTHON_PN}-lang \
     ${PYTHON_PN}-netclient \
     ${PYTHON_PN}-numbers \
     ${PYTHON_PN}-pkgutil \
     ${PYTHON_PN}-pprint \
-    ${PYTHON_PN}-re \
     ${PYTHON_PN}-rfc3987 \
     ${PYTHON_PN}-shell \
     ${PYTHON_PN}-strict-rfc3339 \
-    ${PYTHON_PN}-subprocess \
-    ${PYTHON_PN}-textutils \
     ${PYTHON_PN}-unittest \
 "
 

@@ -16,18 +16,15 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  Makefile.am |    1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/Makefile.am b/Makefile.am
-index 3241311..a43eaa2 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -164,6 +164,7 @@ MAINTAINERCLEANFILES = Makefile.in \
+Index: neard-0.16/Makefile.am
+===================================================================
+--- neard-0.16.orig/Makefile.am
++++ neard-0.16/Makefile.am
+@@ -244,6 +244,7 @@ SED_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(di
  src/plugin.$(OBJEXT): src/builtin.h
  
  src/builtin.h: src/genbuiltin $(builtin_sources)
 +	$(AM_V_at)$(MKDIR_P) src
  	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
  
- $(src_neard_OBJECTS) \
--- 
-1.7.9.5
-
+ se/plugin.$(OBJEXT): se/builtin.h

@@ -282,7 +282,7 @@ class BuildPerfTestCase(unittest.TestCase):
         if not os.path.isdir(self.tmp_dir):
             os.mkdir(self.tmp_dir)
         if self.build_target:
-            self.run_cmd(['bitbake', self.build_target, '-c', 'fetchall'])
+            self.run_cmd(['bitbake', self.build_target, '--runall=fetch'])
 
     def tearDown(self):
         """Tear-down fixture for each test"""

@@ -12,7 +12,7 @@ PR = "r15"
 SRC_URI = "git://git.yoctoproject.org/${BPN} \
            file://psplash-init \
            ${SPLASH_IMAGES}"
-UPSTREAM_VERSION_UNKNOWN = "1"
+UPSTREAM_CHECK_COMMITS = "1"
 
 SPLASH_IMAGES = "file://psplash-poky-img.h;outsuffix=default"
 

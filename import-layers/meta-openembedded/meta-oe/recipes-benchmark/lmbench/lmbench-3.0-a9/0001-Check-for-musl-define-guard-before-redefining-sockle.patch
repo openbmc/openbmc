@@ -1,12 +1,13 @@
-From 31d58ed7e6552781f415501e96d7cc74f83b910d Mon Sep 17 00:00:00 2001
+From ac1657e11cbb0545bdf4d1124def8c013958ed7e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 12 Jul 2017 18:08:51 -0700
-Subject: [PATCH 1/2] Check for musl define guard before redefining socklen_t
+Subject: [PATCH] Check for musl define guard before redefining socklen_t
 
 musl uses __DEFINED_socklen_t so check for that as well
 along with HAVE_socklen_t
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/bench.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -24,6 +25,3 @@ index 597d068..2ebdf5a 100644
  typedef int socklen_t;
  #endif
  
--- 
-2.13.2
-

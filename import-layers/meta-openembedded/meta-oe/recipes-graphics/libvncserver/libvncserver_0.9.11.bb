@@ -12,7 +12,9 @@ PACKAGECONFIG[systemd] = ",,systemd"
 
 RDEPENDS_${PN} += "libpng gtk+ libgcrypt"
 
-inherit autotools binconfig pkgconfig
+inherit distro_features_check autotools binconfig pkgconfig
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "https://github.com/LibVNC/libvncserver/archive/LibVNCServer-${PV}.tar.gz"
 SRC_URI[md5sum] = "7f06104d5c009813e95142932c4ddb06"

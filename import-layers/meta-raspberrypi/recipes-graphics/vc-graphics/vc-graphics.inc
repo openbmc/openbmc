@@ -6,6 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENCE;md5=86e53f5f5909ee66900418028de11780"
 PROVIDES = "virtual/libgles2 virtual/egl"
 COMPATIBLE_MACHINE = "^rpi$"
 
+INHIBIT_DEFAULT_DEPS = "1"
+
 include recipes-bsp/common/firmware.inc
 
 SRC_URI += " \

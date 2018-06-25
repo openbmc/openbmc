@@ -20,6 +20,7 @@
 #
 
 import unittest
+import hashlib
 import tempfile
 import subprocess
 import collections
@@ -522,6 +523,109 @@ class FetcherLocalTest(FetcherTest):
         with self.assertRaises(bb.fetch2.UnpackError):
             self.fetchUnpack(['file://a;subdir=/bin/sh'])
 
+class FetcherNoNetworkTest(FetcherTest):
+    def setUp(self):
+        super().setUp()
+        # all test cases are based on not having network
+        self.d.setVar("BB_NO_NETWORK", "1")
+
+    def test_missing(self):
+        string = "this is a test file\n".encode("utf-8")
+        self.d.setVarFlag("SRC_URI", "md5sum", hashlib.md5(string).hexdigest())
+        self.d.setVarFlag("SRC_URI", "sha256sum", hashlib.sha256(string).hexdigest())
+
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+        fetcher = bb.fetch.Fetch(["http://invalid.yoctoproject.org/test-file.tar.gz"], self.d)
+        with self.assertRaises(bb.fetch2.NetworkAccess):
+            fetcher.download()
+
+    def test_valid_missing_donestamp(self):
+        # create the file in the download directory with correct hash
+        string = "this is a test file\n".encode("utf-8")
+        with open(os.path.join(self.dldir, "test-file.tar.gz"), "wb") as f:
+            f.write(string)
+
+        self.d.setVarFlag("SRC_URI", "md5sum", hashlib.md5(string).hexdigest())
+        self.d.setVarFlag("SRC_URI", "sha256sum", hashlib.sha256(string).hexdigest())
+
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+        fetcher = bb.fetch.Fetch(["http://invalid.yoctoproject.org/test-file.tar.gz"], self.d)
+        fetcher.download()
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+
+    def test_invalid_missing_donestamp(self):
+        # create an invalid file in the download directory with incorrect hash
+        string = "this is a test file\n".encode("utf-8")
+        with open(os.path.join(self.dldir, "test-file.tar.gz"), "wb"):
+            pass
+
+        self.d.setVarFlag("SRC_URI", "md5sum", hashlib.md5(string).hexdigest())
+        self.d.setVarFlag("SRC_URI", "sha256sum", hashlib.sha256(string).hexdigest())
+
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+        fetcher = bb.fetch.Fetch(["http://invalid.yoctoproject.org/test-file.tar.gz"], self.d)
+        with self.assertRaises(bb.fetch2.NetworkAccess):
+            fetcher.download()
+        # the existing file should not exist or should have be moved to "bad-checksum"
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+
+    def test_nochecksums_missing(self):
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+        # ssh fetch does not support checksums
+        fetcher = bb.fetch.Fetch(["ssh://invalid@invalid.yoctoproject.org/test-file.tar.gz"], self.d)
+        # attempts to download with missing donestamp
+        with self.assertRaises(bb.fetch2.NetworkAccess):
+            fetcher.download()
+
+    def test_nochecksums_missing_donestamp(self):
+        # create a file in the download directory
+        with open(os.path.join(self.dldir, "test-file.tar.gz"), "wb"):
+            pass
+
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+        # ssh fetch does not support checksums
+        fetcher = bb.fetch.Fetch(["ssh://invalid@invalid.yoctoproject.org/test-file.tar.gz"], self.d)
+        # attempts to download with missing donestamp
+        with self.assertRaises(bb.fetch2.NetworkAccess):
+            fetcher.download()
+
+    def test_nochecksums_has_donestamp(self):
+        # create a file in the download directory with the donestamp
+        with open(os.path.join(self.dldir, "test-file.tar.gz"), "wb"):
+            pass
+        with open(os.path.join(self.dldir, "test-file.tar.gz.done"), "wb"):
+            pass
+
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+        # ssh fetch does not support checksums
+        fetcher = bb.fetch.Fetch(["ssh://invalid@invalid.yoctoproject.org/test-file.tar.gz"], self.d)
+        # should not fetch
+        fetcher.download()
+        # both files should still exist
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+
+    def test_nochecksums_missing_has_donestamp(self):
+        # create a file in the download directory with the donestamp
+        with open(os.path.join(self.dldir, "test-file.tar.gz.done"), "wb"):
+            pass
+
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+        self.assertTrue(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+        # ssh fetch does not support checksums
+        fetcher = bb.fetch.Fetch(["ssh://invalid@invalid.yoctoproject.org/test-file.tar.gz"], self.d)
+        with self.assertRaises(bb.fetch2.NetworkAccess):
+            fetcher.download()
+        # both files should still exist
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz")))
+        self.assertFalse(os.path.exists(os.path.join(self.dldir, "test-file.tar.gz.done")))
+
 class FetcherNetworkTest(FetcherTest):
     @skipIfNoNetwork()
     def test_fetch(self):
@@ -809,7 +913,7 @@ class FetchLatestVersionTest(FetcherTest):
             ud = bb.fetch2.FetchData(k[1], self.d)
             pupver= ud.method.latest_versionstring(ud, self.d)
             verstring = pupver[0]
-            self.assertTrue(verstring, msg="Could not find upstream version")
+            self.assertTrue(verstring, msg="Could not find upstream version for %s" % k[0])
             r = bb.utils.vercmp_string(v, verstring)
             self.assertTrue(r == -1 or r == 0, msg="Package %s, version: %s <= %s" % (k[0], v, verstring))
 
@@ -822,7 +926,7 @@ class FetchLatestVersionTest(FetcherTest):
             ud = bb.fetch2.FetchData(k[1], self.d)
             pupver = ud.method.latest_versionstring(ud, self.d)
             verstring = pupver[0]
-            self.assertTrue(verstring, msg="Could not find upstream version")
+            self.assertTrue(verstring, msg="Could not find upstream version for %s" % k[0])
             r = bb.utils.vercmp_string(v, verstring)
             self.assertTrue(r == -1 or r == 0, msg="Package %s, version: %s <= %s" % (k[0], v, verstring))
 
@@ -874,9 +978,6 @@ class FetchCheckStatusTest(FetcherTest):
 
 
 class GitMakeShallowTest(FetcherTest):
-    bitbake_dir = os.path.join(os.path.dirname(os.path.join(__file__)), '..', '..', '..')
-    make_shallow_path = os.path.join(bitbake_dir, 'bin', 'git-make-shallow')
-
     def setUp(self):
         FetcherTest.setUp(self)
         self.gitdir = os.path.join(self.tempdir, 'gitshallow')
@@ -905,7 +1006,7 @@ class GitMakeShallowTest(FetcherTest):
     def make_shallow(self, args=None):
         if args is None:
             args = ['HEAD']
-        return bb.process.run([self.make_shallow_path] + args, cwd=self.gitdir)
+        return bb.process.run([bb.fetch2.git.Git.make_shallow_path] + args, cwd=self.gitdir)
 
     def add_empty_file(self, path, msg=None):
         if msg is None:

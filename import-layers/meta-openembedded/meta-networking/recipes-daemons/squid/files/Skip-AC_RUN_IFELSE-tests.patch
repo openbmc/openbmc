@@ -1,3 +1,6 @@
+From a85311965707ba2fa78f7ce044e6f61e65e66fd0 Mon Sep 17 00:00:00 2001
+From: Jim Somerville <Jim.Somerville@windriver.com>
+Date: Tue, 14 Oct 2014 02:56:08 -0400
 Subject: [PATCH] Skip AC_RUN_IFELSE tests
 
 Upstream-Status: Inappropriate [cross compiling specific]
@@ -7,16 +10,17 @@ environment.  Choose sane defaults.
 
 Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
 ---
- acinclude/krb5.m4       |   10 +++++++++-
- acinclude/lib-checks.m4 |    8 ++++++--
+ acinclude/krb5.m4       | 10 +++++++++-
+ acinclude/lib-checks.m4 |  8 ++++++--
  2 files changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/acinclude/krb5.m4 b/acinclude/krb5.m4
-index 946bea8..7a072a2 100644
+index 5c83d88..c264118 100644
 --- a/acinclude/krb5.m4
 +++ b/acinclude/krb5.m4
-@@ -82,7 +82,15 @@ main(void)
+@@ -61,7 +61,15 @@ main(void)
  
          return 0;
  }
@@ -34,31 +38,28 @@ index 946bea8..7a072a2 100644
    ])
  ]) dnl SQUID_CHECK_KRB5_HEIMDAL_BROKEN_KRB5_H
 diff --git a/acinclude/lib-checks.m4 b/acinclude/lib-checks.m4
-index 2bf98ee..50dba9b 100644
+index c4874da..ba72982 100644
 --- a/acinclude/lib-checks.m4
 +++ b/acinclude/lib-checks.m4
-@@ -128,7 +128,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_GETCERTIFICATE_WORKS],[
-    AC_DEFINE(SQUID_SSLGETCERTIFICATE_BUGGY, 1)
-    AC_MSG_RESULT([yes])
+@@ -177,7 +177,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_CONST_SSL_METHOD],[
+   [
+    AC_MSG_RESULT([no])
    ],
 -  [])
 +  [
 +   AC_MSG_RESULT([skipped - can't test in cross-compiled env])
 +  ])
  
-   AC_MSG_CHECKING(whether the workaround for SSL_get_certificate works)
-   AC_RUN_IFELSE([
-@@ -154,7 +156,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_GETCERTIFICATE_WORKS],[
-   [
-    AC_MSG_RESULT([no])
+ SQUID_STATE_ROLLBACK(check_const_SSL_METHOD)
+ ]
+@@ -265,7 +267,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_TXTDB],[
+    AC_MSG_RESULT([yes])
+    AC_DEFINE(SQUID_USE_SSLLHASH_HACK, 1)
    ],
 -[])
 +[
 +   AC_MSG_RESULT([skipped - can't test in cross-compiled env])
 +])
  
- SQUID_STATE_ROLLBACK(check_SSL_get_certificate)
+ SQUID_STATE_ROLLBACK(check_TXTDB)
  ])
--- 
-1.7.1
-

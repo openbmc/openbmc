@@ -13,22 +13,22 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  2 files changed, 3 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index e881cca..1321802 100644
+index 4628401..e8989bf 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -5,7 +5,6 @@ SUBDIRS = \
+@@ -11,7 +11,6 @@ SUBDIRS = \
  	log \
  	lst \
  	ini \
--    libltdl \
+-	libltdl \
  	odbcinst \
  	DriverManager \
  	exe \
 diff --git a/configure.ac b/configure.ac
-index 218502f..d50b7af 100644
+index e4bcdaf..58aa5c5 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -136,9 +136,7 @@ dnl AC_CONFIG_MACRO_DIR([libltdl/m4])
+@@ -144,9 +144,7 @@ dnl AC_CONFIG_MACRO_DIR([libltdl/m4])
  dnl LT_CONFIG_LTDL_DIR([libltdl])
  dnl LTDL_INIT
  
@@ -39,5 +39,5 @@ index 218502f..d50b7af 100644
  dnl Substitute INCLTDL and LIBLTDL in the Makefiles
  AC_SUBST(LTDLINCL)
 -- 
-2.8.1
+2.12.3
 

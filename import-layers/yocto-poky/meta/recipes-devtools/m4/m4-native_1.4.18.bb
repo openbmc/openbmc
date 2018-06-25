@@ -11,3 +11,4 @@ do_configure()  {
 	oe_runconf
 }
 
+UPSTREAM_CHECK_URI = "${GNU_MIRROR}/m4/"

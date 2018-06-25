@@ -11,10 +11,10 @@ Upstream-Status: Inappropriate (disable feature incompatible with ptest)
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.ac b/configure.ac
-index eb0f9d1..a539968 100644
---- a/configure.ac
-+++ b/configure.ac
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
 @@ -14,7 +14,7 @@ AC_USE_SYSTEM_EXTENSIONS
  AC_SYS_LARGEFILE
  AC_PREFIX_DEFAULT([/usr])
@@ -23,7 +23,4 @@ index eb0f9d1..a539968 100644
 +AM_INIT_AUTOMAKE([check-news foreign 1.11 silent-rules tar-pax no-dist-gzip dist-xz subdir-objects color-tests serial-tests])
  AM_SILENT_RULES([yes])
  LT_INIT([disable-static pic-only])
- 
--- 
-1.9.1
-
+ DOLT

@@ -1,3 +1,14 @@
+From 0dc88ed881eb8420dad4cf0934a900d85b6ef313 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 11 Feb 2016 12:53:20 -0800
+
+---
+ config/bellagio/gstomx.conf |  8 ++++----
+ config/rpi/gstomx.conf      | 22 +++++++++++-----------
+ 2 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/config/bellagio/gstomx.conf b/config/bellagio/gstomx.conf
+index 5ca8ba6..8931255 100644
 --- a/config/bellagio/gstomx.conf
 +++ b/config/bellagio/gstomx.conf
 @@ -1,6 +1,6 @@
@@ -6,18 +17,18 @@
 -core-name=/usr/local/lib/libomxil-bellagio.so.0
 +core-name=/usr/lib/libomxil-bellagio.so.0
  component-name=OMX.st.video_decoder.mpeg4
- rank=256
+ rank=257
  in-port-index=0
-@@ -9,7 +9,7 @@
+@@ -9,7 +9,7 @@ hacks=event-port-settings-changed-ndata-parameter-swap;event-port-settings-chang
  
  [omxh264dec]
  type-name=GstOMXH264Dec
 -core-name=/usr/local/lib/libomxil-bellagio.so.0
 +core-name=/usr/lib/libomxil-bellagio.so.0
  component-name=OMX.st.video_decoder.avc
- rank=256
+ rank=257
  in-port-index=0
-@@ -18,7 +18,7 @@
+@@ -18,7 +18,7 @@ hacks=event-port-settings-changed-ndata-parameter-swap;event-port-settings-chang
  
  [omxmpeg4videoenc]
  type-name=GstOMXMPEG4VideoEnc
@@ -26,7 +37,7 @@
  component-name=OMX.st.video_encoder.mpeg4
  rank=0
  in-port-index=0
-@@ -27,7 +27,7 @@
+@@ -27,7 +27,7 @@ hacks=event-port-settings-changed-ndata-parameter-swap;video-framerate-integer;s
  
  [omxaacenc]
  type-name=GstOMXAACEnc
@@ -35,6 +46,8 @@
  component-name=OMX.st.audio_encoder.aac
  rank=0
  in-port-index=0
+diff --git a/config/rpi/gstomx.conf b/config/rpi/gstomx.conf
+index d3ea56a..2508dae 100644
 --- a/config/rpi/gstomx.conf
 +++ b/config/rpi/gstomx.conf
 @@ -1,6 +1,6 @@
@@ -45,7 +58,7 @@
  component-name=OMX.broadcom.video_decode
  rank=257
  in-port-index=130
-@@ -9,7 +9,7 @@
+@@ -9,7 +9,7 @@ hacks=no-component-role
  
  [omxmpeg4videodec]
  type-name=GstOMXMPEG4VideoDec
@@ -54,7 +67,7 @@
  component-name=OMX.broadcom.video_decode
  rank=257
  in-port-index=130
-@@ -18,7 +18,7 @@
+@@ -18,7 +18,7 @@ hacks=no-component-role
  
  [omxh263dec]
  type-name=GstOMXH263Dec
@@ -63,7 +76,7 @@
  component-name=OMX.broadcom.video_decode
  rank=257
  in-port-index=130
-@@ -27,7 +27,7 @@
+@@ -27,7 +27,7 @@ hacks=no-component-role
  
  [omxh264dec]
  type-name=GstOMXH264Dec
@@ -72,7 +85,7 @@
  component-name=OMX.broadcom.video_decode
  rank=257
  in-port-index=130
-@@ -36,7 +36,7 @@
+@@ -36,7 +36,7 @@ hacks=no-component-role;signals-premature-eos
  
  [omxtheoradec]
  type-name=GstOMXTheoraDec
@@ -81,7 +94,7 @@
  component-name=OMX.broadcom.video_decode
  rank=257
  in-port-index=130
-@@ -45,7 +45,7 @@
+@@ -45,7 +45,7 @@ hacks=no-component-role
  
  [omxvp8dec]
  type-name=GstOMXVP8Dec
@@ -90,7 +103,7 @@
  component-name=OMX.broadcom.video_decode
  rank=257
  in-port-index=130
-@@ -54,7 +54,7 @@
+@@ -54,7 +54,7 @@ hacks=no-component-role
  
  [omxmjpegdec]
  type-name=GstOMXMJPEGDec
@@ -99,16 +112,16 @@
  component-name=OMX.broadcom.video_decode
  rank=257
  in-port-index=130
-@@ -63,7 +63,7 @@
+@@ -63,7 +63,7 @@ hacks=no-component-role
  
  [omxvc1dec]
  type-name=GstOMXWMVDec
 -core-name=/opt/vc/lib/libopenmaxil.so
 +core-name=/usr/lib/libopenmaxil.so
  component-name=OMX.broadcom.video_decode
- rank=256
+ rank=257
  in-port-index=130
-@@ -73,7 +73,7 @@
+@@ -73,7 +73,7 @@ sink-template-caps=video/x-wmv,wmvversion=(int)3,format=(string){WMV3,WVC1},widt
  
  [omxh264enc]
  type-name=GstOMXH264Enc
@@ -117,21 +130,21 @@
  component-name=OMX.broadcom.video_encode
  rank=257
  in-port-index=200
-@@ -82,7 +82,7 @@
+@@ -82,7 +82,7 @@ hacks=no-component-role;no-component-reconfigure
  
  [omxanalogaudiosink]
  type-name=GstOMXAnalogAudioSink
 -core-name=/opt/vc/lib/libopenmaxil.so
 +core-name=/usr/lib/libopenmaxil.so
  component-name=OMX.broadcom.audio_render
- rank=256
+ rank=257
  in-port-index=100
-@@ -92,7 +92,7 @@
+@@ -92,7 +92,7 @@ sink-template-caps=audio/x-raw,format=(string){S16LE,S32LE},layout=(string)inter
  
  [omxhdmiaudiosink]
  type-name=GstOMXHdmiAudioSink
 -core-name=/opt/vc/lib/libopenmaxil.so
 +core-name=/usr/lib/libopenmaxil.so
  component-name=OMX.broadcom.audio_render
- rank=257
+ rank=258
  in-port-index=100

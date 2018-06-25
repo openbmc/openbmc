@@ -26,7 +26,7 @@ USERADD_PARAM_${PN} = "--system nm-openvpn"
 
 FILES_${PN} += " \
     ${libdir}/NetworkManager/*.so \
-    ${libdir}/NetworkManager/VPN/nm-openvpn-service.name \
+    ${nonarch_libdir}/NetworkManager/VPN/nm-openvpn-service.name \
 "
 
 FILES_${PN}-staticdev += " \

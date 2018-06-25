@@ -28,7 +28,7 @@
         In addition to the functionality available through
         <filename>devtool</filename>, you can alternatively make use of the
         toolchain directly, for example from Makefile, Autotools, and
-        Eclipse-based projects.
+        <trademark class='trade'>Eclipse</trademark>-based projects.
         See the
         "<link linkend='sdk-working-projects'>Using the SDK Toolchain Directly</link>"
         chapter for more information.
@@ -54,29 +54,29 @@
         </para>
     </section>
 
-    <section id='sdk-setting-up-to-use-the-extensible-sdk'>
-        <title>Setting Up to Use the Extensible SDK</title>
+    <section id='sdk-installing-the-extensible-sdk'>
+        <title>Installing the Extensible SDK</title>
 
         <para>
-            The first thing you need to do is install the SDK on your host
-            development machine by running the <filename>*.sh</filename>
-            installation script.
+            The first thing you need to do is install the SDK on your
+            <ulink url='&YOCTO_DOCS_REF_URL;#hardware-build-system-term'>Build Host</ulink>
+            by running the <filename>*.sh</filename> installation script.
         </para>
 
         <para>
             You can download a tarball installer, which includes the
             pre-built toolchain, the <filename>runqemu</filename>
             script, the internal build system, <filename>devtool</filename>,
-            and support files from the appropriate directory under
-            <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'></ulink>.
-            Toolchains are available for 32-bit and 64-bit x86 development
-            systems from the <filename>i686</filename> and
-            <filename>x86_64</filename> directories, respectively.
+            and support files from the appropriate
+            <ulink url='&YOCTO_TOOLCHAIN_DL_URL;'>toolchain</ulink>
+            directory within the Index of Releases.
+            Toolchains are available for several 32-bit and 64-bit
+            architectures with the <filename>x86_64</filename> directories,
+            respectively.
             The toolchains the Yocto Project provides are based off the
-            <filename>core-image-sato</filename> image and contain
+            <filename>core-image-sato</filename> and
+            <filename>core-image-minimal</filename> images and contain
             libraries appropriate for developing against that image.
-            Each type of development system supports five or more target
-            architectures.
         </para>
 
         <para>
@@ -85,6 +85,7 @@
             filename and then is immediately followed by a string
             representing the target architecture.
             An extensible SDK has the string "-ext" as part of the name.
+            Following is the general form:
             <literallayout class='monospaced'>
      poky-glibc-<replaceable>host_system</replaceable>-<replaceable>image_type</replaceable>-<replaceable>arch</replaceable>-toolchain-ext-<replaceable>release_version</replaceable>.sh
 
@@ -93,14 +94,15 @@
 
                     i686 or x86_64.
 
-         <replaceable>image_type</replaceable> is the image for which the SDK was built.
+         <replaceable>image_type</replaceable> is the image for which the SDK was built:
+
+                    core-image-sato or core-image-minimal
 
          <replaceable>arch</replaceable> is a string representing the tuned target architecture:
 
-                    i586, x86_64, powerpc, mips, armv7a or armv5te
+                    aarch64, armv5e, core2-64, i586, mips32r2, mips64, ppc7400, or cortexa8hf-neon
 
-         <replaceable>release_version</replaceable> is a string representing the release number of the
-                Yocto Project:
+         <replaceable>release_version</replaceable> is a string representing the release number of the Yocto Project:
 
                     &DISTRO;, &DISTRO;+snapshot
             </literallayout>
@@ -131,9 +133,10 @@
             home directory.
             You can choose to install the extensible SDK in any location when
             you run the installer.
-            However, the location you choose needs to be writable for whichever
-            users need to use the SDK, since files will need to be written
-            under that directory during the normal course of operation.
+            However, because files need to be written under that directory
+            during the normal course of operation, the location you choose
+            for installation must be writable for whichever
+            users need to use the SDK.
         </para>
 
         <para>
@@ -141,28 +144,34 @@
             toolchain tarball for a 64-bit x86 development host system and
             a 64-bit x86 target architecture.
             The example assumes the SDK installer is located in
-            <filename>~/Downloads/</filename>.
+            <filename>~/Downloads/</filename> and has execution rights.
             <note>
                 If you do not have write permissions for the directory
                 into which you are installing the SDK, the installer
                 notifies you and exits.
-                Be sure you have write permissions in the directory and
-                run the installer again.
+                For that case, set up the proper permissions in the directory
+                and run the installer again.
             </note>
             <literallayout class='monospaced'>
-     $ ./poky-glibc-x86_64-core-image-minimal-core2-64-toolchain-ext-&DISTRO;.sh
-     Poky (Yocto Project Reference Distro) Extensible SDK installer version &DISTRO;
-     ===================================================================================
+     $ ./Downloads/poky-glibc-x86_64-core-image-minimal-core2-64-toolchain-ext-2.5.sh
+     Poky (Yocto Project Reference Distro) Extensible SDK installer version 2.5
+     ==========================================================================
      Enter target directory for SDK (default: ~/poky_sdk):
      You are about to install the SDK to "/home/scottrif/poky_sdk". Proceed[Y/n]? Y
-     Extracting SDK......................................................................done
+     Extracting SDK..............done
      Setting it up...
      Extracting buildtools...
      Preparing build system...
+     Parsing recipes: 100% |##################################################################| Time: 0:00:52
+     Initialising tasks: 100% |###############################################################| Time: 0:00:00
+     Checking sstate mirror object availability: 100% |#######################################| Time: 0:00:00
+     Loading cache: 100% |####################################################################| Time: 0:00:00
+     Initialising tasks: 100% |###############################################################| Time: 0:00:00
      done
      SDK has been successfully set up and is ready to be used.
      Each time you wish to use the SDK in a new shell session, you need to source the environment setup script e.g.
       $ . /home/scottrif/poky_sdk/environment-setup-core2-64-poky-linux
+
             </literallayout>
         </para>
     </section>
@@ -172,7 +181,7 @@
 
         <para>
             Once you have the SDK installed, you must run the SDK environment
-            setup script before you can actually use it.
+            setup script before you can actually use the SDK.
             This setup script resides in the directory you chose when you
             installed the SDK, which is either the default
             <filename>poky_sdk</filename> directory or the directory you
@@ -196,32 +205,13 @@
      SDK environment now set up; additionally you may now run devtool to perform development tasks.
      Run devtool --help for further details.
             </literallayout>
-            When you run the setup script, many environment variables are
-            defined:
-            <literallayout class='monospaced'>
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-SDKTARGETSYSROOT'><filename>SDKTARGETSYSROOT</filename></ulink> - The path to the sysroot used for cross-compilation
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-PKG_CONFIG_PATH'><filename>PKG_CONFIG_PATH</filename></ulink> - The path to the target pkg-config files
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-CONFIG_SITE'><filename>CONFIG_SITE</filename></ulink> - A GNU autoconf site file preconfigured for the target
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-CC'><filename>CC</filename></ulink> - The minimal command and arguments to run the C compiler
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-CXX'><filename>CXX</filename></ulink> - The minimal command and arguments to run the C++ compiler
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-CPP'><filename>CPP</filename></ulink> - The minimal command and arguments to run the C preprocessor
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-AS'><filename>AS</filename></ulink> - The minimal command and arguments to run the assembler
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-LD'><filename>LD</filename></ulink> - The minimal command and arguments to run the linker
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-GDB'><filename>GDB</filename></ulink> - The minimal command and arguments to run the GNU Debugger
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-STRIP'><filename>STRIP</filename></ulink> - The minimal command and arguments to run 'strip', which strips symbols
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-RANLIB'><filename>RANLIB</filename></ulink> - The minimal command and arguments to run 'ranlib'
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-OBJCOPY'><filename>OBJCOPY</filename></ulink> - The minimal command and arguments to run 'objcopy'
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-OBJDUMP'><filename>OBJDUMP</filename></ulink> - The minimal command and arguments to run 'objdump'
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-AR'><filename>AR</filename></ulink> - The minimal command and arguments to run 'ar'
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-NM'><filename>NM</filename></ulink> - The minimal command and arguments to run 'nm'
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-TARGET_PREFIX'><filename>TARGET_PREFIX</filename></ulink> - The toolchain binary prefix for the target tools
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-CROSS_COMPILE'><filename>CROSS_COMPILE</filename></ulink> - The toolchain binary prefix for the target tools
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-CONFIGURE_FLAGS'><filename>CONFIGURE_FLAGS</filename></ulink> - The minimal arguments for GNU configure
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-CFLAGS'><filename>CFLAGS</filename></ulink> - Suggested C flags
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-CXXFLAGS'><filename>CXXFLAGS</filename></ulink> - Suggested C++ flags
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-LDFLAGS'><filename>LDFLAGS</filename></ulink> - Suggested linker flags when you use CC to link
-     <ulink url='&YOCTO_DOCS_REF_URL;#var-CPPFLAGS'><filename>CPPFLAGS</filename></ulink> - Suggested preprocessor flags
-            </literallayout>
+            Running the setup script defines many environment variables needed
+            in order to use the SDK (e.g. <filename>PATH</filename>,
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-CC'><filename>CC</filename></ulink>,
+            <ulink url='&YOCTO_DOCS_REF_URL;#var-LD'><filename>LD</filename></ulink>,
+            and so forth).
+            If you want to see all the environment variables the script
+            exports, examine the installation file itself.
         </para>
     </section>
 
@@ -240,15 +230,15 @@
                 the extensible SDK.
                 You can use <filename>devtool</filename> to help you easily
                 develop any project whose build output must be part of an
-                image built using the OpenEmbedded build system.
+                image built using the build system.
             </note>
         </para>
 
         <para>
             The <filename>devtool</filename> command line is organized
             similarly to
-            <ulink url='&YOCTO_DOCS_REF_URL;#git'>Git</ulink> in that it has a
-            number of sub-commands for each function.
+            <ulink url='&YOCTO_DOCS_OM_URL;#git'>Git</ulink> in that it
+            has a number of sub-commands for each function.
             You can run <filename>devtool --help</filename> to see all the
             commands.
             <note>
@@ -260,8 +250,8 @@
         </para>
 
         <para>
-            Three <filename>devtool</filename> subcommands that provide
-            entry-points into development are:
+            Three <filename>devtool</filename> subcommands exist that provide
+            entry-points into development:
             <itemizedlist>
                 <listitem><para>
                     <emphasis><filename>devtool add</filename></emphasis>:
@@ -278,17 +268,17 @@
                     an updated set of source files.
                     </para></listitem>
             </itemizedlist>
-            As with the OpenEmbedded build system, "recipes" represent software
-            packages within <filename>devtool</filename>.
+            As with the build system, "recipes" represent software packages
+            within <filename>devtool</filename>.
             When you use <filename>devtool add</filename>, a recipe is
             automatically created.
             When you use <filename>devtool modify</filename>, the specified
-            existing recipe is used in order to determine where to get the source
-            code and how to patch it.
+            existing recipe is used in order to determine where to get the
+            source code and how to patch it.
             In both cases, an environment is set up so that when you build the
             recipe a source tree that is under your control is used in order to
             allow you to make changes to the source as desired.
-            By default, both new recipes and the source go into a "workspace"
+            By default, new recipes and the source go into a "workspace"
             directory under the SDK.
         </para>
 
@@ -335,10 +325,10 @@
                         generate a recipe based on existing source code.</para>
 
                         <para>In a shared development environment, it is
-                        typical where other developers are responsible for
+                        typical for other developers to be responsible for
                         various areas of source code.
                         As a developer, you are probably interested in using
-                        that source code as part of your development using
+                        that source code as part of your development within
                         the Yocto Project.
                         All you need is access to the code, a recipe, and a
                         controlled area in which to do your work.</para>
@@ -346,138 +336,164 @@
                         <para>Within the diagram, three possible scenarios
                         feed into the <filename>devtool add</filename> workflow:
                         <itemizedlist>
-                            <listitem><para><emphasis>Left</emphasis>:
-                                The left scenario represents a common situation
-                                where the source code does not exist locally
-                                and needs to be extracted.
-                                In this situation, you just let it get
-                                extracted to the default workspace - you do not
-                                want it in some specific location outside of the
-                                workspace.
-                                Thus, everything you need will be located in the
-                                workspace:
+                            <listitem><para>
+                                <emphasis>Left</emphasis>:
+                                The left scenario in the figure represents a
+                                common situation where the source code does not
+                                exist locally and needs to be extracted.
+                                In this situation, the source code is extracted
+                                to the default workspace - you do not
+                                want the files in some specific location
+                                outside of the workspace.
+                                Thus, everything you need will be located in
+                                the workspace:
                                 <literallayout class='monospaced'>
      $ devtool add <replaceable>recipe fetchuri</replaceable>
                                 </literallayout>
                                 With this command, <filename>devtool</filename>
-                                creates a recipe and an append file in the
-                                workspace as well as extracts the upstream
-                                source files into a local Git repository also
-                                within the <filename>sources</filename> folder.
+                                extracts the upstream source files into a local
+                                Git repository within the
+                                <filename>sources</filename> folder.
+                                The command then creates a recipe named
+                                <replaceable>recipe</replaceable> and a
+                                corresponding append file in the workspace.
+                                If you do not provide
+                                <replaceable>recipe</replaceable>, the command
+                                makes an attempt to determine the recipe name.
                                 </para></listitem>
-                            <listitem><para><emphasis>Middle</emphasis>:
-                                The middle scenario also represents a situation where
-                                the source code does not exist locally.
+                            <listitem><para>
+                                <emphasis>Middle</emphasis>:
+                                The middle scenario in the figure also
+                                represents a situation where the source code
+                                does not exist locally.
                                 In this case, the code is again upstream
                                 and needs to be extracted to some
                                 local area - this time outside of the default
                                 workspace.
-                                If required, <filename>devtool</filename>
-                                always creates
-                                a Git repository locally during the extraction.
+                                <note>
+                                    If required, <filename>devtool</filename>
+                                    always creates
+                                    a Git repository locally during the
+                                    extraction.
+                                </note>
                                 Furthermore, the first positional argument
-                                <replaceable>srctree</replaceable> in this case
-                                identifies where the
+                                <replaceable>srctree</replaceable> in this
+                                case identifies where the
                                 <filename>devtool add</filename> command
                                 will locate the extracted code outside of the
-                                workspace:
+                                workspace.
+                                You need to specify an empty directory:
                                 <literallayout class='monospaced'>
      $ devtool add <replaceable>recipe srctree fetchuri</replaceable>
                                 </literallayout>
                                 In summary, the source code is pulled from
-                                <replaceable>fetchuri</replaceable> and extracted
-                                into the location defined by
+                                <replaceable>fetchuri</replaceable> and
+                                extracted into the location defined by
                                 <replaceable>srctree</replaceable> as a local
                                 Git repository.</para>
 
-                                <para>Within workspace, <filename>devtool</filename>
-                                creates both the recipe and an append file
-                                for the recipe.
+                                <para>Within workspace,
+                                <filename>devtool</filename> creates a
+                                recipe named <replaceable>recipe</replaceable>
+                                along with an associated append file.
                                 </para></listitem>
-                            <listitem><para><emphasis>Right</emphasis>:
-                                The right scenario represents a situation
-                                where the source tree (srctree) has been
+                            <listitem><para>
+                                <emphasis>Right</emphasis>:
+                                The right scenario in the figure represents a
+                                situation where the
+                                <replaceable>srctree</replaceable> has been
                                 previously prepared outside of the
-                                <filename>devtool</filename> workspace.
-                                </para>
+                                <filename>devtool</filename> workspace.</para>
 
-                                <para>The following command names the recipe
-                                and identifies where the existing source tree
-                                is located:
+                                <para>The following command provides a new
+                                recipe name and identifies the existing source
+                                tree location:
                                 <literallayout class='monospaced'>
      $ devtool add <replaceable>recipe srctree</replaceable>
                                 </literallayout>
-                                The command examines the source code and creates
-                                a recipe for it placing the recipe into the
-                                workspace.</para>
+                                The command examines the source code and
+                                creates a recipe named
+                                <replaceable>recipe</replaceable> for the code
+                                and places the recipe into the workspace.
+                                </para>
 
-                                <para>Because the extracted source code already exists,
-                                <filename>devtool</filename> does not try to
-                                relocate it into the workspace - just the new
-                                the recipe is placed in the workspace.</para>
+                                <para>Because the extracted source code already
+                                exists, <filename>devtool</filename> does not
+                                try to relocate the source code into the
+                                workspace - only the new recipe is placed
+                                in the workspace.</para>
 
                                 <para>Aside from a recipe folder, the command
-                                also creates an append folder and places an initial
-                                <filename>*.bbappend</filename> within.
+                                also creates an associated append folder and
+                                places an initial
+                                <filename>*.bbappend</filename> file within.
                                 </para></listitem>
                         </itemizedlist>
                         </para></listitem>
-                    <listitem><para><emphasis>Edit the Recipe</emphasis>:
-                        At this point, you can use <filename>devtool edit-recipe</filename>
+                    <listitem><para>
+                        <emphasis>Edit the Recipe</emphasis>:
+                        You can use <filename>devtool edit-recipe</filename>
                         to open up the editor as defined by the
                         <filename>$EDITOR</filename> environment variable
                         and modify the file:
                         <literallayout class='monospaced'>
      $ devtool edit-recipe <replaceable>recipe</replaceable>
                         </literallayout>
-                        From within the editor, you can make modifications to the
-                        recipe that take affect when you build it later.
+                        From within the editor, you can make modifications to
+                        the recipe that take affect when you build it later.
                         </para></listitem>
-                    <listitem><para><emphasis>Build the Recipe or Rebuild the Image</emphasis>:
-                        At this point in the flow, the next step you
-                        take depends on what you are going to do with
-                        the new code.</para>
-                        <para>If you need to take the build output and eventually
-                        move it to the target hardware, you would use
-                        <filename>devtool build</filename>:
+                    <listitem><para>
+                        <emphasis>Build the Recipe or Rebuild the Image</emphasis>:
+                        The next step you take depends on what you are going
+                        to do with the new code.</para>
+
+                        <para>If you need to eventually move the build output
+                        to the target hardware, use the following
+                        <filename>devtool</filename> command:
                         <literallayout class='monospaced'>
      $ devtool build <replaceable>recipe</replaceable>
                         </literallayout></para>
+
                         <para>On the other hand, if you want an image to
-                        contain the recipe's packages for immediate deployment
-                        onto a device (e.g. for testing purposes), you can use
+                        contain the recipe's packages from the workspace
+                        for immediate deployment onto a device (e.g. for
+                        testing purposes), you can use
                         the <filename>devtool build-image</filename> command:
                         <literallayout class='monospaced'>
      $ devtool build-image <replaceable>image</replaceable>
                         </literallayout>
                         </para></listitem>
-                    <listitem><para><emphasis>Deploy the Build Output</emphasis>:
+                    <listitem><para>
+                        <emphasis>Deploy the Build Output</emphasis>:
                         When you use the <filename>devtool build</filename>
                         command to build out your recipe, you probably want to
-                        see if the resulting build output works as expected on target
-                        hardware.
+                        see if the resulting build output works as expected
+                        on the target hardware.
                         <note>
                             This step assumes you have a previously built
                             image that is already either running in QEMU or
-                            running on actual hardware.
-                            Also, it is assumed that for deployment of the image
-                            to the target, SSH is installed in the image and if
-                            the image is running on real hardware that you have
-                            network access to and from your development machine.
+                            is running on actual hardware.
+                            Also, it is assumed that for deployment of the
+                            image to the target, SSH is installed in the image
+                            and, if the image is running on real hardware,
+                            you have network access to and from your
+                            development machine.
                         </note>
-                        You can deploy your build output to that target hardware by
-                        using the <filename>devtool deploy-target</filename> command:
+                        You can deploy your build output to that target
+                        hardware by using the
+                        <filename>devtool deploy-target</filename> command:
                         <literallayout class='monospaced'>
      $ devtool deploy-target <replaceable>recipe target</replaceable>
                         </literallayout>
-                        The <replaceable>target</replaceable> is a live target machine
-                        running as an SSH server.</para>
+                        The <replaceable>target</replaceable> is a live target
+                        machine running as an SSH server.</para>
 
-                        <para>You can, of course, also deploy the image you build
-                        using the <filename>devtool build-image</filename> command
-                        to actual hardware.
-                        However, <filename>devtool</filename> does not provide a
-                        specific command that allows you to do this.
+                        <para>You can, of course, also deploy the image you
+                        build to actual hardware by using the
+                        <filename>devtool build-image</filename> command.
+                        However, <filename>devtool</filename> does not provide
+                        a specific command that allows you to deploy the
+                        image to actual hardware.
                         </para></listitem>
                     <listitem><para>
                         <emphasis>Finish Your Work With the Recipe</emphasis>:
@@ -494,8 +510,9 @@
                             committed to the Git repository in the source tree.
                         </note></para>
 
-                        <para>As mentioned, the <filename>devtool finish</filename>
-                        command moves the final recipe to its permanent layer.
+                        <para>As mentioned, the
+                        <filename>devtool finish</filename> command moves the
+                        final recipe to its permanent layer.
                         </para>
 
                         <para>As a final process of the
@@ -520,21 +537,20 @@
 
             <para>
                 The <filename>devtool modify</filename> command prepares the
-                way to work on existing code that already has a recipe in
-                place.
-                The command is flexible enough to allow you to extract code,
-                specify the existing recipe, and keep track of and gather any
-                patch files from other developers that are
-                associated with the code.
+                way to work on existing code that already has a local recipe in
+                place that is used to build the software.
+                The command is flexible enough to allow you to extract code
+                from an upstream source, specify the existing recipe, and
+                keep track of and gather any patch files from other developers
+                that are associated with the code.
             </para>
 
             <para>
                 Depending on your particular scenario, the arguments and options
                 you use with <filename>devtool modify</filename> form different
                 combinations.
-                The following diagram shows common development flows
-                you would use with the <filename>devtool modify</filename>
-                command:
+                The following diagram shows common development flows for the
+                <filename>devtool modify</filename> command:
             </para>
 
             <para>
@@ -543,140 +559,181 @@
 
             <para>
                 <orderedlist>
-                    <listitem><para><emphasis>Preparing to Modify the Code</emphasis>:
+                    <listitem><para>
+                        <emphasis>Preparing to Modify the Code</emphasis>:
                         The top part of the flow shows three scenarios by which
                         you could use <filename>devtool modify</filename> to
                         prepare to work on source files.
                         Each scenario assumes the following:
                         <itemizedlist>
-                            <listitem><para>The recipe exists in some layer external
+                            <listitem><para>
+                                The recipe exists locally in a layer external
                                 to the <filename>devtool</filename> workspace.
                                 </para></listitem>
-                            <listitem><para>The source files exist upstream in an
+                            <listitem><para>
+                                The source files exist either upstream in an
                                 un-extracted state or locally in a previously
                                 extracted state.
                                 </para></listitem>
                         </itemizedlist>
                         The typical situation is where another developer has
-                        created some layer for use with the Yocto Project and
+                        created a layer for use with the Yocto Project and
                         their recipe already resides in that layer.
                         Furthermore, their source code is readily available
                         either upstream or locally.
                         <itemizedlist>
-                            <listitem><para><emphasis>Left</emphasis>:
-                                The left scenario represents a common situation
-                                where the source code does not exist locally
-                                and needs to be extracted.
+                            <listitem><para>
+                                <emphasis>Left</emphasis>:
+                                The left scenario in the figure represents a
+                                common situation where the source code does
+                                not exist locally and it needs to be extracted
+                                from an upstream source.
                                 In this situation, the source is extracted
-                                into the default workspace location.
+                                into the default <filename>devtool</filename>
+                                workspace location.
                                 The recipe, in this scenario, is in its own
                                 layer outside the workspace
                                 (i.e.
                                 <filename>meta-</filename><replaceable>layername</replaceable>).
                                 </para>
 
-                                <para>The following command identifies the recipe
-                                and by default extracts the source files:
+                                <para>The following command identifies the
+                                recipe and, by default, extracts the source
+                                files:
                                 <literallayout class='monospaced'>
      $ devtool modify <replaceable>recipe</replaceable>
                                 </literallayout>
-                                Once <filename>devtool</filename>locates the recipe,
-                                it uses the
+                                Once <filename>devtool</filename>locates the
+                                recipe, <filename>devtool</filename> uses the
+                                recipe's
                                 <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
-                                variable to locate the source code and
-                                any local patch files from other developers are
-                                located.
-                                <note>
-                                    You cannot provide an URL for
-                                    <replaceable>srctree</replaceable> when using the
-                                    <filename>devtool modify</filename> command.
-                                </note>
-                                With this scenario, however, since no
-                                <replaceable>srctree</replaceable> argument exists, the
-                                <filename>devtool modify</filename> command by default
-                                extracts the source files to a Git structure.
-                                Furthermore, the location for the extracted source is the
-                                default area within the workspace.
-                                The result is that the command sets up both the source
-                                code and an append file within the workspace with the
-                                recipe remaining in its original location.
+                                statements to locate the source code and any
+                                local patch files from other developers.</para>
+
+                                <para>With this scenario, no
+                                <replaceable>srctree</replaceable> argument
+                                exists.
+                                Consequently, the default behavior of the
+                                <filename>devtool modify</filename> command is
+                                to extract the source files pointed to by the
+                                <filename>SRC_URI</filename> statements into a
+                                local Git structure.
+                                Furthermore, the location for the extracted
+                                source is the default area within the
+                                <filename>devtool</filename> workspace.
+                                The result is that the command sets up both
+                                the source code and an append file within the
+                                workspace while the recipe remains in its
+                                original location.
                                 </para></listitem>
-                            <listitem><para><emphasis>Middle</emphasis>:
-                                The middle scenario represents a situation where
-                                the source code also does not exist locally.
+                            <listitem><para>
+                                <emphasis>Middle</emphasis>:
+                                The middle scenario in the figure represents a
+                                situation where the source code also does not
+                                exist locally.
                                 In this case, the code is again upstream
                                 and needs to be extracted to some
                                 local area as a Git repository.
-                                The recipe, in this scenario, is again in its own
-                                layer outside the workspace.</para>
+                                The recipe, in this scenario, is again local
+                                and in its own layer outside the workspace.
+                                </para>
 
                                 <para>The following command tells
                                 <filename>devtool</filename> what recipe with
-                                which to work and, in this case, identifies a local
-                                area for the extracted source files that is outside
-                                of the default workspace:
+                                which to work and, in this case, identifies a
+                                local area for the extracted source files that
+                                is outside of the default
+                                <filename>devtool</filename> workspace:
                                 <literallayout class='monospaced'>
      $ devtool modify <replaceable>recipe srctree</replaceable>
                                 </literallayout>
+                                <note>
+                                    You cannot provide a URL for
+                                    <replaceable>srctree</replaceable> using
+                                    the <filename>devtool</filename> command.
+                                </note>
                                 As with all extractions, the command uses
-                                the recipe's <filename>SRC_URI</filename> to locate the
-                                source files.
-                                Once the files are located, the command by default
-                                extracts them.
-                                Providing the <replaceable>srctree</replaceable>
-                                argument instructs <filename>devtool</filename> where
-                                to place the extracted source.</para>
+                                the recipe's <filename>SRC_URI</filename>
+                                statements to locate the source files and any
+                                associated patch files.
+                                Once the files are located, the command by
+                                default extracts them into
+                                <replaceable>srctree</replaceable>.</para>
 
-                                <para>Within workspace, <filename>devtool</filename>
-                                creates an append file for the recipe.
+                                <para>Within workspace,
+                                <filename>devtool</filename> creates an append
+                                file for the recipe.
                                 The recipe remains in its original location but
-                                the source files are extracted to the location you
-                                provided with <replaceable>srctree</replaceable>.
+                                the source files are extracted to the location
+                                you provide with
+                                <replaceable>srctree</replaceable>.
                                 </para></listitem>
-                            <listitem><para><emphasis>Right</emphasis>:
-                                The right scenario represents a situation
-                                where the source tree
-                                (<replaceable>srctree</replaceable>) exists as a
-                                previously extracted Git structure outside of
-                                the <filename>devtool</filename> workspace.
+                            <listitem><para>
+                                <emphasis>Right</emphasis>:
+                                The right scenario in the figure represents a
+                                situation where the source tree
+                                (<replaceable>srctree</replaceable>) already
+                                exists locally as a previously extracted Git
+                                structure outside of the
+                                <filename>devtool</filename> workspace.
                                 In this example, the recipe also exists
-                                elsewhere in its own layer.
+                                elsewhere locally in its own layer.
                                 </para>
 
                                 <para>The following command tells
                                 <filename>devtool</filename> the recipe
-                                with which to work, uses the "-n" option to indicate
-                                source does not need to be extracted, and uses
-                                <replaceable>srctree</replaceable> to point to the
-                                previously extracted source files:
+                                with which to work, uses the "-n" option to
+                                indicate source does not need to be extracted,
+                                and uses <replaceable>srctree</replaceable> to
+                                point to the previously extracted source files:
                                 <literallayout class='monospaced'>
      $ devtool modify -n <replaceable>recipe srctree</replaceable>
                                 </literallayout>
                                 </para>
 
                                 <para>Once the command finishes, it creates only
-                                an append file for the recipe in the workspace.
+                                an append file for the recipe in the
+                                <filename>devtool</filename> workspace.
                                 The recipe and the source code remain in their
                                 original locations.
                                 </para></listitem>
                             </itemizedlist>
                         </para></listitem>
-                    <listitem><para><emphasis>Edit the Source</emphasis>:
-                        Once you have used the <filename>devtool modify</filename>
-                        command, you are free to make changes to the source
-                        files.
+                    <listitem><para>
+                        <emphasis>Edit the Source</emphasis>:
+                        Once you have used the
+                        <filename>devtool modify</filename> command, you are
+                        free to make changes to the source files.
                         You can use any editor you like to make and save
                         your source code modifications.
                         </para></listitem>
-                    <listitem><para><emphasis>Build the Recipe</emphasis>:
-                        Once you have updated the source files, you can build
-                        the recipe.
+                    <listitem><para>
+                        <emphasis>Build the Recipe or Rebuild the Image</emphasis>:
+                        The next step you take depends on what you are going
+                        to do with the new code.</para>
+
+                        <para>If you need to eventually move the build output
+                        to the target hardware, use the following
+                        <filename>devtool</filename> command:
+                        <literallayout class='monospaced'>
+     $ devtool build <replaceable>recipe</replaceable>
+                        </literallayout></para>
+
+                        <para>On the other hand, if you want an image to
+                        contain the recipe's packages from the workspace
+                        for immediate deployment onto a device (e.g. for
+                        testing purposes), you can use
+                        the <filename>devtool build-image</filename> command:
+                        <literallayout class='monospaced'>
+     $ devtool build-image <replaceable>image</replaceable>
+                        </literallayout>
                         </para></listitem>
-                    <listitem><para><emphasis>Deploy the Build Output</emphasis>:
+                    <listitem><para>
+                        <emphasis>Deploy the Build Output</emphasis>:
                         When you use the <filename>devtool build</filename>
-                        command to build out your recipe, you probably want to see
-                        if the resulting build output works as expected on target
-                        hardware.
+                        command to build out your recipe, you probably want to
+                        see if the resulting build output works as expected
+                        on target hardware.
                         <note>
                             This step assumes you have a previously built
                             image that is already either running in QEMU or
@@ -686,19 +743,22 @@
                             the image is running on real hardware that you have
                             network access to and from your development machine.
                         </note>
-                        You can deploy your build output to that target hardware by
-                        using the <filename>devtool deploy-target</filename> command:
+                        You can deploy your build output to that target
+                        hardware by using the
+                        <filename>devtool deploy-target</filename> command:
                         <literallayout class='monospaced'>
      $ devtool deploy-target <replaceable>recipe target</replaceable>
                         </literallayout>
-                        The <replaceable>target</replaceable> is a live target machine
-                        running as an SSH server.</para>
+                        The <replaceable>target</replaceable> is a live target
+                        machine running as an SSH server.</para>
 
-                        <para>You can, of course, also deploy the image you build
-                        using the <filename>devtool build-image</filename> command
-                        to actual hardware.
-                        However, <filename>devtool</filename> does not provide a
-                        specific command that allows you to do this.
+                        <para>You can, of course, use other methods to deploy
+                        the image you built using the
+                        <filename>devtool build-image</filename> command to
+                        actual hardware.
+                        <filename>devtool</filename> does not provide
+                        a specific command to deploy the image to actual
+                        hardware.
                         </para></listitem>
                     <listitem><para>
                         <emphasis>Finish Your Work With the Recipe</emphasis>:
@@ -707,28 +767,30 @@
                         Git repository, updates the recipe to point to them
                         (or creates a <filename>.bbappend</filename> file to do
                         so, depending on the specified destination layer), and
-                        then resets the recipe so that the recipe is built normally
-                        rather than from the workspace.
+                        then resets the recipe so that the recipe is built
+                        normally rather than from the workspace.
                         <literallayout class='monospaced'>
      $ devtool finish <replaceable>recipe layer</replaceable>
                         </literallayout>
                         <note>
                             Any changes you want to turn into patches must be
-                            committed to the Git repository in the source tree.
+                            staged and committed within the local Git
+                            repository before you use the
+                            <filename>devtool finish</filename> command.
                         </note></para>
 
                         <para>Because there is no need to move the recipe,
                         <filename>devtool finish</filename> either updates the
                         original recipe in the original layer or the command
-                        creates a <filename>.bbappend</filename> in a different
-                        layer as provided by <replaceable>layer</replaceable>.
-                        </para>
+                        creates a <filename>.bbappend</filename> file in a
+                        different layer as provided by
+                        <replaceable>layer</replaceable>.</para>
 
                         <para>As a final process of the
                         <filename>devtool finish</filename> command, the state
                         of the standard layers and the upstream source is
                         restored so that you can build the recipe from those
-                        areas rather than the workspace.
+                        areas rather than from the workspace.
                         <note>
                             You can use the <filename>devtool reset</filename>
                             command to put things back should you decide you
@@ -745,22 +807,36 @@
             <title>Use <filename>devtool upgrade</filename> to Create a Version of the Recipe that Supports a Newer Version of the Software</title>
 
             <para>
-                The <filename>devtool upgrade</filename> command updates
-                an existing recipe so that you can build it for an updated
-                set of source files.
-                The command is flexible enough to allow you to specify
-                source code revision and versioning schemes, extract code into
-                or out of the <filename>devtool</filename> workspace, and
-                work with any source file forms that the fetchers support.
+                The <filename>devtool upgrade</filename> command upgrades
+                an existing recipe to that of a more up-to-date version
+                found upstream.
+                Throughout the life of software, recipes continually undergo
+                version upgrades by their upstream publishers.
+                You can use the <filename>devtool upgrade</filename>
+                workflow to make sure your recipes you are using for builds
+                are up-to-date with their upstream counterparts.
+                <note>
+                    Several methods exist by which you can upgrade recipes -
+                    <filename>devtool upgrade</filename> happens to be one.
+                    You can read about all the methods by which you can
+                    upgrade recipes in the
+                    "<ulink url='&YOCTO_DOCS_DEV_URL;#gs-upgrading-recipes'>Upgrading Recipes</ulink>"
+                    section of the Yocto Project Development Tasks Manual.
+                </note>
             </para>
 
             <para>
-                Depending on your particular scenario, the arguments and options
-                you use with <filename>devtool upgrade</filename> form different
-                combinations.
-                The following diagram shows a common development flow
-                you would use with the <filename>devtool modify</filename>
-                command:
+                The <filename>devtool upgrade</filename> command is flexible
+                enough to allow you to specify source code revision and
+                versioning schemes, extract code into or out of the
+                <filename>devtool</filename>
+                <ulink url='&YOCTO_DOCS_REF_URL;#devtool-the-workspace-layer-structure'>workspace</ulink>,
+                and work with any source file forms that the fetchers support.
+            </para>
+
+            <para>
+                The following diagram shows the common development flow
+                used with the <filename>devtool upgrade</filename> command:
             </para>
 
             <para>
@@ -769,110 +845,142 @@
 
             <para>
                 <orderedlist>
-                    <listitem><para><emphasis>Initiate the Upgrade</emphasis>:
-                        The top part of the flow shows a typical scenario by which
-                        you could use <filename>devtool upgrade</filename>.
+                    <listitem><para>
+                        <emphasis>Initiate the Upgrade</emphasis>:
+                        The top part of the flow shows the typical scenario by
+                        which you use the <filename>devtool upgrade</filename>
+                        command.
                         The following conditions exist:
                         <itemizedlist>
-                            <listitem><para>The recipe exists in some layer external
+                            <listitem><para>
+                                The recipe exists in a local layer external
                                 to the <filename>devtool</filename> workspace.
                                 </para></listitem>
-                            <listitem><para>The source files for the new release
-                                exist adjacent to the same location pointed to by
+                            <listitem><para>
+                                The source files for the new release
+                                exist in the same location pointed to by
                                 <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
-                                in the recipe (e.g. a tarball with the new version
-                                number in the name, or as a different revision in
-                                the upstream Git repository).
+                                in the recipe (e.g. a tarball with the new
+                                version number in the name, or as a different
+                                revision in the upstream Git repository).
                                 </para></listitem>
                         </itemizedlist>
                         A common situation is where third-party software has
                         undergone a revision so that it has been upgraded.
-                        The recipe you have access to is likely in your own layer.
+                        The recipe you have access to is likely in your own
+                        layer.
                         Thus, you need to upgrade the recipe to use the
                         newer version of the software:
                         <literallayout class='monospaced'>
      $ devtool upgrade -V <replaceable>version recipe</replaceable>
                         </literallayout>
-                        By default, the <filename>devtool upgrade</filename> command
-                        extracts source code into the <filename>sources</filename>
-                        directory in the workspace.
-                        If you want the code extracted to any other location, you
-                        need to provide the <replaceable>srctree</replaceable>
-                        positional argument with the command as follows:
+                        By default, the <filename>devtool upgrade</filename>
+                        command extracts source code into the
+                        <filename>sources</filename> directory in the
+                        <ulink url='&YOCTO_DOCS_REF_URL;#devtool-the-workspace-layer-structure'>workspace</ulink>.
+                        If you want the code extracted to any other location,
+                        you need to provide the
+                        <replaceable>srctree</replaceable> positional argument
+                        with the command as follows:
                         <literallayout class='monospaced'>
      $ devtool upgrade -V <replaceable>version recipe srctree</replaceable>
                         </literallayout>
-                        Also, in this example, the "-V" option is used to specify
-                        the new version.
+                        <note>
+                            In this example, the "-V" option specifies the new
+                            version.
+                            If you don't use "-V", the command upgrades the
+                            recipe to the latest version.
+                        </note>
                         If the source files pointed to by the
-                        <filename>SRC_URI</filename> statement in the recipe are
-                        in a Git repository, you must provide the "-S" option and
-                        specify a revision for the software.</para>
+                        <filename>SRC_URI</filename> statement in the recipe
+                        are in a Git repository, you must provide the "-S"
+                        option and specify a revision for the software.</para>
 
-                        <para>Once <filename>devtool</filename> locates the recipe,
-                        it uses the <filename>SRC_URI</filename> variable to locate
-                        the source code and any local patch files from other
-                        developers are located.
+                        <para>Once <filename>devtool</filename> locates the
+                        recipe, it uses the <filename>SRC_URI</filename>
+                        variable to locate the source code and any local patch
+                        files from other developers.
                         The result is that the command sets up the source
                         code, the new version of the recipe, and an append file
                         all within the workspace.
                         </para></listitem>
-                    <listitem><para><emphasis>Resolve any Conflicts created by the Upgrade</emphasis>:
-                        At this point, there could be some conflicts due to the
-                        software being upgraded to a new version.
-                        This would occur if your recipe specifies some patch files in
-                        <filename>SRC_URI</filename> that conflict with changes
-                        made in the new version of the software.
-                        If this is the case, you need to resolve the conflicts
+                    <listitem><para>
+                        <emphasis>Resolve any Conflicts created by the Upgrade</emphasis>:
+                        Conflicts could exist due to the software being
+                        upgraded to a new version.
+                        Conflicts occur if your recipe specifies some patch
+                        files in <filename>SRC_URI</filename> that conflict
+                        with changes made in the new version of the software.
+                        For such cases, you need to resolve the conflicts
                         by editing the source and following the normal
                         <filename>git rebase</filename> conflict resolution
                         process.</para>
-                        <para>Before moving onto the next step, be sure to resolve any
-                        such conflicts created through use of a newer or different
-                        version of the software.
+
+                        <para>Before moving onto the next step, be sure to
+                        resolve any such conflicts created through use of a
+                        newer or different version of the software.
                         </para></listitem>
-                    <listitem><para><emphasis>Build the Recipe</emphasis>:
-                        Once you have your recipe in order, you can build it.
-                        You can either use <filename>devtool build</filename> or
-                        <filename>bitbake</filename>.
-                        Either method produces build output that is stored
-                        in
-                        <ulink url='&YOCTO_DOCS_REF_URL;#var-TMPDIR'><filename>TMPDIR</filename></ulink>.
+                    <listitem><para>
+                        <emphasis>Build the Recipe or Rebuild the Image</emphasis>:
+                        The next step you take depends on what you are going
+                        to do with the new code.</para>
+
+                        <para>If you need to eventually move the build output
+                        to the target hardware, use the following
+                        <filename>devtool</filename> command:
+                        <literallayout class='monospaced'>
+     $ devtool build <replaceable>recipe</replaceable>
+                        </literallayout></para>
+
+                        <para>On the other hand, if you want an image to
+                        contain the recipe's packages from the workspace
+                        for immediate deployment onto a device (e.g. for
+                        testing purposes), you can use
+                        the <filename>devtool build-image</filename> command:
+                        <literallayout class='monospaced'>
+     $ devtool build-image <replaceable>image</replaceable>
+                        </literallayout>
                         </para></listitem>
-                    <listitem><para><emphasis>Deploy the Build Output</emphasis>:
+                    <listitem><para>
+                        <emphasis>Deploy the Build Output</emphasis>:
                         When you use the <filename>devtool build</filename>
-                        command or <filename>bitbake</filename> to build out your
-                        recipe, you probably want to see if the resulting build
-                        output works as expected on target hardware.
+                        command or <filename>bitbake</filename> to build
+                        your recipe, you probably want to see if the resulting
+                        build output works as expected on target hardware.
                         <note>
                             This step assumes you have a previously built
                             image that is already either running in QEMU or
                             running on actual hardware.
-                            Also, it is assumed that for deployment of the image
-                            to the target, SSH is installed in the image and if
-                            the image is running on real hardware that you have
-                            network access to and from your development machine.
+                            Also, it is assumed that for deployment of the
+                            image to the target, SSH is installed in the image
+                            and if the image is running on real hardware that
+                            you have network access to and from your
+                            development machine.
                         </note>
-                        You can deploy your build output to that target hardware by
-                        using the <filename>devtool deploy-target</filename> command:
+                        You can deploy your build output to that target
+                        hardware by using the
+                        <filename>devtool deploy-target</filename> command:
                         <literallayout class='monospaced'>
      $ devtool deploy-target <replaceable>recipe target</replaceable>
                         </literallayout>
-                        The <replaceable>target</replaceable> is a live target machine
-                        running as an SSH server.</para>
-                        <para>You can, of course, also deploy the image you build
-                        using the <filename>devtool build-image</filename> command
+                        The <replaceable>target</replaceable> is a live target
+                        machine running as an SSH server.</para>
+
+                        <para>You can, of course, also deploy the image you
+                        build using the
+                        <filename>devtool build-image</filename> command
                         to actual hardware.
-                        However, <filename>devtool</filename> does not provide a
-                        specific command that allows you to do this.
+                        However, <filename>devtool</filename> does not provide
+                        a specific command that allows you to do this.
                         </para></listitem>
                     <listitem><para>
                         <emphasis>Finish Your Work With the Recipe</emphasis>:
                         The <filename>devtool finish</filename> command creates
                         any patches corresponding to commits in the local
-                        Git repository, moves the new recipe to a more permanent
-                        layer, and then resets the recipe so that the recipe is
-                        built normally rather than from the workspace.
+                        Git repository, moves the new recipe to a more
+                        permanent layer, and then resets the recipe so that
+                        the recipe is built normally rather than from the
+                        workspace.
                         If you specify a destination layer that is the same as
                         the original source, then the old version of the
                         recipe and associated files will be removed prior to
@@ -884,6 +992,7 @@
                             Any changes you want to turn into patches must be
                             committed to the Git repository in the source tree.
                         </note></para>
+
                         <para>As a final process of the
                         <filename>devtool finish</filename> command, the state
                         of the standard layers and the upstream source is
@@ -906,8 +1015,8 @@
         <title>A Closer Look at <filename>devtool add</filename></title>
 
         <para>
-            The <filename>devtool add</filename> command automatically creates a
-            recipe based on the source tree with which you provide it.
+            The <filename>devtool add</filename> command automatically creates
+            a recipe based on the source tree you provide with the command.
             Currently, the command has support for the following:
             <itemizedlist>
                 <listitem><para>
@@ -953,8 +1062,8 @@
                 In most cases, you need to edit the automatically generated
                 recipe in order to make it build properly.
                 Typically, you would go through several edit and build cycles
-                until you can build the recipe.
-                Once the recipe can be built, you could use possible further
+                until the recipe successfully builds.
+                Once the recipe builds, you could use possible further
                 iterations to test the recipe on the target device.
             </note>
         </para>
@@ -969,15 +1078,19 @@
 
             <para>
                 If you do not specify a name and version on the command
-                line, <filename>devtool add</filename> attempts to determine
-                the name and version of the software being built from
-                various metadata within the source tree.
-                Furthermore, the command sets the name of the created recipe
-                file accordingly.
-                If the name or version cannot be determined, the
-                <filename>devtool add</filename> command prints an error and
-                you must re-run the command with both the name and version
-                or just the name or version specified.
+                line, <filename>devtool add</filename> uses various metadata
+                within the source tree in an attempt to determine
+                the name and version of the software being built.
+                Based on what the tool determines, <filename>devtool</filename>
+                sets the name of the created recipe file accordingly.
+            </para>
+
+            <para>
+                If <filename>devtool</filename> cannot determine the name and
+                version, the command prints an error.
+                For such cases, you must re-run the command and provide
+                the name and version, just the name, or just the version as
+                part of the command line.
             </para>
 
             <para>
@@ -1001,26 +1114,27 @@
                 detect build-time dependencies and map them to other recipes
                 in the system.
                 During this mapping, the command fills in the names of those
-                recipes in the
+                recipes as part of the
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-DEPENDS'><filename>DEPENDS</filename></ulink>
-                value within the recipe.
-                If a dependency cannot be mapped, then a comment is placed in
-                the recipe indicating such.
-                The inability to map a dependency might be caused because the
-                naming is not recognized or because the dependency simply is
-                not available.
+                variable within the recipe.
+                If a dependency cannot be mapped, <filename>devtool</filename>
+                places a comment in the recipe indicating such.
+                The inability to map a dependency can result from naming not
+                being recognized or because the dependency simply is not
+                available.
                 For cases where the dependency is not available, you must use
                 the <filename>devtool add</filename> command to add an
-                additional recipe to satisfy the dependency and then come
-                back to the first recipe and add its name to
-                <filename>DEPENDS</filename>.
+                additional recipe that satisfies the dependency.
+                Once you add that recipe, you need to update the
+                <filename>DEPENDS</filename> variable in the original recipe
+                to include the new recipe.
             </para>
 
             <para>
                 If you need to add runtime dependencies, you can do so by
                 adding the following to your recipe:
                 <literallayout class='monospaced'>
-     RDEPENDS_${PN} += "dependency1 dependency2 ..."
+     RDEPENDS_${PN} += "<replaceable>dependency1 dependency2 ...</replaceable>"
                 </literallayout>
                 <note>
                     The <filename>devtool add</filename> command often cannot
@@ -1031,7 +1145,7 @@
                     script for the software the recipe is building for further
                     details.
                     In some cases, you might find you can substitute the
-                    dependency for an option to disable the associated
+                    dependency with an option that disables the associated
                     functionality passed to the configure script.
                 </note>
             </para>
@@ -1043,20 +1157,24 @@
             <para>
                 The <filename>devtool add</filename> command attempts to
                 determine if the software you are adding is able to be
-                distributed under a common open-source license and sets the
+                distributed under a common, open-source license.
+                If so, the command sets the
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-LICENSE'><filename>LICENSE</filename></ulink>
                 value accordingly.
-                You should double-check this value against the documentation
-                or source files for the software you are building and update
-                that <filename>LICENSE</filename> value if necessary.
+                You should double-check the value added by the command against
+                the documentation or source files for the software you are
+                building and, if necessary, update that
+                <filename>LICENSE</filename> value.
             </para>
 
             <para>
                 The <filename>devtool add</filename> command also sets the
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-LIC_FILES_CHKSUM'><filename>LIC_FILES_CHKSUM</filename></ulink>
                 value to point to all files that appear to be license-related.
-                However, license statements often appear in comments at the top
-                of source files or within documentation.
+                Realize that license statements often appear in comments at
+                the top of source files or within the documentation.
+                In such cases, the command does not recognize those license
+                statements.
                 Consequently, you might need to amend the
                 <filename>LIC_FILES_CHKSUM</filename> variable to point to one
                 or more of those comments if present.
@@ -1070,14 +1188,13 @@
 
             <para>
                 If the <filename>devtool add</filename> command cannot
-                determine licensing information, the
-                <filename>LICENSE</filename> value is set to "CLOSED" and the
-                <filename>LIC_FILES_CHKSUM</filename> value remains unset.
-                This behavior allows you to continue with development but is
-                unlikely to be correct in all cases.
-                Consequently, you should check the documentation or source
-                files for the software you are building to determine the actual
-                license.
+                determine licensing information, <filename>devtool</filename>
+                sets the <filename>LICENSE</filename> value to "CLOSED" and
+                leaves the <filename>LIC_FILES_CHKSUM</filename> value unset.
+                This behavior allows you to continue with development even
+                though the settings are unlikely to be correct in all cases.
+                You should check the documentation or source files for the
+                software you are building to determine the actual license.
             </para>
         </section>
 
@@ -1085,8 +1202,8 @@
             <title>Adding Makefile-Only Software</title>
 
             <para>
-                The use of <filename>make</filename> by itself is very common
-                in both proprietary and open source software.
+                The use of Make by itself is very common in both proprietary
+                and open-source software.
                 Unfortunately, Makefiles are often not written with
                 cross-compilation in mind.
                 Thus, <filename>devtool add</filename> often cannot do very
@@ -1099,7 +1216,7 @@
                 <filename>gcc</filename> is the compiler for the build host
                 and the cross-compiler is named something similar to
                 <filename>arm-poky-linux-gnueabi-gcc</filename> and might
-                require some arguments (e.g. to point to the associated sysroot
+                require arguments (e.g. to point to the associated sysroot
                 for the target machine).
             </para>
 
@@ -1114,18 +1231,17 @@
                         <filename>g++</filename>.
                         </para></listitem>
                     <listitem><para>
-                        The environment in which <filename>make</filename> runs
-                        is set up with various standard variables for
-                        compilation (e.g. <filename>CC</filename>,
-                        <filename>CXX</filename>, and so forth) in a similar
-                        manner to the environment set up by the SDK's
-                        environment setup script.
+                        The environment in which Make runs is set up with
+                        various standard variables for compilation (e.g.
+                        <filename>CC</filename>, <filename>CXX</filename>, and
+                        so forth) in a similar manner to the environment set
+                        up by the SDK's environment setup script.
                         One easy way to see these variables is to run the
                         <filename>devtool build</filename> command on the
                         recipe and then look in
                         <filename>oe-logs/run.do_compile</filename>.
-                        Towards the top of this file you will see a list of
-                        environment variables that are being set.
+                        Towards the top of this file, a list of environment
+                        variables exists that are being set.
                         You can take advantage of these variables within the
                         Makefile.
                         </para></listitem>
@@ -1133,7 +1249,7 @@
                         If the Makefile sets a default for a variable using "=",
                         that default overrides the value set in the environment,
                         which is usually not desirable.
-                        In this situation, you can either patch the Makefile
+                        For this case, you can either patch the Makefile
                         so it sets the default using the "?=" operator, or
                         you can alternatively force the value on the
                         <filename>make</filename> command line.
@@ -1158,16 +1274,17 @@
                         This is particularly true because those hardcoded paths
                         often point to locations on the build host and thus
                         will either be read-only or will introduce
-                        contamination into the cross-compilation by virtue of
-                        being specific to the build host rather than the target.
+                        contamination into the cross-compilation because they
+                        are specific to the build host rather than the target.
                         Patching the Makefile to use prefix variables or other
-                        path variables is usually the way to handle this.
+                        path variables is usually the way to handle this
+                        situation.
                         </para></listitem>
                     <listitem><para>
                         Sometimes a Makefile runs target-specific commands such
                         as <filename>ldconfig</filename>.
-                        For such cases, you might be able to simply apply
-                        patches that remove these commands from the Makefile.
+                        For such cases, you might be able to apply patches that
+                        remove these commands from the Makefile.
                         </para></listitem>
                 </itemizedlist>
             </para>
@@ -1178,9 +1295,11 @@
 
             <para>
                 Often, you need to build additional tools that run on the
-                build host system as opposed to the target.
-                You should indicate this using one of the following methods
-                when you run <filename>devtool add</filename>:
+                <ulink url='&YOCTO_DOCS_REF_URL;#hardware-build-system-term'>build host</ulink>
+                as opposed to the target.
+                You should indicate this requirement by using one of the
+                following methods when you run
+                <filename>devtool add</filename>:
                 <itemizedlist>
                     <listitem><para>
                         Specify the name of the recipe such that it ends
@@ -1202,8 +1321,8 @@
                     typically accomplish this by building the native and target
                     parts separately rather than within the same compilation
                     process.
-                    Realize though that with the "&dash;&dash;also-native" option, you
-                    can add the tool using just one recipe file.
+                    Realize though that with the "&dash;&dash;also-native"
+                    option, you can add the tool using just one recipe file.
                 </note>
             </para>
         </section>
@@ -1244,11 +1363,9 @@
                             found" errors.
                             </para></listitem>
                         <listitem><para>
-                            In order to support adding
-                            Node.js modules, a
-                            <filename>nodejs</filename> recipe must be part of your
-                            SDK in order to provide Node.js
-                            itself.
+                            In order to support adding Node.js modules, a
+                            <filename>nodejs</filename> recipe must be part
+                            of your SDK.
                             </para></listitem>
                     </itemizedlist>
                 </note>
@@ -1257,14 +1374,15 @@
             <para>
                 As mentioned earlier, you can also add Node.js modules
                 directly from a repository or local source tree.
-                To add modules this way, use <filename>devtool add</filename> in
-                the following form:
+                To add modules this way, use <filename>devtool add</filename>
+                in the following form:
                 <literallayout class='monospaced'>
      $ devtool add https://github.com/diversario/node-ssdp
                 </literallayout>
-                In this example, <filename>devtool</filename> fetches the specified
-                Git repository, detects that the code is Node.js code, fetches
-                dependencies using <filename>npm</filename>, and sets
+                In this example, <filename>devtool</filename> fetches the
+                specified Git repository, detects the code as Node.js
+                code, fetches dependencies using <filename>npm</filename>, and
+                sets
                 <ulink url='&YOCTO_DOCS_REF_URL;#var-SRC_URI'><filename>SRC_URI</filename></ulink>
                 accordingly.
             </para>
@@ -1275,8 +1393,9 @@
         <title>Working With Recipes</title>
 
         <para>
-            When building a recipe with <filename>devtool build</filename>, the
-            typical build progression is as follows:
+            When building a recipe using the
+            <filename>devtool build</filename> command, the typical build
+            progresses as follows:
             <orderedlist>
                 <listitem><para>
                     Fetch the source
@@ -1288,7 +1407,7 @@
                     Configure the source
                     </para></listitem>
                 <listitem><para>
-                    Compiling the source
+                    Compile the source
                     </para></listitem>
                 <listitem><para>
                     Install the build output
@@ -1299,10 +1418,13 @@
             </orderedlist>
             For recipes in the workspace, fetching and unpacking is disabled
             as the source tree has already been prepared and is persistent.
-            Each of these build steps is defined as a function, usually with a
-            "do_" prefix.
-            These functions are typically shell scripts but can instead be written
-            in Python.
+            Each of these build steps is defined as a function (task), usually
+            with a "do_" prefix (e.g.
+            <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-fetch'><filename>do_fetch</filename></ulink>,
+            <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-unpack'><filename>do_unpack</filename></ulink>,
+            and so forth).
+            These functions are typically shell scripts but can instead be
+            written in Python.
         </para>
 
         <para>
@@ -1310,12 +1432,13 @@
             recipe does not include complete instructions for building the
             software.
             Instead, common functionality is encapsulated in classes inherited
-            with the <filename>inherit</filename> directive, leaving the recipe
-            to describe just the things that are specific to the software to be
-            built.
-            A <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-base'><filename>base</filename></ulink>
-            class exists that is implicitly inherited by all recipes and provides
-            the functionality that most typical recipes need.
+            with the <filename>inherit</filename> directive.
+            This technique leaves the recipe to describe just the things that
+            are specific to the software being built.
+            A
+            <ulink url='&YOCTO_DOCS_REF_URL;#ref-classes-base'><filename>base</filename></ulink>
+            class exists that is implicitly inherited by all recipes and
+            provides the functionality that most recipes typically need.
         </para>
 
         <para>
@@ -1327,46 +1450,57 @@
             <title>Finding Logs and Work Files</title>
 
             <para>
-                When you are debugging a recipe that you previously created using
-                <filename>devtool add</filename> or whose source you are modifying
-                by using the <filename>devtool modify</filename> command, after
-                the first run of <filename>devtool build</filename>, you will
-                find some symbolic links created within the source tree:
-                <filename>oe-logs</filename>, which points to the directory in
-                which log files and run scripts for each build step are created
-                and <filename>oe-workdir</filename>, which points to the temporary
-                work area for the recipe.
-                You can use these links to get more information on what is
-                happening at each build step.
-            </para>
-
-            <para>
-                These locations under <filename>oe-workdir</filename> are
-                particularly useful:
+                After the first run of the <filename>devtool build</filename>
+                command, recipes that were previously created using the
+                <filename>devtool add</filename> command or whose sources were
+                modified using the <filename>devtool modify</filename>
+                command contain symbolic links created within the source tree:
                 <itemizedlist>
-                    <listitem><para><filename>image/</filename>:
-                        Contains all of the files installed at the
-                        <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-install'><filename>do_install</filename></ulink>
-                        stage.
-                        Within a recipe, this directory is referred to by the
-                        expression
-                        <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-D'><filename>D</filename></ulink><filename>}</filename>.
+                    <listitem><para>
+                        <filename>oe-logs</filename>:
+                        This link points to the directory in which log files
+                        and run scripts for each build step are created.
                         </para></listitem>
-                    <listitem><para><filename>sysroot-destdir/</filename>:
-                        Contains a subset of files installed within
-                        <filename>do_install</filename> that have been put into the
-                        shared sysroot.
-                        For more information, see the
-                        "<link linkend='sdk-sharing-files-between-recipes'>Sharing Files Between Recipes</link>"
-                        section.
-                        </para></listitem>
-                    <listitem><para><filename>packages-split/</filename>:
-                        Contains subdirectories for each package produced by the
+                    <listitem><para>
+                        <filename>oe-workdir</filename>:
+                        This link points to the temporary work area for the
                         recipe.
-                        For more information, see the
-                        "<link linkend='sdk-packaging'>Packaging</link>" section.
+                        The following locations under
+                        <filename>oe-workdir</filename> are particularly
+                        useful:
+                            <itemizedlist>
+                                <listitem><para>
+                                    <filename>image/</filename>:
+                                    Contains all of the files installed during
+                                    the
+                                    <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-install'><filename>do_install</filename></ulink>
+                                    stage.
+                                    Within a recipe, this directory is referred
+                                    to by the expression
+                                    <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-D'><filename>D</filename></ulink><filename>}</filename>.
+                                    </para></listitem>
+                                <listitem><para>
+                                    <filename>sysroot-destdir/</filename>:
+                                    Contains a subset of files installed within
+                                    <filename>do_install</filename> that have
+                                    been put into the shared sysroot.
+                                    For more information, see the
+                                    "<link linkend='sdk-sharing-files-between-recipes'>Sharing Files Between Recipes</link>"
+                                    section.
+                                    </para></listitem>
+                                <listitem><para>
+                                    <filename>packages-split/</filename>:
+                                    Contains subdirectories for each package
+                                    produced by the recipe.
+                                    For more information, see the
+                                    "<link linkend='sdk-packaging'>Packaging</link>"
+                                    section.
+                                    </para></listitem>
+                            </itemizedlist>
                         </para></listitem>
                 </itemizedlist>
+                You can use these links to get more information on what is
+                happening at each build step.
             </para>
         </section>
 
@@ -1413,12 +1547,14 @@
 
             <para>
                 Recipes often need to use files provided by other recipes on
-                the build host.
+                the
+                <ulink url='&YOCTO_DOCS_REF_URL;#hardware-build-system-term'>build host</ulink>.
                 For example, an application linking to a common library needs
                 access to the library itself and its associated headers.
                 The way this access is accomplished within the extensible SDK is
                 through the sysroot.
-                One sysroot exists per "machine" for which the SDK is being built.
+                One sysroot exists per "machine" for which the SDK is being
+                built.
                 In practical terms, this means a sysroot exists for the target
                 machine, and a sysroot exists for the build host.
             </para>
@@ -1431,7 +1567,7 @@
                 task within the
                 <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-D'><filename>D</filename></ulink><filename>}</filename>
                 directory.
-                A subset of these files automatically go into the sysroot.
+                A subset of these files automatically goes into the sysroot.
                 The reason for this limitation is that almost all files that go
                 into the sysroot are cataloged in manifests in order to ensure
                 they can be removed later when a recipe is modified or removed.
@@ -1456,20 +1592,20 @@
                 <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-package'><filename>do_package</filename></ulink>
                 task, files installed during the
                 <ulink url='&YOCTO_DOCS_REF_URL;#ref-tasks-install'><filename>do_install</filename></ulink>
-                task are split into one main package, which is almost always named
-                the same as the recipe, and several other packages.
-                This separation is done because not all of those installed files
-                are always useful in every image.
+                task are split into one main package, which is almost always
+                named the same as the recipe, and into several other packages.
+                This separation exists because not all of those installed files
+                are useful in every image.
                 For example, you probably do not need any of the documentation
                 installed in a production image.
-                Consequently, for each recipe the documentation files are separated
-                into a <filename>-doc</filename> package.
-                Recipes that package software that has optional modules or
-                plugins might do additional package splitting as well.
+                Consequently, for each recipe the documentation files are
+                separated into a <filename>-doc</filename> package.
+                Recipes that package software containing optional modules or
+                plugins might undergo additional package splitting as well.
             </para>
 
             <para>
-                After building a recipe you can see where files have gone by
+                After building a recipe, you can see where files have gone by
                 looking in the <filename>oe-workdir/packages-split</filename>
                 directory, which contains a subdirectory for each package.
                 Apart from some advanced cases, the
@@ -1479,17 +1615,18 @@
                 variables controls splitting.
                 The <filename>PACKAGES</filename> variable lists all of the
                 packages to be produced, while the <filename>FILES</filename>
-                variable specifies which files to include in each package,
+                variable specifies which files to include in each package by
                 using an override to specify the package.
-                For example, <filename>FILES_${PN}</filename> specifies the files
-                to go into the main package (i.e. the main package is named the
-                same as the recipe and
+                For example, <filename>FILES_${PN}</filename> specifies the
+                files to go into the main package (i.e. the main package has
+                the same name as the recipe and
                 <filename>${</filename><ulink url='&YOCTO_DOCS_REF_URL;#var-PN'><filename>PN</filename></ulink><filename>}</filename>
                 evaluates to the recipe name).
-                The order of the <filename>PACKAGES</filename> value is significant.
+                The order of the <filename>PACKAGES</filename> value is
+                significant.
                 For each installed file, the first package whose
-                <filename>FILES</filename> value matches the file is the package
-                into which the file goes.
+                <filename>FILES</filename> value matches the file is the
+                package into which the file goes.
                 Defaults exist for both the <filename>PACKAGES</filename> and
                 <filename>FILES</filename> variables.
                 Consequently, you might find you do not even need to set these
@@ -1511,29 +1648,29 @@
             <filename>devtool deploy-target</filename> command.
             Because the <filename>devtool deploy-target</filename> command
             backs up any files it overwrites, you can use the
-            <filename>devtool undeploy-target</filename> to restore those files
-            and remove any other files the recipe deployed.
+            <filename>devtool undeploy-target</filename> command to restore
+            those files and remove any other files the recipe deployed.
             Consider the following example:
             <literallayout class='monospaced'>
      $ devtool undeploy-target lighttpd root@192.168.7.2
             </literallayout>
             If you have deployed multiple applications, you can remove them
-            all at once thus restoring the target device back to its
+            all using the "-a" option thus restoring the target device to its
             original state:
             <literallayout class='monospaced'>
      $ devtool undeploy-target -a root@192.168.7.2
             </literallayout>
             Information about files deployed to the target as well as any
             backed up files are stored on the target itself.
-            This storage of course requires some additional space
+            This storage, of course, requires some additional space
             on the target machine.
             <note>
                 The <filename>devtool deploy-target</filename> and
-                <filename>devtool undeploy-target</filename> command do not
+                <filename>devtool undeploy-target</filename> commands do not
                 currently interact with any package management system on the
                 target device (e.g. RPM or OPKG).
-                Consequently, you should not intermingle operations
-                <filename>devtool deploy-target</filename> and the package
+                Consequently, you should not intermingle
+                <filename>devtool deploy-target</filename> and package
                 manager operations on the target device.
                 Doing so could result in a conflicting set of files.
             </note>
@@ -1544,16 +1681,14 @@
         <title>Installing Additional Items Into the Extensible SDK</title>
 
         <para>
-            The extensible SDK typically only comes with a small number of tools
-            and libraries out of the box.
-            If you have a minimal SDK, then it starts mostly empty and is
-            populated on-demand.
-            However, sometimes you will need to explicitly install extra items
-            into the SDK.
+            Out of the box the extensible SDK typically only comes with a small
+            number of tools and libraries.
+            A minimal SDK starts mostly empty and is populated on-demand.
+            Sometimes you must explicitly install extra items into the SDK.
             If you need these extra items, you can first search for the items
             using the <filename>devtool search</filename> command.
             For example, suppose you need to link to libGL but you are not sure
-            which recipe provides it.
+            which recipe provides libGL.
             You can use the following command to find out:
             <literallayout class='monospaced'>
      $ devtool search libGL
@@ -1564,17 +1699,19 @@
             <literallayout class='monospaced'>
      $ devtool sdk-install mesa
             </literallayout>
-            By default, the <filename>devtool sdk-install</filename> assumes the
-            item is available in pre-built form from your SDK provider.
+            By default, the <filename>devtool sdk-install</filename> command
+            assumes the item is available in pre-built form from your SDK
+            provider.
             If the item is not available and it is acceptable to build the item
             from source, you can add the "-s" option as follows:
             <literallayout class='monospaced'>
      $ devtool sdk-install -s mesa
             </literallayout>
-            It is important to remember that building the item from source takes
-            significantly longer than installing the pre-built artifact.
-            Also, if no recipe exists for the item you want to add to the SDK, you
-            must instead add it using the <filename>devtool add</filename> command.
+            It is important to remember that building the item from source
+            takes significantly longer than installing the pre-built artifact.
+            Also, if no recipe exists for the item you want to add to the SDK,
+            you must instead add the item using the
+            <filename>devtool add</filename> command.
         </para>
     </section>
 
@@ -1612,31 +1749,34 @@
 
         <para>
             You might need to produce an SDK that contains your own custom
-            libraries for sending to a third party (e.g., if you are a vendor with
-            customers needing to build their own software for the target platform).
-            If that is the case, then you can produce a derivative SDK based on
-            the currently installed SDK fairly easily.
-            Use these steps:
+            libraries.
+            A good example would be if you were a vendor with customers that
+            use your SDK to build their own platform-specific software and
+            those customers need an SDK that has custom libraries.
+            In such a case, you can produce a derivative SDK based on the
+            currently installed SDK fairly easily by following these steps:
             <orderedlist>
-                <listitem><para>If necessary, install an extensible SDK that
+                <listitem><para>
+                    If necessary, install an extensible SDK that
                     you want to use as a base for your derivative SDK.
                     </para></listitem>
-                <listitem><para>Source the environment script for the SDK.
+                <listitem><para>
+                    Source the environment script for the SDK.
                     </para></listitem>
-                <listitem><para>Add the extra libraries or other components
-                    you want by using the <filename>devtool add</filename>
-                    command.
+                <listitem><para>
+                    Add the extra libraries or other components you want by
+                    using the <filename>devtool add</filename> command.
                     </para></listitem>
-                <listitem><para>Run the <filename>devtool build-sdk</filename>
-                    command.
+                <listitem><para>
+                    Run the <filename>devtool build-sdk</filename> command.
                     </para></listitem>
             </orderedlist>
-            The above procedure takes the recipes added to the workspace and
-            constructs a new SDK installer containing those recipes and the
+            The previous steps take the recipes added to the workspace and
+            construct a new SDK installer that contains those recipes and the
             resulting binary artifacts.
             The recipes go into their own separate layer in the constructed
-            derivative SDK, leaving the workspace clean and ready for users
-            to add their own recipes.
+            derivative SDK, which leaves the workspace clean and ready for
+            users to add their own recipes.
         </para>
     </section>
 </chapter>

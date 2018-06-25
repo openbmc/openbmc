@@ -16,7 +16,7 @@ LICENSE_FLAGS = "commercial"
 
 SRC_URI = " \
     https://github.com/mpv-player/mpv/archive/v${PV}.tar.gz;name=mpv \
-    http://www.freehackers.org/~tnagy/release/waf-1.8.12;name=waf;subdir=${BPN}-${PV} \
+    http://www.freehackers.org/~tnagy/release/waf-1.8.12;name=waf;downloadfilename=waf;subdir=${BPN}-${PV} \
 "
 SRC_URI[mpv.md5sum] = "038d0b660de07ff645ad6a741704ecab"
 SRC_URI[mpv.sha256sum] = "daf3ef358d5f260f2269f7caabce27f446c291457ec330077152127133b71b46"
@@ -64,9 +64,10 @@ EXTRA_OECONF = " \
     ${PACKAGECONFIG_CONFARGS} \
 "
 
-do_configure_prepend () {
-    ln -sf waf-1.8.12 ${S}/waf
+adjust_waf_perms() {
     chmod +x ${S}/waf
 }
+
+do_patch[postfuncs] += "adjust_waf_perms"
 
 FILES_${PN} += "${datadir}/icons"

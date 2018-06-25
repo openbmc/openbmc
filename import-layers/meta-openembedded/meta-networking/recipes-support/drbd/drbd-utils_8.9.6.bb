@@ -8,7 +8,7 @@ SECTION = "admin"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5574c6965ae5f583e55880e397fbb018"
 
-SRC_URI = "http://oss.linbit.com/drbd/${BP}.tar.gz \
+SRC_URI = "http://www.linbit.com/downloads/drbd/utils/archive/${BP}.tar.gz \
            file://0001-Makefile.in-fix-permission-bits-for-drbd.service.patch \
           "
 SRC_URI[md5sum] = "76ed6d3190cd77b00890f3365353124b"

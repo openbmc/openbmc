@@ -11,6 +11,8 @@ PACKAGES =. "${PN}-test "
 
 RPROVIDES_${PN} += "zope-interfaces"
 
+RDEPENDS_${PN}_class-target += "${PYTHON_PN}-datetime"
+
 FILES_${PN}-dbg += "${PYTHON_SITEPACKAGES_DIR}/*.egg/*/*/.debug"
 FILES_${PN}-dev += "${PYTHON_SITEPACKAGES_DIR}/zope/interface/*.c"
 FILES_${PN}-doc += "${PYTHON_SITEPACKAGES_DIR}/zope/interface/*.txt"

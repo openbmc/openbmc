@@ -8,11 +8,8 @@
 #
 DEFAULTTUNE ?= "core2-32"
 
-# Set x86 target arch to i686, so that glibc enables SSE optimised memcpy, etc.
-X86ARCH32 ?= "i686"
-
 # Include the previous tune to pull in PACKAGE_EXTRA_ARCHS
-require conf/machine/include/tune-i586.inc
+require conf/machine/include/tune-i686.inc
 
 # Extra tune features
 TUNEVALID[core2] = "Enable core2 specific processor optimizations"
@@ -23,16 +20,19 @@ AVAILTUNES += "core2-32"
 TUNE_FEATURES_tune-core2-32 = "${TUNE_FEATURES_tune-x86} core2"
 BASE_LIB_tune-core2-32 = "lib"
 TUNE_PKGARCH_tune-core2-32 = "core2-32"
-PACKAGE_EXTRA_ARCHS_tune-core2-32 = "${PACKAGE_EXTRA_ARCHS_tune-i586} core2-32"
+PACKAGE_EXTRA_ARCHS_tune-core2-32 = "${PACKAGE_EXTRA_ARCHS_tune-i686} core2-32"
+QEMU_EXTRAOPTIONS_core2-32 = " -cpu core2duo"
 
 AVAILTUNES += "core2-64"
 TUNE_FEATURES_tune-core2-64 = "${TUNE_FEATURES_tune-x86-64} core2"
 BASE_LIB_tune-core2-64 = "lib64"
 TUNE_PKGARCH_tune-core2-64 = "core2-64"
 PACKAGE_EXTRA_ARCHS_tune-core2-64 = "${PACKAGE_EXTRA_ARCHS_tune-x86-64} core2-64"
+QEMU_EXTRAOPTIONS_core2-64 = " -cpu core2duo"
 
 AVAILTUNES += "core2-64-x32"
 TUNE_FEATURES_tune-core2-64-x32 = "${TUNE_FEATURES_tune-x86-64-x32} core2"
 BASE_LIB_tune-core2-64-x32 = "libx32"
 TUNE_PKGARCH_tune-core2-64-x32 = "core2-64-x32"
 PACKAGE_EXTRA_ARCHS_tune-core2-64-x32 = "${PACKAGE_EXTRA_ARCHS_tune-x86-64-x32} core2-64-x32"
+QEMU_EXTRAOPTIONS_core2-64-x32 = " -cpu core2duo"

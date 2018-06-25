@@ -16,15 +16,17 @@ PACKAGE_WRITE_DEPS += "openssl-native debianutils-native"
 
 SRCREV = "34b8e19e541b8af4076616b2e170c7a70cdaded0"
 
-SRC_URI = "git://anonscm.debian.org/collab-maint/ca-certificates.git \
+SRC_URI = "git://salsa.debian.org/debian/ca-certificates.git;protocol=https \
            file://0002-update-ca-certificates-use-SYSROOT.patch \
            file://0001-update-ca-certificates-don-t-use-Debianisms-in-run-p.patch \
            file://update-ca-certificates-support-Toybox.patch \
            file://default-sysroot.patch \
-           file://sbindir.patch"
+           file://sbindir.patch \
+           file://0003-update-ca-certificates-use-relative-symlinks-from-ET.patch \
+           "
 
 S = "${WORKDIR}/git"
-SYSROOT_DIRS_class-native += "/etc"
+SYSROOT_DIRS_class-native += "${sysconfdir} ${datadir}/ca-certificates"
 
 inherit allarch
 

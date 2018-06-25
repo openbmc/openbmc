@@ -1,4 +1,4 @@
-From a0c0f32299419359b44ac0f880c1ea9073ae51e1 Mon Sep 17 00:00:00 2001
+From 1d1fa95c8ff7697e46343385a79a8f7e5c514a87 Mon Sep 17 00:00:00 2001
 From: Zheng Xu <zheng.xu@linaro.org>
 Date: Fri, 2 Sep 2016 17:40:05 +0800
 Subject: [PATCH] Bug 1143022 - Manually mmap on arm64 to ensure high 17 bits
@@ -16,11 +16,11 @@ Upstream-status: Backport
  1 file changed, 71 insertions(+), 2 deletions(-)
 
 diff --git a/js/src/gc/Memory.cpp b/js/src/gc/Memory.cpp
-index 5b386a2..38101cf 100644
+index e5ad018..4149adf 100644
 --- a/js/src/gc/Memory.cpp
 +++ b/js/src/gc/Memory.cpp
-@@ -306,6 +306,75 @@ InitMemorySubsystem()
-         MOZ_CRASH();
+@@ -309,6 +309,75 @@ InitMemorySubsystem()
+ #endif
  }
  
 +static inline void *
@@ -95,7 +95,7 @@ index 5b386a2..38101cf 100644
  void *
  MapAlignedPages(size_t size, size_t alignment)
  {
-@@ -319,12 +388,12 @@ MapAlignedPages(size_t size, size_t alignment)
+@@ -322,12 +391,12 @@ MapAlignedPages(size_t size, size_t alignment)
  
      /* Special case: If we want page alignment, no further work is needed. */
      if (alignment == PageSize) {
@@ -110,6 +110,3 @@ index 5b386a2..38101cf 100644
      if (region == MAP_FAILED)
          return NULL;
  
--- 
-1.9.1
-

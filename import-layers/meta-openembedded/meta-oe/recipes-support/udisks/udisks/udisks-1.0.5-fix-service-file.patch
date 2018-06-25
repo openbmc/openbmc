@@ -1,4 +1,4 @@
-From 7d61ad048856ee239870b917d6933e3ad63f0789 Mon Sep 17 00:00:00 2001
+From a4f6aa5be37ae6e2194c9ded2ea8c1da330f5694 Mon Sep 17 00:00:00 2001
 From: David King <amigadave@amigadave.com>
 Date: Thu, 2 Jul 2015 13:49:22 +0100
 Subject: [PATCH] Fix systemd service file
@@ -12,6 +12,7 @@ Taken-From: [1]
 [1] http://pkgs.fedoraproject.org/cgit/udisks.git/tree/udisks-1.0.5-fix-service-file.patch
 
 Upstream-Status: Pending
+
 ---
  data/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -29,5 +30,3 @@ index 411ea0f..08af5f4 100644
  endif
  
  udevrulesdir = $(slashlibdir)/udev/rules.d
--- 
-2.4.5

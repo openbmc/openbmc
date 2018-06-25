@@ -11,6 +11,7 @@ python () {
 }
 
 DEPENDS = " \
+    fribidi \
     geany \
     libxml2 \
     libsoup-2.4 \
@@ -22,7 +23,9 @@ DEPENDS = " \
     libgit2 \
 "
 
-inherit autotools pkgconfig gtk-icon-cache
+inherit distro_features_check autotools pkgconfig gtk-icon-cache
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "http://plugins.geany.org/${PN}/${PN}-${PV}.tar.bz2"
 SRC_URI[md5sum] = "808f9048b77fd9704569ed2ba12a56e9"

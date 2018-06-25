@@ -1,4 +1,4 @@
-From bd58d3672bc267824000f34a37561c7ab2bd571f Mon Sep 17 00:00:00 2001
+From 9bcec221a2bb438d8a9ed59aed846ffe3be9cffa Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Tue, 19 Jul 2016 01:56:23 -0400
 Subject: [PATCH] squid: use serial-tests config needed by ptest
@@ -9,12 +9,13 @@ serial-tests is required to generate those targets.
 Upstream-Status: Inappropriate [default automake behavior incompatible with ptest]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
 ---
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 05ad027..e324b93 100644
+index 3827222..504a844 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -10,7 +10,7 @@ AC_PREREQ(2.61)
@@ -26,6 +27,3 @@ index 05ad027..e324b93 100644
  AC_REVISION($Revision$)dnl
  AC_PREFIX_DEFAULT(/usr/local/squid)
  AM_MAINTAINER_MODE
--- 
-2.8.1
-

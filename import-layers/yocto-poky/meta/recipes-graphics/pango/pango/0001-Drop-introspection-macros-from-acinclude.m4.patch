@@ -6,7 +6,7 @@ Subject: [PATCH] Drop introspection macros from acinclude.m4
 They take precendence over our customized macros, and so
 introspection doesn't work correctly.
 
-Upstream-Status: Pending [review on oe-core list]
+Upstream-Status: Backport [upstream 5ccfe0]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  acinclude.m4 | 96 ------------------------------------------------------------
@@ -118,4 +118,3 @@ index 8899c7c..48fd5d8 100644
 -])
 -- 
 2.1.4
-

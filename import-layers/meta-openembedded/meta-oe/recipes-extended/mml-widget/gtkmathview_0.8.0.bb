@@ -17,7 +17,9 @@ SRC_URI = "git://github.com/GNOME/gtkmathview.git \
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig
+inherit distro_features_check autotools pkgconfig
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 do_configure_append() {
     # avoid host polution inf pkg-config files

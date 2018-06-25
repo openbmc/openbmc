@@ -11,8 +11,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d763b081cb10c223435b01e00dc0aba7 \
                     file://src/dri2.xml;beginline=2;endline=28;md5=f8763b13ff432e8597e0d610cf598e65"
 
-SRC_URI = "http://xcb.freedesktop.org/dist/xcb-proto-${PV}.tar.bz2 \
-           file://no-python-native.patch \
+SRC_URI = "http://xcb.freedesktop.org/dist/${BP}.tar.bz2 \
            file://0001-Make-whitespace-use-consistent.patch \
            file://0002-print-is-a-function-and-needs-parentheses.patch \
            "
@@ -20,6 +19,10 @@ SRC_URI[md5sum] = "14e60919f859560f28426a685a555962"
 SRC_URI[sha256sum] = "5922aba4c664ab7899a29d92ea91a87aa4c1fc7eb5ee550325c3216c480a4906"
 
 inherit autotools pkgconfig
+
+# Force the use of Python 3 and a specific library path so we don't need to
+# depend on python3-native
+CACHED_CONFIGUREVARS += "PYTHON=python3 am_cv_python_pythondir=${libdir}/xcb-proto"
 
 PACKAGES += "python-xcbgen"
 
@@ -32,9 +35,19 @@ RRECOMMENDS_${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_install_append() {
-    # Makefile's do_install creates .pyc files for python3, now also create
-    # them for python2 so that they will be recorded by manifest, and can be
-    # cleaned correctly.
-    python -m py_compile ${D}${libdir}/xcb-proto/xcbgen/*.py
+# Need to do this dance because we're forcing the use of host Python above and
+# if xcb-proto is built with Py3.5 and then re-used from sstate on a host with
+# Py3.6 the second build will write new cache files into the sysroot which won't
+# be listed in the manifest so won't be deleted, resulting in an error on
+# rebuilds.  Solve this by deleting the entire cache directory when this package
+# is removed from the sysroot.
+SSTATEPOSTINSTFUNCS += "xcb_sstate_postinst"
+xcb_sstate_postinst() {
+	if [ "${BB_CURRENTTASK}" = "populate_sysroot" -o "${BB_CURRENTTASK}" = "populate_sysroot_setscene" ]
+	then
+		cat <<EOF >${SSTATE_INST_POSTRM}
+#!/bin/sh
+rm -rf ${libdir}/xcb-proto/xcbgen/__pycache__
+EOF
+	fi
 }

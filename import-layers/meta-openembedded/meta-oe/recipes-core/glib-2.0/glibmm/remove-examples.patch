@@ -1,7 +1,16 @@
-Index: glibmm-2.22.1/Makefile.am
-===================================================================
---- glibmm-2.22.1.orig/Makefile.am
-+++ glibmm-2.22.1/Makefile.am
+From f48a69fd11b2eda6c43ff046c202cbc4dcd4e92d Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Tue, 12 Jul 2011 11:46:37 +0200
+
+---
+ Makefile.am  | 7 +------
+ configure.ac | 1 -
+ 2 files changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index a0df8af..c3d5e06 100644
+--- a/Makefile.am
++++ b/Makefile.am
 @@ -23,12 +23,7 @@ src_subdirs = glib/src gio/src
  else
  src_subdirs =
@@ -16,15 +25,15 @@ Index: glibmm-2.22.1/Makefile.am
  
  glibmm_includedir = $(includedir)/$(GLIBMM_MODULE_NAME)
  glibmm_include_HEADERS = glib/glibmm.h
-Index: glibmm-2.22.1/configure.ac
-===================================================================
---- glibmm-2.22.1.orig/configure.ac
-+++ glibmm-2.22.1/configure.ac
-@@ -136,7 +136,6 @@ AC_CONFIG_FILES([Makefile
+diff --git a/configure.ac b/configure.ac
+index c20e778..74203be 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -166,7 +166,6 @@ AC_CONFIG_FILES([Makefile
                   gio/src/Makefile
                   gio/giomm/Makefile
                   tests/Makefile
 -                 examples/Makefile
                   docs/Makefile
                   docs/reference/Doxyfile
-                  MSVC_Net2005/glibmm/glibmm.rc
+                  MSVC_Net2013/glibmm/glibmm.rc

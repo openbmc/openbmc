@@ -4,69 +4,208 @@
 # Copyright (C) 2004 by the Icecream Authors
 # GPL
 
-target_files=
+target_paths=
+target_aliases=
 
-is_contained ()
+# Always prints, optionally to a log file
+print_output ()
 {
-  case " $target_files " in
-    *" $1 "* ) return 0 ;;
-    *"=$1 "* ) return 0;;
-    * ) return 1 ;;
-  esac
+    if test -n "$log_path"; then
+        echo "$@" | tee -a "$log_path"
+    else
+        echo "$@"
+    fi
+}
+
+# Only prints if the debug flag is specified
+print_debug ()
+{
+    if test -n "$debug"; then
+        print_output "$@"
+    fi
+}
+
+is_dynamic_elf ()
+{
+    # Is the file an dynamically linked ELF executable?
+    (file -L "$1" | grep 'ELF' > /dev/null 2>&1) && (! file -L "$1" | grep 'static' > /dev/null 2>&1)
+}
+
+fix_rpath ()
+{
+    # Patches the RPATH for a file. When the program is executed in the chroot
+    # be iceccd, /proc is not mounted. As such, $ORIGIN can't be resolved. To
+    # work around this, replace all instances of $ORIGIN in RPATH with the
+    # known chroot path to the executables directory
+    local path="$1"
+    local origin="$2"
+    if ! is_dynamic_elf "$path"; then
+        return
+    fi
+    local old_rpath="`$PATCHELF --print-rpath "$path"`"
+    local new_rpath="`echo "$old_rpath" | \
+        sed 's/.*\[\(.*\)\]/\1/g' | \
+        sed "s,\\\$ORIGIN,/$origin,g"`"
+
+    if test -n "$new_rpath"; then
+        print_debug "Converting RPATH '$old_rpath' -> '$new_rpath'"
+        $PATCHELF --set-rpath "$new_rpath" "$path"
+    fi
+}
+
+add_path ()
+{
+    case " $target_paths " in
+        *" $1 "*)
+            return 1
+            ;;
+        *)
+            target_paths="$target_paths $1"
+            return 0
+            ;;
+    esac
+}
+
+add_alias ()
+{
+    if test "$1" != "$2"; then
+        local alias="$1=$2"
+        case " $target_aliases " in
+            *" $alias "*)
+                ;;
+            *)
+                print_debug "Adding alias '$2' -> '$1'"
+                target_aliases="$target_aliases $alias"
+                ;;
+        esac
+    fi
+}
+
+normalize_path ()
+{
+    # Normalizes the path to a file or directory, removing all "." and ".."
+    # entries. Use pwd -L to explicitly prevent symlink expansion
+    local path=$1
+    if test -f "$path"; then
+        pushd $(dirname $path) > /dev/null 2>&1
+        dir_path=$(pwd -L)
+        path=$dir_path/$(basename $path)
+        popd > /dev/null 2>&1
+    elif test -d "$path"; then
+        pushd $path > /dev/null 2>&1
+        path=$(pwd -L)
+        popd > /dev/null 2>&1
+    fi
+    echo $path
+}
+
+add_file_common()
+{
+    local p="$1"
+    local path="$2"
+    local alias="$3"
+
+    add_alias "$path" "$p"
+    if test -n "$alias"; then
+        add_alias "$path" "$alias"
+    fi
+
+    add_path "$path" || return 1
+    print_debug "Adding file '$path'"
+
+    return 0
+}
+
+add_deps()
+{
+    local path="$1"
+    local interp="$2"
+
+    if test -n "$interp" && test -x "$interp"; then
+        # Use the dynamic loaders --list argument to list the
+        # dependencies. The program may have a different program
+        # interpreter (typical when using uninative tarballs), which is
+        # why we can't just call ldd.
+        deps="`$interp --list "$path"`"
+    else
+        deps="`ldd "$path"`"
+    fi
+
+    print_debug "Dependencies are:"
+    print_debug "$deps"
+    if test -n "$deps"; then
+        for lib in $deps; do
+            # ldd now outputs ld as /lib/ld-linux.so.xx on current nptl
+            # based glibc this regexp parse the outputs like:
+            # ldd /usr/bin/gcc
+            #         linux-gate.so.1 =>  (0xffffe000)
+            #         libc.so.6 => /lib/tls/libc.so.6 (0xb7e81000)
+            #         /lib/ld-linux.so.2 (0xb7fe8000)
+            # covering both situations ( with => and without )
+            lib="`echo "$lib" | sed -n 's,^[^/]*\(/[^ ]*\).*,\1,p'`"
+
+            test -f "$lib" || continue
+            # Check whether the same library also exists in the parent
+            # directory, and prefer that on the assumption that it is a
+            # more generic one.
+            local baselib=`echo "$lib" | sed 's,\(/[^/]*\)/.*\(/[^/]*\)$,\1\2,'`
+            test -f "$baselib" && lib=$baselib
+            add_dependency "$lib" "$interp"
+        done
+    fi
+}
+
+add_dependency()
+{
+    local p=`normalize_path $1`
+    # readlink is required for Yocto, so we can use it
+    local path=`readlink -f "$p"`
+    local interp="$2"
+
+    add_file_common "$p" "$path" || return
+
+    if test -x "$path" && is_dynamic_elf "$path"; then
+        add_deps "$path" "$interp"
+    fi
 }
 
 add_file ()
 {
-  local name="$1"
-  local path="$1";
-  if test -n "$2"; then
-    name="$2"
-  fi
-  test -z "$name" && return
-  # ls -H isn't really the same as readlink, but
-  # readlink is not portable enough.
-  path=`ls -H $path`
-  toadd="$name=$path"
-  is_contained "$toadd" && return
-  if test -z "$silent"; then
-  echo "adding file $toadd"
-  fi
-  target_files="$target_files $toadd"
-  if test -x "$path"; then
-    # Only call ldd when it makes sense
-    if file -L "$path" | grep 'ELF' > /dev/null 2>&1; then
-	if ! file -L "$path" | grep 'static' > /dev/null 2>&1; then
-	   # ldd now outputs ld as /lib/ld-linux.so.xx on current nptl based glibc
-		# this regexp parse the outputs like:
-		# ldd /usr/bin/gcc
-		#         linux-gate.so.1 =>  (0xffffe000)
-		#         libc.so.6 => /lib/tls/libc.so.6 (0xb7e81000)
-		#         /lib/ld-linux.so.2 (0xb7fe8000)
-		# covering both situations ( with => and without )
-          for lib in `ldd "$path" | sed -n 's,^[^/]*\(/[^ ]*\).*,\1,p'`; do
-	    test -f "$lib" || continue
-	    # Check wether the same library also exists in the parent directory,
-	    # and prefer that on the assumption that it is a more generic one.
-	    local baselib=`echo "$lib" | sed 's,\(/[^/]*\)/.*\(/[^/]*\)$,\1\2,'`
-	    test -f "$baselib" && lib=$baselib
-	  add_file "$lib"
-        done
-      fi
+    local p=`normalize_path $1`
+    # readlink is required for Yocto, so we can use it
+    local path=`readlink -f "$p"`
+
+    add_file_common "$p" "$path" "$2" || return
+
+    if test -x "$path" && is_dynamic_elf "$path"; then
+        # Request the program interpeter (dynamic loader)
+        interp=`readelf -W -l "$path" | grep "Requesting program interpreter:" | sed "s/\s*\[Requesting program interpreter:\s*\(.*\)\]/\1/g"`
+        print_debug "Interpreter is '$interp'"
+
+        add_deps "$path" "$interp"
     fi
-  fi
 }
 
-# backward compat
-if test "$1" = "--respect-path"; then
-  shift
-fi
-
-#add a --silent switch to avoid "broken pipe" errors when calling this scipt from within OE
-if test "$1" = "--silent"; then
- silent=1
- shift
-fi
-
+while test -n "$1"; do
+    case "$1" in
+        --respect-path)
+            # Ignore for backward compatability
+            ;;
+        --debug)
+            debug=1
+            ;;
+        --log)
+            do_log=1
+            ;;
+        --extra=*)
+            extra_tools="$extra_tools ${1#--extra=}"
+            ;;
+        *)
+            break
+            ;;
+    esac
+    shift
+done
 
 added_gcc=$1
 shift
@@ -76,19 +215,35 @@ added_as=$1
 shift
 archive_name=$1
 
+if test -n "$do_log"; then
+    log_path="$archive_name.log"
+    rm -f "$log_path"
+fi
+
+if test -z "$PATCHELF"; then
+    PATCHELF=`which patchelf 2> /dev/null`
+fi
+if test -z "$PATCHELF"; then
+    PATCHELF=`which patchelf-uninative 2> /dev/null`
+fi
+if test -z "$PATCHELF"; then
+    print_output "patchelf is required"
+    exit 1
+fi
+
 if test -z "$added_gcc" || test -z "$added_gxx" ; then
-	echo "usage: $0 <gcc_path> <g++_path>"
-	exit 1
+    print_output "usage: $0 <gcc_path> <g++_path>"
+    exit 1
 fi
 
 if ! test -x "$added_gcc" ; then
-  echo "'$added_gcc' is no executable."
-  exit 1
+    print_output "'$added_gcc' is not executable."
+    exit 1
 fi
 
 if ! test -x "$added_gxx" ; then
-  echo "'$added_gcc' is no executable."
-  exit 1
+    print_output "'$added_gcc' is not executable."
+    exit 1
 fi
 
 
@@ -97,96 +252,131 @@ add_file $added_gcc /usr/bin/gcc
 add_file $added_gxx /usr/bin/g++
 
 if test -z "$added_as" ; then
- add_file /usr/bin/as /usr/bin/as
+    add_file /usr/bin/as /usr/bin/as
 else
- if ! test -x "$added_as" ; then
-  echo "'$added_as' is no executable."
-  exit 1
- fi
+    if ! test -x "$added_as" ; then
+        print_output "'$added_as' is not executable."
+        exit 1
+    fi
 
- add_file $added_as  /usr/bin/as
+    add_file $added_as  /usr/bin/as
 fi
 
 add_file `$added_gcc -print-prog-name=cc1` /usr/bin/cc1
 add_file `$added_gxx -print-prog-name=cc1plus` /usr/bin/cc1plus
 specfile=`$added_gcc -print-file-name=specs`
 if test -n "$specfile" && test -e "$specfile"; then
-  add_file "$specfile"
+    add_file "$specfile"
 fi
 
 ltofile=`$added_gcc -print-prog-name=lto1`
-pluginfile="${ltofile%lto1}liblto_plugin.so"
+pluginfile=`normalize_path "${ltofile%lto1}liblto_plugin.so"`
 if test -r "$pluginfile"
 then
-  add_file $pluginfile  ${pluginfile#*usr}
-  add_file $pluginfile  /usr${pluginfile#*usr}
+    add_file $pluginfile  ${pluginfile#*usr}
+    add_file $pluginfile  /usr${pluginfile#*usr}
 fi
 
+# for testing the environment is usable at all
+if test -x /bin/true; then
+    add_file /bin/true
+elif test -x /usr/bin/true; then
+    add_file /usr/bin/true /bin/true
+else
+    print_output "'true' not found"
+    exit 1
+fi
+
+for extra in $extra_tools; do
+    if test -x "$extra"; then
+        add_file "$extra"
+    else
+        print_output "'$extra' not found"
+        exit 1
+    fi
+done
+
+link_rel ()
+{
+    local target="$1"
+    local name="$2"
+    local base="$3"
+
+    local prefix=`dirname $name`
+
+    prefix=`echo $prefix | sed 's,[^/]\+,..,g' | sed 's,^/*,,g'`
+
+    ln -s $prefix/$target $base/$name
+}
+
 tempdir=`mktemp -d /tmp/iceccenvXXXXXX`
-new_target_files=
-for i in $target_files; do
- case $i in
-   *=/*)
+target_files=
+for path in $target_paths; do
+    mkdir -p $tempdir/`dirname $path`
+    cp -pH $path $tempdir/$path
+
+    if test -f $tempdir/$path -a -x $tempdir/$path; then
+        strip -s $tempdir/$path 2>/dev/null
+    fi
+
+    fix_rpath $tempdir/$path `dirname $path`
+    target_files="$target_files $path"
+done
+
+for i in $target_aliases; do
     target=`echo $i | cut -d= -f1`
-    path=`echo $i | cut -d= -f2`
-    ;;
-   *)
-    path=$i
-    target=$i
-    ;;
-  esac
-  mkdir -p $tempdir/`dirname $target`
-  cp -p $path $tempdir/$target
-  if test -f $tempdir/$target -a -x $tempdir/$target; then
-    strip -s $tempdir/$target 2>/dev/null
-  fi
-  target=`echo $target | cut -b2-`
-  new_target_files="$new_target_files $target"
+    link_name=`echo $i | cut -d= -f2`
+
+    mkdir -p $tempdir/`dirname $link_name`
+    # Relative links are used because the files are checked for being
+    # executable outside the chroot
+    link_rel $target $link_name $tempdir
+
+    link_name=`echo $link_name | cut -b2-`
+    target_files="$target_files $link_name"
 done
 
 #sort the files
-target_files=`for i in $new_target_files; do echo $i; done | sort`
+target_files=`for i in $target_files; do echo $i; done | sort`
 
 #test if an archive name was supplied
 #if not use the md5 of all files as the archive name
 if test -z "$archive_name"; then
-  md5sum=NONE
-  for file in /usr/bin/md5sum /bin/md5 /usr/bin/md5; do
-    if test -x $file; then
-      md5sum=$file
-      break
-    fi
-  done
+    md5sum=NONE
+    for file in /usr/bin/md5sum /bin/md5 /usr/bin/md5; do
+        if test -x $file; then
+            md5sum=$file
+            break
+        fi
+    done
 
-  #calculate md5 and use it as the archive name
-  archive_name=`for i in $target_files; do test -f $tempdir/$i && $md5sum $tempdir/$i; done | sed -e 's/ .*$//' | $md5sum | sed -e 's/ .*$//'`.tar.gz || {
-    if test -z "$silent"; then
-     echo "Couldn't compute MD5 sum."
-    fi
-    exit 2
-  }
-  mydir=`pwd`
-else
-  mydir="`dirname "$archive_name"`"
-
-  #check if we have a full path or only a filename
-  if test "$mydir" = "." ; then
+    #calculate md5 and use it as the archive name
+    archive_name=`for i in $target_files; do test -f $tempdir/$i && $md5sum $tempdir/$i; done | sed -e 's/ .*$//' | $md5sum | sed -e 's/ .*$//'`.tar.gz || {
+        print_output "Couldn't compute MD5 sum."
+        exit 2
+    }
     mydir=`pwd`
-  else
-    mydir=""
-  fi
+else
+    mydir="`dirname "$archive_name"`"
+
+    #check if we have a full path or only a filename
+    if test "$mydir" = "." ; then
+        mydir=`pwd`
+    else
+        mydir=""
+    fi
 fi
 
-if test -z "$silent"; then
-echo "creating $archive_name"
-fi
+print_output "creating $archive_name"
 
 cd $tempdir
-tar -czhf "$mydir/$archive_name" $target_files || {
- if test -z "$silent"; then
-  echo "Couldn't create archive"
- fi
-  exit 3
+# Add everything in the temp directory. Tar doesn't like to be given files with
+# ".." in them, which frequently happens in $target_files, and will strip off
+# the path prefix past the offending "..". This makes the archive generate
+# incorrectly
+tar -czf "$mydir/$archive_name" . || {
+    print_output "Couldn't create archive"
+    exit 3
 }
 cd ..
 rm -rf $tempdir

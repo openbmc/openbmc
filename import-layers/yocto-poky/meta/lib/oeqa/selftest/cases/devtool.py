@@ -174,7 +174,7 @@ class DevtoolTests(DevtoolBase):
     def test_create_workspace(self):
         # Check preconditions
         result = runCmd('bitbake-layers show-layers')
-        self.assertTrue('/workspace' not in result.output, 'This test cannot be run with a workspace layer in bblayers.conf')
+        self.assertTrue('\nworkspace' not in result.output, 'This test cannot be run with a workspace layer in bblayers.conf')
         # Try creating a workspace layer with a specific path
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
@@ -611,7 +611,7 @@ class DevtoolTests(DevtoolBase):
     @OETestID(1165)
     def test_devtool_modify_git(self):
         # Check preconditions
-        testrecipe = 'mkelfimage'
+        testrecipe = 'psplash'
         src_uri = get_bb_var('SRC_URI', testrecipe)
         self.assertIn('git://', src_uri, 'This test expects the %s recipe to be a git recipe' % testrecipe)
         # Clean up anything in the workdir/sysroot/sstate cache
@@ -623,9 +623,9 @@ class DevtoolTests(DevtoolBase):
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
         self.add_command_to_tearDown('bitbake -c clean %s' % testrecipe)
         result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
-        self.assertExists(os.path.join(tempdir, 'Makefile'), 'Extracted source could not be found')
+        self.assertExists(os.path.join(tempdir, 'Makefile.am'), 'Extracted source could not be found')
         self.assertExists(os.path.join(self.workspacedir, 'conf', 'layer.conf'), 'Workspace directory not created. devtool output: %s' % result.output)
-        matches = glob.glob(os.path.join(self.workspacedir, 'appends', 'mkelfimage_*.bbappend'))
+        matches = glob.glob(os.path.join(self.workspacedir, 'appends', 'psplash_*.bbappend'))
         self.assertTrue(matches, 'bbappend not created')
         # Test devtool status
         result = runCmd('devtool status')
@@ -899,6 +899,7 @@ class DevtoolTests(DevtoolBase):
             f.write('BBFILE_PATTERN_oeselftesttemplayer = "^${LAYERDIR}/"\n')
             f.write('BBFILE_PRIORITY_oeselftesttemplayer = "999"\n')
             f.write('BBFILE_PATTERN_IGNORE_EMPTY_oeselftesttemplayer = "1"\n')
+            f.write('LAYERSERIES_COMPAT_oeselftesttemplayer = "${LAYERSERIES_COMPAT_core}"\n')
         self.add_command_to_tearDown('bitbake-layers remove-layer %s || true' % templayerdir)
         result = runCmd('bitbake-layers add-layer %s' % templayerdir, cwd=self.builddir)
         # Create the bbappend
@@ -987,8 +988,12 @@ class DevtoolTests(DevtoolBase):
     @OETestID(1371)
     def test_devtool_update_recipe_local_files_2(self):
         """Check local source files support when oe-local-files is in Git"""
-        testrecipe = 'lzo'
+        testrecipe = 'devtool-test-local'
         recipefile = get_bb_var('FILE', testrecipe)
+        recipedir = os.path.dirname(recipefile)
+        result = runCmd('git status --porcelain .', cwd=recipedir)
+        if result.output.strip():
+            self.fail('Recipe directory for %s contains uncommitted changes' % testrecipe)
         # Setup srctree for modifying the recipe
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
@@ -1002,9 +1007,9 @@ class DevtoolTests(DevtoolBase):
         runCmd('git add oe-local-files', cwd=tempdir)
         runCmd('git commit -m "Add local sources"', cwd=tempdir)
         # Edit / commit local sources
-        runCmd('echo "# Foobar" >> oe-local-files/acinclude.m4', cwd=tempdir)
+        runCmd('echo "# Foobar" >> oe-local-files/file1', cwd=tempdir)
         runCmd('git commit -am "Edit existing file"', cwd=tempdir)
-        runCmd('git rm oe-local-files/run-ptest', cwd=tempdir)
+        runCmd('git rm oe-local-files/file2', cwd=tempdir)
         runCmd('git commit -m"Remove file"', cwd=tempdir)
         runCmd('echo "Foo" > oe-local-files/new-local', cwd=tempdir)
         runCmd('git add oe-local-files/new-local', cwd=tempdir)
@@ -1016,11 +1021,11 @@ class DevtoolTests(DevtoolBase):
                                      os.path.dirname(recipefile))
         # Checkout unmodified file to working copy -> devtool should still pick
         # the modified version from HEAD
-        runCmd('git checkout HEAD^ -- oe-local-files/acinclude.m4', cwd=tempdir)
+        runCmd('git checkout HEAD^ -- oe-local-files/file1', cwd=tempdir)
         runCmd('devtool update-recipe %s' % testrecipe)
         expected_status = [(' M', '.*/%s$' % os.path.basename(recipefile)),
-                           (' M', '.*/acinclude.m4$'),
-                           (' D', '.*/run-ptest$'),
+                           (' M', '.*/file1$'),
+                           (' D', '.*/file2$'),
                            ('??', '.*/new-local$'),
                            ('??', '.*/0001-Add-new-file.patch$')]
         self._check_repo_status(os.path.dirname(recipefile), expected_status)

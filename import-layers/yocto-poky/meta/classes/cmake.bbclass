@@ -7,6 +7,23 @@ B = "${WORKDIR}/build"
 # We need to unset CCACHE otherwise cmake gets too confused
 CCACHE = ""
 
+# What CMake generator to use.
+# The supported options are "Unix Makefiles" or "Ninja".
+OECMAKE_GENERATOR ?= "Ninja"
+
+python() {
+    generator = d.getVar("OECMAKE_GENERATOR")
+    if generator == "Unix Makefiles":
+        args = "-G 'Unix Makefiles' -DCMAKE_MAKE_PROGRAM=" + d.getVar("MAKE")
+        d.setVar("OECMAKE_GENERATOR_ARGS", args)
+        d.setVarFlag("do_compile", "progress", "percent")
+    elif generator == "Ninja":
+        d.appendVar("DEPENDS", " ninja-native")
+        d.setVar("OECMAKE_GENERATOR_ARGS", "-G Ninja -DCMAKE_MAKE_PROGRAM=ninja")
+        d.setVarFlag("do_compile", "progress", "outof:^\[(\d+)/(\d+)\]\s+")
+    else:
+        bb.fatal("Unknown CMake Generator %s" % generator)
+}
 # C/C++ Compiler (without cpu arch/tune arguments)
 OECMAKE_C_COMPILER ?= "`echo ${CC} | sed 's/^\([^ ]*\).*/\1/'`"
 OECMAKE_CXX_COMPILER ?= "`echo ${CXX} | sed 's/^\([^ ]*\).*/\1/'`"
@@ -33,6 +50,11 @@ EXTRA_OECMAKE_append = " ${PACKAGECONFIG_CONFARGS}"
 
 EXTRA_OECMAKE_BUILD_prepend_task-compile = "${PARALLEL_MAKE} "
 EXTRA_OECMAKE_BUILD_prepend_task-install = "${PARALLEL_MAKEINST} "
+
+OECMAKE_TARGET_COMPILE ?= "all"
+OECMAKE_TARGET_INSTALL ?= "install"
+
+FILES_${PN}-dev += "${libdir}/cmake ${datadir}/cmake"
 
 # CMake expects target architectures in the format of uname(2),
 # which do not always match TARGET_ARCH, so all the necessary
@@ -116,6 +138,7 @@ cmake_do_configure() {
 	fi
 
 	cmake \
+	  ${OECMAKE_GENERATOR_ARGS} \
 	  $oecmake_sitefile \
 	  ${OECMAKE_SOURCEPATH} \
 	  -DCMAKE_INSTALL_PREFIX:PATH=${prefix} \
@@ -136,15 +159,17 @@ cmake_do_configure() {
 	  -Wno-dev
 }
 
-do_compile[progress] = "percent"
+cmake_runcmake_build() {
+	bbnote ${DESTDIR:+DESTDIR=${DESTDIR} }VERBOSE=1 cmake --build '${B}' "$@" -- ${EXTRA_OECMAKE_BUILD}
+	eval ${DESTDIR:+DESTDIR=${DESTDIR} }VERBOSE=1 cmake --build '${B}' "$@" -- ${EXTRA_OECMAKE_BUILD}
+}
+
 cmake_do_compile()  {
-	bbnote VERBOSE=1 cmake --build '${B}' -- ${EXTRA_OECMAKE_BUILD}
-	VERBOSE=1 cmake --build '${B}' -- ${EXTRA_OECMAKE_BUILD}
+	cmake_runcmake_build --target ${OECMAKE_TARGET_COMPILE}
 }
 
 cmake_do_install() {
-	bbnote DESTDIR='${D}' cmake --build '${B}' --target install -- ${EXTRA_OECMAKE_BUILD}
-	DESTDIR='${D}' cmake --build '${B}' --target install -- ${EXTRA_OECMAKE_BUILD}
+	DESTDIR='${D}' cmake_runcmake_build --target ${OECMAKE_TARGET_INSTALL}
 }
 
 EXPORT_FUNCTIONS do_configure do_compile do_install do_generate_toolchain_file

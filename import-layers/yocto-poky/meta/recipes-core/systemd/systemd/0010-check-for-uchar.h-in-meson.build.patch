@@ -1,0 +1,45 @@
+From ea4caaa1c6a6dc682bb04548ab05c5c73d0b45d6 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 26 Feb 2018 15:34:52 +0800
+Subject: [PATCH 10/31] check for uchar.h in meson.build
+
+Use #if HAVE_UCHAR_H to include uchar.h conditionally.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ meson.build         | 1 +
+ src/basic/missing.h | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index 9c25022a4..94a16712b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -623,6 +623,7 @@ foreach header : ['crypt.h',
+                   'sys/auxv.h',
+                   'valgrind/memcheck.h',
+                   'valgrind/valgrind.h',
++                  'uchar.h',
+                  ]
+ 
+         conf.set10('HAVE_' + header.underscorify().to_upper(),
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index 39c1fb700..84d6d9167 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -38,7 +38,9 @@
+ #include <sys/resource.h>
+ #include <sys/socket.h>
+ #include <sys/syscall.h>
++#if HAVE_UCHAR_H
+ #include <uchar.h>
++#endif
+ #include <unistd.h>
+ 
+ #if HAVE_AUDIT
+-- 
+2.13.0
+

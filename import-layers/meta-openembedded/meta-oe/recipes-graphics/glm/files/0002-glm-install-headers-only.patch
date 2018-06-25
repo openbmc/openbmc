@@ -1,0 +1,46 @@
+From 7fdd36d7496238e03e43fcc32839f75588116c5d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Fri, 16 Mar 2018 15:44:48 +0100
+Subject: [PATCH 2/2] glm: install headers only
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Plausibility check in root source path
+
+$ find glm -type f ! -name '*.hpp' ! -name '*.h' ! -name '*.inl'
+glm/detail/glm.cpp
+glm/detail/dummy.cpp
+glm/experimental.hpp.in
+glm/CMakeLists.txt
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
+Uptream-Status: Submitted [1]
+
+[1] https://github.com/g-truc/glm/pull/741
+---
+ CMakeLists.txt | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bd4dd654..113dd735 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -171,7 +171,12 @@ option(GLM_INSTALL_ENABLE "GLM install" ON)
+ 
+ set(GLM_INSTALL_CONFIGDIR "${CMAKE_INSTALL_LIBDIR}/cmake/glm")
+ if (GLM_INSTALL_ENABLE)
+-	install(DIRECTORY glm DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++	install(DIRECTORY glm
++		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
++		FILES_MATCHING
++			PATTERN "*.h"
++			PATTERN "*.hpp"
++			PATTERN "*.inl")
+ 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/experimental.hpp" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glm)
+ endif()
+ 
+-- 
+2.14.3
+

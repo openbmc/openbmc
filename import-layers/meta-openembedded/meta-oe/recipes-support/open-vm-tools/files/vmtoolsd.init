@@ -1,0 +1,66 @@
+#!/bin/sh
+#
+#   vmtoolsd          Start/stop the vmware tools daemon
+#
+# chkconfig:  2345 90 60
+# description: vmtoolsd is a daemon that starts up.  for some reason, it
+#              doesn't include a sysv init startup file in the latest release.
+#              so i have to write this
+#
+
+### BEGIN INIT INFO
+# Provides: vmtoolsd
+# Required-Start: $local_fs $syslog
+# Required-Stop: $local_fs $syslog
+# Default-Start: 2345
+# Default-Stop: 90
+# Short-Description: Run vmware tools daemon
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/vmtoolsd
+NAME=vmtoolsd
+DESC="vmware tools daemon"
+VMTOOLSDARGS=" -b /var/run/vmtoolsd.pid "
+RETVAL="1"
+
+# source function library
+. /etc/init.d/functions
+
+test -f $DAEMON || exit 0
+
+
+case "$1" in
+  start)
+    echo -n "Starting vmware tools daemon: "
+    start-stop-daemon --start --quiet --exec $DAEMON -- $VMTOOLSDARGS
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+        echo "OK"
+    else
+        echo "FAIL"
+    fi
+    ;;
+  stop)
+    echo -n "Stopping vmware tools daemon: "
+    start-stop-daemon --stop --quiet --pidfile /var/run/vmtoolsd.pid
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+        echo "OK"
+    else
+        echo "FAIL"
+    fi
+    ;;
+  status)
+    status vmtoolsd
+    exit $?
+    ;;
+  restart)
+    $0 stop && sleep 1 && $0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/vmtoolsd {start|stop|status|restart}"
+    exit 1
+esac
+
+exit $RETVAL

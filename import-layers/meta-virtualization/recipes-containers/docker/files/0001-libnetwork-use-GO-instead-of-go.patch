@@ -1,0 +1,62 @@
+From 04c07804930faad708218a3134c81de06a9c742a Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Fri, 6 Apr 2018 23:58:22 -0400
+Subject: [PATCH] libnetwork: use $(GO) instead of go
+
+Ensure that the libnetwork makefile uses the go cross flags and
+utilities.
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+---
+ Makefile | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/libnetwork/Makefile b/libnetwork/Makefile
+index 17060bc212c7..90cc7a72ef45 100644
+--- a/libnetwork/Makefile
++++ b/libnetwork/Makefile
+@@ -26,9 +26,9 @@ build: ${build_image}.created
+ build-local:
+ 	@echo "🐳 $@"
+ 	@mkdir -p "bin"
+-	go build -tags experimental -o "bin/dnet" ./cmd/dnet
+-	go build -o "bin/docker-proxy" ./cmd/proxy
+-	GOOS=linux go build -o "./cmd/diagnostic/diagnosticClient" ./cmd/diagnostic
++	$(GO) build -tags experimental -o "bin/dnet" ./cmd/dnet
++	$(GO) build -o "bin/proxy" ./cmd/proxy
++	GOOS=linux $(GO) build -o "./cmd/diagnostic/diagnosticClient" ./cmd/diagnostic
+ 
+ clean:
+ 	@echo "🐳 $@"
+@@ -51,8 +51,8 @@ cross: ${build_image}.created
+ 
+ cross-local:
+ 	@echo "🐳 $@"
+-	go build -o "bin/dnet-$$GOOS-$$GOARCH" ./cmd/dnet
+-	go build -o "bin/docker-proxy-$$GOOS-$$GOARCH" ./cmd/proxy
++	@$(GO) build -linkshared $(GOBUILDFLAGS) -o "bin/docker-proxy-$$GOOS-$$GOARCH" ./cmd/proxy
++	@$(GO) build -linkshared $(GOBUILDFLAGS) -o "bin/dnet-$$GOOS-$$GOARCH" ./cmd/dnet
+ 
+ check: ${build_image}.created
+ 	@${docker} ./wrapmake.sh check-local
+@@ -68,7 +68,7 @@ run-tests:
+ 	if ls $$dir/*.go &> /dev/null; then \
+ 		pushd . &> /dev/null ; \
+ 		cd $$dir ; \
+-		go test ${INSIDECONTAINER} -test.parallel 5 -test.v -covermode=count -coverprofile=./profile.tmp ; \
++		$(GO) test ${INSIDECONTAINER} -test.parallel 5 -test.v -covermode=count -coverprofile=./profile.tmp ; \
+ 		ret=$$? ;\
+ 		if [ $$ret -ne 0 ]; then exit $$ret; fi ;\
+ 		popd &> /dev/null; \
+@@ -94,7 +94,7 @@ coveralls:
+ # Depends on binaries because vet will silently fail if it can not load compiled imports
+ vet: ## run go vet
+ 	@echo "🐳 $@"
+-	@test -z "$$(go vet ${PACKAGES} 2>&1 | grep -v 'constant [0-9]* not a string in call to Errorf' | egrep -v '(timestamp_test.go|duration_test.go|exit status 1)' | tee /dev/stderr)"
++	@test -z "$$($(GO) vet ${PACKAGES} 2>&1 | grep -v 'constant [0-9]* not a string in call to Errorf' | egrep -v '(timestamp_test.go|duration_test.go|exit status 1)' | tee /dev/stderr)"
+ 
+ misspell:
+ 	@echo "🐳 $@"
+-- 
+2.4.0.53.g8440f74
+

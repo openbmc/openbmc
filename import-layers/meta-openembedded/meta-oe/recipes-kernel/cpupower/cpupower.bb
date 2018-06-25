@@ -3,7 +3,7 @@ DESCRIPTION = "cpupower is a collection of tools to examine and tune power \
 saving related features of your processor."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-DEPENDS = "pciutils"
+DEPENDS = "pciutils gettext-native"
 PROVIDES = "virtual/cpupower"
 
 inherit kernelsrc kernel-arch

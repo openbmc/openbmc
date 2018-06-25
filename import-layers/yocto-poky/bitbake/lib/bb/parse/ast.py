@@ -335,6 +335,12 @@ def handleInherit(statements, filename, lineno, m):
     classes = m.group(1)
     statements.append(InheritNode(filename, lineno, classes))
 
+def runAnonFuncs(d):
+    code = []
+    for funcname in d.getVar("__BBANONFUNCS", False) or []:
+        code.append("%s(d)" % funcname)
+    bb.utils.better_exec("\n".join(code), {"d": d})
+
 def finalize(fn, d, variant = None):
     saved_handlers = bb.event.get_handlers().copy()
 
@@ -349,10 +355,7 @@ def finalize(fn, d, variant = None):
     bb.event.fire(bb.event.RecipePreFinalise(fn), d)
 
     bb.data.expandKeys(d)
-    code = []
-    for funcname in d.getVar("__BBANONFUNCS", False) or []:
-        code.append("%s(d)" % funcname)
-    bb.utils.better_exec("\n".join(code), {"d": d})
+    runAnonFuncs(d)
 
     tasklist = d.getVar('__BBTASKS', False) or []
     bb.event.fire(bb.event.RecipeTaskPreProcess(fn, list(tasklist)), d)

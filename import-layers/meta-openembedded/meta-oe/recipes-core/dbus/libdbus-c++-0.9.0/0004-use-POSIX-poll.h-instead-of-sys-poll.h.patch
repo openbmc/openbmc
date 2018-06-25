@@ -33,10 +33,10 @@ Signed-off-by: André Draszik <adraszik@tycoint.com>
  src/pipe.cpp                  | 2 +-
  3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/eventloop-integration.cpp b/src/eventloop-integration.cpp
-index 5776971..271b503 100644
---- a/src/eventloop-integration.cpp
-+++ b/src/eventloop-integration.cpp
+Index: libdbus-c++-0.9.0/src/eventloop-integration.cpp
+===================================================================
+--- libdbus-c++-0.9.0.orig/src/eventloop-integration.cpp
++++ libdbus-c++-0.9.0/src/eventloop-integration.cpp
 @@ -36,7 +36,7 @@
  /* STD */
  #include <string.h>
@@ -44,12 +44,12 @@ index 5776971..271b503 100644
 -#include <sys/poll.h>
 +#include <poll.h>
  #include <fcntl.h>
- #include <unistd.h>
  
-diff --git a/src/eventloop.cpp b/src/eventloop.cpp
-index f622812..7790e1e 100644
---- a/src/eventloop.cpp
-+++ b/src/eventloop.cpp
+ using namespace DBus;
+Index: libdbus-c++-0.9.0/src/eventloop.cpp
+===================================================================
+--- libdbus-c++-0.9.0.orig/src/eventloop.cpp
++++ libdbus-c++-0.9.0/src/eventloop.cpp
 @@ -28,7 +28,7 @@
  #include <dbus-c++/eventloop.h>
  #include <dbus-c++/debug.h>
@@ -59,10 +59,10 @@ index f622812..7790e1e 100644
  #include <sys/time.h>
  
  #include <dbus/dbus.h>
-diff --git a/src/pipe.cpp b/src/pipe.cpp
-index 01211b3..45c2ba6 100644
---- a/src/pipe.cpp
-+++ b/src/pipe.cpp
+Index: libdbus-c++-0.9.0/src/pipe.cpp
+===================================================================
+--- libdbus-c++-0.9.0.orig/src/pipe.cpp
++++ libdbus-c++-0.9.0/src/pipe.cpp
 @@ -32,7 +32,7 @@
  
  /* STD */
@@ -72,6 +72,3 @@ index 01211b3..45c2ba6 100644
  #include <fcntl.h>
  #include <errno.h>
  #include <cassert>
--- 
-2.10.2
-

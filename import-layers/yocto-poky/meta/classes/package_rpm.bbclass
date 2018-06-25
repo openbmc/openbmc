@@ -382,6 +382,12 @@ python write_specfile () {
 
         # Gather special src/first package data
         if srcname == splitname:
+            archiving = d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and \
+                        bb.data.inherits_class('archiver', d)
+            if archiving and srclicense != splitlicense:
+                bb.warn("The SRPM produced may not have the correct overall source license in the License tag. This is due to the LICENSE for the primary package and SRPM conflicting.")
+
+            srclicense     = splitlicense
             srcrdepends    = splitrdepends
             srcrrecommends = splitrrecommends
             srcrsuggests   = splitrsuggests
@@ -421,8 +427,7 @@ python write_specfile () {
             spec_preamble_bottom.append('Release: %s' % splitrelease)
         if srcepoch != splitepoch:
             spec_preamble_bottom.append('Epoch: %s' % splitepoch)
-        if srclicense != splitlicense:
-            spec_preamble_bottom.append('License: %s' % splitlicense)
+        spec_preamble_bottom.append('License: %s' % splitlicense)
         spec_preamble_bottom.append('Group: %s' % splitsection)
 
         if srccustomtagschunk != splitcustomtagschunk:
@@ -665,13 +670,15 @@ python do_package_rpm () {
     cmd = rpmbuild
     cmd = cmd + " --noclean --nodeps --short-circuit --target " + pkgarch + " --buildroot " + pkgd
     cmd = cmd + " --define '_topdir " + workdir + "' --define '_rpmdir " + pkgwritedir + "'"
-    cmd = cmd + " --define '_builddir " + d.getVar('S') + "'"
+    cmd = cmd + " --define '_builddir " + d.getVar('B') + "'"
     cmd = cmd + " --define '_build_name_fmt %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm'"
     cmd = cmd + " --define '_use_internal_dependency_generator 0'"
     cmd = cmd + " --define '_binaries_in_noarch_packages_terminate_build 0'"
     cmd = cmd + " --define '_build_id_links none'"
     cmd = cmd + " --define '_binary_payload w6T.xzdio'"
     cmd = cmd + " --define '_source_payload w6T.xzdio'"
+    cmd = cmd + " --define 'clamp_mtime_to_source_date_epoch 1'"
+    cmd = cmd + " --define '_buildhost reproducible'"
     if perfiledeps:
         cmd = cmd + " --define '__find_requires " + outdepends + "'"
         cmd = cmd + " --define '__find_provides " + outprovides + "'"

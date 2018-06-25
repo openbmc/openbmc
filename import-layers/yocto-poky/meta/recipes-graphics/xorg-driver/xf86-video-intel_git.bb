@@ -16,6 +16,7 @@ S = "${WORKDIR}/git"
 SRC_URI = "git://anongit.freedesktop.org/xorg/driver/xf86-video-intel \
            file://disable-x11-dri3.patch \
            file://always_include_xorg_server.h.patch \
+           file://0001-Add-Coffeelake-PCI-IDs-for-S-Skus.patch \
            "
 
 SRC_URI[md5sum] = "fa196a66e52c0c624fe5d350af7a5e7b"
@@ -37,7 +38,7 @@ PACKAGECONFIG[xvmc] = "--enable-xvmc,--disable-xvmc,libxvmc xcb-util"
 PACKAGECONFIG[tools] = "--enable-tools,--disable-tools,libxinerama libxrandr libxdamage libxfixes libxcursor libxtst libxext libxrender"
 
 # --enable-kms-only option is required by ROOTLESS_X
-EXTRA_OECONF += '${@base_conditional( "ROOTLESS_X", "1", " --enable-kms-only", "", d )}'
+EXTRA_OECONF += '${@oe.utils.conditional( "ROOTLESS_X", "1", " --enable-kms-only", "", d )}'
 
 COMPATIBLE_HOST = '(i.86|x86_64).*-linux'
 

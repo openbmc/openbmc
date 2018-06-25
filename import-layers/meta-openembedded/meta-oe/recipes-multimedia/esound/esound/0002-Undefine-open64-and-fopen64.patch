@@ -1,11 +1,12 @@
-From 1fbee6e96384f340b816e221fe1c2f3ff0b487bf Mon Sep 17 00:00:00 2001
+From e218d5a0a545ebb9623d62da5cfca478f9c90fce Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 8 Jun 2017 23:11:31 -0700
-Subject: [PATCH 2/3] Undefine open64 and fopen64
+Subject: [PATCH] Undefine open64 and fopen64
 
 Since the signatures do not match with libc
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  esddsp.c | 2 ++
  1 file changed, 2 insertions(+)
@@ -30,6 +31,3 @@ index d3c6ea9..17b5949 100644
  FILE *
  fopen64 (const char *path, const char *mode)
  {
--- 
-2.13.1
-

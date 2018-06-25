@@ -6,18 +6,22 @@ DESCRIPTION = "XML::NamespaceSupport offers a simple way to process namespace-ba
 
 SECTION = "libs"
 LICENSE = "Artistic-1.0 | GPL-1.0+"
-PR = "r3"
 
-LIC_FILES_CHKSUM = "file://META.yml;beginline=22;endline=22;md5=9ca1a4a941496e7feedac72c4fb8b137"
+SRCNAME = "XML-NamespaceSupport"
 
-SRC_URI = "http://search.cpan.org/CPAN/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-${PV}.tar.gz"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=c9d8a117e7620b5adf8d69c29613ceab"
+
+SRC_URI = "${CPAN_MIRROR}/authors/id/P/PE/PERIGRIN/${SRCNAME}-${PV}.tar.gz"
 SRC_URI[md5sum] = "a8916c6d095bcf073e1108af02e78c97"
 SRC_URI[sha256sum] = "47e995859f8dd0413aa3f22d350c4a62da652e854267aa0586ae544ae2bae5ef"
 
+UPSTREAM_CHECK_REGEX = "XML\-NamespaceSupport\-(?P<pver>(\d+\.\d+))(?!_\d+).tar"
 
-S = "${WORKDIR}/XML-NamespaceSupport-${PV}"
+S = "${WORKDIR}/${SRCNAME}-${PV}"
 
-inherit cpan
+inherit cpan ptest-perl
+
+RDEPENDS_${PN}-ptest += "perl-module-test-more"
 
 BBCLASSEXTEND="native"
 

@@ -9,12 +9,18 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24 \
 
 DEPENDS = "gnome-common-native libxml2 glib-2.0 libsoup-2.4 intltool-native liboauth gcr json-glib"
 
-inherit gnomebase pkgconfig autotools-brokensep gettext gtk-doc vala gobject-introspection
+inherit distro_features_check gnomebase pkgconfig autotools-brokensep gettext gtk-doc vala gobject-introspection
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 do_configure_prepend_class-target () {
     # introspection.m4 pre-packaged with upstream tarballs does not yet
     # have our fixes
     rm -f ${S}/introspection.m4
+    
+    # remove the pre-built gtk-doc files, as they're installed (or attempted to be installed)
+    # even if gtk-doc is explicitly disabled
+    rm -rf ${S}/docs/reference/html
 }
 
 do_compile_prepend() {

@@ -283,7 +283,7 @@ write_results() {
 
 test1_p1 () {
     log "Running Test 1, part 1/3: Measure wall clock of bitbake $IMAGE and size of tmp/ dir"
-    bbnotime $IMAGE -c fetchall
+    bbnotime $IMAGE --runall=fetch
     do_rmtmp
     do_rmsstate
     do_sync

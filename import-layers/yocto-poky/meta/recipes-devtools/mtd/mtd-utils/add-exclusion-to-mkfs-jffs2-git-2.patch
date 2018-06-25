@@ -1,8 +1,10 @@
 Upstream-Status: Pending
 
---- /tmp/mkfs.jffs2.c	2009-01-11 15:28:41.000000000 +0100
-+++ git/jffsX-utils/mkfs.jffs2.c	2009-01-11 15:59:29.000000000 +0100
-@@ -100,6 +100,11 @@
+Index: git/jffsX-utils/mkfs.jffs2.c
+===================================================================
+--- git.orig/jffsX-utils/mkfs.jffs2.c
++++ git/jffsX-utils/mkfs.jffs2.c
+@@ -100,6 +100,11 @@ struct filesystem_entry {
  	struct rb_node hardlink_rb;
  };
  
@@ -14,7 +16,7 @@ Upstream-Status: Pending
  struct rb_root hardlinks;
  static int out_fd = -1;
  static int in_fd = -1;
-@@ -408,7 +413,7 @@
+@@ -309,7 +314,7 @@ static struct filesystem_entry *recursiv
  	char *hpath, *tpath;
  	struct dirent *dp, **namelist;
  	struct filesystem_entry *entry;
@@ -22,8 +24,8 @@ Upstream-Status: Pending
 +	struct ignorepath_entry* element = ignorepath;
  
  	if (lstat(hostpath, &sb)) {
- 		perror_msg_and_die("%s", hostpath);
-@@ -417,6 +422,15 @@
+ 		sys_errmsg_die("%s", hostpath);
+@@ -318,6 +323,15 @@ static struct filesystem_entry *recursiv
  	entry = add_host_filesystem_entry(targetpath, hostpath,
  			sb.st_uid, sb.st_gid, sb.st_mode, 0, parent);
  
@@ -38,8 +40,8 @@ Upstream-Status: Pending
 +
  	n = scandir(hostpath, &namelist, 0, alphasort);
  	if (n < 0) {
- 		perror_msg_and_die("opening directory %s", hostpath);
-@@ -1453,6 +1467,7 @@
+ 		sys_errmsg_die("opening directory %s", hostpath);
+@@ -1359,6 +1373,7 @@ static struct option long_options[] = {
  	{"root", 1, NULL, 'r'},
  	{"pagesize", 1, NULL, 's'},
  	{"eraseblock", 1, NULL, 'e'},
@@ -47,15 +49,15 @@ Upstream-Status: Pending
  	{"output", 1, NULL, 'o'},
  	{"help", 0, NULL, 'h'},
  	{"verbose", 0, NULL, 'v'},
-@@ -1500,6 +1515,7 @@
- "  -L, --list-compressors  Show the list of the avaiable compressors\n"
+@@ -1409,6 +1424,7 @@ static const char helptext[] =
+ "  -L, --list-compressors  Show the list of the available compressors\n"
  "  -t, --test-compression  Call decompress and compare with the original (for test)\n"
  "  -n, --no-cleanmarkers   Don't add a cleanmarker to every eraseblock\n"
 +"  -I, --ignore=PATH       Ignore sub directory and file tree below PATH when recursing over the file system\n"
  "  -o, --output=FILE       Output to FILE (default: stdout)\n"
  "  -l, --little-endian     Create a little-endian filesystem\n"
  "  -b, --big-endian        Create a big-endian filesystem\n"
-@@ -1666,6 +1682,7 @@
+@@ -1566,6 +1582,7 @@ int main(int argc, char **argv)
  	char *compr_name = NULL;
  	int compr_prior  = -1;
  	int warn_page_size = 0;
@@ -63,7 +65,7 @@ Upstream-Status: Pending
  
  	page_size = sysconf(_SC_PAGESIZE);
  	if (page_size < 0) /* System doesn't know so ... */
-@@ -1676,7 +1693,7 @@
+@@ -1576,7 +1593,7 @@ int main(int argc, char **argv)
  	jffs2_compressors_init();
  
  	while ((opt = getopt_long(argc, argv,
@@ -72,7 +74,7 @@ Upstream-Status: Pending
  	{
  		switch (opt) {
  			case 'D':
-@@ -1700,6 +1717,28 @@
+@@ -1600,6 +1617,28 @@ int main(int argc, char **argv)
  				warn_page_size = 0; /* set by user, so don't need to warn */
  				break;
  
@@ -100,4 +102,4 @@ Upstream-Status: Pending
 +
  			case 'o':
  				if (out_fd != -1) {
- 					error_msg_and_die("output filename specified more than once");
+ 					errmsg_die("output filename specified more than once");

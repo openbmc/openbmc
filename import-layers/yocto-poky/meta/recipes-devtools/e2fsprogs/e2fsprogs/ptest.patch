@@ -1,10 +1,10 @@
 Upstream-Status: Inappropriate
 
-diff --git a/tests/Makefile.in b/tests/Makefile.in
-index c130f4a..d2ade03 100644
---- a/tests/Makefile.in
-+++ b/tests/Makefile.in
-@@ -18,7 +18,7 @@ test_one: $(srcdir)/test_one.in Makefile mke2fs.conf
+Index: git/tests/Makefile.in
+===================================================================
+--- git.orig/tests/Makefile.in
++++ git/tests/Makefile.in
+@@ -18,7 +18,7 @@ test_one: $(srcdir)/test_one.in Makefile
  	@echo "#!/bin/sh" > test_one
  	@echo "HTREE=y" >> test_one
  	@echo "QUOTA=y" >> test_one
@@ -12,8 +12,8 @@ index c130f4a..d2ade03 100644
 +	@echo "SRCDIR=${prefix}${libdir}/e2fsprogs/ptest/test" >> test_one
  	@echo "DIFF_OPTS=@UNI_DIFF_OPTS@" >> test_one
  	@echo "SIZEOF_TIME_T=@SIZEOF_TIME_T@" >> test_one
- 	@cat $(srcdir)/test_one.in >> test_one
-@@ -27,7 +27,7 @@ test_one: $(srcdir)/test_one.in Makefile mke2fs.conf
+ 	@echo "DD=@DD@" >>test_one
+@@ -28,7 +28,7 @@ test_one: $(srcdir)/test_one.in Makefile
  test_script: test_one test_script.in Makefile mke2fs.conf
  	@echo "Creating test_script..."
  	@echo "#!/bin/sh" > test_script
@@ -22,10 +22,10 @@ index c130f4a..d2ade03 100644
  	@cat $(srcdir)/test_script.in >> test_script
  	@chmod +x test_script
  
-diff --git a/tests/test_config b/tests/test_config
-index 547ef4c..e11e6f4 100644
---- a/tests/test_config
-+++ b/tests/test_config
+Index: git/tests/test_config
+===================================================================
+--- git.orig/tests/test_config
++++ git/tests/test_config
 @@ -3,24 +3,24 @@
  #
  
@@ -67,10 +67,10 @@ index 547ef4c..e11e6f4 100644
  CLEAN_OUTPUT="sed -f $cmd_dir/filter.sed"
  LD_LIBRARY_PATH=../lib:../lib/ext2fs:../lib/e2p:../lib/et:../lib/ss:${LD_LIBRARY_PATH}
  DYLD_LIBRARY_PATH=../lib:../lib/ext2fs:../lib/e2p:../lib/et:../lib/ss:${DYLD_LIBRARY_PATH}
-diff --git a/tests/test_script.in b/tests/test_script.in
-index 9959e30..442999d 100644
---- a/tests/test_script.in
-+++ b/tests/test_script.in
+Index: git/tests/test_script.in
+===================================================================
+--- git.orig/tests/test_script.in
++++ git/tests/test_script.in
 @@ -39,7 +39,7 @@ for i; do
  done
  

@@ -1,0 +1,215 @@
+From 4ffe00f1d9eac332d928f7dc01fe250dc32b1bb8 Mon Sep 17 00:00:00 2001
+From: Stan Cox <scox@redhat.com>
+Date: Tue, 13 Feb 2018 22:38:03 -0500
+Subject: [PATCH] Fixes for gcc 8
+
+* includes/sys/sdt.h (__SDT_COND_SIGNED):  Add CT, cast type argument
+
+Author: Will Cohen <wcohen.redhat.com>
+
+* stap-serverd.cxx (generate_mok, handleRequest, handle_connection):
+  Catch format overflow
+
+* translate.cxx (translate_pass): Use ref in catch.
+---
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ includes/sys/sdt.h | 20 ++++++++--------
+ stap-serverd.cxx   | 67 +++++++++++++++++++++++++++++++++++++++++++++++-------
+ translate.cxx      |  2 +-
+ 3 files changed, 70 insertions(+), 19 deletions(-)
+
+diff --git a/includes/sys/sdt.h b/includes/sys/sdt.h
+index 940f74483..c0c5a492c 100644
+--- a/includes/sys/sdt.h
++++ b/includes/sys/sdt.h
+@@ -119,8 +119,8 @@ struct __sdt_type
+   
+ #define __SDT_ALWAYS_SIGNED(T) \
+ template<> struct __sdt_type<T> { static const bool __sdt_signed = true; };
+-#define __SDT_COND_SIGNED(T) \
+-template<> struct __sdt_type<T> { static const bool __sdt_signed = ((T)(-1) < 1); };
++#define __SDT_COND_SIGNED(T,CT)						\
++template<> struct __sdt_type<T> { static const bool __sdt_signed = ((CT)(-1) < 1); };
+ __SDT_ALWAYS_SIGNED(signed char)
+ __SDT_ALWAYS_SIGNED(short)
+ __SDT_ALWAYS_SIGNED(int)
+@@ -141,14 +141,14 @@ __SDT_ALWAYS_SIGNED(const volatile short)
+ __SDT_ALWAYS_SIGNED(const volatile int)
+ __SDT_ALWAYS_SIGNED(const volatile long)
+ __SDT_ALWAYS_SIGNED(const volatile long long)
+-__SDT_COND_SIGNED(char)
+-__SDT_COND_SIGNED(wchar_t)
+-__SDT_COND_SIGNED(volatile char)
+-__SDT_COND_SIGNED(volatile wchar_t)
+-__SDT_COND_SIGNED(const char)
+-__SDT_COND_SIGNED(const wchar_t)
+-__SDT_COND_SIGNED(const volatile char)
+-__SDT_COND_SIGNED(const volatile wchar_t)
++__SDT_COND_SIGNED(char, char)
++__SDT_COND_SIGNED(wchar_t, wchar_t)
++__SDT_COND_SIGNED(volatile char, char)
++__SDT_COND_SIGNED(volatile wchar_t, wchar_t)
++__SDT_COND_SIGNED(const char, char)
++__SDT_COND_SIGNED(const wchar_t, wchar_t)
++__SDT_COND_SIGNED(const volatile char, char)
++__SDT_COND_SIGNED(const volatile wchar_t, wchar_t)
+ #if defined (__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))
+ /* __SDT_COND_SIGNED(char16_t) */
+ /* __SDT_COND_SIGNED(char32_t) */
+diff --git a/stap-serverd.cxx b/stap-serverd.cxx
+index 7cf76c617..41f77ee9e 100644
+--- a/stap-serverd.cxx
++++ b/stap-serverd.cxx
+@@ -1607,6 +1607,7 @@ generate_mok(string &mok_fingerprint)
+   char tmpdir[PATH_MAX] = { '\0' };
+   string public_cert_path, private_cert_path, destdir;
+   mode_t old_umask;
++  int retlen;
+ 
+   mok_fingerprint.clear ();
+ 
+@@ -1631,7 +1632,14 @@ generate_mok(string &mok_fingerprint)
+     }
+ 
+   // Make a temporary directory to store results in.
+-  snprintf (tmpdir, PATH_MAX, "%s/stap-server.XXXXXX", mok_path.c_str ());
++  retlen = snprintf (tmpdir, PATH_MAX, "%s/stap-server.XXXXXX", mok_path.c_str ());
++  if (retlen < 0 || retlen >= PATH_MAX)
++    {
++      server_error (_F("Could not create %s name", "temporary directory"));
++      tmpdir[0] = '\0';
++      goto cleanup;
++    }
++
+   if (mkdtemp (tmpdir) == NULL)
+     {
+       server_error (_F("Could not create temporary directory %s: %s", tmpdir, 
+@@ -1704,6 +1712,7 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
+   unsigned u;
+   unsigned i;
+   FILE* f;
++  int retlen;
+ 
+   // Save the server version. Do this early, so the client knows what version of the server
+   // it is dealing with, even if the request is not fully completed.
+@@ -1782,7 +1791,12 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
+       struct stat st;
+       char *arg;
+ 
+-      snprintf (stapargfile, PATH_MAX, "%s/argv%d", requestDirName.c_str (), i);
++      retlen = snprintf (stapargfile, PATH_MAX, "%s/argv%d", requestDirName.c_str (), i);
++      if (retlen < 0 || retlen >= PATH_MAX)
++        {
++          server_error (_F("Error creating %s name", "path"));
++          return;
++        }
+ 
+       rc = stat(stapargfile, & st);
+       if (rc) break;
+@@ -1888,7 +1902,15 @@ handleRequest (const string &requestDirName, const string &responseDirName, stri
+     {
+       glob_t globber;
+       char pattern[PATH_MAX];
+-      snprintf (pattern, PATH_MAX, "%s/*.ko", new_staptmpdir.c_str());
++      int retlen;
++
++      retlen = snprintf (pattern, PATH_MAX, "%s/*.ko", new_staptmpdir.c_str());
++      if (retlen < 0 || retlen >= PATH_MAX)
++        {
++          server_error (_F("Error creating %s name", "pattern"));
++          return;
++        }
++
+       rc = glob (pattern, GLOB_ERR, NULL, &globber);
+       if (rc)
+         server_error (_F("Unable to find a module in %s", new_staptmpdir.c_str()));
+@@ -2164,6 +2186,7 @@ handle_connection (void *arg)
+                         copy for each connection.*/
+   vector<string>     argv;
+   PRInt32            bytesRead;
++  int		     retlen;
+ 
+   /* Detatch to avoid a memory leak */
+   if(max_threads > 0)
+@@ -2213,7 +2236,13 @@ handle_connection (void *arg)
+ #endif
+ 
+   secStatus = SECFailure;
+-  snprintf(tmpdir, PATH_MAX, "%s/stap-server.XXXXXX", getenv("TMPDIR") ?: "/tmp");
++  retlen = snprintf(tmpdir, PATH_MAX, "%s/stap-server.XXXXXX", getenv("TMPDIR") ?: "/tmp");
++  if (retlen < 0 || retlen >= PATH_MAX)
++    {
++      server_error (_F("Error creating %s name", "temporary directory"));
++      tmpdir[0]=0; /* prevent /bin/rm */
++      goto cleanup;
++    }
+   rc1 = mkdtemp(tmpdir);
+   if (! rc1)
+     {
+@@ -2223,9 +2252,20 @@ handle_connection (void *arg)
+     }
+ 
+   /* Create a temporary files names and directories.  */
+-  snprintf (requestFileName, PATH_MAX, "%s/request.zip", tmpdir);
++  retlen = snprintf (requestFileName, PATH_MAX, "%s/request.zip", tmpdir);
++  if (retlen < 0 || retlen >= PATH_MAX)
++    {
++      server_error (_F("Error creating %s name", "request.zip path"));
++      goto cleanup;
++    }
++
++  retlen = snprintf (requestDirName, PATH_MAX, "%s/request", tmpdir);
++  if (retlen < 0 || retlen >= PATH_MAX)
++    {
++      server_error (_F("Error creating %s name", "request directory path"));
++      goto cleanup;
++    }
+ 
+-  snprintf (requestDirName, PATH_MAX, "%s/request", tmpdir);
+   rc = mkdir(requestDirName, 0700);
+   if (rc)
+     {
+@@ -2233,7 +2273,13 @@ handle_connection (void *arg)
+       goto cleanup;
+     }
+ 
+-  snprintf (responseDirName, PATH_MAX, "%s/response", tmpdir);
++  retlen = snprintf (responseDirName, PATH_MAX, "%s/response", tmpdir);
++  if (retlen < 0 || retlen >= PATH_MAX)
++    {
++      server_error (_F("Error creating %s name", "response directory path"));
++      goto cleanup;
++    }
++
+   rc = mkdir(responseDirName, 0700);
+   if (rc)
+     {
+@@ -2243,7 +2289,12 @@ handle_connection (void *arg)
+   // Set this early, since it gets used for errors to be returned to the client.
+   stapstderr = string(responseDirName) + "/stderr";
+ 
+-  snprintf (responseFileName, PATH_MAX, "%s/response.zip", tmpdir);
++  retlen = snprintf (responseFileName, PATH_MAX, "%s/response.zip", tmpdir);
++  if (retlen < 0 || retlen >= PATH_MAX)
++    {
++      server_error (_F("Error creating %s name", "response.zip path"));
++      goto cleanup;
++    }
+ 
+   /* Read data from the socket.
+    * If the user is requesting/requiring authentication, authenticate
+diff --git a/translate.cxx b/translate.cxx
+index 1240a80ec..4ade06fdd 100644
+--- a/translate.cxx
++++ b/translate.cxx
+@@ -7860,7 +7860,7 @@ translate_pass (systemtap_session& s)
+ 	  if (versions.size() >= 3 && s.verbose > 1)
+ 	    clog << _F("ignoring extra parts of compat version: %s", s.compatible.c_str()) << endl;
+ 	}
+-      catch (const runtime_error)
++      catch (const runtime_error&)
+ 	{
+ 	  throw SEMANTIC_ERROR(_F("parse error in compatibility version: %s", s.compatible.c_str()));
+ 	}

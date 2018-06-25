@@ -60,7 +60,7 @@ fi
 
 PACKAGES_DIR="/var/opt/lsb/test/manager/packages/ftp.linuxfoundation.org/pub/lsb"
 
-BASE_PACKAGES_DIR="${PACKAGES_DIR}/base/${LSB_RELEASE}/binary"
+BASE_PACKAGES_DIR="${PACKAGES_DIR}/base/released-all/binary"
 RUNTIME_BASE_PACKAGES_DIR="${PACKAGES_DIR}/test_suites/released-all/binary/runtime"
 RUNTIME_PACKAGES_DIR="${PACKAGES_DIR}/test_suites/${LSB_RELEASE}/binary/runtime"
 APP_PACKAGES_DIR="${PACKAGES_DIR}/app-battery/${LSB_RELEASE}/${LSB_ARCH}"
@@ -98,7 +98,7 @@ then
 fi
 
 # Official download server list. You can replace them with your own server.
-SERVER_IPADDR="140.211.169.23"
+SERVER_IPADDR="140.211.169.28"
 SERVER_NAME="ftp.linuxfoundation.org"
 
 if ! `grep -F -q "${SERVER_NAME}" /etc/hosts`; then

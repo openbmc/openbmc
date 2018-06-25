@@ -28,6 +28,9 @@ SSTATE_EXTRAPATH[vardepvalue] = ""
 SSTATE_DUPWHITELIST = "${DEPLOY_DIR_IMAGE}/ ${DEPLOY_DIR}/licenses/ ${DEPLOY_DIR_RPM}/noarch/"
 # Avoid docbook/sgml catalog warnings for now
 SSTATE_DUPWHITELIST += "${STAGING_ETCDIR_NATIVE}/sgml ${STAGING_DATADIR_NATIVE}/sgml"
+# sdk-provides-dummy-nativesdk and nativesdk-buildtools-perl-dummy overlap for different SDKMACHINE
+SSTATE_DUPWHITELIST += "${DEPLOY_DIR_RPM}/sdk_provides_dummy_nativesdk/ ${DEPLOY_DIR_IPK}/sdk-provides-dummy-nativesdk/"
+SSTATE_DUPWHITELIST += "${DEPLOY_DIR_RPM}/buildtools_dummy_nativesdk/ ${DEPLOY_DIR_IPK}/buildtools-dummy-nativesdk/"
 # Archive the sources for many architectures in one deploy folder
 SSTATE_DUPWHITELIST += "${DEPLOY_DIR_SRC}"
 
@@ -45,7 +48,8 @@ SSTATE_ARCHS = " \
     ${SDK_ARCH}_${PACKAGE_ARCH} \
     allarch \
     ${PACKAGE_ARCH} \
-    ${MACHINE}"
+    ${PACKAGE_EXTRA_ARCHS} \
+    ${MACHINE_ARCH}"
 
 SSTATE_MANMACH ?= "${SSTATE_PKGARCH}"
 
@@ -538,15 +542,15 @@ python sstate_hardcode_path () {
     staging_host = d.getVar('RECIPE_SYSROOT_NATIVE')
     sstate_builddir = d.getVar('SSTATE_BUILDDIR')
 
+    sstate_sed_cmd = "sed -i -e 's:%s:FIXMESTAGINGDIRHOST:g'" % staging_host
     if bb.data.inherits_class('native', d) or bb.data.inherits_class('cross-canadian', d):
         sstate_grep_cmd = "grep -l -e '%s'" % (staging_host)
-        sstate_sed_cmd = "sed -i -e 's:%s:FIXMESTAGINGDIRHOST:g'" % (staging_host)
     elif bb.data.inherits_class('cross', d) or bb.data.inherits_class('crosssdk', d):
         sstate_grep_cmd = "grep -l -e '%s' -e '%s'" % (staging_target, staging_host)
-        sstate_sed_cmd = "sed -i -e 's:%s:FIXMESTAGINGDIRTARGET:g; s:%s:FIXMESTAGINGDIRHOST:g'" % (staging_target, staging_host)
+        sstate_sed_cmd += " -e 's:%s:FIXMESTAGINGDIRTARGET:g'" % staging_target
     else:
-        sstate_grep_cmd = "grep -l -e '%s'" % (staging_target)
-        sstate_sed_cmd = "sed -i -e 's:%s:FIXMESTAGINGDIRTARGET:g'" % (staging_target)
+        sstate_grep_cmd = "grep -l -e '%s' -e '%s'" % (staging_target, staging_host)
+        sstate_sed_cmd += " -e 's:%s:FIXMESTAGINGDIRTARGET:g'" % staging_target
 
     extra_staging_fixmes = d.getVar('EXTRA_STAGING_FIXMES') or ''
     for fixmevar in extra_staging_fixmes.split():
@@ -845,7 +849,7 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
                 missed.append(task)
                 bb.debug(2, "SState: Unsuccessful fetch test for %s" % srcuri)
                 pass
-            bb.event.fire(bb.event.ProcessProgress("Checking sstate mirror object availability", len(tasklist) - thread_worker.tasks.qsize()), d)
+            bb.event.fire(bb.event.ProcessProgress(msg, len(tasklist) - thread_worker.tasks.qsize()), d)
 
         tasklist = []
         for task in range(len(sq_fn)):
@@ -856,7 +860,8 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
             tasklist.append((task, sstatefile))
 
         if tasklist:
-            bb.event.fire(bb.event.ProcessStarted("Checking sstate mirror object availability", len(tasklist)), d)
+            msg = "Checking sstate mirror object availability"
+            bb.event.fire(bb.event.ProcessStarted(msg, len(tasklist)), d)
 
             import multiprocessing
             nproc = min(multiprocessing.cpu_count(), len(tasklist))
@@ -870,7 +875,7 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False):
             pool.wait_completion()
             bb.event.disable_threadlock()
 
-            bb.event.fire(bb.event.ProcessFinished("Checking sstate mirror object availability"), d)
+            bb.event.fire(bb.event.ProcessFinished(msg), d)
 
     inheritlist = d.getVar("INHERIT")
     if "toaster" in inheritlist:
@@ -1022,7 +1027,7 @@ python sstate_eventhandler2() {
         with open(preservestampfile, 'r') as f:
             preservestamps = f.readlines()
     seen = []
-    for a in d.getVar("SSTATE_ARCHS").split():
+    for a in sorted(list(set(d.getVar("SSTATE_ARCHS").split()))):
         toremove = []
         i = d.expand("${SSTATE_MANIFESTS}/index-" + a)
         if not os.path.exists(i):
@@ -1038,18 +1043,25 @@ python sstate_eventhandler2() {
                         seen.append(stamp)
 
         if toremove:
-            bb.note("There are %d recipes to be removed from sysroot %s, removing..." % (len(toremove), a))
+            msg = "Removing %d recipes from the %s sysroot" % (len(toremove), a)
+            bb.event.fire(bb.event.ProcessStarted(msg, len(toremove)), d)
 
-        for r in toremove:
-            (stamp, manifest, workdir) = r.split()
-            for m in glob.glob(manifest + ".*"):
-                if m.endswith(".postrm"):
-                    continue
-                sstate_clean_manifest(m, d)
-            bb.utils.remove(stamp + "*")
-            if removeworkdir:
-                bb.utils.remove(workdir, recurse = True)
-            lines.remove(r)
+            removed = 0
+            for r in toremove:
+                (stamp, manifest, workdir) = r.split()
+                for m in glob.glob(manifest + ".*"):
+                    if m.endswith(".postrm"):
+                        continue
+                    sstate_clean_manifest(m, d)
+                bb.utils.remove(stamp + "*")
+                if removeworkdir:
+                    bb.utils.remove(workdir, recurse = True)
+                lines.remove(r)
+                removed = removed + 1
+                bb.event.fire(bb.event.ProcessProgress(msg, removed), d)
+
+            bb.event.fire(bb.event.ProcessFinished(msg), d)
+
         with open(i, "w") as f:
             for l in lines:
                 f.write(l)

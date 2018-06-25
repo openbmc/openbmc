@@ -4,10 +4,10 @@ Upstream-Status: Pending
  libparted/arch/linux.c |   13 +++++++++++++
  1 file changed, 13 insertions(+)
 
-Index: parted-1.9.0/libparted/arch/linux.c
+Index: parted-3.2/libparted/arch/linux.c
 ===================================================================
---- parted-1.9.0.orig/libparted/arch/linux.c	2009-07-23 18:52:08.000000000 +0100
-+++ parted-1.9.0/libparted/arch/linux.c	2010-02-02 14:14:16.523904768 +0000
+--- parted-3.2.orig/libparted/arch/linux.c
++++ parted-3.2/libparted/arch/linux.c
 @@ -17,6 +17,8 @@
  
  #define PROC_DEVICES_BUFSIZ 16384
@@ -16,8 +16,8 @@ Index: parted-1.9.0/libparted/arch/linux.c
 +
  #include <config.h>
  #include <arch/linux.h>
- 
-@@ -1477,12 +1479,14 @@
+ #include <linux/blkpg.h>
+@@ -1696,12 +1698,14 @@ linux_refresh_close (PedDevice* dev)
  
  #if SIZEOF_OFF_T < 8
  
@@ -32,7 +32,7 @@ Index: parted-1.9.0/libparted/arch/linux.c
  
  loff_t
  llseek (unsigned int fd, loff_t offset, unsigned int whence)
-@@ -1490,11 +1494,20 @@
+@@ -1709,11 +1713,20 @@ llseek (unsigned int fd, loff_t offset,
          loff_t result;
          int retval;
  

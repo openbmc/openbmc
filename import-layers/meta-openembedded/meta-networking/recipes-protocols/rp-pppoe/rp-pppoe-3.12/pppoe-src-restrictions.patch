@@ -1,3 +1,8 @@
+From a6a85ec5c85cbd3c86743b6e2fa391198869bff8 Mon Sep 17 00:00:00 2001
+From: Tom Rini <tom_rini@mentor.com>
+Date: Wed, 27 Jul 2011 03:46:52 +0000
+Subject: [PATCH] rp-pppoe: Port from oe.dev
+
 Relax restrictions on the PPPoE src address, as per debian bug
 293811:
 
@@ -5,9 +10,15 @@ Relax restrictions on the PPPoE src address, as per debian bug
 
 Upstream-Status: Inappropriate [Backport from Debian]
 
---- rp-pppoe-3.8.orig/src/discovery.c
-+++ rp-pppoe-3.8/src/discovery.c
-@@ -376,8 +376,8 @@
+---
+ src/discovery.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/discovery.c b/src/discovery.c
+index 7ee259d..5213a37 100644
+--- a/src/discovery.c
++++ b/src/discovery.c
+@@ -472,8 +472,8 @@ waitForPADO(PPPoEConnection *conn, int timeout)
  	if (!packetIsForMe(conn, &packet)) continue;
  
  	if (packet.code == CODE_PADO) {
@@ -17,4 +28,4 @@ Upstream-Status: Inappropriate [Backport from Debian]
 +		printErr("Ignoring broadcast PADO packet");
  		continue;
  	    }
- 	    parsePacket(&packet, parsePADOTags, &pc);
+ #ifdef PLUGIN

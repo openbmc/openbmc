@@ -30,6 +30,7 @@ PACKAGECONFIG[ruih] = "--enable-ruih-plugin,--disable-ruih-plugin"
 PACKAGECONFIG[media-export] = "--enable-media-export-plugin,--disable-media-export-plugin"
 PACKAGECONFIG[gst-launch] = "--enable-gst-launch-plugin,--disable-gst-launch-plugin"
 PACKAGECONFIG[gtk+3] = ",--without-ui,gtk+3"
+PACKAGECONFIG[lms] = "--enable-lms-plugin,--disable-lms-plugin"
 
 LIBV = "2.6"
 

@@ -69,6 +69,7 @@ Usage: you can run this script with any valid combination
 of the following environment variables (in any order):
   KERNEL - the kernel image file to use
   ROOTFS - the rootfs image file or nfsroot directory to use
+  DEVICE_TREE - the device tree blob to use
   MACHINE - the machine name (optional, autodetected from KERNEL filename if unspecified)
   Simplified QEMU command-line options can be passed with:
     nographic - disable video console
@@ -178,6 +179,7 @@ class BaseConfig(object):
         self.env_vars = ('MACHINE',
                         'ROOTFS',
                         'KERNEL',
+                        'DEVICE_TREE',
                         'DEPLOY_DIR_IMAGE',
                         'OE_TMPDIR',
                         'OECORE_NATIVE_SYSROOT',
@@ -584,16 +586,20 @@ class BaseConfig(object):
                 raise RunQemuError("Can't find OVMF firmware: %s" % ovmf)
 
     def check_kernel(self):
-        """Check and set kernel, dtb"""
+        """Check and set kernel"""
         # The vm image doesn't need a kernel
         if self.fstype in self.vmtypes:
             return
+
+        # See if the user supplied a KERNEL option
+        if self.get('KERNEL'):
+            self.kernel = self.get('KERNEL')
 
         # QB_DEFAULT_KERNEL is always a full file path
         kernel_name = os.path.basename(self.get('QB_DEFAULT_KERNEL'))
 
         # The user didn't want a kernel to be loaded
-        if kernel_name == "none":
+        if kernel_name == "none" and not self.kernel:
             return
 
         deploy_dir_image = self.get('DEPLOY_DIR_IMAGE')
@@ -609,8 +615,18 @@ class BaseConfig(object):
         if not os.path.exists(self.kernel):
             raise RunQemuError("KERNEL %s not found" % self.kernel)
 
+    def check_dtb(self):
+        """Check and set dtb"""
+        # Did the user specify a device tree?
+        if self.get('DEVICE_TREE'):
+            self.dtb = self.get('DEVICE_TREE')
+            if not os.path.exists(self.dtb):
+                raise RunQemuError('Specified DTB not found: %s' % self.dtb)
+            return
+
         dtb = self.get('QB_DTB')
         if dtb:
+            deploy_dir_image = self.get('DEPLOY_DIR_IMAGE')
             cmd_match = "%s/%s" % (deploy_dir_image, dtb)
             cmd_startswith = "%s/%s*" % (deploy_dir_image, dtb)
             cmd_wild = "%s/*.dtb" % deploy_dir_image
@@ -679,6 +695,7 @@ class BaseConfig(object):
         self.check_rootfs()
         self.check_ovmf()
         self.check_kernel()
+        self.check_dtb()
         self.check_biosdir()
         self.check_mem()
         self.check_tcpserial()
@@ -1089,6 +1106,10 @@ class BaseConfig(object):
             qbsys = 'mipsel'
         elif mach == 'qemumips64el':
             qbsys = 'mips64el'
+        elif mach == 'qemuriscv64':
+            qbsys = 'riscv64'
+        elif mach == 'qemuriscv32':
+            qbsys = 'riscv32'
 
         return 'qemu-system-%s' % qbsys
 

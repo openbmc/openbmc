@@ -250,6 +250,7 @@ class Wget(FetchMethod):
                         return ""
                     def close(self):
                         pass
+                    closed = False
 
                 resp = addinfourl(fp_dummy(), r.msg, req.get_full_url())
                 resp.code = r.status
@@ -332,7 +333,8 @@ class Wget(FetchMethod):
             except (TypeError, ImportError, IOError, netrc.NetrcParseError):
                  pass
 
-            opener.open(r)
+            with opener.open(r) as response:
+                pass
         except urllib.error.URLError as e:
             if try_again:
                 logger.debug(2, "checkstatus: trying again")

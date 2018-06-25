@@ -1,7 +1,7 @@
 inherit image_types
 
 #
-# Create an image that can by written onto a SD card using dd.
+# Create an image that can be written onto a SD card using dd.
 #
 # The disk layout used is:
 #
@@ -57,6 +57,8 @@ do_image_rpi_sdimg[depends] = " \
 			${IMAGE_BOOTLOADER}:do_deploy \
 			${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot:do_deploy', '',d)} \
 			"
+
+do_image_rpi_sdimg[recrdeps] = "do_build"
 
 # SD card image name
 SDIMG = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.rpi-sdimg"

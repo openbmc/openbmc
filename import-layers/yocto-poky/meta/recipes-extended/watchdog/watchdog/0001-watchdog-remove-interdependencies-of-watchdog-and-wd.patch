@@ -1,0 +1,68 @@
+From c1fe14fa5bd168292cc4670034bc48b954e9dac7 Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Tue, 13 Mar 2018 14:49:55 +0200
+Subject: [PATCH] watchdog: remove interdependencies of watchdog and
+ wd_keepalive services
+
+Since watchdog and watchdog-keepalive packages can't be installed
+together, remove the inter-dependencies of watchdog and wd_keepalive
+services
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ debian/watchdog.service     |  9 +++------
+ debian/wd_keepalive.service | 10 +++++-----
+ 2 files changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/debian/watchdog.service b/debian/watchdog.service
+index 7a2fc36..f31d1fe 100644
+--- a/debian/watchdog.service
++++ b/debian/watchdog.service
+@@ -1,16 +1,13 @@
+ [Unit]
+ Description=watchdog daemon
+-Conflicts=wd_keepalive.service
+ After=multi-user.target
+-OnFailure=wd_keepalive.service
+ 
+ [Service]
+ Type=forking
+ EnvironmentFile=/etc/default/watchdog
+ ExecStartPre=/bin/sh -c '[ -z "${watchdog_module}" ] || [ "${watchdog_module}" = "none" ] || /sbin/modprobe $watchdog_module'
+-ExecStart=/bin/sh -c '[ $run_watchdog != 1 ] || exec /usr/sbin/watchdog $watchdog_options'
+-ExecStopPost=/bin/sh -c '[ $run_wd_keepalive != 1 ] || false'
++ExecStart=/bin/sh -c '[ x$run_watchdog != x1 ] || exec /usr/sbin/watchdog $watchdog_options'
++PIDFile=/var/run/watchdog.pid
+ 
+ [Install]
+-WantedBy=default.target
+-
++WantedBy=multi-user.target
+diff --git a/debian/wd_keepalive.service b/debian/wd_keepalive.service
+index 45b018e..7f8b1dc 100644
+--- a/debian/wd_keepalive.service
++++ b/debian/wd_keepalive.service
+@@ -1,13 +1,13 @@
+ [Unit]
+ Description=watchdog keepalive daemon
+-Before=watchdog.service shutdown.target
+-Conflicts=watchdog.service shutdown.target
++After=multi-user.target
+ 
+ [Service]
+ Type=forking
+ EnvironmentFile=/etc/default/watchdog
+ ExecStartPre=/bin/sh -c '[ -z "${watchdog_module}" ] || [ "${watchdog_module}" = "none" ] || /sbin/modprobe $watchdog_module'
+-ExecStartPre=-/bin/systemctl reset-failed watchdog.service
+ ExecStart=/usr/sbin/wd_keepalive $watchdog_options
+-ExecStartPost=/bin/sh -c 'ln -s /var/run/wd_keepalive.pid /run/sendsigs.omit.d/wd_keepalive.pid'
+-ExecStopPost=/bin/sh -c 'rm -f /run/sendsigs.omit.d/wd_keepalive.pid'
++PIDFile=/var/run/wd_keepalive.pid
++
++[Install]
++WantedBy=multi-user.target
+-- 
+2.4.0
+

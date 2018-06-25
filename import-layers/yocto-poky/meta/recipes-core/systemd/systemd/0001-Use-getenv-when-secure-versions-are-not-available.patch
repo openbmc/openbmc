@@ -1,0 +1,33 @@
+From b1192a6e171413291d9d64fafc04773c6bbc9cab Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Fri, 23 Feb 2018 10:04:48 +0800
+Subject: [PATCH 01/31] Use getenv when secure versions are not available
+
+musl doesnt implement secure version, so we default
+to it if configure does not detect a secure implementation
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Denied
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/missing.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/basic/missing.h b/src/basic/missing.h
+index 1280e6c41..39c1fb700 100644
+--- a/src/basic/missing.h
++++ b/src/basic/missing.h
+@@ -605,7 +605,7 @@ struct btrfs_ioctl_quota_ctl_args {
+ #  if HAVE___SECURE_GETENV
+ #    define secure_getenv __secure_getenv
+ #  else
+-#    error "neither secure_getenv nor __secure_getenv are available"
++#    define secure_getenv getenv
+ #  endif
+ #endif
+ 
+-- 
+2.13.0
+

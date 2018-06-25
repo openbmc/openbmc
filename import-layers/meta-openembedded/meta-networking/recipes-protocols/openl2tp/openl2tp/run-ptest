@@ -1,0 +1,97 @@
+#!/bin/sh
+
+TMP_DIR=`mktemp -d /tmp/std.26.tmp.XXXXXX`
+
+# restore the file if exist
+restore_file()
+{
+	filelist="test_procs.tcl tunnel.test session.test"
+	for file in ${filelist}
+	do
+		if [ -f ${TMP_DIR}/${file} ]; then
+			mv ${TMP_DIR}/${file} ${OPENL2TP_DIR}
+		fi
+	done
+}
+
+exit_cus()
+{
+	restore_file
+	echo $1
+	exit $2
+}
+
+if [ -d /usr/lib64/openl2tp/ptest ]; then
+	OPENL2TP_DIR="/usr/lib64/openl2tp"
+elif [ -d /usr/lib/openl2tp/ptest ]; then
+	OPENL2TP_DIR="/usr/lib/openl2tp"
+else
+	exit_cus "The openl2tp ptest directory not installed, skip the test" 1
+fi
+
+#read -p "Please input the network interface you use to test(such as eth0, em1 etc):" ETH_TEST
+echo "Please input the network interface you use to test(such as eth0, em1 etc):"
+read ETH_TEST > /dev/null
+
+if [ x"$ETH_TEST" = x ]; then
+    exit_cus "The network interface cannot be null" 1
+fi
+ifconfig | grep $ETH_TEST > /dev/null || exit_cus "The network interface you provide is invalid" 1
+
+# check openl2tp related kernel config
+zcat /proc/config.gz | grep CONFIG_L2TP=y > /dev/null || exit_cus "Failed to check CONFIG_L2TP=y, skip the tests." 1
+zcat /proc/config.gz | grep CONFIG_PPPOL2TP=m > /dev/null || exit_cus "Failed to check CONFIG_PPPOL2TP=m, skip the tests." 1
+
+SYSV_INIT="/etc/init.d/rpcbind"
+if [ -e ${SYSV_INIT} ]; then
+	${SYSV_INIT} status > /dev/null || ${SYSV_INIT} start > /dev/null
+else
+	systemctl status rpcbind > /dev/null || systemctl start rpcbind > /dev/null
+fi
+
+which systemctl > /dev/null && systemctl status rpcbind > /dev/null || service rpcbind status > /dev/null
+[ $? -ne 0 ] && exit_cus "Failed to start rpcbind service, skip the tests." 1
+
+# backup the below files
+cp ${OPENL2TP_DIR}/ptest/test_procs.tcl $TMP_DIR
+cp ${OPENL2TP_DIR}/ptest/tunnel.test $TMP_DIR
+cp ${OPENL2TP_DIR}/ptest/session.test $TMP_DIR
+
+# customise the config
+if [ x"$ETH_TEST" = x ]; then
+	exit_cus "Please set ETH_TEST which used to test first, skip the tests." 1
+fi
+
+sed -i 's/eth2/'\"$ETH_TEST\"'/g' ${OPENL2TP_DIR}/ptest/test_procs.tcl
+test_ip="`ifconfig $ETH_TEST | grep 'inet ' | sed 's/^.*inet addr://g' | \
+    sed 's/ *Mask.*$//g'|sed 's/ *Bcast.*$//g'`"
+sed -i 's/192.168.0.1/'"$test_ip"'/g' ${OPENL2TP_DIR}/ptest/tunnel.test
+
+# load module l2tp_ppp
+modprobe  l2tp_ppp > /dev/null
+lsmod | grep l2tp_ppp > /dev/null || exit_cus "FAIL: Load module l2tp_ppp" 2
+
+# start openl2tpd
+ps aux | grep openl2tpd | grep -v grep > /dev/null && killall openl2tpd > /dev/null
+ppp_path=`rpm -ql openl2tp | grep ppp_null.so`
+echo "test it here"
+/usr/sbin/openl2tpd -d all -D -f -p ${ppp_path} &  > /dev/null
+
+# prepare the test env
+rm -rf $OPENL2TP_DIR/results
+mkdir -p $OPENL2TP_DIR/results || exit_cus "FAIL: mkdir $OPENL2TP_DIR/results" 2
+cp /usr/bin/l2tpconfig ${OPENL2TP_DIR} || exit_cus "FAIL: copy /usr/bin/l2tpconfig to ${OPENL2TP_DIR}" 2
+
+# start the test
+cd ${OPENL2TP_DIR}/ptest && tclsh all.tcl -preservecore 3 -verbose bps -tmpdir $OPENL2TP_DIR/results -outfile test-l2tpd.result -constraints "l2tpdRunning peerProfile tunnelProfile sessionProfile pppProfile system" -match "peer_profile-1.1 tunnel_profile-1.1 session_profile-1.1 ppp_profile-1.1 system-1.1"
+
+# check the result
+PASSNUM=`grep PASS $OPENL2TP_DIR/results/test-l2tpd.result | wc -l`
+FAILNUM=`grep FAIL $OPENL2TP_DIR/results/test-l2tpd.result | wc -l`
+if [ $PASSNUM -ne 0 ] && [ $FAILNUM -eq 0 ]; then
+    echo "PASS: openl2tp"
+else
+    echo "FAIL: openl2tp"
+fi
+
+restore_file

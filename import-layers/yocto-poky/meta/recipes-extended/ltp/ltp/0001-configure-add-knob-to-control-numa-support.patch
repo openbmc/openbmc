@@ -1,0 +1,50 @@
+From 39a85a1f1e6624f554215ba4b6843d3689a8415e Mon Sep 17 00:00:00 2001
+From: Anders Roxell <anders.roxell@linaro.org>
+Date: Mon, 5 Feb 2018 11:56:04 +0100
+Subject: [PATCH] configure: add knob to control numa support
+
+Allow to disable numa from the top level.
+
+Based on patch:
+http://cgit.openembedded.org/openembedded-core/commit/meta/recipes-extended/ltp?id=4c7873552e13dfdba96afca7562c398d2966ca71
+
+Reported-by: Roy Li <rongqing.li@windriver.com>
+Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
+Upstream-Status: Accepted
+---
+ configure.ac | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 5c8d4ea..b39a31d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -83,6 +83,14 @@ else
+     AC_SUBST([WITH_EXPECT],["no"])
+ fi
+ 
++# Numa
++AC_ARG_WITH([numa],
++  AC_HELP_STRING([--without-numa],
++    [without numa support (default=yes)]),
++  [with_numa=no],
++  [with_numa=yes]
++)
++
+ # Perl
+ AC_ARG_WITH([perl],
+   [AC_HELP_STRING([--with-perl],
+@@ -157,7 +165,9 @@ LTP_CHECK_SELINUX
+ LTP_CHECK_SIGNAL
+ LTP_CHECK_SYSCALL_EVENTFD
+ LTP_CHECK_SYSCALL_MODIFY_LDT
++if test "x$with_numa" = xyes; then
+ LTP_CHECK_SYSCALL_NUMA
++fi
+ LTP_CHECK_SYSCALL_QUOTACTL
+ LTP_CHECK_SYSCALL_SIGNALFD
+ LTP_CHECK_SYSCALL_UNSHARE
+-- 
+2.7.4
+

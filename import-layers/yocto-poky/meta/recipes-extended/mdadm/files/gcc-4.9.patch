@@ -7,13 +7,13 @@ make: *** [super-intel.o] Error 1
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
 
-Index: mdadm-3.3/super-intel.c
+Index: mdadm-4.0/super-intel.c
 ===================================================================
---- mdadm-3.3.orig/super-intel.c	2014-05-02 15:08:21.154319651 -0700
-+++ mdadm-3.3/super-intel.c	2014-05-02 15:09:31.470985794 -0700
-@@ -5060,7 +5060,7 @@
- 	spare->cache_size = mpb->cache_size,
- 	spare->pwr_cycle_count = __cpu_to_le32(1),
+--- mdadm-4.0.orig/super-intel.c
++++ mdadm-4.0/super-intel.c
+@@ -5725,7 +5725,7 @@ static int write_super_imsm_spares(struc
+ 	spare->cache_size = mpb->cache_size;
+ 	spare->pwr_cycle_count = __cpu_to_le32(1);
  
 -	snprintf((char *) spare->sig, MAX_SIGNATURE_LENGTH,
 +	(void)snprintf((char *) spare->sig, MAX_SIGNATURE_LENGTH,

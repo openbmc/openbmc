@@ -1,4 +1,7 @@
-lmbench: Fix "make html" graph failure
+From b21ca9f3911628fb66f308c6916485bbbcfb29a4 Mon Sep 17 00:00:00 2001
+From: Lin Yu <lin.yu@windriver.com>
+Date: Tue, 19 Aug 2014 05:16:16 -0400
+Subject: [PATCH] lmbench: Fix "make html" graph failure
 
 The html-list perl script cannot parse the first line of the result
 files about the lmbench version.
@@ -13,6 +16,11 @@ Reworded patch description.
 Upstream-status: inappropriate [ configuration ]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+---
+ results/Makefile  | 1 +
+ scripts/html-list | 7 ++-----
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/results/Makefile b/results/Makefile
 index 0935376..1ef9a15 100644
@@ -38,7 +46,7 @@ index 9850461..6383115 100755
 +<h2><a href=summary.out>Summary of results</a></h2>
  <hr>
  EOF
-
+ 
 @@ -47,7 +47,7 @@ foreach $os (@os) {
  		open(F, $file);
  		$_ = <F>;

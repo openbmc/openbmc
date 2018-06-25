@@ -1,0 +1,65 @@
+From 7f8878ac1aaf4a19992d39379797c151301bedb1 Mon Sep 17 00:00:00 2001
+From: Oleksiy Obitotskyy <oobitots@cisco.com>
+Date: Mon, 5 Feb 2018 08:29:10 -0800
+Subject: [PATCH] Fix build with clang
+
+Fix "error: non-void function 'fix_options' should return a value".
+Add function prototype to tcpd.c and miscd.c.
+
+Upstream-Status: Pending
+
+Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
+---
+ v2 - add function prototypes
+
+ fix_options.c | 2 +-
+ miscd.c       | 4 ++++
+ tcpd.c        | 4 ++++
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/fix_options.c b/fix_options.c
+index b5e81b8..9958ff4 100644
+--- a/fix_options.c
++++ b/fix_options.c
+@@ -29,7 +29,7 @@ static char sccsid[] = "@(#) fix_options.c 1.6 97/04/08 02:29:19";
+ 
+ /* fix_options - get rid of IP-level socket options */
+ 
+-fix_options(request)
++void fix_options(request)
+ struct request_info *request;
+ {
+ #ifdef IP_OPTIONS
+diff --git a/miscd.c b/miscd.c
+index 1ab835c..723b83a 100644
+--- a/miscd.c
++++ b/miscd.c
+@@ -40,6 +40,10 @@ static char sccsid[] = "@(#) miscd.c 1.10 96/02/11 17:01:30";
+ #include "patchlevel.h"
+ #include "tcpd.h"
+ 
++#ifdef KILL_IP_OPTIONS
++void fix_options(struct request_info *);
++#endif
++
+ int     allow_severity = SEVERITY;	/* run-time adjustable */
+ int     deny_severity = LOG_WARNING;	/* ditto */
+ 
+diff --git a/tcpd.c b/tcpd.c
+index d865b9c..a179891 100644
+--- a/tcpd.c
++++ b/tcpd.c
+@@ -38,6 +38,10 @@ static char sccsid[] = "@(#) tcpd.c 1.10 96/02/11 17:01:32";
+ #include "patchlevel.h"
+ #include "tcpd.h"
+ 
++#ifdef KILL_IP_OPTIONS
++void fix_options(struct request_info *);
++#endif
++
+ int     allow_severity = SEVERITY;	/* run-time adjustable */
+ int     deny_severity = LOG_WARNING;	/* ditto */
+ 
+-- 
+2.10.3.dirty
+

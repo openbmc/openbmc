@@ -259,6 +259,14 @@ if [ $savescripts = 0 ] ; then
 	$SUDO_EXEC rm -f ${env_setup_script%/*}/relocate_sdk.py ${env_setup_script%/*}/relocate_sdk.sh
 fi
 
+# Execute post-relocation script
+post_relocate="$target_sdk_dir/post-relocate-setup.sh"
+if [ -e "$post_relocate" ]; then
+	$SUDO_EXEC sed -e "s:@SDKPATH@:$target_sdk_dir:g" -i $post_relocate
+	$SUDO_EXEC /bin/sh $post_relocate "$target_sdk_dir" "@SDKPATH@"
+	$SUDO_EXEC rm -f $post_relocate
+fi
+
 echo "SDK has been successfully set up and is ready to be used."
 echo "Each time you wish to use the SDK in a new shell session, you need to source the environment setup script e.g."
 for env_setup_script in `ls $target_sdk_dir/environment-setup-*`; do

@@ -10,3 +10,5 @@ SRC_URI[sha256sum] = "c4621b64d50be9461d9bd9a71ba0b4af06fbbf818bbd483752d95c1a4e
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 inherit setuptools3 python3native pypi
+
+RDEPENDS_${PN} += "${PYTHON_PN}-datetime"

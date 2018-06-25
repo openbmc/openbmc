@@ -48,9 +48,12 @@ class PtestRunnerTest(OERuntimeTestCase):
 
     @OETestID(1600)
     @skipIfNotFeature('ptest', 'Test requires ptest to be in DISTRO_FEATURES')
-    @skipIfNotFeature('ptest-pkgs', 'Test requires ptest-pkgs to be in IMAGE_FEATURES')
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_ptestrunner(self):
+        status, output = self.target.run('which ptest-runner', 0)
+        if status != 0:
+            self.skipTest("No -ptest packages are installed in the image")
+
         import datetime
 
         test_log_dir = self.td.get('TEST_LOG_DIR', '')
@@ -80,3 +83,11 @@ class PtestRunnerTest(OERuntimeTestCase):
             # Remove the old link to create a new one
             os.remove(ptest_log_dir_link)
         os.symlink(os.path.basename(ptest_log_dir), ptest_log_dir_link)
+
+        failed_tests = {}
+        for section in parse_result.result_dict:
+            failed_testcases = [ test for test, result in parse_result.result_dict[section] if result == 'fail' ]
+            if failed_testcases:
+                failed_tests[section] = failed_testcases
+
+        self.assertFalse(failed_tests, msg = "Failed ptests: %s" %(str(failed_tests)))

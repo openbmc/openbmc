@@ -5,8 +5,6 @@ vcos, openmaxil, vchiq_arm, bcm_host, WFC, OpenVG."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=0448d6488ef8cc380632b1569ee6d196"
 
-PR = "r5"
-
 PROVIDES = "virtual/libgles2 \
             virtual/egl"
 
@@ -16,7 +14,11 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "bc3c52a51315399a9f31ed24049eb4bc81fd1c60"
+SRCREV = "11389772c79685442e0ab8aa9be8ad0e32703f68"
+
+# Use the date of the above commit as the package version. Update this when
+# SRCREV is changed.
+PV = "20180219"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=git;branch=${SRCBRANCH} \
@@ -35,6 +37,7 @@ SRC_URI = "\
     file://0013-Implement-triple-buffering-for-wayland.patch \
     file://0014-GLES2-gl2ext.h-Define-GL_R8_EXT-and-GL_RG8_EXT.patch \
     file://0015-EGL-glplatform.h-define-EGL_CAST.patch \
+    file://0016-Allow-multiple-wayland-compositor-state-data-per-pro.patch \
 "
 S = "${WORKDIR}/git"
 

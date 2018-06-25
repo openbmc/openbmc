@@ -1,0 +1,51 @@
+From ef5db062b7d25e6070acc6922ea48f50491313b5 Mon Sep 17 00:00:00 2001
+From: Michael Hansen <michael.j.hansen@hp.com>
+Date: Mon, 26 Feb 2018 09:42:56 -0800
+Subject: [PATCH 1/2] Only use --sort=name on versions of tar which support it.
+ This fixes compatibility with bsdtar and old versions of GNU tar (e.g.
+ RHEL6).
+
+Signed-off-by: Michael Hansen <michael.j.hansen@hp.com>
+Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
+Upstream-Status: Backport
+
+---
+ opkg-build | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+Index: opkg-utils-0.3.6/opkg-build
+===================================================================
+--- opkg-utils-0.3.6.orig/opkg-build
++++ opkg-utils-0.3.6/opkg-build
+@@ -232,6 +232,11 @@ if [ $compressor = "gzip" ] ; then
+ 	compressorargs=$zipargs
+ fi
+ 
++tsortargs=
++if tar --help 2>&1 | grep -- "--sort=" > /dev/null; then
++	tsortargs="--sort=name"
++fi
++
+ shift $(($OPTIND - 1))
+ 
+ # continue on to process additional arguments
+@@ -280,8 +285,8 @@ mkdir $tmp_dir
+ build_date="$(date --utc --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y-%m-%d)"
+ 
+ echo $CONTROL > $tmp_dir/tarX
+-( cd $pkg_dir && tar $ogargs --sort=name --mtime=$build_date -X $tmp_dir/tarX -c $tarformat . | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
+-( cd $pkg_dir/$CONTROL && tar $ogargs --sort=name --mtime=$build_date -c $tarformat . | gzip $zipargs > $tmp_dir/control.tar.gz )
++( cd $pkg_dir && tar $ogargs $tsortargs --mtime=$build_date -X $tmp_dir/tarX -c $tarformat . | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
++( cd $pkg_dir/$CONTROL && tar $ogargs $tsortargs --mtime=$build_date -c $tarformat . | gzip $zipargs > $tmp_dir/control.tar.gz )
+ rm $tmp_dir/tarX
+ 
+ echo "2.0" > $tmp_dir/debian-binary
+@@ -296,7 +301,7 @@ rm -f $pkg_file
+ if [ "$outer" = "ar" ] ; then
+   ( cd $tmp_dir && ar -crf $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+ else
+-  ( cd $tmp_dir && tar -c --sort=name --mtime=$build_date $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
++  ( cd $tmp_dir && tar -c $tsortargs --mtime=$build_date $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
+ fi
+ 
+ rm $tmp_dir/debian-binary $tmp_dir/data.tar.$cext $tmp_dir/control.tar.gz

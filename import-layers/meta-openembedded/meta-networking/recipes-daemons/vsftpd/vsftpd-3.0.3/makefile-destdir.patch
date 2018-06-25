@@ -1,14 +1,22 @@
-Use DESTDIR within install to allow installing under a prefix
+From bab3f62f1fd5b7c2ab197f4311ad191bf18816b9 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Mon, 20 Feb 2012 13:51:49 +0000
+Subject: [PATCH] Use DESTDIR within install to allow installing under a prefix
 
 Upstream-Status: Pending
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 
+---
+ Makefile | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+
 diff --git a/Makefile b/Makefile
+index c63ed1b..9e4f35f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -24,21 +24,21 @@
- 	$(CC) -o vsftpd $(OBJS) $(LINK) $(LIBS)
+@@ -29,21 +29,21 @@ vsftpd: $(OBJS)
+ 	$(CC) -o vsftpd $(OBJS) $(LINK) $(LDFLAGS) $(LIBS)
  
  install:
 -	if [ -x /usr/local/sbin ]; then \

@@ -1,10 +1,18 @@
-Disable stripping at link time
+From 261874ea47973ea156141185082252fc92081906 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Tue, 16 Apr 2013 10:53:55 +0000
+Subject: [PATCH] Disable stripping at link time
 
 Upstream-Status: Inappropriate [config]
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 
+---
+ Makefile | 1 -
+ 1 file changed, 1 deletion(-)
+
 diff --git a/Makefile b/Makefile
+index 3a5535d..e78019a 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -9,7 +9,6 @@ CFLAGS	=	-O2 -fPIE -fstack-protector --param=ssp-buffer-size=4 \

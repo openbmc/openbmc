@@ -872,6 +872,12 @@ def preceedtask(task, with_recrdeptasks, d):
     that this may lead to the task itself being listed.
     """
     preceed = set()
+
+    # Ignore tasks which don't exist
+    tasks = d.getVar('__BBTASKS', False)
+    if task not in tasks:
+        return preceed
+
     preceed.update(d.getVarFlag(task, 'deps') or [])
     if with_recrdeptasks:
         recrdeptask = d.getVarFlag(task, 'recrdeptask')

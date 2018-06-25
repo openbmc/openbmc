@@ -1,0 +1,25 @@
+From 2e6a0db24be373a5b7741dc5a0d322a28389fbf0 Mon Sep 17 00:00:00 2001
+From: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+Date: Thu, 23 Nov 2017 16:35:44 +0900
+Subject: [PATCH] disable build manpages.
+
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+---
+ CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7c66b39..fc32750 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -65,7 +65,6 @@ endif(GETTEXT_FOUND)
+ 
+ # Build and install the man-pages
+ if(NOT SPHINX_EXECUTABLE-NOTFOUND)
+-	add_subdirectory(man)
+ endif(NOT SPHINX_EXECUTABLE-NOTFOUND)
+ 
+ # Installing application code
+-- 
+2.7.4
+

@@ -11,4 +11,8 @@ inherit pypi
 SRC_URI[md5sum] = "4c129761b661d181ebf7ff4eb2d79950"
 SRC_URI[sha256sum] = "592766c6303207a20efc445587778322d7f73b161bd994f227adaa341ba212ab"
 
+RDEPENDS_${PN} += "\
+    ${PYTHON_PN}-datetime \
+"
+
 BBCLASSEXTEND = "native nativesdk"

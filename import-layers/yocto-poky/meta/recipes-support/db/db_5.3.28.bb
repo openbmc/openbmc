@@ -12,8 +12,10 @@ SECTION = "libs"
 SUMMARY = "Berkeley Database v5"
 HOMEPAGE = "http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html"
 LICENSE = "Sleepycat"
-VIRTUAL_NAME ?= "virtual/db"
 RCONFLICTS_${PN} = "db3"
+
+CVE_PRODUCT = "oracle_berkeley_db"
+CVE_VERSION = "11.2.${PV}"
 
 PR = "r1"
 PE = "1"
@@ -36,15 +38,6 @@ SRC_URI[sha256sum] = "e0a992d740709892e81f9d93f06daf305cf73fb81b545afe7247804317
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ed1158e31437f4f87cdd4ab2b8613955"
 
 inherit autotools
-
-# Put virtual/db in any appropriate provider of a
-# relational database, use it as a dependency in
-# place of a specific db and use:
-#
-# PREFERRED_PROVIDER_virtual/db
-#
-# to select the correct db in the build (distro) .conf
-PROVIDES += "${VIRTUAL_NAME}"
 
 # The executables go in a separate package - typically there
 # is no need to install these unless doing real database

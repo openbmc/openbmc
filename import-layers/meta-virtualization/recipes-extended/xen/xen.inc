@@ -62,15 +62,12 @@ RDEPENDS_${PN} = ""
 
 RDEPENDS_${PN}-base = "\
     bash perl xz \
-    ${PN}-blktap \
     ${PN}-console \
-    ${PN}-libblktapctl \
     ${PN}-libxenguest \
     ${PN}-libxenlight \
     ${PN}-libxenvchan \
     ${PN}-libxenctrl \
     ${PN}-libxlutil \
-    ${PN}-libvhd \
     ${PN}-libxenstat \
     ${PN}-libxenstore \
     ${PN}-libfsimage \
@@ -88,7 +85,10 @@ RDEPENDS_${PN}-base = "\
 RDEPENDS_${PN}-dev = ""
 
 RRECOMMENDS_${PN}-base = " \
+    ${PN}-blktap \
     ${PN}-libblktap \
+    ${PN}-libblktapctl \
+    ${PN}-libvhd \
     ${PN}-flask \
     ${PN}-hvmloader \
     ${PN}-xenpaging \
@@ -196,6 +196,8 @@ PACKAGES = "\
     ${PN}-libxenstat-dev \
     ${PN}-libxenstore \
     ${PN}-libxenstore-dev \
+    ${PN}-libxentoolcore \
+    ${PN}-libxentoolcore-dev \
     ${PN}-libxentoollog \
     ${PN}-libxentoollog-dev \
     ${PN}-libxenvchan \
@@ -344,6 +346,12 @@ FILES_${PN}-libxenstore-dev = " \
     ${datadir}/pkgconfig/xenstore.pc \
     "
 
+FILES_${PN}-libxentoolcore = "${libdir}/libxentoolcore.so.*"
+FILES_${PN}-libxentoolcore-dev = " \
+    ${libdir}/libxentoolcore.so \
+    ${datadir}/pkgconfig/xentoolcore.pc \
+    "
+
 FILES_${PN}-libxentoollog = "${libdir}/libxentoollog.so.*"
 FILES_${PN}-libxentoollog-dev = " \
     ${libdir}/libxentoollog.so \
@@ -474,6 +482,7 @@ FILES_${PN}-misc = "\
     ${sbindir}/xenperf \
     ${sbindir}/xenpm \
     ${sbindir}/xsview \
+    ${sbindir}/xen-diag \
     ${sbindir}/xen-tmem-list-parse \
     ${sbindir}/xen-python-path \
     ${sbindir}/xen-ringwatch \
@@ -739,8 +748,6 @@ FILES_${PN}-xencommons += "\
     ${systemd_unitdir}/system/xenconsoled.service \
     ${systemd_unitdir}/system/xen-init-dom0.service \
     ${systemd_unitdir}/system/xenstored.service \
-    ${systemd_unitdir}/system/xenstored.socket \
-    ${systemd_unitdir}/system/xenstored_ro.socket \
     ${systemd_unitdir}/system/var-lib-xenstored.mount \
     "
 
@@ -780,8 +787,6 @@ SYSTEMD_SERVICE_${PN}-xencommons = " \
     xenconsoled.service \
     xen-init-dom0.service \
     xenstored.service \
-    xenstored.socket \
-    xenstored_ro.socket \
     "
 SYSTEMD_SERVICE_${PN}-xendomains = "xendomains.service"
 
@@ -825,7 +830,7 @@ export LDFLAGS=""
 # Yocto injects -mfpmath=sse for some machine types into the CFLAGS which
 # conflicts with -mno-sse so instead we strip -mfpmath=sse instead of
 # patching the build to be ok with this
-TUNE_CCARGS := "${@oe_filter_out('-mfpmath=sse', '${TUNE_CCARGS}', d)}"
+TUNE_CCARGS := "${@oe.utils.str_filter_out('-mfpmath=sse', '${TUNE_CCARGS}', d)}"
 
 EXTRA_OECONF += " \
     --exec-prefix=/usr \

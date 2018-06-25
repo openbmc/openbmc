@@ -7,11 +7,11 @@ Upstream-status: Inappropriate
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 
-diff --git a/webmin/webmin-lib.pl b/webmin/webmin-lib.pl
-index 57a37f7..838b944 100755
---- a/webmin/webmin-lib.pl
-+++ b/webmin/webmin-lib.pl
-@@ -1086,28 +1086,28 @@
+Index: webmin-1.850/webmin/webmin-lib.pl
+===================================================================
+--- webmin-1.850.orig/webmin/webmin-lib.pl
++++ webmin-1.850/webmin/webmin-lib.pl
+@@ -1112,28 +1112,28 @@ my %miniserv;
  &load_theme_library();	# So that UI functions work
  
  # Need OS upgrade
@@ -62,4 +62,3 @@ index 57a37f7..838b944 100755
  
  # Password close to expiry
  my $warn_days = $config{'warn_days'};
-

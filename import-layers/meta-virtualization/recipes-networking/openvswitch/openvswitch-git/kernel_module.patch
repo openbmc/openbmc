@@ -1,13 +1,19 @@
-Specify install path for kernel module
+From adfd2380d71dff1a31efaf63cf7ac97470466ec9 Mon Sep 17 00:00:00 2001
+From: Amy Fong <amy.fong@windriver.com>
+Date: Thu, 29 Jan 2015 09:56:03 -0500
+Subject: [PATCH] Specify install path for kernel module
 
 Signed-off-by: Amy Fong <amy.fong@windriver.com>
----
- datapath/linux/Makefile.main.in |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
 
+---
+ datapath/linux/Makefile.main.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/datapath/linux/Makefile.main.in b/datapath/linux/Makefile.main.in
+index 7d18253..63c520f 100644
 --- a/datapath/linux/Makefile.main.in
 +++ b/datapath/linux/Makefile.main.in
-@@ -71,8 +71,8 @@
+@@ -71,8 +71,8 @@ default:
  	$(MAKE) -C $(KSRC) M=$(builddir) modules
  
  modules_install:

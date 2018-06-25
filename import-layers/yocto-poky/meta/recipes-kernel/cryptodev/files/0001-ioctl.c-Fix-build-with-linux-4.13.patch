@@ -1,0 +1,49 @@
+From f0d69774afb27ffc62bf353465fba145e70cb85a Mon Sep 17 00:00:00 2001
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Date: Mon, 4 Sep 2017 11:05:08 +0200
+Subject: [PATCH] ioctl.c: Fix build with linux 4.13
+
+git/ioctl.c:1127:3: error: positional initialization of field in 'struct' declared with 'designated_init' attribute [-Werror=designated-init]
+   {0, },
+    ^
+note: (near initialization for 'verbosity_ctl_dir[1]')
+git/ioctl.c:1136:3: error: positional initialization of field in 'struct' declared with 'designated_init' attribute [-Werror=designated-init]
+   {0, },
+    ^
+
+Linux kernel has added -Werror=designated-init around 4.11 (c834f0e8a8b)
+triggering build errors with gcc 5 and 6 (but not with gcc 4)
+
+Upstream-Status: Backport
+
+Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Signed-off-by: Cristian Stoica <cristian.stoica@nxp.com>
+---
+ ioctl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ioctl.c b/ioctl.c
+index 0385203..8d4a162 100644
+--- a/ioctl.c
++++ b/ioctl.c
+@@ -1124,7 +1124,7 @@ static struct ctl_table verbosity_ctl_dir[] = {
+ 		.mode           = 0644,
+ 		.proc_handler   = proc_dointvec,
+ 	},
+-	{0, },
++	{},
+ };
+ 
+ static struct ctl_table verbosity_ctl_root[] = {
+@@ -1133,7 +1133,7 @@ static struct ctl_table verbosity_ctl_root[] = {
+ 		.mode           = 0555,
+ 		.child          = verbosity_ctl_dir,
+ 	},
+-	{0, },
++	{},
+ };
+ static struct ctl_table_header *verbosity_sysctl_header;
+ static int __init init_cryptodev(void)
+-- 
+2.7.4
+

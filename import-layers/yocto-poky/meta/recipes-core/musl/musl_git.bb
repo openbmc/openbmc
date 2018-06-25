@@ -3,9 +3,9 @@
 
 require musl.inc
 
-SRCREV = "eb03bde2f24582874cb72b56c7811bf51da0c817"
+SRCREV = "55df09bfccbfe21fc9dd7d8f94550c0ff25ace04"
 
-PV = "1.1.18+git${SRCPV}"
+PV = "1.1.19+git${SRCPV}"
 
 # mirror is at git://github.com/kraj/musl.git
 
@@ -15,7 +15,7 @@ SRC_URI = "git://git.musl-libc.org/musl \
 
 S = "${WORKDIR}/git"
 
-PROVIDES += "virtual/libc virtual/${TARGET_PREFIX}libc-for-gcc virtual/libiconv virtual/libintl"
+PROVIDES += "virtual/libc virtual/${TARGET_PREFIX}libc-for-gcc virtual/libiconv virtual/libintl virtual/crypt"
 
 DEPENDS = "virtual/${TARGET_PREFIX}binutils \
            virtual/${TARGET_PREFIX}gcc-initial \

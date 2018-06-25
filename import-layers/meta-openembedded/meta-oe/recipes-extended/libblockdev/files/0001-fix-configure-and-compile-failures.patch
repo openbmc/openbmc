@@ -33,7 +33,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 0270c99..b7c7368 100644
+index d41a307..b036e04 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -9,6 +9,8 @@ AC_DISABLE_STATIC
@@ -45,7 +45,7 @@ index 0270c99..b7c7368 100644
  AM_PATH_PYTHON
  
  AM_PROG_AR
-@@ -129,7 +131,6 @@ LIBBLOCKDEV_PKG_CHECK_MODULES([UDEV], [libudev >= 216])
+@@ -154,7 +156,6 @@ LIBBLOCKDEV_PKG_CHECK_MODULES([KMOD], [libkmod >= 19])
  AS_IF([test "x$with_crypto" != "xno"],
        [LIBBLOCKDEV_PKG_CHECK_MODULES([CRYPTSETUP], [libcryptsetup >= 1.6.7])
         LIBBLOCKDEV_PKG_CHECK_MODULES([NSS], [nss >= 3.18.0])
@@ -53,7 +53,7 @@ index 0270c99..b7c7368 100644
        ],
        [])
  
-@@ -137,10 +138,6 @@ AS_IF([test "x$with_dm" != "xno" -o "x$with_lvm" != "xno" -o "x$with_lvm_dbus" !
+@@ -162,10 +163,6 @@ AS_IF([test "x$with_dm" != "xno" -o "x$with_lvm" != "xno" -o "x$with_lvm_dbus" !
        [LIBBLOCKDEV_PKG_CHECK_MODULES([DEVMAPPER], [devmapper >= 1.02.93])],
        [])
  
@@ -61,10 +61,10 @@ index 0270c99..b7c7368 100644
 -      [LIBBLOCKDEV_CHECK_HEADER([dmraid/dmraid.h], [], [dmraid.h not available])],
 -      [])
 -
- AS_IF([test "x$with_kbd" != "xno"],
-       [LIBBLOCKDEV_PKG_CHECK_MODULES([KMOD], [libkmod >= 19])],
+ AS_IF([test "x$with_part" != "xno" -o "x$with_fs" != "xno"],
+       [LIBBLOCKDEV_PKG_CHECK_MODULES([PARTED], [libparted >= 3.1])]
        [])
-@@ -154,7 +151,8 @@ AS_IF([test "x$with_fs" != "xno"],
+@@ -174,7 +171,8 @@ AS_IF([test "x$with_fs" != "xno"],
        [LIBBLOCKDEV_PKG_CHECK_MODULES([MOUNT], [mount >= 2.23.0])
         # new versions of libmount has some new functions we can use
         AS_IF([$PKG_CONFIG --atleast-version=2.30.0 mount],
@@ -75,5 +75,5 @@ index 0270c99..b7c7368 100644
         LIBBLOCKDEV_PKG_CHECK_MODULES([BLKID], [blkid >= 2.23.0])
         # older versions of libblkid don't support BLKID_SUBLKS_BADCSUM so let's just
 -- 
-1.8.3.1
+2.14.3
 

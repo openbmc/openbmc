@@ -1,0 +1,1149 @@
+{
+    "2to3": {
+        "cached": [],
+        "files": [
+            "${bindir}/2to3-*",
+            "${libdir}/python3.5/lib2to3"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python automated Python 2 to 3 code translator"
+    },
+    "asyncio": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/asyncio",
+            "${libdir}/python3.5/concurrent",
+            "${libdir}/python3.5/concurrent/futures"
+        ],
+        "rdepends": [
+            "compression",
+            "core",
+            "crypt",
+            "io",
+            "logging",
+            "math",
+            "multiprocessing",
+            "netclient",
+            "pickle",
+            "shell",
+            "stringold",
+            "threading",
+            "unixadmin"
+        ],
+        "summary": "Python Asynchronous I/"
+    },
+    "audio": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/chunk.*.pyc",
+            "${libdir}/python3.5/__pycache__/sndhdr.*.pyc",
+            "${libdir}/python3.5/__pycache__/sunau.*.pyc",
+            "${libdir}/python3.5/__pycache__/wave.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/chunk.py",
+            "${libdir}/python3.5/lib-dynload/audioop.*.so",
+            "${libdir}/python3.5/lib-dynload/ossaudiodev.*.so",
+            "${libdir}/python3.5/sndhdr.py",
+            "${libdir}/python3.5/sunau.py",
+            "${libdir}/python3.5/wave.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python Audio Handling"
+    },
+    "codecs": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/xdrlib.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/_multibytecodec.*.so",
+            "${libdir}/python3.5/xdrlib.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python codec"
+    },
+    "compile": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/compileall.*.pyc",
+            "${libdir}/python3.5/__pycache__/py_compile.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/compileall.py",
+            "${libdir}/python3.5/py_compile.py"
+        ],
+        "rdepends": [
+            "asyncio",
+            "compression",
+            "core",
+            "crypt",
+            "io",
+            "logging",
+            "math",
+            "multiprocessing",
+            "pickle",
+            "shell",
+            "stringold",
+            "threading",
+            "unixadmin"
+        ],
+        "summary": "Python bytecode compilation support"
+    },
+    "compression": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/_compression.*.pyc",
+            "${libdir}/python3.5/__pycache__/bz2.*.pyc",
+            "${libdir}/python3.5/__pycache__/gzip.*.pyc",
+            "${libdir}/python3.5/__pycache__/lzma.*.pyc",
+            "${libdir}/python3.5/__pycache__/tarfile.*.pyc",
+            "${libdir}/python3.5/__pycache__/zipfile.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/_compression.py",
+            "${libdir}/python3.5/bz2.py",
+            "${libdir}/python3.5/gzip.py",
+            "${libdir}/python3.5/lib-dynload/_bz2.*.so",
+            "${libdir}/python3.5/lib-dynload/_lzma.*.so",
+            "${libdir}/python3.5/lib-dynload/zlib.*.so",
+            "${libdir}/python3.5/lzma.py",
+            "${libdir}/python3.5/tarfile.py",
+            "${libdir}/python3.5/zipfile.py"
+        ],
+        "rdepends": [
+            "core",
+            "shell",
+            "unixadmin"
+        ],
+        "summary": "Python high-level compression support"
+    },
+    "core": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/__future__.*.pyc",
+            "${libdir}/python3.5/__pycache__/_bootlocale.*.pyc",
+            "${libdir}/python3.5/__pycache__/_collections_abc.*.pyc",
+            "${libdir}/python3.5/__pycache__/_markupbase.*.pyc",
+            "${libdir}/python3.5/__pycache__/_sitebuiltins.*.pyc",
+            "${libdir}/python3.5/__pycache__/_sysconfigdata.*.pyc",
+            "${libdir}/python3.5/__pycache__/_weakrefset.*.pyc",
+            "${libdir}/python3.5/__pycache__/abc.*.pyc",
+            "${libdir}/python3.5/__pycache__/argparse.*.pyc",
+            "${libdir}/python3.5/__pycache__/ast.*.pyc",
+            "${libdir}/python3.5/__pycache__/bisect.*.pyc",
+            "${libdir}/python3.5/__pycache__/code.*.pyc",
+            "${libdir}/python3.5/__pycache__/codecs.*.pyc",
+            "${libdir}/python3.5/__pycache__/codeop.*.pyc",
+            "${libdir}/python3.5/__pycache__/configparser.*.pyc",
+            "${libdir}/python3.5/__pycache__/contextlib.*.pyc",
+            "${libdir}/python3.5/__pycache__/copy.*.pyc",
+            "${libdir}/python3.5/__pycache__/copyreg.*.pyc",
+            "${libdir}/python3.5/__pycache__/csv.*.pyc",
+            "${libdir}/python3.5/__pycache__/dis.*.pyc",
+            "${libdir}/python3.5/__pycache__/enum.*.pyc",
+            "${libdir}/python3.5/__pycache__/functools.*.pyc",
+            "${libdir}/python3.5/__pycache__/genericpath.*.pyc",
+            "${libdir}/python3.5/__pycache__/getopt.*.pyc",
+            "${libdir}/python3.5/__pycache__/gettext.*.pyc",
+            "${libdir}/python3.5/__pycache__/heapq.*.pyc",
+            "${libdir}/python3.5/__pycache__/imp.*.pyc",
+            "${libdir}/python3.5/__pycache__/inspect.*.pyc",
+            "${libdir}/python3.5/__pycache__/io.*.pyc",
+            "${libdir}/python3.5/__pycache__/keyword.*.pyc",
+            "${libdir}/python3.5/__pycache__/linecache.*.pyc",
+            "${libdir}/python3.5/__pycache__/locale.*.pyc",
+            "${libdir}/python3.5/__pycache__/opcode.*.pyc",
+            "${libdir}/python3.5/__pycache__/operator.*.pyc",
+            "${libdir}/python3.5/__pycache__/optparse.*.pyc",
+            "${libdir}/python3.5/__pycache__/os.*.pyc",
+            "${libdir}/python3.5/__pycache__/platform.*.pyc",
+            "${libdir}/python3.5/__pycache__/posixpath.*.pyc",
+            "${libdir}/python3.5/__pycache__/re.*.pyc",
+            "${libdir}/python3.5/__pycache__/reprlib.*.pyc",
+            "${libdir}/python3.5/__pycache__/rlcompleter.*.pyc",
+            "${libdir}/python3.5/__pycache__/selectors.*.pyc",
+            "${libdir}/python3.5/__pycache__/signal.*.pyc",
+            "${libdir}/python3.5/__pycache__/site.*.pyc",
+            "${libdir}/python3.5/__pycache__/sre_compile.*.pyc",
+            "${libdir}/python3.5/__pycache__/sre_constants.*.pyc",
+            "${libdir}/python3.5/__pycache__/sre_parse.*.pyc",
+            "${libdir}/python3.5/__pycache__/stat.*.pyc",
+            "${libdir}/python3.5/__pycache__/stringprep.*.pyc",
+            "${libdir}/python3.5/__pycache__/struct.*.pyc",
+            "${libdir}/python3.5/__pycache__/subprocess.*.pyc",
+            "${libdir}/python3.5/__pycache__/symbol.*.pyc",
+            "${libdir}/python3.5/__pycache__/sysconfig.*.pyc",
+            "${libdir}/python3.5/__pycache__/textwrap.*.pyc",
+            "${libdir}/python3.5/__pycache__/threading.*.pyc",
+            "${libdir}/python3.5/__pycache__/token.*.pyc",
+            "${libdir}/python3.5/__pycache__/tokenize.*.pyc",
+            "${libdir}/python3.5/__pycache__/traceback.*.pyc",
+            "${libdir}/python3.5/__pycache__/types.*.pyc",
+            "${libdir}/python3.5/__pycache__/warnings.*.pyc",
+            "${libdir}/python3.5/__pycache__/weakref.*.pyc",
+            "${libdir}/python3.5/collections/__pycache__",
+            "${libdir}/python3.5/collections/__pycache__/abc.*.pyc",
+            "${libdir}/python3.5/encodings/__pycache__",
+            "${libdir}/python3.5/encodings/__pycache__/aliases.*.pyc",
+            "${libdir}/python3.5/encodings/__pycache__/latin_1.*.pyc",
+            "${libdir}/python3.5/encodings/__pycache__/utf_8.*.pyc",
+            "${libdir}/python3.5/importlib/__pycache__",
+            "${libdir}/python3.5/importlib/__pycache__/abc.*.pyc",
+            "${libdir}/python3.5/importlib/__pycache__/machinery.*.pyc",
+            "${libdir}/python3.5/importlib/__pycache__/util.*.pyc"
+        ],
+        "files": [
+            "${bindir}/python*[!-config]",
+            "${includedir}/python${PYTHON_BINABI}/pyconfig*.h",
+            "${libdir}/python${PYTHON_MAJMIN}/_collections_abc.py",
+            "${libdir}/python${PYTHON_MAJMIN}/_sitebuiltins.py",
+            "${libdir}/python${PYTHON_MAJMIN}/collections",
+            "${libdir}/python${PYTHON_MAJMIN}/sitecustomize.py",
+            "${libdir}/python3.5/UserDict.py",
+            "${libdir}/python3.5/UserList.py",
+            "${libdir}/python3.5/UserString.py",
+            "${libdir}/python3.5/__future__.py",
+            "${libdir}/python3.5/_abcoll.py",
+            "${libdir}/python3.5/_bootlocale.py",
+            "${libdir}/python3.5/_collections_abc.py",
+            "${libdir}/python3.5/_markupbase.py",
+            "${libdir}/python3.5/_sitebuiltins.py",
+            "${libdir}/python3.5/_sysconfigdata.py",
+            "${libdir}/python3.5/_weakrefset.py",
+            "${libdir}/python3.5/abc.py",
+            "${libdir}/python3.5/argparse.py",
+            "${libdir}/python3.5/ast.py",
+            "${libdir}/python3.5/bisect.py",
+            "${libdir}/python3.5/code.py",
+            "${libdir}/python3.5/codecs.py",
+            "${libdir}/python3.5/codeop.py",
+            "${libdir}/python3.5/collections",
+            "${libdir}/python3.5/collections/abc.py",
+            "${libdir}/python3.5/configparser.py",
+            "${libdir}/python3.5/contextlib.py",
+            "${libdir}/python3.5/copy.py",
+            "${libdir}/python3.5/copyreg.py",
+            "${libdir}/python3.5/csv.py",
+            "${libdir}/python3.5/dis.py",
+            "${libdir}/python3.5/encodings",
+            "${libdir}/python3.5/encodings/aliases.py",
+            "${libdir}/python3.5/encodings/latin_1.py",
+            "${libdir}/python3.5/encodings/utf_8.py",
+            "${libdir}/python3.5/enum.py",
+            "${libdir}/python3.5/functools.py",
+            "${libdir}/python3.5/genericpath.py",
+            "${libdir}/python3.5/getopt.py",
+            "${libdir}/python3.5/gettext.py",
+            "${libdir}/python3.5/heapq.py",
+            "${libdir}/python3.5/imp.py",
+            "${libdir}/python3.5/importlib",
+            "${libdir}/python3.5/importlib/_bootstrap.py",
+            "${libdir}/python3.5/importlib/_bootstrap_external.py",
+            "${libdir}/python3.5/importlib/abc.py",
+            "${libdir}/python3.5/importlib/machinery.py",
+            "${libdir}/python3.5/importlib/util.py",
+            "${libdir}/python3.5/inspect.py",
+            "${libdir}/python3.5/io.py",
+            "${libdir}/python3.5/keyword.py",
+            "${libdir}/python3.5/lib-dynload/__pycache__/_struct.*.so",
+            "${libdir}/python3.5/lib-dynload/__pycache__/binascii.*.so",
+            "${libdir}/python3.5/lib-dynload/__pycache__/time.*.so",
+            "${libdir}/python3.5/lib-dynload/__pycache__/xreadlines.*.so",
+            "${libdir}/python3.5/lib-dynload/_bisect.*.so",
+            "${libdir}/python3.5/lib-dynload/_csv.*.so",
+            "${libdir}/python3.5/lib-dynload/_heapq.*.so",
+            "${libdir}/python3.5/lib-dynload/_opcode.*.so",
+            "${libdir}/python3.5/lib-dynload/_posixsubprocess.*.so",
+            "${libdir}/python3.5/lib-dynload/_struct.*.so",
+            "${libdir}/python3.5/lib-dynload/array.*.so",
+            "${libdir}/python3.5/lib-dynload/binascii.*.so",
+            "${libdir}/python3.5/lib-dynload/math.*.so",
+            "${libdir}/python3.5/lib-dynload/parser.*.so",
+            "${libdir}/python3.5/lib-dynload/readline.*.so",
+            "${libdir}/python3.5/lib-dynload/select.*.so",
+            "${libdir}/python3.5/lib-dynload/time.*.so",
+            "${libdir}/python3.5/lib-dynload/unicodedata.*.so",
+            "${libdir}/python3.5/lib-dynload/xreadlines.*.so",
+            "${libdir}/python3.5/linecache.py",
+            "${libdir}/python3.5/locale.py",
+            "${libdir}/python3.5/new.py",
+            "${libdir}/python3.5/opcode.py",
+            "${libdir}/python3.5/operator.py",
+            "${libdir}/python3.5/optparse.py",
+            "${libdir}/python3.5/os.py",
+            "${libdir}/python3.5/platform.py",
+            "${libdir}/python3.5/posixpath.py",
+            "${libdir}/python3.5/re.py",
+            "${libdir}/python3.5/reprlib.py",
+            "${libdir}/python3.5/rlcompleter.py",
+            "${libdir}/python3.5/selectors.py",
+            "${libdir}/python3.5/signal.py",
+            "${libdir}/python3.5/site.py",
+            "${libdir}/python3.5/sre_compile.py",
+            "${libdir}/python3.5/sre_constants.py",
+            "${libdir}/python3.5/sre_parse.py",
+            "${libdir}/python3.5/stat.py",
+            "${libdir}/python3.5/stringprep.py",
+            "${libdir}/python3.5/struct.py",
+            "${libdir}/python3.5/subprocess.py",
+            "${libdir}/python3.5/symbol.py",
+            "${libdir}/python3.5/sysconfig.py",
+            "${libdir}/python3.5/textwrap.py",
+            "${libdir}/python3.5/threading.py",
+            "${libdir}/python3.5/token.py",
+            "${libdir}/python3.5/tokenize.py",
+            "${libdir}/python3.5/traceback.py",
+            "${libdir}/python3.5/types.py",
+            "${libdir}/python3.5/warnings.py",
+            "${libdir}/python3.5/weakref.py"
+        ],
+        "rdepends": [],
+        "summary": "Python interpreter and core modules"
+    },
+    "crypt": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/crypt.*.pyc",
+            "${libdir}/python3.5/__pycache__/hashlib.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/crypt.py",
+            "${libdir}/python3.5/hashlib.py",
+            "${libdir}/python3.5/lib-dynload/_crypt.*.so",
+            "${libdir}/python3.5/lib-dynload/_hashlib.*.so",
+            "${libdir}/python3.5/lib-dynload/_sha256.*.so",
+            "${libdir}/python3.5/lib-dynload/_sha512.*.so"
+        ],
+        "rdepends": [
+            "core",
+            "math",
+            "stringold"
+        ],
+        "summary": "Python basic cryptographic and hashing support"
+    },
+    "ctypes": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/ctypes",
+            "${libdir}/python3.5/lib-dynload/_ctypes.*.so",
+            "${libdir}/python3.5/lib-dynload/_ctypes_test.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python C types support"
+    },
+    "curses": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/curses",
+            "${libdir}/python3.5/lib-dynload/_curses.*.so",
+            "${libdir}/python3.5/lib-dynload/_curses_panel.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python curses support"
+    },
+    "datetime": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/_strptime.*.pyc",
+            "${libdir}/python3.5/__pycache__/calendar.*.pyc",
+            "${libdir}/python3.5/__pycache__/datetime.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/_strptime.py",
+            "${libdir}/python3.5/calendar.py",
+            "${libdir}/python3.5/datetime.py",
+            "${libdir}/python3.5/lib-dynload/_datetime.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python calendar and time support"
+    },
+    "db": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/dbm",
+            "${libdir}/python3.5/lib-dynload/_dbm.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python file-based database support"
+    },
+    "debugger": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/bdb.*.pyc",
+            "${libdir}/python3.5/__pycache__/pdb.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/bdb.py",
+            "${libdir}/python3.5/pdb.py"
+        ],
+        "rdepends": [
+            "core",
+            "pprint",
+            "shell",
+            "stringold"
+        ],
+        "summary": "Python debugger"
+    },
+    "dev": {
+        "cached": [],
+        "files": [
+            "${base_libdir}/*.a",
+            "${base_libdir}/*.o",
+            "${bindir}/python*-config",
+            "${datadir}/aclocal",
+            "${datadir}/pkgconfig",
+            "${includedir}",
+            "${libdir}/*.a",
+            "${libdir}/*.la",
+            "${libdir}/*.o",
+            "${libdir}/lib*${SOLIBSDEV}",
+            "${libdir}/pkgconfig",
+            "${libdir}/python3.5/config*/Makefile",
+            "${libdir}/python3.5/config*/Makefile/__pycache__"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python development package"
+    },
+    "difflib": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/difflib.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/difflib.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python helpers for computing deltas between objects"
+    },
+    "distutils": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/distutils"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python Distribution Utilities"
+    },
+    "distutils-staticdev": {
+        "cached": [
+            "${libdir}/python3.5/config/__pycache__/lib*.a"
+        ],
+        "files": [
+            "${libdir}/python3.5/config/lib*.a"
+        ],
+        "rdepends": [
+            "distutils"
+        ],
+        "summary": "Python distribution utilities (static libraries)"
+    },
+    "doctest": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/doctest.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/doctest.py"
+        ],
+        "rdepends": [
+            "core",
+            "debugger",
+            "difflib",
+            "logging",
+            "pprint",
+            "shell",
+            "stringold",
+            "unittest"
+        ],
+        "summary": "Python framework for running examples in docstrings"
+    },
+    "email": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/imaplib.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/email",
+            "${libdir}/python3.5/imaplib.py"
+        ],
+        "rdepends": [
+            "core",
+            "crypt",
+            "datetime",
+            "io",
+            "math",
+            "netclient"
+        ],
+        "summary": "Python email support"
+    },
+    "fcntl": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/fcntl.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python's fcntl interface"
+    },
+    "gdbm": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/_gdbm.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python GNU database support"
+    },
+    "html": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/formatter.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/formatter.py",
+            "${libdir}/python3.5/html"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python HTML processing support"
+    },
+    "idle": {
+        "cached": [],
+        "files": [
+            "${bindir}/idle*",
+            "${libdir}/python3.5/idlelib"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python Integrated Development Environment"
+    },
+    "image": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/colorsys.*.pyc",
+            "${libdir}/python3.5/__pycache__/imghdr.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/colorsys.py",
+            "${libdir}/python3.5/imghdr.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python graphical image handling"
+    },
+    "io": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/_pyio.*.pyc",
+            "${libdir}/python3.5/__pycache__/ipaddress.*.pyc",
+            "${libdir}/python3.5/__pycache__/pipes.*.pyc",
+            "${libdir}/python3.5/__pycache__/socket.*.pyc",
+            "${libdir}/python3.5/__pycache__/ssl.*.pyc",
+            "${libdir}/python3.5/__pycache__/tempfile.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/_pyio.py",
+            "${libdir}/python3.5/ipaddress.py",
+            "${libdir}/python3.5/lib-dynload/_socket.*.so",
+            "${libdir}/python3.5/lib-dynload/_ssl.*.so",
+            "${libdir}/python3.5/lib-dynload/termios.*.so",
+            "${libdir}/python3.5/pipes.py",
+            "${libdir}/python3.5/socket.py",
+            "${libdir}/python3.5/ssl.py",
+            "${libdir}/python3.5/tempfile.py"
+        ],
+        "rdepends": [
+            "compression",
+            "core",
+            "crypt",
+            "math",
+            "netclient",
+            "shell",
+            "unixadmin"
+        ],
+        "summary": "Python low-level I/O"
+    },
+    "json": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/json",
+            "${libdir}/python3.5/lib-dynload/_json.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python JSON support"
+    },
+    "logging": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/logging"
+        ],
+        "rdepends": [
+            "core",
+            "stringold"
+        ],
+        "summary": "Python logging support"
+    },
+    "mailbox": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/mailbox.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/mailbox.py"
+        ],
+        "rdepends": [
+            "core",
+            "crypt",
+            "datetime",
+            "email",
+            "fcntl",
+            "io",
+            "math",
+            "mime",
+            "netclient",
+            "stringold"
+        ],
+        "summary": "Python mailbox format support"
+    },
+    "math": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/random.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/_random.*.so",
+            "${libdir}/python3.5/lib-dynload/cmath.*.so",
+            "${libdir}/python3.5/random.py"
+        ],
+        "rdepends": [
+            "core",
+            "crypt"
+        ],
+        "summary": "Python math support"
+    },
+    "mime": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/quopri.*.pyc",
+            "${libdir}/python3.5/__pycache__/uu.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/quopri.py",
+            "${libdir}/python3.5/uu.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python MIME handling APIs"
+    },
+    "mmap": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/mmap.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python memory-mapped file support"
+    },
+    "modules": {
+        "cached": [],
+        "files": [],
+        "rdepends": [
+            "2to3",
+            "asyncio",
+            "audio",
+            "codecs",
+            "compile",
+            "compression",
+            "core",
+            "crypt",
+            "ctypes",
+            "curses",
+            "datetime",
+            "db",
+            "debugger",
+            "difflib",
+            "distutils",
+            "doctest",
+            "email",
+            "fcntl",
+            "html",
+            "idle",
+            "image",
+            "io",
+            "json",
+            "logging",
+            "mailbox",
+            "math",
+            "mime",
+            "mmap",
+            "multiprocessing",
+            "netclient",
+            "netserver",
+            "numbers",
+            "pickle",
+            "pkgutil",
+            "plistlib",
+            "pprint",
+            "profile",
+            "pydoc",
+            "resource",
+            "runpy",
+            "shell",
+            "smtpd",
+            "sqlite3",
+            "stringold",
+            "syslog",
+            "terminal",
+            "threading",
+            "tkinter",
+            "typing",
+            "unittest",
+            "unixadmin",
+            "xml",
+            "xmlrpc"
+        ],
+        "summary": "All Python modules"
+    },
+    "multiprocessing": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/_multiprocessing.*.so",
+            "${libdir}/python3.5/multiprocessing"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python multiprocessing support"
+    },
+    "netclient": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/base64.*.pyc",
+            "${libdir}/python3.5/__pycache__/ftplib.*.pyc",
+            "${libdir}/python3.5/__pycache__/hmac.*.pyc",
+            "${libdir}/python3.5/__pycache__/mimetypes.*.pyc",
+            "${libdir}/python3.5/__pycache__/nntplib.*.pyc",
+            "${libdir}/python3.5/__pycache__/poplib.*.pyc",
+            "${libdir}/python3.5/__pycache__/smtplib.*.pyc",
+            "${libdir}/python3.5/__pycache__/telnetlib.*.pyc",
+            "${libdir}/python3.5/__pycache__/uuid.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/base64.py",
+            "${libdir}/python3.5/ftplib.py",
+            "${libdir}/python3.5/hmac.py",
+            "${libdir}/python3.5/http",
+            "${libdir}/python3.5/http/__pycache__",
+            "${libdir}/python3.5/mimetypes.py",
+            "${libdir}/python3.5/nntplib.py",
+            "${libdir}/python3.5/poplib.py",
+            "${libdir}/python3.5/smtplib.py",
+            "${libdir}/python3.5/telnetlib.py",
+            "${libdir}/python3.5/urllib",
+            "${libdir}/python3.5/urllib/__pycache__",
+            "${libdir}/python3.5/uuid.py"
+        ],
+        "rdepends": [
+            "compression",
+            "core",
+            "crypt",
+            "ctypes",
+            "datetime",
+            "email",
+            "io",
+            "math",
+            "mime",
+            "shell",
+            "stringold",
+            "unixadmin"
+        ],
+        "summary": "Python Internet Protocol clients"
+    },
+    "netserver": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/cgi.*.pyc",
+            "${libdir}/python3.5/__pycache__/socketserver.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/cgi.py",
+            "${libdir}/python3.5/socketserver.py"
+        ],
+        "rdepends": [
+            "compression",
+            "core",
+            "crypt",
+            "datetime",
+            "email",
+            "html",
+            "io",
+            "math",
+            "mime",
+            "netclient",
+            "shell",
+            "stringold",
+            "unixadmin"
+        ],
+        "summary": "Python Internet Protocol servers"
+    },
+    "numbers": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/_pydecimal.*.pyc",
+            "${libdir}/python3.5/__pycache__/decimal.*.pyc",
+            "${libdir}/python3.5/__pycache__/fractions.*.pyc",
+            "${libdir}/python3.5/__pycache__/numbers.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/_pydecimal.py",
+            "${libdir}/python3.5/decimal.py",
+            "${libdir}/python3.5/fractions.py",
+            "${libdir}/python3.5/lib-dynload/_decimal.*.so",
+            "${libdir}/python3.5/numbers.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python number APIs"
+    },
+    "pickle": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/_compat_pickle.*.pyc",
+            "${libdir}/python3.5/__pycache__/pickle.*.pyc",
+            "${libdir}/python3.5/__pycache__/pickletools.*.pyc",
+            "${libdir}/python3.5/__pycache__/shelve.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/_compat_pickle.py",
+            "${libdir}/python3.5/lib-dynload/_pickle.*.so",
+            "${libdir}/python3.5/pickle.py",
+            "${libdir}/python3.5/pickletools.py",
+            "${libdir}/python3.5/shelve.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python serialisation/persistence support"
+    },
+    "pkgutil": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/pkgutil.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/pkgutil.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python package extension utility support"
+    },
+    "plistlib": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/plistlib.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/plistlib.py"
+        ],
+        "rdepends": [
+            "core",
+            "datetime",
+            "xml"
+        ],
+        "summary": "Generate and parse Mac OS X .plist files"
+    },
+    "pprint": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/pprint.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/pprint.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python pretty-print support"
+    },
+    "profile": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/cProfile.*.pyc",
+            "${libdir}/python3.5/__pycache__/profile.*.pyc",
+            "${libdir}/python3.5/__pycache__/pstats.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/cProfile.py",
+            "${libdir}/python3.5/lib-dynload/_lsprof.*.so",
+            "${libdir}/python3.5/profile.py",
+            "${libdir}/python3.5/pstats.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python basic performance profiling support"
+    },
+    "pydoc": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/pydoc.*.pyc"
+        ],
+        "files": [
+            "${bindir}/pydoc*",
+            "${libdir}/python3.5/pydoc.py",
+            "${libdir}/python3.5/pydoc_data"
+        ],
+        "rdepends": [
+            "core",
+            "netclient",
+            "pkgutil"
+        ],
+        "summary": "Python interactive help support"
+    },
+    "resource": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/resource.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python resource control interface"
+    },
+    "runpy": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/runpy.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/runpy.py"
+        ],
+        "rdepends": [
+            "core",
+            "pkgutil"
+        ],
+        "summary": "Python helper for locating/executing scripts in module namespace"
+    },
+    "shell": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/cmd.*.pyc",
+            "${libdir}/python3.5/__pycache__/fnmatch.*.pyc",
+            "${libdir}/python3.5/__pycache__/glob.*.pyc",
+            "${libdir}/python3.5/__pycache__/shlex.*.pyc",
+            "${libdir}/python3.5/__pycache__/shutil.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/cmd.py",
+            "${libdir}/python3.5/fnmatch.py",
+            "${libdir}/python3.5/glob.py",
+            "${libdir}/python3.5/shlex.py",
+            "${libdir}/python3.5/shutil.py"
+        ],
+        "rdepends": [
+            "compression",
+            "core",
+            "stringold",
+            "unixadmin"
+        ],
+        "summary": "Python shell-like functionality"
+    },
+    "smtpd": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/asynchat.*.pyc",
+            "${libdir}/python3.5/__pycache__/asyncore.*.pyc",
+            "${libdir}/python3.5/__pycache__/smtpd.*.pyc"
+        ],
+        "files": [
+            "${bindir}/smtpd.py",
+            "${libdir}/python3.5/asynchat.py",
+            "${libdir}/python3.5/asyncore.py",
+            "${libdir}/python3.5/smtpd.py"
+        ],
+        "rdepends": [
+            "core",
+            "crypt",
+            "datetime",
+            "email",
+            "io",
+            "math",
+            "mime",
+            "netclient",
+            "stringold"
+        ],
+        "summary": "Python Simple Mail Transport Daemon"
+    },
+    "sqlite3": {
+        "cached": [
+            "${libdir}/python3.5/sqlite3/__pycache__",
+            "${libdir}/python3.5/sqlite3/__pycache__/dbapi2.*.pyc",
+            "${libdir}/python3.5/sqlite3/__pycache__/dump.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/_sqlite3.*.so",
+            "${libdir}/python3.5/sqlite3/dbapi2.py",
+            "${libdir}/python3.5/sqlite3/dump.py"
+        ],
+        "rdepends": [
+            "core",
+            "datetime"
+        ],
+        "summary": "Python Sqlite3 database support"
+    },
+    "sqlite3-tests": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/sqlite3/test"
+        ],
+        "rdepends": [
+            "core",
+            "tests"
+        ],
+        "summary": "Python Sqlite3 database support tests"
+    },
+    "stringold": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/string.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/string.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python string APIs [deprecated]"
+    },
+    "syslog": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/syslog.*.so"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python syslog interface"
+    },
+    "terminal": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/pty.*.pyc",
+            "${libdir}/python3.5/__pycache__/tty.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/pty.py",
+            "${libdir}/python3.5/tty.py"
+        ],
+        "rdepends": [
+            "core",
+            "io"
+        ],
+        "summary": "Python terminal controlling support"
+    },
+    "tests": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/test"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python tests"
+    },
+    "threading": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/_dummy_thread.*.pyc",
+            "${libdir}/python3.5/__pycache__/_threading_local.*.pyc",
+            "${libdir}/python3.5/__pycache__/dummy_threading.*.pyc",
+            "${libdir}/python3.5/__pycache__/queue.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/_dummy_thread.py",
+            "${libdir}/python3.5/_threading_local.py",
+            "${libdir}/python3.5/dummy_threading.py",
+            "${libdir}/python3.5/queue.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python threading & synchronization support"
+    },
+    "tkinter": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/tkinter"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python Tcl/Tk bindings"
+    },
+    "typing": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/typing.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/typing.py"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python typing support"
+    },
+    "unittest": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/unittest",
+            "${libdir}/python3.5/unittest/",
+            "${libdir}/python3.5/unittest/__pycache__"
+        ],
+        "rdepends": [
+            "core",
+            "difflib",
+            "logging",
+            "pprint",
+            "shell",
+            "stringold"
+        ],
+        "summary": "Python unit testing framework"
+    },
+    "unixadmin": {
+        "cached": [
+            "${libdir}/python3.5/__pycache__/getpass.*.pyc"
+        ],
+        "files": [
+            "${libdir}/python3.5/getpass.py",
+            "${libdir}/python3.5/lib-dynload/grp.*.so",
+            "${libdir}/python3.5/lib-dynload/nis.*.so"
+        ],
+        "rdepends": [
+            "core",
+            "io"
+        ],
+        "summary": "Python Unix administration support"
+    },
+    "xml": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/lib-dynload/_elementtree.*.so",
+            "${libdir}/python3.5/lib-dynload/pyexpat.*.so",
+            "${libdir}/python3.5/xml"
+        ],
+        "rdepends": [
+            "core"
+        ],
+        "summary": "Python basic XML support"
+    },
+    "xmlrpc": {
+        "cached": [],
+        "files": [
+            "${libdir}/python3.5/xmlrpc",
+            "${libdir}/python3.5/xmlrpc/__pycache__"
+        ],
+        "rdepends": [
+            "core",
+            "xml"
+        ],
+        "summary": "Python XML-RPC support"
+    }
+}

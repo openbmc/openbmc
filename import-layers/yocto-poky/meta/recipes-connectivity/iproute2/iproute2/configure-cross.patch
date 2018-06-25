@@ -9,19 +9,19 @@ Upstream-Status: Pending
 Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
 Signed-off-by: Shane Wang <shane.wang@intel.com>
 
-Index: iproute2-3.7.0/configure
+Index: iproute2-4.14.1/configure
 ===================================================================
---- iproute2-3.7.0.orig/configure
-+++ iproute2-3.7.0/configure
+--- iproute2-4.14.1.orig/configure
++++ iproute2-4.14.1/configure
 @@ -2,6 +2,7 @@
- # This is not an autconf generated configure
+ # This is not an autoconf generated configure
  #
  INCLUDE=${1:-"$PWD/include"}
 +SYSROOT=$1
  
- # Make a temp directory in build tree.
- TMPDIR=$(mktemp -d config.XXXXXX)
-@@ -158,7 +159,7 @@ check_ipt_lib_dir()
+ # Output file which is input to Makefile
+ CONFIG=config.mk
+@@ -195,7 +196,7 @@ check_ipt_lib_dir()
  		return
  	fi
  

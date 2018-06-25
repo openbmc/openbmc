@@ -1,0 +1,129 @@
+From cd7d76a6d1ecb1856f6ed666fb5c30dc105aa94e Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Tue, 5 Dec 2017 18:28:28 -0800
+Subject: [PATCH] runc-docker: Allow "run start ..." to daemonize with $SIGUSR1_PARENT_PID
+
+The runc-docker has all the code in it to properly run a stop hook if
+you use it in the foreground.  It doesn't work in the back ground
+because there is no way for a golang application to fork a child exit
+out of the parent process because all the golang threads stay with the
+parent.
+
+This patch has three parts that happen ONLY when $SIGUSR1_PARENT_PID
+is set.
+
+1) The code was copied which performs the normal the signal handling
+   block which is used for the foreground operation of runc.
+
+2) At the point where runc start would normally exit, it closes
+   stdin/stdout/stderr so it would be possible to daemonize "runc start ...".
+
+3) The code to send a SIGUSR1 to the parent process was added.  The
+   idea being that a parent process would simply exit at that point
+   because it was blocking until runc performed everything it was
+   required to perform.
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+---
+ signals.go     | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ utils_linux.go |  2 +-
+ 2 files changed, 51 insertions(+), 5 deletions(-)
+
+Index: git/src/import/signals.go
+===================================================================
+--- git.orig/src/import/signals.go
++++ git/src/import/signals.go
+@@ -6,6 +6,7 @@
+ 	"os"
+ 	"os/signal"
+ 	"syscall" // only for Signal
++	"strconv"
+ 
+ 	"github.com/opencontainers/runc/libcontainer"
+ 	"github.com/opencontainers/runc/libcontainer/system"
+@@ -56,9 +57,6 @@
+ func (h *signalHandler) forward(process *libcontainer.Process, tty *tty, detach bool) (int, error) {
+ 	// make sure we know the pid of our main process so that we can return
+ 	// after it dies.
+-	if detach && h.notifySocket == nil {
+-		return 0, nil
+-	}
+ 
+ 	pid1, err := process.Pid()
+ 	if err != nil {
+@@ -68,12 +66,61 @@
+ 	if h.notifySocket != nil {
+ 		if detach {
+ 			h.notifySocket.run(pid1)
+-			return 0, nil
+ 		} else {
+ 			go h.notifySocket.run(0)
+ 		}
+ 	}
+ 
++	if (detach) {
++		// This allows the parent process to daemonize this process
++		// so long as stdin/stderr/stdout are closed
++		if envVal := os.Getenv("SIGUSR1_PARENT_PID"); envVal != "" {
++			// Close stdin/stdout/stderr
++			os.Stdin.Close()
++			os.Stdout.Close()
++			os.Stderr.Close()
++			// Notify parent to detach
++			i, err := strconv.Atoi(envVal)
++			if (err != nil) {
++				return 0, nil
++			}
++			unix.Kill(i, unix.SIGUSR1)
++			// Loop waiting on the child to signal or exit,
++			// after which all stop hooks will be run
++			for s := range h.signals {
++				switch s {
++				case unix.SIGCHLD:
++					exits, err := h.reap()
++					if err != nil {
++						logrus.Error(err)
++					}
++					for _, e := range exits {
++						logrus.WithFields(logrus.Fields{
++							"pid":    e.pid,
++							"status": e.status,
++						}).Debug("process exited")
++						if e.pid == pid1 {
++							// call Wait() on the process even though we already have the exit
++							// status because we must ensure that any of the go specific process
++							// fun such as flushing pipes are complete before we return.
++							process.Wait()
++							if h.notifySocket != nil {
++								h.notifySocket.Close()
++							}
++							return e.status, nil
++						}
++					}
++				default:
++					logrus.Debugf("sending signal to process %s", s)
++					if err := unix.Kill(pid1, s.(syscall.Signal)); err != nil {
++						logrus.Error(err)
++					}
++				}
++			}
++		}
++		return 0, nil
++	}
++
+ 	// Perform the initial tty resize. Always ignore errors resizing because
+ 	// stdout might have disappeared (due to races with when SIGHUP is sent).
+ 	_ = tty.resize()
+Index: git/src/import/utils_linux.go
+===================================================================
+--- git.orig/src/import/utils_linux.go
++++ git/src/import/utils_linux.go
+@@ -338,7 +338,7 @@
+ 	if err != nil {
+ 		r.terminate(process)
+ 	}
+-	if detach {
++	if (detach && os.Getenv("SIGUSR1_PARENT_PID") == "") {
+ 		return 0, nil
+ 	}
+ 	r.destroy()

@@ -6,6 +6,8 @@ DEPENDS = "libxml2 libcap"
 RDEPENDS_${PN} = " \
 		rsync \
 		gzip \
+		xz \
+		tar \
 		libcap-bin \
 		bridge-utils \
 		dnsmasq \
@@ -22,6 +24,9 @@ RDEPENDS_${PN} = " \
 		gnutls \
 		nettle \
 "
+
+RDEPENDS_${PN}_append_libc-glibc = " glibc-utils"
+
 RDEPENDS_${PN}-ptest += "file make gmp nettle gnutls bash"
 
 SRC_URI = "http://linuxcontainers.org/downloads/${BPN}-${PV}.tar.gz \
@@ -33,6 +38,7 @@ SRC_URI = "http://linuxcontainers.org/downloads/${BPN}-${PV}.tar.gz \
 	file://lxc-doc-upgrade-to-use-docbook-3.1-DTD.patch \
 	file://logs-optionally-use-base-filenames-to-report-src-fil.patch \
 	file://cgroups-work-around-issue-in-gcc-7.patch \
+	file://dnsmasq.conf \
 	"
 
 SRC_URI[md5sum] = "7bfd95280522d7936c0979dfea92cdb5"
@@ -54,14 +60,16 @@ EXTRA_OECONF += "--enable-log-src-basename"
 CFLAGS_append = " -Wno-error=deprecated-declarations"
 
 PACKAGECONFIG ??= "templates \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)} \
 "
 PACKAGECONFIG[doc] = "--enable-doc --enable-api-docs,--disable-doc --disable-api-docs,,"
 PACKAGECONFIG[rpath] = "--enable-rpath,--disable-rpath,,"
-PACKAGECONFIG[apparmour] = "--enable-apparmor,--disable-apparmor,apparmor,apparmor"
+PACKAGECONFIG[apparmor] = "--enable-apparmor,--disable-apparmor,apparmor,apparmor"
 PACKAGECONFIG[templates] = ",,, ${PN}-templates"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux,libselinux"
 PACKAGECONFIG[seccomp] ="--enable-seccomp,--disable-seccomp,libseccomp,libseccomp"
+PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/,--without-systemdsystemunitdir,systemd,"
 PACKAGECONFIG[python] = "--enable-python,--disable-python,python3,python3-core"
 PACKAGECONFIG[lua] = "--enable-lua,--disable-lua,lua,lua"
 
@@ -131,6 +139,11 @@ do_install_append() {
 	    if [ -d ${D}${exec_prefix}/lib/python* ]; then mv ${D}${exec_prefix}/lib/python* ${D}${libdir}/; fi
 	    rmdir --ignore-fail-on-non-empty ${D}${exec_prefix}/lib
 	fi
+
+	# Force the main dnsmasq instance to bind only to specified interfaces and
+	# to not bind to virbr0. Libvirt will run its own instance on this interface.
+	install -d ${D}/${sysconfdir}/dnsmasq.d
+	install -m 644 ${WORKDIR}/dnsmasq.conf ${D}/${sysconfdir}/dnsmasq.d/lxc
 }
 
 EXTRA_OEMAKE += "TEST_DIR=${D}${PTEST_PATH}/src/tests"

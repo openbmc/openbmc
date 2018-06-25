@@ -188,14 +188,6 @@ python do_distrodata() {
 }
 do_distrodata[vardepsexclude] = "DATETIME"
 
-addtask distrodataall after do_distrodata
-do_distrodataall[recrdeptask] = "do_distrodataall do_distrodata"
-do_distrodataall[recideptask] = "do_${BB_DEFAULT_TASK}"
-do_distrodataall[nostamp] = "1"
-do_distrodataall() {
-        :
-}
-
 addhandler checkpkg_eventhandler
 checkpkg_eventhandler[eventmask] = "bb.event.BuildStarted bb.event.BuildCompleted"
 python checkpkg_eventhandler() {
@@ -272,24 +264,15 @@ python do_checkpkg() {
             if upstream_check_unreliable == "1":
                 return "N/A", "CHECK_IS_UNRELIABLE"
 
-            try:
-                uv = oe.recipeutils.get_recipe_upstream_version(localdata)
-                pupver = uv['version'] if uv['version'] else "N/A"
-            except Exception as e:
-                pupver = "N/A"
+            uv = oe.recipeutils.get_recipe_upstream_version(localdata)
+            pupver = uv['version'] if uv['version'] else "N/A"
+            pversion = uv['current_version']
+            revision = uv['revision'] if uv['revision'] else "N/A"
 
             if pupver == "N/A":
                 pstatus = "UNKNOWN" if upstream_version_unknown else "UNKNOWN_BROKEN"
             else:
-                src_uri = (localdata.getVar('SRC_URI') or '').split()
-                if src_uri:
-                    uri_type, _, _, _, _, _ = decodeurl(src_uri[0])
-                else:
-                    uri_type = "none"
-                pv, _, _ = oe.recipeutils.get_recipe_pv_without_srcpv(pversion, uri_type)
-                upv, _, _ = oe.recipeutils.get_recipe_pv_without_srcpv(pupver, uri_type)
-
-                cmp = vercmp_string(pv, upv)
+                cmp = vercmp_string(pversion, pupver)
                 if cmp == -1:
                     pstatus = "UPDATE" if not upstream_version_unknown else "KNOWN_BROKEN"
                 elif cmp == 0:
@@ -297,7 +280,7 @@ python do_checkpkg() {
                 else:
                     pstatus = "UNKNOWN" if upstream_version_unknown else "UNKNOWN_BROKEN"
 
-            return pupver, pstatus
+            return pversion, pupver, pstatus, revision
 
 
         """initialize log files."""
@@ -334,7 +317,6 @@ python do_checkpkg() {
 
         pdesc = localdata.getVar('DESCRIPTION')
         pgrp = localdata.getVar('SECTION')
-        pversion = localdata.getVar('PV')
         plicense = localdata.getVar('LICENSE')
         psection = localdata.getVar('SECTION')
         phome = localdata.getVar('HOMEPAGE')
@@ -345,7 +327,7 @@ python do_checkpkg() {
         psrcuri = localdata.getVar('SRC_URI')
         maintainer = localdata.getVar('RECIPE_MAINTAINER')
 
-        pupver, pstatus = get_upstream_version_and_status()
+        pversion, pupver, pstatus, prevision = get_upstream_version_and_status()
 
         if psrcuri:
             psrcuri = psrcuri.split()[0]
@@ -358,18 +340,10 @@ python do_checkpkg() {
         with open(logfile, "a") as f:
             writer = csv.writer(f, delimiter='\t')
             writer.writerow([pname, pversion, pupver, plicense, psection, phome, 
-                prelease, pdepends, pbugtracker, ppe, pdesc, pstatus, pupver,
+                prelease, pdepends, pbugtracker, ppe, pdesc, pstatus, prevision,
                 psrcuri, maintainer, no_upgr_reason])
             f.close()
         bb.utils.unlockfile(lf)
-}
-
-addtask checkpkgall after do_checkpkg
-do_checkpkgall[recrdeptask] = "do_checkpkgall do_checkpkg"
-do_checkpkgall[recideptask] = "do_${BB_DEFAULT_TASK}"
-do_checkpkgall[nostamp] = "1"
-do_checkpkgall() {
-        :
 }
 
 addhandler distro_check_eventhandler
@@ -407,13 +381,6 @@ python do_distro_check() {
     dc.save_distro_check_result(result, datetime, result_file, d)
 }
 
-addtask distro_checkall after do_distro_check
-do_distro_checkall[recrdeptask] = "do_distro_checkall do_distro_check"
-do_distro_checkall[recideptask] = "do_${BB_DEFAULT_TASK}"
-do_distro_checkall[nostamp] = "1"
-do_distro_checkall() {
-        :
-}
 #
 #Check Missing License Text.
 #Use this task to generate the missing license text data for pkg-report system,
@@ -457,12 +424,4 @@ python do_checklicense() {
                 f.close()
             bb.utils.unlockfile(lf)
     return
-}
-
-addtask checklicenseall after do_checklicense
-do_checklicenseall[recrdeptask] = "do_checklicenseall do_checklicense"
-do_checklicenseall[recideptask] = "do_${BB_DEFAULT_TASK}"
-do_checklicenseall[nostamp] = "1"
-do_checklicenseall() {
-        :
 }

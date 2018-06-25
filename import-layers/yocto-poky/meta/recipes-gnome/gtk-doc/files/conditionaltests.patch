@@ -1,14 +1,23 @@
+From 78bbf185934147a69ceb4b617d424e12e70997bf Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 27 Jun 2017 21:00:58 +0100
+Subject: [PATCH 3/3] gtk-doc: Handle floating gtk-doc dependency
+
 Allow the tests to be explicitly disabled to avoid floating dependnecy
 issues. This is not really an issue with RSS but is on previous releases.
 
 RP 2017/6/27
 Upstream-Status: Pending
 
-Index: gtk-doc-1.25/configure.ac
-===================================================================
---- gtk-doc-1.25.orig/configure.ac
-+++ gtk-doc-1.25/configure.ac
-@@ -161,6 +161,11 @@ if test "x$GCC" = "xyes"; then
+---
+ configure.ac | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 684e2d1..e5e3aab 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -146,6 +146,11 @@ if test "x$GCC" = "xyes"; then
  	fi
  fi
  
@@ -20,7 +29,7 @@ Index: gtk-doc-1.25/configure.ac
  dnl if glib is available we can enable the tests
  PKG_CHECK_MODULES(TEST_DEPS, [glib-2.0 >= 2.6.0 gobject-2.0 >= 2.6.0],
  	[	glib_prefix="`$PKG_CONFIG --variable=prefix glib-2.0`"
-@@ -171,6 +176,11 @@ PKG_CHECK_MODULES(TEST_DEPS, [glib-2.0 >
+@@ -156,6 +161,11 @@ PKG_CHECK_MODULES(TEST_DEPS, [glib-2.0 >= 2.6.0 gobject-2.0 >= 2.6.0],
  		build_tests="no"
  	]
  )
@@ -30,5 +39,8 @@ Index: gtk-doc-1.25/configure.ac
 +fi
 +
  AM_CONDITIONAL(GTK_DOC_USE_LIBTOOL, test -n "$LIBTOOL" -a x$gtk_doc_use_libtool = xyes )
- dnl this enable the rule in test/Makefile.am
+ dnl this enables the rule in test/Makefile.am
  AM_CONDITIONAL(BUILD_TESTS, test x$build_tests = xyes)
+-- 
+2.14.1
+

@@ -1,7 +1,7 @@
-From 1c1812def711803382cc28caea1f35fb7ef774b0 Mon Sep 17 00:00:00 2001
+From ed44474c11f577c1644910964a917a4cf701bb0f Mon Sep 17 00:00:00 2001
 From: Daniel Kahn Gillmor <dkg@fifthhorseman.net>
 Date: Tue, 26 Jan 2016 14:24:26 -0500
-Subject: [PATCH 1/5] reflect 2.1 reporting for key imports
+Subject: [PATCH] reflect 2.1 reporting for key imports
 
 GnuPG 2.1 changes how it reports key imports.  These changes should
 make the pygpgme test suite compatible with GnuPG 2.1.
@@ -12,6 +12,7 @@ https://lists.gnupg.org/pipermail/gnupg-devel/2016-January/030718.html
 Upstream-Status: Backport
 
 Signed-off-by: Catalin Enache <catalin.enache@windriver.com>
+
 ---
  tests/test_import.py | 22 +++++++++++-----------
  1 file changed, 11 insertions(+), 11 deletions(-)
@@ -86,3 +87,4 @@ index 10eb816..597eb47 100644
 +                          None, gpgme.IMPORT_NEW | gpgme.IMPORT_SECRET))
          self.assertEqual(result.imports[3],
                           ('93C2240D6B8AA10AB28F701D2CF46B7FC97E6B0F',
+                           None, gpgme.IMPORT_NEW))

@@ -2,7 +2,7 @@
 VERBOSE_LEVEL:   1
 ARCHITECTURE:    targetarch
 USE_INTERNET:    1
-STD_VERSION:     LSB 4.1
+STD_VERSION:     LSB 5.0
 STD_PROFILE:     no
 [cmdchk]
 RUN: 1
@@ -125,15 +125,6 @@ VERSION: local|*
 [python|local|*]
 AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/python
 AUTOREPLY_RESULTS_DIR: /opt/lsb/test/python/results
-
-[qt4-azov]
-RUN: 1
-VERSION: local|*
-
-[qt4-azov|local|*]
-AUTOREPLY_TESTSUITE_DIR: /opt/lsb/test/qt4-azov
-AUTOREPLY_X11_FONT_PATH: [default]
-AUTOREPLY_RESULTS_DIR: /opt/lsb/test/qt4-azov/results
 
 [xml2-azov]
 RUN: 1

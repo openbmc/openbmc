@@ -1,20 +1,25 @@
-vsftpd: change default value of secure_chroot_dir
+From ce2be5d4967445828d5ae9d9462cfaa78ae03c73 Mon Sep 17 00:00:00 2001
+From: Ming Liu <ming.liu@windriver.com>
+Date: Wed, 18 Sep 2013 09:44:20 +0800
+Subject: [PATCH] vsftpd: change default value of secure_chroot_dir
 
 Upstream-Status: Pending
 
 Change secure_chroot_dir pointing to a volatile directory.
 
 Signed-off-by: Ming Liu <ming.liu@windriver.com>
+
 ---
- INSTALL       |    6 +++---
- tunables.c    |    2 +-
- vsftpd.conf.5 |    2 +-
+ INSTALL       | 6 +++---
+ tunables.c    | 2 +-
+ vsftpd.conf.5 | 2 +-
  3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff -urpN a/INSTALL b/INSTALL
---- a/INSTALL	2013-09-13 10:23:57.504972397 +0800
-+++ b/INSTALL	2013-09-13 10:25:25.664971779 +0800
-@@ -27,11 +27,11 @@ user in case it does not already exist. 
+diff --git a/INSTALL b/INSTALL
+index 4f811aa..427122a 100644
+--- a/INSTALL
++++ b/INSTALL
+@@ -27,11 +27,11 @@ user in case it does not already exist. e.g.:
  [root@localhost root]# useradd nobody
  useradd: user nobody exists
  
@@ -29,9 +34,10 @@ diff -urpN a/INSTALL b/INSTALL
  
  2c) For anonymous FTP, you will need the user "ftp" to exist, and have a
  valid home directory (which is NOT owned or writable by the user "ftp").
-diff -urpN a/tunables.c b/tunables.c
---- a/tunables.c	2013-09-13 10:26:29.554972817 +0800
-+++ b/tunables.c	2013-09-13 10:27:18.104972210 +0800
+diff --git a/tunables.c b/tunables.c
+index 284a10d..8c63c3f 100644
+--- a/tunables.c
++++ b/tunables.c
 @@ -254,7 +254,7 @@ tunables_load_defaults()
    /* -rw------- */
    tunable_chown_upload_mode = 0600;
@@ -41,10 +47,11 @@ diff -urpN a/tunables.c b/tunables.c
    install_str_setting("ftp", &tunable_ftp_username);
    install_str_setting("root", &tunable_chown_username);
    install_str_setting("/var/log/xferlog", &tunable_xferlog_file);
-diff -urpN a/vsftpd.conf.5 b/vsftpd.conf.5
---- a/vsftpd.conf.5	2013-09-13 10:09:33.774972462 +0800
-+++ b/vsftpd.conf.5	2013-09-13 10:10:41.914971989 +0800
-@@ -969,7 +969,7 @@ This option should be the name of a dire
+diff --git a/vsftpd.conf.5 b/vsftpd.conf.5
+index fcc6022..e4ffdee 100644
+--- a/vsftpd.conf.5
++++ b/vsftpd.conf.5
+@@ -969,7 +969,7 @@ This option should be the name of a directory which is empty. Also, the
  directory should not be writable by the ftp user. This directory is used
  as a secure chroot() jail at times vsftpd does not require filesystem access.
  

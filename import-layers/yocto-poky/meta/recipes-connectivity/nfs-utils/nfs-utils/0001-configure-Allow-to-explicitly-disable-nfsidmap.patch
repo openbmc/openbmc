@@ -12,11 +12,11 @@ Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
  configure.ac | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/configure.ac b/configure.ac
-index bf433d6..28a8f62 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -69,6 +69,12 @@ AC_ARG_ENABLE(nfsv4,
+Index: nfs-utils-2.1.1/configure.ac
+===================================================================
+--- nfs-utils-2.1.1.orig/configure.ac
++++ nfs-utils-2.1.1/configure.ac
+@@ -92,6 +92,12 @@ AC_ARG_ENABLE(nfsv4,
  	AC_SUBST(enable_nfsv4)
  	AM_CONDITIONAL(CONFIG_NFSV4, [test "$enable_nfsv4" = "yes"])
  
@@ -27,9 +27,9 @@ index bf433d6..28a8f62 100644
 +        enable_nfsidmap=yes)
 +
  AC_ARG_ENABLE(nfsv41,
- 	[AC_HELP_STRING([--enable-nfsv41],
-                         [enable support for NFSv41 @<:@default=yes@:>@])],
-@@ -296,7 +302,7 @@ fi
+ 	[AC_HELP_STRING([--disable-nfsv41],
+                         [disable support for NFSv41 @<:@default=no@:>@])],
+@@ -339,7 +345,7 @@ fi
  
  dnl enable nfsidmap when its support by libnfsidmap
  AM_CONDITIONAL(CONFIG_NFSDCLTRACK, [test "$enable_nfsdcltrack" = "yes" ])
@@ -38,6 +38,3 @@ index bf433d6..28a8f62 100644
  
  
  if test "$knfsd_cv_glibc2" = no; then
--- 
-1.8.4.3
-

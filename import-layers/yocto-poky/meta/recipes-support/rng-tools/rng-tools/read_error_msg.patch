@@ -1,0 +1,98 @@
+rng-tools: modify 'read error' message
+
+Make the 'read error' message more descriptive.
+
+Copied from https://bugzilla.redhat.com/attachment.cgi?id=1295857
+and modified in one place to apply successfully.  Error message during
+bootstrap modified to show device name.
+
+Upstream-Status: pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+
+--- a/rngd.c
++++ b/rngd.c
+@@ -247,8 +247,11 @@ static void do_loop(int random_step)
+ 				continue;	/* failed, no work */
+ 
+ 			retval = iter->xread(buf, sizeof buf, iter);
+-			if (retval)
++			if (retval) {
++				message(LOG_DAEMON|LOG_ERR,
++					"Error reading from entropy source\n");
+ 				continue;	/* failed, no work */
++			}
+ 
+ 			work_done = true;
+ 
+--- a/rngd_entsource.c
++++ b/rngd_entsource.c
+@@ -63,10 +63,8 @@ int xread(void *buf, size_t size, struct
+ 		size -= r;
+ 	}
+ 
+-	if (size) {
+-		message(LOG_DAEMON|LOG_ERR, "read error\n");
++	if (size)
+ 		return -1;
+-	}
+ 	return 0;
+ }
+ 
+@@ -152,7 +150,7 @@ error_out:
+ }
+ 
+ /* Initialize entropy source */
+-static int discard_initial_data(struct rng *ent_src)
++static int discard_initial_data(struct rng *ent_src, int *buf)
+ {
+ 	/* Trash 32 bits of what is probably stale (non-random)
+ 	 * initial state from the RNG.  For Intel's, 8 bits would
+@@ -164,10 +162,12 @@ static int discard_initial_data(struct r
+ 	xread(tempbuf, sizeof(tempbuf), ent_src);
+ 
+ 	/* Return 32 bits of bootstrap data */
+-	xread(tempbuf, sizeof(tempbuf), ent_src);
++	if (xread(tempbuf, sizeof(tempbuf), ent_src) != 0)
++		return -1;
+ 
+-	return tempbuf[0] | (tempbuf[1] << 8) |
++	*buf = tempbuf[0] | (tempbuf[1] << 8) |
+ 		(tempbuf[2] << 16) | (tempbuf[3] << 24);
++	return 0;
+ }
+ 
+ /*
+@@ -175,6 +175,8 @@ static int discard_initial_data(struct r
+  */
+ int init_entropy_source(struct rng *ent_src)
+ {
++	int bootstrap;
++
+ 	ent_src->rng_fd = open(ent_src->rng_name, O_RDONLY);
+ 	if (ent_src->rng_fd == -1) {
+ 		return 1;
+@@ -182,7 +184,11 @@ int init_entropy_source(struct rng *ent_
+ 	src_list_add(ent_src);
+ 	/* Bootstrap FIPS tests */
+ 	ent_src->fipsctx = malloc(sizeof(fips_ctx_t));
+-	fips_init(ent_src->fipsctx, discard_initial_data(ent_src));
++	if (discard_initial_data(ent_src, &bootstrap) != 0) {
++		message(LOG_ERR|LOG_INFO, "Read failure in %s during bootstrap\n",ent_src->rng_name);
++		return 1;
++	}
++	fips_init(ent_src->fipsctx, bootstrap);
+ 	return 0;
+ }
+ 
+--- a/rngtest.c
++++ b/rngtest.c
+@@ -335,6 +335,7 @@ static int discard_initial_data(void)
+ 
+ 	return tempbuf[0] | (tempbuf[1] << 8) |
+ 		(tempbuf[2] << 16) | (tempbuf[3] << 24);
++
+ }
+ 
+ static void do_rng_fips_test_loop( void )

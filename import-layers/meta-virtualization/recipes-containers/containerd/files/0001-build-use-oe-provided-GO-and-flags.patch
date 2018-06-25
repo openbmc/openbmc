@@ -1,0 +1,26 @@
+From e31acef290181434efaf47e70db7ad0d92dbe300 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Date: Thu, 19 Apr 2018 17:09:51 -0400
+Subject: [PATCH] build: use oe provided GO and flags
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/import/Makefile b/src/import/Makefile
+index 9d8cf8a18fbc..492d033fe2a7 100644
+--- a/src/import/Makefile
++++ b/src/import/Makefile
+@@ -134,7 +134,7 @@ bin/%: cmd/% FORCE
+ 
+ bin/containerd-shim: cmd/containerd-shim FORCE # set !cgo and omit pie for a static shim build: https://github.com/golang/go/issues/17789#issuecomment-258542220
+ 	@echo "$(WHALE) bin/containerd-shim"
+-	@CGO_ENABLED=0 go build -o bin/containerd-shim ${SHIM_GO_LDFLAGS} ${GO_TAGS} ./cmd/containerd-shim
++	@$(GO) build -o bin/containerd-shim ${SHIM_GO_LDFLAGS} $(GOBUILDFLAGS) ${GO_TAGS} ./cmd/containerd-shim
+ 
+ binaries: $(BINARIES) ## build binaries
+ 	@echo "$(WHALE) $@"
+-- 
+2.4.0.53.g8440f74
+

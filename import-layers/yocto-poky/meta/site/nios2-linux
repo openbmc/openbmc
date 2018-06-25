@@ -232,7 +232,6 @@ ac_cv_sizeof___int64=${ac_cv_sizeof___int64=0}
 ac_cv_sizeof_char=${ac_cv_sizeof_char=1}
 ac_cv_sizeof_wchar_t=${ac_cv_sizeof_wchar_t=1}
 ac_cv_sizeof_unsigned_char=${ac_cv_sizeof_unsigned_char=1}
-ac_cv_sizeof_bool=${ac_cv_sizeof_bool=1}
 ac_cv_sizeof_char_p=${ac_cv_sizeof_int_p=4}
 ac_cv_sizeof_int=${ac_cv_sizeof_int=4}
 ac_cv_sizeof_int_p=${ac_cv_sizeof_int_p=4}
@@ -372,7 +371,6 @@ samba_cv_LINUX_LFS_SUPPORT=${samba_cv_LINUX_LFS_SUPPORT=yes}
 clamav_av_func_working_snprintf_long=${clamav_av_func_working_snprintf_long=yes}
 clamav_av_have_in_port_t=${clamav_av_have_in_port_t=yes}
 clamav_av_have_in_addr_t=${clamav_av_have_in_addr_t=yes}
-ac_cv_func_mmap_fixed_mapped=${ac_cv_func_mmap_fixed_mapped=yes}
 
 #dbus
 ac_cv_have_abstract_sockets=${ac_cv_have_abstract_sockets=yes}

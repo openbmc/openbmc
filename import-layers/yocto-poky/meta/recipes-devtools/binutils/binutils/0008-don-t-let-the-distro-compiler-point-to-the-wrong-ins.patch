@@ -1,4 +1,4 @@
-From 331443a87a31ec504e5652fc099d9129a9a4deb8 Mon Sep 17 00:00:00 2001
+From 622d66634eb2e509d4126f5bdcab26de367241a1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:39:01 +0000
 Subject: [PATCH 08/15] don't let the distro compiler point to the wrong
@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
-index 25cfa29ad5..ce67a710e3 100644
+index ed1b334c36..d4ffd8b57b 100644
 --- a/libiberty/Makefile.in
 +++ b/libiberty/Makefile.in
 @@ -364,7 +364,8 @@ install-strip: install
@@ -31,5 +31,5 @@ index 25cfa29ad5..ce67a710e3 100644
  	if test -n "${target_header_dir}"; then \
  		${mkinstalldirs} $(DESTDIR)$(libdir)/$(MULTIOSDIR); \
 -- 
-2.14.0
+2.16.1
 

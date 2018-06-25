@@ -41,16 +41,16 @@ PACKAGECONFIG[webp] = "--enable-webp,--disable-webp,libwebp"
 PACKAGECONFIG[tslib] = "--with-inputdrivers=tslib,,tslib"
 PACKAGECONFIG[linuxinput] = "--with-inputdrivers=linuxinput,,"
 PACKAGECONFIG[noinput] = "--with-inputdrivers=none,,"
+PACKAGECONFIG[mesa] = "--enable-mesa,--disable-mesa,virtual/mesa,"
+PACKAGECONFIG[x11] = "--enable-x11,--disable-x11,xserver-xorg,"
 
 EXTRA_OECONF = "\
   --with-gfxdrivers=none \
   --enable-freetype=yes \
   --enable-zlib \
   --disable-imlib2 \
-  --disable-mesa \
   --disable-sdl \
   --disable-vnc \
-  --disable-x11 \
   --disable-x11vdpau \
   --disable-xine-vdpau \
 "

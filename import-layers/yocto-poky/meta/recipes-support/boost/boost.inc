@@ -135,29 +135,7 @@ BJAM_TOOLS   = "--ignore-site-config \
 
 # use PARALLEL_MAKE to speed up the build, but limit it by -j 64, greater parallelism causes bjam to segfault or to ignore -j
 # https://svn.boost.org/trac/boost/ticket/7634
-def get_boost_parallel_make(d):
-    pm = d.getVar('PARALLEL_MAKE')
-    if pm:
-        # look for '-j' and throw other options (e.g. '-l') away
-        # because they might have different meaning in bjam
-        pm = pm.split()
-        while pm:
-            v = None
-            opt = pm.pop(0)
-            if opt == '-j':
-                v = pm.pop(0)
-            elif opt.startswith('-j'):
-                v = opt[2:].strip()
-            else:
-                v = None
-
-            if v:
-                v = min(64, int(v))
-                return '-j' + str(v)
-
-    return ""
-
-BOOST_PARALLEL_MAKE = "${@get_boost_parallel_make(d)}"
+BOOST_PARALLEL_MAKE = "${@oe.utils.parallel_make_argument(d, '-j%d', limit=64)}"
 BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 		${BJAM_TOOLS} \
 		-sBOOST_BUILD_USER_CONFIG=${WORKDIR}/user-config.jam \

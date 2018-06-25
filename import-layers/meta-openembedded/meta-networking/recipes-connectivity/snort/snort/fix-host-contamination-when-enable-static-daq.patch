@@ -1,3 +1,8 @@
+From f46d096015d7402a37a59eb66b8f6b7fbf0cdff0 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 24 May 2017 17:38:53 +0800
+Subject: [PATCH] snort: enable static daq
+
 Upstream-Status: Inappropriate [embedded specific]
 
 When enable static daq for snort, it calls to daq-modules-config to get link
@@ -5,7 +10,11 @@ library and library path. Library path is useless for oe and cause host
 contamination issue. So filter it.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
+ configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/configure.in b/configure.in
 index fded45b..a247bb9 100644
 --- a/configure.in

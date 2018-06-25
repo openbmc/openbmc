@@ -1,0 +1,27 @@
+From 77c3a77210d8ca8b94e999c711156e984a8dc737 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 31 Mar 2018 11:05:33 -0700
+Subject: [PATCH] asmlib: Drop pure function attribute from seg_init
+
+seg_init returns void, so it is impure function
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ include/nasmlib.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/nasmlib.h b/include/nasmlib.h
+index 79e866b..b80b7e2 100644
+--- a/include/nasmlib.h
++++ b/include/nasmlib.h
+@@ -191,7 +191,7 @@ int64_t readstrnum(char *str, int length, bool *warn);
+  * seg_init: Initialise the segment-number allocator.
+  * seg_alloc: allocate a hitherto unused segment number.
+  */
+-void pure_func seg_init(void);
++void seg_init(void);
+ int32_t pure_func seg_alloc(void);
+ 
+ /*

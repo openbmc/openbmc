@@ -1,0 +1,28 @@
+commit 13e70b397dcb0d1bf4a869b670f041c1d7b730d0
+Author: Bjรถrn Esser <besser82@fedoraproject.org>
+Date:   Sat Jan 20 20:22:53 2018 +0100
+
+    pp: Guard fix for really old bug in glibc libcrypt
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+diff --git a/pp.c b/pp.c
+index d50ad7ddbf..6510c7b15c 100644
+--- a/pp.c
++++ b/pp.c
+@@ -3650,8 +3650,12 @@ PP(pp_crypt)
+ #if defined(__GLIBC__) || defined(__EMX__)
+ 	if (PL_reentrant_buffer->_crypt_struct_buffer) {
+ 	    PL_reentrant_buffer->_crypt_struct_buffer->initialized = 0;
+-	    /* work around glibc-2.2.5 bug */
++#if (defined(__GLIBC__) && __GLIBC__ == 2) && \
++    (defined(__GLIBC_MINOR__) && __GLIBC_MINOR__ >= 2 && __GLIBC_MINOR__ < 4)
++	    /* work around glibc-2.2.5 bug, has been fixed at some
++	     * time in glibc-2.3.X */
+ 	    PL_reentrant_buffer->_crypt_struct_buffer->current_saltbits = 0;
++#endif
+ 	}
+ #endif
+     }
+

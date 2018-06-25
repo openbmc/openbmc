@@ -14,6 +14,8 @@ SRC_URI = "git://github.com/jlanza/umip \
            file://mip6d \
            file://mip6d.service \
            file://0001-Add-format-string-to-fprintf-call.patch \
+           file://0001-replace-SIGCLD-with-SIGCHLD-and-include-sys-types.h.patch \
+           file://0002-replace-PTHREAD_MUTEX_FAST_NP-with-PTHREAD_MUTEX_NOR.patch \
            "
 SRCREV = "7d67209cd1bba2dd0e183a0fa07eeef07964dd14"
 

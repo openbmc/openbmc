@@ -17,7 +17,6 @@ COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"
 DEPENDS = "bison flex"
 
 SRC_URI = "https://acpica.org/sites/acpica/files/acpica-unix2-${PV}.tar.gz \
-    file://no-werror.patch \
     file://rename-yy_scan_string-manually.patch \
     file://manipulate-fds-instead-of-FILE.patch;striplevel=2 \
     file://0001-Linux-add-support-for-X32-ABI-compilation.patch \
@@ -49,7 +48,6 @@ do_install() {
 PROVIDES = "iasl"
 RPROVIDES_${PN} += "iasl"
 RREPLACES_${PN} += "iasl"
-RCONFLIGHTS_${PN} += "iasl"
+RCONFLICTS_${PN} += "iasl"
 
-NATIVE_INSTALL_WORKS = "1"
 BBCLASSEXTEND = "native"

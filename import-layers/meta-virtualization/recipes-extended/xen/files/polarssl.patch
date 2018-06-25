@@ -1,0 +1,64 @@
+diff -Naur polarssl-1.1.4/include/polarssl/config.h polarssl-x86_64/include/polarssl/config.h
+--- a/include/polarssl/config.h	2011-12-22 05:06:27.000000000 -0500
++++ b/include/polarssl/config.h	2012-10-30 17:18:07.567001000 -0400
+@@ -164,8 +164,8 @@
+  * application.
+  *
+  * Uncomment this macro to prevent loading of default entropy functions.
+-#define POLARSSL_NO_DEFAULT_ENTROPY_SOURCES
+  */
++#define POLARSSL_NO_DEFAULT_ENTROPY_SOURCES
+
+ /**
+  * \def POLARSSL_NO_PLATFORM_ENTROPY
+@@ -175,8 +175,8 @@
+  * standards like the /dev/urandom or Windows CryptoAPI.
+  *
+  * Uncomment this macro to disable the built-in platform entropy functions.
+-#define POLARSSL_NO_PLATFORM_ENTROPY
+  */
++#define POLARSSL_NO_PLATFORM_ENTROPY
+
+ /**
+  * \def POLARSSL_PKCS1_V21
+@@ -426,8 +426,8 @@
+  * Requires: POLARSSL_TIMING_C
+  *
+  * This module enables the HAVEGE random number generator.
+- */
+ #define POLARSSL_HAVEGE_C
++ */
+
+ /**
+  * \def POLARSSL_MD_C
+@@ -490,7 +490,7 @@
+  *
+  * This module provides TCP/IP networking routines.
+  */
+-#define POLARSSL_NET_C
++//#define POLARSSL_NET_C
+
+ /**
+  * \def POLARSSL_PADLOCK_C
+@@ -644,8 +644,8 @@
+  * Caller:  library/havege.c
+  *
+  * This module is used by the HAVEGE random number generator.
+- */
+ #define POLARSSL_TIMING_C
++ */
+
+ /**
+  * \def POLARSSL_VERSION_C
+diff -Naur polarssl-1.1.4/library/bignum.c polarssl-x86_64/library/bignum.c
+--- a/library/bignum.c	2012-04-29 16:15:55.000000000 -0400
++++ b/library/bignum.c	2012-10-30 17:21:52.135000999 -0400
+@@ -1101,7 +1101,7 @@
+             Z.p[i - t - 1] = ~0;
+         else
+         {
+-#if defined(POLARSSL_HAVE_LONGLONG)
++#if 0 //defined(POLARSSL_HAVE_LONGLONG)
+             t_udbl r;
+
+             r  = (t_udbl) X.p[i] << biL;

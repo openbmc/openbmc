@@ -11,7 +11,9 @@ SRC_URI = "git://github.com/OSSystems/toscoterm.git"
 
 S = "${WORKDIR}/git"
 
-inherit gitpkgv pkgconfig
+inherit distro_features_check gitpkgv pkgconfig
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 do_compile() {
     oe_runmake \

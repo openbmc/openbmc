@@ -23,6 +23,7 @@ SRC_URI = "git://github.com/rhinstaller/blivet;branch=2.2-devel \
            file://0011-invoking-fsck-with-infinite-timeout.patch \
            file://0012-invoking-mkfs-with-infinite-timeout.patch \
            file://0013-Revert-Adapt-to-logging-module-name-change.patch \
+           file://0014-invoking-dd-with-infinite-timeout.patch \
 "
 
 inherit distro_features_check

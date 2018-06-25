@@ -194,7 +194,8 @@ class QemuRunner:
             sys.exit(0)
 
         self.logger.debug("runqemu started, pid is %s" % self.runqemu.pid)
-        self.logger.debug("waiting at most %s seconds for qemu pid" % self.runqemutime)
+        self.logger.debug("waiting at most %s seconds for qemu pid (%s)" %
+                          (self.runqemutime, time.strftime("%D %H:%M:%S")))
         endtime = time.time() + self.runqemutime
         while not self.is_alive() and time.time() < endtime:
             if self.runqemu.poll():
@@ -208,7 +209,8 @@ class QemuRunner:
             time.sleep(0.5)
 
         if not self.is_alive():
-            self.logger.error("Qemu pid didn't appear in %s seconds" % self.runqemutime)
+            self.logger.error("Qemu pid didn't appear in %s seconds (%s)" %
+                              (self.runqemutime, time.strftime("%D %H:%M:%S")))
             # Dump all processes to help us to figure out what is going on...
             ps = subprocess.Popen(['ps', 'axww', '-o', 'pid,ppid,command '], stdout=subprocess.PIPE).communicate()[0]
             processes = ps.decode("utf-8")
@@ -225,7 +227,9 @@ class QemuRunner:
         # We are alive: qemu is running
         out = self.getOutput(output)
         netconf = False # network configuration is not required by default
-        self.logger.debug("qemu started in %s seconds - qemu procces pid is %s" % (time.time() - (endtime - self.runqemutime), self.qemupid))
+        self.logger.debug("qemu started in %s seconds - qemu procces pid is %s (%s)" %
+                          (time.time() - (endtime - self.runqemutime),
+                           self.qemupid, time.strftime("%D %H:%M:%S")))
         if get_ip:
             cmdline = ''
             with open('/proc/%s/cmdline' % self.qemupid) as p:
@@ -269,7 +273,8 @@ class QemuRunner:
             return False
 
         self.logger.debug("Output from runqemu:\n%s", out)
-        self.logger.debug("Waiting at most %d seconds for login banner" % self.boottime)
+        self.logger.debug("Waiting at most %d seconds for login banner (%s)" %
+                          (self.boottime, time.strftime("%D %H:%M:%S")))
         endtime = time.time() + self.boottime
         socklist = [self.server_socket]
         reachedlogin = False
@@ -298,15 +303,22 @@ class QemuRunner:
                             self.server_socket = qemusock
                             stopread = True
                             reachedlogin = True
-                            self.logger.debug("Reached login banner")
+                            self.logger.debug("Reached login banner in %s seconds (%s)" %
+                                              (time.time() - (endtime - self.boottime),
+                                              time.strftime("%D %H:%M:%S")))
                     else:
+                        # no need to check if reachedlogin unless we support multiple connections
+                        self.logger.debug("QEMU socket disconnected before login banner reached. (%s)" %
+                                          time.strftime("%D %H:%M:%S"))
                         socklist.remove(sock)
                         sock.close()
                         stopread = True
 
 
         if not reachedlogin:
-            self.logger.debug("Target didn't reached login boot in %d seconds" % self.boottime)
+            if time.time() >= endtime:
+                self.logger.debug("Target didn't reach login banner in %d seconds (%s)" %
+                                  (self.boottime, time.strftime("%D %H:%M:%S")))
             tail = lambda l: "\n".join(l.splitlines()[-25:])
             # in case bootlog is empty, use tail qemu log store at self.msg
             lines = tail(bootlog if bootlog else self.msg)

@@ -1,7 +1,7 @@
-From 834fa06920f88ceedf752964c8e296c653d541e4 Mon Sep 17 00:00:00 2001
+From f919725918fad2b32504f89a28310fcae4ab0406 Mon Sep 17 00:00:00 2001
 From: Yu Ke <ke.yu@intel.com>
 Date: Wed, 11 Apr 2012 14:26:16 +0200
-Subject: [PATCH 01/12] COPYING: add GPLv2 license file
+Subject: [PATCH] COPYING: add GPLv2 license file
 
 this is a local file recipe and the license file is missing.In order
 to pass the license checksum checking, the license file is needed. So
@@ -9,9 +9,10 @@ this patch add the GPLv2 license file.
 
 Signed-off-by: Yu Ke <ke.yu@intel.com>
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
- COPYING |  339 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 339 insertions(+), 0 deletions(-)
+ COPYING | 339 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 339 insertions(+)
  create mode 100644 COPYING
 
 diff --git a/COPYING b/COPYING
@@ -359,6 +360,3 @@ index 0000000..d511905
 +consider it more useful to permit linking proprietary applications with the
 +library.  If this is what you want to do, use the GNU Lesser General
 +Public License instead of this License.
--- 
-1.7.8.5
-

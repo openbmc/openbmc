@@ -1,0 +1,33 @@
+From ec0e52b49c9b6869413c9544c2ed44710ab91141 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 14 Apr 2018 16:15:59 +0800
+Subject: [PATCH] drop zenity detection
+
+OE does not support zenity
+
+Upstream-Status: inappropriate [OE specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 5f9e7e9..80b32c7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -359,11 +359,6 @@ fi
+ 
+ AM_CONDITIONAL(HAVE_SM, test "$found_sm" = "yes") 
+ 
+-AC_PATH_PROG(ZENITY, zenity, no)
+-if test x"$ZENITY" = xno; then
+-  AC_MSG_ERROR([zenity not found in your path - needed for dialogs])
+-fi
+-
+ dnl **************************************************************************
+ dnl Check for Vulkan support
+ dnl **************************************************************************
+-- 
+1.8.3.1
+

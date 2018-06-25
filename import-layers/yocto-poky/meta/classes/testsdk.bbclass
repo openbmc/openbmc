@@ -156,10 +156,11 @@ def testsdkext_main(d):
         with open(os.path.join(sdk_dir, 'conf', 'auto.conf'), 'a+') as f:
             f.write('SSTATE_MIRRORS += " \\n file://.* file://%s/PATH"\n' % test_data.get('SSTATE_DIR'))
             f.write('SOURCE_MIRROR_URL = "file://%s"\n' % test_data.get('DL_DIR'))
-            f.write('INHERIT += "own-mirrors"')
+            f.write('INHERIT += "own-mirrors"\n')
 
         # We need to do this in case we have a minimal SDK
-        subprocess.check_output(". %s > /dev/null; devtool sdk-install meta-extsdk-toolchain" % sdk_env, cwd=sdk_dir, shell=True)
+        subprocess.check_output(". %s > /dev/null; devtool sdk-install meta-extsdk-toolchain" % \
+                sdk_env, cwd=sdk_dir, shell=True, stderr=subprocess.STDOUT)
 
         tc = OESDKExtTestContext(td=test_data, logger=logger, sdk_dir=sdk_dir,
             sdk_env=sdk_env, target_pkg_manifest=target_pkg_manifest,

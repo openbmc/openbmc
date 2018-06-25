@@ -21,7 +21,7 @@
     <para>
         Kernel Metadata exists in many places.
         One area in the Yocto Project
-        <ulink url='&YOCTO_DOCS_REF_URL;#source-repositories'>Source Repositories</ulink>
+        <ulink url='&YOCTO_DOCS_OM_URL;#source-repositories'>Source Repositories</ulink>
         is the <filename>yocto-kernel-cache</filename> Git repository.
         You can find this repository grouped under the "Yocto Linux Kernel"
         heading in the
@@ -64,8 +64,7 @@
         <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>
         variable.
         This variable is typically set to the same value as the
-        <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
-        variable, which is used by
+        <filename>MACHINE</filename> variable, which is used by
         <ulink url='&YOCTO_DOCS_REF_URL;#bitbake-term'>BitBake</ulink>.
         However, in some cases, the variable might instead refer to the
         underlying platform of the <filename>MACHINE</filename>.
@@ -77,8 +76,7 @@
         Multiple Corei7-based BSPs could share the same "intel-corei7-64"
         value for <filename>KMACHINE</filename>.
         It is important to realize that <filename>KMACHINE</filename> is
-        just for kernel mapping, while
-        <ulink url='&YOCTO_DOCS_REF_URL;#var-MACHINE'><filename>MACHINE</filename></ulink>
+        just for kernel mapping, while <filename>MACHINE</filename>
         is the machine type within a BSP Layer.
         Even with this distinction, however, these two variables can hold
         the same value.
@@ -116,8 +114,7 @@
         used in assembling the configuration.
         If you do not specify a <filename>LINUX_KERNEL_TYPE</filename>,
         it defaults to "standard".
-        Together with
-        <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>,
+        Together with <filename>KMACHINE</filename>,
         <filename>LINUX_KERNEL_TYPE</filename> defines the search
         arguments used by the kernel tools to find the
         appropriate description within the kernel Metadata with which to
@@ -631,8 +628,10 @@
             <note>
                 For BSPs supported by the Yocto Project, the BSP description
                 files are located in the <filename>bsp</filename> directory
-                of the <filename>yocto-kernel-cache</filename> repository
-                organized under the "Yocto Linux Kernel" heading in the
+                of the
+                <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/yocto-kernel-cache/tree/bsp'><filename>yocto-kernel-cache</filename></ulink>
+                repository organized under the "Yocto Linux Kernel" heading
+                in the
                 <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi'>Yocto Project Source Repositories</ulink>.
             </note>
         </para>
@@ -641,27 +640,30 @@
             This section overviews the BSP description structure, the
             aggregation concepts, and presents a detailed example using
             a BSP supported by the Yocto Project (i.e. BeagleBone Board).
+            For complete information on BSP layer file hierarchy, see the
+            <ulink url='&YOCTO_DOCS_BSP_URL;'>Yocto Project Board Support Package (BSP) Developer's Guide</ulink>.
         </para>
 
         <section id='bsp-description-file-overview'>
             <title>Overview</title>
 
             <para>
-                For simplicity, consider the following top-level BSP
+                For simplicity, consider the following root BSP layer
                 description files for the BeagleBone board.
-                Top-level BSP descriptions files employ both a structure
-                and naming convention for consistency.
+                These files employ both a structure and naming convention
+                for consistency.
                 The naming convention for the file is as follows:
                 <literallayout class='monospaced'>
-     <replaceable>bsp_name</replaceable>-<replaceable>kernel_type</replaceable>.scc
+     <replaceable>bsp_root_name</replaceable>-<replaceable>kernel_type</replaceable>.scc
                 </literallayout>
-                Here are some example top-level BSP filenames for the
+                Here are some example root layer BSP filenames for the
                 BeagleBone Board BSP, which is supported by the Yocto Project:
                 <literallayout class='monospaced'>
      beaglebone-standard.scc
      beaglebone-preempt-rt.scc
                 </literallayout>
-                Each file uses the BSP name followed by the kernel type.
+                Each file uses the root name (i.e "beaglebone") BSP name
+                followed by the kernel type.
             </para>
 
             <para>
@@ -850,7 +852,7 @@
 
             <para>
                 Now consider the "minnow" description for the "tiny" kernel
-                type (i.e. <filename>minnow-tiny.scc</filename>:
+                type (i.e. <filename>minnow-tiny.scc</filename>):
                 <literallayout class='monospaced'>
         define KMACHINE minnow
         define KTYPE tiny
@@ -1012,8 +1014,7 @@
 
         <para>
             If you modify the Metadata, you must not forget to update the
-            <ulink url='&YOCTO_DOCS_REF_URL;#var-SRCREV'><filename>SRCREV</filename></ulink>
-            statements in the kernel's recipe.
+            <filename>SRCREV</filename> statements in the kernel's recipe.
             In particular, you need to update the
             <filename>SRCREV_meta</filename> variable to match the commit in
             the <filename>KMETA</filename> branch you wish to use.
@@ -1221,9 +1222,13 @@
                 </para></listitem>
             <listitem><para>
                 <filename>define</filename>:
-                Defines variables, such as <filename>KMACHINE</filename>,
-                <filename>KTYPE</filename>, <filename>KARCH</filename>,
-                and <filename>KFEATURE_DESCRIPTION</filename>.</para></listitem>
+                Defines variables, such as
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KMACHINE'><filename>KMACHINE</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KTYPE'><filename>KTYPE</filename></ulink>,
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KARCH'><filename>KARCH</filename></ulink>,
+                and
+                <ulink url='&YOCTO_DOCS_REF_URL;#var-KFEATURE_DESCRIPTION'><filename>KFEATURE_DESCRIPTION</filename></ulink>.
+                </para></listitem>
             <listitem><para>
                 <filename>include SCC_FILE</filename>:
                 Includes an SCC file in the current file.

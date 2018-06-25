@@ -1,0 +1,24 @@
+From 9a4a872dca78ca9cb6bdc228be61f5a4c2d68b1f Mon Sep 17 00:00:00 2001
+From: Kai Ulrich <kaiu@gmx.de>
+Date: Wed, 18 Mar 2015 11:20:53 +0100
+
+---
+ scripts/sms3 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/sms3 b/scripts/sms3
+index 6b990bf..09c063b 100755
+--- a/scripts/sms3
++++ b/scripts/sms3
+@@ -24,9 +24,9 @@ INFOFILE="/var/run/smsd.working"
+ # Logfile can also be defined in here:
+ LOGFILE="/var/log/smsd.log"
+ 
+-DAEMON=/usr/local/bin/smsd
++DAEMON=/usr/bin/smsd
+ # A program which turns power off for couple of seconds:
+-RESETMODEMS=/usr/local/bin/smsd_resetmodems
++RESETMODEMS=/usr/bin/smsd_resetmodems
+ NAME=smsd
+ PSOPT="-e"
+ ECHO=echo

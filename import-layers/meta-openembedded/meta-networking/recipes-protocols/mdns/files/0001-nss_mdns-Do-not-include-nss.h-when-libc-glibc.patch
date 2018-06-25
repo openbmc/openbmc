@@ -1,0 +1,42 @@
+From d3082d2c606c810aa0a39378bf1e02575af3a301 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Feb 2018 21:54:11 -0800
+Subject: [PATCH] nss_mdns: Do not include nss.h when libc != glibc
+
+Provide nss_status macro instead for non-glibc case
+where nss.h is absent
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ mDNSPosix/nss_mdns.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/mDNSPosix/nss_mdns.c b/mDNSPosix/nss_mdns.c
+index afadb3c..c469584 100755
+--- a/mDNSPosix/nss_mdns.c
++++ b/mDNSPosix/nss_mdns.c
+@@ -378,8 +378,19 @@ init_config ();
+ 
+ #define ENTNAME  hostent
+ #define DATABASE "hosts"
+-
++#ifdef __GLIBC__
+ #include <nss.h>
++#else
++enum nss_status
++{
++    NSS_STATUS_TRYAGAIN = -2,
++    NSS_STATUS_UNAVAIL,
++    NSS_STATUS_NOTFOUND,
++    NSS_STATUS_SUCCESS,
++    NSS_STATUS_RETURN
++};
++#define NETDB_INTERNAL NULL
++#endif
+ // For nss_status
+ #include <netdb.h>
+ // For hostent
+-- 
+2.16.1
+

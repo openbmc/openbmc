@@ -1,4 +1,0 @@
-#!/bin/sh
-
-/usr/bin/trackerd -m &
-

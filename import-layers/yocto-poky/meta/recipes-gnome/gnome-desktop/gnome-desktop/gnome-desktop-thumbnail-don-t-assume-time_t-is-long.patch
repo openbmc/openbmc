@@ -1,0 +1,61 @@
+From 9048939b76b3bd10783adb79ed0aaf6cd13895cc Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Tue, 13 Dec 2016 20:39:51 -0700
+Subject: [PATCH 1/2] gnome-desktop-thumbnail: don't convert time_t to long
+
+Explicitly use strftime+strptime rather than snprintf+atol. This fixes the
+build for X32, where long's size doesn't match that of time_t.
+
+Upstream-Status: Pending
+Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+
+
+Modify patch described above to eliminate replacement of
+
+g_snprintf (mtime_str, 21, "%" G_GINT64_FORMAT, (gint64) mtime)
+
+which is not necessary.  Retain replacement of atol().
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+---
+ libgnome-desktop/gnome-desktop-thumbnail.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/libgnome-desktop/gnome-desktop-thumbnail.c b/libgnome-desktop/gnome-desktop-thumbnail.c
+index e56c3d7..5d96bf3 100644
+--- a/libgnome-desktop/gnome-desktop-thumbnail.c
++++ b/libgnome-desktop/gnome-desktop-thumbnail.c
+@@ -120,6 +120,8 @@
+  * Since: 2.2
+  */
+ 
++#define _XOPEN_SOURCE
++
+ #include <config.h>
+ 
+ #include <glib.h>
+@@ -1319,6 +1326,7 @@ gnome_desktop_thumbnail_is_valid (GdkPixbuf          *pixbuf,
+ {
+   const char *thumb_uri, *thumb_mtime_str;
+   time_t thumb_mtime;
++  struct tm tmp_mtime;
+ 
+   thumb_uri = gdk_pixbuf_get_option (pixbuf, "tEXt::Thumb::URI");
+   if (g_strcmp0 (uri, thumb_uri) != 0)
+@@ -1327,7 +1335,11 @@ gnome_desktop_thumbnail_is_valid (GdkPixbuf          *pixbuf,
+   thumb_mtime_str = gdk_pixbuf_get_option (pixbuf, "tEXt::Thumb::MTime");
+   if (!thumb_mtime_str)
+     return FALSE;
+-  thumb_mtime = atol (thumb_mtime_str);
++  if (!strptime (thumb_mtime_str, "%s", &tmp_mtime))
++    return FALSE;
++  thumb_mtime = mktime (&tmp_mtime);
++  if (!thumb_mtime)
++    return FALSE;
+   if (mtime != thumb_mtime)
+     return FALSE;
+ 
+-- 
+2.14.1
+

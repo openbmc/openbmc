@@ -25,6 +25,8 @@ EXTRA_OECMAKE += "-DBUILD_DOCUMENTATION=OFF"
 
 #--enable-apps --enable-syslog
 
+ASNEEDED = ""
+
 do_install_append () {
     rmdir ${D}${bindir}
 }

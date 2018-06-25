@@ -1,0 +1,63 @@
+From d5028c10f156c224475b340cfb1ba025d6797243 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 2 Feb 2018 15:51:42 +0800
+Subject: [PATCH 3/7] Makefile.in/configure.in: support cross compiling
+
+While cross compiling, the tools/gen_test_char could not
+be executed at build time, use AX_PROG_CC_FOR_BUILD to
+build native tools/gen_test_char
+
+Upstream-Status: Submitted [https://github.com/apache/apr/pull/8]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.in  | 10 +++-------
+ configure.in |  3 +++
+ 2 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 5fb760e..8675f90 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -46,7 +46,7 @@ LT_VERSION = @LT_VERSION@
+ 
+ CLEAN_TARGETS = apr-config.out apr.exp exports.c export_vars.c .make.dirs \
+ 	build/apr_rules.out tools/gen_test_char@EXEEXT@ \
+-	tools/gen_test_char.o tools/gen_test_char.lo \
++	tools/gen_test_char.o \
+ 	include/private/apr_escape_test_char.h
+ DISTCLEAN_TARGETS = config.cache config.log config.status \
+ 	include/apr.h include/arch/unix/apr_private.h \
+@@ -131,13 +131,9 @@ check: $(TARGET_LIB)
+ etags:
+ 	etags `find . -name '*.[ch]'`
+ 
+-OBJECTS_gen_test_char = tools/gen_test_char.lo $(LOCAL_LIBS)
+-tools/gen_test_char.lo: tools/gen_test_char.c
++tools/gen_test_char@EXEEXT@: tools/gen_test_char.c
+ 	$(APR_MKDIR) tools
+-	$(LT_COMPILE)
+-
+-tools/gen_test_char@EXEEXT@: $(OBJECTS_gen_test_char)
+-	$(LINK_PROG) $(OBJECTS_gen_test_char) $(ALL_LIBS)
++	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $< -o $@
+ 
+ include/private/apr_escape_test_char.h: tools/gen_test_char@EXEEXT@
+ 	$(APR_MKDIR) include/private
+diff --git a/configure.in b/configure.in
+index 719f331..361120f 100644
+--- a/configure.in
++++ b/configure.in
+@@ -183,6 +183,9 @@ dnl can only be used once within a configure script, so this prevents a
+ dnl preload section from invoking the macro to get compiler info.
+ AC_PROG_CC
+ 
++dnl Check build CC for gen_test_char compiling which is executed at build time.
++AX_PROG_CC_FOR_BUILD
++
+ dnl AC_PROG_SED is only avaliable in recent autoconf versions.
+ dnl Use AC_CHECK_PROG instead if AC_PROG_SED is not present.
+ ifdef([AC_PROG_SED],
+-- 
+1.8.3.1
+

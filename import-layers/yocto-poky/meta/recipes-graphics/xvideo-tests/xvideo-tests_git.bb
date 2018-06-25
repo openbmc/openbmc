@@ -8,7 +8,7 @@ SRCREV = "7d38b881e99eb74169d292b40f7164e461a65092"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://git.yoctoproject.org/test-xvideo"
-UPSTREAM_VERSION_UNKNOWN = "1"
+UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"
 

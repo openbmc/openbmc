@@ -136,7 +136,6 @@ RDEPENDS_packagegroup-self-hosted-extended = "\
     mtools \
     ncurses \
     ncurses-terminfo-base \
-    neon \
     nfs-utils \
     nfs-utils-client \
     openssl \

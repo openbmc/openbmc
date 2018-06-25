@@ -1,0 +1,42 @@
+From b29e448e12040ed8f4d83743a14db0f138a7cc67 Mon Sep 17 00:00:00 2001
+From: Victor Kamensky <kamensky@cisco.com>
+Date: Wed, 14 Mar 2018 16:54:08 -0500
+Subject: [PATCH] debuginfo lookup with sysroot case do not remove sysroot from
+ file_name
+
+If sysroot option is passed, and debug symbols reside in sysroot along
+with executable <foo> in <foo_dir>/.debug/<foo_file> directory,
+stap fails to find debuginfo because it strips out sysroot path
+from file_name so dwfl_standard_find_debuginfo ends up looking at
+host <foo_dir>/.debug/<foo_file> rather then checking
+<sysroot>/<foo_dir>/.debug/<foo_file>.
+
+Upstream-Status: Backport
+Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+---
+ setupdwfl.cxx | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/setupdwfl.cxx b/setupdwfl.cxx
+index 11e0bb2..2a87982 100644
+--- a/setupdwfl.cxx
++++ b/setupdwfl.cxx
+@@ -627,18 +627,6 @@ internal_find_debuginfo (Dwfl_Module *mod,
+ 
+   call_dwfl_standard_find_debuginfo:
+ 
+-  if (current_session_for_find_debuginfo)
+-    {
+-      string sysroot = current_session_for_find_debuginfo->sysroot + "/*";
+-      int    found   = fnmatch(sysroot.c_str(), file_name, 0);
+-
+-      if (found)
+-	{
+-	  file_name = file_name
+-	    + current_session_for_find_debuginfo->sysroot.length() - 1;
+-	}
+-    }
+-
+   /* Call the original dwfl_standard_find_debuginfo */
+   return dwfl_standard_find_debuginfo(mod, userdata, modname, base,
+               file_name, debuglink_file,

@@ -1,0 +1,155 @@
+From 4cab5e5c0c5f19fcee7d37b4a38b156d63a150d4 Mon Sep 17 00:00:00 2001
+From: Peter Thorson <git@zaphoyd.com>
+Date: Sun, 11 Jun 2017 16:13:25 -0500
+Subject: [PATCH] minor adjustments to recent extension negotiation related
+ fixes, refactor a bit more extension negotiation code to be simpler
+
+---
+ websocketpp/impl/connection_impl.hpp |  6 +--
+ websocketpp/processors/hybi13.hpp    | 92 ++++++++++++++++++------------------
+ 2 files changed, 49 insertions(+), 49 deletions(-)
+
+Index: websocketpp-0.7.0/websocketpp/impl/connection_impl.hpp
+===================================================================
+--- websocketpp-0.7.0.orig/websocketpp/impl/connection_impl.hpp
++++ websocketpp-0.7.0/websocketpp/impl/connection_impl.hpp
+@@ -1222,17 +1222,17 @@
+     std::pair<lib::error_code,std::string> neg_results;
+     neg_results = m_processor->negotiate_extensions(m_request);
+ 
+-    if (neg_results.first == error::make_error_code(error::extension_parse_error)) {
++    if (neg_results.first == processor::error::make_error_code(processor::error::extension_parse_error)) {
+         // There was a fatal error in extension parsing that should result in
+         // a failed connection attempt.
+-        m_alog.write(log::alevel::info, "Bad request: " + neg_results.first.message());
++        m_elog.write(log::elevel::info, "Bad request: " + neg_results.first.message());
+         m_response.set_status(http::status_code::bad_request);
+         return neg_results.first;
+     } else if (neg_results.first) {
+         // There was a fatal error in extension processing that is probably our
+         // fault. Consider extension negotiation to have failed and continue as
+         // if extensions were not supported
+-        m_alog.write(log::alevel::info, 
++        m_elog.write(log::elevel::info, 
+             "Extension negotiation failed: " + neg_results.first.message());
+     } else {
+         // extension negotiation succeeded, set response header accordingly
+Index: websocketpp-0.7.0/websocketpp/processors/hybi13.hpp
+===================================================================
+--- websocketpp-0.7.0.orig/websocketpp/processors/hybi13.hpp
++++ websocketpp-0.7.0/websocketpp/processors/hybi13.hpp
+@@ -97,11 +97,6 @@
+     /**
+      * This exists mostly because the code for requests and responses is
+      * identical and I can't have virtual template methods.
+-     *
+-     * NOTE: this method makes assumptions that the permessage-deflate
+-     * extension is the only one supported. If additional extensions are
+-     * ever supported it should be reviewed carefully. Most cases where
+-     * that assumption is made are explicitly noted.
+      */
+     template <typename header_type>
+     err_str_pair negotiate_extensions_helper(header_type const & header) {
+@@ -130,55 +125,60 @@
+ 
+         http::parameter_list::const_iterator it;
+ 
++        // look through the list of extension requests to find the first
++        // one that we can accept.
+         if (m_permessage_deflate.is_implemented()) {
+             err_str_pair neg_ret;
+             for (it = p.begin(); it != p.end(); ++it) {
+-                // look through each extension, if the key is permessage-deflate
+-                if (it->first == "permessage-deflate") {
+-                    // if we have already successfully negotiated this extension
+-                    // then skip any other requests to negotiate the same one
+-                    // with different parameters 
+-                    if (m_permessage_deflate.is_enabled()) {
+-                        continue;
+-                    }
+-                    
+-                    
+-                    neg_ret = m_permessage_deflate.negotiate(it->second);
+-
+-                    if (neg_ret.first) {
+-                        // Figure out if this is an error that should halt all
+-                        // extension negotiations or simply cause negotiation of
+-                        // this specific extension to fail.
+-                        //std::cout << "permessage-compress negotiation failed: "
+-                        //          << neg_ret.first.message() << std::endl;
+-                    } else {
+-                        // Note: this list will need commas if WebSocket++ ever
+-                        // supports more than one extension
+-                        
+-                        // Actually try to initialize the extension before we
+-                        // deem negotiation complete
+-                        ret.first = m_permessage_deflate.init(base::m_server);
+-                        if (!ret.first) {
+-
+-                            // TODO: support multiple extensions.
+-                            // right now, because there is only one extension 
+-                            // supported, it failing to negotiate means we are
+-                            // done with all negotiating. In the future if more
+-                            // extensions are supported a better solution will
+-                            // be needed here.
+-                            break;
+-                        } else {
+-                            ret.second += neg_ret.second;
+-
+-                            // continue looking for more extensions
+-                            continue;
+-                        }
+-                        
+-                    }
++                // not a permessage-deflate extension request, ignore
++                if (it->first != "permessage-deflate") {
++                    continue;
++                }
++
++                // if we have already successfully negotiated this extension
++                // then skip any other requests to negotiate the same one
++                // with different parameters 
++                if (m_permessage_deflate.is_enabled()) {
++                    continue;
++                }
++                
++                // attempt to negotiate this offer
++                neg_ret = m_permessage_deflate.negotiate(it->second);
++
++                if (neg_ret.first) {
++                    // negotiation offer failed. Do nothing. We will continue
++                    // searching for a permessage-deflate config that succeeds
++                    continue;
++                }
++
++                // Negotiation tentatively succeeded
++
++                // Actually try to initialize the extension before we
++                // deem negotiation complete
++                lib::error_code ec = m_permessage_deflate.init(base::m_server);
++
++                if (ec) {
++                    // Negotiation succeeded but initialization failed this is 
++                    // an error that should stop negotiation of permessage 
++                    // deflate. Return the reason for the init failure
++
++                    ret.first = ec;
++                    break;
++                } else {
++                    // Successfully initialized, push the negotiated response into
++                    // the reply and stop looking for additional permessage-deflate
++                    // extensions
++                    ret.second += neg_ret.second;
++                    break;
+                 }
+             }
+         }
+ 
++        // support for future extensions would go here. Should check the value of 
++        // ret.first before continuing. Might need to consider whether failure of
++        // negotiation of an earlier extension should stop negotiation of subsequent
++        // ones
++
+         return ret;
+     }
+ 

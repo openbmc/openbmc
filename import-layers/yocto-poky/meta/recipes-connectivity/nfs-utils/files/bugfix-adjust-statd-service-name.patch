@@ -16,11 +16,11 @@ Signed-off-by: Ulrich Ölmann <u.oelmann@pengutronix.de>
  utils/statd/start-statd | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/utils/statd/start-statd b/utils/statd/start-statd
-index 8211a90..3c2aa6f 100755
---- a/utils/statd/start-statd
-+++ b/utils/statd/start-statd
-@@ -16,7 +16,7 @@ fi
+Index: nfs-utils-2.1.1/utils/statd/start-statd
+===================================================================
+--- nfs-utils-2.1.1.orig/utils/statd/start-statd
++++ nfs-utils-2.1.1/utils/statd/start-statd
+@@ -28,7 +28,7 @@ fi
  # First try systemd if it's installed.
  if [ -d /run/systemd/system ]; then
      # Quit only if the call worked.
@@ -28,7 +28,4 @@ index 8211a90..3c2aa6f 100755
 +    systemctl start nfs-statd.service && exit
  fi
  
- # Fall back to launching it ourselves.
--- 
-2.1.4
-
+ cd /

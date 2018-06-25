@@ -6,7 +6,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 DEPENDS = "python libxml2 gconf popt gtk+3 intltool-native gnome-common-native"
 
-inherit gnomebase pkgconfig python-dir pythonnative gobject-introspection
+inherit distro_features_check gnomebase pkgconfig python-dir pythonnative gobject-introspection
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 BPN = "gnome-menus"
 

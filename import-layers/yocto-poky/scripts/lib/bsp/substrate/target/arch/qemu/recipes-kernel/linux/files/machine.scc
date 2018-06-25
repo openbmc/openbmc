@@ -1,3 +1,0 @@
-# yocto-bsp-filename {{=machine}}.scc
-kconf hardware {{=machine}}.cfg
-

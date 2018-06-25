@@ -102,6 +102,7 @@ python () {
                 # a variable and let the metadata deal with the deps.
                 d.setVar('_WKS_TEMPLATE', body)
                 bb.build.addtask('do_write_wks_template', 'do_image_wic', None, d)
+        bb.build.addtask('do_image_wic', 'do_image_complete', None, d)
 }
 
 #

@@ -1,0 +1,56 @@
+From a2d146b8dd9d02f523d1e205d79792626a71dec3 Mon Sep 17 00:00:00 2001
+From: Anuj Mittal <anuj.mittal@intel.com>
+Date: Mon, 2 Apr 2018 15:27:09 +0800
+Subject: [PATCH] acinclude.m4: skip binconfig check for libxml
+
+We want libxml flags to be picked up using pkg-config instead of the
+xml2-config file.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+
+---
+ acinclude.m4 | 29 -----------------------------
+ 1 file changed, 29 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index d42d708..d32766a 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -2525,35 +2525,6 @@ dnl
+ AC_DEFUN([PHP_SETUP_LIBXML], [
+   found_libxml=no
+ 
+-  dnl First try to find xml2-config
+-  AC_CACHE_CHECK([for xml2-config path], ac_cv_php_xml2_config_path,
+-  [
+-    for i in $PHP_LIBXML_DIR /usr/local /usr; do
+-      if test -x "$i/bin/xml2-config"; then
+-        ac_cv_php_xml2_config_path="$i/bin/xml2-config"
+-        break
+-      fi
+-    done
+-  ])
+-
+-  if test -x "$ac_cv_php_xml2_config_path"; then
+-    XML2_CONFIG="$ac_cv_php_xml2_config_path"
+-    libxml_full_version=`$XML2_CONFIG --version`
+-    ac_IFS=$IFS
+-    IFS="."
+-    set $libxml_full_version
+-    IFS=$ac_IFS
+-    LIBXML_VERSION=`expr [$]1 \* 1000000 + [$]2 \* 1000 + [$]3`
+-    if test "$LIBXML_VERSION" -ge "2006011"; then
+-      found_libxml=yes
+-      LIBXML_LIBS=`$XML2_CONFIG --libs`
+-      LIBXML_INCS=`$XML2_CONFIG --cflags`
+-    else
+-      AC_MSG_ERROR([libxml2 version 2.6.11 or greater required.])
+-    fi
+-  fi
+-
+-  dnl If xml2-config fails, try pkg-config
+   if test "$found_libxml" = "no"; then
+     if test -z "$PKG_CONFIG"; then
+       AC_PATH_PROG(PKG_CONFIG, pkg-config, no)

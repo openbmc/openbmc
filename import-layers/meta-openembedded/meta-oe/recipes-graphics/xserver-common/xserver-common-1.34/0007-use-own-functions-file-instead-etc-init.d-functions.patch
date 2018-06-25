@@ -1,17 +1,18 @@
-From 63e6b9a54e1f12dbf7ddbfe3376fff4c382421a5 Mon Sep 17 00:00:00 2001
+From 492c65a32a4ae44c34580ed8ac5d3f50a155cfef Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Wed, 11 Apr 2012 14:36:02 +0200
-Subject: [PATCH 07/12] use own functions file instead /etc/init.d/functions
+Subject: [PATCH] use own functions file instead /etc/init.d/functions
 
 * so we don't have to depend on initscripts
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
- Makefile             |    1 +
- X11/Xinit.d/11zaurus |    2 +-
- X11/Xinit.d/12keymap |    2 +-
- X11/functions        |   11 +++++++++++
- X11/xserver-common   |    2 +-
+ Makefile             |  1 +
+ X11/Xinit.d/11zaurus |  2 +-
+ X11/Xinit.d/12keymap |  2 +-
+ X11/functions        | 11 +++++++++++
+ X11/xserver-common   |  2 +-
  5 files changed, 15 insertions(+), 3 deletions(-)
  create mode 100644 X11/functions
 
@@ -70,7 +71,7 @@ index 0000000..a1311ad
 +		{ gsub(" ", "_", $2); print tolower($2) } ' </proc/cpuinfo
 +}
 diff --git a/X11/xserver-common b/X11/xserver-common
-index 6d8c9df..de92bb7 100644
+index bb7c2ff..d622f2a 100644
 --- a/X11/xserver-common
 +++ b/X11/xserver-common
 @@ -30,7 +30,7 @@ if [ -f /etc/profile ]; then
@@ -82,6 +83,3 @@ index 6d8c9df..de92bb7 100644
  
  fallback_screen_arg() {
      geom=`fbset | grep geometry`
--- 
-1.7.8.5
-

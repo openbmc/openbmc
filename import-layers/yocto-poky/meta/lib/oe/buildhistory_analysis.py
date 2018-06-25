@@ -36,10 +36,29 @@ related_fields = {}
 related_fields['RDEPENDS'] = ['DEPENDS']
 related_fields['RRECOMMENDS'] = ['DEPENDS']
 related_fields['FILELIST'] = ['FILES']
-related_fields['PKGSIZE'] = ['FILELIST']
 related_fields['files-in-image.txt'] = ['installed-package-names.txt', 'USER_CLASSES', 'IMAGE_CLASSES', 'ROOTFS_POSTPROCESS_COMMAND', 'IMAGE_POSTPROCESS_COMMAND']
 related_fields['installed-package-names.txt'] = ['IMAGE_FEATURES', 'IMAGE_LINGUAS', 'IMAGE_INSTALL', 'BAD_RECOMMENDATIONS', 'NO_RECOMMENDATIONS', 'PACKAGE_EXCLUDE']
 
+colours = {
+    'colour_default': '',
+    'colour_add':     '',
+    'colour_remove':  '',
+}
+
+def init_colours(use_colours):
+    global colours
+    if use_colours:
+        colours = {
+            'colour_default': '\033[0m',
+            'colour_add':     '\033[1;32m',
+            'colour_remove':  '\033[1;31m',
+        }
+    else:
+        colours = {
+            'colour_default': '',
+            'colour_add':     '',
+            'colour_remove':  '',
+        }
 
 class ChangeRecord:
     def __init__(self, path, fieldname, oldvalue, newvalue, monitored):
@@ -79,7 +98,17 @@ class ChangeRecord:
                                 for name in adirs - bdirs]
             files_ba = [(name, sorted(os.path.basename(item) for item in bitems if os.path.dirname(item) == name)) \
                                 for name in bdirs - adirs]
-            renamed_dirs = [(dir1, dir2) for dir1, files1 in files_ab for dir2, files2 in files_ba if files1 == files2]
+            renamed_dirs = []
+            for dir1, files1 in files_ab:
+                rename = False
+                for dir2, files2 in files_ba:
+                    if files1 == files2 and not rename:
+                        renamed_dirs.append((dir1,dir2))
+                        # Make sure that we don't use this (dir, files) pair again.
+                        files_ba.remove((dir2,files2))
+                        # If a dir has already been found to have a rename, stop and go no further.
+                        rename = True
+
             # remove files that belong to renamed dirs from aitems and bitems
             for dir1, dir2 in renamed_dirs:
                 aitems = [item for item in aitems if os.path.dirname(item) not in (dir1, dir2)]
@@ -88,6 +117,7 @@ class ChangeRecord:
 
         if self.fieldname in list_fields or self.fieldname in list_order_fields:
             renamed_dirs = []
+            changed_order = False
             if self.fieldname in ['RPROVIDES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RREPLACES', 'RCONFLICTS']:
                 (depvera, depverb) = compare_pkg_lists(self.oldvalue, self.newvalue)
                 aitems = pkglist_combine(depvera)
@@ -101,22 +131,33 @@ class ChangeRecord:
             removed = list(set(aitems) - set(bitems))
             added = list(set(bitems) - set(aitems))
 
+            if not removed and not added:
+                depvera = bb.utils.explode_dep_versions2(self.oldvalue, sort=False)
+                depverb = bb.utils.explode_dep_versions2(self.newvalue, sort=False)
+                for i, j in zip(depvera.items(), depverb.items()):
+                    if i[0] != j[0]:
+                        changed_order = True
+                        break
+
             lines = []
             if renamed_dirs:
                 for dfrom, dto in renamed_dirs:
-                    lines.append('directory renamed %s -> %s' % (dfrom, dto))
+                    lines.append('directory renamed {colour_remove}{}{colour_default} -> {colour_add}{}{colour_default}'.format(dfrom, dto, **colours))
             if removed or added:
                 if removed and not bitems:
-                    lines.append('removed all items "%s"' % ' '.join(removed))
+                    lines.append('removed all items "{colour_remove}{}{colour_default}"'.format(' '.join(removed), **colours))
                 else:
                     if removed:
-                        lines.append('removed "%s"' % ' '.join(removed))
+                        lines.append('removed "{colour_remove}{value}{colour_default}"'.format(value=' '.join(removed), **colours))
                     if added:
-                        lines.append('added "%s"' % ' '.join(added))
+                        lines.append('added "{colour_add}{value}{colour_default}"'.format(value=' '.join(added), **colours))
             else:
                 lines.append('changed order')
 
-            out = '%s: %s' % (self.fieldname, ', '.join(lines))
+            if not (removed or added or changed_order):
+                out = ''
+            else:
+                out = '%s: %s' % (self.fieldname, ', '.join(lines))
 
         elif self.fieldname in numeric_fields:
             aval = int(self.oldvalue or 0)
@@ -125,9 +166,9 @@ class ChangeRecord:
                 percentchg = ((bval - aval) / float(aval)) * 100
             else:
                 percentchg = 100
-            out = '%s changed from %s to %s (%s%d%%)' % (self.fieldname, self.oldvalue or "''", self.newvalue or "''", '+' if percentchg > 0 else '', percentchg)
+            out = '{} changed from {colour_remove}{}{colour_default} to {colour_add}{}{colour_default} ({}{:.0f}%)'.format(self.fieldname, self.oldvalue or "''", self.newvalue or "''", '+' if percentchg > 0 else '', percentchg, **colours)
         elif self.fieldname in defaultval_map:
-            out = '%s changed from %s to %s' % (self.fieldname, self.oldvalue, self.newvalue)
+            out = '{} changed from {colour_remove}{}{colour_default} to {colour_add}{}{colour_default}'.format(self.fieldname, self.oldvalue, self.newvalue, **colours)
             if self.fieldname == 'PKG' and '[default]' in self.newvalue:
                 out += ' - may indicate debian renaming failure'
         elif self.fieldname in ['pkg_preinst', 'pkg_postinst', 'pkg_prerm', 'pkg_postrm']:
@@ -163,7 +204,7 @@ class ChangeRecord:
             else:
                 out = ''
         else:
-            out = '%s changed from "%s" to "%s"' % (self.fieldname, self.oldvalue, self.newvalue)
+            out = '{} changed from "{colour_remove}{}{colour_default}" to "{colour_add}{}{colour_default}"'.format(self.fieldname, self.oldvalue, self.newvalue, **colours)
 
         if self.related:
             for chg in self.related:

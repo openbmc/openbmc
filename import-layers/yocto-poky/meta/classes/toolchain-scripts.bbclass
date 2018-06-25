@@ -62,7 +62,8 @@ toolchain_create_tree_env_script () {
 	script=${TMPDIR}/environment-setup-${REAL_MULTIMACH_TARGET_SYS}
 	rm -f $script
 	touch $script
-	echo 'export PATH=${STAGING_DIR_NATIVE}/usr/bin:${PATH}' >> $script
+	echo 'orig=`pwd`; cd ${COREBASE}; . ./oe-init-build-env ${TOPDIR}; cd $orig' >> $script
+	echo 'export PATH=${STAGING_DIR_NATIVE}/usr/bin:${STAGING_BINDIR_TOOLCHAIN}:$PATH' >> $script
 	echo 'export PKG_CONFIG_SYSROOT_DIR=${PKG_CONFIG_SYSROOT_DIR}' >> $script
 	echo 'export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}' >> $script
 	echo 'export CONFIG_SITE="${@siteinfo_get_files(d)}"' >> $script
@@ -112,6 +113,21 @@ if [ -d "\$OECORE_NATIVE_SYSROOT/environment-setup.d" ]; then
     for envfile in \$OECORE_NATIVE_SYSROOT/environment-setup.d/*.sh; do
 	    . \$envfile
     done
+fi
+EOF
+}
+
+toolchain_create_post_relocate_script() {
+	script=$1
+	rm -f $script
+	touch $script
+
+    cat >> $script <<EOF
+if [ -d "${SDKPATHNATIVE}/post-relocate-setup.d/" ]; then
+    for s in ${SDKPATHNATIVE}/post-relocate-setup.d/*.sh; do
+        \$s "\$1"
+    done
+    rm -rf "${SDKPATHNATIVE}/post-relocate-setup.d"
 fi
 EOF
 }

@@ -15,13 +15,13 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  Makefile |    4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.in b/Makefile.in
-index 2a9b918..aa7c04a 100644
---- a/Makefile.in
-+++ b/Makefile.in
-@@ -75,7 +75,9 @@ at: $(ATOBJECTS)
+Index: at-3.1.20/Makefile.in
+===================================================================
+--- at-3.1.20.orig/Makefile.in
++++ at-3.1.20/Makefile.in
+@@ -76,7 +76,9 @@ at: $(ATOBJECTS)
  atd: $(RUNOBJECTS)
- 	$(CC) $(LDFLAGS) -o atd $(RUNOBJECTS) $(LIBS) $(PAMLIB)
+ 	$(CC) $(LDFLAGS) -o atd $(RUNOBJECTS) $(LIBS) $(PAMLIB) $(SELINUXLIB)
  
 -y.tab.c y.tab.h: parsetime.y
 +y.tab.h: y.tab.c
@@ -30,6 +30,3 @@ index 2a9b918..aa7c04a 100644
  	$(YACC) -d parsetime.y
  
  lex.yy.c: parsetime.l
--- 
-1.7.9.5
-

@@ -1,12 +1,28 @@
+From bab41f5e1fc1fc809da1371e6a0222e0eb21e5f0 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Mon, 21 Nov 2011 12:00:54 +0100
+Subject: [PATCH] t1lib: add 5.1.2
 
 #
 # Patch managed by http://www.holgerschurig.de/patcher.html
 #
 
---- t1lib-5.0.2/Makefile.in~libtool
-+++ t1lib-5.0.2/Makefile.in
+---
+ Makefile.in           | 5 +++--
+ examples/Makefile.in  | 5 +++--
+ lib/Makefile.in       | 6 ++++--
+ lib/t1lib/Makefile.in | 6 ++++--
+ lib/type1/Makefile.in | 6 ++++--
+ type1afm/Makefile.in  | 6 ++++--
+ xglyph/Makefile.in    | 6 ++++--
+ 7 files changed, 26 insertions(+), 14 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 29c3468..396c020 100644
+--- a/Makefile.in
++++ b/Makefile.in
 @@ -18,7 +18,8 @@
- # Last modified:       2001-04-01
+ # Last modified:       2005-05-01
  #
  
 -SHELL     = /bin/sh
@@ -15,7 +31,7 @@
  CC        = @CC@
  CPP       = @CPP@
  CFLAGS    = @CFLAGS@
-@@ -150,7 +151,7 @@
+@@ -149,7 +150,7 @@ distclean: clean
  	$(RM) examples/Makefile
  	$(RM) xglyph/Makefile
  	$(RM) doc/Makefile
@@ -24,8 +40,10 @@
  
  
  # The following two targets are for building and cleaning the python-
---- t1lib-5.0.2/examples/Makefile.in~libtool
-+++ t1lib-5.0.2/examples/Makefile.in
+diff --git a/examples/Makefile.in b/examples/Makefile.in
+index b301db5..7a6a514 100644
+--- a/examples/Makefile.in
++++ b/examples/Makefile.in
 @@ -14,9 +14,10 @@
  # Last modified:       2001-04-01
  #
@@ -39,8 +57,10 @@
  CC        = @CC@
  CPP       = @CPP@
  CFLAGS    = @CFLAGS@
---- t1lib-5.0.2/lib/Makefile.in~libtool
-+++ t1lib-5.0.2/lib/Makefile.in
+diff --git a/lib/Makefile.in b/lib/Makefile.in
+index 89e5e86..6e0f960 100644
+--- a/lib/Makefile.in
++++ b/lib/Makefile.in
 @@ -15,8 +15,10 @@
  #
  # Contributions by H.Kakugawa to use libtool!
@@ -54,8 +74,10 @@
  CC        = @CC@
  CPP       = @CPP@
  CFLAGS    = @CFLAGS@
---- t1lib-5.0.2/lib/t1lib/Makefile.in~libtool
-+++ t1lib-5.0.2/lib/t1lib/Makefile.in
+diff --git a/lib/t1lib/Makefile.in b/lib/t1lib/Makefile.in
+index a6c2478..32434b3 100644
+--- a/lib/t1lib/Makefile.in
++++ b/lib/t1lib/Makefile.in
 @@ -14,8 +14,10 @@
  #
  # Modified by H.Kakugawa to use libtool
@@ -69,8 +91,10 @@
  CC        = @CC@
  CPP       = @CPP@
  CFLAGS    = @CFLAGS@
---- t1lib-5.0.2/lib/type1/Makefile.in~libtool
-+++ t1lib-5.0.2/lib/type1/Makefile.in
+diff --git a/lib/type1/Makefile.in b/lib/type1/Makefile.in
+index 241f124..42efa94 100644
+--- a/lib/type1/Makefile.in
++++ b/lib/type1/Makefile.in
 @@ -14,8 +14,10 @@
  #
  # Modified by H.Kakugawa to use libtool
@@ -84,8 +108,10 @@
  CC        = @CC@
  CPP       = @CPP@
  CFLAGS    = @CFLAGS@
---- t1lib-5.0.2/type1afm/Makefile.in~libtool
-+++ t1lib-5.0.2/type1afm/Makefile.in
+diff --git a/type1afm/Makefile.in b/type1afm/Makefile.in
+index 61611e1..9b51406 100644
+--- a/type1afm/Makefile.in
++++ b/type1afm/Makefile.in
 @@ -15,8 +15,10 @@
  #
  # Modified by H.Kakugawa to use libtool
@@ -99,8 +125,10 @@
  CC        = @CC@
  CPP       = @CPP@
  CFLAGS    = @CFLAGS@
---- t1lib-5.0.2/xglyph/Makefile.in~libtool
-+++ t1lib-5.0.2/xglyph/Makefile.in
+diff --git a/xglyph/Makefile.in b/xglyph/Makefile.in
+index 8da9b63..741334c 100644
+--- a/xglyph/Makefile.in
++++ b/xglyph/Makefile.in
 @@ -15,8 +15,10 @@
  #
  # Modified by H.Kakugawa to use libtool

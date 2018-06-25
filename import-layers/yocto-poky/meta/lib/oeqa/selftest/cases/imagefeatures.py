@@ -211,7 +211,7 @@ class ImageFeatures(OESelftestTestCase):
         image_name = 'core-image-minimal'
 
         img_types = [itype for itype in get_bb_var("IMAGE_TYPES", image_name).split() \
-                         if itype not in ('container', 'elf', 'multiubi')]
+                         if itype not in ('container', 'elf', 'f2fs', 'multiubi')]
 
         config = 'IMAGE_FSTYPES += "%s"\n'\
                  'MKUBIFS_ARGS ?= "-m 2048 -e 129024 -c 2047"\n'\

@@ -1,10 +1,18 @@
-Upstream-status: Unknown
+From c084c8349d1780980e232cb28b60a109e3d89438 Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Wed, 2 Nov 2011 16:54:57 +0100
+Subject: [PATCH] Upstream-status: Unknown
+
+---
+ acinclude.m4       |  2 +-
+ ext/imap/config.m4 | 10 ++--------
+ 2 files changed, 3 insertions(+), 9 deletions(-)
 
 diff --git a/acinclude.m4 b/acinclude.m4
-index df11abd..06e7236 100644
+index ad5166e..f6a55ec 100644
 --- a/acinclude.m4
 +++ b/acinclude.m4
-@@ -2357,7 +2357,7 @@ AC_DEFUN([PHP_SETUP_OPENSSL],[
+@@ -2350,7 +2350,7 @@ AC_DEFUN([PHP_SETUP_OPENSSL],[
        PHP_OPENSSL_DIR="/usr/local/ssl /usr/local /usr /usr/local/openssl"
      fi
  
@@ -14,7 +22,7 @@ index df11abd..06e7236 100644
          OPENSSL_INCDIR=$i/include
        fi
 diff --git a/ext/imap/config.m4 b/ext/imap/config.m4
-index 3fcf674..f08caf7 100644
+index badb6e2..8ff803c 100644
 --- a/ext/imap/config.m4
 +++ b/ext/imap/config.m4
 @@ -109,7 +109,7 @@ if test "$PHP_IMAP" != "no"; then
@@ -41,6 +49,3 @@ index 3fcf674..f08caf7 100644
        IMAP_LIB=$lib
        IMAP_LIB_CHK($PHP_LIBDIR)
        IMAP_LIB_CHK(c-client)
--- 
-1.9.3
-

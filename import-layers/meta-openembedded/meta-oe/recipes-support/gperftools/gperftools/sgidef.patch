@@ -1,11 +1,19 @@
-sgidef.h does not exist on musl and its not needed to compile
+From 259b420444c52463795b4b582a2ab7511149eea7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Oct 2017 21:26:40 -0700
+Subject: [PATCH] sgidef.h does not exist on musl and its not needed to compile
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
-Index: git/src/base/linux_syscall_support.h
-===================================================================
---- git.orig/src/base/linux_syscall_support.h
-+++ git/src/base/linux_syscall_support.h
+
+---
+ src/base/linux_syscall_support.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/base/linux_syscall_support.h b/src/base/linux_syscall_support.h
+index 70431ca..b23ca59 100644
+--- a/src/base/linux_syscall_support.h
++++ b/src/base/linux_syscall_support.h
 @@ -164,7 +164,7 @@ extern "C" {
  #include <endian.h>
  #include <fcntl.h>

@@ -1,0 +1,12 @@
+diff -Naur tpm_emulator-x86_64-back/tpm/tpm_emulator_extern.c tpm_emulator-x86_64/tpm/tpm_emulator_extern.c
+--- a/tpm/tpm_emulator_extern.c	2012-04-27 10:55:46.581963398 -0400
++++ b/tpm/tpm_emulator_extern.c	2012-04-27 10:56:02.193034152 -0400
+@@ -249,7 +249,7 @@
+ #else /* TPM_NO_EXTERN */
+
+ int (*tpm_extern_init)(void)                                      = NULL;
+-int (*tpm_extern_release)(void)                                   = NULL;
++void (*tpm_extern_release)(void)                                   = NULL;
+ void* (*tpm_malloc)(size_t size)                                  = NULL;
+ void (*tpm_free)(/*const*/ void *ptr)                             = NULL;
+ void (*tpm_log)(int priority, const char *fmt, ...)               = NULL;

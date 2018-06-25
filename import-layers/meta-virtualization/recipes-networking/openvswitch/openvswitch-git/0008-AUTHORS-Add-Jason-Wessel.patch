@@ -1,12 +1,13 @@
-From a3289add8368e0c970ae1c1c84f5df1f817ed43c Mon Sep 17 00:00:00 2001
+From f8491645416952b31000f42777ff79486a7b0511 Mon Sep 17 00:00:00 2001
 From: Ben Pfaff <blp@ovn.org>
 Date: Thu, 6 Jul 2017 14:01:27 -0700
-Subject: [PATCH 8/8] AUTHORS: Add Jason Wessel.
+Subject: [PATCH] AUTHORS: Add Jason Wessel.
 
 Commit a91c4cfaf863718bc94fb9c88939bd0b0385a6fe from
 https://github.com/openvswitch/ovs.git
 
 Signed-off-by: Ben Pfaff <blp@ovn.org>
+
 ---
  AUTHORS.rst | 1 +
  1 file changed, 1 insertion(+)
@@ -23,6 +24,3 @@ index 63e6a8d..d0dc70d 100644
  Jasper Capel                    jasper@capel.tv
  Jean Tourrilhes                 jt@hpl.hp.com
  Jeremy Stribling                strib@nicira.com
--- 
-2.5.0
-

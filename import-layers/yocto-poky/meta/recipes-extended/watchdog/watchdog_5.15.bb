@@ -10,6 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=ecc0551bf54ad97f6b541720f84d6569"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/watchdog/watchdog-${PV}.tar.gz \
            file://0001-Include-linux-param.h-for-EXEC_PAGESIZE-definition.patch \
+           file://0001-watchdog-remove-interdependencies-of-watchdog-and-wd.patch \
            file://watchdog-init.patch \
            file://watchdog-conf.patch \
            file://wd_keepalive.init \
@@ -36,7 +37,9 @@ INITSCRIPT_PARAMS_${PN} = "start 15 1 2 3 4 5 . stop 85 0 6 ."
 INITSCRIPT_NAME_${PN}-keepalive = "wd_keepalive"
 INITSCRIPT_PARAMS_${PN}-keepalive = "start 15 1 2 3 4 5 . stop 85 0 6 ."
 
-SYSTEMD_SERVICE_${PN} = "watchdog.service wd_keepalive.service"
+SYSTEMD_PACKAGES = "${PN} ${PN}-keepalive"
+SYSTEMD_SERVICE_${PN} = "watchdog.service"
+SYSTEMD_SERVICE_${PN}-keepalive = "wd_keepalive.service"
 
 do_install_append() {
 	install -d ${D}${systemd_system_unitdir}
@@ -54,6 +57,7 @@ PACKAGES =+ "${PN}-keepalive"
 
 FILES_${PN}-keepalive = " \
     ${sysconfdir}/init.d/wd_keepalive \
+    ${systemd_system_unitdir}/wd_keepalive.service \
     ${sbindir}/wd_keepalive \
 "
 

@@ -14,7 +14,7 @@
             create Yocto Linux kernel repositories.
             These kernel repositories are found under the heading "Yocto Linux
             Kernel" at
-            <ulink url='&YOCTO_GIT_URL;/cgit.cgi'>&YOCTO_GIT_URL;/cgit.cgi</ulink>
+            <ulink url='&YOCTO_GIT_URL;'>&YOCTO_GIT_URL;</ulink>
             and are shipped as part of a Yocto Project release.
             The team creates these repositories by compiling and executing the
             set of feature descriptions for every BSP and feature in the
@@ -118,13 +118,13 @@
             The following steps describe what happens when the Yocto Project
             Team constructs the Yocto Project kernel source Git repository
             (or tree) found at
-            <ulink url='&YOCTO_GIT_URL;/cgit.cgi'></ulink> given the
+            <ulink url='&YOCTO_GIT_URL;'></ulink> given the
             introduction of a new top-level kernel feature or BSP.
-            These are the actions that effectively provide the Metadata
-            and create the tree that includes the new feature, patch or BSP:
+            The following actions effectively provide the Metadata
+            and create the tree that includes the new feature, patch, or BSP:
             <orderedlist>
                 <listitem><para>
-                    <emphasis>Pass Feature to Build Subsystem:</emphasis>
+                    <emphasis>Pass Feature to the OpenEmbedded Build System:</emphasis>
                     A top-level kernel feature is passed to the kernel build
                     subsystem.
                     Normally, this feature is a BSP for a particular kernel
@@ -138,8 +138,10 @@
                         <listitem><para>
                             The in-tree kernel-cache directories, which are
                             located in the
-                            <filename>yocto-kernel-cache</filename>
-                            repository
+                            <ulink url='&YOCTO_GIT_URL;/cgit/cgit.cgi/yocto-kernel-cache/tree/bsp'><filename>yocto-kernel-cache</filename></ulink>
+                            repository organized under the "Yocto Linux Kernel"
+                            heading in the
+                            <ulink url='http://git.yoctoproject.org/cgit/cgit.cgi'>Yocto Project Source Repositories</ulink>.
                             </para></listitem>
                         <listitem><para>
                             Areas pointed to by <filename>SRC_URI</filename>
@@ -148,9 +150,11 @@
                     </itemizedlist>
                     For a typical build, the target of the search is a
                     feature description in an <filename>.scc</filename> file
-                    whose name follows this format:
+                    whose name follows this format (e.g.
+                    <filename>beaglebone-standard.scc</filename> and
+                    <filename>beaglebone-preempt-rt.scc</filename>):
                     <literallayout class='monospaced'>
-     <replaceable>bsp_name</replaceable>-<replaceable>kernel_type</replaceable>.scc
+     <replaceable>bsp_root_name</replaceable>-<replaceable>kernel_type</replaceable>.scc
                     </literallayout>
                 </para></listitem>
                 <listitem><para>
@@ -213,7 +217,7 @@
                         end of an existing branch.
                         The full repository generation that is found in the
                         official Yocto Project kernel repositories at
-                        <ulink url='&YOCTO_GIT_URL;/cgit.cgi'>http://git.yoctoproject.org/cgit.cgi</ulink>
+                        <ulink url='&YOCTO_GIT_URL;'>http://git.yoctoproject.org</ulink>
                         is the combination of all supported boards and
                         configurations.
                         </para></listitem>
@@ -227,7 +231,7 @@
                         </para></listitem>
                     <listitem><para>
                         The full kernel tree that you see on
-                        <ulink url='&YOCTO_GIT_URL;/cgit.cgi'></ulink> is
+                        <ulink url='&YOCTO_GIT_URL;'></ulink> is
                         generated through repeating the above steps for all
                         valid BSPs.
                         The end result is a branched, clean history tree that

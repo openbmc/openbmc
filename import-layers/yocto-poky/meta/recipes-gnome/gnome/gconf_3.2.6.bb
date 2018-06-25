@@ -11,6 +11,7 @@ inherit gnomebase gtk-doc gettext gobject-introspection gio-module-cache
 SRC_URI = "${GNOME_MIRROR}/GConf/${@gnome_verdir("${PV}")}/GConf-${PV}.tar.xz;name=archive \
            file://remove_plus_from_invalid_characters_list.patch \
            file://unable-connect-dbus.patch \
+           file://create_config_directory.patch \
 "
 
 SRC_URI[archive.md5sum] = "2b16996d0e4b112856ee5c59130e822c"

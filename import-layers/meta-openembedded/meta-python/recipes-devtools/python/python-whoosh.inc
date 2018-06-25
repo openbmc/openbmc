@@ -12,3 +12,13 @@ SRC_URI[sha256sum] = "e0857375f63e9041e03fedd5b7541f97cf78917ac1b6b06c1fcc9b4537
 
 PYPI_PACKAGE = "Whoosh"
 PYPI_PACKAGE_EXT = "zip"
+
+RDEPENDS_${PN} += " \
+    ${PYTHON_PN}-email \
+    ${PYTHON_PN}-multiprocessing \
+    ${PYTHON_PN}-netclient \
+    ${PYTHON_PN}-numbers \
+    ${PYTHON_PN}-pickle \
+    ${PYTHON_PN}-shell \
+    ${PYTHON_PN}-stringold \
+"

@@ -1,0 +1,69 @@
+From 60c17eb49121bf2aa485acd30750b2fc6c8eb61f Mon Sep 17 00:00:00 2001
+From: Jarmo Jaakkola <jarmo.jaakkola@vincit.fi>
+Date: Mon, 19 Jun 2017 16:41:36 +0300
+Subject: [PATCH] Fix compilation for Helix.
+
+Gnome support, including GNOME_INIT_HOOK, has been removed, but it was
+still being called.
+
+COMPAT_OLD_KEYSYMDEF is a check for a legacy system, which our system
+most definitely is not.  It is accomplished by trying to execute
+a program, which does not work when cross compiling.
+
+The fvwm(1) man page is created from Docbook XML which is set for
+a Windows code page that is not available when compiling.  Easiest is
+to just not create the man page as those are not needed on the monitor.
+
+Upstream-Status: inappropriate [OE specific]
+Signed-off-by: Jarmo Jaakkola <jarmo.jaakkola@vincit.fi>
+Signed-off-by: Riku Hämäläinen <riku.hamalainen@ge.com>
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
+---
+ configure.ac         | 20 ++++----------------
+ doc/fvwm/Makefile.am |  2 +-
+ 3 files changed, 7 insertions(+), 17 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 48ce264..fab7b44 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1413,23 +1413,7 @@ else
+   problem_gdkimlib=": Failed on gdk-imlib, see config.log"
+ fi
+ 
+-GNOME_INIT_HOOK
+-
+-# Unfortunately we have 2 gnome supports: WM hints and gnome libs.
+-# The $with_gnomehints below refers to the first, not GNOME_INIT_HOOK.
+-if test ! x"$enable_gnome_hints" = xno; then
+-  with_gnomehints=yes
+-  problem_gnomehints=""
+-else
+-  with_gnomehints=no
+-  problem_gnomehints=": Explicitly disabled"
+-fi
+-
+ # Define some compatibility macros needed for config.h.
+-mg_DEFINE_IF_NOT([#include <X11/keysym.h>],
+-  [defined XK_Page_Up && defined XK_Page_Down],
+-  [COMPAT_OLD_KEYSYMDEF], [$X_CFLAGS],
+-  [Old AIX systems (3.2.5) don't define some common keysyms.])
+ AH_VERBATIM([_COMPAT_OLD_KEYSYMDEF],
+ [#ifdef COMPAT_OLD_KEYSYMDEF
+ #  define XK_Page_Up   XK_Prior
+diff --git a/doc/fvwm/Makefile.am b/doc/fvwm/Makefile.am
+index cddb102..ff00149 100755
+--- a/doc/fvwm/Makefile.am
++++ b/doc/fvwm/Makefile.am
+@@ -10,7 +10,7 @@ XSL_PROFILE = $(srcdir)/../docbook-xsl/profiling/profile.xsl
+ HTML_FILES = fvwm.man.html
+ XML_FILES = @DOC_SECTIONS_XML_PATH@
+ EXTRA_DIST = @DOC_SECTIONS_XML@ $(man_MANS) sections
+-man_MANS = fvwm.1
++man_MANS =
+ 
+ if FVWM_BUILD_HTMLDOC
+ doc_DATA = $(HTML_FILES)
+-- 
+1.9.1
+

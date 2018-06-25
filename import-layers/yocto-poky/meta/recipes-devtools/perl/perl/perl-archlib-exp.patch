@@ -25,16 +25,16 @@ Upstream-Status:Inappropriate [embedded specific]
 
 Signed-off-by: Tom Zanussi <tom.zanussi@intel.com>
 
-Index: perl-5.14.2/config_h.SH
+Index: perl-5.24.1/config_h.SH
 ===================================================================
---- perl-5.14.2.orig/config_h.SH
-+++ perl-5.14.2/config_h.SH
-@@ -996,7 +996,7 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#und
+--- perl-5.24.1.orig/config_h.SH
++++ perl-5.24.1/config_h.SH
+@@ -1434,7 +1434,7 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#und
   *	in programs that are not prepared to deal with ~ expansion at run-time.
   */
  #$d_archlib ARCHLIB "$archlib"		/**/
 -#$d_archlib ARCHLIB_EXP "$archlibexp"		/**/
 +#$d_archlib ARCHLIB_EXP "$archlib_exp"		/**/
  
- /* ARCHNAME:
-  *	This symbol holds a string representing the architecture name.
+ /* BIN:
+  *	This symbol holds the path of the bin directory where the package will

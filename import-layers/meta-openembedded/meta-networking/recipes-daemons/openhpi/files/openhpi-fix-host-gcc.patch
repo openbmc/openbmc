@@ -6,11 +6,11 @@ Upstream-Status: Pending
 
 Signed-of-by: Aws Ismail <aws.ismail@windriver.com>
 
-diff --git a/configure.ac b/configure.ac
-index f5a5b74..4a20154 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -605,11 +605,6 @@ AC_ARG_ENABLE([werror],
+Index: openhpi-3.6.1/configure.ac
+===================================================================
+--- openhpi-3.6.1.orig/configure.ac
++++ openhpi-3.6.1/configure.ac
+@@ -656,11 +656,6 @@ AC_ARG_ENABLE([werror],
      fi],
      [])
  

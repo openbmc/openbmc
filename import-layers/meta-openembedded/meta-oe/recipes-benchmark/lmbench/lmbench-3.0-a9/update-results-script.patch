@@ -1,45 +1,24 @@
+From 4955021bc283be404df62b97b86af3943efd29de Mon Sep 17 00:00:00 2001
+From: Noor Ahsan <noor_ahsan@mentor.com>
+Date: Mon, 29 Aug 2011 16:17:51 +0000
+Subject: [PATCH] lmbench: Add version 3.0-a9 (initial recipe)
+
 Now that we have our binaries in /usr/bin rather than the normal
 lmbench hierarchy we need to update the scripts as well to behave well here.
 
 Upstream-Status: Inappropriate [This is related to the OE-specific behavior
-of installing into /usr/bin, etc, rather than dumping everything into 
+of installing into /usr/bin, etc, rather than dumping everything into
 /usr/share/lmbench or similar]
 
-Index: lmbench-3.0-a9/scripts/results
-===================================================================
---- lmbench-3.0-a9.orig/scripts/results
-+++ lmbench-3.0-a9/scripts/results
-@@ -8,11 +8,11 @@ RESULTS=results/$OS
- BASE=../$RESULTS/`uname -n`
- EXT=0
- 
--if [ ! -f "../bin/$OS/$CONFIG" ]
-+if [ ! -f "$CONFIG" ]
- then	echo "No config file?"
- 	exit 1
- fi
--. ../bin/$OS/$CONFIG
-+. $CONFIG
- 
- if [ ! -d ../$RESULTS ]
- then	mkdir -p ../$RESULTS
-@@ -23,11 +23,9 @@ do      EXT=`expr $EXT + 1`
- 	RESULTS=$BASE.$EXT
- done
- 
--cd ../bin/$OS 
--PATH=.:${PATH}; export PATH
- export SYNC_MAX
- export OUTPUT
--lmbench $CONFIG 2>../${RESULTS}
-+lmbench $CONFIG 2>${RESULTS}
- 
- if [ X$MAIL = Xyes ]
- then	echo Mailing results
-Index: lmbench-3.0-a9/scripts/config-run
-===================================================================
---- lmbench-3.0-a9.orig/scripts/config-run
-+++ lmbench-3.0-a9/scripts/config-run
+---
+ scripts/config-run | 40 ++++++++++++++++++++--------------------
+ scripts/results    |  8 +++-----
+ 2 files changed, 23 insertions(+), 25 deletions(-)
+
+diff --git a/scripts/config-run b/scripts/config-run
+index a2d5ba4..918cbdf 100755
+--- a/scripts/config-run
++++ b/scripts/config-run
 @@ -132,20 +132,20 @@ export LMBENCH_SCHED
  ############################################################################
  echo $L; echo "";
@@ -89,7 +68,7 @@ Index: lmbench-3.0-a9/scripts/config-run
  if [ `expr $SYNC_MAX \* $MB` -gt `expr $TOTAL_MEM` ]
  then
  	MB=`expr $TOTAL_MEM / $SYNC_MAX`
-@@ -223,8 +223,8 @@ then	echo Warning: you have only ${MB}MB
+@@ -223,8 +223,8 @@ then	echo Warning: you have only ${MB}MB available memory.
  fi
  
  echo "Hang on, we are calculating your cache line size."
@@ -158,3 +137,34 @@ Index: lmbench-3.0-a9/scripts/config-run
  echo DISKS=\"$DISKS\" > $C
  echo DISK_DESC=\"$DISK_DESC\" >> $C
  echo OUTPUT=$OUTPUT >> $C
+diff --git a/scripts/results b/scripts/results
+index cd07c15..d5aa558 100755
+--- a/scripts/results
++++ b/scripts/results
+@@ -8,11 +8,11 @@ RESULTS=results/$OS
+ BASE=../$RESULTS/`uname -n`
+ EXT=0
+ 
+-if [ ! -f "../bin/$OS/$CONFIG" ]
++if [ ! -f "$CONFIG" ]
+ then	echo "No config file?"
+ 	exit 1
+ fi
+-. ../bin/$OS/$CONFIG
++. $CONFIG
+ 
+ if [ ! -d ../$RESULTS ]
+ then	mkdir -p ../$RESULTS
+@@ -23,11 +23,9 @@ do      EXT=`expr $EXT + 1`
+ 	RESULTS=$BASE.$EXT
+ done
+ 
+-cd ../bin/$OS 
+-PATH=.:${PATH}; export PATH
+ export SYNC_MAX
+ export OUTPUT
+-lmbench $CONFIG 2>../${RESULTS}
++lmbench $CONFIG 2>${RESULTS}
+ 
+ if [ X$MAIL = Xyes ]
+ then	echo Mailing results

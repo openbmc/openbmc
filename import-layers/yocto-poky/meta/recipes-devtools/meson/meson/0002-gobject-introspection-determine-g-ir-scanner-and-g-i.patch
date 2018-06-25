@@ -1,0 +1,42 @@
+From 972667e0d789a6969a5d79249404f3539f891810 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 4 Aug 2017 16:18:47 +0300
+Subject: [PATCH 1/2] gobject-introspection: determine g-ir-scanner and
+ g-ir-compiler paths from pkgconfig
+
+Do not hardcode the name of those binaries; gobject-introspection
+provides them via pkgconfig, and they can be set to something else
+(for example when cross-compiling).
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ mesonbuild/modules/gnome.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mesonbuild/modules/gnome.py b/mesonbuild/modules/gnome.py
+index 4f7fe30..9610cf6 100644
+--- a/mesonbuild/modules/gnome.py
++++ b/mesonbuild/modules/gnome.py
+@@ -390,8 +390,6 @@ class GnomeModule(ExtensionModule):
+             raise MesonException('Gir takes one argument')
+         if kwargs.get('install_dir'):
+             raise MesonException('install_dir is not supported with generate_gir(), see "install_dir_gir" and "install_dir_typelib"')
+-        giscanner = find_program('g-ir-scanner', 'Gir')
+-        gicompiler = find_program('g-ir-compiler', 'Gir')
+         girtarget = args[0]
+         while hasattr(girtarget, 'held_object'):
+             girtarget = girtarget.held_object
+@@ -402,6 +400,8 @@ class GnomeModule(ExtensionModule):
+                 self.gir_dep = PkgConfigDependency('gobject-introspection-1.0',
+                                                    state.environment,
+                                                    {'native': True})
++            giscanner = os.environ['PKG_CONFIG_SYSROOT_DIR'] + self.gir_dep.get_pkgconfig_variable('g_ir_scanner', {})
++            gicompiler = os.environ['PKG_CONFIG_SYSROOT_DIR'] + self.gir_dep.get_pkgconfig_variable('g_ir_compiler', {})
+             pkgargs = self.gir_dep.get_compile_args()
+         except Exception:
+             raise MesonException('gobject-introspection dependency was not found, gir cannot be generated.')
+-- 
+2.15.0
+

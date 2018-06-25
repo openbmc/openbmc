@@ -1,4 +1,4 @@
-From 2d6bfa75b2e16b4d764f1bf00bb902fb4b5e507b Mon Sep 17 00:00:00 2001
+From 67a6e919b8263d6d2b7150e62f26fb06bbc526ef Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 27 Feb 2015 21:55:36 +0000
 Subject: [PATCH] Revert "media-ctl: Don't install libmediactl and
@@ -10,6 +10,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Conflicts:
 	utils/media-ctl/Makefile.am
+
 ---
  utils/media-ctl/Makefile.am | 10 +++-------
  1 file changed, 3 insertions(+), 7 deletions(-)
@@ -40,6 +41,3 @@ index ee7dcc9..d11fa2e 100644
  mediactl_includedir=$(includedir)/mediactl
  noinst_HEADERS = mediactl.h v4l2subdev.h
  
--- 
-2.9.3
-

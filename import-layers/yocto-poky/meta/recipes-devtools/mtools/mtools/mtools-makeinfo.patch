@@ -1,8 +1,10 @@
 Upstream-Status: Inappropriate [licensing]
 
---- mtools-3.9.9/configure.in.orig	2006-04-14 16:05:54.337655192 -0600
-+++ mtools-3.9.9/configure.in	2006-04-14 16:12:29.736545424 -0600
-@@ -21,6 +21,33 @@
+Index: mtools-4.0.18/configure.in
+===================================================================
+--- mtools-4.0.18.orig/configure.in
++++ mtools-4.0.18/configure.in
+@@ -35,6 +35,33 @@ AC_CANONICAL_SYSTEM
  AC_C_CONST
  AC_C_INLINE
  
@@ -36,9 +38,11 @@ Upstream-Status: Inappropriate [licensing]
  
  dnl Check for configuration options
  dnl Enable OS/2 extended density format disks
---- mtools-3.9.9/Makefile.in.sav	2006-04-14 15:56:19.000000000 -0600
-+++ mtools-3.9.9/Makefile.in	2006-04-14 16:15:29.315245312 -0600
-@@ -11,10 +11,11 @@
+Index: mtools-4.0.18/Makefile.in
+===================================================================
+--- mtools-4.0.18.orig/Makefile.in
++++ mtools-4.0.18/Makefile.in
+@@ -26,10 +26,11 @@ USERCFLAGS =
  USERLDFLAGS =
  USERLDLIBS =
  
@@ -54,7 +58,7 @@ Upstream-Status: Inappropriate [licensing]
  
  
  # do not edit below this line
-@@ -181,7 +182,7 @@
+@@ -198,7 +199,7 @@ dvi: mtools.dvi
  
  ps: mtools.ps
  %.ps: %.dvi
@@ -62,4 +66,4 @@ Upstream-Status: Inappropriate [licensing]
 +	$(DVI2PS) -f < $< > $@
  
  pdf: mtools.pdf
- %.pdf: %.texi
+ %.pdf: %.texi sysconfdir.texi

@@ -5,12 +5,12 @@ it to be disabled.
 
 RP - 4/11/08
 
-Index: parted-1.9.0/configure.ac
+Index: parted-3.2/configure.ac
 ===================================================================
---- parted-1.9.0.orig/configure.ac	2009-07-23 18:52:08.000000000 +0100
-+++ parted-1.9.0/configure.ac	2010-02-02 14:13:56.013905093 +0000
-@@ -477,7 +477,7 @@
- AM_CONDITIONAL([BUILD_LINUX], [test "$OS" = linux])
+--- parted-3.2.orig/configure.ac
++++ parted-3.2/configure.ac
+@@ -555,7 +555,7 @@ AC_CHECK_HEADER([execinfo.h], [
+ AM_CONDITIONAL([COMPILE_FOR_S390], [test "$host_cpu" = s390 || test "$host_cpu" = s390x])
  
  dnl check for "check", unit testing library/header
 -PKG_CHECK_MODULES([CHECK], [check >= 0.9.3], have_check=yes, have_check=no)

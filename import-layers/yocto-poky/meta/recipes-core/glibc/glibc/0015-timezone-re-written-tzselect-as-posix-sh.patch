@@ -1,7 +1,7 @@
-From b8cb8cb242cb751d888feb1ada5c4d0f05cbc1d7 Mon Sep 17 00:00:00 2001
+From ac240fb01f6470ac207968adfbe20ccc93b16f8b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:33:03 +0000
-Subject: [PATCH 15/25] timezone: re-written tzselect as posix sh
+Subject: [PATCH 15/27] timezone: re-written tzselect as posix sh
 
 To avoid the bash dependency.
 
@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/timezone/Makefile b/timezone/Makefile
-index d6cc7ba357..e4ead6e1a7 100644
+index 0194aba4a1..58e5405a05 100644
 --- a/timezone/Makefile
 +++ b/timezone/Makefile
 @@ -122,7 +122,7 @@ $(testdata)/XT%: testdata/XT%
@@ -41,5 +41,5 @@ index d2c3a6d1dd..089679f306 100755
  # Output one argument as-is to standard output.
  # Safer than 'echo', which can mishandle '\' or leading '-'.
 -- 
-2.13.2
+2.16.1
 

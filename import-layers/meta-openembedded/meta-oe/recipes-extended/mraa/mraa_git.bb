@@ -3,12 +3,13 @@ HOMEPAGE = "https://github.com/intel-iot-devkit/mraa"
 SECTION = "libs"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://COPYING;md5=66493d54e65bfc12c7983ff2e884f37f"
+LIC_FILES_CHKSUM = "file://COPYING;md5=4b92a3b497d7943042a6db40c088c3f2"
 
-SRCREV = "8ddbcde84e2d146bc0f9e38504d6c89c14291480"
-PV = "1.7.0-git${SRCPV}"
+SRCREV = "fbb7d9232067eac3f4508a37a8f7ea0c4fcebacb"
+PV = "1.9.0-git${SRCPV}"
 
-SRC_URI = "git://github.com/intel-iot-devkit/${BPN}.git;protocol=http"
+SRC_URI = "git://github.com/intel-iot-devkit/${BPN}.git;protocol=http \
+           "
 
 S = "${WORKDIR}/git"
 
@@ -31,7 +32,13 @@ FILES_${PN}-utils = "${bindir}/"
 # override this in local.conf to get needed bindings.
 # BINDINGS_pn-mraa="python"
 # will result in only the python bindings being built/packaged.
-BINDINGS ??= "python ${@ 'nodejs' if oe.types.boolean(d.getVar('HAVE_NODEJS') or '0') else '' }"
+# Note: 'nodejs' is disabled by default because the bindings
+# generation currently fails with nodejs (>v7.x).
+BINDINGS ??= "python"
+
+# nodejs isn't available for armv4/armv5 architectures
+BINDINGS_armv4 ??= "python"
+BINDINGS_armv5 ??= "python"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('PACKAGES', 'node-${PN}', 'nodejs', '', d)} \
  ${@bb.utils.contains('PACKAGES', '${PYTHON_PN}-${PN}', 'python', '', d)}"

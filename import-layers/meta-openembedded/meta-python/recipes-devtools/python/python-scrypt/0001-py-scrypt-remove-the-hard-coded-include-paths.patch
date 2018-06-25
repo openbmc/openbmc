@@ -1,0 +1,26 @@
+From d8db473ce9346cd6254c90e13ac45b3bbde494c4 Mon Sep 17 00:00:00 2001
+From: Derek Straka <derek@asterius.io>
+Date: Sun, 11 Mar 2018 19:55:38 -0400
+Subject: [PATCH] py-scrypt: remove the hard coded include paths
+
+Upstream-Status: Pending
+
+Signed-off-by: Derek Straka <derek@asterius.io>
+---
+ setup.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index e36adc4..2ebfbf1 100644
+--- a/setup.py
++++ b/setup.py
+@@ -24,7 +24,6 @@ if sys.platform.startswith('linux'):
+                      ('HAVE_SYS_SYSINFO_H', '1'),
+                      ('_FILE_OFFSET_BITS', '64')]
+     libraries = ['crypto', 'rt']
+-    includes = ['/usr/local/include', '/usr/include']
+     CFLAGS.append('-O2')
+ elif sys.platform.startswith('win32'):
+     define_macros = [('inline', '__inline')]
+-- 
+2.7.4

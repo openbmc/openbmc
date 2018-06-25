@@ -336,7 +336,7 @@ def check_path_length(filepath, pathname, limit):
     return ""
 
 def get_filesystem_id(path):
-    status, result = oe.utils.getstatusoutput("stat -f -c '%s' %s" % ("%t", path))
+    status, result = oe.utils.getstatusoutput("stat -f -c '%s' '%s'" % ("%t", path))
     if status == 0:
         return result
     else:
@@ -456,13 +456,29 @@ def check_sanity_validmachine(sanity_data):
 
     return messages
 
+# Patch before 2.7 can't handle all the features in git-style diffs.  Some
+# patches may incorrectly apply, and others won't apply at all.
+def check_patch_version(sanity_data):
+    from distutils.version import LooseVersion
+    import re, subprocess
+
+    try:
+        result = subprocess.check_output(["patch", "--version"], stderr=subprocess.STDOUT, universal_newlines=True)
+        version = re.search(r"[0-9.]+", result.splitlines()[0]).group()
+        if LooseVersion(version) < LooseVersion("2.7"):
+            return "Your version of patch is older than 2.7 and has bugs which will break builds. Please install a newer version of patch.\n"
+        else:
+            return None
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute patch --version, exit code %d:\n%s\n" % (e.returncode, e.output)
+
 # Unpatched versions of make 3.82 are known to be broken.  See GNU Savannah Bug 30612.
 # Use a modified reproducer from http://savannah.gnu.org/bugs/?30612 to validate.
 def check_make_version(sanity_data):
     from distutils.version import LooseVersion
     status, result = oe.utils.getstatusoutput("make --version")
     if status != 0:
-        return "Unable to execute make --version, exit code %s\n" % status
+        return "Unable to execute make --version, exit code %d\n" % status
     version = result.split()[2]
     if LooseVersion(version) == LooseVersion("3.82"):
         # Construct a test file
@@ -498,7 +514,7 @@ def check_tar_version(sanity_data):
     from distutils.version import LooseVersion
     status, result = oe.utils.getstatusoutput("tar --version")
     if status != 0:
-        return "Unable to execute tar --version, exit code %s\n" % status
+        return "Unable to execute tar --version, exit code %d\n" % status
     version = result.split()[3]
     if LooseVersion(version) < LooseVersion("1.24"):
         return "Your version of tar is older than 1.24 and has bugs which will break builds. Please install a newer version of tar.\n"
@@ -511,7 +527,7 @@ def check_git_version(sanity_data):
     from distutils.version import LooseVersion
     status, result = oe.utils.getstatusoutput("git --version 2> /dev/null")
     if status != 0:
-        return "Unable to execute git --version, exit code %s\n" % status
+        return "Unable to execute git --version, exit code %d\n" % status
     version = result.split()[2]
     if LooseVersion(version) < LooseVersion("1.8.3.1"):
         return "Your version of git is older than 1.8.3.1 and has bugs which will break builds. Please install a newer version of git.\n"
@@ -596,6 +612,7 @@ def check_sanity_version_change(status, d):
     import stat
 
     status.addresult(check_make_version(d))
+    status.addresult(check_patch_version(d))
     status.addresult(check_tar_version(d))
     status.addresult(check_git_version(d))
     status.addresult(check_perl_modules(d))
@@ -692,7 +709,7 @@ def sanity_check_locale(d):
     try:
         locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
     except locale.Error:
-        raise_sanity_error("You system needs to support the en_US.UTF-8 locale.", d)
+        raise_sanity_error("Your system needs to support the en_US.UTF-8 locale.", d)
 
 def check_sanity_everybuild(status, d):
     import os, stat

@@ -1,0 +1,26 @@
+From 80179c297abb9de2829bd02356257241dd414d70 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Mon, 18 Dec 2017 16:25:54 +0900
+Subject: [PATCH] Do not set PYTHON_INSTALL_DIR by running python.
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7c66b39..1489ef6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -19,7 +19,7 @@ else(NOT SPHINX_EXECUTABLE-NOTFOUND)
+ 	message(STATUS "Could NOT find sphinx-build.")
+ endif(NOT SPHINX_EXECUTABLE-NOTFOUND)
+ 
+-execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(), end='')" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
++#execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(), end='')" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
+ string(REGEX REPLACE "\n$" "" ${PYTHON_INSTALL_DIR} "${PYTHON_INSTALL_DIR}")
+ execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; sys.stdout.write('%s.%s' % (sys.version_info.major, sys.version_info.minor))" OUTPUT_VARIABLE PYTHON_MAJOR_DOT_MINOR_VERSION)
+ message(STATUS "Python install dir is ${PYTHON_INSTALL_DIR}")
+-- 
+2.7.4
+

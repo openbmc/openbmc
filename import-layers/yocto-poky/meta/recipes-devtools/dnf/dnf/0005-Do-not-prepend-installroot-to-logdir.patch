@@ -1,0 +1,31 @@
+From 6365389074a1b86962f3d8b22a2ead2202026a98 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 11 Jan 2017 15:10:13 +0200
+Subject: [PATCH 5/5] Do not prepend installroot to logdir.
+
+This would otherwise write the logs into rootfs/var/log
+(whereas we want them in $T),
+and will break installation of base-files rpm.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ dnf/cli/cli.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf/cli/cli.py b/dnf/cli/cli.py
+index d2d9c082..82270ecf 100644
+--- a/dnf/cli/cli.py
++++ b/dnf/cli/cli.py
+@@ -920,7 +920,7 @@ class Cli(object):
+             logger.warning(_("Unable to detect release version (use '--releasever' to specify "
+                              "release version)"))
+ 
+-        for opt in ('cachedir', 'logdir', 'persistdir'):
++        for opt in ('cachedir', 'persistdir'):
+             conf.prepend_installroot(opt)
+ 
+         self.base._logging._setup_from_dnf_conf(conf)
+-- 
+2.14.2
+

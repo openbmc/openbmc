@@ -14,12 +14,15 @@ REQUIRED_DISTRO_FEATURES = "x11"
 # libglu needs virtual/libgl, which requires opengl in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES += "opengl"
 
+# libpam, pam-plugin-wheel requires pam in DISTRO_FEATURES
+REQUIRED_DISTRO_FEATURES += "pam"
+
 #
 # We will skip parsing this packagegeoup for non-glibc systems
 #
 python __anonymous () {
     if d.getVar('TCLIBC') != "glibc":
-        raise bb.parse.SkipPackage("incompatible with %s C library" %
+        raise bb.parse.SkipRecipe("incompatible with %s C library" %
                                    d.getVar('TCLIBC'))
 }
 
@@ -68,7 +71,6 @@ RDEPENDS_packagegroup-core-sys-extended = "\
     mc-helpers-perl \
     mdadm \
     minicom \
-    neon \
     parted \
     quota \
     screen \
@@ -159,7 +161,6 @@ RDEPENDS_packagegroup-core-lsb-core = "\
     mktemp \
     msmtp \
     patch \
-    pax \
     procps \
     psmisc \
     sed \

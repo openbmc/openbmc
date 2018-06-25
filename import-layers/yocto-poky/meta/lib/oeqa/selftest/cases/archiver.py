@@ -116,3 +116,16 @@ class Archiver(OESelftestTestCase):
 
         excluded_present = len(glob.glob(src_path_target + '/%s-*' % target_recipes[1]))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % target_recipes[1])
+
+
+
+    def test_archiver_srpm_mode(self):
+        """
+        Test that in srpm mode, the added recipe dependencies at least exist/work [YOCTO #11121]
+        """
+
+        features = 'INHERIT += "archiver"\n'
+        features += 'ARCHIVER_MODE[srpm] = "1"\n'
+        self.write_config(features)
+
+        bitbake('-n core-image-sato')

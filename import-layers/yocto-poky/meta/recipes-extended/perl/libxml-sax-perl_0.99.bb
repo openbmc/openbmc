@@ -23,6 +23,11 @@ SRC_URI[sha256sum] = "32b04b8e36b6cc4cfc486de2d859d87af5386dd930f2383c49347050d6
 
 S = "${WORKDIR}/XML-SAX-${PV}"
 
-inherit cpan
+inherit cpan ptest-perl
+
+do_install_ptest() {
+	cp -r ${B}/testfiles ${D}${PTEST_PATH}
+	chown -R root:root ${D}${PTEST_PATH}/testfiles
+}
 
 BBCLASSEXTEND = "native"

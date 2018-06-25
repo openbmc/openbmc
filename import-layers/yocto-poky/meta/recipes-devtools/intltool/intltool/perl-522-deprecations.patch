@@ -10,9 +10,11 @@ Take a patch from Debian to solve this.
 Upstream-Status: Submitted (https://bugs.launchpad.net/intltool/+bug/1465010)
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
---- intltool-0.51.0-ORIG/intltool-update.in	2015-05-27 00:20:43.038379963 +0200
-+++ intltool-0.51.0/intltool-update.in	2015-05-27 00:23:53.309078052 +0200
-@@ -1062,7 +1062,7 @@
+Index: intltool-0.51.0/intltool-update.in
+===================================================================
+--- intltool-0.51.0.orig/intltool-update.in
++++ intltool-0.51.0/intltool-update.in
+@@ -1062,7 +1062,7 @@ sub SubstituteVariable
  	}
      }
  
@@ -21,7 +23,7 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
      {
  	my $rest = $3;
  	my $untouched = $1;
-@@ -1190,10 +1190,10 @@
+@@ -1190,10 +1190,10 @@ sub FindPackageName
  	$name    =~ s/\(+$//g;
  	$version =~ s/\(+$//g;
  
@@ -36,7 +38,7 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
      }
  
      if ($conf_source =~ /^AC_INIT\(([^,\)]+),([^,\)]+)[,]?([^,\)]+)?/m)
-@@ -1219,11 +1219,11 @@
+@@ -1219,11 +1219,11 @@ sub FindPackageName
  	$version =~ s/\(+$//g;
          $bugurl  =~ s/\(+$//g if (defined $bugurl);
  

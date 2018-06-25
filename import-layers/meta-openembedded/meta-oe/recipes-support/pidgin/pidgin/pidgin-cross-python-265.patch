@@ -1,9 +1,17 @@
-Use pkg-config instead of ${PYTHON}-config to find python
+From 855cc20bafa30597ae7a62f7672d42654b25cde0 Mon Sep 17 00:00:00 2001
+From: Herrie <github.com@herrie.org>
+Date: Mon, 24 Jul 2017 21:30:16 +0200
+Subject: [PATCH] Use pkg-config instead of ${PYTHON}-config to find python
 
-diff -uNr pidgin-2.10.12.orig/configure.ac pidgin-2.10.12/configure.ac
---- pidgin-2.10.12.orig/configure.ac	2016-01-01 00:19:40.000000000 +0100
-+++ pidgin-2.10.12/configure.ac	2016-05-05 16:55:13.258945925 +0200
-@@ -1585,20 +1585,15 @@
+---
+ configure.ac | 21 ++++++++-------------
+ 1 file changed, 8 insertions(+), 13 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d20a18e..c741829 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1567,20 +1567,15 @@ AM_CONDITIONAL(ENABLE_DBUS, test "x$enable_dbus" = "xyes")
  dnl Check for Python headers (currently useful only for libgnt)
  dnl (Thanks to XChat)
  if test "x$enable_consoleui" = "xyes" -a ! -z "$PYTHON" -a x"$PYTHON" != x"no" ; then

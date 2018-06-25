@@ -5,7 +5,7 @@ HOMEPAGE = "https://abrt.readthedocs.org/"
 LICENSE = "GPLv2+"
 DEPENDS = "xmlrpc-c xmlrpc-c-native intltool-native \
         json-c libtar libnewt libproxy rpm \
-        augeas satyr systemd gtk+3 \
+        augeas satyr systemd \
 "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
@@ -25,6 +25,9 @@ inherit distro_features_check
 REQUIRED_DISTRO_FEATURES = "systemd"
 
 inherit gettext autotools python3native pkgconfig
+
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES','x11','gtk','',d)}"
+PACKAGECONFIG[gtk] = "--with-gtk, --without-gtk, gtk+3,"
 
 RDEPENDS_python3-libreport += "${PN}"
 

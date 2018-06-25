@@ -125,6 +125,9 @@ class GitProgressHandler(bb.progress.LineFilterProgressHandler):
 
 
 class Git(FetchMethod):
+    bitbake_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.join(os.path.abspath(__file__))), '..', '..', '..'))
+    make_shallow_path = os.path.join(bitbake_dir, 'bin', 'git-make-shallow')
+
     """Class to fetch a module or modules from git repositories"""
     def init(self, d):
         pass
@@ -363,6 +366,7 @@ class Git(FetchMethod):
             progresshandler = GitProgressHandler(d)
             runfetchcmd(fetch_cmd, d, log=progresshandler, workdir=ud.clonedir)
             runfetchcmd("%s prune-packed" % ud.basecmd, d, workdir=ud.clonedir)
+            runfetchcmd("%s pack-refs --all" % ud.basecmd, d, workdir=ud.clonedir)
             runfetchcmd("%s pack-redundant --all | xargs -r rm" % ud.basecmd, d, workdir=ud.clonedir)
             try:
                 os.unlink(ud.fullmirror)
@@ -445,7 +449,7 @@ class Git(FetchMethod):
                 shallow_branches.append(r)
 
         # Make the repository shallow
-        shallow_cmd = ['git', 'make-shallow', '-s']
+        shallow_cmd = [self.make_shallow_path, '-s']
         for b in shallow_branches:
             shallow_cmd.append('-r')
             shallow_cmd.append(b)
@@ -591,7 +595,8 @@ class Git(FetchMethod):
         tagregex = re.compile(d.getVar('UPSTREAM_CHECK_GITTAGREGEX') or "(?P<pver>([0-9][\.|_]?)+)")
         try:
             output = self._lsremote(ud, d, "refs/tags/*")
-        except bb.fetch2.FetchError or bb.fetch2.NetworkAccess:
+        except (bb.fetch2.FetchError, bb.fetch2.NetworkAccess) as e:
+            bb.note("Could not list remote: %s" % str(e))
             return pupver
 
         verstring = ""

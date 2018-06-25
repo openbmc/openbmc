@@ -26,3 +26,5 @@ SRC_URI += "file://gevent-allow-ssl-v2-or-v3-certificates.patch"
 do_configure_append() {
 	sed -i -e 's/^cross_compiling=no/cross_compiling=yes/' ${S}/libev/configure
 }
+
+DEFAULT_PREFERENCE = "-1"

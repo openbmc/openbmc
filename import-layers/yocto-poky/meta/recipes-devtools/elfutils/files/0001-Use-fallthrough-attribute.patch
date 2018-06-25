@@ -1,0 +1,791 @@
+From 5cb883f67d00a63531ef195c242763d36b1905ca Mon Sep 17 00:00:00 2001
+From: Joshua Watt <Joshua.Watt@garmin.com>
+Date: Fri, 9 Feb 2018 12:46:38 -0600
+Subject: [PATCH] Use fallthrough attribute
+
+Use __attribute__ ((fallthrough)) to indicate switch case fall through
+instead of a comment. This ensure that the fallthrough warning is not
+triggered even if the file is pre-processed (hence stripping the
+comments) before it is compiled.
+
+The actual fallback implementation is hidden behind a FALLBACK macro in
+case the compiler doesn't support it.
+
+Finally, the -Wimplict-fallthrough warning was upgraded to only allow
+the attribute to satisfy it; a comment alone is no longer sufficient.
+
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+
+Upstream-Status: Submitted [1]
+
+[1] https://sourceware.org/ml/elfutils-devel/2018-q1/msg00027.html
+---
+ backends/aarch64_retval.c    | 2 +-
+ backends/alpha_retval.c      | 4 ++--
+ backends/arm_regs.c          | 2 +-
+ backends/arm_retval.c        | 2 +-
+ backends/i386_regs.c         | 2 +-
+ backends/i386_retval.c       | 4 ++--
+ backends/ia64_retval.c       | 2 +-
+ backends/linux-core-note.c   | 2 +-
+ backends/m68k_retval.c       | 4 ++--
+ backends/mips_retval.c       | 4 ++--
+ backends/parisc_retval.c     | 5 +++--
+ backends/ppc64_retval.c      | 6 +++---
+ backends/ppc_regs.c          | 2 +-
+ backends/ppc_retval.c        | 4 ++--
+ backends/s390_retval.c       | 4 ++--
+ backends/sh_retval.c         | 2 +-
+ backends/sparc_retval.c      | 2 +-
+ backends/tilegx_retval.c     | 4 ++--
+ backends/x86_64_regs.c       | 2 +-
+ backends/x86_64_retval.c     | 2 +-
+ config/eu.am                 | 4 +++-
+ configure.ac                 | 6 ++++++
+ lib/eu-config.h              | 7 +++++++
+ libcpu/i386_disasm.c         | 2 +-
+ libcpu/i386_parse.c          | 4 ++--
+ libdw/cfi.c                  | 4 ++--
+ libdw/dwarf_frame_register.c | 2 +-
+ libdwfl/dwfl_report_elf.c    | 2 +-
+ libdwfl/frame_unwind.c       | 2 +-
+ libebl/eblobjnote.c          | 2 +-
+ libelf/elf32_updatenull.c    | 2 +-
+ libelf/elf_begin.c           | 4 ++--
+ libelf/elf_cntl.c            | 2 +-
+ src/addr2line.c              | 2 +-
+ src/elfcompress.c            | 2 +-
+ src/elflint.c                | 8 ++++----
+ src/objdump.c                | 2 +-
+ src/readelf.c                | 8 ++++----
+ src/strings.c                | 2 +-
+ tests/backtrace.c            | 2 +-
+ tests/elfstrmerge.c          | 3 ++-
+ 41 files changed, 75 insertions(+), 58 deletions(-)
+
+diff --git a/backends/aarch64_retval.c b/backends/aarch64_retval.c
+index 68de307..1308340 100644
+--- a/backends/aarch64_retval.c
++++ b/backends/aarch64_retval.c
+@@ -292,7 +292,7 @@ aarch64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  assert (count > 0);
+ 	  if (count <= 4)
+ 	    return pass_hfa (locp, base_size, count);
+-	  /* Fall through.  */
++	  FALLTHROUGH;
+ 
+ 	case 1:
+ 	  /* Not a HFA.  */
+diff --git a/backends/alpha_retval.c b/backends/alpha_retval.c
+index 53dbfa4..d9bae3b 100644
+--- a/backends/alpha_retval.c
++++ b/backends/alpha_retval.c
+@@ -85,7 +85,7 @@ alpha_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+@@ -131,7 +131,7 @@ alpha_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  }
+       }
+ 
+-      /* Else fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+diff --git a/backends/arm_regs.c b/backends/arm_regs.c
+index 4ee1039..418c931 100644
+--- a/backends/arm_regs.c
++++ b/backends/arm_regs.c
+@@ -81,7 +81,7 @@ arm_register_info (Ebl *ebl __attribute__ ((unused)),
+        * but gcc maps FPA registers here
+        */
+       regno += 96 - 16;
+-      /* Fall through.  */
++      FALLTHROUGH;
+     case 96 + 0 ... 96 + 7:
+       *setname = "FPA";
+       *type = DW_ATE_float;
+diff --git a/backends/arm_retval.c b/backends/arm_retval.c
+index 8687eab..313e4eb 100644
+--- a/backends/arm_retval.c
++++ b/backends/arm_retval.c
+@@ -90,7 +90,7 @@ arm_return_value_location_ (Dwarf_Die *functypedie, const Dwarf_Op **locp,
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+diff --git a/backends/i386_regs.c b/backends/i386_regs.c
+index fd963a6..7ec93bb 100644
+--- a/backends/i386_regs.c
++++ b/backends/i386_regs.c
+@@ -92,7 +92,7 @@ i386_register_info (Ebl *ebl __attribute__ ((unused)),
+     case 5:
+     case 8:
+       *type = DW_ATE_address;
+-      /* Fallthrough */
++      FALLTHROUGH;
+     case 0 ... 3:
+     case 6 ... 7:
+       name[0] = 'e';
+diff --git a/backends/i386_retval.c b/backends/i386_retval.c
+index 4aa646f..32fec72 100644
+--- a/backends/i386_retval.c
++++ b/backends/i386_retval.c
+@@ -85,7 +85,7 @@ i386_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+@@ -123,7 +123,7 @@ i386_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	if (size <= 8)
+ 	  return nloc_intregpair;
+       }
+-    /* Fallthrough */
++    FALLTHROUGH;
+ 
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+diff --git a/backends/ia64_retval.c b/backends/ia64_retval.c
+index dcd5f28..03ea4d8 100644
+--- a/backends/ia64_retval.c
++++ b/backends/ia64_retval.c
+@@ -260,7 +260,7 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+diff --git a/backends/linux-core-note.c b/backends/linux-core-note.c
+index 67638d7..5f06c89 100644
+--- a/backends/linux-core-note.c
++++ b/backends/linux-core-note.c
+@@ -226,7 +226,7 @@ EBLHOOK(core_note) (const GElf_Nhdr *nhdr, const char *name,
+       if (memcmp (name, "CORE", nhdr->n_namesz) == 0)
+ 	break;
+       /* Buggy old Linux kernels didn't terminate "LINUX".  */
+-      /* Fall through. */
++      FALLTHROUGH;
+ 
+     case sizeof "LINUX":
+       if (memcmp (name, "LINUX", nhdr->n_namesz) == 0)
+diff --git a/backends/m68k_retval.c b/backends/m68k_retval.c
+index c68ed02..a653ba3 100644
+--- a/backends/m68k_retval.c
++++ b/backends/m68k_retval.c
+@@ -92,7 +92,7 @@ m68k_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+@@ -135,7 +135,7 @@ m68k_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	if (size <= 8)
+ 	  return nloc_intregpair;
+       }
+-      /* Fallthrough */
++      FALLTHROUGH;
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+     case DW_TAG_union_type:
+diff --git a/backends/mips_retval.c b/backends/mips_retval.c
+index 57487bb..c6e1ffe 100644
+--- a/backends/mips_retval.c
++++ b/backends/mips_retval.c
+@@ -306,7 +306,7 @@ mips_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = dwarf_tag (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+@@ -389,7 +389,7 @@ mips_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+             }
+         }
+ 
+-      /* Fallthrough to handle large types */
++      FALLTHROUGH; /* Fallthrough to handle large types */
+ 
+     case DW_TAG_array_type:
+     large:
+diff --git a/backends/parisc_retval.c b/backends/parisc_retval.c
+index df7ec3a..1f1e91a 100644
+--- a/backends/parisc_retval.c
++++ b/backends/parisc_retval.c
+@@ -116,7 +116,7 @@ parisc_return_value_location_ (Dwarf_Die *functypedie, const Dwarf_Op **locp, in
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = dwarf_tag (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+@@ -167,6 +167,7 @@ parisc_return_value_location_ (Dwarf_Die *functypedie, const Dwarf_Op **locp, in
+ 
+ 	/* Else fall through.  */
+       }
++      FALLTHROUGH;
+ 
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+@@ -189,7 +190,7 @@ parisc_return_value_location_ (Dwarf_Die *functypedie, const Dwarf_Op **locp, in
+         *locp = loc_aggregate;
+         return nloc_aggregate;
+ #endif
+-	/* fall through.  */
++	FALLTHROUGH;
+       }
+     }
+ 
+diff --git a/backends/ppc64_retval.c b/backends/ppc64_retval.c
+index a251983..eb1c11e 100644
+--- a/backends/ppc64_retval.c
++++ b/backends/ppc64_retval.c
+@@ -96,7 +96,7 @@ ppc64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+@@ -141,7 +141,7 @@ ppc64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  return nloc_intreg;
+ 	}
+ 
+-      /* Else fall through.  */
++      FALLTHROUGH;
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+     case DW_TAG_union_type:
+@@ -161,7 +161,7 @@ ppc64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	    return nloc_vmxreg;
+ 	  }
+       }
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_string_type:
+       if (dwarf_aggregate_size (typedie, &size) == 0 && size <= 8)
+diff --git a/backends/ppc_regs.c b/backends/ppc_regs.c
+index c2d5011..43d2534 100644
+--- a/backends/ppc_regs.c
++++ b/backends/ppc_regs.c
+@@ -140,7 +140,7 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
+     case 100:
+       if (*bits == 32)
+ 	return stpcpy (name, "mq") + 1 - name;
+-      /* Fallthrough */
++      FALLTHROUGH;
+     case 102 ... 107:
+       name[0] = 's';
+       name[1] = 'p';
+diff --git a/backends/ppc_retval.c b/backends/ppc_retval.c
+index b14a99f..39b42da 100644
+--- a/backends/ppc_retval.c
++++ b/backends/ppc_retval.c
+@@ -108,7 +108,7 @@ ppc_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+@@ -172,7 +172,7 @@ ppc_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	      return nloc_intregquad;
+ 	    }
+       }
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+diff --git a/backends/s390_retval.c b/backends/s390_retval.c
+index a927d46..2043f98 100644
+--- a/backends/s390_retval.c
++++ b/backends/s390_retval.c
+@@ -87,7 +87,7 @@ s390_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+@@ -127,7 +127,7 @@ s390_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	    return size <= asize ? nloc_intreg : nloc_intregpair;
+ 	  }
+       }
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+diff --git a/backends/sh_retval.c b/backends/sh_retval.c
+index d44f260..33d7d96 100644
+--- a/backends/sh_retval.c
++++ b/backends/sh_retval.c
+@@ -84,7 +84,7 @@ sh_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+diff --git a/backends/sparc_retval.c b/backends/sparc_retval.c
+index e1b1775..fb81cdc 100644
+--- a/backends/sparc_retval.c
++++ b/backends/sparc_retval.c
+@@ -91,7 +91,7 @@ sparc_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+diff --git a/backends/tilegx_retval.c b/backends/tilegx_retval.c
+index db81a20..7f7d24b 100644
+--- a/backends/tilegx_retval.c
++++ b/backends/tilegx_retval.c
+@@ -79,7 +79,7 @@ tilegx_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+@@ -113,7 +113,7 @@ tilegx_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  return nloc_intreg;
+ 	}
+ 
+-      /* Else fall through.  */
++      FALLTHROUGH;
+     case DW_TAG_structure_type:
+     case DW_TAG_class_type:
+     case DW_TAG_union_type:
+diff --git a/backends/x86_64_regs.c b/backends/x86_64_regs.c
+index 8430440..ef987da 100644
+--- a/backends/x86_64_regs.c
++++ b/backends/x86_64_regs.c
+@@ -87,7 +87,7 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
+ 
+     case 6 ... 7:
+       *type = DW_ATE_address;
+-      /* Fallthrough */
++      FALLTHROUGH;
+     case 0 ... 5:
+       name[0] = 'r';
+       name[1] = baseregs[regno][0];
+diff --git a/backends/x86_64_retval.c b/backends/x86_64_retval.c
+index b3799ae..f9114cb 100644
+--- a/backends/x86_64_retval.c
++++ b/backends/x86_64_retval.c
+@@ -100,7 +100,7 @@ x86_64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
+ 	  typedie = dwarf_formref_die (attr, &die_mem);
+ 	  tag = DWARF_TAG_OR_RETURN (typedie);
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+ 
+     case DW_TAG_base_type:
+     case DW_TAG_enumeration_type:
+diff --git a/config/eu.am b/config/eu.am
+index 8fe1e25..b6ec581 100644
+--- a/config/eu.am
++++ b/config/eu.am
+@@ -62,7 +62,9 @@ NULL_DEREFERENCE_WARNING=
+ endif
+ 
+ if HAVE_IMPLICIT_FALLTHROUGH_WARNING
+-IMPLICIT_FALLTHROUGH_WARNING=-Wimplicit-fallthrough
++# Use strict fallthrough. Only __attribute__((fallthrough)) will prevent the
++# warning
++IMPLICIT_FALLTHROUGH_WARNING=-Wimplicit-fallthrough=5
+ else
+ IMPLICIT_FALLTHROUGH_WARNING=
+ endif
+diff --git a/configure.ac b/configure.ac
+index 1f1856d..698efbb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -360,6 +360,12 @@ CFLAGS="$old_CFLAGS"])
+ AM_CONDITIONAL(HAVE_IMPLICIT_FALLTHROUGH_WARNING,
+ 	       [test "x$ac_cv_implicit_fallthrough" != "xno"])
+ 
++# Assume the fallthrough attribute is supported if -Wimplict-fallthrough is supported
++if test "$ac_cv_implicit_fallthrough" = "yes"; then
++	AC_DEFINE([HAVE_FALLTHROUGH], [1],
++		  [Defined if __attribute__((fallthrough)) is supported])
++fi
++
+ dnl Check if we have argp available from our libc
+ AC_LINK_IFELSE(
+ 	[AC_LANG_PROGRAM(
+diff --git a/lib/eu-config.h b/lib/eu-config.h
+index 400cdc6..e8d4ec2 100644
+--- a/lib/eu-config.h
++++ b/lib/eu-config.h
+@@ -186,5 +186,12 @@ asm (".section predict_data, \"aw\"; .previous\n"
+ # define COMPAT_VERSION(name, version, prefix) error "should use #ifdef SYMBOL_VERSIONING"
+ #endif
+ 
++#ifndef FALLTHROUGH
++# ifdef HAVE_FALLTHROUGH
++#  define FALLTHROUGH __attribute__ ((fallthrough))
++# else
++#  define FALLTHROUGH ((void) 0)
++# endif
++#endif
+ 
+ #endif	/* eu-config.h */
+diff --git a/libcpu/i386_disasm.c b/libcpu/i386_disasm.c
+index 60fd6d4..837a3a8 100644
+--- a/libcpu/i386_disasm.c
++++ b/libcpu/i386_disasm.c
+@@ -819,7 +819,7 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
+ 			      ++param_start;
+ 			      break;
+ 			    }
+-			  /* Fallthrough */
++			  FALLTHROUGH;
+ 			default:
+ 			  str = "";
+ 			  assert (! "INVALID not handled");
+diff --git a/libcpu/i386_parse.c b/libcpu/i386_parse.c
+index ef1ac35..6fa7ce3 100644
+--- a/libcpu/i386_parse.c
++++ b/libcpu/i386_parse.c
+@@ -1047,7 +1047,7 @@ yytnamerr (char *yyres, const char *yystr)
+           case '\\':
+             if (*++yyp != '\\')
+               goto do_not_strip_quotes;
+-            /* Fall through.  */
++            FALLTHROUGH;
+           default:
+             if (yyres)
+               yyres[yyn] = *yyp;
+@@ -2042,7 +2042,7 @@ yyabortlab:
+ yyexhaustedlab:
+   yyerror (YY_("memory exhausted"));
+   yyresult = 2;
+-  /* Fall through.  */
++  FALLTHROUGH;
+ #endif
+ 
+ yyreturn:
+diff --git a/libdw/cfi.c b/libdw/cfi.c
+index daa845f..341e055 100644
+--- a/libdw/cfi.c
++++ b/libdw/cfi.c
+@@ -138,7 +138,7 @@ execute_cfi (Dwarf_CFI *cache,
+ 
+ 	case DW_CFA_advance_loc1:
+ 	  operand = *program++;
+-	  /* Fallthrough */
++	  FALLTHROUGH;
+ 	case DW_CFA_advance_loc + 0 ... DW_CFA_advance_loc + CFI_PRIMARY_MAX:
+ 	advance_loc:
+ 	  loc += operand * cie->code_alignment_factor;
+@@ -301,7 +301,7 @@ execute_cfi (Dwarf_CFI *cache,
+ 
+ 	case DW_CFA_restore_extended:
+ 	  get_uleb128 (operand, program, end);
+-	  /* Fallthrough */
++	  FALLTHROUGH;
+ 	case DW_CFA_restore + 0 ... DW_CFA_restore + CFI_PRIMARY_MAX:
+ 
+ 	  if (unlikely (abi_cfi) && likely (opcode == DW_CFA_restore))
+diff --git a/libdw/dwarf_frame_register.c b/libdw/dwarf_frame_register.c
+index 37e8e91..d0159fb 100644
+--- a/libdw/dwarf_frame_register.c
++++ b/libdw/dwarf_frame_register.c
+@@ -62,7 +62,7 @@ dwarf_frame_register (Dwarf_Frame *fs, int regno, Dwarf_Op *ops_mem,
+       /* Use the default rule for registers not yet mentioned in CFI.  */
+       if (fs->cache->default_same_value)
+ 	goto same_value;
+-      /*FALLTHROUGH*/
++      FALLTHROUGH;
+     case reg_undefined:
+       /* The value is known to be unavailable.  */
+       break;
+diff --git a/libdwfl/dwfl_report_elf.c b/libdwfl/dwfl_report_elf.c
+index 6950a37..3fc9384 100644
+--- a/libdwfl/dwfl_report_elf.c
++++ b/libdwfl/dwfl_report_elf.c
+@@ -174,7 +174,7 @@ __libdwfl_elf_address_range (Elf *elf, GElf_Addr base, bool add_p_vaddr,
+       /* An assigned base address is meaningless for these.  */
+       base = 0;
+       add_p_vaddr = true;
+-      /* Fallthrough. */
++      FALLTHROUGH;
+     case ET_DYN:
+     default:;
+       size_t phnum;
+diff --git a/libdwfl/frame_unwind.c b/libdwfl/frame_unwind.c
+index 4dc9c43..eaea495 100644
+--- a/libdwfl/frame_unwind.c
++++ b/libdwfl/frame_unwind.c
+@@ -442,7 +442,7 @@ expr_eval (Dwfl_Frame *state, Dwarf_Frame *frame, const Dwarf_Op *ops,
+ 	    }
+ 	  if (val1 == 0)
+ 	    break;
+-	  /* FALLTHRU */
++	  FALLTHROUGH;
+ 	case DW_OP_skip:;
+ 	  Dwarf_Word offset = op->offset + 1 + 2 + (int16_t) op->number;
+ 	  const Dwarf_Op *found = bsearch ((void *) (uintptr_t) offset, ops, nops,
+diff --git a/libebl/eblobjnote.c b/libebl/eblobjnote.c
+index f80a1a5..ca4f155 100644
+--- a/libebl/eblobjnote.c
++++ b/libebl/eblobjnote.c
+@@ -223,7 +223,7 @@ ebl_object_note (Ebl *ebl, const char *name, uint32_t type,
+ 		free (buf);
+ 	      break;
+ 	    }
+-	  /* FALLTHROUGH */
++	  FALLTHROUGH;
+ 
+ 	default:
+ 	  /* Unknown type.  */
+diff --git a/libelf/elf32_updatenull.c b/libelf/elf32_updatenull.c
+index a51bf70..5351518 100644
+--- a/libelf/elf32_updatenull.c
++++ b/libelf/elf32_updatenull.c
+@@ -232,7 +232,7 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
+ 		      __libelf_seterrno (ELF_E_GROUP_NOT_REL);
+ 		      return -1;
+ 		    }
+-		  /* FALLTHROUGH */
++		  FALLTHROUGH;
+ 		case SHT_SYMTAB_SHNDX:
+ 		  sh_entsize = elf_typesize (32, ELF_T_WORD, 1);
+ 		  break;
+diff --git a/libelf/elf_begin.c b/libelf/elf_begin.c
+index 6f85038..6de206a 100644
+--- a/libelf/elf_begin.c
++++ b/libelf/elf_begin.c
+@@ -582,7 +582,7 @@ read_unmmaped_file (int fildes, off_t offset, size_t maxsize, Elf_Cmd cmd,
+ 			     ? sizeof (Elf32_Ehdr) : sizeof (Elf64_Ehdr)))
+ 	return file_read_elf (fildes, NULL, mem.header, offset, maxsize, cmd,
+ 			      parent);
+-      /* FALLTHROUGH */
++      FALLTHROUGH;
+ 
+     default:
+       break;
+@@ -1097,7 +1097,7 @@ elf_begin (int fildes, Elf_Cmd cmd, Elf *ref)
+ 	  retval = NULL;
+ 	  break;
+ 	}
+-      /* FALLTHROUGH */
++      FALLTHROUGH;
+ 
+     case ELF_C_READ:
+     case ELF_C_READ_MMAP:
+diff --git a/libelf/elf_cntl.c b/libelf/elf_cntl.c
+index ab13ffb..fd68178 100644
+--- a/libelf/elf_cntl.c
++++ b/libelf/elf_cntl.c
+@@ -62,7 +62,7 @@ elf_cntl (Elf *elf, Elf_Cmd cmd)
+ 	  result = -1;
+ 	  break;
+ 	}
+-      /* FALLTHROUGH */
++      FALLTHROUGH;
+ 
+     case ELF_C_FDDONE:
+       /* Mark the file descriptor as not usable.  */
+diff --git a/src/addr2line.c b/src/addr2line.c
+index ba414a7..444ee52 100644
+--- a/src/addr2line.c
++++ b/src/addr2line.c
+@@ -618,7 +618,7 @@ handle_address (const char *string, Dwfl *dwfl)
+ 	case 1:
+ 	  addr = 0;
+ 	  j = i;
+-	  /* Fallthrough */
++	  FALLTHROUGH;
+ 	case 2:
+ 	  if (string[j] != '\0')
+ 	    break;
+diff --git a/src/elfcompress.c b/src/elfcompress.c
+index 8e0d5c5..25378a4 100644
+--- a/src/elfcompress.c
++++ b/src/elfcompress.c
+@@ -149,7 +149,7 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
+ 		    N_("Only one input file allowed together with '-o'"));
+       /* We only use this for checking the number of arguments, we don't
+ 	 actually want to consume them.  */
+-      /* Fallthrough */
++      FALLTHROUGH;
+     default:
+       return ARGP_ERR_UNKNOWN;
+     }
+diff --git a/src/elflint.c b/src/elflint.c
+index 51e53c2..df1b3a0 100644
+--- a/src/elflint.c
++++ b/src/elflint.c
+@@ -1764,7 +1764,7 @@ section [%2d] '%s': entry %zu: pointer does not match address of section [%2d] '
+ 	  if (dyn->d_tag < DT_ADDRRNGLO || dyn->d_tag > DT_ADDRRNGHI)
+ 	    /* Value is no pointer.  */
+ 	    break;
+-	  /* FALLTHROUGH */
++	  FALLTHROUGH;
+ 
+ 	case DT_AUXILIARY:
+ 	case DT_FILTER:
+@@ -3993,7 +3993,7 @@ section [%2zu] '%s': merge flag set but entry size is zero\n"),
+ 	    case SHT_NOBITS:
+ 	      if (is_debuginfo)
+ 		break;
+-	      /* Fallthrough */
++	      FALLTHROUGH;
+ 	    default:
+ 	      ERROR (gettext ("\
+ section [%2zu] '%s' has unexpected type %d for an executable section\n"),
+@@ -4137,7 +4137,7 @@ section [%2zu] '%s': ELF header says this is the section header string table but
+ 	    ERROR (gettext ("\
+ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
+ 		   cnt, section_name (ebl, cnt));
+-	  /* FALLTHROUGH */
++	  FALLTHROUGH;
+ 	case SHT_SYMTAB:
+ 	  check_symtab (ebl, ehdr, shdr, cnt);
+ 	  break;
+@@ -4336,7 +4336,7 @@ section [%2d] '%s': unknown core file note type %" PRIu32
+ 	    if (nhdr.n_namesz == sizeof "Linux"
+ 		&& !memcmp (data->d_buf + name_offset, "Linux", sizeof "Linux"))
+ 	      break;
+-	    /* Fallthrough */
++	    FALLTHROUGH;
+ 	  default:
+ 	    if (shndx == 0)
+ 	      ERROR (gettext ("\
+diff --git a/src/objdump.c b/src/objdump.c
+index 860cfac..0dd9a6a 100644
+--- a/src/objdump.c
++++ b/src/objdump.c
+@@ -223,7 +223,7 @@ parse_opt (int key, char *arg,
+ 	}
+       /* We only use this for checking the number of arguments, we don't
+ 	 actually want to consume them.  */
+-      /* Fallthrough */
++      FALLTHROUGH;
+     default:
+       return ARGP_ERR_UNKNOWN;
+     }
+diff --git a/src/readelf.c b/src/readelf.c
+index 346eccd..6a27e7e 100644
+--- a/src/readelf.c
++++ b/src/readelf.c
+@@ -465,7 +465,7 @@ parse_opt (int key, char *arg,
+ 	  print_string_sections = true;
+ 	  break;
+ 	}
+-      /* Fall through.  */
++      FALLTHROUGH;
+     case 'x':
+       add_dump_section (arg, false);
+       any_control_option = true;
+@@ -6029,7 +6029,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
+ 			dwarf_form_name (form), (uintmax_t) num);
+ 	      return DWARF_CB_OK;
+ 	    }
+-	  /* else fallthrough */
++	  FALLTHROUGH;
+ 
+ 	/* These cases always take a loclistptr and no constant. */
+ 	case DW_AT_location:
+@@ -6195,7 +6195,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
+ 	      print_block (block.length, block.data);
+ 	      break;
+ 	    }
+-	  /* Fall through.  */
++	  FALLTHROUGH;
+ 
+ 	case DW_AT_location:
+ 	case DW_AT_data_location:
+@@ -9227,7 +9227,7 @@ handle_auxv_note (Ebl *ebl, Elf *core, GElf_Word descsz, GElf_Off desc_pos)
+ 		printf ("    %s\n", name);
+ 		break;
+ 	      }
+-	    /* Fall through */
++	    FALLTHROUGH;
+ 	  case 'x':		/* hex */
+ 	  case 'p':		/* address */
+ 	  case 's':		/* address of string */
+diff --git a/src/strings.c b/src/strings.c
+index d214356..03d0f13 100644
+--- a/src/strings.c
++++ b/src/strings.c
+@@ -246,7 +246,7 @@ parse_opt (int key, char *arg,
+ 	case 'b':
+ 	case 'B':
+ 	  big_endian = true;
+-	  /* FALLTHROUGH */
++	  FALLTHROUGH;
+ 
+ 	case 'l':
+ 	case 'L':
+diff --git a/tests/backtrace.c b/tests/backtrace.c
+index 21abe8a..f5dd761 100644
+--- a/tests/backtrace.c
++++ b/tests/backtrace.c
+@@ -127,7 +127,7 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
+ 	  assert (symname2 == NULL || strcmp (symname2, "jmp") != 0);
+ 	  break;
+ 	}
+-      /* FALLTHRU */
++      FALLTHROUGH;
+     case 4:
+       /* Some simple frame unwinders get this wrong and think sigusr2
+ 	 is calling itself again. Allow it and just pretend there is
+diff --git a/tests/elfstrmerge.c b/tests/elfstrmerge.c
+index 8d5b53c..62c549d 100644
+--- a/tests/elfstrmerge.c
++++ b/tests/elfstrmerge.c
+@@ -578,7 +578,8 @@ main (int argc, char **argv)
+ 	      break;
+ 
+ 	    case SHT_DYNAMIC:
+-	      /* Fallthrough.  There are string indexes in here, but
++	      FALLTHROUGH;
++	      /* There are string indexes in here, but
+ 		 they (should) point to a allocated string table,
+ 		 which we don't alter.  */
+ 	    default:
+-- 
+2.14.3
+

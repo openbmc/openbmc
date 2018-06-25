@@ -12,6 +12,7 @@ compiler are accepted.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
+
 ---
  m4/compiler-warnings.m4 | 29 +++++++++++++++++++++++++----
  1 file changed, 25 insertions(+), 4 deletions(-)
@@ -53,7 +54,7 @@ index de4a8b0..e4ba718 100644
  		      -Wdeclaration-after-statement -Wstrict-prototypes \
 @@ -17,22 +37,23 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
  		      -Wmissing-include-dirs -Waggregate-return \
- 		      -Wformat-security; do
+ 		      -Wformat-security -Wtype-limits; do
  		SAVE_CFLAGS="$CFLAGS"
 -		CFLAGS="$CFLAGS $option"
 +		CFLAGS="$CFLAGS $option $WERROR"

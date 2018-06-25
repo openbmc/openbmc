@@ -17,5 +17,3 @@ SRC_URI[sha256sum] = "654c11f759c19237be39f6ad401d917e5a05f36f1736385ed958e60cf2
 UPSTREAM_CHECK_URI = "https://github.com/libical/libical/releases"
 
 inherit cmake pkgconfig
-
-FILES_${PN}-dev += "${libdir}/cmake/*"

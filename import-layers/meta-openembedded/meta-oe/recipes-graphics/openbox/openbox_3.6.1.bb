@@ -16,9 +16,11 @@ inherit autotools gettext update-alternatives pkgconfig distro_features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
-ALTERNATIVE_${PN}-core = "x-window-manager"
+ALTERNATIVE_${PN}-core = "x-window-manager x-session-manager"
 ALTERNATIVE_TARGET[x-window-manager] = "${bindir}/openbox"
 ALTERNATIVE_PRIORITY[x-window-manager] = "10"
+ALTERNATIVE_TARGET[x-session-manager] = "${bindir}/openbox-session"
+ALTERNATIVE_PRIORITY[x-session-manager] = "100"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[imlib2] = "--enable-imlib2,--disable-imlib2,imlib2"
@@ -38,7 +40,7 @@ python populate_packages_prepend() {
 }
 
 RDEPENDS_${PN} += "${PN}-core ${PN}-config ${PN}-theme-clearlooks"
-FILES_${PN}-core = "${bindir}/openbox ${libdir}/*${SOLIBS}"
+FILES_${PN}-core = "${bindir}/openbox ${bindir}/openbox-session ${libdir}/*${SOLIBS}"
 
 FILES_${PN}-lxde += "${datadir}/lxde/ \
                      ${datadir}/lxpanel \
@@ -46,6 +48,7 @@ FILES_${PN}-lxde += "${datadir}/lxde/ \
                      ${datadir}/icons"
 
 FILES_${PN}-gnome += " \
+    ${bindir}/openbox-gnome-session \
     ${datadir}/gnome \
     ${datadir}/gnome-session \
 "

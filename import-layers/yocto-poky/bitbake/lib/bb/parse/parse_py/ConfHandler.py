@@ -134,9 +134,6 @@ def handle(fn, data, include):
     abs_fn = resolve_file(fn, data)
     f = open(abs_fn, 'r')
 
-    if include:
-        bb.parse.mark_dependency(data, abs_fn)
-
     statements = ast.StatementGroup()
     lineno = 0
     while True:

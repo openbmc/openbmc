@@ -181,7 +181,7 @@ class RunQueueScheduler(object):
         if self.rq.stats.active < self.rq.number_tasks:
             return self.next_buildable_task()
 
-    def newbuilable(self, task):
+    def newbuildable(self, task):
         self.buildable.append(task)
 
     def describe_task(self, taskid):
@@ -581,12 +581,6 @@ class RunQueueData:
                     if t in taskData[mc].taskentries:
                         depends.add(t)
 
-        def add_resolved_dependencies(mc, fn, tasknames, depends):
-            for taskname in tasknames:
-                tid = build_tid(mc, fn, taskname)
-                if tid in self.runtaskentries:
-                    depends.add(tid)
-
         for mc in taskData:
             for tid in taskData[mc].taskentries:
 
@@ -673,57 +667,106 @@ class RunQueueData:
                             recursiveitasks[tid].append(newdep)
 
                 self.runtaskentries[tid].depends = depends
+                # Remove all self references
+                self.runtaskentries[tid].depends.discard(tid)
 
         #self.dump_data()
+
+        self.init_progress_reporter.next_stage()
 
         # Resolve recursive 'recrdeptask' dependencies (Part B)
         #
         # e.g. do_sometask[recrdeptask] = "do_someothertask"
         # (makes sure sometask runs after someothertask of all DEPENDS, RDEPENDS and intertask dependencies, recursively)
         # We need to do this separately since we need all of runtaskentries[*].depends to be complete before this is processed
-        self.init_progress_reporter.next_stage(len(recursivetasks))
-        extradeps = {}
-        for taskcounter, tid in enumerate(recursivetasks):
-            extradeps[tid] = set(self.runtaskentries[tid].depends)
 
-            tasknames = recursivetasks[tid]
-            seendeps = set()
+        # Generating/interating recursive lists of dependencies is painful and potentially slow
+        # Precompute recursive task dependencies here by:
+        #     a) create a temp list of reverse dependencies (revdeps)
+        #     b) walk up the ends of the chains (when a given task no longer has dependencies i.e. len(deps) == 0)
+        #     c) combine the total list of dependencies in cumulativedeps
+        #     d) optimise by pre-truncating 'task' off the items in cumulativedeps (keeps items in sets lower)
 
-            def generate_recdeps(t):
-                newdeps = set()
-                (mc, fn, taskname, _) = split_tid_mcfn(t)
-                add_resolved_dependencies(mc, fn, tasknames, newdeps)
-                extradeps[tid].update(newdeps)
-                seendeps.add(t)
-                newdeps.add(t)
-                for i in newdeps:
-                    if i not in self.runtaskentries:
-                        # Not all recipes might have the recrdeptask task as a task
-                        continue
-                    task = self.runtaskentries[i].task
-                    for n in self.runtaskentries[i].depends:
-                        if n not in seendeps:
-                             generate_recdeps(n)
-            generate_recdeps(tid)
 
-            if tid in recursiveitasks:
-                for dep in recursiveitasks[tid]:
-                    generate_recdeps(dep)
-            self.init_progress_reporter.update(taskcounter)
-
-        # Remove circular references so that do_a[recrdeptask] = "do_a do_b" can work
-        for tid in recursivetasks:
-            extradeps[tid].difference_update(recursivetasksselfref)
-
+        revdeps = {}
+        deps = {}
+        cumulativedeps = {}
         for tid in self.runtaskentries:
-            task = self.runtaskentries[tid].task
-            # Add in extra dependencies
-            if tid in extradeps:
-                 self.runtaskentries[tid].depends = extradeps[tid]
-            # Remove all self references
-            if tid in self.runtaskentries[tid].depends:
-                logger.debug(2, "Task %s contains self reference!", tid)
-                self.runtaskentries[tid].depends.remove(tid)
+            deps[tid] = set(self.runtaskentries[tid].depends)
+            revdeps[tid] = set()
+            cumulativedeps[tid] = set()
+        # Generate a temp list of reverse dependencies
+        for tid in self.runtaskentries:
+            for dep in self.runtaskentries[tid].depends:
+                revdeps[dep].add(tid)
+        # Find the dependency chain endpoints
+        endpoints = set()
+        for tid in self.runtaskentries:
+            if len(deps[tid]) == 0:
+                endpoints.add(tid)
+        # Iterate the chains collating dependencies
+        while endpoints:
+            next = set()
+            for tid in endpoints:
+                for dep in revdeps[tid]:
+                    cumulativedeps[dep].add(fn_from_tid(tid))
+                    cumulativedeps[dep].update(cumulativedeps[tid])
+                    if tid in deps[dep]:
+                        deps[dep].remove(tid)
+                    if len(deps[dep]) == 0:
+                        next.add(dep)
+            endpoints = next
+        #for tid in deps:
+        #    if len(deps[tid]) != 0:
+        #        bb.warn("Sanity test failure, dependencies left for %s (%s)" % (tid, deps[tid]))
+
+        # Loop here since recrdeptasks can depend upon other recrdeptasks and we have to
+        # resolve these recursively until we aren't adding any further extra dependencies
+        extradeps = True
+        while extradeps:
+            extradeps = 0
+            for tid in recursivetasks:
+                tasknames = recursivetasks[tid]
+
+                totaldeps = set(self.runtaskentries[tid].depends)
+                if tid in recursiveitasks:
+                    totaldeps.update(recursiveitasks[tid])
+                    for dep in recursiveitasks[tid]:
+                        if dep not in self.runtaskentries:
+                            continue
+                        totaldeps.update(self.runtaskentries[dep].depends)
+
+                deps = set()
+                for dep in totaldeps:
+                    if dep in cumulativedeps:
+                        deps.update(cumulativedeps[dep])
+
+                for t in deps:
+                    for taskname in tasknames:
+                        newtid = t + ":" + taskname
+                        if newtid == tid:
+                            continue
+                        if newtid in self.runtaskentries and newtid not in self.runtaskentries[tid].depends:
+                            extradeps += 1
+                            self.runtaskentries[tid].depends.add(newtid)
+
+                # Handle recursive tasks which depend upon other recursive tasks
+                deps = set()
+                for dep in self.runtaskentries[tid].depends.intersection(recursivetasks):
+                    deps.update(self.runtaskentries[dep].depends.difference(self.runtaskentries[tid].depends))
+                for newtid in deps:
+                    for taskname in tasknames:
+                        if not newtid.endswith(":" + taskname):
+                            continue
+                        if newtid in self.runtaskentries:
+                            extradeps += 1
+                            self.runtaskentries[tid].depends.add(newtid)
+
+            bb.debug(1, "Added %s recursive dependencies in this loop" % extradeps)
+
+        # Remove recrdeptask circular references so that do_a[recrdeptask] = "do_a do_b" can work
+        for tid in recursivetasksselfref:
+            self.runtaskentries[tid].depends.difference_update(recursivetasksselfref)
 
         self.init_progress_reporter.next_stage()
 
@@ -798,30 +841,57 @@ class RunQueueData:
         #
         # Once all active tasks are marked, prune the ones we don't need.
 
-        delcount = 0
+        delcount = {}
         for tid in list(self.runtaskentries.keys()):
             if tid not in runq_build:
+                delcount[tid] = self.runtaskentries[tid]
                 del self.runtaskentries[tid]
-                delcount += 1
 
-        self.init_progress_reporter.next_stage()
-
-        if self.cooker.configuration.runall is not None:
-            runall = "do_%s" % self.cooker.configuration.runall
-            runall_tids = { k: v for k, v in self.runtaskentries.items() if taskname_from_tid(k) == runall }
-
+        # Handle --runall
+        if self.cooker.configuration.runall:
             # re-run the mark_active and then drop unused tasks from new list
             runq_build = {}
-            for tid in list(runall_tids):
-                mark_active(tid,1)
+
+            for task in self.cooker.configuration.runall:
+                runall_tids = set()
+                for tid in list(self.runtaskentries):
+                    wanttid = fn_from_tid(tid) + ":do_%s" % task
+                    if wanttid in delcount:
+                        self.runtaskentries[wanttid] = delcount[wanttid]
+                    if wanttid in self.runtaskentries:
+                        runall_tids.add(wanttid)
+
+                for tid in list(runall_tids):
+                    mark_active(tid,1)
 
             for tid in list(self.runtaskentries.keys()):
                 if tid not in runq_build:
+                    delcount[tid] = self.runtaskentries[tid]
                     del self.runtaskentries[tid]
-                    delcount += 1
 
             if len(self.runtaskentries) == 0:
-                bb.msg.fatal("RunQueue", "No remaining tasks to run for build target %s with runall %s" % (target, runall))
+                bb.msg.fatal("RunQueue", "Could not find any tasks with the tasknames %s to run within the recipes of the taskgraphs of the targets %s" % (str(self.cooker.configuration.runall), str(self.targets)))
+
+        self.init_progress_reporter.next_stage()
+
+        # Handle runonly
+        if self.cooker.configuration.runonly:
+            # re-run the mark_active and then drop unused tasks from new list
+            runq_build = {}
+
+            for task in self.cooker.configuration.runonly:
+                runonly_tids = { k: v for k, v in self.runtaskentries.items() if taskname_from_tid(k) == "do_%s" % task }
+
+                for tid in list(runonly_tids):
+                    mark_active(tid,1)
+
+            for tid in list(self.runtaskentries.keys()):
+                if tid not in runq_build:
+                    delcount[tid] = self.runtaskentries[tid]
+                    del self.runtaskentries[tid]
+
+            if len(self.runtaskentries) == 0:
+                bb.msg.fatal("RunQueue", "Could not find any tasks with the tasknames %s to run within the taskgraphs of the targets %s" % (str(self.cooker.configuration.runonly), str(self.targets)))
 
         #
         # Step D - Sanity checks and computation
@@ -834,7 +904,7 @@ class RunQueueData:
             else:
                 bb.msg.fatal("RunQueue", "No active tasks and not in --continue mode?! Please report this bug.")
 
-        logger.verbose("Pruned %s inactive tasks, %s left", delcount, len(self.runtaskentries))
+        logger.verbose("Pruned %s inactive tasks, %s left", len(delcount), len(self.runtaskentries))
 
         logger.verbose("Assign Weightings")
 
@@ -1781,7 +1851,7 @@ class RunQueueExecuteTasks(RunQueueExecute):
 
     def setbuildable(self, task):
         self.runq_buildable.add(task)
-        self.sched.newbuilable(task)
+        self.sched.newbuildable(task)
 
     def task_completeoutright(self, task):
         """

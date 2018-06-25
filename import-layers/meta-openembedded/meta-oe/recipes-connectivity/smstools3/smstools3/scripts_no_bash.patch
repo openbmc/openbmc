@@ -1,0 +1,51 @@
+From 85602c3e531d39e89dc8cee0c4a592f85006a064 Mon Sep 17 00:00:00 2001
+From: Bill Randle <bill.randle@gmail.com>
+Date: Sun, 31 Dec 2017 09:08:23 -0800
+
+---
+ scripts/sendsms     | 2 +-
+ scripts/sms2html    | 2 +-
+ scripts/sms2unicode | 2 +-
+ scripts/unicode2sms | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/sendsms b/scripts/sendsms
+index 512026d..bb56856 100755
+--- a/scripts/sendsms
++++ b/scripts/sendsms
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # This script send a text sms at the command line by creating
+ # a sms file in the outgoing queue.
+ 
+diff --git a/scripts/sms2html b/scripts/sms2html
+index ff253e3..946185e 100755
+--- a/scripts/sms2html
++++ b/scripts/sms2html
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # This script converts a received sms file into a html file. 
+ 
+diff --git a/scripts/sms2unicode b/scripts/sms2unicode
+index 46e2756..2826dc1 100755
+--- a/scripts/sms2unicode
++++ b/scripts/sms2unicode
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # This script converts a received sms file into a pure unicode text file.
+ 
+diff --git a/scripts/unicode2sms b/scripts/unicode2sms
+index 2ae86dc..3fccf0d 100755
+--- a/scripts/unicode2sms
++++ b/scripts/unicode2sms
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # This script converts a pure unicode text file into an sms file for sending.
+ 

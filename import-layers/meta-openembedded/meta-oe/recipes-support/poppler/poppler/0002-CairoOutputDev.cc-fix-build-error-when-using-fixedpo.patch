@@ -1,0 +1,100 @@
+From 6287663e7db04df7e6dec58a1fc5bb5d510e8bde Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 9 Apr 2018 19:11:20 +0200
+Subject: [PATCH] CairoOutputDev.cc: fix build error when using fixedpoint
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes:
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc: In function 'int splashRound(SplashCoord)':
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc:1604:28: error: call of overloaded 'floor(FixedPoint)' is ambiguous
+|    return (int)floor(x + 0.5);
+|                             ^
+| In file included from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/features.h:428:0,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/arm-oe-linux-gnueabi/bits/os_defines.h:39,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/arm-oe-linux-gnueabi/bits/c++config.h:533,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/cstdint:38,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc:44:
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/bits/mathcalls.h:165:1: note: candidate: double floor(double)
+|  __MATHCALLX (floor,, (_Mdouble_ __x), (__const__));
+|  ^
+| In file included from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/math.h:36:0,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc:46:
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/cmath:260:3: note: candidate: constexpr float std::floor(float)
+|    floor(float __x)
+|    ^~~~~
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/cmath:264:3: note: candidate: constexpr long double std::floor(long double)
+|    floor(long double __x)
+|    ^~~~~
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc: In function 'int splashCeil(SplashCoord)':
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc:1608:21: error: call of overloaded 'ceil(SplashCoord&)' is ambiguous
+|    return (int)ceil(x);
+|                      ^
+| In file included from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/features.h:428:0,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/arm-oe-linux-gnueabi/bits/os_defines.h:39,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/arm-oe-linux-gnueabi/bits/c++config.h:533,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/cstdint:38,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc:44:
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/bits/mathcalls.h:159:1: note: candidate: double ceil(double)
+|  __MATHCALLX (ceil,, (_Mdouble_ __x), (__const__));
+|  ^
+| In file included from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/math.h:36:0,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc:46:
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/cmath:165:3: note: candidate: constexpr float std::ceil(float)
+|    ceil(float __x)
+|    ^~~~
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/cmath:169:3: note: candidate: constexpr long double std::ceil(long double)
+|    ceil(long double __x)
+|    ^~~~
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc: In function 'int splashFloor(SplashCoord)':
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc:1612:22: error: call of overloaded 'floor(SplashCoord&)' is ambiguous
+|    return (int)floor(x);
+|                       ^
+| In file included from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/features.h:428:0,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/arm-oe-linux-gnueabi/bits/os_defines.h:39,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/arm-oe-linux-gnueabi/bits/c++config.h:533,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/c++/7.3.0/cstdint:38,
+|                  from <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/poppler-0.63.0/poppler/CairoOutputDev.cc:44:
+| <tmpdir>/oe-core-glibc/work/armv5te-oe-linux-gnueabi/poppler/0.63.0-r0/recipe-sysroot/usr/include/bits/mathcalls.h:165:1: note: candidate: double floor(double)
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ poppler/CairoOutputDev.cc | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/poppler/CairoOutputDev.cc b/poppler/CairoOutputDev.cc
+index 18124b8f..4c85ad65 100644
+--- a/poppler/CairoOutputDev.cc
++++ b/poppler/CairoOutputDev.cc
+@@ -1602,15 +1602,27 @@ void CairoOutputDev::endActualText(GfxState *state)
+ }
+ 
+ static inline int splashRound(SplashCoord x) {
++#if defined(USE_FIXEDPOINT)
++  return FixedPoint::floor(x + 0.5);
++#else
+   return (int)floor(x + 0.5);
++#endif
+ }
+ 
+ static inline int splashCeil(SplashCoord x) {
++#if defined(USE_FIXEDPOINT)
++  return FixedPoint::ceil(x);
++#else
+   return (int)ceil(x);
++#endif
+ }
+ 
+ static inline int splashFloor(SplashCoord x) {
++#if defined(USE_FIXEDPOINT)
++  return FixedPoint::floor(x);
++#else
+   return (int)floor(x);
++#endif
+ }
+ 
+ static
+-- 
+2.14.3
+
