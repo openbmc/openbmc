@@ -8,7 +8,7 @@ DEPENDS = ""
 
 SRC_URI = "git://github.com/rsyslog/libfastjson.git;protocol=https"
 
-SRCREV = "6e057a094cb225c9d80d8d6e6b1f36ca88a942dd"
+SRCREV = "4758b1caf69ada911ef79e1d80793fe489b98dff"
 
 S = "${WORKDIR}/git"
 
