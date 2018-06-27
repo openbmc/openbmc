@@ -234,10 +234,13 @@ ubi_cleanup() {
 mount_alt_rwfs() {
   altNum="$(findmtdnum "alt-bmc")"
   if [ ! -z "${altNum}" ]; then
-    altVarMount="/media/alt/var"
-    mkdir -p "${altVarMount}"
-    if mount ubi"${altNum}":rwfs "${altVarMount}" -t ubifs -o defaults; then
-      mkdir -p "${altVarMount}"/persist/etc
+    altRwfs=$(ubinfo -a -d ${altNum} | grep -w "rwfs") || true
+    if [ ! -z "${altRwfs}" ]; then
+      altVarMount="/media/alt/var"
+      mkdir -p "${altVarMount}"
+      if mount ubi"${altNum}":rwfs "${altVarMount}" -t ubifs -o defaults; then
+        mkdir -p "${altVarMount}"/persist/etc
+      fi
     fi
   fi
 }
