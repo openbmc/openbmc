@@ -1,0 +1,58 @@
+From 8c014bceeca6a558519e86b16a8142accc41e94f Mon Sep 17 00:00:00 2001
+From: jason <jason@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Thu, 28 Jun 2018 00:25:21 +0000
+Subject: [PATCH] 	PR c++/80290 - memory-hog with std::pair.
+
+	* pt.c (type_unification_real): Skip non-dependent conversion
+	check for a nested list argument.
+	(braced_init_depth): New.
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-7-branch@262204 138bc75d-0d04-0410-961f-82ee72b054a4
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+ gcc/cp/pt.c      | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/gcc/cp/pt.c b/gcc/cp/pt.c
+index 79cfd0129226..71077a3b0498 100644
+--- a/gcc/cp/pt.c
++++ b/gcc/cp/pt.c
+@@ -19242,6 +19242,24 @@ try_array_deduction (tree tparms, tree targs, tree parm)
+ 			  /*nondeduced*/false, array_deduction_r);
+ }
+ 
++/* Returns how many levels of { } INIT contains.  */
++
++static int
++braced_init_depth (tree init)
++{
++  if (!init || !BRACE_ENCLOSED_INITIALIZER_P (init))
++    return 0;
++  unsigned i; tree val;
++  unsigned max = 0;
++  FOR_EACH_CONSTRUCTOR_VALUE (CONSTRUCTOR_ELTS (init), i, val)
++    {
++      unsigned elt_d = braced_init_depth (val);
++      if (elt_d > max)
++	max = elt_d;
++    }
++  return max + 1;
++}
++
+ /* Most parms like fn_type_unification.
+ 
+    If SUBR is 1, we're being called recursively (to unify the
+@@ -19478,6 +19496,10 @@ type_unification_real (tree tparms,
+ 
+ 	    if (uses_template_parms (parm))
+ 	      continue;
++	    /* Workaround for c++/80290: avoid combinatorial explosion on
++	       deeply nested braced init-lists.  */
++	    if (braced_init_depth (arg) > 2)
++	      continue;
+ 	    if (check_non_deducible_conversion (parm, arg, strict, flags,
+ 						explain_p))
+ 	      return 1;
+-- 
+2.17.1
+
