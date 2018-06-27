@@ -13,11 +13,6 @@ TMPL_SCAN = "fsi-scan@.service"
 INSTFMT_SCAN = "fsi-scan@{0}.service"
 FMT_SCAN = "../${TMPL_SCAN}:${TGTFMT}.requires/${INSTFMT_SCAN}"
 
-TMPL_BIND = "fsi-bind@.service"
-INSTFMT_BIND = "fsi-bind@{0}.service"
-FMT_BIND = "../${TMPL_BIND}:${TGTFMT}.requires/${INSTFMT_BIND}"
-
-SYSTEMD_SERVICE_${PN} += "${TMPL_SCAN} ${TMPL_BIND} fsi-enable.service fsi-disable.service"
+SYSTEMD_SERVICE_${PN} += "${TMPL_SCAN} fsi-enable.service fsi-disable.service"
 
 SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_SCAN', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_BIND', 'OBMC_CHASSIS_INSTANCES')}"
