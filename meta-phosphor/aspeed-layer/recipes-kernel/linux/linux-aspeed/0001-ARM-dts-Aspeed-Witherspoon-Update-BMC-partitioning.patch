@@ -1,4 +1,4 @@
-From 3e0b58ab998209b392a2870124503659245c2483 Mon Sep 17 00:00:00 2001
+From b18dcf9d63f024b01373fc2a083b2695830d71cc Mon Sep 17 00:00:00 2001
 From: "Edward A. James" <eajames@us.ibm.com>
 Date: Wed, 16 Aug 2017 07:58:56 -0500
 Subject: [PATCH] ARM: dts: Aspeed: Witherspoon: Update BMC partitioning
@@ -18,7 +18,7 @@ Signed-off-by: Joel Stanley <joel@jms.id.au>
 
 diff --git a/arch/arm/boot/dts/aspeed-bmc-alt-opp-flash-layout-ubi.dtsi b/arch/arm/boot/dts/aspeed-bmc-alt-opp-flash-layout-ubi.dtsi
 new file mode 100644
-index 000000000000..927759950023
+index 0000000..9277599
 --- /dev/null
 +++ b/arch/arm/boot/dts/aspeed-bmc-alt-opp-flash-layout-ubi.dtsi
 @@ -0,0 +1,18 @@
@@ -42,7 +42,7 @@ index 000000000000..927759950023
 +		};
 diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout-ubi.dtsi b/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout-ubi.dtsi
 new file mode 100644
-index 000000000000..0059ad16d2ba
+index 0000000..0059ad1
 --- /dev/null
 +++ b/arch/arm/boot/dts/aspeed-bmc-opp-flash-layout-ubi.dtsi
 @@ -0,0 +1,18 @@
@@ -65,25 +65,26 @@ index 000000000000..0059ad16d2ba
 +				};
 +		};
 diff --git a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
-index b24ea9967fc8..0b69aa942e18 100644
+index c51e3e8..058b9b7 100644
 --- a/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
 +++ b/arch/arm/boot/dts/aspeed-bmc-opp-witherspoon.dts
-@@ -182,13 +182,14 @@
- 		status = "okay";
+@@ -191,7 +191,7 @@
  		label = "bmc";
  		m25p,fast-read;
+ 		spi-max-frequency = <50000000>;
 -#include "openbmc-flash-layout.dtsi"
 +#include "aspeed-bmc-opp-flash-layout-ubi.dtsi"
  	};
  
  	flash@1 {
- 		status = "okay";
+@@ -199,6 +199,7 @@
  		label = "alt";
  		m25p,fast-read;
+ 		spi-max-frequency = <50000000>;
 +#include "aspeed-bmc-alt-opp-flash-layout-ubi.dtsi"
  	};
  };
  
 -- 
-2.15.1
+1.8.3.1
 
