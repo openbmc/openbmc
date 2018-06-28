@@ -1,0 +1,29 @@
+From 95a5541f8b75f7896ee6e5e71edd61838cab3c8b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 28 Jun 2018 07:16:34 -0700
+Subject: [PATCH] Use getenv instead of secure_getenv on musl
+
+musl doesnt implement secure version
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ src/launch/main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/launch/main.c b/src/launch/main.c
+index 6475ae6..6468d84 100644
+--- a/src/launch/main.c
++++ b/src/launch/main.c
+@@ -30,6 +30,10 @@
+ #include "util/log.h"
+ #include "util/misc.h"
+ 
++#ifndef __GLIBC__
++#define secure_getenv getenv
++#endif
++
+ typedef struct Manager Manager;
+ typedef struct Service Service;
+ 

@@ -1,0 +1,37 @@
+From 99657fcbba288a843dc9e411bdfd3934b2074db5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 28 Jun 2018 07:11:58 -0700
+Subject: [PATCH] Include sys/wait.h for WEXITED definition
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted
+
+ src/launch/main.c       | 1 +
+ test/dbus/util-broker.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/launch/main.c b/src/launch/main.c
+index f335d6b..6475ae6 100644
+--- a/src/launch/main.c
++++ b/src/launch/main.c
+@@ -16,6 +16,7 @@
+ #include <sys/socket.h>
+ #include <sys/types.h>
+ #include <sys/un.h>
++#include <sys/wait.h>
+ #include <systemd/sd-bus.h>
+ #include <systemd/sd-daemon.h>
+ #include <systemd/sd-event.h>
+diff --git a/test/dbus/util-broker.c b/test/dbus/util-broker.c
+index d9367ae..3bd021b 100644
+--- a/test/dbus/util-broker.c
++++ b/test/dbus/util-broker.c
+@@ -11,6 +11,7 @@
+ #include <sys/socket.h>
+ #include <sys/types.h>
+ #include <sys/un.h>
++#include <sys/wait.h>
+ #include <systemd/sd-bus.h>
+ #include <systemd/sd-event.h>
+ #include "dbus/protocol.h"
