@@ -1,7 +1,7 @@
 [Unit]
 Description=Enable the clearing of the Volatile PNOR partitions in host%i
 After=mapper-wait@-org-open_power-control-volatile.service
-Before=obmc-flash-bios-check-clearvolatile.service
+Before=obmc-flash-bios-check-clearvolatile@%i.service
 ConditionPathExists=!/run/openbmc/host@%i-on
 
 [Service]
