@@ -12,7 +12,13 @@ DEPENDS += "systemd"
 
 RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 
-SYSTEMD_SERVICE_${PN} += "lpcsnoop.service"
+SNOOP_DEVICE ?= "aspeed-lpc-snoop0"
+POST_CODE_BYTES ?= "1"
+
+SERVICE_FILE = "lpcsnoop.service"
+SYSTEMD_SERVICE_${PN} += "${SERVICE_FILE}"
+SYSTEMD_SUBSTITUTIONS += "SNOOP_DEVICE:${SNOOP_DEVICE}:${SERVICE_FILE}"
+SYSTEMD_SUBSTITUTIONS += "POST_CODE_BYTES:${POST_CODE_BYTES}:${SERVICE_FILE}"
 
 require ${PN}.inc
 
