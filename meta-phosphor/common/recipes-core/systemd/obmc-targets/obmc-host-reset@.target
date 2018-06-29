@@ -1,6 +1,6 @@
 [Unit]
 Description=Host%i (Reset Check)
-Conflicts=obmc-host-stop%i.target
+Conflicts=obmc-host-stop@%i.target
 RefuseManualStop=yes
 
 [Install]
