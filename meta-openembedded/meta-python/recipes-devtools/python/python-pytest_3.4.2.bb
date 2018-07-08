@@ -6,3 +6,4 @@ RDEPENDS_${PN}_class-target += " \
     ${PYTHON_PN}-compiler \
     ${PYTHON_PN}-funcsigs \
 "
+ALTERNATIVE_PRIORITY = "10"

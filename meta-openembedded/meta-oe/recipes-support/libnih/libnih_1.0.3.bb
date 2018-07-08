@@ -34,5 +34,15 @@ SRC_URI[sha256sum] = "897572df7565c0a90a81532671e23c63f99b4efde2eecbbf11e7857fbc
 inherit autotools
 inherit gettext
 
+do_configure_append () {
+        sed -i -e 's,lib/pkgconfig,${baselib}/pkgconfig,g' ${S}/nih/Makefile.in ${S}/nih-dbus/Makefile.in
+}
+
+FILES_${PN}-dev += "${libdir}/pkgconfig/* \
+        ${includedir}/* \
+        ${libdir}/*.so \
+        ${datadir}/* \
+        "
+
 # target libnih requires native nih-dbus-tool
 BBCLASSEXTEND = "native"

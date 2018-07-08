@@ -1,7 +1,7 @@
 From 17cc5645f3acf943a5a06465d09d0ebcfea987bd Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Wed, 2 Nov 2011 16:54:57 +0100
-Subject: [PATCH] Upstream-status: Unknown
+Subject: [PATCH] Upstream-Status: Pending
 
 ---
  acinclude.m4        | 3 ++-

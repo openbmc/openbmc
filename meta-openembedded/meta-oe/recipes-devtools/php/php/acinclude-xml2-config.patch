@@ -1,4 +1,4 @@
-Upstream-status: Unknown
+Upstream-Status: Pending
 
 diff --git a/acinclude.m4 b/acinclude.m4
 index 4fd452e..206fcbf 100644

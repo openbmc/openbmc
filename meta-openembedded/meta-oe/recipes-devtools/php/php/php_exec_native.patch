@@ -1,7 +1,7 @@
 From d251b5aa3d23803d016ca16818e2e1d2f2b70a02 Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Wed, 2 Nov 2011 16:54:57 +0100
-Subject: [PATCH] Upstream-status: Inappriate
+Subject: [PATCH] Upstream-Status: Inappriate
 
 ---
  sapi/cli/config.m4 | 2 +-

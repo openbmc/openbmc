@@ -4,7 +4,7 @@ Date: Tue, 17 Jun 2014 09:53:00 +0200
 Subject: [PATCH 3/8] acinclude: use pkgconfig for libxml2 config
 
 Signed-off-by: Koen Kooi <koen.kooi@linaro.org>
-Upstream-Status: pending
+Upstream-Status: Pending
 ---
  acinclude.m4 | 63 ++++++++++++++++++++++--------------------------------------
  1 file changed, 23 insertions(+), 40 deletions(-)

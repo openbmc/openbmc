@@ -1,7 +1,7 @@
 From 79725e82d5981fc94eb657f0f46a499dbfc1cc40 Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Wed, 2 Nov 2011 16:54:57 +0100
-Subject: [PATCH] Upstream-status: Unknown
+Subject: [PATCH] Upstream-Status: Pending
 
 %% original patch: php5-pear-makefile.patch
 ---
