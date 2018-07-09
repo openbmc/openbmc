@@ -52,7 +52,6 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-ubipatch.service \
         obmc-flash-bios-ubiremount.service \
         obmc-flash-bios-updatesymlinks.service \
-        obmc-flash-bios-ubiclear@.service \
         obmc-flash-bios-cleanup.service \
         obmc-flash-bios-enable-clearvolatile@.service \
         obmc-flash-bios-check-clearvolatile@.service \
