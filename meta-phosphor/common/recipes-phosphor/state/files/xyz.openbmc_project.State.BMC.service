@@ -1,8 +1,9 @@
 [Unit]
 Description=Phosphor BMC State Manager
-Wants=mapper-wait@-org-openbmc-managers-System.service
-After=mapper-wait@-org-openbmc-managers-System.service
 Before=mapper-wait@-xyz-openbmc_project-state-bmc.service
+Wants=obmc-mapper.target
+After=obmc-mapper.target
+
 
 [Service]
 ExecStart=/usr/bin/env phosphor-bmc-state-manager

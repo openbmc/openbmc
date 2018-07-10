@@ -2,10 +2,10 @@
 Description=Phosphor Host State Manager
 Wants=mapper-wait@-xyz-openbmc_project-control-host0-auto_reboot.service
 After=mapper-wait@-xyz-openbmc_project-control-host0-auto_reboot.service
-Wants=mapper-wait@-org-openbmc-managers-System.service
-After=mapper-wait@-org-openbmc-managers-System.service
 Before=mapper-wait@-xyz-openbmc_project-state-host.service
 After=phosphor-reset-host-running@0.service
+Wants=obmc-mapper.target
+After=obmc-mapper.target
 
 [Service]
 ExecStart=/usr/bin/env phosphor-host-state-manager
