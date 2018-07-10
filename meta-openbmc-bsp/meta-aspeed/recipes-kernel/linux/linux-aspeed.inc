@@ -8,8 +8,10 @@ KCONFIG_MODE="--alldefconfig"
 
 KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
-SRC_URI_append_ast2400 = " file://ast2400/defconfig"
-SRC_URI_append_ast2500 = " file://ast2500/defconfig"
+SRC_URI += " file://defconfig"
+
+FILESEXTRAPATHS_prepend_ast2400 := "${THISDIR}/ast2400:"
+FILESEXTRAPATHS_prepend_ast2500 := "${THISDIR}/ast2500:"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
