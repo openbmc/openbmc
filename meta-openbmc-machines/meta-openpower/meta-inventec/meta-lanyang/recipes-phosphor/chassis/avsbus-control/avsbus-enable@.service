@@ -1,0 +1,16 @@
+[Unit]
+Description=Enable AVSBus on VRMs
+Wants=obmc-host-start-pre@%i.target
+Before=obmc-host-start-pre@%i.target
+Conflicts=obmc-host-stop@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
+
+[Service]
+ExecStart=/usr/bin/env lanyang_avsbus.sh vdn_max
+ExecStart=/usr/bin/env lanyang_avsbus.sh enable
+SyslogIdentifier=lanyang_avsbus.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=obmc-chassis-poweron@%i.target

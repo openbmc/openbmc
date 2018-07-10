@@ -1,0 +1,15 @@
+[Unit]
+Description=Disable AVSBus on VRMs
+Wants=obmc-power-stop-pre@%i.target
+Before=obmc-power-stop-pre@%i.target
+Conflicts=obmc-host-startmin@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
+
+[Service]
+ExecStart=/usr/bin/env lanyang_avsbus.sh disable
+SyslogIdentifier=lanyang_avsbus.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-host-stop@%i.target
