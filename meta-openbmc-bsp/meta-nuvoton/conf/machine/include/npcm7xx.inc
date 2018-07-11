@@ -2,13 +2,11 @@
 #@NAME: Nuvoton NPCM7XX
 #@DESCRIPTION: Common machine configuration for Nuvoton NPCM7XX Chip
 
-PREFERRED_PROVIDER_virtual/kernel ?= "linux-nuvoton"
+require conf/machine/include/nuvoton.inc
+
 KERNEL_IMAGETYPE ?= "uImage"
 KERNEL_EXTRA_ARGS ?= "UIMAGE_LOADADDR=0x00008000"
 
-PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-nuvoton"
-PREFERRED_PROVIDER_u-boot ?= "u-boot-nuvoton"
-PREFERRED_PROVIDER_u-boot-fw-utils ?= "u-boot-fw-utils-nuvoton"
 UBOOT_MACHINE ?= "PolegSVB_config"
 UBOOT_ENTRYPOINT ?= "0x00008000"
 UBOOT_LOADADDRESS ?= "0x00008000"
