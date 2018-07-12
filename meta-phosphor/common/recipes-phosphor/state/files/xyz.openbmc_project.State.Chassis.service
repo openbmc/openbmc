@@ -3,7 +3,7 @@ Description=Phosphor Chassis State Manager
 Before=mapper-wait@-xyz-openbmc_project-state-chassis.service
 Wants=obmc-mapper.target
 After=obmc-mapper.target
-
+After=org.openbmc.control.Power@0.service
 
 [Service]
 ExecStart=/usr/bin/env phosphor-chassis-state-manager
