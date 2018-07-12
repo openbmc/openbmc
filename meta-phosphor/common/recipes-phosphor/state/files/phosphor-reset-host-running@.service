@@ -6,7 +6,6 @@ ConditionPathExists=/run/openbmc/host@%i-on
 
 [Service]
 RemainAfterExit=no
-# TODO: openbmc/openbmc#1205 - target name refactor
 ExecStart=/bin/systemctl start obmc-host-start@%i.target
 
 
