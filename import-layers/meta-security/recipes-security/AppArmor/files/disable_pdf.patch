@@ -1,0 +1,33 @@
+Index: apparmor-2.10.95/parser/Makefile
+===================================================================
+--- apparmor-2.10.95.orig/parser/Makefile
++++ apparmor-2.10.95/parser/Makefile
+@@ -139,17 +139,6 @@ export Q VERBOSE BUILD_OUTPUT
+ po/${NAME}.pot: ${SRCS} ${HDRS}
+ 	$(MAKE) -C po ${NAME}.pot NAME=${NAME} SOURCES="${SRCS} ${HDRS}"
+ 
+-techdoc.pdf: techdoc.tex
+-	timestamp=$(shell date --utc "+%Y%m%d%H%M%S%z" -r $< );\
+-	while pdflatex "\def\fixedpdfdate{$$timestamp}\input $<" ${BUILD_OUTPUT} || exit 1 ; \
+-		grep -q "Label(s) may have changed" techdoc.log; \
+-	do :; done
+-
+-techdoc/index.html: techdoc.pdf
+-	latex2html -show_section_numbers -split 0 -noinfo -nonavigation -noaddress techdoc.tex ${BUILD_OUTPUT}
+-
+-techdoc.txt: techdoc/index.html
+-	w3m -dump $< > $@
+ 
+ # targets arranged this way so that people who don't want full docs can
+ # pick specific targets they want.
+@@ -159,9 +148,7 @@ manpages:	$(MANPAGES)
+ 
+ htmlmanpages:	$(HTMLMANPAGES)
+ 
+-pdf:	techdoc.pdf
+-
+-docs:	manpages htmlmanpages pdf
++docs:	manpages htmlmanpages 
+ 
+ indep: docs
+ 	$(Q)$(MAKE) -C po all

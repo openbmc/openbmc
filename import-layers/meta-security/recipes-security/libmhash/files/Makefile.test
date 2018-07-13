@@ -1,0 +1,13 @@
+#
+# Makefile for compiling mhash tests
+#
+
+ALL = mhash
+
+all: $(ALL)
+
+mhash: mhash.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o mhash mhash.c -lmhash
+
+clean:
+	rm -f *.debug $(ALL)

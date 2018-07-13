@@ -1,0 +1,22 @@
+Upstream Status: pending
+
+Don't use inline with gcc 5.0
+
+fixes:
+undefined reference to `libuna_unicode_character_size_to_utf8'
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: libuna/libuna_inline.h
+===================================================================
+--- a/libuna/libuna_inline.h
++++ b/libuna/libuna_inline.h
+@@ -27,7 +27,7 @@
+ #if defined( _MSC_VER )
+ #define LIBUNA_INLINE _inline
+ 
+-#elif defined( __BORLANDC__ ) || defined( __clang__ )
++#elif defined( __BORLANDC__ ) || defined( __clang__ ) || ( __GNUC__ > 4 )
+ #define LIBUNA_INLINE /* inline */
+ 
+ #else

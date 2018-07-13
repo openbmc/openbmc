@@ -1,0 +1,68 @@
+isic: add missing header file
+
+Backport:
+http://pkgs.fedoraproject.org/cgit/isic.git/tree/isic-0.07-netinet.patch
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: isic-0.07/multisic.c
+===================================================================
+--- isic-0.07.orig/multisic.c
++++ isic-0.07/multisic.c
+@@ -1,5 +1,8 @@
+ #include "isic.h"
+ 
++#include <netinet/udp.h>
++/*#include <netinet/tcp.h>*/
++
+ /* This is tuned for ethernet sized frames (1500 bytes)
+  * For user over a modem or frame (or other) you will have to change the
+  * 'rand() & 0x4ff' line below.  The 0x4ff needs to be less than the size of
+Index: isic-0.07/tcpsic.c
+===================================================================
+--- isic-0.07.orig/tcpsic.c
++++ isic-0.07/tcpsic.c
+@@ -1,5 +1,7 @@
+ #include "isic.h"
+ 
++#include <netinet/tcp.h>
++
+ /* This is tuned for ethernet sized frames (1500 bytes)
+  * For user over a modem or frame (or other) you will have to change the
+  * 'rand() & 0x4ff' line below.  The 0x4ff needs to be less than the size of
+Index: isic-0.07/tcpsic6.c
+===================================================================
+--- isic-0.07.orig/tcpsic6.c
++++ isic-0.07/tcpsic6.c
+@@ -1,5 +1,7 @@
+ #include "isic.h"
+ 
++#include <netinet/tcp.h>
++
+ /* This is tuned for ethernet sized frames (1500 bytes)
+  * For user over a modem or frame (or other) you will have to change the
+  * 'rand() & 0x4ff' line below.  The 0x4ff needs to be less than the size of
+Index: isic-0.07/udpsic.c
+===================================================================
+--- isic-0.07.orig/udpsic.c
++++ isic-0.07/udpsic.c
+@@ -1,5 +1,7 @@
+ #include "isic.h"
+ 
++#include <netinet/udp.h>
++
+ /* This is tuned for ethernet sized frames (1500 bytes)
+  * For user over a modem or frame (or other) you will have to change the
+  * 'rand() & 0x4ff' line below.  The 0x4ff needs to be less than the size of
+Index: isic-0.07/udpsic6.c
+===================================================================
+--- isic-0.07.orig/udpsic6.c
++++ isic-0.07/udpsic6.c
+@@ -1,5 +1,7 @@
+ #include "isic.h"
+ 
++#include <netinet/udp.h>
++
+ /* This is tuned for ethernet sized frames (1500 bytes)
+  * For user over a modem or frame (or other) you will have to change the
+  * 'rand() & 0x4ff' line below.  The 0x4ff needs to be less than the size of

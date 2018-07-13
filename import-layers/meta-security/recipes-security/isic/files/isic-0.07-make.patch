@@ -1,0 +1,23 @@
+isic: Fixup makefile to support destination
+
+Backport:
+http://pkgs.fedoraproject.org/cgit/isic.git/tree/isic-0.07-make.patch
+
+Signed-off-by: Armin Kuster <akuser808@gmail.com>
+
+Index: isic-0.07/Makefile.in
+===================================================================
+--- isic-0.07.orig/Makefile.in
++++ isic-0.07/Makefile.in
+@@ -63,7 +63,7 @@ package: distclean
+ 	  tar -czvf isic-$(VERSION).tgz ./isic-$(VERSION)/* )
+ 
+ install: $(BINS) $(MAN)
+-	$(INSTALL) -m 0755 -d $(PREFIX)/bin
+-	$(INSTALL) -m 0755 -c $(BINS) $(PREFIX)/bin
+-	$(INSTALL) -m 0755 -d $(PREFIX)/man/man1
+-	${INSTALL} -m 0755 -c $(MAN) $(PREFIX)/man/man1
++	$(INSTALL) -m 0755 -d $(DESTDIR)$(PREFIX)/bin
++	$(INSTALL) -m 0755 -c $(BINS) $(DESTDIR)$(PREFIX)/bin
++	$(INSTALL) -m 0755 -d $(DESTDIR)$(PREFIX)/share/man/man1
++	${INSTALL} -m 0755 -c $(MAN) $(DESTDIR)$(PREFIX)/share/man/man1

@@ -1,0 +1,27 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/bin/bastille
+===================================================================
+--- Bastille.orig/bin/bastille
++++ Bastille/bin/bastille
+@@ -162,11 +162,12 @@ fi
+ # We check that the version is at least the minimum
+ 
+ PERL_VERSION=`${CURRENT_PERL_PATH}/perl -version |
+-                head -2 |            # the second line contains the version
++                head -n 2 |            # the second line contains the version
+                 tr " "  "\n" |       # split words into separate lines
+-                sed -e "s/^v//" |    # to get rid of the v in v5.6.0
+-                grep "^[1-9]\." |    # find a "word" that starts with number dot
+-                sed -e "s/_/./"`     # substitute _patchlevel with .patchlevel
++                grep "^(v" |         # find a "word" that starts with '(v'
++                sed -e "s/^(v//" -e "s/)//" -e "s/_/./"`
++                                     # to get rid of the (v in v5.6.0
++                                     # substitute _patchlevel with .patchlevel
+                                      #   (used in 5.005_03 and prior)
+ 
+ # everything before the first .

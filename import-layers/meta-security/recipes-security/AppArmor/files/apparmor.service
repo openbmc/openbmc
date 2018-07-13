@@ -1,0 +1,22 @@
+[Unit]
+Description=AppArmor initialization
+After=local-fs.target
+Before=sysinit.target
+AssertPathIsReadWrite=/sys/kernel/security/apparmor/.load
+ConditionSecurity=apparmor
+DefaultDependencies=no
+Documentation=man:apparmor(7)
+Documentation=http://wiki.apparmor.net/
+
+# Don't start this unit on the Ubuntu Live CD
+ConditionPathExists=!/rofs/etc/apparmor.d
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/etc/init.d/apparmor start
+ExecStop=/etc/init.d/apparmor stop
+ExecReload=/etc/init.d/apparmor reload
+
+[Install]
+WantedBy=sysinit.target

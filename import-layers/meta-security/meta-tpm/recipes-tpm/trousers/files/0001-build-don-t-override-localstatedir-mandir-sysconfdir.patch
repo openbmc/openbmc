@@ -1,0 +1,68 @@
+From 3396fc7a184293c23135161f034802062f7f3816 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <adraszik@tycoint.com>
+Date: Wed, 1 Nov 2017 11:41:48 +0000
+Subject: [PATCH] build: don't override --localstatedir --mandir --sysconfdir
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It is currently impossible to override localstatedir,
+mandir and sysconfdir during ./configure, because they
+are being overriden unconditionally because of they
+way trousers is built using rpmbuild.
+
+If they need massaging for rpmbuild, the values should
+be specified inside the spec file, not in ./configure
+and thereby overriding user-requested values.
+
+With this patch it is now possible to set above
+locations as needed. The .spec file is being modified
+as well so as to restore previous behaviour.
+
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+---
+Upstream-Status: Submitted [https://sourceforge.net/p/trousers/mailman/message/36099290/]
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+ configure.ac          | 11 ++---------
+ dist/trousers.spec.in |  2 +-
+ 2 files changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b9626af..7fe5f8e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -376,16 +376,9 @@ CFLAGS="$CFLAGS -I../include \
+ KERNEL_VERSION=`uname -r`
+ AC_SUBST(CFLAGS)
+ 
+-# When we build the rpms, prefix will be /usr. This'll do some things that make sense,
+-# like put our sbin stuff in /usr/sbin and our library in /usr/lib. It'll do some other
+-# things that don't make sense like put our config file in /usr/etc. So, I'll just hack
+-# it here. If the --prefix option isn't specified during configure, let it all go to
++# If the --prefix option isn't specified during configure, let it all go to
+ # /usr/local, even /usr/local/etc. :-P
+-if test x"${prefix}" = x"/usr"; then
+-	sysconfdir="/etc"
+-	localstatedir="/var"
+-	mandir="/usr/share/man"
+-elif test x"${prefix}" = x"NONE"; then
++if test x"${prefix}" = x"NONE"; then
+ 	localstatedir="/usr/local/var"
+ fi
+ 
+diff --git a/dist/trousers.spec.in b/dist/trousers.spec.in
+index b298b0e..10ef178 100644
+--- a/dist/trousers.spec.in
++++ b/dist/trousers.spec.in
+@@ -45,7 +45,7 @@ applications.
+ 
+ %build
+ %{?arch64:export PKG_CONFIG_PATH=%{pkgconfig_path}:$PKG_CONFIG_PATH}
+-./configure --prefix=/usr --libdir=%{_libdir}
++./configure --prefix=/usr --libdir=%{_libdir} --sysconfdir=/etc --localstatedir=/var --mandir=/usr/share/man
+ make
+ 
+ %clean
+-- 
+2.15.0.rc1
+

@@ -1,0 +1,4 @@
+#! /bin/sh
+cd testsuite
+
+make -C  tests/regression/apparmor tests

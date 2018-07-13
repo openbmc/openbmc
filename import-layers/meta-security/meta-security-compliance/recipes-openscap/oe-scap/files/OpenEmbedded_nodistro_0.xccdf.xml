@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xccdf:Benchmark xmlns:xccdf="http://checklists.nist.gov/xccdf/1.1" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" id="generated-xccdf" resolved="1">
+  <xccdf:status>incomplete</xccdf:status>
+  <xccdf:title>Automatically generated XCCDF from OVAL file: OpenEmbedded_nodistro_0.xml</xccdf:title>
+  <xccdf:description>This file has been generated automatically from oval definitions file.</xccdf:description>
+  <xccdf:version time="2017-06-07T04:05:05">None, generated from OVAL file.</xccdf:version>
+  <xccdf:Rule selected="true" id="oval-com.redhat.rhsa-def-20171365">
+    <xccdf:title>CPE-2017:1365: nss security and bug fix update (Important)</xccdf:title>
+    <xccdf:ident system="http://cve.mitre.org">CVE-2017-7502</xccdf:ident>
+    <xccdf:check system="http://oval.mitre.org/XMLSchema/oval-definitions-5">
+      <xccdf:check-content-ref href="OpenEmbedded_nodistro_0.xml" name="oval:com.redhat.rhsa:def:20171365"/>
+    </xccdf:check>
+  </xccdf:Rule>
+</xccdf:Benchmark>

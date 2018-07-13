@@ -1,0 +1,244 @@
+Index: tpm-tools-1.3.8/include/tpm_tspi.h
+===================================================================
+--- tpm-tools-1.3.8.orig/include/tpm_tspi.h	2011-08-17 08:20:35.000000000 -0400
++++ tpm-tools-1.3.8/include/tpm_tspi.h	2013-01-05 23:26:31.571598217 -0500
+@@ -117,6 +117,10 @@
+ 			UINT32 *a_PcrSize, BYTE **a_PcrValue);
+ TSS_RESULT pcrcompositeSetPcrValue(TSS_HPCRS a_hPcrs, UINT32 a_Idx,
+ 					UINT32 a_PcrSize, BYTE *a_PcrValue);
++TSS_RESULT tpmPcrExtend(TSS_HTPM a_hTpm, UINT32 a_Idx,
++			UINT32 a_DataSize, BYTE *a_Data,
++			TSS_PCR_EVENT *a_Event,
++			UINT32 *a_PcrSize, BYTE **a_PcrValue);
+ #ifdef TSS_LIB_IS_12
+ TSS_RESULT unloadVersionInfo(UINT64 *offset, BYTE *blob, TPM_CAP_VERSION_INFO *v);
+ TSS_RESULT pcrcompositeSetPcrLocality(TSS_HPCRS a_hPcrs, UINT32 localityValue);
+Index: tpm-tools-1.3.8/lib/tpm_tspi.c
+===================================================================
+--- tpm-tools-1.3.8.orig/lib/tpm_tspi.c	2011-08-17 08:20:35.000000000 -0400
++++ tpm-tools-1.3.8/lib/tpm_tspi.c	2013-01-05 23:27:37.731593490 -0500
+@@ -594,6 +594,20 @@
+ 	return result;
+ }
+ 
++TSS_RESULT
++tpmPcrExtend(TSS_HTPM a_hTpm, UINT32 a_Idx,
++		UINT32 a_DataSize, BYTE *a_Data,
++		TSS_PCR_EVENT *a_Event,
++		UINT32 *a_PcrSize, BYTE **a_PcrValue)
++{
++	TSS_RESULT result =
++		Tspi_TPM_PcrExtend(a_hTpm, a_Idx, a_DataSize, a_Data, a_Event,
++				   a_PcrSize, a_PcrValue);
++	tspiResult("Tspi_TPM_PcrExtend", result);
++
++	return result;
++}
++
+ #ifdef TSS_LIB_IS_12
+ /*
+  * These getPasswd functions will wrap calls to the other functions and check to see if the TSS
+Index: tpm-tools-1.3.8/src/cmds/Makefile.am
+===================================================================
+--- tpm-tools-1.3.8.orig/src/cmds/Makefile.am	2011-08-15 13:52:08.000000000 -0400
++++ tpm-tools-1.3.8/src/cmds/Makefile.am	2013-01-05 23:30:46.223593698 -0500
+@@ -22,6 +22,7 @@
+ #
+ 
+ bin_PROGRAMS 	=	tpm_sealdata \
++			tpm_extendpcr \
+ 			tpm_unsealdata
+ 
+ if TSS_LIB_IS_12
+@@ -33,4 +34,5 @@
+ LDADD		=	$(top_builddir)/lib/libtpm_tspi.la -ltspi $(top_builddir)/lib/libtpm_unseal.la -ltpm_unseal -lcrypto
+ 
+ tpm_sealdata_SOURCES = tpm_sealdata.c
++tpm_extendpcr_SOURCES = tpm_extendpcr.c
+ tpm_unsealdata_SOURCES = tpm_unsealdata.c
+Index: tpm-tools-1.3.8/src/cmds/tpm_extendpcr.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ tpm-tools-1.3.8/src/cmds/tpm_extendpcr.c	2013-01-05 23:37:43.403585514 -0500
+@@ -0,0 +1,181 @@
++/*
++ * The Initial Developer of the Original Code is International
++ * Business Machines Corporation. Portions created by IBM
++ * Corporation are Copyright (C) 2005, 2006 International Business
++ * Machines Corporation. All Rights Reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the Common Public License as published by
++ * IBM Corporation; either version 1 of the License, or (at your option)
++ * any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * Common Public License for more details.
++ *
++ * You should have received a copy of the Common Public License
++ * along with this program; if not, a copy can be viewed at
++ * http://www.opensource.org/licenses/cpl1.0.php.
++ */
++#include <openssl/evp.h>
++#include <openssl/sha.h>
++#include <limits.h>
++#include "tpm_tspi.h"
++#include "tpm_utils.h"
++#include "tpm_seal.h"
++
++// #define TPM_EXTENDPCR_DEBUG
++
++static void help(const char *aCmd)
++{
++	logCmdHelp(aCmd);
++	logCmdOption("-i, --infile FILE",
++		     _
++		     ("Filename containing data to extend PCRs with. Default is STDIN."));
++	logCmdOption("-p, --pcr NUMBER",
++		     _("PCR to extend."));
++
++}
++
++static char in_filename[PATH_MAX] = "";
++static TSS_HPCRS hPcrs = NULL_HPCRS;
++static TSS_HTPM hTpm;
++static UINT32 selectedPcrs[24];
++static UINT32 selectedPcrsLen = 0;
++TSS_HCONTEXT hContext = 0;
++
++static int parse(const int aOpt, const char *aArg)
++{
++	int rc = -1;
++
++	switch (aOpt) {
++	case 'i':
++		if (aArg) {
++			strncpy(in_filename, aArg, PATH_MAX);
++			rc = 0;
++		}
++		break;
++	case 'p':
++		if (aArg) {
++			selectedPcrs[selectedPcrsLen++] = atoi(aArg);
++			rc = 0;
++		}
++		break;
++	default:
++		break;
++	}
++	return rc;
++
++}
++
++int main(int argc, char **argv)
++{
++
++	int iRc = -1;
++	struct option opts[] = {
++		{"infile", required_argument, NULL, 'i'},
++		{"pcr", required_argument, NULL, 'p'},
++	};
++	unsigned char line[EVP_MD_block_size(EVP_sha1()) * 16];
++	int lineLen;
++	UINT32 i;
++
++	BIO *bin = NULL;
++
++	initIntlSys();
++
++	if (genericOptHandler(argc, argv, "i:p:", opts,
++			      sizeof(opts) / sizeof(struct option), parse,
++			      help) != 0)
++		goto out;
++
++	if (contextCreate(&hContext) != TSS_SUCCESS)
++		goto out;
++
++	if (contextConnect(hContext) != TSS_SUCCESS)
++		goto out_close;
++
++	if (contextGetTpm(hContext, &hTpm) != TSS_SUCCESS)
++		goto out_close;
++
++	/* Create a BIO for the input file */
++	if ((bin = BIO_new(BIO_s_file())) == NULL) {
++		logError(_("Unable to open input BIO\n"));
++		goto out_close;
++	}
++
++	/* Assign the input file to the BIO */
++	if (strlen(in_filename) == 0) 
++		BIO_set_fp(bin, stdin, BIO_NOCLOSE);
++	else if (!BIO_read_filename(bin, in_filename)) {
++		logError(_("Unable to open input file: %s\n"),
++			 in_filename);
++		goto out_close;
++	}
++
++	/* Create the PCRs object. If any PCRs above 15 are selected, this will need to be
++	 * a 1.2 TSS/TPM */
++	if (selectedPcrsLen) {
++		TSS_FLAG initFlag = 0;
++		UINT32 pcrSize;
++		BYTE *pcrValue;
++
++		for (i = 0; i < selectedPcrsLen; i++) {
++			if (selectedPcrs[i] > 15) {
++#ifdef TSS_LIB_IS_12
++				initFlag |= TSS_PCRS_STRUCT_INFO_LONG;
++#else
++				logError(_("This version of %s was compiled for a v1.1 TSS, which "
++					 "can only seal\n data to PCRs 0-15. PCR %u is out of range"
++					 "\n"), argv[0], selectedPcrs[i]);
++				goto out_close;
++#endif
++			}
++		}
++
++		unsigned char msg[EVP_MAX_MD_SIZE];
++		unsigned int msglen;
++		EVP_MD_CTX ctx;
++		EVP_DigestInit(&ctx, EVP_sha1());
++		while ((lineLen = BIO_read(bin, line, sizeof(line))) > 0)
++			EVP_DigestUpdate(&ctx, line, lineLen);
++		EVP_DigestFinal(&ctx, msg, &msglen);
++
++		if (contextCreateObject(hContext, TSS_OBJECT_TYPE_PCRS, initFlag,
++					&hPcrs) != TSS_SUCCESS)
++			goto out_close;
++
++		for (i = 0; i < selectedPcrsLen; i++) {
++#ifdef TPM_EXTENDPCR_DEBUG
++			if (tpmPcrRead(hTpm, selectedPcrs[i], &pcrSize, &pcrValue) != TSS_SUCCESS)
++				goto out_close;
++
++			unsigned int j;
++			for (j = 0; j < pcrSize; j++)
++			  printf("%02X ", pcrValue[j]);
++			printf("\n");
++#endif
++			
++			if (tpmPcrExtend(hTpm, selectedPcrs[i], msglen, msg, NULL, &pcrSize, &pcrValue) != TSS_SUCCESS)
++			  goto out_close;
++
++#ifdef TPM_EXTENDPCR_DEBUG
++			for (j = 0; j < pcrSize; j++)
++			  printf("%02X ", pcrValue[j]);
++			printf("\n");
++#endif
++		}
++	}
++
++	iRc = 0;
++	logSuccess(argv[0]);
++
++out_close:
++	contextClose(hContext);
++
++out:
++	if (bin)
++		BIO_free(bin);
++	return iRc;
++}

@@ -1,0 +1,122 @@
+#!/bin/bash
+# chkconfig: 2345 99 10
+# description: File Integrity Checking Daemon
+#
+# processname: samhain
+# config  : /etc/samhainrc
+# logfile : /var/log/samhain_log
+# database: /var/lib/samhain/samhain_file
+#
+
+NAME=samhain
+DAEMON=/usr/sbin/samhain
+RETVAL=0
+PIDFILE=/var/run/samhain.pid
+
+. /etc/default/rcS
+
+. /etc/default/samhain-client
+
+if [ "x$SAMHAIN_CLIENT_START" != "xyes" ]; then
+	echo "${0}: client disabled in /etc/default/samhain-client"
+	exit 0
+fi
+
+if [ -x $DAEMON ]; then
+	:
+else
+	echo "${0}: executable ${DAEMON} not found"
+	exit 1
+fi
+
+if [ ! -e /var/lib/samhain/samhain_file ]; then
+	echo "${0}: /var/lib/samhain/samhain_file does not exist.  You must"
+	echo "  run 'samhain -t init' before samhian-client can start."
+	exit 1
+fi
+
+samhain_done()
+{
+	if [ $RETVAL -eq 0 ]; then
+		echo "."
+	else
+		echo " failed."
+	fi
+}
+
+log_stat_msg () {
+case "$1" in
+	0)
+	echo "Service $NAME: Running";
+	;;
+	1)
+	echo "Service $NAME: Stopped and /var/run pid file exists";
+	;;
+	3)
+	echo "Service $NAME: Stopped";
+	;;
+	*)
+	echo "Service $NAME: Status unknown";
+	;;
+esac
+}
+
+case "$1" in
+  start)
+	#
+	# Remove a stale PID file, if found
+	#
+	if test -f ${PIDFILE}; then
+	    /bin/rm -f ${PIDFILE}
+	fi
+	#
+        echo -n "Starting ${NAME}"
+        start-stop-daemon --start --quiet --exec $DAEMON
+	RETVAL=$?
+	samhain_done
+	;;
+
+  stop)
+        echo -n "Stopping $NAME"
+        start-stop-daemon --stop --quiet --exec $DAEMON
+	RETVAL=$? 
+
+	#
+	# Remove a stale PID file, if found
+	#
+	if test -f ${PIDFILE}; then
+	    /bin/rm -f ${PIDFILE}
+	fi
+        if test -S /var/run/${NAME}.sock; then
+            /bin/rm -f /var/run/${NAME}.sock
+        fi
+	samhain_done
+	;;
+
+  restart)
+	$0 stop
+	sleep 3
+	$0 start
+	RETVAL=$?
+	;;
+
+  reload|force-reload)
+        echo -n "Reloading $NAME configuration files"
+        start-stop-daemon --stop --signal 1 --quiet --exec $DAEMON
+	RETVAL=$?
+	samhain_done
+	;;
+
+  status)
+	$DAEMON status
+	RETVAL=$?
+	log_stat_msg ${RETVAL}
+	;;
+
+  *)
+	echo "$0 usage: {start|stop|status|restart|reload}"
+	exit 1
+	;;
+esac
+
+exit $RETVAL

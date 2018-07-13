@@ -1,0 +1,99 @@
+commit 16dac0cb7b73b8a7088300e45b98ac20819b03ed
+Author: Junxian.Xiao <Junxian.Xiao@windriver.com>
+Date:   Wed Jun 19 18:57:13 2013 +0800
+
+support well-known password in openssl-tpm-engine.
+
+Add "-z" option to select well known password in create_tpm_key tool.
+
+Signed-off-by: Junxian.Xiao <Junxian.Xiao@windriver.com>
+
+diff --git a/create_tpm_key.c b/create_tpm_key.c
+index fee917f..7b94d62 100644
+--- a/create_tpm_key.c
++++ b/create_tpm_key.c
+@@ -46,6 +46,8 @@
+ #include <trousers/tss.h>
+ #include <trousers/trousers.h>
+ 
++#define TPM_WELL_KNOWN_KEY_LEN 20   /*well know key length is 20 bytes zero*/
++
+ #define print_error(a,b) \
+ 	fprintf(stderr, "%s:%d %s result: 0x%x (%s)\n", __FILE__, __LINE__, \
+ 		a, b, Trspi_Error_String(b))
+@@ -70,6 +72,7 @@ usage(char *argv0)
+ 		"\t\t-e|--enc-scheme  encryption scheme to use [PKCSV15] or OAEP\n"
+ 		"\t\t-q|--sig-scheme  signature scheme to use [DER] or SHA1\n"
+ 		"\t\t-s|--key-size    key size in bits [2048]\n"
++		"\t\t-z|--zerokey     use well known 20 bytes zero as SRK password.\n"
+ 		"\t\t-a|--auth        require a password for the key [NO]\n"
+ 		"\t\t-p|--popup       use TSS GUI popup dialogs to get the password "
+ 		"for the\n\t\t\t\t key [NO] (implies --auth)\n"
+@@ -147,6 +150,7 @@ int main(int argc, char **argv)
+ 	int		asn1_len;
+ 	char		*filename, c, *openssl_key = NULL;
+ 	int		option_index, auth = 0, popup = 0, wrap = 0;
++	int		wellknownkey = 0;
+ 	UINT32		enc_scheme = TSS_ES_RSAESPKCSV15;
+ 	UINT32		sig_scheme = TSS_SS_RSASSAPKCS1V15_DER;
+ 	UINT32		key_size = 2048;
+@@ -154,12 +158,15 @@ int main(int argc, char **argv)
+ 
+ 	while (1) {
+ 		option_index = 0;
+-		c = getopt_long(argc, argv, "pe:q:s:ahw:",
++		c = getopt_long(argc, argv, "pe:q:s:zahw:",
+ 				long_options, &option_index);
+ 		if (c == -1)
+ 			break;
+ 
+ 		switch (c) {
++			case 'z':
++				wellknownkey = 1;
++				break;
+ 			case 'a':
+ 				initFlags |= TSS_KEY_AUTHORIZATION;
+ 				auth = 1;
+@@ -293,6 +300,8 @@ int main(int argc, char **argv)
+ 
+ 	if (srk_authusage) {
+ 		char *authdata = calloc(1, 128);
++		TSS_FLAG secretMode = TSS_SECRET_MODE_PLAIN;
++		int authlen = 0;
+ 
+ 		if (!authdata) {
+ 			fprintf(stderr, "malloc failed.\n");
+@@ -309,17 +318,26 @@ int main(int argc, char **argv)
+ 			exit(result);
+ 		}
+ 
+-		if (EVP_read_pw_string(authdata, 128, "SRK Password: ", 0)) {
+-			Tspi_Context_CloseObject(hContext, hKey);
+-			Tspi_Context_Close(hContext);
+-			free(authdata);
+-			exit(result);
++		if (wellknownkey) {
++			memset(authdata, 0, TPM_WELL_KNOWN_KEY_LEN);
++			secretMode = TSS_SECRET_MODE_SHA1;
++			authlen = TPM_WELL_KNOWN_KEY_LEN;
++		}
++		else {
++			if (EVP_read_pw_string(authdata, 128, "SRK Password: ", 0)) {
++				Tspi_Context_CloseObject(hContext, hKey);
++				Tspi_Context_Close(hContext);
++				free(authdata);
++				exit(result);
++			}
++			secretMode = TSS_SECRET_MODE_PLAIN;
++			authlen = strlen(authdata);
+ 		}
+ 
+ 		//Set Secret
+ 		if ((result = Tspi_Policy_SetSecret(srkUsagePolicy,
+-						    TSS_SECRET_MODE_PLAIN,
+-						    strlen(authdata),
++						    secretMode,
++						    authlen,
+ 						    (BYTE *)authdata))) {
+ 			print_error("Tspi_Policy_SetSecret", result);
+ 			free(authdata);

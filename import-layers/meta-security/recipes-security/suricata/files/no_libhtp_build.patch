@@ -1,0 +1,38 @@
+Upstream-Status: Inappropriate [configuration]
+
+Signed-of_by: Armin Kuster <akuster808@gmail.com>
+
+Index: suricata-2.0.5/Makefile.am
+===================================================================
+--- suricata-2.0.5.orig/Makefile.am
++++ suricata-2.0.5/Makefile.am
+@@ -5,7 +5,7 @@ ACLOCAL_AMFLAGS = -I m4
+ EXTRA_DIST = ChangeLog COPYING LICENSE suricata.yaml.in \
+              classification.config threshold.config \
+              reference.config
+-SUBDIRS = $(HTP_DIR) src qa rules doc contrib scripts
++SUBDIRS = src qa rules doc contrib scripts
+ 
+ CLEANFILES = stamp-h[0-9]*
+ 
+Index: suricata-2.0.5/Makefile.in
+===================================================================
+--- suricata-2.0.5.orig/Makefile.in
++++ suricata-2.0.5/Makefile.in
+@@ -229,7 +229,6 @@ HAVE_PCAP_CONFIG = @HAVE_PCAP_CONFIG@
+ HAVE_PKG_CONFIG = @HAVE_PKG_CONFIG@
+ HAVE_PYTHON_CONFIG = @HAVE_PYTHON_CONFIG@
+ HAVE_WGET = @HAVE_WGET@
+-HTP_DIR = @HTP_DIR@
+ HTP_LDADD = @HTP_LDADD@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+@@ -369,7 +368,7 @@ EXTRA_DIST = ChangeLog COPYING LICENSE s
+              classification.config threshold.config \
+              reference.config
+ 
+-SUBDIRS = $(HTP_DIR) src qa rules doc contrib scripts
++SUBDIRS = src qa rules doc contrib scripts
+ CLEANFILES = stamp-h[0-9]*
+ all: config.h
+ 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

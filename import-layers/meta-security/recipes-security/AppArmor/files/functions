@@ -1,0 +1,271 @@
+# /lib/apparmor/functions for Debian -*- shell-script -*-
+# ----------------------------------------------------------------------
+#    Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
+#     NOVELL (All rights reserved)
+#    Copyright (c) 2008-2010 Canonical, Ltd.
+#
+#    This program is free software; you can redistribute it and/or
+#    modify it under the terms of version 2 of the GNU General Public
+#    License published by the Free Software Foundation.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, contact Novell, Inc.
+# ----------------------------------------------------------------------
+# Authors:
+#  Kees Cook <kees@ubuntu.com>
+
+PROFILES="/etc/apparmor.d"
+PROFILES_CACHE="$PROFILES/cache"
+PROFILES_VAR="/var/lib/apparmor/profiles"
+PROFILES_SNAPPY="/var/lib/snapd/apparmor/profiles"
+PROFILES_CACHE_VAR="/var/cache/apparmor"
+PARSER="/sbin/apparmor_parser"
+SECURITYFS="/sys/kernel/security"
+export AA_SFS="$SECURITYFS/apparmor"
+
+# Suppress warnings when booting in quiet mode
+quiet_arg=""
+[ "${QUIET:-no}" = yes ] && quiet_arg="-q"
+[ "${quiet:-n}" = y ] && quiet_arg="-q"
+
+foreach_configured_profile() {
+	rc_all="0"
+	for pdir in "$PROFILES" "$PROFILES_VAR" "$PROFILES_SNAPPY" ; do
+		if [ ! -d "$pdir" ]; then
+			continue
+		fi
+		num=`find "$pdir" -type f ! -name '*.md5sums' | wc -l`
+		if [ "$num" = "0" ]; then
+			continue
+		fi
+
+		cache_dir="$PROFILES_CACHE"
+		if [ -d "$PROFILES_CACHE_VAR" ] && [ "$pdir" = "$PROFILES_VAR" ] || [ "$pdir" = "$PROFILES_SNAPPY" ]; then
+			cache_dir="$PROFILES_CACHE_VAR"
+		fi
+		cache_args="--cache-loc=$cache_dir"
+		if [ ! -d "$cache_dir" ]; then
+			cache_args=
+		fi
+
+		# LP: #1383858 - expr tree simplification is too slow for
+		# Touch policy on ARM, so disable it for now
+		cache_extra_args=
+		if [ -d "$PROFILES_CACHE_VAR" ] && [ "$pdir" = "$PROFILES_VAR" ] || [ "$pdir" = "$PROFILES_SNAPPY" ]; then
+			cache_extra_args="-O no-expr-simplify"
+		fi
+
+		# If need to compile everything, then use -n1 with xargs to
+		# take advantage of -P. When cache files are in use, omit -n1
+		# since it is considerably faster on moderately sized profile
+		# sets to give the parser all the profiles to load at once
+		n1_args=
+		num=`find "$cache_dir" -type f ! -name '.features' | wc -l`
+		if [ "$num" = "0" ]; then
+			n1_args="-n1"
+		fi
+
+		(ls -1 "$pdir" | egrep -v '(\.dpkg-(new|old|dist|bak)|~)$' | \
+		while read profile; do
+			if [ -f "$pdir"/"$profile" ]; then
+				echo "$pdir"/"$profile"
+			fi
+		done) | \
+		xargs $n1_args -d"\n" -P$(getconf _NPROCESSORS_ONLN) "$PARSER" "$@" $cache_args $cache_extra_args -- || {
+			rc_all="$?"
+			# FIXME: when the parser properly handles broken
+			# profiles (LP: #1377338), remove this if statement.
+			# For now, if the xargs returns with error, just run
+			# through everything with -n1. (This could be broken
+			# out and refactored, but this is temporary so make it
+			# easy to understand and revert)
+			if [ "$rc_all" != "0" ]; then
+				(ls -1 "$pdir" | \
+				egrep -v '(\.dpkg-(new|old|dist|bak)|~)$' | \
+				while read profile; do
+					if [ -f "$pdir"/"$profile" ]; then
+						echo "$pdir"/"$profile"
+					fi
+				done) | \
+				xargs -n1 -d"\n" -P$(getconf _NPROCESSORS_ONLN) "$PARSER" "$@" $cache_args $cache_extra_args -- || {
+					rc_all="$?"
+				}
+			fi
+		}
+	done
+	return $rc_all
+}
+
+load_configured_profiles() {
+	clear_cache_if_outdated
+	foreach_configured_profile $quiet_arg --write-cache --replace
+}
+
+load_configured_profiles_without_caching() {
+	foreach_configured_profile $quiet_arg --replace
+}
+
+recache_profiles() {
+	clear_cache
+	foreach_configured_profile $quiet_arg --write-cache --skip-kernel-load
+}
+
+configured_profile_names() {
+	foreach_configured_profile $quiet_arg -N 2>/dev/null | LC_COLLATE=C sort | grep -v '//'
+}
+
+running_profile_names() {
+	# Output a sorted list of loaded profiles, skipping libvirt's
+	# dynamically generated files
+	cat "$AA_SFS"/profiles | sed -e "s/ (\(enforce\|complain\))$//" | egrep -v '^libvirt-[0-9a-f\-]+$' | LC_COLLATE=C sort | grep -v '//'
+}
+
+unload_profile() {
+	echo -n "$1" > "$AA_SFS"/.remove
+}
+
+clear_cache() {
+	clear_cache_system
+	clear_cache_var
+}
+
+clear_cache_system() {
+	find "$PROFILES_CACHE" -maxdepth 1 -type f -print0 | xargs -0 rm -f --
+}
+
+clear_cache_var() {
+	find "$PROFILES_CACHE_VAR" -maxdepth 1 -type f -print0 | xargs -0 rm -f --
+}
+
+read_features_dir()
+{
+	for f in `ls -AU "$1"` ; do
+		if [ -f "$1/$f" ] ; then
+			read -r KF < "$1/$f" || true
+			echo -n "$f {$KF } "
+		elif [ -d "$1/$f" ] ; then
+			echo -n "$f {"
+			KF=`read_features_dir "$1/$f"` || true
+			echo -n "$KF} "
+		fi
+	done
+}
+
+clear_cache_if_outdated() {
+	if [ -r "$PROFILES_CACHE"/.features ]; then
+		if [ -d "$AA_SFS"/features ]; then
+			KERN_FEATURES=`read_features_dir "$AA_SFS"/features`
+		else
+			read -r KERN_FEATURES < "$AA_SFS"/features
+		fi
+		CACHE_FEATURES=`tr '\n' ' ' < "$PROFILES_CACHE"/.features`
+		if [ "$KERN_FEATURES" != "$CACHE_FEATURES" ]; then
+			clear_cache
+		fi
+	fi
+}
+
+unload_obsolete_profiles() {
+	# Currently we must re-parse all the profiles to get policy names.  :(
+	aa_configured=$(mktemp -t aa-XXXXXX)
+	configured_profile_names > "$aa_configured" || true
+	aa_loaded=$(mktemp -t aa-XXXXXX)
+	running_profile_names > "$aa_loaded" || true
+	LC_COLLATE=C comm -2 -3 "$aa_loaded" "$aa_configured" | while read profile ; do
+		unload_profile "$profile"
+        done
+	rm -f "$aa_configured" "$aa_loaded"
+}
+
+# If the system debsum differs from the saved debsum, the new system debsum is
+# saved and non-zero is returned. Returns 0 if the two debsums matched or if
+# the system debsum file does not exist. This can be removed when system image
+# flavors all move to snappy.
+compare_and_save_debsums() {
+	pkg="$1"
+
+	if [ -n $pkg ] && [ -d "$PROFILES_VAR" ]; then
+		sums="/var/lib/dpkg/info/${pkg}.md5sums"
+		# store saved md5sums in /var/lib/apparmor/profiles since
+		# /var/cache/apparmor might be cleared by apparmor
+		saved_sums="${PROFILES_VAR}/.${pkg}.md5sums"
+
+		if [ -f "$sums" ] && \
+		   ! diff -q "$sums" "$saved_sums" 2>&1 >/dev/null ; then
+			cp -f "$sums" "$saved_sums"
+			return 1
+		fi
+	fi
+
+	return 0
+}
+
+compare_previous_version() {
+	installed="/usr/share/snappy/security-policy-version"
+	previous="/var/lib/snappy/security-policy-version"
+
+	# When just $previous doesn't exist, assume this is a new system with
+	# no cache and don't do anything special.
+	if [ -f "$installed" ] && [ -f "$previous" ]; then
+		pv=`grep '^apparmor/' "$previous" | cut -d ' ' -f 2`
+		iv=`grep '^apparmor/' "$installed" | cut -d ' ' -f 2`
+		if [ -n "$iv" ] && [ -n "$pv" ] && [ "$iv" != "$pv" ]; then
+			# snappy updates $previous elsewhere, so just return
+			return 1
+		fi
+	fi
+
+	return 0
+}
+
+# Checks to see if the current container is capable of having internal AppArmor
+# profiles that should be loaded. Callers of this function should have already
+# verified that they're running inside of a container environment with
+# something like `systemd-detect-virt --container`.
+#
+# The only known container environments capable of supporting internal policy
+# are LXD and LXC environment.
+#
+# Returns 0 if the container environment is capable of having its own internal
+# policy and non-zero otherwise.
+#
+# IMPORTANT: This function will return 0 in the case of a non-LXD/non-LXC
+# system container technology being nested inside of a LXD/LXC container that
+# utilized an AppArmor namespace and profile stacking. The reason 0 will be
+# returned is because .ns_stacked will be "yes" and .ns_name will still match
+# "lx[dc]-*" since the nested system container technology will not have set up
+# a new AppArmor profile namespace. This will result in the nested system
+# container's boot process to experience failed policy loads but the boot
+# process should continue without any loss of functionality. This is an
+# unsupported configuration that cannot be properly handled by this function.
+is_container_with_internal_policy() {
+	local ns_stacked_path="${AA_SFS}/.ns_stacked"
+	local ns_name_path="${AA_SFS}/.ns_name"
+	local ns_stacked
+	local ns_name
+
+	if ! [ -f "$ns_stacked_path" ] || ! [ -f "$ns_name_path" ]; then
+		return 1
+	fi
+
+	read -r ns_stacked < "$ns_stacked_path"
+	if [ "$ns_stacked" != "yes" ]; then
+		return 1
+	fi
+
+	# LXD and LXC set up AppArmor namespaces starting with "lxd-" and
+	# "lxc-", respectively. Return non-zero for all other namespace
+	# identifiers.
+	read -r ns_name < "$ns_name_path"
+	if [ "${ns_name#lxd-*}" = "$ns_name" ] && \
+	   [ "${ns_name#lxc-*}" = "$ns_name" ]; then
+		return 1
+	fi
+
+	return 0
+}

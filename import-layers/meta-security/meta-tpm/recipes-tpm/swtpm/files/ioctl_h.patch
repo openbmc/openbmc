@@ -1,0 +1,22 @@
+tpm_ioctl: fix musl for missing ioctl
+
+tpm_ioctl.c: In function 'ioctl_to_cmd':
+tpm_ioctl.c:86:26: error: '_IOC_NRSHIFT' undeclared (first use in this function)
+     return ((ioctlnum >> _IOC_NRSHIFT) & _IOC_NRMASK) + 1;
+
+
+Upstream-status:
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+Index: git/src/swtpm_ioctl/tpm_ioctl.c
+===================================================================
+--- git.orig/src/swtpm_ioctl/tpm_ioctl.c
++++ git/src/swtpm_ioctl/tpm_ioctl.c
+@@ -58,6 +58,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <sys/ioctl.h>
++#include <asm/ioctl.h>
+ #include <getopt.h>
+ #include <sys/un.h>
+ #include <sys/types.h>

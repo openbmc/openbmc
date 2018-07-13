@@ -1,0 +1,61 @@
+From 00fb527e45da42550156197647e01de9a6b1ad52 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Mon, 3 Mar 2014 01:50:01 -0500
+Subject: [PATCH] fix real path for some files/dirs
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ samhainrc.linux |   15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/samhainrc.linux b/samhainrc.linux
+index e9727b4..7775d83 100644
+--- a/samhainrc.linux
++++ b/samhainrc.linux
+@@ -93,7 +93,6 @@ dir = 99/etc
+ ##
+ file = /etc/mtab
+ file = /etc/fstab
+-file = /etc/adjtime
+ file = /etc/motd
+ file = /etc/lvm/lvm.conf
+ 
+@@ -153,11 +152,11 @@ dir = 99/var
+ 
+ [IgnoreAll]
+ dir = -1/var/cache
+-dir = -1/var/lock
+-dir = -1/var/mail
+-dir = -1/var/run
++dir = -1/run/lock
++dir = -1/var/spool/mail
++dir = -1/run
+ dir = -1/var/spool
+-dir = -1/var/tmp
++dir = -1/var/volatile/tmp
+ 
+ 
+ [Attributes]
+@@ -167,7 +166,7 @@ dir = -1/var/tmp
+ file = /var/lib/rpm/__db.00?
+ 
+ file = /var/lib/logrotate.status
+-file = /var/lib/random-seed
++file = /var/lib/urandom/random-seed
+ 
+ 
+ [GrowingLogFiles]
+@@ -176,7 +175,7 @@ file = /var/lib/random-seed
+ ## are ignored. Logfile rotation will cause a report because of shrinking
+ ## size and different inode. 
+ ##
+-dir = 99/var/log
++dir = 99/var/volatile/log
+ 
+ [Attributes]
+ #
+-- 
+1.7.9.5
+

@@ -1,0 +1,25 @@
+Upstream-Status: Inappropriate [configuration]
+
+As we're cross-compiling here we need to override CC/LD that MakeMaker has
+stuck in the generated Makefile with our cross tools.  In this case, linking is
+done via the compiler rather than the linker directly so pass in CC not LD
+here.
+
+Signed-Off-By: Tom Rini <trini@konsulko.com>
+
+--- a/libraries/libapparmor/swig/perl/Makefile.am.orig	2017-06-13 19:04:43.296676212 -0400
++++ b/libraries/libapparmor/swig/perl/Makefile.am	2017-06-13 19:05:03.488676693 -0400
+@@ -16,11 +16,11 @@
+ 
+ LibAppArmor.so: libapparmor_wrap.c Makefile.perl
+ 	if test ! -f libapparmor_wrap.c; then cp $(srcdir)/libapparmor_wrap.c . ; fi
+-	$(MAKE) -fMakefile.perl
++	$(MAKE) -fMakefile.perl CC='$(CC)' LD='$(CC)'
+ 	if test $(top_srcdir) != $(top_builddir) ; then rm -f libapparmor_wrap.c ; fi
+ 
+ install-exec-local: Makefile.perl
+-	$(MAKE) -fMakefile.perl install_vendor
++	$(MAKE) -fMakefile.perl install_vendor CC='$(CC)' LD='$(CC)'
+ 
+ # sadly there is no make uninstall for perl
+ #uninstall-local: Makefile.perl

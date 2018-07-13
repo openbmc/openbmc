@@ -1,0 +1,19 @@
+Upstream-Status: Inappropriate [configuration]
+
+Remove file check for $perl_includedir/perl.h.  AC_CHECK_FILE will fail on
+cross compilation.  Rather than try and get a compile check to work here,
+we know that we have what's required via our metadata so remove only this
+check.
+
+Signed-Off-By: Tom Rini <trini@konsulko.com>
+
+--- a/libraries/libapparmor/configure.ac.orig	2017-06-13 16:41:38.668471495 -0400
++++ b/libraries/libapparmor/configure.ac	2017-06-13 16:41:40.708471543 -0400
+@@ -58,7 +58,6 @@
+    AC_PATH_PROG(PERL, perl)
+    test -z "$PERL" && AC_MSG_ERROR([perl is required when enabling perl bindings])
+    perl_includedir="`$PERL -e 'use Config; print $Config{archlib}'`/CORE"
+-   AC_CHECK_FILE($perl_includedir/perl.h, enable_perl=yes, enable_perl=no)
+ fi
+ 
+ 

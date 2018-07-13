@@ -1,0 +1,27 @@
+1) add free if malloc failed for (*mechanisms)->elements
+2) g_inq_cred.c: In function 'gss_inquire_cred':
+g_inq_cred.c:161:8: warning: passing argument 3 of 'generic_gss_copy_oid' from incompatible pointer type [enabled by default]
+
+Upstream-Status: Pending
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+
+--- a/src/g_inq_cred.c
++++ b/src/g_inq_cred.c
+@@ -152,13 +152,15 @@ gss_OID_set *		mechanisms;
+ 			     union_cred->count);
+ 	if ((*mechanisms)->elements == NULL) {
+ 	    *minor_status = ENOMEM;
++	    free(*mechanisms);
++	    *mechanisms = GSS_C_NO_OID_SET;
+ 	    return (GSS_S_FAILURE);
+ 	}
+ 
+ 	for (i=0; i < union_cred->count; i++) {
+-	    status = generic_gss_copy_oid(minor_status,
++	    status = generic_gss_add_oid_set_member(minor_status,
+ 	    				  &union_cred->mechs_array[i],
+-					  &((*mechanisms)->elements[i]));
++					  mechanisms);
+ 	    if (status != GSS_S_COMPLETE)
+ 	        break;
+ 	}

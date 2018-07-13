@@ -1,0 +1,73 @@
+From 34698c7f561fb575293a1c991a71e1b4ddc5ae73 Mon Sep 17 00:00:00 2001
+From: Andrei Dinu <andrei.adrianx.dinu@intel.com>
+Date: Fri, 5 Jul 2013 11:56:58 +0300
+Subject: [PATCH] Mandir and perl install dir were overwritten with faulty
+ information in the Makefile. Now the Mandir and perl
+ install dir are sent via paramters from the recipe.
+
+Signed-off-by: Andrei Dinu <andrei.adrianx.dinu@intel.com>
+---
+ Makefile.pl |   12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.pl b/Makefile.pl
+index 9ca5602..8776e18 100644
+--- a/Makefile.pl
++++ b/Makefile.pl
+@@ -131,6 +131,8 @@ foreach (keys %MODULES){
+ 
+ # adjust DESTDIR, if needed
+ $DESTDIR = $ENV{DESTDIR} if(defined $ENV{DESTDIR});
++$MANDIR = $ENV{MANDIR} if(defined $ENV{MANDIR});
++$INSTALLDIR = $ENV{INSTALLDIR} if(defined $ENV{INSTALLDIR});
+ 
+ # parse command line build options
+ while($COMMAND = shift @ARGV){
+@@ -171,7 +173,7 @@ sub command_install_pod {
+ 	command_build() if(!-e $TARGET);
+ 	die("Can not install without Config.pm") if($MODULES{Config}==0);
+ 	$CWD=&cwd if($MODULES{Cwd}>0);
+-	my $where=$DESTDIR . $Config{'man3direxp'};
++	my $where=$DESTDIR . $MANDIR;
+ 	my $t = $TARGET;
+ 	if($LIBRARY){
+ 		$t="$PACKAGE.3pm";
+@@ -219,7 +221,7 @@ sub command_install_pod {
+ sub command_uninstall_pod {
+ 	die("Can not uninstall without Config.pm") if($MODULES{Config}==0);
+ 	$CWD=&cwd if($MODULES{Cwd}>0);
+-	my $where=$DESTDIR . $Config{'man3direxp'};
++	my $where=$DESTDIR . $MANDIR;
+ 	my $t = $TARGET;
+ 	if($LIBRARY){
+ 		$t="$PACKAGE.3pm";
+@@ -243,7 +245,7 @@ sub command_install_library {
+ 	command_build() if(!-e $TARGET);
+ 	die("Can not install without Config.pm") if($MODULES{Config}==0);
+ 	$CWD=&cwd if($MODULES{Cwd}>0);
+-	my $where=$DESTDIR . $Config{'installsitelib'};
++	my $where=$DESTDIR . $INSTALLDIR;
+ 	if(!-e $where){
+ 	  print STDOUT "WARNING!\n\n",
+ 		"The local perl site directory does not exist:\n",
+@@ -271,7 +273,7 @@ sub command_install_library {
+ sub command_uninstall_library {
+ 	die("Can not uninstall without Config.pm") if($MODULES{Config}==0);
+ 	$CWD=&cwd if($MODULES{Cwd}>0);
+-	my $where=$DESTDIR . $Config{'installsitelib'};
++	my $where=$DESTDIR . $INSTALLDIR;
+ 	chdir($where);
+ 	if(-e $TARGET){
+ 		unlink $TARGET;
+@@ -401,7 +403,7 @@ sub command_socket_diag {
+ sub command_install_compat {
+ 	die("Can not install without Config.pm") if($MODULES{Config}==0);
+ 	$CWD=&cwd if($MODULES{Cwd}>0);
+-	my $where=$DESTDIR . $Config{'installsitelib'};
++	my $where=$DESTDIR . $INSTALLDIR;
+ 	if(!-e $where){
+ 	  print STDOUT "WARNING!\n\n",
+ 		"The local perl site directory does not exist:\n",
+-- 
+1.7.9.5
+

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+OUTPUT=$($(dirname $0)/mhash)
+MHASH_MD5="0x750c783e6ab0b503eaa86e310a5db738"
+
+if [ x"$OUTPUT" = x"$MHASH_MD5" ]; then
+    echo "PASS: mhash ptest"
+    exit 0
+else
+    echo "FAIL: mhash ptest"
+    exit 1
+fi

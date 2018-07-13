@@ -1,0 +1,26 @@
+From 847dc52f5a50e34ee4d6e3dc2c708711747a58ca Mon Sep 17 00:00:00 2001
+From: Yulong Pei <Yulong.pei@windriver.com>
+Date: Thu, 21 Jan 2010 14:11:20 +0800
+Subject: [PATCH] force to use our own libtool
+
+Upstream-Status: Inappropriate [ OE specific ]
+
+Signed-off-by: Yulong Pei <Yulong.pei@windriver.com>
+
+---
+ ltmain.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ltmain.sh b/ltmain.sh
+index 147d758..a61f16b 100644
+--- a/ltmain.sh
++++ b/ltmain.sh
+@@ -6969,7 +6969,7 @@ func_mode_link ()
+ 	dir=$func_resolve_sysroot_result
+ 	# We need an absolute path.
+ 	case $dir in
+-	[\\/]* | [A-Za-z]:[\\/]*) ;;
++	=* | [\\/]* | [A-Za-z]:[\\/]*) ;;
+ 	*)
+ 	  absdir=`cd "$dir" && pwd`
+ 	  test -z "$absdir" && \

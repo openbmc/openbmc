@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable vTPM"
+
+kconf hardware vtpm.cfg
+

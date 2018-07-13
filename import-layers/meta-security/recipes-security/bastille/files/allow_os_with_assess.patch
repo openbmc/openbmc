@@ -1,0 +1,43 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/bin/bastille
+===================================================================
+--- Bastille.orig/bin/bastille	2013-08-21 08:59:06.647950000 -0400
++++ Bastille/bin/bastille	2013-08-21 15:55:53.193631711 -0400
+@@ -195,7 +195,6 @@
+ systemFileLocations
+ 
+ isAssessing='no'
+-nonXArg='no'
+ 
+ if [ $PERL_V_MAJ -eq $MIN_V_MAJ  -a  $PERL_V_MIN -lt $MIN_V_MIN -o $PERL_V_MAJ -lt  $MIN_V_MAJ ]; then # invalid Perl
+     printErr
+@@ -316,12 +315,10 @@
+ 	  '--os')
+ 	      options_left="$options_left --os"
+               optarg='yes'
+-              nonXArg='yes'
+ 	      ;;
+           '-f')
+               options_left="$options_left -f"
+               optarg='yes'
+-              nonXArg='yes'
+               ;;
+ #  Non-exclusive (undocumented and unsupported) options follow:
+ #  There is no validity/combination checking done with these.
+@@ -345,11 +342,6 @@
+       fi
+     done
+ 
+-#Detect case where -f or --os attempted use with --assess
+-    if [ \( x$nonXArg = xyes \) -a  \( x$isAssessing = xyes \) ]; then
+-      printUsage
+-      exit 2
+-    fi
+ 
+ # We have a valid version of perl! Verify that all the required
+ # modules can be found.

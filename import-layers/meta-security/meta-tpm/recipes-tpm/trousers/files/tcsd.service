@@ -1,0 +1,10 @@
+[Unit]
+Description=TCG Core Services Daemon
+After=syslog.target
+
+[Service]
+Type=forking
+ExecStart=@SBINDIR@/tcsd
+
+[Install]
+WantedBy=multi-user.target

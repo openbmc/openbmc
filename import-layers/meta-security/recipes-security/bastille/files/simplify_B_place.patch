@@ -1,0 +1,40 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/Bastille/API.pm
+===================================================================
+--- Bastille.orig/Bastille/API.pm	2013-08-21 08:59:17.939950001 -0400
++++ Bastille/Bastille/API.pm	2013-08-21 08:59:30.983950001 -0400
+@@ -1679,24 +1679,22 @@
+ 
+     use File::Copy;
+ 
+-    my $original_source=$source;
+     $source  = &getGlobal('BDIR', "share") . $source;
+-    my $original_target=$target;
+ 
+     if ( -e $target and -f $target ) {
+-	&B_backup_file($original_target);
+-	&B_log("ACTION","About to copy $original_source to $original_target -- had to backup target\n");
++	&B_backup_file($target);
++	&B_log("ACTION","About to copy $source to $target -- had to backup target\n");
+ 	$had_to_backup_target=1;
+     }
+     $retval=copy($source,$target);
+     if ($retval) {
+-	&B_log("ACTION","placed file $original_source  as  $original_target\n");
++	&B_log("ACTION","placed file $source  as  $target\n");
+ 	#
+ 	# We want to add a line to the &getGlobal('BFILE', "created-files") so that the
+ 	# file we just put at $original_target gets deleted.
+-	&B_revert_log(&getGlobal('BIN',"rm") . " $original_target\n");
++	&B_revert_log(&getGlobal('BIN',"rm") . " $target\n");
+     } else {
+-	&B_log("ERROR","Failed to place $original_source as $original_target\n");
++	&B_log("ERROR","Failed to place $source as $target\n");
+     }
+ 
+     # We add the file to the GLOBAL_SUMS hash if it is not already present

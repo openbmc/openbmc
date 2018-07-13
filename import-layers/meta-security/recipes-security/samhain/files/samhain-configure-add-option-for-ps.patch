@@ -1,0 +1,108 @@
+From 02a143f0068cbc6cea71359169210fbb3606d4bb Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Mon, 18 Jan 2016 00:24:57 -0500
+Subject: [PATCH] configure: add option for ps
+
+The configure searches hardcoded host paths for PSPATH
+and run ps commands to decide PSARG which will fail
+on host without ps:
+| configure: error: Cannot find ps in any of /usr/ucb /bin /usr/bin
+
+So add an option so we can specify the ps at configure
+to avoid host contamination.
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ aclocal.m4   |  2 +-
+ configure.ac | 60 ++++++++++--------------------------------------------------
+ 2 files changed, 11 insertions(+), 51 deletions(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index a2e59a6..cd20a2f 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -409,7 +409,7 @@ x_includes=NONE
+ x_libraries=NONE
+ DESTDIR=
+ SH_ENABLE_OPTS="selinux posix-acl asm ssp db-reload xml-log message-queue login-watch process-check port-check mounts-check logfile-monitor userfiles debug ptrace static network udp nocl stealth micro-stealth install-name identity khide suidcheck base largefile mail external-scripts encrypt srp dnmalloc ipv6 shellexpand suid"
+-SH_WITH_OPTS="prelude libprelude-prefix database libwrap cflags libs console altconsole timeserver alttimeserver rnd egd-socket port logserver altlogserver kcheck gpg keyid checksum fp recipient sender trusted tmp-dir config-file log-file pid-file state-dir data-file html-file"
++SH_WITH_OPTS="prelude libprelude-prefix database libwrap cflags libs console altconsole timeserver alttimeserver rnd egd-socket port logserver altlogserver kcheck gpg keyid checksum fp recipient sender trusted tmp-dir config-file log-file pid-file state-dir data-file html-file ps-path"
+ 
+ # Installation directory options.
+ # These are left unexpanded so users can "make install exec_prefix=/foo"
+diff --git a/configure.ac b/configure.ac
+index 5910b1f..8c3e087 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -730,56 +730,16 @@ then
+ fi
+ AC_CHECK_HEADERS(gmp.h)
+ 
+-AC_MSG_CHECKING([for ps])
+-PS=
+-for ff in /usr/ucb /bin /usr/bin; do
+-    if test -x "$ff/ps"; then
+-       PS="$ff/ps"
+-       AC_MSG_RESULT([$PS])
+-       break
+-    fi
+-done
+-if test x$PS = x
+-then
+-	AC_MSG_RESULT([no])
+-	AC_MSG_ERROR([Cannot find ps in any of /usr/ucb /bin /usr/bin])
+-fi
+-AC_DEFINE_UNQUOTED([PSPATH], _("$PS"), [Path to ps])
+-
+-AC_MSG_CHECKING([how to use ps])
+-$PS ax >/dev/null 2>&1
+-if test $? -eq 0; then
+-   case "$host_os" in
+-   *openbsd*)
+-   one=`$PS akx | wc -l`
+-   ;;
+-   *)
+-   one=`$PS ax | wc -l`
+-   ;;
+-   esac
+-else
+-   one=0
+-fi
+-$PS -e >/dev/null 2>&1
+-if test $? -eq 0; then
+-   two=`$PS -e | wc -l`
+-else
+-   two=0
+-fi
+-if test $one -ge $two 
+-then
+-   case "$host_os" in
+-   *openbsd*)
+-	PSARG="akx"
+-	;;
+-   *)
+-	PSARG="ax"
+-	;;
+-   esac
+-else
+-	PSARG="-e"
+-fi
+-AC_DEFINE_UNQUOTED([PSARG], _("$PSARG"), [Argument for ps])
++AC_ARG_WITH(ps-path,
++	[  --with-ps-path=PATH         set path to ps command ],
++	[
++	if test "x${withval}" != xno; then
++		pspath="${withval}"
++		AC_DEFINE_UNQUOTED([PSPATH], _("${pspath}"), [Path to ps])
++		AC_DEFINE_UNQUOTED([PSARG], _("ax"), [Argument for ps])
++	fi
++	])
++
+ AC_MSG_RESULT([$PS $PSARG])
+ 
+ dnl *****************************************
+-- 
+1.9.1
+

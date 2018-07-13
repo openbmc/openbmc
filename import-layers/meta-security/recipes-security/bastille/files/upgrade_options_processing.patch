@@ -1,0 +1,91 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/Bastille/API.pm
+===================================================================
+--- Bastille.orig/Bastille/API.pm	2013-08-21 11:41:09.235950000 -0400
++++ Bastille/Bastille/API.pm	2013-08-21 11:41:16.183950000 -0400
+@@ -271,9 +271,15 @@
+ # setOptions takes six arguments, $GLOBAL_DEBUG, $GLOBAL_LOGONLY,
+ # $GLOBAL_VERBOSE, $GLOBAL_AUDITONLY, $GLOBAL_AUDIT_NO_BROWSER, and GLOBAL_OS;
+ ###########################################################################
+-sub setOptions($$$$$$) {
+-    ($GLOBAL_DEBUG,$GLOBAL_LOGONLY,$GLOBAL_VERBOSE,$GLOBAL_AUDITONLY,
+-     $GLOBAL_AUDIT_NO_BROWSER,$GLOBAL_OS) = @_;
++sub setOptions {
++    my %opts = @_;
++
++    $GLOBAL_DEBUG = $opts{debug};
++    $GLOBAL_LOGONLY = $opts{logonly};
++    $GLOBAL_VERBOSE = $opts{verbose};
++    $GLOBAL_AUDITONLY = $opts{auditonly};
++    $GLOBAL_AUDIT_NO_BROWSER = $opts{audit_no_browser};
++    $GLOBAL_OS = $opts{os};
+     if ($GLOBAL_AUDIT_NO_BROWSER) {
+ 	$GLOBAL_AUDITONLY = 1;
+     }
+Index: Bastille/BastilleBackEnd
+===================================================================
+--- Bastille.orig/BastilleBackEnd	2013-08-21 11:41:09.235950000 -0400
++++ Bastille/BastilleBackEnd	2013-08-21 12:40:54.055950001 -0400
+@@ -50,15 +50,13 @@
+ my $nodisclaim = 0;
+ my $verbose = 0;
+ my $force = 0;
+-my $log_only = 0;
+ my $debug = 0;
+ my $alternate_config=undef;
+ 
+ if( Getopt::Long::GetOptions( "n"     => \$nodisclaim,
+                               "v"     => \$verbose,
+                               "force" => \$force,
+-#			      "log"   => \$log_only, # broken
+-			      "f:s"   => \$alternate_config,
++			      "f=s"   => \$alternate_config,
+ 			      "debug" => \$debug) ) {
+     $error = 0; # no parse error
+ 
+@@ -66,7 +64,9 @@
+     $error = 1; # parse error
+ }
+ 
+-&setOptions($debug,$log_only,$verbose);
++&setOptions(
++  debug => $debug,
++  verbose => $verbose);
+ &ConfigureForDistro;
+ 
+ if ( $error ) { # GetOptions couldn't parse all of the args
+Index: Bastille/InteractiveBastille
+===================================================================
+--- Bastille.orig/InteractiveBastille	2013-08-21 11:41:09.235950000 -0400
++++ Bastille/InteractiveBastille	2013-08-21 12:40:30.531950001 -0400
+@@ -234,8 +234,8 @@
+ 			      "a"     => \$audit,
+                               "force" => \$force,
+ 			      "log"   => \$log_only,
+-			      "os:s"  => \$os_version,
+-                              "f:s"   => \$alternate_config,
++			      "os=s"  => \$os_version,
++                              "f=s"   => \$alternate_config,
+ 			      "debug" => \$debug) ) {
+     $error = 0; # no parse error
+ } else {
+@@ -293,7 +293,13 @@
+     $UseRequiresRules = 'N';
+ }
+ 
+-&setOptions($debug,$log_only,$verbose,$audit,$auditnobrowser,$os_version);
++&setOptions(
++  debug => $debug,
++  logonly => $log_only,
++  verbose => $verbose,
++  auditonly => $audit,
++  audit_no_browser => $auditnobrowser,
++  os => $os_version);
+ &ConfigureForDistro;
+ 
+ # ensuring mutually exclusive options are exclusive

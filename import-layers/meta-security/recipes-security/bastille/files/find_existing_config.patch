@@ -1,0 +1,64 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/bin/bastille
+===================================================================
+--- Bastille.orig/bin/bastille	2013-06-20 14:58:01.065796000 -0400
++++ Bastille/bin/bastille	2013-08-20 15:16:18.472378000 -0400
+@@ -102,8 +102,9 @@
+     # defines OS specific file locations based on uname
+     systemFileLocations
+ 
++    config_files=`find $config_repository -type f -name \*config 2>/dev/null`
++
+     if [ -f $last_config ]; then
+-        config_files=`find $config_repository -type f -name \*config 2>/dev/null`
+ 	for config_cursor in `echo $config_files`
+ 	  do
+ 	  if /usr/bin/diff $last_config $config_cursor >/dev/null 2>&1
+@@ -112,8 +113,8 @@
+ 	  fi
+ 	done
+ 	if [ -n "$match" ]; then
+-	    echo "The last bastille run corresponds to the following profiles:"
+-	    echo "$match"
++	    printf "The last Bastille run corresponds to the following profiles:\n"
++	    printf "$match"
+ 	else
+             cat >&2 << EOF
+ NOTE:    The last config file applied,
+@@ -122,18 +123,28 @@
+ $ERRSPACES $config_repository.
+ $ERRSPACES This probably means that Bastille was last run interactively and
+ $ERRSPACES changes were made to the config file, but they have not yet been
+-$ERRSPACES applied, or that the source config file was moved.  If you do have pending 
++$ERRSPACES applied, or that the source config file was moved.  If you do have pending
+ $ERRSPACES changes in a config file, you can apply them by running
+ $ERRSPACES 'bastille -b -f <config file>.'
+ EOF
+ 
+ 	fi
+     else
+-	echo "NOTE:    The system is in its pre-bastilled state.\n"
++	for config_cursor in `echo $config_files`
++	  do
++	  match="$match   $config_cursor\n"
++	done
++        if [ -n "$match" ]; then
++            printf "The following Bastille profiles were located:\n"
++            printf "$match"
++        else
++            printf "No Bastille profiles were located.\n"
++        fi
++        printf "No log files of profiles from previous executions of Bastille have been found. It is likely that Bastille has not been run on this machine.\n"
+     fi
+-
+ }
+ 
++
+ # First, make sure we're root
+ if [ `PATH="/usr/bin:/bin"; id -u` -ne 0 ]; then
+     echo "ERROR:   Bastille must be run as root user" >&2

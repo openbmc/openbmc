@@ -1,0 +1,32 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/bin/bastille
+===================================================================
+--- Bastille.orig/bin/bastille	2013-08-25 14:16:35.614779001 -0400
++++ Bastille/bin/bastille	2013-08-25 14:16:38.674779000 -0400
+@@ -60,7 +60,7 @@
+ printUsage () {
+   cat >&2 << EOF
+ $ERRSPACES Usage: bastille [ -b  | -c | -x ] [ --os <version>] [ -f <alternate config> ]
+-$ERRSPACES        bastille [-r | -l | -h | --assess | --assessnobrowser ]
++$ERRSPACES        bastille [-r | -l | -h | --assess | --assessnobrowser ] [ --os <version> ]
+ $ERRSPACES -b : use a saved config file to apply changes
+ $ERRSPACES      directly to system
+ $ERRSPACES -c : use the Curses (non-X11) GUI, not available on HP-UX
+Index: Bastille/Bastille/API.pm
+===================================================================
+--- Bastille.orig/Bastille/API.pm	2013-08-25 08:15:40.266779002 -0400
++++ Bastille/Bastille/API.pm	2013-08-25 14:18:22.750778811 -0400
+@@ -206,7 +206,7 @@
+ #options before interactive or Bastille runs, so this check is often redundant
+ $GLOBAL_ERROR{"usage"}="\n".
+     "$spc Usage: bastille [ -b | -c | -x ] [ --os <version> ] [ -f <alternate config> ]\n".
+-    "$spc        bastille [ -r | --assess | --assessnobowser ]\n\n".
++    "$spc        bastille [ -r | --assess | --assessnobowser ] [ --os <version> ]\n\n".
+     "$spc --assess : check status of system and report in browser\n".
+     "$spc --assessnobrowser : check status of system and list report locations\n".
+     "$spc -b : use a saved config file to apply changes\n".

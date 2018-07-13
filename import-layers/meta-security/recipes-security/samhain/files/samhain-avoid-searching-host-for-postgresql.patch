@@ -1,0 +1,134 @@
+From 3e2ca7e06b16ceff6d12beb5113312f6525df595 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 14 Sep 2017 11:02:12 +0800
+Subject: [PATCH] configure.ac: avoid searching host for postgresql
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ configure.ac | 101 +++--------------------------------------------------------
+ 1 file changed, 5 insertions(+), 96 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a224c68..f658d53 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1278,90 +1278,11 @@ AC_ARG_WITH(database,
+           AC_DEFINE(WITH_POSTGRES)
+           AC_DEFINE(WITH_DATABASE)
+ 	  #
+-	  PGCONF="no"
+-	  MY_PATH="${PATH}:/usr/local/bin:/usr/local/pgsql/bin"
+-	  OLD_IFS="$IFS"
+-	  IFS=":"
+-	  for ff in ${MY_PATH}
+-	  do
+-	    if test -f "$ff/pg_config"
+-	    then
+-		PGCONF="$ff/pg_config"
+-	    fi
+-	  done
+-	  IFS="${OLD_IFS}"
+-	  #
+-	  #
+-	  if test "x${PGCONF}" = "xno"
+-	  then
+-	    AC_MSG_CHECKING(for PostgreSQL in /usr/local/pgsql /usr/pgsql /usr/local /usr PGSQL_HOME)
+-	    pgsql_directory="/usr/local/pgsql /usr/pgsql /usr/local /usr ${PGSQL_HOME}"
+-  	    for i in $pgsql_directory; do 
+-    	      if test -r $i/include/pgsql/libpq-fe.h; then
+-                PGSQL_INC_DIR=$i/include
+-		PGSQL_DIR=$i
+-		# use AC_CHECK_HEADERS to check for pgsql/libpq-fe.h
+-              fi
+-            done 
+-            if test -z "$PGSQL_DIR"; then
+-  	      for i in $pgsql_directory; do 
+-    	        if test -r $i/include/postgresql/libpq-fe.h; then
+-                  PGSQL_INC_DIR=$i/include
+-		  PGSQL_DIR=$i
+-                fi
+-              done
+-	    fi
+-            if test -z "$PGSQL_DIR"; then
+-  	      for i in $pgsql_directory; do 
+-    	        if test -r $i/include/libpq-fe.h; then
+-                  PGSQL_INC_DIR=$i/include
+-		  PGSQL_DIR=$i
+-                fi
+-              done
+-	    fi
+-	    
+-            if test -z "$PGSQL_DIR"; then
+-              tmp=""
+-              for i in $pgsql_directory; do
+-                tmp="$tmp $i/include $i/include/pgsql $i/include/postgresql"
+-              done
+-              FAIL_MESSAGE("PostgreSQL header file (libpq-fe.h)", $tmp)
+-	    fi
+-
+-	    for i in lib lib/pgsql lib/postgresql; do
+-      		str="$PGSQL_DIR/$i/libpq.*"
+-      		for j in `echo $str`; do
+-       		 if test -r $j; then
+-       		   PGSQL_LIB_DIR="$PGSQL_DIR/$i"
+-       		   break 2
+-      		  fi
+-    		done
+-   	    done
+-
+-	    if test -z "$PGSQL_LIB_DIR"; then
+-	      for ff in $pgsql_directory; do
+-		for i in lib lib/pgsql lib/postgresql; do
+-      		  str="$ff/$i/libpq.*"
+-      		  for j in `echo $str`; do
+-       		    if test -r $j; then
+-       		      PGSQL_LIB_DIR="$ff/$i"
+-       		      break 3
+-      		    fi
+-    		  done
+-   	        done
+-              done
+-	    fi
+-
+-	    if test -z "$PGSQL_LIB_DIR"; then
+-	       tmp=""
+-	       for i in $pgsql_directory; do
+-		   tmp="$i/lib $i/lib/pgsql $i/lib/postgresql"
+-	       done
+-	       FAIL_MESSAGE("postgresql library libpq", $tmp)
+-            fi
+-
+-            AC_MSG_RESULT(yes)
+-
++	  if test -z "${PGSQL_LIB_DIR}" ; then
++            FAIL_MESSAGE("PGSQL_LIB_DIR is not set!")
++	  elif test -z "${PGSQL_INC_DIR}" ; then
++            FAIL_MESSAGE("PGSQL_INC_DIR is not set!")
++	  else
+ 	    LIBS="$LIBS -L${PGSQL_LIB_DIR} -lpq -lm"
+ 	    if test x"$enable_static" = xyes; then
+ 	      LIBS="$LIBS -L${PGSQL_LIB_DIR} -lpq -lcrypt -lm"
+@@ -1370,18 +1291,6 @@ AC_ARG_WITH(database,
+ 	    fi
+ 	    # CFLAGS="$CFLAGS -I${PGSQL_INC_DIR}"
+ 	    CPPFLAGS="$CPPFLAGS -I${PGSQL_INC_DIR}"
+-	    AC_CHECK_HEADERS(pgsql/libpq-fe.h)
+-	    AC_CHECK_HEADERS(postgresql/libpq-fe.h)
+-	  else
+-	    pg_lib_dir=`${PGCONF} --libdir`
+-	    if test x"$enable_static" = xyes; then
+-	      LIBS="$LIBS -L${pg_lib_dir} -lpq -lcrypt -lm"
+-            else
+-	      LIBS="$LIBS -L${pg_lib_dir} -lpq -lm"
+-            fi
+-	    pg_inc_dir=`${PGCONF} --includedir`
+-	    # CFLAGS="$CFLAGS -I${pg_inc_dir}"
+-	    CPPFLAGS="$CPPFLAGS -I${pg_inc_dir}"
+ 	  fi
+ 	elif test "x${withval}" = "xodbc"; then
+ 	  AC_MSG_CHECKING(for odbc in /usr /usr/local ODBC_HOME)
+-- 
+2.11.0
+

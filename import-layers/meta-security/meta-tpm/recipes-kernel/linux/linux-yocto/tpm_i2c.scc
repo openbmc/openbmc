@@ -1,0 +1,6 @@
+define KFEATURE_DESCRIPTION "Enable TPM i2c"
+
+include features/i2c/i2c.scc
+
+kconf hardware tpm_i2c.cfg
+

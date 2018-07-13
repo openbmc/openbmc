@@ -1,0 +1,98 @@
+description "Pre-cache and pre-load apparmor profiles"
+author "Dimitri John Ledkov <xnox@ubuntu.com> and Jamie Strandboge <jamie@ubuntu.com>"
+
+task
+
+start on starting rc-sysinit
+
+script
+    [ -d /rofs/etc/apparmor.d ]  && exit 0 # do not load on liveCD
+    [ -d /sys/module/apparmor ]  || exit 0 # do not load without AppArmor
+    [ -x /sbin/apparmor_parser ] || exit 0 # do not load without parser
+
+    . /lib/apparmor/functions
+
+    systemd-detect-virt --quiet --container && ! is_container_with_internal_policy && exit 0 || true
+
+    # Need securityfs for any mode
+    if [ ! -d /sys/kernel/security/apparmor ]; then
+        if cut -d" " -f2,3 /proc/mounts | grep -q "^/sys/kernel/security securityfs"'$' ; then
+            exit 0
+        else
+            mount -t securityfs none /sys/kernel/security || exit 0
+        fi
+    fi
+
+    [ -w /sys/kernel/security/apparmor/.load ] || exit 0
+
+    apparmor_was_updated=0
+    if ! compare_previous_version ; then
+        # On snappy flavors, if the current and previous versions are
+        # different then clear the system cache. snappy will handle
+        # "$PROFILES_CACHE_VAR" itself  (on Touch flavors
+        # compare_previous_version  always returns '0' since snappy
+        # isn't available).
+        clear_cache_system
+        apparmor_was_updated=1
+    elif ! compare_and_save_debsums apparmor ; then
+        # If the system policy has been updated since the last time we
+        # ran, clear the cache to prevent potentially stale binary
+        # cache files after an Ubuntu image based upgrade (LP:
+        # #1350673). This can be removed once all system image flavors
+        # move to snappy (on snappy systems compare_and_save_debsums
+        # always returns '0' since /var/lib/dpkg doesn't exist).
+        clear_cache
+        apparmor_was_updated=1
+    fi
+
+    if [ -x /usr/bin/aa-clickhook ] || [ -x /usr/bin/aa-profile-hook ] ; then
+        # If packages for system policy that affect click packages have
+        # been updated since the last time we ran, run aa-clickhook -f
+        force_clickhook=0
+        force_profile_hook=0
+        if ! compare_and_save_debsums apparmor-easyprof-ubuntu ; then
+            force_clickhook=1
+        fi
+        if ! compare_and_save_debsums apparmor-easyprof-ubuntu-snappy ; then
+            force_clickhook=1
+        fi
+        if ! compare_and_save_debsums click-apparmor ; then
+            force_clickhook=1
+            force_profile_hook=1
+        fi
+        if [ -x /usr/bin/aa-clickhook ] && ([ $force_clickhook -eq 1 ] || [ $apparmor_was_updated -eq 1 ]) ; then
+            aa-clickhook -f
+        fi
+        if [ -x /usr/bin/aa-profile-hook ] && ([ $force_profile_hook -eq 1 ] || [ $apparmor_was_updated -eq 1 ]) ; then
+            aa-profile-hook -f
+        fi
+    fi
+
+    if [ "$ACTION" = "teardown" ]; then
+        running_profile_names | while read profile; do
+            unload_profile "$profile"
+        done
+        exit 0
+    fi
+
+    if [ "$ACTION" = "clear" ]; then
+        clear_cache
+        exit 0
+    fi
+
+    if [ "$ACTION" = "reload" ] || [ "$ACTION" = "force-reload" ]; then
+        clear_cache
+        load_configured_profiles
+	unload_obsolete_profiles
+        exit 0
+    fi
+
+    # Note: if apparmor-easyprof-ubuntu md5sums didn't match up above,
+    # aa-clickhook will have already compiled the policy, generated the cache
+    # files and loaded them into the kernel by this point, so reloading click
+    # policy from cache, while fairly fast (<2 seconds for 250 profiles on
+    # armhf), is redundant. Fixing this would complicate the logic quite a bit
+    # and it wouldn't improve the (by far) common case (ie, when
+    # 'aa-clickhook -f' is not run).
+    load_configured_profiles
+end script

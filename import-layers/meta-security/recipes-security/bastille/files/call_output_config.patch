@@ -1,0 +1,19 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/Bastille_Curses.pm
+===================================================================
+--- Bastille.orig/Bastille_Curses.pm	2013-08-21 08:58:53.899950000 -0400
++++ Bastille/Bastille_Curses.pm	2013-08-21 09:20:20.295950005 -0400
+@@ -84,7 +84,7 @@
+     }
+ 
+     # Output answers to the script and display
+-    &checkAndSaveConfig(&getGlobal('BFILE', "config"));
++    &outputConfig;
+ 
+     # Run Bastille
+ 

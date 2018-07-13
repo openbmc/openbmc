@@ -1,0 +1,44 @@
+commit 0f6bdc219e598de08a3f37887efa5dfa50e2b996
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Fri Jun 22 15:47:08 2012 -0400
+
+Hash fix for MIPS64 and AARCH64
+    
+Samhain uses the addresses of local variables in generating hash
+values.  The hashing function is designed only for 32-bit values.
+For MIPS64 when a 64-bit address is passed in the resulting hash
+exceeds the limits of the underlying mechanism and samhain
+ultimately fails.  The solution is to simply take the lower 
+32-bits of the address and use that in generating hash values.
+    
+Signed-off-by: Greg Moffatt <greg.moffatt@windriver.com>
+
+Upstream-Status: Pending
+    
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
+diff --git a/src/dnmalloc.c b/src/dnmalloc.c
+index da9a5c5..fc91400 100644
+--- a/src/dnmalloc.c
++++ b/src/dnmalloc.c
+@@ -2703,11 +2703,19 @@ static void freecilst_add(chunkinfoptr p) {
+ }
+ 
+ /* Calculate the hash table entry for a chunk */
++#if defined(CONFIG_ARCH_MIPS64) || defined(CONFIG_ARCH_AARCH64)
++#ifdef STARTHEAP_IS_ZERO
++#define hash(p)  ((((unsigned long) p) & 0x7fffffff) >> 7)
++#else
++#define hash(p)  ((((unsigned long) p - (unsigned long) startheap) & 0x7fffffff) >> 7)
++#endif
++#else
+ #ifdef STARTHEAP_IS_ZERO
+ #define hash(p)  (((unsigned long) p) >> 7)
+ #else
+ #define hash(p)  (((unsigned long) p - (unsigned long) startheap) >> 7)
+ #endif
++#endif /* CONFIG_ARCH_MIPS64 */ 
+ 
+ static void
+ hashtable_add (chunkinfoptr ci)

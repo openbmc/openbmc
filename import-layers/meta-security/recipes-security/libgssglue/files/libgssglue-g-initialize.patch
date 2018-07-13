@@ -1,0 +1,21 @@
+Fix the warning for getuid, geteuid
+g_initialize.c: In function 'linux_initialize':
+g_initialize.c:275:5: warning: implicit declaration of function 'getuid' [-Wimplicit-function-declaration]
+g_initialize.c:275:5: warning: implicit declaration of function 'geteuid' [-Wimplicit-function-declaration]
+
+Upstream-Status: Pending
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+
+diff --git a/src/g_initialize.c b/src1/g_initialize.c
+index 82fcce1..200f173 100644
+--- a/src/g_initialize.c
++++ b/src/g_initialize.c
+@@ -29,6 +29,8 @@
+ #include "mglueP.h"
+ #include <stdlib.h>
+ 
++#include <unistd.h>   /*getuid, geteuid */
++#include <sys/types.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <ctype.h>

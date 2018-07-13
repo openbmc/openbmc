@@ -1,0 +1,24 @@
+not run test on host, since we are doing cross-compile
+
+Upstream-status: Inappropriate [cross compile specific]
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ Makefile.in |    1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index e1b32a8..74bfdc9 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1234,7 +1234,6 @@ intcutest: internal.h $(OBJECTS) $(CUTEST_OBJECTS) sh_tiger_i.o $(srcsrc)/CuTest
+ 	rm x_samhain.c; \
+ 	$(LINK) sh_tiger_i.o $(CUTEST_OBJECTS) CuTestMain.o CuTest.o $(OBJECTS) $(LIBS_TRY); \
+ 	test -f ./intcutest && mv ./intcutest ./cutest; \
+-	./cutest
+ 
+ runcutest:
+ 	gdb ./cutest
+-- 
+1.7.10.4
+

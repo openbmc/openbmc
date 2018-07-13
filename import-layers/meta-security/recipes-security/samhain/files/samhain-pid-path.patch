@@ -1,0 +1,27 @@
+commit a932b03b65edeb02ccad2fce06bfa68a8f2fbb04
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Thu Jan 10 16:29:05 2013 -0500
+
+    Set the PID Lock path for samhain.pid
+    
+    The explicit path for samhain.pid inorder
+    for samhain to work properly after it initial
+    database build.
+    
+    Upstream-Status: Inappropriate [configuration]
+
+    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/samhainrc.linux b/samhainrc.linux
+index 10a8176..a7b06e6 100644
+--- a/samhainrc.linux
++++ b/samhainrc.linux
+@@ -639,7 +639,7 @@ SetFileCheckTime = 86400
+ 
+ ## Path to the PID file
+ #
+-# SetLockfilePath = (default: compiled-in)
++SetLockfilePath = /run/samhain.pid
+ 
+ 
+ ## The digest/checksum/hash algorithm

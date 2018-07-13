@@ -1,0 +1,36 @@
+Add LDFLAGS variable to Makefile so that extra linker flags can be sent via this variable.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+diff --git a/Makefile.in b/Makefile.in
+index b216648..42b4827 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -35,6 +35,7 @@ MKDIR = @MKDIR@
+ SED = @SED@
+ ECHO = @ECHO@
+ TR = @TR@
++LDFLAGS = @LDFLAGS@
+ 
+ TARFLAGS = -cvzf ${DISTFILE}
+ YACCFLAGS2 = -d -p kv -b z
+@@ -83,7 +84,7 @@ $(TARGET): $(OBJS)
+ 	$(RANLIB) $(TARGET)
+ 
+ $(TARGET2): $(TARGET) $(OBJS2)
+-	$(CC) $(CFLAGS) -o $(TARGET2) $(OBJS2) $(LIBS)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET2) $(OBJS2) $(LIBS)
+ 
+ k.tab.c: keynote.y header.h keynote.h assertion.h config.h
+ 	$(YACC) $(YACCFLAGS) keynote.y
+@@ -131,7 +132,7 @@ $(SSLCERT) $(SSLKEY):
+ 	-keyout $(SSLKEY)
+ 
+ test-sample: all $(OBJS3)
+-	$(CC) $(CFLAGS) -o $(TARGET3) $(OBJS3) $(LIBS)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET3) $(OBJS3) $(LIBS)
+ 
+ test-sig: all $(SSLCERT) $(SSLKEY)
+ 	$(SED) -e 's/--.*//' < $(SSLCERT) > $(SSLCERT).1

@@ -1,0 +1,66 @@
+From 672bb4ee625da3141ba6cecb0601c7563de4c483 Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster808@gmail.com>
+Date: Thu, 13 Oct 2016 02:03:56 -0700
+Subject: [PATCH 1/4] swtpm: add new package
+
+Upstream-Status: Inappropriate [OE config]
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Rebased to current tip.
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+
+---
+ configure.ac | 34 ++++++++++------------------------
+ 1 file changed, 10 insertions(+), 24 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index abf5be1..85ed6ac 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -395,31 +395,17 @@ CFLAGS="$CFLAGS -Wformat -Wformat-security"
+ dnl We have to make sure libtpms is using the same crypto library
+ dnl to avoid problems
+ AC_MSG_CHECKING([the crypto library libtpms is using])
+-dirs=$($CC $CFLAGS -Xlinker --verbose 2>/dev/null | \
+-       sed -n '/SEARCH_DIR/p' | \
+-       sed 's/SEARCH_DIR("\(@<:@^"@:>@*\)"); */\1 /g' | \
+-       sed 's|=/|/|g')
+-for dir in $dirs $LIBRARY_PATH; do
+-  if test -r $dir/libtpms.so; then
+-    if test -n "`ldd $dir/libtpms.so | grep libcrypto.so`"; then
+-      libtpms_cryptolib="openssl"
+-      break
+-    fi
+-    if test -n "`ldd $dir/libtpms.so | grep libnss3.so`"; then
+-      libtpms_cryptolib="freebl"
+-      break
+-    fi
++dir="$SEARCH_DIR"
++if test -r $dir/libtpms.so; then
++  if test -n "`ldd $dir/libtpms.so | grep libcrypto.so`"; then
++    libtpms_cryptolib="openssl"
++    break
+   fi
+-  case $host_os in
+-  cygwin|openbsd*)
+-    if test -r $dir/libtpms.a; then
+-      if test -n "$(nm $dir/libtpms.a | grep "U AES_encrypt")"; then
+-        libtpms_cryptolib="openssl"
+-      fi
+-    fi
+-    ;;
+-  esac
+-done
++  if test -n "`ldd $dir/libtpms.so | grep libnss3.so`"; then
++    libtpms_cryptolib="freebl"
++    break
++  fi
++fi
+ 
+ if test -z "$libtpms_cryptolib"; then
+   AC_MSG_ERROR([Could not determine libtpms crypto library.])
+-- 
+2.11.0
+

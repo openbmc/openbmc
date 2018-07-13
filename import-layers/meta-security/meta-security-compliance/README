@@ -1,0 +1,41 @@
+# Meta-security-compliance
+
+This layer is meant to contain programs to help in security compliance and auditing
+
+
+Dependencies
+============
+
+This layer depends on:
+
+  URI: git://git.openembedded.org/bitbake
+  branch: master
+
+  URI: git://git.openembedded.org/openembedded-core
+  layers: meta
+  branch: master
+
+or
+
+  URI: git://git.yoctoproject.org/poky
+  branch: master
+
+
+
+Maintenance
+-----------
+
+Send pull requests, patches, comments or questions to yocto@yoctoproject.org
+
+When sending single patches, please using something like:
+'git send-email -1 --to yocto@yoctoproject.org --subject-prefix=meta-security][PATCH'
+
+Layer Maintainer: Armin Kuster <akuster@mvista.com>
+
+
+License
+=======
+
+All metadata is MIT licensed unless otherwise stated. Source code included
+in tree for individual recipes is under the LICENSE stated in each recipe
+(.bb file) unless otherwise stated.

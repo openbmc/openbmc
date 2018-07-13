@@ -1,0 +1,38 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/Bastille_Curses.pm
+===================================================================
+--- Bastille.orig/Bastille_Curses.pm	2013-08-24 18:21:54.445288000 -0400
++++ Bastille/Bastille_Curses.pm	2013-08-24 18:29:16.981288000 -0400
+@@ -36,9 +36,6 @@
+     use Curses;
+     use Curses::Widgets;
+ 
+-    # Number_Modules is the number of modules loaded in by Load_Questions
+-    $Number_Modules=0;
+-
+     #
+     # Highlighted button is the button currently chosen in the button bar
+     #     We preserve this from question to question...
+@@ -397,7 +394,7 @@
+     my $title;
+ 
+     if ($module) {
+-	$title=$module . " of $Number_Modules";
++	$title=$module;
+     }
+ 
+     txt_field( 'window'       => $window,
+@@ -488,7 +485,7 @@
+     my $title;
+ 
+     if ($module) {
+-	$title=$module . " of $Number_Modules";
++	$title=$module;
+     }
+ 
+     noecho;

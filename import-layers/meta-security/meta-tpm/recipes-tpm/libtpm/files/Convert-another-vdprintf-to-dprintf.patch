@@ -1,0 +1,26 @@
+From 09e7dd42e5201d079bad70e9f7cc6033ce1c7cad Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 3 Feb 2017 10:58:22 -0500
+Subject: [PATCH] Convert another vdprintf to dprintf
+
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Upstream-Status: Backport
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+---
+ src/tpm_library.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: git/src/tpm_library.c
+===================================================================
+--- git.orig/src/tpm_library.c
++++ git/src/tpm_library.c
+@@ -427,7 +427,7 @@ void TPMLIB_LogPrintfA(unsigned int inde
+             indent = sizeof(spaces) - 1;
+         memset(spaces, ' ', indent);
+         spaces[indent] = 0;
+-        vdprintf(debug_fd, spaces, NULL);
++        dprintf(debug_fd, "%s", spaces);
+     }
+ 
+     va_start(args, format);

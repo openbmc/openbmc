@@ -1,0 +1,18 @@
+Upstream-Status: Pending
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+
+Index: git/tests/Makefile
+===================================================================
+--- git.orig/tests/Makefile
++++ git/tests/Makefile
+@@ -4,7 +4,7 @@ clean:
+ 	rm -rf ./out ./generator
+ 
+ generator: generator.c
+-	gcc -Wall -O3 generator.c -o ./generator
++	${CC}  ${LDFLAGS} generator.c -o ./generator
+ 
+ policies: ./generator ./make_policies.bash
+ 	./make_policies.bash ./generator

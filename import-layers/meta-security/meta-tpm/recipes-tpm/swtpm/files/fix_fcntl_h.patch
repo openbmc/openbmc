@@ -1,0 +1,31 @@
+From 8750a6c3f0b4d9e7e45b4079150d29eb44774e9c Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster@mvista.com>
+Date: Tue, 14 Mar 2017 22:59:36 -0700
+Subject: [PATCH 2/4] logging: Fix musl build issue with fcntl
+
+ error: #warning redirecting incorrect #include <sys/fcntl.h> to <fcntl.h> [-Werror=cpp]
+ #warning redirecting incorrect #include <sys/fcntl.h> to <fcntl.
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+---
+ src/swtpm/logging.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/swtpm/logging.c b/src/swtpm/logging.c
+index f16cab6..7da8606 100644
+--- a/src/swtpm/logging.c
++++ b/src/swtpm/logging.c
+@@ -45,7 +45,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <sys/types.h>
+-#include <sys/fcntl.h>
++#include <fcntl.h>
+ #include <sys/stat.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-- 
+2.11.0
+

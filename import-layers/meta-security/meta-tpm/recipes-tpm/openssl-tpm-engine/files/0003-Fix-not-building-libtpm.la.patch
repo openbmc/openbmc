@@ -1,0 +1,25 @@
+From 7848445a1f4c750ef73bf96f5e89d402f87a1756 Mon Sep 17 00:00:00 2001
+From: Lans Zhang <jia.zhang@windriver.com>
+Date: Mon, 19 Jun 2017 14:54:28 +0800
+Subject: [PATCH] Fix not building libtpm.la
+
+Signed-off-by: Lans Zhang <jia.zhang@windriver.com>
+---
+ Makefile.am | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 6695656..634a7e6 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -10,4 +10,6 @@ libtpm_la_LIBADD=-lcrypto -lc -ltspi
+ libtpm_la_SOURCES=e_tpm.c e_tpm.h e_tpm_err.c
+ 
+ create_tpm_key_SOURCES=create_tpm_key.c
+-create_tpm_key_LDADD=-ltspi
++create_tpm_key_LDFLAGS=-ltspi
++
++LDADD=libtpm.la
+-- 
+2.7.5
+

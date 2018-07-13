@@ -1,0 +1,30 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/OSMap/LINUX.bastille
+===================================================================
+--- Bastille.orig/OSMap/LINUX.bastille	2008-01-25 18:31:35.000000000 -0500
++++ Bastille/OSMap/LINUX.bastille	2013-08-22 04:48:32.677968002 -0400
+@@ -12,7 +12,6 @@
+ 
+ bfile,InteractiveBastille,'/usr/sbin/InteractiveBastille'
+ bfile,BastilleBackEnd,'/usr/sbin/BastilleBackEnd'
+-bfile,Questions,'/usr/share/Bastille/Questions.txt'
+ bfile,QuestionsModules,'/usr/share/Bastille/Modules.txt'
+ bfile,TODO,'/var/log/Bastille/TODO'
+ bfile,TODOFlag,'/var/log/Bastille/TODOFlag.txt'
+Index: Bastille/OSMap/OSX.bastille
+===================================================================
+--- Bastille.orig/OSMap/OSX.bastille	2007-09-11 18:09:26.000000000 -0400
++++ Bastille/OSMap/OSX.bastille	2013-08-22 04:48:47.245968001 -0400
+@@ -10,7 +10,6 @@
+ bdir,share,'/usr/share/Bastille'
+ 
+ bfile,BastilleBackEnd,'/var/root/Bastille/BastilleBackEnd'
+-bfile,Questions,'/usr/share/Bastille/Questions.txt'
+ bfile,QuestionsModules,'/usr/share/Bastille/Modules.txt'
+ bfile,TODO,'/var/log/Bastille/TODO'
+ bfile,TODOFlag,'/var/log/Bastille/TODOFlag.txt'

@@ -1,0 +1,34 @@
+From fb44e2814fd819c086f9a4c925427f89c0e8cec6 Mon Sep 17 00:00:00 2001
+From: Limeng <Meng.Li@windriver.com>
+Date: Fri, 21 Jul 2017 16:32:02 +0800
+Subject: [PATCH] tpm:openssl-tpm-engine: change variable c type from char
+ into int
+
+refer to getopt_long() function definition, its return value type is
+int. So, change variable c type from char into int.
+On arm platform, when getopt_long() calling fails, if we define c as
+char type, its value will be 255, not -1. This will cause code enter
+wrong case.
+
+Signed-off-by: Meng Li <Meng.Li@windriver.com>
+---
+ create_tpm_key.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/create_tpm_key.c b/create_tpm_key.c
+index 7b94d62..f30af90 100644
+--- a/create_tpm_key.c
++++ b/create_tpm_key.c
+@@ -148,7 +148,8 @@ int main(int argc, char **argv)
+ 	ASN1_OCTET_STRING *blob_str;
+ 	unsigned char	*blob_asn1 = NULL;
+ 	int		asn1_len;
+-	char		*filename, c, *openssl_key = NULL;
++	char		*filename, *openssl_key = NULL;
++	int		c;
+ 	int		option_index, auth = 0, popup = 0, wrap = 0;
+ 	int		wellknownkey = 0;
+ 	UINT32		enc_scheme = TSS_ES_RSAESPKCSV15;
+-- 
+1.7.9.5
+

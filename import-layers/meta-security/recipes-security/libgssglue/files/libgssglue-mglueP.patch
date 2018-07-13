@@ -1,0 +1,21 @@
+fix the warning:
+warning: implicit declaration of function 'generic_gss_copy_oid_set' [-Wimplicit-function-declaration]
+
+Upstream-Status: Pending
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+
+--- a/src/mglueP.h
++++ b/src/mglueP.h
+@@ -447,6 +447,12 @@ OM_uint32 generic_gss_copy_oid
+ 	    gss_OID *		/* new_oid */
+ 	    );
+ 
++OM_uint32 generic_gss_copy_oid_set
++	   (OM_uint32 *minor_status,	/* minor_status */
++	    const gss_OID_set_desc * const oidset,	/* oid */
++	    gss_OID_set *new_oidset			/* new_oid */
++	   );
++
+ OM_uint32 generic_gss_create_empty_oid_set
+ 	   (OM_uint32 *,	/* minor_status */
+ 	    gss_OID_set *	/* oid_set */

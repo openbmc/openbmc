@@ -1,0 +1,22 @@
+samhain: fix sha256 for big-endian machines
+
+After computing the digest, big-endian machines would
+memset() the digest to the first byte of state instead
+of using memcpy() to transfer it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+
+
+--- a/src/sh_checksum.c
++++ b/src/sh_checksum.c
+@@ -468,7 +468,7 @@ void SHA256_Final(sha2_byte digest[], SH
+       }
+     }
+ #else
+-    memset(d, context->state, SHA256_DIGEST_LENGTH);
++    memcpy(d, context->state, SHA256_DIGEST_LENGTH);
+     /* bcopy(context->state, d, SHA256_DIGEST_LENGTH); */
+ #endif
+   }

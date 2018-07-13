@@ -1,0 +1,52 @@
+From 24dbeec135ff83f2fd35ef12fe9842f02d6fd337 Mon Sep 17 00:00:00 2001
+From: Andrei Dinu <andrei.adrianx.dinu@intel.com>
+Date: Thu, 20 Jun 2013 15:14:55 +0300
+Subject: [PATCH] changed log folder for check-setuid
+
+check-setuid was creating logs in /var/log directory,
+which cannot be created persistently. To avoid errors
+the log folder was changed to /etc/checksecurity/.
+
+Signed-off-by: Andrei Dinu <andrei.adrianx.dinu@intel.com>
+---
+ etc/check-setuid.conf |    2 +-
+ plugins/check-setuid  |    6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/etc/check-setuid.conf b/etc/check-setuid.conf
+index 621336f..e1532c0 100644
+--- a/etc/check-setuid.conf
++++ b/etc/check-setuid.conf
+@@ -116,4 +116,4 @@ CHECKSECURITY_PATHFILTER="-false"
+ #
+ # Location of setuid file databases. 
+ #
+-LOGDIR=/var/log/setuid
++LOGDIR=/etc/checksecurity/
+diff --git a/plugins/check-setuid b/plugins/check-setuid
+index 8d6f90b..bdb21c1 100755
+--- a/plugins/check-setuid
++++ b/plugins/check-setuid
+@@ -44,8 +44,8 @@ if [ `/usr/bin/id -u` != 0 ] ; then
+    exit 1
+ fi
+ 
+-TMPSETUID=${LOGDIR:=/var/log/setuid}/setuid.new.tmp
+-TMPDIFF=${LOGDIR:=/var/log/setuid}/setuid.diff.tmp
++TMPSETUID=${LOGDIR:=/etc/checksecurity/}/setuid.new.tmp
++TMPDIFF=${LOGDIR:=/etc/checksecurity/}/setuid.diff.tmp
+ 
+ #
+ # Check for NFS/AFS mounts that are not nosuid/nodev
+@@ -75,7 +75,7 @@ if [ "$CHECKSECURITY_NOFINDERRORS" = "TRUE" ] ; then
+ fi
+ 
+ # Guard against undefined vars
+-[ -z "$LOGDIR" ] && LOGDIR=/var/log/setuid
++[ -z "$LOGDIR" ] && LOGDIR=/etc/checksecurity/
+ if [ ! -e "$LOGDIR" ] ; then
+     echo "ERROR: Log directory $LOGDIR does not exist"
+     exit 1
+-- 
+1.7.9.5
+

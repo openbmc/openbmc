@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:red-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" xmlns:unix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://oval.mitre.org/XMLSchema/oval-common-5 oval-common-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5 oval-definitions-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5#unix unix-definitions-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5#linux linux-definitions-schema.xsd">
+  <generator>
+    <oval:product_name>OpenEmbedded Errata Test System</oval:product_name>
+    <oval:schema_version>5.10.1</oval:schema_version>
+    <oval:timestamp>2017-06-07T04:05:05</oval:timestamp>
+  </generator>
+
+  <definitions>
+    <definition class="patch" id="oval:com.redhat.rhsa:def:20171365" version="604">
+      <metadata>
+        <title>CPE-2017:1365: nss security and bug fix update (Important)</title>
+    <affected family="unix">
+      <platform>OpenEmbedded Nodistro</platform>
+    </affected>
+    <reference ref_id="RHSA-2017:1365-03" ref_url="https://access.redhat.com/errata/RHSA-2017:1365" source="RHSA"/>
+      <reference ref_id="CVE-2017-7502" ref_url="https://access.redhat.com/security/cve/CVE-2017-7502" source="CVE"/>
+    <description>Network Security Services (NSS) is a set of libraries designed to support the cross-platform development of security-enabled client and server applications.
+
+Security Fix(es):
+
+* A null pointer dereference flaw was found in the way NSS handled empty SSLv2 messages. An attacker could use this flaw to crash a server application compiled against the NSS library. (CVE-2017-7502)
+
+Bug Fix(es):
+
+* The Network Security Services (NSS) code and Certificate Authority (CA) list have been updated to meet the recommendations as published with the latest Mozilla Firefox Extended Support Release (ESR). The updated CA list improves compatibility with the certificates that are used in the Internet Public Key Infrastructure (PKI). To avoid certificate validation refusals, Red Hat recommends installing the updated CA list on June 12, 2017. (BZ#1451421)</description>
+
+<!-- ~~~~~~~~~~~~~~~~~~~~   advisory details   ~~~~~~~~~~~~~~~~~~~ -->
+
+<advisory from="example.com">
+        <severity>Important</severity>
+        <rights>NA</rights>
+        <issued date="2017-05-30"/>
+        <updated date="2017-05-30"/>
+        <cve cvss3="7.5/CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H" cwe="CWE-476" href="https://access.redhat.com/security/cve/CVE-2017-7502">CVE-2017-7502</cve>
+        <bugzilla href="https://bugzilla.redhat.com/1446631" id="1446631">CVE-2017-7502 nss: Null pointer dereference when handling empty SSLv2 messages</bugzilla>
+    <affected_cpe_list>
+        <cpe>cpe:/o:openembedded:nodistro:0</cpe>
+    </affected_cpe_list>
+</advisory>
+      </metadata>
+
+<criteria operator="AND">
+  <criterion comment="Red Hat Enterprise Linux 7 Client is installed" test_ref="oval:com.redhat.rhsa:tst:20171365001"/>
+  <criterion comment="nss is earlier than 0:3.28.4-r0" test_ref="oval:com.redhat.rhsa:tst:20171365007"/>
+</criteria>
+
+    </definition>
+  </definitions>
+  <tests>
+    <!-- ~~~~~~~~~~~~~~~~~~~~~   rpminfo tests   ~~~~~~~~~~~~~~~~~~~~~ -->
+    <rpminfo_test check="at least one" comment="Red Hat Enterprise Linux 7 Client is installed" id="oval:com.redhat.rhsa:tst:20171365001" version="604" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+  <object object_ref="oval:com.redhat.rhsa:obj:20171365001"/>
+  <state state_ref="oval:com.redhat.rhsa:ste:20171365002"/>
+</rpminfo_test>
+<rpminfo_test check="at least one" comment="nss is earlier than 0:3.31.4-r0" id="oval:com.redhat.rhsa:tst:20171365007" version="604" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+  <object object_ref="oval:com.redhat.rhsa:obj:20171365006"/>
+  <state state_ref="oval:com.redhat.rhsa:ste:20171365003"/>
+</rpminfo_test>
+
+  </tests>
+
+  <objects>
+    <!-- ~~~~~~~~~~~~~~~~~~~~   rpminfo objects   ~~~~~~~~~~~~~~~~~~~~ -->
+    <rpminfo_object id="oval:com.redhat.rhsa:obj:20171365006" version="604" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+  <name>nss</name>
+</rpminfo_object>
+<rpminfo_object id="oval:com.redhat.rhsa:obj:20171365001" version="604" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+  <name>openembedded-release</name>
+</rpminfo_object>
+
+  </objects>
+  <states>
+    <!-- ~~~~~~~~~~~~~~~~~~~~   rpminfo states   ~~~~~~~~~~~~~~~~~~~~~ -->
+<rpminfo_state id="oval:com.redhat.rhsa:ste:20171365002" version="604" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+  <version operation="pattern match">^1[^\d]</version>
+</rpminfo_state>
+<rpminfo_state id="oval:com.redhat.rhsa:ste:20171365003" version="604" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+  <evr datatype="evr_string" operation="less than">0:3.31.4-r0</evr>
+</rpminfo_state>
+
+  </states>
+</oval_definitions>

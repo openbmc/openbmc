@@ -1,0 +1,60 @@
+fix the bug:
+g_canon_name.c:125:5: warning: passing argument 2 of '__gss_copy_namebuf' from incompatible pointer type [enabled by default]
+
+the 2nd argument of __gss_copy_namebuf should be address of *gss_buffer_t, \
+but a *gss_buffer_t is assigned.
+
+what __gss_copy_namebuf does is to alloc memory for a gss_buffer_desc and \
+copy from src and return its address.
+
+if following code failed, gss_release_name will free \
+union_canon_name->external_name.value if it is not NULL.
+
+OM_uint32 __gss_copy_namebuf(src, dest)
+    gss_buffer_t   src;
+    gss_buffer_t   *dest;
+
+typedef struct gss_union_name_t {
+	gss_mechanism		gss_mech;
+	gss_OID			name_type;
+	gss_buffer_desc		external_name;
+	/*
+	 * These last two fields are only filled in for mechanism
+	 * names.
+	 */
+	gss_OID			mech_type;
+	gss_name_t		mech_name;
+} gss_union_name_desc, *gss_union_name_t;
+
+typedef struct gss_buffer_desc_struct {
+      size_t length;
+      void FAR *value;
+} gss_buffer_desc, FAR *gss_buffer_t;
+
+Upstream-Status: Pending
+Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
+
+--- a/src/g_canon_name.c
++++ b/src/g_canon_name.c
+@@ -121,11 +121,17 @@ gss_canonicalize_name (OM_uint32 *minor_
+ 
+     union_canon_name->mech_name = mech_name;
+ 
+-    status = __gss_copy_namebuf(&union_input_name->external_name,
+-				&union_canon_name->external_name);
+-    if (status != GSS_S_COMPLETE)
+-	goto failure;
++    union_canon_name->external_name.value = (void*) malloc(
++                      union_input_name->external_name.length + 1);
++    if (!union_canon_name->external_name.value)
++        goto failure;
+ 
++    memcpy(union_canon_name->external_name.value, 
++           union_input_name->external_name.value, 
++           union_input_name->external_name.length);
++    union_canon_name->external_name.length = 
++                      union_input_name->external_name.length; 
++   
+     if (union_input_name->name_type != GSS_C_NO_OID) {
+ 	status = generic_gss_copy_oid(minor_status,
+ 				      union_input_name->name_type,

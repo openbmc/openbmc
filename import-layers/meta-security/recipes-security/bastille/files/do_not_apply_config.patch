@@ -1,0 +1,40 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/Bastille_Curses.pm
+===================================================================
+--- Bastille.orig/Bastille_Curses.pm	2013-08-27 16:43:39.130959000 -0400
++++ Bastille/Bastille_Curses.pm	2013-08-27 16:43:39.794959000 -0400
+@@ -83,11 +83,6 @@
+     # Output answers to the script and display
+     &outputConfig;
+ 
+-    # Run Bastille
+-
+-    &Run_Bastille_with_Config;
+-
+-
+     # Display Credits
+ 
+     open CREDITS,"/usr/share/Bastille/Credits";
+Index: Bastille/InteractiveBastille
+===================================================================
+--- Bastille.orig/InteractiveBastille	2013-08-27 16:43:39.434959000 -0400
++++ Bastille/InteractiveBastille	2013-08-27 17:18:55.758959000 -0400
+@@ -531,10 +531,10 @@
+     "       Please address bug reports and suggestions to jay\@bastille-linux.org\n" .
+     "\n";
+ 
+-    $InterfaceEndScreenDescription = "We will now implement the choices you have made here.\n\n" .
++    $InterfaceEndScreenDescription = "We will now record the choices you have made here.\n\n" .
+ 	"Answer NO if you want to go back and make changes!\n";
+-    $InterfaceEndScreenQuestion = "Are you finished answering the questions, i.e. may we make the changes?";
+-    $InterfaceEndScreenNoEpilogue = "Please use Back/Next buttons to move among the questions you wish to\nchange.\n\nChoose YES on this question later to implement your choices.\n";
++    $InterfaceEndScreenQuestion = "Are you finished answering the questions, i.e. may we record the answers and exit?";
++    $InterfaceEndScreenNoEpilogue = "Please use Back/Next buttons to move among the questions you wish to\nchange.\n\nChoose YES on this question later to record your choices.\n";
+     require Bastille_Curses;
+ } elsif ($GLOBAL_AUDITONLY) {
+ 

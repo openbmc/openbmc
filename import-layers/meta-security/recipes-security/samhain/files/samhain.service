@@ -1,0 +1,12 @@
+[Unit]
+Description=Samhain @MODE_NAME@ Daemon
+After=syslog.target network.target
+
+[Service]
+Type=forking
+RemainAfterExit=yes
+ExecStart=@LIBDIR@/@SAMHAIN_HELPER@ start
+ExecStop=@LIBDIR@/@SAMHAIN_HELPER@ stop
+
+[Install]
+WantedBy=multi-user.target

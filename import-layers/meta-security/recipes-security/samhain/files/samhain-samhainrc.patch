@@ -1,0 +1,158 @@
+commit 4c6658441eb3ffc4e51ed70f78cbdab046957580
+Author: Aws Ismail <aws.ismail@windriver.com>
+Date:   Fri Jun 22 16:38:20 2012 -0400
+
+Make samhainrc OE-friendly.
+
+Patch the samhainrc that will be installed 
+as part of the 'make install' step to more
+accurately reflect what will be found, and
+what will be of concern, on a OE install.
+    
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+
+diff --git a/samhainrc.linux b/samhainrc.linux
+index 9bc5ca4..10a8176 100644
+--- a/samhainrc.linux
++++ b/samhainrc.linux
+@@ -74,7 +74,6 @@ dir = 0/
+ [Attributes]
+ file = /tmp
+ file = /dev
+-file = /media
+ file = /proc
+ file = /sys
+ 
+@@ -93,19 +92,10 @@ dir = 99/etc
+ ## check permission and ownership
+ ##
+ file = /etc/mtab
++file = /etc/fstab
+ file = /etc/adjtime
+ file = /etc/motd
+-file = /etc/lvm/.cache
+-
+-# On Ubuntu, these are in /var/lib rather than /etc
+-file = /etc/cups/certs
+-file = /etc/cups/certs/0
+-
+-# managed by fstab-sync on Fedora Core
+-file = /etc/fstab
+-
+-# modified when booting 
+-file = /etc/sysconfig/hwconf
++file = /etc/lvm/lvm.conf
+ 
+ # There are files in /etc that might change, thus changing the directory
+ # timestamps. Put it here as 'file', and in the ReadOnly section as 'dir'.
+@@ -147,10 +137,6 @@ dir = 99/dev
+ ##
+ dir = -1/dev/pts
+ 
+-# dir = -1/dev/.udevdb
+-
+-file = /dev/ppp
+-
+ #
+ # --------- /usr -----------
+ #
+@@ -167,50 +153,21 @@ dir = 99/var
+ 
+ [IgnoreAll]
+ dir = -1/var/cache
+-dir = -1/var/backups
+-dir = -1/var/games
+-dir = -1/var/gdm
+ dir = -1/var/lock
+ dir = -1/var/mail
+ dir = -1/var/run
+ dir = -1/var/spool
+ dir = -1/var/tmp
+-dir = -1/var/lib/texmf
+-dir = -1/var/lib/scrollkeeper
+ 
+ 
+ [Attributes]
+ 
+-dir = /var/lib/nfs
+-dir = /var/lib/pcmcia
+-
+ # /var/lib/rpm changes if packets are installed;
+ # /var/lib/rpm/__db.00[123] even more frequently
+ file = /var/lib/rpm/__db.00?
+ 
+-file = /var/lib/acpi-support/vbestate
+-file = /var/lib/alsa/asound.state
+-file = /var/lib/apt/lists/lock
+-file = /var/lib/apt/lists/partial
+-file = /var/lib/cups/certs
+-file = /var/lib/cups/certs/0
+-file = /var/lib/dpkg/lock
+-file = /var/lib/gdm
+-file = /var/lib/gdm/.cookie
+-file = /var/lib/gdm/.gdmfifo
+-file = /var/lib/gdm/:0.Xauth
+-file = /var/lib/gdm/:0.Xservers
+-file = /var/lib/logrotate/status
+-file = /var/lib/mysql
+-file = /var/lib/mysql/ib_logfile0
+-file = /var/lib/mysql/ibdata1
+-file = /var/lib/slocate
+-file = /var/lib/slocate/slocate.db
+-file = /var/lib/slocate/slocate.db.tmp
+-file = /var/lib/urandom
+-file = /var/lib/urandom/random-seed
++file = /var/lib/logrotate.status
+ file = /var/lib/random-seed
+-file = /var/lib/xkb
+ 
+ 
+ [GrowingLogFiles]
+@@ -325,7 +282,7 @@ IgnoreMissing = /var/lib/slocate/slocate.db.tmp
+ 
+ ## Console
+ ##
+-# PrintSeverity=info
++PrintSeverity=warn
+ 
+ ## Logfile
+ ##
+@@ -333,7 +290,7 @@ IgnoreMissing = /var/lib/slocate/slocate.db.tmp
+ 
+ ## Syslog
+ ##
+-# SyslogSeverity=none
++SyslogSeverity=info
+ 
+ ## Remote server (yule)
+ ##
+@@ -556,7 +513,8 @@ ChecksumTest=check
+ ## and I/O limit (kilobytes per second; 0 == off)
+ ## to reduce load on host.
+ #
+-# SetNiceLevel = 0
++# By default we configure samhain to be nice with everything else on the system
++SetNiceLevel = 10
+ # SetIOLimit = 0
+ 
+ ## The version string to embed in file signature databases
+@@ -565,13 +523,14 @@ ChecksumTest=check
+ 
+ ## Interval between time stamp messages
+ #
+-# SetLoopTime = 60
+-SetLoopTime = 600
++# Log a timestamp every hour
++SetLoopTime = 3600
+ 
+ ## Interval between file checks 
+ #
+ # SetFileCheckTime = 600
+-SetFileCheckTime = 7200
++# One file system check per day
++SetFileCheckTime = 86400
+ 
+ ## Alternative: crontab-like schedule
+ #

@@ -1,0 +1,254 @@
+From eb28ad92a2722fd30f8114840cf2b1ade26b80ee Mon Sep 17 00:00:00 2001
+From: Limeng <Meng.Li@windriver.com>
+Date: Fri, 23 Jun 2017 11:39:04 +0800
+Subject: [PATCH] tpm:openssl-tpm-engine:parse an encrypted tpm SRK password 
+ from env
+
+Before, we support reading SRK password from env TPM_SRK_PW,
+but it is a plain password and not secure.
+So, we improve it and support to get an encrypted (AES algorithm)
+SRK password from env, and then parse it. The default decrypting
+AES password and salt is set in bb file.
+When we initialize TPM, and set a SRK pw, and then we need to
+encrypt it with the same AES password and salt by AES algorithm.
+At last, we set a env as below:
+export TPM_SRK_ENC_PW=xxxxxxxx
+"xxxxxxxx" is the encrypted SRK password for libtpm.so.
+
+Signed-off-by: Meng Li <Meng.Li@windriver.com>
+---
+ e_tpm.c     | 157 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ e_tpm.h     |   4 ++
+ e_tpm_err.c |   4 ++
+ 3 files changed, 164 insertions(+), 1 deletion(-)
+
+diff --git a/e_tpm.c b/e_tpm.c
+index 7dcb75a..11bf74b 100644
+--- a/e_tpm.c
++++ b/e_tpm.c
+@@ -245,6 +245,118 @@ void ENGINE_load_tpm(void)
+ 	ERR_clear_error();
+ }
+ 
++static int tpm_decode_base64(unsigned char *indata,
++				int in_len,
++				unsigned char *outdata,
++				int *out_len)
++{
++	int total_len, len, ret;
++	EVP_ENCODE_CTX dctx;
++
++	EVP_DecodeInit(&dctx);
++
++	total_len = 0;
++	ret = EVP_DecodeUpdate(&dctx, outdata, &len, indata, in_len);
++	if (ret < 0) {
++		TSSerr(TPM_F_TPM_DECODE_BASE64, TPM_R_DECODE_BASE64_FAILED);
++		return 1;
++	}
++
++	total_len += len;
++	ret = EVP_DecodeFinal(&dctx, outdata, &len);
++	if (ret < 0) {
++		TSSerr(TPM_F_TPM_DECODE_BASE64, TPM_R_DECODE_BASE64_FAILED);
++		return 1;
++	}
++	total_len += len;
++
++	*out_len = total_len;
++
++	return 0;
++}
++
++static int tpm_decrypt_srk_pw(unsigned char *indata, int in_len,
++				unsigned char *outdata,
++				int *out_len)
++{
++	int dec_data_len, dec_data_lenfinal;
++	unsigned char dec_data[256];
++	unsigned char *aes_pw;
++	unsigned char aes_salt[PKCS5_SALT_LEN];
++	unsigned char key[EVP_MAX_KEY_LENGTH], iv[EVP_MAX_IV_LENGTH];
++	const EVP_CIPHER *cipher = NULL;
++	const EVP_MD *dgst = NULL;
++	EVP_CIPHER_CTX *ctx = NULL;
++
++	if (sizeof(SRK_DEC_SALT) - 1 > PKCS5_SALT_LEN) {
++		TSSerr(TPM_F_TPM_DECRYPT_SRK_PW, TPM_R_DECRYPT_SRK_PW_FAILED);
++		return 1;
++	}
++
++	aes_pw = malloc(sizeof(SRK_DEC_PW) - 1);
++	if (aes_pw == NULL) {
++		TSSerr(TPM_F_TPM_DECRYPT_SRK_PW, TPM_R_DECRYPT_SRK_PW_FAILED);
++		return 1;
++	}
++
++	memset(aes_salt, 0x00, sizeof(aes_salt));
++	memcpy(aes_pw, SRK_DEC_PW, sizeof(SRK_DEC_PW) - 1);
++	memcpy(aes_salt, SRK_DEC_SALT, sizeof(SRK_DEC_SALT) - 1);
++
++	cipher = EVP_get_cipherbyname("aes-128-cbc");
++	if (cipher == NULL) {
++		TSSerr(TPM_F_TPM_DECRYPT_SRK_PW, TPM_R_DECRYPT_SRK_PW_FAILED);
++		free(aes_pw);
++		return 1;
++	}
++	dgst = EVP_sha256();
++
++	EVP_BytesToKey(cipher, dgst, aes_salt, (unsigned char *)aes_pw, sizeof(SRK_DEC_PW) - 1, 1, key, iv);
++
++	ctx = EVP_CIPHER_CTX_new();
++	/* Don't set key or IV right away; we want to check lengths */
++	if (!EVP_CipherInit_ex(ctx, cipher, NULL, NULL, NULL, 0)) {
++		TSSerr(TPM_F_TPM_DECRYPT_SRK_PW, TPM_R_DECRYPT_SRK_PW_FAILED);
++		free(aes_pw);
++		return 1;
++	}
++
++	OPENSSL_assert(EVP_CIPHER_CTX_key_length(ctx) == 16);
++	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) == 16);
++
++	if (!EVP_CipherInit_ex(ctx, NULL, NULL, key, iv, 0)) {
++		TSSerr(TPM_F_TPM_DECRYPT_SRK_PW, TPM_R_DECRYPT_SRK_PW_FAILED);
++		free(aes_pw);
++		return 1;
++	}
++
++	if (!EVP_CipherUpdate(ctx, dec_data, &dec_data_len, indata, in_len)) {
++		/* Error */
++		TSSerr(TPM_F_TPM_DECRYPT_SRK_PW, TPM_R_DECRYPT_SRK_PW_FAILED);
++		free(aes_pw);
++		EVP_CIPHER_CTX_free(ctx);
++		return 1;
++	}
++
++	if (!EVP_CipherFinal_ex(ctx, dec_data + dec_data_len, &dec_data_lenfinal)) {
++		/* Error */
++		TSSerr(TPM_F_TPM_DECRYPT_SRK_PW, TPM_R_DECRYPT_SRK_PW_FAILED);
++		free(aes_pw);
++		EVP_CIPHER_CTX_free(ctx);
++		return 1;
++	}
++
++	dec_data_len = dec_data_len + dec_data_lenfinal;
++
++	memcpy(outdata, dec_data, dec_data_len);
++	*out_len = dec_data_len;
++
++	free(aes_pw);
++	EVP_CIPHER_CTX_free(ctx);
++
++	return 0;
++}
++
+ int tpm_load_srk(UI_METHOD *ui, void *cb_data)
+ {
+ 	TSS_RESULT result;
+@@ -305,8 +417,50 @@ int tpm_load_srk(UI_METHOD *ui, void *cb_data)
+ 		return 0;
+ 	}
+ 
+-	srkPasswd = getenv("TPM_SRK_PW");
++	srkPasswd = getenv("TPM_SRK_ENC_PW");
+ 	if (NULL != srkPasswd) {
++		int in_len = strlen(srkPasswd);
++		int out_len;
++		unsigned char *out_buf;
++
++		if (!in_len || in_len % 4) {
++			Tspi_Context_CloseObject(hContext, hSRK);
++			free(auth);
++			TSSerr(TPM_F_TPM_LOAD_SRK, TPM_R_REQUEST_FAILED);
++			return 0;
++		}
++
++		out_len = in_len * 3 / 4;
++		out_buf = malloc(out_len);
++		if (NULL == out_buf) {
++			Tspi_Context_CloseObject(hContext, hSRK);
++			free(auth);
++			TSSerr(TPM_F_TPM_LOAD_SRK, TPM_R_REQUEST_FAILED);
++			return 0;
++		}
++
++		if (tpm_decode_base64(srkPasswd, strlen(srkPasswd),
++					out_buf, &out_len)) {
++			Tspi_Context_CloseObject(hContext, hSRK);
++			free(auth);
++			free(out_buf);
++			TSSerr(TPM_F_TPM_LOAD_SRK, TPM_R_REQUEST_FAILED);
++			return 0;
++		}
++
++		if (tpm_decrypt_srk_pw(out_buf, out_len,
++							auth, &authlen)) {
++			Tspi_Context_CloseObject(hContext, hSRK);
++			free(auth);
++			free(out_buf);
++			TSSerr(TPM_F_TPM_LOAD_SRK, TPM_R_REQUEST_FAILED);
++			return 0;
++		}
++		secretMode = TSS_SECRET_MODE_PLAIN;
++		free(out_buf);
++	}
++#ifdef TPM_SRK_PLAIN_PW
++	else if (NULL != (srkPasswd = getenv("TPM_SRK_PW")) {
+ 		if (0 == strcmp(srkPasswd, "#WELLKNOWN#")) {
+ 			memset(auth, 0, TPM_WELL_KNOWN_KEY_LEN);
+ 			secretMode = TSS_SECRET_MODE_SHA1;
+@@ -319,6 +473,7 @@ int tpm_load_srk(UI_METHOD *ui, void *cb_data)
+ 			authlen = strlen(auth);
+ 		}
+ 	}
++#endif
+ 	else {
+ 		if (!tpm_engine_get_auth(ui, (char *)auth, 128,
+ 				"SRK authorization: ", cb_data)) {
+diff --git a/e_tpm.h b/e_tpm.h
+index 6316e0b..56ff202 100644
+--- a/e_tpm.h
++++ b/e_tpm.h
+@@ -66,6 +66,8 @@ void ERR_TSS_error(int function, int reason, char *file, int line);
+ #define TPM_F_TPM_FILL_RSA_OBJECT		116
+ #define TPM_F_TPM_ENGINE_GET_AUTH		117
+ #define TPM_F_TPM_CREATE_SRK_POLICY		118
++#define TPM_F_TPM_DECODE_BASE64			119
++#define TPM_F_TPM_DECRYPT_SRK_PW		120
+ 
+ /* Reason codes. */
+ #define TPM_R_ALREADY_LOADED			100
+@@ -96,6 +98,8 @@ void ERR_TSS_error(int function, int reason, char *file, int line);
+ #define TPM_R_ID_INVALID			125
+ #define TPM_R_UI_METHOD_FAILED			126
+ #define TPM_R_UNKNOWN_SECRET_MODE		127
++#define TPM_R_DECODE_BASE64_FAILED		128
++#define TPM_R_DECRYPT_SRK_PW_FAILED		129
+ 
+ /* structure pointed to by the RSA object's app_data pointer */
+ struct rsa_app_data
+diff --git a/e_tpm_err.c b/e_tpm_err.c
+index 25a5d0f..439e267 100644
+--- a/e_tpm_err.c
++++ b/e_tpm_err.c
+@@ -235,6 +235,8 @@ static ERR_STRING_DATA TPM_str_functs[] = {
+ 	{ERR_PACK(0, TPM_F_TPM_BIND_FN, 0), "TPM_BIND_FN"},
+ 	{ERR_PACK(0, TPM_F_TPM_FILL_RSA_OBJECT, 0), "TPM_FILL_RSA_OBJECT"},
+ 	{ERR_PACK(0, TPM_F_TPM_ENGINE_GET_AUTH, 0), "TPM_ENGINE_GET_AUTH"},
++	{ERR_PACK(0, TPM_F_TPM_DECODE_BASE64, 0), "TPM_DECODE_BASE64"},
++	{ERR_PACK(0, TPM_F_TPM_DECRYPT_SRK_PW, 0), "TPM_DECRYPT_SRK_PW"},
+ 	{0, NULL}
+ };
+ 
+@@ -265,6 +267,8 @@ static ERR_STRING_DATA TPM_str_reasons[] = {
+ 	{TPM_R_FILE_READ_FAILED, "failed reading the key file"},
+ 	{TPM_R_ID_INVALID, "engine id doesn't match"},
+ 	{TPM_R_UI_METHOD_FAILED, "ui function failed"},
++	{TPM_R_DECODE_BASE64_FAILED, "decode base64 failed"},
++	{TPM_R_DECRYPT_SRK_PW_FAILED, "decrypt srk password failed"},
+ 	{0, NULL}
+ };
+ 
+-- 
+2.9.3
+

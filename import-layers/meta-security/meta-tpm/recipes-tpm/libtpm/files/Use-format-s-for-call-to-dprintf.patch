@@ -1,0 +1,33 @@
+From 6a9b4e5d70f770aa9ca31e3e6d3b1ae72c192070 Mon Sep 17 00:00:00 2001
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 31 Jan 2017 20:10:51 -0500
+Subject: [PATCH] Use format '%s' for call to dprintf
+
+Fix the dprintf call to use a format parameter that otherwise causes
+errors with gcc on certain platforms.
+
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+
+Upstream-Status: Backport
+replaces local patch
+Signed-off-by: Armin Kuster <akuster@mvsita.com>
+
+---
+ src/tpm_library.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: git/src/tpm_library.c
+===================================================================
+--- git.orig/src/tpm_library.c
++++ git/src/tpm_library.c
+@@ -405,8 +405,8 @@ int TPMLIB_LogPrintf(const char *format,
+     }
+ 
+     if (debug_prefix)
+-        dprintf(debug_fd, debug_prefix);
+-    dprintf(debug_fd, buffer);
++        dprintf(debug_fd, "%s", debug_prefix);
++    dprintf(debug_fd, "%s", buffer);
+ 
+     return i;
+ }

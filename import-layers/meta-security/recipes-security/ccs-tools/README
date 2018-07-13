@@ -1,0 +1,12 @@
+Documentation:
+http://tomoyo.sourceforge.jp/1.8/index.html.en
+
+
+To start via command line add:
+
+" security=tomoyo TOMOYO_trigger=/usr/lib/systemd/systemd"
+
+To initialize:
+/usr/lib/ccs/init_policy
+
+DISTRO_FEATURES_append = " tomoyo"

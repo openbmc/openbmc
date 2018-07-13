@@ -1,0 +1,3 @@
+# <type> <owner> <group> <mode> <path> <linksource>
+d clamav clamav 0755 /var/log/clamav none
+f clamav clamav 0655 /var/log/clamav/freshclam.log none

@@ -1,0 +1,18 @@
+tripwire: Add armeb support
+
+Upstream-Status: Submitted to tripwire-dev
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+diff -Naurp tripwire-2.4.2.2-src_org/config.sub tripwire-2.4.2.2-src/config.sub
+--- tripwire-2.4.2.2-src_org/config.sub	2015-07-20 15:03:04.161452573 +0530
++++ tripwire-2.4.2.2-src/config.sub	2015-07-20 15:06:07.077673139 +0530
+@@ -268,7 +268,7 @@ case $basic_machine in
+ 	# FIXME: clean up the formatting here.
+ 	vax-* | tahoe-* | i*86-* | i860-* | ia64-* | m32r-* | m68k-* | m68000-* \
+ 	      | m88k-* | sparc-* | ns32k-* | fx80-* | arc-* | c[123]* | aarch64-* | aarch64be-*  \
+-	      | arm-*  | armbe-* | armle-* | armv*-* | strongarm-* | xscale-* \
++	      | arm-*  | armeb-* | armbe-* | armle-* | armv*-* | strongarm-* | xscale-* \
+ 	      | mips-* | pyramid-* | tron-* | a29k-* | romp-* | rs6000-* \
+ 	      | power-* | none-* | 580-* | cray2-* | h8300-* | h8500-* | i960-* \
+ 	      | xmp-* | ymp-* \

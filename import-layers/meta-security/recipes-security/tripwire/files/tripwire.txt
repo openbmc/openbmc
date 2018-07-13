@@ -1,0 +1,69 @@
+Post-Installation Instructions
+1. Run the configuration script: /etc/tripwire/twinstall.sh to sign these files. This script walks you through the processes of setting passphrases and signing the Tripwire policy and configuration files. 
+Note: Once encoded and signed, the configuration file should not be renamed or moved.
+2. Initialize the Tripwire database file. (/usr/sbin/tripwire--init)
+3. Run the first integrity check. (/usr/sbin/tripwire--check)
+4. Edit the configuration file (twcfg.txt) with a text editor, if desired.
+5. Edit the policy file (twpol.txt) with a text editor, if desired.
+
+Note: If you plan to modify the policy file, we recommend you do so before running the configuration script. If you modify the policy file after running the configuration script, you must re-run the configuration file before initializing the database file. 
+
+Modifying the Policy File
+You can specify how Tripwire software checks your system in the Tripwire policy file (twpol.txt). A default policy file is included in the Tripwire software installation. We recommend you tailor this policy file to fit your particular system. Tailoring the policy file greatly increases Tripwire software's ability to ensure the integrity of your system. 
+
+Locate the default policy file at  /etc/tripwire/twpol.txt. An example policy file (located at   /usr/doc/tripwire-VER#-REL#/policyguide.txt) is included to help you learn the policy language. Read the sample policy file and the comments in the sample policy file to learn the policy language. 
+
+After you modify the policy file, follow the Post-Installation Instructions (run the configuration script). This script signs the modified policy file and renames it to tw.pol. This is the active policy file that runs as part of the Tripwire software. 
+
+Selecting Passphrases
+Tripwire files are signed or encrypted using site or local keys. These keys are protected by passphrases. When selecting passphrases, the following recommendations apply:
+Use at least eight alphanumeric and symbolic characters for each passphrase. The maximum length of a passphrase is 1023 characters. Quotes should not be used as passphrase characters.
+
+Assign a unique passphrase for the site key. The site key passphrase protects the site key, which is used to sign Tripwire software configuration and policy files. Assign a unique passphrase for the local key. The local key signs Tripwire database files. The local key may sign the Tripwire report files also. 
+
+Store the passphrases in a secure location. There is no way to remove encryption from a signed file if you forget your passphrase. If you forget the passphrases, the files are unusable. In that case you must reinitialize the baseline database.
+
+Initializing the Database 
+In Database Initialization mode, Tripwire software builds a database of filesystem objects based on the rules in the policy file. This database serves as the baseline for integrity checks. The syntax for Database Initialization mode is:
+tripwire  --init 
+
+Running an Integrity Check
+The Integrity Check mode compares the current file system objects with their properties recorded in the Tripwire database. Violations are printed to stdout. The report file is saved and can later be accessed by twprint. An email option enables you to send email. The syntax for Integrity Check mode is:
+tripwire --check 
+
+Printing Reports - twprint Print Report Mode
+The twprint --print-report mode prints the contents of a Tripwire report. If you do not specify a report with the --twrfile or -r command-line argument, the default report file specified by the configuration file REPORTFILE variable is used. 
+Example: On a machine named LIGHTHOUSE, the command would be:
+./twprint -m r --twrfile LIGHTHOUSE-19990622-021212.twr
+
+Updating the Database after an Integrity Check
+Database Update mode enables you to update the Tripwire database after an integrity check if you determine that the violations discovered are valid. This update process saves time by enabling you to update the database without having to re-initialize it. It also enables selective updating, which cannot be done through re-initialization. The syntax for Database Update mode is:
+tripwire --update 
+
+Updating the Policy File
+Change the way that Tripwire software scans the system by changing the rules in the policy file. You can  then update the database without a complete re-initialization. This saves a significant amount of time and preserves security by keeping the policy file synchronized with the database it uses.  The syntax for Policy Update mode is:
+tripwire  --update-policy 
+
+Testing email functions
+Test mode tests the software's email notification system, using the settings currently specified in the configuration file. The syntax for Email Test Reporting mode is:
+tripwire  --test 
+
+Tripwire Components
+The policy file begins as a text file containing comments, rules, directives, and variables. These dictate the way Tripwire software checks your system. Each rule in the policy file specifies a system object to be monitored. Rules also describe which changes to the object to report, and which to ignore. 
+
+System objects are the files and directories you wish to monitor. Each object is identified by an object name. A property refers to a single characteristic of an object that Tripwire software can monitor. Directives control conditional processing of sets of rules in a policy file. During installation, the text policy file is encrypted and renamed, and becomes the active policy file. 
+
+The database file is an important component of Tripwire software. When first installed, Tripwire software uses the policy file rules to create the database file. The database file is a baseline "snapshot" of the system in a known secure state. Tripwire software compares this baseline against the current system to determine what changes have occurred. This is an integrity check.
+
+When you perform an integrity check, Tripwire software produces report files. Report files summarize any changes that violated the policy file rules during the integrity check. You can view the report file in a variety of formats, at varying levels of detail.  
+
+The Tripwire configuration file stores system-specific information, such as the location of Tripwire data files. Tripwire software generates some of the configuration file information during installation. The system administrator can change parameters in the configuration file at any time. The configuration file variables POLFILE, DBFILE, REPORTFILE, SITEKEYFILE, and LOCALKEYFILE specify where the policy file, database file, report files, and site and local key files reside. These variables must be defined or the configuration file is invalid. If any of these variables are undefined, an error occurs on execution of Tripwire software and the program exits. 
+
+Tripwire Help
+All Tripwire commands support the help arguments. Example: To get help with Create Configuration File mode, type: ./twadmin --help --create-cfgfile
+
+-?		Display usage and version information
+--help		Display all command modes
+--help all	Display help for all command modes
+--help [mode]	Display help for current command mode
+--version	Display version information

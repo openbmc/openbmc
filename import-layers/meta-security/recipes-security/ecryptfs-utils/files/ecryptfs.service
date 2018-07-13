@@ -1,0 +1,9 @@
+[Unit]
+Description=A userspace daemon that runs as the user perform file operations under the eCryptfs mount point
+After=udev.service
+
+[Service]
+ExecStart=/usr/bin/ecryptfsd -f
+
+[Install]
+WantedBy=multi-user.target

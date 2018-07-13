@@ -1,0 +1,42 @@
+fix keyutils test error report
+
+Upstream-Status: Pending
+
+"Permission denied" may be the reason of EKEYEXPIRED and EKEYREVOKED.
+"Required key not available" may be the reason of EKEYREVOKED.
+EXPIRED and REVOKED are 2 status of kernel security keys features.
+But the userspace keyutils lib will output the error message, which may
+have several reasons.
+
+Signed-off-by: Han Chao <chan@windriver.com>
+
+diff --git a/tests/toolbox.inc.sh b/tests/toolbox.inc.sh
+index bbca00a..739e9d0 100644
+--- a/tests/toolbox.inc.sh
++++ b/tests/toolbox.inc.sh
+@@ -227,11 +227,12 @@ function expect_error ()
+ 	    ;;
+ 	EKEYEXPIRED)
+ 	    my_err="Key has expired"
+-	    alt_err="Unknown error 127"
++	    alt_err="Permission denied"
+ 	    ;;
+ 	EKEYREVOKED)
+ 	    my_err="Key has been revoked"
+-	    alt_err="Unknown error 128"
++	    alt_err="Permission denied"
++	    alt2_err="Required key not available"
+ 	    ;;
+ 	EKEYREJECTED)
+ 	    my_err="Key has been rejected"
+@@ -249,6 +250,9 @@ function expect_error ()
+     elif [ "x$alt_err" != "x" ] && expr "$my_errmsg" : ".*: $alt_err" >&/dev/null
+     then
+ 	:
++    elif [ "x$alt2_err" != "x" ] && expr "$my_errmsg" : ".*: $alt2_err" >&/dev/null
++    then
++	:
+     elif [ "x$old_err" != "x" ] && expr "$my_errmsg" : ".*: $old_err" >&/dev/null
+     then
+ 	:
+

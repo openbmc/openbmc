@@ -1,0 +1,31 @@
+This fixes musl build issue do to missing FD_* defines.
+Add sys/select.h
+
+Upstream-Status: Pending
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+Index: TPM2.0-TSS/tcti/tcti_socket.cpp
+===================================================================
+--- TPM2.0-TSS.orig/tcti/tcti_socket.cpp
++++ TPM2.0-TSS/tcti/tcti_socket.cpp
+@@ -28,6 +28,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>   // Needed for _wtoi
+ 
++#include "sys/select.h"
+ #include <sapi/tpm20.h>
+ #include <tcti/tcti_socket.h>
+ #include "sysapi_util.h"
+Index: TPM2.0-TSS/resourcemgr/resourcemgr.c
+===================================================================
+--- TPM2.0-TSS.orig/resourcemgr/resourcemgr.c
++++ TPM2.0-TSS/resourcemgr/resourcemgr.c
+@@ -28,6 +28,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>   // Needed for _wtoi
+ 
++#include "sys/select.h"
+ #include <sapi/tpm20.h>
+ #include <tcti/tcti_device.h>
+ #include <tcti/tcti_socket.h>

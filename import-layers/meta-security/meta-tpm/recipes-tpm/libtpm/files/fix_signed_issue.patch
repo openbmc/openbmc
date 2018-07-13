@@ -1,0 +1,48 @@
+Upstream-Status: Pending
+Signed-off-by: Armin kuster <akuster808@gmail.com>
+
+Index: git/src/swtpm/ctrlchannel.c
+===================================================================
+--- git.orig/src/swtpm/ctrlchannel.c
++++ git/src/swtpm/ctrlchannel.c
+@@ -152,7 +152,8 @@ static int ctrlchannel_receive_state(ptm
+     uint32_t tpm_number = 0;
+     unsigned char *blob = NULL;
+     uint32_t blob_length = be32toh(pss->u.req.length);
+-    uint32_t remain = blob_length, offset = 0;
++    ssize_t remain = (ssize_t) blob_length;
++    uint32_t offset = 0;
+     TPM_RESULT res;
+     uint32_t flags = be32toh(pss->u.req.state_flags);
+     TPM_BOOL is_encrypted = (flags & PTM_STATE_FLAG_ENCRYPTED) != 0;
+Index: git/src/swtpm_ioctl/tpm_ioctl.c
+===================================================================
+--- git.orig/src/swtpm_ioctl/tpm_ioctl.c
++++ git/src/swtpm_ioctl/tpm_ioctl.c
+@@ -303,7 +303,7 @@ static int do_save_state_blob(int fd, bo
+         numbytes = write(file_fd, pgs.u.resp.data,
+                          devtoh32(is_chardev, pgs.u.resp.length));
+ 
+-        if (numbytes != devtoh32(is_chardev, pgs.u.resp.length)) {
++        if (numbytes != (ssize_t) devtoh32(is_chardev, pgs.u.resp.length)) {
+             fprintf(stderr,
+                     "Could not write to file '%s': %s\n",
+                     filename, strerror(errno));
+@@ -420,7 +420,7 @@ static int do_load_state_blob(int fd, bo
+                had_error = true;
+                break;
+             }
+-            pss.u.req.length = htodev32(is_chardev, numbytes);
++            pss.u.req.length = htodev32(is_chardev, (uint32_t) numbytes);
+ 
+             /* the returnsize is zero on all intermediate packets */
+             returnsize = ((size_t)numbytes < sizeof(pss.u.req.data))
+@@ -863,7 +863,7 @@ int main(int argc, char *argv[])
+             return EXIT_FAILURE;
+         }
+         /* no tpm_result here */
+-        printf("ptm capability is 0x%lx\n", (uint64_t)devtoh64(is_chardev, cap));
++        printf("ptm capability is 0x%llx\n", (uint64_t)devtoh64(is_chardev, cap));
+ 
+     } else if (!strcmp(command, "-i")) {
+         init.u.req.init_flags = htodev32(is_chardev, PTM_INIT_FLAG_DELETE_VOLATILE);

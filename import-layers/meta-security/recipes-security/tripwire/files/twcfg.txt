@@ -1,0 +1,15 @@
+ROOT                   =/usr/sbin
+POLFILE                =/etc/tripwire/tw.pol
+DBFILE                 =/var/lib/tripwire/$(HOSTNAME).twd
+REPORTFILE             =/var/lib/tripwire/report/$(HOSTNAME)-$(DATE).twr
+SITEKEYFILE            =/etc/tripwire/site.key
+LOCALKEYFILE           =/etc/tripwire/$(HOSTNAME)-local.key
+EDITOR                 =/usr/bin/nano
+LATEPROMPTING          =false
+LOOSEDIRECTORYCHECKING =false
+MAILNOVIOLATIONS       =true
+EMAILREPORTLEVEL       =3
+REPORTLEVEL            =3
+MAILMETHOD             =SENDMAIL
+SYSLOGREPORTING        =false
+MAILPROGRAM            =/usr/lib/sendmail -t

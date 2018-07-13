@@ -1,0 +1,54 @@
+Upstream Status: Inappropriate [No upstream maintenance]
+
+Signed-off-by: Anne Mulhern <mulhern@yoctoproject.org>
+
+---
+
+Index: Bastille/Bastille/Firewall.pm
+===================================================================
+--- Bastille.orig/Bastille/Firewall.pm	2008-09-14 19:56:54.000000000 -0400
++++ Bastille/Bastille/Firewall.pm	2013-08-20 16:28:44.588378000 -0400
+@@ -21,6 +21,7 @@
+ package Bastille::Firewall;
+ 
+ use Bastille::API;
++use Bastille::API::AccountPermission;
+ use Bastille::API::FileContent;
+ use Bastille::API::ServiceAdmin;
+ 
+Index: Bastille/Bastille/SecureInetd.pm
+===================================================================
+--- Bastille.orig/Bastille/SecureInetd.pm	2008-09-14 19:56:58.000000000 -0400
++++ Bastille/Bastille/SecureInetd.pm	2013-08-20 16:45:02.252378001 -0400
+@@ -12,6 +12,7 @@
+ use lib "/usr/lib";
+ 
+ use Bastille::API;
++use Bastille::API::AccountPermission;
+ use Bastille::API::HPSpecific;
+ use Bastille::API::ServiceAdmin;
+ use Bastille::API::FileContent;
+Index: Bastille/Bastille/ConfigureMiscPAM.pm
+===================================================================
+--- Bastille.orig/Bastille/ConfigureMiscPAM.pm	2005-09-12 23:47:28.000000000 -0400
++++ Bastille/Bastille/ConfigureMiscPAM.pm	2013-08-20 18:36:07.340378001 -0400
+@@ -5,6 +5,7 @@
+ use lib "/usr/lib";
+ 
+ use Bastille::API;
++use Bastille::API::FileContent;
+ 
+ # To DO:
+ #
+Index: Bastille/Bastille/Printing.pm
+===================================================================
+--- Bastille.orig/Bastille/Printing.pm	2008-09-14 19:56:58.000000000 -0400
++++ Bastille/Bastille/Printing.pm	2013-08-20 19:05:01.532378002 -0400
+@@ -5,6 +5,7 @@
+ use lib "/usr/lib";
+ 
+ use Bastille::API;
++use Bastille::API::AccountPermission;
+ use Bastille::API::HPSpecific;
+ use Bastille::API::ServiceAdmin;
+ use Bastille::API::FileContent;

@@ -1,0 +1,80 @@
+commit 16dac0cb7b73b8a7088300e45b98ac20819b03ed
+Author: Junxian.Xiao <Junxian.Xiao@windriver.com>
+Date:   Wed Jun 19 18:57:13 2013 +0800
+
+support reading SRK password from env TPM_SRK_PW
+
+Add "env TPM_SRK_PW=xxxx" to set password for libtpm.so. Specially,
+use "env TPM_SRK_PW=#WELLKNOWN#" to set well known password.
+
+Signed-off-by: Junxian.Xiao <Junxian.Xiao@windriver.com>
+
+diff --git a/e_tpm.c b/e_tpm.c
+index f3e8bcf..7dcb75a 100644
+--- a/e_tpm.c
++++ b/e_tpm.c
+@@ -38,6 +38,8 @@
+ 
+ #include "e_tpm.h"
+ 
++#define TPM_WELL_KNOWN_KEY_LEN 20   /*well know key length is 20 bytes zero*/
++
+ //#define DLOPEN_TSPI
+ 
+ #ifndef OPENSSL_NO_HW
+@@ -248,6 +250,10 @@ int tpm_load_srk(UI_METHOD *ui, void *cb_data)
+ 	TSS_RESULT result;
+ 	UINT32 authusage;
+ 	BYTE *auth;
++	char *srkPasswd = NULL;
++	TSS_FLAG secretMode = secret_mode;
++	int authlen = 0;
++
+ 
+ 	if (hSRK != NULL_HKEY) {
+ 		DBGFN("SRK is already loaded.");
+@@ -299,18 +305,36 @@ int tpm_load_srk(UI_METHOD *ui, void *cb_data)
+ 		return 0;
+ 	}
+ 
+-	if (!tpm_engine_get_auth(ui, (char *)auth, 128, "SRK authorization: ",
+-				cb_data)) {
+-		Tspi_Context_CloseObject(hContext, hSRK);
+-		free(auth);
+-		TSSerr(TPM_F_TPM_LOAD_SRK, TPM_R_REQUEST_FAILED);
+-		return 0;
++	srkPasswd = getenv("TPM_SRK_PW");
++	if (NULL != srkPasswd) {
++		if (0 == strcmp(srkPasswd, "#WELLKNOWN#")) {
++			memset(auth, 0, TPM_WELL_KNOWN_KEY_LEN);
++			secretMode = TSS_SECRET_MODE_SHA1;
++			authlen = TPM_WELL_KNOWN_KEY_LEN;
++		} else {
++			int authbuflen = 128;
++			memset(auth, 0, authbuflen);
++			strncpy(auth, srkPasswd, authbuflen-1);
++			secretMode = TSS_SECRET_MODE_PLAIN;
++			authlen = strlen(auth);
++		}
++	}
++	else {
++		if (!tpm_engine_get_auth(ui, (char *)auth, 128,
++				"SRK authorization: ", cb_data)) {
++			Tspi_Context_CloseObject(hContext, hSRK);
++			free(auth);
++			TSSerr(TPM_F_TPM_LOAD_SRK, TPM_R_REQUEST_FAILED);
++			return 0;
++		}
++		secretMode = secret_mode;
++		authlen = strlen(auth);
+ 	}
+ 
+ 	/* secret_mode is a global that may be set by engine ctrl
+ 	 * commands.  By default, its set to TSS_SECRET_MODE_PLAIN */
+-	if ((result = Tspi_Policy_SetSecret(hSRKPolicy, secret_mode,
+-					      strlen((char *)auth), auth))) {
++	if ((result = Tspi_Policy_SetSecret(hSRKPolicy, secretMode,
++					      authlen, auth))) {
+ 		Tspi_Context_CloseObject(hContext, hSRK);
+ 		free(auth);
+ 		TSSerr(TPM_F_TPM_LOAD_SRK, TPM_R_REQUEST_FAILED);
