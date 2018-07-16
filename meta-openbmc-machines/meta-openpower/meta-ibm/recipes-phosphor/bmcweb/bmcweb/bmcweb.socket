@@ -1,0 +1,8 @@
+[Unit]
+Description=Phosphor redfish socket (bmcweb)
+
+[Socket]
+ListenStream=127.0.0.1:8082
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,9 @@
+[Unit]
+Description=BMC Redfish Server (bmcweb)
+After=network.target
+After=obmc-webserver-pre.target
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/env bmcweb
+SyslogIdentifier=bmcweb
