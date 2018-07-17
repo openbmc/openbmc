@@ -183,24 +183,54 @@ do_make_ubi[depends] += " \
         mtd-utils-native:do_populate_sysroot \
         "
 
-do_generate_static() {
+do_mk_static_nor_image() {
 	# Assemble the flash image
 	mk_nor_image ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd ${FLASH_SIZE}
-	dd bs=1k conv=notrunc seek=${FLASH_UBOOT_OFFSET} \
-		if=${DEPLOY_DIR_IMAGE}/u-boot.${UBOOT_SUFFIX} \
-		of=${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd
+}
 
-	dd bs=1k conv=notrunc seek=${FLASH_KERNEL_OFFSET} \
-		if=${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} \
-		of=${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd
+python do_generate_static() {
+    import subprocess
 
-	dd bs=1k conv=notrunc seek=${FLASH_ROFS_OFFSET} \
-		if=${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${IMAGE_BASETYPE} \
-		of=${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd
+    bb.build.exec_func("do_mk_static_nor_image", d)
 
-	dd bs=1k conv=notrunc seek=${FLASH_RWFS_OFFSET} \
-		if=rwfs.${OVERLAY_BASETYPE} \
-		of=${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd
+    nor_image = os.path.join(d.getVar('IMGDEPLOYDIR', True),
+                             '%s.static.mtd' % d.getVar('IMAGE_NAME', True))
+
+    def _append_image(imgpath, start_kb, finish_kb):
+        imgsize = os.path.getsize(imgpath)
+        if imgsize > (finish_kb - start_kb) * 1024:
+            bb.fatal("Image '%s' is too large!" % imgpath)
+
+        subprocess.check_call(['dd', 'bs=1k', 'conv=notrunc',
+                               'seek=%d' % start_kb,
+                               'if=%s' % imgpath,
+                               'of=%s' % nor_image])
+
+    _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+                               'u-boot.%s' % d.getVar('UBOOT_SUFFIX',True)),
+                  int(d.getVar('FLASH_UBOOT_OFFSET', True)),
+                  int(d.getVar('FLASH_KERNEL_OFFSET', True)))
+
+    _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+                               d.getVar('FLASH_KERNEL_IMAGE', True)),
+                  int(d.getVar('FLASH_KERNEL_OFFSET', True)),
+                  int(d.getVar('FLASH_ROFS_OFFSET', True)))
+
+    _append_image(os.path.join(d.getVar('IMGDEPLOYDIR', True),
+                               '%s.%s' % (
+                                    d.getVar('IMAGE_LINK_NAME', True),
+                                    d.getVar('IMAGE_BASETYPE', True))),
+                  int(d.getVar('FLASH_ROFS_OFFSET', True)),
+                  int(d.getVar('FLASH_RWFS_OFFSET', True)))
+
+    _append_image('rwfs.%s' % d.getVar('OVERLAY_BASETYPE', True),
+                  int(d.getVar('FLASH_RWFS_OFFSET', True)),
+                  int(d.getVar('FLASH_SIZE', True)))
+
+    bb.build.exec_func("do_mk_static_symlinks", d)
+}
+
+do_mk_static_symlinks() {
 	# File needed for generating non-standard legacy links below
 	cp rwfs.${OVERLAY_BASETYPE} ${IMGDEPLOYDIR}/rwfs.${OVERLAY_BASETYPE}
 
