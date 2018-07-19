@@ -39,6 +39,7 @@ SUMMARY_${PN}-extras = "Extra features"
 RDEPENDS_${PN}-extras = " \
         phosphor-rest \
         phosphor-dbus-monitor \
+        phosphor-systemd-policy \
         "
 
 SUMMARY_${PN}-extrasdev = "Development features"

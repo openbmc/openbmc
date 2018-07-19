@@ -7,7 +7,6 @@ PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight localed \
                         manpages"
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
-SRC_URI += "file://service-restart-policy.conf"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 SRC_URI += "file://0003-basic-Factor-out-string-checking-from-name_to_prefix.patch"
 SRC_URI += "file://0004-basic-Use-path-escaping-when-mangling-path-instances.patch"
@@ -17,9 +16,7 @@ SRC_URI += "file://0005-dont-return-error-if-unable-to-create-network-namespace.
 
 RRECOMMENDS_${PN} += "obmc-targets"
 FILES_${PN} += "${systemd_unitdir}/network/default.network"
-FILES_${PN} += "${systemd_unitdir}/system.conf.d/service-restart-policy.conf"
 
 do_install_append() {
         install -m 644 ${WORKDIR}/default.network ${D}${systemd_unitdir}/network/
-        install -m 644 -D ${WORKDIR}/service-restart-policy.conf ${D}${systemd_unitdir}/system.conf.d/service-restart-policy.conf
 }
