@@ -281,6 +281,15 @@ then
 	touch $trigger
 fi
 
+if grep -w factory-reset $optfile
+then
+	echo "Factory reset requested."
+	touch $trigger
+	do_save=--no-save-files
+else
+	do_save=--save-files
+fi
+
 if test "x$force_rwfst_jffs2" = xy -a $rwfst != jffs2 -a ! -f $trigger
 then
 	echo "Converting read-write overlay filesystem to jffs2 forced."
@@ -294,15 +303,20 @@ then
 		debug_takeover "Flash update requested but $update missing!"
 	elif test -f $trigger -a ! -s $trigger
 	then
-		echo "Saving selected files from read-write overlay filesystem."
-		$update --no-restore-files
+		if [ $do_save = "--save-files" ]
+		then
+			echo "Saving selected files from read-write overlay filesystem."
+		else
+			echo "No files will be selected for save."
+		fi
+		$update --no-restore-files $do_save
 		echo "Clearing read-write overlay filesystem."
 		flash_eraseall /dev/$rwfs
 		echo "Restoring saved files to read-write overlay filesystem."
 		touch $trigger
 		$update --no-save-files --clean-saved-files
 	else
-		$update --clean-saved-files
+		$update --clean-saved-files $do_save
 	fi
 
 	rwfst=$(probe_fs_type $rwdev)
