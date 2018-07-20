@@ -1,6 +1,7 @@
 [Unit]
 Description=Phosphor DBus Service Discovery Manager
 Before=obmc-mapper.target
+After=dbus.service
 
 [Service]
 Restart=always
