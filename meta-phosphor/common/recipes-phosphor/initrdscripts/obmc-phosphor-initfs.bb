@@ -5,6 +5,8 @@ LIC_FILES_CHKSUM = "file://${PHOSPHORBASE}/COPYING.apache-2.0;md5=34400b68072d71
 
 PR = "r1"
 
+inherit allarch
+
 S = "${WORKDIR}"
 SRC_URI += "file://obmc-init.sh"
 SRC_URI += "file://obmc-shutdown.sh"
