@@ -18,7 +18,7 @@ RDEPENDS_${PN} += "libsystemd \
 
 SRC_URI += "git://github.com/openbmc/ipmitool"
 
-SRCREV = "e9b9c1a9677a3de19726d036cfb07d8d61bbccd8"
+SRCREV = "dfdfd89ec9b36c115a98f589880fd757a162af19"
 
 
 S = "${WORKDIR}/git"
