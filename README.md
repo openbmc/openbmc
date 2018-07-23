@@ -85,7 +85,7 @@ complete test repository can be found
 
 ## Submitting Patches
 Support of additional hardware and software packages is always welcome.
-Please follow the [contributing guidelines](https://github.com/openbmc/docs/blob/master/contributing.md)
+Please follow the [contributing guidelines](https://github.com/openbmc/docs/blob/master/CONTRIBUTING.md)
 when making a submission.  It is expected that contributions contain test
 cases.
 
