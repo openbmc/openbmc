@@ -3,19 +3,16 @@
 PACKAGECONFIG_append = " ubifs_layout"
 
 RDEPENDS_phosphor-software-manager-updater-ubi += " \
-    bash \
     mtd-utils-ubifs \
 "
 
 FILES_${PN}-updater-ubi += " \
-    ${sbindir}/obmc-flash-bmc \
     /usr/local \
     "
 
 SYSTEMD_SERVICE_phosphor-software-manager-updater-ubi += " \
     obmc-flash-bmc-ubirw.service \
     obmc-flash-bmc-ubiro@.service \
-    obmc-flash-bmc-setenv@.service \
     obmc-flash-bmc-ubirw-remove.service \
     obmc-flash-bmc-ubiro-remove@.service \
     obmc-flash-bmc-ubiremount.service \
@@ -37,11 +34,8 @@ SYSTEMD_SUBSTITUTIONS += "RO_MTD:${BMC_RO_MTD}:obmc-flash-bmc-ubiro@.service"
 SYSTEMD_SUBSTITUTIONS += "KERNEL_MTD:${BMC_KERNEL_MTD}:obmc-flash-bmc-ubiro@.service"
 SYSTEMD_SUBSTITUTIONS += "RW_SIZE:${BMC_RW_SIZE}:obmc-flash-bmc-ubirw.service"
 
-SRC_URI += "file://obmc-flash-bmc"
 SRC_URI += "file://synclist"
 do_install_append() {
-    install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/obmc-flash-bmc ${D}${sbindir}/obmc-flash-bmc
     install -d ${D}/usr/local
 
     if [ -f ${WORKDIR}/build/phosphor-sync-software-manager ]; then

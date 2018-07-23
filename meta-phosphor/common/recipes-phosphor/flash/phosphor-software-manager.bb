@@ -50,6 +50,7 @@ RDEPENDS_${PN}-download-mgr += " \
     sdbusplus \
 "
 RDEPENDS_${PN}-updater += " \
+    bash \
     phosphor-logging \
     phosphor-dbus-interfaces \
     sdbusplus \
@@ -62,7 +63,10 @@ RPROVIDES_${PN}-version += " \
 
 FILES_${PN}-version += "${sbindir}/phosphor-version-software-manager ${exec_prefix}/lib/tmpfiles.d/software.conf"
 FILES_${PN}-download-mgr += "${sbindir}/phosphor-download-manager"
-FILES_${PN}-updater += "${sbindir}/phosphor-image-updater"
+FILES_${PN}-updater += " \
+    ${sbindir}/phosphor-image-updater \
+    ${sbindir}/obmc-flash-bmc \
+    "
 FILES_${PN}-sync += " \
     ${sbindir}/phosphor-sync-software-manager \
     ${sysconfdir}/synclist \
@@ -72,9 +76,17 @@ DBUS_SERVICE_${PN}-download-mgr += "xyz.openbmc_project.Software.Download.servic
 DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 DBUS_SERVICE_${PN}-sync += "xyz.openbmc_project.Software.Sync.service"
 
+SYSTEMD_SERVICE_${PN}-updater += " \
+    obmc-flash-bmc-setenv@.service \
+"
+
 SRC_URI += "file://software.conf"
+SRC_URI += "file://obmc-flash-bmc"
 
 do_install_append() {
+    install -d ${D}${sbindir}
+    install -m 0755 ${WORKDIR}/obmc-flash-bmc ${D}${sbindir}/obmc-flash-bmc
+
     # /tmp/images is the software image upload directory.
     # It should not be deleted since it is watched by the Image Manager
     # for new images.
