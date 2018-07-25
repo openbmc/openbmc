@@ -61,7 +61,7 @@ NODE:
       PrettyName:
         IPMIFruSection: Board
         IPMIFruProperty: "Name"
-    xyz.openbmc_project.Inventory.Item.Chassis:
+    xyz.openbmc_project.Inventory.Item.Board:
   AssociatedTypes:
     - SYS
 
