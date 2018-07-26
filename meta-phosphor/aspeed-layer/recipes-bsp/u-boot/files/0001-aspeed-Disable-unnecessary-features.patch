@@ -1,0 +1,262 @@
+From f3082ce0d919a0f3fbe938ee8f86c28db031953b Mon Sep 17 00:00:00 2001
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Mon, 23 Jul 2018 15:22:34 +0930
+Subject: [PATCH] aspeed: Disable unnecessary features
+
+Adjust board_init() to disable hardware features that we don't need
+available during normal BMC operation.
+
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+---
+ arch/arm/include/asm/arch-aspeed/regs-lpc.h  | 29 +++++++++++++
+ arch/arm/include/asm/arch-aspeed/regs-scu.h  |  8 +++-
+ arch/arm/include/asm/arch-aspeed/regs-sdmc.h | 17 ++++++++
+ board/aspeed/ast-g4/ast-g4.c                 | 38 ++++++++++++++++-
+ board/aspeed/ast-g5/ast-g5.c                 | 44 +++++++++++++++++++-
+ 5 files changed, 133 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm/include/asm/arch-aspeed/regs-lpc.h
+
+diff --git a/arch/arm/include/asm/arch-aspeed/regs-lpc.h b/arch/arm/include/asm/arch-aspeed/regs-lpc.h
+new file mode 100644
+index 000000000000..b0162ae4f37c
+--- /dev/null
++++ b/arch/arm/include/asm/arch-aspeed/regs-lpc.h
+@@ -0,0 +1,29 @@
++/* arch/arm/mach-aspeed/include/mach/regs-sdmc.h
++ *
++ * Copyright (C) 2018  IBM Corp
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ *   History      :
++ *    1. 2018/07/23 Andrew Jeffery Create
++ *
++ ******************************************************************************/
++#ifndef __AST_REGS_LPC_H
++#define __AST_REGS_LPC_H
++
++/*
++ *  Register for LPC
++ */
++
++#define AST_LPC_HICR5		0x80
++#define AST_LPC_HICRB		0x100
++
++/*	AST_LPC_HICR5 : 0x80	Host Interface Control Register 5 */
++#define LPC_HICR5_ENFWH		(0x1 << 10)
++
++/*	AST_LPC_HICRB : 0x100	Host Interface Control Register B */
++#define LPC_HICRB_ILPC2AHB	(0x1 << 6)
++
++#endif
+diff --git a/arch/arm/include/asm/arch-aspeed/regs-scu.h b/arch/arm/include/asm/arch-aspeed/regs-scu.h
+index b714fa92341d..c9b91795d1aa 100644
+--- a/arch/arm/include/asm/arch-aspeed/regs-scu.h
++++ b/arch/arm/include/asm/arch-aspeed/regs-scu.h
+@@ -466,6 +466,7 @@
+ #define SCU_MISC_JTAG__M_TO_PCIE_EN	(0x1 << 14)
+ #define SCU_MISC_VUART_TO_CTRL		(0x1 << 13)
+ #define SCU_MISC_DIV13_EN		(0x1 << 12)
++#define SCU_MISC_DEBUG_UART             (0x1 << 10)
+ #define SCU_MISC_Y_CLK_INVERT		(0x1 << 11)
+ #define SCU_MISC_OUT_DELAY		(0x1 << 9)
+ #define SCU_MISC_PCI_TO_AHB_DIS		(0x1 << 8)
+@@ -548,6 +549,7 @@
+ /* AST_SCU_VGA_SCRATCH7			0x6c - VGA Scratch register */
+ 
+ /* AST_SCU_HW_STRAP1			0x70 - hardware strapping register */
++#define SCU_HW_STRAP_LPC_DEC_SUPER_IO	(0x1 << 20)
+ #ifdef AST_SOC_G5
+ 
+ #define CLK_25M_IN			(0x1 << 23)
+@@ -593,7 +595,6 @@
+ 
+ #define SCU_HW_STRAP_GPIOE_PT_EN	(0x1 << 22)
+ #define SCU_HW_STRAP_GPIOD_PT_EN	(0x1 << 21)
+-#define SCU_HW_STRAP_LPC_DEC_SUPER_IO	(0x1 << 20)
+ #define SCU_HW_STRAP_ACPI_DIS		(0x1 << 19)
+ 
+ /* bit 23, 18 [1,0] */
+@@ -940,6 +941,11 @@
+ 
+ /* AST_SCU_UART24_REF			0x160 - Generate UART 24Mhz Ref from H-PLL when CLKIN is 25Mhz */
+ /* AST_SCU_PCIE_CONFIG_SET		0x180 - PCI-E Configuration Setting Control Register */
++#define SCU_PCIE_CONFIG_SET_BMC_DMA     (0x1 << 14)
++#define SCU_PCIE_CONFIG_SET_BMC_MMIO    (0x1 << 9)
++#define SCU_PCIE_CONFIG_SET_BMC_EN      (0x1 << 8)
++#define SCU_PCIE_CONFIG_SET_VGA_MMIO    (0x1 << 1)
++
+ /* AST_SCU_BMC_MMIO_DEC			0x184 - BMC MMIO Decode Setting Register */
+ /* AST_SCU_DEC_AREA1			0x188 - 1st relocated controller decode area location */
+ /* AST_SCU_DEC_AREA2			0x18C - 2nd relocated controller decode area location */
+diff --git a/arch/arm/include/asm/arch-aspeed/regs-sdmc.h b/arch/arm/include/asm/arch-aspeed/regs-sdmc.h
+index 2cc26d29aa9e..2773d3c19e5a 100644
+--- a/arch/arm/include/asm/arch-aspeed/regs-sdmc.h
++++ b/arch/arm/include/asm/arch-aspeed/regs-sdmc.h
+@@ -13,11 +13,14 @@
+ #ifndef __AST_REGS_SDMC_H
+ #define __AST_REGS_SDMC_H
+ 
++#include <asm/arch/aspeed.h>
++
+ /*
+  *  Register for SDMC
+  */
+ #define AST_SDMC_PROTECT	0x00		/* protection key register */
+ #define AST_SDMC_CONFIG		0x04		/* Configuration register */
++#define AST_SDMC_GFX_PROT	0x08		/* Graphics protection register */
+ 
+ /*	AST_SDMC_PROTECT: 0x00  - protection key register */
+ #define SDMC_PROTECT_UNLOCK			0xFC600309
+@@ -29,4 +32,18 @@
+ #define SDMC_CONFIG_CACHE_EN		(0x1 << 10)
+ #define SDMC_CONFIG_EEC_EN		(0x1 << 7)
+ 
++/*	AST_SDMC_GFX_PROT : 0x08 - Graphics protection register */
++#define SDMC_GFX_PROT_VGA_CURSOR	(0x1 << 0)
++#define SDMC_GFX_PROT_VGA_CG_READ	(0x1 << 1)
++#define SDMC_GFX_PROT_VGA_ASCII_READ	(0x1 << 2)
++#define SDMC_GFX_PROT_VGA_CRT		(0x1 << 3)
++
++#if defined(AST_SOC_G5)
++#define SDMC_GFX_PROT_PCIE		(0x1 << 16)
++#define SDMC_GFX_PROT_XDMA		(0x1 << 17)
++#elif defined(AST_SOC_G4)
++#define SDMC_GFX_PROT_PCIE		(0x1 << 10)
++#define SDMC_GFX_PROT_XDMA		(0x1 << 16)
++#endif
++
+ #endif
+diff --git a/board/aspeed/ast-g4/ast-g4.c b/board/aspeed/ast-g4/ast-g4.c
+index 656495307b03..51fb5d46bf7f 100644
+--- a/board/aspeed/ast-g4/ast-g4.c
++++ b/board/aspeed/ast-g4/ast-g4.c
+@@ -1,6 +1,6 @@
+ /*
+  * (C) Copyright 2002 Ryan Chen
+- * Copyright 2016 IBM Corporation
++ * Copyright 2016,2018 IBM Corporation
+  *
+  * SPDX-License-Identifier:     GPL-2.0+
+  */
+@@ -12,13 +12,49 @@
+ #include <asm/arch/ast-sdmc.h>
+ #include <asm/arch/ast_scu.h>
+ #include <asm/arch/regs-ahbc.h>
++#include <asm/arch/regs-lpc.h>
+ #include <asm/arch/regs-scu.h>
++#include <asm/arch/regs-sdmc.h>
+ #include <asm/io.h>
+ 
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ int board_init(void)
+ {
++	u32 val;
++
++	/* iLPC2AHB */
++	val = readl(AST_SCU_BASE + AST_SCU_HW_STRAP1);
++	val |= SCU_HW_STRAP_LPC_DEC_SUPER_IO;
++	writel(val, AST_SCU_BASE + AST_SCU_HW_STRAP1);
++
++	val = readl(AST_LPC_BASE + AST_LPC_HICRB);
++	val |= LPC_HICRB_ILPC2AHB;
++	writel(val, AST_LPC_BASE + AST_LPC_HICRB);
++
++	/* P2A, PCIe BMC */
++	val = readl(AST_SCU_BASE + AST_SCU_PCIE_CONFIG_SET);
++	val &= ~(SCU_PCIE_CONFIG_SET_BMC_DMA
++			| SCU_PCIE_CONFIG_SET_BMC_MMIO
++			| SCU_PCIE_CONFIG_SET_BMC_EN
++			| SCU_PCIE_CONFIG_SET_VGA_MMIO);
++	writel(val, AST_SCU_BASE + AST_SCU_PCIE_CONFIG_SET);
++
++	/* X-DMA */
++	val = readl(AST_SDMC_BASE + AST_SDMC_GFX_PROT);
++	val |= (SDMC_GFX_PROT_VGA_CURSOR
++			| SDMC_GFX_PROT_VGA_CG_READ
++			| SDMC_GFX_PROT_VGA_ASCII_READ
++			| SDMC_GFX_PROT_VGA_CRT
++			| SDMC_GFX_PROT_PCIE
++			| SDMC_GFX_PROT_XDMA);
++	writel(val, AST_SDMC_BASE + AST_SDMC_GFX_PROT);
++
++	/* LPC2AHB */
++	val = readl(AST_LPC_BASE + AST_LPC_HICR5);
++	val &= ~LPC_HICR5_ENFWH;
++	writel(val, AST_LPC_BASE + AST_LPC_HICR5);
++
+ 	/* address of boot parameters */
+ 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
+ 	gd->flags = 0;
+diff --git a/board/aspeed/ast-g5/ast-g5.c b/board/aspeed/ast-g5/ast-g5.c
+index e67a4bf8b2b4..50670a8f5ecc 100644
+--- a/board/aspeed/ast-g5/ast-g5.c
++++ b/board/aspeed/ast-g5/ast-g5.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright 2016 IBM Corporation
++ * Copyright 2016,2018 IBM Corporation
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+@@ -12,12 +12,54 @@
+ 
+ #include <asm/arch/ast_scu.h>
+ #include <asm/arch/ast-sdmc.h>
++#include <asm/arch/regs-lpc.h>
++#include <asm/arch/regs-scu.h>
++#include <asm/arch/regs-sdmc.h>
+ #include <asm/io.h>
+ 
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ int board_init(void)
+ {
++	u32 val;
++
++	/* iLPC2AHB */
++	val = readl(AST_SCU_BASE + AST_SCU_HW_STRAP1);
++	val |= SCU_HW_STRAP_LPC_DEC_SUPER_IO;
++	writel(val, AST_SCU_BASE + AST_SCU_HW_STRAP1);
++
++	val = readl(AST_LPC_BASE + AST_LPC_HICRB);
++	val |= LPC_HICRB_ILPC2AHB;
++	writel(val, AST_LPC_BASE + AST_LPC_HICRB);
++
++	/* P2A, PCIe BMC */
++	val = readl(AST_SCU_BASE + AST_SCU_PCIE_CONFIG_SET);
++	val &= ~(SCU_PCIE_CONFIG_SET_BMC_DMA
++			| SCU_PCIE_CONFIG_SET_BMC_MMIO
++			| SCU_PCIE_CONFIG_SET_BMC_EN
++			| SCU_PCIE_CONFIG_SET_VGA_MMIO);
++	writel(val, AST_SCU_BASE + AST_SCU_PCIE_CONFIG_SET);
++
++	/* Debug UART */
++	val = readl(AST_SCU_BASE + AST_SCU_MISC1_CTRL);
++	val |= SCU_MISC_DEBUG_UART;
++	writel(val, AST_SCU_BASE + AST_SCU_MISC1_CTRL);
++
++	/* X-DMA */
++	val = readl(AST_SDMC_BASE + AST_SDMC_GFX_PROT);
++	val |= (SDMC_GFX_PROT_VGA_CURSOR
++			| SDMC_GFX_PROT_VGA_CG_READ
++			| SDMC_GFX_PROT_VGA_ASCII_READ
++			| SDMC_GFX_PROT_VGA_CRT
++			| SDMC_GFX_PROT_PCIE
++			| SDMC_GFX_PROT_XDMA);
++	writel(val, AST_SDMC_BASE + AST_SDMC_GFX_PROT);
++
++	/* LPC2AHB */
++	val = readl(AST_LPC_BASE + AST_LPC_HICR5);
++	val &= ~LPC_HICR5_ENFWH;
++	writel(val, AST_LPC_BASE + AST_LPC_HICR5);
++
+ 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
+ 	gd->flags = 0;
+ 
+-- 
+2.17.1
+

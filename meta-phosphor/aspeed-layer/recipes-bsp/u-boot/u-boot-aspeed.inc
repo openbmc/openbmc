@@ -9,6 +9,10 @@ SRC_URI_append_aspeed_df-obmc-ubi-fs = " \
     file://0005-config-ast-common-Fall-back-to-secondary-flash-on-fa.patch \
     "
 
+SRC_URI_append_aspeed_df-isolate-bmc = " \
+    file://0001-aspeed-Disable-unnecessary-features.patch \
+    "
+
 do_patch[depends] += "os-release:do_populate_sysroot"
 
 python do_patch_append_aspeed_df-obmc-ubi-fs () {
