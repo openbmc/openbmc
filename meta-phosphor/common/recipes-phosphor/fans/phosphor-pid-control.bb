@@ -39,15 +39,14 @@ RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 
 FILES_${PN} = "${sbindir}/swampd ${sbindir}/setsensor"
 
-# TODO: Enable this once OEM routing is enabled.
-#FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
-#FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
-#FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
-#FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
+# The following installs the OEM IPMI handler for the fan controls.
+FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
+FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
+FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
+FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
 
 EXTRA_OECONF = "SENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/sensor-list.yaml \
                 PID_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/pid-list.yaml \
                 ZONE_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/zone-info.yaml"
 
-# TODO: Enable this once OEM routing is enabled.
-#HOSTIPMI_PROVIDER_LIBRARY += "libmanualcmds.so"
+HOSTIPMI_PROVIDER_LIBRARY += "libmanualcmds.so"
