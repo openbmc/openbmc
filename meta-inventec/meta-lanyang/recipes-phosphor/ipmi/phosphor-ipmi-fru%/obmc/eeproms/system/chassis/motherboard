@@ -1,0 +1,2 @@
+SYSFS_PATH=/sys/bus/i2c/devices/0-0055/eeprom
+FRUID=55
