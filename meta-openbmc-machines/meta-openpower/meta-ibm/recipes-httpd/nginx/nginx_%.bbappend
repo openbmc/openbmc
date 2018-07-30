@@ -9,7 +9,7 @@ SRC_URI += " \
     file://gen-cert.sh \
     "
 
-EXTRA_OECONF =+ " --without-select_module"
+EXTRA_OECONF =+ " --without-select_module --with-http_gunzip_module"
 
 SSLCERTPATH = "/etc/ssl/certs/nginx/"
 
