@@ -15,6 +15,7 @@ PV = "2.0.1+${SRCPV}"
 SRCREV = "9c6173559f95e939e66efb2ec3193d6f3618cf69"
 SRC_URI = "git://git.infradead.org/mtd-utils.git \
            file://add-exclusion-to-mkfs-jffs2-git-2.patch \
+           file://0001-Revert-Return-correct-error-number-in-ubi_get_vol_in.patch \
 "
 
 S = "${WORKDIR}/git/"
