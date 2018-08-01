@@ -52,6 +52,7 @@ RDEPENDS_${PN}-reset-sensor-states += "libsystemd phosphor-dbus-interfaces"
 FILES_${PN}-host = "${sbindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
 DBUS_SERVICE_${PN}-host += "phosphor-reboot-host@.service"
+SYSTEMD_ENVIRONMENT_FILE_${PN}-host += "obmc/phosphor-reboot-host/reboot.conf"
 SYSTEMD_SERVICE_${PN}-host += "phosphor-reset-host-reboot-attempts@.service"
 
 FILES_${PN}-chassis = "${sbindir}/phosphor-chassis-state-manager"

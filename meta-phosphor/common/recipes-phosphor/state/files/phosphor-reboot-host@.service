@@ -11,8 +11,8 @@ After=obmc-host-stop@%i.target
 # solution does the job.
 # Since this is a part of the reboot target, call the startmin
 # target which does the minimum required to start the host.
-ExecStart=/bin/sh -c "sleep 5 && systemctl start obmc-host-startmin@%i.target"
-
+ExecStart=/bin/sh -c "sleep ${{REBOOT_DELAY}} && systemctl start obmc-host-startmin@%i.target"
+EnvironmentFile={envfiledir}/obmc/phosphor-reboot-host/reboot.conf
 
 [Install]
 WantedBy=obmc-host-reboot@%i.target
