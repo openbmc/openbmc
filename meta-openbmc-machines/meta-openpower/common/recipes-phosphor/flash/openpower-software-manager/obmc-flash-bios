@@ -155,8 +155,9 @@ umount_ubi() {
   fi
 
   vol="$(findubi "${name}")"
-  if [ -n "${vol}" ]; then
-    ubirmvol "${ubidev}" -N "${name}"
+  id="${vol##*_}"
+  if [ -n "${id}" ]; then
+    ubirmvol "${ubidev}" -n "${id}"
   fi
 
   if [ -d "${mountdir}" ]; then
