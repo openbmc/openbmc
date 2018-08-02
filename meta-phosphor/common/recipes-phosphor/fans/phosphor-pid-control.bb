@@ -1,7 +1,7 @@
 HOMEPAGE = "github.com/openbmc/phosphor-pid-control"
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=dc7f21ccff0f672f2a7cd6f412ae627d"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 SUMMARY = "Phosphor PID Fan Control"
 DESCRIPTION = "Fan Control"
