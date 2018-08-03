@@ -1,4 +1,6 @@
 2:
+  entityID: 34
+  entityInstance: 1
   interfaces:
     xyz.openbmc_project.State.Boot.Progress:
       BootProgress:
@@ -28,6 +30,8 @@
   sensorType: 15
   serviceInterface: org.freedesktop.DBus.Properties
 3:
+  entityID: 210
+  entityInstance: 1
   interfaces:
     org.open_power.OCC.Status:
       OccActive:
@@ -47,6 +51,8 @@
   sensorType: 7
   serviceInterface: org.freedesktop.DBus.Properties
 4:
+  entityID: 210
+  entityInstance: 2
   interfaces:
     org.open_power.OCC.Status:
       OccActive:
@@ -66,6 +72,8 @@
   sensorType: 7
   serviceInterface: org.freedesktop.DBus.Properties
 8:
+  entityID: 3
+  entityInstance: 1
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -93,6 +101,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 9:
+  entityID: 3
+  entityInstance: 2
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -120,6 +130,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 11:
+  entityID: 32
+  entityInstance: 1
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -147,6 +159,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 12:
+  entityID: 32
+  entityInstance: 2
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -174,6 +188,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 13:
+  entityID: 32
+  entityInstance: 3
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -201,6 +217,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 14:
+  entityID: 32
+  entityInstance: 4
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -228,6 +246,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 15:
+  entityID: 32
+  entityInstance: 5
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -255,6 +275,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 16:
+  entityID: 32
+  entityInstance: 6
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -282,6 +304,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 17:
+  entityID: 32
+  entityInstance: 7
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -309,6 +333,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 18:
+  entityID: 32
+  entityInstance: 8
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -336,6 +362,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 19:
+  entityID: 32
+  entityInstance: 9
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -363,6 +391,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 20:
+  entityID: 32
+  entityInstance: 10
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -390,6 +420,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 21:
+  entityID: 32
+  entityInstance: 11
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -417,6 +449,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 22:
+  entityID: 32
+  entityInstance: 12
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -444,6 +478,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 23:
+  entityID: 32
+  entityInstance: 13
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -471,6 +507,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 24:
+  entityID: 32
+  entityInstance: 14
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -498,6 +536,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 25:
+  entityID: 32
+  entityInstance: 15
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -525,6 +565,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 26:
+  entityID: 32
+  entityInstance: 16
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -552,6 +594,8 @@
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 43:
+  entityID: 208
+  entityInstance: 1
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -580,6 +624,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 44:
+  entityID: 208
+  entityInstance: 2
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -608,6 +654,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 45:
+  entityID: 208
+  entityInstance: 3
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -636,6 +684,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 46:
+  entityID: 208
+  entityInstance: 4
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -664,6 +714,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 47:
+  entityID: 208
+  entityInstance: 5
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -692,6 +744,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 48:
+  entityID: 208
+  entityInstance: 6
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -720,6 +774,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 49:
+  entityID: 208
+  entityInstance: 7
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -748,6 +804,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 50:
+  entityID: 208
+  entityInstance: 8
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -776,6 +834,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 51:
+  entityID: 208
+  entityInstance: 9
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -804,6 +864,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 52:
+  entityID: 208
+  entityInstance: 10
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -832,6 +894,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 53:
+  entityID: 208
+  entityInstance: 11
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -860,6 +924,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 54:
+  entityID: 208
+  entityInstance: 12
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -888,6 +954,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 55:
+  entityID: 208
+  entityInstance: 13
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -916,6 +984,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 56:
+  entityID: 208
+  entityInstance: 14
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -944,6 +1014,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 57:
+  entityID: 208
+  entityInstance: 15
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -972,6 +1044,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 58:
+  entityID: 208
+  entityInstance: 16
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1000,6 +1074,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 59:
+  entityID: 208
+  entityInstance: 17
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1028,6 +1104,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 60:
+  entityID: 208
+  entityInstance: 18
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1056,6 +1134,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 61:
+  entityID: 208
+  entityInstance: 19
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1084,6 +1164,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 62:
+  entityID: 208
+  entityInstance: 20
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1112,6 +1194,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 63:
+  entityID: 208
+  entityInstance: 21
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1140,6 +1224,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 64:
+  entityID: 208
+  entityInstance: 22
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1168,6 +1254,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 65:
+  entityID: 208
+  entityInstance: 23
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1196,6 +1284,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 66:
+  entityID: 208
+  entityInstance: 24
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1224,6 +1314,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 67:
+  entityID: 208
+  entityInstance: 25
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1252,6 +1344,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 68:
+  entityID: 208
+  entityInstance: 26
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1280,6 +1374,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 69:
+  entityID: 208
+  entityInstance: 27
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1308,6 +1404,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 70:
+  entityID: 208
+  entityInstance: 28
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1336,6 +1434,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 71:
+  entityID: 208
+  entityInstance: 29
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1364,6 +1464,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 72:
+  entityID: 208
+  entityInstance: 30
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1392,6 +1494,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 73:
+  entityID: 208
+  entityInstance: 31
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1420,6 +1524,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 74:
+  entityID: 208
+  entityInstance: 32
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1448,6 +1554,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 75:
+  entityID: 208
+  entityInstance: 33
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1476,6 +1584,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 76:
+  entityID: 208
+  entityInstance: 34
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1504,6 +1614,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 77:
+  entityID: 208
+  entityInstance: 35
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1532,6 +1644,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 78:
+  entityID: 208
+  entityInstance: 36
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1560,6 +1674,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 79:
+  entityID: 208
+  entityInstance: 37
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1588,6 +1704,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 80:
+  entityID: 208
+  entityInstance: 38
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1616,6 +1734,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 81:
+  entityID: 208
+  entityInstance: 39
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1644,6 +1764,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 82:
+  entityID: 208
+  entityInstance: 40
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1672,6 +1794,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 83:
+  entityID: 208
+  entityInstance: 41
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1700,6 +1824,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 84:
+  entityID: 208
+  entityInstance: 42
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1728,6 +1854,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 85:
+  entityID: 208
+  entityInstance: 43
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1756,6 +1884,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 86:
+  entityID: 208
+  entityInstance: 44
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1784,6 +1914,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 87:
+  entityID: 208
+  entityInstance: 45
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1812,6 +1944,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 88:
+  entityID: 208
+  entityInstance: 46
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1840,6 +1974,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 89:
+  entityID: 208
+  entityInstance: 47
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1868,6 +2004,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 90:
+  entityID: 208
+  entityInstance: 48
   interfaces:
     xyz.openbmc_project.Inventory.Item:
       Present:
@@ -1896,6 +2034,8 @@
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
 139:
+  entityID: 34
+  entityInstance: 2
   interfaces:
     xyz.openbmc_project.Control.Boot.RebootAttempts:
       AttemptsLeft:
@@ -1909,6 +2049,8 @@
   sensorType: 195
   serviceInterface: org.freedesktop.DBus.Properties
 145:
+  entityID: 35
+  entityInstance: 1
   interfaces:
     xyz.openbmc_project.State.OperatingSystem.Status:
       OperatingSystemState:
