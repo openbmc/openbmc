@@ -8,3 +8,6 @@
 /etc/systemd/network
 /var/cache/obmc
 /var/lib/obmc
+/var/lib/phosphor-inventory-manager
+/var/lib/phosphor-settings-manager
+/var/lib/phosphor-state-manager
