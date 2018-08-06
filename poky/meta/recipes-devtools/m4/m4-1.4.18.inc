@@ -9,6 +9,7 @@ inherit autotools texinfo
 SRC_URI = "${GNU_MIRROR}/m4/m4-${PV}.tar.gz \
            file://ac_config_links.patch \
            file://remove-gets.patch \
+           file://m4-1.4.18-glibc-change-work-around.patch \
            "
 
 SRC_URI_append_class-target = " file://0001-Unset-need_charset_alias-when-building-for-musl.patch"
