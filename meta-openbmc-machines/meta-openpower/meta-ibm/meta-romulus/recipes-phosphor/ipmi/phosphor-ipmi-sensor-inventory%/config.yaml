@@ -593,6 +593,358 @@
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
+27:
+  bExp: 0
+  entityID: 32
+  entityInstance: 17
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm0_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+28:
+  bExp: 0
+  entityID: 32
+  entityInstance: 18
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm1_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+29:
+  bExp: 0
+  entityID: 32
+  entityInstance: 25
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm2_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+30:
+  bExp: 0
+  entityID: 32
+  entityInstance: 26
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm3_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+31:
+  bExp: 0
+  entityID: 32
+  entityInstance: 27
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm4_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+32:
+  bExp: 0
+  entityID: 32
+  entityInstance: 28
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm5_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+33:
+  bExp: 0
+  entityID: 32
+  entityInstance: 29
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm6_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+34:
+  bExp: 0
+  entityID: 32
+  entityInstance: 30
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm7_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+35:
+  bExp: 0
+  entityID: 32
+  entityInstance: 31
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm8_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+36:
+  bExp: 0
+  entityID: 32
+  entityInstance: 32
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm9_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+37:
+  bExp: 0
+  entityID: 32
+  entityInstance: 19
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm10_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+38:
+  bExp: 0
+  entityID: 32
+  entityInstance: 20
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm11_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+39:
+  bExp: 0
+  entityID: 32
+  entityInstance: 21
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm12_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+40:
+  bExp: 0
+  entityID: 32
+  entityInstance: 22
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm13_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+41:
+  bExp: 0
+  entityID: 32
+  entityInstance: 23
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm14_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+42:
+  bExp: 0
+  entityID: 32
+  entityInstance: 24
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/dimm15_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
 43:
   entityID: 208
   entityInstance: 1
@@ -2033,6 +2385,1062 @@
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
+91:
+  bExp: 0
+  entityID: 208
+  entityInstance: 49
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core0_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+92:
+  bExp: 0
+  entityID: 208
+  entityInstance: 50
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core1_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+93:
+  bExp: 0
+  entityID: 208
+  entityInstance: 51
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core2_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+94:
+  bExp: 0
+  entityID: 208
+  entityInstance: 52
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core3_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+95:
+  bExp: 0
+  entityID: 208
+  entityInstance: 53
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core4_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+96:
+  bExp: 0
+  entityID: 208
+  entityInstance: 54
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core5_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+97:
+  bExp: 0
+  entityID: 208
+  entityInstance: 55
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core6_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+98:
+  bExp: 0
+  entityID: 208
+  entityInstance: 56
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core7_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+99:
+  bExp: 0
+  entityID: 208
+  entityInstance: 57
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core8_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+100:
+  bExp: 0
+  entityID: 208
+  entityInstance: 58
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core9_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+101:
+  bExp: 0
+  entityID: 208
+  entityInstance: 59
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core10_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+102:
+  bExp: 0
+  entityID: 208
+  entityInstance: 60
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core11_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+103:
+  bExp: 0
+  entityID: 208
+  entityInstance: 61
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core12_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+104:
+  bExp: 0
+  entityID: 208
+  entityInstance: 62
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core13_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+105:
+  bExp: 0
+  entityID: 208
+  entityInstance: 63
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core14_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+106:
+  bExp: 0
+  entityID: 208
+  entityInstance: 64
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core15_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+107:
+  bExp: 0
+  entityID: 208
+  entityInstance: 65
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core16_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+108:
+  bExp: 0
+  entityID: 208
+  entityInstance: 66
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core17_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+109:
+  bExp: 0
+  entityID: 208
+  entityInstance: 67
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core18_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+110:
+  bExp: 0
+  entityID: 208
+  entityInstance: 68
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core19_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+111:
+  bExp: 0
+  entityID: 208
+  entityInstance: 69
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core20_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+112:
+  bExp: 0
+  entityID: 208
+  entityInstance: 70
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core21_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+113:
+  bExp: 0
+  entityID: 208
+  entityInstance: 71
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core22_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+114:
+  bExp: 0
+  entityID: 208
+  entityInstance: 72
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p0_core23_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+115:
+  bExp: 0
+  entityID: 208
+  entityInstance: 73
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core0_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+116:
+  bExp: 0
+  entityID: 208
+  entityInstance: 74
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core1_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+117:
+  bExp: 0
+  entityID: 208
+  entityInstance: 75
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core2_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+118:
+  bExp: 0
+  entityID: 208
+  entityInstance: 76
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core3_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+119:
+  bExp: 0
+  entityID: 208
+  entityInstance: 77
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core4_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+120:
+  bExp: 0
+  entityID: 208
+  entityInstance: 78
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core5_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+121:
+  bExp: 0
+  entityID: 208
+  entityInstance: 79
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core6_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+122:
+  bExp: 0
+  entityID: 208
+  entityInstance: 80
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core7_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+123:
+  bExp: 0
+  entityID: 208
+  entityInstance: 81
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core8_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+124:
+  bExp: 0
+  entityID: 208
+  entityInstance: 82
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core9_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+125:
+  bExp: 0
+  entityID: 208
+  entityInstance: 83
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core10_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+126:
+  bExp: 0
+  entityID: 208
+  entityInstance: 84
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core11_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+127:
+  bExp: 0
+  entityID: 208
+  entityInstance: 85
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core12_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+128:
+  bExp: 0
+  entityID: 208
+  entityInstance: 86
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core13_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+129:
+  bExp: 0
+  entityID: 208
+  entityInstance: 87
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core14_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+130:
+  bExp: 0
+  entityID: 208
+  entityInstance: 88
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core15_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+131:
+  bExp: 0
+  entityID: 208
+  entityInstance: 89
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core16_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+132:
+  bExp: 0
+  entityID: 208
+  entityInstance: 90
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core17_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+133:
+  bExp: 0
+  entityID: 208
+  entityInstance: 91
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core18_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+134:
+  bExp: 0
+  entityID: 208
+  entityInstance: 92
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core19_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+135:
+  bExp: 0
+  entityID: 208
+  entityInstance: 93
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core20_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+136:
+  bExp: 0
+  entityID: 208
+  entityInstance: 94
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core21_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+137:
+  bExp: 0
+  entityID: 208
+  entityInstance: 95
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core22_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+138:
+  bExp: 0
+  entityID: 208
+  entityInstance: 96
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: int64_t
+  multiplierM: 1
+  mutability: Mutability::Write|Mutability::Read
+  offsetB: -127
+  path: /xyz/openbmc_project/sensors/temperature/p1_core23_temp
+  rExp: 0
+  readingType: readingData
+  scale: -3
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 1
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
 139:
   entityID: 34
   entityInstance: 2
