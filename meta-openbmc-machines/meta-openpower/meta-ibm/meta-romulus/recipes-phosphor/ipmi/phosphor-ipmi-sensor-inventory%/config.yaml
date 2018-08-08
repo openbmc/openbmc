@@ -26,6 +26,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/state/host0
   readingType: eventdata2
+  sensorNamePattern: nameProperty
   sensorReadingType: 111
   sensorType: 15
   serviceInterface: org.freedesktop.DBus.Properties
@@ -47,6 +48,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /org/open_power/control/occ0
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 9
   sensorType: 7
   serviceInterface: org.freedesktop.DBus.Properties
@@ -68,6 +70,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /org/open_power/control/occ1
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 9
   sensorType: 7
   serviceInterface: org.freedesktop.DBus.Properties
@@ -97,6 +100,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -126,6 +130,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -155,6 +160,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm0
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -184,6 +190,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm1
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -213,6 +220,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm2
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -242,6 +250,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm3
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -271,6 +280,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm4
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -300,6 +310,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm5
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -329,6 +340,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm6
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -358,6 +370,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm7
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -387,6 +400,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm8
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -416,6 +430,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm9
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -445,6 +460,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm10
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -474,6 +490,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm11
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -503,6 +520,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm12
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -532,6 +550,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm13
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -561,6 +580,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm14
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -590,6 +610,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/dimm15
   readingType: assertion
+  sensorNamePattern: nameLeaf
   sensorReadingType: 111
   sensorType: 12
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -972,6 +993,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core0
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1002,6 +1024,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core1
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1032,6 +1055,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core2
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1062,6 +1086,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core3
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1092,6 +1117,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core4
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1122,6 +1148,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core5
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1152,6 +1179,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core6
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1182,6 +1210,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core7
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1212,6 +1241,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core8
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1242,6 +1272,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core9
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1272,6 +1303,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core10
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1302,6 +1334,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core11
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1332,6 +1365,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core12
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1362,6 +1396,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core13
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1392,6 +1427,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core14
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1422,6 +1458,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core15
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1452,6 +1489,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core16
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1482,6 +1520,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core17
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1512,6 +1551,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core18
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1542,6 +1582,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core19
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1572,6 +1613,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core20
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1602,6 +1644,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core21
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1632,6 +1675,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core22
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1662,6 +1706,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu0/core23
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1692,6 +1737,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core0
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1722,6 +1768,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core1
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1752,6 +1799,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core2
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1782,6 +1830,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core3
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1812,6 +1861,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core4
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1842,6 +1892,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core5
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1872,6 +1923,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core6
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1902,6 +1954,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core7
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1932,6 +1985,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core8
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1962,6 +2016,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core9
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -1992,6 +2047,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core10
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2022,6 +2078,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core11
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2052,6 +2109,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core12
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2082,6 +2140,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core13
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2112,6 +2171,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core14
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2142,6 +2202,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core15
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2172,6 +2233,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core16
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2202,6 +2264,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core17
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2232,6 +2295,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core18
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2262,6 +2326,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core19
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2292,6 +2357,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core20
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2322,6 +2388,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core21
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2352,6 +2419,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core22
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -2382,6 +2450,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /system/chassis/motherboard/cpu1/core23
   readingType: assertion
+  sensorNamePattern: nameParentLeaf
   sensorReadingType: 111
   sensorType: 7
   serviceInterface: xyz.openbmc_project.Inventory.Manager
@@ -3453,6 +3522,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/state/host0
   readingType: readingAssertion
+  sensorNamePattern: nameProperty
   sensorReadingType: 111
   sensorType: 195
   serviceInterface: org.freedesktop.DBus.Properties
@@ -3484,6 +3554,7 @@
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/state/host0
   readingType: assertion
+  sensorNamePattern: nameProperty
   sensorReadingType: 111
   sensorType: 31
   serviceInterface: org.freedesktop.DBus.Properties
