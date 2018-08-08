@@ -1,0 +1,78 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "SYS_PWROK_BUFF",
+            "latch_out": "BMC_UCD_LATCH_LE",
+            "power_up_outs": [
+                {"name": "SOFTWARE_PGOOD", "polarity": true},
+                {"name": "BMC_POWER_UP", "polarity": false}
+            ],
+            "reset_outs": [
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "SOFTWARE_PGOOD",
+            "pin": "M6",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_POWER_UP",
+            "pin": "E2",
+            "direction": "out"
+        },
+        {
+            "name": "SYS_PWROK_BUFF",
+            "pin": "F6",
+            "direction": "in"
+        },
+        {
+            "name": "PHY_RST_N",
+            "pin": "D6",
+            "direction": "out"
+        },
+        {
+            "name": "HDD_PWR_EN",
+            "pin": "B0",
+            "direction": "out"
+        },
+        {
+            "name": "CP0_DEVICES_RESET_N",
+            "pin": "AA6",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_CP0_PERST_ENABLE",
+            "pin": "H3",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_UCD_LATCH_LE",
+            "pin": "P4",
+            "direction": "out"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "E4",
+            "direction": "both"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "E3",
+            "direction": "both"
+        },
+        {
+            "name": "PE_MEZZB_PRSNT_N",
+            "pin": "P6",
+            "direction": "in"
+        },
+        {
+            "name": "CHECKSTOP",
+            "pin": "F3",
+            "direction": "falling"
+        }
+    ]
+}
