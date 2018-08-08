@@ -1,0 +1,60 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "PGOOD",
+            "power_up_outs": [
+                {"name": "POWER_PIN", "polarity": false}
+            ],
+            "reset_outs": [
+                {"name": "USB_RESET", "polarity": false}
+            ],
+            "pci_reset_outs": [
+                {"name": "PCIE_RESET", "polarity": false, "hold": false}
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "POWER_PIN",
+            "pin": "E1",
+            "direction": "out"
+        },
+        {
+            "name": "PGOOD",
+            "pin": "C7",
+            "direction": "in"
+        },
+        {
+            "name": "BMC_THROTTLE",
+            "pin": "J3",
+            "direction": "out"
+        },
+        {
+            "name": "IDBTN",
+            "pin": "Q7",
+            "direction": "out"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "E0",
+            "direction": "both"
+        },
+        {
+            "name": "PCIE_RESET",
+            "pin": "B5",
+            "direction": "out"
+        },
+        {
+            "name": "USB_RESET",
+            "pin": "B6",
+            "direction": "out"
+        },
+        {
+            "name": "CHECKSTOP",
+            "pin": "P5",
+            "direction": "falling"
+        }
+    ]
+}
