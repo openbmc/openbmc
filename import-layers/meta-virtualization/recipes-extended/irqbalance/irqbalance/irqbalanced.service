@@ -1,9 +1,0 @@
-[Unit]
-Description=irqbalance daemon
-After=syslog.target
-
-[Service]
-ExecStart=@SBINDIR@/irqbalance --foreground
-
-[Install]
-WantedBy=multi-user.target
