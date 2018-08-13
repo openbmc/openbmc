@@ -1,0 +1,65 @@
+From c5785fdf1d660eaefb9711284414262d0cfe8843 Mon Sep 17 00:00:00 2001
+From: Adam Majer <amajer@suse.de>
+Date: Fri, 17 Aug 2018 14:48:17 +0800
+Subject: [PATCH] Verify that we are not reading past end of a buffer
+
+Simple reproducer is just,
+
+    ret &d:ep
+
+which triggers a buffer overread due to parsing of an invalid
+segment override.
+
+Signed-off-by: Adam Majer <amajer@suse.de>
+
+Upstream-Status: Submitted [https://bugzilla.nasm.us/show_bug.cgi?id=3392447]
+CVE: CVE-2018-8883
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ include/opflags.h | 2 +-
+ include/tables.h  | 1 +
+ x86/regs.pl       | 3 ++-
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/include/opflags.h b/include/opflags.h
+index ef2838c1..8d4b6b1e 100644
+--- a/include/opflags.h
++++ b/include/opflags.h
+@@ -166,7 +166,7 @@
+ #define REG_CLASS_BND           GEN_REG_CLASS(9)
+ 
+ #define is_class(class, op)         (!((opflags_t)(class) & ~(opflags_t)(op)))
+-#define is_reg_class(class, reg)    is_class((class), nasm_reg_flags[(reg)])
++#define is_reg_class(class, reg)    is_class((class), ((reg) < nasm_reg_flags_size ? nasm_reg_flags[(reg)] : 0))
+ 
+ #define IS_SREG(reg)                is_reg_class(REG_SREG, (reg))
+ #define IS_FSGS(reg)                is_reg_class(REG_FSGS, (reg))
+diff --git a/include/tables.h b/include/tables.h
+index 24a665e2..458752ce 100644
+--- a/include/tables.h
++++ b/include/tables.h
+@@ -64,6 +64,7 @@ extern const char * const nasm_reg_names[];
+ typedef uint64_t opflags_t;
+ typedef uint16_t  decoflags_t;
+ extern const opflags_t nasm_reg_flags[];
++extern const size_t nasm_reg_flags_size;
+ /* regvals.c */
+ extern const int nasm_regvals[];
+ 
+diff --git a/x86/regs.pl b/x86/regs.pl
+index 3a1b56f5..cb5cea68 100755
+--- a/x86/regs.pl
++++ b/x86/regs.pl
+@@ -158,7 +158,8 @@ if ( $fmt eq 'h' ) {
+ 	printf "    %-15s /* %-5s */\n",
+ 		$regs{$reg}.',', $reg;
+     }
+-    print "};\n";
++    print "};\n\n";
++    print "const size_t nasm_reg_flags_size = sizeof(nasm_reg_flags) / sizeof(opflags_t);\n";
+ } elsif ( $fmt eq 'vc' ) {
+     # Output regvals.c
+     print "/* automatically generated from $file - do not edit */\n\n";
+-- 
+2.17.1
+

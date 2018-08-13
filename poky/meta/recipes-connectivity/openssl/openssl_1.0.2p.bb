@@ -6,62 +6,100 @@ SECTION = "libs/network"
 
 # "openssl | SSLeay" dual license
 LICENSE = "openssl"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=f9a8f968107345e0b75aa8c2ecaa7ec8"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=f475368924827d06d4b416111c8bdb77"
 
-DEPENDS = "makedepend-native hostperl-runtime-native"
+DEPENDS = "hostperl-runtime-native"
 DEPENDS_append_class-target = " openssl-native"
 
 PROVIDES += "openssl10"
 
 SRC_URI = "http://www.openssl.org/source/openssl-${PV}.tar.gz \
-          "
-S = "${WORKDIR}/openssl-${PV}"
+           file://run-ptest \
+           file://openssl-c_rehash.sh \
+           file://configure-targets.patch \
+           file://shared-libs.patch \
+           file://oe-ldflags.patch \
+           file://engines-install-in-libdir-ssl.patch \
+           file://debian1.0.2/block_diginotar.patch \
+           file://debian1.0.2/block_digicert_malaysia.patch \
+           file://debian/c_rehash-compat.patch \
+           file://debian/debian-targets.patch \
+           file://debian/man-dir.patch \
+           file://debian/man-section.patch \
+           file://debian/no-rpath.patch \
+           file://debian/no-symbolic.patch \
+           file://debian/pic.patch \
+           file://debian1.0.2/version-script.patch \
+           file://debian1.0.2/soname.patch \
+           file://openssl_fix_for_x32.patch \
+           file://openssl-fix-des.pod-error.patch \
+           file://Makefiles-ptest.patch \
+           file://ptest-deps.patch \
+           file://ptest_makefile_deps.patch \
+           file://configure-musl-target.patch \
+           file://parallel.patch \
+           file://Use-SHA256-not-MD5-as-default-digest.patch \
+           file://0001-Fix-build-with-clang-using-external-assembler.patch \
+           file://0001-openssl-force-soft-link-to-avoid-rare-race.patch \
+           file://0001-allow-manpages-to-be-disabled.patch \
+           "
+
+SRC_URI_append_class-target = " \
+           file://reproducible-cflags.patch \
+           file://reproducible-mkbuildinf.patch \
+           "
+
+SRC_URI_append_class-nativesdk = " \
+           file://environment.d-openssl.sh \
+           "
+
+SRC_URI[md5sum] = "ac5eb30bf5798aa14b1ae6d0e7da58df"
+SRC_URI[sha256sum] = "50a98e07b1a89eb8f6a99477f262df71c6fa7bef77df4dc83025a2845c827d00"
+
+UPSTREAM_CHECK_REGEX = "openssl-(?P<pver>1\.0.+)\.tar"
+
+inherit pkgconfig siteinfo multilib_header ptest relative_symlinks manpages
 
 PACKAGECONFIG ?= "cryptodev-linux"
-PACKAGECONFIG[perl] = ",,,"
+PACKAGECONFIG_class-native = ""
+PACKAGECONFIG_class-nativesdk = ""
+
 PACKAGECONFIG[cryptodev-linux] = "-DHAVE_CRYPTODEV -DUSE_CRYPTODEV_DIGESTS,,cryptodev-linux"
-
-TERMIO_libc-musl = "-DTERMIOS"
-TERMIO ?= "-DTERMIO"
-# Avoid binaries being marked as requiring an executable stack since it 
-# doesn't(which causes and this causes issues with SELinux
-CFLAG = "${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '-DL_ENDIAN', '-DB_ENDIAN', d)} \
-	 ${TERMIO} ${CFLAGS} -Wall -Wa,--noexecstack"
-
-export DIRS = "crypto ssl apps"
-export EX_LIBS = "-lgcc -ldl"
-export AS = "${CC} -c"
-
-inherit pkgconfig siteinfo multilib_header ptest relative_symlinks
-
-PACKAGES =+ "libcrypto libssl ${PN}-misc openssl-conf"
-FILES_libcrypto = "${libdir}/libcrypto${SOLIBS}"
-FILES_libssl = "${libdir}/libssl${SOLIBS}"
-FILES_${PN} =+ " ${libdir}/ssl/*"
-FILES_${PN}-misc = "${libdir}/ssl/misc"
-RDEPENDS_${PN}-misc = "${@bb.utils.filter('PACKAGECONFIG', 'perl', d)}"
-
-# Add the openssl.cnf file to the openssl-conf package.  Make the libcrypto
-# package RRECOMMENDS on this package.  This will enable the configuration
-# file to be installed for both the base openssl package and the libcrypto
-# package since the base openssl package depends on the libcrypto package.
-FILES_openssl-conf = "${sysconfdir}/ssl/openssl.cnf"
-CONFFILES_openssl-conf = "${sysconfdir}/ssl/openssl.cnf"
-RRECOMMENDS_libcrypto += "openssl-conf"
-RDEPENDS_${PN}-ptest += "${PN}-misc make perl perl-module-filehandle bc"
+PACKAGECONFIG[manpages] = ",,,"
+PACKAGECONFIG[perl] = ",,,"
 
 # Remove this to enable SSLv3. SSLv3 is defaulted to disabled due to the POODLE
 # vulnerability
-EXTRA_OECONF = " -no-ssl3"
+EXTRA_OECONF = "no-ssl3"
 
-do_configure_prepend_darwin () {
-	sed -i -e '/version-script=openssl\.ld/d' Configure
-}
+EXTRA_OEMAKE = "${@bb.utils.contains('PACKAGECONFIG', 'manpages', '', 'OE_DISABLE_MANPAGES=1', d)}"
+
+export OE_LDFLAGS = "${LDFLAGS}"
+
+# openssl fails with ccache: https://bugzilla.yoctoproject.org/show_bug.cgi?id=12810
+CCACHE = ""
+
+TERMIO ?= "-DTERMIO"
+TERMIO_libc-musl = "-DTERMIOS"
+
+CFLAG = "${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '-DL_ENDIAN', '-DB_ENDIAN', d)} \
+         ${TERMIO} ${CFLAGS} -Wall"
+
+# Avoid binaries being marked as requiring an executable stack since they don't
+# (and it causes issues with SELinux)
+CFLAG += "-Wa,--noexecstack"
+
+CFLAG_append_class-native = " -fPIC"
 
 do_configure () {
-	cd util
-	perl perlpath.pl ${STAGING_BINDIR_NATIVE}
-	cd ..
+	# The crypto_use_bigint patch means that perl's bignum module needs to be
+	# installed, but some distributions (for example Fedora 23) don't ship it by
+	# default.  As the resulting error is very misleading check for bignum before
+	# building.
+	if ! perl -Mbigint -e true; then
+		bbfatal "The perl module 'bignum' was not found but this is required to build openssl.  Please install this module (often packaged as perl-bignum) and re-run bitbake."
+	fi
+
 	ln -sf apps/openssl.pod crypto/crypto.pod ssl/ssl.pod doc/
 
 	os=${HOST_OS}
@@ -73,7 +111,7 @@ do_configure () {
 	linux-musl )
 		os=linux
 		;;
-		*)
+	*)
 		;;
 	esac
 	target="$os-${HOST_ARCH}"
@@ -135,11 +173,11 @@ do_configure () {
 	linux-powerpc64)
 		target=linux-ppc64
 		;;
-	linux-riscv64)
-		target=linux-generic64
-		;;
 	linux-riscv32)
 		target=linux-generic32
+		;;
+	linux-riscv64)
+		target=linux-generic64
 		;;
 	linux-supersparc)
 		target=linux-sparcv8
@@ -147,25 +185,17 @@ do_configure () {
 	linux-sparc)
 		target=linux-sparcv8
 		;;
-	darwin-i386)
-		target=darwin-i386-cc
-		;;
 	esac
+
 	# inject machine-specific flags
 	sed -i -e "s|^\(\"$target\",\s*\"[^:]\+\):\([^:]\+\)|\1:${CFLAG}|g" Configure
-        useprefix=${prefix}
-        if [ "x$useprefix" = "x" ]; then
-                useprefix=/
-        fi        
-	libdirleaf="$(echo ${libdir} | sed s:$useprefix::)"
-	perl ./Configure ${EXTRA_OECONF} shared --prefix=$useprefix --openssldir=${libdir}/ssl --libdir=${libdirleaf} $target
-}
 
-do_compile_prepend_class-target () {
-    sed -i 's/\((OPENSSL=\)".*"/\1"openssl"/' Makefile
-    oe_runmake depend
-	cc_sanitized=`echo "${CC} ${CFLAG}" | sed -e 's,--sysroot=${STAGING_DIR_TARGET},,g' -e 's|${DEBUG_PREFIX_MAP}||g'`
-	oe_runmake CC_INFO="${cc_sanitized}"
+	useprefix=${prefix}
+	if [ "x$useprefix" = "x" ]; then
+		useprefix=/
+	fi
+	libdirleaf="$(echo ${libdir} | sed s:$useprefix::)"
+	perl ./Configure ${EXTRA_OECONF} ${PACKAGECONFIG_CONFARGS} shared --prefix=$useprefix --openssldir=${libdir}/ssl --libdir=$libdirleaf $target
 }
 
 do_compile () {
@@ -173,10 +203,14 @@ do_compile () {
 	oe_runmake
 }
 
-do_compile_ptest () {
-	# build dependencies for test directory too
-	export DIRS="$DIRS test"
+do_compile_class-target () {
+	sed -i 's/\((OPENSSL=\)".*"/\1"openssl"/' Makefile
 	oe_runmake depend
+	cc_sanitized=$(echo "${CC} ${CFLAG}" | sed -e 's,--sysroot=${STAGING_DIR_TARGET},,g' -e 's|${DEBUG_PREFIX_MAP}||g' -e 's/[ \t]\+/ /g')
+	oe_runmake CC_INFO="$cc_sanitized"
+}
+
+do_compile_ptest () {
 	oe_runmake buildtest
 }
 
@@ -228,8 +262,8 @@ do_install () {
 do_install_ptest () {
 	cp -r -L Makefile.org Makefile test ${D}${PTEST_PATH}
 
-        # Replace the path to native perl with the path to target perl
-        sed -i 's,^PERL=.*,PERL=${bindir}/perl,' ${D}${PTEST_PATH}/Makefile
+	# Replace the path to native perl with the path to target perl
+	sed -i 's,^PERL=.*,PERL=${bindir}/perl,' ${D}${PTEST_PATH}/Makefile
 
 	cp Configure config e_os.h ${D}${PTEST_PATH}
 	cp -r -L include ${D}${PTEST_PATH}
@@ -268,9 +302,9 @@ do_install_ptest () {
 
 	# Remove build host references
 	sed -i \
-       -e 's,--sysroot=${STAGING_DIR_TARGET},,g' \
-       -e 's|${DEBUG_PREFIX_MAP}||g' \
-       ${D}${PTEST_PATH}/Makefile ${D}${PTEST_PATH}/Configure
+	-e 's,--sysroot=${STAGING_DIR_TARGET},,g' \
+	-e 's|${DEBUG_PREFIX_MAP}||g' \
+	${D}${PTEST_PATH}/Makefile ${D}${PTEST_PATH}/Configure
 }
 
 do_install_append_class-native() {
@@ -281,5 +315,30 @@ do_install_append_class-native() {
 	    OPENSSL_ENGINES=${libdir}/ssl/engines
 }
 
-BBCLASSEXTEND = "native nativesdk"
+do_install_append_class-nativesdk() {
+	mkdir -p ${D}${SDKPATHNATIVE}/environment-setup.d
+	install -m 644 ${WORKDIR}/environment.d-openssl.sh ${D}${SDKPATHNATIVE}/environment-setup.d/openssl.sh
+}
 
+# Add the openssl.cnf file to the openssl-conf package.  Make the libcrypto
+# package RRECOMMENDS on this package.  This will enable the configuration
+# file to be installed for both the base openssl package and the libcrypto
+# package since the base openssl package depends on the libcrypto package.
+
+PACKAGES =+ "libcrypto libssl openssl-conf ${PN}-engines ${PN}-misc"
+
+FILES_libcrypto = "${libdir}/libcrypto${SOLIBS}"
+FILES_libssl = "${libdir}/libssl${SOLIBS}"
+FILES_openssl-conf = "${sysconfdir}/ssl/openssl.cnf"
+FILES_${PN}-engines = "${libdir}/ssl/engines/*.so ${libdir}/engines"
+FILES_${PN}-misc = "${libdir}/ssl/misc"
+FILES_${PN} =+ "${libdir}/ssl/*"
+FILES_${PN}_append_class-nativesdk = " ${SDKPATHNATIVE}/environment-setup.d/openssl.sh"
+
+CONFFILES_openssl-conf = "${sysconfdir}/ssl/openssl.cnf"
+
+RRECOMMENDS_libcrypto += "openssl-conf"
+RDEPENDS_${PN}-misc = "${@bb.utils.filter('PACKAGECONFIG', 'perl', d)}"
+RDEPENDS_${PN}-ptest += "${PN}-misc make perl perl-module-filehandle bc"
+
+BBCLASSEXTEND = "native nativesdk"

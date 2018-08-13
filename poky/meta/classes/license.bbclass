@@ -480,7 +480,9 @@ def find_license_files(d):
 
     for url in lic_files.split():
         try:
-            (type, host, path, user, pswd, parm) = bb.fetch.decodeurl(url)
+            (method, host, path, user, pswd, parm) = bb.fetch.decodeurl(url)
+            if method != "file" or not path:
+                raise bb.fetch.MalformedUrl()
         except bb.fetch.MalformedUrl:
             bb.fatal("%s: LIC_FILES_CHKSUM contains an invalid URL:  %s" % (d.getVar('PF'), url))
         # We want the license filename and path

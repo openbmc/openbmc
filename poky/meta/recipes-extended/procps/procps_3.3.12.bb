@@ -14,6 +14,7 @@ inherit autotools gettext pkgconfig update-alternatives
 
 SRC_URI = "http://downloads.sourceforge.net/project/procps-ng/Production/procps-ng-${PV}.tar.xz \
            file://sysctl.conf \
+           file://CVE-2018-1124.patch \
           "
 
 SRC_URI[md5sum] = "957e42e8b193490b2111252e4a2b443c"

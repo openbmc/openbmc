@@ -13,24 +13,18 @@ Refreshed for 1.0.2i
 Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
 
 ---
- Makefile.org          |  14 +-
- Makefile.org.orig     |  10 +-
- Makefile.shared       |   2 +
- Makefile.shared.orig  | 655 ++++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/Makefile       |  10 +-
- engines/Makefile      |   6 +-
- engines/Makefile.orig | 338 ++++++++++++++++++++++++++
- test/Makefile         |  92 +++----
- test/Makefile.orig    |  88 ++++---
- 9 files changed, 1108 insertions(+), 107 deletions(-)
- create mode 100644 Makefile.shared.orig
- create mode 100644 engines/Makefile.orig
+ Makefile.org                                   | 14 ++--
+ Makefile.shared                                |  2 +
+ crypto/Makefile                                | 10 +--
+ engines/Makefile                               |  6 +-
+ test/Makefile                                  | 94 +++++++++++-----------
+ 5 files changed, 64 insertions(+), 62 deletions(-)
 
 diff --git a/Makefile.org b/Makefile.org
-index 8e7936c..ed98d2a 100644
+index efcfafb..82eab91 100644
 --- a/Makefile.org
 +++ b/Makefile.org
-@@ -283,17 +283,17 @@ build_libcrypto: build_crypto build_engines libcrypto.pc
+@@ -282,17 +282,17 @@ build_libcrypto: build_crypto build_engines libcrypto.pc
  build_libssl: build_ssl libssl.pc
  
  build_crypto:
@@ -54,7 +48,7 @@ index 8e7936c..ed98d2a 100644
  
  all_testapps: build_libs build_testapps
  build_testapps:
-@@ -565,7 +565,7 @@ install_sw:
+@@ -564,7 +564,7 @@ install_sw:
  	(cp $$i $(INSTALL_PREFIX)$(INSTALLTOP)/include/openssl/$$i; \
  	chmod 644 $(INSTALL_PREFIX)$(INSTALLTOP)/include/openssl/$$i ); \
  	done;
@@ -64,7 +58,7 @@ index 8e7936c..ed98d2a 100644
  	do \
  		if [ -f "$$i" ]; then \
 diff --git a/Makefile.shared b/Makefile.shared
-index f6f92e7..8164186 100644
+index bbefb2b..18013a9 100644
 --- a/Makefile.shared
 +++ b/Makefile.shared
 @@ -105,6 +105,7 @@ LINK_SO=	\
@@ -84,7 +78,7 @@ index f6f92e7..8164186 100644
  			  ln -s $$prev $$SHLIB$$SHLIB_SUFFIX ); \
  		fi; \
 diff --git a/crypto/Makefile b/crypto/Makefile
-index 17a87f8..29c2dcf 100644
+index 875ea1a..c22b683 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
 @@ -85,11 +85,11 @@ testapps:
@@ -160,7 +154,7 @@ index fe8e9ca..a43d21b 100644
  tags:
  	ctags $(SRC)
 diff --git a/test/Makefile b/test/Makefile
-index 40abd60..78d3788 100644
+index 36506cf..c69af8b 100644
 --- a/test/Makefile
 +++ b/test/Makefile
 @@ -145,7 +145,7 @@ install:
@@ -172,7 +166,7 @@ index 40abd60..78d3788 100644
  
  apps:
  	@(cd ..; $(MAKE) DIRS=apps all)
-@@ -444,139 +444,139 @@ BUILD_CMD_STATIC=shlib_target=; \
+@@ -448,142 +448,142 @@ BUILD_CMD_STATIC=shlib_target=; \
  		link_app.$${shlib_target}
  
  $(RSATEST)$(EXE_EXT): $(RSATEST).o $(DLIBCRYPTO)
@@ -345,7 +339,11 @@ index 40abd60..78d3788 100644
  
  $(FATALERRTEST)$(EXE_EXT): $(FATALERRTEST).o ssltestlib.o $(DLIBSSL) $(DLIBCRYPTO)
  	@target=$(FATALERRTEST); exobj=ssltestlib.o; $(BUILD_CMD)
- 
+
+ $(X509TIMETEST)$(EXE_EXT): $(X509TIMETEST).o
+-	@target=$(X509TIMETEST) $(BUILD_CMD)
++	+@target=$(X509TIMETEST) $(BUILD_CMD)
+
  $(SSLV2CONFTEST)$(EXE_EXT): $(SSLV2CONFTEST).o
 -	@target=$(SSLV2CONFTEST) $(BUILD_CMD)
 +	+@target=$(SSLV2CONFTEST) $(BUILD_CMD)
@@ -356,7 +354,7 @@ index 40abd60..78d3788 100644
  
  #$(AESTEST).o: $(AESTEST).c
  #	$(CC) -c $(CFLAGS) -DINTERMEDIATE_VALUE_KAT -DTRACE_KAT_MCT $(AESTEST).c
-@@ -589,7 +589,7 @@ $(DTLSTEST)$(EXE_EXT): $(DTLSTEST).o ssltestlib.o $(DLIBSSL) $(DLIBCRYPTO)
+@@ -596,7 +596,7 @@ $(DTLSTEST)$(EXE_EXT): $(DTLSTEST).o ssltestlib.o $(DLIBSSL) $(DLIBCRYPTO)
  #	fi
  
  dummytest$(EXE_EXT): dummytest.o $(DLIBCRYPTO)

@@ -7,7 +7,9 @@ INC_PR = "r1"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f741e51de91d4eeea5930b9c3c7fa69d"
 
-SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz"
+SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
+           file://CVE-2018-1000030-1.patch \
+           file://CVE-2018-1000030-2.patch"
 
 SRC_URI[md5sum] = "1f6db41ad91d9eb0a6f0c769b8613c5b"
 SRC_URI[sha256sum] = "71ffb26e09e78650e424929b2b457b9c912ac216576e6bd9e7d204ed03296a66"

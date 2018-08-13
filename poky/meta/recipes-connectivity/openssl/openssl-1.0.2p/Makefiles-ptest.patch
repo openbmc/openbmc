@@ -11,18 +11,15 @@ Signed-off-by: Maxin B. John <maxin.john@enea.com>
 Upstream-Status: Pending
 
 ---
- Makefile.org       |  10 +-
- Makefile.org.orig  |   7 +-
- test/Makefile      |  13 +-
- test/Makefile.orig | 987 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 1009 insertions(+), 8 deletions(-)
- create mode 100644 test/Makefile.orig
-
+ Makefile.org  | 10 +++++++++-
+ test/Makefile | 13 +++++++++----
+ 2 files changed, 18 insertions(+), 5 deletions(-)
+ 
 diff --git a/Makefile.org b/Makefile.org
 index 111fbba..8e7936c 100644
 --- a/Makefile.org
 +++ b/Makefile.org
-@@ -468,8 +468,16 @@ rehash.time: certs apps
+@@ -467,8 +467,16 @@ rehash.time: certs apps
  test:   tests
  
  tests: rehash
@@ -41,7 +38,7 @@ index 111fbba..8e7936c 100644
  
  report:
 diff --git a/test/Makefile b/test/Makefile
-index a1f7eeb..b2984c4 100644
+index 55a6b50..d46b4d1 100644
 --- a/test/Makefile
 +++ b/test/Makefile
 @@ -150,7 +150,7 @@ tests:	exe apps $(TESTS)
@@ -55,7 +52,7 @@ index a1f7eeb..b2984c4 100644
  	test_rmd test_rc2 test_rc4 test_rc5 test_bf test_cast test_aes \
 @@ -162,6 +162,11 @@ alltests: \
  	test_constant_time test_verify_extra test_clienthello test_sslv2conftest \
- 	test_dtls test_bad_dtls test_fatalerr
+ 	test_dtls test_bad_dtls test_fatalerr test_x509_time
  
 +alltests:
 +	@(for i in $(all-tests); do \
@@ -90,4 +87,3 @@ index a1f7eeb..b2984c4 100644
  
 -- 
 2.15.1
-

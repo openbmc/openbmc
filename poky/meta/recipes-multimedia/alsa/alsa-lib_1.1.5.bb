@@ -19,18 +19,17 @@ EXTRA_OECONF += "${@get_alsa_fpu_setting(bb, d)} "
 
 EXTRA_OECONF += "--disable-python"
 
-PACKAGES =+ "alsa-server libasound alsa-conf alsa-doc"
-FILES_libasound = "${libdir}/libasound.so.*"
+PACKAGES =+ "alsa-server alsa-conf alsa-doc"
 FILES_alsa-server = "${bindir}/*"
 FILES_alsa-conf = "${datadir}/alsa/"
 
-RDEPENDS_libasound = "alsa-conf"
-
-# alsa-lib gets automatically added to alsa-lib-dev dependencies, but the
-# alsa-lib package doesn't exist. libasound is the real library package.
-RDEPENDS_${PN}-dev = "libasound"
+RDEPENDS_${PN}_class-target = "alsa-conf"
 
 # upgrade path
+RPROVIDES_${PN} = "libasound"
+RREPLACES_${PN} = "libasound"
+RCONFLICTS_${PN} = "libasound"
+
 RPROVIDES_${PN}-dev = "alsa-dev"
 RREPLACES_${PN}-dev = "alsa-dev"
 RCONFLICTS_${PN}-dev = "alsa-dev"

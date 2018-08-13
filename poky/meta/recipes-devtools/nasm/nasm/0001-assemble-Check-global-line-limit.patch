@@ -1,0 +1,50 @@
+From 7a46d6b9e3a1d8a0ab0d816ef1bf194ad285e082 Mon Sep 17 00:00:00 2001
+From: "Chang S. Bae" <chang.seok.bae@intel.com>
+Date: Fri, 17 Aug 2018 14:26:03 +0800
+Subject: [PATCH] assemble: Check global line limit
+
+Without the limit, the while loop opens to semi-infinite
+that will exhaustively consume the heap space. Also, the
+index value gets into the garbage.
+
+https://bugzilla.nasm.us/show_bug.cgi?id=3392474
+
+Reported-by : Dongliang Mu <mudongliangabcd@gmail.com>
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+Signed-off-by: Cyrill Gorcunov <gorcunov@gmail.com>
+
+Upstream-Status: Backport from upstream [http://repo.or.cz/nasm.git]
+CVE: CVE-2018-10316
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ asm/nasm.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/asm/nasm.c b/asm/nasm.c
+index 8497ec9..81f6cee 100644
+--- a/asm/nasm.c
++++ b/asm/nasm.c
+@@ -99,6 +99,8 @@ static char outname[FILENAME_MAX];
+ static char listname[FILENAME_MAX];
+ static char errname[FILENAME_MAX];
+ static int globallineno;        /* for forward-reference tracking */
++#define GLOBALLINENO_MAX    INT32_MAX
++
+ /* static int pass = 0; */
+ const struct ofmt *ofmt = &OF_DEFAULT;
+ const struct ofmt_alias *ofmt_alias = NULL;
+@@ -1360,7 +1362,10 @@ static void assemble_file(char *fname, StrList **depend_ptr)
+         location.offset = offs = get_curr_offs();
+ 
+         while ((line = preproc->getline())) {
+-            globallineno++;
++            if (globallineno++ == GLOBALLINENO_MAX)
++                nasm_error(ERR_FATAL,
++                    "overall line number reaches the maximum %d\n",
++                    GLOBALLINENO_MAX);
+ 
+             /*
+              * Here we parse our directives; this is not handled by the
+-- 
+2.7.4
+

@@ -1,0 +1,26 @@
+Unzip doesn't handle large zip files well and crashes:
+
+"This only happens if you have more then 16k entries and when one of
+the 16k entry infos is reused it happend to be previously used for
+a symlink entry."
+
+This patch is taken from Fedora (https://bugzilla.redhat.com/show_bug.cgi?id=972427)
+
+Upstream-Status: Pending (upstream is dead)
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+--- unzip60/process.c.sav	2013-06-09 12:08:57.070392264 +0200
++++ unzip60/process.c	2013-06-09 12:10:08.641696988 +0200
+@@ -1751,6 +1751,12 @@
+         = (G.crec.general_purpose_bit_flag & (1 << 11)) == (1 << 11);
+ #endif
+ 
++#ifdef SYMLINKS
++    /* Initialize the symlink flag, may be set by the platform-specific
++       mapattr function.  */
++    G.pInfo->symlink = 0;
++#endif 
++
+     return PK_COOL;
+ 
+ } /* end function process_cdir_file_hdr() */

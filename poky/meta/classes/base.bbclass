@@ -100,8 +100,8 @@ def get_lic_checksum_file_list(d):
         # We only care about items that are absolute paths since
         # any others should be covered by SRC_URI.
         try:
-            path = bb.fetch.decodeurl(url)[2]
-            if not path:
+            (method, host, path, user, pswd, parm) = bb.fetch.decodeurl(url)
+            if method != "file" or not path:
                 raise bb.fetch.MalformedUrl(url)
 
             if path[0] == '/':

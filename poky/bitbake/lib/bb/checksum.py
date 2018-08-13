@@ -97,6 +97,8 @@ class FileChecksumCache(MultiProcessCache):
 
         def checksum_dir(pth):
             # Handle directories recursively
+            if pth == "/":
+                bb.fatal("Refusing to checksum /")
             dirchecksums = []
             for root, dirs, files in os.walk(pth):
                 for name in files:
