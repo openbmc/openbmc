@@ -1,0 +1,9 @@
+[Unit]
+Description=ASPEED LPC boot from PNOR
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/pnorboot --size 32
+
+[Install]
+WantedBy=obmc-standby.target
