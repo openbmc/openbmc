@@ -14,6 +14,6 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
+  ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-openbmc-machines/meta-x86/meta-portwell/meta-neptune \
   "

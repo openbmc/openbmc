@@ -14,7 +14,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
+  ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-openbmc-machines/meta-arm \
   ##OEROOT##/meta-openbmc-machines/meta-arm/meta-qualcomm \
   ##OEROOT##/meta-openbmc-machines/meta-arm/meta-qualcomm/meta-centriq2400-rep \
@@ -28,7 +28,7 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
+  ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-openbmc-machines/meta-arm \
   ##OEROOT##/meta-openbmc-machines/meta-arm/meta-qualcomm \
   ##OEROOT##/meta-openbmc-machines/meta-arm/meta-qualcomm/meta-centriq2400-rep \

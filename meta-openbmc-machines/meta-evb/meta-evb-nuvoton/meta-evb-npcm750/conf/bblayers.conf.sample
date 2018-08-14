@@ -12,7 +12,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-networking \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-openbmc-bsp/meta-nuvoton \
+  ##OEROOT##/meta-nuvoton \
   ##OEROOT##/meta-openbmc-machines/meta-evb \
   ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-nuvoton \
   ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-nuvoton/meta-evb-npcm750 \
@@ -24,7 +24,7 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-openembedded/meta-networking \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-openbmc-bsp/meta-nuvoton \
+  ##OEROOT##/meta-nuvoton \
   ##OEROOT##/meta-openbmc-machines/meta-evb \
   ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-nuvoton \
   ##OEROOT##/meta-openbmc-machines/meta-evb/meta-evb-nuvoton/meta-evb-npcm750 \

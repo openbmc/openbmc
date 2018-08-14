@@ -14,7 +14,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
+  ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-openbmc-machines/meta-x86 \
   ##OEROOT##/meta-openbmc-machines/meta-x86/meta-quanta \
   ##OEROOT##/meta-openbmc-machines/meta-x86/meta-quanta/meta-q71l \
@@ -28,7 +28,7 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
+  ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-openbmc-machines/meta-x86 \
   ##OEROOT##/meta-openbmc-machines/meta-x86/meta-quanta \
   ##OEROOT##/meta-openbmc-machines/meta-x86/meta-quanta/meta-q71l \
