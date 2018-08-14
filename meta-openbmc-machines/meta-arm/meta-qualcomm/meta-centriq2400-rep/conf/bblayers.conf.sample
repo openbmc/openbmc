@@ -8,11 +8,11 @@ BBFILES ?= ""
 BBLAYERS ?= " \
   ##OEROOT##/meta \
   ##OEROOT##/meta-poky \
-  ##OEROOT##/import-layers/meta-openembedded/meta-oe \
-  ##OEROOT##/import-layers/meta-openembedded/meta-networking \
-  ##OEROOT##/import-layers/meta-openembedded/meta-perl \
-  ##OEROOT##/import-layers/meta-openembedded/meta-python \
-  ##OEROOT##/import-layers/meta-openembedded/meta-webserver \
+  ##OEROOT##/meta-openembedded/meta-oe \
+  ##OEROOT##/meta-openembedded/meta-networking \
+  ##OEROOT##/meta-openembedded/meta-perl \
+  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
   ##OEROOT##/meta-openbmc-machines/meta-arm \
@@ -22,11 +22,11 @@ BBLAYERS ?= " \
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
   ##OEROOT##/meta-poky \
-  ##OEROOT##/import-layers/meta-openembedded/meta-oe \
-  ##OEROOT##/import-layers/meta-openembedded/meta-networking \
-  ##OEROOT##/import-layers/meta-openembedded/meta-perl \
-  ##OEROOT##/import-layers/meta-openembedded/meta-python \
-  ##OEROOT##/import-layers/meta-openembedded/meta-webserver \
+  ##OEROOT##/meta-openembedded/meta-oe \
+  ##OEROOT##/meta-openembedded/meta-networking \
+  ##OEROOT##/meta-openembedded/meta-perl \
+  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-openbmc-bsp/meta-aspeed \
   ##OEROOT##/meta-openbmc-machines/meta-arm \

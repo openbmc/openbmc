@@ -1,1 +1,1 @@
-import-layers/yocto-poky/bitbake
+poky/bitbake/
