@@ -15,7 +15,6 @@ FMT = "org.openbmc.control.Host@{0}.service"
 DBUS_SERVICE_${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_SERVICE_${PN} = " \
         op-start-host@.service \
-        op-init-pnor@.service \
         "
 
 START_TMPL = "op-start-host@.service"
@@ -23,9 +22,4 @@ START_TGTFMT = "obmc-host-startmin@{1}.target"
 START_INSTFMT = "op-start-host@{0}.service"
 START_FMT = "../${START_TMPL}:${START_TGTFMT}.requires/${START_INSTFMT}"
 
-INIT_PNOR_TMPL = "op-init-pnor@.service"
-INIT_PNOR_INSTFMT = "op-init-pnor@{0}.service"
-INIT_PNOR_FMT = "../${INIT_PNOR_TMPL}:${START_TGTFMT}.requires/${INIT_PNOR_INSTFMT}"
-
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'START_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'INIT_PNOR_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
