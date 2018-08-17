@@ -11,6 +11,23 @@ boot_count_sensor:
           0xFF:
             type: uint32_t
 
+ps_redundancy_state_sensor:
+  path: /xyz/openbmc_project/control/power_supply_redundancy
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  mutability: Mutability::Read
+  sensorNamePattern: nameProperty
+  interfaces:
+    xyz.openbmc_project.Control.PowerSupplyRedundancy:
+      PowerSupplyRedundancyEnabled:
+        Offsets:
+          0x00:
+            type: "bool"
+            assert: false
+          0x01:
+            type: "bool"
+            assert: true
+
 os_boot_sensor:
   path: /xyz/openbmc_project/state/host0
   serviceInterface: org.freedesktop.DBus.Properties

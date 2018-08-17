@@ -78,6 +78,26 @@
         Offsets:
           0xFF:
             type: uint32_t
+0x0b:
+  entityID: 0x22
+  entityInstance: 3
+  sensorType: 0xCA
+  path: /xyz/openbmc_project/control/power_supply_redundancy
+  sensorReadingType: 0x03
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  mutability: Mutability::Read
+  sensorNamePattern: nameProperty
+  interfaces:
+    xyz.openbmc_project.Control.PowerSupplyRedundancy:
+      PowerSupplyRedundancyEnabled:
+        Offsets:
+          0x00:
+            type: "bool"
+            assert: false
+          0x01:
+            type: "bool"
+            assert: true
 0x12:
   entityID: 0xD0
   entityInstance: 1
