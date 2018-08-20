@@ -343,3 +343,14 @@ memory_temp_sensor:
         Offsets:
           0xFF:
             type: int64_t
+ps_derating_sensor:
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  mutability: Mutability::Read
+  sensorNamePattern: nameProperty
+  interfaces:
+    xyz.openbmc_project.Control.PowerSupplyAttributes:
+      DeratingFactor:
+        Offsets:
+          0xFF:
+            type: uint32_t

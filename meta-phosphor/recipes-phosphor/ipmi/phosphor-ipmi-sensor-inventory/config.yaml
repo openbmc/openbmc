@@ -2126,3 +2126,19 @@
             assert: true
             deassert: false
             type: bool
+0xd8:
+  entityID: 0x15
+  entityInstance: 1
+  sensorType: 0xC8
+  path: /xyz/openbmc_project/control/power_supply_attributes
+  sensorReadingType: 0x6F
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: assertion
+  mutability: Mutability::Read
+  sensorNamePattern: nameProperty
+  interfaces:
+    xyz.openbmc_project.Control.PowerSupplyAttributes:
+      DeratingFactor:
+        Offsets:
+          0xFF:
+            type: uint32_t
