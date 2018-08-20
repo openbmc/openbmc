@@ -47,6 +47,12 @@ RDEPENDS_${PN} += "sdbusplus"
 RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_ipmi-config}"
 RDEPENDS_${PN} += "virtual/obmc-watchdog"
 
+inherit useradd
+
+USERADD_PACKAGES = "${PN}"
+# add ipmi group
+GROUPADD_PARAM_${PN} = "ipmi"
+
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 
 RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-settings-mgmt}"
