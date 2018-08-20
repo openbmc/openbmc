@@ -4,7 +4,7 @@
 LICENSE = "Apache-2.0"
 SRC_URI = "git://github.com/openbmc/phosphor-webui.git"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
-SRCREV = "ba7dad900c8c0ff4cc0043c3320ebf62c933cf0a"
+SRCREV = "26539864e2aa078fa5d9723f05760a3068ce3bec"
 S = "${WORKDIR}/git"
 
 DEPENDS_prepend = "nodejs-native "
