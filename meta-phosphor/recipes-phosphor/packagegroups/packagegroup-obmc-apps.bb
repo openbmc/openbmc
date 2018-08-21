@@ -83,6 +83,7 @@ RDEPENDS_${PN}-leds = " \
 SUMMARY_${PN}-logging = "Logging applications"
 RDEPENDS_${PN}-logging = " \
         phosphor-logging \
+        rsyslog \
         "
 
 SUMMARY_${PN}-sensors = "Sensor applications"
