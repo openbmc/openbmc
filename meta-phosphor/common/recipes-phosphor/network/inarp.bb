@@ -11,7 +11,7 @@ DEPENDS += "autoconf-archive-native"
 RDEPENDS_${PN} += "network"
 
 SRC_URI += "git://github.com/openbmc/inarp"
-SRCREV = "e0127d27473ca37ded48813e2ed571abada81357"
+SRCREV = "6e296617f041d7665b2540151646af452088482c"
 
 S = "${WORKDIR}/git"
 
