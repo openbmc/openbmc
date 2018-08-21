@@ -57,6 +57,7 @@ RDEPENDS_${PN}-updater += " \
     virtual-obmc-image-manager \
 "
 EXTRA_OECONF += " \
+    ACTIVE_BMC_MAX_ALLOWED=1 \
     MEDIA_DIR=/run/media \
 "
 

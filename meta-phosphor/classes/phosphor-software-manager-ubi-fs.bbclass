@@ -12,11 +12,13 @@ FILES_${PN}-updater-ubi += " \
 
 # Remove default configs
 EXTRA_OECONF_remove_df-obmc-ubi-fs += " \
+    ACTIVE_BMC_MAX_ALLOWED=1 \
     MEDIA_DIR=/run/media \
 "
 
 # Add ubi-fs configs
 EXTRA_OECONF_append_df-obmc-ubi-fs += " \
+    ACTIVE_BMC_MAX_ALLOWED=2 \
     MEDIA_DIR=/media \
 "
 
