@@ -10,6 +10,16 @@ FILES_${PN}-updater-ubi += " \
     /usr/local \
     "
 
+# Remove default configs
+EXTRA_OECONF_remove_df-obmc-ubi-fs += " \
+    MEDIA_DIR=/run/media \
+"
+
+# Add ubi-fs configs
+EXTRA_OECONF_append_df-obmc-ubi-fs += " \
+    MEDIA_DIR=/media \
+"
+
 SYSTEMD_SERVICE_phosphor-software-manager-updater-ubi += " \
     obmc-flash-bmc-ubirw.service \
     obmc-flash-bmc-ubiro@.service \

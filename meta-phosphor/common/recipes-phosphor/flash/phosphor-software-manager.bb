@@ -56,6 +56,9 @@ RDEPENDS_${PN}-updater += " \
     sdbusplus \
     virtual-obmc-image-manager \
 "
+EXTRA_OECONF += " \
+    MEDIA_DIR=/run/media \
+"
 
 RPROVIDES_${PN}-version += " \
     virtual-obmc-image-manager \
