@@ -11,7 +11,8 @@ inherit autotools pkgconfig
 
 DEPENDS = "bison-native flex-native"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/project/libcg/${BPN}/v0.41/${BPN}-${PV}.tar.bz2"
+SRC_URI = "${SOURCEFORGE_MIRROR}/project/libcg/${BPN}/v0.41/${BPN}-${PV}.tar.bz2 \
+           file://CVE-2018-14348.patch"
 SRC_URI_append_libc-musl = " file://musl-decls-compat.patch"
 
 SRC_URI[md5sum] = "3dea9d50b8a5b73ff0bf1cdcb210f63f"

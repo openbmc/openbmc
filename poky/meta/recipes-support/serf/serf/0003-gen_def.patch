@@ -1,0 +1,22 @@
+From 98e793d9f2250e7c1f9f1eb5dfd616a6a8829e9a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 3 Sep 2018 11:12:27 -0700
+Subject: [PATCH] gen_def
+
+---
+ SConstruct | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/SConstruct b/SConstruct
+index 571bdce..877731e 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -158,6 +158,8 @@ env = Environment(variables=opts,
+                   ENV = os.environ,
+                   )
+ 
++gen_def_script = env.File('build/gen_def.py').rstr()
++
+ env.Append(BUILDERS = {
+     'GenDef' : 
+       Builder(action = '"%s" "%s" $SOURCES > $TARGET' % (sys.executable, gen_def_script,),

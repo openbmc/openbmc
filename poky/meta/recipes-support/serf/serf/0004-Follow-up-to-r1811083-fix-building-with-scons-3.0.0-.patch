@@ -1,0 +1,29 @@
+From 565211fd082ef653ca9c44a345350fc1451f5a0f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 3 Sep 2018 11:12:38 -0700
+Subject: [PATCH] Follow-up to r1811083 fix building with scons 3.0.0 and
+ Python3
+
+* SConstruct: Append decode('utf-8) to FILE.get_contents() to avoid
+  TypeError: cannot use a string pattern on a bytes-like object
+
+Upstream-Status: Backport
+[https://svn.apache.org/viewvc/serf/trunk/SConstruct?r1=1811088&r2=1814604]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ SConstruct | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/SConstruct b/SConstruct
+index 877731e..7678bb1 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -169,7 +169,7 @@ env.Append(BUILDERS = {
+ match = re.search('SERF_MAJOR_VERSION ([0-9]+).*'
+                   'SERF_MINOR_VERSION ([0-9]+).*'
+                   'SERF_PATCH_VERSION ([0-9]+)',
+-                  env.File('serf.h').get_contents(),
++                  env.File('serf.h').get_contents().decode('utf-8'),
+                   re.DOTALL)
+ MAJOR, MINOR, PATCH = [int(x) for x in match.groups()]
+ env.Append(MAJOR=str(MAJOR))

@@ -15,8 +15,8 @@ SRC_URI += "file://configure-sbindir.patch \
             file://display_testname_for_subtest.patch \
             file://avoid_parallel_tests.patch \
 "
-SRC_URI[md5sum] = "e0d8a25853f88cd15ff557e5d8cb4ea7"
-SRC_URI[sha256sum] = "6c7397abc764e32e8159c2e96042874a190303e77adceb4ac5bd502a272a4734"
+SRC_URI[md5sum] = "9e5b1b8c1dc99455bdb6b462cf9436d9"
+SRC_URI[sha256sum] = "86e6707a379c7ff5489c218cfaf1e3464b0b95acf7817db0bc5f179e356a67b2"
 
 CACHED_CONFIGUREVARS += "scanf_cv_alloc_modifier=ms"
 

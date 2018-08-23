@@ -15,6 +15,7 @@ SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https \
            file://0001-mksquashfs.c-get-inline-functions-work-with-C99.patch;striplevel=2 \
            file://squashfs-tools-4.3-sysmacros.patch;striplevel=2 \
            file://fix-compat.patch \
+           file://0001-squashfs-tools-patch-for-CVE-2015-4645-6.patch;striplevel=2 \
 "
 UPSTREAM_CHECK_COMMITS = "1"
 SRC_URI[lzma.md5sum] = "29d5ffd03a5a3e51aef6a74e9eafb759"

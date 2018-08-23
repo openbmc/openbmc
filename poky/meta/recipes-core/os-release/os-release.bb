@@ -1,7 +1,7 @@
 inherit allarch
 
 SUMMARY = "Operating system identification"
-DESCRIPTION = "The /etc/os-release file contains operating system identification data."
+DESCRIPTION = "The /usr/lib/os-release file contains operating system identification data."
 LICENSE = "MIT"
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -42,6 +42,9 @@ python do_compile () {
 do_compile[vardeps] += "${OS_RELEASE_FIELDS}"
 
 do_install () {
-    install -d ${D}${sysconfdir}
-    install -m 0644 os-release ${D}${sysconfdir}/
+    install -d ${D}${libdir} ${D}${sysconfdir}
+    install -m 0644 os-release ${D}${libdir}/
+    lnr ${D}${libdir}/os-release ${D}${sysconfdir}/os-release
 }
+
+FILES_${PN} += "${libdir}/os-release"

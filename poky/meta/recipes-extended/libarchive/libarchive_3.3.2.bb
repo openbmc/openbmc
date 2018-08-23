@@ -37,6 +37,7 @@ SRC_URI = "http://libarchive.org/downloads/libarchive-${PV}.tar.gz \
            file://CVE-2017-14502.patch \
            file://non-recursive-extract-and-list.patch \
            file://CVE-2017-14503.patch \
+           file://CVE-2017-14501.patch \
           "
 
 SRC_URI[md5sum] = "4583bd6b2ebf7e0e8963d90879eb1b27"

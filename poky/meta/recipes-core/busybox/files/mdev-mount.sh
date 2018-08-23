@@ -25,7 +25,7 @@ case "$ACTION" in
 		fi
 		# check for full-disk partition
 		if [ "${DEVBASE}" = "${MDEV}" ] ; then
-			if [ -d /sys/block/${DEVBASE}/${DEVBASE}*1 ] ; then
+			if [ -f /sys/block/${DEVBASE}/${DEVBASE}*1/partition ] ; then
 				# Partition detected, just quit
 				exit 0
 			fi
@@ -43,7 +43,7 @@ case "$ACTION" in
 		then
 			MOUNTPOINT="${MDEV_AUTOMOUNT_ROOT}/$MDEV"
 			mkdir -p "$MOUNTPOINT"
-			mount -t auto /dev/$MDEV "$MOUNTPOINT"
+			mount -t auto /dev/$MDEV "$MOUNTPOINT" || rmdir "$MOUNTPOINT"
 		fi
 		;;
 	remove)

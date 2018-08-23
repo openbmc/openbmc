@@ -47,6 +47,7 @@ SRC_URI = "\
      file://CVE-2018-10372.patch \
      file://CVE-2018-10535.patch \
      file://CVE-2018-10534.patch \
+     file://0001-Change-the-ARM-assembler-s-ADR-and-ADRl-pseudo-ops-s.patch \
 "
 S  = "${WORKDIR}/git"
 

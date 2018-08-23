@@ -1,0 +1,27 @@
+From e51b4b37916dd20b13133cb7af16601b6bf3ace9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 3 Sep 2018 10:54:54 -0700
+Subject: [PATCH] SConstruct: Fix path quoting for .def generator
+
+Patch by: Martin Keller <m.keller{_AT_}codesys.com>
+Upstream-Status: Backport
+[https://svn.apache.org/viewvc/serf/trunk/SConstruct?r1=1807594&r2=1809132]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ SConstruct | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/SConstruct b/SConstruct
+index 18a45fa..571bdce 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -160,7 +160,7 @@ env = Environment(variables=opts,
+ 
+ env.Append(BUILDERS = {
+     'GenDef' : 
+-      Builder(action = sys.executable + ' build/gen_def.py $SOURCES > $TARGET',
++      Builder(action = '"%s" "%s" $SOURCES > $TARGET' % (sys.executable, gen_def_script,),
+               suffix='.def', src_suffix='.h')
+   })
+ 

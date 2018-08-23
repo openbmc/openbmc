@@ -1,7 +1,12 @@
 SUMMARY = "High-Performance Asynchronous HTTP Client Library"
 SRC_URI = "${APACHE_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://norpath.patch \
-           file://env.patch"
+           file://env.patch \
+           file://0001-Fix-syntax-of-a-print-in-the-scons-file-to-unbreak-b.patch \
+           file://0002-SConstruct-Fix-path-quoting-for-.def-generator.patch \
+           file://0003-gen_def.patch \
+           file://0004-Follow-up-to-r1811083-fix-building-with-scons-3.0.0-.patch \
+           "
 
 SRC_URI[md5sum] = "370a6340ff20366ab088012cd13f2b57"
 SRC_URI[sha256sum] = "549c2d21c577a8a9c0450facb5cca809f26591f048e466552240947bdf7a87cc"

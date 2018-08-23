@@ -13,6 +13,7 @@ SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.gz \
            file://configfix.patch \
            file://configure_fixes.patch \
            file://run-ptest \
+           file://0001-Fix-error-handling-in-gdbm.patch \
 "
 
 SRC_URI[md5sum] = "bd502b9a8670a8012c4d90c31a84955f"

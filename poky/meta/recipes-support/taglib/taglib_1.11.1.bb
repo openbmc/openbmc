@@ -10,6 +10,7 @@ DEPENDS = "zlib"
 
 SRC_URI = "http://taglib.github.io/releases/${BP}.tar.gz \
            file://CVE-2017-12678.patch \
+           file://CVE-2018-11439.patch \
           "
 
 SRC_URI[md5sum] = "cee7be0ccfc892fa433d6c837df9522a"

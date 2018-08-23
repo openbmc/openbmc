@@ -1,0 +1,40 @@
+From a309323328d9d6e0bf5d9ea1d75920e53b9beef3 Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Fri, 5 Jan 2018 11:58:42 +1000
+Subject: [PATCH] config: fix NULL value detection for ID_INPUT being unset
+
+Erroneous condition caused us to keep going with all devices that didn't have
+ID_INPUT set.
+
+Fixes: 5aad81445c8c3d6
+Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=104382
+Reviewed-by: Adam Jackson <ajax@redhat.com>
+Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+
+Upstream-status: Backport
+https://patchwork.freedesktop.org/patch/196090/
+Affects: < 1.20.0
+[Yocto # 12899]
+
+Signed-off-by: Armin Kuster <akuser808@gmail.com>
+
+---
+ config/udev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/udev.c b/config/udev.c
+index e198e8609..3a73189e2 100644
+--- a/config/udev.c
++++ b/config/udev.c
+@@ -135,7 +135,7 @@ device_added(struct udev_device *udev_device)
+ #endif
+ 
+     value = udev_device_get_property_value(udev_device, "ID_INPUT");
+-    if (value && !strcmp(value, "0")) {
++    if (!value || !strcmp(value, "0")) {
+         LogMessageVerb(X_INFO, 10,
+                        "config/udev: ignoring device %s without "
+                        "property ID_INPUT set\n", path);
+-- 
+2.17.1
+
