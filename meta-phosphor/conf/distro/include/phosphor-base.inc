@@ -154,3 +154,4 @@ SKIP_META_VIRT_SANITY_CHECK = "1"
 # make sense on a BMC anyway.
 BAD_RECOMMENDATIONS_pn-obmc-phosphor-image = "udev-hwdb"
 
+LAYER_CONF_VERSION = "8"

@@ -35,24 +35,22 @@ cd openbmc
 
 ### 3) Target your hardware
 Any build requires an environment variable known as `TEMPLATECONF` to be set
-to a hardware target.  OpenBMC has placed all known hardware targets in a
-standard directory structure
-`meta-openbmc-machines/meta-[architecture]/meta-[company]/meta-[target]`.
+to a hardware target.
 You can see all of the known targets with
-`find meta-openbmc-machines -type d -name conf`. Choose the hardware target and
+`find meta-* -name local.conf.sample`. Choose the hardware target and
 then move to the next step. Additional examples can be found in the
 [OpenBMC Cheatsheet](https://github.com/openbmc/docs/blob/master/cheatsheet.md)
 
 Machine | TEMPLATECONF
 --------|---------
-Palmetto | ```meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto/conf```
-Zaius| ```meta-openbmc-machines/meta-openpower/meta-ingrasys/meta-zaius/conf```
-Witherspoon| ```meta-openbmc-machines/meta-openpower/meta-ibm/meta-witherspoon/conf```
+Palmetto | ```meta-ibm/meta-palmetto/conf```
+Zaius| ```meta-ingrasys/meta-zaius/conf```
+Witherspoon| ```meta-ibm/meta-witherspoon/conf```
 
 
 As an example target Palmetto
 ```
-export TEMPLATECONF=meta-openbmc-machines/meta-openpower/meta-ibm/meta-palmetto/conf
+export TEMPLATECONF=meta-ibm/meta-palmetto/conf
 ```
 
 ### 4) Build

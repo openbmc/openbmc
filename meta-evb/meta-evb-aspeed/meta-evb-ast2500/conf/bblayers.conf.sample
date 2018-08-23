@@ -13,6 +13,10 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-aspeed \
+  ##OEROOT##/meta-evb \
+  ##OEROOT##/meta-evb/meta-evb-aspeed \
+  ##OEROOT##/meta-evb/meta-evb-aspeed/meta-evb-ast2500 \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
@@ -21,4 +25,9 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-openembedded/meta-networking \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-openembedded/meta-webserver \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-aspeed \
+  ##OEROOT##/meta-evb \
+  ##OEROOT##/meta-evb/meta-evb-aspeed \
+  ##OEROOT##/meta-evb/meta-evb-aspeed/meta-evb-ast2500 \
   "

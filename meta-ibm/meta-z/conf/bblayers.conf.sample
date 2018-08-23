@@ -8,17 +8,18 @@ BBFILES ?= ""
 BBLAYERS ?= " \
   ##OEROOT##/meta \
   ##OEROOT##/meta-poky \
-  ##OEROOT##/meta-openembedded/meta-oe \
-  ##OEROOT##/meta-openembedded/meta-networking \
-  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-openembedded/meta-oe/   \
+  ##OEROOT##/meta-openembedded/meta-filesystems/   \
+  ##OEROOT##/meta-openembedded/meta-networking/   \
+  ##OEROOT##/meta-openembedded/meta-python/   \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
-  "
+  ##OEROOT##/meta-ibm/meta-fsp2 \
+  ##OEROOT##/meta-openpower \
+  ##OEROOT##/meta-ibm \
+  ##OEROOT##/meta-ibm/meta-z \
+"
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
   ##OEROOT##/meta-poky \
-  ##OEROOT##/meta-openembedded/meta-oe \
-  ##OEROOT##/meta-openembedded/meta-networking \
-  ##OEROOT##/meta-openembedded/meta-python \
-  ##OEROOT##/meta-openembedded/meta-webserver \
   "

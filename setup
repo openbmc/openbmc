@@ -23,25 +23,23 @@ fi
 
 machine() {
 	local target=$1
-	local arch mfg mach realmach
-	for arch in meta-openbmc-machines/meta-*; do
-		for mfg in $arch/meta-*; do
-			for mach in $mfg/meta-*; do
-				if [ -d "$mach" -a -d "$mach/conf/machine" ]; then
-					realmach=${mach##*meta-}
-					# If a target is specified, then check for a match,
-					# otherwise just list what we've discovered
-					if [ -n "$target" ]; then
-						if [ "$realmach" = "$target" ]; then
-							echo Machine $target is $mach
-							TEMPLATECONF="$mach/conf" source oe-init-build-env build
-							return
-						fi
-					else
-						echo "$realmach"
+	local mfg mach realmach
+	for mfg in meta-*; do
+		for mach in $mfg/meta-*; do
+			if [ -d "$mach" -a -d "$mach/conf/machine" ]; then
+				realmach=${mach##*meta-}
+				# If a target is specified, then check for a match,
+				# otherwise just list what we've discovered
+				if [ -n "$target" ]; then
+					if [ "$realmach" = "$target" ]; then
+						echo Machine $target is $mach
+						TEMPLATECONF="$mach/conf" source oe-init-build-env build
+						return
 					fi
+				else
+					echo "$realmach"
 				fi
-			done
+			fi
 		done
 	done
 
