@@ -11,8 +11,6 @@ inherit obmc-phosphor-dbus-service
 inherit phosphor-logging
 inherit phosphor-dbus-yaml
 
-DBUS_SERVICE_${PN} += "xyz.openbmc_project.Logging.service"
-
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 DEPENDS += "python-mako-native"
@@ -23,13 +21,29 @@ DEPENDS += "virtual/phosphor-logging-callouts"
 DEPENDS += "phosphor-logging-error-logs-native"
 DEPENDS += "phosphor-logging-native"
 DEPENDS += "cereal"
-RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 
 PACKAGE_BEFORE_PN = "${PN}-test"
 FILES_${PN}-test = "${bindir}/*-test"
 
 PACKAGE_BEFORE_PN += "${PN}-elog"
 FILES_${PN}-elog += "${elog_dir}"
+
+# Package configuration
+LOGGING_PACKAGES = " \
+        ${PN}-base \
+"
+
+ALLOW_EMPTY_${PN} = "1"
+PACKAGE_BEFORE_PN += "${LOGGING_PACKAGES}"
+SYSTEMD_PACKAGES = "${LOGGING_PACKAGES}"
+DBUS_PACKAGES = "${LOGGING_PACKAGES}"
+
+RDEPENDS_${PN}-base += "sdbusplus phosphor-dbus-interfaces"
+FILES_${PN}-base += " \
+        ${sbindir}/phosphor-log-manager \
+        ${libdir}/libphosphor_logging.so.* \
+"
+DBUS_SERVICE_${PN}-base += "xyz.openbmc_project.Logging.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-logging"
 SRCREV = "9fab279fb38ab6b391503ce89aceb917ec35efa9"
