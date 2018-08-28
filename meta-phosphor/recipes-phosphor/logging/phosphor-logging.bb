@@ -31,6 +31,7 @@ FILES_${PN}-elog += "${elog_dir}"
 # Package configuration
 LOGGING_PACKAGES = " \
         ${PN}-base \
+        phosphor-rsyslog-config \
 "
 
 ALLOW_EMPTY_${PN} = "1"
@@ -44,6 +45,12 @@ FILES_${PN}-base += " \
         ${libdir}/libphosphor_logging.so.* \
 "
 DBUS_SERVICE_${PN}-base += "xyz.openbmc_project.Logging.service"
+
+RDEPENDS_phosphor-rsyslog-config += "sdbusplus phosphor-dbus-interfaces"
+DBUS_SERVICE_phosphor-rsyslog-config += "xyz.openbmc_project.Syslog.Config.service"
+FILES_phosphor-rsyslog-config += " \
+        ${sbindir}/phosphor-rsyslog-conf \
+"
 
 SRC_URI += "git://github.com/openbmc/phosphor-logging"
 SRCREV = "5ac1bde129258d906246f5d4ad78e036f03a6e80"

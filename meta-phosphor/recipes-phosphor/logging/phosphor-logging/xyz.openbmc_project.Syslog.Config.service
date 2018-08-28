@@ -1,0 +1,12 @@
+[Unit]
+Description=Rsyslog config updater
+
+[Service]
+ExecStart=/usr/bin/env phosphor-rsyslog-conf
+SyslogIdentifier=phosphor-rsyslog-conf
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
