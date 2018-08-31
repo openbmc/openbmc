@@ -8,7 +8,7 @@ DESCRIPTION = "Fan Control"
 PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-pid-control"
-SRCREV = "40be36ac31a4756498a1f297324129fe1271b726"
+SRCREV = "da4a5dd133b88ebfeb69e89d05b381f81ba70e50"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
