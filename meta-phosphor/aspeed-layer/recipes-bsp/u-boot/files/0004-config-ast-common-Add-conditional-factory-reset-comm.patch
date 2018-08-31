@@ -3,7 +3,7 @@ From: "Edward A. James" <eajames@us.ibm.com>
 Date: Thu, 9 Nov 2017 11:39:10 -0600
 Subject: [PATCH 4/4] config/ast-common: Add conditional factory reset command
 
-Factory reset (removing persistant rwfs) has to occur before we've
+Factory reset (removing persistent rwfs) has to occur before we've
 mounted the rwfs. However, the variable to determine whether or not to
 do the reset is stored in the u-boot env. This is tricky to access
 before rwfs is mounted except in u-boot. So, check it before every boot.

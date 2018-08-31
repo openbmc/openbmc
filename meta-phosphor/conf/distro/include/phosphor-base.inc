@@ -35,7 +35,7 @@ ftp://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
 http://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
 https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n"
 
-# The CONNECTIVITY_CHECK_URI's are used to test whether we can succesfully
+# The CONNECTIVITY_CHECK_URI's are used to test whether we can successfully
 # fetch from the network (and warn you if not). To disable the test set
 # the variable to be empty.
 # Git example url: git://git.yoctoproject.org/yocto-firewall-test;protocol=git;rev=master

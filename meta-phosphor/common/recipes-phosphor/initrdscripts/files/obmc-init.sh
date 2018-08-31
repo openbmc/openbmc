@@ -46,7 +46,7 @@ probe_fs_type() {
 
 # This fw_get_env_var is a possibly broken version of fw_printenv that
 # does not check the crc or flag byte.
-# The u-boot environemnt starts with a crc32, followed by a flag byte
+# The u-boot environment starts with a crc32, followed by a flag byte
 # when a redundannt environment is configured, followed by var=value\0 sets.
 # The flag byte for nand is a 1 byte counter; for nor it is a 1 or 0 byte.
 

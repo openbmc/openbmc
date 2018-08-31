@@ -1,4 +1,4 @@
-SUMMARY = "org.openbmc.control.Power implemention for OpenPOWER"
+SUMMARY = "org.openbmc.control.Power implementation for OpenPOWER"
 DESCRIPTION = "A power control implementation suitable for OpenPOWER systems."
 PR = "r1"
 

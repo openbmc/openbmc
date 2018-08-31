@@ -4,7 +4,7 @@ Date: Tue, 13 Mar 2018 15:34:30 -0400
 Subject: [PATCH] sd-bus: Don't automatically add ObjectManager
 
 Even though sdbus helps manage org.freedesktop.DBus.ObjectManager
-it must still be explictly enabled by a library client.
+it must still be explicitly enabled by a library client.
 
 As such do not automatically add ObjectManager to GetManagedObjects
 method call responses or InterfacesAdded/Removed signals.  Bus

@@ -1,4 +1,4 @@
-SUMMARY = "Phosphor OpenBMC - eror log meta data generation"
+SUMMARY = "Phosphor OpenBMC - error log meta data generation"
 PR = "r1"
 
 inherit native
