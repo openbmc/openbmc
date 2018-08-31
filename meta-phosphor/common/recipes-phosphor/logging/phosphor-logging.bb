@@ -46,7 +46,7 @@ FILES_${PN}-base += " \
 DBUS_SERVICE_${PN}-base += "xyz.openbmc_project.Logging.service"
 
 SRC_URI += "git://github.com/openbmc/phosphor-logging"
-SRCREV = "9fab279fb38ab6b391503ce89aceb917ec35efa9"
+SRCREV = "5ac1bde129258d906246f5d4ad78e036f03a6e80"
 
 S = "${WORKDIR}/git"
 
