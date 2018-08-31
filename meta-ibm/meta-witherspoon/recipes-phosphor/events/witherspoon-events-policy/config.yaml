@@ -112,3 +112,22 @@
   properties: occmemtemp property
   eventName: occ
   eventMessage: "Memory throttled due to an over temperature condition."
+
+- name: errorlog path group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/logging
+
+- name: pathwatch errorlog
+  class: pathwatch
+  pathwatch: path
+  paths: errorlog path group
+  pathcallback: create errorlog trap
+
+- name: create errorlog trap
+  class: pathcallback
+  pathcallback: eventpath
+  paths: errorlog path group
+  eventType: ErrorTrap
