@@ -9,7 +9,7 @@ if [ "$1" == "add" ]; then
     echo 5-0042 > /sys/bus/i2c/drivers/ir38163/bind
     sleep 1
 elif [ "$1" == "rm" ]; then
-    echo Remove the 0x42 deivce
+    echo Remove the 0x42 device
     sleep 2
     echo 5-0042 > /sys/bus/i2c/drivers/ir38163/unbind
     sleep 1

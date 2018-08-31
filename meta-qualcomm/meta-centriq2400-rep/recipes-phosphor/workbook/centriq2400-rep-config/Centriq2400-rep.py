@@ -34,7 +34,7 @@ ID_LOOKUP = {
     'FRU' : {},
     # The number at the end needs to match the FRU ID.
     # https://github.com/openbmc/skeleton/blob/master/pysystemmgr/system_manager.py#L143
-    # The paramter for it is of type 'y' (unsigned 8-bit integer) presumably decimal?
+    # The parameter for it is of type 'y' (unsigned 8-bit integer) presumably decimal?
     'FRU_STR' : {},
     'SENSOR' : {},
     'GPIO_PRESENT' : {}
