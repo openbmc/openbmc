@@ -6,7 +6,7 @@
 
 cpu0_i2c_bus="5"
 cpu1_i2c_bus="6"
-busses="$cpu0_i2c_bus $cpu1_i2c_bus"
+buses="$cpu0_i2c_bus $cpu1_i2c_bus"
 vdd_i2c_addr_page="0x60:0x01"
 vdn_i2c_addr_page="0x64:0x01"
 vcs_i2c_addr_page="0x64:0x00"
@@ -72,7 +72,7 @@ vrm_print()
 # <command> will be invoked with <bus> <i2c_address> <page>
 for_each_rail()
 {
-    for bus in $busses
+    for bus in $buses
     do
         for addr_page in $addrs_pages
         do
