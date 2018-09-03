@@ -118,6 +118,7 @@ DISTRO_FEATURES_DEFAULT = " \
         slp \
         systemd \
         ldap \
+        libc-inet-anl \
         "
 
 DISTRO_FEATURES = " \
