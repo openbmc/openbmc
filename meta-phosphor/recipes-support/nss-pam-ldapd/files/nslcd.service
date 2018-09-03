@@ -1,0 +1,10 @@
+[Unit]
+Description=LDAP daemon
+After=syslog.target network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/nslcd
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,84 @@
+#!/bin/sh
+
+set -x
+
+NAME="nslcd"
+CONFIG="/etc/nslcd.conf"
+DAEMON="/usr/sbin/nslcd"
+DESC="LDAP connection daemon"
+STATEDIR="/var/run/$NAME"
+PIDFILE="$STATEDIR/$NAME.pid"
+
+start() 
+{
+    if [ -e $PIDFILE ]; then
+        PIDDIR=/proc/$(cat $PIDFILE)
+        if [ -d ${PIDDIR} ]; then
+            echo "$DESC already running."
+            exit 1
+        else
+            echo "Removing stale PID file $PIDFILE"
+            rm -f $PIDFILE
+        fi
+    fi
+
+    echo -n "Starting $DESC..."
+
+    start-stop-daemon --start --oknodo \
+        --pidfile $PIDFILE --startas $DAEMON
+
+    if [ $? -eq 0 ]; then
+        echo "done."
+    else
+        echo "failed."
+    fi
+}
+
+stop() 
+{
+    echo -n "Stopping $DESC..."
+    start-stop-daemon --stop --quiet --pidfile $PIDFILE \
+      --name $NAME
+    if [ $? -eq 0 ]; then
+        echo "done."
+    else
+        echo "failed."
+    fi
+    rm -f $PIDFILE
+}
+
+status()
+{
+    if [ -f $PIDFILE ]; then
+        if $DAEMON --check
+        then
+            echo "$DESC is running (pid `cat $PIDFILE`"
+        else
+            echo "$DESC stopped"
+        fi
+    else
+        echo "$DESC stopped"
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|force-reload|reload)
+        stop
+        start
+        ;;
+    status)
+	status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|force-reload|restart|reload|status}"
+        exit 1
+        ;;
+esac
+
+exit 0
