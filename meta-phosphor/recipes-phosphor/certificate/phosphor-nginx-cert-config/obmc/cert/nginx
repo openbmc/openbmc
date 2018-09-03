@@ -1,0 +1,12 @@
+#REST URI endpoint
+#example: /xyz/openbmc_project/certs/server/https
+ENDPOINT=https
+
+#Path for the certificate file
+CERTPATH=/etc/ssl/certs/nginx/cert.pem
+
+#Units to restart
+UNIT=nginx.service
+
+#Type of the service client/server
+TYPE=server

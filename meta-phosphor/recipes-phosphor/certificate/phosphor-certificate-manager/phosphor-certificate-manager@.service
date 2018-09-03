@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor certificate manager for %I
+
+[Service]
+EnvironmentFile={envfiledir}/obmc/cert/%I
+ExecStart=/usr/bin/env phosphor-certificate-manager --endpoint=${{ENDPOINT}} --path=${{CERTPATH}} --unit=${{UNIT}} --type=${{TYPE}}
+SyslogIdentifier=phosphor-certificate-manager
+Restart=always
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
