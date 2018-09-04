@@ -1,0 +1,15 @@
+[Unit]
+Description=Phosphor Ldap config updater
+Wants=nslcd.service nscd.service
+After=nslcd.service nscd.service
+Before=xyz.openbmc_project.Software.Sync.service
+
+[Service]
+ExecStart=/usr/bin/env phosphor-ldap-conf
+SyslogIdentifier=phosphor-ldap-conf
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

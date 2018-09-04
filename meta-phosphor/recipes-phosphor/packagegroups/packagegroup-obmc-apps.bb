@@ -139,4 +139,5 @@ SUMMARY_${PN}-user-mgmt = "User management applications"
 RDEPENDS_${PN}-user-mgmt = " \
         ${VIRTUAL-RUNTIME_obmc-user-mgmt} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', 'nss-pam-ldapd', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', 'phosphor-ldap', '', d)} \
         "
