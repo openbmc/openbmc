@@ -7,13 +7,6 @@ RDEPENDS_${PN}-extrasdevtools_append_df-openpower = " obmc-pydevtools"
 # provider (VIRTUAL-RUNTIME_obmc-inventory-manager).
 RDEPENDS_${PN}-inventory_append_df-openpower = " obmc-mgr-inventory"
 
-# Add the deprecated /org/openbmc sensor namespace providing
-# the obmc-mgr-sensor application to the sensor
-# packagegroup until all applications have been updated to use
-# the new, officially spec'ed xyz.openbmc_project.SensorValue
-# providers (VIRTUAL-RUNTIME_obmc-sensor-hwmon).
-RDEPENDS_${PN}-sensors_append_df-openpower = " obmc-mgr-sensor"
-
 # Add checkstop monitor as part of host state management package
 # This will kick start a gpio monitor that will catch the
 # host checkstop conditions and takes necessary actions
