@@ -1663,12 +1663,19 @@ class CustomImageRecipe(Recipe):
 
         path_schema_two = self.base_recipe.file_path
 
+        path_schema_three = "%s/%s" % (self.base_recipe.layer_version.layer.local_source_dir,
+                                     self.base_recipe.file_path)
+
         if os.path.exists(path_schema_one):
             return path_schema_one
 
         # The path may now be the full path if the recipe has been built
         if os.path.exists(path_schema_two):
             return path_schema_two
+
+        # Or a local path if all layers are local
+        if os.path.exists(path_schema_three):
+            return path_schema_three
 
         return None
 

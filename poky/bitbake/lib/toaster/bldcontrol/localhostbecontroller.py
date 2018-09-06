@@ -217,9 +217,21 @@ class LocalhostBEController(BuildEnvironmentController):
         self.setCloneStatus(bitbake,'complete',clone_total,clone_count)
         logger.debug("localhostbecontroller: current layer list %s " % pformat(layerlist))
 
-        if self.pokydirname is None and os.path.exists(os.path.join(self.be.sourcedir, "oe-init-build-env")):
-            logger.debug("localhostbecontroller: selected poky dir name %s" % self.be.sourcedir)
-            self.pokydirname = self.be.sourcedir
+        # Resolve self.pokydirname if not resolved yet, consider the scenario
+        # where all layers are local, that's the else clause
+        if self.pokydirname is None:
+            if os.path.exists(os.path.join(self.be.sourcedir, "oe-init-build-env")):
+                logger.debug("localhostbecontroller: selected poky dir name %s" % self.be.sourcedir)
+                self.pokydirname = self.be.sourcedir
+            else:
+                # Alternatively, scan local layers for relative "oe-init-build-env" location
+                for layer in layers:
+                    if os.path.exists(os.path.join(layer.layer_version.layer.local_source_dir,"..","oe-init-build-env")):
+                        logger.debug("localhostbecontroller, setting pokydirname to %s" % (layer.layer_version.layer.local_source_dir))
+                        self.pokydirname = os.path.join(layer.layer_version.layer.local_source_dir,"..")
+                        break
+                else:
+                    logger.error("pokydirname is not set, you will run into trouble!")
 
         # 5. create custom layer and add custom recipes to it
         for target in targets:
@@ -338,6 +350,19 @@ class LocalhostBEController(BuildEnvironmentController):
 
         # clean the Toaster to build environment
         env_clean = 'unset BBPATH;' # clean BBPATH for <= YP-2.4.0
+
+        # run bitbake server from the clone if available
+        # otherwise pick it from the PATH
+        bitbake = os.path.join(self.pokydirname, 'bitbake', 'bin', 'bitbake')
+        if not os.path.exists(bitbake):
+            logger.info("Bitbake not available under %s, will try to use it from PATH" %
+                        self.pokydirname)
+            for path in os.environ["PATH"].split(os.pathsep):
+                if os.path.exists(os.path.join(path, 'bitbake')):
+                    bitbake = os.path.join(path, 'bitbake')
+                    break
+            else:
+                logger.error("Looks like Bitbake is not available, please fix your environment")
 
         # run bitbake server from the clone
         bitbake = os.path.join(self.pokydirname, 'bitbake', 'bin', 'bitbake')

@@ -176,7 +176,7 @@
                     <td>{{task.get_executed_display}}</td>
 
                     <td>{{task.get_outcome_display}} 
-                        {% if task.outcome = task.OUTCOME_FAILED %}
+                        {% if task.outcome == task.OUTCOME_FAILED %}
                             <a href="{% url 'build_artifact' build.pk "tasklogfile" task.pk %}">
                                 <span class="glyphicon glyphicon-download-alt
                                     get-help" title="Download task log

@@ -359,7 +359,8 @@ function layerDetailsPageInit (ctx) {
     if ($(this).is("dt")) {
       var dd = $(this).next("dd");
       if (!dd.children("form:visible")|| !dd.find(".current-value").html()){
-        if (ctx.layerVersion.layer_source == ctx.layerSourceTypes.TYPE_IMPORTED){
+        if (ctx.layerVersion.layer_source == ctx.layerSourceTypes.TYPE_IMPORTED ||
+            ctx.layerVersion.layer_source == ctx.layerSourceTypes.TYPE_LOCAL) {
         /* There's no current value and the layer is editable
          * so show the "Not set" and hide the delete icon
          */

@@ -54,12 +54,12 @@
                     <span class="help-block">{{release.helptext|safe}}</span>
                   </div>
                 {% endfor %}
+                </div>
+              </div>
             {% else %}
               <input type="hidden" name="projectversion" value="{{releases.0.id}}"/>
             {% endif %}
                 </div>
-              </div>
-            </fieldset>
         {% endif %}
             <div class="top-air">
               <input type="submit" id="create-project-button" class="btn btn-primary btn-lg" value="Create project"/>

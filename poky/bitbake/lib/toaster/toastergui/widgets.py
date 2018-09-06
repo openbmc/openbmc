@@ -511,13 +511,18 @@ class MostRecentBuildsView(View):
                 buildrequest_id = build_obj.buildrequest.pk
             build['buildrequest_id'] = buildrequest_id
 
-            build['recipes_parsed_percentage'] = \
-                int((build_obj.recipes_parsed /
-                     build_obj.recipes_to_parse) * 100)
-
-            build['repos_cloned_percentage'] = \
-                int((build_obj.repos_cloned /
-                     build_obj.repos_to_clone) * 100)
+            if build_obj.recipes_to_parse > 0:
+                build['recipes_parsed_percentage'] = \
+                    int((build_obj.recipes_parsed /
+                         build_obj.recipes_to_parse) * 100)
+            else:
+                build['recipes_parsed_percentage'] = 0
+            if build_obj.repos_to_clone > 0:
+                build['repos_cloned_percentage'] = \
+                    int((build_obj.repos_cloned /
+                         build_obj.repos_to_clone) * 100)
+            else:
+                build['repos_cloned_percentage'] = 0
 
             tasks_complete_percentage = 0
             if build_obj.outcome in (Build.SUCCEEDED, Build.FAILED):

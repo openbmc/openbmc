@@ -18,11 +18,12 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 
 HELP="
-Usage: source toaster start|stop [webport=<address:port>] [noweb] [nobuild]
+Usage: source toaster start|stop [webport=<address:port>] [noweb] [nobuild] [toasterdir]
     Optional arguments:
         [nobuild] Setup the environment for capturing builds with toaster but disable managed builds
         [noweb] Setup the environment for capturing builds with toaster but don't start the web server
         [webport] Set the development server (default: localhost:8000)
+        [toasterdir] Set absolute path to be used as TOASTER_DIR (default: BUILDDIR/../)
 "
 
 custom_extention()
@@ -186,6 +187,7 @@ unset OE_ROOT
 WEBSERVER=1
 export TOASTER_BUILDSERVER=1
 ADDR_PORT="localhost:8000"
+TOASTERDIR=`dirname $BUILDDIR`
 unset CMD
 for param in $*; do
     case $param in
@@ -210,6 +212,9 @@ for param in $*; do
             if [ $ADDR = $PORT ] ; then
                 ADDR_PORT="localhost:$PORT"
             fi
+    ;;
+    toasterdir=*)
+            TOASTERDIR="${param#*=}"
     ;;
     --help)
             echo "$HELP"
@@ -241,7 +246,7 @@ fi
 # 2) the build dir (in build)
 # 3) the sqlite db if that is being used.
 # 4) pid's we need to clean up on exit/shutdown
-export TOASTER_DIR=`dirname $BUILDDIR`
+export TOASTER_DIR=$TOASTERDIR
 export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE TOASTER_DIR"
 
 # Determine the action. If specified by arguments, fine, if not, toggle it
