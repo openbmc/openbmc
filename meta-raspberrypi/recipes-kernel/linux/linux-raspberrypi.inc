@@ -11,6 +11,8 @@ PV = "${LINUX_VERSION}+git${SRCPV}"
 inherit kernel siteinfo
 require recipes-kernel/linux/linux-yocto.inc
 
+SRC_URI += "file://rpi-kernel-misc.cfg"
+
 KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG_raspberrypi0-wifi ?= "bcmrpi_defconfig"
 KBUILD_DEFCONFIG_raspberrypi ?= "bcmrpi_defconfig"

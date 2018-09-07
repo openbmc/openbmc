@@ -29,6 +29,7 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/pitft35-resistive.dtbo \
     overlays/pps-gpio.dtbo \
     overlays/rpi-ft5406.dtbo \
+    overlays/rpi-poe.dtbo \
     overlays/w1-gpio.dtbo \
     overlays/w1-gpio-pullup.dtbo \
     overlays/pi3-disable-bt.dtbo \
