@@ -83,7 +83,6 @@ CORE_IMAGE_EXTRA_INSTALL_append = " bash \
         packagegroup-obmc-apps-extrasdev \
         packagegroup-obmc-apps-extrasdevtools \
         i2c-tools \
-        screen \
         obmc-console \
         pam-plugin-access \
         ${OBMC_IMAGE_EXTRA_INSTALL} \
