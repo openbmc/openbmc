@@ -12,7 +12,7 @@ DEPENDS = "zlib"
 DEPENDS_append_class-target  = " protobuf-native"
 RDEPENDS_${PN}-compiler = "${PN}"
 RDEPENDS_${PN}-dev += "${PN}-compiler"
-RDEPENDS_${PN}-ptest = "bash python-protobuf"
+RDEPENDS_${PN}-ptest = "bash ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python-protobuf', '', d)}"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=35953c752efc9299b184f91bef540095"
 
@@ -24,13 +24,16 @@ SRC_URI = "git://github.com/google/protobuf.git;branch=3.5.x \
 	   file://run-ptest \
           "
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[python] = ",,"
+
 EXTRA_OECONF += " --with-protoc=echo"
 
 inherit autotools-brokensep pkgconfig ptest
 
 S = "${WORKDIR}/git"
 TEST_SRC_DIR="examples"
-LANG_SUPPORT="cpp python"
+LANG_SUPPORT = "cpp ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python', '', d)}"
 
 do_compile_ptest() {
 	# Modify makefile to use the cross-compiler

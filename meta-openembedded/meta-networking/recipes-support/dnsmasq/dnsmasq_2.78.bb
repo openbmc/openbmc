@@ -2,6 +2,7 @@ require dnsmasq.inc
 
 SRC_URI += "\
     file://lua.patch \
+    file://CVE-2017-15107.patch \
 "
 
 SRC_URI[dnsmasq-2.78.md5sum] = "3bb97f264c73853f802bf70610150788"

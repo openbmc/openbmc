@@ -2,15 +2,15 @@ SUMMARY = "Poppler is a PDF rendering library based on the xpdf-3.0 code base"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = " \
-    http://poppler.freedesktop.org/${BP}.tar.xz \
-    file://0001-Do-not-overwrite-all-our-build-flags.patch \
-    file://0002-CairoOutputDev.cc-fix-build-error-when-using-fixedpo.patch \
-"
-SRC_URI[md5sum] = "66a54da4896b1408611699feda5c1821"
-SRC_URI[sha256sum] = "27cc8addafc791e1a26ce6acc2b490926ea73a4f89196dd8a7742cff7cf8a111"
+SRC_URI = "http://poppler.freedesktop.org/${BP}.tar.xz \
+           file://0001-Do-not-overwrite-all-our-build-flags.patch \
+           file://0002-CairoOutputDev.cc-fix-build-error-when-using-fixedpo.patch \
+           file://0001-glib-CMakeLists.txt-Add-libpoppler-to-link-along-wit.patch \
+           "
+SRC_URI[md5sum] = "f7f687ebb60004f8ad61994575018044"
+SRC_URI[sha256sum] = "b21df92ca99f78067785cf2dc8e06deb04726b62389c0ee1f5d8b103c77f64b1"
 
-DEPENDS = "fontconfig zlib cairo lcms"
+DEPENDS = "fontconfig zlib cairo lcms glib-2.0"
 
 inherit cmake pkgconfig gobject-introspection
 
@@ -29,9 +29,11 @@ inherit ${@bb.utils.contains('PACKAGECONFIG', 'qt5', 'cmake_qt5', '', d)}
 SECURITY_CFLAGS = "${SECURITY_NO_PIE_CFLAGS}"
 
 EXTRA_OECMAKE += " \
+    -DENABLE_CMS=lcms2 \
     -DENABLE_XPDF_HEADERS=ON \
     -DBUILD_GTK_TESTS=OFF \
     -DENABLE_ZLIB=ON \
+    -DCMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES:PATH='${STAGING_INCDIR}' \
 "
 
 do_configure_append() {

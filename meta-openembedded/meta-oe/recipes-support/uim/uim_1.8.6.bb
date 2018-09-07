@@ -4,7 +4,7 @@ LICENSE = "BSD-3-Clause & LGPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=32463fd29aa303fb2360faeeae17256b"
 SECTION = "inputmethods"
 
-SRC_URI = "http://uim.googlecode.com/files/uim-${PV}.tar.bz2"
+SRC_URI = "https://github.com/uim/uim/releases/download/uim-${PV}/uim-${PV}.tar.bz2"
 
 SRC_URI_append_class-target = " file://uim-module-manager.patch \
     file://0001-fix-bug-for-cross-compile.patch \
