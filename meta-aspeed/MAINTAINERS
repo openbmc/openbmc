@@ -46,3 +46,4 @@ START OF MAINTAINERS LIST
 # @openbmc and is synced by the maintainer using git-subtree. Please submit
 # changes against @openbmc.
 M:  Brad Bishop <bradleyb@fuzziesquirrel.com> <radsquirrel!>
+M:  Joel Stanley <joel@jms.id.au> <shenki!>
