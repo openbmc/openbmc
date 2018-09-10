@@ -26,6 +26,6 @@ DEPENDS += "net-snmp"
 RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 RDEPENDS_${PN} += "phosphor-logging"
-RDEPENDS_${PN} += "net-snmp-libs"
+RDEPENDS_${PN} += "net-snmp-lib-netsnmp"
 
 S = "${WORKDIR}/git"

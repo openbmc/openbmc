@@ -173,17 +173,21 @@ net_snmp_sysroot_preprocess () {
     fi
 }
 
-PACKAGES += "${PN}-libs ${PN}-mibs ${PN}-server ${PN}-client ${PN}-server-snmpd ${PN}-server-snmptrapd"
+PACKAGES += "${PN}-libs ${PN}-mibs ${PN}-server ${PN}-client \
+             ${PN}-server-snmpd ${PN}-server-snmptrapd \
+             ${PN}-lib-netsnmp ${PN}-lib-agent ${PN}-lib-helpers \
+             ${PN}-lib-mibs ${PN}-lib-trapd"
 
 # perl module
 PACKAGES += "${@bb.utils.contains('PACKAGECONFIG', 'perl', '${PN}-perl-modules', '', d)}"
 
 ALLOW_EMPTY_${PN} = "1"
 ALLOW_EMPTY_${PN}-server = "1"
+ALLOW_EMPTY_${PN}-libs = "1"
 
 FILES_${PN}-perl-modules = "${libdir}/perl/*"
 
-FILES_${PN}-libs = "${libdir}/lib*${SOLIBS}"
+FILES_${PN}-libs = ""
 FILES_${PN}-mibs = "${datadir}/snmp/mibs"
 FILES_${PN}-server-snmpd = "${sbindir}/snmpd \
                             ${sysconfdir}/snmp/snmpd.conf \
@@ -195,6 +199,12 @@ FILES_${PN}-server-snmptrapd = "${sbindir}/snmptrapd \
                                 ${sysconfdir}/snmp/snmptrapd.conf \
                                 ${systemd_unitdir}/system/snmptrapd.service \
 "
+
+FILES_${PN}-lib-netsnmp = "${libdir}/libnetsnmp${SOLIBS}"
+FILES_${PN}-lib-agent = "${libdir}/libnetsnmpagent${SOLIBS}"
+FILES_${PN}-lib-helpers = "${libdir}/libnetsnmphelpers${SOLIBS}"
+FILES_${PN}-lib-mibs = "${libdir}/libnetsnmpmibs${SOLIBS}"
+FILES_${PN}-lib-trapd = "${libdir}/libnetsnmptrapd${SOLIBS}"
 
 FILES_${PN} = ""
 FILES_${PN}-client = "${bindir}/* ${datadir}/snmp/"
@@ -219,10 +229,15 @@ SYSTEMD_SERVICE_${PN}-server-snmptrapd =  "snmptrapd.service"
 RDEPENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'perl', 'net-snmp-perl-modules', '', d)}"
 RDEPENDS_${PN} += "net-snmp-client"
 RDEPENDS_${PN}-server-snmpd += "net-snmp-mibs"
-RDEPENDS_${PN}-server-snmptrapd += "net-snmp-server-snmpd"
+RDEPENDS_${PN}-server-snmptrapd += "net-snmp-server-snmpd ${PN}-lib-trapd"
 RDEPENDS_${PN}-server += "net-snmp-server-snmpd net-snmp-server-snmptrapd"
 RDEPENDS_${PN}-client += "net-snmp-mibs net-snmp-libs"
-RDEPENDS_${PN}-libs += "libpci"
+RDEPENDS_${PN}-libs += "libpci \
+                        ${PN}-lib-netsnmp \
+                        ${PN}-lib-agent \
+                        ${PN}-lib-helpers \
+                        ${PN}-lib-mibs \
+"
 RDEPENDS_${PN}-ptest += "perl \
                          perl-module-test \
                          perl-module-file-basename \
