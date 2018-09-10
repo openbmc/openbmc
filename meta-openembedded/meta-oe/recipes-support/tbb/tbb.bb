@@ -13,6 +13,7 @@ PV = "${PRDATE}+${SRCPV}"
 SRC_URI = "git://github.com/01org/tbb;branch=${BRANCH} \
            file://cross-compile.patch \
            file://0001-mallinfo-is-glibc-specific-API-mark-it-so.patch \
+           file://0002-linux-Fix-gcc-version-check.patch \
            file://tbb.pc \
 "
 

@@ -3,17 +3,19 @@ Add configure check for gtk2+ and objc++
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
 
---- A/configure.ac
-+++ B/configure.ac
-@@ -39,6 +39,7 @@ AC_PROG_CC
- AC_PROG_CXX
+Index: boinc-client_release-7.6-7.6.33/configure.ac
+===================================================================
+--- boinc-client_release-7.6-7.6.33.orig/configure.ac
++++ boinc-client_release-7.6-7.6.33/configure.ac
+@@ -64,6 +64,7 @@ m4_ifdef([AC_PROG_OBJCXX],[AC_PROG_OBJCX
+ dnl ------
  AC_PROG_F77
  AC_PROG_CPP
 +AC_PROG_OBJCXX
  AC_PROG_MAKE_SET
  SAH_LINKS
  AC_LANG_PUSH(C)
-@@ -744,6 +745,8 @@ AM_CONDITIONAL(ENABLE_LIBRARIES, [test "
+@@ -1081,6 +1082,8 @@ AM_CONDITIONAL(ENABLE_BOINCCRYPT, [test
  AM_CONDITIONAL(INSTALL_HEADERS, [test "${enable_install_headers}" = yes])
  AM_CONDITIONAL(HAVE_CUDA_LIB, [test "${enable_client}" = yes -a -f ./coprocs/CUDA/posix/${boinc_platform}/libcudart.so])
  

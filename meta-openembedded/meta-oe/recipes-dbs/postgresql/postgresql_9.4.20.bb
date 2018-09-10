@@ -10,5 +10,5 @@ do_compile_prepend_libc-musl() {
     sed -i -e 's/\-lnsl//g' ${B}/src/Makefile.global
 }
 
-SRC_URI[md5sum] = "0a08f4078f5e4a54e764f63ad38a6de3"
-SRC_URI[sha256sum] = "7a320cd335052b840d209dc9688f09965763351c590e3cc7bf577591179fd7c6"
+SRC_URI[md5sum] = "5821867741c821736266f27b6b8a859a"
+SRC_URI[sha256sum] = "eeb1d8ddb2854c9e4d8b5cbd65665260c0ae8cbcb911003f24c2d82ccb97f87f"

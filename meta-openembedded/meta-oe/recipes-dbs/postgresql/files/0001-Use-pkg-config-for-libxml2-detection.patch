@@ -12,11 +12,11 @@ Signed-off-by: Philip Balister <philip@balister.org>
  configure.in | 15 ++-------------
  1 file changed, 2 insertions(+), 13 deletions(-)
 
-Index: postgresql-9.4.15/configure.in
+Index: postgresql-9.4.20/configure.in
 ===================================================================
---- postgresql-9.4.15.orig/configure.in
-+++ postgresql-9.4.15/configure.in
-@@ -759,19 +759,8 @@ PGAC_ARG_BOOL(with, libxml, no, [build w
+--- postgresql-9.4.20.orig/configure.in
++++ postgresql-9.4.20/configure.in
+@@ -789,19 +789,8 @@ PGAC_ARG_BOOL(with, libxml, no, [build w
                [AC_DEFINE([USE_LIBXML], 1, [Define to 1 to build with XML support. (--with-libxml)])])
  
  if test "$with_libxml" = yes ; then

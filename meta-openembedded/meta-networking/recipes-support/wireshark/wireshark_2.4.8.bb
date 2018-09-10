@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6e271234ba1a13c6e512e76b94ac2f77"
 
 DEPENDS = "pcre expat glib-2.0 glib-2.0-native libgcrypt libgpg-error"
 
-SRC_URI = "https://1.as.dl.wireshark.org/src/${BP}.tar.xz"
+SRC_URI = "https://1.as.dl.wireshark.org/src/all-versions/${BP}.tar.xz"
 SRC_URI += "file://libgcrypt.patch"
 
 UPSTREAM_CHECK_URI = "https://1.as.dl.wireshark.org/src"

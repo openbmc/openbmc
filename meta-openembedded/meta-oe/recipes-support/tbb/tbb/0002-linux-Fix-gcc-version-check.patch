@@ -1,0 +1,57 @@
+From aee098f1bf0511c6b5544de3170a9e8b51673b60 Mon Sep 17 00:00:00 2001
+From: Pierre Le Magourou <plemagourou@softbankrobotics.com>
+Date: Tue, 23 Jan 2018 15:25:50 +0100
+Subject: [PATCH] linux.gcc: Fix cross compilation error.
+
+When cross compiling on linux with gcc, the host gcc was used instead of
+the cross gcc to set compilation flags according to gcc version.
+
+When the cross gcc was in version 5.X and the host gcc in version 7.X,
+tbb was compiled with the -flifetime-dse=1 flag that does not exist on
+gcc 5.X.
+---
+ build/linux.gcc.inc | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/build/linux.gcc.inc b/build/linux.gcc.inc
+index 5c1889c..a4d6698 100644
+--- a/build/linux.gcc.inc
++++ b/build/linux.gcc.inc
+@@ -41,29 +41,29 @@ LINK_FLAGS = -Wl,-rpath-link=. -rdynamic
+ C_FLAGS = $(CPLUS_FLAGS)
+ 
+ # gcc 4.2 and higher support OpenMP
+-ifneq (,$(shell gcc -dumpversion | egrep  "^(4\.[2-9]|[5-9])"))
++ifneq (,$(shell $(CC) -dumpversion | egrep  "^(4\.[2-9]|[5-9])"))
+     OPENMP_FLAG = -fopenmp
+ endif
+ 
+ # gcc 4.8 and later support RTM intrinsics, but require command line switch to enable them
+-ifneq (,$(shell gcc -dumpversion | egrep  "^(4\.[8-9]|[5-9])"))
++ifneq (,$(shell $(CC) -dumpversion | egrep  "^(4\.[8-9]|[5-9])"))
+     RTM_KEY = -mrtm
+ endif
+ 
+ # gcc 4.0 and later have -Wextra that is used by some our customers.
+-ifneq (,$(shell gcc -dumpversion | egrep  "^([4-9])"))
++ifneq (,$(shell $(CC) -dumpversion | egrep  "^([4-9])"))
+     TEST_WARNING_KEY += -Wextra
+ endif
+ 
+ # gcc 5.0 and later have -Wsuggest-override option
+ # enable it via a pre-included header in order to limit to C++11 and above
+-ifneq (,$(shell gcc -dumpversion | egrep  "^([5-9])"))
++ifneq (,$(shell $(CC) -dumpversion | egrep  "^([5-9])"))
+     INCLUDE_TEST_HEADERS = -include $(tbb_root)/src/test/harness_preload.h
+ endif
+ 
+ # gcc 6.0 and later have -flifetime-dse option that controls
+ # elimination of stores done outside the object lifetime
+-ifneq (,$(shell gcc -dumpversion | egrep  "^([6-9])"))
++ifneq (,$(shell $(CC) -dumpversion | egrep  "^([6-9])"))
+     # keep pre-contruction stores for zero initialization
+     DSE_KEY = -flifetime-dse=1
+ endif
+-- 
+2.15.1
+

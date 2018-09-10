@@ -3,7 +3,7 @@ DESCRIPTION = "\
 This package provides a common library for functions shared between Small Footprint CIM Broker (sblim-sfcb) \
 Small Footprint CIM Client (and sblim-sfcc)."
 HOMEPAGE = "http://sourceforge.net/projects/sblim/"
-LICENSE = "EPL"
+LICENSE = "EPL-1.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f300afd598546add034364cd0a533261"
 SECTION = "Development/Libraries"
 

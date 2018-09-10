@@ -24,3 +24,8 @@ inherit autotools
 EXTRA_OECONF="--disable-build-docs \
   --with-libxml-prefix=${STAGING_LIBDIR}/.. \
   --with-libxslt-prefix=${STAGING_LIBDIR}/.."
+
+# http://errors.yoctoproject.org/Errors/Details/157121/
+# /bin/bash: src/usage.c: No such file or directory
+# Makefile:2121: recipe for target 'src/usage.c' failed
+PARALLEL_MAKE = ""
