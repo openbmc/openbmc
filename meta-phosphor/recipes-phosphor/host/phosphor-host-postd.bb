@@ -7,10 +7,11 @@ inherit obmc-phosphor-systemd
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
+DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "systemd"
 
-RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
+RDEPENDS_${PN} += "sdbusplus sdeventplus phosphor-dbus-interfaces"
 
 SNOOP_DEVICE ?= "aspeed-lpc-snoop0"
 POST_CODE_BYTES ?= "1"
