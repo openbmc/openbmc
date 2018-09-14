@@ -13,6 +13,7 @@ PROVIDES += "virtual/obmc-watchdog"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 RDEPENDS_${PN} += "libsystemd"
