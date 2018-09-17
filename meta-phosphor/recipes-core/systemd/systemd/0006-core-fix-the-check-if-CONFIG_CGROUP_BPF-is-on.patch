@@ -1,0 +1,64 @@
+From 501fa6c60d303f0d6e747939172281d77247626e Mon Sep 17 00:00:00 2001
+From: Alexander Filippov <a.filippov@yadro.com>
+Date: Mon, 17 Sep 2018 13:33:06 +0300
+Subject: [PATCH] core: fix the check if CONFIG_CGROUP_BPF is on
+
+Since the commit torvalds/linux@fdb5c4531c1e0e50e609df83f736b6f3a02896e2
+the syscall BPF_PROG_ATTACH return EBADF when CONFIG_CGROUP_BPF is
+turned off and as result the bpf_firewall_supported() returns the
+incorrect value.
+
+This commmit replaces the syscall BPF_PROG_ATTACH with BPF_PROG_DETACH
+which is still work as expected.
+
+Resolves openbmc/linux#159
+See also systemd/systemd#7054
+
+Signed-off-by: Alexander Filippov <a.filippov@yadro.com>
+---
+ src/core/bpf-firewall.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/core/bpf-firewall.c b/src/core/bpf-firewall.c
+index f3f40fb0e8..51dc5b9506 100644
+--- a/src/core/bpf-firewall.c
++++ b/src/core/bpf-firewall.c
+@@ -658,7 +658,7 @@ int bpf_firewall_supported(void) {
+          * b) whether the unified hierarchy is being used
+          * c) the BPF implementation in the kernel supports BPF LPM TRIE maps, which we require
+          * d) the BPF implementation in the kernel supports BPF_PROG_TYPE_CGROUP_SKB programs, which we require
+-         * e) the BPF implementation in the kernel supports the BPF_PROG_ATTACH call, which we require
++         * e) the BPF implementation in the kernel supports the BPF_PROG_DETACH call, which we require
+          *
+          */
+ 
+@@ -711,7 +711,7 @@ int bpf_firewall_supported(void) {
+          * is turned off at kernel compilation time. This sucks of course: why does it allow us to create a cgroup BPF
+          * program if we can't do a thing with it later?
+          *
+-         * We detect this case by issuing the BPF_PROG_ATTACH bpf() call with invalid file descriptors: if
++         * We detect this case by issuing the BPF_PROG_DETACH bpf() call with invalid file descriptors: if
+          * CONFIG_CGROUP_BPF is turned off, then the call will fail early with EINVAL. If it is turned on the
+          * parameters are validated however, and that'll fail with EBADF then. */
+ 
+@@ -721,14 +721,14 @@ int bpf_firewall_supported(void) {
+                 .attach_bpf_fd = -1,
+         };
+ 
+-        r = bpf(BPF_PROG_ATTACH, &attr, sizeof(attr));
++        r = bpf(BPF_PROG_DETACH, &attr, sizeof(attr));
+         if (r < 0) {
+                 if (errno == EBADF) /* YAY! */
+                         return supported = true;
+ 
+-                log_debug_errno(errno, "Didn't get EBADF from BPF_PROG_ATTACH, BPF firewalling is not supported: %m");
++                log_debug_errno(errno, "Didn't get EBADF from BPF_PROG_DETACH, BPF firewalling is not supported: %m");
+         } else
+-                log_debug("Wut? kernel accepted our invalid BPF_PROG_ATTACH call? Something is weird, assuming BPF firewalling is broken and hence not supported.");
++                log_debug("Wut? kernel accepted our invalid BPF_PROG_DETACH call? Something is weird, assuming BPF firewalling is broken and hence not supported.");
+ 
+         return supported = false;
+ }
+-- 
+2.14.4
+
