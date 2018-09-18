@@ -14,3 +14,6 @@ After=mapper-wait@-xyz-openbmc_project-control-host0-restriction_mode.service
 ExecStart=/usr/bin/env netipmid
 SyslogIdentifier=netipmid
 Restart=always
+RuntimeDirectory = ipmi
+RuntimeDirectoryPreserve = yes
+StateDirectory = ipmi

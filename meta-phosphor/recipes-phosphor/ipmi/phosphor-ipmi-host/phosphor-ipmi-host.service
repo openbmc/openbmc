@@ -16,6 +16,9 @@ After=clear-once.service
 Restart=always
 ExecStart=/usr/bin/env ipmid
 SyslogIdentifier=ipmid
+RuntimeDirectory = ipmi
+RuntimeDirectoryPreserve = yes
+StateDirectory = ipmi
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
