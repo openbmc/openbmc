@@ -37,7 +37,7 @@ RDEPENDS_${PN}-chassis-state-mgmt = " \
 
 SUMMARY_${PN}-extras = "Extra features"
 RDEPENDS_${PN}-extras = " \
-        phosphor-rest \
+        bmcweb \
         phosphor-dbus-monitor \
         phosphor-systemd-policy \
         dbus-broker \
