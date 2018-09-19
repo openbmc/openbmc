@@ -37,6 +37,7 @@ import sys
 import subprocess
 import json
 import os
+import collections
 
 # Hack to get native python search path (for folders), not fond of it but it works for now
 pivot='recipe-sysroot-native'
@@ -45,7 +46,7 @@ for p in sys.path:
     nativelibfolder=p[:p.find(pivot)+len(pivot)]
 
 # Empty dict to hold the whole manifest
-new_manifest = {}
+new_manifest = collections.OrderedDict()
 
 # Check for repeated files, folders and wildcards
 allfiles=[]
@@ -63,7 +64,7 @@ def isFolder(value):
 
 # Read existing JSON manifest
 with open('python2-manifest.json') as manifest:
-  old_manifest=json.load(manifest)
+  old_manifest = json.load(manifest, object_pairs_hook=collections.OrderedDict)
 
 
 # First pass to get core-package functionality, because we base everything on the fact that core is actually working
@@ -124,13 +125,14 @@ for key in old_manifest:
 
 for key in old_manifest:
     # Use an empty dict as data structure to hold data for each package and fill it up
-    new_manifest[key]={}
-    new_manifest[key]['files']=[]
+    new_manifest[key] = collections.OrderedDict()
+    new_manifest[key]['summary'] = old_manifest[key]['summary']
     new_manifest[key]['rdepends']=[]
+    new_manifest[key]['files'] = []
+
     # All packages should depend on core
     if key != 'core':
-         new_manifest[key]['rdepends'].append('core')
-    new_manifest[key]['summary']=old_manifest[key]['summary']
+        new_manifest[key]['rdepends'].append('core')
 
     # Handle special cases, we assume that when they were manually added 
     # to the manifest we knew what we were doing.
@@ -274,4 +276,4 @@ for key in new_manifest:
 
 # Create the manifest from the data structure that was built
 with open('python2-manifest.json.new','w') as outfile:
-    json.dump(new_manifest,outfile,sort_keys=True, indent=4, separators=(',', ': '))
+    json.dump(new_manifest,outfile, indent=4)
