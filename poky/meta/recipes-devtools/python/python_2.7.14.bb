@@ -207,7 +207,7 @@ RPROVIDES_${PN} += "${PN}-modules"
 INCLUDE_PYCS ?= "1"
 
 python(){
-    import json
+    import collections, json
 
     filename = os.path.join(d.getVar('THISDIR'), 'python', 'python2-manifest.json')
     # This python changes the datastore based on the contents of a file, so mark
@@ -215,7 +215,7 @@ python(){
     bb.parse.mark_dependency(d, filename)
 
     with open(filename) as manifest_file:
-        python_manifest=json.load(manifest_file)
+        python_manifest=json.load(manifest_file, object_pairs_hook=collections.OrderedDict)
 
     include_pycs = d.getVar('INCLUDE_PYCS')
 
@@ -248,8 +248,6 @@ python(){
             d.appendVar('RDEPENDS_' + pypackage, ' ' + pn + '-' + value)
         d.setVar('SUMMARY_' + pypackage, python_manifest[key]['summary'])
 
-    # We need to ensure staticdev packages match for files first so we sort in reverse
-    newpackages.sort(reverse=True)
     # Prepending so to avoid python-misc getting everything
     packages = newpackages + packages
     d.setVar('PACKAGES', ' '.join(packages))
