@@ -53,7 +53,6 @@ RDEPENDS_${PN}-flash_df-openpower-ubi-fs = " \
 
 SUMMARY_${PN}-system = "OpenPOWER System"
 RDEPENDS_${PN}-system = " \
-        obmc-mgr-system \
         hostboot-settings \
         pdbg \
         "
