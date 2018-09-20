@@ -3,6 +3,7 @@
 #@DESCRIPTION: evaluation machine board configuration for the fsp2 ppc476
 
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-fsp2"
+PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-fsp2"
 
 DEFAULTTUNE = "powerpc-nf"
 
