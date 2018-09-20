@@ -29,7 +29,6 @@ RDEPENDS_${PN}-chassis = " \
         obmc-button-reset \
         obmc-control-chassis \
         obmc-op-control-power \
-        obmc-pcie-detect \
         obmc-host-failure-reboots \
         "
 #Pull in obmc-fsi on all P9 OpenPOWER systems
