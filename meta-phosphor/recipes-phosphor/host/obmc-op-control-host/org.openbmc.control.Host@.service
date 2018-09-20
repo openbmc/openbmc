@@ -1,7 +1,5 @@
 [Unit]
 Description=OpenPOWER Host%i Control
-Wants=mapper-wait@-org-openbmc-managers-System.service
-After=mapper-wait@-org-openbmc-managers-System.service
 
 [Service]
 Restart=always

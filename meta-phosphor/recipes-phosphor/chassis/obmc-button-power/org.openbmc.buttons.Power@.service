@@ -1,7 +1,5 @@
 [Unit]
 Description=Phosphor Power Button%i
-Wants=mapper-wait@-org-openbmc-managers-System.service
-After=mapper-wait@-org-openbmc-managers-System.service
 
 [Service]
 Restart=always
