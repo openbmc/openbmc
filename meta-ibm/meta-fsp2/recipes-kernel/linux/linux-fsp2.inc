@@ -13,6 +13,7 @@ PV = "${LINUX_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE_${MACHINE} = "^${MACHINE}$"
 KERNEL_CLASSES ?= "kernel-uimage"
+KERNEL_IMAGETYPE ?= "uImage"
 
 do_patch_append() {
     for DTB in "${KERNEL_DEVICETREE}"; do
