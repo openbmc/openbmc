@@ -4,6 +4,7 @@ ZAIUS_CHIPS = "i2c@1e78a000/i2c-bus@40/ucd90160@64"
 ZAIUS_ITEMSFMT = "ahb/apb/{0}.conf"
 
 ZAIUS_ITEMS = "${@compose_list(d, 'ZAIUS_ITEMSFMT', 'ZAIUS_CHIPS')}"
+ZAIUS_ITEMS += "iio-hwmon.conf iio-hwmon-battery.conf"
 
 ZAIUS_OCCS = " \
               00--00--00--06/sbefifo1-dev0/occ-hwmon.1 \
