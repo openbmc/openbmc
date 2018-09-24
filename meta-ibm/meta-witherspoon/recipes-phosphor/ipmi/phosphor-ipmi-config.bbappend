@@ -1,28 +1,4 @@
-SUMMARY = "Witherspoon IPMI daemon configuration"
-PR = "r1"
-
-inherit obmc-phosphor-license
-inherit allarch
-
-SRC_URI = " \
-    file://cipher_list.json \
-    file://dcmi_cap.json \
-    file://dcmi_sensors.json \
-    file://dev_id.json \
-    file://power_reading.json \
-    "
-
-FILES_${PN} = " \
-    ${datadir}/ipmi-providers/cipher_list.json \
-    ${datadir}/ipmi-providers/dcmi_cap.json \
-    ${datadir}/ipmi-providers/dcmi_sensors.json \
-    ${datadir}/ipmi-providers/dev_id.json \
-    ${datadir}/ipmi-providers/power_reading.json \
-    "
-
-do_fetch[noexec] = "1"
-do_configure[noexec] = "1"
-do_compile[noexec] = "1"
+FILESEXTRAPATHS_prepend_witherspoon := "${THISDIR}/${PN}:"
 
 # Calculate the auxiliary firmware revision to be updated in the dev_id.json
 # file. It is calculated from the VERSION_ID field which currently has two
@@ -35,9 +11,9 @@ do_compile[noexec] = "1"
 # "ibm-v2.0-10-r41-0-gd0c319e" Petitboot would display the firmware revision
 # as "Firmware version: 2.00.00100041", "0010" is count and the revision
 # is "0041".
-
 inherit image_version
 
+unset do_patch[noexec]
 do_patch[depends] = "os-release:do_populate_sysroot"
 
 python do_patch() {
@@ -65,18 +41,4 @@ python do_patch() {
         jsonFile.truncate()
         data["aux"] = int(auxVer, 16)
         json.dump(data, jsonFile)
-}
-
-do_install() {
-    install -d ${D}${datadir}/ipmi-providers
-    install -m 0644 -D ${WORKDIR}/cipher_list.json \
-        ${D}${datadir}/ipmi-providers/cipher_list.json
-    install -m 0644 -D ${WORKDIR}/dcmi_cap.json \
-        ${D}${datadir}/ipmi-providers/dcmi_cap.json
-    install -m 0644 -D ${WORKDIR}/dcmi_sensors.json \
-        ${D}${datadir}/ipmi-providers/dcmi_sensors.json
-    install -m 0644 -D ${WORKDIR}/dev_id.json \
-        ${D}${datadir}/ipmi-providers/dev_id.json
-    install -m 0644 -D ${WORKDIR}/power_reading.json \
-        ${D}${datadir}/ipmi-providers/power_reading.json
 }
