@@ -1,2 +1,2 @@
-RDEPENDS_${PN} += 'refclock-fixup'
-RDEPENDS_${PN} += 'avsbus-control'
+RDEPENDS_${PN}_append_zaius = ' refclock-fixup'
+RDEPENDS_${PN}_append_zaius = ' avsbus-control'
