@@ -176,3 +176,31 @@
             assert: true
             deassert: false
             type: bool
+
+0xB0: &fan_tach
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan0
+  sensorReadingType: 0x01
+  multiplierM: 100
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  scale: 0
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+0xB1:
+  <<: *fan_tach
+  path: /xyz/openbmc_project/sensors/fan_tach/fan1
+0xB2:
+  <<: *fan_tach
+  path: /xyz/openbmc_project/sensors/fan_tach/fan2
+0xB3:
+  <<: *fan_tach
+  path: /xyz/openbmc_project/sensors/fan_tach/fan3
+
