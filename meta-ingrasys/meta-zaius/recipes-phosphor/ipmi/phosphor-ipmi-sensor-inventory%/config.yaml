@@ -230,3 +230,111 @@
   <<: *fanpwm
   path: /xyz/openbmc_project/sensors/fan_tach/fan3
 
+0xD0: &voltage
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/p5v_aux
+  sensorReadingType: 0x01
+  multiplierM: 23
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  scale: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+0xD1:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/p2v5_aux
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xD2:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/p3v3_aux
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xD3:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/p1v1_aux
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xD4:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/cpu0_vpp1
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xD5:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/cpu0_vpp2
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xD6:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/cpu1_vpp1
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xD7:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/cpu1_vpp2
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xD8:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/cpu0_vddq1
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xD9:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/cpu0_vddq2
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xDA:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/cpu1_vddq1
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xDB:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/cpu1_vddq2
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xDC:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/vbat
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xDD:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/p1v2_aux
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xDE:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/vendor_id
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+0xDF:
+  <<: *voltage
+  path: /xyz/openbmc_project/sensors/voltage/board_id
+  multiplierM: 15
+  offsetB: 0
+  bExp: 0
+
