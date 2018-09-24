@@ -24,6 +24,7 @@ RDEPENDS_${PN} += " \
         pyphosphor-dbus \
         pyphosphor-wsgi-apps-ns \
         pamela \
+        jsnbd \
         "
 SRC_URI += "file://url_config.json \
            "
