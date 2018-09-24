@@ -204,6 +204,33 @@
   <<: *fan_tach
   path: /xyz/openbmc_project/sensors/fan_tach/fan3
 
+0xC0: &temperature
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/w1_inlet
+  sensorReadingType: 0x01
+  multiplierM: 235
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: int64_t
+0xC1:
+  <<: *temperature
+  path: /xyz/openbmc_project/sensors/temperature/w1_exhaust_left
+0xC2:
+  <<: *temperature
+  path: /xyz/openbmc_project/sensors/temperature/w1_exhaust_right
+0xC3:
+  <<: *temperature
+  path: /xyz/openbmc_project/sensors/temperature/w1_exhaust_mid
+
 0xC4: &fanpwm
   sensorType: 0x04
   path: /xyz/openbmc_project/sensors/fan_tach/fan0
