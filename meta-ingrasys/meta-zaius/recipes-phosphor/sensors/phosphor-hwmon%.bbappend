@@ -5,6 +5,10 @@ ZAIUS_ITEMSFMT = "ahb/apb/{0}.conf"
 
 ZAIUS_ITEMS = "${@compose_list(d, 'ZAIUS_ITEMSFMT', 'ZAIUS_CHIPS')}"
 ZAIUS_ITEMS += "iio-hwmon.conf iio-hwmon-battery.conf"
+ZAIUS_ITEMS += " onewire0.conf"
+ZAIUS_ITEMS += " onewire1.conf"
+ZAIUS_ITEMS += " onewire2.conf"
+ZAIUS_ITEMS += " onewire3.conf"
 
 ZAIUS_OCCS = " \
               00--00--00--06/sbefifo1-dev0/occ-hwmon.1 \
