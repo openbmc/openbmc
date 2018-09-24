@@ -204,3 +204,29 @@
   <<: *fan_tach
   path: /xyz/openbmc_project/sensors/fan_tach/fan3
 
+0xC4: &fanpwm
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/fan0
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: 0
+  bExp: 0
+  mutability: Mutability::Write
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Control.FanPwm:
+      Target:
+        Offsets:
+          0xFF:
+            type: uint64_t
+0xC5:
+  <<: *fanpwm
+  path: /xyz/openbmc_project/sensors/fan_tach/fan1
+0xC6:
+  <<: *fanpwm
+  path: /xyz/openbmc_project/sensors/fan_tach/fan2
+0xC7:
+  <<: *fanpwm
+  path: /xyz/openbmc_project/sensors/fan_tach/fan3
+
