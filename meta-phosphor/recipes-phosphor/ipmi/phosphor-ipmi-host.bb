@@ -32,6 +32,7 @@ DEPENDS += "virtual/phosphor-ipmi-inventory-sel"
 DEPENDS += "virtual/phosphor-ipmi-fru-merge-config"
 DEPENDS += "virtual/phosphor-ipmi-sensor-inventory"
 DEPENDS += "virtual/phosphor-ipmi-channel-config"
+DEPENDS += "boost"
 
 VIRTUAL-RUNTIME_ipmi-config ?= "phosphor-ipmi-config"
 
