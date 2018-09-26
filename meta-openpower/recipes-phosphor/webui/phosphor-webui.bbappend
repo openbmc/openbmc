@@ -1,4 +1,4 @@
-do_install_append () {
+do_install_append_df-openpower () {
 
 # The webui content is served as pre-compressed gzip content. While nginx can
 # handle this via the gzip_static directive (and we use that), the nginx
