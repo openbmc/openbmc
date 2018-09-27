@@ -23,6 +23,7 @@ fi
 
 machine() {
 	local target=$1
+	local build_dir=$2
 	local mfg mach realmach
 	for mfg in meta-*; do
 		for mach in $mfg/meta-*; do
@@ -33,7 +34,7 @@ machine() {
 				if [ -n "$target" ]; then
 					if [ "$realmach" = "$target" ]; then
 						echo Machine $target is $mach
-						TEMPLATECONF="$mach/conf" source oe-init-build-env build
+						TEMPLATECONF="$mach/conf" source oe-init-build-env $build_dir
 						return
 					fi
 				else
@@ -53,6 +54,10 @@ if [ -z "$1" ]; then
 elif [ "$1" = "qemuarm" ]; then
 	source openbmc-env
 else
-	machine $1
+	bld_dir=$2
+	if [ -z "$2" ]; then
+		bld_dir="build"
+	fi
+	machine $1 $bld_dir
 fi
 
