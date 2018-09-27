@@ -1,0 +1,37 @@
+enclosure_identify:
+  led1:
+    Action: 'Blink'
+    DutyOn: 20
+    Period: 100
+
+bmc_booted:
+  led2:
+    Action: 'Blink'
+    DutyOn: 50
+    Period: 1000
+
+power_on:
+  led3:
+    Action: 'Blink'
+    DutyOn: 50
+    Period: 1000
+
+enclosure_fault:
+  led3:
+    Action: 'Blink'
+    DutyOn: 50
+    Period: 30
+
+lamp_test:
+  led1:
+    Action: 'Blink'
+    DutyOn: 20
+    Period: 50
+  led2:
+    Action: 'Blink'
+    DutyOn: 20
+    Period: 100
+  led3:
+    Action: 'Blink'
+    DutyOn: 20
+    Period: 150

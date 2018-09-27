@@ -1,0 +1,35 @@
+# LAYER_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+LCONF_VERSION = "8"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-poky \
+  ##OEROOT##/meta-openembedded/meta-oe \
+  ##OEROOT##/meta-openembedded/meta-networking \
+  ##OEROOT##/meta-openembedded/meta-perl \
+  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-openembedded/meta-webserver \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-xilinx/meta-xilinx-bsp/ \
+  ##OEROOT##/meta-evb \
+  ##OEROOT##/meta-evb/meta-evb-enclustra \
+  ##OEROOT##/meta-evb/meta-evb-enclustra/meta-evb-zx3-pm3 \
+  "
+BBLAYERS_NON_REMOVABLE ?= " \
+##OEROOT##/meta \
+##OEROOT##/meta-poky \
+##OEROOT##/meta-openembedded/meta-oe \
+##OEROOT##/meta-openembedded/meta-networking \
+##OEROOT##/meta-openembedded/meta-perl \
+##OEROOT##/meta-openembedded/meta-python \
+##OEROOT##/meta-openembedded/meta-webserver \
+##OEROOT##/meta-phosphor \
+##OEROOT##/meta-xilinx/meta-xilinx-bsp/ \
+##OEROOT##/meta-evb \
+##OEROOT##/meta-evb/meta-evb-enclustra \
+##OEROOT##/meta-evb/meta-evb-enclustra/meta-evb-zx3-pm3 \
+  "
