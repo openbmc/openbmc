@@ -3,7 +3,7 @@ SUMMARY = "Phosphor certificate manager configuration for an nginx certificate"
 PR = "r1"
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${PHOSPHORBASE}/LICENSE;md5=784eea0404d452a8b0d1966b14c37b5c"
+LIC_FILES_CHKSUM = "file://${PHOSPHORBASE}/LICENSE;md5=19407077e42b1ba3d653da313f1f5b4e"
 
 RRECOMMENDS_${PN} = "phosphor-certificate-manager"
 
