@@ -2,7 +2,6 @@ SUMMARY = "OpenBMC - IPMI providers"
 PR = "r1"
 
 inherit packagegroup
-inherit obmc-phosphor-license
 
 PROVIDES = "${PACKAGES}"
 PACKAGES = "${PN}-libs"
