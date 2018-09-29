@@ -1,21 +1,20 @@
-HOMEPAGE = "github.com/openbmc/phosphor-pid-control"
-
-LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
-
 SUMMARY = "Phosphor PID Fan Control"
 DESCRIPTION = "Fan Control"
+HOMEPAGE = "github.com/openbmc/phosphor-pid-control"
 PR = "r1"
-
-SRC_URI = "git://github.com/openbmc/phosphor-pid-control"
-SRCREV = "ce15e02f6859df404cc9c1e39b40496f3e7a15f6"
-S = "${WORKDIR}/git"
+PV = "0.1+git${SRCPV}"
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 inherit autotools pkgconfig
 inherit pythonnative
 
 inherit phosphor-pid-control
 inherit obmc-phosphor-ipmiprovider-symlink
+
+S = "${WORKDIR}/git"
+SRC_URI = "git://github.com/openbmc/phosphor-pid-control"
+SRCREV = "ce15e02f6859df404cc9c1e39b40496f3e7a15f6"
 
 # Each platform will need a service file that starts
 # at an appropriate time per system.  For instance, if
