@@ -360,12 +360,12 @@ class LocalhostBEController(BuildEnvironmentController):
             for path in os.environ["PATH"].split(os.pathsep):
                 if os.path.exists(os.path.join(path, 'bitbake')):
                     bitbake = os.path.join(path, 'bitbake')
+                    logger.info("Found Bitbake at: %s" % path)
                     break
             else:
                 logger.error("Looks like Bitbake is not available, please fix your environment")
 
         # run bitbake server from the clone
-        bitbake = os.path.join(self.pokydirname, 'bitbake', 'bin', 'bitbake')
         toasterlayers = os.path.join(builddir,"conf/toaster-bblayers.conf")
         self._shellcmd('%s bash -c \"source %s %s; BITBAKE_UI="knotty" %s --read %s --read %s '
                        '--server-only -B 0.0.0.0:0\"' % (env_clean, oe_init,
