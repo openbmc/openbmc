@@ -9,7 +9,7 @@ ExecStartPre=/usr/bin/env gen-cert.sh
 ExecStartPre=-/usr/bin/env mkdir /var/volatile/nginx/
 ExecStartPre=/usr/bin/env nginx -t -p /var/volatile/nginx
 ExecStart=/usr/bin/env nginx -p /var/volatile/nginx
-ExecReload=/usr/bin/env kill -s HUP $MAINPID
+ExecReload=/usr/bin/env gen-cert.sh ; /usr/bin/env kill -s HUP $MAINPID
 ExecStop=/usr/bin/env kill -s QUIT $MAINPID
 PrivateTmp=true
 # First time on system takes longer for initial setup so
