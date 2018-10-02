@@ -167,6 +167,10 @@ def add_layer_dependencies(bblayersconf, layer, layers, logger):
             # multiple errors at once
             if ret is not None and layer_depend not in ret:
                 ret.append(layer_depend)
+            else:
+                # we might have processed this dependency already, in which case
+                # we should not do it again (avoid recursive loop)
+                continue
 
             # Recursively process...
             if 'collections' not in layer_depend:

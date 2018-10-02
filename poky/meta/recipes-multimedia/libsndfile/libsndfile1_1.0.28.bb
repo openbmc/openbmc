@@ -12,6 +12,7 @@ SRC_URI = "http://www.mega-nerd.com/libsndfile/files/libsndfile-${PV}.tar.gz \
            file://CVE-2017-8363.patch \
            file://CVE-2017-14245-14246.patch \
            file://CVE-2017-14634.patch \
+           file://CVE-2018-13139.patch \
           "
 
 SRC_URI[md5sum] = "646b5f98ce89ac60cdb060fcd398247c"

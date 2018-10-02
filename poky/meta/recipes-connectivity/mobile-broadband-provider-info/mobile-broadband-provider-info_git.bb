@@ -7,7 +7,8 @@ SRCREV = "befcbbc9867e742ac16415660b0b7521218a530c"
 PV = "20170310"
 PE = "1"
 
-SRC_URI = "git://git.gnome.org/mobile-broadband-provider-info"
+SRC_URI = "git://gitlab.gnome.org/GNOME/mobile-broadband-provider-info;protocol=https"
+
 S = "${WORKDIR}/git"
 
 inherit autotools

@@ -41,8 +41,8 @@ python () {
     # re-parsed so that the file-checksums function for do_compile is run every
     # time.
     bpn = d.getVar('BPN')
-    if bpn == d.getVar('PN'):
-        classextend = (d.getVar('BBCLASSEXTEND') or '').split()
+    classextend = (d.getVar('BBCLASSEXTEND') or '').split()
+    if bpn == d.getVar('PN') or not classextend:
         if (externalsrc or
                 ('native' in classextend and
                  d.getVar('EXTERNALSRC_pn-%s-native' % bpn)) or

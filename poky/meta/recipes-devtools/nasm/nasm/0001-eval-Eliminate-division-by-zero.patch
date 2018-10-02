@@ -1,0 +1,40 @@
+From ceec0d818798aeaa75ed4907e6135b0247ed46b2 Mon Sep 17 00:00:00 2001
+From: Cyrill Gorcunov <gorcunov@gmail.com>
+Date: Sun, 14 Oct 2018 01:26:19 +0300
+Subject: [PATCH] eval: Eliminate division by zero
+
+When doing division we should detect if the value we're
+divided by is not zero. Instead of is_unknown() helper
+we should use is_just_unknown().
+
+https://bugzilla.nasm.us/show_bug.cgi?id=3392515
+https://bugzilla.nasm.us/show_bug.cgi?id=3392473
+
+Reported-by: Jun <jxx13@psu.edu>
+Reported-by: stuartly <situlingyun@gmail.com>
+Signed-off-by: Cyrill Gorcunov <gorcunov@gmail.com>
+
+Upstream-Status: Backport [https://github.com/netwide-assembler/nasm/commit/ceec0d818798aeaa75ed4907e6135b0247ed46b2.patch]
+CVE: CVE-2018-10016
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+---
+ asm/eval.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/asm/eval.c b/asm/eval.c
+index 1a6680f..7e727a4 100644
+--- a/asm/eval.c
++++ b/asm/eval.c
+@@ -580,7 +580,7 @@ static expr *expr5(int critical)
+                   " scalar values");
+             return NULL;
+         }
+-        if (j != '*' && !is_unknown(f) && reloc_value(f) == 0) {
++        if (j != '*' && !is_just_unknown(f) && reloc_value(f) == 0) {
+             nasm_error(ERR_NONFATAL, "division by zero");
+             return NULL;
+         }
+-- 
+2.10.2
+

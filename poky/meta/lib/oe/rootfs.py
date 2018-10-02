@@ -849,9 +849,8 @@ class OpkgRootfs(DpkgOpkgRootfs):
         opkg_pre_process_cmds = self.d.getVar('OPKG_PREPROCESS_COMMANDS')
         opkg_post_process_cmds = self.d.getVar('OPKG_POSTPROCESS_COMMANDS')
 
-        # update PM index files, unless users provide their own feeds
-        if (self.d.getVar('BUILD_IMAGES_FROM_FEEDS') or "") != "1":
-            self.pm.write_index()
+        # update PM index files
+        self.pm.write_index()
 
         execute_pre_post_process(self.d, opkg_pre_process_cmds)
 
