@@ -1,6 +1,7 @@
 SUMMARY = "Phosphor IPMI Inventory Plugin"
 DESCRIPTION = "A Phosphor IPMI plugin that updates inventory."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-systemd
