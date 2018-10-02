@@ -2,6 +2,7 @@ SUMMARY = "Phosphor Network IPMI Daemon"
 DESCRIPTION = "Daemon to support IPMI protocol over network"
 HOMEPAGE = "https://github.com/openbmc/phosphor-net-ipmid"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-license
