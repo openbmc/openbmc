@@ -1,0 +1,28 @@
+From 9393a3e346d2ccbb86761117260c1dd89070a507 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+Date: Wed, 15 Nov 2017 17:45:34 -0800
+Subject: [PATCH] Fixing MicroBlaze constant range check issue
+
+Sample error: not in range ffffffff80000000..7fffffff, not ffffffff70000000
+
+Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Pending
+
+---
+ gas/config/tc-microblaze.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 21a5a0c..c614556 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -749,7 +749,7 @@ parse_imm (char * s, expressionS * e, offsetT min, offsetT max)
+       if ((e->X_add_number >> 31) == 1)
+ 	e->X_add_number |= -((addressT) (1U << 31));
+ 
+-      if (e->X_add_number < min || e->X_add_number > max)
++      if ((int)e->X_add_number < min || (int)e->X_add_number > max)
+ 	{
+ 	  as_fatal (_("operand must be absolute in range %lx..%lx, not %lx"),
+ 		    (long) min, (long) max, (long) e->X_add_number);

@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Xen Kernel Support"
+define KFEATURE_COMPATIBILITY arch
+
+kconf non-hardware xen.cfg

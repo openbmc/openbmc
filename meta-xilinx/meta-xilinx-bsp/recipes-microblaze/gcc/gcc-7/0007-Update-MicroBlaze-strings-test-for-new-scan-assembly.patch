@@ -1,0 +1,46 @@
+From 4622988b62335af6ef17d58bf10940419fd0f99f Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Sat, 26 Aug 2017 19:21:21 -0700
+Subject: [PATCH] Update MicroBlaze strings test for new scan-assembly output
+ resulting in use of $LC label
+
+ChangeLog/testsuite
+
+2014-02-14  David Holsgrove <david.holsgrove@xilinx.com>
+
+ * gcc/testsuite/gcc.target/microblaze/others/strings1.c: Update
+   to include $LC label.
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Pending
+---
+ gcc/testsuite/gcc.target/microblaze/others/strings1.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/testsuite/gcc.target/microblaze/others/strings1.c b/gcc/testsuite/gcc.target/microblaze/others/strings1.c
+index 7a63faf79f..0403b7bdca 100644
+--- a/gcc/testsuite/gcc.target/microblaze/others/strings1.c
++++ b/gcc/testsuite/gcc.target/microblaze/others/strings1.c
+@@ -1,13 +1,15 @@
+ /* { dg-options "-O3" } */
+ 
++/* { dg-final { scan-assembler "\.rodata*" } } */
++/* { dg-final { scan-assembler "addik\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),\\\$LC.*" } } */
++/* { dg-final { scan-assembler "\lwi\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),*" } } */
++
+ #include <string.h>
+ 
+-/* { dg-final { scan-assembler "\.rodata*" } } */
+ extern void somefunc (char *);
+ int testfunc ()
+ {
+     char string2[80];
+-/* { dg-final { scan-assembler "\lwi\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r0,.LC*" } } */    
+     strcpy (string2, "hello");
+     somefunc (string2);
+ }
+-- 
+2.14.2
+

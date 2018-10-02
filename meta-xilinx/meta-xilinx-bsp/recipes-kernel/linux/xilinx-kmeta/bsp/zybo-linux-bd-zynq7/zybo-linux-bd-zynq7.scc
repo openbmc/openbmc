@@ -1,0 +1,7 @@
+define KFEATURE_DESCRIPTION "Kernel Config for ZYBO Linux-BD Design"
+define KFEATURE_COMPATIBILITY board
+
+kconf hardware zybo-linux-bd-zynq7.cfg
+
+include bsp/xilinx/soc/drivers-drm.scc
+

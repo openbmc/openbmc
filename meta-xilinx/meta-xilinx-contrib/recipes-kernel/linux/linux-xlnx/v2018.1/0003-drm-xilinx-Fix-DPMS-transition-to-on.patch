@@ -1,0 +1,54 @@
+From 1a18e2b514ae9e75145597ac509a87f656c976ba Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Mon, 2 May 2016 23:46:42 +1000
+Subject: [PATCH 3/3] drm: xilinx: Fix DPMS transition to on
+
+Fix the issues where the VTC is reset (losing its timing config).
+
+Also fix the issue where the plane destroys its DMA descriptors and
+marks the DMA channels as inactive but never recreates the descriptors
+and never updates the active state when turning DPMS back on.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Pending [This is a workaround]
+---
+ drivers/gpu/drm/xilinx/xilinx_drm_crtc.c  | 1 -
+ drivers/gpu/drm/xilinx/xilinx_drm_plane.c | 3 ++-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c b/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c
+index 631d35b921..93dbd4b58a 100644
+--- a/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c
++++ b/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c
+@@ -88,7 +88,6 @@ static void xilinx_drm_crtc_dpms(struct drm_crtc *base_crtc, int dpms)
+ 	default:
+ 		if (crtc->vtc) {
+ 			xilinx_vtc_disable(crtc->vtc);
+-			xilinx_vtc_reset(crtc->vtc);
+ 		}
+ 		if (crtc->cresample) {
+ 			xilinx_cresample_disable(crtc->cresample);
+diff --git a/drivers/gpu/drm/xilinx/xilinx_drm_plane.c b/drivers/gpu/drm/xilinx/xilinx_drm_plane.c
+index 6a248b72d4..d2518a4bdf 100644
+--- a/drivers/gpu/drm/xilinx/xilinx_drm_plane.c
++++ b/drivers/gpu/drm/xilinx/xilinx_drm_plane.c
+@@ -140,7 +140,7 @@ void xilinx_drm_plane_commit(struct drm_plane *base_plane)
+ 	for (i = 0; i < MAX_NUM_SUB_PLANES; i++) {
+ 		struct xilinx_drm_plane_dma *dma = &plane->dma[i];
+ 
+-		if (dma->chan && dma->is_active) {
++		if (dma->chan) {
+ 			flags = DMA_CTRL_ACK | DMA_PREP_INTERRUPT;
+ 			desc = dmaengine_prep_interleaved_dma(dma->chan,
+ 							      &dma->xt,
+@@ -153,6 +153,7 @@ void xilinx_drm_plane_commit(struct drm_plane *base_plane)
+ 			dmaengine_submit(desc);
+ 
+ 			dma_async_issue_pending(dma->chan);
++			dma->is_active = true;
+ 		}
+ 	}
+ }
+-- 
+2.14.2
+

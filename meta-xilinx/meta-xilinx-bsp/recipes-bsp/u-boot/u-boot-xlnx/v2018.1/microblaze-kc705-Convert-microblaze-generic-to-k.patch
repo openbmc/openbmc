@@ -1,0 +1,1168 @@
+From 539838b4fe4afecd9b6874c5ac397ab7f5b343d4 Mon Sep 17 00:00:00 2001
+From: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Date: Tue, 10 Apr 2018 18:34:45 -0700
+Subject: [PATCH] kc705-microblazeel: Convert microblaze-generic to
+ kc705-microblazeel
+
+This is an update to earlier kc705-trd patch done by Nathan Rossi.
+Starting from v2016.1, KC705 will no longer refer to deprecated KC705
+TRD application.
+
+Change the microblaze-generic board to match the kc705-microblazeel.
+This patch is not intended for upstream and serves as an intermediate
+solution until OF support in upstream u-boot allows for easy support for
+custom microblaze boards.
+
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Not-Upstreamable [meta-xilinx/kc705 specific]
+---
+ arch/microblaze/dts/microblaze-generic.dts | 590 ++++++++++++++++++++++++++++-
+ board/xilinx/microblaze-generic/config.mk  |  30 +-
+ configs/microblaze-generic_defconfig       |  57 ++-
+ include/configs/microblaze-generic.h       | 396 ++++++++-----------
+ 4 files changed, 782 insertions(+), 291 deletions(-)
+
+diff --git a/arch/microblaze/dts/microblaze-generic.dts b/arch/microblaze/dts/microblaze-generic.dts
+index 08a1396..f8e616b 100644
+--- a/arch/microblaze/dts/microblaze-generic.dts
++++ b/arch/microblaze/dts/microblaze-generic.dts
+@@ -1,9 +1,587 @@
+ /dts-v1/;
++
+ / {
+-	#address-cells = <1>;
+-	#size-cells = <1>;
+-	aliases {
+-	} ;
++	#address-cells = <0x1>;
++	#size-cells = <0x1>;
++	compatible = "xlnx,microblaze";
++	model = "Xilinx MicroBlaze";
++	hard-reset-gpios = <0x1 0x0 0x1>;
++
++	cpus {
++		#address-cells = <0x1>;
++		#cpus = <0x1>;
++		#size-cells = <0x0>;
++
++		cpu@0 {
++			bus-handle = <0x2>;
++			clock-frequency = <0xbebc200>;
++			clocks = <0x3>;
++			compatible = "xlnx,microblaze-10.0";
++			d-cache-baseaddr = <0x80000000>;
++			d-cache-highaddr = <0xbfffffff>;
++			d-cache-line-size = <0x20>;
++			d-cache-size = <0x4000>;
++			device_type = "cpu";
++			i-cache-baseaddr = <0x80000000>;
++			i-cache-highaddr = <0xbfffffff>;
++			i-cache-line-size = <0x10>;
++			i-cache-size = <0x4000>;
++			interrupt-handle = <0x4>;
++			model = "microblaze,10.0";
++			timebase-frequency = <0xbebc200>;
++			xlnx,addr-size = <0x20>;
++			xlnx,addr-tag-bits = <0x10>;
++			xlnx,allow-dcache-wr = <0x1>;
++			xlnx,allow-icache-wr = <0x1>;
++			xlnx,area-optimized = <0x0>;
++			xlnx,async-interrupt = <0x1>;
++			xlnx,async-wakeup = <0x3>;
++			xlnx,avoid-primitives = <0x0>;
++			xlnx,base-vectors = <0x0>;
++			xlnx,branch-target-cache-size = <0x0>;
++			xlnx,cache-byte-size = <0x4000>;
++			xlnx,d-axi = <0x1>;
++			xlnx,d-lmb = <0x1>;
++			xlnx,d-lmb-mon = <0x0>;
++			xlnx,daddr-size = <0x20>;
++			xlnx,data-size = <0x20>;
++			xlnx,dc-axi-mon = <0x0>;
++			xlnx,dcache-addr-tag = <0x10>;
++			xlnx,dcache-always-used = <0x1>;
++			xlnx,dcache-byte-size = <0x4000>;
++			xlnx,dcache-data-width = <0x0>;
++			xlnx,dcache-force-tag-lutram = <0x0>;
++			xlnx,dcache-line-len = <0x8>;
++			xlnx,dcache-use-writeback = <0x0>;
++			xlnx,dcache-victims = <0x0>;
++			xlnx,debug-counter-width = <0x20>;
++			xlnx,debug-enabled = <0x1>;
++			xlnx,debug-event-counters = <0x5>;
++			xlnx,debug-external-trace = <0x0>;
++			xlnx,debug-interface = <0x0>;
++			xlnx,debug-latency-counters = <0x1>;
++			xlnx,debug-profile-size = <0x0>;
++			xlnx,debug-trace-async-reset = <0x0>;
++			xlnx,debug-trace-size = <0x2000>;
++			xlnx,div-zero-exception = <0x1>;
++			xlnx,dp-axi-mon = <0x0>;
++			xlnx,dynamic-bus-sizing = <0x0>;
++			xlnx,ecc-use-ce-exception = <0x0>;
++			xlnx,edge-is-positive = <0x1>;
++			xlnx,enable-discrete-ports = <0x0>;
++			xlnx,endianness = <0x1>;
++			xlnx,fault-tolerant = <0x0>;
++			xlnx,fpu-exception = <0x0>;
++			xlnx,freq = <0xbebc200>;
++			xlnx,fsl-exception = <0x0>;
++			xlnx,fsl-links = <0x0>;
++			xlnx,i-axi = <0x0>;
++			xlnx,i-lmb = <0x1>;
++			xlnx,i-lmb-mon = <0x0>;
++			xlnx,iaddr-size = <0x20>;
++			xlnx,ic-axi-mon = <0x0>;
++			xlnx,icache-always-used = <0x1>;
++			xlnx,icache-data-width = <0x0>;
++			xlnx,icache-force-tag-lutram = <0x0>;
++			xlnx,icache-line-len = <0x4>;
++			xlnx,icache-streams = <0x1>;
++			xlnx,icache-victims = <0x8>;
++			xlnx,ill-opcode-exception = <0x1>;
++			xlnx,imprecise-exceptions = <0x0>;
++			xlnx,instr-size = <0x20>;
++			xlnx,interconnect = <0x2>;
++			xlnx,interrupt-is-edge = <0x0>;
++			xlnx,interrupt-mon = <0x0>;
++			xlnx,ip-axi-mon = <0x0>;
++			xlnx,lockstep-master = <0x0>;
++			xlnx,lockstep-select = <0x0>;
++			xlnx,lockstep-slave = <0x0>;
++			xlnx,mmu-dtlb-size = <0x4>;
++			xlnx,mmu-itlb-size = <0x2>;
++			xlnx,mmu-privileged-instr = <0x0>;
++			xlnx,mmu-tlb-access = <0x3>;
++			xlnx,mmu-zones = <0x2>;
++			xlnx,num-sync-ff-clk = <0x2>;
++			xlnx,num-sync-ff-clk-debug = <0x2>;
++			xlnx,num-sync-ff-clk-irq = <0x1>;
++			xlnx,num-sync-ff-dbg-clk = <0x1>;
++			xlnx,num-sync-ff-dbg-trace-clk = <0x2>;
++			xlnx,number-of-pc-brk = <0x1>;
++			xlnx,number-of-rd-addr-brk = <0x0>;
++			xlnx,number-of-wr-addr-brk = <0x0>;
++			xlnx,opcode-0x0-illegal = <0x1>;
++			xlnx,optimization = <0x0>;
++			xlnx,pc-width = <0x20>;
++			xlnx,piaddr-size = <0x20>;
++			xlnx,pvr = <0x2>;
++			xlnx,pvr-user1 = <0x0>;
++			xlnx,pvr-user2 = <0x0>;
++			xlnx,reset-msr = <0x0>;
++			xlnx,reset-msr-bip = <0x0>;
++			xlnx,reset-msr-dce = <0x0>;
++			xlnx,reset-msr-ee = <0x0>;
++			xlnx,reset-msr-eip = <0x0>;
++			xlnx,reset-msr-ice = <0x0>;
++			xlnx,reset-msr-ie = <0x0>;
++			xlnx,sco = <0x0>;
++			xlnx,trace = <0x0>;
++			xlnx,unaligned-exceptions = <0x1>;
++			xlnx,use-barrel = <0x1>;
++			xlnx,use-branch-target-cache = <0x0>;
++			xlnx,use-config-reset = <0x0>;
++			xlnx,use-dcache = <0x1>;
++			xlnx,use-div = <0x1>;
++			xlnx,use-ext-brk = <0x0>;
++			xlnx,use-ext-nm-brk = <0x0>;
++			xlnx,use-extended-fsl-instr = <0x0>;
++			xlnx,use-fpu = <0x0>;
++			xlnx,use-hw-mul = <0x2>;
++			xlnx,use-icache = <0x1>;
++			xlnx,use-interrupt = <0x2>;
++			xlnx,use-mmu = <0x3>;
++			xlnx,use-msr-instr = <0x1>;
++			xlnx,use-non-secure = <0x0>;
++			xlnx,use-pcmp-instr = <0x1>;
++			xlnx,use-reorder-instr = <0x1>;
++			xlnx,use-stack-protection = <0x0>;
++		};
++	};
++
++	clocks {
++		#address-cells = <0x1>;
++		#size-cells = <0x0>;
++
++		clk_cpu@0 {
++			#clock-cells = <0x0>;
++			clock-frequency = <0xbebc200>;
++			clock-output-names = "clk_cpu";
++			compatible = "fixed-clock";
++			reg = <0x0>;
++			linux,phandle = <0x3>;
++			phandle = <0x3>;
++		};
++
++		clk_bus_0@1 {
++			#clock-cells = <0x0>;
++			clock-frequency = <0xbebc200>;
++			clock-output-names = "clk_bus_0";
++			compatible = "fixed-clock";
++			reg = <0x1>;
++			linux,phandle = <0x8>;
++			phandle = <0x8>;
++		};
++	};
++
++	amba_pl {
++		#address-cells = <0x1>;
++		#size-cells = <0x1>;
++		compatible = "simple-bus";
++		ranges;
++		linux,phandle = <0x2>;
++		phandle = <0x2>;
++
++		ethernet@40c00000 {
++			axistream-connected = <0x5>;
++			axistream-control-connected = <0x5>;
++			clock-frequency = <0x5f5e100>;
++			compatible = "xlnx,axi-ethernet-1.00.a";
++			device_type = "network";
++			interrupt-names = "interrupt";
++			interrupt-parent = <0x4>;
++			interrupts = <0x4 0x2>;
++			phy-mode = "gmii";
++			reg = <0x40c00000 0x40000>;
++			xlnx = <0x0>;
++			xlnx,axiliteclkrate = <0x0>;
++			xlnx,axisclkrate = <0x0>;
++			xlnx,clockselection = <0x0>;
++			xlnx,enableasyncsgmii = <0x0>;
++			xlnx,gt-type = <0x0>;
++			xlnx,gtinex = <0x0>;
++			xlnx,gtlocation = <0x0>;
++			xlnx,gtrefclksrc = <0x0>;
++			xlnx,include-dre;
++			xlnx,instantiatebitslice0 = <0x0>;
++			xlnx,phy-type = <0x1>;
++			xlnx,phyaddr = <0x1>;
++			xlnx,rable = <0x0>;
++			xlnx,rxcsum = <0x0>;
++			xlnx,rxlane0-placement = <0x0>;
++			xlnx,rxlane1-placement = <0x0>;
++			xlnx,rxmem = <0x1000>;
++			xlnx,rxnibblebitslice0used = <0x0>;
++			xlnx,tx-in-upper-nibble = <0x1>;
++			xlnx,txcsum = <0x0>;
++			xlnx,txlane0-placement = <0x0>;
++			xlnx,txlane1-placement = <0x0>;
++			phy-handle = <0x6>;
++			local-mac-address = [00 0a 35 00 22 01];
++			linux,phandle = <0x7>;
++			phandle = <0x7>;
++
++			mdio {
++				#address-cells = <0x1>;
++				#size-cells = <0x0>;
++
++				phy@7 {
++					device_type = "ethernet-phy";
++					reg = <0x7>;
++					linux,phandle = <0x6>;
++					phandle = <0x6>;
++				};
++			};
++		};
++
++		dma@41e00000 {
++			#dma-cells = <0x1>;
++			axistream-connected = <0x7>;
++			axistream-control-connected = <0x7>;
++			clock-frequency = <0xbebc200>;
++			clock-names = "s_axi_lite_aclk";
++			clocks = <0x8>;
++			compatible = "xlnx,eth-dma";
++			interrupt-names = "mm2s_introut", "s2mm_introut";
++			interrupt-parent = <0x4>;
++			interrupts = <0x3 0x2 0x2 0x2>;
++			reg = <0x41e00000 0x10000>;
++			xlnx,include-dre;
++			linux,phandle = <0x5>;
++			phandle = <0x5>;
++		};
++
++		timer@41c00000 {
++			clock-frequency = <0xbebc200>;
++			clocks = <0x8>;
++			compatible = "xlnx,xps-timer-1.00.a";
++			interrupt-names = "interrupt";
++			interrupt-parent = <0x4>;
++			interrupts = <0x5 0x2>;
++			reg = <0x41c00000 0x10000>;
++			xlnx,count-width = <0x20>;
++			xlnx,gen0-assert = <0x1>;
++			xlnx,gen1-assert = <0x1>;
++			xlnx,one-timer-only = <0x0>;
++			xlnx,trig0-assert = <0x1>;
++			xlnx,trig1-assert = <0x1>;
++		};
++
++		gpio@40010000 {
++			#gpio-cells = <0x2>;
++			clock-frequency = <0xbebc200>;
++			clock-names = "s_axi_aclk";
++			clocks = <0x8>;
++			compatible = "xlnx,xps-gpio-1.00.a";
++			gpio-controller;
++			reg = <0x40010000 0x10000>;
++			xlnx,all-inputs = <0x1>;
++			xlnx,all-inputs-2 = <0x0>;
++			xlnx,all-outputs = <0x0>;
++			xlnx,all-outputs-2 = <0x0>;
++			xlnx,dout-default = <0x0>;
++			xlnx,dout-default-2 = <0x0>;
++			xlnx,gpio-width = <0x1>;
++			xlnx,gpio2-width = <0x20>;
++			xlnx,interrupt-present = <0x0>;
++			xlnx,is-dual = <0x0>;
++			xlnx,tri-default = <0xffffffff>;
++			xlnx,tri-default-2 = <0xffffffff>;
++		};
++
++		gpio@40020000 {
++			#gpio-cells = <0x2>;
++			clock-frequency = <0xbebc200>;
++			clock-names = "s_axi_aclk";
++			clocks = <0x8>;
++			compatible = "xlnx,xps-gpio-1.00.a";
++			gpio-controller;
++			reg = <0x40020000 0x10000>;
++			xlnx,all-inputs = <0x1>;
++			xlnx,all-inputs-2 = <0x0>;
++			xlnx,all-outputs = <0x0>;
++			xlnx,all-outputs-2 = <0x0>;
++			xlnx,dout-default = <0x0>;
++			xlnx,dout-default-2 = <0x0>;
++			xlnx,gpio-width = <0x4>;
++			xlnx,gpio2-width = <0x20>;
++			xlnx,interrupt-present = <0x0>;
++			xlnx,is-dual = <0x0>;
++			xlnx,tri-default = <0xffffffff>;
++			xlnx,tri-default-2 = <0xffffffff>;
++		};
++
++		i2c@40800000 {
++			#address-cells = <0x1>;
++			#size-cells = <0x0>;
++			clock-frequency = <0xbebc200>;
++			clocks = <0x8>;
++			compatible = "xlnx,xps-iic-2.00.a";
++			interrupt-names = "iic2intc_irpt";
++			interrupt-parent = <0x4>;
++			interrupts = <0x1 0x2>;
++			reg = <0x40800000 0x10000>;
++
++			i2cswitch@74 {
++				compatible = "nxp,pca9548";
++				#address-cells = <0x1>;
++				#size-cells = <0x0>;
++				reg = <0x74>;
++
++				i2c@0 {
++					#address-cells = <0x1>;
++					#size-cells = <0x0>;
++					reg = <0x0>;
++
++					clock-generator@5d {
++						#clock-cells = <0x0>;
++						compatible = "silabs,si570";
++						temperature-stability = <0x32>;
++						reg = <0x5d>;
++						factory-fout = <0x9502f90>;
++						clock-frequency = <0x8d9ee20>;
++					};
++				};
++
++				i2c@3 {
++					#address-cells = <0x1>;
++					#size-cells = <0x0>;
++					reg = <0x3>;
++
++					eeprom@54 {
++						compatible = "at,24c08";
++						reg = <0x54>;
++					};
++				};
++			};
++		};
++
++		gpio@40030000 {
++			#gpio-cells = <0x2>;
++			clock-frequency = <0xbebc200>;
++			clock-names = "s_axi_aclk";
++			clocks = <0x8>;
++			compatible = "xlnx,xps-gpio-1.00.a";
++			gpio-controller;
++			reg = <0x40030000 0x10000>;
++			xlnx,all-inputs = <0x0>;
++			xlnx,all-inputs-2 = <0x0>;
++			xlnx,all-outputs = <0x1>;
++			xlnx,all-outputs-2 = <0x0>;
++			xlnx,dout-default = <0x0>;
++			xlnx,dout-default-2 = <0x0>;
++			xlnx,gpio-width = <0x8>;
++			xlnx,gpio2-width = <0x20>;
++			xlnx,interrupt-present = <0x0>;
++			xlnx,is-dual = <0x0>;
++			xlnx,tri-default = <0xffffffff>;
++			xlnx,tri-default-2 = <0xffffffff>;
++		};
++
++		flash@60000000 {
++			bank-width = <0x2>;
++			compatible = "cfi-flash";
++			reg = <0x60000000 0x8000000>;
++			xlnx,axi-clk-period-ps = <0x1388>;
++			xlnx,include-datawidth-matching-0 = <0x1>;
++			xlnx,include-datawidth-matching-1 = <0x1>;
++			xlnx,include-datawidth-matching-2 = <0x1>;
++			xlnx,include-datawidth-matching-3 = <0x1>;
++			xlnx,include-negedge-ioregs = <0x0>;
++			xlnx,lflash-period-ps = <0x1388>;
++			xlnx,linear-flash-sync-burst = <0x0>;
++			xlnx,max-mem-width = <0x10>;
++			xlnx,mem-a-lsb = <0x0>;
++			xlnx,mem-a-msb = <0x1f>;
++			xlnx,mem0-type = <0x2>;
++			xlnx,mem0-width = <0x10>;
++			xlnx,mem1-type = <0x0>;
++			xlnx,mem1-width = <0x10>;
++			xlnx,mem2-type = <0x0>;
++			xlnx,mem2-width = <0x10>;
++			xlnx,mem3-type = <0x0>;
++			xlnx,mem3-width = <0x10>;
++			xlnx,num-banks-mem = <0x1>;
++			xlnx,page-size = <0x10>;
++			xlnx,parity-type-mem-0 = <0x0>;
++			xlnx,parity-type-mem-1 = <0x0>;
++			xlnx,parity-type-mem-2 = <0x0>;
++			xlnx,parity-type-mem-3 = <0x0>;
++			xlnx,port-diff = <0x0>;
++			xlnx,s-axi-en-reg = <0x0>;
++			xlnx,s-axi-mem-addr-width = <0x20>;
++			xlnx,s-axi-mem-data-width = <0x20>;
++			xlnx,s-axi-mem-id-width = <0x1>;
++			xlnx,s-axi-reg-addr-width = <0x5>;
++			xlnx,s-axi-reg-data-width = <0x20>;
++			xlnx,synch-pipedelay-0 = <0x1>;
++			xlnx,synch-pipedelay-1 = <0x1>;
++			xlnx,synch-pipedelay-2 = <0x1>;
++			xlnx,synch-pipedelay-3 = <0x1>;
++			xlnx,tavdv-ps-mem-0 = <0x1fbd0>;
++			xlnx,tavdv-ps-mem-1 = <0x3a98>;
++			xlnx,tavdv-ps-mem-2 = <0x3a98>;
++			xlnx,tavdv-ps-mem-3 = <0x3a98>;
++			xlnx,tcedv-ps-mem-0 = <0x1fbd0>;
++			xlnx,tcedv-ps-mem-1 = <0x3a98>;
++			xlnx,tcedv-ps-mem-2 = <0x3a98>;
++			xlnx,tcedv-ps-mem-3 = <0x3a98>;
++			xlnx,thzce-ps-mem-0 = <0x88b8>;
++			xlnx,thzce-ps-mem-1 = <0x1b58>;
++			xlnx,thzce-ps-mem-2 = <0x1b58>;
++			xlnx,thzce-ps-mem-3 = <0x1b58>;
++			xlnx,thzoe-ps-mem-0 = <0x1b58>;
++			xlnx,thzoe-ps-mem-1 = <0x1b58>;
++			xlnx,thzoe-ps-mem-2 = <0x1b58>;
++			xlnx,thzoe-ps-mem-3 = <0x1b58>;
++			xlnx,tlzwe-ps-mem-0 = <0xc350>;
++			xlnx,tlzwe-ps-mem-1 = <0x0>;
++			xlnx,tlzwe-ps-mem-2 = <0x0>;
++			xlnx,tlzwe-ps-mem-3 = <0x0>;
++			xlnx,tpacc-ps-flash-0 = <0x61a8>;
++			xlnx,tpacc-ps-flash-1 = <0x61a8>;
++			xlnx,tpacc-ps-flash-2 = <0x61a8>;
++			xlnx,tpacc-ps-flash-3 = <0x61a8>;
++			xlnx,twc-ps-mem-0 = <0x11170>;
++			xlnx,twc-ps-mem-1 = <0x3a98>;
++			xlnx,twc-ps-mem-2 = <0x3a98>;
++			xlnx,twc-ps-mem-3 = <0x3a98>;
++			xlnx,twp-ps-mem-0 = <0x13880>;
++			xlnx,twp-ps-mem-1 = <0x2ee0>;
++			xlnx,twp-ps-mem-2 = <0x2ee0>;
++			xlnx,twp-ps-mem-3 = <0x2ee0>;
++			xlnx,twph-ps-mem-0 = <0x13880>;
++			xlnx,twph-ps-mem-1 = <0x2ee0>;
++			xlnx,twph-ps-mem-2 = <0x2ee0>;
++			xlnx,twph-ps-mem-3 = <0x2ee0>;
++			xlnx,use-startup = <0x0>;
++			xlnx,use-startup-int = <0x0>;
++			xlnx,wr-rec-time-mem-0 = <0x186a0>;
++			xlnx,wr-rec-time-mem-1 = <0x6978>;
++			xlnx,wr-rec-time-mem-2 = <0x6978>;
++			xlnx,wr-rec-time-mem-3 = <0x6978>;
++			#address-cells = <0x1>;
++			#size-cells = <0x1>;
++
++			partition@0x00000000 {
++				label = "fpga";
++				reg = <0x0 0xb00000>;
++			};
++
++			partition@0x00b00000 {
++				label = "boot";
++				reg = <0xb00000 0x80000>;
++			};
++
++			partition@0x00b80000 {
++				label = "bootenv";
++				reg = <0xb80000 0x20000>;
++			};
++
++			partition@0x00ba0000 {
++				label = "kernel";
++				reg = <0xba0000 0xc00000>;
++			};
++
++			partition@0x017a0000 {
++				label = "spare";
++				reg = <0x17a0000 0x0>;
++			};
++		};
++
++		interrupt-controller@41200000 {
++			#interrupt-cells = <0x2>;
++			compatible = "xlnx,xps-intc-1.00.a";
++			interrupt-controller;
++			reg = <0x41200000 0x10000>;
++			xlnx,kind-of-intr = <0x0>;
++			xlnx,num-intr-inputs = <0x6>;
++			linux,phandle = <0x4>;
++			phandle = <0x4>;
++		};
++
++		gpio@40040000 {
++			#gpio-cells = <0x2>;
++			clock-frequency = <0xbebc200>;
++			clock-names = "s_axi_aclk";
++			clocks = <0x8>;
++			compatible = "xlnx,xps-gpio-1.00.a";
++			gpio-controller;
++			reg = <0x40040000 0x10000>;
++			xlnx,all-inputs = <0x1>;
++			xlnx,all-inputs-2 = <0x0>;
++			xlnx,all-outputs = <0x0>;
++			xlnx,all-outputs-2 = <0x0>;
++			xlnx,dout-default = <0x0>;
++			xlnx,dout-default-2 = <0x0>;
++			xlnx,gpio-width = <0x5>;
++			xlnx,gpio2-width = <0x20>;
++			xlnx,interrupt-present = <0x0>;
++			xlnx,is-dual = <0x0>;
++			xlnx,tri-default = <0xffffffff>;
++			xlnx,tri-default-2 = <0xffffffff>;
++		};
++
++		gpio@40000000 {
++			#gpio-cells = <0x2>;
++			clock-frequency = <0xbebc200>;
++			clock-names = "s_axi_aclk";
++			clocks = <0x8>;
++			compatible = "xlnx,xps-gpio-1.00.a";
++			gpio-controller;
++			reg = <0x40000000 0x10000>;
++			xlnx,all-inputs = <0x0>;
++			xlnx,all-inputs-2 = <0x0>;
++			xlnx,all-outputs = <0x1>;
++			xlnx,all-outputs-2 = <0x0>;
++			xlnx,dout-default = <0x0>;
++			xlnx,dout-default-2 = <0x0>;
++			xlnx,gpio-width = <0x1>;
++			xlnx,gpio2-width = <0x20>;
++			xlnx,interrupt-present = <0x0>;
++			xlnx,is-dual = <0x0>;
++			xlnx,tri-default = <0xffffffff>;
++			xlnx,tri-default-2 = <0xffffffff>;
++			linux,phandle = <0x1>;
++			phandle = <0x1>;
++		};
++
++		serial@44a00000 {
++			clock-frequency = <0xbebc200>;
++			clocks = <0x8>;
++			compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
++			current-speed = <0x1c200>;
++			device_type = "serial";
++			interrupt-names = "ip2intc_irpt";
++			interrupt-parent = <0x4>;
++			interrupts = <0x0 0x2>;
++			port-number = <0x0>;
++			reg = <0x44a00000 0x10000>;
++			reg-offset = <0x1000>;
++			reg-shift = <0x2>;
++			xlnx,external-xin-clk-hz = <0x17d7840>;
++			xlnx,external-xin-clk-hz-d = <0x19>;
++			xlnx,has-external-rclk = <0x0>;
++			xlnx,has-external-xin = <0x0>;
++			xlnx,is-a-16550 = <0x1>;
++			xlnx,s-axi-aclk-freq-hz-d = "200.0";
++			xlnx,use-modem-ports = <0x1>;
++			xlnx,use-user-ports = <0x1>;
++		};
++	};
++
+ 	chosen {
+-	} ;
+-} ;
++		bootargs = "console=ttyS0,115200 earlyprintk";
++		stdout-path = "serial0:115200n8";
++	};
++
++	aliases {
++		ethernet0 = "/amba_pl/ethernet@40c00000";
++		i2c0 = "/amba_pl/i2c@40800000";
++		serial0 = "/amba_pl/serial@44a00000";
++	};
++
++	memory {
++		device_type = "memory";
++		reg = <0x80000000 0x40000000>;
++	};
++};
++
+diff --git a/board/xilinx/microblaze-generic/config.mk b/board/xilinx/microblaze-generic/config.mk
+index 1dee2d6..cb75fde 100644
+--- a/board/xilinx/microblaze-generic/config.mk
++++ b/board/xilinx/microblaze-generic/config.mk
+@@ -1,20 +1,10 @@
+-#
+-# (C) Copyright 2007 - 2016 Michal Simek
+-#
+-# Michal SIMEK <monstr@monstr.eu>
+-#
+-# SPDX-License-Identifier:	GPL-2.0+
+-#
+-
+-CPU_VER := $(shell echo $(CONFIG_XILINX_MICROBLAZE0_HW_VER))
+-
+-# USE_HW_MUL can be 0, 1, or 2, defining a hierarchy of HW Mul support.
+-CPUFLAGS-$(subst 1,,$(CONFIG_XILINX_MICROBLAZE0_USE_HW_MUL)) += -mxl-multiply-high
+-CPUFLAGS-$(CONFIG_XILINX_MICROBLAZE0_USE_HW_MUL) += -mno-xl-soft-mul
+-CPUFLAGS-$(CONFIG_XILINX_MICROBLAZE0_USE_DIV) += -mno-xl-soft-div
+-CPUFLAGS-$(CONFIG_XILINX_MICROBLAZE0_USE_BARREL) += -mxl-barrel-shift
+-CPUFLAGS-$(CONFIG_XILINX_MICROBLAZE0_USE_PCMP_INSTR) += -mxl-pattern-compare
+-
+-CPUFLAGS-1 += $(call cc-option,-mcpu=v$(CPU_VER))
+-
+-PLATFORM_CPPFLAGS += $(CPUFLAGS-1) $(CPUFLAGS-2)
++TEXT_BASE = 0x80400000
++CONFIG_SYS_TEXT_BASE = 0x80400000
++
++PLATFORM_CPPFLAGS += -mxl-barrel-shift
++PLATFORM_CPPFLAGS += -mno-xl-soft-div
++PLATFORM_CPPFLAGS += -mxl-pattern-compare
++PLATFORM_CPPFLAGS += -mxl-multiply-high
++PLATFORM_CPPFLAGS += -mno-xl-soft-mul
++PLATFORM_CPPFLAGS += -mcpu=v10.0
++PLATFORM_CPPFLAGS += -fgnu89-inline
+diff --git a/configs/microblaze-generic_defconfig b/configs/microblaze-generic_defconfig
+index 08d99f2..bac6939 100644
+--- a/configs/microblaze-generic_defconfig
++++ b/configs/microblaze-generic_defconfig
+@@ -1,5 +1,4 @@
+ CONFIG_MICROBLAZE=y
+-CONFIG_SYS_TEXT_BASE=0x29000000
+ CONFIG_SPL_LIBCOMMON_SUPPORT=y
+ CONFIG_SPL_LIBGENERIC_SUPPORT=y
+ CONFIG_SPL_SERIAL_SUPPORT=y
+@@ -8,50 +7,50 @@ CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR=1
+ CONFIG_XILINX_MICROBLAZE0_USE_BARREL=1
+ CONFIG_XILINX_MICROBLAZE0_USE_DIV=1
+ CONFIG_XILINX_MICROBLAZE0_USE_HW_MUL=1
++CONFIG_SYS_TEXT_BASE=0x80400000
+ CONFIG_DEFAULT_DEVICE_TREE="microblaze-generic"
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+-CONFIG_BOOTDELAY=-1
+-CONFIG_USE_BOOTARGS=y
+-CONFIG_BOOTARGS="root=romfs"
++CONFIG_BOOTDELAY=4
+ CONFIG_SYS_CONSOLE_IS_IN_ENV=y
+-CONFIG_SPL=y
+-CONFIG_SPL_BOARD_INIT=y
+-CONFIG_SPL_SYS_MALLOC_SIMPLE=y
+ CONFIG_SPL_NOR_SUPPORT=y
+ CONFIG_SPL_OS_BOOT=y
+ CONFIG_SYS_OS_BASE=0x2c060000
+ CONFIG_HUSH_PARSER=y
+-CONFIG_SYS_PROMPT="U-Boot-mONStR> "
+-CONFIG_CMD_IMLS=y
+-CONFIG_CMD_SPL=y
++CONFIG_SYS_PROMPT="U-Boot> "
+ CONFIG_CMD_ASKENV=y
+-CONFIG_CMD_GPIO=y
+ CONFIG_CMD_SAVES=y
+ # CONFIG_CMD_SETEXPR is not set
+-CONFIG_CMD_TFTPPUT=y
++CONFIG_SYS_ENET=y
++CONFIG_NET=y
++CONFIG_NETDEVICES=y
++CONFIG_CMD_NET=y
+ CONFIG_CMD_DHCP=y
++CONFIG_CMD_NFS=y
+ CONFIG_CMD_MII=y
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_JFFS2=y
+-CONFIG_SPL_OF_CONTROL=y
+ CONFIG_OF_EMBED=y
+-CONFIG_ENV_IS_IN_FLASH=y
+-CONFIG_NETCONSOLE=y
+-CONFIG_SPL_DM=y
+-CONFIG_MTD_NOR_FLASH=y
+-CONFIG_PHY_ATHEROS=y
+-CONFIG_PHY_BROADCOM=y
+-CONFIG_PHY_DAVICOM=y
+-CONFIG_PHY_LXT=y
+-CONFIG_PHY_MARVELL=y
+-CONFIG_PHY_MICREL=y
+-CONFIG_PHY_MICREL_KSZ90X1=y
+-CONFIG_PHY_NATSEMI=y
+-CONFIG_PHY_REALTEK=y
+-CONFIG_PHY_VITESSE=y
+ CONFIG_DM_ETH=y
++CONFIG_SYS_MALLOC_F=y
++CONFIG_SYS_GENERIC_BOARD=y
+ CONFIG_XILINX_AXIEMAC=y
+-CONFIG_XILINX_EMACLITE=y
+ CONFIG_SYS_NS16550=y
+-CONFIG_XILINX_UARTLITE=y
++CONFIG_CMD_FLASH=y
++CONFIG_MTD_NOR_FLASH=y
++CONFIG_CMD_IMLS=y
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_TFTPPUT=y
++CONFIG_NETCONSOLE=y
++CONFIG_XILINX_FSL_LINKS=0
++CONFIG_PHY_GIGE=y
++CONFIG_ENV_IS_IN_FLASH=y
++CONFIG_PHY_MICREL=y
++CONFIG_PHY_MICREL_KSZ90X1=y
++CONFIG_SPL_DM_SERIAL=y
++CONFIG_SPL_OF_LIBFDT=y
++CONFIG_PHY_XILINX=y
++# CONFIG_SPL is not set
++# CONFIG_CMD_EEPROM is not set
++# CONFIG_BOOTARGS is not set
++# CONFIG_USE_BOOTARGS is not set
+diff --git a/include/configs/microblaze-generic.h b/include/configs/microblaze-generic.h
+index 16481cb..1377c5e 100644
+--- a/include/configs/microblaze-generic.h
++++ b/include/configs/microblaze-generic.h
+@@ -1,254 +1,178 @@
+-/*
+- * (C) Copyright 2007-2010 Michal Simek
+- *
+- * Michal SIMEK <monstr@monstr.eu>
+- *
+- * SPDX-License-Identifier:	GPL-2.0+
+- */
+-
+ #ifndef __CONFIG_H
+ #define __CONFIG_H
+ 
+-#include "../board/xilinx/microblaze-generic/xparameters.h"
+-
+-/* MicroBlaze CPU */
+-#define	MICROBLAZE_V5		1
+-
+-/* linear and spi flash memory */
+-#ifdef XILINX_FLASH_START
+-#define	FLASH
+-#undef	SPIFLASH
+-#undef	RAMENV	/* hold environment in flash */
+-#else
+-#ifdef XILINX_SPI_FLASH_BASEADDR
+-#undef	FLASH
+-#define	SPIFLASH
+-#undef	RAMENV	/* hold environment in flash */
+-#else
+-#undef	FLASH
+-#undef	SPIFLASH
+-#define	RAMENV	/* hold environment in RAM */
+-#endif
+-#endif
+-
+-/* uart */
+-/* The following table includes the supported baudrates */
+-# define CONFIG_SYS_BAUDRATE_TABLE \
+-	{300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400}
+-
+-/* setting reset address */
+-/*#define	CONFIG_SYS_RESET_ADDRESS	CONFIG_SYS_TEXT_BASE*/
+-
+-/* gpio */
+-#ifdef XILINX_GPIO_BASEADDR
+-# define CONFIG_XILINX_GPIO
+-# define CONFIG_SYS_GPIO_0_ADDR		XILINX_GPIO_BASEADDR
+-#endif
+-
+-/* watchdog */
+-#if defined(XILINX_WATCHDOG_BASEADDR) && defined(XILINX_WATCHDOG_IRQ)
+-# define CONFIG_WATCHDOG_BASEADDR	XILINX_WATCHDOG_BASEADDR
+-# define CONFIG_WATCHDOG_IRQ		XILINX_WATCHDOG_IRQ
+-# ifndef CONFIG_SPL_BUILD
+-#  define CONFIG_HW_WATCHDOG
+-#  define CONFIG_XILINX_TB_WATCHDOG
+-# endif
+-#endif
+-
+-#define CONFIG_SYS_MALLOC_LEN	0xC0000
+-
+-/* Stack location before relocation */
+-#define CONFIG_SYS_INIT_SP_OFFSET	(CONFIG_SYS_TEXT_BASE - \
+-					 CONFIG_SYS_MALLOC_F_LEN)
+-
+-/*
+- * CFI flash memory layout - Example
+- * CONFIG_SYS_FLASH_BASE = 0x2200_0000;
+- * CONFIG_SYS_FLASH_SIZE = 0x0080_0000;	  8MB
+- *
+- * SECT_SIZE = 0x20000;			128kB is one sector
+- * CONFIG_ENV_SIZE = SECT_SIZE;		128kB environment store
+- *
+- * 0x2200_0000	CONFIG_SYS_FLASH_BASE
+- *					FREE		256kB
+- * 0x2204_0000	CONFIG_ENV_ADDR
+- *					ENV_AREA	128kB
+- * 0x2206_0000
+- *					FREE
+- * 0x2280_0000	CONFIG_SYS_FLASH_BASE + CONFIG_SYS_FLASH_SIZE
+- *
+- */
+-
+-#ifdef FLASH
+-# define CONFIG_SYS_FLASH_BASE		XILINX_FLASH_START
+-# define CONFIG_SYS_FLASH_SIZE		XILINX_FLASH_SIZE
+-# define CONFIG_SYS_FLASH_CFI		1
+-# define CONFIG_FLASH_CFI_DRIVER	1
+-/* ?empty sector */
+-# define CONFIG_SYS_FLASH_EMPTY_INFO	1
+-/* max number of memory banks */
+-# define CONFIG_SYS_MAX_FLASH_BANKS	1
+-/* max number of sectors on one chip */
+-# define CONFIG_SYS_MAX_FLASH_SECT	512
+-/* hardware flash protection */
+-# define CONFIG_SYS_FLASH_PROTECTION
+-/* use buffered writes (20x faster) */
+-# define	CONFIG_SYS_FLASH_USE_BUFFER_WRITE	1
+-# ifdef	RAMENV
+-#  define CONFIG_ENV_SIZE	0x1000
+-#  define CONFIG_ENV_ADDR	(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SIZE)
+-
+-# else	/* FLASH && !RAMENV */
+-/* 128K(one sector) for env */
+-#  define CONFIG_ENV_SECT_SIZE	0x20000
+-#  define CONFIG_ENV_ADDR \
+-			(CONFIG_SYS_FLASH_BASE + (2 * CONFIG_ENV_SECT_SIZE))
+-#  define CONFIG_ENV_SIZE	0x20000
+-# endif /* FLASH && !RAMBOOT */
+-#else /* !FLASH */
+-
+-#ifdef SPIFLASH
+-# define CONFIG_SYS_SPI_BASE		XILINX_SPI_FLASH_BASEADDR
+-# define CONFIG_SPI			1
+-# define CONFIG_SF_DEFAULT_MODE		SPI_MODE_3
+-# define CONFIG_SF_DEFAULT_SPEED	XILINX_SPI_FLASH_MAX_FREQ
+-# define CONFIG_SF_DEFAULT_CS		XILINX_SPI_FLASH_CS
+-
+-# ifdef	RAMENV
+-#  define CONFIG_ENV_SIZE	0x1000
+-#  define CONFIG_ENV_ADDR	(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SIZE)
+-
+-# else	/* SPIFLASH && !RAMENV */
+-#  define CONFIG_ENV_SPI_MODE		SPI_MODE_3
+-#  define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
+-#  define CONFIG_ENV_SPI_CS		CONFIG_SF_DEFAULT_CS
+-/* 128K(two sectors) for env */
+-#  define CONFIG_ENV_SECT_SIZE	0x10000
+-#  define CONFIG_ENV_SIZE	(2 * CONFIG_ENV_SECT_SIZE)
+-/* Warning: adjust the offset in respect of other flash content and size */
+-#  define CONFIG_ENV_OFFSET	(128 * CONFIG_ENV_SECT_SIZE) /* at 8MB */
+-# endif /* SPIFLASH && !RAMBOOT */
+-#else /* !SPIFLASH */
+-
+-/* ENV in RAM */
+-# define CONFIG_ENV_SIZE	0x1000
+-# define CONFIG_ENV_ADDR	(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SIZE)
+-#endif /* !SPIFLASH */
+-#endif /* !FLASH */
+-
+-#if defined(XILINX_USE_ICACHE)
+-# define CONFIG_ICACHE
+-#else
+-# undef CONFIG_ICACHE
+-#endif
+-
+-#if defined(XILINX_USE_DCACHE)
+-# define CONFIG_DCACHE
+-#else
+-# undef CONFIG_DCACHE
+-#endif
+-
+-#ifndef XILINX_DCACHE_BYTE_SIZE
+-#define XILINX_DCACHE_BYTE_SIZE	32768
+-#endif
+-
+-/*
+- * BOOTP options
+- */
++#define CONFIG_SYS_BAUDRATE_TABLE  { 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400 }
++
++/* processor - microblaze_0 */
++#define XILINX_USE_MSR_INSTR	1
++#define XILINX_USE_ICACHE	1
++#define XILINX_USE_DCACHE	1
++#define XILINX_DCACHE_BYTE_SIZE	16384
++#define XILINX_PVR	2
++#define MICROBLAZE_V5
++#define CONFIG_CMD_IRQ
++#define CONFIG_DCACHE
++#define CONFIG_ICACHE
++
++/* main_memory - ddr3_sdram */
++
++
++/* uart - rs232_uart */
++#define CONFIG_SYS_NS16550_COM1	((XILINX_UART16550_BASEADDR & ~0xF) + 0x1000)
++#define CONFIG_SYS_NS16550_REG_SIZE	-4
++#define CONSOLE_ARG	"console=console=ttyS0,115200\0"
++#define CONFIG_SYS_NS16550_SERIAL
++#define CONFIG_CONS_INDEX	1
++#define ESERIAL0	"eserial0=setenv stdout eserial0;setenv stdin eserial0\0"
++#define SERIAL_MULTI  "serial=setenv stdout serial;setenv stdin serial\0"
++#define CONFIG_SYS_NS16550_CLK	200000000
++#define CONFIG_BAUDRATE	115200
++
++/* ethernet - axi_ethernet */
++#define CONFIG_PHY_XILINX
++#define CONFIG_MII
++#define CONFIG_PHY_MARVELL
++#define CONFIG_PHY_NATSEMI
++#define CONFIG_NET_MULTI
++#define CONFIG_PHY_REALTEK
++#define CONFIG_NETCONSOLE	1
++#define CONFIG_SERVERIP	172.25.229.115
++#define CONFIG_IPADDR
++
++/* nor_flash - linear_flash */
++#define CONFIG_SYS_FLASH_BASE	0x60000000
++#define CONFIG_FLASH_END	0x68000000
++#define CONFIG_SYS_MAX_FLASH_SECT	2048
++#define CONFIG_SYS_FLASH_PROTECTION
++#define CONFIG_SYS_FLASH_EMPTY_INFO
++#define CONFIG_SYS_FLASH_CFI
++#define CONFIG_FLASH_CFI_DRIVER
++#define CONFIG_SYS_FLASH_USE_BUFFER_WRITE
++#define CONFIG_SYS_MAX_FLASH_BANKS	1
++
++/* timer - axi_timer_0 */
++
++/* gpio - reset_gpio */
++#define XILINX_GPIO_BASEADDR	0x40000000
++#define CONFIG_SYS_GPIO_0_ADDR	0x40000000
++#define CONFIG_XILINX_GPIO
++
++/* intc - microblaze_0_axi_intc */
++
++/* FPGA */
++
++/* Memory testing handling */
++#define CONFIG_SYS_MEMTEST_START	0x80000000
++#define CONFIG_SYS_MEMTEST_END	(0x80000000 + 0x1000)
++#define CONFIG_SYS_LOAD_ADDR	0x80000000 /* default load address */
++
++/* global pointer options */
++#define CONFIG_SYS_GBL_DATA_OFFSET	(0x40000000 - GENERATED_GBL_DATA_SIZE)
++
++/* Size of malloc() pool */
++#define SIZE	0x100000
++#define CONFIG_SYS_MALLOC_LEN	SIZE
++#define CONFIG_SYS_MONITOR_LEN	SIZE
++#define CONFIG_SYS_MONITOR_BASE	(0x80000000 + CONFIG_SYS_GBL_DATA_OFFSET - CONFIG_SYS_MONITOR_LEN - GENERATED_BD_INFO_SIZE)
++#define CONFIG_SYS_MALLOC_BASE	(CONFIG_SYS_MONITOR_BASE - CONFIG_SYS_MALLOC_LEN)
++
++/* stack */
++#define CONFIG_SYS_INIT_SP_OFFSET	(CONFIG_SYS_TEXT_BASE - CONFIG_SYS_MALLOC_F_LEN)
++
++/* No of_control support yet*/
++
++/* BOOTP options */
++#define CONFIG_BOOTP_SERVERIP
+ #define CONFIG_BOOTP_BOOTFILESIZE
+ #define CONFIG_BOOTP_BOOTPATH
+ #define CONFIG_BOOTP_GATEWAY
+ #define CONFIG_BOOTP_HOSTNAME
++#define CONFIG_BOOTP_MAY_FAIL
++#define CONFIG_BOOTP_DNS
++#define CONFIG_BOOTP_SUBNETMASK
++#define CONFIG_BOOTP_PXE
+ 
+-#if defined(CONFIG_CMD_JFFS2)
+-# define CONFIG_MTD_PARTITIONS
+-#endif
+-
+-#if defined(CONFIG_CMD_UBI)
+-# define CONFIG_MTD_PARTITIONS
+-#endif
+-
+-#if defined(CONFIG_MTD_PARTITIONS)
+-/* MTD partitions */
+-#define CONFIG_MTD_DEVICE	/* needed for mtdparts commands */
+-#define CONFIG_FLASH_CFI_MTD
+-
+-/* default mtd partition table */
+-#endif
+-
+-/* size of console buffer */
+-#define	CONFIG_SYS_CBSIZE	512
+-/* max number of command args */
+-#define	CONFIG_SYS_MAXARGS	15
+-#define	CONFIG_SYS_LONGHELP
+-/* default load address */
+-#define	CONFIG_SYS_LOAD_ADDR	0
+-
+-#define	CONFIG_HOSTNAME		XILINX_BOARD_NAME
+-#define	CONFIG_BOOTCOMMAND	"base 0;tftp 11000000 image.img;bootm"
+-
+-/* architecture dependent code */
+-#define	CONFIG_SYS_USR_EXCEP	/* user exception */
+-
+-#define	CONFIG_PREBOOT	"echo U-BOOT for ${hostname};setenv preboot;echo"
+-
+-#ifndef CONFIG_EXTRA_ENV_SETTINGS
+-#define	CONFIG_EXTRA_ENV_SETTINGS	"unlock=yes\0" \
+-					"nor0=flash-0\0"\
+-					"mtdparts=mtdparts=flash-0:"\
+-					"256k(u-boot),256k(env),3m(kernel),"\
+-					"1m(romfs),1m(cramfs),-(jffs2)\0"\
+-					"nc=setenv stdout nc;"\
+-					"setenv stdin nc\0" \
+-					"serial=setenv stdout serial;"\
+-					"setenv stdin serial\0"
+-#endif
+-
++/*Command line configuration.*/
+ #define CONFIG_CMDLINE_EDITING
++#define CONFIG_AUTO_COMPLETE
+ 
+-/* Enable flat device tree support */
+-#define CONFIG_LMB		1
+-
+-#if defined(CONFIG_XILINX_AXIEMAC)
+-# define CONFIG_MII		1
+-# define CONFIG_SYS_FAULT_ECHO_LINK_DOWN	1
+-#else
+-# undef CONFIG_MII
+-#endif
+-
+-/* SPL part */
+-#define CONFIG_SPL_FRAMEWORK
++/* Miscellaneous configurable options */
++#define CONFIG_SYS_CBSIZE	2048/* Console I/O Buffer Size      */
++#define CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
++#define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
+ 
+-#ifdef CONFIG_SYS_FLASH_BASE
+-# define CONFIG_SYS_UBOOT_BASE		CONFIG_SYS_FLASH_BASE
+-#endif
+-
+-/* for booting directly linux */
+ 
+-#define CONFIG_SYS_FDT_BASE		(CONFIG_SYS_FLASH_BASE + \
+-					 0x40000)
+-#define CONFIG_SYS_FDT_SIZE		(16<<10)
+-#define CONFIG_SYS_SPL_ARGS_ADDR	(CONFIG_SYS_TEXT_BASE + \
+-					 0x1000000)
++/* Use the HUSH parser */
++#define CONFIG_SYS_PROMPT_HUSH_PS2 "> "
+ 
+-/* SP location before relocation, must use scratch RAM */
+-/* BRAM start */
+-#define CONFIG_SYS_INIT_RAM_ADDR	0x0
+-/* BRAM size - will be generated */
+-#define CONFIG_SYS_INIT_RAM_SIZE	0x100000
++#define CONFIG_ENV_VARS_UBOOT_CONFIG
++#define CONFIG_ENV_OVERWRITE	/* Allow to overwrite the u-boot environment variables */
+ 
+-# define CONFIG_SPL_STACK_ADDR		(CONFIG_SYS_INIT_RAM_ADDR + \
+-					 CONFIG_SYS_INIT_RAM_SIZE - \
+-					 CONFIG_SYS_MALLOC_F_LEN)
++#define CONFIG_LMB
+ 
+-/* Just for sure that there is a space for stack */
+-#define CONFIG_SPL_STACK_SIZE		0x100
++/* FDT support */
++#define CONFIG_DISPLAY_BOARDINFO_LATE
+ 
+-#define CONFIG_SYS_UBOOT_START		CONFIG_SYS_TEXT_BASE
+ 
+-#define CONFIG_SPL_MAX_FOOTPRINT	(CONFIG_SYS_INIT_RAM_SIZE - \
+-					 CONFIG_SYS_INIT_RAM_ADDR - \
+-					 CONFIG_SYS_MALLOC_F_LEN - \
+-					 CONFIG_SPL_STACK_SIZE)
++/* architecture dependent code */
++#define CONFIG_SYS_USR_EXCEP    /* user exception */
++#define CONFIG_SYS_HZ   1000
++
++/* Boot Argument Buffer Size */
++#define CONFIG_SYS_MAXARGS     32      /* max number of command args */
++#define CONFIG_SYS_LONGHELP
++/* Initial memory map for Linux */
++#define CONFIG_SYS_BOOTMAPSZ 0x8000000
++
++/* Environment settings*/
++#define CONFIG_ENV_ADDR	0x60b80000
++#define CONFIG_ENV_SIZE	0x20000
++#define CONFIG_ENV_SECT_SIZE	0x20000
++/* PREBOOT */
++#define CONFIG_PREBOOT	"echo U-BOOT for ${hostname};setenv preboot; echo; dhcp"
++
++/* Extra U-Boot Env settings */
++#define CONFIG_EXTRA_ENV_SETTINGS \
++	SERIAL_MULTI \ 
++	CONSOLE_ARG \ 
++	ESERIAL0 \ 
++	"nc=setenv stdout nc;setenv stdin nc;\0" \ 
++	"ethaddr=00:0a:35:00:22:01\0" \
++	"autoload=no\0" \ 
++	"sdbootdev=0\0" \ 
++	"clobstart=0x81000000\0" \ 
++	"netstart=0x81000000\0" \ 
++	"dtbnetstart=0x82800000\0" \ 
++	"loadaddr=0x81000000\0" \ 
++	"bootsize=0x80000\0" \ 
++	"bootstart=0x60b00000\0" \ 
++	"boot_img=u-boot-s.bin\0" \ 
++	"load_boot=tftpboot ${clobstart} ${boot_img}\0" \ 
++	"update_boot=setenv img boot; setenv psize ${bootsize}; setenv installcmd \"install_boot\"; run load_boot test_img; setenv img; setenv psize; setenv installcmd\0" \ 
++	"install_boot=protect off ${bootstart} +${bootsize} && erase ${bootstart} +${bootsize} && "  "cp.b ${clobstart} ${bootstart} ${filesize}\0" \ 
++	"bootenvsize=0x20000\0" \ 
++	"bootenvstart=0x60b80000\0" \ 
++	"eraseenv=protect off ${bootenvstart} +${bootenvsize} && erase ${bootenvstart} +${bootenvsize}\0" \ 
++	"kernelsize=0xc00000\0" \ 
++	"kernelstart=0x60ba0000\0" \ 
++	"kernel_img=image.ub\0" \ 
++	"load_kernel=tftpboot ${clobstart} ${kernel_img}\0" \ 
++	"update_kernel=setenv img kernel; setenv psize ${kernelsize}; setenv installcmd \"install_kernel\"; run load_kernel test_crc; setenv img; setenv psize; setenv installcmd\0" \ 
++	"install_kernel=protect off ${kernelstart} +${kernelsize} && erase ${kernelstart} +${kernelsize} && "  "cp.b ${clobstart} ${kernelstart} ${filesize}\0" \ 
++	"cp_kernel2ram=cp.b ${kernelstart} ${netstart} ${kernelsize}\0" \ 
++	"fpgasize=0xb00000\0" \ 
++	"fpgastart=0x60000000\0" \ 
++	"fpga_img=system.bit.bin\0" \ 
++	"load_fpga=tftpboot ${clobstart} ${fpga_img}\0" \ 
++	"update_fpga=setenv img fpga; setenv psize ${fpgasize}; setenv installcmd \"install_fpga\"; run load_fpga test_img; setenv img; setenv psize; setenv installcmd\0" \ 
++	"install_fpga=protect off ${fpgastart} +${fpgasize} && erase ${fpgastart} +${fpgasize} && "  "cp.b ${clobstart} ${fpgastart} ${filesize}\0" \ 
++	"fault=echo ${img} image size is greater than allocated place - partition ${img} is NOT UPDATED\0" \ 
++	"test_crc=if imi ${clobstart}; then run test_img; else echo ${img} Bad CRC - ${img} is NOT UPDATED; fi\0" \ 
++	"test_img=setenv var \"if test ${filesize} -gt ${psize}\\; then run fault\\; else run ${installcmd}\\; fi\"; run var; setenv var\0" \ 
++	"netboot=tftpboot ${netstart} ${kernel_img} && bootm\0" \ 
++	"default_bootcmd=run cp_kernel2ram && bootm ${netstart}\0" \ 
++""
++/* BOOTCOMMAND */
++#define CONFIG_BOOTCOMMAND	"run default_bootcmd"
+ 
+-#endif	/* __CONFIG_H */
++#endif
+-- 
+2.7.4
+

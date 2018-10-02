@@ -1,0 +1,81 @@
+From 927ef228dfedf229dc915b273a308ab2c7bf9e19 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Mon, 28 Aug 2017 19:53:55 -0700
+Subject: [PATCH] Fix relaxation of assembler resolved references
+
+03/2018
+Rebased for binutils 2.30
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandr@xilinx.com>
+
+Upstream-Status: Pending
+
+---
+ bfd/elf32-microblaze.c     | 39 +++++++++++++++++++++++++++++++++++++++
+ gas/config/tc-microblaze.c |  1 +
+ 2 files changed, 40 insertions(+)
+
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index f1808bc..a1d810c 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -1887,6 +1887,45 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	  irelscanend = irelocs + o->reloc_count;
+ 	  for (irelscan = irelocs; irelscan < irelscanend; irelscan++)
+ 	    {
++              if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_NONE)
++                {
++                  unsigned int val;
++
++                  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
++
++                  /* This was a PC-relative instruction that was completely resolved.  */
++                  if (ocontents == NULL)
++                    {
++                      if (elf_section_data (o)->this_hdr.contents != NULL)
++                          ocontents = elf_section_data (o)->this_hdr.contents;
++                      else
++                        {
++                          /* We always cache the section contents.
++                             Perhaps, if info->keep_memory is FALSE, we
++                             should free them, if we are permitted to.  */
++
++                          if (o->rawsize == 0)
++                              o->rawsize = o->size;
++                          ocontents = (bfd_byte *) bfd_malloc (o->rawsize);
++                          if (ocontents == NULL)
++                              goto error_return;
++                          if (!bfd_get_section_contents (abfd, o, ocontents,
++                                                         (file_ptr) 0,
++                                                         o->rawsize))
++                              goto error_return;
++                          elf_section_data (o)->this_hdr.contents = ocontents;
++                        }
++                    }
++
++                  irelscan->r_addend -= calc_fixup (irelscan->r_addend
++                                                    + isym->st_value, sec);
++                  val = bfd_get_32 (abfd, ocontents + irelscan->r_offset);
++                  microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
++                                                     irelscan->r_addend);
++              }
++              if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_64_NONE) {
++                  fprintf(stderr, "Unhandled NONE 64\n");
++              }
+ 	      if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)
+ 		{
+ 		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 42dd7ae..50dbfc7 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -2183,6 +2183,7 @@ md_apply_fix (fixS *   fixP,
+       else
+ 	fixP->fx_r_type = BFD_RELOC_NONE;
+       fixP->fx_addsy = section_symbol (absolute_section);
++      fixP->fx_done = 0;
+     }
+   return;
+ }

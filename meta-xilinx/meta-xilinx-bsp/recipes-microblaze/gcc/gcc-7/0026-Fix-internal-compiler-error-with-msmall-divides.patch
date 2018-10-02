@@ -1,0 +1,42 @@
+From 2149d85f1f7375dd97bf961b2bdb693d6d931c13 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Sat, 26 Aug 2017 19:21:46 -0700
+Subject: [PATCH] Fix internal compiler error with msmall-divides
+
+This patch will fix the internal error microblaze_expand_divide function
+which comes because of rtx PLUS where the mem_rtx is of type SI and the
+operand is of type QImode. This patch modifies the mem_rtx as QImode and
+Plus as QImode to fix the error.
+
+ChangeLog:
+
+2016-02-23  Nagaraju Mekala  <nagaraju.mekala@xilinx.com>
+            Ajit Agarwal  <ajitkum@xilinx.com>
+
+	* microblaze.c (microblaze_expand_divide): Update
+
+Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+Signed-off-by: Ajit Agarwal <ajitkum@xilinx.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Pending
+---
+ gcc/config/microblaze/microblaze.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 96bf6e1cab..a41121264e 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -3719,7 +3719,7 @@ microblaze_expand_divide (rtx operands[])
+   emit_insn (gen_ashlsi3_bshift (regt1, operands[1], GEN_INT(4)));
+   emit_insn (gen_addsi3 (regt1, regt1, operands[2]));
+   mem_rtx = gen_rtx_MEM (QImode,
+-                            gen_rtx_PLUS (Pmode, regt1, div_table_rtx));
++                            gen_rtx_PLUS (QImode, regt1, div_table_rtx));
+ 
+   insn = emit_insn (gen_zero_extendqisi2(operands[0],mem_rtx));
+   jump = emit_jump_insn_after (gen_jump (div_end_label), insn); 
+-- 
+2.14.2
+

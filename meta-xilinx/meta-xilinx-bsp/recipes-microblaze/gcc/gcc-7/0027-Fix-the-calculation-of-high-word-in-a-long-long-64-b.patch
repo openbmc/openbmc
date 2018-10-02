@@ -1,0 +1,48 @@
+From 34049c9fcaa256befad032cbcd8aa74beecf13dc Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Sat, 26 Aug 2017 19:21:47 -0700
+Subject: [PATCH] Fix the calculation of high word in a long long 64-bit
+
+This patch will change the calculation of high word in a long long 64-bit.
+Earlier to this patch the high word of long long word (0xF0000000ULL) is
+coming to be 0xFFFFFFFF and low word is 0xF0000000. Instead the high word
+should be 0x00000000 and the low word should be 0xF0000000. This patch
+removes the condition of checking high word = 0 & low word < 0.
+This check is not required for the correctness of calculating 32-bit high
+and low words in a 64-bit long long.
+
+ChangeLog:
+
+2016-03-01  Nagaraju Mekala  <nagaraju.mekala@xilinx.com>
+            Ajit Agarwal  <ajitkum@xilinx.com>
+
+	* config/microblaze/microblaze.c (print_operand): Remove the
+	  condition of checking high word = 0 & low word < 0.
+	* testsuite/gcc.target/microblaze/others/long.c: Add -O0 option.
+
+Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+Signed-off-by: Ajit Agarwal <ajitkum@xilinx.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Pending
+---
+ gcc/config/microblaze/microblaze.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index a41121264e..2ed64971fb 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2509,9 +2509,6 @@ print_operand (FILE * file, rtx op, int letter)
+         {
+ 	  val[0] = (INTVAL (op) & 0xffffffff00000000LL) >> 32;
+ 	  val[1] = INTVAL (op) & 0x00000000ffffffffLL;
+-	  if (val[0] == 0 && val[1] < 0)
+-	    val[0] = -1;
+-	    
+         }
+       fprintf (file, "0x%8.8lx", (letter == 'h') ? val[0] : val[1]);
+     }
+-- 
+2.14.2
+

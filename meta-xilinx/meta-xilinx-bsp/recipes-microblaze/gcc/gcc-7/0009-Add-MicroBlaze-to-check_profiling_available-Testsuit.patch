@@ -1,0 +1,32 @@
+From 23a04c06c2a689fed151eeb94c45ea9b512036ae Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Sat, 26 Aug 2017 19:21:23 -0700
+Subject: [PATCH] Add MicroBlaze to check_profiling_available Testsuite
+
+Add MicroBlaze to check_profiling_available Testsuite, add
+microblaze*-*-* target in check_profiling_available inline with other
+archs setting profiling_available_saved to 0
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Pending
+---
+ gcc/testsuite/lib/target-supports.exp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
+index b0f510e596..fffb690e49 100644
+--- a/gcc/testsuite/lib/target-supports.exp
++++ b/gcc/testsuite/lib/target-supports.exp
+@@ -625,6 +625,7 @@ proc check_profiling_available { test_what } {
+ 	     || [istarget m68k-*-elf]
+ 	     || [istarget m68k-*-uclinux*]
+ 	     || [istarget mips*-*-elf*]
++	     || [istarget microblaze*-*-*]
+ 	     || [istarget mmix-*-*]
+ 	     || [istarget mn10300-*-elf*]
+ 	     || [istarget moxie-*-elf*]
+-- 
+2.14.2
+

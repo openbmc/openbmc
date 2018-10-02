@@ -1,0 +1,11 @@
+define KMACHINE microblaze
+define KTYPE tiny
+define KARCH microblaze
+
+include ktypes/tiny/tiny.scc
+
+include bsp/xilinx/soc/microblaze.scc
+
+# Common board drivers
+include bsp/xilinx/board-common.scc
+

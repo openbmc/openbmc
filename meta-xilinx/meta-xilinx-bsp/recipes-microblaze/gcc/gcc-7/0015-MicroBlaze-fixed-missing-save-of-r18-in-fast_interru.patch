@@ -1,0 +1,46 @@
+From 79ea36649467aea6045a49c7d016f8f9245efb8c Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Sat, 26 Aug 2017 19:21:29 -0700
+Subject: [PATCH] MicroBlaze fixed missing save of r18 in fast_interrupt
+
+Fixed missing save of r18 in fast_interrupt. Register 18 is used as a
+clobber register, and must be stored when entering a fast_interrupt.
+Before this fix, register 18 was only saved if it was used directly in
+the interrupt function.
+
+However, if the fast_interrupt function called a function that used
+r18, the register would not be saved, and thus be mangled
+upon returning from the interrupt.
+
+Changelog
+
+2014-02-27  Klaus Petersen <klauspetersen@gmail.com>
+
+ * gcc/config/microblaze/microblaze.c: Check for fast_interrupt in
+   microblaze_must_save_register.
+
+Signed-off-by: Klaus Petersen <klauspetersen@gmail.com>
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Pending
+---
+ gcc/config/microblaze/microblaze.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 15080db539..558796cad9 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -1943,7 +1943,7 @@ microblaze_must_save_register (int regno)
+     {
+       if (df_regs_ever_live_p (regno) 
+ 	  || regno == MB_ABI_MSR_SAVE_REG
+-	  || (interrupt_handler
++	  || ((interrupt_handler || fast_interrupt)
+               && (regno == MB_ABI_ASM_TEMP_REGNUM
+ 	          || regno == MB_ABI_EXCEPTION_RETURN_ADDR_REGNUM)))
+ 	return 1;
+-- 
+2.14.2
+

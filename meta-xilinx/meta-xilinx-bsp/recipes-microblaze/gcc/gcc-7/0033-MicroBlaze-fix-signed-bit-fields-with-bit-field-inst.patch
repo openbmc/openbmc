@@ -1,0 +1,51 @@
+From e2a7a582945d24ede55393462a3360f377f45478 Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Sun, 5 Nov 2017 23:03:54 +1000
+Subject: [PATCH] MicroBlaze fix signed bit fields with bit field instructions
+
+The 'extv' definition is expected to sign extended the result based on
+the width of the bit field.
+
+  https://gcc.gnu.org/onlinedocs/gccint/Standard-Names.html#index-extvm-instruction-pattern
+
+The MicroBlaze 'bsefi' instruction does not sign extended, it zero
+extends. There is no option for the instruction to sign extended the
+result and no simple instruction or expression to implement a variant
+length sign extend (only sext8/sext16 instructions exist).
+
+As such these definitions needs to be changed to the zero extended
+variant of 'extv' which is 'extzv'. This change updates the existing
+definitions to allow for signed bit fields to function correctly and be
+sign extended.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Pending
+---
+ gcc/config/microblaze/microblaze.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index ef53c3069e..b52be42d6e 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -2476,7 +2476,7 @@
+   DONE;
+ }")
+ 
+-(define_expand "extvsi"
++(define_expand "extzvsi"
+   [(set (match_operand:SI 0 "register_operand" "r")
+ 	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
+ 			 (match_operand:SI 2 "immediate_operand" "I")
+@@ -2485,7 +2485,7 @@
+ ""
+ )
+ 
+-(define_insn "extv_32"
++(define_insn "extzv_32"
+   [(set (match_operand:SI 0 "register_operand" "=r")
+ 	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
+ 			 (match_operand:SI 2 "immediate_operand" "I")
+-- 
+2.14.2
+

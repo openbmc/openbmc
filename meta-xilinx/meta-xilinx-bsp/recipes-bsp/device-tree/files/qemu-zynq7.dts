@@ -1,0 +1,85 @@
+/dts-v1/;
+/include/ "zynq-7000.dtsi"
+/include/ "zynq-7000-qspi-dummy.dtsi"
+
+/ {
+	model = "Zynq A9 QEMU";
+	compatible = "qemu,xilinx-zynq-a9", "xlnx,zynq-7000";
+
+	aliases {
+		ethernet0 = &gem0;
+		serial0 = &uart1;
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x40000000>;
+	};
+
+	chosen {
+		bootargs = "earlyprintk";
+		stdout-path = "serial0:115200n8";
+	};
+};
+
+&amba {
+	/* Setup a fixed 25 MHz clock (100Mbps) to trick the ethernet driver */
+	fixednetclk: clock {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <25000000>;
+	};
+};
+
+&gem0 {
+	status = "okay";
+	clocks = <&clkc 30>, <&clkc 30>, <&fixednetclk>, <&fixednetclk>, <&clkc 30>;
+	phy-mode = "rgmii-id";
+	phy-handle = <&ethernet_phy>;
+
+	ethernet_phy: ethernet-phy@23 {
+		device_type = "ethernet-phy";
+		reg = <23>;
+	};
+};
+
+&sdhci0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&qspi {
+	status = "okay";
+	is-dual = <1>;
+	primary_flash: ps7-qspi@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "st,m25p80";
+		reg = <0x0>;
+		spi-max-frequency = <50000000>;
+		partition@0x00000000 {
+			label = "boot";
+			reg = <0x00000000 0x00500000>;
+		};
+		partition@0x00500000 {
+			label = "bootenv";
+			reg = <0x00500000 0x00020000>;
+		};
+		partition@0x00520000 {
+			label = "config";
+			reg = <0x00520000 0x00020000>;
+		};
+		partition@0x00540000 {
+			label = "image";
+			reg = <0x00540000 0x00a80000>;
+		};
+		partition@0x00fc0000 {
+			label = "spare";
+			reg = <0x00fc0000 0x00000000>;
+		};
+	};
+};
+

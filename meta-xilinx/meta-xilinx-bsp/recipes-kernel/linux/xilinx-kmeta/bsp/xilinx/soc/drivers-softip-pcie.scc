@@ -1,0 +1,5 @@
+define KFEATURE_DESCRIPTION "Xilinx AXI PCIe Host Bridge"
+define KFEATURE_COMPATIBILITY board
+
+kconfig hardware drivers-softip-pcie.cfg
+

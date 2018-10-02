@@ -1,0 +1,90 @@
+From e67e20ec6ff0c9720d87844270421453c738066a Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Thu, 16 Feb 2017 12:15:58 -0800
+Subject: [PATCH 5/9] linux/mali_kernel_linux.c: Handle clock when probed and
+ removed
+
+This patch will handle the clock through clock
+specifier for GPU PP0 and PP1.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream Status: Inappropriate [Xilinx specific]
+---
+ .../src/devicedrv/mali/linux/mali_kernel_linux.c   | 40 +++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_kernel_linux.c b/driver/src/devicedrv/mali/linux/mali_kernel_linux.c
+index d7893a3..f15fb56 100644
+--- linux/mali_kernel_linux.c
++++ b/linux/mali_kernel_linux.c
+@@ -45,6 +45,14 @@
+ #if defined(CONFIG_MALI400_INTERNAL_PROFILING)
+ #include "mali_profiling_internal.h"
+ #endif
++
++#if defined(CONFIG_ARCH_ZYNQMP)
++/* Initialize variables for clocks */
++struct clk *clk_gpu;
++struct clk *clk_gpu_pp0;
++struct clk *clk_gpu_pp1;
++#endif
++
+ #if defined(CONFIG_MALI400_PROFILING) && defined(CONFIG_MALI_DVFS)
+ #include "mali_osk_profiling.h"
+ #include "mali_dvfs_policy.h"
+@@ -580,7 +588,23 @@ static int mali_probe(struct platform_device *pdev)
+ 	}
+ #endif
+ 
+-
++#if defined(CONFIG_ARCH_ZYNQMP)
++	/* Initialize clocks for GPU and PP */
++	clk_gpu = devm_clk_get(&pdev->dev, "gpu");
++	if (IS_ERR(clk_gpu))
++		return PTR_ERR(clk_gpu);
++	clk_prepare_enable(clk_gpu);
++
++	clk_gpu_pp0 = devm_clk_get(&pdev->dev, "gpu_pp0");
++	if (IS_ERR(clk_gpu_pp0))
++		return PTR_ERR(clk_gpu_pp0);
++	clk_prepare_enable(clk_gpu_pp0);
++
++	clk_gpu_pp1 = devm_clk_get(&pdev->dev, "gpu_pp1");
++	if (IS_ERR(clk_gpu_pp1))
++		return PTR_ERR(clk_gpu_pp1);
++	clk_prepare_enable(clk_gpu_pp1);
++#endif
+ 	if (_MALI_OSK_ERR_OK == _mali_osk_wq_init()) {
+ 		/* Initialize the Mali GPU HW specified by pdev */
+ 		if (_MALI_OSK_ERR_OK == mali_initialize_subsystems()) {
+@@ -608,6 +632,12 @@ static int mali_probe(struct platform_device *pdev)
+ 		_mali_osk_wq_term();
+ 	}
+ 
++#if defined(CONFIG_ARCH_ZYNQMP)
++	clk_disable_unprepare(clk_gpu);
++	clk_disable_unprepare(clk_gpu_pp0);
++	clk_disable_unprepare(clk_gpu_pp1);
++#endif
++
+ #ifdef CONFIG_MALI_DEVFREQ
+ 	mali_devfreq_term(mdev);
+ devfreq_init_failed:
+@@ -673,6 +703,14 @@ static int mali_remove(struct platform_device *pdev)
+ 	mali_platform_device_deinit(mali_platform_device);
+ #endif
+ 	mali_platform_device = NULL;
++
++#if defined(CONFIG_ARCH_ZYNQMP)
++	/* Remove clock */
++	clk_disable_unprepare(clk_gpu);
++	clk_disable_unprepare(clk_gpu_pp0);
++	clk_disable_unprepare(clk_gpu_pp1);
++#endif
++
+ 	return 0;
+ }
+ 
+-- 
+2.7.4
+

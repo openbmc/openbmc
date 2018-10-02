@@ -1,0 +1,15 @@
+define KMACHINE zynqmp
+define KTYPE standard
+define KARCH arm64
+
+include ktypes/standard/standard.scc
+
+include bsp/xilinx/soc/zynqmp.scc
+include bsp/xilinx/board-common.scc
+
+include features/input/input.scc
+include cfg/usb-mass-storage.scc
+
+# default policy for standard kernels
+#include features/latencytop/latencytop.scc
+#include features/profiling/profiling.scc

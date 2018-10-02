@@ -1,0 +1,9 @@
+define KMACHINE zynqmp
+define KTYPE tiny
+define KARCH arm64
+
+include ktypes/tiny/tiny.scc
+
+include bsp/xilinx/soc/zynqmp.scc
+include bsp/xilinx/board-common.scc
+

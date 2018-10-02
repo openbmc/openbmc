@@ -1,0 +1,10 @@
+define KFEATURE_DESCRIPTION "Xilinx Zynq UltraScale+ MPSoC"
+define KFEATURE_COMPATIBILITY board
+
+include features/net/net.scc
+include cfg/timer/no_hz.scc
+
+kconf hardware zynqmp.cfg
+kconf hardware drivers-zynqmp.cfg
+include bsp/xilinx/soc/drivers-softip.scc
+

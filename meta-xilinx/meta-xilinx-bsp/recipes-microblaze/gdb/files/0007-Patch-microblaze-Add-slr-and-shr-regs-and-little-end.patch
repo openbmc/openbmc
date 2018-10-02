@@ -1,0 +1,82 @@
+From fb2af2fffb673dbb14d743c8da94c4a83b71c792 Mon Sep 17 00:00:00 2001
+From: David Holsgrove <david.holsgrove@xilinx.com>
+Date: Mon, 26 Nov 2012 17:39:17 +1000
+Subject: [PATCH 07/16] [Patch, microblaze]: Add slr and shr regs and
+ little-endian breakpoint
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Upstream-Status: Pending
+---
+ gdb/microblaze-tdep.c             | 10 ++++++++--
+ gdb/microblaze-tdep.h             |  6 ++++--
+ gdb/regformats/reg-microblaze.dat |  2 ++
+ 3 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 1c6dbfe..0ce4947 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -73,7 +73,8 @@ static const char *microblaze_register_names[] =
+   "rpc",  "rmsr", "rear", "resr", "rfsr", "rbtr",
+   "rpvr0", "rpvr1", "rpvr2", "rpvr3", "rpvr4", "rpvr5", "rpvr6",
+   "rpvr7", "rpvr8", "rpvr9", "rpvr10", "rpvr11",
+-  "redr", "rpid", "rzpr", "rtlbx", "rtlbsx", "rtlblo", "rtlbhi"
++  "redr", "rpid", "rzpr", "rtlbx", "rtlbsx", "rtlblo", "rtlbhi",
++  "rslr", "rshr"
+ };
+ 
+ #define MICROBLAZE_NUM_REGS ARRAY_SIZE (microblaze_register_names)
+@@ -201,10 +202,15 @@ static const gdb_byte *
+ microblaze_breakpoint_from_pc (struct gdbarch *gdbarch, CORE_ADDR *pc, 
+ 			       int *len)
+ {
++  enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
+   static gdb_byte break_insn[] = MICROBLAZE_BREAKPOINT;
++  static gdb_byte break_insn_le[] = MICROBLAZE_BREAKPOINT_LE;
+ 
+   *len = sizeof (break_insn);
+-  return break_insn;
++  if (byte_order == BFD_ENDIAN_BIG)
++    return break_insn;
++  else
++    return break_insn_le;
+ }
+ 
+ /* Allocate and initialize a frame cache.  */
+diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
+index 98aa0f5..cd32e9f 100644
+--- a/gdb/microblaze-tdep.h
++++ b/gdb/microblaze-tdep.h
+@@ -56,7 +56,7 @@ struct microblaze_frame_cache
+   int fp_regnum;
+ 
+   /* Offsets to saved registers.  */
+-  int register_offsets[57];	/* Must match MICROBLAZE_NUM_REGS.  */
++  int register_offsets[59];	/* Must match MICROBLAZE_NUM_REGS.  */
+ 
+   /* Table of saved registers.  */
+   struct trad_frame_saved_reg *saved_regs;
+@@ -121,7 +121,9 @@ enum microblaze_regnum
+   MICROBLAZE_RTLBX_REGNUM,
+   MICROBLAZE_RTLBSX_REGNUM,
+   MICROBLAZE_RTLBLO_REGNUM,
+-  MICROBLAZE_RTLBHI_REGNUM
++  MICROBLAZE_RTLBHI_REGNUM,
++  MICROBLAZE_SLR_REGNUM,
++  MICROBLAZE_SHR_REGNUM
+ };
+ 
+ /* All registers are 32 bits.  */
+diff --git a/gdb/regformats/reg-microblaze.dat b/gdb/regformats/reg-microblaze.dat
+index a5dd0a0..bd8a438 100644
+--- a/gdb/regformats/reg-microblaze.dat
++++ b/gdb/regformats/reg-microblaze.dat
+@@ -37,3 +37,5 @@ expedite:r1,pc
+ 32:ear
+ 32:esr
+ 32:fsr
++32:slr
++32:shr
+-- 
+1.9.0
+

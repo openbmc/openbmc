@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable Xilinx V4L2 support"
+define KFEATURE_COMPATIBILITY board
+
+kconfig hardware v4l2-xilinx.cfg

@@ -1,0 +1,42 @@
+From 12cd383fbef719cc1a84cc80ff171073409a8557 Mon Sep 17 00:00:00 2001
+From: eager <eager@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Sat, 27 May 2017 18:29:40 +0000
+Subject: [PATCH] 	Revert: 	2016-01-21  Ajit Agarwal 
+ <ajitkum@xilinx.com>
+
+	See https://gcc.gnu.org/ml/gcc/2017-05/msg00221.html.
+
+	* config/microblaze/microblaze.h
+	(FIXED_REGISTERS): Update in macro.
+	(CALL_USED_REGISTERS): Update in macro.
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@248540 138bc75d-0d04-0410-961f-82ee72b054a4
+Upstream-Status: Backport [from post gcc-7]
+---
+ gcc/config/microblaze/microblaze.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 66e4ef5c3d..2c9ece1d6c 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -269,14 +269,14 @@ extern enum pipeline_type microblaze_pipe;
+ #define FIXED_REGISTERS							\
+ {									\
+   1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,			\
+-  1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			\
++  1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			\
+   1, 1, 1, 1 								\
+ }
+ 
+ #define CALL_USED_REGISTERS						\
+ {									\
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,			\
+-  1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			\
++  1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			\
+   1, 1, 1, 1								\
+ }
+ #define GP_REG_FIRST    0
+-- 
+2.14.2
+

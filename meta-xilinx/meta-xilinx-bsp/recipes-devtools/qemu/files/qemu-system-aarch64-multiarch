@@ -1,0 +1,32 @@
+#!/bin/bash
+
+BINPATH=$(dirname $0)
+MACHINE_PATH=$(mktemp -d)
+
+APU_ARGS=
+PMU_ARGS=
+
+while [ ! -z "$1" ]; do
+	if [ "$1" = "-pmu-args" ]; then
+		PMU_ARGS+=" $2"
+		shift
+	else
+		APU_ARGS+=" $1"
+	fi
+	shift
+done
+
+PMU_ROM=$(last=; for i in $PMU_ARGS; do if [ "$last" = "-kernel" ]; then echo "$i"; break; fi; last=$i; done)
+if [ ! -e $PMU_ROM ]; then
+	echo "------"
+	echo "Error: Missing PMU ROM - $PMU_ROM"
+	echo "    See 'meta-xilinx/README.qemu.md' for more information on accquiring the PMU ROM."
+	echo "------"
+	exit 255
+fi
+
+# start the PMU instance
+$BINPATH/qemu-system-microblazeel $PMU_ARGS -machine-path $MACHINE_PATH &
+# start the APU instance
+$BINPATH/qemu-system-aarch64 $APU_ARGS -machine-path $MACHINE_PATH
+

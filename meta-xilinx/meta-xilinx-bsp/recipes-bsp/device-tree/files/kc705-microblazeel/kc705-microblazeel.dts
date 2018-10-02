@@ -1,0 +1,56 @@
+/dts-v1/;
+/include/ "pl.dtsi"
+/include/ "system-conf.dtsi"
+/ {
+	hard-reset-gpios = <&reset_gpio 0 1>;
+	aliases {
+		ethernet0 = &axi_ethernet;
+		i2c0 = &iic_main;
+		serial0 = &rs232_uart;
+	};
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x40000000>;
+	};
+};
+
+&iic_main {
+	i2cswitch@74 {
+		compatible = "nxp,pca9548";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x74>;
+		i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+			si570: clock-generator@5d {
+				#clock-cells = <0>;
+				compatible = "silabs,si570";
+				temperature-stability = <50>;
+				reg = <0x5d>;
+				factory-fout = <156250000>;
+				clock-frequency = <148500000>;
+			};
+		};
+		i2c@3 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <3>;
+			eeprom@54 {
+				compatible = "at,24c08";
+				reg = <0x54>;
+			};
+		};
+	};
+};
+
+&axi_ethernet {
+	phy-handle = <&phy0>;
+	axi_ethernet_mdio: mdio {
+		phy0: phy@7 {
+			device_type = "ethernet-phy";
+			reg = <7>;
+		};
+	};
+};

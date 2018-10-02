@@ -1,0 +1,48 @@
+From 478de18bf513ecad419d25981e7b66c78126752c Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Tue, 5 Dec 2017 09:58:36 -0800
+Subject: [PATCH 9/9] mali_memory_swap_alloc.c: Rename global_page_state with
+ global_zone_page_state
+
+Refer Kernel commit c41f012ade0b95b0a6e25c7150673e0554736165
+Which simply renames without any functional changes
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream-Status: Pending
+---
+ driver/src/devicedrv/mali/linux/mali_memory_swap_alloc.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_memory_swap_alloc.c b/driver/src/devicedrv/mali/linux/mali_memory_swap_alloc.c
+index a54faca..e122b4c 100644
+--- linux/mali_memory_swap_alloc.c
++++ b/linux/mali_memory_swap_alloc.c
+@@ -248,7 +248,11 @@ static void mali_mem_swap_swapped_bkend_pool_shrink(_mali_mem_swap_pool_shrink_t
+ 	}
+ 
+ 	/* Get system free pages number. */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++	system_free_size = global_zone_page_state(NR_FREE_PAGES) * PAGE_SIZE;
++#else
+ 	system_free_size = global_page_state(NR_FREE_PAGES) * PAGE_SIZE;
++#endif
+ 	last_gpu_utilization = _mali_ukk_utilization_gp_pp();
+ 
+ 	if ((last_gpu_utilization < gpu_utilization_threshold_value)
+@@ -575,8 +579,12 @@ int mali_mem_swap_alloc_pages(mali_mem_swap *swap_mem, u32 size, u32 *bkend_idx)
+ 
+ 		list_add_tail(&m_page->list, &swap_mem->pages);
+ 	}
+-
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++	system_free_size = global_zone_page_state(NR_FREE_PAGES) * PAGE_SIZE;
++#else
+ 	system_free_size = global_page_state(NR_FREE_PAGES) * PAGE_SIZE;
++#endif
++
+ 
+ 	if ((system_free_size < mali_mem_swap_out_threshold_value)
+ 	    && (mem_backend_swapped_pool_size > (mali_mem_swap_out_threshold_value >> 2))
+-- 
+2.7.4
+

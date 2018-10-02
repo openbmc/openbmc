@@ -1,0 +1,31 @@
+From 58e2c55176f1a146781430b2a570c8ce5f80d426 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Mon, 28 Aug 2017 09:40:37 -0700
+Subject: [PATCH] common/mali_pm.c: Add PM runtime barrier after removing
+ suspend
+
+Runtime PM suspend "put" results in addition of PM suspend
+API in work queue. This barrier API will remove it from
+the work queue.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream-Status: Pending
+---
+ driver/src/devicedrv/mali/common/mali_pm.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/driver/src/devicedrv/mali/common/mali_pm.c b/driver/src/devicedrv/mali/common/mali_pm.c
+index 858c689..62a1e5f 100644
+--- common/mali_pm.c
++++ b/common/mali_pm.c
+@@ -301,6 +301,7 @@ void mali_pm_init_end(void)
+ 	}
+ 
+ 	_mali_osk_pm_dev_ref_put();
++	_mali_osk_pm_dev_barrier();
+ }
+ 
+ void mali_pm_update_sync(void)
+-- 
+2.7.4
+

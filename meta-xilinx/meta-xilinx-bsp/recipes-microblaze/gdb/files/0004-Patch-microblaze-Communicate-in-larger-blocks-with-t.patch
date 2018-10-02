@@ -1,0 +1,67 @@
+From 26e124f0d78233b1d976bd4b787f6a7866bcb7e7 Mon Sep 17 00:00:00 2001
+From: nagaraju <nmekala@xilix.com>
+Date: Wed, 4 Jan 2012 16:59:33 +0530
+Subject: [PATCH 04/16] [Patch, microblaze]: Communicate in larger blocks with
+ the target
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+Upstream-Status: Pending
+---
+ gdb/microblaze-tdep.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 36cf1ca..76e87b3 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -242,6 +242,10 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+   int flags = 0;
+   int save_hidden_pointer_found = 0;
+   int non_stack_instruction_found = 0;
++  int n_insns;
++  unsigned long *insn_block;
++  gdb_byte *buf_block;
++  int ti, tj;
+ 
+   /* Find the start of this function.  */
+   find_pc_partial_function (pc, &name, &func_addr, &func_end);
+@@ -281,9 +285,23 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+ 		    name, paddress (gdbarch, func_addr), 
+ 		    paddress (gdbarch, stop));
+ 
++/* Do a block read to minimize the transaction with the Debug Agent */
++  n_insns = (stop == func_addr) ? 1 : ((stop - func_addr) / INST_WORD_SIZE);
++  insn_block = (unsigned long *)calloc(n_insns, sizeof(unsigned long));
++  buf_block = (gdb_byte *)calloc(n_insns * INST_WORD_SIZE, sizeof(gdb_byte));
++
++  target_read_memory (func_addr, buf_block, n_insns * INST_WORD_SIZE );
++
++  for(ti = 0; ti < n_insns; ti++){
++         insn_block[ti] = 0;
++         for( tj = ti * INST_WORD_SIZE; tj < (ti + 1) * INST_WORD_SIZE; tj++ )
++                 insn_block[ti] = (insn_block[ti] << 8) | buf_block[tj];
++  }
++
+   for (addr = func_addr; addr < stop; addr += INST_WORD_SIZE)
+     {
+-      insn = microblaze_fetch_instruction (addr);
++     //insn = microblaze_fetch_instruction (addr);
++      insn = insn_block[(addr - func_addr) / INST_WORD_SIZE];
+       op = microblaze_decode_insn (insn, &rd, &ra, &rb, &imm);
+       microblaze_debug ("%s %08lx\n", paddress (gdbarch, pc), insn);
+ 
+@@ -409,8 +427,9 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+      part of the prologue.  */
+   if (save_hidden_pointer_found)
+     prologue_end_addr -= INST_WORD_SIZE;
+-
+-  return prologue_end_addr;
++    free(insn_block);
++    free(buf_block);
++    return prologue_end_addr;
+ }
+ 
+ static CORE_ADDR
+-- 
+1.9.0
+

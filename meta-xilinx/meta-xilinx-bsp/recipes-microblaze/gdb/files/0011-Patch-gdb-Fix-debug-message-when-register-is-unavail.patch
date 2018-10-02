@@ -1,0 +1,43 @@
+From a05fb34192727fc1b63c827ed006ddde846ce6b8 Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan.rossi@petalogix.com>
+Date: Tue, 8 May 2012 18:11:17 +1000
+Subject: [PATCH 11/16] [Patch, gdb]: Fix debug message when register is
+ unavailable
+
+Signed-off-by: Nathan Rossi <nathan.rossi@xilinx.com>
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Upstream-Status: Pending
+---
+ gdb/frame.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/gdb/frame.c b/gdb/frame.c
+index 013d602..4d0766f 100644
+--- a/gdb/frame.c
++++ b/gdb/frame.c
+@@ -1134,12 +1134,19 @@ frame_unwind_register_value (struct frame_info *frame, int regnum)
+ 	  else
+ 	    {
+ 	      int i;
+-	      const gdb_byte *buf = value_contents (value);
++	      const gdb_byte *buf = NULL;
++	      if (value_entirely_available(value)) {
++	        buf = value_contents (value);
++	      }
+ 
+ 	      fprintf_unfiltered (gdb_stdlog, " bytes=");
+ 	      fprintf_unfiltered (gdb_stdlog, "[");
+-	      for (i = 0; i < register_size (gdbarch, regnum); i++)
+-		fprintf_unfiltered (gdb_stdlog, "%02x", buf[i]);
++	      if (buf != NULL) {
++	        for (i = 0; i < register_size (gdbarch, regnum); i++)
++		  fprintf_unfiltered (gdb_stdlog, "%02x", buf[i]);
++	      } else {
++	        fprintf_unfiltered (gdb_stdlog, "unavailable");
++	      }
+ 	      fprintf_unfiltered (gdb_stdlog, "]");
+ 	    }
+ 	}
+-- 
+1.9.0
+

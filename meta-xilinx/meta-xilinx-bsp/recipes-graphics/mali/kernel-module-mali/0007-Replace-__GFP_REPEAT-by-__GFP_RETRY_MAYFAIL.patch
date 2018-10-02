@@ -1,0 +1,54 @@
+From a8190cd3b346633016d1c0096ef73e0e1ceef438 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Tue, 5 Dec 2017 09:25:15 -0800
+Subject: [PATCH 7/9] Replace __GFP_REPEAT by __GFP_RETRY_MAYFAIL
+
+Refer kernel patch dcda9b04713c3f6ff0875652924844fae28286ea
+which replaces with a useful semantic
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream-Status: Pending
+---
+ driver/src/devicedrv/mali/linux/mali_memory_os_alloc.c  | 4 ++++
+ driver/src/devicedrv/mali/linux/mali_osk_notification.c | 7 ++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_memory_os_alloc.c b/driver/src/devicedrv/mali/linux/mali_memory_os_alloc.c
+index 5fe1270..1602371 100644
+--- linux/mali_memory_os_alloc.c
++++ b/linux/mali_memory_os_alloc.c
+@@ -202,7 +202,11 @@ int mali_mem_os_alloc_pages(mali_mem_os_mem *os_mem, u32 size)
+ 	/* Allocate new pages, if needed. */
+ 	for (i = 0; i < remaining; i++) {
+ 		dma_addr_t dma_addr;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++		gfp_t flags = __GFP_ZERO | __GFP_RETRY_MAYFAIL | __GFP_NOWARN | __GFP_COLD;
++#else
+ 		gfp_t flags = __GFP_ZERO | __GFP_REPEAT | __GFP_NOWARN | __GFP_COLD;
++#endif
+ 		int err;
+ 
+ #if defined(CONFIG_ARM) && !defined(CONFIG_ARM_LPAE)
+diff --git a/driver/src/devicedrv/mali/linux/mali_osk_notification.c b/driver/src/devicedrv/mali/linux/mali_osk_notification.c
+index b22fe68..d0c302a 100644
+--- linux/mali_osk_notification.c
++++ b/linux/mali_osk_notification.c
+@@ -55,9 +55,14 @@ _mali_osk_notification_t *_mali_osk_notification_create(u32 type, u32 size)
+ {
+ 	/* OPT Recycling of notification objects */
+ 	_mali_osk_notification_wrapper_t *notification;
+-
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
++	notification = (_mali_osk_notification_wrapper_t *)kmalloc(sizeof(_mali_osk_notification_wrapper_t) + size,
++			GFP_KERNEL | __GFP_HIGH | __GFP_RETRY_MAYFAIL);
++#else
+ 	notification = (_mali_osk_notification_wrapper_t *)kmalloc(sizeof(_mali_osk_notification_wrapper_t) + size,
+ 			GFP_KERNEL | __GFP_HIGH | __GFP_REPEAT);
++#endif
++
+ 	if (NULL == notification) {
+ 		MALI_DEBUG_PRINT(1, ("Failed to create a notification object\n"));
+ 		return NULL;
+-- 
+2.7.4
+

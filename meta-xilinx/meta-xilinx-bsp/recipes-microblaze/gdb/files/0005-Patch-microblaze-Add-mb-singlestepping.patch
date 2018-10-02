@@ -1,0 +1,200 @@
+From 5c3a08f407e1cbee5b0a4ca6092165b97acddda5 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar@axis.com>
+Date: Fri, 24 Feb 2012 11:52:30 +0100
+Subject: [PATCH 05/16] [Patch, microblaze]: Add mb singlestepping.
+
+Fix prologue analysis for little-endian.
+Always provide a frame base.
+
+Signed-off-by: Edgar E. Iglesias <edgar@axis.com>
+Upstream-Status: Pending
+---
+ gdb/microblaze-tdep.c | 123 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 108 insertions(+), 15 deletions(-)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 76e87b3..50b68d2 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -243,9 +243,7 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+   int save_hidden_pointer_found = 0;
+   int non_stack_instruction_found = 0;
+   int n_insns;
+-  unsigned long *insn_block;
+-  gdb_byte *buf_block;
+-  int ti, tj;
++  unsigned int *insn_block;
+ 
+   /* Find the start of this function.  */
+   find_pc_partial_function (pc, &name, &func_addr, &func_end);
+@@ -287,23 +285,16 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+ 
+ /* Do a block read to minimize the transaction with the Debug Agent */
+   n_insns = (stop == func_addr) ? 1 : ((stop - func_addr) / INST_WORD_SIZE);
+-  insn_block = (unsigned long *)calloc(n_insns, sizeof(unsigned long));
+-  buf_block = (gdb_byte *)calloc(n_insns * INST_WORD_SIZE, sizeof(gdb_byte));
++  insn_block = calloc(n_insns, sizeof(unsigned long));
+ 
+-  target_read_memory (func_addr, buf_block, n_insns * INST_WORD_SIZE );
+-
+-  for(ti = 0; ti < n_insns; ti++){
+-         insn_block[ti] = 0;
+-         for( tj = ti * INST_WORD_SIZE; tj < (ti + 1) * INST_WORD_SIZE; tj++ )
+-                 insn_block[ti] = (insn_block[ti] << 8) | buf_block[tj];
+-  }
++  target_read_memory (func_addr, (void*) insn_block, n_insns * INST_WORD_SIZE );
+ 
+   for (addr = func_addr; addr < stop; addr += INST_WORD_SIZE)
+     {
+      //insn = microblaze_fetch_instruction (addr);
+       insn = insn_block[(addr - func_addr) / INST_WORD_SIZE];
+       op = microblaze_decode_insn (insn, &rd, &ra, &rb, &imm);
+-      microblaze_debug ("%s %08lx\n", paddress (gdbarch, pc), insn);
++      microblaze_debug ("%s %08lx op=%x r%d r%d imm=%d\n", paddress (gdbarch, addr), insn, op, rd, ra, imm);
+ 
+       /* This code is very sensitive to what functions are present in the
+ 	 prologue.  It assumes that the (addi, addik, swi, sw) can be the 
+@@ -428,7 +419,6 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+   if (save_hidden_pointer_found)
+     prologue_end_addr -= INST_WORD_SIZE;
+     free(insn_block);
+-    free(buf_block);
+     return prologue_end_addr;
+ }
+ 
+@@ -502,6 +492,7 @@ microblaze_frame_cache (struct frame_info *next_frame, void **this_cache)
+ 
+   func = get_frame_func (next_frame);
+ 
++  cache->base = get_frame_register_unsigned (next_frame, gdbarch_sp_regnum (gdbarch));
+   cache->pc = get_frame_address_in_block (next_frame);
+ 
+   return cache;
+@@ -518,7 +509,7 @@ microblaze_frame_this_id (struct frame_info *next_frame, void **this_cache,
+   if (cache->base == 0)
+     return;
+ 
+-  (*this_id) = frame_id_build (cache->base, cache->pc);
++  (*this_id) = frame_id_build (cache->base, get_frame_pc (next_frame));
+ }
+ 
+ static struct value *
+@@ -661,6 +652,107 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
+   return (TYPE_LENGTH (type) == 16);
+ }
+ 
++int
++microblaze_software_single_step (struct frame_info *frame)
++{
++  struct gdbarch *arch = get_frame_arch (frame);
++  struct address_space *aspace = get_frame_address_space (frame);
++  struct gdbarch_tdep *tdep = gdbarch_tdep (arch);
++  static char le_breakp[] = MICROBLAZE_BREAKPOINT_LE;
++  static char be_breakp[] = MICROBLAZE_BREAKPOINT;
++  enum bfd_endian byte_order = gdbarch_byte_order (arch);
++  char *breakp = byte_order == BFD_ENDIAN_BIG ? be_breakp : le_breakp;
++  int ret = 0;
++
++  /* Save the address and the values of the next_pc and the target */
++  static struct sstep_breaks
++  {
++    CORE_ADDR address;
++    bfd_boolean valid;
++    /* Shadow contents.  */
++    char data[INST_WORD_SIZE];
++  } stepbreaks[2];
++  int ii;
++
++  if (1)
++    {
++      CORE_ADDR pc;
++      long insn;
++      enum microblaze_instr minstr;
++      bfd_boolean isunsignednum;
++      enum microblaze_instr_type insn_type;
++      short delay_slots;
++      int imm;
++      bfd_boolean immfound = FALSE;
++
++      /* Set a breakpoint at the next instruction */
++      /* If the current instruction is an imm, set it at the inst after */
++      /* If the instruction has a delay slot, skip the delay slot */
++      pc = get_frame_pc (frame);
++      insn = microblaze_fetch_instruction (pc);
++      minstr = get_insn_microblaze (insn, &isunsignednum, &insn_type, &delay_slots);
++      if (insn_type == immediate_inst)
++	{
++	  int rd, ra, rb;
++	  immfound = TRUE;
++	  minstr = microblaze_decode_insn (insn, &rd, &ra, &rb, &imm);
++	  pc = pc + INST_WORD_SIZE;
++	  insn = microblaze_fetch_instruction (pc);
++	  minstr = get_insn_microblaze (insn, &isunsignednum, &insn_type, &delay_slots);
++	}
++      stepbreaks[0].address = pc + (delay_slots * INST_WORD_SIZE) + INST_WORD_SIZE;
++      if (insn_type != return_inst) {
++	stepbreaks[0].valid = TRUE;
++      } else {
++	stepbreaks[0].valid = FALSE;
++      }
++
++      microblaze_debug ("single-step insn_type=%x insn=%x\n", insn_type, insn);
++      /* Now check for branch or return instructions */
++      if (insn_type == branch_inst || insn_type == return_inst) {
++	int limm;
++	int lrd, lra, lrb;
++	int ra, rb;
++	bfd_boolean targetvalid;
++	bfd_boolean unconditionalbranch;
++	microblaze_decode_insn(insn, &lrd, &lra, &lrb, &limm);
++	if (lra >= 0 && lra < MICROBLAZE_NUM_REGS)
++	  ra = get_frame_register_unsigned (frame, lra);
++	else
++	  ra = 0;
++	if (lrb >= 0 && lrb < MICROBLAZE_NUM_REGS)
++	  rb = get_frame_register_unsigned (frame, lrb);
++	else
++	  rb = 0;
++	stepbreaks[1].address = microblaze_get_target_address (insn, immfound, imm, pc, ra, rb, &targetvalid, &unconditionalbranch);
++        microblaze_debug ("single-step uncondbr=%d targetvalid=%d target=%x\n", unconditionalbranch, targetvalid, stepbreaks[1].address);
++	if (unconditionalbranch)
++	  stepbreaks[0].valid = FALSE; /* This is a unconditional branch: will not come to the next address */
++	if (targetvalid && (stepbreaks[0].valid == FALSE ||
++			    (stepbreaks[0].address != stepbreaks[1].address))
++	                && (stepbreaks[1].address != pc)) {
++	  stepbreaks[1].valid = TRUE;
++	} else {
++	  stepbreaks[1].valid = FALSE;
++	}
++      } else {
++	stepbreaks[1].valid = FALSE;
++      }
++
++      /* Insert the breakpoints */
++      for (ii = 0; ii < 2; ++ii)
++        {
++
++          /* ignore invalid breakpoint. */
++          if (stepbreaks[ii].valid) {
++            insert_single_step_breakpoint (arch, aspace, stepbreaks[ii].address);
++            ret = 1;
++	  }
++	}
++    }
++    return ret;
++}
++
+ static void
+ microblaze_write_pc (struct regcache *regcache, CORE_ADDR pc)
+ {
+@@ -809,6 +901,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
+ 
+   set_gdbarch_breakpoint_from_pc (gdbarch, microblaze_breakpoint_from_pc);
++  set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
+ 
+   set_gdbarch_frame_args_skip (gdbarch, 8);
+ 
+-- 
+1.9.0
+

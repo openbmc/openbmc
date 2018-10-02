@@ -1,0 +1,553 @@
+From 2112c9ded01ddd08f0e31e5ce23eecac6c04e8c4 Mon Sep 17 00:00:00 2001
+From: David Holsgrove <david.holsgrove@petalogix.com>
+Date: Mon, 6 Feb 2012 10:28:29 +1000
+Subject: [PATCH 06/16] [Patch, microblaze]: Add initial port of linux
+ gdbserver
+
+add gdb_proc_service_h to gdbserver microblaze-linux
+
+gdbserver needs to initialise the microblaze registers
+
+other archs use this step to run a *_arch_setup() to carry out all
+architecture specific setup - may need to add in future
+
+ * add linux-ptrace.o to gdbserver configure
+ * gdb/configure.tgt: Set build_gdbserver=yes
+ * Update breakpoint opcode
+ * fix segfault on connecting gdbserver
+ * add microblaze_linux_memory_remove_breakpoint
+ * add set_solib_svr4_fetch_link_map_offsets
+ * add set_gdbarch_fetch_tls_load_module_address
+ * Force reading of r0 as 0, prevent stores
+
+Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
+Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
+Upstream-Status: Pending
+---
+ gdb/configure.host                   |   3 +
+ gdb/configure.tgt                    |   1 +
+ gdb/gdbserver/Makefile.in            |   4 +
+ gdb/gdbserver/configure.srv          |   6 +
+ gdb/gdbserver/linux-microblaze-low.c | 228 +++++++++++++++++++++++++++++++++++
+ gdb/microblaze-linux-tdep.c          |  25 +++-
+ gdb/microblaze-tdep.c                |  45 ++++++-
+ gdb/microblaze-tdep.h                |   3 +-
+ gdb/regformats/reg-microblaze.dat    |  39 ++++++
+ 9 files changed, 348 insertions(+), 6 deletions(-)
+ create mode 100644 gdb/gdbserver/linux-microblaze-low.c
+ create mode 100644 gdb/regformats/reg-microblaze.dat
+
+diff --git a/gdb/configure.host b/gdb/configure.host
+index 15a8288..76cc5fe 100644
+--- a/gdb/configure.host
++++ b/gdb/configure.host
+@@ -59,6 +59,7 @@ i[34567]86*)		gdb_host_cpu=i386 ;;
+ m68*)			gdb_host_cpu=m68k ;;
+ m88*)			gdb_host_cpu=m88k ;;
+ mips*)			gdb_host_cpu=mips ;;
++microblaze*)		gdb_host_cpu=microblaze ;;
+ powerpc* | rs6000)	gdb_host_cpu=powerpc ;;
+ sparcv9 | sparc64)	gdb_host_cpu=sparc ;;
+ s390*)			gdb_host_cpu=s390 ;;
+@@ -133,6 +134,8 @@ mips*-*-netbsd* | mips*-*-knetbsd*-gnu)
+ 			gdb_host=nbsd ;;
+ mips64*-*-openbsd*)	gdb_host=obsd64 ;;
+ 
++microblaze*-*linux*)    gdb_host=linux ;;
++
+ powerpc-*-aix* | rs6000-*-* | powerpc64-*-aix*)
+ 			gdb_host=aix ;;
+ powerpc*-*-freebsd*)	gdb_host=fbsd ;;
+diff --git a/gdb/configure.tgt b/gdb/configure.tgt
+index 9297c56..3a7951a 100644
+--- a/gdb/configure.tgt
++++ b/gdb/configure.tgt
+@@ -343,6 +343,7 @@ microblaze*-linux-*|microblaze*-*-linux*)
+ 	gdb_target_obs="microblaze-tdep.o microblaze-linux-tdep.o microblaze-rom.o glibc-tdep.o \
+ 			monitor.o dsrec.o solib-svr4.o symfile-mem.o linux-tdep.o"
+ 	gdb_sim=../sim/microblaze/libsim.a
++	build_gdbserver=yes
+ 	;;
+ microblaze*-*-*)
+ 	# Target: Xilinx MicroBlaze running standalone
+diff --git a/gdb/gdbserver/Makefile.in b/gdb/gdbserver/Makefile.in
+index f773fa2..a11ace1 100644
+--- a/gdb/gdbserver/Makefile.in
++++ b/gdb/gdbserver/Makefile.in
+@@ -148,6 +148,7 @@ SFILES=	$(srcdir)/gdbreplay.c $(srcdir)/inferiors.c $(srcdir)/dll.c \
+ 	$(srcdir)/linux-ia64-low.c $(srcdir)/linux-low.c \
+ 	$(srcdir)/linux-m32r-low.c \
+ 	$(srcdir)/linux-m68k-low.c $(srcdir)/linux-mips-low.c \
++	$(srcdir)/linux-microblaze-low.c \
+ 	$(srcdir)/linux-nios2-low.c \
+ 	$(srcdir)/linux-ppc-low.c \
+ 	$(srcdir)/linux-s390-low.c \
+@@ -329,6 +330,7 @@ clean:
+ 	rm -f arm-with-iwmmxt.c
+ 	rm -f arm-with-vfpv2.c arm-with-vfpv3.c arm-with-neon.c
+ 	rm -f mips-linux.c mips64-linux.c
++	rm -f microblaze-linux.c
+ 	rm -f nios2-linux.c
+ 	rm -f powerpc-32.c powerpc-32l.c powerpc-64l.c powerpc-e500l.c
+ 	rm -f powerpc-altivec32l.c powerpc-cell32l.c powerpc-vsx32l.c
+@@ -612,6 +614,8 @@ reg-m68k.c : $(srcdir)/../regformats/reg-m68k.dat $(regdat_sh)
+ 	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/reg-m68k.dat reg-m68k.c
+ reg-cf.c : $(srcdir)/../regformats/reg-cf.dat $(regdat_sh)
+ 	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/reg-cf.dat reg-cf.c
++microblaze-linux.c : $(srcdir)/../regformats/reg-microblaze.dat $(regdat_sh)
++	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/reg-microblaze.dat microblaze-linux.c
+ mips-linux.c : $(srcdir)/../regformats/mips-linux.dat $(regdat_sh)
+ 	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/mips-linux.dat mips-linux.c
+ mips-dsp-linux.c : $(srcdir)/../regformats/mips-dsp-linux.dat $(regdat_sh)
+diff --git a/gdb/gdbserver/configure.srv b/gdb/gdbserver/configure.srv
+index cc4f53d..359c756 100644
+--- a/gdb/gdbserver/configure.srv
++++ b/gdb/gdbserver/configure.srv
+@@ -198,6 +198,12 @@ case "${target}" in
+ 			srv_linux_usrregs=yes
+ 			srv_linux_thread_db=yes
+ 			;;
++  microblaze*-*-linux*)	srv_regobj=microblaze-linux.o
++			srv_tgtobj="$srv_linux_obj linux-microblaze-low.o"
++			srv_linux_usrregs=yes
++			srv_linux_regsets=yes
++			srv_linux_thread_db=yes
++			;;
+   nios2*-*-linux*)	srv_regobj="nios2-linux.o"
+ 			srv_tgtobj="$srv_linux_obj linux-nios2-low.o"
+ 			srv_xmlfiles="nios2-linux.xml"
+diff --git a/gdb/gdbserver/linux-microblaze-low.c b/gdb/gdbserver/linux-microblaze-low.c
+new file mode 100644
+index 0000000..279df9f
+--- /dev/null
++++ b/gdb/gdbserver/linux-microblaze-low.c
+@@ -0,0 +1,228 @@
++/* GNU/Linux/Microblaze specific low level interface, for the remote server for
++   GDB.
++   Copyright (C) 1995-2013 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++#include "server.h"
++#include "linux-low.h"
++
++#include <asm/ptrace.h>
++#include <sys/procfs.h>
++#include <sys/ptrace.h>
++
++#include "gdb_proc_service.h"
++
++static int microblaze_regmap[] =
++ {PT_GPR(0),     PT_GPR(1),     PT_GPR(2),     PT_GPR(3),
++  PT_GPR(4),     PT_GPR(5),     PT_GPR(6),     PT_GPR(7),
++  PT_GPR(8),     PT_GPR(9),     PT_GPR(10),    PT_GPR(11),
++  PT_GPR(12),    PT_GPR(13),    PT_GPR(14),    PT_GPR(15),
++  PT_GPR(16),    PT_GPR(17),    PT_GPR(18),    PT_GPR(19),
++  PT_GPR(20),    PT_GPR(21),    PT_GPR(22),    PT_GPR(23),
++  PT_GPR(24),    PT_GPR(25),    PT_GPR(26),    PT_GPR(27),
++  PT_GPR(28),    PT_GPR(29),    PT_GPR(30),    PT_GPR(31),
++  PT_PC,         PT_MSR,        PT_EAR,        PT_ESR,
++  PT_FSR
++  };
++
++#define microblaze_num_regs (sizeof microblaze_regmap / sizeof microblaze_regmap[0])
++
++/* Defined in auto-generated file microblaze-linux.c.  */
++void init_registers_microblaze (void);
++extern const struct target_desc *tdesc_microblaze;
++
++static int
++microblaze_cannot_store_register (int regno)
++{
++  if (microblaze_regmap[regno] == -1 || regno == 0)
++    return 1;
++
++  return 0;
++}
++
++static int
++microblaze_cannot_fetch_register (int regno)
++{
++  return 0;
++}
++
++static CORE_ADDR
++microblaze_get_pc (struct regcache *regcache)
++{
++  unsigned long pc;
++
++  collect_register_by_name (regcache, "pc", &pc);
++  return (CORE_ADDR) pc;
++}
++
++static void
++microblaze_set_pc (struct regcache *regcache, CORE_ADDR pc)
++{
++  unsigned long newpc = pc;
++
++  supply_register_by_name (regcache, "pc", &newpc);
++}
++
++/* dbtrap insn */
++/* brki r16, 0x18; */
++static const unsigned long microblaze_breakpoint = 0xba0c0018;
++#define microblaze_breakpoint_len 4
++
++static int
++microblaze_breakpoint_at (CORE_ADDR where)
++{
++  unsigned long insn;
++
++  (*the_target->read_memory) (where, (unsigned char *) &insn, 4);
++  if (insn == microblaze_breakpoint)
++    return 1;
++  /* If necessary, recognize more trap instructions here.  GDB only uses the
++     one.  */
++  return 0;
++}
++
++static CORE_ADDR
++microblaze_reinsert_addr (struct regcache *regcache)
++{
++  unsigned long pc;
++  collect_register_by_name (regcache, "r15", &pc);
++  return pc;
++}
++
++#ifdef HAVE_PTRACE_GETREGS
++
++static void
++microblaze_collect_ptrace_register (struct regcache *regcache, int regno, char *buf)
++{
++  int size = register_size (regcache->tdesc, regno);
++
++  memset (buf, 0, sizeof (long));
++
++  if (size < sizeof (long))
++    collect_register (regcache, regno, buf + sizeof (long) - size);
++  else
++    collect_register (regcache, regno, buf);
++}
++
++static void
++microblaze_supply_ptrace_register (struct regcache *regcache,
++			    int regno, const char *buf)
++{
++  int size = register_size (regcache->tdesc, regno);
++
++  if (regno == 0) {
++    unsigned long regbuf_0 = 0;
++    /* clobbering r0 so that it is always 0 as enforced by hardware */
++    supply_register (regcache, regno, (const char*)&regbuf_0);
++  } else {
++      if (size < sizeof (long))
++        supply_register (regcache, regno, buf + sizeof (long) - size);
++      else
++        supply_register (regcache, regno, buf);
++  }
++}
++
++/* Provide only a fill function for the general register set.  ps_lgetregs
++   will use this for NPTL support.  */
++
++static void microblaze_fill_gregset (struct regcache *regcache, void *buf)
++{
++  int i;
++
++  for (i = 0; i < 32; i++)
++    microblaze_collect_ptrace_register (regcache, i, (char *) buf + microblaze_regmap[i]);
++}
++
++static void
++microblaze_store_gregset (struct regcache *regcache, const void *buf)
++{
++  int i;
++
++  for (i = 0; i < 32; i++)
++    supply_register (regcache, i, (char *) buf + microblaze_regmap[i]);
++}
++
++#endif /* HAVE_PTRACE_GETREGS */
++
++static struct regset_info microblaze_regsets[] = {
++#ifdef HAVE_PTRACE_GETREGS
++  { PTRACE_GETREGS, PTRACE_SETREGS, 0, sizeof (elf_gregset_t), GENERAL_REGS, microblaze_fill_gregset, microblaze_store_gregset },
++  { 0, 0, 0, -1, -1, NULL, NULL },
++#endif /* HAVE_PTRACE_GETREGS */
++  { 0, 0, 0, -1, -1, NULL, NULL }
++};
++
++static struct regsets_info microblaze_regsets_info =
++  {
++    microblaze_regsets, /* regsets */
++    0, /* num_regsets */
++    NULL, /* disabled_regsets */
++  };
++
++static struct usrregs_info microblaze_usrregs_info =
++  {
++    microblaze_num_regs,
++    microblaze_regmap,
++  };
++
++static struct regs_info regs_info =
++  {
++    NULL, /* regset_bitmap */
++    &microblaze_usrregs_info,
++    &microblaze_regsets_info
++  };
++
++static const struct regs_info *
++microblaze_regs_info (void)
++{
++  return &regs_info;
++}
++
++static void
++microblaze_arch_setup (void)
++{
++  current_process ()->tdesc = tdesc_microblaze;
++}
++
++struct linux_target_ops the_low_target = {
++  microblaze_arch_setup,
++  microblaze_regs_info,
++  microblaze_cannot_fetch_register,
++  microblaze_cannot_store_register,
++  NULL, /* fetch_register */
++  microblaze_get_pc,
++  microblaze_set_pc,
++  (const unsigned char *) &microblaze_breakpoint,
++  microblaze_breakpoint_len,
++  microblaze_reinsert_addr,
++  0,
++  microblaze_breakpoint_at,
++  NULL,
++  NULL,
++  NULL,
++  NULL,
++  microblaze_collect_ptrace_register,
++  microblaze_supply_ptrace_register,
++};
++
++void
++initialize_low_arch (void)
++{
++  init_registers_microblaze ();
++
++  initialize_regsets_info (&microblaze_regsets_info);
++}
+\ No newline at end of file
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index 7e6b61b..cf58e21 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
+@@ -38,6 +38,22 @@
+ #include "tramp-frame.h"
+ #include "linux-tdep.h"
+ 
++static int microblaze_debug_flag = 0;
++
++static void
++microblaze_debug (const char *fmt, ...)
++{
++  if (microblaze_debug_flag)
++    {
++       va_list args;
++
++       va_start (args, fmt);
++       printf_unfiltered ("MICROBLAZE LINUX: ");
++       vprintf_unfiltered (fmt, args);
++       va_end (args);
++    }
++}
++
+ static int
+ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch, 
+ 					   struct bp_target_info *bp_tgt)
+@@ -47,20 +63,27 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+   int val;
+   int bplen;
+   gdb_byte old_contents[BREAKPOINT_MAX];
++  struct cleanup *cleanup;
+ 
+   /* Determine appropriate breakpoint contents and size for this address.  */
+   bp = gdbarch_breakpoint_from_pc (gdbarch, &addr, &bplen);
+   if (bp == NULL)
+     error (_("Software breakpoints not implemented for this target."));
+ 
++  /* Make sure we see the memory breakpoints.  */
++  cleanup = make_show_memory_breakpoints_cleanup (1);
+   val = target_read_memory (addr, old_contents, bplen);
+ 
+   /* If our breakpoint is no longer at the address, this means that the
+      program modified the code on us, so it is wrong to put back the
+      old value.  */
+   if (val == 0 && memcmp (bp, old_contents, bplen) == 0)
+-    val = target_write_raw_memory (addr, bp_tgt->shadow_contents, bplen);
++  {
++      val = target_write_raw_memory (addr, bp_tgt->shadow_contents, bplen);
++      microblaze_debug ("microblaze_linux_memory_remove_breakpoint writing back to memory at addr 0x%lx\n", addr);
++  }
+ 
++  do_cleanups (cleanup);
+   return val;
+ }
+ 
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 50b68d2..1c6dbfe 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -164,6 +164,39 @@ microblaze_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
+   return sp;
+ }
+ 
++static int
++microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
++				    struct bp_target_info *bp_tgt)
++{
++  CORE_ADDR addr = bp_tgt->placed_address;
++  const unsigned char *bp;
++  int val;
++  int bplen;
++  gdb_byte old_contents[BREAKPOINT_MAX];
++  struct cleanup *cleanup;
++
++  /* Determine appropriate breakpoint contents and size for this address.  */
++  bp = gdbarch_breakpoint_from_pc (gdbarch, &addr, &bplen);
++  if (bp == NULL)
++    error (_("Software breakpoints not implemented for this target."));
++
++  /* Make sure we see the memory breakpoints.  */
++  cleanup = make_show_memory_breakpoints_cleanup (1);
++  val = target_read_memory (addr, old_contents, bplen);
++
++  /* If our breakpoint is no longer at the address, this means that the
++     program modified the code on us, so it is wrong to put back the
++     old value.  */
++  if (val == 0 && memcmp (bp, old_contents, bplen) == 0)
++  {
++    val = target_write_raw_memory (addr, bp_tgt->shadow_contents, bplen);
++    microblaze_debug ("microblaze_linux_memory_remove_breakpoint writing back to memory at addr 0x%lx\n", addr);
++  }
++
++  do_cleanups (cleanup);
++  return val;
++}
++
+ static const gdb_byte *
+ microblaze_breakpoint_from_pc (struct gdbarch *gdbarch, CORE_ADDR *pc, 
+ 			       int *len)
+@@ -291,8 +324,8 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+ 
+   for (addr = func_addr; addr < stop; addr += INST_WORD_SIZE)
+     {
+-     //insn = microblaze_fetch_instruction (addr);
+-      insn = insn_block[(addr - func_addr) / INST_WORD_SIZE];
++      insn = microblaze_fetch_instruction (addr);
++      //insn = insn_block[(addr - func_addr) / INST_WORD_SIZE];
+       op = microblaze_decode_insn (insn, &rd, &ra, &rb, &imm);
+       microblaze_debug ("%s %08lx op=%x r%d r%d imm=%d\n", paddress (gdbarch, addr), insn, op, rd, ra, imm);
+ 
+@@ -724,13 +757,15 @@ microblaze_software_single_step (struct frame_info *frame)
+ 	  rb = get_frame_register_unsigned (frame, lrb);
+ 	else
+ 	  rb = 0;
++
+ 	stepbreaks[1].address = microblaze_get_target_address (insn, immfound, imm, pc, ra, rb, &targetvalid, &unconditionalbranch);
+-        microblaze_debug ("single-step uncondbr=%d targetvalid=%d target=%x\n", unconditionalbranch, targetvalid, stepbreaks[1].address);
++	microblaze_debug ("single-step uncondbr=%d targetvalid=%d target=%x\n", unconditionalbranch, targetvalid, stepbreaks[1].address);
++
+ 	if (unconditionalbranch)
+ 	  stepbreaks[0].valid = FALSE; /* This is a unconditional branch: will not come to the next address */
+ 	if (targetvalid && (stepbreaks[0].valid == FALSE ||
+ 			    (stepbreaks[0].address != stepbreaks[1].address))
+-	                && (stepbreaks[1].address != pc)) {
++			&& (stepbreaks[1].address != pc)) {
+ 	  stepbreaks[1].valid = TRUE;
+ 	} else {
+ 	  stepbreaks[1].valid = FALSE;
+@@ -900,6 +935,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   /* Stack grows downward.  */
+   set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
+ 
++  set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
++
+   set_gdbarch_breakpoint_from_pc (gdbarch, microblaze_breakpoint_from_pc);
+   set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
+ 
+diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
+index fec24b9..98aa0f5 100644
+--- a/gdb/microblaze-tdep.h
++++ b/gdb/microblaze-tdep.h
+@@ -129,7 +129,8 @@ enum microblaze_regnum
+ 
+ /* MICROBLAZE_BREAKPOINT defines the breakpoint that should be used.
+    Only used for native debugging.  */
+-#define MICROBLAZE_BREAKPOINT {0xb9, 0xcc, 0x00, 0x60}
++#define MICROBLAZE_BREAKPOINT {0xba, 0x0c, 0x00, 0x18}
++#define MICROBLAZE_BREAKPOINT_LE {0x18, 0x00, 0x0c, 0xba}
+ 
+ extern void microblaze_supply_gregset (const struct microblaze_gregset *gregset,
+                                     struct regcache *regcache,
+diff --git a/gdb/regformats/reg-microblaze.dat b/gdb/regformats/reg-microblaze.dat
+new file mode 100644
+index 0000000..a5dd0a0
+--- /dev/null
++++ b/gdb/regformats/reg-microblaze.dat
+@@ -0,0 +1,39 @@
++name:microblaze
++expedite:r1,pc
++32:r0
++32:r1
++32:r2
++32:r3
++32:r4
++32:r5
++32:r6
++32:r7
++32:r8
++32:r9
++32:r10
++32:r11
++32:r12
++32:r13
++32:r14
++32:r15
++32:r16
++32:r17
++32:r18
++32:r19
++32:r20
++32:r21
++32:r22
++32:r23
++32:r24
++32:r25
++32:r26
++32:r27
++32:r28
++32:r29
++32:r30
++32:r31
++32:pc
++32:msr
++32:ear
++32:esr
++32:fsr
+-- 
+1.9.0
+

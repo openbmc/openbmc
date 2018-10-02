@@ -1,0 +1,212 @@
+From f5416ee7ddc6e4853e57ed15fb2bf630de2c3b12 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Sat, 26 Aug 2017 19:21:37 -0700
+Subject: [PATCH] Reducing Stack space for arguments Currently in Microblaze
+ target stack space
+
+Reducing Stack space for arguments Currently in Microblaze target stack
+space for arguments in register is being allocated even if there are no
+arguments in the function. This patch will optimize the extra 24 bytes
+that are being allocated.
+
+ChangeLog:
+2015-04-17  Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+            Ajit Agarwal  <ajitkum@xilinx.com>
+
+    * microblaze.c (microblaze_parm_needs_stack, microblaze_function_parms_need_stack): New
+    * microblaze.c (REG_PARM_STACK_SPACE): Modify
+
+Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+Signed-off-by: Ajit Agarwal <ajitkum@xilinx.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Pending
+---
+ gcc/config/microblaze/microblaze-protos.h |   1 +
+ gcc/config/microblaze/microblaze.c        | 134 +++++++++++++++++++++++++++++-
+ gcc/config/microblaze/microblaze.h        |   4 +-
+ 3 files changed, 136 insertions(+), 3 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
+index b56e052ae4..a1408629cc 100644
+--- a/gcc/config/microblaze/microblaze-protos.h
++++ b/gcc/config/microblaze/microblaze-protos.h
+@@ -57,6 +57,7 @@ extern int symbol_mentioned_p (rtx);
+ extern int label_mentioned_p (rtx);
+ extern bool microblaze_cannot_force_const_mem (machine_mode, rtx);
+ extern void microblaze_eh_return (rtx op0);
++int  microblaze_reg_parm_stack_space(tree fun);
+ #endif  /* RTX_CODE */
+ 
+ /* Declare functions in microblaze-c.c.  */
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index c1b0172bcf..f46dffff0d 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -1965,6 +1965,138 @@ microblaze_must_save_register (int regno)
+   return 0;
+ }
+ 
++static bool
++microblaze_parm_needs_stack (cumulative_args_t args_so_far, tree type)
++{
++  enum machine_mode mode;
++  int unsignedp;
++  rtx entry_parm;
++
++  /* Catch errors.  */
++  if (type == NULL || type == error_mark_node)
++    return true;
++
++  if (TREE_CODE (type) == POINTER_TYPE)
++    return true;
++
++  /* Handle types with no storage requirement.  */
++  if (TYPE_MODE (type) == VOIDmode)
++    return false;
++
++   /* Handle complex types.  */
++  if (TREE_CODE (type) == COMPLEX_TYPE)
++    return (microblaze_parm_needs_stack (args_so_far, TREE_TYPE (type))
++             || microblaze_parm_needs_stack (args_so_far, TREE_TYPE (type)));
++
++  /* Handle transparent aggregates.  */
++ if ((TREE_CODE (type) == UNION_TYPE || TREE_CODE (type) == RECORD_TYPE)
++     && TYPE_TRANSPARENT_AGGR (type))
++  type = TREE_TYPE (first_field (type));
++
++  /* See if this arg was passed by invisible reference.  */
++ if (pass_by_reference (get_cumulative_args (args_so_far),
++                        TYPE_MODE (type), type, true))
++    type = build_pointer_type (type);
++
++    /* Find mode as it is passed by the ABI.  */
++    unsignedp = TYPE_UNSIGNED (type);
++    mode = promote_mode (type, TYPE_MODE (type), &unsignedp);
++
++/* If there is no incoming register, we need a stack.  */
++ entry_parm = microblaze_function_arg (args_so_far, mode, type, true);
++ if (entry_parm == NULL)
++    return true;
++
++ /* Likewise if we need to pass both in registers and on the stack.  */
++ if (GET_CODE (entry_parm) == PARALLEL
++     && XEXP (XVECEXP (entry_parm, 0, 0), 0) == NULL_RTX)
++   return true;
++
++ /* Also true if we're partially in registers and partially not.  */
++  if (function_arg_partial_bytes (args_so_far, mode, type, true) != 0)
++     return true;
++
++ /* Update info on where next arg arrives in registers.  */
++ microblaze_function_arg_advance (args_so_far, mode, type, true);
++ return false;
++ }
++
++static bool
++microblaze_function_parms_need_stack (tree fun, bool incoming)
++{
++  tree fntype, result;
++  CUMULATIVE_ARGS args_so_far_v;
++  cumulative_args_t args_so_far;
++  int num_of_args = 0;
++
++  /* Must be a libcall, all of which only use reg parms.  */
++  if (!fun)
++    return true;
++
++  fntype = fun;
++  if (!TYPE_P (fun))
++    fntype = TREE_TYPE (fun);
++
++  /* Varargs functions need the parameter save area.  */
++  if ((!incoming && !prototype_p (fntype)) || stdarg_p (fntype))
++    return true;
++
++  INIT_CUMULATIVE_ARGS(args_so_far_v, fntype, NULL_RTX,0,0);
++  args_so_far = pack_cumulative_args (&args_so_far_v);
++
++  /* When incoming, we will have been passed the function decl.
++   *      It is necessary to use the decl to handle K&R style functions,
++   *      where TYPE_ARG_TYPES may not be available.  */
++  if (incoming)
++    {
++      gcc_assert (DECL_P (fun));
++      result = DECL_RESULT (fun);
++    }
++  else
++    result = TREE_TYPE (fntype);
++
++  if (result && aggregate_value_p (result, fntype))
++    {
++      if (!TYPE_P (result))
++        result = build_pointer_type (result);
++        microblaze_parm_needs_stack (args_so_far, result);
++    }
++
++  if (incoming)
++    {
++      tree parm;
++      for (parm = DECL_ARGUMENTS (fun);
++           parm && parm != void_list_node;
++           parm = TREE_CHAIN (parm))
++         if (microblaze_parm_needs_stack (args_so_far, TREE_TYPE (parm)))
++           return true;
++    }
++  else
++    {
++      function_args_iterator args_iter;
++      tree arg_type;
++
++      FOREACH_FUNCTION_ARGS (fntype, arg_type, args_iter)
++      {
++        num_of_args++;
++        if (microblaze_parm_needs_stack (args_so_far, arg_type))
++         return true;
++      }
++    }
++
++  if (num_of_args > 3) return true;
++
++  return false;
++}
++
++int  microblaze_reg_parm_stack_space(tree fun)
++{
++  if (microblaze_function_parms_need_stack (fun,false))
++    return MAX_ARGS_IN_REGISTERS * UNITS_PER_WORD;
++  else
++    return 0;
++}
++
+ /* Return the bytes needed to compute the frame pointer from the current
+    stack pointer.
+ 
+@@ -3275,7 +3407,7 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
+   emit_insn (gen_indirect_jump (temp2));
+ 
+   /* Run just enough of rest_of_compilation.  This sequence was
+-     "borrowed" from rs6000.c.  */
++     "borrowed" from microblaze.c.  */
+   insn = get_insns ();
+   shorten_branches (insn);
+   final_start_function (insn, file, 1);
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 0dd8b853e2..82e7e890be 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -467,9 +467,9 @@ extern struct microblaze_frame_info current_frame_info;
+ 
+ #define ARG_POINTER_CFA_OFFSET(FNDECL)		0
+ 
+-#define REG_PARM_STACK_SPACE(FNDECL)  		(MAX_ARGS_IN_REGISTERS * UNITS_PER_WORD)
++#define REG_PARM_STACK_SPACE(FNDECL)  		 microblaze_reg_parm_stack_space(FNDECL)
+ 
+-#define OUTGOING_REG_PARM_STACK_SPACE(FNTYPE)	1
++#define OUTGOING_REG_PARM_STACK_SPACE(FNTYPE)  1
+ 
+ #define STACK_BOUNDARY				32
+ 
+-- 
+2.14.2
+

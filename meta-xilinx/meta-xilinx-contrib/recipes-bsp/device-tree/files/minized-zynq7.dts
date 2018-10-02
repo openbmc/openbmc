@@ -1,0 +1,254 @@
+/*
+* dts file for MiniZed
+*
+* Copyright (C) 2018 Clément Laigle <clement.laigle8@gmail.com>
+*/
+
+/dts-v1/;
+/include/ "zynq-7000.dtsi"
+
+
+/ {
+	model = "Zynq Minized Board";
+	compatible = "xlnx,zynq-Minized", "xlnx,zynq-7000";
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	cpus {
+		cpu@0 {
+			operating-points = <666666 1000000 333333 1000000>;
+		};
+	};
+
+	aliases {
+		serial0 = &uart1;
+                serial1 = &bluetooth_uart;
+		spi0 = &qspi;
+		mmc0 = &sdhci1;
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0 0x20000000>;
+	};
+
+	usb_phy0: phy0 {
+		compatible = "usb-nop-xceiv";
+		#phy-cells = <0x0>;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		led-psg {
+			label = "led-psg";
+			gpios = <&gpio0 53 0>;
+			default-state = "on";
+			linux,default-trigger = "heartbeat";
+		};
+		led-psr {
+			label = "led-psr";
+			gpios = <&gpio0 52 0>;
+			default-state = "on";
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		autorepeat;
+		sw3 {
+			label = "ps-bp";
+			gpios = <&gpio0 0 0>;
+			linux,code = <108>; /* down */
+			gpio-key,wakeup;
+			autorepeat;
+		};
+	};
+
+	amba_pl: amba_pl {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "simple-bus";
+		ranges ;
+
+		axi_gpio_0: gpio@41200000 {
+			#gpio-cells = <2>;
+			compatible = "xlnx,xps-gpio-1.00.a";
+			gpio-controller ;
+			reg = <0x41200000 0x10000>;
+			xlnx,all-inputs = <0x0>;
+			xlnx,all-inputs-2 = <0x0>;
+			xlnx,all-outputs = <0x1>;
+			xlnx,all-outputs-2 = <0x1>;
+			xlnx,dout-default = <0x00000000>;
+			xlnx,dout-default-2 = <0x00000000>;
+			xlnx,gpio-width = <0x1>;
+			xlnx,gpio2-width = <0x1>;
+			xlnx,interrupt-present = <0x0>;
+			xlnx,is-dual = <0x1>;
+			xlnx,tri-default = <0xFFFFFFFF>;
+			xlnx,tri-default-2 = <0xFFFFFFFF>;
+		};
+		axi_gpio_1: gpio@41210000 {
+			#gpio-cells = <2>;
+			compatible = "xlnx,xps-gpio-1.00.a";
+			gpio-controller ;
+			reg = <0x41210000 0x10000>;
+			xlnx,all-inputs = <0x1>;
+			xlnx,all-inputs-2 = <0x0>;
+			xlnx,all-outputs = <0x0>;
+			xlnx,all-outputs-2 = <0x0>;
+			xlnx,dout-default = <0x00000000>;
+			xlnx,dout-default-2 = <0x00000000>;
+			xlnx,gpio-width = <0x1>;
+			xlnx,gpio2-width = <0x20>;
+			xlnx,interrupt-present = <0x0>;
+			xlnx,is-dual = <0x0>;
+			xlnx,tri-default = <0xFFFFFFFF>;
+			xlnx,tri-default-2 = <0xFFFFFFFF>;
+		};
+		axi_iic_0: i2c@41600000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			clock-names = "ref_clk";
+			clocks = <&clkc 15>;
+			compatible = "xlnx,xps-iic-2.00.a";
+			interrupt-parent = <&intc>;
+			interrupts = <0 30 4>;
+			reg = <0x41600000 0x10000>;
+		};
+		bluetooth_uart: serial@43c00000 {
+			clock-frequency = <0x2dc6c00>;
+			clock-names = "ref_clk";
+			clocks = <&clkc 0>;
+			compatible = "xlnx,xps-uart16550-2.00.a", "ns16550a";
+			current-speed = <115200>;
+			device_type = "serial";
+			interrupt-parent = <&intc>;
+			interrupts = <0 29 4>;
+			port-number = <1>;
+			reg = <0x43c00000 0x10000>;
+			reg-offset = <0x1000>;
+			reg-shift = <2>;
+			xlnx,external-xin-clk-hz = <0x2dc6c00>;
+			xlnx,external-xin-clk-hz-d = <0x30>;
+			xlnx,has-external-rclk = <0x0>;
+			xlnx,has-external-xin = <0x1>;
+			xlnx,is-a-16550 = <0x1>;
+			xlnx,s-axi-aclk-freq-hz-d = "100.0";
+			xlnx,use-modem-ports = <0x1>;
+			xlnx,use-user-ports = <0x1>;
+		};
+	};
+
+	wlreg_on: wlreg-on {
+		compatible = "regulator-fixed";
+		regulator-name = "wlreg_on";
+		enable-active-high;
+		gpio = <&gpio0 56 0>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		startup-delay-us = <100>;
+	};
+};
+
+&gpio0 {
+	emio-gpio-width = <4>;
+	gpio-mask-high = <0x0>;
+	gpio-mask-low = <0x5600>;
+};
+
+&intc {
+	num_cpus = <1>;
+	num_interrupts = <96>;
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&sdhci0 {
+	status = "okay";
+	bus-width= <4>;
+	xlnx,has-cd = <0x0>;
+	xlnx,has-power = <0x0>;
+	xlnx,has-wp = <0x0>;
+	non-removeable;
+	broken-cd;
+	vmmc-supply = <&wlreg_on>;
+
+        brcmf: brcmf@1 {
+		status = "okay";
+                reg = <1>;
+                compatible = "brcm,bcm43430-fmac";
+	};
+};
+
+&sdhci1 {
+	status = "okay";
+	non-removable;
+	bus-width = <4>;
+	max-frequency = <12000000>;
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	mmccard: mmccard@0 {
+		compatible = "mmc-card";
+		reg = <0>;
+		broken-hpi;
+	};
+};
+
+&usb0 {
+	status = "okay";
+	dr_mode = "host";
+	usb-reset = <&gpio0 7 0>;
+	usb-phy = <&usb_phy0>;
+};
+
+&uart1 {
+	u-boot,dm-pre-reloc;
+	status = "okay";
+};
+
+&qspi {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	interrupt-parent = <0x3>;
+	is-dual = <0x0>;
+	num-cs = <0x1>;
+
+
+	flash0: flash@0 {
+		compatible = "micron,m25p80";
+		reg = <0x0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		spi-max-frequency = <50000000>;
+
+		partition@0x00000000 {
+			label = "boot";
+			reg = <0x0 0xff0000>;
+		};
+		partition@0x00270000 {
+			label = "kernel";
+			reg = <0x270000 0xd80000>;
+		};
+		partition@0x00ff0000 {
+			label = "bootenv";
+			reg = <0xff0000 0x10000>;
+		};
+		
+		partition@0x01000000 {
+			label = "spare";
+			reg = <0x1000000 0x0>;
+		};
+
+	};
+};
+

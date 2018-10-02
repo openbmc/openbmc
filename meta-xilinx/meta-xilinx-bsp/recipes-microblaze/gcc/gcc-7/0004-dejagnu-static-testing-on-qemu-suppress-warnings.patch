@@ -1,0 +1,36 @@
+From ab2cb6320138c173b20fee8ce6e8d4afa4696384 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Sat, 26 Aug 2017 19:21:16 -0700
+Subject: [PATCH] dejagnu static testing on qemu, suppress warnings
+
+For dejagnu static testing on qemu, suppress warnings about multiple
+definitions from the test function and libc in line with method used by
+powerpc. Dynamic linking and using a qemu binary which understands
+sysroot resolves all test failures with builtins
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Pending
+---
+ gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp b/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp
+index ba16b09c41..ada149912b 100644
+--- a/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp
++++ b/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp
+@@ -48,6 +48,10 @@ if { [istarget *-*-eabi*]
+    lappend additional_flags "-Wl,--allow-multiple-definition"
+ }
+ 
++if [istarget "microblaze*-*-linux*"] {
++   lappend additional_flags "-Wl,-zmuldefs"
++}
++
+ foreach src [lsort [find $srcdir/$subdir *.c]] {
+     if {![string match *-lib.c $src] && [runtest_file_p $runtests $src]} {
+ 	c-torture-execute [list $src \
+-- 
+2.14.2
+

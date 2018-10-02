@@ -1,0 +1,108 @@
+From 717d7899f6d8048c6b88b3c52e8a9c8afbddbb65 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Tue, 5 Dec 2017 09:48:42 -0800
+Subject: [PATCH 8/9] mali_internal_sync: Rename wait_queue_t with
+ wait_queue_entry_t
+
+Refer kernel patch ac6424b981bce1c4bc55675c6ce11bfe1bbfa64f
+and 2055da which replaces the struct name
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream-Status: Pending
+---
+ .../src/devicedrv/mali/linux/mali_internal_sync.c  | 27 ++++++++++++++++++++--
+ .../src/devicedrv/mali/linux/mali_internal_sync.h  |  4 ++++
+ 2 files changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_internal_sync.c b/driver/src/devicedrv/mali/linux/mali_internal_sync.c
+index 1f2574e..957a056 100644
+--- linux/mali_internal_sync.c
++++ b/linux/mali_internal_sync.c
+@@ -121,8 +121,13 @@ static void mali_internal_sync_fence_add_fence(struct mali_internal_sync_fence *
+ }
+ #endif
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
++static int mali_internal_sync_fence_wake_up_wq(wait_queue_entry_t *curr, unsigned mode,
++		int wake_flags, void *key)
++#else
+ static int mali_internal_sync_fence_wake_up_wq(wait_queue_t *curr, unsigned mode,
+ 		int wake_flags, void *key)
++#endif
+ {
+ 	struct mali_internal_sync_fence_waiter *wait;
+ 	MALI_IGNORE(mode);
+@@ -130,8 +135,12 @@ static int mali_internal_sync_fence_wake_up_wq(wait_queue_t *curr, unsigned mode
+ 	MALI_IGNORE(key);
+ 
+ 	wait = container_of(curr, struct mali_internal_sync_fence_waiter, work);
+-	list_del_init(&wait->work.task_list);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
++	list_del_init(&wait->work.entry);
++#else
++	list_del_init(&wait->work.task_list);
++#endif
+ 	wait->callback(wait->work.private, wait);
+ 	return 1;
+ }
+@@ -498,7 +507,11 @@ void mali_internal_sync_fence_waiter_init(struct mali_internal_sync_fence_waiter
+ 	MALI_DEBUG_ASSERT_POINTER(waiter);
+ 	MALI_DEBUG_ASSERT_POINTER(callback);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
++	INIT_LIST_HEAD(&waiter->work.entry);
++#else
+ 	INIT_LIST_HEAD(&waiter->work.task_list);
++#endif
+ 	waiter->callback = callback;
+ }
+ 
+@@ -560,8 +573,13 @@ int mali_internal_sync_fence_wait_async(struct mali_internal_sync_fence *sync_fe
+ 	spin_lock_irqsave(&sync_fence->wq.lock, flags);
+ 	err =  sync_fence->fence->ops->signaled(sync_fence->fence);
+ 
+-	if (0 == err)
++	if (0 == err){
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
++		__add_wait_queue_entry_tail(&sync_fence->wq, &waiter->work);
++#else
+ 		__add_wait_queue_tail(&sync_fence->wq, &waiter->work);
++#endif
++	}
+ 	spin_unlock_irqrestore(&sync_fence->wq.lock, flags);
+ 
+ 	return err;
+@@ -578,8 +596,13 @@ int mali_internal_sync_fence_cancel_async(struct mali_internal_sync_fence *sync_
+ 	MALI_DEBUG_ASSERT_POINTER(waiter);
+ 
+ 	spin_lock_irqsave(&sync_fence->wq.lock, flags);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
++	if (!list_empty(&waiter->work.entry))
++		list_del_init(&waiter->work.entry);
++#else
+ 	if (!list_empty(&waiter->work.task_list))
+ 		list_del_init(&waiter->work.task_list);
++#endif
+ 	else
+ 		ret = -ENOENT;
+ 	spin_unlock_irqrestore(&sync_fence->wq.lock, flags);
+diff --git a/driver/src/devicedrv/mali/linux/mali_internal_sync.h b/driver/src/devicedrv/mali/linux/mali_internal_sync.h
+index a5655c7..70f29f9 100644
+--- linux/mali_internal_sync.h
++++ b/linux/mali_internal_sync.h
+@@ -112,7 +112,11 @@ typedef void (*mali_internal_sync_callback_t)(struct mali_internal_sync_fence *s
+ 		struct mali_internal_sync_fence_waiter *waiter);
+ 
+ struct mali_internal_sync_fence_waiter {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
++	wait_queue_entry_t work;
++#else
+ 	wait_queue_t work;
++#endif
+ 	mali_internal_sync_callback_t callback;
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0)
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
+-- 
+2.7.4
+

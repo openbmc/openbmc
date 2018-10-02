@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable Xilinx DRM support"
+define KFEATURE_COMPATIBILITY board
+
+kconfig hardware drivers-drm.cfg

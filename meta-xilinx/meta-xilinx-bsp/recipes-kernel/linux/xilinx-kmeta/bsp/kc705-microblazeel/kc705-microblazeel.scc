@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Kernel Config for kc705-microblazeel specific setup"
+define KFEATURE_COMPATIBILITY board
+
+kconf hardware kc705-microblazeel.cfg

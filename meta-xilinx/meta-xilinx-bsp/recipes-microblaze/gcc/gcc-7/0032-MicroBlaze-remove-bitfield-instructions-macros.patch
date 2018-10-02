@@ -1,0 +1,83 @@
+From 646fe1dbaca06f2fe2df4c0da3fa20e0aff0a4ec Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+Date: Sat, 26 Aug 2017 19:21:56 -0700
+Subject: [PATCH] MicroBlaze remove bitfield instructions macros
+
+Remove the conditions in the bit field expand macros to generate the
+instructions in structure bit-field usecases
+
+ChangeLog:
+
+2018-08-16  Nagaraju Mekala  <nagaraju.mekala@xilinx.com>
+
+	* gcc/config/microblaze/microblaze.md:
+	  remove the expand constraints
+
+Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream-Status: Pending
+---
+ gcc/config/microblaze/microblaze.md | 40 +++++--------------------------------
+ 1 file changed, 5 insertions(+), 35 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 68c3b22bd4..ef53c3069e 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -2482,25 +2482,8 @@
+ 			 (match_operand:SI 2 "immediate_operand" "I")
+ 			 (match_operand:SI 3 "immediate_operand" "I")))]
+ "TARGET_HAS_BITFIELD"
+-"
+-{
+-  unsigned HOST_WIDE_INT len = UINTVAL (operands[2]);
+-  unsigned HOST_WIDE_INT pos = UINTVAL (operands[3]);
+-
+-  if ((len == 0) || (pos + len > 32) )
+-    FAIL;
+-
+-  ;;if (!register_operand (operands[1], VOIDmode))
+-  ;;  FAIL;
+-  if (operands[0] == operands[1])
+-  FAIL;
+-  if (GET_CODE (operands[1]) == ASHIFT)
+-  FAIL;
+-;;  operands[2] = GEN_INT(INTVAL(operands[2])+1 );
+- emit_insn (gen_extv_32 (operands[0], operands[1],
+-			  operands[2], operands[3]));
+-  DONE;
+-}")
++""
++)
+ 
+ (define_insn "extv_32"
+   [(set (match_operand:SI 0 "register_operand" "=r")
+@@ -2518,22 +2501,9 @@
+ 			 (match_operand:SI 1 "immediate_operand" "I")
+ 			 (match_operand:SI 2 "immediate_operand" "I"))
+ 	(match_operand:SI 3 "register_operand" "r"))]
+- "TARGET_HAS_BITFIELD"
+-  "
+-{
+-  unsigned HOST_WIDE_INT len = UINTVAL (operands[1]);
+-  unsigned HOST_WIDE_INT pos = UINTVAL (operands[2]);
+-
+-  if (len <= 0 || pos + len > 32)
+-    FAIL;
+-
+-  ;;if (!register_operand (operands[0], VOIDmode))
+-  ;;  FAIL;
+-
+-  emit_insn (gen_insv_32 (operands[0], operands[1],
+-			  operands[2], operands[3]));
+-  DONE;
+-}")
++"TARGET_HAS_BITFIELD"
++""
++)
+ 
+ (define_insn "insv_32"
+   [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+-- 
+2.14.2
+

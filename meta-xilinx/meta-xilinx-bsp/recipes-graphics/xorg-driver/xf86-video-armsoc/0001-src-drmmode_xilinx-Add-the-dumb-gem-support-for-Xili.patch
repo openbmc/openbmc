@@ -1,0 +1,141 @@
+From 630a8ea035fe2f075f6ea7f4bad0928f5b541c80 Mon Sep 17 00:00:00 2001
+From: Hyun Kwon <hyun.kwon@xilinx.com>
+Date: Wed, 21 Jan 2015 11:53:19 -0800
+Subject: [PATCH] src: drmmode_xilinx: Add the dumb gem support for Xilinx
+
+Add the dumb gem support for Xilinx
+
+Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Pending
+---
+ src/Makefile.am                     |  3 +-
+ src/armsoc_driver.c                 |  1 +
+ src/drmmode_driver.h                |  1 +
+ src/drmmode_xilinx/drmmode_xilinx.c | 76 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 80 insertions(+), 1 deletion(-)
+ create mode 100644 src/drmmode_xilinx/drmmode_xilinx.c
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 3b2601927c..db5f110fb2 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -43,7 +43,8 @@ armsoc_drv_ladir = @moduledir@/drivers
+ DRMMODE_SRCS = drmmode_exynos/drmmode_exynos.c \
+ 	drmmode_pl111/drmmode_pl111.c \
+ 	drmmode_kirin/drmmode_kirin.c \
+-	drmmode_sti/drmmode_sti.c
++	drmmode_sti/drmmode_sti.c \
++	drmmode_xilinx/drmmode_xilinx.c
+ 
+ 
+ armsoc_drv_la_SOURCES = \
+diff --git a/src/armsoc_driver.c b/src/armsoc_driver.c
+index 83e74a7ed1..3ace3c7be5 100644
+--- a/src/armsoc_driver.c
++++ b/src/armsoc_driver.c
+@@ -737,6 +737,7 @@ static struct drmmode_interface *get_drmmode_implementation(int drm_fd)
+ 		&pl111_interface,
+ 		&kirin_interface,
+ 		&sti_interface,
++		&xilinx_interface,
+ 	};
+ 	int i;
+ 
+diff --git a/src/drmmode_driver.h b/src/drmmode_driver.h
+index 879fc60ddc..18245d591a 100644
+--- a/src/drmmode_driver.h
++++ b/src/drmmode_driver.h
+@@ -106,6 +106,7 @@ extern struct drmmode_interface exynos_interface;
+ extern struct drmmode_interface pl111_interface;
+ extern struct drmmode_interface kirin_interface;
+ extern struct drmmode_interface sti_interface;
++extern struct drmmode_interface xilinx_interface;
+ 
+ 
+ #endif
+diff --git a/src/drmmode_xilinx/drmmode_xilinx.c b/src/drmmode_xilinx/drmmode_xilinx.c
+new file mode 100644
+index 0000000000..f4faceb0b4
+--- /dev/null
++++ b/src/drmmode_xilinx/drmmode_xilinx.c
+@@ -0,0 +1,76 @@
++/*
++ * Xilinx X11 ARMSOC driver
++ *
++ * Author: Hyun Woo Kwon <hyun.kwon@xilinx.com>
++ *
++ * Copyright (C) 2014 Xilinx, Inc.
++ *
++ * Based on drmmode_exynos.c
++ *
++ * Copyright © 2013 ARM Limited.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a
++ * copy of this software and associated documentation files (the "Software"),
++ * to deal in the Software without restriction, including without limitation
++ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the
++ * Software is furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice (including the next
++ * paragraph) shall be included in all copies or substantial portions of the
++ * Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ *
++ */
++
++#include <stdlib.h>
++
++#include <drm.h>
++#include <xf86drm.h>
++
++#include "../drmmode_driver.h"
++
++static int create_custom_gem(int fd, struct armsoc_create_gem *create_gem)
++{
++	struct drm_mode_create_dumb arg;
++	int ret;
++
++	memset(&arg, 0, sizeof(arg));
++	arg.height = create_gem->height;
++	arg.width = create_gem->width;
++	arg.bpp = create_gem->bpp;
++
++	ret = drmIoctl(fd, DRM_IOCTL_MODE_CREATE_DUMB, &arg);
++	if (ret)
++		return ret;
++
++	create_gem->height = arg.height;
++	create_gem->width = arg.width;
++	create_gem->bpp = arg.bpp;
++	create_gem->handle = arg.handle;
++	create_gem->pitch = arg.pitch;
++	create_gem->size = arg.size;
++
++	return 0;
++}
++
++struct drmmode_interface xilinx_interface = {
++	"xlnx"                /* name of drm driver */,
++	1                     /* use_page_flip_events */,
++	1                     /* use_early_display */,
++	0                     /* cursor width */,
++	0                     /* cursor_height */,
++	0                     /* cursor padding */,
++	HWCURSOR_API_NONE     /* cursor_api */,
++	NULL                  /* init_plane_for_cursor */,
++	0                     /* vblank_query_supported */,
++	create_custom_gem     /* create_custom_gem */,
++};
++
+-- 
+2.11.0
+

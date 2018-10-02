@@ -1,0 +1,43 @@
+From a02963a97d7ce38b0af205f9e3e6dd7e0e06d9be Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar@axis.com>
+Date: Mon, 27 Feb 2012 06:28:00 +0100
+Subject: [PATCH 10/16] [Patch, gdb]: Robustify inline function support
+
+Signed-off-by: Edgar E. Iglesias <edgar@axis.com>
+Upstream-Status: Pending
+---
+ gdb/blockframe.c   | 3 ++-
+ gdb/inline-frame.c | 3 +++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/gdb/blockframe.c b/gdb/blockframe.c
+index 0a9381e..ba41d85 100644
+--- a/gdb/blockframe.c
++++ b/gdb/blockframe.c
+@@ -77,7 +77,8 @@ get_frame_block (struct frame_info *frame, CORE_ADDR *addr_in_block)
+ 	inline_count--;
+ 
+       bl = BLOCK_SUPERBLOCK (bl);
+-      gdb_assert (bl != NULL);
++      if (!bl)
++        return NULL;
+     }
+ 
+   return bl;
+diff --git a/gdb/inline-frame.c b/gdb/inline-frame.c
+index eb82143..a793390 100644
+--- a/gdb/inline-frame.c
++++ b/gdb/inline-frame.c
+@@ -231,6 +231,9 @@ inline_frame_sniffer (const struct frame_unwind *self,
+       cur_block = BLOCK_SUPERBLOCK (cur_block);
+     }
+ 
++  if (depth == 0)
++    return 0;
++
+   /* Check how many inlined functions already have frames.  */
+   for (next_frame = get_next_frame (this_frame);
+        next_frame && get_frame_type (next_frame) == INLINE_FRAME;
+-- 
+1.9.0
+

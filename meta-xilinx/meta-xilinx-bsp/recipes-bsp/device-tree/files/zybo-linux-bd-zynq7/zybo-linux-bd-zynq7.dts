@@ -1,0 +1,184 @@
+/dts-v1/;
+/include/ "skeleton.dtsi"
+/include/ "zynq-7000.dtsi"
+/include/ "zynq-7000-qspi-dummy.dtsi"
+/include/ "pcw.dtsi"
+/include/ "pl.dtsi"
+
+/ {
+	model = "Digilent-Zybo-Linux-BD-v2015.4";
+	aliases {
+		serial0 = &uart1;
+		ethernet0 = &gem0;
+		spi0 = &qspi;
+	};
+	chosen {
+		bootargs = "";
+		stdout-path = "serial0:115200n8";
+	};
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x20000000>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		autorepeat;
+		btn4 {
+			label = "btn4";
+			gpios = <&gpio0 50 0>;
+			linux,code = <108>; /* down */
+			gpio-key,wakeup;
+			autorepeat;
+		};
+		btn5 {
+			label = "btn5";
+			gpios = <&gpio0 51 0>;
+			linux,code = <103>; /* up */
+			gpio-key,wakeup;
+			autorepeat;
+		};
+	};
+
+	usb_phy0: usb_phy@0 {
+		compatible = "usb-nop-xceiv";
+		#phy-cells = <0>;
+		reset-gpios = <&gpio0 46 1>;
+	};
+};
+
+&amba {
+	u-boot,dm-pre-reloc;
+};
+
+&amba_pl {
+	encoder_0: digilent_encoder {
+		compatible = "digilent,drm-encoder";
+		dglnt,edid-i2c = <&i2c1>;
+	};
+
+	xilinx_drm {
+		compatible = "xlnx,drm";
+		xlnx,vtc = <&v_tc_0>;
+		xlnx,connector-type = "HDMIA";
+		xlnx,encoder-slave = <&encoder_0>;
+		clocks = <&axi_dynclk_0>;
+		planes {
+			xlnx,pixel-format = "xrgb8888";
+			plane0 {
+				dmas = <&axi_vdma_0 0>;
+				dma-names = "dma0";
+			};
+		};
+	};
+
+	i2s_clk: i2s_clk {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <12288000>;
+		clock-output-names = "i2s_clk";
+	};
+
+	sound {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "ZYBO-Sound-Card";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,bitclock-master = <&dailink0_master>;
+		simple-audio-card,frame-master = <&dailink0_master>;
+		simple-audio-card,widgets =
+			"Microphone", "Microphone Jack",
+			"Headphone", "Headphone Jack",
+			"Line", "Line In Jack";
+		simple-audio-card,routing =
+			"MICIN", "Microphone Jack",
+			"Headphone Jack", "LHPOUT",
+			"Headphone Jack", "RHPOUT",
+			"LLINEIN", "Line In Jack",
+			"RLINEIN", "Line In Jack";
+		dailink0_master: simple-audio-card,cpu {
+			clocks = <&i2s_clk>;
+			sound-dai = <&axi_i2s_adi_0>;
+		};
+		simple-audio-card,codec {
+			clocks = <&i2s_clk>;
+			sound-dai = <&ssm2603>;
+		};
+	};
+};
+
+&axi_dynclk_0 {
+	compatible = "digilent,axi-dynclk";
+	#clock-cells = <0>;
+	clocks = <&clkc 15>;
+};
+
+&axi_i2s_adi_0 {
+	#sound-dai-cells = <0>;
+	compatible = "adi,axi-i2s-1.00.a";
+	clocks = <&clkc 15>, <&i2s_clk>;
+	clock-names = "axi", "ref";
+	dmas = <&dmac_s 0 &dmac_s 1>;
+	dma-names = "tx", "rx";
+};
+
+&gem0 {
+	phy-handle = <&phy0>;
+	phy-mode = "rgmii-id";
+	local-mac-address = [];
+	phy0: phy@0 {
+		device_type = "ethernet-phy";
+		reg = <0>;
+	};
+};
+
+&i2c0 {
+	eeprom@50 {
+		/* Microchip 24AA02E48 */
+		compatible = "microchip,24c02";
+		reg = <0x50>;
+	};
+
+	ssm2603: ssm2603@1a{
+		#sound-dai-cells = <0>;
+		compatible = "adi,ssm2603";
+		reg = <0x1a>;
+	};
+};
+
+&qspi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	flash0: flash@0 {
+		compatible = "micron,m25p80", "s25fl128s";
+		reg = <0x0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		spi-max-frequency = <50000000>;
+		partition@0x00000000 {
+			label = "boot";
+			reg = <0x00000000 0x00300000>;
+		};
+		partition@0x00300000 {
+			label = "bootenv";
+			reg = <0x00300000 0x00020000>;
+		};
+		partition@0x00320000 {
+			label = "kernel";
+			reg = <0x00320000 0x00a80000>;
+		};
+		partition@0x00da0000 {
+			label = "spare";
+			reg = <0x00da0000 0x00000000>;
+		};
+	};
+};
+
+&usb0 {
+	usb-phy = <&usb_phy0>;
+};
+
+&v_tc_0 {
+	compatible = "xlnx,v-tc-5.01.a";
+};

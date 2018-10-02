@@ -1,0 +1,35 @@
+From ed7242238151c12029c566d1974058c579d8ae3d Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Wed, 25 Jan 2017 10:00:33 -0800
+Subject: [PATCH 6/9] arm.c: global variable dma_ops is removed from the kernel
+ 4.7
+
+Refer kernel commit 1dccb598df549d892b6450c261da54cdd7af44b4, the global
+dma_ops variable and the special-casing for ACPI is removed , and just
+returns the dma ops that got set for the device, or the dummy_dma_ops
+if none were present.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream Status: Pending
+---
+ driver/src/devicedrv/mali/platform/arm/arm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/driver/src/devicedrv/mali/platform/arm/arm.c b/driver/src/devicedrv/mali/platform/arm/arm.c
+index 62f9be6..57ca989 100644
+--- platform/arm/arm.c
++++ b/platform/arm/arm.c
+@@ -529,8 +529,9 @@ int mali_platform_device_init(struct platform_device *device)
+ 	 */
+ 	if (!device->dev.dma_mask)
+ 		device->dev.dma_mask = &device->dev.coherent_dma_mask;
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 8, 0))
+ 	device->dev.archdata.dma_ops = dma_ops;
+-
++#endif
+ 	err = platform_device_add_data(device, &mali_gpu_data, sizeof(mali_gpu_data));
+ 
+ 	if (0 == err) {
+-- 
+2.7.4
+

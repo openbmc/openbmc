@@ -1,0 +1,47 @@
+From 2f5e8944357f43fbde4cb642c6ee4a699c88efb5 Mon Sep 17 00:00:00 2001
+From: Hyun Kwon <hyun.kwon@xilinx.com>
+Date: Wed, 29 Jun 2016 09:14:37 -0700
+Subject: [PATCH 4/9] staging: mali: r8p0-01rel0: Don't include
+ mali_read_phys() for zynq/zynqmp
+
+mali_read_phys() is not used with CONFIG_ARCH_ZYNQ and CONFIG_ARCH_ZYNQMP.
+
+Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
+Upstream Status: Inappropriate [Xilinx specific]
+---
+ driver/src/devicedrv/mali/platform/arm/arm.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/driver/src/devicedrv/mali/platform/arm/arm.c b/driver/src/devicedrv/mali/platform/arm/arm.c
+index fac99bc..62f9be6 100644
+--- platform/arm/arm.c
++++ b/platform/arm/arm.c
+@@ -38,7 +38,9 @@
+ static int mali_core_scaling_enable = 0;
+ 
+ void mali_gpu_utilization_callback(struct mali_gpu_utilization_data *data);
++#if !(defined(CONFIG_ARCH_ZYNQ) || defined(CONFIG_ARCH_ZYNQMP))
+ static u32 mali_read_phys(u32 phys_addr);
++#endif
+ #if defined(CONFIG_ARCH_REALVIEW)
+ static void mali_write_phys(u32 phys_addr, u32 value);
+ #endif
+@@ -578,6 +580,7 @@ int mali_platform_device_deinit(struct platform_device *device)
+ 
+ #endif /* CONFIG_MALI_DT */
+ 
++#if !(defined(CONFIG_ARCH_ZYNQ) || defined(CONFIG_ARCH_ZYNQMP))
+ static u32 mali_read_phys(u32 phys_addr)
+ {
+ 	u32 phys_addr_page = phys_addr & 0xFFFFE000;
+@@ -592,6 +595,7 @@ static u32 mali_read_phys(u32 phys_addr)
+ 
+ 	return ret;
+ }
++#endif
+ 
+ #if defined(CONFIG_ARCH_REALVIEW)
+ static void mali_write_phys(u32 phys_addr, u32 value)
+-- 
+2.7.4
+

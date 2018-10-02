@@ -1,0 +1,4 @@
+&amba {
+	/* empty defintion for kernels that don't have qspi node */
+	qspi: spi@e000d000 { };
+};
