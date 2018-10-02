@@ -13,6 +13,8 @@ inherit phosphor-mapperdir
 
 DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
+DEPENDS += "boost"
+DEPENDS += "libtinyxml2"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "${PN}-config-native"
@@ -35,7 +37,7 @@ RDEPENDS_${PN} += " \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-objmgr"
 
-SRCREV = "d6729ea39d443bf62a27bbf64ef6bc7a123125c8"
+SRCREV = "1036b4d13183f2967115e51e45a9b7de38eb859a"
 
 S = "${WORKDIR}/git"
 
