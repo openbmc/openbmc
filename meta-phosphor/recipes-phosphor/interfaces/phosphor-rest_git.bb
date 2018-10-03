@@ -1,6 +1,7 @@
 SUMMARY = "Phosphor DBUS to REST WSGI Application"
 DESCRIPTION = "Phosphor DBUS to REST WSGI Application."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit allarch
 inherit obmc-phosphor-systemd
