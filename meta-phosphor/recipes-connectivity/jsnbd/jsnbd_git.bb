@@ -10,6 +10,8 @@ inherit autotools pkgconfig
 DEPENDS += "json-c"
 DEPENDS += "udev"
 
+RDEPENDS_${PN} += "nbd-client"
+
 S = "${WORKDIR}/git"
 
 SRC_URI = "git://github.com/openbmc/jsnbd"
