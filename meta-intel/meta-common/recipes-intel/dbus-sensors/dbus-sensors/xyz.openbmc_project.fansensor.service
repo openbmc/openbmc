@@ -1,0 +1,11 @@
+[Unit]
+Description=Fan Sensor
+StopWhenUnneeded=false
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart={bindir}/fansensor
+
+[Install]
+WantedBy=multi-user.target

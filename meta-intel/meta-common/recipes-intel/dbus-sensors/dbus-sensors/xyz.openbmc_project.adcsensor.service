@@ -1,0 +1,11 @@
+[Unit]
+Description=Adc Sensor
+StopWhenUnneeded=false
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart={bindir}/adcsensor
+
+[Install]
+WantedBy=multi-user.target
