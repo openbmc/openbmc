@@ -1,6 +1,7 @@
 SUMMARY = "Phosphor IPMI plugin for OpenPOWER OEM Commands"
 DESCRIPTION = "Phosphor IPMI plugin for OpenPOWER OEM Commands"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-license
