@@ -1,6 +1,7 @@
 SUMMARY = "Open POWER DBus Interfaces"
 DESCRIPTION = "Generated bindings, using sdbus++, for the openpower YAML"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
