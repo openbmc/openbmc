@@ -1,6 +1,7 @@
 SUMMARY = "python-gevent startup script"
 DESCRIPTION = "python-gevent startup script."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit allarch
 inherit setuptools
