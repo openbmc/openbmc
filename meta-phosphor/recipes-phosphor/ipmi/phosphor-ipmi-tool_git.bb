@@ -2,7 +2,7 @@ SUMMARY = "Phosphor ipmi tool for injecting ipmi commands"
 DESCRIPTION = "IPMI Tool with dbus capabilities"
 HOMEPAGE = "https://github.com/openbmc/ipmitool"
 PR = "r1"
-
+PV = "1.0+git${SRCPV}"
 
 inherit obmc-phosphor-license
 
