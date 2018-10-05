@@ -2,6 +2,7 @@ SUMMARY = "Inverse ARP daemon"
 DESCRIPTION = "Daemon to respond to Inverse-ARP requests"
 HOMEPAGE = "http://github.com/openbmc/inarp"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools
 inherit obmc-phosphor-license
