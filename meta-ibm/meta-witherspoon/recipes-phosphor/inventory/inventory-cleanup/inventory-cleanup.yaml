@@ -19,6 +19,17 @@ events:
           Remove all fan1 associated objects and have fan presence and
           fan monitor create it based on cooling type.
       type: startup
+      filters:
+          - name: propertyIs
+            service: xyz.openbmc_project.Inventory.Manager
+            path: /system/chassis
+            interface: xyz.openbmc_project.Inventory.Decorator.CoolingType
+            property: WaterCooled
+            value:
+                value: true
+                type: boolean
+            dbusMember: "sdbusplus::xyz::openbmc_project::Inventory::\
+                Decorator::server::CoolingType"
       actions:
           - name: destroyObjects
             paths:
