@@ -41,7 +41,6 @@ RDEPENDS_${PN}-flash = " \
 
 SUMMARY_${PN}-system = "Intel System"
 RDEPENDS_${PN}-system = " \
-        obmc-mgr-system \
         bmcweb \
         entity-manager \
         intel-ipmi-oem \
