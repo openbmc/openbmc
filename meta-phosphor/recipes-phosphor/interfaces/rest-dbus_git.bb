@@ -2,6 +2,7 @@ SUMMARY = "Phosphor OpenBMC REST framework"
 DESCRIPTION = "Phosphor OpenBMC REST to DBUS daemon."
 HOMEPAGE = "http://github.com/openbmc/rest-dbus"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit allarch
 inherit obmc-phosphor-license
