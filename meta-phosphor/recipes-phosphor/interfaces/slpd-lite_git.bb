@@ -2,6 +2,7 @@ SUMMARY = "Lightweight SLP Server"
 DESCRIPTION = "Lightweight Unicast-only SLP Server"
 HOMEPAGE = "http://github.com/openbmc/slpd-lite"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-license
