@@ -17,7 +17,7 @@ RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "iptables"
 
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
-SRCREV = "584fa8877dca6181c84a9ad687a814ec90fb0c6f"
+SRCREV = "5e452093830644245b83a817b8dad2fdb36ea550"
 
 S = "${WORKDIR}/git"
 
