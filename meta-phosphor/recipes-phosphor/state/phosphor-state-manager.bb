@@ -136,6 +136,6 @@ HOST_RST_RBT_ATTEMPTS_SVC_FMT = "../${HOST_RST_RBT_ATTEMPTS_SVC}:${HOST_START_TG
 SYSTEMD_LINK_${PN}-host += "${@compose_list_zip(d, 'HOST_RST_RBT_ATTEMPTS_SVC_FMT', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "14e14cddf60e9858d5f3de8f46adfc42bc880cfa"
+SRCREV = "6425ab76f5bdde1ea098645acc3b578414406f4f"
 
 S = "${WORKDIR}/git"
