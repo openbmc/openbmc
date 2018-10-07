@@ -1,0 +1,12 @@
+[Unit]
+Description=Phosphor LDAP privilege mapper
+
+[Service]
+ExecStart=/usr/bin/env phosphor-ldap-mapper
+SyslogIdentifier=phosphor-ldap-mapper
+Restart=always
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}
