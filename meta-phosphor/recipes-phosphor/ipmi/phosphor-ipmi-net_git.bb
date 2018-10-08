@@ -24,7 +24,7 @@ GROUPADD_PARAM_${PN} = "ipmi"
 
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
 SRC_URI += "file://ipmi-net-firewall.sh"
-SRCREV = "5e452093830644245b83a817b8dad2fdb36ea550"
+SRCREV = "b00f8f7fdbe850ac6dc431713a10764031f5a0ec"
 
 S = "${WORKDIR}/git"
 
