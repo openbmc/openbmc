@@ -6,6 +6,7 @@ udev_shutdown_hook_handler() {
 	status=$1
 	module=$2
 	if [ "$status" = "pre" ] && [ "$module" = "finish" ]; then
+		udevadm settle
 		killall `basename $_UDEV_DAEMON` 2>/dev/null
 	fi
 }

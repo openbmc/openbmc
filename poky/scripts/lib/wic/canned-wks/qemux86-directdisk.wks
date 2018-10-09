@@ -4,5 +4,5 @@
 
 include common.wks.inc
 
-bootloader  --timeout=0  --append="vga=0 rw mem=256M oprofile.timer=1 rootfstype=ext4 "
+bootloader  --timeout=0  --append="vga=0 rw oprofile.timer=1 rootfstype=ext4 "
 

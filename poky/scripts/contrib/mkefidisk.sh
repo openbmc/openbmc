@@ -381,7 +381,15 @@ mount $BOOTFS $BOOTFS_MNT >$OUT 2>&1 || error "Failed to mount $BOOTFS on $BOOTF
 
 info "Preparing boot partition"
 EFIDIR="$BOOTFS_MNT/EFI/BOOT"
-cp $HDDIMG_MNT/vmlinuz $BOOTFS_MNT >$OUT 2>&1 || error "Failed to copy vmlinuz"
+# Get kernel image name
+if [ -e "$HDDIMG_MNT/vmlinuz" ]; then
+	kernel_image="vmlinuz"
+elif [ "$HDDIMG_MNT/bzImage" ]; then
+	kernel_image="bzImage"
+else
+	die "No kernel image found"
+fi
+cp $HDDIMG_MNT/${kernel_image} $BOOTFS_MNT >$OUT 2>&1 || error "Failed to copy ${kernel_image}"
 # Copy the efi loader and configs (booti*.efi and grub.cfg if it exists)
 cp -r $HDDIMG_MNT/EFI $BOOTFS_MNT >$OUT 2>&1 || error "Failed to copy EFI dir"
 # Silently ignore a missing systemd-boot loader dir (we might just be a GRUB image)
@@ -407,7 +415,7 @@ if [ -e "$GRUB_CFG" ]; then
 	sed -i "s/ LABEL=[^ ]*/ /" $GRUB_CFG
 
 	sed -i "s@ root=[^ ]*@ @" $GRUB_CFG
-	sed -i "s@vmlinuz @vmlinuz root=$TARGET_ROOTFS ro rootwait console=ttyS0 console=tty0 @" $GRUB_CFG
+	sed -i "s@${kernel_image} @${kernel_image} root=$TARGET_ROOTFS ro rootwait console=ttyS0 console=tty0 @" $GRUB_CFG
 fi
 
 # Look for a systemd-boot installation

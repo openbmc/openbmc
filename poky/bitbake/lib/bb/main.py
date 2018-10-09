@@ -405,9 +405,6 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
         # In status only mode there are no logs and no UI
         logger.addHandler(handler)
 
-    # Clear away any spurious environment variables while we stoke up the cooker
-    cleanedvars = bb.utils.clean_environment()
-
     if configParams.server_only:
         featureset = []
         ui_module = None
@@ -422,6 +419,10 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
                 featureset.append(feature)
 
     server_connection = None
+
+    # Clear away any spurious environment variables while we stoke up the cooker
+    # (done after import_extension_module() above since for example import gi triggers env var usage)
+    cleanedvars = bb.utils.clean_environment()
 
     if configParams.remote_server:
         # Connect to a remote XMLRPC server

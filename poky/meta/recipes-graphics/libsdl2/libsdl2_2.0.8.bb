@@ -16,6 +16,7 @@ DEPENDS_class-nativesdk = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'virtu
 
 SRC_URI = " \
     http://www.libsdl.org/release/SDL2-${PV}.tar.gz \
+    file://0001-GLES2-Get-sin-cos-out-of-vertex-shader.patch \
 "
 
 S = "${WORKDIR}/SDL2-${PV}"
