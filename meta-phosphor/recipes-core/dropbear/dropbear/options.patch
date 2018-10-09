@@ -1,26 +1,33 @@
 diff --git a/options.h b/options.h
-index 0c51bb1..2c38f42 100644
+index 0c51bb1..3df2d67 100644
 --- a/options.h
 +++ b/options.h
-@@ -95,12 +95,9 @@ much traffic. */
+@@ -95,12 +95,12 @@ much traffic. */
  #define DROPBEAR_AES256
  /* Compiling in Blowfish will add ~6kB to runtime heap memory usage */
  /*#define DROPBEAR_BLOWFISH*/
 -#define DROPBEAR_TWOFISH256
 -#define DROPBEAR_TWOFISH128
++/*#define DROPBEAR_TWOFISH256*/
++/*#define DROPBEAR_TWOFISH128*/
  
  /* Enable CBC mode for ciphers. This has security issues though
   * is the most compatible with older SSH implementations */
 -#define DROPBEAR_ENABLE_CBC_MODE
++/*#define DROPBEAR_ENABLE_CBC_MODE*/
  
  /* Enable "Counter Mode" for ciphers. This is more secure than normal
   * CBC mode against certain attacks. It is recommended for security
-@@ -130,8 +127,6 @@ If you test it please contact the Dropbear author */
-  * These hashes are also used for public key fingerprints in logs.
+@@ -131,10 +131,10 @@ If you test it please contact the Dropbear author */
   * If you disable MD5, Dropbear will fall back to SHA1 fingerprints,
   * which are not the standard form. */
--#define DROPBEAR_SHA1_HMAC
+ #define DROPBEAR_SHA1_HMAC
 -#define DROPBEAR_SHA1_96_HMAC
++/*#define DROPBEAR_SHA1_96_HMAC*/
  #define DROPBEAR_SHA2_256_HMAC
  #define DROPBEAR_SHA2_512_HMAC
- #define DROPBEAR_MD5_HMAC
+-#define DROPBEAR_MD5_HMAC
++/*#define DROPBEAR_MD5_HMAC*/
+ 
+ /* You can also disable integrity. Don't bother disabling this if you're
+  * still using a cipher, it's relatively cheap. If you disable this it's dead
