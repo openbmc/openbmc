@@ -1,0 +1,9 @@
+#REST URI endpoint
+#example: /xyz/openbmc_project/certs/authority/ldap
+ENDPOINT=ldap
+
+#Path for the certificate file
+CERTPATH=/etc/ssl/certs/Root-CA.pem
+
+#Type of service
+TYPE=authority
