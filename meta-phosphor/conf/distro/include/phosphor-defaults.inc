@@ -247,7 +247,6 @@ VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
 
 PREFERRED_VERSION_phosphor-gpio-monitor = "1.0"
 PREFERRED_VERSION_network = "1.0"
-PREFERRED_VERSION_phosphor-logging = "1.0"
 PREFERRED_VERSION_phosphor-state-manager = "1.0"
 PREFERRED_VERSION_phosphor-ipmi-host = "1.0"
 PREFERRED_VERSION_phosphor-dbus-monitor = "1.0"
