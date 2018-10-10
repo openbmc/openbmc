@@ -1,6 +1,7 @@
 SUMMARY = "OpenBMC inventory manager"
 DESCRIPTION = "OpenBMC inventory manager."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit skeleton-python
 inherit obmc-phosphor-dbus-service
