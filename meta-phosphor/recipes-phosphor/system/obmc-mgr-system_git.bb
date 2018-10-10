@@ -1,6 +1,7 @@
 SUMMARY = "OpenBMC system manager"
 DESCRIPTION = "OpenBMC system manager."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit skeleton-python
 inherit obmc-phosphor-dbus-service
