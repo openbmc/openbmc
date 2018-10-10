@@ -1,6 +1,7 @@
 SUMMARY = "org.openbmc.control.Power implementation for OpenPOWER"
 DESCRIPTION = "A power control implementation suitable for OpenPOWER systems."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit skeleton-gdbus
 inherit obmc-phosphor-dbus-service
