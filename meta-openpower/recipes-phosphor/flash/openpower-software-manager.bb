@@ -55,6 +55,7 @@ SYSTEMD_SERVICE_${PN} += " \
         obmc-flash-bios-cleanup.service \
         obmc-flash-bios-enable-clearvolatile@.service \
         obmc-flash-bios-check-clearvolatile@.service \
+        op-pnor-msl.service \
         "
 
 ENABLE_CLEAR_VOLATILE_TMPL = "obmc-flash-bios-enable-clearvolatile@.service"
