@@ -1,6 +1,7 @@
 SUMMARY = "OpenBMC python devtools"
 DESCRIPTION = "Shortcut scripts for developers."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit skeleton-python
 
