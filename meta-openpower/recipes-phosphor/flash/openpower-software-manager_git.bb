@@ -14,6 +14,10 @@ inherit pythonnative
 
 PACKAGECONFIG[verify_pnor_signature] = "--enable-verify_pnor_signature,--disable-verify_pnor_signature"
 
+EXTRA_OECONF += " \
+    PNOR_MSL="v2.0.10 v2.2" \
+    "
+
 DEPENDS += " \
         autoconf-archive-native \
         phosphor-dbus-interfaces \
