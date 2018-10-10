@@ -3,6 +3,7 @@ DESCRIPTION = "A sample implementation for the org.openbmc.Flash DBUS API. \
 org.openbmc.Flash provides APIs for functions like BIOS flash access control \
 and updating."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit skeleton-gdbus
 inherit obmc-phosphor-dbus-service
