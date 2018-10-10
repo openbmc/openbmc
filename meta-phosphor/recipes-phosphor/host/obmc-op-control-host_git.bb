@@ -1,6 +1,7 @@
 SUMMARY = "org.openbmc.control.Host implementation for OpenPOWER"
 DESCRIPTION = "A host control implementation suitable for OpenPOWER systems."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit skeleton-gdbus
 inherit obmc-phosphor-dbus-service
