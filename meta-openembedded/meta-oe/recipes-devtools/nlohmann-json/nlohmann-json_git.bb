@@ -6,9 +6,9 @@ LIC_FILES_CHKSUM = "file://LICENSE.MIT;md5=9a8ae1c2d606c432a2aa2e2de15be22a"
 
 SRC_URI = "git://github.com/nlohmann/json.git"
 
-PV = "3.2.0+git${SRCPV}"
+PV = "3.3.0+git${SRCPV}"
 
-SRCREV = "8c20571136f2d5351b379a06ad6591bd980880fe"
+SRCREV = "aafad2be1f3cd259a1e79d2f6fcf267d1ede9ec7"
 
 S = "${WORKDIR}/git"
 
@@ -21,3 +21,9 @@ EXTRA_OECMAKE += "-DJSON_BuildTests=OFF"
 RDEPENDS_${PN}-dev = ""
 
 BBCLASSEXTEND = "native nativesdk"
+
+# other packages commonly reference the file directly as "json.hpp"
+# create symlink to allow this usage
+do_install_append() {
+    ln -s nlohmann/json.hpp ${D}${includedir}/json.hpp
+}
