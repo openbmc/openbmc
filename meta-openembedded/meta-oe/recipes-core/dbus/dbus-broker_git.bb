@@ -8,13 +8,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=7b486c2338d225a1405d979ed2c15ce8"
 
 DEPENDS = "dbus glib-2.0 expat"
 
-PV = "13+git${SRCPV}"
-SRCREV = "1165025e26c3b46160402841dadf08d3d42f5cbb"
+PV = "16+git${SRCPV}"
+SRCREV = "fc874afa0992d0c75ec25acb43d344679f0ee7d2"
 
-SRC_URI = "git://github.com/bus1/dbus-broker;protocol=git \
-           file://0001-Include-sys-wait.h-for-WEXITED-definition.patch \
-           file://0002-Use-getenv-instead-of-secure_getenv-on-musl.patch \
-           "
+SRC_URI = "git://github.com/bus1/dbus-broker;protocol=git"
 
 S = "${WORKDIR}/git"
 
