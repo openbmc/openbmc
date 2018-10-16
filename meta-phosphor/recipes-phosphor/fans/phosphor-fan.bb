@@ -2,6 +2,7 @@ SUMMARY = "Phosphor Fan"
 DESCRIPTION = "Phosphor fan provides a set of fan monitoring and \
 control applications."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 require ${PN}.inc
 
