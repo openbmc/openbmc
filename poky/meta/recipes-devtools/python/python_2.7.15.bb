@@ -23,19 +23,20 @@ SRC_URI += "\
   file://avoid_warning_about_tkinter.patch \
   file://avoid_warning_for_sunos_specific_module.patch \
   file://python-2.7.3-remove-bsdb-rpath.patch \
-  file://fix-makefile-for-ptest.patch \
   file://run-ptest \
   file://parallel-makeinst-create-bindir.patch \
   file://use_sysroot_ncurses_instead_of_host.patch \
   file://add-CROSSPYTHONPATH-for-PYTHON_FOR_BUILD.patch \
   file://pass-missing-libraries-to-Extension-for-mul.patch \
   file://support_SOURCE_DATE_EPOCH_in_py_compile_2.7.patch \
-  file://fix-gc-alignment.patch \
+  file://float-endian.patch \
+  file://0001-closes-bpo-34540-Convert-shutil._call_external_zip-t.patch \
+  file://0001-2.7-bpo-34623-Use-XML_SetHashSalt-in-_elementtree-GH.patch \
 "
 
 S = "${WORKDIR}/Python-${PV}"
 
-inherit autotools multilib_header python-dir pythonnative
+inherit autotools multilib_header python-dir pythonnative ptest
 
 CONFIGUREOPTS += " --with-system-ffi "
 
@@ -168,27 +169,7 @@ FILES_${PN}-misc = "${libdir}/python${PYTHON_MAJMIN}"
 RDEPENDS_${PN}-modules += "${PN}-misc"
 
 # ptest
-RDEPENDS_${PN}-ptest = "${PN}-modules ${PN}-tests"
-#inherit ptest after "require python-${PYTHON_MAJMIN}-manifest.inc" so PACKAGES doesn't get overwritten
-inherit ptest
-
-# This must come after inherit ptest for the override to take effect
-do_install_ptest() {
-	cp ${B}/Makefile ${D}${PTEST_PATH}
-	sed -e s:LIBDIR/python/ptest:${PTEST_PATH}:g \
-	 -e s:LIBDIR:${libdir}:g \
-	 -i ${D}${PTEST_PATH}/run-ptest
-
-	#Remove build host references
-	sed -i \
-		-e 's:--with-libtool-sysroot=${STAGING_DIR_TARGET}'::g \
-	    -e 's:--sysroot=${STAGING_DIR_TARGET}::g' \
-	    -e 's|${DEBUG_PREFIX_MAP}||g' \
-	    -e 's:${HOSTTOOLS_DIR}/::g' \
-	    -e 's:${RECIPE_SYSROOT}::g' \
-	    -e 's:${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}::g' \
-	${D}/${PTEST_PATH}/Makefile
-}
+RDEPENDS_${PN}-ptest = "${PN}-modules ${PN}-tests unzip"
 
 # catch manpage
 PACKAGES += "${PN}-man"

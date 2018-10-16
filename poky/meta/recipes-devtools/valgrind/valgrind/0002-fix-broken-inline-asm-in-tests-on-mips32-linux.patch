@@ -1,0 +1,47 @@
+From 63ce36396348e7c4c021cffa652d2e3d20f7963a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 27 Jul 2018 17:51:54 +0800
+Subject: [PATCH 2/2] fix broken inline asm in tests on mips32-linux
+
+While build tests(`make check') with gcc 8.1.0 on mips32-linux,
+there is a failure
+[snip]
+|mips-wrsmllib32-linux-gcc  -meb -mabi=32 -mhard-float -march=mips32
+-c -o tc08_hbl2-tc08_hbl2.o `test -f 'tc08_hbl2.c' || echo '../../../
+valgrind-3.13.0/helgrind/tests/'`tc08_hbl2.c
+|/tmp/cc37aJxQ.s: Assembler messages:
+|/tmp/cc37aJxQ.s:275: Error: symbol `L1xyzzy1main' is already defined
+|Makefile:1323: recipe for target 'tc08_hbl2-tc08_hbl2.o' failed
+[snip]
+
+Remove the duplicated L1xyzzy1main, and use local symbol to replace.
+http://tigcc.ticalc.org/doc/gnuasm.html#SEC46
+
+Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=396906]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ helgrind/tests/tc08_hbl2.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/helgrind/tests/tc08_hbl2.c b/helgrind/tests/tc08_hbl2.c
+index 2a757a008..f660d82dd 100644
+--- a/helgrind/tests/tc08_hbl2.c
++++ b/helgrind/tests/tc08_hbl2.c
+@@ -121,12 +121,12 @@
+ #elif defined(PLAT_mips32_linux) || defined(PLAT_mips64_linux)
+ #  define INC(_lval,_lqual)                         \
+      __asm__ __volatile__ (                         \
+-      "L1xyzzy1" _lqual":\n"                        \
++      "1:\n"                                        \
+       "        move  $t0, %0\n"                     \
+       "        ll    $t1, 0($t0)\n"                 \
+       "        addiu $t1, $t1, 1\n"                 \
+       "        sc    $t1, 0($t0)\n"                 \
+-      "        beqz  $t1, L1xyzzy1" _lqual          \
++      "        beqz  $t1, 1b\n"                     \
+       : /*out*/ : /*in*/ "r"(&(_lval))              \
+       : /*trash*/ "t0", "t1", "memory"              \
+         )
+-- 
+2.17.1
+

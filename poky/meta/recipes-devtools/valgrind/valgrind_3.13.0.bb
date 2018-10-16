@@ -37,6 +37,8 @@ SRC_URI = "ftp://sourceware.org/pub/valgrind/valgrind-${PV}.tar.bz2 \
            file://link-gz-tests.patch \
            file://ppc-headers.patch \
            file://mask-CPUID-support-in-HWCAP-on-aarch64.patch \
+           file://0001-fix-opcode-not-supported-on-mips32-linux.patch \
+           file://0002-fix-broken-inline-asm-in-tests-on-mips32-linux.patch \
            "
 SRC_URI[md5sum] = "817dd08f1e8a66336b9ff206400a5369"
 SRC_URI[sha256sum] = "d76680ef03f00cd5e970bbdcd4e57fb1f6df7d2e2c071635ef2be74790190c3b"
@@ -54,7 +56,6 @@ COMPATIBLE_HOST_linux-gnux32 = 'null'
 COMPATIBLE_HOST_linux-muslx32 = 'null'
 
 # Disable for some MIPS variants
-COMPATIBLE_HOST_mipsarchn32 = 'null'
 COMPATIBLE_HOST_mipsarchr6 = 'null'
 
 inherit autotools ptest multilib_header

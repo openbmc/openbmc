@@ -12,6 +12,11 @@ The #ifdef HAS_VSX guard is wrongly placed. It makes the standard
 include headers not be used. Causing a build failure. Fix by moving
 the #ifdef HAS_VSX after the standard includes.
 
+[v2 changes]
+- Add #ifdef HAS_VSX guard correctly for ppc64 test_isa_2_06_partx.c 
+  test cases. The changes are similar to what was done for ppc32.
+
+Signed-off-by: Jagadeesh Krishnanjanappa <jkrishnanjanappa@mvista.com>
 Index: none/tests/ppc32/test_isa_2_06_part3.c
 ===================================================================
 --- a/none/tests/ppc32/test_isa_2_06_part3.c	(revision 16449)
@@ -63,6 +68,79 @@ Index: none/tests/ppc32/test_isa_2_06_part2.c
 ===================================================================
 --- a/none/tests/ppc32/test_isa_2_06_part2.c	(revision 16449)
 +++ b/none/tests/ppc32/test_isa_2_06_part2.c	(revision 16450)
+@@ -20,17 +20,18 @@
+  The GNU General Public License is contained in the file COPYING.
+  */
+ 
+-#ifdef HAS_VSX
+-
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <malloc.h>
+-#include <altivec.h>
+ #include <math.h>
+ #include <unistd.h>    // getopt
+ 
++#ifdef HAS_VSX
++
++#include <altivec.h>
++
+ #ifndef __powerpc64__
+ typedef uint32_t HWord_t;
+ #else
+Index: none/tests/ppc64/test_isa_2_06_part3.c
+===================================================================
+--- a/none/tests/ppc64/test_isa_2_06_part3.c	(revision 16449)
++++ b/none/tests/ppc64/test_isa_2_06_part3.c	(revision 16450)
+@@ -20,17 +20,18 @@
+  The GNU General Public License is contained in the file COPYING.
+  */
+ 
+-#ifdef HAS_VSX
+-
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <malloc.h>
+-#include <altivec.h>
+ #include <math.h>
+ #include <unistd.h>    // getopt
+ 
++#ifdef HAS_VSX
++
++#include <altivec.h>
++
+ #ifndef __powerpc64__
+ typedef uint32_t HWord_t;
+ #else
+Index: none/tests/ppc64/test_isa_2_06_part1.c
+===================================================================
+--- a/none/tests/ppc64/test_isa_2_06_part1.c	(revision 16449)
++++ b/none/tests/ppc64/test_isa_2_06_part1.c	(revision 16450)
+@@ -20,13 +20,14 @@
+  The GNU General Public License is contained in the file COPYING.
+  */
+ 
+-#ifdef HAS_VSX
+-
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <malloc.h>
++
++#ifdef HAS_VSX
++
+ #include <altivec.h>
+ 
+ #ifndef __powerpc64__
+Index: none/tests/ppc64/test_isa_2_06_part2.c
+===================================================================
+--- a/none/tests/ppc64/test_isa_2_06_part2.c	(revision 16449)
++++ b/none/tests/ppc64/test_isa_2_06_part2.c	(revision 16450)
 @@ -20,17 +20,18 @@
   The GNU General Public License is contained in the file COPYING.
   */

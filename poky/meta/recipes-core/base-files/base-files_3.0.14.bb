@@ -32,15 +32,16 @@ INHIBIT_DEFAULT_DEPS = "1"
 docdir_append = "/${P}"
 dirs1777 = "/tmp ${localstatedir}/volatile/tmp"
 dirs2775 = ""
+dirs555 = "/sys /proc"
 dirs755 = "/boot /dev ${base_bindir} ${base_sbindir} ${base_libdir} \
            ${sysconfdir} ${sysconfdir}/default \
-           ${sysconfdir}/skel ${nonarch_base_libdir} /mnt /proc ${ROOT_HOME} /run \
+           ${sysconfdir}/skel ${nonarch_base_libdir} /mnt ${ROOT_HOME} /run \
            ${prefix} ${bindir} ${docdir} /usr/games ${includedir} \
            ${libdir} ${sbindir} ${datadir} \
            ${datadir}/common-licenses ${datadir}/dict ${infodir} \
            ${mandir} ${datadir}/misc ${localstatedir} \
            ${localstatedir}/backups ${localstatedir}/lib \
-           /sys ${localstatedir}/lib/misc ${localstatedir}/spool \
+           ${localstatedir}/lib/misc ${localstatedir}/spool \
            ${localstatedir}/volatile \
            ${localstatedir}/${@'volatile/' if oe.types.boolean('${VOLATILE_LOG_DIR}') else ''}log \
            /home ${prefix}/src ${localstatedir}/local \
@@ -93,6 +94,9 @@ pkg_preinst_${PN} () {
 }
 
 do_install () {
+	for d in ${dirs555}; do
+		install -m 0555 -d ${D}$d
+	done
 	for d in ${dirs755}; do
 		install -m 0755 -d ${D}$d
 	done

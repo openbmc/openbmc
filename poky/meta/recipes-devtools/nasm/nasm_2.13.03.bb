@@ -9,6 +9,7 @@ SRC_URI = "http://www.nasm.us/pub/nasm/releasebuilds/${PV}/nasm-${PV}.tar.bz2 \
            file://0001-fix-CVE-2018-8882.patch \
            file://0001-Verify-that-we-are-not-reading-past-end-of-a-buffer.patch \
            file://0001-eval-Eliminate-division-by-zero.patch \
+           file://0001-preproc-parse_size-Check-for-string-provided.patch \
            "
 
 SRC_URI[md5sum] = "0c581d482f39d5111879ca9601938f74"

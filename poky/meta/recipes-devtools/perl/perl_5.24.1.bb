@@ -62,7 +62,6 @@ SRC_URI += " \
         file://perl-PathTools-don-t-filter-out-blib-from-INC.patch \
         file://perl-errno-generation-gcc5.patch \
         file://perl-fix-conflict-between-skip_all-and-END.patch \
-        file://perl-test-customized.patch \
         file://perl-5.26.1-guard_old_libcrypt_fix.patch \
         file://CVE-2017-12883.patch \
         file://CVE-2017-12837.patch \
@@ -77,6 +76,7 @@ SRC_URI += " \
 SRC_URI_append_class-target = " \
             file://test/dist-threads-t-join.t-adjust-ps-option.patch \
             file://test/ext-DynaLoader-t-DynaLoader.t-fix-calling-dl_findfil.patch \
+            file://0001-Skip-various-tests-if-PERL_BUILD_PACKAGING-is-set.patch \
            "
 
 SRC_URI[md5sum] = "af6a84c7c3e2b8b269c105a5db2f6d53"

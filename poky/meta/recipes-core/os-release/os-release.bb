@@ -42,9 +42,9 @@ python do_compile () {
 do_compile[vardeps] += "${OS_RELEASE_FIELDS}"
 
 do_install () {
-    install -d ${D}${libdir} ${D}${sysconfdir}
-    install -m 0644 os-release ${D}${libdir}/
-    lnr ${D}${libdir}/os-release ${D}${sysconfdir}/os-release
+    install -d ${D}${nonarch_libdir} ${D}${sysconfdir}
+    install -m 0644 os-release ${D}${nonarch_libdir}/
+    lnr ${D}${nonarch_libdir}/os-release ${D}${sysconfdir}/os-release
 }
 
-FILES_${PN} += "${libdir}/os-release"
+FILES_${PN} += "${nonarch_libdir}/os-release"

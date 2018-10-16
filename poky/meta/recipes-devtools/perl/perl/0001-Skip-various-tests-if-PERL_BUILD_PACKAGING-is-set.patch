@@ -1,0 +1,126 @@
+From ba6733216202523a95b0b7ee2e534b8e30b6d7df Mon Sep 17 00:00:00 2001
+From: Dominic Hargreaves <dom@earth.li>
+Date: Sat, 14 Oct 2017 16:27:53 +0200
+Subject: [PATCH] Skip various tests if PERL_BUILD_PACKAGING is set
+
+These are tests which tend not to be useful for downstream packagers
+
+t/porting/customized.t change originally from Todd Rinaldo
+
+Upstream-Status: Backport[https://perl5.git.perl.org/perl.git/ba6733216202523a95b0b7ee2e534b8e30b6d7df]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ INSTALL                |  3 ++-
+ MANIFEST               |  1 +
+ PACKAGING              | 30 ++++++++++++++++++++++++++++++
+ regen/lib_cleanup.pl   |  5 +++++
+ t/porting/customized.t |  1 +
+ t/test.pl              |  3 +++
+ 6 files changed, 42 insertions(+), 1 deletion(-)
+ create mode 100644 PACKAGING
+
+diff --git a/INSTALL b/INSTALL
+index 636f4bd52f..1285fc69a2 100644
+--- a/INSTALL
++++ b/INSTALL
+@@ -2714,4 +2714,5 @@ This document is part of the Perl package and may be distributed under
+ the same terms as perl itself, with the following additional request:
+ If you are distributing a modified version of perl (perhaps as part of
+ a larger package) please B<do> modify these installation instructions
+-and the contact information to match your distribution.
++and the contact information to match your distribution. Additional
++information for packagers is in F<PACKAGING>.
+diff --git a/MANIFEST b/MANIFEST
+index b3207030a9..32de824ca1 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -4932,6 +4932,7 @@ os2/perlrexx.c			Support perl interpreter embedded in REXX
+ os2/perlrexx.cmd		Test perl interpreter embedded in REXX
+ overload.h			generated overload enum (public)
+ overload.inc			generated overload name table (implementation)
++PACKAGING			notes and best practice for packaging perl 5
+ packsizetables.inc		The generated packprops array used in pp_pack.c
+ pad.c				Scratchpad functions
+ pad.h				Scratchpad headers
+diff --git a/PACKAGING b/PACKAGING
+new file mode 100644
+index 0000000000..0c69b87ba6
+--- /dev/null
++++ b/PACKAGING
+@@ -0,0 +1,30 @@
++If you read this file _as_is_, just ignore the funny characters you
++see.  It is written in the POD format (see pod/perlpod.pod) which is
++specifically designed to be readable as is.
++
++=head1 NAME
++
++PACKAGING - notes and best practice for packaging perl 5
++
++=head1 SYNOPSIS
++
++This document is aimed at anyone who is producing their own version of
++perl for distribution to other users. It is intended as a collection
++of useful tips, advice and best practice, rather than being a complete
++packaging manual. The starting point for installing perl remains
++F<INSTALL>.
++
++=head1 Customizing test running
++
++A small number of porting tests (those in t/porting) are not well suited
++to typical distribution packaging scenarios. For example, they assume
++they are working in a git clone of the upstream Perl repository, or
++enforce rules which are not relevant to downstream packagers. These can
++be skipped by setting the environment variable PERL_BUILD_PACKAGING.
++A complete list of tests which this applied to can be found by searching
++the codebase for this string.
++
++An alternative strategy would be to skip all porting tests, but many of
++them are useful if additional patches might be applied.
++
++=cut
+diff --git a/regen/lib_cleanup.pl b/regen/lib_cleanup.pl
+index 5e40b405a4..6caf74a563 100644
+--- a/regen/lib_cleanup.pl
++++ b/regen/lib_cleanup.pl
+@@ -164,6 +164,11 @@ if ($TAP && !-d '.git' && !-f 'lib/.gitignore') {
+     exit 0;
+ }
+ 
++if ($ENV{'PERL_BUILD_PACKAGING'}) {
++    print "ok # skip explicitly disabled git tests by PERL_BUILD_PACKAGING\n";
++    exit 0;
++}
++
+ $fh = open_new('lib/.gitignore', '>',
+                { by => $0,
+                  from => 'MANIFEST and parsing files in cpan/ dist/ and ext/'});
+diff --git a/t/porting/customized.t b/t/porting/customized.t
+index 45fcafb100..5c3739198c 100644
+--- a/t/porting/customized.t
++++ b/t/porting/customized.t
+@@ -13,6 +13,7 @@ BEGIN {
+     @INC = qw(lib Porting t);
+     require 'test.pl';
+     skip_all("pre-computed SHA1 won't match under EBCDIC") if $::IS_EBCDIC;
++    skip_all("This distro may have modified some files in cpan/. Skipping validation.") if $ENV{'PERL_BUILD_PACKAGING'};
+ }
+ 
+ use strict;
+diff --git a/t/test.pl b/t/test.pl
+index 79e6e25e95..1782dcf73c 100644
+--- a/t/test.pl
++++ b/t/test.pl
+@@ -212,6 +212,9 @@ sub find_git_or_skip {
+     } else {
+ 	$reason = 'not being run from a git checkout';
+     }
++    if ($ENV{'PERL_BUILD_PACKAGING'}) {
++	$reason = 'PERL_BUILD_PACKAGING is set';
++    }
+     skip_all($reason) if $_[0] && $_[0] eq 'all';
+     skip($reason, @_);
+ }
+-- 
+2.17.1
+
