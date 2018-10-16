@@ -247,4 +247,3 @@ VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
 
 PREFERRED_VERSION_phosphor-ipmi-host = "1.0"
 PREFERRED_VERSION_phosphor-dbus-monitor = "1.0"
-PREFERRED_VERSION_mboxd = "1.0"
