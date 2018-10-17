@@ -3,6 +3,7 @@ DESCRIPTION = "Phosphor Inventory Manager is an inventory object \
 lifecycle management application, suitable for use on a wide variety \
 of OpenBMC platforms."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools \
         pkgconfig \
