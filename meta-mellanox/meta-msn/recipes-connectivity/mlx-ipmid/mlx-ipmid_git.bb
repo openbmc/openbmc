@@ -1,4 +1,5 @@
 PV = "git${SRCPV}"
+PV = "2.0.22+git${SRCPV}"
 
 MLX_IPMID_BRANCH = "openbmc"
 
