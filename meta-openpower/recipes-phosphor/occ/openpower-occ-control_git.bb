@@ -2,6 +2,7 @@ SUMMARY = "OpenPOWER OCC controller"
 DESCRIPTION = "Application to control the OpenPOWER On-Chip-Controller"
 HOMEPAGE = "https://github.com/openbmc/openpower-occ-control"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools \
         pkgconfig \
