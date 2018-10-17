@@ -11,6 +11,8 @@ Wants=mapper-wait@-xyz-openbmc_project-control-host0-restriction_mode.service
 After=mapper-wait@-xyz-openbmc_project-control-host0-restriction_mode.service
 
 [Service]
+Environment=IPTABLESRULE=/var/lib/iptables_rules
+ExecStartPre=/usr/bin/env ipmi-net-firewall.sh
 ExecStart=/usr/bin/env netipmid
 SyslogIdentifier=netipmid
 Restart=always
