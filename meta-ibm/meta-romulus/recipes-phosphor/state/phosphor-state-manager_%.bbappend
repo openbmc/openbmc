@@ -1,1 +1,1 @@
-phosphor-state-manager.bbappend
+FILESEXTRAPATHS_prepend_romulus := "${THISDIR}/${PN}:"
