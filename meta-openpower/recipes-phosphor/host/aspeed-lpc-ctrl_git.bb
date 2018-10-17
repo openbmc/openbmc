@@ -1,6 +1,7 @@
 SUMMARY = "ASPEED LPC Host Interface Control tool"
 DESCRIPTION = "Configures the BMC to expose memory regions to the host"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit obmc-phosphor-license
 inherit obmc-phosphor-systemd
