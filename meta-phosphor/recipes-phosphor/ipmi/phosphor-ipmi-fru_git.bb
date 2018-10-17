@@ -22,6 +22,7 @@ DEPENDS += " \
         phosphor-ipmi-host \
         phosphor-mapper \
         autoconf-archive-native \
+        phosphor-logging \
         "
 
 RDEPENDS_${PN} += " \
