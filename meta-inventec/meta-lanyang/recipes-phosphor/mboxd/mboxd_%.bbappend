@@ -1,1 +1,1 @@
-mboxd.bbappend
+MBOXD_FLASH_SIZE = "64M"
