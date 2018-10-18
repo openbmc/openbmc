@@ -20,7 +20,7 @@ DEPENDS += "${@df_enabled(d, 'obmc-mrw', 'phosphor-settings-read-settings-mrw-na
 DEPENDS += "sdbusplus sdbusplus-native"
 DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "phosphor-logging"
-DEPENDS += "cereal"
+DEPENDS += "libcereal"
 
 RDEPENDS_${PN} += "sdbusplus phosphor-dbus-interfaces"
 

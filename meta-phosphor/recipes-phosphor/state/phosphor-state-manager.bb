@@ -41,7 +41,7 @@ DEPENDS += "sdbusplus"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
-DEPENDS += "cereal"
+DEPENDS += "libcereal"
 RDEPENDS_${PN} += "sdbusplus"
 
 RDEPENDS_${PN}-host += "libsystemd phosphor-dbus-interfaces"

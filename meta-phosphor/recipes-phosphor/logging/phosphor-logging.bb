@@ -21,7 +21,7 @@ DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
 DEPENDS += "virtual/phosphor-logging-callouts"
 DEPENDS += "phosphor-logging-error-logs-native"
 DEPENDS += "phosphor-logging-native"
-DEPENDS += "cereal"
+DEPENDS += "libcereal"
 
 PACKAGE_BEFORE_PN = "${PN}-test"
 FILES_${PN}-test = "${bindir}/*-test"
@@ -64,7 +64,7 @@ DEPENDS_remove_class-native = " \
         virtual/phosphor-logging-callouts \
         sdbus++ \
         systemd \
-        cereal \
+        libcereal \
         "
 
 # Do not DEPEND on the specified packages for native SDK build
@@ -72,7 +72,7 @@ DEPENDS_remove_class-native = " \
 DEPENDS_remove_class-nativesdk = " \
         virtual/phosphor-logging-callouts \
         sdbus++-native \
-        cereal \
+        libcereal \
         systemd \
         phosphor-dbus-interfaces \
         "

@@ -22,7 +22,7 @@ DEPENDS += " \
         sdbusplus \
         sdbusplus-native \
         autoconf-archive-native \
-        cereal \
+        libcereal \
         "
 RDEPENDS_${PN} += " \
         sdbusplus \
