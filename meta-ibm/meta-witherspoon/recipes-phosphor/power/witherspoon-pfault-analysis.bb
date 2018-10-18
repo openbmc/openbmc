@@ -16,6 +16,7 @@ DEPENDS += " \
          autoconf-archive-native \
          openpower-dbus-interfaces \
          sdbus++-native \
+         sdeventplus \
          "
 
 RDEPENDS_${PN} += " \
