@@ -1,5 +1,3 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-
 # General config settings.
 EXTRA_OECONF_append_class-target = " shared no-hw no-err no-psk no-srp no-engines "
 
