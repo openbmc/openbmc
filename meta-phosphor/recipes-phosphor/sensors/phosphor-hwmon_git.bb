@@ -24,10 +24,6 @@ DEPENDS += " \
 
 
 RDEPENDS_${PN} += "\
-        sdbusplus \
-        phosphor-dbus-interfaces \
-        phosphor-logging \
-        gpioplus \
         bash \
         "
 
