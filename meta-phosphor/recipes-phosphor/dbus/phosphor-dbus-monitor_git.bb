@@ -24,6 +24,7 @@ DEPENDS += " \
         phosphor-logging \
         autoconf-archive-native \
         sdbusplus-native \
+        sdeventplus \
         gtest \
         phosphor-snmp \
         "
