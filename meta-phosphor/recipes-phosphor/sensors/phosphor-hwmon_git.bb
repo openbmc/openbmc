@@ -17,6 +17,7 @@ SYSTEMD_SERVICE_max31785-msl = "phosphor-max31785-msl@.service"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += " \
         sdbusplus \
+        sdeventplus \
         phosphor-dbus-interfaces \
         phosphor-logging \
         gpioplus \
