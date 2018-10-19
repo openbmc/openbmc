@@ -7,6 +7,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: -3
+  rExp: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -26,6 +27,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -45,6 +47,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -83,6 +86,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
   scale: 0
+  rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -119,6 +123,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
   scale: 0
+  rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -155,6 +160,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
   scale: 0
+  rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -191,6 +197,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
   scale: 0
+  rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -227,6 +234,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
   scale: 0
+  rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -246,6 +254,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
   scale: 0
+  rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -284,6 +293,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
   scale: 0
+  rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -303,6 +313,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -322,6 +333,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -341,6 +353,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -379,6 +392,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -398,6 +412,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -417,6 +432,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -455,6 +471,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -474,6 +491,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -493,6 +511,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -512,6 +531,7 @@
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: -3
+  rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
