@@ -27,19 +27,7 @@ DEPENDS += " \
         gtest \
         phosphor-snmp \
         "
-RDEPENDS_${PN} += " \
-        sdbusplus \
-        phosphor-dbus-interfaces \
-        phosphor-logging \
-        phosphor-snmp \
-        "
 
-RDEPENDS_phosphor-msl-verify += " \
-        sdbusplus \
-        phosphor-dbus-interfaces \
-        phosphor-logging \
-        phosphor-snmp \
-        "
 FILES_phosphor-msl-verify = "${sbindir}/phosphor-msl-verify"
 
 S = "${WORKDIR}/git"
