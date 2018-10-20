@@ -18,6 +18,7 @@ DEPENDS += "python-pyyaml-native"
 DEPENDS += "python-mako-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "sdbusplus-native"
+DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libevdev"
 
