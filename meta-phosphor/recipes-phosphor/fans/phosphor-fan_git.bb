@@ -42,7 +42,6 @@ PACKAGECONFIG[presence] = " \
         virtual/phosphor-fan-presence-config \
         , \
 "
-RDEPENDS_${PN}-presence-tach += "sdbusplus"
 
 # Needed to install into the obmc-chassis-poweron target
 TMPL_TACH = "phosphor-fan-presence-tach@.service"
@@ -70,8 +69,6 @@ PACKAGECONFIG[control] = "--enable-control \
     , \
 "
 
-RDEPENDS_${PN}-control += "sdbusplus"
-
 FAN_CONTROL_TGT = "obmc-fan-control-ready@{0}.target"
 
 TMPL_CONTROL = "phosphor-fan-control@.service"
@@ -96,8 +93,6 @@ PACKAGECONFIG[monitor] = "--enable-monitor \
     phosphor-fan-monitor-config-native \
     , \
 "
-
-RDEPENDS_${PN}-monitor += "sdbusplus"
 
 TMPL_MONITOR = "phosphor-fan-monitor@.service"
 INSTFMT_MONITOR = "phosphor-fan-monitor@{0}.service"
