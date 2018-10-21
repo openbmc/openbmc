@@ -1,7 +1,6 @@
 SUMMARY = "Phosphor OpenBMC IPMI daemon"
 DESCRIPTION = "Phosphor OpenBMC IPMI router and plugin libraries"
 PR = "r1"
-PV = "1.0+git${SRCPV}"
 
 RRECOMMENDS_${PN} += "packagegroup-obmc-ipmid-providers-libs"
 

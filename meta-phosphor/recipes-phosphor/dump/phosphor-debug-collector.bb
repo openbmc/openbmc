@@ -5,7 +5,6 @@ This will be helpful for troubleshooting the problems in OpenBMC \
 based systems."
 
 PR = "r1"
-PV = "1.0+git${SRCPV}"
 
 DEBUG_COLLECTOR_PKGS = " \
     ${PN}-manager \

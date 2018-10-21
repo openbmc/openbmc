@@ -2,7 +2,6 @@ SUMMARY = "Network DBUS object"
 DESCRIPTION = "Network DBUS object"
 HOMEPAGE = "http://github.com/openbmc/phosphor-networkd"
 PR = "r1"
-PV = "1.0+git${SRCPV}"
 
 inherit autotools pkgconfig
 inherit pythonnative
