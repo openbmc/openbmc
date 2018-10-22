@@ -27,15 +27,7 @@ PHOSPHOR_MAPPER_NAMESPACE = ""
 # Add interfaces to be monitored.
 PHOSPHOR_MAPPER_INTERFACE = ""
 
-# Blacklist paths from being monitored.
-PHOSPHOR_MAPPER_NAMESPACE_BLACKLIST = ""
-
-# Blacklist interfaces from being monitored.
-PHOSPHOR_MAPPER_INTERFACE_BLACKLIST = ""
-
 do_install() {
         install -d ${D}/${namespace_dir}
         install -d ${D}/${interface_dir}
-        install -d ${D}/${blacklist_dir}
-        install -d ${D}/${interfaceblacklist_dir}
 }

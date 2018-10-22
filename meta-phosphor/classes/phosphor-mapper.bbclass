@@ -18,12 +18,6 @@
 # Add interfaces to be monitored:
 # PHOSPHOR_MAPPER_INTERFACE_append = " foo.bar"
 
-# Blacklist paths from being monitored:
-# PHOSPHOR_MAPPER_NAMESPACE_BLACKLIST_append = " /foo/bar/baz"
-
-# Blacklist interfaces from being monitored:
-# PHOSPHOR_MAPPER_INTERFACE_BLACKLIST_append = " foo.bar.baz"
-
 inherit phosphor-mapperdir
 inherit obmc-phosphor-utils
 
@@ -41,13 +35,8 @@ python phosphor_mapper_do_postinst() {
 
     process_var(d, 'PHOSPHOR_MAPPER_NAMESPACE', 'namespace_dir')
     process_var(d, 'PHOSPHOR_MAPPER_INTERFACE', 'interface_dir')
-    process_var(d, 'PHOSPHOR_MAPPER_NAMESPACE_BLACKLIST', 'blacklist_dir')
-    process_var(
-        d, 'PHOSPHOR_MAPPER_INTERFACE_BLACKLIST', 'interfaceblacklist_dir')
 }
 
 do_install[vardeps] += "PHOSPHOR_MAPPER_NAMESPACE"
 do_install[vardeps] += "PHOSPHOR_MAPPER_INTERFACE"
-do_install[vardeps] += "PHOSPHOR_MAPPER_NAMESPACE_BLACKLIST"
-do_install[vardeps] += "PHOSPHOR_MAPPER_INTERFACE_BLACKLIST"
 do_install[postfuncs] += "phosphor_mapper_do_postinst"

@@ -64,18 +64,6 @@ python do_emit_env() {
     for i in os.listdir(path):
         interfaces.append('.'.join(i.split('-')))
 
-    path = d.getVar('STAGING_DIR_NATIVE', True) + \
-        d.getVar('blacklist_dir', True)
-    blacklists = []
-    for b in os.listdir(path):
-        blacklists.append(os.sep + os.sep.join(b.split('-')))
-
-    path = d.getVar('STAGING_DIR_NATIVE', True) + \
-        d.getVar('interfaceblacklist_dir', True)
-    interface_blacklists = []
-    for ib in os.listdir(path):
-        interface_blacklists.append('.'.join(ib.split('-')))
-
     path = [d.getVar('D', True) + d.getVar('envfiledir', True)]
     path.append('obmc')
     path.append('mapper')
@@ -88,10 +76,6 @@ python do_emit_env() {
         fd.write('MAPPER_NAMESPACES="{}"'.format(' '.join(paths)))
         fd.write('\n')
         fd.write('MAPPER_INTERFACES="{}"'.format(' '.join(interfaces)))
-        fd.write('\n')
-        fd.write('MAPPER_BLACKLISTS="{}"'.format(' '.join(blacklists)))
-        fd.write('\n')
-        fd.write('MAPPER_INTERFACEBLACKLISTS="{}"'.format(' '.join(interface_blacklists)))
         fd.write('\n')
 }
 
