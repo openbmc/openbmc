@@ -59,10 +59,22 @@ python do_emit_env() {
         paths.append(os.sep.join(p.split('-')))
 
     path = d.getVar('STAGING_DIR_NATIVE', True) + \
+        d.getVar('service_dir', True)
+    services = []
+    for s in os.listdir(path):
+        services.append('.'.join(s.split('-')))
+
+    path = d.getVar('STAGING_DIR_NATIVE', True) + \
         d.getVar('interface_dir', True)
     interfaces = []
     for i in os.listdir(path):
         interfaces.append('.'.join(i.split('-')))
+
+    path = d.getVar('STAGING_DIR_NATIVE', True) + \
+        d.getVar('serviceblacklist_dir', True)
+    service_blacklists = []
+    for x in os.listdir(path):
+        service_blacklists.append('.'.join(x.split('-')))
 
     path = [d.getVar('D', True) + d.getVar('envfiledir', True)]
     path.append('obmc')
@@ -75,7 +87,11 @@ python do_emit_env() {
     with open(path, 'w+') as fd:
         fd.write('MAPPER_NAMESPACES="{}"'.format(' '.join(paths)))
         fd.write('\n')
+        fd.write('MAPPER_SERVICES="{}"'.format(' '.join(services)))
+        fd.write('\n')
         fd.write('MAPPER_INTERFACES="{}"'.format(' '.join(interfaces)))
+        fd.write('\n')
+        fd.write('MAPPER_SERVICEBLACKLISTS="{}"'.format(' '.join(service_blacklists)))
         fd.write('\n')
 }
 

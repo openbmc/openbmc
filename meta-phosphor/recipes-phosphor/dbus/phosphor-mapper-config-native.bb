@@ -24,10 +24,17 @@ DEPENDS += "${PHOSPHOR_MAPPER_CONFIGS}"
 # Add path namespaces to be monitored.
 PHOSPHOR_MAPPER_NAMESPACE = ""
 
+# Add services to be monitored.
+PHOSPHOR_MAPPER_SERVICE = ""
+
 # Add interfaces to be monitored.
 PHOSPHOR_MAPPER_INTERFACE = ""
+
+# Blacklist services from being monitored.
+PHOSPHOR_MAPPER_SERVICE_BLACKLIST = ""
 
 do_install() {
         install -d ${D}/${namespace_dir}
         install -d ${D}/${interface_dir}
+        install -d ${D}/${serviceblacklist_dir}
 }
