@@ -1,1 +1,1 @@
-obmc-libobmc-intf.bbappend
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
