@@ -53,12 +53,6 @@ FILES_${PN}_remove = "${libdir}/lib*.so.* ${libdir}/*"
 # from the native sysroot /usr/share/phosphor-mapper filesystem.
 python do_emit_env() {
     path = d.getVar('STAGING_DIR_NATIVE', True) + \
-        d.getVar('namespace_dir', True)
-    paths = []
-    for p in os.listdir(path):
-        paths.append(os.sep.join(p.split('-')))
-
-    path = d.getVar('STAGING_DIR_NATIVE', True) + \
         d.getVar('service_dir', True)
     services = []
     for s in os.listdir(path):
@@ -85,8 +79,6 @@ python do_emit_env() {
     if not os.path.exists(parent):
         os.makedirs(parent)
     with open(path, 'w+') as fd:
-        fd.write('MAPPER_NAMESPACES="{}"'.format(' '.join(paths)))
-        fd.write('\n')
         fd.write('MAPPER_SERVICES="{}"'.format(' '.join(services)))
         fd.write('\n')
         fd.write('MAPPER_INTERFACES="{}"'.format(' '.join(interfaces)))
@@ -96,4 +88,3 @@ python do_emit_env() {
 }
 
 do_install[postfuncs] += "do_emit_env"
-do_install[vardeps] += "PHOSPHOR_MAPPER_NAMESPACES"

@@ -7,13 +7,10 @@
 # interfaces it will keep track of.
 #
 # The Phosphor layer by default configures the mapper to
-# watch xyz.openbmc_project services, interfaces and paths
-# only.  This configuration file is intended to be inherited
-# by native recipes in other layers that wish to add namespaces
+# watch xyz.openbmc_project services and interfaces only.
+# This configuration file is intended to be inherited by
+# native recipes in other layers that wish to add namespaces
 # or interfaces to the mapper watchlist.
-
-# Add path namespaces to be monitored:
-# PHOSPHOR_MAPPER_NAMESPACE_append = " /foo/bar"
 
 # Add service namespaces to be monitored:
 # PHOSPHOR_MAPPER_SERVICE_append = " foo.bar"
@@ -39,13 +36,11 @@ python phosphor_mapper_do_postinst() {
             with open(path, 'w+') as fd:
                 pass
 
-    process_var(d, 'PHOSPHOR_MAPPER_NAMESPACE', 'namespace_dir')
     process_var(d, 'PHOSPHOR_MAPPER_SERVICE', 'service_dir')
     process_var(d, 'PHOSPHOR_MAPPER_INTERFACE', 'interface_dir')
     process_var(d, 'PHOSPHOR_MAPPER_SERVICE_BLACKLIST', 'serviceblacklist_dir')
 }
 
-do_install[vardeps] += "PHOSPHOR_MAPPER_NAMESPACE"
 do_install[vardeps] += "PHOSPHOR_MAPPER_SERVICE"
 do_install[vardeps] += "PHOSPHOR_MAPPER_INTERFACE"
 do_install[vardeps] += "PHOSPHOR_MAPPER_SERVICE_BLACKLIST"

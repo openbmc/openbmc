@@ -21,9 +21,6 @@ DEPENDS += "${PHOSPHOR_MAPPER_CONFIGS}"
 # Recipes should set one of the variables below.
 # Consult phosphor-mapper.bbclass for additional information.
 
-# Add path namespaces to be monitored.
-PHOSPHOR_MAPPER_NAMESPACE = ""
-
 # Add services to be monitored.
 PHOSPHOR_MAPPER_SERVICE = ""
 

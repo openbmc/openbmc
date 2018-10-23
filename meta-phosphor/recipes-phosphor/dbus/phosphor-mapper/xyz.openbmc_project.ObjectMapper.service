@@ -7,7 +7,6 @@ After=dbus.service
 Restart=always
 Type=dbus
 ExecStart=/usr/bin/env phosphor-mapper \
-        --path_namespaces="${{MAPPER_NAMESPACES}}" \
         --service_namespaces="${{MAPPER_SERVICES}}" \
         --interface_namespaces="${{MAPPER_INTERFACES}}" \
         --service_blacklists="${{MAPPER_SERVICEBLACKLISTS}}"
