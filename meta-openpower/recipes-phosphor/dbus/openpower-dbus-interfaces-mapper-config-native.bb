@@ -8,4 +8,5 @@ inherit native
 inherit obmc-phosphor-license
 
 PHOSPHOR_MAPPER_NAMESPACE_append = " /org/open_power"
+PHOSPHOR_MAPPER_SERVICE_append = " org.open_power"
 PHOSPHOR_MAPPER_INTERFACE_append = " org.open_power"
