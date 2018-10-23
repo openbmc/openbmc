@@ -7,4 +7,5 @@ inherit native
 inherit obmc-phosphor-license
 
 PHOSPHOR_MAPPER_NAMESPACE_append = " /com/ibm"
+PHOSPHOR_MAPPER_SERVICE_append = " com.ibm"
 PHOSPHOR_MAPPER_INTERFACE_append = " com.ibm"
