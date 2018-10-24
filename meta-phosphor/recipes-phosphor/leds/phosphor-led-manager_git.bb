@@ -1,6 +1,7 @@
 SUMMARY = "Phosphor LED Group Management Daemon"
 DESCRIPTION = "Daemon to cater to triggering actions on LED groups"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 require ${PN}.inc
 

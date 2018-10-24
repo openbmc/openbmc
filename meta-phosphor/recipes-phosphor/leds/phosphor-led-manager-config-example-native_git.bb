@@ -1,5 +1,6 @@
 SUMMARY = "Phosphor LED Group Management with example data"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit native
 require phosphor-led-manager.inc
