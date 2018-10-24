@@ -1,0 +1,1 @@
+openpower-fru-vpd.bb
