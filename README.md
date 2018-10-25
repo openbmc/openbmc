@@ -46,6 +46,7 @@ Machine | TEMPLATECONF
 Palmetto | ```meta-ibm/meta-palmetto/conf```
 Zaius| ```meta-ingrasys/meta-zaius/conf```
 Witherspoon| ```meta-ibm/meta-witherspoon/conf```
+Romulus| ```meta-ibm/meta-romulus/conf```
 
 
 As an example target Palmetto
