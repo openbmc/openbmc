@@ -1,5 +1,3 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-
 EXTRA_OECONF += "--disable-mib-loading \
 --disable-manuals --disable-scripts --disable-embedded-perl \
 --disable-perl-cc-checks --disable-libtool-lock --disable-debugging \
