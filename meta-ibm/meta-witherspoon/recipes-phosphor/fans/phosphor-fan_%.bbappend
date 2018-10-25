@@ -1,7 +1,5 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-SRCREV = "d9a580aa5037fdb08911940263a580b036f2d9fa"
-
 # Package configuration
 FAN_PACKAGES += " \
         phosphor-cooling-type \
