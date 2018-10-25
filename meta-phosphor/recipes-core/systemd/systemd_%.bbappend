@@ -1,7 +1,7 @@
 FILES_${PN}-catalog-extralocales = \
             "${exec_prefix}/lib/systemd/catalog/*.*.catalog"
 PACKAGES =+ "${PN}-catalog-extralocales"
-PACKAGECONFIG_append = " networkd coredump"
+PACKAGECONFIG_append = " networkd"
 PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight localed \
                         quotacheck kdbus ima smack polkit logind bootchart utmp \
                         manpages"
