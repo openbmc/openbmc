@@ -64,9 +64,6 @@ SANITY_TESTED_DISTROS ?= " \
 
 OELAYOUT_ABI = "12"
 
-# add poky sanity bbclass
-INHERIT += "poky-sanity"
-
 # QA check settings - a little stricter than the OE-Core defaults
 WARN_TO_ERROR_QA = "already-stripped compile-host-path install-host-path \
                     installed-vs-shipped ldflags pn-overrides rpaths staticdev \
@@ -74,7 +71,6 @@ WARN_TO_ERROR_QA = "already-stripped compile-host-path install-host-path \
 WARN_QA_remove = "${WARN_TO_ERROR_QA}"
 ERROR_QA_append = " ${WARN_TO_ERROR_QA}"
 
-require conf/distro/include/poky-world-exclude.inc
 require conf/distro/include/no-static-libs.inc
 
 DISTRO = "openbmc-phosphor"
