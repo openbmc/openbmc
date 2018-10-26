@@ -1,5 +1,6 @@
 SUMMARY = "Generate inventory map for phosphor-ipmi-host from a MRW."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit native
 inherit phosphor-ipmi-host
