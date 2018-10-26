@@ -1,5 +1,6 @@
 SUMMARY = "Sample inventory map for phosphor-ipmi-fru"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit native
 inherit phosphor-ipmi-fru
