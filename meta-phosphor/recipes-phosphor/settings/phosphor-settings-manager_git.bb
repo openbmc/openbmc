@@ -2,6 +2,7 @@ SUMMARY = "Phosphor Settings Manager"
 DESCRIPTION = "Phosphor Settings Manager is an application that creates \
 d-bus objects to represent various user settings."
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools
 inherit obmc-phosphor-dbus-service
