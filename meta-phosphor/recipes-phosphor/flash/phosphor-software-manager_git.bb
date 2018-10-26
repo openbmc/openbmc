@@ -1,0 +1,1 @@
+phosphor-software-manager.bb
