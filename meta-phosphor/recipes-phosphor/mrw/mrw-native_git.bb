@@ -1,6 +1,7 @@
 SUMMARY = "Phosphor OpenBMC machine readable workbook"
 DESCRIPTION = "Pulls down system specific data"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
