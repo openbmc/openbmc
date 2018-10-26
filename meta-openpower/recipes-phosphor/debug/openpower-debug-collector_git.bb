@@ -2,6 +2,7 @@ SUMMARY = "OpenPOWER Debug Collector"
 DESCRIPTION = "Application to log error during host checkstop and watchdog timeout"
 
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools \
         pkgconfig \
