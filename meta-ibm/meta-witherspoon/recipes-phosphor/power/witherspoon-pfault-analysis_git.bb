@@ -1,6 +1,7 @@
 SUMMARY = "Witherspoon Power Fault Analysis"
 DESCRIPTION = "Analyzes power devices for faults"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit autotools
 inherit pkgconfig
