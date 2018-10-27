@@ -1,1 +1,1 @@
-phosphor-software-manager.bbappend
+PACKAGECONFIG_append = " verify_signature"
