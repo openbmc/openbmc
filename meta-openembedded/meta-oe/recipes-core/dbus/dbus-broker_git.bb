@@ -11,7 +11,7 @@ DEPENDS = "dbus glib-2.0 expat"
 PV = "16+git${SRCPV}"
 SRCREV = "fc874afa0992d0c75ec25acb43d344679f0ee7d2"
 
-SRC_URI = "git://github.com/bus1/dbus-broker;protocol=git"
+SRC_URI = "gitsm://github.com/bus1/dbus-broker;protocol=git"
 
 S = "${WORKDIR}/git"
 
