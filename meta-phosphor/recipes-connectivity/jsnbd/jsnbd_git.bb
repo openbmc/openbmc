@@ -15,4 +15,4 @@ RDEPENDS_${PN} += "nbd-client"
 S = "${WORKDIR}/git"
 
 SRC_URI = "git://github.com/openbmc/jsnbd"
-SRCREV = "fa1d37502c87310886614949a8d72124762b2dcb"
+SRCREV = "d5b9857609401e3cf9c53b111134a6aab8e4573c"
