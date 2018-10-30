@@ -1,6 +1,7 @@
 SUMMARY = "Phosphor machine readable workbook patching script"
 DESCRIPTION = "Retrieve the script that can patch the MRW XML"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
