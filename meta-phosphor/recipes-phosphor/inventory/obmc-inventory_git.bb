@@ -1,6 +1,7 @@
 SUMMARY = "Phosphor Inventory Generation"
 DESCRIPTION = "Generates inventory data from the machine readable workbook"
 PR = "r1"
+PV = "1.0+git${SRCPV}"
 
 inherit mrw-xml
 
