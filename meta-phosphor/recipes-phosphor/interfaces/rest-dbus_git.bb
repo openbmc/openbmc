@@ -21,6 +21,6 @@ SYSTEMD_SERVICE_${PN} += "rest-dbus.service rest-dbus.socket"
 
 SRC_URI += "git://github.com/openbmc/rest-dbus.git"
 
-SRCREV = "58996aedccf45bca045a0b00eab54477e7ee35d7"
+SRCREV = "403ce23066a8b0f0dca23220530b8760748b168e"
 
 S = "${WORKDIR}/git"
