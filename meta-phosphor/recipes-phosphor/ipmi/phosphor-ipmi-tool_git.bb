@@ -3,8 +3,8 @@ DESCRIPTION = "IPMI Tool with dbus capabilities"
 HOMEPAGE = "https://github.com/openbmc/ipmitool"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
-
-inherit obmc-phosphor-license
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://COPYING;md5=9aa91e13d644326bf281924212862184"
 
 DEPENDS += "systemd    \
             phosphor-ipmi-host \

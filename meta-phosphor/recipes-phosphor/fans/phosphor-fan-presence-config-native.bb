@@ -6,10 +6,11 @@
 
 SUMMARY = "Config file for phosphor-fan-presence"
 PR = "r1"
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://${PHOSPHORBASE}/COPYING.apache-2.0;md5=34400b68072d710fecd0a2940a0d1658"
 
 inherit native
 inherit phosphor-fan
-inherit obmc-phosphor-license
 
 PROVIDES += "virtual/phosphor-fan-presence-config"
 

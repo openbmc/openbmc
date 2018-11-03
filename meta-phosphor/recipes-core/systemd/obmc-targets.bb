@@ -2,9 +2,10 @@ SUMMARY = "Phosphor Systemd targets"
 DESCRIPTION = "Provides well known Systemd synchronization points for OpenBMC."
 HOMEPAGE = "http://github.com/openbmc"
 PR = "r1"
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://${PHOSPHORBASE}/COPYING.apache-2.0;md5=34400b68072d710fecd0a2940a0d1658"
 
 inherit obmc-phosphor-systemd
-inherit obmc-phosphor-license
 inherit allarch
 
 # Chassis power synchronization targets
