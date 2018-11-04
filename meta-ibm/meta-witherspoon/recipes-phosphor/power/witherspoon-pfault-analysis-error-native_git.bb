@@ -3,7 +3,6 @@ PR = "r1"
 PV = "1.0+git${SRCPV}"
 
 inherit native
-inherit obmc-phosphor-license
 inherit phosphor-dbus-yaml
 
 require witherspoon-pfault-analysis.inc
