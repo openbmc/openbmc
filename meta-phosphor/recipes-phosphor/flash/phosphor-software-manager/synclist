@@ -1,11 +1,3 @@
-/etc/dropbear/
-/etc/group
-/etc/gshadow
 /etc/hostname
 /etc/machine-id
-/etc/passwd
-/etc/shadow
-/etc/ssl/
-/etc/ssl/certs/nginx/
-/etc/ssl/private/
 /etc/systemd/network/
