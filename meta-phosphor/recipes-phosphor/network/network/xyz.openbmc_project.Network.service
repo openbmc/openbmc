@@ -8,6 +8,9 @@ SyslogIdentifier=phosphor-network-manager
 Restart=always
 Type=dbus
 BusName={BUSNAME}
+RuntimeDirectory = network
+RuntimeDirectoryPreserve = yes
+StateDirectory = network
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
