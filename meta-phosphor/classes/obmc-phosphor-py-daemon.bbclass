@@ -2,7 +2,6 @@
 
 inherit allarch
 inherit obmc-phosphor-systemd
-inherit obmc-phosphor-license
 
 RDEPENDS_${PN} += "python-dbus python-pygobject"
 INSTALL_NAME ?= "${PN}"
