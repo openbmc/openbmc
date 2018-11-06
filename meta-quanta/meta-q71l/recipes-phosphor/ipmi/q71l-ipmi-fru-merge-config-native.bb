@@ -1,5 +1,7 @@
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://${QUANTABASE}/COPYING.apache-2.0;md5=34400b68072d710fecd0a2940a0d1658"
+
 inherit native
-inherit obmc-phosphor-license
 
 DEPENDS += "virtual/phosphor-ipmi-fru-inventory"
 PROVIDES += "virtual/phosphor-ipmi-fru-merge-config"
