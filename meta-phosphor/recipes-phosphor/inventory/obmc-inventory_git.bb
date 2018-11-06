@@ -2,6 +2,8 @@ SUMMARY = "Phosphor Inventory Generation"
 DESCRIPTION = "Generates inventory data from the machine readable workbook"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit mrw-xml
 
@@ -11,7 +13,6 @@ PROVIDES += "virtual/obmc-inventory-data"
 RPROVIDES_${PN} += "virtual-obmc-inventory-data"
 
 inherit allarch
-inherit obmc-phosphor-license
 inherit mrw-rev
 
 DEPENDS += "mrw-native mrw-api-native"
