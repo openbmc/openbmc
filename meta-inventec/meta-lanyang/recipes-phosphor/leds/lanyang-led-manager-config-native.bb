@@ -1,8 +1,9 @@
 SUMMARY = "Phosphor LED Group Management for Lanyang"
 PR = "r1"
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://${INVENTECBASE}/COPYING.apache-2.0;md5=34400b68072d710fecd0a2940a0d1658"
 
 inherit native
-inherit obmc-phosphor-license
 
 PROVIDES += "virtual/phosphor-led-manager-config-native"
 
