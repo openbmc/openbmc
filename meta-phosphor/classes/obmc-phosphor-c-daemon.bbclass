@@ -1,7 +1,5 @@
 # Common code for dbus applications using c.
-
 inherit obmc-phosphor-systemd
-inherit obmc-phosphor-license
 
 DEPENDS += "glib-2.0"
 
