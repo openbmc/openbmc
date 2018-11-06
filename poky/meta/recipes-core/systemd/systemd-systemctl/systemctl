@@ -84,11 +84,7 @@ for service in $services; do
 	else
 		echo "Try to find location of template $service_base_file of instance $service..."
 		service_template=true
-		if [ -z `echo $service | sed 's/^.\+@\(.*\)\.[^.]\+/\1/'` ]; then
-			instance_specified=false
-		else
-			instance_specified=true
-		fi
+		instance_specified=`echo $service | sed 's/^.\+@\(.*\)\.[^.]\+/\1/'`
 	fi
 
 	# find service file
@@ -139,9 +135,14 @@ for service in $services; do
 		fi
 		for r in $dependency_list; do
 			echo "$dependency=$r found in $service"
+			if [ -n "$instance_specified" ]; then
+				# substitute wildcards in the dependency
+				r=`echo $r | sed "s/%i/$instance_specified/g"`
+			fi
+
 			if [ "$action" = "enable" ]; then
 				enable_service=$service
-				if [ "$service_template" = true -a "$instance_specified" = false ]; then
+				if [ "$service_template" = true -a -z "$instance_specified" ]; then
 					default_instance=$(sed '/^DefaultInstance[[:space:]]*=/s,[^=]*=,,p;d' "$ROOT/$service_file")
 					if [ -z $default_instance ]; then
 						echo "Template unit without instance or DefaultInstance directive, nothing to enable"
@@ -155,7 +156,7 @@ for service in $services; do
 				ln -s $service_file $ROOT/etc/systemd/system/$r.$suffix/$enable_service
 				echo "Enabled $enable_service for $r."
 			else
-				if [ "$service_template" = true -a "$instance_specified" = false ]; then
+				if [ "$service_template" = true -a -z "$instance_specified" ]; then
 					disable_service="$ROOT/etc/systemd/system/$r.$suffix/`echo $service | sed 's/@/@*/'`"
 				else
 					disable_service="$ROOT/etc/systemd/system/$r.$suffix/$service"
