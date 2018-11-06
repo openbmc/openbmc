@@ -4,7 +4,8 @@
 IMAGE_FSTYPES = "tar.xz"
 
 inherit image
-inherit obmc-phosphor-license
+
+LICENSE = "Apache-2.0"
 
 IMAGE_INSTALL_append = " busybox packagegroup-obmc-phosphor-debugtools perf "
 
