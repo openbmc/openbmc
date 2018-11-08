@@ -8,9 +8,6 @@ PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight localed \
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
-#TODO upstream the below patch via below issue
-#https://github.com/openbmc/openbmc/issues/2016
-SRC_URI += "file://0005-dont-return-error-if-unable-to-create-network-namespace.patch"
 SRC_URI += "file://0006-core-fix-the-check-if-CONFIG_CGROUP_BPF-is-on.patch"
 
 RRECOMMENDS_${PN} += "obmc-targets"
