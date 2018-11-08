@@ -10,7 +10,7 @@ S = "${WORKDIR}/git"
 inherit autotools pkgconfig pythonnative
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control"
-SRCREV = "1f733b3d82fda0ba35947745ef199cc91436e0e6"
+SRCREV = "5970484133ac208bd3675697ac120901ea6654a7"
 
 DEPENDS += " \
         autoconf-archive-native \
