@@ -5,7 +5,7 @@ Description=Install iotool links
 RemainAfterExit=no
 Type=oneshot
 ExecStart=/usr/bin/env iotools --make-links
-SystlogIdentifier=iotools
+SyslogIdentifier=iotools
 
 [Install]
 WantedBy={SYSTEMD_DEFAULT_TARGET}
