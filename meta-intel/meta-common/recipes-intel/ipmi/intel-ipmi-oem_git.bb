@@ -16,9 +16,7 @@ inherit cmake obmc-phosphor-ipmiprovider-symlink
 
 EXTRA_OECMAKE="-DENABLE_TEST=0 -DYOCTO=1"
 
-LIBRARY_NAMES = "libsensorcommands.so"
-LIBRARY_NAMES += "libzstoragecommands.so"
-LIBRARY_NAMES += "liboemcmds.so"
+LIBRARY_NAMES = "libzinteloemcmds.so"
 
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 NETIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
