@@ -6,12 +6,9 @@ HOMEDIR = "https://cisofy.com/"
 LICENSE = "GPL-3.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3edd6782854304fd11da4975ab9799c1"
 
-SRC_URI = "https://cisofy.com/files/${BPN}-${PV}.tar.gz"
-
-SRC_URI[md5sum] = "5b9da89c616344bbc73cbc5688a4a0bd"
-SRC_URI[sha256sum] = "7a09c6fc71c65d572ca702df7b4394d71f9037484062ef71b76f59a2c498b029"
-
-S = "${WORKDIR}/${BPN}"
+SRCREV= "1be5154b35ce144db4f386856debe8a06b403899"
+SRC_URI = "git://github.com/CISOfy/Lynis.git"
+S = "${WORKDIR}/git"
 
 inherit autotools-brokensep
 
