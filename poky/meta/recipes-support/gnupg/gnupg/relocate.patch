@@ -1,0 +1,81 @@
+Allow the environment to override where gnupg looks for its own files. Useful in native builds.
+
+Upstream-Status: Inappropriate [OE-specific]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/common/homedir.c b/common/homedir.c
+index e9e75d01e..19140aa0d 100644
+--- a/common/homedir.c
++++ b/common/homedir.c
+@@ -760,7 +760,7 @@ gnupg_socketdir (void)
+   if (!name)
+     {
+       unsigned int dummy;
+-      name = _gnupg_socketdir_internal (0, &dummy);
++      name = getenv("GNUPG_SOCKETDIR") ?: _gnupg_socketdir_internal (0, &dummy);
+     }
+ 
+   return name;
+@@ -786,7 +786,7 @@ gnupg_sysconfdir (void)
+     }
+   return name;
+ #else /*!HAVE_W32_SYSTEM*/
+-  return GNUPG_SYSCONFDIR;
++  return getenv("GNUPG_SYSCONFDIR") ?: GNUPG_SYSCONFDIR;
+ #endif /*!HAVE_W32_SYSTEM*/
+ }
+ 
+@@ -815,7 +815,7 @@ gnupg_bindir (void)
+   else
+     return rdir;
+ #else /*!HAVE_W32_SYSTEM*/
+-  return GNUPG_BINDIR;
++  return getenv("GNUPG_BINDIR") ?: GNUPG_BINDIR;
+ #endif /*!HAVE_W32_SYSTEM*/
+ }
+ 
+@@ -828,7 +828,7 @@ gnupg_libexecdir (void)
+ #ifdef HAVE_W32_SYSTEM
+   return gnupg_bindir ();
+ #else /*!HAVE_W32_SYSTEM*/
+-  return GNUPG_LIBEXECDIR;
++  return getenv("GNUPG_LIBEXECDIR") ?: GNUPG_LIBEXECDIR;
+ #endif /*!HAVE_W32_SYSTEM*/
+ }
+ 
+@@ -842,7 +842,7 @@ gnupg_libdir (void)
+     name = xstrconcat (w32_rootdir (), DIRSEP_S "lib" DIRSEP_S "gnupg", NULL);
+   return name;
+ #else /*!HAVE_W32_SYSTEM*/
+-  return GNUPG_LIBDIR;
++  return getenv("GNUPG_LIBDIR") ?: GNUPG_LIBDIR;
+ #endif /*!HAVE_W32_SYSTEM*/
+ }
+ 
+@@ -856,7 +856,7 @@ gnupg_datadir (void)
+     name = xstrconcat (w32_rootdir (), DIRSEP_S "share" DIRSEP_S "gnupg", NULL);
+   return name;
+ #else /*!HAVE_W32_SYSTEM*/
+-  return GNUPG_DATADIR;
++  return getenv("GNUPG_DATADIR") ?: GNUPG_DATADIR;
+ #endif /*!HAVE_W32_SYSTEM*/
+ }
+ 
+@@ -872,7 +872,7 @@ gnupg_localedir (void)
+                        NULL);
+   return name;
+ #else /*!HAVE_W32_SYSTEM*/
+-  return LOCALEDIR;
++  return getenv("LOCALEDIR") ?: LOCALEDIR;
+ #endif /*!HAVE_W32_SYSTEM*/
+ }
+ 
+@@ -940,7 +940,7 @@ gnupg_cachedir (void)
+     }
+   return dir;
+ #else /*!HAVE_W32_SYSTEM*/
+-  return GNUPG_LOCALSTATEDIR "/cache/" PACKAGE_NAME;
++  return getenv("GNUPG_LOCALSTATEDIR") ?: GNUPG_LOCALSTATEDIR "/cache/" PACKAGE_NAME;
+ #endif /*!HAVE_W32_SYSTEM*/
+ }
+ 

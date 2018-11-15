@@ -23,11 +23,11 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  server/tests/Makefile.am |  7 +++----
  8 files changed, 26 insertions(+), 43 deletions(-)
 
-diff --git a/client/Makefile.am b/client/Makefile.am
-index 84d8131..e776bf0 100644
---- a/client/Makefile.am
-+++ b/client/Makefile.am
-@@ -15,7 +15,7 @@ dhclient_SOURCES = $(srcdir)/clparse.c $(srcdir)/dhclient.c $(srcdir)/dhc6.c \
+Index: dhcp-4.3.6/client/Makefile.am
+===================================================================
+--- dhcp-4.3.6.orig/client/Makefile.am
++++ dhcp-4.3.6/client/Makefile.am
+@@ -15,7 +15,7 @@ dhclient_SOURCES = $(srcdir)/clparse.c $
  		   scripts/bsdos scripts/freebsd scripts/linux scripts/macos \
  		   scripts/netbsd scripts/nextstep scripts/openbsd \
  		   scripts/solaris scripts/openwrt
@@ -37,11 +37,11 @@ index 84d8131..e776bf0 100644
 +		  -L$(BINDLIBDIR) -lirs -ldns -lisccfg -lisc
  man_MANS = dhclient.8 dhclient-script.8 dhclient.conf.5 dhclient.leases.5
  EXTRA_DIST = $(man_MANS)
-diff --git a/common/tests/Makefile.am b/common/tests/Makefile.am
-index 2f98d22..8745e88 100644
---- a/common/tests/Makefile.am
-+++ b/common/tests/Makefile.am
-@@ -15,26 +15,23 @@ ATF_TESTS += alloc_unittest dns_unittest misc_unittest ns_name_unittest
+Index: dhcp-4.3.6/common/tests/Makefile.am
+===================================================================
+--- dhcp-4.3.6.orig/common/tests/Makefile.am
++++ dhcp-4.3.6/common/tests/Makefile.am
+@@ -15,26 +15,23 @@ ATF_TESTS += alloc_unittest dns_unittest
  alloc_unittest_SOURCES = test_alloc.c $(top_srcdir)/tests/t_api_dhcp.c
  alloc_unittest_LDADD = $(ATF_LDFLAGS)
  alloc_unittest_LDADD += ../libdhcp.a  \
@@ -73,11 +73,11 @@ index 2f98d22..8745e88 100644
  
  check: $(ATF_TESTS)
  	@if test $(top_srcdir) != ${top_builddir}; then \
-diff --git a/configure.ac b/configure.ac
-index 8e9f509..bfe988a 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -47,16 +47,8 @@ AM_CONDITIONAL(CROSS_COMPILING, test "$cross_compiling" = "yes")
+Index: dhcp-4.3.6/configure.ac
+===================================================================
+--- dhcp-4.3.6.orig/configure.ac
++++ dhcp-4.3.6/configure.ac
+@@ -47,16 +47,8 @@ AM_CONDITIONAL(CROSS_COMPILING, test "$c
  # Use this to define _GNU_SOURCE to pull in the IPv6 Advanced Socket API.
  AC_USE_SYSTEM_EXTENSIONS
  
@@ -96,11 +96,11 @@ index 8e9f509..bfe988a 100644
  
  AC_CONFIG_HEADERS([includes/config.h])
  
-diff --git a/dhcpctl/Makefile.am b/dhcpctl/Makefile.am
-index 9b2486e..784cdf7 100644
---- a/dhcpctl/Makefile.am
-+++ b/dhcpctl/Makefile.am
-@@ -3,19 +3,17 @@ BINDLIBDIR = @BINDDIR@
+Index: dhcp-4.3.6/dhcpctl/Makefile.am
+===================================================================
+--- dhcp-4.3.6.orig/dhcpctl/Makefile.am
++++ dhcp-4.3.6/dhcpctl/Makefile.am
+@@ -3,19 +3,17 @@ BINDLIBDIR = @BINDDIR@/lib
  AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_srcdir)
  
  bin_PROGRAMS = omshell
@@ -126,12 +126,12 @@ index 9b2486e..784cdf7 100644
 -               $(BINDLIBDIR)/libisccfg.a $(BINDLIBDIR)/libisc.a
 +cltest_LDADD = libdhcpctl.la ../common/libdhcp.a ../omapip/libomapi.la \
 +	       -L$(BINDLIBDIR) -lirs -ldns -lisccfg -lisc
-diff --git a/omapip/Makefile.am b/omapip/Makefile.am
-index e4a8599..c0c7a1e 100644
---- a/omapip/Makefile.am
-+++ b/omapip/Makefile.am
+Index: dhcp-4.3.6/omapip/Makefile.am
+===================================================================
+--- dhcp-4.3.6.orig/omapip/Makefile.am
++++ dhcp-4.3.6/omapip/Makefile.am
 @@ -1,10 +1,10 @@
- BINDLIBDIR = @BINDDIR@
+ BINDLIBDIR = @BINDDIR@/lib
  AM_CPPFLAGS = -I$(top_srcdir)/includes
  
 -lib_LIBRARIES = libomapi.a
@@ -151,11 +151,11 @@ index e4a8599..c0c7a1e 100644
 -		$(BINDLIBDIR)/libisccfg.a $(BINDLIBDIR)/libisc.a
 +svtest_LDADD = libomapi.la -L$(BINDLIBDIR) -lirs -ldns -lisccfg -lisc
  
-diff --git a/relay/Makefile.am b/relay/Makefile.am
-index b3bf578..f47009f 100644
---- a/relay/Makefile.am
-+++ b/relay/Makefile.am
-@@ -4,9 +4,8 @@ AM_CPPFLAGS = -DLOCALSTATEDIR='"@localstatedir@"' -I$(top_srcdir)/includes
+Index: dhcp-4.3.6/relay/Makefile.am
+===================================================================
+--- dhcp-4.3.6.orig/relay/Makefile.am
++++ dhcp-4.3.6/relay/Makefile.am
+@@ -4,9 +4,8 @@ AM_CPPFLAGS = -DLOCALSTATEDIR='"@localst
  
  sbin_PROGRAMS = dhcrelay
  dhcrelay_SOURCES = dhcrelay.c
@@ -167,11 +167,11 @@ index b3bf578..f47009f 100644
  man_MANS = dhcrelay.8
  EXTRA_DIST = $(man_MANS)
  
-diff --git a/server/Makefile.am b/server/Makefile.am
-index b5d8c2d..d7f876d 100644
---- a/server/Makefile.am
-+++ b/server/Makefile.am
-@@ -15,10 +15,9 @@ dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c confpars.c db.c class.c failover.c \
+Index: dhcp-4.3.6/server/Makefile.am
+===================================================================
+--- dhcp-4.3.6.orig/server/Makefile.am
++++ dhcp-4.3.6/server/Makefile.am
+@@ -15,10 +15,9 @@ dhcpd_SOURCES = dhcpd.c dhcp.c bootp.c c
  		dhcpv6.c mdb6.c ldap.c ldap_casa.c leasechain.c ldap_krb_helper.c
  
  dhcpd_CFLAGS = $(LDAP_CFLAGS)
@@ -185,11 +185,11 @@ index b5d8c2d..d7f876d 100644
  
  man_MANS = dhcpd.8 dhcpd.conf.5 dhcpd.leases.5
  EXTRA_DIST = $(man_MANS)
-diff --git a/server/tests/Makefile.am b/server/tests/Makefile.am
-index 9821081..de95872 100644
---- a/server/tests/Makefile.am
-+++ b/server/tests/Makefile.am
-@@ -19,10 +19,9 @@ DHCPSRC = ../dhcp.c ../bootp.c ../confpars.c ../db.c ../class.c      \
+Index: dhcp-4.3.6/server/tests/Makefile.am
+===================================================================
+--- dhcp-4.3.6.orig/server/tests/Makefile.am
++++ dhcp-4.3.6/server/tests/Makefile.am
+@@ -19,10 +19,9 @@ DHCPSRC = ../dhcp.c ../bootp.c ../confpa
            ../ddns.c ../dhcpleasequery.c ../dhcpv6.c ../mdb6.c        \
            ../ldap.c ../ldap_casa.c ../dhcpd.c ../leasechain.c
  
@@ -203,6 +203,3 @@ index 9821081..de95872 100644
  
  ATF_TESTS =
  if HAVE_ATF
--- 
-1.8.3.1
-

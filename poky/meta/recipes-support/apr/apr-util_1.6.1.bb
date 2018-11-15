@@ -7,7 +7,7 @@ BBCLASSEXTEND = "native nativesdk"
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=158aa0b1efe0c12f23d4b007ddb9a5db \
-                    file://include/apu_version.h;endline=17;md5=806685a84e71f10c80144c48eb35df42"
+                    file://include/apu_version.h;endline=15;md5=823b3d1a7225df8f7b68a69c3c2b4c71"
 
 SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.gz \
            file://configfix.patch \

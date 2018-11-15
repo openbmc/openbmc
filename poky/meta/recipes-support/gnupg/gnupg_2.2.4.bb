@@ -17,7 +17,8 @@ SRC_URI = "${GNUPG_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://CVE-2018-12020.patch \
            file://CVE-2018-9234.patch \
           "
-SRC_URI_append_class-native = " file://0001-configure.ac-use-a-custom-value-for-the-location-of-.patch"
+SRC_URI_append_class-native = " file://0001-configure.ac-use-a-custom-value-for-the-location-of-.patch \
+                                file://relocate.patch"
 
 
 SRC_URI[md5sum] = "709e5af5bba84d251c520222e720972f"
@@ -43,6 +44,10 @@ do_configure_prepend () {
 do_install_append() {
 	ln -sf gpg2 ${D}${bindir}/gpg
 	ln -sf gpgv2 ${D}${bindir}/gpgv
+}
+
+do_install_append_class-native() {
+	create_wrapper ${D}${bindir}/gpg2 GNUPG_BINDIR=${STAGING_BINDIR_NATIVE}
 }
 
 PACKAGECONFIG ??= "gnutls"

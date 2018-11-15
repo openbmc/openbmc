@@ -161,7 +161,9 @@ fi
 
 export BBBASEDIR=`dirname $TOASTER`/..
 MANAGE="python3 $BBBASEDIR/lib/toaster/manage.py"
-OE_ROOT=`dirname $TOASTER`/../..
+if [ -z "$OE_ROOT" ]; then
+    OE_ROOT=`dirname $TOASTER`/../..
+fi
 
 # this is the configuraton file we are using for toaster
 # we are using the same logic that oe-setup-builddir uses

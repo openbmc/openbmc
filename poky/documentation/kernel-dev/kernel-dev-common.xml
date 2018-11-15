@@ -1603,8 +1603,11 @@
             <title>Creating a&nbsp;&nbsp;<filename>defconfig</filename> File</title>
 
             <para>
-                A <filename>defconfig</filename> file is simply a
-                <filename>.config</filename> renamed to "defconfig".
+                A <filename>defconfig</filename> file in the context of
+                the Yocto Project is often a <filename>.config</filename>
+                file that is copied from a build or a
+                <filename>defconfig</filename> taken from the kernel tree
+                and moved into recipe space.
                 You can use a <filename>defconfig</filename> file
                 to retain a known set of kernel configurations from which the
                 OpenEmbedded build system can draw to create the final

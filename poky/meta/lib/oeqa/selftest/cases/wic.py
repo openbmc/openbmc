@@ -64,13 +64,13 @@ def only_for_arch(archs, image='core-image-minimal'):
 class Wic(OESelftestTestCase):
     """Wic test class."""
 
-    resultdir = "/var/tmp/wic.oe-selftest/"
     image_is_ready = False
     native_sysroot = None
     wicenv_cache = {}
 
     def setUpLocal(self):
         """This code is executed before each test method."""
+        self.resultdir = self.builddir + "/wic-tmp/"
         super(Wic, self).setUpLocal()
         if not self.native_sysroot:
             Wic.native_sysroot = get_bb_var('STAGING_DIR_NATIVE', 'wic-tools')
@@ -191,7 +191,7 @@ class Wic(OESelftestTestCase):
                  'MACHINE_FEATURES_append = " efi"\n'\
                  'DEPENDS_pn-core-image-minimal += "syslinux"\n'
         self.append_config(config)
-        bitbake('core-image-minimal')
+        bitbake('core-image-minimal core-image-minimal-initramfs')
         self.remove_config(config)
         cmd = "wic create mkhybridiso --image-name core-image-minimal -o %s" % self.resultdir
         self.assertEqual(0, runCmd(cmd).status)
@@ -691,9 +691,7 @@ part /etc --source rootfs --ondisk mmcblk0 --fstype=ext4 --exclude-path bin/ --r
 
         # verify partition size with wic
         res = runCmd("parted -m %s unit mib p 2>/dev/null" % wicimg,
-                     ignore_status=True,
                      native_sysroot=self.native_sysroot)
-        self.assertEqual(0, res.status)
 
         # parse parted output which looks like this:
         # BYT;\n

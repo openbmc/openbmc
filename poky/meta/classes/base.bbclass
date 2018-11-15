@@ -303,7 +303,9 @@ base_do_configure() {
 			if [ "${CLEANBROKEN}" != "1" -a \( -e Makefile -o -e makefile -o -e GNUmakefile \) ]; then
 				oe_runmake clean
 			fi
-			find ${B} -ignore_readdir_race -name \*.la -delete
+			# -ignore_readdir_race does not work correctly with -delete;
+			# use xargs to avoid spurious build failures
+			find ${B} -ignore_readdir_race -name \*.la -type f -print0 | xargs -0 rm -f
 		fi
 	fi
 	if [ -n "${CONFIGURESTAMPFILE}" ]; then

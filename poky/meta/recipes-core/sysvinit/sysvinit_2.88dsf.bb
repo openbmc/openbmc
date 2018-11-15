@@ -104,6 +104,6 @@ do_install () {
 	install -d ${D}${sysconfdir}/default/volatiles
 	install -m 0644 ${WORKDIR}/01_bootlogd ${D}${sysconfdir}/default/volatiles
 
-	chown root.shutdown ${D}${base_sbindir}/halt ${D}${base_sbindir}/shutdown
+	chown root:shutdown ${D}${base_sbindir}/halt ${D}${base_sbindir}/shutdown
 	chmod o-x,u+s ${D}${base_sbindir}/halt ${D}${base_sbindir}/shutdown
 }

@@ -5,7 +5,7 @@ DEPENDS = "util-linux"
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4dfd4cd216828c8cae5de5a12f3844c8 \
-                    file://include/apr_lib.h;endline=17;md5=ee42fa7575dc40580a9e01c1b75fae96"
+                    file://include/apr_lib.h;endline=15;md5=823b3d1a7225df8f7b68a69c3c2b4c71"
 
 BBCLASSEXTEND = "native nativesdk"
 
