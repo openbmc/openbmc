@@ -9849,6 +9849,27 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
+        "xyz.openbmc_project.Certs.Install.Error.InvalidCertificate": {
+            "AffectedLEDs": null,
+            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
+            "BMCMessageID": "xyz.openbmc_project.Certs.Install.Error.InvalidCertificate",
+            "CallHomeCandidate": false,
+            "CommonEventID": "FQPSPCR0075G",
+            "ComponentInstance": null,
+            "DateAdded": null,
+            "DateReviewed": null,
+            "EventType": "Firmware/Software Failure",
+            "Internal": false,
+            "LengthyDescription": "The provided certificate is not valid. The BMC will continue operating with the old certificate.",
+            "LogSource": "BMC",
+            "Message": "The provided certificate is not valid",
+            "ReferencedInventory": null,
+            "RelatedEventIDs": {},
+            "Serviceable": true,
+            "Severity": "Warning",
+            "UserAction": null,
+            "VMMigrationFlag": null
+        },
         "xyz.openbmc_project.Common.Callout.Error.Device||FSI": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
@@ -10244,6 +10265,27 @@
             "ReferencedInventory": null,
             "RelatedEventIDs": {},
             "Serviceable": false,
+            "Severity": "Warning",
+            "UserAction": null,
+            "VMMigrationFlag": null
+        },
+        "xyz.openbmc_project.Common.Error.NoCACertificate": {
+            "AffectedLEDs": null,
+            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
+            "BMCMessageID": "xyz.openbmc_project.Common.Error.NoCACertificate",
+            "CallHomeCandidate": false,
+            "CommonEventID": "FQPSPCR0076G",
+            "ComponentInstance": null,
+            "DateAdded": null,
+            "DateReviewed": null,
+            "EventType": "Firmware/Software Failure",
+            "Internal": false,
+            "LengthyDescription": "Unable to validate the Certificate Authority (CA) for an external server, such as an LDAP server.",
+            "LogSource": "BMC",
+            "Message": "Unable to verify a server's CA certificate",
+            "ReferencedInventory": null,
+            "RelatedEventIDs": {},
+            "Serviceable": true,
             "Severity": "Warning",
             "UserAction": null,
             "VMMigrationFlag": null
@@ -10693,7 +10735,7 @@
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Control.Host.Error.CommandNotSupported",
-            "CallHomeCandidate": null,
+            "CallHomeCandidate": false,
             "CommonEventID": "FQPSPCR0039F",
             "ComponentInstance": null,
             "DateAdded": null,
@@ -21685,7 +21727,7 @@
             "Internal": false,
             "LengthyDescription": null,
             "LogSource": "BMC",
-            "Message": "Three or more CPU cores have gone over temperature, initiating  a thermal shutdown.",
+            "Message": "Three or more CPU cores have gone over temperature, initiating a thermal shutdown.",
             "ReferencedInventory": "temperature",
             "RelatedEventIDs": {},
             "Serviceable": true,
@@ -22116,7 +22158,7 @@
     },
     "fileInfo": {
         "Entity": "IBM OpenBMC",
-        "Version": 1.8,
+        "Version": "1.8.1",
         "language": "English"
     }
 }
