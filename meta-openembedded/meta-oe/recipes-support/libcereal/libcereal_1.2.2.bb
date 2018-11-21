@@ -14,3 +14,5 @@ S = "${WORKDIR}/git"
 inherit cmake
 
 EXTRA_OECMAKE = "-DJUST_INSTALL_CEREAL=ON"
+
+BBCLASSEXTEND = "native nativesdk"
