@@ -27,3 +27,8 @@ FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
 FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV}"
+
+do_install_append(){
+   install -d ${D}${includedir}/intel-ipmi-oem
+   install -m 0644 -D ${S}/include/*.hpp ${D}${includedir}/intel-ipmi-oem
+}
