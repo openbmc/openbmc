@@ -35,6 +35,7 @@ DEPENDS += " \
         sdbusplus \
         sdbusplus-native \
         autoconf-archive-native \
+        virtual/phosphor-debug-errors \
 "
 
 RDEPENDS_${PN}-manager += " \
@@ -62,7 +63,11 @@ MGR_SVC ?= "xyz.openbmc_project.Dump.Manager.service"
 
 SYSTEMD_SUBSTITUTIONS += "BMC_DUMP_PATH:${bmc_dump_path}:${MGR_SVC}"
 
-FILES_${PN}-manager += "${sbindir}/phosphor-dump-manager ${exec_prefix}/lib/tmpfiles.d/coretemp.conf"
+FILES_${PN}-manager +=  " \
+    ${sbindir}/phosphor-dump-manager \
+    ${exec_prefix}/lib/tmpfiles.d/coretemp.conf \
+    ${datadir}/dump/ \
+    "
 FILES_${PN}-monitor += "${sbindir}/phosphor-dump-monitor"
 FILES_${PN}-dreport += "${bindir}/dreport"
 FILES_${PN}-scripts += "${dreport_dir}"
@@ -70,7 +75,10 @@ FILES_${PN}-scripts += "${dreport_dir}"
 DBUS_SERVICE_${PN}-manager += "${MGR_SVC}"
 SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
 
-EXTRA_OECONF = "BMC_DUMP_PATH=${bmc_dump_path}"
+EXTRA_OECONF = " \
+    BMC_DUMP_PATH=${bmc_dump_path} \
+    ERROR_MAP_YAML=${STAGING_DIR_NATIVE}/${datadir}/dump/errors_watch.yaml \
+    "
 
 S = "${WORKDIR}/git"
 SRC_URI += "file://coretemp.conf"
