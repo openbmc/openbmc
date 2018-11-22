@@ -511,6 +511,16 @@ def check_make_version(sanity_data):
     return None
 
 
+# Check if we're running on WSL (Windows Subsystem for Linux). Its known not to
+# work but we should tell the user that upfront.
+def check_wsl(d):
+    with open("/proc/version", "r") as f:
+        verdata = f.readlines()
+    for l in verdata:
+        if "Microsoft" in l:
+            return "OpenEmbedded doesn't work under WSL at this time, sorry"
+    return None
+
 # Tar version 1.24 and onwards handle overwriting symlinks correctly
 # but earlier versions do not; this needs to work properly for sstate
 def check_tar_version(sanity_data):
@@ -625,6 +635,7 @@ def check_sanity_version_change(status, d):
     status.addresult(check_tar_version(d))
     status.addresult(check_git_version(d))
     status.addresult(check_perl_modules(d))
+    status.addresult(check_wsl(d))
 
     missing = ""
 

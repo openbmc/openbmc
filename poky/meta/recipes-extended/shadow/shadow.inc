@@ -53,6 +53,8 @@ PAM_SRC_URI = "file://pam.d/chfn \
 
 inherit autotools gettext
 
+export CONFIG_SHELL="/bin/sh"
+
 EXTRA_OECONF += "--without-audit \
                  --without-libcrack \
                  --without-selinux \

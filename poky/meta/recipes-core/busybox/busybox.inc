@@ -183,7 +183,8 @@ do_compile() {
 			oe_runmake busybox_unstripped
 			mv busybox_unstripped busybox.$s
 			oe_runmake busybox.links
-			mv busybox.links busybox.links.$s
+			sort busybox.links > busybox.links.$s
+			rm busybox.links
 		done
 
 		# hard fail if sh is being linked to the suid busybox (detects bug 10346)

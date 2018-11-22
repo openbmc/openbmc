@@ -448,7 +448,7 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
                 else:
                     logger.info("Reconnecting to bitbake server...")
                     if not os.path.exists(sockname):
-                        print("Previous bitbake instance shutting down?, waiting to retry...")
+                        logger.info("Previous bitbake instance shutting down?, waiting to retry...")
                         i = 0
                         lock = None
                         # Wait for 5s or until we can get the lock
