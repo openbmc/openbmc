@@ -19,4 +19,5 @@ DEPENDS += "openssl libpam"
 FILES_${PN} += " \
                ${base_libdir}/security/ \
                ${sysconfdir}/key_file \
+               ${sysconfdir}/ipmi_pass \
                "
