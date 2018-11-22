@@ -122,7 +122,7 @@ LIC_FILES_CHKSUM = "\
     file://LICENCE.xc4000;md5=0ff51d2dc49fce04814c9155081092f0 \
     file://LICENCE.xc5000;md5=1e170c13175323c32c7f4d0998d53f66 \
     file://LICENCE.xc5000c;md5=12b02efa3049db65d524aeb418dd87ca \
-    file://WHENCE;md5=36ef3e9887bb8b38ff265c602de6740e \
+    file://WHENCE;md5=cecb9bd279516f42a589647557e806f2 \
 "
 
 # These are not common licenses, set NO_GENERIC_LICENSE for them
@@ -188,7 +188,7 @@ NO_GENERIC_LICENSE[Firmware-xc5000] = "LICENCE.xc5000"
 NO_GENERIC_LICENSE[Firmware-xc5000c] = "LICENCE.xc5000c"
 NO_GENERIC_LICENSE[WHENCE] = "WHENCE"
 
-SRCREV = "44d4fca9922a252a0bd81f6307bcc072a78da54a"
+SRCREV = "1baa34868b2c0a004dc595b20678145e3fff83e7"
 PE = "1"
 PV = "0.0+git${SRCPV}"
 
@@ -237,7 +237,7 @@ PACKAGES =+ "${PN}-ralink-license ${PN}-ralink \
              ${PN}-marvell-license ${PN}-pcie8897 ${PN}-pcie8997 \
              ${PN}-sd8686 ${PN}-sd8688 ${PN}-sd8787 ${PN}-sd8797 ${PN}-sd8801 ${PN}-sd8887 ${PN}-sd8897 \
              ${PN}-usb8997 \
-             ${PN}-ti-connectivity-license ${PN}-wl12xx ${PN}-wl18xx \
+             ${PN}-ti-connectivity-license ${PN}-wlcommon ${PN}-wl12xx ${PN}-wl18xx \
              ${PN}-vt6656-license ${PN}-vt6656 \
              ${PN}-rtl-license ${PN}-rtl8188 ${PN}-rtl8192cu ${PN}-rtl8192ce ${PN}-rtl8192su ${PN}-rtl8723 ${PN}-rtl8821 \
              ${PN}-rtl8168 \
@@ -521,24 +521,27 @@ RDEPENDS_${PN}-rtl8821 += "${PN}-rtl-license"
 RDEPENDS_${PN}-rtl8168 += "${PN}-whence-license"
 
 # For ti-connectivity
+LICENSE_${PN}-wlcommon = "Firmware-ti-connectivity"
 LICENSE_${PN}-wl12xx = "Firmware-ti-connectivity"
 LICENSE_${PN}-wl18xx = "Firmware-ti-connectivity"
 LICENSE_${PN}-ti-connectivity-license = "Firmware-ti-connectivity"
 
 FILES_${PN}-ti-connectivity-license = "${nonarch_base_libdir}/firmware/LICENCE.ti-connectivity"
+FILES_${PN}-wlcommon = " \
+  ${nonarch_base_libdir}/firmware/TI* \
+  ${nonarch_base_libdir}/firmware/ti-connectivity/TI* \
+"
 FILES_${PN}-wl12xx = " \
   ${nonarch_base_libdir}/firmware/wl12* \
-  ${nonarch_base_libdir}/firmware/TI* \
-  ${nonarch_base_libdir}/firmware/ti-connectivity \
+  ${nonarch_base_libdir}/firmware/ti-connectivity/wl12* \
 "
 FILES_${PN}-wl18xx = " \
   ${nonarch_base_libdir}/firmware/wl18* \
-  ${nonarch_base_libdir}/firmware/TI* \
-  ${nonarch_base_libdir}/firmware/ti-connectivity \
+  ${nonarch_base_libdir}/firmware/ti-connectivity/wl18* \
 "
 
-RDEPENDS_${PN}-wl12xx = "${PN}-ti-connectivity-license"
-RDEPENDS_${PN}-wl18xx = "${PN}-ti-connectivity-license"
+RDEPENDS_${PN}-wl12xx = "${PN}-ti-connectivity-license ${PN}-wlcommon"
+RDEPENDS_${PN}-wl18xx = "${PN}-ti-connectivity-license ${PN}-wlcommon"
 
 # For vt6656
 LICENSE_${PN}-vt6656 = "Firmware-via_vt6656"

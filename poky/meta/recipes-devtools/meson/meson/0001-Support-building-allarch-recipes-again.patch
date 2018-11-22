@@ -11,11 +11,11 @@ Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
  mesonbuild/environment.py | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/mesonbuild/environment.py b/mesonbuild/environment.py
-index a0580a2..712b1e8 100644
---- a/mesonbuild/environment.py
-+++ b/mesonbuild/environment.py
-@@ -73,6 +73,7 @@ from .compilers import (
+Index: meson-0.47.2/mesonbuild/environment.py
+===================================================================
+--- meson-0.47.2.orig/mesonbuild/environment.py
++++ meson-0.47.2/mesonbuild/environment.py
+@@ -75,6 +75,7 @@ from .compilers import (
  build_filename = 'meson.build'
  
  known_cpu_families = (
@@ -23,6 +23,3 @@ index a0580a2..712b1e8 100644
      'aarch64',
      'arm',
      'e2k',
--- 
-2.12.0
-

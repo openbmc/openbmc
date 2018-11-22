@@ -1,0 +1,73 @@
+From 80810f04f2de6bae6e394f52ad9cdd2189862f74 Mon Sep 17 00:00:00 2001
+From: Jaroslav Rohel <jrohel@redhat.com>
+Date: Fri, 9 Nov 2018 07:35:13 +0100
+Subject: [PATCH] Fix setup of logging (log domains) (RhBug:1645897)
+
+New debug messages were added into GLib library. These messages come
+from the "GLib" log domain and were not hidden in the standard and
+quiet mode of the application.
+This fix hides log messages regardless on source log domain.
+
+Upstream-Status: Backport
+
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+---
+ src/createrepo_shared.c | 19 ++++++-------------
+ src/misc.c              |  5 ++++-
+ 2 files changed, 10 insertions(+), 14 deletions(-)
+
+diff --git a/src/createrepo_shared.c b/src/createrepo_shared.c
+index 8a26787..7cb8ba8 100644
+--- a/src/createrepo_shared.c
++++ b/src/createrepo_shared.c
+@@ -270,24 +270,17 @@ cr_lock_repo(const gchar *repo_dir,
+ void
+ cr_setup_logging(gboolean quiet, gboolean verbose)
+ {
+-    g_log_set_default_handler (cr_log_fn, NULL);
+-
+     if (quiet) {
+         // Quiet mode
+-        GLogLevelFlags levels = G_LOG_LEVEL_MESSAGE | G_LOG_LEVEL_INFO |
+-                                G_LOG_LEVEL_DEBUG | G_LOG_LEVEL_WARNING;
+-        g_log_set_handler(NULL, levels, cr_null_log_fn, NULL);
+-        g_log_set_handler("C_CREATEREPOLIB", levels, cr_null_log_fn, NULL);
++        GLogLevelFlags hidden_levels = G_LOG_LEVEL_MESSAGE | G_LOG_LEVEL_INFO |
++                                       G_LOG_LEVEL_DEBUG | G_LOG_LEVEL_WARNING;
++        g_log_set_default_handler (cr_log_fn, GINT_TO_POINTER(hidden_levels));
+     } else if (verbose) {
+         // Verbose mode
+-        GLogLevelFlags levels = G_LOG_LEVEL_MESSAGE | G_LOG_LEVEL_INFO |
+-                                G_LOG_LEVEL_DEBUG | G_LOG_LEVEL_WARNING;
+-        g_log_set_handler(NULL, levels, cr_log_fn, NULL);
+-        g_log_set_handler("C_CREATEREPOLIB", levels, cr_log_fn, NULL);
++        g_log_set_default_handler (cr_log_fn, GINT_TO_POINTER(0));
+     } else {
+         // Standard mode
+-        GLogLevelFlags levels = G_LOG_LEVEL_DEBUG;
+-        g_log_set_handler(NULL, levels, cr_null_log_fn, NULL);
+-        g_log_set_handler("C_CREATEREPOLIB", levels, cr_null_log_fn, NULL);
++        GLogLevelFlags hidden_levels = G_LOG_LEVEL_DEBUG;
++        g_log_set_default_handler (cr_log_fn, GINT_TO_POINTER(hidden_levels));
+     }
+ }
+diff --git a/src/misc.c b/src/misc.c
+index 9937480..9549a44 100644
+--- a/src/misc.c
++++ b/src/misc.c
+@@ -912,8 +912,11 @@ void
+ cr_log_fn(const gchar *log_domain,
+           GLogLevelFlags log_level,
+           const gchar *message,
+-          G_GNUC_UNUSED gpointer user_data)
++          gpointer user_data)
+ {
++    gint hidden_log_levels = GPOINTER_TO_INT(user_data);
++    if (log_level & hidden_log_levels)
++        return;
+     switch(log_level) {
+         case G_LOG_LEVEL_ERROR:
+             if (log_domain) g_printerr("%s: ", log_domain);
+-- 
+1.8.3.1
+

@@ -49,13 +49,7 @@ python __anonymous () {
 
 OVERRIDES_append = ":${TARGET_ARCH}-${TARGET_OS}"
 
-locale_base_postinst() {
-#!/bin/sh
-
-if [ "x$D" != "x" ]; then
-	exit 1
-fi
-
+locale_base_postinst_ontarget() {
 localedef --inputfile=${datadir}/i18n/locales/%s --charmap=%s %s
 }
 
@@ -215,7 +209,7 @@ python package_do_split_gconvs () {
     def output_locale_source(name, pkgname, locale, encoding):
         d.setVar('RDEPENDS_%s' % pkgname, '%slocaledef %s-localedata-%s %s-charmap-%s' % \
         (mlprefix, mlprefix+bpn, legitimize_package_name(locale), mlprefix+bpn, legitimize_package_name(encoding)))
-        d.setVar('pkg_postinst_%s' % pkgname, d.getVar('locale_base_postinst') \
+        d.setVar('pkg_postinst_ontarget_%s' % pkgname, d.getVar('locale_base_postinst_ontarget') \
         % (locale, encoding, locale))
         d.setVar('pkg_postrm_%s' % pkgname, d.getVar('locale_base_postrm') % \
         (locale, encoding, locale))

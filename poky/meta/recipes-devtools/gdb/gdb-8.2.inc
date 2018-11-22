@@ -5,7 +5,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 		    file://COPYING.LIB;md5=9f604d8a4f8e74f4f5140845a21b6674"
 
 SRC_URI = "http://ftp.gnu.org/gnu/gdb/gdb-${PV}.tar.xz \
-           file://0001-include-sys-types.h-for-mode_t.patch \
            file://0002-make-man-install-relative-to-DESTDIR.patch \
            file://0003-mips-linux-nat-Define-_ABIO32-if-not-defined.patch \
            file://0004-ppc-ptrace-Define-pt_regs-uapi_pt_regs-on-GLIBC-syst.patch \

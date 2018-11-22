@@ -1,0 +1,243 @@
+Author: Douglas Royds <douglas.royds@taitradio.com>
+Date:   Thu Nov 22 09:34:22 2018 +1300
+
+Add a .file directive explicitly for all *_elf_gas.S files to prevent the linker
+adding a host build-system path as a FILE symbol to the object file.
+
+This replaces the existing patch that added the .file directive to a small
+subset of these files.
+
+Upstream-Status: Submitted [https://github.com/boostorg/context/issues/91]
+Signed-off-by: Douglas Royds <douglas.royds@taitradio.com>
+
+diff -ur boost_1_68_0.original/libs/context/src/asm/jump_arm64_aapcs_elf_gas.S boost_1_68_0/libs/context/src/asm/jump_arm64_aapcs_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/jump_arm64_aapcs_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/jump_arm64_aapcs_elf_gas.S	2018-11-22 09:04:27.900876941 +1300
+@@ -51,6 +51,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "jump_arm64_aapcs_elf_gas.S"
+ .text
+ .align  2
+ .global jump_fcontext
+diff -ur boost_1_68_0.original/libs/context/src/asm/jump_arm_aapcs_elf_gas.S boost_1_68_0/libs/context/src/asm/jump_arm_aapcs_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/jump_arm_aapcs_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/jump_arm_aapcs_elf_gas.S	2018-11-22 09:04:28.876898240 +1300
+@@ -38,6 +38,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "jump_arm_aapcs_elf_gas.S"
+ .text
+ .globl jump_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/jump_i386_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/jump_i386_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/jump_i386_sysv_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/jump_i386_sysv_elf_gas.S	2018-11-22 09:04:29.904920674 +1300
+@@ -24,6 +24,7 @@
+  *                                                                                      *
+  ****************************************************************************************/
+ 
++.file "jump_i386_sysv_elf_gas.S"
+ .text
+ .globl jump_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/jump_mips32_o32_elf_gas.S boost_1_68_0/libs/context/src/asm/jump_mips32_o32_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/jump_mips32_o32_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/jump_mips32_o32_elf_gas.S	2018-11-22 09:04:41.021163195 +1300
+@@ -38,6 +38,7 @@
+  *                                                     *
+  * *****************************************************/
+ 
++.file "jump_mips32_o32_elf_gas.S"
+ .text
+ .globl jump_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/jump_ppc32_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/jump_ppc32_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/jump_ppc32_sysv_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/jump_ppc32_sysv_elf_gas.S	2018-11-22 09:04:42.281190679 +1300
+@@ -73,6 +73,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "jump_ppc32_sysv_elf_gas.S"
+ .text
+ .globl jump_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/jump_ppc64_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/jump_ppc64_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/jump_ppc64_sysv_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/jump_ppc64_sysv_elf_gas.S	2018-11-22 09:04:43.193210571 +1300
+@@ -66,6 +66,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "jump_ppc64_sysv_elf_gas.S"
+ .globl jump_fcontext
+ #if _CALL_ELF == 2
+ 	.text
+diff -ur boost_1_68_0.original/libs/context/src/asm/jump_x86_64_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/jump_x86_64_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/jump_x86_64_sysv_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/jump_x86_64_sysv_elf_gas.S	2018-11-22 09:04:44.213232818 +1300
+@@ -24,6 +24,7 @@
+  *                                                                                      *
+  ****************************************************************************************/
+ 
++.file "jump_x86_64_sysv_elf_gas.S"
+ .text
+ .globl jump_fcontext
+ .type jump_fcontext,@function
+diff -ur boost_1_68_0.original/libs/context/src/asm/make_arm64_aapcs_elf_gas.S boost_1_68_0/libs/context/src/asm/make_arm64_aapcs_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/make_arm64_aapcs_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/make_arm64_aapcs_elf_gas.S	2018-11-22 09:04:45.153253319 +1300
+@@ -51,6 +51,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "make_arm64_aapcs_elf_gas.S"
+ .text
+ .align  2
+ .global make_fcontext
+diff -ur boost_1_68_0.original/libs/context/src/asm/make_arm_aapcs_elf_gas.S boost_1_68_0/libs/context/src/asm/make_arm_aapcs_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/make_arm_aapcs_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/make_arm_aapcs_elf_gas.S	2018-11-22 09:04:46.097273908 +1300
+@@ -38,6 +38,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "make_arm_aapcs_elf_gas.S"
+ .text
+ .globl make_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/make_i386_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/make_i386_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/make_i386_sysv_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/make_i386_sysv_elf_gas.S	2018-11-22 09:04:46.973293012 +1300
+@@ -24,6 +24,7 @@
+  *                                                                                      *
+  ****************************************************************************************/
+ 
++.file "make_i386_sysv_elf_gas.S"
+ .text
+ .globl make_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/make_mips32_o32_elf_gas.S boost_1_68_0/libs/context/src/asm/make_mips32_o32_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/make_mips32_o32_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/make_mips32_o32_elf_gas.S	2018-11-22 09:04:47.925313772 +1300
+@@ -38,6 +38,7 @@
+  *                                                     *
+  * *****************************************************/
+ 
++.file "make_mips32_o32_elf_gas.S"
+ .text
+ .globl make_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/make_ppc32_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/make_ppc32_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/make_ppc32_sysv_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/make_ppc32_sysv_elf_gas.S	2018-11-22 09:04:48.865334271 +1300
+@@ -73,6 +73,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "make_ppc32_sysv_elf_gas.S"
+ .text
+ .globl make_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/make_ppc64_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/make_ppc64_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/make_ppc64_sysv_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/make_ppc64_sysv_elf_gas.S	2018-11-22 09:04:50.049360089 +1300
+@@ -66,6 +66,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "make_ppc64_sysv_elf_gas.S"
+ .globl make_fcontext
+ #if _CALL_ELF == 2
+ 	.text
+diff -ur boost_1_68_0.original/libs/context/src/asm/make_x86_64_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/make_x86_64_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/make_x86_64_sysv_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/make_x86_64_sysv_elf_gas.S	2018-11-22 09:04:51.117383378 +1300
+@@ -24,6 +24,7 @@
+  *                                                                                      *
+  ****************************************************************************************/
+ 
++.file "make_x86_64_sysv_elf_gas.S"
+ .text
+ .globl make_fcontext
+ .type make_fcontext,@function
+diff -ur boost_1_68_0.original/libs/context/src/asm/ontop_arm64_aapcs_elf_gas.S boost_1_68_0/libs/context/src/asm/ontop_arm64_aapcs_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/ontop_arm64_aapcs_elf_gas.S	2018-11-21 16:31:18.601760893 +1300
++++ boost_1_68_0/libs/context/src/asm/ontop_arm64_aapcs_elf_gas.S	2018-11-22 09:04:52.201407013 +1300
+@@ -51,6 +51,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "ontop_arm64_aapcs_elf_gas.S"
+ .text
+ .align  2
+ .global ontop_fcontext
+diff -ur boost_1_68_0.original/libs/context/src/asm/ontop_arm_aapcs_elf_gas.S boost_1_68_0/libs/context/src/asm/ontop_arm_aapcs_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/ontop_arm_aapcs_elf_gas.S	2018-11-21 16:31:18.605760935 +1300
++++ boost_1_68_0/libs/context/src/asm/ontop_arm_aapcs_elf_gas.S	2018-11-22 09:04:53.269430300 +1300
+@@ -38,6 +38,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "ontop_arm_aapcs_elf_gas.S"
+ .text
+ .globl ontop_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/ontop_i386_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/ontop_i386_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/ontop_i386_sysv_elf_gas.S	2018-11-21 16:31:18.605760935 +1300
++++ boost_1_68_0/libs/context/src/asm/ontop_i386_sysv_elf_gas.S	2018-11-22 09:04:54.389454719 +1300
+@@ -24,6 +24,7 @@
+  *                                                                                      *
+  ****************************************************************************************/
+ 
++.file "ontop_i386_sysv_elf_gas.S"
+ .text
+ .globl ontop_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/ontop_mips32_o32_elf_gas.S boost_1_68_0/libs/context/src/asm/ontop_mips32_o32_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/ontop_mips32_o32_elf_gas.S	2018-11-21 16:31:18.605760935 +1300
++++ boost_1_68_0/libs/context/src/asm/ontop_mips32_o32_elf_gas.S	2018-11-22 09:04:55.657482363 +1300
+@@ -38,6 +38,7 @@
+  *                                                     *
+  * *****************************************************/
+ 
++.file "ontop_mips32_o32_elf_gas.S"
+ .text
+ .globl ontop_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/ontop_ppc32_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/ontop_ppc32_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/ontop_ppc32_sysv_elf_gas.S	2018-11-21 16:31:18.605760935 +1300
++++ boost_1_68_0/libs/context/src/asm/ontop_ppc32_sysv_elf_gas.S	2018-11-22 09:04:56.777506781 +1300
+@@ -73,6 +73,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "ontop_ppc32_sysv_elf_gas.S"
+ .text
+ .globl ontop_fcontext
+ .align 2
+diff -ur boost_1_68_0.original/libs/context/src/asm/ontop_ppc64_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/ontop_ppc64_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/ontop_ppc64_sysv_elf_gas.S	2018-11-21 16:31:18.605760935 +1300
++++ boost_1_68_0/libs/context/src/asm/ontop_ppc64_sysv_elf_gas.S	2018-11-22 09:04:58.485544015 +1300
+@@ -66,6 +66,7 @@
+  *                                                     *
+  *******************************************************/
+ 
++.file "ontop_ppc64_sysv_elf_gas.S"
+ .globl ontop_fcontext
+ #if _CALL_ELF == 2
+ 	.text
+diff -ur boost_1_68_0.original/libs/context/src/asm/ontop_x86_64_sysv_elf_gas.S boost_1_68_0/libs/context/src/asm/ontop_x86_64_sysv_elf_gas.S
+--- boost_1_68_0.original/libs/context/src/asm/ontop_x86_64_sysv_elf_gas.S	2018-11-21 16:31:18.605760935 +1300
++++ boost_1_68_0/libs/context/src/asm/ontop_x86_64_sysv_elf_gas.S	2018-11-22 09:04:59.609568516 +1300
+@@ -24,6 +24,7 @@
+  *                                                                                      *
+  ****************************************************************************************/
+ 
++.file "ontop_x86_64_sysv_elf_gas.S"
+ .text
+ .globl ontop_fcontext
+ .type ontop_fcontext,@function

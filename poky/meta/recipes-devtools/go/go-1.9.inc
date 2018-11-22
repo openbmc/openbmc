@@ -19,6 +19,7 @@ SRC_URI += "\
         file://0008-make.bash-add-GOHOSTxx-indirection-for-cross-canadia.patch \
         file://0009-cmd-go-buildmode-pie-forces-external-linking-mode-on.patch \
         file://0010-make.bash-override-CC-when-building-dist-and-go_boot.patch \
+        file://0011-use-GOBUILDMODE-to-set-buildmode.patch \
 "
 SRC_URI_append_libc-musl = " file://set-external-linker.patch"
 

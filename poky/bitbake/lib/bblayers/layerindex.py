@@ -28,7 +28,7 @@ class LayerIndexPlugin(ActionPlugin):
         layerdir = os.path.join(repodir, subdir)
         if not os.path.exists(repodir):
             if fetch_layer:
-                result = subprocess.call('git clone %s %s' % (url, repodir), shell = True)
+                result = subprocess.call(['git', 'clone', url, repodir])
                 if result:
                     logger.error("Failed to download %s" % url)
                     return None, None, None

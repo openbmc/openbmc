@@ -18,6 +18,6 @@ DEPENDS = "bison-native"
 SRC_URI[md5sum] = "ce2ba4d3088119b48e7531a703669c52"
 SRC_URI[sha256sum] = "7e528e8c317ddd156230c4e31d082cd13e7ddeb7a54824be82632209550c8cca"
 
-inherit autotools texinfo binconfig lib_package gtk-doc
+inherit autotools texinfo lib_package gtk-doc
 
 BBCLASSEXTEND = "native"

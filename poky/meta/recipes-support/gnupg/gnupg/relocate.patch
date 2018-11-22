@@ -1,10 +1,18 @@
-Allow the environment to override where gnupg looks for its own files. Useful in native builds.
+From 1eaf630343cc77d8b5d41d0b0a3551fa193c5fcf Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Wed, 19 Sep 2018 14:44:40 +0100
+Subject: [PATCH] Allow the environment to override where gnupg looks for its
+ own files. Useful in native builds.
 
 Upstream-Status: Inappropriate [OE-specific]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
+---
+ common/homedir.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
 diff --git a/common/homedir.c b/common/homedir.c
-index e9e75d01e..19140aa0d 100644
+index e9e75d0..19140aa 100644
 --- a/common/homedir.c
 +++ b/common/homedir.c
 @@ -760,7 +760,7 @@ gnupg_socketdir (void)

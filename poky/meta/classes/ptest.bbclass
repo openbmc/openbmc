@@ -59,6 +59,7 @@ addtask install_ptest_base   after do_install   before do_package do_populate_sy
 python () {
     if not bb.data.inherits_class('native', d) and not bb.data.inherits_class('cross', d):
         d.setVarFlag('do_install_ptest_base', 'fakeroot', '1')
+        d.setVarFlag('do_install_ptest_base', 'umask', '022')
 
     # Remove all '*ptest_base' tasks when ptest is not enabled
     if not(d.getVar('PTEST_ENABLED') == "1"):

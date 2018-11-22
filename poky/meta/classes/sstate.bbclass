@@ -423,8 +423,9 @@ def sstate_clean_cachefile(ss, d):
     import oe.path
 
     sstatepkgfile = d.getVar('SSTATE_PATHSPEC') + "*_" + ss['task'] + ".tgz*"
-    bb.note("Removing %s" % sstatepkgfile)
-    oe.path.remove(sstatepkgfile)
+    if d.getVarFlag('do_%s' % ss['task'], 'task'):
+        bb.note("Removing %s" % sstatepkgfile)
+        oe.path.remove(sstatepkgfile)
 
 def sstate_clean_cachefiles(d):
     for task in (d.getVar('SSTATETASKS') or "").split():

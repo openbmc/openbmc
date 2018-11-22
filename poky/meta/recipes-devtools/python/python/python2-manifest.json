@@ -1,3 +1,93 @@
+# DO NOT (entirely) modify this file manually, please read.
+#
+# IMPORTANT NOTE:
+# Please keep in mind that the create_manifest task relies on the fact the the
+# target and native Python packages are the same, and it also needs to be executed
+# with a fully working native package (with all the PACKAGECONFIGs enabled and all
+# and all the modules should be working, check log.do_compile), otherwise the script
+# will fail to find dependencies correctly, this note is valid either if you are
+# upgrading to a new Python version or adding a new package.
+#
+#
+# If you are adding a new package please follow the next steps:
+#     How to add a new package:
+#     - If a user wants to add a new package all that has to be done is:
+#     Modify the python2-manifest.json file, and add the required file(s) to the FILES list,
+#     fill up the SUMMARY section as well, the script should handle all the rest.
+#
+#     Real example:
+#     We want to add a web browser package, including the file webbrowser.py
+#     which at the moment is on python-misc.
+#     "webbrowser": {
+#         "files": ["${libdir}/python2.7/lib-dynload/webbrowser.py"],
+#         "rdepends": [],
+#         "summary": "Python Web Browser support"}
+#
+#     * Note that the rdepends field was left empty
+#
+#     We run $ bitbake python -c create_manifest and the resulting manifest
+#     should be completed after a few seconds, showing something like:
+#     "webbrowser": {
+#         "files": ["${libdir}/python2.7/webbrowser.py"],
+#         "rdepends": ["core","fcntl","io","pickle","shell","subprocess"],
+#         "summary": "Python Web Browser support"}
+#
+#
+# If you are upgrading Python to a new version please follow the next steps:
+#     After each Python upgrade, the create_manifest task should be executed, because we
+#     don't control what changes on upstream Python, so, some module dependency
+#     might have changed without us realizing it, a certain module can either have
+#     more or less dependencies, or could be depending on a new file that was just
+#     created on the new release and for obvious reasons we wouldn't have it on our
+#     old manifest, all of these issues would cause runtime errors on our system.
+#
+#     - Upgrade both the native and target Python packages to a new version
+#     - Run the create_manifest task for the target Python package as its shown below:
+#
+#     $ bitbake python -c create_manifest
+#
+#     This will automatically replace your manifest file located under the Python directory
+#     with an new one, which contains the new dependencies (if any).
+#
+#     Several things could have gone wrong here, I will try to explain a few:
+#
+#     a) A new file was introduced on this release, e.g. sha3*.so:
+#        The task will check what its needed to import every module, more than one module would
+#        would probably depend on sha3*.so, although only one module should contain it.
+#
+#        After running the task, the new manifest will have the sha3*.so file on more than one
+#        module, you need to manually decide which one of them should get it and delete it from
+#        the others, for example sha3*.so should likely be on ${PN}-crypt.
+#        Once you have deleted from the others you need to run the create_manifest task again,
+#        this will populate the other module's rdepends fields, with ${PN}-crypt and you should be
+#        good to go.
+#
+#     b) The native package wasn't built correctly and its missing a certain module:
+#        As mentioned before, you need to make sure the native package was built with all the modules
+#        because it is used as base to build the manifest file, you need to manually check log.do_compile
+#        since it won't error out the compile function if its only missing a couple of modules.
+#
+#        e.g. missing the _uuid module, log.do_compile would show the following:
+#        Python build finished successfully!
+#        The necessary bits to build these optional modules were not found:
+#        _uuid
+#
+#        What will happen here is that the new manifest would not be aware that the _uuid module exists, so
+#        not only we won't know of any dependencies to it, but also, the _uuid* files will be packaged on
+#        the misc package (which is where any file that doesn't belong anywhere else ends up).
+#
+#        This will eventually cause runtime errors on our system if we don't include the misc package on
+#        on our image, because the _uuid files will be missing.
+#        If we build the _uuid module correctly and run the create_manifest task the _uuid files will be
+#        detected correctly along with its dependencies, and we will get a working manifest.
+#
+#        This is the reason why it is important to make sure we have a fully working native build,
+#        so we can avoid these errors.
+#
+#
+#
+# DO NOT MODIFY THE NEXT LINE!, IT IS USED AS A MARKER FOR THE ACTUAL JSON MANIFEST
+# EOC
 {
     "tests": {
         "summary": "Python test suite", 

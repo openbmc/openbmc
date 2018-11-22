@@ -55,35 +55,35 @@ inherit cml1 systemd update-rc.d ptest
 
 # internal helper
 def busybox_cfg(feature, tokens, cnf, rem):
-	if type(tokens) == type(""):
-		tokens = [tokens]
-	rem.extend(['/^[# ]*' + token + '[ =]/d' for token in tokens])
-	if feature:
-		cnf.extend([token + '=y' for token in tokens])
-	else:
-		cnf.extend(['# ' + token + ' is not set' for token in tokens])
+    if type(tokens) == type(""):
+        tokens = [tokens]
+    rem.extend(['/^[# ]*' + token + '[ =]/d' for token in tokens])
+    if feature:
+        cnf.extend([token + '=y' for token in tokens])
+    else:
+        cnf.extend(['# ' + token + ' is not set' for token in tokens])
 
 # Map distro features to config settings
 def features_to_busybox_settings(d):
-	cnf, rem = ([], [])
-	busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv6', True, False, d), 'CONFIG_FEATURE_IPV6', cnf, rem)
-	busybox_cfg(True, 'CONFIG_LFS', cnf, rem)
-	busybox_cfg(True, 'CONFIG_FDISK_SUPPORT_LARGE_DISKS', cnf, rem)
-	busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'nls', True, False, d), 'CONFIG_LOCALE_SUPPORT', cnf, rem)
-	busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv4', True, False, d), 'CONFIG_FEATURE_IFUPDOWN_IPV4', cnf, rem)
-	busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv6', True, False, d), 'CONFIG_FEATURE_IFUPDOWN_IPV6', cnf, rem)
-	busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'wifi', True, False, d), 'CONFIG_RFKILL', cnf, rem)
-	busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'bluetooth', True, False, d), 'CONFIG_RFKILL', cnf, rem)
-	return "\n".join(cnf), "\n".join(rem)
+    cnf, rem = ([], [])
+    busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv6', True, False, d), 'CONFIG_FEATURE_IPV6', cnf, rem)
+    busybox_cfg(True, 'CONFIG_LFS', cnf, rem)
+    busybox_cfg(True, 'CONFIG_FDISK_SUPPORT_LARGE_DISKS', cnf, rem)
+    busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'nls', True, False, d), 'CONFIG_LOCALE_SUPPORT', cnf, rem)
+    busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv4', True, False, d), 'CONFIG_FEATURE_IFUPDOWN_IPV4', cnf, rem)
+    busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv6', True, False, d), 'CONFIG_FEATURE_IFUPDOWN_IPV6', cnf, rem)
+    busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'wifi', True, False, d), 'CONFIG_RFKILL', cnf, rem)
+    busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'bluetooth', True, False, d), 'CONFIG_RFKILL', cnf, rem)
+    return "\n".join(cnf), "\n".join(rem)
 
 # X, Y = ${@features_to_busybox_settings(d)}
 # unfortunately doesn't seem to work with bitbake, workaround:
 def features_to_busybox_conf(d):
-	cnf, rem = features_to_busybox_settings(d)
-	return cnf
+    cnf, rem = features_to_busybox_settings(d)
+    return cnf
 def features_to_busybox_del(d):
-	cnf, rem = features_to_busybox_settings(d)
-	return rem
+    cnf, rem = features_to_busybox_settings(d)
+    return rem
 
 configmangle = '/CONFIG_EXTRA_CFLAGS/d; \
 		'

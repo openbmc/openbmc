@@ -474,14 +474,11 @@ class BaseConfig(object):
                                        "Try 'runqemu help' on how to use it" % \
                                         (unknown_arg, arg))
         # Check to make sure it is a valid machine
-        if unknown_arg:
-            if self.get('MACHINE') == unknown_arg:
-                return
+        if unknown_arg and self.get('MACHINE') != unknown_arg:
             if self.get('DEPLOY_DIR_IMAGE'):
                 machine = os.path.basename(self.get('DEPLOY_DIR_IMAGE'))
                 if unknown_arg == machine:
                     self.set("MACHINE", machine)
-                    return
 
             self.check_arg_machine(unknown_arg)
 

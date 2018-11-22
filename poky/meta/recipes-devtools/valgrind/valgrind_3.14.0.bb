@@ -96,6 +96,19 @@ do_install_append () {
 
 TUNE = "${@strip_mcpu(d)}"
 
+VALGRINDARCH ?= "${TARGET_ARCH}"
+VALGRINDARCH_aarch64 = "arm64"
+VALGRINDARCH_x86-64 = "amd64"
+VALGRINDARCH_x86 = "x86"
+VALGRINDARCH_mips = "mips32"
+VALGRINDARCH_mipsel = "mips32"
+VALGRINDARCH_mips64el = "mips64"
+VALGRINDARCH_powerpc = "ppc"
+VALGRINDARCH_powerpc64 = "ppc64"
+VALGRINDARCH_powerpc64el = "ppc64le"
+
+INHIBIT_PACKAGE_STRIP_FILES = "${PKGD}${libdir}/valgrind/vgpreload_memcheck-${VALGRINDARCH}-linux.so"
+
 RDEPENDS_${PN} += "perl"
 
 # valgrind needs debug information for ld.so at runtime in order to

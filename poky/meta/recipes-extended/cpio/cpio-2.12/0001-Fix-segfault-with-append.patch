@@ -1,0 +1,87 @@
+Upstream-Status: Submitted [bugs-cpio]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+From 3f0bd5a40ad0ceaee78c74a52a7166ed7f08db81 Mon Sep 17 00:00:00 2001
+From: Pavel Raiskup <praiskup@redhat.com>
+Date: Thu, 29 Nov 2018 07:03:48 +0100
+Subject: [PATCH] Fix segfault with --append
+
+The --append mode combines both process_copy_in() and
+process_copy_out() methods, each of them working with different
+(local) file_hdr->c_name buffers.  So ensure that
+cpio_set_c_name() isn't using the same static variable for
+maintaining length of different buffers.
+
+Complements d36ec5f4e93130efb24fb9.  Thanks to Ross Burton.
+
+* src/copyin.c (process_copy_in): Always initialize file_hdr.
+* src/copyout.c (process_copy_out): Likewise.
+* src/cpiohdr.h (cpio_file_stat): Add c_name_buflen variable.
+* src/util.c (cpio_set_c_name): Use file_hdr->c_name_buflen.
+---
+ src/copyin.c  | 1 +
+ src/copyout.c | 1 +
+ src/cpiohdr.h | 1 +
+ src/util.c    | 3 ++-
+ 4 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/copyin.c b/src/copyin.c
+index ba887ae..767c2f8 100644
+--- a/src/copyin.c
++++ b/src/copyin.c
+@@ -1213,6 +1213,7 @@ process_copy_in ()
+ 
+   newdir_umask = umask (0);     /* Reset umask to preserve modes of
+ 				   created files  */
++  memset (&file_hdr, 0, sizeof (struct cpio_file_stat));
+   
+   /* Initialize the copy in.  */
+   if (pattern_file_name)
+diff --git a/src/copyout.c b/src/copyout.c
+index 7532dac..fb890cb 100644
+--- a/src/copyout.c
++++ b/src/copyout.c
+@@ -594,6 +594,7 @@ process_copy_out ()
+ 
+   /* Initialize the copy out.  */
+   ds_init (&input_name, 128);
++  memset (&file_hdr, 0, sizeof (struct cpio_file_stat));
+   file_hdr.c_magic = 070707;
+ 
+   /* Check whether the output file might be a tape.  */
+diff --git a/src/cpiohdr.h b/src/cpiohdr.h
+index 588135b..cf64f3e 100644
+--- a/src/cpiohdr.h
++++ b/src/cpiohdr.h
+@@ -127,6 +127,7 @@ struct cpio_file_stat /* Internal representation of a CPIO header */
+   uint32_t c_chksum;
+   char *c_name;
+   char *c_tar_linkname;
++  size_t c_name_buflen;
+ };
+ 
+ void cpio_set_c_name(struct cpio_file_stat *file_hdr, char *name);
+diff --git a/src/util.c b/src/util.c
+index 10486dc..1256469 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -1413,7 +1413,7 @@ set_file_times (int fd,
+ void
+ cpio_set_c_name (struct cpio_file_stat *file_hdr, char *name)
+ {
+-  static size_t buflen = 0;
++  size_t buflen = file_hdr->c_name_buflen;
+   size_t len = strlen (name) + 1;
+ 
+   if (buflen == 0)
+@@ -1430,6 +1430,7 @@ cpio_set_c_name (struct cpio_file_stat *file_hdr, char *name)
+     }
+ 
+   file_hdr->c_namesize = len;
++  file_hdr->c_name_buflen = buflen;
+   memmove (file_hdr->c_name, name, len);
+ }
+ 
+-- 
+2.11.0
+

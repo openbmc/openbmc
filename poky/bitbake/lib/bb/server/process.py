@@ -239,6 +239,12 @@ class ProcessServer(multiprocessing.Process):
         while not lock:
             with bb.utils.timeout(3):
                 lock = bb.utils.lockfile(lockfile, shared=False, retry=False, block=True)
+                if lock:
+                    # We hold the lock so we can remove the file (hide stale pid data)
+                    bb.utils.remove(lockfile)
+                    bb.utils.unlockfile(lock)
+                    return
+
                 if not lock:
                     # Some systems may not have lsof available
                     procs = None
@@ -259,10 +265,6 @@ class ProcessServer(multiprocessing.Process):
                     if procs:
                         msg += ":\n%s" % str(procs)
                     print(msg)
-                    return
-        # We hold the lock so we can remove the file (hide stale pid data)
-        bb.utils.remove(lockfile)
-        bb.utils.unlockfile(lock)
 
     def idle_commands(self, delay, fds=None):
         nextsleep = delay
@@ -412,23 +414,33 @@ class BitBakeServer(object):
                 logstart_re = re.compile(self.start_log_format % ('([0-9]+)', '([0-9-]+ [0-9:.]+)'))
                 started = False
                 lines = []
+                lastlines = []
                 with open(logfile, "r") as f:
                     for line in f:
                         if started:
                             lines.append(line)
                         else:
+                            lastlines.append(line)
                             res = logstart_re.match(line.rstrip())
                             if res:
                                 ldatetime = datetime.datetime.strptime(res.group(2), self.start_log_datetime_format)
                                 if ldatetime >= startdatetime:
                                     started = True
                                     lines.append(line)
+                        if len(lastlines) > 60:
+                            lastlines = lastlines[-60:]
                 if lines:
-                    if len(lines) > 10:
-                        bb.error("Last 10 lines of server log for this session (%s):\n%s" % (logfile, "".join(lines[-10:])))
+                    if len(lines) > 60:
+                        bb.error("Last 60 lines of server log for this session (%s):\n%s" % (logfile, "".join(lines[-60:])))
                     else:
                         bb.error("Server log for this session (%s):\n%s" % (logfile, "".join(lines)))
+                elif lastlines:
+                        bb.error("Server didn't start, last 60 loglines (%s):\n%s" % (logfile, "".join(lastlines)))
+            else:
+                bb.error("%s doesn't exist" % logfile)
+
             raise SystemExit(1)
+
         ready.close()
 
     def _startServer(self):

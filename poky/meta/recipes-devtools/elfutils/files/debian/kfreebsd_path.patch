@@ -1,0 +1,19 @@
+Upstream-Status: Pending [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Index: b/tests/run-native-test.sh
+===================================================================
+--- a/tests/run-native-test.sh
++++ b/tests/run-native-test.sh
+@@ -77,6 +77,12 @@ native_test()
+   test $native -eq 0 || testrun "$@" -p $native > /dev/null
+ }
+ 
++# On the Debian buildds, GNU/kFreeBSD linprocfs /proc/$PID/maps does
++# not give absolute paths due to sbuild's bind mounts (bug #570805)
++# therefore the next two test programs are expected to fail with
++# "cannot attach to process: Function not implemented".
++[ "$(uname)" = "GNU/kFreeBSD" ] && exit 77
++
+ native_test ${abs_builddir}/allregs
+ native_test ${abs_builddir}/funcretval
+ 

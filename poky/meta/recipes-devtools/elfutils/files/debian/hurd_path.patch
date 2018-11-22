@@ -1,0 +1,16 @@
+Upstream-Status: Pending [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Index: elfutils-0.165/tests/run-native-test.sh
+===================================================================
+--- elfutils-0.165.orig/tests/run-native-test.sh
++++ elfutils-0.165/tests/run-native-test.sh
+@@ -83,6 +83,9 @@ native_test()
+ # "cannot attach to process: Function not implemented".
+ [ "$(uname)" = "GNU/kFreeBSD" ] && exit 77
+ 
++# hurd's /proc/$PID/maps does not give paths yet.
++[ "$(uname)" = "GNU" ] && exit 77
++
+ native_test ${abs_builddir}/allregs
+ native_test ${abs_builddir}/funcretval
+ 

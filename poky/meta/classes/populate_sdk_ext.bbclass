@@ -280,6 +280,8 @@ python copy_buildsystem () {
 
     # Create local.conf
     builddir = d.getVar('TOPDIR')
+    if derivative and os.path.exists(builddir + '/conf/site.conf'):
+        shutil.copyfile(builddir + '/conf/site.conf', baseoutpath + '/conf/site.conf')
     if derivative and os.path.exists(builddir + '/conf/auto.conf'):
         shutil.copyfile(builddir + '/conf/auto.conf', baseoutpath + '/conf/auto.conf')
     if derivative:
@@ -297,6 +299,9 @@ python copy_buildsystem () {
                 return origvalue, op, 0, True
         varlist = ['[^#=+ ]*']
         oldlines = []
+        if os.path.exists(builddir + '/conf/site.conf'):
+            with open(builddir + '/conf/site.conf', 'r') as f:
+                oldlines += f.readlines()
         if os.path.exists(builddir + '/conf/auto.conf'):
             with open(builddir + '/conf/auto.conf', 'r') as f:
                 oldlines += f.readlines()

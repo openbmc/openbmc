@@ -31,7 +31,7 @@ BINCONFIG_GLOB ?= "*-config"
 PACKAGE_PREPROCESS_FUNCS += "binconfig_package_preprocess"
 
 binconfig_package_preprocess () {
-	for config in `find ${PKGD} -name '${BINCONFIG_GLOB}'`; do
+	for config in `find ${PKGD} -type f -name '${BINCONFIG_GLOB}'`; do
 		sed -i \
 		    -e 's:${STAGING_BASELIBDIR}:${base_libdir}:g;' \
 		    -e 's:${STAGING_LIBDIR}:${libdir}:g;' \
@@ -40,7 +40,7 @@ binconfig_package_preprocess () {
 		    -e 's:${STAGING_DIR_HOST}${prefix}:${prefix}:' \
                     $config
 	done
-	for lafile in `find ${PKGD} -name "*.la"` ; do
+	for lafile in `find ${PKGD} -type f -name "*.la"` ; do
 		sed -i \
 		    -e 's:${STAGING_BASELIBDIR}:${base_libdir}:g;' \
 		    -e 's:${STAGING_LIBDIR}:${libdir}:g;' \
@@ -54,7 +54,7 @@ binconfig_package_preprocess () {
 SYSROOT_PREPROCESS_FUNCS += "binconfig_sysroot_preprocess"
 
 binconfig_sysroot_preprocess () {
-	for config in `find ${S} -name '${BINCONFIG_GLOB}'` `find ${B} -name '${BINCONFIG_GLOB}'`; do
+	for config in `find ${S} -type f -name '${BINCONFIG_GLOB}'` `find ${B} -type f -name '${BINCONFIG_GLOB}'`; do
 		configname=`basename $config`
 		install -d ${SYSROOT_DESTDIR}${bindir_crossscripts}
 		sed ${@get_binconfig_mangle(d)} $config > ${SYSROOT_DESTDIR}${bindir_crossscripts}/$configname

@@ -28,6 +28,7 @@ SRC_URI = "http://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/${VERSIO
            file://blank-cert9.db \
            file://blank-key4.db \
            file://system-pkcs11.txt \
+           file://nss-fix-SHA_HTONL-bug-for-arm-32be.patch \
            "
 
 SRC_URI[md5sum] = "10720fc70fd483de1b085402fb10ed59"

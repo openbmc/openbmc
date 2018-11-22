@@ -1,0 +1,20 @@
+From: Helmut Grohne <helmut@subdivi.de>
+Subject: disable -Werror as it tends to break with new gcc versions
+Bug-Debian: https://bugs.debian.org/886004
+Last-Update: 2018-01-01
+
+Upstream-Status: Pending [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Index: elfutils-0.175/config/eu.am
+===================================================================
+--- elfutils-0.175.orig/config/eu.am
++++ elfutils-0.175/config/eu.am
+@@ -73,7 +73,6 @@ AM_CFLAGS = -std=gnu99 -Wall -Wshadow -W
+ 	    -Wold-style-definition -Wstrict-prototypes \
+ 	    $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
+ 	    $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+-	    $(if $($(*F)_no_Werror),,-Werror) \
+ 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
+ 	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
+ 	    $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \

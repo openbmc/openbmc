@@ -1,0 +1,25 @@
+From: Kurt Roeckx <kurt@roeckx.be>
+Subject: Make readelf -w output debug information on mips
+Bug-Debian: http://bugs.debian.org/662041
+Forwarded: not-needed
+
+Upstreams wants a change where this is handled by a hook that needs
+to be filled in by the backend for the arch.
+
+Upstream-Status: Pending [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Index: elfutils-0.175/src/readelf.c
+===================================================================
+--- elfutils-0.175.orig/src/readelf.c
++++ elfutils-0.175/src/readelf.c
+@@ -11133,7 +11133,8 @@ print_debug (Dwfl_Module *dwflmod, Ebl *
+       GElf_Shdr shdr_mem;
+       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+ 
+-      if (shdr != NULL && shdr->sh_type == SHT_PROGBITS)
++      if (shdr != NULL && (
++	 (shdr->sh_type == SHT_PROGBITS) || (shdr->sh_type == SHT_MIPS_DWARF)))
+ 	{
+ 	  static const struct
+ 	  {

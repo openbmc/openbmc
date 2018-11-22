@@ -34,8 +34,8 @@ def get_kernelversion_file(p):
         return None
 
 def linux_module_packages(s, d):
-	suffix = ""
-	return " ".join(map(lambda s: "kernel-module-%s%s" % (s.lower().replace('_', '-').replace('@', '+'), suffix), s.split()))
+    suffix = ""
+    return " ".join(map(lambda s: "kernel-module-%s%s" % (s.lower().replace('_', '-').replace('@', '+'), suffix), s.split()))
 
 # that's all
 

@@ -33,7 +33,7 @@ BB_HASHBASE_WHITELIST += "ICECC_PARALLEL_MAKE ICECC_DISABLED ICECC_USER_PACKAGE_
     ICECC_CARET_WORKAROUND ICECC_CFLAGS ICECC_ENV_VERSION \
     ICECC_DEBUG ICECC_LOGFILE ICECC_REPEAT_RATE ICECC_PREFERRED_HOST \
     ICECC_CLANG_REMOTE_CPP ICECC_IGNORE_UNVERIFIED ICECC_TEST_SOCKET \
-    ICECC_ENV_DEBUG \
+    ICECC_ENV_DEBUG ICECC_SYSTEM_PACKAGE_BL ICECC_SYSTEM_CLASS_BL \
     "
 
 ICECC_ENV_EXEC ?= "${STAGING_BINDIR_NATIVE}/icecc-create-env"
@@ -60,6 +60,31 @@ CXXFLAGS += "${ICECC_CFLAGS}"
 
 # Debug flags when generating environments
 ICECC_ENV_DEBUG ??= ""
+
+# "system" recipe blacklist contains a list of packages that can not distribute
+# compile tasks for one reason or the other. When adding new entry, please
+# document why (how it failed) so that we can re-evaluate it later e.g. when
+# there is new version
+#
+# libgcc-initial - fails with CPP sanity check error if host sysroot contains
+#                  cross gcc built for another target tune/variant
+# target-sdk-provides-dummy - ${HOST_PREFIX} is empty which triggers the "NULL
+#                             prefix" error.
+ICECC_SYSTEM_PACKAGE_BL += "\
+    libgcc-initial \
+    target-sdk-provides-dummy \
+    "
+
+# "system" classes that should be blacklisted. When adding new entry, please
+# document why (how it failed) so that we can re-evaluate it later
+#
+# image - Image aren't compiling, but the testing framework for images captures
+#         PARALLEL_MAKE as part of the test environment. Many tests won't use
+#         icecream, but leaving the high level of parallelism can cause them to
+#         consume an unnecessary amount of resources.
+ICECC_SYSTEM_CLASS_BL += "\
+    image \
+    "
 
 def icecc_dep_prepend(d):
     # INHIBIT_DEFAULT_DEPS doesn't apply to the patch command.  Whether or  not
@@ -134,7 +159,7 @@ def use_icecc(bb,d):
 
     pn = d.getVar('PN')
 
-    system_class_blacklist = []
+    system_class_blacklist = (d.getVar('ICECC_SYSTEM_CLASS_BL') or "").split()
     user_class_blacklist = (d.getVar('ICECC_USER_CLASS_BL') or "none").split()
     package_class_blacklist = system_class_blacklist + user_class_blacklist
 
@@ -143,15 +168,7 @@ def use_icecc(bb,d):
             bb.debug(1, "%s: class %s found in blacklist, disable icecc" % (pn, black))
             return "no"
 
-    # "system" recipe blacklist contains a list of packages that can not distribute compile tasks
-    # for one reason or the other
-    # this is the old list (which doesn't seem to be valid anymore, because I was able to build
-    # all these with icecc enabled)
-    # system_package_blacklist = [ "glibc", "gcc", "bind", "u-boot", "dhcp-forwarder", "enchant", "connman", "orbit2" ]
-    # when adding new entry, please document why (how it failed) so that we can re-evaluate it later
-    # e.g. when there is new version
-    # building libgcc-initial with icecc fails with CPP sanity check error if host sysroot contains cross gcc built for another target tune/variant
-    system_package_blacklist = ["libgcc-initial"]
+    system_package_blacklist = (d.getVar('ICECC_SYSTEM_PACKAGE_BL') or "").split()
     user_package_blacklist = (d.getVar('ICECC_USER_PACKAGE_BL') or "").split()
     user_package_whitelist = (d.getVar('ICECC_USER_PACKAGE_WL') or "").split()
     package_blacklist = system_package_blacklist + user_package_blacklist
@@ -381,7 +398,7 @@ set_icecc_env() {
     # Don't let ccache find the icecream compiler links that have been created, otherwise
     # it can end up invoking icecream recursively.
     export CCACHE_PATH="$PATH"
-    export CCACHE_DISBALE="1"
+    export CCACHE_DISABLE="1"
 
     export ICECC_VERSION ICECC_CC ICECC_CXX
     export PATH="$ICE_PATH:$PATH"

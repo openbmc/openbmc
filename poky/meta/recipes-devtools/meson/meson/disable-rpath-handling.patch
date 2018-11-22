@@ -1,0 +1,26 @@
+We need to allow our rpaths generated through the compiler flags to make it into 
+our binaries. Therefore disable the meson manipulations of these unless there
+is a specific directive to do something differently in the project.
+
+RP 2018/11/23
+
+Upstream-Status: Submitted [https://github.com/mesonbuild/meson/issues/2567]
+
+Index: meson-0.47.2/mesonbuild/minstall.py
+===================================================================
+--- meson-0.47.2.orig/mesonbuild/minstall.py
++++ meson-0.47.2/mesonbuild/minstall.py
+@@ -486,8 +486,11 @@ class Installer:
+                         printed_symlink_error = True
+             if os.path.isfile(outname):
+                 try:
+-                    depfixer.fix_rpath(outname, install_rpath, final_path,
+-                                       install_name_mappings, verbose=False)
++                    if install_rpath:
++                        depfixer.fix_rpath(outname, install_rpath, final_path,
++                                           install_name_mappings, verbose=False)
++                    else:
++                        print("RPATH changes at install time disabled")
+                 except SystemExit as e:
+                     if isinstance(e.code, int) and e.code == 0:
+                         pass

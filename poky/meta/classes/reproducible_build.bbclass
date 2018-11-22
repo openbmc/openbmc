@@ -22,7 +22,10 @@
 # 3. Use the mtime of "known" files such as NEWS, CHANGLELOG, ...
 #    This works for well-kept repositories distributed via tarball.
 #
-# 4. If the above steps fail, use the modification time of the youngest file in the source tree.
+# 4. Use the modification time of the youngest file in the source tree, if there is one.
+#    This will be the newest file from the distribution tarball, if any.
+#
+# 5. Fall back to a fixed timestamp.
 #
 # Once the value of SOURCE_DATE_EPOCH is determined, it is stored in the recipe's SDE_FILE.
 # If none of these mechanisms are suitable, replace the do_deploy_source_date_epoch task
@@ -104,15 +107,15 @@ def get_source_date_epoch_from_git(d, sourcedir):
     return source_date_epoch
 
 def get_source_date_epoch_from_youngest_file(d, sourcedir):
+    if sourcedir == d.getVar('WORKDIR'):
+       # These sources are almost certainly not from a tarball
+       return None
+
     # Do it the hard way: check all files and find the youngest one...
     source_date_epoch = None
     newest_file = None
-    # Just in case S = WORKDIR
-    exclude = set(["build", "image", "license-destdir", "patches", "pseudo",
-                   "recipe-sysroot", "recipe-sysroot-native", "sysroot-destdir", "temp"])
     for root, dirs, files in os.walk(sourcedir, topdown=True):
         files = [f for f in files if not f[0] == '.']
-        dirs[:] = [d for d in dirs if d not in exclude]
 
         for fname in files:
             filename = os.path.join(root, fname)
@@ -128,6 +131,10 @@ def get_source_date_epoch_from_youngest_file(d, sourcedir):
         bb.debug(1, "Newest file found: %s" % newest_file)
     return source_date_epoch
 
+def fixed_source_date_epoch():
+    bb.debug(1, "No tarball or git repo found to determine SOURCE_DATE_EPOCH")
+    return 0
+
 python do_create_source_date_epoch_stamp() {
     epochfile = d.getVar('SDE_FILE')
     if os.path.isfile(epochfile):
@@ -139,11 +146,8 @@ python do_create_source_date_epoch_stamp() {
         get_source_date_epoch_from_git(d, sourcedir) or
         get_source_date_epoch_from_known_files(d, sourcedir) or
         get_source_date_epoch_from_youngest_file(d, sourcedir) or
-        0       # Last resort
+        fixed_source_date_epoch()       # Last resort
     )
-    if source_date_epoch == 0:
-        # empty folder, not a single file ...
-        bb.debug(1, "No files found to determine SOURCE_DATE_EPOCH")
 
     bb.debug(1, "SOURCE_DATE_EPOCH: %d" % source_date_epoch)
     bb.utils.mkdirhier(d.getVar('SDE_DIR'))

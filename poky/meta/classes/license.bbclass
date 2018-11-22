@@ -309,7 +309,7 @@ def incompatible_license(d, dont_want_licenses, package=None):
     except oe.license.LicenseError as exc:
         bb.fatal('%s: %s' % (d.getVar('P'), exc))
     return any(not oe.license.license_ok(canonical_license(d, l), \
-		dont_want_licenses) for l in licenses)
+               dont_want_licenses) for l in licenses)
 
 def check_license_flags(d):
     """

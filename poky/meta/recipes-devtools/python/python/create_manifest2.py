@@ -22,7 +22,7 @@
 #
 #
 # This way we will create a new manifest from the data structure that was built during
-# this process, ont this new manifest each package will contain specifically only
+# this process, on this new manifest each package will contain specifically only
 # what it needs to run.
 #
 # There are some caveats which we try to deal with, such as repeated files on different
@@ -30,7 +30,7 @@
 # Its also important to note that this method only works for python files, and shared
 # libraries. Static libraries, header files and binaries need to be dealt with manually.
 #
-# Author: Alejandro Enedino Hernandez Samaniego "aehs29" <aehs29@gmail.com>
+# Author: Alejandro Enedino Hernandez Samaniego "aehs29" <aehs29 at gmail dot com>
 
 
 import sys
@@ -62,10 +62,21 @@ def isFolder(value):
   else:
     return False
 
+def prepend_comments(comments, json_manifest):
+    with open(json_manifest, 'r+') as manifest:
+        json_contents = manifest.read()
+        manifest.seek(0, 0)
+        manifest.write(comments + json_contents)
+
 # Read existing JSON manifest
 with open('python2-manifest.json') as manifest:
-  old_manifest = json.load(manifest, object_pairs_hook=collections.OrderedDict)
-
+    # The JSON format doesn't allow comments so we hack the call to keep the comments using a marker
+    manifest_str =  manifest.read()
+    json_start = manifest_str.find('# EOC') + 6 # EOC + \n
+    manifest.seek(0)
+    comments = manifest.read(json_start)
+    manifest_str = manifest.read()
+    old_manifest = json.loads(manifest_str, object_pairs_hook=collections.OrderedDict)
 
 # First pass to get core-package functionality, because we base everything on the fact that core is actually working
 # Not exactly the same so it should not be a function
@@ -277,3 +288,5 @@ for key in new_manifest:
 # Create the manifest from the data structure that was built
 with open('python2-manifest.json.new','w') as outfile:
     json.dump(new_manifest,outfile, indent=4)
+
+prepend_comments(comments,'python2-manifest.json.new')

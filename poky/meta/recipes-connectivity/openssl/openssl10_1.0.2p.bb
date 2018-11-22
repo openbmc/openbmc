@@ -354,8 +354,8 @@ openssl_package_preprocess () {
         for file in `find ${PKGD} -name *.h -o -name *.pc -o -name *.so`; do
                 rm $file
         done
-        rm ${PKGD}/usr/bin/openssl
-        rm ${PKGD}/usr/bin/c_rehash
-        rmdir ${PKGD}/usr/bin
+        rm ${PKGD}${bindir}/openssl
+        rm ${PKGD}${bindir}/c_rehash
+        rmdir ${PKGD}${bindir}
 
 }

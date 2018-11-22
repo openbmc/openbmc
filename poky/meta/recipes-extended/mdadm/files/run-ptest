@@ -1,10 +1,19 @@
 #!/bin/sh
 
-./test &>./test.log
-if [ $? -eq 0 ]
-then
-	echo "PASS: mdadm"
-	rm test.log
-else
-	echo "FAIL: mdadm"
-fi
+LOG="$(pwd)/test.log"
+# make the test continue to execute even one fail
+./test --keep-going 2>&1|tee ${LOG}
+# translate the test report
+# "tests/18imsm-r10_4d-takeover-r0_2d... succeeded" -> "PASS: tests/18imsm-r10_4d-takeover-r0_2d"
+# "tests/19raid6repair... FAILED - see //log for details" -> "FAIL: tests/19raid6repair"
+sed -i -e '/succeeded/ s/^/PASS: /' -e '/FAILED/ s/^/FAIL: /' ${LOG}
+sed -i -e 's/... FAILED//g' -e 's/... succeeded//g' ${LOG}
+passed=`grep PASS: ${LOG}|wc -l`
+failed=`grep FAIL: ${LOG}|wc -l`
+all=$((passed + failed))
+
+( echo "=== Test Summary ==="
+  echo "TOTAL: ${all}"
+  echo "PASSED: ${passed}"
+  echo "FAILED: ${failed}"
+) | tee -a /${LOG}

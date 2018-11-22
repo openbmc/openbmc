@@ -7,7 +7,7 @@ Subject: [PATCH] build: Provide alternatives for glibc assumptions helps
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-Rebase to 0.174
+Rebase to 0.175
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
@@ -129,7 +129,7 @@ index 7bcf61c..c345797 100644
        return elf_errmsg (error & 0xffff);
      case OTHER_ERROR (LIBDW):
 diff --git a/libdwfl/dwfl_module_getdwarf.c b/libdwfl/dwfl_module_getdwarf.c
-index af6838a..c079d6a 100644
+index 56e6105..f4a0649 100644
 --- a/libdwfl/dwfl_module_getdwarf.c
 +++ b/libdwfl/dwfl_module_getdwarf.c
 @@ -35,6 +35,7 @@
@@ -161,12 +161,12 @@ index f849128..6f0aca1 100644
  #define crc32 __libdwfl_crc32
  #include <libdwflP.h>
 diff --git a/libdwfl/linux-kernel-modules.c b/libdwfl/linux-kernel-modules.c
-index 9d0fef2..9fc09b8 100644
+index 360e4ee..b5aa397 100644
 --- a/libdwfl/linux-kernel-modules.c
 +++ b/libdwfl/linux-kernel-modules.c
-@@ -40,6 +40,7 @@
- #include <system.h>
+@@ -41,6 +41,7 @@
  
+ #include "libelfP.h"
  #include "libdwflP.h"
 +#include "system.h"
  #include <inttypes.h>
@@ -198,7 +198,7 @@ index 5dc632b..14da1b7 100644
  
  #endif	/* elf.h */
 diff --git a/libelf/libelf.h b/libelf/libelf.h
-index d11358c..4cf9272 100644
+index 1ff11c9..c21e018 100644
 --- a/libelf/libelf.h
 +++ b/libelf/libelf.h
 @@ -29,6 +29,7 @@
@@ -210,7 +210,7 @@ index d11358c..4cf9272 100644
  #include <sys/types.h>
  
 diff --git a/libelf/libelfP.h b/libelf/libelfP.h
-index ed216c8..415e6f6 100644
+index 9f3e8e9..10a347a 100644
 --- a/libelf/libelfP.h
 +++ b/libelf/libelfP.h
 @@ -32,6 +32,7 @@

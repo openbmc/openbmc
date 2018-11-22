@@ -1,0 +1,687 @@
+Upstream-Status: Pending [from debian]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Index: elfutils-0.175/backends/mips_init.c
+===================================================================
+--- /dev/null
++++ elfutils-0.175/backends/mips_init.c
+@@ -0,0 +1,59 @@
++/* Initialization of mips specific backend library.
++   Copyright (C) 2006 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#define BACKEND		mips_
++#define RELOC_PREFIX	R_MIPS_
++#include "libebl_CPU.h"
++
++/* This defines the common reloc hooks based on mips_reloc.def.  */
++#include "common-reloc.c"
++
++const char *
++mips_init (Elf *elf __attribute__ ((unused)),
++     GElf_Half machine __attribute__ ((unused)),
++     Ebl *eh,
++     size_t ehlen)
++{
++  /* Check whether the Elf_BH object has a sufficent size.  */
++  if (ehlen < sizeof (Ebl))
++    return NULL;
++
++  /* We handle it.  */
++  if (machine == EM_MIPS)
++    eh->name = "MIPS R3000 big-endian";
++  else if (machine == EM_MIPS_RS3_LE)
++    eh->name = "MIPS R3000 little-endian";
++
++  mips_init_reloc (eh);
++  HOOK (eh, reloc_simple_type);
++  HOOK (eh, return_value_location);
++  HOOK (eh, register_info);
++
++  return MODVERSION;
++}
+Index: elfutils-0.175/backends/mips_regs.c
+===================================================================
+--- /dev/null
++++ elfutils-0.175/backends/mips_regs.c
+@@ -0,0 +1,104 @@
++/* Register names and numbers for MIPS DWARF.
++   Copyright (C) 2006 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#include <string.h>
++#include <dwarf.h>
++
++#define BACKEND mips_
++#include "libebl_CPU.h"
++
++ssize_t
++mips_register_info (Ebl *ebl __attribute__((unused)),
++		    int regno, char *name, size_t namelen,
++		    const char **prefix, const char **setname,
++		    int *bits, int *type)
++{
++  if (name == NULL)
++    return 66;
++
++  if (regno < 0 || regno > 65 || namelen < 4)
++    return -1;
++
++  *prefix = "$";
++
++  if (regno < 32)
++    {
++      *setname = "integer";
++      *type = DW_ATE_signed;
++      *bits = 32;
++      if (regno < 32 + 10)
++        {
++          name[0] = regno + '0';
++          namelen = 1;
++        }
++      else
++        {
++          name[0] = (regno / 10) + '0';
++          name[1] = (regno % 10) + '0';
++          namelen = 2;
++        }
++    }
++  else if (regno < 64)
++    {
++      *setname = "FPU";
++      *type = DW_ATE_float;
++      *bits = 32;
++      name[0] = 'f';
++      if (regno < 32 + 10)
++	{
++	  name[1] = (regno - 32) + '0';
++	  namelen = 2;
++	}
++      else
++	{
++	  name[1] = (regno - 32) / 10 + '0';
++	  name[2] = (regno - 32) % 10 + '0';
++	  namelen = 3;
++	}
++    }
++  else if (regno == 64)
++    {
++      *type = DW_ATE_signed;
++      *bits = 32;
++      name[0] = 'h';
++      name[1] = 'i';
++      namelen = 2;
++    }
++  else
++    {
++      *type = DW_ATE_signed;
++      *bits = 32;
++      name[0] = 'l';
++      name[1] = 'o';
++      namelen = 2;
++    }
++
++  name[namelen++] = '\0';
++  return namelen;
++}
+Index: elfutils-0.175/backends/mips_reloc.def
+===================================================================
+--- /dev/null
++++ elfutils-0.175/backends/mips_reloc.def
+@@ -0,0 +1,79 @@
++/* List the relocation types for mips.  -*- C -*-
++   Copyright (C) 2006 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++/* 	    NAME,		REL|EXEC|DYN	*/
++
++RELOC_TYPE (NONE,               0)
++RELOC_TYPE (16,                 0)
++RELOC_TYPE (32,                 0)
++RELOC_TYPE (REL32,              0)
++RELOC_TYPE (26,                 0)
++RELOC_TYPE (HI16,               0)
++RELOC_TYPE (LO16,               0)
++RELOC_TYPE (GPREL16,            0)
++RELOC_TYPE (LITERAL,            0)
++RELOC_TYPE (GOT16,              0)
++RELOC_TYPE (PC16,               0)
++RELOC_TYPE (CALL16,             0)
++RELOC_TYPE (GPREL32,            0)
++
++RELOC_TYPE (SHIFT5,             0)
++RELOC_TYPE (SHIFT6,             0)
++RELOC_TYPE (64,                 0)
++RELOC_TYPE (GOT_DISP,           0)
++RELOC_TYPE (GOT_PAGE,           0)
++RELOC_TYPE (GOT_OFST,           0)
++RELOC_TYPE (GOT_HI16,           0)
++RELOC_TYPE (GOT_LO16,           0)
++RELOC_TYPE (SUB,                0)
++RELOC_TYPE (INSERT_A,           0)
++RELOC_TYPE (INSERT_B,           0)
++RELOC_TYPE (DELETE,             0)
++RELOC_TYPE (HIGHER,             0)
++RELOC_TYPE (HIGHEST,            0)
++RELOC_TYPE (CALL_HI16,          0)
++RELOC_TYPE (CALL_LO16,          0)
++RELOC_TYPE (SCN_DISP,           0)
++RELOC_TYPE (REL16,              0)
++RELOC_TYPE (ADD_IMMEDIATE,      0)
++RELOC_TYPE (PJUMP,              0)
++RELOC_TYPE (RELGOT,             0)
++RELOC_TYPE (JALR,               0)
++RELOC_TYPE (TLS_DTPMOD32,       0)
++RELOC_TYPE (TLS_DTPREL32,       0)
++RELOC_TYPE (TLS_DTPMOD64,       0)
++RELOC_TYPE (TLS_DTPREL64,       0)
++RELOC_TYPE (TLS_GD,             0)
++RELOC_TYPE (TLS_LDM,            0)
++RELOC_TYPE (TLS_DTPREL_HI16,    0)
++RELOC_TYPE (TLS_DTPREL_LO16,    0)
++RELOC_TYPE (TLS_GOTTPREL,       0)
++RELOC_TYPE (TLS_TPREL32,        0)
++RELOC_TYPE (TLS_TPREL64,        0)
++RELOC_TYPE (TLS_TPREL_HI16,     0)
++RELOC_TYPE (TLS_TPREL_LO16,     0)
++
++#define NO_COPY_RELOC 1
++#define NO_RELATIVE_RELOC 1
+Index: elfutils-0.175/backends/mips_retval.c
+===================================================================
+--- /dev/null
++++ elfutils-0.175/backends/mips_retval.c
+@@ -0,0 +1,321 @@
++/* Function return value location for Linux/mips ABI.
++   Copyright (C) 2005 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#include <string.h>
++#include <assert.h>
++#include <dwarf.h>
++#include <elf.h>
++
++#include "../libebl/libeblP.h"
++#include "../libdw/libdwP.h"
++
++#define BACKEND mips_
++#include "libebl_CPU.h"
++
++/* The ABI of the file.  Also see EF_MIPS_ABI2 above. */
++#define EF_MIPS_ABI		0x0000F000
++
++/* The original o32 abi. */
++#define E_MIPS_ABI_O32          0x00001000
++
++/* O32 extended to work on 64 bit architectures */
++#define E_MIPS_ABI_O64          0x00002000
++
++/* EABI in 32 bit mode */
++#define E_MIPS_ABI_EABI32       0x00003000
++
++/* EABI in 64 bit mode */
++#define E_MIPS_ABI_EABI64       0x00004000
++
++/* All the possible MIPS ABIs. */
++enum mips_abi
++  {
++    MIPS_ABI_UNKNOWN = 0,
++    MIPS_ABI_N32,
++    MIPS_ABI_O32,
++    MIPS_ABI_N64,
++    MIPS_ABI_O64,
++    MIPS_ABI_EABI32,
++    MIPS_ABI_EABI64,
++    MIPS_ABI_LAST
++  };
++
++/* Find the mips ABI of the current file */
++enum mips_abi find_mips_abi(Elf *elf)
++{
++  GElf_Ehdr ehdr_mem;
++  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
++
++  if (ehdr == NULL)
++    return MIPS_ABI_LAST;
++
++  GElf_Word elf_flags = ehdr->e_flags;
++
++  /* Check elf_flags to see if it specifies the ABI being used.  */
++  switch ((elf_flags & EF_MIPS_ABI))
++    {
++    case E_MIPS_ABI_O32:
++      return MIPS_ABI_O32;
++    case E_MIPS_ABI_O64:
++      return MIPS_ABI_O64;
++    case E_MIPS_ABI_EABI32:
++      return MIPS_ABI_EABI32;
++    case E_MIPS_ABI_EABI64:
++      return MIPS_ABI_EABI64;
++    default:
++      if ((elf_flags & EF_MIPS_ABI2))
++	return MIPS_ABI_N32;
++    }
++
++  /* GCC creates a pseudo-section whose name describes the ABI.  */
++  size_t shstrndx;
++  if (elf_getshdrstrndx (elf, &shstrndx) < 0)
++    return MIPS_ABI_LAST;
++
++  const char *name;
++  Elf_Scn *scn = NULL;
++  while ((scn = elf_nextscn (elf, scn)) != NULL)
++    {
++      GElf_Shdr shdr_mem;
++      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
++      if (shdr == NULL)
++        return MIPS_ABI_LAST;
++
++      name = elf_strptr (elf, shstrndx, shdr->sh_name) ?: "";
++      if (strncmp (name, ".mdebug.", 8) != 0)
++        continue;
++
++      if (strcmp (name, ".mdebug.abi32") == 0)
++        return MIPS_ABI_O32;
++      else if (strcmp (name, ".mdebug.abiN32") == 0)
++        return MIPS_ABI_N32;
++      else if (strcmp (name, ".mdebug.abi64") == 0)
++        return MIPS_ABI_N64;
++      else if (strcmp (name, ".mdebug.abiO64") == 0)
++        return MIPS_ABI_O64;
++      else if (strcmp (name, ".mdebug.eabi32") == 0)
++        return MIPS_ABI_EABI32;
++      else if (strcmp (name, ".mdebug.eabi64") == 0)
++        return MIPS_ABI_EABI64;
++      else
++        return MIPS_ABI_UNKNOWN;
++    }
++
++  return MIPS_ABI_UNKNOWN;
++}
++
++unsigned int
++mips_abi_regsize (enum mips_abi abi)
++{
++  switch (abi)
++    {
++    case MIPS_ABI_EABI32:
++    case MIPS_ABI_O32:
++      return 4;
++    case MIPS_ABI_N32:
++    case MIPS_ABI_N64:
++    case MIPS_ABI_O64:
++    case MIPS_ABI_EABI64:
++      return 8;
++    case MIPS_ABI_UNKNOWN:
++    case MIPS_ABI_LAST:
++    default:
++      return 0;
++    }
++}
++
++
++/* $v0 or pair $v0, $v1 */
++static const Dwarf_Op loc_intreg_o32[] =
++  {
++    { .atom = DW_OP_reg2 }, { .atom = DW_OP_piece, .number = 4 },
++    { .atom = DW_OP_reg3 }, { .atom = DW_OP_piece, .number = 4 },
++  };
++
++static const Dwarf_Op loc_intreg[] =
++  {
++    { .atom = DW_OP_reg2 }, { .atom = DW_OP_piece, .number = 8 },
++    { .atom = DW_OP_reg3 }, { .atom = DW_OP_piece, .number = 8 },
++  };
++#define nloc_intreg	1
++#define nloc_intregpair	4
++
++/* $f0 (float), or pair $f0, $f1 (double).
++ * f2/f3 are used for COMPLEX (= 2 doubles) returns in Fortran */
++static const Dwarf_Op loc_fpreg_o32[] =
++  {
++    { .atom = DW_OP_regx, .number = 32 }, { .atom = DW_OP_piece, .number = 4 },
++    { .atom = DW_OP_regx, .number = 33 }, { .atom = DW_OP_piece, .number = 4 },
++    { .atom = DW_OP_regx, .number = 34 }, { .atom = DW_OP_piece, .number = 4 },
++    { .atom = DW_OP_regx, .number = 35 }, { .atom = DW_OP_piece, .number = 4 },
++  };
++
++/* $f0, or pair $f0, $f2.  */
++static const Dwarf_Op loc_fpreg[] =
++  {
++    { .atom = DW_OP_regx, .number = 32 }, { .atom = DW_OP_piece, .number = 8 },
++    { .atom = DW_OP_regx, .number = 34 }, { .atom = DW_OP_piece, .number = 8 },
++  };
++#define nloc_fpreg  1
++#define nloc_fpregpair 4
++#define nloc_fpregquad 8
++
++/* The return value is a structure and is actually stored in stack space
++   passed in a hidden argument by the caller.  But, the compiler
++   helpfully returns the address of that space in $v0.  */
++static const Dwarf_Op loc_aggregate[] =
++  {
++    { .atom = DW_OP_breg2, .number = 0 }
++  };
++#define nloc_aggregate 1
++
++int
++mips_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
++{
++  /* First find the ABI used by the elf object */
++  enum mips_abi abi = find_mips_abi(functypedie->cu->dbg->elf);
++
++  /* Something went seriously wrong while trying to figure out the ABI */
++  if (abi == MIPS_ABI_LAST)
++    return -1;
++
++  /* We couldn't identify the ABI, but the file seems valid */
++  if (abi == MIPS_ABI_UNKNOWN)
++    return -2;
++
++  /* Can't handle EABI variants */
++  if ((abi == MIPS_ABI_EABI32) || (abi == MIPS_ABI_EABI64))
++    return -2;
++
++  unsigned int regsize = mips_abi_regsize (abi);
++  if (!regsize)
++    return -2;
++
++  /* Start with the function's type, and get the DW_AT_type attribute,
++     which is the type of the return value.  */
++
++  Dwarf_Attribute attr_mem;
++  Dwarf_Attribute *attr = dwarf_attr_integrate (functypedie, DW_AT_type, &attr_mem);
++  if (attr == NULL)
++    /* The function has no return value, like a `void' function in C.  */
++    return 0;
++
++  Dwarf_Die die_mem;
++  Dwarf_Die *typedie = dwarf_formref_die (attr, &die_mem);
++  int tag = dwarf_tag (typedie);
++
++  /* Follow typedefs and qualifiers to get to the actual type.  */
++  while (tag == DW_TAG_typedef
++	 || tag == DW_TAG_const_type || tag == DW_TAG_volatile_type
++	 || tag == DW_TAG_restrict_type)
++    {
++      attr = dwarf_attr_integrate (typedie, DW_AT_type, &attr_mem);
++      typedie = dwarf_formref_die (attr, &die_mem);
++      tag = dwarf_tag (typedie);
++    }
++
++  switch (tag)
++    {
++    case -1:
++      return -1;
++
++    case DW_TAG_subrange_type:
++      if (! dwarf_hasattr_integrate (typedie, DW_AT_byte_size))
++	{
++	  attr = dwarf_attr_integrate (typedie, DW_AT_type, &attr_mem);
++	  typedie = dwarf_formref_die (attr, &die_mem);
++	  tag = dwarf_tag (typedie);
++	}
++      /* Fall through.  */
++
++    case DW_TAG_base_type:
++    case DW_TAG_enumeration_type:
++    case DW_TAG_pointer_type:
++    case DW_TAG_ptr_to_member_type:
++      {
++        Dwarf_Word size;
++	if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
++					 &attr_mem), &size) != 0)
++	  {
++	    if (tag == DW_TAG_pointer_type || tag == DW_TAG_ptr_to_member_type)
++	      size = regsize;
++	    else
++	      return -1;
++	  }
++	if (tag == DW_TAG_base_type)
++	  {
++	    Dwarf_Word encoding;
++	    if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_encoding,
++					     &attr_mem), &encoding) != 0)
++	      return -1;
++
++#define ABI_LOC(loc, regsize) ((regsize) == 4 ? (loc ## _o32) : (loc))
++
++	    if (encoding == DW_ATE_float)
++	      {
++		*locp = ABI_LOC(loc_fpreg, regsize);
++		if (size <= regsize)
++		    return nloc_fpreg;
++
++		if (size <= 2*regsize)
++                  return nloc_fpregpair;
++
++		if (size <= 4*regsize && abi == MIPS_ABI_O32)
++                  return nloc_fpregquad;
++
++		goto aggregate;
++	      }
++	  }
++	*locp = ABI_LOC(loc_intreg, regsize);
++	if (size <= regsize)
++	  return nloc_intreg;
++	if (size <= 2*regsize)
++	  return nloc_intregpair;
++
++	/* Else fall through. Shouldn't happen though (at least with gcc) */
++      }
++
++    case DW_TAG_structure_type:
++    case DW_TAG_class_type:
++    case DW_TAG_union_type:
++    case DW_TAG_array_type:
++    aggregate:
++      /* XXX TODO: Can't handle structure return with other ABI's yet :-/ */
++      if ((abi != MIPS_ABI_O32) && (abi != MIPS_ABI_O64))
++        return -2;
++
++      *locp = loc_aggregate;
++      return nloc_aggregate;
++    }
++
++  /* XXX We don't have a good way to return specific errors from ebl calls.
++     This value means we do not understand the type, but it is well-formed
++     DWARF and might be valid.  */
++  return -2;
++}
+Index: elfutils-0.175/backends/mips_symbol.c
+===================================================================
+--- /dev/null
++++ elfutils-0.175/backends/mips_symbol.c
+@@ -0,0 +1,53 @@
++/* MIPS specific symbolic name handling.
++   Copyright (C) 2002, 2003, 2005 Red Hat, Inc.
++   This file is part of Red Hat elfutils.
++   Written by Jakub Jelinek <jakub@redhat.com>, 2002.
++
++   Red Hat elfutils is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by the
++   Free Software Foundation; version 2 of the License.
++
++   Red Hat elfutils is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with Red Hat elfutils; if not, write to the Free Software Foundation,
++   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
++
++   Red Hat elfutils is an included package of the Open Invention Network.
++   An included package of the Open Invention Network is a package for which
++   Open Invention Network licensees cross-license their patents.  No patent
++   license is granted, either expressly or impliedly, by designation as an
++   included package.  Should you wish to participate in the Open Invention
++   Network licensing program, please visit www.openinventionnetwork.com
++   <http://www.openinventionnetwork.com>.  */
++
++#ifdef HAVE_CONFIG_H
++# include <config.h>
++#endif
++
++#include <elf.h>
++#include <stddef.h>
++
++#define BACKEND		mips_
++#include "libebl_CPU.h"
++
++/* Check for the simple reloc types.  */
++Elf_Type
++mips_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type,
++                        int *addsub __attribute__ ((unused)))
++{
++  switch (type)
++    {
++    case R_MIPS_16:
++      return ELF_T_HALF;
++    case R_MIPS_32:
++      return ELF_T_WORD;
++    case R_MIPS_64:
++      return ELF_T_XWORD;
++    default:
++      return ELF_T_NUM;
++    }
++}
+Index: elfutils-0.175/libebl/eblopenbackend.c
+===================================================================
+--- elfutils-0.175.orig/libebl/eblopenbackend.c
++++ elfutils-0.175/libebl/eblopenbackend.c
+@@ -71,6 +71,8 @@ static const struct
+   { "sparc", "elf_sparc", "sparc", 5, EM_SPARC, 0, 0 },
+   { "sparc", "elf_sparcv8plus", "sparc", 5, EM_SPARC32PLUS, 0, 0 },
+   { "s390", "ebl_s390", "s390", 4, EM_S390, 0, 0 },
++  { "mips", "elf_mips", "mips", 4, EM_MIPS, 0, 0 },
++  { "mips", "elf_mipsel", "mipsel", 4, EM_MIPS_RS3_LE, 0, 0 },
+ 
+   { "m32", "elf_m32", "m32", 3, EM_M32, 0, 0 },
+   { "m68k", "elf_m68k", "m68k", 4, EM_68K, ELFCLASS32, ELFDATA2MSB },
+Index: elfutils-0.175/backends/Makefile.am
+===================================================================
+--- elfutils-0.175.orig/backends/Makefile.am
++++ elfutils-0.175/backends/Makefile.am
+@@ -33,13 +33,13 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I
+ 
+ 
+ modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
+-	  tilegx m68k bpf riscv parisc
++	  tilegx m68k bpf riscv parisc mips
+ libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
+ 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
+ 	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
+ 	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
+ 	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a \
+-	     libebl_parisc_pic.a
++	     libebl_parisc_pic.a libebl_mips_pic.a
+ noinst_LIBRARIES = $(libebl_pic)
+ noinst_DATA = $(libebl_pic:_pic.a=.so)
+ 
+@@ -141,6 +141,10 @@ parisc_SRCS = parisc_init.c parisc_symbo
+ libebl_parisc_pic_a_SOURCES = $(parisc_SRCS)
+ am_libebl_parisc_pic_a_OBJECTS = $(parisc_SRCS:.c=.os)
+ 
++mips_SRCS = mips_init.c mips_symbol.c mips_regs.c mips_retval.c
++libebl_mips_pic_a_SOURCES = $(mips_SRCS)
++am_libebl_mips_pic_a_OBJECTS = $(mips_SRCS:.c=.os)
++
+ libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw) $(libeu)
+ 	@rm -f $(@:.so=.map)
+ 	$(AM_V_at)echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' \
