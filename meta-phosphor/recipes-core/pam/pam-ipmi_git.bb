@@ -13,6 +13,7 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 
+DEPENDS += "autoconf-archive-native"
 DEPENDS += "openssl libpam"
 
 FILES_${PN} += " \
