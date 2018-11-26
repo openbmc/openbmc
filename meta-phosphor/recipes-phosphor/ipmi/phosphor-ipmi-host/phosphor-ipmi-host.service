@@ -11,6 +11,8 @@ Wants=mapper-wait@-xyz-openbmc_project-control-host0-restriction_mode.service
 After=mapper-wait@-xyz-openbmc_project-control-host0-restriction_mode.service
 Wants=clear-once.service
 After=clear-once.service
+Requires=org.openbmc.HostIpmi.service
+After=org.openbmc.HostIpmi.service
 
 [Service]
 Restart=always

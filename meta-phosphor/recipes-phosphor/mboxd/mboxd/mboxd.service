@@ -4,7 +4,8 @@ BindsTo=dev-aspeed\x2dlpc\x2dctrl.device
 After=dev-aspeed\x2dlpc\x2dctrl.device
 BindsTo=dev-aspeed\x2dmbox.device
 After=dev-aspeed\x2dmbox.device
-
+Requires=phosphor-ipmi-host.service
+After=phosphor-ipmi-host.service
 
 [Service]
 Restart=always
