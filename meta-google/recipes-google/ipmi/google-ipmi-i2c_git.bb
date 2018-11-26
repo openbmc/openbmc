@@ -14,7 +14,7 @@ DEPENDS += "phosphor-ipmi-host"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/google-ipmi-i2c"
-SRCREV = "6471cef69b27a63d741ca6e7d9c95a9d1499df9f"
+SRCREV = "9a074dc5b2944db765c6f533a5f41c60f4a4e237"
 
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
