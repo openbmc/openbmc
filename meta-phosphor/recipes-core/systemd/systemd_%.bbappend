@@ -1,10 +1,9 @@
 FILES_${PN}-catalog-extralocales = \
             "${exec_prefix}/lib/systemd/catalog/*.*.catalog"
 PACKAGES =+ "${PN}-catalog-extralocales"
-PACKAGECONFIG_append = " networkd"
-PACKAGECONFIG_remove = "machined hibernate ldconfig binfmt backlight localed \
-                        quotacheck kdbus ima smack polkit logind bootchart utmp \
-                        manpages"
+PACKAGECONFIG_remove = "backlight binfmt firstboot hibernate ima \
+                        localed logind machined polkit quotacheck smack utmp \
+                        vconsole"
 FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
 SRC_URI += "file://default.network"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
