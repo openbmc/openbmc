@@ -53,11 +53,6 @@
             "name": "POWER_BUTTON",
             "pin": "I3",
             "direction": "both"
-        },
-        {
-            "name": "RESET_BUTTON",
-            "pin": "J1",
-            "direction": "both"
         }
     ]
 }
