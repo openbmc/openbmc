@@ -24,8 +24,8 @@ RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
 
 SUMMARY_${PN}-chassis = "OpenPOWER Chassis"
 RDEPENDS_${PN}-chassis = " \
-        obmc-button-power \
-        obmc-button-reset \
+        obmc-phosphor-buttons-signals \
+        obmc-phosphor-buttons-handler \
         obmc-control-chassis \
         obmc-op-control-power \
         obmc-host-failure-reboots \
