@@ -1,0 +1,14 @@
+[Unit]
+Description=Init BMC MAC address for NIC %I
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+Wants=mapper-wait@-xyz-openbmc_project-network-%i.service
+After=mapper-wait@-xyz-openbmc_project-network-%i.service
+
+[Service]
+ExecStart=/usr/bin/first-boot-set-mac.sh %i
+Type=oneshot
+RemainAfterExit=Yes
+
+[Install]
+WantedBy=multi-user.target
