@@ -5,7 +5,7 @@ SRC_URI += "file://fw_env.config"
 SRC_URI += "file://alt_fw_env.config"
 
 SUMMARY = "U-Boot bootloader fw_printenv/setenv utilities"
-DEPENDS = "mtd-utils"
+DEPENDS += "mtd-utils"
 
 PROVIDES += "u-boot-fw-utils"
 
