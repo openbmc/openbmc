@@ -1,0 +1,47 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "PGOOD",
+            "power_up_outs": [
+                {"name": "POWER_UP_PIN", "polarity": true}
+            ],
+            "reset_outs": [
+                {"name": "RESET_OUT", "polarity": false}
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "PGOOD",
+            "pin": "AB3",
+            "direction": "in"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "E2",
+            "direction": "both"
+        },
+        {
+            "name": "POWER_UP_PIN",
+            "pin": "E3",
+            "direction": "out"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "E0",
+            "direction": "both"
+        },
+        {
+            "name": "RESET_OUT",
+            "pin": "E1",
+            "direction": "out"
+        },
+        {
+            "name": "ID_BUTTON",
+            "pin": "S6",
+            "direction": "both"
+        }
+    ]
+}
