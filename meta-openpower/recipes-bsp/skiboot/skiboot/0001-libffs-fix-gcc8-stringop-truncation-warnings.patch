@@ -1,0 +1,35 @@
+From 0876e5091c5ed06bae8a2bac296d04b1d0e87f56 Mon Sep 17 00:00:00 2001
+From: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Date: Wed, 21 Nov 2018 08:54:45 -0500
+Subject: [PATCH] libffs: fix gcc8 stringop-truncation warnings
+
+Copy the null byte too in this copy operation to avoid the following
+warning:
+
+| libflash/libffs.c: In function 'ffs_part_info':
+| libflash/libffs.c:525:3: error: 'strncpy' output may be truncated copying 15 bytes from a string of length 15 [-Werror=stringop-truncation]
+|    strncpy(n, ent->name, FFS_PART_NAME_MAX);
+|    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Brad Bishop <bradleyb@fuzziesquirrel.com>
+Upstream-Status: Submitted
+---
+ libflash/libffs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libflash/libffs.c b/libflash/libffs.c
+index 221c2b02..816153d3 100644
+--- a/libflash/libffs.c
++++ b/libflash/libffs.c
+@@ -522,7 +522,7 @@ int ffs_part_info(struct ffs_handle *ffs, uint32_t part_idx,
+ 		n = calloc(1, FFS_PART_NAME_MAX + 1);
+ 		if (!n)
+ 			return FLASH_ERR_MALLOC_FAILED;
+-		strncpy(n, ent->name, FFS_PART_NAME_MAX);
++		strncpy(n, ent->name, FFS_PART_NAME_MAX +1);
+ 		*name = n;
+ 	}
+ 	return 0;
+-- 
+2.19.1
+
