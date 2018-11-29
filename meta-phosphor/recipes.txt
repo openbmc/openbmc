@@ -5,3 +5,4 @@ recipes-extended     - Applications which whilst not essential add features comp
                        core. May be needed for full tool functionality or LSB compliance.
 recipes-kernel       - The kernel and generic applications/libraries with strong kernel dependencies
 recipes-phosphor     - Phosphor OpenBMC applications and configuration
+recipes-protocols    - bbappends from recipes-protocols in the meta-networking layer
