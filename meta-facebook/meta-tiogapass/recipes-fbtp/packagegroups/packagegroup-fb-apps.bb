@@ -15,4 +15,5 @@ RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
 SUMMARY_${PN}-system = "Facebook System"
 RDEPENDS_${PN}-system = " \
         entity-manager \
+        dbus-sensors \
         "
