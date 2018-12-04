@@ -3,7 +3,6 @@
 
 from unittest import SkipTest
 
-from oeqa.core.threaded import OETestRunnerThreaded
 from oeqa.core.exception import OEQADependency
 
 from . import OETestDiscover, registerDecorator
@@ -64,16 +63,10 @@ def _order_test_case_by_depends(cases, depends):
     return [cases[case_id] for case_id in cases_ordered]
 
 def _skipTestDependency(case, depends):
-    if isinstance(case.tc.runner, OETestRunnerThreaded):
-        import threading
-        results = case.tc._results[threading.get_ident()]
-    else:
-        results = case.tc._results
-
     skipReasons = ['errors', 'failures', 'skipped']
 
     for reason in skipReasons:
-        for test, _ in results[reason]:
+        for test, _ in getattr(case.tc.results, reason):
             if test.id() in depends:
                 raise SkipTest("Test case %s depends on %s and was in %s." \
                         % (case.id(), test.id(), reason))

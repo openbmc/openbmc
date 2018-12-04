@@ -1,3 +1,6 @@
+import unittest
+import pprint
+
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.oeid import OETestID
@@ -49,6 +52,7 @@ class PtestRunnerTest(OERuntimeTestCase):
     @OETestID(1600)
     @skipIfNotFeature('ptest', 'Test requires ptest to be in DISTRO_FEATURES')
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @unittest.expectedFailure
     def test_ptestrunner(self):
         status, output = self.target.run('which ptest-runner', 0)
         if status != 0:
@@ -76,6 +80,11 @@ class PtestRunnerTest(OERuntimeTestCase):
         # status != 0 is OK since some ptest tests may fail
         self.assertTrue(status != 127, msg="Cannot execute ptest-runner!")
 
+        if not hasattr(self.tc, "extraresults"):
+            self.tc.extraresults = {}
+        extras = self.tc.extraresults
+        extras['ptestresult.rawlogs'] = {'log': output}
+
         # Parse and save results
         parse_result = self.parse_ptest(ptest_runner_log)
         parse_result.log_as_files(ptest_log_dir, test_status = ['pass','fail', 'skip'])
@@ -84,10 +93,18 @@ class PtestRunnerTest(OERuntimeTestCase):
             os.remove(ptest_log_dir_link)
         os.symlink(os.path.basename(ptest_log_dir), ptest_log_dir_link)
 
+        trans = str.maketrans("()", "__")
+        resmap = {'pass': 'PASSED', 'skip': 'SKIPPED', 'fail': 'FAILED'}
+        for section in parse_result.result_dict:
+            for test, result in parse_result.result_dict[section]:
+                testname = "ptestresult." + section + "." + "_".join(test.translate(trans).split())
+                extras[testname] = {'status': resmap[result]}
+
         failed_tests = {}
         for section in parse_result.result_dict:
-            failed_testcases = [ test for test, result in parse_result.result_dict[section] if result == 'fail' ]
+            failed_testcases = [ "_".join(test.translate(trans).split()) for test, result in parse_result.result_dict[section] if result == 'fail' ]
             if failed_testcases:
                 failed_tests[section] = failed_testcases
 
-        self.assertFalse(failed_tests, msg = "Failed ptests: %s" %(str(failed_tests)))
+        if failed_tests:
+            self.fail("Failed ptests:\n%s" % pprint.pformat(failed_tests))

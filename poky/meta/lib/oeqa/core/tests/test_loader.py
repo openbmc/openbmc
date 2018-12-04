@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2016-2017 Intel Corporation
+# Copyright (C) 2016 Intel Corporation
 # Released under the MIT license (see COPYING.MIT)
 
 import os
@@ -81,34 +81,6 @@ class TestLoader(TestBase):
         self.cases_path = cases_path
         msg = 'Expected modules from two different paths'
         self.assertEqual(modules, expected_modules, msg=msg)
-
-    def test_loader_threaded(self):
-        cases_path = self.cases_path
-
-        self.cases_path = [os.path.join(self.cases_path, 'loader', 'threaded')]
-
-        tc = self._testLoaderThreaded()
-        self.assertEqual(len(tc.suites), 3, "Expected to be 3 suites")
-
-        case_ids = ['threaded.ThreadedTest.test_threaded_no_depends',
-                'threaded.ThreadedTest2.test_threaded_same_module',
-                'threaded_depends.ThreadedTest3.test_threaded_depends']
-        for case in tc.suites[0]._tests:
-            self.assertEqual(case.id(),
-                    case_ids[tc.suites[0]._tests.index(case)])
-
-        case_ids = ['threaded_alone.ThreadedTestAlone.test_threaded_alone']
-        for case in tc.suites[1]._tests:
-            self.assertEqual(case.id(),
-                    case_ids[tc.suites[1]._tests.index(case)])
-
-        case_ids = ['threaded_module.ThreadedTestModule.test_threaded_module',
-                'threaded_module.ThreadedTestModule2.test_threaded_module2']
-        for case in tc.suites[2]._tests:
-            self.assertEqual(case.id(),
-                    case_ids[tc.suites[2]._tests.index(case)])
-
-        self.cases_path = cases_path
 
 if __name__ == '__main__':
     unittest.main()

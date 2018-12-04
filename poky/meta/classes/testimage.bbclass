@@ -2,7 +2,7 @@
 #
 # Released under the MIT license (see COPYING.MIT)
 
-
+inherit metadata_scm
 # testimage.bbclass enables testing of qemu images using python unittests.
 # Most of the tests are commands run on target image over ssh.
 # To use it add testimage to global inherit and call your target image with -c testimage
@@ -131,6 +131,30 @@ def testimage_sanity(d):
              or not d.getVar('TEST_SERVER_IP'))):
         bb.fatal('When TEST_TARGET is set to "simpleremote" '
                  'TEST_TARGET_IP and TEST_SERVER_IP are needed too.')
+
+def get_testimage_configuration(d, test_type, machine):
+    import platform
+    from oeqa.utils.metadata import get_layers
+    configuration = {'TEST_TYPE': test_type,
+                    'MACHINE': machine,
+                    'DISTRO': d.getVar("DISTRO"),
+                    'IMAGE_BASENAME': d.getVar("IMAGE_BASENAME"),
+                    'IMAGE_PKGTYPE': d.getVar("IMAGE_PKGTYPE"),
+                    'STARTTIME': d.getVar("DATETIME"),
+                    'HOST_DISTRO': ('-'.join(platform.linux_distribution())).replace(' ', '-'),
+                    'LAYERS': get_layers(d.getVar("BBLAYERS"))}
+    return configuration
+get_testimage_configuration[vardepsexclude] = "DATETIME"
+
+def get_testimage_json_result_dir(d):
+    json_result_dir = os.path.join(d.getVar("LOG_DIR"), 'oeqa')
+    custom_json_result_dir = d.getVar("OEQA_JSON_RESULT_DIR")
+    if custom_json_result_dir:
+        json_result_dir = custom_json_result_dir
+    return json_result_dir
+
+def get_testimage_result_id(configuration):
+    return '%s_%s_%s_%s' % (configuration['TEST_TYPE'], configuration['IMAGE_BASENAME'], configuration['MACHINE'], configuration['STARTTIME'])
 
 def testimage_main(d):
     import os
@@ -299,7 +323,10 @@ def testimage_main(d):
     # Show results (if we have them)
     if not results:
         bb.fatal('%s - FAILED - tests were interrupted during execution' % pn, forcelog=True)
-    results.logDetails()
+    configuration = get_testimage_configuration(d, 'runtime', machine)
+    results.logDetails(get_testimage_json_result_dir(d),
+                       configuration,
+                       get_testimage_result_id(configuration))
     results.logSummary(pn)
     if not results.wasSuccessful():
         bb.fatal('%s - FAILED - check the task log and the ssh log' % pn, forcelog=True)

@@ -17,7 +17,8 @@ class BuildProject(metaclass=ABCMeta):
         self.uri = uri
         self.archive = os.path.basename(uri)
         if not tmpdir:
-            tmpdir = tempfile.mkdtemp(prefix='buildproject')
+            self.tempdirobj = tempfile.TemporaryDirectory(prefix='buildproject-')
+            tmpdir = self.tempdirobj.name
         self.localarchive = os.path.join(tmpdir, self.archive)
         self.dl_dir = dl_dir
         if foldername:

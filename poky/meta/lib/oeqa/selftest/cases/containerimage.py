@@ -39,6 +39,7 @@ class ContainerImageTests(OESelftestTestCase):
 IMAGE_FSTYPES = "container"
 PACKAGE_CLASSES = "package_ipk"
 IMAGE_FEATURES = ""
+IMAGE_BUILDINFO_FILE = ""
 """)
 
         bbvars = get_bb_vars(['bindir', 'sysconfdir', 'localstatedir',

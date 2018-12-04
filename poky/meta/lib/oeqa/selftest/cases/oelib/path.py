@@ -38,13 +38,6 @@ class TestRealPath(TestCase):
         ( "b/test", errno.ENOENT ),
     ]
 
-    def __del__(self):
-        try:
-            #os.system("tree -F %s" % self.tmpdir)
-            shutil.rmtree(self.tmpdir)
-        except:
-            pass
-
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp(prefix = "oe-test_path")
         self.root = os.path.join(self.tmpdir, "R")
@@ -58,6 +51,9 @@ class TestRealPath(TestCase):
             open(os.path.join(self.root, f), "w")
         for l in self.LINKS:
             os.symlink(l[1], os.path.join(self.root, l[0]))
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
 
     def __realpath(self, file, use_physdir, assume_dir = True):
         return oe.path.realpath(os.path.join(self.root, file), self.root,

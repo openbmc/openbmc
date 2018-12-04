@@ -33,13 +33,3 @@ class TestBase(unittest.TestCase):
         tc.loadTests(self.cases_path, modules=modules, tests=tests,
                      filters=filters)
         return tc
-
-    def _testLoaderThreaded(self, d={}, modules=[],
-            tests=[], filters={}):
-        from oeqa.core.threaded import OETestContextThreaded
-
-        tc = OETestContextThreaded(d, self.logger)
-        tc.loadTests(self.cases_path, modules=modules, tests=tests,
-                     filters=filters)
-
-        return tc

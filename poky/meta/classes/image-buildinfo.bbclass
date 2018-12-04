@@ -64,6 +64,8 @@ def buildinfo_target(d):
 
 # Write build information to target filesystem
 python buildinfo () {
+    if not d.getVar('IMAGE_BUILDINFO_FILE'):
+        return
     with open(d.expand('${IMAGE_ROOTFS}${IMAGE_BUILDINFO_FILE}'), 'w') as build:
         build.writelines((
             '''-----------------------

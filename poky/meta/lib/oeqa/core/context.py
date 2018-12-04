@@ -27,7 +27,6 @@ class OETestContext(object):
         self.logger = logger
         self._registry = {}
         self._registry['cases'] = collections.OrderedDict()
-        self._results = {}
 
     def _read_modules_from_manifest(self, manifest):
         if not os.path.exists(manifest):

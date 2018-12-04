@@ -14,6 +14,30 @@
 #
 # where "<image-name>" is an image like core-image-sato.
 
+def get_sdk_configuration(d, test_type):
+    import platform
+    from oeqa.utils.metadata import get_layers
+    configuration = {'TEST_TYPE': test_type,
+                    'MACHINE': d.getVar("MACHINE"),
+                    'SDKMACHINE': d.getVar("SDKMACHINE"),
+                    'IMAGE_BASENAME': d.getVar("IMAGE_BASENAME"),
+                    'IMAGE_PKGTYPE': d.getVar("IMAGE_PKGTYPE"),
+                    'STARTTIME': d.getVar("DATETIME"),
+                    'HOST_DISTRO': ('-'.join(platform.linux_distribution())).replace(' ', '-'),
+                    'LAYERS': get_layers(d.getVar("BBLAYERS"))}
+    return configuration
+get_sdk_configuration[vardepsexclude] = "DATETIME"
+
+def get_sdk_json_result_dir(d):
+    json_result_dir = os.path.join(d.getVar("LOG_DIR"), 'oeqa')
+    custom_json_result_dir = d.getVar("OEQA_JSON_RESULT_DIR")
+    if custom_json_result_dir:
+        json_result_dir = custom_json_result_dir
+    return json_result_dir
+
+def get_sdk_result_id(configuration):
+    return '%s_%s_%s_%s_%s' % (configuration['TEST_TYPE'], configuration['IMAGE_BASENAME'], configuration['SDKMACHINE'], configuration['MACHINE'], configuration['STARTTIME'])
+
 def testsdk_main(d):
     import os
     import subprocess
@@ -23,8 +47,6 @@ def testsdk_main(d):
     from bb.utils import export_proxies
     from oeqa.sdk.context import OESDKTestContext, OESDKTestContextExecutor
     from oeqa.utils import make_logger_bitbake_compatible
-
-    bb.event.enable_threadlock()
 
     pn = d.getVar("PN")
     logger = make_logger_bitbake_compatible(logging.getLogger("BitBake"))
@@ -71,8 +93,10 @@ def testsdk_main(d):
 
         component = "%s %s" % (pn, OESDKTestContextExecutor.name)
         context_msg = "%s:%s" % (os.path.basename(tcname), os.path.basename(sdk_env))
-
-        result.logDetails()
+        configuration = get_sdk_configuration(d, 'sdk')
+        result.logDetails(get_sdk_json_result_dir(d),
+                          configuration,
+                          get_sdk_result_id(configuration))
         result.logSummary(component, context_msg)
 
         if not result.wasSuccessful():
@@ -98,8 +122,6 @@ def testsdkext_main(d):
     from bb.utils import export_proxies
     from oeqa.utils import avoid_paths_in_environ, make_logger_bitbake_compatible, subprocesstweak
     from oeqa.sdkext.context import OESDKExtTestContext, OESDKExtTestContextExecutor
-
-    bb.event.enable_threadlock()
 
     pn = d.getVar("PN")
     logger = make_logger_bitbake_compatible(logging.getLogger("BitBake"))
@@ -176,8 +198,10 @@ def testsdkext_main(d):
 
         component = "%s %s" % (pn, OESDKExtTestContextExecutor.name)
         context_msg = "%s:%s" % (os.path.basename(tcname), os.path.basename(sdk_env))
-
-        result.logDetails()
+        configuration = get_sdk_configuration(d, 'sdkext')
+        result.logDetails(get_sdk_json_result_dir(d),
+                          configuration,
+                          get_sdk_result_id(configuration))
         result.logSummary(component, context_msg)
 
         if not result.wasSuccessful():

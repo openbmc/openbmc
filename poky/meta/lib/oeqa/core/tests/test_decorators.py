@@ -131,17 +131,5 @@ class TestTimeoutDecorator(TestBase):
         msg = "OETestTimeout didn't restore SIGALRM"
         self.assertIs(alarm_signal, signal.getsignal(signal.SIGALRM), msg=msg)
 
-    def test_timeout_thread(self):
-        tests = ['timeout.TimeoutTest.testTimeoutPass']
-        msg = 'Failed to run test using OETestTimeout'
-        tc = self._testLoaderThreaded(modules=self.modules, tests=tests)
-        self.assertTrue(tc.runTests().wasSuccessful(), msg=msg)
-
-    def test_timeout_threaded_fail(self):
-        tests = ['timeout.TimeoutTest.testTimeoutFail']
-        msg = "OETestTimeout test didn't timeout as expected"
-        tc = self._testLoaderThreaded(modules=self.modules, tests=tests)
-        self.assertFalse(tc.runTests().wasSuccessful(), msg=msg)
-
 if __name__ == '__main__':
     unittest.main()

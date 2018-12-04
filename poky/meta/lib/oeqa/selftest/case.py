@@ -12,6 +12,8 @@ import oeqa.utils.ftools as ftools
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var
 from oeqa.core.case import OETestCase
 
+import bb.utils
+
 class OESelftestTestCase(OETestCase):
     def __init__(self, methodName="runTest"):
         self._extra_tear_down_commands = []
@@ -167,7 +169,7 @@ to ensure accurate results.")
         if self._track_for_cleanup:
             for path in self._track_for_cleanup:
                 if os.path.isdir(path):
-                    shutil.rmtree(path)
+                    bb.utils.remove(path, recurse=True)
                 if os.path.isfile(path):
                     os.remove(path)
             self._track_for_cleanup = []
