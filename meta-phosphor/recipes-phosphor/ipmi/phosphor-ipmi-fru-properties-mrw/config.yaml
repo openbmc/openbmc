@@ -29,3 +29,11 @@ NODE:
         Cached: 'false'
     xyz.openbmc_project.Inventory.Item:
         Present: 'true'
+
+TPM:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'false'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
