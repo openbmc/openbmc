@@ -78,8 +78,6 @@ DISTRO_NAME = "Phosphor OpenBMC (Phosphor OpenBMC Project Reference Distro)"
 DISTRO_VERSION = "0.1.0"
 TARGET_VENDOR="-openbmc"
 
-IMAGE_LINGUAS = "en-us"
-
 VIRTUAL-RUNTIME_keymaps = ""
 
 # Phosphor OpenBMC uses systemd and udev
