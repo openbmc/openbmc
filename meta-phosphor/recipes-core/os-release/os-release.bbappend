@@ -24,9 +24,13 @@ python() {
     build_id = run_git(d, 'describe --abbrev=0')
     if build_id:
         d.setVar('BUILD_ID', build_id)
+
+    target_machine = d.getVar('MACHINE', True)
+    if target_machine:
+        d.setVar('OPENBMC_TARGET_MACHINE', target_machine)
 }
 
-OS_RELEASE_FIELDS_append = " BUILD_ID"
+OS_RELEASE_FIELDS_append = " BUILD_ID OPENBMC_TARGET_MACHINE"
 
 # Ensure the git commands run every time bitbake is invoked.
 BB_DONT_CACHE = "1"
