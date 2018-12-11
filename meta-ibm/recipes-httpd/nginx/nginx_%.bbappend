@@ -9,6 +9,11 @@ SRC_URI += " \
     file://gen-cert.sh \
     "
 
+RDEPENDS_${PN} += " \
+        openssl \
+        ${VIRTUAL-RUNTIME_base-utils} \
+        "
+
 EXTRA_OECONF =+ " --without-select_module --with-http_gunzip_module"
 
 SSLCERTPATH = "/etc/ssl/certs/nginx/"
