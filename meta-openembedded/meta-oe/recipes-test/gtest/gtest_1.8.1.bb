@@ -1,5 +1,5 @@
 DESCRIPTION = "Google's framework for writing C++ tests"
-HOMEPAGE = "https://github.com/google/googletest"
+HOMEPAGE = "https://github.com/abseil/googletest"
 SECTION = "libs"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://googlemock/LICENSE;md5=cbbd27594afd089daa160d3a16dd515a \
@@ -8,10 +8,9 @@ LIC_FILES_CHKSUM = "file://googlemock/LICENSE;md5=cbbd27594afd089daa160d3a16dd51
 PROVIDES += "gmock"
 
 S = "${WORKDIR}/git"
-SRCREV = "ec44c6c1675c25b9827aacd08c02433cccde7780"
+SRCREV = "2fe3bd994b3189899d93f1d5a881e725e046fdc2"
 SRC_URI = "\
-    git://github.com/google/googletest.git;protocol=https; \
-    file://Add-pkg-config-support.patch \
+    git://github.com/abseil/googletest.git;protocol=https; \
 "
 
 inherit cmake
