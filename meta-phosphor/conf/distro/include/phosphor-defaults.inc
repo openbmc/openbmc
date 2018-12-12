@@ -244,3 +244,10 @@ OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
 # Will add a build dependency to host-ipmid on the
 # phosphor-ipmi-fru-whitelist-native recipe.
 VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
+
+# Set the root password to '0penBmc'
+inherit extrausers
+
+EXTRA_USERS_PARAMS = " \
+  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
+  "

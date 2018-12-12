@@ -15,9 +15,5 @@ BB_DISKMON_DIRS = "\
     ABORT,${SSTATE_DIR},100M,1K \
     ABORT,/tmp,10M,1K"
 CONF_VERSION = "1"
-INHERIT += "extrausers"
-EXTRA_USERS_PARAMS = " \
-  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
-  "
 MACHINE_FEATURES_BACKFILL_CONSIDERED = "qemu-usermode"
 
