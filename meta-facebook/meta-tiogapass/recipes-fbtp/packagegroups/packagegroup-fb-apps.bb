@@ -16,4 +16,5 @@ SUMMARY_${PN}-system = "Facebook System"
 RDEPENDS_${PN}-system = " \
         entity-manager \
         dbus-sensors \
+        fb-powerctrl \
         "

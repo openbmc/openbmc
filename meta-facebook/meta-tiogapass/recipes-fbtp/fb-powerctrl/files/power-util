@@ -1,0 +1,49 @@
+#!/bin/bash
+# Usage of this utility
+function usage() {
+	echo "usage: power-util mb 1 [on|off]";
+}
+
+GPIO_BASE=$(cat /sys/class/gpio/gpio*/base)
+PWR_GPIO=$(($GPIO_BASE + 32 + 3))
+BMC_RDY_GPIO=$(($GPIO_BASE + 144 +1))
+
+if [ $# -lt 3 ]; then
+	echo "Total number of parameter=$#"
+	echo "Insufficient parameter"
+	usage;
+	exit 0;
+fi
+
+if [ $1 != "mb" ]; then
+	echo "Invalid parameter1=$1"
+	usage;
+	exit 0;
+fi
+
+if [ $2 -ne 1 ]; then
+	echo "Invalid parameter2=$2, Server $2 not supported"
+	usage;
+	exit 0;
+fi
+
+if [ $3 = "on" ]; then
+	echo "Powering on Server $2"
+	echo 0 > /sys/class/gpio/gpio${BMC_RDY_GPIO}/value
+	echo 1 > /sys/class/gpio/gpio${PWR_GPIO}/value
+	echo 0 > /sys/class/gpio/gpio${PWR_GPIO}/value
+	sleep 1
+	echo 1 > /sys/class/gpio/gpio${PWR_GPIO}/value
+elif [ $3 = "off" ]; then
+	echo "Shutting down Server $2"
+	echo 1 > /sys/class/gpio/gpio${PWR_GPIO}/value
+	sleep 1
+	echo 0 > /sys/class/gpio/gpio${PWR_GPIO}/value
+	sleep 6
+	echo 1 > /sys/class/gpio/gpio${PWR_GPIO}/value
+else
+	echo "Invalid parameter3=$3"
+	usage;
+fi
+
+exit 0;
