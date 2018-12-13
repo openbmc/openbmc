@@ -3,7 +3,7 @@ DESCRIPTION = "Entity Manager provides d-bus configuration data \
 and configures system sensors"
 
 SRC_URI = "git://github.com/openbmc/entity-manager.git"
-SRCREV = "2f0030cd9fdbc1422eff3951e90e0a72b0091b9c"
+SRCREV = "3cab78718e266416be9cea4b15b6370e18bbafcb"
 PV = "0.1+git${SRCPV}"
 
 LICENSE = "Apache-2.0"
