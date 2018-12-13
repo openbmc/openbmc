@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/x86-power-control.git"
-SRCREV = "c8153bca62d25f441bab5b7804cebf6ee8c7e989"
+SRCREV = "80f6d927c220be0e638a0674a986429825a070aa"
 
 inherit cmake pkgconfig  pythonnative systemd
 
