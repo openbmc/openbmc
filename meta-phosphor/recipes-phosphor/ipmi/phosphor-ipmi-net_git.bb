@@ -17,12 +17,6 @@ RDEPENDS_${PN} += "libmapper"
 RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "iptables"
 
-inherit useradd
-
-USERADD_PACKAGES = "${PN}"
-# add ipmi group
-GROUPADD_PARAM_${PN} = "ipmi"
-
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
 SRC_URI += "file://ipmi-net-firewall.sh"
 SRCREV = "472a37be3a4f6585fa2d30cdc69a27c38771c0bf"
