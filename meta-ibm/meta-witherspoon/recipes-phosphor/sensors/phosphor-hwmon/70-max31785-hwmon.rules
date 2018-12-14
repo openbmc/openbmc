@@ -1,1 +1,1 @@
-SUBSYSTEM=="hwmon", ACTION=="add", ENV{OF_NAME}=="max31785", RUN="/bin/systemctl start max31785-hwmon-helper@%E{OF_FULLNAME}.service"
+SUBSYSTEM=="hwmon", ACTION=="add", ENV{OF_NAME}=="max31785", PROGRAM="/bin/systemd-escape -p '%E{OF_FULLNAME}'", RUN="/bin/systemctl start max31785-hwmon-helper@%c.service"

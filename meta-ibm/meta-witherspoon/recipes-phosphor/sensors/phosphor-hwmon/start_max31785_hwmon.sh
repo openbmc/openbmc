@@ -3,9 +3,9 @@
 # Copy in the correct MAX31785 phosphor-hwmon config file to use based on the
 # WaterCooled property, and then start the hwmon service.
 
-# $1: The OF_FULLNAME udev attribute for the MAX31785
+# $1: The escaped OF_FULLNAME udev attribute for the MAX31785
 
-base="/etc/default/obmc/hwmon/"$1
+base="/etc/default/obmc/hwmon/"$(systemd-escape -u "$1")
 target=$base".conf"
 
 service=$(mapper get-service /xyz/openbmc_project/inventory/system/chassis)
@@ -22,5 +22,5 @@ fi
 
 cp $source $target
 
-instance=$(systemd-escape $1)
+instance='-'$1
 systemctl start xyz.openbmc_project.Hwmon@$instance.service

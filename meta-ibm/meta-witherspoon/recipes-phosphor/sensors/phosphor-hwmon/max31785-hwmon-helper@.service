@@ -5,5 +5,5 @@ After=phosphor-cooling-type@0.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/env start_max31785_hwmon.sh %I
+ExecStart=/usr/bin/env start_max31785_hwmon.sh %i
 SyslogIdentifier=max31785-hwmon-helper
