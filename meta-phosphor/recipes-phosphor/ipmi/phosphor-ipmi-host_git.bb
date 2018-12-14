@@ -56,6 +56,8 @@ inherit useradd
 USERADD_PACKAGES = "${PN}"
 # add ipmi group
 GROUPADD_PARAM_${PN} = "ipmi"
+# Add root user to ipmi group
+GROUPMEMS_PARAM_${PN} = "-g ipmi -a root"
 
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 

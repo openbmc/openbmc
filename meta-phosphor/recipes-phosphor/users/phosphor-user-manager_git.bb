@@ -26,6 +26,10 @@ DBUS_PACKAGES = "${USERADD_PACKAGES}"
 # add groups needed for privilege maintenance
 GROUPADD_PARAM_${PN} = "priv-admin; priv-operator; priv-user; priv-callback "
 GROUPADD_PARAM_phosphor-ldap = "priv-admin; priv-operator; priv-user; priv-callback "
+
+# Add root user to priv-admin group
+GROUPMEMS_PARAM_${PN} = "-g priv-admin -a root"
+
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.User.Manager.service"
 FILES_phosphor-ldap += " \
         ${sbindir}/phosphor-ldap-conf \
