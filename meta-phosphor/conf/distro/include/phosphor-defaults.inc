@@ -248,6 +248,6 @@ VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
 # Set the root password to '0penBmc'
 inherit extrausers
 
-EXTRA_USERS_PARAMS = " \
+EXTRA_USERS_PARAMS_pn-obmc-phosphor-image = " \
   usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
   "
