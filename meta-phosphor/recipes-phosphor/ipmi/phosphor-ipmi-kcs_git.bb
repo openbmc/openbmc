@@ -27,7 +27,7 @@ RDEPENDS_${PN} += "libsystemd"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/kcsbridge.git;protocol=https"
-SRCREV = "ccf086f151b30d792efec493021fd862f9b3e77e"
+SRCREV = "33aea0d47f4cb32191ddce32db8716acf29c8acb"
 
 # This is how linux-libc-headers says to include custom uapi headers
 CFLAGS_append = " -I ${STAGING_KERNEL_DIR}/include/uapi"
