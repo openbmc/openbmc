@@ -108,7 +108,6 @@ a new one.
 * Host Watchdog
 * Simulation
 * Code Update Support for multiple BMC/BIOS images
-* POWER On Chip Controller (OCC) Support
 
 **Features In Progress**
 * Full IPMI 2.0 Compliance with DCMI
